@@ -344,8 +344,13 @@ ACTION ActionPressNewStandardSelect(void){
 
 ACTION ActionPressNewStandardOkay(void){
 
-    fprintf(stderr, "%s\n", GetStrValue("filemapspath"));
-    return NONE;
+    if(GetStrValue("filemapspath")){
+
+	fprintf(stderr, "%s\n", GetStrValue("filemapspath"));
+	return NONE;
+
+    }else
+	return NONE;
 }
 
 ACTION ActionPressNewStandardCancel(void){

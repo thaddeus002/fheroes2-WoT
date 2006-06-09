@@ -218,7 +218,6 @@ void SetIntValue(const char *key, Uint8 value){
 		strcpy(ptr->valueStr, "1280x1024");
 		ptr->valueInt = 3;
 		break;
-
 	}
 
     else if(0 == strcmp(ptr->key, "limitmemory"))
