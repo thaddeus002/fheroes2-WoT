@@ -37,6 +37,8 @@
 #include "agg.h"
 #include "cursor.h"
 #include "sound.h"
+#include "monster.h"
+#include "artifact.h"
 
 int main(int argc, char **argv){
 
@@ -145,6 +147,8 @@ int main(int argc, char **argv){
     // инициализация игровых данных
     if(! InitAGG(heroes2_agg)) exit(1);
     InitSound();
+    InitMonster();
+    InitArtifact();
     InitCursor();
 
     // переходим на первый экран
@@ -155,6 +159,7 @@ int main(int argc, char **argv){
 
     // освобождаем данные
     FreeCursor();
+    FreeMonster();
     FreeSound();
     FreeAGG();
 

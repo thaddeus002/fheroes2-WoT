@@ -27,11 +27,8 @@
 */
 
 #include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <dirent.h>
 #include <string.h>
-#include <limits.h>
 #include "SDL.h"
 #include "agg.h"
 #include "actionevent.h"
@@ -88,8 +85,8 @@ void InitSlider(void);
 void DrawSlider(Uint16);
 void ResetSlider(void);
 void FreeSlider(void);
-FILEMAPINFO *ExistsMapSizeDown(FILEMAPINFO *, SIZEMAP);	// дополнительная функция поиска элемента по критерию (SIZEMAP)
-FILEMAPINFO *ExistsMapSizeUp(FILEMAPINFO *, SIZEMAP);	// дополнительная функция поиска элемента по критерию (SIZEMAP)
+FILEMAPINFO *ExistsMapSizeDown(FILEMAPINFO *, E_SIZEMAP);	// дополнительная функция поиска элемента по критерию (E_SIZEMAP)
+FILEMAPINFO *ExistsMapSizeUp(FILEMAPINFO *, E_SIZEMAP);	// дополнительная функция поиска элемента по критерию (E_SIZEMAP)
 
 ACTION ActionPressShowSmall(void);
 ACTION ActionPressShowMedium(void);
@@ -105,7 +102,7 @@ ACTION ActionPressScrollBar(void);
 INTERFACEACTION *stpeload = NULL;
 FILEMAPINFO	*header = NULL;			// указатель головы всего списка
 FILEMAPINFO	*firstName = NULL;		// указатель текущего первого имени в окне выбора
-SIZEMAP		showmaps = MAPS_ALL;		// фильтр карты
+E_SIZEMAP		showmaps = MAPS_ALL;		// фильтр карты
 Uint8		count = 0;			// количество отображенных имен (отсортированных по размеру)
 FILEMAPINFO	*currentName = NULL;		// текущий выделенный элемент
 SCROLLCURSOR	*slider;
@@ -873,7 +870,7 @@ void ShowFileMapInfo(FILEMAPINFO *cur){
     PrintText(video, &dest, (const char *) cur->info.description, FONT_BIG);
 }
 
-FILEMAPINFO *ExistsMapSizeDown(FILEMAPINFO *cur, SIZEMAP size){
+FILEMAPINFO *ExistsMapSizeDown(FILEMAPINFO *cur, E_SIZEMAP size){
 
     while(cur->next){
 
@@ -905,7 +902,7 @@ FILEMAPINFO *ExistsMapSizeDown(FILEMAPINFO *cur, SIZEMAP size){
     return NULL;
 }
 
-FILEMAPINFO *ExistsMapSizeUp(FILEMAPINFO *cur, SIZEMAP size){
+FILEMAPINFO *ExistsMapSizeUp(FILEMAPINFO *cur, E_SIZEMAP size){
 
     if(cur == header) return NULL;
 
