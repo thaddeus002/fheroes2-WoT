@@ -26,43 +26,21 @@
     Description:
 */
 
-#ifndef _AGG_H
-#define _AGG_H
+#ifndef _RESOURCE_H
+#define _RESOURCE_H
 
-#include "SDL.h"
-#include "gamedefs.h"
 
-#define AGGSIZENAME     15
+typedef enum {
+		RES_NULL	= 0,
+                WOOD		= 1,
+                MERCURY		= 3,
+                ORE		= 5,
+                SULFUR		= 7,
+                CRYSTAL		= 9,
+                GEMS		= 11,
+                GOLDS		= 13
+            } E_RESOURCE;
 
-typedef enum {ICN, WAV, TIL, BMP, XMI, BIN, PAL, FNT, UNK} AGGTYPE;
-
-typedef struct {
-    char	name[AGGSIZENAME];
-    Uint16	number;
-} AGGSPRITE;
-
-typedef struct {
-    Uint16      offsetX;
-    Uint16      offsetY;
-    SDL_Surface *surface;
-    void        *next;
-} ICNHEADER;
-
-BOOL            InitAGG(const char *);
-void            FreeAGG(void);
-void		PreloadObject(const char *);
-void		FreeObject(const char *);
-
-SDL_Surface *   GetICNSprite(AGGSPRITE *);
-ICNHEADER *     GetICNHeader(AGGSPRITE *);
-Uint8 *		GetTILData(const char *);
-
-SDL_AudioCVT *  GetAudioCVT(const char *);
-
-AGGTYPE		ExistsAGGName(const char *);
-
-SDL_Color *     GetPalette(void);
-
-Uint32		GetCurrentSizeMemory(void);
+E_RESOURCE GetRNDResource();
 
 #endif

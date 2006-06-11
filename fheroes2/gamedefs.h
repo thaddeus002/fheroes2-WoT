@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060610
+#define VERSION 20060611
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -45,6 +45,15 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define TILEWIDTH       32
 
 typedef enum {
+	    BLUE,
+	    RED,
+	    GREEN,
+	    YELLOW,
+	    ORANGE,
+	    PURPLE
+	    } E_COLORS;
+
+typedef enum {
 		MAPS_ALL	= 0, 
 		MAPS_SMALL	= 36, 
 		MAPS_MEDIUM	= 72, 
@@ -52,27 +61,6 @@ typedef enum {
 		MAPS_XLARGE	= 144
 
 	    } E_SIZEMAP;
-
-typedef enum {
-		LUCK_AWFUL	= -2, 
-		LUCK_BAD	= -1, 
-		LUCK_NORMAL	= 0, 
-		LUCK_GOOD	= 1, 
-		LUCK_GREAT	= 2, 
-		LUCK_IRISH	= 3
-		
-	    } E_LUCK;
-
-typedef enum {
-		MORALE_TREASON	= -3,
-		MORALE_AWFUL	= -2, 
-		MORALE_POOR	= -1, 
-		MORALE_NORMAL	= 0, 
-		MORALE_GOOD	= 1, 
-		MORALE_GREAT	= 2, 
-		MORALE_IRISH	= 3
-		
-	    } E_MORALE;
 
 typedef enum {
 		DESERT, 
@@ -87,15 +75,26 @@ typedef enum {
 		ROAD
 
 	    } E_SURFACE;
-
+                
 typedef enum {
-		WOOD		= 1,
-		MERCURY		= 3,
-		ORE		= 5,
-		SULFUR		= 7,
-		CRYSTAL		= 9,
-		GEMS		= 11,
-		GOLD		= 13
-	    } E_RESOURCE;
+                LUCK_AWFUL      = -2,
+                LUCK_BAD        = -1,
+                LUCK_NORMAL     = 0,
+                LUCK_GOOD       = 1,
+                LUCK_GREAT      = 2,
+                LUCK_IRISH      = 3
+                
+            } E_LUCK;
+                
+typedef enum {
+                MORALE_TREASON  = -3,
+                MORALE_AWFUL    = -2,
+                MORALE_POOR     = -1,
+                MORALE_NORMAL   = 0,
+                MORALE_GOOD     = 1,
+                MORALE_GREAT    = 2,
+                MORALE_IRISH    = 3
+                
+            } E_MORALE;
 
 #endif

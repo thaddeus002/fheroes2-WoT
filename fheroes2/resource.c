@@ -26,43 +26,48 @@
     Description:
 */
 
-#ifndef _AGG_H
-#define _AGG_H
-
+#include <stdlib.h>
 #include "SDL.h"
-#include "gamedefs.h"
 
-#define AGGSIZENAME     15
+#include "resource.h"
 
-typedef enum {ICN, WAV, TIL, BMP, XMI, BIN, PAL, FNT, UNK} AGGTYPE;
+E_RESOURCE GetRNDResource(){
 
-typedef struct {
-    char	name[AGGSIZENAME];
-    Uint16	number;
-} AGGSPRITE;
+    switch(rand() % 7){
+    
+	case 0:
+	    return WOOD;
+	    break;
+	
+	case 1:
+	    return MERCURY;
+	    break;
+	    
+	case 2:
+	    return ORE;
+	    break;
+	    
+	case 3:
+	    return SULFUR;
+	    break;
+	
+	case 4:
+	    return CRYSTAL;
+	    break;
+	
+	case 5:
+	    return GEMS;
+	    break;
+	
+	case 6:
+	    return GOLDS;
+	    break;
 
-typedef struct {
-    Uint16      offsetX;
-    Uint16      offsetY;
-    SDL_Surface *surface;
-    void        *next;
-} ICNHEADER;
+	default:
+	    break;
+    }
+    
+    return RES_NULL;
+}
 
-BOOL            InitAGG(const char *);
-void            FreeAGG(void);
-void		PreloadObject(const char *);
-void		FreeObject(const char *);
 
-SDL_Surface *   GetICNSprite(AGGSPRITE *);
-ICNHEADER *     GetICNHeader(AGGSPRITE *);
-Uint8 *		GetTILData(const char *);
-
-SDL_AudioCVT *  GetAudioCVT(const char *);
-
-AGGTYPE		ExistsAGGName(const char *);
-
-SDL_Color *     GetPalette(void);
-
-Uint32		GetCurrentSizeMemory(void);
-
-#endif

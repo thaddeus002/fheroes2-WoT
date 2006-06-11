@@ -29,7 +29,23 @@
 #ifndef _ARTIFACT_H
 #define _ARTIFACT_H
 
+#include "SDL.h"
+#include "gamedefs.h"
+#include "resource.h"
+
+#define	ARTIFACTCOUNT_LEVEL1	27
+#define	ARTIFACTCOUNT_LEVEL2	21
+#define	ARTIFACTCOUNT_LEVEL3	22
+
 typedef enum {
+	    ART_ALL,
+	    ART_LEVEL1,
+	    ART_LEVEL2,
+	    ART_LEVEL3
+	    } E_LEVELARTIFACT;
+
+typedef enum {
+		ARTIFACT_NONE,
 		ULTIMATE_BOOK,
 		ULTIMATE_SWORD,
 		ULTIMATE_CLOAK,
@@ -112,8 +128,7 @@ typedef enum {
 		WHITE_PEARL,
 		BLACK_PEARL,
 
-/* VARIANT HEROES 2.2
-		MAGIC_BOOK,
+/* HEROES 2.2 (ANDURAN VERSION)
 		SPELL_SCROLL,
 		ARM_MARTYR,
 		BREASTPLATE_ANDURAN,
@@ -132,10 +147,18 @@ typedef enum {
 		SWORD_ANDURAN,
 		SPADE_NECROMANCY,
 */
+		MAGIC_BOOK,
 		E_ARTIFACT_COUNT
 	    } E_ARTIFACT;
 
+typedef struct {
+		const char *	name;
+		const char *	description;
+	    } S_ARTIFACT;
+
 void		InitArtifact(void);
-const char *	GetDescriptionArtifact(E_ARTIFACT);
+void		FreeArtifact(void);
+S_ARTIFACT *	GetStatArtifact(E_ARTIFACT);
+E_ARTIFACT	GetRNDArtifact(E_LEVELARTIFACT);
 
 #endif

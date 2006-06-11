@@ -30,177 +30,302 @@
 #include <string.h>
 #include "SDL.h"
 
+#include "heroes.h"
+#include "resource.h"
 #include "artifact.h"
 
-static char *descriptionArtifact[E_ARTIFACT_COUNT];
+static S_ARTIFACT * ptrArtifact = NULL;
 
-const char * GetDescriptionArtifact(E_ARTIFACT artifact){
+S_ARTIFACT * GetStatArtifact(E_ARTIFACT artifact){
 
-    return descriptionArtifact[artifact];
+    return &ptrArtifact[artifact];
+}
+
+void FreeArtifact(void){
+
+    if(ptrArtifact) free(ptrArtifact);
+    
+    ptrArtifact = NULL;
+}
+
+E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
+
+    E_ARTIFACT level1[] = { MEDAL_VALOR, MEDAL_COURAGE, MEDAL_HONOR, MEDAL_DISTINCTION, THUNDER_MACE, ARMORED_GAUNTLETS, DEFENDER_HELM, GIANT_FLAIL, RABBIT_FOOT, GOLDEN_HORSESHOE, GAMBLER_LUCKY_COIN, FOUR_LEAF_CLOVER, ENCHANTED_HOURGLASS, ICE_CLOAK, FIRE_CLOAK, LIGHTNING_HELM, SNAKE_RING, HOLY_PENDANT, PENDANT_FREE_WILL, PENDANT_LIFE, PENDANT_DEATH, GOLDEN_BOW, TELESCOPE, SERENITY_PENDANT, STATESMAN_QUILL, KINETIC_PENDANT, SEEING_EYE_PENDANT };
+    E_ARTIFACT level2[] = { CASTER_BRACELET, MAGE_RING, STEALTH_SHIELD, POWER_AXE, MINOR_SCROLL, ENDLESS_PURSE_GOLD, SAILORS_ASTROLABE_MOBILITY, ENDLESS_CORD_WOOD, ENDLESS_CART_ORE, SPIKED_HELM, WHITE_PEARL, EVIL_EYE, GOLD_WATCH, ANKH, BOOK_ELEMENTS, ELEMENTAL_RING, SKULLCAP, EVERCOLD_ICICLE, POWER_RING, AMMO_CART, EVERHOT_LAVA_ROCK };
+    E_ARTIFACT level3[] = { ARCANE_NECKLACE, WITCHES_BROACH, BALLISTA, DRAGON_SWORD, DIVINE_BREASTPLATE, MAJOR_SCROLL, SUPERIOR_SCROLL, FOREMOST_SCROLL, ENDLESS_SACK_GOLD, ENDLESS_BAG_GOLD, NOMAD_BOOTS_MOBILITY, TRAVELER_BOOTS_MOBILITY, TRUE_COMPASS_MOBILITY, ENDLESS_POUCH_SULFUR, ENDLESS_POUCH_GEMS, ENDLESS_POUCH_CRYSTAL, ENDLESS_VIAL_MERCURY, SPIKED_SHIELD, BLACK_PEARL, LIGHTNING_ROD, WAND_NEGATION, WIZARD_HAT };
+
+    switch(level){
+    
+	case ART_LEVEL1:
+	    return level1[rand() % ARTIFACTCOUNT_LEVEL1];
+	    break;
+	    
+	case ART_LEVEL2:
+	    return level2[rand() % ARTIFACTCOUNT_LEVEL2];
+	    break;
+	    
+	case ART_LEVEL3:
+	    return level3[rand() % ARTIFACTCOUNT_LEVEL3];
+	    break;
+	    
+	default:
+	    break;
+    }
+
+    // ART_ALL
+    return 9 + (rand() % (E_ARTIFACT_COUNT - 10));
 }
 
 void    InitArtifact(void){
 
-	descriptionArtifact[ULTIMATE_BOOK] = "The Ultimate Book of Knowledge increases your knowledge by 12.";
+	if(NULL == (ptrArtifact = malloc(sizeof(S_ARTIFACT) * E_ARTIFACT_COUNT))){
+	    fprintf(stderr, "InitArtifact: error malloc: %d\n", sizeof(S_ARTIFACT) * E_ARTIFACT_COUNT);
+	    return;
+	}
 
-	descriptionArtifact[ULTIMATE_SWORD] = "The Ultimate Sword of Dominion increases your attack skill by 12.";
+	ptrArtifact[ULTIMATE_BOOK].name = "Ultimate Book";
+	ptrArtifact[ULTIMATE_BOOK].description = "The Ultimate Book of Knowledge increases your knowledge by 12.";
 
-	descriptionArtifact[ULTIMATE_CLOAK] = "The Ultimate Cloak of Protection increases your defense skill by 12.";
+	ptrArtifact[ULTIMATE_SWORD].name = "Ultimate Sword";
+	ptrArtifact[ULTIMATE_SWORD].description = "The Ultimate Sword of Dominion increases your attack skill by 12.";
 
-	descriptionArtifact[ULTIMATE_WAND] = "The Ultimate Wand of Magic increases your spell power by 12.";
+	ptrArtifact[ULTIMATE_CLOAK].name = "Ultimate Cloak";
+	ptrArtifact[ULTIMATE_CLOAK].description = "The Ultimate Cloak of Protection increases your defense skill by 12.";
 
-	descriptionArtifact[ULTIMATE_SHIELD] = "The Ultimate Shield increases your attack and defense skills by 6 each.";
+	ptrArtifact[ULTIMATE_WAND].name = "Ultimate Wand";
+	ptrArtifact[ULTIMATE_WAND].description = "The Ultimate Wand of Magic increases your spell power by 12.";
 
-	descriptionArtifact[ULTIMATE_STAFF] = "The Ultimate Staff increases your spell power and knowledge by 6 each.";
+	ptrArtifact[ULTIMATE_SHIELD].name = "Ultimate Shield";
+	ptrArtifact[ULTIMATE_SHIELD].description = "The Ultimate Shield increases your attack and defense skills by 6 each.";
 
-	descriptionArtifact[ULTIMATE_CROWN] = "The Ultimate Crown increases each of your basic skills by 4 points.";
+	ptrArtifact[ULTIMATE_STAFF].name = "Ultimate Staff";
+	ptrArtifact[ULTIMATE_STAFF].description = "The Ultimate Staff increases your spell power and knowledge by 6 each.";
 
-	descriptionArtifact[GOLDEN_GOOSE] = "The Golden Goose brings in an income of 10,000 gold per turn.";
+	ptrArtifact[ULTIMATE_CROWN].name = "Ultimate Crown";
+	ptrArtifact[ULTIMATE_CROWN].description = "The Ultimate Crown increases each of your basic skills by 4 points.";
 
-	descriptionArtifact[ARCANE_NECKLACE] = "The Arcane Necklace of Magic increases your spell power by 4.";
+	ptrArtifact[GOLDEN_GOOSE].name = "Ultimate Goose";
+	ptrArtifact[GOLDEN_GOOSE].description = "The Golden Goose brings in an income of 10,000 gold per turn.";
 
-	descriptionArtifact[CASTER_BRACELET] = "The Caster's Bracelet of Magic increases your spell power by 2.";
+	ptrArtifact[ARCANE_NECKLACE].name = "Arcane Necklace";
+	ptrArtifact[ARCANE_NECKLACE].description = "The Arcane Necklace of Magic increases your spell power by 4.";
 
-	descriptionArtifact[MAGE_RING] = "The Mage's Ring of Power increases your spell power by 2.";
+	ptrArtifact[CASTER_BRACELET].name = "Caster's Bracelet";
+	ptrArtifact[CASTER_BRACELET].description = "The Caster's Bracelet of Magic increases your spell power by 2.";
 
-	descriptionArtifact[WITCHES_BROACH] = "The Witch's Broach of Magic increases your spell power by 3.";
+	ptrArtifact[MAGE_RING].name = "Mage's Ring";
+	ptrArtifact[MAGE_RING].description = "The Mage's Ring of Power increases your spell power by 2.";
 
-	descriptionArtifact[MEDAL_VALOR] = "The Medal of Valor increases your morale.";
+	ptrArtifact[WITCHES_BROACH].name = "Witches Broach";
+	ptrArtifact[WITCHES_BROACH].description = "The Witch's Broach of Magic increases your spell power by 3.";
 
-	descriptionArtifact[MEDAL_COURAGE] = "The Medal of Courage increases your morale.";
+	ptrArtifact[MEDAL_VALOR].name = "Medal of Valor";
+	ptrArtifact[MEDAL_VALOR].description = "The Medal of Valor increases your morale.";
 
-	descriptionArtifact[MEDAL_HONOR] = "The Medal of Honor increases your morale.";
+	ptrArtifact[MEDAL_COURAGE].name = "Medal of Courage";
+	ptrArtifact[MEDAL_COURAGE].description = "The Medal of Courage increases your morale.";
 
-	descriptionArtifact[MEDAL_DISTINCTION] = "The Medal of Distinction increases your morale.";
+	ptrArtifact[MEDAL_HONOR].name = "Medal of Honor";
+	ptrArtifact[MEDAL_HONOR].description = "The Medal of Honor increases your morale.";
 
-	descriptionArtifact[FIZBIN_MISFORTUNE] = "The Fizbin of Misfortune greatly decreases your morale.";
+	ptrArtifact[MEDAL_DISTINCTION].name = "Medal of Distinction";
+	ptrArtifact[MEDAL_DISTINCTION].description = "The Medal of Distinction increases your morale.";
 
-	descriptionArtifact[THUNDER_MACE] = "The Thunder Mace of Dominion increases your attack skill by 1.";
+	ptrArtifact[FIZBIN_MISFORTUNE].name = "Fizbin of Misfortune";
+	ptrArtifact[FIZBIN_MISFORTUNE].description = "The Fizbin of Misfortune greatly decreases your morale.";
 
-	descriptionArtifact[ARMORED_GAUNTLETS] = "The Armored Gauntlets of Protection increase your defense skill by 1.";
+	ptrArtifact[THUNDER_MACE].name = "Thunder Mace";
+	ptrArtifact[THUNDER_MACE].description = "The Thunder Mace of Dominion increases your attack skill by 1.";
 
-	descriptionArtifact[DEFENDER_HELM] = "The Defender Helm of Protection increases your defense skill by 1.";
+	ptrArtifact[ARMORED_GAUNTLETS].name = "Armored Gauntlets";
+	ptrArtifact[ARMORED_GAUNTLETS].description = "The Armored Gauntlets of Protection increase your defense skill by 1.";
 
-	descriptionArtifact[GIANT_FLAIL] = "The Giant Flail of Dominion increases your attack skill by 1.";
+	ptrArtifact[DEFENDER_HELM].name = "Defender Helm";
+	ptrArtifact[DEFENDER_HELM].description = "The Defender Helm of Protection increases your defense skill by 1.";
 
-	descriptionArtifact[BALLISTA] = "The Ballista of Quickness lets your catapult fire twice per combat round.";
+	ptrArtifact[GIANT_FLAIL].name = "Giant Flail";
+	ptrArtifact[GIANT_FLAIL].description = "The Giant Flail of Dominion increases your attack skill by 1.";
 
-	descriptionArtifact[STEALTH_SHIELD] = "The Stealth Shield of Protection increases your defense skill by 2.";
+	ptrArtifact[BALLISTA].name = "Ballista";
+	ptrArtifact[BALLISTA].description = "The Ballista of Quickness lets your catapult fire twice per combat round.";
 
-	descriptionArtifact[DRAGON_SWORD] = "The Dragon Sword of Dominion increases your attack skill by 3.";
+	ptrArtifact[STEALTH_SHIELD].name = "Stealth Shield";
+	ptrArtifact[STEALTH_SHIELD].description = "The Stealth Shield of Protection increases your defense skill by 2.";
 
-	descriptionArtifact[POWER_AXE]	= "The Power Axe of Dominion increases your attack skill by 2.";
+	ptrArtifact[DRAGON_SWORD].name = "Dragon Sword";
+	ptrArtifact[DRAGON_SWORD].description = "The Dragon Sword of Dominion increases your attack skill by 3.";
 
-	descriptionArtifact[DIVINE_BREASTPLATE] = "The Divine Breastplate of Protection increases your defense skill by 3.";
+	ptrArtifact[POWER_AXE].name = "Power Axe";
+	ptrArtifact[POWER_AXE].description = "The Power Axe of Dominion increases your attack skill by 2.";
 
-	descriptionArtifact[MINOR_SCROLL] = "The Minor Scroll of Knowledge increases your knowledge by 2.";
+	ptrArtifact[DIVINE_BREASTPLATE].name = "Divine Breastplate";
+	ptrArtifact[DIVINE_BREASTPLATE].description = "The Divine Breastplate of Protection increases your defense skill by 3.";
 
-	descriptionArtifact[MAJOR_SCROLL] = "The Major Scroll of Knowledge increases your knowledge by 3.";
+	ptrArtifact[MINOR_SCROLL].name = "Minor Scroll";
+	ptrArtifact[MINOR_SCROLL].description = "The Minor Scroll of Knowledge increases your knowledge by 2.";
 
-	descriptionArtifact[SUPERIOR_SCROLL] = "The Superior Scroll of Knowledge increases your knowledge by 4.";
+	ptrArtifact[MAJOR_SCROLL].name = "Major Scroll";
+	ptrArtifact[MAJOR_SCROLL].description = "The Major Scroll of Knowledge increases your knowledge by 3.";
 
-	descriptionArtifact[FOREMOST_SCROLL] = "The Foremost Scroll of Knowledge increases your knowledge by 5.";
+	ptrArtifact[SUPERIOR_SCROLL].name = "Superior Scroll";
+	ptrArtifact[SUPERIOR_SCROLL].description = "The Superior Scroll of Knowledge increases your knowledge by 4.";
 
-	descriptionArtifact[ENDLESS_SACK_GOLD] = "The Endless Sack of Gold provides you with 1000 gold per day.";
+	ptrArtifact[FOREMOST_SCROLL].name = "Foremost Scroll";
+	ptrArtifact[FOREMOST_SCROLL].description = "The Foremost Scroll of Knowledge increases your knowledge by 5.";
 
-	descriptionArtifact[ENDLESS_BAG_GOLD] = "The Endless Bag of Gold provides you with 750 gold per day.";
+	ptrArtifact[ENDLESS_SACK_GOLD].name = "Endless Sack of Gold";
+	ptrArtifact[ENDLESS_SACK_GOLD].description = "The Endless Sack of Gold provides you with 1000 gold per day.";
 
-	descriptionArtifact[ENDLESS_PURSE_GOLD] = "The Endless Purse of Gold provides you with 500 gold per day.";
+	ptrArtifact[ENDLESS_BAG_GOLD].name = "Endless Bag of Gold";
+	ptrArtifact[ENDLESS_BAG_GOLD].description = "The Endless Bag of Gold provides you with 750 gold per day.";
 
-	descriptionArtifact[RABBIT_FOOT] = "The Lucky Rabbit's Foot increases your luck in combat.";
+	ptrArtifact[ENDLESS_PURSE_GOLD].name = "Endless Purse of Gold";
+	ptrArtifact[ENDLESS_PURSE_GOLD].description = "The Endless Purse of Gold provides you with 500 gold per day.";
 
-	descriptionArtifact[GOLDEN_HORSESHOE] = "The Golden Horseshoe increases your luck in combat.";
+	ptrArtifact[RABBIT_FOOT].name = "Rabbit's Foot";
+	ptrArtifact[RABBIT_FOOT].description = "The Lucky Rabbit's Foot increases your luck in combat.";
 
-	descriptionArtifact[GAMBLER_LUCKY_COIN] = "The Gambler's Lucky Coin increases your luck in combat.";
+	ptrArtifact[GOLDEN_HORSESHOE].name = "Golden Horseshoe";
+	ptrArtifact[GOLDEN_HORSESHOE].description = "The Golden Horseshoe increases your luck in combat.";
 
-	descriptionArtifact[FOUR_LEAF_CLOVER] = "The Four_Leaf Clover increases your luck in combat.";
+	ptrArtifact[GAMBLER_LUCKY_COIN].name = "Gambler's Lucky Coin";
+	ptrArtifact[GAMBLER_LUCKY_COIN].description = "The Gambler's Lucky Coin increases your luck in combat.";
 
-	descriptionArtifact[EVIL_EYE] = "The Evil Eye reduces the casting cost of curse spells by half.";
+	ptrArtifact[FOUR_LEAF_CLOVER].name = "Four-Leaf Clover";
+	ptrArtifact[FOUR_LEAF_CLOVER].description = "The Four_Leaf Clover increases your luck in combat.";
 
-	descriptionArtifact[ENCHANTED_HOURGLASS] = "The Enchanted Hourglass extends the duration of all your spells by 2 turns.";
+	ptrArtifact[EVIL_EYE].name = "Evil Eye";
+	ptrArtifact[EVIL_EYE].description = "The Evil Eye reduces the casting cost of curse spells by half.";
 
-	descriptionArtifact[GOLD_WATCH] = "The Gold Watch doubles the effectiveness of your hypnotize spells.";
+	ptrArtifact[ENCHANTED_HOURGLASS].name = "Enchanted Hourglass";
+	ptrArtifact[ENCHANTED_HOURGLASS].description = "The Enchanted Hourglass extends the duration of all your spells by 2 turns.";
 
-	descriptionArtifact[SKULLCAP] = "The Skullcap halves the casting cost of all mind influencing spells.";
+	ptrArtifact[GOLD_WATCH].name = "Gold Wath";
+	ptrArtifact[GOLD_WATCH].description = "The Gold Watch doubles the effectiveness of your hypnotize spells.";
 
-	descriptionArtifact[ICE_CLOAK] = "The Ice Cloak halves all damage your troops take from cold spells.";
+	ptrArtifact[SKULLCAP].name = "Skullcap";
+	ptrArtifact[SKULLCAP].description = "The Skullcap halves the casting cost of all mind influencing spells.";
 
-	descriptionArtifact[FIRE_CLOAK] = "The Fire Cloak halves all damage your troops take from fire spells.";
+	ptrArtifact[ICE_CLOAK].name = "Ice Clock";
+	ptrArtifact[ICE_CLOAK].description = "The Ice Cloak halves all damage your troops take from cold spells.";
 
-	descriptionArtifact[LIGHTNING_HELM] = "The Lightning Helm halves all damage your troops take from lightning spells.";
+	ptrArtifact[FIRE_CLOAK].name = "Fire Cloak";
+	ptrArtifact[FIRE_CLOAK].description = "The Fire Cloak halves all damage your troops take from fire spells.";
 
-	descriptionArtifact[EVERCOLD_ICICLE] = "The Evercold Icicle causes your cold spells to do 50% more damage to enemy troops.";
+	ptrArtifact[LIGHTNING_HELM].name = "Lightning Helm";
+	ptrArtifact[LIGHTNING_HELM].description = "The Lightning Helm halves all damage your troops take from lightning spells.";
 
-	descriptionArtifact[EVERHOT_LAVA_ROCK] = "The Everhot Lava Rock causes your fire spells to do 50% more damage to enemy troops.";
+	ptrArtifact[EVERCOLD_ICICLE].name = "Evercold Icicle";
+	ptrArtifact[EVERCOLD_ICICLE].description = "The Evercold Icicle causes your cold spells to do 50% more damage to enemy troops.";
 
-	descriptionArtifact[LIGHTNING_ROD] = "The Lightning Rod causes your lightning spells to do 50% more damage to enemy troops.";
+	ptrArtifact[EVERHOT_LAVA_ROCK].name = "Everhot Lava Rock";
+	ptrArtifact[EVERHOT_LAVA_ROCK].description = "The Everhot Lava Rock causes your fire spells to do 50% more damage to enemy troops.";
 
-	descriptionArtifact[SNAKE_RING] = "The Snake Ring halves the casting cost of all your bless spells.";
+	ptrArtifact[LIGHTNING_ROD].name = "Lightning Rod";
+	ptrArtifact[LIGHTNING_ROD].description = "The Lightning Rod causes your lightning spells to do 50% more damage to enemy troops.";
 
-	descriptionArtifact[ANKH] = "The Ankh doubles the effectiveness of all your resurrect and animate spells.";
+	ptrArtifact[SNAKE_RING].name = "Snake-Ring";
+	ptrArtifact[SNAKE_RING].description = "The Snake Ring halves the casting cost of all your bless spells.";
 
-	descriptionArtifact[BOOK_ELEMENTS] = "The Book of Elements doubles the effectiveness of all your summoning spells.";
+	ptrArtifact[ANKH].name = "Ankh";
+	ptrArtifact[ANKH].description = "The Ankh doubles the effectiveness of all your resurrect and animate spells.";
 
-	descriptionArtifact[ELEMENTAL_RING] = "The Elemental Ring halves the casting cost of all summoning spells.";
+	ptrArtifact[BOOK_ELEMENTS].name = "Book of Elements";
+	ptrArtifact[BOOK_ELEMENTS].description = "The Book of Elements doubles the effectiveness of all your summoning spells.";
 
-	descriptionArtifact[HOLY_PENDANT] = "The Holy Pendant makes all your troops immune to curse spells.";
+	ptrArtifact[ELEMENTAL_RING].name = "Elemental Ring";
+	ptrArtifact[ELEMENTAL_RING].description = "The Elemental Ring halves the casting cost of all summoning spells.";
 
-	descriptionArtifact[PENDANT_FREE_WILL] = "The Pendant of Free Will makes all your troops immune to hypnotize spells.";
+	ptrArtifact[HOLY_PENDANT].name = "Holy Pendant";
+	ptrArtifact[HOLY_PENDANT].description = "The Holy Pendant makes all your troops immune to curse spells.";
 
-	descriptionArtifact[PENDANT_LIFE] = "The Pendant of Life makes all your troops immune to death spells.";
+	ptrArtifact[PENDANT_FREE_WILL].name = "Pendant of Free Will";
+	ptrArtifact[PENDANT_FREE_WILL].description = "The Pendant of Free Will makes all your troops immune to hypnotize spells.";
 
-	descriptionArtifact[SERENITY_PENDANT] = "The Serenity Pendant makes all your troops immune to berserk spells.";
+	ptrArtifact[PENDANT_LIFE].name = "Pendant of Life";
+	ptrArtifact[PENDANT_LIFE].description = "The Pendant of Life makes all your troops immune to death spells.";
 
-	descriptionArtifact[SEEING_EYE_PENDANT] = "The Seeing_eye Pendant makes all your troops immune to blindness spells.";
+	ptrArtifact[SERENITY_PENDANT].name = "Serenity Pendant";
+	ptrArtifact[SERENITY_PENDANT].description = "The Serenity Pendant makes all your troops immune to berserk spells.";
 
-	descriptionArtifact[KINETIC_PENDANT] = "The Kinetic Pendant makes all your troops immune to paralyze spells.";
+	ptrArtifact[SEEING_EYE_PENDANT].name = "Seeing-eye Pendant";
+	ptrArtifact[SEEING_EYE_PENDANT].description = "The Seeing_eye Pendant makes all your troops immune to blindness spells.";
 
-	descriptionArtifact[PENDANT_DEATH] = "The Pendant of Death makes all your troops immune to holy spells.";
+	ptrArtifact[KINETIC_PENDANT].name = "Kinetic Pendant";
+	ptrArtifact[KINETIC_PENDANT].description = "The Kinetic Pendant makes all your troops immune to paralyze spells.";
 
-	descriptionArtifact[WAND_NEGATION] = "The Wand of Negation protects your troops from the Dispel Magic spell.";
+	ptrArtifact[PENDANT_DEATH].name = "Pendant of Death";
+	ptrArtifact[PENDANT_DEATH].description = "The Pendant of Death makes all your troops immune to holy spells.";
 
-	descriptionArtifact[GOLDEN_BOW] = "The Golden Bow eliminates the 50% penalty for your troops shooting past obstacles. (e.g. castle walls)";
+	ptrArtifact[WAND_NEGATION].name = "Wand of Negation";
+	ptrArtifact[WAND_NEGATION].description = "The Wand of Negation protects your troops from the Dispel Magic spell.";
 
-	descriptionArtifact[TELESCOPE] = "The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.";
+	ptrArtifact[GOLDEN_BOW].name = "Golden Bow";
+	ptrArtifact[GOLDEN_BOW].description = "The Golden Bow eliminates the 50% penalty for your troops shooting past obstacles. (e.g. castle walls)";
 
-	descriptionArtifact[STATESMAN_QUILL] = "The Statesman's Quill reduces the cost of surrender to 10% of the total cost of troops you have in your army.";
+	ptrArtifact[TELESCOPE].name = "Telescope";
+	ptrArtifact[TELESCOPE].description = "The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.";
 
-	descriptionArtifact[WIZARD_HAT] = "The Wizard's Hat increases the duration of your spells by 10 turns!";
+	ptrArtifact[STATESMAN_QUILL].name = "Statesman's Quill";
+	ptrArtifact[STATESMAN_QUILL].description = "The Statesman's Quill reduces the cost of surrender to 10% of the total cost of troops you have in your army.";
 
-	descriptionArtifact[POWER_RING] = "The Power Ring returns 2 extra power points/turn to your hero.";
+	ptrArtifact[WIZARD_HAT].name = "Wizard's Hat";
+	ptrArtifact[WIZARD_HAT].description = "The Wizard's Hat increases the duration of your spells by 10 turns!";
 
-	descriptionArtifact[AMMO_CART] = "The Ammo Cart provides endless ammunition for all your troops that shoot.";
+	ptrArtifact[POWER_RING].name = "Power Ring";
+	ptrArtifact[POWER_RING].description = "The Power Ring returns 2 extra power points/turn to your hero.";
 
-	descriptionArtifact[TAX_LIEN] = "The Tax Lien costs you 250 gold pieces/turn.";
+	ptrArtifact[AMMO_CART].name = "Ammo Cart";
+	ptrArtifact[AMMO_CART].description = "The Ammo Cart provides endless ammunition for all your troops that shoot.";
 
-	descriptionArtifact[HIDEOUS_MASK] = "The Hideous Mask prevents all 'wandering' armies from joining your hero.";
+	ptrArtifact[TAX_LIEN].name = "Tax Lien";
+	ptrArtifact[TAX_LIEN].description = "The Tax Lien costs you 250 gold pieces/turn.";
 
-	descriptionArtifact[ENDLESS_POUCH_SULFUR] = "The Endless Pouch of Sulfur provides 1 unit of sulfur per day.";
+	ptrArtifact[HIDEOUS_MASK].name = "Hideous Mask";
+	ptrArtifact[HIDEOUS_MASK].description = "The Hideous Mask prevents all 'wandering' armies from joining your hero.";
 
-	descriptionArtifact[ENDLESS_VIAL_MERCURY] = "The Endless Vial of Mercury provides 1 unit of mercury per day.";
+	ptrArtifact[ENDLESS_POUCH_SULFUR].name = "Endless Pouch of Sulfur";
+	ptrArtifact[ENDLESS_POUCH_SULFUR].description = "The Endless Pouch of Sulfur provides 1 unit of sulfur per day.";
 
-	descriptionArtifact[ENDLESS_POUCH_GEMS] = "The Endless Pouch of Gems provides 1 unit of gems per day.";
+	ptrArtifact[ENDLESS_VIAL_MERCURY].name = "Endless Vial of Mercury";
+	ptrArtifact[ENDLESS_VIAL_MERCURY].description = "The Endless Vial of Mercury provides 1 unit of mercury per day.";
 
-	descriptionArtifact[ENDLESS_CORD_WOOD] = "The Endless Cord of Wood provides 1 unit of wood per day.";
+	ptrArtifact[ENDLESS_POUCH_GEMS].name = "Endless Pouch of Gems";
+	ptrArtifact[ENDLESS_POUCH_GEMS].description = "The Endless Pouch of Gems provides 1 unit of gems per day.";
 
-	descriptionArtifact[ENDLESS_CART_ORE] = "The Endless Cart of Ore provides 1 unit of ore per day.";
+	ptrArtifact[ENDLESS_CORD_WOOD].name = "Endless Cord of Wood";
+	ptrArtifact[ENDLESS_CORD_WOOD].description = "The Endless Cord of Wood provides 1 unit of wood per day.";
 
-	descriptionArtifact[ENDLESS_POUCH_CRYSTAL] = "The Endless Pouch of Crystal provides 1 unit of crystal/day.";
+	ptrArtifact[ENDLESS_CART_ORE].name = "Endless Cart of Ore";
+	ptrArtifact[ENDLESS_CART_ORE].description = "The Endless Cart of Ore provides 1 unit of ore per day.";
 
-	descriptionArtifact[SPIKED_HELM] = "The Spiked Helm increases your attack and defense skills by 1 each.";
+	ptrArtifact[ENDLESS_POUCH_CRYSTAL].name = "Endless Pouch of Crystal";
+	ptrArtifact[ENDLESS_POUCH_CRYSTAL].description = "The Endless Pouch of Crystal provides 1 unit of crystal/day.";
 
-	descriptionArtifact[SPIKED_SHIELD] = "The Spiked Shield increases your attack and defense skills by 2 each.";
+	ptrArtifact[SPIKED_HELM].name = "Spiked Helm";
+	ptrArtifact[SPIKED_HELM].description = "The Spiked Helm increases your attack and defense skills by 1 each.";
 
-	descriptionArtifact[WHITE_PEARL] = "The White Pearl increases your spell power and knowledge by 1 each.";
+	ptrArtifact[SPIKED_SHIELD].name = "Spiked Shield";
+	ptrArtifact[SPIKED_SHIELD].description = "The Spiked Shield increases your attack and defense skills by 2 each.";
 
-	descriptionArtifact[BLACK_PEARL] = "The Black Pearl increases your spell power and knowledge by 2 each.";
+	ptrArtifact[WHITE_PEARL].name = "White Pearl";
+	ptrArtifact[WHITE_PEARL].description = "The White Pearl increases your spell power and knowledge by 1 each.";
 
-	descriptionArtifact[NOMAD_BOOTS_MOBILITY] = "The Nomad Boots of Mobility increase your movement on land.";
+	ptrArtifact[BLACK_PEARL].name = "Black Pearl";
+	ptrArtifact[BLACK_PEARL].description = "The Black Pearl increases your spell power and knowledge by 2 each.";
 
-	descriptionArtifact[TRAVELER_BOOTS_MOBILITY] = "The Traveler's Boots of Mobility increase your movement on land.";
+	ptrArtifact[NOMAD_BOOTS_MOBILITY].name = "Nomad Boots of Mobility";
+	ptrArtifact[NOMAD_BOOTS_MOBILITY].description = "The Nomad Boots of Mobility increase your movement on land.";
 
-	descriptionArtifact[TRUE_COMPASS_MOBILITY] = "The True Compass of Mobility increases your movement on land and sea.";
+	ptrArtifact[TRAVELER_BOOTS_MOBILITY].name = "Traveler's Boots of Mobility";
+	ptrArtifact[TRAVELER_BOOTS_MOBILITY].description = "The Traveler's Boots of Mobility increase your movement on land.";
 
-	descriptionArtifact[SAILORS_ASTROLABE_MOBILITY] = "The Sailors' Astrolabe of Mobility increases your movement on sea.";
+	ptrArtifact[TRUE_COMPASS_MOBILITY].name = "True Compass of Mobility";
+	ptrArtifact[TRUE_COMPASS_MOBILITY].description = "The True Compass of Mobility increases your movement on land and sea.";
 
+	ptrArtifact[SAILORS_ASTROLABE_MOBILITY].name = "Sailor's Astrolabe of Mobility";
+	ptrArtifact[SAILORS_ASTROLABE_MOBILITY].description = "The Sailors' Astrolabe of Mobility increases your movement on sea.";
+
+	ptrArtifact[MAGIC_BOOK].name = "Magic Book";
+	ptrArtifact[MAGIC_BOOK].description = "The Magic Book enables you to cast spells.";
 }

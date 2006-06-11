@@ -32,7 +32,20 @@
 #include "SDL.h"
 #include "gamedefs.h"
 
-                
+#define	MONSTERCOUNT		66
+#define	MONSTERCOUNT_LEVEL1	10
+#define	MONSTERCOUNT_LEVEL2	15
+#define	MONSTERCOUNT_LEVEL3	27
+#define	MONSTERCOUNT_LEVEL4	14
+
+typedef enum {
+		MNS_ALL		= 0xAF,
+		MNS_LEVEL1	= 0xB3,
+		MNS_LEVEL2	= 0xB4,
+		MNS_LEVEL3	= 0xB5,
+		MNS_LEVEL4	= 0xB6
+	    } E_LEVELMONSTER;
+
 typedef enum {
                 FEW		= 1,                // 1 - 4
                 SEVERAL		= 5,                // 5 - 9
@@ -157,8 +170,8 @@ void		FreeMonster(void);
 
 S_MONSTER *	GetStatMonster(E_MONSTER);
 E_ARMYSIZE 	GetSizeArmy(Uint16);
+E_MONSTER	GetRNDMonster(E_LEVELMONSTER);
 BOOL		DeadMonster(E_MONSTER);
 BOOL		FlyMonster(E_MONSTER);
-
 
 #endif

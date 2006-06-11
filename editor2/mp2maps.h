@@ -212,13 +212,14 @@ Uint32	uniqNumberN2;		// уникальный номер целого объек
 #define	OBJ_BOAT			0xAB	// лодка
 #define	OBJ_RNDARTIFACT			0xAD	// random артифакт
 #define	OBJ_RNDRESOURCE			0xAE	// random ресурс
+#define	OBJ_RNDMONSTER			0xAF	// random monster level 1 - 4
 
 #define	OBJ_RNDTOWN			0xB0	// random город, точка входа
 #define	OBJ_RNDCASTLE			0xB1	// random замок, точка входа
-#define	OBJ_RNDMONSTER1			0xB3	// radom monster level1
-#define	OBJ_RNDMONSTER2			0xB4	// radom monster level2
-#define	OBJ_RNDMONSTER3			0xB5	// radom monster level3
-#define	OBJ_RNDMONSTER4			0xB6	// radom monster level4
+#define	OBJ_RNDMONSTER1			0xB3	// random monster level1
+#define	OBJ_RNDMONSTER2			0xB4	// random monster level2
+#define	OBJ_RNDMONSTER3			0xB5	// random monster level3
+#define	OBJ_RNDMONSTER4			0xB6	// random monster level4
 #define	OBJ_WATCHTOWER			0xBA	// домик орков
 #define OBJ_TREEHOUSE			0xBB	// домик спрайтов (маленький)
 #define OBJ_TREECITY			0xBC	// тройной дом спрайтов, точка входа

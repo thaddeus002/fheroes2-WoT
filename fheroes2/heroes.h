@@ -30,6 +30,8 @@
 #define _HEROES_H
 
 #include "SDL.h"
+#include "artifact.h"
+#include "monster.h"
 #include "gamedefs.h"
 
 #define HEROESMAXSKILL		8
@@ -140,21 +142,37 @@ typedef enum {
 	    } E_ARMYFORMAT;
 
 typedef struct { 
-    E_RACE              race;
-    Uint8               attack;
-    Uint8               defence;
-    Uint8               spell;
-    Uint8               knowledge;
-    E_MORALE            morale;
-    E_LUCK              luck;
-    Uint32              experience;
-    Uint16              mp;				// magic point
-    Uint8               movement;
-    Uint8               cf;				// ballista count fire
-    E_SKILL		skill[HEROESMAXSKILL];
-    E_ARTIFACT		artifact[HEROESMAXARTIFACT];
-    S_ARMY		army[HEROESMAXARMY];
-    E_ARMYFORMAT	af;				// army format
-} S_HEROES;
+		E_RACE          race;
+		E_COLORS	color;
+		Uint8           attack;
+		Uint8           defence;
+		Uint8           power;
+		Uint8           knowledge;
+		E_MORALE        morale;
+		E_LUCK          luck;
+		Uint32          experience;
+		Uint16          mp;				// magic point
+		Uint8           movement;
+		//Uint8         cf;				// ballista count fire (расчитаем при бое)
+		E_SKILL		skill[HEROESMAXSKILL];
+		E_ARTIFACT	artifact[HEROESMAXARTIFACT];
+	        S_ARMY		army[HEROESMAXARMY];
+		E_ARMYFORMAT	af;				// army format
+		Uint8		review;				// amount of terrain heroes reveals
+		Uint8		posx;
+		Uint8		posy;
+	    } S_HEROES;
+
+Uint8		CalculationHeroesAttack(S_HEROES *);
+Uint8		CalculationHeroesDefence(S_HEROES *);
+Uint8		CalculationHeroesPower(S_HEROES *);
+Uint8		CalculationHeroesKnowledge(S_HEROES *);
+E_MORALE	CalculationHeroesMorale(S_HEROES *);
+E_LUCK		CalculationHeroesLuck(S_HEROES *);
+Uint32		CalculationHeroesExperience(S_HEROES *);
+Uint16		CalculationHeroesMagicPoint(S_HEROES *);
+Uint8		CalculationHeroesMovementPoint(S_HEROES *);
+
+BOOL		HeroesArtifactPresent(S_HEROES *, E_ARTIFACT);
 
 #endif

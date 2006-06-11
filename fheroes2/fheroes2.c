@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "SDL.h"
 #include "gamedefs.h"
@@ -144,6 +145,9 @@ int main(int argc, char **argv){
         exit(1);
     }
 
+    // инициализация rnd
+    srand((unsigned int) time(NULL));
+
     // инициализация игровых данных
     if(! InitAGG(heroes2_agg)) exit(1);
     InitSound();
@@ -159,6 +163,7 @@ int main(int argc, char **argv){
 
     // освобождаем данные
     FreeCursor();
+    FreeArtifact();
     FreeMonster();
     FreeSound();
     FreeAGG();
