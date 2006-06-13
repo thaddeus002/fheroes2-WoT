@@ -44,7 +44,9 @@
 void	ShowStaticMainDisplay(void);
 void	RedrawMapsArea(void);
 void	DrawRectAreaMaps(SDL_Rect *);
-void	DrawCellAreaMaps(Uint8, Uint8);
+void	DrawCellAreaMapsMonster(Uint8, Uint8);
+void	DrawCellAreaMapsLevel1(Uint8, Uint8);
+void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 
 ACTION ActionClickMapsArea(void);
 ACTION ActionClickRadarArea(void);
@@ -86,6 +88,8 @@ ACTION OptionsClickOkay(void);
 INTERFACEACTION *stpemaindisplay = NULL;
 
 SDL_Surface	*backgroundArea = NULL;
+SDL_Surface	*frameAreaLeft = NULL;
+SDL_Surface	*frameAreaBottom = NULL;
 
 S_DISPLAY       display;
 
@@ -540,15 +544,18 @@ ACTION DrawMainDisplay(){
     FreeActionEvent(stpemaindisplay);
     FreeRadar();
 
-    SDL_FreeSurface(backgroundArea);
+    if(backgroundArea) SDL_FreeSurface(backgroundArea);
+    if(frameAreaLeft) SDL_FreeSurface(frameAreaLeft);
+    if(frameAreaBottom) SDL_FreeSurface(frameAreaBottom);
     
     return result;
 }
 
 void ShowStaticMainDisplay(void){
 
-    SDL_Surface *video;
-    SDL_Surface *image;
+    SDL_Surface *video = NULL;
+    SDL_Surface *image = NULL;
+    SDL_Surface *formatSurface = NULL;
     SDL_Rect dst, src;
 
     AGGSPRITE sprite;
@@ -1157,6 +1164,42 @@ void ShowStaticMainDisplay(void){
 	    break;
     }
 
+    // сохраняем рамку (левую) для перерисовки поверх всех
+    if(NULL == frameAreaLeft){
+	src.x = BORDERWIDTH + GetAreaWidth() * TILEWIDTH;
+	src.y = BORDERWIDTH;
+	src.w = BORDERWIDTH;
+	src.h = GetAreaWidth() * TILEWIDTH;
+
+	if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, src.w, src.h, 16, 0, 0, 0, 0))){
+	    fprintf(stderr, "RedrawMapsArea: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), src.w, src.h);
+	    return;
+	}
+
+	SDL_BlitSurface(video, &src, formatSurface, NULL);
+	
+	frameAreaLeft = SDL_DisplayFormat(formatSurface);
+	SDL_FreeSurface(formatSurface);
+    }
+
+    // сохраняем рамку (нижнюю) для перерисовки поверх всех
+    if(NULL == frameAreaBottom){
+	src.x = BORDERWIDTH;
+	src.y = BORDERWIDTH + GetAreaHeight() * TILEWIDTH;
+	src.w = GetAreaHeight() * TILEWIDTH;
+	src.h = BORDERWIDTH;
+
+	if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, src.w, src.h, 16, 0, 0, 0, 0))){
+	    fprintf(stderr, "RedrawMapsArea: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), src.w, src.h);
+	    return;
+	}
+
+	SDL_BlitSurface(video, &src, formatSurface, NULL);
+
+	frameAreaBottom = SDL_DisplayFormat(formatSurface);
+	SDL_FreeSurface(formatSurface);
+    }
+
     // динамические элементы
     INTERFACEACTION *ptr = stpemaindisplay;
     while(ptr){
@@ -1692,7 +1735,7 @@ void RedrawMapsArea(){
 void DrawRectAreaMaps(SDL_Rect *rect){
 
     Uint8 x, y;
-    
+
     SDL_Surface *image = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     Uint16 index = 0;
@@ -1718,16 +1761,76 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 	    
     }
 
-    // отрисовываем все object
+    // отрисовываем все нижние объекты
     for(y = rect->y; y < rect->y + rect->h; ++y)
 
 	for(x = rect->x; x < rect->x + rect->w; ++x)
+	
+	    DrawCellAreaMapsLevel1(x, y);
 
-	    DrawCellAreaMaps(x, y);
+    // отрисовываем всех монстров
+    for(y = rect->y; y < rect->y + rect->h; ++y)
+
+	for(x = rect->x; x < rect->x + rect->w; ++x)
+	
+	    DrawCellAreaMapsMonster(x, y);
+
+    // отрисовываем все верхние объекты
+    for(y = rect->y; y < rect->y + rect->h; ++y)
+
+	for(x = rect->x; x < rect->x + rect->w; ++x){
+
+	    DrawCellAreaMapsLevel2(x, y);
+
+	    // и рисуем сетку
+	    if(GetIntValue("debug")){
+		LockSurface(video);
+		PutPixel(video, dest.x + dest.w - 1, dest.y + dest.h - 1, 0xFF00);
+		UnlockSurface(video);
+	    }
+	}
+
+    // востановим нестандартные спрайты при скроллинге вправо и вниз
+    if(rect->x == (GetAreaWidth() - 1)){
+
+	// отрисовываем всех монстров
+	for(y = rect->y; y < rect->y + rect->h; ++y)
+
+		DrawCellAreaMapsMonster(rect->x - 1, y);
+
+	// отрисовываем все верхние объекты
+	for(y = rect->y; y < rect->y + rect->h; ++y)
+
+		DrawCellAreaMapsLevel2(rect->x - 1, y);
+
+    }else if(rect->y == (GetAreaHeight() - 1)){
+
+	// отрисовываем всех монстров
+	for(x = rect->x; x < rect->x + rect->w; ++x)
+
+		DrawCellAreaMapsMonster(x, rect->y - 1);
+
+	// отрисовываем все верхние объекты
+	for(y = rect->y; y < rect->y + rect->h; ++y)
+
+		DrawCellAreaMapsLevel2(y, rect->y - 1);
+    }
+
+    // отрисовываем рамку area
+    dest.x = BORDERWIDTH + GetAreaWidth() * TILEWIDTH;
+    dest.y = BORDERWIDTH;
+    dest.w = BORDERWIDTH;
+    dest.h = GetAreaHeight() * TILEWIDTH;
+    SDL_BlitSurface(frameAreaLeft, NULL, video, &dest);
+    dest.x = BORDERWIDTH;
+    dest.y = BORDERWIDTH + GetAreaHeight() * TILEWIDTH;
+    dest.w = GetAreaWidth() * TILEWIDTH;
+    dest.h = BORDERWIDTH;
+    SDL_BlitSurface(frameAreaBottom, NULL, video, &dest);
 }
 
-/* функция реализующая алгоритм отрисовки объектов одной клетки */
-void DrawCellAreaMaps(Uint8 x, Uint8 y){
+/* функция реализующая алгоритм отрисовки нижних объектов одной клетки */
+void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
 
     SDL_Rect dest;
     dest.x = BORDERWIDTH + x * TILEWIDTH;
@@ -1756,12 +1859,64 @@ void DrawCellAreaMaps(Uint8 x, Uint8 y){
 	    indexAddon = ptrAddon->indexAddon;
 	}
     }
+}
+
+/* функция реализующая алгоритм отрисовки монстров одной клетки */
+void DrawCellAreaMapsMonster(Uint8 x, Uint8 y){
+
+    SDL_Rect dest;
+    dest.x = BORDERWIDTH + x * TILEWIDTH;
+    dest.y = BORDERWIDTH + y * TILEWIDTH;
+    dest.w = TILEWIDTH;
+    dest.h = TILEWIDTH;
+
+    Uint16 index = (display.offsetY + y) * GetWidthMaps() + display.offsetX + x;
+    Uint16 indexAddon = 0;
+
+    CELLMAPS *ptrCell = GetCELLMAPS(index);
+    MP2ADDONTAIL *ptrAddon = NULL;
+    Sint8 i = 0;
+
+    for(i = 3; i >= 0; --i){
+    
+	if(0x98 == ptrCell->info->generalObject){
+
+	    // объект 1 уровня
+	    if(0xFF != ptrCell->info->indexName1 && i == (ptrCell->info->quantity1 % 4)) DrawMapObject(&dest, ptrCell->info->objectName1, ptrCell->info->indexName1);
+
+	    indexAddon = ptrCell->info->indexAddon;
+
+	    // все объекты N1
+	    while(indexAddon){
+		ptrAddon = GetADDONTAIL(indexAddon);
+		if(0xFF != ptrAddon->indexNameN1 && i == (ptrAddon->quantityN % 4)) DrawMapObject(&dest, ptrAddon->objectNameN1 * 2, ptrAddon->indexNameN1);
+		indexAddon = ptrAddon->indexAddon;
+	    }
+	}
+    }
+}
+
+/* функция реализующая алгоритм отрисовки верхних объектов одной клетки */
+void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
+
+    SDL_Rect dest;
+    dest.x = BORDERWIDTH + x * TILEWIDTH;
+    dest.y = BORDERWIDTH + y * TILEWIDTH;
+    dest.w = TILEWIDTH;
+    dest.h = TILEWIDTH;
+
+    Uint16 index = (display.offsetY + y) * GetWidthMaps() + display.offsetX + x;
+    Uint16 indexAddon = 0;
+
+    CELLMAPS *ptrCell = GetCELLMAPS(index);
+    MP2ADDONTAIL *ptrAddon = NULL;
+    Sint8 i = 0;
 
     for(i = 3; i >= 0; --i){
 
         // объект 2 уровня
 	if(0xFF != ptrCell->info->indexName2 && i == (ptrCell->info->quantity1 % 4)) DrawMapObject(&dest, ptrCell->info->objectName2, ptrCell->info->indexName2);
-    
+
 	indexAddon = ptrCell->info->indexAddon;
 
         // все объекты N2
@@ -1770,14 +1925,6 @@ void DrawCellAreaMaps(Uint8 x, Uint8 y){
 	    if(0xFF != ptrAddon->indexNameN2 && i == (ptrAddon->quantityN % 4)) DrawMapObject(&dest, ptrAddon->objectNameN2, ptrAddon->indexNameN2);
 	    indexAddon = ptrAddon->indexAddon;
 	}
-    }
-
-    SDL_Surface *video = SDL_GetVideoSurface();
-    // рисуем сетку
-    if(GetIntValue("debug")){
-	LockSurface(video);
-	PutPixel(video, dest.x + dest.w - 1, dest.y + dest.h - 1, 0xFF00);
-	UnlockSurface(video);
     }
 }
 
