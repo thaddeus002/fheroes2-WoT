@@ -45,6 +45,14 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define TILEWIDTH       32
 
 typedef enum {
+	    GAME_EASY,
+	    GAME_NORMAL,
+	    GAME_HARD,
+	    GAME_EXPERT,
+	    GAME_IMPOSIBLE
+	    } E_GAMELEVEL;
+
+typedef enum {
 	    BLUE,
 	    RED,
 	    GREEN,

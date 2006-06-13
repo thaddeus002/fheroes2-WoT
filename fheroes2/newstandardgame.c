@@ -374,6 +374,7 @@ ACTION ActionPressNewStandardSelect(void){
     FreeObject("REQSBKG.ICN");
 
     ShowNewStandardGame();
+    ActionSelectDifficultyNormal();
 
     return NONE;
 }

@@ -969,21 +969,22 @@ void ShowStaticMainDisplay(void){
 	    // TOP BORDER
 	    src.x = 0;
 	    src.y = 0; 
-	    src.w = 140;
+	    src.w = 128;
 	    src.h = BORDERWIDTH;
 	    dst = src;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    src.x += src.w;
-	    src.w = 192;
+	    src.w = 214;
 	    dst = src;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.x += src.w;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.x += src.w;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.x += src.w - 1;
 	    src.w = image->w - src.x;
 	    dst.w = src.w;
 	    SDL_BlitSurface(image, &src, video, &dst);
-/*
 	    // BOTTOM BORDER
 	    src.x = 0;
 	    src.y = image->h - BORDERWIDTH;
@@ -993,13 +994,15 @@ void ShowStaticMainDisplay(void){
 	    dst.y = video->h - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    src.x += src.w;
-	    src.w = 192;
+	    src.w = 214;
 	    dst = src;
 	    dst.y = video->h - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.x += src.w;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.x += src.w;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.x += src.w - 1;
 	    src.w = image->w - src.x;
 	    dst.w = src.w;
 	    SDL_BlitSurface(image, &src, video, &dst);
@@ -1007,12 +1010,14 @@ void ShowStaticMainDisplay(void){
 	    src.x = 0;
 	    src.y = 0; 
 	    src.w = BORDERWIDTH;
-	    src.h = 166;
+	    src.h = 160;
 	    dst = src;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    src.y += src.h;
-	    src.h = 144;
+	    src.h = 181;
 	    dst = src;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.y += src.h;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.y += src.h;
 	    SDL_BlitSurface(image, &src, video, &dst);
@@ -1024,14 +1029,16 @@ void ShowStaticMainDisplay(void){
 	    src.x = image->w - BORDERWIDTH;
 	    src.y = 0; 
 	    src.w = BORDERWIDTH;
-	    src.h = 166;
+	    src.h = 160;
 	    dst = src;
 	    dst.x = video->w - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    src.y += src.h;
-	    src.h = 144;
+	    src.h = 181;
 	    dst = src;
 	    dst.x = video->w - BORDERWIDTH;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.y += src.h;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.y += src.h;
 	    SDL_BlitSurface(image, &src, video, &dst);
@@ -1043,14 +1050,16 @@ void ShowStaticMainDisplay(void){
 	    src.x = image->w - RADARWIDTH - 2 * BORDERWIDTH;
 	    src.y = 0; 
 	    src.w = BORDERWIDTH;
-	    src.h = 166;
+	    src.h = 160;
 	    dst = src;
 	    dst.x = video->w - RADARWIDTH - 2 * BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    src.y += src.h;
-	    src.h = 144;
+	    src.h = 181;
 	    dst = src;
 	    dst.x = video->w - RADARWIDTH - 2 * BORDERWIDTH;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.y += src.h;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.y += src.h;
 	    SDL_BlitSurface(image, &src, video, &dst);
@@ -1113,6 +1122,7 @@ void ShowStaticMainDisplay(void){
 		SDL_BlitSurface(image, &src, video, &dst);
 		dst.y += 32;
 	    }
+
 	    // BOTTOM PANEL BACKGROUND ELEMENT
 	    if(GetIntValue("evilinterface"))
 		icnname = "STONBAKE.ICN";
@@ -1132,7 +1142,15 @@ void ShowStaticMainDisplay(void){
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    dst.y += image->h;
 	    SDL_BlitSurface(image, &src, video, &dst);
-*/
+	    dst.y += image->h;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.y += image->h;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.y += image->h;
+	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.y += image->h;
+	    SDL_BlitSurface(image, &src, video, &dst);
+
 	    break;
 	
 	default:
