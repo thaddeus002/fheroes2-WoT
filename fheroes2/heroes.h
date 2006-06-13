@@ -38,91 +38,32 @@
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXARMY		5
 
+#define SCOUTINGBASE		4	// стартовое количество клеток обзора у героя
+
 typedef enum {
-		// увеличивает урон стрелков 10%
-		ARCHERY_BASIC,
-		// 25%
-		ARCHERY_ADVANCED,
-		// 50%
-		ARCHERY_EXPERT,
-		// увеличивает вероятность катапульты
-		BALLISTICS_BASIC,
-		// стреляет 2 раза
-		BALLISTICS_ADVANCED,
-		// стреляет 2 раза + пробивает стену спервого раза
-		BALLISTICS_EXPERT,
-		// присоединение нейтралов
-		DIPLOMACY_BASIC,
-		// присоединение нейтралов
-		DIPLOMACY_ADVANCED,
-		// присоединение нейтралов
-		DIPLOMACY_EXPERT,
-		// 20% 2 уровня
-		EAGLEEYE_BASIC,
-		// 30% 3 уровня
-		EAGLEEYE_ADVANCED,
-		// 40% 4 уровня
-		EAGLEEYE_EXPERT,
-		// 100 gold
-		ESTATES_BASIC,
-		// 250 gold
-		ESTATES_ADVANCED,
-		// 500 gold
-		ESTATES_EXPERT,
-		// +1 мораль
-		LEADERSHIP_BASIC,
-		// +2 мораль
-		LEADERSHIP_ADVANCED,
-		// +3 мораль
-		LEADERSHIP_EXPERT,
-		// увеличивает число ходов TP
-		LOGISTICS_BASIC,
-		// увеличивает число ходов TP
-		LOGISTICS_ADVANCED,
-		// увеличивает число ходов TP
-		LOGISTICS_EXPERT,
-		// +1 удачи
-		LUCK_BASIC,
-		// +2 удачи
-		LUCK_ADVANCED,
-		// +3 удачи
-		LUCK_EXPERT,
-		// +1 MP
-		MYSTICISM_BASIC,
-		// +2 MP
-		MYSTICISM_ADVANCED,
-		// +3 MP
-		MYSTICISM_EXPERT,
-		// увеличивает число ходов на море TP
-		NAVIGATION_BASIC,
-		// увеличивает число ходов на море TP
-		NAVIGATION_ADVANCED,
-		// увеличивает число ходов на море TP
-		NAVIGATION_EXPERT,
-		//
-		NECROMANCY_BASIC,
-		//
-		NECROMANCY_ADVANCED,
-		//
-		NECROMANCY_EXPERT,
-		// увеличивает скорость прохождения
-		PATHFINDING_BASIC,
-		// увеличивает скорость прохождения
-		PATHFINDING_ADVANCED,
-		// увеличивает скорость прохождения
-		PATHFINDING_EXPERT,
-		// +1 к обзору
-		SCOUTING_BASIC,
-		// +2 к обзору
-		SCOUTING_ADVANCED,
-		// +3 к обзору
-		SCOUTING_EXPERT,
-		// 3 magic level
-		WISDOM_BASIC,
-		// 4 magic level
-		WISDOM_ADVANCED,
-		// 5 magic level
-		WISDOM_EXPERT
+		LNONE,
+		BASIC,
+		ADVANCED,
+		EXPERT
+
+	    } E_LEVELSKILL;
+
+typedef enum {
+		SNONE,
+		ARCHERY,
+		BALLISTICS,
+		DIPLOMACY,
+		EAGLEEYE,
+		ESTATES,
+		LEADERSHIP,
+		LOGISTICS,
+		LUCK,
+		MYSTICISM,
+		NAVIGATION,
+		NECROMANCY,
+		PATHFINDING,
+		SCOUTING,
+		WISDOM,
 
 	    } E_SKILL;
 
@@ -141,6 +82,11 @@ typedef enum {
 		GROUPED
 	    } E_ARMYFORMAT;
 
+typedef struct {
+		E_SKILL		type;
+		E_LEVELSKILL	level;
+	    } S_SKILL;
+
 typedef struct { 
 		E_RACE          race;
 		E_COLORS	color;
@@ -151,28 +97,28 @@ typedef struct {
 		E_MORALE        morale;
 		E_LUCK          luck;
 		Uint32          experience;
-		Uint16          mp;				// magic point
-		Uint8           movement;
-		//Uint8         cf;				// ballista count fire (расчитаем при бое)
-		E_SKILL		skill[HEROESMAXSKILL];
+		Uint16          magicPoint;
+		float           movePoint;
+		S_SKILL		skill[HEROESMAXSKILL];
 		E_ARTIFACT	artifact[HEROESMAXARTIFACT];
 	        S_ARMY		army[HEROESMAXARMY];
 		E_ARMYFORMAT	af;				// army format
-		Uint8		review;				// amount of terrain heroes reveals
 		Uint8		posx;
 		Uint8		posy;
 	    } S_HEROES;
 
-Uint8		CalculationHeroesAttack(S_HEROES *);
-Uint8		CalculationHeroesDefence(S_HEROES *);
-Uint8		CalculationHeroesPower(S_HEROES *);
-Uint8		CalculationHeroesKnowledge(S_HEROES *);
-E_MORALE	CalculationHeroesMorale(S_HEROES *);
-E_LUCK		CalculationHeroesLuck(S_HEROES *);
-Uint32		CalculationHeroesExperience(S_HEROES *);
-Uint16		CalculationHeroesMagicPoint(S_HEROES *);
-Uint8		CalculationHeroesMovementPoint(S_HEROES *);
+Uint8		CalculateHeroesAttack(S_HEROES *);
+Uint8		CalculateHeroesDefence(S_HEROES *);
+Uint8		CalculateHeroesPower(S_HEROES *);
+Uint8		CalculateHeroesKnowledge(S_HEROES *);
+E_MORALE	CalculateHeroesMorale(S_HEROES *);
+E_LUCK		CalculateHeroesLuck(S_HEROES *);
+Uint16		CalculateHeroesMagicPoint(S_HEROES *);
+Uint8		CalculateHeroesMoveLandPoint(S_HEROES *);
+Uint8		CalculateHeroesMoveSeaPoint(S_HEROES *);
+Uint8		CalculateHeroesScouting(S_HEROES *);
 
 BOOL		HeroesArtifactPresent(S_HEROES *, E_ARTIFACT);
+E_LEVELSKILL	HeroesLevelSkill(S_HEROES *, E_SKILL);
 
 #endif

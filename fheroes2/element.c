@@ -31,6 +31,7 @@
 #include "tools.h"
 #include "actionevent.h"
 #include "cursor.h"
+#include "config.h"
 #include "element.h"
 
 #define BOXWIDTH 306
@@ -44,6 +45,13 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     CursorOff();
     
     Uint32 cursor = GetCursor();
+    
+    char *buybuild = "BUYBUILD.ICN";
+    char *system = "SYSTEM.ICN";
+    if(GetIntValue("evilinterface")){
+	buybuild = "BUYBUILE.ICN";
+	system = "SYSTEME.ICN";
+    }
     
     // отрисовка диалога по центру экрана
     SDL_Surface *format, *back, *elem, *video;
@@ -64,7 +72,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     SDL_BlitSurface(video, &rectBack, back, NULL);
 
     // получаем левый верхний спрайт
-    FillSPRITE(&sprite, "BUYBUILD.ICN", 4);
+    FillSPRITE(&sprite, buybuild, 4);
     elem = GetICNSprite(&sprite);
     rectCur.x = rectBack.x + 1;
     rectCur.y = rectBack.y;
@@ -73,7 +81,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     SDL_BlitSurface(elem, NULL, video, &rectCur);
 
     // получаем левый средний спрайт
-    FillSPRITE(&sprite, "BUYBUILD.ICN", 5);
+    FillSPRITE(&sprite, buybuild, 5);
     elem = GetICNSprite(&sprite);
     rectCur.x = rectBack.x;
     rectCur.y += rectCur.h;
@@ -82,7 +90,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     SDL_BlitSurface(elem, NULL, video, &rectCur);
 
     // получаем левый нижний спрайт
-    FillSPRITE(&sprite, "BUYBUILD.ICN", 6);
+    FillSPRITE(&sprite, buybuild, 6);
     elem = GetICNSprite(&sprite);
     rectCur.y += rectCur.h;
     rectCur.w = elem->w;
@@ -90,7 +98,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     SDL_BlitSurface(elem, NULL, video, &rectCur);
 
     // получаем правый верхний спрайт
-    FillSPRITE(&sprite, "BUYBUILD.ICN", 0);
+    FillSPRITE(&sprite, buybuild, 0);
     elem = GetICNSprite(&sprite);
     rectCur.x = rectBack.x + rectCur.w;
     rectCur.y = rectBack.y;
@@ -99,7 +107,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     SDL_BlitSurface(elem, NULL, video, &rectCur);
 
     // получаем правый средний спрайт
-    FillSPRITE(&sprite, "BUYBUILD.ICN", 1);
+    FillSPRITE(&sprite, buybuild, 1);
     elem = GetICNSprite(&sprite);
     rectCur.y += rectCur.h;
     rectCur.w = elem->w;
@@ -107,7 +115,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     SDL_BlitSurface(elem, NULL, video, &rectCur);
 
     // получаем правый нижний спрайт
-    FillSPRITE(&sprite, "BUYBUILD.ICN", 2);
+    FillSPRITE(&sprite, buybuild, 2);
     elem = GetICNSprite(&sprite);
     rectCur.y += rectCur.h;
     rectCur.w = elem->w;
@@ -126,15 +134,17 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     INTERFACEACTION *dialog = NULL;        
 
     // кнопка YES
-    FillSPRITE(&sprite, "SYSTEM.ICN", 5);
+    FillSPRITE(&sprite, system, 5);
     elem = GetICNSprite(&sprite);
     rectCur.x = rectBack.x + 40;
     rectCur.y = rectBack.y + BOXHEIGHT - 70;
+    if(GetIntValue("evilinterface"))
+        rectCur.y = rectBack.y + BOXHEIGHT - 85;
     rectCur.w = elem->w;
     rectCur.h = elem->h;
     ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "SYSTEM.ICN", 5);
-    FillSPRITE(&action.objectPush, "SYSTEM.ICN", 6);
+    FillSPRITE(&action.objectUp, system, 5);
+    FillSPRITE(&action.objectPush, system, 6);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = DialogPressYES;
@@ -142,15 +152,16 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     SDL_BlitSurface(elem, NULL, video, &rectCur);
 
     // кнопка NO
-    FillSPRITE(&sprite, "SYSTEM.ICN", 7);
+    FillSPRITE(&sprite, system, 7);
     elem = GetICNSprite(&sprite);
     rectCur.x = rectBack.x + BOXWIDTH - elem->w - 25;
-    rectCur.y = rectBack.y + BOXHEIGHT - 70;
+    if(GetIntValue("evilinterface"))
+	rectCur.y = rectBack.y + BOXHEIGHT - 85;
     rectCur.w = elem->w;
     rectCur.h = elem->h;
     ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "SYSTEM.ICN", 7);
-    FillSPRITE(&action.objectPush, "SYSTEM.ICN", 8);
+    FillSPRITE(&action.objectUp, system, 7);
+    FillSPRITE(&action.objectPush, system, 8);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = DialogPressNO;

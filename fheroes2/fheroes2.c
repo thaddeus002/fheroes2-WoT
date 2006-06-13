@@ -75,7 +75,7 @@ int main(int argc, char **argv){
 	    case 'h':
 		printf("Usage: %s [OPTIONS]\n", argv[0]);
 		printf("  -d\tdebug mode\n");
-		printf("  -c\tpath to config file\n");
+		printf("  -c\tpath to config file (default fheroes2.cfg)\n");
 		printf("  -f\tpath to heroes2.agg\n");
 		printf("  -h\tprint this help and exit\n");
 		exit(0);
@@ -86,9 +86,9 @@ int main(int argc, char **argv){
 	}
 
     // инициализация переопределенных конфигурационных парамертов
-    if(NULL == config_file) config_file = "heroes2.cfg";
+    if(NULL == config_file) config_file = "fheroes2.cfg";
     InitConfig(config_file);
-    SetIntValue("debug", debug);
+    if(debug) SetIntValue("debug", debug);
     if(NULL == heroes2_agg) heroes2_agg = GetStrValue("aggfile");
 
     Uint32 flags;
@@ -124,6 +124,11 @@ int main(int argc, char **argv){
         case 2:
 	    xres = 1024;
 	    yres = 768;
+            break;
+
+        case 3:
+	    xres = 1280;
+	    yres = 1024;
             break;
     }
 

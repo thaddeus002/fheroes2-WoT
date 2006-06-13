@@ -43,7 +43,7 @@ typedef struct{
     BOOL        present;
     BOOL        usepresent;
     BOOL        use;
-} OLDOBJECT;
+} S_OLDOBJECT;
 
 void AddActionEvent(INTERFACEACTION **pointer, INTERFACEACTION *action){
 
@@ -137,7 +137,7 @@ ACTION ActionCycle(INTERFACEACTION *action){
     SDL_Event event;
     SDL_Surface *video = SDL_GetVideoSurface();;
     ACTION exit = NONE;
-    OLDOBJECT old;
+    S_OLDOBJECT old;
     memset(old.object.name, 0, AGGSIZENAME);
     old.object.number = 0xFFFF;
     old.rect.x = 0;
@@ -299,13 +299,16 @@ ACTION ActionCycle(INTERFACEACTION *action){
 	while(ptr){
 	    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, mousex, mousey)){
 		old.present = TRUE;
-		if(!old.usepresent){
+		if(!old.usepresent && ptr->objectMotion.number != 0xFFFF){
 		    old.usepresent = TRUE;
 		    old.rect = ptr->rect;
 		    old.object = ptr->objectUp;
 		    DrawSprite(&ptr->rect, &ptr->objectMotion);
 		    SetCursor(ptr->cursorMotion);
 		    if(ptr->pf) exit = (*ptr->pf)();
+		}else{
+                    SetCursor(ptr->cursorMotion);
+                    if(ptr->pf) exit = (*ptr->pf)();
 		}
 	    }
     	    ptr = (INTERFACEACTION *) ptr->next;

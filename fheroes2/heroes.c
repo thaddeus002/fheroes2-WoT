@@ -28,7 +28,20 @@
 
 #include "SDL.h"
 
+#include "monster.h"
 #include "heroes.h"
+
+E_LEVELSKILL HeroesLevelSkill(S_HEROES *heroes, E_SKILL skill){
+
+    if(NULL == heroes || SNONE == skill) return LNONE;
+
+    Uint8 i;
+
+    for(i = 0; i < HEROESMAXSKILL; ++i)
+	if(skill == heroes->skill[i].type) return heroes->skill[i].level;
+
+    return LNONE;
+}
 
 BOOL    HeroesArtifactPresent(S_HEROES *heroes, E_ARTIFACT artifact){
 
@@ -42,7 +55,7 @@ BOOL    HeroesArtifactPresent(S_HEROES *heroes, E_ARTIFACT artifact){
     return FALSE;
 }
 
-Uint8   CalculationHeroesAttack(S_HEROES *heroes){
+Uint8   CalculateHeroesAttack(S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -88,7 +101,7 @@ Uint8   CalculationHeroesAttack(S_HEROES *heroes){
     return result;
 }
 
-Uint8   CalculationHeroesDefence(S_HEROES *heroes){
+Uint8   CalculateHeroesDefence(S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -134,7 +147,7 @@ Uint8   CalculationHeroesDefence(S_HEROES *heroes){
     return result;
 }
 
-Uint8   CalculationHeroesPower(S_HEROES *heroes){
+Uint8   CalculateHeroesPower(S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -180,7 +193,7 @@ Uint8   CalculationHeroesPower(S_HEROES *heroes){
     return result;
 }
 
-Uint8	CalculationHeroesKnowledge(S_HEROES *heroes){
+Uint8	CalculateHeroesKnowledge(S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -230,7 +243,7 @@ Uint8	CalculationHeroesKnowledge(S_HEROES *heroes){
     return result;
 }
 
-E_MORALE CalculationHeroesMorale(S_HEROES *heroes){
+E_MORALE CalculateHeroesMorale(S_HEROES *heroes){
 
     if(NULL == heroes) return MORALE_NORMAL;
 
@@ -250,17 +263,40 @@ E_MORALE CalculationHeroesMorale(S_HEROES *heroes){
 		break;
 
 	    case FIZBIN_MISFORTUNE:
-		if(MORALE_TREASON < result--);
+		if(MORALE_AWFUL < result) result-=2;
+		else result = MORALE_TREASON;
 		break;
 
 	    default:
 		break;
 	}
 
+    // bonus leadership
+    switch(HeroesLevelSkill(heroes, LEADERSHIP)){
+    
+	case EXPERT:
+	    if(MORALE_IRISH > result++);
+	    if(MORALE_IRISH > result++);
+	    if(MORALE_IRISH > result++);
+	    break;
+	    
+	case ADVANCED:
+	    if(MORALE_IRISH > result++);
+	    if(MORALE_IRISH > result++);
+	    break;
+	    
+	case BASIC:
+	    if(MORALE_IRISH > result++);
+	    break;
+	    
+	default:
+	    break;
+    }
+
     return result;
 }
 
-E_LUCK  CalculationHeroesLuck(S_HEROES *heroes){
+E_LUCK  CalculateHeroesLuck(S_HEROES *heroes){
 
     if(NULL == heroes) return LUCK_NORMAL;
 
@@ -283,20 +319,165 @@ E_LUCK  CalculationHeroesLuck(S_HEROES *heroes){
 		break;
 	}
 
+    // bonus luck
+    switch(HeroesLevelSkill(heroes, LUCK)){
+    
+	case EXPERT:
+	    if(LUCK_IRISH > result++);
+	    if(LUCK_IRISH > result++);
+	    if(LUCK_IRISH > result++);
+	    break;
+	    
+	case ADVANCED:
+	    if(LUCK_IRISH > result++);
+	    if(LUCK_IRISH > result++);
+	    break;
+	    
+	case BASIC:
+	    if(LUCK_IRISH > result++);
+	    break;
+	    
+	default:
+	    break;
+    }
+
     return result;
 }
 
-Uint32  CalculationHeroesExperience(S_HEROES *heroes){
+Uint16  CalculateHeroesMagicPoint(S_HEROES *heroes){
 
-    return 0;
+    if(NULL == heroes) return 0;
+
+    return CalculateHeroesKnowledge(heroes) * 10;
 }
 
-Uint16  CalculationHeroesMagicPoint(S_HEROES *heroes){
+Uint8   CalculateHeroesScouting(S_HEROES *heroes){
 
-    return 0;
+    // base scouting
+    Uint8 scout = SCOUTINGBASE;
+    
+    // bonus scouting
+    switch(HeroesLevelSkill(heroes, SCOUTING)){
+    
+	case EXPERT:
+	    scout += 3;
+	    break;
+	    
+	case ADVANCED:
+	    scout += 2;
+	    break;
+	    
+	case BASIC:
+	    scout += 1;
+	    break;
+	    
+	default:
+	    break;
+    }
+
+    // bonus artifact
+    if(HeroesArtifactPresent(heroes, TELESCOPE))
+	++scout;
+
+    return scout;
 }
 
-Uint8   CalculationHeroesMovementPoint(S_HEROES *heroes){
+Uint8   CalculateHeroesMoveLandPoint(S_HEROES *heroes){
 
-    return 0;
+    if(NULL == heroes) return 0;
+    
+    Uint8 i;
+
+    float log = 0;
+    E_MONSTERSPEED speed = INSTANT;
+
+    // Slowest Army Speed
+    for(i = 0; i < HEROESMAXARMY; ++i)
+	if((GetStatMonster(heroes->army[i].monster))->speed < speed)
+	    speed = (GetStatMonster(heroes->army[i].monster))->speed;
+    
+    Uint8 sas = speed + 8;
+
+    // bonus logistic
+    switch(HeroesLevelSkill(heroes, LOGISTICS)){
+    
+	case EXPERT:
+	    log = 1.299;
+	    break;
+	    
+	case ADVANCED:
+	    log = 1.2;
+	    break;
+	    
+	case BASIC:
+	    log = 1.1;
+	    break;
+	    
+	default:
+	    log = 1;
+	    break;
+    }
+
+    float tp = (2 * sas * log) / 2;
+    
+    // bonus artefact
+    if(HeroesArtifactPresent(heroes, NOMAD_BOOTS_MOBILITY))
+	tp += 6;
+    if(HeroesArtifactPresent(heroes, TRAVELER_BOOTS_MOBILITY))
+	tp += 3;
+    if(HeroesArtifactPresent(heroes, TRUE_COMPASS_MOBILITY))
+	tp += 5;
+
+/*
+    GetTypeSurface(POS);
+    move cost
+
+          None  Basic   Adv.  Expert (PATHFINDING)
+  Desert  2.00   1.75   1.50   1.00
+  Snow    1.75   1.50   1.25   1.00
+  Swamp   1.75   1.50   1.25   1.00
+  Cracked 1.25   1.00   1.00   1.00
+  Beach   1.25   1.00   1.00   1.00
+  Lava    1.00   1.00   1.00   1.00
+  Dirt    1.00   1.00   1.00   1.00
+  Grass   1.00   1.00   1.00   1.00
+  Water   1.00   1.00   1.00   1.00
+  Road    0.75   0.75   0.75   0.75
+*/
+
+    return tp;
+}
+
+Uint8   CalculateHeroesMoveSeaPoint(S_HEROES *heroes){
+
+    if(NULL == heroes) return 0;
+
+    float tp = 15;
+    
+    // bonus navigation
+    switch(HeroesLevelSkill(heroes, NAVIGATION)){
+    
+	case EXPERT:
+	    tp += 15;
+	    break;
+	    
+	case ADVANCED:
+	    tp += 9.5;
+	    break;
+	    
+	case BASIC:
+	    tp += 4.5;
+	    break;
+	
+	default:
+	    break;
+    }
+    
+    // bonus artefact
+    if(HeroesArtifactPresent(heroes, TRUE_COMPASS_MOBILITY))
+	tp += 5;
+    if(HeroesArtifactPresent(heroes, SAILORS_ASTROLABE_MOBILITY))
+	tp += 10;
+
+    return tp;
 }

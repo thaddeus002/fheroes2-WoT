@@ -522,6 +522,8 @@ ACTION ActionPressOKLoad(){
     }
 
     SetStrValue("filemapspath", currentName->filename);
+    SetStrValue("mapslongname", currentName->info.longname);
+    SetStrValue("mapsdescription", currentName->info.description);
 
     return OK;
 }

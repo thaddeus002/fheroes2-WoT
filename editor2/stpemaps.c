@@ -453,13 +453,6 @@ ACTION DrawEditDisplay(){
     dest.h = video->h - 2 * BORDERWIDTH;
     // обнуляем
     ZeroINTERFACEACTION(&action);
-    action.rect = dest;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.cursorMotion = CURSOR_POINTER;
-    // регистрируем
-    AddActionEvent(&stpemaps, &action);
-    // обнуляем
-    ZeroINTERFACEACTION(&action);
     // заполняем
     action.rect = dest;
     action.mouseEvent = MOUSE_PRESENT;
@@ -775,7 +768,7 @@ void ShowEditDisplay(void){
     CursorOff();
     SDL_FillRect(video, NULL, SDL_MapRGB(video->format, 0x00, 0x00, 0x00));
 
-    // show bquantityN
+    // show border
     FillSPRITE(&sprite, "ADVBORD.ICN", 0);
     image = GetICNSprite(&sprite);
     dest.x = video->w - image->w;
@@ -867,33 +860,34 @@ void ShowEditDisplay(void){
     SDL_BlitSurface(image, NULL, video, &dest);
 
     // заполняем пустое пространство правый нижний квадрат
-    FillSPRITE(&sprite, "EDITBTNS.ICN", 18);
-    image = GetICNSprite(&sprite);
-    dest.h = image->h;
-    FillSPRITE(&sprite, "EDITPANL.ICN", 3);
-    image = GetICNSprite(&sprite);
-    // top
-    dest.x = video->w - BORDERWIDTH - RADARWIDTH;
-    dest.y = BORDERWIDTH + RADARWIDTH + 4 * dest.h + image->h;
-    dest.w = image->w;
-    dest.h = 32;
-    src.x = 0;
-    src.y = 0;
-    src.w = image->w;
-    src.h = 32;
-    SDL_BlitSurface(image, &src, video, &dest);
-    // middle
-    dest.x = video->w - BORDERWIDTH - RADARWIDTH;
-    src.y = 5;
-    while( video->h - BORDERWIDTH - 64 > dest.y){
+    if(GetIntValue("videomode")){
+	FillSPRITE(&sprite, "EDITBTNS.ICN", 18);
+	image = GetICNSprite(&sprite);
+	dest.h = image->h;
+	FillSPRITE(&sprite, "EDITPANL.ICN", 3);
+	image = GetICNSprite(&sprite);
+	// top
+	dest.x = video->w - BORDERWIDTH - RADARWIDTH;
+	dest.y = BORDERWIDTH + RADARWIDTH + 4 * dest.h + image->h;
+	dest.w = image->w;
+	dest.h = 32;
+	src.x = 0;
+	src.y = 0;
+	src.w = image->w;
+	src.h = 32;
+	SDL_BlitSurface(image, &src, video, &dest);
+	// middle
+	dest.x = video->w - BORDERWIDTH - RADARWIDTH;
+	src.y = 5;
+	while( video->h - BORDERWIDTH - 64 > dest.y){
+	    dest.y += 32;
+	    SDL_BlitSurface(image, &src, video, &dest);
+	}
+	// bottom
 	dest.y += 32;
+	src.y = image->h - 32;
 	SDL_BlitSurface(image, &src, video, &dest);
     }
-    // bottom
-    dest.y += 32;
-    src.y = image->h - 32;
-    SDL_BlitSurface(image, &src, video, &dest);
-
     // динамические элементы
     INTERFACEACTION *ptr = stpemaps;
     while(ptr){
@@ -1759,8 +1753,7 @@ ACTION ActionPressGround(void){
     AddActionEvent(&stpemaps, &action);
 
     // select swamp
-    //dest.x = 512;
-    dest.x = video->w - BORDERWIDTH - image->w + 31;
+    dest.x = video->w - BORDERWIDTH - RADARWIDTH + 31;
     dest.y = 272;
     dest.w = 26;
     dest.h = 26;
@@ -1775,7 +1768,6 @@ ACTION ActionPressGround(void){
     AddActionEvent(&stpemaps, &action);
 
     // select lava
-    //dest.x = 540;
     dest.x += 28;
     dest.y = 272;
     dest.w = 26;
@@ -1791,7 +1783,6 @@ ACTION ActionPressGround(void){
     AddActionEvent(&stpemaps, &action);
 
     // select desert
-    //dest.x = 568;
     dest.x += 28;
     dest.y = 272;
     dest.w = 26;
@@ -1807,8 +1798,7 @@ ACTION ActionPressGround(void){
     AddActionEvent(&stpemaps, &action);
 
     // select dirt
-    //dest.x = 512;
-    dest.x = video->w - BORDERWIDTH - image->w + 31;
+    dest.x = video->w - BORDERWIDTH - RADARWIDTH + 31;
     dest.y = 300;
     dest.w = 26;
     dest.h = 26;
@@ -1823,7 +1813,6 @@ ACTION ActionPressGround(void){
     AddActionEvent(&stpemaps, &action);
 
     // select wasteland
-    //dest.x = 540;
     dest.x += 28;
     dest.y = 300;
     dest.w = 26;
@@ -1839,8 +1828,7 @@ ACTION ActionPressGround(void){
     AddActionEvent(&stpemaps, &action);
 
     // select beach
-    //dest.x = 568;
-    dest.x = 28;
+    dest.x += 28;
     dest.y = 300;
     dest.w = 26;
     dest.h = 26;

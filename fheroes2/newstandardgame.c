@@ -39,6 +39,7 @@
 #include "cursor.h"
 #include "config.h"
 #include "newstandardgame.h"
+#include "mp2maps.h"
 #include "newselectmaps.h"
 
 void	ShowNewStandardGame(void);
@@ -303,9 +304,16 @@ void ShowNewStandardGame(void){
     dest.w = FONT_WIDTHBIG * 10;
     dest.h = FONT_HEIGHTBIG;
     PrintText(video, &dest, "Scenario:", FONT_BIG);
+    // Name Scenario
+    dest.x = 260;
+    dest.y = 78;
+    dest.w = FONT_WIDTHBIG * 16;
+    dest.h = FONT_HEIGHTBIG / 2;
+    PrintText(video, &dest, GetStrValue("mapslongname"), FONT_BIG);
+
     // Game Difficulty
     dest.x = 330;
-    dest.y = 108;
+    dest.y = 107;
     dest.w = FONT_WIDTHBIG * 17;
     dest.h = FONT_HEIGHTBIG;
     PrintText(video, &dest, "Game Difficulty:", FONT_BIG);
@@ -372,11 +380,9 @@ ACTION ActionPressNewStandardSelect(void){
 
 ACTION ActionPressNewStandardOkay(void){
 
-    if(GetStrValue("filemapspath")){
+    if(strlen(GetStrValue("filemapspath"))){
 
-	fprintf(stderr, "%s\n", GetStrValue("filemapspath"));
-	return NONE;
-
+	return InitMaps(GetStrValue("filemapspath"));
     }else
 	return NONE;
 }
