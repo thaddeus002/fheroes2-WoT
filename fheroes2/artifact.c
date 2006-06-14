@@ -73,14 +73,14 @@ E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
     }
 
     // ART_ALL
-    return 9 + (rand() % (E_ARTIFACT_COUNT - 10));
+    return 9 + (rand() % (ARTIFACTMAXCOUNT - 10));
 }
 
-void    InitArtifact(void){
+BOOL    InitArtifact(void){
 
-	if(NULL == (ptrArtifact = malloc(sizeof(S_ARTIFACT) * E_ARTIFACT_COUNT))){
-	    fprintf(stderr, "InitArtifact: error malloc: %d\n", sizeof(S_ARTIFACT) * E_ARTIFACT_COUNT);
-	    return;
+	if(NULL == (ptrArtifact = malloc(sizeof(S_ARTIFACT) * ARTIFACTMAXCOUNT))){
+	    fprintf(stderr, "InitArtifact: error malloc: %d\n", sizeof(S_ARTIFACT) * ARTIFACTMAXCOUNT);
+	    return FALSE;
 	}
 
 	ptrArtifact[ULTIMATE_BOOK].name = "Ultimate Book";
@@ -328,4 +328,8 @@ void    InitArtifact(void){
 
 	ptrArtifact[MAGIC_BOOK].name = "Magic Book";
 	ptrArtifact[MAGIC_BOOK].description = "The Magic Book enables you to cast spells.";
+
+    fprintf(stderr, "Init artifact.\n");	
+
+    return TRUE;
 }

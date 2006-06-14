@@ -31,7 +31,7 @@
 
 #define NUM_SOUNDS 10
 
-int	InitSound(void);
+BOOL	InitSound(void);
 void	FreeSound(void);
 void	PlaySound(char *);
 

@@ -32,7 +32,7 @@
 #include "SDL.h"
 #include "gamedefs.h"
 
-#define	MONSTERCOUNT		66
+#define	MONSTERMAXCOUNT		66
 #define	MONSTERCOUNT_LEVEL1	10
 #define	MONSTERCOUNT_LEVEL2	15
 #define	MONSTERCOUNT_LEVEL3	27
@@ -145,7 +145,7 @@ typedef enum {
 		MONSTER_RND3 	= 68,
 		MONSTER_RND4 	= 69,
 
-		E_MONSTER_COUNT = 70
+		MONSTERNONE
 	     } E_MONSTER;
 
 typedef struct {
@@ -165,13 +165,13 @@ typedef struct {
     E_MONSTER		monster;
 	    } S_ARMY;
 
-void		InitMonster(void);
+BOOL		InitMonster(void);
 void		FreeMonster(void);
 
 S_MONSTER *	GetStatMonster(E_MONSTER);
 E_ARMYSIZE 	GetSizeArmy(Uint16);
 E_MONSTER	GetRNDMonster(E_LEVELMONSTER);
-BOOL		DeadMonster(E_MONSTER);
-BOOL		FlyMonster(E_MONSTER);
+BOOL		TheDeadMonster(E_MONSTER);
+BOOL		TheFlyMonster(E_MONSTER);
 
 #endif

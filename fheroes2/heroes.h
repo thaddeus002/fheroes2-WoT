@@ -37,19 +37,20 @@
 #define HEROESMAXSKILL		8
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXARMY		5
+#define HEROESCOUNT		48	// количество героев в игре (6 цветов по 8 героев)
+#define HEROESMAXCOUNT		54	// количество портретов
 
 #define SCOUTINGBASE		4	// стартовое количество клеток обзора у героя
 
 typedef enum {
-		LNONE,
 		BASIC,
 		ADVANCED,
-		EXPERT
+		EXPERT,
+		LEVELNONE
 
 	    } E_LEVELSKILL;
 
 typedef enum {
-		SNONE,
 		ARCHERY,
 		BALLISTICS,
 		DIPLOMACY,
@@ -64,8 +65,86 @@ typedef enum {
 		PATHFINDING,
 		SCOUTING,
 		WISDOM,
+		SKILLNONE
 
 	    } E_SKILL;
+
+typedef enum {
+		// knight
+		LORDKILBURN	= 0,
+		SIRGALLANTH	= 1,
+		ECTOR		= 2,
+		GVENNETH	= 3,
+		TYRO		= 4,
+		AMBROSE		= 5,
+		RUBY		= 6,
+		MAXIMUS		= 7,
+		DIMITRY		= 8,
+
+		// barbarian
+		THUNDAX		= 9,
+		FINEOUS		= 10,
+		JOJOSH		= 11,
+		CRAGHACK	= 12,
+		JEZEBEL		= 13,
+		JACLYN		= 14,
+		ERGON		= 15,
+		TSABU		= 16,
+		ATLAS		= 17,
+
+		// sorceress
+		ASTRA		= 18,
+		NATASHA		= 19,
+		TROYAN		= 20,
+		VATAWNA		= 21,
+		REBECCA		= 22,
+		GEM		= 23,
+		ARIEL		= 24,
+		CARLAWN		= 25,
+		LUNA		= 26,
+
+		// warlock
+		ARIE		= 27,
+		ALAMAR		= 28,
+		VESPER		= 29,
+		CRODO		= 30,
+		BAROK		= 31,
+		KASTORE		= 32,
+		AGAR		= 33,
+		FALAGAR		= 34,
+		WRATHMONT	= 35,
+
+		// wizard
+		MYRA		= 36,
+		FLINT		= 37,
+		DAWN		= 38,
+		HALON		= 39,
+		MYRINI		= 40,
+		WILFREY		= 41,
+		SARAKIN		= 42,
+		KALINDRA	= 43,
+		MANDIGAL	= 44,
+
+		// necromancer
+		ZOM		= 45,
+		DARLANA		= 46,
+		ZAM		= 47,
+		RANLOO		= 48,
+		CHARITY		= 49,
+		RIALDO		= 50,
+		ROXANA		= 51,
+		SANDRO		= 52,
+		CELIA		= 53,
+
+		// герои из компаний
+		NAME_UNK1	= 54,
+		NAME_UNK2	= 55,
+		NAME_UNK3	= 56,
+		NAME_UNK4	= 57,
+		NAME_UNK5	= 58,
+		NAME_UNK6	= 59
+
+	    } E_NAMEHEROES;
 
 typedef enum {
 		BARBARIAN, 
@@ -89,6 +168,8 @@ typedef struct {
 
 typedef struct { 
 		E_RACE          race;
+		const char *	name;
+		SDL_Surface *	face;
 		E_COLORS	color;
 		Uint8           attack;
 		Uint8           defence;
@@ -107,6 +188,9 @@ typedef struct {
 		Uint8		posy;
 	    } S_HEROES;
 
+BOOL		InitHeroes(void);
+void		FreeHeroes();
+
 Uint8		CalculateHeroesAttack(S_HEROES *);
 Uint8		CalculateHeroesDefence(S_HEROES *);
 Uint8		CalculateHeroesPower(S_HEROES *);
@@ -120,5 +204,6 @@ Uint8		CalculateHeroesScouting(S_HEROES *);
 
 BOOL		HeroesArtifactPresent(S_HEROES *, E_ARTIFACT);
 E_LEVELSKILL	HeroesLevelSkill(S_HEROES *, E_SKILL);
+void		HeroesDefaultValues(S_HEROES *, E_RACE);
 
 #endif

@@ -43,9 +43,9 @@ void MixAudio(void *, Uint8 *, int);
 
 static SOUNDHEADER *sounds = NULL;
 
-int InitSound(void){
+BOOL InitSound(void){
 
-    if(0 == GetIntValue("sound")) return 1;
+    if(0 == GetIntValue("sound")) return TRUE;
 
     SDL_AudioSpec fmt;
 
@@ -57,21 +57,21 @@ int InitSound(void){
     fmt.userdata = NULL;
 
     if(0 > SDL_OpenAudio(&fmt, NULL)){
-	fprintf(stderr, "error open audio: %s\n", SDL_GetError());
-	return 1;
+	fprintf(stderr, "InitSound: error open audio: %s\n", SDL_GetError());
+	return FALSE;
     }
     SDL_PauseAudio(0);
     
     sounds = (SOUNDHEADER *) malloc(NUM_SOUNDS * sizeof(SOUNDHEADER));
     if(sounds == NULL){
-	fprintf(stderr, "error malloc: %d\n", NUM_SOUNDS * sizeof(SOUNDHEADER));
-	return 1;
+	fprintf(stderr, "InitSound: error malloc: %d\n", NUM_SOUNDS * sizeof(SOUNDHEADER));
+	return FALSE;
     }
     memset(sounds, 0, NUM_SOUNDS * sizeof(SOUNDHEADER));
 
     fprintf(stderr, "Init sound.\n");
 
-    return 0;
+    return TRUE;
 }
 
 void FreeSound(void){

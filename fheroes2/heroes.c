@@ -28,19 +28,190 @@
 
 #include "SDL.h"
 
+#include "artifact.h"
 #include "monster.h"
 #include "heroes.h"
 
+static S_HEROES *	allHeroes = NULL;
+
+BOOL	InitHeroes(void){
+
+    allHeroes = (S_HEROES *) malloc(HEROESMAXCOUNT * sizeof(S_HEROES));
+
+    if(allHeroes == NULL){
+        fprintf(stderr, "InitHeroes: error malloc: %d\n", HEROESMAXCOUNT * sizeof(S_HEROES));
+        return FALSE;
+    }
+
+    HeroesDefaultValues(&allHeroes[LORDKILBURN], KNIGHT);
+    HeroesDefaultValues(&allHeroes[SIRGALLANTH], KNIGHT);
+    HeroesDefaultValues(&allHeroes[ECTOR], KNIGHT);
+    HeroesDefaultValues(&allHeroes[GVENNETH], KNIGHT);
+    HeroesDefaultValues(&allHeroes[TYRO], KNIGHT);
+    HeroesDefaultValues(&allHeroes[AMBROSE], KNIGHT);
+    HeroesDefaultValues(&allHeroes[RUBY], KNIGHT);
+    HeroesDefaultValues(&allHeroes[MAXIMUS], KNIGHT);
+    HeroesDefaultValues(&allHeroes[DIMITRY], KNIGHT);
+
+    allHeroes[LORDKILBURN].name	= "Lord Kilburn";
+    allHeroes[SIRGALLANTH].name	= "Sir Gallanth";
+    allHeroes[ECTOR].name	= "Ector";
+    allHeroes[GVENNETH].name	= "Gvenneth";
+    allHeroes[TYRO].name	= "Tyro";
+    allHeroes[AMBROSE].name	= "Ambrose";
+    allHeroes[RUBY].name	= "Ruby";
+    allHeroes[MAXIMUS].name	= "Maximus";
+    allHeroes[DIMITRY].name	= "Dimitry";
+
+    fprintf(stderr, "Init heroes.\n");
+
+    return TRUE;
+}
+
+void	FreeHeroes(void){
+
+    if(allHeroes) free(allHeroes);
+
+}
+
+void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
+
+    Uint8 i = 0;
+
+    for(i = 0; i < HEROESMAXSKILL; ++i){
+	heroes->skill[i].type	= SKILLNONE;
+	heroes->skill[i].level	= LEVELNONE;
+    }
+
+    for(i = 0; i < HEROESMAXARTIFACT; ++i)
+	heroes->artifact[i]	= ARTIFACTNONE;
+
+    for(i = 0; i < HEROESMAXARMY; ++i){
+	heroes->army[i].count	= 0;
+	heroes->army[i].monster	= MONSTERNONE;
+    }
+
+    switch(race){
+    
+	case KNIGHT:
+
+	    heroes->race		= KNIGHT;
+	    heroes->attack		= 2;
+	    heroes->defence		= 2;
+	    heroes->power		= 1;
+	    heroes->knowledge		= 1;
+	    heroes->skill[0].type	= LEADERSHIP;
+	    heroes->skill[0].level	= BASIC;
+	    heroes->skill[1].type	= BALLISTICS;
+	    heroes->skill[1].level	= BASIC;
+	    heroes->army[0].count	= 1;
+	    heroes->army[0].monster	= PEASANT;
+	
+	    break;
+	    
+	case BARBARIAN:
+
+	    heroes->race		= BARBARIAN;
+	    heroes->attack		= 3;
+	    heroes->defence		= 1;
+	    heroes->power		= 1;
+	    heroes->knowledge		= 1;
+	    heroes->skill[0].type	= PATHFINDING;
+	    heroes->skill[0].level	= ADVANCED;
+	    heroes->army[0].count	= 1;
+	    heroes->army[0].monster	= GOBLIN;
+	
+	    break;
+
+        case NECROMANCER:
+
+	    heroes->race		= NECROMANCER;
+	    heroes->attack		= 1;
+	    heroes->defence		= 0;
+	    heroes->power		= 2;
+	    heroes->knowledge		= 2;
+	    heroes->skill[0].type	= NECROMANCY;
+	    heroes->skill[0].level	= BASIC;
+	    heroes->skill[1].type	= WISDOM;
+	    heroes->skill[1].level	= BASIC;
+	    heroes->army[0].count	= 1;
+	    heroes->army[0].monster	= SKELETON;
+	    heroes->artifact[0]		= MAGIC_BOOK;
+	    // artifact book + haste
+	    break;
+
+        case SORCERESS:
+
+	    heroes->race		= SORCERESS;
+	    heroes->attack		= 0;
+	    heroes->defence		= 0;
+	    heroes->power		= 2;
+	    heroes->knowledge		= 3;
+	    heroes->skill[0].type	= NAVIGATION;
+	    heroes->skill[0].level	= ADVANCED;
+	    heroes->skill[1].type	= WISDOM;
+	    heroes->skill[1].level	= BASIC;
+	    heroes->army[0].count	= 1;
+	    heroes->army[0].monster	= SPRITE;
+	    heroes->artifact[0]		= MAGIC_BOOK;
+	    // artifact book + bless
+	    break;
+
+        case WARLOCK:
+
+	    heroes->race		= WARLOCK;
+	    heroes->attack		= 0;
+	    heroes->defence		= 0;
+	    heroes->power		= 3;
+	    heroes->knowledge		= 2;
+	    heroes->skill[0].type	= SCOUTING;
+	    heroes->skill[0].level	= ADVANCED;
+	    heroes->skill[1].type	= WISDOM;
+	    heroes->skill[1].level	= BASIC;
+	    heroes->army[0].count	= 1;
+	    heroes->army[0].monster	= CENTAUR;
+	    heroes->artifact[0]		= MAGIC_BOOK;
+	    // artifact book + curse
+	    break;
+
+        case WIZARD:
+
+	    heroes->race		= WIZARD;
+	    heroes->attack		= 0;
+	    heroes->defence		= 1;
+	    heroes->power		= 2;
+	    heroes->knowledge		= 2;
+	    heroes->skill[0].type	= WISDOM;
+	    heroes->skill[0].level	= ADVANCED;
+	    heroes->army[0].count	= 1;
+	    heroes->army[0].monster	= HALFLING;
+	    heroes->artifact[0]		= MAGIC_BOOK;
+	    // artifact book + stoneskin
+	    break;
+
+	default:
+	    break;
+    }
+
+    heroes->morale	= MORALE_GOOD;
+    heroes->luck	= LUCK_NORMAL;
+    heroes->experience	= 0;
+    heroes->magicPoint	= CalculateHeroesMagicPoint(heroes);
+    heroes->movePoint	= 0;
+    heroes->af		= SPREAD;
+
+}
+
 E_LEVELSKILL HeroesLevelSkill(S_HEROES *heroes, E_SKILL skill){
 
-    if(NULL == heroes || SNONE == skill) return LNONE;
+    if(NULL == heroes || SKILLNONE == skill) return LEVELNONE;
 
     Uint8 i;
 
     for(i = 0; i < HEROESMAXSKILL; ++i)
 	if(skill == heroes->skill[i].type) return heroes->skill[i].level;
 
-    return LNONE;
+    return LEVELNONE;
 }
 
 BOOL    HeroesArtifactPresent(S_HEROES *heroes, E_ARTIFACT artifact){

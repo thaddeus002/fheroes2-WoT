@@ -37,9 +37,9 @@
 SDL_Surface	*radarArea = NULL;
 SDL_Surface	*radarCursor = NULL;
 
-void InitRadar(void){
+BOOL InitRadar(void){
 
-    if(radarArea || radarCursor) return;
+    if(radarArea || radarCursor) return FALSE;
 
     int i, j;
     Uint16 index = 0;
@@ -70,8 +70,8 @@ void InitRadar(void){
     CELLMAPS *ptrTile = NULL;
 
     if(NULL == (radarArea = SDL_CreateRGBSurface(SDL_SWSURFACE, RADARWIDTH, RADARWIDTH, 16, rmask, gmask, bmask, 0))){
-	fprintf(stderr, "CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), RADARWIDTH, RADARWIDTH);
-	return;
+	fprintf(stderr, "InitRadar: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), RADARWIDTH, RADARWIDTH);
+	return FALSE;
     }
     for(j = 0; j < heightMaps; ++j){
 
@@ -93,8 +93,8 @@ void InitRadar(void){
 	    tiles = ptrTile->tile;
 
     	    if(NULL == (image = SDL_CreateRGBSurface(SDL_SWSURFACE, RADARWIDTH / widthMaps, RADARWIDTH / heightMaps, 16, rmask, gmask, bmask, 0))){
-		fprintf(stderr, "CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), RADARWIDTH / widthMaps, RADARWIDTH / heightMaps);
-		return;
+		fprintf(stderr, "InitRadar: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), RADARWIDTH / widthMaps, RADARWIDTH / heightMaps);
+		return FALSE;
 	    }
 
 	    ScaleSurface(tiles, image);
@@ -125,8 +125,8 @@ void InitRadar(void){
     Uint8 heightCursor = GetAreaHeight() * scale;
 
     if(NULL == (radarCursor = SDL_CreateRGBSurface(SDL_SWSURFACE, widthCursor, heightCursor, 16, rmask, gmask, bmask, 0))){
-	fprintf(stderr, "CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), widthCursor, heightCursor);
-	return;
+	fprintf(stderr, "InitRadar: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), widthCursor, heightCursor);
+	return FALSE;
     }
 
     SDL_FillRect(radarCursor, NULL, COLORKEY);
@@ -159,7 +159,7 @@ void InitRadar(void){
 	j += 3;
     }
 
-    return;
+    return TRUE;
 }
 
 void FreeRadar(void){

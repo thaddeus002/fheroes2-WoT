@@ -131,7 +131,7 @@ void CursorShow(Uint16 x, Uint16 y){
     return;
 }
 
-void InitCursor(void){
+BOOL InitCursor(void){
 
     SDL_ShowCursor(SDL_DISABLE);
     cursor.name = CURSOR_NULL;
@@ -142,6 +142,8 @@ void InitCursor(void){
     SetCursor(CURSOR_POINTER);
 
     fprintf(stderr, "Init cursor.\n");
+    
+    return TRUE;
 }
 
 void FreeCursor(void){

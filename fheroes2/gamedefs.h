@@ -71,15 +71,15 @@ typedef enum {
 	    } E_SIZEMAP;
 
 typedef enum {
-		DESERT, 
-		SNOW, 
-		SWAMP, 
-		CRACKED, 
-		BEACH, 
-		LAVA, 
-		DIRT, 
-		GRASS, 
-		WATER, 
+		DESERT,
+		SNOW,
+		SWAMP,
+		CRACKED,
+		BEACH,
+		LAVA,
+		DIRT,
+		GRASS,
+		WATER,
 		ROAD
 
 	    } E_SURFACE;

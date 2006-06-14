@@ -32,7 +32,7 @@
 
 void    RedrawRadar(void);
 void    RedrawRadarCursor(void);
-void    InitRadar(void);
+BOOL    InitRadar(void);
 void    FreeRadar(void);
 
 #endif

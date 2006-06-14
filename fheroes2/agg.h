@@ -48,7 +48,7 @@ typedef struct {
     void        *next;
 } ICNHEADER;
 
-BOOL            InitAGG(const char *);
+BOOL            InitAGG();
 void            FreeAGG(void);
 void		PreloadObject(const char *);
 void		FreeObject(const char *);

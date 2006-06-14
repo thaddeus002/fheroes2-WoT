@@ -33,6 +33,7 @@
 #include "SDL.h"
 #include "draw.h"
 #include "tools.h"
+#include "config.h"
 #include "agg.h"
 
 #pragma pack(1)
@@ -295,7 +296,9 @@ BOOL AddICN(void **ptr, INSIDEICNHEADER *hdr, INSIDEICNSPRITE *hdrspr){
     return TRUE;
 }
 
-BOOL InitAGG(const char *filename){
+BOOL InitAGG(){
+
+    char *filename = GetStrValue("aggfile");
 
     // открываем файл
     if(NULL == (fd = fopen(filename, "rb"))){

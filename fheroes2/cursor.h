@@ -29,6 +29,8 @@
 #ifndef _CURSOR_H
 #define _CURSOR_H
 
+#include "gamedefs.h"
+
 #define MOUSE_NULL	0x0000
 #define MOUSE_LCLICK   	0x0001
 #define MOUSE_RCLICK   	0x0002
@@ -147,7 +149,7 @@
 void	SetCursor(Uint32);
 Uint32	GetCursor(void);
 void	CursorShow(Uint16, Uint16);
-void	InitCursor(void);
+BOOL	InitCursor(void);
 void	FreeCursor(void);
 void	CursorOff(void);
 void	CursorOn(void);

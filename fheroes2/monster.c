@@ -68,7 +68,7 @@ E_ARMYSIZE GetSizeArmy(Uint16 count){
     else return LEGION;
 }
 
-BOOL	DeadMonster(E_MONSTER monster){
+BOOL	TheDeadMonster(E_MONSTER monster){
 
     switch(monster){
     
@@ -94,7 +94,7 @@ BOOL	DeadMonster(E_MONSTER monster){
     }
 }
 
-BOOL	FlyMonster(E_MONSTER monster){
+BOOL	TheFlyMonster(E_MONSTER monster){
 
     switch(monster){
     
@@ -152,14 +152,14 @@ E_MONSTER GetRNDMonster(E_LEVELMONSTER level){
     }
 
     // MNS_ALL
-    return rand() % MONSTERCOUNT;
+    return rand() % MONSTERMAXCOUNT;
 }
 
-void	InitMonster(void){
+BOOL	InitMonster(void){
 
-    if(NULL == (ptrMonster = (S_MONSTER *) malloc(sizeof(S_MONSTER) * E_MONSTER_COUNT))){
-	fprintf(stderr, "InitMonster: malloc error: %d\n", sizeof(S_MONSTER) * E_MONSTER_COUNT);
-	return;
+    if(NULL == (ptrMonster = (S_MONSTER *) malloc(sizeof(S_MONSTER) * MONSTERMAXCOUNT))){
+	fprintf(stderr, "InitMonster: malloc error: %d\n", sizeof(S_MONSTER) * MONSTERMAXCOUNT);
+	return FALSE;
     }
 
 	ptrMonster[PEASANT].attack       = 1;
@@ -822,4 +822,7 @@ void	InitMonster(void){
 	ptrMonster[WATER_ELEMENT].cost         = 500;
 	ptrMonster[WATER_ELEMENT].descriptions = "Water Element";
 
+    fprintf(stderr, "Init monster.\n");
+
+    return TRUE;
 }

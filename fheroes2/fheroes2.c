@@ -39,11 +39,11 @@
 #include "cursor.h"
 #include "sound.h"
 #include "monster.h"
+#include "heroes.h"
 #include "artifact.h"
 
 int main(int argc, char **argv){
 
-    char *heroes2_agg = NULL;
     char *config_file = NULL;
     
     SDL_Surface *video = NULL;
@@ -56,12 +56,8 @@ int main(int argc, char **argv){
     sprintf(caption, "Free Heroes II, version: %d", VERSION);
     fprintf(stderr, "Free Heroes II, version: %d\n", VERSION);
 
-    while((c = getopt(argc, argv, "dhc:f:")) != -1)
+    while((c = getopt(argc, argv, "dhc:")) != -1)
 	switch (c){
-
-	    case 'f':
-		heroes2_agg = optarg;
-		break;
 
 	    case 'c':
 		config_file = optarg;
@@ -74,9 +70,11 @@ int main(int argc, char **argv){
 	    case '?':
 	    case 'h':
 		printf("Usage: %s [OPTIONS]\n", argv[0]);
+		printf("  -w\tfull screen\n");
+		printf("  -s\tsound on\n");
+		printf("  -m\tmusic on\n");
 		printf("  -d\tdebug mode\n");
 		printf("  -c\tpath to config file (default fheroes2.cfg)\n");
-		printf("  -f\tpath to heroes2.agg\n");
 		printf("  -h\tprint this help and exit\n");
 		exit(0);
 		break;
@@ -89,7 +87,6 @@ int main(int argc, char **argv){
     if(NULL == config_file) config_file = "fheroes2.cfg";
     InitConfig(config_file);
     if(debug) SetIntValue("debug", debug);
-    if(NULL == heroes2_agg) heroes2_agg = GetStrValue("aggfile");
 
     Uint32 flags;
     // инициализация SDL
@@ -108,6 +105,7 @@ int main(int argc, char **argv){
 
     Uint16 xres = 0;
     Uint16 yres = 0;
+
     switch(GetIntValue("videomode")){
 
         default:
@@ -154,20 +152,24 @@ int main(int argc, char **argv){
     srand((unsigned int) time(NULL));
 
     // инициализация игровых данных
-    if(! InitAGG(heroes2_agg)) exit(1);
-    InitSound();
-    InitMonster();
-    InitArtifact();
-    InitCursor();
+    if(
+	InitAGG() &&
+	InitSound() &&
+	InitMonster() &&
+	InitArtifact() &&
+	InitHeroes() &&
+	InitCursor() ){
 
-    // переходим на первый экран
-    PreloadObject("HEROES.ICN");
-    PreloadObject("BTNSHNGL.ICN");
+	// переходим на первый экран
+	PreloadObject("HEROES.ICN");
+	PreloadObject("BTNSHNGL.ICN");
 
-    DrawNewLoadQuit();
+	DrawNewLoadQuit();
+    }
 
     // освобождаем данные
     FreeCursor();
+    FreeHeroes();
     FreeArtifact();
     FreeMonster();
     FreeSound();

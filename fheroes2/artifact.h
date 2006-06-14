@@ -36,6 +36,7 @@
 #define	ARTIFACTCOUNT_LEVEL1	27
 #define	ARTIFACTCOUNT_LEVEL2	21
 #define	ARTIFACTCOUNT_LEVEL3	22
+#define	ARTIFACTMAXCOUNT	82	// all (level1 + level2 + level3 + 8 ultimate + 2 bad artifact) + 1 magic book
 
 typedef enum {
 	    ART_ALL,
@@ -45,7 +46,6 @@ typedef enum {
 	    } E_LEVELARTIFACT;
 
 typedef enum {
-		ARTIFACT_NONE,
 		ULTIMATE_BOOK,
 		ULTIMATE_SWORD,
 		ULTIMATE_CLOAK,
@@ -148,7 +148,7 @@ typedef enum {
 		SPADE_NECROMANCY,
 */
 		MAGIC_BOOK,
-		E_ARTIFACT_COUNT
+		ARTIFACTNONE
 	    } E_ARTIFACT;
 
 typedef struct {
@@ -156,7 +156,7 @@ typedef struct {
 		const char *	description;
 	    } S_ARTIFACT;
 
-void		InitArtifact(void);
+BOOL		InitArtifact(void);
 void		FreeArtifact(void);
 S_ARTIFACT *	GetStatArtifact(E_ARTIFACT);
 E_ARTIFACT	GetRNDArtifact(E_LEVELARTIFACT);
