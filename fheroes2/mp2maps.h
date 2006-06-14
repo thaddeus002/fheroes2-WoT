@@ -88,20 +88,131 @@ Uint32	uniqNumber2; 	        // уникальный номер целого о�
 
 /* дополнительная информация о клетке карты */
 typedef struct {
-Uint16	indexAddon;		// индекс следующей неотрисованной части объекта иначе 0
-Uint8	objectNameN1;		// объект следующего 1 уровня
-Uint8	indexNameN1;		// 0xFF или индекс спрайта
-Uint8	quantityN;		// используется для порядка отрисовки % 4
-Uint8	objectNameN2;		// объект следующего 2 уровня
-Uint8	indexNameN2;		// 0xFF или индекс спрайта
-Uint32	uniqNumberN1;		// уникальный номер целого объекта следующего первого уровня
-Uint32	uniqNumberN2;		// уникальный номер целого объекта следующего второго уровня
+    Uint16	indexAddon;		// индекс следующей неотрисованной части объекта иначе 0
+    Uint8	objectNameN1;		// объект следующего 1 уровня
+    Uint8	indexNameN1;		// 0xFF или индекс спрайта
+    Uint8	quantityN;		// используется для порядка отрисовки % 4
+    Uint8	objectNameN2;		// объект следующего 2 уровня
+    Uint8	indexNameN2;		// 0xFF или индекс спрайта
+    Uint32	uniqNumberN1;		// уникальный номер целого объекта следующего первого уровня
+    Uint32	uniqNumberN2;		// уникальный номер целого объекта следующего второго уровня
 } MP2ADDONTAIL;
 
 // далее
 // дополнительная информация о карте
 // тексты сообщений запрограммированных событий
 // дополнительная инормация о замках по 48 байт
+
+// 01
+// Uint32	countObject - 1;
+
+typedef struct {
+
+    Uint8	xxa;		// 0x46
+    Uint8	xxb;		// 0x00 
+    Uint8	color; // 00 blue, 01 green, 02 red, 03 yellow, 04 orange, 05 purpl, ff unknown
+    BOOL	customBuilding;
+    Uint16	building;
+		    /*
+			0000 0000 0000 0010	Thieve's Guild
+			0000 0000 0000 0100	Tavern
+			0000 0000 0000 1000	Shipyard
+			0000 0000 0001 0000	Well
+			0000 0000 1000 0000	Statue
+			0000 0001 0000 0000	Left Turret
+			0000 0010 0000 0000	Right Turret
+			0000 0100 0000 0000	Marketplace
+			0000 1000 0000 0000	Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
+			0001 0000 0000 0000	Moat
+			0010 0000 0000 0000	Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
+		    */
+    Uint16	dwelling;
+		    /*
+			0000 0000 0000 1000	dweling1
+			0000 0000 0001 0000	dweling2
+			0000 0000 0010 0000	dweling3
+			0000 0000 0100 0000	dweling4
+			0000 0000 1000 0000	dweling5
+			0000 0001 0000 0000	dweling6
+			0000 0010 0000 0000	upgDweling2
+			0000 0100 0000 0000	upgDweling3
+			0000 1000 0000 0000	upgDweling4
+			0001 0000 0000 0000	upgDweling5
+			0010 0000 0000 0000	upgDweling6
+		    */
+    Uint8	magicTower;
+    BOOL	customTroops;
+    Uint8	monster1;
+    Uint8	monster2;
+    Uint8	monster3;
+    Uint8	monster4;
+    Uint8	monster5;
+    Uint16	countMonter1;
+    Uint16	countMonter2;
+    Uint16	countMonter3;
+    Uint16	countMonter4;
+    Uint16	countMonter5;
+    BOOL	capitan;
+    BOOL	customCastleName;
+    char	castleName[13];		// name + '\0' // 40 byte
+    Uint8	type;			// 00 knight, 01 barb, 02 sorc, 03 warl, 04 wiz, 05 necr, 06 rnd
+    BOOL	castle;
+    Uint8	allowCastle;		// 00 TRUE, 01 FALSE
+    Uint8	xxc[29];
+
+} MP2CASTLE;
+
+/*
+typedef struct {
+
+    Uint8	xxa;		// 0x4c
+    00 00
+    BOOL	customTroops;
+    Uint8	monster1;	// 0xff none
+    Uint8	monster2;	// 0xff none
+    Uint8	monster3;	// 0xff none
+    Uint8	monster4;	// 0xff none
+    Uint8	monster5;	// 0xff none
+    Uint16	countMonter1;
+    Uint16	countMonter2;
+    Uint16	countMonter3;
+    Uint16	countMonter4;
+    Uint16	countMonter5;
+    Uint8	customPortrate;
+    Uint8	portrate;
+    Uint8	artifact1;	// 0xff none
+    Uint8	artifact2;	// 0xff none
+    Uint8	artifact3;	// 0xff none
+    Uint8	00;
+    Uint32	exerience;
+    BOOL	customSkill;
+    Uint8	skill1;		// 0xff none
+    Uint8	skill2;		// pathfinding, arcgery, logistic, scouting, 
+    Uint8	skill3;		// diplomacy, navigation, leadership, wisdom,
+    Uint8	skill4;		// mysticism, luck, ballistics, eagle, necromance, estate
+    Uint8	skill5;
+    Uint8	skill6;
+    Uint8	skill7;
+    Uint8	skill8;
+    Uint8	skillLevel1;
+    Uint8	skillLevel2;
+    Uint8	skillLevel3;
+    Uint8	skillLevel4;
+    Uint8	skillLevel5;
+    Uint8	skillLevel6;
+    Uint8	skillLevel7;
+    Uint8	skillLevel8;
+    Uint8	00;
+    Uint8	customName;
+    char	name[13];	// name + '\0'
+    BOOL	patrol;
+    Uint8	countSquare;	// for patrol
+    000000000000 total size 0x4e
+} MPHEROES;
+*/
+
+//Uint32	endCount;
+
 
 /* ************** END MP2 **************** */
 

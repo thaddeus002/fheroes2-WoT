@@ -29,6 +29,8 @@
 #include "SDL.h"
 
 #include "artifact.h"
+#include "magic.h"
+#include "magicbook.h"
 #include "monster.h"
 #include "heroes.h"
 
@@ -53,6 +55,63 @@ BOOL	InitHeroes(void){
     HeroesDefaultValues(&allHeroes[MAXIMUS], KNIGHT);
     HeroesDefaultValues(&allHeroes[DIMITRY], KNIGHT);
 
+    HeroesDefaultValues(&allHeroes[THUNDAX], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[FINEOUS], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[JOJOSH], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[CRAGHACK], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[JEZEBEL], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[JACLYN], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[ERGON], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[TSABU], BARBARIAN);
+    HeroesDefaultValues(&allHeroes[ATLAS], BARBARIAN);
+
+    HeroesDefaultValues(&allHeroes[ASTRA], SORCERESS);
+    HeroesDefaultValues(&allHeroes[NATASHA], SORCERESS);
+    HeroesDefaultValues(&allHeroes[TROYAN], SORCERESS);
+    HeroesDefaultValues(&allHeroes[VATAWNA], SORCERESS);
+    HeroesDefaultValues(&allHeroes[REBECCA], SORCERESS);
+    HeroesDefaultValues(&allHeroes[GEM], SORCERESS);
+    HeroesDefaultValues(&allHeroes[ARIEL], SORCERESS);
+    HeroesDefaultValues(&allHeroes[CARLAWN], SORCERESS);
+    HeroesDefaultValues(&allHeroes[LUNA], SORCERESS);
+
+    HeroesDefaultValues(&allHeroes[ARIE], WARLOCK);
+    HeroesDefaultValues(&allHeroes[ALAMAR], WARLOCK);
+    HeroesDefaultValues(&allHeroes[VESPER], WARLOCK);
+    HeroesDefaultValues(&allHeroes[CRODO], WARLOCK);
+    HeroesDefaultValues(&allHeroes[BAROK], WARLOCK);
+    HeroesDefaultValues(&allHeroes[KASTORE], WARLOCK);
+    HeroesDefaultValues(&allHeroes[AGAR], WARLOCK);
+    HeroesDefaultValues(&allHeroes[FALAGAR], WARLOCK);
+    HeroesDefaultValues(&allHeroes[WRATHMONT], WARLOCK);
+
+    HeroesDefaultValues(&allHeroes[MYRA], WIZARD);
+    HeroesDefaultValues(&allHeroes[FLINT], WIZARD);
+    HeroesDefaultValues(&allHeroes[DAWN], WIZARD);
+    HeroesDefaultValues(&allHeroes[HALON], WIZARD);
+    HeroesDefaultValues(&allHeroes[MYRINI], WIZARD);
+    HeroesDefaultValues(&allHeroes[WILFREY], WIZARD);
+    HeroesDefaultValues(&allHeroes[SARAKIN], WIZARD);
+    HeroesDefaultValues(&allHeroes[KALINDRA], WIZARD);
+    HeroesDefaultValues(&allHeroes[MANDIGAL], WIZARD);
+
+    HeroesDefaultValues(&allHeroes[ZOM], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[DARLANA], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[ZAM], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[RANLOO], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[CHARITY], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[RIALDO], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[ROXANA], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[SANDRO], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[CELIA], NECROMANCER);
+
+    HeroesDefaultValues(&allHeroes[NAME_UNK1], KNIGHT);
+    HeroesDefaultValues(&allHeroes[NAME_UNK2], KNIGHT);
+    HeroesDefaultValues(&allHeroes[NAME_UNK3], KNIGHT);
+    HeroesDefaultValues(&allHeroes[NAME_UNK4], KNIGHT);
+    HeroesDefaultValues(&allHeroes[NAME_UNK5], KNIGHT);
+    HeroesDefaultValues(&allHeroes[NAME_UNK6], KNIGHT);
+
     allHeroes[LORDKILBURN].name	= "Lord Kilburn";
     allHeroes[SIRGALLANTH].name	= "Sir Gallanth";
     allHeroes[ECTOR].name	= "Ector";
@@ -62,6 +121,63 @@ BOOL	InitHeroes(void){
     allHeroes[RUBY].name	= "Ruby";
     allHeroes[MAXIMUS].name	= "Maximus";
     allHeroes[DIMITRY].name	= "Dimitry";
+
+    allHeroes[THUNDAX].name	= "Thundax";
+    allHeroes[FINEOUS].name	= "Fineous";
+    allHeroes[JOJOSH].name	= "Jojosh";
+    allHeroes[CRAGHACK].name	= "Crag Hack";
+    allHeroes[JEZEBEL].name	= "Jezebel";
+    allHeroes[JACLYN].name	= "Jaclin";
+    allHeroes[ERGON].name	= "Ergon";
+    allHeroes[TSABU].name	= "Tsabu";
+    allHeroes[ATLAS].name	= "Atlas";
+
+    allHeroes[ASTRA].name	= "Astra";
+    allHeroes[NATASHA].name	= "Natasha";
+    allHeroes[TROYAN].name	= "Troyan";
+    allHeroes[VATAWNA].name	= "Vatawna";
+    allHeroes[REBECCA].name	= "Rebecca";
+    allHeroes[GEM].name		= "Gem";
+    allHeroes[ARIEL].name	= "Ariel";
+    allHeroes[CARLAWN].name	= "Carlawn";
+    allHeroes[LUNA].name	= "Luna";
+
+    allHeroes[ARIE].name	= "Arie";
+    allHeroes[ALAMAR].name	= "Alamar";
+    allHeroes[VESPER].name	= "Vesper";
+    allHeroes[CRODO].name	= "Crodo";
+    allHeroes[BAROK].name	= "Barok";
+    allHeroes[KASTORE].name	= "Kastore";
+    allHeroes[AGAR].name	= "Agar";
+    allHeroes[FALAGAR].name	= "Falagar";
+    allHeroes[WRATHMONT].name	= "Wrathmont";
+
+    allHeroes[MYRA].name	= "Myra";
+    allHeroes[FLINT].name	= "Flint";
+    allHeroes[DAWN].name	= "Dawn";
+    allHeroes[HALON].name	= "Halon";
+    allHeroes[MYRINI].name	= "Myrini";
+    allHeroes[WILFREY].name	= "Wilfrey";
+    allHeroes[SARAKIN].name	= "Sarakin";
+    allHeroes[KALINDRA].name	= "Kalindra";
+    allHeroes[MANDIGAL].name	= "Mandigal";
+
+    allHeroes[ZOM].name		= "Zom";
+    allHeroes[DARLANA].name	= "Darlana";
+    allHeroes[ZAM].name		= "Zam";
+    allHeroes[RANLOO].name	= "Ranloo";
+    allHeroes[CHARITY].name	= "Charity";
+    allHeroes[RIALDO].name	= "Rialdo";
+    allHeroes[ROXANA].name	= "Roxana";
+    allHeroes[SANDRO].name	= "Sandro";
+    allHeroes[CELIA].name	= "Celia";
+
+    allHeroes[NAME_UNK1].name	= "Unknown 1";
+    allHeroes[NAME_UNK2].name	= "Unknown 2";
+    allHeroes[NAME_UNK3].name	= "Unknown 3";
+    allHeroes[NAME_UNK4].name	= "Unknown 4";
+    allHeroes[NAME_UNK5].name	= "Unknown 5";
+    allHeroes[NAME_UNK6].name	= "Unknown 6";
 
     fprintf(stderr, "Init heroes.\n");
 
@@ -137,7 +253,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].count	= 1;
 	    heroes->army[0].monster	= SKELETON;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    // artifact book + haste
+	    AddMagicToBook(HASTLE);
 	    break;
 
         case SORCERESS:
@@ -154,7 +270,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].count	= 1;
 	    heroes->army[0].monster	= SPRITE;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    // artifact book + bless
+	    AddMagicToBook(BLESS);
 	    break;
 
         case WARLOCK:
@@ -171,7 +287,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].count	= 1;
 	    heroes->army[0].monster	= CENTAUR;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    // artifact book + curse
+	    AddMagicToBook(CURSE);
 	    break;
 
         case WIZARD:
@@ -186,7 +302,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].count	= 1;
 	    heroes->army[0].monster	= HALFLING;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    // artifact book + stoneskin
+	    AddMagicToBook(STONESKIN);
 	    break;
 
 	default:

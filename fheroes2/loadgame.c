@@ -1799,9 +1799,11 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 		DrawCellAreaMapsMonster(rect->x - 1, y);
 
 	// отрисовываем все верхние объекты
-	for(y = rect->y; y < rect->y + rect->h; ++y)
+	for(y = rect->y; y < rect->y + rect->h; ++y){
 
 		DrawCellAreaMapsLevel2(rect->x - 1, y);
+		DrawCellAreaMapsLevel2(rect->x, y);
+	}
 
     }else if(rect->y == (GetAreaHeight() - 1)){
 
@@ -1811,9 +1813,11 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 		DrawCellAreaMapsMonster(x, rect->y - 1);
 
 	// отрисовываем все верхние объекты
-	for(y = rect->y; y < rect->y + rect->h; ++y)
+	for(y = rect->y; y < rect->y + rect->h; ++y){
 
 		DrawCellAreaMapsLevel2(y, rect->y - 1);
+		DrawCellAreaMapsLevel2(y, rect->y);
+	}
     }
 
     // отрисовываем рамку area

@@ -38,7 +38,7 @@
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXARMY		5
 #define HEROESCOUNT		48	// количество героев в игре (6 цветов по 8 героев)
-#define HEROESMAXCOUNT		54	// количество портретов
+#define HEROESMAXCOUNT		60	// количество портретов
 
 #define SCOUTINGBASE		4	// стартовое количество клеток обзора у героя
 
