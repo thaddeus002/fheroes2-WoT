@@ -26,5 +26,5 @@
     Description:
 */
 
-#include "magic.h"
+#include "spell.h"
 

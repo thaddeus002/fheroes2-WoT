@@ -29,7 +29,7 @@
 #include "SDL.h"
 
 #include "artifact.h"
-#include "magic.h"
+#include "spell.h"
 #include "magicbook.h"
 #include "monster.h"
 #include "heroes.h"

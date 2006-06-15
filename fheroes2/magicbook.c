@@ -26,7 +26,7 @@
     Description:
 */
 
-#include "magic.h"
+#include "spell.h"
 #include "magicbook.h"
 
 void AddMagicToBook(E_MAGIC magic){

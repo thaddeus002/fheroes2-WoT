@@ -29,7 +29,7 @@
 #ifndef _MAGICBOOK_H
 #define _MAGICBOOK_H
 
-#include "magic.h"
+#include "spell.h"
 
 void	AddMagicToBook(E_MAGIC);
 

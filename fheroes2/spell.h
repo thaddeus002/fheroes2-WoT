@@ -26,8 +26,8 @@
     Description:
 */
 
-#ifndef _MAGIC_H
-#define _MAGIC_H
+#ifndef _SPELL_H
+#define _SPELL_H
 
 #include "SDL.h"
 
