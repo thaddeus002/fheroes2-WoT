@@ -99,18 +99,19 @@ typedef struct {
 } MP2ADDONTAIL;
 
 // далее
-// дополнительная информация о карте
-// тексты сообщений запрограммированных событий
-// дополнительная инормация о замках по 48 байт
+// блок FF FF FF нахрен нужен непонятно
+// дополнительная информация о замках по 0x48 байт
+// дополнительная информация о героях по 0x4E байт
 
-// 01
-// Uint32	countObject - 1;
+// count;
+// count;
+// count;
 
 typedef struct {
 
-    Uint8	xxa;		// 0x46
-    Uint8	xxb;		// 0x00 
-    Uint8	color; // 00 blue, 01 green, 02 red, 03 yellow, 04 orange, 05 purpl, ff unknown
+    Uint8	identify;	// 0x46
+    Uint8	zero;		// 0x00
+    Uint8	color; 		// 00 blue, 01 green, 02 red, 03 yellow, 04 orange, 05 purpl, ff unknown
     BOOL	customBuilding;
     Uint16	building;
 		    /*
@@ -165,8 +166,9 @@ typedef struct {
 /*
 typedef struct {
 
-    Uint8	xxa;		// 0x4c
-    00 00
+    Uint8	identify;	// 0x4c
+    Uint8	00;
+    Uint8	00;
     BOOL	customTroops;
     Uint8	monster1;	// 0xff none
     Uint8	monster2;	// 0xff none
@@ -210,6 +212,9 @@ typedef struct {
     000000000000 total size 0x4e
 } MPHEROES;
 */
+
+// дополнительная информация о карте
+// тексты сообщений запрограммированных событий
 
 //Uint32	endCount;
 

@@ -26,12 +26,21 @@
     Description:
 */
 
-#ifndef _MAGICBOOK_H
-#define _MAGICBOOK_H
+#ifndef _CASTLE_H
+#define _CASTLE_H
 
-#include "spell.h"
+#include "SDL.h"
+#include "gamedefs.h"
 
-void	AddMagicToBook(E_SPELL);
+typedef enum {
+		BARBARIAN, 
+		KNIGHT, 
+		NECROMANCER, 
+		SORCERESS, 
+		WARLOCK, 
+		WIZARD,
+		BOMG
 
+	    } E_RACE;
 
 #endif

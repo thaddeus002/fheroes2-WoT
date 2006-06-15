@@ -31,6 +31,7 @@
 #include "artifact.h"
 #include "spell.h"
 #include "magicbook.h"
+#include "castle.h"
 #include "monster.h"
 #include "heroes.h"
 
@@ -253,7 +254,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].count	= 1;
 	    heroes->army[0].monster	= SKELETON;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    AddMagicToBook(HASTLE);
+	    AddMagicToBook(HASTE);
 	    break;
 
         case SORCERESS:

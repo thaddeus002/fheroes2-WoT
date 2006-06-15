@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include "SDL.h"
 
+#include "castle.h"
 #include "monster.h"
 
 static S_MONSTER	*ptrMonster = NULL;
@@ -68,7 +69,7 @@ E_ARMYSIZE GetSizeArmy(Uint16 count){
     else return LEGION;
 }
 
-BOOL	TheDeadMonster(E_MONSTER monster){
+E_RACE	GetRaceMonster(E_MONSTER monster){
 
     switch(monster){
     
@@ -82,14 +83,79 @@ BOOL	TheDeadMonster(E_MONSTER monster){
 	case LICH:
 	case POWER_LICH:
 	case BONE_DRAGON:
-	case GHOST:
 
-	    return TRUE;
+	    return NECROMANCER;
 	    break;
-	
-	default:
 
-	    return FALSE;
+	case GOBLIN:
+	case ORC:
+	case CHIEF_ORC:
+	case WOLF:
+	case OGRE:
+	case LORD_OGRE:
+	case TROLL:
+	case WAR_TROLL:
+	case CYCLOPS:
+
+	    return BARBARIAN;
+	    break;
+
+	case PEASANT:
+	case ARCHER:
+	case RANGER:
+	case PIKEMAN:
+	case VETERAN_PIKEMAN:
+	case SWORDSMAN:
+	case MASTER_SWORDSMAN:
+	case CAVALIRY:
+	case CHAMPION:
+	case PALADIN:
+	case CRUSADER:
+
+	    return KNIGHT;
+	    break;
+
+	case SPRITE:
+	case DWARF:
+	case BATTLE_DWARF:
+	case ELF:
+	case GRAND_ELF:
+	case DRUID:
+	case GREATER_DRUID:
+	case UNICORN:
+	case PHOENIX:
+
+	    return SORCERESS;
+	    break;
+
+	case CENTAUR:
+	case GARGOYLE:
+	case GRIFFIN:
+	case MINOTAUR:
+	case KNIGHT_MINOTAUR:
+	case HIDRA:
+	case GREEN_DRAGON:
+	case RED_DRAGON:
+	case BLACK_DRAGON:
+
+	    return WARLOCK;
+	    break;
+
+	case HALFLING:
+	case BOAR:
+	case IRON_GOLEM:
+	case STEEL_GOLEM:
+	case ROC:
+	case MAGE:
+	case ARCHMAGE:
+	case GIANT:
+	case TITAN:
+
+	    return WIZARD;
+	    break;
+
+	default:
+	    return BOMG;
 	    break;
     }
 }

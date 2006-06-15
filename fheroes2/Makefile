@@ -1,5 +1,5 @@
 # makefile
-# project: Open Heroes2
+# project: Free Heroes2
 #
 
 TARGET = fheroes2

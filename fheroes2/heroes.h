@@ -31,6 +31,7 @@
 
 #include "SDL.h"
 #include "artifact.h"
+#include "castle.h"
 #include "monster.h"
 #include "gamedefs.h"
 
@@ -145,16 +146,6 @@ typedef enum {
 		NAME_UNK6	= 59
 
 	    } E_NAMEHEROES;
-
-typedef enum {
-		BARBARIAN, 
-		KNIGHT, 
-		NECROMANCER, 
-		SORCERESS, 
-		WARLOCK, 
-		WIZARD
-
-	    } E_RACE;
 
 typedef enum {
 		SPREAD,

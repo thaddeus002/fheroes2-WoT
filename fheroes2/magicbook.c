@@ -29,7 +29,7 @@
 #include "spell.h"
 #include "magicbook.h"
 
-void AddMagicToBook(E_MAGIC magic){
+void AddMagicToBook(E_SPELL magic){
 
     return;
 }

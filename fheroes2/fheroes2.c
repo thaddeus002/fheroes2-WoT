@@ -40,6 +40,7 @@
 #include "sound.h"
 #include "monster.h"
 #include "heroes.h"
+#include "spell.h"
 #include "artifact.h"
 
 int main(int argc, char **argv){
@@ -158,6 +159,7 @@ int main(int argc, char **argv){
 	InitMonster() &&
 	InitArtifact() &&
 	InitHeroes() &&
+	InitSpell() &&
 	InitCursor() ){
 
 	// переходим на первый экран
@@ -169,6 +171,7 @@ int main(int argc, char **argv){
 
     // освобождаем данные
     FreeCursor();
+    FreeSpell();
     FreeHeroes();
     FreeArtifact();
     FreeMonster();

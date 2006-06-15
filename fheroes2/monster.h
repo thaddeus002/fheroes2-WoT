@@ -31,6 +31,7 @@
 
 #include "SDL.h"
 #include "gamedefs.h"
+#include "castle.h"
 
 #define	MONSTERMAXCOUNT		66
 #define	MONSTERCOUNT_LEVEL1	10
@@ -171,7 +172,7 @@ void		FreeMonster(void);
 S_MONSTER *	GetStatMonster(E_MONSTER);
 E_ARMYSIZE 	GetSizeArmy(Uint16);
 E_MONSTER	GetRNDMonster(E_LEVELMONSTER);
-BOOL		TheDeadMonster(E_MONSTER);
+E_RACE		GetRaceMonster(E_MONSTER);
 BOOL		TheFlyMonster(E_MONSTER);
 
 #endif
