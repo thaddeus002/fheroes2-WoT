@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include "SDL.h"
 
+#include "config.h"
 #include "castle.h"
 #include "monster.h"
 
@@ -39,6 +40,20 @@ void	FreeMonster(void){
     if(ptrMonster) free(ptrMonster);
 
     ptrMonster = NULL;
+}
+
+E_MONSTER CheckCorrectMonster(Uint8 type){
+
+    E_MONSTER a;
+                
+    for(a = PEASANT; a < MONSTERNONE; ++a)
+	if(a == type)
+    	    return a;
+
+    if(GetIntValue("debug"))
+        fprintf(stderr, "CheckCorrectMonster: unknown monster: 0x%hhX\n", type);
+
+    return PEASANT;
 }
 
 S_MONSTER *GetStatMonster(E_MONSTER monster){

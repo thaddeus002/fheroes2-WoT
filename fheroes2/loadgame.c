@@ -36,6 +36,7 @@
 #include "actionevent.h"
 #include "element.h"
 #include "config.h"
+#include "debug.h"
 #include "draw.h"
 #include "radar.h"
 #include "loadgame.h"
@@ -1741,7 +1742,7 @@ void DrawRectAreaMaps(SDL_Rect *rect){
     Uint16 index = 0;
     SDL_Rect dest;
 
-    CELLMAPS *ptrCell = NULL;
+    S_CELLMAPS *ptrCell = NULL;
     // циклы разделены bug (объекты больше чем tile, следующий tile зарисовывает объект)
 
     // сначала отрисовываем все tile
@@ -1831,104 +1832,58 @@ void DrawRectAreaMaps(SDL_Rect *rect){
     dest.w = GetAreaWidth() * TILEWIDTH;
     dest.h = BORDERWIDTH;
     SDL_BlitSurface(frameAreaBottom, NULL, video, &dest);
+
 }
 
 /* функция реализующая алгоритм отрисовки нижних объектов одной клетки */
 void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
 
+    SDL_Surface *video = SDL_GetVideoSurface();
+
     SDL_Rect dest;
-    dest.x = BORDERWIDTH + x * TILEWIDTH;
-    dest.y = BORDERWIDTH + y * TILEWIDTH;
-    dest.w = TILEWIDTH;
-    dest.h = TILEWIDTH;
 
-    Uint16 index = (display.offsetY + y) * GetWidthMaps() + display.offsetX + x;
-    Uint16 indexAddon = 0;
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+    ICNHEADER  *icn = ptrCell->level1;
 
-    CELLMAPS *ptrCell = GetCELLMAPS(index);
-    MP2ADDONTAIL *ptrAddon = NULL;
-    Sint8 i = 0;
+    // все нижние объекты
+    while(icn){
 
-    for(i = 3; i >= 0; --i){
-    
-	// объект 1 уровня
-	if(0xFF != ptrCell->info->indexName1 && i == (ptrCell->info->quantity1 % 4)) DrawMapObject(&dest, ptrCell->info->objectName1, ptrCell->info->indexName1);
+	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
+	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
+	dest.w = TILEWIDTH;
+	dest.h = TILEWIDTH;
 
-	indexAddon = ptrCell->info->indexAddon;
+        SDL_BlitSurface(icn->surface, NULL, video, &dest);
 
-	// все объекты N1
-	while(indexAddon){
-	    ptrAddon = GetADDONTAIL(indexAddon);
-	    if(0xFF != ptrAddon->indexNameN1 && i == (ptrAddon->quantityN % 4)) DrawMapObject(&dest, ptrAddon->objectNameN1 * 2, ptrAddon->indexNameN1);
-	    indexAddon = ptrAddon->indexAddon;
-	}
+        icn = icn->next;
     }
 }
 
 /* функция реализующая алгоритм отрисовки монстров одной клетки */
 void DrawCellAreaMapsMonster(Uint8 x, Uint8 y){
-
-    SDL_Rect dest;
-    dest.x = BORDERWIDTH + x * TILEWIDTH;
-    dest.y = BORDERWIDTH + y * TILEWIDTH;
-    dest.w = TILEWIDTH;
-    dest.h = TILEWIDTH;
-
-    Uint16 index = (display.offsetY + y) * GetWidthMaps() + display.offsetX + x;
-    Uint16 indexAddon = 0;
-
-    CELLMAPS *ptrCell = GetCELLMAPS(index);
-    MP2ADDONTAIL *ptrAddon = NULL;
-    Sint8 i = 0;
-
-    for(i = 3; i >= 0; --i){
-    
-	if(0x98 == ptrCell->info->generalObject){
-
-	    // объект 1 уровня
-	    if(0xFF != ptrCell->info->indexName1 && i == (ptrCell->info->quantity1 % 4)) DrawMapObject(&dest, ptrCell->info->objectName1, ptrCell->info->indexName1);
-
-	    indexAddon = ptrCell->info->indexAddon;
-
-	    // все объекты N1
-	    while(indexAddon){
-		ptrAddon = GetADDONTAIL(indexAddon);
-		if(0xFF != ptrAddon->indexNameN1 && i == (ptrAddon->quantityN % 4)) DrawMapObject(&dest, ptrAddon->objectNameN1 * 2, ptrAddon->indexNameN1);
-		indexAddon = ptrAddon->indexAddon;
-	    }
-	}
-    }
 }
 
 /* функция реализующая алгоритм отрисовки верхних объектов одной клетки */
 void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
 
+    SDL_Surface *video = SDL_GetVideoSurface();
+
     SDL_Rect dest;
-    dest.x = BORDERWIDTH + x * TILEWIDTH;
-    dest.y = BORDERWIDTH + y * TILEWIDTH;
-    dest.w = TILEWIDTH;
-    dest.h = TILEWIDTH;
 
-    Uint16 index = (display.offsetY + y) * GetWidthMaps() + display.offsetX + x;
-    Uint16 indexAddon = 0;
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+    ICNHEADER  *icn = ptrCell->level2;
 
-    CELLMAPS *ptrCell = GetCELLMAPS(index);
-    MP2ADDONTAIL *ptrAddon = NULL;
-    Sint8 i = 0;
+    // все нижние объекты
+    while(icn){
 
-    for(i = 3; i >= 0; --i){
+	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
+	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
+	dest.w = TILEWIDTH;
+	dest.h = TILEWIDTH;
 
-        // объект 2 уровня
-	if(0xFF != ptrCell->info->indexName2 && i == (ptrCell->info->quantity1 % 4)) DrawMapObject(&dest, ptrCell->info->objectName2, ptrCell->info->indexName2);
+        SDL_BlitSurface(icn->surface, NULL, video, &dest);
 
-	indexAddon = ptrCell->info->indexAddon;
-
-        // все объекты N2
-	while(indexAddon){
-	    ptrAddon = GetADDONTAIL(indexAddon);
-	    if(0xFF != ptrAddon->indexNameN2 && i == (ptrAddon->quantityN % 4)) DrawMapObject(&dest, ptrAddon->objectNameN2, ptrAddon->indexNameN2);
-	    indexAddon = ptrAddon->indexAddon;
-	}
+        icn = icn->next;
     }
 }
 

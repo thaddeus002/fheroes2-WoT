@@ -50,26 +50,13 @@ BOOL InitRadar(void){
     Uint8 widthMaps = GetWidthMaps();
     Uint8 heightMaps = GetHeightMaps();
     
-    Uint16 rmask, gmask, bmask, amask;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    rmask = 0xF000;
-    gmask = 0x0F00;
-    bmask = 0x00F0;
-    amask = 0x000F;
-#else
-    rmask = 0x000F;
-    gmask = 0x00F0;
-    bmask = 0x0F00;
-    amask = 0xF000;
-#endif
-
     SDL_Rect dest, dst, src;
     dest.x = 0;
     dest.y = 0;
 
-    CELLMAPS *ptrTile = NULL;
+    S_CELLMAPS *ptrTile = NULL;
 
-    if(NULL == (radarArea = SDL_CreateRGBSurface(SDL_SWSURFACE, RADARWIDTH, RADARWIDTH, 16, rmask, gmask, bmask, 0))){
+    if(NULL == (radarArea = SDL_CreateRGBSurface(SDL_SWSURFACE, RADARWIDTH, RADARWIDTH, 16, 0, 0, 0, 0))){
 	fprintf(stderr, "InitRadar: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), RADARWIDTH, RADARWIDTH);
 	return FALSE;
     }
@@ -92,7 +79,7 @@ BOOL InitRadar(void){
 	    ptrTile = GetCELLMAPS(index);
 	    tiles = ptrTile->tile;
 
-    	    if(NULL == (image = SDL_CreateRGBSurface(SDL_SWSURFACE, RADARWIDTH / widthMaps, RADARWIDTH / heightMaps, 16, rmask, gmask, bmask, 0))){
+    	    if(NULL == (image = SDL_CreateRGBSurface(SDL_SWSURFACE, RADARWIDTH / widthMaps, RADARWIDTH / heightMaps, 16, 0, 0, 0, 0))){
 		fprintf(stderr, "InitRadar: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), RADARWIDTH / widthMaps, RADARWIDTH / heightMaps);
 		return FALSE;
 	    }
@@ -124,7 +111,7 @@ BOOL InitRadar(void){
     scale = RADARWIDTH / (float) heightMaps;
     Uint8 heightCursor = GetAreaHeight() * scale;
 
-    if(NULL == (radarCursor = SDL_CreateRGBSurface(SDL_SWSURFACE, widthCursor, heightCursor, 16, rmask, gmask, bmask, 0))){
+    if(NULL == (radarCursor = SDL_CreateRGBSurface(SDL_SWSURFACE, widthCursor, heightCursor, 16, 0, 0, 0, 0))){
 	fprintf(stderr, "InitRadar: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), widthCursor, heightCursor);
 	return FALSE;
     }

@@ -30,6 +30,9 @@
 #define _MP2MAPS_H
 
 #include "SDL.h"
+#include "agg.h"
+#include "object.h"
+#include "heroes.h"
 #include "actionevent.h"
 
 
@@ -221,180 +224,43 @@ typedef struct {
 
 /* ************** END MP2 **************** */
 
+typedef enum {
+                DESERT,
+                SNOW,
+                SWAMP,
+                WASTELAND,
+                BEACH,
+                LAVA,
+                DIRT,
+                GRASS,
+                WATER,
+                ROAD
+
+            } E_GROUND;
+                                                                                                                                                                            
+                                                                                                                                                                            
 
 typedef struct {
-                MP2TILEINFO         *info;
-                SDL_Surface         *tile;
-                } CELLMAPS;
+                E_GROUND        ground;
+                SDL_Surface     *tile;
+                BOOL            move;
+                E_OBJECT        type;
+		Uint16		count;
+                void            *object;
+		ICNHEADER	*level1;
+		ICNHEADER	*level2;
+                S_HEROES        *heroes;
+
+                } S_CELLMAPS;
 
 void		FreeMaps(void);
 ACTION		InitMaps(char *);
-CELLMAPS       *GetCELLMAPS(Uint16);
-MP2ADDONTAIL   *GetADDONTAIL(Uint16);
+S_CELLMAPS     *GetCELLMAPS(Uint16);
 Uint8		GetWidthMaps(void);
 Uint8		GetHeightMaps(void);
-void		PrintCellInfo(Uint16);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-// список general maps object
-
-#define	OBJ_ZERO			0x00	// пусто
-#define	OBJN_ALCHEMYTOWER		0x01	// башня алхимика, mercury
-#define	OBJN_DAEMONCAVE			0x05	// пещера демона
-#define OBJN_FAERIERING			0x07	// холм с мухоморами (+1 удача)
-#define	OBJN_GRAVEYARD			0x0C	// кладбище
-
-#define OBJN_DRAGONCITY			0x14	// город драконов
-#define	OBJN_LIGHTHOUSE			0x15	// маяк
-#define	OBJN_WATERMILL			0x16	// водяная мельница
-#define	OBJN_MINES			0x17	// шахта
-#define	OBJN_OBELISK			0x19	// обелиск
-#define	OBJN_OASIS			0x1A	// оазис
-#define	OBJ_COAST			0x1C	// побережье (граница между морем и сушей)
-#define	OBJN_SAWMILL			0x1D	// лесопилка
-#define OBJN_ORACLE			0x1E	// оракул
-
-#define	OBJN_DERELICTSHIP		0x20	// разрушенный корабль (правый)
-#define OBJN_DESERTTENT			0x22	// тент кочевников nomads
-#define	OBJN_CASTLE			0x23	// замок
-#define OBJN_WAGONCAMP			0x25	// вагоны на поляне (rogues)
-#define OBJN_WINDMILL			0x28	// мельница
-
-#define	OBJN_RNDTOWN			0x30	// random город
-#define	OBJN_RNDCASTLE			0x31	// random замок
-#define OBJ_SMALLCRACK			0x38	// трещина малая
-#define OBJN_TREECITY			0x3C	// тройной дом спрайтов
-#define OBJN_RUINS			0x3D	// medusa hunt
-#define	OBJN_FORT			0x3E	// повышение навыка (+1 defence)
-#define	OBJN_TRADINGPOST		0x3F	// рынок
-
-#define OBJN_ABANDONEDMINE		0x40	// заброшенная шахта
-#define OBJN_TREEKNOWLEDGE		0x44	// дерево знаний
-#define OBJN_DOCTORHUNT			0x45	// хижина повышения знаний (+1 knowledge)
-#define	OBJN_TEMPLE			0x46	// храм
-#define OBJN_HILLFORT			0x47	// форт для upgrade orc ogre
-#define OBJN_HALFLINGHOLE		0x48	// нора halfling
-#define OBJN_MERCENARYCAMP		0x49	// палатка повышения атаки (+1 attack)
-#define	OBJN_PIRAMID			0x4C	// пирамида
-#define OBJN_CITYDEAD			0x4D	// город мертвых, руины в песке
-#define OBJN_EXCAVATION			0x4E	// развалины дома, в песке
-#define OBJN_SPHINX			0x4F	// сфинкс
-
-#define OBJ_OILLAKE			0x51	// озеро нефти
-#define OBJN_TROLLBRIDGE		0x53	// мост троллей
-#define	OBJN_WITCHHUNT			0x55	// хижина приобретения вторичного навыка (skill)
-#define OBJN_XANADU			0x56	// замок дворецкого
-#define OBJN_CAVE			0x57	// пещера кентавров
-#define OBJN_MAGELLANMAPS		0x59	// лодочник
-#define	OBJN_SHIPWRECK			0x5B	// разрушенный корабль (левый)
-
-#define	OBJN_OBSERVATIONTOWER		0x60	// башня обзора
-#define OBJN_FREEMANFOUNDRY		0x61	// кузница upgrade
-#define	OBJ_TREES			0x63	// деревья
-#define	OBJ_MOUNTS			0x64	// горы
-#define OBJ_STONES			0x67	// камни
-#define OBJ_VEGETATION1			0x66	// цветы, растительность
-#define OBJ_WATERLAKE			0x68	// озеро воды
-#define OBJ_VEGETATION2			0x69	// цветы, растительность
-#define OBJ_BIGCRACK			0x6C	// трещина большая
-
-#define OBJ_LAVALAKE			0x70	// озеро лавы
-#define OBJ_VEGETATION3			0x71	// цветы, растительность
-
-#define	OBJ_ALCHEMYTOWER		0x81	// башня алхимика mercury, точка входа
-#define	OBJ_BUOY			0x83	// буй на воде
-#define	OBJ_SKELETON			0x84	// скелет странника в пустыне
-#define	OBJ_DAEMONCAVE			0x85	// пещера демона, точка входа
-#define	OBJ_TREASURECHEST		0x86	// сундук с сокровищами
-#define OBJ_FAERIERING			0x87	// холм с мухоморами (+1 удача), точка входа
-#define	OBJ_CAMPFIRE			0x88	// брошенный костер
-#define	OBJ_FOUNTAIN			0x89	// фонтан +luck
-#define	OBJ_GAZEBO			0x8A	// беседка (+1000 exp)
-#define	OBJ_ANCIENTLAMP			0x8B	// лампа джина
-#define	OBJ_GRAVEYARD			0x8C	// кладбище, точка входа
-#define	OBJ_ARCHERHOUSE			0x8D	// хижина лучников
-#define	OBJ_GOBLINHUNT			0x8E	// хижина гоблинов
-#define	OBJ_DWARFCOTT			0x8F	// хижина dwarf
-
-#define	OBJ_PEASANTHUNT			0x90	// хижина крестьянина
-#define OBJ_DRAGONCITY			0x94	// город драконов, точка входа
-#define	OBJ_LIGHTHOUSE			0x95	// маяк, точка входа
-#define	OBJ_WATERMILL			0x96	// водяная мельница, точка входа
-#define	OBJ_MINES			0x97	// шахта, точка входа
-#define	OBJ_MONSTER			0x98	// монстры
-#define	OBJ_OBELISK			0x99	// обелиск, точка входа
-#define	OBJ_OASIS			0x9A	// оазис, точка входа
-#define	OBJ_RESOURCE			0x9B	// ресурсы тип определяется по indexName1 (1: wood, 3: mercury, 5: ore, 7: sulfur, 8: crystal, B: gems, D: gold)
-#define	OBJ_SAWMILL			0x9D	// лесопилка, точка входа
-#define OBJ_ORACLE			0x9E	// оракул
-#define	OBJ_SHRINE1			0x9F	// хижина магии 1 уровня
-
-#define	OBJ_DERELICTSHIP		0xA0	// разрушенный корабль, точка входа
-#define OBJ_DESERTTENT			0xA2	// тент кочевников nomads, точка входа
-#define	OBJ_CASTLE			0xA3	// замок, точка входа
-#define	OBJ_STONELITHS			0xA4	// телепорт
-#define OBJ_WAGONCAMP			0xA5	// вагоны на поляне (rogues), точка входа
-#define OBJ_WHIRLPOOL			0xA7	// водоворот
-#define OBJ_WINDMILL			0xA8	// мельница, точка входа
-#define	OBJ_ARTIFACT			0xA9	// артифакт
-#define	OBJ_BOAT			0xAB	// лодка
-#define	OBJ_RNDARTIFACT			0xAD	// random артифакт
-#define	OBJ_RNDRESOURCE			0xAE	// random ресурс
-
-#define	OBJ_RNDTOWN			0xB0	// random город, точка входа
-#define	OBJ_RNDCASTLE			0xB1	// random замок, точка входа
-#define	OBJ_RNDMONSTER1			0xB3	// radom monster level1
-#define	OBJ_RNDMONSTER2			0xB4	// radom monster level2
-#define	OBJ_RNDMONSTER3			0xB5	// radom monster level3
-#define	OBJ_RNDMONSTER4			0xB6	// radom monster level4
-#define	OBJ_WATCHTOWER			0xBA	// домик орков
-#define OBJ_TREEHOUSE			0xBB	// домик спрайтов (маленький)
-#define OBJ_TREECITY			0xBC	// тройной дом спрайтов, точка входа
-#define OBJ_RUINS			0xBD	// medusa hunt, точка входа
-#define	OBJ_FORT			0xBE	// хижина повышение навыка (+1 defence), точка входа
-#define	OBJ_TRADINGPOST			0xBF	// рынок, точка входа
-
-#define OBJ_ABANDONEDMINE		0xC0	// заброшенная шахта, точка входа
-#define OBJ_STANDINGSTONES		0xC2	// стоунхедж, (+1 power)
-#define OBJ_IDOL			0xC3	// идол
-#define OBJ_TREEKNOWLEDGE		0xC4	// дерево знаний, точка входа
-#define OBJ_DOCTORHUNT			0xC5	// хижина повышения знаний (+1 knowledge), точка входа
-#define	OBJ_TEMPLE			0xC6	// храм, точка входа
-#define OBJ_HILLFORT			0xC7	// форт для upgrade orc ogre, точка входа
-#define OBJ_HALFLINGHOLE		0xC8	// нора halfling, точка входа
-#define OBJ_MERCENARYCAMP		0xC9	// палатка повышения атаки (+1 attack), точка входа
-#define	OBJ_SHRINE2			0xCA	// хижина магии 2 уровня
-#define	OBJ_SHRINE3			0xCB	// хижина магии 3 уровня
-#define	OBJ_PIRAMID			0xCC	// пирамида, точка входа
-#define OBJ_CITYDEAD			0xCD	// город мертвых, руины в песке, точка входа
-#define OBJ_EXCAVATION			0xCE	// развалины дома, в песке, точка входа
-#define OBJ_SPHINX			0xCF	// сфинкс, точка входа
-
-#define OBJ_WAGON			0xD0	// брошенная тачка
-#define	OBJ_ARTESIANSPRING		0xD2	// родник
-#define OBJ_TROLLBRIDGE			0xD3	// мост троллей, точка входа
-#define OBJ_CRAKEDLAKE			0xD4	// озеро на cracked
-#define	OBJ_WITCHHUNT			0xD5	// хижина приобретения вторичного навыка (skill), точка входа
-#define OBJ_XANADU			0xD6	// замок дворецкого, точка входа
-#define OBJ_CAVE			0xD7	// пещера кентавров, точка входа
-#define OBJ_LEANTO			0xD8	// загон (зимовка)
-#define OBJ_MAGELLANMAPS		0xD9	// лодочник, точка входа
-#define	OBJ_FLOTSAM			0xDA	// бревна на воде
-#define	OBJ_SHIPWRECK			0xDB	// разрушенный корабль, точка входа
-#define OBJ_SHIPWRECKSURVIROR		0xDC	// матрос в воде
-#define	OBJ_BOTTLE			0xDD	// бутылка в воде
-#define	OBJ_MAGICWELL			0xDE	// колодец
-#define	OBJ_MAGICGARDEN			0xDF	// гном под грибами (+5 gems)
-
-#define	OBJ_OBSERVATIONTOWER		0xE0	// башня обзора, точка входа
-#define OBJ_FREEMANFOUNDRY		0xE1	// кузница upgrade, точка входа
-
-#define	OBJ_RNDARTIFACT1		0xF4	// random артифакт 1 уровня
-#define	OBJ_RNDARTIFACT2		0xF5	// random артифакт 2 уровня
-#define	OBJ_RNDARTIFACT3		0xF6	// random артифакт 3 уровня
 
 // список resource
 #define OBJ_RESOURCE_WOOD		0x01
@@ -597,7 +463,5 @@ void		PrintCellInfo(Uint16);
 #define OBJ_ARTIFACT_SPADE_NECROMANCY			102		// The Spade gives you increased necromancy skill.
 #define OBJ_ARTIFACT_NONE				255		// 
 */
-
-const char * PrintObjectType(Uint8, Uint8);
 
 #endif

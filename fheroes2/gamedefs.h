@@ -71,20 +71,6 @@ typedef enum {
 	    } E_SIZEMAP;
 
 typedef enum {
-		DESERT,
-		SNOW,
-		SWAMP,
-		CRACKED,
-		BEACH,
-		LAVA,
-		DIRT,
-		GRASS,
-		WATER,
-		ROAD
-
-	    } E_SURFACE;
-                
-typedef enum {
                 LUCK_AWFUL      = -2,
                 LUCK_BAD        = -1,
                 LUCK_NORMAL     = 0,

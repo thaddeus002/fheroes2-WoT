@@ -26,28 +26,13 @@
     Description:
 */
 
-#ifndef _DRAW_H
-#define _DRAW_H
+#ifndef _DEBUG_H
+#define _DEBUG_H
 
 #include "SDL.h"
-#include "agg.h"
+#include "object.h"
 
-#define ICNRLE_DEBUG 0
-
-void DrawSceneVar2(SDL_Surface *, Uint8 *, Uint32);
-void DrawPixel(SDL_Surface *, Uint16, Uint16, Uint8);
-void DrawPixelAlpha(SDL_Surface *, Uint16, Uint16, Uint8, Uint8, Uint8, Uint8);
-void DrawSprite(SDL_Rect *, AGGSPRITE *);
-void DrawTILBmp(SDL_Surface *, Uint8 *, Uint16, Uint8);
-void DrawMapObject(SDL_Rect *, Uint8, Uint8);
-void DrawAnimationFrame(SDL_Rect *, Uint8, Uint8, Uint8);
-
-Uint16 GetPixel(SDL_Surface *, Uint16, Uint16);
-void PutPixel(SDL_Surface *, Uint16, Uint16, Uint16);
-
-void ScaleSurface(SDL_Surface *, SDL_Surface *);
-
-void LockSurface(SDL_Surface *);
-void UnlockSurface(SDL_Surface *);
+const char * PrintObjectType(E_OBJECT, Uint8);
+void         PrintCellInfo(Uint16);
 
 #endif

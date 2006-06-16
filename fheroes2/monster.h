@@ -33,6 +33,8 @@
 #include "gamedefs.h"
 #include "castle.h"
 
+#define RNDMONSTERMAXCOUNT	4000
+
 #define	MONSTERMAXCOUNT		66
 #define	MONSTERCOUNT_LEVEL1	10
 #define	MONSTERCOUNT_LEVEL2	15
@@ -174,5 +176,5 @@ E_ARMYSIZE 	GetSizeArmy(Uint16);
 E_MONSTER	GetRNDMonster(E_LEVELMONSTER);
 E_RACE		GetRaceMonster(E_MONSTER);
 BOOL		TheFlyMonster(E_MONSTER);
-
+E_MONSTER	CheckCorrectMonster(Uint8);
 #endif
