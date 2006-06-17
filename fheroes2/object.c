@@ -33,7 +33,7 @@
 #include "config.h"
 #include "object.h"
 
-E_OBJECT CheckCorrectObject(Uint8 type){
+E_OBJECT CheckValidObject(Uint8 type){
 
     E_OBJECT a = OBJ_ZERO;
 
@@ -42,7 +42,7 @@ E_OBJECT CheckCorrectObject(Uint8 type){
 	    return a;
 
     if(GetIntValue("debug"))
-	fprintf(stderr, "CheckCorrectObject: unknown object: 0x%hhX\n", type);
+	fprintf(stderr, "CheckValidObject: unknown object: 0x%hhX\n", type);
 
     return OBJ_ZERO;
 }

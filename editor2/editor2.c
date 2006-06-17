@@ -85,7 +85,7 @@ int main(int argc, char **argv){
     // инициализация переопределенных конфигурационных парамертов
     if(NULL == config_file) config_file = "fheroes2.cfg";
     InitConfig(config_file);
-    SetIntValue("debug", debug);
+    if(debug) SetIntValue("debug", debug);
     if(NULL == heroes2_agg) heroes2_agg = GetStrValue("aggfile");
 
     Uint32 flags;

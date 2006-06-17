@@ -1313,6 +1313,11 @@ const char * PrintObjectType(Uint8 type, Uint8 ext){
             string = "OBJ_WAGON";
             break;
 
+        // event
+        case OBJ_EVENT:
+            string = "OBJ_EVENT";
+            break;
+
         // родник
         case OBJ_ARTESIANSPRING:
             string = "OBJ_ARTESIANSPRING";
@@ -1391,6 +1396,16 @@ const char * PrintObjectType(Uint8 type, Uint8 ext){
         // кузница upgrade, точка входа
         case OBJ_FREEMANFOUNDRY:
             string = "OBJ_FREEMANFOUNDRY";
+            break;
+
+        // random monster
+        case OBJ_RNDMONSTER:
+            string = "OBJ_RNDMONSTER";
+            break;
+
+        // random артифакт ultimate
+        case OBJ_RNDULTIMATEARTIFACT:
+            string = "OBJ_RNDULTIMATEARTIFACT";
             break;
 
         // random артифакт 1 уровня

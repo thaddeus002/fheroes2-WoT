@@ -40,8 +40,6 @@ typedef struct {
 static CONFIGDESC settings[] = {
     { "aggfile",	"heroes2.agg",	0 },
     { "debug",		"off",		FALSE },
-    { "mapcell",	"off",		FALSE },
-    { "mapinfo",	"off",		FALSE },
     { "sound",		"off",		FALSE },
     { "music",		"off",		FALSE },
     { "animation",	"off",		FALSE },

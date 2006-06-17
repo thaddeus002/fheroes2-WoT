@@ -36,8 +36,8 @@
 #include "resource.h"
 #include "loadgame.h"
 
-void		RescanRNDObject();
-E_GROUND	GetTypeGround(Uint16);
+void		MapsRescanObject(Uint8, MP2TILEINFO *, MP2ADDONTAIL *, S_CELLMAPS *);
+E_GROUND	GetTypeGround(MP2TILEINFO*);
 ICNHEADER	*AddLEVELDRAW(ICNHEADER**);
 MP2ADDONTAIL   *GetADDONTAIL(Uint16);
 
@@ -195,7 +195,7 @@ ACTION InitMaps(char *filename){
 	    return EXIT;
 	}
 
-	ptrMaps[i].ground = GetTypeGround(ptrMapsInfo[i].tileIndex);
+	ptrMaps[i].ground = GetTypeGround(&ptrMapsInfo[i]);
 	DrawTILBmp(ptrMaps[i].tile, ptrTILData, ptrMapsInfo[i].tileIndex, ptrMapsInfo[i].shape);
 
 	Sint8			j = 0;
@@ -208,13 +208,19 @@ ACTION InitMaps(char *filename){
 	ptrMaps[i].level1	= NULL;
 	ptrMaps[i].level2	= NULL;
 
+	ptrMaps[i].move		= TRUE;
+	ptrMaps[i].count	= 0;
+	ptrMaps[i].type		= OBJ_ZERO;
+
 	// init level1
 	for(j = 3; j >= 0; --j){
 
     	    if(0xFF != ptrMapsInfo[i].indexName1 && j == (ptrMapsInfo[i].quantity1 % 4)){
 
+		MapsRescanObject(ptrMapsInfo[i].objectName1, &ptrMapsInfo[i], NULL, &ptrMaps[i]);
+
 		if(NULL != (current = GetICNHEADERCellObject(ptrMapsInfo[i].objectName1, ptrMapsInfo[i].indexName1))){
-		
+
 		    tail = AddLEVELDRAW(&ptrMaps[i].level1);
 
 		    tail->surface = current->surface;
@@ -230,6 +236,8 @@ ACTION InitMaps(char *filename){
         	ptrAddon = GetADDONTAIL(indexAddon);
 
         	if(0xFF != ptrAddon->indexNameN1 && j == (ptrAddon->quantityN % 4)){
+	
+		    MapsRescanObject(ptrAddon->objectNameN1 * 2, &ptrMapsInfo[i], ptrAddon, &ptrMaps[i]);
 
 		    if(NULL != (current = GetICNHEADERCellObject(ptrAddon->objectNameN1 * 2, ptrAddon->indexNameN1))){
 
@@ -286,81 +294,8 @@ ACTION InitMaps(char *filename){
     	    }
 	}
 
-	ptrMaps[i].move = TRUE;
-	ptrMaps[i].count = 0;
-	ptrMaps[i].type = CheckCorrectObject(ptrMapsInfo[i].generalObject);
+	if(OBJ_ZERO == ptrMaps[i].type) ptrMaps[i].type = CheckValidObject(ptrMapsInfo[i].generalObject);
 
-	ptrMaps[i].object = NULL;
-	ptrMaps[i].heroes = NULL;
-/*
-	E_MONSTER	rndMonster;
-	// монстры
-	switch(ptrMaps[i].type){
-
-	    case OBJ_MONSTER: 
-
-		// раскодируем количество
-                ptrMaps[i].count = ptrMapsInfo[i].quantity2;
-                ptrMaps[i].count <<= 8;
-                ptrMaps[i].count |=  ptrMapsInfo[i].quantity1;
-                ptrMaps[i].count >>= 3;
-             
-                ptrMaps[i].object = GetStatMonster(CheckCorrectMonster(ptrMapsInfo[i].indexName1));
-                if(0 == ptrMaps[i].count) ptrMaps[i].count = rand() % RNDMONSTERMAXCOUNT;
-                break;
-                
-            case OBJ_RNDMONSTER1:
-        	rndMonster = GetRNDMonster(MNS_LEVEL1);
-        	ptrMaps[i].type = OBJ_MONSTER;
-                ptrMaps[i].object = GetStatMonster(rndMonster);
-                ptrMaps[i].count = rand() % RNDMONSTERMAXCOUNT;
-                
-                current = GetICNHEADERCellObject(0x30, rndMonster);
-                ptrMaps[i].level1->surface = current->surface;
-                ptrMaps[i].level1->offsetX = current->offsetX;
-                ptrMaps[i].level1->offsetY = current->offsetY;
-                break;
-
-            case OBJ_RNDMONSTER2:
-        	rndMonster = GetRNDMonster(MNS_LEVEL2);
-        	ptrMaps[i].type = OBJ_MONSTER;
-                ptrMaps[i].object = GetStatMonster(rndMonster);
-                ptrMaps[i].count = rand() % RNDMONSTERMAXCOUNT;
-                
-                current = GetICNHEADERCellObject(0x30, rndMonster);
-                ptrMaps[i].level1->surface = current->surface;
-                ptrMaps[i].level1->offsetX = current->offsetX;
-                ptrMaps[i].level1->offsetY = current->offsetY;
-                break;
-
-            case OBJ_RNDMONSTER3:
-        	rndMonster = GetRNDMonster(MNS_LEVEL3);
-        	ptrMaps[i].type = OBJ_MONSTER;
-                ptrMaps[i].object = GetStatMonster(rndMonster);
-                ptrMaps[i].count = rand() % RNDMONSTERMAXCOUNT;
-                
-                current = GetICNHEADERCellObject(0x30, rndMonster);
-                ptrMaps[i].level1->surface = current->surface;
-                ptrMaps[i].level1->offsetX = current->offsetX;
-                ptrMaps[i].level1->offsetY = current->offsetY;
-                break;
-
-            case OBJ_RNDMONSTER4:
-        	rndMonster = GetRNDMonster(MNS_LEVEL4);
-        	ptrMaps[i].type = OBJ_MONSTER;
-                ptrMaps[i].object = GetStatMonster(rndMonster);
-                ptrMaps[i].count = rand() % RNDMONSTERMAXCOUNT;
-                
-                current = GetICNHEADERCellObject(0x30, rndMonster);
-                ptrMaps[i].level1->surface = current->surface;
-                ptrMaps[i].level1->offsetX = current->offsetX;
-                ptrMaps[i].level1->offsetY = current->offsetY;
-                break;
-            
-            default:
-        	break;
-        }
-*/
     }
 
     // Освобождаем загруженные объекты TIL
@@ -372,9 +307,6 @@ ACTION InitMaps(char *filename){
     
     fprintf(stderr, "InitMaps: %s\n", filename);
 
-    // переопределяем rnd объекты
-    RescanRNDObject();
-    
     // Рисуем экран и в цикл событий
     ACTION result = DrawMainDisplay();
 
@@ -383,35 +315,244 @@ ACTION InitMaps(char *filename){
     return result;
 }
 
-/* функция переопределяет все RND объекты */
-void RescanRNDObject(void){
-/*
-    Uint16 index = 0;
-    Uint16 max = GetWidthMaps() * GetHeightMaps();
-    CELLMAPS *ptrCell = NULL;
-    
-    while(index != max){
+// объекты которые необходимо дополнить инфомацией
+void MapsRescanObject(Uint8 type, MP2TILEINFO *info, MP2ADDONTAIL *addon, S_CELLMAPS *maps){
 
-	ptrCell = GetCELLMAPS(index);
-	
-	switch(ptrCell->info->generalObject){
-	
-	    case OBJ_RNDARTIFACT:
-	    case OBJ_RNDARTIFACT1:
-	    case OBJ_RNDARTIFACT2:
-	    case OBJ_RNDARTIFACT3:
+    switch(type){
+        // артифакты
+        case 0x2C:
+        case 0x2D:
+        case 0x2E:
+        case 0x2F:
+
+        // монстры
+        case 0x30:
+        case 0x31:
+        case 0x32:
+        case 0x33:
+
+        // ресурсы
+        case 0xB8:
+        case 0xB9:
+        case 0xBA:
+        case 0xBB:
 	    
+            break;
+
+	default:
+	
+	    return;
+	    break;
+    }
+
+    switch(info->generalObject){
+
+	case OBJ_RESOURCE:
+
+	    // ресурсы только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_RESOURCE;
+	    maps->object.resource = CheckValidResource(info->indexName1);
+	    maps->count = GetCountResource(maps->object.resource);
+
+	    break;
+
+	case OBJ_RNDRESOURCE:
+
+	    // ресурсы только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_RESOURCE;
+	    maps->object.resource = GetRNDResource();
+	    maps->count = GetCountResource(maps->object.resource);
+	    
+	    info->generalObject = OBJ_RESOURCE;
+
+	    if(RNDRES == CheckValidResource(info->indexName1))
+		info->indexName1 = maps->object.resource;
+
+	    break;
+
+	case OBJ_ARTIFACT:
+
+	    // артифакты только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_ARTIFACT;
+	    maps->object.artifact = CheckValidArtifact((info->indexName1 + 1) / 2 - 1);
+	    
+	    break;
+
+	case OBJ_RNDARTIFACT:
+
+	    // артифакты только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_ARTIFACT;
+	    maps->object.artifact = GetRNDArtifact(ART_ALL);
+	    
+	    info->generalObject = OBJ_ARTIFACT;
+
+	    if(RND_ARTIFACT == CheckValidArtifact(info->indexName1))
+		info->indexName1 = maps->object.artifact * 2 + 1;
+
+	    break;
+
+	case OBJ_RNDARTIFACT1:
+
+	    // артифакты только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_ARTIFACT;
+	    maps->object.artifact = GetRNDArtifact(ART_LEVEL1);
+	    
+	    info->generalObject = OBJ_ARTIFACT;
+
+	    if(RND_ARTIFACT1 == CheckValidArtifact(info->indexName1))
+		info->indexName1 = maps->object.artifact * 2 +1;
+
+	    break;
+
+	case OBJ_RNDARTIFACT2:
+
+	    // артифакты только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_ARTIFACT;
+	    maps->object.artifact = GetRNDArtifact(ART_LEVEL2);
+	    
+	    info->generalObject = OBJ_ARTIFACT;
+
+	    if(RND_ARTIFACT2 == CheckValidArtifact(info->indexName1))
+		info->indexName1 = maps->object.artifact * 2 +1;
+
+	    break;
+
+	case OBJ_RNDARTIFACT3:
+
+	    // артифакты только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_ARTIFACT;
+	    maps->object.artifact = GetRNDArtifact(ART_LEVEL3);
+	    
+	    info->generalObject = OBJ_ARTIFACT;
+
+	    if(RND_ARTIFACT3 == CheckValidArtifact(info->indexName1))
+		info->indexName1 = maps->object.artifact * 2 +1;
+
+	    break;
+
+	case OBJ_MONSTER:
+
+	    // монстры только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_MONSTER;
+	    maps->object.monster = CheckValidMonster(info->indexName1);
+	    maps->count = info->quantity2;
+            maps->count <<= 8;
+            maps->count |= info->quantity1;
+            maps->count >>= 3;
+
+	    if(! maps->count) maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
+
+	    break;
+
+	case OBJ_RNDMONSTER:
+
+	    // монстры только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_MONSTER;
+	    maps->object.monster = GetRNDMonster(MNS_ALL);
+	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
+
+	    info->generalObject = OBJ_MONSTER;
+
+	    if(MONSTER_RND == CheckValidMonster(info->indexName1))
+		info->indexName1 = maps->object.monster;
+
+
+	    break;
+
+	case OBJ_RNDMONSTER1:
+
+	    // монстры только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_MONSTER;
+	    maps->object.monster = GetRNDMonster(MNS_LEVEL1);
+	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
+
+	    info->generalObject = OBJ_MONSTER;
+
+	    if(MONSTER_RND1 == CheckValidMonster(info->indexName1))
+		info->indexName1 = maps->object.monster;
+
+	    break;
+
+	case OBJ_RNDMONSTER2:
+
+	    // монстры только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_MONSTER;
+	    maps->object.monster = GetRNDMonster(MNS_LEVEL2);
+	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
+
+	    info->generalObject = OBJ_MONSTER;
+
+	    if(MONSTER_RND2 == CheckValidMonster(info->indexName1))
+		info->indexName1 = maps->object.monster;
+
+	    break;
+
+	case OBJ_RNDMONSTER3:
+
+	    // монстры только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_MONSTER;
+	    maps->object.monster = GetRNDMonster(MNS_LEVEL3);
+	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
+
+	    info->generalObject = OBJ_MONSTER;
+
+	    if(MONSTER_RND3 == CheckValidMonster(info->indexName1))
+		info->indexName1 = maps->object.monster;
+
+	    break;
+
+	case OBJ_RNDMONSTER4:
+
+	    // монстры только в первой секции
+	    if(addon) return;
+
+	    maps->type = OBJ_MONSTER;
+	    maps->object.monster = GetRNDMonster(MNS_LEVEL4);
+	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
+
+	    info->generalObject = OBJ_MONSTER;
+
+	    if(MONSTER_RND4 == CheckValidMonster(info->indexName1))
+		info->indexName1 = maps->object.monster;
+
+	    break;
+
+
 	    default:
 		break;
 	}
-	
-	++index;
-    }
-*/
+
+
+    return;
 }
 
-E_GROUND GetTypeGround(Uint16 index){
+E_GROUND GetTypeGround(MP2TILEINFO *info){
 
+    Uint16 index = info->tileIndex;
     // список поверхностей по индексу из GROUND32.TIL
     // найти место для ROAD!!
 

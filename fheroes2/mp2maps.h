@@ -32,6 +32,8 @@
 #include "SDL.h"
 #include "agg.h"
 #include "object.h"
+#include "resource.h"
+#include "artifact.h"
 #include "heroes.h"
 #include "actionevent.h"
 
@@ -246,7 +248,13 @@ typedef struct {
                 BOOL            move;
                 E_OBJECT        type;
 		Uint16		count;
-                void            *object;
+
+		union {
+		    E_MONSTER	monster;
+		    E_RESOURCE  resource;
+		    E_ARTIFACT  artifact;
+		} object;
+
 		ICNHEADER	*level1;
 		ICNHEADER	*level2;
                 S_HEROES        *heroes;
@@ -262,95 +270,13 @@ Uint8		GetHeightMaps(void);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-// список resource
-#define OBJ_RESOURCE_WOOD		0x01
-#define OBJ_RESOURCE_MERCURY		0x03
-#define OBJ_RESOURCE_ORE		0x05
-#define OBJ_RESOURCE_SULFUR		0x07
-#define OBJ_RESOURCE_CRYSTAL		0x09
-#define OBJ_RESOURCE_GEMS		0x0B
-#define OBJ_RESOURCE_GOLD		0x0D
-
 // список mines
 #define OBJ_MINE_ORE		0x00
 #define OBJ_MINE_SULFUR		0x01
 #define OBJ_MINE_CRYSTAL	0x02
 #define OBJ_MINE_GEMS		0x03
 #define OBJ_MINE_GOLD		0x04
-
-// список monster
-
-#define OBJ_MONSTER_PEASANT		0
-#define OBJ_MONSTER_ARCHER		1
-#define OBJ_MONSTER_RANGER		2
-#define OBJ_MONSTER_PIKEMAN		3
-#define OBJ_MONSTER_VETERAN_PIKEMAN	4
-#define OBJ_MONSTER_SWORDSMAN		5
-#define OBJ_MONSTER_MASTER_SWORDSMAN	6
-#define OBJ_MONSTER_CAVALIRY		7
-#define OBJ_MONSTER_CHAMPION		8
-#define OBJ_MONSTER_PALADIN		9
-#define OBJ_MONSTER_CRUSADER		10
-#define OBJ_MONSTER_GOBLIN		11
-#define OBJ_MONSTER_ORC			12
-#define OBJ_MONSTER_CHIEF_ORC		13
-#define OBJ_MONSTER_WOLF		14
-#define OBJ_MONSTER_OGRE		15
-#define OBJ_MONSTER_LORD_OGRE		16
-#define OBJ_MONSTER_TROLL		17
-#define OBJ_MONSTER_WAR_TROLL		18
-#define OBJ_MONSTER_CYCLOPS		19
-#define OBJ_MONSTER_SPRITE		20
-#define OBJ_MONSTER_DWARF		21
-#define OBJ_MONSTER_BATTLE_DWARF	22
-#define OBJ_MONSTER_ELF			23
-#define OBJ_MONSTER_GRAND_ELF		24
-#define OBJ_MONSTER_DRUID		25
-#define OBJ_MONSTER_GREATER_DRUID	26
-#define OBJ_MONSTER_UNICORN		27
-#define OBJ_MONSTER_PHOENIX		28
-#define OBJ_MONSTER_CENTAUR		29
-#define OBJ_MONSTER_GARGOYLE		30
-#define OBJ_MONSTER_GRIFFIN		31
-#define OBJ_MONSTER_MINOTAUR		32
-#define OBJ_MONSTER_KNIGHT_MINOTAUR	33
-#define OBJ_MONSTER_HIDRA		34
-#define OBJ_MONSTER_GREEN_DRAGON	35
-#define OBJ_MONSTER_RED_DRAGON		36
-#define OBJ_MONSTER_BLACK_DRAGON	37
-#define OBJ_MONSTER_HALFLING		38
-#define OBJ_MONSTER_BOAR		39
-#define OBJ_MONSTER_IRON_GOLEM		40
-#define OBJ_MONSTER_STEEL_GOLEM		41
-#define OBJ_MONSTER_ROC			42
-#define OBJ_MONSTER_MAGE		43
-#define OBJ_MONSTER_ARCHMAGE		44
-#define OBJ_MONSTER_GIANT		45
-#define OBJ_MONSTER_TITAN		46
-#define OBJ_MONSTER_SKELETON		47
-#define OBJ_MONSTER_ZOMBIE		48
-#define OBJ_MONSTER_MUTANT_ZOMBIE	49
-#define OBJ_MONSTER_MUMMY		50
-#define OBJ_MONSTER_ROYAL_MUMMY		51
-#define OBJ_MONSTER_VAMPIRE		52
-#define OBJ_MONSTER_LORD_VAMPIRE	53
-#define OBJ_MONSTER_LICH		54
-#define OBJ_MONSTER_POWER_LICH		55
-#define OBJ_MONSTER_BONE_DRAGON		56
-#define OBJ_MONSTER_ROGUE		57
-#define OBJ_MONSTER_NOMAD		58
-#define OBJ_MONSTER_GHOST		59
-#define OBJ_MONSTER_GENIE		60
-#define OBJ_MONSTER_MEDUSA		61
-#define OBJ_MONSTER_EARTH_ELEMENT	62
-#define OBJ_MONSTER_AIR_ELEMENT		63
-#define OBJ_MONSTER_FIRE_ELEMENT	64
-#define OBJ_MONSTER_WATER_ELEMENT	65
-#define OBJ_MONSTER_RANDOM_LEVEL1	66
-#define OBJ_MONSTER_RANDOM_LEVEL2	67
-#define OBJ_MONSTER_RANDOM_LEVEL3	68
-#define OBJ_MONSTER_RANDOM_LEVEL4	69
-
+/*
 // список artifact
 
 #define OBJ_ARTIFACT_ARCANE_NECKLACE			0x11		// The Arcane Necklace of Magic increases your spell power by 4.
@@ -426,6 +352,7 @@ Uint8		GetHeightMaps(void);
 #define OBJ_ARTIFACT_SPIKED_SHIELD			0x9D		// The Spiked Shield increases your attack and defense skills by 2 each.
 #define OBJ_ARTIFACT_WHITE_PEARL			0x9F		// The White Pearl increases your spell power and knowledge by 1 each.
 #define OBJ_ARTIFACT_BLACK_PEARL			0xA1		// The Black Pearl increases your spell power and knowledge by 2 each.
+*/
 
 /*
 #define OBJ_ARTIFACT_ULTIMATE_BOOK			0		// The Ultimate Book of Knowledge increases your knowledge by 12.

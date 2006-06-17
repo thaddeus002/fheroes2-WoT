@@ -42,7 +42,7 @@ void	FreeMonster(void){
     ptrMonster = NULL;
 }
 
-E_MONSTER CheckCorrectMonster(Uint8 type){
+E_MONSTER CheckValidMonster(Uint8 type){
 
     E_MONSTER a;
                 
@@ -51,7 +51,7 @@ E_MONSTER CheckCorrectMonster(Uint8 type){
     	    return a;
 
     if(GetIntValue("debug"))
-        fprintf(stderr, "CheckCorrectMonster: unknown monster: 0x%hhX\n", type);
+        fprintf(stderr, "CheckValidMonster: unknown monster: 0x%hhX\n", type);
 
     return PEASANT;
 }
@@ -83,6 +83,83 @@ E_ARMYSIZE GetSizeArmy(Uint16 count){
     
     else return LEGION;
 }
+
+Uint16 GetRNDSizeLevelMonster(E_LEVELMONSTER level){
+
+    Uint16 res;
+    
+    switch(level){
+    
+	case MNS_LEVEL1:
+	    res = rand() % (THRONG - LOTS) + LOTS;
+	break;
+
+	case MNS_LEVEL2:
+	    res = rand() % (HORDE - PACK) + PACK;
+	break;
+
+	case MNS_LEVEL3:
+	    res = rand() % (LOTS - SEVERAL) + SEVERAL;
+	break;
+
+	case MNS_LEVEL4:
+	    res = rand() % (PACK - FEW) + FEW;
+	break;
+
+	default:
+	    res = 1;
+	break;
+    }
+
+    return res;
+}
+
+const char *GetStringSizeArmy(E_ARMYSIZE size){
+
+    const char *string = "";
+
+    switch(size){
+    
+	case FEW:
+	    string = "Few";
+	    break;
+
+	case SEVERAL:
+	    string = "Several";
+	    break;
+
+	case PACK:
+	    string = "Pack";
+	    break;
+
+	case LOTS:
+	    string = "Lots";
+	    break;
+
+	case HORDE:
+	    string = "Horde";
+	    break;
+
+	case THRONG:
+	    string = "Throng";
+	    break;
+
+	case SWARM:
+	    string = "Swarm";
+	    break;
+
+	case ZOUNDS:
+	    string = "Zounds";
+	    break;
+
+	case LEGION:
+	    string = "Legion";
+	    break;
+    }
+    
+    return string;
+}
+
 
 E_RACE	GetRaceMonster(E_MONSTER monster){
 
@@ -201,6 +278,95 @@ BOOL	TheFlyMonster(E_MONSTER monster){
 	    return FALSE;
 	    break;
     }
+}
+
+E_LEVELMONSTER GetLevelMonster(E_MONSTER monster){
+
+    switch(monster){
+    
+	case PEASANT:
+	case ARCHER:
+	case GOBLIN:
+	case ORC:
+	case SPRITE:
+	case CENTAUR:
+	case HALFLING:
+	case SKELETON:
+	case ZOMBIE:
+	case ROGUE:
+	    return MNS_LEVEL1;
+	    break;
+	    
+	case RANGER:
+	case PIKEMAN:
+	case VETERAN_PIKEMAN:
+	case CHIEF_ORC:
+	case WOLF:
+	case DWARF:
+	case BATTLE_DWARF:
+	case ELF:
+	case GRAND_ELF:
+	case GARGOYLE:
+	case BOAR:
+	case IRON_GOLEM:
+	case MUTANT_ZOMBIE:
+	case MUMMY:
+	case NOMAD:
+	    return MNS_LEVEL2;
+	    break;
+
+	case SWORDSMAN:
+	case MASTER_SWORDSMAN:
+	case CAVALIRY:
+	case CHAMPION:
+	case OGRE:
+	case LORD_OGRE:
+	case TROLL:
+	case WAR_TROLL:
+	case DRUID:
+	case GREATER_DRUID:
+	case GRIFFIN:
+	case MINOTAUR:
+	case KNIGHT_MINOTAUR:
+	case STEEL_GOLEM:
+	case ROC:
+	case MAGE:
+	case ARCHMAGE:
+	case ROYAL_MUMMY:
+	case VAMPIRE:
+	case LORD_VAMPIRE:
+	case LICH:
+	case GHOST:
+	case MEDUSA:
+	case EARTH_ELEMENT:
+	case AIR_ELEMENT:
+	case FIRE_ELEMENT:
+	case WATER_ELEMENT:
+	    return MNS_LEVEL3;
+	    break;
+
+	case PALADIN:
+	case CRUSADER:
+	case CYCLOPS:
+	case UNICORN:
+	case PHOENIX:
+	case HIDRA:
+	case GREEN_DRAGON:
+	case RED_DRAGON:
+	case BLACK_DRAGON:
+	case GIANT:
+	case TITAN:
+	case POWER_LICH:
+	case BONE_DRAGON:
+	case GENIE:
+	    return MNS_LEVEL3;
+	    break;
+
+	default:
+	    break;
+    }
+    
+    return MNS_ALL;
 }
 
 E_MONSTER GetRNDMonster(E_LEVELMONSTER level){

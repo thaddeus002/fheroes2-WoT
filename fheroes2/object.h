@@ -115,6 +115,7 @@ typedef enum {
 		OBJ_DWARFCOTT		= 0x8F,	// хижина dwarf
 
 		OBJ_PEASANTHUNT		= 0x90,	// хижина крестьянина
+		OBJ_EVENT		= 0x93,	// event, программированое событие (раздариваие ресурсов и т.п.)
 		OBJ_DRAGONCITY		= 0x94,	// город драконов, точка входа
 		OBJ_LIGHTHOUSE		= 0x95,	// маяк, точка входа
 		OBJ_WATERMILL		= 0x96,	// водяная мельница, точка входа
@@ -136,8 +137,10 @@ typedef enum {
 		OBJ_WINDMILL		= 0xA8,	// мельница, точка входа
 		OBJ_ARTIFACT		= 0xA9,	// артифакт
 		OBJ_BOAT		= 0xAB,	// лодка
+		OBJ_RNDULTIMATEARTIFACT	= 0xAC,	// random ultimate artifact
 		OBJ_RNDARTIFACT		= 0xAD,	// random артифакт
 		OBJ_RNDRESOURCE		= 0xAE,	// random ресурс
+		OBJ_RNDMONSTER		= 0xAF,	// radom monster
 
 		OBJ_RNDTOWN		= 0xB0,	// random город, точка входа
 		OBJ_RNDCASTLE		= 0xB1,	// random замок, точка входа
@@ -194,7 +197,7 @@ typedef enum {
 		OBJ_END			= 0xFF
 	    } E_OBJECT;
 
-E_OBJECT CheckCorrectObject(Uint8);
+E_OBJECT CheckValidObject(Uint8);
 ICNHEADER *GetICNHEADERCellObject(Uint8, Uint8);
 
 #endif

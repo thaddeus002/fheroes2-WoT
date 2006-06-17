@@ -29,7 +29,24 @@
 #include <stdlib.h>
 #include "SDL.h"
 
+#include "config.h"
 #include "resource.h"
+
+
+E_RESOURCE CheckValidResource(Uint8 type){
+
+    E_RESOURCE a;
+        
+    for(a = WOOD; a < RES_NONE; ++a)
+        if(a == type)
+            return a;
+
+    if(GetIntValue("debug"))
+        fprintf(stderr, "CheckValidResource: unknown object: 0x%hhX\n", type);
+
+    return RES_NONE;
+}
+
 
 E_RESOURCE GetRNDResource(){
 
@@ -67,7 +84,67 @@ E_RESOURCE GetRNDResource(){
 	    break;
     }
     
-    return RES_NULL;
+    return RES_NONE;
 }
 
+Uint16 GetCountResource(E_RESOURCE res){
 
+    if(GOLDS == res)
+	return 100 * (rand() % (RESOURCEMAXCOUNT - RESOURCEMINCOUNT) + RESOURCEMINCOUNT);
+    else
+	return rand() % (RESOURCEMAXCOUNT - RESOURCEMINCOUNT) + RESOURCEMINCOUNT;
+}
+
+const char * GetDescriptionsResource(E_RESOURCE res){
+
+    const char * string;
+
+    switch(res){
+    
+	case WOOD:
+	    string = "Wood";
+	    break;
+	
+	case MERCURY:
+	    string = "Mercury";
+	    break;
+	    
+	case ORE:
+	    string = "Ore";
+	    break;
+	    
+	case SULFUR:
+	    string = "Sulfur";
+	    break;
+	
+	case CRYSTAL:
+	    string = "Crystal";
+	    break;
+	
+	case GEMS:
+	    string = "Gems";
+	    break;
+	
+	case GOLDS:
+	    string = "Gold";
+	    break;
+
+	case LAMP:
+	    string = "Lamp";
+	    break;
+
+	case RNDRES:
+	    string = "Random resource";
+	    break;
+
+	case CHEST:
+	    string = "Treasure chest";
+	    break;
+
+	default:
+	    string = "";
+	    break;
+    }
+    
+    return string;
+}

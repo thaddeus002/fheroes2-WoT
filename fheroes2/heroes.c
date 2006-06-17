@@ -37,6 +37,13 @@
 
 static S_HEROES *	allHeroes = NULL;
 
+S_HEROES *GetStatHeroes(E_NAMEHEROES name){
+
+    if(allHeroes) return &allHeroes[name];
+    
+    return NULL;
+}
+
 BOOL	InitHeroes(void){
 
     allHeroes = (S_HEROES *) malloc(HEROESMAXCOUNT * sizeof(S_HEROES));

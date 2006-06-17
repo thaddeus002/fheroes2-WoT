@@ -148,6 +148,13 @@ typedef enum {
 		SPADE_NECROMANCY,
 */
 		MAGIC_BOOK,
+
+		RND_ARTIFACT		= 163,
+		RND_ULTIMATEARTIFACT	= 164,
+		RND_ARTIFACT1		= 167,
+		RND_ARTIFACT2		= 169,
+		RND_ARTIFACT3		= 171,
+		
 		ARTIFACTNONE
 	    } E_ARTIFACT;
 
@@ -160,5 +167,6 @@ BOOL		InitArtifact(void);
 void		FreeArtifact(void);
 S_ARTIFACT *	GetStatArtifact(E_ARTIFACT);
 E_ARTIFACT	GetRNDArtifact(E_LEVELARTIFACT);
+E_ARTIFACT	CheckValidArtifact(Uint8);
 
 #endif

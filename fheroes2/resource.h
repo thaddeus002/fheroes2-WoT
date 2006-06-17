@@ -29,18 +29,26 @@
 #ifndef _RESOURCE_H
 #define _RESOURCE_H
 
+#define RESOURCEMAXCOUNT	15
+#define RESOURCEMINCOUNT	5
 
 typedef enum {
-		RES_NULL	= 0,
                 WOOD		= 1,
                 MERCURY		= 3,
                 ORE		= 5,
                 SULFUR		= 7,
                 CRYSTAL		= 9,
                 GEMS		= 11,
-                GOLDS		= 13
+                GOLDS		= 13,
+		LAMP		= 15,
+		RNDRES		= 17,
+		CHEST		= 19,
+		RES_NONE	= 20
             } E_RESOURCE;
 
-E_RESOURCE GetRNDResource();
+Uint16	    GetCountResource(E_RESOURCE);
+E_RESOURCE  GetRNDResource(void);
+E_RESOURCE  CheckValidResource(Uint8);
+const char *GetDescriptionsResource(E_RESOURCE);
 
 #endif

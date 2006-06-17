@@ -197,4 +197,6 @@ BOOL		HeroesArtifactPresent(S_HEROES *, E_ARTIFACT);
 E_LEVELSKILL	HeroesLevelSkill(S_HEROES *, E_SKILL);
 void		HeroesDefaultValues(S_HEROES *, E_RACE);
 
+S_HEROES       *GetStatHeroes(E_NAMEHEROES);
+
 #endif

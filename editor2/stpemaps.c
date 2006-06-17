@@ -2634,7 +2634,7 @@ void DrawSingleTile(Uint8 x, Uint8 y){
     }
 
     // рисуем сетку
-    if(GetIntValue("mapcell")){
+    if(GetIntValue("debug")){
 	LockSurface(video);
 	PutPixel(video, dest.x + dest.w - 1, dest.y + dest.h - 1, 0xFF00);
 	UnlockSurface(video);
@@ -2643,7 +2643,7 @@ void DrawSingleTile(Uint8 x, Uint8 y){
 
 ACTION ActionClickMapsArea(void){
 
-    if(! GetIntValue("mapinfo")) return NONE;
+    if(! GetIntValue("debug")) return NONE;
 
     int x, y;
     const char *string = "";
@@ -2684,8 +2684,8 @@ ACTION ActionClickMapsArea(void){
     fprintf(stderr, "\n");
 
     //fprintf(stderr, "indexAddon   : %6hX\n", ptrMaps[index].info->indexAddon);
-    //fprintf(stderr, "uniqNumber1  : %6lX\n", (long unsigned int) ptrMaps[index].info->uniqNumber1);
-    //fprintf(stderr, "uniqNumber2  : %6lX\n", (long unsigned int) ptrMaps[index].info->uniqNumber2);
+    fprintf(stderr, "uniqNumber1  : %6lX\n", (long unsigned int) ptrMaps[index].info->uniqNumber1);
+    fprintf(stderr, "uniqNumber2  : %6lX\n", (long unsigned int) ptrMaps[index].info->uniqNumber2);
 
     if(ptrMaps[index].info->indexAddon > countTail)
 
@@ -2739,8 +2739,8 @@ ACTION ActionClickMapsArea(void){
 	    fprintf(stderr, "objectNameN2 : %6hhX\n", tailAddon[indexAddon].objectNameN2);
     	    fprintf(stderr, "indexNameN2  : %6hhX\n", tailAddon[indexAddon].indexNameN2);
 
-	    //fprintf(stderr, "uniqNumberN1 : %6lX\n", (long unsigned int) tailAddon[indexAddon].uniqNumberN1);
-	    //fprintf(stderr, "uniqNumberN2 : %6lX\n", (long unsigned int) tailAddon[indexAddon].uniqNumberN2);
+	    fprintf(stderr, "uniqNumberN1 : %6lX\n", (long unsigned int) tailAddon[indexAddon].uniqNumberN1);
+	    fprintf(stderr, "uniqNumberN2 : %6lX\n", (long unsigned int) tailAddon[indexAddon].uniqNumberN2);
 
 	    indexAddon = tailAddon[indexAddon].indexAddon;
 	}

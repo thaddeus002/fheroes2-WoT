@@ -569,6 +569,21 @@ const char * PrintObjectType(E_OBJECT type, Uint8 ext){
             string = "OBJ_STANDINGSTONES";
             break;
 
+        // event
+        case OBJ_EVENT:
+            string = "OBJ_EVENT";
+            break;
+
+        //random monster
+        case OBJ_RNDMONSTER:
+            string = "OBJ_RNDMONSTER";
+            break;
+
+        //random ultimate artifact
+        case OBJ_RNDULTIMATEARTIFACT:
+            string = "OBJ_RNDULTIMATEARTIFACT";
+            break;
+
         // идол
         case OBJ_IDOL:
             string = "OBJ_IDOL";
@@ -808,8 +823,22 @@ void PrintCellInfo(Uint16 index){
 
     fprintf(stderr, "type    : %s\n", PrintObjectType(ptrCell->type, 0));
 
-    if(OBJ_MONSTER == ptrCell->type){
-	fprintf(stderr, "object  : %s\n", ((S_MONSTER *) ptrCell->object)->descriptions);
+    switch(ptrCell->type){
+
+	case OBJ_RESOURCE:
+    	    fprintf(stderr, "object  : %s\n", GetDescriptionsResource(ptrCell->object.resource));
+	    break;
+
+	case OBJ_ARTIFACT:
+    	    fprintf(stderr, "object  : %s\n", ((S_ARTIFACT *) GetStatArtifact(ptrCell->object.artifact))->name );
+	    break;
+
+	case OBJ_MONSTER:
+    	    fprintf(stderr, "object  : %s\n", ((S_MONSTER *) GetStatMonster(ptrCell->object.monster))->descriptions );
+	    break;
+
+	default:
+	    break;
     }
 
     fprintf(stderr, "count   : %d\n", ptrCell->count);

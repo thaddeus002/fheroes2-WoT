@@ -189,6 +189,7 @@ Uint32	uniqNumberN2;		// уникальный номер целого объек
 #define	OBJ_DWARFCOTT			0x8F	// хижина dwarf
 
 #define	OBJ_PEASANTHUNT			0x90	// хижина крестьянина
+#define OBJ_EVENT			0x93	// event
 #define OBJ_DRAGONCITY			0x94	// город драконов, точка входа
 #define	OBJ_LIGHTHOUSE			0x95	// маяк, точка входа
 #define	OBJ_WATERMILL			0x96	// водяная мельница, точка входа
@@ -210,6 +211,7 @@ Uint32	uniqNumberN2;		// уникальный номер целого объек
 #define OBJ_WINDMILL			0xA8	// мельница, точка входа
 #define	OBJ_ARTIFACT			0xA9	// артифакт
 #define	OBJ_BOAT			0xAB	// лодка
+#define	OBJ_RNDULTIMATEARTIFACT		0xAC	// random ultimate artifact
 #define	OBJ_RNDARTIFACT			0xAD	// random артифакт
 #define	OBJ_RNDRESOURCE			0xAE	// random ресурс
 #define	OBJ_RNDMONSTER			0xAF	// random monster level 1 - 4

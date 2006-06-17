@@ -31,10 +31,26 @@
 #include "SDL.h"
 
 #include "heroes.h"
+#include "config.h"
 #include "resource.h"
 #include "artifact.h"
 
 static S_ARTIFACT * ptrArtifact = NULL;
+
+            
+E_ARTIFACT CheckValidArtifact(Uint8 type){
+
+    E_ARTIFACT a;
+            
+    for(a = ULTIMATE_BOOK; a < ARTIFACTNONE; ++a)
+        if(a == type)
+            return a;
+
+    if(GetIntValue("debug"))
+        fprintf(stderr, "CheckValidArtifact: unknown object: 0x%hhX\n", type);
+
+    return ARTIFACTNONE;
+}
 
 S_ARTIFACT * GetStatArtifact(E_ARTIFACT artifact){
 

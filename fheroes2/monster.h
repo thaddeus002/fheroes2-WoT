@@ -147,6 +147,7 @@ typedef enum {
 		MONSTER_RND2 	= 67,
 		MONSTER_RND3 	= 68,
 		MONSTER_RND4 	= 69,
+		MONSTER_RND 	= 70,
 
 		MONSTERNONE
 	     } E_MONSTER;
@@ -173,8 +174,13 @@ void		FreeMonster(void);
 
 S_MONSTER *	GetStatMonster(E_MONSTER);
 E_ARMYSIZE 	GetSizeArmy(Uint16);
+const char *    GetStringSizeArmy(E_ARMYSIZE);
 E_MONSTER	GetRNDMonster(E_LEVELMONSTER);
 E_RACE		GetRaceMonster(E_MONSTER);
 BOOL		TheFlyMonster(E_MONSTER);
-E_MONSTER	CheckCorrectMonster(Uint8);
+E_MONSTER	CheckValidMonster(Uint8);
+Uint16		GetRNDSizeLevelMonster(E_LEVELMONSTER);
+E_LEVELMONSTER	GetLevelMonster(E_MONSTER);
+
+
 #endif
