@@ -41,7 +41,7 @@ E_RESOURCE CheckValidResource(Uint8 type){
         if(a == type)
             return a;
 
-    if(GetIntValue("debug"))
+    if(GetIntValue(DEBUG))
         fprintf(stderr, "CheckValidResource: unknown object: 0x%hhX\n", type);
 
     return RES_NONE;

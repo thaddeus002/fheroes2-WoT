@@ -50,7 +50,7 @@ E_MONSTER CheckValidMonster(Uint8 type){
 	if(a == type)
     	    return a;
 
-    if(GetIntValue("debug"))
+    if(GetIntValue(DEBUG))
         fprintf(stderr, "CheckValidMonster: unknown monster: 0x%hhX\n", type);
 
     return PEASANT;

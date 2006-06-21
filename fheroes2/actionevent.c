@@ -37,34 +37,32 @@
 #include "cursor.h"
 #include "config.h"
 
-typedef struct{
-    SDL_Rect    rect;
-    AGGSPRITE   object;
-    BOOL        present;
-    BOOL        usepresent;
-    BOOL        use;
-} S_OLDOBJECT;
-
 void AddActionEvent(INTERFACEACTION **pointer, INTERFACEACTION *action){
 
+    INTERFACEACTION *ptr;
+
     if(NULL == *pointer){
-	*pointer = (INTERFACEACTION *) malloc(sizeof(INTERFACEACTION));
-	**pointer = *action;
-	(*pointer)->next = NULL;
+	if(NULL == (*pointer = (INTERFACEACTION *) malloc(sizeof(INTERFACEACTION)))){
+	    fprintf(stderr, "AddActionEvent: error malloc: %d\n", sizeof(INTERFACEACTION));
+    	    return;
+	}
+	ptr = *pointer;
 
-	return;
-    }
+    }else{
     
-    INTERFACEACTION *ptr = *pointer;
-    while(ptr->next) ptr = (INTERFACEACTION *) ptr->next;
+	ptr = *pointer;
+	while(ptr->next) ptr = (INTERFACEACTION *) ptr->next;
 
-    ptr->next = malloc(sizeof(INTERFACEACTION));
-    if(ptr->next == NULL){
-	fprintf(stderr, "error malloc: %d\n", sizeof(INTERFACEACTION));
-        return;
+	if(NULL == (ptr->next = malloc(sizeof(INTERFACEACTION)))){
+	    fprintf(stderr, "AddActionEvent: error malloc: %d\n", sizeof(INTERFACEACTION));
+    	    return;
+	}
+
+	ptr = (INTERFACEACTION *) ptr->next;
     }
-    ptr = (INTERFACEACTION *) ptr->next;
+
     *ptr = *action;
+
     ptr->next = NULL;
 }
 
@@ -73,7 +71,7 @@ void RemoveActionLevelEvent(INTERFACEACTION *headAction, Uint8 level){
     INTERFACEACTION *head = headAction;
 
     if(head->level == level || level == LEVELEVENT_ROOT){
-	fprintf(stderr, "First element ACTIONEVENT always only LEVELEVENT_ROOT, and not remove!\n");
+	fprintf(stderr, "RemoveActionLevelEvent: First element ACTIONEVENT always only LEVELEVENT_ROOT, and not remove!\n");
 	return;
     }
 
@@ -140,13 +138,15 @@ ACTION ActionCycle(INTERFACEACTION *action){
     S_OLDOBJECT old;
     memset(old.object.name, 0, AGGSIZENAME);
     old.object.number = 0xFFFF;
-    old.rect.x = 0;
-    old.rect.y = 0;
-    old.rect.w = 0;
-    old.rect.h = 0;
-    old.use = FALSE;
+    old.pushRect.x = 0;
+    old.pushRect.y = 0;
+    old.pushRect.w = 0;
+    old.pushRect.h = 0;
+    old.presRect = old.pushRect;
+    old.flagPush = FALSE;
+    old.flagPres = FALSE;
     INTERFACEACTION *ptr = NULL;
-    int mousex, mousey;
+    Uint8 delay = GetIntValue(ANIMATIONDELAY);
 
     // цикл по событиям
     while(exit == NONE){
@@ -170,18 +170,12 @@ ACTION ActionCycle(INTERFACEACTION *action){
 			    exit = ESC;
 			    break;
 
-                	case SDLK_m:
-
-			    fprintf(stderr, "%d\n", GetCurrentSizeMemory());
-			    break;
-
 			// F4 switch to full screen
                 	case SDLK_F4:
 
 			    SDL_WM_ToggleFullScreen(video);
 
-			    if(GetIntValue("fullscreen")) SetIntValue("fullscreen", FALSE);
-			    else SetIntValue("fullscreen", TRUE);
+			    GetIntValue(FULLSCREEN) ? SetIntValue(FULLSCREEN, FALSE) : SetIntValue(FULLSCREEN, TRUE);
 
 			    break;
 								    
@@ -189,7 +183,7 @@ ACTION ActionCycle(INTERFACEACTION *action){
 			    break;
 		    }
 		    break;
-		
+
 		case SDL_MOUSEBUTTONDOWN:
 
 		    switch(event.button.button){
@@ -201,27 +195,18 @@ ACTION ActionCycle(INTERFACEACTION *action){
 			    while(ptr){
 				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
 				    (ptr->mouseEvent & MOUSE_LCLICK)){
-				    old.rect = ptr->rect;
+				    old.pushRect = ptr->rect;
 				    old.object = ptr->objectUp;
-				    old.use = TRUE;
+				    old.flagPush = TRUE;
 				    DrawSprite(&ptr->rect, &ptr->objectPush);
-				    SetCursor(ptr->cursorPush);
 				}
     				ptr = (INTERFACEACTION *) ptr->next;
 			    }
 			    break;
-			
-			case SDL_BUTTON_RIGHT:
 
-			    // правая кнопка down
-			    ptr = action;
-			    while(ptr){
-				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
-				    (ptr->mouseEvent & MOUSE_RCLICK) && ptr->pf) exit = (*ptr->pf)();
-    
-    				ptr = (INTERFACEACTION *) ptr->next;
-			    }
-    			    fprintf(stderr, "x: %d, y: %d\n", event.motion.x, event.motion.y);
+			case SDL_BUTTON_RIGHT:
+			    
+			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
 			    break;
 
 			case SDL_BUTTON_WHEELUP:
@@ -245,7 +230,7 @@ ACTION ActionCycle(INTERFACEACTION *action){
     				ptr = (INTERFACEACTION *) ptr->next;
 			    }
 			    break;
-
+			
 			default:
 			    break;
 		    }
@@ -259,20 +244,16 @@ ACTION ActionCycle(INTERFACEACTION *action){
 
 			    // левая кнопка up
 			    ptr = action;
-			    if(old.use){
-				DrawSprite(&old.rect, &old.object);
-				old.use = FALSE;
+			    if(old.flagPush){
+				DrawSprite(&old.pushRect, &old.object);
+				old.flagPush = FALSE;
 			    }
 
 			    while(ptr){
-				if(ValidPoint(&old.rect, event.button.x, event.button.y) &&
-				    (ptr->mouseEvent & MOUSE_LCLICK)){
-
-				    if(CompareRect(&ptr->rect, &old.rect) && ptr->pf)
+				if(ValidPoint(&old.pushRect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_LCLICK) && CompareRect(&ptr->rect, &old.pushRect) && ptr->pf )
 					exit = (*ptr->pf)();
-				    
-				    SetCursor(ptr->cursorUp);
-				}
+
 				ptr = (INTERFACEACTION *) ptr->next;
 			    }
 			    break;
@@ -283,45 +264,33 @@ ACTION ActionCycle(INTERFACEACTION *action){
 		    break;
 
 		case SDL_MOUSEMOTION:
-
-		    // рисуем курсор
-    		    CursorShow(event.motion.x, event.motion.y);
-		    break;
 		
+		    ptr = action;
+		    
+		    if(old.flagPres && !ValidPoint(&old.presRect, event.motion.x, event.motion.y)){
+			DrawSprite(&old.presRect, &old.object);
+			old.flagPres = FALSE;
+
+		    }else
+			while(ptr){
+			    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, event.motion.x, event.motion.y)){
+				DrawSprite(&ptr->rect, &ptr->objectMotion);
+				old.object = ptr->objectUp;
+				old.presRect = ptr->rect;
+				old.flagPres = TRUE;
+			    }
+
+    			    ptr = (INTERFACEACTION *) ptr->next;
+			}
+		    break;
+
 		default:
     		    break;
 	    }
 
-	// Проверка на событие MOUSE_PRESENT
-	SDL_GetMouseState(&mousex, &mousey);
-	ptr = action;
-	old.present = FALSE;
-	while(ptr){
-	    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, mousex, mousey)){
-		old.present = TRUE;
-		if(!old.usepresent && ptr->objectMotion.number != 0xFFFF){
-		    old.usepresent = TRUE;
-		    old.rect = ptr->rect;
-		    old.object = ptr->objectUp;
-		    DrawSprite(&ptr->rect, &ptr->objectMotion);
-		    SetCursor(ptr->cursorMotion);
-		    if(ptr->pf) exit = (*ptr->pf)();
-		}else{
-                    SetCursor(ptr->cursorMotion);
-                    if(ptr->pf) exit = (*ptr->pf)();
-		}
-	    }
-    	    ptr = (INTERFACEACTION *) ptr->next;
-	}
-
-	// востанавливаем объект MOUSE_PRESENT
-	if(!old.present && old.usepresent){
-	    DrawSprite(&old.rect, &old.object);
-	    old.usepresent = FALSE;
-	}
-
-	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY * delay);
     }
+
 
     return exit;
 }

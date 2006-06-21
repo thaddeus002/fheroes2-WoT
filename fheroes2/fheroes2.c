@@ -87,27 +87,27 @@ int main(int argc, char **argv){
     // инициализация переопределенных конфигурационных парамертов
     if(NULL == config_file) config_file = "fheroes2.cfg";
     InitConfig(config_file);
-    if(debug) SetIntValue("debug", debug);
+    if(debug) SetIntValue(DEBUG, debug);
 
     Uint32 flags;
     // инициализация SDL
-    if(GetIntValue("sound"))
-	flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
+    if(GetIntValue(SOUND))
+	flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER;
     else
-	flags = SDL_INIT_VIDEO;
+	flags = SDL_INIT_VIDEO | SDL_INIT_TIMER;
 
     if( 0 > SDL_Init(flags)){
 	fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
 	exit(1);
     }
 
-    if(GetIntValue("sound")) atexit(SDL_CloseAudio);
+    if(GetIntValue(SOUND)) atexit(SDL_CloseAudio);
     atexit(SDL_Quit);
 
     Uint16 xres = 0;
     Uint16 yres = 0;
 
-    switch(GetIntValue("videomode")){
+    switch(GetIntValue(VIDEOMODE)){
 
         default:
         case 0:
@@ -142,7 +142,7 @@ int main(int argc, char **argv){
 
     // only 640x480
     Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if(TRUE == GetIntValue("fullscreen")) flag |= SDL_FULLSCREEN;
+    if(TRUE == GetIntValue(FULLSCREEN)) flag |= SDL_FULLSCREEN;
 
     if(NULL == (video = SDL_SetVideoMode(640, 480, 16, flag))){
         fprintf(stderr, "SDL_SetVideoMode: %s\n", SDL_GetError());
@@ -167,16 +167,16 @@ int main(int argc, char **argv){
 	PreloadObject("BTNSHNGL.ICN");
 
 	DrawNewLoadQuit();
-    }
 
-    // освобождаем данные
-    FreeCursor();
-    FreeSpell();
-    FreeHeroes();
-    FreeArtifact();
-    FreeMonster();
-    FreeSound();
-    FreeAGG();
+        // освобождаем данные
+	FreeCursor();
+	FreeSpell();
+	FreeHeroes();
+	FreeArtifact();
+	FreeMonster();
+	FreeSound();
+	FreeAGG();
+    }
 
     fprintf(stderr, "Free all resource.\nBye!\n");
     exit(0);

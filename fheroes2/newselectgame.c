@@ -158,12 +158,12 @@ void ShowNewSelectGame(void){
 
     // на данной картинке работаем только в 640x480
     Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if(TRUE == GetIntValue("fullscreen")) flag |= SDL_FULLSCREEN;
+    if(TRUE == GetIntValue(FULLSCREEN)) flag |= SDL_FULLSCREEN;
     if(NULL == (video = SDL_GetVideoSurface()) || video->w != 640 || video->h !=480)
         video = SDL_SetVideoMode(640, 480, 16, flag);
 
-    if(NULL == video){ 
-        fprintf(stderr, "SDL_SetVideoMode: %s\n", SDL_GetError()); 
+    if(NULL == video){
+        fprintf(stderr, "SDL_SetVideoMode: %s\n", SDL_GetError());
 	return;
     }
 

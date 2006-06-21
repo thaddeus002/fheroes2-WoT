@@ -148,7 +148,6 @@
 
 void	SetCursor(Uint32);
 Uint32	GetCursor(void);
-void	CursorShow(Uint16, Uint16);
 BOOL	InitCursor(void);
 void	FreeCursor(void);
 void	CursorOff(void);

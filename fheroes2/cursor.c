@@ -36,14 +36,16 @@ typedef struct {
     Uint32	name;
     SDL_Surface *image;
     SDL_Surface *background;
-    SDL_Rect pos;		// реальная позициа курсора
-    BOOL show;			// флаг рисуем или нет
+    SDL_Rect 	pos;		// реальная позициа курсора
+    BOOL 	show;		// флаг рисуем или нет
+    SDL_TimerID	timer;
 } CURSORHEADER;
 
 static CURSORHEADER cursor;
 
 void CursorSaveBackground(void);
 void CursorRestoreBackground(void);
+Uint32 CursorShow(Uint32, void *);
 
 Uint32  GetCursor(void){
 
@@ -102,20 +104,19 @@ void CursorRestoreBackground(void){
     SDL_BlitSurface(cursor.background, &rest, video, &cursor.pos);
 }
 
-void CursorShow(Uint16 x, Uint16 y){
+Uint32 CursorShow(Uint32 interval, void *param){
 
-    if(0 == cursor.show) return;
+    if(0 == cursor.show) return interval;
 
-    SDL_Surface *formatSurface;
+    Sint32 x;
+    Sint32 y;
+
+    SDL_GetMouseState(&x, &y);
+
+    if(cursor.pos.x == x && cursor.pos.y == y) return interval;
 
     // востановить old
     CursorRestoreBackground();
-
-    if(NULL == cursor.background){
-	formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, CURSOR_WIDTH, CURSOR_HEIGHT, 16, 0, 0, 0, 0);
-	cursor.background = SDL_DisplayFormat(formatSurface);
-	SDL_FreeSurface(formatSurface);
-    }
 
     // сохранить new
     cursor.pos.x = x;
@@ -128,27 +129,39 @@ void CursorShow(Uint16 x, Uint16 y){
     CursorSaveBackground();
     SDL_BlitSurface(cursor.image, NULL, video, &cursor.pos);
     SDL_Flip(video);
-    return;
+
+    return interval;
 }
 
 BOOL InitCursor(void){
 
+    SDL_Surface *formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, CURSOR_WIDTH, CURSOR_HEIGHT, 16, 0, 0, 0, 0);
+
     SDL_ShowCursor(SDL_DISABLE);
     cursor.name = CURSOR_NULL;
     cursor.image = NULL;
-    cursor.background = NULL;
     cursor.show = TRUE;
+    cursor.background = SDL_DisplayFormat(formatSurface);
+
+    if(NULL == cursor.background) return FALSE;
 
     SetCursor(CURSOR_POINTER);
 
+    cursor.timer = SDL_AddTimer(10, CursorShow, NULL);
+
+    if(formatSurface) SDL_FreeSurface(formatSurface);
+
     fprintf(stderr, "Init cursor.\n");
-    
+
     return TRUE;
 }
 
 void FreeCursor(void){
 
     if(cursor.background) SDL_FreeSurface(cursor.background);
+
+    SDL_RemoveTimer(cursor.timer);
+
     SDL_ShowCursor(SDL_ENABLE);
 }
 
@@ -168,5 +181,26 @@ void CursorOn(void){
 
     cursor.show = TRUE;
     CursorSaveBackground();
-    CursorShow(cursor.pos.x, cursor.pos.y);
+    
+    Sint32 x;
+    Sint32 y;
+
+    SDL_GetMouseState(&x, &y);
+
+    // востановить old
+    CursorRestoreBackground();
+
+    // сохранить new
+    cursor.pos.x = x;
+    cursor.pos.y = y;
+    cursor.pos.w = cursor.image->w;
+    cursor.pos.h = cursor.image->h;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    // рисуем курсор
+    CursorSaveBackground();
+    SDL_BlitSurface(cursor.image, NULL, video, &cursor.pos);
+    SDL_Flip(video);
+
+    return;
 }

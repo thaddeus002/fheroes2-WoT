@@ -113,12 +113,12 @@ BOOL	InitHeroes(void){
     HeroesDefaultValues(&allHeroes[SANDRO], NECROMANCER);
     HeroesDefaultValues(&allHeroes[CELIA], NECROMANCER);
 
-    HeroesDefaultValues(&allHeroes[NAME_UNK1], KNIGHT);
-    HeroesDefaultValues(&allHeroes[NAME_UNK2], KNIGHT);
-    HeroesDefaultValues(&allHeroes[NAME_UNK3], KNIGHT);
-    HeroesDefaultValues(&allHeroes[NAME_UNK4], KNIGHT);
-    HeroesDefaultValues(&allHeroes[NAME_UNK5], KNIGHT);
-    HeroesDefaultValues(&allHeroes[NAME_UNK6], KNIGHT);
+    HeroesDefaultValues(&allHeroes[ROLAND], KNIGHT);
+    HeroesDefaultValues(&allHeroes[NAME_UNK2], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[NAME_UNK3], SORCERESS);
+    HeroesDefaultValues(&allHeroes[ARCHIBALD], KNIGHT);
+    HeroesDefaultValues(&allHeroes[NAME_UNK5], WARLOCK);
+    HeroesDefaultValues(&allHeroes[SANDYSANDY], NECROMANCER);
 
     allHeroes[LORDKILBURN].name	= "Lord Kilburn";
     allHeroes[SIRGALLANTH].name	= "Sir Gallanth";
@@ -180,12 +180,12 @@ BOOL	InitHeroes(void){
     allHeroes[SANDRO].name	= "Sandro";
     allHeroes[CELIA].name	= "Celia";
 
-    allHeroes[NAME_UNK1].name	= "Unknown 1";
-    allHeroes[NAME_UNK2].name	= "Unknown 2";
-    allHeroes[NAME_UNK3].name	= "Unknown 3";
-    allHeroes[NAME_UNK4].name	= "Unknown 4";
-    allHeroes[NAME_UNK5].name	= "Unknown 5";
-    allHeroes[NAME_UNK6].name	= "Unknown 6";
+    allHeroes[ROLAND].name	= "Roland";
+    allHeroes[NAME_UNK2].name	= "Unknown Name 2";
+    allHeroes[NAME_UNK3].name	= "Unknown Name 3";
+    allHeroes[ARCHIBALD].name	= "Archibald";
+    allHeroes[NAME_UNK5].name	= "Unknown Name 5";
+    allHeroes[SANDYSANDY].name	= "SandySandy";
 
     fprintf(stderr, "Init heroes.\n");
 

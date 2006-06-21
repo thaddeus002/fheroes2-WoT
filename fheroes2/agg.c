@@ -298,7 +298,7 @@ BOOL AddICN(void **ptr, INSIDEICNHEADER *hdr, INSIDEICNSPRITE *hdrspr){
 
 BOOL InitAGG(){
 
-    char *filename = GetStrValue("aggfile");
+    char *filename = GetStrValue(AGGFILE);
 
     // открываем файл
     if(NULL == (fd = fopen(filename, "rb"))){

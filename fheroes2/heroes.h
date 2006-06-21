@@ -138,12 +138,12 @@ typedef enum {
 		CELIA		= 53,
 
 		// герои из компаний
-		NAME_UNK1	= 54,
+		ROLAND		= 54,
 		NAME_UNK2	= 55,
 		NAME_UNK3	= 56,
-		NAME_UNK4	= 57,
+		ARCHIBALD	= 57,
 		NAME_UNK5	= 58,
-		NAME_UNK6	= 59
+		SANDYSANDY	= 59
 
 	    } E_NAMEHEROES;
 

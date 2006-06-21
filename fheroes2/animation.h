@@ -26,42 +26,22 @@
     Description:
 */
 
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _ANIMATION_H
+#define _ANIMATION_H
 
 #include "SDL.h"
-#include "gamedefs.h"
 
-typedef enum {
-		AGGFILE,
-		DIRECTORYMAPS,
-		DEBUG,
-		SOUND,
-		MUSIC,
-		ANIMATION,
-		ANIMATIONDELAY,
-		FULLSCREEN,
-		EVILINTERFACE,
-		VIDEOMODE,
-		LIMITMEMORY,
-		//
-		FILEMAPSPATH,
-		MAPSLONGNAME,
-		MAPSDESCRIPTION,
-		MAPSDIFFICULTY,
-		GAMEDIFFICULTY,
-		VICTORYCONDITIONS,
-		LOSSCONDITIONS,
+typedef struct {
+		Uint8		count;
+		SDL_Rect	*rect;
+		SDL_Surface	**surface;
+		void		*next;
 
-		// end config
-		CONFIGEND
-} E_CONFIG;
+		} S_ANIMATION;
 
-void InitConfig(const char *);
+S_ANIMATION*	AddAnimationEvent(S_ANIMATION **, SDL_Rect *, ICNHEADER *, Uint8);
+void		FreeAnimationEvent(S_ANIMATION *);
+void		RedrawAllAnimation(S_ANIMATION *);
 
-char	*GetStrValue(E_CONFIG);
-Uint8	GetIntValue(E_CONFIG);
-void	SetIntValue(E_CONFIG, Uint8);
-void	SetStrValue(E_CONFIG, const char *);
 
 #endif

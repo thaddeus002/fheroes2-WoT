@@ -46,7 +46,7 @@ E_ARTIFACT CheckValidArtifact(Uint8 type){
         if(a == type)
             return a;
 
-    if(GetIntValue("debug"))
+    if(GetIntValue(DEBUG))
         fprintf(stderr, "CheckValidArtifact: unknown object: 0x%hhX\n", type);
 
     return ARTIFACTNONE;

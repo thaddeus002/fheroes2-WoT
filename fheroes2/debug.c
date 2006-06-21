@@ -750,7 +750,7 @@ const char * PrintObjectType(E_OBJECT type, Uint8 ext){
             break;
 
 	default:
-	    if(GetIntValue("debug"))
+	    if(GetIntValue(DEBUG))
 		fprintf(stderr, "OBJECT: UNKNOWN: 0x%hhX\n", type);
 	    string = "";
 	    break;
@@ -761,11 +761,13 @@ const char * PrintObjectType(E_OBJECT type, Uint8 ext){
 
 void PrintCellInfo(Uint16 index){
 
-    if(! GetIntValue("debug")) return;
+    if(! GetIntValue(DEBUG)) return;
 
     S_CELLMAPS *ptrCell = GetCELLMAPS(index);
 
     fprintf(stderr, "---------------------\n");
+    fprintf(stderr, "ax      : %d\n", ptrCell->ax);
+    fprintf(stderr, "ay      : %d\n", ptrCell->ay);
     fprintf(stderr, "ground  : ");
 
     switch(ptrCell->ground){

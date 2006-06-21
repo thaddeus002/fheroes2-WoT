@@ -101,7 +101,7 @@ void InitConfig(const char * configFile){
 		++ptr;
 	    }
 
-	else if(0 == strcmp(s1, "mapinfo") || 0 == strcmp(s1, "mapcell") || 0 == strcmp(s1, "debug") || 0 == strcmp(s1, "sound") || 0 == strcmp(s1, "music") || 0 == strcmp(s1, "fullscreen") || 0 == strcmp(s1, "animation"))
+	else if(0 == strcmp(s1, "debug") || 0 == strcmp(s1, "sound") || 0 == strcmp(s1, "music") || 0 == strcmp(s1, "fullscreen") || 0 == strcmp(s1, "animation"))
 	    while(ptr->key){
 		if(0 == strcmp(s1, ptr->key)){
 		    if(0 == strcmp(s2, "off")){
@@ -179,7 +179,7 @@ void SetIntValue(const char *key, Uint8 value){
 
     while(ptr->key && strcmp(key, ptr->key)) ++ptr;
 
-    if(0 == strcmp(ptr->key, "mapinfo") || 0 == strcmp(ptr->key, "mapcell") || 0 == strcmp(ptr->key, "debug") || 0 == strcmp(ptr->key, "sound") || 0 == strcmp(ptr->key, "music") || 0 == strcmp(ptr->key, "fullscreen") || 0 == strcmp(ptr->key, "animation"))
+    if(0 == strcmp(ptr->key, "debug") || 0 == strcmp(ptr->key, "sound") || 0 == strcmp(ptr->key, "music") || 0 == strcmp(ptr->key, "fullscreen") || 0 == strcmp(ptr->key, "animation"))
 	if(FALSE == value){
 	    ptr->valueInt = FALSE;
 	    strcpy(ptr->valueStr, "off");

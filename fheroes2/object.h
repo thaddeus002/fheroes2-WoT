@@ -197,7 +197,8 @@ typedef enum {
 		OBJ_END			= 0xFF
 	    } E_OBJECT;
 
-E_OBJECT CheckValidObject(Uint8);
-ICNHEADER *GetICNHEADERCellObject(Uint8, Uint8);
+E_OBJECT	CheckValidObject(Uint8);
+ICNHEADER	*GetICNHEADERCellObject(Uint8, Uint8);
+BOOL		StoreAnimationFrame(Uint8, Uint8, void *);
 
 #endif

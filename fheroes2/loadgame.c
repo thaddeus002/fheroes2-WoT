@@ -48,6 +48,10 @@ void	DrawRectAreaMaps(SDL_Rect *);
 void	DrawCellAreaMapsMonster(Uint8, Uint8);
 void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
+void	DrawCellStaticAnimation(Uint8, Uint8);
+Uint32	RedrawMapsAnimation(Uint32, void *);
+
+ACTION ActionGAMELOOP(INTERFACEACTION *);
 
 ACTION ActionClickMapsArea(void);
 ACTION ActionClickRadarArea(void);
@@ -66,7 +70,7 @@ ACTION ActionButtonHeroes(void);
 ACTION ActionButtonAction(void);
 ACTION ActionButtonCastle(void);
 ACTION ActionButtonMagic(void);
-ACTION ActionButtonTur(void);
+ACTION ActionButtonCloseDay(void);
 ACTION ActionButtonInfo(void);
 ACTION ActionButtonOptions(void);
 ACTION ActionButtonSettings(void);
@@ -92,6 +96,8 @@ SDL_Surface	*backgroundArea = NULL;
 SDL_Surface	*frameAreaLeft = NULL;
 SDL_Surface	*frameAreaBottom = NULL;
 
+SDL_TimerID	timerAnime = NULL;
+
 S_DISPLAY       display;
 
 ACTION DrawMainDisplay(){
@@ -108,11 +114,11 @@ ACTION DrawMainDisplay(){
     Uint16 dy = 0;
 
     Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if(TRUE == GetIntValue("fullscreen")) flag = flag | SDL_FULLSCREEN;
+    if(TRUE == GetIntValue(FULLSCREEN)) flag = flag | SDL_FULLSCREEN;
 
     // select video mode
 
-    switch(GetIntValue("videomode")){
+    switch(GetIntValue(VIDEOMODE)){
 
 	default:
 	case 0:
@@ -187,6 +193,7 @@ ACTION DrawMainDisplay(){
     action.rect = dest;
     action.mouseEvent = MOUSE_PRESENT;
     action.cursorMotion = CURSOR_POINTER;
+    //action.pf = RedrawMapsAnimation;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
@@ -279,7 +286,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // button
-    if(GetIntValue("evilinterface"))
+    if(GetIntValue(EVILINTERFACE))
 	icnname = "ADVEBTNS.ICN";
     else
 	icnname = "ADVBTNS.ICN";
@@ -369,7 +376,7 @@ ACTION DrawMainDisplay(){
     FillSPRITE(&action.objectPush, icnname, 9);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionButtonTur;
+    action.pf = ActionButtonCloseDay;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
@@ -428,7 +435,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // scroll element
-    if(GetIntValue("evilinterface"))
+    if(GetIntValue(EVILINTERFACE))
 	icnname = "SCROLLE.ICN";
     else
 	icnname = "SCROLL.ICN";
@@ -469,7 +476,7 @@ ACTION DrawMainDisplay(){
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
-    switch(GetIntValue("videomode")){
+    switch(GetIntValue(VIDEOMODE)){
 
 	// 640x480
 	default:
@@ -522,22 +529,22 @@ ACTION DrawMainDisplay(){
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
-
-
-
-
-
     // инициализируем радар
     InitRadar();
 
     // отображаем картинку
     ShowStaticMainDisplay();
     RedrawMapsArea();
-    
+
+    // включаем анимацию
+    timerAnime = SDL_AddTimer(GetIntValue(ANIMATIONDELAY) * 10, RedrawMapsAnimation, NULL);
+
     // идем в цикл сообщений
     ACTION result;
 
-    while(! (EXIT == (result = ActionCycle(stpemaindisplay)) || (ESC == result && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
+    while(! (EXIT == (result = ActionGAMELOOP(stpemaindisplay)) || (ESC == result && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
+
+    SDL_RemoveTimer(timerAnime);
 
     result = EXIT;
 
@@ -571,7 +578,7 @@ void ShowStaticMainDisplay(void){
     SDL_FillRect(video, NULL, SDL_MapRGB(video->format, 0x00, 0x00, 0x00));
 
     // show border
-    if(GetIntValue("evilinterface"))
+    if(GetIntValue(EVILINTERFACE))
 	icnname = "ADVBORDE.ICN";
     else
 	icnname = "ADVBORD.ICN";
@@ -580,7 +587,7 @@ void ShowStaticMainDisplay(void){
     image = GetICNSprite(&sprite);
 
     // ниже, собирается интерфейс из кусочков под видеорежим
-    switch(GetIntValue("videomode")){
+    switch(GetIntValue(VIDEOMODE)){
 
 	// 640x480 draw all
 	case 0:
@@ -591,7 +598,7 @@ void ShowStaticMainDisplay(void){
 	    dst = src;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "LOCATORE.ICN";
 	    else
 		icnname = "LOCATORS.ICN";
@@ -619,7 +626,7 @@ void ShowStaticMainDisplay(void){
 		dst.y += 32;
 	    }
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "STONBAKE.ICN";
 	    else
 		icnname = "STONBACK.ICN";
@@ -760,7 +767,7 @@ void ShowStaticMainDisplay(void){
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "LOCATORE.ICN";
 	    else
 		icnname = "LOCATORS.ICN";
@@ -788,7 +795,7 @@ void ShowStaticMainDisplay(void){
 		dst.y += 32;
 	    }
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "STONBAKE.ICN";
 	    else
 		icnname = "STONBACK.ICN";
@@ -925,7 +932,7 @@ void ShowStaticMainDisplay(void){
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "LOCATORE.ICN";
 	    else
 		icnname = "LOCATORS.ICN";
@@ -953,7 +960,7 @@ void ShowStaticMainDisplay(void){
 		dst.y += 32;
 	    }
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "STONBAKE.ICN";
 	    else
 		icnname = "STONBACK.ICN";
@@ -1103,7 +1110,7 @@ void ShowStaticMainDisplay(void){
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "LOCATORE.ICN";
 	    else
 		icnname = "LOCATORS.ICN";
@@ -1132,7 +1139,7 @@ void ShowStaticMainDisplay(void){
 	    }
 
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue("evilinterface"))
+	    if(GetIntValue(EVILINTERFACE))
 		icnname = "STONBAKE.ICN";
 	    else
 		icnname = "STONBACK.ICN";
@@ -1723,6 +1730,7 @@ void RedrawMapsArea(){
 
     DrawRectAreaMaps(&dest);
 
+
     SDL_Flip(video);
     
     // redraw radar
@@ -1737,9 +1745,7 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 
     Uint8 x, y;
 
-    SDL_Surface *image = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
-    Uint16 index = 0;
     SDL_Rect dest;
 
     S_CELLMAPS *ptrCell = NULL;
@@ -1755,42 +1761,32 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 	    dest.w = TILEWIDTH;
 	    dest.h = TILEWIDTH;
 
-	    index = (display.offsetY + y) * GetWidthMaps() + display.offsetX + x;
-	    ptrCell = GetCELLMAPS(index);
-	    image = ptrCell->tile;
-	    SDL_BlitSurface(image, NULL, video, &dest);
+	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+	    SDL_BlitSurface(ptrCell->tile, NULL, video, &dest);
 	    
     }
 
     // отрисовываем все нижние объекты
     for(y = rect->y; y < rect->y + rect->h; ++y)
-
 	for(x = rect->x; x < rect->x + rect->w; ++x)
-	
 	    DrawCellAreaMapsLevel1(x, y);
-
+/*
     // отрисовываем всех монстров
     for(y = rect->y; y < rect->y + rect->h; ++y)
-
 	for(x = rect->x; x < rect->x + rect->w; ++x)
-	
 	    DrawCellAreaMapsMonster(x, y);
-
+*/
     // отрисовываем все верхние объекты
     for(y = rect->y; y < rect->y + rect->h; ++y)
-
-	for(x = rect->x; x < rect->x + rect->w; ++x){
-
+	for(x = rect->x; x < rect->x + rect->w; ++x)
 	    DrawCellAreaMapsLevel2(x, y);
 
-	    // и рисуем сетку
-	    if(GetIntValue("debug")){
-		LockSurface(video);
-		PutPixel(video, dest.x + dest.w - 1, dest.y + dest.h - 1, 0xFF00);
-		UnlockSurface(video);
-	    }
-	}
+    // если присутствует анимация на клетке, отрисовываем отдельно, пару статичных спрайтов
+    for(y = rect->y; y < rect->y + rect->h; ++y)
+	for(x = rect->x; x < rect->x + rect->w; ++x)
+	    DrawCellStaticAnimation(x, y);
 
+/*
     // востановим нестандартные спрайты при скроллинге вправо и вниз
     if(rect->x == (GetAreaWidth() - 1)){
 
@@ -1820,8 +1816,26 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 		DrawCellAreaMapsLevel2(y, rect->y);
 	}
     }
+*/
 
-    // отрисовываем рамку area
+    // и рисуем сетку
+    if(GetIntValue(DEBUG)){
+
+	dest.w = TILEWIDTH;
+	dest.h = TILEWIDTH;
+
+	for(y = rect->y; y < rect->y + rect->h; ++y)
+	    for(x = rect->x; x < rect->x + rect->w; ++x){
+
+		dest.x = BORDERWIDTH + x * TILEWIDTH;
+		dest.y = BORDERWIDTH + y * TILEWIDTH;
+
+		LockSurface(video);
+		PutPixel(video, dest.x + dest.w - 1, dest.y + dest.h - 1, 0xFF00);
+		UnlockSurface(video);
+    }}
+
+    // отрисовываем бордюр рамки и справа и внизу
     dest.x = BORDERWIDTH + GetAreaWidth() * TILEWIDTH;
     dest.y = BORDERWIDTH;
     dest.w = BORDERWIDTH;
@@ -1838,11 +1852,13 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 /* функция реализующая алгоритм отрисовки нижних объектов одной клетки */
 void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
 
-    SDL_Surface *video = SDL_GetVideoSurface();
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+    
+    if(ptrCell->animation) return;
 
+    SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect dest;
 
-    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
     ICNHEADER  *icn = ptrCell->level1;
 
     // все нижние объекты
@@ -1863,14 +1879,65 @@ void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
 void DrawCellAreaMapsMonster(Uint8 x, Uint8 y){
 }
 
+/* функция реализующая алгоритм отрисовки первых 2 кадров анимации */
+void DrawCellStaticAnimation(Uint8 x, Uint8 y){
+
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+
+    if(! ptrCell->animation) return;
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect dest;
+    ICNHEADER  *icn;
+
+    dest.w = TILEWIDTH;
+    dest.h = TILEWIDTH;
+    
+    // все нижние объекты
+    icn = ptrCell->level1;
+    while(icn){
+
+	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
+	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
+
+        SDL_BlitSurface(icn->surface, NULL, video, &dest);
+
+        icn = icn->next;
+    }
+
+    // анимация 1 кадр
+    dest.x = ptrCell->animation->rect[0].x + BORDERWIDTH + x * TILEWIDTH;
+    dest.y = ptrCell->animation->rect[0].y + BORDERWIDTH + y * TILEWIDTH;
+    SDL_BlitSurface(ptrCell->animation->surface[0], NULL, video, &dest);
+
+    // анимация 2 кадр
+    dest.x = ptrCell->animation->rect[1].x + BORDERWIDTH + x * TILEWIDTH;
+    dest.y = ptrCell->animation->rect[1].y + BORDERWIDTH + y * TILEWIDTH;
+    SDL_BlitSurface(ptrCell->animation->surface[1], NULL, video, &dest);
+
+    // все верхние объекты
+    icn = ptrCell->level2;
+    while(icn){
+
+	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
+	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
+
+        SDL_BlitSurface(icn->surface, NULL, video, &dest);
+
+        icn = icn->next;
+    }
+}
+
 /* функция реализующая алгоритм отрисовки верхних объектов одной клетки */
 void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
 
-    SDL_Surface *video = SDL_GetVideoSurface();
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
 
+    if(ptrCell->animation) return;
+
+    SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect dest;
 
-    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
     ICNHEADER  *icn = ptrCell->level2;
 
     // все нижние объекты
@@ -1885,6 +1952,83 @@ void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
 
         icn = icn->next;
     }
+}
+
+Uint32 RedrawMapsAnimation(Uint32 interval, void *param){
+
+    if(! GetIntValue(ANIMATION)) return interval;
+
+    static Uint32 animationFrame = 0;
+    Uint8 x, y;
+
+    S_CELLMAPS	*ptrCell = NULL;
+    ICNHEADER	*icn = NULL;
+    SDL_Surface	*video = SDL_GetVideoSurface();
+
+    SDL_Rect dest;
+    Uint8 frame;
+
+    Sint32 cx, cy;
+
+    SDL_GetMouseState(&cx, &cy);
+    dest.w = TILEWIDTH;
+    dest.h = TILEWIDTH;
+    
+    for(y = 0; y < GetAreaHeight(); ++y)
+
+	for(x = 0; x < GetAreaWidth(); ++x){
+
+	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+
+	    if(! ptrCell->animation) continue;
+
+	    dest.x = BORDERWIDTH + x * TILEWIDTH;
+	    dest.y = BORDERWIDTH + y * TILEWIDTH;
+	    
+	    // если курсор над клеткой с анимацией то выключаем
+	    if(ValidPoint(&dest, cx, cy)) CursorOff();
+
+	    // TILE
+	    SDL_BlitSurface(ptrCell->tile, NULL, video, &dest);
+    
+	    // все нижние объекты
+	    icn = ptrCell->level1;
+	    while(icn){
+
+		dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
+		dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
+
+    		SDL_BlitSurface(icn->surface, NULL, video, &dest);
+
+    		icn = icn->next;
+	    }
+
+	    // анимация
+	    frame = 1 + animationFrame % (ptrCell->animation->count - 1);
+	    dest.x = ptrCell->animation->rect[frame].x + BORDERWIDTH + x * TILEWIDTH;
+	    dest.y = ptrCell->animation->rect[frame].y + BORDERWIDTH + y * TILEWIDTH;
+	    SDL_BlitSurface(ptrCell->animation->surface[frame], NULL, video, &dest);
+
+	    // все верхние объекты
+	    icn = ptrCell->level2;
+	    while(icn){
+
+		dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
+		dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
+
+    		SDL_BlitSurface(icn->surface, NULL, video, &dest);
+
+    		icn = icn->next;
+	    }
+    }
+
+    SDL_Flip(video);
+
+    CursorOn();
+
+    ++animationFrame;
+
+    return interval;
 }
 
 ACTION ActionClickMapsArea(void){
@@ -1999,7 +2143,7 @@ ACTION ActionButtonMagic(void){
     return NONE;
 }
 
-ACTION ActionButtonTur(void){
+ACTION ActionButtonCloseDay(void){
 
     return NONE;
 }
@@ -2042,4 +2186,139 @@ ACTION ActionScrollCastleDown(void){
 S_DISPLAY *GetDisplayPos(void){
 
     return &display;
+}
+
+ACTION ActionGAMELOOP(INTERFACEACTION *action){
+
+    SDL_Event event;
+    SDL_Surface *video = SDL_GetVideoSurface();;
+    ACTION exit = NONE;
+    S_OLDOBJECT old;
+    memset(old.object.name, 0, AGGSIZENAME);
+    old.object.number = 0xFFFF;
+    old.pushRect.x = 0;
+    old.pushRect.y = 0;
+    old.pushRect.w = 0;
+    old.pushRect.h = 0;
+    old.presRect = old.pushRect;
+    old.flagPush = FALSE;
+    old.flagPres = FALSE;
+    INTERFACEACTION *ptr = NULL;
+
+    // цикл по событиям
+    while(exit == NONE){
+
+	while(SDL_PollEvent(&event))
+
+	    switch(event.type){
+	    
+		case SDL_QUIT:
+
+		    // close windows
+		    exit = EXIT;
+		    break;
+
+		case SDL_KEYDOWN:
+
+		    // нажатия клавиатуры
+		    switch(event.key.keysym.sym){
+
+			case SDLK_ESCAPE:
+
+			    exit = ESC;
+			    break;
+
+			// F4 switch to full screen
+                	case SDLK_F4:
+
+			    SDL_WM_ToggleFullScreen(video);
+
+			    GetIntValue(FULLSCREEN) ? SetIntValue(FULLSCREEN, FALSE) : SetIntValue(FULLSCREEN, TRUE);
+
+			    break;
+								    
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEBUTTONDOWN:
+
+		    switch(event.button.button){
+		    
+			case SDL_BUTTON_LEFT:
+
+			    // левая кнопка down
+			    ptr = stpemaindisplay;
+			    while(ptr){
+				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_LCLICK)){
+				    old.pushRect = ptr->rect;
+				    old.object = ptr->objectUp;
+				    old.flagPush = TRUE;
+				    DrawSprite(&ptr->rect, &ptr->objectPush);
+				}
+    				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+			    break;
+
+			case SDL_BUTTON_RIGHT:
+			    
+			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
+			    break;
+
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEBUTTONUP:
+
+		    switch(event.button.button){
+		    
+			case SDL_BUTTON_LEFT:
+
+			    // левая кнопка up
+			    ptr = stpemaindisplay;
+			    if(old.flagPush){
+				DrawSprite(&old.pushRect, &old.object);
+				old.flagPush = FALSE;
+			    }
+
+			    while(ptr){
+				if(ValidPoint(&old.pushRect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_LCLICK) && CompareRect(&ptr->rect, &old.pushRect) && ptr->pf )
+					exit = (*ptr->pf)();
+
+				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+			    break;
+			    
+			default:
+			    break;
+		    }
+		    break;
+
+		default:
+    		    break;
+	    }
+
+	ptr = stpemaindisplay;
+
+	while(ptr){
+
+	    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, event.motion.x, event.motion.y)){
+
+		if(ptr->cursorMotion) SetCursor(ptr->cursorMotion);
+		if(ptr->pf) exit = (*ptr->pf)();
+	    
+	    }
+
+    	    ptr = (INTERFACEACTION *) ptr->next;
+	}
+
+	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+    }
+
+    return exit;
 }

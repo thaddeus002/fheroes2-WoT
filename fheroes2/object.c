@@ -29,6 +29,7 @@
 #include "SDL.h"
 #include "gamedefs.h"
 #include "agg.h"
+#include "mp2maps.h"
 #include "tools.h"
 #include "config.h"
 #include "object.h"
@@ -41,7 +42,7 @@ E_OBJECT CheckValidObject(Uint8 type){
 	if(a == type)
 	    return a;
 
-    if(GetIntValue("debug"))
+    if(GetIntValue(DEBUG))
 	fprintf(stderr, "CheckValidObject: unknown object: 0x%hhX\n", type);
 
     return OBJ_ZERO;
@@ -368,10 +369,650 @@ ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index){
 	    break;
 
 	default:
-	    if(GetIntValue("debug")) fprintf(stderr, "GetICNHEADERCellObject: return NULL: object: 0x%hhX, memorize\n", type);
+	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetICNHEADERCellObject: return NULL: object: 0x%hhX, memorize\n", type);
 	    return NULL;
 	    break;
     }
     
     return GetICNHeader(&sprite);
+}
+
+/* функция отрисовки анимации объекта */
+BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
+
+    S_CELLMAPS *maps = (S_CELLMAPS *) ptr;
+/*
+    if(maps->animation){
+	if(GetIntValue(DEBUG)) fprintf(stderr, "StoreAnimationFrame: multi frame: x: %d, y: %d\n", maps->ax ,maps->ay);
+	return FALSE;
+    }
+*/
+    AGGSPRITE sprite;
+    SDL_Rect  src;
+    ICNHEADER *info = NULL;
+
+    src.x = 0;
+    src.y = 0;
+    src.w = 0;
+    src.h = 0;
+    
+    switch(type){
+
+	// объекты на море
+	case 0xC8:
+	case 0xC9:
+	case 0xCA:
+	case 0xCB:
+	
+	    switch(index){
+	    
+		// бутылка
+		case 0x00:
+
+		    FillSPRITE(&sprite, "OBJNWATR.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 12);
+
+		    break;
+
+		// тень ?
+		case 0x0C:
+		// сундук
+		case 0x13:
+		// тень ?
+		case 0x26:
+		// дрова
+		case 0x2D:
+		// свет в окне картографа?
+		case 0x37:
+		// лодка у картографа
+		case 0x3E:
+		// волны у картографа
+		case 0x45:
+		// зеленая трава на воде (2 варианта)
+		case 0x4C:
+		case 0x53:
+		case 0x5A:
+		case 0x61:
+		case 0x68:
+		// утопающий матрос
+		case 0x6F:
+		// тень буя ?
+		case 0xBC:
+		// буй
+		case 0xC3:
+		// правый broken ship
+		case 0xE2:
+		case 0xE9:
+		case 0xF1:
+		case 0xF8:
+
+		    FillSPRITE(&sprite, "OBJNWATR.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		// чайка на камнях (2 варианта) (16 кадров)
+		case 0x76:
+		case 0x86:
+		case 0x96:
+
+		    FillSPRITE(&sprite, "OBJNWATR.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 16);
+
+		    break;
+
+		// водоворот (4 кадров)
+		case 0xCA:
+		case 0xCE:
+		case 0xD2:
+		case 0xD6:
+		case 0xDA:
+		case 0xDE:
+
+		    FillSPRITE(&sprite, "OBJNWATR.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 4);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+
+	// объекты на море №2
+	case 0xA0:
+	case 0xA1:
+	case 0xA2:
+	case 0xA3:
+
+	    switch(index){
+
+		// парус левого broken ship
+		case 0x03:
+		case 0x0C:
+
+		    FillSPRITE(&sprite, "OBJNWAT2.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+
+	// объекты на crck
+	case 0xE4:
+	case 0xE5:
+	case 0xE6:
+	case 0xE7:
+
+	    switch(index){
+	    
+		// лужа грязи (11 кадров)
+		case 0x50:
+		case 0x5B:
+		case 0x66:
+		case 0x71:
+		case 0x7C:
+		case 0x89:
+		case 0x94:
+		case 0x9F:
+		case 0xAA:
+		// рынок дым от трубы
+		case 0xBE:
+		// рынок тень от дыма
+		case 0xCA:
+
+		    FillSPRITE(&sprite, "OBJNCRCK.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 11);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+
+	// объекты на dirt
+	case 0xE0:
+	case 0xE1:
+	case 0xE2:
+	case 0xE3:
+
+	    switch(index){
+	    
+		// мельница (4 кадра)
+		case 0x99:
+		case 0x9D:
+		case 0xA1:
+		case 0xA5:
+		case 0xA9:
+		case 0xAD:
+		case 0xB1:
+		case 0xB5:
+		case 0xB9:
+		case 0xBD:
+
+		    FillSPRITE(&sprite, "OBJNDIRT.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 4);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+
+	// объекты на desert
+	case 0xDC:
+	case 0xDD:
+	case 0xDE:
+	case 0xDF:
+
+	    switch(index){
+	    
+		// костер (7)
+		case 0x36:
+		case 0x3D:
+
+		    FillSPRITE(&sprite, "OBJNDSRT.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+
+	// объекты gras
+	case 0xC0:
+	case 0xC1:
+	case 0xC2:
+	case 0xC3:
+
+	    switch(index){
+
+		// мельница (4)
+		case 0x17:
+		case 0x1B:
+		case 0x1F:
+		case 0x23:
+		case 0x27:
+		case 0x2B:
+		case 0x2F:
+		case 0x33:
+		case 0x37:
+		case 0x3B:
+
+		    FillSPRITE(&sprite, "OBJNGRA2.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 4);
+
+		    break;
+
+		// дым из трубы 7
+		case 0x3F:
+		case 0x46:
+		case 0x4D:
+		// домик лучника
+		case 0x54:
+		// дым из трубы
+		case 0x5D:
+		case 0x64:
+		// тень
+		case 0x6B:
+		// домик крестьянина
+		case 0x72:
+
+		    FillSPRITE(&sprite, "OBJNGRA2.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+/*
+	// объекты на lava
+	case 0xF0:
+	case 0xF1:
+	case 0xF2:
+	case 0xF3:
+
+	    switch(index){
+
+		// вулкан (7)
+		case 0x00:
+		// тень
+		case 0x07:
+		case 0x0E:
+		// лава
+		case 0x15:
+
+		    FillSPRITE(&sprite, "OBJNLAV2.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		// дым (5)
+		case 0x21:
+		case 0x27:
+
+		    maps->frame = 5;
+		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
+			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
+			return FALSE;
+		    }
+
+		    
+		    for(i = 0; i < maps->frame; ++i){
+		    
+			FillSPRITE(&sprite, "OBJNLAV2.ICN", index + (i % maps->frame) + 1);
+			info = GetICNHeader(&sprite);
+
+			maps->animation[i].offsetX = info->offsetX;
+			maps->animation[i].offsetY = info->offsetY;
+			maps->animation[i].surface = info->surface;
+			maps->animation[i].next = NULL;
+		    }
+		    break;
+
+		// тень от дыма (4)
+		case 0x2C:
+		//case 0x32:
+		case 0x37:
+		//case 0x3C:
+
+		    maps->frame = 4;
+		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
+			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
+			return FALSE;
+		    }
+
+		    
+		    for(i = 0; i < maps->frame; ++i){
+		    
+			FillSPRITE(&sprite, "OBJNLAV2.ICN", index + (i % maps->frame) + 1);
+			info = GetICNHeader(&sprite);
+
+			maps->animation[i].offsetX = info->offsetX;
+			maps->animation[i].offsetY = info->offsetY;
+			maps->animation[i].surface = info->surface;
+			maps->animation[i].next = NULL;
+		    }
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+	    
+	break;
+
+	// объекты на lava
+	case 0xE8:
+	case 0xE9:
+	case 0xEA:
+	case 0xEB:
+
+	    // большой вулкан
+	    switch(index){
+
+//		case 0x00:
+//
+//		    maps->frame = 6;
+//		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
+//			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
+//			return FALSE;
+//		    }
+//
+//		    
+//		    for(i = 0; i < maps->frame; ++i){
+//		    
+//			FillSPRITE(&sprite, "OBJNLAV3.ICN", index + (i % maps->frame) + 1);
+//			info = GetICNHeader(&sprite);
+//
+//			maps->animation[i].offsetX = info->offsetX;
+//			maps->animation[i].offsetY = info->offsetY;
+//			maps->animation[i].surface = info->surface;
+//			maps->animation[i].next = NULL;
+//		    }
+//		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+	    
+	break;
+
+	// объекты на lava
+	case 0xD8:
+	case 0xD9:
+	case 0xDA:
+	case 0xDB:
+
+	    switch(index){
+
+		// дым лавы (9)
+		case 0x58:
+		case 0x62:
+
+		    maps->frame = 8;
+		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
+			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
+			return FALSE;
+		    }
+
+		    
+		    for(i = 0; i < maps->frame; ++i){
+		    
+			FillSPRITE(&sprite, "OBJNLAVA.ICN", index + (i % maps->frame) + 1);
+			info = GetICNHeader(&sprite);
+
+			maps->animation[i].offsetX = info->offsetX;
+			maps->animation[i].offsetY = info->offsetY;
+			maps->animation[i].surface = info->surface;
+			maps->animation[i].next = NULL;
+		    }
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+	    
+	break;
+*/
+	// объекты на земле №2
+	case 0xA4:
+	case 0xA5:
+	case 0xA6:
+	case 0xA7:
+
+	    switch(index){
+
+		// свет маяка (10)
+		case 0x3D:
+
+		    FillSPRITE(&sprite, "OBJNMUL2.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 10);
+
+		    break;
+
+		// mercury капли и огонь (7)
+		case 0x1B:
+		// водяная мельница
+		case 0x53:
+		case 0x5A:
+		case 0x62:
+		case 0x69:
+		// огонь в загоне воров
+		case 0x81:
+		// дым кузницы 2 трубы
+		case 0xA6:
+		// дым кузницы 1 труба
+		case 0xAD:
+		// тень от дыма кузницы
+		case 0xB4:
+		// наркоман под грибом
+		case 0xBE:
+
+		    FillSPRITE(&sprite, "OBJNMUL2.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+	    
+	    break;
+
+	// объекты на земле
+	case 0xEC:
+	case 0xED:
+	case 0xEE:
+	case 0xEF:
+
+	    switch(index){
+
+		// дым (10)
+		case 0x05:
+		// тень
+		case 0x0F:
+		case 0x19:
+		// дым
+		case 0x23:
+		// тень
+		case 0x2D:
+
+		    FillSPRITE(&sprite, "OBJNMULT.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 10);
+
+		    break;
+
+		// дым (7)
+		case 0x5A:
+		// тень
+		case 0x61:
+		case 0x68:
+		case 0x7C:
+		// огонь
+		case 0x83:
+
+		    FillSPRITE(&sprite, "OBJNMULT.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+
+	// объекты на snow
+	case 0xD0:
+	case 0xD1:
+	case 0xD2:
+	case 0xD3:
+
+	    switch(index){
+		// огонь (7)
+		case 0x04:
+		// mercury котел и огонь
+		case 0x97:
+		// водяная мельница
+		case 0xA2:
+		case 0xA9:
+		case 0xB1:
+		case 0xB8:
+
+		    FillSPRITE(&sprite, "OBJNSNOW.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+
+		// мельница (4)
+		case 0x60:
+		case 0x64:
+		case 0x68:
+		case 0x6C:
+		case 0x70:
+		case 0x74:
+		case 0x78:
+		case 0x7C:
+		case 0x80:
+		case 0x84:
+
+		    FillSPRITE(&sprite, "OBJNSNOW.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 4);
+
+		    break;
+
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	    break;
+
+	// объекты на swamp
+	case 0xD4:
+	case 0xD5:
+	case 0xD6:
+	case 0xD7:
+
+	    switch(index){
+
+		// тень (7)
+		case 0x00:
+		// дым
+		case 0x07:
+		// тень
+		case 0x0E:
+		// свет в окнах
+		case 0x16:
+		// дым
+		case 0x22:
+		// тень
+		case 0x2B:
+		// дым
+		case 0x33:
+		// свет в окнах
+		case 0x3A:
+		// свет в окнах
+		case 0x43:
+		// свет в окнах
+		case 0x4A:
+
+		    FillSPRITE(&sprite, "OBJNSWMP.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 7);
+
+		    break;
+    
+		default:
+		    return FALSE;
+		    break;
+	    }
+
+	default:
+	    return FALSE;
+	    break;
+    }
+    
+    return TRUE;
 }

@@ -344,7 +344,7 @@ void ShowStaticForm(void){
 
     // only 640x480
     Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if(TRUE == GetIntValue("fullscreen")) flag |= SDL_FULLSCREEN;
+    if(TRUE == GetIntValue(FULLSCREEN)) flag |= SDL_FULLSCREEN;
     if(NULL == (video = SDL_GetVideoSurface()) || video->w != 640 || video->h !=480)
         video = SDL_SetVideoMode(640, 480, 16, flag);
 
@@ -521,9 +521,9 @@ ACTION ActionPressOKLoad(){
 	return EXIT;
     }
 
-    SetStrValue("filemapspath", currentName->filename);
-    SetStrValue("mapslongname", (char *) currentName->info.longname);
-    SetStrValue("mapsdescription", (char *) currentName->info.description);
+    SetStrValue(FILEMAPSPATH, currentName->filename);
+    SetStrValue(MAPSLONGNAME, (char *) currentName->info.longname);
+    SetStrValue(MAPSDESCRIPTION, (char *) currentName->info.description);
 
     return OK;
 }
@@ -578,10 +578,10 @@ void ReadFileMapInfo(){
     FILE	*fd = NULL;
 
     // читаем
-    dp = opendir(GetStrValue("directorymaps"));
+    dp = opendir(GetStrValue(DIRECTORYMAPS));
     
     if(dp == NULL){
-	fprintf(stderr, "ReadFileMapInfo: error open directory %s\n", GetStrValue("directorymaps"));
+	fprintf(stderr, "ReadFileMapInfo: error open directory %s\n", GetStrValue(DIRECTORYMAPS));
 	return;
     }
 
@@ -615,8 +615,8 @@ void ReadFileMapInfo(){
 	    ptr->next = NULL;
 	    memset(ptr->filename, 0, MAXLENFILENAME);
 	    char *pf = ptr->filename;
-	    strncat(pf, (const char *) GetStrValue("directorymaps"), strlen(GetStrValue("directorymaps")));
-	    pf += strlen(GetStrValue("directorymaps"));
+	    strncat(pf, (const char *) GetStrValue(DIRECTORYMAPS), strlen(GetStrValue(DIRECTORYMAPS)));
+	    pf += strlen(GetStrValue(DIRECTORYMAPS));
 	    strncat(pf, SEPARATOR, 1);
 	    ++pf;
 	    strncat(pf, (const char *) ep->d_name, strlen(ep->d_name) + 1);

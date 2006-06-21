@@ -34,43 +34,73 @@
 #define MAXSTRLEN 255
 
 typedef struct {
-    char	*key;
     char 	valueStr[MAXSTRLEN];
     Uint8	valueInt;
 } CONFIGDESC;
 
-static CONFIGDESC settings[] = {
-    // изменяемые настройки игры
-    { "aggfile",	"heroes2.agg",	0 },
-    { "directorymaps",	"maps",		0 },
-    { "directorysave",	"save",		0 },
-    { "debug",		"off",		FALSE },
-    { "sound",		"off",		FALSE },
-    { "music",		"off",		FALSE },
-    { "animation",	"off",		FALSE },
-    { "fullscreen",	"off",		FALSE },
-    { "evilinterface",	"off",		FALSE },
-    { "videomode",	"640x480",	0 },
-    { "limitmemory",	"\0",		0 },
-
-    // служебные параметры сценария карты
-    { "filemapspath",	"\0",		0 },	// здесь хранится полный путь к выбранному файлу карты игры
-    { "mapslongname",	"\0", 		0 },	// название карты
-    { "mapsdescription","\0", 		0 },	// описание сценария карты
-    { "mapsdifficulty", "\0", 		0 },	// сложность карты
-    { "gamedifficulty", "\0", 		0 },	// сложность игры
-    { "victoryconditions", "\0", 	0 },	// условия победы
-    { "lossconditions", "\0", 		0 },	// условия поражения
-
-    { NULL,		"\0",		0 }
-};
+static CONFIGDESC settings[CONFIGEND];
 
 void InitConfig(const char * configFile){
 
     FILE	*fd;
     char	str[1024], c, *s1, *s2, *e;
-    CONFIGDESC *ptr = NULL;
-    
+    Uint32	value = 0;
+
+    // изменяемые настройки игры
+    strcpy(settings[AGGFILE].valueStr, "heroes2.agg");
+    settings[AGGFILE].valueInt	= 0;
+
+    strcpy(settings[DIRECTORYMAPS].valueStr, "maps");
+    settings[DIRECTORYMAPS].valueInt = 0;
+
+    strcpy(settings[DEBUG].valueStr, "off");
+    settings[DEBUG].valueInt = FALSE;
+
+    strcpy(settings[SOUND].valueStr, "off");
+    settings[SOUND].valueInt = FALSE;
+
+    strcpy(settings[MUSIC].valueStr, "off");
+    settings[MUSIC].valueInt = FALSE;
+
+    strcpy(settings[ANIMATION].valueStr, "off");
+    settings[ANIMATION].valueInt = FALSE;
+
+    strcpy(settings[ANIMATIONDELAY].valueStr, "");
+    settings[ANIMATIONDELAY].valueInt = 100;
+
+    strcpy(settings[FULLSCREEN].valueStr, "off");
+    settings[FULLSCREEN].valueInt = FALSE;
+
+    strcpy(settings[EVILINTERFACE].valueStr, "off");
+    settings[EVILINTERFACE].valueInt = FALSE;
+
+    strcpy(settings[VIDEOMODE].valueStr, "640x480");
+    settings[VIDEOMODE].valueInt = 0;
+
+    strcpy(settings[LIMITMEMORY].valueStr, "");
+    settings[LIMITMEMORY].valueInt = 0;
+
+    // служебные параметры сценария карты
+    strcpy(settings[FILEMAPSPATH].valueStr, "");// здесь хранится полный путь к выбранному файлу карты игры
+    settings[FILEMAPSPATH].valueInt = 0;	// здесь хранится полный путь к выбранному файлу карты игры
+
+    strcpy(settings[MAPSLONGNAME].valueStr, "");// название карты
+    settings[MAPSLONGNAME].valueInt = 0;	// название карты
+
+    strcpy(settings[MAPSDESCRIPTION].valueStr, "");// описание сценария карты
+    settings[MAPSDESCRIPTION].valueInt = 0;	   // описание сценария карты
+
+    strcpy(settings[MAPSDIFFICULTY].valueStr, "");// сложность карты
+    settings[MAPSDIFFICULTY].valueInt = 0;	  // сложность карты
+
+    strcpy(settings[GAMEDIFFICULTY].valueStr, "");// сложность игры
+    settings[GAMEDIFFICULTY].valueInt = 0;	  // сложность игры
+
+    strcpy(settings[VICTORYCONDITIONS].valueStr, "");// условия победы
+    settings[VICTORYCONDITIONS].valueInt = 0;	     // условия победы
+
+    strcpy(settings[LOSSCONDITIONS].valueStr, "");   // условия поражения
+    settings[LOSSCONDITIONS].valueInt = 0;	     // условия поражения
 
     // открытие файла конфигурации
     if(NULL == (fd = fopen(configFile, "r"))){
@@ -107,159 +137,144 @@ void InitConfig(const char * configFile){
         *e = 0;
 
 	// и заполняем структуру
-	ptr = &settings[0];
 
-	if( 0 == strcmp(s1, "aggfile") ||
-	    0 == strcmp(s1, "directorymaps") ||
-	    0 == strcmp(s1, "directorysave"))
-	    while(ptr->key){
-		if(0 == strcmp(s1, ptr->key) && strlen(s2) < MAXSTRLEN)
-		    strcpy(ptr->valueStr, s2);
+	if( 0 == strcmp(s1, "aggfile"))
+	    SetStrValue(AGGFILE, s2);
 
-		++ptr;
-	    }
+	else if( 0 == strcmp(s1, "directorymaps"))
+	    SetStrValue(DIRECTORYMAPS, s2);
 
-	else if(
-		0 == strcmp(s1, "debug") ||
-		0 == strcmp(s1, "sound") ||
-		0 == strcmp(s1, "music") ||
-		0 == strcmp(s1, "fullscreen") ||
-		0 == strcmp(s1, "evilinterface") ||
-		0 == strcmp(s1, "animation"))
-	    while(ptr->key){
-		if(0 == strcmp(s1, ptr->key)){
-		    if(0 == strcmp(s2, "off")){
-			ptr->valueInt = FALSE;
-			strcpy(ptr->valueStr, "off");
-		    }else if(0 == strcmp(s2, "on")){
-			ptr->valueInt = TRUE;
-			strcpy(ptr->valueStr, "on");
-		    }
-		}
-		++ptr;
-	    }
+	else if( 0 == strcmp(s1, "debug") && 0 == strcmp(s2, "on"))
+	    SetIntValue(DEBUG, TRUE);
+	
+	else if(0 == strcmp(s1, "sound") && 0 == strcmp(s2, "on"))
+	    SetIntValue(SOUND, TRUE);
+	
+	else if(0 == strcmp(s1, "music") && 0 == strcmp(s2, "on"))
+	    SetIntValue(MUSIC, TRUE);
+	
+	else if(0 == strcmp(s1, "fullscreen") && 0 == strcmp(s2, "on"))
+	    SetIntValue(FULLSCREEN, TRUE);
+	
+	else if(0 == strcmp(s1, "evilinterface") && 0 == strcmp(s2, "on"))
+	    SetIntValue(EVILINTERFACE, TRUE);
+	
+	else if(0 == strcmp(s1, "animation") && 0 == strcmp(s2, "on"))
+	    SetIntValue(ANIMATION, TRUE);
 
-	else if(0 == strcmp(s1, "videomode"))
-	    while(ptr->key){
-		if(0 == strcmp(s1, ptr->key)){
-		    if(0 == strcmp(s2, "640x480")){
-			strcpy(ptr->valueStr, "640x480");
-			ptr->valueInt = 0;
-		    }else if(0 == strcmp(s2, "800x600")){
-			strcpy(ptr->valueStr, "800x600");
-			ptr->valueInt = 1;
-		    }else if(0 == strcmp(s2, "1024x768")){
-			strcpy(ptr->valueStr, "1024x768");
-			ptr->valueInt = 2;
-		    }else if(0 == strcmp(s2, "1280x1024")){
-			strcpy(ptr->valueStr, "1280x1024");
-			ptr->valueInt = 3;
-		    }
-		}
-		++ptr;
-	    }
+	else if(0 == strcmp(s1, "videomode")){
 
-	else if(0 == strcmp(s1, "limitmemory"))
-	    while(ptr->key){
-		if(0 == strcmp(s1, ptr->key))
-		    sscanf(s2, "%c", (char *) &ptr->valueInt);
-		++ptr;
-	    }
+	    if(0 == strcmp(s2, "800x600"))
+		SetIntValue(VIDEOMODE, 1);
 
+	    else if(0 == strcmp(s2, "1024x768"))
+		SetIntValue(VIDEOMODE, 2);
+
+	    else if(0 == strcmp(s2, "1280x1024"))
+		SetIntValue(VIDEOMODE, 3);
+
+	    else
+	    	SetIntValue(VIDEOMODE, 0);
+	
+	}else if(0 == strcmp(s1, "limitmemory")){
+	    sscanf(s2, "%u", &value);
+	    SetIntValue(LIMITMEMORY, value);
+
+	}else if(0 == strcmp(s1, "animationdelay")){
+	    sscanf(s2, "%u", &value);
+	    SetIntValue(ANIMATIONDELAY, value);
+
+	}
     }
 
     // закрытие файла
     fclose(fd);
 }
 
-char *GetStrValue(const char *key){
+char *GetStrValue(E_CONFIG key){
 
-    CONFIGDESC *ptr = &settings[0];
-
-    while(ptr->key){
-
-	if(0 == strcmp(key, ptr->key)) return ptr->valueStr;
-
-	++ptr;
-    }
-
-    return NULL;
+    return settings[key].valueStr;
 }
 
-Uint8 GetIntValue(const char *key){
+Uint8 GetIntValue(E_CONFIG key){
 
-    CONFIGDESC *ptr = &settings[0];
-
-    while(ptr->key){
-
-	if(0 == strcmp(key, ptr->key)) return ptr->valueInt;
-
-	++ptr;
-    }
-
-    return 0;
+    return settings[key].valueInt;
 }
 
-void SetStrValue(const char *key, const char *value){
+void SetStrValue(E_CONFIG key, const char *value){
 
-    CONFIGDESC *ptr = &settings[0];
+    if(strlen(value) < MAXSTRLEN){
 
-    while(ptr->key && strcmp(key, ptr->key)) ++ptr;
-
-    if(0 == strcmp(ptr->key, key) && strlen(value) < MAXSTRLEN){
-
-	ptr->valueInt = 0;
-	strcpy(ptr->valueStr, value);
+	settings[key].valueInt = 0;
+	strcpy(settings[key].valueStr, value);
 
     }else
 	fprintf(stderr, "SetStrValue: error, key not found or string limit!\n");
 }
 
-void SetIntValue(const char *key, Uint8 value){
+void SetIntValue(E_CONFIG key, Uint8 value){
 
-    CONFIGDESC *ptr = &settings[0];
+    switch(key){
+    
+	case DEBUG:
+	case SOUND:
+	case MUSIC:
+	case FULLSCREEN:
+	case EVILINTERFACE:
+	case ANIMATION:
 
-    while(ptr->key && strcmp(key, ptr->key)) ++ptr;
+	    if(FALSE == value){
+		settings[key].valueInt = FALSE;
+		strcpy(settings[key].valueStr, "off");
+	    }else{
+		settings[key].valueInt = TRUE;
+		strcpy(settings[key].valueStr, "on");
+	    }
+	    break;
 
-    if( 0 == strcmp(ptr->key, "debug") ||
-	0 == strcmp(ptr->key, "sound") ||
-	0 == strcmp(ptr->key, "music") ||
-	0 == strcmp(ptr->key, "fullscreen") ||
-	0 == strcmp(ptr->key, "evilinterface") ||
-	0 == strcmp(ptr->key, "animation"))
-	if(FALSE == value){
-	    ptr->valueInt = FALSE;
-	    strcpy(ptr->valueStr, "off");
-	}else{
-	    ptr->valueInt = TRUE;
-	    strcpy(ptr->valueStr, "on");
-	}
+	case VIDEOMODE:
 
-    else if(0 == strcmp(ptr->key, "videomode"))
-	switch(value){
+	    switch(value){
 	
-	    default:
-	    case 0:
-		strcpy(ptr->valueStr, "640x480");
-		ptr->valueInt = 0;
-		break;
+		default:
+		case 0:
+		    strcpy(settings[key].valueStr, "640x480");
+		    settings[key].valueInt = 0;
+		    break;
 	
-	    case 1:
-		strcpy(ptr->valueStr, "800x600");
-		ptr->valueInt = 1;
-		break;
+		case 1:
+		    strcpy(settings[key].valueStr, "800x600");
+		    settings[key].valueInt = 1;
+		    break;
 		
-	    case 2:
-		strcpy(ptr->valueStr, "1024x768");
-		ptr->valueInt = 2;
-		break;
+		case 2:
+		    strcpy(settings[key].valueStr, "1024x768");
+		    settings[key].valueInt = 2;
+		    break;
 
-	    case 3:
-		strcpy(ptr->valueStr, "1280x1024");
-		ptr->valueInt = 3;
-		break;
-	}
+		case 3:
+		    strcpy(settings[key].valueStr, "1280x1024");
+		    settings[key].valueInt = 3;
+		    break;
+	    }
+	    break;
+	
+	case MAPSDIFFICULTY:
+	case GAMEDIFFICULTY:
+	case VICTORYCONDITIONS:
+	case LOSSCONDITIONS:
+	case ANIMATIONDELAY:
+	case LIMITMEMORY:
 
-    else if(0 == strcmp(ptr->key, "limitmemory"))
-	ptr->valueInt = value;
+	    settings[key].valueInt = value;
+	    break;
+	
+	case AGGFILE:
+	case DIRECTORYMAPS:
+	case FILEMAPSPATH:
+	case MAPSLONGNAME:
+	case MAPSDESCRIPTION:
+	case CONFIGEND:
+	    break;
+    }
 }

@@ -43,12 +43,13 @@ ACTION DialogPressNO(void);
 ACTION MessageBox(const char *message, ENUMFONT font){
 
     CursorOff();
+    SetIntValue(ANIMATION, FALSE);
     
     Uint32 cursor = GetCursor();
     
     char *buybuild = "BUYBUILD.ICN";
     char *system = "SYSTEM.ICN";
-    if(GetIntValue("evilinterface")){
+    if(GetIntValue(EVILINTERFACE)){
 	buybuild = "BUYBUILE.ICN";
 	system = "SYSTEME.ICN";
     }
@@ -138,7 +139,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     elem = GetICNSprite(&sprite);
     rectCur.x = rectBack.x + 40;
     rectCur.y = rectBack.y + BOXHEIGHT - 70;
-    if(GetIntValue("evilinterface"))
+    if(GetIntValue(EVILINTERFACE))
         rectCur.y = rectBack.y + BOXHEIGHT - 85;
     rectCur.w = elem->w;
     rectCur.h = elem->h;
@@ -155,7 +156,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     FillSPRITE(&sprite, system, 7);
     elem = GetICNSprite(&sprite);
     rectCur.x = rectBack.x + BOXWIDTH - elem->w - 25;
-    if(GetIntValue("evilinterface"))
+    if(GetIntValue(EVILINTERFACE))
 	rectCur.y = rectBack.y + BOXHEIGHT - 85;
     rectCur.w = elem->w;
     rectCur.h = elem->h;
@@ -188,6 +189,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     
     SetCursor(cursor);
     
+    SetIntValue(ANIMATION, TRUE);
     CursorOn();
 
     return result;

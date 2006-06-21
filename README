@@ -23,6 +23,9 @@ DEFAULT CONFIG OPTION (fheroes2.cfg)
 # animation
 # animation = off
 #
+# animation delay (SDL_Delay)
+# animationdelay = 50
+#
 # interface (good/evil)
 # evilinterface = off
 #

@@ -106,6 +106,10 @@ void FreeMaps(void){
 		    free(ptrMaps[i].level2);
 		    ptrMaps[i].level2 = next;
 		}
+
+		if(ptrMaps[i].animation)
+			    FreeAnimationEvent(ptrMaps[i].animation);
+
 	    }
 	    free(ptrMaps);
 	}
@@ -205,12 +209,16 @@ ACTION InitMaps(char *filename){
 	ICNHEADER		*tail = NULL;
 	ICNHEADER		*current = NULL;
 
+	ptrMaps[i].ax		= i % ptrMP2Header->widthMaps;
+	ptrMaps[i].ay		= i / ptrMP2Header->widthMaps;
+
 	ptrMaps[i].level1	= NULL;
 	ptrMaps[i].level2	= NULL;
 
 	ptrMaps[i].move		= TRUE;
 	ptrMaps[i].count	= 0;
 	ptrMaps[i].type		= OBJ_ZERO;
+	ptrMaps[i].animation	= NULL;
 
 	// init level1
 	for(j = 3; j >= 0; --j){
@@ -227,6 +235,8 @@ ACTION InitMaps(char *filename){
 		    tail->offsetX = current->offsetX;
 		    tail->offsetY = current->offsetY;
 		    tail->next = NULL;
+		    
+		    StoreAnimationFrame(ptrMapsInfo[i].objectName1, ptrMapsInfo[i].indexName1, &ptrMaps[i]);
 		}
 	    }
 
@@ -247,6 +257,8 @@ ACTION InitMaps(char *filename){
 			tail->offsetX = current->offsetX;
 			tail->offsetY = current->offsetY;
 			tail->next = NULL;
+		    
+			StoreAnimationFrame(ptrAddon->objectNameN1 * 2, ptrAddon->indexNameN1, &ptrMaps[i]);
 		    }
 		}
 
@@ -269,6 +281,8 @@ ACTION InitMaps(char *filename){
 		    tail->offsetX = current->offsetX;
 		    tail->offsetY = current->offsetY;
 		    tail->next = NULL;
+
+		    StoreAnimationFrame(ptrMapsInfo[i].objectName2, ptrMapsInfo[i].indexName2, &ptrMaps[i]);
 		}
 	    }
 
@@ -287,6 +301,8 @@ ACTION InitMaps(char *filename){
 			tail->offsetX = current->offsetX;
 			tail->offsetY = current->offsetY;
 			tail->next = NULL;
+
+			StoreAnimationFrame(ptrAddon->objectNameN2, ptrAddon->indexNameN2, &ptrMaps[i]);
 		    }
 		}
 
@@ -546,16 +562,29 @@ void MapsRescanObject(Uint8 type, MP2TILEINFO *info, MP2ADDONTAIL *addon, S_CELL
 		break;
 	}
 
-
     return;
 }
 
 E_GROUND GetTypeGround(MP2TILEINFO *info){
 
     Uint16 index = info->tileIndex;
-    // список поверхностей по индексу из GROUND32.TIL
-    // найти место для ROAD!!
 
+    // сканируем дорогу ROAD
+    if(0x7A == info->objectName1) return ROAD;
+    
+    Uint16 indexAddon = info->indexAddon;
+    MP2ADDONTAIL	*ptrAddon = NULL;
+        
+    while(indexAddon){
+
+        ptrAddon = GetADDONTAIL(indexAddon);
+
+	if(0x7A == ptrAddon->objectNameN1 * 2) return ROAD;
+
+        indexAddon = ptrAddon->indexAddon;
+    }
+
+    // список поверхностей по индексу из GROUND32.TIL
     if(30 > index)
         return WATER;
     

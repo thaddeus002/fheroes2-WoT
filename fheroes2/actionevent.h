@@ -40,6 +40,14 @@
 
 typedef enum {NONE=0, YES=1, OK=2, NO=3, CANCEL=4, EXIT=5, ESC=6} ACTION;
 
+typedef struct{
+    SDL_Rect    pushRect;
+    SDL_Rect    presRect;
+    AGGSPRITE   object;
+    BOOL        flagPres;
+    BOOL        flagPush;
+} S_OLDOBJECT;
+
 typedef struct {
     AGGSPRITE	objectPush;		// спрайт нажатия
     AGGSPRITE	objectMotion;		// спрайт наведения

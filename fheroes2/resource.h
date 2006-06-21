@@ -32,6 +32,12 @@
 #define RESOURCEMAXCOUNT	15
 #define RESOURCEMINCOUNT	5
 
+//#define OBJ_MINE_ORE            0x00 
+//#define OBJ_MINE_SULFUR         0x01 
+//#define OBJ_MINE_CRYSTAL        0x02 
+//#define OBJ_MINE_GEMS           0x03 
+//#define OBJ_MINE_GOLD           0x04 
+
 typedef enum {
                 WOOD		= 1,
                 MERCURY		= 3,

@@ -256,7 +256,7 @@ void ShowNewStandardGame(void){
 
     // на данной картинке работаем только в 640x480
     Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if(TRUE == GetIntValue("fullscreen")) flag |= SDL_FULLSCREEN;
+    if(TRUE == GetIntValue(FULLSCREEN)) flag |= SDL_FULLSCREEN;
     if(NULL == (video = SDL_GetVideoSurface()) || video->w != 640 || video->h !=480)
         video = SDL_SetVideoMode(640, 480, 16, flag);
 
@@ -309,7 +309,7 @@ void ShowNewStandardGame(void){
     dest.y = 78;
     dest.w = FONT_WIDTHBIG * 16;
     dest.h = FONT_HEIGHTBIG / 2;
-    PrintText(video, &dest, GetStrValue("mapslongname"), FONT_BIG);
+    PrintText(video, &dest, GetStrValue(MAPSLONGNAME), FONT_BIG);
 
     // Game Difficulty
     dest.x = 330;
@@ -381,9 +381,9 @@ ACTION ActionPressNewStandardSelect(void){
 
 ACTION ActionPressNewStandardOkay(void){
 
-    if(strlen(GetStrValue("filemapspath"))){
+    if(strlen(GetStrValue(FILEMAPSPATH))){
 
-	return InitMaps(GetStrValue("filemapspath"));
+	return InitMaps(GetStrValue(FILEMAPSPATH));
     }else
 	return NONE;
 }

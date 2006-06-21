@@ -45,7 +45,7 @@ static SOUNDHEADER *sounds = NULL;
 
 BOOL InitSound(void){
 
-    if(0 == GetIntValue("sound")) return TRUE;
+    if(0 == GetIntValue(SOUND)) return TRUE;
 
     SDL_AudioSpec fmt;
 
@@ -76,7 +76,7 @@ BOOL InitSound(void){
 
 void FreeSound(void){
 
-    if(0 == GetIntValue("sound")) return;
+    if(0 == GetIntValue(SOUND)) return;
 
     SDL_CloseAudio();
 
@@ -100,7 +100,7 @@ void MixAudio(void *unused, Uint8 *stream, int len){
 
 void PlaySound(char *nameSound){
 
-    if(0 == GetIntValue("sound")) return;
+    if(0 == GetIntValue(SOUND)) return;
 
     if(WAV != ExistsAGGName(nameSound)) return;
 

@@ -35,11 +35,52 @@
 #include "resource.h"
 #include "artifact.h"
 #include "heroes.h"
+#include "animation.h"
 #include "actionevent.h"
 
+typedef enum {
+                DESERT,
+                SNOW,
+                SWAMP,
+                WASTELAND,
+                BEACH,
+                LAVA,
+                DIRT,
+                GRASS,
+                WATER,
+                ROAD
 
-/* ************** START MP2 **************** 
-*/
+            } E_GROUND;
+
+typedef struct {
+		Uint8		ax;
+		Uint8		ay;
+                E_GROUND        ground;
+                SDL_Surface     *tile;
+                BOOL            move;
+                E_OBJECT        type;
+		Uint16		count;
+
+		union {
+		    E_MONSTER	monster;
+		    E_RESOURCE  resource;
+		    E_ARTIFACT  artifact;
+		} object;
+
+		ICNHEADER	*level1;
+		ICNHEADER	*level2;
+		S_ANIMATION	*animation;
+                S_HEROES        *heroes;
+
+                } S_CELLMAPS;
+
+void		FreeMaps(void);
+ACTION		InitMaps(char *);
+S_CELLMAPS     *GetCELLMAPS(Uint16);
+Uint8		GetWidthMaps(void);
+Uint8		GetHeightMaps(void);
+
+/* ***************************** START MP2 ********************************** */
 /* заголовок карты */
 typedef struct {
 Uint32  headerMagic;		// address: 0x0000
@@ -223,172 +264,7 @@ typedef struct {
 
 //Uint32	endCount;
 
+/* ****************************** END MP2 ************************************** */
 
-/* ************** END MP2 **************** */
-
-typedef enum {
-                DESERT,
-                SNOW,
-                SWAMP,
-                WASTELAND,
-                BEACH,
-                LAVA,
-                DIRT,
-                GRASS,
-                WATER,
-                ROAD
-
-            } E_GROUND;
-                                                                                                                                                                            
-                                                                                                                                                                            
-
-typedef struct {
-                E_GROUND        ground;
-                SDL_Surface     *tile;
-                BOOL            move;
-                E_OBJECT        type;
-		Uint16		count;
-
-		union {
-		    E_MONSTER	monster;
-		    E_RESOURCE  resource;
-		    E_ARTIFACT  artifact;
-		} object;
-
-		ICNHEADER	*level1;
-		ICNHEADER	*level2;
-                S_HEROES        *heroes;
-
-                } S_CELLMAPS;
-
-void		FreeMaps(void);
-ACTION		InitMaps(char *);
-S_CELLMAPS     *GetCELLMAPS(Uint16);
-Uint8		GetWidthMaps(void);
-Uint8		GetHeightMaps(void);
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-// список mines
-#define OBJ_MINE_ORE		0x00
-#define OBJ_MINE_SULFUR		0x01
-#define OBJ_MINE_CRYSTAL	0x02
-#define OBJ_MINE_GEMS		0x03
-#define OBJ_MINE_GOLD		0x04
-/*
-// список artifact
-
-#define OBJ_ARTIFACT_ARCANE_NECKLACE			0x11		// The Arcane Necklace of Magic increases your spell power by 4.
-#define OBJ_ARTIFACT_CASTER_BRACELET			0x13		// The Caster's Bracelet of Magic increases your spell power by 2.
-#define OBJ_ARTIFACT_MAGE_RING				0x15		// The Mage's Ring of Power increases your spell power by 2.
-#define OBJ_ARTIFACT_WITCHES_BROACH			0x17		// The Witch's Broach of Magic increases your spell power by 3.
-#define OBJ_ARTIFACT_MEDAL_VALOR			0x19		// The Medal of Valor increases your morale.
-#define OBJ_ARTIFACT_MEDAL_COURAGE			0x1B		// The Medal of Courage increases your morale.
-#define OBJ_ARTIFACT_MEDAL_HONOR			0x1D		// The Medal of Honor increases your morale.
-#define OBJ_ARTIFACT_MEDAL_DISTINCTION			0x1F		// The Medal of Distinction increases your morale.
-#define OBJ_ARTIFACT_FIZBIN_MISFORTUNE			0x21		// The Fizbin of Misfortune greatly decreases your morale.
-#define OBJ_ARTIFACT_THUNDER_MACE			0x23		// The Thunder Mace of Dominion increases your attack skill by 1.
-#define OBJ_ARTIFACT_ARMORED_GAUNTLETS			0x25		// The Armored Gauntlets of Protection increase your defense skill by 1.
-#define OBJ_ARTIFACT_DEFENDER_HELM			0x27		// The Defender Helm of Protection increases your defense skill by 1.
-#define OBJ_ARTIFACT_GIANT_FLAIL			0x29		// The Giant Flail of Dominion increases your attack skill by 1.
-#define OBJ_ARTIFACT_BALLISTA				0x2B		// The Ballista of Quickness lets your catapult fire twice per combat round.
-#define OBJ_ARTIFACT_STEALTH_SHIELD			0x2D		// The Stealth Shield of Protection increases your defense skill by 2.
-#define OBJ_ARTIFACT_DRAGON_SWORD			0x2F		// The Dragon Sword of Dominion increases your attack skill by 3.
-#define OBJ_ARTIFACT_POWER_AXE				0x31		// The Power Axe of Dominion increases your attack skill by 2.
-#define OBJ_ARTIFACT_DIVINE_BREASTPLATE			0x33		// The Divine Breastplate of Protection increases your defense skill by 3.
-#define OBJ_ARTIFACT_MINOR_SCROLL			0x35		// The Minor Scroll of Knowledge increases your knowledge by 2.
-#define OBJ_ARTIFACT_MAJOR_SCROLL			0x37		// The Major Scroll of Knowledge increases your knowledge by 3.
-#define OBJ_ARTIFACT_SUPERIOR_SCROLL			0x39		// The Superior Scroll of Knowledge increases your knowledge by 4.
-#define OBJ_ARTIFACT_FOREMOST_SCROLL			0x3B		// The Foremost Scroll of Knowledge increases your knowledge by 5.
-#define OBJ_ARTIFACT_ENDLESS_SACK_GOLD			0x3D		// The Endless Sack of Gold provides you with 1000 gold per day.
-#define OBJ_ARTIFACT_ENDLESS_BAG_GOLD			0x3F		// The Endless Bag of Gold provides you with 750 gold per day.
-#define OBJ_ARTIFACT_ENDLESS_PURSE_GOLD			0x41		// The Endless Purse of Gold provides you with 500 gold per day.
-#define OBJ_ARTIFACT_NOMAD_BOOTS_MOBILITY		0x43		// The Nomad Boots of Mobility increase your movement on land.
-#define OBJ_ARTIFACT_TRAVELER_BOOTS_MOBILITY		0x45		// The Traveler's Boots of Mobility increase your movement on land.
-#define OBJ_ARTIFACT_RABBIT_FOOT			0x47		// The Lucky Rabbit's Foot increases your luck in combat.
-#define OBJ_ARTIFACT_GOLDEN_HORSESHOE			0x49		// The Golden Horseshoe increases your luck in combat.
-#define OBJ_ARTIFACT_GAMBLER_LUCKY_COIN			0x4B		// The Gambler's Lucky Coin increases your luck in combat.
-#define OBJ_ARTIFACT_FOUR_LEAF_CLOVER			0x4D		// The Four_Leaf Clover increases your luck in combat.
-#define OBJ_ARTIFACT_TRUE_COMPASS_MOBILITY		0x4F		// The True Compass of Mobility increases your movement on land and sea.
-#define OBJ_ARTIFACT_SAILORS_ASTROLABE_MOBILITY		0x51		// The Sailors' Astrolabe of Mobility increases your movement on sea.
-#define OBJ_ARTIFACT_EVIL_EYE				0x53		// The Evil Eye reduces the casting cost of curse spells by half.
-#define OBJ_ARTIFACT_ENCHANTED_HOURGLASS		0x55		// The Enchanted Hourglass extends the duration of all your spells by 2 turns.
-#define OBJ_ARTIFACT_GOLD_WATCH				0x57		// The Gold Watch doubles the effectiveness of your hypnotize spells.
-#define OBJ_ARTIFACT_SKULLCAP				0x59		// The Skullcap halves the casting cost of all mind influencing spells.
-#define OBJ_ARTIFACT_ICE_CLOAK				0x5B		// The Ice Cloak halves all damage your troops take from cold spells.
-#define OBJ_ARTIFACT_FIRE_CLOAK				0x5D		// The Fire Cloak halves all damage your troops take from fire spells.
-#define OBJ_ARTIFACT_LIGHTNING_HELM			0x5F		// The Lightning Helm halves all damage your troops take from lightning spells.
-#define OBJ_ARTIFACT_EVERCOLD_ICICLE			0x61		// The Evercold Icicle causes your cold spells to do 50% more damage to enemy troops.
-#define OBJ_ARTIFACT_EVERHOT_LAVA_ROCK			0x63		// The Everhot Lava Rock causes your fire spells to do 50% more damage to enemy troops.
-#define OBJ_ARTIFACT_LIGHTNING_ROD			0x65		// The Lightning Rod causes your lightning spells to do 50% more damage to enemy troops.
-#define OBJ_ARTIFACT_SNAKE_RING				0x67		// The Snake Ring halves the casting cost of all your bless spells.
-#define OBJ_ARTIFACT_ANKH				0x69		// The Ankh doubles the effectiveness of all your resurrect and animate spells.
-#define OBJ_ARTIFACT_BOOK_ELEMENTS			0x6B		// The Book of Elements doubles the effectiveness of all your summoning spells.
-#define OBJ_ARTIFACT_ELEMENTAL_RING			0x6D		// The Elemental Ring halves the casting cost of all summoning spells.
-#define OBJ_ARTIFACT_HOLY_PENDANT			0x6F		// The Holy Pendant makes all your troops immune to curse spells.
-#define OBJ_ARTIFACT_PENDANT_FREE_WILL			0x71		// The Pendant of Free Will makes all your troops immune to hypnotize spells.
-#define OBJ_ARTIFACT_PENDANT_LIFE			0x73		// The Pendant of Life makes all your troops immune to death spells.
-#define OBJ_ARTIFACT_SERENITY_PENDANT			0x75		// The Serenity Pendant makes all your troops immune to berserk spells.
-#define OBJ_ARTIFACT_SEEING_EYE_PENDANT			0x77		// The Seeing_eye Pendant makes all your troops immune to blindness spells.
-#define OBJ_ARTIFACT_KINETIC_PENDANT			0x79		// The Kinetic Pendant makes all your troops immune to paralyze spells.
-#define OBJ_ARTIFACT_PENDANT_DEATH			0x7B		// The Pendant of Death makes all your troops immune to holy spells.
-#define OBJ_ARTIFACT_WAND_NEGATION			0x7D		// The Wand of Negation protects your troops from the Dispel Magic spell.
-#define OBJ_ARTIFACT_GOLDEN_BOW				0x7F		// The Golden Bow eliminates the 50% penalty for your troops shooting past obstacles. (e.g. castle walls)
-#define OBJ_ARTIFACT_TELESCOPE				0x81		// The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.
-#define OBJ_ARTIFACT_STATESMAN_QUILL			0x83		// The Statesman's Quill reduces the cost of surrender to 10% of the total cost of troops you have in your army.
-#define OBJ_ARTIFACT_WIZARD_HAT				0x85		// The Wizard's Hat increases the duration of your spells by 10 turns!
-#define OBJ_ARTIFACT_POWER_RING				0x87		// The Power Ring returns 2 extra power points/turn to your hero.
-#define OBJ_ARTIFACT_AMMO_CART				0x89		// The Ammo Cart provides endless ammunition for all your troops that shoot.
-#define OBJ_ARTIFACT_TAX_LIEN				0x8B		// The Tax Lien costs you 250 gold pieces/turn.
-#define OBJ_ARTIFACT_HIDEOUS_MASK			0x8D		// The Hideous Mask prevents all 'wandering' armies from joining your hero.
-#define OBJ_ARTIFACT_ENDLESS_POUCH_SULFUR		0x8F		// The Endless Pouch of Sulfur provides 1 unit of sulfur per day.
-#define OBJ_ARTIFACT_ENDLESS_VIAL_MERCURY		0x91		// The Endless Vial of Mercury provides 1 unit of mercury per day.
-#define OBJ_ARTIFACT_ENDLESS_POUCH_GEMS			0x93		// The Endless Pouch of Gems provides 1 unit of gems per day.
-#define OBJ_ARTIFACT_ENDLESS_CORD_WOOD			0x95		// The Endless Cord of Wood provides 1 unit of wood per day.
-#define OBJ_ARTIFACT_ENDLESS_CART_ORE			0x97		// The Endless Cart of Ore provides 1 unit of ore per day.
-#define OBJ_ARTIFACT_ENDLESS_POUCH_CRYSTAL		0x99		// The Endless Pouch of Crystal provides 1 unit of crystal/day.
-#define OBJ_ARTIFACT_SPIKED_HELM			0x9B		// The Spiked Helm increases your attack and defense skills by 1 each.
-#define OBJ_ARTIFACT_SPIKED_SHIELD			0x9D		// The Spiked Shield increases your attack and defense skills by 2 each.
-#define OBJ_ARTIFACT_WHITE_PEARL			0x9F		// The White Pearl increases your spell power and knowledge by 1 each.
-#define OBJ_ARTIFACT_BLACK_PEARL			0xA1		// The Black Pearl increases your spell power and knowledge by 2 each.
-*/
-
-/*
-#define OBJ_ARTIFACT_ULTIMATE_BOOK			0		// The Ultimate Book of Knowledge increases your knowledge by 12.
-#define OBJ_ARTIFACT_ULTIMATE_SWORD			1		// The Ultimate Sword of Dominion increases your attack skill by 12.
-#define OBJ_ARTIFACT_ULTIMATE_CLOAK			2		// The Ultimate Cloak of Protection increases your defense skill by 12.
-#define OBJ_ARTIFACT_ULTIMATE_WAND			3		// The Ultimate Wand of Magic increases your spell power by 12.
-#define OBJ_ARTIFACT_ULTIMATE_SHIELD			4		// The Ultimate Shield increases your attack and defense skills by 6 each.
-#define OBJ_ARTIFACT_ULTIMATE_STAFF			5		// The Ultimate Staff increases your spell power and knowledge by 6 each.
-#define OBJ_ARTIFACT_ULTIMATE_CROWN			6		// The Ultimate Crown increases each of your basic skills by 4 points.
-#define OBJ_ARTIFACT_GOLDEN_GOOSE			7		// The Golden Goose brings in an income of 10,000 gold per turn.
-*/
-
-/*
-#define OBJ_ARTIFACT_MAGIC_BOOK				81		// The Magic Book enables you to cast spells.
-#define OBJ_ARTIFACT_ERROR_ARTIFACT_82			82		// Artifact 82.
-#define OBJ_ARTIFACT_ERROR_ARTIFACT_83			83		// Artifact 83.
-#define OBJ_ARTIFACT_ERROR_ARTIFACT_84			84		// Artifact 84.
-#define OBJ_ARTIFACT_ERROR_ARTIFACT_85			85		// Artifact 85.
-#define OBJ_ARTIFACT_SPELL_SCROLL			86		// This Spell Scroll gives your hero the ability to cast the '%s' spell.
-#define OBJ_ARTIFACT_ARM_MARTYR				87		// The Arm of the Martyr increases your spell power by 3 but adds the undead morale penalty.
-#define OBJ_ARTIFACT_BREASTPLATE_ANDURAN		88		// The Breastplate increases your defense by 5.
-#define OBJ_ARTIFACT_BROACH_SHIELDING			89		// The Broach of Shielding provides 50% protection from Armageddon and Elemental Storm, but decreases spell power by 2.
-#define OBJ_ARTIFACT_BATTLE_GARB			90		// The Battle Garb of Anduran combines the powers of the three Anduran artifacts.
-#define OBJ_ARTIFACT_CRYSTAL_BALL			91		// The Crystal Ball lets you get more specific information about monsters,
-#define OBJ_ARTIFACT_HEART_FIRE				92		// The Heart of Fire provides 50% protection from fire, but doubles the damage taken from cold.
-#define OBJ_ARTIFACT_HEART_ICE				93		// The Heart of Ice provides 50% protection from cold, but doubles the damage taken from fire.
-#define OBJ_ARTIFACT_HELMET_ANDURAN			94		// The Helmet increases your spell power by 5.
-#define OBJ_ARTIFACT_HOLY_HAMMER			95		// The Holy Hammer increases your attack skill by 5.
-#define OBJ_ARTIFACT_LEGENDARY_SCEPTER			96		// The Legendary Scepter adds 2 points to all attributes.
-#define OBJ_ARTIFACT_MASTHEAD				97		// The Masthead boosts your luck and morale by 1 each in sea combat.
-#define OBJ_ARTIFACT_SPHERE_NEGATION			98		// The Sphere of Negation disables all spell casting, for both sides, in combat.
-#define OBJ_ARTIFACT_STAFF_WIZARDRY			99		// The Staff of Wizardry boosts your spell power by 5.
-#define OBJ_ARTIFACT_SWORD_BREAKER			100		// The Sword Breaker increases your defense by 4 and attack by 1.
-#define OBJ_ARTIFACT_SWORD_ANDURAN			101		// The Sword increases your attack skill by 5.
-#define OBJ_ARTIFACT_SPADE_NECROMANCY			102		// The Spade gives you increased necromancy skill.
-#define OBJ_ARTIFACT_NONE				255		// 
-*/
 
 #endif

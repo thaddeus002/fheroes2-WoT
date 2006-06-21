@@ -26,14 +26,12 @@
     Description:
 */
 
-/*
-    load new quit game
-*/
-
 #include <stdlib.h>
 #include "SDL.h"
 #include "agg.h"
 #include "tools.h"
+#include "draw.h"
+#include "animation.h"
 #include "actionevent.h"
 #include "loadnewquit.h"
 #include "newselectgame.h"
@@ -41,6 +39,15 @@
 #include "sound.h"
 #include "cursor.h"
 #include "config.h"
+
+
+typedef struct{
+    SDL_Rect    pushRect;
+    SDL_Rect    presRect;
+    AGGSPRITE   object;
+    BOOL        flagPres;
+    BOOL        flagPush;
+} S_OLDOBJECT2;
 
 void ShowNewLoadQuit(void);
 ACTION ActionPressNewGame(void);
@@ -50,6 +57,7 @@ ACTION ActionPressCredits(void);
 ACTION ActionPressHighScores(void);
 
 INTERFACEACTION *sthemain = NULL;
+S_ANIMATION	*stheanim = NULL;
 
 ACTION DrawNewLoadQuit(void){
 
@@ -237,13 +245,160 @@ ACTION DrawNewLoadQuit(void){
     // регистрируем
     AddActionEvent(&sthemain, &action);
 
+    // анимация фонарей
+    ICNHEADER *header;
+    FillSPRITE(&sprite, "SHNGANIM.ICN", 0);
+    header = GetICNHeader(&sprite);
+    dest.x = 0;
+    dest.y = 0;
+    dest.w = 0;
+    dest.h = 0;
+    AddAnimationEvent(&stheanim, &dest, header, 41);
+    
     // отображаем всю картинку
     ShowNewLoadQuit();
 
     // цикл событий
-    ACTION result = ActionCycle(sthemain);
+    SDL_Event event;
+    SDL_Surface *video = SDL_GetVideoSurface();;
+    ACTION result = NONE;
+    S_OLDOBJECT2 old;
+    memset(old.object.name, 0, AGGSIZENAME);
+    old.object.number = 0xFFFF;
+    old.pushRect.x = 0;
+    old.pushRect.y = 0;
+    old.pushRect.w = 0;
+    old.pushRect.h = 0;
+    old.presRect = old.pushRect;
+    old.flagPush = FALSE;
+    old.flagPres = FALSE;
+    INTERFACEACTION *ptr = NULL;
+
+    // цикл по событиям
+    while(result == NONE){
+	while(SDL_PollEvent(&event))
+
+	    switch(event.type){
+	    
+		case SDL_QUIT:
+
+		    // close windows
+		    result = EXIT;
+		    break;
+
+		case SDL_KEYDOWN:
+
+		    // нажатия клавиатуры
+		    switch(event.key.keysym.sym){
+
+			case SDLK_ESCAPE:
+
+			    result = ESC;
+			    break;
+
+			// F4 switch to full screen
+                	case SDLK_F4:
+
+			    SDL_WM_ToggleFullScreen(video);
+
+			    GetIntValue(FULLSCREEN) ? SetIntValue(FULLSCREEN, FALSE) : SetIntValue(FULLSCREEN, TRUE);
+
+			    break;
+								    
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEBUTTONDOWN:
+
+		    switch(event.button.button){
+		    
+			case SDL_BUTTON_LEFT:
+
+			    // левая кнопка down
+			    ptr = sthemain;
+			    while(ptr){
+				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_LCLICK)){
+				    old.pushRect = ptr->rect;
+				    old.object = ptr->objectUp;
+				    old.flagPush = TRUE;
+				    DrawSprite(&ptr->rect, &ptr->objectPush);
+				}
+    				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+			    break;
+
+			case SDL_BUTTON_RIGHT:
+			    
+			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
+			    break;
+			
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEBUTTONUP:
+
+		    switch(event.button.button){
+		    
+			case SDL_BUTTON_LEFT:
+
+			    // левая кнопка up
+			    ptr = sthemain;
+			    if(old.flagPush){
+				DrawSprite(&old.pushRect, &old.object);
+				old.flagPush = FALSE;
+			    }
+
+			    while(ptr){
+				if(ValidPoint(&old.pushRect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_LCLICK) && CompareRect(&ptr->rect, &old.pushRect) && ptr->pf )
+					result = (*ptr->pf)();
+
+				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+			    break;
+			    
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEMOTION:
+		
+		    ptr = sthemain;
+		    
+		    if(old.flagPres && !ValidPoint(&old.presRect, event.motion.x, event.motion.y)){
+			DrawSprite(&old.presRect, &old.object);
+			old.flagPres = FALSE;
+
+		    }else
+			while(ptr){
+			    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, event.motion.x, event.motion.y)){
+				DrawSprite(&ptr->rect, &ptr->objectMotion);
+				old.object = ptr->objectUp;
+				old.presRect = ptr->rect;
+				old.flagPres = TRUE;
+			    }
+
+    			    ptr = (INTERFACEACTION *) ptr->next;
+			}
+		    break;
+
+		default:
+    		    break;
+	    }
+
+//	RedrawAllAnimation(stheanim);
+
+	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+    }
 
     // освобождаем данные
+    FreeAnimationEvent(stheanim);
     FreeActionEvent(sthemain);
     
     return result;
@@ -262,7 +417,7 @@ void ShowNewLoadQuit(void){
 
     // на данной картинке работаем только в 640x480
     Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if(TRUE == GetIntValue("fullscreen")) flag |= SDL_FULLSCREEN;
+    if(TRUE == GetIntValue(FULLSCREEN)) flag |= SDL_FULLSCREEN;
     if(NULL == (video = SDL_GetVideoSurface()) || video->w != 640 || video->h !=480)
         video = SDL_SetVideoMode(640, 480, 16, flag);
 
@@ -305,7 +460,7 @@ ACTION ActionPressNewGame(){
     if(EXIT == DrawNewSelectGame()) return EXIT;
     
     ShowNewLoadQuit();
-        
+
     return NONE;
 }
 
@@ -317,7 +472,7 @@ ACTION ActionPressLoadGame(){
     if(EXIT == DrawLoadSelectGame()) return EXIT;
 
     ShowNewLoadQuit();
-        
+
     return NONE;
 }
 
