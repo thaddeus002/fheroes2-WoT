@@ -26,10 +26,6 @@
     Description:
 */
 
-/*
-    load select game: standart campain multi
-*/
-
 #include <stdlib.h>
 #include "SDL.h"
 #include "agg.h"

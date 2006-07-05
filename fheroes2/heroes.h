@@ -38,7 +38,6 @@
 #define HEROESMAXSKILL		8
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXARMY		5
-#define HEROESCOUNT		48	// количество героев в игре (6 цветов по 8 героев)
 #define HEROESMAXCOUNT		60	// количество портретов
 
 #define SCOUTINGBASE		4	// стартовое количество клеток обзора у героя
@@ -143,7 +142,9 @@ typedef enum {
 		NAME_UNK3	= 56,
 		ARCHIBALD	= 57,
 		NAME_UNK5	= 58,
-		SANDYSANDY	= 59
+		SANDYSANDY	= 59,
+
+		HEROESNULL	= 0xFF
 
 	    } E_NAMEHEROES;
 

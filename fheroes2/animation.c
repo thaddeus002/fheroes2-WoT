@@ -108,33 +108,3 @@ void FreeAnimationEvent(S_ANIMATION *head){
 
     head = NULL;
 }
-
-void RedrawAllAnimation(S_ANIMATION *head){
-
-    if(FALSE == GetIntValue(ANIMATION)) return;
-
-    static Uint32 countFrame = 0;
-
-    
-
-    Sint32 x;
-    Sint32 y;
-    
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_GetMouseState(&x, &y);
-    S_ANIMATION *ptr = head;
-
-    while(ptr){
-
-	if(ValidPoint(&ptr->rect[countFrame % ptr->count], x, y)) CursorOff();
-
-	SDL_BlitSurface(ptr->surface[countFrame % ptr->count], NULL, video, &ptr->rect[countFrame % ptr->count]);
-	
-	CursorOn();
-        ptr = ptr->next;
-    }
-
-    SDL_Flip(video);
-    SDL_Delay(GetIntValue(ANIMATIONDELAY));    
-    ++countFrame;
-}

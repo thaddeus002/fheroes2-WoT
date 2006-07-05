@@ -26,20 +26,60 @@
     Description:
 */
 
-#ifndef _ANIMATION_H
-#define _ANIMATION_H
+#ifndef _KINGDOM_H
+#define _KINGDOM_H
 
 #include "SDL.h"
+#include "gamedefs.h"
+#include "resource.h"
+#include "heroes.h"
+#include "object.h"
+#include "castle.h"
+
+#define KINGDOMMAXHEROES	8
+#define KINGDOMMAX		6
+
+// объекты которые которые можно захватить (с флажками)
+typedef enum {
+
+		ALCHEMYTOWER	= OBJ_ALCHEMYTOWER,
+		DRAGONCITY	= OBJ_DRAGONCITY,
+		LIGHTHOUSE	= OBJ_LIGHTHOUSE,
+		MINES		= OBJ_MINES,
+		SAWMILL		= OBJ_SAWMILL,
+		ABANDONEDMINE	= OBJ_ABANDONEDMINE,
+
+	    } E_COLOROBJECT;
 
 typedef struct {
-		Uint8		count;
-		SDL_Rect	*rect;
-		SDL_Surface	**surface;
-		void		*next;
 
-		} S_ANIMATION;
+		Uint8		ax;
+		Uint8		ay;
+		E_COLOROBJECT	type;
+		E_RESOURCE	res;
+		void		*object;
 
-S_ANIMATION*	AddAnimationEvent(S_ANIMATION **, SDL_Rect *, ICNHEADER *, Uint8);
-void		FreeAnimationEvent(S_ANIMATION *);
+	    } S_BUILDING;
+ 
+typedef struct {
+
+		BOOL		play;
+		S_BUILDING	*build;
+		S_CASTLE	*castle;
+		E_NAMEHEROES	nameheroes[KINGDOMMAXHEROES];
+
+	    } S_KINGDOM;
+
+BOOL    InitKingdom(void);
+void	FreeKingdom(void);
+
+void	KingdomAddHeroes(E_COLORS, E_NAMEHEROES);
+void	KingdomRemoveHeroes(E_COLORS, E_NAMEHEROES);
+
+void	KingdomAddCastle(E_COLORS, S_CASTLE *);
+void	KingdomRemoveCastle(E_COLORS, S_CASTLE *);
+
+//void	KingdomAddBuilding(Uint8, Uint8, E_COLOROBJECT);
+//void	KingdomRemoveBuilding(Uint8, Uint8);
 
 #endif

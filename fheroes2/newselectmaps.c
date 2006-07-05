@@ -43,6 +43,9 @@ typedef struct {			// структура заголовка карты с нео
     Uint16	level;			// address: 0x04
     Uint8	width;			// address: 0x06
     Uint8	height;			// address: 0x07
+    Uint8	kingdomColors;		// address: 0x08 - 0x0D
+    Uint8	allowColors;		// address: 0x0E - 0x13
+    Uint8	rndColors;		// address: 0x14 - 0x19
     Uint8	count;			// address: 0x1A
     Uint8	conditionsWins;		// address: 0x1D
     Uint8	conditionsLoss;		// address: 0x22
@@ -69,10 +72,10 @@ typedef struct {
 #define	SEPARATOR	"/"
 #endif
 
-typedef struct {				// структура для формирования связанного списка карт
-    char	filename[MAXLENFILENAME]; 	// имя файла карты
-    LOADMP2HEADER	info;			// информация заголовка
-    void	*next;
+typedef struct {				  // структура для формирования связанного списка карт
+    char		filename[MAXLENFILENAME]; // имя файла карты
+    LOADMP2HEADER	info;			  // информация заголовка
+    void		*next;
 } FILEMAPINFO;
 
 void ShowSelectLoad(void);		// отображает динамичые элементы с обновлением
@@ -102,7 +105,7 @@ ACTION ActionPressScrollBar(void);
 INTERFACEACTION *stpeload = NULL;
 FILEMAPINFO	*header = NULL;			// указатель головы всего списка
 FILEMAPINFO	*firstName = NULL;		// указатель текущего первого имени в окне выбора
-E_SIZEMAP		showmaps = MAPS_ALL;		// фильтр карты
+E_SIZEMAP	showmaps = MAPS_ALL;		// фильтр карты
 Uint8		count = 0;			// количество отображенных имен (отсортированных по размеру)
 FILEMAPINFO	*currentName = NULL;		// текущий выделенный элемент
 SCROLLCURSOR	*slider;
@@ -524,6 +527,12 @@ ACTION ActionPressOKLoad(){
     SetStrValue(FILEMAPSPATH, currentName->filename);
     SetStrValue(MAPSLONGNAME, (char *) currentName->info.longname);
     SetStrValue(MAPSDESCRIPTION, (char *) currentName->info.description);
+    SetIntValue(MAPSDIFFICULTY, currentName->info.level);
+    SetIntValue(VICTORYCONDITIONS, currentName->info.conditionsWins);
+    SetIntValue(LOSSCONDITIONS, currentName->info.conditionsLoss);
+    SetIntValue(KINGDOMCOLORS, currentName->info.kingdomColors);
+    SetIntValue(ALLOWCOLORS, currentName->info.allowColors);
+    SetIntValue(RNDCOLORS, currentName->info.rndColors);
 
     return OK;
 }
@@ -576,6 +585,8 @@ void ReadFileMapInfo(){
 
     FILEMAPINFO	*ptr = NULL;
     FILE	*fd = NULL;
+
+    Uint8	byte = 0;
 
     // читаем
     dp = opendir(GetStrValue(DIRECTORYMAPS));
@@ -645,6 +656,49 @@ void ReadFileMapInfo(){
 	    fread(&ptr->info.level, sizeof(Uint16), 1, fd);
 	    fread(&ptr->info.width, sizeof(Uint8), 1, fd);
 	    fread(&ptr->info.height, sizeof(Uint8), 1, fd);
+
+	    ptr->info.kingdomColors = 0;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.kingdomColors |= BLUE;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.kingdomColors |= GREEN;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.kingdomColors |= RED;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.kingdomColors |= YELLOW;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.kingdomColors |= ORANGE;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.kingdomColors |= PURPLE;
+
+	    ptr->info.allowColors = 0;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.allowColors |= BLUE;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.allowColors |= GREEN;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.allowColors |= RED;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.allowColors |= YELLOW;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.allowColors |= ORANGE;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.allowColors |= PURPLE;
+
+	    ptr->info.rndColors = 0;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.rndColors |= BLUE;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.rndColors |= GREEN;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.rndColors |= RED;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.rndColors |= YELLOW;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.rndColors |= ORANGE;
+	    fread(&byte, sizeof(Uint8), 1, fd);
+	    if(byte) ptr->info.rndColors |= PURPLE;
+
 	    fseek(fd, 0x1A, SEEK_SET);
 	    fread(&ptr->info.count, sizeof(Uint8), 1, fd);
 	    fseek(fd, 0x1D, SEEK_SET);

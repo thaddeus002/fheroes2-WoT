@@ -31,6 +31,8 @@
 #include "debug.h"
 #include "draw.h"
 #include "config.h"
+#include "castle.h"
+#include "kingdom.h"
 #include "monster.h"
 #include "artifact.h"
 #include "resource.h"
@@ -186,11 +188,26 @@ ACTION InitMaps(char *filename){
         fread((char *) &tailAddon[i].uniqNumberN2, sizeof(Uint32), 1, fd);
     }
 
+    //идем в хвост с инфо о замках
+
+    fseek(fd, 3 * 72, SEEK_CUR);
+    fseek(fd, 3 * 144 + 1, SEEK_CUR);
+    fread(&i, sizeof(i), 1, fd);
+    while(i) fread(&i, sizeof(i), 1, fd);
+    InitCastle(fd);
+
     // close file
     fclose(fd);
 
     // цикл конвертации в новый формат
     Uint8  *ptrTILData = GetTILData("GROUND32.TIL");
+
+    Sint8		j = 0;
+    Uint16 		indexAddon = 0;
+
+    MP2ADDONTAIL	*ptrAddon = NULL;
+    ICNHEADER		*tail = NULL;
+    ICNHEADER		*current = NULL;
 
     for(i = 0; i < ptrMP2Header->heightMaps * ptrMP2Header->widthMaps; ++i){
 
@@ -202,23 +219,16 @@ ACTION InitMaps(char *filename){
 	ptrMaps[i].ground = GetTypeGround(&ptrMapsInfo[i]);
 	DrawTILBmp(ptrMaps[i].tile, ptrTILData, ptrMapsInfo[i].tileIndex, ptrMapsInfo[i].shape);
 
-	Sint8			j = 0;
-	Uint16 			indexAddon = 0;
-
-	MP2ADDONTAIL		*ptrAddon = NULL;
-	ICNHEADER		*tail = NULL;
-	ICNHEADER		*current = NULL;
-
 	ptrMaps[i].ax		= i % ptrMP2Header->widthMaps;
 	ptrMaps[i].ay		= i / ptrMP2Header->widthMaps;
 
 	ptrMaps[i].level1	= NULL;
 	ptrMaps[i].level2	= NULL;
 
-	ptrMaps[i].move		= TRUE;
 	ptrMaps[i].count	= 0;
 	ptrMaps[i].type		= OBJ_ZERO;
 	ptrMaps[i].animation	= NULL;
+	ptrMaps[i].monster	= NULL;
 
 	// init level1
 	for(j = 3; j >= 0; --j){
@@ -310,7 +320,14 @@ ACTION InitMaps(char *filename){
     	    }
 	}
 
+	// monster
+	if(0x2F < ptrMapsInfo[i].objectName1 && 0x34 > ptrMapsInfo[i].objectName1)
+	    StoreAnimationFrame(ptrMapsInfo[i].objectName1, ptrMapsInfo[i].indexName1, &ptrMaps[i]);
+
+
 	if(OBJ_ZERO == ptrMaps[i].type) ptrMaps[i].type = CheckValidObject(ptrMapsInfo[i].generalObject);
+
+	ptrMaps[i].move	= TRUE;
 
     }
 
@@ -321,11 +338,16 @@ ACTION InitMaps(char *filename){
     free(ptrMapsInfo);
     free(tailAddon);
     
+    // инициализируем королевства
+    InitKingdom();
+
     fprintf(stderr, "InitMaps: %s\n", filename);
 
     // Рисуем экран и в цикл событий
     ACTION result = DrawMainDisplay();
 
+    FreeKingdom();
+    FreeCastle();
     FreeMaps();
 
     return result;
@@ -486,10 +508,7 @@ void MapsRescanObject(Uint8 type, MP2TILEINFO *info, MP2ADDONTAIL *addon, S_CELL
 	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
 
 	    info->generalObject = OBJ_MONSTER;
-
-	    if(MONSTER_RND == CheckValidMonster(info->indexName1))
-		info->indexName1 = maps->object.monster;
-
+	    info->indexName1 = maps->object.monster;
 
 	    break;
 
@@ -503,9 +522,7 @@ void MapsRescanObject(Uint8 type, MP2TILEINFO *info, MP2ADDONTAIL *addon, S_CELL
 	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
 
 	    info->generalObject = OBJ_MONSTER;
-
-	    if(MONSTER_RND1 == CheckValidMonster(info->indexName1))
-		info->indexName1 = maps->object.monster;
+	    info->indexName1 = maps->object.monster;
 
 	    break;
 
@@ -519,9 +536,7 @@ void MapsRescanObject(Uint8 type, MP2TILEINFO *info, MP2ADDONTAIL *addon, S_CELL
 	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
 
 	    info->generalObject = OBJ_MONSTER;
-
-	    if(MONSTER_RND2 == CheckValidMonster(info->indexName1))
-		info->indexName1 = maps->object.monster;
+	    info->indexName1 = maps->object.monster;
 
 	    break;
 
@@ -535,9 +550,7 @@ void MapsRescanObject(Uint8 type, MP2TILEINFO *info, MP2ADDONTAIL *addon, S_CELL
 	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
 
 	    info->generalObject = OBJ_MONSTER;
-
-	    if(MONSTER_RND3 == CheckValidMonster(info->indexName1))
-		info->indexName1 = maps->object.monster;
+	    info->indexName1 = maps->object.monster;
 
 	    break;
 
@@ -551,12 +564,9 @@ void MapsRescanObject(Uint8 type, MP2TILEINFO *info, MP2ADDONTAIL *addon, S_CELL
 	    maps->count = GetRNDSizeLevelMonster(GetLevelMonster(maps->object.monster));
 
 	    info->generalObject = OBJ_MONSTER;
-
-	    if(MONSTER_RND4 == CheckValidMonster(info->indexName1))
-		info->indexName1 = maps->object.monster;
+	    info->indexName1 = maps->object.monster;
 
 	    break;
-
 
 	    default:
 		break;

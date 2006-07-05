@@ -302,7 +302,7 @@ BOOL InitAGG(){
 
     // открываем файл
     if(NULL == (fd = fopen(filename, "rb"))){
-	fprintf(stderr, "error fopen: %s\n", filename);
+	fprintf(stderr, "InitAGG: error fopen: %s\n", filename);
 	return FALSE;
     }
 
@@ -310,12 +310,11 @@ BOOL InitAGG(){
 
     // читаем количество файлов
     fread(&countAGG, sizeof(countAGG), 1, fd);
-    fprintf(stderr, "object count: %d\n", countAGG);
 
     // выделяем память для буффера AGGDATA
     ptrAGG = (AGGDATA *) malloc(countAGG * sizeof(AGGDATA));
     if(ptrAGG == NULL){
-	fprintf(stderr, "error malloc: %d\n", countAGG * sizeof(AGGDATA));
+	fprintf(stderr, "InitAGG: error malloc: %d\n", countAGG * sizeof(AGGDATA));
 	return FALSE;
     }
     sizeMemory += countAGG * sizeof(AGGDATA);
@@ -384,14 +383,14 @@ BOOL InitAGG(){
 	// память для палитры
 	colorsPtr = (SDL_Color *) malloc(256 * sizeof(SDL_Color));
 	if(colorsPtr == NULL){
-	    fprintf(stderr, "error malloc: %d\n", 256 * sizeof(SDL_Color));
+	    fprintf(stderr, "InitAGG: error malloc: %d\n", 256 * sizeof(SDL_Color));
 	    return FALSE;
 	}
 
 	// buffer для файла
 	char *icnFileData = (char *) malloc(ptr->size);
 	if(icnFileData == NULL){
-	    fprintf(stderr, "error malloc: %d\n", ptr->size);
+	    fprintf(stderr, "InitAGG: error malloc: %d\n", ptr->size);
 	    return FALSE;
 	}
 		    
@@ -415,7 +414,7 @@ BOOL InitAGG(){
 	colorsPtr[COLORKEY].g = 0x00;
 	colorsPtr[COLORKEY].b = 0xFF;
 	free(icnFileData);
-	fprintf(stderr, "load PAL: kb.pal\n");
+	if(GetIntValue(DEBUG)) fprintf(stderr, "load palette: kb.pal\n");
     }
 
     return TRUE;	    

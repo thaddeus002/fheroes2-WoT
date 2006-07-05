@@ -31,7 +31,6 @@
 
 #include "SDL.h"
 #include "gamedefs.h"
-#include "castle.h"
 
 #define RNDMONSTERMAXCOUNT	4000
 

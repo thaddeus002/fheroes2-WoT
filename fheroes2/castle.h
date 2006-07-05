@@ -31,16 +31,54 @@
 
 #include "SDL.h"
 #include "gamedefs.h"
+#include "monster.h"
 
-typedef enum {
-		BARBARIAN, 
-		KNIGHT, 
-		NECROMANCER, 
-		SORCERESS, 
-		WARLOCK, 
-		WIZARD,
-		BOMG
+#define	BUILD_THIEVEGUILD	0x0002
+#define	BUILD_TAVERN		0x0004
+#define	BUILD_SHIPYARD		0x0008
+#define BUILD_WELL		0x0010
+#define BUILD_STATUE		0x0080
+#define	BUILD_LEFTTURRET	0x0100
+#define BUILD_RIGHTTURRET	0x0200
+#define BUILD_MARKETPLACE	0x0400
+#define BUILD_MOAT		0x1000
+#define BUILD_EXT1		0x0800	// Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
+#define BUILD_EXT2		0x2000	// Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
 
-	    } E_RACE;
+#define DWELLING_MONSTER1	0x0008
+#define DWELLING_MONSTER2	0x0010
+#define DWELLING_MONSTER3	0x0020
+#define DWELLING_MONSTER4	0x0040
+#define DWELLING_MONSTER5	0x0080
+#define DWELLING_MONSTER6	0x0100
+#define DWELLING_UPGRADE2	0x0200
+#define DWELLING_UPGRADE3	0x0400
+#define DWELLING_UPGRADE4	0x0800
+#define DWELLING_UPGRADE5	0x1000
+#define DWELLING_UPGRADE6	0x2000
+
+typedef struct {
+
+    E_COLORS	color;
+    E_RACE	race;
+    char	name[13];
+    SDL_Rect	pos;
+    Uint16	building;
+    Uint16	dwelling;
+    Uint8	magicTower;
+    S_ARMY	army1;
+    S_ARMY	army2;
+    S_ARMY	army3;
+    S_ARMY	army4;
+    S_ARMY	army5;
+    BOOL	capitan;
+    BOOL	castle;
+    BOOL	allowCastle;
+    void	*next;
+
+} S_CASTLE;
+
+BOOL	InitCastle(FILE *);
+void	FreeCastle(void);
 
 #endif

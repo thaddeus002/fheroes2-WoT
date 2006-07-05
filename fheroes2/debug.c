@@ -189,6 +189,16 @@ const char * PrintObjectType(E_OBJECT type, Uint8 ext){
             string = "OBJN_TEMPLE";
             break;
 
+        // герой
+        case OBJ_HEROES:
+            string = "OBJ_HEROES";
+            break;
+
+        // табличка
+        case OBJ_SIGN:
+            string = "OBJ_SIGN";
+            break;
+
         // форт для upgrade orc ogre
         case OBJN_HILLFORT:
             string = "OBJN_HILLFORT";
@@ -277,6 +287,11 @@ const char * PrintObjectType(E_OBJECT type, Uint8 ext){
         // горы
         case OBJ_MOUNTS:
             string = "OBJ_MOUNTS";
+            break;
+
+        // вулкан
+        case OBJ_VOLCANO:
+            string = "OBJ_VOLCANO";
             break;
 
         // камни

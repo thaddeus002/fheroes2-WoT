@@ -90,6 +90,7 @@ typedef enum {
 		OBJN_FREEMANFOUNDRY	= 0x61,	// кузница upgrade
 		OBJ_TREES		= 0x63,	// деревья
 		OBJ_MOUNTS		= 0x64,	// горы
+		OBJ_VOLCANO		= 0x65,	// вулкан
 		OBJ_STONES		= 0x67,	// камни
 		OBJ_VEGETATION1		= 0x66,	// цветы, растительность
 		OBJ_WATERLAKE		= 0x68,	// озеро воды
@@ -100,6 +101,7 @@ typedef enum {
 		OBJ_VEGETATION3		= 0x71,	// цветы, растительность
 
 		OBJ_ALCHEMYTOWER	= 0x81,	// башня алхимика mercury, точка входа
+		OBJ_SIGN		= 0x82, // табличка
 		OBJ_BUOY		= 0x83,	// буй на воде
 		OBJ_SKELETON		= 0x84,	// скелет странника в пустыне
 		OBJ_DAEMONCAVE		= 0x85,	// пещера демона, точка входа
@@ -144,10 +146,11 @@ typedef enum {
 
 		OBJ_RNDTOWN		= 0xB0,	// random город, точка входа
 		OBJ_RNDCASTLE		= 0xB1,	// random замок, точка входа
-		OBJ_RNDMONSTER1		= 0xB3,	// radom monster level1
-		OBJ_RNDMONSTER2		= 0xB4,	// radom monster level2
-		OBJ_RNDMONSTER3		= 0xB5,	// radom monster level3
-		OBJ_RNDMONSTER4		= 0xB6,	// radom monster level4
+		OBJ_RNDMONSTER1		= 0xB3,	// random monster level1
+		OBJ_RNDMONSTER2		= 0xB4,	// random monster level2
+		OBJ_RNDMONSTER3		= 0xB5,	// random monster level3
+		OBJ_RNDMONSTER4		= 0xB6,	// random monster level4
+		OBJ_HEROES		= 0xB7,	// heroes
 		OBJ_WATCHTOWER		= 0xBA,	// домик орков
 		OBJ_TREEHOUSE		= 0xBB,	// домик спрайтов (маленький)
 		OBJ_TREECITY		= 0xBC,	// тройной дом спрайтов, точка входа

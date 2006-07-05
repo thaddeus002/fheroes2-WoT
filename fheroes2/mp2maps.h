@@ -34,6 +34,7 @@
 #include "object.h"
 #include "resource.h"
 #include "artifact.h"
+#include "castle.h"
 #include "heroes.h"
 #include "animation.h"
 #include "actionevent.h"
@@ -70,7 +71,7 @@ typedef struct {
 		ICNHEADER	*level1;
 		ICNHEADER	*level2;
 		S_ANIMATION	*animation;
-                S_HEROES        *heroes;
+		S_ANIMATION	*monster;
 
                 } S_CELLMAPS;
 
@@ -83,30 +84,47 @@ Uint8		GetHeightMaps(void);
 /* ***************************** START MP2 ********************************** */
 /* заголовок карты */
 typedef struct {
-Uint32  headerMagic;		// address: 0x0000
-Uint16  difficultLevel;		// address: 0x0004
-Uint8   widthMaps;              // address: 0x0006
-Uint8	heightMaps;             // address: 0x0007
-Uint8	t1[18];			// address: 0x0008 - 0x0019  ??
-Uint8	countHeroes;            // address: 0x001A
-Uint8	requiredHumans;		// address: 0x001B
-Uint8	maxHumans;		// address: 0x001C
-Uint8   conditionsWins;         // address: 0x001D
-Uint8	specialWins1;		// address: 0x001E
-Uint8	specialWins2;		// address: 0x001F
-Uint8	specialWins3;		// address: 0x0020
-Uint8	specialWins4;		// address: 0x0021
-Uint8   conditionsLoss;         // address: 0x0022
-Uint8	specialLoss1;		// address: 0x0023
-Uint8	specialLoss2;		// address: 0x0024
-Uint8	startWithHeroCastle;	// address: 0x0025
-Uint8	t2[20];			// address: 0x0026 - 0x0039  ??
-Uint8   longname[16];           // address: 0x003A - 0x0049
-Uint8	t3[44];			// address: 0x004A - 0x0075  ??
-Uint8   description[143];       // address: 0x0076 - 0x0105
-Uint8	uniqName1[159];		// address: 0x0106 - 0x01A3  ??
-Uint32	mapsWidth;		// address: 0x01A4
-Uint32	mapsHeight;		// address: 0x01A8
+Uint32  headerMagic;		// заголовок
+Uint16  difficultLevel;		// уровень сложности
+Uint8   widthMaps;              // размерность карты
+Uint8	heightMaps;             // размерность карты
+Uint8	kingdomBlue;		// цвет королевства (00 - нет, 01 - участвует в игре)
+Uint8	kingdomGreen;		// цвет королевства (00 - нет, 01 - участвует в игре)
+Uint8	kingdomRed;		// цвет королевства (00 - нет, 01 - участвует в игре)
+Uint8	kingdomYellow;		// цвет королевства (00 - нет, 01 - участвует в игре)
+Uint8	kingdomOrange;		// цвет королевства (00 - нет, 01 - участвует в игре)
+Uint8	kingdomPurple;		// цвет королевства (00 - нет, 01 - участвует в игре)
+Uint8	allowBlue;		// выбор цвета игроком (00 - заблокировано, 01 - разрешено)
+Uint8	allowGreen;		// выбор цвета игроком (00 - заблокировано, 01 - разрешено)
+Uint8	allowRed;		// выбор цвета игроком (00 - заблокировано, 01 - разрешено)
+Uint8	allowYellow;		// выбор цвета игроком (00 - заблокировано, 01 - разрешено)
+Uint8	allowOrange;		// выбор цвета игроком (00 - заблокировано, 01 - разрешено)
+Uint8	allowPurple;		// выбор цвета игроком (00 - заблокировано, 01 - разрешено)
+Uint8	rndBlue;		// случайная раса королевства (00 - нет, 01 - да)
+Uint8	rndGreen;		// случайная раса королевства (00 - нет, 01 - да)
+Uint8	rndRed;			// случайная раса королевства (00 - нет, 01 - да)
+Uint8	rndYellow;		// случайная раса королевства (00 - нет, 01 - да)
+Uint8	rndOrange;		// случайная раса королевства (00 - нет, 01 - да)
+Uint8	rndPurple;		// случайная раса королевства (00 - нет, 01 - да)
+Uint8	countHeroes;            // общее количество участников
+Uint8	requiredHumans;		// из них, количество участников людей
+Uint8	maxHumans;		// максимальное количество участников людей
+Uint8   conditionsWins;         // 
+Uint8	specialWins1;		// 
+Uint8	specialWins2;		// 
+Uint8	specialWins3;		// 
+Uint8	specialWins4;		// 
+Uint8   conditionsLoss;         // 
+Uint8	specialLoss1;		// 
+Uint8	specialLoss2;		// 
+Uint8	startWithHeroCastle;	// Начинать игру с героем возле замка (00 - да, 01 - нет)
+Uint8	t2[20];			// неопределенный блок 20 байт
+Uint8   longname[16];           // полное имя сценария
+Uint8	t3[44];			// неопределенный блок 44 байт
+Uint8   description[143];       // описание сценария
+Uint8	uniqName1[159];		// неопределенный блок 159 байт
+Uint32	mapsWidth;		// размерность карты
+Uint32	mapsHeight;		// размерность карты
 } MP2HEADER;			// total:   428 байт
 
 // далее
@@ -145,18 +163,49 @@ typedef struct {
 } MP2ADDONTAIL;
 
 // далее
-// блок FF FF FF нахрен нужен непонятно
-// дополнительная информация о замках по 0x48 байт
-// дополнительная информация о героях по 0x4E байт
-
-// count;
-// count;
-// count;
+// 216 байт
+// массив из 3 байтовых элементов в количестве 72, координаты замков и идентификатор
+// где идентификатор:
+// 0x80 castle kni, 0x00 tower kni
+// 0x81 castle bar, 0x01 tower bar
+// 0x82 castle sor, 0x02 tower sor
+// 0x83 castle war, 0x03 tower war
+// 0x84 castle wiz, 0x04 tower wiz
+// 0x85 castle nec, 0x05 tower nec
+// 0x86 castle rnd, 0x06 tower rnd
+//
+// далее
+// 432 байт
+// массив из 3 байтовых элементов в количестве 144, координаты ресурсов и идентификатор
+// где идентификатор:
+// 0x00 mines woo
+// 0x01 mines mer
+// 0x02 mines ore
+// 0x03 mines sul
+// 0x04 mines cry
+// 0x05 mines gem
+// 0x06 mines gol
+// 0x64 маяк
+// 0x65 дом драконов
+// 0x67 mines ghost
+//
+// далее
+// несколько динамических байт
+// порядок:
+// Uint8, несколько Uint16 счетчики?, в конце 0x0000
+//
+// далее по блокам
+// порядок определяется байтом quantity1 объекта, кратным 0x08. (начинается с 0x08, следующий 0x10, 0x18, 0x20 и.т.д):
+//  - дополнительная информация о замках по 0x48 байт
+//  - дополнительная информация о героях по 0x4E байт
+//  - дополнительная информация о табличках OBJ_SIGN
+//  - дополнительная информация о событиях  OBJ_EVENT по клетке
+//  - дополнительная информация о слухах в таверне
+//  - дополнительная информация о событиях по дню
+//
 
 typedef struct {
 
-    Uint8	identify;	// 0x46
-    Uint8	zero;		// 0x00
     Uint8	color; 		// 00 blue, 01 green, 02 red, 03 yellow, 04 orange, 05 purpl, ff unknown
     BOOL	customBuilding;
     Uint16	building;
@@ -194,27 +243,27 @@ typedef struct {
     Uint8	monster3;
     Uint8	monster4;
     Uint8	monster5;
-    Uint16	countMonter1;
-    Uint16	countMonter2;
-    Uint16	countMonter3;
-    Uint16	countMonter4;
-    Uint16	countMonter5;
+    Uint16	count1;
+    Uint16	count2;
+    Uint16	count3;
+    Uint16	count4;
+    Uint16	count5;
     BOOL	capitan;
     BOOL	customCastleName;
-    char	castleName[13];		// name + '\0' // 40 byte
+    char	castleName[13];		// name + '\0' // 39 byte
     Uint8	type;			// 00 knight, 01 barb, 02 sorc, 03 warl, 04 wiz, 05 necr, 06 rnd
     BOOL	castle;
     Uint8	allowCastle;		// 00 TRUE, 01 FALSE
-    Uint8	xxc[29];
+    Uint8	unknown[29];
 
 } MP2CASTLE;
 
-/*
+
 typedef struct {
 
     Uint8	identify;	// 0x4c
-    Uint8	00;
-    Uint8	00;
+    Uint8	xx1;		// 0
+    Uint8	xx2;		// 0
     BOOL	customTroops;
     Uint8	monster1;	// 0xff none
     Uint8	monster2;	// 0xff none
@@ -231,7 +280,7 @@ typedef struct {
     Uint8	artifact1;	// 0xff none
     Uint8	artifact2;	// 0xff none
     Uint8	artifact3;	// 0xff none
-    Uint8	00;
+    Uint8	xx3;		// 0
     Uint32	exerience;
     BOOL	customSkill;
     Uint8	skill1;		// 0xff none
@@ -250,21 +299,79 @@ typedef struct {
     Uint8	skillLevel6;
     Uint8	skillLevel7;
     Uint8	skillLevel8;
-    Uint8	00;
+    Uint8	xx4;		// 0
     Uint8	customName;
     char	name[13];	// name + '\0'
     BOOL	patrol;
     Uint8	countSquare;	// for patrol
-    000000000000 total size 0x4e
-} MPHEROES;
-*/
+    Uint8	xx5[15];	// 0
+} MP2HEROES;
 
-// дополнительная информация о карте
-// тексты сообщений запрограммированных событий
+// структура sign
+// Uint16 количество следующих байт
+// 0x01
+// 0x08 байт по 0x00
+// текст
+// завершающий \0
 
-//Uint32	endCount;
+// структура event по клетке
+// Uint16 количество следующих байт
+// 0x01
+// Uint32 WOOD
+// Uint32 MERCURY
+// Uint32 ORE
+// Uint32 SULFUR
+// Uint32 CRYSTAL
+// Uint32 GEMS
+// Uint32 GOLDS
+// Uin16  artifact
+// Uint8  allow computer
+// 10 байт 0x00
+// Uint8 blue   ? кто имеет право получать event
+// Uint8 green  ?
+// Uint8 red    !
+// Uint8 yellow ?
+// Uint8 orange !
+// Uint8 purple ?
+// текст
+// завершающий \0
+
+// структура rumor
+// Uint16 количество следующих байт
+// 8 байт по 0x00
+// текст
+// завершающий \0
+
+// структура event по дню
+// Uint16 количество следующих байт
+// 0x00
+// Uint32 WOOD
+// Uint32 MERCURY
+// Uint32 ORE
+// Uint32 SULFUR
+// Uint32 CRYSTAL
+// Uint32 GEMS
+// Uint32 GOLDS
+// Uin16  artifact         0xffff
+// Uint8  allow computer
+// Uint8  first visit      0x00
+// Uint16 day of first
+// Uint8 Every day
+// 6 байт по 0x00
+// 0x01
+// Uint8 blue   ? кто имеет право получать event
+// Uint8 green  ?
+// Uint8 red    !
+// Uint8 yellow ?
+// Uint8 orange !
+// Uint8 purple ?
+// текст
+// завершающий \0
+
+//
+// в самом конце 4 байтовый счетчик, версионность карты?
+//Uint32	endCount
 
 /* ****************************** END MP2 ************************************** */
-
 
 #endif

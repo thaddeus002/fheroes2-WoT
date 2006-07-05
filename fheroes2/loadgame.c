@@ -42,10 +42,13 @@
 #include "loadgame.h"
 #include "mp2maps.h"
 
+#define  MONSTERFIXTURE 26;
+
 void	ShowStaticMainDisplay(void);
 void	RedrawMapsArea(void);
 void	DrawRectAreaMaps(SDL_Rect *);
 void	DrawCellAreaMapsMonster(Uint8, Uint8);
+void	DrawCellAreaMapsTile(Uint8, Uint8);
 void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
@@ -72,23 +75,31 @@ ACTION ActionButtonCastle(void);
 ACTION ActionButtonMagic(void);
 ACTION ActionButtonCloseDay(void);
 ACTION ActionButtonInfo(void);
-ACTION ActionButtonOptions(void);
+ACTION ActionButtonMenu(void);
 ACTION ActionButtonSettings(void);
 
-ACTION ActionPressPreferences(void);
-ACTION ActionPressOptions(void);
+ACTION InfoClickWorld(void);
+ACTION InfoClickPuzzle(void);
+ACTION InfoClickInfo(void);
+ACTION InfoClickDig(void);
+ACTION InfoClickCancel(void);
 
-ACTION PreferencePressNewMap(void);
-ACTION PreferencePressLoadMap(void);
-ACTION PreferencePressSaveMap(void);
-ACTION PreferencePressQuit(void);
-ACTION PreferencePressCancel(void);
+ACTION MenuClickNew(void);
+ACTION MenuClickLoad(void);
+ACTION MenuClickSave(void);
+ACTION MenuClickQuit(void);
+ACTION MenuClickCancel(void);
 
-ACTION OptionsClickAnimation(void);
-ACTION OptionsClickCycling(void);
-ACTION OptionsClickGrid(void);
-ACTION OptionsClickCursor(void);
-ACTION OptionsClickOkay(void);
+ACTION SettingsClickMusic(void);
+ACTION SettingsClickSound(void);
+ACTION SettingsClickType(void);
+ACTION SettingsClickHeroesSpeed(void);
+ACTION SettingsClickEnemySpeed(void);
+ACTION SettingsClickPath(void);
+ACTION SettingsClickInterface(void);
+ACTION SettingsClickVideo(void);
+ACTION SettingsClickCursor(void);
+ACTION SettingsClickOkay(void);
 
 INTERFACEACTION *stpemaindisplay = NULL;
 
@@ -193,7 +204,6 @@ ACTION DrawMainDisplay(){
     action.rect = dest;
     action.mouseEvent = MOUSE_PRESENT;
     action.cursorMotion = CURSOR_POINTER;
-    //action.pf = RedrawMapsAnimation;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
@@ -412,7 +422,7 @@ ACTION DrawMainDisplay(){
     FillSPRITE(&action.objectPush, icnname, 13);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionButtonOptions;
+    action.pf = ActionButtonMenu;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
@@ -1313,320 +1323,6 @@ ACTION ActionClickRadarArea(void){
     return NONE;
 }
 
-ACTION ActionPressPreferences(void){
-
-    CursorOff();
-
-    // Сохраняем курсор
-    Uint32 cursor = GetCursor();    
-
-    AGGSPRITE sprite;
-    SDL_Rect rectCur, rectBack;
-    ACTION result = NONE;
-
-    INTERFACEACTION action;
-    INTERFACEACTION *dialogPreferences = NULL;
-
-    SDL_Surface *format = NULL;
-    SDL_Surface *back = NULL;
-    SDL_Surface *video = SDL_GetVideoSurface();
-
-    // фон панели cpanbkg
-    FillSPRITE(&sprite, "CPANBKG.ICN", 0);
-    SDL_Surface *image = GetICNSprite(&sprite);
-
-    // сохраняем background
-    rectBack.x = (video->w - image->w) / 2;
-    rectBack.y = (video->h - image->h) / 2;
-    rectBack.w = image->w;
-    rectBack.h = image->h;
-    format = SDL_CreateRGBSurface(SDL_SWSURFACE, image->w, image->h, 16, 0, 0, 0, 0);
-    back = SDL_DisplayFormat(format);
-    SDL_FreeSurface(format);
-    SDL_BlitSurface(video, &rectBack, back, NULL);
-
-    //  по центру
-    SDL_BlitSurface(image, NULL, video, &rectBack);
-
-    // New Game
-    FillSPRITE(&sprite, "CPANEL.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 62;
-    rectCur.y = rectBack.y + 31;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "CPANEL.ICN", 0);
-    FillSPRITE(&action.objectPush, "CPANEL.ICN", 1);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = PreferencePressNewMap;
-    AddActionEvent(&dialogPreferences, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // Load Game
-    FillSPRITE(&sprite, "CPANEL.ICN", 2);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 195;
-    rectCur.y = rectBack.y + 31;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "CPANEL.ICN", 2);
-    FillSPRITE(&action.objectPush, "CPANEL.ICN", 3);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = PreferencePressLoadMap;
-    AddActionEvent(&dialogPreferences, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // Save Game
-    FillSPRITE(&sprite, "CPANEL.ICN", 4);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 62;
-    rectCur.y = rectBack.y + 107;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "CPANEL.ICN", 4);
-    FillSPRITE(&action.objectPush, "CPANEL.ICN", 5);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = PreferencePressSaveMap;
-    AddActionEvent(&dialogPreferences, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // Quit Game
-    FillSPRITE(&sprite, "CPANEL.ICN", 6);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 195;
-    rectCur.y = rectBack.y + 107;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "CPANEL.ICN", 6);
-    FillSPRITE(&action.objectPush, "CPANEL.ICN", 7);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = PreferencePressQuit;
-    AddActionEvent(&dialogPreferences, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // cancel
-    FillSPRITE(&sprite, "CPANEL.ICN", 8);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 128;
-    rectCur.y = rectBack.y + 183;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "CPANEL.ICN", 8);
-    FillSPRITE(&action.objectPush, "CPANEL.ICN", 9);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = PreferencePressCancel;
-    AddActionEvent(&dialogPreferences, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // отрисовка диалога
-    SDL_Flip(video);
-
-    // Стандартный курсор
-    SetCursor(CURSOR_POINTER);
-
-    CursorOn();
-
-    // в цикл событий
-    result = ActionCycle(dialogPreferences);
-
-    if(ESC == result) result = NONE;
-
-    // востанавливаем background
-    CursorOff();
-
-    SDL_BlitSurface(back, NULL, video, &rectBack);
-    SDL_Flip(video);
-
-    FreeActionEvent(dialogPreferences);
-    SDL_FreeSurface(back);
-
-    // Востанавливаем курсор
-    SetCursor(cursor);    
-
-    CursorOn();
-
-    return result;
-}
-
-ACTION ActionPressOptions(void){
-
-    CursorOff();
-
-    // Сохраняем курсор
-    Uint32 cursor = GetCursor();    
-
-    AGGSPRITE sprite;
-    SDL_Rect rectCur, rectBack;
-
-    INTERFACEACTION action;
-    INTERFACEACTION *dialogOptions = NULL;
-
-    ACTION result = NONE;
-
-    SDL_Surface *format = NULL;
-    SDL_Surface *back = NULL;
-    SDL_Surface *video = SDL_GetVideoSurface();
-
-    // фон панели espanbkg
-    FillSPRITE(&sprite, "ESPANBKG.ICN", 0);
-    SDL_Surface *image = GetICNSprite(&sprite);
-
-    Uint8 widthshadow = 16;
-    
-    // сохраняем background
-    rectBack.x = (video->w - image->w) / 2 - widthshadow;
-    rectBack.y = (video->h - image->h) / 2;
-    rectBack.w = image->w + widthshadow;
-    rectBack.h = image->h + widthshadow;
-    format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0);
-    back = SDL_DisplayFormat(format);
-    SDL_FreeSurface(format);
-    SDL_BlitSurface(video, &rectBack, back, NULL);
-
-    // по центру
-    rectCur = rectBack;
-    // тень
-    FillSPRITE(&sprite, "ESPANBKG.ICN", 1);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x;
-    rectCur.y = rectBack.y + widthshadow;
-    rectCur.w = image->w;
-    rectCur.h = image->h;    
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    // картинка
-    FillSPRITE(&sprite, "ESPANBKG.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + widthshadow;
-    rectCur.y = rectBack.y;
-    rectCur.w = image->w;
-    rectCur.h = image->h;    
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // animation
-    FillSPRITE(&sprite, "ESPANEL.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 85;
-    rectCur.y = rectBack.y + 47;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "ESPANEL.ICN", 0);
-    FillSPRITE(&action.objectPush, "ESPANEL.ICN", 1);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = OptionsClickAnimation;
-    AddActionEvent(&dialogOptions, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // cycling
-    FillSPRITE(&sprite, "ESPANEL.ICN", 2);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 203;
-    rectCur.y = rectBack.y + 47;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "ESPANEL.ICN", 2);
-    FillSPRITE(&action.objectPush, "ESPANEL.ICN", 3);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = OptionsClickCycling;
-    AddActionEvent(&dialogOptions, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    
-    // grid
-    FillSPRITE(&sprite, "ESPANEL.ICN", 4);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 85;
-    rectCur.y = rectBack.y + 157;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "ESPANEL.ICN", 4);
-    FillSPRITE(&action.objectPush, "ESPANEL.ICN", 5);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = OptionsClickGrid;
-    AddActionEvent(&dialogOptions, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    
-    // cursor
-    FillSPRITE(&sprite, "ESPANEL.ICN", 6);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 203;
-    rectCur.y = rectBack.y + 157;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "ESPANEL.ICN", 6);
-    FillSPRITE(&action.objectPush, "ESPANEL.ICN", 7);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = OptionsClickCursor;
-    AddActionEvent(&dialogOptions, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    
-    // okay
-    FillSPRITE(&sprite, "ESPANBTN.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 128;
-    rectCur.y = rectBack.y + 252;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "ESPANBTN.ICN", 0);
-    FillSPRITE(&action.objectPush, "ESPANBTN.ICN", 1);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = OptionsClickOkay;
-    AddActionEvent(&dialogOptions, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // отрисовка диалога
-    SDL_Flip(video);
-
-    // Стандартный курсор
-    SetCursor(CURSOR_POINTER);
-
-    CursorOn();
-
-    // в цикл событий
-    result = ActionCycle(dialogOptions);
-
-    if(OK == result){
-	
-	fprintf(stderr, "save options\n");
-    }
-
-    if(EXIT != result) result = NONE;
-
-    // востанавливаем background
-    CursorOff();
-
-    SDL_BlitSurface(back, NULL, video, &rectBack);
-    SDL_Flip(video);
-
-    FreeActionEvent(dialogOptions);
-    SDL_FreeSurface(back);
-
-    // Востанавливаем курсор
-    SetCursor(cursor);    
-
-    CursorOn();
-
-    return result;
-}
-
 void RedrawMapsArea(){
 
     // проверка границ экрана
@@ -1749,74 +1445,45 @@ void DrawRectAreaMaps(SDL_Rect *rect){
     SDL_Rect dest;
 
     S_CELLMAPS *ptrCell = NULL;
-    // циклы разделены bug (объекты больше чем tile, следующий tile зарисовывает объект)
+
+    // циклы разделены bugs (объекты больше чем tile, следующий tile зарисовывает объект)
 
     // сначала отрисовываем все tile
     for(y = rect->y; y < rect->y + rect->h; ++y)
-
 	for(x = rect->x; x < rect->x + rect->w; ++x){
 
-	    dest.x = BORDERWIDTH + x * TILEWIDTH;
-	    dest.y = BORDERWIDTH + y * TILEWIDTH;
-	    dest.w = TILEWIDTH;
-	    dest.h = TILEWIDTH;
-
 	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
-	    SDL_BlitSurface(ptrCell->tile, NULL, video, &dest);
-	    
+
+	    if(! ptrCell->animation) DrawCellAreaMapsTile(x, y);
     }
 
     // отрисовываем все нижние объекты
     for(y = rect->y; y < rect->y + rect->h; ++y)
-	for(x = rect->x; x < rect->x + rect->w; ++x)
-	    DrawCellAreaMapsLevel1(x, y);
-/*
+	for(x = rect->x; x < rect->x + rect->w; ++x){
+
+	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+
+	    if(! ptrCell->animation) DrawCellAreaMapsLevel1(x, y);
+    }
+
     // отрисовываем всех монстров
     for(y = rect->y; y < rect->y + rect->h; ++y)
 	for(x = rect->x; x < rect->x + rect->w; ++x)
 	    DrawCellAreaMapsMonster(x, y);
-*/
+
     // отрисовываем все верхние объекты
     for(y = rect->y; y < rect->y + rect->h; ++y)
-	for(x = rect->x; x < rect->x + rect->w; ++x)
-	    DrawCellAreaMapsLevel2(x, y);
+	for(x = rect->x; x < rect->x + rect->w; ++x){
+
+	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+
+	    if(! ptrCell->animation) DrawCellAreaMapsLevel2(x, y);
+    }
 
     // если присутствует анимация на клетке, отрисовываем отдельно, пару статичных спрайтов
     for(y = rect->y; y < rect->y + rect->h; ++y)
 	for(x = rect->x; x < rect->x + rect->w; ++x)
 	    DrawCellStaticAnimation(x, y);
-
-/*
-    // востановим нестандартные спрайты при скроллинге вправо и вниз
-    if(rect->x == (GetAreaWidth() - 1)){
-
-	// отрисовываем всех монстров
-	for(y = rect->y; y < rect->y + rect->h; ++y)
-
-		DrawCellAreaMapsMonster(rect->x - 1, y);
-
-	// отрисовываем все верхние объекты
-	for(y = rect->y; y < rect->y + rect->h; ++y){
-
-		DrawCellAreaMapsLevel2(rect->x - 1, y);
-		DrawCellAreaMapsLevel2(rect->x, y);
-	}
-
-    }else if(rect->y == (GetAreaHeight() - 1)){
-
-	// отрисовываем всех монстров
-	for(x = rect->x; x < rect->x + rect->w; ++x)
-
-		DrawCellAreaMapsMonster(x, rect->y - 1);
-
-	// отрисовываем все верхние объекты
-	for(y = rect->y; y < rect->y + rect->h; ++y){
-
-		DrawCellAreaMapsLevel2(y, rect->y - 1);
-		DrawCellAreaMapsLevel2(y, rect->y);
-	}
-    }
-*/
 
     // и рисуем сетку
     if(GetIntValue(DEBUG)){
@@ -1834,31 +1501,15 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 		PutPixel(video, dest.x + dest.w - 1, dest.y + dest.h - 1, 0xFF00);
 		UnlockSurface(video);
     }}
-
-    // отрисовываем бордюр рамки и справа и внизу
-    dest.x = BORDERWIDTH + GetAreaWidth() * TILEWIDTH;
-    dest.y = BORDERWIDTH;
-    dest.w = BORDERWIDTH;
-    dest.h = GetAreaHeight() * TILEWIDTH;
-    SDL_BlitSurface(frameAreaLeft, NULL, video, &dest);
-    dest.x = BORDERWIDTH;
-    dest.y = BORDERWIDTH + GetAreaHeight() * TILEWIDTH;
-    dest.w = GetAreaWidth() * TILEWIDTH;
-    dest.h = BORDERWIDTH;
-    SDL_BlitSurface(frameAreaBottom, NULL, video, &dest);
-
 }
 
 /* функция реализующая алгоритм отрисовки нижних объектов одной клетки */
 void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
 
-    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
-    
-    if(ptrCell->animation) return;
-
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect dest;
 
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
     ICNHEADER  *icn = ptrCell->level1;
 
     // все нижние объекты
@@ -1866,8 +1517,8 @@ void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
 
 	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
 	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
-	dest.w = TILEWIDTH;
-	dest.h = TILEWIDTH;
+	dest.w = icn->surface->w;
+	dest.h = icn->surface->h;
 
         SDL_BlitSurface(icn->surface, NULL, video, &dest);
 
@@ -1875,8 +1526,75 @@ void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
     }
 }
 
+void DrawCellAreaMapsTile(Uint8 x, Uint8 y){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect dest;
+
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+
+    dest.x = BORDERWIDTH + x * TILEWIDTH;
+    dest.y = BORDERWIDTH + y * TILEWIDTH;
+    dest.w = TILEWIDTH;
+    dest.h = TILEWIDTH;
+
+    SDL_BlitSurface(ptrCell->tile, NULL, video, &dest);
+}
+
 /* функция реализующая алгоритм отрисовки монстров одной клетки */
 void DrawCellAreaMapsMonster(Uint8 x, Uint8 y){
+
+
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+
+    if(! ptrCell->monster) return;
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect dest, src;
+
+    // monster 1 кадр
+    dest.x = ptrCell->monster->rect[0].x + x * TILEWIDTH + TILEWIDTH;
+    dest.y = ptrCell->monster->rect[0].y + BORDERWIDTH + y * TILEWIDTH + MONSTERFIXTURE;
+    dest.w = ptrCell->monster->rect[0].w;
+    dest.h = ptrCell->monster->rect[0].h;
+
+    src = dest;
+    src.x = 0;
+    src.y = 0;
+
+    if(x == 0 && dest.x < BORDERWIDTH){
+	src.x += BORDERWIDTH - dest.x;
+	dest.x = BORDERWIDTH;
+    }else if(y == 0 && dest.y < BORDERWIDTH){
+	src.y += BORDERWIDTH - dest.y;
+	dest.y = BORDERWIDTH;
+    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+	src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
+    }
+
+    SDL_BlitSurface(ptrCell->monster->surface[0], &src, video, &dest);
+
+    // monster 2 кадр
+    dest.x = ptrCell->monster->rect[1].x + x * TILEWIDTH + TILEWIDTH;
+    dest.y = ptrCell->monster->rect[1].y + BORDERWIDTH + y * TILEWIDTH + MONSTERFIXTURE;
+    dest.w = ptrCell->monster->rect[1].w;
+    dest.h = ptrCell->monster->rect[1].h;
+
+    src = dest;
+    src.x = 0;
+    src.y = 0;
+
+    if(x == 0 && dest.x < BORDERWIDTH){
+	src.x += BORDERWIDTH - dest.x;
+	dest.x = BORDERWIDTH;
+    }else if(y == 0 && dest.y < BORDERWIDTH){
+	src.y += BORDERWIDTH - dest.y;
+	dest.y = BORDERWIDTH;
+    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+	src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
+    }
+
+    SDL_BlitSurface(ptrCell->monster->surface[1], &src, video, &dest);
 }
 
 /* функция реализующая алгоритм отрисовки первых 2 кадров анимации */
@@ -1888,65 +1606,45 @@ void DrawCellStaticAnimation(Uint8 x, Uint8 y){
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect dest;
-    ICNHEADER  *icn;
 
-    dest.w = TILEWIDTH;
-    dest.h = TILEWIDTH;
-    
+    DrawCellAreaMapsTile(x, y);
+
     // все нижние объекты
-    icn = ptrCell->level1;
-    while(icn){
-
-	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
-	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
-
-        SDL_BlitSurface(icn->surface, NULL, video, &dest);
-
-        icn = icn->next;
-    }
+    DrawCellAreaMapsLevel1(x, y);
 
     // анимация 1 кадр
     dest.x = ptrCell->animation->rect[0].x + BORDERWIDTH + x * TILEWIDTH;
     dest.y = ptrCell->animation->rect[0].y + BORDERWIDTH + y * TILEWIDTH;
+    dest.w = ptrCell->animation->rect[0].w;
+    dest.h = ptrCell->animation->rect[0].h;
     SDL_BlitSurface(ptrCell->animation->surface[0], NULL, video, &dest);
 
     // анимация 2 кадр
     dest.x = ptrCell->animation->rect[1].x + BORDERWIDTH + x * TILEWIDTH;
     dest.y = ptrCell->animation->rect[1].y + BORDERWIDTH + y * TILEWIDTH;
+    dest.w = ptrCell->animation->rect[0].w;
+    dest.h = ptrCell->animation->rect[0].h;
     SDL_BlitSurface(ptrCell->animation->surface[1], NULL, video, &dest);
 
     // все верхние объекты
-    icn = ptrCell->level2;
-    while(icn){
-
-	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
-	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
-
-        SDL_BlitSurface(icn->surface, NULL, video, &dest);
-
-        icn = icn->next;
-    }
+    DrawCellAreaMapsLevel2(x, y);
 }
 
 /* функция реализующая алгоритм отрисовки верхних объектов одной клетки */
 void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
 
-    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
-
-    if(ptrCell->animation) return;
-
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect dest;
 
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
     ICNHEADER  *icn = ptrCell->level2;
 
-    // все нижние объекты
     while(icn){
 
 	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
 	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
-	dest.w = TILEWIDTH;
-	dest.h = TILEWIDTH;
+	dest.w = icn->surface->w;
+	dest.h = icn->surface->h;
 
         SDL_BlitSurface(icn->surface, NULL, video, &dest);
 
@@ -1957,22 +1655,21 @@ void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
 Uint32 RedrawMapsAnimation(Uint32 interval, void *param){
 
     if(! GetIntValue(ANIMATION)) return interval;
+    if(! GetIntValue(ANIM2)) return interval;
 
     static Uint32 animationFrame = 0;
     Uint8 x, y;
 
     S_CELLMAPS	*ptrCell = NULL;
-    ICNHEADER	*icn = NULL;
+    S_ANIMATION *ptrFrame = NULL;
     SDL_Surface	*video = SDL_GetVideoSurface();
 
-    SDL_Rect dest;
+    SDL_Rect dest, src;
     Uint8 frame;
 
     Sint32 cx, cy;
 
     SDL_GetMouseState(&cx, &cy);
-    dest.w = TILEWIDTH;
-    dest.h = TILEWIDTH;
     
     for(y = 0; y < GetAreaHeight(); ++y)
 
@@ -1980,46 +1677,171 @@ Uint32 RedrawMapsAnimation(Uint32 interval, void *param){
 
 	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
 
-	    if(! ptrCell->animation) continue;
+	    if(! ptrCell->animation && ! ptrCell->monster) continue;
 
-	    dest.x = BORDERWIDTH + x * TILEWIDTH;
-	    dest.y = BORDERWIDTH + y * TILEWIDTH;
-	    
+	    dest.w = TILEWIDTH + CURSOR_WIDTH;
+	    dest.h = TILEWIDTH + CURSOR_HEIGHT;
+
 	    // если курсор над клеткой с анимацией то выключаем
+	    if(BORDERWIDTH + x * TILEWIDTH < CURSOR_WIDTH) dest.x = 0; else dest.x = BORDERWIDTH + x * TILEWIDTH - CURSOR_WIDTH;
+	    if(BORDERWIDTH + y * TILEWIDTH < CURSOR_HEIGHT) dest.y = 0; else dest.y = BORDERWIDTH + y * TILEWIDTH - CURSOR_HEIGHT;
 	    if(ValidPoint(&dest, cx, cy)) CursorOff();
 
 	    // TILE
-	    SDL_BlitSurface(ptrCell->tile, NULL, video, &dest);
-    
+	    DrawCellAreaMapsTile(x, y);
+
 	    // все нижние объекты
-	    icn = ptrCell->level1;
-	    while(icn){
+	    DrawCellAreaMapsLevel1(x, y);
 
-		dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
-		dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
 
-    		SDL_BlitSurface(icn->surface, NULL, video, &dest);
+	    // multi анимация
+	    if(ptrCell->animation){
 
-    		icn = icn->next;
+		ptrFrame = ptrCell->animation;
+		while(ptrFrame){
+	    
+		    frame = 1 + animationFrame % (ptrFrame->count - 1);
+		    dest.x = ptrFrame->rect[frame].x + BORDERWIDTH + x * TILEWIDTH;
+		    dest.y = ptrFrame->rect[frame].y + BORDERWIDTH + y * TILEWIDTH;
+		    dest.w = ptrFrame->rect[frame].w;
+		    dest.h = ptrFrame->rect[frame].h;
+		    SDL_BlitSurface(ptrFrame->surface[frame], NULL, video, &dest);
+
+		    ptrFrame = (S_ANIMATION *) ptrFrame->next;
+		}
+
+		if(OBJ_MOUNTS == ptrCell->type) DrawCellAreaMapsLevel1(x, y);
 	    }
 
-	    // анимация
-	    frame = 1 + animationFrame % (ptrCell->animation->count - 1);
-	    dest.x = ptrCell->animation->rect[frame].x + BORDERWIDTH + x * TILEWIDTH;
-	    dest.y = ptrCell->animation->rect[frame].y + BORDERWIDTH + y * TILEWIDTH;
-	    SDL_BlitSurface(ptrCell->animation->surface[frame], NULL, video, &dest);
+	    // monster анимация
+	    if(ptrCell->monster){
+
+		// перерисовать клетки
+		// справа - тень монстра
+		if(x){
+		    DrawCellAreaMapsTile(x - 1, y);
+		    DrawCellAreaMapsLevel1(x - 1, y);
+		    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x - 1);
+		    // multi анимация
+		    if(ptrCell->animation){
+			ptrFrame = ptrCell->animation;
+			while(ptrFrame){
+	    
+			    frame = 1 + animationFrame % (ptrFrame->count - 1);
+			    dest.x = ptrFrame->rect[frame].x + BORDERWIDTH + (x - 1) * TILEWIDTH;
+			    dest.y = ptrFrame->rect[frame].y + BORDERWIDTH + y * TILEWIDTH;
+			    dest.w = ptrFrame->rect[frame].w;
+			    dest.h = ptrFrame->rect[frame].h;
+			    SDL_BlitSurface(ptrFrame->surface[frame], NULL, video, &dest);
+
+			    ptrFrame = (S_ANIMATION *) ptrFrame->next;
+			}
+		    }
+		}
+		// слева - части монстра
+		if(x < GetAreaWidth() - 1){
+		    DrawCellAreaMapsTile(x + 1, y);
+		    DrawCellAreaMapsLevel1(x + 1, y);
+		    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x + 1);
+		    // multi анимация
+		    if(ptrCell->animation){
+			ptrFrame = ptrCell->animation;
+			while(ptrFrame){
+	    
+			    frame = 1 + animationFrame % (ptrFrame->count - 1);
+			    dest.x = ptrFrame->rect[frame].x + BORDERWIDTH + (x + 1) * TILEWIDTH;
+			    dest.y = ptrFrame->rect[frame].y + BORDERWIDTH + y * TILEWIDTH;
+			    dest.w = ptrFrame->rect[frame].w;
+			    dest.h = ptrFrame->rect[frame].h;
+			    SDL_BlitSurface(ptrFrame->surface[frame], NULL, video, &dest);
+
+			    ptrFrame = (S_ANIMATION *) ptrFrame->next;
+			}
+		    }
+		}
+		// сверху - части монстра
+		if(y){
+		    DrawCellAreaMapsTile(x, y - 1);
+		    DrawCellAreaMapsLevel1(x, y - 1);
+		    ptrCell = GetCELLMAPS((display.offsetY + y - 1) * GetWidthMaps() + display.offsetX + x);
+		    // multi анимация
+		    if(ptrCell->animation){
+			ptrFrame = ptrCell->animation;
+			while(ptrFrame){
+	    
+			    frame = 1 + animationFrame % (ptrFrame->count - 1);
+			    dest.x = ptrFrame->rect[frame].x + BORDERWIDTH + x * TILEWIDTH;
+			    dest.y = ptrFrame->rect[frame].y + BORDERWIDTH + (y - 1) * TILEWIDTH;
+			    dest.w = ptrFrame->rect[frame].w;
+			    dest.h = ptrFrame->rect[frame].h;
+			    SDL_BlitSurface(ptrFrame->surface[frame], NULL, video, &dest);
+
+			    ptrFrame = (S_ANIMATION *) ptrFrame->next;
+			}
+		    }
+		}
+
+		// основная клетка с монстром
+		ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+		ptrFrame = ptrCell->monster;
+		while(ptrFrame){
+		    dest.x = ptrFrame->rect[0].x + x * TILEWIDTH + TILEWIDTH;
+		    dest.y = ptrFrame->rect[0].y + BORDERWIDTH + y * TILEWIDTH + MONSTERFIXTURE;
+		    dest.w = ptrFrame->rect[0].w;
+		    dest.h = ptrFrame->rect[0].h;
+		    
+		    src = dest;
+		    src.x = 0;
+		    src.y = 0;
+
+		    if(x == 0 && dest.x < BORDERWIDTH){
+			src.x += BORDERWIDTH - dest.x;
+			dest.x = BORDERWIDTH;
+		    }else if(y == 0 && dest.y < BORDERWIDTH){
+			src.y += BORDERWIDTH - dest.y;
+			dest.y = BORDERWIDTH;
+		    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+		        src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
+		    }
+
+		    SDL_BlitSurface(ptrFrame->surface[0], &src, video, &dest);
+
+		    frame = 1 + animationFrame % (ptrFrame->count - 1);
+		    dest.x = ptrFrame->rect[frame].x + x * TILEWIDTH + TILEWIDTH;
+		    dest.y = ptrFrame->rect[frame].y + BORDERWIDTH + y * TILEWIDTH + MONSTERFIXTURE;
+		    dest.w = ptrFrame->rect[frame].w;
+		    dest.h = ptrFrame->rect[frame].h;
+		    
+		    src = dest;
+		    src.x = 0;
+		    src.y = 0;
+
+		    if(x == 0 && dest.x < BORDERWIDTH){
+			src.x += BORDERWIDTH - dest.x;
+			dest.x = BORDERWIDTH;
+		    }else if(y == 0 && dest.y < BORDERWIDTH){
+			src.y += BORDERWIDTH - dest.y;
+			dest.y = BORDERWIDTH;
+		    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+		        src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
+		    }
+
+		    SDL_BlitSurface(ptrFrame->surface[frame], &src, video, &dest);
+
+		    ptrFrame = (S_ANIMATION *) ptrFrame->next;
+		}
+
+		// перерисовать клетки
+		// справа - тень монстра
+		if(x) DrawCellAreaMapsLevel2(x - 1, y);
+		// слева - части монстра
+		if(x < GetAreaWidth() - 1) DrawCellAreaMapsLevel2(x + 1, y);
+		// сверху - части монстра
+		if(y) DrawCellAreaMapsLevel2(x, y - 1);
+	    }
 
 	    // все верхние объекты
-	    icn = ptrCell->level2;
-	    while(icn){
-
-		dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
-		dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
-
-    		SDL_BlitSurface(icn->surface, NULL, video, &dest);
-
-    		icn = icn->next;
-	    }
+	    DrawCellAreaMapsLevel2(x, y);
     }
 
     SDL_Flip(video);
@@ -2062,67 +1884,6 @@ Uint8 GetAreaHeight(void){
     return (video->h - 2 * BORDERWIDTH) / TILEWIDTH;
 }
 
-ACTION PreferencePressNewMap(void){
-
-    fprintf(stderr, "PreferencePressNewMap\n");
-    return NONE;
-}
-
-
-ACTION PreferencePressLoadMap(void){
-
-    fprintf(stderr, "PreferencePressLoadMap\n");
-    return NONE;
-}
-
-
-ACTION PreferencePressSaveMap(void){
-
-    fprintf(stderr, "PreferencePressSaveMap\n");
-    return NONE;
-}
-
-
-ACTION PreferencePressQuit(void){
-
-    return EXIT;
-}
-
-ACTION PreferencePressCancel(void){
-
-    return CANCEL;
-}
-
-ACTION OptionsClickAnimation(void){
-
-    fprintf(stderr, "OptionsClickAnimation\n");
-    return NONE;
-}
-
-ACTION OptionsClickCycling(void){
-
-    fprintf(stderr, "OptionsClickCycling\n");
-    return NONE;
-}
-
-ACTION OptionsClickGrid(void){
-
-    fprintf(stderr, "OptionsClickGrid\n");
-    return NONE;
-}
-
-ACTION OptionsClickCursor(void){
-
-    fprintf(stderr, "OptionsClickCursor\n");
-    return NONE;
-}
-
-ACTION OptionsClickOkay(void){
-
-    return OK;
-}
-
-
 ACTION ActionButtonHeroes(void){
 
     return NONE;
@@ -2150,17 +1911,618 @@ ACTION ActionButtonCloseDay(void){
 
 ACTION ActionButtonInfo(void){
 
-    return NONE;
+    SetIntValue(ANIM2, FALSE);
+    CursorOff();
+
+    // Сохраняем курсор
+    Uint32 cursor = GetCursor();    
+
+    AGGSPRITE sprite;
+    SDL_Rect rectCur, rectBack;
+
+    INTERFACEACTION action;
+    INTERFACEACTION *dialogInfo = NULL;
+
+    ACTION result = NONE;
+
+    SDL_Surface *format = NULL;
+    SDL_Surface *back = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    // фон панели cpanbkg
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "APANBKGE.ICN", 0) : FillSPRITE(&sprite, "APANBKG.ICN", 0);
+    SDL_Surface *image = GetICNSprite(&sprite);
+
+    Uint8 widthshadow = 16;
+    
+    // сохраняем background
+    rectBack.x = (video->w - image->w) / 2 - widthshadow;
+    rectBack.y = (video->h - image->h) / 2;
+    rectBack.w = image->w + widthshadow;
+    rectBack.h = image->h + widthshadow;
+    format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0);
+    back = SDL_DisplayFormat(format);
+    SDL_FreeSurface(format);
+    SDL_BlitSurface(video, &rectBack, back, NULL);
+
+    // по центру
+    rectCur = rectBack;
+    // картинка
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "APANBKGE.ICN", 0) : FillSPRITE(&sprite, "APANBKG.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + widthshadow;
+    rectCur.y = rectBack.y;
+    rectCur.w = image->w;
+    rectCur.h = image->h;    
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // world
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "APANELE.ICN", 0) : FillSPRITE(&sprite, "APANEL.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 78;
+    rectCur.y = rectBack.y + 30;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "APANELE.ICN", 0) : FillSPRITE(&action.objectUp, "APANEL.ICN", 0);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "APANELE.ICN", 1) : FillSPRITE(&action.objectPush, "APANEL.ICN", 1);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = InfoClickWorld;
+    AddActionEvent(&dialogInfo, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // puzzle
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "APANELE.ICN", 2) : FillSPRITE(&sprite, "APANEL.ICN", 2);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 211;
+    rectCur.y = rectBack.y + 30;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "APANELE.ICN", 2) : FillSPRITE(&action.objectUp, "APANEL.ICN", 2);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "APANELE.ICN", 3) : FillSPRITE(&action.objectPush, "APANEL.ICN", 3);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = InfoClickPuzzle;
+    AddActionEvent(&dialogInfo, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // info
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "APANELE.ICN", 4) : FillSPRITE(&sprite, "APANEL.ICN", 4);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 78;
+    rectCur.y = rectBack.y + 107;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "APANELE.ICN", 4) : FillSPRITE(&action.objectUp, "APANEL.ICN", 4);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "APANELE.ICN", 5) : FillSPRITE(&action.objectPush, "APANEL.ICN", 5);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = InfoClickInfo;
+    AddActionEvent(&dialogInfo, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // dig
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "APANELE.ICN", 6) : FillSPRITE(&sprite, "APANEL.ICN", 6);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 211;
+    rectCur.y = rectBack.y + 107;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "APANELE.ICN", 6) : FillSPRITE(&action.objectUp, "APANEL.ICN", 6);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "APANELE.ICN", 7) : FillSPRITE(&action.objectPush, "APANEL.ICN", 7);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = InfoClickDig;
+    AddActionEvent(&dialogInfo, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // cancel
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "APANELE.ICN", 8) : FillSPRITE(&sprite, "APANEL.ICN", 8);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 144;
+    rectCur.y = rectBack.y + 184;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "APANELE.ICN", 8) : FillSPRITE(&action.objectUp, "APANEL.ICN", 8);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "APANELE.ICN", 9) : FillSPRITE(&action.objectPush, "APANEL.ICN", 9);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = InfoClickCancel;
+    AddActionEvent(&dialogInfo, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // отрисовка диалога
+    SDL_Flip(video);
+
+    // Стандартный курсор
+    SetCursor(CURSOR_POINTER);
+
+    CursorOn();
+
+    // в цикл событий
+    result = ActionCycle(dialogInfo);
+
+    if(EXIT != result) result = NONE;
+
+    // востанавливаем background
+    CursorOff();
+
+    SDL_BlitSurface(back, NULL, video, &rectBack);
+    SDL_Flip(video);
+
+    FreeActionEvent(dialogInfo);
+    SDL_FreeSurface(back);
+
+    // Востанавливаем курсор
+    SetCursor(cursor);    
+
+    CursorOn();
+    SetIntValue(ANIM2, TRUE);
+
+    return result;
 }
 
-ACTION ActionButtonOptions(void){
+ACTION ActionButtonMenu(void){
 
-    return NONE;
+    SetIntValue(ANIM2, FALSE);
+    CursorOff();
+
+    // Сохраняем курсор
+    Uint32 cursor = GetCursor();    
+
+    AGGSPRITE sprite;
+    SDL_Rect rectCur, rectBack;
+
+    INTERFACEACTION action;
+    INTERFACEACTION *dialogMenu = NULL;
+
+    ACTION result = NONE;
+
+    SDL_Surface *format = NULL;
+    SDL_Surface *back = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    // фон панели cpanbkg
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "CPANBKGE.ICN", 0) : FillSPRITE(&sprite, "CPANBKG.ICN", 0);
+    SDL_Surface *image = GetICNSprite(&sprite);
+
+    Uint8 widthshadow = 16;
+    
+    // сохраняем background
+    rectBack.x = (video->w - image->w) / 2 - widthshadow;
+    rectBack.y = (video->h - image->h) / 2;
+    rectBack.w = image->w + widthshadow;
+    rectBack.h = image->h + widthshadow;
+    format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0);
+    back = SDL_DisplayFormat(format);
+    SDL_FreeSurface(format);
+    SDL_BlitSurface(video, &rectBack, back, NULL);
+
+    // по центру
+    rectCur = rectBack;
+    // картинка
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "CPANBKGE.ICN", 0) : FillSPRITE(&sprite, "CPANBKG.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + widthshadow;
+    rectCur.y = rectBack.y;
+    rectCur.w = image->w;
+    rectCur.h = image->h;    
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // new
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "CPANELE.ICN", 0) : FillSPRITE(&sprite, "CPANEL.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 78;
+    rectCur.y = rectBack.y + 31;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "CPANELE.ICN", 0) : FillSPRITE(&action.objectUp, "CPANEL.ICN", 0);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "CPANELE.ICN", 1) : FillSPRITE(&action.objectPush, "CPANEL.ICN", 1);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = MenuClickNew;
+    AddActionEvent(&dialogMenu, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // load
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "CPANELE.ICN", 2) : FillSPRITE(&sprite, "CPANEL.ICN", 2);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 211;
+    rectCur.y = rectBack.y + 31;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "CPANELE.ICN", 2) : FillSPRITE(&action.objectUp, "CPANEL.ICN", 2);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "CPANELE.ICN", 3) : FillSPRITE(&action.objectPush, "CPANEL.ICN", 3);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = MenuClickLoad;
+    AddActionEvent(&dialogMenu, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // save
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "CPANELE.ICN", 4) : FillSPRITE(&sprite, "CPANEL.ICN", 4);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 78;
+    rectCur.y = rectBack.y + 107;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "CPANELE.ICN", 4) : FillSPRITE(&action.objectUp, "CPANEL.ICN", 4);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "CPANELE.ICN", 5) : FillSPRITE(&action.objectPush, "CPANEL.ICN", 5);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = MenuClickSave;
+    AddActionEvent(&dialogMenu, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // quit
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "CPANELE.ICN", 6) : FillSPRITE(&sprite, "CPANEL.ICN", 6);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 211;
+    rectCur.y = rectBack.y + 107;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "CPANELE.ICN", 6) : FillSPRITE(&action.objectUp, "CPANEL.ICN", 6);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "CPANELE.ICN", 7) : FillSPRITE(&action.objectPush, "CPANEL.ICN", 7);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = MenuClickQuit;
+    AddActionEvent(&dialogMenu, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // cancel
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "CPANELE.ICN", 8) : FillSPRITE(&sprite, "CPANEL.ICN", 8);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 144;
+    rectCur.y = rectBack.y + 184;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "CPANELE.ICN", 8) : FillSPRITE(&action.objectUp, "CPANEL.ICN", 8);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "CPANELE.ICN", 9) : FillSPRITE(&action.objectPush, "CPANEL.ICN", 9);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = MenuClickCancel;
+    AddActionEvent(&dialogMenu, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // отрисовка диалога
+    SDL_Flip(video);
+
+    // Стандартный курсор
+    SetCursor(CURSOR_POINTER);
+
+    CursorOn();
+
+    // в цикл событий
+    result = ActionCycle(dialogMenu);
+
+    if(EXIT != result) result = NONE;
+
+    // востанавливаем background
+    CursorOff();
+
+    SDL_BlitSurface(back, NULL, video, &rectBack);
+    SDL_Flip(video);
+
+    FreeActionEvent(dialogMenu);
+    SDL_FreeSurface(back);
+
+    // Востанавливаем курсор
+    SetCursor(cursor);    
+
+    CursorOn();
+    SetIntValue(ANIM2, TRUE);
+
+    return result;
 }
 
 ACTION ActionButtonSettings(void){
 
-    return NONE;
+    SetIntValue(ANIM2, FALSE);
+    CursorOff();
+
+    // Сохраняем курсор
+    Uint32 cursor = GetCursor();    
+
+    AGGSPRITE sprite;
+    SDL_Rect rectCur, rectBack;
+
+    INTERFACEACTION action;
+    INTERFACEACTION *dialogSettings = NULL;
+
+    ACTION result = NONE;
+
+    SDL_Surface *format = NULL;
+    SDL_Surface *back = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    // фон панели spanbkg
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "SPANBKGE.ICN", 0) : FillSPRITE(&sprite, "SPANBKG.ICN", 0);
+    SDL_Surface *image = GetICNSprite(&sprite);
+
+    Uint8 widthshadow = 16;
+    
+    // сохраняем background
+    rectBack.x = (video->w - image->w) / 2 - widthshadow;
+    rectBack.y = (video->h - image->h) / 2;
+    rectBack.w = image->w + widthshadow;
+    rectBack.h = image->h + widthshadow;
+    format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0);
+    back = SDL_DisplayFormat(format);
+    SDL_FreeSurface(format);
+    SDL_BlitSurface(video, &rectBack, back, NULL);
+
+    // по центру
+    rectCur = rectBack;
+    // тень
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "SPANBKGE.ICN", 1) : FillSPRITE(&sprite, "SPANBKG.ICN", 1);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x;
+    rectCur.y = rectBack.y + widthshadow;
+    rectCur.w = image->w;
+    rectCur.h = image->h;    
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // картинка
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "SPANBKGE.ICN", 0) : FillSPRITE(&sprite, "SPANBKG.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + widthshadow;
+    rectCur.y = rectBack.y;
+    rectCur.w = image->w;
+    rectCur.h = image->h;    
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // music
+    FillSPRITE(&sprite, "SPANEL.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 52;
+    rectCur.y = rectBack.y + 47;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 0);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 1);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickMusic;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 67;
+    rectCur.y = rectBack.y + 34;
+    rectCur.w = FONT_WIDTHSMALL * 6;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Music", FONT_SMALL);
+
+    // sound
+    FillSPRITE(&sprite, "SPANEL.ICN", 2);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 144;
+    rectCur.y = rectBack.y + 47;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 2);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 3);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickSound;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 155;
+    rectCur.y = rectBack.y + 34;
+    rectCur.w = FONT_WIDTHSMALL * 8;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Effects", FONT_SMALL);
+
+    // type
+    FillSPRITE(&sprite, "SPANEL.ICN", 11);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 236;
+    rectCur.y = rectBack.y + 47;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 11);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 12);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickType;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 235;
+    rectCur.y = rectBack.y + 34;
+    rectCur.w = FONT_WIDTHSMALL * 12;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Music Type", FONT_SMALL);
+
+    // heroes speed
+    FillSPRITE(&sprite, "SPANEL.ICN", 6);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 52;
+    rectCur.y = rectBack.y + 157;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 6);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 7);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickHeroesSpeed;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 68;
+    rectCur.y = rectBack.y + 144;
+    rectCur.w = FONT_WIDTHSMALL * 6;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Speed", FONT_SMALL);
+
+    // enemy speed
+    FillSPRITE(&sprite, "SPANEL.ICN", 6);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 144;
+    rectCur.y = rectBack.y + 157;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 6);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 7);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickEnemySpeed;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 138;
+    rectCur.y = rectBack.y + 144;
+    rectCur.w = FONT_WIDTHSMALL * 14;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Enemy Speed", FONT_SMALL);
+
+    // path
+    FillSPRITE(&sprite, "SPANEL.ICN", 13);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 236;
+    rectCur.y = rectBack.y + 157;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 13);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 14);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickPath;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 236;
+    rectCur.y = rectBack.y + 144;
+    rectCur.w = FONT_WIDTHSMALL * 11;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Show Path", FONT_SMALL);
+
+    // interface
+    FillSPRITE(&sprite, "SPANEL.ICN", 16);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 52;
+    rectCur.y = rectBack.y + 267;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 16);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 17);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickInterface;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 58;
+    rectCur.y = rectBack.y + 254;
+    rectCur.w = FONT_WIDTHSMALL * 10;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Interface", FONT_SMALL);
+
+    // video
+    FillSPRITE(&sprite, "SPANEL.ICN", 18);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 144;
+    rectCur.y = rectBack.y + 267;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 18);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 19);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickVideo;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 160;
+    rectCur.y = rectBack.y + 254;
+    rectCur.w = FONT_WIDTHSMALL * 6;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Video", FONT_SMALL);
+
+    // cursor
+    FillSPRITE(&sprite, "SPANEL.ICN", 20);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 236;
+    rectCur.y = rectBack.y + 267;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SPANEL.ICN", 20);
+    FillSPRITE(&action.objectPush, "SPANEL.ICN", 21);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickCursor;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text
+    rectCur.x = rectBack.x + 228;
+    rectCur.y = rectBack.y + 254;
+    rectCur.w = FONT_WIDTHSMALL * 15;
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, "Mouse Cursor", FONT_SMALL);
+
+    // okay
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "SPANBTNE.ICN", 0) : FillSPRITE(&sprite, "SPANBTN.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 129;
+    rectCur.y = rectBack.y + 361;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectUp, "SPANBTNE.ICN", 0) : FillSPRITE(&action.objectUp, "SPANBTN.ICN", 0);
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&action.objectPush, "SPANBTNE.ICN", 1) : FillSPRITE(&action.objectPush, "SPANBTN.ICN", 1);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = SettingsClickOkay;
+    AddActionEvent(&dialogSettings, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // отрисовка диалога
+    SDL_Flip(video);
+
+    // Стандартный курсор
+    SetCursor(CURSOR_POINTER);
+
+    CursorOn();
+
+    // в цикл событий
+    result = ActionCycle(dialogSettings);
+
+    if(EXIT != result) result = NONE;
+
+    // востанавливаем background
+    CursorOff();
+
+    SDL_BlitSurface(back, NULL, video, &rectBack);
+    SDL_Flip(video);
+
+    FreeActionEvent(dialogSettings);
+    SDL_FreeSurface(back);
+
+    // Востанавливаем курсор
+    SetCursor(cursor);    
+
+    CursorOn();
+    SetIntValue(ANIM2, TRUE);
+
+    return result;
 }
 
 ACTION ActionScrollHeroesUp(void){
@@ -2322,3 +2684,106 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
 
     return exit;
 }
+
+ACTION InfoClickWorld(void){
+
+    return NONE;
+}
+
+ACTION InfoClickPuzzle(void){
+
+    return NONE;
+}
+
+ACTION InfoClickInfo(void){
+
+    return NONE;
+}
+
+ACTION InfoClickDig(void){
+
+    return NONE;
+}
+
+ACTION InfoClickCancel(void){
+
+    return CANCEL;
+}
+
+ACTION MenuClickNew(void){
+
+    return NONE;
+}
+
+ACTION MenuClickLoad(void){
+
+    return NONE;
+}
+
+ACTION MenuClickSave(void){
+
+    return NONE;
+}
+
+ACTION MenuClickQuit(void){
+
+    return EXIT;
+}
+
+ACTION MenuClickCancel(void){
+
+    return CANCEL;
+}
+
+ACTION SettingsClickMusic(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickSound(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickType(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickHeroesSpeed(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickEnemySpeed(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickPath(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickInterface(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickVideo(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickCursor(void){
+
+    return NONE;
+}
+
+ACTION SettingsClickOkay(void){
+
+    fprintf(stderr, "save options\n");
+
+    return OK;
+}
+

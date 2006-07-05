@@ -46,10 +46,14 @@ void	ShowNewStandardGame(void);
 void	SelectCursorRestoreBackground(void);
 void	SelectCursorSaveBackground(SDL_Rect *);
 
+void    DrawMapsOpponents(void);
+void    DrawMapsClass(void);
+
 ACTION	ActionPressNewStandardSelect(void);
 ACTION	ActionPressNewStandardOkay(void);
 ACTION	ActionPressNewStandardCancel(void);
 
+ACTION	ActionSelectDifficulty(E_GAMELEVEL);
 ACTION	ActionSelectDifficultyEasy(void);
 ACTION	ActionSelectDifficultyNormal(void);
 ACTION	ActionSelectDifficultyHard(void);
@@ -299,7 +303,7 @@ void ShowNewStandardGame(void){
     // основные надписи
     
     // Scenario
-    dest.x = 360;
+    dest.x = 376;
     dest.y = 53;
     dest.w = FONT_WIDTHBIG * 10;
     dest.h = FONT_HEIGHTBIG;
@@ -374,17 +378,303 @@ ACTION ActionPressNewStandardSelect(void){
     FreeObject("REQSBKG.ICN");
 
     ShowNewStandardGame();
+
+    DrawMapsOpponents();
+    DrawMapsClass();
+
     ActionSelectDifficultyNormal();
 
     return NONE;
 }
 
+void DrawMapsOpponents(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+
+    AGGSPRITE sprite;
+    Uint8 seek = 0;
+    
+    // text
+    dest.x = 368;
+    dest.y = 210;
+    dest.w = FONT_WIDTHBIG * 11;
+    dest.h = FONT_HEIGHTBIG;
+    PrintText(video, &dest, "Opponents:", FONT_BIG);
+
+    if(GetIntValue(KINGDOMCOLORS) & BLUE){
+
+	seek = 0;
+
+	GetIntValue(ALLOWCOLORS) & BLUE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 230;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & GREEN){
+
+	seek = 1;
+
+	GetIntValue(ALLOWCOLORS) & GREEN ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 230;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & RED){
+
+	seek = 2;
+
+	GetIntValue(ALLOWCOLORS) & RED ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 230;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & YELLOW){
+
+	seek = 3;
+
+	GetIntValue(ALLOWCOLORS) & YELLOW ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 230;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & ORANGE){
+
+	seek = 4;
+
+	GetIntValue(ALLOWCOLORS) & ORANGE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 230;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & PURPLE){
+
+	seek = 5;
+
+	GetIntValue(ALLOWCOLORS) & PURPLE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 230;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+}
+
+void DrawMapsClass(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+
+    AGGSPRITE sprite;
+    Uint8 seek = 0;
+    
+    // text
+    dest.x = 386;
+    dest.y = 284;
+    dest.w = FONT_WIDTHBIG * 7;
+    dest.h = FONT_HEIGHTBIG;
+    PrintText(video, &dest, "Class:", FONT_BIG);
+
+    if(GetIntValue(KINGDOMCOLORS) & BLUE){
+
+	seek = 0;
+
+	if(GetIntValue(RNDCOLORS) & BLUE)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+
+	else if(GetIntValue(ALLOWCOLORS) & BLUE)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
+
+	else
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
+
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 308;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & GREEN){
+
+	seek = 1;
+
+	if(GetIntValue(RNDCOLORS) & GREEN)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+
+	else if(GetIntValue(ALLOWCOLORS) & GREEN)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
+
+	else
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
+
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 308;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & RED){
+
+	seek = 2;
+
+	if(GetIntValue(RNDCOLORS) & RED)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+
+	else if(GetIntValue(ALLOWCOLORS) & RED)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
+
+	else
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
+
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 308;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & YELLOW){
+
+	seek = 3;
+
+	if(GetIntValue(RNDCOLORS) & YELLOW)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+
+	else if(GetIntValue(ALLOWCOLORS) & YELLOW)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
+
+	else
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
+
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 308;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & ORANGE){
+
+	seek = 4;
+
+	if(GetIntValue(RNDCOLORS) & ORANGE)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+
+	else if(GetIntValue(ALLOWCOLORS) & ORANGE)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
+
+	else
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
+
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 308;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+    if(GetIntValue(KINGDOMCOLORS) & PURPLE){
+
+	seek = 5;
+
+	if(GetIntValue(RNDCOLORS) & PURPLE)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+
+	else if(GetIntValue(ALLOWCOLORS) & PURPLE)
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
+
+	else
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
+
+	image = GetICNSprite(&sprite);
+
+	dest.x = 225 + seek * image->w;
+	dest.y = 308;
+	dest.w = image->w;
+	dest.h = image->h;
+
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+    }
+}
+
 ACTION ActionPressNewStandardOkay(void){
 
-    if(strlen(GetStrValue(FILEMAPSPATH))){
+    if(strlen(GetStrValue(FILEMAPSPATH)))
 
 	return InitMaps(GetStrValue(FILEMAPSPATH));
-    }else
+    else
 	return NONE;
 }
 
@@ -395,126 +685,46 @@ ACTION ActionPressNewStandardCancel(void){
 
 ACTION ActionSelectDifficultyEasy(void){
 
-    AGGSPRITE sprite;
-    SDL_Surface *image = NULL;
-
-    SDL_Rect rect;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    
-    FillSPRITE(&sprite, "NGEXTRA.ICN", 62);
-    image = GetICNSprite(&sprite);
-    rect.x = 225;
-    rect.y = 124;
-    rect.w = image->w;
-    rect.h = image->h;
-    
-    CursorOff();
-
-    SelectCursorRestoreBackground();
-
-    SelectCursorSaveBackground(&rect);
-    
-    SDL_BlitSurface(image, NULL, video, &rect);
-
-    SDL_Flip(video);
-
-    CursorOn();
+    ActionSelectDifficulty(GAME_EASY);
+    SetIntValue(GAMEDIFFICULTY, GAME_EASY);
 
     return NONE;
 }
 
 ACTION ActionSelectDifficultyNormal(void){
 
-    AGGSPRITE sprite;
-    SDL_Surface *image = NULL;
-
-    SDL_Rect rect;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    
-    FillSPRITE(&sprite, "NGEXTRA.ICN", 62);
-    image = GetICNSprite(&sprite);
-    rect.x = 302;
-    rect.y = 124;
-    rect.w = image->w;
-    rect.h = image->h;
-    
-    CursorOff();
-
-    SelectCursorRestoreBackground();
-
-    SelectCursorSaveBackground(&rect);
-    
-    SDL_BlitSurface(image, NULL, video, &rect);
-
-    SDL_Flip(video);
-
-    CursorOn();
+    ActionSelectDifficulty(GAME_NORMAL);
+    SetIntValue(GAMEDIFFICULTY, GAME_NORMAL);
 
     return NONE;
 }
 
 ACTION ActionSelectDifficultyHard(void){
 
-    AGGSPRITE sprite;
-    SDL_Surface *image = NULL;
-
-    SDL_Rect rect;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    
-    FillSPRITE(&sprite, "NGEXTRA.ICN", 62);
-    image = GetICNSprite(&sprite);
-    rect.x = 378;
-    rect.y = 124;
-    rect.w = image->w;
-    rect.h = image->h;
-    
-    CursorOff();
-
-    SelectCursorRestoreBackground();
-
-    SelectCursorSaveBackground(&rect);
-    
-    SDL_BlitSurface(image, NULL, video, &rect);
-
-    SDL_Flip(video);
-
-    CursorOn();
+    ActionSelectDifficulty(GAME_HARD);
+    SetIntValue(GAMEDIFFICULTY, GAME_HARD);
 
     return NONE;
 }
 
 ACTION ActionSelectDifficultyExpert(void){
 
-    AGGSPRITE sprite;
-    SDL_Surface *image = NULL;
-
-    SDL_Rect rect;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    
-    FillSPRITE(&sprite, "NGEXTRA.ICN", 62);
-    image = GetICNSprite(&sprite);
-    rect.x = 455;
-    rect.y = 124;
-    rect.w = image->w;
-    rect.h = image->h;
-    
-    CursorOff();
-
-    SelectCursorRestoreBackground();
-
-    SelectCursorSaveBackground(&rect);
-    
-    SDL_BlitSurface(image, NULL, video, &rect);
-
-    SDL_Flip(video);
-
-    CursorOn();
+    ActionSelectDifficulty(GAME_EXPERT);
+    SetIntValue(GAMEDIFFICULTY, GAME_EXPERT);
 
     return NONE;
 }
 
 ACTION ActionSelectDifficultyImpossible(void){
 
+    ActionSelectDifficulty(GAME_IMPOSSIBLE);
+    SetIntValue(GAMEDIFFICULTY, GAME_IMPOSSIBLE);
+
+    return NONE;
+}
+
+ACTION ActionSelectDifficulty(E_GAMELEVEL level){
+
     AGGSPRITE sprite;
     SDL_Surface *image = NULL;
 
@@ -523,10 +733,33 @@ ACTION ActionSelectDifficultyImpossible(void){
     
     FillSPRITE(&sprite, "NGEXTRA.ICN", 62);
     image = GetICNSprite(&sprite);
-    rect.x = 532;
-    rect.y = 124;
     rect.w = image->w;
     rect.h = image->h;
+    rect.y = 124;
+
+    switch(level){
+    
+	default:
+	case GAME_EASY:
+	    rect.x = 225;
+	    break;
+	
+	case GAME_NORMAL:
+	    rect.x = 302;
+	    break;
+
+	case GAME_HARD:
+	    rect.x = 378;
+	    break;
+
+	case GAME_EXPERT:
+	    rect.x = 455;
+	    break;
+
+	case GAME_IMPOSSIBLE:
+	    rect.x = 532;
+	    break;
+    }
     
     CursorOff();
 

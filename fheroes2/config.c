@@ -31,76 +31,47 @@
 #include "gamedefs.h"
 #include "config.h"
 
-#define MAXSTRLEN 255
+#define MAXSTRLEN 256
 
 typedef struct {
     char 	valueStr[MAXSTRLEN];
     Uint8	valueInt;
 } CONFIGDESC;
 
-static CONFIGDESC settings[CONFIGEND];
+static CONFIGDESC settings[CONFIGEND] = {
+    { "heroes2.agg",	0 },		// AGGFILE
+    { "maps", 		0 },		// DIRECTORYMAPS
+    { "off",		FALSE },	// DEBUG
+    { "off",		FALSE },	// SOUND
+    { "off", 		FALSE },	// MUSIC
+    { "off",		FALSE },	// ANIMATION
+    { "\0", 		30 },		// ANIMATIONDELAY
+    { "off", 		FALSE },	// FULLSCREEN
+    { "off", 		FALSE },	// EVILINTERFACE
+    { "640x480", 	0 },		// VIDEOMODE
+    { "\0", 		0 },		// LIMITMEMORY
+
+    { "\0", 		0 },		// FILEMAPSPATH
+    { "\0",		0 },		// MAPSLONGNAME
+    { "\0",		0 },		// MAPSDESCRIPTION
+    { "\0",		0 },		// MAPSDIFFICULTY
+    { "\0",		0 },		// GAMEDIFFICULTY
+    { "\0",		0 },		// VICTORYCONDITIONS
+    { "\0",		0 },		// LOSSCONDITIONS
+    { "\0",		0 },		// KINGDOMCOLORS
+    { "\0",		0 },		// ALLOWCOLORS
+    { "\0",		0 },		// RNDCOLORS
+    { "\0",		0 },		// HUMANCOLORS
+
+    { "on",		TRUE },		// ANIM1
+    { "on",		TRUE },		// ANIM2
+};
 
 void InitConfig(const char * configFile){
 
     FILE	*fd;
     char	str[1024], c, *s1, *s2, *e;
     Uint32	value = 0;
-
-    // изменяемые настройки игры
-    strcpy(settings[AGGFILE].valueStr, "heroes2.agg");
-    settings[AGGFILE].valueInt	= 0;
-
-    strcpy(settings[DIRECTORYMAPS].valueStr, "maps");
-    settings[DIRECTORYMAPS].valueInt = 0;
-
-    strcpy(settings[DEBUG].valueStr, "off");
-    settings[DEBUG].valueInt = FALSE;
-
-    strcpy(settings[SOUND].valueStr, "off");
-    settings[SOUND].valueInt = FALSE;
-
-    strcpy(settings[MUSIC].valueStr, "off");
-    settings[MUSIC].valueInt = FALSE;
-
-    strcpy(settings[ANIMATION].valueStr, "off");
-    settings[ANIMATION].valueInt = FALSE;
-
-    strcpy(settings[ANIMATIONDELAY].valueStr, "");
-    settings[ANIMATIONDELAY].valueInt = 100;
-
-    strcpy(settings[FULLSCREEN].valueStr, "off");
-    settings[FULLSCREEN].valueInt = FALSE;
-
-    strcpy(settings[EVILINTERFACE].valueStr, "off");
-    settings[EVILINTERFACE].valueInt = FALSE;
-
-    strcpy(settings[VIDEOMODE].valueStr, "640x480");
-    settings[VIDEOMODE].valueInt = 0;
-
-    strcpy(settings[LIMITMEMORY].valueStr, "");
-    settings[LIMITMEMORY].valueInt = 0;
-
-    // служебные параметры сценария карты
-    strcpy(settings[FILEMAPSPATH].valueStr, "");// здесь хранится полный путь к выбранному файлу карты игры
-    settings[FILEMAPSPATH].valueInt = 0;	// здесь хранится полный путь к выбранному файлу карты игры
-
-    strcpy(settings[MAPSLONGNAME].valueStr, "");// название карты
-    settings[MAPSLONGNAME].valueInt = 0;	// название карты
-
-    strcpy(settings[MAPSDESCRIPTION].valueStr, "");// описание сценария карты
-    settings[MAPSDESCRIPTION].valueInt = 0;	   // описание сценария карты
-
-    strcpy(settings[MAPSDIFFICULTY].valueStr, "");// сложность карты
-    settings[MAPSDIFFICULTY].valueInt = 0;	  // сложность карты
-
-    strcpy(settings[GAMEDIFFICULTY].valueStr, "");// сложность игры
-    settings[GAMEDIFFICULTY].valueInt = 0;	  // сложность игры
-
-    strcpy(settings[VICTORYCONDITIONS].valueStr, "");// условия победы
-    settings[VICTORYCONDITIONS].valueInt = 0;	     // условия победы
-
-    strcpy(settings[LOSSCONDITIONS].valueStr, "");   // условия поражения
-    settings[LOSSCONDITIONS].valueInt = 0;	     // условия поражения
 
     // открытие файла конфигурации
     if(NULL == (fd = fopen(configFile, "r"))){
@@ -222,6 +193,10 @@ void SetIntValue(E_CONFIG key, Uint8 value){
 	case FULLSCREEN:
 	case EVILINTERFACE:
 	case ANIMATION:
+	//
+	case ANIM1:
+	case ANIM2:
+
 
 	    if(FALSE == value){
 		settings[key].valueInt = FALSE;
@@ -263,6 +238,10 @@ void SetIntValue(E_CONFIG key, Uint8 value){
 	case GAMEDIFFICULTY:
 	case VICTORYCONDITIONS:
 	case LOSSCONDITIONS:
+	case KINGDOMCOLORS:
+	case ALLOWCOLORS:
+	case RNDCOLORS:
+	case HUMANCOLORS:
 	case ANIMATIONDELAY:
 	case LIMITMEMORY:
 

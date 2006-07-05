@@ -50,6 +50,8 @@ typedef struct{
 } S_OLDOBJECT2;
 
 void ShowNewLoadQuit(void);
+Uint32  RedrawMenuAnimation(Uint32, void *);
+
 ACTION ActionPressNewGame(void);
 ACTION ActionPressLoadGame(void);
 ACTION ActionPressQuitGame(void);
@@ -58,6 +60,8 @@ ACTION ActionPressHighScores(void);
 
 INTERFACEACTION *sthemain = NULL;
 S_ANIMATION	*stheanim = NULL;
+
+SDL_TimerID     timerAnime1 = NULL;
 
 ACTION DrawNewLoadQuit(void){
 
@@ -258,6 +262,9 @@ ACTION DrawNewLoadQuit(void){
     // отображаем всю картинку
     ShowNewLoadQuit();
 
+    // включаем анимацию
+    timerAnime1 = SDL_AddTimer(GetIntValue(ANIMATIONDELAY) * 10, RedrawMenuAnimation, NULL);
+
     // цикл событий
     SDL_Event event;
     SDL_Surface *video = SDL_GetVideoSurface();;
@@ -392,12 +399,12 @@ ACTION DrawNewLoadQuit(void){
     		    break;
 	    }
 
-//	RedrawAllAnimation(stheanim);
-
 	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
     }
 
     // освобождаем данные
+    SDL_RemoveTimer(timerAnime1);
+
     FreeAnimationEvent(stheanim);
     FreeActionEvent(sthemain);
     
@@ -457,7 +464,11 @@ ACTION ActionPressNewGame(){
     PreloadObject("BTNNEWGM.ICN");
     PreloadObject("REDBACK.ICN");
 
+    SetIntValue(ANIM1, FALSE);
+
     if(EXIT == DrawNewSelectGame()) return EXIT;
+
+    SetIntValue(ANIM1, TRUE);
     
     ShowNewLoadQuit();
 
@@ -469,7 +480,11 @@ ACTION ActionPressLoadGame(){
     PreloadObject("BTNNEWGM.ICN");
     PreloadObject("REDBACK.ICN");
 
+    SetIntValue(ANIM1, FALSE);
+
     if(EXIT == DrawLoadSelectGame()) return EXIT;
+
+    SetIntValue(ANIM1, TRUE);
 
     ShowNewLoadQuit();
 
@@ -477,6 +492,8 @@ ACTION ActionPressLoadGame(){
 }
 
 ACTION ActionPressQuitGame(){
+
+    SetIntValue(ANIM1, FALSE);
 
     return EXIT;
 }
@@ -489,4 +506,36 @@ ACTION ActionPressCredits(void){
 ACTION ActionPressHighScores(void){
 
     return NONE;
+}
+
+Uint32  RedrawMenuAnimation(Uint32 interval, void *param){
+
+    if(! GetIntValue(ANIMATION)) return interval;
+    if(! GetIntValue(ANIM1)) return interval;
+
+    static Uint32 animationFrame = 0;
+ 
+    Sint32 x; 
+    Sint32 y; 
+     
+    SDL_Surface *video = SDL_GetVideoSurface(); 
+    SDL_GetMouseState(&x, &y); 
+    S_ANIMATION *ptr = stheanim; 
+ 
+    while(ptr){ 
+ 
+        if(ValidPoint(&ptr->rect[animationFrame % ptr->count], x, y)) CursorOff(); 
+ 
+        SDL_BlitSurface(ptr->surface[animationFrame % ptr->count], NULL, video, &ptr->rect[animationFrame % ptr->count]); 
+
+        CursorOn(); 
+        ptr = ptr->next; 
+    } 
+ 
+    SDL_Flip(video); 
+    SDL_Delay(GetIntValue(ANIMATIONDELAY));     
+
+    ++animationFrame;
+    
+     return interval;
 }

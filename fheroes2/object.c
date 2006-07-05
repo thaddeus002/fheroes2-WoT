@@ -67,7 +67,7 @@ ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index){
 	case 0x31:
 	case 0x32:
 	case 0x33:
-	    FillSPRITE(&sprite, "MONS32.ICN", index);
+	    return NULL;
 	    break;
 
 	// флажок возле замка
@@ -213,7 +213,10 @@ ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index){
 	case 0xA1:
 	case 0xA2:
 	case 0xA3:
-	    FillSPRITE(&sprite, "OBJNWAT2.ICN", index);
+	    if(0x17 == index)
+		FillSPRITE(&sprite, "BOAT32.ICN", 18);
+	    else
+		FillSPRITE(&sprite, "OBJNWAT2.ICN", index);
 	    break;
 
 	// объекты на земле №2
@@ -381,12 +384,7 @@ ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index){
 BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 
     S_CELLMAPS *maps = (S_CELLMAPS *) ptr;
-/*
-    if(maps->animation){
-	if(GetIntValue(DEBUG)) fprintf(stderr, "StoreAnimationFrame: multi frame: x: %d, y: %d\n", maps->ax ,maps->ay);
-	return FALSE;
-    }
-*/
+
     AGGSPRITE sprite;
     SDL_Rect  src;
     ICNHEADER *info = NULL;
@@ -397,6 +395,19 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
     src.h = 0;
     
     switch(type){
+
+	// монстры
+	case 0x30:
+	case 0x31:
+	case 0x32:
+	case 0x33:
+
+	    FillSPRITE(&sprite, "MINIMON.ICN", index * 9);
+	    info = GetICNHeader(&sprite);
+
+	    AddAnimationEvent(&maps->monster, &src, info, 7);
+
+	    break;
 
 	// объекты на море
 	case 0xC8:
@@ -666,7 +677,7 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 	    }
 
 	    break;
-/*
+
 	// объекты на lava
 	case 0xF0:
 	case 0xF1:
@@ -675,7 +686,7 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 
 	    switch(index){
 
-		// вулкан (7)
+		// средний вулкан (7)
 		case 0x00:
 		// тень
 		case 0x07:
@@ -690,52 +701,19 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 
 		    break;
 
-		// дым (5)
+		// маленький вулкан (11)
+		// дым
 		case 0x21:
-		case 0x27:
-
-		    maps->frame = 5;
-		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
-			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
-			return FALSE;
-		    }
-
-		    
-		    for(i = 0; i < maps->frame; ++i){
-		    
-			FillSPRITE(&sprite, "OBJNLAV2.ICN", index + (i % maps->frame) + 1);
-			info = GetICNHeader(&sprite);
-
-			maps->animation[i].offsetX = info->offsetX;
-			maps->animation[i].offsetY = info->offsetY;
-			maps->animation[i].surface = info->surface;
-			maps->animation[i].next = NULL;
-		    }
-		    break;
-
-		// тень от дыма (4)
 		case 0x2C:
-		//case 0x32:
+		// лава
 		case 0x37:
-		//case 0x3C:
+		case 0x43:
 
-		    maps->frame = 4;
-		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
-			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
-			return FALSE;
-		    }
+		    FillSPRITE(&sprite, "OBJNLAV2.ICN", index);
+		    info = GetICNHeader(&sprite);
 
-		    
-		    for(i = 0; i < maps->frame; ++i){
-		    
-			FillSPRITE(&sprite, "OBJNLAV2.ICN", index + (i % maps->frame) + 1);
-			info = GetICNHeader(&sprite);
+		    AddAnimationEvent(&maps->animation, &src, info, 11);
 
-			maps->animation[i].offsetX = info->offsetX;
-			maps->animation[i].offsetY = info->offsetY;
-			maps->animation[i].surface = info->surface;
-			maps->animation[i].next = NULL;
-		    }
 		    break;
 
 		default:
@@ -754,26 +732,31 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 	    // большой вулкан
 	    switch(index){
 
-//		case 0x00:
-//
-//		    maps->frame = 6;
-//		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
-//			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
-//			return FALSE;
-//		    }
-//
-//		    
-//		    for(i = 0; i < maps->frame; ++i){
-//		    
-//			FillSPRITE(&sprite, "OBJNLAV3.ICN", index + (i % maps->frame) + 1);
-//			info = GetICNHeader(&sprite);
-//
-//			maps->animation[i].offsetX = info->offsetX;
-//			maps->animation[i].offsetY = info->offsetY;
-//			maps->animation[i].surface = info->surface;
-//			maps->animation[i].next = NULL;
-//		    }
-//		    break;
+		// дым лавы
+		case 0x00:
+		case 0x0F:
+		case 0x1E:
+		case 0x2D:
+		case 0x3C:
+		case 0x4B:
+		case 0x5A:
+		case 0x69:
+		case 0x87:
+		case 0x96:
+		case 0xA5:
+		// тень
+		case 0x78:
+		case 0xB4:
+		case 0xC3:
+		case 0xD2:
+		case 0xE1:
+
+		    FillSPRITE(&sprite, "OBJNLAV3.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 15);
+
+		    break;
 
 		default:
 		    return FALSE;
@@ -790,27 +773,16 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 
 	    switch(index){
 
-		// дым лавы (9)
+		// дым лавы (10)
+		case 0x4F:
 		case 0x58:
 		case 0x62:
 
-		    maps->frame = 8;
-		    if(NULL == (maps->animation = malloc(maps->frame * sizeof(ICNHEADER)))){
-			fprintf(stderr, "StoreAnimationFrame: error malloc: %d\n", maps->frame * sizeof(ICNHEADER));
-			return FALSE;
-		    }
+		    FillSPRITE(&sprite, "OBJNLAVA.ICN", index);
+		    info = GetICNHeader(&sprite);
 
-		    
-		    for(i = 0; i < maps->frame; ++i){
-		    
-			FillSPRITE(&sprite, "OBJNLAVA.ICN", index + (i % maps->frame) + 1);
-			info = GetICNHeader(&sprite);
+		    AddAnimationEvent(&maps->animation, &src, info, 10);
 
-			maps->animation[i].offsetX = info->offsetX;
-			maps->animation[i].offsetY = info->offsetY;
-			maps->animation[i].surface = info->surface;
-			maps->animation[i].next = NULL;
-		    }
 		    break;
 
 		default:
@@ -819,7 +791,7 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 	    }
 	    
 	break;
-*/
+
 	// объекты на земле №2
 	case 0xA4:
 	case 0xA5:
@@ -883,15 +855,23 @@ BOOL StoreAnimationFrame(Uint8 type, Uint8 index, void *ptr){
 		// тень
 		case 0x0F:
 		case 0x19:
+
+		    FillSPRITE(&sprite, "OBJNMULT.ICN", index);
+		    info = GetICNHeader(&sprite);
+
+		    AddAnimationEvent(&maps->animation, &src, info, 10);
+
+		    break;
+
 		// дым
-		case 0x23:
+		case 0x24:
 		// тень
 		case 0x2D:
 
 		    FillSPRITE(&sprite, "OBJNMULT.ICN", index);
 		    info = GetICNHeader(&sprite);
 
-		    AddAnimationEvent(&maps->animation, &src, info, 10);
+		    AddAnimationEvent(&maps->animation, &src, info, 9);
 
 		    break;
 
