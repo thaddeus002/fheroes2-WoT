@@ -104,8 +104,6 @@ ACTION SettingsClickOkay(void);
 INTERFACEACTION *stpemaindisplay = NULL;
 
 SDL_Surface	*backgroundArea = NULL;
-SDL_Surface	*frameAreaLeft = NULL;
-SDL_Surface	*frameAreaBottom = NULL;
 
 SDL_TimerID	timerAnime = NULL;
 
@@ -563,9 +561,7 @@ ACTION DrawMainDisplay(){
     FreeRadar();
 
     if(backgroundArea) SDL_FreeSurface(backgroundArea);
-    if(frameAreaLeft) SDL_FreeSurface(frameAreaLeft);
-    if(frameAreaBottom) SDL_FreeSurface(frameAreaBottom);
-    
+
     return result;
 }
 
@@ -573,7 +569,6 @@ void ShowStaticMainDisplay(void){
 
     SDL_Surface *video = NULL;
     SDL_Surface *image = NULL;
-    SDL_Surface *formatSurface = NULL;
     SDL_Rect dst, src;
 
     AGGSPRITE sprite;
@@ -1180,42 +1175,6 @@ void ShowStaticMainDisplay(void){
 	
 	default:
 	    break;
-    }
-
-    // сохраняем рамку (левую) для перерисовки поверх всех
-    if(NULL == frameAreaLeft){
-	src.x = BORDERWIDTH + GetAreaWidth() * TILEWIDTH;
-	src.y = BORDERWIDTH;
-	src.w = BORDERWIDTH;
-	src.h = GetAreaWidth() * TILEWIDTH;
-
-	if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, src.w, src.h, 16, 0, 0, 0, 0))){
-	    fprintf(stderr, "RedrawMapsArea: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), src.w, src.h);
-	    return;
-	}
-
-	SDL_BlitSurface(video, &src, formatSurface, NULL);
-	
-	frameAreaLeft = SDL_DisplayFormat(formatSurface);
-	SDL_FreeSurface(formatSurface);
-    }
-
-    // сохраняем рамку (нижнюю) для перерисовки поверх всех
-    if(NULL == frameAreaBottom){
-	src.x = BORDERWIDTH;
-	src.y = BORDERWIDTH + GetAreaHeight() * TILEWIDTH;
-	src.w = GetAreaHeight() * TILEWIDTH;
-	src.h = BORDERWIDTH;
-
-	if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, src.w, src.h, 16, 0, 0, 0, 0))){
-	    fprintf(stderr, "RedrawMapsArea: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), src.w, src.h);
-	    return;
-	}
-
-	SDL_BlitSurface(video, &src, formatSurface, NULL);
-
-	frameAreaBottom = SDL_DisplayFormat(formatSurface);
-	SDL_FreeSurface(formatSurface);
     }
 
     // динамические элементы

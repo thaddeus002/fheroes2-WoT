@@ -42,8 +42,8 @@ typedef struct {
 } AGGSPRITE;
 
 typedef struct {
-    Uint16      offsetX;
-    Uint16      offsetY;
+    Sint16      offsetX;
+    Sint16      offsetY;
     SDL_Surface *surface;
     void        *next;
 } ICNHEADER;

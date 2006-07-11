@@ -33,14 +33,15 @@
 
 BOOL ValidPoint(SDL_Rect *rect, Uint16 x, Uint16 y){
 
-    if(x >= rect->x && x <= rect->x + rect->w && y >= rect->y && y <= rect->y + rect->h)
+    if(rect && x >= rect->x && x <= rect->x + rect->w && y >= rect->y && y <= rect->y + rect->h)
         return TRUE;
     else
         return FALSE;
 }
 
 BOOL CompareRect(SDL_Rect *a, SDL_Rect *b){
-    if(a->x == b->x && a->y == b->y && a->w == b->w && a->h == b->h)
+
+    if(a && b && a->x == b->x && a->y == b->y && a->w == b->w && a->h == b->h)
 	return TRUE;
     else
 	return FALSE;

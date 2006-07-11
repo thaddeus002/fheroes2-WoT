@@ -30,6 +30,7 @@
 #include "agg.h"
 #include "mp2maps.h"
 #include "config.h"
+#include "castle.h"
 #include "object.h"
 #include "gamedefs.h"
 
@@ -840,6 +841,8 @@ void PrintCellInfo(Uint16 index){
 
     fprintf(stderr, "type    : %s\n", PrintObjectType(ptrCell->type, 0));
 
+    S_CASTLE *castle;
+
     switch(ptrCell->type){
 
 	case OBJ_RESOURCE:
@@ -852,6 +855,64 @@ void PrintCellInfo(Uint16 index){
 
 	case OBJ_MONSTER:
     	    fprintf(stderr, "object  : %s\n", ((S_MONSTER *) GetStatMonster(ptrCell->object.monster))->descriptions );
+	    break;
+
+	case OBJ_CASTLE:
+	    castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
+	    fprintf(stderr, "object  : ");
+	    castle->castle ? fprintf(stderr, "Castle: ") : fprintf(stderr, "Tower: ");
+    	    fprintf(stderr, "%s, ", castle->name);
+    	    fprintf(stderr, "Kingdom: ");
+    	    switch(castle->color){
+    		case BLUE:
+    		    fprintf(stderr, "BLUE, ");
+    		    break;
+    		case RED:
+    		    fprintf(stderr, "RED, ");
+    		    break;
+    		case GREEN:
+    		    fprintf(stderr, "GREEN, ");
+    		    break;
+    		case YELLOW:
+    		    fprintf(stderr, "YELLOW, ");
+    		    break;
+    		case ORANGE:
+    		    fprintf(stderr, "ORANGE, ");
+    		    break;
+    		case PURPLE:
+    		    fprintf(stderr, "PURPLE, ");
+    		    break;
+    		case GRAY:
+    		default:
+    		    fprintf(stderr, "GRAY, ");
+    		    break;
+    	    }
+    	    fprintf(stderr, "Race: ");
+    	    switch(castle->race){
+    		case KNIGHT:
+    		    fprintf(stderr, "KNIGHT");
+    		    break;
+    		case BARBARIAN:
+    		    fprintf(stderr, "BARBARIAN");
+    		    break;
+    		case WARLOCK:
+    		    fprintf(stderr, "WARLOCK");
+    		    break;
+    		case WIZARD:
+    		    fprintf(stderr, "WIZARD");
+    		    break;
+    		case SORCERESS:
+    		    fprintf(stderr, "SORCERESS");
+    		    break;
+    		case NECROMANCER:
+    		    fprintf(stderr, "NECROMANCER");
+    		    break;
+    		case BOMG:
+    		default:
+    		    fprintf(stderr, "BOMG");
+    		    break;
+    	    }
+    	    fprintf(stderr, "\n");
 	    break;
 
 	default:

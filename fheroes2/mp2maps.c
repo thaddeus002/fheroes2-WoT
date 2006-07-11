@@ -46,6 +46,8 @@ MP2ADDONTAIL   *GetADDONTAIL(Uint16);
 MP2HEADER       *ptrMP2Header = NULL;
 S_CELLMAPS      *ptrMaps = NULL;
 
+Uint8           *ptrMP2Castle = NULL;
+
 MP2ADDONTAIL    *tailAddon = NULL;
 static Uint32   countTail = 0;
 
@@ -118,6 +120,11 @@ void FreeMaps(void){
 
 	free(ptrMP2Header);
     }
+    if(ptrMP2Castle) free(ptrMP2Castle);
+    
+    ptrMP2Castle	= NULL;
+    ptrMP2Header	= NULL;
+    ptrMaps		= NULL;
 }
 
 ACTION InitMaps(char *filename){
@@ -189,20 +196,33 @@ ACTION InitMaps(char *filename){
     }
 
     //идем в хвост с инфо о замках
+    if(NULL == (ptrMP2Castle = (Uint8 *) malloc(3 * 72))){
+	printf("InitMaps malloc: error size %d\n", 3 * 72);
+        return EXIT;
+    }
+    fread(ptrMP2Castle, 1, 3 * 72, fd);
 
-    fseek(fd, 3 * 72, SEEK_CUR);
+    // здесь инфо и ресурсах, пока пропускаем
     fseek(fd, 3 * 144 + 1, SEEK_CUR);
+
+    // те самые несколько байт, пропускаем
     fread(&i, sizeof(i), 1, fd);
     while(i) fread(&i, sizeof(i), 1, fd);
-    InitCastle(fd);
 
-    // close file
-    fclose(fd);
+    // позиция хвоста
+    Uint32 fdTail = ftell(fd);
+
+    // возможно еще что то прочитаем
+
+
+    // инициализируем королевства
+    InitKingdom();
 
     // цикл конвертации в новый формат
     Uint8  *ptrTILData = GetTILData("GROUND32.TIL");
 
     Sint8		j = 0;
+    Uint8 		castle = 0;
     Uint16 		indexAddon = 0;
 
     MP2ADDONTAIL	*ptrAddon = NULL;
@@ -237,7 +257,7 @@ ACTION InitMaps(char *filename){
 
 		MapsRescanObject(ptrMapsInfo[i].objectName1, &ptrMapsInfo[i], NULL, &ptrMaps[i]);
 
-		if(NULL != (current = GetICNHEADERCellObject(ptrMapsInfo[i].objectName1, ptrMapsInfo[i].indexName1))){
+		if(NULL != (current = GetICNHEADERCellObject(ptrMapsInfo[i].objectName1, ptrMapsInfo[i].indexName1, ptrMaps[i].ax, ptrMaps[i].ay))){
 
 		    tail = AddLEVELDRAW(&ptrMaps[i].level1);
 
@@ -259,7 +279,7 @@ ACTION InitMaps(char *filename){
 	
 		    MapsRescanObject(ptrAddon->objectNameN1 * 2, &ptrMapsInfo[i], ptrAddon, &ptrMaps[i]);
 
-		    if(NULL != (current = GetICNHEADERCellObject(ptrAddon->objectNameN1 * 2, ptrAddon->indexNameN1))){
+		    if(NULL != (current = GetICNHEADERCellObject(ptrAddon->objectNameN1 * 2, ptrAddon->indexNameN1, ptrMaps[i].ax, ptrMaps[i].ay))){
 
 			tail = AddLEVELDRAW(&ptrMaps[i].level1);
 
@@ -283,7 +303,7 @@ ACTION InitMaps(char *filename){
             
     	    if(0xFF != ptrMapsInfo[i].indexName2 && j == (ptrMapsInfo[i].quantity1 % 4)){
 
-		if(NULL != (current = GetICNHEADERCellObject(ptrMapsInfo[i].objectName2, ptrMapsInfo[i].indexName2))){
+		if(NULL != (current = GetICNHEADERCellObject(ptrMapsInfo[i].objectName2, ptrMapsInfo[i].indexName2, ptrMaps[i].ax, ptrMaps[i].ay))){
 
 		    tail = AddLEVELDRAW(&ptrMaps[i].level2);
 
@@ -303,7 +323,7 @@ ACTION InitMaps(char *filename){
 
         	if(0xFF != ptrAddon->indexNameN2 && j == (ptrAddon->quantityN % 4)){
 
-		    if(NULL != (current = GetICNHEADERCellObject(ptrAddon->objectNameN2, ptrAddon->indexNameN2))){
+		    if(NULL != (current = GetICNHEADERCellObject(ptrAddon->objectNameN2, ptrAddon->indexNameN2, ptrMaps[i].ax, ptrMaps[i].ay))){
 
 			tail = AddLEVELDRAW(&ptrMaps[i].level2);
 
@@ -327,9 +347,23 @@ ACTION InitMaps(char *filename){
 
 	if(OBJ_ZERO == ptrMaps[i].type) ptrMaps[i].type = CheckValidObject(ptrMapsInfo[i].generalObject);
 
-	ptrMaps[i].move	= TRUE;
+	// все рандом замки переопределены
+	if(OBJ_RNDCASTLE == ptrMaps[i].type || OBJ_RNDTOWN == ptrMaps[i].type) ptrMaps[i].type = OBJ_CASTLE;
+	if(OBJN_RNDCASTLE == ptrMaps[i].type || OBJN_RNDTOWN == ptrMaps[i].type) ptrMaps[i].type = OBJN_CASTLE;
 
+	// добавляем замки
+	if(OBJ_CASTLE == ptrMaps[i].type){
+	    if(GetIntValue(DEBUG) && (0 == ptrMapsInfo[i].quantity1 || ptrMapsInfo[i].quantity1 % 0x08)) fprintf(stderr, "InitMaps: hmm.. unknown castle position, quantity: %d\n", ptrMapsInfo[i].quantity1);
+	    fseek(fd, fdTail, SEEK_SET);
+	    AddCastle(fd, ptrMapsInfo[i].quantity1 / 8 - 1, ptrMP2Castle[castle * 3], ptrMP2Castle[castle * 3 + 1]);
+	    ++castle;
+	}
+
+	ptrMaps[i].move	= TRUE;
     }
+
+    // close file
+    fclose(fd);
 
     // Освобождаем загруженные объекты TIL
     FreeObject("GROUND32.TIL");
@@ -337,17 +371,14 @@ ACTION InitMaps(char *filename){
     // Освобождаем использованную информацию
     free(ptrMapsInfo);
     free(tailAddon);
-    
-    // инициализируем королевства
-    InitKingdom();
 
     fprintf(stderr, "InitMaps: %s\n", filename);
 
     // Рисуем экран и в цикл событий
     ACTION result = DrawMainDisplay();
 
-    FreeKingdom();
     FreeCastle();
+    FreeKingdom();
     FreeMaps();
 
     return result;

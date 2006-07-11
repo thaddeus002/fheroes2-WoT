@@ -403,11 +403,11 @@ void DrawMapsOpponents(void){
     dest.h = FONT_HEIGHTBIG;
     PrintText(video, &dest, "Opponents:", FONT_BIG);
 
-    if(GetIntValue(KINGDOMCOLORS) & BLUE){
+    if(GetIntValue(KINGDOMCOLORS) & COLORBLUE){
 
 	seek = 0;
 
-	GetIntValue(ALLOWCOLORS) & BLUE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	GetIntValue(ALLOWCOLORS) & COLORBLUE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
 	image = GetICNSprite(&sprite);
 
 	dest.x = 225 + seek * image->w;
@@ -418,11 +418,11 @@ void DrawMapsOpponents(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & GREEN){
+    if(GetIntValue(KINGDOMCOLORS) & COLORGREEN){
 
 	seek = 1;
 
-	GetIntValue(ALLOWCOLORS) & GREEN ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	GetIntValue(ALLOWCOLORS) & COLORGREEN ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
 	image = GetICNSprite(&sprite);
 
 	dest.x = 225 + seek * image->w;
@@ -433,11 +433,11 @@ void DrawMapsOpponents(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & RED){
+    if(GetIntValue(KINGDOMCOLORS) & COLORRED){
 
 	seek = 2;
 
-	GetIntValue(ALLOWCOLORS) & RED ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	GetIntValue(ALLOWCOLORS) & COLORRED ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
 	image = GetICNSprite(&sprite);
 
 	dest.x = 225 + seek * image->w;
@@ -448,11 +448,11 @@ void DrawMapsOpponents(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & YELLOW){
+    if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW){
 
 	seek = 3;
 
-	GetIntValue(ALLOWCOLORS) & YELLOW ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	GetIntValue(ALLOWCOLORS) & COLORYELLOW ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
 	image = GetICNSprite(&sprite);
 
 	dest.x = 225 + seek * image->w;
@@ -463,11 +463,11 @@ void DrawMapsOpponents(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & ORANGE){
+    if(GetIntValue(KINGDOMCOLORS) & COLORORANGE){
 
 	seek = 4;
 
-	GetIntValue(ALLOWCOLORS) & ORANGE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	GetIntValue(ALLOWCOLORS) & COLORORANGE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
 	image = GetICNSprite(&sprite);
 
 	dest.x = 225 + seek * image->w;
@@ -478,11 +478,11 @@ void DrawMapsOpponents(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & PURPLE){
+    if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE){
 
 	seek = 5;
 
-	GetIntValue(ALLOWCOLORS) & PURPLE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
+	GetIntValue(ALLOWCOLORS) & COLORPURPLE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
 	image = GetICNSprite(&sprite);
 
 	dest.x = 225 + seek * image->w;
@@ -511,15 +511,15 @@ void DrawMapsClass(void){
     dest.h = FONT_HEIGHTBIG;
     PrintText(video, &dest, "Class:", FONT_BIG);
 
-    if(GetIntValue(KINGDOMCOLORS) & BLUE){
+    if(GetIntValue(KINGDOMCOLORS) & COLORBLUE){
 
 	seek = 0;
 
-	if(GetIntValue(RNDCOLORS) & BLUE)
+	if(GetIntValue(RNDCOLORS) & COLORBLUE)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
 
-	else if(GetIntValue(ALLOWCOLORS) & BLUE)
+	else if(GetIntValue(ALLOWCOLORS) & COLORBLUE)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
 
@@ -537,15 +537,15 @@ void DrawMapsClass(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & GREEN){
+    if(GetIntValue(KINGDOMCOLORS) & COLORGREEN){
 
 	seek = 1;
 
-	if(GetIntValue(RNDCOLORS) & GREEN)
+	if(GetIntValue(RNDCOLORS) & COLORGREEN)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
 
-	else if(GetIntValue(ALLOWCOLORS) & GREEN)
+	else if(GetIntValue(ALLOWCOLORS) & COLORGREEN)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
 
@@ -563,15 +563,15 @@ void DrawMapsClass(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & RED){
+    if(GetIntValue(KINGDOMCOLORS) & COLORRED){
 
 	seek = 2;
 
-	if(GetIntValue(RNDCOLORS) & RED)
+	if(GetIntValue(RNDCOLORS) & COLORRED)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
 
-	else if(GetIntValue(ALLOWCOLORS) & RED)
+	else if(GetIntValue(ALLOWCOLORS) & COLORRED)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
 
@@ -589,15 +589,15 @@ void DrawMapsClass(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & YELLOW){
+    if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW){
 
 	seek = 3;
 
-	if(GetIntValue(RNDCOLORS) & YELLOW)
+	if(GetIntValue(RNDCOLORS) & COLORYELLOW)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
 
-	else if(GetIntValue(ALLOWCOLORS) & YELLOW)
+	else if(GetIntValue(ALLOWCOLORS) & COLORYELLOW)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
 
@@ -615,15 +615,15 @@ void DrawMapsClass(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & ORANGE){
+    if(GetIntValue(KINGDOMCOLORS) & COLORORANGE){
 
 	seek = 4;
 
-	if(GetIntValue(RNDCOLORS) & ORANGE)
+	if(GetIntValue(RNDCOLORS) & COLORORANGE)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
 
-	else if(GetIntValue(ALLOWCOLORS) & ORANGE)
+	else if(GetIntValue(ALLOWCOLORS) & COLORORANGE)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
 
@@ -641,15 +641,15 @@ void DrawMapsClass(void){
 	SDL_BlitSurface(image, NULL, video, &dest);
 
     }
-    if(GetIntValue(KINGDOMCOLORS) & PURPLE){
+    if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE){
 
 	seek = 5;
 
-	if(GetIntValue(RNDCOLORS) & PURPLE)
+	if(GetIntValue(RNDCOLORS) & COLORPURPLE)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
 
-	else if(GetIntValue(ALLOWCOLORS) & PURPLE)
+	else if(GetIntValue(ALLOWCOLORS) & COLORPURPLE)
 
 	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
 

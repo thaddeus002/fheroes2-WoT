@@ -146,7 +146,7 @@ SDL_Surface *GetICNSprite(AGGSPRITE *object){
 	return ptr->surface;
     }
 
-    fprintf(stderr, "GetICNSprite error: return NULL\n");
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetICNSprite error: return NULL\n");
     return NULL;
 }
 
@@ -157,12 +157,12 @@ ICNHEADER * GetICNHeader(AGGSPRITE *object){
     if(1 > strlen(object->name)) return NULL;
 
     if(NULL == (ptrAGGData = GetHeaderAGGName(object->name))){
-	fprintf(stderr, "GetICNHeader object not found: %s, %d\n", object->name, object->number);
+	if(GetIntValue(DEBUG)) fprintf(stderr, "GetICNHeader object not found: %s, %d\n", object->name, object->number);
 	return NULL;
     }
 
     if(ptrAGGData->type != ICN){
-	fprintf(stderr, "GetICNHeader error: type not ICN, name %s\n", object->name);
+	if(GetIntValue(DEBUG)) fprintf(stderr, "GetICNHeader error: type not ICN, name %s\n", object->name);
 	return NULL;
     }
 
@@ -200,7 +200,7 @@ ICNHEADER * GetICNHeader(AGGSPRITE *object){
     if(ptrAGGData->data){
 
 	if(object->number > ptrAGGData->count){
-	    fprintf(stderr, "GetICNHeader error: name %s, number %d, > count %d\n", object->name, object->number, ptrAGGData->count);
+	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetICNHeader error: name %s, number %d, > count %d\n", object->name, object->number, ptrAGGData->count);
 	    object->number = ptrAGGData->count;
 	}
 
@@ -218,7 +218,7 @@ ICNHEADER * GetICNHeader(AGGSPRITE *object){
 	return ptr;
     }
 
-    fprintf(stderr, "GetICNHeader error: return NULL\n");
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetICNHeader error: return NULL\n");
     return NULL;
 }
 

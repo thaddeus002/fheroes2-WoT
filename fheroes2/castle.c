@@ -27,74 +27,77 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "SDL.h"
 
 #include "gamedefs.h"
+#include "tools.h"
 #include "config.h"
 #include "mp2maps.h"
 #include "monster.h"
+#include "kingdom.h"
 #include "castle.h"
 
 static S_CASTLE		*ptrCastle = NULL;
+static Uint8		countCastle = 0;
 
-BOOL	InitCastle(FILE *fd){
+BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 
     if(! fd){
-	fprintf(stderr, "InitCastle: descriptor NULL\n");
+	fprintf(stderr, "AddCastle: descriptor NULL\n");
 	return FALSE;
     }
 
-    Uint32 pos = ftell(fd);
-    fseek(fd, 0, SEEK_END);
-    Uint32 size = ftell(fd);
-    
-    fseek(fd, pos, SEEK_SET);
     Uint16 countBlock = 0;
-    Uint8  countCastle = 0;
     MP2CASTLE *ptr = NULL;
 
-    while((pos = ftell(fd)) < size - 4){
-
+    while(seek){
 	fread(&countBlock, sizeof(Uint16), 1, fd);
+	fseek(fd, countBlock, SEEK_CUR);
+	--seek;
+    }
 
-	if(0x0046 != countBlock){
-	    fseek(fd, countBlock, SEEK_CUR);
-	    continue;
-	}
-	
-	if(NULL == (ptr = (MP2CASTLE *) malloc(sizeof(MP2CASTLE)))){
-	    fprintf(stderr, "InitCastle: error malloc: %d\n", sizeof(MP2CASTLE));
-	    return FALSE;
-	}
+    fread(&countBlock, sizeof(Uint16), 1, fd);
+    if(0x0046 != countBlock){
+	fprintf(stderr, "AddCastle: error magic: %hX\n", countBlock);
+	return FALSE;
+    }
 
-	fread((char *) &ptr->color, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->customBuilding, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->building, 1, sizeof(Uint16), fd);
-	fread((char *) &ptr->dwelling, 1, sizeof(Uint16), fd);
-	fread((char *) &ptr->magicTower, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->customTroops, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->monster1, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->monster2, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->monster3, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->monster4, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->monster5, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->count1, 1, sizeof(Uint16), fd);
-	fread((char *) &ptr->count2, 1, sizeof(Uint16), fd);
-	fread((char *) &ptr->count3, 1, sizeof(Uint16), fd);
-	fread((char *) &ptr->count4, 1, sizeof(Uint16), fd);
-	fread((char *) &ptr->count5, 1, sizeof(Uint16), fd);
-	fread((char *) &ptr->capitan, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->customCastleName, 1, sizeof(Uint8), fd);
-	fread((char *) ptr->castleName, 1, 13, fd);
-	fread((char *) &ptr->type, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->castle, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->allowCastle, 1, sizeof(Uint8), fd);
-	fread((char *) &ptr->unknown, 1, 29, fd);
+    if(NULL == (ptr = (MP2CASTLE *) malloc(sizeof(MP2CASTLE)))){
+	fprintf(stderr, "AddCastle: error malloc: %d\n", sizeof(MP2CASTLE));
+	return FALSE;
+    }
+
+    memset(ptr, 0, sizeof(MP2CASTLE));
+
+    fread((char *) &ptr->color, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->customBuilding, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->building, 1, sizeof(Uint16), fd);
+    fread((char *) &ptr->dwelling, 1, sizeof(Uint16), fd);
+    fread((char *) &ptr->magicTower, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->customTroops, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->monster1, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->monster2, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->monster3, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->monster4, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->monster5, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->count1, 1, sizeof(Uint16), fd);
+    fread((char *) &ptr->count2, 1, sizeof(Uint16), fd);
+    fread((char *) &ptr->count3, 1, sizeof(Uint16), fd);
+    fread((char *) &ptr->count4, 1, sizeof(Uint16), fd);
+    fread((char *) &ptr->count5, 1, sizeof(Uint16), fd);
+    fread((char *) &ptr->capitan, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->customCastleName, 1, sizeof(Uint8), fd);
+    fread((char *) ptr->castleName, 1, 13, fd);
+    fread((char *) &ptr->type, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->castle, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->allowCastle, 1, sizeof(Uint8), fd);
+    fread((char *) &ptr->unknown, 1, 29, fd);
 	
-	if(NULL == (ptrCastle = realloc(ptrCastle, sizeof(S_CASTLE) * (countCastle + 1)))){
-	    fprintf(stderr, "InitCastle: error malloc: %d\n", sizeof(S_CASTLE) * (countCastle + 1));
-	    return FALSE;
-	}
+    if(NULL == (ptrCastle = realloc(ptrCastle, sizeof(S_CASTLE) * (countCastle + 1)))){
+	fprintf(stderr, "AddCastle: error malloc: %d\n", sizeof(S_CASTLE) * (countCastle + 1));
+	return FALSE;
+    }
 	
 	switch(ptr->color){
 	
@@ -128,7 +131,7 @@ BOOL	InitCastle(FILE *fd){
 
 	    default:
 		ptrCastle[countCastle].color = GRAY;
-		fprintf(stderr, "InitCastle: unknown colors, default GRAY\n");
+		fprintf(stderr, "AddCastle: unknown colors, default GRAY\n");
 		break;
 	}
 
@@ -158,27 +161,26 @@ BOOL	InitCastle(FILE *fd){
 		ptrCastle[countCastle].race = NECROMANCER;
 		break;
 
+	    // rnd
 	    case 6:
-		ptrCastle[countCastle].race = NECROMANCER;
+		ptrCastle[countCastle].race = rand() % BOMG;
 		break;
 	
 	    default:
 		ptrCastle[countCastle].race = KNIGHT;
-		fprintf(stderr, "InitCastle: unknown race, default KNIGHT\n");
+		fprintf(stderr, "AddCastle: unknown race, default KNIGHT\n");
 		break;
 	}
 
 	strncpy(ptrCastle[countCastle].name, ptr->castleName, 13);
 
-	if(ptr->customBuilding)
+	if(ptr->customBuilding){
 	    ptrCastle[countCastle].building = ptr->building;
-	else
-	    ptrCastle[countCastle].building = BUILD_TAVERN; // BUILD_THIEVEGUILD BUILD_TAVERN BUILD_SHIPYARD BUILD_WELL BUILD_STATUE BUILD_LEFTTURRET BUILD_RIGHTTURRET BUILD_MARKETPLACE BUILD_MOAT BUILD_EXT1 BUILD_EXT2
-
-	if(ptr->customBuilding)
 	    ptrCastle[countCastle].dwelling = ptr->dwelling;
-	else
+	}else{
+	    ptrCastle[countCastle].building = BUILD_TAVERN; // BUILD_THIEVEGUILD BUILD_TAVERN BUILD_SHIPYARD BUILD_WELL BUILD_STATUE BUILD_LEFTTURRET BUILD_RIGHTTURRET BUILD_MARKETPLACE BUILD_MOAT BUILD_EXT1 BUILD_EXT2
 	    ptrCastle[countCastle].dwelling = DWELLING_MONSTER1 | DWELLING_MONSTER2; // DWELLING_MONSTER1 DWELLING_MONSTER2 DWELLING_MONSTER3 DWELLING_MONSTER4 DWELLING_MONSTER5 DWELLING_MONSTER6 DWELLING_UPGRADE2 DWELLING_UPGRADE3 DWELLING_UPGRADE4 DWELLING_UPGRADE5 DWELLING_UPGRADE6
+	}
 
 	ptrCastle[countCastle].magicTower = ptr->magicTower;
 
@@ -251,25 +253,29 @@ BOOL	InitCastle(FILE *fd){
 	    ptrCastle[countCastle].army5.count = 0;
 	}
 
-	ptrCastle[countCastle].capitan = ptr->capitan;
-	ptrCastle[countCastle].castle = ptr->castle;
+    ptrCastle[countCastle].capitan = ptr->capitan;
 
-	if(ptr->allowCastle)
-	    ptrCastle[countCastle].allowCastle = FALSE;
-	else
-	    ptrCastle[countCastle].allowCastle = TRUE;
+    if(ptr->castle) ptrCastle[countCastle].castle = TRUE; else ptrCastle[countCastle].castle = FALSE;
 
-	ptrCastle[countCastle].next = NULL;
+    if(ptr->allowCastle)
+        ptrCastle[countCastle].allowCastle = FALSE;
+    else
+        ptrCastle[countCastle].allowCastle = TRUE;
 
-	//ptrCastle[countCastle].pos.x;
-	//ptrCastle[countCastle].pos.y;
-	//ptrCastle[countCastle].pos.w;
-	//ptrCastle[countCastle].pos.h;
+    if(ax < 5) ptrCastle[countCastle].pos.x = 0; else ptrCastle[countCastle].pos.x = ax - 5;
+    if(ay < 3) ptrCastle[countCastle].pos.y = 0; else ptrCastle[countCastle].pos.y = ay - 3;
 
-	free(ptr);
-	++countCastle;
-    }
-    if(GetIntValue(DEBUG)) fprintf(stderr, "InitCastle: total %d\n", countCastle);
+    ptrCastle[countCastle].ax = ax;
+    ptrCastle[countCastle].ay = ay;
+    ptrCastle[countCastle].pos.w = 8;
+    ptrCastle[countCastle].pos.h = 5;
+
+    ptrCastle[countCastle].next = NULL;
+
+    KingdomAddCastle(ptrCastle[countCastle].color, &ptrCastle[countCastle]);
+
+    free(ptr);
+    ++countCastle;
 
     return TRUE;
 }
@@ -277,4 +283,30 @@ BOOL	InitCastle(FILE *fd){
 void	FreeCastle(void){
 
     if(ptrCastle) free(ptrCastle);
+    countCastle = 0;
+}
+
+E_RACE GetRaceRNDCastle(Uint8 ax, Uint8 ay){
+
+    Uint8 i;
+
+    for(i = 0; i < countCastle; ++i)
+	if(ValidPoint(&ptrCastle[i].pos, ax, ay))
+	    return ptrCastle[i].race;
+	    
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRaceRNDCastle: unknown castle, ax: %d, ay: %d\n", ax, ay);
+    return BOMG;
+}
+
+S_CASTLE *GetStatCastlePos(Uint8 ax, Uint8 ay){
+
+    Uint8 i;
+
+    for(i = 0; i < countCastle; ++i)
+
+	if(ax == ptrCastle[i].ax && ay == ptrCastle[i].ay)
+
+	    return &ptrCastle[i];
+
+    return NULL;
 }

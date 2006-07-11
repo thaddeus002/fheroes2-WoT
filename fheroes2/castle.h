@@ -62,6 +62,8 @@ typedef struct {
     E_COLORS	color;
     E_RACE	race;
     char	name[13];
+    Uint8	ax;
+    Uint8	ay;
     SDL_Rect	pos;
     Uint16	building;
     Uint16	dwelling;
@@ -78,7 +80,9 @@ typedef struct {
 
 } S_CASTLE;
 
-BOOL	InitCastle(FILE *);
-void	FreeCastle(void);
+BOOL		AddCastle(FILE *, Uint8, Uint8, Uint8);
+void		FreeCastle(void);
+E_RACE		GetRaceRNDCastle(Uint8, Uint8);
+S_CASTLE	*GetStatCastlePos(Uint8, Uint8);
 
 #endif

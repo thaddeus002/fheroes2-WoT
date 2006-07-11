@@ -29,6 +29,7 @@
 #include "SDL.h"
 #include "gamedefs.h"
 #include "agg.h"
+#include "castle.h"
 #include "mp2maps.h"
 #include "tools.h"
 #include "config.h"
@@ -48,7 +49,7 @@ E_OBJECT CheckValidObject(Uint8 type){
     return OBJ_ZERO;
 }
 
-ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index){
+ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index, Uint8 ax, Uint8 ay){
 
     AGGSPRITE sprite;
 
@@ -205,7 +206,38 @@ ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index){
 	case 0x99:
 	case 0x9A:
 	case 0x9B:
-	    FillSPRITE(&sprite, "OBJNTWRD.ICN", index);
+
+	    switch(GetRaceRNDCastle(ax, ay)){
+
+		case KNIGHT:
+		    index < 32 ? FillSPRITE(&sprite, "OBJNTOWN.ICN", index) : FillSPRITE(&sprite, "OBJNTWSH.ICN", index - 32);
+		    break;
+
+		case BARBARIAN:
+		    index < 32 ? FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 32) : FillSPRITE(&sprite, "OBJNTWSH.ICN", index);
+		    break;
+
+                case SORCERESS:
+		    index < 32 ? FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 32 * 2) : FillSPRITE(&sprite, "OBJNTWSH.ICN", index + 32);
+		    break;
+
+                case WARLOCK:
+		    index < 32 ? FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 32 * 3) : FillSPRITE(&sprite, "OBJNTWSH.ICN", index + 32 * 2);
+		    break;
+
+                case WIZARD:
+		    index < 32 ? FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 32 * 4) : FillSPRITE(&sprite, "OBJNTWSH.ICN", index + 32 * 3);
+		    break;
+
+                case NECROMANCER:
+		    index < 32 ? FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 32 * 5) : FillSPRITE(&sprite, "OBJNTWSH.ICN", index + 32 * 4);
+		    break;
+
+		default:
+		    FillSPRITE(&sprite, "OBJNTWRD.ICN", index);
+		    break;
+	    }
+
 	    break;
 
 	// объекты на воде №2

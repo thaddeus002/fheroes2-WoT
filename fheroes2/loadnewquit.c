@@ -407,7 +407,7 @@ ACTION DrawNewLoadQuit(void){
 
     FreeAnimationEvent(stheanim);
     FreeActionEvent(sthemain);
-    
+
     return result;
 }
 

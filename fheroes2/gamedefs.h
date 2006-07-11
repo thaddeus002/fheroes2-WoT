@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060705
+#define VERSION 20060711
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -44,6 +44,14 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define BORDERWIDTH     16
 #define TILEWIDTH       32
 
+#define COLORBLUE	0x01
+#define COLORGREEN	0x02
+#define COLORRED	0x04
+#define COLORYELLOW	0x08
+#define COLORORANGE	0x10
+#define COLORPURPLE	0x20
+#define COLORGRAY	0xFF
+
 typedef enum {
 	    GAME_EASY,
 	    GAME_NORMAL,
@@ -53,13 +61,13 @@ typedef enum {
 	    } E_GAMELEVEL;
 
 typedef enum {
-            BLUE	= 0x01,
-            GREEN	= 0x02,
-            RED		= 0x04,
-            YELLOW	= 0x08,
-            ORANGE	= 0x10,
-            PURPLE	= 0x20,
-	    GRAY	= 0xFF
+            BLUE	= 0,
+            GREEN	= 1,
+            RED		= 2,
+            YELLOW	= 3,
+            ORANGE	= 4,
+            PURPLE	= 5,
+	    GRAY	= 6
             } E_COLORS;
 
 

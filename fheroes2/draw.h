@@ -40,7 +40,6 @@ void DrawPixelAlpha(SDL_Surface *, Uint16, Uint16, Uint8, Uint8, Uint8, Uint8);
 void DrawSprite(SDL_Rect *, AGGSPRITE *);
 void DrawTILBmp(SDL_Surface *, Uint8 *, Uint16, Uint8);
 void DrawMapObject(SDL_Rect *, Uint8, Uint8);
-void DrawAnimationFrame(SDL_Rect *, Uint8, Uint8, Uint8);
 
 Uint16 GetPixel(SDL_Surface *, Uint16, Uint16);
 void PutPixel(SDL_Surface *, Uint16, Uint16, Uint16);

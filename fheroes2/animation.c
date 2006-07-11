@@ -41,6 +41,8 @@ S_ANIMATION * AddAnimationEvent(S_ANIMATION **pointer, SDL_Rect *rect, ICNHEADER
     ICNHEADER   *current;
     Uint8 i;
 
+    if(NULL == rect || NULL == header || 0 == count) return NULL;
+
     if(NULL == *pointer){
 
 	if(NULL == (*pointer = (S_ANIMATION *) malloc(sizeof(S_ANIMATION)))){
@@ -71,12 +73,12 @@ S_ANIMATION * AddAnimationEvent(S_ANIMATION **pointer, SDL_Rect *rect, ICNHEADER
     }
 
     if(NULL == (ptr->surface = malloc(count * sizeof(SDL_Surface *)))){
-    	fprintf(stderr, "AddAnimationEvent: error malloc: %d\n", count * sizeof(SDL_Surface));
+    	fprintf(stderr, "AddAnimationEvent: error malloc: %d\n", count * sizeof(SDL_Surface *));
     	return NULL;
     }
 
     current = header;
-    
+
     for(i = 0; i < count; ++i){
 
 	ptr->rect[i].x = rect->x + current->offsetX;
@@ -84,27 +86,24 @@ S_ANIMATION * AddAnimationEvent(S_ANIMATION **pointer, SDL_Rect *rect, ICNHEADER
 	ptr->rect[i].w = current->surface->w;
 	ptr->rect[i].h = current->surface->h;
 	ptr->surface[i] = current->surface;
-	
+
 	if(current->next) current = current->next;
     }
 
     return ptr;
 }
 
-
 void FreeAnimationEvent(S_ANIMATION *head){
 
     S_ANIMATION *ptr = head;
-    
+
     while(ptr){
         head = (S_ANIMATION *) head->next;
 	
-	free(ptr->rect);
-	free(ptr->surface);
+	if(ptr->rect) free(ptr->rect);
+	if(ptr->surface) free(ptr->surface);
         free(ptr);
 
         ptr = head;
     }
-
-    head = NULL;
 }

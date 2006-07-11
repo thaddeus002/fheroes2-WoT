@@ -291,6 +291,5 @@ ACTION ActionCycle(INTERFACEACTION *action){
 	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY * delay);
     }
 
-
     return exit;
 }

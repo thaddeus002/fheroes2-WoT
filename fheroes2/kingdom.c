@@ -33,35 +33,31 @@
 #include "kingdom.h"
 
 
-static S_KINGDOM kingdom[KINGDOMMAX] = {
-	{FALSE, NULL, NULL, { HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL } }, // BLUE
-	{FALSE, NULL, NULL, { HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL } }, // RED
-	{FALSE, NULL, NULL, { HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL } }, // GREEN
-	{FALSE, NULL, NULL, { HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL } }, // YELLOW
-	{FALSE, NULL, NULL, { HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL } }, // ORANGE
-	{FALSE, NULL, NULL, { HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL, HEROESNULL } }, // PURPLE
-};
+static S_KINGDOM kingdom[KINGDOMMAX];
 
 BOOL	InitKingdom(void){
 
-    if(GetIntValue(KINGDOMCOLORS) & BLUE)   kingdom[BLUE].play   = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & GREEN)  kingdom[GREEN].play  = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & RED)    kingdom[RED].play    = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & YELLOW) kingdom[YELLOW].play = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & ORANGE) kingdom[ORANGE].play = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & PURPLE) kingdom[PURPLE].play = TRUE;
+    FreeKingdom();
+
+    if(GetIntValue(KINGDOMCOLORS) & COLORBLUE)   kingdom[BLUE].play   = TRUE;
+    if(GetIntValue(KINGDOMCOLORS) & COLORGREEN)  kingdom[GREEN].play  = TRUE;
+    if(GetIntValue(KINGDOMCOLORS) & COLORRED)    kingdom[RED].play    = TRUE;
+    if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW) kingdom[YELLOW].play = TRUE;
+    if(GetIntValue(KINGDOMCOLORS) & COLORORANGE) kingdom[ORANGE].play = TRUE;
+    if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE) kingdom[PURPLE].play = TRUE;
 
     if(GetIntValue(DEBUG)){
 	fprintf(stderr, "InitKingdom:");
-	if(GetIntValue(KINGDOMCOLORS) & BLUE)   fprintf(stderr, " BLUE");
-	if(GetIntValue(KINGDOMCOLORS) & GREEN)  fprintf(stderr, " GREEN");
-	if(GetIntValue(KINGDOMCOLORS) & RED)    fprintf(stderr, " RED");
-	if(GetIntValue(KINGDOMCOLORS) & YELLOW) fprintf(stderr, " YELLOW");
-	if(GetIntValue(KINGDOMCOLORS) & ORANGE) fprintf(stderr, " ORANGE");
-	if(GetIntValue(KINGDOMCOLORS) & PURPLE) fprintf(stderr, " PURPLE");
+	if(GetIntValue(KINGDOMCOLORS) & COLORBLUE)   fprintf(stderr, " BLUE");
+	if(GetIntValue(KINGDOMCOLORS) & COLORGREEN)  fprintf(stderr, " GREEN");
+	if(GetIntValue(KINGDOMCOLORS) & COLORRED)    fprintf(stderr, " RED");
+	if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW) fprintf(stderr, " YELLOW");
+	if(GetIntValue(KINGDOMCOLORS) & COLORORANGE) fprintf(stderr, " ORANGE");
+	if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE) fprintf(stderr, " PURPLE");
+	if(! GetIntValue(KINGDOMCOLORS)) fprintf(stderr, " (test mode?)");
 	fprintf(stderr, "\n");
     }
-    
+
     return TRUE;
 }
 
@@ -81,6 +77,7 @@ void	FreeKingdom(void){
 
 void    KingdomAddHeroes(E_COLORS color, E_NAMEHEROES name){
 
+    if(color == GRAY) return;
     if(! kingdom[color].play) return;
 
     Uint8 i;
@@ -105,9 +102,9 @@ void    KingdomRemoveHeroes(E_COLORS color, E_NAMEHEROES name){
 	}
 }
 
-
 void    KingdomAddCastle(E_COLORS color, S_CASTLE *castle){
 
+    if(color == GRAY) return;
     if(! kingdom[color].play) return;
 
     if(! castle){
@@ -115,11 +112,21 @@ void    KingdomAddCastle(E_COLORS color, S_CASTLE *castle){
 	return;
     }
     
+    if(! kingdom[color].castle){
+
+	kingdom[color].castle = castle;
+    
+	if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddCastle: %s\n", castle->name);
+	return;
+    }
+
     S_CASTLE *ptrCastle = kingdom[color].castle;
 
-    while(ptrCastle) ptrCastle = (S_CASTLE *) ptrCastle->next;
+    while(ptrCastle->next) ptrCastle = (S_CASTLE *) ptrCastle->next;
 
     ptrCastle->next = castle;
+    
+    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddCastle: %s\n", castle->name);
 }
 
 void    KingdomRemoveCastle(E_COLORS color, S_CASTLE *castle){
@@ -130,6 +137,8 @@ void    KingdomRemoveCastle(E_COLORS color, S_CASTLE *castle){
     }
     
     S_CASTLE *head = kingdom[color].castle;
+
+    if(! head) return;
 
     if(castle->pos.x == head->pos.x && castle->pos.y == head->pos.y){
 	kingdom[color].castle = head->next;
