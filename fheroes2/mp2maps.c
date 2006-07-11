@@ -229,6 +229,7 @@ ACTION InitMaps(char *filename){
     ICNHEADER		*tail = NULL;
     ICNHEADER		*current = NULL;
 
+    // цикл по заполнению основной информации
     for(i = 0; i < ptrMP2Header->heightMaps * ptrMP2Header->widthMaps; ++i){
 
         if(NULL == (ptrMaps[i].tile = SDL_CreateRGBSurface(SDL_SWSURFACE, TILEWIDTH, TILEWIDTH, 16, 0, 0, 0, 0))){
@@ -246,9 +247,27 @@ ACTION InitMaps(char *filename){
 	ptrMaps[i].level2	= NULL;
 
 	ptrMaps[i].count	= 0;
-	ptrMaps[i].type		= OBJ_ZERO;
 	ptrMaps[i].animation	= NULL;
 	ptrMaps[i].monster	= NULL;
+
+	ptrMaps[i].type = CheckValidObject(ptrMapsInfo[i].generalObject);
+
+	// все рандом замки переопределены
+	if(OBJ_RNDCASTLE == ptrMaps[i].type || OBJ_RNDTOWN == ptrMaps[i].type) ptrMaps[i].type = OBJ_CASTLE;
+	if(OBJN_RNDCASTLE == ptrMaps[i].type || OBJN_RNDTOWN == ptrMaps[i].type) ptrMaps[i].type = OBJN_CASTLE;
+
+	// добавляем замки
+	if(OBJ_CASTLE == ptrMaps[i].type){
+	    if(GetIntValue(DEBUG) && (0 == ptrMapsInfo[i].quantity1 || ptrMapsInfo[i].quantity1 % 0x08)) fprintf(stderr, "InitMaps: hmm.. unknown castle position, quantity: %d\n", ptrMapsInfo[i].quantity1);
+	    fseek(fd, fdTail, SEEK_SET);
+	    AddCastle(fd, ptrMapsInfo[i].quantity1 / 8 - 1, ptrMP2Castle[castle * 3], ptrMP2Castle[castle * 3 + 1]);
+	    ++castle;
+	}
+	ptrMaps[i].move	= TRUE;
+    }
+
+    // цикл по заполнению спрайтов и анимации
+    for(i = 0; i < ptrMP2Header->heightMaps * ptrMP2Header->widthMaps; ++i){
 
 	// init level1
 	for(j = 3; j >= 0; --j){
@@ -343,23 +362,6 @@ ACTION InitMaps(char *filename){
 	// monster
 	if(0x2F < ptrMapsInfo[i].objectName1 && 0x34 > ptrMapsInfo[i].objectName1)
 	    StoreAnimationFrame(ptrMapsInfo[i].objectName1, ptrMapsInfo[i].indexName1, &ptrMaps[i]);
-
-
-	if(OBJ_ZERO == ptrMaps[i].type) ptrMaps[i].type = CheckValidObject(ptrMapsInfo[i].generalObject);
-
-	// все рандом замки переопределены
-	if(OBJ_RNDCASTLE == ptrMaps[i].type || OBJ_RNDTOWN == ptrMaps[i].type) ptrMaps[i].type = OBJ_CASTLE;
-	if(OBJN_RNDCASTLE == ptrMaps[i].type || OBJN_RNDTOWN == ptrMaps[i].type) ptrMaps[i].type = OBJN_CASTLE;
-
-	// добавляем замки
-	if(OBJ_CASTLE == ptrMaps[i].type){
-	    if(GetIntValue(DEBUG) && (0 == ptrMapsInfo[i].quantity1 || ptrMapsInfo[i].quantity1 % 0x08)) fprintf(stderr, "InitMaps: hmm.. unknown castle position, quantity: %d\n", ptrMapsInfo[i].quantity1);
-	    fseek(fd, fdTail, SEEK_SET);
-	    AddCastle(fd, ptrMapsInfo[i].quantity1 / 8 - 1, ptrMP2Castle[castle * 3], ptrMP2Castle[castle * 3 + 1]);
-	    ++castle;
-	}
-
-	ptrMaps[i].move	= TRUE;
     }
 
     // close file
