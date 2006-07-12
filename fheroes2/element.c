@@ -186,9 +186,9 @@ ACTION MessageBox(const char *message, ENUMFONT font){
 
     FreeActionEvent(dialog);
     SDL_FreeSurface(back);
-    
+
     SetCursor(cursor);
-    
+
     SetIntValue(ANIMATION, TRUE);
     CursorOn();
 

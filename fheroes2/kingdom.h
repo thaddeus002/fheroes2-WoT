@@ -37,7 +37,8 @@
 #include "castle.h"
 
 #define KINGDOMMAXHEROES	8
-#define KINGDOMMAX		6
+#define KINGDOMMAXCASTLE	72
+#define KINGDOMMAX		7	// включая и GRAY
 
 // объекты которые которые можно захватить (с флажками)
 typedef enum {
@@ -64,8 +65,8 @@ typedef struct {
 typedef struct {
 
 		BOOL		play;
-		S_BUILDING	*build;
-		S_CASTLE	*castle;
+		//S_BUILDING	*build;
+		Uint8		castle[KINGDOMMAXCASTLE];
 		E_NAMEHEROES	nameheroes[KINGDOMMAXHEROES];
 
 	    } S_KINGDOM;
@@ -76,8 +77,8 @@ void	FreeKingdom(void);
 void	KingdomAddHeroes(E_COLORS, E_NAMEHEROES);
 void	KingdomRemoveHeroes(E_COLORS, E_NAMEHEROES);
 
-void	KingdomAddCastle(E_COLORS, S_CASTLE *);
-void	KingdomRemoveCastle(E_COLORS, S_CASTLE *);
+void	KingdomAddCastle(E_COLORS, Uint8);
+void	KingdomRemoveCastle(E_COLORS, Uint8);
 
 //void	KingdomAddBuilding(Uint8, Uint8, E_COLOROBJECT);
 //void	KingdomRemoveBuilding(Uint8, Uint8);

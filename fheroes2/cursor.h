@@ -152,5 +152,6 @@ BOOL	InitCursor(void);
 void	FreeCursor(void);
 void	CursorOff(void);
 void	CursorOn(void);
+void	CursorShow(void);
 
 #endif

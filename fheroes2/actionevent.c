@@ -117,9 +117,6 @@ void ZeroINTERFACEACTION(INTERFACEACTION *action){
     action->rect.w = 0;
     action->rect.h = 0;
     action->mouseEvent = MOUSE_NULL;
-    action->cursorPush = CURSOR_NULL;
-    action->cursorMotion = CURSOR_NULL;
-    action->cursorUp = CURSOR_NULL;
     action->pf = NULL;
     action->level = LEVELEVENT_ROOT;
     action->next = NULL;
@@ -146,7 +143,6 @@ ACTION ActionCycle(INTERFACEACTION *action){
     old.flagPush = FALSE;
     old.flagPres = FALSE;
     INTERFACEACTION *ptr = NULL;
-    Uint8 delay = GetIntValue(ANIMATIONDELAY);
 
     // цикл по событиям
     while(exit == NONE){
@@ -265,30 +261,14 @@ ACTION ActionCycle(INTERFACEACTION *action){
 
 		case SDL_MOUSEMOTION:
 		
-		    ptr = action;
-		    
-		    if(old.flagPres && !ValidPoint(&old.presRect, event.motion.x, event.motion.y)){
-			DrawSprite(&old.presRect, &old.object);
-			old.flagPres = FALSE;
-
-		    }else
-			while(ptr){
-			    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, event.motion.x, event.motion.y)){
-				DrawSprite(&ptr->rect, &ptr->objectMotion);
-				old.object = ptr->objectUp;
-				old.presRect = ptr->rect;
-				old.flagPres = TRUE;
-			    }
-
-    			    ptr = (INTERFACEACTION *) ptr->next;
-			}
+		    CursorShow();
 		    break;
 
 		default:
     		    break;
 	    }
 
-	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY * delay);
+	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
     }
 
     return exit;

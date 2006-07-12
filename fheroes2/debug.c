@@ -857,6 +857,7 @@ void PrintCellInfo(Uint16 index){
     	    fprintf(stderr, "object  : %s\n", ((S_MONSTER *) GetStatMonster(ptrCell->object.monster))->descriptions );
 	    break;
 
+	case OBJN_CASTLE:
 	case OBJ_CASTLE:
 	    castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 	    fprintf(stderr, "object  : ");

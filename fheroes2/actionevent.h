@@ -53,9 +53,6 @@ typedef struct {
     AGGSPRITE	objectMotion;		// спрайт наведения
     AGGSPRITE	objectUp;		// спрайт отжатия
     Uint16	mouseEvent;		// реагируем на MOUSE_RCLICK MOUSE_LCLICK MOUSE_UWHEEL MOUSE_DWHEEL или MOUSE_PRESENT
-    Uint32	cursorPush;		// имя курсора после нажатия
-    Uint32	cursorMotion;		// имя курсора при наведении
-    Uint32	cursorUp;		// имя курсора после отжатия
     ACTION	(*pf)();		// функция действия, если возвращает 1 то выход из цикла
     SDL_Rect	rect;			// квадрат действия
     Uint8	level;			// для контроля уровеней вложенности

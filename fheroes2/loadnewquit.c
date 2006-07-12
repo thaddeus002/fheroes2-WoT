@@ -50,7 +50,7 @@ typedef struct{
 } S_OLDOBJECT2;
 
 void ShowNewLoadQuit(void);
-Uint32  RedrawMenuAnimation(Uint32, void *);
+void RedrawMenuAnimation(void);
 
 ACTION ActionPressNewGame(void);
 ACTION ActionPressLoadGame(void);
@@ -60,8 +60,6 @@ ACTION ActionPressHighScores(void);
 
 INTERFACEACTION *sthemain = NULL;
 S_ANIMATION	*stheanim = NULL;
-
-SDL_TimerID     timerAnime1 = NULL;
 
 ACTION DrawNewLoadQuit(void){
 
@@ -262,9 +260,6 @@ ACTION DrawNewLoadQuit(void){
     // отображаем всю картинку
     ShowNewLoadQuit();
 
-    // включаем анимацию
-    timerAnime1 = SDL_AddTimer(GetIntValue(ANIMATIONDELAY) * 10, RedrawMenuAnimation, NULL);
-
     // цикл событий
     SDL_Event event;
     SDL_Surface *video = SDL_GetVideoSurface();;
@@ -281,6 +276,8 @@ ACTION DrawNewLoadQuit(void){
     old.flagPres = FALSE;
     INTERFACEACTION *ptr = NULL;
 
+    Uint32 ticket = 0;
+    
     // цикл по событиям
     while(result == NONE){
 	while(SDL_PollEvent(&event))
@@ -392,20 +389,24 @@ ACTION DrawNewLoadQuit(void){
 			    }
 
     			    ptr = (INTERFACEACTION *) ptr->next;
-			}
+		    }
+
+		    CursorShow();
+
 		    break;
 
 		default:
     		    break;
 	    }
 
+	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMenuAnimation();
+
 	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
     }
 
     // освобождаем данные
-    SDL_RemoveTimer(timerAnime1);
-
     FreeAnimationEvent(stheanim);
+
     FreeActionEvent(sthemain);
 
     return result;
@@ -508,10 +509,10 @@ ACTION ActionPressHighScores(void){
     return NONE;
 }
 
-Uint32  RedrawMenuAnimation(Uint32 interval, void *param){
+void RedrawMenuAnimation(void){
 
-    if(! GetIntValue(ANIMATION)) return interval;
-    if(! GetIntValue(ANIM1)) return interval;
+    if(! GetIntValue(ANIMATION)) return;
+    if(! GetIntValue(ANIM1)) return;
 
     static Uint32 animationFrame = 0;
  
@@ -537,5 +538,5 @@ Uint32  RedrawMenuAnimation(Uint32 interval, void *param){
 
     ++animationFrame;
     
-     return interval;
+     return;
 }

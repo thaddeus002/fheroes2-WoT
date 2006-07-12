@@ -52,7 +52,8 @@ void	DrawCellAreaMapsTile(Uint8, Uint8);
 void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
-Uint32	RedrawMapsAnimation(Uint32, void *);
+void	RedrawMapsAnimation(void);
+void	CheckCursorAreaAction(void);
 
 ACTION ActionGAMELOOP(INTERFACEACTION *);
 
@@ -104,8 +105,6 @@ ACTION SettingsClickOkay(void);
 INTERFACEACTION *stpemaindisplay = NULL;
 
 SDL_Surface	*backgroundArea = NULL;
-
-SDL_TimerID	timerAnime = NULL;
 
 S_DISPLAY       display;
 
@@ -191,33 +190,21 @@ ACTION DrawMainDisplay(){
     display.lastOffsetX = 0;
     display.lastOffsetY = 0;
 
-    // востановим курсор рабочей области
-    dest.x = BORDERWIDTH;
-    dest.y = BORDERWIDTH;
-    dest.w = video->w - 2 * BORDERWIDTH;
-    dest.h = video->h - 2 * BORDERWIDTH;
-    // обнуляем
-    ZeroINTERFACEACTION(&action);
-    // заполняем
-    action.rect = dest;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.cursorMotion = CURSOR_POINTER;
-    // регистрируем
-    AddActionEvent(&stpemaindisplay, &action);
-
     // click по области карты
-    dest.x = BORDERWIDTH;
-    dest.y = BORDERWIDTH;
-    dest.w = GetAreaWidth() * TILEWIDTH;
-    dest.h = GetAreaHeight() * TILEWIDTH;
-    // обнуляем
-    ZeroINTERFACEACTION(&action);
-    // заполняем
-    action.rect = dest;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionClickMapsArea;
-    // регистрируем
-    AddActionEvent(&stpemaindisplay, &action);
+    if(GetIntValue(DEBUG)){
+	dest.x = BORDERWIDTH;
+	dest.y = BORDERWIDTH;
+	dest.w = GetAreaWidth() * TILEWIDTH;
+	dest.h = GetAreaHeight() * TILEWIDTH;
+	// обнуляем
+	ZeroINTERFACEACTION(&action);
+	// заполняем
+	action.rect = dest;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickMapsArea;
+	// регистрируем
+	AddActionEvent(&stpemaindisplay, &action);
+    }
 
     // scroll mouse левый
     dest.x = 0;
@@ -229,7 +216,6 @@ ACTION DrawMainDisplay(){
     // заполняем
     action.rect = dest;
     action.mouseEvent = MOUSE_PRESENT;
-    action.cursorMotion = CURSOR_SCROLL_LEFT;
     action.pf = ActionScrollLeft;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
@@ -244,7 +230,6 @@ ACTION DrawMainDisplay(){
     // заполняем
     action.rect = dest;
     action.mouseEvent = MOUSE_PRESENT;
-    action.cursorMotion = CURSOR_SCROLL_RIGHT;
     action.pf = ActionScrollRight;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
@@ -259,7 +244,6 @@ ACTION DrawMainDisplay(){
     // заполняем
     action.rect = dest;
     action.mouseEvent = MOUSE_PRESENT;
-    action.cursorMotion = CURSOR_SCROLL_TOP;
     action.pf = ActionScrollTop;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
@@ -274,7 +258,6 @@ ACTION DrawMainDisplay(){
     // заполняем
     action.rect = dest;
     action.mouseEvent = MOUSE_PRESENT;
-    action.cursorMotion = CURSOR_SCROLL_BOTTOM;
     action.pf = ActionScrollBottom;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
@@ -544,15 +527,10 @@ ACTION DrawMainDisplay(){
     ShowStaticMainDisplay();
     RedrawMapsArea();
 
-    // включаем анимацию
-    timerAnime = SDL_AddTimer(GetIntValue(ANIMATIONDELAY) * 10, RedrawMapsAnimation, NULL);
-
     // идем в цикл сообщений
     ACTION result;
 
     while(! (EXIT == (result = ActionGAMELOOP(stpemaindisplay)) || (ESC == result && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
-
-    SDL_RemoveTimer(timerAnime);
 
     result = EXIT;
 
@@ -1197,6 +1175,8 @@ void ShowStaticMainDisplay(void){
 
 ACTION ActionScrollTop(void){
 
+    SetCursor(CURSOR_SCROLL_TOP);
+
     if(display.offsetY){
 	display.lastOffsetX = display.offsetX;
 	display.lastOffsetY = display.offsetY;
@@ -1208,6 +1188,8 @@ ACTION ActionScrollTop(void){
 }
 
 ACTION ActionScrollBottom(void){
+
+    SetCursor(CURSOR_SCROLL_BOTTOM);
 
     if(display.offsetY < GetHeightMaps() - GetAreaHeight()){
 	display.lastOffsetX = display.offsetX;
@@ -1221,6 +1203,8 @@ ACTION ActionScrollBottom(void){
 
 ACTION ActionScrollRight(void){
 
+    SetCursor(CURSOR_SCROLL_RIGHT);
+
     if(display.offsetX < GetWidthMaps() - GetAreaWidth()){
 	display.lastOffsetY = display.offsetY;
 	display.lastOffsetX = display.offsetX;
@@ -1232,6 +1216,8 @@ ACTION ActionScrollRight(void){
 }
 
 ACTION ActionScrollLeft(void){
+
+    SetCursor(CURSOR_SCROLL_LEFT);
 
     if(display.offsetX){
 	display.lastOffsetY = display.offsetY;
@@ -1385,13 +1371,12 @@ void RedrawMapsArea(){
 
     DrawRectAreaMaps(&dest);
 
-
-    SDL_Flip(video);
-    
     // redraw radar
     RedrawRadarCursor();
 
     CursorOn();
+
+    SDL_Flip(video);
 
     return;
 }
@@ -1611,10 +1596,10 @@ void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
     }
 }
 
-Uint32 RedrawMapsAnimation(Uint32 interval, void *param){
+void RedrawMapsAnimation(void){
 
-    if(! GetIntValue(ANIMATION)) return interval;
-    if(! GetIntValue(ANIM2)) return interval;
+    if(! GetIntValue(ANIMATION)) return;
+    if(! GetIntValue(ANIM2)) return;
 
     static Uint32 animationFrame = 0;
     Uint8 x, y;
@@ -1638,12 +1623,12 @@ Uint32 RedrawMapsAnimation(Uint32 interval, void *param){
 
 	    if(! ptrCell->animation && ! ptrCell->monster) continue;
 
-	    dest.w = TILEWIDTH + CURSOR_WIDTH;
-	    dest.h = TILEWIDTH + CURSOR_HEIGHT;
+	    dest.w = 3 * TILEWIDTH + CURSOR_WIDTH;
+	    dest.h = 2 * TILEWIDTH + CURSOR_HEIGHT;
 
 	    // если курсор над клеткой с анимацией то выключаем
-	    if(BORDERWIDTH + x * TILEWIDTH < CURSOR_WIDTH) dest.x = 0; else dest.x = BORDERWIDTH + x * TILEWIDTH - CURSOR_WIDTH;
-	    if(BORDERWIDTH + y * TILEWIDTH < CURSOR_HEIGHT) dest.y = 0; else dest.y = BORDERWIDTH + y * TILEWIDTH - CURSOR_HEIGHT;
+	    if(BORDERWIDTH + x * TILEWIDTH < CURSOR_WIDTH * 2) dest.x = 0; else dest.x = BORDERWIDTH + x * TILEWIDTH - CURSOR_WIDTH * 2;
+	    if(BORDERWIDTH + y * TILEWIDTH < CURSOR_HEIGHT * 2) dest.y = 0; else dest.y = BORDERWIDTH + y * TILEWIDTH - CURSOR_HEIGHT * 2;
 	    if(ValidPoint(&dest, cx, cy)) CursorOff();
 
 	    // TILE
@@ -1803,13 +1788,12 @@ Uint32 RedrawMapsAnimation(Uint32 interval, void *param){
 	    DrawCellAreaMapsLevel2(x, y);
     }
 
-    SDL_Flip(video);
-
     CursorOn();
+    SDL_Flip(video);
 
     ++animationFrame;
 
-    return interval;
+    return;
 }
 
 ACTION ActionClickMapsArea(void){
@@ -2526,10 +2510,24 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
     old.flagPres = FALSE;
     INTERFACEACTION *ptr = NULL;
 
+    Uint32	ticket = 0;
+    Sint32 	cx, cy;
+
     // цикл по событиям
     while(exit == NONE){
 
-	while(SDL_PollEvent(&event))
+	ptr = stpemaindisplay;
+
+	while(ptr){
+
+	    SDL_GetMouseState(&cx, &cy);
+	    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, cx, cy) && ptr->pf)
+		exit = (*ptr->pf)();
+
+    	    ptr = (INTERFACEACTION *) ptr->next;
+	}
+
+	while(SDL_PollEvent(&event)){
 
 	    switch(event.type){
 	    
@@ -2620,25 +2618,25 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
 		    }
 		    break;
 
+		case SDL_MOUSEMOTION:
+
+		    CursorShow();
+		    break;
+
 		default:
     		    break;
 	    }
 
-	ptr = stpemaindisplay;
-
-	while(ptr){
-
-	    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, event.motion.x, event.motion.y)){
-
-		if(ptr->cursorMotion) SetCursor(ptr->cursorMotion);
-		if(ptr->pf) exit = (*ptr->pf)();
-	    
-	    }
-
-    	    ptr = (INTERFACEACTION *) ptr->next;
+	    if(0 == ticket % (GetIntValue(ANIMATIONDELAY) / 2)) RedrawMapsAnimation();
+	    ++ticket;
 	}
 
-	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+	CheckCursorAreaAction();
+
+	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMapsAnimation();
+	else if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+
+	++ticket;
     }
 
     return exit;
@@ -2746,3 +2744,102 @@ ACTION SettingsClickOkay(void){
     return OK;
 }
 
+void CheckCursorAreaAction(void){
+
+    Sint32 x, y;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    SDL_GetMouseState(&x, &y);
+
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + (y - BORDERWIDTH) / TILEWIDTH) * GetWidthMaps() + display.offsetX + (x - BORDERWIDTH) / TILEWIDTH);
+
+    // если над областью арены то по свойствам
+    if(x > BORDERWIDTH && x < BORDERWIDTH + GetAreaWidth() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
+
+	switch(ptrCell->type){
+
+	case OBJ_MONSTER:
+	    SetCursor(CURSOR_FIGHT);
+	    break;
+
+	case OBJN_CASTLE:
+	    SetCursor(CURSOR_CASTLE);
+	    break;
+
+	case OBJ_CASTLE:
+	case OBJ_ALCHEMYTOWER:
+	case OBJ_SIGN:
+	case OBJ_SKELETON:
+	case OBJ_DAEMONCAVE:
+	case OBJ_TREASURECHEST:
+	case OBJ_FAERIERING:
+	case OBJ_CAMPFIRE:
+	case OBJ_FOUNTAIN:
+	case OBJ_GAZEBO:
+	case OBJ_ANCIENTLAMP:
+	case OBJ_GRAVEYARD:
+	case OBJ_ARCHERHOUSE:
+	case OBJ_GOBLINHUNT:
+	case OBJ_DWARFCOTT:
+	case OBJ_PEASANTHUNT:
+	case OBJ_DRAGONCITY:
+	case OBJ_LIGHTHOUSE:
+	case OBJ_WATERMILL:
+	case OBJ_MINES:
+	case OBJ_OBELISK:
+	case OBJ_OASIS:
+	case OBJ_RESOURCE:
+	case OBJ_SAWMILL:
+	case OBJ_ORACLE:
+	case OBJ_SHRINE1:
+	case OBJ_DERELICTSHIP:
+	case OBJ_DESERTTENT:
+	case OBJ_STONELITHS:
+	case OBJ_WAGONCAMP:
+	case OBJ_WINDMILL:
+	case OBJ_ARTIFACT:
+	case OBJ_WATCHTOWER:
+	case OBJ_TREEHOUSE:
+	case OBJ_TREECITY:
+	case OBJ_RUINS:
+	case OBJ_FORT:
+	case OBJ_TRADINGPOST:
+	case OBJ_ABANDONEDMINE:
+	case OBJ_STANDINGSTONES:
+	case OBJ_IDOL:
+	case OBJ_TREEKNOWLEDGE:
+	case OBJ_DOCTORHUNT:
+	case OBJ_TEMPLE:
+	case OBJ_HILLFORT:
+	case OBJ_HALFLINGHOLE:
+	case OBJ_MERCENARYCAMP:
+	case OBJ_SHRINE2:
+	case OBJ_SHRINE3:
+	case OBJ_PIRAMID:
+	case OBJ_CITYDEAD:
+	case OBJ_EXCAVATION:
+	case OBJ_SPHINX:
+	case OBJ_WAGON:
+	case OBJ_ARTESIANSPRING:
+	case OBJ_TROLLBRIDGE:
+	case OBJ_WITCHHUNT:
+	case OBJ_XANADU:
+	case OBJ_CAVE:
+	case OBJ_LEANTO:
+	case OBJ_SHIPWRECK:
+	case OBJ_MAGICWELL:
+	case OBJ_MAGICGARDEN:
+	case OBJ_OBSERVATIONTOWER:
+	case OBJ_FREEMANFOUNDRY:
+	    SetCursor(CURSOR_ACTION);
+	    break;
+
+	default:
+	    SetCursor(CURSOR_POINTER);
+	    break;
+	}
+
+    // если за областью арены то обычный курсор
+    else if(x < video->w - BORDERWIDTH && x > BORDERWIDTH + GetAreaWidth() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
+	SetCursor(CURSOR_POINTER);
+}

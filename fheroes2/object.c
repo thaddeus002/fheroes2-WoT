@@ -246,6 +246,9 @@ ICNHEADER *GetICNHEADERCellObject(Uint8 type, Uint8 index, Uint8 ax, Uint8 ay){
 	case 0xA2:
 	case 0xA3:
 	    if(0x17 == index)
+
+		return NULL;
+
 		FillSPRITE(&sprite, "BOAT32.ICN", 18);
 	    else
 		FillSPRITE(&sprite, "OBJNWAT2.ICN", index);

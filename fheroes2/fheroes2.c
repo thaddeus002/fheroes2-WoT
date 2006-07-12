@@ -92,9 +92,9 @@ int main(int argc, char **argv){
     Uint32 flags;
     // инициализация SDL
     if(GetIntValue(SOUND))
-	flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER;
+	flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
     else
-	flags = SDL_INIT_VIDEO | SDL_INIT_TIMER;
+	flags = SDL_INIT_VIDEO;
 
     if( 0 > SDL_Init(flags)){
 	fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());

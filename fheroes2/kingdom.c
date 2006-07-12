@@ -39,6 +39,8 @@ BOOL	InitKingdom(void){
 
     FreeKingdom();
 
+    kingdom[GRAY].play = TRUE;
+
     if(GetIntValue(KINGDOMCOLORS) & COLORBLUE)   kingdom[BLUE].play   = TRUE;
     if(GetIntValue(KINGDOMCOLORS) & COLORGREEN)  kingdom[GREEN].play  = TRUE;
     if(GetIntValue(KINGDOMCOLORS) & COLORRED)    kingdom[RED].play    = TRUE;
@@ -68,9 +70,9 @@ void	FreeKingdom(void){
     for(dom = 0; dom < KINGDOMMAX; ++dom){
 
 	kingdom[dom].play = FALSE;
-	kingdom[dom].build = NULL;
-	kingdom[dom].castle = NULL;
+	//kingdom[dom].build = NULL;
 
+	for(name = 0; name < KINGDOMMAXCASTLE; ++name) kingdom[dom].castle[name] = 0xFF;
 	for(name = 0; name < KINGDOMMAXHEROES; ++name) kingdom[dom].nameheroes[name] = HEROESNULL;
     }
 }
@@ -102,62 +104,34 @@ void    KingdomRemoveHeroes(E_COLORS color, E_NAMEHEROES name){
 	}
 }
 
-void    KingdomAddCastle(E_COLORS color, S_CASTLE *castle){
+void    KingdomAddCastle(E_COLORS color, Uint8 index){
 
-    if(color == GRAY) return;
     if(! kingdom[color].play) return;
 
-    if(! castle){
-	fprintf(stderr, "KingdomAddCastle: error: *castle NULL\n");
-	return;
-    }
+    Uint8 i;
     
-    if(! kingdom[color].castle){
+    for(i = 0; i < KINGDOMMAXCASTLE; ++i)
 
-	kingdom[color].castle = castle;
-    
-	if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddCastle: %s\n", castle->name);
-	return;
+	if(0xFF == kingdom[color].castle[i]){
+
+	    kingdom[color].castle[index] = index;
+	    break;
     }
 
-    S_CASTLE *ptrCastle = kingdom[color].castle;
-
-    while(ptrCastle->next) ptrCastle = (S_CASTLE *) ptrCastle->next;
-
-    ptrCastle->next = castle;
-    
-    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddCastle: %s\n", castle->name);
+    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddCastle: %s\n", ((S_CASTLE *) GetStatCastle(index))->name);
 }
 
-void    KingdomRemoveCastle(E_COLORS color, S_CASTLE *castle){
+void    KingdomRemoveCastle(E_COLORS color, Uint8 index){
 
-    if(! castle){
-	fprintf(stderr, "KingdomRemoveCastle: error: *castle NULL\n");
-	return;
-    }
+    if(! kingdom[color].play) return;
+
+    Uint8 i;
+
+    for(i = 0; i < KINGDOMMAXCASTLE; ++i)
     
-    S_CASTLE *head = kingdom[color].castle;
+	if(index == kingdom[color].castle[i]){
 
-    if(! head) return;
-
-    if(castle->pos.x == head->pos.x && castle->pos.y == head->pos.y){
-	kingdom[color].castle = head->next;
-	head->next = NULL;
-	return;
-    }
-
-    S_CASTLE *tail = head->next;
-
-    while(tail){
-	
-	if(castle->pos.x == tail->pos.x && castle->pos.y == tail->pos.y){
-	    
-	    head->next = tail->next;
-	    tail= NULL;
-	    return;
-	}
-	
-	head = (S_CASTLE *) head->next;
-	tail = (S_CASTLE *) tail->next;
+	    kingdom[color].castle[i] = 0xFF;
+	    break;
     }
 }

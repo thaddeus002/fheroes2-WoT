@@ -31,6 +31,7 @@
 #include "debug.h"
 #include "draw.h"
 #include "config.h"
+#include "tools.h"
 #include "castle.h"
 #include "kingdom.h"
 #include "monster.h"
@@ -228,6 +229,7 @@ ACTION InitMaps(char *filename){
     MP2ADDONTAIL	*ptrAddon = NULL;
     ICNHEADER		*tail = NULL;
     ICNHEADER		*current = NULL;
+    Uint16		quantity;
 
     // цикл по заполнению основной информации
     for(i = 0; i < ptrMP2Header->heightMaps * ptrMP2Header->widthMaps; ++i){
@@ -258,9 +260,10 @@ ACTION InitMaps(char *filename){
 
 	// добавляем замки
 	if(OBJ_CASTLE == ptrMaps[i].type){
-	    if(GetIntValue(DEBUG) && (0 == ptrMapsInfo[i].quantity1 || ptrMapsInfo[i].quantity1 % 0x08)) fprintf(stderr, "InitMaps: hmm.. unknown castle position, quantity: %d\n", ptrMapsInfo[i].quantity1);
+	    quantity = PackUint16(ptrMapsInfo[i].quantity2, ptrMapsInfo[i].quantity1);
+	    if(GetIntValue(DEBUG) && (0 == quantity || quantity % 0x08)) fprintf(stderr, "InitMaps: hmm.. unknown castle position, quantity: %hX\n", quantity);
 	    fseek(fd, fdTail, SEEK_SET);
-	    AddCastle(fd, ptrMapsInfo[i].quantity1 / 8 - 1, ptrMP2Castle[castle * 3], ptrMP2Castle[castle * 3 + 1]);
+	    if(! AddCastle(fd, quantity / 8 - 1, ptrMP2Castle[castle * 3], ptrMP2Castle[castle * 3 + 1])) fprintf(stderr, "ax: %d, ay: %d, quantity: %hX\n", ptrMaps[i].ax, ptrMaps[i].ay, quantity);
 	    ++castle;
 	}
 	ptrMaps[i].move	= TRUE;

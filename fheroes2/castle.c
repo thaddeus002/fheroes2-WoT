@@ -272,10 +272,11 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 
     ptrCastle[countCastle].next = NULL;
 
-    KingdomAddCastle(ptrCastle[countCastle].color, &ptrCastle[countCastle]);
+    ++countCastle;
+
+    KingdomAddCastle(ptrCastle[countCastle].color, countCastle - 1);
 
     free(ptr);
-    ++countCastle;
 
     return TRUE;
 }
@@ -304,9 +305,16 @@ S_CASTLE *GetStatCastlePos(Uint8 ax, Uint8 ay){
 
     for(i = 0; i < countCastle; ++i)
 
-	if(ax == ptrCastle[i].ax && ay == ptrCastle[i].ay)
+	if(ValidPoint(&ptrCastle[i].pos, ax, ay))
 
 	    return &ptrCastle[i];
 
     return NULL;
+}
+
+S_CASTLE *GetStatCastle(Uint8 index){
+
+    if(index >= countCastle) return NULL;
+
+    return &ptrCastle[index];
 }

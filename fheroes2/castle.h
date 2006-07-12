@@ -84,5 +84,6 @@ BOOL		AddCastle(FILE *, Uint8, Uint8, Uint8);
 void		FreeCastle(void);
 E_RACE		GetRaceRNDCastle(Uint8, Uint8);
 S_CASTLE	*GetStatCastlePos(Uint8, Uint8);
+S_CASTLE	*GetStatCastle(Uint8);
 
 #endif

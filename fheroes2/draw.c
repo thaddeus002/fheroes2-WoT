@@ -232,10 +232,8 @@ void DrawSprite(SDL_Rect *rect, AGGSPRITE *object){
 
     image = GetICNSprite(object);
 
-    if(image){
+    if(image)
         SDL_BlitSurface(image, &src, video, rect);
-	SDL_Flip(video);
-    }
 
     CursorOn();
 }
