@@ -70,6 +70,11 @@ typedef enum {
 	    GRAY	= 6
             } E_COLORS;
 
+typedef enum {
+	    HEROES,
+	    CASTLE,
+	    BOAT
+	    } E_FOCUSE;
 
 typedef enum {
                 BARBARIAN,

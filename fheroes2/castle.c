@@ -93,12 +93,12 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
     fread((char *) &ptr->castle, 1, sizeof(Uint8), fd);
     fread((char *) &ptr->allowCastle, 1, sizeof(Uint8), fd);
     fread((char *) &ptr->unknown, 1, 29, fd);
-	
-    if(NULL == (ptrCastle = realloc(ptrCastle, sizeof(S_CASTLE) * (countCastle + 1)))){
+
+    if(NULL == (ptrCastle = (S_CASTLE *) realloc(ptrCastle, sizeof(S_CASTLE) * (countCastle + 1)))){
 	fprintf(stderr, "AddCastle: error malloc: %d\n", sizeof(S_CASTLE) * (countCastle + 1));
 	return FALSE;
     }
-	
+
 	switch(ptr->color){
 	
 	    case 0:
@@ -274,7 +274,7 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 
     ++countCastle;
 
-    KingdomAddCastle(ptrCastle[countCastle].color, countCastle - 1);
+    KingdomAddCastle(ptrCastle[countCastle - 1].color, countCastle - 1);
 
     free(ptr);
 

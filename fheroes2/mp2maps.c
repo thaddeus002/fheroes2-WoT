@@ -115,6 +115,9 @@ void FreeMaps(void){
 		if(ptrMaps[i].animation)
 			    FreeAnimationEvent(ptrMaps[i].animation);
 
+		if(ptrMaps[i].monster)
+			    FreeAnimationEvent(ptrMaps[i].monster);
+
 	    }
 	    free(ptrMaps);
 	}

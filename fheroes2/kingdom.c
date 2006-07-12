@@ -28,16 +28,22 @@
 
 #include "SDL.h"
 #include "gamedefs.h"
+#include "string.h"
 #include "config.h"
 #include "heroes.h"
 #include "kingdom.h"
 
 
-static S_KINGDOM kingdom[KINGDOMMAX];
+static S_KINGDOM *kingdom = NULL;
 
 BOOL	InitKingdom(void){
 
-    FreeKingdom();
+    if(NULL == (kingdom = (S_KINGDOM *) malloc(sizeof(S_KINGDOM) * KINGDOMMAX))){
+	fprintf(stderr, "InitKingdom: error malloc: %d\n", sizeof(S_KINGDOM) * KINGDOMMAX);
+	return FALSE;
+    }
+    
+    memset(kingdom, 0, sizeof(S_KINGDOM) * KINGDOMMAX);
 
     kingdom[GRAY].play = TRUE;
 
@@ -65,16 +71,7 @@ BOOL	InitKingdom(void){
 
 void	FreeKingdom(void){
 
-    Uint8 dom, name;
-    
-    for(dom = 0; dom < KINGDOMMAX; ++dom){
-
-	kingdom[dom].play = FALSE;
-	//kingdom[dom].build = NULL;
-
-	for(name = 0; name < KINGDOMMAXCASTLE; ++name) kingdom[dom].castle[name] = 0xFF;
-	for(name = 0; name < KINGDOMMAXHEROES; ++name) kingdom[dom].nameheroes[name] = HEROESNULL;
-    }
+    if(kingdom) free(kingdom);
 }
 
 void    KingdomAddHeroes(E_COLORS color, E_NAMEHEROES name){
@@ -109,7 +106,7 @@ void    KingdomAddCastle(E_COLORS color, Uint8 index){
     if(! kingdom[color].play) return;
 
     Uint8 i;
-    
+
     for(i = 0; i < KINGDOMMAXCASTLE; ++i)
 
 	if(0xFF == kingdom[color].castle[i]){

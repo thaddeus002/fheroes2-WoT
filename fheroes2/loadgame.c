@@ -53,7 +53,7 @@ void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
 void	RedrawMapsAnimation(void);
-void	CheckCursorAreaAction(void);
+void	CheckCursorAreaAction(E_FOCUSE);
 
 ACTION ActionGAMELOOP(INTERFACEACTION *);
 
@@ -2631,7 +2631,7 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
 	    ++ticket;
 	}
 
-	CheckCursorAreaAction();
+	CheckCursorAreaAction(HEROES);
 
 	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMapsAnimation();
 	else if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
@@ -2744,7 +2744,7 @@ ACTION SettingsClickOkay(void){
     return OK;
 }
 
-void CheckCursorAreaAction(void){
+void CheckCursorAreaAction(E_FOCUSE f){
 
     Sint32 x, y;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -2756,87 +2756,178 @@ void CheckCursorAreaAction(void){
     // если над областью арены то по свойствам
     if(x > BORDERWIDTH && x < BORDERWIDTH + GetAreaWidth() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
 
-	switch(ptrCell->type){
+	switch(f){
+	
+	    // фокус на лодке
+	    case BOAT:
 
-	case OBJ_MONSTER:
-	    SetCursor(CURSOR_FIGHT);
-	    break;
+		switch(ptrCell->type){
 
-	case OBJN_CASTLE:
-	    SetCursor(CURSOR_CASTLE);
-	    break;
+		    case OBJ_TREASURECHEST:
+			WATER == ptrCell->ground ? SetCursor(CURSOR_REDBOAT) : SetCursor(CURSOR_POINTER);
+			break;
 
-	case OBJ_CASTLE:
-	case OBJ_ALCHEMYTOWER:
-	case OBJ_SIGN:
-	case OBJ_SKELETON:
-	case OBJ_DAEMONCAVE:
-	case OBJ_TREASURECHEST:
-	case OBJ_FAERIERING:
-	case OBJ_CAMPFIRE:
-	case OBJ_FOUNTAIN:
-	case OBJ_GAZEBO:
-	case OBJ_ANCIENTLAMP:
-	case OBJ_GRAVEYARD:
-	case OBJ_ARCHERHOUSE:
-	case OBJ_GOBLINHUNT:
-	case OBJ_DWARFCOTT:
-	case OBJ_PEASANTHUNT:
-	case OBJ_DRAGONCITY:
-	case OBJ_LIGHTHOUSE:
-	case OBJ_WATERMILL:
-	case OBJ_MINES:
-	case OBJ_OBELISK:
-	case OBJ_OASIS:
-	case OBJ_RESOURCE:
-	case OBJ_SAWMILL:
-	case OBJ_ORACLE:
-	case OBJ_SHRINE1:
-	case OBJ_DERELICTSHIP:
-	case OBJ_DESERTTENT:
-	case OBJ_STONELITHS:
-	case OBJ_WAGONCAMP:
-	case OBJ_WINDMILL:
-	case OBJ_ARTIFACT:
-	case OBJ_WATCHTOWER:
-	case OBJ_TREEHOUSE:
-	case OBJ_TREECITY:
-	case OBJ_RUINS:
-	case OBJ_FORT:
-	case OBJ_TRADINGPOST:
-	case OBJ_ABANDONEDMINE:
-	case OBJ_STANDINGSTONES:
-	case OBJ_IDOL:
-	case OBJ_TREEKNOWLEDGE:
-	case OBJ_DOCTORHUNT:
-	case OBJ_TEMPLE:
-	case OBJ_HILLFORT:
-	case OBJ_HALFLINGHOLE:
-	case OBJ_MERCENARYCAMP:
-	case OBJ_SHRINE2:
-	case OBJ_SHRINE3:
-	case OBJ_PIRAMID:
-	case OBJ_CITYDEAD:
-	case OBJ_EXCAVATION:
-	case OBJ_SPHINX:
-	case OBJ_WAGON:
-	case OBJ_ARTESIANSPRING:
-	case OBJ_TROLLBRIDGE:
-	case OBJ_WITCHHUNT:
-	case OBJ_XANADU:
-	case OBJ_CAVE:
-	case OBJ_LEANTO:
-	case OBJ_SHIPWRECK:
-	case OBJ_MAGICWELL:
-	case OBJ_MAGICGARDEN:
-	case OBJ_OBSERVATIONTOWER:
-	case OBJ_FREEMANFOUNDRY:
-	    SetCursor(CURSOR_ACTION);
-	    break;
+		    case OBJ_SHIPWRECK:
+		    case OBJ_WHIRLPOOL:
+		    case OBJ_BUOY:
+		    case OBJ_BOTTLE:
+		    case OBJ_SHIPWRECKSURVIROR:
+		    case OBJ_FLOTSAM:
+		    case OBJ_MAGELLANMAPS:
+			SetCursor(CURSOR_REDBOAT);
+			break;
+		    
+		    case OBJ_COAST:
+			SetCursor(CURSOR_ANCHOR);
+			break;
 
-	default:
-	    SetCursor(CURSOR_POINTER);
-	    break;
+		    case OBJN_CASTLE:
+		    case OBJ_CASTLE:
+			SetCursor(CURSOR_CASTLE);
+			break;
+
+		    case OBJ_HEROES:
+			SetCursor(CURSOR_HEROES);
+			break;
+		
+		    case OBJN_SHIPWRECK:
+		    case OBJN_DERELICTSHIP:
+		    case OBJN_MAGELLANMAPS:
+		    case OBJ_STONES:
+			SetCursor(CURSOR_POINTER);
+			break;
+
+		    default:
+			WATER == ptrCell->ground ? SetCursor(CURSOR_BOAT) : SetCursor(CURSOR_POINTER);
+			break;
+
+		}
+		break;
+		
+	    // фокус на герое
+	    case HEROES:
+
+		switch(ptrCell->type){
+		
+		    case OBJ_MONSTER:
+			SetCursor(CURSOR_FIGHT);
+			break;
+
+		    case OBJN_CASTLE:
+			SetCursor(CURSOR_CASTLE);
+			break;
+
+		    case OBJ_BOAT:
+			SetCursor(CURSOR_BOAT);
+			break;
+
+		    case OBJ_TREASURECHEST:
+			WATER == ptrCell->ground ? SetCursor(CURSOR_POINTER) : SetCursor(CURSOR_ACTION);
+			break;
+
+		    case OBJ_STONES:
+		    case OBJ_OILLAKE:
+		    case OBJ_BIGCRACK:
+		    case OBJ_MOUNTS:
+		    case OBJ_TREES:
+		    case OBJN_WAGONCAMP:
+		    case OBJN_SAWMILL:
+		    case OBJN_MINES:
+		    case OBJ_WATERLAKE:
+			SetCursor(CURSOR_POINTER);
+			break;
+
+		    case OBJ_CASTLE:
+		    case OBJ_ALCHEMYTOWER:
+		    case OBJ_SIGN:
+    	    	    case OBJ_SKELETON:
+    		    case OBJ_DAEMONCAVE:
+		    case OBJ_FAERIERING:
+		    case OBJ_CAMPFIRE:
+	    	    case OBJ_FOUNTAIN:
+		    case OBJ_GAZEBO:
+		    case OBJ_ANCIENTLAMP:
+		    case OBJ_GRAVEYARD:
+		    case OBJ_ARCHERHOUSE:
+		    case OBJ_GOBLINHUNT:
+		    case OBJ_DWARFCOTT:
+		    case OBJ_PEASANTHUNT:
+		    case OBJ_DRAGONCITY:
+		    case OBJ_LIGHTHOUSE:
+		    case OBJ_WATERMILL:
+		    case OBJ_MINES:
+		    case OBJ_OBELISK:
+		    case OBJ_OASIS:
+		    case OBJ_RESOURCE:
+		    case OBJ_SAWMILL:
+		    case OBJ_ORACLE:
+		    case OBJ_SHRINE1:
+		    case OBJ_DERELICTSHIP:
+		    case OBJ_DESERTTENT:
+		    case OBJ_STONELITHS:
+		    case OBJ_WAGONCAMP:
+		    case OBJ_WINDMILL:
+		    case OBJ_ARTIFACT:
+		    case OBJ_WATCHTOWER:
+		    case OBJ_TREEHOUSE:
+		    case OBJ_TREECITY:
+		    case OBJ_RUINS:
+		    case OBJ_FORT:
+		    case OBJ_TRADINGPOST:
+		    case OBJ_ABANDONEDMINE:
+		    case OBJ_STANDINGSTONES:
+		    case OBJ_IDOL:
+		    case OBJ_TREEKNOWLEDGE:
+		    case OBJ_DOCTORHUNT:
+		    case OBJ_TEMPLE:
+		    case OBJ_HILLFORT:
+		    case OBJ_HALFLINGHOLE:
+		    case OBJ_MERCENARYCAMP:
+		    case OBJ_SHRINE2:
+		    case OBJ_SHRINE3:
+		    case OBJ_PIRAMID:
+		    case OBJ_CITYDEAD:
+		    case OBJ_EXCAVATION:
+		    case OBJ_SPHINX:
+		    case OBJ_WAGON:
+		    case OBJ_ARTESIANSPRING:
+		    case OBJ_TROLLBRIDGE:
+		    case OBJ_WITCHHUNT:
+		    case OBJ_XANADU:
+		    case OBJ_CAVE:
+		    case OBJ_LEANTO:
+		    case OBJ_MAGICWELL:
+		    case OBJ_MAGICGARDEN:
+		    case OBJ_OBSERVATIONTOWER:
+		    case OBJ_FREEMANFOUNDRY:
+			SetCursor(CURSOR_ACTION);
+			break;
+
+		    default:
+			WATER == ptrCell->ground ? SetCursor(CURSOR_POINTER) : SetCursor(CURSOR_MOVE);
+			break;
+		}
+		break;
+		
+	    // фокус на замке
+	    case CASTLE:
+
+		switch(ptrCell->type){
+
+		    case OBJ_HEROES:
+			SetCursor(CURSOR_HEROES);
+			break;
+
+		    case OBJN_CASTLE:
+		    case OBJ_CASTLE:
+			SetCursor(CURSOR_CASTLE);
+			break;
+
+		    default:
+			SetCursor(CURSOR_POINTER);
+			break;
+		}
+		break;
 	}
 
     // если за областью арены то обычный курсор

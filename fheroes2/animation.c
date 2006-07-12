@@ -95,15 +95,15 @@ S_ANIMATION * AddAnimationEvent(S_ANIMATION **pointer, SDL_Rect *rect, ICNHEADER
 
 void FreeAnimationEvent(S_ANIMATION *head){
 
-    S_ANIMATION *ptr = head;
+    S_ANIMATION *ptr = NULL;
 
-    while(ptr){
+    while(head){
+    
+	ptr = head;
         head = (S_ANIMATION *) head->next;
-	
+
 	if(ptr->rect) free(ptr->rect);
 	if(ptr->surface) free(ptr->surface);
         free(ptr);
-
-        ptr = head;
     }
 }
