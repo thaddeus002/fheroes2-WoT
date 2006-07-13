@@ -399,9 +399,9 @@ ACTION DrawNewLoadQuit(void){
     		    break;
 	    }
 
-	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMenuAnimation();
+	if(result != EXIT && 0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMenuAnimation();
 
-	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+	if(GetIntValue(CYCLELOOP) && CYCLEDELAY) SDL_Delay(CYCLEDELAY);
     }
 
     // освобождаем данные

@@ -159,6 +159,7 @@ typedef enum {
 	    } E_ARTIFACT;
 
 typedef struct {
+		BOOL		use;
 		const char *	name;
 		const char *	description;
 	    } S_ARTIFACT;

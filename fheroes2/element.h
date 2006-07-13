@@ -31,6 +31,8 @@
 
 #include "tools.h"
 
-ACTION MessageBox(const char *, ENUMFONT font);
+ACTION	MessageBox(const char *, ENUMFONT font);
+
+void	ShowQuickInfo(Uint16);
 
 #endif

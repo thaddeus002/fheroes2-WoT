@@ -59,6 +59,8 @@ typedef enum {
 
 		ANIM1,
 		ANIM2,
+		ANIM3,
+		CYCLELOOP,
 
 		// end config
 		CONFIGEND

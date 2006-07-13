@@ -161,6 +161,7 @@ typedef struct {
     E_MONSTERSPEED	speed;
     Uint16		cost;
     const char *	descriptions;
+    const char *	filename;
 	    } S_MONSTER;
 
 typedef struct {

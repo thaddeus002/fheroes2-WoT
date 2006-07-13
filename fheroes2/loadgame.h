@@ -39,10 +39,17 @@ typedef struct {
 		Uint8           lastOffsetY;
 		} S_DISPLAY;
 
+typedef struct {
+    		E_FOCUS         type;
+                Uint8           ax;
+                Uint8           ay;
+                void            *object;
+                } S_FOCUS;
+                                        
 ACTION DrawMainDisplay(void);
 
 S_DISPLAY *GetDisplayPos(void);
-Uint8   GetAreaWidth(void);
-Uint8   GetAreaHeight(void);
+Uint8   GetWidthArea(void);
+Uint8   GetHeightArea(void);
 
 #endif

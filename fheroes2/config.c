@@ -63,8 +63,10 @@ static CONFIGDESC settings[CONFIGEND] = {
     { "\0",		0 },		// RNDCOLORS
     { "\0",		0 },		// HUMANCOLORS
 
-    { "on",		TRUE },		// ANIM1
-    { "on",		TRUE },		// ANIM2
+    { "on",		TRUE },		// ANIM1 анимация меню
+    { "on",		TRUE },		// ANIM2 анимация карта
+    { "on",		TRUE },		// ANIM3 анимация замок
+    { "on",		TRUE },		// CYCLELOOP
 };
 
 void InitConfig(const char * configFile){
@@ -196,15 +198,11 @@ void SetIntValue(E_CONFIG key, Uint8 value){
 	//
 	case ANIM1:
 	case ANIM2:
+	case ANIM3:
+	case CYCLELOOP:
 
+	    if(FALSE == value) settings[key].valueInt = FALSE; else settings[key].valueInt = TRUE;
 
-	    if(FALSE == value){
-		settings[key].valueInt = FALSE;
-		strcpy(settings[key].valueStr, "off");
-	    }else{
-		settings[key].valueInt = TRUE;
-		strcpy(settings[key].valueStr, "on");
-	    }
 	    break;
 
 	case VIDEOMODE:

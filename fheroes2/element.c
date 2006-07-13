@@ -31,6 +31,8 @@
 #include "tools.h"
 #include "actionevent.h"
 #include "cursor.h"
+#include "mp2maps.h"
+#include "object.h"
 #include "config.h"
 #include "element.h"
 
@@ -67,7 +69,11 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     rectBack.h = BOXHEIGHT;
 
     // сохраняем бакгроунд
-    format = SDL_CreateRGBSurface(SDL_SWSURFACE, BOXWIDTH, BOXHEIGHT, 16, 0, 0, 0, 0);
+    if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, BOXWIDTH, BOXHEIGHT, 16, 0, 0, 0, 0))){
+	fprintf(stderr, "MessageBox: CreateRGBSurface failed: %s\n", SDL_GetError());
+	return EXIT;
+    }    
+
     back = SDL_DisplayFormat(format);
     SDL_FreeSurface(format);
     SDL_BlitSurface(video, &rectBack, back, NULL);
@@ -182,7 +188,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     // востанавливаем бакгроунд
     CursorOff();
     SDL_BlitSurface(back, NULL, video, &rectBack);
-    SDL_Flip(video);
+    //SDL_Flip(video);
 
     FreeActionEvent(dialog);
     SDL_FreeSurface(back);
@@ -203,4 +209,112 @@ ACTION DialogPressYES(){
 ACTION DialogPressNO(){
 
     return NO;
+}
+
+void ShowQuickInfo(Uint16 index){
+
+    SDL_Event event;
+    BOOL exit = FALSE;
+    
+    CursorOff();
+    SetIntValue(ANIMATION, FALSE);
+    
+    Uint32 cursor = GetCursor();
+
+    SDL_Surface *format, *back, *ram, *video;
+    Sint32 cx, cy;
+    SDL_Rect rectBack, rectCur;
+    AGGSPRITE sprite;
+    char *message;
+
+    SDL_GetMouseState(&cx, &cy);
+
+    // выборка по герою замку или объекту
+    switch((GetCELLMAPS(index))->type){
+    
+	case OBJN_CASTLE:
+	case OBJ_CASTLE:
+	    FillSPRITE(&sprite, "QWIKTOWN.ICN", 0);
+	    break;
+	    
+	case OBJ_HEROES:
+	    FillSPRITE(&sprite, "QWIKHERO.ICN", 0);
+	    break;
+	
+	default:
+	    FillSPRITE(&sprite, "QWIKINFO.ICN", 0);
+	    break;
+    }
+
+    ram = GetICNSprite(&sprite);
+
+    // отрисовка диалога по центру курсора
+    video = SDL_GetVideoSurface();
+
+    if(GetIntValue(VIDEOMODE)){
+	rectBack.x = (video->w - ram->w) / 2 - BORDERWIDTH;
+	rectBack.y = (video->h - ram->h) / 2 - BORDERWIDTH;
+	rectBack.w = ram->w + 2 * BORDERWIDTH;
+	rectBack.h = ram->h + 2 * BORDERWIDTH;
+    }else{
+	rectBack.x = 0;
+	rectBack.y = 0;
+	rectBack.w = ram->w;
+	rectBack.h = ram->h;
+    }
+
+    // сохраняем бакгроунд
+    if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
+	fprintf(stderr, "ShowQuickInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
+	return;
+    }    
+    back = SDL_DisplayFormat(format);
+    SDL_FreeSurface(format);
+    SDL_BlitSurface(video, &rectBack, back, NULL);
+
+    // рисуем рамку
+    SDL_BlitSurface(ram, NULL, video, &rectBack);
+
+    // выборка надписи по герою замку или объекту
+    switch((GetCELLMAPS(index))->type){
+
+	case OBJN_CASTLE:
+	case OBJ_CASTLE:
+	    message = "Castle Info";
+	    break;
+	    
+	case OBJ_HEROES:
+	    message = "Heroes Info";
+	    break;
+	
+	default:
+	    message = "Object Info";
+	    break;
+    }
+
+    // здесь левый верхний угол после бордюра
+    rectCur.x = rectBack.x + 26;
+    rectCur.y = rectBack.y + 10;
+    rectCur.w = rectBack.w - 36;
+    rectCur.h = rectBack.h - 36;
+
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    SDL_Flip(video);
+
+    while(! exit){
+
+	while(SDL_PollEvent(&event))
+	    if(SDL_RELEASED == event.button.state) exit = TRUE;
+    
+	if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY * 10);
+    }
+
+    // востанавливаем бакгроунд
+    SDL_BlitSurface(back, NULL, video, &rectBack);
+
+    SDL_FreeSurface(back);
+
+    SetCursor(cursor);
+    SetIntValue(ANIMATION, TRUE);
+    CursorOn();
 }

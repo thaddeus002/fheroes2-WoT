@@ -107,9 +107,9 @@ BOOL InitRadar(void){
     // рисуем курсор радара
     float scale = 0;
     scale = RADARWIDTH / (float) widthMaps;
-    Uint8 widthCursor = GetAreaWidth() * scale;
+    Uint8 widthCursor = GetWidthArea() * scale;
     scale = RADARWIDTH / (float) heightMaps;
-    Uint8 heightCursor = GetAreaHeight() * scale;
+    Uint8 heightCursor = GetHeightArea() * scale;
 
     if(NULL == (radarCursor = SDL_CreateRGBSurface(SDL_SWSURFACE, widthCursor, heightCursor, 16, 0, 0, 0, 0))){
 	fprintf(stderr, "InitRadar: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), widthCursor, heightCursor);

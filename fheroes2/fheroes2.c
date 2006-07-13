@@ -133,7 +133,7 @@ int main(int argc, char **argv){
 
     // check mode
     fprintf(stderr, "Checking mode %dx%d@16bpp. (SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF)\n", xres, yres);
-    if(16 != SDL_VideoModeOK(xres, yres, 16, SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF)){
+    if(8 == SDL_VideoModeOK(xres, yres, 16, SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF)){
 	fprintf(stderr, "Mode not available.");
 	exit(1);
     }

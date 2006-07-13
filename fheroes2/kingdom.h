@@ -41,6 +41,7 @@
 #define KINGDOMMAX		7	// включая и GRAY
 
 // объекты которые которые можно захватить (с флажками)
+/*
 typedef enum {
 
 		ALCHEMYTOWER	= OBJ_ALCHEMYTOWER,
@@ -51,24 +52,21 @@ typedef enum {
 		ABANDONEDMINE	= OBJ_ABANDONEDMINE,
 
 	    } E_COLOROBJECT;
+*/
 
-typedef struct {
-
-		Uint8		ax;
-		Uint8		ay;
-		E_COLOROBJECT	type;
-		E_RESOURCE	res;
-		void		*object;
-
-	    } S_BUILDING;
- 
 typedef struct {
 
 		BOOL		play;
 		//S_BUILDING	*build;
 		Uint8		castle[KINGDOMMAXCASTLE];
 		E_NAMEHEROES	nameheroes[KINGDOMMAXHEROES];
-
+		Uint16		wood;
+		Uint16		mercury;
+		Uint16		ore;
+		Uint16		sulfur;
+		Uint16		crystal;
+		Uint16		gems;
+		Uint16		gold;
 	    } S_KINGDOM;
 
 BOOL    InitKingdom(void);

@@ -33,9 +33,11 @@
 #include "gamedefs.h"
 #include "tools.h"
 #include "config.h"
+#include "cursor.h"
 #include "mp2maps.h"
 #include "monster.h"
 #include "kingdom.h"
+#include "heroes.h"
 #include "castle.h"
 
 static S_CASTLE		*ptrCastle = NULL;
@@ -317,4 +319,299 @@ S_CASTLE *GetStatCastle(Uint8 index){
     if(index >= countCastle) return NULL;
 
     return &ptrCastle[index];
+}
+
+void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
+
+    // определяем тип замка
+    S_CASTLE *castle = GetStatCastlePos(ax, ay);
+    S_HEROES *heroes = GetStatHeroes(nameHeroes);
+
+    // в серые замки не заходим
+    if(GRAY == castle->color) return;
+
+    // переопределяем курсор и выключаем анимацию карты
+    SetIntValue(ANIM1, FALSE);
+    CursorOff();
+    Uint32 cursor = GetCursor();
+    INTERFACEACTION *dialogCastle = NULL;
+
+    SDL_Surface *format, *back, *ram, *video;
+    SDL_Rect rectBack, rectCur;
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    
+    Uint16 cx, cy;
+    Uint8 i, j;
+
+    // рисуем бакгроунд 640х480 если videomode более то рисуем бордюр и по центру экрана
+    video = SDL_GetVideoSurface();
+    if(GetIntValue(VIDEOMODE)){
+	rectBack.x = (video->w - 640) / 2 - BORDERWIDTH;
+	rectBack.y = (video->h - 480) / 2 - BORDERWIDTH;
+	rectBack.w = 640 + 2 * BORDERWIDTH;
+	rectBack.h = 480 + 2 * BORDERWIDTH;
+    }else{
+	rectBack.x = 0;
+	rectBack.y = 0;
+	rectBack.w = 640;
+	rectBack.h = 480;
+    }
+
+    if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "EnterCastle: CreateRGBSurface failed: %s\n", SDL_GetError());
+        return;
+    }
+
+    // сохраняем бакгроунд
+    back = SDL_DisplayFormat(format);
+    SDL_FreeSurface(format);
+    SDL_BlitSurface(video, &rectBack, back, NULL);
+
+    // рисуем фон
+    rectCur = rectBack;
+    SDL_FillRect(video, &rectBack, 0);
+    switch(castle->race){
+
+	case KNIGHT:
+	    FillSPRITE(&sprite, "TOWNBKG0.ICN", 0);
+	    break;
+
+	case BARBARIAN:
+	    FillSPRITE(&sprite, "TOWNBKG1.ICN", 0);
+	    break;
+
+	case SORCERESS:
+	    FillSPRITE(&sprite, "TOWNBKG2.ICN", 0);
+	    break;
+
+	case WARLOCK:
+	    FillSPRITE(&sprite, "TOWNBKG3.ICN", 0);
+	    break;
+
+	case WIZARD:
+	    FillSPRITE(&sprite, "TOWNBKG4.ICN", 0);
+	    break;
+
+	case NECROMANCER:
+	    FillSPRITE(&sprite, "TOWNBKG5.ICN", 0);
+	    break;
+	
+	default:
+	    break;
+    }
+    ram = GetICNSprite(&sprite);
+    if(GetIntValue(VIDEOMODE)){
+	// рисуем бордюр
+	rectCur.x = rectBack.x + BORDERWIDTH;
+	rectCur.y = rectBack.y + BORDERWIDTH;
+	rectCur.w = ram->w;
+	rectCur.h = ram->h;
+    }
+    SDL_BlitSurface(ram, NULL, video, &rectCur);
+
+    // рисуем сетку
+    FillSPRITE(&sprite, "STRIP.ICN", 0);
+    ram = GetICNSprite(&sprite);
+    rectCur.y += rectCur.h;
+    rectCur.w = ram->w;
+    rectCur.h = ram->h;
+    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    cx = rectCur.x;
+    cy = rectCur.y;
+
+    // левый скролинг замка
+    FillSPRITE(&sprite, "SMALLBAR.ICN", 1);
+    ram = GetICNSprite(&sprite);
+    rectCur.y += rectCur.h;
+    rectCur.w = ram->w;
+    rectCur.h = ram->h;
+    SDL_BlitSurface(ram, NULL, video, &rectCur);
+
+    // нижний бар
+    FillSPRITE(&sprite, "SMALLBAR.ICN", 0);
+    ram = GetICNSprite(&sprite);
+    rectCur.x += rectCur.w;
+    rectCur.w = ram->w;
+    rectCur.h = ram->h;
+    SDL_BlitSurface(ram, NULL, video, &rectCur);
+
+    // правый скролинг замка
+    FillSPRITE(&sprite, "SMALLBAR.ICN", 3);
+    ram = GetICNSprite(&sprite);
+    rectCur.x += rectCur.w;
+    rectCur.w = ram->w;
+    rectCur.h = ram->h;
+    SDL_BlitSurface(ram, NULL, video, &rectCur);
+
+    // рисуем цветовой знак
+    switch(castle->color){
+    
+	case BLUE:
+	    FillSPRITE(&sprite, "CREST.ICN", 0);
+	    break;
+
+	case GREEN:
+	    FillSPRITE(&sprite, "CREST.ICN", 1);
+	    break;
+
+	case RED:
+	    FillSPRITE(&sprite, "CREST.ICN", 2);
+	    break;
+
+	case YELLOW:
+	    FillSPRITE(&sprite, "CREST.ICN", 3);
+	    break;
+
+	case ORANGE:
+	    FillSPRITE(&sprite, "CREST.ICN", 4);
+	    break;
+
+	case PURPLE:
+	    FillSPRITE(&sprite, "CREST.ICN", 5);
+	    break;
+
+	default:
+	    break;
+    }
+    ram = GetICNSprite(&sprite);
+    rectCur.x = cx + 6;
+    rectCur.y = cy + 6;
+    rectCur.w = ram->w;
+    rectCur.h = ram->h;
+    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    cx = rectCur.x;
+    cy = rectCur.y + ram->h;
+
+    // рисуем фон ячеек для монстров
+    FillSPRITE(&sprite, "STRIP.ICN", 2);
+    ram = GetICNSprite(&sprite);
+    for(i = 0; i < 5; ++i){
+	rectCur.x += rectCur.w + 6;
+	rectCur.w = ram->w;
+	rectCur.h = ram->h;
+	SDL_BlitSurface(ram, NULL, video, &rectCur);
+    }
+
+    // рисуем фон ячейки героя
+    char number[5];
+    char icnstring[13];
+    if(heroes){
+	memset(number, 0, strlen(number) + 1);
+	memset(icnstring, 0, strlen(icnstring) + 1);
+        sprintf(number, "%4d", nameHeroes);
+        for(i = 0; i < 4; i++)
+	    if(0 == strncmp(&number[i], " ", 1)) number[i] = '0';
+        sprintf(icnstring, "PORT%4s.ICN", number);
+	FillSPRITE(&sprite, icnstring, 0);
+    }else
+	FillSPRITE(&sprite, "STRIP.ICN", 3);
+    ram = GetICNSprite(&sprite);
+    rectCur.x = cx;
+    rectCur.y = cy + 6;
+    rectCur.w = ram->w;
+    rectCur.h = ram->h;
+    SDL_BlitSurface(ram, NULL, video, &rectCur);
+
+    // рисуем фон ячеек для монстров героя
+    if(heroes){
+
+	cx = rectCur.x + rectCur.w + 6;
+	cy = rectCur.y;
+
+	for( i = 0; i < HEROESMAXARMY; ++i)
+	    // если есть у героя монстры
+	    if(MONSTERNONE != heroes->army[i].monster){
+
+		// то рисуем фон в зависимости от расы
+		switch(GetRaceMonster(heroes->army[i].monster)){
+		
+		    case KNIGHT:
+			FillSPRITE(&sprite, "STRIP.ICN", 4);
+			break;
+
+		    case BARBARIAN:
+			FillSPRITE(&sprite, "STRIP.ICN", 5);
+			break;
+
+		    case SORCERESS:
+			FillSPRITE(&sprite, "STRIP.ICN", 6);
+			break;
+
+		    case WARLOCK:
+			FillSPRITE(&sprite, "STRIP.ICN", 7);
+			break;
+
+		    case WIZARD:
+			FillSPRITE(&sprite, "STRIP.ICN", 8);
+			break;
+
+		    case NECROMANCER:
+			FillSPRITE(&sprite, "STRIP.ICN", 9);
+			break;
+
+		    default:
+			FillSPRITE(&sprite, "STRIP.ICN", 10);
+			break;
+		}
+		ram = GetICNSprite(&sprite);
+		rectCur.x = cx + (ram->w + 6) * i;
+		rectCur.y = cy;
+		rectCur.w = ram->w;
+		rectCur.h = ram->h;
+		SDL_BlitSurface(ram, NULL, video, &rectCur);
+
+		// рисуем монстров
+		memset(number, 0, strlen(number) + 1);
+		memset(icnstring, 0, strlen(icnstring) + 1);
+    		sprintf(number, "%4d", heroes->army[i].monster);
+    		for(j = 0; j < 4; j++)
+		    if(0 == strncmp(&number[j], " ", 1)) number[j] = '0';
+    		sprintf(icnstring, "MONH%4s.ICN", number);
+		FillSPRITE(&sprite, icnstring, 0);
+		header = GetICNHeader(&sprite);
+		rectCur.x = cx + (header->surface->w + 6) * i + header->offsetX;
+		rectCur.y = cy + header->offsetY;
+		rectCur.w = header->surface->w;
+		rectCur.h = header->surface->h;
+		SDL_BlitSurface(header->surface, NULL, video, &rectCur);
+
+	    }else{
+		FillSPRITE(&sprite, "STRIP.ICN", 2);
+		ram = GetICNSprite(&sprite);
+		rectCur.x = cx + (ram->w + 6) * i;
+		rectCur.y = cy;
+		rectCur.w = ram->w;
+		rectCur.h = ram->h;
+		SDL_BlitSurface(ram, NULL, video, &rectCur);
+	    }
+    }else{
+	FillSPRITE(&sprite, "STRIP.ICN", 11);
+	ram = GetICNSprite(&sprite);
+	rectCur.x += rectCur.w + 6;
+	rectCur.w = ram->w;
+	rectCur.h = ram->h;
+	SDL_BlitSurface(ram, NULL, video, &rectCur);
+    }
+
+
+
+
+
+
+    SetCursor(CURSOR_POINTER);
+    CursorOn();
+
+    ActionCycle(dialogCastle);
+
+    // востанавливаем бакгроунд
+    CursorOff();
+    SDL_BlitSurface(back, NULL, video, &rectBack);
+    SDL_FreeSurface(back);
+            
+    // востанавливаем курсор и анимацию карты
+    SetCursor(cursor);
+    CursorOn();
+
+    SetIntValue(ANIM1, TRUE);
 }

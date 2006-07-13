@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060712
+#define VERSION 20060713
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -53,28 +53,31 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define COLORGRAY	0xFF
 
 typedef enum {
-	    GAME_EASY,
-	    GAME_NORMAL,
-	    GAME_HARD,
-	    GAME_EXPERT,
-	    GAME_IMPOSSIBLE
+		GAME_EASY,
+		GAME_NORMAL,
+		GAME_HARD,
+		GAME_EXPERT,
+		GAME_IMPOSSIBLE
+
 	    } E_GAMELEVEL;
 
 typedef enum {
-            BLUE	= 0,
-            GREEN	= 1,
-            RED		= 2,
-            YELLOW	= 3,
-            ORANGE	= 4,
-            PURPLE	= 5,
-	    GRAY	= 6
+        	BLUE		= 0,
+        	GREEN		= 1,
+        	RED		= 2,
+        	YELLOW		= 3,
+        	ORANGE		= 4,
+        	PURPLE		= 5,
+		GRAY		= 6
+
             } E_COLORS;
 
 typedef enum {
-	    HEROES,
-	    CASTLE,
-	    BOAT
-	    } E_FOCUSE;
+		HEROES,
+		CASTLE,
+		BOAT
+
+	    } E_FOCUS;
 
 typedef enum {
                 BARBARIAN,

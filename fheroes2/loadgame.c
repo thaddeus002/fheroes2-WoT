@@ -47,13 +47,15 @@
 void	ShowStaticMainDisplay(void);
 void	RedrawMapsArea(void);
 void	DrawRectAreaMaps(SDL_Rect *);
+void	DrawCellAreaMapsFlags(Uint8, Uint8);
 void	DrawCellAreaMapsMonster(Uint8, Uint8);
 void	DrawCellAreaMapsTile(Uint8, Uint8);
 void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
 void	RedrawMapsAnimation(void);
-void	CheckCursorAreaAction(E_FOCUSE);
+void	CheckCursorAreaAction(E_FOCUS);
+void	ClickCursorAreaAction(E_FOCUS);
 
 ACTION ActionGAMELOOP(INTERFACEACTION *);
 
@@ -107,6 +109,8 @@ INTERFACEACTION *stpemaindisplay = NULL;
 SDL_Surface	*backgroundArea = NULL;
 
 S_DISPLAY       display;
+
+S_FOCUS		gameFocus;
 
 ACTION DrawMainDisplay(){
 
@@ -177,25 +181,20 @@ ACTION DrawMainDisplay(){
     amask = 0xF000;
 #endif
 
-    if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GetAreaWidth() * TILEWIDTH, GetAreaHeight() * TILEWIDTH, 16, rmask, gmask, bmask, 0))){
-	fprintf(stderr, "RedrawMapsArea: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), GetAreaWidth() * TILEWIDTH, GetAreaHeight() * TILEWIDTH);
+    if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GetWidthArea() * TILEWIDTH, GetHeightArea() * TILEWIDTH, 16, rmask, gmask, bmask, 0))){
+	fprintf(stderr, "DrawMainDisplay: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), GetWidthArea() * TILEWIDTH, GetHeightArea() * TILEWIDTH);
 	return EXIT;
     }
 
     backgroundArea = SDL_DisplayFormat(formatSurface);
     SDL_FreeSurface(formatSurface);
 
-    display.offsetX = 0;
-    display.offsetY = 0;
-    display.lastOffsetX = 0;
-    display.lastOffsetY = 0;
-
     // click по области карты
     if(GetIntValue(DEBUG)){
 	dest.x = BORDERWIDTH;
 	dest.y = BORDERWIDTH;
-	dest.w = GetAreaWidth() * TILEWIDTH;
-	dest.h = GetAreaHeight() * TILEWIDTH;
+	dest.w = GetWidthArea() * TILEWIDTH;
+	dest.h = GetHeightArea() * TILEWIDTH;
 	// обнуляем
 	ZeroINTERFACEACTION(&action);
 	// заполняем
@@ -237,7 +236,7 @@ ACTION DrawMainDisplay(){
     // scroll mouse верхний
     dest.x = BORDERWIDTH;
     dest.y = 0;
-    dest.w = (GetAreaWidth() - 1) * TILEWIDTH;
+    dest.w = (GetWidthArea() - 1) * TILEWIDTH;
     dest.h = BORDERWIDTH;
     // обнуляем
     ZeroINTERFACEACTION(&action);
@@ -251,7 +250,7 @@ ACTION DrawMainDisplay(){
     // scroll mouse нижний
     dest.x = 2 * BORDERWIDTH;
     dest.y = video->h - BORDERWIDTH;
-    dest.w = (GetAreaWidth() - 1) * TILEWIDTH;
+    dest.w = (GetWidthArea() - 1) * TILEWIDTH;
     dest.h = BORDERWIDTH;
     // обнуляем
     ZeroINTERFACEACTION(&action);
@@ -522,6 +521,23 @@ ACTION DrawMainDisplay(){
 
     // инициализируем радар
     InitRadar();
+
+    // стартовый фокус на герое
+    gameFocus.type = HEROES;
+    gameFocus.ax = 18;
+    gameFocus.ay = 18;
+    gameFocus.object = NULL;
+
+    if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
+    else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea() / 2;
+    else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
+
+    if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
+    else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea() / 2;
+    else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+
+    display.lastOffsetX = 0;
+    display.lastOffsetY = 0;
 
     // отображаем картинку
     ShowStaticMainDisplay();
@@ -1191,7 +1207,7 @@ ACTION ActionScrollBottom(void){
 
     SetCursor(CURSOR_SCROLL_BOTTOM);
 
-    if(display.offsetY < GetHeightMaps() - GetAreaHeight()){
+    if(display.offsetY < GetHeightMaps() - GetHeightArea()){
 	display.lastOffsetX = display.offsetX;
 	display.lastOffsetY = display.offsetY;
 	++display.offsetY;
@@ -1205,7 +1221,7 @@ ACTION ActionScrollRight(void){
 
     SetCursor(CURSOR_SCROLL_RIGHT);
 
-    if(display.offsetX < GetWidthMaps() - GetAreaWidth()){
+    if(display.offsetX < GetWidthMaps() - GetWidthArea()){
 	display.lastOffsetY = display.offsetY;
 	display.lastOffsetX = display.offsetX;
 	++display.offsetX;
@@ -1243,25 +1259,25 @@ ACTION ActionClickRadarArea(void){
     display.offsetY = (y - BORDERWIDTH) * GetHeightMaps() / RADARWIDTH;
     
     // центрируем
-    if(0 > display.offsetX - GetAreaWidth() / 2)
+    if(0 > display.offsetX - GetWidthArea() / 2)
 	display.offsetX = 0;
     else
-	display.offsetX = display.offsetX - GetAreaWidth() / 2;
+	display.offsetX = display.offsetX - GetWidthArea() / 2;
     
 
-    if(0 > display.offsetY - GetAreaHeight() / 2)
+    if(0 > display.offsetY - GetHeightArea() / 2)
 	display.offsetY = 0;
     else
-	display.offsetY = display.offsetY - GetAreaHeight() / 2;
+	display.offsetY = display.offsetY - GetHeightArea() / 2;
     
 
     // проверка за границы
-    if(display.offsetY > GetHeightMaps() - GetAreaHeight())
-	display.offsetY = GetHeightMaps() - GetAreaHeight();
+    if(display.offsetY > GetHeightMaps() - GetHeightArea())
+	display.offsetY = GetHeightMaps() - GetHeightArea();
     
 
-    if(display.offsetX > GetWidthMaps() - GetAreaWidth())
-	display.offsetX = GetWidthMaps() - GetAreaWidth();
+    if(display.offsetX > GetWidthMaps() - GetWidthArea())
+	display.offsetX = GetWidthMaps() - GetWidthArea();
     
     RedrawMapsArea();
 
@@ -1271,21 +1287,24 @@ ACTION ActionClickRadarArea(void){
 void RedrawMapsArea(){
 
     // проверка границ экрана
-    if(display.offsetX > GetWidthMaps() - GetAreaWidth() || display.offsetY > GetHeightMaps() - GetAreaHeight()) return;
+    if(display.offsetX > GetWidthMaps() - GetWidthArea() || display.offsetY > GetHeightMaps() - GetHeightArea()) return;
+
+    SetIntValue(ANIM2, FALSE);
+    SetIntValue(CYCLELOOP, FALSE);
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect dest, src;
 
     CursorOff();
 
-    Uint8 areaHeight = GetAreaHeight();
-    Uint8 areaWidth = GetAreaWidth();
+    Uint8 areaHeight = GetHeightArea();
+    Uint8 areaWidth = GetWidthArea();
 
     // копируем видимую область area для сдвига при одинарном скроллинге
     src.x = BORDERWIDTH;
     src.y = BORDERWIDTH;
-    src.w = GetAreaWidth() * TILEWIDTH;
-    src.h = GetAreaHeight() * TILEWIDTH;
+    src.w = GetWidthArea() * TILEWIDTH;
+    src.h = GetHeightArea() * TILEWIDTH;
     SDL_BlitSurface(video, &src, backgroundArea, NULL);
 
     // переместить влево на 1
@@ -1378,6 +1397,9 @@ void RedrawMapsArea(){
 
     SDL_Flip(video);
 
+    SetIntValue(CYCLELOOP, TRUE);
+    SetIntValue(ANIM2, TRUE);
+
     return;
 }
 
@@ -1424,6 +1446,11 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 	    if(! ptrCell->animation) DrawCellAreaMapsLevel2(x, y);
     }
 
+    // отрисовываем все флаги
+    for(y = rect->y; y < rect->y + rect->h; ++y)
+	for(x = rect->x; x < rect->x + rect->w; ++x)
+	    DrawCellAreaMapsFlags(x, y);
+
     // если присутствует анимация на клетке, отрисовываем отдельно, пару статичных спрайтов
     for(y = rect->y; y < rect->y + rect->h; ++y)
 	for(x = rect->x; x < rect->x + rect->w; ++x)
@@ -1468,6 +1495,7 @@ void DrawCellAreaMapsLevel1(Uint8 x, Uint8 y){
 
         icn = icn->next;
     }
+
 }
 
 void DrawCellAreaMapsTile(Uint8 x, Uint8 y){
@@ -1512,7 +1540,7 @@ void DrawCellAreaMapsMonster(Uint8 x, Uint8 y){
     }else if(y == 0 && dest.y < BORDERWIDTH){
 	src.y += BORDERWIDTH - dest.y;
 	dest.y = BORDERWIDTH;
-    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+    }else if(x == GetWidthArea() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
 	src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
     }
 
@@ -1534,11 +1562,109 @@ void DrawCellAreaMapsMonster(Uint8 x, Uint8 y){
     }else if(y == 0 && dest.y < BORDERWIDTH){
 	src.y += BORDERWIDTH - dest.y;
 	dest.y = BORDERWIDTH;
-    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+    }else if(x == GetWidthArea() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
 	src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
     }
 
     SDL_BlitSurface(ptrCell->monster->surface[1], &src, video, &dest);
+}
+
+/* функция реализующая алгоритм отрисовки флагов */
+void DrawCellAreaMapsFlags(Uint8 x, Uint8 y){
+
+    if(0 == x && 0 == y) return;
+
+    S_CELLMAPS *ptrCellLeft;
+    S_CELLMAPS *ptrCellRight;
+
+    ptrCellLeft  = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x + 1);
+    ptrCellRight = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x - 1);
+    if(OBJ_CASTLE != ptrCellLeft->type && OBJ_CASTLE != ptrCellRight->type) return;
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect dest;
+
+    AGGSPRITE	sprite;
+    ICNHEADER	*flagLeft = NULL;
+    ICNHEADER	*flagRight = NULL;
+    S_CASTLE	*castle;
+
+    castle = GetStatCastlePos(display.offsetX + x, display.offsetY + y);
+
+    if(! castle){
+	if(GetIntValue(DEBUG)) fprintf(stderr, "DrawCellAreaMapsFlags: castle NULL, ax: %d, ay: %d\n", display.offsetX + x, display.offsetY + y);
+	return;
+    }
+    
+    switch(castle->color){
+    
+	case BLUE:
+	    FillSPRITE(&sprite, "FLAG32.ICN", 0);
+	    flagLeft = GetICNHeader(&sprite);
+	    FillSPRITE(&sprite, "FLAG32.ICN", 1);
+	    flagRight = GetICNHeader(&sprite);
+	    break;
+    
+	case GREEN:
+	    FillSPRITE(&sprite, "FLAG32.ICN", 2);
+	    flagLeft = GetICNHeader(&sprite);
+	    FillSPRITE(&sprite, "FLAG32.ICN", 3);
+	    flagRight = GetICNHeader(&sprite);
+	    break;
+    
+	case RED:
+	    FillSPRITE(&sprite, "FLAG32.ICN", 4);
+	    flagLeft = GetICNHeader(&sprite);
+	    FillSPRITE(&sprite, "FLAG32.ICN", 5);
+	    flagRight = GetICNHeader(&sprite);
+	    break;
+    
+	case YELLOW:
+	    FillSPRITE(&sprite, "FLAG32.ICN", 6);
+	    flagLeft = GetICNHeader(&sprite);
+	    FillSPRITE(&sprite, "FLAG32.ICN", 7);
+	    flagRight = GetICNHeader(&sprite);
+	    break;
+    
+	case ORANGE:
+	    FillSPRITE(&sprite, "FLAG32.ICN", 8);
+	    flagLeft = GetICNHeader(&sprite);
+	    FillSPRITE(&sprite, "FLAG32.ICN", 9);
+	    flagRight = GetICNHeader(&sprite);
+	    break;
+    
+	case PURPLE:
+	    FillSPRITE(&sprite, "FLAG32.ICN", 10);
+	    flagLeft = GetICNHeader(&sprite);
+	    FillSPRITE(&sprite, "FLAG32.ICN", 11);
+	    flagRight = GetICNHeader(&sprite);
+	    break;
+    
+	case GRAY:
+	    FillSPRITE(&sprite, "FLAG32.ICN", 12);
+	    flagLeft = GetICNHeader(&sprite);
+	    FillSPRITE(&sprite, "FLAG32.ICN", 13);
+	    flagRight = GetICNHeader(&sprite);
+	    break;
+    }
+
+    // левый флаг
+    if(flagLeft && OBJ_CASTLE == ptrCellLeft->type){
+	dest.x = BORDERWIDTH + TILEWIDTH * x + flagLeft->offsetX;
+	dest.y = BORDERWIDTH + TILEWIDTH * y + flagLeft->offsetY;
+	dest.w = flagLeft->surface->w;
+	dest.h = flagLeft->surface->h;
+	SDL_BlitSurface(flagLeft->surface, NULL, video, &dest);
+    }
+
+    // правый флаг
+    if(flagRight && OBJ_CASTLE == ptrCellRight->type){
+	dest.x = BORDERWIDTH + TILEWIDTH * x + flagRight->offsetX;
+	dest.y = BORDERWIDTH + TILEWIDTH * y + flagRight->offsetY;
+	dest.w = flagRight->surface->w;
+	dest.h = flagRight->surface->h;
+	SDL_BlitSurface(flagRight->surface, NULL, video, &dest);
+    }
 }
 
 /* функция реализующая алгоритм отрисовки первых 2 кадров анимации */
@@ -1594,6 +1720,7 @@ void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
 
         icn = icn->next;
     }
+
 }
 
 void RedrawMapsAnimation(void){
@@ -1615,9 +1742,9 @@ void RedrawMapsAnimation(void){
 
     SDL_GetMouseState(&cx, &cy);
     
-    for(y = 0; y < GetAreaHeight(); ++y)
+    for(y = 0; y < GetHeightArea(); ++y)
 
-	for(x = 0; x < GetAreaWidth(); ++x){
+	for(x = 0; x < GetWidthArea(); ++x){
 
 	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
 
@@ -1683,7 +1810,7 @@ void RedrawMapsAnimation(void){
 		    }
 		}
 		// слева - части монстра
-		if(x < GetAreaWidth() - 1){
+		if(x < GetWidthArea() - 1){
 		    DrawCellAreaMapsTile(x + 1, y);
 		    DrawCellAreaMapsLevel1(x + 1, y);
 		    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x + 1);
@@ -1744,7 +1871,7 @@ void RedrawMapsAnimation(void){
 		    }else if(y == 0 && dest.y < BORDERWIDTH){
 			src.y += BORDERWIDTH - dest.y;
 			dest.y = BORDERWIDTH;
-		    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+		    }else if(x == GetWidthArea() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
 		        src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
 		    }
 
@@ -1766,7 +1893,7 @@ void RedrawMapsAnimation(void){
 		    }else if(y == 0 && dest.y < BORDERWIDTH){
 			src.y += BORDERWIDTH - dest.y;
 			dest.y = BORDERWIDTH;
-		    }else if(x == GetAreaWidth() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
+		    }else if(x == GetWidthArea() - 1 && dest.w > TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x){
 		        src.w = TILEWIDTH + BORDERWIDTH + x * TILEWIDTH - dest.x;
 		    }
 
@@ -1779,7 +1906,7 @@ void RedrawMapsAnimation(void){
 		// справа - тень монстра
 		if(x) DrawCellAreaMapsLevel2(x - 1, y);
 		// слева - части монстра
-		if(x < GetAreaWidth() - 1) DrawCellAreaMapsLevel2(x + 1, y);
+		if(x < GetWidthArea() - 1) DrawCellAreaMapsLevel2(x + 1, y);
 		// сверху - части монстра
 		if(y) DrawCellAreaMapsLevel2(x, y - 1);
 	    }
@@ -1815,13 +1942,13 @@ ACTION ActionClickMapsArea(void){
     return NONE;
 }
 
-Uint8 GetAreaWidth(void){
+Uint8 GetWidthArea(void){
 
     SDL_Surface *video = SDL_GetVideoSurface();
     return (video->w - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH;
 }
 
-Uint8 GetAreaHeight(void){
+Uint8 GetHeightArea(void){
 
     SDL_Surface *video = SDL_GetVideoSurface();
     return (video->h - 2 * BORDERWIDTH) / TILEWIDTH;
@@ -2567,6 +2694,8 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
 		    
 			case SDL_BUTTON_LEFT:
 
+			    ClickCursorAreaAction(gameFocus.type);
+
 			    // левая кнопка down
 			    ptr = stpemaindisplay;
 			    while(ptr){
@@ -2583,6 +2712,19 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
 
 			case SDL_BUTTON_RIGHT:
 			    
+			    SDL_GetMouseState(&cx, &cy);
+
+			    // правая кнопка по арене, рисуем QuickInfo
+			    if(cx > BORDERWIDTH && cy > BORDERWIDTH && cx < GetWidthArea() * TILEWIDTH + BORDERWIDTH && cy < GetHeightArea() * TILEWIDTH + BORDERWIDTH){
+				cx -= BORDERWIDTH;
+
+				cy -= BORDERWIDTH;
+				cx /= TILEWIDTH;
+				cy /= TILEWIDTH;
+	
+				ShowQuickInfo((display.offsetY + cy) * GetWidthMaps() + display.offsetX + cx);
+			    }
+
 			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
 			    break;
 
@@ -2627,14 +2769,14 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
     		    break;
 	    }
 
-	    if(0 == ticket % (GetIntValue(ANIMATIONDELAY) / 2)) RedrawMapsAnimation();
+	    if(exit != EXIT && 0 == ticket % (GetIntValue(ANIMATIONDELAY) / 2)) RedrawMapsAnimation();
 	    ++ticket;
 	}
 
-	CheckCursorAreaAction(HEROES);
+	CheckCursorAreaAction(gameFocus.type);
 
 	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMapsAnimation();
-	else if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+	else if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY);
 
 	++ticket;
     }
@@ -2744,7 +2886,7 @@ ACTION SettingsClickOkay(void){
     return OK;
 }
 
-void CheckCursorAreaAction(E_FOCUSE f){
+void CheckCursorAreaAction(E_FOCUS f){
 
     Sint32 x, y;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -2754,7 +2896,7 @@ void CheckCursorAreaAction(E_FOCUSE f){
     S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + (y - BORDERWIDTH) / TILEWIDTH) * GetWidthMaps() + display.offsetX + (x - BORDERWIDTH) / TILEWIDTH);
 
     // если над областью арены то по свойствам
-    if(x > BORDERWIDTH && x < BORDERWIDTH + GetAreaWidth() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
+    if(x > BORDERWIDTH && x < BORDERWIDTH + GetWidthArea() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
 
 	switch(f){
 	
@@ -2834,6 +2976,10 @@ void CheckCursorAreaAction(E_FOCUSE f){
 		    case OBJN_SAWMILL:
 		    case OBJN_MINES:
 		    case OBJ_WATERLAKE:
+		    case OBJN_ALCHEMYTOWER:
+		    case OBJN_EXCAVATION:
+		    case OBJN_FORT:
+		    case OBJN_DRAGONCITY:
 			SetCursor(CURSOR_POINTER);
 			break;
 
@@ -2931,6 +3077,244 @@ void CheckCursorAreaAction(E_FOCUSE f){
 	}
 
     // если за областью арены то обычный курсор
-    else if(x < video->w - BORDERWIDTH && x > BORDERWIDTH + GetAreaWidth() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
+    else if(x < video->w - BORDERWIDTH && x > BORDERWIDTH + GetWidthArea() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
 	SetCursor(CURSOR_POINTER);
+}
+
+void ClickCursorAreaAction(E_FOCUS f){
+
+    Sint32 x, y;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    SDL_GetMouseState(&x, &y);
+
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + (y - BORDERWIDTH) / TILEWIDTH) * GetWidthMaps() + display.offsetX + (x - BORDERWIDTH) / TILEWIDTH);
+    S_CASTLE	*castle = NULL;
+    
+    // если над областью арены то по свойствам
+    if(! (x > BORDERWIDTH && x < BORDERWIDTH + GetWidthArea() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)) return;
+
+    switch(f){
+/*	
+	    // фокус на лодке
+	    case BOAT:
+
+		switch(ptrCell->type){
+
+		    case OBJ_TREASURECHEST:
+			WATER == ptrCell->ground ? SetCursor(CURSOR_REDBOAT) : SetCursor(CURSOR_POINTER);
+			break;
+
+		    case OBJ_SHIPWRECK:
+		    case OBJ_WHIRLPOOL:
+		    case OBJ_BUOY:
+		    case OBJ_BOTTLE:
+		    case OBJ_SHIPWRECKSURVIROR:
+		    case OBJ_FLOTSAM:
+		    case OBJ_MAGELLANMAPS:
+			SetCursor(CURSOR_REDBOAT);
+			break;
+		    
+		    case OBJ_COAST:
+			SetCursor(CURSOR_ANCHOR);
+			break;
+
+		    case OBJN_CASTLE:
+		    case OBJ_CASTLE:
+			SetCursor(CURSOR_CASTLE);
+			break;
+
+		    case OBJ_HEROES:
+			SetCursor(CURSOR_HEROES);
+			break;
+		
+		    case OBJN_SHIPWRECK:
+		    case OBJN_DERELICTSHIP:
+		    case OBJN_MAGELLANMAPS:
+		    case OBJ_STONES:
+			SetCursor(CURSOR_POINTER);
+			break;
+
+		    default:
+			WATER == ptrCell->ground ? SetCursor(CURSOR_BOAT) : SetCursor(CURSOR_POINTER);
+			break;
+
+		}
+		break;
+*/		
+	    // фокус на герое
+	    case HEROES:
+
+		switch(ptrCell->type){
+		
+		    case OBJ_MONSTER:
+//			SetCursor(CURSOR_FIGHT);
+			break;
+
+		    case OBJN_CASTLE:
+
+			// фокус на замок
+			gameFocus.type = CASTLE;
+			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
+			if(!castle) break;
+			gameFocus.ax = castle->ax;
+			gameFocus.ay = castle->ay;
+			gameFocus.object = NULL;
+
+			if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
+			else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea() / 2;
+			else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
+
+			if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
+			else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea() / 2;
+			else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+			RedrawRadar();
+			RedrawMapsArea();
+
+			break;
+/*
+		    case OBJ_BOAT:
+			SetCursor(CURSOR_BOAT);
+			break;
+
+		    case OBJ_TREASURECHEST:
+			WATER == ptrCell->ground ? SetCursor(CURSOR_POINTER) : SetCursor(CURSOR_ACTION);
+			break;
+
+		    case OBJ_STONES:
+		    case OBJ_OILLAKE:
+		    case OBJ_BIGCRACK:
+		    case OBJ_MOUNTS:
+		    case OBJ_TREES:
+		    case OBJN_WAGONCAMP:
+		    case OBJN_SAWMILL:
+		    case OBJN_MINES:
+		    case OBJ_WATERLAKE:
+		    case OBJN_ALCHEMYTOWER:
+		    case OBJN_EXCAVATION:
+		    case OBJN_FORT:
+		    case OBJN_DRAGONCITY:
+			SetCursor(CURSOR_POINTER);
+			break;
+
+		    case OBJ_CASTLE:
+		    case OBJ_ALCHEMYTOWER:
+		    case OBJ_SIGN:
+    	    	    case OBJ_SKELETON:
+    		    case OBJ_DAEMONCAVE:
+		    case OBJ_FAERIERING:
+		    case OBJ_CAMPFIRE:
+	    	    case OBJ_FOUNTAIN:
+		    case OBJ_GAZEBO:
+		    case OBJ_ANCIENTLAMP:
+		    case OBJ_GRAVEYARD:
+		    case OBJ_ARCHERHOUSE:
+		    case OBJ_GOBLINHUNT:
+		    case OBJ_DWARFCOTT:
+		    case OBJ_PEASANTHUNT:
+		    case OBJ_DRAGONCITY:
+		    case OBJ_LIGHTHOUSE:
+		    case OBJ_WATERMILL:
+		    case OBJ_MINES:
+		    case OBJ_OBELISK:
+		    case OBJ_OASIS:
+		    case OBJ_RESOURCE:
+		    case OBJ_SAWMILL:
+		    case OBJ_ORACLE:
+		    case OBJ_SHRINE1:
+		    case OBJ_DERELICTSHIP:
+		    case OBJ_DESERTTENT:
+		    case OBJ_STONELITHS:
+		    case OBJ_WAGONCAMP:
+		    case OBJ_WINDMILL:
+		    case OBJ_ARTIFACT:
+		    case OBJ_WATCHTOWER:
+		    case OBJ_TREEHOUSE:
+		    case OBJ_TREECITY:
+		    case OBJ_RUINS:
+		    case OBJ_FORT:
+		    case OBJ_TRADINGPOST:
+		    case OBJ_ABANDONEDMINE:
+		    case OBJ_STANDINGSTONES:
+		    case OBJ_IDOL:
+		    case OBJ_TREEKNOWLEDGE:
+		    case OBJ_DOCTORHUNT:
+		    case OBJ_TEMPLE:
+		    case OBJ_HILLFORT:
+		    case OBJ_HALFLINGHOLE:
+		    case OBJ_MERCENARYCAMP:
+		    case OBJ_SHRINE2:
+		    case OBJ_SHRINE3:
+		    case OBJ_PIRAMID:
+		    case OBJ_CITYDEAD:
+		    case OBJ_EXCAVATION:
+		    case OBJ_SPHINX:
+		    case OBJ_WAGON:
+		    case OBJ_ARTESIANSPRING:
+		    case OBJ_TROLLBRIDGE:
+		    case OBJ_WITCHHUNT:
+		    case OBJ_XANADU:
+		    case OBJ_CAVE:
+		    case OBJ_LEANTO:
+		    case OBJ_MAGICWELL:
+		    case OBJ_MAGICGARDEN:
+		    case OBJ_OBSERVATIONTOWER:
+		    case OBJ_FREEMANFOUNDRY:
+			SetCursor(CURSOR_ACTION);
+			break;
+*/
+		    default:
+//			WATER == ptrCell->ground ? SetCursor(CURSOR_POINTER) : SetCursor(CURSOR_MOVE);
+			break;
+		}
+		break;
+
+
+	// фокус на замке
+	case CASTLE:
+
+	    switch(ptrCell->type){
+
+		case OBJ_HEROES:
+//			SetCursor(CURSOR_HEROES);
+			break;
+
+		case OBJN_CASTLE:
+		case OBJ_CASTLE:
+
+			// фокус на замок
+			gameFocus.type = CASTLE;
+			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
+			if(!castle) break;
+			
+			if(gameFocus.ax == castle->ax && gameFocus.ay && castle->ay){
+			    EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY); //HEROESNULL);
+			    break;
+			}
+
+			gameFocus.ax = castle->ax;
+			gameFocus.ay = castle->ay;
+			gameFocus.object = NULL;
+
+			if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
+			else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea() / 2;
+			else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
+
+			if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
+			else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea() / 2;
+			else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+			RedrawRadar();
+			RedrawMapsArea();
+
+			break;
+
+		default:
+//			SetCursor(CURSOR_POINTER);
+			break;
+	    }
+	    break;
+	
+	default:
+	    break;
+    }
 }

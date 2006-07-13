@@ -29,6 +29,9 @@
 #ifndef _RESOURCE_H
 #define _RESOURCE_H
 
+#include "object.h"
+#include "gamedefs.h"
+
 #define RESOURCEMAXCOUNT	15
 #define RESOURCEMINCOUNT	5
 
@@ -51,6 +54,13 @@ typedef enum {
 		CHEST		= 19,
 		RES_NONE	= 20
             } E_RESOURCE;
+
+typedef struct {
+		Uint8		ax;
+		Uint8		ay;
+		E_OBJECT	type;
+		E_COLORS	color;
+	    } S_BUILDING;
 
 Uint16	    GetCountResource(E_RESOURCE);
 E_RESOURCE  GetRNDResource(void);

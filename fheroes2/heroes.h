@@ -31,7 +31,6 @@
 
 #include "SDL.h"
 #include "artifact.h"
-#include "castle.h"
 #include "monster.h"
 #include "gamedefs.h"
 

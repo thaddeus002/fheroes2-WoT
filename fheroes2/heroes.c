@@ -39,7 +39,7 @@ static S_HEROES *	allHeroes = NULL;
 
 S_HEROES *GetStatHeroes(E_NAMEHEROES name){
 
-    if(allHeroes) return &allHeroes[name];
+    if(allHeroes && name != HEROESNULL) return &allHeroes[name];
     
     return NULL;
 }

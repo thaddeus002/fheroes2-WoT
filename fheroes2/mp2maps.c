@@ -269,7 +269,30 @@ ACTION InitMaps(char *filename){
 	    if(! AddCastle(fd, quantity / 8 - 1, ptrMP2Castle[castle * 3], ptrMP2Castle[castle * 3 + 1])) fprintf(stderr, "ax: %d, ay: %d, quantity: %hX\n", ptrMaps[i].ax, ptrMaps[i].ay, quantity);
 	    ++castle;
 	}
-	ptrMaps[i].move	= TRUE;
+
+
+	switch(ptrMaps[i].type){
+	
+            case OBJ_STONES:
+            case OBJ_OILLAKE:
+            case OBJ_BIGCRACK:
+            case OBJ_MOUNTS:
+            case OBJ_TREES:
+            case OBJN_WAGONCAMP:
+            case OBJN_SAWMILL:
+            case OBJN_MINES:
+            case OBJ_WATERLAKE:
+            case OBJN_ALCHEMYTOWER:
+            case OBJN_EXCAVATION:
+            case OBJN_FORT:
+            case OBJN_DRAGONCITY:
+		ptrMaps[i].move = FALSE;
+		break;
+	
+	    default:
+		ptrMaps[i].move = TRUE;
+		break;
+	}
     }
 
     // цикл по заполнению спрайтов и анимации

@@ -46,13 +46,79 @@ BOOL	InitKingdom(void){
     memset(kingdom, 0, sizeof(S_KINGDOM) * KINGDOMMAX);
 
     kingdom[GRAY].play = TRUE;
+    kingdom[GRAY].ore = 0;
+    kingdom[GRAY].wood = 0;
+    kingdom[GRAY].mercury = 0;
+    kingdom[GRAY].sulfur = 0;
+    kingdom[GRAY].crystal = 0;
+    kingdom[GRAY].gems = 0;
+    kingdom[GRAY].gold = 0;
 
-    if(GetIntValue(KINGDOMCOLORS) & COLORBLUE)   kingdom[BLUE].play   = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & COLORGREEN)  kingdom[GREEN].play  = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & COLORRED)    kingdom[RED].play    = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW) kingdom[YELLOW].play = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & COLORORANGE) kingdom[ORANGE].play = TRUE;
-    if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE) kingdom[PURPLE].play = TRUE;
+    if(GetIntValue(KINGDOMCOLORS) & COLORBLUE){
+	kingdom[BLUE].play = TRUE;
+	kingdom[BLUE].ore = 20;
+	kingdom[BLUE].wood = 20;
+	kingdom[BLUE].mercury = 5;
+	kingdom[BLUE].sulfur = 5;
+	kingdom[BLUE].crystal = 5;
+	kingdom[BLUE].gems = 5;
+	kingdom[BLUE].gold = 7500;
+    }
+
+    if(GetIntValue(KINGDOMCOLORS) & COLORGREEN){
+	kingdom[GREEN].play = TRUE;
+	kingdom[GREEN].ore = 20;
+	kingdom[GREEN].wood = 20;
+	kingdom[GREEN].mercury = 5;
+	kingdom[GREEN].sulfur = 5;
+	kingdom[GREEN].crystal = 5;
+	kingdom[GREEN].gems = 5;
+	kingdom[GREEN].gold = 7500;
+    }
+
+    if(GetIntValue(KINGDOMCOLORS) & COLORRED){
+        kingdom[RED].play = TRUE;
+	kingdom[RED].ore = 20;
+	kingdom[RED].wood = 20;
+	kingdom[RED].mercury = 5;
+	kingdom[RED].sulfur = 5;
+	kingdom[RED].crystal = 5;
+	kingdom[RED].gems = 5;
+	kingdom[RED].gold = 7500;
+    }
+
+    if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW){
+	kingdom[YELLOW].play = TRUE;
+	kingdom[YELLOW].ore = 20;
+	kingdom[YELLOW].wood = 20;
+	kingdom[YELLOW].mercury = 5;
+	kingdom[YELLOW].sulfur = 5;
+	kingdom[YELLOW].crystal = 5;
+	kingdom[YELLOW].gems = 5;
+	kingdom[YELLOW].gold = 7500;
+    }
+
+    if(GetIntValue(KINGDOMCOLORS) & COLORORANGE){
+	kingdom[ORANGE].play = TRUE;
+	kingdom[ORANGE].ore = 20;
+	kingdom[ORANGE].wood = 20;
+	kingdom[ORANGE].mercury = 5;
+	kingdom[ORANGE].sulfur = 5;
+	kingdom[ORANGE].crystal = 5;
+	kingdom[ORANGE].gems = 5;
+	kingdom[ORANGE].gold = 7500;
+    }
+
+    if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE){
+	kingdom[PURPLE].play = TRUE;
+	kingdom[PURPLE].ore = 20;
+	kingdom[PURPLE].wood = 20;
+	kingdom[PURPLE].mercury = 5;
+	kingdom[PURPLE].sulfur = 5;
+	kingdom[PURPLE].crystal = 5;
+	kingdom[PURPLE].gems = 5;
+	kingdom[PURPLE].gold = 7500;
+    }
 
     if(GetIntValue(DEBUG)){
 	fprintf(stderr, "InitKingdom:");

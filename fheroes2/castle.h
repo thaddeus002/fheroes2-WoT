@@ -31,6 +31,7 @@
 
 #include "SDL.h"
 #include "gamedefs.h"
+#include "heroes.h"
 #include "monster.h"
 
 #define	BUILD_THIEVEGUILD	0x0002
@@ -85,5 +86,7 @@ void		FreeCastle(void);
 E_RACE		GetRaceRNDCastle(Uint8, Uint8);
 S_CASTLE	*GetStatCastlePos(Uint8, Uint8);
 S_CASTLE	*GetStatCastle(Uint8);
+
+void		EnterCastle(Uint8, Uint8, E_NAMEHEROES);
 
 #endif
