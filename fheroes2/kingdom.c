@@ -184,7 +184,7 @@ void    KingdomAddCastle(E_COLORS color, Uint8 index){
     if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddCastle: %s\n", ((S_CASTLE *) GetStatCastle(index))->name);
 }
 
-void    KingdomRemoveCastle(E_COLORS color, Uint8 index){
+void KingdomRemoveCastle(E_COLORS color, Uint8 index){
 
     if(! kingdom[color].play) return;
 
@@ -197,4 +197,11 @@ void    KingdomRemoveCastle(E_COLORS color, Uint8 index){
 	    kingdom[color].castle[i] = 0xFF;
 	    break;
     }
+}
+
+S_KINGDOM *GetStatKingdom(E_COLORS color){
+
+    if(! kingdom) return NULL;
+    
+    return &kingdom[color];
 }

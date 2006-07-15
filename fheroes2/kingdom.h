@@ -66,7 +66,7 @@ typedef struct {
 		Uint16		sulfur;
 		Uint16		crystal;
 		Uint16		gems;
-		Uint16		gold;
+		Uint32		gold;
 	    } S_KINGDOM;
 
 BOOL    InitKingdom(void);
@@ -80,5 +80,7 @@ void	KingdomRemoveCastle(E_COLORS, Uint8);
 
 //void	KingdomAddBuilding(Uint8, Uint8, E_COLOROBJECT);
 //void	KingdomRemoveBuilding(Uint8, Uint8);
+
+S_KINGDOM	*GetStatKingdom(E_COLORS);
 
 #endif

@@ -10,7 +10,7 @@ CFLAGS = -O3 -Wall -fomit-frame-pointer `sdl-config --cflags` -mtune=pentium3 -m
 CC = gcc
 
 all: $(TARGET)
-	strip $(TARGET)
+#	strip $(TARGET)
 
 fheroes2: $(patsubst %.c, %.o, $(wildcard *.c))
 	$(CC) $^ -o $@ $(LIBS)

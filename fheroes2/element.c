@@ -32,6 +32,7 @@
 #include "actionevent.h"
 #include "cursor.h"
 #include "mp2maps.h"
+#include "loadgame.h"
 #include "object.h"
 #include "config.h"
 #include "element.h"
@@ -211,6 +212,163 @@ ACTION DialogPressNO(){
     return NO;
 }
 
+void ShowBorder(SDL_Rect *rect){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect src, dst;
+    AGGSPRITE sprite;
+    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "SURDRBKE.ICN", 0) : FillSPRITE(&sprite, "SURDRBKG.ICN", 0);
+    SDL_Surface *image = GetICNSprite(&sprite);
+
+    // top left angle
+    src.x = 0;
+    src.y = 0;
+    src.w = SHADOWWIDTH + BORDERWIDTH * 3;
+    src.h = BORDERWIDTH;
+    dst.x = rect->x;
+    dst.y = rect->y;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // top bar
+    src.x = SHADOWWIDTH + BORDERWIDTH * 3;
+    src.y = 0;
+    src.w = image->w - SHADOWWIDTH - BORDERWIDTH * 6;
+    src.h = BORDERWIDTH;
+    dst.x = rect->x + SHADOWWIDTH + BORDERWIDTH * 3;
+    dst.y = rect->y;
+    dst.w = src.w;
+    dst.h = src.h;
+    while(dst.x + dst.w < rect->x + rect->w){
+	SDL_BlitSurface(image, &src, video, &dst);
+	dst.x += dst.w;
+    }
+    src.w = rect->x + rect->w - dst.x;
+    dst.w = src.w;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // top right angle
+    src.x = image->w - BORDERWIDTH * 3;
+    src.y = 0;
+    src.w = BORDERWIDTH * 3;
+    src.h = BORDERWIDTH;
+    dst.x = rect->x + rect->w - src.w;
+    dst.y = rect->y;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+
+    // bottom left angle
+    src.x = 0;
+    src.y = image->h - SHADOWWIDTH - BORDERWIDTH;
+    src.w = SHADOWWIDTH + BORDERWIDTH * 3;
+    src.h = BORDERWIDTH + SHADOWWIDTH;
+    dst.x = rect->x;
+    dst.y = rect->y + rect->h - BORDERWIDTH - SHADOWWIDTH;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // bottom bar
+    src.x = SHADOWWIDTH + BORDERWIDTH * 3;
+    src.y = image->h - SHADOWWIDTH - BORDERWIDTH;
+    src.w = image->w - SHADOWWIDTH - BORDERWIDTH * 6;
+    src.h = BORDERWIDTH + SHADOWWIDTH;
+    dst.x = rect->x + SHADOWWIDTH + BORDERWIDTH * 3;
+    dst.y = rect->y + rect->h - BORDERWIDTH - SHADOWWIDTH;
+    dst.w = src.w;
+    dst.h = src.h;
+    while(dst.x + dst.w < rect->x + rect->w){
+	SDL_BlitSurface(image, &src, video, &dst);
+	dst.x += dst.w;
+    }
+    src.w = rect->x + rect->w - dst.x - BORDERWIDTH * 3;
+    dst.w = src.w;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // bottom right angle
+    src.x = image->w - BORDERWIDTH * 3;
+    src.y = image->h - SHADOWWIDTH - BORDERWIDTH;
+    src.w = BORDERWIDTH * 3;
+    src.h = BORDERWIDTH + SHADOWWIDTH;
+    dst.x = rect->x + rect->w - src.w;
+    dst.y = rect->y + rect->h - BORDERWIDTH - SHADOWWIDTH;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+
+    // left top angle
+    src.x = 0;
+    src.y = BORDERWIDTH;
+    src.w = SHADOWWIDTH + BORDERWIDTH;
+    src.h = BORDERWIDTH * 2;
+    dst.x = rect->x;
+    dst.y = rect->y + BORDERWIDTH;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // left bar
+    src.x = 0;
+    src.y = BORDERWIDTH * 3;
+    src.w = SHADOWWIDTH + BORDERWIDTH;
+    src.h = image->h - BORDERWIDTH * 6 - SHADOWWIDTH;
+    dst.x = rect->x;
+    dst.y = rect->y + BORDERWIDTH * 3;
+    dst.w = src.w;
+    dst.h = src.h;
+    while(dst.y + dst.h < rect->y + rect->h - SHADOWWIDTH - BORDERWIDTH * 3){
+	SDL_BlitSurface(image, &src, video, &dst);
+	dst.y += dst.h;
+    }
+    src.h = rect->y + rect->h - dst.y - SHADOWWIDTH - BORDERWIDTH * 3;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // left bottom angle
+    src.x = 0;
+    src.y = image->h - SHADOWWIDTH - BORDERWIDTH * 3;
+    src.w = SHADOWWIDTH + BORDERWIDTH;
+    src.h = BORDERWIDTH * 2;
+    dst.x = rect->x;
+    dst.y = rect->y + rect->h - BORDERWIDTH * 3 - SHADOWWIDTH;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+
+    // right top angle
+    src.x = image->w - BORDERWIDTH;
+    src.y = BORDERWIDTH;
+    src.w = BORDERWIDTH;
+    src.h = BORDERWIDTH * 2;
+    dst.x = rect->x + rect->w - BORDERWIDTH;
+    dst.y = rect->y + BORDERWIDTH;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // right bar
+    src.x = image->w - BORDERWIDTH;
+    src.y = BORDERWIDTH * 3;
+    src.w = BORDERWIDTH;
+    src.h = image->h - BORDERWIDTH * 6 - SHADOWWIDTH;
+    dst.x = rect->x + rect->w - BORDERWIDTH;
+    dst.y = rect->y + BORDERWIDTH * 3;
+    dst.w = src.w;
+    dst.h = src.h;
+    while(dst.y + dst.h < rect->y + rect->h - SHADOWWIDTH - BORDERWIDTH * 3){
+	SDL_BlitSurface(image, &src, video, &dst);
+	dst.y += dst.h;
+    }
+    src.h = rect->y + rect->h - dst.y - SHADOWWIDTH - BORDERWIDTH * 3;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+    // right bottom angle
+    src.x = image->w - BORDERWIDTH;
+    src.y = image->h - SHADOWWIDTH - BORDERWIDTH * 3;
+    src.w = BORDERWIDTH;
+    src.h = BORDERWIDTH * 2;
+    dst.x = rect->x + rect->w - BORDERWIDTH;
+    dst.y = rect->y + rect->h - BORDERWIDTH * 3 - SHADOWWIDTH;
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_BlitSurface(image, &src, video, &dst);
+}
+
 void ShowQuickInfo(Uint16 index){
 
     SDL_Event event;
@@ -251,18 +409,13 @@ void ShowQuickInfo(Uint16 index){
     // отрисовка диалога по центру курсора
     video = SDL_GetVideoSurface();
 
-    if(GetIntValue(VIDEOMODE)){
-	rectBack.x = (video->w - ram->w) / 2 - BORDERWIDTH;
-	rectBack.y = (video->h - ram->h) / 2 - BORDERWIDTH;
-	rectBack.w = ram->w + 2 * BORDERWIDTH;
-	rectBack.h = ram->h + 2 * BORDERWIDTH;
-    }else{
-	rectBack.x = 0;
-	rectBack.y = 0;
-	rectBack.w = ram->w;
-	rectBack.h = ram->h;
-    }
-
+    rectBack.x = cx;
+    rectBack.y = cy;
+    rectBack.w = ram->w;
+    rectBack.h = ram->h;
+    if(cx + ram->w > BORDERWIDTH + GetWidthArea() * TILEWIDTH) rectBack.x = BORDERWIDTH + GetWidthArea() * TILEWIDTH - ram->w;
+    if(cy + ram->h + BORDERWIDTH > video->h) rectBack.y = video->h - BORDERWIDTH - ram->h;
+    
     // сохраняем бакгроунд
     if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
 	fprintf(stderr, "ShowQuickInfo: CreateRGBSurface failed: %s\n", SDL_GetError());

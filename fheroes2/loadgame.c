@@ -3157,20 +3157,25 @@ void ClickCursorAreaAction(E_FOCUS f){
 			gameFocus.type = CASTLE;
 			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 			if(!castle) break;
+
 			gameFocus.ax = castle->ax;
 			gameFocus.ay = castle->ay;
-			gameFocus.object = NULL;
+			gameFocus.object = castle;
 
 			if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
-			else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea() / 2;
+			else if(gameFocus.ax > GetWidthMaps() - GetWidthArea()) display.offsetX = GetWidthMaps() - GetWidthArea();
 			else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
 
 			if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
-			else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea() / 2;
+			else if(gameFocus.ay > GetHeightMaps() - GetHeightArea()) display.offsetY = GetHeightMaps() - GetHeightArea();
 			else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+
+			display.lastOffsetX = 0;
+			display.lastOffsetY = 0;
+
 			RedrawRadar();
 			RedrawMapsArea();
-
+			EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
 			break;
 /*
 		    case OBJ_BOAT:
@@ -3287,25 +3292,25 @@ void ClickCursorAreaAction(E_FOCUS f){
 			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 			if(!castle) break;
 			
-			if(gameFocus.ax == castle->ax && gameFocus.ay && castle->ay){
-			    EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY); //HEROESNULL);
-			    break;
-			}
-
 			gameFocus.ax = castle->ax;
 			gameFocus.ay = castle->ay;
-			gameFocus.object = NULL;
+			gameFocus.object = castle;
 
 			if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
-			else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea() / 2;
+			else if(gameFocus.ax > GetWidthMaps() - GetWidthArea()) display.offsetX = GetWidthMaps() - GetWidthArea();
 			else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
 
 			if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
-			else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea() / 2;
+			else if(gameFocus.ay > GetHeightMaps() - GetHeightArea()) display.offsetY = GetHeightMaps() - GetHeightArea();
 			else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+
+			display.lastOffsetX = 0;
+			display.lastOffsetY = 0;
+
 			RedrawRadar();
 			RedrawMapsArea();
 
+			EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
 			break;
 
 		default:

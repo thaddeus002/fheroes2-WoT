@@ -32,13 +32,19 @@
 
 #include "gamedefs.h"
 #include "tools.h"
+#include "element.h"
 #include "config.h"
 #include "cursor.h"
+#include "loadgame.h"
 #include "mp2maps.h"
 #include "monster.h"
 #include "kingdom.h"
 #include "heroes.h"
 #include "castle.h"
+
+ACTION ActionExitCastle(void);
+ACTION ActionLeftCastle(void);
+ACTION ActionRightCastle(void);
 
 static S_CASTLE		*ptrCastle = NULL;
 static Uint8		countCastle = 0;
@@ -324,6 +330,7 @@ S_CASTLE *GetStatCastle(Uint8 index){
 void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 
     // определяем тип замка
+    S_KINGDOM *kingdom = NULL;
     S_CASTLE *castle = GetStatCastlePos(ax, ay);
     S_HEROES *heroes = GetStatHeroes(nameHeroes);
 
@@ -335,22 +342,26 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     CursorOff();
     Uint32 cursor = GetCursor();
     INTERFACEACTION *dialogCastle = NULL;
+    INTERFACEACTION action;
 
-    SDL_Surface *format, *back, *ram, *video;
+    SDL_Surface *format, *back, *image, *video;
     SDL_Rect rectBack, rectCur;
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
-    
+
+    char message[8];
+
     Uint16 cx, cy;
     Uint8 i, j;
 
-    // рисуем бакгроунд 640х480 если videomode более то рисуем бордюр и по центру экрана
+    // рисуем бакгроунд 640х480
+    // если videomode более то рисуем бордюр + тень и по центру экрана
     video = SDL_GetVideoSurface();
     if(GetIntValue(VIDEOMODE)){
-	rectBack.x = (video->w - 640) / 2 - BORDERWIDTH;
-	rectBack.y = (video->h - 480) / 2 - BORDERWIDTH;
-	rectBack.w = 640 + 2 * BORDERWIDTH;
-	rectBack.h = 480 + 2 * BORDERWIDTH;
+	rectBack.x = (video->w - (640 + 2 * BORDERWIDTH + SHADOWWIDTH)) / 2;
+	rectBack.y = (video->h - (480 + 2 * BORDERWIDTH + SHADOWWIDTH)) / 2;
+	rectBack.w = 640 + 2 * BORDERWIDTH + SHADOWWIDTH;
+	rectBack.h = 480 + 2 * BORDERWIDTH + SHADOWWIDTH;
     }else{
 	rectBack.x = 0;
 	rectBack.y = 0;
@@ -368,9 +379,9 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     SDL_FreeSurface(format);
     SDL_BlitSurface(video, &rectBack, back, NULL);
 
-    // рисуем фон
-    rectCur = rectBack;
-    SDL_FillRect(video, &rectBack, 0);
+    // рисуем бордюр
+    if(GetIntValue(VIDEOMODE)) ShowBorder(&rectBack);
+
     switch(castle->race){
 
 	case KNIGHT:
@@ -400,49 +411,62 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	default:
 	    break;
     }
-    ram = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
     if(GetIntValue(VIDEOMODE)){
-	// рисуем бордюр
-	rectCur.x = rectBack.x + BORDERWIDTH;
+	rectCur.x = rectBack.x + BORDERWIDTH + SHADOWWIDTH;
 	rectCur.y = rectBack.y + BORDERWIDTH;
-	rectCur.w = ram->w;
-	rectCur.h = ram->h;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
     }
-    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
 
     // рисуем сетку
     FillSPRITE(&sprite, "STRIP.ICN", 0);
-    ram = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
     rectCur.y += rectCur.h;
-    rectCur.w = ram->w;
-    rectCur.h = ram->h;
-    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
     cx = rectCur.x;
     cy = rectCur.y;
 
     // левый скролинг замка
     FillSPRITE(&sprite, "SMALLBAR.ICN", 1);
-    ram = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
     rectCur.y += rectCur.h;
-    rectCur.w = ram->w;
-    rectCur.h = ram->h;
-    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SMALLBAR.ICN", 1);
+    FillSPRITE(&action.objectPush, "SMALLBAR.ICN", 2);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionLeftCastle;
+    AddActionEvent(&dialogCastle, &action);
 
     // нижний бар
     FillSPRITE(&sprite, "SMALLBAR.ICN", 0);
-    ram = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
     rectCur.x += rectCur.w;
-    rectCur.w = ram->w;
-    rectCur.h = ram->h;
-    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
 
     // правый скролинг замка
     FillSPRITE(&sprite, "SMALLBAR.ICN", 3);
-    ram = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
     rectCur.x += rectCur.w;
-    rectCur.w = ram->w;
-    rectCur.h = ram->h;
-    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SMALLBAR.ICN", 3);
+    FillSPRITE(&action.objectPush, "SMALLBAR.ICN", 4);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionRightCastle;
+    AddActionEvent(&dialogCastle, &action);
 
     // рисуем цветовой знак
     switch(castle->color){
@@ -474,23 +498,23 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	default:
 	    break;
     }
-    ram = GetICNSprite(&sprite);
-    rectCur.x = cx + 6;
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 6 - 1;
     rectCur.y = cy + 6;
-    rectCur.w = ram->w;
-    rectCur.h = ram->h;
-    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
     cx = rectCur.x;
-    cy = rectCur.y + ram->h;
+    cy = rectCur.y + image->h;
 
     // рисуем фон ячеек для монстров
     FillSPRITE(&sprite, "STRIP.ICN", 2);
-    ram = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
     for(i = 0; i < 5; ++i){
 	rectCur.x += rectCur.w + 6;
-	rectCur.w = ram->w;
-	rectCur.h = ram->h;
-	SDL_BlitSurface(ram, NULL, video, &rectCur);
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
     }
 
     // рисуем фон ячейки героя
@@ -506,12 +530,12 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	FillSPRITE(&sprite, icnstring, 0);
     }else
 	FillSPRITE(&sprite, "STRIP.ICN", 3);
-    ram = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
     rectCur.x = cx;
     rectCur.y = cy + 6;
-    rectCur.w = ram->w;
-    rectCur.h = ram->h;
-    SDL_BlitSurface(ram, NULL, video, &rectCur);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
 
     // рисуем фон ячеек для монстров героя
     if(heroes){
@@ -554,12 +578,12 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 			FillSPRITE(&sprite, "STRIP.ICN", 10);
 			break;
 		}
-		ram = GetICNSprite(&sprite);
-		rectCur.x = cx + (ram->w + 6) * i;
+		image = GetICNSprite(&sprite);
+		rectCur.x = cx + (image->w + 6) * i;
 		rectCur.y = cy;
-		rectCur.w = ram->w;
-		rectCur.h = ram->h;
-		SDL_BlitSurface(ram, NULL, video, &rectCur);
+		rectCur.w = image->w;
+		rectCur.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &rectCur);
 
 		// рисуем монстров
 		memset(number, 0, strlen(number) + 1);
@@ -578,26 +602,182 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 
 	    }else{
 		FillSPRITE(&sprite, "STRIP.ICN", 2);
-		ram = GetICNSprite(&sprite);
-		rectCur.x = cx + (ram->w + 6) * i;
+		image = GetICNSprite(&sprite);
+		rectCur.x = cx + (image->w + 6) * i;
 		rectCur.y = cy;
-		rectCur.w = ram->w;
-		rectCur.h = ram->h;
-		SDL_BlitSurface(ram, NULL, video, &rectCur);
+		rectCur.w = image->w;
+		rectCur.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &rectCur);
 	    }
     }else{
 	FillSPRITE(&sprite, "STRIP.ICN", 11);
-	ram = GetICNSprite(&sprite);
+	image = GetICNSprite(&sprite);
 	rectCur.x += rectCur.w + 6;
-	rectCur.w = ram->w;
-	rectCur.h = ram->h;
-	SDL_BlitSurface(ram, NULL, video, &rectCur);
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
     }
 
+    // наименование замка
+    FillSPRITE(&sprite, "TOWNNAME.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 264;
+    rectCur.y = rectBack.y + 264;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    rectCur.x = rectCur.x + 90 - strlen(castle->name) * FONT_WIDTHSMALL / 2 ;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(castle->name);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, castle->name, FONT_SMALL);
 
+    // закрашиваем фон для инфо ресурсов
+    rectCur.x = rectBack.x + 584;
+    rectCur.y = rectBack.y + 278;
+    rectCur.w = 82;
+    rectCur.h = 192;
+    SDL_FillRect(video, &rectCur, 0);
+    cx = rectCur.x;
+    cy = rectCur.y;
+    // sprite wood
+    FillSPRITE(&sprite, "RESOURCE.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 1;
+    rectCur.y = cy + 10;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text count wood
+    kingdom = GetStatKingdom(castle->color);
+    memset(message, 0, strlen(message));
+    sprintf(message, "%5d", kingdom->wood);
+    rectCur.x = cx + 8;
+    rectCur.y = cy + 32;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // sprite sulfur
+    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 42;
+    rectCur.y = cy + 6;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text count sulfur
+    kingdom = GetStatKingdom(castle->color);
+    memset(message, 0, strlen(message));
+    sprintf(message, "%5d", kingdom->sulfur);
+    rectCur.x = cx + 48;
+    rectCur.y = cy + 32;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // sprite crystal
+    FillSPRITE(&sprite, "RESOURCE.ICN", 4);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 1;
+    rectCur.y = cy + 45;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text count crystal
+    kingdom = GetStatKingdom(castle->color);
+    memset(message, 0, strlen(message));
+    sprintf(message, "%5d", kingdom->crystal);
+    rectCur.x = cx + 8;
+    rectCur.y = cy + 78;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // sprite mercury
+    FillSPRITE(&sprite, "RESOURCE.ICN", 1);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 44;
+    rectCur.y = cy + 47;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text count mercury
+    kingdom = GetStatKingdom(castle->color);
+    memset(message, 0, strlen(message));
+    sprintf(message, "%5d", kingdom->mercury);
+    rectCur.x = cx + 48;
+    rectCur.y = cy + 78;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // sprite ore
+    FillSPRITE(&sprite, "RESOURCE.ICN", 2);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 1;
+    rectCur.y = cy + 92;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text count ore
+    kingdom = GetStatKingdom(castle->color);
+    memset(message, 0, strlen(message));
+    sprintf(message, "%5d", kingdom->ore);
+    rectCur.x = cx + 8;
+    rectCur.y = cy + 118;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // sprite gems
+    FillSPRITE(&sprite, "RESOURCE.ICN", 5);
+    image = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 45;
+    rectCur.y = cy + 92;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text count gems
+    kingdom = GetStatKingdom(castle->color);
+    memset(message, 0, strlen(message));
+    sprintf(message, "%5d", kingdom->gems);
+    rectCur.x = cx + 48;
+    rectCur.y = cy + 118;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // sprite gold
+    FillSPRITE(&sprite, "RESOURCE.ICN", 6);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 6;
+    rectCur.y = cy + 130;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text count gold
+    kingdom = GetStatKingdom(castle->color);
+    memset(message, 0, strlen(message));
+    sprintf(message, "%7d", kingdom->gold);
+    rectCur.x = cx + 24;
+    rectCur.y = cy + 154;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
-
-
+    // кнопка exit
+    FillSPRITE(&sprite, "SWAPBTN.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx +  1;
+    rectCur.y = cy + 166;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "SWAPBTN.ICN", 0);
+    FillSPRITE(&action.objectPush, "SWAPBTN.ICN", 1);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionExitCastle;
+    AddActionEvent(&dialogCastle, &action);
+                                                                
+    //DrawCastle();
 
     SetCursor(CURSOR_POINTER);
     CursorOn();
@@ -608,10 +788,26 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     CursorOff();
     SDL_BlitSurface(back, NULL, video, &rectBack);
     SDL_FreeSurface(back);
-            
+    FreeActionEvent(dialogCastle);
+
     // востанавливаем курсор и анимацию карты
     SetCursor(cursor);
     CursorOn();
 
     SetIntValue(ANIM1, TRUE);
+}
+
+ACTION ActionExitCastle(void){
+
+    return CANCEL;
+}
+
+ACTION ActionLeftCastle(void){
+
+    return NONE;
+}
+
+ACTION ActionRightCastle(void){
+
+    return NONE;
 }
