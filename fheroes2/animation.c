@@ -65,6 +65,7 @@ S_ANIMATION * AddAnimationEvent(S_ANIMATION **pointer, SDL_Rect *rect, ICNHEADER
     }
 
     ptr->next = NULL;
+    ptr->background = NULL;
     ptr->count = count;
 
     if(NULL == (ptr->rect = malloc(count * sizeof(SDL_Rect)))){
@@ -104,6 +105,7 @@ void FreeAnimationEvent(S_ANIMATION *head){
 
 	if(ptr->rect) free(ptr->rect);
 	if(ptr->surface) free(ptr->surface);
+	if(ptr->background) SDL_FreeSurface(ptr->background);
         free(ptr);
     }
 }

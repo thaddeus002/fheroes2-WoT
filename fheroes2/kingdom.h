@@ -56,7 +56,8 @@ typedef enum {
 
 typedef struct {
 
-		BOOL		play;
+		BOOL		play;				// королевство участвует в игре
+		BOOL		allowBuild;			// флаг строительства
 		//S_BUILDING	*build;
 		Uint8		castle[KINGDOMMAXCASTLE];
 		E_NAMEHEROES	nameheroes[KINGDOMMAXHEROES];

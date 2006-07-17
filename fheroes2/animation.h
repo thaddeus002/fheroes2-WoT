@@ -35,6 +35,8 @@ typedef struct {
 		Uint8		count;
 		SDL_Rect	*rect;
 		SDL_Surface	**surface;
+		SDL_Surface	*background;
+		SDL_Rect	rectBack;
 		void		*next;
 
 		} S_ANIMATION;

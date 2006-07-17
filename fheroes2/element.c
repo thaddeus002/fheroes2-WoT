@@ -35,6 +35,7 @@
 #include "loadgame.h"
 #include "object.h"
 #include "config.h"
+#include "debug.h"
 #include "element.h"
 
 #define BOXWIDTH 306
@@ -178,9 +179,9 @@ ACTION MessageBox(const char *message, ENUMFONT font){
 
     // Отрисовка диалога
     SDL_Flip(video);
-    
+
     SetCursor(CURSOR_POINTER);
-    
+
     CursorOn();
 
     // цикл событий
@@ -383,7 +384,7 @@ void ShowQuickInfo(Uint16 index){
     Sint32 cx, cy;
     SDL_Rect rectBack, rectCur;
     AGGSPRITE sprite;
-    char *message;
+    const char *message;
 
     SDL_GetMouseState(&cx, &cy);
 
@@ -429,7 +430,8 @@ void ShowQuickInfo(Uint16 index){
     SDL_BlitSurface(ram, NULL, video, &rectBack);
 
     // выборка надписи по герою замку или объекту
-    switch((GetCELLMAPS(index))->type){
+    E_OBJECT obj = (GetCELLMAPS(index))->type;
+    switch(obj){
 
 	case OBJN_CASTLE:
 	case OBJ_CASTLE:
@@ -441,15 +443,16 @@ void ShowQuickInfo(Uint16 index){
 	    break;
 	
 	default:
-	    message = "Object Info";
+	    message = PrintObjectType(obj, 0);
 	    break;
     }
-
     // здесь левый верхний угол после бордюра
-    rectCur.x = rectBack.x + 26;
+    rectCur.x = rectBack.x + 24;
     rectCur.y = rectBack.y + 10;
-    rectCur.w = rectBack.w - 36;
-    rectCur.h = rectBack.h - 36;
+    rectCur.w = rectBack.w - 40;
+    rectCur.h = rectBack.h - 40;
+
+    rectCur.x = rectCur.x + rectCur.w / 2 - strlen(message) * FONT_WIDTHSMALL / 2 ;
 
     PrintText(video, &rectCur, message, FONT_SMALL);
     SDL_Flip(video);

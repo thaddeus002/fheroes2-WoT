@@ -2643,7 +2643,7 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
     // цикл по событиям
     while(exit == NONE){
 
-	ptr = stpemaindisplay;
+	ptr = action;
 
 	while(ptr){
 
@@ -2697,7 +2697,7 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
 			    ClickCursorAreaAction(gameFocus.type);
 
 			    // левая кнопка down
-			    ptr = stpemaindisplay;
+			    ptr = action;
 			    while(ptr){
 				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
 				    (ptr->mouseEvent & MOUSE_LCLICK)){
@@ -2740,7 +2740,7 @@ ACTION ActionGAMELOOP(INTERFACEACTION *action){
 			case SDL_BUTTON_LEFT:
 
 			    // левая кнопка up
-			    ptr = stpemaindisplay;
+			    ptr = action;
 			    if(old.flagPush){
 				DrawSprite(&old.pushRect, &old.object);
 				old.flagPush = FALSE;
@@ -3175,7 +3175,7 @@ void ClickCursorAreaAction(E_FOCUS f){
 
 			RedrawRadar();
 			RedrawMapsArea();
-			EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
+			EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY); //HEROESNULL);
 			break;
 /*
 		    case OBJ_BOAT:

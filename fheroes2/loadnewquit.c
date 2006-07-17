@@ -249,13 +249,13 @@ ACTION DrawNewLoadQuit(void){
 
     // анимация фонарей
     ICNHEADER *header;
-    FillSPRITE(&sprite, "SHNGANIM.ICN", 0);
+    FillSPRITE(&sprite, "SHNGANIM.ICN", 1);
     header = GetICNHeader(&sprite);
     dest.x = 0;
     dest.y = 0;
     dest.w = 0;
     dest.h = 0;
-    AddAnimationEvent(&stheanim, &dest, header, 41);
+    AddAnimationEvent(&stheanim, &dest, header, 40);
     
     // отображаем всю картинку
     ShowNewLoadQuit();
@@ -402,6 +402,8 @@ ACTION DrawNewLoadQuit(void){
 	if(result != EXIT && 0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMenuAnimation();
 
 	if(GetIntValue(CYCLELOOP) && CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+
+	++ticket;
     }
 
     // освобождаем данные
@@ -527,6 +529,21 @@ void RedrawMenuAnimation(void){
  
         if(ValidPoint(&ptr->rect[animationFrame % ptr->count], x, y)) CursorOff(); 
  
+	// востановить фон предыдущего спрайта
+	if(ptr->background)
+
+    	    SDL_BlitSurface(ptr->background, NULL, video, &ptr->rectBack);
+	
+	else if(NULL == (ptr->background = SDL_CreateRGBSurface(SDL_SWSURFACE, ptr->rect[animationFrame % ptr->count].w, ptr->rect[animationFrame % ptr->count].h, 16, 0, 0, 0, 0))){
+            fprintf(stderr, "RedrawMenuAnimation: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), ptr->rect[animationFrame % ptr->count].w, ptr->rect[animationFrame % ptr->count].h);
+            return;
+        }
+
+	// сохраняем фон нового спрайта
+    	SDL_BlitSurface(video, &ptr->rect[animationFrame % ptr->count], ptr->background, NULL);
+	ptr->rectBack = ptr->rect[animationFrame % ptr->count];
+
+	// рисуем спрайт
         SDL_BlitSurface(ptr->surface[animationFrame % ptr->count], NULL, video, &ptr->rect[animationFrame % ptr->count]); 
 
         CursorOn(); 
@@ -537,6 +554,6 @@ void RedrawMenuAnimation(void){
     SDL_Delay(GetIntValue(ANIMATIONDELAY));     
 
     ++animationFrame;
-    
-     return;
+
+    return;
 }

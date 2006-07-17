@@ -46,6 +46,7 @@ BOOL	InitKingdom(void){
     memset(kingdom, 0, sizeof(S_KINGDOM) * KINGDOMMAX);
 
     kingdom[GRAY].play = TRUE;
+    kingdom[GRAY].allowBuild = FALSE;
     kingdom[GRAY].ore = 0;
     kingdom[GRAY].wood = 0;
     kingdom[GRAY].mercury = 0;
@@ -56,6 +57,7 @@ BOOL	InitKingdom(void){
 
     if(GetIntValue(KINGDOMCOLORS) & COLORBLUE){
 	kingdom[BLUE].play = TRUE;
+	kingdom[BLUE].allowBuild = TRUE;
 	kingdom[BLUE].ore = 20;
 	kingdom[BLUE].wood = 20;
 	kingdom[BLUE].mercury = 5;
@@ -67,6 +69,7 @@ BOOL	InitKingdom(void){
 
     if(GetIntValue(KINGDOMCOLORS) & COLORGREEN){
 	kingdom[GREEN].play = TRUE;
+	kingdom[GREEN].allowBuild = TRUE;
 	kingdom[GREEN].ore = 20;
 	kingdom[GREEN].wood = 20;
 	kingdom[GREEN].mercury = 5;
@@ -78,6 +81,7 @@ BOOL	InitKingdom(void){
 
     if(GetIntValue(KINGDOMCOLORS) & COLORRED){
         kingdom[RED].play = TRUE;
+        kingdom[RED].allowBuild = TRUE;
 	kingdom[RED].ore = 20;
 	kingdom[RED].wood = 20;
 	kingdom[RED].mercury = 5;
@@ -89,6 +93,7 @@ BOOL	InitKingdom(void){
 
     if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW){
 	kingdom[YELLOW].play = TRUE;
+	kingdom[YELLOW].allowBuild = TRUE;
 	kingdom[YELLOW].ore = 20;
 	kingdom[YELLOW].wood = 20;
 	kingdom[YELLOW].mercury = 5;
@@ -100,6 +105,7 @@ BOOL	InitKingdom(void){
 
     if(GetIntValue(KINGDOMCOLORS) & COLORORANGE){
 	kingdom[ORANGE].play = TRUE;
+	kingdom[ORANGE].allowBuild = TRUE;
 	kingdom[ORANGE].ore = 20;
 	kingdom[ORANGE].wood = 20;
 	kingdom[ORANGE].mercury = 5;
@@ -111,6 +117,7 @@ BOOL	InitKingdom(void){
 
     if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE){
 	kingdom[PURPLE].play = TRUE;
+	kingdom[PURPLE].allowBuild = TRUE;
 	kingdom[PURPLE].ore = 20;
 	kingdom[PURPLE].wood = 20;
 	kingdom[PURPLE].mercury = 5;

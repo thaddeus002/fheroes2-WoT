@@ -34,6 +34,10 @@
 #include "heroes.h"
 #include "monster.h"
 
+#define CASTLEMAXARMY		5
+#define CASTLEMAXMONSTER	6
+
+
 #define	BUILD_THIEVEGUILD	0x0002
 #define	BUILD_TAVERN		0x0004
 #define	BUILD_SHIPYARD		0x0008
@@ -44,7 +48,7 @@
 #define BUILD_MARKETPLACE	0x0400
 #define BUILD_MOAT		0x1000
 #define BUILD_EXT1		0x0800	// Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
-#define BUILD_EXT2		0x2000	// Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
+#define BUILD_SPEC		0x2000	// Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
 
 #define DWELLING_MONSTER1	0x0008
 #define DWELLING_MONSTER2	0x0010
@@ -69,11 +73,8 @@ typedef struct {
     Uint16	building;
     Uint16	dwelling;
     Uint8	magicTower;
-    S_ARMY	army1;
-    S_ARMY	army2;
-    S_ARMY	army3;
-    S_ARMY	army4;
-    S_ARMY	army5;
+    Uint16	monster[CASTLEMAXMONSTER];
+    S_ARMY	army[CASTLEMAXARMY];
     BOOL	capitan;
     BOOL	castle;
     BOOL	allowCastle;

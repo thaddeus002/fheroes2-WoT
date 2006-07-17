@@ -273,7 +273,7 @@ ACTION ActionCycle(INTERFACEACTION *action){
     		    break;
 	    }
 
-	if(CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+	if(GetIntValue(CYCLELOOP) && CYCLEDELAY) SDL_Delay(CYCLEDELAY);
     }
 
     return exit;
