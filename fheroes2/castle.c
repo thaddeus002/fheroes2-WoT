@@ -44,7 +44,7 @@
 #include "heroes.h"
 #include "castle.h"
 
-void DrawBuildingCastle(S_CASTLE *);
+void DrawBuildingCastle(S_CASTLE *, INTERFACEACTION **);
 void DrawBuildingCapitan(S_CASTLE *);
 void DrawBuildingMagicTower(S_CASTLE *);
 void DrawBuildingStatue(S_CASTLE *);
@@ -65,6 +65,13 @@ void DrawDwelling3(S_CASTLE *);
 void DrawDwelling4(S_CASTLE *);
 void DrawDwelling5(S_CASTLE *);
 void DrawDwelling6(S_CASTLE *);
+void DrawDwellingUpgrade2(S_CASTLE *);
+void DrawDwellingUpgrade3(S_CASTLE *);
+void DrawDwellingUpgrade4(S_CASTLE *);
+void DrawDwellingUpgrade5(S_CASTLE *);
+void DrawDwellingUpgrade6(S_CASTLE *);
+void DrawDwellingUpgrade7(S_CASTLE *);
+
 
 void RedrawCastleAnimation(void);
 
@@ -445,11 +452,13 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	    break;
     }
     image = GetICNSprite(&sprite);
+    rectCur.x = 0;
+    rectCur.y = 0;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
     if(GetIntValue(VIDEOMODE)){
 	rectCur.x = rectBack.x + BORDERWIDTH + SHADOWWIDTH;
 	rectCur.y = rectBack.y + BORDERWIDTH;
-	rectCur.w = image->w;
-	rectCur.h = image->h;
     }
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
@@ -879,10 +888,10 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     AddActionEvent(&dialogCastle, &action);
 
     switch(castle->race){
-    
+
 	case KNIGHT:
 	    if(castle->capitan) DrawBuildingCapitan(castle);
-	    DrawBuildingCastle(castle);
+	    DrawBuildingCastle(castle, &dialogCastle);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBuildingLeftTurret(castle);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBuildingRightTurret(castle);
 	    if(castle->building & BUILD_MOAT) DrawBuildingMoat(castle);
@@ -908,7 +917,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawDwelling6(castle);
 	    if(castle->magicTower) DrawBuildingMagicTower(castle);
 	    if(castle->capitan) DrawBuildingCapitan(castle);
-	    DrawBuildingCastle(castle);
+	    DrawBuildingCastle(castle, &dialogCastle);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBuildingLeftTurret(castle);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBuildingRightTurret(castle);
 	    if(castle->building & BUILD_MOAT) DrawBuildingMoat(castle);
@@ -933,7 +942,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawDwelling6(castle);
 	    if(castle->magicTower) DrawBuildingMagicTower(castle);
 	    if(castle->capitan) DrawBuildingCapitan(castle);
-	    DrawBuildingCastle(castle);
+	    DrawBuildingCastle(castle, &dialogCastle);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBuildingLeftTurret(castle);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBuildingRightTurret(castle);
 	    if(castle->building & BUILD_MOAT) DrawBuildingMoat(castle);
@@ -954,7 +963,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 
 	case NECROMANCER:
 	    if(castle->building & BUILD_SPEC) DrawBuildingSpec(castle);
-	    DrawBuildingCastle(castle);
+	    DrawBuildingCastle(castle, &dialogCastle);
 	    if(castle->capitan) DrawBuildingCapitan(castle);
     	    if(castle->building & BUILD_LEFTTURRET) DrawBuildingLeftTurret(castle);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBuildingRightTurret(castle);
@@ -979,7 +988,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	case WARLOCK:
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawDwelling5(castle);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawDwelling3(castle);
-	    DrawBuildingCastle(castle);
+	    DrawBuildingCastle(castle, &dialogCastle);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBuildingLeftTurret(castle);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBuildingRightTurret(castle);
 	    if(castle->capitan) DrawBuildingCapitan(castle);
@@ -1002,7 +1011,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 
 	case WIZARD:
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawDwelling6(castle);
-	    DrawBuildingCastle(castle);
+	    DrawBuildingCastle(castle, &dialogCastle);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBuildingLeftTurret(castle);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBuildingRightTurret(castle);
 	    if(castle->building & BUILD_MOAT) DrawBuildingMoat(castle);
@@ -1281,7 +1290,7 @@ void RedrawCastleAnimation(void){
     return;
 }
 
-void DrawBuildingCastle(S_CASTLE *castle){
+void DrawBuildingCastle(S_CASTLE *castle, INTERFACEACTION **ptrAction){
 
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
@@ -2330,7 +2339,6 @@ void DrawBuildingExt0(S_CASTLE *castle){
 }
 
 void DrawDwelling1(S_CASTLE *castle){
-
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -2417,6 +2425,11 @@ void DrawDwelling1(S_CASTLE *castle){
 
 void DrawDwelling2(S_CASTLE *castle){
 
+    if(castle->dwelling & DWELLING_UPGRADE2){
+	DrawDwellingUpgrade2(castle);
+	return;
+    }
+
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -2478,6 +2491,11 @@ void DrawDwelling2(S_CASTLE *castle){
 }
 
 void DrawDwelling3(S_CASTLE *castle){
+
+    if(castle->dwelling & DWELLING_UPGRADE3){
+	DrawDwellingUpgrade3(castle);
+	return;
+    }
 
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
@@ -2557,6 +2575,11 @@ void DrawDwelling3(S_CASTLE *castle){
 
 void DrawDwelling4(S_CASTLE *castle){
 
+    if(castle->dwelling & DWELLING_UPGRADE4){
+	DrawDwellingUpgrade4(castle);
+	return;
+    }
+
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -2618,6 +2641,11 @@ void DrawDwelling4(S_CASTLE *castle){
 }
 
 void DrawDwelling5(S_CASTLE *castle){
+
+    if(castle->dwelling & DWELLING_UPGRADE5){
+	DrawDwellingUpgrade5(castle);
+	return;
+    }
 
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
@@ -2688,6 +2716,14 @@ void DrawDwelling5(S_CASTLE *castle){
 }
 
 void DrawDwelling6(S_CASTLE *castle){
+
+    if(castle->dwelling & DWELLING_UPGRADE7){
+	DrawDwellingUpgrade7(castle);
+	return;
+    }else if(castle->dwelling & DWELLING_UPGRADE6){
+	DrawDwellingUpgrade6(castle);
+	return;
+    }
 
     AGGSPRITE sprite;
     ICNHEADER *header = NULL;
@@ -2777,14 +2813,16 @@ void DrawBuildingMagicTower(S_CASTLE *castle){
 	    break;
 
 	case BARBARIAN:
-	    // анимация
-	    cur.x = cx;
-	    cur.y = cy;
-	    cur.w = 0;
-	    cur.h = 0;
-	    FillSPRITE(&sprite, "TWNBMAGE.ICN", 5);
-	    header = GetICNHeader(&sprite);
-	    AddAnimationEvent(&castanim, &cur, header, 8);
+	    if(5 == castle->magicTower){
+		// анимация
+		cur.x = cx;
+		cur.y = cy;
+		cur.w = 0;
+		cur.h = 0;
+		FillSPRITE(&sprite, "TWNBMAGE.ICN", 5);
+		header = GetICNHeader(&sprite);
+		AddAnimationEvent(&castanim, &cur, header, 8);
+	    }
 	    // спрайт
 	    FillSPRITE(&sprite, "TWNBMAGE.ICN", castle->magicTower);
 	    break;
@@ -2829,3 +2867,315 @@ void DrawBuildingMagicTower(S_CASTLE *castle){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 }
+
+void DrawDwellingUpgrade2(S_CASTLE *castle){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    Uint16 cx = video->w / 2 - 640 / 2;
+    Uint16 cy = video->h / 2 - 480 / 2;
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNKUP_1.ICN", 0);
+	    break;
+
+	case BARBARIAN:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNBUP_1.ICN", 0);
+	    break;
+	    
+	case NECROMANCER:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNNUP_1.ICN", 0);
+	    break;
+
+	case SORCERESS:
+	    // анимация
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNSUP_1.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(&castanim, &cur, header, 5);
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNKUP_1.ICN", 0);
+	    break;
+
+	default:
+	    return;
+	    break;
+    }
+
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+}
+
+void DrawDwellingUpgrade3(S_CASTLE *castle){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    Uint16 cx = video->w / 2 - 640 / 2;
+    Uint16 cy = video->h / 2 - 480 / 2;
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    // анимация
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNKUP_2.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(&castanim, &cur, header, 6);
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNKUP_2.ICN", 0);
+	    break;
+
+	case NECROMANCER:
+	    // анимация
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNNUP_2.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(&castanim, &cur, header, 5);
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNNUP_2.ICN", 0);
+	    break;
+
+	case SORCERESS:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNSUP_2.ICN", 0);
+	    break;
+
+	case WIZARD:
+	    // анимация
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNZUP_2.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(&castanim, &cur, header, 5);
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNZUP_2.ICN", 0);
+	    break;
+
+	default:
+	    return;
+	    break;
+    }
+
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+}
+
+void DrawDwellingUpgrade4(S_CASTLE *castle){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    Uint16 cx = video->w / 2 - 640 / 2;
+    Uint16 cy = video->h / 2 - 480 / 2;
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNKUP_3.ICN", 0);
+	    break;
+
+	case BARBARIAN:
+	    // анимация
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNBUP_3.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(&castanim, &cur, header, 5);
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNBUP_3.ICN", 0);
+	    break;
+	    
+	case NECROMANCER:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNNUP_3.ICN", 0);
+	    break;
+
+	case SORCERESS:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNSUP_3.ICN", 0);
+	    break;
+
+	case WARLOCK:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNWUP_3.ICN", 0);
+	    break;
+	    
+	default:
+	    return;
+	    break;
+    }
+
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+}
+
+void DrawDwellingUpgrade5(S_CASTLE *castle){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    Uint16 cx = video->w / 2 - 640 / 2;
+    Uint16 cy = video->h / 2 - 480 / 2;
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    // анимация
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNKUP_4.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(&castanim, &cur, header, 7);
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNKUP_4.ICN", 0);
+	    break;
+
+	case BARBARIAN:
+	    // анимация
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNBUP_4.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(&castanim, &cur, header, 5);
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNBUP_4.ICN", 0);
+	    break;
+	    
+	case NECROMANCER:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNNUP_4.ICN", 0);
+	    break;
+
+	case WIZARD:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNZUP_4.ICN", 0);
+	    break;
+
+	default:
+	    return;
+	    break;
+    }
+
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+}
+
+void DrawDwellingUpgrade6(S_CASTLE *castle){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    Uint16 cx = video->w / 2 - 640 / 2;
+    Uint16 cy = video->h / 2 - 480 / 2;
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNKUP_5.ICN", 0);
+	    break;
+
+	case WARLOCK:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNWUP_5.ICN", 0);
+	    break;
+	    
+	case WIZARD:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNZUP_5.ICN", 0);
+	    break;
+
+	default:
+	    return;
+	    break;
+    }
+
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+}
+
+void DrawDwellingUpgrade7(S_CASTLE *castle){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    Uint16 cx = video->w / 2 - 640 / 2;
+    Uint16 cy = video->h / 2 - 480 / 2;
+
+    switch(castle->race){
+
+	case WARLOCK:
+	    // спрайт
+	    FillSPRITE(&sprite, "TWNWUP5B.ICN", 0);
+	    break;
+	    
+	default:
+	    return;
+	    break;
+    }
+
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+}
+

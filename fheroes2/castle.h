@@ -61,6 +61,7 @@
 #define DWELLING_UPGRADE4	0x0800
 #define DWELLING_UPGRADE5	0x1000
 #define DWELLING_UPGRADE6	0x2000
+#define DWELLING_UPGRADE7	0x4000	// черный дракон
 
 typedef struct {
 
