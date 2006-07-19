@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060718
+#define VERSION 20060719
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -80,10 +80,10 @@ typedef enum {
 	    } E_FOCUS;
 
 typedef enum {
-                BARBARIAN,
                 KNIGHT,
-                NECROMANCER,
+                BARBARIAN,
                 SORCERESS,
+                NECROMANCER,
                 WARLOCK,
                 WIZARD,
                 BOMG
