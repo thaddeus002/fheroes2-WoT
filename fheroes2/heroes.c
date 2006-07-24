@@ -27,13 +27,25 @@
 */
 
 #include "SDL.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "artifact.h"
 #include "spell.h"
 #include "magicbook.h"
+#include "config.h"
+#include "cursor.h"
+#include "tools.h"
 #include "castle.h"
 #include "monster.h"
 #include "heroes.h"
+
+E_MORALE CalculateArmyMorale(S_ARMY *, S_HEROES *);
+
+ACTION	ActionMonsterInfoUpgrade(void);
+ACTION	ActionMonsterInfoDismiss(void);
+ACTION	ActionMonsterInfoExit(void);
 
 static S_HEROES *	allHeroes = NULL;
 
@@ -186,6 +198,10 @@ BOOL	InitHeroes(void){
     allHeroes[ARCHIBALD].name	= "Archibald";
     allHeroes[NAME_UNK5].name	= "Unknown Name 5";
     allHeroes[SANDYSANDY].name	= "SandySandy";
+    allHeroes[SANDYSANDY].army[0].count = 3;
+    allHeroes[SANDYSANDY].army[0].monster = RED_DRAGON;
+    allHeroes[SANDYSANDY].army[1].count = 2;
+    allHeroes[SANDYSANDY].army[1].monster = BLACK_DRAGON;
 
     fprintf(stderr, "Init heroes.\n");
 
@@ -775,4 +791,312 @@ Uint8   CalculateHeroesMoveSeaPoint(S_HEROES *heroes){
 	tp += 10;
 
     return tp;
+}
+
+Uint8 HeroesCountArmy(S_HEROES *heroes){
+
+    if(! heroes) return 0;
+    
+    Uint8 i;
+    Uint8 res = 0;
+    for(i = 0; i < HEROESMAXARMY; ++i)
+	if(heroes->army[i].count) ++res;
+
+    return res;
+}
+
+ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image = NULL;
+    SDL_Surface *background = NULL;
+    AGGSPRITE sprite;
+    const char *icnname = NULL;
+    INTERFACEACTION action;
+    INTERFACEACTION *dialog = NULL;
+    ACTION result;
+    SDL_Rect rectBack, rect;
+    char str[64];
+    char message[8];
+
+    if(GetIntValue(EVILINTERFACE)){ icnname = "VIEWARME.ICN"; }else{  icnname = "VIEWARMY.ICN"; }
+
+    CursorOff();
+    SetIntValue(ANIM3, FALSE);
+
+    Uint32 cursor = GetCursor();
+
+    FillSPRITE(&sprite, icnname, 0);
+    image = GetICNSprite(&sprite);
+    rectBack.x = video->w / 2 - image->w / 2;
+    rectBack.y = video->h / 2 - image->h / 2;
+    rectBack.w = image->w;
+    rectBack.h = image->h;
+    
+    // сохраняем background
+    if(NULL == (background = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "ShowArmyInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
+        return NONE;
+    }
+    SDL_BlitSurface(video, &rectBack, background, NULL);
+
+    // рисуем картинку диалога
+    SDL_BlitSurface(image, NULL, video , &rectBack);
+
+    // рисуем картинку монстра
+    S_MONSTER *monster = GetStatMonster(army->monster);
+    FillSPRITE(&sprite, monster->filename, 2);
+    image = GetICNSprite(&sprite);
+    rect.x = rectBack.x + 150 - image->w / 2;
+    rect.y = rectBack.y + 100;
+    rect.w = image->w;
+    rect.h = image->h;
+    SDL_BlitSurface(image, NULL, video , &rect);
+
+    // наименование
+    rect.x = rectBack.x + 120;
+    rect.y = rectBack.y + 35;
+    rect.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    rect.h = FONT_HEIGHTBIG;
+    PrintText(video, &rect, monster->descriptions, FONT_BIG);
+
+    // количество
+    memset(message, 0, strlen(message));
+    sprintf(message, "%5d", army->count);
+    rect.x = rectBack.x + 120;
+    rect.y = rectBack.y + 224;
+    rect.w = FONT_WIDTHBIG * strlen(message);
+    rect.h = FONT_HEIGHTBIG;
+    PrintText(video, &rect, message, FONT_BIG);
+
+    // attack
+    sprintf(str, "Attack Skill: %d", monster->attack);
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // defence
+    sprintf(str, "Defense Skill: %d", monster->defence);
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // shot
+    sprintf(str, "Shots: %d", monster->shots);
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 2;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // damage
+    sprintf(str, "Damage: %d - %d", monster->damageMin, monster->damageMax);
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 3;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // hp
+    sprintf(str, "Hit Points: %d", monster->hp);
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 4;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // speed
+    switch(monster->speed){
+	case CRAWLING:
+	    sprintf(str, "Speed: Crawling");
+	    break;
+	case VERYSLOW:
+	    sprintf(str, "Speed: Very Slow");
+	    break;
+        case SLOW:
+	    sprintf(str, "Speed: Slow");
+	    break;
+	case AVERAGE:
+	    sprintf(str, "Speed: Average");
+	    break;
+        case FAST:
+	    sprintf(str, "Speed: Fast");
+	    break;
+        case VERYFAST:
+	    sprintf(str, "Speed: Very Fast");
+	    break;
+        case ULTRAFAST:
+	    sprintf(str, "Speed: Ultra Fast");
+	    break;
+        case BLAZING:
+	    sprintf(str, "Speed: Brazing");
+	    break;
+        case INSTANT:
+	    sprintf(str, "Speed: Instant");
+	    break;
+    }
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 5;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // morale
+    if(heroes)
+    switch(CalculateHeroesMorale(heroes)){
+        case MORALE_TREASON:
+	    sprintf(str, "Morale: Treason");
+	    break;
+        case MORALE_AWFUL:
+	    sprintf(str, "Morale: Awful");
+	    break;
+        case MORALE_POOR:
+	    sprintf(str, "Morale: Poor");
+	    break;
+        case MORALE_NORMAL:
+	    sprintf(str, "Morale: Normal");
+	    break;
+        case MORALE_GOOD:
+	    sprintf(str, "Morale: Good");
+	    break;
+        case MORALE_GREAT:
+	    sprintf(str, "Morale: Great");
+	    break;
+        case MORALE_IRISH:
+	    sprintf(str, "Morale: Irish");
+	    break;
+    }
+    else
+	sprintf(str, "Morale: Normal");
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 6;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // luck
+    if(heroes)
+    switch(CalculateHeroesLuck(heroes)){
+        case LUCK_AWFUL:
+	    sprintf(str, "Luck: Awful");
+	    break;
+        case LUCK_BAD:
+	    sprintf(str, "Luck: Bad");
+	    break;
+        case LUCK_NORMAL:
+	    sprintf(str, "Luck: Normal");
+	    break;
+        case LUCK_GOOD:
+	    sprintf(str, "Luck: Good");
+	    break;
+        case LUCK_GREAT:
+	    sprintf(str, "Luck: Great");
+	    break;
+        case LUCK_IRISH:
+	    sprintf(str, "Luck: Irish");
+	    break;
+    }
+    else
+	sprintf(str, "Luck: Normal");
+    rect.x = rectBack.x + 400;
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 7;
+    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.h = FONT_HEIGHTBIG;
+    rect.x = rect.x - rect.w / 2;
+    PrintText(video, &rect, str, FONT_BIG);
+
+    // click dismiss
+    if(heroes && 1 == HeroesCountArmy(heroes)){
+	FillSPRITE(&sprite, icnname, 2);
+	image = GetICNSprite(&sprite);
+	rect.x = rectBack.x + 290;
+	rect.y = rectBack.y + 220;
+	rect.w = image->w;
+	rect.h = image->h;
+    }else{
+	FillSPRITE(&sprite, icnname, 1);
+	image = GetICNSprite(&sprite);
+	rect.x = rectBack.x + 290;
+	rect.y = rectBack.y + 220;
+	rect.w = image->w;
+	rect.h = image->h;
+	// click
+	ZeroINTERFACEACTION(&action);
+	FillSPRITE(&action.objectUp, icnname, 1);
+	FillSPRITE(&action.objectPush, icnname, 2);
+	action.rect = rect;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionMonsterInfoDismiss;
+	AddActionEvent(&dialog, &action);
+    }
+    SDL_BlitSurface(image, NULL, video, &rect);
+
+    // click exit
+    FillSPRITE(&sprite, icnname, 3);
+    image = GetICNSprite(&sprite);
+    rect.x = rectBack.x + 420;
+    rect.y = rectBack.y + 220;
+    rect.w = image->w;
+    rect.h = image->h;
+    // click
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, icnname, 3);
+    FillSPRITE(&action.objectPush, icnname, 4);
+    action.rect = rect;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionMonsterInfoExit;
+    AddActionEvent(&dialog, &action);
+    SDL_BlitSurface(image, NULL, video, &rect);
+
+    SDL_Flip(video);
+    SetCursor(CURSOR_POINTER);
+            
+    CursorOn();
+                
+    result = ActionCycle(dialog);
+
+    if(CANCEL == result) result = NONE;
+
+    CursorOff();
+
+    SDL_BlitSurface(background, NULL, video, &rectBack);
+    FreeActionEvent(dialog);
+    SDL_FreeSurface(background);
+
+    SetCursor(cursor);
+    SetIntValue(ANIM3, TRUE);
+    CursorOn();
+    
+    return result;
+}
+
+ACTION	ActionMonsterInfoUpgrade(void){
+
+    return NONE;
+}
+
+ACTION	ActionMonsterInfoDismiss(void){
+
+    return DISMISS;
+}
+
+ACTION	ActionMonsterInfoExit(void){
+
+    return CANCEL;
+}
+
+ACTION ShowHeroesInfo(S_HEROES *heroes){
+
+    return NONE;
 }

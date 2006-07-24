@@ -39,7 +39,6 @@
 #include "cursor.h"
 #include "loadgame.h"
 #include "mp2maps.h"
-#include "monster.h"
 #include "kingdom.h"
 #include "heroes.h"
 #include "castle.h"
@@ -51,29 +50,37 @@
 #include "castle_wrlk.h"
 #include "castle_wzrd.h"
 
-ACTION ActionClickCastleMonster(void);
-ACTION ActionClickHeroesMonster(void);
-ACTION ActionOverHeroes(void);
-ACTION ActionViewHeroes(void);
-ACTION ActionOverExit(void);
 void RedrawCastleAnimation(void);
 void RedrawBottomBar(void);
+void RedrawCastleMonster(void);
+void RedrawHeroesMonster(E_NAMEHEROES);
+
+ACTION ActionCASTLELOOP(INTERFACEACTION *); 
+
 ACTION ActionExitCastle(void); 
 ACTION ActionLeftCastle(void); 
 ACTION ActionRightCastle(void); 
-ACTION ActionCASTLELOOP(INTERFACEACTION *); 
-
+ACTION ActionClickCastleMonster(void);
+ACTION ActionClickCastleMonsterEmpty(Uint8);
+ACTION ActionClickHeroesMonster(void);
+ACTION ActionClickHeroesMonsterEmpty(Uint8);
+ACTION ActionViewHeroes(void);
 
 static 	S_CASTLE	*ptrCastle	= NULL;
 static 	Uint8		countCastle	= 0;
+
+	S_CASTLE	*currentCastle	= NULL;
+	E_NAMEHEROES	heroesName 	= HEROESNULL;
+
 	S_ANIMATION    	*castanim	= NULL;
-const	S_CASTLE	*currentCastle	= NULL;
-	INTERFACEACTION *dialogCastle	= NULL;
+	INTERFACEACTION *castlact	= NULL;
 
 struct {
     Uint8		select;
+    BOOL		castle;
     SDL_Rect            rect;
-    SDL_Surface         *surface;
+    SDL_Surface         *back;
+    SDL_Surface         *cursor;
     BOOL                use;
 } backMonsterCursor;
 
@@ -214,7 +221,7 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].building = ptr->building;
 	    ptrCastle[countCastle].dwelling = ptr->dwelling;
 	}else{
-	    ptrCastle[countCastle].building = BUILD_TAVERN; // BUILD_THIEVEGUILD BUILD_TAVERN BUILD_SHIPYARD BUILD_WELL BUILD_STATUE BUILD_LEFTTURRET BUILD_RIGHTTURRET BUILD_MARKETPLACE BUILD_MOAT BUILD_EXT1 BUILD_SPEC
+	    ptrCastle[countCastle].building = BUILD_TAVERN; // BUILD_THIEVEGUILD BUILD_TAVERN BUILD_SHIPYARD BUILD_WELL BUILD_STATUE BUILD_LEFTTURRET BUILD_RIGHTTURRET BUILD_MARKETPLACE BUILD_MOAT BUILD_WEL2 BUILD_SPEC
 	    ptrCastle[countCastle].dwelling = DWELLING_MONSTER1 | DWELLING_MONSTER2; // DWELLING_MONSTER1 DWELLING_MONSTER2 DWELLING_MONSTER3 DWELLING_MONSTER4 DWELLING_MONSTER5 DWELLING_MONSTER6 DWELLING_UPGRADE2 DWELLING_UPGRADE3 DWELLING_UPGRADE4 DWELLING_UPGRADE5 DWELLING_UPGRADE6
 	}
 
@@ -363,7 +370,7 @@ S_CASTLE *GetStatCastle(Uint8 index){
     return &ptrCastle[index];
 }
 
-void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
+void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 
     // определяем тип замка
     SDL_Surface *format, *back, *image, *video;
@@ -372,22 +379,26 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     ICNHEADER *header = NULL;
     S_KINGDOM *kingdom = NULL;
     S_CASTLE *castle = GetStatCastlePos(ax, ay);
-    S_HEROES *heroes = GetStatHeroes(nameHeroes);
+    S_HEROES *heroes = GetStatHeroes(castleHeroes);
 
     // в серые замки не заходим
     if(GRAY == castle->color) return;
     currentCastle = castle;
+    heroesName = castleHeroes;
 
     // инициализируем backgroundCursor
     FillSPRITE(&sprite, "STRIP.ICN", 1);
-    image = GetICNSprite(&sprite);
+    backMonsterCursor.cursor = GetICNSprite(&sprite);
     backMonsterCursor.select = 0xFF;
-    backMonsterCursor.surface = NULL;
     backMonsterCursor.use = FALSE;
     backMonsterCursor.rect.x = 0;
     backMonsterCursor.rect.y = 0;
-    backMonsterCursor.rect.w = image->w;
-    backMonsterCursor.rect.h = image->h;
+    backMonsterCursor.rect.w = backMonsterCursor.cursor->w;
+    backMonsterCursor.rect.h = backMonsterCursor.cursor->h;
+    if(NULL == (backMonsterCursor.back = SDL_CreateRGBSurface(SDL_SWSURFACE, backMonsterCursor.rect.w, backMonsterCursor.rect.h, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "EnterCastle: CreateRGBSurface failed: %s\n", SDL_GetError());
+        return;
+    }
 
     // переопределяем курсор и выключаем анимацию карты
     SetIntValue(ANIM1, FALSE);
@@ -434,7 +445,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     action.rect.w = 1;
     action.rect.h = 1;
     action.mouseEvent = MOUSE_LCLICK;
-    AddActionEvent(&dialogCastle, &action);
+    AddActionEvent(&castlact, &action);
 
     // рисуем бордюр
     if(GetIntValue(VIDEOMODE)) ShowBorder(&rectBack);
@@ -502,7 +513,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionLeftCastle;
-    AddActionEvent(&dialogCastle, &action);
+    AddActionEvent(&castlact, &action);
 
     // нижний бар
     FillSPRITE(&sprite, "SMALLBAR.ICN", 0);
@@ -525,7 +536,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionRightCastle;
-    AddActionEvent(&dialogCastle, &action);
+    AddActionEvent(&castlact, &action);
 
     // рисуем цветовой знак
     switch(castle->color){
@@ -615,8 +626,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 		action.rect = rectCur;
 		action.mouseEvent = MOUSE_LCLICK;
 		action.pf = ActionClickCastleMonster;
-		//action.level = LEVELEVENT_CASTLEMONSTER;
-		AddActionEvent(&dialogCastle, &action);
+		AddActionEvent(&castlact, &action);
 
 		// рисуем монстров
 		memset(number, 0, strlen(number) + 1);
@@ -649,6 +659,13 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	    rectCur.w = image->w;
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+	    // регистрируем событие на click
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionClickCastleMonster;
+	    AddActionEvent(&castlact, &action);
 	}
     }
 
@@ -656,7 +673,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     if(heroes){
 	memset(number, 0, strlen(number) + 1);
 	memset(icnstring, 0, strlen(icnstring) + 1);
-        sprintf(number, "%4d", nameHeroes);
+        sprintf(number, "%4d", castleHeroes);
         for(i = 0; i < 4; i++)
 	    if(0 == strncmp(&number[i], " ", 1)) number[i] = '0';
         sprintf(icnstring, "PORT%4s.ICN", number);
@@ -671,18 +688,41 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 	action.rect = rectCur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverHeroes;
-	AddActionEvent(&dialogCastle, &action);
+	AddActionEvent(&castlact, &action);
 	// клик
 	ZeroINTERFACEACTION(&action);
         action.rect = rectCur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionViewHeroes;
-	AddActionEvent(&dialogCastle, &action);
+	AddActionEvent(&castlact, &action);
 
+    // рисуем капитана
     }else if(castle->capitan){
 	memset(number, 0, strlen(number) + 1);
 	memset(icnstring, 0, strlen(icnstring) + 1);
-        sprintf(number, "%4d", castle->race + 89);
+        switch(castle->race){
+	    case KNIGHT:
+		sprintf(number, "%4d", 90);
+		break;
+	    case BARBARIAN:
+		sprintf(number, "%4d", 91);
+		break;
+	    case SORCERESS:
+		sprintf(number, "%4d", 92);
+		break;
+	    case WARLOCK:
+		sprintf(number, "%4d", 93);
+		break;
+	    case WIZARD:
+		sprintf(number, "%4d", 94);
+		break;
+	    case NECROMANCER:
+		sprintf(number, "%4d", 95);
+		break;
+	    default:
+		return;
+		break;
+	}
         for(i = 0; i < 4; i++)
 	    if(0 == strncmp(&number[i], " ", 1)) number[i] = '0';
         sprintf(icnstring, "PORT%4s.ICN", number);
@@ -750,8 +790,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 		action.rect = rectCur;
 		action.mouseEvent = MOUSE_LCLICK;
 		action.pf = ActionClickHeroesMonster;
-		//action.level = LEVELEVENT_HEROESMONSTER;
-		AddActionEvent(&dialogCastle, &action);
+		AddActionEvent(&castlact, &action);
 
 		// рисуем монстров
 		memset(number, 0, strlen(number) + 1);
@@ -785,6 +824,13 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
 		rectCur.w = image->w;
 		rectCur.h = image->h;
 		SDL_BlitSurface(image, NULL, video, &rectCur);
+
+		// регистрируем событие на click
+		ZeroINTERFACEACTION(&action);
+		action.rect = rectCur;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickHeroesMonster;
+		AddActionEvent(&castlact, &action);
 	    }
     }else{
 	FillSPRITE(&sprite, "STRIP.ICN", 11);
@@ -943,7 +989,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     action.rect = rectCur;
     action.mouseEvent = MOUSE_PRESENT;
     action.pf = ActionOverExit;
-    AddActionEvent(&dialogCastle, &action);
+    AddActionEvent(&castlact, &action);
     // клик
     ZeroINTERFACEACTION(&action);
     FillSPRITE(&action.objectUp, "SWAPBTN.ICN", 0);
@@ -951,182 +997,159 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionExitCastle;
-    AddActionEvent(&dialogCastle, &action);
+    AddActionEvent(&castlact, &action);
 
     switch(castle->race){
 
 	case KNIGHT:
-	    if(castle->capitan) DrawKNGTCapitan(&castanim, &dialogCastle);
-	    DrawKNGTCastle(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE2) DrawKNGTUpgrade2(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawKNGTThievesGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(&castanim, &dialogCastle);
-	    if(castle->magicTower) DrawKNGTMageGuild(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE5) DrawKNGTUpgrade5(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE6) DrawKNGTUpgrade6(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE3) DrawKNGTUpgrade3(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER3) DrawKNGTDwelling3(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE4) DrawKNGTUpgrade4(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER4) DrawKNGTDwelling4(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_WELL) DrawKNGTWell(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(&castanim, &dialogCastle);
+	    if(castle->capitan) DrawKNGTCapitan(&castanim, &castlact);
+	    DrawKNGTCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawKNGTWel2(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawKNGTThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(&castanim, &castlact);
+	    if(castle->magicTower) DrawKNGTMageGuild(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawKNGTDwelling3(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawKNGTDwelling4(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawKNGTWell(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(&castanim, &castlact);
 	    // если рядом море
-	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(&castanim, &dialogCastle);
-	    else DrawKNGTExt0(&castanim, &dialogCastle);
+	    // DrawKNGTExt1 - дороги
+	    // DrawKNGTExt2 - дороги
+	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(&castanim, &castlact);
+	    else DrawKNGTExt0(&castanim, &castlact);
 	    break;
 
 	case BARBARIAN:
-	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE6) DrawBRBNUpgrade6(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(&castanim, &dialogCastle);
-	    if(castle->magicTower) DrawBRBNMageGuild(&castanim, &dialogCastle);
-	    if(castle->capitan) DrawBRBNCapitan(&castanim, &dialogCastle);
-	    DrawBRBNCastle(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE3) DrawBRBNUpgrade3(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE2) DrawBRBNUpgrade2(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER2) DrawBRBNDwelling2(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE4) DrawBRBNUpgrade4(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE5) DrawBRBNUpgrade5(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_WELL) DrawBRBNWell(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &dialogCastle);
+	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(&castanim, &castlact);
+	    if(castle->magicTower) DrawBRBNMageGuild(&castanim, &castlact);
+	    if(castle->capitan) DrawBRBNCapitan(&castanim, &castlact);
+	    DrawBRBNCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawBRBNDwelling2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
 	    // учесть что анимация перерисовывает мост и таверну
-	    //if(castle->building & BUILD_EXT1) DrawBRBNExt1(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(&castanim, &dialogCastle);
-	    else DrawBRBNExt0(&castanim, &dialogCastle);
+	    //DrawBRBNExt1 - ручей
+	    //DrawBRBNExt2 - ров
+	    //DrawBRBNExt3 - ров
+	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(&castanim, &castlact);
+	    else DrawBRBNExt0(&castanim, &castlact);
 	    break;
 
 	case SORCERESS:
-	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE6) DrawSCRSUpgrade6(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(&castanim, &dialogCastle);
-	    if(castle->magicTower) DrawSCRSMageGuild(&castanim, &dialogCastle);
-	    if(castle->capitan) DrawSCRSCapitan(&castanim, &dialogCastle);
-	    DrawSCRSCastle(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE3) DrawSCRSUpgrade3(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(&castanim, &dialogCastle);
-	    else DrawSCRSExt0(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE2) DrawSCRSUpgrade2(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawSCRSThievesGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_STATUE) DrawSCRSStatue(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_EXT1) DrawSCRSExt1(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE4) DrawSCRSUpgrade4(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER4) DrawSCRSDwelling4(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_WELL) DrawSCRSWell(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE5) DrawSCRSUpgrade5(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER5) DrawSCRSDwelling5(&castanim, &dialogCastle);
+	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(&castanim, &castlact);
+	    if(castle->magicTower) DrawSCRSMageGuild(&castanim, &castlact);
+	    if(castle->capitan) DrawSCRSCapitan(&castanim, &castlact);
+	    DrawSCRSCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(&castanim, &castlact);
+	    else DrawSCRSExt0(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawSCRSThievesGuild(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE && castle->building & BUILD_WEL2) DrawSCRSExt1(&castanim, &castlact);
+	    else if(castle->building & BUILD_STATUE) DrawSCRSStatue(&castanim, &castlact);
+	    else if(castle->building & BUILD_WEL2) DrawSCRSWel2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawSCRSDwelling4(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawSCRSWell(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawSCRSDwelling5(&castanim, &castlact);
 	break;
 
 	case NECROMANCER:
-	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(&castanim, &dialogCastle);
-	    DrawNCRMCastle(&castanim, &dialogCastle);
-	    if(castle->capitan) DrawNCRMCapitan(&castanim, &dialogCastle);
-    	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE6) DrawNCRMUpgrade6(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(&castanim, &dialogCastle);
-	    else DrawNCRMExt0(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawNCRMThievesGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE3) DrawNCRMUpgrade3(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE5) DrawNCRMUpgrade5(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE2) DrawNCRMUpgrade2(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE4) DrawNCRMUpgrade4(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(&castanim, &dialogCastle);
-	    if(castle->magicTower) DrawNCRMMageGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_EXT1) DrawNCRMExt1(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_WELL) DrawNCRMWell(&castanim, &dialogCastle);
+	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(&castanim, &castlact);
+	    DrawNCRMCastle(&castanim, &castlact);
+	    if(castle->capitan) DrawNCRMCapitan(&castanim, &castlact);
+    	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(&castanim, &castlact);
+	    else DrawNCRMExt0(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawNCRMThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(&castanim, &castlact);
+	    if(castle->magicTower) DrawNCRMMageGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawNCRMWell(&castanim, &castlact);
 	    break;
 
 	case WARLOCK:
-	    if(castle->dwelling & DWELLING_UPGRADE5) DrawWRLKUpgrade5(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER5) DrawWRLKDwelling5(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE3) DrawWRLKUpgrade3(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER3) DrawWRLKDwelling3(&castanim, &dialogCastle);
-	    DrawWRLKCastle(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(&castanim, &dialogCastle);
-	    if(castle->capitan) DrawWRLKCapitan(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &dialogCastle);
-	    else DrawWRLKExt0(&castanim, &dialogCastle);
-	    if(castle->magicTower) DrawWRLKMageGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_EXT1) DrawWRLKExt1(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_SPEC) DrawWRLKSpec(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE4) DrawWRLKUpgrade4(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER4) DrawWRLKDwelling4(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE2) DrawWRLKUpgrade2(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER2) DrawWRLKDwelling2(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE6) DrawWRLKUpgrade6(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER6) DrawWRLKDwelling6(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_WELL) DrawWRLKWell(&castanim, &dialogCastle);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawWRLKDwelling5(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawWRLKDwelling3(&castanim, &castlact);
+	    DrawWRLKCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(&castanim, &castlact);
+	    if(castle->capitan) DrawWRLKCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
+	    else DrawWRLKExt0(&castanim, &castlact);
+	    if(castle->magicTower) DrawWRLKMageGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawWRLKWel2(&castanim, &castlact);
+	    if(castle->building & BUILD_SPEC) DrawWRLKSpec(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawWRLKDwelling4(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawWRLKDwelling2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawWRLKDwelling6(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawWRLKWell(&castanim, &castlact);
 	break;
 
 	case WIZARD:
-	    if(castle->dwelling & DWELLING_UPGRADE6) DrawWZRDUpgrade6(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER6) DrawWZRDDwelling6(&castanim, &dialogCastle);
-	    DrawWZRDCastle(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(&castanim, &dialogCastle);
-	    if(castle->capitan) DrawWZRDCapitan(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE2) DrawWZRDUpgrade2(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawWZRDThievesGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(&castanim, &dialogCastle);
-	    else DrawWZRDExt0(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_WELL) DrawWZRDWell(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE3) DrawWZRDUpgrade3(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE5) DrawWZRDUpgrade5(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(&castanim, &dialogCastle);
-	    if(castle->magicTower) DrawWZRDMageGuild(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(&castanim, &dialogCastle);
-	    if(castle->dwelling & DWELLING_UPGRADE4) DrawWZRDUpgrade4(&castanim, &dialogCastle);
-	    else if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_MARKETPLACE) DrawWZRDMarketplace(&castanim, &dialogCastle);
-	    if(castle->building & BUILD_EXT1) DrawWZRDExt1(&castanim, &dialogCastle);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawWZRDDwelling6(&castanim, &castlact);
+	    DrawWZRDCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(&castanim, &castlact);
+	    if(castle->capitan) DrawWZRDCapitan(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawWZRDThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(&castanim, &castlact);
+	    else DrawWZRDExt0(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawWZRDWell(&castanim, &castlact);
+	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(&castanim, &castlact);
+	    if(castle->magicTower) DrawWZRDMageGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawWZRDMarketplace(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawWZRDWel2(&castanim, &castlact);
 	break;
 	
 	default:
@@ -1156,20 +1179,21 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES nameHeroes){
     SetCursor(CURSOR_POINTER);
     CursorOn();
 
-    ActionCASTLELOOP(dialogCastle);
+    ActionCASTLELOOP(castlact);
 
     CursorOff();
     // чистим данные
     FreeAnimationEvent(castanim);
-    FreeActionEvent(dialogCastle);
-    if(backMonsterCursor.surface) SDL_FreeSurface(backMonsterCursor.surface);
+    FreeActionEvent(castlact);
+    if(backMonsterCursor.back) SDL_FreeSurface(backMonsterCursor.back);
 
     // востанавливаем бакгроунд
     SDL_BlitSurface(back, NULL, video, &rectBack);
     SDL_FreeSurface(back);
 
-    dialogCastle = NULL;
+    castlact = NULL;
     castanim = NULL;
+    currentCastle = NULL;
 
     // востанавливаем курсор и анимацию карты
     SetCursor(cursor);
@@ -1405,10 +1429,437 @@ void RedrawBottomBar(void){
     // нижний бар
     FillSPRITE(&sprite, "SMALLBAR.ICN", 0);
     image = GetICNSprite(&sprite);
-    rect.x = video->w / 2 - 320 + BORDERWIDTH + 4;
+    rect.x = video->w / 2 - 320 + BORDERWIDTH + 5;
     rect.y = video->h / 2 + 240 - BORDERWIDTH - 3;
     rect.w = image->w;
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
     SDL_Flip(video);
+}
+
+ACTION ActionClickCastleMonster(void){
+
+    Sint32 mx, my;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    CursorOff();
+
+    // верхний левый угол начала
+    Uint16 cx = video->w / 2 - 208;
+    Uint16 cy = video->h / 2 + 22;
+
+    SDL_GetMouseState(&mx, &my);
+
+    Uint8 index = (Uint16) (mx - cx) / 88;
+    Uint16 count = 0;
+    E_MONSTER monster = MONSTERNONE;
+    S_HEROES *heroes = NULL;
+
+    if(MONSTERNONE == currentCastle->army[index].monster) return ActionClickCastleMonsterEmpty(index);
+
+    // двойной клик - инфо монстра
+    if(backMonsterCursor.select == index && backMonsterCursor.use){
+	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	switch(ShowArmyInfo(&currentCastle->army[index], NULL)){
+	    case DISMISS:
+		currentCastle->army[index].monster = MONSTERNONE;
+		currentCastle->army[index].count = 0;
+		RedrawCastleMonster();
+		break;
+	    default:
+		break;
+	}
+	CursorOff();
+	backMonsterCursor.use = FALSE;
+    // обмен
+    }else if(backMonsterCursor.use){
+	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	backMonsterCursor.use = FALSE;
+	monster = currentCastle->army[index].monster;
+	count = currentCastle->army[index].count;
+	// в замке
+	if(backMonsterCursor.castle){
+	    currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	    currentCastle->army[index].count = currentCastle->army[backMonsterCursor.select].count;
+	    currentCastle->army[backMonsterCursor.select].monster = monster;
+	    currentCastle->army[backMonsterCursor.select].count = count;
+	    RedrawCastleMonster();
+	// с героем
+	}else if(HEROESNULL != heroesName){
+	    heroes = GetStatHeroes(heroesName);
+	    currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	    currentCastle->army[index].count = heroes->army[backMonsterCursor.select].count;
+	    heroes->army[backMonsterCursor.select].monster = monster;
+	    heroes->army[backMonsterCursor.select].count = count;
+	    RedrawHeroesMonster(heroesName);
+	}
+    // первый клик рисуем рамку
+    }else{
+	// востанавливаем background
+	if(backMonsterCursor.use){
+	    SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	    backMonsterCursor.use = FALSE;
+	}
+	backMonsterCursor.rect.x = cx + index * (backMonsterCursor.rect.w + 6);
+	backMonsterCursor.rect.y = cy;
+	backMonsterCursor.select = index;
+	backMonsterCursor.castle = TRUE;
+	// сохраняем background
+	SDL_BlitSurface(video, &backMonsterCursor.rect, backMonsterCursor.back, NULL);
+	backMonsterCursor.use = TRUE;
+        // рисуем рамку
+	SDL_BlitSurface(backMonsterCursor.cursor, NULL, video, &backMonsterCursor.rect);
+    }
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION ActionClickCastleMonsterEmpty(Uint8 index){
+
+    if(! backMonsterCursor.use) return NONE;
+
+    CursorOff();
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    // востанавливаем background
+    backMonsterCursor.use = FALSE;
+    S_HEROES *heroes = GetStatHeroes(heroesName);
+
+    if(! backMonsterCursor.castle && 2 > HeroesCountArmy(heroes)){
+	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	CursorOn();
+	return NONE;
+    }
+
+    // перемещаем на пустую клетку
+    if(backMonsterCursor.castle){
+	currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	currentCastle->army[index].count = currentCastle->army[backMonsterCursor.select].count;
+	currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
+	currentCastle->army[backMonsterCursor.select].count = 0;
+    }else{
+	currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	currentCastle->army[index].count = heroes->army[backMonsterCursor.select].count;
+	heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
+	heroes->army[backMonsterCursor.select].count = 0;
+    }
+
+    RedrawCastleMonster();
+    RedrawHeroesMonster(heroesName);
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION ActionClickHeroesMonster(void){
+
+    Sint32 mx, my;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    CursorOff();
+
+    // верхний левый угол начала
+    Uint16 cx = video->w / 2 - 208;
+    Uint16 cy = video->h / 2 + 121;
+
+    SDL_GetMouseState(&mx, &my);
+
+    Uint8 index = (Uint16) (mx - cx) / 88;
+    Uint16 count = 0;
+    E_MONSTER monster = MONSTERNONE;
+    S_HEROES *heroes = GetStatHeroes(heroesName);
+    if(! heroes) return NONE;
+
+    if(MONSTERNONE == heroes->army[index].monster) return ActionClickHeroesMonsterEmpty(index);
+
+    // двойной клик - инфо монстра
+    if(backMonsterCursor.select == index && backMonsterCursor.use){
+	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	switch(ShowArmyInfo(&heroes->army[index], heroes)){
+	    case DISMISS:
+		heroes->army[index].monster = MONSTERNONE;
+		heroes->army[index].count = 0;
+		RedrawHeroesMonster(heroesName);
+		break;
+	    default:
+		break;
+	}
+	backMonsterCursor.use = FALSE;
+	CursorOff();
+    // обмен
+    }else if(backMonsterCursor.use){
+	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	backMonsterCursor.use = FALSE;
+	monster = heroes->army[index].monster;
+	count = heroes->army[index].count;
+	// в герое
+	if(backMonsterCursor.castle){
+	    heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	    heroes->army[index].count = heroes->army[backMonsterCursor.select].count;
+	    heroes->army[backMonsterCursor.select].monster = monster;
+	    heroes->army[backMonsterCursor.select].count = count;
+	    RedrawHeroesMonster(heroesName);
+	// с замком
+	}else{
+	    heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	    heroes->army[index].count = currentCastle->army[backMonsterCursor.select].count;
+	    currentCastle->army[backMonsterCursor.select].monster = monster;
+	    currentCastle->army[backMonsterCursor.select].count = count;
+	    RedrawHeroesMonster(heroesName);
+	}
+    // первый клик рисуем рамку
+    }else{
+	// востанавливаем background
+	if(backMonsterCursor.use){
+	    SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	    backMonsterCursor.use = FALSE;
+	}
+	backMonsterCursor.rect.x = cx + index * (backMonsterCursor.rect.w + 6);
+	backMonsterCursor.rect.y = cy;
+	backMonsterCursor.select = index;
+	backMonsterCursor.castle = FALSE;
+	// сохраняем background
+	SDL_BlitSurface(video, &backMonsterCursor.rect, backMonsterCursor.back, NULL);
+	backMonsterCursor.use = TRUE;
+        // рисуем рамку
+	SDL_BlitSurface(backMonsterCursor.cursor, NULL, video, &backMonsterCursor.rect);
+    }
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION ActionClickHeroesMonsterEmpty(Uint8 index){
+
+    if(! backMonsterCursor.use) return NONE;
+
+    CursorOff();
+
+    S_HEROES *heroes = GetStatHeroes(heroesName);
+    backMonsterCursor.use = FALSE;
+
+    // перемещаем на пустую клетку
+    if(backMonsterCursor.castle){
+	heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	heroes->army[index].count = currentCastle->army[backMonsterCursor.select].count;
+	currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
+	currentCastle->army[backMonsterCursor.select].count = 0;
+    }else{
+	heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	heroes->army[index].count = heroes->army[backMonsterCursor.select].count;
+	heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
+	heroes->army[backMonsterCursor.select].count = 0;
+    }
+
+    RedrawCastleMonster();
+    RedrawHeroesMonster(heroesName);
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION ActionViewHeroes(void){
+
+    return NONE;
+    //ShowHeroesInfo();
+}
+
+void RedrawCastleMonster(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image = NULL;
+    AGGSPRITE sprite;
+    SDL_Rect rectCur;
+    Uint16 cx, cy;
+    Uint8 i, j;
+    ICNHEADER *header = NULL;
+
+    char message[8];
+    char number[5];
+    char icnstring[13];
+
+    // рисуем фон ячеек для монстров
+    FillSPRITE(&sprite, "STRIP.ICN", 2);
+    image = GetICNSprite(&sprite);
+    cx = video->w / 2 - 208;
+    cy = video->h / 2 + 22;
+    for(i = 0; i < CASTLEMAXARMY; ++i){
+
+	// если есть в замке монстры
+	if(currentCastle->army[i].count){
+		// то рисуем фон в зависимости от расы
+		switch(GetRaceMonster(currentCastle->army[i].monster)){
+		
+		    case KNIGHT:
+			FillSPRITE(&sprite, "STRIP.ICN", 4);
+			break;
+
+		    case BARBARIAN:
+			FillSPRITE(&sprite, "STRIP.ICN", 5);
+			break;
+
+		    case SORCERESS:
+			FillSPRITE(&sprite, "STRIP.ICN", 6);
+			break;
+
+		    case WARLOCK:
+			FillSPRITE(&sprite, "STRIP.ICN", 7);
+			break;
+
+		    case WIZARD:
+			FillSPRITE(&sprite, "STRIP.ICN", 8);
+			break;
+
+		    case NECROMANCER:
+			FillSPRITE(&sprite, "STRIP.ICN", 9);
+			break;
+
+		    default:
+			FillSPRITE(&sprite, "STRIP.ICN", 10);
+			break;
+		}
+		image = GetICNSprite(&sprite);
+		rectCur.x = cx + (image->w + 6) * i;
+		rectCur.y = cy;
+		rectCur.w = image->w;
+		rectCur.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &rectCur);
+
+		// рисуем монстров
+		memset(number, 0, strlen(number) + 1);
+		memset(icnstring, 0, strlen(icnstring) + 1);
+    		sprintf(number, "%4d", currentCastle->army[i].monster);
+    		for(j = 0; j < 4; j++)
+		    if(0 == strncmp(&number[j], " ", 1)) number[j] = '0';
+    		sprintf(icnstring, "MONH%4s.ICN", number);
+		FillSPRITE(&sprite, icnstring, 0);
+		header = GetICNHeader(&sprite);
+		rectCur.x = cx + 88 * i + header->offsetX;
+		rectCur.y = cy + header->offsetY;
+		rectCur.w = header->surface->w;
+		rectCur.h = header->surface->h;
+		SDL_BlitSurface(header->surface, NULL, video, &rectCur);
+		
+		// рисуем количество
+	        memset(message, 0, strlen(message));
+		sprintf(message, "%5d", currentCastle->army[i].count);
+		rectCur.x = cx + 88 * i + 54;
+		rectCur.y = cy + 80;
+		rectCur.w = FONT_WIDTHSMALL * strlen(message);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, message, FONT_SMALL);
+	}else{
+	    FillSPRITE(&sprite, "STRIP.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + (image->w + 6) * i;
+	    rectCur.y = cy;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	}
+    }
+}
+
+void RedrawHeroesMonster(E_NAMEHEROES name){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image = NULL;
+    AGGSPRITE sprite;
+    SDL_Rect rectCur;
+    Uint16 cx, cy;
+    Uint8 i, j;
+    ICNHEADER *header = NULL;
+    S_HEROES *heroes = GetStatHeroes(name);
+
+    char message[8];
+    char number[5];
+    char icnstring[13];
+
+    // рисуем фон ячеек для монстров героя
+    if(heroes){
+
+	cx = video->w / 2 - 208;
+	cy = video->h / 2 + 121;
+
+	for( i = 0; i < HEROESMAXARMY; ++i)
+	    // если есть у героя монстры
+	    if(heroes->army[i].count){
+
+		// то рисуем фон в зависимости от расы
+		switch(GetRaceMonster(heroes->army[i].monster)){
+		
+		    case KNIGHT:
+			FillSPRITE(&sprite, "STRIP.ICN", 4);
+			break;
+
+		    case BARBARIAN:
+			FillSPRITE(&sprite, "STRIP.ICN", 5);
+			break;
+
+		    case SORCERESS:
+			FillSPRITE(&sprite, "STRIP.ICN", 6);
+			break;
+
+		    case WARLOCK:
+			FillSPRITE(&sprite, "STRIP.ICN", 7);
+			break;
+
+		    case WIZARD:
+			FillSPRITE(&sprite, "STRIP.ICN", 8);
+			break;
+
+		    case NECROMANCER:
+			FillSPRITE(&sprite, "STRIP.ICN", 9);
+			break;
+
+		    default:
+			FillSPRITE(&sprite, "STRIP.ICN", 10);
+			break;
+		}
+		image = GetICNSprite(&sprite);
+		rectCur.x = cx + (image->w + 6) * i;
+		rectCur.y = cy;
+		rectCur.w = image->w;
+		rectCur.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &rectCur);
+
+		// рисуем монстров
+		memset(number, 0, strlen(number) + 1);
+		memset(icnstring, 0, strlen(icnstring) + 1);
+    		sprintf(number, "%4d", heroes->army[i].monster);
+    		for(j = 0; j < 4; j++)
+		    if(0 == strncmp(&number[j], " ", 1)) number[j] = '0';
+    		sprintf(icnstring, "MONH%4s.ICN", number);
+		FillSPRITE(&sprite, icnstring, 0);
+		header = GetICNHeader(&sprite);
+		rectCur.x = cx + 88 * i + header->offsetX;
+		rectCur.y = cy + header->offsetY;
+		rectCur.w = header->surface->w;
+		rectCur.h = header->surface->h;
+		SDL_BlitSurface(header->surface, NULL, video, &rectCur);
+		
+		// рисуем количество
+	        memset(message, 0, strlen(message));
+		sprintf(message, "%5d", heroes->army[i].count);
+		rectCur.x = cx + 88 * i + 54;
+		rectCur.y = cy + 80;
+		rectCur.w = FONT_WIDTHSMALL * strlen(message);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, message, FONT_SMALL);
+
+	    }else{
+		FillSPRITE(&sprite, "STRIP.ICN", 2);
+		image = GetICNSprite(&sprite);
+		rectCur.x = cx + (image->w + 6) * i;
+		rectCur.y = cy;
+		rectCur.w = image->w;
+		rectCur.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &rectCur);
+	    }
+    }
 }

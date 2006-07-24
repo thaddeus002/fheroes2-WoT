@@ -39,6 +39,7 @@
 #include "debug.h"
 #include "draw.h"
 #include "radar.h"
+#include "kingdom.h"
 #include "loadgame.h"
 #include "mp2maps.h"
 
@@ -57,7 +58,10 @@ void	RedrawMapsAnimation(void);
 void	CheckCursorAreaAction(E_FOCUS);
 void	ClickCursorAreaAction(E_FOCUS);
 
-ACTION ActionGAMELOOP(INTERFACEACTION *);
+void 	CenterAreaFocus(void);
+void   ComputerStep(E_COLORS);
+ACTION ActionGAMELOOP(void);
+ACTION ActionHUMANLOOP(INTERFACEACTION *);
 
 ACTION ActionClickMapsArea(void);
 ACTION ActionClickRadarArea(void);
@@ -523,18 +527,22 @@ ACTION DrawMainDisplay(){
     InitRadar();
 
     // стартовый фокус на герое
-    gameFocus.type = HEROES;
-    gameFocus.ax = 18;
-    gameFocus.ay = 18;
-    gameFocus.object = NULL;
+    S_KINGDOM *kingdom = GetStatKingdom(GetIntValue(HUMANCOLORS));
+    if(!kingdom){
+	return EXIT;
+    }
 
-    if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
-    else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea() / 2;
-    else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
+    S_CASTLE *castle = GetStatCastle(kingdom->castle[0]);
+    if(!castle){
+	return EXIT;
+    }
 
-    if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
-    else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea() / 2;
-    else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+    gameFocus.type = CASTLE;
+    gameFocus.ax = castle->ax;
+    gameFocus.ay = castle->ay;
+    gameFocus.object = castle;
+
+    CenterAreaFocus();
 
     display.lastOffsetX = 0;
     display.lastOffsetY = 0;
@@ -543,12 +551,8 @@ ACTION DrawMainDisplay(){
     ShowStaticMainDisplay();
     RedrawMapsArea();
 
-    // идем в цикл сообщений
-    ACTION result;
-
-    while(! (EXIT == (result = ActionGAMELOOP(stpemaindisplay)) || (ESC == result && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
-
-    result = EXIT;
+    // идем в игровой цикл
+    ACTION result = ActionGAMELOOP();
 
     // овобождаем данные
     FreeActionEvent(stpemaindisplay);
@@ -1976,7 +1980,7 @@ ACTION ActionButtonMagic(void){
 
 ACTION ActionButtonCloseDay(void){
 
-    return NONE;
+    return ENDTUR;
 }
 
 ACTION ActionButtonInfo(void){
@@ -2620,170 +2624,6 @@ S_DISPLAY *GetDisplayPos(void){
     return &display;
 }
 
-ACTION ActionGAMELOOP(INTERFACEACTION *action){
-
-    SDL_Event event;
-    SDL_Surface *video = SDL_GetVideoSurface();;
-    ACTION exit = NONE;
-    S_OLDOBJECT old;
-    memset(old.object.name, 0, AGGSIZENAME);
-    old.object.number = 0xFFFF;
-    old.pushRect.x = 0;
-    old.pushRect.y = 0;
-    old.pushRect.w = 0;
-    old.pushRect.h = 0;
-    old.presRect = old.pushRect;
-    old.flagPush = FALSE;
-    old.flagPres = FALSE;
-    INTERFACEACTION *ptr = NULL;
-
-    Uint32	ticket = 0;
-    Sint32 	cx, cy;
-
-    // цикл по событиям
-    while(exit == NONE){
-
-	ptr = action;
-
-	while(ptr){
-
-	    SDL_GetMouseState(&cx, &cy);
-	    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, cx, cy) && ptr->pf)
-		exit = (*ptr->pf)();
-
-    	    ptr = (INTERFACEACTION *) ptr->next;
-	}
-
-	while(SDL_PollEvent(&event)){
-
-	    switch(event.type){
-	    
-		case SDL_QUIT:
-
-		    // close windows
-		    exit = EXIT;
-		    break;
-
-		case SDL_KEYDOWN:
-
-		    // нажатия клавиатуры
-		    switch(event.key.keysym.sym){
-
-			case SDLK_ESCAPE:
-
-			    exit = ESC;
-			    break;
-
-			// F4 switch to full screen
-                	case SDLK_F4:
-
-			    SDL_WM_ToggleFullScreen(video);
-
-			    GetIntValue(FULLSCREEN) ? SetIntValue(FULLSCREEN, FALSE) : SetIntValue(FULLSCREEN, TRUE);
-
-			    break;
-								    
-			default:
-			    break;
-		    }
-		    break;
-
-		case SDL_MOUSEBUTTONDOWN:
-
-		    switch(event.button.button){
-		    
-			case SDL_BUTTON_LEFT:
-
-			    ClickCursorAreaAction(gameFocus.type);
-
-			    // левая кнопка down
-			    ptr = action;
-			    while(ptr){
-				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
-				    (ptr->mouseEvent & MOUSE_LCLICK)){
-				    old.pushRect = ptr->rect;
-				    old.object = ptr->objectUp;
-				    old.flagPush = TRUE;
-				    DrawSprite(&ptr->rect, &ptr->objectPush);
-				}
-    				ptr = (INTERFACEACTION *) ptr->next;
-			    }
-			    break;
-
-			case SDL_BUTTON_RIGHT:
-			    
-			    SDL_GetMouseState(&cx, &cy);
-
-			    // правая кнопка по арене, рисуем QuickInfo
-			    if(cx > BORDERWIDTH && cy > BORDERWIDTH && cx < GetWidthArea() * TILEWIDTH + BORDERWIDTH && cy < GetHeightArea() * TILEWIDTH + BORDERWIDTH){
-				cx -= BORDERWIDTH;
-
-				cy -= BORDERWIDTH;
-				cx /= TILEWIDTH;
-				cy /= TILEWIDTH;
-	
-				ShowQuickInfo((display.offsetY + cy) * GetWidthMaps() + display.offsetX + cx);
-			    }
-
-			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
-			    break;
-
-			default:
-			    break;
-		    }
-		    break;
-
-		case SDL_MOUSEBUTTONUP:
-
-		    switch(event.button.button){
-		    
-			case SDL_BUTTON_LEFT:
-
-			    // левая кнопка up
-			    ptr = action;
-			    if(old.flagPush){
-				DrawSprite(&old.pushRect, &old.object);
-				old.flagPush = FALSE;
-			    }
-
-			    while(ptr){
-				if(ValidPoint(&old.pushRect, event.button.x, event.button.y) &&
-				    (ptr->mouseEvent & MOUSE_LCLICK) && CompareRect(&ptr->rect, &old.pushRect) && ptr->pf )
-					exit = (*ptr->pf)();
-
-				ptr = (INTERFACEACTION *) ptr->next;
-			    }
-			    break;
-			    
-			default:
-			    break;
-		    }
-		    break;
-
-		case SDL_MOUSEMOTION:
-
-		    CursorShow();
-		    break;
-
-		default:
-    		    break;
-	    }
-
-	    if(exit != EXIT && 0 == ticket % (GetIntValue(ANIMATIONDELAY) / 2)) RedrawMapsAnimation();
-	    ++ticket;
-	}
-
-	CheckCursorAreaAction(gameFocus.type);
-
-	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMapsAnimation();
-	else if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY);
-
-	++ticket;
-    }
-
-    return exit;
-}
-
 ACTION InfoClickWorld(void){
 
     return NONE;
@@ -3162,13 +3002,7 @@ void ClickCursorAreaAction(E_FOCUS f){
 			gameFocus.ay = castle->ay;
 			gameFocus.object = castle;
 
-			if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
-			else if(gameFocus.ax > GetWidthMaps() - GetWidthArea()) display.offsetX = GetWidthMaps() - GetWidthArea();
-			else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
-
-			if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
-			else if(gameFocus.ay > GetHeightMaps() - GetHeightArea()) display.offsetY = GetHeightMaps() - GetHeightArea();
-			else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+			CenterAreaFocus();
 
 			display.lastOffsetX = 0;
 			display.lastOffsetY = 0;
@@ -3296,13 +3130,7 @@ void ClickCursorAreaAction(E_FOCUS f){
 			gameFocus.ay = castle->ay;
 			gameFocus.object = castle;
 
-			if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
-			else if(gameFocus.ax > GetWidthMaps() - GetWidthArea()) display.offsetX = GetWidthMaps() - GetWidthArea();
-			else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
-
-			if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
-			else if(gameFocus.ay > GetHeightMaps() - GetHeightArea()) display.offsetY = GetHeightMaps() - GetHeightArea();
-			else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+			CenterAreaFocus();
 
 			display.lastOffsetX = 0;
 			display.lastOffsetY = 0;
@@ -3322,4 +3150,233 @@ void ClickCursorAreaAction(E_FOCUS f){
 	default:
 	    break;
     }
+}
+
+ACTION ActionGAMELOOP(void){
+
+    Uint8 i; 
+    ACTION exit = ENDTUR;
+
+    while(1){
+    
+	// ход оппонентов по цветам
+	for(i = 0; i < 8; ++i) 
+    	    if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
+		// ход humans
+		if(GetIntValue(HUMANCOLORS) == i){
+		    while(! (ENDTUR == (exit = ActionHUMANLOOP(stpemaindisplay)) || EXIT == exit || (ESC == exit && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
+
+		    if(ESC == exit) exit = EXIT;
+
+		}// ход computers
+		else if(ENDTUR == exit)
+		    ComputerStep(i);
+	    }
+	
+	if(EXIT == exit || ESC == exit) break;
+
+	// расчет дат
+	if(7 == GetIntValue(DAY)){
+	    SetIntValue(DAY, 1);
+
+	    if(4 == GetIntValue(WEEK)){
+		SetIntValue(WEEK, 1);
+		SetIntValue(MONTH, GetIntValue(MONTH) + 1);
+	    }else
+		SetIntValue(WEEK, GetIntValue(WEEK) + 1);
+
+	    // перегенерация недельных событий карты
+	}else
+	    SetIntValue(DAY, GetIntValue(DAY) + 1);
+
+	// перегенерация однодневных событий карты
+	// расчет ресурсов всех королевств
+	// расчет хода для героев
+	
+	if(GetIntValue(DEBUG)) fprintf(stderr, "Month: %d, Week: %d, Day: %d\n", GetIntValue(MONTH), GetIntValue(WEEK), GetIntValue(DAY));
+    }
+    
+    return exit;
+}
+
+ACTION ActionHUMANLOOP(INTERFACEACTION *action){
+
+    SDL_Event event;
+    SDL_Surface *video = SDL_GetVideoSurface();;
+    ACTION exit = NONE;
+    S_OLDOBJECT old;
+    memset(old.object.name, 0, AGGSIZENAME);
+    old.object.number = 0xFFFF;
+    old.pushRect.x = 0;
+    old.pushRect.y = 0;
+    old.pushRect.w = 0;
+    old.pushRect.h = 0;
+    old.presRect = old.pushRect;
+    old.flagPush = FALSE;
+    old.flagPres = FALSE;
+    INTERFACEACTION *ptr = NULL;
+
+    Uint32	ticket = 0;
+    Sint32 	cx, cy;
+
+    // цикл по событиям
+    while(exit == NONE){
+
+	ptr = action;
+
+	while(ptr){
+
+	    SDL_GetMouseState(&cx, &cy);
+	    if((ptr->mouseEvent & MOUSE_PRESENT) && ValidPoint(&ptr->rect, cx, cy) && ptr->pf)
+		exit = (*ptr->pf)();
+
+    	    ptr = (INTERFACEACTION *) ptr->next;
+	}
+
+	while(SDL_PollEvent(&event)){
+
+	    switch(event.type){
+	    
+		case SDL_QUIT:
+
+		    // close windows
+		    exit = EXIT;
+		    break;
+
+		case SDL_KEYDOWN:
+
+		    // нажатия клавиатуры
+		    switch(event.key.keysym.sym){
+
+			case SDLK_ESCAPE:
+
+			    exit = ESC;
+			    break;
+
+			// F4 switch to full screen
+                	case SDLK_F4:
+
+			    SDL_WM_ToggleFullScreen(video);
+
+			    GetIntValue(FULLSCREEN) ? SetIntValue(FULLSCREEN, FALSE) : SetIntValue(FULLSCREEN, TRUE);
+
+			    break;
+								    
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEBUTTONDOWN:
+
+		    switch(event.button.button){
+		    
+			case SDL_BUTTON_LEFT:
+
+			    ClickCursorAreaAction(gameFocus.type);
+
+			    // левая кнопка down
+			    ptr = action;
+			    while(ptr){
+				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_LCLICK)){
+				    old.pushRect = ptr->rect;
+				    old.object = ptr->objectUp;
+				    old.flagPush = TRUE;
+				    DrawSprite(&ptr->rect, &ptr->objectPush);
+				}
+    				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+			    break;
+
+			case SDL_BUTTON_RIGHT:
+			    
+			    SDL_GetMouseState(&cx, &cy);
+
+			    // правая кнопка по арене, рисуем QuickInfo
+			    if(cx > BORDERWIDTH && cy > BORDERWIDTH && cx < GetWidthArea() * TILEWIDTH + BORDERWIDTH && cy < GetHeightArea() * TILEWIDTH + BORDERWIDTH){
+				cx -= BORDERWIDTH;
+
+				cy -= BORDERWIDTH;
+				cx /= TILEWIDTH;
+				cy /= TILEWIDTH;
+	
+				ShowQuickInfo((display.offsetY + cy) * GetWidthMaps() + display.offsetX + cx);
+			    }
+
+			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
+			    break;
+
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEBUTTONUP:
+
+		    switch(event.button.button){
+		    
+			case SDL_BUTTON_LEFT:
+
+			    // левая кнопка up
+			    ptr = action;
+			    if(old.flagPush){
+				DrawSprite(&old.pushRect, &old.object);
+				old.flagPush = FALSE;
+			    }
+
+			    while(ptr){
+				if(ValidPoint(&old.pushRect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_LCLICK) && CompareRect(&ptr->rect, &old.pushRect) && ptr->pf )
+					exit = (*ptr->pf)();
+
+				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+			    break;
+			    
+			default:
+			    break;
+		    }
+		    break;
+
+		case SDL_MOUSEMOTION:
+
+		    CursorShow();
+		    break;
+
+		default:
+    		    break;
+	    }
+
+	    if(exit == NONE && 0 == ticket % (GetIntValue(ANIMATIONDELAY) / 2)) RedrawMapsAnimation();
+	    ++ticket;
+	}
+
+	CheckCursorAreaAction(gameFocus.type);
+
+	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawMapsAnimation();
+	else if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY);
+
+	++ticket;
+    }
+
+    return exit;
+}
+
+void ComputerStep(E_COLORS color){
+
+    printf("Computer move\n");
+    return;
+}
+
+void CenterAreaFocus(void){
+
+    if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
+    else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea();
+    else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
+
+    if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
+    else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea();
+    else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+
 }

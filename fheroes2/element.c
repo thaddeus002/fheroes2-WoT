@@ -47,7 +47,7 @@ ACTION DialogPressNO(void);
 ACTION MessageBox(const char *message, ENUMFONT font){
 
     CursorOff();
-    SetIntValue(ANIMATION, FALSE);
+    SetIntValue(ANIM2, FALSE);
     
     Uint32 cursor = GetCursor();
     
@@ -197,7 +197,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
 
     SetCursor(cursor);
 
-    SetIntValue(ANIMATION, TRUE);
+    SetIntValue(ANIM2, TRUE);
     CursorOn();
 
     return result;
@@ -376,7 +376,7 @@ void ShowQuickInfo(Uint16 index){
     BOOL exit = FALSE;
     
     CursorOff();
-    SetIntValue(ANIMATION, FALSE);
+    SetIntValue(ANIM2, FALSE);
     
     Uint32 cursor = GetCursor();
 
@@ -471,6 +471,6 @@ void ShowQuickInfo(Uint16 index){
     SDL_FreeSurface(back);
 
     SetCursor(cursor);
-    SetIntValue(ANIMATION, TRUE);
+    SetIntValue(ANIM2, TRUE);
     CursorOn();
 }

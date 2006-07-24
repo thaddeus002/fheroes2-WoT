@@ -32,6 +32,8 @@
 #include "SDL.h"
 #include "artifact.h"
 #include "monster.h"
+#include "actionevent.h"
+#include "heroes.h"
 #include "gamedefs.h"
 
 #define HEROESMAXSKILL		8
@@ -175,8 +177,8 @@ typedef struct {
 		E_ARTIFACT	artifact[HEROESMAXARTIFACT];
 	        S_ARMY		army[HEROESMAXARMY];
 		E_ARMYFORMAT	af;				// army format
-		Uint8		posx;
-		Uint8		posy;
+		Uint8		ax;
+		Uint8		ay;
 	    } S_HEROES;
 
 BOOL		InitHeroes(void);
@@ -196,7 +198,9 @@ Uint8		CalculateHeroesScouting(S_HEROES *);
 BOOL		HeroesArtifactPresent(S_HEROES *, E_ARTIFACT);
 E_LEVELSKILL	HeroesLevelSkill(S_HEROES *, E_SKILL);
 void		HeroesDefaultValues(S_HEROES *, E_RACE);
-
+Uint8		HeroesCountArmy(S_HEROES *);
 S_HEROES       *GetStatHeroes(E_NAMEHEROES);
+ACTION		ShowArmyInfo(S_ARMY *, S_HEROES *);
+ACTION		ShowHeroesInfo(S_HEROES *);
 
 #endif

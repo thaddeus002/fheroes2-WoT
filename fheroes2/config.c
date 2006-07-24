@@ -62,6 +62,9 @@ static CONFIGDESC settings[CONFIGEND] = {
     { "\0",		0 },		// ALLOWCOLORS
     { "\0",		0 },		// RNDCOLORS
     { "\0",		0 },		// HUMANCOLORS
+    { "\0",		1 },		// MONTH
+    { "\0",		1 },		// WEEK
+    { "\0",		1 },		// DAY
 
     { "on",		TRUE },		// ANIM1 анимация меню
     { "on",		TRUE },		// ANIM2 анимация карта
@@ -241,6 +244,9 @@ void SetIntValue(E_CONFIG key, Uint8 value){
 	case RNDCOLORS:
 	case HUMANCOLORS:
 	case ANIMATIONDELAY:
+	case MONTH:
+	case WEEK:
+	case DAY:
 	case LIMITMEMORY:
 
 	    settings[key].valueInt = value;

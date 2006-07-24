@@ -71,7 +71,7 @@ void DrawKNGTCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     cur.w -= 80;
-    cur.h -= 15;
+    cur.h -= 25;
     ZeroINTERFACEACTION(&action);
     action.rect = cur;
     action.mouseEvent = MOUSE_PRESENT;
@@ -385,6 +385,7 @@ void DrawKNGTMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
+    cur.h = 20;
     INTERFACEACTION action;
     ZeroINTERFACEACTION(&action);
     action.rect = cur;
@@ -399,7 +400,8 @@ void DrawKNGTSpec(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
-    
+    INTERFACEACTION action;
+        
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
@@ -410,6 +412,39 @@ void DrawKNGTSpec(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.w = header->surface->w;
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
+    
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverSpec;
+    AddActionEvent(actionHead, &action);
+}
+
+void DrawKNGTWel2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+        
+    Uint16 cx = video->w / 2 - 320;
+    Uint16 cy = video->h / 2 - 240;
+
+    // спрайт
+    FillSPRITE(&sprite, "TWNKWEL2.ICN", 0);
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+
+    INTERFACEACTION action;
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverWel2;
+    AddActionEvent(actionHead, &action);
 }
 
 void DrawKNGTExt1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -418,12 +453,32 @@ void DrawKNGTExt1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
-    
+        
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
     // спрайт
     FillSPRITE(&sprite, "TWNKEXT1.ICN", 0);
+    header = GetICNHeader(&sprite);
+    cur.x = cx + header->offsetX;
+    cur.y = cy + header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, video, &cur);
+}
+
+void DrawKNGTExt2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
+
+    AGGSPRITE sprite;
+    ICNHEADER *header = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+        
+    Uint16 cx = video->w / 2 - 320;
+    Uint16 cy = video->h / 2 - 240;
+
+    // спрайт
+    FillSPRITE(&sprite, "TWNKEXT2.ICN", 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
@@ -488,6 +543,14 @@ void DrawKNGTDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.w = header->surface->w;
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
+
+    cur.w = 80;
+    INTERFACEACTION action;
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverDwelling1;
+    AddActionEvent(actionHead, &action);
 }
 
 void DrawKNGTDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -496,18 +559,29 @@ void DrawKNGTDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    const S_CASTLE *castle = GetCurrentCastle();
+    const char *icnname = NULL;
+    if(castle->dwelling & DWELLING_UPGRADE2){ icnname = "TWNKUP_1.ICN"; }else{ icnname = "TWNKDW_1.ICN"; }
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
     // спрайт
-    FillSPRITE(&sprite, "TWNKDW_1.ICN", 0);
+    FillSPRITE(&sprite, icnname, 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
+
+    cur.w = 80;
+    INTERFACEACTION action;
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverDwelling2;
+    AddActionEvent(actionHead, &action);
 }
 
 void DrawKNGTDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -516,6 +590,9 @@ void DrawKNGTDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    const S_CASTLE *castle = GetCurrentCastle();
+    const char *icnname = NULL;
+    if(castle->dwelling & DWELLING_UPGRADE3){ icnname = "TWNKUP_2.ICN"; }else{ icnname = "TWNKDW_2.ICN"; }
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -525,18 +602,28 @@ void DrawKNGTDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy;
     cur.w = 0;
     cur.h = 0;
-    FillSPRITE(&sprite, "TWNKDW_2.ICN", 1);
+    FillSPRITE(&sprite, icnname, 1);
     header = GetICNHeader(&sprite);
     AddAnimationEvent(animHead, &cur, header, 6);
 
     // спрайт
-    FillSPRITE(&sprite, "TWNKDW_2.ICN", 0);
+    FillSPRITE(&sprite, icnname, 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
+
+    cur.x += 30;
+    cur.w = 110;
+    cur.h = 60;
+    INTERFACEACTION action;
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverDwelling3;
+    AddActionEvent(actionHead, &action);
 }
 
 void DrawKNGTDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -545,18 +632,32 @@ void DrawKNGTDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    const S_CASTLE *castle = GetCurrentCastle();
+    const char *icnname = NULL;
+    if(castle->dwelling & DWELLING_UPGRADE4){ icnname = "TWNKUP_3.ICN"; }else{ icnname = "TWNKDW_3.ICN"; }
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
     // спрайт
-    FillSPRITE(&sprite, "TWNKDW_3.ICN", 0);
+    FillSPRITE(&sprite, icnname, 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
+
+    cur.x += 120;
+    cur.w = 85;
+    cur.y += 5;
+    cur.h = 80;
+    INTERFACEACTION action;
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverDwelling4;
+    AddActionEvent(actionHead, &action);
 }
 
 void DrawKNGTDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -565,6 +666,9 @@ void DrawKNGTDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    const S_CASTLE *castle = GetCurrentCastle();
+    const char *icnname = NULL;
+    if(castle->dwelling & DWELLING_UPGRADE5){ icnname = "TWNKUP_4.ICN"; }else{ icnname = "TWNKDW_4.ICN"; }
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -574,18 +678,28 @@ void DrawKNGTDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy;
     cur.w = 0;
     cur.h = 0;
-    FillSPRITE(&sprite, "TWNKDW_4.ICN", 1);
+    FillSPRITE(&sprite, icnname, 1);
     header = GetICNHeader(&sprite);
     AddAnimationEvent(animHead, &cur, header, 7);
 
     // спрайт
-    FillSPRITE(&sprite, "TWNKDW_4.ICN", 0);
+    FillSPRITE(&sprite, icnname, 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
+
+    cur.y += 22;
+    cur.w = 160;
+    cur.h = 60;
+    INTERFACEACTION action;
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverDwelling5;
+    AddActionEvent(actionHead, &action);
 }
 
 void DrawKNGTDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -594,18 +708,31 @@ void DrawKNGTDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
-    
+    const S_CASTLE *castle = GetCurrentCastle();
+    const char *icnname = NULL;
+    if(castle->dwelling & DWELLING_UPGRADE6){ icnname = "TWNKUP_5.ICN"; }else{ icnname = "TWNKDW_5.ICN"; }
+
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
     // спрайт
-    FillSPRITE(&sprite, "TWNKDW_5.ICN", 0);
+    FillSPRITE(&sprite, icnname, 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
+
+    cur.x += 360;
+    cur.w = 130;
+    cur.h = 130;
+    INTERFACEACTION action;
+    ZeroINTERFACEACTION(&action);
+    action.rect = cur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionOverDwelling6;
+    AddActionEvent(actionHead, &action);
 }
 
 void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -659,128 +786,4 @@ void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     action.mouseEvent = MOUSE_PRESENT;
     action.pf = ActionOverMageGuild;
     AddActionEvent(actionHead, &action);
-}
-
-void DrawKNGTUpgrade2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
-
-    AGGSPRITE sprite;
-    ICNHEADER *header = NULL;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_Rect cur;
-    
-    Uint16 cx = video->w / 2 - 320;
-    Uint16 cy = video->h / 2 - 240;
-
-    // спрайт
-    FillSPRITE(&sprite, "TWNKUP_1.ICN", 0);
-    header = GetICNHeader(&sprite);
-    cur.x = cx + header->offsetX;
-    cur.y = cy + header->offsetY;
-    cur.w = header->surface->w;
-    cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
-}
-
-void DrawKNGTUpgrade3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
-
-    AGGSPRITE sprite;
-    ICNHEADER *header = NULL;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_Rect cur;
-    
-    Uint16 cx = video->w / 2 - 320;
-    Uint16 cy = video->h / 2 - 240;
-
-    // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNKUP_2.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 6);
-
-    // спрайт
-    FillSPRITE(&sprite, "TWNKUP_2.ICN", 0);
-    header = GetICNHeader(&sprite);
-    cur.x = cx + header->offsetX;
-    cur.y = cy + header->offsetY;
-    cur.w = header->surface->w;
-    cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
-}
-
-void DrawKNGTUpgrade4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
-
-    AGGSPRITE sprite;
-    ICNHEADER *header = NULL;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_Rect cur;
-    
-    Uint16 cx = video->w / 2 - 320;
-    Uint16 cy = video->h / 2 - 240;
-
-    // спрайт
-    FillSPRITE(&sprite, "TWNKUP_3.ICN", 0);
-
-    header = GetICNHeader(&sprite);
-    cur.x = cx + header->offsetX;
-    cur.y = cy + header->offsetY;
-    cur.w = header->surface->w;
-    cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
-}
-
-void DrawKNGTUpgrade5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
-
-    AGGSPRITE sprite;
-    ICNHEADER *header = NULL;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_Rect cur;
-    
-    Uint16 cx = video->w / 2 - 320;
-    Uint16 cy = video->h / 2 - 240;
-
-    // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNKUP_4.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 7);
-
-    // спрайт
-    FillSPRITE(&sprite, "TWNKUP_4.ICN", 0);
-    header = GetICNHeader(&sprite);
-    cur.x = cx + header->offsetX;
-    cur.y = cy + header->offsetY;
-    cur.w = header->surface->w;
-    cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
-}
-
-void DrawKNGTUpgrade6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
-
-    AGGSPRITE sprite;
-    ICNHEADER *header = NULL;
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_Rect cur;
-    
-    Uint16 cx = video->w / 2 - 320;
-    Uint16 cy = video->h / 2 - 240;
-
-    // спрайт
-    FillSPRITE(&sprite, "TWNKUP_5.ICN", 0);
-    header = GetICNHeader(&sprite);
-    cur.x = cx + header->offsetX;
-    cur.y = cy + header->offsetY;
-    cur.w = header->surface->w;
-    cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
-}
-
-void DrawKNGTUpgrade7(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
-
-    return;
 }

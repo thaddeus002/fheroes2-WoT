@@ -182,5 +182,4 @@ E_MONSTER	CheckValidMonster(Uint8);
 Uint16		GetRNDSizeLevelMonster(E_LEVELMONSTER);
 E_LEVELMONSTER	GetLevelMonster(E_MONSTER);
 
-
 #endif

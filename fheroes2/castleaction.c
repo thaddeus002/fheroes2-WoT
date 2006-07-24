@@ -32,6 +32,7 @@
 #include "gamedefs.h"
 #include "tools.h"
 #include "castle.h"
+#include "monster.h"
 #include "castleaction.h"
 
 ACTION ActionOverCastle(void){
@@ -227,53 +228,450 @@ ACTION ActionOverMageGuild(void){
     return NONE;
 }
 
-ACTION ActionClickCastleMonster(void){
-/*
-    Uint8               select;
-    SDL_Rect            rect;
-    SDL_Surface         *surface;
-    BOOL                use;
-    } backMonsterCursor;
-*/
-    Sint32 mx, my;
+ACTION ActionOverSpec(void){
+
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    switch(castle->race){
+	case BARBARIAN:
+	    message = "Coliseum";
+	    break;
+	case KNIGHT:
+	    message = "Fortifications";
+	    break;
+	case WARLOCK:
+	    message = "Dungeon";
+	    break;
+	case SORCERESS:
+	    message = "Rainbow";
+	    break;
+	case NECROMANCER:
+	    message = "Storm";
+	    break;
+	case WIZARD:
+	    message = "Library";
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
     SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    // верхний левый угол начала
-    Uint16 cx = video->w / 2 - 208;
-    //Uint16 cy = video->h / 2 + 22;
-
-    SDL_GetMouseState(&mx, &my);
-
-    Uint8 index = (Uint8) ((mx - cx) / 88 + 1);
-    printf("%d\n", index);
+    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
 
     return NONE;
 }
 
-ACTION ActionClickHeroesMonster(void){
 
-    Sint32 mx, my;
+ACTION ActionOverWel2(void){
+
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    switch(castle->race){
+	case BARBARIAN:
+	    message = "Garbadge Heap";
+	    break;
+	case KNIGHT:
+	    message = "Farm";
+	    break;
+	case WARLOCK:
+	    message = " Waterfall";
+	    break;
+	case SORCERESS:
+	    message = "Crystal Garden";
+	    break;
+	case NECROMANCER:
+	    message = "Skull Pile";
+	    break;
+	case WIZARD:
+	    message = "Orchard";
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
     SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    // верхний левый угол начала
-    Uint16 cx = video->w / 2 - 208;
-    //Uint16 cy = video->h / 2 + 120;
-
-    SDL_GetMouseState(&mx, &my);
-
-    Uint8 index = (Uint8) ((mx - cx) / 88 + 1);
-    printf("%d\n", index);
+    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
 
     return NONE;
 }
 
+ACTION ActionOverDwelling1(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    const S_MONSTER *monster = NULL;
+
+    switch(castle->race){
+	case BARBARIAN:
+	    monster = GetStatMonster(GOBLIN);
+	    break;
+	case KNIGHT:
+	    monster = GetStatMonster(PEASANT);
+	    break;
+	case WARLOCK:
+	    monster = GetStatMonster(CENTAUR);
+	    break;
+	case SORCERESS:
+	    monster = GetStatMonster(SPRITE);
+	    break;
+	case NECROMANCER:
+	    monster = GetStatMonster(SKELETON);
+	    break;
+	case WIZARD:
+	    monster = GetStatMonster(HALFLING);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, monster->descriptions, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionOverDwelling2(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    const S_MONSTER *monster = NULL;
+
+    switch(castle->race){
+	case BARBARIAN:
+	    if(castle->dwelling & DWELLING_UPGRADE2)
+		monster = GetStatMonster(CHIEF_ORC);
+	    else
+		monster = GetStatMonster(ORC);
+	    break;
+	case KNIGHT:
+	    if(castle->dwelling & DWELLING_UPGRADE2)
+		monster = GetStatMonster(ARCHER);
+	    else
+		monster = GetStatMonster(RANGER);
+	    break;
+	case WARLOCK:
+	    monster = GetStatMonster(GARGOYLE);
+	    break;
+	case SORCERESS:
+	    if(castle->dwelling & DWELLING_UPGRADE2)
+		monster = GetStatMonster(DWARF);
+	    else
+		monster = GetStatMonster(BATTLE_DWARF);
+	    break;
+	case NECROMANCER:
+	    if(castle->dwelling & DWELLING_UPGRADE2)
+		monster = GetStatMonster(ZOMBIE);
+	    else
+		monster = GetStatMonster(MUTANT_ZOMBIE);
+	    break;
+	case WIZARD:
+	    monster = GetStatMonster(BOAR);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, monster->descriptions, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionOverDwelling3(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    const S_MONSTER *monster = NULL;
+
+    switch(castle->race){
+	case BARBARIAN:
+	    monster = GetStatMonster(WOLF);
+	    break;
+	case KNIGHT:
+	    if(castle->dwelling & DWELLING_UPGRADE3)
+		monster = GetStatMonster(PIKEMAN);
+	    else
+		monster = GetStatMonster(VETERAN_PIKEMAN);
+	    break;
+	case WARLOCK:
+	    monster = GetStatMonster(GRIFFIN);
+	    break;
+	case SORCERESS:
+	    if(castle->dwelling & DWELLING_UPGRADE3)
+		monster = GetStatMonster(ELF);
+	    else
+		monster = GetStatMonster(GRAND_ELF);
+	    break;
+	case NECROMANCER:
+	    if(castle->dwelling & DWELLING_UPGRADE3)
+		monster = GetStatMonster(MUMMY);
+	    else
+		monster = GetStatMonster(ROYAL_MUMMY);
+	    break;
+	case WIZARD:
+	    if(castle->dwelling & DWELLING_UPGRADE3)
+		monster = GetStatMonster(IRON_GOLEM);
+	    else
+		monster = GetStatMonster(STEEL_GOLEM);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, monster->descriptions, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionOverDwelling4(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    const S_MONSTER *monster = NULL;
+
+    switch(castle->race){
+	case BARBARIAN:
+	    if(castle->dwelling & DWELLING_UPGRADE4)
+		monster = GetStatMonster(OGRE);
+	    else
+		monster = GetStatMonster(LORD_OGRE);
+	    break;
+	case KNIGHT:
+	    if(castle->dwelling & DWELLING_UPGRADE4)
+		monster = GetStatMonster(SWORDSMAN);
+	    else
+		monster = GetStatMonster(MASTER_SWORDSMAN);
+	    break;
+	case WARLOCK:
+	    if(castle->dwelling & DWELLING_UPGRADE4)
+		monster = GetStatMonster(MINOTAUR);
+	    else
+		monster = GetStatMonster(KNIGHT_MINOTAUR);
+	    break;
+	case SORCERESS:
+	    if(castle->dwelling & DWELLING_UPGRADE4)
+		monster = GetStatMonster(DRUID);
+	    else
+		monster = GetStatMonster(GREATER_DRUID);
+	    break;
+	case NECROMANCER:
+	    if(castle->dwelling & DWELLING_UPGRADE4)
+		monster = GetStatMonster(VAMPIRE);
+	    else
+		monster = GetStatMonster(LORD_VAMPIRE);
+	    break;
+	case WIZARD:
+	    monster = GetStatMonster(ROC);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, monster->descriptions, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionOverDwelling5(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    const S_MONSTER *monster = NULL;
+
+    switch(castle->race){
+	case BARBARIAN:
+	    if(castle->dwelling & DWELLING_UPGRADE5)
+		monster = GetStatMonster(TROLL);
+	    else
+		monster = GetStatMonster(WAR_TROLL);
+	    break;
+	case KNIGHT:
+	    if(castle->dwelling & DWELLING_UPGRADE5)
+		monster = GetStatMonster(CAVALIRY);
+	    else
+		monster = GetStatMonster(CHAMPION);
+	    break;
+	case WARLOCK:
+	    monster = GetStatMonster(HIDRA);
+	    break;
+	case SORCERESS:
+	    monster = GetStatMonster(UNICORN);
+	    break;
+	case NECROMANCER:
+	    if(castle->dwelling & DWELLING_UPGRADE5)
+		monster = GetStatMonster(LICH);
+	    else
+		monster = GetStatMonster(POWER_LICH);
+	    break;
+	case WIZARD:
+	    if(castle->dwelling & DWELLING_UPGRADE5)
+		monster = GetStatMonster(MAGE);
+	    else
+		monster = GetStatMonster(ARCHMAGE);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, monster->descriptions, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionOverDwelling6(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    const S_MONSTER *monster = NULL;
+
+    switch(castle->race){
+	case BARBARIAN:
+	    monster = GetStatMonster(CYCLOPS);
+	    break;
+	case KNIGHT:
+	    if(castle->dwelling & DWELLING_UPGRADE6)
+		monster = GetStatMonster(PALADIN);
+	    else
+		monster = GetStatMonster(CRUSADER);
+	    break;
+	case WARLOCK:
+	    if(castle->dwelling & DWELLING_UPGRADE7)
+		monster = GetStatMonster(BLACK_DRAGON);
+	    else if(castle->dwelling & DWELLING_UPGRADE6)
+		monster = GetStatMonster(RED_DRAGON);
+	    else
+		monster = GetStatMonster(GREEN_DRAGON);
+	    break;
+	case SORCERESS:
+	    monster = GetStatMonster(PHOENIX);
+	    break;
+	case NECROMANCER:
+	    monster = GetStatMonster(BONE_DRAGON);
+	    break;
+	case WIZARD:
+	    if(castle->dwelling & DWELLING_UPGRADE6)
+		monster = GetStatMonster(GIANT);
+	    else
+		monster = GetStatMonster(TITAN);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, monster->descriptions, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionOverExit(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+                
+    if(castle->castle){ message = "Exit Castle"; }else{ message = "Exit Town"; }
+    
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+                
+    return NONE;
+}               
+                    
 ACTION ActionOverHeroes(void){
 
     const char *message = "View Hero";
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
-    
+
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
@@ -286,29 +684,3 @@ ACTION ActionOverHeroes(void){
     return NONE;
 }
 
-ACTION ActionOverExit(void){
-
-    const char *message = NULL;
-    const S_CASTLE *castle = GetCurrentCastle();
-
-    if(castle->castle){ message = "Exit Castle"; }else{ message = "Exit Town"; }
-
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_Rect cur;
-    
-    cur.x = video->w / 2;
-    cur.y = video->h / 2 + 240 - BORDERWIDTH;
-
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
-    cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
-    cur.h = FONT_HEIGHTBIG;
-    PrintText(video, &cur, message, FONT_BIG);
-
-    return NONE;
-}
-
-ACTION ActionViewHeroes(void){
-
-    return NONE;
-}

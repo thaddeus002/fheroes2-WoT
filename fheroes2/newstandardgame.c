@@ -59,7 +59,7 @@ ACTION	ActionSelectDifficultyNormal(void);
 ACTION	ActionSelectDifficultyHard(void);
 ACTION	ActionSelectDifficultyExpert(void);
 ACTION	ActionSelectDifficultyImpossible(void);
-
+ACTION	ActionClickSelectColor(void);
 
 INTERFACEACTION *stpenewstandard = NULL;
 
@@ -394,7 +394,9 @@ void DrawMapsOpponents(void){
     SDL_Rect dest;
 
     AGGSPRITE sprite;
-    Uint8 seek = 0;
+    INTERFACEACTION action;
+
+    RemoveActionLevelEvent(stpenewstandard, LEVELEVENT_SELECTCOLOR);
     
     // text
     dest.x = 368;
@@ -403,270 +405,98 @@ void DrawMapsOpponents(void){
     dest.h = FONT_HEIGHTBIG;
     PrintText(video, &dest, "Opponents:", FONT_BIG);
 
-    if(GetIntValue(KINGDOMCOLORS) & COLORBLUE){
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    Uint8 human = 0;
+    
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
 
-	seek = 0;
+    if(! count) return;
 
-	GetIntValue(ALLOWCOLORS) & COLORBLUE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
-	image = GetICNSprite(&sprite);
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
 
-	dest.x = 225 + seek * image->w;
-	dest.y = 230;
-	dest.w = image->w;
-	dest.h = image->h;
+    	    if((GetIntValue(ALLOWCOLORS) >> i) & 0x01 && !human){
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 9 + i);
+		human = i + 1;
+    	    }else if((GetIntValue(ALLOWCOLORS) >> i) & 0x01)
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + i);
+	    else
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + i);
 
-	SDL_BlitSurface(image, NULL, video, &dest);
+	    image = GetICNSprite(&sprite);
 
+	    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+	    dest.y = 234;
+	    dest.w = image->w;
+	    dest.h = image->h;
+
+    	    if((GetIntValue(ALLOWCOLORS) >> i) & 0x01){
+		// обнуляем структуру
+		ZeroINTERFACEACTION(&action);
+		// заполняем
+		action.rect = dest;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.level = LEVELEVENT_SELECTCOLOR;
+		action.pf = ActionClickSelectColor;
+		// регистрируем
+		AddActionEvent(&stpenewstandard, &action);
+	    }
+
+	    SDL_BlitSurface(image, NULL, video, &dest);
+	    ++current;
     }
-    if(GetIntValue(KINGDOMCOLORS) & COLORGREEN){
-
-	seek = 1;
-
-	GetIntValue(ALLOWCOLORS) & COLORGREEN ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 230;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORRED){
-
-	seek = 2;
-
-	GetIntValue(ALLOWCOLORS) & COLORRED ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 230;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW){
-
-	seek = 3;
-
-	GetIntValue(ALLOWCOLORS) & COLORYELLOW ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 230;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORORANGE){
-
-	seek = 4;
-
-	GetIntValue(ALLOWCOLORS) & COLORORANGE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 230;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE){
-
-	seek = 5;
-
-	GetIntValue(ALLOWCOLORS) & COLORPURPLE ? FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + seek) : FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + seek);
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 230;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
+    
+    SetIntValue(HUMANCOLORS, human - 1);
 }
 
 void DrawMapsClass(void){
-
+/*
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Surface *image;
     SDL_Rect dest;
 
     AGGSPRITE sprite;
-    Uint8 seek = 0;
     
     // text
     dest.x = 386;
-    dest.y = 284;
+    dest.y = 290;
     dest.w = FONT_WIDTHBIG * 7;
     dest.h = FONT_HEIGHTBIG;
     PrintText(video, &dest, "Class:", FONT_BIG);
 
-    if(GetIntValue(KINGDOMCOLORS) & COLORBLUE){
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
 
-	seek = 0;
+    if(! count) return;
 
-	if(GetIntValue(RNDCOLORS) & COLORBLUE)
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
 
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    if((GetIntValue(RNDCOLORS) >> i) & 0x01)
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    else if((GetIntValue(ALLOWCOLORS) >> i) & 0x01)
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + i);
+	    else
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + i);
 
-	else if(GetIntValue(ALLOWCOLORS) & COLORBLUE)
+	    image = GetICNSprite(&sprite);
 
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
+	    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+	    dest.y = 314;
+	    dest.w = image->w;
+	    dest.h = image->h;
 
-	else
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
-
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 308;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
+	    SDL_BlitSurface(image, NULL, video, &dest);
+	    ++current;
     }
-    if(GetIntValue(KINGDOMCOLORS) & COLORGREEN){
-
-	seek = 1;
-
-	if(GetIntValue(RNDCOLORS) & COLORGREEN)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
-
-	else if(GetIntValue(ALLOWCOLORS) & COLORGREEN)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
-
-	else
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
-
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 308;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORRED){
-
-	seek = 2;
-
-	if(GetIntValue(RNDCOLORS) & COLORRED)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
-
-	else if(GetIntValue(ALLOWCOLORS) & COLORRED)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
-
-	else
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
-
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 308;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW){
-
-	seek = 3;
-
-	if(GetIntValue(RNDCOLORS) & COLORYELLOW)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
-
-	else if(GetIntValue(ALLOWCOLORS) & COLORYELLOW)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
-
-	else
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
-
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 308;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORORANGE){
-
-	seek = 4;
-
-	if(GetIntValue(RNDCOLORS) & COLORORANGE)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
-
-	else if(GetIntValue(ALLOWCOLORS) & COLORORANGE)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
-
-	else
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
-
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 308;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
-    if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE){
-
-	seek = 5;
-
-	if(GetIntValue(RNDCOLORS) & COLORPURPLE)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
-
-	else if(GetIntValue(ALLOWCOLORS) & COLORPURPLE)
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + seek);
-
-	else
-
-	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + seek);
-
-	image = GetICNSprite(&sprite);
-
-	dest.x = 225 + seek * image->w;
-	dest.y = 308;
-	dest.w = image->w;
-	dest.h = image->h;
-
-	SDL_BlitSurface(image, NULL, video, &dest);
-
-    }
+*/
 }
 
 ACTION ActionPressNewStandardOkay(void){
@@ -798,4 +628,57 @@ void SelectCursorSaveBackground(SDL_Rect *rect){
     
     backCursor.rect = *rect;
     backCursor.use = TRUE;
+}
+
+ACTION	ActionClickSelectColor(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+    AGGSPRITE sprite;
+    Uint8 i;
+
+    Uint8 count = 0;
+    Uint8 current = 0;
+    Uint8 human = GetIntValue(HUMANCOLORS);
+    
+    Sint32 mx, my;
+    SDL_GetMouseState(&mx, &my);    
+
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
+
+    if(! count) return NONE;
+    
+    CursorOff();
+    
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
+
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 3);
+	    image = GetICNSprite(&sprite);
+
+	    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+	    dest.y = 234;
+	    dest.w = image->w;
+	    dest.h = image->h;
+	    
+    	    if(((GetIntValue(ALLOWCOLORS) >> i) & 0x01) && ValidPoint(&dest, mx, my)){
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 9 + i);
+		human = i;
+    	    }else if((GetIntValue(ALLOWCOLORS) >> i) & 0x01)
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 3 + i);
+	    else
+		FillSPRITE(&sprite, "NGEXTRA.ICN", 15 + i);
+
+	    image = GetICNSprite(&sprite);
+	    SDL_BlitSurface(image, NULL, video, &dest);
+
+	    ++current;
+    }
+    
+    CursorOn();
+    SetIntValue(HUMANCOLORS, human);
+
+    return NONE;
 }

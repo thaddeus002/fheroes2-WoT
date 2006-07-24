@@ -41,5 +41,15 @@ ACTION ActionOverTavern(void);
 ACTION ActionOverDock(void);
 ACTION ActionOverMarketplace(void);
 ACTION ActionOverMoat(void);
+ACTION ActionOverSpec(void);
+ACTION ActionOverWel2(void);
+ACTION ActionOverDwelling1(void);
+ACTION ActionOverDwelling2(void);
+ACTION ActionOverDwelling3(void);
+ACTION ActionOverDwelling4(void);
+ACTION ActionOverDwelling5(void);
+ACTION ActionOverDwelling6(void);
+ACTION ActionOverHeroes(void);
+ACTION ActionOverExit(void);
 
 #endif

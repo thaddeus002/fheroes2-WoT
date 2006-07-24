@@ -56,6 +56,9 @@ typedef enum {
 		ALLOWCOLORS,
 		RNDCOLORS,
 		HUMANCOLORS,
+		MONTH,
+		WEEK,
+		DAY,
 
 		ANIM1,
 		ANIM2,

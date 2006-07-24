@@ -30,7 +30,6 @@
 #include "SDL.h"
 
 #include "config.h"
-#include "castle.h"
 #include "monster.h"
 
 static S_MONSTER	*ptrMonster = NULL;
@@ -825,7 +824,7 @@ BOOL	InitMonster(void){
 	ptrMonster[BLACK_DRAGON].speed        = VERYFAST;
 	ptrMonster[BLACK_DRAGON].cost         = 4000;
 	ptrMonster[BLACK_DRAGON].descriptions = "Black Dragon";
-	ptrMonster[BLACK_DRAGON].filename = "DRAGBLOK.ICN";
+	ptrMonster[BLACK_DRAGON].filename = "DRAGBLAK.ICN";
 
 	ptrMonster[HALFLING].attack       = 2;
 	ptrMonster[HALFLING].defence      = 1;
