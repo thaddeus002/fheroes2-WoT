@@ -3323,7 +3323,7 @@ ACTION ActionGAMELOOP(void){
 		else if(ENDTUR == exit)
 		    ComputerStep(i);
 	    }
-	
+
 	if(EXIT == exit || ESC == exit) break;
 
 	// расчет дат
@@ -3528,6 +3528,7 @@ void InitCursorFocus(void){
     gameFocus.cursor = NULL;
     gameFocus.background = NULL;
     gameFocus.useBack = FALSE;
+    gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 
     if(NULL == (gameFocus.background = SDL_CreateRGBSurface(SDL_SWSURFACE, 56, 32, 16, 0, 0, 0, 0))){
         fprintf(stderr, "InitCursorFocus: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), 56, 32);
@@ -3568,14 +3569,13 @@ void FreeCursorFocus(void){
 void RedrawFocusPanel(S_FOCUS *focus){
 
     // текущие кординаты
-
     SDL_Surface *video = NULL;
     SDL_Surface *image = NULL;
     SDL_Rect dst, cur;
-    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));;
+    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 
     AGGSPRITE sprite;
-    
+
     video = SDL_GetVideoSurface();
     Uint8 i, seek, maxCount;
 
@@ -3620,7 +3620,7 @@ void RedrawFocusPanel(S_FOCUS *focus){
 	SDL_BlitSurface(gameFocus.background, NULL, video, &gameFocus.back);
 	gameFocus.useBack = FALSE;
     }
-    
+
     dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;
     dst.y = RADARWIDTH + BORDERWIDTH + 21;
     dst.w = 46;
@@ -3645,6 +3645,7 @@ void RedrawFocusPanel(S_FOCUS *focus){
 	castle = GetNextCastle(GetIntValue(HUMANCOLORS));
 	++i;
     }
+
     CursorOn();
 }
 
@@ -3653,7 +3654,24 @@ void SetGameFocus(void *object, E_OBJECT type){
     S_CASTLE *castle = NULL;
     Sint32 mx, my;
     SDL_GetMouseState(&mx, &my);
-    Uint8 index = (my - RADARWIDTH - BORDERWIDTH - 21) / 32;
+
+    Uint8 first, maxCount, seek;
+
+    switch(GetIntValue(VIDEOMODE)){
+        default:
+        case 0:
+            maxCount = 4;
+            break;
+
+        case 1:
+            maxCount = 7;
+            break;
+
+        case 2:
+        case 3:
+            maxCount = 8;
+            break;
+    }
 
     if(object && type == OBJ_CASTLE){
 
@@ -3663,15 +3681,28 @@ void SetGameFocus(void *object, E_OBJECT type){
 	gameFocus.ay = castle->ay;
 	gameFocus.object = castle;
 
+	// позиция выбранного замка
+	seek = 0;
 	castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
-	while(castle != gameFocus.object) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
-
-	while(index){
-	    gameFocus.firstCastle = GetPrevCastle(GetIntValue(HUMANCOLORS));
-	    --index;
+	while(castle != gameFocus.object){
+	    castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+	    ++seek;
 	}
 
-	if(! gameFocus.firstCastle) gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+	// позиция первого элемента
+	if(GetCountCastle(GetIntValue(HUMANCOLORS)) > maxCount && seek < GetCountCastle(GetIntValue(HUMANCOLORS)) - maxCount)
+	    gameFocus.firstCastle = gameFocus.object;
+	else if(seek < maxCount)
+	    gameFocus.firstCastle = gameFocus.object;
+	else{
+	    first = maxCount - 1;
+	    gameFocus.firstCastle = GetEndCastle(GetIntValue(HUMANCOLORS));
+	    while(first){
+		gameFocus.firstCastle = GetPrevCastle(GetIntValue(HUMANCOLORS));
+		--first;
+	    }
+	}
+
 	gameFocus.firstHeroes = NULL;
     }
 

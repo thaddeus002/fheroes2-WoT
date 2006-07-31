@@ -310,8 +310,10 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 
     ptrCastle[countCastle].ax = ax;
     ptrCastle[countCastle].ay = ay;
-    ptrCastle[countCastle].pos.w = 8;
-    ptrCastle[countCastle].pos.h = 5;
+    ptrCastle[countCastle].pos.x = ptrCastle[countCastle].pos.x + 1;
+    ptrCastle[countCastle].pos.y = ptrCastle[countCastle].pos.y + 1;
+    ptrCastle[countCastle].pos.w = 6;
+    ptrCastle[countCastle].pos.h = 3;
     
     Uint8 i;
     for(i = 0; i < CASTLEMAXMONSTER; ++i) ptrCastle[countCastle].monster[i] = 0;
@@ -319,8 +321,6 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
     ptrCastle[countCastle].next = NULL;
 
     ++countCastle;
-
-    //KingdomAddCastle(ptrCastle[countCastle - 1].color, countCastle - 1);
 
     free(ptr);
 
@@ -336,11 +336,17 @@ void	FreeCastle(void){
 E_RACE GetRaceRNDCastle(Uint8 ax, Uint8 ay){
 
     Uint8 i;
+    SDL_Rect rect;
+    
+    rect.w = 8;
+    rect.h = 5;
 
-    for(i = 0; i < countCastle; ++i)
-	if(ValidPoint(&ptrCastle[i].pos, ax, ay))
-	    return ptrCastle[i].race;
-	    
+    for(i = 0; i < countCastle; ++i){
+	rect.x = ptrCastle[i].pos.x - 1;
+	rect.y = ptrCastle[i].pos.y - 1;
+	if(ValidPoint(&rect, ax, ay))   return ptrCastle[i].race;
+    }
+
     if(GetIntValue(DEBUG)) fprintf(stderr, "GetRaceRNDCastle: unknown castle, ax: %d, ay: %d\n", ax, ay);
     return BOMG;
 }
@@ -372,6 +378,8 @@ S_CASTLE *GetStatCastle(Uint8 index){
 
 void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 
+    // 
+    fprintf(stderr, "ax: %d, ay: %d\n", ax, ay);
     // определяем тип замка
     SDL_Surface *format, *back, *image, *video;
     SDL_Rect rectBack, rectCur;
@@ -1115,8 +1123,8 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
 	    else DrawWRLKExt0(&castanim, &castlact);
 	    if(castle->magicTower) DrawWRLKMageGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(&castanim, &castlact);
