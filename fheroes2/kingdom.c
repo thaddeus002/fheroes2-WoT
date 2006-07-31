@@ -38,8 +38,6 @@ static S_KINGDOM *kingdom = NULL;
 
 BOOL	InitKingdom(void){
 
-    Uint8 i;
-
     if(NULL == (kingdom = (S_KINGDOM *) malloc(sizeof(S_KINGDOM) * KINGDOMMAX))){
 	fprintf(stderr, "InitKingdom: error malloc: %d\n", sizeof(S_KINGDOM) * KINGDOMMAX);
 	return FALSE;
@@ -56,7 +54,6 @@ BOOL	InitKingdom(void){
     kingdom[GRAY].crystal = 0;
     kingdom[GRAY].gems = 0;
     kingdom[GRAY].gold = 0;
-    for(i = 0; i < KINGDOMMAXCASTLE; ++i) kingdom[GRAY].castle[i] = 0xFF;
 
     if(GetIntValue(KINGDOMCOLORS) & COLORBLUE){
 	kingdom[BLUE].play = TRUE;
@@ -68,7 +65,6 @@ BOOL	InitKingdom(void){
 	kingdom[BLUE].crystal = 5;
 	kingdom[BLUE].gems = 5;
 	kingdom[BLUE].gold = 7500;
-	for(i = 0; i < KINGDOMMAXCASTLE; ++i) kingdom[BLUE].castle[i] = 0xFF;
     }
 
     if(GetIntValue(KINGDOMCOLORS) & COLORGREEN){
@@ -81,7 +77,6 @@ BOOL	InitKingdom(void){
 	kingdom[GREEN].crystal = 5;
 	kingdom[GREEN].gems = 5;
 	kingdom[GREEN].gold = 7500;
-	for(i = 0; i < KINGDOMMAXCASTLE; ++i) kingdom[GREEN].castle[i] = 0xFF;
     }
 
     if(GetIntValue(KINGDOMCOLORS) & COLORRED){
@@ -94,7 +89,6 @@ BOOL	InitKingdom(void){
 	kingdom[RED].crystal = 5;
 	kingdom[RED].gems = 5;
 	kingdom[RED].gold = 7500;
-	for(i = 0; i < KINGDOMMAXCASTLE; ++i) kingdom[RED].castle[i] = 0xFF;
     }
 
     if(GetIntValue(KINGDOMCOLORS) & COLORYELLOW){
@@ -107,7 +101,6 @@ BOOL	InitKingdom(void){
 	kingdom[YELLOW].crystal = 5;
 	kingdom[YELLOW].gems = 5;
 	kingdom[YELLOW].gold = 7500;
-	for(i = 0; i < KINGDOMMAXCASTLE; ++i) kingdom[YELLOW].castle[i] = 0xFF;
     }
 
     if(GetIntValue(KINGDOMCOLORS) & COLORORANGE){
@@ -120,7 +113,6 @@ BOOL	InitKingdom(void){
 	kingdom[ORANGE].crystal = 5;
 	kingdom[ORANGE].gems = 5;
 	kingdom[ORANGE].gold = 7500;
-	for(i = 0; i < KINGDOMMAXCASTLE; ++i) kingdom[ORANGE].castle[i] = 0xFF;
     }
 
     if(GetIntValue(KINGDOMCOLORS) & COLORPURPLE){
@@ -133,7 +125,6 @@ BOOL	InitKingdom(void){
 	kingdom[PURPLE].crystal = 5;
 	kingdom[PURPLE].gems = 5;
 	kingdom[PURPLE].gold = 7500;
-	for(i = 0; i < KINGDOMMAXCASTLE; ++i) kingdom[PURPLE].castle[i] = 0xFF;
     }
 
     if(GetIntValue(DEBUG)){
@@ -161,65 +152,6 @@ BOOL	InitKingdom(void){
 void	FreeKingdom(void){
 
     if(kingdom) free(kingdom);
-}
-
-void    KingdomAddHeroes(E_COLORS color, E_NAMEHEROES name){
-
-    if(color == GRAY) return;
-    if(! kingdom[color].play) return;
-
-    Uint8 i;
-    for(i = 0; i < KINGDOMMAXHEROES; ++i)
-
-	if(HEROESNULL == kingdom[color].nameheroes[i]){
-	    kingdom[color].nameheroes[i] = name;
-	    return;
-	}
-
-    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddHeroes: define KINGDOMMAXHEROES %d\n", KINGDOMMAXHEROES);
-}
-
-void    KingdomRemoveHeroes(E_COLORS color, E_NAMEHEROES name){
-
-    Uint8 i;
-    for(i = 0; i < KINGDOMMAXHEROES; ++i)
-
-	if(name == kingdom[color].nameheroes[i]){
-	    kingdom[color].nameheroes[i] = HEROESNULL;
-	    return;
-	}
-}
-
-void    KingdomAddCastle(E_COLORS color, Uint8 index){
-
-    if(! kingdom[color].play) return;
-
-    Uint8 i;
-
-    for(i = 0; i < KINGDOMMAXCASTLE; ++i)
-
-	if(0xFF == kingdom[color].castle[i]){
-
-	    kingdom[color].castle[i] = index;
-	    break;
-    }
-
-    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomAddCastle: %s\n", ((S_CASTLE *) GetStatCastle(index))->name);
-}
-
-void KingdomRemoveCastle(E_COLORS color, Uint8 index){
-
-    if(! kingdom[color].play) return;
-
-    Uint8 i;
-
-    for(i = 0; i < KINGDOMMAXCASTLE; ++i)
-    
-	if(index == kingdom[color].castle[i]){
-
-	    kingdom[color].castle[i] = 0xFF;
-	    break;
-    }
 }
 
 S_KINGDOM *GetStatKingdom(E_COLORS color){

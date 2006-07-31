@@ -31,6 +31,9 @@
 
 #include "SDL.h"
 #include "actionevent.h"
+#include "object.h"
+#include "castle.h"
+#include "heroes.h"
 
 typedef struct {
 		Uint8           offsetX;
@@ -40,12 +43,21 @@ typedef struct {
 		} S_DISPLAY;
 
 typedef struct {
-    		E_FOCUS         type;
+		// object
+    		E_OBJECT        type;
                 Uint8           ax;
                 Uint8           ay;
                 void            *object;
+		// cursor
+		SDL_Surface	*cursor;
+		SDL_Surface	*background;
+		BOOL		useBack;
+		SDL_Rect	back;
+		SDL_Rect	click;
+		S_CASTLE	*firstCastle;
+		S_HEROES	*firstHeroes;
                 } S_FOCUS;
-                                        
+
 ACTION DrawMainDisplay(void);
 
 S_DISPLAY *GetDisplayPos(void);

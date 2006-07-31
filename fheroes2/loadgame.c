@@ -55,10 +55,14 @@ void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
 void	RedrawMapsAnimation(void);
-void	CheckCursorAreaAction(E_FOCUS);
-void	ClickCursorAreaAction(E_FOCUS);
+void	CheckCursorAreaAction(E_OBJECT);
+void	ClickCursorAreaAction(E_OBJECT);
 
-void 	CenterAreaFocus(void);
+void	InitCursorFocus(void);
+void	RedrawFocusPanel(S_FOCUS *);
+void	FreeCursorFocus(void);
+void	SetGameFocus(void *, E_OBJECT);
+
 void   ComputerStep(E_COLORS);
 ACTION ActionGAMELOOP(void);
 ACTION ActionHUMANLOOP(INTERFACEACTION *);
@@ -75,6 +79,8 @@ ACTION ActionScrollHeroesUp(void);
 ACTION ActionScrollHeroesDown(void);
 ACTION ActionScrollCastleUp(void);
 ACTION ActionScrollCastleDown(void);
+ACTION ActionClickFocusHeroes(void);
+ACTION ActionClickFocusCastle(void);
 
 ACTION ActionButtonHeroes(void);
 ACTION ActionButtonAction(void);
@@ -491,7 +497,7 @@ ACTION DrawMainDisplay(){
 	    break;
     }
     // scroll heroes down
-    FillSPRITE(&sprite, icnname, 0);
+    FillSPRITE(&sprite, icnname, 2);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH + 57;
     dest.w = image->w;
@@ -499,15 +505,16 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 0);
-    FillSPRITE(&action.objectPush, icnname, 1);
+    FillSPRITE(&action.objectUp, icnname, 2);
+    FillSPRITE(&action.objectPush, icnname, 3);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionScrollHeroesDown;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
-    // scroll castle Down
-    FillSPRITE(&sprite, icnname, 0);
+
+    // scroll castle down
+    FillSPRITE(&sprite, icnname, 2);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH + 115 + image->w;
     dest.w = image->w;
@@ -515,8 +522,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 0);
-    FillSPRITE(&action.objectPush, icnname, 1);
+    FillSPRITE(&action.objectUp, icnname, 2);
+    FillSPRITE(&action.objectPush, icnname, 3);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionScrollCastleDown;
@@ -525,24 +532,16 @@ ACTION DrawMainDisplay(){
 
     // инициализируем радар
     InitRadar();
+    InitCursorFocus();
+    
+    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 
-    // стартовый фокус на герое
-    S_KINGDOM *kingdom = GetStatKingdom(GetIntValue(HUMANCOLORS));
-    if(!kingdom){
+    if(castle)
+	SetGameFocus(castle, OBJ_CASTLE);
+    else
+	// alter focus heroes
 	return EXIT;
-    }
 
-    S_CASTLE *castle = GetStatCastle(kingdom->castle[0]);
-    if(!castle){
-	return EXIT;
-    }
-
-    gameFocus.type = CASTLE;
-    gameFocus.ax = castle->ax;
-    gameFocus.ay = castle->ay;
-    gameFocus.object = castle;
-
-    CenterAreaFocus();
 
     display.lastOffsetX = 0;
     display.lastOffsetY = 0;
@@ -550,6 +549,7 @@ ACTION DrawMainDisplay(){
     // отображаем картинку
     ShowStaticMainDisplay();
     RedrawMapsArea();
+    RedrawFocusPanel(&gameFocus);
 
     // идем в игровой цикл
     ACTION result = ActionGAMELOOP();
@@ -557,6 +557,7 @@ ACTION DrawMainDisplay(){
     // овобождаем данные
     FreeActionEvent(stpemaindisplay);
     FreeRadar();
+    FreeCursorFocus();
 
     if(backgroundArea) SDL_FreeSurface(backgroundArea);
 
@@ -570,6 +571,7 @@ void ShowStaticMainDisplay(void){
     SDL_Rect dst, src;
 
     AGGSPRITE sprite;
+    INTERFACEACTION action;
         
     video = SDL_GetVideoSurface();
     char * icnname = NULL;
@@ -618,6 +620,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusHeroes;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
@@ -626,6 +634,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusCastle;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 	    // BOTTOM PANEL BACKGROUND ELEMENT
@@ -787,6 +801,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusHeroes;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
@@ -795,6 +815,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusCastle;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 	    // BOTTOM PANEL BACKGROUND ELEMENT
@@ -952,6 +978,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusHeroes;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
@@ -960,6 +992,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusCastle;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 	    // BOTTOM PANEL BACKGROUND ELEMENT
@@ -1130,6 +1168,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusHeroes;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
@@ -1138,6 +1182,12 @@ void ShowStaticMainDisplay(void){
 		FillSPRITE(&sprite, icnname, i + 1);
 		image = GetICNSprite(&sprite);
 		SDL_BlitSurface(image, &src, video, &dst);
+		// регистрируем область
+		ZeroINTERFACEACTION(&action);
+		action.rect = dst;
+		action.mouseEvent = MOUSE_LCLICK;
+		action.pf = ActionClickFocusCastle;
+		AddActionEvent(&stpemaindisplay, &action);
 		dst.y += 32;
 	    }
 
@@ -2601,20 +2651,116 @@ ACTION ActionButtonSettings(void){
 
 ACTION ActionScrollHeroesUp(void){
 
+    RedrawFocusPanel(&gameFocus);
     return NONE;
 }
 
 ACTION ActionScrollHeroesDown(void){
 
+    RedrawFocusPanel(&gameFocus);
     return NONE;
 }
 
 ACTION ActionScrollCastleUp(void){
 
+    Uint8 maxCount;
+
+    switch(GetIntValue(VIDEOMODE)){
+        default:
+        case 0:
+            maxCount = 4;
+            break;
+
+        case 1:
+            maxCount = 7;
+            break;
+
+        case 2:
+        case 3:
+            maxCount = 8;
+            break;
+    }
+
+    if(GetCountCastle(GetIntValue(HUMANCOLORS)) < maxCount) return NONE;
+
+    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+    while(castle && castle != gameFocus.firstCastle) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+
+    gameFocus.firstCastle = GetPrevCastle(GetIntValue(HUMANCOLORS));
+    if(! gameFocus.firstCastle) gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+
+    RedrawFocusPanel(&gameFocus);
+
     return NONE;
 }
 
 ACTION ActionScrollCastleDown(void){
+
+    Uint8 maxCount, count;
+
+    switch(GetIntValue(VIDEOMODE)){
+        default:
+        case 0:
+            maxCount = 4;
+            break;
+
+        case 1:
+            maxCount = 7;
+            break;
+
+        case 2:
+        case 3:
+            maxCount = 8;
+            break;
+    }
+
+    if(GetCountCastle(GetIntValue(HUMANCOLORS)) < maxCount) return NONE;
+
+    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+
+    count = 0;
+    while(castle && castle != gameFocus.firstCastle){
+	castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+	++count;
+    }
+
+    if(count < GetCountCastle(GetIntValue(HUMANCOLORS)) - maxCount)
+	gameFocus.firstCastle = GetNextCastle(GetIntValue(HUMANCOLORS));
+
+    RedrawFocusPanel(&gameFocus);
+
+    return NONE;
+}
+
+ACTION ActionClickFocusHeroes(void){
+
+    return NONE;
+}
+
+ACTION ActionClickFocusCastle(void){
+
+    Sint32 mx, my;
+
+    SDL_GetMouseState(&mx, &my);
+
+    Uint8 index = (my - RADARWIDTH - BORDERWIDTH - 21) / 32;
+
+    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+    
+    while(castle && castle != gameFocus.firstCastle) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+
+    while(index){
+	castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+	--index;
+    }
+
+    if(castle){
+	if(ValidPoint(&gameFocus.back, mx, my)) EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY);
+	SetGameFocus(castle, OBJ_CASTLE);
+	RedrawFocusPanel(&gameFocus);
+	RedrawMapsArea();
+	RedrawRadar();
+    }
 
     return NONE;
 }
@@ -2726,7 +2872,7 @@ ACTION SettingsClickOkay(void){
     return OK;
 }
 
-void CheckCursorAreaAction(E_FOCUS f){
+void CheckCursorAreaAction(E_OBJECT f){
 
     Sint32 x, y;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -2741,7 +2887,7 @@ void CheckCursorAreaAction(E_FOCUS f){
 	switch(f){
 	
 	    // фокус на лодке
-	    case BOAT:
+	    case OBJ_BOAT:
 
 		switch(ptrCell->type){
 
@@ -2787,7 +2933,7 @@ void CheckCursorAreaAction(E_FOCUS f){
 		break;
 		
 	    // фокус на герое
-	    case HEROES:
+	    case OBJ_HEROES:
 
 		switch(ptrCell->type){
 		
@@ -2896,7 +3042,7 @@ void CheckCursorAreaAction(E_FOCUS f){
 		break;
 		
 	    // фокус на замке
-	    case CASTLE:
+	    case OBJ_CASTLE:
 
 		switch(ptrCell->type){
 
@@ -2914,6 +3060,10 @@ void CheckCursorAreaAction(E_FOCUS f){
 			break;
 		}
 		break;
+	
+	    default:
+		return;
+		break;
 	}
 
     // если за областью арены то обычный курсор
@@ -2921,7 +3071,7 @@ void CheckCursorAreaAction(E_FOCUS f){
 	SetCursor(CURSOR_POINTER);
 }
 
-void ClickCursorAreaAction(E_FOCUS f){
+void ClickCursorAreaAction(E_OBJECT f){
 
     Sint32 x, y;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -2937,7 +3087,7 @@ void ClickCursorAreaAction(E_FOCUS f){
     switch(f){
 /*	
 	    // фокус на лодке
-	    case BOAT:
+	    case OBJ_BOAT:
 
 		switch(ptrCell->type){
 
@@ -2983,7 +3133,7 @@ void ClickCursorAreaAction(E_FOCUS f){
 		break;
 */		
 	    // фокус на герое
-	    case HEROES:
+	    case OBJ_HEROES:
 
 		switch(ptrCell->type){
 		
@@ -2994,7 +3144,7 @@ void ClickCursorAreaAction(E_FOCUS f){
 		    case OBJN_CASTLE:
 
 			// фокус на замок
-			gameFocus.type = CASTLE;
+			gameFocus.type = OBJ_CASTLE;
 			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 			if(!castle) break;
 
@@ -3002,14 +3152,15 @@ void ClickCursorAreaAction(E_FOCUS f){
 			gameFocus.ay = castle->ay;
 			gameFocus.object = castle;
 
-			CenterAreaFocus();
+			SetGameFocus(castle, OBJ_CASTLE);
+			RedrawFocusPanel(&gameFocus);
 
 			display.lastOffsetX = 0;
 			display.lastOffsetY = 0;
 
 			RedrawRadar();
 			RedrawMapsArea();
-			EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY); //HEROESNULL);
+			EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
 			break;
 /*
 		    case OBJ_BOAT:
@@ -3110,7 +3261,7 @@ void ClickCursorAreaAction(E_FOCUS f){
 
 
 	// фокус на замке
-	case CASTLE:
+	case OBJ_CASTLE:
 
 	    switch(ptrCell->type){
 
@@ -3122,15 +3273,12 @@ void ClickCursorAreaAction(E_FOCUS f){
 		case OBJ_CASTLE:
 
 			// фокус на замок
-			gameFocus.type = CASTLE;
+			gameFocus.type = OBJ_CASTLE;
 			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 			if(!castle) break;
 			
-			gameFocus.ax = castle->ax;
-			gameFocus.ay = castle->ay;
-			gameFocus.object = castle;
-
-			CenterAreaFocus();
+			SetGameFocus(castle, OBJ_CASTLE);
+			RedrawFocusPanel(&gameFocus);
 
 			display.lastOffsetX = 0;
 			display.lastOffsetY = 0;
@@ -3148,6 +3296,7 @@ void ClickCursorAreaAction(E_FOCUS f){
 	    break;
 	
 	default:
+	    return;
 	    break;
     }
 }
@@ -3164,7 +3313,9 @@ ACTION ActionGAMELOOP(void){
     	    if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
 		// ход humans
 		if(GetIntValue(HUMANCOLORS) == i){
-		    while(! (ENDTUR == (exit = ActionHUMANLOOP(stpemaindisplay)) || EXIT == exit || (ESC == exit && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
+		    while(! (ENDTUR == (exit = ActionHUMANLOOP(stpemaindisplay)) || 
+		             EXIT == exit || 
+		             (ESC == exit && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
 
 		    if(ESC == exit) exit = EXIT;
 
@@ -3267,6 +3418,7 @@ ACTION ActionHUMANLOOP(INTERFACEACTION *action){
 		    }
 		    break;
 
+
 		case SDL_MOUSEBUTTONDOWN:
 
 		    switch(event.button.button){
@@ -3311,6 +3463,7 @@ ACTION ActionHUMANLOOP(INTERFACEACTION *action){
 			    break;
 		    }
 		    break;
+
 
 		case SDL_MOUSEBUTTONUP:
 
@@ -3369,7 +3522,158 @@ void ComputerStep(E_COLORS color){
     return;
 }
 
-void CenterAreaFocus(void){
+void InitCursorFocus(void){
+
+    SDL_Surface *formatSurface = NULL;
+    gameFocus.cursor = NULL;
+    gameFocus.background = NULL;
+    gameFocus.useBack = FALSE;
+
+    if(NULL == (gameFocus.background = SDL_CreateRGBSurface(SDL_SWSURFACE, 56, 32, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "InitCursorFocus: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), 56, 32);
+        return;
+    }
+
+    if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, 56, 32, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "InitCursorFocus: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), 56, 32);
+        return;
+    }
+
+    SDL_FillRect(formatSurface, NULL, COLORKEY);
+
+    Uint8 i;
+    for(i = 0; i < formatSurface->w; ++i){
+        DrawPixel(formatSurface, i, 0, FOCUSCOLOR);
+        DrawPixel(formatSurface, i, formatSurface->h - 1, FOCUSCOLOR);
+    }
+    for(i = 0; i < formatSurface->h; ++i){
+        DrawPixel(formatSurface, 0, i, FOCUSCOLOR);
+        DrawPixel(formatSurface, formatSurface->w - 1, i, FOCUSCOLOR);
+    }
+
+    SDL_SetColorKey(formatSurface, SDL_SRCCOLORKEY, COLORKEY);
+    gameFocus.cursor = SDL_DisplayFormat(formatSurface);
+    
+    SDL_FreeSurface(formatSurface);
+}
+
+void FreeCursorFocus(void){
+
+    if(gameFocus.cursor) SDL_FreeSurface(gameFocus.cursor);
+    if(gameFocus.background) SDL_FreeSurface(gameFocus.background);
+    gameFocus.cursor = NULL;
+    gameFocus.background = NULL;
+}
+
+void RedrawFocusPanel(S_FOCUS *focus){
+
+    // текущие кординаты
+
+    SDL_Surface *video = NULL;
+    SDL_Surface *image = NULL;
+    SDL_Rect dst, cur;
+    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));;
+
+    AGGSPRITE sprite;
+    
+    video = SDL_GetVideoSurface();
+    Uint8 i, seek, maxCount;
+
+    switch(GetIntValue(VIDEOMODE)){
+        default:
+        case 0:
+            maxCount = 4;
+            break;
+
+        case 1:
+            maxCount = 7;
+            break;
+
+        case 2:
+        case 3:
+            maxCount = 8;
+            break;
+    }
+
+    CursorOff();
+
+    // heroes
+/*
+	    FillSPRITE(&sprite, icnname, 1);
+	    image = GetICNSprite(&sprite);
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 5;
+	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
+	    dst->w = image->w;
+	    dst->h = image->h;
+	    for(i = 0; i < 4; ++i){
+		FillSPRITE(&sprite, icnname, i + 1);
+		image = GetICNSprite(&sprite);
+		SDL_BlitSurface(image, &src, video, &dst);
+		dst.y += 32;
+	    }
+*/
+    // castle
+    i = 0;
+    while(castle && castle != focus->firstCastle) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+
+    if(gameFocus.useBack){
+	SDL_BlitSurface(gameFocus.background, NULL, video, &gameFocus.back);
+	gameFocus.useBack = FALSE;
+    }
+    
+    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;
+    dst.y = RADARWIDTH + BORDERWIDTH + 21;
+    dst.w = 46;
+    dst.h = 22;
+    while(castle && i < maxCount){
+	if(castle->castle) seek = 9 + castle->race; else seek = 15 + castle->race;
+	FillSPRITE(&sprite, "LOCATORS.ICN", seek);
+	image = GetICNSprite(&sprite);
+	SDL_BlitSurface(image, NULL, video, &dst);
+	// маркируем
+	if(focus->object == castle){
+	    cur.x = dst.x - 5;
+	    cur.y = dst.y - 5;
+	    cur.w = gameFocus.background->w;
+	    cur.h = gameFocus.background->h;
+	    SDL_BlitSurface(video, &cur, gameFocus.background, NULL);
+	    gameFocus.useBack = TRUE;
+	    gameFocus.back = cur;
+	    SDL_BlitSurface(gameFocus.cursor, NULL, video, &cur);
+	}
+	dst.y += 32;
+	castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+	++i;
+    }
+    CursorOn();
+}
+
+void SetGameFocus(void *object, E_OBJECT type){
+
+    S_CASTLE *castle = NULL;
+    Sint32 mx, my;
+    SDL_GetMouseState(&mx, &my);
+    Uint8 index = (my - RADARWIDTH - BORDERWIDTH - 21) / 32;
+
+    if(object && type == OBJ_CASTLE){
+
+	castle = object;
+	gameFocus.type = OBJ_CASTLE;
+	gameFocus.ax = castle->ax;
+	gameFocus.ay = castle->ay;
+	gameFocus.object = castle;
+
+	castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+	while(castle != gameFocus.object) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
+
+	while(index){
+	    gameFocus.firstCastle = GetPrevCastle(GetIntValue(HUMANCOLORS));
+	    --index;
+	}
+
+	if(! gameFocus.firstCastle) gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+	gameFocus.firstHeroes = NULL;
+    }
 
     if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
     else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea();
@@ -3378,5 +3682,4 @@ void CenterAreaFocus(void){
     if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
     else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea();
     else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
-
 }

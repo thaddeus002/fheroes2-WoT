@@ -98,4 +98,10 @@ const S_CASTLE	*GetCurrentCastle(void);
 
 void		EnterCastle(Uint8, Uint8, E_NAMEHEROES);
 
+S_CASTLE *GetFirstCastle(E_COLORS);
+S_CASTLE *GetNextCastle(E_COLORS);
+S_CASTLE *GetPrevCastle(E_COLORS);
+S_CASTLE *GetEndCastle(E_COLORS);
+Uint8     GetCountCastle(E_COLORS);
+
 #endif

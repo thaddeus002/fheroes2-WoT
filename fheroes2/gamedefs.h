@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060721
+#define VERSION 20060731
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -39,6 +39,7 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define COLORCHANGE	0xFE
 
 #define RADARCOLOR	0x10
+#define FOCUSCOLOR	0x40
 
 #define RADARWIDTH      144
 #define BORDERWIDTH     16
@@ -62,30 +63,23 @@ typedef enum {
 	    } E_GAMELEVEL;
 
 typedef enum {
-        	BLUE		= 0,
-        	GREEN		= 1,
-        	RED		= 2,
-        	YELLOW		= 3,
-        	ORANGE		= 4,
-        	PURPLE		= 5,
-		GRAY		= 6
+        	BLUE,
+        	GREEN,
+        	RED,
+        	YELLOW,
+        	ORANGE,
+        	PURPLE,
+		GRAY,
 
             } E_COLORS;
-
-typedef enum {
-		HEROES,
-		CASTLE,
-		BOAT
-
-	    } E_FOCUS;
 
 typedef enum {
                 KNIGHT,
                 BARBARIAN,
                 SORCERESS,
-                NECROMANCER,
                 WARLOCK,
                 WIZARD,
+                NECROMANCER,
                 BOMG
 
             } E_RACE;

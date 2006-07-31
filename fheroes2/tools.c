@@ -243,3 +243,4 @@ Uint32 GetSizeSurface(SDL_Surface *surface){
 
     return result;
 }
+

@@ -69,7 +69,7 @@ ACTION ActionViewHeroes(void);
 static 	S_CASTLE	*ptrCastle	= NULL;
 static 	Uint8		countCastle	= 0;
 
-	S_CASTLE	*currentCastle	= NULL;
+static	S_CASTLE	*currentCastle	= NULL;
 	E_NAMEHEROES	heroesName 	= HEROESNULL;
 
 	S_ANIMATION    	*castanim	= NULL;
@@ -320,7 +320,7 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 
     ++countCastle;
 
-    KingdomAddCastle(ptrCastle[countCastle - 1].color, countCastle - 1);
+    //KingdomAddCastle(ptrCastle[countCastle - 1].color, countCastle - 1);
 
     free(ptr);
 
@@ -1479,18 +1479,33 @@ ACTION ActionClickCastleMonster(void){
 	count = currentCastle->army[index].count;
 	// в замке
 	if(backMonsterCursor.castle){
-	    currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
-	    currentCastle->army[index].count = currentCastle->army[backMonsterCursor.select].count;
-	    currentCastle->army[backMonsterCursor.select].monster = monster;
-	    currentCastle->army[backMonsterCursor.select].count = count;
+	    // одинаковых объединяем
+	    if(currentCastle->army[index].monster == currentCastle->army[backMonsterCursor.select].monster){
+		currentCastle->army[index].count += currentCastle->army[backMonsterCursor.select].count;
+		currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
+		currentCastle->army[backMonsterCursor.select].count = 0;
+	    }else{
+		currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+		currentCastle->army[index].count = currentCastle->army[backMonsterCursor.select].count;
+		currentCastle->army[backMonsterCursor.select].monster = monster;
+		currentCastle->army[backMonsterCursor.select].count = count;
+	    }
 	    RedrawCastleMonster();
 	// с героем
 	}else if(HEROESNULL != heroesName){
 	    heroes = GetStatHeroes(heroesName);
-	    currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
-	    currentCastle->army[index].count = heroes->army[backMonsterCursor.select].count;
-	    heroes->army[backMonsterCursor.select].monster = monster;
-	    heroes->army[backMonsterCursor.select].count = count;
+	    // одинаковых объединяем
+	    if(currentCastle->army[index].monster == heroes->army[backMonsterCursor.select].monster){
+		currentCastle->army[index].count += heroes->army[backMonsterCursor.select].count;
+		heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
+		heroes->army[backMonsterCursor.select].count = 0;
+	    }else{
+		currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+		currentCastle->army[index].count = heroes->army[backMonsterCursor.select].count;
+		heroes->army[backMonsterCursor.select].monster = monster;
+		heroes->army[backMonsterCursor.select].count = count;
+	    }
+	    RedrawCastleMonster();
 	    RedrawHeroesMonster(heroesName);
 	}
     // первый клик рисуем рамку
@@ -1595,19 +1610,34 @@ ACTION ActionClickHeroesMonster(void){
 	backMonsterCursor.use = FALSE;
 	monster = heroes->army[index].monster;
 	count = heroes->army[index].count;
-	// в герое
-	if(backMonsterCursor.castle){
-	    heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
-	    heroes->army[index].count = heroes->army[backMonsterCursor.select].count;
-	    heroes->army[backMonsterCursor.select].monster = monster;
-	    heroes->army[backMonsterCursor.select].count = count;
-	    RedrawHeroesMonster(heroesName);
 	// с замком
+	if(backMonsterCursor.castle){
+	    // одинаковых объединяем
+	    if(heroes->army[index].monster == currentCastle->army[backMonsterCursor.select].monster){
+		heroes->army[index].count += currentCastle->army[backMonsterCursor.select].count;
+		currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
+		currentCastle->army[backMonsterCursor.select].count = 0;
+	    }else{
+		heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+		heroes->army[index].count = currentCastle->army[backMonsterCursor.select].count;
+		currentCastle->army[backMonsterCursor.select].monster = monster;
+		currentCastle->army[backMonsterCursor.select].count = count;
+	    }
+	    RedrawHeroesMonster(heroesName);
+	    RedrawCastleMonster();
+	// в герое
 	}else{
-	    heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
-	    heroes->army[index].count = currentCastle->army[backMonsterCursor.select].count;
-	    currentCastle->army[backMonsterCursor.select].monster = monster;
-	    currentCastle->army[backMonsterCursor.select].count = count;
+	    // одинаковых объединяем
+	    if(heroes->army[index].monster == heroes->army[backMonsterCursor.select].monster){
+		heroes->army[index].count += heroes->army[backMonsterCursor.select].count;
+		heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
+		heroes->army[backMonsterCursor.select].count = 0;
+	    }else{
+		heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+		heroes->army[index].count = heroes->army[backMonsterCursor.select].count;
+		heroes->army[backMonsterCursor.select].monster = monster;
+		heroes->army[backMonsterCursor.select].count = count;
+	    }
 	    RedrawHeroesMonster(heroesName);
 	}
     // первый клик рисуем рамку
@@ -1862,4 +1892,78 @@ void RedrawHeroesMonster(E_NAMEHEROES name){
 		SDL_BlitSurface(image, NULL, video, &rectCur);
 	    }
     }
+}
+
+S_CASTLE *GetFirstCastle(E_COLORS color){
+
+    Uint8 i;
+    currentCastle = NULL;
+
+    for(i = 0; i < countCastle; ++i)
+	if(ptrCastle[i].color == color){
+	    currentCastle = &ptrCastle[i];
+	    return currentCastle;
+	}
+
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetFirstCastle: return NULL\n");
+
+    return NULL;
+}
+
+S_CASTLE *GetNextCastle(E_COLORS color){
+
+    Uint8 i;
+    BOOL  flag = FALSE;
+
+    for(i = 0; i < countCastle; ++i)
+	if(ptrCastle[i].color == color){
+	    if(flag){
+		currentCastle = &ptrCastle[i];
+		return currentCastle;
+	    }else if(currentCastle == &ptrCastle[i]) flag = TRUE;
+	}
+
+    return NULL;
+}
+
+S_CASTLE *GetPrevCastle(E_COLORS color){
+
+    Uint8 i;
+    S_CASTLE *result = NULL;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(ptrCastle[i].color == color){
+	    if(currentCastle == &ptrCastle[i]){
+		currentCastle = result;
+		return result;
+	    }else
+		result = &ptrCastle[i];
+	}
+
+    return NULL;
+}
+
+S_CASTLE *GetEndCastle(E_COLORS color){
+
+    Uint8 i;
+    currentCastle = NULL;
+
+    for(i = 0; i < countCastle; ++i)
+	if(ptrCastle[i].color == color) currentCastle = &ptrCastle[i];
+
+    if(!currentCastle && GetIntValue(DEBUG)) fprintf(stderr, "GetEndCastle: return NULL\n");
+
+    return currentCastle;
+}
+
+Uint8 GetCountCastle(E_COLORS color){
+
+    Uint8 i;
+    Uint8 result = 0;
+
+    for(i = 0; i < countCastle; ++i)
+	if(ptrCastle[i].color == color) ++result;
+
+    return result;
 }

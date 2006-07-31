@@ -59,8 +59,6 @@ typedef struct {
 		BOOL		play;				// королевство участвует в игре
 		BOOL		allowBuild;			// флаг строительства
 		//S_BUILDING	*build;
-		Uint8		castle[KINGDOMMAXCASTLE];
-		E_NAMEHEROES	nameheroes[KINGDOMMAXHEROES];
 		Uint16		wood;
 		Uint16		mercury;
 		Uint16		ore;
@@ -75,12 +73,6 @@ void	FreeKingdom(void);
 
 void	KingdomAddHeroes(E_COLORS, E_NAMEHEROES);
 void	KingdomRemoveHeroes(E_COLORS, E_NAMEHEROES);
-
-void	KingdomAddCastle(E_COLORS, Uint8);
-void	KingdomRemoveCastle(E_COLORS, Uint8);
-
-//void	KingdomAddBuilding(Uint8, Uint8, E_COLOROBJECT);
-//void	KingdomRemoveBuilding(Uint8, Uint8);
 
 S_KINGDOM	*GetStatKingdom(E_COLORS);
 
