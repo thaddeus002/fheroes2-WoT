@@ -443,7 +443,7 @@ void ShowQuickInfo(Uint16 index){
 	    break;
 	
 	default:
-	    message = PrintObjectType(obj, 0);
+	    message = GetStringObjectType(obj, 0);
 	    break;
     }
     // здесь левый верхний угол после бордюра

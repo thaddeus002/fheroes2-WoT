@@ -305,16 +305,14 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
     else
         ptrCastle[countCastle].allowCastle = TRUE;
 
-    if(ax < 5) ptrCastle[countCastle].pos.x = 0; else ptrCastle[countCastle].pos.x = ax - 5;
+    if(ax < 2) ptrCastle[countCastle].pos.x = 0; else ptrCastle[countCastle].pos.x = ax - 2;
     if(ay < 3) ptrCastle[countCastle].pos.y = 0; else ptrCastle[countCastle].pos.y = ay - 3;
 
     ptrCastle[countCastle].ax = ax;
     ptrCastle[countCastle].ay = ay;
-    ptrCastle[countCastle].pos.x = ptrCastle[countCastle].pos.x + 1;
-    ptrCastle[countCastle].pos.y = ptrCastle[countCastle].pos.y + 1;
-    ptrCastle[countCastle].pos.w = 6;
-    ptrCastle[countCastle].pos.h = 3;
-    
+    ptrCastle[countCastle].pos.w = 5;
+    ptrCastle[countCastle].pos.h = 5;
+
     Uint8 i;
     for(i = 0; i < CASTLEMAXMONSTER; ++i) ptrCastle[countCastle].monster[i] = 0;
 
@@ -342,8 +340,8 @@ E_RACE GetRaceRNDCastle(Uint8 ax, Uint8 ay){
     rect.h = 5;
 
     for(i = 0; i < countCastle; ++i){
-	rect.x = ptrCastle[i].pos.x - 1;
-	rect.y = ptrCastle[i].pos.y - 1;
+	if(ptrCastle[i].pos.x > 3){ rect.x = ptrCastle[i].pos.x - 3; }else{ rect.x = 0; }
+	rect.y = ptrCastle[i].pos.y;
 	if(ValidPoint(&rect, ax, ay))   return ptrCastle[i].race;
     }
 
@@ -1028,8 +1026,8 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(&castanim, &castlact);
 	    else DrawKNGTExt0(&castanim, &castlact);
-	    //DrawKNGTExt1(&castanim, &castlact); // кусок дороги
-	    //DrawKNGTExt2(&castanim, &castlact); // кусок дороги
+	    //DrawKNGTExt1(&castanim, &castlact); // развилка дорог?
+	    //DrawKNGTExt2(&castanim, &castlact); // развилка дорог?
 	    break;
 
 	case BARBARIAN:
@@ -1058,7 +1056,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(&castanim, &castlact);
 	    else DrawBRBNExt0(&castanim, &castlact);
 	    DrawBRBNExt1(&castanim, &castlact);
-	    //DrawBRBNExt3(&castanim, &castlact);
+	    //DrawBRBNExt3(&castanim, &castlact); // развилка дорог?
 	    break;
 
 	case SORCERESS:
@@ -1432,7 +1430,7 @@ void RedrawCastleAnimation(void){
 		if(currentCastle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
 		if(currentCastle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &castlact);
 		if(currentCastle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &castlact);
-		if(currentCastle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact);
+		//if(currentCastle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact); // необходимо перерисовать имя замка
 		break;
 
 	    default:

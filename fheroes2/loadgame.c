@@ -3518,7 +3518,7 @@ ACTION ActionHUMANLOOP(INTERFACEACTION *action){
 
 void ComputerStep(E_COLORS color){
 
-    printf("Computer move\n");
+    printf("Computer %s: move\n", GetStringColor(color));
     return;
 }
 

@@ -34,7 +34,7 @@
 #include "object.h"
 #include "gamedefs.h"
 
-const char * PrintObjectType(E_OBJECT type, Uint8 ext){
+const char * GetStringObjectType(E_OBJECT type, Uint8 ext){
 
     const char	*string;
 
@@ -839,7 +839,7 @@ void PrintCellInfo(Uint16 index){
 	else
 	    fprintf(stderr, "FALSE\n");
 
-    fprintf(stderr, "type    : %s\n", PrintObjectType(ptrCell->type, 0));
+    fprintf(stderr, "type    : %s\n", GetStringObjectType(ptrCell->type, 0));
 
     S_CASTLE *castle;
 
@@ -863,57 +863,8 @@ void PrintCellInfo(Uint16 index){
 	    fprintf(stderr, "object  : ");
 	    castle->castle ? fprintf(stderr, "Castle: ") : fprintf(stderr, "Tower: ");
     	    fprintf(stderr, "%s, ", castle->name);
-    	    fprintf(stderr, "Kingdom: ");
-    	    switch(castle->color){
-    		case BLUE:
-    		    fprintf(stderr, "BLUE, ");
-    		    break;
-    		case RED:
-    		    fprintf(stderr, "RED, ");
-    		    break;
-    		case GREEN:
-    		    fprintf(stderr, "GREEN, ");
-    		    break;
-    		case YELLOW:
-    		    fprintf(stderr, "YELLOW, ");
-    		    break;
-    		case ORANGE:
-    		    fprintf(stderr, "ORANGE, ");
-    		    break;
-    		case PURPLE:
-    		    fprintf(stderr, "PURPLE, ");
-    		    break;
-    		case GRAY:
-    		default:
-    		    fprintf(stderr, "GRAY, ");
-    		    break;
-    	    }
-    	    fprintf(stderr, "Race: ");
-    	    switch(castle->race){
-    		case KNIGHT:
-    		    fprintf(stderr, "KNIGHT");
-    		    break;
-    		case BARBARIAN:
-    		    fprintf(stderr, "BARBARIAN");
-    		    break;
-    		case WARLOCK:
-    		    fprintf(stderr, "WARLOCK");
-    		    break;
-    		case WIZARD:
-    		    fprintf(stderr, "WIZARD");
-    		    break;
-    		case SORCERESS:
-    		    fprintf(stderr, "SORCERESS");
-    		    break;
-    		case NECROMANCER:
-    		    fprintf(stderr, "NECROMANCER");
-    		    break;
-    		case BOMG:
-    		default:
-    		    fprintf(stderr, "BOMG");
-    		    break;
-    	    }
-    	    fprintf(stderr, "\n");
+    	    fprintf(stderr, "Kingdom: %s, ", GetStringColor(castle->color));
+    	    fprintf(stderr, "Race: %s\n", GetStringRace(castle->race));
 	    break;
 
 	default:
@@ -943,4 +894,80 @@ void PrintCellInfo(Uint16 index){
     //fprintf(stderr, "heroes  : ");
 
     fprintf(stderr, "\n");
+}
+
+const char * GetStringRace(E_RACE race){
+
+    const char  *string;
+
+    switch(race){
+    
+	case KNIGHT:
+	    string = "Knight";
+	    break;
+
+	case BARBARIAN:
+	    string = "Barbarian";
+	    break;
+
+	case SORCERESS:
+	    string = "Sorceress";
+	    break;
+
+	case WARLOCK:
+	    string = "Warlock";
+	    break;
+
+	case WIZARD:
+	    string = "Wizard";
+	    break;
+
+	case NECROMANCER:
+	    string = "Necromancer";
+	    break;
+
+	default:
+	    string = "Bomg";
+	    break;
+
+    }
+    
+    return string;
+}
+
+const char * GetStringColor(E_COLORS color){
+
+    const char  *string;
+
+    switch(color){
+    
+	case GREEN:
+	    string = "Green";
+	    break;
+
+	case BLUE:
+	    string = "Blue";
+	    break;
+
+	case RED:
+	    string = "Red";
+	    break;
+	case YELLOW:
+	    string = "Yellow";
+	    break;
+
+	case ORANGE:
+	    string = "Orange";
+	    break;
+
+	case PURPLE:
+	    string = "Purple";
+	    break;
+
+	default:
+	    string = "";
+	    break;
+    }
+    
+    return string;
 }

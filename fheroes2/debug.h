@@ -32,7 +32,9 @@
 #include "SDL.h"
 #include "object.h"
 
-const char * PrintObjectType(E_OBJECT, Uint8);
+const char * GetStringObjectType(E_OBJECT, Uint8);
+const char * GetStringRace(E_RACE);
+const char * GetStringColor(E_COLORS);
 void         PrintCellInfo(Uint16);
 
 #endif
