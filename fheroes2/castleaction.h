@@ -49,7 +49,27 @@ ACTION ActionOverDwelling3(void);
 ACTION ActionOverDwelling4(void);
 ACTION ActionOverDwelling5(void);
 ACTION ActionOverDwelling6(void);
+
 ACTION ActionOverHeroes(void);
 ACTION ActionOverExit(void);
+
+ACTION ActionClickCastle(void);
+ACTION ActionClickCaptain(void);
+ACTION ActionClickMageGuild(void);
+ACTION ActionClickStatue(void);
+ACTION ActionClickWell(void);
+ACTION ActionClickThievesGuild(void);
+ACTION ActionClickTavern(void);
+ACTION ActionClickDock(void);
+ACTION ActionClickMarketplace(void);
+ACTION ActionClickMoat(void);
+ACTION ActionClickSpec(void);
+ACTION ActionClickWel2(void);
+ACTION ActionClickDwelling1(void);
+ACTION ActionClickDwelling2(void);
+ACTION ActionClickDwelling3(void);
+ACTION ActionClickDwelling4(void);
+ACTION ActionClickDwelling5(void);
+ACTION ActionClickDwelling6(void);
 
 #endif

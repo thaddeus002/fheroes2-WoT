@@ -378,8 +378,6 @@ S_CASTLE *GetStatCastle(Uint8 index){
 
 void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 
-    // 
-    fprintf(stderr, "ax: %d, ay: %d\n", ax, ay);
     // определяем тип замка
     SDL_Surface *format, *back, *image, *video;
     SDL_Rect rectBack, rectCur;
@@ -1028,18 +1026,20 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER4) DrawKNGTDwelling4(&castanim, &castlact);
 	    if(castle->building & BUILD_WELL) DrawKNGTWell(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(&castanim, &castlact);
-	    // если рядом море
-	    // DrawKNGTExt1 - дороги
-	    // DrawKNGTExt2 - дороги
 	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(&castanim, &castlact);
 	    else DrawKNGTExt0(&castanim, &castlact);
+	    //DrawKNGTExt1(&castanim, &castlact); // кусок дороги
+	    //DrawKNGTExt2(&castanim, &castlact); // кусок дороги
 	    break;
 
 	case BARBARIAN:
 	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(&castanim, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(&castanim, &castlact);
-	    if(castle->magicTower) DrawBRBNMageGuild(&castanim, &castlact);
+	    if(castle->magicTower){
+		DrawBRBNMageGuild(&castanim, &castlact);
+		DrawBRBNExt2(&castanim, &castlact);
+	    }
 	    if(castle->capitan) DrawBRBNCapitan(&castanim, &castlact);
 	    DrawBRBNCastle(&castanim, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(&castanim, &castlact);
@@ -1055,12 +1055,10 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &castlact);
 	    if(castle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
-	    // учесть что анимация перерисовывает мост и таверну
-	    //DrawBRBNExt1 - ручей
-	    //DrawBRBNExt2 - ров
-	    //DrawBRBNExt3 - ров
 	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(&castanim, &castlact);
 	    else DrawBRBNExt0(&castanim, &castlact);
+	    DrawBRBNExt1(&castanim, &castlact);
+	    //DrawBRBNExt3(&castanim, &castlact);
 	    break;
 
 	case SORCERESS:
@@ -1391,10 +1389,10 @@ void RedrawCastleAnimation(void){
     SDL_Surface *video = SDL_GetVideoSurface(); 
     SDL_GetMouseState(&x, &y); 
     S_ANIMATION *ptr = castanim; 
+
+    CursorOff();
  
     while(ptr){ 
-
-        if(ValidPoint(&ptr->rect[animationFrame % ptr->count], x, y)) CursorOff();
  
 	// востановить фон предыдущего спрайта
 	if(ptr->background){
@@ -1415,12 +1413,35 @@ void RedrawCastleAnimation(void){
 	// рисуем спрайт
         SDL_BlitSurface(ptr->surface[animationFrame % ptr->count], NULL, video, &ptr->rectBack);
 
-        CursorOn(); 
         ptr = ptr->next; 
     } 
  
-    SDL_Flip(video); 
-    SDL_Delay(GetIntValue(ANIMATIONDELAY));     
+    // в зависимости от замка дорисовываем постройки
+    if(currentCastle)
+	switch(currentCastle->race){
+
+	    case WARLOCK:
+		if(currentCastle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(NULL, NULL);
+		if(currentCastle->building & BUILD_STATUE) DrawWRLKStatue(NULL, NULL);
+        	if(currentCastle->dwelling & DWELLING_MONSTER6) DrawWRLKDwelling6(NULL, NULL);
+            	break;
+
+	    case BARBARIAN:
+		if(currentCastle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(&castanim, &castlact);
+		if(currentCastle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(&castanim, &castlact);
+		if(currentCastle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
+		if(currentCastle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &castlact);
+		if(currentCastle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &castlact);
+		if(currentCastle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact);
+		break;
+
+	    default:
+		break;
+	}
+                            
+    CursorOn(); 
+    //SDL_Flip(video); 
+    SDL_Delay(GetIntValue(ANIMATIONDELAY));
 
     ++animationFrame;
 

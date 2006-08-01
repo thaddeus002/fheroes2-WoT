@@ -30,6 +30,7 @@
 #define _CASTLEWRLK_H
 
 #include "actionevent.h"
+#include "gamedefs.h"
 #include "animation.h"
 
 void DrawWRLKCastle(S_ANIMATION **, INTERFACEACTION **);

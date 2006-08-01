@@ -684,3 +684,92 @@ ACTION ActionOverHeroes(void){
     return NONE;
 }
 
+ACTION ActionClickCastle(void){
+    fprintf(stderr, "ClickCastle\n");
+    return NONE;
+}
+
+ACTION ActionClickCaptain(void){
+    fprintf(stderr, "ClickCaptain\n");
+    return NONE;
+}
+
+ACTION ActionClickMageGuild(void){
+    fprintf(stderr, "ClickMageGuild\n");
+    return NONE;
+}
+
+ACTION ActionClickStatue(void){
+    fprintf(stderr, "ClickStatue\n");
+    return NONE;
+}
+
+ACTION ActionClickWell(void){
+    fprintf(stderr, "ClickWell\n");
+    return NONE;
+}
+
+ACTION ActionClickThievesGuild(void){
+    fprintf(stderr, "ClickThievesGuild\n");
+    return NONE;
+}
+
+ACTION ActionClickTavern(void){
+    fprintf(stderr, "ClickTavern\n");
+    return NONE;
+}
+
+ACTION ActionClickDock(void){
+    fprintf(stderr, "ClickDock\n");
+    return NONE;
+}
+
+ACTION ActionClickMarketplace(void){
+    fprintf(stderr, "ClickMarketplace\n");
+    return NONE;
+}
+
+ACTION ActionClickMoat(void){
+    fprintf(stderr, "ClickMoat\n");
+    return NONE;
+}
+
+ACTION ActionClickSpec(void){
+    fprintf(stderr, "ClickSpec\n");
+    return NONE;
+}
+
+ACTION ActionClickWel2(void){
+    fprintf(stderr, "ClickWel2\n");
+    return NONE;
+}
+
+ACTION ActionClickDwelling1(void){
+    fprintf(stderr, "ClickDwelling1\n");
+    return NONE;
+}
+
+ACTION ActionClickDwelling2(void){
+    fprintf(stderr, "ClickDwelling2\n");
+    return NONE;
+}
+
+ACTION ActionClickDwelling3(void){
+    fprintf(stderr, "ClickDwelling3\n");
+    return NONE;
+}
+
+ACTION ActionClickDwelling4(void){
+    fprintf(stderr, "ClickDwelling4\n");
+    return NONE;
+}
+
+ACTION ActionClickDwelling5(void){
+    fprintf(stderr, "ClickDwelling5\n");
+    return NONE;
+}
+
+ACTION ActionClickDwelling6(void){
+    fprintf(stderr, "ClickDwelling6\n");
+    return NONE;
+}

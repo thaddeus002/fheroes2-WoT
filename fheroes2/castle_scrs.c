@@ -51,13 +51,15 @@ void DrawSCRSCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     if(castle->castle){
 	// анимация
-	cur.x = cx;
-	cur.y = cy;
-	cur.w = 0;
-	cur.h = 0;
-	FillSPRITE(&sprite, "TWNSCSTL.ICN", 1);
-	header = GetICNHeader(&sprite);
-	AddAnimationEvent(animHead, &cur, header, 5);
+	if(animHead){
+	    cur.x = cx;
+	    cur.y = cy;
+	    cur.w = 0;
+	    cur.h = 0;
+	    FillSPRITE(&sprite, "TWNSCSTL.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(animHead, &cur, header, 5);
+	}
 	// спрайт замка
 	FillSPRITE(&sprite, "TWNSCSTL.ICN", 0);
     }else FillSPRITE(&sprite, "TWNSTENT.ICN", 0);
@@ -69,13 +71,21 @@ void DrawSCRSCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.w -= 20;
-    cur.h -=10;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverCastle;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.w -= 20;
+	cur.h -=10;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverCastle;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickCastle;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSCapitan(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -84,20 +94,21 @@ void DrawSCRSCapitan(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    INTERFACEACTION action;
-
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSCAPT.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSCAPT.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSCAPT.ICN", 0);
@@ -108,11 +119,19 @@ void DrawSCRSCapitan(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverCaptain;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverCaptain;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickCaptain;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSStatue(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -121,11 +140,10 @@ void DrawSCRSStatue(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
-
-    INTERFACEACTION action;
 
     // спрайт
     FillSPRITE(&sprite, "TWNSSTAT.ICN", 0);
@@ -136,13 +154,21 @@ void DrawSCRSStatue(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.x += 6;
-    cur.w = 54;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverStatue;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.x += 6;
+	cur.w = 54;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverStatue;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickStatue;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSWell(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -151,6 +177,7 @@ void DrawSCRSWell(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -164,12 +191,19 @@ void DrawSCRSWell(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverWell;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverWell;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickWell;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSThievesGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -178,20 +212,21 @@ void DrawSCRSThievesGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    INTERFACEACTION action;
-
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSTHIE.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSTHIE.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSTHIE.ICN", 0);
@@ -202,12 +237,20 @@ void DrawSCRSThievesGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.w = 85;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverThievesGuild;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.w = 85;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverThievesGuild;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickThievesGuild;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -216,20 +259,21 @@ void DrawSCRSTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    INTERFACEACTION action;
-
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSTVRN.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSTVRN.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSTVRN.ICN", 0);
@@ -240,15 +284,23 @@ void DrawSCRSTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.x += 9;
-    cur.w = 140;
-    cur.y += 11;
-    cur.h = 150;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverTavern;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.x += 9;
+	cur.w = 140;
+	cur.y += 11;
+	cur.h = 150;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverTavern;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickTavern;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -257,20 +309,21 @@ void DrawSCRSShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    INTERFACEACTION action;
-
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSDOCK.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSDOCK.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSDOCK.ICN", 0);
@@ -281,14 +334,22 @@ void DrawSCRSShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.w = 140;
-    cur.y += 10;
-    cur.h = 54;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverDock;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.w = 140;
+	cur.y += 10;
+	cur.h = 54;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverDock;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickDock;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSLTurret(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -337,6 +398,7 @@ void DrawSCRSMarketplace(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -350,12 +412,19 @@ void DrawSCRSMarketplace(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverMarketplace;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverMarketplace;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickMarketplace;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -364,6 +433,7 @@ void DrawSCRSMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -377,13 +447,20 @@ void DrawSCRSMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.h = 30;
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverMoat;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.h = 30;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverMoat;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickMoat;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSSpec(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -406,12 +483,20 @@ void DrawSCRSSpec(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.h = 70;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverSpec;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.h = 70;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverSpec;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickSpec;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSWel2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -426,13 +511,15 @@ void DrawSCRSWel2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cy = video->h / 2 - 240;
 
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSWEL2.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSWEL2.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSWEL2.ICN", 0);
@@ -443,13 +530,21 @@ void DrawSCRSWel2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.y += 10;
-    cur.h = 40;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverWel2;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.y += 10;
+	cur.h = 40;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverWel2;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickWel2;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSExt1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -464,13 +559,15 @@ void DrawSCRSExt1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cy = video->h / 2 - 240;
 
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSEXT1.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSEXT1.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSEXT1.ICN", 0);
@@ -481,20 +578,34 @@ void DrawSCRSExt1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.h = 33;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverWel2;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.h = 33;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverWel2;
+	AddActionEvent(actionHead, &action);
 
-    cur.y += 33;
-    cur.h = 33;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverStatue;
-    AddActionEvent(actionHead, &action);
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickWel2;
+	AddActionEvent(actionHead, &action);
+
+	cur.y += 33;
+	cur.h = 33;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverStatue;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickStatue;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSExt0(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -508,13 +619,15 @@ void DrawSCRSExt0(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cy = video->h / 2 - 240;
 
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSEXT0.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSEXT0.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSEXT0.ICN", 0);
@@ -532,18 +645,21 @@ void DrawSCRSDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, "TWNSDW_0.ICN", 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, "TWNSDW_0.ICN", 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, "TWNSDW_0.ICN", 0);
@@ -554,12 +670,19 @@ void DrawSCRSDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverDwelling1;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverDwelling1;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickDwelling1;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -571,18 +694,21 @@ void DrawSCRSDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     const S_CASTLE *castle = GetCurrentCastle();
     const char *icnname = NULL;
     if(castle->dwelling & DWELLING_UPGRADE2){ icnname = "TWNSUP_1.ICN"; }else{ icnname = "TWNSDW_1.ICN"; }
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
     // анимация
-    cur.x = cx;
-    cur.y = cy;
-    cur.w = 0;
-    cur.h = 0;
-    FillSPRITE(&sprite, icnname, 1);
-    header = GetICNHeader(&sprite);
-    AddAnimationEvent(animHead, &cur, header, 5);
+    if(animHead){
+	cur.x = cx;
+	cur.y = cy;
+	cur.w = 0;
+	cur.h = 0;
+	FillSPRITE(&sprite, icnname, 1);
+	header = GetICNHeader(&sprite);
+	AddAnimationEvent(animHead, &cur, header, 5);
+    }
 
     // спрайт
     FillSPRITE(&sprite, icnname, 0);
@@ -593,14 +719,21 @@ void DrawSCRSDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.x += 5;
-    cur.w = 75;
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverDwelling2;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.x += 5;
+	cur.w = 75;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverDwelling2;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickDwelling2;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -612,6 +745,7 @@ void DrawSCRSDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     const S_CASTLE *castle = GetCurrentCastle();
     const char *icnname = NULL;
     if(castle->dwelling & DWELLING_UPGRADE3){ icnname = "TWNSUP_2.ICN"; }else{ icnname = "TWNSDW_2.ICN"; }
+    INTERFACEACTION action;
 
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -625,13 +759,20 @@ void DrawSCRSDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.w = 80;
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverDwelling3;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.w = 80;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverDwelling3;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickDwelling3;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -643,6 +784,7 @@ void DrawSCRSDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     const S_CASTLE *castle = GetCurrentCastle();
     const char *icnname = NULL;
     if(castle->dwelling & DWELLING_UPGRADE4){ icnname = "TWNSUP_3.ICN"; }else{ icnname = "TWNSDW_3.ICN"; }
+    INTERFACEACTION action;
 
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -656,12 +798,19 @@ void DrawSCRSDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverDwelling4;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverDwelling4;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickDwelling4;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -670,6 +819,7 @@ void DrawSCRSDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -683,12 +833,19 @@ void DrawSCRSDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverDwelling5;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverDwelling5;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickDwelling5;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -697,6 +854,7 @@ void DrawSCRSDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
@@ -710,14 +868,21 @@ void DrawSCRSDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    cur.w = 90;
-    cur.h = 120;
-    INTERFACEACTION action;
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverDwelling6;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	cur.w = 90;
+	cur.h = 120;
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverDwelling6;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickDwelling6;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
 void DrawSCRSMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -726,11 +891,11 @@ void DrawSCRSMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     ICNHEADER *header = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
+    INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    INTERFACEACTION action;
     const S_CASTLE *castle = GetCurrentCastle();
 
     if(castle->magicTower > 5 || castle->magicTower < 1) return;
@@ -761,10 +926,18 @@ void DrawSCRSMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	cur.w = 60;
     }
 
-    ZeroINTERFACEACTION(&action);
-    action.rect = cur;
-    action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverMageGuild;
-    AddActionEvent(actionHead, &action);
+    if(actionHead){
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverMageGuild;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickMageGuild;
+	AddActionEvent(actionHead, &action);
+    }
 }
 
