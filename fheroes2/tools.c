@@ -173,6 +173,10 @@ void PrintText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFON
 	    dst.y = rezy;
 	    if(font == FONT_SMALL)
 		switch(*string){
+		    
+		    case '-':
+	    		    dst.y += FONT_HEIGHTSMALL / 2;
+			break;
 
 		    case 'y':
 		    case 'g':
@@ -189,6 +193,10 @@ void PrintText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFON
 		}
 	    else if(font == FONT_BIG)
 		switch(*string){
+		    
+		    case '-':
+	    		    dst.y += FONT_HEIGHTBIG / 2;
+			break;
 
 		    case 'y':
 		    case 'g':
@@ -230,6 +238,65 @@ void PrintText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFON
     }
 }
 
+Uint16 GetLengthText(const char *string, ENUMFONT font){
+
+    Uint16	result = 0;
+    AGGSPRITE	sprite;
+    SDL_Surface	*letter = NULL;
+
+    // парсим string по буквам
+    while(*string){
+
+    	// здесь пробел
+	if(0x20 == *string)
+	    switch(font){
+		case FONT_SMALL:
+		    result += FONT_WIDTHSMALL / 2;
+		    break;
+		case FONT_BIG:
+		    result += FONT_WIDTHBIG / 2;
+		    break;
+		default:
+		    break;
+	    }
+
+	// если \t
+	else if(0x09 == *string)
+	    switch(font){
+		case FONT_SMALL:
+		    result += 4 * FONT_WIDTHSMALL / 2;
+		    break;
+		case FONT_BIG:
+		    result += 4 * FONT_WIDTHBIG / 2;
+		    break;
+		default:
+		    break;
+	    }
+
+	// если \n
+	else if(0x0A == *string)
+	    return result;
+
+	// если в диаппазоне FONT_LETTER_BEGIN FONT_LETTER_END
+	else if(FONT_LETTER_BEGIN < *string && FONT_LETTER_END > *string){
+
+	    // рисуем букву
+	    if(font == FONT_BIG)
+		FillSPRITE(&sprite, "FONT.ICN", *string - FONT_LETTER_BEGIN);
+	    else
+		FillSPRITE(&sprite, "SMALFONT.ICN", *string - FONT_LETTER_BEGIN);
+
+	    letter = GetICNSprite(&sprite);
+	    result += letter->w;
+
+	}
+
+	++string;
+    }
+    
+    return result;
+}
+
 Uint32 GetSizeSurface(SDL_Surface *surface){
 
     if(NULL == surface) return 0;
@@ -243,4 +310,3 @@ Uint32 GetSizeSurface(SDL_Surface *surface){
 
     return result;
 }
-

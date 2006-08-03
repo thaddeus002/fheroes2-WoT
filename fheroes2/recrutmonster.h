@@ -26,22 +26,14 @@
     Description:
 */
 
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef _RECRUTMONSTER_H
+#define _RECRUTMONSTER_H
 
-#include "SDL.h"
-#include "object.h"
-#include "mp2maps.h"
 #include "monster.h"
+#include "castle.h"
+#include "SDL.h"
 
-const char * GetStringObject(E_OBJECT);
-const char * GetStringRace(E_RACE);
-const char * GetStringColor(E_COLORS);
-const char * GetStringLuck(E_LUCK);
-const char * GetStringMorale(E_MORALE);
-const char * GetStringSpeed(E_MONSTERSPEED);
-const char * GetStringGround(E_GROUND);
-
-void         PrintCellInfo(Uint16);
+Uint8	DialogRecrutMonster(E_MONSTER, Uint8, Uint16);
+void	ErrorDialogRecrutMonster(const S_CASTLE *);
 
 #endif

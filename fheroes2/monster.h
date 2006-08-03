@@ -132,6 +132,7 @@ typedef enum {
 		LICH 		= 54,
 		POWER_LICH 	= 55,
 		BONE_DRAGON 	= 56,
+
 		ROGUE 		= 57,
 		NOMAD 		= 58,
 		GHOST 		= 59,
@@ -181,5 +182,6 @@ BOOL		TheFlyMonster(E_MONSTER);
 E_MONSTER	CheckValidMonster(Uint8);
 Uint16		GetRNDSizeLevelMonster(E_LEVELMONSTER);
 E_LEVELMONSTER	GetLevelMonster(E_MONSTER);
+const char *	MonsterBigNamePortrait(E_MONSTER);
 
 #endif

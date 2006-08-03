@@ -36,8 +36,8 @@
 #include "magicbook.h"
 #include "config.h"
 #include "cursor.h"
+#include "debug.h"
 #include "tools.h"
-#include "castle.h"
 #include "monster.h"
 #include "heroes.h"
 
@@ -48,6 +48,7 @@ ACTION	ActionMonsterInfoDismiss(void);
 ACTION	ActionMonsterInfoExit(void);
 
 static S_HEROES *	allHeroes = NULL;
+static char 		heroesPortrait[13];
 
 S_HEROES *GetStatHeroes(E_NAMEHEROES name){
 
@@ -805,6 +806,56 @@ Uint8 HeroesCountArmy(S_HEROES *heroes){
     return res;
 }
 
+const char * HeroesBigNamePortrait(E_NAMEHEROES name){
+
+    char num[5];
+    char *ptr;
+
+    snprintf(num, 5, "%4d", name);
+
+    for(ptr = num; *ptr; ++ptr) if(0 == strncmp(ptr, " ", 1)) *ptr = '0';
+
+    snprintf(heroesPortrait, 13, "PORT%4s.ICN", num);
+
+    return heroesPortrait;
+}
+
+const char * CapitanBigNamePortrait(E_RACE race){
+
+    char num[5];
+    char *ptr;
+
+    switch(race){ 
+        case KNIGHT: 
+    	    snprintf(num, 5, "%4d", 90); 
+            break; 
+        case BARBARIAN: 
+            snprintf(num, 5, "%4d", 91); 
+            break; 
+        case SORCERESS: 
+            snprintf(num, 5, "%4d", 92); 
+            break; 
+        case WARLOCK: 
+            snprintf(num, 5, "%4d", 93); 
+    	    break; 
+        case WIZARD: 
+            snprintf(num, 5, "%4d", 94); 
+            break; 
+        case NECROMANCER: 
+            snprintf(num, 5, "%4d", 95); 
+            break; 
+        default: 
+            return NULL;
+            break; 
+    } 
+
+    for(ptr = num; *ptr; ++ptr) if(0 == strncmp(ptr, " ", 1)) *ptr = '0';
+
+    snprintf(heroesPortrait, 13, "PORT%4s.ICN", num);
+
+    return heroesPortrait;
+}
+
 ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
 
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -872,8 +923,8 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     // attack
     sprintf(str, "Attack Skill: %d", monster->attack);
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
@@ -881,8 +932,8 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     // defence
     sprintf(str, "Defense Skill: %d", monster->defence);
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
@@ -890,8 +941,8 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     // shot
     sprintf(str, "Shots: %d", monster->shots);
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 2;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 2 + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
@@ -899,8 +950,8 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     // damage
     sprintf(str, "Damage: %d - %d", monster->damageMin, monster->damageMax);
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 3;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 3 + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
@@ -908,110 +959,35 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     // hp
     sprintf(str, "Hit Points: %d", monster->hp);
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 4;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 4 + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
 
     // speed
-    switch(monster->speed){
-	case CRAWLING:
-	    sprintf(str, "Speed: Crawling");
-	    break;
-	case VERYSLOW:
-	    sprintf(str, "Speed: Very Slow");
-	    break;
-        case SLOW:
-	    sprintf(str, "Speed: Slow");
-	    break;
-	case AVERAGE:
-	    sprintf(str, "Speed: Average");
-	    break;
-        case FAST:
-	    sprintf(str, "Speed: Fast");
-	    break;
-        case VERYFAST:
-	    sprintf(str, "Speed: Very Fast");
-	    break;
-        case ULTRAFAST:
-	    sprintf(str, "Speed: Ultra Fast");
-	    break;
-        case BLAZING:
-	    sprintf(str, "Speed: Brazing");
-	    break;
-        case INSTANT:
-	    sprintf(str, "Speed: Instant");
-	    break;
-    }
+    sprintf(str, "Speed: %s", GetStringSpeed(monster->speed));
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 5;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 5 + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
 
     // morale
-    if(heroes)
-    switch(CalculateHeroesMorale(heroes)){
-        case MORALE_TREASON:
-	    sprintf(str, "Morale: Treason");
-	    break;
-        case MORALE_AWFUL:
-	    sprintf(str, "Morale: Awful");
-	    break;
-        case MORALE_POOR:
-	    sprintf(str, "Morale: Poor");
-	    break;
-        case MORALE_NORMAL:
-	    sprintf(str, "Morale: Normal");
-	    break;
-        case MORALE_GOOD:
-	    sprintf(str, "Morale: Good");
-	    break;
-        case MORALE_GREAT:
-	    sprintf(str, "Morale: Great");
-	    break;
-        case MORALE_IRISH:
-	    sprintf(str, "Morale: Irish");
-	    break;
-    }
-    else
-	sprintf(str, "Morale: Normal");
+    heroes ? sprintf(str, "Morale: %s", GetStringMorale(CalculateHeroesMorale(heroes))) : sprintf(str, "Morale: Normal");
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 6;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 6 + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
 
     // luck
-    if(heroes)
-    switch(CalculateHeroesLuck(heroes)){
-        case LUCK_AWFUL:
-	    sprintf(str, "Luck: Awful");
-	    break;
-        case LUCK_BAD:
-	    sprintf(str, "Luck: Bad");
-	    break;
-        case LUCK_NORMAL:
-	    sprintf(str, "Luck: Normal");
-	    break;
-        case LUCK_GOOD:
-	    sprintf(str, "Luck: Good");
-	    break;
-        case LUCK_GREAT:
-	    sprintf(str, "Luck: Great");
-	    break;
-        case LUCK_IRISH:
-	    sprintf(str, "Luck: Irish");
-	    break;
-    }
-    else
-	sprintf(str, "Luck: Normal");
+    heroes ? sprintf(str, "Luck: %s", GetStringLuck(CalculateHeroesLuck(heroes))) : sprintf(str, "Luck: Normal");
     rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 7;
-    rect.w = FONT_WIDTHBIG * strlen(str);
+    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 7 + FONT_HEIGHTBIG / 2;
+    rect.w = GetLengthText(str, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
@@ -1077,7 +1053,7 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     SetCursor(cursor);
     SetIntValue(ANIM3, TRUE);
     CursorOn();
-    
+
     return result;
 }
 
@@ -1094,9 +1070,4 @@ ACTION	ActionMonsterInfoDismiss(void){
 ACTION	ActionMonsterInfoExit(void){
 
     return CANCEL;
-}
-
-ACTION ShowHeroesInfo(S_HEROES *heroes){
-
-    return NONE;
 }

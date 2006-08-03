@@ -160,3 +160,40 @@ S_KINGDOM *GetStatKingdom(E_COLORS color){
     
     return &kingdom[color];
 }
+
+void    RecalculateKingdomDay(E_COLORS color){
+
+    if(! kingdom[color].play) return;
+    
+    S_CASTLE *castle = GetFirstCastle(color);
+
+    while(castle){
+    
+	// gold
+	if(castle->castle)
+	    kingdom[color].gold += GOLD_CASTLE_DAY;
+	else
+	    kingdom[color].gold += GOLD_TOWN_DAY;
+
+	castle = GetNextCastle(color);
+    }
+
+    //
+    // MINES gold ore wood sulfur crystal mercury gems
+    //
+    // HeroesLevelSkill(S_HEROES *, E_SKILL)
+    // ESTATES +100 +250 +500
+    //
+    // HeroesArtifactPresent(S_HEROES *, E_ARTIFACT)
+    // ENDLESS_SACK_GOLD	+1000 gold
+    // ENDLESS_BAG_GOLD		+750 gold
+    // ENDLESS_PURSE_GOLD	+500 gold
+    // ENDLESS_POUCH_SULFUR	+1 sulfur
+    // ENDLESS_VIAL_MERCURY	+1 mercury
+    // ENDLESS_POUCH_GEMS	+1 gems
+    // ENDLESS_CORD_WOOD	+1 wood
+    // ENDLESS_CART_ORE		+1 ore
+    // ENDLESS_POUCH_CRYSTAL	+1 crystal
+    // TAX_LIEN			-250 gold
+
+}

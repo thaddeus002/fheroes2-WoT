@@ -374,7 +374,7 @@ ACTION DrawNewLoadQuit(void){
 		case SDL_MOUSEMOTION:
 		
 		    ptr = sthemain;
-		    
+
 		    if(old.flagPres && !ValidPoint(&old.presRect, event.motion.x, event.motion.y)){
 			DrawSprite(&old.presRect, &old.object);
 			old.flagPres = FALSE;

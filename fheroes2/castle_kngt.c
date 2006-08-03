@@ -644,6 +644,7 @@ void DrawKNGTDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
+	cur.x += 10;
 	cur.w = 80;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
@@ -733,9 +734,9 @@ void DrawKNGTDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.x += 30;
+	cur.x += 40;
 	cur.w = 110;
-	cur.h = 60;
+	cur.h = 50;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
@@ -868,9 +869,9 @@ void DrawKNGTDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.x += 360;
-	cur.w = 130;
-	cur.h = 130;
+	cur.x += 330;
+	cur.w = 170;
+	cur.h = 190;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
@@ -911,23 +912,23 @@ void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     if(1 == castle->magicTower){
 	cur.x += 260;
-	cur.w = 80;
+	cur.w = 55;
 	cur.h = 50;
     }else if(2 == castle->magicTower){
 	cur.x += 260;
-	cur.w = 80;
+	cur.w = 55;
 	cur.h = 70;
     }else if(3 == castle->magicTower){
 	cur.x += 260;
-	cur.w = 80;
+	cur.w = 55;
 	cur.h = 90;
     }else if(4 == castle->magicTower){
 	cur.x += 260;
-	cur.w = 80;
+	cur.w = 55;
 	cur.h = 110;
     }else if(5 == castle->magicTower){
 	cur.x += 260;
-	cur.w = 80;
+	cur.w = 55;
 	cur.h = 130;
     }
     

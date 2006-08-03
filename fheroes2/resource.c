@@ -145,6 +145,6 @@ const char * GetDescriptionsResource(E_RESOURCE res){
 	    string = "";
 	    break;
     }
-    
+
     return string;
 }

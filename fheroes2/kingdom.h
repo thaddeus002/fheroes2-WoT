@@ -76,4 +76,6 @@ void	KingdomRemoveHeroes(E_COLORS, E_NAMEHEROES);
 
 S_KINGDOM	*GetStatKingdom(E_COLORS);
 
+void	RecalculateKingdomDay(E_COLORS);
+
 #endif

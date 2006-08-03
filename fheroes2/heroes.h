@@ -201,6 +201,8 @@ void		HeroesDefaultValues(S_HEROES *, E_RACE);
 Uint8		HeroesCountArmy(S_HEROES *);
 S_HEROES       *GetStatHeroes(E_NAMEHEROES);
 ACTION		ShowArmyInfo(S_ARMY *, S_HEROES *);
-ACTION		ShowHeroesInfo(S_HEROES *);
+
+const char *	HeroesBigNamePortrait(E_NAMEHEROES);
+const char *	CapitanBigNamePortrait(E_RACE);
 
 #endif

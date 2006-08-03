@@ -32,7 +32,8 @@
 #include "config.h"
 #include "monster.h"
 
-static S_MONSTER	*ptrMonster = NULL;
+static S_MONSTER *ptrMonster = NULL;
+static char monsterPortrait[13];
 
 void	FreeMonster(void){
 
@@ -392,7 +393,7 @@ E_MONSTER GetRNDMonster(E_LEVELMONSTER level){
 	case MNS_LEVEL4:
 		return level4[rand() % MONSTERCOUNT_LEVEL4];
 		break;
-	
+
 	default:
 		break;
     }
@@ -921,7 +922,7 @@ BOOL	InitMonster(void){
 	ptrMonster[TITAN].damageMax    = 30;
 	ptrMonster[TITAN].hp           = 300;
 	ptrMonster[TITAN].speed        = VERYFAST;
-	ptrMonster[TITAN].cost         = 150;
+	ptrMonster[TITAN].cost         = 5000;
 	ptrMonster[TITAN].descriptions = "Titan";
 	ptrMonster[TITAN].filename = "TITANBLA.ICN";
 
@@ -1137,4 +1138,18 @@ BOOL	InitMonster(void){
     fprintf(stderr, "Init monster.\n");
 
     return TRUE;
+}
+
+const char * MonsterBigNamePortrait(E_MONSTER name){
+
+    char num[5];
+    char *ptr;
+
+    snprintf(num, 5, "%4d", name);
+
+    for(ptr = num; *ptr; ++ptr) if(0 == strncmp(ptr, " ", 1)) *ptr = '0';
+
+    snprintf(monsterPortrait, 13, "MONH%4s.ICN", num);
+
+    return monsterPortrait;
 }

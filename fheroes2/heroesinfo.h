@@ -26,22 +26,12 @@
     Description:
 */
 
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef _HEROESINFO_H
+#define _HEROESINFO_H
 
 #include "SDL.h"
-#include "object.h"
-#include "mp2maps.h"
-#include "monster.h"
+#include "actionevent.h"
 
-const char * GetStringObject(E_OBJECT);
-const char * GetStringRace(E_RACE);
-const char * GetStringColor(E_COLORS);
-const char * GetStringLuck(E_LUCK);
-const char * GetStringMorale(E_MORALE);
-const char * GetStringSpeed(E_MONSTERSPEED);
-const char * GetStringGround(E_GROUND);
-
-void         PrintCellInfo(Uint16);
+ACTION ShowHeroesInfo(E_NAMEHEROES name);
 
 #endif

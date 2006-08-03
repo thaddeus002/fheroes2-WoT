@@ -54,21 +54,21 @@ typedef enum {
 	    } E_BUILDINGCASTLE;
 
 typedef enum {
-		DWELLING_MONSTER1	= 0x0008,
-		DWELLING_MONSTER2	= 0x0010,
-		DWELLING_MONSTER3	= 0x0020,
-		DWELLING_MONSTER4	= 0x0040,
-		DWELLING_MONSTER5	= 0x0080,
-		DWELLING_MONSTER6	= 0x0100,
-		DWELLING_UPGRADE2	= 0x0200,
-		DWELLING_UPGRADE3	= 0x0400,
-		DWELLING_UPGRADE4	= 0x0800,
-		DWELLING_UPGRADE5	= 0x1000,
-		DWELLING_UPGRADE6	= 0x2000,
-		DWELLING_UPGRADE7	= 0x4000	// черный дракон
+                DWELLING_MONSTER1       = 0x0008,
+                DWELLING_MONSTER2       = 0x0010,
+                DWELLING_MONSTER3       = 0x0020,
+                DWELLING_MONSTER4       = 0x0040,
+                DWELLING_MONSTER5       = 0x0080,
+                DWELLING_MONSTER6       = 0x0100,
+                DWELLING_UPGRADE2       = 0x0200,
+        	DWELLING_UPGRADE3       = 0x0400,
+                DWELLING_UPGRADE4       = 0x0800,
+                DWELLING_UPGRADE5       = 0x1000,
+                DWELLING_UPGRADE6       = 0x2000,
+                DWELLING_UPGRADE7       = 0x4000        // black dragon
 
-	    } E_DWELLINGCASTLE;
-
+            } E_DWELLINGCASTLE;
+                                                                                                                                                                                                            
 typedef struct {
 
     E_COLORS	color;
@@ -98,10 +98,16 @@ const S_CASTLE	*GetCurrentCastle(void);
 
 void		EnterCastle(Uint8, Uint8, E_NAMEHEROES);
 
-S_CASTLE *GetFirstCastle(E_COLORS);
-S_CASTLE *GetNextCastle(E_COLORS);
-S_CASTLE *GetPrevCastle(E_COLORS);
-S_CASTLE *GetEndCastle(E_COLORS);
-Uint8     GetCountCastle(E_COLORS);
+S_CASTLE	*GetFirstCastle(E_COLORS);
+S_CASTLE 	*GetNextCastle(E_COLORS);
+S_CASTLE 	*GetPrevCastle(E_COLORS);
+S_CASTLE 	*GetEndCastle(E_COLORS);
+Uint8     	GetCountCastle(E_COLORS);
+E_MONSTER	GetMonsterFromCastle(const S_CASTLE *, Uint8);
+BOOL		BuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
+BOOL		CheckBuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
+
+void		RedrawCastleMonster(void);
+void		RedrawCastleInfoResource(void);
 
 #endif

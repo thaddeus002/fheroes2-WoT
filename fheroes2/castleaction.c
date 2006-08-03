@@ -31,9 +31,15 @@
 
 #include "gamedefs.h"
 #include "tools.h"
+#include "cursor.h"
+#include "debug.h"
 #include "castle.h"
+#include "config.h"
+#include "actionevent.h"
 #include "monster.h"
+#include "castle.h"
 #include "castleaction.h"
+#include "recrutmonster.h"
 
 ACTION ActionOverCastle(void){
 
@@ -745,31 +751,103 @@ ACTION ActionClickWel2(void){
 }
 
 ACTION ActionClickDwelling1(void){
-    fprintf(stderr, "ClickDwelling1\n");
+
+    const Uint8 levelMonster = 1;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    if(! castle) return NONE;
+
+    if(	BuyMonsterFromCastle(castle, levelMonster, 
+	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
+	    RedrawCastleMonster();
+	    RedrawCastleInfoResource();
+    }else
+	ErrorDialogRecrutMonster(castle);
+
     return NONE;
 }
 
 ACTION ActionClickDwelling2(void){
-    fprintf(stderr, "ClickDwelling2\n");
+
+    const Uint8 levelMonster = 2;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    if(! castle) return NONE;
+
+    if(	BuyMonsterFromCastle(castle, levelMonster, 
+	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
+	    RedrawCastleMonster();
+	    RedrawCastleInfoResource();
+    }else
+	ErrorDialogRecrutMonster(castle);
+
     return NONE;
 }
 
 ACTION ActionClickDwelling3(void){
-    fprintf(stderr, "ClickDwelling3\n");
+
+    const Uint8 levelMonster = 3;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    if(! castle) return NONE;
+
+    if(	BuyMonsterFromCastle(castle, levelMonster, 
+	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
+	    RedrawCastleMonster();
+	    RedrawCastleInfoResource();
+    }else
+	ErrorDialogRecrutMonster(castle);
+
     return NONE;
 }
 
 ACTION ActionClickDwelling4(void){
-    fprintf(stderr, "ClickDwelling4\n");
+
+    const Uint8 levelMonster = 4;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    if(! castle) return NONE;
+
+    if(	BuyMonsterFromCastle(castle, levelMonster, 
+	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
+	    RedrawCastleMonster();
+	    RedrawCastleInfoResource();
+    }else
+	ErrorDialogRecrutMonster(castle);
+
     return NONE;
 }
 
 ACTION ActionClickDwelling5(void){
-    fprintf(stderr, "ClickDwelling5\n");
+
+    const Uint8 levelMonster = 5;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    if(! castle) return NONE;
+
+    if(	BuyMonsterFromCastle(castle, levelMonster, 
+	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
+	    RedrawCastleMonster();
+	    RedrawCastleInfoResource();
+    }else
+	ErrorDialogRecrutMonster(castle);
+
     return NONE;
 }
 
 ACTION ActionClickDwelling6(void){
-    fprintf(stderr, "ClickDwelling6\n");
+
+    const Uint8 levelMonster = 6;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    if(! castle) return NONE;
+
+    if(	BuyMonsterFromCastle(castle, levelMonster, 
+	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
+	    RedrawCastleMonster();
+	    RedrawCastleInfoResource();
+    }else
+	ErrorDialogRecrutMonster(castle);
+
     return NONE;
 }

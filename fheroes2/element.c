@@ -443,16 +443,17 @@ void ShowQuickInfo(Uint16 index){
 	    break;
 	
 	default:
-	    message = GetStringObjectType(obj, 0);
+	    message = GetStringObject(obj);
 	    break;
     }
     // здесь левый верхний угол после бордюра
-    rectCur.x = rectBack.x + 24;
+    rectCur.x = rectBack.x + 25;
     rectCur.y = rectBack.y + 10;
     rectCur.w = rectBack.w - 40;
     rectCur.h = rectBack.h - 40;
 
-    rectCur.x = rectCur.x + rectCur.w / 2 - strlen(message) * FONT_WIDTHSMALL / 2 ;
+    rectCur.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
+    rectCur.y += 20;
 
     PrintText(video, &rectCur, message, FONT_SMALL);
     SDL_Flip(video);

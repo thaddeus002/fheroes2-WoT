@@ -72,7 +72,7 @@ void DrawSCRSCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.w -= 20;
+	cur.w -= 40;
 	cur.h -=10;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
@@ -285,10 +285,10 @@ void DrawSCRSTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.x += 9;
-	cur.w = 140;
-	cur.y += 11;
-	cur.h = 150;
+	cur.x += 30;
+	cur.w = 120;
+	cur.y += 30;
+	cur.h = 130;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;

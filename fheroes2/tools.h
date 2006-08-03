@@ -54,6 +54,7 @@ Uint32 GetSizeSurface(SDL_Surface *);
 
 void FillSPRITE(AGGSPRITE *, const char *, Uint16);
 
-void PrintText(SDL_Surface *, SDL_Rect *, const char *, ENUMFONT);
+void	PrintText(SDL_Surface *, SDL_Rect *, const char *, ENUMFONT);
+Uint16	GetLengthText(const char *, ENUMFONT);
 
 #endif

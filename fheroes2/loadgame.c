@@ -543,8 +543,8 @@ ACTION DrawMainDisplay(){
 	return EXIT;
 
 
-    display.lastOffsetX = 0;
-    display.lastOffsetY = 0;
+    display.lastOffsetX = 0xFF;
+    display.lastOffsetY = 0xFF;
 
     // отображаем картинку
     ShowStaticMainDisplay();
@@ -2734,6 +2734,9 @@ ACTION ActionScrollCastleDown(void){
 
 ACTION ActionClickFocusHeroes(void){
 
+    display.lastOffsetX = 0xFF;
+    display.lastOffsetY = 0xFF;
+
     return NONE;
 }
 
@@ -2758,6 +2761,10 @@ ACTION ActionClickFocusCastle(void){
 	if(ValidPoint(&gameFocus.back, mx, my)) EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY);
 	SetGameFocus(castle, OBJ_CASTLE);
 	RedrawFocusPanel(&gameFocus);
+
+	display.lastOffsetX = 0xFF;
+	display.lastOffsetY = 0xFF;
+
 	RedrawMapsArea();
 	RedrawRadar();
     }
@@ -2880,6 +2887,7 @@ void CheckCursorAreaAction(E_OBJECT f){
     SDL_GetMouseState(&x, &y);
 
     S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + (y - BORDERWIDTH) / TILEWIDTH) * GetWidthMaps() + display.offsetX + (x - BORDERWIDTH) / TILEWIDTH);
+    S_CASTLE *castle = NULL;
 
     // если над областью арены то по свойствам
     if(x > BORDERWIDTH && x < BORDERWIDTH + GetWidthArea() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)
@@ -2911,7 +2919,11 @@ void CheckCursorAreaAction(E_OBJECT f){
 
 		    case OBJN_CASTLE:
 		    case OBJ_CASTLE:
-			SetCursor(CURSOR_CASTLE);
+			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
+			if(castle->color == GetIntValue(HUMANCOLORS))
+			    SetCursor(CURSOR_CASTLE);
+			else
+			    SetCursor(CURSOR_POINTER);
 			break;
 
 		    case OBJ_HEROES:
@@ -2942,7 +2954,19 @@ void CheckCursorAreaAction(E_OBJECT f){
 			break;
 
 		    case OBJN_CASTLE:
-			SetCursor(CURSOR_CASTLE);
+			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
+			if(castle->color == GetIntValue(HUMANCOLORS))
+			    SetCursor(CURSOR_CASTLE);
+			else
+			    SetCursor(CURSOR_FIGHT);
+			break;
+
+		    case OBJ_CASTLE:
+			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
+			if(castle->color == GetIntValue(HUMANCOLORS))
+			    SetCursor(CURSOR_ACTION);
+			else
+			    SetCursor(CURSOR_FIGHT);
 			break;
 
 		    case OBJ_BOAT:
@@ -2969,7 +2993,6 @@ void CheckCursorAreaAction(E_OBJECT f){
 			SetCursor(CURSOR_POINTER);
 			break;
 
-		    case OBJ_CASTLE:
 		    case OBJ_ALCHEMYTOWER:
 		    case OBJ_SIGN:
     	    	    case OBJ_SKELETON:
@@ -3052,7 +3075,11 @@ void CheckCursorAreaAction(E_OBJECT f){
 
 		    case OBJN_CASTLE:
 		    case OBJ_CASTLE:
-			SetCursor(CURSOR_CASTLE);
+			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
+			if(castle->color == GetIntValue(HUMANCOLORS))
+			    SetCursor(CURSOR_CASTLE);
+			else
+			    SetCursor(CURSOR_POINTER);
 			break;
 
 		    default:
@@ -3144,23 +3171,25 @@ void ClickCursorAreaAction(E_OBJECT f){
 		    case OBJN_CASTLE:
 
 			// фокус на замок
-			gameFocus.type = OBJ_CASTLE;
 			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 			if(!castle) break;
 
-			gameFocus.ax = castle->ax;
-			gameFocus.ay = castle->ay;
-			gameFocus.object = castle;
+			if(castle->color == GetIntValue(HUMANCOLORS)){
+			    gameFocus.type = OBJ_CASTLE;
+			    gameFocus.ax = castle->ax;
+			    gameFocus.ay = castle->ay;
+			    gameFocus.object = castle;
 
-			SetGameFocus(castle, OBJ_CASTLE);
-			RedrawFocusPanel(&gameFocus);
+			    SetGameFocus(castle, OBJ_CASTLE);
+			    RedrawFocusPanel(&gameFocus);
 
-			display.lastOffsetX = 0;
-			display.lastOffsetY = 0;
+			    display.lastOffsetX = 0xFF;
+			    display.lastOffsetY = 0xFF;
 
-			RedrawRadar();
-			RedrawMapsArea();
-			EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
+			    RedrawRadar();
+			    RedrawMapsArea();
+			    EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
+			}
 			break;
 /*
 		    case OBJ_BOAT:
@@ -3273,20 +3302,23 @@ void ClickCursorAreaAction(E_OBJECT f){
 		case OBJ_CASTLE:
 
 			// фокус на замок
-			gameFocus.type = OBJ_CASTLE;
 			castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 			if(!castle) break;
-			
-			SetGameFocus(castle, OBJ_CASTLE);
-			RedrawFocusPanel(&gameFocus);
 
-			display.lastOffsetX = 0;
-			display.lastOffsetY = 0;
+			if(castle->color == GetIntValue(HUMANCOLORS)){
 
-			RedrawRadar();
-			RedrawMapsArea();
+			    gameFocus.type = OBJ_CASTLE;
+			    SetGameFocus(castle, OBJ_CASTLE);
+			    RedrawFocusPanel(&gameFocus);
 
-			EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
+			    display.lastOffsetX = 0xFF;
+			    display.lastOffsetY = 0xFF;
+
+			    RedrawRadar();
+			    RedrawMapsArea();
+
+			    EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
+			}
 			break;
 
 		default:
@@ -3326,7 +3358,7 @@ ACTION ActionGAMELOOP(void){
 
 	if(EXIT == exit || ESC == exit) break;
 
-	// расчет дат
+	// расчет даты
 	if(7 == GetIntValue(DAY)){
 	    SetIntValue(DAY, 1);
 
@@ -3342,6 +3374,10 @@ ACTION ActionGAMELOOP(void){
 
 	// перегенерация однодневных событий карты
 	// расчет ресурсов всех королевств
+	for(i = 0; i < 8; ++i) 
+    	    if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01)
+		RecalculateKingdomDay(i);
+
 	// расчет хода для героев
 	
 	if(GetIntValue(DEBUG)) fprintf(stderr, "Month: %d, Week: %d, Day: %d\n", GetIntValue(MONTH), GetIntValue(WEEK), GetIntValue(DAY));
@@ -3690,10 +3726,10 @@ void SetGameFocus(void *object, E_OBJECT type){
 	}
 
 	// позиция первого элемента
-	if(GetCountCastle(GetIntValue(HUMANCOLORS)) > maxCount && seek < GetCountCastle(GetIntValue(HUMANCOLORS)) - maxCount)
+	if(GetCountCastle(GetIntValue(HUMANCOLORS)) > maxCount && seek < (GetCountCastle(GetIntValue(HUMANCOLORS)) - maxCount) && seek > maxCount)
 	    gameFocus.firstCastle = gameFocus.object;
 	else if(seek < maxCount)
-	    gameFocus.firstCastle = gameFocus.object;
+	    gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 	else{
 	    first = maxCount - 1;
 	    gameFocus.firstCastle = GetEndCastle(GetIntValue(HUMANCOLORS));
