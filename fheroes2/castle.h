@@ -106,7 +106,7 @@ Uint8     	GetCountCastle(E_COLORS);
 E_MONSTER	GetMonsterFromCastle(const S_CASTLE *, Uint8);
 BOOL		BuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
 BOOL		CheckBuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
-
+BOOL		CastleDwellingUpgradable(const S_CASTLE *, E_DWELLINGCASTLE);
 void		RedrawCastleMonster(void);
 void		RedrawCastleInfoResource(void);
 

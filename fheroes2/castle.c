@@ -2178,3 +2178,53 @@ void RedrawCastleInfoResource(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
 }
+
+BOOL CastleDwellingUpgradable(const S_CASTLE *castle, E_DWELLINGCASTLE level){
+
+    switch(castle->race){
+    
+	case BARBARIAN:
+	    if( (level & DWELLING_UPGRADE2) ||
+	        (level & DWELLING_UPGRADE4) ||
+		(level & DWELLING_UPGRADE5) ) return TRUE;
+	    break;
+	
+	case KNIGHT:
+	    if( (level & DWELLING_UPGRADE2) ||
+	        (level & DWELLING_UPGRADE3) ||
+		(level & DWELLING_UPGRADE4) ||
+		(level & DWELLING_UPGRADE5) ||
+		(level & DWELLING_UPGRADE6) ) return TRUE;
+	    break;
+
+	case NECROMANCER:
+	    if( (level & DWELLING_UPGRADE2) ||
+	        (level & DWELLING_UPGRADE3) ||
+		(level & DWELLING_UPGRADE4) ||
+		(level & DWELLING_UPGRADE5) ) return TRUE;
+	    break;
+
+	case SORCERESS:
+	    if( (level & DWELLING_UPGRADE2) ||
+	        (level & DWELLING_UPGRADE3) ||
+		(level & DWELLING_UPGRADE4) ) return TRUE;
+	    break;
+
+	case WARLOCK:
+	    if( (level & DWELLING_UPGRADE4) ||
+	        (level & DWELLING_UPGRADE6) ||
+		(level & DWELLING_UPGRADE7) ) return TRUE;
+	    break;
+
+	case WIZARD:
+	    if( (level & DWELLING_UPGRADE3) ||
+	        (level & DWELLING_UPGRADE5) ||
+		(level & DWELLING_UPGRADE6) ) return TRUE;
+	    break;
+
+	default:
+	    break;
+    }
+
+    return FALSE;
+}

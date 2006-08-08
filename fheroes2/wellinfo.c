@@ -39,17 +39,15 @@
 #include "actionevent.h"
 #include "castle.h"
 #include "monster.h"
-#include "heroesinfo.h"
+#include "wellinfo.h"
 
-ACTION ActionHeroesInfoPressDismiss(void);
-ACTION ActionHeroesInfoPressExit(void);
+ACTION ActionWellInfoPressExit(void);
 
-ACTION ShowHeroesInfo(E_NAMEHEROES name){
+ACTION ShowWellInfo(void){
 
     CursorOff();
-    SetIntValue(ANIM2, FALSE);
     SetIntValue(ANIM3, FALSE);
-    
+
     SDL_Surface *back, *image, *video;
     SDL_Rect rectBack, rectCur;
     Uint16 cx, cy;
@@ -57,13 +55,13 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     BOOL exit = FALSE;
 //    char str[64];
 
-    INTERFACEACTION action;
+//    INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
     ACTION result;
 
-    const S_HEROES *heroes = GetStatHeroes(name);
+//    const S_CASTLE *castle = GetCurrentCastle();
 
-    FillSPRITE(&sprite, "HEROBKG.ICN", 0);
+    FillSPRITE(&sprite, "WELLBKG.ICN", 0);
     image = GetICNSprite(&sprite);
 
     // отрисовка диалога по центру экрана
@@ -102,15 +100,7 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     cx = rectCur.x;
     cy = rectCur.y;
 
-    // признак интерфейса evil
-    GetIntValue(EVILINTERFACE) ? FillSPRITE(&sprite, "HEROEXTG.ICN", 0) : FillSPRITE(&sprite, "HEROEXTE.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx;
-    rectCur.y = cy;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
+/*
     // портрет героя PORT00XX
     FillSPRITE(&sprite, HeroesBigNamePortrait(name), 0);
     image = GetICNSprite(&sprite);
@@ -149,44 +139,10 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
-    Uint8 i;
-    // фон монстров
-    FillSPRITE(&sprite, "STRIP.ICN", 2);
-    image = GetICNSprite(&sprite);
-    rectCur.y = cy + 130;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    for(i = 0; i < HEROESMAXARMY; i++){
-	rectCur.x = cx + 156 + i * (rectCur.w + 6);
-	SDL_BlitSurface(image, NULL, video, &rectCur);
-    }
-    // фон спец SECSKILL
-    FillSPRITE(&sprite, "SECSKILL.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.y = cy + 233;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    for(i = 0; i < HEROESMAXSKILL; i++){
-	rectCur.x = cx + 3 + i * (rectCur.w + 5);
-	SDL_BlitSurface(image, NULL, video, &rectCur);
-    }
+    // фон монстров STRIP.ICN 2
+    // фон спец SECSKILL 0
+    // фон артифактов ARTIFACT 0
 
-    // фон артифактов ARTIFACT
-    FillSPRITE(&sprite, "ARTIFACT.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.y = cy + 308;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    for(i = 0; i < HEROESMAXARTIFACT / 2; i++){
-	rectCur.x = cx + 51 + i * (rectCur.w + 15);
-	SDL_BlitSurface(image, NULL, video, &rectCur);
-    }
-    rectCur.y = cy + 387;
-    for(i = 0; i < HEROESMAXARTIFACT / 2; i++){
-	rectCur.x = cx + 51 + i * (rectCur.w + 15);
-	SDL_BlitSurface(image, NULL, video, &rectCur);
-    }
-/*
     // название монстра
     sprintf(str, "Recrut %s", monster->descriptions);
     rectCur.x = rectBack.x + 160;
@@ -218,7 +174,7 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     rectCur.w = GetLengthText(str, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
-*/
+
 
     // рисуем кнопки
     // кнопка Dismiss
@@ -251,7 +207,7 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     action.pf = ActionHeroesInfoPressExit;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
-
+*/
     // Отрисовка диалога
     CursorOn();
 
@@ -289,18 +245,12 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     SDL_FreeSurface(back);
 
     SetIntValue(ANIM3, TRUE);
-    SetIntValue(ANIM1, TRUE);
     CursorOn();
 
     return result;
 }
 
-ACTION ActionHeroesInfoPressExit(void){
+ACTION ActionWellInfoPressExit(void){
 
     return CANCEL;
-}
-
-ACTION ActionHeroesInfoPressDismiss(void){
-
-    return DISMISS;
 }

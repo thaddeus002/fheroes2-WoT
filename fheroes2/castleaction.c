@@ -33,11 +33,11 @@
 #include "tools.h"
 #include "cursor.h"
 #include "debug.h"
-#include "castle.h"
 #include "config.h"
 #include "actionevent.h"
 #include "monster.h"
 #include "castle.h"
+#include "castleinfo.h"
 #include "castleaction.h"
 #include "recrutmonster.h"
 
@@ -691,7 +691,8 @@ ACTION ActionOverHeroes(void){
 }
 
 ACTION ActionClickCastle(void){
-    fprintf(stderr, "ClickCastle\n");
+
+    ShowCastleInfo();
     return NONE;
 }
 
