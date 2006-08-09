@@ -36,6 +36,7 @@
 #include "config.h"
 #include "actionevent.h"
 #include "monster.h"
+#include "kingdom.h"
 #include "castle.h"
 #include "castleinfo.h"
 #include "castleaction.h"
@@ -54,7 +55,7 @@ ACTION ActionOverCastle(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -65,7 +66,7 @@ ACTION ActionOverCastle(void){
 
 ACTION ActionOverCaptain(void){
 
-    const char *message = "Captains Quarters";
+    const char *message = GetStringCapitan();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -73,7 +74,7 @@ ACTION ActionOverCaptain(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -84,7 +85,7 @@ ACTION ActionOverCaptain(void){
 
 ACTION ActionOverStatue(void){
 
-    const char *message = "Statue";
+    const char *message = GetStringStatue();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -92,7 +93,7 @@ ACTION ActionOverStatue(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -103,7 +104,7 @@ ACTION ActionOverStatue(void){
 
 ACTION ActionOverMarketplace(void){
 
-    const char *message = "Marketplace";
+    const char *message = GetStringMarketplace();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -111,7 +112,7 @@ ACTION ActionOverMarketplace(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -122,7 +123,7 @@ ACTION ActionOverMarketplace(void){
 
 ACTION ActionOverMoat(void){
 
-    const char *message = "Moat";
+    const char *message = GetStringMoat();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -130,7 +131,7 @@ ACTION ActionOverMoat(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -141,7 +142,7 @@ ACTION ActionOverMoat(void){
 
 ACTION ActionOverDock(void){
 
-    const char *message = "Dock";
+    const char *message = GetStringShipyard();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -149,7 +150,7 @@ ACTION ActionOverDock(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -160,7 +161,7 @@ ACTION ActionOverDock(void){
 
 ACTION ActionOverWell(void){
 
-    const char *message = "Well";
+    const char *message = GetStringWell();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -168,7 +169,7 @@ ACTION ActionOverWell(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -179,7 +180,7 @@ ACTION ActionOverWell(void){
 
 ACTION ActionOverTavern(void){
 
-    const char *message = "Tavern";
+    const char *message = GetStringTavern();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -187,7 +188,7 @@ ACTION ActionOverTavern(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -198,7 +199,7 @@ ACTION ActionOverTavern(void){
 
 ACTION ActionOverThievesGuild(void){
 
-    const char *message = "Thieves Guild";
+    const char *message = GetStringThievesGuild();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -206,7 +207,7 @@ ACTION ActionOverThievesGuild(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -217,7 +218,7 @@ ACTION ActionOverThievesGuild(void){
 
 ACTION ActionOverMageGuild(void){
 
-    const char *message = "Mage Guild";
+    const char *message = GetStringMageGuild();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -225,7 +226,7 @@ ACTION ActionOverMageGuild(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -239,29 +240,7 @@ ACTION ActionOverSpec(void){
     const char *message = NULL;
     const S_CASTLE *castle = GetCurrentCastle();
 
-    switch(castle->race){
-	case BARBARIAN:
-	    message = "Coliseum";
-	    break;
-	case KNIGHT:
-	    message = "Fortifications";
-	    break;
-	case WARLOCK:
-	    message = "Dungeon";
-	    break;
-	case SORCERESS:
-	    message = "Rainbow";
-	    break;
-	case NECROMANCER:
-	    message = "Storm";
-	    break;
-	case WIZARD:
-	    message = "Library";
-	    break;
-	default:
-	    return NONE;
-	    break;
-    }
+    message = GetStringSpec(castle->race);
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -269,7 +248,7 @@ ACTION ActionOverSpec(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -284,29 +263,7 @@ ACTION ActionOverWel2(void){
     const char *message = NULL;
     const S_CASTLE *castle = GetCurrentCastle();
 
-    switch(castle->race){
-	case BARBARIAN:
-	    message = "Garbadge Heap";
-	    break;
-	case KNIGHT:
-	    message = "Farm";
-	    break;
-	case WARLOCK:
-	    message = " Waterfall";
-	    break;
-	case SORCERESS:
-	    message = "Crystal Garden";
-	    break;
-	case NECROMANCER:
-	    message = "Skull Pile";
-	    break;
-	case WIZARD:
-	    message = "Orchard";
-	    break;
-	default:
-	    return NONE;
-	    break;
-    }
+    message = GetStringWel2(castle->race);
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -314,7 +271,7 @@ ACTION ActionOverWel2(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -358,7 +315,7 @@ ACTION ActionOverDwelling1(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
     cur.h = FONT_HEIGHTBIG;
@@ -414,7 +371,7 @@ ACTION ActionOverDwelling2(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
     cur.h = FONT_HEIGHTBIG;
@@ -470,7 +427,7 @@ ACTION ActionOverDwelling3(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
     cur.h = FONT_HEIGHTBIG;
@@ -529,7 +486,7 @@ ACTION ActionOverDwelling4(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
     cur.h = FONT_HEIGHTBIG;
@@ -585,7 +542,7 @@ ACTION ActionOverDwelling5(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
     cur.h = FONT_HEIGHTBIG;
@@ -640,7 +597,7 @@ ACTION ActionOverDwelling6(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
     cur.h = FONT_HEIGHTBIG;
@@ -662,7 +619,7 @@ ACTION ActionOverExit(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -681,7 +638,7 @@ ACTION ActionOverHeroes(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
     cur.y = cur.y - 3;
     cur.w = FONT_WIDTHBIG * strlen(message);
     cur.h = FONT_HEIGHTBIG;
@@ -692,7 +649,15 @@ ACTION ActionOverHeroes(void){
 
 ACTION ActionClickCastle(void){
 
-    ShowCastleInfo();
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    if(castle->castle)
+	ShowCastleInfo();
+    else if(castle->allowCastle)
+	fprintf(stderr, "Allow build Castle\n");
+    else
+	fprintf(stderr, "Not allow build Castle\n");
+
     return NONE;
 }
 
@@ -849,6 +814,859 @@ ACTION ActionClickDwelling6(void){
 	    RedrawCastleInfoResource();
     }else
 	ErrorDialogRecrutMonster(castle);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverExit(void){
+    
+    const char *message = "Exit Castle Options";
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+                
+    return NONE;
+}               
+
+ACTION ActionCastleClickExit(void){
+            
+    return CANCEL;      
+}
+
+ACTION ActionCastleOverTavern(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildTavern(castle)){
+
+	case BUILD_OK:
+	    message = "Build Tavern";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Tavern";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Tavern is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverStatue(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildStatue(castle)){
+
+	case BUILD_OK:
+	    message = "Build Statue";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Statue";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Statue is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverWell(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildWell(castle)){
+
+	case BUILD_OK:
+	    message = "Build Well";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Well";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Well is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverMoat(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildMoat(castle)){
+
+	case BUILD_OK:
+	    message = "Build Moat";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Moat";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Moat is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverMarketplace(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildMarketplace(castle)){
+
+	case BUILD_OK:
+	    message = "Build Marketplace";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Marketplace";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Marketplace is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverThievesGuild(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildThievesGuild(castle)){
+
+	case BUILD_OK:
+	    message = "Build Thieves Guild";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Thieves Guild";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Thieves Guild is already  build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverLeftTurret(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildLeftTurret(castle)){
+
+	case BUILD_OK:
+	    message = "Build Left Turret";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Left Turret";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Left Turret is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverRightTurret(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildRightTurret(castle)){
+
+	case BUILD_OK:
+	    message = "Build Right Turret";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Right Turret";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Right Turret is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverMageGuild(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildMageGuild(castle)){
+
+	case BUILD_OK:
+	    message = "Build Mage Guild";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Mage Guild";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Mage Guild is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverShipyard(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildShipyard(castle)){
+
+	case BUILD_OK:
+	    message = "Build Shipyard";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Shipyard";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Shipyard is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverWel2(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildWel2(castle)){
+
+	case BUILD_OK:
+	    sprintf(message, "Build %s", GetStringWel2(castle->race));
+	    break;
+	
+	case CANNOT_BUILD:
+	    sprintf(message, "Cannot build %s", GetStringWel2(castle->race));
+	    break;
+	
+	case ALREADY_BUILD:
+	    sprintf(message, "%s is already build", GetStringWel2(castle->race));
+	    break;
+	
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverSpec(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildSpec(castle)){
+
+	case BUILD_OK:
+	    sprintf(message, "Build %s", GetStringSpec(castle->race));
+	    break;
+	
+	case CANNOT_BUILD:
+	    sprintf(message, "Cannot build %s", GetStringSpec(castle->race));
+	    break;
+	
+	case ALREADY_BUILD:
+	    sprintf(message, "%s is already build", GetStringSpec(castle->race));
+	    break;
+	
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverDwelling1(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildDwelling1(castle)){
+
+	case BUILD_OK:
+	    sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    break;
+	
+	case CANNOT_BUILD:
+	    sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    break;
+	
+	case ALREADY_BUILD:
+	    sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    break;
+	
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverDwelling2(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    
+    switch(AllowBuildDwelling2(castle)){
+
+	case BUILD_OK:
+	    castle->dwelling & DWELLING_MONSTER2 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
+		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	    break;
+
+	case CANNOT_BUILD:
+	    castle->dwelling & DWELLING_MONSTER2 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
+		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	    break;
+
+	case ALREADY_BUILD:
+	    if(castle->dwelling & DWELLING_UPGRADE2)
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE2));
+	    else
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	    break;
+
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverDwelling3(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildDwelling3(castle)){
+
+	case BUILD_OK:
+	    castle->dwelling & DWELLING_MONSTER3 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
+		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	    break;
+	
+	case CANNOT_BUILD:
+	    castle->dwelling & DWELLING_MONSTER3 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
+		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	    break;
+	
+	case ALREADY_BUILD:
+	    if(castle->dwelling & DWELLING_UPGRADE3)
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE3));
+	    else
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	    break;
+	
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverDwelling4(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildDwelling4(castle)){
+
+	case BUILD_OK:
+	    castle->dwelling & DWELLING_MONSTER4 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
+		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	    break;
+	
+	case CANNOT_BUILD:
+	    castle->dwelling & DWELLING_MONSTER4 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
+		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	    break;
+	
+	case ALREADY_BUILD:
+	    if(castle->dwelling & DWELLING_UPGRADE4)
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE4));
+	    else
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	    break;
+	
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverDwelling5(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildDwelling5(castle)){
+
+	case BUILD_OK:
+	    castle->dwelling & DWELLING_MONSTER5 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
+		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	    break;
+	
+	case CANNOT_BUILD:
+	    castle->dwelling & DWELLING_MONSTER5 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
+		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	    break;
+	
+	case ALREADY_BUILD:
+	    if(castle->dwelling & DWELLING_UPGRADE5)
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE5));
+	    else
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	    break;
+	
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverDwelling6(void){
+    
+    char message[64];
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowBuildDwelling6(castle)){
+
+	case BUILD_OK:
+	    if(castle->race == WARLOCK && castle->dwelling & DWELLING_UPGRADE6)
+		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
+	    else if(castle->dwelling & DWELLING_MONSTER6)
+		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+	    else
+		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+	    break;
+	
+	case CANNOT_BUILD:
+	    if(castle->race == WARLOCK && castle->dwelling & DWELLING_UPGRADE6)
+		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
+	    else if(castle->dwelling & DWELLING_MONSTER6)
+		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+	    else
+		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+	    break;
+	
+	case ALREADY_BUILD:
+	    if(castle->dwelling & DWELLING_UPGRADE7)
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
+	    else if(castle->dwelling & DWELLING_UPGRADE6)
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+	    else if(castle->dwelling & DWELLING_MONSTER6)
+		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+	    break;
+	
+	case END_TUR:
+	    sprintf(message, "Cannot build. Already build here this turn.");
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.y = cur.y - 3;
+    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+
+ACTION ActionCastleClickTavern(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickStatue(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickWell(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickMoat(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickMarketplace(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickThievesGuild(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickLeftTurret(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickRightTurret(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickMageGuild(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickShipyard(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickWel2(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickSpec(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickDwelling1(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickDwelling2(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickDwelling3(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickDwelling4(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickDwelling5(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleClickDwelling6(void){
 
     return NONE;
 }

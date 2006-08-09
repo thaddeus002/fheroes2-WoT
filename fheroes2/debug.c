@@ -922,3 +922,262 @@ const char * GetStringGround(E_GROUND ground){
     
     return string;
 }
+
+const char * GetStringWel2(E_RACE race){
+
+    const char  *string;
+
+    switch(race){
+    
+	case KNIGHT:
+	    string = "Farm";
+	    break;
+
+	case BARBARIAN:
+	    string = "Garbage Heap";
+	    break;
+
+	case SORCERESS:
+	    string = "Crystal Garden";
+	    break;
+
+	case WARLOCK:
+	    string = "Waterfall";
+	    break;
+
+	case WIZARD:
+	    string = "Orchard";
+	    break;
+
+	case NECROMANCER:
+	    string = "Skull Pile";
+	    break;
+
+	default:
+	    string = NULL;
+	    break;
+
+    }
+    
+    return string;
+}
+
+const char * GetStringSpec(E_RACE race){
+
+    const char  *string;
+
+    switch(race){
+    
+	case KNIGHT:
+	    string = "Fortifications";
+	    break;
+
+	case BARBARIAN:
+	    string = "Coliseum";
+	    break;
+
+	case SORCERESS:
+	    string = "Rainbow";
+	    break;
+
+	case WARLOCK:
+	    string = "Dungeon";
+	    break;
+
+	case WIZARD:
+	    string = "Library";
+	    break;
+
+	case NECROMANCER:
+	    string = "Storm";
+	    break;
+
+	default:
+	    string = NULL;
+	    break;
+
+    }
+    
+    return string;
+}
+
+const char * GetStringDwelling(E_RACE race, E_DWELLINGCASTLE level){
+
+    const char  *string = NULL;
+
+    switch(race){
+    
+	case KNIGHT:
+	    if(DWELLING_MONSTER1 == level) string = "Thatched Hut";
+	    if(DWELLING_MONSTER2 == level) string = "Archery Range";
+	    if(DWELLING_MONSTER3 == level) string = "Blacksmith";
+	    if(DWELLING_MONSTER4 == level) string = "Armory";
+	    if(DWELLING_MONSTER5 == level) string = "Jousting Arena";
+	    if(DWELLING_MONSTER6 == level) string = "Cathedral";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Archery Range";
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Blacksmith";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Armory";
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Jousting Arena";
+	    if(DWELLING_UPGRADE6 == level) string = "Upg. Cathedral";
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    break;
+
+	case BARBARIAN:
+	    if(DWELLING_MONSTER1 == level) string = "Hut";
+	    if(DWELLING_MONSTER2 == level) string = "Stick Hut";
+	    if(DWELLING_MONSTER3 == level) string = "Den";
+	    if(DWELLING_MONSTER4 == level) string = "Adobe";
+	    if(DWELLING_MONSTER5 == level) string = "Bridge";
+	    if(DWELLING_MONSTER6 == level) string = "Pyramid";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Stick Hut";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Adobe";
+	    if(DWELLING_UPGRADE3 == level) string = NULL;
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Bridge";
+	    if(DWELLING_UPGRADE6 == level) string = NULL;
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    break;
+
+	case SORCERESS:
+	    if(DWELLING_MONSTER1 == level) string = "Treehouse";
+	    if(DWELLING_MONSTER2 == level) string = "Cottage";
+	    if(DWELLING_MONSTER3 == level) string = "Archery Range";
+	    if(DWELLING_MONSTER4 == level) string = "Stonehenge";
+	    if(DWELLING_MONSTER5 == level) string = "Fenced Meadow";
+	    if(DWELLING_MONSTER6 == level) string = "Red Tower";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Cottage";
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Archery Range";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Stonehenge";
+	    if(DWELLING_UPGRADE5 == level) string = NULL;
+	    if(DWELLING_UPGRADE6 == level) string = NULL;
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    break;
+
+	case WIZARD:
+	    if(DWELLING_MONSTER1 == level) string = "Habitat";
+	    if(DWELLING_MONSTER2 == level) string = "Pen";
+	    if(DWELLING_MONSTER3 == level) string = "Foundry";
+	    if(DWELLING_MONSTER4 == level) string = "Cliff Nest";
+	    if(DWELLING_MONSTER5 == level) string = "Ivory Tower";
+	    if(DWELLING_MONSTER6 == level) string = "Cloud Castle";
+	    if(DWELLING_UPGRADE2 == level) string = NULL;
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Foundry";
+	    if(DWELLING_UPGRADE4 == level) string = NULL;
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Ivory Tower";
+	    if(DWELLING_UPGRADE6 == level) string = "Upg. Cloud Castle";
+	    break;
+
+	case WARLOCK:
+	    if(DWELLING_MONSTER1 == level) string = "Cave";
+	    if(DWELLING_MONSTER2 == level) string = "Crypt";
+	    if(DWELLING_MONSTER3 == level) string = "Nest";
+	    if(DWELLING_MONSTER4 == level) string = "Maze";
+	    if(DWELLING_MONSTER5 == level) string = "Swamp";
+	    if(DWELLING_MONSTER6 == level) string = "Green Tower";
+	    if(DWELLING_UPGRADE2 == level) string = NULL;
+	    if(DWELLING_UPGRADE3 == level) string = NULL;
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Maze";
+	    if(DWELLING_UPGRADE5 == level) string = "Red Tower";
+	    if(DWELLING_UPGRADE6 == level) string = "Black Tower";
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    break;
+
+	case NECROMANCER:
+	    if(DWELLING_MONSTER1 == level) string = "Excavation";
+	    if(DWELLING_MONSTER2 == level) string = "Graveyard";
+	    if(DWELLING_MONSTER3 == level) string = "Pyramid";
+	    if(DWELLING_MONSTER4 == level) string = "Mansion";
+	    if(DWELLING_MONSTER5 == level) string = "Mausoleum";
+	    if(DWELLING_MONSTER6 == level) string = "Laboratory";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Graveyard";
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Pyramid";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Mansion";
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Mausoleum";
+	    if(DWELLING_UPGRADE6 == level) string = NULL;
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    break;
+
+	default:
+	    string = NULL;
+	    break;
+
+    }
+    
+    return string;
+}
+
+const char * GetStringMageGuild(void){
+
+    const char *string = "Mage Guild";
+    
+    return string;
+}
+
+const char * GetStringTavern(void){
+
+    const char *string = "Tavern";
+    
+    return string;
+}
+
+const char * GetStringThievesGuild(void){
+
+    const char *string = "Thieves Guild";
+    
+    return string;
+}
+
+const char * GetStringWell(void){
+
+    const char *string = "Well";
+    
+    return string;
+}
+
+const char * GetStringShipyard(void){
+
+    const char *string = "Shipyard";
+    
+    return string;
+}
+
+const char * GetStringStatue(void){
+
+    const char *string = "Statue";
+    
+    return string;
+}
+
+const char * GetStringMarketplace(void){
+
+    const char *string = "Marketplace";
+    
+    return string;
+}
+
+const char * GetStringLeftTurret(void){
+
+    const char *string = "LeftTurret";
+    
+    return string;
+}
+
+const char * GetStringRightTurret(void){
+
+    const char *string = "Right Turret";
+    
+    return string;
+}
+
+const char * GetStringMoat(void){
+
+    const char *string = "Moat";
+    
+    return string;
+}
+
+const char * GetStringCapitan(void){
+
+    const char *string = "Captains Quarters";
+    
+    return string;
+}

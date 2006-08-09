@@ -75,7 +75,7 @@ void	KingdomAddHeroes(E_COLORS, E_NAMEHEROES);
 void	KingdomRemoveHeroes(E_COLORS, E_NAMEHEROES);
 
 S_KINGDOM	*GetStatKingdom(E_COLORS);
-
+BOOL	KingdomAllowBuild(E_COLORS);
 void	RecalculateKingdomDay(E_COLORS);
 
 #endif

@@ -53,17 +53,19 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define COLORPURPLE	0x20
 #define COLORGRAY	0xFF
 
-#define BUY_CYCLOPS_CRYSTAL     1 
-#define BUY_PHOENIX_MERCURY     1 
-#define BUY_GREENDRAGON_SULFUR  1 
-#define BUY_REDDRAGON_SULFUR    1 
-#define BUY_BLACKDRAGON_SULFUR  3 
-#define BUY_GIANT_GEMS          1 
-#define BUY_TITAN_GEMS          2 
-#define BUY_GENIE_GEMS          1 
+#define BUY_CYCLOPS_CRYSTAL     1
+#define BUY_PHOENIX_MERCURY     1
+#define BUY_GREENDRAGON_SULFUR  1
+#define BUY_REDDRAGON_SULFUR    1
+#define BUY_BLACKDRAGON_SULFUR  3
+#define BUY_GIANT_GEMS          1
+#define BUY_TITAN_GEMS          2
+#define BUY_GENIE_GEMS          1
 
 #define GOLD_CASTLE_DAY		1000
 #define GOLD_TOWN_DAY		750
+#define GOLD_STATUE_DAY		250
+#define GOLD_DUNGEON_DAY	500
 
 typedef enum {
 		GAME_EASY,

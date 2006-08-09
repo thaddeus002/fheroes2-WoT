@@ -33,6 +33,7 @@
 #include "object.h"
 #include "mp2maps.h"
 #include "monster.h"
+#include "castle.h"
 
 const char * GetStringObject(E_OBJECT);
 const char * GetStringRace(E_RACE);
@@ -41,6 +42,21 @@ const char * GetStringLuck(E_LUCK);
 const char * GetStringMorale(E_MORALE);
 const char * GetStringSpeed(E_MONSTERSPEED);
 const char * GetStringGround(E_GROUND);
+const char * GetStringWel2(E_RACE);
+const char * GetStringSpec(E_RACE);
+const char * GetStringDwelling(E_RACE, E_DWELLINGCASTLE);
+
+const char * GetStringMageGuild(void);
+const char * GetStringTavern(void);
+const char * GetStringThievesGuild(void);
+const char * GetStringWell(void);
+const char * GetStringShipyard(void);
+const char * GetStringStatue(void);
+const char * GetStringMarketplace(void);
+const char * GetStringLeftTurret(void);
+const char * GetStringRightTurret(void);
+const char * GetStringMoat(void);
+const char * GetStringCapitan(void);
 
 void         PrintCellInfo(Uint16);
 

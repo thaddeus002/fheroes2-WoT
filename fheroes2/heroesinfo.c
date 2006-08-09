@@ -277,6 +277,7 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     		break;
 
     	    default:
+		result = NONE;
     		break;
 
 	}

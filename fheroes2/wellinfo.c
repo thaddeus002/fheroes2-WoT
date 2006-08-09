@@ -233,6 +233,7 @@ ACTION ShowWellInfo(void){
     		break;
 
     	    default:
+		result = NONE;
     		break;
 
 	}

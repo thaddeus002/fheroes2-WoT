@@ -72,4 +72,44 @@ ACTION ActionClickDwelling4(void);
 ACTION ActionClickDwelling5(void);
 ACTION ActionClickDwelling6(void);
 
+ACTION ActionCastleOverExit(void);
+ACTION ActionCastleOverStatue(void);
+ACTION ActionCastleOverTavern(void);
+ACTION ActionCastleOverWell(void);
+ACTION ActionCastleOverMoat(void);
+ACTION ActionCastleOverMarketplace(void);
+ACTION ActionCastleOverThievesGuild(void);
+ACTION ActionCastleOverLeftTurret(void);
+ACTION ActionCastleOverRightTurret(void);
+ACTION ActionCastleOverMageGuild(void);
+ACTION ActionCastleOverShipyard(void);
+ACTION ActionCastleOverWel2(void);
+ACTION ActionCastleOverSpec(void);
+ACTION ActionCastleOverDwelling1(void);
+ACTION ActionCastleOverDwelling2(void);
+ACTION ActionCastleOverDwelling3(void);
+ACTION ActionCastleOverDwelling4(void);
+ACTION ActionCastleOverDwelling5(void);
+ACTION ActionCastleOverDwelling6(void);
+
+ACTION ActionCastleClickExit(void);
+ACTION ActionCastleClickTavern(void);
+ACTION ActionCastleClickStatue(void);
+ACTION ActionCastleClickWell(void);
+ACTION ActionCastleClickMoat(void);
+ACTION ActionCastleClickMarketplace(void);
+ACTION ActionCastleClickThievesGuild(void);
+ACTION ActionCastleClickLeftTurret(void);
+ACTION ActionCastleClickRightTurret(void);
+ACTION ActionCastleClickMageGuild(void);
+ACTION ActionCastleClickShipyard(void);
+ACTION ActionCastleClickWel2(void);
+ACTION ActionCastleClickSpec(void);
+ACTION ActionCastleClickDwelling1(void);
+ACTION ActionCastleClickDwelling2(void);
+ACTION ActionCastleClickDwelling3(void);
+ACTION ActionCastleClickDwelling4(void);
+ACTION ActionCastleClickDwelling5(void);
+ACTION ActionCastleClickDwelling6(void);
+
 #endif

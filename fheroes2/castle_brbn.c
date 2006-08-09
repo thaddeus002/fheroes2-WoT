@@ -935,3 +935,4 @@ void DrawBRBNMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	AddActionEvent(actionHead, &action);
     }
 }
+

@@ -45,7 +45,6 @@
 
 void RedrawInfoBottomBar(void);
 
-ACTION ActionCastleInfoPressExit(void);
 ACTION ActionCASTLEINFOLOOP(INTERFACEACTION *);
 
 ACTION ShowCastleInfo(void){
@@ -58,7 +57,7 @@ ACTION ShowCastleInfo(void){
     Uint16 cx, cy;
     AGGSPRITE sprite;
     const char *icnname;
-    //char str[64];
+    const char *message;
 
     INTERFACEACTION action;
     INTERFACEACTION *castinfo = NULL;        
@@ -120,7 +119,7 @@ ACTION ShowCastleInfo(void){
     ZeroINTERFACEACTION(&action);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_PRESENT;
-    action.pf = ActionOverExit;
+    action.pf = ActionCastleOverExit;
     AddActionEvent(&castinfo, &action);
     // клик
     ZeroINTERFACEACTION(&action);
@@ -128,7 +127,7 @@ ACTION ShowCastleInfo(void){
     FillSPRITE(&action.objectPush, "SWAPBTN.ICN", 1);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionCastleInfoPressExit;
+    action.pf = ActionCastleClickExit;
     AddActionEvent(&castinfo, &action);
 
     // далее по расам
@@ -171,6 +170,78 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverDwelling1;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildDwelling1(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickDwelling1;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringDwelling(castle->race, DWELLING_MONSTER1);
+    rectCur.x = cx + 75;
+    rectCur.y = cy + 60;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон dwelling 2
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE2) &&
@@ -182,6 +253,81 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverDwelling2;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildDwelling2(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickDwelling2;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
+	message = GetStringDwelling(castle->race, DWELLING_UPGRADE2);
+    else
+	message = GetStringDwelling(castle->race, DWELLING_MONSTER2);
+    rectCur.x = cx + 225;
+    rectCur.y = cy + 60;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон dwelling 3
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE3) &&
@@ -193,6 +339,81 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverDwelling3;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildDwelling3(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickDwelling3;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
+	message = GetStringDwelling(castle->race, DWELLING_UPGRADE3);
+    else
+	message = GetStringDwelling(castle->race, DWELLING_MONSTER3);
+    rectCur.x = cx + 370;
+    rectCur.y = cy + 60;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон dwelling 4
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE4) &&
@@ -204,6 +425,81 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverDwelling4;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildDwelling4(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickDwelling4;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
+	message = GetStringDwelling(castle->race, DWELLING_UPGRADE4);
+    else
+	message = GetStringDwelling(castle->race, DWELLING_MONSTER4);
+    rectCur.x = cx + 75;
+    rectCur.y = cy + 135;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон dwelling 5
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE5) &&
@@ -215,6 +511,81 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverDwelling5;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildDwelling5(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickDwelling5;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
+	message = GetStringDwelling(castle->race, DWELLING_UPGRADE5);
+    else
+	message = GetStringDwelling(castle->race, DWELLING_MONSTER5);
+    rectCur.x = cx + 225;
+    rectCur.y = cy + 135;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон dwelling 6
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE7) &&
@@ -228,6 +599,83 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverDwelling6;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildDwelling6(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickDwelling6;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 135;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
+	message = GetStringDwelling(castle->race, DWELLING_UPGRADE7);
+    else if(castle->dwelling & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
+	message = GetStringDwelling(castle->race, DWELLING_UPGRADE6);
+    else
+	message = GetStringDwelling(castle->race, DWELLING_MONSTER6);
+    rectCur.x = cx + 370;
+    rectCur.y = cy + 135;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон magic tower
     FillSPRITE(&sprite, icnname, 0);
@@ -237,26 +685,244 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverMageGuild;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildMageGuild(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickMageGuild;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringMageGuild();
+    rectCur.x = cx + 75;
+    rectCur.y = cy + 215;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон tawern
-    FillSPRITE(&sprite, icnname, 1);
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx + 150;
-    rectCur.y = cy + 158;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
+    if(NECROMANCER != castle->race){
+	FillSPRITE(&sprite, icnname, 1);
+	image = GetICNSprite(&sprite);
+	rectCur.x = cx + 150;
+	rectCur.y = cy + 158;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+	// наведение
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionCastleOverTavern;
+	AddActionEvent(&castinfo, &action);
+	// клик
+	switch(AllowBuildTavern(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickTavern;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	}
+	message = GetStringTavern();
+	rectCur.x = cx + 225;
+	rectCur.y = cy + 215;
+	rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+	rectCur.y = rectCur.y + 1;
+	rectCur.w = FONT_WIDTHSMALL * strlen(message);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
+    }
+    
     // фон thieves guild
-    FillSPRITE(&sprite, icnname, 2);
+    NECROMANCER != castle->race ? FillSPRITE(&sprite, icnname, 2) : FillSPRITE(&sprite, icnname, 1);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 294;
     rectCur.y = cy + 158;
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverThievesGuild;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildThievesGuild(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickThievesGuild;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 215;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringThievesGuild();
+    rectCur.x = cx + 370;
+    rectCur.y = cy + 215;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
-    // фон chip guard
+    // фон chip yard
     FillSPRITE(&sprite, icnname, 3);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 6;
@@ -264,6 +930,78 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverShipyard;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildShipyard(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickShipyard;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringShipyard();
+    rectCur.x = cx + 75;
+    rectCur.y = cy + 290;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон statue
     FillSPRITE(&sprite, icnname, 7);
@@ -273,6 +1011,78 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverStatue;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildStatue(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickStatue;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringStatue();
+    rectCur.x = cx + 225;
+    rectCur.y = cy + 290;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон market
     FillSPRITE(&sprite, icnname, 10);
@@ -282,6 +1092,78 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverMarketplace;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildMarketplace(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickMarketplace;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 290;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringMarketplace();
+    rectCur.x = cx + 370;
+    rectCur.y = cy + 290;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон well
     FillSPRITE(&sprite, icnname, 4);
@@ -291,8 +1173,80 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverWell;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildWell(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickWell;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringWell();
+    rectCur.x = cx + 75;
+    rectCur.y = cy + 365;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
-    // фон spec
+    // фон wel2
     FillSPRITE(&sprite, icnname, 11);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 150;
@@ -300,8 +1254,80 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverWel2;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildWel2(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickWel2;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringWel2(castle->race);
+    rectCur.x = cx + 225;
+    rectCur.y = cy + 365;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
-    // фон ext
+    // фон spec
     FillSPRITE(&sprite, icnname, 13);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 294;
@@ -309,6 +1335,78 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverSpec;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildSpec(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickSpec;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 365;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringSpec(castle->race);
+    rectCur.x = cx + 370;
+    rectCur.y = cy + 365;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон l turret
     FillSPRITE(&sprite, icnname, 8);
@@ -318,6 +1416,78 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverLeftTurret;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildLeftTurret(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickLeftTurret;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 5;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringLeftTurret();
+    rectCur.x = cx + 75;
+    rectCur.y = cy + 445;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон r turret
     FillSPRITE(&sprite, icnname, 9);
@@ -327,6 +1497,78 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverRightTurret;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildRightTurret(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickRightTurret;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 149;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+    }
+    message = GetStringRightTurret();
+    rectCur.x = cx + 225;
+    rectCur.y = cy + 445;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
     // фон moat
     FillSPRITE(&sprite, icnname, 12);
@@ -336,115 +1578,79 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
-
-/*
-    // портрет героя PORT00XX
-    FillSPRITE(&sprite, HeroesBigNamePortrait(name), 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx + 49;
-    rectCur.y = cy + 31;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // знак
-    switch(heroes->color){
-        default:
-        case BLUE:
-            FillSPRITE(&sprite, "CREST.ICN", 0);
-            break;
-        case GREEN:
-            FillSPRITE(&sprite, "CREST.ICN", 1);
-            break;
-        case RED:
-            FillSPRITE(&sprite, "CREST.ICN", 2);
-            break;
-        case YELLOW:
-            FillSPRITE(&sprite, "CREST.ICN", 3);
-    	    break;
-        case ORANGE:
-            FillSPRITE(&sprite, "CREST.ICN", 4);
-    	    break;
-        case PURPLE:
-            FillSPRITE(&sprite, "CREST.ICN", 5);
-            break;
+    // наведение
+    ZeroINTERFACEACTION(&action);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverMoat;
+    AddActionEvent(&castinfo, &action);
+    // клик
+    switch(AllowBuildMoat(castle)){
+    	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionCastleClickMoat;
+	    AddActionEvent(&castinfo, &action);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    FillSPRITE(&sprite, "CASLXTRA.ICN", 2);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = cx + 293;
+	    rectCur.y = cy + 445;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 11);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 118;
+	    rectCur.y += 40;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
     }
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx + 49;
-    rectCur.y = cy + 130;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // фон монстров STRIP.ICN 2
-    // фон спец SECSKILL 0
-    // фон артифактов ARTIFACT 0
-
-    // название монстра
-    sprintf(str, "Recrut %s", monster->descriptions);
-    rectCur.x = rectBack.x + 160;
-    rectCur.y = rectBack.y + 25;
-    rectCur.w = GetLengthText(str, FONT_BIG);
-    rectCur.h = FONT_HEIGHTBIG;
-    rectCur.x = rectCur.x - rectCur.w / 2;
-    PrintText(video, &rectCur, str, FONT_BIG);
-
-    // картинка монстра
-    char number[5];
-    Uint8 j;
-    sprintf(number, "%4d", emonster);
-    for(j = 0; j < 4; j++)
-        if(0 == strncmp(&number[j], " ", 1)) number[j] = '0';
-    sprintf(str, "MONH%4s.ICN", number);
-    FillSPRITE(&sprite, str, 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 50;
-    rectCur.y = rectBack.y + 45;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // text number to buy
-    sprintf(str, "Number to buy:");
-    rectCur.x = rectBack.x + 30;
-    rectCur.y = rectBack.y + 163;
-    rectCur.w = GetLengthText(str, FONT_SMALL);
+    message = GetStringMoat();
+    rectCur.x = cx + 370;
+    rectCur.y = cy + 445;
+    rectCur.x = rectCur.x - strlen(message) * FONT_WIDTHSMALL / 2;
+    rectCur.y = rectCur.y + 1;
+    rectCur.w = FONT_WIDTHSMALL * strlen(message);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, str, FONT_SMALL);
+    PrintText(video, &rectCur, message, FONT_SMALL);
 
-
-    // рисуем кнопки
-    // кнопка Dismiss
-    FillSPRITE(&sprite, "HSBTNS.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx + 5;
-    rectCur.y = cy + 318;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "HSBTNS.ICN", 0);
-    FillSPRITE(&action.objectPush, "HSBTNS.ICN", 1);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionHeroesInfoPressDismiss;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    // кнопка Exit
-    FillSPRITE(&sprite, "HSBTNS.ICN", 2);
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx + 603;
-    rectCur.y = cy + 318;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "HSBTNS.ICN", 2);
-    FillSPRITE(&action.objectPush, "HSBTNS.ICN", 3);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionHeroesInfoPressExit;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-*/
     // Отрисовка диалога
     CursorOn();
 
@@ -462,11 +1668,6 @@ ACTION ShowCastleInfo(void){
     CursorOn();
 
     return NONE;
-}
-
-ACTION ActionCastleInfoPressExit(void){
-
-    return CANCEL;
 }
 
 ACTION ActionCASTLEINFOLOOP(INTERFACEACTION *action){

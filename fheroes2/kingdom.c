@@ -175,6 +175,12 @@ void    RecalculateKingdomDay(E_COLORS color){
 	else
 	    kingdom[color].gold += GOLD_TOWN_DAY;
 
+	if(castle->building & BUILD_STATUE)
+	    kingdom[color].gold += GOLD_STATUE_DAY;
+	
+	if(WARLOCK == castle->race && castle->building & BUILD_SPEC)
+	    kingdom[color].gold += GOLD_DUNGEON_DAY;
+
 	castle = GetNextCastle(color);
     }
 
@@ -196,4 +202,12 @@ void    RecalculateKingdomDay(E_COLORS color){
     // ENDLESS_POUCH_CRYSTAL	+1 crystal
     // TAX_LIEN			-250 gold
 
+    kingdom[color].allowBuild = TRUE;
+}
+
+BOOL KingdomAllowBuild(E_COLORS color){
+
+    if(! kingdom) return FALSE;
+    
+    return kingdom[color].allowBuild;
 }

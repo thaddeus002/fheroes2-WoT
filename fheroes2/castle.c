@@ -305,6 +305,8 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
     else
         ptrCastle[countCastle].allowCastle = TRUE;
 
+    ptrCastle[countCastle].boat = FALSE;
+
     if(ax < 2) ptrCastle[countCastle].pos.x = 0; else ptrCastle[countCastle].pos.x = ax - 2;
     if(ay < 3) ptrCastle[countCastle].pos.y = 0; else ptrCastle[countCastle].pos.y = ay - 3;
 
@@ -2179,6 +2181,11 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
 }
 
+BOOL CastleNearOcean(const S_CASTLE * castle){
+
+    return FALSE;
+}
+
 BOOL CastleDwellingUpgradable(const S_CASTLE *castle, E_DWELLINGCASTLE level){
 
     switch(castle->race){
@@ -2228,3 +2235,830 @@ BOOL CastleDwellingUpgradable(const S_CASTLE *castle, E_DWELLINGCASTLE level){
 
     return FALSE;
 }
+
+BUILDACTION AllowBuildCastle(const S_CASTLE *castle){
+
+    if(castle->castle) return ALREADY_BUILD;
+    if(! castle->allowCastle) return CANNOT_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+    
+    if(BUILD_CASTLE_GOLD <= kingdom->gold && BUILD_CASTLE_WOOD <= kingdom->wood && BUILD_CASTLE_ORE <= kingdom->ore) return BUILD_OK;
+    
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildMageGuild(const S_CASTLE *castle){
+
+    if(5 == castle->magicTower) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+    
+    switch(castle->magicTower){
+	case 0:
+	    if(	BUILD_MAGEGUILD1_GOLD <= kingdom->gold &&
+		BUILD_MAGEGUILD1_WOOD <= kingdom->wood &&
+		BUILD_MAGEGUILD1_ORE <= kingdom->ore ) return BUILD_OK;
+	    break;
+	case 1:
+	    if(	BUILD_MAGEGUILD2_GOLD <= kingdom->gold &&
+		BUILD_MAGEGUILD2_WOOD <= kingdom->wood &&
+		BUILD_MAGEGUILD2_ORE <= kingdom->ore  &&
+		BUILD_MAGEGUILD2_CRYSTAL <= kingdom->crystal &&
+		BUILD_MAGEGUILD2_GEMS <= kingdom->gems &&
+		BUILD_MAGEGUILD2_MERCURY <= kingdom->mercury &&
+		BUILD_MAGEGUILD2_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    break;
+	case 2:
+	    if(	BUILD_MAGEGUILD3_GOLD <= kingdom->gold &&
+		BUILD_MAGEGUILD3_WOOD <= kingdom->wood &&
+		BUILD_MAGEGUILD3_ORE <= kingdom->ore  &&
+		BUILD_MAGEGUILD3_CRYSTAL <= kingdom->crystal &&
+		BUILD_MAGEGUILD3_GEMS <= kingdom->gems &&
+		BUILD_MAGEGUILD3_MERCURY <= kingdom->mercury &&
+		BUILD_MAGEGUILD3_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    break;
+	case 3:
+	    if(	BUILD_MAGEGUILD4_GOLD <= kingdom->gold &&
+		BUILD_MAGEGUILD4_WOOD <= kingdom->wood &&
+		BUILD_MAGEGUILD4_ORE <= kingdom->ore  &&
+		BUILD_MAGEGUILD4_CRYSTAL <= kingdom->crystal &&
+		BUILD_MAGEGUILD4_GEMS <= kingdom->gems &&
+		BUILD_MAGEGUILD4_MERCURY <= kingdom->mercury &&
+		BUILD_MAGEGUILD4_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    break;
+	case 4:
+	    if(	BUILD_MAGEGUILD5_GOLD <= kingdom->gold &&
+		BUILD_MAGEGUILD5_WOOD <= kingdom->wood &&
+		BUILD_MAGEGUILD5_ORE <= kingdom->ore  &&
+		BUILD_MAGEGUILD5_CRYSTAL <= kingdom->crystal &&
+		BUILD_MAGEGUILD5_GEMS <= kingdom->gems &&
+		BUILD_MAGEGUILD5_MERCURY <= kingdom->mercury &&
+		BUILD_MAGEGUILD5_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    break;
+	case 5:
+	    if(5 == castle->magicTower) return ALREADY_BUILD;
+	    break;
+	default:
+	    break;
+    }
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildTavern(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_TAVERN) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_TAVERN <= kingdom->gold && BUILD_TAVERN_WOOD <= kingdom->wood) return BUILD_OK;
+    
+    return CANNOT_BUILD;
+}
+
+
+BUILDACTION AllowBuildThievesGuild(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_THIEVEGUILD) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_THIEVESGUILD_GOLD <= kingdom->gold && BUILD_THIEVESGUILD_WOOD <= kingdom->wood) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildShipyard(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_SHIPYARD) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_SHIPYARD_GOLD <= kingdom->gold && BUILD_SHIPYARD_WOOD <= kingdom->wood && CastleNearOcean(castle)) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+BUILDACTION AllowBuildStatue(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_STATUE) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_STATUE_GOLD <= kingdom->gold && BUILD_STATUE_ORE <= kingdom->ore) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildMarketplace(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_MARKETPLACE) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_MARKETPLACE_GOLD <= kingdom->gold && BUILD_MARKETPLACE_WOOD <= kingdom->wood) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildWell(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_WELL) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_WELL_GOLD <= kingdom->gold) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildMoat(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_MOAT) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_MOAT_GOLD <= kingdom->gold) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildLeftTurret(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_LEFTTURRET) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_LEFTTURRET_GOLD <= kingdom->gold && BUILD_LEFTTURRET_ORE <= kingdom->ore) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildRightTurret(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_RIGHTTURRET) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_RIGHTTURRET_GOLD <= kingdom->gold && BUILD_RIGHTTURRET_ORE <= kingdom->ore) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildCaptain(const S_CASTLE *castle){
+
+    if(castle->capitan) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_CAPTAIN_GOLD <= kingdom->gold) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildBoat(const S_CASTLE *castle){
+
+    if(castle->boat) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_BOAT_GOLD <= kingdom->gold && BUILD_BOAT_WOOD <= kingdom->wood) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildWel2(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_WEL2) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(BUILD_WEL2_GOLD <= kingdom->gold) return BUILD_OK;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildSpec(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_SPEC) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    switch(castle->race){
+    
+	case KNIGHT:
+	    if( BUILD_FORTIFICATION_GOLD <= kingdom->gold &&
+		BUILD_FORTIFICATION_ORE <= kingdom->ore &&
+		BUILD_FORTIFICATION_WOOD <= kingdom->wood ) return BUILD_OK;
+	    break;
+	
+	case BARBARIAN:
+	    if( BUILD_COLISEUM_GOLD <= kingdom->gold &&
+		BUILD_COLISEUM_WOOD <= kingdom->wood &&
+		BUILD_COLISEUM_ORE <= kingdom->ore ) return BUILD_OK;
+	    break;
+	    
+	case NECROMANCER:
+	    if(	BUILD_STORM_GOLD <= kingdom->gold &&
+		BUILD_STORM_MERCURY <= kingdom->mercury &&
+		BUILD_STORM_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    break;
+	
+	case SORCERESS:
+	    if(	BUILD_RAINBOW_GOLD <= kingdom->gold &&
+		BUILD_RAINBOW_CRYSTAL <= kingdom->crystal ) return BUILD_OK;
+	    break;
+	
+	case WARLOCK:
+	    if(	BUILD_DUNGEON_GOLD <= kingdom->gold &&
+		BUILD_DUNGEON_ORE <= kingdom->ore &&
+		BUILD_DUNGEON_WOOD <= kingdom->wood ) return BUILD_OK;
+	    break;
+	
+	case WIZARD:
+	    if(	BUIILD_LIBRARY_GOLD <= kingdom->gold &&
+		BUIILD_LIBRARY_WOOD <=kingdom->wood &&
+		BUIILD_LIBRARY_ORE <= kingdom->ore &&
+		BUIILD_LIBRARY_CRYSTAL <= kingdom->crystal &&
+		BUIILD_LIBRARY_GEMS <= kingdom->gems &&
+		BUIILD_LIBRARY_MERCURY <= kingdom->mercury &&
+		BUIILD_LIBRARY_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    break;
+	
+	default:
+	    break;
+    }	
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildDwelling1(const S_CASTLE *castle){
+
+    if(castle->dwelling & DWELLING_MONSTER1) return ALREADY_BUILD;
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    if(BUILD_THATCHEDHUT_GOLD <= kingdom->gold) return BUILD_OK;
+	    break;
+	    
+	case BARBARIAN:
+	    if(BUILD_HUT_GOLD <= kingdom->gold) return BUILD_OK;
+	    break;
+	    
+	case NECROMANCER:
+	    if(	BUILD_EXCAVATION_GOLD <= kingdom->gold) return BUILD_OK;
+	    break;
+	    
+	case SORCERESS:
+	    if(	BUILD_TREEHOUSE_GOLD <= kingdom->gold &&
+		BUILD_TREEHOUSE_WOOD <= kingdom->wood ) return BUILD_OK;
+	    break;
+
+	case WIZARD:
+	    if(BUILD_HABITAT_GOLD <= kingdom->gold) return BUILD_OK;
+	    break;
+	
+	case WARLOCK:
+	    if(BUILD_CAVE_GOLD <= kingdom->gold) return BUILD_OK;
+	    break;
+	
+	default:
+	    break;
+
+    }
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildDwelling2(const S_CASTLE *castle){
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(castle->dwelling & DWELLING_UPGRADE2) return ALREADY_BUILD;
+
+    if(! (castle->dwelling & DWELLING_MONSTER2))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( BUILD_ARCHERYRANGE_GOLD <= kingdom->gold &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( BUILD_STICKHUT_GOLD <= kingdom->gold &&
+		    BUILD_STICKHUT_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	    
+	    case NECROMANCER:
+		if( BUILD_GRAVEYARD_GOLD <= kingdom->gold &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( BUILD_COTTAGE_GOLD <= kingdom->gold &&
+		    BUILD_COTTAGE_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER1  &&
+		    castle->building & BUILD_TAVERN ) return BUILD_OK;
+		break;
+
+	    case WIZARD:
+		if( BUILD_PEN_GOLD <= kingdom->gold &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	
+	    case WARLOCK:
+		if( BUILD_CRYPT_GOLD <= kingdom->gold &&
+		    BUILD_CRYPT_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	
+	    default:
+		break;
+	}
+
+    else if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( UPGRADE_ARCHERYRANGE_GOLD <= kingdom->gold &&
+		    UPGRADE_ARCHERYRANGE_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( UPGRADE_STICKHUT_GOLD <= kingdom->gold &&
+		    UPGRADE_STICKHUT_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+	    
+	    case NECROMANCER:
+		if( UPGRADE_GRAVEYARD_GOLD <= kingdom->gold ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( UPGRADE_COTTAGE_GOLD <= kingdom->gold &&
+		    UPGRADE_COTTAGE_WOOD <= kingdom->wood &&
+		    castle->building & BUILD_WELL ) return BUILD_OK;
+		break;
+
+	    default:
+		break;
+	}
+
+    else return ALREADY_BUILD;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildDwelling3(const S_CASTLE *castle){
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(castle->dwelling & DWELLING_UPGRADE3) return ALREADY_BUILD;
+
+    if(! (castle->dwelling & DWELLING_MONSTER3))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( BUILD_BLACKSMITH_GOLD <= kingdom->gold &&
+		    BUILD_BLACKSMITH_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER1 &&
+		    castle->building & BUILD_WELL ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( BUILD_DEN_GOLD <= kingdom->gold &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	    
+	    case NECROMANCER:
+		if( BUILD_NECPYRAMID_GOLD <= kingdom->gold &&
+		    BUILD_NECPYRAMID_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( BUILD_ELVESRANGE_GOLD <= kingdom->gold &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+
+	    case WIZARD:
+		if( BUILD_FOUNDRY_GOLD <= kingdom->gold &&
+		    BUILD_FOUNDRY_WOOD <= kingdom->wood &&
+		    BUILD_FOUNDRY_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	
+	    case WARLOCK:
+		if( BUILD_NEST_GOLD <= kingdom->gold &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	
+	    default:
+		break;
+	}
+
+    else if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( UPGRADE_BLACKSMITH_GOLD <= kingdom->gold &&
+		    UPGRADE_BLACKSMITH_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+	    
+	    case NECROMANCER:
+		if( UPGRADE_NECPYRAMID_GOLD <= kingdom->gold &&
+		    UPGRADE_NECPYRAMID_ORE <= kingdom->ore ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( UPGRADE_ELVESRANGE_GOLD <= kingdom->gold &&
+		    UPGRADE_ELVESRANGE_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+
+	    case WIZARD:
+		if( UPGRADE_FOUNDRY_GOLD <= kingdom->gold &&
+		    UPGRADE_FOUNDRY_MERCURY <= kingdom->mercury &&
+		    castle->building & BUILD_WELL ) return BUILD_OK;
+		break;
+
+	    default:
+		break;
+	}
+
+    else return ALREADY_BUILD;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildDwelling4(const S_CASTLE *castle){
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(castle->dwelling & DWELLING_UPGRADE4) return ALREADY_BUILD;
+
+    if(! (castle->dwelling & DWELLING_MONSTER4))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( BUILD_ARMORY_GOLD <= kingdom->gold &&
+		    BUILD_ARMORY_ORE <= kingdom->ore &&
+		    BUILD_ARMORY_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER1 &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->building & BUILD_TAVERN ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( BUILD_ADOBE_GOLD <= kingdom->gold &&
+		    BUILD_ADOBE_WOOD <= kingdom->wood &&
+		    BUILD_ADOBE_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
+		break;
+	    
+	    case NECROMANCER:
+		if( BUILD_MANSION_GOLD <= kingdom->gold &&
+		    BUILD_MANSION_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->building & BUILD_THIEVEGUILD ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( BUILD_STONEHENGE_GOLD <= kingdom->gold &&
+		    BUILD_STONEHENGE_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->magicTower ) return BUILD_OK;
+		break;
+
+	    case WIZARD:
+		if( BUILD_CLIFFNEST_GOLD <= kingdom->gold &&
+		    BUILD_CLIFFNEST_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER2 ) return BUILD_OK;
+		break;
+	
+	    case WARLOCK:
+		if( BUILD_MAZE_GOLD <= kingdom->gold &&
+		    BUILD_MAZE_GEMS <= kingdom->gems &&
+		    castle->dwelling & DWELLING_MONSTER2 ) return BUILD_OK;
+		break;
+	
+	    default:
+		break;
+	}
+
+    else if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( UPGRADE_ARMORY_GOLD <= kingdom->gold &&
+		    UPGRADE_ARMORY_WOOD <= kingdom->wood &&
+		    UPGRADE_ARMORY_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->dwelling & DWELLING_MONSTER3 ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( UPGRADE_ADOBE_GOLD <= kingdom->gold &&
+		    UPGRADE_ADOBE_WOOD <= kingdom->wood &&
+		    UPGRADE_ADOBE_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->dwelling & DWELLING_MONSTER3 ) return BUILD_OK;
+		break;
+
+	    case NECROMANCER:
+		if( UPGRADE_MANSION_GOLD <= kingdom->gold &&
+		    UPGRADE_MANSION_WOOD <= kingdom->wood &&
+		    UPGRADE_MANSION_CRYSTAL <= kingdom->crystal &&
+		    UPGRADE_MANSION_GEMS <= kingdom->gems ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( UPGRADE_STONEHENGE_GOLD <= kingdom->gold &&
+		    UPGRADE_STONEHENGE_MERCURY <= kingdom->mercury ) return BUILD_OK;
+		break;
+
+	    case WARLOCK:
+		if( UPGRADE_MAZE_GOLD <= kingdom->gold &&
+		    UPGRADE_MAZE_GEMS <= kingdom->gems ) return BUILD_OK;
+		break;
+
+	    default:
+		break;
+	}
+
+    else return ALREADY_BUILD;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if(castle->dwelling & DWELLING_UPGRADE5) return ALREADY_BUILD;
+
+    if(! (castle->dwelling & DWELLING_MONSTER5))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( BUILD_ARENA_GOLD <= kingdom->gold &&
+		    BUILD_ARENA_WOOD <= kingdom->wood &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( BUILD_BRIDGE_GOLD <= kingdom->gold &&
+		    BUILD_BRIDGE_ORE <= kingdom->ore &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+
+	    case NECROMANCER:
+		if( BUILD_MAUSOLEUM_GOLD <= kingdom->gold &&
+		    BUILD_MAUSOLEUM_WOOD <= kingdom->wood &&
+		    BUILD_MAUSOLEUM_SULFUR <= kingdom->sulfur &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->magicTower ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( BUILD_FENCED_GOLD <= kingdom->gold &&
+		    BUILD_FENCED_WOOD <= kingdom->wood &&
+		    BUILD_FENCED_GEMS <= kingdom->gems &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+
+	    case WIZARD:
+		if( BUILD_IVORYTOWER_GOLD <= kingdom->gold &&
+		    BUILD_IVORYTOWER_WOOD <= kingdom->wood &&
+		    BUILD_IVORYTOWER_ORE <= kingdom->ore &&
+		    BUILD_IVORYTOWER_CRYSTAL <= kingdom->crystal &&
+		    BUILD_IVORYTOWER_SULFUR <= kingdom->sulfur &&
+		    BUILD_IVORYTOWER_MERCURY <= kingdom->mercury &&
+		    BUILD_IVORYTOWER_GEMS <= kingdom->gems &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->magicTower ) return BUILD_OK;
+		break;
+	
+	    case WARLOCK:
+		if( BUILD_SWAMP_GOLD <= kingdom->gold &&
+		    BUILD_SWAMP_SULFUR <= kingdom->sulfur &&
+		    castle->dwelling & DWELLING_MONSTER3 ) return BUILD_OK;
+		break;
+	
+	    default:
+		break;
+	}
+
+    else if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( UPGRADE_ARENA_GOLD <= kingdom->gold &&
+		    UPGRADE_ARENA_WOOD <= kingdom->wood ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( UPGRADE_BRIDGE_GOLD <= kingdom->gold &&
+		    UPGRADE_BRIDGE_ORE <= kingdom->ore ) return BUILD_OK;
+		break;
+
+	    case NECROMANCER:
+		if( UPGRADE_MAUSOLEUM_GOLD <= kingdom->gold &&
+		    UPGRADE_MAUSOLEUM_ORE <= kingdom->ore &&
+		    UPGRADE_MAUSOLEUM_CRYSTAL <= kingdom->crystal &&
+		    castle->magicTower > 1) return BUILD_OK;
+		break;
+
+	    case WIZARD:
+		if( UPGRADE_IVORYTOWER_GOLD <= kingdom->gold &&
+		    UPGRADE_IVORYTOWER_WOOD <= kingdom->wood &&
+		    UPGRADE_IVORYTOWER_ORE <= kingdom->ore &&
+		    castle->building & BUILD_SPEC ) return BUILD_OK;
+		break;
+
+	    default:
+		break;
+	}
+
+    else return ALREADY_BUILD;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowBuildDwelling6(const S_CASTLE *castle){
+
+    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+
+    if(! kingdom->allowBuild) return END_TUR;
+
+    if((castle->race != WARLOCK && castle->dwelling & DWELLING_UPGRADE6) || castle->dwelling & DWELLING_UPGRADE7) return ALREADY_BUILD;
+
+    if(! (castle->dwelling & DWELLING_MONSTER6))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( BUILD_CATHEDRAL_GOLD <= kingdom->gold &&
+		    BUILD_CATHEDRAL_WOOD <= kingdom->wood &&
+		    BUILD_CATHEDRAL_CRYSTAL <= kingdom->crystal &&
+		    castle->dwelling & DWELLING_MONSTER2 &&
+		    castle->dwelling & DWELLING_MONSTER3 &&
+		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
+		break;
+	    
+	    case BARBARIAN:
+		if( BUILD_PYRAMID_GOLD <= kingdom->gold &&
+		    BUILD_PYRAMID_ORE <= kingdom->ore &&
+		    BUILD_PYRAMID_CRYSTAL <= kingdom->crystal &&
+		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
+		break;
+
+	    case NECROMANCER:
+		if( BUILD_LABORATORY_GOLD <= kingdom->gold &&
+		    BUILD_LABORATORY_WOOD <= kingdom->wood &&
+		    BUILD_LABORATORY_ORE <= kingdom->ore &&
+		    BUILD_LABORATORY_SULFUR <= kingdom->sulfur &&
+		    BUILD_LABORATORY_CRYSTAL <= kingdom->crystal &&
+		    BUILD_LABORATORY_MERCURY <= kingdom->mercury &&
+		    BUILD_LABORATORY_GEMS <= kingdom->gems &&
+		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
+		break;
+	    
+	    case SORCERESS:
+		if( BUILD_REDTOWER_GOLD <= kingdom->gold &&
+		    BUILD_REDTOWER_ORE <= kingdom->ore &&
+		    BUILD_REDTOWER_MERCURY <= kingdom->mercury &&
+		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
+		break;
+
+	    case WIZARD:
+		if( BUILD_CLOUDCASTLE_GOLD <= kingdom->gold &&
+		    BUILD_CLOUDCASTLE_WOOD <= kingdom->wood &&
+		    BUILD_CLOUDCASTLE_ORE <= kingdom->ore &&
+		    BUILD_CLOUDCASTLE_GEMS <= kingdom->gems &&
+		    castle->dwelling & DWELLING_MONSTER4 &&
+		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
+		break;
+
+	    case WARLOCK:
+		if( BUILD_GREENDRAGON_GOLD <= kingdom->gold &&
+		    BUILD_GREENDRAGON_ORE <= kingdom->ore &&
+		    BUILD_GREENDRAGON_SULFUR <= kingdom->sulfur &&
+		    castle->dwelling & DWELLING_MONSTER4 &&
+		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
+		break;
+	
+	    default:
+		break;
+	}
+
+    else if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
+
+	switch(castle->race){
+
+	    case WARLOCK:
+		if( UPGRADE_BLACKDRAGON_GOLD <= kingdom->gold &&
+		    UPGRADE_BLACKDRAGON_ORE <= kingdom->ore &&
+	    	    UPGRADE_BLACKDRAGON_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+		break;
+
+
+	    default:
+		break;
+	}
+
+    else if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
+
+	switch(castle->race){
+
+	    case KNIGHT:
+		if( UPGRADE_CATHEDRAL_GOLD <= kingdom->gold &&
+		    UPGRADE_CATHEDRAL_WOOD <= kingdom->wood &&
+		    UPGRADE_CATHEDRAL_CRYSTAL <= kingdom->crystal) return BUILD_OK;
+		break;
+	    
+	    case WIZARD:
+		if( UPGRADE_CLOUDCASTLE_GOLD <= kingdom->gold &&
+		    UPGRADE_CLOUDCASTLE_WOOD <= kingdom->wood &&
+		    UPGRADE_CLOUDCASTLE_ORE <= kingdom->ore &&
+	    	    UPGRADE_CLOUDCASTLE_GEMS <= kingdom->gems ) return BUILD_OK;
+		break;
+
+	    case WARLOCK:
+		if( UPGRADE_REDDRAGON_GOLD <= kingdom->gold &&
+		    UPGRADE_REDDRAGON_ORE <= kingdom->ore &&
+	    	    UPGRADE_REDDRAGON_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+		break;
+
+
+	    default:
+		break;
+	}
+
+    else return ALREADY_BUILD;
+
+    return CANNOT_BUILD;
+}
+
