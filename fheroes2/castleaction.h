@@ -91,6 +91,7 @@ ACTION ActionCastleOverDwelling3(void);
 ACTION ActionCastleOverDwelling4(void);
 ACTION ActionCastleOverDwelling5(void);
 ACTION ActionCastleOverDwelling6(void);
+ACTION ActionCastleOverCaptain(void);
 
 ACTION ActionCastleClickExit(void);
 ACTION ActionCastleClickTavern(void);
@@ -111,5 +112,6 @@ ACTION ActionCastleClickDwelling3(void);
 ACTION ActionCastleClickDwelling4(void);
 ACTION ActionCastleClickDwelling5(void);
 ACTION ActionCastleClickDwelling6(void);
+ACTION ActionCastleClickCaptain(void);
 
 #endif

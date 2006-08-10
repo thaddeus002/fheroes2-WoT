@@ -55,9 +55,9 @@ ACTION ActionOverCastle(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -74,9 +74,9 @@ ACTION ActionOverCaptain(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -93,9 +93,9 @@ ACTION ActionOverStatue(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -112,9 +112,9 @@ ACTION ActionOverMarketplace(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -131,9 +131,9 @@ ACTION ActionOverMoat(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -150,9 +150,9 @@ ACTION ActionOverDock(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -169,9 +169,9 @@ ACTION ActionOverWell(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -188,9 +188,9 @@ ACTION ActionOverTavern(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -207,9 +207,9 @@ ACTION ActionOverThievesGuild(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -226,9 +226,9 @@ ACTION ActionOverMageGuild(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -248,9 +248,9 @@ ACTION ActionOverSpec(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -271,9 +271,9 @@ ACTION ActionOverWel2(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -315,9 +315,9 @@ ACTION ActionOverDwelling1(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(monster->descriptions, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.w = GetLengthText(monster->descriptions, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, monster->descriptions, FONT_BIG);
 
@@ -371,9 +371,9 @@ ACTION ActionOverDwelling2(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(monster->descriptions, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.w = GetLengthText(monster->descriptions, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, monster->descriptions, FONT_BIG);
 
@@ -427,9 +427,9 @@ ACTION ActionOverDwelling3(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(monster->descriptions, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.w = GetLengthText(monster->descriptions, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, monster->descriptions, FONT_BIG);
 
@@ -486,9 +486,9 @@ ACTION ActionOverDwelling4(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(monster->descriptions, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.w = GetLengthText(monster->descriptions, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, monster->descriptions, FONT_BIG);
 
@@ -542,9 +542,9 @@ ACTION ActionOverDwelling5(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(monster->descriptions, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.w = GetLengthText(monster->descriptions, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, monster->descriptions, FONT_BIG);
 
@@ -597,9 +597,9 @@ ACTION ActionOverDwelling6(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(monster->descriptions) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(monster->descriptions, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    cur.w = GetLengthText(monster->descriptions, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, monster->descriptions, FONT_BIG);
 
@@ -619,12 +619,12 @@ ACTION ActionOverExit(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
-                
+
     return NONE;
 }               
                     
@@ -638,9 +638,9 @@ ACTION ActionOverHeroes(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -828,9 +828,9 @@ ACTION ActionCastleOverExit(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
                 
@@ -872,9 +872,9 @@ ACTION ActionCastleOverTavern(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -911,9 +911,9 @@ ACTION ActionCastleOverStatue(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -950,9 +950,9 @@ ACTION ActionCastleOverWell(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -989,9 +989,9 @@ ACTION ActionCastleOverMoat(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1028,9 +1028,9 @@ ACTION ActionCastleOverMarketplace(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1067,9 +1067,9 @@ ACTION ActionCastleOverThievesGuild(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1106,9 +1106,9 @@ ACTION ActionCastleOverLeftTurret(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1145,9 +1145,9 @@ ACTION ActionCastleOverRightTurret(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1184,9 +1184,9 @@ ACTION ActionCastleOverMageGuild(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1223,9 +1223,9 @@ ACTION ActionCastleOverShipyard(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1262,9 +1262,9 @@ ACTION ActionCastleOverWel2(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1301,9 +1301,9 @@ ACTION ActionCastleOverSpec(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1340,9 +1340,9 @@ ACTION ActionCastleOverDwelling1(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1385,9 +1385,9 @@ ACTION ActionCastleOverDwelling2(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1429,9 +1429,9 @@ ACTION ActionCastleOverDwelling3(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1473,9 +1473,9 @@ ACTION ActionCastleOverDwelling4(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1517,9 +1517,9 @@ ACTION ActionCastleOverDwelling5(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
@@ -1571,15 +1571,54 @@ ACTION ActionCastleOverDwelling6(void){
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
     
-    cur.x = cur.x - strlen(message) * FONT_WIDTHBIG / 2;
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
     cur.y = cur.y - 3;
-    cur.w = FONT_WIDTHBIG * strlen(message);
+    cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
 
     return NONE;
 }
 
+ACTION ActionCastleOverCaptain(void){
+    
+    const char *message = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    switch(AllowBuildCaptain(castle)){
+
+	case BUILD_OK:
+	    message = "Cannot build. Already build here this turn.";
+//	    message = "Build Captains Quarters";
+	    break;
+	
+	case CANNOT_BUILD:
+	    message = "Cannot build Captains Quarters";
+	    break;
+	
+	case ALREADY_BUILD:
+	    message = "Captains Quarters is already build";
+	    break;
+	
+	case END_TUR:
+	    message = "Cannot build. Already build here this turn.";
+	    break;
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
+    cur.y = cur.y - 3;
+    cur.w = GetLengthText(message, FONT_BIG);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
 
 ACTION ActionCastleClickTavern(void){
 
@@ -1643,30 +1682,42 @@ ACTION ActionCastleClickSpec(void){
 
 ACTION ActionCastleClickDwelling1(void){
 
+    fprintf(stderr, "buy dwelling1\n");
     return NONE;
 }
 
 ACTION ActionCastleClickDwelling2(void){
 
+    fprintf(stderr, "buy dwelling2\n");
     return NONE;
 }
 
 ACTION ActionCastleClickDwelling3(void){
 
+    fprintf(stderr, "buy dwelling3\n");
     return NONE;
 }
 
 ACTION ActionCastleClickDwelling4(void){
 
+    fprintf(stderr, "buy dwelling4\n");
     return NONE;
 }
 
 ACTION ActionCastleClickDwelling5(void){
 
+    fprintf(stderr, "buy dwelling5\n");
     return NONE;
 }
 
 ACTION ActionCastleClickDwelling6(void){
 
+    fprintf(stderr, "buy dwelling6\n");
+    return NONE;
+}
+
+ACTION ActionCastleClickCaptain(void){
+
+    fprintf(stderr, "buy captain\n");
     return NONE;
 }

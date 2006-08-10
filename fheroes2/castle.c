@@ -306,6 +306,7 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
         ptrCastle[countCastle].allowCastle = TRUE;
 
     ptrCastle[countCastle].boat = FALSE;
+    ptrCastle[countCastle].af = SPREAD;
 
     if(ax < 2) ptrCastle[countCastle].pos.x = 0; else ptrCastle[countCastle].pos.x = ax - 2;
     if(ay < 3) ptrCastle[countCastle].pos.y = 0; else ptrCastle[countCastle].pos.y = ay - 3;

@@ -307,6 +307,7 @@ typedef struct {
     Uint16	monster[CASTLEMAXMONSTER];
     S_ARMY	army[CASTLEMAXARMY];
     BOOL	capitan;
+    E_ARMYFORMAT    af;                             // army format
     BOOL	castle;
     BOOL	allowCastle;
     BOOL	boat;

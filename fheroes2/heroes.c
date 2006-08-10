@@ -907,7 +907,7 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     // наименование
     rect.x = rectBack.x + 120;
     rect.y = rectBack.y + 35;
-    rect.w = FONT_WIDTHBIG * strlen(monster->descriptions);
+    rect.w = GetLengthText(monster->descriptions, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     PrintText(video, &rect, monster->descriptions, FONT_BIG);
 
@@ -916,7 +916,7 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     sprintf(message, "%5d", army->count);
     rect.x = rectBack.x + 120;
     rect.y = rectBack.y + 224;
-    rect.w = FONT_WIDTHBIG * strlen(message);
+    rect.w = GetLengthText(message, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
     PrintText(video, &rect, message, FONT_BIG);
 
@@ -1070,4 +1070,14 @@ ACTION	ActionMonsterInfoDismiss(void){
 ACTION	ActionMonsterInfoExit(void){
 
     return CANCEL;
+}
+
+E_NAMEHEROES    GetRecrutPrimaryHeroes(void){
+
+    return ROLAND;
+}
+
+E_NAMEHEROES    GetRecrutSecondaryHeroes(void){
+
+    return ARCHIBALD;
 }

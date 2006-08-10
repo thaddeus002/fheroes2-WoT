@@ -287,13 +287,12 @@ Uint16 GetLengthText(const char *string, ENUMFONT font){
 		FillSPRITE(&sprite, "SMALFONT.ICN", *string - FONT_LETTER_BEGIN);
 
 	    letter = GetICNSprite(&sprite);
-	    result += letter->w;
 
+	    result += letter->w;
 	}
 
 	++string;
     }
-    
     return result;
 }
 

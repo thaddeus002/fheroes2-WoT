@@ -149,11 +149,6 @@ typedef enum {
 
 	    } E_NAMEHEROES;
 
-typedef enum {
-		SPREAD,
-		GROUPED
-	    } E_ARMYFORMAT;
-
 typedef struct {
 		E_SKILL		type;
 		E_LEVELSKILL	level;
@@ -204,5 +199,8 @@ ACTION		ShowArmyInfo(S_ARMY *, S_HEROES *);
 
 const char *	HeroesBigNamePortrait(E_NAMEHEROES);
 const char *	CapitanBigNamePortrait(E_RACE);
+
+E_NAMEHEROES	GetRecrutPrimaryHeroes(void);
+E_NAMEHEROES	GetRecrutSecondaryHeroes(void);
 
 #endif

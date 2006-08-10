@@ -3336,27 +3336,29 @@ void ClickCursorAreaAction(E_OBJECT f){
 ACTION ActionGAMELOOP(void){
 
     Uint8 i; 
+    Uint32 cursor;
+    
     ACTION exit = ENDTUR;
 
     while(1){
     
-	// ход оппонентов по цветам
-	for(i = 0; i < 8; ++i) 
-    	    if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
-		// ход humans
-		if(GetIntValue(HUMANCOLORS) == i){
-		    while(! (ENDTUR == (exit = ActionHUMANLOOP(stpemaindisplay)) || 
-		             EXIT == exit || 
-		             (ESC == exit && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
-
-		    if(ESC == exit) exit = EXIT;
-
-		}// ход computers
-		else if(ENDTUR == exit)
-		    ComputerStep(i);
-	    }
+	// ход humans
+	while(! (ENDTUR == (exit = ActionHUMANLOOP(stpemaindisplay)) || 
+		EXIT == exit || 
+		(ESC == exit && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
 
 	if(EXIT == exit || ESC == exit) break;
+
+	CursorOff();
+	cursor = GetCursor();
+	SetCursor(CURSOR_WAIT);
+	CursorOn();
+
+	// ход оппонентов по цветам
+	for(i = 0; i < 8; ++i) 
+    	    if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01)
+		if(GetIntValue(HUMANCOLORS) != i && ENDTUR == exit)
+		    ComputerStep(i);
 
 	// расчет даты
 	if(7 == GetIntValue(DAY)){
@@ -3381,6 +3383,10 @@ ACTION ActionGAMELOOP(void){
 	// расчет хода для героев
 	
 	if(GetIntValue(DEBUG)) fprintf(stderr, "Month: %d, Week: %d, Day: %d\n", GetIntValue(MONTH), GetIntValue(WEEK), GetIntValue(DAY));
+
+	CursorOff();
+	SetCursor(cursor);
+	CursorOn();
     }
     
     return exit;

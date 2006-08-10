@@ -127,5 +127,10 @@ typedef enum {
                 MORALE_IRISH    = 3
                 
             } E_MORALE;
+
+typedef enum {
+                SPREAD,
+                GROUPED
+            } E_ARMYFORMAT;
                                                                                                                                                                                                             
 #endif
