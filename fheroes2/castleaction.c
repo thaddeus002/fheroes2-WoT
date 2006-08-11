@@ -1718,6 +1718,205 @@ ACTION ActionCastleClickDwelling6(void){
 
 ACTION ActionCastleClickCaptain(void){
 
-    fprintf(stderr, "buy captain\n");
+    const S_CASTLE *castle = GetCurrentCastle();
+    BuildingMessageBox(castle->race, BUILD_CAPTAIN, "The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.", BUILD_CAPTAIN_GOLD, 0, 0, 0, 0, 0, 0);
     return NONE;
+}
+
+ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text, Uint16 gold, Uint8 ore, Uint8 wood, Uint8 mercury, Uint8 crystal, Uint8 sulfur, Uint8 gems){
+
+    CursorOff();
+    SetIntValue(ANIM2, FALSE);
+    SetIntValue(ANIM3, FALSE);
+    
+    Uint32 cursor = GetCursor();
+    SDL_Surface *back, *image, *video;
+    SDL_Rect rectBack, rectCur;
+    ACTION result = NONE;
+    AGGSPRITE sprite;
+    Uint8 i;
+    
+    const char *buybuild = "BUYBUILD.ICN";
+    const char *system = "SYSTEM.ICN";
+    if(GetIntValue(EVILINTERFACE)){
+	buybuild = "BUYBUILE.ICN";
+	system = "SYSTEME.ICN";
+    }
+    
+    Uint16 height = 0;
+    Uint16 width = 0;
+    Uint8 count = 0;
+    Uint16 max = 0;
+    // получаем левый верхний спрайт
+    FillSPRITE(&sprite, buybuild, 4);
+    image = GetICNSprite(&sprite);
+    width += image->w;
+    // получаем правый верхний спрайт
+    FillSPRITE(&sprite, buybuild, 0);
+    width += image->w;
+    // вычисляем динамически высоту диалога
+	max += 57;	// высота картинки
+	max += 10;	// отступ
+	max += FONT_HEIGHTBIG * (GetLengthText(text, FONT_BIG) / (width - 30)) + 1;
+	max += 10;	// отступ
+    if(gold) count++;
+    if(ore) count++;
+    if(wood) count++;
+    if(mercury) count++;
+    if(crystal) count++;
+    if(sulfur) count++;
+    if(gems) count++;
+    if(count > 4) max += 80;	// две строки с ресурсом
+    else max += 40;
+
+    // получаем левый средний спрайт
+    FillSPRITE(&sprite, buybuild, 5);
+    image = GetICNSprite(&sprite);
+    // количество средних блоков
+    count = (max - height) / image->h + 1;
+    height = height + count * image->h;
+
+    // отрисовка диалога по центру экрана
+    video = SDL_GetVideoSurface();
+    rectBack.w = width;
+    rectBack.h = height;
+    // поправка на верхний и нижний
+    FillSPRITE(&sprite, buybuild, 4);
+    image = GetICNSprite(&sprite);
+    rectBack.h += image->h;
+    FillSPRITE(&sprite, buybuild, 6);
+    image = GetICNSprite(&sprite);
+    rectBack.h += image->h;
+    rectBack.x = (video->w - rectBack.w) / 2;
+    rectBack.y = (video->h - rectBack.h) / 2;
+
+    // сохраняем бакгроунд
+    if(NULL == (back = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
+	fprintf(stderr, "MessageBox: CreateRGBSurface failed: %s\n", SDL_GetError());
+	return EXIT;
+    }    
+
+    SDL_BlitSurface(video, &rectBack, back, NULL);
+
+    // получаем левый верхний спрайт
+    FillSPRITE(&sprite, buybuild, 4);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 1;
+    rectCur.y = rectBack.y;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // получаем левый средний спрайт
+    FillSPRITE(&sprite, buybuild, 5);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x;
+    rectCur.w = image->w;
+    rectCur.y += rectCur.h;
+    rectCur.h = image->h;
+    for(i = 0; i < count; ++i){
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+	rectCur.y += rectCur.h;
+    }
+
+    // получаем левый нижний спрайт
+    FillSPRITE(&sprite, buybuild, 6);
+    image = GetICNSprite(&sprite);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // получаем правый верхний спрайт
+    FillSPRITE(&sprite, buybuild, 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + rectCur.w;
+    rectCur.y = rectBack.y;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // получаем правый средний спрайт
+    FillSPRITE(&sprite, buybuild, 1);
+    image = GetICNSprite(&sprite);
+    rectCur.w = image->w;
+    rectCur.y += rectCur.h;
+    rectCur.h = image->h;
+    for(i = 0; i < count; ++i){
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+	rectCur.y += rectCur.h;
+    }
+
+    // получаем правый нижний спрайт
+    FillSPRITE(&sprite, buybuild, 2);
+    image = GetICNSprite(&sprite);
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    INTERFACEACTION *dialog = NULL;        
+/*
+    // рисуем кнопки
+    INTERFACEACTION action;
+
+    // кнопка YES
+    FillSPRITE(&sprite, system, 5);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 40;
+    rectCur.y = rectBack.y + BOXHEIGHT - 70;
+    if(GetIntValue(EVILINTERFACE))
+        rectCur.y = rectBack.y + BOXHEIGHT - 85;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, system, 5);
+    FillSPRITE(&action.objectPush, system, 6);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = DialogPressYES;
+    AddActionEvent(&dialog, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // кнопка NO
+    FillSPRITE(&sprite, system, 7);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + BOXWIDTH - image->w - 25;
+    if(GetIntValue(EVILINTERFACE))
+	rectCur.y = rectBack.y + BOXHEIGHT - 85;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, system, 7);
+    FillSPRITE(&action.objectPush, system, 8);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = DialogPressNO;
+    AddActionEvent(&dialog, &action);
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+*/
+
+    // Отрисовка диалога
+    SDL_Flip(video);
+
+    SetCursor(CURSOR_POINTER);
+
+    CursorOn();
+
+    // цикл событий
+    result = ActionCycle(dialog);
+
+    // востанавливаем бакгроунд
+    CursorOff();
+    SDL_BlitSurface(back, NULL, video, &rectBack);
+    //SDL_Flip(video);
+
+    FreeActionEvent(dialog);
+    SDL_FreeSurface(back);
+
+    SetCursor(cursor);
+
+    SetIntValue(ANIM2, TRUE);
+    SetIntValue(ANIM3, TRUE);
+    CursorOn();
+
+    return result;
 }

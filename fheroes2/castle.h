@@ -271,9 +271,10 @@ typedef enum {
 		BUILD_LEFTTURRET	= 0x0100,
 		BUILD_RIGHTTURRET	= 0x0200,
 		BUILD_MARKETPLACE	= 0x0400,
-		BUILD_MOAT		= 0x1000,
 		BUILD_WEL2		= 0x0800,	// Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
-		BUILD_SPEC		= 0x2000	// Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
+		BUILD_MOAT		= 0x1000,
+		BUILD_SPEC		= 0x2000,	// Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
+		BUILD_CAPTAIN		= 0x4000
 
 	    } E_BUILDINGCASTLE;
 
@@ -292,7 +293,7 @@ typedef enum {
                 DWELLING_UPGRADE7       = 0x4000        // black dragon
 
             } E_DWELLINGCASTLE;
-                                                                                                                                                                                                            
+
 typedef struct {
 
     E_COLORS	color;

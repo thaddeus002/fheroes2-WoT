@@ -177,6 +177,9 @@ void PrintText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFON
 		    case '-':
 	    		    dst.y += FONT_HEIGHTSMALL / 2;
 			break;
+		    // '
+		    case 0x27:
+			break;
 
 		    case 'y':
 		    case 'g':
@@ -196,6 +199,9 @@ void PrintText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFON
 		    
 		    case '-':
 	    		    dst.y += FONT_HEIGHTBIG / 2;
+			break;
+		    // '
+		    case 0x27:
 			break;
 
 		    case 'y':

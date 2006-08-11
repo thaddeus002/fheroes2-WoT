@@ -284,7 +284,7 @@ const char * GetStringObject(E_OBJECT type){
         // хижина приобретения вторичного навыка (skill)
         case OBJN_WITCHHUNT:
         case OBJ_WITCHHUNT:
-            string = "Witch Hunt";
+            string = "Witch's Hunt";
             break;
 
         // замок дворецкого
@@ -438,14 +438,10 @@ const char * GetStringObject(E_OBJECT type){
 	    string = "Resource";
             break;
 
-        // хижина магии 1 уровня
-        case OBJ_SHRINE1:
-            string = "OBJ_SHRINE1";
-            break;
 
         // телепорт
         case OBJ_STONELITHS:
-            string = "OBJ_STONELITHS";
+            string = "Stonelights";
             break;
 
         // водоворот
@@ -528,14 +524,19 @@ const char * GetStringObject(E_OBJECT type){
             string = "Idol";
             break;
 
+        // хижина магии 1 уровня
+        case OBJ_SHRINE1:
+            string = "Shrine of Level 1";
+            break;
+
         // хижина магии 2 уровня
         case OBJ_SHRINE2:
-            string = "OBJ_SHRINE2";
+            string = "Shrine of Level 2";
             break;
 
         // хижина магии 3 уровня
         case OBJ_SHRINE3:
-            string = "OBJ_SHRINE3";
+            string = "Shrine of Level 3";
             break;
 
         // брошенная тачка

@@ -644,7 +644,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		sprintf(message, "%5d", castle->army[i].count);
 		rectCur.x = cx + 88 * i + 54;
 		rectCur.y = cy + 80;
-		rectCur.w = FONT_WIDTHSMALL * strlen(message);
+		rectCur.w = GetLengthText(message, FONT_SMALL);
 		rectCur.h = FONT_HEIGHTSMALL;
 		PrintText(video, &rectCur, message, FONT_SMALL);
 	}else{
@@ -766,10 +766,9 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		sprintf(message, "%5d", heroes->army[i].count);
 		rectCur.x = cx + 88 * i + 54;
 		rectCur.y = cy + 80;
-		rectCur.w = FONT_WIDTHSMALL * strlen(message);
+		rectCur.w = GetLengthText(message, FONT_SMALL);
 		rectCur.h = FONT_HEIGHTSMALL;
 		PrintText(video, &rectCur, message, FONT_SMALL);
-
 	    }else{
 		FillSPRITE(&sprite, "STRIP.ICN", 2);
 		image = GetICNSprite(&sprite);
@@ -991,12 +990,12 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
-    rectCur.x = rectCur.x + 90 - strlen(castle->name) * FONT_WIDTHSMALL / 2 ;
+    rectCur.x = rectCur.x + 90 - GetLengthText(castle->name, FONT_SMALL) / 2 ;
     rectCur.y = rectCur.y + 1;
-    rectCur.w = FONT_WIDTHSMALL * strlen(castle->name);
+    rectCur.w = GetLengthText(castle->name, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, castle->name, FONT_SMALL);
-
+                    
     SetCursor(CURSOR_POINTER);
     CursorOn();
 
@@ -1619,7 +1618,7 @@ void RedrawCastleMonster(void){
 		sprintf(message, "%5d", currentCastle->army[i].count);
 		rectCur.x = cx + 88 * i + 54;
 		rectCur.y = cy + 80;
-		rectCur.w = FONT_WIDTHSMALL * strlen(message);
+		rectCur.w = GetLengthText(message, FONT_SMALL);
 		rectCur.h = FONT_HEIGHTSMALL;
 		PrintText(video, &rectCur, message, FONT_SMALL);
 	}else{
@@ -1708,7 +1707,7 @@ void RedrawHeroesMonster(E_NAMEHEROES name){
 		sprintf(message, "%5d", heroes->army[i].count);
 		rectCur.x = cx + 88 * i + 54;
 		rectCur.y = cy + 80;
-		rectCur.w = FONT_WIDTHSMALL * strlen(message);
+		rectCur.w = GetLengthText(message, FONT_SMALL);
 		rectCur.h = FONT_HEIGHTSMALL;
 		PrintText(video, &rectCur, message, FONT_SMALL);
 
@@ -2073,7 +2072,7 @@ void RedrawCastleInfoResource(void){
     sprintf(message, "%5d", kingdom->wood);
     rectCur.x = cx + 8;
     rectCur.y = cy + 32;
-    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // sprite sulfur
@@ -2089,7 +2088,7 @@ void RedrawCastleInfoResource(void){
     sprintf(message, "%5d", kingdom->sulfur);
     rectCur.x = cx + 48;
     rectCur.y = cy + 32;
-    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // sprite crystal
@@ -2105,7 +2104,7 @@ void RedrawCastleInfoResource(void){
     sprintf(message, "%5d", kingdom->crystal);
     rectCur.x = cx + 8;
     rectCur.y = cy + 78;
-    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // sprite mercury
@@ -2121,7 +2120,7 @@ void RedrawCastleInfoResource(void){
     sprintf(message, "%5d", kingdom->mercury);
     rectCur.x = cx + 48;
     rectCur.y = cy + 78;
-    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // sprite ore
@@ -2137,7 +2136,7 @@ void RedrawCastleInfoResource(void){
     sprintf(message, "%5d", kingdom->ore);
     rectCur.x = cx + 8;
     rectCur.y = cy + 118;
-    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // sprite gems
@@ -2153,7 +2152,7 @@ void RedrawCastleInfoResource(void){
     sprintf(message, "%5d", kingdom->gems);
     rectCur.x = cx + 48;
     rectCur.y = cy + 118;
-    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // sprite gold
@@ -2169,7 +2168,7 @@ void RedrawCastleInfoResource(void){
     sprintf(message, "%7d", kingdom->gold);
     rectCur.x = cx + 24;
     rectCur.y = cy + 154;
-    rectCur.w = FONT_WIDTHSMALL * strlen(message);
+    rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // exit

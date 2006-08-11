@@ -379,17 +379,25 @@ void ShowQuickInfo(Uint16 index){
     SetIntValue(ANIM2, FALSE);
     
     Uint32 cursor = GetCursor();
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current;
 
-    SDL_Surface *format, *back, *ram, *video;
+    SDL_Surface *format, *back, *ram, *video, *image;
     Sint32 cx, cy;
-    SDL_Rect rectBack, rectCur;
+    SDL_Rect rectBack, rectCur, rect;
     AGGSPRITE sprite;
     const char *message;
+    char string[64];
 
+    const S_CELLMAPS *cell = NULL;
+    const S_CASTLE *castle = NULL;
+    
     SDL_GetMouseState(&cx, &cy);
 
     // выборка по герою замку или объекту
-    switch((GetCELLMAPS(index))->type){
+    cell = GetCELLMAPS(index);
+    switch(cell->type){
     
 	case OBJN_CASTLE:
 	case OBJ_CASTLE:
@@ -429,40 +437,114 @@ void ShowQuickInfo(Uint16 index){
     // рисуем рамку
     SDL_BlitSurface(ram, NULL, video, &rectBack);
 
-    // выборка надписи по герою замку или объекту
-    E_OBJECT obj = (GetCELLMAPS(index))->type;
-    switch(obj){
-
-	case OBJN_CASTLE:
-	case OBJ_CASTLE:
-	    message = "Castle Info";
-	    break;
-	    
-	case OBJ_HEROES:
-	    message = "Heroes Info";
-	    break;
-	
-	default:
-	    message = GetStringObject(obj);
-	    break;
-    }
     // здесь левый верхний угол после бордюра
     rectCur.x = rectBack.x + 25;
     rectCur.y = rectBack.y + 10;
     rectCur.w = rectBack.w - 40;
     rectCur.h = rectBack.h - 40;
 
-    rectCur.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
-    rectCur.y += 20;
+    // выборка надписи по герою замку или объекту
+    switch(cell->type){
 
-    PrintText(video, &rectCur, message, FONT_SMALL);
+	case OBJN_CASTLE:
+	case OBJ_CASTLE:
+	    castle = GetStatCastlePos(cell->ax, cell->ay);
+	    if(castle == NULL){ printf("NULL\n"); break;}
+	    message = castle->name;
+	    rect.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
+	    rect.y = rectCur.y + 5;
+	    rect.w = rectBack.w - 40;
+            rect.h = FONT_HEIGHTSMALL;
+            PrintText(video, &rect, message, FONT_SMALL);
+
+    	    castle->castle ? FillSPRITE(&sprite, "LOCATORS.ICN", 9 + castle->race) : FillSPRITE(&sprite, "LOCATORS.ICN", 15 + castle->race);
+            image = GetICNSprite(&sprite);
+	    rect.x = rectCur.x + (rectCur.w - image->w) / 2 ;
+	    rect.y = rect.y + rect.h + 5;
+	    rect.w = image->w;
+	    rect.h = image->h;
+            SDL_BlitSurface(image, NULL, video, &rect);
+                                
+	    message = "Defenders:";
+	    rect.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
+	    rect.y = rect.y + image->h + 5;
+            rectCur.h = FONT_HEIGHTSMALL;
+	    rect.w = GetLengthText(message, FONT_SMALL);
+            PrintText(video, &rect, message, FONT_SMALL);
+            
+            for(i = 0; i < CASTLEMAXARMY; ++i)
+        	if(MONSTERNONE != castle->army[i].monster && castle->army[i].count) ++count;
+	    
+	    if(! count){
+		message = "None";
+		rect.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
+		rect.y = rect.y + 45;
+        	rectCur.h = FONT_HEIGHTSMALL;
+		rect.w = GetLengthText(message, FONT_SMALL);
+        	PrintText(video, &rect, message, FONT_SMALL);
+    	    
+    	    }else{
+    	    // рисуем в одну строку
+    		current = 0;
+    		for(i = 0; i < CASTLEMAXARMY; ++i)
+        	    if(MONSTERNONE != castle->army[i].monster && castle->army[i].count){
+    			FillSPRITE(&sprite, "MONS32.ICN", castle->army[i].monster);
+        		image = GetICNSprite(&sprite);
+        		// выравнивание по количеству монстров
+			rect.x = (rectCur.w / CASTLEMAXARMY - image->w) / 2 + rectCur.x + current * rectCur.w / count + ((rectCur.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
+			rect.w = image->w;
+			rect.h = image->h;
+			rect.y = rectCur.y + 85;
+			// выравнивание по высоте монстра
+			if(image->h > 32) rect.y -= image->h - 32; else rect.y += 32 - image->h;
+        		SDL_BlitSurface(image, NULL, video, &rect);
+        		// текст количества
+        		sprintf(string, "%d", castle->army[i].count);
+        		rect.x += image->w / 2;
+			rect.x = rect.x - GetLengthText(string, FONT_SMALL) / 2;
+        		rect.y = rectCur.y + 118;
+			rect.w = GetLengthText(string, FONT_SMALL);
+        		rect.h = FONT_HEIGHTSMALL;
+        		PrintText(video, &rect, string, FONT_SMALL);
+        		
+        		current++;
+    		    }
+    	    }
+	    break;
+	    
+	case OBJ_HEROES:
+	    message = "Heroes Info";
+	    rectCur.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
+	    rectCur.y += 20;
+
+	    PrintText(video, &rectCur, message, FONT_SMALL);
+	    break;
+	
+	case OBJ_MONSTER:
+    	    sprintf(string, "%s of %s", GetStringSizeArmy(GetSizeArmy(cell->count)), GetStringMonster((E_MONSTER) cell->object.monster));
+	    rectCur.x = rectCur.x + (rectCur.w - GetLengthText(string, FONT_SMALL)) / 2 ;
+	    rectCur.y += 20;
+	    rectCur.w = GetLengthText(string, FONT_SMALL);
+    	    rectCur.h = FONT_HEIGHTSMALL;
+	    PrintText(video, &rectCur, string, FONT_SMALL);
+	    break;
+
+	default:
+	    message = GetStringObject(cell->type);
+	    rectCur.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
+	    rectCur.y += 20;
+
+	    PrintText(video, &rectCur, message, FONT_SMALL);
+	    break;
+    }
+
     SDL_Flip(video);
 
     while(! exit){
 
 	while(SDL_PollEvent(&event))
-	    if(SDL_RELEASED == event.button.state) exit = TRUE;
-    
+	    if( SDL_BUTTON_RIGHT == event.button.button && SDL_RELEASED == event.button.state) exit = TRUE;
+
 	if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY * 10);
     }
 

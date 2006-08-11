@@ -176,6 +176,7 @@ void		FreeMonster(void);
 S_MONSTER *	GetStatMonster(E_MONSTER);
 E_ARMYSIZE 	GetSizeArmy(Uint16);
 const char *    GetStringSizeArmy(E_ARMYSIZE);
+const char *    GetStringMonster(E_MONSTER);
 E_MONSTER	GetRNDMonster(E_LEVELMONSTER);
 E_RACE		GetRaceMonster(E_MONSTER);
 BOOL		TheFlyMonster(E_MONSTER);

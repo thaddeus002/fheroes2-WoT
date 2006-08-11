@@ -1140,6 +1140,11 @@ BOOL	InitMonster(void){
     return TRUE;
 }
 
+const char * GetStringMonster(E_MONSTER name){
+
+    return ptrMonster[name].descriptions;
+}
+
 const char * MonsterBigNamePortrait(E_MONSTER name){
 
     char num[5];
