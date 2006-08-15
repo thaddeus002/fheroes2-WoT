@@ -161,12 +161,13 @@ typedef enum {
 typedef struct {
 		BOOL		use;
 		const char *	name;
-		const char *	description;
+		const char *	descriptions;
 	    } S_ARTIFACT;
 
 BOOL		InitArtifact(void);
 void		FreeArtifact(void);
 S_ARTIFACT *	GetStatArtifact(E_ARTIFACT);
+const char * 	GetStringArtifact(E_ARTIFACT);
 E_ARTIFACT	GetRNDArtifact(E_LEVELARTIFACT);
 E_ARTIFACT	CheckValidArtifact(Uint8);
 

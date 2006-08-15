@@ -39,7 +39,7 @@
 #define LEVELEVENT_SELECTCOLOR		0x06
 #define LEVELEVENT_CASTLEBUILD		0x07
 
-typedef enum {NONE=0, YES, OK, NO, CANCEL, EXIT, ESC, DISMISS, UPGRADE, ENDTUR, MAX, UP, DOWN} ACTION;
+typedef enum {NONE=0, YES, OK, NO, CANCEL, EXIT, ESC, DISMISS, UPGRADE, ENDTUR, MAX, UP, DOWN, SELECT} ACTION;
 
 typedef struct{
     SDL_Rect    pushRect;
@@ -66,6 +66,17 @@ void FreeActionEvent(INTERFACEACTION *);
 void ZeroINTERFACEACTION(INTERFACEACTION *);
 ACTION ActionCycle(INTERFACEACTION *);
 
-ACTION ActionPressCancel(void);
+ACTION ActionPressYES(void);
+ACTION ActionPressOK(void);
+ACTION ActionPressNO(void);
+ACTION ActionPressCANCEL(void);
+ACTION ActionPressEXIT(void);
+ACTION ActionPressESC(void);
+ACTION ActionPressDISMISS(void);
+ACTION ActionPressUPGRADE(void);
+ACTION ActionPressMAX(void);
+ACTION ActionPressUP(void);
+ACTION ActionPressDOWN(void);
+ACTION ActionPressSELECT(void);
 
 #endif

@@ -42,12 +42,6 @@
 
 void RedrawDinamicRecrutMonster(SDL_Surface *, SDL_Rect *, E_MONSTER, Uint16, Uint16, Uint16, Uint32);
 
-ACTION RecrutMonsterPressUp(void);
-ACTION RecrutMonsterPressDown(void);
-ACTION RecrutMonsterPressMax(void);
-ACTION RecrutMonsterPressOkay(void);
-ACTION RecrutMonsterPressCancel(void);
-
 Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 available){
 
     CursorOff();
@@ -93,7 +87,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     SDL_BlitSurface(image, NULL, video, &rectBack);
 
     // название монстра
-    sprintf(str, "Recrut %s", monster->descriptions);
+    sprintf(str, "Recrut %s", GetStringMonster(emonster));
     rectCur.x = rectBack.x + 160;
     rectCur.y = rectBack.y + 25;
     rectCur.w = GetLengthText(str, FONT_BIG);
@@ -404,7 +398,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     FillSPRITE(&action.objectPush, "RECRUIT.ICN", 1);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = RecrutMonsterPressUp;
+    action.pf = ActionPressUP;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // кнопка DOWN
@@ -419,7 +413,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     FillSPRITE(&action.objectPush, "RECRUIT.ICN", 3);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = RecrutMonsterPressDown;
+    action.pf = ActionPressDOWN;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // кнопка MAX
@@ -434,7 +428,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     FillSPRITE(&action.objectPush, "RECRUIT.ICN", 5);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = RecrutMonsterPressMax;
+    action.pf = ActionPressMAX;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // кнопка OKAY
@@ -449,7 +443,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     FillSPRITE(&action.objectPush, "RECRUIT.ICN", 9);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = RecrutMonsterPressOkay;
+    action.pf = ActionPressOK;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // кнопка CANCEL
@@ -464,7 +458,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     FillSPRITE(&action.objectPush, "RECRUIT.ICN", 7);
     action.rect = rectCur;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = RecrutMonsterPressCancel;
+    action.pf = ActionPressCANCEL;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
@@ -585,31 +579,6 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     CursorOn();
 
     return resultRecrutMonster;
-}
-
-ACTION RecrutMonsterPressUp(void){
-
-    return UP;
-}
-
-ACTION RecrutMonsterPressDown(void){
-
-    return DOWN;
-}
-
-ACTION RecrutMonsterPressMax(void){
-
-    return MAX;
-}
-
-ACTION RecrutMonsterPressOkay(void){
-
-    return OK;
-}
-
-ACTION RecrutMonsterPressCancel(void){
-
-    return CANCEL;
 }
 
 void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emonster, Uint16 available, Uint16 resultRecrutMonster, Uint16 resultCountResource, Uint32 resultCountGold){

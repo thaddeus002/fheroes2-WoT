@@ -160,6 +160,7 @@ typedef struct {
     Uint8       	damageMax;
     Uint16		hp;
     E_MONSTERSPEED	speed;
+    Uint8		grown;
     Uint16		cost;
     const char *	descriptions;
     const char *	filename;

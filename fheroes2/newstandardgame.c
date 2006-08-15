@@ -49,10 +49,6 @@ void	SelectCursorSaveBackground(SDL_Rect *);
 void    DrawMapsOpponents(void);
 void    DrawMapsClass(void);
 
-ACTION	ActionPressNewStandardSelect(void);
-ACTION	ActionPressNewStandardOkay(void);
-ACTION	ActionPressNewStandardCancel(void);
-
 ACTION	ActionSelectDifficulty(E_GAMELEVEL);
 ACTION	ActionSelectDifficultyEasy(void);
 ACTION	ActionSelectDifficultyNormal(void);
@@ -76,6 +72,8 @@ ACTION DrawSelectNewStandardGame(void){
 
     INTERFACEACTION action;
     AGGSPRITE sprite;
+    ACTION result;
+    BOOL exit;
 
     stpenewstandard = NULL;
     
@@ -111,7 +109,7 @@ ACTION DrawSelectNewStandardGame(void){
     FillSPRITE(&action.objectPush, "NGEXTRA.ICN", 65);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressNewStandardSelect;
+    action.pf = ActionPressSELECT;
     // регистрируем
     AddActionEvent(&stpenewstandard, &action);
 
@@ -129,7 +127,7 @@ ACTION DrawSelectNewStandardGame(void){
     FillSPRITE(&action.objectPush, "NGEXTRA.ICN", 67);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressNewStandardOkay;
+    action.pf = ActionPressOK;
     // регистрируем
     AddActionEvent(&stpenewstandard, &action);
 
@@ -147,7 +145,7 @@ ACTION DrawSelectNewStandardGame(void){
     FillSPRITE(&action.objectPush, "NGEXTRA.ICN", 69);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressNewStandardCancel;
+    action.pf = ActionPressCANCEL;
     // регистрируем
     AddActionEvent(&stpenewstandard, &action);
 
@@ -230,15 +228,52 @@ ACTION DrawSelectNewStandardGame(void){
     action.pf = ActionSelectDifficultyImpossible;
     // регистрируем
     AddActionEvent(&stpenewstandard, &action);
-
-
-
                         
     // отображаем всю картинку
     ShowNewStandardGame();
 
     // цикл событий
-    ACTION result = ActionCycle(stpenewstandard);
+    exit = FALSE;
+    while(! exit)
+        switch(ActionCycle(stpenewstandard)){
+
+            case EXIT:
+                exit = TRUE;
+                result = EXIT;
+                break;
+
+            case ESC:
+            case CANCEL:
+                exit = TRUE;
+                result = CANCEL;
+                break;
+
+            case SELECT:
+		PreloadObject("REQUESTS.ICN");
+		PreloadObject("REQSBKG.ICN");
+		if(EXIT == DrawNewSelectMaps()){
+		    exit = TRUE;
+		    result = EXIT;
+		}else{
+		    FreeObject("REQUESTS.ICN");
+		    FreeObject("REQSBKG.ICN");
+		    ShowNewStandardGame();
+		    DrawMapsOpponents();
+		    DrawMapsClass();
+		    ActionSelectDifficultyNormal();
+		}
+        	break;
+    
+            case OK:
+		if(strlen(GetStrValue(FILEMAPSPATH))){
+            	    exit = TRUE;
+		    result = InitMaps(GetStrValue(FILEMAPSPATH));
+		}
+                break;
+
+            default:
+        	break;
+	}
 
     // освобождаем данные
     FreeActionEvent(stpenewstandard);
@@ -367,26 +402,6 @@ void ShowNewStandardGame(void){
     CursorOn();
 }
 
-ACTION ActionPressNewStandardSelect(void){
-
-    PreloadObject("REQUESTS.ICN");
-    PreloadObject("REQSBKG.ICN");
-    
-    if(EXIT == DrawNewSelectMaps()) return EXIT;
-
-    FreeObject("REQUESTS.ICN");
-    FreeObject("REQSBKG.ICN");
-
-    ShowNewStandardGame();
-
-    DrawMapsOpponents();
-    DrawMapsClass();
-
-    ActionSelectDifficultyNormal();
-
-    return NONE;
-}
-
 void DrawMapsOpponents(void){
 
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -497,20 +512,6 @@ void DrawMapsClass(void){
 	    ++current;
     }
 */
-}
-
-ACTION ActionPressNewStandardOkay(void){
-
-    if(strlen(GetStrValue(FILEMAPSPATH)))
-
-	return InitMaps(GetStrValue(FILEMAPSPATH));
-    else
-	return NONE;
-}
-
-ACTION ActionPressNewStandardCancel(void){
-
-    return CANCEL;
 }
 
 ACTION ActionSelectDifficultyEasy(void){

@@ -30,6 +30,7 @@
 #include "SDL.h"
 
 #include "config.h"
+#include "castle.h"
 #include "monster.h"
 
 static S_MONSTER *ptrMonster = NULL;
@@ -116,7 +117,7 @@ Uint16 GetRNDSizeLevelMonster(E_LEVELMONSTER level){
 
 const char *GetStringSizeArmy(E_ARMYSIZE size){
 
-    const char *string = "";
+    const char *string = NULL;
 
     switch(size){
     
@@ -417,6 +418,7 @@ BOOL	InitMonster(void){
 	ptrMonster[PEASANT].hp           = 1;
 	ptrMonster[PEASANT].speed        = VERYSLOW;
 	ptrMonster[PEASANT].cost         = 20;
+	ptrMonster[PEASANT].grown        = GROWN_WEEK_PEASANT;
 	ptrMonster[PEASANT].descriptions = "Peasant";
 	ptrMonster[PEASANT].filename = "PEASANT.ICN";
 
@@ -428,6 +430,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ARCHER].hp           = 10;
 	ptrMonster[ARCHER].speed        = VERYSLOW;
 	ptrMonster[ARCHER].cost         = 150;
+	ptrMonster[ARCHER].grown        = GROWN_WEEK_ARCHER;
 	ptrMonster[ARCHER].descriptions = "Archer";
 	ptrMonster[ARCHER].filename = "ARCHER.ICN";
 
@@ -439,6 +442,7 @@ BOOL	InitMonster(void){
 	ptrMonster[RANGER].hp           = 10;
 	ptrMonster[RANGER].speed        = AVERAGE;
 	ptrMonster[RANGER].cost         = 200;
+	ptrMonster[RANGER].grown        = GROWN_WEEK_RANGER;
 	ptrMonster[RANGER].descriptions = "Ranger";
 	ptrMonster[RANGER].filename = "ARCHER2.ICN";
 
@@ -450,6 +454,7 @@ BOOL	InitMonster(void){
 	ptrMonster[PIKEMAN].hp           = 15;
 	ptrMonster[PIKEMAN].speed        = AVERAGE;
 	ptrMonster[PIKEMAN].cost         = 200;
+	ptrMonster[PIKEMAN].grown        = GROWN_WEEK_PIKEMAN;
 	ptrMonster[PIKEMAN].descriptions = "Pikeman";
 	ptrMonster[PIKEMAN].filename = "PIKEMAN.ICN";
 
@@ -461,6 +466,7 @@ BOOL	InitMonster(void){
 	ptrMonster[VETERAN_PIKEMAN].hp           = 20;
 	ptrMonster[VETERAN_PIKEMAN].speed        = FAST;
 	ptrMonster[VETERAN_PIKEMAN].cost         = 250;
+	ptrMonster[VETERAN_PIKEMAN].grown        = GROWN_WEEK_VETERAN_PIKEMAN;
 	ptrMonster[VETERAN_PIKEMAN].descriptions = "Veteran Pikeman";
 	ptrMonster[VETERAN_PIKEMAN].filename = "PIKEMAN2.ICN";
 
@@ -472,6 +478,7 @@ BOOL	InitMonster(void){
 	ptrMonster[SWORDSMAN].hp           = 25;
 	ptrMonster[SWORDSMAN].speed        = AVERAGE;
 	ptrMonster[SWORDSMAN].cost         = 250;
+	ptrMonster[SWORDSMAN].grown        = GROWN_WEEK_SWORDSMAN;
 	ptrMonster[SWORDSMAN].descriptions = "Swordsman";
 	ptrMonster[SWORDSMAN].filename = "SWORDSMN.ICN";
 
@@ -483,6 +490,7 @@ BOOL	InitMonster(void){
 	ptrMonster[MASTER_SWORDSMAN].hp           = 30;
 	ptrMonster[MASTER_SWORDSMAN].speed        = FAST;
 	ptrMonster[MASTER_SWORDSMAN].cost         = 300;
+	ptrMonster[MASTER_SWORDSMAN].grown        = GROWN_WEEK_MASTER_SWORDSMAN;
 	ptrMonster[MASTER_SWORDSMAN].descriptions = "Master Swordsman";
 	ptrMonster[MASTER_SWORDSMAN].filename = "SWORDSM2.ICN";
 
@@ -494,6 +502,7 @@ BOOL	InitMonster(void){
 	ptrMonster[CAVALIRY].hp           = 30;
 	ptrMonster[CAVALIRY].speed        = VERYFAST;
 	ptrMonster[CAVALIRY].cost         = 300;
+	ptrMonster[CAVALIRY].grown        = GROWN_WEEK_CAVALIRY;
 	ptrMonster[CAVALIRY].descriptions = "Cavalry";
 	ptrMonster[CAVALIRY].filename = "CAVALRYR.ICN";
 
@@ -505,6 +514,7 @@ BOOL	InitMonster(void){
 	ptrMonster[CHAMPION].hp           = 40;
 	ptrMonster[CHAMPION].speed        = ULTRAFAST;
 	ptrMonster[CHAMPION].cost         = 375;
+	ptrMonster[CHAMPION].grown        = GROWN_WEEK_CHAMPION;
 	ptrMonster[CHAMPION].descriptions = "Champion";
 	ptrMonster[CHAMPION].filename = "CAVALRYB.ICN";
 
@@ -516,6 +526,7 @@ BOOL	InitMonster(void){
 	ptrMonster[PALADIN].hp           = 50;
 	ptrMonster[PALADIN].speed        = FAST;
 	ptrMonster[PALADIN].cost         = 600;
+	ptrMonster[PALADIN].grown        = GROWN_WEEK_PALADIN;
 	ptrMonster[PALADIN].descriptions = "Paladin";
 	ptrMonster[PALADIN].filename = "PALADIN.ICN";
 
@@ -527,6 +538,7 @@ BOOL	InitMonster(void){
 	ptrMonster[CRUSADER].hp           = 65;
 	ptrMonster[CRUSADER].speed        = VERYFAST;
 	ptrMonster[CRUSADER].cost         = 1000;
+	ptrMonster[CRUSADER].grown        = GROWN_WEEK_CRUSADER;
 	ptrMonster[CRUSADER].descriptions = "Crusader";
 	ptrMonster[CRUSADER].filename = "PALADIN2.ICN";
 
@@ -538,6 +550,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GOBLIN].hp           = 3;
 	ptrMonster[GOBLIN].speed        = AVERAGE;
 	ptrMonster[GOBLIN].cost         = 40;
+	ptrMonster[GOBLIN].grown        = GROWN_WEEK_GOBLIN;
 	ptrMonster[GOBLIN].descriptions = "Goblin";
 	ptrMonster[GOBLIN].filename = "GOBLIN.ICN";
 
@@ -549,6 +562,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ORC].hp           = 10;
 	ptrMonster[ORC].speed        = VERYSLOW;
 	ptrMonster[ORC].cost         = 140;
+	ptrMonster[ORC].grown        = GROWN_WEEK_ORC;
 	ptrMonster[ORC].descriptions = "Orc";
 	ptrMonster[ORC].filename = "ORC.ICN";
 
@@ -560,6 +574,7 @@ BOOL	InitMonster(void){
 	ptrMonster[CHIEF_ORC].hp           = 15;
 	ptrMonster[CHIEF_ORC].speed        = SLOW;
 	ptrMonster[CHIEF_ORC].cost         = 175;
+	ptrMonster[CHIEF_ORC].grown        = GROWN_WEEK_CHIEF_ORC;
 	ptrMonster[CHIEF_ORC].descriptions = "Orc Chief";
 	ptrMonster[CHIEF_ORC].filename = "ORC2.ICN";
 
@@ -571,6 +586,7 @@ BOOL	InitMonster(void){
 	ptrMonster[WOLF].hp           = 20;
 	ptrMonster[WOLF].speed        = VERYFAST;
 	ptrMonster[WOLF].cost         = 200;
+	ptrMonster[WOLF].grown        = GROWN_WEEK_WOLF;
 	ptrMonster[WOLF].descriptions = "Wolf";
 	ptrMonster[WOLF].filename = "WOLF.ICN";
 
@@ -582,6 +598,7 @@ BOOL	InitMonster(void){
 	ptrMonster[OGRE].hp           = 40;
 	ptrMonster[OGRE].speed        = VERYSLOW;
 	ptrMonster[OGRE].cost         = 300;
+	ptrMonster[OGRE].grown        = GROWN_WEEK_OGRE;
 	ptrMonster[OGRE].descriptions = "Ogre";
 	ptrMonster[OGRE].filename = "OGRE.ICN";
 
@@ -593,6 +610,7 @@ BOOL	InitMonster(void){
 	ptrMonster[LORD_OGRE].hp           = 60;
 	ptrMonster[LORD_OGRE].speed        = AVERAGE;
 	ptrMonster[LORD_OGRE].cost         = 500;
+	ptrMonster[LORD_OGRE].grown        = GROWN_WEEK_LORD_OGRE;
 	ptrMonster[LORD_OGRE].descriptions = "Ogre Lord";
 	ptrMonster[LORD_OGRE].filename = "OGRE2.ICN";
 
@@ -604,6 +622,7 @@ BOOL	InitMonster(void){
 	ptrMonster[TROLL].hp           = 40;
 	ptrMonster[TROLL].speed        = AVERAGE;
 	ptrMonster[TROLL].cost         = 600;
+	ptrMonster[TROLL].grown        = GROWN_WEEK_TROLL;
 	ptrMonster[TROLL].descriptions = "Troll";
 	ptrMonster[TROLL].filename = "TROLL.ICN";
 
@@ -615,6 +634,7 @@ BOOL	InitMonster(void){
 	ptrMonster[WAR_TROLL].hp           = 40;
 	ptrMonster[WAR_TROLL].speed        = FAST;
 	ptrMonster[WAR_TROLL].cost         = 700;
+	ptrMonster[WAR_TROLL].grown        = GROWN_WEEK_WAR_TROLL;
 	ptrMonster[WAR_TROLL].descriptions = "War Troll";
 	ptrMonster[WAR_TROLL].filename = "TROLL2.ICN";
 
@@ -626,6 +646,7 @@ BOOL	InitMonster(void){
 	ptrMonster[CYCLOPS].hp           = 80;
 	ptrMonster[CYCLOPS].speed        = FAST;
 	ptrMonster[CYCLOPS].cost         = 750;
+	ptrMonster[CYCLOPS].grown        = GROWN_WEEK_CYCLOPS;
 	ptrMonster[CYCLOPS].descriptions = "Cyclops";
 	ptrMonster[CYCLOPS].filename = "CYCLOPS.ICN";
 
@@ -637,6 +658,7 @@ BOOL	InitMonster(void){
 	ptrMonster[SPRITE].hp           = 2;
 	ptrMonster[SPRITE].speed        = AVERAGE;
 	ptrMonster[SPRITE].cost         = 50;
+	ptrMonster[SPRITE].grown        = GROWN_WEEK_SPRITE;
 	ptrMonster[SPRITE].descriptions = "Sprite";
 	ptrMonster[SPRITE].filename = "SPRITE.ICN";
 
@@ -648,6 +670,7 @@ BOOL	InitMonster(void){
 	ptrMonster[DWARF].hp           = 20;
 	ptrMonster[DWARF].speed        = VERYSLOW;
 	ptrMonster[DWARF].cost         = 200;
+	ptrMonster[DWARF].grown        = GROWN_WEEK_DWARF;
 	ptrMonster[DWARF].descriptions = "Dwarf";
 	ptrMonster[DWARF].filename = "DWARF.ICN";
 
@@ -659,6 +682,7 @@ BOOL	InitMonster(void){
 	ptrMonster[BATTLE_DWARF].hp           = 20;
 	ptrMonster[BATTLE_DWARF].speed        = AVERAGE;
 	ptrMonster[BATTLE_DWARF].cost         = 250;
+	ptrMonster[BATTLE_DWARF].grown        = GROWN_WEEK_BATTLE_DWARF;
 	ptrMonster[BATTLE_DWARF].descriptions = "Battle Dwarf";
 	ptrMonster[BATTLE_DWARF].filename = "DWARF2.ICN";
 
@@ -670,6 +694,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ELF].hp           = 15;
 	ptrMonster[ELF].speed	     = AVERAGE;
 	ptrMonster[ELF].cost         = 250;
+	ptrMonster[ELF].grown        = GROWN_WEEK_ELF;
 	ptrMonster[ELF].descriptions = "Elf";
 	ptrMonster[ELF].filename = "ELF.ICN";
 
@@ -681,6 +706,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GRAND_ELF].hp           = 15;
 	ptrMonster[GRAND_ELF].speed        = VERYFAST;
 	ptrMonster[GRAND_ELF].cost         = 300;
+	ptrMonster[GRAND_ELF].grown        = GROWN_WEEK_GRAND_ELF;
 	ptrMonster[GRAND_ELF].descriptions = "Grand Elf";
 	ptrMonster[GRAND_ELF].filename = "ELF2.ICN";
 
@@ -692,6 +718,7 @@ BOOL	InitMonster(void){
 	ptrMonster[DRUID].hp           = 25;
 	ptrMonster[DRUID].speed        = FAST;
 	ptrMonster[DRUID].cost         = 350;
+	ptrMonster[DRUID].grown        = GROWN_WEEK_DRUID;
 	ptrMonster[DRUID].descriptions = "Druid";
 	ptrMonster[DRUID].filename = "DRUID.ICN";
 
@@ -703,6 +730,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GREATER_DRUID].hp           = 25;
 	ptrMonster[GREATER_DRUID].speed        = VERYFAST;
 	ptrMonster[GREATER_DRUID].cost         = 400;
+	ptrMonster[GREATER_DRUID].grown        = GROWN_WEEK_GREATER_DRUID;
 	ptrMonster[GREATER_DRUID].descriptions = "Greater Druid";
 	ptrMonster[GREATER_DRUID].filename = "DRUID2.ICN";
 
@@ -714,6 +742,7 @@ BOOL	InitMonster(void){
 	ptrMonster[UNICORN].hp           = 40;
 	ptrMonster[UNICORN].speed        = FAST;
 	ptrMonster[UNICORN].cost         = 500;
+	ptrMonster[UNICORN].grown        = GROWN_WEEK_UNICORN;
 	ptrMonster[UNICORN].descriptions = "Unicorn";
 	ptrMonster[UNICORN].filename = "UNICORN.ICN";
 
@@ -725,6 +754,7 @@ BOOL	InitMonster(void){
 	ptrMonster[PHOENIX].hp           = 100;
 	ptrMonster[PHOENIX].speed        = ULTRAFAST;
 	ptrMonster[PHOENIX].cost         = 1500;
+	ptrMonster[PHOENIX].grown        = GROWN_WEEK_PHOENIX;
 	ptrMonster[PHOENIX].descriptions = "Phoenix";
 	ptrMonster[PHOENIX].filename = "PHOENIX.ICN";
 
@@ -736,6 +766,7 @@ BOOL	InitMonster(void){
 	ptrMonster[CENTAUR].hp           = 5;
 	ptrMonster[CENTAUR].speed        = AVERAGE;
 	ptrMonster[CENTAUR].cost         = 60;
+	ptrMonster[CENTAUR].grown        = GROWN_WEEK_CENTAUR;
 	ptrMonster[CENTAUR].descriptions = "Centaur";
 	ptrMonster[CENTAUR].filename = "CENTAUR.ICN";
 
@@ -747,6 +778,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GARGOYLE].hp           = 15;
 	ptrMonster[GARGOYLE].speed        = VERYFAST;
 	ptrMonster[GARGOYLE].cost         = 200;
+	ptrMonster[GARGOYLE].grown        = GROWN_WEEK_GARGOYLE;
 	ptrMonster[GARGOYLE].descriptions = "Gargoyle";
 	ptrMonster[GARGOYLE].filename = "GARGOYLE.ICN";
 
@@ -758,6 +790,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GRIFFIN].hp           = 25;
 	ptrMonster[GRIFFIN].speed        = AVERAGE;
 	ptrMonster[GRIFFIN].cost         = 300;
+	ptrMonster[GRIFFIN].grown        = GROWN_WEEK_GRIFFIN;
 	ptrMonster[GRIFFIN].descriptions = "Griffin";
 	ptrMonster[GRIFFIN].filename = "GRIFFIN.ICN";
 
@@ -769,6 +802,7 @@ BOOL	InitMonster(void){
 	ptrMonster[MINOTAUR].hp           = 35;
 	ptrMonster[MINOTAUR].speed        = AVERAGE;
 	ptrMonster[MINOTAUR].cost         = 400;
+	ptrMonster[MINOTAUR].grown        = GROWN_WEEK_MINOTAUR;
 	ptrMonster[MINOTAUR].descriptions = "Minotaur";
 	ptrMonster[MINOTAUR].filename = "MINOTAUR.ICN";
 
@@ -780,6 +814,7 @@ BOOL	InitMonster(void){
 	ptrMonster[KNIGHT_MINOTAUR].hp           = 45;
 	ptrMonster[KNIGHT_MINOTAUR].speed        = VERYFAST;
 	ptrMonster[KNIGHT_MINOTAUR].cost         = 500;
+	ptrMonster[KNIGHT_MINOTAUR].grown        = GROWN_WEEK_KNIGHT_MINOTAUR;
 	ptrMonster[KNIGHT_MINOTAUR].descriptions = "Minotaur King";
 	ptrMonster[KNIGHT_MINOTAUR].filename = "MINOTAU2.ICN";
 
@@ -791,6 +826,7 @@ BOOL	InitMonster(void){
 	ptrMonster[HIDRA].hp           = 75;
 	ptrMonster[HIDRA].speed        = VERYSLOW;
 	ptrMonster[HIDRA].cost         = 800;
+	ptrMonster[HIDRA].grown        = GROWN_WEEK_HIDRA;
 	ptrMonster[HIDRA].descriptions = "Hydra";
 	ptrMonster[HIDRA].filename = "HYDRA.ICN";
 
@@ -802,6 +838,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GREEN_DRAGON].hp           = 200;
 	ptrMonster[GREEN_DRAGON].speed        = AVERAGE;
 	ptrMonster[GREEN_DRAGON].cost         = 3000;
+	ptrMonster[GREEN_DRAGON].grown        = GROWN_WEEK_GREEN_DRAGON;
 	ptrMonster[GREEN_DRAGON].descriptions = "Green Dragon";
 	ptrMonster[GREEN_DRAGON].filename = "DRAGGREE.ICN";
 
@@ -813,6 +850,7 @@ BOOL	InitMonster(void){
 	ptrMonster[RED_DRAGON].hp           = 250;
 	ptrMonster[RED_DRAGON].speed        = FAST;
 	ptrMonster[RED_DRAGON].cost         = 3500;
+	ptrMonster[RED_DRAGON].grown        = GROWN_WEEK_RED_DRAGON;
 	ptrMonster[RED_DRAGON].descriptions = "Red Dragon";
 	ptrMonster[RED_DRAGON].filename = "DRAGRED.ICN";
 
@@ -824,6 +862,7 @@ BOOL	InitMonster(void){
 	ptrMonster[BLACK_DRAGON].hp           = 300;
 	ptrMonster[BLACK_DRAGON].speed        = VERYFAST;
 	ptrMonster[BLACK_DRAGON].cost         = 4000;
+	ptrMonster[BLACK_DRAGON].grown        = GROWN_WEEK_BLACK_DRAGON;
 	ptrMonster[BLACK_DRAGON].descriptions = "Black Dragon";
 	ptrMonster[BLACK_DRAGON].filename = "DRAGBLAK.ICN";
 
@@ -835,6 +874,7 @@ BOOL	InitMonster(void){
 	ptrMonster[HALFLING].hp           = 3;
 	ptrMonster[HALFLING].speed        = SLOW;
 	ptrMonster[HALFLING].cost         = 50;
+	ptrMonster[HALFLING].grown        = GROWN_WEEK_HALFLING;
 	ptrMonster[HALFLING].descriptions = "Halfling";
 	ptrMonster[HALFLING].filename = "HALFLING.ICN";
 
@@ -846,6 +886,7 @@ BOOL	InitMonster(void){
 	ptrMonster[BOAR].hp           = 15;
 	ptrMonster[BOAR].speed        = VERYFAST;
 	ptrMonster[BOAR].cost         = 150;
+	ptrMonster[BOAR].grown        = GROWN_WEEK_BOAR;
 	ptrMonster[BOAR].descriptions = "Boar";
 	ptrMonster[BOAR].filename = "BOAR.ICN";
 
@@ -857,6 +898,7 @@ BOOL	InitMonster(void){
 	ptrMonster[IRON_GOLEM].hp           = 30;
 	ptrMonster[IRON_GOLEM].speed        = VERYSLOW;
 	ptrMonster[IRON_GOLEM].cost         = 300;
+	ptrMonster[IRON_GOLEM].grown        = GROWN_WEEK_IRON_GOLEM;
 	ptrMonster[IRON_GOLEM].descriptions = "Iron Golem";
 	ptrMonster[IRON_GOLEM].filename = "GOLEM.ICN";
 
@@ -868,6 +910,7 @@ BOOL	InitMonster(void){
 	ptrMonster[STEEL_GOLEM].hp           = 35;
 	ptrMonster[STEEL_GOLEM].speed        = SLOW;
 	ptrMonster[STEEL_GOLEM].cost         = 350;
+	ptrMonster[STEEL_GOLEM].grown        = GROWN_WEEK_STEEL_GOLEM;
 	ptrMonster[STEEL_GOLEM].descriptions = "Steel Golem";
 	ptrMonster[STEEL_GOLEM].filename = "GOLEM2.ICN";
 
@@ -879,6 +922,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ROC].hp           = 40;
 	ptrMonster[ROC].speed        = AVERAGE;
 	ptrMonster[ROC].cost         = 400;
+	ptrMonster[ROC].grown        = GROWN_WEEK_ROC;
 	ptrMonster[ROC].descriptions = "Roc";
 	ptrMonster[ROC].filename = "ROC.ICN";
 
@@ -890,6 +934,7 @@ BOOL	InitMonster(void){
 	ptrMonster[MAGE].hp           = 30;
 	ptrMonster[MAGE].speed        = FAST;
 	ptrMonster[MAGE].cost         = 600;
+	ptrMonster[MAGE].grown        = GROWN_WEEK_MAGE;
 	ptrMonster[MAGE].descriptions = "Mage";
 	ptrMonster[MAGE].filename = "MAGE1.ICN";
 
@@ -901,6 +946,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ARCHMAGE].hp           = 35;
 	ptrMonster[ARCHMAGE].speed        = VERYFAST;
 	ptrMonster[ARCHMAGE].cost         = 700;
+	ptrMonster[ARCHMAGE].grown        = GROWN_WEEK_ARCHMAGE;
 	ptrMonster[ARCHMAGE].descriptions = "Archmage";
 	ptrMonster[ARCHMAGE].filename = "MAGE2.ICN";
 
@@ -912,6 +958,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GIANT].hp           = 150;
 	ptrMonster[GIANT].speed        = AVERAGE;
 	ptrMonster[GIANT].cost         = 2000;
+	ptrMonster[GIANT].grown        = GROWN_WEEK_GIANT;
 	ptrMonster[GIANT].descriptions = "Giant";
 	ptrMonster[GIANT].filename = "TITANBLU.ICN";
 
@@ -923,6 +970,7 @@ BOOL	InitMonster(void){
 	ptrMonster[TITAN].hp           = 300;
 	ptrMonster[TITAN].speed        = VERYFAST;
 	ptrMonster[TITAN].cost         = 5000;
+	ptrMonster[TITAN].grown        = GROWN_WEEK_TITAN;
 	ptrMonster[TITAN].descriptions = "Titan";
 	ptrMonster[TITAN].filename = "TITANBLA.ICN";
 
@@ -934,6 +982,7 @@ BOOL	InitMonster(void){
 	ptrMonster[SKELETON].hp           = 4;
 	ptrMonster[SKELETON].speed        = AVERAGE;
 	ptrMonster[SKELETON].cost         = 75;
+	ptrMonster[SKELETON].grown        = GROWN_WEEK_SKELETON;
 	ptrMonster[SKELETON].descriptions = "Skeleton";
 	ptrMonster[SKELETON].filename = "SKELETON.ICN";
 	
@@ -945,6 +994,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ZOMBIE].hp           = 15;
 	ptrMonster[ZOMBIE].speed        = VERYSLOW;
 	ptrMonster[ZOMBIE].cost         = 150;
+	ptrMonster[ZOMBIE].grown        = GROWN_WEEK_ZOMBIE;
 	ptrMonster[ZOMBIE].descriptions = "Zombie";
 	ptrMonster[ZOMBIE].filename = "ZOMBIE.ICN";
 
@@ -956,6 +1006,7 @@ BOOL	InitMonster(void){
 	ptrMonster[MUTANT_ZOMBIE].hp           = 20;
 	ptrMonster[MUTANT_ZOMBIE].speed        = AVERAGE;
 	ptrMonster[MUTANT_ZOMBIE].cost         = 200;
+	ptrMonster[MUTANT_ZOMBIE].grown        = GROWN_WEEK_MUTANT_ZOMBIE;
 	ptrMonster[MUTANT_ZOMBIE].descriptions = "Mutant Zombie";
 	ptrMonster[MUTANT_ZOMBIE].filename = "ZOMBIE2.ICN";
 
@@ -967,6 +1018,7 @@ BOOL	InitMonster(void){
 	ptrMonster[MUMMY].hp           = 25;
 	ptrMonster[MUMMY].speed        = AVERAGE;
 	ptrMonster[MUMMY].cost         = 250;
+	ptrMonster[MUMMY].grown        = GROWN_WEEK_MUMMY;
 	ptrMonster[MUMMY].descriptions = "Mummy";
 	ptrMonster[MUMMY].filename = "MUMMYW.ICN";
 
@@ -978,6 +1030,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ROYAL_MUMMY].hp           = 30;
 	ptrMonster[ROYAL_MUMMY].speed        = FAST;
 	ptrMonster[ROYAL_MUMMY].cost         = 300;
+	ptrMonster[ROYAL_MUMMY].grown        = GROWN_WEEK_ROYAL_MUMMY;
 	ptrMonster[ROYAL_MUMMY].descriptions = "Royal Mummy";
 	ptrMonster[ROYAL_MUMMY].filename = "MUMMY2.ICN";
 
@@ -989,6 +1042,7 @@ BOOL	InitMonster(void){
 	ptrMonster[VAMPIRE].hp           = 30;
 	ptrMonster[VAMPIRE].speed        = AVERAGE;
 	ptrMonster[VAMPIRE].cost         = 500;
+	ptrMonster[VAMPIRE].grown        = GROWN_WEEK_VAMPIRE;
 	ptrMonster[VAMPIRE].descriptions = "Vampire";
 	ptrMonster[VAMPIRE].filename = "VAMPIRE.ICN";
 
@@ -1000,6 +1054,7 @@ BOOL	InitMonster(void){
 	ptrMonster[LORD_VAMPIRE].hp           = 40;
 	ptrMonster[LORD_VAMPIRE].speed        = FAST;
 	ptrMonster[LORD_VAMPIRE].cost         = 650;
+	ptrMonster[LORD_VAMPIRE].grown        = GROWN_WEEK_LORD_VAMPIRE;
 	ptrMonster[LORD_VAMPIRE].descriptions = "Vampire Lord";
 	ptrMonster[LORD_VAMPIRE].filename = "VAMPIRE2.ICN";
 
@@ -1011,6 +1066,7 @@ BOOL	InitMonster(void){
 	ptrMonster[LICH].hp           = 25;
 	ptrMonster[LICH].speed        = FAST;
 	ptrMonster[LICH].cost         = 750;
+	ptrMonster[LICH].grown        = GROWN_WEEK_LICH;
 	ptrMonster[LICH].descriptions = "Lich";
 	ptrMonster[LICH].filename = "LICH.ICN";
 
@@ -1022,6 +1078,7 @@ BOOL	InitMonster(void){
 	ptrMonster[POWER_LICH].hp           = 35;
 	ptrMonster[POWER_LICH].speed        = VERYFAST;
 	ptrMonster[POWER_LICH].cost         = 900;
+	ptrMonster[POWER_LICH].grown        = GROWN_WEEK_POWER_LICH;
 	ptrMonster[POWER_LICH].descriptions = "Power Lich";
 	ptrMonster[POWER_LICH].filename = "LICH2.ICN";
 
@@ -1033,6 +1090,7 @@ BOOL	InitMonster(void){
 	ptrMonster[BONE_DRAGON].hp           = 150;
 	ptrMonster[BONE_DRAGON].speed        = AVERAGE;
 	ptrMonster[BONE_DRAGON].cost         = 1500;
+	ptrMonster[BONE_DRAGON].grown        = GROWN_WEEK_BONE_DRAGON;
 	ptrMonster[BONE_DRAGON].descriptions = "Bone Dragon";
 	ptrMonster[BONE_DRAGON].filename = "DRAGBONE.ICN";
 
@@ -1044,6 +1102,7 @@ BOOL	InitMonster(void){
 	ptrMonster[ROGUE].hp           = 4;
 	ptrMonster[ROGUE].speed        = FAST;
 	ptrMonster[ROGUE].cost         = 50;
+	ptrMonster[ROGUE].grown        = GROWN_WEEK_ROGUE;
 	ptrMonster[ROGUE].descriptions = "Rogue";
 	ptrMonster[ROGUE].filename = "ROGUE.ICN";
 
@@ -1055,6 +1114,7 @@ BOOL	InitMonster(void){
 	ptrMonster[NOMAD].hp           = 20;
 	ptrMonster[NOMAD].speed        = VERYFAST;
 	ptrMonster[NOMAD].cost         = 200;
+	ptrMonster[NOMAD].grown        = GROWN_WEEK_NOMAD;
 	ptrMonster[NOMAD].descriptions = "Nomad";
 	ptrMonster[NOMAD].filename = "NOMAD.ICN";
 
@@ -1066,6 +1126,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GHOST].hp           = 20;
 	ptrMonster[GHOST].speed        = FAST;
 	ptrMonster[GHOST].cost         = 1000;
+	ptrMonster[GHOST].grown        = GROWN_WEEK_GHOST;
 	ptrMonster[GHOST].descriptions = "Ghost";
 	ptrMonster[GHOST].filename = "GHOST.ICN";
 
@@ -1077,6 +1138,7 @@ BOOL	InitMonster(void){
 	ptrMonster[GENIE].hp           = 50;
 	ptrMonster[GENIE].speed        = VERYFAST;
 	ptrMonster[GENIE].cost         = 650;
+	ptrMonster[GENIE].grown        = GROWN_WEEK_GENIE;
 	ptrMonster[GENIE].descriptions = "Genie";
 	ptrMonster[GENIE].filename = "GENIE.ICN";
 
@@ -1088,6 +1150,7 @@ BOOL	InitMonster(void){
 	ptrMonster[MEDUSA].hp           = 35;
 	ptrMonster[MEDUSA].speed        = AVERAGE;
 	ptrMonster[MEDUSA].cost         = 500;
+	ptrMonster[MEDUSA].grown        = GROWN_WEEK_MEDUSA;
 	ptrMonster[MEDUSA].descriptions = "Medusa";
 	ptrMonster[MEDUSA].filename = "MEDUSA.ICN";
 
@@ -1099,6 +1162,7 @@ BOOL	InitMonster(void){
 	ptrMonster[EARTH_ELEMENT].hp           = 50;
 	ptrMonster[EARTH_ELEMENT].speed        = SLOW;
 	ptrMonster[EARTH_ELEMENT].cost         = 500;
+	ptrMonster[EARTH_ELEMENT].grown        = GROWN_WEEK_EARTH_ELEMENT;
 	ptrMonster[EARTH_ELEMENT].descriptions = "Earth Element";
 	ptrMonster[EARTH_ELEMENT].filename = "EELEM.ICN";
 
@@ -1110,6 +1174,7 @@ BOOL	InitMonster(void){
 	ptrMonster[AIR_ELEMENT].hp           = 35;
 	ptrMonster[AIR_ELEMENT].speed        = VERYFAST;
 	ptrMonster[AIR_ELEMENT].cost         = 500;
+	ptrMonster[AIR_ELEMENT].grown	     = GROWN_WEEK_AIR_ELEMENT;
 	ptrMonster[AIR_ELEMENT].descriptions = "Air Element";
 	ptrMonster[AIR_ELEMENT].filename = "AELEM.ICN";
 
@@ -1121,6 +1186,7 @@ BOOL	InitMonster(void){
 	ptrMonster[FIRE_ELEMENT].hp           = 40;
 	ptrMonster[FIRE_ELEMENT].speed        = FAST;
 	ptrMonster[FIRE_ELEMENT].cost         = 500;
+	ptrMonster[FIRE_ELEMENT].grown        = GROWN_WEEK_FIRE_ELEMENT;
 	ptrMonster[FIRE_ELEMENT].descriptions = "Fire Element";
 	ptrMonster[FIRE_ELEMENT].filename = "FELEM.ICN";
 
@@ -1132,6 +1198,7 @@ BOOL	InitMonster(void){
 	ptrMonster[WATER_ELEMENT].hp           = 45;
 	ptrMonster[WATER_ELEMENT].speed        = AVERAGE;
 	ptrMonster[WATER_ELEMENT].cost         = 500;
+	ptrMonster[WATER_ELEMENT].grown        = GROWN_WEEK_WATER_ELEMENT;
 	ptrMonster[WATER_ELEMENT].descriptions = "Water Element";
 	ptrMonster[WATER_ELEMENT].filename = "WELEM.ICN";
 

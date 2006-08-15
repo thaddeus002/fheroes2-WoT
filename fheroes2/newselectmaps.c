@@ -97,9 +97,6 @@ ACTION ActionPressShowLarge(void);
 ACTION ActionPressShowXLarge(void);
 ACTION ActionPressShowAll(void);
 ACTION ActionPressSelectMap(void);
-ACTION ActionPressOKLoad(void);
-ACTION ActionPressScrollUp(void);
-ACTION ActionPressScrollDown(void);
 ACTION ActionPressScrollBar(void);
 
 INTERFACEACTION *stpeload = NULL;
@@ -117,6 +114,8 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
 
     INTERFACEACTION action;
     AGGSPRITE sprite;
+    BOOL exit;
+    ACTION result = NONE;
 
     stpeload = NULL;
 
@@ -144,7 +143,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     // заполняем
     action.rect = dest;
     action.mouseEvent = MOUSE_UWHEEL;
-    action.pf = ActionPressScrollUp;
+    action.pf = ActionPressUP;
     // регистрируем
     AddActionEvent(&stpeload, &action);
 
@@ -158,7 +157,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     // заполняем
     action.rect = dest;
     action.mouseEvent = MOUSE_DWHEEL;
-    action.pf = ActionPressScrollDown;
+    action.pf = ActionPressDOWN;
     // регистрируем
     AddActionEvent(&stpeload, &action);
 
@@ -266,7 +265,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     FillSPRITE(&action.objectPush, "REQUESTS.ICN", 2);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressOKLoad;
+    action.pf = ActionPressOK;
     // регистрируем
     AddActionEvent(&stpeload, &action);
 
@@ -284,7 +283,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     FillSPRITE(&action.objectPush, "REQUESTS.ICN", 6);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressScrollUp;
+    action.pf = ActionPressUP;
     // регистрируем
     AddActionEvent(&stpeload, &action);
 
@@ -302,7 +301,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     FillSPRITE(&action.objectPush, "REQUESTS.ICN", 8);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressScrollDown;
+    action.pf = ActionPressDOWN;
     // регистрируем
     AddActionEvent(&stpeload, &action);
 
@@ -326,7 +325,60 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     // отображаем всю картинку
     ShowStaticForm();
 
-    ACTION result = ActionCycle(stpeload);
+    exit = FALSE;
+    while(! exit)
+        switch(ActionCycle(stpeload)){
+
+            case EXIT:
+		result = EXIT;
+		exit = TRUE;
+                break;
+
+            case ESC:
+            case CANCEL:
+		result = CANCEL;
+		exit = TRUE;
+                break;
+
+            case OK:
+		if(firstName == NULL){
+		    fprintf(stderr, "ActionPressOKLoad: error open maps file.\n");
+		    result = EXIT;
+		    exit = TRUE;
+	        }else{
+		    SetStrValue(FILEMAPSPATH, currentName->filename);
+		    SetStrValue(MAPSLONGNAME, (char *) currentName->info.longname);
+		    SetStrValue(MAPSDESCRIPTION, (char *) currentName->info.description);
+		    SetIntValue(MAPSDIFFICULTY, currentName->info.level);
+		    SetIntValue(VICTORYCONDITIONS, currentName->info.conditionsWins);
+		    SetIntValue(LOSSCONDITIONS, currentName->info.conditionsLoss);
+		    SetIntValue(KINGDOMCOLORS, currentName->info.kingdomColors);
+		    SetIntValue(ALLOWCOLORS, currentName->info.allowColors);
+		    SetIntValue(RNDCOLORS, currentName->info.rndColors);
+		    result = OK;
+		    exit = TRUE;
+		}
+        	break;
+
+            case UP:
+		if(firstName != header){
+		    if(ExistsMapSizeUp(firstName, showmaps))
+			firstName = ExistsMapSizeUp(firstName, showmaps);
+		    ShowSelectLoad();
+		}
+        	break;
+
+            case DOWN:
+		if(NULL != firstName->next && count >= MAXNAMES){
+		    if(ExistsMapSizeDown(firstName, showmaps))
+			firstName = ExistsMapSizeDown(firstName, showmaps);
+		    ShowSelectLoad();
+		}
+        	break;
+
+	    default:
+		break;
+	}
 
     FreeActionEvent(stpeload);
     FreeSlider();
@@ -512,55 +564,6 @@ ACTION ActionPressShowAll(){
     firstName = NULL;
 
     ResetSlider();
-    ShowSelectLoad();
-
-    return NONE;
-}
-
-ACTION ActionPressOKLoad(){
-
-    if(firstName == NULL){
-	fprintf(stderr, "ActionPressOKLoad: error open maps file.\n");
-	return EXIT;
-    }
-
-    SetStrValue(FILEMAPSPATH, currentName->filename);
-    SetStrValue(MAPSLONGNAME, (char *) currentName->info.longname);
-    SetStrValue(MAPSDESCRIPTION, (char *) currentName->info.description);
-    SetIntValue(MAPSDIFFICULTY, currentName->info.level);
-    SetIntValue(VICTORYCONDITIONS, currentName->info.conditionsWins);
-    SetIntValue(LOSSCONDITIONS, currentName->info.conditionsLoss);
-    SetIntValue(KINGDOMCOLORS, currentName->info.kingdomColors);
-    SetIntValue(ALLOWCOLORS, currentName->info.allowColors);
-    SetIntValue(RNDCOLORS, currentName->info.rndColors);
-
-    return OK;
-}
-
-ACTION ActionPressScrollUp(){
-
-    // если первый элемент
-    if(firstName == header) return NONE;
-
-    if(ExistsMapSizeUp(firstName, showmaps))
-	firstName = ExistsMapSizeUp(firstName, showmaps);
-
-    ShowSelectLoad();
-
-    return NONE;
-}
-
-ACTION ActionPressScrollDown(){
-
-    // если последний элемент
-    if(NULL == firstName->next) return NONE;
-    
-    // если число отображенных меньше максимально возможного в списке
-    if(count < MAXNAMES) return NONE;
-
-    if(ExistsMapSizeDown(firstName, showmaps))
-	firstName = ExistsMapSizeDown(firstName, showmaps);
-
     ShowSelectLoad();
 
     return NONE;

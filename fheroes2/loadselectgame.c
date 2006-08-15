@@ -40,7 +40,6 @@ void ShowLoadSelectGame(void);
 ACTION ActionPressLoadStandardGame(void);
 ACTION ActionPressLoadCampainGame(void);
 ACTION ActionPressLoadMultiGame(void);
-ACTION ActionPressLoadCancelGame(void);
 
 INTERFACEACTION *stpeloadselect = NULL;
 
@@ -51,6 +50,8 @@ ACTION DrawLoadSelectGame(void){
 
     INTERFACEACTION action;
     AGGSPRITE sprite;
+    BOOL exit;
+    ACTION result = NONE;
 
     stpeloadselect = NULL;
 
@@ -124,7 +125,7 @@ ACTION DrawLoadSelectGame(void){
     FillSPRITE(&action.objectPush, "BTNNEWGM.ICN", 7);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressLoadCancelGame;
+    action.pf = ActionPressCANCEL;
     // регистрируем
     AddActionEvent(&stpeloadselect, &action);
 
@@ -132,7 +133,24 @@ ACTION DrawLoadSelectGame(void){
     ShowLoadSelectGame();
 
     // цикл событий
-    ACTION result = ActionCycle(stpeloadselect);
+    exit = FALSE;
+    while(! exit)
+        switch(ActionCycle(stpeloadselect)){
+
+            case EXIT:
+                result = EXIT;
+                exit = TRUE;
+                break;
+
+            case ESC:
+            case CANCEL:
+                result = CANCEL;
+                exit = TRUE;
+        	break;
+
+            default:
+            break;
+	}
 
     // освобождаем данные
     FreeActionEvent(stpeloadselect);
@@ -217,9 +235,4 @@ ACTION ActionPressLoadMultiGame(void){
     fprintf(stderr, "action: LoadMultiGame\n");
 
     return NONE;
-}
-
-ACTION ActionPressLoadCancelGame(void){
-
-    return CANCEL;
 }

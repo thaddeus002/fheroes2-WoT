@@ -122,9 +122,64 @@ void ZeroINTERFACEACTION(INTERFACEACTION *action){
     action->next = NULL;
 }
 
-ACTION ActionPressCancel(void){
+ACTION ActionPressCANCEL(void){
     
     return CANCEL;
+}
+
+ACTION ActionPressYES(void){
+    
+    return YES;
+}
+
+ACTION ActionPressOK(void){
+    
+    return OK;
+}
+
+ACTION ActionPressNO(void){
+    
+    return NO;
+}
+
+ACTION ActionPressEXIT(void){
+    
+    return EXIT;
+}
+
+ACTION ActionPressESC(void){
+    
+    return ESC;
+}
+
+ACTION ActionPressDISMISS(void){
+    
+    return DISMISS;
+}
+
+ACTION ActionPressUPGRADE(void){
+    
+    return UPGRADE;
+}
+
+ACTION ActionPressMAX(void){
+    
+    return MAX;
+}
+
+ACTION ActionPressUP(void){
+    
+    return UP;
+}
+
+ACTION ActionPressDOWN(void){
+    
+    return DOWN;
+}
+
+ACTION ActionPressSELECT(void){
+    
+    return SELECT;
 }
 
 ACTION ActionCycle(INTERFACEACTION *action){
@@ -153,7 +208,7 @@ ACTION ActionCycle(INTERFACEACTION *action){
 		case SDL_QUIT:
 
 		    // close windows
-		    exit = EXIT;
+		    exit = ActionPressEXIT();
 		    break;
 
 		case SDL_KEYDOWN:
@@ -163,7 +218,7 @@ ACTION ActionCycle(INTERFACEACTION *action){
 
 			case SDLK_ESCAPE:
 
-			    exit = ESC;
+			    exit = ActionPressESC();
 			    break;
 /*
 			case SDLK_RETURN:

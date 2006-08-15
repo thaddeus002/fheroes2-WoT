@@ -3347,7 +3347,10 @@ ACTION ActionGAMELOOP(void){
 		EXIT == exit || 
 		(ESC == exit && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
 
-	if(EXIT == exit || ESC == exit) break;
+	if(EXIT == exit || ESC == exit){
+	    exit = EXIT;
+	    break;
+	}
 
 	CursorOff();
 	cursor = GetCursor();

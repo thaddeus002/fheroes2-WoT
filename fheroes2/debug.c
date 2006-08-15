@@ -635,11 +635,11 @@ void PrintCellInfo(Uint16 index){
 	    break;
 
 	case OBJ_ARTIFACT:
-    	    fprintf(stderr, "object  : %s\n", ((S_ARTIFACT *) GetStatArtifact(ptrCell->object.artifact))->name );
+    	    fprintf(stderr, "object  : %s\n", GetStringArtifact(ptrCell->object.artifact) );
 	    break;
 
 	case OBJ_MONSTER:
-    	    fprintf(stderr, "object  : %s\n", ((S_MONSTER *) GetStatMonster(ptrCell->object.monster))->descriptions );
+    	    fprintf(stderr, "object  : %s\n", GetStringMonster(ptrCell->object.monster) );
 	    break;
 
 	case OBJN_CASTLE:
@@ -1131,6 +1131,7 @@ const char * GetStringLevelMageGuild(Uint8 level){
 	    string = "Mage Guild, Level 4";
 	    break;
 	case 5:
+	case 6:
 	    string = "Mage Guild, Level 5";
 	    break;
 	default:

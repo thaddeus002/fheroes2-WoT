@@ -60,6 +60,7 @@ ACTION ActionCASTLELOOP(INTERFACEACTION *);
 ACTION ActionExitCastle(void); 
 ACTION ActionLeftCastle(void); 
 ACTION ActionRightCastle(void); 
+ACTION ActionClickRedistributeMonster(void);
 ACTION ActionClickCastleMonster(void);
 ACTION ActionClickCastleMonsterEmpty(Uint8);
 ACTION ActionClickHeroesMonster(void);
@@ -630,6 +631,11 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		action.mouseEvent = MOUSE_LCLICK;
 		action.pf = ActionClickCastleMonster;
 		AddActionEvent(&castlact, &action);
+		ZeroINTERFACEACTION(&action);
+		action.rect = rectCur;
+		action.mouseEvent = MOUSE_RCLICK;
+		action.pf = ActionClickRedistributeMonster;
+		AddActionEvent(&castlact, &action);
 
 		// рисуем монстров
 		FillSPRITE(&sprite, MonsterBigNamePortrait(castle->army[i].monster), 0);
@@ -661,6 +667,11 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.pf = ActionClickCastleMonster;
+	    AddActionEvent(&castlact, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.pf = ActionClickRedistributeMonster;
 	    AddActionEvent(&castlact, &action);
 	}
     }
@@ -752,6 +763,11 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		action.mouseEvent = MOUSE_LCLICK;
 		action.pf = ActionClickHeroesMonster;
 		AddActionEvent(&castlact, &action);
+		ZeroINTERFACEACTION(&action);
+		action.rect = rectCur;
+		action.mouseEvent = MOUSE_RCLICK;
+		action.pf = ActionClickRedistributeMonster;
+		AddActionEvent(&castlact, &action);
 
 		// рисуем монстров
 		FillSPRITE(&sprite, MonsterBigNamePortrait(heroes->army[i].monster), 0);
@@ -783,6 +799,11 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		action.rect = rectCur;
 		action.mouseEvent = MOUSE_LCLICK;
 		action.pf = ActionClickHeroesMonster;
+		AddActionEvent(&castlact, &action);
+		ZeroINTERFACEACTION(&action);
+		action.rect = rectCur;
+		action.mouseEvent = MOUSE_RCLICK;
+		action.pf = ActionClickRedistributeMonster;
 		AddActionEvent(&castlact, &action);
 	    }
 	cy -= 99;
@@ -1164,7 +1185,17 @@ ACTION ActionCASTLELOOP(INTERFACEACTION *action){
 				ptr = (INTERFACEACTION *) ptr->next;
 			    }
 			    break;
-			    
+
+			case SDL_BUTTON_RIGHT:
+			    ptr = action;
+			    while(ptr){
+				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_RCLICK) && ptr->pf )
+					exit = (*ptr->pf)();
+
+				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+
 			default:
 			    break;
 		    }
@@ -1243,12 +1274,12 @@ void RedrawCastleAnimation(void){
             	break;
 
 	    case BARBARIAN:
-		if(currentCastle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(&castanim, &castlact);
-		if(currentCastle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(&castanim, &castlact);
-		if(currentCastle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
-		if(currentCastle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &castlact);
-		if(currentCastle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &castlact);
-		//if(currentCastle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact); // необходимо перерисовать имя замка
+		if(currentCastle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(NULL, NULL);
+		if(currentCastle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(NULL, NULL);
+		if(currentCastle->building & BUILD_STATUE) DrawBRBNStatue(NULL, NULL);
+		if(currentCastle->building & BUILD_TAVERN) DrawBRBNTavern(NULL, NULL);
+		if(currentCastle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(NULL, NULL);
+		//if(currentCastle->building & BUILD_WELL) DrawBRBNWell(NULL, NULL); // необходимо перерисовать имя замка
 		break;
 
 	    default:
@@ -1280,6 +1311,31 @@ void RedrawBottomBar(void){
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
     SDL_Flip(video);
+}
+
+ACTION ActionClickRedistributeMonster(void){
+/*
+    Sint32 mx, my;
+    SDL_Surface *video = SDL_GetVideoSurface();
+
+    // верхний левый угол начала
+    Uint16 cx = video->w / 2 - 208;
+    Uint16 cy1 = video->h / 2 + 22;
+    Uint16 cy2 = video->h / 2 + 121;
+
+    BOOL fromCastle = FALSE;
+
+    SDL_GetMouseState(&mx, &my);
+
+    Uint8 index = (Uint16) (mx - cx) / 88;
+
+    if(my > cy2) fromCastle = TRUE;
+    
+    S_HEROES *heroes = GetStatHeroes(heroesName);
+
+    if(! heroes || (fromCastle && MONSTERNONE != currentCastle->army[index].monster) || (!fromCastle && MONSTERNONE != heroes->army[index].monster)) return NONE;
+*/
+    return NONE;
 }
 
 ACTION ActionClickCastleMonster(void){
@@ -3062,3 +3118,23 @@ BUILDACTION AllowBuildDwelling6(const S_CASTLE *castle){
     return CANNOT_BUILD;
 }
 
+
+Uint8 GetMonsterGrown(const S_CASTLE *castle, E_MONSTER name){
+
+    const S_MONSTER *monster = GetStatMonster(name);
+    Uint8 grown = monster->grown;
+    
+        if(castle){
+            // постройка колодец
+            if(castle->building & BUILD_WELL) grown +=2;
+            // спец постройка и монстр 1 уровня
+            if((GOBLIN == name ||
+                PEASANT == name ||
+                SKELETON == name ||
+        	SPRITE == name ||
+                HALFLING == name ||
+                CENTAUR) && castle->building & BUILD_WEL2) grown += 8;
+        }
+
+    return grown;
+}

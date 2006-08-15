@@ -37,7 +37,7 @@
 #define FONT_WIDTHBIG           0x0E 
 #define FONT_WIDTHSMALL         0x07
 #define FONT_HEIGHTBIG          0x10
-#define FONT_HEIGHTSMALL        0x0A 
+#define FONT_HEIGHTSMALL        0x0B
 
 typedef enum {FONT_BIG, FONT_SMALL} ENUMFONT;
 

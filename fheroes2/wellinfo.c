@@ -41,8 +41,6 @@
 #include "monster.h"
 #include "wellinfo.h"
 
-ACTION ActionWellInfoPressExit(void);
-
 ACTION ShowWellInfo(void){
 
     CursorOff();
@@ -50,16 +48,19 @@ ACTION ShowWellInfo(void){
 
     SDL_Surface *back, *image, *video;
     SDL_Rect rectBack, rectCur;
-    Uint16 cx, cy;
+    Uint16 cx, cy, mx, my;
+    Uint8 level;
     AGGSPRITE sprite;
+    const char *message = NULL;
+    char str[32];
     BOOL exit = FALSE;
-//    char str[64];
 
-//    INTERFACEACTION action;
+    INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
-    ACTION result;
+    ACTION result = NONE;
 
-//    const S_CASTLE *castle = GetCurrentCastle();
+    const S_CASTLE *castle = GetCurrentCastle();
+    const S_MONSTER *monster = NULL;
 
     FillSPRITE(&sprite, "WELLBKG.ICN", 0);
     image = GetICNSprite(&sprite);
@@ -100,114 +101,192 @@ ACTION ShowWellInfo(void){
     cx = rectCur.x;
     cy = rectCur.y;
 
-/*
-    // портрет героя PORT00XX
-    FillSPRITE(&sprite, HeroesBigNamePortrait(name), 0);
+    // Text
+    message = "Town Population Information and Statistics";
+    rectCur.x = video->w / 2;
+    rectCur.y = video->h / 2 + 240 - BORDERWIDTH;
+    rectCur.x = rectCur.x - GetLengthText(message, FONT_BIG) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(message, FONT_BIG);
+    rectCur.h = FONT_HEIGHTBIG;
+    PrintText(video, &rectCur, message, FONT_BIG);
+                            
+    // кнопка Exit
+    FillSPRITE(&sprite, "WELLXTRA.ICN", 0);
     image = GetICNSprite(&sprite);
-    rectCur.x = cx + 49;
-    rectCur.y = cy + 31;
+    rectCur.x = cx + 578;
+    rectCur.y = cy + 461;
     rectCur.w = image->w;
     rectCur.h = image->h;
+    ZeroINTERFACEACTION(&action);
+    FillSPRITE(&action.objectUp, "WELLXTRA.ICN", 0);
+    FillSPRITE(&action.objectPush, "WELLXTRA.ICN", 1);
+    action.rect = rectCur;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionPressCANCEL;
+    AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
-    // знак
-    switch(heroes->color){
+    switch(castle->race){
+
         default:
-        case BLUE:
-            FillSPRITE(&sprite, "CREST.ICN", 0);
+        case BARBARIAN:
+            message = "CSTLBARB.ICN";
             break;
-        case GREEN:
-            FillSPRITE(&sprite, "CREST.ICN", 1);
+
+        case KNIGHT:
+            message = "CSTLKNGT.ICN";
             break;
-        case RED:
-            FillSPRITE(&sprite, "CREST.ICN", 2);
+
+	case NECROMANCER:
+            message = "CSTLNECR.ICN";
             break;
-        case YELLOW:
-            FillSPRITE(&sprite, "CREST.ICN", 3);
-    	    break;
-        case ORANGE:
-            FillSPRITE(&sprite, "CREST.ICN", 4);
-    	    break;
-        case PURPLE:
-            FillSPRITE(&sprite, "CREST.ICN", 5);
+
+        case SORCERESS:
+            message = "CSTLSORC.ICN";
+            break;
+
+        case WARLOCK:
+            message = "CSTLWRLK.ICN";
+            break;
+
+        case WIZARD:
+            message = "CSTLWZRD.ICN";
             break;
     }
+
+    // LEVEL 1
+    level = 1;
+    mx = cx;
+    my = cy;
+    monster = GetStatMonster(GetMonsterFromCastle(castle, level));
+    // image dwelling
+    FillSPRITE(&sprite, message, 19);
     image = GetICNSprite(&sprite);
-    rectCur.x = cx + 49;
-    rectCur.y = cy + 130;
+    rectCur.x = mx + 21;
+    rectCur.y = my + 35;
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // фон монстров STRIP.ICN 2
-    // фон спец SECSKILL 0
-    // фон артифактов ARTIFACT 0
-
-    // название монстра
-    sprintf(str, "Recrut %s", monster->descriptions);
-    rectCur.x = rectBack.x + 160;
-    rectCur.y = rectBack.y + 25;
-    rectCur.w = GetLengthText(str, FONT_BIG);
-    rectCur.h = FONT_HEIGHTBIG;
-    rectCur.x = rectCur.x - rectCur.w / 2;
-    PrintText(video, &rectCur, str, FONT_BIG);
-
-    // картинка монстра
-    char number[5];
-    Uint8 j;
-    sprintf(number, "%4d", emonster);
-    for(j = 0; j < 4; j++)
-        if(0 == strncmp(&number[j], " ", 1)) number[j] = '0';
-    sprintf(str, "MONH%4s.ICN", number);
-    FillSPRITE(&sprite, str, 0);
+    //text dwelling
+    message = GetStringDwelling(castle->race, DWELLING_MONSTER1);
+    rectCur.x = mx + 86;
+    rectCur.y = my + 106;
+    rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // image monster
+    FillSPRITE(&sprite, MonsterBigNamePortrait(GetMonsterFromCastle(castle, level)), 0);
     image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 50;
-    rectCur.y = rectBack.y + 45;
+    rectCur.x = mx + 180;
+    rectCur.y = my + 60;
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    //text monster
+    message = GetStringMonster(GetMonsterFromCastle(castle, level));
+    rectCur.x = mx + 120;
+    rectCur.y = my + 22;
+    rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // available
+    if(castle->dwelling & DWELLING_MONSTER1 && castle->monster[level - 1]){
+	message = "Available:";
+	rectCur.x = mx + 70;
+	rectCur.y = my + 122;
+	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(message, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
 
-    // text number to buy
-    sprintf(str, "Number to buy:");
-    rectCur.x = rectBack.x + 30;
-    rectCur.y = rectBack.y + 163;
+        sprintf(str, "%d", castle->monster[level - 1]);
+	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
+	rectCur.y = my + 118;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_BIG);
+	rectCur.h = FONT_HEIGHTBIG;
+	PrintText(video, &rectCur, str, FONT_BIG);
+    }
+    // attack
+    sprintf(str, "Attack: %d", monster->attack);
+    rectCur.x = mx + 270;
+    rectCur.y = my + 24;
+    rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
     rectCur.w = GetLengthText(str, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
+    // defense
+    sprintf(str, "Defense: %d", monster->defence);
+    rectCur.x = mx + 270;
+    rectCur.y = my + 24 + FONT_HEIGHTSMALL;
+    rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(str, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, str, FONT_SMALL);
+    // damage
+    sprintf(str, "Damg: %d-%d", monster->damageMin, monster->damageMax);
+    rectCur.x = mx + 270;
+    rectCur.y = my + 24 + FONT_HEIGHTSMALL * 2;
+    rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(str, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, str, FONT_SMALL);
+    // hp
+    sprintf(str, "HP: %d", monster->hp);
+    rectCur.x = mx + 270;
+    rectCur.y = my + 24 + FONT_HEIGHTSMALL * 3;
+    rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(str, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, str, FONT_SMALL);
+    // speed
+    sprintf(str, "Speed:");
+    rectCur.x = mx + 270;
+    rectCur.y = my + 24 + FONT_HEIGHTSMALL * 5;
+    rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(str, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, str, FONT_SMALL);
+    message = GetStringSpeed(monster->speed);
+    rectCur.x = mx + 270;
+    rectCur.y = my + 24 + FONT_HEIGHTSMALL * 6;
+    rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+    rectCur.y = rectCur.y - 3;
+    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, message, FONT_SMALL);
+    // growth
+    if(castle->dwelling & DWELLING_MONSTER1){
+	sprintf(str, "Growth");
+	rectCur.x = mx + 270;
+	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, str, FONT_SMALL);
+	sprintf(str, "+ %d / week", GetMonsterGrown(castle, GetMonsterFromCastle(castle, level)));
+	rectCur.x = mx + 270;
+	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, str, FONT_SMALL);
+    }
 
-
-    // рисуем кнопки
-    // кнопка Dismiss
-    FillSPRITE(&sprite, "HSBTNS.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx + 5;
-    rectCur.y = cy + 318;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "HSBTNS.ICN", 0);
-    FillSPRITE(&action.objectPush, "HSBTNS.ICN", 1);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionHeroesInfoPressDismiss;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    // кнопка Exit
-    FillSPRITE(&sprite, "HSBTNS.ICN", 2);
-    image = GetICNSprite(&sprite);
-    rectCur.x = cx + 603;
-    rectCur.y = cy + 318;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "HSBTNS.ICN", 2);
-    FillSPRITE(&action.objectPush, "HSBTNS.ICN", 3);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionHeroesInfoPressExit;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-*/
     // Отрисовка диалога
     CursorOn();
 
@@ -227,13 +306,8 @@ ACTION ShowWellInfo(void){
     		result = NONE;
     		break;
 
-    	    case DISMISS:
-    		exit = TRUE;
-    		result = DISMISS;
-    		break;
 
     	    default:
-		result = NONE;
     		break;
 
 	}
@@ -249,9 +323,4 @@ ACTION ShowWellInfo(void){
     CursorOn();
 
     return result;
-}
-
-ACTION ActionWellInfoPressExit(void){
-
-    return CANCEL;
 }

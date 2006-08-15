@@ -114,6 +114,4 @@ ACTION ActionCastleClickDwelling5(void);
 ACTION ActionCastleClickDwelling6(void);
 ACTION ActionCastleClickCaptain(void);
 
-ACTION BuildingMessageBox(E_RACE, E_BUILDINGCASTLE, const char *, Uint16, Uint8, Uint8, Uint8, Uint8, Uint8, Uint8);
-
 #endif

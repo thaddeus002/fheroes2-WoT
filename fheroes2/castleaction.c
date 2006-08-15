@@ -39,6 +39,7 @@
 #include "kingdom.h"
 #include "castle.h"
 #include "castleinfo.h"
+#include "wellinfo.h"
 #include "castleaction.h"
 #include "recrutmonster.h"
 
@@ -677,8 +678,8 @@ ACTION ActionClickStatue(void){
 }
 
 ACTION ActionClickWell(void){
-    fprintf(stderr, "ClickWell\n");
-    return NONE;
+    
+    return ShowWellInfo();
 }
 
 ACTION ActionClickThievesGuild(void){
@@ -1588,8 +1589,7 @@ ACTION ActionCastleOverCaptain(void){
     switch(AllowBuildCaptain(castle)){
 
 	case BUILD_OK:
-	    message = "Cannot build. Already build here this turn.";
-//	    message = "Build Captains Quarters";
+	    message = "Build Captains Quarters";
 	    break;
 	
 	case CANNOT_BUILD:
@@ -1718,8 +1718,8 @@ ACTION ActionCastleClickDwelling6(void){
 
 ACTION ActionCastleClickCaptain(void){
 
-    const S_CASTLE *castle = GetCurrentCastle();
-    BuildingMessageBox(castle->race, BUILD_CAPTAIN, "The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.", BUILD_CAPTAIN_GOLD, 0, 0, 0, 0, 0, 0);
+    //const S_CASTLE *castle = GetCurrentCastle();
+    //BuildingMessageBox(castle->race, BUILD_CAPTAIN, "The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.", BUILD_CAPTAIN_GOLD, 0, 0, 0, 0, 0, 0);
     return NONE;
 }
 
@@ -1732,7 +1732,9 @@ ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text,
     Uint32 cursor = GetCursor();
     SDL_Surface *back, *image, *video;
     SDL_Rect rectBack, rectCur;
-    ACTION result = NONE;
+    ACTION result;
+    //INTERFACEACTION action;
+    INTERFACEACTION *dialog = NULL;        
     AGGSPRITE sprite;
     Uint8 i;
     
@@ -1853,18 +1855,14 @@ ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text,
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
-    INTERFACEACTION *dialog = NULL;        
 /*
-    // рисуем кнопки
-    INTERFACEACTION action;
-
     // кнопка YES
     FillSPRITE(&sprite, system, 5);
     image = GetICNSprite(&sprite);
     rectCur.x = rectBack.x + 40;
-    rectCur.y = rectBack.y + BOXHEIGHT - 70;
+    rectCur.y = rectBack.y + rectBack.h - 70;
     if(GetIntValue(EVILINTERFACE))
-        rectCur.y = rectBack.y + BOXHEIGHT - 85;
+        rectCur.y = rectBack.y + rectBack.h - 85;
     rectCur.w = image->w;
     rectCur.h = image->h;
     ZeroINTERFACEACTION(&action);
@@ -1879,9 +1877,9 @@ ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text,
     // кнопка NO
     FillSPRITE(&sprite, system, 7);
     image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + BOXWIDTH - image->w - 25;
+    rectCur.x = rectBack.x + rectBack.w - image->w - 25;
     if(GetIntValue(EVILINTERFACE))
-	rectCur.y = rectBack.y + BOXHEIGHT - 85;
+	rectCur.y = rectBack.y + rectBack.h - 85;
     rectCur.w = image->w;
     rectCur.h = image->h;
     ZeroINTERFACEACTION(&action);
@@ -1893,7 +1891,6 @@ ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text,
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
 */
-
     // Отрисовка диалога
     SDL_Flip(video);
 
@@ -1903,7 +1900,7 @@ ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text,
 
     // цикл событий
     result = ActionCycle(dialog);
-
+                                    
     // востанавливаем бакгроунд
     CursorOff();
     SDL_BlitSurface(back, NULL, video, &rectBack);
