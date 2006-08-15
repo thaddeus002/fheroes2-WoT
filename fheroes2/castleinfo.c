@@ -682,14 +682,18 @@ void RedrawInfoBottomBar(void){
     FillSPRITE(&sprite, "CASLBAR.ICN", 0);
     image = GetICNSprite(&sprite);
 
+/*
     if(GetIntValue(VIDEOMODE)){
 	rectCur.x =  video->w / 2 - 320;
-	rectCur.y = 480 + 2 * BORDERWIDTH + SHADOWWIDTH - image->h;
+	rectCur.y = video->h + 2 * BORDERWIDTH + SHADOWWIDTH - image->h;
     }else{
 	rectCur.x = 0;
 	rectCur.y = 480 - image->h;
     }
-
+*/
+    rectCur.x = video->w / 2 - 320;
+    rectCur.y = video->h / 2 + 240 - BORDERWIDTH - 3;
+    
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);

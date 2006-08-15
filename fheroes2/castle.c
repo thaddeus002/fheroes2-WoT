@@ -3128,12 +3128,12 @@ Uint8 GetMonsterGrown(const S_CASTLE *castle, E_MONSTER name){
             // постройка колодец
             if(castle->building & BUILD_WELL) grown +=2;
             // спец постройка и монстр 1 уровня
-            if((GOBLIN == name ||
-                PEASANT == name ||
-                SKELETON == name ||
-        	SPRITE == name ||
-                HALFLING == name ||
-                CENTAUR) && castle->building & BUILD_WEL2) grown += 8;
+            if(GOBLIN == name && castle->building & BUILD_WEL2) grown += 8;
+            if(PEASANT == name && castle->building & BUILD_WEL2) grown += 8;
+            if(SKELETON == name && castle->building & BUILD_WEL2) grown += 8;
+            if(SPRITE == name  && castle->building & BUILD_WEL2) grown += 8;
+            if(HALFLING == name && castle->building & BUILD_WEL2) grown += 8;
+            if(CENTAUR == name && castle->building & BUILD_WEL2) grown += 8;
         }
 
     return grown;
