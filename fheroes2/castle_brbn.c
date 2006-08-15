@@ -73,8 +73,15 @@ void DrawBRBNCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.w -= 30;
-	cur.h -= 45;
+	if(castle->castle){
+	    cur.w -= 30;
+	    cur.h -= 45;
+	}else{
+	    cur.x += 20;
+	    cur.y += 20;
+	    cur.w = 70;
+	    cur.h = 50;
+	}
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;

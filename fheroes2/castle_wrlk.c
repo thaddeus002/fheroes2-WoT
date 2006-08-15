@@ -72,9 +72,15 @@ void DrawWRLKCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.x += 30;
-	cur.w = 210;
-	cur.h -= 20;
+	if(castle->castle){
+	    cur.x += 30;
+	    cur.w = 210;
+	    cur.h -= 20;
+	}else{
+	    cur.x += 20;
+	    cur.w = 60;
+	    cur.h = 40;
+	}
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;

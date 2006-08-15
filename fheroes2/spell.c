@@ -30,6 +30,7 @@
 #include "SDL.h"
 
 #include "gamedefs.h"
+#include "config.h"
 #include "spell.h"
 
 static S_SPELL	*ptrSpell = NULL;
@@ -224,16 +225,16 @@ BOOL	InitSpell(void){
     ptrSpell[HAUNT].name = "Haunt";
     ptrSpell[HAUNT].cost = 8;
 
-    ptrSpell[EARTHGUARDIAN].name = "Set Earth Guardian";
+    ptrSpell[EARTHGUARDIAN].name = "Earth Guardian";
     ptrSpell[EARTHGUARDIAN].cost = 15;
     
-    ptrSpell[AIRGUARDIAN].name = "Set Air Guardian";
+    ptrSpell[AIRGUARDIAN].name = "Air Guardian";
     ptrSpell[AIRGUARDIAN].cost = 15;
 
-    ptrSpell[FIREGUARDIAN].name = "Set Fire Guardian";
+    ptrSpell[FIREGUARDIAN].name = "Fire Guardian";
     ptrSpell[FIREGUARDIAN].cost = 15;
 
-    ptrSpell[WATERGUARDIAN].name = "Set Water Guardian";
+    ptrSpell[WATERGUARDIAN].name = "Water Guardian";
     ptrSpell[WATERGUARDIAN].cost = 15;
 
 
@@ -313,4 +314,103 @@ BOOL	InitSpell(void){
 void	FreeSpell(void){
     
     if(ptrSpell) free(ptrSpell);
+}
+
+E_MAGICLEVEL GetLevelSpellMagic(E_SPELL spell){
+
+    switch(spell){
+
+	case BLESS:
+	case BLOODLUST:
+	case CURE:
+	case CURSE:
+	case DISPELMAGIC:
+	case HASTE:
+	case MAGICARROW:
+	case SHIELD:
+	case SPELLSLOW:
+	case STONESKIN:
+	case VIEWMINES:
+	case VIEWRESOURCES:
+	    return MAGIC_LEVEL1;
+	    break;
+	
+	case BLIND:
+	case COLDRAY:
+	case DEATHRIPPLE:
+	case DISRUPTINGRAY:
+	case DRAGONSLAYER:
+	case LIGHTNINGBOLT:
+	case STEELSKIN:
+	case SUMMONBOAT:
+	case HAUNT:
+	case VISIONS:
+	case VIEWARTIFACTS:
+	    return MAGIC_LEVEL2;
+	    break;
+	
+	
+	case ANIMATEDEAD:
+	case ANTIMAGIC:
+	case COLDRING:
+	case DEATHWAVE:
+	case EARTHQUAKE:
+	case FIREBALL:
+	case HOLYWORD:
+	case MASSBLESS:
+	case MASSCURSE:
+	case MASSDISPEL:
+	case MASSHASTE:
+	case PARALYZE:
+	case TELEPORT:
+	case IDENTIFYHERO:
+	case VIEWHEROES:
+	case VIEWTOWNS:
+	    return MAGIC_LEVEL3;
+	    break;
+
+	case BERZERKER:
+	case CHAINLIGHTNING:
+	case ELEMENTALSTORM:
+	case FIREBLAST:
+	case HOLYSHOUT:
+	case MASSCURE:
+	case MASSSHIELD:
+	case MASSSLOW:
+	case METEORSHOWER:
+	case RESURRECT:
+	case VIEWALL:
+	case TOWNGATE:
+	case EARTHGUARDIAN:
+	case AIRGUARDIAN:
+	case FIREGUARDIAN:
+	case WATERGUARDIAN:
+	    return MAGIC_LEVEL4;
+	    break;
+	
+	case ARMAGEDDON:
+	case HYPNOTIZE:
+	case MIRRORIMAGE:
+	case RESURRECTTRUE:
+	case EARTHSUMMON:
+	case AIRSUMMON:
+	case FIRESUMMON:
+	case WATERSUMMON:
+	case DIMENSIONDOOR:
+	case TOWNPORTAL:
+	    return MAGIC_LEVEL5;
+	    break;
+	
+	case SPELLNONE:
+	    break;
+    }
+    
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetLevelSpellMagic: unknown spell: %d\n", spell);
+    
+    return MAGIC_NONE;
+}
+
+const char * GetStringSpellMagic(E_SPELL spell){
+
+    return ptrSpell[spell].name;
 }

@@ -35,6 +35,16 @@
 #define SPELLMAXCOUNT	66
 
 typedef enum {
+	    MAGIC_NONE = 0,
+	    MAGIC_LEVEL1,
+	    MAGIC_LEVEL2,
+	    MAGIC_LEVEL3,
+	    MAGIC_LEVEL4,
+	    MAGIC_LEVEL5
+
+	    } E_MAGICLEVEL;
+
+typedef enum {
 		SPELLNONE,
 		SPELLSLOW,
 		MASSCURE,
@@ -113,7 +123,9 @@ typedef struct {
 
 	    } S_SPELL;
 
-BOOL	InitSpell(void);
-void	FreeSpell(void);
+BOOL	     InitSpell(void);
+void	     FreeSpell(void);
+E_MAGICLEVEL GetLevelSpellMagic(E_SPELL);
+const char * GetStringSpellMagic(E_SPELL);
 
 #endif

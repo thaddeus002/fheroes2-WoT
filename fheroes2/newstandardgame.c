@@ -72,7 +72,7 @@ ACTION DrawSelectNewStandardGame(void){
 
     INTERFACEACTION action;
     AGGSPRITE sprite;
-    ACTION result;
+    ACTION result = NONE;
     BOOL exit;
 
     stpenewstandard = NULL;

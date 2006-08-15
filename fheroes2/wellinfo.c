@@ -834,7 +834,12 @@ ACTION ShowWellInfo(void){
     my = cy + 300;
     monster = GetStatMonster(GetMonsterFromCastle(castle, level));
     // image dwelling
-    castle->dwelling & DWELLING_UPGRADE6 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
+    if(castle->dwelling & DWELLING_UPGRADE7 && WARLOCK == castle->race)
+	FillSPRITE(&sprite, icnname, 24 + level);
+    else if(castle->dwelling & DWELLING_UPGRADE6)
+	FillSPRITE(&sprite, icnname, 23 + level);
+    else
+	FillSPRITE(&sprite, icnname, 18 + level);
     image = GetICNSprite(&sprite);
     rectCur.x = mx + 21;
     rectCur.y = my + 35;
@@ -842,7 +847,9 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    if(castle->dwelling & DWELLING_UPGRADE6)
+    if(castle->dwelling & DWELLING_UPGRADE7 && WARLOCK == castle->race)
+	message = GetStringDwelling(castle->race, DWELLING_UPGRADE7);
+    else if(castle->dwelling & DWELLING_UPGRADE6)
 	message = GetStringDwelling(castle->race, DWELLING_UPGRADE6);
     else
 	message = GetStringDwelling(castle->race, DWELLING_MONSTER6);
@@ -871,7 +878,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // available
-    if((castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6) && castle->monster[level - 1]){
+    if((castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6 || castle->dwelling & DWELLING_UPGRADE7) && castle->monster[level - 1]){
 	message = "Available:";
 	rectCur.x = mx + 70;
 	rectCur.y = my + 122;
@@ -944,7 +951,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
-    if(castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6){
+    if(castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6 || castle->dwelling & DWELLING_UPGRADE7){
 	sprintf(str, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
@@ -962,7 +969,6 @@ ACTION ShowWellInfo(void){
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
     }
-
 
     // Отрисовка диалога
     CursorOn();

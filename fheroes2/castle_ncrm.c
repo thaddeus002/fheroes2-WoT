@@ -73,9 +73,15 @@ void DrawNCRMCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.x += 270;
-	cur.w  = 192;
-	cur.h -= 100;
+	if(castle->castle){
+	    cur.x += 270;
+	    cur.w  = 192;
+	    cur.h -= 100;
+	}else{
+	    cur.x -= 130;
+	    cur.w = 50;
+	    cur.h = 50;
+	}
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;

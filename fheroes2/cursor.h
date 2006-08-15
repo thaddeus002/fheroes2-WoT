@@ -107,7 +107,7 @@
 
 #define CURSOR_SPELL_NONE	0x015C0000	// магия красный крест
 #define CURSOR_SPELL_SLOW	0x015C0001	// магия замедление
-#define CURSOR_SPELL_UNK1	0x015C0002	// магия ?? синий пузырек
+#define CURSOR_SPELL_MASSCURE	0x015C0002	// магия ?? синий пузырек
 #define CURSOR_SPELL_CURSE	0x015C0003	// магия проклятье
 #define CURSOR_SPELL_LIGHT	0x015C0004	// магия молния
 #define CURSOR_SPELL_MORELIGHT	0x015C0005	// магия цепь молний

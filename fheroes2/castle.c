@@ -42,6 +42,7 @@
 #include "kingdom.h"
 #include "heroes.h"
 #include "heroesinfo.h"
+#include "debug.h"
 #include "castle.h"
 #include "castleaction.h"
 #include "castle_kngt.h"
@@ -1861,12 +1862,12 @@ E_MONSTER GetMonsterFromCastle(const S_CASTLE *castle, Uint8 level){
 	    if(castle->dwelling & DWELLING_UPGRADE5 && level == 5) return WAR_TROLL;
 	    if(castle->dwelling & DWELLING_UPGRADE4 && level == 4) return LORD_OGRE;
 	    if(castle->dwelling & DWELLING_UPGRADE2 && level == 2) return CHIEF_ORC;
-	    if(castle->dwelling & DWELLING_MONSTER6 && level == 6) return CYCLOPS;
-	    if(castle->dwelling & DWELLING_MONSTER5 && level == 5) return TROLL;
-	    if(castle->dwelling & DWELLING_MONSTER4 && level == 4) return TROLL;
-	    if(castle->dwelling & DWELLING_MONSTER3 && level == 3) return WOLF;
-	    if(castle->dwelling & DWELLING_MONSTER2 && level == 2) return ORC;
-	    if(castle->dwelling & DWELLING_MONSTER1 && level == 1) return GOBLIN;
+	    if(level == 6) return CYCLOPS;
+	    if(level == 5) return TROLL;
+	    if(level == 4) return TROLL;
+	    if(level == 3) return WOLF;
+	    if(level == 2) return ORC;
+	    if(level == 1) return GOBLIN;
 	    break;
 
 	case KNIGHT:
@@ -1875,48 +1876,48 @@ E_MONSTER GetMonsterFromCastle(const S_CASTLE *castle, Uint8 level){
 	    if(castle->dwelling & DWELLING_UPGRADE4 && level == 4) return MASTER_SWORDSMAN;
 	    if(castle->dwelling & DWELLING_UPGRADE3 && level == 3) return VETERAN_PIKEMAN;
 	    if(castle->dwelling & DWELLING_UPGRADE2 && level == 2) return RANGER;
-	    if(castle->dwelling & DWELLING_MONSTER6 && level == 6) return PALADIN;
-	    if(castle->dwelling & DWELLING_MONSTER5 && level == 5) return CAVALIRY;
-	    if(castle->dwelling & DWELLING_MONSTER4 && level == 4) return SWORDSMAN;
-	    if(castle->dwelling & DWELLING_MONSTER3 && level == 3) return PIKEMAN;
-	    if(castle->dwelling & DWELLING_MONSTER2 && level == 2) return ARCHER;
-	    if(castle->dwelling & DWELLING_MONSTER1 && level == 1) return PEASANT;
+	    if(level == 6) return PALADIN;
+	    if(level == 5) return CAVALIRY;
+	    if(level == 4) return SWORDSMAN;
+	    if(level == 3) return PIKEMAN;
+	    if(level == 2) return ARCHER;
+	    if(level == 1) return PEASANT;
 	    break;
 
 	case SORCERESS:
 	    if(castle->dwelling & DWELLING_UPGRADE4 && level == 4) return GREATER_DRUID;
 	    if(castle->dwelling & DWELLING_UPGRADE3 && level == 3) return GRAND_ELF;
 	    if(castle->dwelling & DWELLING_UPGRADE2 && level == 2) return BATTLE_DWARF;
-	    if(castle->dwelling & DWELLING_MONSTER6 && level == 6) return PHOENIX;
-	    if(castle->dwelling & DWELLING_MONSTER5 && level == 5) return UNICORN;
-	    if(castle->dwelling & DWELLING_MONSTER4 && level == 4) return DRUID;
-	    if(castle->dwelling & DWELLING_MONSTER3 && level == 3) return ELF;
-	    if(castle->dwelling & DWELLING_MONSTER2 && level == 2) return DWARF;
-	    if(castle->dwelling & DWELLING_MONSTER1 && level == 1) return SPRITE;
+	    if(level == 6) return PHOENIX;
+	    if(level == 5) return UNICORN;
+	    if(level == 4) return DRUID;
+	    if(level == 3) return ELF;
+	    if(level == 2) return DWARF;
+	    if(level == 1) return SPRITE;
 	    break;
 
 	case WARLOCK:
 	    if(castle->dwelling & DWELLING_UPGRADE7 && level == 6) return BLACK_DRAGON;
 	    if(castle->dwelling & DWELLING_UPGRADE6 && level == 6) return RED_DRAGON;
 	    if(castle->dwelling & DWELLING_UPGRADE4 && level == 4) return KNIGHT_MINOTAUR;
-	    if(castle->dwelling & DWELLING_MONSTER6 && level == 6) return GREEN_DRAGON;
-	    if(castle->dwelling & DWELLING_MONSTER5 && level == 5) return HIDRA;
-	    if(castle->dwelling & DWELLING_MONSTER4 && level == 4) return MINOTAUR;
-	    if(castle->dwelling & DWELLING_MONSTER3 && level == 3) return GRIFFIN;
-	    if(castle->dwelling & DWELLING_MONSTER2 && level == 2) return GARGOYLE;
-	    if(castle->dwelling & DWELLING_MONSTER1 && level == 1) return CENTAUR;
+	    if(level == 6) return GREEN_DRAGON;
+	    if(level == 5) return HIDRA;
+	    if(level == 4) return MINOTAUR;
+	    if(level == 3) return GRIFFIN;
+	    if(level == 2) return GARGOYLE;
+	    if(level == 1) return CENTAUR;
 	    break;
 
 	case WIZARD:
 	    if(castle->dwelling & DWELLING_UPGRADE6 && level == 6) return TITAN;
 	    if(castle->dwelling & DWELLING_UPGRADE5 && level == 5) return ARCHMAGE;
 	    if(castle->dwelling & DWELLING_UPGRADE3 && level == 3) return STEEL_GOLEM;
-	    if(castle->dwelling & DWELLING_MONSTER6 && level == 6) return GIANT;
-	    if(castle->dwelling & DWELLING_MONSTER5 && level == 5) return MAGE;
-	    if(castle->dwelling & DWELLING_MONSTER4 && level == 4) return ROC;
-	    if(castle->dwelling & DWELLING_MONSTER3 && level == 3) return IRON_GOLEM;
-	    if(castle->dwelling & DWELLING_MONSTER2 && level == 2) return BOAR;
-	    if(castle->dwelling & DWELLING_MONSTER1 && level == 1) return HALFLING;
+	    if(level == 6) return GIANT;
+	    if(level == 5) return MAGE;
+	    if(level == 4) return ROC;
+	    if(level == 3) return IRON_GOLEM;
+	    if(level == 2) return BOAR;
+	    if(level == 1) return HALFLING;
 	    break;
 
 	case NECROMANCER:
@@ -1924,17 +1925,19 @@ E_MONSTER GetMonsterFromCastle(const S_CASTLE *castle, Uint8 level){
 	    if(castle->dwelling & DWELLING_UPGRADE4 && level == 4) return LORD_VAMPIRE;
 	    if(castle->dwelling & DWELLING_UPGRADE3 && level == 3) return ROYAL_MUMMY;
 	    if(castle->dwelling & DWELLING_UPGRADE2 && level == 2) return MUTANT_ZOMBIE;
-	    if(castle->dwelling & DWELLING_MONSTER6 && level == 6) return BONE_DRAGON;
-	    if(castle->dwelling & DWELLING_MONSTER5 && level == 5) return LICH;
-	    if(castle->dwelling & DWELLING_MONSTER4 && level == 4) return VAMPIRE;
-	    if(castle->dwelling & DWELLING_MONSTER3 && level == 3) return MUMMY;
-	    if(castle->dwelling & DWELLING_MONSTER2 && level == 2) return ZOMBIE;
-	    if(castle->dwelling & DWELLING_MONSTER1 && level == 1) return SKELETON;
+	    if(level == 6) return BONE_DRAGON;
+	    if(level == 5) return LICH;
+	    if(level == 4) return VAMPIRE;
+	    if(level == 3) return MUMMY;
+	    if(level == 2) return ZOMBIE;
+	    if(level == 1) return SKELETON;
 	    break;
 				
 	default:
 	    break;
     }
+
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetMonsterFromCastle: return MONSTERNONE, level: %d, castle: %s, race: %s, ax: %d, ay: %d\n", level, castle->name, GetStringRace(castle->race), castle->ax, castle->ay);
 
     return MONSTERNONE;
 }

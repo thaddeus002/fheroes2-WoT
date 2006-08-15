@@ -72,8 +72,13 @@ void DrawKNGTCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.w -= 80;
-	cur.h -= 25;
+	if(castle->castle){
+	    cur.w -= 80;
+	    cur.h -= 25;
+	}else{
+	    cur.w = 50;
+	    cur.h = 50;
+	}
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
