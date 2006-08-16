@@ -794,7 +794,7 @@ void DrawNCRMMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->magicTower > 5 || castle->magicTower < 1) return;
+    if(castle->mageGuild.level > 5 || castle->mageGuild.level < 1) return;
 
     // анимация
     if(animHead){
@@ -802,13 +802,13 @@ void DrawNCRMMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	cur.y = cy;
 	cur.w = 0;
 	cur.h = 0;
-	FillSPRITE(&sprite, "TWNNMAGE.ICN", (castle->magicTower - 1) * 6 + 1);
+	FillSPRITE(&sprite, "TWNNMAGE.ICN", (castle->mageGuild.level - 1) * 6 + 1);
 	header = GetICNHeader(&sprite);
 	AddAnimationEvent(animHead, &cur, header, 5);
     }
 
     // спрайт
-    FillSPRITE(&sprite, "TWNNMAGE.ICN", (castle->magicTower - 1) * 6);
+    FillSPRITE(&sprite, "TWNNMAGE.ICN", (castle->mageGuild.level - 1) * 6);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
@@ -816,20 +816,20 @@ void DrawNCRMMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    if(1 == castle->magicTower){
+    if(1 == castle->mageGuild.level){
 	cur.x += 250;
 	cur.w = 80;
-    }else if(2 == castle->magicTower){
+    }else if(2 == castle->mageGuild.level){
 	cur.x += 260;
 	cur.w = 80;
 	cur.h = 70;
-    }else if(3 == castle->magicTower){
+    }else if(3 == castle->mageGuild.level){
 	cur.x += 250;
 	cur.w = 80;
-    }else if(4 == castle->magicTower){
+    }else if(4 == castle->mageGuild.level){
 	cur.x += 250;
 	cur.w = 80;
-    }else if(5 == castle->magicTower){
+    }else if(5 == castle->mageGuild.level){
 	cur.x += 250;
 	cur.w = 80;
     }

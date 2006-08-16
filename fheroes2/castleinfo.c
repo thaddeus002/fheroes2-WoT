@@ -1243,7 +1243,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringLevelMageGuild(castle->magicTower + 1);
+    message = GetStringLevelMageGuild(castle->mageGuild.level + 1);
     rectCur.x = cx + 70;
     rectCur.y = cy + 215;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;

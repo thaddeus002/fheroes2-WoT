@@ -33,7 +33,6 @@
 #include "tools.h"
 #include "cursor.h"
 #include "debug.h"
-#include "castle.h"
 #include "config.h"
 #include "element.h"
 #include "actionevent.h"

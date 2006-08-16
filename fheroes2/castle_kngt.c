@@ -283,7 +283,7 @@ void DrawKNGTTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     if(actionHead){
 	cur.x += 190;
 	cur.w = 70;
-	cur.h = 55;
+	cur.h = 45;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
@@ -782,8 +782,8 @@ void DrawKNGTDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     if(actionHead){
 	cur.x += 120;
 	cur.w = 85;
-	cur.y += 5;
-	cur.h = 80;
+	cur.y += 15;
+	cur.h = 70;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
@@ -904,9 +904,9 @@ void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    if(castle->magicTower > 5 || castle->magicTower < 1) return;
+    if(castle->mageGuild.level > 5 || castle->mageGuild.level < 1) return;
 
-    FillSPRITE(&sprite, "TWNKMAGE.ICN", castle->magicTower);
+    FillSPRITE(&sprite, "TWNKMAGE.ICN", castle->mageGuild.level);
 
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
@@ -915,26 +915,31 @@ void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    if(1 == castle->magicTower){
+    if(1 == castle->mageGuild.level){
 	cur.x += 260;
+	cur.y += 10;
 	cur.w = 55;
-	cur.h = 50;
-    }else if(2 == castle->magicTower){
+	cur.h = 60;
+    }else if(2 == castle->mageGuild.level){
 	cur.x += 260;
+	cur.y += 10;
 	cur.w = 55;
-	cur.h = 70;
-    }else if(3 == castle->magicTower){
+	cur.h = 80;
+    }else if(3 == castle->mageGuild.level){
 	cur.x += 260;
+	cur.y += 10;
 	cur.w = 55;
-	cur.h = 90;
-    }else if(4 == castle->magicTower){
+	cur.h = 100;
+    }else if(4 == castle->mageGuild.level){
 	cur.x += 260;
+	cur.y += 10;
 	cur.w = 55;
-	cur.h = 110;
-    }else if(5 == castle->magicTower){
+	cur.h = 120;
+    }else if(5 == castle->mageGuild.level){
 	cur.x += 260;
+	cur.y += 10;
 	cur.w = 55;
-	cur.h = 130;
+	cur.h = 140;
     }
     
     if(actionHead){

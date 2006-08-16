@@ -36,6 +36,7 @@
 #include "config.h"
 #include "actionevent.h"
 #include "monster.h"
+#include "magictower.h"
 #include "kingdom.h"
 #include "castle.h"
 #include "castleinfo.h"
@@ -668,8 +669,12 @@ ACTION ActionClickCaptain(void){
 }
 
 ACTION ActionClickMageGuild(void){
-    fprintf(stderr, "ClickMageGuild\n");
-    return NONE;
+
+    ACTION result = ShowMageGuildInfo();
+
+    if(EXIT != result) result = NONE;
+    
+    return result;
 }
 
 ACTION ActionClickStatue(void){

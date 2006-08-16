@@ -33,6 +33,7 @@
 #include "gamedefs.h"
 #include "heroes.h"
 #include "actionevent.h"
+#include "spell.h"
 #include "monster.h"
 
 #define CASTLEMAXARMY		5
@@ -329,6 +330,23 @@ typedef enum { BUILD_OK, CANNOT_BUILD, ALREADY_BUILD, END_TUR } BUILDACTION;
 #define GROWN_WEEK_FIRE_ELEMENT		5
 #define GROWN_WEEK_WATER_ELEMENT	5
 
+
+#define CASTLESPELL_LEVEL5      2 
+#define CASTLESPELL_LEVEL4      3 
+#define CASTLESPELL_LEVEL3      3 
+#define CASTLESPELL_LEVEL2      4 
+#define CASTLESPELL_LEVEL1      4 
+
+typedef struct {
+                E_MAGICLEVEL level;
+                E_SPELL level5[CASTLESPELL_LEVEL5];
+                E_SPELL level4[CASTLESPELL_LEVEL4];
+                E_SPELL level3[CASTLESPELL_LEVEL3];
+                E_SPELL level2[CASTLESPELL_LEVEL2];
+                E_SPELL level1[CASTLESPELL_LEVEL1];
+
+                } S_MAGEGUILD;
+                                                                                                                
 typedef enum {
 		BUILD_THIEVEGUILD	= 0x0002,
 		BUILD_TAVERN		= 0x0004,
@@ -371,7 +389,7 @@ typedef struct {
     SDL_Rect	pos;
     Uint16	building;
     Uint16	dwelling;
-    Uint8	magicTower;
+    S_MAGEGUILD	mageGuild;
     Uint16	monster[CASTLEMAXMONSTER];
     S_ARMY	army[CASTLEMAXARMY];
     BOOL	capitan;

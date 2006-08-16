@@ -32,7 +32,17 @@
 #include "SDL.h"
 #include "gamedefs.h"
 
-#define SPELLMAXCOUNT	66
+#define SPELLMAXCOUNT		66
+#define FIGHTINGSPELL_LEVEL1	10
+#define FIGHTINGSPELL_LEVEL2	7
+#define FIGHTINGSPELL_LEVEL3	12
+#define FIGHTINGSPELL_LEVEL4	10
+#define FIGHTINGSPELL_LEVEL5	8
+#define LIFESPELL_LEVEL1	2
+#define LIFESPELL_LEVEL2	4
+#define LIFESPELL_LEVEL3	4
+#define LIFESPELL_LEVEL4	6
+#define LIFESPELL_LEVEL5	2
 
 typedef enum {
 	    MAGIC_NONE = 0,
@@ -127,5 +137,12 @@ BOOL	     InitSpell(void);
 void	     FreeSpell(void);
 E_MAGICLEVEL GetLevelSpellMagic(E_SPELL);
 const char * GetStringSpellMagic(E_SPELL);
+Uint8 	     GetCostSpellMagic(E_SPELL);
+
+void	     FillSpellLevel1(E_RACE, E_SPELL *, BOOL);
+void	     FillSpellLevel2(E_RACE, E_SPELL *, BOOL);
+void	     FillSpellLevel3(E_RACE, E_SPELL *, BOOL);
+void	     FillSpellLevel4(E_RACE, E_SPELL *, BOOL);
+void	     FillSpellLevel5(E_RACE, E_SPELL *, BOOL);
 
 #endif

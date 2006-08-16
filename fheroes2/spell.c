@@ -35,6 +35,18 @@
 
 static S_SPELL	*ptrSpell = NULL;
 
+static const E_SPELL fightingSpellLevel1[FIGHTINGSPELL_LEVEL1] = {BLESS, BLOODLUST, CURE, CURSE, DISPELMAGIC, HASTE, MAGICARROW, SHIELD, SPELLSLOW, STONESKIN};
+static const E_SPELL fightingSpellLevel2[FIGHTINGSPELL_LEVEL2] = {BLIND, COLDRAY, DEATHRIPPLE, DISRUPTINGRAY, DRAGONSLAYER, LIGHTNINGBOLT, STEELSKIN};
+static const E_SPELL fightingSpellLevel3[FIGHTINGSPELL_LEVEL3] = {ANIMATEDEAD, ANTIMAGIC, COLDRING, DEATHWAVE, EARTHQUAKE, FIREBALL, HOLYWORD, MASSBLESS, MASSCURSE, MASSDISPEL, MASSHASTE, PARALYZE};
+static const E_SPELL fightingSpellLevel4[FIGHTINGSPELL_LEVEL4] = {BERZERKER, CHAINLIGHTNING, ELEMENTALSTORM, FIREBLAST, HOLYSHOUT, MASSCURE, MASSSHIELD, MASSSLOW, METEORSHOWER, RESURRECT};
+static const E_SPELL fightingSpellLevel5[FIGHTINGSPELL_LEVEL5] = {ARMAGEDDON, HYPNOTIZE, MIRRORIMAGE, RESURRECTTRUE, EARTHSUMMON, AIRSUMMON, FIRESUMMON, WATERSUMMON};
+
+static const E_SPELL lifeSpellLevel1[LIFESPELL_LEVEL1] = {VIEWMINES, VIEWRESOURCES};
+static const E_SPELL lifeSpellLevel2[LIFESPELL_LEVEL2] = {SUMMONBOAT, HAUNT, VISIONS, VIEWARTIFACTS};
+static const E_SPELL lifeSpellLevel3[LIFESPELL_LEVEL3] = {TELEPORT, IDENTIFYHERO, VIEWHEROES, VIEWTOWNS};
+static const E_SPELL lifeSpellLevel4[LIFESPELL_LEVEL4] = {VIEWALL, TOWNGATE, EARTHGUARDIAN, AIRGUARDIAN, FIREGUARDIAN, WATERGUARDIAN};
+static const E_SPELL lifeSpellLevel5[LIFESPELL_LEVEL5] = {DIMENSIONDOOR, TOWNPORTAL};
+
 BOOL	InitSpell(void){
 
     if(NULL == (ptrSpell = malloc(SPELLMAXCOUNT * sizeof(S_SPELL)))){
@@ -413,4 +425,271 @@ E_MAGICLEVEL GetLevelSpellMagic(E_SPELL spell){
 const char * GetStringSpellMagic(E_SPELL spell){
 
     return ptrSpell[spell].name;
+}
+
+Uint8 GetCostSpellMagic(E_SPELL spell){
+
+    return ptrSpell[spell].cost;
+}
+
+void FillSpellLevel1(E_RACE race, E_SPELL *spell, BOOL ext){
+
+    E_SPELL next = SPELLNONE;
+
+    spell[0] = SPELLNONE;
+    spell[1] = SPELLNONE;
+    spell[2] = SPELLNONE;
+    spell[3] = SPELLNONE;
+
+    switch(race){
+
+	case KNIGHT:
+	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    break;
+
+	case BARBARIAN:
+	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    break;
+	
+	case SORCERESS:
+	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    break;
+	
+	case NECROMANCER:
+	    while(next == BLESS || next == CURE || spell[0] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[0] = next;
+	    while(next == BLESS || next == CURE || spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    break;
+	
+	case WARLOCK:
+	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    break;
+	
+	case WIZARD:
+	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    break;
+	
+	default:
+	    return;
+	    break;
+    }
+}
+
+void FillSpellLevel2(E_RACE race, E_SPELL *spell, BOOL ext){
+
+    E_SPELL next = SPELLNONE;
+
+    spell[0] = SPELLNONE;
+    spell[1] = SPELLNONE;
+    spell[2] = SPELLNONE;
+    spell[3] = SPELLNONE;
+
+    switch(race){
+
+	case KNIGHT:
+	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[0] = next;
+	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    break;
+	    
+	case BARBARIAN:
+	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[0] = next;
+	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    break;
+	
+	case SORCERESS:
+	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[0] = next;
+	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    break;
+	
+	case NECROMANCER:
+	    spell[0] = DEATHRIPPLE;
+	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    break;
+	
+	case WARLOCK:
+	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[0] = next;
+	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    break;
+	
+	case WIZARD:
+	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[0] = next;
+	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[1] = next;
+	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    break;
+	
+	default:
+	    return;
+	    break;
+    }
+}
+
+void FillSpellLevel3(E_RACE race, E_SPELL *spell, BOOL ext){
+
+    E_SPELL next = SPELLNONE;
+
+    spell[0] = SPELLNONE;
+    spell[1] = SPELLNONE;
+    spell[2] = SPELLNONE;
+
+    switch(race){
+
+	case KNIGHT:
+	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[0] = next;
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	    
+	case BARBARIAN:
+	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[0] = next;
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	
+	case SORCERESS:
+	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[0] = next;
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	
+	case NECROMANCER:
+	    while(HOLYWORD == next || MASSBLESS == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[0] = next;
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	
+	case WARLOCK:
+	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[0] = next;
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	
+	case WIZARD:
+	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[0] = next;
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	
+	default:
+	    return;
+	    break;
+    }
+}
+
+void FillSpellLevel4(E_RACE race, E_SPELL *spell, BOOL ext){
+
+    E_SPELL next = SPELLNONE;
+
+    spell[0] = SPELLNONE;
+    spell[1] = SPELLNONE;
+    spell[2] = SPELLNONE;
+
+    switch(race){
+
+	case KNIGHT:
+	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    break;
+	    
+	case BARBARIAN:
+	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    break;
+	
+	case SORCERESS:
+	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    break;
+	
+	case NECROMANCER:
+	    while(MASSCURE == next || HOLYSHOUT == next || spell[0] == next) next = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[0] = next;
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    break;
+	
+	case WARLOCK:
+	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    break;
+	
+	case WIZARD:
+	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    break;
+	
+	default:
+	    return;
+	    break;
+    }
+}
+
+void FillSpellLevel5(E_RACE race, E_SPELL *spell, BOOL ext){
+
+    //E_SPELL next = SPELLNONE;
+
+    spell[0] = SPELLNONE;
+    spell[1] = SPELLNONE;
+
+    switch(race){
+
+	case KNIGHT:
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
+	    break;
+	    
+	case BARBARIAN:
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
+	    break;
+	
+	case SORCERESS:
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
+	    break;
+	
+	case NECROMANCER:
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
+	    break;
+	
+	case WARLOCK:
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
+	    break;
+	
+	case WIZARD:
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
+	    break;
+	
+	default:
+	    return;
+	    break;
+    }
 }

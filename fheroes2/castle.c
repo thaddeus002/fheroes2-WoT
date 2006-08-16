@@ -43,6 +43,8 @@
 #include "heroes.h"
 #include "heroesinfo.h"
 #include "debug.h"
+#include "spell.h"
+#include "magictower.h"
 #include "castle.h"
 #include "castleaction.h"
 #include "castle_kngt.h"
@@ -227,7 +229,13 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].dwelling = DWELLING_MONSTER1 | DWELLING_MONSTER2; // DWELLING_MONSTER1 DWELLING_MONSTER2 DWELLING_MONSTER3 DWELLING_MONSTER4 DWELLING_MONSTER5 DWELLING_MONSTER6 DWELLING_UPGRADE2 DWELLING_UPGRADE3 DWELLING_UPGRADE4 DWELLING_UPGRADE5 DWELLING_UPGRADE6
 	}
 
-	ptrCastle[countCastle].magicTower = ptr->magicTower;
+	ptrCastle[countCastle].mageGuild.level = ptr->magicTower;
+	if(0 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL1);
+	if(1 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL2);
+	if(2 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL3);
+	if(3 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL4);
+	if(4 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL5);
+	
 
 	if(ptr->customTroops){
 	    ptrCastle[countCastle].army[0].monster = ptr->monster1;
@@ -854,7 +862,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(&castanim, &castlact);
 	    if(castle->building & BUILD_THIEVEGUILD) DrawKNGTThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(&castanim, &castlact);
-	    if(castle->magicTower) DrawKNGTMageGuild(&castanim, &castlact);
+	    if(castle->mageGuild.level) DrawKNGTMageGuild(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(&castanim, &castlact);
@@ -872,7 +880,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(&castanim, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(&castanim, &castlact);
-	    if(castle->magicTower){
+	    if(castle->mageGuild.level){
 		DrawBRBNMageGuild(&castanim, &castlact);
 		DrawBRBNExt2(&castanim, &castlact);
 	    }
@@ -900,7 +908,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	case SORCERESS:
 	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(&castanim, &castlact);
-	    if(castle->magicTower) DrawSCRSMageGuild(&castanim, &castlact);
+	    if(castle->mageGuild.level) DrawSCRSMageGuild(&castanim, &castlact);
 	    if(castle->capitan) DrawSCRSCapitan(&castanim, &castlact);
 	    DrawSCRSCastle(&castanim, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(&castanim, &castlact);
@@ -939,7 +947,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(&castanim, &castlact);
-	    if(castle->magicTower) DrawNCRMMageGuild(&castanim, &castlact);
+	    if(castle->mageGuild.level) DrawNCRMMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(&castanim, &castlact);
@@ -956,7 +964,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
 	    else DrawWRLKExt0(&castanim, &castlact);
-	    if(castle->magicTower) DrawWRLKMageGuild(&castanim, &castlact);
+	    if(castle->mageGuild.level) DrawWRLKMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
 	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &castlact);
@@ -986,7 +994,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(&castanim, &castlact);
-	    if(castle->magicTower) DrawWZRDMageGuild(&castanim, &castlact);
+	    if(castle->mageGuild.level) DrawWZRDMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(&castanim, &castlact);
@@ -2311,13 +2319,13 @@ BUILDACTION AllowBuildCastle(const S_CASTLE *castle){
 
 BUILDACTION AllowBuildMageGuild(const S_CASTLE *castle){
 
-    if(5 == castle->magicTower) return ALREADY_BUILD;
+    if(5 == castle->mageGuild.level) return ALREADY_BUILD;
 
     const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
 
     if(! kingdom->allowBuild) return END_TUR;
     
-    switch(castle->magicTower){
+    switch(castle->mageGuild.level){
 	case 0:
 	    if(	BUILD_MAGEGUILD1_GOLD <= kingdom->gold &&
 		BUILD_MAGEGUILD1_WOOD <= kingdom->wood &&
@@ -2360,7 +2368,7 @@ BUILDACTION AllowBuildMageGuild(const S_CASTLE *castle){
 		BUILD_MAGEGUILD5_SULFUR <= kingdom->sulfur ) return BUILD_OK;
 	    break;
 	case 5:
-	    if(5 == castle->magicTower) return ALREADY_BUILD;
+	    if(5 == castle->mageGuild.level) return ALREADY_BUILD;
 	    break;
 	default:
 	    break;
@@ -2839,7 +2847,7 @@ BUILDACTION AllowBuildDwelling4(const S_CASTLE *castle){
 		if( BUILD_STONEHENGE_GOLD <= kingdom->gold &&
 		    BUILD_STONEHENGE_ORE <= kingdom->ore &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
-		    castle->magicTower ) return BUILD_OK;
+		    castle->mageGuild.level ) return BUILD_OK;
 		break;
 
 	    case WIZARD:
@@ -2937,7 +2945,7 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 		    BUILD_MAUSOLEUM_WOOD <= kingdom->wood &&
 		    BUILD_MAUSOLEUM_SULFUR <= kingdom->sulfur &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
-		    castle->magicTower ) return BUILD_OK;
+		    castle->mageGuild.level ) return BUILD_OK;
 		break;
 	    
 	    case SORCERESS:
@@ -2956,7 +2964,7 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 		    BUILD_IVORYTOWER_MERCURY <= kingdom->mercury &&
 		    BUILD_IVORYTOWER_GEMS <= kingdom->gems &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
-		    castle->magicTower ) return BUILD_OK;
+		    castle->mageGuild.level ) return BUILD_OK;
 		break;
 	
 	    case WARLOCK:
@@ -2987,7 +2995,7 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 		if( UPGRADE_MAUSOLEUM_GOLD <= kingdom->gold &&
 		    UPGRADE_MAUSOLEUM_ORE <= kingdom->ore &&
 		    UPGRADE_MAUSOLEUM_CRYSTAL <= kingdom->crystal &&
-		    castle->magicTower > 1) return BUILD_OK;
+		    castle->mageGuild.level > 1) return BUILD_OK;
 		break;
 
 	    case WIZARD:
