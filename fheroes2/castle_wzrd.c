@@ -820,7 +820,7 @@ void DrawWZRDMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     if(castle->mageGuild.level > 5 || castle->mageGuild.level < 1) return;
 
     // спрайт
-    FillSPRITE(&sprite, "TWNZMAGE.ICN", castle->mageGuild.level);
+    FillSPRITE(&sprite, "TWNZMAGE.ICN", castle->mageGuild.level - 1);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;

@@ -202,7 +202,7 @@ void    RecalculateKingdomDay(E_COLORS color){
     // ENDLESS_POUCH_CRYSTAL	+1 crystal
     // TAX_LIEN			-250 gold
 
-    kingdom[color].allowBuild = TRUE;
+    KingdomSetAllowBuild(color, TRUE);
 }
 
 BOOL KingdomAllowBuild(E_COLORS color){
@@ -210,4 +210,9 @@ BOOL KingdomAllowBuild(E_COLORS color){
     if(! kingdom) return FALSE;
     
     return kingdom[color].allowBuild;
+}
+
+void KingdomSetAllowBuild(E_COLORS color, BOOL allow){
+
+    kingdom[color].allowBuild = allow;
 }

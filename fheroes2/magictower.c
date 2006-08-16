@@ -237,7 +237,7 @@ ACTION  ShowMageGuildInfo(void){
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
-	if(SPELLNONE != castle->mageGuild.level5[i]){
+	if(! level){
 	    // картика заклинания
 	    FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level5[i]);
 	    image = GetICNSprite(&sprite);
@@ -277,7 +277,7 @@ ACTION  ShowMageGuildInfo(void){
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
-	if(SPELLNONE != castle->mageGuild.level4[i]){
+	if(! level){
 	    // картика заклинания
             if(MASSBLESS == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", BLESS);
             else if(MASSCURSE == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", CURSE);
@@ -323,7 +323,7 @@ ACTION  ShowMageGuildInfo(void){
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
-	if(SPELLNONE != castle->mageGuild.level3[i]){
+	if(! level){
 	    // картика заклинания
             if(MASSBLESS == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", BLESS);
             else if(MASSCURSE == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", CURSE);
@@ -369,7 +369,7 @@ ACTION  ShowMageGuildInfo(void){
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
-	if(SPELLNONE != castle->mageGuild.level2[i]){
+	if(! level){
 	    // картика заклинания
 	    FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level2[i]);
 	    image = GetICNSprite(&sprite);
@@ -409,7 +409,7 @@ ACTION  ShowMageGuildInfo(void){
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
-	if(SPELLNONE != castle->mageGuild.level1[i]){
+	if(! level){
 	    // картика заклинания
 	    FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level1[i]);
 	    image = GetICNSprite(&sprite);

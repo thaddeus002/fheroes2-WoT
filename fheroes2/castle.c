@@ -3149,3 +3149,442 @@ Uint8 GetMonsterGrown(const S_CASTLE *castle, E_MONSTER name){
 
     return grown;
 }
+
+BOOL BuildMageGuild(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ++ptrCastle[i].mageGuild.level;
+	    
+	    if(1 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL1);
+	    if(2 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL2);
+	    if(3 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL3);
+	    if(4 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL4);
+	    if(5 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL5);
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+	
+    return FALSE;
+}
+
+BOOL BuildRightTurret(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_RIGHTTURRET;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildLeftTurret(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_LEFTTURRET;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildTavern(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_TAVERN;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildStatue(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_STATUE;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildMarketplace(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_MARKETPLACE;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildThievesGuild(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_THIEVEGUILD;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildWell(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_WELL;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildMoat(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_MOAT;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildWel2(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_WEL2;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildSpec(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_SPEC;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildShipyard(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_SHIPYARD;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+
+BOOL BuildDwelling1(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_MONSTER1;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildDwelling2(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_MONSTER2;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildDwelling3(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_MONSTER3;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildDwelling4(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_MONSTER4;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildDwelling5(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_MONSTER5;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildDwelling6(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_MONSTER6;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildUpgrade2(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_UPGRADE2;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildUpgrade3(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_UPGRADE3;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildUpgrade4(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_UPGRADE4;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildUpgrade5(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_UPGRADE5;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildUpgrade6(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_UPGRADE6;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildUpgrade7(const S_CASTLE *castle){
+
+    Uint8 i;
+    
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].dwelling |= DWELLING_UPGRADE7;
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}

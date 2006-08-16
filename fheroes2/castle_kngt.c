@@ -906,7 +906,7 @@ void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     if(castle->mageGuild.level > 5 || castle->mageGuild.level < 1) return;
 
-    FillSPRITE(&sprite, "TWNKMAGE.ICN", castle->mageGuild.level);
+    FillSPRITE(&sprite, "TWNKMAGE.ICN", castle->mageGuild.level - 1);
 
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;

@@ -445,6 +445,32 @@ BUILDACTION	AllowBuildDwelling4(const S_CASTLE *);
 BUILDACTION	AllowBuildDwelling5(const S_CASTLE *);
 BUILDACTION	AllowBuildDwelling6(const S_CASTLE *);
 
+BOOL		BuildWel2(const S_CASTLE *);
+BOOL		BuildSpec(const S_CASTLE *);
+BOOL		BuildShipyard(const S_CASTLE *);
+BOOL		BuildWell(const S_CASTLE *);
+BOOL		BuildMoat(const S_CASTLE *);
+BOOL		BuildTavern(const S_CASTLE *);
+BOOL		BuildStatue(const S_CASTLE *);
+BOOL		BuildMarketplace(const S_CASTLE *);
+BOOL		BuildThievesGuild(const S_CASTLE *);
+BOOL		BuildRightTurret(const S_CASTLE *);
+BOOL		BuildLeftTurret(const S_CASTLE *);
+BOOL		BuildMageGuild(const S_CASTLE *);
+
+BOOL		BuildDwelling1(const S_CASTLE *);
+BOOL		BuildDwelling2(const S_CASTLE *);
+BOOL		BuildDwelling3(const S_CASTLE *);
+BOOL		BuildDwelling4(const S_CASTLE *);
+BOOL		BuildDwelling5(const S_CASTLE *);
+BOOL		BuildDwelling6(const S_CASTLE *);
+BOOL		BuildUpgrade2(const S_CASTLE *);
+BOOL		BuildUpgrade3(const S_CASTLE *);
+BOOL		BuildUpgrade4(const S_CASTLE *);
+BOOL		BuildUpgrade5(const S_CASTLE *);
+BOOL		BuildUpgrade6(const S_CASTLE *);
+BOOL		BuildUpgrade7(const S_CASTLE *);
+
 Uint8           GetMonsterGrown(const S_CASTLE *, E_MONSTER);
 
 #endif
