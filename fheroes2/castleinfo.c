@@ -729,7 +729,7 @@ void RedrawCastleStatusBuilding(void){
 	cy = 0;
     }
 
-    RemoveActionLevelEvent(castinfo, LEVELEVENT_CASTLEBUILD);
+    RemoveActionLevelEvent(castinfo, LEVELEVENT_CASTLEINFOBUILD);
 
     rectCur.x = cx + 6;
     rectCur.y = cy + 3;
@@ -740,7 +740,7 @@ void RedrawCastleStatusBuilding(void){
             ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling1;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -812,7 +812,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling2;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -887,7 +887,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling3;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -962,7 +962,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling4;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1037,7 +1037,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling5;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1112,7 +1112,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling6;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1189,7 +1189,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickMageGuild;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1263,7 +1263,7 @@ void RedrawCastleStatusBuilding(void){
 		ZeroINTERFACEACTION(&action);
 	        action.rect = rectCur;
 	        action.mouseEvent = MOUSE_LCLICK;
-		action.level = LEVELEVENT_CASTLEBUILD;
+		action.level = LEVELEVENT_CASTLEINFOBUILD;
 	        action.pf = ActionCastleClickTavern;
 		AddActionEvent(&castinfo, &action);
 	        FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1336,7 +1336,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickThievesGuild;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1408,7 +1408,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickShipyard;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1480,7 +1480,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickStatue;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1552,7 +1552,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickMarketplace;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1624,7 +1624,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickWell;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1696,7 +1696,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickWel2;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1768,7 +1768,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickSpec;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1840,7 +1840,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickLeftTurret;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1912,7 +1912,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickRightTurret;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -1984,7 +1984,7 @@ void RedrawCastleStatusBuilding(void){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
-	    action.level = LEVELEVENT_CASTLEBUILD;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickMoat;
 	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "CASLXTRA.ICN", 1);
@@ -2082,7 +2082,7 @@ void RedrawCastleStatusBuilding(void){
 	ZeroINTERFACEACTION(&action); 
 	action.rect = rectCur; 
 	action.mouseEvent = MOUSE_LCLICK; 
-	action.level = LEVELEVENT_CASTLEBUILD;
+	action.level = LEVELEVENT_CASTLEINFOBUILD;
 	action.pf = ActionCastleClickCaptain; 
 	AddActionEvent(&castinfo, &action);
     }

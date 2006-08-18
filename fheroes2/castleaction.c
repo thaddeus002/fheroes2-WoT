@@ -1633,6 +1633,7 @@ ACTION ActionCastleClickTavern(void){
     if(YES == MessageBox("Build Tavern ?", FONT_BIG)){
 
 	BuildTavern(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1647,6 +1648,7 @@ ACTION ActionCastleClickStatue(void){
     if(YES == MessageBox("Build Statue ?", FONT_BIG)){
 
 	BuildStatue(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1661,6 +1663,7 @@ ACTION ActionCastleClickWell(void){
     if(YES == MessageBox("Build Well ?", FONT_BIG)){
 
 	BuildWell(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1675,6 +1678,7 @@ ACTION ActionCastleClickMoat(void){
     if(YES == MessageBox("Build Moat ?", FONT_BIG)){
 
 	BuildMoat(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1689,6 +1693,7 @@ ACTION ActionCastleClickMarketplace(void){
     if(YES == MessageBox("Build Marketplace ?", FONT_BIG)){
 
 	BuildMarketplace(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1703,6 +1708,7 @@ ACTION ActionCastleClickThievesGuild(void){
     if(YES == MessageBox("Build Thieves Guild ?", FONT_BIG)){
 
 	BuildThievesGuild(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1717,6 +1723,7 @@ ACTION ActionCastleClickLeftTurret(void){
     if(YES == MessageBox("Build Left Turret ?", FONT_BIG)){
 
 	BuildLeftTurret(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1731,6 +1738,7 @@ ACTION ActionCastleClickRightTurret(void){
     if(YES == MessageBox("Build Right Turret ?", FONT_BIG)){
 
 	BuildRightTurret(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1748,6 +1756,7 @@ ACTION ActionCastleClickMageGuild(void){
     if(YES == MessageBox(message, FONT_BIG)){
 
 	BuildMageGuild(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1762,6 +1771,7 @@ ACTION ActionCastleClickShipyard(void){
     if(YES == MessageBox("Build Shipyard ?", FONT_BIG)){
 
 	BuildShipyard(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1779,6 +1789,7 @@ ACTION ActionCastleClickWel2(void){
     if(YES == MessageBox(message, FONT_BIG)){
 
 	BuildWel2(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1796,6 +1807,7 @@ ACTION ActionCastleClickSpec(void){
     if(YES == MessageBox(message, FONT_BIG)){
 
 	BuildSpec(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1814,6 +1826,7 @@ ACTION ActionCastleClickDwelling1(void){
     if(YES == MessageBox(message, FONT_BIG)){
 
 	BuildDwelling1(castle);
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1839,6 +1852,8 @@ ACTION ActionCastleClickDwelling2(void){
 	else
 	    BuildDwelling2(castle);
 
+	EnableCastleUpdateBuilding();
+
 	return CANCEL;
     }
 
@@ -1862,6 +1877,8 @@ ACTION ActionCastleClickDwelling3(void){
 	    BuildUpgrade3(castle);
 	else
 	    BuildDwelling3(castle);
+
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1887,6 +1904,8 @@ ACTION ActionCastleClickDwelling4(void){
 	else
 	    BuildDwelling4(castle);
 
+	EnableCastleUpdateBuilding();
+
 	return CANCEL;
     }
 
@@ -1910,6 +1929,8 @@ ACTION ActionCastleClickDwelling5(void){
 	    BuildUpgrade5(castle);
 	else
 	    BuildDwelling5(castle);
+
+	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
@@ -1939,9 +1960,10 @@ ACTION ActionCastleClickDwelling6(void){
 	else
 	    BuildDwelling6(castle);
 
+	EnableCastleUpdateBuilding();
+
 	return CANCEL;
     }
-
     return NONE;
 }
 

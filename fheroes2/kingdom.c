@@ -216,3 +216,79 @@ void KingdomSetAllowBuild(E_COLORS color, BOOL allow){
 
     kingdom[color].allowBuild = allow;
 }
+
+void KingdomWasteResource(E_COLORS color, Uint16 gold, Uint8 wood, Uint8 ore, Uint8 mercury, Uint8 crystal, Uint8 sulfur , Uint8 gems){
+
+    if(gold){
+
+	if(kingdom[color].gold < gold){
+
+	    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, gold: 0\n", gold);
+	    kingdom[color].gold = 0;
+
+	}else
+	    kingdom[color].gold -= gold;
+    }
+
+    if(wood){
+    
+	if(kingdom[color].wood < wood){
+
+	    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, wood: 0\n", wood);
+	    kingdom[color].wood = 0;
+
+	}else
+	    kingdom[color].wood -= wood;
+    }
+
+    if(ore){
+    
+	if(kingdom[color].ore < ore){
+
+		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, ore: 0\n", ore);
+		kingdom[color].ore = 0;
+	}else
+	    kingdom[color].ore -= ore;
+    }
+
+    if(mercury){
+    
+	if(kingdom[color].mercury < mercury){
+
+		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, mercury: 0\n", mercury);
+		kingdom[color].mercury = 0;
+	}else
+	    kingdom[color].mercury -= mercury;
+    }
+
+    if(crystal){
+    
+	if(kingdom[color].crystal < crystal){
+
+		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, crystal: 0\n", crystal);
+		kingdom[color].crystal = 0;
+	}else
+	    kingdom[color].crystal -= crystal;
+    }
+
+    if(sulfur){
+    
+	if(kingdom[color].sulfur < sulfur){
+
+		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, sulfur: 0\n", sulfur);
+		kingdom[color].sulfur = 0;
+	}else
+	    kingdom[color].sulfur -= sulfur;
+    }
+
+    if(gems){
+    
+	if(kingdom[color].gems < gems){
+
+		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, gems: 0\n", gems);
+		kingdom[color].gems = 0;
+	}else
+	    kingdom[color].gems -= gems;
+    }
+
+}

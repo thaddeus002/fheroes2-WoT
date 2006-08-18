@@ -78,12 +78,14 @@ void DrawSCRSCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverCastle;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickCastle;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -124,12 +126,14 @@ void DrawSCRSCapitan(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverCaptain;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickCaptain;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -161,12 +165,14 @@ void DrawSCRSStatue(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverStatue;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickStatue;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -196,12 +202,14 @@ void DrawSCRSWell(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverWell;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickWell;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -243,12 +251,14 @@ void DrawSCRSThievesGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverThievesGuild;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickThievesGuild;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -293,12 +303,14 @@ void DrawSCRSTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverTavern;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickTavern;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -342,12 +354,14 @@ void DrawSCRSShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverDock;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDock;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -417,12 +431,14 @@ void DrawSCRSMarketplace(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverMarketplace;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickMarketplace;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -453,12 +469,14 @@ void DrawSCRSMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverMoat;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickMoat;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -489,12 +507,14 @@ void DrawSCRSSpec(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverSpec;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickSpec;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -537,12 +557,14 @@ void DrawSCRSWel2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverWel2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickWel2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -584,12 +606,14 @@ void DrawSCRSExt1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverWel2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickWel2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	cur.y += 33;
@@ -598,12 +622,14 @@ void DrawSCRSExt1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverStatue;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickStatue;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -675,12 +701,14 @@ void DrawSCRSDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverDwelling1;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling1;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -726,12 +754,14 @@ void DrawSCRSDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverDwelling2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -765,12 +795,14 @@ void DrawSCRSDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverDwelling3;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling3;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -803,12 +835,14 @@ void DrawSCRSDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverDwelling4;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling4;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -838,12 +872,14 @@ void DrawSCRSDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverDwelling5;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling5;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -875,12 +911,14 @@ void DrawSCRSDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverDwelling6;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling6;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }
@@ -931,12 +969,14 @@ void DrawSCRSMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
 	action.pf = ActionOverMageGuild;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
 
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickMageGuild;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
 }

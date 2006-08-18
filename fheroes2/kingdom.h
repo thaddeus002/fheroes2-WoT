@@ -78,5 +78,6 @@ S_KINGDOM	*GetStatKingdom(E_COLORS);
 BOOL		KingdomAllowBuild(E_COLORS);
 void		RecalculateKingdomDay(E_COLORS);
 void		KingdomSetAllowBuild(E_COLORS, BOOL);
+void		KingdomWasteResource(E_COLORS, Uint16, Uint8, Uint8, Uint8, Uint8, Uint8, Uint8);
 
 #endif

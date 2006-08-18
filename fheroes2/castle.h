@@ -471,6 +471,8 @@ BOOL		BuildUpgrade5(const S_CASTLE *);
 BOOL		BuildUpgrade6(const S_CASTLE *);
 BOOL		BuildUpgrade7(const S_CASTLE *);
 
+void		EnableCastleUpdateBuilding(void);
+
 Uint8           GetMonsterGrown(const S_CASTLE *, E_MONSTER);
 
 #endif

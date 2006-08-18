@@ -56,7 +56,9 @@
 
 void RedrawCastleAnimation(void);
 void RedrawBottomBar(void);
+void RedrawRamkaCastleName(void);
 void RedrawHeroesMonster(E_NAMEHEROES);
+void UpdateCastleBuilding(void);
 
 ACTION ActionCASTLELOOP(INTERFACEACTION *); 
 
@@ -78,6 +80,8 @@ static	S_CASTLE	*currentCastle	= NULL;
 
 	S_ANIMATION    	*castanim	= NULL;
 	INTERFACEACTION *castlact	= NULL;
+
+static	BOOL		flagUpdateBuilding = FALSE;
 
 struct {
     Uint8		select;
@@ -396,12 +400,12 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     ICNHEADER *header = NULL;
     S_CASTLE *castle = GetStatCastlePos(ax, ay);
     S_HEROES *heroes = GetStatHeroes(castleHeroes);
+    flagUpdateBuilding = FALSE;
 
     // в серые замки не заходим
     if(GRAY == castle->color) return;
     currentCastle = castle;
     heroesName = castleHeroes;
-
     // инициализируем backgroundCursor
     FillSPRITE(&sprite, "STRIP.ICN", 1);
     backMonsterCursor.cursor = GetICNSprite(&sprite);
@@ -449,16 +453,6 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     back = SDL_DisplayFormat(format);
     SDL_FreeSurface(format);
     SDL_BlitSurface(video, &rectBack, back, NULL);
-
-    // регистрируем пустое событие
-
-    ZeroINTERFACEACTION(&action);
-    action.rect.x = 0;
-    action.rect.y = 0;
-    action.rect.w = 1;
-    action.rect.h = 1;
-    action.mouseEvent = MOUSE_LCLICK;
-    AddActionEvent(&castlact, &action);
 
     // рисуем бордюр
     if(GetIntValue(VIDEOMODE)) ShowBorder(&rectBack);
@@ -509,7 +503,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     rectCur.y += rectCur.h;
     rectCur.w = image->w;
     rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
+    //SDL_BlitSurface(image, NULL, video, &rectCur);
     cx = rectCur.x;
     cy = rectCur.y;
 
@@ -1019,12 +1013,13 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     }
     rectCur.w = image->w;
     rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
+    //SDL_BlitSurface(image, NULL, video, &rectCur);
     rectCur.x = rectCur.x + 90 - GetLengthText(castle->name, FONT_SMALL) / 2 ;
     rectCur.y = rectCur.y + 1;
     rectCur.w = GetLengthText(castle->name, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, castle->name, FONT_SMALL);
+    //PrintText(video, &rectCur, castle->name, FONT_SMALL);
+    RedrawRamkaCastleName();
                     
     SetCursor(CURSOR_POINTER);
     CursorOn();
@@ -1095,6 +1090,8 @@ ACTION ActionCASTLELOOP(INTERFACEACTION *action){
 	ptr = action;
 
 	SDL_GetMouseState(&cx, &cy);
+
+	if(flagUpdateBuilding)  UpdateCastleBuilding();
 
         if(old.flagPres && !ValidPoint(&old.presRect, cx, cy)){
             RedrawBottomBar();
@@ -1221,6 +1218,7 @@ ACTION ActionCASTLELOOP(INTERFACEACTION *action){
 
             if(exit != EXIT && 0 == ticket % (GetIntValue(ANIMATIONDELAY) / 2)) RedrawCastleAnimation();
             ++ticket;
+
 	}
 
 	if(0 == ticket % GetIntValue(ANIMATIONDELAY)) RedrawCastleAnimation();
@@ -1288,7 +1286,9 @@ void RedrawCastleAnimation(void){
 		if(currentCastle->building & BUILD_STATUE) DrawBRBNStatue(NULL, NULL);
 		if(currentCastle->building & BUILD_TAVERN) DrawBRBNTavern(NULL, NULL);
 		if(currentCastle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(NULL, NULL);
-		//if(currentCastle->building & BUILD_WELL) DrawBRBNWell(NULL, NULL); // необходимо перерисовать имя замка
+		if(currentCastle->building & BUILD_WELL) DrawBRBNWell(NULL, NULL);
+		// необходимо перерисовать имя замка
+		RedrawRamkaCastleName();
 		break;
 
 	    default:
@@ -1872,7 +1872,7 @@ E_MONSTER GetMonsterFromCastle(const S_CASTLE *castle, Uint8 level){
 	    if(castle->dwelling & DWELLING_UPGRADE2 && level == 2) return CHIEF_ORC;
 	    if(level == 6) return CYCLOPS;
 	    if(level == 5) return TROLL;
-	    if(level == 4) return TROLL;
+	    if(level == 4) return OGRE;
 	    if(level == 3) return WOLF;
 	    if(level == 2) return ORC;
 	    if(level == 1) return GOBLIN;
@@ -3160,11 +3160,37 @@ BOOL BuildMageGuild(const S_CASTLE *castle){
 
 	    ++ptrCastle[i].mageGuild.level;
 	    
-	    if(1 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL1);
-	    if(2 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL2);
-	    if(3 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL3);
-	    if(4 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL4);
-	    if(5 == ptrCastle[i].mageGuild.level) FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL5);
+	    switch(ptrCastle[i].mageGuild.level){
+	    
+		case 1:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD1_GOLD, BUILD_MAGEGUILD1_WOOD, BUILD_MAGEGUILD1_ORE, 0, 0, 0, 0);
+		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL1);
+		    break;
+		    
+		case 2:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD2_GOLD, BUILD_MAGEGUILD2_WOOD, BUILD_MAGEGUILD2_ORE, BUILD_MAGEGUILD2_MERCURY, BUILD_MAGEGUILD2_CRYSTAL, BUILD_MAGEGUILD2_SULFUR, BUILD_MAGEGUILD2_GEMS);
+		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL2);
+		    break;
+
+		case 3:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD3_GOLD, BUILD_MAGEGUILD3_WOOD, BUILD_MAGEGUILD3_ORE, BUILD_MAGEGUILD3_MERCURY, BUILD_MAGEGUILD3_CRYSTAL, BUILD_MAGEGUILD3_SULFUR, BUILD_MAGEGUILD3_GEMS);
+		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL3);
+		    break;
+
+		case 4:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD4_GOLD, BUILD_MAGEGUILD4_WOOD, BUILD_MAGEGUILD4_ORE, BUILD_MAGEGUILD4_MERCURY, BUILD_MAGEGUILD4_CRYSTAL, BUILD_MAGEGUILD4_SULFUR, BUILD_MAGEGUILD4_GEMS);
+		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL4);
+		    break;
+
+		case 5:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD2_GOLD, BUILD_MAGEGUILD5_WOOD, BUILD_MAGEGUILD5_ORE, BUILD_MAGEGUILD5_MERCURY, BUILD_MAGEGUILD5_CRYSTAL, BUILD_MAGEGUILD5_SULFUR, BUILD_MAGEGUILD5_GEMS);
+		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL5);
+		    break;
+		    
+		default:
+		    return FALSE;
+		    break;
+	    }
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3184,6 +3210,8 @@ BOOL BuildRightTurret(const S_CASTLE *castle){
 
 	    ptrCastle[i].building |= BUILD_RIGHTTURRET;
 
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_RIGHTTURRET_GOLD, 0, BUILD_RIGHTTURRET_ORE, 0, 0, 0, 0);
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3201,6 +3229,8 @@ BOOL BuildLeftTurret(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_LEFTTURRET;
+
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_LEFTTURRET_GOLD, 0, BUILD_LEFTTURRET_ORE, 0, 0, 0, 0);
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3220,6 +3250,8 @@ BOOL BuildTavern(const S_CASTLE *castle){
 
 	    ptrCastle[i].building |= BUILD_TAVERN;
 
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_TAVERN_GOLD, BUILD_TAVERN_WOOD, 0, 0, 0, 0, 0);
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3237,6 +3269,8 @@ BOOL BuildStatue(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_STATUE;
+
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_STATUE_GOLD, 0, BUILD_STATUE_ORE, 0, 0, 0, 0);
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3256,6 +3290,8 @@ BOOL BuildMarketplace(const S_CASTLE *castle){
 
 	    ptrCastle[i].building |= BUILD_MARKETPLACE;
 
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_MARKETPLACE_GOLD, BUILD_MARKETPLACE_WOOD, 0, 0, 0, 0, 0);
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3273,6 +3309,8 @@ BOOL BuildThievesGuild(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_THIEVEGUILD;
+
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_THIEVESGUILD_GOLD, BUILD_THIEVESGUILD_WOOD, 0, 0, 0, 0, 0);
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3292,6 +3330,8 @@ BOOL BuildWell(const S_CASTLE *castle){
 
 	    ptrCastle[i].building |= BUILD_WELL;
 
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_WELL_GOLD, 0, 0, 0, 0, 0, 0);
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3309,6 +3349,8 @@ BOOL BuildMoat(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_MOAT;
+
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_MOAT_GOLD, 0, 0, 0, 0, 0, 0);
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3328,6 +3370,8 @@ BOOL BuildWel2(const S_CASTLE *castle){
 
 	    ptrCastle[i].building |= BUILD_WEL2;
 
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_WEL2_GOLD, 0, 0, 0, 0, 0, 0);
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3346,6 +3390,37 @@ BOOL BuildSpec(const S_CASTLE *castle){
 
 	    ptrCastle[i].building |= BUILD_SPEC;
 
+	    switch(ptrCastle[i].race){
+	    
+		case KNIGHT:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_FORTIFICATION_GOLD, BUILD_FORTIFICATION_WOOD, BUILD_FORTIFICATION_ORE, 0, 0, 0, 0);
+		    break;
+		    
+		case BARBARIAN:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_COLISEUM_GOLD, BUILD_COLISEUM_WOOD, BUILD_COLISEUM_ORE, 0, 0, 0, 0);
+		    break;
+		    
+		case NECROMANCER:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_STORM_GOLD, 0, 0, BUILD_STORM_MERCURY, 0, BUILD_STORM_SULFUR, 0);
+		    break;
+		    
+		case SORCERESS:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_RAINBOW_GOLD, 0, 0, 0, BUILD_RAINBOW_CRYSTAL, 0, 0);
+		    break;
+		    
+		case WARLOCK:
+		    KingdomWasteResource(ptrCastle[i].color, BUILD_DUNGEON_GOLD, BUILD_DUNGEON_WOOD, BUILD_DUNGEON_ORE, 0, 0, 0, 0);
+		    break;
+		    
+		case WIZARD:
+		    KingdomWasteResource(ptrCastle[i].color, BUIILD_LIBRARY_GOLD, BUIILD_LIBRARY_WOOD, BUIILD_LIBRARY_ORE, BUIILD_LIBRARY_MERCURY, BUIILD_LIBRARY_CRYSTAL, BUIILD_LIBRARY_SULFUR, BUIILD_LIBRARY_GEMS);
+		    break;
+		    
+		default:
+		    return FALSE;
+		    break;
+	    }
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3363,6 +3438,8 @@ BOOL BuildShipyard(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_SHIPYARD;
+
+	    KingdomWasteResource(ptrCastle[i].color, BUILD_SHIPYARD_GOLD, BUILD_SHIPYARD_WOOD, 0, 0, 0, 0, 0);
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3587,4 +3664,231 @@ BOOL BuildUpgrade7(const S_CASTLE *castle){
 	}
 
     return FALSE;
+}
+
+void UpdateCastleBuilding(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    CursorOff();
+    SetIntValue(ANIM3, FALSE);
+
+    RemoveActionLevelEvent(castlact, LEVELEVENT_CASTLEUPDATEBUILD);
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    if(castle->capitan) DrawKNGTCapitan(NULL, &castlact);
+	    DrawKNGTCastle(NULL, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawKNGTWel2(NULL, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(NULL, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(NULL, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(NULL, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawKNGTThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(NULL, &castlact);
+	    if(castle->mageGuild.level) DrawKNGTMageGuild(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawKNGTDwelling3(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawKNGTDwelling4(NULL, &castlact);
+	    if(castle->building & BUILD_WELL) DrawKNGTWell(NULL, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(NULL, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(NULL, &castlact);
+	    else DrawKNGTExt0(NULL, &castlact);
+	    //DrawKNGTExt1(NULL, &castlact); // развилка дорог?
+	    //DrawKNGTExt2(NULL, &castlact); // развилка дорог?
+	    break;
+
+	case BARBARIAN:
+	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(NULL, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(NULL, &castlact);
+	    if(castle->mageGuild.level){
+		DrawBRBNMageGuild(NULL, &castlact);
+		DrawBRBNExt2(NULL, &castlact);
+	    }
+	    if(castle->capitan) DrawBRBNCapitan(NULL, &castlact);
+	    DrawBRBNCastle(NULL, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(NULL, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(NULL, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(NULL, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawBRBNDwelling2(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(NULL, &castlact);
+	    if(castle->building & BUILD_WELL) DrawBRBNWell(NULL, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(NULL, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(NULL, &castlact);
+	    else DrawBRBNExt0(NULL, &castlact);
+	    DrawBRBNExt1(NULL, &castlact);
+	    //DrawBRBNExt3(NULL, &castlact); // развилка дорог?
+	    break;
+
+	case SORCERESS:
+	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(NULL, &castlact);
+	    if(castle->mageGuild.level) DrawSCRSMageGuild(NULL, &castlact);
+	    if(castle->capitan) DrawSCRSCapitan(NULL, &castlact);
+	    DrawSCRSCastle(NULL, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(NULL, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(NULL, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(NULL, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(NULL, &castlact);
+	    else DrawSCRSExt0(NULL, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawSCRSThievesGuild(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(NULL, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(NULL, &castlact);
+	    if(castle->building & BUILD_STATUE && castle->building & BUILD_WEL2) DrawSCRSExt1(NULL, &castlact);
+	    else if(castle->building & BUILD_STATUE) DrawSCRSStatue(NULL, &castlact);
+	    else if(castle->building & BUILD_WEL2) DrawSCRSWel2(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawSCRSDwelling4(NULL, &castlact);
+	    if(castle->building & BUILD_WELL) DrawSCRSWell(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawSCRSDwelling5(NULL, &castlact);
+	break;
+
+	case NECROMANCER:
+	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(NULL, &castlact);
+	    DrawNCRMCastle(NULL, &castlact);
+	    if(castle->capitan) DrawNCRMCapitan(NULL, &castlact);
+    	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(NULL, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(NULL, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(NULL, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(NULL, &castlact);
+	    else DrawNCRMExt0(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawNCRMThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(NULL, &castlact);
+	    if(castle->mageGuild.level) DrawNCRMMageGuild(NULL, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(NULL, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(NULL, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(NULL, &castlact);
+	    if(castle->building & BUILD_WELL) DrawNCRMWell(NULL, &castlact);
+	    break;
+
+	case WARLOCK:
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawWRLKDwelling5(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawWRLKDwelling3(NULL, &castlact);
+	    DrawWRLKCastle(NULL, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(NULL, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(NULL, &castlact);
+	    if(castle->capitan) DrawWRLKCapitan(NULL, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(NULL, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(NULL, &castlact);
+	    else DrawWRLKExt0(NULL, &castlact);
+	    if(castle->mageGuild.level) DrawWRLKMageGuild(NULL, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(NULL, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(NULL, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawWRLKWel2(NULL, &castlact);
+	    if(castle->building & BUILD_SPEC) DrawWRLKSpec(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawWRLKDwelling4(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawWRLKDwelling2(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawWRLKDwelling6(NULL, &castlact);
+	    if(castle->building & BUILD_WELL) DrawWRLKWell(NULL, &castlact);
+	break;
+
+	case WIZARD:
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawWZRDDwelling6(NULL, &castlact);
+	    DrawWZRDCastle(NULL, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(NULL, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(NULL, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(NULL, &castlact);
+	    if(castle->capitan) DrawWZRDCapitan(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVEGUILD) DrawWZRDThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(NULL, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(NULL, &castlact);
+	    else DrawWZRDExt0(NULL, &castlact);
+	    if(castle->building & BUILD_WELL) DrawWZRDWell(NULL, &castlact);
+	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(NULL, &castlact);
+	    if(castle->mageGuild.level) DrawWZRDMageGuild(NULL, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(NULL, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(NULL, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawWZRDMarketplace(NULL, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawWZRDWel2(NULL, &castlact);
+	break;
+	
+	default:
+	return;
+	break;
+    }
+
+    // обновим рамку
+    RedrawRamkaCastleName();
+    
+    // раз купили, так обновим инфо
+    RedrawCastleInfoResource();
+
+    flagUpdateBuilding = FALSE;
+    SetIntValue(ANIM3, TRUE);
+    CursorOn();
+}
+
+void EnableCastleUpdateBuilding(void){
+
+    flagUpdateBuilding = TRUE;
+}
+
+void RedrawRamkaCastleName(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image = NULL;
+    SDL_Rect rectCur;
+    AGGSPRITE sprite;
+    Uint16 cx, cy;
+    
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(GetIntValue(VIDEOMODE)){
+        cx = video->w / 2 - 320;
+	cy = video->h / 2 - 240;
+    }else{
+        cx = 0;
+        cy = 0;
+    }
+
+    // рисуем сетку
+    FillSPRITE(&sprite, "STRIP.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx;
+    rectCur.y = cy + 256;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // рамка наименования
+    FillSPRITE(&sprite, "TOWNNAME.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = cx + 320 - image->w / 2;
+    rectCur.y = cy + 248;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // наименование замка
+    rectCur.x = cx + 320 - GetLengthText(castle->name, FONT_SMALL) / 2 ;
+    rectCur.y = cy + 248;
+    rectCur.w = GetLengthText(castle->name, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, castle->name, FONT_SMALL);
 }
