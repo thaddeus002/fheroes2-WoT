@@ -47,7 +47,7 @@ const char * GetStringSpec(E_RACE);
 const char * GetStringDwelling(E_RACE, E_DWELLINGCASTLE);
 
 const char * GetStringMageGuild(void);
-const char * GetStringLevelMageGuild(Uint8);
+const char * GetStringLevelMageGuild(E_MAGICLEVEL level);
 const char * GetStringTavern(void);
 const char * GetStringThievesGuild(void);
 const char * GetStringWell(void);

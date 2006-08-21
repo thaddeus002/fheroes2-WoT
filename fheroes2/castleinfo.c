@@ -1243,7 +1243,18 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringLevelMageGuild(castle->mageGuild.level + 1);
+    switch(GetMageGuildLevel(castle)){
+	case MAGIC_NONE:
+	case MAGIC_LEVEL1:
+	case MAGIC_LEVEL2:
+	case MAGIC_LEVEL3:
+	case MAGIC_LEVEL4:
+	    message = GetStringLevelMageGuild(GetMageGuildLevel(castle) + 1);
+	    break;
+	case MAGIC_LEVEL5:
+	    message = GetStringLevelMageGuild(GetMageGuildLevel(castle));
+	    break;
+    }
     rectCur.x = cx + 70;
     rectCur.y = cy + 215;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;

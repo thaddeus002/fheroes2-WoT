@@ -46,11 +46,11 @@
 
 typedef enum {
 	    MAGIC_NONE = 0,
-	    MAGIC_LEVEL1,
-	    MAGIC_LEVEL2,
-	    MAGIC_LEVEL3,
-	    MAGIC_LEVEL4,
-	    MAGIC_LEVEL5
+	    MAGIC_LEVEL1 = 1,
+	    MAGIC_LEVEL2 = 2,
+	    MAGIC_LEVEL3 = 3,
+	    MAGIC_LEVEL4 = 4,
+	    MAGIC_LEVEL5 = 5
 
 	    } E_MAGICLEVEL;
 

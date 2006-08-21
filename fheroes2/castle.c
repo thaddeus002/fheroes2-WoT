@@ -234,7 +234,6 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].dwelling = DWELLING_MONSTER1 | DWELLING_MONSTER2; // DWELLING_MONSTER1 DWELLING_MONSTER2 DWELLING_MONSTER3 DWELLING_MONSTER4 DWELLING_MONSTER5 DWELLING_MONSTER6 DWELLING_UPGRADE2 DWELLING_UPGRADE3 DWELLING_UPGRADE4 DWELLING_UPGRADE5 DWELLING_UPGRADE6
 	}
 
-	ptrCastle[countCastle].mageGuild.level = ptr->magicTower;
 	if(0 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL1);
 	if(1 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL2);
 	if(2 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL3);
@@ -880,7 +879,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(&castanim, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawKNGTThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(&castanim, &castlact);
-	    if(castle->mageGuild.level) DrawKNGTMageGuild(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawKNGTMageGuild(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(&castanim, &castlact);
@@ -898,7 +897,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(&castanim, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(&castanim, &castlact);
-	    if(castle->mageGuild.level){
+	    if(GetMageGuildLevel(castle)){
 		DrawBRBNMageGuild(&castanim, &castlact);
 		DrawBRBNExt2(&castanim, &castlact);
 	    }
@@ -926,7 +925,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	case SORCERESS:
 	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(&castanim, &castlact);
-	    if(castle->mageGuild.level) DrawSCRSMageGuild(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawSCRSMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_CAPTAIN) DrawSCRSCapitan(&castanim, &castlact);
 	    DrawSCRSCastle(&castanim, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(&castanim, &castlact);
@@ -965,7 +964,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(&castanim, &castlact);
-	    if(castle->mageGuild.level) DrawNCRMMageGuild(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawNCRMMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(&castanim, &castlact);
@@ -982,7 +981,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
 	    else DrawWRLKExt0(&castanim, &castlact);
-	    if(castle->mageGuild.level) DrawWRLKMageGuild(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawWRLKMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &castlact);
@@ -1012,7 +1011,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(&castanim, &castlact);
-	    if(castle->mageGuild.level) DrawWZRDMageGuild(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawWZRDMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(&castanim, &castlact);
@@ -2025,7 +2024,7 @@ BOOL BuyMonsterFromCastle(const S_CASTLE *castle, Uint8 level, Uint16 count){
 	MONSTERNONE == emonster ||
 	! CheckBuyMonsterFromCastle(castle, level, count) ) return FALSE;
  
-    KingdomWasteMultiResource(castle->color, PaymentConditionsMonster(emonster), count);
+    KingdomWasteResource(castle->color, GetMultiPayment(PaymentConditionsMonster(emonster), count));
 
     currentCastle->monster[level - 1] -= count;
     currentCastle->army[i].monster = emonster;
@@ -2043,7 +2042,7 @@ BOOL CheckBuyMonsterFromCastle(const S_CASTLE *castle, Uint8 level, Uint16 count
     const S_PAYMENT *payment = PaymentConditionsMonster(emonster);
 
     // проверяем платежеспособность
-    if( !KingdomAllowMultiPayment(castle->color, payment, count)) return FALSE;
+    if( !KingdomAllowPayment(castle->color, GetMultiPayment(payment, count))) return FALSE;
     
     return TRUE;
 }
@@ -2277,30 +2276,28 @@ BUILDACTION AllowBuildCastle(const S_CASTLE *castle){
 
 BUILDACTION AllowBuildMageGuild(const S_CASTLE *castle){
 
-    if(5 == castle->mageGuild.level) return ALREADY_BUILD;
+    if(MAGIC_LEVEL5 == GetMageGuildLevel(castle)) return ALREADY_BUILD;
 
     if(! KingdomAllowBuild(castle->color)) return END_TUR;
     
-    switch(castle->mageGuild.level){
-	case 0:
+    switch(GetMageGuildLevel(castle)){
+	case MAGIC_NONE:
 	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD1))) return BUILD_OK;
 	    break;
-	case 1:
+	case MAGIC_LEVEL1:
 	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD2))) return BUILD_OK;
 	    break;
-	case 2:
+	case MAGIC_LEVEL2:
 	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD3))) return BUILD_OK;
 	    break;
-	case 3:
+	case MAGIC_LEVEL3:
 	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD4))) return BUILD_OK;
 	    break;
-	case 4:
+	case MAGIC_LEVEL4:
 	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD5))) return BUILD_OK;
 	    break;
-	case 5:
-	    if(5 == castle->mageGuild.level) return ALREADY_BUILD;
-	    break;
-	default:
+	case MAGIC_LEVEL5:
+	    return ALREADY_BUILD;
 	    break;
     }
 
@@ -2614,7 +2611,7 @@ BUILDACTION AllowBuildDwelling4(const S_CASTLE *castle){
 	    case SORCERESS:
 		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(SORCERESS, DWELLING_MONSTER4)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
-		    castle->mageGuild.level ) return BUILD_OK;
+		    GetMageGuildLevel(castle) ) return BUILD_OK;
 		break;
 
 	    case WIZARD:
@@ -2674,7 +2671,7 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 	    case NECROMANCER:
 		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(NECROMANCER, DWELLING_MONSTER5)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
-		    castle->mageGuild.level ) return BUILD_OK;
+		    GetMageGuildLevel(castle) ) return BUILD_OK;
 		break;
 	    
 	    case SORCERESS:
@@ -2685,7 +2682,7 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 	    case WIZARD:
 		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(WIZARD, DWELLING_MONSTER5)) &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
-		    castle->mageGuild.level ) return BUILD_OK;
+		    GetMageGuildLevel(castle) ) return BUILD_OK;
 		break;
 	
 	    case WARLOCK:
@@ -2708,7 +2705,7 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 
 	    case NECROMANCER:
 		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(NECROMANCER, DWELLING_UPGRADE5)) &&
-		    castle->mageGuild.level > 1) return BUILD_OK;
+		    GetMageGuildLevel(castle) > MAGIC_LEVEL1) return BUILD_OK;
 		break;
 
 	    case WIZARD:
@@ -2800,41 +2797,39 @@ BOOL BuildMageGuild(const S_CASTLE *castle){
 
 	if(&ptrCastle[i] == castle){
 
-	    ++ptrCastle[i].mageGuild.level;
+	    switch(GetMageGuildLevel(&ptrCastle[i])){
 	    
-	    switch(ptrCastle[i].mageGuild.level){
-	    
-		case 1:
+		case MAGIC_NONE:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD1));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD1;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL1);
 		    break;
 		    
-		case 2:
+		case MAGIC_LEVEL1:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD2));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD2;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL2);
 		    break;
 
-		case 3:
+		case MAGIC_LEVEL2:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD3));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD3;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL3);
 		    break;
 
-		case 4:
+		case MAGIC_LEVEL3:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD4));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD4;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL4);
 		    break;
 
-		case 5:
+		case MAGIC_LEVEL4:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD5));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD5;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL5);
 		    break;
 		    
-		default:
+		case MAGIC_LEVEL5:
 		    return FALSE;
 		    break;
 	    }
@@ -3337,7 +3332,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(NULL, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawKNGTThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(NULL, &castlact);
-	    if(castle->mageGuild.level) DrawKNGTMageGuild(NULL, &castlact);
+	    DrawKNGTMageGuild(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(NULL, &castlact);
@@ -3355,7 +3350,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(NULL, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(NULL, &castlact);
-	    if(castle->mageGuild.level){
+	    if(GetMageGuildLevel(castle)){
 		DrawBRBNMageGuild(NULL, &castlact);
 		DrawBRBNExt2(NULL, &castlact);
 	    }
@@ -3383,7 +3378,7 @@ void UpdateCastleBuilding(void){
 	case SORCERESS:
 	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(NULL, &castlact);
-	    if(castle->mageGuild.level) DrawSCRSMageGuild(NULL, &castlact);
+	    DrawSCRSMageGuild(NULL, &castlact);
 	    if(castle->building & BUILD_CAPTAIN) DrawSCRSCapitan(NULL, &castlact);
 	    DrawSCRSCastle(NULL, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(NULL, &castlact);
@@ -3422,7 +3417,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(NULL, &castlact);
-	    if(castle->mageGuild.level) DrawNCRMMageGuild(NULL, &castlact);
+	    DrawNCRMMageGuild(NULL, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(NULL, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(NULL, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(NULL, &castlact);
@@ -3439,7 +3434,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(NULL, &castlact);
 	    else DrawWRLKExt0(NULL, &castlact);
-	    if(castle->mageGuild.level) DrawWRLKMageGuild(NULL, &castlact);
+	    DrawWRLKMageGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(NULL, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(NULL, &castlact);
@@ -3469,7 +3464,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(NULL, &castlact);
-	    if(castle->mageGuild.level) DrawWZRDMageGuild(NULL, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawWZRDMageGuild(NULL, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(NULL, &castlact);
@@ -3627,4 +3622,15 @@ void AllCastleIncreaseArmy(void){
 	   ptrCastle[i].dwelling & DWELLING_UPGRADE6 ||
 	   ptrCastle[i].dwelling & DWELLING_UPGRADE7) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 6)));
     }
+}
+
+E_MAGICLEVEL GetMageGuildLevel(const S_CASTLE *castle){
+
+    if(castle->building & BUILD_MAGEGUILD5) return MAGIC_LEVEL5;
+    if(castle->building & BUILD_MAGEGUILD4) return MAGIC_LEVEL4;
+    if(castle->building & BUILD_MAGEGUILD3) return MAGIC_LEVEL3;
+    if(castle->building & BUILD_MAGEGUILD2) return MAGIC_LEVEL2;
+    if(castle->building & BUILD_MAGEGUILD1) return MAGIC_LEVEL1;
+
+    return MAGIC_NONE;
 }

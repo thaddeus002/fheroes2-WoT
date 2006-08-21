@@ -49,7 +49,6 @@ void FillMageGuildLevel(S_MAGEGUILD *guild, const S_CASTLE *castle, E_MAGICLEVEL
 	    break;
 
 	case MAGIC_LEVEL1:
-	    guild->level = 1;
 	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
 		FillSpellLevel1(castle->race, guild->level1, TRUE);
 	    else
@@ -57,7 +56,6 @@ void FillMageGuildLevel(S_MAGEGUILD *guild, const S_CASTLE *castle, E_MAGICLEVEL
 	    break;
 
 	case MAGIC_LEVEL2:
-	    guild->level = 2;
 	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
 		FillSpellLevel2(castle->race, guild->level2, TRUE);
 	    else
@@ -65,7 +63,6 @@ void FillMageGuildLevel(S_MAGEGUILD *guild, const S_CASTLE *castle, E_MAGICLEVEL
 	    break;
 
 	case MAGIC_LEVEL3:
-	    guild->level = 3;
 	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
 		FillSpellLevel3(castle->race, guild->level3, TRUE);
 	    else
@@ -73,7 +70,6 @@ void FillMageGuildLevel(S_MAGEGUILD *guild, const S_CASTLE *castle, E_MAGICLEVEL
 	    break;
 
 	case MAGIC_LEVEL4:
-	    guild->level = 4;
 	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
 		FillSpellLevel4(castle->race, guild->level4, TRUE);
 	    else
@@ -81,7 +77,6 @@ void FillMageGuildLevel(S_MAGEGUILD *guild, const S_CASTLE *castle, E_MAGICLEVEL
 	    break;
 
 	case MAGIC_LEVEL5:
-	    guild->level = 5;
 	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
 		FillSpellLevel5(castle->race, guild->level5, TRUE);
 	    else
@@ -110,7 +105,7 @@ ACTION  ShowMageGuildInfo(void){
     ACTION result = NONE;
 
     const S_CASTLE *castle = GetCurrentCastle();
-    if(! castle || !castle->mageGuild.level) return NONE;
+    if(! castle || !GetMageGuildLevel(castle)) return NONE;
 
     FillSPRITE(&sprite, "STONEBAK.ICN", 0);
     image = GetICNSprite(&sprite);
@@ -214,7 +209,7 @@ ACTION  ShowMageGuildInfo(void){
 	    message = "MAGEGLDN.ICN";
 	    break;
     }
-    FillSPRITE(&sprite, message, castle->mageGuild.level - 1);
+    FillSPRITE(&sprite, message, GetMageGuildLevel(castle) - 1);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 80 - image->w / 2;
     rectCur.y = cy + 270 - image->h;
@@ -226,7 +221,7 @@ ACTION  ShowMageGuildInfo(void){
     max = 1;
     for(i = 0; i < max; ++i){
 
-	if(4 < castle->mageGuild.level && SPELLNONE != castle->mageGuild.level5[i]) level = 0; else level = 1;
+	if(MAGIC_LEVEL4 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level5[i]) level = 0; else level = 1;
 
 	// свиток
 	FillSPRITE(&sprite, "TOWNWIND.ICN", level);
@@ -266,7 +261,7 @@ ACTION  ShowMageGuildInfo(void){
     max = 2;
     for(i = 0; i < max; ++i){
 
-	if(3 < castle->mageGuild.level && SPELLNONE != castle->mageGuild.level4[i]) level = 0; else level = 1;
+	if(MAGIC_LEVEL3 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level4[i]) level = 0; else level = 1;
 
 	// свиток
 	FillSPRITE(&sprite, "TOWNWIND.ICN", level);
@@ -312,7 +307,7 @@ ACTION  ShowMageGuildInfo(void){
     max = 2;
     for(i = 0; i < max; ++i){
 
-	if(2 < castle->mageGuild.level && SPELLNONE != castle->mageGuild.level3[i]) level = 0; else level = 1;
+	if(MAGIC_LEVEL2 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level3[i]) level = 0; else level = 1;
 
 	// свиток
 	FillSPRITE(&sprite, "TOWNWIND.ICN", level);
@@ -358,7 +353,7 @@ ACTION  ShowMageGuildInfo(void){
     max = 3;
     for(i = 0; i < max; ++i){
 
-	if(1 < castle->mageGuild.level && SPELLNONE != castle->mageGuild.level2[i]) level = 0; else level = 1;
+	if(MAGIC_LEVEL1 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level2[i]) level = 0; else level = 1;
 
 	// свиток
 	FillSPRITE(&sprite, "TOWNWIND.ICN", level);
@@ -398,7 +393,7 @@ ACTION  ShowMageGuildInfo(void){
     max = 3;
     for(i = 0; i < max; ++i){
 
-	if(castle->mageGuild.level && SPELLNONE != castle->mageGuild.level1[i]) level = 0; else level = 1;
+	if(GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level1[i]) level = 0; else level = 1;
 
 	// свиток
 	FillSPRITE(&sprite, "TOWNWIND.ICN", level);

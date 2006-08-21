@@ -938,9 +938,9 @@ void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    if(castle->mageGuild.level > 5 || castle->mageGuild.level < 1) return;
+    if(GetMageGuildLevel(castle) == MAGIC_NONE) return;
 
-    FillSPRITE(&sprite, "TWNKMAGE.ICN", castle->mageGuild.level - 1);
+    FillSPRITE(&sprite, "TWNKMAGE.ICN", GetMageGuildLevel(castle) - 1);
 
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
@@ -949,31 +949,39 @@ void DrawKNGTMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    if(1 == castle->mageGuild.level){
-	cur.x += 260;
-	cur.y += 10;
-	cur.w = 55;
-	cur.h = 60;
-    }else if(2 == castle->mageGuild.level){
-	cur.x += 260;
-	cur.y += 10;
-	cur.w = 55;
-	cur.h = 80;
-    }else if(3 == castle->mageGuild.level){
-	cur.x += 260;
-	cur.y += 10;
-	cur.w = 55;
-	cur.h = 100;
-    }else if(4 == castle->mageGuild.level){
-	cur.x += 260;
-	cur.y += 10;
-	cur.w = 55;
-	cur.h = 120;
-    }else if(5 == castle->mageGuild.level){
-	cur.x += 260;
-	cur.y += 10;
-	cur.w = 55;
-	cur.h = 140;
+    switch(GetMageGuildLevel(castle)){
+	case MAGIC_LEVEL1:
+	    cur.x += 260;
+	    cur.y += 10;
+	    cur.w = 55;
+	    cur.h = 60;
+	    break;
+	case MAGIC_LEVEL2:
+	    cur.x += 260;
+	    cur.y += 10;
+	    cur.w = 55;
+	    cur.h = 80;
+	    break;
+	case MAGIC_LEVEL3:
+	    cur.x += 260;
+	    cur.y += 10;
+	    cur.w = 55;
+	    cur.h = 100;
+	    break;
+	case MAGIC_LEVEL4:
+	    cur.x += 260;
+	    cur.y += 10;
+	    cur.w = 55;
+	    cur.h = 120;
+	    break;
+	case MAGIC_LEVEL5:
+	    cur.x += 260;
+	    cur.y += 10;
+	    cur.w = 55;
+	    cur.h = 140;
+	    break;
+	default:
+	    break;
     }
     
     if(actionHead){

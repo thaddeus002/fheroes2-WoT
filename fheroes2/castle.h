@@ -117,7 +117,6 @@ typedef enum { BUILD_OK, CANNOT_BUILD, ALREADY_BUILD, END_TUR } BUILDACTION;
 #define CASTLESPELL_LEVEL1      4 
 
 typedef struct {
-                E_MAGICLEVEL level;
                 E_SPELL level5[CASTLESPELL_LEVEL5];
                 E_SPELL level4[CASTLESPELL_LEVEL4];
                 E_SPELL level3[CASTLESPELL_LEVEL3];
@@ -211,6 +210,7 @@ void		CastleIncreaseArmy(const S_CASTLE *, E_DWELLINGCASTLE, Uint8);
 void		AllCastleIncreaseArmy(void);
 
 Uint8           GetMonsterGrownCastle(const S_CASTLE *, E_MONSTER);
+E_MAGICLEVEL	GetMageGuildLevel(const S_CASTLE *);
 
 void		RedrawCastleMonster(void);
 void		RedrawCastleInfoResource(void);

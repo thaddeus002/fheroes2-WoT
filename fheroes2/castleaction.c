@@ -1751,7 +1751,7 @@ ACTION ActionCastleClickMageGuild(void){
     const S_CASTLE *castle = GetCurrentCastle();
 
     char message[32];
-    sprintf(message, "Build Mage Guild Level %d ?", castle->mageGuild.level + 1);
+    sprintf(message, "Build Mage Guild Level %d ?", GetMageGuildLevel(castle) + 1);
     
     if(YES == MessageBox(message, FONT_BIG)){
 

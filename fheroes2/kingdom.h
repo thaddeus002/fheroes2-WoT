@@ -78,12 +78,10 @@ void		KingdomRemoveHeroes(E_COLORS, E_NAMEHEROES);
 S_KINGDOM	*GetStatKingdom(E_COLORS);
 BOOL		KingdomAllowBuild(E_COLORS);
 BOOL		KingdomAllowPayment(E_COLORS, const S_PAYMENT *);
-BOOL		KingdomAllowMultiPayment(E_COLORS, const S_PAYMENT *, Uint16);
 void		RecalculateKingdomDay(E_COLORS);
 void		RecalculateKingdomWeek(E_COLORS);
 void		RecalculateKingdomMonth(E_COLORS);
 void		KingdomSetAllowBuild(E_COLORS, BOOL);
 void		KingdomWasteResource(E_COLORS, const S_PAYMENT *);
-void		KingdomWasteMultiResource(E_COLORS, const S_PAYMENT *, Uint16);
 
 #endif

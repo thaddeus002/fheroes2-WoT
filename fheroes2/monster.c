@@ -30,6 +30,8 @@
 #include "SDL.h"
 
 #include "config.h"
+#include "kingdom.h"
+#include "payment.h"
 #include "castle.h"
 #include "monster.h"
 
@@ -1330,6 +1332,11 @@ E_MONSTER UpgradeMonster(E_MONSTER name){
 
 ACTION UpgradableArmy(const S_ARMY *army, E_COLORS color){
     
-    // YES NO EXIT
-    return EXIT;
+    E_MONSTER upgradeMonster = UpgradeMonster(army->monster);
+
+    if(army->monster == upgradeMonster) return EXIT;
+
+    if(KingdomAllowPayment(color, GetMultiPayment(PaymentConditionsMonster(upgradeMonster), army->count))) return YES;
+
+    return NO;
 }

@@ -851,10 +851,10 @@ void DrawWZRDMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     const S_CASTLE *castle = GetCurrentCastle();
     
-    if(castle->mageGuild.level > 5 || castle->mageGuild.level < 1) return;
+    if(GetMageGuildLevel(castle) == MAGIC_NONE) return;
 
     // спрайт
-    FillSPRITE(&sprite, "TWNZMAGE.ICN", castle->mageGuild.level - 1);
+    FillSPRITE(&sprite, "TWNZMAGE.ICN", GetMageGuildLevel(castle) - 1);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
@@ -862,21 +862,28 @@ void DrawWZRDMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    if(1 == castle->mageGuild.level){
-	cur.x += 52;
-	cur.w = 60;
-    }else if(2 == castle->mageGuild.level){
-	cur.x += 52;
-	cur.w = 60;
-    }else if(3 == castle->mageGuild.level){
-	cur.x += 52;
-	cur.w = 60;
-    }else if(4 == castle->mageGuild.level){
-	cur.x += 52;
-	cur.w = 60;
-    }else if(5 == castle->mageGuild.level){
-	cur.x += 52;
-	cur.w = 60;
+    switch(GetMageGuildLevel(castle)){
+	case MAGIC_LEVEL1:
+	    cur.x += 52;
+	    cur.w = 60;
+	    break;
+	case MAGIC_LEVEL2:
+	    cur.x += 52;
+	    cur.w = 60;
+	    break;
+	case MAGIC_LEVEL3:
+	    cur.x += 52;
+	    cur.w = 60;
+	    break;
+	case MAGIC_LEVEL4:
+	    cur.x += 52;
+	    cur.w = 60;
+	    break;
+	case MAGIC_LEVEL5:
+	    cur.x += 52;
+	    cur.w = 60;
+	default:
+	    break;
     }
 
     if(actionHead){

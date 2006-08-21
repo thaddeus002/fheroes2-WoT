@@ -927,3 +927,16 @@ const S_PAYMENT * PaymentConditionsMonster(E_MONSTER monster){
 
     return &paymentObject;
 }
+
+const S_PAYMENT * GetMultiPayment(const S_PAYMENT *payment, Uint16 count){
+
+    if(payment->gold) paymentObject.gold = payment->gold * count;
+    if(payment->wood) paymentObject.wood = payment->wood * count;
+    if(payment->ore) paymentObject.ore = payment->ore * count;
+    if(payment->mercury) paymentObject.mercury = payment->mercury * count;
+    if(payment->crystal) paymentObject.crystal = payment->crystal * count;
+    if(payment->sulfur) paymentObject.sulfur = payment->sulfur * count;
+    if(payment->gems) paymentObject.gems = payment->gems * count;
+
+    return &paymentObject;
+}

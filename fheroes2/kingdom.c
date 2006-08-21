@@ -256,35 +256,6 @@ void KingdomWasteResource(E_COLORS color, const S_PAYMENT *payment){
 	    kingdom[color].gems -= payment->gems;
 }
 
-void KingdomWasteMultiResource(E_COLORS color, const S_PAYMENT *payment, Uint16 count){
-
-    if( !KingdomAllowPayment(color, payment)){
-	if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteMultiResource: incorrect payment\n");
-	return;
-    }
-
-    if(payment->gold)
-	    kingdom[color].gold -= payment->gold * count;
-
-    if(payment->wood)
-	    kingdom[color].wood -= payment->wood * count;
-
-    if(payment->ore)
-	    kingdom[color].ore -= payment->ore * count;
-
-    if(payment->mercury)
-	    kingdom[color].mercury -= payment->mercury * count;
-
-    if(payment->crystal)
-	    kingdom[color].crystal -= payment->crystal * count;
-
-    if(payment->sulfur)
-	    kingdom[color].sulfur -= payment->sulfur * count;
-
-    if(payment->gems)
-	    kingdom[color].gems -= payment->gems * count;
-}
-
 BOOL KingdomAllowPayment(E_COLORS color, const S_PAYMENT *payment){
 
     if( kingdom[color].gold < payment->gold ||
@@ -294,19 +265,6 @@ BOOL KingdomAllowPayment(E_COLORS color, const S_PAYMENT *payment){
 	kingdom[color].crystal < payment->crystal ||
 	kingdom[color].sulfur < payment->sulfur ||
 	kingdom[color].gems < payment->gems ) return FALSE;
-
-    return TRUE;
-}
-
-BOOL KingdomAllowMultiPayment(E_COLORS color, const S_PAYMENT *payment, Uint16 count){
-
-    if( kingdom[color].gold < payment->gold * count ||
-	kingdom[color].wood < payment->wood * count ||
-	kingdom[color].ore < payment->ore * count ||
-	kingdom[color].mercury < payment->mercury * count ||
-	kingdom[color].crystal < payment->crystal * count ||
-	kingdom[color].sulfur < payment->sulfur * count ||
-	kingdom[color].gems < payment->gems * count ) return FALSE;
 
     return TRUE;
 }

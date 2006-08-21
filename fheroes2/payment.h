@@ -29,6 +29,8 @@
 #ifndef _PAYMENT_H
 #define _PAYMENT_H
 
+#include "castle.h"
+
 #define BUILD_CASTLE_GOLD		5000
 #define BUILD_CASTLE_WOOD		20
 #define BUILD_CASTLE_ORE		20
@@ -343,6 +345,7 @@ typedef struct {
 const S_PAYMENT * PaymentConditionsBuilding(E_RACE, E_BUILDINGCASTLE);
 const S_PAYMENT * PaymentConditionsDwelling(E_RACE, E_DWELLINGCASTLE); 
 const S_PAYMENT * PaymentConditionsMonster(E_MONSTER); 
+const S_PAYMENT * GetMultiPayment(const S_PAYMENT *, Uint16); 
 
 #endif
 

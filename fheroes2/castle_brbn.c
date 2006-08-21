@@ -936,10 +936,10 @@ void DrawBRBNMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     const S_CASTLE *castle = GetCurrentCastle();
     
-    if(castle->mageGuild.level > 5 || castle->mageGuild.level < 1) return;
+    if(GetMageGuildLevel(castle) == MAGIC_NONE) return;
 
     // спрайт
-    FillSPRITE(&sprite, "TWNBMAGE.ICN", castle->mageGuild.level - 1);
+    FillSPRITE(&sprite, "TWNBMAGE.ICN", GetMageGuildLevel(castle) - 1);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
@@ -947,7 +947,7 @@ void DrawBRBNMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.h = header->surface->h;
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
-    if(5 == castle->mageGuild.level && animHead){
+    if(MAGIC_LEVEL5 == GetMageGuildLevel(castle) && animHead){
 	// анимация
 	cur.x = cx;
 	cur.y = cy;
@@ -960,7 +960,7 @@ void DrawBRBNMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     if(actionHead){
 	cur.x = cx + 350;
-	cur.h = 25 * castle->mageGuild.level;
+	cur.h = 25 * GetMageGuildLevel(castle);
 	cur.y = cy + 155 - cur.h;
 	cur.w = 45;
 	ZeroINTERFACEACTION(&action);

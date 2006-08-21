@@ -1113,29 +1113,27 @@ const char * GetStringMageGuild(void){
     return string;
 }
 
-const char * GetStringLevelMageGuild(Uint8 level){
+const char * GetStringLevelMageGuild(E_MAGICLEVEL level){
 
-    const char *string;
+    const char *string = NULL;
 
     switch(level){
-	case 1:
+	case MAGIC_NONE:
+	    break;
+	case MAGIC_LEVEL1:
 	    string = "Mage Guild, Level 1";
 	    break;
-	case 2:
+	case MAGIC_LEVEL2:
 	    string = "Mage Guild, Level 2";
 	    break;
-	case 3:
+	case MAGIC_LEVEL3:
 	    string = "Mage Guild, Level 3";
 	    break;
-	case 4:
+	case MAGIC_LEVEL4:
 	    string = "Mage Guild, Level 4";
 	    break;
-	case 5:
-	case 6:
+	case MAGIC_LEVEL5:
 	    string = "Mage Guild, Level 5";
-	    break;
-	default:
-	    string = NULL;
 	    break;
     }
 
