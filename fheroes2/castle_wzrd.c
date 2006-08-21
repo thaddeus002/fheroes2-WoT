@@ -49,7 +49,7 @@ void DrawWZRDCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    if(castle->castle){
+    if(castle->building & BUILD_CASTLE){
 	// анимация
 	if(animHead){
 	    cur.x = cx;

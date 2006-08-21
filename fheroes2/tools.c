@@ -28,6 +28,7 @@
 
 #include <string.h>
 #include "gamedefs.h"
+#include "config.h"
 #include "SDL.h"
 #include "tools.h"
 
@@ -249,6 +250,11 @@ Uint16 GetLengthText(const char *string, ENUMFONT font){
     Uint16	result = 0;
     AGGSPRITE	sprite;
     SDL_Surface	*letter = NULL;
+    
+    if(NULL == string){
+	if(GetIntValue(DEBUG)) fprintf(stderr, "GetLengthText: string is NULL.\n");
+	return 0;
+    }
 
     // парсим string по буквам
     while(*string){

@@ -179,23 +179,23 @@ typedef struct {
 BOOL		InitHeroes(void);
 void		FreeHeroes();
 
-Uint8		CalculateHeroesAttack(S_HEROES *);
-Uint8		CalculateHeroesDefence(S_HEROES *);
-Uint8		CalculateHeroesPower(S_HEROES *);
-Uint8		CalculateHeroesKnowledge(S_HEROES *);
-E_MORALE	CalculateHeroesMorale(S_HEROES *);
-E_LUCK		CalculateHeroesLuck(S_HEROES *);
-Uint16		CalculateHeroesMagicPoint(S_HEROES *);
-Uint8		CalculateHeroesMoveLandPoint(S_HEROES *);
-Uint8		CalculateHeroesMoveSeaPoint(S_HEROES *);
-Uint8		CalculateHeroesScouting(S_HEROES *);
+Uint8		CalculateHeroesAttack(const S_HEROES *);
+Uint8		CalculateHeroesDefence(const S_HEROES *);
+Uint8		CalculateHeroesPower(const S_HEROES *);
+Uint8		CalculateHeroesKnowledge(const S_HEROES *);
+E_MORALE	CalculateHeroesMorale(const S_HEROES *);
+E_LUCK		CalculateHeroesLuck(const S_HEROES *);
+Uint16		CalculateHeroesMagicPoint(const S_HEROES *);
+Uint8		CalculateHeroesMoveLandPoint(const S_HEROES *);
+Uint8		CalculateHeroesMoveSeaPoint(const S_HEROES *);
+Uint8		CalculateHeroesScouting(const S_HEROES *);
 
-BOOL		HeroesArtifactPresent(S_HEROES *, E_ARTIFACT);
-E_LEVELSKILL	HeroesLevelSkill(S_HEROES *, E_SKILL);
+BOOL		HeroesArtifactPresent(const S_HEROES *, E_ARTIFACT);
+E_LEVELSKILL	HeroesLevelSkill(const S_HEROES *, E_SKILL);
 void		HeroesDefaultValues(S_HEROES *, E_RACE);
-Uint8		HeroesCountArmy(S_HEROES *);
+Uint8		HeroesCountArmy(const S_HEROES *);
 S_HEROES       *GetStatHeroes(E_NAMEHEROES);
-ACTION		ShowArmyInfo(S_ARMY *, S_HEROES *);
+ACTION		ShowArmyInfo(const S_ARMY *, const S_HEROES *);
 
 const char *	HeroesBigNamePortrait(E_NAMEHEROES);
 const char *	CapitanBigNamePortrait(E_RACE);

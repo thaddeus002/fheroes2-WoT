@@ -33,11 +33,9 @@
 #include "tools.h"
 #include "cursor.h"
 #include "debug.h"
-#include "castle.h"
 #include "config.h"
 #include "actionevent.h"
-#include "castle.h"
-#include "monster.h"
+#include "payment.h"
 #include "castleaction.h"
 
 void RedrawDinamicRecrutMonster(SDL_Surface *, SDL_Rect *, E_MONSTER, Uint16, Uint16, Uint16, Uint32);
@@ -56,8 +54,8 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
     
-    S_MONSTER *monster = GetStatMonster(emonster);
     const S_CASTLE *castle = GetCurrentCastle();
+    const S_PAYMENT *payment = NULL;
 
     Uint16 countAvailable = available;
     Uint16 resultRecrutMonster = 0;
@@ -95,15 +93,14 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     rectCur.x = rectCur.x - rectCur.w / 2;
     PrintText(video, &rectCur, str, FONT_BIG);
 
+    payment = PaymentConditionsMonster(emonster);
     // cost per troop
-    if( emonster == CYCLOPS ||
-        emonster == PHOENIX ||
-	emonster == GREEN_DRAGON ||
-        emonster == RED_DRAGON ||
-        emonster == BLACK_DRAGON ||
-        emonster == GIANT ||
-        emonster == TITAN ||
-        emonster == GENIE ){
+    if( payment->wood ||
+        payment->ore ||
+	payment->crystal ||
+        payment->sulfur ||
+        payment-> mercury ||
+        payment->gems ){
 
 	// спрайт золото (условия)
 	FillSPRITE(&sprite, "RESOURCE.ICN", 6);
@@ -120,7 +117,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", monster->cost);
+	sprintf(str, "%d", payment->gold);
 	rectCur.x = rectBack.x + 183;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -143,7 +140,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", monster->cost);
+	sprintf(str, "%d", payment->gold);
 	rectCur.x = rectBack.x + 205;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -152,9 +149,8 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	PrintText(video, &rectCur, str, FONT_SMALL);
     }
 
-    switch(emonster){
+    if(payment->crystal){
 
-        case CYCLOPS:
 	    // спрайт crystal (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 4);
 	    image = GetICNSprite(&sprite);
@@ -170,16 +166,16 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество crystal (условия)
-	    sprintf(str, "%d", BUY_CYCLOPS_CRYSTAL);
+	    sprintf(str, "%d", payment->crystal);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
 	    rectCur.h = FONT_HEIGHTSMALL;
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
 
-        case PHOENIX:
+    }else if(payment->mercury){
+
 	    // спрайт mercury (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 1);
 	    image = GetICNSprite(&sprite);
@@ -195,16 +191,66 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", BUY_PHOENIX_MERCURY);
+	    sprintf(str, "%d", payment->mercury);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
 	    rectCur.h = FONT_HEIGHTSMALL;
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
 
-        case GREEN_DRAGON:
+    }else if(payment->wood){
+
+	    // спрайт mercury (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 0);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 72;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // спрайт mercury (всего)
+	    rectCur.x = rectBack.x + 180;
+	    rectCur.y = rectBack.y + 197;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество mercury (условия)
+	    sprintf(str, "%d", payment->wood);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    }else if(payment->ore){
+
+	    // спрайт mercury (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 72;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // спрайт mercury (всего)
+	    rectCur.x = rectBack.x + 180;
+	    rectCur.y = rectBack.y + 197;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество mercury (условия)
+	    sprintf(str, "%d", payment->ore);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    }else if(payment->sulfur){
+
 	    // спрайт sulfur (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
 	    image = GetICNSprite(&sprite);
@@ -220,66 +266,16 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество sulfur (условия)
-	    sprintf(str, "%d", BUY_GREENDRAGON_SULFUR);
+	    sprintf(str, "%d", payment->sulfur);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
 	    rectCur.h = FONT_HEIGHTSMALL;
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
 
-        case RED_DRAGON:
-	    // спрайт sulfur (условия)
-	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
-	    image = GetICNSprite(&sprite);
-	    rectCur.x = rectBack.x + 225;
-	    rectCur.y = rectBack.y + 75;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // спрайт sulfur (всего)
-	    rectCur.x = rectBack.x + 180;
-	    rectCur.y = rectBack.y + 200;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // количество sulfur (условия)
-	    sprintf(str, "%d", BUY_REDDRAGON_SULFUR);
-	    rectCur.x = rectBack.x + 240;
-	    rectCur.y = rectBack.y + 103;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    rectCur.x = rectCur.x - rectCur.w / 2;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
+    }else if(payment->gems){
 
-        case BLACK_DRAGON:
-	    // спрайт sulfur (условия)
-	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
-	    image = GetICNSprite(&sprite);
-	    rectCur.x = rectBack.x + 225;
-	    rectCur.y = rectBack.y + 75;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // спрайт sulfur (всего)
-	    rectCur.x = rectBack.x + 180;
-	    rectCur.y = rectBack.y + 200;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // количество sulfur (условия)
-	    sprintf(str, "%d", BUY_BLACKDRAGON_SULFUR);
-	    rectCur.x = rectBack.x + 240;
-	    rectCur.y = rectBack.y + 103;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    rectCur.x = rectCur.x - rectCur.w / 2;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
-
-        case GIANT:
 	    // спрайт gems (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 5);
 	    image = GetICNSprite(&sprite);
@@ -295,67 +291,13 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество gems (условия)
-	    sprintf(str, "%d", BUY_GIANT_GEMS);
+	    sprintf(str, "%d", payment->gems);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
 	    rectCur.h = FONT_HEIGHTSMALL;
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
-
-        case TITAN:
-	    // спрайт gems (условия)
-	    FillSPRITE(&sprite, "RESOURCE.ICN", 5);
-	    image = GetICNSprite(&sprite);
-	    rectCur.x = rectBack.x + 225;
-	    rectCur.y = rectBack.y + 75;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // спрайт gems (всего)
-	    rectCur.x = rectBack.x + 180;
-	    rectCur.y = rectBack.y + 200;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // количество gems (условия)
-	    sprintf(str, "%d", BUY_TITAN_GEMS);
-	    rectCur.x = rectBack.x + 240;
-	    rectCur.y = rectBack.y + 103;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    rectCur.x = rectCur.x - rectCur.w / 2;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
-
-        case GENIE:
-	    // спрайт gems (условия)
-	    FillSPRITE(&sprite, "RESOURCE.ICN", 5);
-	    image = GetICNSprite(&sprite);
-	    rectCur.x = rectBack.x + 225;
-	    rectCur.y = rectBack.y + 75;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // спрайт gems (всего)
-	    rectCur.x = rectBack.x + 180;
-	    rectCur.y = rectBack.y + 200;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-	    // количество gems (условия)
-	    sprintf(str, "%d", BUY_GENIE_GEMS);
-	    rectCur.x = rectBack.x + 240;
-	    rectCur.y = rectBack.y + 103;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    rectCur.x = rectCur.x - rectCur.w / 2;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
-            break;
-
-        default:
-            break;
     }
 
     // картинка монстра
@@ -485,23 +427,19 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 		if(countAvailable && CheckBuyMonsterFromCastle(castle, levelMonster, resultRecrutMonster + 1)){
 		    resultRecrutMonster++;
 		    countAvailable--;
-		    if(emonster == CYCLOPS)
-			resultCountResource += BUY_CYCLOPS_CRYSTAL;
-		    else if(emonster == PHOENIX)
-			resultCountResource += BUY_PHOENIX_MERCURY;
-		    else if(emonster == GREEN_DRAGON)
-			resultCountResource += BUY_GREENDRAGON_SULFUR;
-		    else if(emonster == RED_DRAGON)
-			resultCountResource += BUY_REDDRAGON_SULFUR;
-		    else if(emonster == BLACK_DRAGON)
-			resultCountResource += BUY_BLACKDRAGON_SULFUR;
-		    else if(emonster == GIANT)
-			resultCountResource += BUY_GIANT_GEMS;
-		    else if(emonster == TITAN)
-			resultCountResource += BUY_TITAN_GEMS;
-		    else if(emonster == GENIE)
-			resultCountResource += BUY_GENIE_GEMS;
-		    resultCountGold += monster->cost;
+		    if(payment->wood)
+			resultCountResource += payment->wood;
+		    else if(payment->ore)
+			resultCountResource += payment->ore;
+		    else if(payment->mercury)
+			resultCountResource += payment->mercury;
+		    else if(payment->crystal)
+			resultCountResource += payment->crystal;
+		    else if(payment->sulfur)
+			resultCountResource += payment->sulfur;
+		    else if(payment->gems)
+			resultCountResource += payment->gems;
+		    resultCountGold += payment->gold;
 		    CursorOff();
 		    RedrawDinamicRecrutMonster(stat, &rectBack, emonster, countAvailable, resultRecrutMonster, resultCountResource, resultCountGold);
 		    CursorOn();
@@ -512,23 +450,19 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 		if(resultRecrutMonster){
 		    resultRecrutMonster--;
 		    countAvailable++;
-		    if(emonster == CYCLOPS)
-			resultCountResource -= BUY_CYCLOPS_CRYSTAL;
-		    else if(emonster == PHOENIX)
-			resultCountResource -= BUY_PHOENIX_MERCURY;
-		    else if(emonster == GREEN_DRAGON)
-			resultCountResource -= BUY_GREENDRAGON_SULFUR;
-		    else if(emonster == RED_DRAGON)
-			resultCountResource -= BUY_REDDRAGON_SULFUR;
-		    else if(emonster == BLACK_DRAGON)
-			resultCountResource -= BUY_BLACKDRAGON_SULFUR;
-		    else if(emonster == GIANT)
-			resultCountResource -= BUY_GIANT_GEMS;
-		    else if(emonster == TITAN)
-			resultCountResource -= BUY_TITAN_GEMS;
-		    else if(emonster == GENIE)
-			resultCountResource -= BUY_GENIE_GEMS;
-		    resultCountGold -= monster->cost;
+		    if(payment->wood)
+			resultCountResource -= payment->wood;
+		    else if(payment->ore)
+			resultCountResource -= payment->ore;
+		    else if(payment->mercury)
+			resultCountResource -= payment->mercury;
+		    else if(payment->crystal)
+			resultCountResource -= payment->crystal;
+		    else if(payment->sulfur)
+			resultCountResource -= payment->sulfur;
+		    else if(payment->gems)
+			resultCountResource -= payment->gems;
+		    resultCountGold -= payment->gold;
 		    CursorOff();
 		    RedrawDinamicRecrutMonster(stat, &rectBack, emonster, countAvailable, resultRecrutMonster, resultCountResource, resultCountGold);
 		    CursorOn();
@@ -539,23 +473,19 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 		while(countAvailable && CheckBuyMonsterFromCastle(castle, levelMonster, resultRecrutMonster + 1)){
 		    resultRecrutMonster++;
 		    countAvailable--;
-		    if(emonster == CYCLOPS)
-			resultCountResource += BUY_CYCLOPS_CRYSTAL;
-		    else if(emonster == PHOENIX)
-			resultCountResource += BUY_PHOENIX_MERCURY;
-		    else if(emonster == GREEN_DRAGON)
-			resultCountResource += BUY_GREENDRAGON_SULFUR;
-		    else if(emonster == RED_DRAGON)
-			resultCountResource += BUY_REDDRAGON_SULFUR;
-		    else if(emonster == BLACK_DRAGON)
-			resultCountResource += BUY_BLACKDRAGON_SULFUR;
-		    else if(emonster == GIANT)
-			resultCountResource += BUY_GIANT_GEMS;
-		    else if(emonster == TITAN)
-			resultCountResource += BUY_TITAN_GEMS;
-		    else if(emonster == GENIE)
-			resultCountResource += BUY_GENIE_GEMS;
-		    resultCountGold += monster->cost;
+		    if(payment->wood)
+			resultCountResource += payment->wood;
+		    else if(payment->ore)
+			resultCountResource += payment->ore;
+		    else if(payment->mercury)
+			resultCountResource += payment->mercury;
+		    else if(payment->crystal)
+			resultCountResource += payment->crystal;
+		    else if(payment->sulfur)
+			resultCountResource += payment->sulfur;
+		    else if(payment->gems)
+			resultCountResource += payment->gems;
+		    resultCountGold += payment->gold;
 		}
 		CursorOff();
 		RedrawDinamicRecrutMonster(stat, &rectBack, emonster, countAvailable, resultRecrutMonster, resultCountResource, resultCountGold);
@@ -605,14 +535,15 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
     rectCur.h = FONT_HEIGHTBIG;
     rectCur.x = rectCur.x - rectCur.w / 2;
     PrintText(video, &rectCur, str, FONT_BIG);
-    if( emonster == CYCLOPS ||
-        emonster == PHOENIX ||
-	emonster == GREEN_DRAGON ||
-        emonster == RED_DRAGON ||
-        emonster == BLACK_DRAGON ||
-        emonster == GIANT ||
-        emonster == TITAN ||
-        emonster == GENIE ){
+
+    const S_PAYMENT *payment = PaymentConditionsMonster(emonster);
+    // cost per troop
+    if( payment->wood ||
+        payment->ore ||
+	payment->crystal ||
+        payment->sulfur ||
+        payment-> mercury ||
+        payment->gems ){
 	// text count gold
 	sprintf(str, "%d", resultCountGold);
 	rectCur.x = rect->x + 133;

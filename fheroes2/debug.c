@@ -646,7 +646,7 @@ void PrintCellInfo(Uint16 index){
 	case OBJ_CASTLE:
 	    castle = GetStatCastlePos(ptrCell->ax, ptrCell->ay);
 	    fprintf(stderr, "object  : ");
-	    castle->castle ? fprintf(stderr, "Castle: ") : fprintf(stderr, "Tower: ");
+	    castle->building & BUILD_CASTLE ? fprintf(stderr, "Castle: ") : fprintf(stderr, "Tower: ");
     	    fprintf(stderr, "%s, ", castle->name);
     	    fprintf(stderr, "Kingdom: %s, ", GetStringColor(castle->color));
     	    fprintf(stderr, "Race: %s\n", GetStringRace(castle->race));
@@ -1077,9 +1077,9 @@ const char * GetStringDwelling(E_RACE race, E_DWELLINGCASTLE level){
 	    if(DWELLING_UPGRADE2 == level) string = NULL;
 	    if(DWELLING_UPGRADE3 == level) string = NULL;
 	    if(DWELLING_UPGRADE4 == level) string = "Upg. Maze";
-	    if(DWELLING_UPGRADE5 == level) string = "Red Tower";
-	    if(DWELLING_UPGRADE6 == level) string = "Black Tower";
-	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    if(DWELLING_UPGRADE5 == level) string = NULL;
+	    if(DWELLING_UPGRADE6 == level) string = "Red Tower";
+	    if(DWELLING_UPGRADE7 == level) string = "Black Tower";
 	    break;
 
 	case NECROMANCER:
@@ -1205,7 +1205,7 @@ const char * GetStringMoat(void){
     return string;
 }
 
-const char * GetStringCapitan(void){
+const char * GetStringCaptain(void){
 
     const char *string = "Captains Quarters";
     

@@ -170,7 +170,7 @@ void    RecalculateKingdomDay(E_COLORS color){
     while(castle){
     
 	// gold
-	if(castle->castle)
+	if(castle->building & BUILD_CASTLE)
 	    kingdom[color].gold += GOLD_CASTLE_DAY;
 	else
 	    kingdom[color].gold += GOLD_TOWN_DAY;
@@ -205,6 +205,16 @@ void    RecalculateKingdomDay(E_COLORS color){
     KingdomSetAllowBuild(color, TRUE);
 }
 
+void    RecalculateKingdomWeek(E_COLORS color){
+
+    return;
+}
+
+void    RecalculateKingdomMonth(E_COLORS color){
+
+    return;
+}
+
 BOOL KingdomAllowBuild(E_COLORS color){
 
     if(! kingdom) return FALSE;
@@ -217,78 +227,86 @@ void KingdomSetAllowBuild(E_COLORS color, BOOL allow){
     kingdom[color].allowBuild = allow;
 }
 
-void KingdomWasteResource(E_COLORS color, Uint16 gold, Uint8 wood, Uint8 ore, Uint8 mercury, Uint8 crystal, Uint8 sulfur , Uint8 gems){
+void KingdomWasteResource(E_COLORS color, const S_PAYMENT *payment){
 
-    if(gold){
-
-	if(kingdom[color].gold < gold){
-
-	    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, gold: 0\n", gold);
-	    kingdom[color].gold = 0;
-
-	}else
-	    kingdom[color].gold -= gold;
+    if( !KingdomAllowPayment(color, payment)){
+	if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect payment\n");
+	return;
     }
 
-    if(wood){
-    
-	if(kingdom[color].wood < wood){
+    if(payment->gold)
+	    kingdom[color].gold -= payment->gold;
 
-	    if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, wood: 0\n", wood);
-	    kingdom[color].wood = 0;
+    if(payment->wood)
+	    kingdom[color].wood -= payment->wood;
 
-	}else
-	    kingdom[color].wood -= wood;
+    if(payment->ore)
+	    kingdom[color].ore -= payment->ore;
+
+    if(payment->mercury)
+	    kingdom[color].mercury -= payment->mercury;
+
+    if(payment->crystal)
+	    kingdom[color].crystal -= payment->crystal;
+
+    if(payment->sulfur)
+	    kingdom[color].sulfur -= payment->sulfur;
+
+    if(payment->gems)
+	    kingdom[color].gems -= payment->gems;
+}
+
+void KingdomWasteMultiResource(E_COLORS color, const S_PAYMENT *payment, Uint16 count){
+
+    if( !KingdomAllowPayment(color, payment)){
+	if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteMultiResource: incorrect payment\n");
+	return;
     }
 
-    if(ore){
-    
-	if(kingdom[color].ore < ore){
+    if(payment->gold)
+	    kingdom[color].gold -= payment->gold * count;
 
-		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, ore: 0\n", ore);
-		kingdom[color].ore = 0;
-	}else
-	    kingdom[color].ore -= ore;
-    }
+    if(payment->wood)
+	    kingdom[color].wood -= payment->wood * count;
 
-    if(mercury){
-    
-	if(kingdom[color].mercury < mercury){
+    if(payment->ore)
+	    kingdom[color].ore -= payment->ore * count;
 
-		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, mercury: 0\n", mercury);
-		kingdom[color].mercury = 0;
-	}else
-	    kingdom[color].mercury -= mercury;
-    }
+    if(payment->mercury)
+	    kingdom[color].mercury -= payment->mercury * count;
 
-    if(crystal){
-    
-	if(kingdom[color].crystal < crystal){
+    if(payment->crystal)
+	    kingdom[color].crystal -= payment->crystal * count;
 
-		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, crystal: 0\n", crystal);
-		kingdom[color].crystal = 0;
-	}else
-	    kingdom[color].crystal -= crystal;
-    }
+    if(payment->sulfur)
+	    kingdom[color].sulfur -= payment->sulfur * count;
 
-    if(sulfur){
-    
-	if(kingdom[color].sulfur < sulfur){
+    if(payment->gems)
+	    kingdom[color].gems -= payment->gems * count;
+}
 
-		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, sulfur: 0\n", sulfur);
-		kingdom[color].sulfur = 0;
-	}else
-	    kingdom[color].sulfur -= sulfur;
-    }
+BOOL KingdomAllowPayment(E_COLORS color, const S_PAYMENT *payment){
 
-    if(gems){
-    
-	if(kingdom[color].gems < gems){
+    if( kingdom[color].gold < payment->gold ||
+	kingdom[color].wood < payment->wood ||
+	kingdom[color].ore < payment->ore ||
+	kingdom[color].mercury < payment->mercury ||
+	kingdom[color].crystal < payment->crystal ||
+	kingdom[color].sulfur < payment->sulfur ||
+	kingdom[color].gems < payment->gems ) return FALSE;
 
-		if(GetIntValue(DEBUG)) fprintf(stderr, "KingdomWasteResource: incorrect count: %d, gems: 0\n", gems);
-		kingdom[color].gems = 0;
-	}else
-	    kingdom[color].gems -= gems;
-    }
+    return TRUE;
+}
 
+BOOL KingdomAllowMultiPayment(E_COLORS color, const S_PAYMENT *payment, Uint16 count){
+
+    if( kingdom[color].gold < payment->gold * count ||
+	kingdom[color].wood < payment->wood * count ||
+	kingdom[color].ore < payment->ore * count ||
+	kingdom[color].mercury < payment->mercury * count ||
+	kingdom[color].crystal < payment->crystal * count ||
+	kingdom[color].sulfur < payment->sulfur * count ||
+	kingdom[color].gems < payment->gems * count ) return FALSE;
+
+    return TRUE;
 }

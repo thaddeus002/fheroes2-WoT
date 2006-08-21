@@ -471,7 +471,7 @@ ACTION ShowCastleInfo(void){
             icnname = "CSTLCAPZ.ICN"; 
             break; 
     } 
-    castle->capitan ? FillSPRITE(&sprite, icnname, 1) : FillSPRITE(&sprite, icnname, 0); 
+    castle->building & BUILD_CAPTAIN ? FillSPRITE(&sprite, icnname, 1) : FillSPRITE(&sprite, icnname, 0); 
     image = GetICNSprite(&sprite); 
     rectCur.x = cx + 444;
     rectCur.y = cy + 165; 
@@ -2071,7 +2071,7 @@ void RedrawCastleStatusBuilding(void){
             icnname = "CSTLCAPZ.ICN"; 
             break; 
     } 
-    castle->capitan ? FillSPRITE(&sprite, icnname, 1) : FillSPRITE(&sprite, icnname, 0); 
+    castle->building & BUILD_CAPTAIN ? FillSPRITE(&sprite, icnname, 1) : FillSPRITE(&sprite, icnname, 0); 
     image = GetICNSprite(&sprite); 
     rectCur.x = cx + 444;
     rectCur.y = cy + 165; 

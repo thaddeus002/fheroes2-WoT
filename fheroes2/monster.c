@@ -1225,3 +1225,111 @@ const char * MonsterBigNamePortrait(E_MONSTER name){
 
     return monsterPortrait;
 }
+
+Uint8 GetMonsterGrown(E_MONSTER name){
+
+    return ptrMonster[name].grown;
+}
+
+E_MONSTER UpgradeMonster(E_MONSTER name){
+
+    E_MONSTER result = name;
+
+    switch(name){
+    
+	case ARCHER:
+	    result = RANGER;
+	    break;
+
+	case PIKEMAN:
+	    result = VETERAN_PIKEMAN;
+	    break;
+
+	case SWORDSMAN:
+	    result = MASTER_SWORDSMAN;
+	    break;
+
+	case CAVALIRY:
+	    result = CHAMPION;
+	    break;
+
+	case PALADIN:
+	    result = CRUSADER;
+	    break;
+	
+	case ORC:
+	    result = CHIEF_ORC;
+	    break;
+
+	case OGRE:
+	    result = LORD_OGRE;
+	    break;
+
+	case TROLL:
+	    result = WAR_TROLL;
+	    break;
+
+	case DWARF:
+	    result = BATTLE_DWARF;
+	    break;
+	
+	case ELF:
+	    result = GRAND_ELF;
+	    break;
+
+	case DRUID:
+	    result = GREATER_DRUID;
+	    break;
+
+	case ZOMBIE:
+	    result = MUTANT_ZOMBIE;
+	    break;
+	
+	case MUMMY:
+	    result = ROYAL_MUMMY;
+	    break;
+
+	case VAMPIRE:
+	    result = LORD_VAMPIRE;
+	    break;
+
+	case LICH:
+	    result = POWER_LICH;
+	    break;
+
+	case MINOTAUR:
+	    result = KNIGHT_MINOTAUR;
+	    break;
+	
+	case GREEN_DRAGON:
+	    result = RED_DRAGON;
+	    break;
+
+	case RED_DRAGON:
+	    result = BLACK_DRAGON;
+	    break;
+
+	case IRON_GOLEM:
+	    result = STEEL_GOLEM;
+	    break;
+
+	case MAGE:
+	    result = ARCHMAGE;
+	    break;
+
+	case GIANT:
+	    result = TITAN;
+	    break;
+
+	default:
+	    break;
+    }
+    
+    return result;
+}
+
+ACTION UpgradableArmy(const S_ARMY *army, E_COLORS color){
+    
+    // YES NO EXIT
+    return EXIT;
+}

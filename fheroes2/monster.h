@@ -30,6 +30,7 @@
 #define _MONSTER_H
 
 #include "SDL.h"
+#include "actionevent.h"
 #include "gamedefs.h"
 
 #define RNDMONSTERMAXCOUNT	4000
@@ -176,14 +177,21 @@ void		FreeMonster(void);
 
 S_MONSTER *	GetStatMonster(E_MONSTER);
 E_ARMYSIZE 	GetSizeArmy(Uint16);
+E_MONSTER	CheckValidMonster(Uint8);
+
 const char *    GetStringSizeArmy(E_ARMYSIZE);
 const char *    GetStringMonster(E_MONSTER);
+const char *	MonsterBigNamePortrait(E_MONSTER);
+
 E_MONSTER	GetRNDMonster(E_LEVELMONSTER);
 E_RACE		GetRaceMonster(E_MONSTER);
 BOOL		TheFlyMonster(E_MONSTER);
-E_MONSTER	CheckValidMonster(Uint8);
 Uint16		GetRNDSizeLevelMonster(E_LEVELMONSTER);
 E_LEVELMONSTER	GetLevelMonster(E_MONSTER);
-const char *	MonsterBigNamePortrait(E_MONSTER);
+
+Uint8		GetMonsterGrown(E_MONSTER);
+
+E_MONSTER	UpgradeMonster(E_MONSTER);
+ACTION		UpgradableArmy(const S_ARMY *, E_COLORS);
 
 #endif

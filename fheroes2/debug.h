@@ -57,7 +57,7 @@ const char * GetStringMarketplace(void);
 const char * GetStringLeftTurret(void);
 const char * GetStringRightTurret(void);
 const char * GetStringMoat(void);
-const char * GetStringCapitan(void);
+const char * GetStringCaptain(void);
 
 void         PrintCellInfo(Uint16);
 

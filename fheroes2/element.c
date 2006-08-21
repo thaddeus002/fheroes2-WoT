@@ -187,6 +187,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     while(! exit)
         switch(ActionCycle(dialog)){
 
+            case ENTER:
             case YES:
                 exit = TRUE;
                 result = YES;
@@ -696,7 +697,7 @@ void ShowQuickInfo(Uint16 index){
             rect.h = FONT_HEIGHTSMALL;
             PrintText(video, &rect, message, FONT_SMALL);
 
-    	    castle->castle ? FillSPRITE(&sprite, "LOCATORS.ICN", 9 + castle->race) : FillSPRITE(&sprite, "LOCATORS.ICN", 15 + castle->race);
+    	    castle->building & BUILD_CASTLE ? FillSPRITE(&sprite, "LOCATORS.ICN", 9 + castle->race) : FillSPRITE(&sprite, "LOCATORS.ICN", 15 + castle->race);
             image = GetICNSprite(&sprite);
 	    rect.x = rectCur.x + (rectCur.w - image->w) / 2 ;
 	    rect.y = rect.y + rect.h + 5;

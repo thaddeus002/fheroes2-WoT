@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060816
+#define VERSION 20060819
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -52,15 +52,6 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define COLORORANGE	0x10
 #define COLORPURPLE	0x20
 #define COLORGRAY	0xFF
-
-#define BUY_CYCLOPS_CRYSTAL     1
-#define BUY_PHOENIX_MERCURY     1
-#define BUY_GREENDRAGON_SULFUR  1
-#define BUY_REDDRAGON_SULFUR    1
-#define BUY_BLACKDRAGON_SULFUR  3
-#define BUY_GIANT_GEMS          1
-#define BUY_TITAN_GEMS          2
-#define BUY_GENIE_GEMS          1
 
 #define GOLD_CASTLE_DAY		1000
 #define GOLD_TOWN_DAY		750
@@ -132,5 +123,5 @@ typedef enum {
                 SPREAD,
                 GROUPED
             } E_ARMYFORMAT;
-                                                                                                                                                                                                            
+
 #endif

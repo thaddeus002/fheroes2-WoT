@@ -49,7 +49,7 @@ void DrawKNGTCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    if(castle->castle){
+    if(castle->building & BUILD_CASTLE){
 	// анимация
 	if(animHead){
 	    cur.x = cx;
@@ -72,7 +72,7 @@ void DrawKNGTCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	if(castle->castle){
+	if(castle->building & BUILD_CASTLE){
 	    cur.w -= 80;
 	    cur.h -= 25;
 	}else{
@@ -107,7 +107,7 @@ void DrawKNGTCapitan(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cy = video->h / 2 - 240;
 
     // спрайт
-    FillSPRITE(&sprite, "TWNBCAPT.ICN", 0);
+    FillSPRITE(&sprite, "TWNKCAPT.ICN", 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;

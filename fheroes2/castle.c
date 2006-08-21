@@ -43,6 +43,7 @@
 #include "heroes.h"
 #include "heroesinfo.h"
 #include "debug.h"
+#include "payment.h"
 #include "spell.h"
 #include "magictower.h"
 #include "castle.h"
@@ -229,7 +230,7 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].building = ptr->building;
 	    ptrCastle[countCastle].dwelling = ptr->dwelling;
 	}else{
-	    ptrCastle[countCastle].building = BUILD_TAVERN; // BUILD_THIEVEGUILD BUILD_TAVERN BUILD_SHIPYARD BUILD_WELL BUILD_STATUE BUILD_LEFTTURRET BUILD_RIGHTTURRET BUILD_MARKETPLACE BUILD_MOAT BUILD_WEL2 BUILD_SPEC
+	    ptrCastle[countCastle].building = BUILD_TAVERN; // BUILD_THIEVESGUILD BUILD_TAVERN BUILD_SHIPYARD BUILD_WELL BUILD_STATUE BUILD_LEFTTURRET BUILD_RIGHTTURRET BUILD_MARKETPLACE BUILD_MOAT BUILD_WEL2 BUILD_SPEC
 	    ptrCastle[countCastle].dwelling = DWELLING_MONSTER1 | DWELLING_MONSTER2; // DWELLING_MONSTER1 DWELLING_MONSTER2 DWELLING_MONSTER3 DWELLING_MONSTER4 DWELLING_MONSTER5 DWELLING_MONSTER6 DWELLING_UPGRADE2 DWELLING_UPGRADE3 DWELLING_UPGRADE4 DWELLING_UPGRADE5 DWELLING_UPGRADE6
 	}
 
@@ -254,53 +255,46 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].army[4].count = ptr->count5;
 
 	}else{	
+	    ptrCastle[countCastle].army[0].count = 2 * GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 1));
+	    ptrCastle[countCastle].army[1].count = 2 * GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 2));
 	    switch(ptrCastle[countCastle].race){
 	
 		case KNIGHT:
 		    ptrCastle[countCastle].army[0].monster = PEASANT;
 		    ptrCastle[countCastle].army[1].monster = ARCHER;
-		    ptrCastle[countCastle].army[0].count = 28;
-		    ptrCastle[countCastle].army[1].count = 7;
 		    break;
 
 		case BARBARIAN:
 		    ptrCastle[countCastle].army[0].monster = GOBLIN;
 		    ptrCastle[countCastle].army[1].monster = ORC;
-		    ptrCastle[countCastle].army[0].count = 28;
-		    ptrCastle[countCastle].army[1].count = 7;
 		    break;
 
 		case SORCERESS:
 		    ptrCastle[countCastle].army[0].monster = SPRITE;
 		    ptrCastle[countCastle].army[1].monster = DWARF;
-		    ptrCastle[countCastle].army[0].count = 28;
-		    ptrCastle[countCastle].army[1].count = 7;
 		    break;
 
 		case WARLOCK:
 		    ptrCastle[countCastle].army[0].monster = CENTAUR;
 		    ptrCastle[countCastle].army[1].monster = GARGOYLE;
-		    ptrCastle[countCastle].army[0].count = 28;
-		    ptrCastle[countCastle].army[1].count = 7;
 		    break;
 
 		case WIZARD:
 		    ptrCastle[countCastle].army[0].monster = HALFLING;
 		    ptrCastle[countCastle].army[1].monster = BOAR;
-		    ptrCastle[countCastle].army[0].count = 28;
-		    ptrCastle[countCastle].army[1].count = 7;
 		    break;
 
 		case NECROMANCER:
 		    ptrCastle[countCastle].army[0].monster = SKELETON;
 		    ptrCastle[countCastle].army[1].monster = ZOMBIE;
-		    ptrCastle[countCastle].army[0].count = 28;
-		    ptrCastle[countCastle].army[1].count = 7;
 		    break;
 	
 		default:
 		    break;
 	    }
+
+	    ptrCastle[countCastle].army[0].count = 2 * GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 1));
+	    ptrCastle[countCastle].army[1].count = 2 * GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 2));
 
 	    ptrCastle[countCastle].army[2].monster = MONSTERNONE;
 	    ptrCastle[countCastle].army[3].monster = MONSTERNONE;
@@ -310,15 +304,46 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].army[4].count = 0;
 	}
 
-    ptrCastle[countCastle].capitan = ptr->capitan;
+    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER1)
+	ptrCastle[countCastle].monster[0] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 1));
+    else
+	ptrCastle[countCastle].monster[0] = 0;
 
-    if(ptr->castle) ptrCastle[countCastle].castle = TRUE; else ptrCastle[countCastle].castle = FALSE;
+    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER2)
+	ptrCastle[countCastle].monster[1] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 2));
+    else
+	ptrCastle[countCastle].monster[1] = 0;
+
+    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER3)
+	ptrCastle[countCastle].monster[2] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 3));
+    else
+	ptrCastle[countCastle].monster[2] = 0;
+
+    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER4)
+	ptrCastle[countCastle].monster[3] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 4));
+    else
+	ptrCastle[countCastle].monster[3] = 0;
+
+    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER5)
+	ptrCastle[countCastle].monster[4] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 5));
+    else
+	ptrCastle[countCastle].monster[4] = 0;
+
+    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER6)
+	ptrCastle[countCastle].monster[5] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 6));
+    else
+	ptrCastle[countCastle].monster[5] = 0;
+
+    if(ptr->capitan) ptrCastle[countCastle].building |= BUILD_CAPTAIN;
+
+    if(ptr->castle)
+        ptrCastle[countCastle].building |= BUILD_CASTLE;
 
     if(ptr->allowCastle)
         ptrCastle[countCastle].allowCastle = FALSE;
     else
         ptrCastle[countCastle].allowCastle = TRUE;
-
+    
     ptrCastle[countCastle].boat = FALSE;
     ptrCastle[countCastle].af = SPREAD;
 
@@ -330,8 +355,6 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
     ptrCastle[countCastle].pos.w = 5;
     ptrCastle[countCastle].pos.h = 5;
 
-    Uint8 i;
-    for(i = 0; i < CASTLEMAXMONSTER; ++i) ptrCastle[countCastle].monster[i] = 5;
 
     ptrCastle[countCastle].next = NULL;
 
@@ -391,19 +414,20 @@ S_CASTLE *GetStatCastle(Uint8 index){
     return &ptrCastle[index];
 }
 
-void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
+ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 
     // определяем тип замка
     SDL_Surface *format, *back, *image, *video;
     SDL_Rect rectBack, rectCur;
     AGGSPRITE sprite;
+    ACTION result;
     ICNHEADER *header = NULL;
     S_CASTLE *castle = GetStatCastlePos(ax, ay);
     S_HEROES *heroes = GetStatHeroes(castleHeroes);
     flagUpdateBuilding = FALSE;
 
     // в серые замки не заходим
-    if(GRAY == castle->color) return;
+    if(GRAY == castle->color) return NONE;
     currentCastle = castle;
     heroesName = castleHeroes;
     // инициализируем backgroundCursor
@@ -417,7 +441,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     backMonsterCursor.rect.h = backMonsterCursor.cursor->h;
     if(NULL == (backMonsterCursor.back = SDL_CreateRGBSurface(SDL_SWSURFACE, backMonsterCursor.rect.w, backMonsterCursor.rect.h, 16, 0, 0, 0, 0))){
         fprintf(stderr, "EnterCastle: CreateRGBSurface failed: %s\n", SDL_GetError());
-        return;
+        return EXIT;
     }
 
     // переопределяем курсор и выключаем анимацию карты
@@ -446,7 +470,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     }
     if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
         fprintf(stderr, "EnterCastle: CreateRGBSurface failed: %s\n", SDL_GetError());
-        return;
+        return EXIT;
     }
 
     // сохраняем бакгроунд
@@ -700,7 +724,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	AddActionEvent(&castlact, &action);
 
     // рисуем капитана
-    }else if(castle->capitan)
+    }else if(castle->building & BUILD_CAPTAIN)
 	FillSPRITE(&sprite, CapitanBigNamePortrait(castle->race), 0);
     else
 	FillSPRITE(&sprite, "STRIP.ICN", 3);
@@ -846,15 +870,15 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     switch(castle->race){
 
 	case KNIGHT:
-	    if(castle->capitan) DrawKNGTCapitan(&castanim, &castlact);
 	    DrawKNGTCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawKNGTCapitan(&castanim, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawKNGTWel2(&castanim, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawKNGTThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawKNGTThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(&castanim, &castlact);
 	    if(castle->mageGuild.level) DrawKNGTMageGuild(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(&castanim, &castlact);
@@ -878,13 +902,13 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		DrawBRBNMageGuild(&castanim, &castlact);
 		DrawBRBNExt2(&castanim, &castlact);
 	    }
-	    if(castle->capitan) DrawBRBNCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawBRBNCapitan(&castanim, &castlact);
 	    DrawBRBNCastle(&castanim, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawBRBNThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(&castanim, &castlact);
@@ -903,7 +927,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(&castanim, &castlact);
 	    if(castle->mageGuild.level) DrawSCRSMageGuild(&castanim, &castlact);
-	    if(castle->capitan) DrawSCRSCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawSCRSCapitan(&castanim, &castlact);
 	    DrawSCRSCastle(&castanim, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(&castanim, &castlact);
@@ -913,7 +937,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    else DrawSCRSExt0(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawSCRSThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawSCRSThievesGuild(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE && castle->building & BUILD_WEL2) DrawSCRSExt1(&castanim, &castlact);
@@ -927,14 +951,14 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	case NECROMANCER:
 	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(&castanim, &castlact);
 	    DrawNCRMCastle(&castanim, &castlact);
-	    if(castle->capitan) DrawNCRMCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawNCRMCapitan(&castanim, &castlact);
     	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(&castanim, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(&castanim, &castlact);
 	    else DrawNCRMExt0(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawNCRMThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawNCRMThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(&castanim, &castlact);
@@ -954,13 +978,13 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    DrawWRLKCastle(&castanim, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(&castanim, &castlact);
-	    if(castle->capitan) DrawWRLKCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawWRLKCapitan(&castanim, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
 	    else DrawWRLKExt0(&castanim, &castlact);
 	    if(castle->mageGuild.level) DrawWRLKMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(&castanim, &castlact);
@@ -978,9 +1002,9 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(&castanim, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(&castanim, &castlact);
-	    if(castle->capitan) DrawWZRDCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawWZRDCapitan(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawWZRDThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawWZRDThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(&castanim, &castlact);
 	    else DrawWZRDExt0(&castanim, &castlact);
@@ -997,7 +1021,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	break;
 	
 	default:
-	return;
+	return NONE;
 	break;
     }
 
@@ -1024,7 +1048,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     SetCursor(CURSOR_POINTER);
     CursorOn();
 
-    ActionCASTLELOOP(castlact);
+    result = ActionCASTLELOOP(castlact);
 
     CursorOff();
     // чистим данные
@@ -1046,7 +1070,7 @@ void EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 
     SetIntValue(ANIM1, TRUE);
     
-    return;
+    return result;
 }
 
 ACTION ActionExitCastle(void){
@@ -1281,7 +1305,7 @@ void RedrawCastleAnimation(void){
             	break;
 
 	    case BARBARIAN:
-		if(currentCastle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(NULL, NULL);
+		if(currentCastle->building & BUILD_THIEVESGUILD) DrawBRBNThievesGuild(NULL, NULL);
 		if(currentCastle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(NULL, NULL);
 		if(currentCastle->building & BUILD_STATUE) DrawBRBNStatue(NULL, NULL);
 		if(currentCastle->building & BUILD_TAVERN) DrawBRBNTavern(NULL, NULL);
@@ -1378,6 +1402,18 @@ ACTION ActionClickCastleMonster(void){
 		RedrawCastleMonster();
 		CursorOn();
 		break;
+
+	    case UPGRADE:
+		CursorOff();
+		currentCastle->army[index].monster = UpgradeMonster(currentCastle->army[index].monster);
+		RedrawCastleMonster();
+		CursorOn();
+		break;
+	
+	    case EXIT:
+		return EXIT;
+		break;
+
 	    default:
 		break;
 	}
@@ -1507,10 +1543,24 @@ ACTION ActionClickHeroesMonster(void){
 	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
 	switch(ShowArmyInfo(&heroes->army[index], heroes)){
 	    case DISMISS:
+		CursorOff();
 		heroes->army[index].monster = MONSTERNONE;
 		heroes->army[index].count = 0;
 		RedrawHeroesMonster(heroesName);
+		CursorOn();
 		break;
+
+	    case UPGRADE:
+		CursorOff();
+		heroes->army[index].monster = UpgradeMonster(heroes->army[index].monster);
+		RedrawHeroesMonster(heroesName);
+		CursorOn();
+		break;
+
+	    case EXIT:
+		return EXIT;
+		break;
+
 	    default:
 		break;
 	}
@@ -1959,74 +2009,23 @@ BOOL BuyMonsterFromCastle(const S_CASTLE *castle, Uint8 level, Uint16 count){
     for(i = 0; i < countCastle; ++i)
 	if(&ptrCastle[i] == castle) currentCastle = &ptrCastle[i];
 
-
     if(	! count ||
 	! currentCastle ||
 	! level ||
 	level > CASTLEMAXMONSTER ||
 	currentCastle->monster[level - 1] < count ) return FALSE;
 
-    S_KINGDOM *kingdom = GetStatKingdom(castle->color);
     E_MONSTER emonster = GetMonsterFromCastle(castle, level);
-    S_MONSTER *monster = GetStatMonster(emonster);
 
     // проверяем свободный слот
     for(i = 0; i < CASTLEMAXARMY; ++i)
 	if(! castle->army[i].count || castle->army[i].monster == emonster){ free = TRUE; break; }
 
-    if(MONSTERNONE == emonster || ! free) return FALSE;
-
-    // проверяем золото
-    if(kingdom->gold < monster->cost * count) return FALSE;
-
-    // проверяем ресурсы
-    switch(emonster){
-    
-	case CYCLOPS:
-	    if(kingdom->crystal < BUY_CYCLOPS_CRYSTAL * count) return FALSE;
-	    kingdom->crystal -= BUY_CYCLOPS_CRYSTAL * count;
-	    break;
-	
-	case PHOENIX:
-	    if(kingdom->mercury < BUY_PHOENIX_MERCURY * count) return FALSE;
-	    kingdom->mercury -= BUY_PHOENIX_MERCURY * count;
-	    break;
-	
-	case GREEN_DRAGON:
-	    if(kingdom->sulfur < BUY_GREENDRAGON_SULFUR * count) return FALSE;
-	    kingdom->sulfur -= BUY_GREENDRAGON_SULFUR * count;
-	    break;
-
-	case RED_DRAGON:
-	    if(kingdom->sulfur < BUY_REDDRAGON_SULFUR * count) return FALSE;
-	    kingdom->sulfur -= BUY_REDDRAGON_SULFUR * count;
-	    break;
-
-	case BLACK_DRAGON:
-	    if(kingdom->sulfur < BUY_BLACKDRAGON_SULFUR * count) return FALSE;
-	    kingdom->sulfur -= BUY_BLACKDRAGON_SULFUR * count;
-	    break;
-
-	case GIANT:
-	    if(kingdom->gems < BUY_GIANT_GEMS * count) return FALSE;
-	    kingdom->gems -= BUY_GIANT_GEMS * count;
-	    break;
-
-	case TITAN:
-	    if(kingdom->gems < BUY_TITAN_GEMS * count) return FALSE;
-	    kingdom->gems -= BUY_TITAN_GEMS * count;
-	    break;
-
-	case GENIE:
-	    if(kingdom->gems < BUY_GENIE_GEMS * count) return FALSE;
-	    kingdom->gems -= BUY_GENIE_GEMS * count;
-	    break;
-    
-	default:
-	    break;
-    }
-
-    kingdom->gold -= monster->cost * count;
+    if( ! free ||
+	MONSTERNONE == emonster ||
+	! CheckBuyMonsterFromCastle(castle, level, count) ) return FALSE;
+ 
+    KingdomWasteMultiResource(castle->color, PaymentConditionsMonster(emonster), count);
 
     currentCastle->monster[level - 1] -= count;
     currentCastle->army[i].monster = emonster;
@@ -2037,53 +2036,14 @@ BOOL BuyMonsterFromCastle(const S_CASTLE *castle, Uint8 level, Uint16 count){
 
 BOOL CheckBuyMonsterFromCastle(const S_CASTLE *castle, Uint8 level, Uint16 count){
 
-    S_KINGDOM *kingdom = GetStatKingdom(castle->color);
     E_MONSTER emonster = GetMonsterFromCastle(castle, level);
-    S_MONSTER *monster = GetStatMonster(emonster);
 
     if(MONSTERNONE == emonster) return FALSE;
 
-    // проверяем золото
-    if(kingdom->gold < monster->cost * count) return FALSE;
+    const S_PAYMENT *payment = PaymentConditionsMonster(emonster);
 
-    // проверяем ресурсы
-    switch(emonster){
-    
-	case CYCLOPS:
-	    if(kingdom->crystal < BUY_CYCLOPS_CRYSTAL * count) return FALSE;
-	    break;
-	
-	case PHOENIX:
-	    if(kingdom->mercury < BUY_PHOENIX_MERCURY * count) return FALSE;
-	    break;
-	
-	case GREEN_DRAGON:
-	    if(kingdom->sulfur < BUY_GREENDRAGON_SULFUR * count) return FALSE;
-	    break;
-
-	case RED_DRAGON:
-	    if(kingdom->sulfur < BUY_REDDRAGON_SULFUR * count) return FALSE;
-	    break;
-
-	case BLACK_DRAGON:
-	    if(kingdom->sulfur < BUY_BLACKDRAGON_SULFUR * count) return FALSE;
-	    break;
-
-	case GIANT:
-	    if(kingdom->gems < BUY_GIANT_GEMS * count) return FALSE;
-	    break;
-
-	case TITAN:
-	    if(kingdom->gems < BUY_TITAN_GEMS * count) return FALSE;
-	    break;
-
-	case GENIE:
-	    if(kingdom->gems < BUY_GENIE_GEMS * count) return FALSE;
-	    break;
-    
-	default:
-	    break;
-    }
+    // проверяем платежеспособность
+    if( !KingdomAllowMultiPayment(castle->color, payment, count)) return FALSE;
     
     return TRUE;
 }
@@ -2305,14 +2265,12 @@ BOOL CastleDwellingUpgradable(const S_CASTLE *castle, E_DWELLINGCASTLE level){
 
 BUILDACTION AllowBuildCastle(const S_CASTLE *castle){
 
-    if(castle->castle) return ALREADY_BUILD;
+    if(castle->building & BUILD_CASTLE) return ALREADY_BUILD;
     if(! castle->allowCastle) return CANNOT_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
-
-    if(! kingdom->allowBuild) return END_TUR;
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
     
-    if(BUILD_CASTLE_GOLD <= kingdom->gold && BUILD_CASTLE_WOOD <= kingdom->wood && BUILD_CASTLE_ORE <= kingdom->ore) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_CASTLE))) return BUILD_OK;
     
     return CANNOT_BUILD;
 }
@@ -2321,51 +2279,23 @@ BUILDACTION AllowBuildMageGuild(const S_CASTLE *castle){
 
     if(5 == castle->mageGuild.level) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
-
-    if(! kingdom->allowBuild) return END_TUR;
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
     
     switch(castle->mageGuild.level){
 	case 0:
-	    if(	BUILD_MAGEGUILD1_GOLD <= kingdom->gold &&
-		BUILD_MAGEGUILD1_WOOD <= kingdom->wood &&
-		BUILD_MAGEGUILD1_ORE <= kingdom->ore ) return BUILD_OK;
+	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD1))) return BUILD_OK;
 	    break;
 	case 1:
-	    if(	BUILD_MAGEGUILD2_GOLD <= kingdom->gold &&
-		BUILD_MAGEGUILD2_WOOD <= kingdom->wood &&
-		BUILD_MAGEGUILD2_ORE <= kingdom->ore  &&
-		BUILD_MAGEGUILD2_CRYSTAL <= kingdom->crystal &&
-		BUILD_MAGEGUILD2_GEMS <= kingdom->gems &&
-		BUILD_MAGEGUILD2_MERCURY <= kingdom->mercury &&
-		BUILD_MAGEGUILD2_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD2))) return BUILD_OK;
 	    break;
 	case 2:
-	    if(	BUILD_MAGEGUILD3_GOLD <= kingdom->gold &&
-		BUILD_MAGEGUILD3_WOOD <= kingdom->wood &&
-		BUILD_MAGEGUILD3_ORE <= kingdom->ore  &&
-		BUILD_MAGEGUILD3_CRYSTAL <= kingdom->crystal &&
-		BUILD_MAGEGUILD3_GEMS <= kingdom->gems &&
-		BUILD_MAGEGUILD3_MERCURY <= kingdom->mercury &&
-		BUILD_MAGEGUILD3_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD3))) return BUILD_OK;
 	    break;
 	case 3:
-	    if(	BUILD_MAGEGUILD4_GOLD <= kingdom->gold &&
-		BUILD_MAGEGUILD4_WOOD <= kingdom->wood &&
-		BUILD_MAGEGUILD4_ORE <= kingdom->ore  &&
-		BUILD_MAGEGUILD4_CRYSTAL <= kingdom->crystal &&
-		BUILD_MAGEGUILD4_GEMS <= kingdom->gems &&
-		BUILD_MAGEGUILD4_MERCURY <= kingdom->mercury &&
-		BUILD_MAGEGUILD4_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD4))) return BUILD_OK;
 	    break;
 	case 4:
-	    if(	BUILD_MAGEGUILD5_GOLD <= kingdom->gold &&
-		BUILD_MAGEGUILD5_WOOD <= kingdom->wood &&
-		BUILD_MAGEGUILD5_ORE <= kingdom->ore  &&
-		BUILD_MAGEGUILD5_CRYSTAL <= kingdom->crystal &&
-		BUILD_MAGEGUILD5_GEMS <= kingdom->gems &&
-		BUILD_MAGEGUILD5_MERCURY <= kingdom->mercury &&
-		BUILD_MAGEGUILD5_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+	    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD5))) return BUILD_OK;
 	    break;
 	case 5:
 	    if(5 == castle->mageGuild.level) return ALREADY_BUILD;
@@ -2381,11 +2311,9 @@ BUILDACTION AllowBuildTavern(const S_CASTLE *castle){
 
     if(castle->building & BUILD_TAVERN) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_TAVERN <= kingdom->gold && BUILD_TAVERN_WOOD <= kingdom->wood) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_TAVERN))) return BUILD_OK;
     
     return CANNOT_BUILD;
 }
@@ -2393,13 +2321,11 @@ BUILDACTION AllowBuildTavern(const S_CASTLE *castle){
 
 BUILDACTION AllowBuildThievesGuild(const S_CASTLE *castle){
 
-    if(castle->building & BUILD_THIEVEGUILD) return ALREADY_BUILD;
+    if(castle->building & BUILD_THIEVESGUILD) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_THIEVESGUILD_GOLD <= kingdom->gold && BUILD_THIEVESGUILD_WOOD <= kingdom->wood) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_THIEVESGUILD))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2408,23 +2334,20 @@ BUILDACTION AllowBuildShipyard(const S_CASTLE *castle){
 
     if(castle->building & BUILD_SHIPYARD) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_SHIPYARD_GOLD <= kingdom->gold && BUILD_SHIPYARD_WOOD <= kingdom->wood && CastleNearOcean(castle)) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_SHIPYARD))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
+
 BUILDACTION AllowBuildStatue(const S_CASTLE *castle){
 
     if(castle->building & BUILD_STATUE) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_STATUE_GOLD <= kingdom->gold && BUILD_STATUE_ORE <= kingdom->ore) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_STATUE))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2433,11 +2356,9 @@ BUILDACTION AllowBuildMarketplace(const S_CASTLE *castle){
 
     if(castle->building & BUILD_MARKETPLACE) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_MARKETPLACE_GOLD <= kingdom->gold && BUILD_MARKETPLACE_WOOD <= kingdom->wood) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MARKETPLACE))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2446,11 +2367,9 @@ BUILDACTION AllowBuildWell(const S_CASTLE *castle){
 
     if(castle->building & BUILD_WELL) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_WELL_GOLD <= kingdom->gold) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_WELL))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2459,11 +2378,9 @@ BUILDACTION AllowBuildMoat(const S_CASTLE *castle){
 
     if(castle->building & BUILD_MOAT) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_MOAT_GOLD <= kingdom->gold) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_MOAT))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2472,11 +2389,9 @@ BUILDACTION AllowBuildLeftTurret(const S_CASTLE *castle){
 
     if(castle->building & BUILD_LEFTTURRET) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_LEFTTURRET_GOLD <= kingdom->gold && BUILD_LEFTTURRET_ORE <= kingdom->ore) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_LEFTTURRET))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2485,24 +2400,20 @@ BUILDACTION AllowBuildRightTurret(const S_CASTLE *castle){
 
     if(castle->building & BUILD_RIGHTTURRET) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_RIGHTTURRET_GOLD <= kingdom->gold && BUILD_RIGHTTURRET_ORE <= kingdom->ore) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_RIGHTTURRET))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
 
 BUILDACTION AllowBuildCaptain(const S_CASTLE *castle){
 
-    if(castle->capitan) return ALREADY_BUILD;
+    if(castle->building & BUILD_CAPTAIN) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_CAPTAIN_GOLD <= kingdom->gold) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_CAPTAIN))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2511,11 +2422,9 @@ BUILDACTION AllowBuildBoat(const S_CASTLE *castle){
 
     if(castle->boat) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_BOAT_GOLD <= kingdom->gold && BUILD_BOAT_WOOD <= kingdom->wood) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_BOAT))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2524,11 +2433,9 @@ BUILDACTION AllowBuildWel2(const S_CASTLE *castle){
 
     if(castle->building & BUILD_WEL2) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    if(BUILD_WEL2_GOLD <= kingdom->gold) return BUILD_OK;
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_WEL2))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2537,54 +2444,9 @@ BUILDACTION AllowBuildSpec(const S_CASTLE *castle){
 
     if(castle->building & BUILD_SPEC) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    switch(castle->race){
-    
-	case KNIGHT:
-	    if( BUILD_FORTIFICATION_GOLD <= kingdom->gold &&
-		BUILD_FORTIFICATION_ORE <= kingdom->ore &&
-		BUILD_FORTIFICATION_WOOD <= kingdom->wood ) return BUILD_OK;
-	    break;
-	
-	case BARBARIAN:
-	    if( BUILD_COLISEUM_GOLD <= kingdom->gold &&
-		BUILD_COLISEUM_WOOD <= kingdom->wood &&
-		BUILD_COLISEUM_ORE <= kingdom->ore ) return BUILD_OK;
-	    break;
-	    
-	case NECROMANCER:
-	    if(	BUILD_STORM_GOLD <= kingdom->gold &&
-		BUILD_STORM_MERCURY <= kingdom->mercury &&
-		BUILD_STORM_SULFUR <= kingdom->sulfur ) return BUILD_OK;
-	    break;
-	
-	case SORCERESS:
-	    if(	BUILD_RAINBOW_GOLD <= kingdom->gold &&
-		BUILD_RAINBOW_CRYSTAL <= kingdom->crystal ) return BUILD_OK;
-	    break;
-	
-	case WARLOCK:
-	    if(	BUILD_DUNGEON_GOLD <= kingdom->gold &&
-		BUILD_DUNGEON_ORE <= kingdom->ore &&
-		BUILD_DUNGEON_WOOD <= kingdom->wood ) return BUILD_OK;
-	    break;
-	
-	case WIZARD:
-	    if(	BUIILD_LIBRARY_GOLD <= kingdom->gold &&
-		BUIILD_LIBRARY_WOOD <=kingdom->wood &&
-		BUIILD_LIBRARY_ORE <= kingdom->ore &&
-		BUIILD_LIBRARY_CRYSTAL <= kingdom->crystal &&
-		BUIILD_LIBRARY_GEMS <= kingdom->gems &&
-		BUIILD_LIBRARY_MERCURY <= kingdom->mercury &&
-		BUIILD_LIBRARY_SULFUR <= kingdom->sulfur ) return BUILD_OK;
-	    break;
-	
-	default:
-	    break;
-    }	
+    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_SPEC))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -2593,89 +2455,36 @@ BUILDACTION AllowBuildDwelling1(const S_CASTLE *castle){
 
     if(castle->dwelling & DWELLING_MONSTER1) return ALREADY_BUILD;
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(! kingdom->allowBuild) return END_TUR;
-
-    switch(castle->race){
-
-	case KNIGHT:
-	    if(BUILD_THATCHEDHUT_GOLD <= kingdom->gold) return BUILD_OK;
-	    break;
-	    
-	case BARBARIAN:
-	    if(BUILD_HUT_GOLD <= kingdom->gold) return BUILD_OK;
-	    break;
-	    
-	case NECROMANCER:
-	    if(	BUILD_EXCAVATION_GOLD <= kingdom->gold) return BUILD_OK;
-	    break;
-	    
-	case SORCERESS:
-	    if(	BUILD_TREEHOUSE_GOLD <= kingdom->gold &&
-		BUILD_TREEHOUSE_WOOD <= kingdom->wood ) return BUILD_OK;
-	    break;
-
-	case WIZARD:
-	    if(BUILD_HABITAT_GOLD <= kingdom->gold) return BUILD_OK;
-	    break;
-	
-	case WARLOCK:
-	    if(BUILD_CAVE_GOLD <= kingdom->gold) return BUILD_OK;
-	    break;
-	
-	default:
-	    break;
-
-    }
+    if(KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER1))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
 
 BUILDACTION AllowBuildDwelling2(const S_CASTLE *castle){
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
-
-    if(! kingdom->allowBuild) return END_TUR;
-
     if(castle->dwelling & DWELLING_UPGRADE2) return ALREADY_BUILD;
+
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
     if(! (castle->dwelling & DWELLING_MONSTER2))
 
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( BUILD_ARCHERYRANGE_GOLD <= kingdom->gold &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
-		break;
-	    
 	    case BARBARIAN:
-		if( BUILD_STICKHUT_GOLD <= kingdom->gold &&
-		    BUILD_STICKHUT_WOOD <= kingdom->wood &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
-		break;
-	    
 	    case NECROMANCER:
-		if( BUILD_GRAVEYARD_GOLD <= kingdom->gold &&
+	    case WIZARD:
+	    case WARLOCK:
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER2)) &&
 		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
 		break;
 	    
 	    case SORCERESS:
-		if( BUILD_COTTAGE_GOLD <= kingdom->gold &&
-		    BUILD_COTTAGE_WOOD <= kingdom->wood &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER2)) &&
 		    castle->dwelling & DWELLING_MONSTER1  &&
 		    castle->building & BUILD_TAVERN ) return BUILD_OK;
-		break;
-
-	    case WIZARD:
-		if( BUILD_PEN_GOLD <= kingdom->gold &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
-		break;
-	
-	    case WARLOCK:
-		if( BUILD_CRYPT_GOLD <= kingdom->gold &&
-		    BUILD_CRYPT_ORE <= kingdom->ore &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
 		break;
 	
 	    default:
@@ -2687,26 +2496,18 @@ BUILDACTION AllowBuildDwelling2(const S_CASTLE *castle){
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( UPGRADE_ARCHERYRANGE_GOLD <= kingdom->gold &&
-		    UPGRADE_ARCHERYRANGE_WOOD <= kingdom->wood &&
-		    castle->dwelling & DWELLING_MONSTER3 &&
-		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
-		break;
-	    
 	    case BARBARIAN:
-		if( UPGRADE_STICKHUT_GOLD <= kingdom->gold &&
-		    UPGRADE_STICKHUT_WOOD <= kingdom->wood &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE2)) &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
 		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
 		break;
 	    
 	    case NECROMANCER:
-		if( UPGRADE_GRAVEYARD_GOLD <= kingdom->gold ) return BUILD_OK;
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(NECROMANCER, DWELLING_UPGRADE2)) ) return BUILD_OK;
 		break;
 	    
 	    case SORCERESS:
-		if( UPGRADE_COTTAGE_GOLD <= kingdom->gold &&
-		    UPGRADE_COTTAGE_WOOD <= kingdom->wood &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(SORCERESS, DWELLING_UPGRADE2)) &&
 		    castle->building & BUILD_WELL ) return BUILD_OK;
 		break;
 
@@ -2721,48 +2522,26 @@ BUILDACTION AllowBuildDwelling2(const S_CASTLE *castle){
 
 BUILDACTION AllowBuildDwelling3(const S_CASTLE *castle){
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
-
-    if(! kingdom->allowBuild) return END_TUR;
-
     if(castle->dwelling & DWELLING_UPGRADE3) return ALREADY_BUILD;
+
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
     if(! (castle->dwelling & DWELLING_MONSTER3))
 
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( BUILD_BLACKSMITH_GOLD <= kingdom->gold &&
-		    BUILD_BLACKSMITH_ORE <= kingdom->ore &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(KNIGHT, DWELLING_MONSTER3)) &&
 		    castle->dwelling & DWELLING_MONSTER1 &&
 		    castle->building & BUILD_WELL ) return BUILD_OK;
 		break;
 	    
 	    case BARBARIAN:
-		if( BUILD_DEN_GOLD <= kingdom->gold &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
-		break;
-	    
 	    case NECROMANCER:
-		if( BUILD_NECPYRAMID_GOLD <= kingdom->gold &&
-		    BUILD_NECPYRAMID_ORE <= kingdom->ore &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
-		break;
-	    
 	    case SORCERESS:
-		if( BUILD_ELVESRANGE_GOLD <= kingdom->gold &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
-		break;
-
 	    case WIZARD:
-		if( BUILD_FOUNDRY_GOLD <= kingdom->gold &&
-		    BUILD_FOUNDRY_WOOD <= kingdom->wood &&
-		    BUILD_FOUNDRY_ORE <= kingdom->ore &&
-		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
-		break;
-	
 	    case WARLOCK:
-		if( BUILD_NEST_GOLD <= kingdom->gold &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER3)) &&
 		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
 		break;
 	
@@ -2775,26 +2554,22 @@ BUILDACTION AllowBuildDwelling3(const S_CASTLE *castle){
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( UPGRADE_BLACKSMITH_GOLD <= kingdom->gold &&
-		    UPGRADE_BLACKSMITH_ORE <= kingdom->ore &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(KNIGHT, DWELLING_UPGRADE3)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
 		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
 		break;
 	    
 	    case NECROMANCER:
-		if( UPGRADE_NECPYRAMID_GOLD <= kingdom->gold &&
-		    UPGRADE_NECPYRAMID_ORE <= kingdom->ore ) return BUILD_OK;
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(NECROMANCER, DWELLING_UPGRADE3)) ) return BUILD_OK;
 		break;
 	    
 	    case SORCERESS:
-		if( UPGRADE_ELVESRANGE_GOLD <= kingdom->gold &&
-		    UPGRADE_ELVESRANGE_WOOD <= kingdom->wood &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(SORCERESS, DWELLING_UPGRADE3)) &&
 		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
 		break;
 
 	    case WIZARD:
-		if( UPGRADE_FOUNDRY_GOLD <= kingdom->gold &&
-		    UPGRADE_FOUNDRY_MERCURY <= kingdom->mercury &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(WIZARD, DWELLING_UPGRADE3)) &&
 		    castle->building & BUILD_WELL ) return BUILD_OK;
 		break;
 
@@ -2809,20 +2584,16 @@ BUILDACTION AllowBuildDwelling3(const S_CASTLE *castle){
 
 BUILDACTION AllowBuildDwelling4(const S_CASTLE *castle){
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
-
-    if(! kingdom->allowBuild) return END_TUR;
-
     if(castle->dwelling & DWELLING_UPGRADE4) return ALREADY_BUILD;
+
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
     if(! (castle->dwelling & DWELLING_MONSTER4))
 
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( BUILD_ARMORY_GOLD <= kingdom->gold &&
-		    BUILD_ARMORY_ORE <= kingdom->ore &&
-		    BUILD_ARMORY_WOOD <= kingdom->wood &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(KNIGHT, DWELLING_MONSTER4)) &&
 		    castle->dwelling & DWELLING_MONSTER1 &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
@@ -2830,35 +2601,25 @@ BUILDACTION AllowBuildDwelling4(const S_CASTLE *castle){
 		break;
 	    
 	    case BARBARIAN:
-		if( BUILD_ADOBE_GOLD <= kingdom->gold &&
-		    BUILD_ADOBE_WOOD <= kingdom->wood &&
-		    BUILD_ADOBE_ORE <= kingdom->ore &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(BARBARIAN, DWELLING_MONSTER4)) &&
 		    castle->dwelling & DWELLING_MONSTER1 ) return BUILD_OK;
 		break;
 	    
 	    case NECROMANCER:
-		if( BUILD_MANSION_GOLD <= kingdom->gold &&
-		    BUILD_MANSION_WOOD <= kingdom->wood &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(NECROMANCER, DWELLING_MONSTER4)) &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
-		    castle->building & BUILD_THIEVEGUILD ) return BUILD_OK;
+		    castle->building & BUILD_THIEVESGUILD ) return BUILD_OK;
 		break;
 	    
 	    case SORCERESS:
-		if( BUILD_STONEHENGE_GOLD <= kingdom->gold &&
-		    BUILD_STONEHENGE_ORE <= kingdom->ore &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(SORCERESS, DWELLING_MONSTER4)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
 		    castle->mageGuild.level ) return BUILD_OK;
 		break;
 
 	    case WIZARD:
-		if( BUILD_CLIFFNEST_GOLD <= kingdom->gold &&
-		    BUILD_CLIFFNEST_WOOD <= kingdom->wood &&
-		    castle->dwelling & DWELLING_MONSTER2 ) return BUILD_OK;
-		break;
-	
 	    case WARLOCK:
-		if( BUILD_MAZE_GOLD <= kingdom->gold &&
-		    BUILD_MAZE_GEMS <= kingdom->gems &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER4)) &&
 		    castle->dwelling & DWELLING_MONSTER2 ) return BUILD_OK;
 		break;
 	
@@ -2871,36 +2632,16 @@ BUILDACTION AllowBuildDwelling4(const S_CASTLE *castle){
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( UPGRADE_ARMORY_GOLD <= kingdom->gold &&
-		    UPGRADE_ARMORY_WOOD <= kingdom->wood &&
-		    UPGRADE_ARMORY_ORE <= kingdom->ore &&
-		    castle->dwelling & DWELLING_MONSTER2 &&
-		    castle->dwelling & DWELLING_MONSTER3 ) return BUILD_OK;
-		break;
-	    
 	    case BARBARIAN:
-		if( UPGRADE_ADOBE_GOLD <= kingdom->gold &&
-		    UPGRADE_ADOBE_WOOD <= kingdom->wood &&
-		    UPGRADE_ADOBE_ORE <= kingdom->ore &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE4)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
 		    castle->dwelling & DWELLING_MONSTER3 ) return BUILD_OK;
 		break;
 
 	    case NECROMANCER:
-		if( UPGRADE_MANSION_GOLD <= kingdom->gold &&
-		    UPGRADE_MANSION_WOOD <= kingdom->wood &&
-		    UPGRADE_MANSION_CRYSTAL <= kingdom->crystal &&
-		    UPGRADE_MANSION_GEMS <= kingdom->gems ) return BUILD_OK;
-		break;
-	    
 	    case SORCERESS:
-		if( UPGRADE_STONEHENGE_GOLD <= kingdom->gold &&
-		    UPGRADE_STONEHENGE_MERCURY <= kingdom->mercury ) return BUILD_OK;
-		break;
-
 	    case WARLOCK:
-		if( UPGRADE_MAZE_GOLD <= kingdom->gold &&
-		    UPGRADE_MAZE_GEMS <= kingdom->gems ) return BUILD_OK;
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE4)) ) return BUILD_OK;
 		break;
 
 	    default:
@@ -2914,62 +2655,41 @@ BUILDACTION AllowBuildDwelling4(const S_CASTLE *castle){
 
 BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
-
-    if(! kingdom->allowBuild) return END_TUR;
-
     if(castle->dwelling & DWELLING_UPGRADE5) return ALREADY_BUILD;
+
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
     if(! (castle->dwelling & DWELLING_MONSTER5))
 
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( BUILD_ARENA_GOLD <= kingdom->gold &&
-		    BUILD_ARENA_WOOD <= kingdom->wood &&
-		    castle->dwelling & DWELLING_MONSTER2 &&
-		    castle->dwelling & DWELLING_MONSTER3 &&
-		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
-		break;
-	    
 	    case BARBARIAN:
-		if( BUILD_BRIDGE_GOLD <= kingdom->gold &&
-		    BUILD_BRIDGE_ORE <= kingdom->ore &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER5)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
 		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
 		break;
 
 	    case NECROMANCER:
-		if( BUILD_MAUSOLEUM_GOLD <= kingdom->gold &&
-		    BUILD_MAUSOLEUM_WOOD <= kingdom->wood &&
-		    BUILD_MAUSOLEUM_SULFUR <= kingdom->sulfur &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(NECROMANCER, DWELLING_MONSTER5)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
 		    castle->mageGuild.level ) return BUILD_OK;
 		break;
 	    
 	    case SORCERESS:
-		if( BUILD_FENCED_GOLD <= kingdom->gold &&
-		    BUILD_FENCED_WOOD <= kingdom->wood &&
-		    BUILD_FENCED_GEMS <= kingdom->gems &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(SORCERESS, DWELLING_MONSTER5)) &&
 		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
 		break;
 
 	    case WIZARD:
-		if( BUILD_IVORYTOWER_GOLD <= kingdom->gold &&
-		    BUILD_IVORYTOWER_WOOD <= kingdom->wood &&
-		    BUILD_IVORYTOWER_ORE <= kingdom->ore &&
-		    BUILD_IVORYTOWER_CRYSTAL <= kingdom->crystal &&
-		    BUILD_IVORYTOWER_SULFUR <= kingdom->sulfur &&
-		    BUILD_IVORYTOWER_MERCURY <= kingdom->mercury &&
-		    BUILD_IVORYTOWER_GEMS <= kingdom->gems &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(WIZARD, DWELLING_MONSTER5)) &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
 		    castle->mageGuild.level ) return BUILD_OK;
 		break;
 	
 	    case WARLOCK:
-		if( BUILD_SWAMP_GOLD <= kingdom->gold &&
-		    BUILD_SWAMP_SULFUR <= kingdom->sulfur &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(WARLOCK, DWELLING_MONSTER5)) &&
 		    castle->dwelling & DWELLING_MONSTER3 ) return BUILD_OK;
 		break;
 	
@@ -2982,26 +2702,17 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( UPGRADE_ARENA_GOLD <= kingdom->gold &&
-		    UPGRADE_ARENA_WOOD <= kingdom->wood ) return BUILD_OK;
-		break;
-	    
 	    case BARBARIAN:
-		if( UPGRADE_BRIDGE_GOLD <= kingdom->gold &&
-		    UPGRADE_BRIDGE_ORE <= kingdom->ore ) return BUILD_OK;
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE5)) ) return BUILD_OK;
 		break;
 
 	    case NECROMANCER:
-		if( UPGRADE_MAUSOLEUM_GOLD <= kingdom->gold &&
-		    UPGRADE_MAUSOLEUM_ORE <= kingdom->ore &&
-		    UPGRADE_MAUSOLEUM_CRYSTAL <= kingdom->crystal &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(NECROMANCER, DWELLING_UPGRADE5)) &&
 		    castle->mageGuild.level > 1) return BUILD_OK;
 		break;
 
 	    case WIZARD:
-		if( UPGRADE_IVORYTOWER_GOLD <= kingdom->gold &&
-		    UPGRADE_IVORYTOWER_WOOD <= kingdom->wood &&
-		    UPGRADE_IVORYTOWER_ORE <= kingdom->ore &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(WIZARD, DWELLING_UPGRADE5)) &&
 		    castle->building & BUILD_SPEC ) return BUILD_OK;
 		break;
 
@@ -3016,63 +2727,31 @@ BUILDACTION AllowBuildDwelling5(const S_CASTLE *castle){
 
 BUILDACTION AllowBuildDwelling6(const S_CASTLE *castle){
 
-    const S_KINGDOM *kingdom = GetStatKingdom(castle->color);
-
-    if(! kingdom->allowBuild) return END_TUR;
-
     if((castle->race != WARLOCK && castle->dwelling & DWELLING_UPGRADE6) || castle->dwelling & DWELLING_UPGRADE7) return ALREADY_BUILD;
+
+    if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
     if(! (castle->dwelling & DWELLING_MONSTER6))
 
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( BUILD_CATHEDRAL_GOLD <= kingdom->gold &&
-		    BUILD_CATHEDRAL_WOOD <= kingdom->wood &&
-		    BUILD_CATHEDRAL_CRYSTAL <= kingdom->crystal &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(KNIGHT, DWELLING_MONSTER6)) &&
 		    castle->dwelling & DWELLING_MONSTER2 &&
 		    castle->dwelling & DWELLING_MONSTER3 &&
 		    castle->dwelling & DWELLING_MONSTER4 ) return BUILD_OK;
 		break;
 	    
 	    case BARBARIAN:
-		if( BUILD_PYRAMID_GOLD <= kingdom->gold &&
-		    BUILD_PYRAMID_ORE <= kingdom->ore &&
-		    BUILD_PYRAMID_CRYSTAL <= kingdom->crystal &&
-		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
-		break;
-
 	    case NECROMANCER:
-		if( BUILD_LABORATORY_GOLD <= kingdom->gold &&
-		    BUILD_LABORATORY_WOOD <= kingdom->wood &&
-		    BUILD_LABORATORY_ORE <= kingdom->ore &&
-		    BUILD_LABORATORY_SULFUR <= kingdom->sulfur &&
-		    BUILD_LABORATORY_CRYSTAL <= kingdom->crystal &&
-		    BUILD_LABORATORY_MERCURY <= kingdom->mercury &&
-		    BUILD_LABORATORY_GEMS <= kingdom->gems &&
-		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
-		break;
-	    
 	    case SORCERESS:
-		if( BUILD_REDTOWER_GOLD <= kingdom->gold &&
-		    BUILD_REDTOWER_ORE <= kingdom->ore &&
-		    BUILD_REDTOWER_MERCURY <= kingdom->mercury &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER6)) &&
 		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
 		break;
 
 	    case WIZARD:
-		if( BUILD_CLOUDCASTLE_GOLD <= kingdom->gold &&
-		    BUILD_CLOUDCASTLE_WOOD <= kingdom->wood &&
-		    BUILD_CLOUDCASTLE_ORE <= kingdom->ore &&
-		    BUILD_CLOUDCASTLE_GEMS <= kingdom->gems &&
-		    castle->dwelling & DWELLING_MONSTER4 &&
-		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
-		break;
-
 	    case WARLOCK:
-		if( BUILD_GREENDRAGON_GOLD <= kingdom->gold &&
-		    BUILD_GREENDRAGON_ORE <= kingdom->ore &&
-		    BUILD_GREENDRAGON_SULFUR <= kingdom->sulfur &&
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER6)) &&
 		    castle->dwelling & DWELLING_MONSTER4 &&
 		    castle->dwelling & DWELLING_MONSTER5 ) return BUILD_OK;
 		break;
@@ -3086,9 +2765,7 @@ BUILDACTION AllowBuildDwelling6(const S_CASTLE *castle){
 	switch(castle->race){
 
 	    case WARLOCK:
-		if( UPGRADE_BLACKDRAGON_GOLD <= kingdom->gold &&
-		    UPGRADE_BLACKDRAGON_ORE <= kingdom->ore &&
-	    	    UPGRADE_BLACKDRAGON_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(WARLOCK, DWELLING_UPGRADE7)) ) return BUILD_OK;
 		break;
 
 
@@ -3101,22 +2778,9 @@ BUILDACTION AllowBuildDwelling6(const S_CASTLE *castle){
 	switch(castle->race){
 
 	    case KNIGHT:
-		if( UPGRADE_CATHEDRAL_GOLD <= kingdom->gold &&
-		    UPGRADE_CATHEDRAL_WOOD <= kingdom->wood &&
-		    UPGRADE_CATHEDRAL_CRYSTAL <= kingdom->crystal) return BUILD_OK;
-		break;
-	    
 	    case WIZARD:
-		if( UPGRADE_CLOUDCASTLE_GOLD <= kingdom->gold &&
-		    UPGRADE_CLOUDCASTLE_WOOD <= kingdom->wood &&
-		    UPGRADE_CLOUDCASTLE_ORE <= kingdom->ore &&
-	    	    UPGRADE_CLOUDCASTLE_GEMS <= kingdom->gems ) return BUILD_OK;
-		break;
-
 	    case WARLOCK:
-		if( UPGRADE_REDDRAGON_GOLD <= kingdom->gold &&
-		    UPGRADE_REDDRAGON_ORE <= kingdom->ore &&
-	    	    UPGRADE_REDDRAGON_SULFUR <= kingdom->sulfur ) return BUILD_OK;
+		if( KingdomAllowPayment(castle->color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE6)) ) return BUILD_OK;
 		break;
 
 
@@ -3129,31 +2793,9 @@ BUILDACTION AllowBuildDwelling6(const S_CASTLE *castle){
     return CANNOT_BUILD;
 }
 
-
-Uint8 GetMonsterGrown(const S_CASTLE *castle, E_MONSTER name){
-
-    const S_MONSTER *monster = GetStatMonster(name);
-    Uint8 grown = monster->grown;
-    
-        if(castle){
-            // постройка колодец
-            if(castle->building & BUILD_WELL) grown +=2;
-            // спец постройка и монстр 1 уровня
-            if(GOBLIN == name && castle->building & BUILD_WEL2) grown += 8;
-            if(PEASANT == name && castle->building & BUILD_WEL2) grown += 8;
-            if(SKELETON == name && castle->building & BUILD_WEL2) grown += 8;
-            if(SPRITE == name  && castle->building & BUILD_WEL2) grown += 8;
-            if(HALFLING == name && castle->building & BUILD_WEL2) grown += 8;
-            if(CENTAUR == name && castle->building & BUILD_WEL2) grown += 8;
-        }
-
-    return grown;
-}
-
 BOOL BuildMageGuild(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
@@ -3163,27 +2805,32 @@ BOOL BuildMageGuild(const S_CASTLE *castle){
 	    switch(ptrCastle[i].mageGuild.level){
 	    
 		case 1:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD1_GOLD, BUILD_MAGEGUILD1_WOOD, BUILD_MAGEGUILD1_ORE, 0, 0, 0, 0);
+		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD1));
+		    ptrCastle[i].building |= BUILD_MAGEGUILD1;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL1);
 		    break;
 		    
 		case 2:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD2_GOLD, BUILD_MAGEGUILD2_WOOD, BUILD_MAGEGUILD2_ORE, BUILD_MAGEGUILD2_MERCURY, BUILD_MAGEGUILD2_CRYSTAL, BUILD_MAGEGUILD2_SULFUR, BUILD_MAGEGUILD2_GEMS);
+		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD2));
+		    ptrCastle[i].building |= BUILD_MAGEGUILD2;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL2);
 		    break;
 
 		case 3:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD3_GOLD, BUILD_MAGEGUILD3_WOOD, BUILD_MAGEGUILD3_ORE, BUILD_MAGEGUILD3_MERCURY, BUILD_MAGEGUILD3_CRYSTAL, BUILD_MAGEGUILD3_SULFUR, BUILD_MAGEGUILD3_GEMS);
+		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD3));
+		    ptrCastle[i].building |= BUILD_MAGEGUILD3;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL3);
 		    break;
 
 		case 4:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD4_GOLD, BUILD_MAGEGUILD4_WOOD, BUILD_MAGEGUILD4_ORE, BUILD_MAGEGUILD4_MERCURY, BUILD_MAGEGUILD4_CRYSTAL, BUILD_MAGEGUILD4_SULFUR, BUILD_MAGEGUILD4_GEMS);
+		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD4));
+		    ptrCastle[i].building |= BUILD_MAGEGUILD4;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL4);
 		    break;
 
 		case 5:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_MAGEGUILD2_GOLD, BUILD_MAGEGUILD5_WOOD, BUILD_MAGEGUILD5_ORE, BUILD_MAGEGUILD5_MERCURY, BUILD_MAGEGUILD5_CRYSTAL, BUILD_MAGEGUILD5_SULFUR, BUILD_MAGEGUILD5_GEMS);
+		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD5));
+		    ptrCastle[i].building |= BUILD_MAGEGUILD5;
 		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL5);
 		    break;
 		    
@@ -3203,14 +2850,13 @@ BOOL BuildMageGuild(const S_CASTLE *castle){
 BOOL BuildRightTurret(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_RIGHTTURRET;
-
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_RIGHTTURRET_GOLD, 0, BUILD_RIGHTTURRET_ORE, 0, 0, 0, 0);
+	    
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_RIGHTTURRET));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3223,14 +2869,13 @@ BOOL BuildRightTurret(const S_CASTLE *castle){
 BOOL BuildLeftTurret(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_LEFTTURRET;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_LEFTTURRET_GOLD, 0, BUILD_LEFTTURRET_ORE, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_LEFTTURRET));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3243,14 +2888,13 @@ BOOL BuildLeftTurret(const S_CASTLE *castle){
 BOOL BuildTavern(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_TAVERN;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_TAVERN_GOLD, BUILD_TAVERN_WOOD, 0, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_TAVERN));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3263,14 +2907,13 @@ BOOL BuildTavern(const S_CASTLE *castle){
 BOOL BuildStatue(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_STATUE;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_STATUE_GOLD, 0, BUILD_STATUE_ORE, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_STATUE));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3283,14 +2926,13 @@ BOOL BuildStatue(const S_CASTLE *castle){
 BOOL BuildMarketplace(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_MARKETPLACE;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_MARKETPLACE_GOLD, BUILD_MARKETPLACE_WOOD, 0, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MARKETPLACE));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3303,14 +2945,13 @@ BOOL BuildMarketplace(const S_CASTLE *castle){
 BOOL BuildThievesGuild(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
-	    ptrCastle[i].building |= BUILD_THIEVEGUILD;
+	    ptrCastle[i].building |= BUILD_THIEVESGUILD;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_THIEVESGUILD_GOLD, BUILD_THIEVESGUILD_WOOD, 0, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_THIEVESGUILD));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3323,14 +2964,13 @@ BOOL BuildThievesGuild(const S_CASTLE *castle){
 BOOL BuildWell(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_WELL;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_WELL_GOLD, 0, 0, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_WELL));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3343,14 +2983,13 @@ BOOL BuildWell(const S_CASTLE *castle){
 BOOL BuildMoat(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_MOAT;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_MOAT_GOLD, 0, 0, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MOAT));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3363,14 +3002,13 @@ BOOL BuildMoat(const S_CASTLE *castle){
 BOOL BuildWel2(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_WEL2;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_WEL2_GOLD, 0, 0, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_WEL2));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3383,43 +3021,13 @@ BOOL BuildWel2(const S_CASTLE *castle){
 BOOL BuildSpec(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_SPEC;
 
-	    switch(ptrCastle[i].race){
-	    
-		case KNIGHT:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_FORTIFICATION_GOLD, BUILD_FORTIFICATION_WOOD, BUILD_FORTIFICATION_ORE, 0, 0, 0, 0);
-		    break;
-		    
-		case BARBARIAN:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_COLISEUM_GOLD, BUILD_COLISEUM_WOOD, BUILD_COLISEUM_ORE, 0, 0, 0, 0);
-		    break;
-		    
-		case NECROMANCER:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_STORM_GOLD, 0, 0, BUILD_STORM_MERCURY, 0, BUILD_STORM_SULFUR, 0);
-		    break;
-		    
-		case SORCERESS:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_RAINBOW_GOLD, 0, 0, 0, BUILD_RAINBOW_CRYSTAL, 0, 0);
-		    break;
-		    
-		case WARLOCK:
-		    KingdomWasteResource(ptrCastle[i].color, BUILD_DUNGEON_GOLD, BUILD_DUNGEON_WOOD, BUILD_DUNGEON_ORE, 0, 0, 0, 0);
-		    break;
-		    
-		case WIZARD:
-		    KingdomWasteResource(ptrCastle[i].color, BUIILD_LIBRARY_GOLD, BUIILD_LIBRARY_WOOD, BUIILD_LIBRARY_ORE, BUIILD_LIBRARY_MERCURY, BUIILD_LIBRARY_CRYSTAL, BUIILD_LIBRARY_SULFUR, BUIILD_LIBRARY_GEMS);
-		    break;
-		    
-		default:
-		    return FALSE;
-		    break;
-	    }
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_SPEC));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3432,14 +3040,13 @@ BOOL BuildSpec(const S_CASTLE *castle){
 BOOL BuildShipyard(const S_CASTLE *castle){
 
     Uint8 i;
-    
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].building |= BUILD_SHIPYARD;
 
-	    KingdomWasteResource(ptrCastle[i].color, BUILD_SHIPYARD_GOLD, BUILD_SHIPYARD_WOOD, 0, 0, 0, 0, 0);
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_SHIPYARD));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3449,6 +3056,24 @@ BOOL BuildShipyard(const S_CASTLE *castle){
     return FALSE;
 }
 
+BOOL BuildCaptain(const S_CASTLE *castle){
+
+    Uint8 i;
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_CAPTAIN;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_CAPTAIN));
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
 
 BOOL BuildDwelling1(const S_CASTLE *castle){
 
@@ -3459,6 +3084,8 @@ BOOL BuildDwelling1(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_MONSTER1;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER1));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3478,6 +3105,8 @@ BOOL BuildDwelling2(const S_CASTLE *castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_MONSTER2;
 
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER2));
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3495,6 +3124,8 @@ BOOL BuildDwelling3(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_MONSTER3;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER3));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3514,6 +3145,8 @@ BOOL BuildDwelling4(const S_CASTLE *castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_MONSTER4;
 
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER4));
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3531,6 +3164,8 @@ BOOL BuildDwelling5(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_MONSTER5;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER5));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3550,6 +3185,8 @@ BOOL BuildDwelling6(const S_CASTLE *castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_MONSTER6;
 
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_MONSTER6));
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3567,6 +3204,8 @@ BOOL BuildUpgrade2(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_UPGRADE2;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE2));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3586,6 +3225,8 @@ BOOL BuildUpgrade3(const S_CASTLE *castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_UPGRADE3;
 
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE3));
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3603,6 +3244,8 @@ BOOL BuildUpgrade4(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_UPGRADE4;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE4));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3622,6 +3265,8 @@ BOOL BuildUpgrade5(const S_CASTLE *castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_UPGRADE5;
 
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE5));
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3640,6 +3285,8 @@ BOOL BuildUpgrade6(const S_CASTLE *castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_UPGRADE6;
 
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE6));
+
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
 	    return TRUE;
@@ -3657,6 +3304,8 @@ BOOL BuildUpgrade7(const S_CASTLE *castle){
 	if(&ptrCastle[i] == castle){
 
 	    ptrCastle[i].dwelling |= DWELLING_UPGRADE7;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsDwelling(castle->race, DWELLING_UPGRADE7));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3678,15 +3327,15 @@ void UpdateCastleBuilding(void){
     switch(castle->race){
 
 	case KNIGHT:
-	    if(castle->capitan) DrawKNGTCapitan(NULL, &castlact);
 	    DrawKNGTCastle(NULL, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawKNGTCapitan(NULL, &castlact);
 	    if(castle->building & BUILD_WEL2) DrawKNGTWel2(NULL, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(NULL, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(NULL, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(NULL, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawKNGTThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawKNGTThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(NULL, &castlact);
 	    if(castle->mageGuild.level) DrawKNGTMageGuild(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(NULL, &castlact);
@@ -3710,13 +3359,13 @@ void UpdateCastleBuilding(void){
 		DrawBRBNMageGuild(NULL, &castlact);
 		DrawBRBNExt2(NULL, &castlact);
 	    }
-	    if(castle->capitan) DrawBRBNCapitan(NULL, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawBRBNCapitan(NULL, &castlact);
 	    DrawBRBNCastle(NULL, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(NULL, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(NULL, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawBRBNThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawBRBNThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(NULL, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(NULL, &castlact);
@@ -3735,7 +3384,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(NULL, &castlact);
 	    if(castle->mageGuild.level) DrawSCRSMageGuild(NULL, &castlact);
-	    if(castle->capitan) DrawSCRSCapitan(NULL, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawSCRSCapitan(NULL, &castlact);
 	    DrawSCRSCastle(NULL, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(NULL, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(NULL, &castlact);
@@ -3745,7 +3394,7 @@ void UpdateCastleBuilding(void){
 	    else DrawSCRSExt0(NULL, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawSCRSThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawSCRSThievesGuild(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(NULL, &castlact);
 	    if(castle->building & BUILD_STATUE && castle->building & BUILD_WEL2) DrawSCRSExt1(NULL, &castlact);
@@ -3759,14 +3408,14 @@ void UpdateCastleBuilding(void){
 	case NECROMANCER:
 	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(NULL, &castlact);
 	    DrawNCRMCastle(NULL, &castlact);
-	    if(castle->capitan) DrawNCRMCapitan(NULL, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawNCRMCapitan(NULL, &castlact);
     	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(NULL, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(NULL, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(NULL, &castlact);
 	    else DrawNCRMExt0(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawNCRMThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawNCRMThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(NULL, &castlact);
@@ -3786,13 +3435,13 @@ void UpdateCastleBuilding(void){
 	    DrawWRLKCastle(NULL, &castlact);
 	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(NULL, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(NULL, &castlact);
-	    if(castle->capitan) DrawWRLKCapitan(NULL, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawWRLKCapitan(NULL, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(NULL, &castlact);
 	    else DrawWRLKExt0(NULL, &castlact);
 	    if(castle->mageGuild.level) DrawWRLKMageGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawWRLKThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(NULL, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(NULL, &castlact);
@@ -3810,9 +3459,9 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(NULL, &castlact);
 	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(NULL, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(NULL, &castlact);
-	    if(castle->capitan) DrawWZRDCapitan(NULL, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawWZRDCapitan(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVEGUILD) DrawWZRDThievesGuild(NULL, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawWZRDThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(NULL, &castlact);
 	    else DrawWZRDExt0(NULL, &castlact);
@@ -3891,4 +3540,91 @@ void RedrawRamkaCastleName(void){
     rectCur.w = GetLengthText(castle->name, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, castle->name, FONT_SMALL);
+}
+
+void CastleIncreaseArmy(const S_CASTLE *castle, E_DWELLINGCASTLE dwelling, Uint8 count){
+
+    Uint8 i;
+
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    switch(dwelling){
+	    
+		case DWELLING_MONSTER1:
+		    ptrCastle[i].monster[0] += count;
+		    break;
+
+		case DWELLING_MONSTER2:
+		    ptrCastle[i].monster[1] += count;
+		    break;
+
+		case DWELLING_MONSTER3:
+		    ptrCastle[i].monster[2] += count;
+		    break;
+
+		case DWELLING_MONSTER4:
+		    ptrCastle[i].monster[3] += count;
+		    break;
+
+		case DWELLING_MONSTER5:
+		    ptrCastle[i].monster[4] += count;
+		    break;
+
+		case DWELLING_MONSTER6:
+		    ptrCastle[i].monster[5] += count;
+		    break;
+		
+		default:
+		    break;
+	    }
+	    
+	    return;
+	}
+}
+
+Uint8 GetMonsterGrownCastle(const S_CASTLE *castle, E_MONSTER name){
+
+    Uint8 grown = GetMonsterGrown(name);
+
+        if(castle){
+            // well
+            if(castle->building & BUILD_WELL) grown +=2;
+            // wel2
+            if(GOBLIN == name && castle->building & BUILD_WEL2) grown += 8;
+            if(PEASANT == name && castle->building & BUILD_WEL2) grown += 8;
+            if(SKELETON == name && castle->building & BUILD_WEL2) grown += 8;
+            if(SPRITE == name  && castle->building & BUILD_WEL2) grown += 8;
+            if(HALFLING == name && castle->building & BUILD_WEL2) grown += 8;
+            if(CENTAUR == name && castle->building & BUILD_WEL2) grown += 8;
+        }
+
+    return grown;
+}
+
+void AllCastleIncreaseArmy(void){
+
+    Uint8 i;
+
+    for(i = 0; i < countCastle; ++i){
+
+	if(ptrCastle[i].dwelling & DWELLING_MONSTER1) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER1, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 1)));
+
+	if(ptrCastle[i].dwelling & DWELLING_MONSTER2 ||
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE2) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER2, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 2)));
+
+	if(ptrCastle[i].dwelling & DWELLING_MONSTER3 ||
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE3) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER3, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 3)));
+
+	if(ptrCastle[i].dwelling & DWELLING_MONSTER4 ||
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE4) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER4, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 4)));
+
+	if(ptrCastle[i].dwelling & DWELLING_MONSTER5 ||
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE5) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER5, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 5)));
+
+	if(ptrCastle[i].dwelling & DWELLING_MONSTER6 ||
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE6 ||
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE7) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 6)));
+    }
 }

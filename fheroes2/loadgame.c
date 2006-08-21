@@ -56,7 +56,7 @@ void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
 void	RedrawMapsAnimation(void);
 void	CheckCursorAreaAction(E_OBJECT);
-void	ClickCursorAreaAction(E_OBJECT);
+ACTION	ClickCursorAreaAction(E_OBJECT);
 
 void	InitCursorFocus(void);
 void	RedrawFocusPanel(S_FOCUS *);
@@ -2758,7 +2758,10 @@ ACTION ActionClickFocusCastle(void){
     }
 
     if(castle){
-	if(ValidPoint(&gameFocus.back, mx, my)) EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY);
+	if(ValidPoint(&gameFocus.back, mx, my) &&
+	    EXIT == EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY))
+		return EXIT;
+
 	SetGameFocus(castle, OBJ_CASTLE);
 	RedrawFocusPanel(&gameFocus);
 
@@ -3098,7 +3101,7 @@ void CheckCursorAreaAction(E_OBJECT f){
 	SetCursor(CURSOR_POINTER);
 }
 
-void ClickCursorAreaAction(E_OBJECT f){
+ACTION ClickCursorAreaAction(E_OBJECT f){
 
     Sint32 x, y;
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -3109,7 +3112,7 @@ void ClickCursorAreaAction(E_OBJECT f){
     S_CASTLE	*castle = NULL;
     
     // если над областью арены то по свойствам
-    if(! (x > BORDERWIDTH && x < BORDERWIDTH + GetWidthArea() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)) return;
+    if(! (x > BORDERWIDTH && x < BORDERWIDTH + GetWidthArea() * TILEWIDTH && y > BORDERWIDTH && y < video->h - BORDERWIDTH)) return NONE;
 
     switch(f){
 /*	
@@ -3188,7 +3191,9 @@ void ClickCursorAreaAction(E_OBJECT f){
 
 			    RedrawRadar();
 			    RedrawMapsArea();
-			    EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL);
+
+			    if(EXIT == EnterCastle(gameFocus.ax, gameFocus.ay, HEROESNULL))
+				return EXIT;
 			}
 			break;
 /*
@@ -3328,9 +3333,10 @@ void ClickCursorAreaAction(E_OBJECT f){
 	    break;
 	
 	default:
-	    return;
 	    break;
     }
+
+    return NONE;
 }
 
 ACTION ActionGAMELOOP(void){
@@ -3370,10 +3376,23 @@ ACTION ActionGAMELOOP(void){
 	    if(4 == GetIntValue(WEEK)){
 		SetIntValue(WEEK, 1);
 		SetIntValue(MONTH, GetIntValue(MONTH) + 1);
+
+		// перегенерация месячных событий карты
+		for(i = 0; i < 8; ++i) 
+    		    if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01)
+			RecalculateKingdomMonth(i);
+
 	    }else
 		SetIntValue(WEEK, GetIntValue(WEEK) + 1);
 
 	    // перегенерация недельных событий карты
+	    for(i = 0; i < 8; ++i) 
+    		if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01)
+		    RecalculateKingdomWeek(i);
+
+	    // увеличиваем недельный прирост
+	    AllCastleIncreaseArmy();
+
 	}else
 	    SetIntValue(DAY, GetIntValue(DAY) + 1);
 
@@ -3470,7 +3489,7 @@ ACTION ActionHUMANLOOP(INTERFACEACTION *action){
 		    
 			case SDL_BUTTON_LEFT:
 
-			    ClickCursorAreaAction(gameFocus.type);
+			    exit = ClickCursorAreaAction(gameFocus.type);
 
 			    // левая кнопка down
 			    ptr = action;
@@ -3671,7 +3690,7 @@ void RedrawFocusPanel(S_FOCUS *focus){
     dst.w = 46;
     dst.h = 22;
     while(castle && i < maxCount){
-	if(castle->castle) seek = 9 + castle->race; else seek = 15 + castle->race;
+	if(castle->building & BUILD_CASTLE) seek = 9 + castle->race; else seek = 15 + castle->race;
 	FillSPRITE(&sprite, "LOCATORS.ICN", seek);
 	image = GetICNSprite(&sprite);
 	SDL_BlitSurface(image, NULL, video, &dst);

@@ -220,12 +220,12 @@ ACTION ActionCycle(INTERFACEACTION *action){
 
 			    exit = ActionPressESC();
 			    break;
-/*
+
 			case SDLK_RETURN:
 
-			    exit = YES;
+			    exit = ENTER;
 			    break;
-*/
+
 			// F4 switch to full screen
                 	case SDLK_F4:
 

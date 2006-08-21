@@ -50,7 +50,7 @@ void DrawBRBNCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->castle){
+    if(castle->building & BUILD_CASTLE){
     	// анимация
     	if(animHead){
 	    cur.x = cx;
@@ -73,7 +73,7 @@ void DrawBRBNCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	if(castle->castle){
+	if(castle->building & BUILD_CASTLE){
 	    cur.w -= 30;
 	    cur.h -= 45;
 	}else{

@@ -277,7 +277,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrown(castle, GetMonsterFromCastle(castle, level)));
+	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -412,7 +412,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrown(castle, GetMonsterFromCastle(castle, level)));
+	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -547,7 +547,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrown(castle, GetMonsterFromCastle(castle, level)));
+	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -682,7 +682,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrown(castle, GetMonsterFromCastle(castle, level)));
+	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -817,7 +817,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrown(castle, GetMonsterFromCastle(castle, level)));
+	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -959,7 +959,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrown(castle, GetMonsterFromCastle(castle, level)));
+	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;

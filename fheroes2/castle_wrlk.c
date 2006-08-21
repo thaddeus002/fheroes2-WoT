@@ -49,7 +49,7 @@ void DrawWRLKCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     Uint16 cx = video->w / 2 - 320;
     Uint16 cy = video->h / 2 - 240;
 
-    if(castle->castle){
+    if(castle->building & BUILD_CASTLE){
 	if(animHead){
 	    // анимация
 	    cur.x = cx;
@@ -72,7 +72,7 @@ void DrawWRLKCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	if(castle->castle){
+	if(castle->building & BUILD_CASTLE){
 	    cur.x += 30;
 	    cur.w = 210;
 	    cur.h -= 20;

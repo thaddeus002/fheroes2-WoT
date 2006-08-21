@@ -50,7 +50,7 @@ ACTION ActionOverCastle(void){
     const char *message = NULL;
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->castle){ message = "Castle"; }else{ message = "Tent"; }
+    if(castle->building & BUILD_CASTLE){ message = "Castle"; }else{ message = "Tent"; }
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -69,7 +69,7 @@ ACTION ActionOverCastle(void){
 
 ACTION ActionOverCaptain(void){
 
-    const char *message = GetStringCapitan();
+    const char *message = GetStringCaptain();
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -614,7 +614,7 @@ ACTION ActionOverExit(void){
     const char *message = NULL;
     const S_CASTLE *castle = GetCurrentCastle();
                 
-    if(castle->castle){ message = "Exit Castle"; }else{ message = "Exit Town"; }
+    if(castle->building & BUILD_CASTLE){ message = "Exit Castle"; }else{ message = "Exit Town"; }
     
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -654,7 +654,7 @@ ACTION ActionClickCastle(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
     
-    if(castle->castle)
+    if(castle->building & BUILD_CASTLE)
 	ShowCastleInfo();
     else if(castle->allowCastle)
 	fprintf(stderr, "Allow build Castle\n");
@@ -1826,6 +1826,7 @@ ACTION ActionCastleClickDwelling1(void){
     if(YES == MessageBox(message, FONT_BIG)){
 
 	BuildDwelling1(castle);
+	CastleIncreaseArmy(castle, DWELLING_MONSTER1, GetMonsterGrown(GetMonsterFromCastle(castle, 1)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -1852,6 +1853,7 @@ ACTION ActionCastleClickDwelling2(void){
 	else
 	    BuildDwelling2(castle);
 
+	CastleIncreaseArmy(castle, DWELLING_MONSTER2, GetMonsterGrown(GetMonsterFromCastle(castle, 2)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -1878,6 +1880,7 @@ ACTION ActionCastleClickDwelling3(void){
 	else
 	    BuildDwelling3(castle);
 
+	CastleIncreaseArmy(castle, DWELLING_MONSTER3, GetMonsterGrown(GetMonsterFromCastle(castle, 3)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -1904,6 +1907,7 @@ ACTION ActionCastleClickDwelling4(void){
 	else
 	    BuildDwelling4(castle);
 
+	CastleIncreaseArmy(castle, DWELLING_MONSTER4, GetMonsterGrown(GetMonsterFromCastle(castle, 4)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -1930,6 +1934,7 @@ ACTION ActionCastleClickDwelling5(void){
 	else
 	    BuildDwelling5(castle);
 
+	CastleIncreaseArmy(castle, DWELLING_MONSTER5, GetMonsterGrown(GetMonsterFromCastle(castle, 5)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -1960,6 +1965,7 @@ ACTION ActionCastleClickDwelling6(void){
 	else
 	    BuildDwelling6(castle);
 
+	CastleIncreaseArmy(castle, DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(castle, 6)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -1969,8 +1975,19 @@ ACTION ActionCastleClickDwelling6(void){
 
 ACTION ActionCastleClickCaptain(void){
 
-    //const S_CASTLE *castle = GetCurrentCastle();
-    //BuildingMessageBox(castle->race, BUILD_CAPTAIN, "The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.", BUILD_CAPTAIN_GOLD, 0, 0, 0, 0, 0, 0);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    char message[32];
+    sprintf(message, "Build %s ?", GetStringCaptain());
+    
+    if(YES == MessageBox(message, FONT_BIG)){
+
+	BuildCaptain(castle);
+	EnableCastleUpdateBuilding();
+
+	return CANCEL;
+    }
+
     return NONE;
 }
 

@@ -41,12 +41,6 @@
 #include "monster.h"
 #include "heroes.h"
 
-E_MORALE CalculateArmyMorale(S_ARMY *, S_HEROES *);
-
-ACTION	ActionMonsterInfoUpgrade(void);
-ACTION	ActionMonsterInfoDismiss(void);
-ACTION	ActionMonsterInfoExit(void);
-
 static S_HEROES *	allHeroes = NULL;
 static char 		heroesPortrait[13];
 
@@ -343,7 +337,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 
 }
 
-E_LEVELSKILL HeroesLevelSkill(S_HEROES *heroes, E_SKILL skill){
+E_LEVELSKILL HeroesLevelSkill(const S_HEROES *heroes, E_SKILL skill){
 
     if(NULL == heroes || SKILLNONE == skill) return LEVELNONE;
 
@@ -355,7 +349,7 @@ E_LEVELSKILL HeroesLevelSkill(S_HEROES *heroes, E_SKILL skill){
     return LEVELNONE;
 }
 
-BOOL    HeroesArtifactPresent(S_HEROES *heroes, E_ARTIFACT artifact){
+BOOL    HeroesArtifactPresent(const S_HEROES *heroes, E_ARTIFACT artifact){
 
     if(NULL == heroes) return FALSE;
 
@@ -367,7 +361,7 @@ BOOL    HeroesArtifactPresent(S_HEROES *heroes, E_ARTIFACT artifact){
     return FALSE;
 }
 
-Uint8   CalculateHeroesAttack(S_HEROES *heroes){
+Uint8   CalculateHeroesAttack(const S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -413,7 +407,7 @@ Uint8   CalculateHeroesAttack(S_HEROES *heroes){
     return result;
 }
 
-Uint8   CalculateHeroesDefence(S_HEROES *heroes){
+Uint8   CalculateHeroesDefence(const S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -459,7 +453,7 @@ Uint8   CalculateHeroesDefence(S_HEROES *heroes){
     return result;
 }
 
-Uint8   CalculateHeroesPower(S_HEROES *heroes){
+Uint8   CalculateHeroesPower(const S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -505,7 +499,7 @@ Uint8   CalculateHeroesPower(S_HEROES *heroes){
     return result;
 }
 
-Uint8	CalculateHeroesKnowledge(S_HEROES *heroes){
+Uint8	CalculateHeroesKnowledge(const S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -555,7 +549,7 @@ Uint8	CalculateHeroesKnowledge(S_HEROES *heroes){
     return result;
 }
 
-E_MORALE CalculateHeroesMorale(S_HEROES *heroes){
+E_MORALE CalculateHeroesMorale(const S_HEROES *heroes){
 
     if(NULL == heroes) return MORALE_NORMAL;
 
@@ -608,7 +602,7 @@ E_MORALE CalculateHeroesMorale(S_HEROES *heroes){
     return result;
 }
 
-E_LUCK  CalculateHeroesLuck(S_HEROES *heroes){
+E_LUCK  CalculateHeroesLuck(const S_HEROES *heroes){
 
     if(NULL == heroes) return LUCK_NORMAL;
 
@@ -656,14 +650,14 @@ E_LUCK  CalculateHeroesLuck(S_HEROES *heroes){
     return result;
 }
 
-Uint16  CalculateHeroesMagicPoint(S_HEROES *heroes){
+Uint16  CalculateHeroesMagicPoint(const S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
     return CalculateHeroesKnowledge(heroes) * 10;
 }
 
-Uint8   CalculateHeroesScouting(S_HEROES *heroes){
+Uint8   CalculateHeroesScouting(const S_HEROES *heroes){
 
     // base scouting
     Uint8 scout = SCOUTINGBASE;
@@ -694,7 +688,7 @@ Uint8   CalculateHeroesScouting(S_HEROES *heroes){
     return scout;
 }
 
-Uint8   CalculateHeroesMoveLandPoint(S_HEROES *heroes){
+Uint8   CalculateHeroesMoveLandPoint(const S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
     
@@ -760,7 +754,7 @@ Uint8   CalculateHeroesMoveLandPoint(S_HEROES *heroes){
     return tp;
 }
 
-Uint8   CalculateHeroesMoveSeaPoint(S_HEROES *heroes){
+Uint8   CalculateHeroesMoveSeaPoint(const S_HEROES *heroes){
 
     if(NULL == heroes) return 0;
 
@@ -794,7 +788,7 @@ Uint8   CalculateHeroesMoveSeaPoint(S_HEROES *heroes){
     return tp;
 }
 
-Uint8 HeroesCountArmy(S_HEROES *heroes){
+Uint8 HeroesCountArmy(const S_HEROES *heroes){
 
     if(! heroes) return 0;
     
@@ -856,7 +850,7 @@ const char * CapitanBigNamePortrait(E_RACE race){
     return heroesPortrait;
 }
 
-ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
+ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes){
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Surface *image = NULL;
@@ -865,10 +859,11 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     const char *icnname = NULL;
     INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;
-    ACTION result;
+    ACTION result = NONE;
     SDL_Rect rectBack, rect;
     char str[64];
     char message[8];
+    BOOL exit;
 
     if(GetIntValue(EVILINTERFACE)){ icnname = "VIEWARME.ICN"; }else{  icnname = "VIEWARMY.ICN"; }
 
@@ -992,6 +987,41 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     rect.x = rect.x - rect.w / 2;
     PrintText(video, &rect, str, FONT_BIG);
 
+    // click upgrade
+    switch(UpgradableArmy(army, GetIntValue(HUMANCOLORS))){
+    
+	case YES:
+	    FillSPRITE(&sprite, icnname, 5);
+	    image = GetICNSprite(&sprite);
+	    rect.x = rectBack.x + 290;
+	    rect.y = rectBack.y + 190;
+	    rect.w = image->w;
+	    rect.h = image->h;
+	    // click
+	    ZeroINTERFACEACTION(&action);
+	    FillSPRITE(&action.objectUp, icnname, 5);
+	    FillSPRITE(&action.objectPush, icnname, 6);
+	    action.rect = rect;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionPressUPGRADE;
+	    AddActionEvent(&dialog, &action);
+	    SDL_BlitSurface(image, NULL, video, &rect);
+	    break;
+	
+	case NO:
+	    FillSPRITE(&sprite, icnname, 6);
+	    image = GetICNSprite(&sprite);
+	    rect.x = rectBack.x + 290;
+	    rect.y = rectBack.y + 190;
+	    rect.w = image->w;
+	    rect.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rect);
+	    break;
+	
+	default:
+	    break;
+    }
+
     // click dismiss
     if(heroes && 1 == HeroesCountArmy(heroes)){
 	FillSPRITE(&sprite, icnname, 2);
@@ -1013,7 +1043,7 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
 	FillSPRITE(&action.objectPush, icnname, 2);
 	action.rect = rect;
 	action.mouseEvent = MOUSE_LCLICK;
-	action.pf = ActionMonsterInfoDismiss;
+	action.pf = ActionPressDISMISS;
 	AddActionEvent(&dialog, &action);
     }
     SDL_BlitSurface(image, NULL, video, &rect);
@@ -1031,7 +1061,7 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     FillSPRITE(&action.objectPush, icnname, 4);
     action.rect = rect;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionMonsterInfoExit;
+    action.pf = ActionPressCANCEL;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rect);
 
@@ -1039,11 +1069,31 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     SetCursor(CURSOR_POINTER);
             
     CursorOn();
-                
-    result = ActionCycle(dialog);
 
-    if(CANCEL == result) result = NONE;
+    exit = FALSE;
+    while(! exit)
+        switch(ActionCycle(dialog)){
 
+            case UPGRADE:
+                exit = TRUE;
+                result = UPGRADE;
+            break;
+
+            case EXIT:
+                exit = TRUE;
+                result = EXIT;
+            break;
+
+            case ESC:
+            case CANCEL:
+                exit = TRUE;
+                result = CANCEL;
+            break;
+	    
+	    default:
+	    break;
+    }
+        
     CursorOff();
 
     SDL_BlitSurface(background, NULL, video, &rectBack);
@@ -1055,21 +1105,6 @@ ACTION ShowArmyInfo(S_ARMY *army, S_HEROES *heroes){
     CursorOn();
 
     return result;
-}
-
-ACTION	ActionMonsterInfoUpgrade(void){
-
-    return NONE;
-}
-
-ACTION	ActionMonsterInfoDismiss(void){
-
-    return DISMISS;
-}
-
-ACTION	ActionMonsterInfoExit(void){
-
-    return CANCEL;
 }
 
 E_NAMEHEROES    GetRecrutPrimaryHeroes(void){
