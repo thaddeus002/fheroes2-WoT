@@ -191,7 +191,6 @@ E_LEVELMONSTER	GetLevelMonster(E_MONSTER);
 
 Uint8		GetMonsterGrown(E_MONSTER);
 
-E_MONSTER	UpgradeMonster(E_MONSTER);
-ACTION		UpgradableArmy(const S_ARMY *, E_COLORS);
+E_MONSTER	GetUpgradeMonster(E_MONSTER);
 
 #endif

@@ -88,7 +88,7 @@ ACTION ShowCastleInfo(void){
 
     // сохраняем бакгроунд
     if(NULL == (back = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
-	fprintf(stderr, "DialogRecrutMonster: CreateRGBSurface failed: %s\n", SDL_GetError());
+	fprintf(stderr, "CastleInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
 	return 0;
     }
     SDL_BlitSurface(video, &rectBack, back, NULL);
@@ -491,6 +491,16 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w; 
     rectCur.h = image->h; 
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    ZeroINTERFACEACTION(&action); 
+    action.rect = rectCur; 
+    action.mouseEvent = MOUSE_PRESENT; 
+    action.pf = ActionCastleOverRecrutPrimaryHeroes;
+    AddActionEvent(&castinfo, &action); 
+    ZeroINTERFACEACTION(&action); 
+    action.rect = rectCur; 
+    action.mouseEvent = MOUSE_RCLICK; 
+    action.pf = ActionCastleRClickRecrutPrimaryHeroes;
+    AddActionEvent(&castinfo, &action); 
 
     // portrait recrut secondary heroes
     FillSPRITE(&sprite, HeroesBigNamePortrait(GetRecrutSecondaryHeroes()), 0);
@@ -500,6 +510,16 @@ ACTION ShowCastleInfo(void){
     rectCur.w = image->w; 
     rectCur.h = image->h; 
     SDL_BlitSurface(image, NULL, video, &rectCur);
+    ZeroINTERFACEACTION(&action); 
+    action.rect = rectCur; 
+    action.mouseEvent = MOUSE_PRESENT;
+    action.pf = ActionCastleOverRecrutSecondaryHeroes;
+    AddActionEvent(&castinfo, &action); 
+    ZeroINTERFACEACTION(&action); 
+    action.rect = rectCur; 
+    action.mouseEvent = MOUSE_RCLICK; 
+    action.pf = ActionCastleRClickRecrutSecondaryHeroes;
+    AddActionEvent(&castinfo, &action); 
 
     // отрисовка статуса построек
     RedrawCastleStatusBuilding();
@@ -649,6 +669,19 @@ ACTION ActionCASTLEINFOLOOP(INTERFACEACTION *action){
 			    }
 			    break;
 			    
+			case SDL_BUTTON_RIGHT:
+
+			    ptr = action;
+
+			    while(ptr){
+				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_RCLICK) && ptr->pf )
+					exit = (*ptr->pf)();
+
+				ptr = (INTERFACEACTION *) ptr->next;
+			    }
+			    break;
+
 			default:
 			    break;
 		    }
@@ -682,15 +715,6 @@ void RedrawInfoBottomBar(void){
     FillSPRITE(&sprite, "CASLBAR.ICN", 0);
     image = GetICNSprite(&sprite);
 
-/*
-    if(GetIntValue(VIDEOMODE)){
-	rectCur.x =  video->w / 2 - 320;
-	rectCur.y = video->h + 2 * BORDERWIDTH + SHADOWWIDTH - image->h;
-    }else{
-	rectCur.x = 0;
-	rectCur.y = 480 - image->h;
-    }
-*/
     rectCur.x = video->w / 2 - 320;
     rectCur.y = video->h / 2 + 240 - BORDERWIDTH - 3;
     
@@ -2089,12 +2113,110 @@ void RedrawCastleStatusBuilding(void){
     rectCur.w = image->w; 
     rectCur.h = image->h; 
     SDL_BlitSurface(image, NULL, video, &rectCur); 
-    if(BUILD_OK == AllowBuildCaptain(castle)){
-	ZeroINTERFACEACTION(&action); 
-	action.rect = rectCur; 
-	action.mouseEvent = MOUSE_LCLICK; 
-	action.level = LEVELEVENT_CASTLEINFOBUILD;
-	action.pf = ActionCastleClickCaptain; 
-	AddActionEvent(&castinfo, &action);
+    switch(AllowBuildCaptain(castle)){
+	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action); 
+	    action.rect = rectCur; 
+	    action.mouseEvent = MOUSE_LCLICK; 
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleClickCaptain; 
+	    AddActionEvent(&castinfo, &action);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 64;
+	    rectCur.y += 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case END_TUR:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 64;
+	    rectCur.y += 60;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	default:
+	    break;
+    }
+
+    // recrut primary hero
+    FillSPRITE(&sprite, HeroesBigNamePortrait(GetRecrutPrimaryHeroes()), 0);
+    image = GetICNSprite(&sprite); 
+    rectCur.x = cx + 444;
+    rectCur.y = cy + 260;
+    rectCur.w = image->w; 
+    rectCur.h = image->h; 
+    switch(AllowRecrutHeroes(castle)){
+	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action); 
+	    action.rect = rectCur; 
+	    action.mouseEvent = MOUSE_LCLICK; 
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleLClickRecrutPrimaryHeroes; 
+	    AddActionEvent(&castinfo, &action);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 84;
+	    rectCur.y += 75;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 84;
+	    rectCur.y += 75;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	default:
+	    break;
+    }
+
+    // recrut secondary hero
+    FillSPRITE(&sprite, HeroesBigNamePortrait(GetRecrutSecondaryHeroes()), 0);
+    image = GetICNSprite(&sprite); 
+    rectCur.x = cx + 444;
+    rectCur.y = cy + 360;
+    rectCur.w = image->w; 
+    rectCur.h = image->h; 
+    switch(AllowRecrutHeroes(castle)){
+	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action); 
+	    action.rect = rectCur; 
+	    action.mouseEvent = MOUSE_LCLICK; 
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleLClickRecrutPrimaryHeroes; 
+	    AddActionEvent(&castinfo, &action);
+	    break;
+	case ALREADY_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 84;
+	    rectCur.y += 75;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	case CANNOT_BUILD:
+	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x += 84;
+	    rectCur.y += 75;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    break;
+	default:
+	    break;
     }
 }

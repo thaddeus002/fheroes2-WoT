@@ -720,6 +720,31 @@ const char * GetStringRace(E_RACE race){
     return string;
 }
 
+const char * GetStringGameLevel(E_GAMELEVEL level){
+
+    const char  *string = NULL;
+
+    switch(level){
+	case GAME_EASY:
+	    string = "Easy";
+	    break;
+	case GAME_NORMAL:
+	    string = "Normal";
+	    break;
+	case GAME_HARD:
+	    string = "Hard";
+	    break;
+	case GAME_EXPERT:
+	    string = "Expert";
+	    break;
+	case GAME_IMPOSSIBLE:
+	    string = "Impossible";
+	    break;
+    }
+                                                                                
+                                                                                            
+    return string;
+}
 const char * GetStringColor(E_COLORS color){
 
     const char  *string;

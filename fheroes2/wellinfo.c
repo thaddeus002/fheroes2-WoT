@@ -81,7 +81,7 @@ ACTION ShowWellInfo(void){
 
     // сохраняем бакгроунд
     if(NULL == (back = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
-	fprintf(stderr, "DialogRecrutMonster: CreateRGBSurface failed: %s\n", SDL_GetError());
+	fprintf(stderr, "WellInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
 	return 0;
     }
     SDL_BlitSurface(video, &rectBack, back, NULL);

@@ -36,6 +36,7 @@
 #include "element.h"
 #include "config.h"
 #include "actionevent.h"
+#include "heroesinfo.h"
 #include "monster.h"
 #include "magictower.h"
 #include "kingdom.h"
@@ -1626,6 +1627,84 @@ ACTION ActionCastleOverCaptain(void){
     return NONE;
 }
 
+ACTION ActionCastleOverRecrutPrimaryHeroes(void){
+
+    char message[64];
+
+    const S_HEROES *heroes = GetStatHeroes(GetRecrutPrimaryHeroes());
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowRecrutHeroes(castle)){
+
+	case BUILD_OK:
+	    sprintf(message,  "Recrut %s The %s.", heroes->name, GetStringRace(heroes->race));
+	    break;
+	
+	default:
+	case CANNOT_BUILD:
+	    sprintf(message, "Cannot afford a Hero.");
+	    break;
+	
+	case ALREADY_BUILD:
+	    sprintf(message, "Cannot recrut - you already have a Hero in this town.");
+	    break;
+	
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
+    cur.y = cur.y - 3;
+    cur.w = GetLengthText(message, FONT_BIG);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+ACTION ActionCastleOverRecrutSecondaryHeroes(void){
+
+    char message[64];
+
+    const S_HEROES *heroes = GetStatHeroes(GetRecrutSecondaryHeroes());
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    switch(AllowRecrutHeroes(castle)){
+
+	case BUILD_OK:
+	    sprintf(message,  "Recrut %s The %s.", heroes->name, GetStringRace(heroes->race));
+	    break;
+	
+	default:
+	case CANNOT_BUILD:
+	    sprintf(message, "Cannot afford a Hero.");
+	    break;
+	
+	case ALREADY_BUILD:
+	    sprintf(message, "Cannot recrut - you already have a Hero in this town.");
+	    break;
+	
+    }
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+    
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+    
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
+    cur.y = cur.y - 3;
+    cur.w = GetLengthText(message, FONT_BIG);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
 ACTION ActionCastleClickTavern(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
@@ -1991,6 +2070,27 @@ ACTION ActionCastleClickCaptain(void){
     return NONE;
 }
 
+ACTION ActionCastleRClickRecrutPrimaryHeroes(void){
+
+    return ShowHeroesInfo(GetRecrutPrimaryHeroes());
+}
+
+ACTION ActionCastleRClickRecrutSecondaryHeroes(void){
+
+    return ShowHeroesInfo(GetRecrutSecondaryHeroes());
+}
+
+ACTION ActionCastleLClickRecrutPrimaryHeroes(void){
+
+    return NONE;
+}
+
+ACTION ActionCastleLClickRecrutSecondaryHeroes(void){
+
+    return NONE;
+}
+
+
 ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text, Uint16 gold, Uint8 ore, Uint8 wood, Uint8 mercury, Uint8 crystal, Uint8 sulfur, Uint8 gems){
 
     CursorOff();
@@ -2185,3 +2285,4 @@ ACTION BuildingMessageBox(E_RACE race, E_BUILDINGCASTLE build, const char *text,
 
     return result;
 }
+

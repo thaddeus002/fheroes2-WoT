@@ -55,7 +55,6 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     Uint16 cx, cy;
     AGGSPRITE sprite;
     BOOL exit = FALSE;
-//    char str[64];
 
     INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
@@ -82,7 +81,7 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
 
     // сохраняем бакгроунд
     if(NULL == (back = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
-	fprintf(stderr, "DialogRecrutMonster: CreateRGBSurface failed: %s\n", SDL_GetError());
+	fprintf(stderr, "HeroesInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
 	return 0;
     }
     SDL_BlitSurface(video, &rectBack, back, NULL);
@@ -290,7 +289,7 @@ ACTION ShowHeroesInfo(E_NAMEHEROES name){
     SDL_FreeSurface(back);
 
     SetIntValue(ANIM3, TRUE);
-    SetIntValue(ANIM1, TRUE);
+    SetIntValue(ANIM2, TRUE);
     CursorOn();
 
     return result;

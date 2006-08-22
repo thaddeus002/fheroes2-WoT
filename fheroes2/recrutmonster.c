@@ -55,7 +55,6 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     INTERFACEACTION *dialog = NULL;        
     
     const S_CASTLE *castle = GetCurrentCastle();
-    const S_PAYMENT *payment = NULL;
 
     Uint16 countAvailable = available;
     Uint16 resultRecrutMonster = 0;
@@ -93,14 +92,14 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     rectCur.x = rectCur.x - rectCur.w / 2;
     PrintText(video, &rectCur, str, FONT_BIG);
 
-    payment = PaymentConditionsMonster(emonster);
+    S_PAYMENT payment = *(PaymentConditionsMonster(emonster));
     // cost per troop
-    if( payment->wood ||
-        payment->ore ||
-	payment->crystal ||
-        payment->sulfur ||
-        payment-> mercury ||
-        payment->gems ){
+    if( payment.wood ||
+        payment.ore ||
+	payment.crystal ||
+        payment.sulfur ||
+        payment. mercury ||
+        payment.gems ){
 
 	// спрайт золото (условия)
 	FillSPRITE(&sprite, "RESOURCE.ICN", 6);
@@ -117,7 +116,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", payment->gold);
+	sprintf(str, "%d", payment.gold);
 	rectCur.x = rectBack.x + 183;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -140,7 +139,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", payment->gold);
+	sprintf(str, "%d", payment.gold);
 	rectCur.x = rectBack.x + 205;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -149,7 +148,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	PrintText(video, &rectCur, str, FONT_SMALL);
     }
 
-    if(payment->crystal){
+    if(payment.crystal){
 
 	    // спрайт crystal (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 4);
@@ -166,7 +165,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество crystal (условия)
-	    sprintf(str, "%d", payment->crystal);
+	    sprintf(str, "%d", payment.crystal);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -174,7 +173,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
 
-    }else if(payment->mercury){
+    }else if(payment.mercury){
 
 	    // спрайт mercury (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 1);
@@ -191,7 +190,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment->mercury);
+	    sprintf(str, "%d", payment.mercury);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -199,7 +198,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
 
-    }else if(payment->wood){
+    }else if(payment.wood){
 
 	    // спрайт mercury (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 0);
@@ -216,7 +215,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment->wood);
+	    sprintf(str, "%d", payment.wood);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -224,7 +223,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
 
-    }else if(payment->ore){
+    }else if(payment.ore){
 
 	    // спрайт mercury (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
@@ -241,7 +240,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment->ore);
+	    sprintf(str, "%d", payment.ore);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -249,7 +248,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
 
-    }else if(payment->sulfur){
+    }else if(payment.sulfur){
 
 	    // спрайт sulfur (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
@@ -266,7 +265,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество sulfur (условия)
-	    sprintf(str, "%d", payment->sulfur);
+	    sprintf(str, "%d", payment.sulfur);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -274,7 +273,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.x = rectCur.x - rectCur.w / 2;
 	    PrintText(video, &rectCur, str, FONT_SMALL);
 
-    }else if(payment->gems){
+    }else if(payment.gems){
 
 	    // спрайт gems (условия)
 	    FillSPRITE(&sprite, "RESOURCE.ICN", 5);
@@ -291,7 +290,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество gems (условия)
-	    sprintf(str, "%d", payment->gems);
+	    sprintf(str, "%d", payment.gems);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -427,19 +426,19 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 		if(countAvailable && CheckBuyMonsterFromCastle(castle, levelMonster, resultRecrutMonster + 1)){
 		    resultRecrutMonster++;
 		    countAvailable--;
-		    if(payment->wood)
-			resultCountResource += payment->wood;
-		    else if(payment->ore)
-			resultCountResource += payment->ore;
-		    else if(payment->mercury)
-			resultCountResource += payment->mercury;
-		    else if(payment->crystal)
-			resultCountResource += payment->crystal;
-		    else if(payment->sulfur)
-			resultCountResource += payment->sulfur;
-		    else if(payment->gems)
-			resultCountResource += payment->gems;
-		    resultCountGold += payment->gold;
+		    if(payment.wood)
+			resultCountResource += payment.wood;
+		    else if(payment.ore)
+			resultCountResource += payment.ore;
+		    else if(payment.mercury)
+			resultCountResource += payment.mercury;
+		    else if(payment.crystal)
+			resultCountResource += payment.crystal;
+		    else if(payment.sulfur)
+			resultCountResource += payment.sulfur;
+		    else if(payment.gems)
+			resultCountResource += payment.gems;
+		    resultCountGold += payment.gold;
 		    CursorOff();
 		    RedrawDinamicRecrutMonster(stat, &rectBack, emonster, countAvailable, resultRecrutMonster, resultCountResource, resultCountGold);
 		    CursorOn();
@@ -450,19 +449,19 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 		if(resultRecrutMonster){
 		    resultRecrutMonster--;
 		    countAvailable++;
-		    if(payment->wood)
-			resultCountResource -= payment->wood;
-		    else if(payment->ore)
-			resultCountResource -= payment->ore;
-		    else if(payment->mercury)
-			resultCountResource -= payment->mercury;
-		    else if(payment->crystal)
-			resultCountResource -= payment->crystal;
-		    else if(payment->sulfur)
-			resultCountResource -= payment->sulfur;
-		    else if(payment->gems)
-			resultCountResource -= payment->gems;
-		    resultCountGold -= payment->gold;
+		    if(payment.wood)
+			resultCountResource -= payment.wood;
+		    else if(payment.ore)
+			resultCountResource -= payment.ore;
+		    else if(payment.mercury)
+			resultCountResource -= payment.mercury;
+		    else if(payment.crystal)
+			resultCountResource -= payment.crystal;
+		    else if(payment.sulfur)
+			resultCountResource -= payment.sulfur;
+		    else if(payment.gems)
+			resultCountResource -= payment.gems;
+		    resultCountGold -= payment.gold;
 		    CursorOff();
 		    RedrawDinamicRecrutMonster(stat, &rectBack, emonster, countAvailable, resultRecrutMonster, resultCountResource, resultCountGold);
 		    CursorOn();
@@ -473,19 +472,19 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 		while(countAvailable && CheckBuyMonsterFromCastle(castle, levelMonster, resultRecrutMonster + 1)){
 		    resultRecrutMonster++;
 		    countAvailable--;
-		    if(payment->wood)
-			resultCountResource += payment->wood;
-		    else if(payment->ore)
-			resultCountResource += payment->ore;
-		    else if(payment->mercury)
-			resultCountResource += payment->mercury;
-		    else if(payment->crystal)
-			resultCountResource += payment->crystal;
-		    else if(payment->sulfur)
-			resultCountResource += payment->sulfur;
-		    else if(payment->gems)
-			resultCountResource += payment->gems;
-		    resultCountGold += payment->gold;
+		    if(payment.wood)
+			resultCountResource += payment.wood;
+		    else if(payment.ore)
+			resultCountResource += payment.ore;
+		    else if(payment.mercury)
+			resultCountResource += payment.mercury;
+		    else if(payment.crystal)
+			resultCountResource += payment.crystal;
+		    else if(payment.sulfur)
+			resultCountResource += payment.sulfur;
+		    else if(payment.gems)
+			resultCountResource += payment.gems;
+		    resultCountGold += payment.gold;
 		}
 		CursorOff();
 		RedrawDinamicRecrutMonster(stat, &rectBack, emonster, countAvailable, resultRecrutMonster, resultCountResource, resultCountGold);
@@ -536,14 +535,14 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
     rectCur.x = rectCur.x - rectCur.w / 2;
     PrintText(video, &rectCur, str, FONT_BIG);
 
-    const S_PAYMENT *payment = PaymentConditionsMonster(emonster);
+    S_PAYMENT payment = *(PaymentConditionsMonster(emonster));
     // cost per troop
-    if( payment->wood ||
-        payment->ore ||
-	payment->crystal ||
-        payment->sulfur ||
-        payment-> mercury ||
-        payment->gems ){
+    if( payment.wood ||
+        payment.ore ||
+	payment.crystal ||
+        payment.sulfur ||
+        payment. mercury ||
+        payment.gems ){
 	// text count gold
 	sprintf(str, "%d", resultCountGold);
 	rectCur.x = rect->x + 133;

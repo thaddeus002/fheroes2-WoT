@@ -47,6 +47,7 @@
 #include "spell.h"
 #include "magictower.h"
 #include "castle.h"
+#include "armyinfo.h"
 #include "castleaction.h"
 #include "castle_kngt.h"
 #include "castle_brbn.h"
@@ -1393,20 +1394,17 @@ ACTION ActionClickCastleMonster(void){
     // двойной клик - инфо монстра
     if(backMonsterCursor.select == index && backMonsterCursor.use){
 	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-	switch(ShowArmyInfo(&currentCastle->army[index], NULL)){
+	switch(ShowArmyInfo(&currentCastle->army[index], NULL, currentCastle)){
 	    case DISMISS:
-		CursorOff();
 		currentCastle->army[index].monster = MONSTERNONE;
 		currentCastle->army[index].count = 0;
 		RedrawCastleMonster();
-		CursorOn();
 		break;
 
 	    case UPGRADE:
-		CursorOff();
-		currentCastle->army[index].monster = UpgradeMonster(currentCastle->army[index].monster);
+		UpgradeArmy(&currentCastle->army[index], currentCastle->color);
 		RedrawCastleMonster();
-		CursorOn();
+		RedrawCastleInfoResource();
 		break;
 	
 	    case EXIT:
@@ -1416,7 +1414,6 @@ ACTION ActionClickCastleMonster(void){
 	    default:
 		break;
 	}
-	CursorOff();
 	backMonsterCursor.use = FALSE;
     // обмен
     }else if(backMonsterCursor.use){
@@ -1534,13 +1531,14 @@ ACTION ActionClickHeroesMonster(void){
     E_MONSTER monster = MONSTERNONE;
     S_HEROES *heroes = GetStatHeroes(heroesName);
     if(! heroes) return NONE;
+    const S_CASTLE *castle = GetStatCastlePos(heroes->ax, heroes->ay);
 
     if(MONSTERNONE == heroes->army[index].monster) return ActionClickHeroesMonsterEmpty(index);
 
     // двойной клик - инфо монстра
     if(backMonsterCursor.select == index && backMonsterCursor.use){
 	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-	switch(ShowArmyInfo(&heroes->army[index], heroes)){
+	switch(ShowArmyInfo(&heroes->army[index], heroes, castle)){
 	    case DISMISS:
 		CursorOff();
 		heroes->army[index].monster = MONSTERNONE;
@@ -1551,8 +1549,9 @@ ACTION ActionClickHeroesMonster(void){
 
 	    case UPGRADE:
 		CursorOff();
-		heroes->army[index].monster = UpgradeMonster(heroes->army[index].monster);
+		UpgradeArmy(&heroes->army[index], heroes->color);
 		RedrawHeroesMonster(heroesName);
+		RedrawCastleInfoResource();
 		CursorOn();
 		break;
 
@@ -1671,6 +1670,7 @@ void RedrawCastleMonster(void){
     ICNHEADER *header = NULL;
 
     char message[8];
+    CursorOff();
 
     // рисуем фон ячеек для монстров
     FillSPRITE(&sprite, "STRIP.ICN", 2);
@@ -1757,6 +1757,8 @@ void RedrawHeroesMonster(E_NAMEHEROES name){
     Uint8 i;
     ICNHEADER *header = NULL;
     S_HEROES *heroes = GetStatHeroes(name);
+
+    CursorOff();
 
     char message[8];
 
@@ -2057,6 +2059,8 @@ void RedrawCastleInfoResource(void){
     char message[8];
     Uint16 cx, cy;
     
+    CursorOff();
+
     video = SDL_GetVideoSurface();
     if(GetIntValue(VIDEOMODE)){
         rectBack.x = video->w / 2 - 320 - BORDERWIDTH - SHADOWWIDTH;
@@ -2786,6 +2790,18 @@ BUILDACTION AllowBuildDwelling6(const S_CASTLE *castle){
 	}
 
     else return ALREADY_BUILD;
+
+    return CANNOT_BUILD;
+}
+
+BUILDACTION AllowRecrutHeroes(const S_CASTLE *castle){
+
+    // незабыть проверку на макс количество
+
+    //если герой присутствет в замке
+    if(CastlePresentHeroes(castle)) return ALREADY_BUILD;
+
+    if(KingdomAllowPayment(castle->color, PaymentConditionsRecrutHeroes())) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -3633,4 +3649,68 @@ E_MAGICLEVEL GetMageGuildLevel(const S_CASTLE *castle){
     if(castle->building & BUILD_MAGEGUILD1) return MAGIC_LEVEL1;
 
     return MAGIC_NONE;
+}
+
+    
+ACTION UpgradableArmy(const S_ARMY *army, E_COLORS color, const S_CASTLE *castle){
+    
+    E_MONSTER upgradeMonster = GetUpgradeMonster(army->monster);
+    
+    if(army->monster == upgradeMonster) return EXIT;
+    
+    // check upgrade building
+    if(!castle) return EXIT;
+
+    Uint8 i;
+    BOOL upgrade = FALSE;
+
+    for(i = 1; i < CASTLEMAXMONSTER; ++i)
+	if(upgradeMonster == GetMonsterFromCastle(castle, i + 1))
+	    switch(i + 1){
+	    
+		case 2:
+		    if(castle->dwelling & DWELLING_UPGRADE2) upgrade = TRUE;
+		    break;
+
+		case 3:
+		    if(castle->dwelling & DWELLING_UPGRADE3) upgrade = TRUE;
+		    break;
+
+		case 4:
+		    if(castle->dwelling & DWELLING_UPGRADE4) upgrade = TRUE;
+		    break;
+
+		case 5:
+		    if(castle->dwelling & DWELLING_UPGRADE5) upgrade = TRUE;
+		    break;
+
+		case 6:
+		    if(castle->dwelling & DWELLING_UPGRADE7) upgrade = TRUE;
+		    else if(GREEN_DRAGON == army->monster && castle->dwelling & DWELLING_UPGRADE6) upgrade = TRUE;
+		    break;
+		
+		default:
+		    break;
+	    }
+
+    // check resource
+    if(upgrade && KingdomAllowPayment(color, GetMultiPayment(PaymentConditionsUpgradeMonster(army->monster, upgradeMonster), army->count * RATE_DIFFERENCE_UPGRADE))) return YES;
+
+    return NO;
+}
+
+void UpgradeArmy(S_ARMY *army, E_COLORS color){
+
+    if(! army) return;
+
+    E_MONSTER upgradeMonster = GetUpgradeMonster(army->monster);
+    
+    KingdomWasteResource(color, GetMultiPayment(PaymentConditionsUpgradeMonster(army->monster, upgradeMonster), army->count * RATE_DIFFERENCE_UPGRADE));
+    
+    army->monster = upgradeMonster;
+}
+
+BOOL CastlePresentHeroes(const S_CASTLE *castle){
+
+    return TRUE;
 }

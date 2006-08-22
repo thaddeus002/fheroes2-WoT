@@ -1233,7 +1233,7 @@ Uint8 GetMonsterGrown(E_MONSTER name){
     return ptrMonster[name].grown;
 }
 
-E_MONSTER UpgradeMonster(E_MONSTER name){
+E_MONSTER GetUpgradeMonster(E_MONSTER name){
 
     E_MONSTER result = name;
 
@@ -1328,15 +1328,4 @@ E_MONSTER UpgradeMonster(E_MONSTER name){
     }
     
     return result;
-}
-
-ACTION UpgradableArmy(const S_ARMY *army, E_COLORS color){
-    
-    E_MONSTER upgradeMonster = UpgradeMonster(army->monster);
-
-    if(army->monster == upgradeMonster) return EXIT;
-
-    if(KingdomAllowPayment(color, GetMultiPayment(PaymentConditionsMonster(upgradeMonster), army->count))) return YES;
-
-    return NO;
 }

@@ -205,6 +205,7 @@ BOOL		BuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
 BOOL		CheckBuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
 BOOL		CastleDwellingUpgradable(const S_CASTLE *, E_DWELLINGCASTLE);
 BOOL		CastleNearOcean(const S_CASTLE *);
+BOOL		CastlePresentHeroes(const S_CASTLE *);
 
 void		CastleIncreaseArmy(const S_CASTLE *, E_DWELLINGCASTLE, Uint8);
 void		AllCastleIncreaseArmy(void);
@@ -236,6 +237,7 @@ BUILDACTION	AllowBuildDwelling3(const S_CASTLE *);
 BUILDACTION	AllowBuildDwelling4(const S_CASTLE *);
 BUILDACTION	AllowBuildDwelling5(const S_CASTLE *);
 BUILDACTION	AllowBuildDwelling6(const S_CASTLE *);
+BUILDACTION	AllowRecrutHeroes(const S_CASTLE *);
 
 BOOL		BuildWel2(const S_CASTLE *);
 BOOL		BuildSpec(const S_CASTLE *);
@@ -265,6 +267,9 @@ BOOL		BuildUpgrade6(const S_CASTLE *);
 BOOL		BuildUpgrade7(const S_CASTLE *);
 
 void		EnableCastleUpdateBuilding(void);
+
+ACTION          UpgradableArmy(const S_ARMY *, E_COLORS, const S_CASTLE *);
+void		UpgradeArmy(S_ARMY *army, E_COLORS color);
 
 #endif
 

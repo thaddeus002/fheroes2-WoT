@@ -26,36 +26,13 @@
     Description:
 */
 
-#ifndef _TOOLS_H
-#define _TOOLS_H
+#ifndef _ARMYINFO_H
+#define _ARMYINFO_H
 
-#include "gamedefs.h"
-#include "agg.h"
+#include "monster.h"
+#include "heroes.h"
+#include "castle.h"
 
-#define FONT_LETTER_BEGIN	0x20
-#define FONT_LETTER_END		0x7F
-#define FONT_WIDTHBIG           0x0E 
-#define FONT_WIDTHSMALL         0x07
-#define FONT_HEIGHTBIG          0x10
-#define FONT_HEIGHTSMALL        0x0B
-
-typedef enum {FONT_BIG, FONT_SMALL} ENUMFONT;
-
-BOOL ValidPoint(SDL_Rect *, Uint16, Uint16);
-BOOL CompareRect(SDL_Rect *, SDL_Rect *);
-
-Uint16 GetHiUint32(Uint32);
-Uint16 GetLoUint32(Uint32);
-Uint8  GetHiUint16(Uint16);
-Uint8  GetLoUint16(Uint16);
-Uint32 PackUint32(Uint16, Uint16);
-Uint16 PackUint16(Uint8, Uint8);
-Uint32 GetSizeSurface(SDL_Surface *);
-
-void FillSPRITE(AGGSPRITE *, const char *, Uint16);
-
-void	PrintText(SDL_Surface *, SDL_Rect *, const char *, ENUMFONT);
-void	PrintAlignText(SDL_Surface *, SDL_Rect *, const char *, ENUMFONT);
-Uint16	GetLengthText(const char *, ENUMFONT);
+ACTION          ShowArmyInfo(const S_ARMY *, const S_HEROES *, const S_CASTLE *);
 
 #endif

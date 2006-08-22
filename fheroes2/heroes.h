@@ -195,10 +195,10 @@ E_LEVELSKILL	HeroesLevelSkill(const S_HEROES *, E_SKILL);
 void		HeroesDefaultValues(S_HEROES *, E_RACE);
 Uint8		HeroesCountArmy(const S_HEROES *);
 S_HEROES       *GetStatHeroes(E_NAMEHEROES);
-ACTION		ShowArmyInfo(const S_ARMY *, const S_HEROES *);
 
 const char *	HeroesBigNamePortrait(E_NAMEHEROES);
 const char *	CapitanBigNamePortrait(E_RACE);
+const char *	HeroesGetStringName(E_NAMEHEROES);
 
 E_NAMEHEROES	GetRecrutPrimaryHeroes(void);
 E_NAMEHEROES	GetRecrutSecondaryHeroes(void);

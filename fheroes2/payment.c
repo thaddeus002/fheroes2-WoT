@@ -928,6 +928,35 @@ const S_PAYMENT * PaymentConditionsMonster(E_MONSTER monster){
     return &paymentObject;
 }
 
+const S_PAYMENT * PaymentConditionsUpgradeMonster(E_MONSTER oldMonster, E_MONSTER newMonster){
+    
+    S_PAYMENT oldPayment = *(PaymentConditionsMonster(oldMonster));
+    S_PAYMENT newPayment = *(PaymentConditionsMonster(newMonster));
+
+    paymentObject.gold = newPayment.gold - oldPayment.gold;
+    paymentObject.wood = newPayment.wood - oldPayment.wood;
+    paymentObject.ore = newPayment.ore - oldPayment.ore;
+    paymentObject.mercury = newPayment.mercury - oldPayment.mercury;
+    paymentObject.crystal = newPayment.crystal - oldPayment.crystal;
+    paymentObject.sulfur = newPayment.sulfur - oldPayment.sulfur;
+    paymentObject.gems = newPayment.gems - oldPayment.gems;
+
+    return &paymentObject;
+}
+
+const S_PAYMENT * PaymentConditionsRecrutHeroes(void){
+
+    paymentObject.gold = RECRUT_HEROES_GOLD;
+    paymentObject.wood = 0;
+    paymentObject.ore = 0;
+    paymentObject.mercury = 0;
+    paymentObject.crystal = 0;
+    paymentObject.sulfur = 0;
+    paymentObject.gems = 0;
+
+    return &paymentObject;
+}
+
 const S_PAYMENT * GetMultiPayment(const S_PAYMENT *payment, Uint16 count){
 
     if(payment->gold) paymentObject.gold = payment->gold * count;

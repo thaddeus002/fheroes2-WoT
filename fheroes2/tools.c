@@ -32,6 +32,10 @@
 #include "SDL.h"
 #include "tools.h"
 
+Uint8   GetLengthLetter(char, ENUMFONT);
+Uint16	GetLengthSubstr(const char *, const char *, ENUMFONT);
+void 	PrintSubstr(SDL_Surface *, SDL_Rect *, const char *, const char *, ENUMFONT);
+
 BOOL ValidPoint(SDL_Rect *rect, Uint16 x, Uint16 y){
 
     if(rect && x >= rect->x && x <= rect->x + rect->w && y >= rect->y && y <= rect->y + rect->h)
@@ -245,6 +249,38 @@ void PrintText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFON
     }
 }
 
+void PrintAlignText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFONT font){
+
+    const char	*first, *end;
+    SDL_Rect cur = *rect;
+
+    first = string;
+    end = &string[strlen(string)];
+    
+    while(first < end){
+    
+	// поиск оптимальной ширины строки
+	while(rect->w < GetLengthSubstr(first, end, font)) --end;
+    
+	// поиск пробела
+	while(*end != 0x20 && end > first && end != &string[strlen(string)]) --end;
+
+	if(end == first) end = &string[strlen(string)];
+
+	// рисуем строку посередине
+	cur.x = rect->x + (rect->w - GetLengthSubstr(first, end, font)) / 2;
+	PrintSubstr(surface, &cur, first, end, font);
+
+	// перевод новой строки
+	if(FONT_BIG == font) cur.y += FONT_HEIGHTBIG; else cur.y += FONT_HEIGHTSMALL;
+	if(cur.y > rect->y + rect->h) return;
+
+	// востанавливаем значения
+	first = end;
+	end = &string[strlen(string)];
+    }
+}
+
 Uint16 GetLengthText(const char *string, ENUMFONT font){
 
     Uint16	result = 0;
@@ -305,8 +341,157 @@ Uint16 GetLengthText(const char *string, ENUMFONT font){
 
 	++string;
     }
+
     return result;
 }
+
+Uint8 GetLengthLetter(char chr, ENUMFONT font){
+
+    Uint8 result = 0;
+
+    AGGSPRITE	sprite;
+    SDL_Surface	*letter = NULL;
+
+    // здесь пробел
+    if(0x20 == chr)
+	switch(font){
+	    case FONT_SMALL:
+		result = FONT_WIDTHSMALL / 2;
+		break;
+	    case FONT_BIG:
+		result = FONT_WIDTHBIG / 2;
+		break;
+	    default:
+		break;
+	}
+
+    // если в диаппазоне FONT_LETTER_BEGIN FONT_LETTER_END
+    else if(FONT_LETTER_BEGIN < chr && FONT_LETTER_END > chr){
+
+	// рисуем букву
+	if(font == FONT_BIG)
+	    FillSPRITE(&sprite, "FONT.ICN", chr - FONT_LETTER_BEGIN);
+	else
+	    FillSPRITE(&sprite, "SMALFONT.ICN", chr - FONT_LETTER_BEGIN);
+
+	letter = GetICNSprite(&sprite);
+
+	result = letter->w;
+    }
+
+    return result;
+}
+
+Uint16 GetLengthSubstr(const char *s1, const char *s2, ENUMFONT font){
+
+    Uint16 result = 0;
+
+    if(!s1 || !s2) return result;
+    
+    const char *head = s1;
+    
+    while(head != s2){
+	result += GetLengthLetter(*head, font);
+	++head;
+    }
+    
+    return result;
+}
+
+void PrintSubstr(SDL_Surface *surface, SDL_Rect *rect, const char *s1, const char *s2, ENUMFONT font){
+
+    SDL_Surface	*letter = NULL;
+    SDL_Rect	dst = *rect;
+    Uint16	rezy = rect->y;
+    AGGSPRITE	sprite;
+
+    // парсим string по буквам
+    while(s1 < s2){
+
+    	// здесь пробел
+	if(0x20 == *s1)
+	    switch(font){
+		case FONT_SMALL:
+		    dst.x += FONT_WIDTHSMALL / 2;
+		    break;
+		case FONT_BIG:
+		    dst.x += FONT_WIDTHBIG / 2;
+		    break;
+		default:
+		    break;
+	    }
+
+	// если в диаппазоне FONT_LETTER_BEGIN FONT_LETTER_END
+	else if(FONT_LETTER_BEGIN < *s1 && FONT_LETTER_END > *s1){
+
+	    // рисуем букву
+	    if(font == FONT_BIG)
+		FillSPRITE(&sprite,"FONT.ICN", *s1 - FONT_LETTER_BEGIN);
+	    else
+		FillSPRITE(&sprite,"SMALFONT.ICN", *s1 - FONT_LETTER_BEGIN);
+	    letter = GetICNSprite(&sprite);
+
+	    // выравнивание по высоте буквы
+	    dst.y = rezy;
+	    if(font == FONT_SMALL)
+		switch(*s1){
+		    
+		    case '-':
+	    		    dst.y += FONT_HEIGHTSMALL / 2;
+			break;
+		    // '
+		    case 0x27:
+			break;
+
+		    case 'y':
+		    case 'g':
+		    case 'p':
+		    case 'q':
+		    case 'j':
+	    		    dst.y += FONT_HEIGHTSMALL - letter->h + 2;
+			break;
+
+		    default:
+			if(letter->h < FONT_HEIGHTSMALL)
+	    		    dst.y += FONT_HEIGHTSMALL - letter->h;
+			break;
+		}
+	    else if(font == FONT_BIG)
+		switch(*s1){
+		    
+		    case '-':
+	    		    dst.y += FONT_HEIGHTBIG / 2;
+			break;
+		    // '
+		    case 0x27:
+	    		    dst.y += 3;
+			break;
+
+		    case 'y':
+		    case 'g':
+		    case 'p':
+		    case 'q':
+		    case 'j':
+	    		    dst.y += FONT_HEIGHTBIG - letter->h + 3;
+			break;
+
+		    default:
+			if(letter->h < FONT_HEIGHTBIG)
+	    		    dst.y += FONT_HEIGHTBIG - letter->h;
+			break;
+		}
+	    
+	    SDL_BlitSurface(letter, NULL, surface, &dst);
+	    dst.x += letter->w;
+
+	    if(dst.x > (rect->x + rect->w)) return;
+	    if(rezy > (rect->y + rect->h)) return;
+	}
+
+	++s1;
+    }
+}
+
 
 Uint32 GetSizeSurface(SDL_Surface *surface){
 

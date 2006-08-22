@@ -31,6 +31,11 @@
 
 #include "castle.h"
 
+// коэффициент разности обновления монстров
+#define RATE_DIFFERENCE_UPGRADE		2
+#define RECRUT_HEROES_GOLD		2500
+
+// стоимость построек
 #define BUILD_CASTLE_GOLD		5000
 #define BUILD_CASTLE_WOOD		20
 #define BUILD_CASTLE_ORE		20
@@ -345,6 +350,8 @@ typedef struct {
 const S_PAYMENT * PaymentConditionsBuilding(E_RACE, E_BUILDINGCASTLE);
 const S_PAYMENT * PaymentConditionsDwelling(E_RACE, E_DWELLINGCASTLE); 
 const S_PAYMENT * PaymentConditionsMonster(E_MONSTER); 
+const S_PAYMENT * PaymentConditionsUpgradeMonster(E_MONSTER, E_MONSTER); 
+const S_PAYMENT * PaymentConditionsRecrutHeroes(void); 
 const S_PAYMENT * GetMultiPayment(const S_PAYMENT *, Uint16); 
 
 #endif

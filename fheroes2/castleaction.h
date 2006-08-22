@@ -92,6 +92,8 @@ ACTION ActionCastleOverDwelling4(void);
 ACTION ActionCastleOverDwelling5(void);
 ACTION ActionCastleOverDwelling6(void);
 ACTION ActionCastleOverCaptain(void);
+ACTION ActionCastleOverRecrutPrimaryHeroes(void);
+ACTION ActionCastleOverRecrutSecondaryHeroes(void);
 
 ACTION ActionCastleClickExit(void);
 ACTION ActionCastleClickTavern(void);
@@ -113,5 +115,9 @@ ACTION ActionCastleClickDwelling4(void);
 ACTION ActionCastleClickDwelling5(void);
 ACTION ActionCastleClickDwelling6(void);
 ACTION ActionCastleClickCaptain(void);
+ACTION ActionCastleRClickRecrutPrimaryHeroes(void);
+ACTION ActionCastleRClickRecrutSecondaryHeroes(void);
+ACTION ActionCastleLClickRecrutPrimaryHeroes(void);
+ACTION ActionCastleLClickRecrutSecondaryHeroes(void);
 
 #endif

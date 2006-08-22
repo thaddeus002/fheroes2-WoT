@@ -239,8 +239,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->skill[0].level	= BASIC;
 	    heroes->skill[1].type	= BALLISTICS;
 	    heroes->skill[1].level	= BASIC;
-	    heroes->army[0].count	= 1;
+	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, PEASANT);
 	    heroes->army[0].monster	= PEASANT;
+	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ARCHER);
+	    heroes->army[1].monster	= ARCHER;
 	
 	    break;
 	    
@@ -253,8 +255,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->knowledge		= 1;
 	    heroes->skill[0].type	= PATHFINDING;
 	    heroes->skill[0].level	= ADVANCED;
-	    heroes->army[0].count	= 1;
+	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, GOBLIN);
 	    heroes->army[0].monster	= GOBLIN;
+	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ORC);
+	    heroes->army[1].monster	= ORC;
 	
 	    break;
 
@@ -269,8 +273,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->skill[0].level	= BASIC;
 	    heroes->skill[1].type	= WISDOM;
 	    heroes->skill[1].level	= BASIC;
-	    heroes->army[0].count	= 1;
+	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, SKELETON);
 	    heroes->army[0].monster	= SKELETON;
+	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ZOMBIE);
+	    heroes->army[1].monster	= ZOMBIE;
 	    heroes->artifact[0]		= MAGIC_BOOK;
 	    AddMagicToBook(HASTE);
 	    break;
@@ -286,8 +292,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->skill[0].level	= ADVANCED;
 	    heroes->skill[1].type	= WISDOM;
 	    heroes->skill[1].level	= BASIC;
-	    heroes->army[0].count	= 1;
+	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, SPRITE);
 	    heroes->army[0].monster	= SPRITE;
+	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, DWARF);
+	    heroes->army[1].monster	= DWARF;
 	    heroes->artifact[0]		= MAGIC_BOOK;
 	    AddMagicToBook(BLESS);
 	    break;
@@ -303,8 +311,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->skill[0].level	= ADVANCED;
 	    heroes->skill[1].type	= WISDOM;
 	    heroes->skill[1].level	= BASIC;
-	    heroes->army[0].count	= 1;
+	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, CENTAUR);
 	    heroes->army[0].monster	= CENTAUR;
+	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, GARGOYLE);
+	    heroes->army[1].monster	= GARGOYLE;
 	    heroes->artifact[0]		= MAGIC_BOOK;
 	    AddMagicToBook(CURSE);
 	    break;
@@ -318,9 +328,11 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->knowledge		= 2;
 	    heroes->skill[0].type	= WISDOM;
 	    heroes->skill[0].level	= ADVANCED;
-	    heroes->army[0].count	= 1;
+	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, HALFLING);
 	    heroes->army[0].monster	= HALFLING;
 	    heroes->artifact[0]		= MAGIC_BOOK;
+	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, BOAR);
+	    heroes->army[1].monster	= BOAR;
 	    AddMagicToBook(STONESKIN);
 	    break;
 
@@ -850,263 +862,6 @@ const char * CapitanBigNamePortrait(E_RACE race){
     return heroesPortrait;
 }
 
-ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes){
-
-    SDL_Surface *video = SDL_GetVideoSurface();
-    SDL_Surface *image = NULL;
-    SDL_Surface *background = NULL;
-    AGGSPRITE sprite;
-    const char *icnname = NULL;
-    INTERFACEACTION action;
-    INTERFACEACTION *dialog = NULL;
-    ACTION result = NONE;
-    SDL_Rect rectBack, rect;
-    char str[64];
-    char message[8];
-    BOOL exit;
-
-    if(GetIntValue(EVILINTERFACE)){ icnname = "VIEWARME.ICN"; }else{  icnname = "VIEWARMY.ICN"; }
-
-    CursorOff();
-    SetIntValue(ANIM3, FALSE);
-
-    Uint32 cursor = GetCursor();
-
-    FillSPRITE(&sprite, icnname, 0);
-    image = GetICNSprite(&sprite);
-    rectBack.x = video->w / 2 - image->w / 2;
-    rectBack.y = video->h / 2 - image->h / 2;
-    rectBack.w = image->w;
-    rectBack.h = image->h;
-    
-    // сохраняем background
-    if(NULL == (background = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
-        fprintf(stderr, "ShowArmyInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
-        return NONE;
-    }
-    SDL_BlitSurface(video, &rectBack, background, NULL);
-
-    // рисуем картинку диалога
-    SDL_BlitSurface(image, NULL, video , &rectBack);
-
-    // рисуем картинку монстра
-    S_MONSTER *monster = GetStatMonster(army->monster);
-    FillSPRITE(&sprite, monster->filename, 2);
-    image = GetICNSprite(&sprite);
-    rect.x = rectBack.x + 150 - image->w / 2;
-    rect.y = rectBack.y + 100;
-    rect.w = image->w;
-    rect.h = image->h;
-    SDL_BlitSurface(image, NULL, video , &rect);
-
-    // наименование
-    rect.x = rectBack.x + 120;
-    rect.y = rectBack.y + 35;
-    rect.w = GetLengthText(monster->descriptions, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    PrintText(video, &rect, monster->descriptions, FONT_BIG);
-
-    // количество
-    memset(message, 0, strlen(message));
-    sprintf(message, "%5d", army->count);
-    rect.x = rectBack.x + 120;
-    rect.y = rectBack.y + 224;
-    rect.w = GetLengthText(message, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    PrintText(video, &rect, message, FONT_BIG);
-
-    // attack
-    sprintf(str, "Attack Skill: %d", monster->attack);
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // defence
-    sprintf(str, "Defense Skill: %d", monster->defence);
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // shot
-    sprintf(str, "Shots: %d", monster->shots);
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 2 + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // damage
-    sprintf(str, "Damage: %d - %d", monster->damageMin, monster->damageMax);
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 3 + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // hp
-    sprintf(str, "Hit Points: %d", monster->hp);
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 4 + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // speed
-    sprintf(str, "Speed: %s", GetStringSpeed(monster->speed));
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 5 + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // morale
-    heroes ? sprintf(str, "Morale: %s", GetStringMorale(CalculateHeroesMorale(heroes))) : sprintf(str, "Morale: Normal");
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 6 + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // luck
-    heroes ? sprintf(str, "Luck: %s", GetStringLuck(CalculateHeroesLuck(heroes))) : sprintf(str, "Luck: Normal");
-    rect.x = rectBack.x + 400;
-    rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 7 + FONT_HEIGHTBIG / 2;
-    rect.w = GetLengthText(str, FONT_BIG);
-    rect.h = FONT_HEIGHTBIG;
-    rect.x = rect.x - rect.w / 2;
-    PrintText(video, &rect, str, FONT_BIG);
-
-    // click upgrade
-    switch(UpgradableArmy(army, GetIntValue(HUMANCOLORS))){
-    
-	case YES:
-	    FillSPRITE(&sprite, icnname, 5);
-	    image = GetICNSprite(&sprite);
-	    rect.x = rectBack.x + 290;
-	    rect.y = rectBack.y + 190;
-	    rect.w = image->w;
-	    rect.h = image->h;
-	    // click
-	    ZeroINTERFACEACTION(&action);
-	    FillSPRITE(&action.objectUp, icnname, 5);
-	    FillSPRITE(&action.objectPush, icnname, 6);
-	    action.rect = rect;
-	    action.mouseEvent = MOUSE_LCLICK;
-	    action.pf = ActionPressUPGRADE;
-	    AddActionEvent(&dialog, &action);
-	    SDL_BlitSurface(image, NULL, video, &rect);
-	    break;
-	
-	case NO:
-	    FillSPRITE(&sprite, icnname, 6);
-	    image = GetICNSprite(&sprite);
-	    rect.x = rectBack.x + 290;
-	    rect.y = rectBack.y + 190;
-	    rect.w = image->w;
-	    rect.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rect);
-	    break;
-	
-	default:
-	    break;
-    }
-
-    // click dismiss
-    if(heroes && 1 == HeroesCountArmy(heroes)){
-	FillSPRITE(&sprite, icnname, 2);
-	image = GetICNSprite(&sprite);
-	rect.x = rectBack.x + 290;
-	rect.y = rectBack.y + 220;
-	rect.w = image->w;
-	rect.h = image->h;
-    }else{
-	FillSPRITE(&sprite, icnname, 1);
-	image = GetICNSprite(&sprite);
-	rect.x = rectBack.x + 290;
-	rect.y = rectBack.y + 220;
-	rect.w = image->w;
-	rect.h = image->h;
-	// click
-	ZeroINTERFACEACTION(&action);
-	FillSPRITE(&action.objectUp, icnname, 1);
-	FillSPRITE(&action.objectPush, icnname, 2);
-	action.rect = rect;
-	action.mouseEvent = MOUSE_LCLICK;
-	action.pf = ActionPressDISMISS;
-	AddActionEvent(&dialog, &action);
-    }
-    SDL_BlitSurface(image, NULL, video, &rect);
-
-    // click exit
-    FillSPRITE(&sprite, icnname, 3);
-    image = GetICNSprite(&sprite);
-    rect.x = rectBack.x + 420;
-    rect.y = rectBack.y + 220;
-    rect.w = image->w;
-    rect.h = image->h;
-    // click
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, icnname, 3);
-    FillSPRITE(&action.objectPush, icnname, 4);
-    action.rect = rect;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressCANCEL;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(image, NULL, video, &rect);
-
-    SDL_Flip(video);
-    SetCursor(CURSOR_POINTER);
-            
-    CursorOn();
-
-    exit = FALSE;
-    while(! exit)
-        switch(ActionCycle(dialog)){
-
-            case UPGRADE:
-                exit = TRUE;
-                result = UPGRADE;
-            break;
-
-            case EXIT:
-                exit = TRUE;
-                result = EXIT;
-            break;
-
-            case ESC:
-            case CANCEL:
-                exit = TRUE;
-                result = CANCEL;
-            break;
-	    
-	    default:
-	    break;
-    }
-        
-    CursorOff();
-
-    SDL_BlitSurface(background, NULL, video, &rectBack);
-    FreeActionEvent(dialog);
-    SDL_FreeSurface(background);
-
-    SetCursor(cursor);
-    SetIntValue(ANIM3, TRUE);
-    CursorOn();
-
-    return result;
-}
-
 E_NAMEHEROES    GetRecrutPrimaryHeroes(void){
 
     return ROLAND;
@@ -1115,4 +870,9 @@ E_NAMEHEROES    GetRecrutPrimaryHeroes(void){
 E_NAMEHEROES    GetRecrutSecondaryHeroes(void){
 
     return ARCHIBALD;
+}
+
+const char * HeroesGetStringName(E_NAMEHEROES name){
+
+    return allHeroes[name].name;
 }

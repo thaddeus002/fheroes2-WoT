@@ -134,7 +134,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     rectCur.y = rectBack.y + 70;
     rectCur.w = BOXWIDTH - 70;
     rectCur.h = BOXHEIGHT - 150;
-    PrintText(video, &rectCur, message, font);
+    PrintAlignText(video, &rectCur, message, font);
 
     // рисуем кнопки
     INTERFACEACTION action;

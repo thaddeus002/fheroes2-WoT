@@ -3351,7 +3351,7 @@ ACTION ActionGAMELOOP(void){
 	// ход humans
 	while(! (ENDTUR == (exit = ActionHUMANLOOP(stpemaindisplay)) || 
 		EXIT == exit || 
-		(ESC == exit && YES == MessageBox("Are you sure you want to\n\t\t\t quit?", FONT_BIG))) );
+		(ESC == exit && YES == MessageBox("Are you sure you want to quit?", FONT_BIG))) );
 
 	if(EXIT == exit || ESC == exit){
 	    exit = EXIT;

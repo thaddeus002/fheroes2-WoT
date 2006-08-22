@@ -37,6 +37,7 @@
 
 const char * GetStringObject(E_OBJECT);
 const char * GetStringRace(E_RACE);
+const char * GetStringGameLevel(E_GAMELEVEL);
 const char * GetStringColor(E_COLORS);
 const char * GetStringLuck(E_LUCK);
 const char * GetStringMorale(E_MORALE);

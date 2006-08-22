@@ -31,6 +31,7 @@
 #include <string.h>
 #include "SDL.h"
 #include "agg.h"
+#include "debug.h"
 #include "actionevent.h"
 #include "config.h"
 #include "cursor.h"
@@ -807,10 +808,10 @@ void ShowListFileMap(void){
 	    SDL_BlitSurface(image, NULL, video, &dest);
 	    
 	    // отображаем имя карты
-	    dest.x += dest.w + 14;
-	    dest.w = FONT_WIDTHBIG * 10;
-	    dest.h = FONT_HEIGHTBIG / 2;
-	    PrintText(video, &dest, (const char *) ptr->info.longname, FONT_BIG);
+            dest.x += dest.w + 14;
+            dest.w = FONT_WIDTHBIG * 10;
+            dest.h = FONT_HEIGHTBIG;
+            PrintText(video, &dest, (const char *) ptr->info.longname, FONT_BIG);
 
 	    // отображаем условия победы
 	    FillSPRITE(&sprite, "REQUESTS.ICN", 30 + ptr->info.conditionsWins);
@@ -877,10 +878,10 @@ void ShowFileMapInfo(FILEMAPINFO *cur){
     SDL_BlitSurface(image, NULL, video, &dest);
 
     // отображаем имя карты
-    dest.x = 240;
-    dest.w = FONT_WIDTHBIG * 10;
-    dest.h = FONT_HEIGHTBIG / 2;
-    PrintText(video, &dest, (const char *) cur->info.longname, FONT_BIG);
+    dest.x = 237;
+    dest.w = 160;
+    dest.h = FONT_HEIGHTBIG;
+    PrintAlignText(video, &dest, (const char *) cur->info.longname, FONT_BIG);
 
     // отображаем условия победы
     FillSPRITE(&sprite, "REQUESTS.ICN", 30 + cur->info.conditionsWins);
@@ -899,34 +900,18 @@ void ShowFileMapInfo(FILEMAPINFO *cur){
     SDL_BlitSurface(image, NULL, video, &dest);
 
     // level
-    dest.x = 360;
-    dest.y = 295;
-    dest.w = 100;
+    dest.x = 350;
+    dest.y = 296;
+    dest.w = 112;
     dest.h = 15;
-    switch(cur->info.level){
-	case 0:
-	    PrintText(video, &dest, "Easy", FONT_BIG);
-	    break;
-	case 1:
-	    PrintText(video, &dest, "Normal", FONT_BIG);
-	    break;
-	case 2:
-	    PrintText(video, &dest, "Hard", FONT_BIG);
-	    break;
-	case 3:
-	    PrintText(video, &dest, "Expert", FONT_BIG);
-	    break;
-	default:
-	    PrintText(video, &dest, "Unknown", FONT_BIG);
-	    break;
-    }
-    // description
-    dest.x = 180;
-    dest.y = 323;
-    dest.w = 265;
-    dest.h = 86;
+    PrintAlignText(video, &dest, GetStringGameLevel(cur->info.level), FONT_BIG);
 
-    PrintText(video, &dest, (const char *) cur->info.description, FONT_BIG);
+    // description
+    dest.x = 175;
+    dest.y = 325;
+    dest.w = 285;
+    dest.h = 80;
+    PrintAlignText(video, &dest, (const char *) cur->info.description, FONT_BIG);
 }
 
 FILEMAPINFO *ExistsMapSizeDown(FILEMAPINFO *cur, E_SIZEMAP size){
