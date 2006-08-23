@@ -39,20 +39,6 @@
 #include "animation.h"
 #include "actionevent.h"
 
-typedef enum {
-                DESERT,
-                SNOW,
-                SWAMP,
-                WASTELAND,
-                BEACH,
-                LAVA,
-                DIRT,
-                GRASS,
-                WATER,
-                ROAD
-
-            } E_GROUND;
-
 typedef struct {
 		Uint8		ax;
 		Uint8		ay;
@@ -80,6 +66,7 @@ ACTION		InitMaps(char *);
 S_CELLMAPS     *GetCELLMAPS(Uint16);
 Uint8		GetWidthMaps(void);
 Uint8		GetHeightMaps(void);
+E_GROUND	GetGroundMaps(Uint8, Uint8);
 
 /* ***************************** START MP2 ********************************** */
 /* заголовок карты */

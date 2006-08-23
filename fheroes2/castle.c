@@ -3714,3 +3714,146 @@ BOOL CastlePresentHeroes(const S_CASTLE *castle){
 
     return TRUE;
 }
+
+// фуункция рисует составную картинку замка
+void DrawAmountedCastle(SDL_Surface *surface, SDL_Rect *rect, E_RACE race, E_GROUND ground, BOOL castle){
+
+/*
+спрайт замка  OBJNTOWN.ICN 32x32 kngt barb srcr wrlc wizrd necr
+спрайт грунта OBJNTWBA.ICN 32x32 grass snow swamp lava desert dirt wast beach
+
+XXX XXX C00 XXX XXX     XXX XXX XXX XXX XXX
+C01 C02 C03 C04 C05     XXX XXX XXX XXX XXX
+C06 C07 C08 C09 C10     XXX XXX XXX XXX XXX
+C11 C12 C13 C14 C15	G00 G01 G02 G03 G04
+XXX XXX XXX XXX XXX     G05 G06 G07 G08 G09
+*/
+
+    SDL_Rect cur;
+    AGGSPRITE sprite;
+    ICNHEADER *header;
+    Uint8 index, i;
+    // невыполнимые условия (160 ширина нарисованой картинки)
+    if(! surface || ! rect) return;
+
+    // рисуем грунт под замком
+    switch(ground){
+	case GRASS:
+	    index = 0;
+	    break;
+	case SNOW:
+	    index = 10;
+	    break;
+	case SWAMP:
+	    index = 20;
+	    break;
+	case LAVA:
+	    index = 30;
+	    break;
+	case DESERT:
+	    index = 40;
+	    break;
+	case DIRT:
+	    index = 50;
+	    break;
+	case WASTELAND:
+	    index = 60;
+	    break;
+	case BEACH:
+	    index = 70;
+	    break;
+	default:
+	    return;
+	    break;
+    }
+    for(i = 0; i < 5; ++i){
+	FillSPRITE(&sprite, "OBJNTWBA.ICN", index + i);
+	header = GetICNHeader(&sprite);
+	cur.x = rect->x + i * 32;
+	cur.y = rect->y + 3 * 32;
+	cur.x += header->offsetX;
+	cur.y += header->offsetY;
+	cur.w = header->surface->w;
+	cur.h = header->surface->h;
+	SDL_BlitSurface(header->surface, NULL, surface, &cur);
+    }
+    for(i = 0; i < 5; ++i){
+	FillSPRITE(&sprite, "OBJNTWBA.ICN", index + 5 + i);
+	header = GetICNHeader(&sprite);
+	cur.x = rect->x + i * 32;
+	cur.y = rect->y + 4 * 32;
+	cur.x += header->offsetX;
+	cur.y += header->offsetY;
+	cur.w = header->surface->w;
+	cur.h = header->surface->h;
+	SDL_BlitSurface(header->surface, NULL, surface, &cur);
+    }
+
+    // рисуем замоk
+    switch(race){
+	case KNIGHT:
+	    index = 0;
+	    break;
+	case BARBARIAN:
+	    index = 32;
+	    break;
+	case SORCERESS:
+	    index = 64;
+	    break;
+	case WARLOCK:
+	    index = 96;
+	    break;
+	case WIZARD:
+	    index = 128;
+	    break;
+	case NECROMANCER:
+	    index = 160;
+	    break;
+	default:
+	    break;
+    }
+    if(! castle) index += 16;
+
+    cur.y = rect->y;
+    cur.x = rect->x + 2 * 32;
+    FillSPRITE(&sprite, "OBJNTOWN.ICN", index);
+    header = GetICNHeader(&sprite);
+    cur.x += header->offsetX;
+    cur.y += header->offsetY;
+    cur.w = header->surface->w;
+    cur.h = header->surface->h;
+    SDL_BlitSurface(header->surface, NULL, surface, &cur);
+    for(i = 0; i < 5; ++i){
+	FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 1 + i);
+	header = GetICNHeader(&sprite);
+	cur.x = rect->x + i * 32;
+	cur.y = rect->y + 32;
+	cur.x += header->offsetX;
+	cur.y += header->offsetY;
+	cur.w = header->surface->w;
+	cur.h = header->surface->h;
+	SDL_BlitSurface(header->surface, NULL, surface, &cur);
+    }
+    for(i = 0; i < 5; ++i){
+	FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 6 + i);
+	header = GetICNHeader(&sprite);
+	cur.x = rect->x + i * 32;
+	cur.y = rect->y + 2 * 32;
+	cur.x += header->offsetX;
+	cur.y += header->offsetY;
+	cur.w = header->surface->w;
+	cur.h = header->surface->h;
+	SDL_BlitSurface(header->surface, NULL, surface, &cur);
+    }
+    for(i = 0; i < 5; ++i){
+	FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 11 + i);
+	header = GetICNHeader(&sprite);
+	cur.x = rect->x + i * 32;
+	cur.y = rect->y + 3 * 32;
+	cur.x += header->offsetX;
+	cur.y += header->offsetY;
+	cur.w = header->surface->w;
+	cur.h = header->surface->h;
+	SDL_BlitSurface(header->surface, NULL, surface, &cur);
+    }
+}

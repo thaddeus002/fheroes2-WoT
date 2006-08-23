@@ -59,6 +59,20 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define GOLD_DUNGEON_DAY	500
 
 typedef enum {
+                DESERT,
+                SNOW,
+                SWAMP,
+                WASTELAND,
+                BEACH,
+                LAVA,
+                DIRT,
+                GRASS,
+                WATER,
+                ROAD
+
+            } E_GROUND;
+
+typedef enum {
 		GAME_EASY,
 		GAME_NORMAL,
 		GAME_HARD,

@@ -38,6 +38,7 @@
 #include "element.h"
 #include "actionevent.h"
 #include "castle.h"
+#include "mp2maps.h"
 #include "monster.h"
 #include "draw.h"
 #include "castleaction.h"
@@ -520,6 +521,13 @@ ACTION ShowCastleInfo(void){
     action.mouseEvent = MOUSE_RCLICK; 
     action.pf = ActionCastleRClickRecrutSecondaryHeroes;
     AddActionEvent(&castinfo, &action); 
+
+    // мини картинка замка
+    rectCur.x = 460;
+    rectCur.y = 5;
+    rectCur.w = image->w - rectCur.x;
+    rectCur.h = image->h - rectCur.y;
+    DrawAmountedCastle(video, &rectCur, castle->race, GetGroundMaps(castle->ax, castle->ay), TRUE);
 
     // отрисовка статуса построек
     RedrawCastleStatusBuilding();

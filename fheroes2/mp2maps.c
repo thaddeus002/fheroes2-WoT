@@ -727,3 +727,12 @@ ICNHEADER *AddLEVELDRAW(ICNHEADER **ptr){
 
     return tail;
 }
+
+E_GROUND GetGroundMaps(Uint8 ax, Uint8 ay){
+
+    const S_CELLMAPS *maps = GetCELLMAPS(ay * GetWidthMaps() + ax);
+    
+    if(maps) return maps->ground;
+    
+    return WATER;
+}

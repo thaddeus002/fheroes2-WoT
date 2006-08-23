@@ -271,5 +271,7 @@ void		EnableCastleUpdateBuilding(void);
 ACTION          UpgradableArmy(const S_ARMY *, E_COLORS, const S_CASTLE *);
 void		UpgradeArmy(S_ARMY *army, E_COLORS color);
 
+void		DrawAmountedCastle(SDL_Surface *, SDL_Rect *, E_RACE, E_GROUND, BOOL);
+
 #endif
 
