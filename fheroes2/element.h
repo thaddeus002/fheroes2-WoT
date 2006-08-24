@@ -36,7 +36,6 @@
 #include "tools.h"
 
 ACTION	MessageBox(const char *, ENUMFONT font);
-Uint16 MessageSelectCountBox(Uint16, const char *, ENUMFONT);
 
 void	ShowQuickInfo(Uint16);
 void	ShowBorder(SDL_Rect *);

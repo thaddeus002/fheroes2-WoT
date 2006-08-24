@@ -1360,7 +1360,7 @@ void RedrawCastleStatusBuilding(void){
 		break;
 	}
 	// text
-	message = GetStringTavern();
+	message = GetStringBuilding(castle->race, BUILD_TAVERN);
 	rectCur.x = cx + 215;
 	rectCur.y = cy + 215;
 	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1433,7 +1433,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringThievesGuild();
+    message = GetStringBuilding(castle->race, BUILD_THIEVESGUILD);
     rectCur.x = cx + 360;
     rectCur.y = cy + 215;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1505,7 +1505,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringShipyard();
+    message = GetStringBuilding(castle->race, BUILD_SHIPYARD);
     rectCur.x = cx + 70;
     rectCur.y = cy + 290;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1577,7 +1577,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringStatue();
+    message = GetStringBuilding(castle->race, BUILD_STATUE);
     rectCur.x = cx + 215;
     rectCur.y = cy + 290;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1649,7 +1649,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringMarketplace();
+    message = GetStringBuilding(castle->race, BUILD_MARKETPLACE);
     rectCur.x = cx + 360;
     rectCur.y = cy + 290;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1721,7 +1721,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringWell();
+    message = GetStringBuilding(castle->race, BUILD_WELL);
     rectCur.x = cx + 70;
     rectCur.y = cy + 365;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1793,7 +1793,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringWel2(castle->race);
+    message = GetStringBuilding(castle->race, BUILD_WEL2);
     rectCur.x = cx + 215;
     rectCur.y = cy + 365;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1865,7 +1865,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringSpec(castle->race);
+    message = GetStringBuilding(castle->race, BUILD_SPEC);
     rectCur.x = cx + 360;
     rectCur.y = cy + 365;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1937,7 +1937,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringLeftTurret();
+    message = GetStringBuilding(castle->race, BUILD_LEFTTURRET);
     rectCur.x = cx + 70;
     rectCur.y = cy + 445;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -2009,7 +2009,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringRightTurret();
+    message = GetStringBuilding(castle->race, BUILD_RIGHTTURRET);
     rectCur.x = cx + 215;
     rectCur.y = cy + 445;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -2081,7 +2081,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringMoat();
+    message = GetStringBuilding(castle->race, BUILD_MOAT);
     rectCur.x = cx + 360;
     rectCur.y = cy + 445;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;

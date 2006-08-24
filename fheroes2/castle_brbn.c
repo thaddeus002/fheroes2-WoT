@@ -95,6 +95,13 @@ void DrawBRBNCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickCastle;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRCastle;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -145,6 +152,13 @@ void DrawBRBNCapitan(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickCaptain;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRCaptain;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -180,6 +194,13 @@ void DrawBRBNStatue(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickStatue;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRStatue;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
@@ -218,6 +239,13 @@ void DrawBRBNWell(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickWell;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRWell;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
@@ -260,6 +288,13 @@ void DrawBRBNThievesGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickThievesGuild;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRThievesGuild;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -296,6 +331,13 @@ void DrawBRBNTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickTavern;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRTavern;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
@@ -344,6 +386,13 @@ void DrawBRBNShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
         action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDock;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+        AddActionEvent(actionHead, &action);
+
+        ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+        action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRDock;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
         AddActionEvent(actionHead, &action);
     }
@@ -423,6 +472,13 @@ void DrawBRBNMarketplace(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickMarketplace;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRMarketplace;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -472,6 +528,13 @@ void DrawBRBNMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickMoat;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRMoat;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -511,6 +574,13 @@ void DrawBRBNSpec(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickSpec;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRSpec;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -546,6 +616,13 @@ void DrawBRBNWel2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickWel2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRWel2;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
@@ -974,6 +1051,13 @@ void DrawBRBNMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickMageGuild;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRMageGuild;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }

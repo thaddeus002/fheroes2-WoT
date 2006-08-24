@@ -26,29 +26,10 @@
     Description:
 */
 
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef _CASTLEDIALOG_H
+#define _CASTLEDIALOG_H
 
-#include "SDL.h"
-#include "object.h"
-#include "mp2maps.h"
-#include "monster.h"
-#include "castle.h"
-
-const char * GetStringObject(E_OBJECT);
-const char * GetStringRace(E_RACE);
-const char * GetStringGameLevel(E_GAMELEVEL);
-const char * GetStringColor(E_COLORS);
-const char * GetStringLuck(E_LUCK);
-const char * GetStringMorale(E_MORALE);
-const char * GetStringSpeed(E_MONSTERSPEED);
-const char * GetStringGround(E_GROUND);
-const char * GetStringDwelling(E_RACE, E_DWELLINGCASTLE);
-const char * GetStringBuilding(E_RACE, E_BUILDINGCASTLE);
-const char * GetStringDescriptionsBuilding(E_RACE, E_BUILDINGCASTLE);
-
-const char * GetStringLevelMageGuild(E_MAGICLEVEL level);
-
-void         PrintCellInfo(Uint16);
+ACTION BuildingInfoBox(E_BUILDINGCASTLE);
+ACTION BuildingInfoYESBox(E_BUILDINGCASTLE);
 
 #endif

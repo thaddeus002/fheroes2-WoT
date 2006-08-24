@@ -35,6 +35,9 @@
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
+#define MESSAGEBOX_WIDTH        306 
+#define MESSAGEBOX_HEIGHT       226 
+
 #define COLORKEY	0xFF
 #define COLORCHANGE	0xFE
 

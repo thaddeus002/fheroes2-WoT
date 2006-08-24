@@ -72,6 +72,19 @@ ACTION ActionClickDwelling4(void);
 ACTION ActionClickDwelling5(void);
 ACTION ActionClickDwelling6(void);
 
+ACTION ActionClickRCastle(void);
+ACTION ActionClickRCaptain(void);
+ACTION ActionClickRMageGuild(void);
+ACTION ActionClickRStatue(void);
+ACTION ActionClickRWell(void);
+ACTION ActionClickRThievesGuild(void);
+ACTION ActionClickRTavern(void);
+ACTION ActionClickRDock(void);
+ACTION ActionClickRMarketplace(void);
+ACTION ActionClickRMoat(void);
+ACTION ActionClickRSpec(void);
+ACTION ActionClickRWel2(void);
+
 ACTION ActionCastleOverExit(void);
 ACTION ActionCastleOverStatue(void);
 ACTION ActionCastleOverTavern(void);

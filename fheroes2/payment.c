@@ -202,6 +202,9 @@ const S_PAYMENT * PaymentConditionsBuilding(E_RACE race, E_BUILDINGCASTLE build)
 		    break;
 	    }
 	    break;
+
+	default:
+	    break;
     }
     
     return &paymentObject;

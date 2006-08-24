@@ -1187,6 +1187,15 @@ ACTION ActionCASTLELOOP(INTERFACEACTION *action){
 			case SDL_BUTTON_RIGHT:
 			    
 			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
+
+			    ptr = action;
+			    while(ptr){
+				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_RCLICK) && ptr->pf )
+					exit = (*ptr->pf)();
+
+				ptr = (INTERFACEACTION *) ptr->next;
+			    }
 			    break;
 
 			default:
@@ -1215,16 +1224,6 @@ ACTION ActionCASTLELOOP(INTERFACEACTION *action){
 				ptr = (INTERFACEACTION *) ptr->next;
 			    }
 			    break;
-
-			case SDL_BUTTON_RIGHT:
-			    ptr = action;
-			    while(ptr){
-				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
-				    (ptr->mouseEvent & MOUSE_RCLICK) && ptr->pf )
-					exit = (*ptr->pf)();
-
-				ptr = (INTERFACEACTION *) ptr->next;
-			    }
 
 			default:
 			    break;

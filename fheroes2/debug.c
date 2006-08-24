@@ -949,84 +949,6 @@ const char * GetStringGround(E_GROUND ground){
     return string;
 }
 
-const char * GetStringWel2(E_RACE race){
-
-    const char  *string;
-
-    switch(race){
-    
-	case KNIGHT:
-	    string = "Farm";
-	    break;
-
-	case BARBARIAN:
-	    string = "Garbage Heap";
-	    break;
-
-	case SORCERESS:
-	    string = "Crystal Garden";
-	    break;
-
-	case WARLOCK:
-	    string = "Waterfall";
-	    break;
-
-	case WIZARD:
-	    string = "Orchard";
-	    break;
-
-	case NECROMANCER:
-	    string = "Skull Pile";
-	    break;
-
-	default:
-	    string = NULL;
-	    break;
-
-    }
-    
-    return string;
-}
-
-const char * GetStringSpec(E_RACE race){
-
-    const char  *string;
-
-    switch(race){
-    
-	case KNIGHT:
-	    string = "Fortifications";
-	    break;
-
-	case BARBARIAN:
-	    string = "Coliseum";
-	    break;
-
-	case SORCERESS:
-	    string = "Rainbow";
-	    break;
-
-	case WARLOCK:
-	    string = "Dungeon";
-	    break;
-
-	case WIZARD:
-	    string = "Library";
-	    break;
-
-	case NECROMANCER:
-	    string = "Storm";
-	    break;
-
-	default:
-	    string = NULL;
-	    break;
-
-    }
-    
-    return string;
-}
-
 const char * GetStringDwelling(E_RACE race, E_DWELLINGCASTLE level){
 
     const char  *string = NULL;
@@ -1131,13 +1053,6 @@ const char * GetStringDwelling(E_RACE race, E_DWELLINGCASTLE level){
     return string;
 }
 
-const char * GetStringMageGuild(void){
-
-    const char *string = "Mage Guild";
-    
-    return string;
-}
-
 const char * GetStringLevelMageGuild(E_MAGICLEVEL level){
 
     const char *string = NULL;
@@ -1165,72 +1080,244 @@ const char * GetStringLevelMageGuild(E_MAGICLEVEL level){
     return string;
 }
 
-const char * GetStringTavern(void){
 
-    const char *string = "Tavern";
+const char * GetStringBuilding(E_RACE race, E_BUILDINGCASTLE build){
+
+    const char  *string = NULL;
+
+    switch(build){
+
+	case BUILD_WEL2:
+	    switch(race){
+    		case KNIGHT:
+		    string = "Farm";
+		    break;
+		case BARBARIAN:
+		    string = "Garbage Heap";
+		    break;
+		case SORCERESS:
+		    string = "Crystal Garden";
+		    break;
+		case WARLOCK:
+		    string = "Waterfall";
+		    break;
+		case WIZARD:
+		    string = "Orchard";
+		    break;
+		case NECROMANCER:
+		    string = "Skull Pile";
+		    break;
+		default:
+		    string = "";
+		    break;
+	    }
+	    break;
+	
+	case BUILD_SPEC:
+	    switch(race){
+		case KNIGHT:
+		    string = "Fortifications";
+		    break;
+		case BARBARIAN:
+		    string = "Coliseum";
+		    break;
+		case SORCERESS:
+		    string = "Rainbow";
+		    break;
+		case WARLOCK:
+		    string = "Dungeon";
+		    break;
+		case WIZARD:
+		    string = "Library";
+		    break;
+		case NECROMANCER:
+		    string = "Storm";
+		    break;
+		default:
+		    string = "";
+		    break;
+	    }
+	    break;
+
+	case BUILD_TAVERN:
+		    string = "Tavern";
+		    break;
+	
+	case BUILD_THIEVESGUILD:
+		    string = "Thieves' Guild";
+		    break;
+
+	case BUILD_WELL:
+		    string = "Well";
+		    break;
+
+	case BUILD_SHIPYARD:
+		    string = "Shipyard";
+		    break;
+    
+	case BUILD_STATUE:
+		    string = "Statue";
+		    break;
+
+	case BUILD_LEFTTURRET:
+		    string = "Left Turret";
+		    break;
+
+	case BUILD_RIGHTTURRET:
+		    string = "Right Turret";
+		    break;
+
+	case BUILD_MOAT:
+		    string = "Moat";
+		    break;
+
+	case BUILD_CASTLE:
+		    string = "Castle";
+		    break;
+
+	case BUILD_TENT:
+		    string = "Tent";
+		    break;
+
+	case BUILD_CAPTAIN:
+		    string = "Captain";
+		    break;
+
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:
+		    string = "Mage Guild";
+		    break;
+
+	default:
+	    string = "";
+	    break;
+    }
     
     return string;
 }
 
-const char * GetStringThievesGuild(void){
+const char * GetStringDescriptionsBuilding(E_RACE race, E_BUILDINGCASTLE build){
 
-    const char *string = "Thieves Guild";
+    const char  *string = NULL;
+
+    switch(build){
+
+	case BUILD_WEL2:
+	    switch(race){
+    		case KNIGHT:
+		    string = "The Farm increases production of Peasants by 8 per week.";
+		    break;
+		case BARBARIAN:
+		    string = "The Garbage Heap increases production of Goblins by 8 per week.";
+		    break;
+		case SORCERESS:
+		    string = "The Crystal Garden increases production of Sprites by 8 per week.";
+		    break;
+		case WARLOCK:
+		    string = "The Waterfall increases production of Centaurs by 8 per week.";
+		    break;
+		case WIZARD:
+		    string = "The Orchard increases production of Halflings by 8 per week.";
+		    break;
+		case NECROMANCER:
+		    string = "The Skull Pile increases production of Skeletons by 8 per week.";
+		    break;
+		default:
+		    string = "";
+		    break;
+	    }
+	    break;
+	
+	case BUILD_SPEC:
+	    switch(race){
+		case KNIGHT:
+		    string = "The Fortifications increase the toughness of the walls, increasing the number of turns it takes to knock them down.";
+		    break;
+		case BARBARIAN:
+		    string = "The Coliseum provides inspiring spectacles to defending troops, raising their morale by two during combat.";
+		    break;
+		case SORCERESS:
+		    string = "The Rainbow increases the luck of the defending units by two.";
+		    break;
+		case WARLOCK:
+		    string = "The Dungeon increases the income of the town by 500 / day.";
+		    break;
+		case WIZARD:
+		    string = "The Library increases the number of spells in the Guild by one for each level of the guild.";
+		    break;
+		case NECROMANCER:
+		    string = "The Storm adds +2 to the power of spells of a defending spell caster.";
+		    break;
+		default:
+		    string = "";
+		    break;
+	    }
+	    break;
+
+	case BUILD_TAVERN:
+	    string = "The Tavern increases morale for troops defending the castle.";
+	    break;
+	
+	case BUILD_THIEVESGUILD:
+	    string = "The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns.";
+	    break;
+
+	case BUILD_WELL:
+	    string = "The Well increases the growth rate of all dwellings by 2 creatures per week.";
+	    break;
+
+	case BUILD_SHIPYARD:
+	    string = "The Shipyard allows ships to be built.";
+	    break;
+    
+	case BUILD_STATUE:
+	    string = "The Statue increases your town's income by 250 per day.";
+	    break;
+
+	case BUILD_LEFTTURRET:
+	    string = "The Left Turret provides extra firepower during castle combat.";
+	    break;
+
+	case BUILD_RIGHTTURRET:
+	    string = "The Right Turret provides extra firepower during castle combat.";
+	    break;
+
+	case BUILD_MOAT:
+	    string = "The Moat slows attacking units. Any unit entering the moat must end its turn there and becomes more vulnerable to attack.";
+	    break;
+
+	case BUILD_CAPTAIN:
+	    string = "The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.";
+	    break;
+
+	case BUILD_MARKETPLACE:
+	    string = "The Marketplace can be used to convert one type of resource into another. The more marketplaces you control, the better the exchange rate.";
+	    break;
+
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:
+	    string = "The Mage Guild allows heroes to learn spells and replenish their spell points.";
+	    break;
+
+	case BUILD_TENT:
+	    string = "The Tent provides workers to build a castle, provided the materials and the gold are available.";
+	    break;
+
+	case BUILD_CASTLE:
+	    string = "The Castle improves town defense and increases income to 1000 gold per day.";
+	    break;
+
+	default:
+	    string = "";
+	    break;
+    }
     
     return string;
 }
 
-const char * GetStringWell(void){
-
-    const char *string = "Well";
-    
-    return string;
-}
-
-const char * GetStringShipyard(void){
-
-    const char *string = "Shipyard";
-    
-    return string;
-}
-
-const char * GetStringStatue(void){
-
-    const char *string = "Statue";
-    
-    return string;
-}
-
-const char * GetStringMarketplace(void){
-
-    const char *string = "Marketplace";
-    
-    return string;
-}
-
-const char * GetStringLeftTurret(void){
-
-    const char *string = "LeftTurret";
-    
-    return string;
-}
-
-const char * GetStringRightTurret(void){
-
-    const char *string = "Right Turret";
-    
-    return string;
-}
-
-const char * GetStringMoat(void){
-
-    const char *string = "Moat";
-    
-    return string;
-}
-
-const char * GetStringCaptain(void){
-
-    const char *string = "Captains Quarters";
-    
-    return string;
-}
