@@ -110,7 +110,7 @@ ACTION BuildingInfoYESBox(E_BUILDINGCASTLE build){
     FillSPRITE(&sprite, buybuild, 5);
     image = GetICNSprite(&sprite);
     // количество средних блоков
-    count = (max - height) / image->h + 1;
+    count = (max - height) / image->h;
     height = height + count * image->h;
 
     // отрисовка диалога по центру экрана
@@ -354,7 +354,7 @@ ACTION BuildingInfoBox(E_BUILDINGCASTLE build){
     FillSPRITE(&sprite, buybuild, 5);
     image = GetICNSprite(&sprite);
     // количество средних блоков
-    count = (max - height) / image->h + 1;
+    count = (max - height) / image->h;
     height = height + count * image->h;
 
     // отрисовка диалога по центру экрана

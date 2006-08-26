@@ -81,7 +81,7 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     // получаем левый верхний спрайт
     FillSPRITE(&sprite, buybuild, 4);
     elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 1;
+    if(GetIntValue(EVILINTERFACE)) rectCur.x = rectBack.x; else rectCur.x = rectBack.x + 1;
     rectCur.y = rectBack.y;
     rectCur.w = elem->w;
     rectCur.h = elem->h;

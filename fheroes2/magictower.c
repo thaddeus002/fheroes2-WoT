@@ -127,7 +127,7 @@ ACTION  ShowMageGuildInfo(void){
     // сохраняем бакгроунд
     if(NULL == (back = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
 	fprintf(stderr, "ShowMageGuildInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
-	return 0;
+	return EXIT;
     }
     SDL_BlitSurface(video, &rectBack, back, NULL);
 

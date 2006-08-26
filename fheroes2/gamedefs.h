@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060821
+#define VERSION 20060826
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 

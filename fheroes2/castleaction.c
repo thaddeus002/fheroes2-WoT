@@ -39,10 +39,12 @@
 #include "heroesinfo.h"
 #include "monster.h"
 #include "magictower.h"
+#include "thievesguild.h"
 #include "kingdom.h"
 #include "castle.h"
 #include "castleinfo.h"
 #include "wellinfo.h"
+#include "taverninfo.h"
 #include "castleaction.h"
 #include "castledialog.h"
 #include "recrutmonster.h"
@@ -691,13 +693,13 @@ ACTION ActionClickWell(void){
 }
 
 ACTION ActionClickThievesGuild(void){
-    fprintf(stderr, "ClickThievesGuild\n");
-    return NONE;
+
+    return ShowThievesGuildInfo();
 }
 
 ACTION ActionClickTavern(void){
-    fprintf(stderr, "ClickTavern\n");
-    return NONE;
+
+    return ShowTavernInfo("The ultimate artifact may be found in a murky swamp..");
 }
 
 ACTION ActionClickDock(void){

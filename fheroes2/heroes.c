@@ -192,12 +192,17 @@ BOOL	InitHeroes(void){
     allHeroes[NAME_UNK3].name	= "Unknown Name 3";
     allHeroes[ARCHIBALD].name	= "Archibald";
     allHeroes[NAME_UNK5].name	= "Unknown Name 5";
-    allHeroes[SANDYSANDY].name	= "SandySandy";
-    allHeroes[SANDYSANDY].army[0].count = 3;
-    allHeroes[SANDYSANDY].army[0].monster = RED_DRAGON;
-    allHeroes[SANDYSANDY].army[1].count = 2;
-    allHeroes[SANDYSANDY].army[1].monster = BLACK_DRAGON;
 
+    if(GetIntValue(DEBUG)){
+	allHeroes[SANDYSANDY].name = "Debugger";
+	allHeroes[SANDYSANDY].army[0].count = 3;
+	allHeroes[SANDYSANDY].army[0].monster = RED_DRAGON;
+	allHeroes[SANDYSANDY].army[1].count = 2;
+	allHeroes[SANDYSANDY].army[1].monster = BLACK_DRAGON;
+    } else
+	allHeroes[SANDYSANDY].name = "SandySandy";
+
+    
     fprintf(stderr, "Init heroes.\n");
 
     return TRUE;

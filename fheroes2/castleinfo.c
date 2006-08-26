@@ -283,7 +283,7 @@ ACTION ShowCastleInfo(void){
 
     // фон tawern
     if(NECROMANCER != castle->race){
-	FillSPRITE(&sprite, icnname, 1);
+	FillSPRITE(&sprite, icnname, 2);
 	image = GetICNSprite(&sprite);
 	rectCur.x = cx + 150;
 	rectCur.y = cy + 158;
@@ -299,7 +299,7 @@ ACTION ShowCastleInfo(void){
     }
     
     // фон thieves guild
-    NECROMANCER != castle->race ? FillSPRITE(&sprite, icnname, 2) : FillSPRITE(&sprite, icnname, 1);
+    FillSPRITE(&sprite, icnname, 1);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 294;
     rectCur.y = cy + 158;
