@@ -192,14 +192,14 @@ ACTION BuildingInfoYESBox(E_BUILDINGCASTLE build){
     
     // text header
     rectCur.x = rectBack.x + 35;
-    rectCur.y = rectBack.y + 70;
+    if(GetIntValue(EVILINTERFACE)) rectCur.y = rectBack.y + 50; else rectCur.y = rectBack.y + 65;
     rectCur.w = rectBack.w - 70;
     rectCur.h = rectBack.h - 70;
     PrintAlignText(video, &rectCur, header, FONT_BIG);
 
     // text info
     rectCur.x = rectBack.x + 35;
-    rectCur.y = rectBack.y + 100;
+    if(GetIntValue(EVILINTERFACE)) rectCur.y = rectBack.y + 70; else rectCur.y = rectBack.y + 85;
     rectCur.w = rectBack.w - 70;
     rectCur.h = rectBack.h - 90;
     PrintAlignText(video, &rectCur, info, FONT_BIG);
@@ -209,8 +209,6 @@ ACTION BuildingInfoYESBox(E_BUILDINGCASTLE build){
     image = GetICNSprite(&sprite);
     rectCur.x = (video->w - image->w) / 2;
     rectCur.y = rectBack.y + rectBack.h - 70;
-    if(GetIntValue(EVILINTERFACE))
-        rectCur.y = rectBack.y + rectBack.h - 85;
     rectCur.w = image->w;
     rectCur.h = image->h;
     ZeroINTERFACEACTION(&action);
@@ -229,7 +227,7 @@ ACTION BuildingInfoYESBox(E_BUILDINGCASTLE build){
     CursorOn();
 
     // цикл событий
-    ActionCycle(dialog);
+    ActionCycle(dialog, NULL);
                                     
     // востанавливаем бакгроунд
     CursorOff();

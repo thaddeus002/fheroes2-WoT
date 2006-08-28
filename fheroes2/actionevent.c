@@ -182,7 +182,7 @@ ACTION ActionPressSELECT(void){
     return SELECT;
 }
 
-ACTION ActionCycle(INTERFACEACTION *action){
+ACTION ActionCycle(INTERFACEACTION *action, void (*pfanim)()){
 
     SDL_Event event;
     SDL_Surface *video = SDL_GetVideoSurface();;
@@ -199,9 +199,11 @@ ACTION ActionCycle(INTERFACEACTION *action){
     old.flagPres = FALSE;
     INTERFACEACTION *ptr = NULL;
 
+    Uint32 ticket = 0;
+
     // цикл по событиям
     while(exit == NONE){
-	while(SDL_PollEvent(&event))
+	while(SDL_PollEvent(&event)){
 
 	    switch(event.type){
 	    
@@ -328,7 +330,14 @@ ACTION ActionCycle(INTERFACEACTION *action){
     		    break;
 	    }
 
-	if(GetIntValue(CYCLELOOP) && CYCLEDELAY) SDL_Delay(CYCLEDELAY);
+            if(exit != EXIT && 0 == ticket % (GetIntValue(ANIMATIONDELAY) / 2) && pfanim) (*pfanim)();
+            ++ticket;
+        }
+
+	if(0 == ticket % GetIntValue(ANIMATIONDELAY) && pfanim) (*pfanim)();
+        else if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY);
+
+        ++ticket;
     }
 
     return exit;

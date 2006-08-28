@@ -268,3 +268,22 @@ BOOL KingdomAllowPayment(E_COLORS color, const S_PAYMENT *payment){
 
     return TRUE;
 }
+
+void GetKingdomResource(E_COLORS color, S_PAYMENT *result){
+
+    if(! result) return;
+
+    result->gold = kingdom[color].gold;
+    result->wood = kingdom[color].wood;
+    result->ore = kingdom[color].ore;
+    result->mercury = kingdom[color].mercury;
+    result->crystal = kingdom[color].crystal;
+    result->sulfur = kingdom[color].sulfur;
+    result->gems = kingdom[color].gems;
+
+}
+
+Uint8 GetCountMarketplace(E_COLORS color){
+
+    return 1;
+}

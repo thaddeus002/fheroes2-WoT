@@ -889,7 +889,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_WELL) DrawKNGTWell(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(&castanim, &castlact);
-	    else DrawKNGTExt0(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawKNGTExt0(&castanim, &castlact);
 	    //DrawKNGTExt1(&castanim, &castlact); // развилка дорог?
 	    //DrawKNGTExt2(&castanim, &castlact); // развилка дорог?
 	    break;
@@ -918,7 +918,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(&castanim, &castlact);
-	    else DrawBRBNExt0(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawBRBNExt0(&castanim, &castlact);
 	    DrawBRBNExt1(&castanim, &castlact);
 	    //DrawBRBNExt3(&castanim, &castlact); // развилка дорог?
 	    break;
@@ -934,7 +934,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(&castanim, &castlact);
-	    else DrawSCRSExt0(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawSCRSExt0(&castanim, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(&castanim, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawSCRSThievesGuild(&castanim, &castlact);
@@ -957,7 +957,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(&castanim, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(&castanim, &castlact);
-	    else DrawNCRMExt0(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawNCRMExt0(&castanim, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawNCRMThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(&castanim, &castlact);
@@ -981,7 +981,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_CAPTAIN) DrawWRLKCapitan(&castanim, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
-	    else DrawWRLKExt0(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawWRLKExt0(&castanim, &castlact);
 	    if(GetMageGuildLevel(castle)) DrawWRLKMageGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
@@ -1007,7 +1007,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    if(castle->building & BUILD_THIEVESGUILD) DrawWZRDThievesGuild(&castanim, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(&castanim, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(&castanim, &castlact);
-	    else DrawWZRDExt0(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawWZRDExt0(&castanim, &castlact);
 	    if(castle->building & BUILD_WELL) DrawWZRDWell(&castanim, &castlact);
 	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(&castanim, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(&castanim, &castlact);
@@ -1346,27 +1346,126 @@ void RedrawBottomBar(void){
 }
 
 ACTION ActionClickRedistributeMonster(void){
-/*
+
     Sint32 mx, my;
     SDL_Surface *video = SDL_GetVideoSurface();
+    S_HEROES *heroes = NULL;
 
     // верхний левый угол начала
     Uint16 cx = video->w / 2 - 208;
-    Uint16 cy1 = video->h / 2 + 22;
     Uint16 cy2 = video->h / 2 + 121;
+    Uint16 res = 0;
+    
+    if(! backMonsterCursor.use) return NONE;
 
-    BOOL fromCastle = FALSE;
+    CursorOff();
 
     SDL_GetMouseState(&mx, &my);
 
     Uint8 index = (Uint16) (mx - cx) / 88;
 
-    if(my > cy2) fromCastle = TRUE;
+    if(backMonsterCursor.castle){
     
-    S_HEROES *heroes = GetStatHeroes(heroesName);
+	if(my < cy2){
 
-    if(! heroes || (fromCastle && MONSTERNONE != currentCastle->army[index].monster) || (!fromCastle && MONSTERNONE != heroes->army[index].monster)) return NONE;
-*/
+	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != currentCastle->army[backMonsterCursor.select].monster){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+
+	    res = SelectCountBox(currentCastle->army[backMonsterCursor.select].count);
+	    if(0xFFFF == res) return EXIT;
+	    if(0 == res){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+
+	    currentCastle->army[backMonsterCursor.select].count -= res;
+
+	    currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	    currentCastle->army[index].count += res;
+
+	}else if(HEROESNULL != heroesName){
+
+	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != currentCastle->army[backMonsterCursor.select].monster){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+	    
+	    res = SelectCountBox(currentCastle->army[backMonsterCursor.select].count);
+	    if(0xFFFF == res) return EXIT;
+	    if(0 == res){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+
+	    currentCastle->army[backMonsterCursor.select].count -= res;
+
+	    heroes = GetStatHeroes(heroesName);
+	    heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	    heroes->army[index].count += res;
+	}
+
+    }else if(HEROESNULL != heroesName){
+    
+	heroes = GetStatHeroes(heroesName);
+
+	if(my < cy2){
+
+	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != heroes->army[backMonsterCursor.select].monster){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+	
+	    res = SelectCountBox(heroes->army[backMonsterCursor.select].count);
+	    if(0xFFFF == res) return EXIT;
+	    if(0 == res){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+
+	    heroes->army[backMonsterCursor.select].count -= res;
+
+	    currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	    currentCastle->army[index].count += res;
+
+	}else if(HEROESNULL != heroesName){
+
+	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != heroes->army[backMonsterCursor.select].monster){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+
+	    res = SelectCountBox(heroes->army[backMonsterCursor.select].count);
+	    if(0xFFFF == res) return EXIT;
+	    if(0 == res){
+		backMonsterCursor.use = FALSE;
+		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		return NONE;
+	    }
+
+	    heroes->army[backMonsterCursor.select].count -= res;
+
+	    heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	    heroes->army[index].count += res;
+	}
+    }
+
+    backMonsterCursor.use = FALSE;
+    SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+
+    RedrawCastleMonster();
+    RedrawHeroesMonster(heroesName);
+
+    CursorOn();
+
     return NONE;
 }
 
@@ -2212,6 +2311,10 @@ void RedrawCastleInfoResource(void){
 
 BOOL CastleNearOcean(const S_CASTLE * castle){
 
+    if( WATER == GetGroundMaps(castle->ax - 1, castle->ay + 2) ||
+	WATER == GetGroundMaps(castle->ax, castle->ay + 2) ||
+        WATER == GetGroundMaps(castle->ax + 1, castle->ay + 2) ) return TRUE;
+
     return FALSE;
 }
 
@@ -2336,7 +2439,7 @@ BUILDACTION AllowBuildShipyard(const S_CASTLE *castle){
 
     if(! KingdomAllowBuild(castle->color)) return END_TUR;
 
-    if(KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_SHIPYARD))) return BUILD_OK;
+    if(CastleNearOcean(castle) && KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_SHIPYARD))) return BUILD_OK;
 
     return CANNOT_BUILD;
 }
@@ -3356,7 +3459,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_WELL) DrawKNGTWell(NULL, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(NULL, &castlact);
-	    else DrawKNGTExt0(NULL, &castlact);
+	    else if(CastleNearOcean(castle)) DrawKNGTExt0(NULL, &castlact);
 	    //DrawKNGTExt1(NULL, &castlact); // развилка дорог?
 	    //DrawKNGTExt2(NULL, &castlact); // развилка дорог?
 	    break;
@@ -3385,7 +3488,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_WELL) DrawBRBNWell(NULL, &castlact);
 	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(NULL, &castlact);
-	    else DrawBRBNExt0(NULL, &castlact);
+	    else if(CastleNearOcean(castle)) DrawBRBNExt0(NULL, &castlact);
 	    DrawBRBNExt1(NULL, &castlact);
 	    //DrawBRBNExt3(NULL, &castlact); // развилка дорог?
 	    break;
@@ -3401,7 +3504,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(NULL, &castlact);
-	    else DrawSCRSExt0(NULL, &castlact);
+	    else if(CastleNearOcean(castle)) DrawSCRSExt0(NULL, &castlact);
 	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(NULL, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawSCRSThievesGuild(NULL, &castlact);
@@ -3424,7 +3527,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(NULL, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(NULL, &castlact);
-	    else DrawNCRMExt0(NULL, &castlact);
+	    else if(CastleNearOcean(castle)) DrawNCRMExt0(NULL, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawNCRMThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(NULL, &castlact);
@@ -3448,7 +3551,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_CAPTAIN) DrawWRLKCapitan(NULL, &castlact);
 	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(NULL, &castlact);
-	    else DrawWRLKExt0(NULL, &castlact);
+	    else if(CastleNearOcean(castle)) DrawWRLKExt0(NULL, &castlact);
 	    DrawWRLKMageGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(NULL, &castlact);
 	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(NULL, &castlact);
@@ -3474,7 +3577,7 @@ void UpdateCastleBuilding(void){
 	    if(castle->building & BUILD_THIEVESGUILD) DrawWZRDThievesGuild(NULL, &castlact);
 	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(NULL, &castlact);
 	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(NULL, &castlact);
-	    else DrawWZRDExt0(NULL, &castlact);
+	    else if(CastleNearOcean(castle)) DrawWZRDExt0(NULL, &castlact);
 	    if(castle->building & BUILD_WELL) DrawWZRDWell(NULL, &castlact);
 	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(NULL, &castlact);
 	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(NULL, &castlact);

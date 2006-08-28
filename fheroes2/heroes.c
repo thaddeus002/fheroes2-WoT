@@ -124,8 +124,8 @@ BOOL	InitHeroes(void){
     HeroesDefaultValues(&allHeroes[NAME_UNK2], NECROMANCER);
     HeroesDefaultValues(&allHeroes[NAME_UNK3], SORCERESS);
     HeroesDefaultValues(&allHeroes[ARCHIBALD], KNIGHT);
-    HeroesDefaultValues(&allHeroes[NAME_UNK5], WARLOCK);
-    HeroesDefaultValues(&allHeroes[SANDYSANDY], NECROMANCER);
+    HeroesDefaultValues(&allHeroes[SANDYSANDY], WARLOCK);
+    HeroesDefaultValues(&allHeroes[BRAX], NECROMANCER);
 
     allHeroes[LORDKILBURN].name	= "Lord Kilburn";
     allHeroes[SIRGALLANTH].name	= "Sir Gallanth";
@@ -191,7 +191,6 @@ BOOL	InitHeroes(void){
     allHeroes[NAME_UNK2].name	= "Unknown Name 2";
     allHeroes[NAME_UNK3].name	= "Unknown Name 3";
     allHeroes[ARCHIBALD].name	= "Archibald";
-    allHeroes[NAME_UNK5].name	= "Unknown Name 5";
 
     if(GetIntValue(DEBUG)){
 	allHeroes[SANDYSANDY].name = "Debugger";
@@ -202,6 +201,7 @@ BOOL	InitHeroes(void){
     } else
 	allHeroes[SANDYSANDY].name = "SandySandy";
 
+    allHeroes[BRAX].name = "Brother Brax";
     
     fprintf(stderr, "Init heroes.\n");
 

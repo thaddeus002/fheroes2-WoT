@@ -328,7 +328,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
 
     exit = FALSE;
     while(! exit)
-        switch(ActionCycle(stpeload)){
+        switch(ActionCycle(stpeload, NULL)){
 
             case EXIT:
 		result = EXIT;

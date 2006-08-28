@@ -235,7 +235,7 @@ ACTION DrawSelectNewStandardGame(void){
     // цикл событий
     exit = FALSE;
     while(! exit)
-        switch(ActionCycle(stpenewstandard)){
+        switch(ActionCycle(stpenewstandard, NULL)){
 
             case EXIT:
                 exit = TRUE;

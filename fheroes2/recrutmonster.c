@@ -409,7 +409,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     // цикл событий
     while(! exit)
 
-        switch(ActionCycle(dialog)){
+        switch(ActionCycle(dialog, NULL)){
 
     	    case EXIT:
     	    case ESC:
@@ -572,4 +572,238 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
 }
 
 void ErrorDialogRecrutMonster(const S_CASTLE *castle){
+}
+
+void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
+
+    CursorOff();
+    SetIntValue(ANIM3, FALSE);
+    
+    SDL_Surface *back, *image, *video;
+    SDL_Event event;
+    SDL_Rect rectBack, rectCur;
+    AGGSPRITE sprite;
+    BOOL exit = FALSE;
+    char str[32];
+
+    S_PAYMENT payment = *(PaymentConditionsMonster(emonster));
+
+    FillSPRITE(&sprite, "RECR2BKG.ICN", 0);
+    image = GetICNSprite(&sprite);
+
+    // отрисовка диалога по центру экрана
+    video = SDL_GetVideoSurface();
+    rectBack.x = (video->w - image->w) / 2;
+    rectBack.y = (video->h - image->h) / 2;
+    rectBack.w = image->w;
+    rectBack.h = image->h;
+
+    // сохраняем бакгроунд
+    if(NULL == (back = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
+	fprintf(stderr, "DialogRecrutMonster: CreateRGBSurface failed: %s\n", SDL_GetError());
+	return;
+    }
+
+    // сохраняем бакграунд
+    SDL_BlitSurface(video, &rectBack, back, NULL);
+
+    // отображаем фон диалога
+    SDL_BlitSurface(image, NULL, video, &rectBack);
+
+    // картинка монстра
+    FillSPRITE(&sprite, MonsterBigNamePortrait(emonster), 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = rectBack.x + 70 - image->w / 2;
+    rectCur.y = rectBack.y + 120 - image->h;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+    // text available
+    sprintf(str, "Available: %d", available);
+    rectCur.y = rectBack.y + 130;
+    rectCur.w = GetLengthText(str, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    rectCur.x = rectBack.x + 70 - rectCur.w / 2;
+    PrintAlignText(video, &rectCur, str, FONT_SMALL);
+
+    // cost per troop
+    if( payment.wood ||
+        payment.ore ||
+	payment.crystal ||
+        payment.sulfur ||
+        payment. mercury ||
+        payment.gems ){
+
+	// спрайт золото (условия)
+	FillSPRITE(&sprite, "RESOURCE.ICN", 6);
+	image = GetICNSprite(&sprite);
+	rectCur.x = rectBack.x + 150;
+	rectCur.y = rectBack.y + 75;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+	// количество золото (условия)
+	sprintf(str, "%d", payment.gold);
+	rectCur.x = rectBack.x + 183;
+	rectCur.y = rectBack.y + 103;
+	rectCur.w = GetLengthText(str, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	rectCur.x = rectCur.x - rectCur.w / 2;
+	PrintText(video, &rectCur, str, FONT_SMALL);
+    }else{
+	// спрайт золото (условия)
+	FillSPRITE(&sprite, "RESOURCE.ICN", 6);
+	image = GetICNSprite(&sprite);
+	rectCur.x = rectBack.x + 175;
+	rectCur.y = rectBack.y + 75;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+	// количество золото (условия)
+	sprintf(str, "%d", payment.gold);
+	rectCur.x = rectBack.x + 205;
+	rectCur.y = rectBack.y + 103;
+	rectCur.w = GetLengthText(str, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	rectCur.x = rectCur.x - rectCur.w / 2;
+	PrintText(video, &rectCur, str, FONT_SMALL);
+    }
+
+    if(payment.crystal){
+
+	    // спрайт crystal (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 4);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 75;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество crystal (условия)
+	    sprintf(str, "%d", payment.crystal);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    }else if(payment.mercury){
+
+	    // спрайт mercury (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 1);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 72;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество mercury (условия)
+	    sprintf(str, "%d", payment.mercury);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    }else if(payment.wood){
+
+	    // спрайт mercury (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 0);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 72;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество mercury (условия)
+	    sprintf(str, "%d", payment.wood);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    }else if(payment.ore){
+
+	    // спрайт mercury (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 72;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество mercury (условия)
+	    sprintf(str, "%d", payment.ore);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    }else if(payment.sulfur){
+
+	    // спрайт sulfur (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 3);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 75;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество sulfur (условия)
+	    sprintf(str, "%d", payment.sulfur);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    }else if(payment.gems){
+
+	    // спрайт gems (условия)
+	    FillSPRITE(&sprite, "RESOURCE.ICN", 5);
+	    image = GetICNSprite(&sprite);
+	    rectCur.x = rectBack.x + 225;
+	    rectCur.y = rectBack.y + 75;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &rectCur);
+	    // количество gems (условия)
+	    sprintf(str, "%d", payment.gems);
+	    rectCur.x = rectBack.x + 240;
+	    rectCur.y = rectBack.y + 103;
+	    rectCur.w = GetLengthText(str, FONT_SMALL);
+	    rectCur.h = FONT_HEIGHTSMALL;
+	    rectCur.x = rectCur.x - rectCur.w / 2;
+	    PrintText(video, &rectCur, str, FONT_SMALL);
+    }
+
+    // Отрисовка диалога
+    SDL_Flip(video);
+
+    // цикл событий
+    while(! exit){
+    
+        while(SDL_PollEvent(&event))
+            if( SDL_BUTTON_RIGHT == event.button.button && SDL_RELEASED == event.button.state) exit = TRUE;
+                        
+        if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY * 10);
+    }
+                                                                        
+    // востанавливаем бакгроунд
+    SDL_BlitSurface(back, NULL, video, &rectBack);
+    //SDL_Flip(video);
+
+    SDL_FreeSurface(back);
+
+    SetIntValue(ANIM2, TRUE);
+    SetIntValue(ANIM3, TRUE);
+
+    CursorOn();
 }

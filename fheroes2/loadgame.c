@@ -2169,7 +2169,7 @@ ACTION ActionButtonInfo(void){
     CursorOn();
 
     // в цикл событий
-    result = ActionCycle(dialogInfo);
+    result = ActionCycle(dialogInfo, NULL);
 
     if(EXIT != result) result = NONE;
 
@@ -2327,7 +2327,7 @@ ACTION ActionButtonMenu(void){
     CursorOn();
 
     // в цикл событий
-    result = ActionCycle(dialogMenu);
+    result = ActionCycle(dialogMenu, NULL);
 
     if(EXIT != result) result = NONE;
 
@@ -2627,7 +2627,7 @@ ACTION ActionButtonSettings(void){
     CursorOn();
 
     // в цикл событий
-    result = ActionCycle(dialogSettings);
+    result = ActionCycle(dialogSettings, NULL);
 
     if(EXIT != result) result = NONE;
 

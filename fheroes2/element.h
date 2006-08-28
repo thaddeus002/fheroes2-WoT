@@ -40,4 +40,6 @@ ACTION	MessageBox(const char *, ENUMFONT font);
 void	ShowQuickInfo(Uint16);
 void	ShowBorder(SDL_Rect *);
 
+Uint16	SelectCountBox(Uint16);
+
 #endif

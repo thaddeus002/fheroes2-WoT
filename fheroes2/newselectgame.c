@@ -140,7 +140,7 @@ ACTION DrawNewSelectGame(void){
     // цикл событий
     exit = FALSE;
     while(! exit)
-        switch(ActionCycle(stpenewselect)){
+        switch(ActionCycle(stpenewselect, NULL)){
 
             case EXIT:
                 result = EXIT;

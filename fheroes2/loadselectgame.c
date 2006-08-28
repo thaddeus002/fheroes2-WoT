@@ -135,7 +135,7 @@ ACTION DrawLoadSelectGame(void){
     // цикл событий
     exit = FALSE;
     while(! exit)
-        switch(ActionCycle(stpeloadselect)){
+        switch(ActionCycle(stpeloadselect, NULL)){
 
             case EXIT:
                 result = EXIT;

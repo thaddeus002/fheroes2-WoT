@@ -256,7 +256,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
 
     exit = FALSE;
     while(! exit)
-        switch(ActionCycle(dialog)){
+        switch(ActionCycle(dialog, NULL)){
 
             case UPGRADE:
                 exit = TRUE;

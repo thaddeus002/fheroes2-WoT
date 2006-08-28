@@ -43,6 +43,7 @@
 #include "kingdom.h"
 #include "castle.h"
 #include "castleinfo.h"
+#include "marketplace.h"
 #include "wellinfo.h"
 #include "taverninfo.h"
 #include "castleaction.h"
@@ -708,8 +709,11 @@ ACTION ActionClickDock(void){
 }
 
 ACTION ActionClickMarketplace(void){
-    fprintf(stderr, "ClickMarketplace\n");
-    return NONE;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    if(! castle) return NONE;
+
+    return ShowMarketplace(castle->color);
 }
 
 ACTION ActionClickMoat(void){
@@ -892,6 +896,72 @@ ACTION ActionClickRSpec(void){
 ACTION ActionClickRWel2(void){
 
     return BuildingInfoBox(BUILD_WEL2);
+}
+
+ACTION ActionClickRDwelling1(void){
+
+    Uint8 level = 1;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    DialogRecrutMonsterInfo(GetMonsterFromCastle(castle, level), castle->monster[level - 1]);
+
+    return NONE;
+}
+
+ACTION ActionClickRDwelling2(void){
+
+    Uint8 level = 2;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    DialogRecrutMonsterInfo(GetMonsterFromCastle(castle, level), castle->monster[level - 1]);
+
+    return NONE;
+}
+
+ACTION ActionClickRDwelling3(void){
+
+    Uint8 level = 3;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    DialogRecrutMonsterInfo(GetMonsterFromCastle(castle, level), castle->monster[level - 1]);
+
+    return NONE;
+}
+
+ACTION ActionClickRDwelling4(void){
+
+    Uint8 level = 4;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    DialogRecrutMonsterInfo(GetMonsterFromCastle(castle, level), castle->monster[level - 1]);
+
+    return NONE;
+}
+
+ACTION ActionClickRDwelling5(void){
+
+    Uint8 level = 5;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    DialogRecrutMonsterInfo(GetMonsterFromCastle(castle, level), castle->monster[level - 1]);
+
+    return NONE;
+}
+
+ACTION ActionClickRDwelling6(void){
+
+    Uint8 level = 6;
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    DialogRecrutMonsterInfo(GetMonsterFromCastle(castle, level), castle->monster[level - 1]);
+
+    return NONE;
 }
 
 ACTION ActionCastleOverExit(void){

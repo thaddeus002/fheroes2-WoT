@@ -729,6 +729,13 @@ void DrawWRLKDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickDwelling1;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRDwelling1;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -766,6 +773,13 @@ void DrawWRLKDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling2;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRDwelling2;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
@@ -806,6 +820,13 @@ void DrawWRLKDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling3;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRDwelling3;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
@@ -849,6 +870,13 @@ void DrawWRLKDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.pf = ActionClickDwelling4;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRDwelling4;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
     }
 }
 
@@ -887,6 +915,13 @@ void DrawWRLKDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling5;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRDwelling5;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }
@@ -931,6 +966,13 @@ void DrawWRLKDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	action.rect = cur;
 	action.mouseEvent = MOUSE_LCLICK;
 	action.pf = ActionClickDwelling6;
+	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
+	AddActionEvent(actionHead, &action);
+
+	ZeroINTERFACEACTION(&action);
+	action.rect = cur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRDwelling6;
 	action.level = LEVELEVENT_CASTLEUPDATEBUILD;
 	AddActionEvent(actionHead, &action);
     }

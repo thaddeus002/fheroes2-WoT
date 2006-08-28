@@ -1171,6 +1171,10 @@ const char * GetStringBuilding(E_RACE race, E_BUILDINGCASTLE build){
 		    string = "Moat";
 		    break;
 
+	case BUILD_MARKETPLACE:
+		    string = "Marketplace";
+		    break;
+
 	case BUILD_CASTLE:
 		    string = "Castle";
 		    break;

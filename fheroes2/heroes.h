@@ -142,8 +142,8 @@ typedef enum {
 		NAME_UNK2	= 55,
 		NAME_UNK3	= 56,
 		ARCHIBALD	= 57,
-		NAME_UNK5	= 58,
-		SANDYSANDY	= 59,
+		SANDYSANDY	= 58,
+		BRAX		= 59,
 
 		HEROESNULL	= 0xFF
 

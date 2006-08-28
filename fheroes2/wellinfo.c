@@ -975,7 +975,7 @@ ACTION ShowWellInfo(void){
     // цикл событий
     while(! exit)
 
-        switch(ActionCycle(dialog)){
+        switch(ActionCycle(dialog, NULL)){
 
     	    case EXIT:
     		exit = TRUE;

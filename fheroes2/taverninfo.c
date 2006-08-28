@@ -35,14 +35,17 @@
 #include "debug.h"
 #include "config.h"
 #include "actionevent.h"
+#include "animation.h"
 #include "castle.h"
 #include "taverninfo.h"
 
+void RedrawTavernAnimation(void);
+
+S_ANIMATION *animTavern = NULL;
 
 ACTION ShowTavernInfo(const char *rumor){
 
     CursorOff();
-    SetIntValue(ANIM2, FALSE);
     SetIntValue(ANIM3, FALSE);
     
     Uint32 cursor = GetCursor();
@@ -50,10 +53,12 @@ ACTION ShowTavernInfo(const char *rumor){
     SDL_Rect rectBack, rectCur;
     ACTION result = NONE;
     BOOL exit = FALSE;
+    ICNHEADER *header = NULL;
     INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
     AGGSPRITE sprite;
     Uint8 i;
+    animTavern = NULL;
     
     const char *buybuild = "BUYBUILD.ICN";
     const char *system = "SYSTEM.ICN";
@@ -167,7 +172,6 @@ ACTION ShowTavernInfo(const char *rumor){
     PrintAlignText(video, &rectCur, GetStringBuilding(KNIGHT, BUILD_TAVERN), FONT_BIG);
 
     // TAVWIN.ICN 0 1
-    // anim 2 - 20 frame
     FillSPRITE(&sprite, "TAVWIN.ICN", 0);
     image = GetICNSprite(&sprite);
     rectCur.x = (video->w - image->w) / 2;
@@ -183,6 +187,15 @@ ACTION ShowTavernInfo(const char *rumor){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // TAVWIN.ICN anim 2 - 20 frame
+    rectCur.x = rectBack.x + 69;
+    rectCur.y = rectBack.y + 78;
+    rectCur.w = 0;
+    rectCur.h = 0;
+    FillSPRITE(&sprite, "TAVWIN.ICN", 2);
+    header = GetICNHeader(&sprite);
+    AddAnimationEvent(&animTavern, &rectCur, header, 20);
 
     // text info
     rectCur.x = rectBack.x + 35;
@@ -225,7 +238,7 @@ ACTION ShowTavernInfo(const char *rumor){
     // цикл событий
     while(! exit)
     
-        switch(ActionCycle(dialog)){
+        switch(ActionCycle(dialog, RedrawTavernAnimation)){
     
             case EXIT:
                 exit = TRUE;
@@ -248,15 +261,61 @@ ACTION ShowTavernInfo(const char *rumor){
     SDL_BlitSurface(back, NULL, video, &rectBack);
     //SDL_Flip(video);
 
+    FreeAnimationEvent(animTavern);
     FreeActionEvent(dialog);
     SDL_FreeSurface(back);
 
     SetCursor(cursor);
 
-    SetIntValue(ANIM2, TRUE);
     SetIntValue(ANIM3, TRUE);
     CursorOn();
 
     return result;
 }
 
+
+void RedrawTavernAnimation(void){
+
+    if(! GetIntValue(ANIMATION)) return;
+
+    static Uint32 animationFrame = 0;
+ 
+    Sint32 x; 
+    Sint32 y; 
+     
+    SDL_Surface *video = SDL_GetVideoSurface(); 
+    SDL_GetMouseState(&x, &y); 
+    S_ANIMATION *ptr = animTavern;
+ 
+    while(ptr){ 
+ 
+        CursorOff(); 
+ 
+	// востановить фон предыдущего спрайта
+	if(ptr->background)
+
+    	    SDL_BlitSurface(ptr->background, NULL, video, &ptr->rectBack);
+
+	else if(NULL == (ptr->background = SDL_CreateRGBSurface(SDL_SWSURFACE, ptr->rect[animationFrame % ptr->count].w, ptr->rect[animationFrame % ptr->count].h, 16, 0, 0, 0, 0))){
+            fprintf(stderr, "RedrawMenuAnimation: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), ptr->rect[animationFrame % ptr->count].w, ptr->rect[animationFrame % ptr->count].h);
+            return;
+        }
+
+	// сохраняем фон нового спрайта
+    	SDL_BlitSurface(video, &ptr->rect[animationFrame % ptr->count], ptr->background, NULL);
+	ptr->rectBack = ptr->rect[animationFrame % ptr->count];
+
+	// рисуем спрайт
+        SDL_BlitSurface(ptr->surface[animationFrame % ptr->count], NULL, video, &ptr->rect[animationFrame % ptr->count]); 
+
+        CursorOn(); 
+        ptr = ptr->next; 
+    } 
+ 
+    SDL_Flip(video); 
+    SDL_Delay(GetIntValue(ANIMATIONDELAY));     
+
+    ++animationFrame;
+
+    return;
+}

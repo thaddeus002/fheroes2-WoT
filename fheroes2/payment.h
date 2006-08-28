@@ -337,7 +337,7 @@
 
 typedef struct {
 
-                Uint16          gold;
+                Uint32          gold;
                 Uint16          wood;
                 Uint16          ore;
                 Uint16          mercury;

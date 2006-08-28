@@ -523,8 +523,8 @@ ACTION ShowCastleInfo(void){
     AddActionEvent(&castinfo, &action); 
 
     // мини картинка замка
-    rectCur.x = 460;
-    rectCur.y = 5;
+    rectCur.x = cx + 460;
+    rectCur.y = cy;
     rectCur.w = image->w - rectCur.x;
     rectCur.h = image->h - rectCur.y;
     DrawAmountedCastle(video, &rectCur, castle->race, GetGroundMaps(castle->ax, castle->ay), TRUE);

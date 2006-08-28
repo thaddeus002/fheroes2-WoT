@@ -84,6 +84,12 @@ ACTION ActionClickRMarketplace(void);
 ACTION ActionClickRMoat(void);
 ACTION ActionClickRSpec(void);
 ACTION ActionClickRWel2(void);
+ACTION ActionClickRDwelling1(void);
+ACTION ActionClickRDwelling2(void);
+ACTION ActionClickRDwelling3(void);
+ACTION ActionClickRDwelling4(void);
+ACTION ActionClickRDwelling5(void);
+ACTION ActionClickRDwelling6(void);
 
 ACTION ActionCastleOverExit(void);
 ACTION ActionCastleOverStatue(void);
