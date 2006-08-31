@@ -37,6 +37,7 @@
 #include "cursor.h"
 #include "tools.h"
 #include "element.h"
+#include "spliter.h"
 #include "newselectmaps.h"
 
 typedef struct {			// структура заголовка карты с необходимыми полями
@@ -54,16 +55,6 @@ typedef struct {			// структура заголовка карты с нео
     Uint8	description[143];	// address: 0x76
 } LOADMP2HEADER;
 
-typedef struct {
-    SDL_Surface	*backSurface;
-    SDL_Surface	*cursor;
-    SDL_Rect	backRect;
-    BOOL	backUse;
-    Uint16	maxy;
-    Uint16	miny;
-    Uint8	step;
-} SCROLLCURSOR;
-
 #define MAXLENFILENAME 64
 #define MAXNAMES 9			// количество имен в окне выбора
 
@@ -79,16 +70,16 @@ typedef struct {				  // структура для формирования св
     void		*next;
 } FILEMAPINFO;
 
-void ShowSelectLoad(void);		// отображает динамичые элементы с обновлением
+void RedrawListPanel(void);		// отображает динамичые элементы с обновлением
 void ShowStaticForm(void);		// отображает статичные элементы (без обновления)
 void ReadFileMapInfo(void);		// читаем все файлы карт в структуру
 void FreeFileMapInfo(void);		// освобождаем память
 void ShowListFileMap(void);		// отобразить список карт
 void ShowFileMapInfo(FILEMAPINFO *cur);	// отобразить дополнительное инфо карты
-void InitSlider(void);
-void DrawSlider(Uint16);
-void ResetSlider(void);
-void FreeSlider(void);
+Uint16 GetCountAll(E_SIZEMAP);
+Uint16 GetCountTail(E_SIZEMAP, FILEMAPINFO *);
+void StartSpliter(void);
+
 FILEMAPINFO *ExistsMapSizeDown(FILEMAPINFO *, E_SIZEMAP);	// дополнительная функция поиска элемента по критерию (E_SIZEMAP)
 FILEMAPINFO *ExistsMapSizeUp(FILEMAPINFO *, E_SIZEMAP);	// дополнительная функция поиска элемента по критерию (E_SIZEMAP)
 
@@ -100,25 +91,52 @@ ACTION ActionPressShowAll(void);
 ACTION ActionPressSelectMap(void);
 ACTION ActionPressScrollBar(void);
 
-INTERFACEACTION *stpeload = NULL;
 FILEMAPINFO	*header = NULL;			// указатель головы всего списка
 FILEMAPINFO	*firstName = NULL;		// указатель текущего первого имени в окне выбора
 E_SIZEMAP	showmaps = MAPS_ALL;		// фильтр карты
-Uint8		count = 0;			// количество отображенных имен (отсортированных по размеру)
 FILEMAPINFO	*currentName = NULL;		// текущий выделенный элемент
-SCROLLCURSOR	*slider;
+S_SPLITER	*spliterMaps = NULL;
 
 ACTION DrawNewSelectMaps(void){			// типа майн ;)
 
     SDL_Rect dest;
-    SDL_Surface *image;
-
+    SDL_Surface *image = NULL;
+    SDL_Surface *video = NULL;
     INTERFACEACTION action;
     AGGSPRITE sprite;
     BOOL exit;
     ACTION result = NONE;
+    INTERFACEACTION *stpeload = NULL;
 
-    stpeload = NULL;
+    CursorOff();
+    // only 640x480
+    Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
+    if(TRUE == GetIntValue(FULLSCREEN)) flag |= SDL_FULLSCREEN;
+    if(NULL == (video = SDL_GetVideoSurface()) || video->w != 640 || video->h !=480)
+        video = SDL_SetVideoMode(640, 480, 16, flag);
+
+    if(NULL == video){
+	fprintf(stderr, "SDL_SetVideoMode: %s\n", SDL_GetError());
+	return EXIT;
+    }
+
+    // загружаем фон
+    FillSPRITE(&sprite, "HEROES.ICN", 0);
+    image = GetICNSprite(&sprite);
+    dest.x = 0;
+    dest.y = 0;
+    dest.w = image->w;
+    dest.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &dest);
+
+    // загружаем тень ;)
+    FillSPRITE(&sprite, "REQSBKG.ICN", 1);
+    image = GetICNSprite(&sprite);
+    dest.x = 114;
+    dest.y = 21;
+    dest.w = image->w;
+    dest.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // выбор текущей карты (щелчек  по списку)
     dest.x = 174;
@@ -179,6 +197,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressShowSmall;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // кнопка medium
     FillSPRITE(&sprite, "REQUESTS.ICN", 11);
@@ -197,6 +216,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressShowMedium;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // кнопка large
     FillSPRITE(&sprite, "REQUESTS.ICN", 13);
@@ -215,6 +235,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressShowLarge;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // кнопка xlarge
     FillSPRITE(&sprite, "REQUESTS.ICN", 15);
@@ -233,6 +254,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressShowXLarge;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // кнопка all
     FillSPRITE(&sprite, "REQUESTS.ICN", 17);
@@ -251,6 +273,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressShowAll;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // кнопка okay
     FillSPRITE(&sprite, "REQUESTS.ICN", 1);
@@ -269,6 +292,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressOK;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // кнопка scroll up
     FillSPRITE(&sprite, "REQUESTS.ICN", 5);
@@ -287,6 +311,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressUP;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // кнопка scroll down
     FillSPRITE(&sprite, "REQUESTS.ICN", 7);
@@ -305,6 +330,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     action.pf = ActionPressDOWN;
     // регистрируем
     AddActionEvent(&stpeload, &action);
+    SDL_BlitSurface(image, NULL, video, &dest);
 
     // scroll bar
     dest.x = 459;
@@ -321,10 +347,11 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     AddActionEvent(&stpeload, &action);
 
     ReadFileMapInfo();
-    InitSlider();
+    FillSPRITE(&sprite, "ESCROLL.ICN", 3);
+    if(NULL == (spliterMaps = InitSpliter(&sprite))) return EXIT;
 
-    // отображаем всю картинку
-    ShowStaticForm();
+    RedrawListPanel();
+    StartSpliter();
 
     exit = FALSE;
     while(! exit)
@@ -365,15 +392,18 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
 		if(firstName != header){
 		    if(ExistsMapSizeUp(firstName, showmaps))
 			firstName = ExistsMapSizeUp(firstName, showmaps);
-		    ShowSelectLoad();
+		    RedrawListPanel();
+		    MoveBackwardSpliter(spliterMaps);
 		}
         	break;
 
             case DOWN:
-		if(NULL != firstName->next && count >= MAXNAMES){
+		if(NULL != firstName->next && GetCountTail(showmaps, firstName) > MAXNAMES - 1){
+
 		    if(ExistsMapSizeDown(firstName, showmaps))
 			firstName = ExistsMapSizeDown(firstName, showmaps);
-		    ShowSelectLoad();
+		    RedrawListPanel();
+		    MoveForwardSpliter(spliterMaps);
 		}
         	break;
 
@@ -382,58 +412,15 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
 	}
 
     FreeActionEvent(stpeload);
-    FreeSlider();
+    FreeSpliter(spliterMaps);
     FreeFileMapInfo();
+
+    CursorOn();
 
     return result;
 }
 
-void ShowStaticForm(void){
-
-    SDL_Surface *video; 
-    SDL_Surface *image;
-    SDL_Rect dest;
-    AGGSPRITE sprite;
-
-    SetCursor(CURSOR_POINTER);
-    CursorOff();
-
-    // only 640x480
-    Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-    if(TRUE == GetIntValue(FULLSCREEN)) flag |= SDL_FULLSCREEN;
-    if(NULL == (video = SDL_GetVideoSurface()) || video->w != 640 || video->h !=480)
-        video = SDL_SetVideoMode(640, 480, 16, flag);
-
-    if(NULL == video){
-	fprintf(stderr, "SDL_SetVideoMode: %s\n", SDL_GetError());
-	return;
-    }
-
-    // загружаем фон
-    FillSPRITE(&sprite, "HEROES.ICN", 0);
-    image = GetICNSprite(&sprite);
-    dest.x = 0;
-    dest.y = 0;
-    dest.w = image->w;
-    dest.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &dest);
-
-    // загружаем тень ;)
-    FillSPRITE(&sprite, "REQSBKG.ICN", 1);
-    image = GetICNSprite(&sprite);
-    dest.x = 114;
-    dest.y = 21;
-    dest.w = image->w;
-    dest.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &dest);
-
-    CursorOn();
-
-    // дополнительно
-    ShowSelectLoad();
-}
-
-void ShowSelectLoad(void){
+void RedrawListPanel(void){
 
     SDL_Surface *video; 
     SDL_Surface *image;
@@ -443,6 +430,7 @@ void ShowSelectLoad(void){
     video = SDL_GetVideoSurface();
 
     CursorOff();
+
     // загружаем панель
     FillSPRITE(&sprite, "REQSBKG.ICN", 0);
     image = GetICNSprite(&sprite);
@@ -450,29 +438,13 @@ void ShowSelectLoad(void){
     dest.y = 5;
     dest.w = image->w;
     dest.h = image->h;
-    
     SDL_BlitSurface(image, NULL, video, &dest);
-
-    INTERFACEACTION *ptr = stpeload;
-
-    // отображаем динамические элементы
-    while(ptr){
-
-	if(NULL != (image = GetICNSprite(&ptr->objectUp)))
-	    SDL_BlitSurface(image, NULL, video, &ptr->rect);
-
-	ptr = (INTERFACEACTION *) ptr->next;
-    }
-
 
     ShowListFileMap();
     ShowFileMapInfo(currentName);
 
-    SDL_Flip(video);
+    //SDL_Flip(video);
     CursorOn();
-
-    // slider
-    DrawSlider(slider->backRect.y);
 }
 
 ACTION ActionPressSelectMap(){
@@ -505,8 +477,8 @@ ACTION ActionPressSelectMap(){
 	dest.y += dest.h;
     }
 
-    ResetSlider();
-    ShowSelectLoad();
+
+    RedrawListPanel();
 
     return NONE;
 }
@@ -517,8 +489,8 @@ ACTION ActionPressShowSmall(){
     if(ExistsMapSizeDown(header, showmaps))
 	firstName = ExistsMapSizeDown(header, showmaps);
 
-    ResetSlider();
-    ShowSelectLoad();
+    RedrawListPanel();
+    StartSpliter();
 
     return NONE;
 }
@@ -529,8 +501,8 @@ ACTION ActionPressShowMedium(){
     if(ExistsMapSizeDown(header, showmaps))
 	firstName = ExistsMapSizeDown(header, showmaps);
     
-    ResetSlider();
-    ShowSelectLoad();
+    RedrawListPanel();
+    StartSpliter();
 
     return NONE;
 }
@@ -541,8 +513,8 @@ ACTION ActionPressShowLarge(){
     if(ExistsMapSizeDown(header, showmaps))
 	firstName = ExistsMapSizeDown(header, showmaps);
     
-    ResetSlider();
-    ShowSelectLoad();
+    RedrawListPanel();
+    StartSpliter();
 
     return NONE;
 }
@@ -553,8 +525,8 @@ ACTION ActionPressShowXLarge(){
     if(ExistsMapSizeDown(header, showmaps))
 	firstName = ExistsMapSizeDown(header, showmaps);
     
-    ResetSlider();
-    ShowSelectLoad();
+    RedrawListPanel();
+    StartSpliter();
 
     return NONE;
 }
@@ -564,8 +536,8 @@ ACTION ActionPressShowAll(){
     showmaps = MAPS_ALL;
     firstName = NULL;
 
-    ResetSlider();
-    ShowSelectLoad();
+    RedrawListPanel();
+    StartSpliter();
 
     return NONE;
 }
@@ -574,8 +546,6 @@ ACTION ActionPressScrollBar(){
 
     int mousex, mousey;
     SDL_GetMouseState(&mousex, &mousey);
-
-    DrawSlider(mousey);
 
     return NONE;
 }
@@ -751,7 +721,6 @@ void ShowListFileMap(void){
     int i;
     
     // инициализация первого элемента
-    count = 0;
     if(NULL == firstName)
 	switch(showmaps){
 	    case MAPS_ALL:
@@ -830,7 +799,6 @@ void ShowListFileMap(void){
 	    SDL_BlitSurface(image, NULL, video, &dest);
 
 	    dest.y += 19;
-	    count++;
 	    ptr  = ExistsMapSizeDown(ptr, showmaps);
 	}
     }
@@ -972,62 +940,43 @@ FILEMAPINFO *ExistsMapSizeUp(FILEMAPINFO *cur, E_SIZEMAP size){
     return NULL;
 }
 
-void InitSlider(void){
+Uint16 GetCountAll(E_SIZEMAP size){
 
-    if(NULL == (slider = (SCROLLCURSOR *) malloc(sizeof(SCROLLCURSOR)))){
-	fprintf(stderr, "InitSlider: error malloc: %d\n", sizeof(SCROLLCURSOR));
-	return;
-    }
-
-    AGGSPRITE sprite;
-
-    FillSPRITE(&sprite, "ESCROLL.ICN", 3);
-    slider->cursor = GetICNSprite(&sprite);
-    slider->backSurface = NULL;
-    if(NULL == (slider->backSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, slider->cursor->w, slider->cursor->h, 16, 0, 0, 0, 0))){
-        fprintf(stderr, "DrawSelectNewStandardGame: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), slider->cursor->w, slider->cursor->w);
-        return;
-    }
-    slider->maxy = 218;
-    slider->miny = 78;
-    slider->backUse = FALSE;
-    slider->backRect.x = 460;
-    slider->backRect.y = 0;
-    slider->backRect.w = slider->cursor->w;
-    slider->backRect.h = slider->cursor->h;
-    slider->step = 0;
+    Uint16 result = 0;
+    
+    FILEMAPINFO *ptr = header;
+    while(NULL != (ptr = ExistsMapSizeDown(ptr, size))) ++result;
+    
+    return result;
 }
 
-void FreeSlider(void){
+Uint16 GetCountTail(E_SIZEMAP size, FILEMAPINFO *next){
 
-    if(slider->backSurface) SDL_FreeSurface(slider->backSurface);
-    if(slider) free(slider);
+    Uint16 result = 0;
+    
+    FILEMAPINFO *ptr = next;
+    while(NULL != (ptr = ExistsMapSizeDown(ptr, size))) ++result;
+    
+    return result;
 }
 
-void DrawSlider(Uint16 y){
+void StartSpliter(void){
 
-    CursorOff();
-        
+    SDL_Rect dest;
     SDL_Surface *video = SDL_GetVideoSurface();
 
-    if(slider->backUse)
-	SDL_BlitSurface(slider->backSurface, NULL, video, &slider->backRect);
+    if(spliterMaps->background)
+        SDL_BlitSurface(spliterMaps->background, NULL, video, &spliterMaps->pos);
 
-    if(y < slider->miny)
-	slider->backRect.y = slider->miny;
-    else if(y > (slider->maxy - slider->backRect.h))
-	slider->backRect.y = slider->maxy - slider->backRect.h;
-    else
-	slider->backRect.y = y;
-    
-    SDL_BlitSurface(video,  &slider->backRect, slider->backSurface, NULL);
-    slider->backUse = TRUE;
+    // init spliterMaps
+    dest.x = 460;
+    dest.y = 77;
+    dest.w = 8;
+    dest.h = 140;
 
-    SDL_BlitSurface(slider->cursor, NULL, video, &slider->backRect);
+    Uint16 max = 0;
+    if(GetCountAll(showmaps) > MAXNAMES) max = GetCountAll(showmaps) - MAXNAMES + 1;
 
-    CursorOn();
-}
-
-void ResetSlider(void){
-    slider->backRect.y = slider->miny;
+    SetRangeSpliter(spliterMaps, &dest, max);
+    RedrawSpliter(spliterMaps);
 }

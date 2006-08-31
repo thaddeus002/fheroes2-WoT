@@ -41,8 +41,9 @@
 #define LEVELEVENT_CASTLEINFOBUILD	0x08
 #define LEVELEVENT_MARKETPLACE1		0x09
 #define LEVELEVENT_MARKETPLACE2		0x0A
+#define LEVELEVENT_MARKETTRADE		0x0B
 
-typedef enum {NONE=0, YES, OK, NO, CANCEL, EXIT, ESC, DISMISS, UPGRADE, ENDTUR, MAX, UP, DOWN, SELECT, ENTER} ACTION;
+typedef enum {NONE=0, YES, OK, NO, CANCEL, EXIT, ESC, DISMISS, UPGRADE, ENDTUR, MAX, UP, DOWN, SELECT, ENTER, LEFT, RIGHT} ACTION;
 
 typedef struct{
     SDL_Rect    pushRect;
@@ -81,5 +82,7 @@ ACTION ActionPressMAX(void);
 ACTION ActionPressUP(void);
 ACTION ActionPressDOWN(void);
 ACTION ActionPressSELECT(void);
+ACTION ActionPressLEFT(void);
+ACTION ActionPressRIGHT(void);
 
 #endif

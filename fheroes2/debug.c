@@ -1325,3 +1325,45 @@ const char * GetStringDescriptionsBuilding(E_RACE race, E_BUILDINGCASTLE build){
     return string;
 }
 
+const char * GetStringResource(E_RESOURCE resource){
+
+    const char *string = NULL;
+    
+    switch(resource){
+	
+    case WOOD:
+	string = "Wood";
+	break;
+	
+    case MERCURY:
+	string = "Mercury";
+	break;
+
+    case ORE:
+	string = "Ore";
+	break;
+
+    case SULFUR:
+	string = "Sulfur";
+	break;
+
+    case CRYSTAL:
+	string = "Crystal";
+	break;
+
+    case GEMS:
+	string = "Gems";
+	break;
+
+    case GOLDS:
+	string = "Gold";
+	break;
+
+    default:
+	string = "";
+	break;
+    }
+
+    return string;
+}
+

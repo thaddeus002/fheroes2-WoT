@@ -26,30 +26,27 @@
     Description:
 */
 
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef _SPLITER_H
+#define _SPLITER_H
 
-#include "SDL.h"
-#include "object.h"
-#include "mp2maps.h"
-#include "monster.h"
-#include "castle.h"
+typedef struct {
 
-const char * GetStringObject(E_OBJECT);
-const char * GetStringRace(E_RACE);
-const char * GetStringGameLevel(E_GAMELEVEL);
-const char * GetStringColor(E_COLORS);
-const char * GetStringLuck(E_LUCK);
-const char * GetStringMorale(E_MORALE);
-const char * GetStringSpeed(E_MONSTERSPEED);
-const char * GetStringGround(E_GROUND);
-const char * GetStringDwelling(E_RACE, E_DWELLINGCASTLE);
-const char * GetStringBuilding(E_RACE, E_BUILDINGCASTLE);
-const char * GetStringDescriptionsBuilding(E_RACE, E_BUILDINGCASTLE);
-const char * GetStringResource(E_RESOURCE);
+    SDL_Surface         *background;
+    SDL_Surface         *cursor;
+    SDL_Rect            pos;
+    float               step;
+    Uint16		start;
+    Uint16              max;
+    Uint16              cur;
+    BOOL		vertical;
 
-const char * GetStringLevelMageGuild(E_MAGICLEVEL level);
-
-void         PrintCellInfo(Uint16);
+		} S_SPLITER;
+                            
+S_SPLITER *	InitSpliter(AGGSPRITE *sprite);
+void		FreeSpliter(S_SPLITER *);
+void		SetRangeSpliter(S_SPLITER *, SDL_Rect *, Uint16);
+void		RedrawSpliter(S_SPLITER *);
+void		MoveForwardSpliter(S_SPLITER *);
+void		MoveBackwardSpliter(S_SPLITER *);
 
 #endif

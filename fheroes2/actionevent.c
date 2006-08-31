@@ -142,6 +142,16 @@ ACTION ActionPressNO(void){
     return NO;
 }
 
+ACTION ActionPressLEFT(void){
+    
+    return LEFT;
+}
+
+ACTION ActionPressRIGHT(void){
+    
+    return RIGHT;
+}
+
 ACTION ActionPressEXIT(void){
     
     return EXIT;
