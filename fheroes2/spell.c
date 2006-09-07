@@ -30,6 +30,11 @@
 #include "SDL.h"
 
 #include "gamedefs.h"
+#include "actionevent.h"
+#include "debug.h"
+#include "cursor.h"
+#include "tools.h"
+#include "box.h"
 #include "config.h"
 #include "spell.h"
 
@@ -46,6 +51,7 @@ static const E_SPELL lifeSpellLevel2[LIFESPELL_LEVEL2] = {SUMMONBOAT, HAUNT, VIS
 static const E_SPELL lifeSpellLevel3[LIFESPELL_LEVEL3] = {TELEPORT, IDENTIFYHERO, VIEWHEROES, VIEWTOWNS};
 static const E_SPELL lifeSpellLevel4[LIFESPELL_LEVEL4] = {VIEWALL, TOWNGATE, EARTHGUARDIAN, AIRGUARDIAN, FIREGUARDIAN, WATERGUARDIAN};
 static const E_SPELL lifeSpellLevel5[LIFESPELL_LEVEL5] = {DIMENSIONDOOR, TOWNPORTAL};
+
 
 BOOL	InitSpell(void){
 
@@ -183,16 +189,16 @@ BOOL	InitSpell(void){
     ptrSpell[MASSSHIELD].name = "Mass Shield";
     ptrSpell[MASSSHIELD].cost = 7;
 
-    ptrSpell[EARTHSUMMON].name = "Summon Earth Elemental";
+    ptrSpell[EARTHSUMMON].name = "Summon Earth El.";
     ptrSpell[EARTHSUMMON].cost = 30;
     
-    ptrSpell[AIRSUMMON].name = "Summon Air Elemental";
+    ptrSpell[AIRSUMMON].name = "Summon Air El.";
     ptrSpell[AIRSUMMON].cost = 30;
 
-    ptrSpell[FIRESUMMON].name = "Summon Fire Elemental";
+    ptrSpell[FIRESUMMON].name = "Summon Fire El.";
     ptrSpell[FIRESUMMON].cost = 30;
 
-    ptrSpell[WATERSUMMON].name = "Summon Water Elemental";
+    ptrSpell[WATERSUMMON].name = "Summon Water El.";
     ptrSpell[WATERSUMMON].cost = 30;
 
     ptrSpell[EARTHQUAKE].name = "Earthquake";
@@ -250,73 +256,71 @@ BOOL	InitSpell(void){
     ptrSpell[WATERGUARDIAN].cost = 15;
 
 
-
-
-    ptrSpell[FIREBALL].descriptions = "Fireball";
-    ptrSpell[FIREBLAST].descriptions = "Fireblast";
-    ptrSpell[LIGHTNINGBOLT].descriptions = "Lightning Bolt";
-    ptrSpell[CHAINLIGHTNING].descriptions = "Chain Lightning";
-    ptrSpell[TELEPORT].descriptions = "Teleport";
-    ptrSpell[CURE].descriptions = "Cure";
-    ptrSpell[MASSCURE].descriptions = "Mass Cure";
-    ptrSpell[RESURRECT].descriptions = "Resurrect";
-    ptrSpell[RESURRECTTRUE].descriptions = "Resurrect True";
-    ptrSpell[HASTE].descriptions = "Haste";
-    ptrSpell[MASSHASTE].descriptions = "Mass Haste";
-    ptrSpell[SPELLSLOW].descriptions = "Slow";
-    ptrSpell[MASSSLOW].descriptions = "Mass Slow";
-    ptrSpell[BLIND].descriptions = "Blind";
-    ptrSpell[BLESS].descriptions = "Bless";
-    ptrSpell[MASSBLESS].descriptions = "Mass Bless";
-    ptrSpell[STONESKIN].descriptions = "Stoneskin";
-    ptrSpell[STEELSKIN].descriptions = "Steelskin";
-    ptrSpell[CURSE].descriptions = "Curse";
-    ptrSpell[MASSCURSE].descriptions = "Mass Curse";
-    ptrSpell[HOLYWORD].descriptions = "Holy Word";
-    ptrSpell[HOLYSHOUT].descriptions = "Holy Shout";
-    ptrSpell[ANTIMAGIC].descriptions = "Anti-Magic";
-    ptrSpell[DISPELMAGIC].descriptions = "Dispel Magic";
-    ptrSpell[MASSDISPEL].descriptions = "Mass Dispel";
-    ptrSpell[MAGICARROW].descriptions = "Magic Arrow";
-    ptrSpell[BERZERKER].descriptions = "Berzerker";
-    ptrSpell[ARMAGEDDON].descriptions = "Armageddon";
-    ptrSpell[ELEMENTALSTORM].descriptions = "Elemental Storm";
-    ptrSpell[METEORSHOWER].descriptions = "Meteor Shower";
-    ptrSpell[PARALYZE].descriptions = "Paralyze";
-    ptrSpell[HYPNOTIZE].descriptions = "Hypnotize";
-    ptrSpell[COLDRAY].descriptions = "Cold Ray";
-    ptrSpell[COLDRING].descriptions = "Cold Ring";
-    ptrSpell[DISRUPTINGRAY].descriptions = "Disrupting Ray";
-    ptrSpell[DEATHRIPPLE].descriptions = "Death Ripple";
-    ptrSpell[DEATHWAVE].descriptions = "Death Wave";
-    ptrSpell[DRAGONSLAYER].descriptions = "Dragon Slayer";
-    ptrSpell[BLOODLUST].descriptions = "Blood Lust";
-    ptrSpell[ANIMATEDEAD].descriptions = "Animate Dead";
-    ptrSpell[MIRRORIMAGE].descriptions = "Mirror Image";
-    ptrSpell[SHIELD].descriptions = "Shield";
-    ptrSpell[MASSSHIELD].descriptions = "Mass Shield";
-    ptrSpell[EARTHSUMMON].descriptions = "Summon Earth Elemental";
-    ptrSpell[AIRSUMMON].descriptions = "Summon Air Elemental";
-    ptrSpell[FIRESUMMON].descriptions = "Summon Fire Elemental";
-    ptrSpell[WATERSUMMON].descriptions = "Summon Water Elemental";
-    ptrSpell[EARTHQUAKE].descriptions = "Earthquake";
-    ptrSpell[VIEWMINES].descriptions = "View Mines";
-    ptrSpell[VIEWRESOURCES].descriptions = "View Resources";
-    ptrSpell[VIEWARTIFACTS].descriptions = "View Artifacts";
-    ptrSpell[VIEWTOWNS].descriptions = "View Towns";
-    ptrSpell[VIEWHEROES].descriptions = "View Heroes";
-    ptrSpell[VIEWALL].descriptions = "View All";
-    ptrSpell[IDENTIFYHERO].descriptions = "Identify Hero";
-    ptrSpell[SUMMONBOAT].descriptions = "Summon Boat";
-    ptrSpell[DIMENSIONDOOR].descriptions = "Dimension Door";
-    ptrSpell[TOWNGATE].descriptions = "Town Gate";
-    ptrSpell[TOWNPORTAL].descriptions = "Town Portal";
-    ptrSpell[VISIONS].descriptions = "Visions";
-    ptrSpell[HAUNT].descriptions = "Haunt";
-    ptrSpell[EARTHGUARDIAN].descriptions = "Set Earth Guardian";
-    ptrSpell[AIRGUARDIAN].descriptions = "Set Air Guardian";
-    ptrSpell[FIREGUARDIAN].descriptions = "Set Fire Guardian";
-    ptrSpell[WATERGUARDIAN].descriptions = "Set Water Guardian";
+    ptrSpell[FIREBALL].descriptions = "Causes a giant fireball to strike the selected area, damaging all nearby creatures.";
+    ptrSpell[FIREBLAST].descriptions = "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one.";
+    ptrSpell[LIGHTNINGBOLT].descriptions = "Causes a bolt of electrical energy to strike the selected creature.";
+    ptrSpell[CHAINLIGHTNING].descriptions = "Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!";
+    ptrSpell[TELEPORT].descriptions = "Teleports the creature you select to any open position on the battlefield.";
+    ptrSpell[CURE].descriptions = "Removes all negative spells cast upon one of your units, and restores up to 5 HP per level of spell power.";
+    ptrSpell[MASSCURE].descriptions = "Removes all negative spells cast upon your forces, and restores up to 5 HP per level of spell power, per creature.";
+    ptrSpell[RESURRECT].descriptions = "Resurrects creatures from a damaged or dead unit until end of combat.";
+    ptrSpell[RESURRECTTRUE].descriptions = "Resurrects creatures from a damaged or dead unit permanently.";
+    ptrSpell[HASTE].descriptions = "Increases the speed of any creature by two.";
+    ptrSpell[MASSHASTE].descriptions = "Increases the speed of all of your creatures by two.";
+    ptrSpell[SPELLSLOW].descriptions = "Slows target to half movement rate.";
+    ptrSpell[MASSSLOW].descriptions = "Slows all enemies to half movement rate.";
+    ptrSpell[BLIND].descriptions = "Clouds the affected creatures' eyes, preventing them from moving.";
+    ptrSpell[BLESS].descriptions = "Causes the selected creatures to inflict maximum damage.";
+    ptrSpell[MASSBLESS].descriptions = "Causes all of your units to inflict maximum damage.";
+    ptrSpell[STONESKIN].descriptions = "Magically increases the defense skill of the selected creatures.";
+    ptrSpell[STEELSKIN].descriptions = "Increases the defense skill of the targeted creatures.  This is an improved version of Stoneskin.";
+    ptrSpell[CURSE].descriptions = "Causes the selected creatures to inflict minimum damage.";
+    ptrSpell[MASSCURSE].descriptions = "Causes all enemy troops to inflict minimum damage.";
+    ptrSpell[HOLYWORD].descriptions = "Damages all undead in the battle.";
+    ptrSpell[HOLYSHOUT].descriptions = "Damages all undead in the battle.  This is an improved version of Holy Word.";
+    ptrSpell[ANTIMAGIC].descriptions = "Prevents harmful magic against the selected creatures.";
+    ptrSpell[DISPELMAGIC].descriptions = "Removes all magic spells from a single target.";
+    ptrSpell[MASSDISPEL].descriptions = "Removes all magic spells from all creatures.";
+    ptrSpell[MAGICARROW].descriptions = "Causes a magic arrow to strike the selected target.";
+    ptrSpell[BERZERKER].descriptions = "Causes a creature to attack its nearest neighbor.";
+    ptrSpell[ARMAGEDDON].descriptions = "Holy terror strikes the battlefield, causing severe damage to all creatures.";
+    ptrSpell[ELEMENTALSTORM].descriptions = "Magical elements pour down on the battlefield, damaging all creatures.";
+    ptrSpell[METEORSHOWER].descriptions = "A rain of rocks strikes an area of the battlefield, damaging all nearby creatures.";
+    ptrSpell[PARALYZE].descriptions = "The targeted creatures are paralyzed, unable to move or retaliate.";
+    ptrSpell[HYPNOTIZE].descriptions = "Brings a single enemy unit under your control for one combat round if its hits are less than 25 times the caster's spell power.";
+    ptrSpell[COLDRAY].descriptions = "Drains body heat from a single enemy unit.";
+    ptrSpell[COLDRING].descriptions = "Drains body heat from all units surrounding the center point, but not including the center point.";
+    ptrSpell[DISRUPTINGRAY].descriptions = "Reduces the defense rating of an enemy unit by three.";
+    ptrSpell[DEATHRIPPLE].descriptions = "Damages all living (non-undead) units in the battle.";
+    ptrSpell[DEATHWAVE].descriptions = "Damages all living (non-undead) units in the battle.  This spell is an improved version of Death Ripple.";
+    ptrSpell[DRAGONSLAYER].descriptions = "Greatly increases a unit's attack skill vs. Dragons.";
+    ptrSpell[BLOODLUST].descriptions = "Increases a unit's attack skill.";
+    ptrSpell[ANIMATEDEAD].descriptions = "'Resurrects' creatures from a damaged or dead undead unit permanently.";
+    ptrSpell[MIRRORIMAGE].descriptions = "Creates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage.";
+    ptrSpell[SHIELD].descriptions = "Halves damage received from ranged attacks for a single unit.";
+    ptrSpell[MASSSHIELD].descriptions = "Halves damage received from ranged attacks for all of your units.";
+    ptrSpell[EARTHSUMMON].descriptions = "Summons Earth Elementals to fight for your army.";
+    ptrSpell[AIRSUMMON].descriptions = "Summons Air Elementals to fight for your army.";
+    ptrSpell[FIRESUMMON].descriptions = "Summons Fire Elementals to fight for your army.";
+    ptrSpell[WATERSUMMON].descriptions = "Summons Water Elementals to fight for your army.";
+    ptrSpell[EARTHQUAKE].descriptions = "Damages castle walls.";
+    ptrSpell[VIEWMINES].descriptions = "Causes all mines across the land to become visible.";
+    ptrSpell[VIEWRESOURCES].descriptions = "Causes all resources across the land to become visible.";
+    ptrSpell[VIEWARTIFACTS].descriptions = "Causes all artifacts across the land to become visible.";
+    ptrSpell[VIEWTOWNS].descriptions = "Causes all towns and castles across the land to become visible.";
+    ptrSpell[VIEWHEROES].descriptions = "Causes all Heroes across the land to become visible.";
+    ptrSpell[VIEWALL].descriptions = "Causes the entire land to become visible.";
+    ptrSpell[IDENTIFYHERO].descriptions = "Allows the caster to view detailed information on enemy Heroes.";
+    ptrSpell[SUMMONBOAT].descriptions = "Summons the nearest unoccupied, friendly boat to an adjacent shore location.  A friendly boat is one which you just built or were the most recent player to occupy.";
+    ptrSpell[DIMENSIONDOOR].descriptions = "Allows the caster to magically transport to a nearby location.";
+    ptrSpell[TOWNGATE].descriptions = "Returns the caster to any town or castle currently owned.";
+    ptrSpell[TOWNPORTAL].descriptions = "Returns the hero to the town or castle of choice, provided it is controlled by you.";
+    ptrSpell[VISIONS].descriptions = "Visions predicts the likely outcome of an encounter with a neutral army camp.";
+    ptrSpell[HAUNT].descriptions = "Haunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)";
+    ptrSpell[EARTHGUARDIAN].descriptions = "Sets Earth Elementals to guard a mine against enemy armies.";
+    ptrSpell[AIRGUARDIAN].descriptions = "Sets Air Elementals to guard a mine against enemy armies.";
+    ptrSpell[FIREGUARDIAN].descriptions = "Sets Fire Elementals to guard a mine against enemy armies.";
+    ptrSpell[WATERGUARDIAN].descriptions = "Sets Water Elementals to guard a mine against enemy armies.";
 
     fprintf(stderr, "Init spell.\n");
     
@@ -422,9 +426,14 @@ E_MAGICLEVEL GetLevelSpellMagic(E_SPELL spell){
     return MAGIC_NONE;
 }
 
-const char * GetStringSpellMagic(E_SPELL spell){
+const char * GetStringNameSpellMagic(E_SPELL spell){
 
     return ptrSpell[spell].name;
+}
+
+const char * GetStringDescriptionsSpellMagic(E_SPELL spell){
+
+    return ptrSpell[spell].descriptions;
 }
 
 Uint8 GetCostSpellMagic(E_SPELL spell){
@@ -432,122 +441,118 @@ Uint8 GetCostSpellMagic(E_SPELL spell){
     return ptrSpell[spell].cost;
 }
 
-void FillSpellLevel1(E_RACE race, E_SPELL *spell, BOOL ext){
-
-    E_SPELL next = SPELLNONE;
-
-    spell[0] = SPELLNONE;
-    spell[1] = SPELLNONE;
-    spell[2] = SPELLNONE;
-    spell[3] = SPELLNONE;
+void FillSpellLevel1(E_RACE race, E_SPELL *spell){
 
     switch(race){
 
 	case KNIGHT:
-	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
-	    break;
-
 	case BARBARIAN:
-	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
-	    break;
-	
 	case SORCERESS:
+	case WARLOCK:
 	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    spell[1] = next;
+	    spell[1] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    while(spell[1] == spell[0]) spell[1] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
 	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
 	    break;
 	
 	case NECROMANCER:
-	    while(next == BLESS || next == CURE || spell[0] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    spell[0] = next;
-	    while(next == BLESS || next == CURE || spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
-	    break;
-	
-	case WARLOCK:
 	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    spell[1] = next;
+	    while(BLESS == spell[0] || CURE == spell[0]) spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    spell[1] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    while(BLESS == spell[0] || CURE == spell[0] || spell[1] == spell[0]) spell[1] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
 	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
 	    break;
 	
 	case WIZARD:
-	    spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    if(spell[0] == SPELLNONE && spell[1] == SPELLNONE && spell[2] == SPELLNONE){
+		spell[0] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+		spell[1] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+		while(spell[1] == spell[0]) spell[1] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+		spell[2] = lifeSpellLevel1[rand() % LIFESPELL_LEVEL1];
+	    }else{
+		spell[3] = spell[2];
+		spell[2] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+		while(spell[2] == spell[0] || spell[2] == spell[1]) spell[2] = fightingSpellLevel1[rand() % FIGHTINGSPELL_LEVEL1];
+	    }
 	    break;
-	
+
 	default:
 	    return;
 	    break;
     }
 }
 
-void FillSpellLevel2(E_RACE race, E_SPELL *spell, BOOL ext){
-
-    E_SPELL next = SPELLNONE;
-
-    spell[0] = SPELLNONE;
-    spell[1] = SPELLNONE;
-    spell[2] = SPELLNONE;
-    spell[3] = SPELLNONE;
+void FillSpellLevel2(E_RACE race, E_SPELL *spell){
 
     switch(race){
 
 	case KNIGHT:
-	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[0] = next;
-	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[1] = next;
+	case BARBARIAN:
+	case SORCERESS:
+	case WARLOCK:
+	    spell[0] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    while(DEATHRIPPLE == spell[0]) spell[0] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    spell[1] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    while(DEATHRIPPLE == spell[1] || spell[0] == spell[1]) spell[1] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
 	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
 	    break;
 	    
-	case BARBARIAN:
-	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[0] = next;
-	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
-	    break;
-	
-	case SORCERESS:
-	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[0] = next;
-	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
-	    break;
-	
 	case NECROMANCER:
 	    spell[0] = DEATHRIPPLE;
-	    while(spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
-	    break;
-	
-	case WARLOCK:
-	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[0] = next;
-	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[1] = next;
+	    spell[1] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    while(spell[0] == spell[1]) spell[1] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
 	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
 	    break;
 	
 	case WIZARD:
-	    while(DEATHRIPPLE == next || spell[0] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[0] = next;
-	    while(DEATHRIPPLE == next || spell[0] == next || spell[1] == next) next = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
-	    spell[1] = next;
-	    spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    if(spell[0] == SPELLNONE && spell[1] == SPELLNONE && spell[2] == SPELLNONE){
+		spell[0] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+		while(DEATHRIPPLE == spell[0]) spell[0] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+		spell[1] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+		while(DEATHRIPPLE == spell[1] || spell[0] == spell[1]) spell[1] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+		spell[2] = lifeSpellLevel2[rand() % LIFESPELL_LEVEL2];
+	    }else{
+		spell[3] = spell[2];
+		spell[2] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+		while(DEATHRIPPLE == spell[2] || spell[0] == spell[2] || spell[1] == spell[2]) spell[2] = fightingSpellLevel2[rand() % FIGHTINGSPELL_LEVEL2];
+	    }
+	    break;
+
+	default:
+	    return;
+	    break;
+    }
+}
+
+void FillSpellLevel3(E_RACE race, E_SPELL *spell){
+
+    switch(race){
+
+	case KNIGHT:
+	case BARBARIAN:
+	case SORCERESS:
+	case WARLOCK:
+	    spell[0] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    while(DEATHWAVE == spell[0] || ANIMATEDEAD == spell[0]) spell[0] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	    
+	case NECROMANCER:
+	    spell[0] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    while(HOLYWORD == spell[0] || MASSBLESS == spell[0]) spell[0] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    break;
+	
+	case WIZARD:
+	    if(spell[0] == SPELLNONE && spell[1] == SPELLNONE){
+		spell[0] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+		while(DEATHWAVE == spell[0] || ANIMATEDEAD == spell[0]) spell[0] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+		spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    }else{
+		spell[2] = spell[1];
+		spell[1] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+		while(DEATHWAVE == spell[1] || ANIMATEDEAD == spell[1] || spell[0] == spell[1]) spell[1] = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
+	    }
 	    break;
 	
 	default:
@@ -556,50 +561,35 @@ void FillSpellLevel2(E_RACE race, E_SPELL *spell, BOOL ext){
     }
 }
 
-void FillSpellLevel3(E_RACE race, E_SPELL *spell, BOOL ext){
-
-    E_SPELL next = SPELLNONE;
-
-    spell[0] = SPELLNONE;
-    spell[1] = SPELLNONE;
-    spell[2] = SPELLNONE;
+void FillSpellLevel4(E_RACE race, E_SPELL *spell){
 
     switch(race){
 
 	case KNIGHT:
-	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
-	    spell[0] = next;
-	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	case BARBARIAN:
+	case SORCERESS:
+	case WARLOCK:
+	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
 	    break;
 	    
-	case BARBARIAN:
-	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
-	    spell[0] = next;
-	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
-	    break;
-	
-	case SORCERESS:
-	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
-	    spell[0] = next;
-	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
-	    break;
 	
 	case NECROMANCER:
-	    while(HOLYWORD == next || MASSBLESS == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
-	    spell[0] = next;
-	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    while(MASSCURE == spell[0] || HOLYSHOUT == spell[0]) spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
 	    break;
 	
-	case WARLOCK:
-	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
-	    spell[0] = next;
-	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
-	    break;
 	
 	case WIZARD:
-	    while(DEATHWAVE == next || ANIMATEDEAD == next || spell[0] == next) next = fightingSpellLevel3[rand() % FIGHTINGSPELL_LEVEL3];
-	    spell[0] = next;
-	    spell[1] = lifeSpellLevel3[rand() % LIFESPELL_LEVEL3];
+	    if(spell[0] == SPELLNONE && spell[1] == SPELLNONE){
+		spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+		spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    }else{
+		spell[2] = spell[1];
+		spell[1] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+		while(spell[0] == spell[1]) spell[1] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
+	    }
 	    break;
 	
 	default:
@@ -608,88 +598,122 @@ void FillSpellLevel3(E_RACE race, E_SPELL *spell, BOOL ext){
     }
 }
 
-void FillSpellLevel4(E_RACE race, E_SPELL *spell, BOOL ext){
-
-    E_SPELL next = SPELLNONE;
-
-    spell[0] = SPELLNONE;
-    spell[1] = SPELLNONE;
-    spell[2] = SPELLNONE;
+void FillSpellLevel5(E_RACE race, E_SPELL *spell){
 
     switch(race){
 
 	case KNIGHT:
-	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
-	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	case BARBARIAN:
+	case SORCERESS:
+	case WARLOCK:
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
 	    break;
 	    
-	case BARBARIAN:
-	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
-	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
-	    break;
-	
-	case SORCERESS:
-	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
-	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
-	    break;
-	
 	case NECROMANCER:
-	    while(MASSCURE == next || HOLYSHOUT == next || spell[0] == next) next = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
-	    spell[0] = next;
-	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
-	    break;
-	
-	case WARLOCK:
-	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
-	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
 	    break;
 	
 	case WIZARD:
-	    spell[0] = fightingSpellLevel4[rand() % FIGHTINGSPELL_LEVEL4];
-	    spell[1] = lifeSpellLevel4[rand() % LIFESPELL_LEVEL4];
+	    if(spell[0] == SPELLNONE)
+		spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
+	    else
+		spell[1] = lifeSpellLevel5[rand() % LIFESPELL_LEVEL5];
 	    break;
-	
+
 	default:
 	    return;
 	    break;
     }
 }
 
-void FillSpellLevel5(E_RACE race, E_SPELL *spell, BOOL ext){
+ACTION ShowSpellInfo(E_SPELL spell, Uint32 flag){
+    
+    CursorOff();
+        
+    SDL_Surface *image = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
 
-    //E_SPELL next = SPELLNONE;
+    SDL_Rect dst;
+    SDL_Event event;
 
-    spell[0] = SPELLNONE;
-    spell[1] = SPELLNONE;
+    ACTION result = NONE;
+    INTERFACEACTION *dialog = NULL;
+    AGGSPRITE sprite;
+    BOOL exit = FALSE;
+            
+    S_BOX box;
+    Uint16 height = 0;
 
-    switch(race){
+    if(MASSSHIELD == spell) FillSPRITE(&sprite, "SPELLS.ICN", SHIELD);
+    else if(MASSSLOW == spell) FillSPRITE(&sprite, "SPELLS.ICN", SLOW);
+    else if(MASSBLESS == spell) FillSPRITE(&sprite, "SPELLS.ICN", BLESS);
+    else if(MASSCURSE == spell) FillSPRITE(&sprite, "SPELLS.ICN", CURSE);
+    else if(MASSDISPEL == spell) FillSPRITE(&sprite, "SPELLS.ICN", DISPELMAGIC);
+    else if(MASSHASTE == spell) FillSPRITE(&sprite, "SPELLS.ICN", HASTE);
+    else FillSPRITE(&sprite, "SPELLS.ICN", spell);
+    image = GetICNSprite(&sprite);
+    
+    height += GetHeightText(GetStringNameSpellMagic(spell), FONT_BIG);
+    height += 20;
+    height += GetHeightText(GetStringDescriptionsSpellMagic(spell), FONT_BIG);
+    height += 60;
+    
+    if( ! InitBox(&box, height, &dialog, flag)) return NONE;
 
-	case KNIGHT:
-	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
-	    break;
-	    
-	case BARBARIAN:
-	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
-	    break;
-	
-	case SORCERESS:
-	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
-	    break;
-	
-	case NECROMANCER:
-	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
-	    break;
-	
-	case WARLOCK:
-	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
-	    break;
-	
-	case WIZARD:
-	    spell[0] = fightingSpellLevel5[rand() % FIGHTINGSPELL_LEVEL5];
-	    break;
-	
-	default:
-	    return;
-	    break;
-    }
+    // text header
+    dst = box.rectArea;
+    PrintAlignText(video, &dst, GetStringNameSpellMagic(spell), FONT_BIG);
+
+    // text info
+    dst.y += GetHeightText(GetStringNameSpellMagic(spell), FONT_BIG);
+    dst.y += 20;
+    PrintAlignText(video, &dst, GetStringDescriptionsSpellMagic(spell), FONT_BIG);
+    
+    // sprite
+    dst.y += GetHeightText(GetStringDescriptionsSpellMagic(spell), FONT_BIG);
+    dst.y += 20;
+    dst.y += ((box.rectArea.y + box.rectArea.h - dst.y) - image->h) / 2;
+    dst.x = (video->w - image->w) / 2 + 5;
+    dst.w = image->w;
+    dst.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &dst);
+    
+    SDL_Flip(video);
+
+    CursorOn();
+        
+    if(flag)
+        while(! exit)
+            switch(ActionCycle(dialog, NULL)){
+                case EXIT:
+                    exit = TRUE;
+		    result = EXIT;
+                    break;
+        
+                case ESC:
+                case OK:
+                case ENTER:
+                    exit = TRUE;
+                    result = NONE;
+                    break;
+
+                default:
+                    break;
+
+            }
+    else
+        while(! exit){
+            while(SDL_PollEvent(&event))
+                if( SDL_BUTTON_RIGHT == event.button.button && SDL_RELEASED == event.button.state) exit = TRUE;
+
+            if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY * 10);
+        }
+
+    CursorOff();
+
+    FreeBox(&box);
+
+    CursorOn();
+
+    return result;
 }

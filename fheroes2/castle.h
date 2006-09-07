@@ -122,7 +122,6 @@ typedef struct {
                 E_SPELL level3[CASTLESPELL_LEVEL3];
                 E_SPELL level2[CASTLESPELL_LEVEL2];
                 E_SPELL level1[CASTLESPELL_LEVEL1];
-
                 } S_MAGEGUILD;
                                                                                                                 
 typedef enum {
@@ -198,7 +197,6 @@ S_CASTLE	*GetFirstCastle(E_COLORS);
 S_CASTLE 	*GetNextCastle(E_COLORS);
 S_CASTLE 	*GetPrevCastle(E_COLORS);
 S_CASTLE 	*GetEndCastle(E_COLORS);
-Uint8     	GetCountCastle(E_COLORS);
 
 E_MONSTER	GetMonsterFromCastle(const S_CASTLE *, Uint8);
 BOOL		BuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
@@ -206,6 +204,7 @@ BOOL		BuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
 BOOL		CheckBuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
 BOOL		CastleDwellingUpgradable(const S_CASTLE *, E_DWELLINGCASTLE);
 BOOL		CastleNearOcean(const S_CASTLE *);
+BOOL		CastleNearBoat();
 BOOL		CastlePresentHeroes(const S_CASTLE *);
 
 void		CastleIncreaseArmy(const S_CASTLE *, E_DWELLINGCASTLE, Uint8);
@@ -253,6 +252,7 @@ BOOL		BuildRightTurret(const S_CASTLE *);
 BOOL		BuildLeftTurret(const S_CASTLE *);
 BOOL		BuildMageGuild(const S_CASTLE *);
 BOOL		BuildCaptain(const S_CASTLE *);
+BOOL		BuildCastle(const S_CASTLE *);
 
 BOOL		BuildDwelling1(const S_CASTLE *);
 BOOL		BuildDwelling2(const S_CASTLE *);

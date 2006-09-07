@@ -31,12 +31,11 @@
 
 #include "SDL.h"
 
-#define VERSION 20060826
+#define VERSION 20060908
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
-#define MESSAGEBOX_WIDTH        306 
-#define MESSAGEBOX_HEIGHT       226 
+#define SHADOWWIDTH     16 
 
 #define COLORKEY	0xFF
 #define COLORCHANGE	0xFE

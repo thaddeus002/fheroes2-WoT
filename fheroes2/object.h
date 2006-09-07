@@ -159,6 +159,7 @@ typedef enum {
 		OBJ_TRADINGPOST		= 0xBF,	// рынок, точка входа
 
 		OBJ_ABANDONEDMINE	= 0xC0,	// заброшенная шахта, точка входа
+		OBJ_PEASANTHUNT2	= 0xC1,	// хижина крестьянина
 		OBJ_STANDINGSTONES	= 0xC2,	// стоунхедж, (+1 power)
 		OBJ_IDOL		= 0xC3,	// идол
 		OBJ_TREEKNOWLEDGE	= 0xC4,	// дерево знаний, точка входа

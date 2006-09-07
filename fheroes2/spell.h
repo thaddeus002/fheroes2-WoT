@@ -31,6 +31,7 @@
 
 #include "SDL.h"
 #include "gamedefs.h"
+#include "actionevent.h"
 
 #define SPELLMAXCOUNT		66
 #define FIGHTINGSPELL_LEVEL1	10
@@ -136,13 +137,16 @@ typedef struct {
 BOOL	     InitSpell(void);
 void	     FreeSpell(void);
 E_MAGICLEVEL GetLevelSpellMagic(E_SPELL);
-const char * GetStringSpellMagic(E_SPELL);
+const char * GetStringNameSpellMagic(E_SPELL);
+const char * GetStringDescriptionsSpellMagic(E_SPELL);
 Uint8 	     GetCostSpellMagic(E_SPELL);
 
-void	     FillSpellLevel1(E_RACE, E_SPELL *, BOOL);
-void	     FillSpellLevel2(E_RACE, E_SPELL *, BOOL);
-void	     FillSpellLevel3(E_RACE, E_SPELL *, BOOL);
-void	     FillSpellLevel4(E_RACE, E_SPELL *, BOOL);
-void	     FillSpellLevel5(E_RACE, E_SPELL *, BOOL);
+void	     FillSpellLevel1(E_RACE, E_SPELL *);
+void	     FillSpellLevel2(E_RACE, E_SPELL *);
+void	     FillSpellLevel3(E_RACE, E_SPELL *);
+void	     FillSpellLevel4(E_RACE, E_SPELL *);
+void	     FillSpellLevel5(E_RACE, E_SPELL *);
+
+ACTION	     ShowSpellInfo(E_SPELL, Uint32);
 
 #endif

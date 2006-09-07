@@ -33,7 +33,6 @@
 #include "castle.h"
 #include "spell.h"
 
-void	FillMageGuildLevel(S_MAGEGUILD *, const S_CASTLE *, E_MAGICLEVEL);
 ACTION 	ShowMageGuildInfo(void);
 
 #endif

@@ -26,28 +26,22 @@
     Description:
 */
 
-#ifndef _SPLITER_H
-#define _SPLITER_H
+#ifndef _BOX_H
+#define _BOX_H
+
+#include "actionevent.h"
 
 typedef struct {
 
-    SDL_Surface         *background;
-    SDL_Surface         *cursor;
-    SDL_Rect            pos;
-    Uint16              step;
-    Uint16		start;
-    Uint16              max;
-    Uint16              cur;
-    BOOL		vertical;
+	    SDL_Surface		*background;
+	    SDL_Rect		rectBack;
+	    SDL_Rect		rectArea;
+	    INTERFACEACTION	*action;
 
-		} S_SPLITER;
+		} S_BOX;
 
-S_SPLITER *	InitSpliter(AGGSPRITE *sprite);
-void		FreeSpliter(S_SPLITER *);
-void		SetRangeSpliter(S_SPLITER *, SDL_Rect *, Uint16);
-void		RedrawSpliter(S_SPLITER *);
-void		MoveForwardSpliter(S_SPLITER *);
-void		MoveBackwardSpliter(S_SPLITER *);
-Uint16		GetCurrentSpliter(S_SPLITER *);
+BOOL		InitBox(S_BOX *, Uint16, INTERFACEACTION **, Uint32);
+void		FreeBox(S_BOX *);
+Uint16		GetHeightText(const char *, ENUMFONT);
 
 #endif

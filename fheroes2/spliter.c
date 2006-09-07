@@ -83,19 +83,20 @@ void SetRangeSpliter(S_SPLITER *sp, SDL_Rect *rect, Uint16 count){
     if(rect->w < rect->h) sp->vertical = TRUE;
 
     // шаг сплитера
-    if(sp->max){
-	if(sp->vertical) sp->step = (rect->h - sp->cursor->h) / sp->max; else sp->step = (rect->w - sp->cursor->w) / sp->max;
-    }
-    if(sp->vertical) sp->start = rect->y; else sp->start = rect->x;
+    if(sp->max)
+	sp->step = (sp->vertical ? 100 * (rect->h - sp->cursor->h) / sp->max : 100 * (rect->w - sp->cursor->w) / sp->max);
+    sp->start = (sp->vertical ? rect->y : rect->x);
     
     sp->pos.w = sp->cursor->w;
     sp->pos.h = sp->cursor->h;
-    
-    if(NULL == (sp->background = SDL_CreateRGBSurface(SDL_SWSURFACE, sp->cursor->w, sp->cursor->h, 16, 0 , 0, 0, 0))){
-         fprintf(stderr, "InitSpliter: CreateRGBSurface failed: %s\n", SDL_GetError());
-         return;
+
+    if(NULL == sp->background){
+	if(NULL == (sp->background = SDL_CreateRGBSurface(SDL_SWSURFACE, sp->cursor->w, sp->cursor->h, 16, 0 , 0, 0, 0))){
+    	    fprintf(stderr, "InitSpliter: CreateRGBSurface failed: %s\n", SDL_GetError());
+    	    return;
+	}
     }
-    
+
     SDL_BlitSurface(video, &sp->pos, sp->background, NULL);
 }
 
@@ -115,7 +116,11 @@ void RedrawSpliter(S_SPLITER *sp){
 
 void MoveForwardSpliter(S_SPLITER *sp){
 
-    if(! sp || sp->cur == sp->max) return;
+    if(! sp) return;
+    
+    RedrawSpliter(sp);
+
+    if(sp->cur == sp->max) return;
 
     CursorOff();
 
@@ -127,10 +132,9 @@ void MoveForwardSpliter(S_SPLITER *sp){
     ++sp->cur;
 
     if(sp->vertical)
-	sp->pos.y = sp->start + sp->cur * sp->step;
+	sp->pos.y = sp->start + sp->cur * sp->step / 100;
     else
-	sp->pos.x = sp->start + sp->cur * sp->step;
-    printf("%d, %d, %f\n", sp->start, sp->cur, sp->cur * sp->step);
+	sp->pos.x = sp->start + sp->cur * sp->step / 100;
     
     if(sp->cursor)
 	SDL_BlitSurface(sp->cursor, NULL, video, &sp->pos);
@@ -140,7 +144,11 @@ void MoveForwardSpliter(S_SPLITER *sp){
 
 void MoveBackwardSpliter(S_SPLITER *sp){
 
-    if(! sp || ! sp->cur) return;
+    if(! sp) return;
+
+    RedrawSpliter(sp);
+
+    if(! sp->cur) return;
 
     CursorOff();
 
@@ -152,12 +160,19 @@ void MoveBackwardSpliter(S_SPLITER *sp){
     --sp->cur;
 
     if(sp->vertical)
-	sp->pos.y = sp->start + sp->cur * sp->step;
+	sp->pos.y = sp->start + sp->cur * sp->step / 100;
     else
-	sp->pos.x = sp->start + sp->cur * sp->step;
+	sp->pos.x = sp->start + sp->cur * sp->step / 100;
     
     if(sp->cursor)
 	SDL_BlitSurface(sp->cursor, NULL, video, &sp->pos);
 
     CursorOn();
+}
+
+Uint16 GetCurrentSpliter(S_SPLITER *sp){
+
+    if(! sp) return 0;
+    
+    return sp->cur;
 }

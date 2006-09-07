@@ -83,8 +83,12 @@ void		RecalculateKingdomWeek(E_COLORS);
 void		RecalculateKingdomMonth(E_COLORS);
 void		KingdomSetAllowBuild(E_COLORS, BOOL);
 void		KingdomWasteResource(E_COLORS, const S_PAYMENT *);
-Uint8		GetCountMarketplace(E_COLORS);
+void		KingdomProfitResource(E_COLORS, const S_PAYMENT *);
 void		GetKingdomAllResource(E_COLORS, S_PAYMENT *);
 Uint32		GetKingdomResource(E_COLORS, E_RESOURCE);
+
+Uint8		GetKingdomCountCastle(E_COLORS);
+Uint8		GetKingdomCountTown(E_COLORS);
+Uint8		GetKingdomCountMarketplace(E_COLORS);
 
 #endif

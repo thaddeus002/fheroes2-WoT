@@ -37,6 +37,7 @@
 #include "kingdom.h"
 #include "config.h"
 #include "spliter.h"
+#include "box.h"
 #include "resource.h"
 #include "actionevent.h"
 #include "marketplace.h"
@@ -60,6 +61,7 @@ struct {
 void	RedrawTradeFromResource(void);
 void	RedrawTradeToResource(void);
 void	RedrawActionTrade(void);
+void	RedrawSpriteResource(void);
 void	TradeRestoreFromCursor(void);
 void	TradeRestoreToCursor(void);
 void	TradeSaveFromCursor(void);
@@ -87,24 +89,27 @@ ACTION ShowMarketplace(E_COLORS color){
     SetIntValue(ANIM3, FALSE);
     
     Uint32 cursor = GetCursor();
-    SDL_Surface *back, *image, *video;
-    SDL_Rect rectBack, rectCur;
-    INTERFACEACTION action;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image = NULL;
+    SDL_Rect rect;
     BOOL exit = FALSE;
+    INTERFACEACTION action;
     ACTION result = NONE;
     AGGSPRITE sprite;
+    S_PAYMENT resource;
+    S_BOX box;
+    Uint16 countFrom = 0;
+    Uint16 countTo = 0;
+
     Uint8 i;
-    
+    Uint16 cx, cy;
+
     actionTrade = NULL;
     backgroundAction.surface = NULL;
     colorKingdom = color;
-    
-    const char *buybuild = "BUYBUILD.ICN";
-    const char *trade = "TRADPOST.ICN";
-    if(GetIntValue(EVILINTERFACE)){
-	buybuild = "BUYBUILE.ICN";
-	trade = "TRADPOSE.ICN";
-    }
+
+    const char *trade = NULL;
+    trade = (GetIntValue(EVILINTERFACE) ? "TRADPOSE.ICN" : "TRADPOST.ICN");
 
     // инициализация курсора
     FillSPRITE(&sprite, trade, 14);
@@ -138,134 +143,110 @@ ACTION ShowMarketplace(E_COLORS color){
     spliterMarket = InitSpliter(&sprite);
     if(NULL == spliterMarket) return EXIT;
     
-    Uint16 height = 0;
-    Uint16 width = 0;
-    Uint8 count = 0;
-    // получаем левый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 4);
-    image = GetICNSprite(&sprite);
-    width += image->w;
-    // получаем правый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 0);
-    width += image->w;
 
-    // получаем левый средний спрайт
-    FillSPRITE(&sprite, buybuild, 5);
-    image = GetICNSprite(&sprite);
-    // количество средних блоков
-    count = 6;
-    height = height + count * image->h;
+    if( ! InitBox(&box, 250, &actionTrade, EXIT)) return NONE;
 
-    // отрисовка диалога по центру экрана
-    video = SDL_GetVideoSurface();
-    rectBack.w = width;
-    rectBack.h = height;
-    // поправка на верхний и нижний
-    FillSPRITE(&sprite, buybuild, 4);
-    image = GetICNSprite(&sprite);
-    rectBack.h += image->h;
-    FillSPRITE(&sprite, buybuild, 6);
-    image = GetICNSprite(&sprite);
-    rectBack.h += image->h;
-    rectBack.x = (video->w - rectBack.w) / 2;
-    rectBack.y = (video->h - rectBack.h) / 2;
-
-    // сохраняем бакгроунд
-    if(NULL == (back = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
-	fprintf(stderr, "ShowMarketplace: CreateRGBSurface failed: %s\n", SDL_GetError());
-	return EXIT;
-    }
-
-    SDL_BlitSurface(video, &rectBack, back, NULL);
-
-    // получаем левый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 4);
-    image = GetICNSprite(&sprite);
-    if(GetIntValue(EVILINTERFACE)) rectCur.x = rectBack.x; else rectCur.x = rectBack.x + 1;
-    rectCur.y = rectBack.y;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // получаем левый средний спрайт
-    FillSPRITE(&sprite, buybuild, 5);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x;
-    rectCur.w = image->w;
-    rectCur.y += rectCur.h;
-    rectCur.h = image->h;
-    for(i = 0; i < count; ++i){
-	SDL_BlitSurface(image, NULL, video, &rectCur);
-	rectCur.y += rectCur.h;
-    }
-
-    // получаем левый нижний спрайт
-    FillSPRITE(&sprite, buybuild, 6);
-    image = GetICNSprite(&sprite);
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // получаем правый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 0);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + rectCur.w;
-    rectCur.y = rectBack.y;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // получаем правый средний спрайт
-    FillSPRITE(&sprite, buybuild, 1);
-    image = GetICNSprite(&sprite);
-    rectCur.w = image->w;
-    rectCur.y += rectCur.h;
-    rectCur.h = image->h;
-    for(i = 0; i < count; ++i){
-	SDL_BlitSurface(image, NULL, video, &rectCur);
-	rectCur.y += rectCur.h;
-    }
-
-    // получаем правый нижний спрайт
-    FillSPRITE(&sprite, buybuild, 2);
-    image = GetICNSprite(&sprite);
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    
-    // text header
-    rectCur.x = rectBack.x + 35;
-    if(GetIntValue(EVILINTERFACE)) rectCur.y = rectBack.y + 50; else rectCur.y = rectBack.y + 65;
-    rectCur.w = rectBack.w - 70;
-    rectCur.h = rectBack.h - 70;
-    //
-    backgroundAction.rect = rectCur;
-    backgroundAction.rect.h = 182;
+    // второй бекграунд для затирки
+    rect = box.rectArea;
+    backgroundAction.rect = rect;
+    backgroundAction.rect.x -= 5;
+    backgroundAction.rect.w += 10;
+    backgroundAction.rect.h = 180;
     if(NULL == (backgroundAction.surface = SDL_CreateRGBSurface(SDL_SWSURFACE, backgroundAction.rect.w, backgroundAction.rect.h, 16, 0, 0, 0, 0))){
 	fprintf(stderr, "ShowMarketplace: CreateRGBSurface failed: %s\n", SDL_GetError());
 	return EXIT;
     }
     SDL_BlitSurface(video, &backgroundAction.rect, backgroundAction.surface, NULL);
-    RedrawActionTrade();
 
-    // кнопка EXIT
-    FillSPRITE(&sprite, trade, 17);
+
+    // ACTION
+    cx = video->w / 2 - 115;
+    cy = video->h / 2;
+    // from action: wood ore mercury
+    for(i = 0; i < 3; ++i){
+	FillSPRITE(&sprite, trade, 7 + i);
+	image = GetICNSprite(&sprite);
+	rect.w = image->w;
+	rect.h = image->h;
+	rect.x = cx + i * (rect.w + 6);
+	rect.y = cy + 20;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rect;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = (1 == i ? ActionPressFromCostly : ActionPressFromUncostly);
+	AddActionEvent(&actionTrade, &action);
+    }
+    // from action: sulfur crytal gems
+    for(i = 0; i < 3; ++i){
+	FillSPRITE(&sprite, trade, 10 + i);
+	image = GetICNSprite(&sprite);
+	rect.w = image->w;
+	rect.h = image->h;
+	rect.x = cx + i * (rect.w + 6);
+	rect.y = cy + 60;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rect;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionPressFromCostly;
+	AddActionEvent(&actionTrade, &action);
+    }
+    // from action: gold
+    FillSPRITE(&sprite, trade, 10 + i);
     image = GetICNSprite(&sprite);
-    rectCur.x = (video->w - image->w) / 2;
-    rectCur.y = rectBack.y + rectBack.h - 70;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
+    rect.w = image->w;
+    rect.h = image->h;
+    rect.x = cx + rect.w + 6;
+    rect.y = cy + 100;
     ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, trade, 17);
-    FillSPRITE(&action.objectPush, trade, 18);
-    action.rect = rectCur;
+    action.rect = rect;
     action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressCANCEL;
+    action.pf = ActionPressFromGold;
     AddActionEvent(&actionTrade, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
-    // Отрисовка диалога
-    SDL_Flip(video);
+    //
+    cx = video->w / 2 + 10;
+    cy = video->h / 2;
+    // to action: wood ore mercury
+    for(i = 0; i < 3; ++i){
+	FillSPRITE(&sprite, trade, 7 + i);
+	image = GetICNSprite(&sprite);
+	rect.w = image->w;
+	rect.h = image->h;
+	rect.x = cx + i * (rect.w + 6);
+	rect.y = cy + 20;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rect;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = (1 == i ? ActionPressToCostly : ActionPressToUncostly);
+	AddActionEvent(&actionTrade, &action);
+    }
+    // to action: sulfur crytal gems
+    for(i = 0; i < 3; ++i){
+	FillSPRITE(&sprite, trade, 10 + i);
+	image = GetICNSprite(&sprite);
+	rect.w = image->w;
+	rect.h = image->h;
+	rect.x = cx + i * (rect.w + 6);
+	rect.y = cy + 60;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rect;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionPressToCostly;
+	AddActionEvent(&actionTrade, &action);
+    }
+    // to action: gold
+    FillSPRITE(&sprite, trade, 10 + i);
+    image = GetICNSprite(&sprite);
+    rect.w = image->w;
+    rect.h = image->h;
+    rect.x = cx + rect.w + 6;
+    rect.y = cy + 100;
+    ZeroINTERFACEACTION(&action);
+    action.rect = rect;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionPressToGold;
+    AddActionEvent(&actionTrade, &action);
 
+    RedrawActionTrade();
     RedrawTradeFromResource();
     RedrawTradeToResource();
 
@@ -288,17 +269,92 @@ ACTION ShowMarketplace(E_COLORS color){
                 exit = TRUE;
                 result = NONE;
                 break;
-
 	    case LEFT:
 		MoveBackwardSpliter(spliterMarket);
+		RedrawSpriteResource();
 		break;
 
 	    case RIGHT:
 		MoveForwardSpliter(spliterMarket);
+		RedrawSpriteResource();
 		break;
 		
 	    case YES:
-		// trade
+		if(tradeTo.resource != GOLDS){
+		    countFrom = GetCurrentSpliter(spliterMarket) * GetTradeFactor(tradeFrom.select, tradeTo.select);
+		    countTo = GetCurrentSpliter(spliterMarket);
+		}else{
+		    countTo = GetCurrentSpliter(spliterMarket) * GetTradeFactor(tradeFrom.select, tradeTo.select);
+		    countFrom = GetCurrentSpliter(spliterMarket);
+		}
+		resource.ore = 0;
+		resource.wood = 0;
+		resource.mercury = 0;
+		resource.sulfur = 0;
+		resource.crystal = 0;
+		resource.gems = 0;
+		resource.gold = 0;
+		switch(tradeFrom.resource){
+    		    case ORE:
+			resource.ore = countFrom;
+			break;
+    		    case WOOD:
+			resource.wood = countFrom;
+			break;
+    		    case MERCURY:
+			resource.mercury = countFrom;
+			break;
+    		    case SULFUR:
+			resource.sulfur = countFrom;
+			break;
+    		    case CRYSTAL:
+			resource.crystal = countFrom;
+			break;
+    		    case GEMS:
+			resource.gems = countFrom;
+			break;
+    		    case GOLDS:
+			resource.gold = countFrom;
+			break;
+		    default:
+			break;
+		}
+		KingdomWasteResource(colorKingdom, &resource);
+		resource.ore = 0;
+		resource.wood = 0;
+		resource.mercury = 0;
+		resource.sulfur = 0;
+		resource.crystal = 0;
+		resource.gems = 0;
+		resource.gold = 0;
+		switch(tradeTo.resource){
+    		    case ORE:
+			resource.ore = countTo;
+			break;
+    		    case WOOD:
+			resource.wood = countTo;
+			break;
+    		    case MERCURY:
+			resource.mercury = countTo;
+			break;
+    		    case SULFUR:
+			resource.sulfur = countTo;
+			break;
+    		    case CRYSTAL:
+			resource.crystal = countTo;
+			break;
+    		    case GEMS:
+			resource.gems = countTo;
+			break;
+    		    case GOLDS:
+			resource.gold = countTo;
+			break;
+		    default:
+			break;
+		}
+		KingdomProfitResource(colorKingdom, &resource);
+                exit = TRUE;
+                result = NONE;
 		break;
 
             default:
@@ -308,11 +364,8 @@ ACTION ShowMarketplace(E_COLORS color){
                                     
     // востанавливаем бакгроунд
     CursorOff();
-    SDL_BlitSurface(back, NULL, video, &rectBack);
-    //SDL_Flip(video);
 
-    FreeActionEvent(actionTrade);
-    SDL_FreeSurface(back);
+    FreeBox(&box);
 
     if(tradeFrom.background) SDL_FreeSurface(tradeFrom.background);
     if(tradeTo.background) SDL_FreeSurface(tradeTo.background);
@@ -334,21 +387,18 @@ void RedrawTradeFromResource(void){
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect rectCur;
     AGGSPRITE sprite;
-    INTERFACEACTION action;
     Uint8 i;
     Uint16 cx, cy;
     S_PAYMENT resource;
     GetKingdomAllResource(colorKingdom, &resource);
     
     const char *header = "Your Resources";
-    const char *trade = "TRADPOST.ICN";
+    const char *trade = NULL;
     char number[8];
-    if(GetIntValue(EVILINTERFACE)) trade = "TRADPOSE.ICN";
+    trade = (GetIntValue(EVILINTERFACE) ? "TRADPOSE.ICN" : "TRADPOST.ICN");
 
-    RemoveActionLevelEvent(actionTrade, LEVELEVENT_MARKETPLACE1);
-
-    cx = video->w / 2 - 120;
-    cy = video->h / 2 + 10;
+    cx = video->w / 2 - 115;
+    cy = video->h / 2;
     rectCur.x = cx;
     rectCur.y = cy;
     rectCur.w = 120;
@@ -363,16 +413,6 @@ void RedrawTradeFromResource(void){
 	rectCur.h = image->h;
 	rectCur.x = cx + i * (rectCur.w + 6);
 	rectCur.y = cy + 20;
-
-	ZeroINTERFACEACTION(&action);
-	action.rect = rectCur;
-	action.mouseEvent = MOUSE_LCLICK;
-	action.level = LEVELEVENT_MARKETPLACE1;
-	if(1 == i)
-	    action.pf = ActionPressFromCostly;
-	else
-	    action.pf = ActionPressFromUncostly;
-	AddActionEvent(&actionTrade, &action);
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	// cost
@@ -397,13 +437,6 @@ void RedrawTradeFromResource(void){
 	rectCur.h = image->h;
 	rectCur.x = cx + i * (rectCur.w + 6);
 	rectCur.y = cy + 60;
-
-	ZeroINTERFACEACTION(&action);
-	action.rect = rectCur;
-	action.mouseEvent = MOUSE_LCLICK;
-	action.level = LEVELEVENT_MARKETPLACE1;
-	action.pf = ActionPressFromCostly;
-	AddActionEvent(&actionTrade, &action);
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	// cost
@@ -427,12 +460,6 @@ void RedrawTradeFromResource(void){
     rectCur.h = image->h;
     rectCur.x = cx + rectCur.w + 6;
     rectCur.y = cy + 100;
-    ZeroINTERFACEACTION(&action);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.level = LEVELEVENT_MARKETPLACE1;
-    action.pf = ActionPressFromGold;
-    AddActionEvent(&actionTrade, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // cost
     sprintf(number, "%d", resource.gold);
@@ -449,21 +476,18 @@ void RedrawTradeToResource(void){
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect rectCur;
     AGGSPRITE sprite;
-    INTERFACEACTION action;
     Uint8 i;
     Uint16 cx, cy;
     S_PAYMENT resource;
     GetKingdomAllResource(colorKingdom, &resource);
     
     const char *header = "Available Trades";
-    const char *trade = "TRADPOST.ICN";
+    const char *trade = NULL;
     char string[8];
-    if(GetIntValue(EVILINTERFACE)) trade = "TRADPOSE.ICN";
-
-    RemoveActionLevelEvent(actionTrade, LEVELEVENT_MARKETPLACE2);
+    trade = (GetIntValue(EVILINTERFACE) ? "TRADPOSE.ICN" : "TRADPOST.ICN");
 
     cx = video->w / 2 + 10;
-    cy = video->h / 2 + 10;
+    cy = video->h / 2;
     rectCur.x = cx;
     rectCur.y = cy;
     rectCur.w = 120;
@@ -478,16 +502,6 @@ void RedrawTradeToResource(void){
 	rectCur.h = image->h;
 	rectCur.x = cx + i * (rectCur.w + 6);
 	rectCur.y = cy + 20;
-
-	ZeroINTERFACEACTION(&action);
-	action.rect = rectCur;
-	action.mouseEvent = MOUSE_LCLICK;
-	action.level = LEVELEVENT_MARKETPLACE2;
-	if(1 == i)
-	    action.pf = ActionPressToCostly;
-	else
-	    action.pf = ActionPressToUncostly;
-	AddActionEvent(&actionTrade, &action);
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	// cost
@@ -514,13 +528,6 @@ void RedrawTradeToResource(void){
 	rectCur.h = image->h;
 	rectCur.x = cx + i * (rectCur.w + 6);
 	rectCur.y = cy + 60;
-
-	ZeroINTERFACEACTION(&action);
-	action.rect = rectCur;
-	action.mouseEvent = MOUSE_LCLICK;
-	action.level = LEVELEVENT_MARKETPLACE2;
-	action.pf = ActionPressToCostly;
-	AddActionEvent(&actionTrade, &action);
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	// cost
@@ -546,13 +553,8 @@ void RedrawTradeToResource(void){
     rectCur.h = image->h;
     rectCur.x = cx + rectCur.w + 6;
     rectCur.y = cy + 100;
-    ZeroINTERFACEACTION(&action);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.level = LEVELEVENT_MARKETPLACE2;
-    action.pf = ActionPressToGold;
-    AddActionEvent(&actionTrade, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
+
     // cost
     if(tradeFrom.resource != SULFUR)
 	TradeCostToString(string, tradeFrom.select, GOLD);
@@ -576,7 +578,6 @@ ACTION  ActionPressFromUncostly(void){
 
     RedrawTradeToResource();
     if(UNFOCUS != tradeTo.select) RedrawActionTrade();
-
     
     CursorOn();
 
@@ -694,8 +695,8 @@ void TradeSaveFromCursor(void){
         
     SDL_GetMouseState(&mx, &my);
 
-    rect.x = video->w / 2 - 120;
-    rect.y = video->h / 2 + 30;
+    rect.x = video->w / 2 - 115;
+    rect.y = video->h / 2 + 20;
     rect.w = 34;
     rect.h = 34;
 
@@ -736,7 +737,7 @@ void TradeSaveFromCursor(void){
     }
     
     rect.y += 40;
-    rect.x = video->w / 2 - 120;
+    rect.x = video->w / 2 - 115;
     // sulfur
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = COSTLY;
@@ -774,7 +775,7 @@ void TradeSaveFromCursor(void){
     }
 
     rect.y += 40;
-    rect.x = video->w / 2 - 80;
+    rect.x = video->w / 2 - 75;
     // gold
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = GOLD;
@@ -797,7 +798,7 @@ void TradeSaveToCursor(void){
     SDL_GetMouseState(&mx, &my);
 
     rect.x = video->w / 2 + 10;
-    rect.y = video->h / 2 + 30;
+    rect.y = video->h / 2 + 20;
     rect.w = 34;
     rect.h = 34;
 
@@ -898,7 +899,7 @@ void TradeCostToString(char *string, E_FOCUSTRADE from, E_FOCUSTRADE to){
 	sprintf(string, "n/a");
 	return;
     }
-    Uint8 market = GetCountMarketplace(colorKingdom);
+    Uint8 market = GetKingdomCountMarketplace(colorKingdom);
 
     switch(from){
 
@@ -1006,7 +1007,7 @@ void TradeCostToString(char *string, E_FOCUSTRADE from, E_FOCUSTRADE to){
 
 Uint16 GetTradeFactor(E_FOCUSTRADE from, E_FOCUSTRADE to){
 
-    Uint8 market = GetCountMarketplace(colorKingdom);
+    Uint8 market = GetKingdomCountMarketplace(colorKingdom);
 
     if( tradeFrom.resource == tradeTo.resource ||
 	UNFOCUS == from ||
@@ -1203,7 +1204,7 @@ void RedrawActionTrade(void){
     PrintAlignText(video, &rectCur, header, FONT_BIG);
     rectCur.y += 30;
 
-    if(UNFOCUS != tradeFrom.select) RemoveActionLevelEvent(actionTrade, LEVELEVENT_MARKETTRADE);
+    if(UNFOCUS != tradeFrom.select && UNFOCUS != tradeTo.select) RemoveActionLevelEvent(actionTrade, LEVELEVENT_MARKETTRADE);
 
     if(! GetTradeFactor(tradeFrom.select, tradeTo.select)){
 	PrintAlignText(video, &rectCur, info, FONT_BIG);
@@ -1216,7 +1217,7 @@ void RedrawActionTrade(void){
     // splite
     FillSPRITE(&sprite, trade, 1);
     image = GetICNSprite(&sprite);
-    rectCur.y += 101;
+    rectCur.y += 93;
     rectCur.x = (video->w - image->w) / 2;
     rectCur.w = image->w;
     rectCur.h = image->h;
@@ -1274,14 +1275,171 @@ void RedrawActionTrade(void){
 
     // init spliterMarket
     rectCur.x = video->w / 2 - 91;
-    rectCur.y = video->h / 2 - 35;
+    rectCur.y = (GetIntValue(EVILINTERFACE) ? video->h / 2 - 35 : video->h / 2 - 25);
     rectCur.w = 188;
     rectCur.h = 10;
 
     Uint16 max = 0;
     if(GetTradeFactor(tradeFrom.select, tradeTo.select))
-	max = GetKingdomResource(colorKingdom, tradeFrom.resource) / GetTradeFactor(tradeFrom.select, tradeTo.select);
+	max = (tradeTo.resource != GOLDS ?
+	    GetKingdomResource(colorKingdom, tradeFrom.resource) / GetTradeFactor(tradeFrom.select, tradeTo.select) :
+	    GetKingdomResource(colorKingdom, tradeFrom.resource) );
 
     SetRangeSpliter(spliterMarket, &rectCur, max);
     RedrawSpliter(spliterMarket);
+    RedrawSpriteResource();
+}
+
+void RedrawSpriteResource(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image = NULL;
+    SDL_Rect rectCur, rectFrom;
+    AGGSPRITE sprite;
+    Uint8 index;
+    Uint16 countFrom = 0;
+    Uint16 countTo = 0;
+    const char *text = NULL;
+    char str[8];
+
+    CursorOff();
+
+    // background
+    rectCur = backgroundAction.rect;
+    rectCur.y = video->h / 2 - 80;
+    rectCur.h = 40;
+    rectFrom = rectCur;
+    rectFrom.x = 0;
+    rectFrom.y = 0;
+    
+    if(backgroundAction.surface) SDL_BlitSurface(backgroundAction.surface, &rectFrom, video, &rectCur);
+
+    switch(tradeFrom.resource){
+
+        case ORE:
+	    index = 2;
+	    break;
+
+        case WOOD:
+	    index = 0;
+	    break;
+
+        case MERCURY:
+	    index = 1;
+	    break;
+
+        case SULFUR:
+	    index = 3;
+	    break;
+
+        case CRYSTAL:
+	    index = 4;
+	    break;
+
+        case GEMS:
+	    index = 5;
+	    break;
+
+        case GOLDS:
+	    index = 6;
+	    break;
+	
+	default:
+	    return;
+	    break;
+    }
+
+    // sprite From resource
+    FillSPRITE(&sprite, "RESOURCE.ICN", index);
+    image = GetICNSprite(&sprite);
+    rectCur.x = (video->w - image->w) / 2 - 75;
+    rectCur.y = video->h / 2 - 55 - image->h;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    switch(tradeTo.resource){
+
+        case ORE:
+	    index = 2;
+	    break;
+
+        case WOOD:
+	    index = 0;
+	    break;
+
+        case MERCURY:
+	    index = 1;
+	    break;
+
+        case SULFUR:
+	    index = 3;
+	    break;
+
+        case CRYSTAL:
+	    index = 4;
+	    break;
+
+        case GEMS:
+	    index = 5;
+	    break;
+
+        case GOLDS:
+	    index = 6;
+	    break;
+	
+	default:
+	    return;
+	    break;
+    }
+
+    // sprite To resource
+    FillSPRITE(&sprite, "RESOURCE.ICN", index);
+    image = GetICNSprite(&sprite);
+    rectCur.x = (video->w - image->w) / 2 + 75;
+    rectCur.y = video->h / 2 - 55 - image->h;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // sprite arrow
+    FillSPRITE(&sprite, "TRADPOST.ICN", 0);
+    image = GetICNSprite(&sprite);
+    rectCur.x = (video->w - image->w) / 2;
+    rectCur.y = video->h / 2 - 60 - image->h;
+    rectCur.w = image->w;
+    rectCur.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    // text
+    text = "Qty to trade";
+    rectCur.x = (video->w - GetLengthText(text, FONT_SMALL)) / 2;
+    rectCur.y = video->h / 2 - 53;
+    rectCur.w = GetLengthText(text, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, text, FONT_SMALL);
+    
+    if(tradeTo.resource != GOLDS){
+	countFrom = GetCurrentSpliter(spliterMarket) * GetTradeFactor(tradeFrom.select, tradeTo.select);
+	countTo = GetCurrentSpliter(spliterMarket);
+    }else{
+	countTo = GetCurrentSpliter(spliterMarket) * GetTradeFactor(tradeFrom.select, tradeTo.select);
+	countFrom = GetCurrentSpliter(spliterMarket);
+    }
+
+    sprintf(str, "%d", countFrom);
+    rectCur.x = (video->w - GetLengthText(str, FONT_SMALL)) / 2 - 75;
+    rectCur.y = video->h / 2 - 53;
+    rectCur.w = GetLengthText(str, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, str, FONT_SMALL);
+
+    sprintf(str, "%d", countTo);
+    rectCur.x = (video->w - GetLengthText(str, FONT_SMALL)) / 2 + 75;
+    rectCur.y = video->h / 2 - 53;
+    rectCur.w = GetLengthText(str, FONT_SMALL);
+    rectCur.h = FONT_HEIGHTSMALL;
+    PrintText(video, &rectCur, str, FONT_SMALL);
+    
+    CursorOn();
 }

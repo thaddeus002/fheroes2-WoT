@@ -50,6 +50,7 @@ static CONFIGDESC settings[CONFIGEND] = {
     { "off", 		FALSE },	// EVILINTERFACE
     { "640x480", 	0 },		// VIDEOMODE
     { "\0", 		0 },		// LIMITMEMORY
+    { "off", 		FALSE },	// UNIQUEARTIFACT
 
     { "\0", 		0 },		// FILEMAPSPATH
     { "\0",		0 },		// MAPSLONGNAME
@@ -138,6 +139,9 @@ void InitConfig(const char * configFile){
 	else if(0 == strcmp(s1, "animation") && 0 == strcmp(s2, "on"))
 	    SetIntValue(ANIMATION, TRUE);
 
+	else if(0 == strcmp(s1, "uniqueartifact") && 0 == strcmp(s2, "on"))
+	    SetIntValue(UNIQUEARTIFACT, TRUE);
+
 	else if(0 == strcmp(s1, "videomode")){
 
 	    if(0 == strcmp(s2, "800x600"))
@@ -198,6 +202,7 @@ void SetIntValue(E_CONFIG key, Uint8 value){
 	case FULLSCREEN:
 	case EVILINTERFACE:
 	case ANIMATION:
+	case UNIQUEARTIFACT:
 	//
 	case ANIM1:
 	case ANIM2:

@@ -43,6 +43,31 @@
 
 #define SCOUTINGBASE		4	// стартовое количество клеток обзора у героя
 
+#define DEFAULT_KNGT_ATTACK	2
+#define DEFAULT_KNGT_DEFENCE	2
+#define DEFAULT_KNGT_POWER	1
+#define DEFAULT_KNGT_KNOWLEDGE	1
+#define DEFAULT_BRBN_ATTACK	3
+#define DEFAULT_BRBN_DEFENCE	1
+#define DEFAULT_BRBN_POWER	1
+#define DEFAULT_BRBN_KNOWLEDGE	1
+#define DEFAULT_NCRM_ATTACK	1
+#define DEFAULT_NCRM_DEFENCE	0
+#define DEFAULT_NCRM_POWER	2
+#define DEFAULT_NCRM_KNOWLEDGE	2
+#define DEFAULT_SCRS_ATTACK	0
+#define DEFAULT_SCRS_DEFENCE	0
+#define DEFAULT_SCRS_POWER	2
+#define DEFAULT_SCRS_KNOWLEDGE	3
+#define DEFAULT_WRLK_ATTACK	0
+#define DEFAULT_WRLK_DEFENCE	0
+#define DEFAULT_WRLK_POWER	3
+#define DEFAULT_WRLK_KNOWLEDGE	2
+#define DEFAULT_WZRD_ATTACK	0
+#define DEFAULT_WZRD_DEFENCE	1
+#define DEFAULT_WZRD_POWER	2
+#define DEFAULT_WZRD_KNOWLEDGE	2
+                                                                                                                                                
 typedef enum {
 		BASIC,
 		ADVANCED,

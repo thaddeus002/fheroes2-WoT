@@ -236,10 +236,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	case KNIGHT:
 
 	    heroes->race		= KNIGHT;
-	    heroes->attack		= 2;
-	    heroes->defence		= 2;
-	    heroes->power		= 1;
-	    heroes->knowledge		= 1;
+	    heroes->attack		= DEFAULT_KNGT_ATTACK;
+	    heroes->defence		= DEFAULT_KNGT_DEFENCE;
+	    heroes->power		= DEFAULT_KNGT_POWER;
+	    heroes->knowledge		= DEFAULT_KNGT_KNOWLEDGE;
 	    heroes->skill[0].type	= LEADERSHIP;
 	    heroes->skill[0].level	= BASIC;
 	    heroes->skill[1].type	= BALLISTICS;
@@ -254,10 +254,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	case BARBARIAN:
 
 	    heroes->race		= BARBARIAN;
-	    heroes->attack		= 3;
-	    heroes->defence		= 1;
-	    heroes->power		= 1;
-	    heroes->knowledge		= 1;
+	    heroes->attack		= DEFAULT_BRBN_ATTACK;
+	    heroes->defence		= DEFAULT_BRBN_DEFENCE;
+	    heroes->power		= DEFAULT_BRBN_POWER;
+	    heroes->knowledge		= DEFAULT_BRBN_KNOWLEDGE;
 	    heroes->skill[0].type	= PATHFINDING;
 	    heroes->skill[0].level	= ADVANCED;
 	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, GOBLIN);
@@ -270,10 +270,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
         case NECROMANCER:
 
 	    heroes->race		= NECROMANCER;
-	    heroes->attack		= 1;
-	    heroes->defence		= 0;
-	    heroes->power		= 2;
-	    heroes->knowledge		= 2;
+	    heroes->attack		= DEFAULT_NCRM_ATTACK;
+	    heroes->defence		= DEFAULT_NCRM_DEFENCE;
+	    heroes->power		= DEFAULT_NCRM_POWER;
+	    heroes->knowledge		= DEFAULT_NCRM_KNOWLEDGE;
 	    heroes->skill[0].type	= NECROMANCY;
 	    heroes->skill[0].level	= BASIC;
 	    heroes->skill[1].type	= WISDOM;
@@ -289,10 +289,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
         case SORCERESS:
 
 	    heroes->race		= SORCERESS;
-	    heroes->attack		= 0;
-	    heroes->defence		= 0;
-	    heroes->power		= 2;
-	    heroes->knowledge		= 3;
+	    heroes->attack		= DEFAULT_SCRS_ATTACK;
+	    heroes->defence		= DEFAULT_SCRS_DEFENCE;
+	    heroes->power		= DEFAULT_SCRS_POWER;
+	    heroes->knowledge		= DEFAULT_SCRS_KNOWLEDGE;
 	    heroes->skill[0].type	= NAVIGATION;
 	    heroes->skill[0].level	= ADVANCED;
 	    heroes->skill[1].type	= WISDOM;
@@ -308,10 +308,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
         case WARLOCK:
 
 	    heroes->race		= WARLOCK;
-	    heroes->attack		= 0;
-	    heroes->defence		= 0;
-	    heroes->power		= 3;
-	    heroes->knowledge		= 2;
+	    heroes->attack		= DEFAULT_WRLK_ATTACK;
+	    heroes->defence		= DEFAULT_WRLK_DEFENCE;
+	    heroes->power		= DEFAULT_WRLK_POWER;
+	    heroes->knowledge		= DEFAULT_WRLK_KNOWLEDGE;
 	    heroes->skill[0].type	= SCOUTING;
 	    heroes->skill[0].level	= ADVANCED;
 	    heroes->skill[1].type	= WISDOM;
@@ -327,10 +327,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
         case WIZARD:
 
 	    heroes->race		= WIZARD;
-	    heroes->attack		= 0;
-	    heroes->defence		= 1;
-	    heroes->power		= 2;
-	    heroes->knowledge		= 2;
+	    heroes->attack		= DEFAULT_WZRD_ATTACK;
+	    heroes->defence		= DEFAULT_WZRD_DEFENCE;
+	    heroes->power		= DEFAULT_WZRD_POWER;
+	    heroes->knowledge		= DEFAULT_WZRD_KNOWLEDGE;
 	    heroes->skill[0].type	= WISDOM;
 	    heroes->skill[0].level	= ADVANCED;
 	    heroes->army[0].count	= GetMonsterGrownCastle(NULL, HALFLING);

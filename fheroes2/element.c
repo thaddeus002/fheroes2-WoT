@@ -36,144 +36,50 @@
 #include "object.h"
 #include "config.h"
 #include "debug.h"
+#include "box.h"
 #include "element.h"
 
-#define MESSAGEBOX_WIDTH	306
-#define MESSAGEBOX_HEIGHT	226
-
-ACTION MessageBox(const char *message, ENUMFONT font){
+ACTION MessageBox(const char *header, const char *message, ENUMFONT font, Uint32 flag){
 
     CursorOff();
     SetIntValue(ANIM2, FALSE);
+    SetIntValue(ANIM3, FALSE);
     
     Uint32 cursor = GetCursor();
     
-    char *buybuild = "BUYBUILD.ICN";
-    char *system = "SYSTEM.ICN";
-    if(GetIntValue(EVILINTERFACE)){
-	buybuild = "BUYBUILE.ICN";
-	system = "SYSTEME.ICN";
-    }
-    
-    // отрисовка диалога по центру экрана
-    SDL_Surface *format, *back, *elem, *video;
-    SDL_Rect rectBack, rectCur;
-    BOOL exit;
+
+    SDL_Surface *video = SDL_GetVideoSurface();;
+    SDL_Rect rect;
+    SDL_Event event;
+    BOOL exit = FALSE;
     ACTION result = NONE;
-    AGGSPRITE sprite;
-            
-    video = SDL_GetVideoSurface();
-    rectBack.x = (video->w - MESSAGEBOX_WIDTH) / 2;
-    rectBack.y = (video->h - MESSAGEBOX_HEIGHT) / 2;
-    rectBack.w = MESSAGEBOX_WIDTH;
-    rectBack.h = MESSAGEBOX_HEIGHT;
-
-    // сохраняем бакгроунд
-    if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT, 16, 0, 0, 0, 0))){
-	fprintf(stderr, "MessageBox: CreateRGBSurface failed: %s\n", SDL_GetError());
-	return EXIT;
-    }    
-
-    back = SDL_DisplayFormat(format);
-    SDL_FreeSurface(format);
-    SDL_BlitSurface(video, &rectBack, back, NULL);
-
-    // получаем левый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 4);
-    elem = GetICNSprite(&sprite);
-    if(GetIntValue(EVILINTERFACE)) rectCur.x = rectBack.x; else rectCur.x = rectBack.x + 1;
-    rectCur.y = rectBack.y;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем левый средний спрайт
-    FillSPRITE(&sprite, buybuild, 5);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x;
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем левый нижний спрайт
-    FillSPRITE(&sprite, buybuild, 6);
-    elem = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем правый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 0);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + rectCur.w;
-    rectCur.y = rectBack.y;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем правый средний спрайт
-    FillSPRITE(&sprite, buybuild, 1);
-    elem = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем правый нижний спрайт
-    FillSPRITE(&sprite, buybuild, 2);
-    elem = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // рисуем текст
-    rectCur.x = rectBack.x + 40;
-    rectCur.y = rectBack.y + 70;
-    rectCur.w = MESSAGEBOX_WIDTH - 70;
-    rectCur.h = MESSAGEBOX_HEIGHT - 150;
-    PrintAlignText(video, &rectCur, message, font);
-
-    // рисуем кнопки
-    INTERFACEACTION action;
+    S_BOX box;
     INTERFACEACTION *dialog = NULL;        
 
-    // кнопка YES
-    FillSPRITE(&sprite, system, 5);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 40;
-    rectCur.y = rectBack.y + MESSAGEBOX_HEIGHT - 70;
-    if(GetIntValue(EVILINTERFACE))
-        rectCur.y = rectBack.y + MESSAGEBOX_HEIGHT - 85;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, system, 5);
-    FillSPRITE(&action.objectPush, system, 6);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressYES;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
+    if( ! InitBox(&box, GetHeightText(header, font) + 20 + GetHeightText(message, font), &dialog, flag)) return NONE;
 
-    // кнопка NO
-    FillSPRITE(&sprite, system, 7);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + MESSAGEBOX_WIDTH - elem->w - 25;
-    if(GetIntValue(EVILINTERFACE))
-	rectCur.y = rectBack.y + MESSAGEBOX_HEIGHT - 85;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, system, 7);
-    FillSPRITE(&action.objectPush, system, 8);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressNO;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
+    rect = box.rectArea;
+
+    // рисуем заголовок
+    if(header){
+
+	PrintAlignText(video, &rect, header, font);
+
+	if(message){
+
+	    rect.y += GetHeightText(header, font) + 20;
+
+	    // рисуем текст
+	    PrintAlignText(video, &rect, message, font);
+	}
+
+    }else if(message){
+	rect = box.rectArea;
+	rect.y += (rect.h - GetHeightText(message, font)) / 2;
+
+	// рисуем текст
+	PrintAlignText(video, &rect, message, font);
+    }
 
     // Отрисовка диалога
     SDL_Flip(video);
@@ -183,47 +89,24 @@ ACTION MessageBox(const char *message, ENUMFONT font){
     CursorOn();
 
     // цикл событий
-    exit = FALSE;
-    while(! exit)
-        switch(ActionCycle(dialog, NULL)){
-
-            case ENTER:
-            case YES:
-                exit = TRUE;
-                result = YES;
-            break;
-
-            case NO:
-                exit = TRUE;
-                result = NO;
-            break;
-
-            case EXIT:
-                exit = TRUE;
-                result = EXIT;
-            break;
-
-            case ESC:
-            case CANCEL:
-                exit = TRUE;
-                result = CANCEL;
-            break;
-	    
-	    default:
-		break;
+    if(flag)
+	result = ActionCycle(dialog, NULL);
+    else
+	while(! exit){
+    	    while(SDL_PollEvent(&event))
+        	if( SDL_BUTTON_RIGHT == event.button.button && SDL_RELEASED == event.button.state) exit = TRUE;
+        
+    	    if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY * 10);
 	}
 
-    // востанавливаем бакгроунд
     CursorOff();
-    SDL_BlitSurface(back, NULL, video, &rectBack);
-    //SDL_Flip(video);
-
-    FreeActionEvent(dialog);
-    SDL_FreeSurface(back);
+    FreeBox(&box);
 
     SetCursor(cursor);
 
+    SetIntValue(ANIM3, TRUE);
     SetIntValue(ANIM2, TRUE);
+
     CursorOn();
 
     return result;
@@ -543,7 +426,7 @@ void ShowQuickInfo(Uint16 index){
 	    break;
 
 	default:
-	    message = GetStringObject(cell->type);
+	    message = (OBJ_ZERO == cell->type ? GetStringGround(GetGroundMaps(cell->ax, cell->ay)) : GetStringObject(cell->type));
 	    rectCur.x = rectCur.x + (rectCur.w - GetLengthText(message, FONT_SMALL)) / 2 ;
 	    rectCur.y += 20;
 
@@ -551,7 +434,8 @@ void ShowQuickInfo(Uint16 index){
 	    break;
     }
 
-    SDL_Flip(video);
+    //SDL_Flip(video);
+    CursorOn();
 
     while(! exit){
 
@@ -561,6 +445,7 @@ void ShowQuickInfo(Uint16 index){
 	if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY * 10);
     }
 
+    CursorOff();
     // востанавливаем бакгроунд
     SDL_BlitSurface(back, NULL, video, &rectBack);
 
@@ -579,194 +464,85 @@ Uint16 SelectCountBox(Uint16 max){
     
     Uint32 cursor = GetCursor();
     
-    char *buybuild = "BUYBUILD.ICN";
-    char *system = "SYSTEM.ICN";
-    if(GetIntValue(EVILINTERFACE)){
-	buybuild = "BUYBUILE.ICN";
-	system = "SYSTEME.ICN";
-    }
-    
     // отрисовка диалога по центру экрана
-    SDL_Surface *format, *back, *elem, *video;
-    SDL_Rect rectBack, rectCur;
+    SDL_Surface *image = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect rect;
     Uint16 result = max / 2;
     BOOL exit = FALSE;
     AGGSPRITE sprite;
     char number[8];
             
-    video = SDL_GetVideoSurface();
-    rectBack.x = (video->w - MESSAGEBOX_WIDTH) / 2;
-    rectBack.y = (video->h - MESSAGEBOX_HEIGHT) / 2;
-    rectBack.w = MESSAGEBOX_WIDTH;
-    rectBack.h = MESSAGEBOX_HEIGHT;
-    FillSPRITE(&sprite, buybuild, 5);
-    elem = GetICNSprite(&sprite);
-    rectBack.h += elem->h;
-
-    // сохраняем бакгроунд
-    if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
-	fprintf(stderr, "MessageBox: CreateRGBSurface failed: %s\n", SDL_GetError());
-	return EXIT;
-    }    
-
-    back = SDL_DisplayFormat(format);
-    SDL_FreeSurface(format);
-    SDL_BlitSurface(video, &rectBack, back, NULL);
-
-    // получаем левый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 4);
-    elem = GetICNSprite(&sprite);
-    if(GetIntValue(EVILINTERFACE)) rectCur.x = rectBack.x; else rectCur.x = rectBack.x + 1;
-    rectCur.y = rectBack.y;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем левый средний спрайт
-    FillSPRITE(&sprite, buybuild, 5);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x;
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем левый средний спрайт
-    FillSPRITE(&sprite, buybuild, 5);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x;
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем левый нижний спрайт
-    FillSPRITE(&sprite, buybuild, 6);
-    elem = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем правый верхний спрайт
-    FillSPRITE(&sprite, buybuild, 0);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + rectCur.w;
-    rectCur.y = rectBack.y;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем правый средний спрайт
-    FillSPRITE(&sprite, buybuild, 1);
-    elem = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем правый средний спрайт
-    FillSPRITE(&sprite, buybuild, 1);
-    elem = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // получаем правый нижний спрайт
-    FillSPRITE(&sprite, buybuild, 2);
-    elem = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-
-    // рисуем текст
-    rectCur.x = rectBack.x + 40;
-    rectCur.y = rectBack.y + 70;
-    rectCur.w = MESSAGEBOX_WIDTH - 70;
-    rectCur.h = FONT_HEIGHTBIG;
-    PrintAlignText(video, &rectCur, "Move how many troops?", FONT_BIG);
-
-    // рисуем кнопки
     INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
+    S_BOX box;
 
-    // кнопка YES
-    FillSPRITE(&sprite, system, 5);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 40;
-    if(GetIntValue(EVILINTERFACE)) rectCur.y = rectBack.y + MESSAGEBOX_HEIGHT - 45; else rectCur.y = rectBack.y + MESSAGEBOX_HEIGHT - 30;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, system, 5);
-    FillSPRITE(&action.objectPush, system, 6);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressYES;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
+    if( ! InitBox(&box, 60, &dialog, OK|CANCEL)) return NONE;
 
-    // кнопка NO
-    FillSPRITE(&sprite, system, 7);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + MESSAGEBOX_WIDTH - elem->w - 30;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, system, 7);
-    FillSPRITE(&action.objectPush, system, 8);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressNO;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
+    // рисуем заголовок
+    rect = box.rectArea;
+    PrintAlignText(video, &rect, "Move how many troops?", FONT_BIG);
 
     // edit
     FillSPRITE(&sprite, "TOWNWIND.ICN", 4);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 128;
-    rectCur.y = rectBack.y + 120;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
-    rectCur.w = elem->w;
-    rectCur.h = FONT_HEIGHTBIG;
+    image = GetICNSprite(&sprite);
+    rect.x = box.rectArea.x + 80;
+    rect.y = box.rectArea.y + 55;
+    rect.w = image->w;
+    rect.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rect);
+    rect.w = image->w;
+    rect.h = FONT_HEIGHTBIG;
     sprintf(number, "%d", result);
-    PrintAlignText(video, &rectCur, number, FONT_BIG);
+    PrintAlignText(video, &rect, number, FONT_BIG);
 
     // UP
     FillSPRITE(&sprite, "TOWNWIND.ICN", 5);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 200;
-    rectCur.y = rectBack.y + 117;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
+    image = GetICNSprite(&sprite);
+    rect.x = box.rectArea.x + 150;
+    rect.y = box.rectArea.y + 51;
+    rect.w = image->w;
+    rect.h = image->h;
     ZeroINTERFACEACTION(&action);
     FillSPRITE(&action.objectUp, "TOWNWIND.ICN", 5);
     FillSPRITE(&action.objectPush, "TOWNWIND.ICN", 6);
-    action.rect = rectCur;
+    action.rect = rect;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionPressUP;
     AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
+    SDL_BlitSurface(image, NULL, video, &rect);
 
     // DOWN
     FillSPRITE(&sprite, "TOWNWIND.ICN", 7);
-    elem = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 200;
-    rectCur.y = rectBack.y + 133;
-    rectCur.w = elem->w;
-    rectCur.h = elem->h;
+    image = GetICNSprite(&sprite);
+    rect.x = box.rectArea.x + 150;
+    rect.y = box.rectArea.y + 67;
+    rect.w = image->w;
+    rect.h = image->h;
     ZeroINTERFACEACTION(&action);
     FillSPRITE(&action.objectUp, "TOWNWIND.ICN", 7);
     FillSPRITE(&action.objectPush, "TOWNWIND.ICN", 8);
-    action.rect = rectCur;
+    action.rect = rect;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionPressDOWN;
     AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(elem, NULL, video, &rectCur);
+    SDL_BlitSurface(image, NULL, video, &rect);
+
+    // WEEL UP
+    ZeroINTERFACEACTION(&action);
+    action.rect = box.rectArea;
+    action.mouseEvent = MOUSE_UWHEEL;
+    action.pf = ActionPressUP;
+    AddActionEvent(&dialog, &action);
+    SDL_BlitSurface(image, NULL, video, &rect);
+
+    // WEEL DOWN
+    ZeroINTERFACEACTION(&action);
+    action.rect = box.rectArea;
+    action.mouseEvent = MOUSE_DWHEEL;
+    action.pf = ActionPressDOWN;
+    AddActionEvent(&dialog, &action);
+    SDL_BlitSurface(image, NULL, video, &rect);
 
     // Отрисовка диалога
     SDL_Flip(video);
@@ -786,12 +562,13 @@ Uint16 SelectCountBox(Uint16 max){
                 break;
 
             case ESC:
-            case NO:
+            case CANCEL:
                 result = 0;
                 exit = TRUE;
                 break;
 
-            case YES:
+            case OK:
+            case ENTER:
                 exit = TRUE;
                 break;
 
@@ -800,16 +577,16 @@ Uint16 SelectCountBox(Uint16 max){
 		    ++result;
 		    CursorOff();
 		    FillSPRITE(&sprite, "TOWNWIND.ICN", 4);
-		    elem = GetICNSprite(&sprite);
-		    rectCur.x = rectBack.x + 128;
-		    rectCur.y = rectBack.y + 120;
-		    rectCur.w = elem->w;
-		    rectCur.h = elem->h;
-		    SDL_BlitSurface(elem, NULL, video, &rectCur);
-		    rectCur.w = elem->w;
-		    rectCur.h = FONT_HEIGHTBIG;
+		    image = GetICNSprite(&sprite);
+		    rect.x = box.rectArea.x + 80;
+		    rect.y = box.rectArea.y + 55;
+		    rect.w = image->w;
+		    rect.h = image->h;
+		    SDL_BlitSurface(image, NULL, video, &rect);
+		    rect.w = image->w;
+		    rect.h = FONT_HEIGHTBIG;
     		    sprintf(number, "%d", result);
-		    PrintAlignText(video, &rectCur, number, FONT_BIG);
+		    PrintAlignText(video, &rect, number, FONT_BIG);
 		    CursorOn();
 		}
 		break;
@@ -819,16 +596,16 @@ Uint16 SelectCountBox(Uint16 max){
 		    --result;
 		    CursorOff();
 	    	    FillSPRITE(&sprite, "TOWNWIND.ICN", 4);
-	    	    elem = GetICNSprite(&sprite);
-	    	    rectCur.x = rectBack.x + 128;
-	    	    rectCur.y = rectBack.y + 120;
-	    	    rectCur.w = elem->w;
-	    	    rectCur.h = elem->h;
-	    	    SDL_BlitSurface(elem, NULL, video, &rectCur);
-	    	    rectCur.w = elem->w;
-	    	    rectCur.h = FONT_HEIGHTBIG;
+	    	    image = GetICNSprite(&sprite);
+		    rect.x = box.rectArea.x + 80;
+		    rect.y = box.rectArea.y + 55;
+	    	    rect.w = image->w;
+	    	    rect.h = image->h;
+	    	    SDL_BlitSurface(image, NULL, video, &rect);
+	    	    rect.w = image->w;
+	    	    rect.h = FONT_HEIGHTBIG;
 	    	    sprintf(number, "%d", result);
-	    	    PrintAlignText(video, &rectCur, number, FONT_BIG);
+	    	    PrintAlignText(video, &rect, number, FONT_BIG);
 		    CursorOn();
 		}
 		break;
@@ -837,20 +614,16 @@ Uint16 SelectCountBox(Uint16 max){
                 break;
         }
 
-    // востанавливаем бакгроунд
     CursorOff();
-    SDL_BlitSurface(back, NULL, video, &rectBack);
-    //SDL_Flip(video);
 
-    FreeActionEvent(dialog);
-    SDL_FreeSurface(back);
+    FreeBox(&box);
 
     SetCursor(cursor);
 
     SetIntValue(ANIM2, TRUE);
     SetIntValue(ANIM3, TRUE);
+
     CursorOn();
 
     return result;
 }
-

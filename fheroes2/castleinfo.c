@@ -645,9 +645,18 @@ ACTION ActionCASTLEINFOLOOP(INTERFACEACTION *action){
 			    }
 			    break;
 
-			case SDL_BUTTON_RIGHT:
-			    
-			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
+                       case SDL_BUTTON_RIGHT:
+
+                            if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
+
+                            ptr = action;
+                            while(ptr){
+                                if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+                                    (ptr->mouseEvent & MOUSE_RCLICK) && ptr->pf )
+                                        exit = (*ptr->pf)();
+
+                                ptr = (INTERFACEACTION *) ptr->next;
+                            }
 			    break;
 
 			default:
@@ -771,6 +780,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
             ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling1;
+	    AddActionEvent(&castinfo, &action);
+            ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling1;
@@ -784,6 +799,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+            ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling1;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -800,6 +821,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+            ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling1;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -843,6 +870,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling2;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling2;
@@ -856,6 +889,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling2;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -872,6 +911,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling2;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -898,10 +943,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE2);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER2);
+    message = (castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2) ?
+	       GetStringDwelling(castle->race, DWELLING_UPGRADE2) : GetStringDwelling(castle->race, DWELLING_MONSTER2));
     rectCur.x = cx + 215;
     rectCur.y = cy + 60;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -918,6 +961,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling3;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling3;
@@ -931,6 +980,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling3;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -947,6 +1002,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling3;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -973,10 +1034,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE3);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER3);
+    message = (castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3) ?
+	       GetStringDwelling(castle->race, DWELLING_UPGRADE3) : GetStringDwelling(castle->race, DWELLING_MONSTER3));
     rectCur.x = cx + 360;
     rectCur.y = cy + 60;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -993,6 +1052,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling4;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling4;
@@ -1006,6 +1071,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling4;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1022,6 +1093,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling4;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1048,10 +1125,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE4);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER4);
+    message = (castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4) ?
+	       GetStringDwelling(castle->race, DWELLING_UPGRADE4) : GetStringDwelling(castle->race, DWELLING_MONSTER4));
     rectCur.x = cx + 70;
     rectCur.y = cy + 135;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1062,10 +1137,16 @@ void RedrawCastleStatusBuilding(void){
 
     rectCur.x = cx + 150;
     rectCur.y = cy + 78;
-    rectCur.w = 57;
-    rectCur.h = 135;
+    rectCur.w = 135;
+    rectCur.h = 57;
     switch(AllowBuildDwelling5(castle)){
     	case BUILD_OK:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling5;
+	    AddActionEvent(&castinfo, &action);
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
@@ -1081,6 +1162,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling5;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1097,6 +1184,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling5;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1123,10 +1216,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE5);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER5);
+    message = (castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5) ?
+	       GetStringDwelling(castle->race, DWELLING_UPGRADE5) : GetStringDwelling(castle->race, DWELLING_MONSTER5));
     rectCur.x = cx + 215;
     rectCur.y = cy + 135;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1143,6 +1234,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling6;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickDwelling6;
@@ -1156,6 +1253,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling6;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1172,6 +1275,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickDwelling6;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1220,6 +1329,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMageGuild;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickMageGuild;
@@ -1233,6 +1348,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMageGuild;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1249,6 +1370,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMageGuild;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1305,6 +1432,12 @@ void RedrawCastleStatusBuilding(void){
     	    case BUILD_OK:
 		ZeroINTERFACEACTION(&action);
 	        action.rect = rectCur;
+	        action.mouseEvent = MOUSE_RCLICK;
+		action.level = LEVELEVENT_CASTLEINFOBUILD;
+	        action.pf = ActionCastleRClickTavern;
+		AddActionEvent(&castinfo, &action);
+		ZeroINTERFACEACTION(&action);
+	        action.rect = rectCur;
 	        action.mouseEvent = MOUSE_LCLICK;
 		action.level = LEVELEVENT_CASTLEINFOBUILD;
 	        action.pf = ActionCastleClickTavern;
@@ -1318,6 +1451,12 @@ void RedrawCastleStatusBuilding(void){
 		SDL_BlitSurface(image, NULL, video, &rectCur);
 		break;
 	    case CANNOT_BUILD:
+		ZeroINTERFACEACTION(&action);
+	        action.rect = rectCur;
+	        action.mouseEvent = MOUSE_RCLICK;
+		action.level = LEVELEVENT_CASTLEINFOBUILD;
+	        action.pf = ActionCastleRClickTavern;
+		AddActionEvent(&castinfo, &action);
 	        FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	        image = GetICNSprite(&sprite);
 	        rectCur.x += 118;
@@ -1334,6 +1473,12 @@ void RedrawCastleStatusBuilding(void){
 	        SDL_BlitSurface(image, NULL, video, &rectCur);
 		break;
 	    case END_TUR:
+		ZeroINTERFACEACTION(&action);
+	        action.rect = rectCur;
+	        action.mouseEvent = MOUSE_RCLICK;
+		action.level = LEVELEVENT_CASTLEINFOBUILD;
+	        action.pf = ActionCastleRClickTavern;
+		AddActionEvent(&castinfo, &action);
 		FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 		image = GetICNSprite(&sprite);
 		rectCur.x += 118;
@@ -1378,6 +1523,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickThievesGuild;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickThievesGuild;
@@ -1391,6 +1542,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickThievesGuild;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1407,6 +1564,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickThievesGuild;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1450,6 +1613,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickShipyard;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickShipyard;
@@ -1463,6 +1632,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickShipyard;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1479,6 +1654,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickShipyard;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1522,6 +1703,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickStatue;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickStatue;
@@ -1535,6 +1722,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickStatue;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1551,6 +1744,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickStatue;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1594,6 +1793,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMarketplace;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickMarketplace;
@@ -1607,6 +1812,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMarketplace;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1623,6 +1834,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMarketplace;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1666,6 +1883,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickWell;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickWell;
@@ -1679,6 +1902,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickWell;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1695,6 +1924,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickWell;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1738,6 +1973,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickWel2;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickWel2;
@@ -1751,6 +1992,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickWel2;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1767,6 +2014,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickWel2;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1810,6 +2063,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickSpec;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickSpec;
@@ -1823,6 +2082,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickSpec;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1839,6 +2104,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickSpec;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1882,6 +2153,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickLeftTurret;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickLeftTurret;
@@ -1895,6 +2172,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickLeftTurret;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1911,6 +2194,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickLeftTurret;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1954,6 +2243,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickRightTurret;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickRightTurret;
@@ -1967,6 +2262,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickRightTurret;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -1983,6 +2284,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickRightTurret;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -2026,6 +2333,12 @@ void RedrawCastleStatusBuilding(void){
     	case BUILD_OK:
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMoat;
+	    AddActionEvent(&castinfo, &action);
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.level = LEVELEVENT_CASTLEINFOBUILD;
 	    action.pf = ActionCastleClickMoat;
@@ -2039,6 +2352,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case CANNOT_BUILD:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMoat;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 12);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -2055,6 +2374,12 @@ void RedrawCastleStatusBuilding(void){
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    break;
 	case END_TUR:
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.level = LEVELEVENT_CASTLEINFOBUILD;
+	    action.pf = ActionCastleRClickMoat;
+	    AddActionEvent(&castinfo, &action);
 	    FillSPRITE(&sprite, "TOWNWIND.ICN", 13);
 	    image = GetICNSprite(&sprite);
 	    rectCur.x += 118;
@@ -2151,6 +2476,13 @@ void RedrawCastleStatusBuilding(void){
 	default:
 	    break;
     }
+    // right click info
+    ZeroINTERFACEACTION(&action); 
+    action.rect = rectCur; 
+    action.mouseEvent = MOUSE_RCLICK; 
+    action.level = LEVELEVENT_CASTLEINFOBUILD;
+    action.pf = ActionCastleRClickCaptain; 
+    AddActionEvent(&castinfo, &action);
 
     // recrut primary hero
     FillSPRITE(&sprite, HeroesBigNamePortrait(GetRecrutPrimaryHeroes()), 0);

@@ -274,6 +274,13 @@ ACTION ActionCycle(INTERFACEACTION *action, void (*pfanim)()){
 
 			case SDL_BUTTON_RIGHT:
 			    
+			    ptr = action;
+			    while(ptr){
+				if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+				    (ptr->mouseEvent & MOUSE_RCLICK) && ptr->pf) exit = (*ptr->pf)();
+		    
+    				ptr = (INTERFACEACTION *) ptr->next;
+			    }
 			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
 			    break;
 

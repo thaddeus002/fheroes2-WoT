@@ -71,9 +71,11 @@ int main(int argc, char **argv){
 	    case '?':
 	    case 'h':
 		printf("Usage: %s [OPTIONS]\n", argv[0]);
+		/*
 		printf("  -w\tfull screen\n");
 		printf("  -s\tsound on\n");
 		printf("  -m\tmusic on\n");
+		*/
 		printf("  -d\tdebug mode\n");
 		printf("  -c\tpath to config file (default fheroes2.cfg)\n");
 		printf("  -h\tprint this help and exit\n");

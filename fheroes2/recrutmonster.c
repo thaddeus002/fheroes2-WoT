@@ -358,35 +358,55 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // кнопка MAX
-    FillSPRITE(&sprite, "RECRUIT.ICN", 4);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 230;
-    rectCur.y = rectBack.y + 155;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "RECRUIT.ICN", 4);
-    FillSPRITE(&action.objectPush, "RECRUIT.ICN", 5);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressMAX;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
+    if(available){
+	FillSPRITE(&sprite, "RECRUIT.ICN", 4);
+	image = GetICNSprite(&sprite);
+	rectCur.x = rectBack.x + 230;
+	rectCur.y = rectBack.y + 155;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	ZeroINTERFACEACTION(&action);
+	FillSPRITE(&action.objectUp, "RECRUIT.ICN", 4);
+	FillSPRITE(&action.objectPush, "RECRUIT.ICN", 5);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionPressMAX;
+	AddActionEvent(&dialog, &action);
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+    }else{
+	FillSPRITE(&sprite, "RECRUIT.ICN", 5);
+	image = GetICNSprite(&sprite);
+	rectCur.x = rectBack.x + 230;
+	rectCur.y = rectBack.y + 155;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+    }
     // кнопка OKAY
-    FillSPRITE(&sprite, "RECRUIT.ICN", 8);
-    image = GetICNSprite(&sprite);
-    rectCur.x = rectBack.x + 34;
-    rectCur.y = rectBack.y + 249;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    ZeroINTERFACEACTION(&action);
-    FillSPRITE(&action.objectUp, "RECRUIT.ICN", 8);
-    FillSPRITE(&action.objectPush, "RECRUIT.ICN", 9);
-    action.rect = rectCur;
-    action.mouseEvent = MOUSE_LCLICK;
-    action.pf = ActionPressOK;
-    AddActionEvent(&dialog, &action);
-    SDL_BlitSurface(image, NULL, video, &rectCur);
+    if(available){
+	FillSPRITE(&sprite, "RECRUIT.ICN", 8);
+	image = GetICNSprite(&sprite);
+	rectCur.x = rectBack.x + 34;
+	rectCur.y = rectBack.y + 249;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	ZeroINTERFACEACTION(&action);
+	FillSPRITE(&action.objectUp, "RECRUIT.ICN", 8);
+	FillSPRITE(&action.objectPush, "RECRUIT.ICN", 9);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionPressOK;
+	AddActionEvent(&dialog, &action);
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+    }else{
+	FillSPRITE(&sprite, "RECRUIT.ICN", 9);
+	image = GetICNSprite(&sprite);
+	rectCur.x = rectBack.x + 34;
+	rectCur.y = rectBack.y + 249;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+    }
     // кнопка CANCEL
     FillSPRITE(&sprite, "RECRUIT.ICN", 6);
     image = GetICNSprite(&sprite);
@@ -402,6 +422,23 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     action.pf = ActionPressCANCEL;
     AddActionEvent(&dialog, &action);
     SDL_BlitSurface(image, NULL, video, &rectCur);
+
+    if(available){
+	// WEEL UP
+	rectCur.x = rectBack.x + 20;
+	rectCur.y = rectBack.y + 20;
+	rectCur.w = rectBack.w - 20;
+	rectCur.h = rectBack.h - 20;
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_UWHEEL;
+	action.pf = ActionPressUP;
+	AddActionEvent(&dialog, &action);
+	// WEEL DOWN
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_DWHEEL;
+	action.pf = ActionPressDOWN;
+	AddActionEvent(&dialog, &action);
+    }
 
     // Отрисовка диалога
     CursorOn();
@@ -569,9 +606,6 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
 	rectCur.x = rectCur.x - rectCur.w / 2;
 	PrintText(video, &rectCur, str, FONT_SMALL);
     }
-}
-
-void ErrorDialogRecrutMonster(const S_CASTLE *castle){
 }
 
 void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
@@ -785,8 +819,9 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
     }
 
     // Отрисовка диалога
-    SDL_Flip(video);
-
+    //SDL_Flip(video);
+    CursorOn();
+    
     // цикл событий
     while(! exit){
     
@@ -795,10 +830,12 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
                         
         if(GetIntValue(CYCLELOOP)) SDL_Delay(CYCLEDELAY * 10);
     }
-                                                                        
+    
+    CursorOff();
+                                                                    
     // востанавливаем бакгроунд
     SDL_BlitSurface(back, NULL, video, &rectBack);
-    //SDL_Flip(video);
+    SDL_Flip(video);
 
     SDL_FreeSurface(back);
 

@@ -346,6 +346,24 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
     // регистрируем
     AddActionEvent(&stpeload, &action);
 
+    // обнуляем структуру
+    ZeroINTERFACEACTION(&action);
+    // заполняем
+    action.rect = dest;
+    action.mouseEvent = MOUSE_UWHEEL;
+    action.pf = ActionPressUP;
+    // регистрируем
+    AddActionEvent(&stpeload, &action);
+
+    // обнуляем структуру
+    ZeroINTERFACEACTION(&action);
+    // заполняем
+    action.rect = dest;
+    action.mouseEvent = MOUSE_UWHEEL;
+    action.pf = ActionPressDOWN;
+    // регистрируем
+    AddActionEvent(&stpeload, &action);
+
     ReadFileMapInfo();
     FillSPRITE(&sprite, "ESCROLL.ICN", 3);
     if(NULL == (spliterMaps = InitSpliter(&sprite))) return EXIT;
@@ -479,7 +497,8 @@ ACTION ActionPressSelectMap(){
 
 
     RedrawListPanel();
-
+    RedrawSpliter(spliterMaps);
+    
     return NONE;
 }
 
@@ -970,12 +989,12 @@ void StartSpliter(void){
 
     // init spliterMaps
     dest.x = 460;
-    dest.y = 77;
+    dest.y = 78;
     dest.w = 8;
-    dest.h = 140;
+    dest.h = 141;
 
     Uint16 max = 0;
-    if(GetCountAll(showmaps) > MAXNAMES) max = GetCountAll(showmaps) - MAXNAMES + 1;
+    if(GetCountAll(showmaps) > MAXNAMES) max = GetCountAll(showmaps) - MAXNAMES;
 
     SetRangeSpliter(spliterMaps, &dest, max);
     RedrawSpliter(spliterMaps);

@@ -330,7 +330,7 @@ const char * GetStringObject(E_OBJECT type){
 
         // горы
         case OBJ_MOUNTS:
-            string = "Mounts";
+            string = "Mountains";
             break;
 
         // вулкан
@@ -425,6 +425,7 @@ const char * GetStringObject(E_OBJECT type){
 
         // хижина крестьянина
         case OBJ_PEASANTHUNT:
+        case OBJ_PEASANTHUNT2:
             string = "Peasant Hunt";
             break;
 
@@ -1367,3 +1368,522 @@ const char * GetStringResource(E_RESOURCE resource){
     return string;
 }
 
+
+const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
+
+    static char string[128];
+
+    switch(dwelling){
+    
+	case DWELLING_MONSTER2:
+	
+	    switch(race){
+		case KNIGHT:
+		case BARBARIAN:
+		case NECROMANCER:
+		case WIZARD:
+	        case WARLOCK:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		break;
+	    
+		case SORCERESS:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER1),
+			GetStringBuilding(race, BUILD_TAVERN));
+		break;
+	
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+	
+	case DWELLING_UPGRADE2:
+
+	    switch(race){
+		case KNIGHT:
+		case BARBARIAN:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringDwelling(race, DWELLING_MONSTER4));
+		break;
+	    
+		case SORCERESS:
+		    sprintf(string , "%s.", GetStringBuilding(race, BUILD_WELL));
+		break;
+
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+	
+	case DWELLING_MONSTER3:
+
+	    switch(race){
+		case KNIGHT:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER1),
+			GetStringBuilding(race, BUILD_WELL));
+		break;
+	    
+		case BARBARIAN:
+		case NECROMANCER:
+		case SORCERESS:
+		case WIZARD:
+		case WARLOCK:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		break;
+	
+		default:
+		break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE3:
+
+	    switch(race){
+		case KNIGHT:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringDwelling(race, DWELLING_MONSTER4) );
+		break;
+	    
+		case SORCERESS:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
+		break;
+
+		case WIZARD:
+		    sprintf(string , "%s.", GetStringBuilding(race, BUILD_WELL));
+		break;
+
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+
+	case DWELLING_MONSTER4:
+
+	    switch(race){
+		case KNIGHT:
+		    sprintf(string , "%s, %s, %s, %s.", 
+			GetStringDwelling(race, DWELLING_MONSTER1),
+			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, BUILD_TAVERN) );
+		break;
+	    
+		case BARBARIAN:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		break;
+	    
+		case NECROMANCER:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, BUILD_THIEVESGUILD) );
+		break;
+	    
+		case SORCERESS:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, BUILD_MAGEGUILD1) );
+		break;
+
+		case WIZARD:
+		case WARLOCK:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER2));
+		break;
+	
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE4:
+
+	    switch(race){
+		case KNIGHT:
+		case BARBARIAN:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringDwelling(race, DWELLING_MONSTER3) );
+		break;
+
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+
+    
+	case DWELLING_MONSTER5:
+
+	    switch(race){
+		case KNIGHT:
+		case BARBARIAN:
+		    sprintf(string , "%s, %s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringDwelling(race, DWELLING_MONSTER4) );
+		break;
+
+		case NECROMANCER:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, BUILD_MAGEGUILD1) );
+		break;
+	    
+		case SORCERESS:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
+		break;
+
+		case WIZARD:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringLevelMageGuild(MAGIC_LEVEL1) );
+		break;
+	
+		case WARLOCK:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER3));
+		break;
+	
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE5:
+
+	    switch(race){
+		case NECROMANCER:
+		    sprintf(string , "%s.",
+			GetStringLevelMageGuild(MAGIC_LEVEL2) );
+		break;
+
+		case WIZARD:
+		    sprintf(string , "%s.",
+			GetStringBuilding(race, BUILD_SPEC) );
+		break;
+
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+
+	case DWELLING_MONSTER6:
+
+	    switch(race){
+		case KNIGHT:
+		    sprintf(string , "%s, %s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringDwelling(race, DWELLING_MONSTER4) );
+		break;
+	    
+		case BARBARIAN:
+		case NECROMANCER:
+		case SORCERESS:
+		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER5));
+		break;
+
+		case WIZARD:
+		case WARLOCK:
+		    sprintf(string , "%s, %s.",
+			GetStringDwelling(race, DWELLING_MONSTER4),
+			GetStringDwelling(race, DWELLING_MONSTER5) );
+		break;
+	
+		default:
+		    return NULL;
+		break;
+	    }
+	    break;
+
+	default:
+	    return NULL;
+	    break;
+    }
+    
+    return string;
+}
+
+const char * GetStringMonsterFromDwelling(E_RACE race, E_DWELLINGCASTLE dwelling){
+
+    switch(race){
+    
+	case KNIGHT:
+	    if(DWELLING_MONSTER1 == dwelling) return GetStringMonster(PEASANT);
+	    if(DWELLING_MONSTER2 == dwelling) return GetStringMonster(ARCHER);
+	    if(DWELLING_UPGRADE2 == dwelling) return GetStringMonster(RANGER);
+	    if(DWELLING_MONSTER3 == dwelling) return GetStringMonster(PIKEMAN);
+	    if(DWELLING_UPGRADE3 == dwelling) return GetStringMonster(VETERAN_PIKEMAN);
+	    if(DWELLING_MONSTER4 == dwelling) return GetStringMonster(SWORDSMAN);
+	    if(DWELLING_UPGRADE4 == dwelling) return GetStringMonster(MASTER_SWORDSMAN);
+	    if(DWELLING_MONSTER5 == dwelling) return GetStringMonster(CAVALIRY);
+	    if(DWELLING_UPGRADE5 == dwelling) return GetStringMonster(CHAMPION);
+	    if(DWELLING_MONSTER6 == dwelling) return GetStringMonster(PALADIN);
+	    if(DWELLING_UPGRADE6 == dwelling) return GetStringMonster(CRUSADER);
+	    break;
+	    
+	case BARBARIAN:
+	    if(DWELLING_MONSTER1 == dwelling) return GetStringMonster(GOBLIN);
+	    if(DWELLING_MONSTER2 == dwelling) return GetStringMonster(ORC);
+	    if(DWELLING_UPGRADE2 == dwelling) return GetStringMonster(CHIEF_ORC);
+	    if(DWELLING_MONSTER3 == dwelling) return GetStringMonster(WOLF);
+	    if(DWELLING_MONSTER4 == dwelling) return GetStringMonster(OGRE);
+	    if(DWELLING_UPGRADE4 == dwelling) return GetStringMonster(LORD_OGRE);
+	    if(DWELLING_MONSTER5 == dwelling) return GetStringMonster(TROLL);
+	    if(DWELLING_UPGRADE5 == dwelling) return GetStringMonster(WAR_TROLL);
+	    if(DWELLING_MONSTER6 == dwelling) return GetStringMonster(CYCLOPS);
+	    break;
+	    
+	case SORCERESS:
+	    if(DWELLING_MONSTER1 == dwelling) return GetStringMonster(SPRITE);
+	    if(DWELLING_MONSTER2 == dwelling) return GetStringMonster(DWARF);
+	    if(DWELLING_UPGRADE2 == dwelling) return GetStringMonster(BATTLE_DWARF);
+	    if(DWELLING_MONSTER3 == dwelling) return GetStringMonster(ELF);
+	    if(DWELLING_UPGRADE3 == dwelling) return GetStringMonster(GRAND_ELF);
+	    if(DWELLING_MONSTER4 == dwelling) return GetStringMonster(DRUID);
+	    if(DWELLING_UPGRADE4 == dwelling) return GetStringMonster(GREATER_DRUID);
+	    if(DWELLING_MONSTER5 == dwelling) return GetStringMonster(UNICORN);
+	    if(DWELLING_MONSTER6 == dwelling) return GetStringMonster(PHOENIX);
+	    break;
+	
+	case WARLOCK:
+	    if(DWELLING_MONSTER1 == dwelling) return GetStringMonster(CENTAUR);
+	    if(DWELLING_MONSTER2 == dwelling) return GetStringMonster(GARGOYLE);
+	    if(DWELLING_MONSTER3 == dwelling) return GetStringMonster(GRIFFIN);
+	    if(DWELLING_MONSTER4 == dwelling) return GetStringMonster(MINOTAUR);
+	    if(DWELLING_UPGRADE4 == dwelling) return GetStringMonster(KNIGHT_MINOTAUR);
+	    if(DWELLING_MONSTER5 == dwelling) return GetStringMonster(HIDRA);
+	    if(DWELLING_MONSTER6 == dwelling) return GetStringMonster(GREEN_DRAGON);
+	    if(DWELLING_UPGRADE6 == dwelling) return GetStringMonster(RED_DRAGON);
+	    if(DWELLING_UPGRADE7 == dwelling) return GetStringMonster(BLACK_DRAGON);
+	    break;
+	
+	case WIZARD:
+	    if(DWELLING_MONSTER1 == dwelling) return GetStringMonster(HALFLING);
+	    if(DWELLING_MONSTER2 == dwelling) return GetStringMonster(BOAR);
+	    if(DWELLING_MONSTER3 == dwelling) return GetStringMonster(IRON_GOLEM);
+	    if(DWELLING_UPGRADE3 == dwelling) return GetStringMonster(STEEL_GOLEM);
+	    if(DWELLING_MONSTER4 == dwelling) return GetStringMonster(ROC);
+	    if(DWELLING_MONSTER5 == dwelling) return GetStringMonster(MAGE);
+	    if(DWELLING_UPGRADE5 == dwelling) return GetStringMonster(ARCHMAGE);
+	    if(DWELLING_MONSTER6 == dwelling) return GetStringMonster(GIANT);
+	    if(DWELLING_UPGRADE6 == dwelling) return GetStringMonster(TITAN);
+	    break;
+	
+	case NECROMANCER:
+	    if(DWELLING_MONSTER1 == dwelling) return GetStringMonster(SKELETON);
+	    if(DWELLING_MONSTER2 == dwelling) return GetStringMonster(ZOMBIE);
+	    if(DWELLING_UPGRADE2 == dwelling) return GetStringMonster(MUTANT_ZOMBIE);
+	    if(DWELLING_MONSTER3 == dwelling) return GetStringMonster(MUMMY);
+	    if(DWELLING_UPGRADE3 == dwelling) return GetStringMonster(ROYAL_MUMMY);
+	    if(DWELLING_MONSTER4 == dwelling) return GetStringMonster(VAMPIRE);
+	    if(DWELLING_UPGRADE4 == dwelling) return GetStringMonster(LORD_VAMPIRE);
+	    if(DWELLING_MONSTER5 == dwelling) return GetStringMonster(LICH);
+	    if(DWELLING_UPGRADE5 == dwelling) return GetStringMonster(POWER_LICH);
+	    if(DWELLING_MONSTER6 == dwelling) return GetStringMonster(BONE_DRAGON);
+	    break;
+	
+	default:
+	    break;
+    }
+    
+    return NULL;
+}
+
+const char * GetStringLevelSkill(E_LEVELSKILL level){
+
+    const char *string = NULL;
+
+    switch(level){
+
+	case BASIC:
+	    string = "Basic";
+	    break;
+	
+	case ADVANCED:
+	    string = "Advanced";
+	    break;
+	
+	case EXPERT:
+	    string = "Expert";
+	    break;
+	
+	default:
+	    break;
+    }
+    
+    return string;
+}
+
+const char * GetStringSkill(E_SKILL skill){
+
+    const char *string = NULL;
+
+    switch(skill){
+
+	case ARCHERY:
+	    string = "Archery";
+	    break;
+
+	case BALLISTICS:
+	    string = "Ballistics";
+	    break;
+
+	case DIPLOMACY:
+	    string = "Diplomacy";
+	    break;
+
+	case EAGLEEYE:
+	    string = "Eagle Eye";
+	    break;
+
+	case ESTATES:
+	    string = "Estates";
+	    break;
+
+	case LEADERSHIP:
+	    string = "Leadership";
+	    break;
+
+	case LOGISTICS:
+	    string = "Logistics";
+	    break;
+
+	case LUCK:
+	    string = "Luck";
+	    break;
+
+	case MYSTICISM:
+	    string = "Mysticism";
+	    break;
+
+	case NAVIGATION:
+	    string = "Navigation";
+	    break;
+
+	case NECROMANCY:
+	    string = "Necromancy";
+	    break;
+
+	case PATHFINDING:
+	    string = "Pathfinding";
+	    break;
+
+	case SCOUTING:
+	    string = "Scouting";
+	    break;
+
+	case WISDOM:
+	    string = "Wisdom";
+	    break;
+
+	default:
+	    break;
+    }
+    
+    return string;
+}
+
+const char * GetStringDescriptionsSkill(E_SKILL skill, E_LEVELSKILL level){
+
+    const char *string = NULL;
+
+    switch(skill){
+
+	case ARCHERY:
+	    if(BASIC == level)		string = "Basic Archery increases the damage done by range attacking creatures by 10 percent.";
+	    else if(ADVANCED == level)	string = "Advanced Archery increases the damage done by range attacking creatures by 25 percent.";
+	    else if(EXPERT == level)	string = "Expert Archery increases the damage done by range attacking creatures by 50 percent.";
+	    break;
+
+	case BALLISTICS:
+	    if(BASIC == level)		string = "Basic Ballistics gives your hero's catapult shots a greater chance to hit and do damage to castle walls.";
+	    else if(ADVANCED == level)	string = "Advanced Ballistics gives your hero's catapult an extra shot, and each shot has a greater chance to hit and do damage to castle walls.";
+	    else if(EXPERT == level)	string = "Expert Ballistics gives your hero's catapult an extra shot, and each shot automatically destroys any wall, except a fortified wall in a Knight town.";
+	    break;
+
+	case DIPLOMACY:
+	    if(BASIC == level)		string = "Basic Diplomacy allows you to negotiate with monsters who are weaker than your group.  Approximately 1/4 of the creatures may offer to join you.";
+	    else if(ADVANCED == level)	string = "Advanced Diplomacy allows you to negotiate with monsters who are weaker than your group.  Approximately 1/2 of the creatures may offer to join you.";
+	    else if(EXPERT == level)	string = "Expert Diplomacy allows you to negotiate with monsters who are weaker than your group.  All of the creatures may offer to join you.";
+	    break;
+
+	case EAGLEEYE:
+	    if(BASIC == level)		string = "Basic Eagle Eye gives your hero a 20 percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat.";
+	    else if(ADVANCED == level)	string = "Advanced Eagle Eye gives your hero a 30 percent chance to learn any given 3rd level spell (or below) used against him in combat.";
+	    else if(EXPERT == level)	string = "Expert Eagle Eye gives your hero a 40 percent chance to learn any given 4th level spell (or below) used against him in combat.";
+	    break;
+
+	case ESTATES:
+	    if(BASIC == level)		string = "Your hero produces 100 gold pieces per turn as tax revenue from estates.";
+	    else if(ADVANCED == level)	string = "Your hero produces 250 gold pieces per turn as tax revenue from estates.";
+	    else if(EXPERT == level)	string = "Your hero produces 500 gold pieces per turn as tax revenue from estates.";
+	    break;
+
+	case LEADERSHIP:
+	    if(BASIC == level)		string = "Basic Leadership increases your hero's troops' morale by 1.";
+	    else if(ADVANCED == level)	string = "Advanced Leadership increases your hero's troops' morale by 2.";
+	    else if(EXPERT == level)	string = "Expert Leadership increases your hero's troops' morale by 3.";
+	    break;
+
+	case LOGISTICS:
+	    if(BASIC == level)		string = "Basic Logistics increases your hero's movement points by 10 percent.";
+	    else if(ADVANCED == level)	string = "Advanced Logistics increases your hero's movement points by 20 percent.";
+	    else if(EXPERT == level)	string = "Expert Logistics increases your hero's movement points by 30 percent.";
+	    break;
+
+	case LUCK:
+	    if(BASIC == level)		string = "Basic Luck increases your hero's luck by 1.";
+	    else if(ADVANCED == level)	string = "Advanced Luck increases your hero's luck by 2.";
+	    else if(EXPERT == level)	string = "Expert Luck increases your hero's luck by 3.";
+	    break;
+
+	case MYSTICISM:
+	    if(BASIC == level)		string = "Basic Mysticism regenerates two of your hero's spell points per day.";
+	    else if(ADVANCED == level)	string = "Advanced Mysticism regenerates three of your hero's spell points per day.";
+	    else if(EXPERT == level)	string = "Expert Mysticism regenerates four of your hero's spell points per day.";
+	    break;
+
+	case NAVIGATION:
+	    if(BASIC == level)		string = "Basic Navigation increases your hero's movement points over water by 1/3.";
+	    else if(ADVANCED == level)	string = "Advanced Navigation increases your hero's movement points over water by 2/3.";
+	    else if(EXPERT == level)	string = "Expert Navigation doubles your hero's movement points over water.";
+	    break;
+
+	case NECROMANCY:
+	    if(BASIC == level)		string = "Basic Necromancy allows 10 percent of the creatures killed in combat to be brought back from the dead as Skeletons.";
+	    else if(ADVANCED == level)	string = "Advanced Necromancy allows 20 percent of the creatures killed in combat to be brought back from the dead as Skeletons.";
+	    else if(EXPERT == level)	string = "Expert Necromancy allows 30 percent of the creatures killed in combat to be brought back from the dead as Skeletons.";
+	    break;
+
+	case PATHFINDING:
+	    if(BASIC == level)		string = "Basic Pathfinding reduces the movement penalty for rough terrain by 25 percent.";
+	    else if(ADVANCED == level)	string = "Advanced Pathfinding reduces the movement penalty for rough terrain by 50 percent.";
+	    else if(EXPERT == level)	string = "Expert Pathfinding eliminates the movement penalty for rough terrain.";
+	    break;
+
+	case SCOUTING:
+	    if(BASIC == level)		string = "Basic Scouting increases your hero's viewable area by 1 square.";
+	    else if(ADVANCED == level)	string = "Advanced Scouting increases your hero's viewable area by 2 squares.";
+	    else if(EXPERT == level)	string = "Expert Scouting increases your hero's viewable area by 3 squares.";
+	    break;
+
+	case WISDOM:
+	    if(BASIC == level)		string = "Basic Wisdom allows your hero to learn third level spells.";
+	    else if(ADVANCED == level)	string = "Advanced Wisdom allows your hero to learn fourth level spells.";
+	    else if(EXPERT == level)	string = "Expert Wisdom allows your hero to learn fifth level spells.";
+	    break;
+
+	default:
+	    break;
+    }
+    
+    return string;
+}

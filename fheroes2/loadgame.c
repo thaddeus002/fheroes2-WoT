@@ -40,7 +40,9 @@
 #include "draw.h"
 #include "radar.h"
 #include "kingdom.h"
+#include "payment.h"
 #include "loadgame.h"
+#include "spliter.h"
 #include "mp2maps.h"
 
 #define  MONSTERFIXTURE 26;
@@ -53,6 +55,7 @@ void	DrawCellAreaMapsMonster(Uint8, Uint8);
 void	DrawCellAreaMapsTile(Uint8, Uint8);
 void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
+void	DrawCellAreaMapsUpgrade(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
 void	RedrawMapsAnimation(void);
 void	CheckCursorAreaAction(E_OBJECT);
@@ -62,6 +65,9 @@ void	InitCursorFocus(void);
 void	RedrawFocusPanel(S_FOCUS *);
 void	FreeCursorFocus(void);
 void	SetGameFocus(void *, E_OBJECT);
+
+void	RedrawPanelInfoResource(void);
+void	RedrawPanelInfoDay(void);
 
 void   ComputerStep(E_COLORS);
 ACTION ActionGAMELOOP(void);
@@ -114,12 +120,12 @@ ACTION SettingsClickVideo(void);
 ACTION SettingsClickCursor(void);
 ACTION SettingsClickOkay(void);
 
+ACTION ClickPanelInfoDay(void);
+
 INTERFACEACTION *stpemaindisplay = NULL;
-
 SDL_Surface	*backgroundArea = NULL;
-
+S_SPLITER       *spliterCastle = NULL;
 S_DISPLAY       display;
-
 S_FOCUS		gameFocus;
 
 ACTION DrawMainDisplay(){
@@ -130,20 +136,32 @@ ACTION DrawMainDisplay(){
 
     INTERFACEACTION action;
     AGGSPRITE sprite;
+
     stpemaindisplay = NULL;
+    backgroundArea = NULL;
+    spliterCastle = NULL;
     
-    char *icnname;
+    char *icnadv = NULL;
+    char *icnscroll = NULL;
+    char *icnlocator = NULL;
+    char *icnston = NULL;
+
     Uint16 dy = 0;
+    Uint8 countPortr = 0;
 
     Uint32 flag = SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
     if(TRUE == GetIntValue(FULLSCREEN)) flag = flag | SDL_FULLSCREEN;
 
-    // select video mode
+    if(GetIntValue(EVILINTERFACE)) icnadv = "ADVEBTNS.ICN"; else icnadv = "ADVBTNS.ICN";
+    if(GetIntValue(EVILINTERFACE)) icnscroll = "SCROLLE.ICN"; else icnscroll = "SCROLL.ICN";
+    if(GetIntValue(EVILINTERFACE)) icnlocator = "LOCATORE.ICN"; else icnlocator = "LOCATORS.ICN";
+    if(GetIntValue(EVILINTERFACE)) icnston = "STONBAKE.ICN"; else icnston = "STONBACK.ICN";
 
+
+    // select video mode
     switch(GetIntValue(VIDEOMODE)){
 
 	default:
-	case 0:
 	    if(NULL == (video = SDL_GetVideoSurface()) || video->w != 640 || video->h != 480)
 		video = SDL_SetVideoMode(640, 480, 16, flag);
 
@@ -285,13 +303,8 @@ ACTION DrawMainDisplay(){
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
-    // button
-    if(GetIntValue(EVILINTERFACE))
-	icnname = "ADVEBTNS.ICN";
-    else
-	icnname = "ADVBTNS.ICN";
     // next heroes
-    FillSPRITE(&sprite, icnname, 0);
+    FillSPRITE(&sprite, icnadv, 0);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH;
     dest.y = dy;
@@ -300,8 +313,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 0);
-    FillSPRITE(&action.objectPush, icnname, 1);
+    FillSPRITE(&action.objectUp, icnadv, 0);
+    FillSPRITE(&action.objectPush, icnadv, 1);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonHeroes;
@@ -309,7 +322,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // action
-    FillSPRITE(&sprite, icnname, 2);
+    FillSPRITE(&sprite, icnadv, 2);
     image = GetICNSprite(&sprite);
     dest.x += image->w;
     dest.y = dy;
@@ -318,8 +331,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 2);
-    FillSPRITE(&action.objectPush, icnname, 3);
+    FillSPRITE(&action.objectUp, icnadv, 2);
+    FillSPRITE(&action.objectPush, icnadv, 3);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonAction;
@@ -327,7 +340,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // castle
-    FillSPRITE(&sprite, icnname, 4);
+    FillSPRITE(&sprite, icnadv, 4);
     image = GetICNSprite(&sprite);
     dest.x += image->w;
     dest.y = dy;
@@ -336,8 +349,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 4);
-    FillSPRITE(&action.objectPush, icnname, 5);
+    FillSPRITE(&action.objectUp, icnadv, 4);
+    FillSPRITE(&action.objectPush, icnadv, 5);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonCastle;
@@ -345,7 +358,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
     
     // magic
-    FillSPRITE(&sprite, icnname, 6);
+    FillSPRITE(&sprite, icnadv, 6);
     image = GetICNSprite(&sprite);
     dest.x += image->w;
     dest.y = dy;
@@ -354,8 +367,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 6);
-    FillSPRITE(&action.objectPush, icnname, 7);
+    FillSPRITE(&action.objectUp, icnadv, 6);
+    FillSPRITE(&action.objectPush, icnadv, 7);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonMagic;
@@ -363,7 +376,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
     
     // end tur
-    FillSPRITE(&sprite, icnname, 8);
+    FillSPRITE(&sprite, icnadv, 8);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH;
     dest.y = dy + image->h;
@@ -372,8 +385,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 8);
-    FillSPRITE(&action.objectPush, icnname, 9);
+    FillSPRITE(&action.objectUp, icnadv, 8);
+    FillSPRITE(&action.objectPush, icnadv, 9);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonCloseDay;
@@ -381,7 +394,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // info
-    FillSPRITE(&sprite, icnname, 10);
+    FillSPRITE(&sprite, icnadv, 10);
     image = GetICNSprite(&sprite);
     dest.x += image->w;
     dest.y = dy + image->h;
@@ -390,8 +403,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 10);
-    FillSPRITE(&action.objectPush, icnname, 11);
+    FillSPRITE(&action.objectUp, icnadv, 10);
+    FillSPRITE(&action.objectPush, icnadv, 11);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonInfo;
@@ -399,7 +412,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // options
-    FillSPRITE(&sprite, icnname, 12);
+    FillSPRITE(&sprite, icnadv, 12);
     image = GetICNSprite(&sprite);
     dest.x += image->w;
     dest.y = dy + image->h;
@@ -408,8 +421,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 12);
-    FillSPRITE(&action.objectPush, icnname, 13);
+    FillSPRITE(&action.objectUp, icnadv, 12);
+    FillSPRITE(&action.objectPush, icnadv, 13);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonMenu;
@@ -417,7 +430,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // settings
-    FillSPRITE(&sprite, icnname, 14);
+    FillSPRITE(&sprite, icnadv, 14);
     image = GetICNSprite(&sprite);
     dest.x += image->w;
     dest.y = dy + image->h;
@@ -426,22 +439,16 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 14);
-    FillSPRITE(&action.objectPush, icnname, 15);
+    FillSPRITE(&action.objectUp, icnadv, 14);
+    FillSPRITE(&action.objectPush, icnadv, 15);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionButtonSettings;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
-    // scroll element
-    if(GetIntValue(EVILINTERFACE))
-	icnname = "SCROLLE.ICN";
-    else
-	icnname = "SCROLL.ICN";
-
     // scroll heroes up
-    FillSPRITE(&sprite, icnname, 0);
+    FillSPRITE(&sprite, icnscroll, 0);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH + 57;
     dest.y = RADARWIDTH + 2 * BORDERWIDTH;
@@ -450,8 +457,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 0);
-    FillSPRITE(&action.objectPush, icnname, 1);
+    FillSPRITE(&action.objectUp, icnscroll, 0);
+    FillSPRITE(&action.objectPush, icnscroll, 1);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionScrollHeroesUp;
@@ -459,7 +466,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // scroll castle up
-    FillSPRITE(&sprite, icnname, 0);
+    FillSPRITE(&sprite, icnscroll, 0);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH + 115 + image->w;
     dest.y = RADARWIDTH + 2 * BORDERWIDTH;
@@ -468,8 +475,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 0);
-    FillSPRITE(&action.objectPush, icnname, 1);
+    FillSPRITE(&action.objectUp, icnscroll, 0);
+    FillSPRITE(&action.objectPush, icnscroll, 1);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionScrollCastleUp;
@@ -480,12 +487,43 @@ ACTION DrawMainDisplay(){
 
 	// 640x480
 	default:
-	case 0:
+	    // action click info panel
+	    FillSPRITE(&sprite, icnston, 0);
+	    image = GetICNSprite(&sprite);
+	    dest.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dest.y = 392;
+	    dest.w = image->w;
+	    dest.h = image->h;
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = dest;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ClickPanelInfoDay;
+	    AddActionEvent(&stpemaindisplay, &action);
+
+	    countPortr = 4;
+	    FillSPRITE(&sprite, icnscroll, 0);
+	    image = GetICNSprite(&sprite);
 	    dest.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * 4 - image->h;
 	    break;
 
 	// 800x600
 	case 1:
+	    // action click info panel
+	    FillSPRITE(&sprite, icnston, 0);
+	    image = GetICNSprite(&sprite);
+	    dest.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dest.y = 488;
+	    dest.w = image->w;
+	    dest.h = image->h;
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = dest;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ClickPanelInfoDay;
+	    AddActionEvent(&stpemaindisplay, &action);
+
+	    countPortr = 7;
+	    FillSPRITE(&sprite, icnscroll, 0);
+	    image = GetICNSprite(&sprite);
 	    dest.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * 7 - image->h;
 	    break;
 
@@ -493,11 +531,15 @@ ACTION DrawMainDisplay(){
 	case 2:
 	// 1280x1024
 	case 3:
+	    FillSPRITE(&sprite, icnscroll, 0);
+	    image = GetICNSprite(&sprite);
 	    dest.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * 8 - image->h;
+	    countPortr = 8;
 	    break;
     }
+
     // scroll heroes down
-    FillSPRITE(&sprite, icnname, 2);
+    FillSPRITE(&sprite, icnscroll, 2);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH + 57;
     dest.w = image->w;
@@ -505,8 +547,8 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 2);
-    FillSPRITE(&action.objectPush, icnname, 3);
+    FillSPRITE(&action.objectUp, icnscroll, 2);
+    FillSPRITE(&action.objectPush, icnscroll, 3);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionScrollHeroesDown;
@@ -514,7 +556,7 @@ ACTION DrawMainDisplay(){
     AddActionEvent(&stpemaindisplay, &action);
 
     // scroll castle down
-    FillSPRITE(&sprite, icnname, 2);
+    FillSPRITE(&sprite, icnscroll, 2);
     image = GetICNSprite(&sprite);
     dest.x = video->w - RADARWIDTH - BORDERWIDTH + 115 + image->w;
     dest.w = image->w;
@@ -522,39 +564,110 @@ ACTION DrawMainDisplay(){
     // обнуляем
     ZeroINTERFACEACTION(&action);
     // заполняем
-    FillSPRITE(&action.objectUp, icnname, 2);
-    FillSPRITE(&action.objectPush, icnname, 3);
+    FillSPRITE(&action.objectUp, icnscroll, 2);
+    FillSPRITE(&action.objectPush, icnscroll, 3);
     action.rect = dest;
     action.mouseEvent = MOUSE_LCLICK;
     action.pf = ActionScrollCastleDown;
     // регистрируем
     AddActionEvent(&stpemaindisplay, &action);
 
+    // action click panel castle
+    FillSPRITE(&sprite, icnlocator, 1);
+    image = GetICNSprite(&sprite);
+    dest.x = video->w - RADARWIDTH - BORDERWIDTH + 5;
+    dest.y = RADARWIDTH + BORDERWIDTH + 21;
+    dest.w = image->w;
+    dest.h = 30 * countPortr;
+    ZeroINTERFACEACTION(&action);
+    action.rect = dest;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionClickFocusHeroes;
+    AddActionEvent(&stpemaindisplay, &action);
+    // heroes scroll mouse up
+    ZeroINTERFACEACTION(&action);
+    action.rect = dest;
+    action.mouseEvent = MOUSE_UWHEEL;
+    action.pf = ActionScrollHeroesUp;
+    AddActionEvent(&stpemaindisplay, &action);
+    // heroes scroll mouse down
+    ZeroINTERFACEACTION(&action);
+    action.rect = dest;
+    action.mouseEvent = MOUSE_DWHEEL;
+    action.pf = ActionScrollHeroesDown;
+    AddActionEvent(&stpemaindisplay, &action);
+    // action click panel castle
+    dest.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	
+    dest.y = RADARWIDTH + BORDERWIDTH + 21;
+    ZeroINTERFACEACTION(&action);
+    action.rect = dest;
+    action.mouseEvent = MOUSE_LCLICK;
+    action.pf = ActionClickFocusCastle;
+    AddActionEvent(&stpemaindisplay, &action);
+    // castle scroll mouse up
+    ZeroINTERFACEACTION(&action);
+    action.rect = dest;
+    action.mouseEvent = MOUSE_UWHEEL;
+    action.pf = ActionScrollCastleUp;
+    AddActionEvent(&stpemaindisplay, &action);
+    // castle scroll mouse down
+    ZeroINTERFACEACTION(&action);
+    action.rect = dest;
+    action.mouseEvent = MOUSE_DWHEEL;
+    action.pf = ActionScrollCastleDown;
+    AddActionEvent(&stpemaindisplay, &action);
+
     // инициализируем радар
     InitRadar();
     InitCursorFocus();
-    
-    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 
+    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
     if(castle)
 	SetGameFocus(castle, OBJ_CASTLE);
     else
 	// alter focus heroes
 	return EXIT;
 
-
     display.lastOffsetX = 0xFF;
     display.lastOffsetY = 0xFF;
 
     // отображаем картинку
     ShowStaticMainDisplay();
+
+    // init scroll castle
+    if(GetIntValue(EVILINTERFACE)) FillSPRITE(&sprite, "SCROLLE.ICN", 4); else FillSPRITE(&sprite, "SCROLL.ICN", 4);
+    spliterCastle = InitSpliter(&sprite);
+    if(NULL == spliterCastle) return EXIT;
+    dest.x = video->w - 28;
+    dest.y = 195;
+    dest.w = 10;
+    dest.h = 91;
+    if(countPortr < GetKingdomCountCastle(GetIntValue(HUMANCOLORS)) + GetKingdomCountTown(GetIntValue(HUMANCOLORS)))
+	SetRangeSpliter(spliterCastle, &dest, GetKingdomCountCastle(GetIntValue(HUMANCOLORS)) + GetKingdomCountTown(GetIntValue(HUMANCOLORS)) - countPortr);
+    else
+	SetRangeSpliter(spliterCastle, &dest, 0);
+
+    // динамические элементы
+    INTERFACEACTION *ptr = stpemaindisplay;
+    while(ptr){
+
+	if(NULL != (image = GetICNSprite(&ptr->objectUp)))
+    	    SDL_BlitSurface(image, NULL, video, &ptr->rect);
+
+	ptr = (INTERFACEACTION *) ptr->next;
+    }
+    SDL_Flip(video);
+
+    RedrawRadar();
     RedrawMapsArea();
     RedrawFocusPanel(&gameFocus);
-
+    RedrawSpliter(spliterCastle);
+        
     // идем в игровой цикл
     ACTION result = ActionGAMELOOP();
 
     // овобождаем данные
+    FreeSpliter(spliterCastle);
     FreeActionEvent(stpemaindisplay);
     FreeRadar();
     FreeCursorFocus();
@@ -566,15 +679,15 @@ ACTION DrawMainDisplay(){
 
 void ShowStaticMainDisplay(void){
 
-    SDL_Surface *video = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Surface *image = NULL;
     SDL_Rect dst, src;
 
     AGGSPRITE sprite;
-    INTERFACEACTION action;
         
-    video = SDL_GetVideoSurface();
-    char * icnname = NULL;
+    char * icnadv = NULL;
+    char * icnlocator = NULL;
+    char * icnston = NULL;
     Uint8 i;
 
     SetCursor(CURSOR_POINTER);
@@ -583,80 +696,54 @@ void ShowStaticMainDisplay(void){
     SDL_FillRect(video, NULL, SDL_MapRGB(video->format, 0x00, 0x00, 0x00));
 
     // show border
-    if(GetIntValue(EVILINTERFACE))
-	icnname = "ADVBORDE.ICN";
-    else
-	icnname = "ADVBORD.ICN";
+    if(GetIntValue(EVILINTERFACE)) icnadv = "ADVBORDE.ICN"; else icnadv = "ADVBORD.ICN";
+    if(GetIntValue(EVILINTERFACE)) icnlocator = "LOCATORE.ICN"; else icnlocator = "LOCATORS.ICN";
+    if(GetIntValue(EVILINTERFACE)) icnston = "STONBAKE.ICN"; else icnston = "STONBACK.ICN";
 
-    FillSPRITE(&sprite, icnname, 0);
+    FillSPRITE(&sprite, icnadv, 0);
     image = GetICNSprite(&sprite);
 
     // ниже, собирается интерфейс из кусочков под видеорежим
     switch(GetIntValue(VIDEOMODE)){
 
 	// 640x480 draw all
-	case 0:
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	default:
+	    dst.x = 0;
+	    dst.y = 0;
+	    dst.w = image->w;
+	    dst.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &dst);
+
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "LOCATORE.ICN";
-	    else
-		icnname = "LOCATORS.ICN";
-	    FillSPRITE(&sprite, icnname, 1);
-	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 5;	// background panel heroes
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 4; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusHeroes;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 4; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusCastle;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
+	    
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "STONBAKE.ICN";
-	    else
-		icnname = "STONBACK.ICN";
-	    FillSPRITE(&sprite, icnname, 0);
+	    FillSPRITE(&sprite, icnston, 0);
 	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    dst.y = 392;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.w = image->w;
+	    dst.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    break;
 
 	// 800x600
@@ -783,61 +870,37 @@ void ShowStaticMainDisplay(void){
 	    dst.h = src.h;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
+
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "LOCATORE.ICN";
-	    else
-		icnname = "LOCATORS.ICN";
-	    FillSPRITE(&sprite, icnname, 1);
-	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 5;	// background panel heroes
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 7; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusHeroes;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 7; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusCastle;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
+
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "STONBAKE.ICN";
-	    else
-		icnname = "STONBACK.ICN";
-	    FillSPRITE(&sprite, icnname, 0);
+	    FillSPRITE(&sprite, icnston, 0);
 	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    dst.y = 488;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.w = image->w;
+	    dst.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    break;
 
 	// 1024x768
@@ -960,65 +1023,41 @@ void ShowStaticMainDisplay(void){
 	    dst.h = src.h;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
+
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "LOCATORE.ICN";
-	    else
-		icnname = "LOCATORS.ICN";
-	    FillSPRITE(&sprite, icnname, 1);
-	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 5;	// background panel heroes
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 8; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusHeroes;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 8; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusCastle;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
+	    
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "STONBAKE.ICN";
-	    else
-		icnname = "STONBACK.ICN";
-	    FillSPRITE(&sprite, icnname, 0);
+	    FillSPRITE(&sprite, icnston, 0);
 	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    dst.y = 520;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.w = image->w;
+	    dst.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    break;
 
 	case 3:
@@ -1150,95 +1189,53 @@ void ShowStaticMainDisplay(void){
 	    dst.h = src.h;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    SDL_BlitSurface(image, &src, video, &dst);
+
 	    // TOP PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "LOCATORE.ICN";
-	    else
-		icnname = "LOCATORS.ICN";
-	    FillSPRITE(&sprite, icnname, 1);
-	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 5;	// background panel heroes
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 8; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusHeroes;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;	// background panel castle
 	    dst.y = RADARWIDTH + BORDERWIDTH + 21;
 	    for(i = 0; i < 8; ++i){
-		FillSPRITE(&sprite, icnname, i + 1);
+		FillSPRITE(&sprite, icnlocator, i + 1);
 		image = GetICNSprite(&sprite);
-		SDL_BlitSurface(image, &src, video, &dst);
-		// регистрируем область
-		ZeroINTERFACEACTION(&action);
-		action.rect = dst;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickFocusCastle;
-		AddActionEvent(&stpemaindisplay, &action);
+		dst.w = image->w;
+		dst.h = image->h;
+		SDL_BlitSurface(image, NULL, video, &dst);
 		dst.y += 32;
 	    }
 
 	    // BOTTOM PANEL BACKGROUND ELEMENT
-	    if(GetIntValue(EVILINTERFACE))
-		icnname = "STONBAKE.ICN";
-	    else
-		icnname = "STONBACK.ICN";
-	    FillSPRITE(&sprite, icnname, 0);
+	    FillSPRITE(&sprite, icnston, 0);
 	    image = GetICNSprite(&sprite);
-	    src.x = 0;
-	    src.y = 0;
-	    src.w = image->w;
-	    src.h = image->h;
-	    dst = src;
 	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
 	    dst.y = 520;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    dst.w = image->w;
+	    dst.h = image->h;
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    dst.y += image->h;
-	    SDL_BlitSurface(image, &src, video, &dst);
-
+	    SDL_BlitSurface(image, NULL, video, &dst);
 	    break;
-	
-	default:
-	    break;
-    }
-
-    // динамические элементы
-    INTERFACEACTION *ptr = stpemaindisplay;
-    while(ptr){
-
-	if(NULL != (image = GetICNSprite(&ptr->objectUp)))
-    	    SDL_BlitSurface(image, NULL, video, &ptr->rect);
-
-	ptr = (INTERFACEACTION *) ptr->next;
     }
 
     SDL_Flip(video);
-
-    // перерисовываем радар
-    RedrawRadar();
 
     CursorOn();
 }
@@ -1486,6 +1483,15 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 	    if(! ptrCell->animation) DrawCellAreaMapsLevel1(x, y);
     }
 
+    // отрисовываем все upgrade объекты
+    for(y = rect->y; y < rect->y + rect->h; ++y)
+	for(x = rect->x; x < rect->x + rect->w; ++x){
+
+	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+
+	    if(! ptrCell->animation) DrawCellAreaMapsUpgrade(x, y);
+    }
+
     // отрисовываем всех монстров
     for(y = rect->y; y < rect->y + rect->h; ++y)
 	for(x = rect->x; x < rect->x + rect->w; ++x)
@@ -1499,6 +1505,7 @@ void DrawRectAreaMaps(SDL_Rect *rect){
 
 	    if(! ptrCell->animation) DrawCellAreaMapsLevel2(x, y);
     }
+
 
     // отрисовываем все флаги
     for(y = rect->y; y < rect->y + rect->h; ++y)
@@ -1774,7 +1781,28 @@ void DrawCellAreaMapsLevel2(Uint8 x, Uint8 y){
 
         icn = icn->next;
     }
+}
 
+/* функция реализующая алгоритм обновленных объектов одной клетки */
+void DrawCellAreaMapsUpgrade(Uint8 x, Uint8 y){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect dest;
+
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+    ICNHEADER  *icn = ptrCell->upgrade;
+
+    while(icn){
+
+	dest.x = icn->offsetX + BORDERWIDTH + x * TILEWIDTH;
+	dest.y = icn->offsetY + BORDERWIDTH + y * TILEWIDTH;
+	dest.w = icn->surface->w;
+	dest.h = icn->surface->h;
+
+        SDL_BlitSurface(icn->surface, NULL, video, &dest);
+
+        icn = icn->next;
+    }
 }
 
 void RedrawMapsAnimation(void){
@@ -2663,11 +2691,10 @@ ACTION ActionScrollHeroesDown(void){
 
 ACTION ActionScrollCastleUp(void){
 
-    Uint8 maxCount;
+    Uint8 maxCount, countCastle;
 
     switch(GetIntValue(VIDEOMODE)){
         default:
-        case 0:
             maxCount = 4;
             break;
 
@@ -2681,7 +2708,9 @@ ACTION ActionScrollCastleUp(void){
             break;
     }
 
-    if(GetCountCastle(GetIntValue(HUMANCOLORS)) < maxCount) return NONE;
+    countCastle = GetKingdomCountCastle(GetIntValue(HUMANCOLORS)) + GetKingdomCountTown(GetIntValue(HUMANCOLORS));
+
+    if(countCastle < maxCount) return NONE;
 
     S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
     while(castle && castle != gameFocus.firstCastle) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
@@ -2690,17 +2719,17 @@ ACTION ActionScrollCastleUp(void){
     if(! gameFocus.firstCastle) gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 
     RedrawFocusPanel(&gameFocus);
+    MoveBackwardSpliter(spliterCastle);
 
     return NONE;
 }
 
 ACTION ActionScrollCastleDown(void){
 
-    Uint8 maxCount, count;
+    Uint8 maxCount, countCastle, pos;
 
     switch(GetIntValue(VIDEOMODE)){
         default:
-        case 0:
             maxCount = 4;
             break;
 
@@ -2714,20 +2743,23 @@ ACTION ActionScrollCastleDown(void){
             break;
     }
 
-    if(GetCountCastle(GetIntValue(HUMANCOLORS)) < maxCount) return NONE;
+    countCastle = GetKingdomCountCastle(GetIntValue(HUMANCOLORS)) + GetKingdomCountTown(GetIntValue(HUMANCOLORS));
+    
+    if(countCastle < maxCount) return NONE;
 
     S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 
-    count = 0;
+    pos = 0;
     while(castle && castle != gameFocus.firstCastle){
 	castle = GetNextCastle(GetIntValue(HUMANCOLORS));
-	++count;
+	++pos;
     }
 
-    if(count < GetCountCastle(GetIntValue(HUMANCOLORS)) - maxCount)
+    if(pos < countCastle - maxCount)
 	gameFocus.firstCastle = GetNextCastle(GetIntValue(HUMANCOLORS));
 
     RedrawFocusPanel(&gameFocus);
+    MoveForwardSpliter(spliterCastle);
 
     return NONE;
 }
@@ -2746,18 +2778,19 @@ ACTION ActionClickFocusCastle(void){
 
     SDL_GetMouseState(&mx, &my);
 
-    Uint8 index = (my - RADARWIDTH - BORDERWIDTH - 21) / 32;
+    Uint8 index = (my - RADARWIDTH - BORDERWIDTH - 21) / 30;
 
     S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
     
+    // установка на выбранный castle
     while(castle && castle != gameFocus.firstCastle) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
 
-    while(index){
-	castle = GetNextCastle(GetIntValue(HUMANCOLORS));
-	--index;
-    }
+    while(index--) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
 
+    //
     if(castle){
+    
+	// если выделен то действие
 	if(ValidPoint(&gameFocus.back, mx, my) &&
 	    EXIT == EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY))
 		return EXIT;
@@ -3010,6 +3043,7 @@ void CheckCursorAreaAction(E_OBJECT f){
 		    case OBJ_GOBLINHUNT:
 		    case OBJ_DWARFCOTT:
 		    case OBJ_PEASANTHUNT:
+		    case OBJ_PEASANTHUNT2:
 		    case OBJ_DRAGONCITY:
 		    case OBJ_LIGHTHOUSE:
 		    case OBJ_WATERMILL:
@@ -3345,13 +3379,18 @@ ACTION ActionGAMELOOP(void){
     Uint32 cursor;
     
     ACTION exit = ENDTUR;
+    ACTION result;
 
     while(1){
     
+	// redraw panel
+	RedrawPanelInfoDay();
+	if(1 < GetIntValue(VIDEOMODE)) RedrawPanelInfoResource();
+	
 	// ход humans
 	while(! (ENDTUR == (exit = ActionHUMANLOOP(stpemaindisplay)) || 
-		EXIT == exit || 
-		(ESC == exit && YES == MessageBox("Are you sure you want to quit?", FONT_BIG))) );
+		EXIT == exit ||
+		(ESC == exit && (YES == (result = MessageBox(NULL, "Are you sure you want to quit?", FONT_BIG, YES|NO)) || ENTER == result))) );
 
 	if(EXIT == exit || ESC == exit){
 	    exit = EXIT;
@@ -3523,6 +3562,28 @@ ACTION ActionHUMANLOOP(INTERFACEACTION *action){
 			    if(GetIntValue(DEBUG)) fprintf(stderr, "x: %d, y: %d\n", event.button.x, event.button.y);
 			    break;
 
+                        case SDL_BUTTON_WHEELUP:
+                        
+                            ptr = action;
+                            while(ptr){
+                                if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+                                    (ptr->mouseEvent & MOUSE_UWHEEL) && ptr->pf) exit = (*ptr->pf)();
+                        
+                                ptr = (INTERFACEACTION *) ptr->next;
+                            }
+                            break;
+                        
+                        case SDL_BUTTON_WHEELDOWN:
+                        
+                            ptr = action;
+                    	    while(ptr){
+                                if(ValidPoint(&ptr->rect, event.button.x, event.button.y) &&
+                                    (ptr->mouseEvent & MOUSE_DWHEEL) && ptr->pf) exit = (*ptr->pf)();
+                        
+                            ptr = (INTERFACEACTION *) ptr->next;
+                            }
+                            break;
+
 			default:
 			    break;
 		    }
@@ -3645,7 +3706,6 @@ void RedrawFocusPanel(S_FOCUS *focus){
 
     switch(GetIntValue(VIDEOMODE)){
         default:
-        case 0:
             maxCount = 4;
             break;
 
@@ -3719,11 +3779,10 @@ void SetGameFocus(void *object, E_OBJECT type){
     Sint32 mx, my;
     SDL_GetMouseState(&mx, &my);
 
-    Uint8 first, maxCount, seek;
+    Uint8 maxCount;
 
     switch(GetIntValue(VIDEOMODE)){
         default:
-        case 0:
             maxCount = 4;
             break;
 
@@ -3738,43 +3797,223 @@ void SetGameFocus(void *object, E_OBJECT type){
     }
 
     if(object && type == OBJ_CASTLE){
-
 	castle = object;
 	gameFocus.type = OBJ_CASTLE;
 	gameFocus.ax = castle->ax;
 	gameFocus.ay = castle->ay;
 	gameFocus.object = castle;
-
-	// позиция выбранного замка
-	seek = 0;
-	castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
-	while(castle != gameFocus.object){
-	    castle = GetNextCastle(GetIntValue(HUMANCOLORS));
-	    ++seek;
-	}
-
-	// позиция первого элемента
-	if(GetCountCastle(GetIntValue(HUMANCOLORS)) > maxCount && seek < (GetCountCastle(GetIntValue(HUMANCOLORS)) - maxCount) && seek > maxCount)
-	    gameFocus.firstCastle = gameFocus.object;
-	else if(seek < maxCount)
-	    gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
-	else{
-	    first = maxCount - 1;
-	    gameFocus.firstCastle = GetEndCastle(GetIntValue(HUMANCOLORS));
-	    while(first){
-		gameFocus.firstCastle = GetPrevCastle(GetIntValue(HUMANCOLORS));
-		--first;
-	    }
-	}
-
 	gameFocus.firstHeroes = NULL;
     }
 
-    if(gameFocus.ax < GetWidthArea() / 2) display.offsetX = 0;
+    if(gameFocus.ax <= GetWidthArea() / 2) display.offsetX = 0;
     else if(GetWidthMaps() < gameFocus.ax + GetWidthArea() / 2) display.offsetX = GetWidthMaps() - GetWidthArea();
-    else display.offsetX = gameFocus.ax - GetWidthArea() / 2;
+    else display.offsetX = gameFocus.ax - GetWidthArea() / 2 - 1;
 
-    if(gameFocus.ay < GetHeightArea() / 2) display.offsetY = 0;
+    if(gameFocus.ay <= GetHeightArea() / 2) display.offsetY = 0;
     else if(GetHeightMaps() < gameFocus.ay + GetHeightArea() / 2) display.offsetY = GetHeightMaps() - GetHeightArea();
-    else display.offsetY = gameFocus.ay - GetHeightArea() / 2;
+    else display.offsetY = gameFocus.ay - GetHeightArea() / 2 - 1;
+}
+
+void RedrawPanelInfoResource(void){
+
+    SDL_Surface *image = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect src, dst;
+    AGGSPRITE sprite;
+    const char *icnname;
+    char str[8];
+    S_PAYMENT resource;
+    E_COLORS color = GetIntValue(HUMANCOLORS);
+
+    CursorOff();
+    
+    // востановим фон
+    if(GetIntValue(EVILINTERFACE)) icnname = "STONBAKE.ICN"; else icnname = "STONBACK.ICN";
+    FillSPRITE(&sprite, icnname, 0);
+    image = GetICNSprite(&sprite);
+    dst.w = image->w;
+    dst.h = image->h;
+
+    switch(GetIntValue(VIDEOMODE)){
+	default:
+	    // 640x480
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 392;
+	    break;
+	case 1:
+	    // 800x600
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 488;
+	    break;
+	case 2:
+	case 3:
+	    // 1024x768
+	    // 1280x1024
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 520;
+	    dst.y += dst.h;
+	    break;
+    }
+    SDL_BlitSurface(image, NULL, video, &dst);
+
+    FillSPRITE(&sprite, "RESSMALL.ICN", 0);
+    image = GetICNSprite(&sprite);
+    src.x = dst.x + 6;
+    src.y = dst.y + 3;
+    src.w = image->w;
+    src.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &src);
+
+    sprintf(str, "%d", GetKingdomCountCastle(color));
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 26 - src.w / 2;
+    src.y = dst.y + 28;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "%d", GetKingdomCountTown(color));
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 78 - src.w / 2;
+    src.y = dst.y + 28;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    GetKingdomAllResource(color, &resource);
+
+    sprintf(str, "%d", resource.gold);
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 122 - src.w / 2;
+    src.y = dst.y + 28;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "%d", resource.wood);
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 15 - src.w / 2;
+    src.y = dst.y + 58;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "%d", resource.mercury);
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 37 - src.w / 2;
+    src.y = dst.y + 58;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "%d", resource.ore);
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 60 - src.w / 2;
+    src.y = dst.y + 58;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "%d", resource.sulfur);
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 84 - src.w / 2;
+    src.y = dst.y + 58;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "%d", resource.crystal);
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 108 - src.w / 2;
+    src.y = dst.y + 58;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "%d", resource.gems);
+    src.w = GetLengthText(str, FONT_SMALL);
+    src.h = FONT_HEIGHTSMALL;
+    src.x = dst.x + 130 - src.w / 2;
+    src.y = dst.y + 58;
+    PrintText(video, &src, str, FONT_SMALL);
+
+    CursorOn();
+}
+
+void RedrawPanelInfoDay(void){
+
+    SDL_Surface *image = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect src, dst;
+    AGGSPRITE sprite;
+    const char *icnname;
+    char str[22];
+
+    CursorOff();
+
+    // востановим фон
+    if(GetIntValue(EVILINTERFACE)) icnname = "STONBAKE.ICN"; else icnname = "STONBACK.ICN";
+    FillSPRITE(&sprite, icnname, 0);
+    image = GetICNSprite(&sprite);
+    dst.w = image->w;
+    dst.h = image->h;
+
+    switch(GetIntValue(VIDEOMODE)){
+	default:
+	    // 640x480
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 392;
+	    break;
+	case 1:
+	    // 800x600
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 488;
+	    break;
+	case 2:
+	case 3:
+	    // 1024x768
+	    // 1280x1024
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 520;
+	    break;
+    }
+    SDL_BlitSurface(image, NULL, video, &dst);
+
+    if(GetIntValue(EVILINTERFACE)) icnname = "SUNMOONE.ICN"; else icnname = "SUNMOON.ICN";
+    FillSPRITE(&sprite, icnname, (GetIntValue(WEEK) - 1) % 5);
+    image = GetICNSprite(&sprite);
+    src.x = dst.x;
+    src.y = dst.y + 1;
+    src.w = image->w;
+    src.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &src);
+
+    sprintf(str, "Month: %d  Week: %d", GetIntValue(MONTH), GetIntValue(WEEK));
+    src.h = FONT_HEIGHTSMALL;
+    src.y = dst.y + 30;
+    PrintAlignText(video, &src, str, FONT_SMALL);
+
+    sprintf(str, "Day: %d", GetIntValue(DAY));
+    src.h = FONT_HEIGHTBIG;
+    src.y = dst.y + 46;
+    PrintAlignText(video, &src, str, FONT_BIG);
+    
+    CursorOn();
+}
+
+ACTION ClickPanelInfoDay(void){
+
+    static Uint8 trigger = 0;
+    
+    // переключаем вид отображения
+    switch(trigger){
+
+	case 0:
+	    RedrawPanelInfoResource();
+	    trigger = 1;
+	    break;
+
+	case 1:
+	    RedrawPanelInfoDay();
+	    trigger = 0;
+	    break;
+
+	default:
+	    trigger = 0;
+	    break;
+    }
+
+    return NONE;
 }

@@ -71,6 +71,8 @@ void FreeArtifact(void){
 
 E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
 
+    Uint8 i;
+
     E_ARTIFACT level1[] = { MEDAL_VALOR, MEDAL_COURAGE, MEDAL_HONOR, MEDAL_DISTINCTION, THUNDER_MACE, ARMORED_GAUNTLETS, DEFENDER_HELM, GIANT_FLAIL, RABBIT_FOOT, GOLDEN_HORSESHOE, GAMBLER_LUCKY_COIN, FOUR_LEAF_CLOVER, ENCHANTED_HOURGLASS, ICE_CLOAK, FIRE_CLOAK, LIGHTNING_HELM, SNAKE_RING, HOLY_PENDANT, PENDANT_FREE_WILL, PENDANT_LIFE, PENDANT_DEATH, GOLDEN_BOW, TELESCOPE, SERENITY_PENDANT, STATESMAN_QUILL, KINETIC_PENDANT, SEEING_EYE_PENDANT };
     E_ARTIFACT level2[] = { CASTER_BRACELET, MAGE_RING, STEALTH_SHIELD, POWER_AXE, MINOR_SCROLL, ENDLESS_PURSE_GOLD, SAILORS_ASTROLABE_MOBILITY, ENDLESS_CORD_WOOD, ENDLESS_CART_ORE, SPIKED_HELM, WHITE_PEARL, EVIL_EYE, GOLD_WATCH, ANKH, BOOK_ELEMENTS, ELEMENTAL_RING, SKULLCAP, EVERCOLD_ICICLE, POWER_RING, AMMO_CART, EVERHOT_LAVA_ROCK };
     E_ARTIFACT level3[] = { ARCANE_NECKLACE, WITCHES_BROACH, BALLISTA, DRAGON_SWORD, DIVINE_BREASTPLATE, MAJOR_SCROLL, SUPERIOR_SCROLL, FOREMOST_SCROLL, ENDLESS_SACK_GOLD, ENDLESS_BAG_GOLD, NOMAD_BOOTS_MOBILITY, TRAVELER_BOOTS_MOBILITY, TRUE_COMPASS_MOBILITY, ENDLESS_POUCH_SULFUR, ENDLESS_POUCH_GEMS, ENDLESS_POUCH_CRYSTAL, ENDLESS_VIAL_MERCURY, SPIKED_SHIELD, BLACK_PEARL, LIGHTNING_ROD, WAND_NEGATION, WIZARD_HAT };
@@ -80,33 +82,54 @@ E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
     
 	case ART_LEVEL1:
 	    result = level1[rand() % ARTIFACTCOUNT_LEVEL1];
-	    while(ptrArtifact[result].use) result = level1[rand() % ARTIFACTCOUNT_LEVEL1];
-	    ptrArtifact[result].use = TRUE;
+	    if(! GetIntValue(UNIQUEARTIFACT)) return result;
+	    for(i = 0; i < ARTIFACTCOUNT_LEVEL1; ++i)
+		if(! ptrArtifact[level1[i]].use){
+		    while(ptrArtifact[result].use) result = level1[rand() % ARTIFACTCOUNT_LEVEL1];
+		    ptrArtifact[result].use = TRUE;
+		}
+	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_LEVEL1 all busy. Use uniqueartifact = off.\n");
 	    return result;
 	    break;
 	    
 	case ART_LEVEL2:
 	    result = level2[rand() % ARTIFACTCOUNT_LEVEL2];
-	    while(ptrArtifact[result].use) result = level2[rand() % ARTIFACTCOUNT_LEVEL2];
-	    ptrArtifact[result].use = TRUE;
+	    if(! GetIntValue(UNIQUEARTIFACT)) return result;
+	    for(i = 0; i < ARTIFACTCOUNT_LEVEL2; ++i)
+		if(! ptrArtifact[level2[i]].use){
+		    while(ptrArtifact[result].use) result = level2[rand() % ARTIFACTCOUNT_LEVEL2];
+		    ptrArtifact[result].use = TRUE;
+		}
+	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_LEVEL2 all busy. Use uniqueartifact = off.\n");
 	    return result;
 	    break;
 	    
 	case ART_LEVEL3:
 	    result = level3[rand() % ARTIFACTCOUNT_LEVEL3];
-	    while(ptrArtifact[result].use) result = level3[rand() % ARTIFACTCOUNT_LEVEL3];
-	    ptrArtifact[result].use = TRUE;
+	    if(! GetIntValue(UNIQUEARTIFACT)) return result;
+	    for(i = 0; i < ARTIFACTCOUNT_LEVEL3; ++i)
+		if(! ptrArtifact[level3[i]].use){
+		    while(ptrArtifact[result].use) result = level3[rand() % ARTIFACTCOUNT_LEVEL3];
+		    ptrArtifact[result].use = TRUE;
+		}
+	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_LEVEL3 all busy. Use uniqueartifact = off.\n");
 	    return result;
 	    break;
-	    
+
 	default:
 	    break;
     }
 
     // ART_ALL
     result = 9 + (rand() % (ARTIFACTMAXCOUNT - 10));
-    while(ptrArtifact[result].use) result = 9 + (rand() % (ARTIFACTMAXCOUNT - 10));
-    ptrArtifact[result].use = TRUE;
+    if(! GetIntValue(UNIQUEARTIFACT)) return result;
+    for(i = 9; i < ARTIFACTMAXCOUNT - 10; ++i)
+	if(! ptrArtifact[i].use){
+	    while(ptrArtifact[result].use) result = 9 + (rand() % (ARTIFACTMAXCOUNT - 10));
+	    ptrArtifact[result].use = TRUE;
+	}
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_ALL all busy. Use uniqueartifact = off.\n");
+
     return result;
 }
 

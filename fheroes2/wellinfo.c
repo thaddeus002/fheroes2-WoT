@@ -34,8 +34,8 @@
 #include "cursor.h"
 #include "debug.h"
 #include "config.h"
-#include "element.h"
 #include "actionevent.h"
+#include "element.h"
 #include "castle.h"
 #include "monster.h"
 #include "wellinfo.h"
@@ -301,10 +301,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    if(castle->dwelling & DWELLING_UPGRADE2)
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE2);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER2);
+    message = (castle->dwelling & DWELLING_UPGRADE2 ? GetStringDwelling(castle->race, DWELLING_UPGRADE2) : GetStringDwelling(castle->race, DWELLING_MONSTER2));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -436,10 +433,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    if(castle->dwelling & DWELLING_UPGRADE3)
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE3);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER3);
+    message = (castle->dwelling & DWELLING_UPGRADE3 ? GetStringDwelling(castle->race, DWELLING_UPGRADE3) : GetStringDwelling(castle->race, DWELLING_MONSTER3));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -571,10 +565,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    if(castle->dwelling & DWELLING_UPGRADE4)
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE4);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER4);
+    message = (castle->dwelling & DWELLING_UPGRADE4 ? GetStringDwelling(castle->race, DWELLING_UPGRADE4) : GetStringDwelling(castle->race, DWELLING_MONSTER4));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -706,10 +697,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    if(castle->dwelling & DWELLING_UPGRADE5)
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE5);
-    else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER5);
+    message = (castle->dwelling & DWELLING_UPGRADE5 ? GetStringDwelling(castle->race, DWELLING_UPGRADE5) : GetStringDwelling(castle->race, DWELLING_MONSTER5));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;

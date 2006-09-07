@@ -39,51 +39,8 @@
 #include "actionevent.h"
 #include "magictower.h"
 
-
-void FillMageGuildLevel(S_MAGEGUILD *guild, const S_CASTLE *castle, E_MAGICLEVEL level){
-
-    switch(level){
-
-	default:
-	    return;
-	    break;
-
-	case MAGIC_LEVEL1:
-	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
-		FillSpellLevel1(castle->race, guild->level1, TRUE);
-	    else
-		FillSpellLevel1(castle->race, guild->level1, FALSE);
-	    break;
-
-	case MAGIC_LEVEL2:
-	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
-		FillSpellLevel2(castle->race, guild->level2, TRUE);
-	    else
-		FillSpellLevel2(castle->race, guild->level2, FALSE);
-	    break;
-
-	case MAGIC_LEVEL3:
-	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
-		FillSpellLevel3(castle->race, guild->level3, TRUE);
-	    else
-		FillSpellLevel3(castle->race, guild->level3, FALSE);
-	    break;
-
-	case MAGIC_LEVEL4:
-	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
-		FillSpellLevel4(castle->race, guild->level4, TRUE);
-	    else
-		FillSpellLevel4(castle->race, guild->level4, FALSE);
-	    break;
-
-	case MAGIC_LEVEL5:
-	    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
-		FillSpellLevel5(castle->race, guild->level5, TRUE);
-	    else
-		FillSpellLevel5(castle->race, guild->level5, FALSE);
-	    break;
-    }
-}
+ACTION	ActionLClickSpell(void);
+ACTION	ActionRClickSpell(void);
 
 ACTION  ShowMageGuildInfo(void){
 
@@ -94,10 +51,10 @@ ACTION  ShowMageGuildInfo(void){
     SDL_Surface *back, *image, *video;
     SDL_Rect rectBack, rectCur;
     Uint16 cx, cy;
-    Uint8 level, max, i;
+    Uint8 level, i;
     AGGSPRITE sprite;
     const char *message = NULL;
-    char str[32];
+    char str[64];
     BOOL exit = FALSE;
 
     INTERFACEACTION action;
@@ -218,8 +175,9 @@ ACTION  ShowMageGuildInfo(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
     // LEVEL 5
-    max = 1;
-    for(i = 0; i < max; ++i){
+    for(i = 0; i <  CASTLESPELL_LEVEL5; ++i){
+
+	if(WIZARD != castle->race && i == CASTLESPELL_LEVEL5 - 1 ) break;
 
 	if(MAGIC_LEVEL4 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level5[i]) level = 0; else level = 1;
 
@@ -233,33 +191,58 @@ ACTION  ShowMageGuildInfo(void){
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	if(! level){
+	    // события
+	    rectCur.x += 10;
+	    rectCur.y += 5;
+	    rectCur.w -= 15;
+	    rectCur.h -= 10;
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_LCLICK;
+    	    action.pf = ActionLClickSpell;
+    	    AddActionEvent(&dialog, &action);
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_RCLICK;
+    	    action.pf = ActionRClickSpell;
+    	    AddActionEvent(&dialog, &action);
 	    // картика заклинания
 	    FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level5[i]);
 	    image = GetICNSprite(&sprite);
-	    rectCur.x = cx + 250 - image->w / 2 + i * 110;
-	    rectCur.y = cy + 55 - image->h + 5;
+	    rectCur.x = cx + 250 - image->w / 2 + i * 110 + 5;
+	    rectCur.y = cy + 28 - image->h / 2 + 5;
 	    rectCur.w = image->w;
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // text
-	    message = GetStringSpellMagic(castle->mageGuild.level5[i]);
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2;
-	    rectCur.y = cy + 55 + 5;
-	    rectCur.w = GetLengthText(message, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, message, FONT_SMALL);
-	    sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level5[i]));
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2;
-	    rectCur.y = cy + 55 + FONT_HEIGHTSMALL + 5;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
+	    message = GetStringNameSpellMagic(castle->mageGuild.level5[i]);
+	    if(80 < GetLengthText(message, FONT_SMALL)){
+		sprintf(str, "%s [%d]", message, GetCostSpellMagic(castle->mageGuild.level5[i]));
+		rectCur.x = cx + 250 + i * 110 - 40;
+		rectCur.y = cy + 55 + 3;
+		rectCur.w = 80;
+		rectCur.h = 3 * FONT_HEIGHTSMALL;
+		PrintAlignText(video, &rectCur, str, FONT_SMALL);
+	    }else{
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 55 + 5;
+		rectCur.w = GetLengthText(message, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, message, FONT_SMALL);
+		sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level5[i]));
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 55 + FONT_HEIGHTSMALL + 5;
+		rectCur.w = GetLengthText(str, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, str, FONT_SMALL);
+	    }
 	}
     }
 
     // LEVEL 4
-    max = 2;
-    for(i = 0; i < max; ++i){
+    for(i = 0; i <  CASTLESPELL_LEVEL4; ++i){
+
+	if(WIZARD != castle->race && i == CASTLESPELL_LEVEL4 - 1 ) break;
 
 	if(MAGIC_LEVEL3 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level4[i]) level = 0; else level = 1;
 
@@ -273,39 +256,60 @@ ACTION  ShowMageGuildInfo(void){
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	if(! level){
+	    // события
+	    rectCur.x += 10;
+	    rectCur.y += 5;
+	    rectCur.w -= 15;
+	    rectCur.h -= 10;
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_LCLICK;
+    	    action.pf = ActionLClickSpell;
+    	    AddActionEvent(&dialog, &action);
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_RCLICK;
+    	    action.pf = ActionRClickSpell;
+    	    AddActionEvent(&dialog, &action);
 	    // картика заклинания
-            if(MASSBLESS == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", BLESS);
-            else if(MASSCURSE == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", CURSE);
-            else if(MASSDISPEL == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", DISPELMAGIC);
-            else if(MASSHASTE == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", HASTE);
-            else if(MASSSHIELD == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", SHIELD);
+            if(MASSSHIELD == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", SHIELD);
             else if(MASSSLOW == castle->mageGuild.level4[i]) FillSPRITE(&sprite, "SPELLS.ICN", SLOW);
 	    else FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level4[i]);
 	    image = GetICNSprite(&sprite);
-	    rectCur.x = cx + 250 - image->w / 2 + i * 110;
-	    rectCur.y = cy + 90 + 55 - image->h + 5;
+	    rectCur.x = cx + 250 - image->w / 2 + i * 110 + 5;
+	    rectCur.y = cy + 90 + 28 - image->h / 2 + 5;
 	    rectCur.w = image->w;
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // text
-	    message = GetStringSpellMagic(castle->mageGuild.level4[i]);
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2;
-	    rectCur.y = cy + 90 + 55 + 5;
-	    rectCur.w = GetLengthText(message, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, message, FONT_SMALL);
-	    sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level4[i]));
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2;
-	    rectCur.y = cy + 90 + 55 + FONT_HEIGHTSMALL + 5;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
+	    message = GetStringNameSpellMagic(castle->mageGuild.level4[i]);
+	    if(80 < GetLengthText(message, FONT_SMALL)){
+		sprintf(str, "%s [%d]", message, GetCostSpellMagic(castle->mageGuild.level4[i]));
+		rectCur.x = cx + 250 + i * 110 - 40;
+		rectCur.y = cy + 90 + 55 + 3;
+		rectCur.w = 80;
+		rectCur.h = 3 * FONT_HEIGHTSMALL;
+		PrintAlignText(video, &rectCur, str, FONT_SMALL);
+	    }else{
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 90 + 55 + 5;
+		rectCur.w = GetLengthText(message, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, message, FONT_SMALL);
+		sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level4[i]));
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 90 + 55 + FONT_HEIGHTSMALL + 5;
+		rectCur.w = GetLengthText(str, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, str, FONT_SMALL);
+	    }
 	}
     }
 
     // LEVEL 3
-    max = 2;
-    for(i = 0; i < max; ++i){
+    for(i = 0; i <  CASTLESPELL_LEVEL3; ++i){
+
+	if(WIZARD != castle->race && i == CASTLESPELL_LEVEL3 - 1 ) break;
 
 	if(MAGIC_LEVEL2 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level3[i]) level = 0; else level = 1;
 
@@ -319,39 +323,62 @@ ACTION  ShowMageGuildInfo(void){
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	if(! level){
+	    rectCur.x += 10;
+	    rectCur.y += 5;
+	    rectCur.w -= 15;
+	    rectCur.h -= 10;
+	    // события
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_LCLICK;
+    	    action.pf = ActionLClickSpell;
+    	    AddActionEvent(&dialog, &action);
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_RCLICK;
+    	    action.pf = ActionRClickSpell;
+    	    AddActionEvent(&dialog, &action);
 	    // картика заклинания
             if(MASSBLESS == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", BLESS);
             else if(MASSCURSE == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", CURSE);
             else if(MASSDISPEL == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", DISPELMAGIC);
             else if(MASSHASTE == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", HASTE);
-            else if(MASSSHIELD == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", SHIELD);
-            else if(MASSSLOW == castle->mageGuild.level3[i]) FillSPRITE(&sprite, "SPELLS.ICN", SLOW);
 	    else FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level3[i]);
 	    image = GetICNSprite(&sprite);
-	    rectCur.x = cx + 250 - image->w / 2 + i * 110;
-	    rectCur.y = cy + 180 + 55 - image->h + 5;
+	    rectCur.x = cx + 250 - image->w / 2 + i * 110 + 5;
+	    rectCur.y = cy + 180 + 28 - image->h / 2 + 5;
 	    rectCur.w = image->w;
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // text
-	    message = GetStringSpellMagic(castle->mageGuild.level3[i]);
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2;
-	    rectCur.y = cy + 180 + 55 + 5;
-	    rectCur.w = GetLengthText(message, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, message, FONT_SMALL);
-	    sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level3[i]));
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2;
-	    rectCur.y = cy + 180 + 55 + FONT_HEIGHTSMALL + 5;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
+	    message = GetStringNameSpellMagic(castle->mageGuild.level3[i]);
+	    if(80 < GetLengthText(message, FONT_SMALL)){
+		sprintf(str, "%s [%d]", message, GetCostSpellMagic(castle->mageGuild.level4[i]));
+		rectCur.x = cx + 250 + i * 110 - 40;
+		rectCur.y = cy + 180 + 55 + 3;
+		rectCur.w = 80;
+		rectCur.h = 3 * FONT_HEIGHTSMALL;
+		PrintAlignText(video, &rectCur, str, FONT_SMALL);
+	    }else{
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 180 + 55 + 5;
+		rectCur.w = GetLengthText(message, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, message, FONT_SMALL);
+		sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level3[i]));
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 180 + 55 + FONT_HEIGHTSMALL + 5;
+		rectCur.w = GetLengthText(str, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, str, FONT_SMALL);
+	    }
 	}
     }
 
     // LEVEL 2
-    max = 3;
-    for(i = 0; i < max; ++i){
+    for(i = 0; i <  CASTLESPELL_LEVEL2; ++i){
+
+	if(WIZARD != castle->race && i == CASTLESPELL_LEVEL2 - 1 ) break;
 
 	if(MAGIC_LEVEL1 < GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level2[i]) level = 0; else level = 1;
 
@@ -365,34 +392,58 @@ ACTION  ShowMageGuildInfo(void){
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	if(! level){
+	    rectCur.x += 10;
+	    rectCur.y += 5;
+	    rectCur.w -= 15;
+	    rectCur.h -= 10;
+	    // события
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_LCLICK;
+    	    action.pf = ActionLClickSpell;
+    	    AddActionEvent(&dialog, &action);
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_RCLICK;
+    	    action.pf = ActionRClickSpell;
+    	    AddActionEvent(&dialog, &action);
 	    // картика заклинания
 	    FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level2[i]);
 	    image = GetICNSprite(&sprite);
-	    rectCur.x = cx + 250 - image->w / 2 + i * 110;
-	    rectCur.y = cy + 270 + 55 - image->h + 5;
+	    rectCur.x = cx + 250 - image->w / 2 + i * 110 + 5;
+	    rectCur.y = cy + 270 + 28 - image->h / 2 + 5;
 	    rectCur.w = image->w;
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // text
-	    message = GetStringSpellMagic(castle->mageGuild.level2[i]);
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2;
-	    rectCur.y = cy + 270 + 55 + 5;
-	    rectCur.w = GetLengthText(message, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, message, FONT_SMALL);
-	    sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level2[i]));
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2;
-	    rectCur.y = cy + 270 + 55 + FONT_HEIGHTSMALL + 5;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
+	    message = GetStringNameSpellMagic(castle->mageGuild.level2[i]);
+	    if(80 < GetLengthText(message, FONT_SMALL)){
+		sprintf(str, "%s [%d]", message, GetCostSpellMagic(castle->mageGuild.level2[i]));
+		rectCur.x = cx + 250 + i * 110 - 40;
+		rectCur.y = cy + 270 + 55 + 3;
+		rectCur.w = 80;
+		rectCur.h = 3 * FONT_HEIGHTSMALL;
+		PrintAlignText(video, &rectCur, str, FONT_SMALL);
+	    }else{
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 270 + 55 + 5;
+		rectCur.w = GetLengthText(message, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, message, FONT_SMALL);
+		sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level2[i]));
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 270 + 55 + FONT_HEIGHTSMALL + 5;
+		rectCur.w = GetLengthText(str, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, str, FONT_SMALL);
+	    }
 	}
     }
 
     // LEVEL 1
-    max = 3;
-    for(i = 0; i < max; ++i){
+    for(i = 0; i <  CASTLESPELL_LEVEL1; ++i){
 
+	if(WIZARD != castle->race && i == CASTLESPELL_LEVEL1 - 1 ) break;
 	if(GetMageGuildLevel(castle) && SPELLNONE != castle->mageGuild.level1[i]) level = 0; else level = 1;
 
 	// свиток
@@ -405,27 +456,51 @@ ACTION  ShowMageGuildInfo(void){
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 
 	if(! level){
+	    rectCur.x += 10;
+	    rectCur.y += 5;
+	    rectCur.w -= 15;
+	    rectCur.h -= 10;
+	    // события
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_LCLICK;
+    	    action.pf = ActionLClickSpell;
+    	    AddActionEvent(&dialog, &action);
+    	    ZeroINTERFACEACTION(&action);
+    	    action.rect = rectCur;
+    	    action.mouseEvent = MOUSE_RCLICK;
+    	    action.pf = ActionRClickSpell;
+    	    AddActionEvent(&dialog, &action);
 	    // картика заклинания
 	    FillSPRITE(&sprite, "SPELLS.ICN", castle->mageGuild.level1[i]);
 	    image = GetICNSprite(&sprite);
-	    rectCur.x = cx + 250 - image->w / 2 + i * 110;
-	    rectCur.y = cy + 360 + 55 - image->h + 5;
+	    rectCur.x = cx + 250 - image->w / 2 + i * 110 + 5;
+	    rectCur.y = cy + 360 + 28 - image->h / 2 + 5;
 	    rectCur.w = image->w;
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // text
-	    message = GetStringSpellMagic(castle->mageGuild.level1[i]);
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2;
-	    rectCur.y = cy + 360 + 55 + 5;
-	    rectCur.w = GetLengthText(message, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, message, FONT_SMALL);
-	    sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level1[i]));
-	    rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2;
-	    rectCur.y = cy + 360 + 55 + FONT_HEIGHTSMALL + 5;
-	    rectCur.w = GetLengthText(str, FONT_SMALL);
-	    rectCur.h = FONT_HEIGHTSMALL;
-	    PrintText(video, &rectCur, str, FONT_SMALL);
+	    message = GetStringNameSpellMagic(castle->mageGuild.level1[i]);
+	    if(80 < GetLengthText(message, FONT_SMALL)){
+		sprintf(str, "%s [%d]", message, GetCostSpellMagic(castle->mageGuild.level1[i]));
+		rectCur.x = cx + 250 + i * 110 - 40;
+		rectCur.y = cy + 360 + 55 + 3;
+		rectCur.w = 80;
+		rectCur.h = 3 * FONT_HEIGHTSMALL;
+		PrintAlignText(video, &rectCur, str, FONT_SMALL);
+	    }else{
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(message, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 360 + 55 + 5;
+		rectCur.w = GetLengthText(message, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, message, FONT_SMALL);
+		sprintf(str, "[%d]", GetCostSpellMagic(castle->mageGuild.level1[i]));
+		rectCur.x = cx + 250 + i * 110 - GetLengthText(str, FONT_SMALL) / 2 + 2;
+		rectCur.y = cy + 360 + 55 + FONT_HEIGHTSMALL + 5;
+		rectCur.w = GetLengthText(str, FONT_SMALL);
+		rectCur.h = FONT_HEIGHTSMALL;
+		PrintText(video, &rectCur, str, FONT_SMALL);
+	    }
 	}
     }
 
@@ -465,4 +540,52 @@ ACTION  ShowMageGuildInfo(void){
     CursorOn();
 
     return result;
+}
+
+ACTION ActionLClickSpell(void){
+
+    Sint32 mx, my;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    SDL_GetMouseState(&mx, &my);
+
+    Uint8 level = 5 - (Uint8)(my / 90);
+    Uint8 index = (mx - 195) / 110;
+
+    if(1 == level)
+	return ShowSpellInfo(castle->mageGuild.level1[index], OK);
+    else if(2 == level)
+	return ShowSpellInfo(castle->mageGuild.level2[index], OK);
+    else if(3 == level)
+	return ShowSpellInfo(castle->mageGuild.level3[index], OK);
+    else if(4 == level)
+	return ShowSpellInfo(castle->mageGuild.level4[index], OK);
+    else if(5 == level)
+	return ShowSpellInfo(castle->mageGuild.level5[index], OK);
+
+    return NONE;
+}
+
+ACTION ActionRClickSpell(void){
+
+    Sint32 mx, my;
+    const S_CASTLE *castle = GetCurrentCastle();
+    
+    SDL_GetMouseState(&mx, &my);
+
+    Uint8 level = 5 - (Uint8)( my / 90);
+    Uint8 index = (mx - 195) / 110;
+
+    if(1 == level)
+	return ShowSpellInfo(castle->mageGuild.level1[index], NONE);
+    else if(2 == level)
+	return ShowSpellInfo(castle->mageGuild.level2[index], NONE);
+    else if(3 == level)
+	return ShowSpellInfo(castle->mageGuild.level3[index], NONE);
+    else if(4 == level)
+	return ShowSpellInfo(castle->mageGuild.level4[index], NONE);
+    else if(5 == level)
+	return ShowSpellInfo(castle->mageGuild.level5[index], NONE);
+
+    return NONE;
 }

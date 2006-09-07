@@ -35,6 +35,5 @@
 
 Uint8	DialogRecrutMonster(E_MONSTER, Uint8, Uint16);
 void	DialogRecrutMonsterInfo(E_MONSTER, Uint16);
-void	ErrorDialogRecrutMonster(const S_CASTLE *);
 
 #endif

@@ -374,13 +374,19 @@ void DrawSCRSShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	cur.y = cy;
 	cur.w = 0;
 	cur.h = 0;
-	FillSPRITE(&sprite, "TWNSDOCK.ICN", 1);
-	header = GetICNHeader(&sprite);
-	AddAnimationEvent(animHead, &cur, header, 5);
+	if(CastleNearBoat()){
+	    FillSPRITE(&sprite, "TWNSBOAT.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(animHead, &cur, header, 9);
+	}else{
+	    FillSPRITE(&sprite, "TWNSDOCK.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(animHead, &cur, header, 5);
+	}
     }
 
     // спрайт
-    FillSPRITE(&sprite, "TWNSDOCK.ICN", 0);
+    if(CastleNearBoat()) FillSPRITE(&sprite, "TWNSBOAT.ICN", 0); else FillSPRITE(&sprite, "TWNSDOCK.ICN", 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;

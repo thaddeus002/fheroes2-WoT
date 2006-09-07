@@ -369,13 +369,19 @@ void DrawKNGTShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	cur.y = cy;
 	cur.w = 0;
 	cur.h = 0;
-	FillSPRITE(&sprite, "TWNKDOCK.ICN", 1);
-	header = GetICNHeader(&sprite);
-	AddAnimationEvent(animHead, &cur, header, 5);
+	if(CastleNearBoat()){
+	    FillSPRITE(&sprite, "TWNKBOAT.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(animHead, &cur, header, 9);
+	}else{
+	    FillSPRITE(&sprite, "TWNKDOCK.ICN", 1);
+	    header = GetICNHeader(&sprite);
+	    AddAnimationEvent(animHead, &cur, header, 5);
+	}
     }
 
     // спрайт
-    FillSPRITE(&sprite, "TWNKDOCK.ICN", 0);
+    if(CastleNearBoat()) FillSPRITE(&sprite, "TWNKBOAT.ICN", 0); else FillSPRITE(&sprite, "TWNKDOCK.ICN", 0);
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
     cur.y = cy + header->offsetY;
@@ -490,6 +496,7 @@ void DrawKNGTMarketplace(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
+	cur.w -= 10;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
@@ -535,6 +542,7 @@ void DrawKNGTMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     if(actionHead){
 	cur.h = 20;
+	cur.w /= 2;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
@@ -749,7 +757,8 @@ void DrawKNGTDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 
     if(actionHead){
 	cur.x += 10;
-	cur.w = 80;
+	cur.w = 70;
+	cur.h -= 10;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;
@@ -797,7 +806,8 @@ void DrawKNGTDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.w = 80;
+	cur.w = 70;
+	cur.h -= 10;
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;

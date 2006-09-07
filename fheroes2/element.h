@@ -29,17 +29,14 @@
 #ifndef _ELEMENT_H
 #define _ELEMENT_H
 
-#define SHADOWWIDTH	16
-
 #include "SDL.h"
 #include "actionevent.h"
 #include "tools.h"
 
-ACTION	MessageBox(const char *, ENUMFONT font);
+ACTION	MessageBox(const char *, const char *, ENUMFONT, Uint32);
+Uint16	SelectCountBox(Uint16);
 
 void	ShowQuickInfo(Uint16);
 void	ShowBorder(SDL_Rect *);
-
-Uint16	SelectCountBox(Uint16);
 
 #endif

@@ -48,7 +48,13 @@ const char * GetStringBuilding(E_RACE, E_BUILDINGCASTLE);
 const char * GetStringDescriptionsBuilding(E_RACE, E_BUILDINGCASTLE);
 const char * GetStringResource(E_RESOURCE);
 
+const char * GetStringLevelSkill(E_LEVELSKILL);
+const char * GetStringSkill(E_SKILL);
+const char * GetStringDescriptionsSkill(E_SKILL, E_LEVELSKILL);
+
 const char * GetStringLevelMageGuild(E_MAGICLEVEL level);
+const char * GetStringDepenceDwelling(E_RACE, E_DWELLINGCASTLE);
+const char * GetStringMonsterFromDwelling(E_RACE, E_DWELLINGCASTLE);
 
 void         PrintCellInfo(Uint16);
 

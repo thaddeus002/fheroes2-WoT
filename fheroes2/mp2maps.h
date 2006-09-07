@@ -56,6 +56,7 @@ typedef struct {
 
 		ICNHEADER	*level1;
 		ICNHEADER	*level2;
+		ICNHEADER	*upgrade;
 		S_ANIMATION	*animation;
 		S_ANIMATION	*monster;
 
@@ -67,6 +68,7 @@ S_CELLMAPS     *GetCELLMAPS(Uint16);
 Uint8		GetWidthMaps(void);
 Uint8		GetHeightMaps(void);
 E_GROUND	GetGroundMaps(Uint8, Uint8);
+void		MapsUpgradeTown2Castle(Uint8, Uint8);
 
 /* ***************************** START MP2 ********************************** */
 /* заголовок карты */

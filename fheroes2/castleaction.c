@@ -40,6 +40,7 @@
 #include "monster.h"
 #include "magictower.h"
 #include "thievesguild.h"
+#include "mp2maps.h"
 #include "kingdom.h"
 #include "castle.h"
 #include "castleinfo.h"
@@ -55,7 +56,7 @@ ACTION ActionOverCastle(void){
     const char *message = NULL;
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->building & BUILD_CASTLE){ message = "Castle"; }else{ message = "Tent"; }
+    message = (castle->building & BUILD_CASTLE ? "Castle" : "Tent");
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -339,31 +340,19 @@ ACTION ActionOverDwelling2(void){
 
     switch(castle->race){
 	case BARBARIAN:
-	    if(castle->dwelling & DWELLING_UPGRADE2)
-		monster = GetStatMonster(CHIEF_ORC);
-	    else
-		monster = GetStatMonster(ORC);
+	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(CHIEF_ORC) : GetStatMonster(ORC));
 	    break;
 	case KNIGHT:
-	    if(castle->dwelling & DWELLING_UPGRADE2)
-		monster = GetStatMonster(ARCHER);
-	    else
-		monster = GetStatMonster(RANGER);
+	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(ARCHER) : GetStatMonster(RANGER));
 	    break;
 	case WARLOCK:
 	    monster = GetStatMonster(GARGOYLE);
 	    break;
 	case SORCERESS:
-	    if(castle->dwelling & DWELLING_UPGRADE2)
-		monster = GetStatMonster(DWARF);
-	    else
-		monster = GetStatMonster(BATTLE_DWARF);
+	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(DWARF) : GetStatMonster(BATTLE_DWARF));
 	    break;
 	case NECROMANCER:
-	    if(castle->dwelling & DWELLING_UPGRADE2)
-		monster = GetStatMonster(ZOMBIE);
-	    else
-		monster = GetStatMonster(MUTANT_ZOMBIE);
+	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(ZOMBIE) : GetStatMonster(MUTANT_ZOMBIE));
 	    break;
 	case WIZARD:
 	    monster = GetStatMonster(BOAR);
@@ -398,31 +387,19 @@ ACTION ActionOverDwelling3(void){
 	    monster = GetStatMonster(WOLF);
 	    break;
 	case KNIGHT:
-	    if(castle->dwelling & DWELLING_UPGRADE3)
-		monster = GetStatMonster(PIKEMAN);
-	    else
-		monster = GetStatMonster(VETERAN_PIKEMAN);
+	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(PIKEMAN) : GetStatMonster(VETERAN_PIKEMAN));
 	    break;
 	case WARLOCK:
 	    monster = GetStatMonster(GRIFFIN);
 	    break;
 	case SORCERESS:
-	    if(castle->dwelling & DWELLING_UPGRADE3)
-		monster = GetStatMonster(ELF);
-	    else
-		monster = GetStatMonster(GRAND_ELF);
+	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(ELF) : GetStatMonster(GRAND_ELF));
 	    break;
 	case NECROMANCER:
-	    if(castle->dwelling & DWELLING_UPGRADE3)
-		monster = GetStatMonster(MUMMY);
-	    else
-		monster = GetStatMonster(ROYAL_MUMMY);
+	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(MUMMY) : GetStatMonster(ROYAL_MUMMY));
 	    break;
 	case WIZARD:
-	    if(castle->dwelling & DWELLING_UPGRADE3)
-		monster = GetStatMonster(IRON_GOLEM);
-	    else
-		monster = GetStatMonster(STEEL_GOLEM);
+	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(IRON_GOLEM) : GetStatMonster(STEEL_GOLEM));
 	    break;
 	default:
 	    return NONE;
@@ -451,34 +428,19 @@ ACTION ActionOverDwelling4(void){
 
     switch(castle->race){
 	case BARBARIAN:
-	    if(castle->dwelling & DWELLING_UPGRADE4)
-		monster = GetStatMonster(OGRE);
-	    else
-		monster = GetStatMonster(LORD_OGRE);
+	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(OGRE) : GetStatMonster(LORD_OGRE));
 	    break;
 	case KNIGHT:
-	    if(castle->dwelling & DWELLING_UPGRADE4)
-		monster = GetStatMonster(SWORDSMAN);
-	    else
-		monster = GetStatMonster(MASTER_SWORDSMAN);
+	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(SWORDSMAN) : GetStatMonster(MASTER_SWORDSMAN));
 	    break;
 	case WARLOCK:
-	    if(castle->dwelling & DWELLING_UPGRADE4)
-		monster = GetStatMonster(MINOTAUR);
-	    else
-		monster = GetStatMonster(KNIGHT_MINOTAUR);
+	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(MINOTAUR) : GetStatMonster(KNIGHT_MINOTAUR));
 	    break;
 	case SORCERESS:
-	    if(castle->dwelling & DWELLING_UPGRADE4)
-		monster = GetStatMonster(DRUID);
-	    else
-		monster = GetStatMonster(GREATER_DRUID);
+	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(DRUID) : GetStatMonster(GREATER_DRUID));
 	    break;
 	case NECROMANCER:
-	    if(castle->dwelling & DWELLING_UPGRADE4)
-		monster = GetStatMonster(VAMPIRE);
-	    else
-		monster = GetStatMonster(LORD_VAMPIRE);
+	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(VAMPIRE) : GetStatMonster(LORD_VAMPIRE));
 	    break;
 	case WIZARD:
 	    monster = GetStatMonster(ROC);
@@ -510,16 +472,10 @@ ACTION ActionOverDwelling5(void){
 
     switch(castle->race){
 	case BARBARIAN:
-	    if(castle->dwelling & DWELLING_UPGRADE5)
-		monster = GetStatMonster(TROLL);
-	    else
-		monster = GetStatMonster(WAR_TROLL);
+	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(TROLL) : GetStatMonster(WAR_TROLL));
 	    break;
 	case KNIGHT:
-	    if(castle->dwelling & DWELLING_UPGRADE5)
-		monster = GetStatMonster(CAVALIRY);
-	    else
-		monster = GetStatMonster(CHAMPION);
+	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(CAVALIRY) : GetStatMonster(CHAMPION));
 	    break;
 	case WARLOCK:
 	    monster = GetStatMonster(HIDRA);
@@ -528,16 +484,10 @@ ACTION ActionOverDwelling5(void){
 	    monster = GetStatMonster(UNICORN);
 	    break;
 	case NECROMANCER:
-	    if(castle->dwelling & DWELLING_UPGRADE5)
-		monster = GetStatMonster(LICH);
-	    else
-		monster = GetStatMonster(POWER_LICH);
+	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(LICH) : GetStatMonster(POWER_LICH));
 	    break;
 	case WIZARD:
-	    if(castle->dwelling & DWELLING_UPGRADE5)
-		monster = GetStatMonster(MAGE);
-	    else
-		monster = GetStatMonster(ARCHMAGE);
+	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(MAGE) : GetStatMonster(ARCHMAGE));
 	    break;
 	default:
 	    return NONE;
@@ -569,10 +519,7 @@ ACTION ActionOverDwelling6(void){
 	    monster = GetStatMonster(CYCLOPS);
 	    break;
 	case KNIGHT:
-	    if(castle->dwelling & DWELLING_UPGRADE6)
-		monster = GetStatMonster(PALADIN);
-	    else
-		monster = GetStatMonster(CRUSADER);
+	    monster = (castle->dwelling & DWELLING_UPGRADE6 ? GetStatMonster(PALADIN) : GetStatMonster(CRUSADER));
 	    break;
 	case WARLOCK:
 	    if(castle->dwelling & DWELLING_UPGRADE7)
@@ -589,10 +536,7 @@ ACTION ActionOverDwelling6(void){
 	    monster = GetStatMonster(BONE_DRAGON);
 	    break;
 	case WIZARD:
-	    if(castle->dwelling & DWELLING_UPGRADE6)
-		monster = GetStatMonster(GIANT);
-	    else
-		monster = GetStatMonster(TITAN);
+	    monster = (castle->dwelling & DWELLING_UPGRADE6 ? GetStatMonster(GIANT) : GetStatMonster(TITAN));
 	    break;
 	default:
 	    return NONE;
@@ -618,8 +562,8 @@ ACTION ActionOverExit(void){
     
     const char *message = NULL;
     const S_CASTLE *castle = GetCurrentCastle();
-                
-    if(castle->building & BUILD_CASTLE){ message = "Exit Castle"; }else{ message = "Exit Town"; }
+
+    message = (castle->building & BUILD_CASTLE ? "Exit Castle" : "Exit Town");
     
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect cur;
@@ -660,18 +604,36 @@ ACTION ActionClickCastle(void){
     const S_CASTLE *castle = GetCurrentCastle();
     
     if(castle->building & BUILD_CASTLE)
+
 	ShowCastleInfo();
-    else if(castle->allowCastle)
-	fprintf(stderr, "Allow build Castle\n");
-    else
-	fprintf(stderr, "Not allow build Castle\n");
+    
+    else if(! castle->allowCastle)
+	return MessageBox(NULL, "This town may not be upgraded to a castle.", FONT_BIG, OK);
+
+    else if(OK == BuyBuildingBox(castle->race, BUILD_CASTLE, OK|CANCEL)){
+
+	BuildCastle(castle);
+	EnableCastleUpdateBuilding();
+	MapsUpgradeTown2Castle(castle->ax, castle->ay);
+
+	return NONE;
+
+    }
 
     return NONE;
 }
 
 ACTION ActionClickCaptain(void){
 
-    return BuildingInfoYESBox(BUILD_CAPTAIN);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(EXIT == MessageBox(
+			GetStringBuilding(castle->race, BUILD_CAPTAIN),
+			GetStringDescriptionsBuilding(castle->race, BUILD_CAPTAIN),
+			FONT_BIG,
+			OK )) return EXIT;
+    
+    return NONE;
 }
 
 ACTION ActionClickMageGuild(void){
@@ -685,7 +647,15 @@ ACTION ActionClickMageGuild(void){
 
 ACTION ActionClickStatue(void){
 
-    return BuildingInfoYESBox(BUILD_STATUE);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(EXIT == MessageBox(
+			GetStringBuilding(castle->race, BUILD_STATUE),
+			GetStringDescriptionsBuilding(castle->race, BUILD_STATUE),
+			FONT_BIG,
+			OK )) return EXIT;
+    
+    return NONE;
 }
 
 ACTION ActionClickWell(void){
@@ -704,7 +674,17 @@ ACTION ActionClickTavern(void){
 }
 
 ACTION ActionClickDock(void){
-    fprintf(stderr, "ClickDock\n");
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    S_PAYMENT payment = *(PaymentConditionsBuilding(castle->race, BUILD_BOAT));
+
+    if(OK == BuyBoat() && KingdomAllowPayment(castle->color, &payment)){
+
+	KingdomWasteResource(castle->color, &payment);
+
+	fprintf(stderr, "Buy Boat OK.!");
+    }
+
     return NONE;
 }
 
@@ -713,22 +693,49 @@ ACTION ActionClickMarketplace(void){
     const S_CASTLE *castle = GetCurrentCastle();
     if(! castle) return NONE;
 
-    return ShowMarketplace(castle->color);
+    ACTION result = ShowMarketplace(castle->color);
+    RedrawCastleInfoResource();
+    
+    return result;
 }
 
 ACTION ActionClickMoat(void){
 
-    return BuildingInfoYESBox(BUILD_MOAT);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(EXIT == MessageBox(
+			GetStringBuilding(castle->race, BUILD_MOAT),
+			GetStringDescriptionsBuilding(castle->race, BUILD_MOAT),
+			FONT_BIG,
+			OK )) return EXIT;
+    
+    return NONE;
 }
 
 ACTION ActionClickSpec(void){
 
-    return BuildingInfoYESBox(BUILD_SPEC);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(EXIT == MessageBox(
+			GetStringBuilding(castle->race, BUILD_SPEC),
+			GetStringDescriptionsBuilding(castle->race, BUILD_SPEC),
+			FONT_BIG,
+			OK )) return EXIT;
+    
+    return NONE;
 }
 
 ACTION ActionClickWel2(void){
 
-    return BuildingInfoYESBox(BUILD_WEL2);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(EXIT == MessageBox(
+			GetStringBuilding(castle->race, BUILD_WEL2),
+			GetStringDescriptionsBuilding(castle->race, BUILD_WEL2),
+			FONT_BIG,
+			OK )) return EXIT;
+    
+    return NONE;
 }
 
 ACTION ActionClickDwelling1(void){
@@ -742,8 +749,7 @@ ACTION ActionClickDwelling1(void){
 	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
 	    RedrawCastleMonster();
 	    RedrawCastleInfoResource();
-    }else
-	ErrorDialogRecrutMonster(castle);
+    }
 
     return NONE;
 }
@@ -759,8 +765,7 @@ ACTION ActionClickDwelling2(void){
 	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
 	    RedrawCastleMonster();
 	    RedrawCastleInfoResource();
-    }else
-	ErrorDialogRecrutMonster(castle);
+    }
 
     return NONE;
 }
@@ -776,8 +781,7 @@ ACTION ActionClickDwelling3(void){
 	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
 	    RedrawCastleMonster();
 	    RedrawCastleInfoResource();
-    }else
-	ErrorDialogRecrutMonster(castle);
+    }
 
     return NONE;
 }
@@ -793,8 +797,7 @@ ACTION ActionClickDwelling4(void){
 	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
 	    RedrawCastleMonster();
 	    RedrawCastleInfoResource();
-    }else
-	ErrorDialogRecrutMonster(castle);
+    }
 
     return NONE;
 }
@@ -810,8 +813,7 @@ ACTION ActionClickDwelling5(void){
 	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
 	    RedrawCastleMonster();
 	    RedrawCastleInfoResource();
-    }else
-	ErrorDialogRecrutMonster(castle);
+    }
 
     return NONE;
 }
@@ -827,8 +829,7 @@ ACTION ActionClickDwelling6(void){
 	DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) ){
 	    RedrawCastleMonster();
 	    RedrawCastleInfoResource();
-    }else
-	ErrorDialogRecrutMonster(castle);
+    }
 
     return NONE;
 }
@@ -838,64 +839,138 @@ ACTION ActionClickRCastle(void){
     const S_CASTLE *castle = GetCurrentCastle();
     
     if(castle->building & BUILD_CASTLE)
-	return BuildingInfoBox(BUILD_CASTLE);
+	return MessageBox(
+			    GetStringBuilding(castle->race, BUILD_CASTLE),
+			    GetStringDescriptionsBuilding(castle->race, BUILD_CASTLE),
+			    FONT_BIG,
+			    NONE );
 
-    return BuildingInfoBox(BUILD_TENT);
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_TENT),
+			GetStringDescriptionsBuilding(castle->race, BUILD_TENT),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRCaptain(void){
 
-    return BuildingInfoBox(BUILD_CAPTAIN);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_CAPTAIN),
+			GetStringDescriptionsBuilding(castle->race, BUILD_CAPTAIN),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRMageGuild(void){
 
-    return BuildingInfoBox(BUILD_MAGEGUILD1);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_MAGEGUILD1),
+			GetStringDescriptionsBuilding(castle->race, BUILD_MAGEGUILD1),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRStatue(void){
 
-    return BuildingInfoBox(BUILD_STATUE);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_STATUE),
+			GetStringDescriptionsBuilding(castle->race, BUILD_STATUE),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRWell(void){
 
-    return BuildingInfoBox(BUILD_WELL);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_WELL),
+			GetStringDescriptionsBuilding(castle->race, BUILD_WELL),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRThievesGuild(void){
 
-    return BuildingInfoBox(BUILD_THIEVESGUILD);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_THIEVESGUILD),
+			GetStringDescriptionsBuilding(castle->race, BUILD_THIEVESGUILD),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRTavern(void){
 
-    return BuildingInfoBox(BUILD_TAVERN);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_TAVERN),
+			GetStringDescriptionsBuilding(castle->race, BUILD_TAVERN),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRDock(void){
 
-    return BuildingInfoBox(BUILD_SHIPYARD);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_SHIPYARD),
+			GetStringDescriptionsBuilding(castle->race, BUILD_SHIPYARD),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRMarketplace(void){
 
-    return BuildingInfoBox(BUILD_MARKETPLACE);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_MARKETPLACE),
+			GetStringDescriptionsBuilding(castle->race, BUILD_MARKETPLACE),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRMoat(void){
 
-    return BuildingInfoBox(BUILD_MOAT);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_MOAT),
+			GetStringDescriptionsBuilding(castle->race, BUILD_MOAT),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRSpec(void){
 
-    return BuildingInfoBox(BUILD_SPEC);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_SPEC),
+			GetStringDescriptionsBuilding(castle->race, BUILD_SPEC),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRWel2(void){
 
-    return BuildingInfoBox(BUILD_WEL2);
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return MessageBox(
+			GetStringBuilding(castle->race, BUILD_WEL2),
+			GetStringDescriptionsBuilding(castle->race, BUILD_WEL2),
+			FONT_BIG,
+			NONE );
 }
 
 ACTION ActionClickRDwelling1(void){
@@ -1847,7 +1922,7 @@ ACTION ActionCastleClickTavern(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Tavern ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_TAVERN, OK|CANCEL)){
 
 	BuildTavern(castle);
 	EnableCastleUpdateBuilding();
@@ -1862,7 +1937,7 @@ ACTION ActionCastleClickStatue(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Statue ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_STATUE, OK|CANCEL)){
 
 	BuildStatue(castle);
 	EnableCastleUpdateBuilding();
@@ -1877,7 +1952,7 @@ ACTION ActionCastleClickWell(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Well ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_WELL, OK|CANCEL)){
 
 	BuildWell(castle);
 	EnableCastleUpdateBuilding();
@@ -1892,7 +1967,7 @@ ACTION ActionCastleClickMoat(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Moat ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_MOAT, OK|CANCEL)){
 
 	BuildMoat(castle);
 	EnableCastleUpdateBuilding();
@@ -1907,7 +1982,7 @@ ACTION ActionCastleClickMarketplace(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Marketplace ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_MARKETPLACE, OK|CANCEL)){
 
 	BuildMarketplace(castle);
 	EnableCastleUpdateBuilding();
@@ -1922,7 +1997,7 @@ ACTION ActionCastleClickThievesGuild(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Thieves Guild ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_THIEVESGUILD, OK|CANCEL)){
 
 	BuildThievesGuild(castle);
 	EnableCastleUpdateBuilding();
@@ -1937,7 +2012,7 @@ ACTION ActionCastleClickLeftTurret(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Left Turret ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_LEFTTURRET, OK|CANCEL)){
 
 	BuildLeftTurret(castle);
 	EnableCastleUpdateBuilding();
@@ -1952,7 +2027,7 @@ ACTION ActionCastleClickRightTurret(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Right Turret ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_RIGHTTURRET, OK|CANCEL)){
 
 	BuildRightTurret(castle);
 	EnableCastleUpdateBuilding();
@@ -1966,18 +2041,36 @@ ACTION ActionCastleClickRightTurret(void){
 ACTION ActionCastleClickMageGuild(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
-
-    char message[32];
-    sprintf(message, "Build Mage Guild Level %d ?", GetMageGuildLevel(castle) + 1);
+    ACTION result = NONE;
     
-    if(YES == MessageBox(message, FONT_BIG)){
+    switch(GetMageGuildLevel(castle)){
+	case MAGIC_NONE:
+	    result = BuyBuildingBox(castle->race, BUILD_MAGEGUILD1, OK|CANCEL);
+	    break;
+	case MAGIC_LEVEL1:
+	    result = BuyBuildingBox(castle->race, BUILD_MAGEGUILD2, OK|CANCEL);
+	    break;
+	case MAGIC_LEVEL2:
+	    result = BuyBuildingBox(castle->race, BUILD_MAGEGUILD3, OK|CANCEL);
+	    break;
+	case MAGIC_LEVEL3:
+	    result = BuyBuildingBox(castle->race, BUILD_MAGEGUILD4, OK|CANCEL);
+	    break;
+	case MAGIC_LEVEL4:
+	    result = BuyBuildingBox(castle->race, BUILD_MAGEGUILD5, OK|CANCEL);
+	    break;
+	case MAGIC_LEVEL5:
+	    break;
+    }
+
+    if( OK == result){
 
 	BuildMageGuild(castle);
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
     }
-
+    
     return NONE;
 }
 
@@ -1985,7 +2078,7 @@ ACTION ActionCastleClickShipyard(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(YES == MessageBox("Build Shipyard ?", FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_SHIPYARD, OK|CANCEL)){
 
 	BuildShipyard(castle);
 	EnableCastleUpdateBuilding();
@@ -2000,10 +2093,7 @@ ACTION ActionCastleClickWel2(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    char message[32];
-    sprintf(message, "Build %s ?", GetStringBuilding(castle->race, BUILD_WEL2));
-    
-    if(YES == MessageBox(message, FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_WEL2, OK|CANCEL)){
 
 	BuildWel2(castle);
 	EnableCastleUpdateBuilding();
@@ -2018,10 +2108,7 @@ ACTION ActionCastleClickSpec(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    char message[32];
-    sprintf(message, "Build %s ?", GetStringBuilding(castle->race, BUILD_SPEC));
-    
-    if(YES == MessageBox(message, FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_SPEC, OK|CANCEL)){
 
 	BuildSpec(castle);
 	EnableCastleUpdateBuilding();
@@ -2036,11 +2123,7 @@ ACTION ActionCastleClickDwelling1(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    char message[32];
-
-    sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_MONSTER1));
-
-    if(YES == MessageBox(message, FONT_BIG)){
+    if(OK == BuyDwellingBox(castle->race, DWELLING_MONSTER1, OK|CANCEL)){
 
 	BuildDwelling1(castle);
 	CastleIncreaseArmy(castle, DWELLING_MONSTER1, GetMonsterGrown(GetMonsterFromCastle(castle, 1)));
@@ -2055,15 +2138,14 @@ ACTION ActionCastleClickDwelling1(void){
 ACTION ActionCastleClickDwelling2(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
-
-    char message[32];
+    ACTION result;
 
     if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_UPGRADE2));
+	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE2, OK|CANCEL);
     else
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	result = BuyDwellingBox(castle->race, DWELLING_MONSTER2, OK|CANCEL);
 
-    if(YES == MessageBox(message, FONT_BIG)){
+    if(OK == result){
 
 	if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
 	    BuildUpgrade2(castle);
@@ -2082,15 +2164,14 @@ ACTION ActionCastleClickDwelling2(void){
 ACTION ActionCastleClickDwelling3(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
-
-    char message[32];
+    ACTION result;
 
     if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_UPGRADE3));
+	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE3, OK|CANCEL);
     else
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	result = BuyDwellingBox(castle->race, DWELLING_MONSTER3, OK|CANCEL);
 
-    if(YES == MessageBox(message, FONT_BIG)){
+    if(OK == result){
 
 	if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
 	    BuildUpgrade3(castle);
@@ -2109,15 +2190,14 @@ ACTION ActionCastleClickDwelling3(void){
 ACTION ActionCastleClickDwelling4(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
-
-    char message[32];
+    ACTION result;
 
     if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_UPGRADE4));
+	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE4, OK|CANCEL);
     else
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	result = BuyDwellingBox(castle->race, DWELLING_MONSTER4, OK|CANCEL);
 
-    if(YES == MessageBox(message, FONT_BIG)){
+    if(OK == result){
 
 	if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
 	    BuildUpgrade4(castle);
@@ -2136,15 +2216,14 @@ ACTION ActionCastleClickDwelling4(void){
 ACTION ActionCastleClickDwelling5(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
-
-    char message[32];
+    ACTION result;
 
     if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_UPGRADE5));
+	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE5, OK|CANCEL);
     else
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	result = BuyDwellingBox(castle->race, DWELLING_MONSTER5, OK|CANCEL);
 
-    if(YES == MessageBox(message, FONT_BIG)){
+    if(OK == result){
 
 	if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
 	    BuildUpgrade5(castle);
@@ -2163,17 +2242,16 @@ ACTION ActionCastleClickDwelling5(void){
 ACTION ActionCastleClickDwelling6(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
-
-    char message[32];
+    ACTION result;
 
     if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
+	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE7, OK|CANCEL);
     else if(castle->dwelling & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE6, OK|CANCEL);
     else
-	sprintf(message, "Build %s ?", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+	result = BuyDwellingBox(castle->race, DWELLING_MONSTER6, OK|CANCEL);
 
-    if(YES == MessageBox(message, FONT_BIG)){
+    if(OK == result){
 
 	if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
 	    BuildUpgrade7(castle);
@@ -2194,10 +2272,7 @@ ACTION ActionCastleClickCaptain(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    char message[32];
-    sprintf(message, "Build %s ?", GetStringBuilding(KNIGHT, BUILD_CAPTAIN));
-    
-    if(YES == MessageBox(message, FONT_BIG)){
+    if( OK == BuyBuildingBox(castle->race, BUILD_CAPTAIN, OK|CANCEL)){
 
 	BuildCaptain(castle);
 	EnableCastleUpdateBuilding();
@@ -2228,3 +2303,183 @@ ACTION ActionCastleLClickRecrutSecondaryHeroes(void){
     return NONE;
 }
 
+ACTION ActionCastleRClickTavern(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_TAVERN, NONE);
+}
+
+ACTION ActionCastleRClickStatue(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_STATUE, NONE);
+}
+
+ACTION ActionCastleRClickWell(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_WELL, NONE);
+}
+
+ACTION ActionCastleRClickMoat(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_MOAT, NONE);
+}
+
+ACTION ActionCastleRClickMarketplace(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_MARKETPLACE, NONE);
+}
+
+ACTION ActionCastleRClickThievesGuild(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_THIEVESGUILD, NONE);
+}
+
+ACTION ActionCastleRClickLeftTurret(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_LEFTTURRET, NONE);
+}
+
+ACTION ActionCastleRClickRightTurret(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_RIGHTTURRET, NONE);
+}
+
+ACTION ActionCastleRClickMageGuild(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    switch(GetMageGuildLevel(castle)){
+	case MAGIC_NONE:
+	    BuyBuildingBox(castle->race, BUILD_MAGEGUILD1, NONE);
+	    break;
+	case MAGIC_LEVEL1:
+	    BuyBuildingBox(castle->race, BUILD_MAGEGUILD2, NONE);
+	    break;
+	case MAGIC_LEVEL2:
+	    BuyBuildingBox(castle->race, BUILD_MAGEGUILD3, NONE);
+	    break;
+	case MAGIC_LEVEL3:
+	    BuyBuildingBox(castle->race, BUILD_MAGEGUILD4, NONE);
+	    break;
+	case MAGIC_LEVEL4:
+	case MAGIC_LEVEL5:
+	    BuyBuildingBox(castle->race, BUILD_MAGEGUILD5, NONE);
+	    break;
+    }
+    
+    return NONE;
+}
+
+ACTION ActionCastleRClickShipyard(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_SHIPYARD, NONE);
+}
+
+ACTION ActionCastleRClickWel2(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_WEL2, NONE);
+}
+
+ACTION ActionCastleRClickSpec(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_SPEC, NONE);
+}
+
+ACTION ActionCastleRClickCaptain(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    return BuyBuildingBox(castle->race, BUILD_CAPTAIN, NONE);
+}
+
+ACTION ActionCastleRClickDwelling1(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    BuyDwellingBox(castle->race, DWELLING_MONSTER1, NONE);
+
+    return NONE;
+}
+
+ACTION ActionCastleRClickDwelling2(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
+	BuyDwellingBox(castle->race, DWELLING_UPGRADE2, NONE);
+    else
+	BuyDwellingBox(castle->race, DWELLING_MONSTER2, NONE);
+
+    return NONE;
+}
+
+ACTION ActionCastleRClickDwelling3(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
+	BuyDwellingBox(castle->race, DWELLING_UPGRADE3, NONE);
+    else
+	BuyDwellingBox(castle->race, DWELLING_MONSTER3, NONE);
+
+    return NONE;
+}
+
+ACTION ActionCastleRClickDwelling4(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
+	BuyDwellingBox(castle->race, DWELLING_UPGRADE4, NONE);
+    else
+	BuyDwellingBox(castle->race, DWELLING_MONSTER4, NONE);
+
+    return NONE;
+}
+
+ACTION ActionCastleRClickDwelling5(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
+	BuyDwellingBox(castle->race, DWELLING_UPGRADE5, NONE);
+    else
+	BuyDwellingBox(castle->race, DWELLING_MONSTER5, NONE);
+
+    return NONE;
+}
+
+ACTION ActionCastleRClickDwelling6(void){
+
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
+	BuyDwellingBox(castle->race, DWELLING_UPGRADE7, NONE);
+    else if(castle->dwelling & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
+	BuyDwellingBox(castle->race, DWELLING_UPGRADE6, NONE);
+    else
+	BuyDwellingBox(castle->race, DWELLING_MONSTER6, NONE);
+
+    return NONE;
+}

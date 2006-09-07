@@ -256,6 +256,30 @@ void KingdomWasteResource(E_COLORS color, const S_PAYMENT *payment){
 	    kingdom[color].gems -= payment->gems;
 }
 
+void KingdomProfitResource(E_COLORS color, const S_PAYMENT *payment){
+
+    if(payment->gold)
+	    kingdom[color].gold += payment->gold;
+
+    if(payment->wood)
+	    kingdom[color].wood += payment->wood;
+
+    if(payment->ore)
+	    kingdom[color].ore += payment->ore;
+
+    if(payment->mercury)
+	    kingdom[color].mercury += payment->mercury;
+
+    if(payment->crystal)
+	    kingdom[color].crystal += payment->crystal;
+
+    if(payment->sulfur)
+	    kingdom[color].sulfur += payment->sulfur;
+
+    if(payment->gems)
+	    kingdom[color].gems += payment->gems;
+}
+
 BOOL KingdomAllowPayment(E_COLORS color, const S_PAYMENT *payment){
 
     if( kingdom[color].gold < payment->gold ||
@@ -322,7 +346,56 @@ Uint32 GetKingdomResource(E_COLORS color, E_RESOURCE resource){
     return 0;
 }
 
-Uint8 GetCountMarketplace(E_COLORS color){
+Uint8 GetKingdomCountMarketplace(E_COLORS color){
 
-    return 1;
+    Uint8 result = 0;
+
+    S_CASTLE *castle = GetFirstCastle(color);
+    
+    if(! castle) return 0;
+    
+    while(castle){
+
+	if(ALREADY_BUILD == AllowBuildMarketplace(castle)) ++result;
+
+	castle = GetNextCastle(color);
+    }
+
+    return result;
+}
+
+Uint8 GetKingdomCountCastle(E_COLORS color){
+
+    Uint8 result = 0;
+
+    S_CASTLE *castle = GetFirstCastle(color);
+    
+    if(! castle) return 0;
+    
+    while(castle){
+
+	if(castle->building & BUILD_CASTLE) ++result;
+
+	castle = GetNextCastle(color);
+    }
+
+    return result;
+}
+
+Uint8 GetKingdomCountTown(E_COLORS color){
+
+    Uint8 result = 0;
+
+    S_CASTLE *castle = GetFirstCastle(color);
+    
+    if(! castle) return 0;
+    
+    while(castle){
+
+	if(!(castle->building & BUILD_CASTLE)) ++result;
+
+	castle = GetNextCastle(color);
+    }
+
+    return result;
 }

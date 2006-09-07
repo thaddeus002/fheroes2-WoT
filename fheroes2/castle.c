@@ -61,16 +61,19 @@ void RedrawBottomBar(void);
 void RedrawRamkaCastleName(void);
 void RedrawHeroesMonster(E_NAMEHEROES);
 void UpdateCastleBuilding(void);
+void RedrawNNNNCastle(const S_CASTLE *);
 
 ACTION ActionCASTLELOOP(INTERFACEACTION *); 
 
 ACTION ActionExitCastle(void); 
 ACTION ActionLeftCastle(void); 
 ACTION ActionRightCastle(void); 
-ACTION ActionClickRedistributeMonster(void);
+ACTION ActionClickRedistributeMonster(Uint8, BOOL);
 ACTION ActionClickCastleMonster(void);
+ACTION ActionClickRCastleMonster(void);
 ACTION ActionClickCastleMonsterEmpty(Uint8);
 ACTION ActionClickHeroesMonster(void);
+ACTION ActionClickRHeroesMonster(void);
 ACTION ActionClickHeroesMonsterEmpty(Uint8);
 ACTION ActionClickHeroes(void);
 
@@ -235,13 +238,42 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].dwelling = DWELLING_MONSTER1 | DWELLING_MONSTER2; // DWELLING_MONSTER1 DWELLING_MONSTER2 DWELLING_MONSTER3 DWELLING_MONSTER4 DWELLING_MONSTER5 DWELLING_MONSTER6 DWELLING_UPGRADE2 DWELLING_UPGRADE3 DWELLING_UPGRADE4 DWELLING_UPGRADE5 DWELLING_UPGRADE6
 	}
 
-	if(0 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL1);
-	if(1 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL2);
-	if(2 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL3);
-	if(3 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL4);
-	if(4 < ptr->magicTower) FillMageGuildLevel(&ptrCastle[countCastle].mageGuild, &ptrCastle[countCastle], MAGIC_LEVEL5);
-	
+    Uint8 i;
+    
+    for(i = 0; i < CASTLESPELL_LEVEL1; ++i) ptrCastle[countCastle].mageGuild.level1[i] = SPELLNONE;
+    for(i = 0; i < CASTLESPELL_LEVEL2; ++i) ptrCastle[countCastle].mageGuild.level2[i] = SPELLNONE;
+    for(i = 0; i < CASTLESPELL_LEVEL3; ++i) ptrCastle[countCastle].mageGuild.level3[i] = SPELLNONE;
+    for(i = 0; i < CASTLESPELL_LEVEL4; ++i) ptrCastle[countCastle].mageGuild.level4[i] = SPELLNONE;
+    for(i = 0; i < CASTLESPELL_LEVEL5; ++i) ptrCastle[countCastle].mageGuild.level5[i] = SPELLNONE;
 
+    if(0 < ptr->magicTower){
+	FillSpellLevel1(ptrCastle[countCastle].race, ptrCastle[countCastle].mageGuild.level1);
+	ptrCastle[countCastle].building |= BUILD_MAGEGUILD1;
+    }
+    if(1 < ptr->magicTower){
+	FillSpellLevel2(ptrCastle[countCastle].race, ptrCastle[countCastle].mageGuild.level2);
+	ptrCastle[countCastle].building |= BUILD_MAGEGUILD2;
+    }
+    if(2 < ptr->magicTower){
+	FillSpellLevel3(ptrCastle[countCastle].race, ptrCastle[countCastle].mageGuild.level3);
+	ptrCastle[countCastle].building |= BUILD_MAGEGUILD3;
+    }
+    if(3 < ptr->magicTower){
+	FillSpellLevel4(ptrCastle[countCastle].race, ptrCastle[countCastle].mageGuild.level4);
+	ptrCastle[countCastle].building |= BUILD_MAGEGUILD4;
+    }
+    if(4 < ptr->magicTower){
+	FillSpellLevel5(ptrCastle[countCastle].race, ptrCastle[countCastle].mageGuild.level5);
+	ptrCastle[countCastle].building |= BUILD_MAGEGUILD5;
+    }
+    // дополняем магией из библиотеки
+    if(WIZARD == ptrCastle[countCastle].race && BUILD_SPEC & ptrCastle[countCastle].building){
+	if(0 < ptr->magicTower) FillSpellLevel1(WIZARD, ptrCastle[countCastle].mageGuild.level1);
+	if(1 < ptr->magicTower) FillSpellLevel2(WIZARD, ptrCastle[countCastle].mageGuild.level2);
+	if(2 < ptr->magicTower) FillSpellLevel3(WIZARD, ptrCastle[countCastle].mageGuild.level3);
+	if(3 < ptr->magicTower) FillSpellLevel4(WIZARD, ptrCastle[countCastle].mageGuild.level4);
+	if(4 < ptr->magicTower) FillSpellLevel5(WIZARD, ptrCastle[countCastle].mageGuild.level5);
+    }
 	if(ptr->customTroops){
 	    ptrCastle[countCastle].army[0].monster = ptr->monster1;
 	    ptrCastle[countCastle].army[1].monster = ptr->monster2;
@@ -304,51 +336,35 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 	    ptrCastle[countCastle].army[4].count = 0;
 	}
 
-    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER1)
-	ptrCastle[countCastle].monster[0] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 1));
-    else
-	ptrCastle[countCastle].monster[0] = 0;
+    ptrCastle[countCastle].monster[0] = (ptrCastle[countCastle].dwelling & DWELLING_MONSTER1 ?
+	 GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 1)) : 0);
 
-    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER2)
-	ptrCastle[countCastle].monster[1] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 2));
-    else
-	ptrCastle[countCastle].monster[1] = 0;
+    ptrCastle[countCastle].monster[1] = (ptrCastle[countCastle].dwelling & DWELLING_MONSTER2 ?
+	GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 2)) : 0);
 
-    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER3)
-	ptrCastle[countCastle].monster[2] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 3));
-    else
-	ptrCastle[countCastle].monster[2] = 0;
+    ptrCastle[countCastle].monster[2] = (ptrCastle[countCastle].dwelling & DWELLING_MONSTER3 ?
+	GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 3)) : 0);
 
-    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER4)
-	ptrCastle[countCastle].monster[3] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 4));
-    else
-	ptrCastle[countCastle].monster[3] = 0;
+    ptrCastle[countCastle].monster[3] = (ptrCastle[countCastle].dwelling & DWELLING_MONSTER4 ?
+	GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 4)) : 0);
 
-    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER5)
-	ptrCastle[countCastle].monster[4] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 5));
-    else
-	ptrCastle[countCastle].monster[4] = 0;
+    ptrCastle[countCastle].monster[4] = (ptrCastle[countCastle].dwelling & DWELLING_MONSTER5 ?
+	GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 5)) : 0);
 
-    if(ptrCastle[countCastle].dwelling & DWELLING_MONSTER6)
-	ptrCastle[countCastle].monster[5] = GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 6));
-    else
-	ptrCastle[countCastle].monster[5] = 0;
+    ptrCastle[countCastle].monster[5] = (ptrCastle[countCastle].dwelling & DWELLING_MONSTER6 ?
+	GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[countCastle], 6)) : 0);
 
     if(ptr->capitan) ptrCastle[countCastle].building |= BUILD_CAPTAIN;
 
-    if(ptr->castle)
-        ptrCastle[countCastle].building |= BUILD_CASTLE;
+    if(ptr->castle) ptrCastle[countCastle].building |= BUILD_CASTLE;
 
-    if(ptr->allowCastle)
-        ptrCastle[countCastle].allowCastle = FALSE;
-    else
-        ptrCastle[countCastle].allowCastle = TRUE;
+    ptrCastle[countCastle].allowCastle = (ptr->allowCastle ? FALSE : TRUE);
     
     ptrCastle[countCastle].boat = FALSE;
     ptrCastle[countCastle].af = SPREAD;
 
-    if(ax < 2) ptrCastle[countCastle].pos.x = 0; else ptrCastle[countCastle].pos.x = ax - 2;
-    if(ay < 3) ptrCastle[countCastle].pos.y = 0; else ptrCastle[countCastle].pos.y = ay - 3;
+    ptrCastle[countCastle].pos.x = (ax < 2 ? 0 : ax - 2);
+    ptrCastle[countCastle].pos.y = (ay < 3 ? 0 : ay - 3);
 
     ptrCastle[countCastle].ax = ax;
     ptrCastle[countCastle].ay = ay;
@@ -380,7 +396,7 @@ E_RACE GetRaceRNDCastle(Uint8 ax, Uint8 ay){
     rect.h = 5;
 
     for(i = 0; i < countCastle; ++i){
-	if(ptrCastle[i].pos.x > 3){ rect.x = ptrCastle[i].pos.x - 3; }else{ rect.x = 0; }
+	rect.x = (ptrCastle[i].pos.x > 3 ? ptrCastle[i].pos.x - 3 : 0);
 	rect.y = ptrCastle[i].pos.y;
 	if(ValidPoint(&rect, ax, ay))   return ptrCastle[i].race;
     }
@@ -527,7 +543,6 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     rectCur.y += rectCur.h;
     rectCur.w = image->w;
     rectCur.h = image->h;
-    //SDL_BlitSurface(image, NULL, video, &rectCur);
     cx = rectCur.x;
     cy = rectCur.y;
 
@@ -600,7 +615,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    break;
     }
     image = GetICNSprite(&sprite);
-    if(GetIntValue(VIDEOMODE)){ rectCur.x = rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5; }else{ rectCur.x = rectBack.x + 5; }
+    rectCur.x = (GetIntValue(VIDEOMODE) ? rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5 : rectBack.x + 5);
     rectCur.y = cy + 6;
     rectCur.w = image->w;
     rectCur.h = image->h;
@@ -661,7 +676,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		ZeroINTERFACEACTION(&action);
 		action.rect = rectCur;
 		action.mouseEvent = MOUSE_RCLICK;
-		action.pf = ActionClickRedistributeMonster;
+		action.pf = ActionClickRCastleMonster;
 		AddActionEvent(&castlact, &action);
 
 		// рисуем монстров
@@ -698,7 +713,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    ZeroINTERFACEACTION(&action);
 	    action.rect = rectCur;
 	    action.mouseEvent = MOUSE_RCLICK;
-	    action.pf = ActionClickRedistributeMonster;
+	    action.pf = ActionClickRCastleMonster;
 	    AddActionEvent(&castlact, &action);
 	}
     }
@@ -707,7 +722,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     if(heroes){
 	FillSPRITE(&sprite, HeroesBigNamePortrait(castleHeroes), 0);
 	// наведение мыши
-	if(GetIntValue(VIDEOMODE)){ rectCur.x = rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5; }else{ rectCur.x = rectBack.x + 5; }
+	rectCur.x = (GetIntValue(VIDEOMODE) ? rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5 : rectBack.x + 5);
 	rectCur.y = cy + image->w - 2;
 	rectCur.w = image->w;
 	rectCur.h = image->h;
@@ -730,7 +745,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	FillSPRITE(&sprite, "STRIP.ICN", 3);
 
     image = GetICNSprite(&sprite);
-    if(GetIntValue(VIDEOMODE)){ rectCur.x = rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5; }else{ rectCur.x = rectBack.x + 5; }
+    rectCur.x = (GetIntValue(VIDEOMODE) ? rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5 : rectBack.x + 5);
     rectCur.y = cy + image->w - 2;
     rectCur.w = image->w;
     rectCur.h = image->h;
@@ -793,7 +808,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		ZeroINTERFACEACTION(&action);
 		action.rect = rectCur;
 		action.mouseEvent = MOUSE_RCLICK;
-		action.pf = ActionClickRedistributeMonster;
+		action.pf = ActionClickRHeroesMonster;
 		AddActionEvent(&castlact, &action);
 
 		// рисуем монстров
@@ -830,7 +845,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 		ZeroINTERFACEACTION(&action);
 		action.rect = rectCur;
 		action.mouseEvent = MOUSE_RCLICK;
-		action.pf = ActionClickRedistributeMonster;
+		action.pf = ActionClickRHeroesMonster;
 		AddActionEvent(&castlact, &action);
 	    }
 	cy -= 99;
@@ -851,7 +866,6 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     rectCur.y = cy + 166;
     rectCur.w = image->w;
     rectCur.h = image->h;
-    //SDL_BlitSurface(image, NULL, video, &rectCur);
     // наведение мыши
     ZeroINTERFACEACTION(&action);
     action.rect = rectCur;
@@ -867,163 +881,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     action.pf = ActionExitCastle;
     AddActionEvent(&castlact, &action);
 
-    switch(castle->race){
-
-	case KNIGHT:
-	    DrawKNGTCastle(&castanim, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawKNGTCapitan(&castanim, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawKNGTWel2(&castanim, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(&castanim, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawKNGTThievesGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(&castanim, &castlact);
-	    if(GetMageGuildLevel(castle)) DrawKNGTMageGuild(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawKNGTDwelling3(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawKNGTDwelling4(&castanim, &castlact);
-	    if(castle->building & BUILD_WELL) DrawKNGTWell(&castanim, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(&castanim, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(&castanim, &castlact);
-	    else if(CastleNearOcean(castle)) DrawKNGTExt0(&castanim, &castlact);
-	    //DrawKNGTExt1(&castanim, &castlact); // развилка дорог?
-	    //DrawKNGTExt2(&castanim, &castlact); // развилка дорог?
-	    break;
-
-	case BARBARIAN:
-	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(&castanim, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(&castanim, &castlact);
-	    if(GetMageGuildLevel(castle)){
-		DrawBRBNMageGuild(&castanim, &castlact);
-		DrawBRBNExt2(&castanim, &castlact);
-	    }
-	    if(castle->building & BUILD_CAPTAIN) DrawBRBNCapitan(&castanim, &castlact);
-	    DrawBRBNCastle(&castanim, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawBRBNThievesGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(&castanim, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawBRBNDwelling2(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &castlact);
-	    if(castle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(&castanim, &castlact);
-	    else if(CastleNearOcean(castle)) DrawBRBNExt0(&castanim, &castlact);
-	    DrawBRBNExt1(&castanim, &castlact);
-	    //DrawBRBNExt3(&castanim, &castlact); // развилка дорог?
-	    break;
-
-	case SORCERESS:
-	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(&castanim, &castlact);
-	    if(GetMageGuildLevel(castle)) DrawSCRSMageGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawSCRSCapitan(&castanim, &castlact);
-	    DrawSCRSCastle(&castanim, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(&castanim, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(&castanim, &castlact);
-	    else if(CastleNearOcean(castle)) DrawSCRSExt0(&castanim, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawSCRSThievesGuild(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(&castanim, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(&castanim, &castlact);
-	    if(castle->building & BUILD_STATUE && castle->building & BUILD_WEL2) DrawSCRSExt1(&castanim, &castlact);
-	    else if(castle->building & BUILD_STATUE) DrawSCRSStatue(&castanim, &castlact);
-	    else if(castle->building & BUILD_WEL2) DrawSCRSWel2(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawSCRSDwelling4(&castanim, &castlact);
-	    if(castle->building & BUILD_WELL) DrawSCRSWell(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawSCRSDwelling5(&castanim, &castlact);
-	break;
-
-	case NECROMANCER:
-	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(&castanim, &castlact);
-	    DrawNCRMCastle(&castanim, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawNCRMCapitan(&castanim, &castlact);
-    	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(&castanim, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(&castanim, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(&castanim, &castlact);
-	    else if(CastleNearOcean(castle)) DrawNCRMExt0(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawNCRMThievesGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(&castanim, &castlact);
-	    if(GetMageGuildLevel(castle)) DrawNCRMMageGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(&castanim, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(&castanim, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(&castanim, &castlact);
-	    if(castle->building & BUILD_WELL) DrawNCRMWell(&castanim, &castlact);
-	    break;
-
-	case WARLOCK:
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawWRLKDwelling5(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawWRLKDwelling3(&castanim, &castlact);
-	    DrawWRLKCastle(&castanim, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawWRLKCapitan(&castanim, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
-	    else if(CastleNearOcean(castle)) DrawWRLKExt0(&castanim, &castlact);
-	    if(GetMageGuildLevel(castle)) DrawWRLKMageGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(&castanim, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawWRLKWel2(&castanim, &castlact);
-	    if(castle->building & BUILD_SPEC) DrawWRLKSpec(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawWRLKDwelling4(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawWRLKDwelling2(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawWRLKDwelling6(&castanim, &castlact);
-	    if(castle->building & BUILD_WELL) DrawWRLKWell(&castanim, &castlact);
-	break;
-
-	case WIZARD:
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawWZRDDwelling6(&castanim, &castlact);
-	    DrawWZRDCastle(&castanim, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(&castanim, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(&castanim, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawWZRDCapitan(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(&castanim, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawWZRDThievesGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(&castanim, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(&castanim, &castlact);
-	    else if(CastleNearOcean(castle)) DrawWZRDExt0(&castanim, &castlact);
-	    if(castle->building & BUILD_WELL) DrawWZRDWell(&castanim, &castlact);
-	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(&castanim, &castlact);
-	    if(GetMageGuildLevel(castle)) DrawWZRDMageGuild(&castanim, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(&castanim, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(&castanim, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawWZRDMarketplace(&castanim, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawWZRDWel2(&castanim, &castlact);
-	break;
-	
-	default:
-	return NONE;
-	break;
-    }
+    RedrawNNNNCastle(castle);
 
     // наименование замка
     FillSPRITE(&sprite, "TOWNNAME.ICN", 0);
@@ -1037,12 +895,10 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     }
     rectCur.w = image->w;
     rectCur.h = image->h;
-    //SDL_BlitSurface(image, NULL, video, &rectCur);
     rectCur.x = rectCur.x + 90 - GetLengthText(castle->name, FONT_SMALL) / 2 ;
     rectCur.y = rectCur.y + 1;
     rectCur.w = GetLengthText(castle->name, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    //PrintText(video, &rectCur, castle->name, FONT_SMALL);
     RedrawRamkaCastleName();
                     
     SetCursor(CURSOR_POINTER);
@@ -1279,7 +1135,7 @@ void RedrawCastleAnimation(void){
 	}
 	
 	if(NULL == (ptr->background = SDL_CreateRGBSurface(SDL_SWSURFACE, ptr->rect[animationFrame % ptr->count].w, ptr->rect[animationFrame % ptr->count].h, 16, 0, 0, 0, 0))){
-            fprintf(stderr, "RedrawMenuAnimation: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), ptr->rect[animationFrame % ptr->count].w, ptr->rect[animationFrame % ptr->count].h);
+            fprintf(stderr, "RedrawCastleAnimation: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), ptr->rect[animationFrame % ptr->count].w, ptr->rect[animationFrame % ptr->count].h);
             return;
         }
 
@@ -1345,28 +1201,79 @@ void RedrawBottomBar(void){
     SDL_Flip(video);
 }
 
-ACTION ActionClickRedistributeMonster(void){
+ACTION ActionClickRCastleMonster(void){
 
     Sint32 mx, my;
     SDL_Surface *video = SDL_GetVideoSurface();
-    S_HEROES *heroes = NULL;
+    const S_CASTLE *castle = GetCurrentCastle();
+    ACTION result;
+    
+    SDL_GetMouseState(&mx, &my);
 
     // верхний левый угол начала
     Uint16 cx = video->w / 2 - 208;
-    Uint16 cy2 = video->h / 2 + 121;
-    Uint16 res = 0;
+
+    Uint8 index = (Uint16) (mx - cx) / 88;
+
+    CursorOff();
+    if(backMonsterCursor.use) SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+    CursorOn();
     
+    // если монстр показываем инфо
+    if(MONSTERNONE != castle->army[index].monster) result =  ShowArmyInfoRight(&castle->army[index], NULL, castle);
+    // иначе диалог деления
+    else result = ActionClickRedistributeMonster(index, FALSE);
+
+    backMonsterCursor.use = FALSE;
+
+    return result;
+}
+
+ACTION ActionClickRHeroesMonster(void){
+
+    Sint32 mx, my;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    const S_CASTLE *castle = GetCurrentCastle();
+    S_HEROES *heroes = GetStatHeroes(heroesName);
+    ACTION result;
+
+    SDL_GetMouseState(&mx, &my);
+
+    // верхний левый угол начала
+    Uint16 cx = video->w / 2 - 208;
+
+    Uint8 index = (Uint16) (mx - cx) / 88;
+
+    CursorOff();
+    if(backMonsterCursor.use) SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+    CursorOn();
+
+    // если монстр показываем инфо
+    if(MONSTERNONE != castle->army[index].monster) result =  ShowArmyInfoRight(&castle->army[index], heroes, castle);
+    // иначе диалог деления
+    else result = ActionClickRedistributeMonster(index, TRUE);
+
+    backMonsterCursor.use = FALSE;
+
+    return result;
+}
+
+ACTION ActionClickRedistributeMonster(Uint8 index, BOOL toHero){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    S_HEROES *heroes = NULL;
+    
+    // верхний левый угол начала
+    Uint16 res = 0;
+
     if(! backMonsterCursor.use) return NONE;
 
     CursorOff();
 
-    SDL_GetMouseState(&mx, &my);
-
-    Uint8 index = (Uint16) (mx - cx) / 88;
-
     if(backMonsterCursor.castle){
     
-	if(my < cy2){
+	// from castle to castle
+	if(! toHero){
 
 	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != currentCastle->army[backMonsterCursor.select].monster){
 		backMonsterCursor.use = FALSE;
@@ -1387,7 +1294,10 @@ ACTION ActionClickRedistributeMonster(void){
 	    currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
 	    currentCastle->army[index].count += res;
 
+	// from castle to hero
 	}else if(HEROESNULL != heroesName){
+
+	    heroes = GetStatHeroes(heroesName);
 
 	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != currentCastle->army[backMonsterCursor.select].monster){
 		backMonsterCursor.use = FALSE;
@@ -1404,17 +1314,16 @@ ACTION ActionClickRedistributeMonster(void){
 	    }
 
 	    currentCastle->army[backMonsterCursor.select].count -= res;
-
-	    heroes = GetStatHeroes(heroesName);
 	    heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
 	    heroes->army[index].count += res;
 	}
 
     }else if(HEROESNULL != heroesName){
-    
+
 	heroes = GetStatHeroes(heroesName);
 
-	if(my < cy2){
+	// from hero to castle
+	if(! toHero){
 
 	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != heroes->army[backMonsterCursor.select].monster){
 		backMonsterCursor.use = FALSE;
@@ -1431,11 +1340,10 @@ ACTION ActionClickRedistributeMonster(void){
 	    }
 
 	    heroes->army[backMonsterCursor.select].count -= res;
-
 	    currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
 	    currentCastle->army[index].count += res;
 
-	}else if(HEROESNULL != heroesName){
+	}else{
 
 	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != heroes->army[backMonsterCursor.select].monster){
 		backMonsterCursor.use = FALSE;
@@ -1452,14 +1360,10 @@ ACTION ActionClickRedistributeMonster(void){
 	    }
 
 	    heroes->army[backMonsterCursor.select].count -= res;
-
 	    heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
 	    heroes->army[index].count += res;
 	}
     }
-
-    backMonsterCursor.use = FALSE;
-    SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
 
     RedrawCastleMonster();
     RedrawHeroesMonster(heroesName);
@@ -2000,17 +1904,6 @@ S_CASTLE *GetEndCastle(E_COLORS color){
     return currentCastle;
 }
 
-Uint8 GetCountCastle(E_COLORS color){
-
-    Uint8 i;
-    Uint8 result = 0;
-
-    for(i = 0; i < countCastle; ++i)
-	if(ptrCastle[i].color == color) ++result;
-
-    return result;
-}
-
 E_MONSTER GetMonsterFromCastle(const S_CASTLE *castle, Uint8 level){
 
     switch(castle->race){
@@ -2314,6 +2207,11 @@ BOOL CastleNearOcean(const S_CASTLE * castle){
     if( WATER == GetGroundMaps(castle->ax - 1, castle->ay + 2) ||
 	WATER == GetGroundMaps(castle->ax, castle->ay + 2) ||
         WATER == GetGroundMaps(castle->ax + 1, castle->ay + 2) ) return TRUE;
+
+    return FALSE;
+}
+
+BOOL CastleNearBoat(void){
 
     return FALSE;
 }
@@ -2920,31 +2818,41 @@ BOOL BuildMageGuild(const S_CASTLE *castle){
 		case MAGIC_NONE:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD1));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD1;
-		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL1);
+		    FillSpellLevel1(ptrCastle[i].race, ptrCastle[i].mageGuild.level1);
+		    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
+			FillSpellLevel1(WIZARD, ptrCastle[i].mageGuild.level1);
 		    break;
 		    
 		case MAGIC_LEVEL1:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD2));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD2;
-		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL2);
+		    FillSpellLevel2(ptrCastle[i].race, ptrCastle[i].mageGuild.level2);
+		    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
+			FillSpellLevel2(WIZARD, ptrCastle[i].mageGuild.level2);
 		    break;
 
 		case MAGIC_LEVEL2:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD3));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD3;
-		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL3);
+		    FillSpellLevel3(ptrCastle[i].race, ptrCastle[i].mageGuild.level3);
+		    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
+			FillSpellLevel3(WIZARD, ptrCastle[i].mageGuild.level3);
 		    break;
 
 		case MAGIC_LEVEL3:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD4));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD4;
-		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL4);
+		    FillSpellLevel4(ptrCastle[i].race, ptrCastle[i].mageGuild.level4);
+		    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
+			FillSpellLevel4(WIZARD, ptrCastle[i].mageGuild.level4);
 		    break;
 
 		case MAGIC_LEVEL4:
 		    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_MAGEGUILD5));
 		    ptrCastle[i].building |= BUILD_MAGEGUILD5;
-		    FillMageGuildLevel(&ptrCastle[i].mageGuild, &ptrCastle[i], MAGIC_LEVEL5);
+		    FillSpellLevel5(ptrCastle[i].race, ptrCastle[i].mageGuild.level5);
+		    if(WIZARD == castle->race && castle->building & BUILD_SPEC)
+			FillSpellLevel5(WIZARD, ptrCastle[i].mageGuild.level5);
 		    break;
 		    
 		case MAGIC_LEVEL5:
@@ -3133,7 +3041,7 @@ BOOL BuildWel2(const S_CASTLE *castle){
 
 BOOL BuildSpec(const S_CASTLE *castle){
 
-    Uint8 i;
+    Uint8 i, j;
     for(i = 0; i < countCastle; ++i)
 
 	if(&ptrCastle[i] == castle){
@@ -3143,6 +3051,46 @@ BOOL BuildSpec(const S_CASTLE *castle){
 	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_SPEC));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+	    
+	        for(j = 0; j < countCastle; ++j)
+
+		    if(&ptrCastle[j] == castle && WIZARD == castle->race && MAGIC_NONE != GetMageGuildLevel(castle))
+
+			switch(GetMageGuildLevel(castle)){
+			
+			    case MAGIC_LEVEL5:
+				FillSpellLevel1(WIZARD, ptrCastle[j].mageGuild.level1);
+				FillSpellLevel2(WIZARD, ptrCastle[j].mageGuild.level2);
+				FillSpellLevel3(WIZARD, ptrCastle[j].mageGuild.level3);
+				FillSpellLevel4(WIZARD, ptrCastle[j].mageGuild.level4);
+				FillSpellLevel5(WIZARD, ptrCastle[j].mageGuild.level5);
+				break;
+
+			    case MAGIC_LEVEL4:
+				FillSpellLevel1(WIZARD, ptrCastle[j].mageGuild.level1);
+				FillSpellLevel2(WIZARD, ptrCastle[j].mageGuild.level2);
+				FillSpellLevel3(WIZARD, ptrCastle[j].mageGuild.level3);
+				FillSpellLevel4(WIZARD, ptrCastle[j].mageGuild.level4);
+				break;
+
+			    case MAGIC_LEVEL3:
+				FillSpellLevel1(WIZARD, ptrCastle[j].mageGuild.level1);
+				FillSpellLevel2(WIZARD, ptrCastle[j].mageGuild.level2);
+				FillSpellLevel3(WIZARD, ptrCastle[j].mageGuild.level3);
+				break;
+
+			    case MAGIC_LEVEL2:
+				FillSpellLevel1(WIZARD, ptrCastle[j].mageGuild.level1);
+				FillSpellLevel2(WIZARD, ptrCastle[j].mageGuild.level2);
+				break;
+
+			    case MAGIC_LEVEL1:
+				FillSpellLevel1(WIZARD, ptrCastle[j].mageGuild.level1);
+				break;
+			
+			    default:
+				break;
+			}
 
 	    return TRUE;
 	}
@@ -3179,6 +3127,25 @@ BOOL BuildCaptain(const S_CASTLE *castle){
 	    ptrCastle[i].building |= BUILD_CAPTAIN;
 
 	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_CAPTAIN));
+
+	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
+
+	    return TRUE;
+	}
+
+    return FALSE;
+}
+
+BOOL BuildCastle(const S_CASTLE *castle){
+
+    Uint8 i;
+    for(i = 0; i < countCastle; ++i)
+
+	if(&ptrCastle[i] == castle){
+
+	    ptrCastle[i].building |= BUILD_CASTLE;
+
+	    KingdomWasteResource(ptrCastle[i].color, PaymentConditionsBuilding(castle->race, BUILD_CASTLE));
 
 	    KingdomSetAllowBuild(ptrCastle[i].color, FALSE);
 
@@ -3435,165 +3402,11 @@ void UpdateCastleBuilding(void){
     CursorOff();
     SetIntValue(ANIM3, FALSE);
 
+    FreeAnimationEvent(castanim);
+    castanim = NULL;
     RemoveActionLevelEvent(castlact, LEVELEVENT_CASTLEUPDATEBUILD);
 
-    switch(castle->race){
-
-	case KNIGHT:
-	    DrawKNGTCastle(NULL, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawKNGTCapitan(NULL, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawKNGTWel2(NULL, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(NULL, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(NULL, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(NULL, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawKNGTThievesGuild(NULL, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(NULL, &castlact);
-	    DrawKNGTMageGuild(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawKNGTDwelling3(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawKNGTDwelling4(NULL, &castlact);
-	    if(castle->building & BUILD_WELL) DrawKNGTWell(NULL, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(NULL, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(NULL, &castlact);
-	    else if(CastleNearOcean(castle)) DrawKNGTExt0(NULL, &castlact);
-	    //DrawKNGTExt1(NULL, &castlact); // развилка дорог?
-	    //DrawKNGTExt2(NULL, &castlact); // развилка дорог?
-	    break;
-
-	case BARBARIAN:
-	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(NULL, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(NULL, &castlact);
-	    if(GetMageGuildLevel(castle)){
-		DrawBRBNMageGuild(NULL, &castlact);
-		DrawBRBNExt2(NULL, &castlact);
-	    }
-	    if(castle->building & BUILD_CAPTAIN) DrawBRBNCapitan(NULL, &castlact);
-	    DrawBRBNCastle(NULL, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(NULL, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(NULL, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawBRBNThievesGuild(NULL, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(NULL, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawBRBNDwelling2(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(NULL, &castlact);
-	    if(castle->building & BUILD_WELL) DrawBRBNWell(NULL, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(NULL, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(NULL, &castlact);
-	    else if(CastleNearOcean(castle)) DrawBRBNExt0(NULL, &castlact);
-	    DrawBRBNExt1(NULL, &castlact);
-	    //DrawBRBNExt3(NULL, &castlact); // развилка дорог?
-	    break;
-
-	case SORCERESS:
-	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(NULL, &castlact);
-	    DrawSCRSMageGuild(NULL, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawSCRSCapitan(NULL, &castlact);
-	    DrawSCRSCastle(NULL, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(NULL, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(NULL, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(NULL, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(NULL, &castlact);
-	    else if(CastleNearOcean(castle)) DrawSCRSExt0(NULL, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawSCRSThievesGuild(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(NULL, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(NULL, &castlact);
-	    if(castle->building & BUILD_STATUE && castle->building & BUILD_WEL2) DrawSCRSExt1(NULL, &castlact);
-	    else if(castle->building & BUILD_STATUE) DrawSCRSStatue(NULL, &castlact);
-	    else if(castle->building & BUILD_WEL2) DrawSCRSWel2(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawSCRSDwelling4(NULL, &castlact);
-	    if(castle->building & BUILD_WELL) DrawSCRSWell(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawSCRSDwelling5(NULL, &castlact);
-	break;
-
-	case NECROMANCER:
-	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(NULL, &castlact);
-	    DrawNCRMCastle(NULL, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawNCRMCapitan(NULL, &castlact);
-    	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(NULL, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(NULL, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(NULL, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(NULL, &castlact);
-	    else if(CastleNearOcean(castle)) DrawNCRMExt0(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawNCRMThievesGuild(NULL, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(NULL, &castlact);
-	    DrawNCRMMageGuild(NULL, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(NULL, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(NULL, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(NULL, &castlact);
-	    if(castle->building & BUILD_WELL) DrawNCRMWell(NULL, &castlact);
-	    break;
-
-	case WARLOCK:
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawWRLKDwelling5(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawWRLKDwelling3(NULL, &castlact);
-	    DrawWRLKCastle(NULL, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(NULL, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(NULL, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawWRLKCapitan(NULL, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(NULL, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(NULL, &castlact);
-	    else if(CastleNearOcean(castle)) DrawWRLKExt0(NULL, &castlact);
-	    DrawWRLKMageGuild(NULL, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(NULL, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(NULL, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(NULL, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawWRLKWel2(NULL, &castlact);
-	    if(castle->building & BUILD_SPEC) DrawWRLKSpec(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawWRLKDwelling4(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawWRLKDwelling2(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawWRLKDwelling6(NULL, &castlact);
-	    if(castle->building & BUILD_WELL) DrawWRLKWell(NULL, &castlact);
-	break;
-
-	case WIZARD:
-	    if(castle->dwelling & DWELLING_MONSTER6) DrawWZRDDwelling6(NULL, &castlact);
-	    DrawWZRDCastle(NULL, &castlact);
-	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(NULL, &castlact);
-	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(NULL, &castlact);
-	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(NULL, &castlact);
-	    if(castle->building & BUILD_CAPTAIN) DrawWZRDCapitan(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(NULL, &castlact);
-	    if(castle->building & BUILD_THIEVESGUILD) DrawWZRDThievesGuild(NULL, &castlact);
-	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(NULL, &castlact);
-	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(NULL, &castlact);
-	    else if(CastleNearOcean(castle)) DrawWZRDExt0(NULL, &castlact);
-	    if(castle->building & BUILD_WELL) DrawWZRDWell(NULL, &castlact);
-	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(NULL, &castlact);
-	    if(GetMageGuildLevel(castle)) DrawWZRDMageGuild(NULL, &castlact);
-	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(NULL, &castlact);
-	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(NULL, &castlact);
-	    if(castle->building & BUILD_MARKETPLACE) DrawWZRDMarketplace(NULL, &castlact);
-	    if(castle->building & BUILD_WEL2) DrawWZRDWel2(NULL, &castlact);
-	break;
-	
-	default:
-	return;
-	break;
-    }
+    RedrawNNNNCastle(castle);
 
     // обновим рамку
     RedrawRamkaCastleName();
@@ -3617,16 +3430,14 @@ void RedrawRamkaCastleName(void){
     SDL_Surface *image = NULL;
     SDL_Rect rectCur;
     AGGSPRITE sprite;
-    Uint16 cx, cy;
+    Uint16 cx = 0;
+    Uint16 cy = 0;
     
     const S_CASTLE *castle = GetCurrentCastle();
 
     if(GetIntValue(VIDEOMODE)){
         cx = video->w / 2 - 320;
 	cy = video->h / 2 - 240;
-    }else{
-        cx = 0;
-        cy = 0;
     }
 
     // рисуем сетку
@@ -3957,5 +3768,166 @@ XXX XXX XXX XXX XXX     G05 G06 G07 G08 G09
 	cur.w = header->surface->w;
 	cur.h = header->surface->h;
 	SDL_BlitSurface(header->surface, NULL, surface, &cur);
+    }
+}
+
+void RedrawNNNNCastle(const S_CASTLE *castle){
+
+    switch(castle->race){
+
+	case KNIGHT:
+	    DrawKNGTCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawKNGTCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawKNGTWel2(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawKNGTLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawKNGTRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawKNGTMoat(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawKNGTMarketplace(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawKNGTDwelling2(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawKNGTThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawKNGTTavern(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawKNGTMageGuild(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawKNGTDwelling5(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawKNGTDwelling6(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawKNGTDwelling1(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawKNGTDwelling3(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawKNGTDwelling4(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawKNGTWell(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawKNGTStatue(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawKNGTShipyard(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawKNGTExt0(&castanim, &castlact);
+	    //DrawKNGTExt1(&castanim, &castlact); // развилка дорог?
+	    //DrawKNGTExt2(&castanim, &castlact); // развилка дорог?
+	    break;
+
+	case BARBARIAN:
+	    if(castle->building & BUILD_SPEC) DrawBRBNSpec(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawBRBNWel2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawBRBNDwelling6(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)){
+		DrawBRBNMageGuild(&castanim, &castlact);
+		DrawBRBNExt2(&castanim, &castlact);
+	    }
+	    if(castle->building & BUILD_CAPTAIN) DrawBRBNCapitan(&castanim, &castlact);
+	    DrawBRBNCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawBRBNLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawBRBNRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawBRBNMoat(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawBRBNDwelling3(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawBRBNThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawBRBNTavern(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawBRBNDwelling1(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawBRBNMarketplace(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawBRBNDwelling2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawBRBNDwelling4(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawBRBNDwelling5(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawBRBNWell(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawBRBNStatue(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawBRBNShipyard(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawBRBNExt0(&castanim, &castlact);
+	    DrawBRBNExt1(&castanim, &castlact);
+	    //DrawBRBNExt3(&castanim, &castlact); // развилка дорог?
+	    break;
+
+	case SORCERESS:
+	    if(castle->building & BUILD_SPEC) DrawSCRSSpec(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawSCRSDwelling6(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawSCRSMageGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawSCRSCapitan(&castanim, &castlact);
+	    DrawSCRSCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawSCRSLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawSCRSRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawSCRSMoat(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawSCRSDwelling3(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawSCRSShipyard(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawSCRSExt0(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawSCRSMarketplace(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawSCRSDwelling2(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawSCRSThievesGuild(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawSCRSDwelling1(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawSCRSTavern(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE && castle->building & BUILD_WEL2) DrawSCRSExt1(&castanim, &castlact);
+	    else if(castle->building & BUILD_STATUE) DrawSCRSStatue(&castanim, &castlact);
+	    else if(castle->building & BUILD_WEL2) DrawSCRSWel2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawSCRSDwelling4(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawSCRSWell(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawSCRSDwelling5(&castanim, &castlact);
+	break;
+
+	case NECROMANCER:
+	    if(castle->building & BUILD_SPEC) DrawNCRMSpec(&castanim, &castlact);
+	    DrawNCRMCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawNCRMCapitan(&castanim, &castlact);
+    	    if(castle->building & BUILD_LEFTTURRET) DrawNCRMLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawNCRMRTurret(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawNCRMDwelling6(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawNCRMMoat(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawNCRMShipyard(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawNCRMExt0(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawNCRMThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawNCRMTavern(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawNCRMDwelling3(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawNCRMDwelling5(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawNCRMDwelling2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawNCRMDwelling4(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawNCRMDwelling1(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawNCRMMageGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawNCRMWel2(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawNCRMMarketplace(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawNCRMStatue(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawNCRMWell(&castanim, &castlact);
+	    break;
+
+	case WARLOCK:
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawWRLKDwelling5(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawWRLKDwelling3(&castanim, &castlact);
+	    DrawWRLKCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawWRLKLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawWRLKRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawWRLKCapitan(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawWRLKMoat(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawWRLKShipyard(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawWRLKExt0(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawWRLKMageGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawWRLKTavern(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawWRLKThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawWRLKMarketplace(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawWRLKStatue(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawWRLKDwelling1(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawWRLKWel2(&castanim, &castlact);
+	    if(castle->building & BUILD_SPEC) DrawWRLKSpec(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawWRLKDwelling4(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawWRLKDwelling2(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawWRLKDwelling6(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawWRLKWell(&castanim, &castlact);
+	break;
+
+	case WIZARD:
+	    if(castle->dwelling & DWELLING_MONSTER6) DrawWZRDDwelling6(&castanim, &castlact);
+	    DrawWZRDCastle(&castanim, &castlact);
+	    if(castle->building & BUILD_LEFTTURRET) DrawWZRDLTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_RIGHTTURRET) DrawWZRDRTurret(&castanim, &castlact);
+	    if(castle->building & BUILD_MOAT) DrawWZRDMoat(&castanim, &castlact);
+	    if(castle->building & BUILD_CAPTAIN) DrawWZRDCapitan(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER2) DrawWZRDDwelling2(&castanim, &castlact);
+	    if(castle->building & BUILD_THIEVESGUILD) DrawWZRDThievesGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_TAVERN) DrawWZRDTavern(&castanim, &castlact);
+	    if(castle->building & BUILD_SHIPYARD) DrawWZRDShipyard(&castanim, &castlact);
+	    else if(CastleNearOcean(castle)) DrawWZRDExt0(&castanim, &castlact);
+	    if(castle->building & BUILD_WELL) DrawWZRDWell(&castanim, &castlact);
+	    if(castle->building & BUILD_SPEC) DrawWZRDSpec(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER3) DrawWZRDDwelling3(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER5) DrawWZRDDwelling5(&castanim, &castlact);
+	    if(GetMageGuildLevel(castle)) DrawWZRDMageGuild(&castanim, &castlact);
+	    if(castle->building & BUILD_STATUE) DrawWZRDStatue(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER1) DrawWZRDDwelling1(&castanim, &castlact);
+	    if(castle->dwelling & DWELLING_MONSTER4) DrawWZRDDwelling4(&castanim, &castlact);
+	    if(castle->building & BUILD_MARKETPLACE) DrawWZRDMarketplace(&castanim, &castlact);
+	    if(castle->building & BUILD_WEL2) DrawWZRDWel2(&castanim, &castlact);
+	break;
+	
+	default:
+	return;
+	break;
     }
 }

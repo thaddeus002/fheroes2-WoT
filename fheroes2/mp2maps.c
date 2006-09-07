@@ -112,6 +112,13 @@ void FreeMaps(void){
 		    ptrMaps[i].level2 = next;
 		}
 
+		while(ptrMaps[i].upgrade){
+
+		    next = (ICNHEADER *) ptrMaps[i].upgrade->next;
+		    free(ptrMaps[i].upgrade);
+		    ptrMaps[i].upgrade = next;
+		}
+
 		if(ptrMaps[i].animation)
 			    FreeAnimationEvent(ptrMaps[i].animation);
 
@@ -250,6 +257,7 @@ ACTION InitMaps(char *filename){
 
 	ptrMaps[i].level1	= NULL;
 	ptrMaps[i].level2	= NULL;
+	ptrMaps[i].upgrade	= NULL;
 
 	ptrMaps[i].count	= 0;
 	ptrMaps[i].animation	= NULL;
@@ -341,11 +349,11 @@ ACTION InitMaps(char *filename){
 		}
 
         	indexAddon = ptrAddon->indexAddon;
-    	    }
+	    }
 	}
 
 	indexAddon = 0;
-	
+
 	// init level2
 	for(j = 3; j >= 0; --j){
             
@@ -391,6 +399,7 @@ ACTION InitMaps(char *filename){
 	// monster
 	if(0x2F < ptrMapsInfo[i].objectName1 && 0x34 > ptrMapsInfo[i].objectName1)
 	    StoreAnimationFrame(ptrMapsInfo[i].objectName1, ptrMapsInfo[i].indexName1, &ptrMaps[i]);
+
     }
 
     // close file
@@ -735,4 +744,153 @@ E_GROUND GetGroundMaps(Uint8 ax, Uint8 ay){
     if(maps) return maps->ground;
     
     return WATER;
+}
+
+void MapsUpgradeTown2Castle(Uint8 ax, Uint8 ay){
+
+/* 
+ sprite castle OBJNTOWN.ICN 32x32 kngt barb srcr wrlc wizrd necr 
+ sprite ground OBJNTWBA.ICN 32x32 grass snow swamp lava desert dirt wast beach 
+ 
+             XXX XXX C00 XXX XXX     XXX XXX XXX XXX XXX 
+     TTT TTT C01 C02 C03 C04 C05     XXX XXX XXX XXX XXX 
+ TTT TTT TTT C06 C07 C08 C09 C10     XXX XXX XXX XXX XXX 
+     TTT TTT C11 C12 AAA C14 C15     G00 G01 AAA G03 G04 
+         TTT XXX XXX XXX XXX XXX     G05 G06 G07 G08 G09 
+*/
+
+    Uint8 index, i;
+    Uint16 cx, cy;
+    ICNHEADER *header = NULL;
+    ICNHEADER *tail = NULL;
+    AGGSPRITE sprite;
+
+    const S_CASTLE *castle = GetStatCastlePos(ax, ay);
+    S_CELLMAPS *maps = GetCELLMAPS(ay * GetWidthMaps() + ax);
+ 
+    switch(maps->ground){
+        case GRASS:
+            index = 0;
+            break;
+        case SNOW:
+            index = 10;
+            break;
+        case SWAMP:
+            index = 20;
+            break;
+        case LAVA:
+            index = 30;
+            break;
+        case DESERT:
+            index = 40;
+            break;
+        case DIRT:
+            index = 50;
+            break;
+        case WASTELAND:
+            index = 60;
+            break;
+        case BEACH:
+            index = 70;
+            break;
+        default:
+            return;
+            break;
+    }
+    // castle ground
+    for(i = 0; i < 5; ++i){
+        FillSPRITE(&sprite, "OBJNTWBA.ICN", index + i);
+        header = GetICNHeader(&sprite);
+	cx = ax - 2 + i;
+	cy = ay;
+	maps = GetCELLMAPS(cy * GetWidthMaps() + cx);
+	tail = AddLEVELDRAW(&maps->upgrade);
+        tail->surface = header->surface;
+        tail->offsetX = header->offsetX;
+        tail->offsetY = header->offsetY;
+        tail->next = NULL;
+    }
+    for(i = 0; i < 5; ++i){
+        FillSPRITE(&sprite, "OBJNTWBA.ICN", index + 5 + i);
+        header = GetICNHeader(&sprite);
+	cx = ax - 2 + i;
+	cy = ay + 1;
+	maps = GetCELLMAPS(cy * GetWidthMaps() + cx);
+	tail = AddLEVELDRAW(&maps->upgrade);
+        tail->surface = header->surface;
+        tail->offsetX = header->offsetX;
+        tail->offsetY = header->offsetY;
+        tail->next = NULL;
+    }
+
+    switch(castle->race){
+        case KNIGHT:
+            index = 0;
+            break;
+        case BARBARIAN:
+            index = 32;
+            break;
+        case SORCERESS:
+            index = 64;
+            break;
+        case WARLOCK:
+            index = 96;
+            break;
+        case WIZARD:
+            index = 128;
+            break;
+        case NECROMANCER:
+            index = 160;
+            break;
+        default:
+            break;
+    }
+    FillSPRITE(&sprite, "OBJNTOWN.ICN", index);
+    header = GetICNHeader(&sprite);
+    cx = ax;
+    cy = ay - 3;
+    maps = GetCELLMAPS(cy * GetWidthMaps() + cx);
+    tail = AddLEVELDRAW(&maps->upgrade);
+    tail->surface = header->surface;
+    tail->offsetX = header->offsetX;
+    tail->offsetY = header->offsetY;
+    tail->next = NULL;
+    for(i = 0; i < 5; ++i){
+        FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 1 + i);
+        header = GetICNHeader(&sprite);
+	cx = ax - 2 + i;
+	cy = ay - 2;
+	maps = GetCELLMAPS(cy * GetWidthMaps() + cx);
+	tail = AddLEVELDRAW(&maps->upgrade);
+        tail->surface = header->surface;
+        tail->offsetX = header->offsetX;
+        tail->offsetY = header->offsetY;
+        tail->next = NULL;
+    }
+    for(i = 0; i < 5; ++i){
+        FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 6 + i);
+        header = GetICNHeader(&sprite);
+	cx = ax - 2 + i;
+	cy = ay - 1;
+	maps = GetCELLMAPS(cy * GetWidthMaps() + cx);
+	tail = AddLEVELDRAW(&maps->upgrade);
+        tail->surface = header->surface;
+        tail->offsetX = header->offsetX;
+        tail->offsetY = header->offsetY;
+        tail->next = NULL;
+    }
+    for(i = 0; i < 5; ++i){
+        FillSPRITE(&sprite, "OBJNTOWN.ICN", index + 11 + i);
+        header = GetICNHeader(&sprite);
+	cx = ax - 2 + i;
+	cy = ay;
+	maps = GetCELLMAPS(cy * GetWidthMaps() + cx);
+	tail = AddLEVELDRAW(&maps->upgrade);
+        tail->surface = header->surface;
+        tail->offsetX = header->offsetX;
+        tail->offsetY = header->offsetY;
+        tail->next = NULL;
+    }
+
+    return;
 }
