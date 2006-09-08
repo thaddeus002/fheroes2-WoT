@@ -290,7 +290,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     return result;
 }
 
-ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *castle){
+ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Surface *image = NULL;

@@ -34,6 +34,6 @@
 #include "castle.h"
 
 ACTION          ShowArmyInfo(const S_ARMY *, const S_HEROES *, const S_CASTLE *);
-ACTION          ShowArmyInfoRight(const S_ARMY *, const S_HEROES *, const S_CASTLE *);
+ACTION          ShowArmyInfoRight(const S_ARMY *, const S_HEROES *);
 
 #endif

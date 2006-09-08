@@ -852,6 +852,32 @@ const char * GetStringMorale(E_MORALE morale){
     return string;
 }
 
+const char * GetStringDescriptionsMorale(E_MORALE morale){
+
+    const char  *string = NULL;
+
+    switch(morale){
+        case MORALE_TREASON:
+        case MORALE_AWFUL:
+        case MORALE_POOR:
+            string = "Bad morale may cause your armies to freeze in combat.";
+            break;
+
+        default:
+	case MORALE_NORMAL:
+            string = "Neutral morale means your armies will never be blessed with extra attacks or freeze in combat.";
+            break;
+
+        case MORALE_GOOD:
+        case MORALE_GREAT:
+        case MORALE_IRISH:
+            string = "Good morale may give your armies extra attacks in combat.";
+            break;
+    }
+
+    return string;
+}
+
 const char * GetStringSpeed(E_MONSTERSPEED speed){
 
     const char  *string;

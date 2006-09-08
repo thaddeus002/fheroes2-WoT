@@ -46,7 +46,7 @@ static char 		heroesPortrait[13];
 
 S_HEROES *GetStatHeroes(E_NAMEHEROES name){
 
-    if(allHeroes && name != HEROESNULL) return &allHeroes[name];
+    if(allHeroes && name < HEROESNULL) return &allHeroes[name];
     
     return NULL;
 }

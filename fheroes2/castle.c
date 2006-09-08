@@ -59,7 +59,7 @@
 void RedrawCastleAnimation(void);
 void RedrawBottomBar(void);
 void RedrawRamkaCastleName(void);
-void RedrawHeroesMonster(E_NAMEHEROES);
+void RedrawHeroesMonster(void);
 void UpdateCastleBuilding(void);
 void RedrawNNNNCastle(const S_CASTLE *);
 
@@ -77,11 +77,13 @@ ACTION ActionClickRHeroesMonster(void);
 ACTION ActionClickHeroesMonsterEmpty(Uint8);
 ACTION ActionClickHeroes(void);
 
+ACTION ActionOverHeroesArmy(void);
+ACTION ActionOverCastleArmy(void);
+
 static 	S_CASTLE	*ptrCastle	= NULL;
 static 	Uint8		countCastle	= 0;
 
 static	S_CASTLE	*currentCastle	= NULL;
-	E_NAMEHEROES	heroesName 	= HEROESNULL;
 
 	S_ANIMATION    	*castanim	= NULL;
 	INTERFACEACTION *castlact	= NULL;
@@ -437,15 +439,26 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     SDL_Rect rectBack, rectCur;
     AGGSPRITE sprite;
     ACTION result;
-    ICNHEADER *header = NULL;
     S_CASTLE *castle = GetStatCastlePos(ax, ay);
-    S_HEROES *heroes = GetStatHeroes(castleHeroes);
+    S_HEROES *heroes = NULL;
     flagUpdateBuilding = FALSE;
 
     // в серые замки не заходим
     if(GRAY == castle->color) return NONE;
+
     currentCastle = castle;
-    heroesName = castleHeroes;
+    
+    if(HEROESNULL == castleHeroes){
+	if(HEROESNULL > castle->hero){
+	    heroes = GetStatHeroes(castle->hero);
+	    if(heroes->ax != castle->ax || heroes->ay != castle->ay) castle->hero = HEROESNULL;
+	}else
+	    castle->hero = HEROESNULL;
+    }else
+	castle->hero = castleHeroes;
+
+    heroes = GetStatHeroes(castle->hero);
+
     // инициализируем backgroundCursor
     FillSPRITE(&sprite, "STRIP.ICN", 1);
     backMonsterCursor.cursor = GetICNSprite(&sprite);
@@ -466,7 +479,6 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     Uint32 cursor = GetCursor();
     INTERFACEACTION action;
 
-    char message[8];
     Uint16 cx, cy;
     Uint8 i;
 
@@ -478,11 +490,15 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	rectBack.y = video->h / 2 - 240 - BORDERWIDTH;
 	rectBack.w = 640 + 2 * BORDERWIDTH + SHADOWWIDTH;
 	rectBack.h = 480 + 2 * BORDERWIDTH + SHADOWWIDTH;
+	cx = rectBack.x + BORDERWIDTH + SHADOWWIDTH;
+	cy = rectBack.y + BORDERWIDTH;
     }else{
 	rectBack.x = 0;
 	rectBack.y = 0;
 	rectBack.w = 640;
 	rectBack.h = 480;
+	cx = rectBack.x;
+	cy = rectBack.y;
     }
     if(NULL == (format = SDL_CreateRGBSurface(SDL_SWSURFACE, rectBack.w, rectBack.h, 16, 0, 0, 0, 0))){
         fprintf(stderr, "EnterCastle: CreateRGBSurface failed: %s\n", SDL_GetError());
@@ -497,6 +513,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     // рисуем бордюр
     if(GetIntValue(VIDEOMODE)) ShowBorder(&rectBack);
 
+    // рисуем фон хозяйства
     switch(castle->race){
 
 	case KNIGHT:
@@ -527,29 +544,17 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    break;
     }
     image = GetICNSprite(&sprite);
-    rectCur.x = 0;
-    rectCur.y = 0;
+    rectCur.x = cx;
+    rectCur.y = cy;
     rectCur.w = image->w;
     rectCur.h = image->h;
-    if(GetIntValue(VIDEOMODE)){
-	rectCur.x = rectBack.x + BORDERWIDTH + SHADOWWIDTH;
-	rectCur.y = rectBack.y + BORDERWIDTH;
-    }
     SDL_BlitSurface(image, NULL, video, &rectCur);
-
-    // рисуем сетку
-    FillSPRITE(&sprite, "STRIP.ICN", 0);
-    image = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    cx = rectCur.x;
-    cy = rectCur.y;
 
     // левый скролинг замка
     FillSPRITE(&sprite, "SMALLBAR.ICN", 1);
     image = GetICNSprite(&sprite);
-    rectCur.y += rectCur.h;
+    rectCur.x = cx;
+    rectCur.y = cy + 480 - image->h;
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
@@ -568,6 +573,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
+
 
     // правый скролинг замка
     FillSPRITE(&sprite, "SMALLBAR.ICN", 3);
@@ -615,115 +621,46 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	    break;
     }
     image = GetICNSprite(&sprite);
-    rectCur.x = (GetIntValue(VIDEOMODE) ? rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5 : rectBack.x + 5);
-    rectCur.y = cy + 6;
+    rectCur.x = cx + 5;
+    rectCur.y = cy + 262;
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
-    // рисуем фон ячеек для монстров
+
+    // action from castle monster
     FillSPRITE(&sprite, "STRIP.ICN", 2);
     image = GetICNSprite(&sprite);
-    cx = rectCur.x + rectCur.w + 6;
-    cy = rectCur.y;
     for(i = 0; i < CASTLEMAXARMY; ++i){
-
-	// если есть в замке монстры
-	if(castle->army[i].count){
-		// то рисуем фон в зависимости от расы
-		switch(GetRaceMonster(castle->army[i].monster)){
-		
-		    case KNIGHT:
-			FillSPRITE(&sprite, "STRIP.ICN", 4);
-			break;
-
-		    case BARBARIAN:
-			FillSPRITE(&sprite, "STRIP.ICN", 5);
-			break;
-
-		    case SORCERESS:
-			FillSPRITE(&sprite, "STRIP.ICN", 6);
-			break;
-
-		    case WARLOCK:
-			FillSPRITE(&sprite, "STRIP.ICN", 7);
-			break;
-
-		    case WIZARD:
-			FillSPRITE(&sprite, "STRIP.ICN", 8);
-			break;
-
-		    case NECROMANCER:
-			FillSPRITE(&sprite, "STRIP.ICN", 9);
-			break;
-
-		    default:
-			FillSPRITE(&sprite, "STRIP.ICN", 10);
-			break;
-		}
-		image = GetICNSprite(&sprite);
-		rectCur.x = cx + (image->w + 6) * i;
-		rectCur.y = cy;
-		rectCur.w = image->w;
-		rectCur.h = image->h;
-		SDL_BlitSurface(image, NULL, video, &rectCur);
-
-		// регистрируем событие на click
-		ZeroINTERFACEACTION(&action);
-		action.rect = rectCur;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickCastleMonster;
-		AddActionEvent(&castlact, &action);
-		ZeroINTERFACEACTION(&action);
-		action.rect = rectCur;
-		action.mouseEvent = MOUSE_RCLICK;
-		action.pf = ActionClickRCastleMonster;
-		AddActionEvent(&castlact, &action);
-
-		// рисуем монстров
-		FillSPRITE(&sprite, MonsterBigNamePortrait(castle->army[i].monster), 0);
-		header = GetICNHeader(&sprite);
-		rectCur.x = cx + 88 * i + header->offsetX;
-		rectCur.y = cy + header->offsetY;
-		rectCur.w = header->surface->w;
-		rectCur.h = header->surface->h;
-		SDL_BlitSurface(header->surface, NULL, video, &rectCur);
-		
-		// рисуем количество
-		sprintf(message, "%5d", castle->army[i].count);
-		rectCur.x = cx + 88 * i + 54;
-		rectCur.y = cy + 80;
-		rectCur.w = GetLengthText(message, FONT_SMALL);
-		rectCur.h = FONT_HEIGHTSMALL;
-		PrintText(video, &rectCur, message, FONT_SMALL);
-	}else{
-	    FillSPRITE(&sprite, "STRIP.ICN", 2);
-	    image = GetICNSprite(&sprite);
-	    rectCur.x = cx + (image->w + 6) * i;
-	    rectCur.y = cy;
-	    rectCur.w = image->w;
-	    rectCur.h = image->h;
-	    SDL_BlitSurface(image, NULL, video, &rectCur);
-
-	    // регистрируем событие на click
-	    ZeroINTERFACEACTION(&action);
-	    action.rect = rectCur;
-	    action.mouseEvent = MOUSE_LCLICK;
-	    action.pf = ActionClickCastleMonster;
-	    AddActionEvent(&castlact, &action);
-	    ZeroINTERFACEACTION(&action);
-	    action.rect = rectCur;
-	    action.mouseEvent = MOUSE_RCLICK;
-	    action.pf = ActionClickRCastleMonster;
-	    AddActionEvent(&castlact, &action);
-	}
+	rectCur.x = cx + 112 + (image->w + 6) * i;
+	rectCur.y = cy + 262;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	// регистрируем событие на left click
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionClickCastleMonster;
+	AddActionEvent(&castlact, &action);
+	// регистрируем событие на right click
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_RCLICK;
+	action.pf = ActionClickRCastleMonster;
+	AddActionEvent(&castlact, &action);
+	// наведение мыши
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_PRESENT;
+	action.pf = ActionOverCastleArmy;
+	AddActionEvent(&castlact, &action);
     }
 
-    // рисуем фон ячейки героя
+    // портрет героя
     if(heroes){
 	FillSPRITE(&sprite, HeroesBigNamePortrait(castleHeroes), 0);
 	// наведение мыши
-	rectCur.x = (GetIntValue(VIDEOMODE) ? rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5 : rectBack.x + 5);
-	rectCur.y = cy + image->w - 2;
+	rectCur.x = cx + 5;
+	rectCur.y = cy + 350;
 	rectCur.w = image->w;
 	rectCur.h = image->h;
 	ZeroINTERFACEACTION(&action);
@@ -745,125 +682,52 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 	FillSPRITE(&sprite, "STRIP.ICN", 3);
 
     image = GetICNSprite(&sprite);
-    rectCur.x = (GetIntValue(VIDEOMODE) ? rectBack.x + BORDERWIDTH + SHADOWWIDTH + 5 : rectBack.x + 5);
-    rectCur.y = cy + image->w - 2;
+    rectCur.x = cx + 5;
+    rectCur.y = cy + 361;
     rectCur.w = image->w;
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
-    // рисуем фон ячеек для монстров героя
+    // action from castle monster
     if(heroes){
-
-	cx = rectCur.x + rectCur.w + 6;
-	cy = rectCur.y;
-
-	for( i = 0; i < HEROESMAXARMY; ++i)
-	    // если есть у героя монстры
-	    if(heroes->army[i].count){
-
-		// то рисуем фон в зависимости от расы
-		switch(GetRaceMonster(heroes->army[i].monster)){
-		
-		    case KNIGHT:
-			FillSPRITE(&sprite, "STRIP.ICN", 4);
-			break;
-
-		    case BARBARIAN:
-			FillSPRITE(&sprite, "STRIP.ICN", 5);
-			break;
-
-		    case SORCERESS:
-			FillSPRITE(&sprite, "STRIP.ICN", 6);
-			break;
-
-		    case WARLOCK:
-			FillSPRITE(&sprite, "STRIP.ICN", 7);
-			break;
-
-		    case WIZARD:
-			FillSPRITE(&sprite, "STRIP.ICN", 8);
-			break;
-
-		    case NECROMANCER:
-			FillSPRITE(&sprite, "STRIP.ICN", 9);
-			break;
-
-		    default:
-			FillSPRITE(&sprite, "STRIP.ICN", 10);
-			break;
-		}
-		image = GetICNSprite(&sprite);
-		rectCur.x = cx + (image->w + 6) * i;
-		rectCur.y = cy;
-		rectCur.w = image->w;
-		rectCur.h = image->h;
-		SDL_BlitSurface(image, NULL, video, &rectCur);
-
-		// регистрируем событие на click
-		ZeroINTERFACEACTION(&action);
-		action.rect = rectCur;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickHeroesMonster;
-		AddActionEvent(&castlact, &action);
-		ZeroINTERFACEACTION(&action);
-		action.rect = rectCur;
-		action.mouseEvent = MOUSE_RCLICK;
-		action.pf = ActionClickRHeroesMonster;
-		AddActionEvent(&castlact, &action);
-
-		// рисуем монстров
-		FillSPRITE(&sprite, MonsterBigNamePortrait(heroes->army[i].monster), 0);
-		header = GetICNHeader(&sprite);
-		rectCur.x = cx + 88 * i + header->offsetX;
-		rectCur.y = cy + header->offsetY;
-		rectCur.w = header->surface->w;
-		rectCur.h = header->surface->h;
-		SDL_BlitSurface(header->surface, NULL, video, &rectCur);
-		
-		// рисуем количество
-		sprintf(message, "%5d", heroes->army[i].count);
-		rectCur.x = cx + 88 * i + 54;
-		rectCur.y = cy + 80;
-		rectCur.w = GetLengthText(message, FONT_SMALL);
-		rectCur.h = FONT_HEIGHTSMALL;
-		PrintText(video, &rectCur, message, FONT_SMALL);
-	    }else{
-		FillSPRITE(&sprite, "STRIP.ICN", 2);
-		image = GetICNSprite(&sprite);
-		rectCur.x = cx + (image->w + 6) * i;
-		rectCur.y = cy;
-		rectCur.w = image->w;
-		rectCur.h = image->h;
-		SDL_BlitSurface(image, NULL, video, &rectCur);
-
-		// регистрируем событие на click
-		ZeroINTERFACEACTION(&action);
-		action.rect = rectCur;
-		action.mouseEvent = MOUSE_LCLICK;
-		action.pf = ActionClickHeroesMonster;
-		AddActionEvent(&castlact, &action);
-		ZeroINTERFACEACTION(&action);
-		action.rect = rectCur;
-		action.mouseEvent = MOUSE_RCLICK;
-		action.pf = ActionClickRHeroesMonster;
-		AddActionEvent(&castlact, &action);
-	    }
-	cy -= 99;
-    }else{
-	FillSPRITE(&sprite, "STRIP.ICN", 11);
+	FillSPRITE(&sprite, "STRIP.ICN", 2);
 	image = GetICNSprite(&sprite);
-	rectCur.x += rectCur.w + 6;
-	rectCur.w = image->w;
-	rectCur.h = image->h;
-	SDL_BlitSurface(image, NULL, video, &rectCur);
+	for( i = 0; i < HEROESMAXARMY; ++i){
+	    rectCur.x = cx + 112 + (image->w + 6) * i;
+	    rectCur.y = cy + 361;
+	    rectCur.w = image->w;
+	    rectCur.h = image->h;
+
+	    // регистрируем событие на click
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionClickHeroesMonster;
+	    AddActionEvent(&castlact, &action);
+	    // регистрируем событие на click
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_RCLICK;
+	    action.pf = ActionClickRHeroesMonster;
+	    AddActionEvent(&castlact, &action);
+	    // наведение мыши
+	    ZeroINTERFACEACTION(&action);
+	    action.rect = rectCur;
+	    action.mouseEvent = MOUSE_PRESENT;
+	    action.pf = ActionOverHeroesArmy;
+	    AddActionEvent(&castlact, &action);
+	}
     }
 
+    RedrawCastleMonster();
+    RedrawHeroesMonster();
     RedrawCastleInfoResource();
+
     // кнопка exit
     FillSPRITE(&sprite, "SWAPBTN.ICN", 0);
     image = GetICNSprite(&sprite);
-    rectCur.x = cx +  440 + 1;
-    rectCur.y = cy + 166;
+    rectCur.x = cx + 553;
+    rectCur.y = cy + 428;
     rectCur.w = image->w;
     rectCur.h = image->h;
     // наведение мыши
@@ -883,24 +747,8 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 
     RedrawNNNNCastle(castle);
 
-    // наименование замка
-    FillSPRITE(&sprite, "TOWNNAME.ICN", 0);
-    image = GetICNSprite(&sprite);
-    if(GetIntValue(VIDEOMODE)){
-	rectCur.x = rectBack.x + 264;
-	rectCur.y = rectBack.y + 264;
-    }else{
-	rectCur.x = rectBack.x + 264 - BORDERWIDTH * 3;
-	rectCur.y = rectBack.y + 264 - BORDERWIDTH;
-    }
-    rectCur.w = image->w;
-    rectCur.h = image->h;
-    rectCur.x = rectCur.x + 90 - GetLengthText(castle->name, FONT_SMALL) / 2 ;
-    rectCur.y = rectCur.y + 1;
-    rectCur.w = GetLengthText(castle->name, FONT_SMALL);
-    rectCur.h = FONT_HEIGHTSMALL;
     RedrawRamkaCastleName();
-                    
+
     SetCursor(CURSOR_POINTER);
     CursorOn();
 
@@ -1220,7 +1068,7 @@ ACTION ActionClickRCastleMonster(void){
     CursorOn();
     
     // если монстр показываем инфо
-    if(MONSTERNONE != castle->army[index].monster) result =  ShowArmyInfoRight(&castle->army[index], NULL, castle);
+    if(MONSTERNONE != castle->army[index].monster) result =  ShowArmyInfoRight(&castle->army[index], NULL);
     // иначе диалог деления
     else result = ActionClickRedistributeMonster(index, FALSE);
 
@@ -1233,8 +1081,7 @@ ACTION ActionClickRHeroesMonster(void){
 
     Sint32 mx, my;
     SDL_Surface *video = SDL_GetVideoSurface();
-    const S_CASTLE *castle = GetCurrentCastle();
-    S_HEROES *heroes = GetStatHeroes(heroesName);
+    S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
     ACTION result;
 
     SDL_GetMouseState(&mx, &my);
@@ -1249,7 +1096,7 @@ ACTION ActionClickRHeroesMonster(void){
     CursorOn();
 
     // если монстр показываем инфо
-    if(MONSTERNONE != castle->army[index].monster) result =  ShowArmyInfoRight(&castle->army[index], heroes, castle);
+    if(MONSTERNONE != heroes->army[index].monster) result =  ShowArmyInfoRight(&heroes->army[index], heroes);
     // иначе диалог деления
     else result = ActionClickRedistributeMonster(index, TRUE);
 
@@ -1261,7 +1108,7 @@ ACTION ActionClickRHeroesMonster(void){
 ACTION ActionClickRedistributeMonster(Uint8 index, BOOL toHero){
 
     SDL_Surface *video = SDL_GetVideoSurface();
-    S_HEROES *heroes = NULL;
+    S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
     
     // верхний левый угол начала
     Uint16 res = 0;
@@ -1295,9 +1142,7 @@ ACTION ActionClickRedistributeMonster(Uint8 index, BOOL toHero){
 	    currentCastle->army[index].count += res;
 
 	// from castle to hero
-	}else if(HEROESNULL != heroesName){
-
-	    heroes = GetStatHeroes(heroesName);
+	}else if(heroes){
 
 	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != currentCastle->army[backMonsterCursor.select].monster){
 		backMonsterCursor.use = FALSE;
@@ -1318,9 +1163,7 @@ ACTION ActionClickRedistributeMonster(Uint8 index, BOOL toHero){
 	    heroes->army[index].count += res;
 	}
 
-    }else if(HEROESNULL != heroesName){
-
-	heroes = GetStatHeroes(heroesName);
+    }else if(heroes){
 
 	// from hero to castle
 	if(! toHero){
@@ -1366,7 +1209,7 @@ ACTION ActionClickRedistributeMonster(Uint8 index, BOOL toHero){
     }
 
     RedrawCastleMonster();
-    RedrawHeroesMonster(heroesName);
+    RedrawHeroesMonster();
 
     CursorOn();
 
@@ -1389,7 +1232,7 @@ ACTION ActionClickCastleMonster(void){
     Uint8 index = (Uint16) (mx - cx) / 88;
     Uint16 count = 0;
     E_MONSTER monster = MONSTERNONE;
-    S_HEROES *heroes = NULL;
+    S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
 
     if(MONSTERNONE == currentCastle->army[index].monster) return ActionClickCastleMonsterEmpty(index);
 
@@ -1438,8 +1281,8 @@ ACTION ActionClickCastleMonster(void){
 	    }
 	    RedrawCastleMonster();
 	// с героем
-	}else if(HEROESNULL != heroesName){
-	    heroes = GetStatHeroes(heroesName);
+	}else if(heroes){
+
 	    // одинаковых объединяем
 	    if(currentCastle->army[index].monster == heroes->army[backMonsterCursor.select].monster){
 		currentCastle->army[index].count += heroes->army[backMonsterCursor.select].count;
@@ -1452,7 +1295,7 @@ ACTION ActionClickCastleMonster(void){
 		heroes->army[backMonsterCursor.select].count = count;
 	    }
 	    RedrawCastleMonster();
-	    RedrawHeroesMonster(heroesName);
+	    RedrawHeroesMonster();
 	}
     // первый клик рисуем рамку
     }else{
@@ -1486,7 +1329,7 @@ ACTION ActionClickCastleMonsterEmpty(Uint8 index){
 
     // востанавливаем background
     backMonsterCursor.use = FALSE;
-    S_HEROES *heroes = GetStatHeroes(heroesName);
+    S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
 
     if(! backMonsterCursor.castle && 2 > HeroesCountArmy(heroes)){
 	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
@@ -1508,7 +1351,7 @@ ACTION ActionClickCastleMonsterEmpty(Uint8 index){
     }
 
     RedrawCastleMonster();
-    RedrawHeroesMonster(heroesName);
+    RedrawHeroesMonster();
 
     CursorOn();
 
@@ -1531,9 +1374,10 @@ ACTION ActionClickHeroesMonster(void){
     Uint8 index = (Uint16) (mx - cx) / 88;
     Uint16 count = 0;
     E_MONSTER monster = MONSTERNONE;
-    S_HEROES *heroes = GetStatHeroes(heroesName);
+
+    const S_CASTLE *castle = GetCurrentCastle();
+    S_HEROES *heroes = GetStatHeroes(castle->hero);
     if(! heroes) return NONE;
-    const S_CASTLE *castle = GetStatCastlePos(heroes->ax, heroes->ay);
 
     if(MONSTERNONE == heroes->army[index].monster) return ActionClickHeroesMonsterEmpty(index);
 
@@ -1545,14 +1389,14 @@ ACTION ActionClickHeroesMonster(void){
 		CursorOff();
 		heroes->army[index].monster = MONSTERNONE;
 		heroes->army[index].count = 0;
-		RedrawHeroesMonster(heroesName);
+		RedrawHeroesMonster();
 		CursorOn();
 		break;
 
 	    case UPGRADE:
 		CursorOff();
 		UpgradeArmy(&heroes->army[index], heroes->color);
-		RedrawHeroesMonster(heroesName);
+		RedrawHeroesMonster();
 		RedrawCastleInfoResource();
 		CursorOn();
 		break;
@@ -1585,7 +1429,7 @@ ACTION ActionClickHeroesMonster(void){
 		currentCastle->army[backMonsterCursor.select].monster = monster;
 		currentCastle->army[backMonsterCursor.select].count = count;
 	    }
-	    RedrawHeroesMonster(heroesName);
+	    RedrawHeroesMonster();
 	    RedrawCastleMonster();
 	// в герое
 	}else{
@@ -1600,7 +1444,7 @@ ACTION ActionClickHeroesMonster(void){
 		heroes->army[backMonsterCursor.select].monster = monster;
 		heroes->army[backMonsterCursor.select].count = count;
 	    }
-	    RedrawHeroesMonster(heroesName);
+	    RedrawHeroesMonster();
 	}
     // первый клик рисуем рамку
     }else{
@@ -1631,7 +1475,7 @@ ACTION ActionClickHeroesMonsterEmpty(Uint8 index){
 
     CursorOff();
 
-    S_HEROES *heroes = GetStatHeroes(heroesName);
+    S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
     backMonsterCursor.use = FALSE;
 
     // перемещаем на пустую клетку
@@ -1648,7 +1492,7 @@ ACTION ActionClickHeroesMonsterEmpty(Uint8 index){
     }
 
     RedrawCastleMonster();
-    RedrawHeroesMonster(heroesName);
+    RedrawHeroesMonster();
 
     CursorOn();
 
@@ -1749,7 +1593,7 @@ void RedrawCastleMonster(void){
     }
 }
 
-void RedrawHeroesMonster(E_NAMEHEROES name){
+void RedrawHeroesMonster(void){
 
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Surface *image = NULL;
@@ -1758,7 +1602,9 @@ void RedrawHeroesMonster(E_NAMEHEROES name){
     Uint16 cx, cy;
     Uint8 i;
     ICNHEADER *header = NULL;
-    S_HEROES *heroes = GetStatHeroes(name);
+    S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
+
+    if(! heroes) return;
 
     CursorOff();
 
@@ -3464,6 +3310,16 @@ void RedrawRamkaCastleName(void){
     rectCur.w = GetLengthText(castle->name, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, castle->name, FONT_SMALL);
+
+    if(HEROESNULL == castle->hero){
+	FillSPRITE(&sprite, "STRIP.ICN", 11);
+	image = GetICNSprite(&sprite);
+	rectCur.x = cx + 112;
+	rectCur.y = cy + 361;
+	rectCur.w = image->w;
+	rectCur.h = image->h;
+	SDL_BlitSurface(image, NULL, video, &rectCur);
+    }
 }
 
 void CastleIncreaseArmy(const S_CASTLE *castle, E_DWELLINGCASTLE dwelling, Uint8 count){
@@ -3930,4 +3786,93 @@ void RedrawNNNNCastle(const S_CASTLE *castle){
 	return;
 	break;
     }
+}
+
+ACTION ActionOverHeroesArmy(void){
+
+    Sint32 mx;
+    
+    const char *message = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+
+    const S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
+    if(! heroes) return NONE;
+    
+    SDL_GetMouseState(&mx, NULL);
+
+    // верхний левый угол начала
+    Uint16 cx = video->w / 2 - 208;
+
+    Uint8 index = (Uint16) (mx - cx) / 88;
+
+    if(MONSTERNONE != heroes->army[index].monster){
+	if(! backMonsterCursor.use)
+	    message = "Select Army";
+	else if(index == backMonsterCursor.select && !backMonsterCursor.castle)
+	    message = "View Army";
+	else
+	    message = "Change Army";
+    }else
+	message = (backMonsterCursor.use ? "Left click Move Army, Right click Redistribute Army" : "Empty");
+
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
+    cur.y = cur.y - 3;
+    cur.w = GetLengthText(message, FONT_BIG);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+
+    return NONE;
+}
+
+ACTION ActionOverCastleArmy(void){
+
+    Sint32 mx;
+    
+    const S_CASTLE *castle = GetCurrentCastle();
+    const char *message = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect cur;
+
+    if( ! castle) return NONE;
+    
+    SDL_GetMouseState(&mx, NULL);
+
+    // верхний левый угол начала
+    Uint16 cx = video->w / 2 - 208;
+
+    Uint8 index = (Uint16) (mx - cx) / 88;
+
+    if(MONSTERNONE != castle->army[index].monster){
+	if(! backMonsterCursor.use)
+	    message = "Select Army";
+	else if(index == backMonsterCursor.select && backMonsterCursor.castle)
+	    message = "View Army";
+	else
+	    message = "Change Army";
+    }else
+	message = (backMonsterCursor.use ? "Left click Move Army, Right click Redistribute Army" : "Empty");
+
+    cur.x = video->w / 2;
+    cur.y = video->h / 2 + 240 - BORDERWIDTH;
+
+    cur.x = cur.x - GetLengthText(message, FONT_BIG) / 2;
+    cur.y = cur.y - 3;
+    cur.w = GetLengthText(message, FONT_BIG);
+    cur.h = FONT_HEIGHTBIG;
+    PrintText(video, &cur, message, FONT_BIG);
+
+    return NONE;
+}
+
+E_NAMEHEROES GetHeroesFromCastle(const S_CASTLE *castle){
+
+    if(! castle) return HEROESNULL;
+    
+    return castle->hero;
 }

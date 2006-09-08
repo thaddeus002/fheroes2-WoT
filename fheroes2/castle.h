@@ -177,9 +177,10 @@ typedef struct {
     S_MAGEGUILD	mageGuild;
     Uint16	monster[CASTLEMAXMONSTER];
     S_ARMY	army[CASTLEMAXARMY];
-    E_ARMYFORMAT    af;                             // army format
+    E_ARMYFORMAT af;                             // army format
     BOOL	allowCastle;
     BOOL	boat;
+    E_NAMEHEROES hero;
     void	*next;
 
 } S_CASTLE;
@@ -212,6 +213,8 @@ void		AllCastleIncreaseArmy(void);
 
 Uint8           GetMonsterGrownCastle(const S_CASTLE *, E_MONSTER);
 E_MAGICLEVEL	GetMageGuildLevel(const S_CASTLE *);
+
+E_NAMEHEROES	GetHeroesFromCastle(const S_CASTLE *);
 
 void		RedrawCastleMonster(void);
 void		RedrawCastleInfoResource(void);

@@ -41,6 +41,7 @@ const char * GetStringGameLevel(E_GAMELEVEL);
 const char * GetStringColor(E_COLORS);
 const char * GetStringLuck(E_LUCK);
 const char * GetStringMorale(E_MORALE);
+const char * GetStringDescriptionsMorale(E_MORALE);
 const char * GetStringSpeed(E_MONSTERSPEED);
 const char * GetStringGround(E_GROUND);
 const char * GetStringDwelling(E_RACE, E_DWELLINGCASTLE);

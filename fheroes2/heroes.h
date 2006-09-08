@@ -170,7 +170,7 @@ typedef enum {
 		SANDYSANDY	= 58,
 		BRAX		= 59,
 
-		HEROESNULL	= 0xFF
+		HEROESNULL	= 60
 
 	    } E_NAMEHEROES;
 
