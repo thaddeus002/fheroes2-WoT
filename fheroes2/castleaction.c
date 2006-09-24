@@ -51,6 +51,8 @@
 #include "castledialog.h"
 #include "recrutmonster.h"
 
+#define MESSAGELEN	64
+
 ACTION ActionOverCastle(void){
 
     const char *message = NULL;
@@ -601,6 +603,8 @@ ACTION ActionOverHeroes(void){
 
 ACTION ActionClickCastle(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
     
     if(castle->building & BUILD_CASTLE)
@@ -625,6 +629,8 @@ ACTION ActionClickCastle(void){
 
 ACTION ActionClickCaptain(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     if(EXIT == MessageBox(
@@ -638,6 +644,8 @@ ACTION ActionClickCaptain(void){
 
 ACTION ActionClickMageGuild(void){
 
+    ResetCastleSelector();
+
     ACTION result = ShowMageGuildInfo();
 
     if(EXIT != result) result = NONE;
@@ -646,6 +654,8 @@ ACTION ActionClickMageGuild(void){
 }
 
 ACTION ActionClickStatue(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
 
@@ -659,23 +669,33 @@ ACTION ActionClickStatue(void){
 }
 
 ACTION ActionClickWell(void){
-    
-    return ShowWellInfo();
+
+    ResetCastleSelector();
+    ACTION result = ShowWellInfo();
+    RedrawCastleMonster();
+    return result;
 }
 
 ACTION ActionClickThievesGuild(void){
+
+    ResetCastleSelector();
 
     return ShowThievesGuildInfo();
 }
 
 ACTION ActionClickTavern(void){
 
+    ResetCastleSelector();
+
     return ShowTavernInfo("The ultimate artifact may be found in a murky swamp..");
 }
 
 ACTION ActionClickDock(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
+
     S_PAYMENT payment = *(PaymentConditionsBuilding(castle->race, BUILD_BOAT));
 
     if(OK == BuyBoat() && KingdomAllowPayment(castle->color, &payment)){
@@ -690,7 +710,10 @@ ACTION ActionClickDock(void){
 
 ACTION ActionClickMarketplace(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
+
     if(! castle) return NONE;
 
     ACTION result = ShowMarketplace(castle->color);
@@ -700,6 +723,8 @@ ACTION ActionClickMarketplace(void){
 }
 
 ACTION ActionClickMoat(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
 
@@ -714,6 +739,8 @@ ACTION ActionClickMoat(void){
 
 ACTION ActionClickSpec(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     if(EXIT == MessageBox(
@@ -727,6 +754,8 @@ ACTION ActionClickSpec(void){
 
 ACTION ActionClickWel2(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     if(EXIT == MessageBox(
@@ -739,6 +768,8 @@ ACTION ActionClickWel2(void){
 }
 
 ACTION ActionClickDwelling1(void){
+
+    ResetCastleSelector();
 
     const Uint8 levelMonster = 1;
 
@@ -756,6 +787,8 @@ ACTION ActionClickDwelling1(void){
 
 ACTION ActionClickDwelling2(void){
 
+    ResetCastleSelector();
+
     const Uint8 levelMonster = 2;
 
     const S_CASTLE *castle = GetCurrentCastle();
@@ -771,6 +804,8 @@ ACTION ActionClickDwelling2(void){
 }
 
 ACTION ActionClickDwelling3(void){
+
+    ResetCastleSelector();
 
     const Uint8 levelMonster = 3;
 
@@ -788,6 +823,8 @@ ACTION ActionClickDwelling3(void){
 
 ACTION ActionClickDwelling4(void){
 
+    ResetCastleSelector();
+
     const Uint8 levelMonster = 4;
 
     const S_CASTLE *castle = GetCurrentCastle();
@@ -803,6 +840,8 @@ ACTION ActionClickDwelling4(void){
 }
 
 ACTION ActionClickDwelling5(void){
+
+    ResetCastleSelector();
 
     const Uint8 levelMonster = 5;
 
@@ -820,6 +859,8 @@ ACTION ActionClickDwelling5(void){
 
 ACTION ActionClickDwelling6(void){
 
+    ResetCastleSelector();
+
     const Uint8 levelMonster = 6;
 
     const S_CASTLE *castle = GetCurrentCastle();
@@ -835,6 +876,8 @@ ACTION ActionClickDwelling6(void){
 }
 
 ACTION ActionClickRCastle(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
     
@@ -854,6 +897,8 @@ ACTION ActionClickRCastle(void){
 
 ACTION ActionClickRCaptain(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     return MessageBox(
@@ -864,6 +909,8 @@ ACTION ActionClickRCaptain(void){
 }
 
 ACTION ActionClickRMageGuild(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
 
@@ -876,6 +923,8 @@ ACTION ActionClickRMageGuild(void){
 
 ACTION ActionClickRStatue(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     return MessageBox(
@@ -886,6 +935,8 @@ ACTION ActionClickRStatue(void){
 }
 
 ACTION ActionClickRWell(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
 
@@ -898,6 +949,8 @@ ACTION ActionClickRWell(void){
 
 ACTION ActionClickRThievesGuild(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     return MessageBox(
@@ -908,6 +961,8 @@ ACTION ActionClickRThievesGuild(void){
 }
 
 ACTION ActionClickRTavern(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
 
@@ -920,6 +975,8 @@ ACTION ActionClickRTavern(void){
 
 ACTION ActionClickRDock(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     return MessageBox(
@@ -930,6 +987,8 @@ ACTION ActionClickRDock(void){
 }
 
 ACTION ActionClickRMarketplace(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
 
@@ -942,6 +1001,8 @@ ACTION ActionClickRMarketplace(void){
 
 ACTION ActionClickRMoat(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     return MessageBox(
@@ -952,6 +1013,8 @@ ACTION ActionClickRMoat(void){
 }
 
 ACTION ActionClickRSpec(void){
+
+    ResetCastleSelector();
 
     const S_CASTLE *castle = GetCurrentCastle();
 
@@ -964,6 +1027,8 @@ ACTION ActionClickRSpec(void){
 
 ACTION ActionClickRWel2(void){
 
+    ResetCastleSelector();
+
     const S_CASTLE *castle = GetCurrentCastle();
 
     return MessageBox(
@@ -974,6 +1039,8 @@ ACTION ActionClickRWel2(void){
 }
 
 ACTION ActionClickRDwelling1(void){
+
+    ResetCastleSelector();
 
     Uint8 level = 1;
 
@@ -986,6 +1053,8 @@ ACTION ActionClickRDwelling1(void){
 
 ACTION ActionClickRDwelling2(void){
 
+    ResetCastleSelector();
+
     Uint8 level = 2;
 
     const S_CASTLE *castle = GetCurrentCastle();
@@ -996,6 +1065,8 @@ ACTION ActionClickRDwelling2(void){
 }
 
 ACTION ActionClickRDwelling3(void){
+
+    ResetCastleSelector();
 
     Uint8 level = 3;
 
@@ -1008,6 +1079,8 @@ ACTION ActionClickRDwelling3(void){
 
 ACTION ActionClickRDwelling4(void){
 
+    ResetCastleSelector();
+
     Uint8 level = 4;
 
     const S_CASTLE *castle = GetCurrentCastle();
@@ -1019,6 +1092,8 @@ ACTION ActionClickRDwelling4(void){
 
 ACTION ActionClickRDwelling5(void){
 
+    ResetCastleSelector();
+
     Uint8 level = 5;
 
     const S_CASTLE *castle = GetCurrentCastle();
@@ -1029,6 +1104,8 @@ ACTION ActionClickRDwelling5(void){
 }
 
 ACTION ActionClickRDwelling6(void){
+
+    ResetCastleSelector();
 
     Uint8 level = 6;
 
@@ -1455,25 +1532,25 @@ ACTION ActionCastleOverShipyard(void){
 
 ACTION ActionCastleOverWel2(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     switch(AllowBuildWel2(castle)){
 
 	case BUILD_OK:
-	    sprintf(message, "Build %s", GetStringBuilding(castle->race, BUILD_WEL2));
+	    snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, BUILD_WEL2));
 	    break;
 	
 	case CANNOT_BUILD:
-	    sprintf(message, "Cannot build %s", GetStringBuilding(castle->race, BUILD_WEL2));
+	    snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, BUILD_WEL2));
 	    break;
 	
 	case ALREADY_BUILD:
-	    sprintf(message, "%s is already build", GetStringBuilding(castle->race, BUILD_WEL2));
+	    snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, BUILD_WEL2));
 	    break;
 	
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1494,25 +1571,25 @@ ACTION ActionCastleOverWel2(void){
 
 ACTION ActionCastleOverSpec(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     switch(AllowBuildSpec(castle)){
 
 	case BUILD_OK:
-	    sprintf(message, "Build %s", GetStringBuilding(castle->race, BUILD_SPEC));
+	    snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, BUILD_SPEC));
 	    break;
 	
 	case CANNOT_BUILD:
-	    sprintf(message, "Cannot build %s", GetStringBuilding(castle->race, BUILD_SPEC));
+	    snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, BUILD_SPEC));
 	    break;
 	
 	case ALREADY_BUILD:
-	    sprintf(message, "%s is already build", GetStringBuilding(castle->race, BUILD_SPEC));
+	    snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, BUILD_SPEC));
 	    break;
 	
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1533,25 +1610,25 @@ ACTION ActionCastleOverSpec(void){
 
 ACTION ActionCastleOverDwelling1(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     switch(AllowBuildDwelling1(castle)){
 
 	case BUILD_OK:
-	    sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
 	    break;
 	
 	case CANNOT_BUILD:
-	    sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
 	    break;
 	
 	case ALREADY_BUILD:
-	    sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER1));
 	    break;
 	
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1572,31 +1649,31 @@ ACTION ActionCastleOverDwelling1(void){
 
 ACTION ActionCastleOverDwelling2(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     
     switch(AllowBuildDwelling2(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER2 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
-		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	    castle->dwelling & DWELLING_MONSTER2 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
 	    break;
 
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER2 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
-		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	    castle->dwelling & DWELLING_MONSTER2 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
 	    break;
 
 	case ALREADY_BUILD:
 	    if(castle->dwelling & DWELLING_UPGRADE2)
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE2));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE2));
 	    else
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER2));
 	    break;
 
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1617,30 +1694,30 @@ ACTION ActionCastleOverDwelling2(void){
 
 ACTION ActionCastleOverDwelling3(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     switch(AllowBuildDwelling3(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER3 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
-		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	    castle->dwelling & DWELLING_MONSTER3 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
 	    break;
 	
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER3 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
-		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	    castle->dwelling & DWELLING_MONSTER3 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
 	    break;
 	
 	case ALREADY_BUILD:
 	    if(castle->dwelling & DWELLING_UPGRADE3)
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE3));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE3));
 	    else
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER3));
 	    break;
 	
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1661,30 +1738,30 @@ ACTION ActionCastleOverDwelling3(void){
 
 ACTION ActionCastleOverDwelling4(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     switch(AllowBuildDwelling4(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER4 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
-		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	    castle->dwelling & DWELLING_MONSTER4 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
 	    break;
 	
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER4 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
-		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	    castle->dwelling & DWELLING_MONSTER4 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
 	    break;
 	
 	case ALREADY_BUILD:
 	    if(castle->dwelling & DWELLING_UPGRADE4)
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE4));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE4));
 	    else
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER4));
 	    break;
 	
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1705,30 +1782,30 @@ ACTION ActionCastleOverDwelling4(void){
 
 ACTION ActionCastleOverDwelling5(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     switch(AllowBuildDwelling5(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER5 ? sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
-		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	    castle->dwelling & DWELLING_MONSTER5 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
 	    break;
 	
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER5 ? sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
-		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	    castle->dwelling & DWELLING_MONSTER5 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
 	    break;
 	
 	case ALREADY_BUILD:
 	    if(castle->dwelling & DWELLING_UPGRADE5)
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE5));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE5));
 	    else
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER5));
 	    break;
 	
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1749,40 +1826,40 @@ ACTION ActionCastleOverDwelling5(void){
 
 ACTION ActionCastleOverDwelling6(void){
     
-    char message[64];
+    char message[MESSAGELEN + 1];
     const S_CASTLE *castle = GetCurrentCastle();
     
     switch(AllowBuildDwelling6(castle)){
 
 	case BUILD_OK:
 	    if(castle->race == WARLOCK && castle->dwelling & DWELLING_UPGRADE6)
-		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
+		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
 	    else if(castle->dwelling & DWELLING_MONSTER6)
-		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
 	    else
-		sprintf(message, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
 	    break;
 	
 	case CANNOT_BUILD:
 	    if(castle->race == WARLOCK && castle->dwelling & DWELLING_UPGRADE6)
-		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
 	    else if(castle->dwelling & DWELLING_MONSTER6)
-		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
 	    else
-		sprintf(message, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
 	    break;
 	
 	case ALREADY_BUILD:
 	    if(castle->dwelling & DWELLING_UPGRADE7)
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
 	    else if(castle->dwelling & DWELLING_UPGRADE6)
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
 	    else if(castle->dwelling & DWELLING_MONSTER6)
-		sprintf(message, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER6));
 	    break;
 	
 	case END_TUR:
-	    sprintf(message, "Cannot build. Already build here this turn.");
+	    snprintf(message, MESSAGELEN, "Cannot build. Already build here this turn.");
 	    break;
     }
 
@@ -1842,7 +1919,7 @@ ACTION ActionCastleOverCaptain(void){
 
 ACTION ActionCastleOverRecrutPrimaryHeroes(void){
 
-    char message[64];
+    char message[MESSAGELEN + 1];
 
     const S_HEROES *heroes = GetStatHeroes(GetRecrutPrimaryHeroes());
     const S_CASTLE *castle = GetCurrentCastle();
@@ -1850,16 +1927,16 @@ ACTION ActionCastleOverRecrutPrimaryHeroes(void){
     switch(AllowRecrutHeroes(castle)){
 
 	case BUILD_OK:
-	    sprintf(message,  "Recrut %s The %s.", heroes->name, GetStringRace(heroes->race));
+	    snprintf(message, MESSAGELEN,  "Recrut %s The %s.", heroes->name, GetStringRace(heroes->race));
 	    break;
 	
 	default:
 	case CANNOT_BUILD:
-	    sprintf(message, "Cannot afford a Hero.");
+	    snprintf(message, MESSAGELEN, "Cannot afford a Hero.");
 	    break;
 	
 	case ALREADY_BUILD:
-	    sprintf(message, "Cannot recrut - you already have a Hero in this town.");
+	    snprintf(message, MESSAGELEN, "Cannot recrut - you already have a Hero in this town.");
 	    break;
 	
     }
@@ -1881,7 +1958,7 @@ ACTION ActionCastleOverRecrutPrimaryHeroes(void){
 
 ACTION ActionCastleOverRecrutSecondaryHeroes(void){
 
-    char message[64];
+    char message[MESSAGELEN + 1];
 
     const S_HEROES *heroes = GetStatHeroes(GetRecrutSecondaryHeroes());
     const S_CASTLE *castle = GetCurrentCastle();
@@ -1889,16 +1966,16 @@ ACTION ActionCastleOverRecrutSecondaryHeroes(void){
     switch(AllowRecrutHeroes(castle)){
 
 	case BUILD_OK:
-	    sprintf(message,  "Recrut %s The %s.", heroes->name, GetStringRace(heroes->race));
+	    snprintf(message, MESSAGELEN,  "Recrut %s The %s.", heroes->name, GetStringRace(heroes->race));
 	    break;
 	
 	default:
 	case CANNOT_BUILD:
-	    sprintf(message, "Cannot afford a Hero.");
+	    snprintf(message, MESSAGELEN, "Cannot afford a Hero.");
 	    break;
 	
 	case ALREADY_BUILD:
-	    sprintf(message, "Cannot recrut - you already have a Hero in this town.");
+	    snprintf(message, MESSAGELEN, "Cannot recrut - you already have a Hero in this town.");
 	    break;
 	
     }
@@ -2152,7 +2229,7 @@ ACTION ActionCastleClickDwelling2(void){
 	else
 	    BuildDwelling2(castle);
 
-	CastleIncreaseArmy(castle, DWELLING_MONSTER2, GetMonsterGrown(GetMonsterFromCastle(castle, 2)));
+	if(! castle->dwelling & DWELLING_UPGRADE2) CastleIncreaseArmy(castle, DWELLING_MONSTER2, GetMonsterGrown(GetMonsterFromCastle(castle, 2)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2178,7 +2255,7 @@ ACTION ActionCastleClickDwelling3(void){
 	else
 	    BuildDwelling3(castle);
 
-	CastleIncreaseArmy(castle, DWELLING_MONSTER3, GetMonsterGrown(GetMonsterFromCastle(castle, 3)));
+	if(! castle->dwelling & DWELLING_UPGRADE3) CastleIncreaseArmy(castle, DWELLING_MONSTER3, GetMonsterGrown(GetMonsterFromCastle(castle, 3)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2204,7 +2281,7 @@ ACTION ActionCastleClickDwelling4(void){
 	else
 	    BuildDwelling4(castle);
 
-	CastleIncreaseArmy(castle, DWELLING_MONSTER4, GetMonsterGrown(GetMonsterFromCastle(castle, 4)));
+	if(! castle->dwelling & DWELLING_UPGRADE4) CastleIncreaseArmy(castle, DWELLING_MONSTER4, GetMonsterGrown(GetMonsterFromCastle(castle, 4)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2230,7 +2307,7 @@ ACTION ActionCastleClickDwelling5(void){
 	else
 	    BuildDwelling5(castle);
 
-	CastleIncreaseArmy(castle, DWELLING_MONSTER5, GetMonsterGrown(GetMonsterFromCastle(castle, 5)));
+	if(! castle->dwelling & DWELLING_UPGRADE5) CastleIncreaseArmy(castle, DWELLING_MONSTER5, GetMonsterGrown(GetMonsterFromCastle(castle, 5)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2260,7 +2337,7 @@ ACTION ActionCastleClickDwelling6(void){
 	else
 	    BuildDwelling6(castle);
 
-	CastleIncreaseArmy(castle, DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(castle, 6)));
+	if(!castle->dwelling & DWELLING_UPGRADE6 && !castle->dwelling & DWELLING_UPGRADE7) CastleIncreaseArmy(castle, DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(castle, 6)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2285,12 +2362,12 @@ ACTION ActionCastleClickCaptain(void){
 
 ACTION ActionCastleRClickRecrutPrimaryHeroes(void){
 
-    return ShowHeroesInfo(GetRecrutPrimaryHeroes());
+    return ShowHeroesInfo(GetRecrutPrimaryHeroes(), TRUE);
 }
 
 ACTION ActionCastleRClickRecrutSecondaryHeroes(void){
 
-    return ShowHeroesInfo(GetRecrutSecondaryHeroes());
+    return ShowHeroesInfo(GetRecrutSecondaryHeroes(), TRUE);
 }
 
 ACTION ActionCastleLClickRecrutPrimaryHeroes(void){

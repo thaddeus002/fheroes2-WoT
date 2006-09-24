@@ -40,7 +40,7 @@ typedef struct {
 
 		} S_BOX;
 
-BOOL		InitBox(S_BOX *, Uint16, INTERFACEACTION **, Uint32);
+S_BOX *		InitBox(Uint16, INTERFACEACTION **, Uint32);
 void		FreeBox(S_BOX *);
 Uint16		GetHeightText(const char *, ENUMFONT);
 

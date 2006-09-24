@@ -25,7 +25,8 @@
 
     Description:
 */
-
+#include <stdlib.h>
+#include "SDL.h"
 #include "mp2maps.h"
 #include "gamedefs.h"
 #include "debug.h"

@@ -35,14 +35,14 @@
 #include "resource.h"
 #include "artifact.h"
 
-static S_ARTIFACT * ptrArtifact = NULL;
+static BOOL useArtifact[ARTIFACTMAXCOUNT];
 
             
 E_ARTIFACT CheckValidArtifact(Uint8 type){
 
     E_ARTIFACT a;
             
-    for(a = ULTIMATE_BOOK; a < ARTIFACTNONE; ++a)
+    for(a = ULTIMATE_BOOK; a <= RND_ARTIFACT3; ++a)
         if(a == type)
             return a;
 
@@ -50,23 +50,6 @@ E_ARTIFACT CheckValidArtifact(Uint8 type){
         fprintf(stderr, "CheckValidArtifact: unknown object: 0x%hhX\n", type);
 
     return ARTIFACTNONE;
-}
-
-S_ARTIFACT * GetStatArtifact(E_ARTIFACT artifact){
-
-    return &ptrArtifact[artifact];
-}
-
-const char * GetStringArtifact(E_ARTIFACT artifact){
-
-    return ptrArtifact[artifact].descriptions;
-}
-
-void FreeArtifact(void){
-
-    if(ptrArtifact) free(ptrArtifact);
-    
-    ptrArtifact = NULL;
 }
 
 E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
@@ -84,9 +67,9 @@ E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
 	    result = level1[rand() % ARTIFACTCOUNT_LEVEL1];
 	    if(! GetIntValue(UNIQUEARTIFACT)) return result;
 	    for(i = 0; i < ARTIFACTCOUNT_LEVEL1; ++i)
-		if(! ptrArtifact[level1[i]].use){
-		    while(ptrArtifact[result].use) result = level1[rand() % ARTIFACTCOUNT_LEVEL1];
-		    ptrArtifact[result].use = TRUE;
+		if(! useArtifact[level1[i]]){
+		    while(useArtifact[result]) result = level1[rand() % ARTIFACTCOUNT_LEVEL1];
+		    useArtifact[result] = TRUE;
 		}
 	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_LEVEL1 all busy. Use uniqueartifact = off.\n");
 	    return result;
@@ -96,9 +79,9 @@ E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
 	    result = level2[rand() % ARTIFACTCOUNT_LEVEL2];
 	    if(! GetIntValue(UNIQUEARTIFACT)) return result;
 	    for(i = 0; i < ARTIFACTCOUNT_LEVEL2; ++i)
-		if(! ptrArtifact[level2[i]].use){
-		    while(ptrArtifact[result].use) result = level2[rand() % ARTIFACTCOUNT_LEVEL2];
-		    ptrArtifact[result].use = TRUE;
+		if(! useArtifact[level2[i]]){
+		    while(useArtifact[result]) result = level2[rand() % ARTIFACTCOUNT_LEVEL2];
+		    useArtifact[result] = TRUE;
 		}
 	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_LEVEL2 all busy. Use uniqueartifact = off.\n");
 	    return result;
@@ -108,9 +91,9 @@ E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
 	    result = level3[rand() % ARTIFACTCOUNT_LEVEL3];
 	    if(! GetIntValue(UNIQUEARTIFACT)) return result;
 	    for(i = 0; i < ARTIFACTCOUNT_LEVEL3; ++i)
-		if(! ptrArtifact[level3[i]].use){
-		    while(ptrArtifact[result].use) result = level3[rand() % ARTIFACTCOUNT_LEVEL3];
-		    ptrArtifact[result].use = TRUE;
+		if(! useArtifact[level3[i]]){
+		    while(useArtifact[result]) result = level3[rand() % ARTIFACTCOUNT_LEVEL3];
+		    useArtifact[result] = TRUE;
 		}
 	    if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_LEVEL3 all busy. Use uniqueartifact = off.\n");
 	    return result;
@@ -124,351 +107,535 @@ E_ARTIFACT GetRNDArtifact(E_LEVELARTIFACT level){
     result = 9 + (rand() % (ARTIFACTMAXCOUNT - 10));
     if(! GetIntValue(UNIQUEARTIFACT)) return result;
     for(i = 9; i < ARTIFACTMAXCOUNT - 10; ++i)
-	if(! ptrArtifact[i].use){
-	    while(ptrArtifact[result].use) result = 9 + (rand() % (ARTIFACTMAXCOUNT - 10));
-	    ptrArtifact[result].use = TRUE;
+	if(! useArtifact[i]){
+	    while(useArtifact[result]) result = 9 + (rand() % (ARTIFACTMAXCOUNT - 10));
+	    useArtifact[result] = TRUE;
 	}
     if(GetIntValue(DEBUG)) fprintf(stderr, "GetRNDArtifact: ART_ALL all busy. Use uniqueartifact = off.\n");
 
     return result;
 }
 
+void	FreeArtifact(void){
+    return;
+}
+
 BOOL    InitArtifact(void){
 
-	if(NULL == (ptrArtifact = malloc(sizeof(S_ARTIFACT) * ARTIFACTMAXCOUNT))){
-	    fprintf(stderr, "InitArtifact: error malloc: %d\n", sizeof(S_ARTIFACT) * ARTIFACTMAXCOUNT);
-	    return FALSE;
-	}
-
-	ptrArtifact[ULTIMATE_BOOK].name = "Ultimate Book";
-	ptrArtifact[ULTIMATE_BOOK].descriptions = "The Ultimate Book of Knowledge increases your knowledge by 12.";
-	ptrArtifact[ULTIMATE_BOOK].use = FALSE;
-
-	ptrArtifact[ULTIMATE_SWORD].name = "Ultimate Sword";
-	ptrArtifact[ULTIMATE_SWORD].descriptions = "The Ultimate Sword of Dominion increases your attack skill by 12.";
-	ptrArtifact[ULTIMATE_SWORD].use = FALSE;
-
-	ptrArtifact[ULTIMATE_CLOAK].name = "Ultimate Cloak";
-	ptrArtifact[ULTIMATE_CLOAK].descriptions = "The Ultimate Cloak of Protection increases your defense skill by 12.";
-	ptrArtifact[ULTIMATE_CLOAK].use = FALSE;
-
-	ptrArtifact[ULTIMATE_WAND].name = "Ultimate Wand";
-	ptrArtifact[ULTIMATE_WAND].descriptions = "The Ultimate Wand of Magic increases your spell power by 12.";
-	ptrArtifact[ULTIMATE_WAND].use = FALSE;
-
-	ptrArtifact[ULTIMATE_SHIELD].name = "Ultimate Shield";
-	ptrArtifact[ULTIMATE_SHIELD].descriptions = "The Ultimate Shield increases your attack and defense skills by 6 each.";
-	ptrArtifact[ULTIMATE_SHIELD].use = FALSE;
-
-	ptrArtifact[ULTIMATE_STAFF].name = "Ultimate Staff";
-	ptrArtifact[ULTIMATE_STAFF].descriptions = "The Ultimate Staff increases your spell power and knowledge by 6 each.";
-	ptrArtifact[ULTIMATE_STAFF].use = FALSE;
-
-	ptrArtifact[ULTIMATE_CROWN].name = "Ultimate Crown";
-	ptrArtifact[ULTIMATE_CROWN].descriptions = "The Ultimate Crown increases each of your basic skills by 4 points.";
-	ptrArtifact[ULTIMATE_CROWN].use = FALSE;
-
-	ptrArtifact[GOLDEN_GOOSE].name = "Ultimate Goose";
-	ptrArtifact[GOLDEN_GOOSE].descriptions = "The Golden Goose brings in an income of 10,000 gold per turn.";
-	ptrArtifact[GOLDEN_GOOSE].use = FALSE;
-
-	ptrArtifact[ARCANE_NECKLACE].name = "Arcane Necklace";
-	ptrArtifact[ARCANE_NECKLACE].descriptions = "The Arcane Necklace of Magic increases your spell power by 4.";
-	ptrArtifact[ARCANE_NECKLACE].use = FALSE;
-
-	ptrArtifact[CASTER_BRACELET].name = "Caster's Bracelet";
-	ptrArtifact[CASTER_BRACELET].descriptions = "The Caster's Bracelet of Magic increases your spell power by 2.";
-	ptrArtifact[CASTER_BRACELET].use = FALSE;
-
-	ptrArtifact[MAGE_RING].name = "Mage's Ring";
-	ptrArtifact[MAGE_RING].descriptions = "The Mage's Ring of Power increases your spell power by 2.";
-	ptrArtifact[MAGE_RING].use = FALSE;
-
-	ptrArtifact[WITCHES_BROACH].name = "Witches Broach";
-	ptrArtifact[WITCHES_BROACH].descriptions = "The Witch's Broach of Magic increases your spell power by 3.";
-	ptrArtifact[WITCHES_BROACH].use = FALSE;
-
-	ptrArtifact[MEDAL_VALOR].name = "Medal of Valor";
-	ptrArtifact[MEDAL_VALOR].descriptions = "The Medal of Valor increases your morale.";
-	ptrArtifact[MEDAL_VALOR].use = FALSE;
-
-	ptrArtifact[MEDAL_COURAGE].name = "Medal of Courage";
-	ptrArtifact[MEDAL_COURAGE].descriptions = "The Medal of Courage increases your morale.";
-	ptrArtifact[MEDAL_COURAGE].use = FALSE;
-
-	ptrArtifact[MEDAL_HONOR].name = "Medal of Honor";
-	ptrArtifact[MEDAL_HONOR].descriptions = "The Medal of Honor increases your morale.";
-	ptrArtifact[MEDAL_HONOR].use = FALSE;
-
-	ptrArtifact[MEDAL_DISTINCTION].name = "Medal of Distinction";
-	ptrArtifact[MEDAL_DISTINCTION].descriptions = "The Medal of Distinction increases your morale.";
-	ptrArtifact[MEDAL_DISTINCTION].use = FALSE;
-
-	ptrArtifact[FIZBIN_MISFORTUNE].name = "Fizbin of Misfortune";
-	ptrArtifact[FIZBIN_MISFORTUNE].descriptions = "The Fizbin of Misfortune greatly decreases your morale.";
-	ptrArtifact[FIZBIN_MISFORTUNE].use = FALSE;
-
-	ptrArtifact[THUNDER_MACE].name = "Thunder Mace";
-	ptrArtifact[THUNDER_MACE].descriptions = "The Thunder Mace of Dominion increases your attack skill by 1.";
-	ptrArtifact[THUNDER_MACE].use = FALSE;
-
-	ptrArtifact[ARMORED_GAUNTLETS].name = "Armored Gauntlets";
-	ptrArtifact[ARMORED_GAUNTLETS].descriptions = "The Armored Gauntlets of Protection increase your defense skill by 1.";
-	ptrArtifact[ARMORED_GAUNTLETS].use = FALSE;
-
-	ptrArtifact[DEFENDER_HELM].name = "Defender Helm";
-	ptrArtifact[DEFENDER_HELM].descriptions = "The Defender Helm of Protection increases your defense skill by 1.";
-	ptrArtifact[DEFENDER_HELM].use = FALSE;
-
-	ptrArtifact[GIANT_FLAIL].name = "Giant Flail";
-	ptrArtifact[GIANT_FLAIL].descriptions = "The Giant Flail of Dominion increases your attack skill by 1.";
-	ptrArtifact[GIANT_FLAIL].use = FALSE;
-
-	ptrArtifact[BALLISTA].name = "Ballista";
-	ptrArtifact[BALLISTA].descriptions = "The Ballista of Quickness lets your catapult fire twice per combat round.";
-	ptrArtifact[BALLISTA].use = FALSE;
-
-	ptrArtifact[STEALTH_SHIELD].name = "Stealth Shield";
-	ptrArtifact[STEALTH_SHIELD].descriptions = "The Stealth Shield of Protection increases your defense skill by 2.";
-	ptrArtifact[STEALTH_SHIELD].use = FALSE;
-
-	ptrArtifact[DRAGON_SWORD].name = "Dragon Sword";
-	ptrArtifact[DRAGON_SWORD].descriptions = "The Dragon Sword of Dominion increases your attack skill by 3.";
-	ptrArtifact[DRAGON_SWORD].use = FALSE;
-
-	ptrArtifact[POWER_AXE].name = "Power Axe";
-	ptrArtifact[POWER_AXE].descriptions = "The Power Axe of Dominion increases your attack skill by 2.";
-	ptrArtifact[POWER_AXE].use = FALSE;
-
-	ptrArtifact[DIVINE_BREASTPLATE].name = "Divine Breastplate";
-	ptrArtifact[DIVINE_BREASTPLATE].descriptions = "The Divine Breastplate of Protection increases your defense skill by 3.";
-	ptrArtifact[DIVINE_BREASTPLATE].use = FALSE;
-
-	ptrArtifact[MINOR_SCROLL].name = "Minor Scroll";
-	ptrArtifact[MINOR_SCROLL].descriptions = "The Minor Scroll of Knowledge increases your knowledge by 2.";
-	ptrArtifact[MINOR_SCROLL].use = FALSE;
-
-	ptrArtifact[MAJOR_SCROLL].name = "Major Scroll";
-	ptrArtifact[MAJOR_SCROLL].descriptions = "The Major Scroll of Knowledge increases your knowledge by 3.";
-	ptrArtifact[MAJOR_SCROLL].use = FALSE;
-
-	ptrArtifact[SUPERIOR_SCROLL].name = "Superior Scroll";
-	ptrArtifact[SUPERIOR_SCROLL].descriptions = "The Superior Scroll of Knowledge increases your knowledge by 4.";
-	ptrArtifact[SUPERIOR_SCROLL].use = FALSE;
-
-	ptrArtifact[FOREMOST_SCROLL].name = "Foremost Scroll";
-	ptrArtifact[FOREMOST_SCROLL].descriptions = "The Foremost Scroll of Knowledge increases your knowledge by 5.";
-	ptrArtifact[FOREMOST_SCROLL].use = FALSE;
-
-	ptrArtifact[ENDLESS_SACK_GOLD].name = "Endless Sack of Gold";
-	ptrArtifact[ENDLESS_SACK_GOLD].descriptions = "The Endless Sack of Gold provides you with 1000 gold per day.";
-	ptrArtifact[ENDLESS_SACK_GOLD].use = FALSE;
-
-	ptrArtifact[ENDLESS_BAG_GOLD].name = "Endless Bag of Gold";
-	ptrArtifact[ENDLESS_BAG_GOLD].descriptions = "The Endless Bag of Gold provides you with 750 gold per day.";
-	ptrArtifact[ENDLESS_BAG_GOLD].use = FALSE;
-
-	ptrArtifact[ENDLESS_PURSE_GOLD].name = "Endless Purse of Gold";
-	ptrArtifact[ENDLESS_PURSE_GOLD].descriptions = "The Endless Purse of Gold provides you with 500 gold per day.";
-	ptrArtifact[ENDLESS_PURSE_GOLD].use = FALSE;
-
-	ptrArtifact[RABBIT_FOOT].name = "Rabbit's Foot";
-	ptrArtifact[RABBIT_FOOT].descriptions = "The Lucky Rabbit's Foot increases your luck in combat.";
-	ptrArtifact[RABBIT_FOOT].use = FALSE;
-
-	ptrArtifact[GOLDEN_HORSESHOE].name = "Golden Horseshoe";
-	ptrArtifact[GOLDEN_HORSESHOE].descriptions = "The Golden Horseshoe increases your luck in combat.";
-	ptrArtifact[GOLDEN_HORSESHOE].use = FALSE;
-
-	ptrArtifact[GAMBLER_LUCKY_COIN].name = "Gambler's Lucky Coin";
-	ptrArtifact[GAMBLER_LUCKY_COIN].descriptions = "The Gambler's Lucky Coin increases your luck in combat.";
-	ptrArtifact[GAMBLER_LUCKY_COIN].use = FALSE;
-
-	ptrArtifact[FOUR_LEAF_CLOVER].name = "Four-Leaf Clover";
-	ptrArtifact[FOUR_LEAF_CLOVER].descriptions = "The Four_Leaf Clover increases your luck in combat.";
-	ptrArtifact[FOUR_LEAF_CLOVER].use = FALSE;
-
-	ptrArtifact[EVIL_EYE].name = "Evil Eye";
-	ptrArtifact[EVIL_EYE].descriptions = "The Evil Eye reduces the casting cost of curse spells by half.";
-	ptrArtifact[EVIL_EYE].use = FALSE;
-
-	ptrArtifact[ENCHANTED_HOURGLASS].name = "Enchanted Hourglass";
-	ptrArtifact[ENCHANTED_HOURGLASS].descriptions = "The Enchanted Hourglass extends the duration of all your spells by 2 turns.";
-	ptrArtifact[ENCHANTED_HOURGLASS].use = FALSE;
-
-	ptrArtifact[GOLD_WATCH].name = "Gold Wath";
-	ptrArtifact[GOLD_WATCH].descriptions = "The Gold Watch doubles the effectiveness of your hypnotize spells.";
-	ptrArtifact[GOLD_WATCH].use = FALSE;
-
-	ptrArtifact[SKULLCAP].name = "Skullcap";
-	ptrArtifact[SKULLCAP].descriptions = "The Skullcap halves the casting cost of all mind influencing spells.";
-	ptrArtifact[SKULLCAP].use = FALSE;
-
-	ptrArtifact[ICE_CLOAK].name = "Ice Clock";
-	ptrArtifact[ICE_CLOAK].descriptions = "The Ice Cloak halves all damage your troops take from cold spells.";
-	ptrArtifact[ICE_CLOAK].use = FALSE;
-
-	ptrArtifact[FIRE_CLOAK].name = "Fire Cloak";
-	ptrArtifact[FIRE_CLOAK].descriptions = "The Fire Cloak halves all damage your troops take from fire spells.";
-	ptrArtifact[FIRE_CLOAK].use = FALSE;
-
-	ptrArtifact[LIGHTNING_HELM].name = "Lightning Helm";
-	ptrArtifact[LIGHTNING_HELM].descriptions = "The Lightning Helm halves all damage your troops take from lightning spells.";
-	ptrArtifact[LIGHTNING_HELM].use = FALSE;
-
-	ptrArtifact[EVERCOLD_ICICLE].name = "Evercold Icicle";
-	ptrArtifact[EVERCOLD_ICICLE].descriptions = "The Evercold Icicle causes your cold spells to do 50% more damage to enemy troops.";
-	ptrArtifact[EVERCOLD_ICICLE].use = FALSE;
-
-	ptrArtifact[EVERHOT_LAVA_ROCK].name = "Everhot Lava Rock";
-	ptrArtifact[EVERHOT_LAVA_ROCK].descriptions = "The Everhot Lava Rock causes your fire spells to do 50% more damage to enemy troops.";
-	ptrArtifact[EVERHOT_LAVA_ROCK].use = FALSE;
-
-	ptrArtifact[LIGHTNING_ROD].name = "Lightning Rod";
-	ptrArtifact[LIGHTNING_ROD].descriptions = "The Lightning Rod causes your lightning spells to do 50% more damage to enemy troops.";
-	ptrArtifact[LIGHTNING_ROD].use = FALSE;
-
-	ptrArtifact[SNAKE_RING].name = "Snake-Ring";
-	ptrArtifact[SNAKE_RING].descriptions = "The Snake Ring halves the casting cost of all your bless spells.";
-	ptrArtifact[SNAKE_RING].use = FALSE;
-
-	ptrArtifact[ANKH].name = "Ankh";
-	ptrArtifact[ANKH].descriptions = "The Ankh doubles the effectiveness of all your resurrect and animate spells.";
-	ptrArtifact[ANKH].use = FALSE;
-
-	ptrArtifact[BOOK_ELEMENTS].name = "Book of Elements";
-	ptrArtifact[BOOK_ELEMENTS].descriptions = "The Book of Elements doubles the effectiveness of all your summoning spells.";
-	ptrArtifact[BOOK_ELEMENTS].use = FALSE;
-
-	ptrArtifact[ELEMENTAL_RING].name = "Elemental Ring";
-	ptrArtifact[ELEMENTAL_RING].descriptions = "The Elemental Ring halves the casting cost of all summoning spells.";
-	ptrArtifact[ELEMENTAL_RING].use = FALSE;
-
-	ptrArtifact[HOLY_PENDANT].name = "Holy Pendant";
-	ptrArtifact[HOLY_PENDANT].descriptions = "The Holy Pendant makes all your troops immune to curse spells.";
-	ptrArtifact[HOLY_PENDANT].use = FALSE;
-
-	ptrArtifact[PENDANT_FREE_WILL].name = "Pendant of Free Will";
-	ptrArtifact[PENDANT_FREE_WILL].descriptions = "The Pendant of Free Will makes all your troops immune to hypnotize spells.";
-	ptrArtifact[PENDANT_FREE_WILL].use = FALSE;
-
-	ptrArtifact[PENDANT_LIFE].name = "Pendant of Life";
-	ptrArtifact[PENDANT_LIFE].descriptions = "The Pendant of Life makes all your troops immune to death spells.";
-	ptrArtifact[PENDANT_LIFE].use = FALSE;
-
-	ptrArtifact[SERENITY_PENDANT].name = "Serenity Pendant";
-	ptrArtifact[SERENITY_PENDANT].descriptions = "The Serenity Pendant makes all your troops immune to berserk spells.";
-	ptrArtifact[SERENITY_PENDANT].use = FALSE;
-
-	ptrArtifact[SEEING_EYE_PENDANT].name = "Seeing-eye Pendant";
-	ptrArtifact[SEEING_EYE_PENDANT].descriptions = "The Seeing_eye Pendant makes all your troops immune to blindness spells.";
-	ptrArtifact[SEEING_EYE_PENDANT].use = FALSE;
-
-	ptrArtifact[KINETIC_PENDANT].name = "Kinetic Pendant";
-	ptrArtifact[KINETIC_PENDANT].descriptions = "The Kinetic Pendant makes all your troops immune to paralyze spells.";
-	ptrArtifact[KINETIC_PENDANT].use = FALSE;
-
-	ptrArtifact[PENDANT_DEATH].name = "Pendant of Death";
-	ptrArtifact[PENDANT_DEATH].descriptions = "The Pendant of Death makes all your troops immune to holy spells.";
-	ptrArtifact[PENDANT_DEATH].use = FALSE;
-
-	ptrArtifact[WAND_NEGATION].name = "Wand of Negation";
-	ptrArtifact[WAND_NEGATION].descriptions = "The Wand of Negation protects your troops from the Dispel Magic spell.";
-	ptrArtifact[WAND_NEGATION].use = FALSE;
-
-	ptrArtifact[GOLDEN_BOW].name = "Golden Bow";
-	ptrArtifact[GOLDEN_BOW].descriptions = "The Golden Bow eliminates the 50% penalty for your troops shooting past obstacles. (e.g. castle walls)";
-	ptrArtifact[GOLDEN_BOW].use = FALSE;
-
-	ptrArtifact[TELESCOPE].name = "Telescope";
-	ptrArtifact[TELESCOPE].descriptions = "The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.";
-	ptrArtifact[TELESCOPE].use = FALSE;
-
-	ptrArtifact[STATESMAN_QUILL].name = "Statesman's Quill";
-	ptrArtifact[STATESMAN_QUILL].descriptions = "The Statesman's Quill reduces the cost of surrender to 10% of the total cost of troops you have in your army.";
-	ptrArtifact[STATESMAN_QUILL].use = FALSE;
-
-	ptrArtifact[WIZARD_HAT].name = "Wizard's Hat";
-	ptrArtifact[WIZARD_HAT].descriptions = "The Wizard's Hat increases the duration of your spells by 10 turns!";
-	ptrArtifact[WIZARD_HAT].use = FALSE;
-
-	ptrArtifact[POWER_RING].name = "Power Ring";
-	ptrArtifact[POWER_RING].descriptions = "The Power Ring returns 2 extra power points/turn to your hero.";
-	ptrArtifact[POWER_RING].use = FALSE;
-
-	ptrArtifact[AMMO_CART].name = "Ammo Cart";
-	ptrArtifact[AMMO_CART].descriptions = "The Ammo Cart provides endless ammunition for all your troops that shoot.";
-	ptrArtifact[AMMO_CART].use = FALSE;
-
-	ptrArtifact[TAX_LIEN].name = "Tax Lien";
-	ptrArtifact[TAX_LIEN].descriptions = "The Tax Lien costs you 250 gold pieces/turn.";
-	ptrArtifact[TAX_LIEN].use = FALSE;
-
-	ptrArtifact[HIDEOUS_MASK].name = "Hideous Mask";
-	ptrArtifact[HIDEOUS_MASK].descriptions = "The Hideous Mask prevents all 'wandering' armies from joining your hero.";
-	ptrArtifact[HIDEOUS_MASK].use = FALSE;
-
-	ptrArtifact[ENDLESS_POUCH_SULFUR].name = "Endless Pouch of Sulfur";
-	ptrArtifact[ENDLESS_POUCH_SULFUR].descriptions = "The Endless Pouch of Sulfur provides 1 unit of sulfur per day.";
-	ptrArtifact[ENDLESS_POUCH_SULFUR].use = FALSE;
-
-	ptrArtifact[ENDLESS_VIAL_MERCURY].name = "Endless Vial of Mercury";
-	ptrArtifact[ENDLESS_VIAL_MERCURY].descriptions = "The Endless Vial of Mercury provides 1 unit of mercury per day.";
-	ptrArtifact[ENDLESS_VIAL_MERCURY].use = FALSE;
-
-	ptrArtifact[ENDLESS_POUCH_GEMS].name = "Endless Pouch of Gems";
-	ptrArtifact[ENDLESS_POUCH_GEMS].descriptions = "The Endless Pouch of Gems provides 1 unit of gems per day.";
-	ptrArtifact[ENDLESS_POUCH_GEMS].use = FALSE;
-
-	ptrArtifact[ENDLESS_CORD_WOOD].name = "Endless Cord of Wood";
-	ptrArtifact[ENDLESS_CORD_WOOD].descriptions = "The Endless Cord of Wood provides 1 unit of wood per day.";
-	ptrArtifact[ENDLESS_CORD_WOOD].use = FALSE;
-
-	ptrArtifact[ENDLESS_CART_ORE].name = "Endless Cart of Ore";
-	ptrArtifact[ENDLESS_CART_ORE].descriptions = "The Endless Cart of Ore provides 1 unit of ore per day.";
-	ptrArtifact[ENDLESS_CART_ORE].use = FALSE;
-
-	ptrArtifact[ENDLESS_POUCH_CRYSTAL].name = "Endless Pouch of Crystal";
-	ptrArtifact[ENDLESS_POUCH_CRYSTAL].descriptions = "The Endless Pouch of Crystal provides 1 unit of crystal/day.";
-	ptrArtifact[ENDLESS_POUCH_CRYSTAL].use = FALSE;
-
-	ptrArtifact[SPIKED_HELM].name = "Spiked Helm";
-	ptrArtifact[SPIKED_HELM].descriptions = "The Spiked Helm increases your attack and defense skills by 1 each.";
-	ptrArtifact[SPIKED_HELM].use = FALSE;
-
-	ptrArtifact[SPIKED_SHIELD].name = "Spiked Shield";
-	ptrArtifact[SPIKED_SHIELD].descriptions = "The Spiked Shield increases your attack and defense skills by 2 each.";
-	ptrArtifact[SPIKED_SHIELD].use = FALSE;
-
-	ptrArtifact[WHITE_PEARL].name = "White Pearl";
-	ptrArtifact[WHITE_PEARL].descriptions = "The White Pearl increases your spell power and knowledge by 1 each.";
-	ptrArtifact[WHITE_PEARL].use = FALSE;
-
-	ptrArtifact[BLACK_PEARL].name = "Black Pearl";
-	ptrArtifact[BLACK_PEARL].descriptions = "The Black Pearl increases your spell power and knowledge by 2 each.";
-	ptrArtifact[BLACK_PEARL].use = FALSE;
-
-	ptrArtifact[NOMAD_BOOTS_MOBILITY].name = "Nomad Boots of Mobility";
-	ptrArtifact[NOMAD_BOOTS_MOBILITY].descriptions = "The Nomad Boots of Mobility increase your movement on land.";
-	ptrArtifact[NOMAD_BOOTS_MOBILITY].use = FALSE;
-
-	ptrArtifact[TRAVELER_BOOTS_MOBILITY].name = "Traveler's Boots of Mobility";
-	ptrArtifact[TRAVELER_BOOTS_MOBILITY].descriptions = "The Traveler's Boots of Mobility increase your movement on land.";
-	ptrArtifact[TRAVELER_BOOTS_MOBILITY].use = FALSE;
-
-	ptrArtifact[TRUE_COMPASS_MOBILITY].name = "True Compass of Mobility";
-	ptrArtifact[TRUE_COMPASS_MOBILITY].descriptions = "The True Compass of Mobility increases your movement on land and sea.";
-	ptrArtifact[TRUE_COMPASS_MOBILITY].use = FALSE;
-
-	ptrArtifact[SAILORS_ASTROLABE_MOBILITY].name = "Sailor's Astrolabe of Mobility";
-	ptrArtifact[SAILORS_ASTROLABE_MOBILITY].descriptions = "The Sailors' Astrolabe of Mobility increases your movement on sea.";
-	ptrArtifact[SAILORS_ASTROLABE_MOBILITY].use = FALSE;
-
-	ptrArtifact[MAGIC_BOOK].name = "Magic Book";
-	ptrArtifact[MAGIC_BOOK].descriptions = "The Magic Book enables you to cast spells.";
-	ptrArtifact[MAGIC_BOOK].use = TRUE;
-
-    fprintf(stderr, "Init artifact.\n");	
+    Uint8 i;
+    
+    for(i = 0; i < ARTIFACTMAXCOUNT; ++i)
+	useArtifact[i] = FALSE;
 
     return TRUE;
+}
+
+const char * GetStringArtifact(E_ARTIFACT art){
+
+    const char *string = NULL;
+
+    switch(art){
+	case ULTIMATE_BOOK:
+	    string = "Ultimate Book";
+	    break;
+	case ULTIMATE_SWORD:
+	    string = "Ultimate Sword";
+	    break;
+	case ULTIMATE_CLOAK:
+	    string = "Ultimate Cloak";
+	    break;
+	case ULTIMATE_WAND:
+	    string = "Ultimate Wand";
+	    break;
+	case ULTIMATE_SHIELD:
+	    string = "Ultimate Shield";
+	    break;
+	case ULTIMATE_STAFF:
+	    string = "Ultimate Staff";
+	    break;
+	case ULTIMATE_CROWN:
+	    string = "Ultimate Crown";
+	    break;
+	case GOLDEN_GOOSE:
+	    string = "Ultimate Goose";
+	    break;
+	case ARCANE_NECKLACE:
+	    string = "Arcane Necklace";
+	    break;
+	case CASTER_BRACELET:
+	    string = "Caster's Bracelet";
+	    break;
+	case MAGE_RING:
+	    string = "Mage's Ring";
+	    break;
+	case MEDAL_VALOR:
+	    string = "Medal of Valor";
+	    break;
+	case WITCHES_BROACH:
+	    string = "Witches Broach";
+	    break;
+	case MEDAL_COURAGE:
+	    string = "Medal of Courage";
+	    break;
+	case MEDAL_HONOR:
+	    string = "Medal of Honor";
+	    break;
+	case MEDAL_DISTINCTION:
+	    string = "Medal of Distinction";
+	    break;
+	case FIZBIN_MISFORTUNE:
+	    string = "Fizbin of Misfortune";
+	    break;
+	case THUNDER_MACE:
+	    string = "Thunder Mace";
+	    break;
+	case ARMORED_GAUNTLETS:
+	    string = "Armored Gauntlets";
+	    break;
+	case DEFENDER_HELM:
+	    string = "Defender Helm";
+	    break;
+	case GIANT_FLAIL:
+	    string = "Giant Flail";
+	    break;
+	case BALLISTA:
+	    string = "Ballista";
+	    break;
+	case STEALTH_SHIELD:
+	    string = "Stealth Shield";
+	    break;
+	case DRAGON_SWORD:
+	    string = "Dragon Sword";
+	    break;
+	case POWER_AXE:
+	    string = "Power Axe";
+	    break;
+	case DIVINE_BREASTPLATE:
+	    string = "Divine Breastplate";
+	    break;
+	case MINOR_SCROLL:
+	    string = "Minor Scroll";
+	    break;
+	case MAJOR_SCROLL:
+	    string = "Major Scroll";
+	    break;
+	case SUPERIOR_SCROLL:
+	    string = "Superior Scroll";
+	    break;
+	case FOREMOST_SCROLL:
+	    string = "Foremost Scroll";
+	    break;
+	case ENDLESS_SACK_GOLD:
+	    string = "Endless Sack of Gold";
+	    break;
+	case ENDLESS_BAG_GOLD:
+	    string = "Endless Bag of Gold";
+	    break;
+	case ENDLESS_PURSE_GOLD:
+	    string = "Endless Purse of Gold";
+	    break;
+	case RABBIT_FOOT:
+	    string = "Rabbit's Foot";
+	    break;
+	case GOLDEN_HORSESHOE:
+	    string = "Golden Horseshoe";
+	    break;
+	case GAMBLER_LUCKY_COIN:
+	    string = "Gambler's Lucky Coin";
+	    break;
+	case FOUR_LEAF_CLOVER:
+	    string = "Four-Leaf Clover";
+	    break;
+	case EVIL_EYE:
+	    string = "Evil Eye";
+	    break;
+	case ENCHANTED_HOURGLASS:
+	    string = "Enchanted Hourglass";
+	    break;
+	case GOLD_WATCH:
+	    string = "Gold Wath";
+	    break;
+	case SKULLCAP:
+	    string = "Skullcap";
+	    break;
+	case ICE_CLOAK:
+	    string = "Ice Clock";
+	    break;
+	case FIRE_CLOAK:
+	    string = "Fire Cloak";
+	    break;
+	case LIGHTNING_HELM:
+	    string = "Lightning Helm";
+	    break;
+	case EVERCOLD_ICICLE:
+	    string = "Evercold Icicle";
+	    break;
+	case EVERHOT_LAVA_ROCK:
+	    string = "Everhot Lava Rock";
+	    break;
+	case LIGHTNING_ROD:
+	    string = "Lightning Rod";
+	    break;
+	case SNAKE_RING:
+	    string = "Snake-Ring";
+	    break;
+	case ANKH:
+	    string = "Ankh";
+	    break;
+	case BOOK_ELEMENTS:
+	    string = "Book of Elements";
+	    break;
+	case ELEMENTAL_RING:
+	    string = "Elemental Ring";
+	    break;
+	case HOLY_PENDANT:
+	    string = "Holy Pendant";
+	    break;
+	case PENDANT_FREE_WILL:
+	    string = "Pendant of Free Will";
+	    break;
+	case PENDANT_LIFE:
+	    string = "Pendant of Life";
+	    break;
+	case SERENITY_PENDANT:
+	    string = "Serenity Pendant";
+	    break;
+	case SEEING_EYE_PENDANT:
+	    string = "Seeing-eye Pendant";
+	    break;
+	case KINETIC_PENDANT:
+	    string = "Kinetic Pendant";
+	    break;
+	case PENDANT_DEATH:
+	    string = "Pendant of Death";
+	    break;
+	case WAND_NEGATION:
+	    string = "Wand of Negation";
+	    break;
+	case GOLDEN_BOW:
+	    string = "Golden Bow";
+	    break;
+	case TELESCOPE:
+	    string = "Telescope";
+	    break;
+	case STATESMAN_QUILL:
+	    string = "Statesman's Quill";
+	    break;
+	case WIZARD_HAT:
+	    string = "Wizard's Hat";
+	    break;
+	case POWER_RING:
+	    string = "Power Ring";
+	    break;
+	case AMMO_CART:
+	    string = "Ammo Cart";
+	    break;
+	case TAX_LIEN:
+	    string = "Tax Lien";
+	    break;
+	case HIDEOUS_MASK:
+	    string = "Hideous Mask";
+	    break;
+	case ENDLESS_POUCH_SULFUR:
+	    string = "Endless Pouch of Sulfur";
+	    break;
+	case ENDLESS_VIAL_MERCURY:
+	    string = "Endless Vial of Mercury";
+	    break;
+	case ENDLESS_POUCH_GEMS:
+	    string = "Endless Pouch of Gems";
+	    break;
+	case ENDLESS_CORD_WOOD:
+	    string = "Endless Cord of Wood";
+	    break;
+	case ENDLESS_CART_ORE:
+	    string = "Endless Cart of Ore";
+	    break;
+	case ENDLESS_POUCH_CRYSTAL:
+	    string = "Endless Pouch of Crystal";
+	    break;
+	case SPIKED_HELM:
+	    string = "Spiked Helm";
+	    break;
+	case SPIKED_SHIELD:
+	    string = "Spiked Shield";
+	    break;
+	case WHITE_PEARL:
+	    string = "White Pearl";
+	    break;
+	case BLACK_PEARL:
+	    string = "Black Pearl";
+	    break;
+	case NOMAD_BOOTS_MOBILITY:
+	    string = "Nomad Boots of Mobility";
+	    break;
+	case TRAVELER_BOOTS_MOBILITY:
+	    string = "Traveler's Boots of Mobility";
+	    break;
+	case TRUE_COMPASS_MOBILITY:
+	    string = "True Compass of Mobility";
+	    break;
+	case SAILORS_ASTROLABE_MOBILITY:
+	    string = "Sailor's Astrolabe of Mobility";
+	    break;
+	case MAGIC_BOOK:
+	    string = "Magic Book";
+	    break;
+
+	default:
+	    break;
+    }
+    
+    return string;
+}
+
+const char * GetStringDescriptionsArtifact(E_ARTIFACT art){
+
+    const char *string = NULL;
+
+    switch(art){
+	    break;
+	case FIZBIN_MISFORTUNE:
+	    string = "The Fizbin of Misfortune greatly decreases your morale.";
+	    break;
+	case MEDAL_DISTINCTION:
+	    string = "The Medal of Distinction increases your morale.";
+	    break;
+	case MEDAL_HONOR:
+	    string = "The Medal of Honor increases your morale.";
+	    break;
+	case MEDAL_COURAGE:
+	    string = "The Medal of Courage increases your morale.";
+	    break;
+	case MEDAL_VALOR:
+	    string = "The Medal of Valor increases your morale.";
+	    break;
+	case WITCHES_BROACH:
+	    string = "The Witch's Broach of Magic increases your spell power by 3.";
+	    break;
+	case MAGE_RING:
+	    string = "The Mage's Ring of Power increases your spell power by 2.";
+	    break;
+	case CASTER_BRACELET:
+	    string = "The Caster's Bracelet of Magic increases your spell power by 2.";
+	    break;
+	case ARCANE_NECKLACE:
+	    string = "The Arcane Necklace of Magic increases your spell power by 4.";
+	    break;
+	case GOLDEN_GOOSE:
+	    string = "The Golden Goose brings in an income of 10,000 gold per turn.";
+	    break;
+	case ULTIMATE_CROWN:
+	    string = "The Ultimate Crown increases each of your basic skills by 4 points.";
+	    break;
+	case ULTIMATE_STAFF:
+	    string = "The Ultimate Staff increases your spell power and knowledge by 6 each.";
+	    break;
+	case ULTIMATE_SHIELD:
+	    string = "The Ultimate Shield increases your attack and defense skills by 6 each.";
+	    break;
+	case ULTIMATE_WAND:
+	    string = "The Ultimate Wand of Magic increases your spell power by 12.";
+	    break;
+	case ULTIMATE_CLOAK:
+	    string = "The Ultimate Cloak of Protection increases your defense skill by 12.";
+	    break;
+	case ULTIMATE_SWORD:
+	    string = "The Ultimate Sword of Dominion increases your attack skill by 12.";
+	    break;
+	case ULTIMATE_BOOK:
+	    string = "The Ultimate Book of Knowledge increases your knowledge by 12.";
+	    break;
+	case THUNDER_MACE:
+	    string = "The Thunder Mace of Dominion increases your attack skill by 1.";
+	    break;
+	case ARMORED_GAUNTLETS:
+	    string = "The Armored Gauntlets of Protection increase your defense skill by 1.";
+	    break;
+	case DEFENDER_HELM:
+	    string = "The Defender Helm of Protection increases your defense skill by 1.";
+	    break;
+	case GIANT_FLAIL:
+	    string = "The Giant Flail of Dominion increases your attack skill by 1.";
+	    break;
+	case BALLISTA:
+	    string = "The Ballista of Quickness lets your catapult fire twice per combat round.";
+	    break;
+	case STEALTH_SHIELD:
+	    string = "The Stealth Shield of Protection increases your defense skill by 2.";
+	    break;
+	case DRAGON_SWORD:
+	    string = "The Dragon Sword of Dominion increases your attack skill by 3.";
+	    break;
+	case POWER_AXE:
+	    string = "The Power Axe of Dominion increases your attack skill by 2.";
+	    break;
+	case DIVINE_BREASTPLATE:
+	    string = "The Divine Breastplate of Protection increases your defense skill by 3.";
+	    break;
+	case MINOR_SCROLL:
+	    string = "The Minor Scroll of Knowledge increases your knowledge by 2.";
+	    break;
+	case MAJOR_SCROLL:
+	    string = "The Major Scroll of Knowledge increases your knowledge by 3.";
+	    break;
+	case SUPERIOR_SCROLL:
+	    string = "The Superior Scroll of Knowledge increases your knowledge by 4.";
+	    break;
+	case FOREMOST_SCROLL:
+	    string = "The Foremost Scroll of Knowledge increases your knowledge by 5.";
+	    break;
+	case ENDLESS_SACK_GOLD:
+	    string = "The Endless Sack of Gold provides you with 1000 gold per day.";
+	    break;
+	case ENDLESS_BAG_GOLD:
+	    string = "The Endless Bag of Gold provides you with 750 gold per day.";
+	    break;
+	case ENDLESS_PURSE_GOLD:
+	    string = "The Endless Purse of Gold provides you with 500 gold per day.";
+	    break;
+	case RABBIT_FOOT:
+	    string = "The Lucky Rabbit's Foot increases your luck in combat.";
+	    break;
+	case GOLDEN_HORSESHOE:
+	    string = "The Golden Horseshoe increases your luck in combat.";
+	    break;
+	case GAMBLER_LUCKY_COIN:
+	    string = "The Gambler's Lucky Coin increases your luck in combat.";
+	    break;
+	case FOUR_LEAF_CLOVER:
+	    string = "The Four_Leaf Clover increases your luck in combat.";
+	    break;
+	case EVIL_EYE:
+	    string = "The Evil Eye reduces the casting cost of curse spells by half.";
+	    break;
+	case ENCHANTED_HOURGLASS:
+	    string = "The Enchanted Hourglass extends the duration of all your spells by 2 turns.";
+	    break;
+	case GOLD_WATCH:
+	    string = "The Gold Watch doubles the effectiveness of your hypnotize spells.";
+	    break;
+	case SKULLCAP:
+	    string = "The Skullcap halves the casting cost of all mind influencing spells.";
+	    break;
+	case ICE_CLOAK:
+	    string = "The Ice Cloak halves all damage your troops take from cold spells.";
+	    break;
+	case FIRE_CLOAK:
+	    string = "The Fire Cloak halves all damage your troops take from fire spells.";
+	    break;
+	case LIGHTNING_HELM:
+	    string = "The Lightning Helm halves all damage your troops take from lightning spells.";
+	    break;
+	case HIDEOUS_MASK:
+	    string = "The Hideous Mask prevents all 'wandering' armies from joining your hero.";
+	    break;
+	case TAX_LIEN:
+	    string = "The Tax Lien costs you 250 gold pieces/turn.";
+	    break;
+	case AMMO_CART:
+	    string = "The Ammo Cart provides endless ammunition for all your troops that shoot.";
+	    break;
+	case POWER_RING:
+	    string = "The Power Ring returns 2 extra power points/turn to your hero.";
+	    break;
+	case WIZARD_HAT:
+	    string = "The Wizard's Hat increases the duration of your spells by 10 turns!";
+	    break;
+	case STATESMAN_QUILL:
+	    string = "The Statesman's Quill reduces the cost of surrender to 10% of the total cost of troops you have in your army.";
+	    break;
+	case TELESCOPE:
+	    string = "The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.";
+	    break;
+	case GOLDEN_BOW:
+	    string = "The Golden Bow eliminates the 50% penalty for your troops shooting past obstacles. (e.g. castle walls)";
+	    break;
+	case WAND_NEGATION:
+	    string = "The Wand of Negation protects your troops from the Dispel Magic spell.";
+	    break;
+	case PENDANT_DEATH:
+	    string = "The Pendant of Death makes all your troops immune to holy spells.";
+	    break;
+	case KINETIC_PENDANT:
+	    string = "The Kinetic Pendant makes all your troops immune to paralyze spells.";
+	    break;
+	case SEEING_EYE_PENDANT:
+	    string = "The Seeing_eye Pendant makes all your troops immune to blindness spells.";
+	    break;
+	case SERENITY_PENDANT:
+	    string = "The Serenity Pendant makes all your troops immune to berserk spells.";
+	    break;
+	case PENDANT_LIFE:
+	    string = "The Pendant of Life makes all your troops immune to death spells.";
+	    break;
+	case PENDANT_FREE_WILL:
+	    string = "The Pendant of Free Will makes all your troops immune to hypnotize spells.";
+	    break;
+	case HOLY_PENDANT:
+	    string = "The Holy Pendant makes all your troops immune to curse spells.";
+	    break;
+	case ELEMENTAL_RING:
+	    string = "The Elemental Ring halves the casting cost of all summoning spells.";
+	    break;
+	case BOOK_ELEMENTS:
+	    string = "The Book of Elements doubles the effectiveness of all your summoning spells.";
+	    break;
+	case ANKH:
+	    string = "The Ankh doubles the effectiveness of all your resurrect and animate spells.";
+	    break;
+	case SNAKE_RING:
+	    string = "The Snake Ring halves the casting cost of all your bless spells.";
+	    break;
+	case MAGIC_BOOK:
+	    string = "The Magic Book enables you to cast spells.";
+	    break;
+	case SAILORS_ASTROLABE_MOBILITY:
+	    string = "The Sailors' Astrolabe of Mobility increases your movement on sea.";
+	    break;
+	case TRUE_COMPASS_MOBILITY:
+	    string = "The True Compass of Mobility increases your movement on land and sea.";
+	    break;
+	case TRAVELER_BOOTS_MOBILITY:
+	    string = "The Traveler's Boots of Mobility increase your movement on land.";
+	    break;
+	case NOMAD_BOOTS_MOBILITY:
+	    string = "The Nomad Boots of Mobility increase your movement on land.";
+	    break;
+	case BLACK_PEARL:
+	    string = "The Black Pearl increases your spell power and knowledge by 2 each.";
+	    break;
+	case WHITE_PEARL:
+	    string = "The White Pearl increases your spell power and knowledge by 1 each.";
+	    break;
+	case SPIKED_SHIELD:
+	    string = "The Spiked Shield increases your attack and defense skills by 2 each.";
+	    break;
+	case SPIKED_HELM:
+	    string = "The Spiked Helm increases your attack and defense skills by 1 each.";
+	    break;
+	case ENDLESS_POUCH_CRYSTAL:
+	    string = "The Endless Pouch of Crystal provides 1 unit of crystal/day.";
+	    break;
+	case ENDLESS_CART_ORE:
+	    string = "The Endless Cart of Ore provides 1 unit of ore per day.";
+	    break;
+	case ENDLESS_CORD_WOOD:
+	    string = "The Endless Cord of Wood provides 1 unit of wood per day.";
+	    break;
+	case ENDLESS_POUCH_GEMS:
+	    string = "The Endless Pouch of Gems provides 1 unit of gems per day.";
+	    break;
+	case ENDLESS_VIAL_MERCURY:
+	    string = "The Endless Vial of Mercury provides 1 unit of mercury per day.";
+	    break;
+	case ENDLESS_POUCH_SULFUR:
+	    string = "The Endless Pouch of Sulfur provides 1 unit of sulfur per day.";
+	    break;
+	
+	default:
+	    break;
+    }
+    
+    return string;
 }

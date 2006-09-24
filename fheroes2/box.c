@@ -50,11 +50,13 @@
 #define BUTTON_HEIGHT	50
 
 // draw box && button YES|NO, OK|CANCEL, YES, OK, EXIT
-BOOL InitBox(S_BOX *box, Uint16 height, INTERFACEACTION **ptr, Uint32 flag){
+S_BOX * InitBox(Uint16 height, INTERFACEACTION **ptr, Uint32 flag){
 
-    if(! box){
-	if(GetIntValue(DEBUG)) fprintf(stderr, "InitBox: pointer is NULL.\n");
-	return FALSE;
+    S_BOX *box = NULL;
+
+    if(NULL == (box = (S_BOX *) malloc(sizeof(S_BOX)))){
+	fprintf(stderr, "InitBox: error malloc: %d\n", sizeof(S_BOX));
+        return NULL;
     }
 
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -87,8 +89,8 @@ BOOL InitBox(S_BOX *box, Uint16 height, INTERFACEACTION **ptr, Uint32 flag){
     
     // сохраняем бакгроунд
     if(NULL == (box->background = SDL_CreateRGBSurface(SDL_SWSURFACE, box->rectBack.w, box->rectBack.h, 16, 0, 0, 0, 0))){
-	fprintf(stderr, "BuildingInfoYESBox: CreateRGBSurface failed: %s\n", SDL_GetError());
-	return FALSE;
+	fprintf(stderr, "InitBox: CreateRGBSurface failed: %s\n", SDL_GetError());
+	return NULL;
     }
     SDL_BlitSurface(video, &box->rectBack, box->background, NULL);
 
@@ -147,7 +149,7 @@ BOOL InitBox(S_BOX *box, Uint16 height, INTERFACEACTION **ptr, Uint32 flag){
     dst.h = image->h;
     SDL_BlitSurface(image, NULL, video, &dst);
 
-    if(!ptr || ! flag) return TRUE;
+    if(!ptr) return NULL;
 
     button = (GetIntValue(EVILINTERFACE) ? "SYSTEME.ICN" : "SYSTEM.ICN");
 
@@ -282,7 +284,7 @@ BOOL InitBox(S_BOX *box, Uint16 height, INTERFACEACTION **ptr, Uint32 flag){
 
     box->action = *ptr;
 
-    return TRUE;
+    return box;
 }
 
 void FreeBox(S_BOX *box){
@@ -295,11 +297,10 @@ void FreeBox(S_BOX *box){
 	SDL_BlitSurface(box->background, NULL, video, &box->rectBack);
 	SDL_FreeSurface(box->background);
     }
-    box->background = NULL;
 
     if(box->action) FreeActionEvent(box->action);
 
-    box->action = NULL;
+    free(box);
 }
 
 Uint16 GetHeightText(const char *string, ENUMFONT font){

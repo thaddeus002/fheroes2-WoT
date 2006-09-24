@@ -48,6 +48,7 @@
 #include "magictower.h"
 #include "castle.h"
 #include "armyinfo.h"
+#include "selector.h"
 #include "castleaction.h"
 #include "castle_kngt.h"
 #include "castle_brbn.h"
@@ -55,6 +56,8 @@
 #include "castle_ncrm.h"
 #include "castle_wrlk.h"
 #include "castle_wzrd.h"
+
+#define NUMLEN	8
 
 void RedrawCastleAnimation(void);
 void RedrawBottomBar(void);
@@ -93,11 +96,8 @@ static	BOOL		flagUpdateBuilding = FALSE;
 struct {
     Uint8		select;
     BOOL		castle;
-    SDL_Rect            rect;
-    SDL_Surface         *back;
-    SDL_Surface         *cursor;
-    BOOL                use;
-} backMonsterCursor;
+    S_SELECT		*selector;
+} selectCastleArmy;
 
 BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 
@@ -461,17 +461,8 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
 
     // инициализируем backgroundCursor
     FillSPRITE(&sprite, "STRIP.ICN", 1);
-    backMonsterCursor.cursor = GetICNSprite(&sprite);
-    backMonsterCursor.select = 0xFF;
-    backMonsterCursor.use = FALSE;
-    backMonsterCursor.rect.x = 0;
-    backMonsterCursor.rect.y = 0;
-    backMonsterCursor.rect.w = backMonsterCursor.cursor->w;
-    backMonsterCursor.rect.h = backMonsterCursor.cursor->h;
-    if(NULL == (backMonsterCursor.back = SDL_CreateRGBSurface(SDL_SWSURFACE, backMonsterCursor.rect.w, backMonsterCursor.rect.h, 16, 0, 0, 0, 0))){
-        fprintf(stderr, "EnterCastle: CreateRGBSurface failed: %s\n", SDL_GetError());
-        return EXIT;
-    }
+    selectCastleArmy.selector = InitSelector(&sprite, 0, 0, FALSE);
+    selectCastleArmy.select = 0xFF;
 
     // переопределяем курсор и выключаем анимацию карты
     SetIntValue(ANIM1, FALSE);
@@ -758,7 +749,7 @@ ACTION EnterCastle(Uint8 ax, Uint8 ay, E_NAMEHEROES castleHeroes){
     // чистим данные
     FreeAnimationEvent(castanim);
     FreeActionEvent(castlact);
-    if(backMonsterCursor.back) SDL_FreeSurface(backMonsterCursor.back);
+    FreeSelector(selectCastleArmy.selector);
 
     // востанавливаем бакгроунд
     SDL_BlitSurface(back, NULL, video, &rectBack);
@@ -1038,6 +1029,7 @@ void RedrawBottomBar(void){
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Rect rect;
 
+    CursorOff();
     // нижний бар
     FillSPRITE(&sprite, "SMALLBAR.ICN", 0);
     image = GetICNSprite(&sprite);
@@ -1046,7 +1038,7 @@ void RedrawBottomBar(void){
     rect.w = image->w;
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
-    SDL_Flip(video);
+    CursorOn();
 }
 
 ACTION ActionClickRCastleMonster(void){
@@ -1062,17 +1054,19 @@ ACTION ActionClickRCastleMonster(void){
     Uint16 cx = video->w / 2 - 208;
 
     Uint8 index = (Uint16) (mx - cx) / 88;
+    //selectCastleArmy.selector->use = TRUE;
 
-    CursorOff();
-    if(backMonsterCursor.use) SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-    CursorOn();
-    
     // если монстр показываем инфо
     if(MONSTERNONE != castle->army[index].monster) result =  ShowArmyInfoRight(&castle->army[index], NULL);
     // иначе диалог деления
     else result = ActionClickRedistributeMonster(index, FALSE);
 
-    backMonsterCursor.use = FALSE;
+    ResetSelector(selectCastleArmy.selector);
+
+    RedrawCastleMonster();
+    RedrawHeroesMonster();
+
+    CursorOn();
 
     return result;
 }
@@ -1091,75 +1085,75 @@ ACTION ActionClickRHeroesMonster(void){
 
     Uint8 index = (Uint16) (mx - cx) / 88;
 
-    CursorOff();
-    if(backMonsterCursor.use) SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-    CursorOn();
-
     // если монстр показываем инфо
     if(MONSTERNONE != heroes->army[index].monster) result =  ShowArmyInfoRight(&heroes->army[index], heroes);
     // иначе диалог деления
     else result = ActionClickRedistributeMonster(index, TRUE);
 
-    backMonsterCursor.use = FALSE;
+    ResetSelector(selectCastleArmy.selector);
+
+    RedrawCastleMonster();
+    RedrawHeroesMonster();
+
+    CursorOn();
 
     return result;
 }
 
 ACTION ActionClickRedistributeMonster(Uint8 index, BOOL toHero){
 
-    SDL_Surface *video = SDL_GetVideoSurface();
     S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
     
     // верхний левый угол начала
     Uint16 res = 0;
 
-    if(! backMonsterCursor.use) return NONE;
+    if(! selectCastleArmy.selector->use) return NONE;
 
     CursorOff();
 
-    if(backMonsterCursor.castle){
+    if(selectCastleArmy.castle){
     
 	// from castle to castle
 	if(! toHero){
 
-	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != currentCastle->army[backMonsterCursor.select].monster){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != currentCastle->army[selectCastleArmy.select].monster){
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 
-	    res = SelectCountBox(currentCastle->army[backMonsterCursor.select].count);
+	    res = SelectCountBox(currentCastle->army[selectCastleArmy.select].count);
 	    if(0xFFFF == res) return EXIT;
 	    if(0 == res){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 
-	    currentCastle->army[backMonsterCursor.select].count -= res;
+	    currentCastle->army[selectCastleArmy.select].count -= res;
 
-	    currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	    currentCastle->army[index].monster = currentCastle->army[selectCastleArmy.select].monster;
 	    currentCastle->army[index].count += res;
 
 	// from castle to hero
 	}else if(heroes){
 
-	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != currentCastle->army[backMonsterCursor.select].monster){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != currentCastle->army[selectCastleArmy.select].monster){
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 	    
-	    res = SelectCountBox(currentCastle->army[backMonsterCursor.select].count);
+	    res = SelectCountBox(currentCastle->army[selectCastleArmy.select].count);
 	    if(0xFFFF == res) return EXIT;
 	    if(0 == res){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 
-	    currentCastle->army[backMonsterCursor.select].count -= res;
-	    heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
+	    currentCastle->army[selectCastleArmy.select].count -= res;
+	    heroes->army[index].monster = currentCastle->army[selectCastleArmy.select].monster;
 	    heroes->army[index].count += res;
 	}
 
@@ -1168,50 +1162,45 @@ ACTION ActionClickRedistributeMonster(Uint8 index, BOOL toHero){
 	// from hero to castle
 	if(! toHero){
 
-	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != heroes->army[backMonsterCursor.select].monster){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	    if(currentCastle->army[index].monster != MONSTERNONE && currentCastle->army[index].monster != heroes->army[selectCastleArmy.select].monster){
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 	
-	    res = SelectCountBox(heroes->army[backMonsterCursor.select].count);
+	    res = SelectCountBox(heroes->army[selectCastleArmy.select].count);
 	    if(0xFFFF == res) return EXIT;
 	    if(0 == res){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 
-	    heroes->army[backMonsterCursor.select].count -= res;
-	    currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	    heroes->army[selectCastleArmy.select].count -= res;
+	    currentCastle->army[index].monster = heroes->army[selectCastleArmy.select].monster;
 	    currentCastle->army[index].count += res;
 
 	}else{
 
-	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != heroes->army[backMonsterCursor.select].monster){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+	    if(heroes->army[index].monster != MONSTERNONE && heroes->army[index].monster != heroes->army[selectCastleArmy.select].monster){
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 
-	    res = SelectCountBox(heroes->army[backMonsterCursor.select].count);
+	    res = SelectCountBox(heroes->army[selectCastleArmy.select].count);
 	    if(0xFFFF == res) return EXIT;
 	    if(0 == res){
-		backMonsterCursor.use = FALSE;
-		SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+		ResetSelector(selectCastleArmy.selector);
+		CursorOn();
 		return NONE;
 	    }
 
-	    heroes->army[backMonsterCursor.select].count -= res;
-	    heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
+	    heroes->army[selectCastleArmy.select].count -= res;
+	    heroes->army[index].monster = heroes->army[selectCastleArmy.select].monster;
 	    heroes->army[index].count += res;
 	}
     }
-
-    RedrawCastleMonster();
-    RedrawHeroesMonster();
-
-    CursorOn();
 
     return NONE;
 }
@@ -1220,6 +1209,7 @@ ACTION ActionClickCastleMonster(void){
 
     Sint32 mx, my;
     SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect rect;
 
     CursorOff();
 
@@ -1237,8 +1227,8 @@ ACTION ActionClickCastleMonster(void){
     if(MONSTERNONE == currentCastle->army[index].monster) return ActionClickCastleMonsterEmpty(index);
 
     // двойной клик - инфо монстра
-    if(backMonsterCursor.select == index && backMonsterCursor.use){
-	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+    if(selectCastleArmy.select == index && selectCastleArmy.castle && selectCastleArmy.selector->use){
+	ResetSelector(selectCastleArmy.selector);
 	switch(ShowArmyInfo(&currentCastle->army[index], NULL, currentCastle)){
 	    case DISMISS:
 		currentCastle->army[index].monster = MONSTERNONE;
@@ -1259,60 +1249,49 @@ ACTION ActionClickCastleMonster(void){
 	    default:
 		break;
 	}
-	backMonsterCursor.use = FALSE;
     // обмен
-    }else if(backMonsterCursor.use){
-	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-	backMonsterCursor.use = FALSE;
+    }else if(selectCastleArmy.selector->use){
+	ResetSelector(selectCastleArmy.selector);
 	monster = currentCastle->army[index].monster;
 	count = currentCastle->army[index].count;
 	// в замке
-	if(backMonsterCursor.castle){
+	if(selectCastleArmy.castle){
 	    // одинаковых объединяем
-	    if(currentCastle->army[index].monster == currentCastle->army[backMonsterCursor.select].monster){
-		currentCastle->army[index].count += currentCastle->army[backMonsterCursor.select].count;
-		currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
-		currentCastle->army[backMonsterCursor.select].count = 0;
+	    if(currentCastle->army[index].monster == currentCastle->army[selectCastleArmy.select].monster){
+		currentCastle->army[index].count += currentCastle->army[selectCastleArmy.select].count;
+		currentCastle->army[selectCastleArmy.select].monster = MONSTERNONE;
+		currentCastle->army[selectCastleArmy.select].count = 0;
 	    }else{
-		currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
-		currentCastle->army[index].count = currentCastle->army[backMonsterCursor.select].count;
-		currentCastle->army[backMonsterCursor.select].monster = monster;
-		currentCastle->army[backMonsterCursor.select].count = count;
+		currentCastle->army[index].monster = currentCastle->army[selectCastleArmy.select].monster;
+		currentCastle->army[index].count = currentCastle->army[selectCastleArmy.select].count;
+		currentCastle->army[selectCastleArmy.select].monster = monster;
+		currentCastle->army[selectCastleArmy.select].count = count;
 	    }
 	    RedrawCastleMonster();
 	// с героем
 	}else if(heroes){
 
 	    // одинаковых объединяем
-	    if(currentCastle->army[index].monster == heroes->army[backMonsterCursor.select].monster){
-		currentCastle->army[index].count += heroes->army[backMonsterCursor.select].count;
-		heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
-		heroes->army[backMonsterCursor.select].count = 0;
+	    if(currentCastle->army[index].monster == heroes->army[selectCastleArmy.select].monster){
+		currentCastle->army[index].count += heroes->army[selectCastleArmy.select].count;
+		heroes->army[selectCastleArmy.select].monster = MONSTERNONE;
+		heroes->army[selectCastleArmy.select].count = 0;
 	    }else{
-		currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
-		currentCastle->army[index].count = heroes->army[backMonsterCursor.select].count;
-		heroes->army[backMonsterCursor.select].monster = monster;
-		heroes->army[backMonsterCursor.select].count = count;
+		currentCastle->army[index].monster = heroes->army[selectCastleArmy.select].monster;
+		currentCastle->army[index].count = heroes->army[selectCastleArmy.select].count;
+		heroes->army[selectCastleArmy.select].monster = monster;
+		heroes->army[selectCastleArmy.select].count = count;
 	    }
 	    RedrawCastleMonster();
 	    RedrawHeroesMonster();
 	}
     // первый клик рисуем рамку
     }else{
-	// востанавливаем background
-	if(backMonsterCursor.use){
-	    SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-	    backMonsterCursor.use = FALSE;
-	}
-	backMonsterCursor.rect.x = cx + index * (backMonsterCursor.rect.w + 6);
-	backMonsterCursor.rect.y = cy;
-	backMonsterCursor.select = index;
-	backMonsterCursor.castle = TRUE;
-	// сохраняем background
-	SDL_BlitSurface(video, &backMonsterCursor.rect, backMonsterCursor.back, NULL);
-	backMonsterCursor.use = TRUE;
-        // рисуем рамку
-	SDL_BlitSurface(backMonsterCursor.cursor, NULL, video, &backMonsterCursor.rect);
+	rect.x = cx + index * (selectCastleArmy.selector->pos.w + 6);
+	rect.y = cy;
+	selectCastleArmy.select = index;
+	selectCastleArmy.castle = TRUE;
+	RedrawSelector(selectCastleArmy.selector, &rect);
     }
 
     CursorOn();
@@ -1322,32 +1301,29 @@ ACTION ActionClickCastleMonster(void){
 
 ACTION ActionClickCastleMonsterEmpty(Uint8 index){
 
-    if(! backMonsterCursor.use) return NONE;
+    if(! selectCastleArmy.selector->use) return NONE;
 
     CursorOff();
-    SDL_Surface *video = SDL_GetVideoSurface();
 
-    // востанавливаем background
-    backMonsterCursor.use = FALSE;
     S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
+    ResetSelector(selectCastleArmy.selector);
 
-    if(! backMonsterCursor.castle && 2 > HeroesCountArmy(heroes)){
-	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+    if(! selectCastleArmy.castle && 2 > HeroesCountArmy(heroes)){
 	CursorOn();
 	return NONE;
     }
 
     // перемещаем на пустую клетку
-    if(backMonsterCursor.castle){
-	currentCastle->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
-	currentCastle->army[index].count = currentCastle->army[backMonsterCursor.select].count;
-	currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
-	currentCastle->army[backMonsterCursor.select].count = 0;
+    if(selectCastleArmy.castle){
+	currentCastle->army[index].monster = currentCastle->army[selectCastleArmy.select].monster;
+	currentCastle->army[index].count = currentCastle->army[selectCastleArmy.select].count;
+	currentCastle->army[selectCastleArmy.select].monster = MONSTERNONE;
+	currentCastle->army[selectCastleArmy.select].count = 0;
     }else{
-	currentCastle->army[index].monster = heroes->army[backMonsterCursor.select].monster;
-	currentCastle->army[index].count = heroes->army[backMonsterCursor.select].count;
-	heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
-	heroes->army[backMonsterCursor.select].count = 0;
+	currentCastle->army[index].monster = heroes->army[selectCastleArmy.select].monster;
+	currentCastle->army[index].count = heroes->army[selectCastleArmy.select].count;
+	heroes->army[selectCastleArmy.select].monster = MONSTERNONE;
+	heroes->army[selectCastleArmy.select].count = 0;
     }
 
     RedrawCastleMonster();
@@ -1362,6 +1338,7 @@ ACTION ActionClickHeroesMonster(void){
 
     Sint32 mx, my;
     SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect rect;
 
     CursorOff();
 
@@ -1382,8 +1359,8 @@ ACTION ActionClickHeroesMonster(void){
     if(MONSTERNONE == heroes->army[index].monster) return ActionClickHeroesMonsterEmpty(index);
 
     // двойной клик - инфо монстра
-    if(backMonsterCursor.select == index && backMonsterCursor.use){
-	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
+    if(selectCastleArmy.select == index && !selectCastleArmy.castle && selectCastleArmy.selector->use){
+	ResetSelector(selectCastleArmy.selector);
 	switch(ShowArmyInfo(&heroes->army[index], heroes, castle)){
 	    case DISMISS:
 		CursorOff();
@@ -1408,60 +1385,49 @@ ACTION ActionClickHeroesMonster(void){
 	    default:
 		break;
 	}
-	backMonsterCursor.use = FALSE;
 	CursorOff();
     // обмен
-    }else if(backMonsterCursor.use){
-	SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-	backMonsterCursor.use = FALSE;
+    }else if(selectCastleArmy.selector->use){
+	ResetSelector(selectCastleArmy.selector);
 	monster = heroes->army[index].monster;
 	count = heroes->army[index].count;
 	// с замком
-	if(backMonsterCursor.castle){
+	if(selectCastleArmy.castle){
 	    // одинаковых объединяем
-	    if(heroes->army[index].monster == currentCastle->army[backMonsterCursor.select].monster){
-		heroes->army[index].count += currentCastle->army[backMonsterCursor.select].count;
-		currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
-		currentCastle->army[backMonsterCursor.select].count = 0;
+	    if(heroes->army[index].monster == currentCastle->army[selectCastleArmy.select].monster){
+		heroes->army[index].count += currentCastle->army[selectCastleArmy.select].count;
+		currentCastle->army[selectCastleArmy.select].monster = MONSTERNONE;
+		currentCastle->army[selectCastleArmy.select].count = 0;
 	    }else{
-		heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
-		heroes->army[index].count = currentCastle->army[backMonsterCursor.select].count;
-		currentCastle->army[backMonsterCursor.select].monster = monster;
-		currentCastle->army[backMonsterCursor.select].count = count;
+		heroes->army[index].monster = currentCastle->army[selectCastleArmy.select].monster;
+		heroes->army[index].count = currentCastle->army[selectCastleArmy.select].count;
+		currentCastle->army[selectCastleArmy.select].monster = monster;
+		currentCastle->army[selectCastleArmy.select].count = count;
 	    }
 	    RedrawHeroesMonster();
 	    RedrawCastleMonster();
 	// в герое
 	}else{
 	    // одинаковых объединяем
-	    if(heroes->army[index].monster == heroes->army[backMonsterCursor.select].monster){
-		heroes->army[index].count += heroes->army[backMonsterCursor.select].count;
-		heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
-		heroes->army[backMonsterCursor.select].count = 0;
+	    if(heroes->army[index].monster == heroes->army[selectCastleArmy.select].monster){
+		heroes->army[index].count += heroes->army[selectCastleArmy.select].count;
+		heroes->army[selectCastleArmy.select].monster = MONSTERNONE;
+		heroes->army[selectCastleArmy.select].count = 0;
 	    }else{
-		heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
-		heroes->army[index].count = heroes->army[backMonsterCursor.select].count;
-		heroes->army[backMonsterCursor.select].monster = monster;
-		heroes->army[backMonsterCursor.select].count = count;
+		heroes->army[index].monster = heroes->army[selectCastleArmy.select].monster;
+		heroes->army[index].count = heroes->army[selectCastleArmy.select].count;
+		heroes->army[selectCastleArmy.select].monster = monster;
+		heroes->army[selectCastleArmy.select].count = count;
 	    }
 	    RedrawHeroesMonster();
 	}
     // первый клик рисуем рамку
     }else{
-	// востанавливаем background
-	if(backMonsterCursor.use){
-	    SDL_BlitSurface(backMonsterCursor.back, NULL, video, &backMonsterCursor.rect);
-	    backMonsterCursor.use = FALSE;
-	}
-	backMonsterCursor.rect.x = cx + index * (backMonsterCursor.rect.w + 6);
-	backMonsterCursor.rect.y = cy;
-	backMonsterCursor.select = index;
-	backMonsterCursor.castle = FALSE;
-	// сохраняем background
-	SDL_BlitSurface(video, &backMonsterCursor.rect, backMonsterCursor.back, NULL);
-	backMonsterCursor.use = TRUE;
-        // рисуем рамку
-	SDL_BlitSurface(backMonsterCursor.cursor, NULL, video, &backMonsterCursor.rect);
+	rect.x = cx + index * (selectCastleArmy.selector->pos.w + 6);
+	rect.y = cy;
+	selectCastleArmy.select = index;
+	selectCastleArmy.castle = FALSE;
+	RedrawSelector(selectCastleArmy.selector, &rect);
     }
 
     CursorOn();
@@ -1471,24 +1437,24 @@ ACTION ActionClickHeroesMonster(void){
 
 ACTION ActionClickHeroesMonsterEmpty(Uint8 index){
 
-    if(! backMonsterCursor.use) return NONE;
+    if(! selectCastleArmy.selector->use) return NONE;
 
     CursorOff();
 
     S_HEROES *heroes = GetStatHeroes(GetHeroesFromCastle(GetCurrentCastle()));
-    backMonsterCursor.use = FALSE;
-
+    ResetSelector(selectCastleArmy.selector);
+    
     // перемещаем на пустую клетку
-    if(backMonsterCursor.castle){
-	heroes->army[index].monster = currentCastle->army[backMonsterCursor.select].monster;
-	heroes->army[index].count = currentCastle->army[backMonsterCursor.select].count;
-	currentCastle->army[backMonsterCursor.select].monster = MONSTERNONE;
-	currentCastle->army[backMonsterCursor.select].count = 0;
+    if(selectCastleArmy.castle){
+	heroes->army[index].monster = currentCastle->army[selectCastleArmy.select].monster;
+	heroes->army[index].count = currentCastle->army[selectCastleArmy.select].count;
+	currentCastle->army[selectCastleArmy.select].monster = MONSTERNONE;
+	currentCastle->army[selectCastleArmy.select].count = 0;
     }else{
-	heroes->army[index].monster = heroes->army[backMonsterCursor.select].monster;
-	heroes->army[index].count = heroes->army[backMonsterCursor.select].count;
-	heroes->army[backMonsterCursor.select].monster = MONSTERNONE;
-	heroes->army[backMonsterCursor.select].count = 0;
+	heroes->army[index].monster = heroes->army[selectCastleArmy.select].monster;
+	heroes->army[index].count = heroes->army[selectCastleArmy.select].count;
+	heroes->army[selectCastleArmy.select].monster = MONSTERNONE;
+	heroes->army[selectCastleArmy.select].count = 0;
     }
 
     RedrawCastleMonster();
@@ -1501,7 +1467,11 @@ ACTION ActionClickHeroesMonsterEmpty(Uint8 index){
 
 ACTION ActionClickHeroes(void){
 
-    ShowHeroesInfo(SANDYSANDY);
+    ResetSelector(selectCastleArmy.selector);
+    //ShowHeroesInfo(GetHeroesFromCastle(GetCurrentCastle()), FALSE);
+    ShowHeroesInfo(SANDYSANDY, FALSE);
+    RedrawHeroesMonster();
+
     return NONE;
 }
 
@@ -1515,7 +1485,7 @@ void RedrawCastleMonster(void){
     Uint8 i;
     ICNHEADER *header = NULL;
 
-    char message[8];
+    char num[NUMLEN + 1];
     CursorOff();
 
     // рисуем фон ячеек для монстров
@@ -1575,12 +1545,12 @@ void RedrawCastleMonster(void){
 		SDL_BlitSurface(header->surface, NULL, video, &rectCur);
 		
 		// рисуем количество
-		sprintf(message, "%5d", currentCastle->army[i].count);
+		snprintf(num, NUMLEN, "%5d", currentCastle->army[i].count);
 		rectCur.x = cx + 88 * i + 54;
 		rectCur.y = cy + 80;
-		rectCur.w = GetLengthText(message, FONT_SMALL);
+		rectCur.w = GetLengthText(num, FONT_SMALL);
 		rectCur.h = FONT_HEIGHTSMALL;
-		PrintText(video, &rectCur, message, FONT_SMALL);
+		PrintText(video, &rectCur, num, FONT_SMALL);
 	}else{
 	    FillSPRITE(&sprite, "STRIP.ICN", 2);
 	    image = GetICNSprite(&sprite);
@@ -1608,7 +1578,7 @@ void RedrawHeroesMonster(void){
 
     CursorOff();
 
-    char message[8];
+    char num[NUMLEN + 1];
 
     // рисуем фон ячеек для монстров героя
     if(heroes){
@@ -1668,12 +1638,12 @@ void RedrawHeroesMonster(void){
 		SDL_BlitSurface(header->surface, NULL, video, &rectCur);
 		
 		// рисуем количество
-		sprintf(message, "%5d", heroes->army[i].count);
+		snprintf(num, NUMLEN, "%5d", heroes->army[i].count);
 		rectCur.x = cx + 88 * i + 54;
 		rectCur.y = cy + 80;
-		rectCur.w = GetLengthText(message, FONT_SMALL);
+		rectCur.w = GetLengthText(num, FONT_SMALL);
 		rectCur.h = FONT_HEIGHTSMALL;
-		PrintText(video, &rectCur, message, FONT_SMALL);
+		PrintText(video, &rectCur, num, FONT_SMALL);
 
 	    }else{
 		FillSPRITE(&sprite, "STRIP.ICN", 2);
@@ -1893,7 +1863,7 @@ void RedrawCastleInfoResource(void){
     const S_CASTLE *castle = GetCurrentCastle();
     S_KINGDOM *kingdom = NULL;
     AGGSPRITE sprite;
-    char message[8];
+    char num[NUMLEN + 1];
     Uint16 cx, cy;
     
     CursorOff();
@@ -1936,12 +1906,12 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text count wood
     kingdom = GetStatKingdom(castle->color);
-    sprintf(message, "%5d", kingdom->wood);
+    snprintf(num, NUMLEN, "%5d", kingdom->wood);
     rectCur.x = cx + 8;
     rectCur.y = cy + 32;
-    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, message, FONT_SMALL);
+    PrintText(video, &rectCur, num, FONT_SMALL);
     // sprite sulfur
     FillSPRITE(&sprite, "RESOURCE.ICN", 3);
     image = GetICNSprite(&sprite);
@@ -1952,12 +1922,12 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text count sulfur
     kingdom = GetStatKingdom(castle->color);
-    sprintf(message, "%5d", kingdom->sulfur);
+    snprintf(num, NUMLEN, "%5d", kingdom->sulfur);
     rectCur.x = cx + 48;
     rectCur.y = cy + 32;
-    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, message, FONT_SMALL);
+    PrintText(video, &rectCur, num, FONT_SMALL);
     // sprite crystal
     FillSPRITE(&sprite, "RESOURCE.ICN", 4);
     image = GetICNSprite(&sprite);
@@ -1968,12 +1938,12 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text count crystal
     kingdom = GetStatKingdom(castle->color);
-    sprintf(message, "%5d", kingdom->crystal);
+    snprintf(num, NUMLEN, "%5d", kingdom->crystal);
     rectCur.x = cx + 8;
     rectCur.y = cy + 78;
-    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, message, FONT_SMALL);
+    PrintText(video, &rectCur, num, FONT_SMALL);
     // sprite mercury
     FillSPRITE(&sprite, "RESOURCE.ICN", 1);
     image = GetICNSprite(&sprite);
@@ -1984,12 +1954,12 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text count mercury
     kingdom = GetStatKingdom(castle->color);
-    sprintf(message, "%5d", kingdom->mercury);
+    snprintf(num, NUMLEN, "%5d", kingdom->mercury);
     rectCur.x = cx + 48;
     rectCur.y = cy + 78;
-    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, message, FONT_SMALL);
+    PrintText(video, &rectCur, num, FONT_SMALL);
     // sprite ore
     FillSPRITE(&sprite, "RESOURCE.ICN", 2);
     image = GetICNSprite(&sprite);
@@ -2000,12 +1970,12 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text count ore
     kingdom = GetStatKingdom(castle->color);
-    sprintf(message, "%5d", kingdom->ore);
+    snprintf(num, NUMLEN, "%5d", kingdom->ore);
     rectCur.x = cx + 8;
     rectCur.y = cy + 118;
-    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, message, FONT_SMALL);
+    PrintText(video, &rectCur, num, FONT_SMALL);
     // sprite gems
     FillSPRITE(&sprite, "RESOURCE.ICN", 5);
     image = GetICNSprite(&sprite);
@@ -2016,12 +1986,12 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text count gems
     kingdom = GetStatKingdom(castle->color);
-    sprintf(message, "%5d", kingdom->gems);
+    snprintf(num, NUMLEN, "%5d", kingdom->gems);
     rectCur.x = cx + 48;
     rectCur.y = cy + 118;
-    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, message, FONT_SMALL);
+    PrintText(video, &rectCur, num, FONT_SMALL);
     // sprite gold
     FillSPRITE(&sprite, "RESOURCE.ICN", 6);
     image = GetICNSprite(&sprite);
@@ -2032,12 +2002,12 @@ void RedrawCastleInfoResource(void){
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text count gold
     kingdom = GetStatKingdom(castle->color);
-    sprintf(message, "%7d", kingdom->gold);
+    snprintf(num, NUMLEN, "%7d", kingdom->gold);
     rectCur.x = cx + 24;
     rectCur.y = cy + 154;
-    rectCur.w = GetLengthText(message, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rectCur, message, FONT_SMALL);
+    PrintText(video, &rectCur, num, FONT_SMALL);
     // exit
     FillSPRITE(&sprite, "SWAPBTN.ICN", 0);
     image = GetICNSprite(&sprite);
@@ -3383,29 +3353,29 @@ Uint8 GetMonsterGrownCastle(const S_CASTLE *castle, E_MONSTER name){
     return grown;
 }
 
-void AllCastleIncreaseArmy(void){
+void AllCastleIncreaseRecrut(void){
 
     Uint8 i;
 
     for(i = 0; i < countCastle; ++i){
 
-	if(ptrCastle[i].dwelling & DWELLING_MONSTER1) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER1, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 1)));
+	if(ptrCastle[i].dwelling & DWELLING_MONSTER1) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER1, GetMonsterGrownCastle(&ptrCastle[i], GetMonsterFromCastle(&ptrCastle[i], 1)));
 
 	if(ptrCastle[i].dwelling & DWELLING_MONSTER2 ||
-	   ptrCastle[i].dwelling & DWELLING_UPGRADE2) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER2, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 2)));
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE2) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER2, GetMonsterGrownCastle(&ptrCastle[i], GetMonsterFromCastle(&ptrCastle[i], 2)));
 
 	if(ptrCastle[i].dwelling & DWELLING_MONSTER3 ||
-	   ptrCastle[i].dwelling & DWELLING_UPGRADE3) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER3, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 3)));
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE3) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER3, GetMonsterGrownCastle(&ptrCastle[i], GetMonsterFromCastle(&ptrCastle[i], 3)));
 
 	if(ptrCastle[i].dwelling & DWELLING_MONSTER4 ||
-	   ptrCastle[i].dwelling & DWELLING_UPGRADE4) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER4, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 4)));
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE4) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER4, GetMonsterGrownCastle(&ptrCastle[i], GetMonsterFromCastle(&ptrCastle[i], 4)));
 
 	if(ptrCastle[i].dwelling & DWELLING_MONSTER5 ||
-	   ptrCastle[i].dwelling & DWELLING_UPGRADE5) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER5, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 5)));
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE5) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER5, GetMonsterGrownCastle(&ptrCastle[i], GetMonsterFromCastle(&ptrCastle[i], 5)));
 
 	if(ptrCastle[i].dwelling & DWELLING_MONSTER6 ||
 	   ptrCastle[i].dwelling & DWELLING_UPGRADE6 ||
-	   ptrCastle[i].dwelling & DWELLING_UPGRADE7) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(&ptrCastle[i], 6)));
+	   ptrCastle[i].dwelling & DWELLING_UPGRADE7) CastleIncreaseArmy(&ptrCastle[i], DWELLING_MONSTER6, GetMonsterGrownCastle(&ptrCastle[i], GetMonsterFromCastle(&ptrCastle[i], 6)));
     }
 }
 
@@ -3807,15 +3777,16 @@ ACTION ActionOverHeroesArmy(void){
     Uint8 index = (Uint16) (mx - cx) / 88;
 
     if(MONSTERNONE != heroes->army[index].monster){
-	if(! backMonsterCursor.use)
+	if(! selectCastleArmy.selector->use)
 	    message = "Select Army";
-	else if(index == backMonsterCursor.select && !backMonsterCursor.castle)
+	else if(index == selectCastleArmy.select && !selectCastleArmy.castle)
 	    message = "View Army";
 	else
 	    message = "Change Army";
     }else
-	message = (backMonsterCursor.use ? "Left click Move Army, Right click Redistribute Army" : "Empty");
+	message = (selectCastleArmy.selector->use ? "Left click Move Army, Right click Redistribute Army" : "Empty");
 
+    CursorOff();
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
@@ -3824,8 +3795,7 @@ ACTION ActionOverHeroesArmy(void){
     cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
-
-    return NONE;
+    CursorOn();
 
     return NONE;
 }
@@ -3849,15 +3819,16 @@ ACTION ActionOverCastleArmy(void){
     Uint8 index = (Uint16) (mx - cx) / 88;
 
     if(MONSTERNONE != castle->army[index].monster){
-	if(! backMonsterCursor.use)
+	if(! selectCastleArmy.selector->use)
 	    message = "Select Army";
-	else if(index == backMonsterCursor.select && backMonsterCursor.castle)
+	else if(index == selectCastleArmy.select && selectCastleArmy.castle)
 	    message = "View Army";
 	else
 	    message = "Change Army";
     }else
-	message = (backMonsterCursor.use ? "Left click Move Army, Right click Redistribute Army" : "Empty");
+	message = (selectCastleArmy.selector->use ? "Left click Move Army, Right click Redistribute Army" : "Empty");
 
+    CursorOff();
     cur.x = video->w / 2;
     cur.y = video->h / 2 + 240 - BORDERWIDTH;
 
@@ -3866,7 +3837,8 @@ ACTION ActionOverCastleArmy(void){
     cur.w = GetLengthText(message, FONT_BIG);
     cur.h = FONT_HEIGHTBIG;
     PrintText(video, &cur, message, FONT_BIG);
-
+    CursorOn();
+    
     return NONE;
 }
 
@@ -3875,4 +3847,20 @@ E_NAMEHEROES GetHeroesFromCastle(const S_CASTLE *castle){
     if(! castle) return HEROESNULL;
     
     return castle->hero;
+}
+
+const S_CASTLE *HeroesInCastle(const S_HEROES *heroes){
+
+    Uint8 i;
+
+    for(i = 0; i < countCastle; ++i)
+	if(ptrCastle[i].ax == heroes->ax && ptrCastle[i].ay == heroes->ay)
+	    return &ptrCastle[i];
+
+    return NULL;
+}
+
+void ResetCastleSelector(void){
+
+    ResetSelector(selectCastleArmy.selector);
 }

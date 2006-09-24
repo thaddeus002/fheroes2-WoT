@@ -34,16 +34,16 @@
 #include "actionevent.h"
 
 #define SPELLMAXCOUNT		66
-#define FIGHTINGSPELL_LEVEL1	10
-#define FIGHTINGSPELL_LEVEL2	7
-#define FIGHTINGSPELL_LEVEL3	12
-#define FIGHTINGSPELL_LEVEL4	10
-#define FIGHTINGSPELL_LEVEL5	8
-#define LIFESPELL_LEVEL1	2
-#define LIFESPELL_LEVEL2	4
-#define LIFESPELL_LEVEL3	4
-#define LIFESPELL_LEVEL4	6
-#define LIFESPELL_LEVEL5	2
+#define COMBATSPELL_LEVEL1	10
+#define COMBATSPELL_LEVEL2	7
+#define COMBATSPELL_LEVEL3	13
+#define COMBATSPELL_LEVEL4	10
+#define COMBATSPELL_LEVEL5	8
+#define ADVENTURESPELL_LEVEL1	2
+#define ADVENTURESPELL_LEVEL2	4
+#define ADVENTURESPELL_LEVEL3	3
+#define ADVENTURESPELL_LEVEL4	6
+#define ADVENTURESPELL_LEVEL5	2
 
 typedef enum {
 	    MAGIC_NONE = 0,
@@ -55,6 +55,8 @@ typedef enum {
 
 	    } E_MAGICLEVEL;
 
+typedef enum { ADVENTURE, COMBAT } E_SPELLTYPE;
+	    
 typedef enum {
 		SPELLNONE,
 		SPELLSLOW,
@@ -128,8 +130,8 @@ typedef enum {
 	    } E_SPELL;
 
 typedef struct {
-	    const char *	name;
-	    const char *	descriptions;
+	    E_SPELLTYPE		type;
+	    E_MAGICLEVEL	level;
 	    Uint8		cost;
 
 	    } S_SPELL;
@@ -137,8 +139,6 @@ typedef struct {
 BOOL	     InitSpell(void);
 void	     FreeSpell(void);
 E_MAGICLEVEL GetLevelSpellMagic(E_SPELL);
-const char * GetStringNameSpellMagic(E_SPELL);
-const char * GetStringDescriptionsSpellMagic(E_SPELL);
 Uint8 	     GetCostSpellMagic(E_SPELL);
 
 void	     FillSpellLevel1(E_RACE, E_SPELL *);

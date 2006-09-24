@@ -38,6 +38,7 @@
 #include "cursor.h"
 #include "debug.h"
 #include "tools.h"
+#include "spell.h"
 #include "monster.h"
 #include "heroes.h"
 
@@ -194,11 +195,17 @@ BOOL	InitHeroes(void){
 
     if(GetIntValue(DEBUG)){
 	allHeroes[SANDYSANDY].name = "Debugger";
+	allHeroes[SANDYSANDY].morale = MORALE_NORMAL;
+	allHeroes[SANDYSANDY].luck = LUCK_NORMAL;
 	allHeroes[SANDYSANDY].army[0].count = 3;
 	allHeroes[SANDYSANDY].army[0].monster = RED_DRAGON;
 	allHeroes[SANDYSANDY].army[1].count = 2;
 	allHeroes[SANDYSANDY].army[1].monster = BLACK_DRAGON;
-    } else
+	allHeroes[SANDYSANDY].artifact[1] = MEDAL_HONOR;
+	allHeroes[SANDYSANDY].artifact[2] = GAMBLER_LUCKY_COIN;
+	allHeroes[SANDYSANDY].artifact[3] = STEALTH_SHIELD;
+	allHeroes[SANDYSANDY].artifact[4] = DRAGON_SWORD;
+     } else
 	allHeroes[SANDYSANDY].name = "SandySandy";
 
     allHeroes[BRAX].name = "Brother Brax";
@@ -216,6 +223,7 @@ void	FreeHeroes(void){
 
 void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 
+    AGGSPRITE sprite;
     Uint8 i = 0;
 
     for(i = 0; i < HEROESMAXSKILL; ++i){
@@ -225,6 +233,9 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 
     for(i = 0; i < HEROESMAXARTIFACT; ++i)
 	heroes->artifact[i]	= ARTIFACTNONE;
+
+    for(i = 0; i < SPELLMAXCOUNT; ++i)
+	heroes->book[i]		= SPELLNONE;
 
     for(i = 0; i < HEROESMAXARMY; ++i){
 	heroes->army[i].count	= 0;
@@ -248,7 +259,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].monster	= PEASANT;
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ARCHER);
 	    heroes->army[1].monster	= ARCHER;
-	
+	    FillSPRITE(&sprite, "KNGT32.ICN", 18);
 	    break;
 	    
 	case BARBARIAN:
@@ -264,7 +275,7 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].monster	= GOBLIN;
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ORC);
 	    heroes->army[1].monster	= ORC;
-	
+	    FillSPRITE(&sprite, "BARB32.ICN", 18);
 	    break;
 
         case NECROMANCER:
@@ -283,7 +294,8 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ZOMBIE);
 	    heroes->army[1].monster	= ZOMBIE;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    AddMagicToBook(HASTE);
+	    heroes->book[0]		= HASTE;
+	    FillSPRITE(&sprite, "NECR32.ICN", 18);
 	    break;
 
         case SORCERESS:
@@ -302,7 +314,8 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, DWARF);
 	    heroes->army[1].monster	= DWARF;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    AddMagicToBook(BLESS);
+	    heroes->book[0]		= BLESS;
+	    FillSPRITE(&sprite, "SORC32.ICN", 18);
 	    break;
 
         case WARLOCK:
@@ -321,7 +334,8 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, GARGOYLE);
 	    heroes->army[1].monster	= GARGOYLE;
 	    heroes->artifact[0]		= MAGIC_BOOK;
-	    AddMagicToBook(CURSE);
+	    heroes->book[0]		= CURSE;
+	    FillSPRITE(&sprite, "WRLK32.ICN", 18);
 	    break;
 
         case WIZARD:
@@ -338,20 +352,22 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->artifact[0]		= MAGIC_BOOK;
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, BOAR);
 	    heroes->army[1].monster	= BOAR;
-	    AddMagicToBook(STONESKIN);
+	    heroes->book[0]		= STONESKIN;
+	    FillSPRITE(&sprite, "WZRD32.ICN", 18);
 	    break;
 
 	default:
 	    break;
     }
 
-    heroes->morale	= MORALE_GOOD;
+    heroes->image	= GetICNSprite(&sprite);
+    heroes->morale	= MORALE_NORMAL;
     heroes->luck	= LUCK_NORMAL;
     heroes->experience	= 0;
-    heroes->magicPoint	= CalculateHeroesMagicPoint(heroes);
+    heroes->magicPoint	= CalculateHeroesMagicPoint(heroes) / 2;
     heroes->movePoint	= 0;
     heroes->af		= SPREAD;
-
+    heroes->visit	= 0;
 }
 
 E_LEVELSKILL HeroesLevelSkill(const S_HEROES *heroes, E_SKILL skill){
@@ -567,13 +583,39 @@ Uint8	CalculateHeroesKnowledge(const S_HEROES *heroes){
 }
 
 E_MORALE CalculateHeroesMorale(const S_HEROES *heroes){
+/*
+[-] Knight bonus +1 ???
+[+] All %s troops +1
+[+] Troops of 3 alignments -1
+[+] Troops of 4 alignments -2
+[+] Troops of 5 alignments -3 
+[+] Medal of Valor +1
+[+] Medal of Courage +1
+[+] Medal of Honor +1
+[+] Medal of Distinction +1
+[+] Fizbin of Misfortune -2
+[+] Buoy visited +1
+[+] Oasis visited +1
+[+] Temple visited +2
+[+] Graveyard robber -1
+[+] Shipwreck robber -1
+[+] Some undead in group -1
+[+] Watering hole visited +1
+[+] Derelict ship robber -1
+[+] Barbarian Coliseum +2
+[+] Tavern +1
+[+] Basic Leadership +1
+[+] Advanced Leadership +2
+[+] Expert Leadership +3
+*/
 
     if(NULL == heroes) return MORALE_NORMAL;
 
-    E_MORALE result = heroes->morale;
+    Sint8 result = heroes->morale;
 
     Uint8 i;
-
+    const S_CASTLE *castle = NULL;
+    
     for(i = 0; i < HEROESMAXARTIFACT; ++i)
 
 	switch(heroes->artifact[i]){
@@ -582,12 +624,12 @@ E_MORALE CalculateHeroesMorale(const S_HEROES *heroes){
 	    case MEDAL_COURAGE:
 	    case MEDAL_HONOR:
 	    case MEDAL_DISTINCTION:
-		if(MORALE_IRISH > result++);
+		result++;
 		break;
 
 	    case FIZBIN_MISFORTUNE:
-		if(MORALE_AWFUL < result) result-=2;
-		else result = MORALE_TREASON;
+		result--;
+		result--;
 		break;
 
 	    default:
@@ -598,34 +640,121 @@ E_MORALE CalculateHeroesMorale(const S_HEROES *heroes){
     switch(HeroesLevelSkill(heroes, LEADERSHIP)){
     
 	case EXPERT:
-	    if(MORALE_IRISH > result++);
-	    if(MORALE_IRISH > result++);
-	    if(MORALE_IRISH > result++);
+	    result++;
+	    result++;
+	    result++;
 	    break;
 	    
 	case ADVANCED:
-	    if(MORALE_IRISH > result++);
-	    if(MORALE_IRISH > result++);
+	    result++;
+	    result++;
 	    break;
 	    
 	case BASIC:
-	    if(MORALE_IRISH > result++);
+	    result++;
 	    break;
 	    
 	default:
 	    break;
     }
 
+    // bonus troops
+    Uint8 count = 0;
+    Uint8 countKNGT = 0;
+    Uint8 countBARB = 0;
+    Uint8 countSRCS = 0;
+    Uint8 countWRLK = 0;
+    Uint8 countWZRD = 0;
+    Uint8 countNCRM = 0;
+    Uint8 countBOMG = 0;
+    for(i = 0; i < HEROESMAXARMY; ++i)
+	if(MONSTERNONE != heroes->army[i].monster)
+	    switch(GetRaceMonster(heroes->army[i].monster)){
+		case KNIGHT:
+		    ++countKNGT;
+		    break;
+		case BARBARIAN:
+		    ++countBARB;
+		    break;
+		case SORCERESS:
+		    ++countSRCS;
+		    break;
+		case WARLOCK:
+		    ++countWRLK;
+		    break;
+		case WIZARD:
+		    ++countWZRD;
+		    break;
+		case NECROMANCER:
+		    ++countNCRM;
+		    break;
+		default:
+		    ++countBOMG;
+		    break;
+	    }
+    if(countKNGT) ++count;
+    if(countBARB) ++count;
+    if(countSRCS) ++count;
+    if(countWRLK) ++count;
+    if(countWZRD) ++count;
+    if(countNCRM) ++count;
+    if(countBOMG) ++count;
+    if(1 == count) ++result;
+    else if(3 == count) result -= 1;
+    else if(4 == count) result -= 2;
+    else if(4 < count)  result -= 3;
+    // undead in life group
+    if(countNCRM && (countKNGT || countBARB || countSRCS || countWRLK || countWZRD || countBOMG)) --result;
+
+    // castle: bonus tavern
+    if(NULL != (castle = HeroesInCastle(heroes)) && ALREADY_BUILD == AllowBuildTavern(castle))
+	++result;
+
+    // castle: bonus coliseum
+    if(NULL != (castle = HeroesInCastle(heroes)) && BARBARIAN == castle->race && ALREADY_BUILD == AllowBuildSpec(castle))
+	result += 2;
+
+    // visit bonus
+    if(heroes->visit & VISIT_TEMPLE) result += 2;
+    if(heroes->visit & VISIT_BYOU)  result += 1;
+    if(heroes->visit & VISIT_OASIS)  result += 1;
+    if(heroes->visit & VISIT_WATERINGHOLE) result += 1;
+    if(heroes->visit & VISIT_GRAVEYARD) result -= 1;
+    if(heroes->visit & VISIT_SHIPWRECK) result -= 1;
+    if(heroes->visit & VISIT_DERELICTSHIP) result -= 1;
+
+    // all undead
+    if(1 == count && countNCRM) result = MORALE_NORMAL;
+
+    // result
+    if(result > MORALE_BLOOD) return MORALE_BLOOD;
+    if(result < MORALE_TREASON) return MORALE_TREASON;
+
     return result;
 }
 
 E_LUCK  CalculateHeroesLuck(const S_HEROES *heroes){
-
+/*
+[+] Lucky Rabbit's Foot +1
+[+] Golden Horseshoe +1
+[+] Gambler's Lucky Coin +1
+[+] Four-Leaf Clover +1
+[+] Faerie ring visited +1
+[+] Fountain visited +1
+[-] Tomb robber -1 ????
+[+] Sorceress Rainbow +2
+[+] Idol visited +1
+[+] Pyramid raided -2
+[+] Basic Luck +1
+[+] Advanced Luck +2
+[+] Expert Luck +3
+*/
     if(NULL == heroes) return LUCK_NORMAL;
 
     E_LUCK result = heroes->luck;
 
     Uint8 i;
+    const S_CASTLE *castle = NULL;
 
     for(i = 0; i < HEROESMAXARTIFACT; ++i)
 
@@ -635,7 +764,7 @@ E_LUCK  CalculateHeroesLuck(const S_HEROES *heroes){
 	    case GOLDEN_HORSESHOE:
 	    case GAMBLER_LUCKY_COIN:
 	    case FOUR_LEAF_CLOVER:
-		if(LUCK_IRISH > result++);
+		result++;
 		break;
 
 	    default:
@@ -646,23 +775,37 @@ E_LUCK  CalculateHeroesLuck(const S_HEROES *heroes){
     switch(HeroesLevelSkill(heroes, LUCK)){
     
 	case EXPERT:
-	    if(LUCK_IRISH > result++);
-	    if(LUCK_IRISH > result++);
-	    if(LUCK_IRISH > result++);
+	    result++;
+	    result++;
+	    result++;
 	    break;
 	    
 	case ADVANCED:
-	    if(LUCK_IRISH > result++);
-	    if(LUCK_IRISH > result++);
+	    result++;
+	    result++;
 	    break;
 	    
 	case BASIC:
-	    if(LUCK_IRISH > result++);
+	    result++;
 	    break;
 	    
 	default:
 	    break;
     }
+
+    // visit object
+    if(heroes->visit & VISIT_FOUNTAIN) result += 1;
+    if(heroes->visit & VISIT_FAERIERING) result += 1;
+    if(heroes->visit & VISIT_IDOL) result += 1;
+    if(heroes->visit & VISIT_MERMAID) result += 1;
+    if(heroes->visit & VISIT_PYRAMID) result -= 2;
+
+    // castle: bonus rainbow
+    if(NULL != (castle = HeroesInCastle(heroes)) && SORCERESS == castle->race && ALREADY_BUILD == AllowBuildSpec(castle))
+	result += 2;
+
+    // result
+    if(LUCK_IRISH < result) return LUCK_IRISH;
 
     return result;
 }
@@ -867,12 +1010,12 @@ const char * CapitanBigNamePortrait(E_RACE race){
     return heroesPortrait;
 }
 
-E_NAMEHEROES    GetRecrutPrimaryHeroes(void){
+E_NAMEHEROES GetRecrutPrimaryHeroes(void){
 
     return ROLAND;
 }
 
-E_NAMEHEROES    GetRecrutSecondaryHeroes(void){
+E_NAMEHEROES GetRecrutSecondaryHeroes(void){
 
     return ARCHIBALD;
 }
@@ -880,4 +1023,48 @@ E_NAMEHEROES    GetRecrutSecondaryHeroes(void){
 const char * HeroesGetStringName(E_NAMEHEROES name){
 
     return allHeroes[name].name;
+}
+
+/* return current hero level */
+Uint8 GetHeroesLevel(const S_HEROES *heroes){
+
+    return 1;
+}
+
+/* return rest exp for next level */
+Uint32 GetHeroesRestLevel(const S_HEROES *heroes){
+
+    return 1000;
+}
+
+BOOL HeroesAddSpell(const S_HEROES *heroes, E_SPELL spell){
+
+    E_SPELL *ptrSpell = (E_SPELL *) &heroes->book[0];
+
+    if(! HeroesArtifactPresent(heroes, MAGIC_BOOK)) return FALSE;
+
+    switch(GetLevelSpellMagic(spell)){
+    
+	case MAGIC_LEVEL3:
+	    if(BASIC > HeroesLevelSkill(heroes, WISDOM)) return FALSE;
+	    break;
+	case MAGIC_LEVEL4:
+	    if(ADVANCED > HeroesLevelSkill(heroes, WISDOM)) return FALSE;
+	    break;
+	case MAGIC_LEVEL5:
+	    if(EXPERT > HeroesLevelSkill(heroes, WISDOM)) return FALSE;
+	    break;
+
+	default:
+	    break;
+    }
+
+    while(*ptrSpell != SPELLNONE){
+	if(spell == *ptrSpell) return TRUE;
+	++ptrSpell;
+    }
+
+    if(ptrSpell < &heroes->book[0] + SPELLMAXCOUNT) *ptrSpell = spell;
+
+    return TRUE;
 }

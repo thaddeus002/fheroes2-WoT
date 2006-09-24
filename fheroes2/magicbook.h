@@ -29,9 +29,9 @@
 #ifndef _MAGICBOOK_H
 #define _MAGICBOOK_H
 
+#include "heroes.h"
 #include "spell.h"
 
-void	AddMagicToBook(E_SPELL);
-
+ACTION	ShowMagicBook(const S_HEROES *);
 
 #endif

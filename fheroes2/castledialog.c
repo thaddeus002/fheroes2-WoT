@@ -40,6 +40,9 @@
 #include "payment.h"
 #include "castledialog.h"
 
+#define NUMLEN	8
+#define TEXTLEN	128
+
 ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 
     CursorOff();
@@ -60,9 +63,9 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
     const S_PAYMENT *payment = PaymentConditionsBuilding(race, build);    
     const char *icnsprite = NULL;
     const char *text = NULL;
-    char str[8];
+    char num[NUMLEN + 1];
 
-    S_BOX box;
+    S_BOX *box = NULL;
     Uint8 countres = 0;
     Uint16 height;
 
@@ -80,7 +83,7 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
     if(countres > 3) height += 55; // res
     if(countres > 6) height += 55; // res
 
-    if( ! InitBox(&box, height, &dialog, flag)) return NONE;
+    if(NULL == (box = InitBox(height, &dialog, flag))) return NONE;
 
     switch(race){
 	case KNIGHT:
@@ -167,7 +170,7 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
     src.y = 2;
     src.w = 137;
     src.h = 72;
-    dst.y = box.rectArea.y + 5;
+    dst.y = box->rectArea.y + 5;
     dst.x = (video->w - src.w) / 2 + 5;
     dst.w = src.w;
     dst.h = src.h;
@@ -175,7 +178,7 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 
     FillSPRITE(&sprite, icnsprite, index);
     image = GetICNSprite(&sprite);
-    dst.y = box.rectArea.y + 6;
+    dst.y = box->rectArea.y + 6;
     dst.x = (video->w - src.w) / 2 + 6;
     dst.w = image->w;
     dst.h = image->h;
@@ -183,22 +186,22 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 
     text = GetStringBuilding(race, build);
     dst.x = (video->w - src.w) / 2 + 6;
-    dst.y = box.rectArea.y + 63;
+    dst.y = box->rectArea.y + 63;
     dst.w = image->w + 2;
     dst.h = FONT_HEIGHTSMALL;
     PrintAlignText(video, &dst, text, FONT_SMALL);
 
     // text info
     text = GetStringDescriptionsBuilding(race, build);
-    dst = box.rectArea;
-    dst.y = box.rectArea.y + 90;
+    dst = box->rectArea;
+    dst.y = box->rectArea.y + 90;
     PrintAlignText(video, &dst, text, FONT_BIG);
     
-    dst.y = box.rectArea.y + 150 + GetHeightText(text, FONT_BIG);
+    dst.y = box->rectArea.y + 150 + GetHeightText(text, FONT_BIG);
 
     // resource
     Uint8 count = 0;
-    index = (countres > 2 ? box.rectArea.w / 3 : box.rectArea.w / countres);
+    index = (countres > 2 ? box->rectArea.w / 3 : box->rectArea.w / countres);
 
     if(payment->wood){
 	FillSPRITE(&sprite, "RESOURCE.ICN", 0);
@@ -209,12 +212,12 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->wood);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->wood);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -227,12 +230,12 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->ore);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->ore);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -245,12 +248,12 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->mercury);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->mercury);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -264,12 +267,12 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->sulfur);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->sulfur);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -283,12 +286,12 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->crystal);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->crystal);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -302,12 +305,12 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->gems);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->gems);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -315,19 +318,19 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
     if(payment->gold){
 	FillSPRITE(&sprite, "RESOURCE.ICN", 6);
 	image = GetICNSprite(&sprite);
-	if(! count) index = box.rectArea.w;
+	if(! count) index = box->rectArea.w;
 	src.x = dst.x + index / 2 + count * index - image->w / 2;
 	src.y = dst.y - image->h;
 	src.w = image->w;
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->gold);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->gold);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
     }
 
     // Отрисовка диалога
@@ -373,7 +376,7 @@ ACTION BuyBuildingBox(E_RACE race, E_BUILDINGCASTLE build, Uint32 flag){
     // востанавливаем бакгроунд
     CursorOff();
 
-    FreeBox(&box);
+    FreeBox(box);
     SetCursor(cursor);
 
     SetIntValue(ANIM2, TRUE);
@@ -403,10 +406,10 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
     const S_PAYMENT *payment = PaymentConditionsDwelling(race, dwelling);    
     const char *icnsprite = NULL;
     const char *depens = GetStringDepenceDwelling(race, dwelling);
-    char text[128];
-    char str[8];
+    char text[TEXTLEN + 1];
+    char num[NUMLEN + 1];
 
-    S_BOX box;
+    S_BOX *box = NULL;
     Uint8 countres = 0;
     Uint16 height;
 
@@ -418,7 +421,7 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
     if(payment->gems)    ++countres;
     if(payment->gold)    ++countres;
     
-    sprintf(text, "The %s produces %s.", GetStringDwelling(race, dwelling), GetStringMonsterFromDwelling(race, dwelling));
+    snprintf(text, TEXTLEN, "The %s produces %s.", GetStringDwelling(race, dwelling), GetStringMonsterFromDwelling(race, dwelling));
     height  = 100;
     height += GetHeightText(text, FONT_BIG);
     height += 55;
@@ -426,7 +429,7 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
     if(countres > 6) height += 55; // res
     if(depens) height += 20 + GetHeightText(depens, FONT_BIG);
 
-    if( ! InitBox(&box, height, &dialog, flag)) return NONE;
+    if(NULL == (box = InitBox(height, &dialog, flag))) return NONE;
 
     switch(race){
 	case KNIGHT:
@@ -503,7 +506,7 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
     src.y = 2;
     src.w = 137;
     src.h = 72;
-    dst.y = box.rectArea.y + 5;
+    dst.y = box->rectArea.y + 5;
     dst.x = (video->w - src.w) / 2 + 5;
     dst.w = src.w;
     dst.h = src.h;
@@ -511,27 +514,27 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
 
     FillSPRITE(&sprite, icnsprite, index);
     image = GetICNSprite(&sprite);
-    dst.y = box.rectArea.y + 6;
+    dst.y = box->rectArea.y + 6;
     dst.x = (video->w - src.w) / 2 + 6;
     dst.w = image->w;
     dst.h = image->h;
     SDL_BlitSurface(image, NULL, video, &dst);
 
-    sprintf(text, "%s", GetStringDwelling(race, dwelling));
+    snprintf(text, TEXTLEN, "%s", GetStringDwelling(race, dwelling));
     dst.x = (video->w - src.w) / 2 + 6;
-    dst.y = box.rectArea.y + 63;
+    dst.y = box->rectArea.y + 63;
     dst.w = image->w + 2;
     dst.h = FONT_HEIGHTSMALL;
     PrintAlignText(video, &dst, text, FONT_SMALL);
 
     // text info
-    sprintf(text, "The %s produces %s.", GetStringDwelling(race, dwelling), GetStringMonsterFromDwelling(race, dwelling));
+    snprintf(text, TEXTLEN, "The %s produces %s.", GetStringDwelling(race, dwelling), GetStringMonsterFromDwelling(race, dwelling));
 
-    dst = box.rectArea;
-    dst.y = box.rectArea.y + 90;
+    dst = box->rectArea;
+    dst.y = box->rectArea.y + 90;
     PrintAlignText(video, &dst, text, FONT_BIG);
     
-    dst.y = box.rectArea.y + 110 + GetHeightText(text, FONT_BIG);
+    dst.y = box->rectArea.y + 110 + GetHeightText(text, FONT_BIG);
 
     if(depens){
 	PrintAlignText(video, &dst, "Require:", FONT_BIG);
@@ -543,7 +546,7 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
     dst.y += 40;
     // resource
     Uint8 count = 0;
-    index = (countres > 2 ? box.rectArea.w / 3 : box.rectArea.w / countres);
+    index = (countres > 2 ? box->rectArea.w / 3 : box->rectArea.w / countres);
 
     if(payment->wood){
 	FillSPRITE(&sprite, "RESOURCE.ICN", 0);
@@ -554,12 +557,12 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->wood);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->wood);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -572,12 +575,12 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->ore);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->ore);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -590,12 +593,12 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->mercury);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->mercury);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -609,12 +612,12 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->sulfur);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->sulfur);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -628,12 +631,12 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->crystal);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->crystal);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -647,12 +650,12 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->gems);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->gems);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
 	++count;
     }
 
@@ -660,19 +663,19 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
     if(payment->gold){
 	FillSPRITE(&sprite, "RESOURCE.ICN", 6);
 	image = GetICNSprite(&sprite);
-	if(! count) index = box.rectArea.w;
+	if(! count) index = box->rectArea.w;
 	src.x = dst.x + index / 2 + count * index - image->w / 2;
 	src.y = dst.y - image->h;
 	src.w = image->w;
 	src.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &src);
 
-	sprintf(str, "%d", payment->gold);
-	src.x = dst.x + index / 2 + count * index - GetLengthText(str, FONT_SMALL) / 2;
+	snprintf(num, NUMLEN, "%d", payment->gold);
+	src.x = dst.x + index / 2 + count * index - GetLengthText(num, FONT_SMALL) / 2;
 	src.y = dst.y + 2;
-	src.w = GetLengthText(str, FONT_SMALL);
+	src.w = GetLengthText(num, FONT_SMALL);
 	src.h = FONT_HEIGHTSMALL;
-	PrintText(video, &src, str, FONT_SMALL);
+	PrintText(video, &src, num, FONT_SMALL);
     }
 
     // Отрисовка диалога
@@ -717,7 +720,7 @@ ACTION BuyDwellingBox(E_RACE race, E_DWELLINGCASTLE dwelling, Uint32 flag){
     // востанавливаем бакгроунд
     CursorOff();
 
-    FreeBox(&box);
+    FreeBox(box);
     
     SetCursor(cursor);
 
@@ -740,17 +743,17 @@ ACTION BuyBoat(void){
     ACTION result = NONE;
     INTERFACEACTION *dialog = NULL;        
     BOOL exit = FALSE;
-    S_BOX box;
+    S_BOX *box = NULL;
     SDL_Rect rect;
     SDL_Surface *image = NULL;
     SDL_Surface *video = SDL_GetVideoSurface();;
     AGGSPRITE sprite;
-    char str[8];
+    char num[NUMLEN + 1];
     
-    if( ! InitBox(&box, 120, &dialog, OK|CANCEL)) return NONE;
+    if(NULL == (box = InitBox(120, &dialog, OK|CANCEL))) return NONE;
 
     // text header
-    rect = box.rectArea;
+    rect = box->rectArea;
     PrintAlignText(video, &rect, "Build a new ship:", FONT_BIG);
 
     // sprite
@@ -763,10 +766,10 @@ ACTION BuyBoat(void){
     SDL_BlitSurface(image, NULL, video, &rect);
 
     // text info
-    rect.x = box.rectArea.x;
+    rect.x = box->rectArea.x;
     rect.y += 10 + image->h;
-    rect.w = box.rectArea.w;
-    rect.h = box.rectArea.h;
+    rect.w = box->rectArea.w;
+    rect.h = box->rectArea.h;
     PrintAlignText(video, &rect, "Resource cost:", FONT_BIG);
 
     Uint16 cx = rect.y + 50;
@@ -779,12 +782,12 @@ ACTION BuyBoat(void){
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
     // count
-    sprintf(str, "%d", BUILD_BOAT_WOOD);
-    rect.x = (video->w - GetLengthText(str, FONT_SMALL)) / 2 - 60;
+    snprintf(num, NUMLEN, "%d", BUILD_BOAT_WOOD);
+    rect.x = (video->w - GetLengthText(num, FONT_SMALL)) / 2 - 60;
     rect.y = cx + 3;
-    rect.w = GetLengthText(str, FONT_SMALL);
+    rect.w = GetLengthText(num, FONT_SMALL);
     rect.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rect, str, FONT_SMALL);
+    PrintText(video, &rect, num, FONT_SMALL);
 
     // sprite gold
     FillSPRITE(&sprite, "RESOURCE.ICN", 6);
@@ -795,12 +798,12 @@ ACTION BuyBoat(void){
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
     // count
-    sprintf(str, "%d", BUILD_BOAT_GOLD);
-    rect.x = (video->w - GetLengthText(str, FONT_SMALL)) / 2 + 60;
+    snprintf(num, NUMLEN, "%d", BUILD_BOAT_GOLD);
+    rect.x = (video->w - GetLengthText(num, FONT_SMALL)) / 2 + 60;
     rect.y = cx + 3;
-    rect.w = GetLengthText(str, FONT_SMALL);
+    rect.w = GetLengthText(num, FONT_SMALL);
     rect.h = FONT_HEIGHTSMALL;
-    PrintText(video, &rect, str, FONT_SMALL);
+    PrintText(video, &rect, num, FONT_SMALL);
 
     // Отрисовка диалога
     SDL_Flip(video);
@@ -835,7 +838,7 @@ ACTION BuyBoat(void){
     // востанавливаем бакгроунд
     CursorOff();
 
-    FreeBox(&box);
+    FreeBox(box);
     
     SetCursor(cursor);
 

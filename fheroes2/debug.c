@@ -33,7 +33,10 @@
 #include "monster.h"
 #include "castle.h"
 #include "object.h"
+#include "spell.h"
 #include "gamedefs.h"
+
+#define STRLEN	128
 
 const char * GetStringObject(E_OBJECT type){
 
@@ -782,9 +785,13 @@ const char * GetStringColor(E_COLORS color){
 
 const char * GetStringLuck(E_LUCK luck){
 
-    const char  *string;
+    const char  *string = NULL;
 
     switch(luck){
+        case LUCK_CURSED:
+            string = "Cursed";
+            break;
+
         case LUCK_AWFUL:
             string = "Awful";
             break;
@@ -793,7 +800,6 @@ const char * GetStringLuck(E_LUCK luck){
             string = "Bad";
             break;
 
-        default:
 	case LUCK_NORMAL:
             string = "Normal";
             break;
@@ -808,6 +814,31 @@ const char * GetStringLuck(E_LUCK luck){
 
         case LUCK_IRISH:
             string = "Irish";
+            break;
+    }
+
+    return string;
+}
+
+const char * GetStringDescriptionsLuck(E_LUCK luck){
+
+    const char  *string = NULL;
+
+    switch(luck){
+        case LUCK_CURSED:
+        case LUCK_AWFUL:
+        case LUCK_BAD:
+            string = "Bad luck sometimes falls on your armies in combat, causing their attacks to only do half damage.";
+            break;
+
+	case LUCK_NORMAL:
+            string = "Neutral luck means your armies will never get lucky or unlucky attacks on the enemy.";
+            break;
+
+        case LUCK_GOOD:
+        case LUCK_GREAT:
+        case LUCK_IRISH:
+            string = "Good luck sometimes lets your armies get lucky attacks (double strength) in combat.";
             break;
     }
 
@@ -844,8 +875,8 @@ const char * GetStringMorale(E_MORALE morale){
             string = "Great";
             break;
 
-        case MORALE_IRISH:
-            string = "Irish";
+        case MORALE_BLOOD:
+            string = "Blood!";
             break;
     }
 
@@ -870,7 +901,7 @@ const char * GetStringDescriptionsMorale(E_MORALE morale){
 
         case MORALE_GOOD:
         case MORALE_GREAT:
-        case MORALE_IRISH:
+        case MORALE_BLOOD:
             string = "Good morale may give your armies extra attacks in combat.";
             break;
     }
@@ -1397,7 +1428,7 @@ const char * GetStringResource(E_RESOURCE resource){
 
 const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 
-    static char string[128];
+    static char str[STRLEN];
 
     switch(dwelling){
     
@@ -1409,11 +1440,11 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case NECROMANCER:
 		case WIZARD:
 	        case WARLOCK:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
 		break;
 	    
 		case SORCERESS:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER1),
 			GetStringBuilding(race, BUILD_TAVERN));
 		break;
@@ -1429,13 +1460,13 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    switch(race){
 		case KNIGHT:
 		case BARBARIAN:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER3),
 			GetStringDwelling(race, DWELLING_MONSTER4));
 		break;
 	    
 		case SORCERESS:
-		    sprintf(string , "%s.", GetStringBuilding(race, BUILD_WELL));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, BUILD_WELL));
 		break;
 
 		default:
@@ -1448,7 +1479,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 
 	    switch(race){
 		case KNIGHT:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER1),
 			GetStringBuilding(race, BUILD_WELL));
 		break;
@@ -1458,7 +1489,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case SORCERESS:
 		case WIZARD:
 		case WARLOCK:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
 		break;
 	
 		default:
@@ -1470,17 +1501,17 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 
 	    switch(race){
 		case KNIGHT:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER2),
 			GetStringDwelling(race, DWELLING_MONSTER4) );
 		break;
 	    
 		case SORCERESS:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
 		break;
 
 		case WIZARD:
-		    sprintf(string , "%s.", GetStringBuilding(race, BUILD_WELL));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, BUILD_WELL));
 		break;
 
 		default:
@@ -1493,7 +1524,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 
 	    switch(race){
 		case KNIGHT:
-		    sprintf(string , "%s, %s, %s, %s.", 
+		    snprintf(str, STRLEN, "%s, %s, %s, %s.", 
 			GetStringDwelling(race, DWELLING_MONSTER1),
 			GetStringDwelling(race, DWELLING_MONSTER2),
 			GetStringDwelling(race, DWELLING_MONSTER3),
@@ -1501,24 +1532,24 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		break;
 	    
 		case BARBARIAN:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
 		break;
 	    
 		case NECROMANCER:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER3),
 			GetStringBuilding(race, BUILD_THIEVESGUILD) );
 		break;
 	    
 		case SORCERESS:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER2),
 			GetStringBuilding(race, BUILD_MAGEGUILD1) );
 		break;
 
 		case WIZARD:
 		case WARLOCK:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER2));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER2));
 		break;
 	
 		default:
@@ -1532,7 +1563,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    switch(race){
 		case KNIGHT:
 		case BARBARIAN:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER2),
 			GetStringDwelling(race, DWELLING_MONSTER3) );
 		break;
@@ -1549,30 +1580,30 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    switch(race){
 		case KNIGHT:
 		case BARBARIAN:
-		    sprintf(string , "%s, %s, %s.",
+		    snprintf(str, STRLEN, "%s, %s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER2),
 			GetStringDwelling(race, DWELLING_MONSTER3),
 			GetStringDwelling(race, DWELLING_MONSTER4) );
 		break;
 
 		case NECROMANCER:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER2),
 			GetStringBuilding(race, BUILD_MAGEGUILD1) );
 		break;
 	    
 		case SORCERESS:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
 		break;
 
 		case WIZARD:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER3),
 			GetStringLevelMageGuild(MAGIC_LEVEL1) );
 		break;
 	
 		case WARLOCK:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER3));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER3));
 		break;
 	
 		default:
@@ -1585,12 +1616,12 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 
 	    switch(race){
 		case NECROMANCER:
-		    sprintf(string , "%s.",
+		    snprintf(str, STRLEN, "%s.",
 			GetStringLevelMageGuild(MAGIC_LEVEL2) );
 		break;
 
 		case WIZARD:
-		    sprintf(string , "%s.",
+		    snprintf(str, STRLEN, "%s.",
 			GetStringBuilding(race, BUILD_SPEC) );
 		break;
 
@@ -1604,7 +1635,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 
 	    switch(race){
 		case KNIGHT:
-		    sprintf(string , "%s, %s, %s.",
+		    snprintf(str, STRLEN, "%s, %s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER2),
 			GetStringDwelling(race, DWELLING_MONSTER3),
 			GetStringDwelling(race, DWELLING_MONSTER4) );
@@ -1613,12 +1644,12 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case BARBARIAN:
 		case NECROMANCER:
 		case SORCERESS:
-		    sprintf(string , "%s.", GetStringDwelling(race, DWELLING_MONSTER5));
+		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER5));
 		break;
 
 		case WIZARD:
 		case WARLOCK:
-		    sprintf(string , "%s, %s.",
+		    snprintf(str, STRLEN, "%s, %s.",
 			GetStringDwelling(race, DWELLING_MONSTER4),
 			GetStringDwelling(race, DWELLING_MONSTER5) );
 		break;
@@ -1634,7 +1665,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    break;
     }
     
-    return string;
+    return str;
 }
 
 const char * GetStringMonsterFromDwelling(E_RACE race, E_DWELLINGCASTLE dwelling){
@@ -1909,6 +1940,245 @@ const char * GetStringDescriptionsSkill(E_SKILL skill, E_LEVELSKILL level){
 
 	default:
 	    break;
+    }
+    
+    return string;
+}
+
+const char * GetStringAttackSkill(void){
+
+    const char *string = "Attack Skill";
+
+    return string;
+}
+
+const char * GetStringDefenseSkill(void){
+
+    const char *string = "Defense Skill";
+
+    return string;
+}
+
+const char * GetStringSpellPower(void){
+
+    const char *string = "Spell Power";
+
+    return string;
+}
+
+const char * GetStringKnowledge(void){
+
+    const char *string = "Knowledge";
+
+    return string;
+}
+
+const char * GetStringDescriptionsAttackSkill(void){
+
+    const char *string = "Your attack skill is a bonus added to each creature's attack skill.";
+
+    return string;
+}
+
+const char * GetStringDescriptionsDefenseSkill(void){
+
+    const char *string = "Your defense skill is a bonus added to each creature's defense skill.";
+
+    return string;
+}
+
+const char * GetStringDescriptionsSpellPower(void){
+
+    const char *string = "Your spell power determines the length or power of a spell.";
+
+    return string;
+}
+
+const char * GetStringDescriptionsKnowledge(void){
+
+    const char *string = "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.";
+
+    return string;
+}
+
+const char * GetStringFormation(E_ARMYFORMAT af){
+
+    const char *string = NULL;
+    
+    switch(af){
+	case SPREAD:
+	    string = "'Spread'";
+	    break;
+	case GROUPED:
+	    string = "'Grouped'";
+	    break;
+    }
+        
+    return string;
+}
+
+const char * GetStringDescriptionsFormation(E_ARMYFORMAT af){
+
+    const char *string = NULL;
+    
+    switch(af){
+	case SPREAD:
+	    string = "'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.";
+	    break;
+	case GROUPED:
+	    string = "'Grouped' combat formation bunches your army together in the center of your side of the battlefield.";
+	    break;
+    }
+
+    return string;
+}
+const char * GetStringSpell(E_SPELL spell){
+
+    const char *string = NULL;
+
+    switch(spell){
+    case FIREBALL:string = "Fireball";break;
+    case FIREBLAST:string = "Fireblast";break;
+    case LIGHTNINGBOLT:string = "Lightning Bolt";break;
+    case CHAINLIGHTNING:string = "Chain Lightning";break;
+    case TELEPORT:string = "Teleport";break;
+    case CURE:string = "Cure";break;
+    case MASSCURE:string = "Mass Cure";break;
+    case RESURRECT:string = "Resurrect";break;
+    case RESURRECTTRUE:string = "Resurrect True";break;
+    case HASTE:string = "Haste";break;
+    case MASSHASTE:string = "Mass Haste";break;
+    case SPELLSLOW:string = "Slow";break;
+    case MASSSLOW:string = "Mass Slow";break;
+    case BLIND:string = "Blind";break;
+    case BLESS:string = "Bless";break;
+    case MASSBLESS:string = "Mass Bless";break;
+    case STONESKIN:string = "Stoneskin";break;
+    case STEELSKIN:string = "Steelskin";break;
+    case CURSE:string = "Curse";break;
+    case MASSCURSE:string = "Mass Curse";break;
+    case HOLYWORD:string = "Holy Word";break;
+    case HOLYSHOUT:string = "Holy Shout";break;
+    case ANTIMAGIC:string = "Anti-Magic";break;
+    case DISPELMAGIC:string = "Dispel Magic";break;
+    case MASSDISPEL:string = "Mass Dispel";break;
+    case MAGICARROW:string = "Magic Arrow";break;
+    case BERZERKER:string = "Berzerker";break;
+    case ARMAGEDDON:string = "Armageddon";break;
+    case ELEMENTALSTORM:string = "Elemental Storm";break;
+    case METEORSHOWER:string = "Meteor Shower";break;
+    case PARALYZE:string = "Paralyze";break;
+    case HYPNOTIZE:string = "Hypnotize";break;
+    case COLDRAY:string = "Cold Ray";break;
+    case COLDRING:string = "Cold Ring";break;
+    case DISRUPTINGRAY:string = "Disrupting Ray";break;
+    case DEATHRIPPLE:string = "Death Ripple";break;
+    case DEATHWAVE:string = "Death Wave";break;
+    case DRAGONSLAYER:string = "Dragon Slayer";break;
+    case BLOODLUST:string = "Blood Lust";break;
+    case ANIMATEDEAD:string = "Animate Dead";break;
+    case MIRRORIMAGE:string = "Mirror Image";break;
+    case SHIELD:string = "Shield";break;
+    case MASSSHIELD:string = "Mass Shield";break;
+    case EARTHSUMMON:string = "Summon Earth El.";break;
+    case AIRSUMMON:string = "Summon Air El.";break;
+    case FIRESUMMON:string = "Summon Fire El.";break;
+    case WATERSUMMON:string = "Summon Water El.";break;
+    case EARTHQUAKE:string = "Earthquake";break;
+    case VIEWMINES:string = "View Mines";break;
+    case VIEWRESOURCES:string = "View Resources";break;
+    case VIEWARTIFACTS:string = "View Artifacts";break;
+    case VIEWTOWNS:string = "View Towns";break;
+    case VIEWHEROES:string = "View Heroes";break;
+    case VIEWALL:string = "View All";break;
+    case IDENTIFYHERO:string = "Identify Hero";break;
+    case SUMMONBOAT:string = "Summon Boat";break;
+    case DIMENSIONDOOR:string = "Dimension Door";break;
+    case TOWNGATE:string = "Town Gate";break;
+    case TOWNPORTAL:string = "Town Portal";break;
+    case VISIONS:string = "Visions";break;
+    case HAUNT:string = "Haunt";break;
+    case EARTHGUARDIAN:string = "Earth Guardian";break;
+    case AIRGUARDIAN:string = "Air Guardian";break;
+    case FIREGUARDIAN:string = "Fire Guardian";break;
+    case WATERGUARDIAN:string = "Water Guardian";break;
+    default:break;
+    }
+
+    return string;
+}
+
+const char * GetStringDescriptionsSpell(E_SPELL spell){
+
+    const char *string = NULL;
+
+    switch(spell){
+    case FIREBALL:string = "Causes a giant fireball to strike the selected area, damaging all nearby creatures.";break;
+    case FIREBLAST:string = "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one.";break;
+    case LIGHTNINGBOLT:string = "Causes a bolt of electrical energy to strike the selected creature.";break;
+    case CHAINLIGHTNING:string = "Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!";break;
+    case TELEPORT:string = "Teleports the creature you select to any open position on the battlefield.";break;
+    case CURE:string = "Removes all negative spells cast upon one of your units, and restores up to 5 HP per level of spell power.";break;
+    case MASSCURE:string = "Removes all negative spells cast upon your forces, and restores up to 5 HP per level of spell power, per creature.";break;
+    case RESURRECT:string = "Resurrects creatures from a damaged or dead unit until end of combat.";break;
+    case RESURRECTTRUE:string = "Resurrects creatures from a damaged or dead unit permanently.";break;
+    case HASTE:string = "Increases the speed of any creature by two.";break;
+    case MASSHASTE:string = "Increases the speed of all of your creatures by two.";break;
+    case SPELLSLOW:string = "Slows target to half movement rate.";break;
+    case MASSSLOW:string = "Slows all enemies to half movement rate.";break;
+    case BLIND:string = "Clouds the affected creatures' eyes, preventing them from moving.";break;
+    case BLESS:string = "Causes the selected creatures to inflict maximum damage.";break;
+    case MASSBLESS:string = "Causes all of your units to inflict maximum damage.";break;
+    case STONESKIN:string = "Magically increases the defense skill of the selected creatures.";break;
+    case STEELSKIN:string = "Increases the defense skill of the targeted creatures.  This is an improved version of Stoneskin.";break;
+    case CURSE:string = "Causes the selected creatures to inflict minimum damage.";break;
+    case MASSCURSE:string = "Causes all enemy troops to inflict minimum damage.";break;
+    case HOLYWORD:string = "Damages all undead in the battle.";break;
+    case HOLYSHOUT:string = "Damages all undead in the battle.  This is an improved version of Holy Word.";break;
+    case ANTIMAGIC:string = "Prevents harmful magic against the selected creatures.";break;
+    case DISPELMAGIC:string = "Removes all magic spells from a single target.";break;
+    case MASSDISPEL:string = "Removes all magic spells from all creatures.";break;
+    case MAGICARROW:string = "Causes a magic arrow to strike the selected target.";break;
+    case BERZERKER:string = "Causes a creature to attack its nearest neighbor.";break;
+    case ARMAGEDDON:string = "Holy terror strikes the battlefield, causing severe damage to all creatures.";break;
+    case ELEMENTALSTORM:string = "Magical elements pour down on the battlefield, damaging all creatures.";break;
+    case METEORSHOWER:string = "A rain of rocks strikes an area of the battlefield, damaging all nearby creatures.";break;
+    case PARALYZE:string = "The targeted creatures are paralyzed, unable to move or retaliate.";break;
+    case HYPNOTIZE:string = "Brings a single enemy unit under your control for one combat round if its hits are less than 25 times the caster's spell power.";break;
+    case COLDRAY:string = "Drains body heat from a single enemy unit.";break;
+    case COLDRING:string = "Drains body heat from all units surrounding the center point, but not including the center point.";break;
+    case DISRUPTINGRAY:string = "Reduces the defense rating of an enemy unit by three.";break;
+    case DEATHRIPPLE:string = "Damages all living (non-undead) units in the battle.";break;
+    case DEATHWAVE:string = "Damages all living (non-undead) units in the battle.  This spell is an improved version of Death Ripple.";break;
+    case DRAGONSLAYER:string = "Greatly increases a unit's attack skill vs. Dragons.";break;
+    case BLOODLUST:string = "Increases a unit's attack skill.";break;
+    case ANIMATEDEAD:string = "'Resurrects' creatures from a damaged or dead undead unit permanently.";break;
+    case MIRRORIMAGE:string = "Creates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage.";break;
+    case SHIELD:string = "Halves damage received from ranged attacks for a single unit.";break;
+    case MASSSHIELD:string = "Halves damage received from ranged attacks for all of your units.";break;
+    case EARTHSUMMON:string = "Summons Earth Elementals to fight for your army.";break;
+    case AIRSUMMON:string = "Summons Air Elementals to fight for your army.";break;
+    case FIRESUMMON:string = "Summons Fire Elementals to fight for your army.";break;
+    case WATERSUMMON:string = "Summons Water Elementals to fight for your army.";break;
+    case EARTHQUAKE:string = "Damages castle walls.";break;
+    case VIEWMINES:string = "Causes all mines across the land to become visible.";break;
+    case VIEWRESOURCES:string = "Causes all resources across the land to become visible.";break;
+    case VIEWARTIFACTS:string = "Causes all artifacts across the land to become visible.";break;
+    case VIEWTOWNS:string = "Causes all towns and castles across the land to become visible.";break;
+    case VIEWHEROES:string = "Causes all Heroes across the land to become visible.";break;
+    case VIEWALL:string = "Causes the entire land to become visible.";break;
+    case IDENTIFYHERO:string = "Allows the caster to view detailed information on enemy Heroes.";break;
+    case SUMMONBOAT:string = "Summons the nearest unoccupied, friendly boat to an adjacent shore location.  A friendly boat is one which you just built or were the most recent player to occupy.";break;
+    case DIMENSIONDOOR:string = "Allows the caster to magically transport to a nearby location.";break;
+    case TOWNGATE:string = "Returns the caster to any town or castle currently owned.";break;
+    case TOWNPORTAL:string = "Returns the hero to the town or castle of choice, provided it is controlled by you.";break;
+    case VISIONS:string = "Visions predicts the likely outcome of an encounter with a neutral army camp.";break;
+    case HAUNT:string = "Haunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)";break;
+    case EARTHGUARDIAN:string = "Sets Earth Elementals to guard a mine against enemy armies.";break;
+    case AIRGUARDIAN:string = "Sets Air Elementals to guard a mine against enemy armies.";break;
+    case FIREGUARDIAN:string = "Sets Fire Elementals to guard a mine against enemy armies.";break;
+    case WATERGUARDIAN:string = "Sets Water Elementals to guard a mine against enemy armies.";break;
+    default:break;
     }
     
     return string;

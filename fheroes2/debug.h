@@ -40,6 +40,7 @@ const char * GetStringRace(E_RACE);
 const char * GetStringGameLevel(E_GAMELEVEL);
 const char * GetStringColor(E_COLORS);
 const char * GetStringLuck(E_LUCK);
+const char * GetStringDescriptionsLuck(E_LUCK);
 const char * GetStringMorale(E_MORALE);
 const char * GetStringDescriptionsMorale(E_MORALE);
 const char * GetStringSpeed(E_MONSTERSPEED);
@@ -49,6 +50,9 @@ const char * GetStringBuilding(E_RACE, E_BUILDINGCASTLE);
 const char * GetStringDescriptionsBuilding(E_RACE, E_BUILDINGCASTLE);
 const char * GetStringResource(E_RESOURCE);
 
+const char * GetStringFormation(E_ARMYFORMAT);
+const char * GetStringDescriptionsFormation(E_ARMYFORMAT);
+
 const char * GetStringLevelSkill(E_LEVELSKILL);
 const char * GetStringSkill(E_SKILL);
 const char * GetStringDescriptionsSkill(E_SKILL, E_LEVELSKILL);
@@ -56,6 +60,19 @@ const char * GetStringDescriptionsSkill(E_SKILL, E_LEVELSKILL);
 const char * GetStringLevelMageGuild(E_MAGICLEVEL level);
 const char * GetStringDepenceDwelling(E_RACE, E_DWELLINGCASTLE);
 const char * GetStringMonsterFromDwelling(E_RACE, E_DWELLINGCASTLE);
+
+const char * GetStringAttackSkill(void);
+const char * GetStringDefenseSkill(void);
+const char * GetStringSpellPower(void);
+const char * GetStringKnowledge(void);
+
+const char * GetStringDescriptionsAttackSkill(void);
+const char * GetStringDescriptionsDefenseSkill(void);
+const char * GetStringDescriptionsSpellPower(void);
+const char * GetStringDescriptionsKnowledge(void);
+
+const char * GetStringSpell(E_SPELL);
+const char * GetStringDescriptionsSpell(E_SPELL);
 
 void         PrintCellInfo(Uint16);
 

@@ -43,9 +43,11 @@
 #include "payment.h"
 #include "loadgame.h"
 #include "spliter.h"
+#include "selector.h"
 #include "mp2maps.h"
 
-#define  MONSTERFIXTURE 26;
+#define MONSTERFIXTURE	26
+#define	STRLEN		22
 
 void	ShowStaticMainDisplay(void);
 void	RedrawMapsArea(void);
@@ -70,6 +72,7 @@ void	RedrawPanelInfoResource(void);
 void	RedrawPanelInfoDay(void);
 
 void   ComputerStep(E_COLORS);
+void	DrawHourGlas(E_COLORS);
 ACTION ActionGAMELOOP(void);
 ACTION ActionHUMANLOOP(INTERFACEACTION *);
 
@@ -2791,7 +2794,7 @@ ACTION ActionClickFocusCastle(void){
     if(castle){
     
 	// если выделен то действие
-	if(ValidPoint(&gameFocus.back, mx, my) &&
+	if(ValidPoint(&gameFocus.selectCastle->pos, mx, my) &&
 	    EXIT == EnterCastle(gameFocus.ax, gameFocus.ay, SANDYSANDY))
 		return EXIT;
 
@@ -3430,7 +3433,7 @@ ACTION ActionGAMELOOP(void){
 		    RecalculateKingdomWeek(i);
 
 	    // увеличиваем недельный прирост
-	    AllCastleIncreaseArmy();
+	    AllCastleIncreaseRecrut();
 
 	}else
 	    SetIntValue(DAY, GetIntValue(DAY) + 1);
@@ -3643,30 +3646,28 @@ ACTION ActionHUMANLOOP(INTERFACEACTION *action){
 
 void ComputerStep(E_COLORS color){
 
+    DrawHourGlas(color);
+    SDL_Delay(100);
     printf("Computer %s: move\n", GetStringColor(color));
     return;
 }
 
 void InitCursorFocus(void){
 
-    SDL_Surface *formatSurface = NULL;
-    gameFocus.cursor = NULL;
-    gameFocus.background = NULL;
-    gameFocus.useBack = FALSE;
+    AGGSPRITE sprite;
+    FillSPRITE(&sprite, "LOCATORS.ICN", 0);
+
+    gameFocus.selectCastle = InitSelector(&sprite, RADARWIDTH + BORDERWIDTH + 21, RADARWIDTH + BORDERWIDTH + 21 + 30, TRUE);
+    gameFocus.selectHeroes = InitSelector(&sprite, RADARWIDTH + BORDERWIDTH + 21, RADARWIDTH + BORDERWIDTH + 21 + 30, TRUE);
     gameFocus.firstCastle = GetFirstCastle(GetIntValue(HUMANCOLORS));
 
-    if(NULL == (gameFocus.background = SDL_CreateRGBSurface(SDL_SWSURFACE, 56, 32, 16, 0, 0, 0, 0))){
-        fprintf(stderr, "InitCursorFocus: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), 56, 32);
-        return;
-    }
-
+    // LOCATORS.ICN 0 - incorrect cusor, create main cursor
+    SDL_Surface *formatSurface = NULL;
     if(NULL == (formatSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, 56, 32, 16, 0, 0, 0, 0))){
         fprintf(stderr, "InitCursorFocus: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), 56, 32);
         return;
     }
-
     SDL_FillRect(formatSurface, NULL, COLORKEY);
-
     Uint8 i;
     for(i = 0; i < formatSurface->w; ++i){
         DrawPixel(formatSurface, i, 0, FOCUSCOLOR);
@@ -3676,19 +3677,21 @@ void InitCursorFocus(void){
         DrawPixel(formatSurface, 0, i, FOCUSCOLOR);
         DrawPixel(formatSurface, formatSurface->w - 1, i, FOCUSCOLOR);
     }
-
     SDL_SetColorKey(formatSurface, SDL_SRCCOLORKEY, COLORKEY);
-    gameFocus.cursor = SDL_DisplayFormat(formatSurface);
-    
+
+    gameFocus.selectCastle->cursor = SDL_DisplayFormat(formatSurface);
+    gameFocus.selectHeroes->cursor = gameFocus.selectCastle->cursor;
+
     SDL_FreeSurface(formatSurface);
 }
 
 void FreeCursorFocus(void){
 
-    if(gameFocus.cursor) SDL_FreeSurface(gameFocus.cursor);
-    if(gameFocus.background) SDL_FreeSurface(gameFocus.background);
-    gameFocus.cursor = NULL;
-    gameFocus.background = NULL;
+    // in. InitCursorFocus
+    if(gameFocus.selectCastle->cursor) SDL_FreeSurface(gameFocus.selectCastle->cursor);
+
+    FreeSelector(gameFocus.selectCastle);
+    FreeSelector(gameFocus.selectHeroes);
 }
 
 void RedrawFocusPanel(S_FOCUS *focus){
@@ -3740,10 +3743,7 @@ void RedrawFocusPanel(S_FOCUS *focus){
     i = 0;
     while(castle && castle != focus->firstCastle) castle = GetNextCastle(GetIntValue(HUMANCOLORS));
 
-    if(gameFocus.useBack){
-	SDL_BlitSurface(gameFocus.background, NULL, video, &gameFocus.back);
-	gameFocus.useBack = FALSE;
-    }
+    ResetSelector(gameFocus.selectCastle);
 
     dst.x = video->w - RADARWIDTH - BORDERWIDTH + 77;
     dst.y = RADARWIDTH + BORDERWIDTH + 21;
@@ -3758,12 +3758,7 @@ void RedrawFocusPanel(S_FOCUS *focus){
 	if(focus->object == castle){
 	    cur.x = dst.x - 5;
 	    cur.y = dst.y - 5;
-	    cur.w = gameFocus.background->w;
-	    cur.h = gameFocus.background->h;
-	    SDL_BlitSurface(video, &cur, gameFocus.background, NULL);
-	    gameFocus.useBack = TRUE;
-	    gameFocus.back = cur;
-	    SDL_BlitSurface(gameFocus.cursor, NULL, video, &cur);
+	    RedrawSelector(gameFocus.selectCastle, &cur);
 	}
 	dst.y += 32;
 	castle = GetNextCastle(GetIntValue(HUMANCOLORS));
@@ -3821,7 +3816,7 @@ void RedrawPanelInfoResource(void){
     SDL_Rect src, dst;
     AGGSPRITE sprite;
     const char *icnname;
-    char str[8];
+    char str[STRLEN + 1];
     S_PAYMENT resource;
     E_COLORS color = GetIntValue(HUMANCOLORS);
 
@@ -3864,14 +3859,14 @@ void RedrawPanelInfoResource(void){
     src.h = image->h;
     SDL_BlitSurface(image, NULL, video, &src);
 
-    sprintf(str, "%d", GetKingdomCountCastle(color));
+    snprintf(str, STRLEN, "%d", GetKingdomCountCastle(color));
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 26 - src.w / 2;
     src.y = dst.y + 28;
     PrintText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "%d", GetKingdomCountTown(color));
+    snprintf(str, STRLEN, "%d", GetKingdomCountTown(color));
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 78 - src.w / 2;
@@ -3880,49 +3875,49 @@ void RedrawPanelInfoResource(void){
 
     GetKingdomAllResource(color, &resource);
 
-    sprintf(str, "%d", resource.gold);
+    snprintf(str, STRLEN, "%d", resource.gold);
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 122 - src.w / 2;
     src.y = dst.y + 28;
     PrintText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "%d", resource.wood);
+    snprintf(str, STRLEN, "%d", resource.wood);
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 15 - src.w / 2;
     src.y = dst.y + 58;
     PrintText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "%d", resource.mercury);
+    snprintf(str, STRLEN, "%d", resource.mercury);
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 37 - src.w / 2;
     src.y = dst.y + 58;
     PrintText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "%d", resource.ore);
+    snprintf(str, STRLEN, "%d", resource.ore);
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 60 - src.w / 2;
     src.y = dst.y + 58;
     PrintText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "%d", resource.sulfur);
+    snprintf(str, STRLEN, "%d", resource.sulfur);
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 84 - src.w / 2;
     src.y = dst.y + 58;
     PrintText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "%d", resource.crystal);
+    snprintf(str, STRLEN, "%d", resource.crystal);
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 108 - src.w / 2;
     src.y = dst.y + 58;
     PrintText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "%d", resource.gems);
+    snprintf(str, STRLEN, "%d", resource.gems);
     src.w = GetLengthText(str, FONT_SMALL);
     src.h = FONT_HEIGHTSMALL;
     src.x = dst.x + 130 - src.w / 2;
@@ -3939,7 +3934,7 @@ void RedrawPanelInfoDay(void){
     SDL_Rect src, dst;
     AGGSPRITE sprite;
     const char *icnname;
-    char str[22];
+    char str[STRLEN + 1];
 
     CursorOff();
 
@@ -3980,12 +3975,12 @@ void RedrawPanelInfoDay(void){
     src.h = image->h;
     SDL_BlitSurface(image, NULL, video, &src);
 
-    sprintf(str, "Month: %d  Week: %d", GetIntValue(MONTH), GetIntValue(WEEK));
+    snprintf(str, STRLEN, "Month: %d  Week: %d", GetIntValue(MONTH), GetIntValue(WEEK));
     src.h = FONT_HEIGHTSMALL;
     src.y = dst.y + 30;
     PrintAlignText(video, &src, str, FONT_SMALL);
 
-    sprintf(str, "Day: %d", GetIntValue(DAY));
+    snprintf(str, STRLEN, "Day: %d", GetIntValue(DAY));
     src.h = FONT_HEIGHTBIG;
     src.y = dst.y + 46;
     PrintAlignText(video, &src, str, FONT_BIG);
@@ -4016,4 +4011,64 @@ ACTION ClickPanelInfoDay(void){
     }
 
     return NONE;
+}
+
+void DrawHourGlas(E_COLORS color){
+
+    SDL_Surface *image = NULL;
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect dst;
+    AGGSPRITE sprite;
+    const char *icnname;
+
+    CursorOff();
+
+    // востановим фон
+    if(GetIntValue(EVILINTERFACE)) icnname = "STONBAKE.ICN"; else icnname = "STONBACK.ICN";
+    FillSPRITE(&sprite, icnname, 0);
+    image = GetICNSprite(&sprite);
+    dst.w = image->w;
+    dst.h = image->h;
+
+    switch(GetIntValue(VIDEOMODE)){
+	default:
+	    // 640x480
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 392;
+	    break;
+	case 1:
+	    // 800x600
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 488;
+	    break;
+	case 2:
+	case 3:
+	    // 1024x768
+	    // 1280x1024
+	    dst.x = video->w - RADARWIDTH - BORDERWIDTH;
+	    dst.y = 520;
+	    dst.y += dst.h;
+	    SDL_BlitSurface(image, NULL, video, &dst);
+	    dst.y -= dst.h;
+	    break;
+    }
+    SDL_BlitSurface(image, NULL, video, &dst);
+
+    FillSPRITE(&sprite, "HOURGLAS.ICN", 0);
+    image = GetICNSprite(&sprite);
+    dst.x += (dst.w - image->w) / 2;
+    dst.y += (dst.h - image->h) / 2;
+    dst.w = image->w;
+    dst.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &dst);
+
+    FillSPRITE(&sprite, "BRCREST.ICN", color);
+    image = GetICNSprite(&sprite);
+    dst.x += 2;
+    dst.y += 2;
+    dst.w = image->w;
+    dst.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &dst);
+
+    CursorOn();
 }

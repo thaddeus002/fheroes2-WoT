@@ -40,17 +40,18 @@
 #include "box.h"
 #include "resource.h"
 #include "actionevent.h"
+#include "selector.h"
 #include "marketplace.h"
+
+#define STRLEN	64
+#define	NUMLEN	8
 
 typedef enum {UNFOCUS, COSTLY, UNCOSTLY, GOLD} E_FOCUSTRADE;
 
 struct {
     E_FOCUSTRADE        select;
     E_RESOURCE		resource;
-    SDL_Rect            rect;
-    SDL_Surface         *background;
-    SDL_Surface         *cursor;
-    BOOL		use;
+    S_SELECT		*selector;
 } tradeFrom, tradeTo;
 
 struct {
@@ -97,7 +98,7 @@ ACTION ShowMarketplace(E_COLORS color){
     ACTION result = NONE;
     AGGSPRITE sprite;
     S_PAYMENT resource;
-    S_BOX box;
+    S_BOX *box = NULL;
     Uint16 countFrom = 0;
     Uint16 countTo = 0;
 
@@ -114,29 +115,9 @@ ACTION ShowMarketplace(E_COLORS color){
     // инициализация курсора
     FillSPRITE(&sprite, trade, 14);
     tradeFrom.select = UNFOCUS;
-    tradeFrom.background = NULL;
-    tradeFrom.cursor = GetICNSprite(&sprite);
-    tradeFrom.use = FALSE;
-    tradeFrom.rect.x = 0;
-    tradeFrom.rect.y = 0;
-    tradeFrom.rect.w = tradeFrom.cursor->w;
-    tradeFrom.rect.h = tradeFrom.cursor->h;
+    tradeFrom.selector = InitSelector(&sprite, 0, 0, FALSE);
     tradeTo.select = UNFOCUS;
-    tradeTo.background = NULL;
-    tradeTo.cursor = GetICNSprite(&sprite);
-    tradeTo.use = FALSE;
-    tradeTo.rect.x = 0;
-    tradeTo.rect.y = 0;
-    tradeTo.rect.w = tradeTo.cursor->w;
-    tradeTo.rect.h = tradeTo.cursor->h;
-    if(NULL == (tradeFrom.background = SDL_CreateRGBSurface(SDL_SWSURFACE, tradeFrom.cursor->w, tradeFrom.cursor->h, 16, 0, 0, 0, 0))){
-            fprintf(stderr, "ShowMarketplace: CreateRGBSurface failed: %s\n", SDL_GetError());
-            return EXIT;
-    }
-    if(NULL == (tradeTo.background = SDL_CreateRGBSurface(SDL_SWSURFACE, tradeTo.cursor->w, tradeTo.cursor->h, 16, 0, 0, 0, 0))){
-            fprintf(stderr, "ShowMarketplace: CreateRGBSurface failed: %s\n", SDL_GetError());
-            return EXIT;
-    }
+    tradeTo.selector = InitSelector(&sprite, 0, 0, FALSE);
 
     // инициализация сплитера
     FillSPRITE(&sprite, trade, 2);
@@ -144,10 +125,10 @@ ACTION ShowMarketplace(E_COLORS color){
     if(NULL == spliterMarket) return EXIT;
     
 
-    if( ! InitBox(&box, 250, &actionTrade, EXIT)) return NONE;
+    if(NULL == (box = InitBox(250, &actionTrade, EXIT))) return NONE;
 
     // второй бекграунд для затирки
-    rect = box.rectArea;
+    rect = box->rectArea;
     backgroundAction.rect = rect;
     backgroundAction.rect.x -= 5;
     backgroundAction.rect.w += 10;
@@ -260,10 +241,6 @@ ACTION ShowMarketplace(E_COLORS color){
         switch(ActionCycle(actionTrade, NULL)){
     
             case EXIT:
-                exit = TRUE;
-                result = EXIT;
-                break;
-
             case ESC:
             case CANCEL:
                 exit = TRUE;
@@ -365,10 +342,10 @@ ACTION ShowMarketplace(E_COLORS color){
     // востанавливаем бакгроунд
     CursorOff();
 
-    FreeBox(&box);
+    FreeBox(box);
 
-    if(tradeFrom.background) SDL_FreeSurface(tradeFrom.background);
-    if(tradeTo.background) SDL_FreeSurface(tradeTo.background);
+    FreeSelector(tradeFrom.selector);
+    FreeSelector(tradeTo.selector);
     if(backgroundAction.surface) SDL_FreeSurface(backgroundAction.surface);
     FreeSpliter(spliterMarket);
 
@@ -394,7 +371,7 @@ void RedrawTradeFromResource(void){
     
     const char *header = "Your Resources";
     const char *trade = NULL;
-    char number[8];
+    char num[NUMLEN + 1];
     trade = (GetIntValue(EVILINTERFACE) ? "TRADPOSE.ICN" : "TRADPOST.ICN");
 
     cx = video->w / 2 - 115;
@@ -417,16 +394,16 @@ void RedrawTradeFromResource(void){
 
 	// cost
 	if(0 == i)
-	    sprintf(number, "%d", resource.wood);
+	    snprintf(num, NUMLEN, "%d", resource.wood);
 	else if(1 == i)
-	    sprintf(number, "%d", resource.mercury);
+	    snprintf(num, NUMLEN, "%d", resource.mercury);
 	else
-	    sprintf(number, "%d", resource.ore);
-	rectCur.x += (image->w - GetLengthText(number, FONT_SMALL)) / 2;
+	    snprintf(num, NUMLEN, "%d", resource.ore);
+	rectCur.x += (image->w - GetLengthText(num, FONT_SMALL)) / 2;
 	rectCur.y += image->h - FONT_HEIGHTSMALL - 2;
-	rectCur.w = GetLengthText(number, FONT_SMALL);
+	rectCur.w = GetLengthText(num, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
-	PrintAlignText(video, &rectCur, number, FONT_SMALL);
+	PrintAlignText(video, &rectCur, num, FONT_SMALL);
     }
 
     // image sulfur crytal gems
@@ -441,16 +418,16 @@ void RedrawTradeFromResource(void){
 
 	// cost
 	if(0 == i)
-	    sprintf(number, "%d", resource.sulfur);
+	    snprintf(num, NUMLEN, "%d", resource.sulfur);
 	else if(1 == i)
-	    sprintf(number, "%d", resource.crystal);
+	    snprintf(num, NUMLEN, "%d", resource.crystal);
 	else
-	    sprintf(number, "%d", resource.gems);
-	rectCur.x += (image->w - GetLengthText(number, FONT_SMALL)) / 2;
+	    snprintf(num, NUMLEN, "%d", resource.gems);
+	rectCur.x += (image->w - GetLengthText(num, FONT_SMALL)) / 2;
 	rectCur.y += image->h - FONT_HEIGHTSMALL - 2;
-	rectCur.w = GetLengthText(number, FONT_SMALL);
+	rectCur.w = GetLengthText(num, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
-	PrintAlignText(video, &rectCur, number, FONT_SMALL);
+	PrintAlignText(video, &rectCur, num, FONT_SMALL);
     }
 
     // image gold
@@ -462,12 +439,12 @@ void RedrawTradeFromResource(void){
     rectCur.y = cy + 100;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // cost
-    sprintf(number, "%d", resource.gold);
-    rectCur.x += (image->w - GetLengthText(number, FONT_SMALL)) / 2;
+    snprintf(num, NUMLEN, "%d", resource.gold);
+    rectCur.x += (image->w - GetLengthText(num, FONT_SMALL)) / 2;
     rectCur.y += image->h - FONT_HEIGHTSMALL - 2;
-    rectCur.w = GetLengthText(number, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintAlignText(video, &rectCur, number, FONT_SMALL);
+    PrintAlignText(video, &rectCur, num, FONT_SMALL);
 }
 
 void RedrawTradeToResource(void){
@@ -483,7 +460,7 @@ void RedrawTradeToResource(void){
     
     const char *header = "Available Trades";
     const char *trade = NULL;
-    char string[8];
+    char num[NUMLEN + 1];
     trade = (GetIntValue(EVILINTERFACE) ? "TRADPOSE.ICN" : "TRADPOST.ICN");
 
     cx = video->w / 2 + 10;
@@ -506,18 +483,18 @@ void RedrawTradeToResource(void){
 
 	// cost
 	if(0 == i && tradeFrom.resource != WOOD)
-	    TradeCostToString(string, tradeFrom.select, UNCOSTLY);
+	    TradeCostToString(num, tradeFrom.select, UNCOSTLY);
 	else if(1 == i && tradeFrom.resource != MERCURY)
-	    TradeCostToString(string, tradeFrom.select, COSTLY);
+	    TradeCostToString(num, tradeFrom.select, COSTLY);
 	else if(2 == i && tradeFrom.resource != ORE)
-	    TradeCostToString(string, tradeFrom.select, UNCOSTLY);
+	    TradeCostToString(num, tradeFrom.select, UNCOSTLY);
 	else
-	    sprintf(string, "n/a");
-	rectCur.x += (image->w - GetLengthText(string, FONT_SMALL)) / 2;
+	    snprintf(num, NUMLEN, "n/a");
+	rectCur.x += (image->w - GetLengthText(num, FONT_SMALL)) / 2;
 	rectCur.y += image->h - FONT_HEIGHTSMALL - 2;
-	rectCur.w = GetLengthText(string, FONT_SMALL);
+	rectCur.w = GetLengthText(num, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
-	PrintAlignText(video, &rectCur, string, FONT_SMALL);
+	PrintAlignText(video, &rectCur, num, FONT_SMALL);
     }
 
     // image sulfur crytal gems
@@ -532,18 +509,18 @@ void RedrawTradeToResource(void){
 
 	// cost
 	if(0 == i && tradeFrom.resource != SULFUR)
-	    TradeCostToString(string, tradeFrom.select, COSTLY);
+	    TradeCostToString(num, tradeFrom.select, COSTLY);
 	else if(1 == i && tradeFrom.resource != CRYSTAL)
-	    TradeCostToString(string, tradeFrom.select, COSTLY);
+	    TradeCostToString(num, tradeFrom.select, COSTLY);
 	else if(2 == i && tradeFrom.resource != GEMS)
-	    TradeCostToString(string, tradeFrom.select, COSTLY);
+	    TradeCostToString(num, tradeFrom.select, COSTLY);
 	else
-	    sprintf(string, "n/a");
-	rectCur.x += (image->w - GetLengthText(string, FONT_SMALL)) / 2;
+	    snprintf(num, NUMLEN, "n/a");
+	rectCur.x += (image->w - GetLengthText(num, FONT_SMALL)) / 2;
 	rectCur.y += image->h - FONT_HEIGHTSMALL - 2;
-	rectCur.w = GetLengthText(string, FONT_SMALL);
+	rectCur.w = GetLengthText(num, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
-	PrintAlignText(video, &rectCur, string, FONT_SMALL);
+	PrintAlignText(video, &rectCur, num, FONT_SMALL);
     }
 
     // image gold
@@ -557,14 +534,14 @@ void RedrawTradeToResource(void){
 
     // cost
     if(tradeFrom.resource != SULFUR)
-	TradeCostToString(string, tradeFrom.select, GOLD);
+	TradeCostToString(num, tradeFrom.select, GOLD);
     else
-	sprintf(string, "n/a");
-    rectCur.x += (image->w - GetLengthText(string, FONT_SMALL)) / 2;
+	snprintf(num, NUMLEN, "n/a");
+    rectCur.x += (image->w - GetLengthText(num, FONT_SMALL)) / 2;
     rectCur.y += image->h - FONT_HEIGHTSMALL - 2;
-    rectCur.w = GetLengthText(string, FONT_SMALL);
+    rectCur.w = GetLengthText(num, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
-    PrintAlignText(video, &rectCur, string, FONT_SMALL);
+    PrintAlignText(video, &rectCur, num, FONT_SMALL);
 }
 
 ACTION  ActionPressFromUncostly(void){
@@ -671,27 +648,21 @@ ACTION  ActionPressToGold(void){
 
 void TradeRestoreFromCursor(void){
 
-    SDL_Surface *video = SDL_GetVideoSurface();
-
-    if(tradeFrom.use) SDL_BlitSurface(tradeFrom.background, NULL, video, &tradeFrom.rect);
+    ResetSelector(tradeFrom.selector);
     tradeFrom.select = UNFOCUS;
-    tradeFrom.use = FALSE;
 }
 
 void TradeRestoreToCursor(void){
 
-    SDL_Surface *video = SDL_GetVideoSurface();
-
-    if(tradeTo.use) SDL_BlitSurface(tradeTo.background, NULL, video, &tradeTo.rect);
+    ResetSelector(tradeTo.selector);
     tradeTo.select = UNFOCUS;
-    tradeTo.use = FALSE;
 }
 
 void TradeSaveFromCursor(void){
 
-    SDL_Surface *video =SDL_GetVideoSurface();
+    SDL_Surface *video = SDL_GetVideoSurface();
     Sint32 mx, my;
-    SDL_Rect rect;
+    SDL_Rect rect, src;
         
     SDL_GetMouseState(&mx, &my);
 
@@ -703,11 +674,9 @@ void TradeSaveFromCursor(void){
     //wood
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = UNCOSTLY;
-	tradeFrom.rect.x = rect.x - 2;
-	tradeFrom.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeFrom.rect, tradeFrom.background, NULL);
-	tradeFrom.use = TRUE;
-	SDL_BlitSurface(tradeFrom.cursor, NULL, video, &tradeFrom.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeFrom.selector, &src);
 	tradeFrom.resource = WOOD;
 	return;
     }
@@ -715,11 +684,9 @@ void TradeSaveFromCursor(void){
     // mercury
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = COSTLY;
-	tradeFrom.rect.x = rect.x - 2;
-	tradeFrom.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeFrom.rect, tradeFrom.background, NULL);
-	tradeFrom.use = TRUE;
-	SDL_BlitSurface(tradeFrom.cursor, NULL, video, &tradeFrom.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeFrom.selector, &src);
 	tradeFrom.resource = MERCURY;
 	return;
     }
@@ -727,11 +694,9 @@ void TradeSaveFromCursor(void){
     // ore
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = UNCOSTLY;
-	tradeFrom.rect.x = rect.x - 2;
-	tradeFrom.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeFrom.rect, tradeFrom.background, NULL);
-	tradeFrom.use = TRUE;
-	SDL_BlitSurface(tradeFrom.cursor, NULL, video, &tradeFrom.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeFrom.selector, &src);
 	tradeFrom.resource = ORE;
 	return;
     }
@@ -741,11 +706,9 @@ void TradeSaveFromCursor(void){
     // sulfur
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = COSTLY;
-	tradeFrom.rect.x = rect.x - 2;
-	tradeFrom.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeFrom.rect, tradeFrom.background, NULL);
-	tradeFrom.use = TRUE;
-	SDL_BlitSurface(tradeFrom.cursor, NULL, video, &tradeFrom.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeFrom.selector, &src);
 	tradeFrom.resource = SULFUR;
 	return;
     }
@@ -753,11 +716,9 @@ void TradeSaveFromCursor(void){
     // crystal
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = COSTLY;
-	tradeFrom.rect.x = rect.x - 2;
-	tradeFrom.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeFrom.rect, tradeFrom.background, NULL);
-	tradeFrom.use = TRUE;
-	SDL_BlitSurface(tradeFrom.cursor, NULL, video, &tradeFrom.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeFrom.selector, &src);
 	tradeFrom.resource = CRYSTAL;
 	return;
     }
@@ -765,11 +726,9 @@ void TradeSaveFromCursor(void){
     // gems
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = COSTLY;
-	tradeFrom.rect.x = rect.x - 2;
-	tradeFrom.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeFrom.rect, tradeFrom.background, NULL);
-	tradeFrom.use = TRUE;
-	SDL_BlitSurface(tradeFrom.cursor, NULL, video, &tradeFrom.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeFrom.selector, &src);
 	tradeFrom.resource = GEMS;
 	return;
     }
@@ -779,11 +738,9 @@ void TradeSaveFromCursor(void){
     // gold
     if(ValidPoint(&rect, mx, my)){
 	tradeFrom.select = GOLD;
-	tradeFrom.rect.x = rect.x - 2;
-	tradeFrom.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeFrom.rect, tradeFrom.background, NULL);
-	tradeFrom.use = TRUE;
-	SDL_BlitSurface(tradeFrom.cursor, NULL, video, &tradeFrom.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeFrom.selector, &src);
 	tradeFrom.resource = GOLDS;
 	return;
     }
@@ -793,7 +750,7 @@ void TradeSaveToCursor(void){
 
     SDL_Surface *video = SDL_GetVideoSurface();
     Sint32 mx, my;
-    SDL_Rect rect;
+    SDL_Rect rect, src;
         
     SDL_GetMouseState(&mx, &my);
 
@@ -805,11 +762,9 @@ void TradeSaveToCursor(void){
     //wood
     if(ValidPoint(&rect, mx, my)){
 	tradeTo.select = UNCOSTLY;
-	tradeTo.rect.x = rect.x - 2;
-	tradeTo.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeTo.rect, tradeTo.background, NULL);
-	tradeTo.use = TRUE;
-	SDL_BlitSurface(tradeTo.cursor, NULL, video, &tradeTo.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeTo.selector, &src);
 	tradeTo.resource = WOOD;
 	return;
     }
@@ -817,11 +772,9 @@ void TradeSaveToCursor(void){
     // mercury
     if(ValidPoint(&rect, mx, my)){
 	tradeTo.select = COSTLY;
-	tradeTo.rect.x = rect.x - 2;
-	tradeTo.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeTo.rect, tradeTo.background, NULL);
-	tradeTo.use = TRUE;
-	SDL_BlitSurface(tradeTo.cursor, NULL, video, &tradeTo.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeTo.selector, &src);
 	tradeTo.resource = MERCURY;
 	return;
     }
@@ -829,11 +782,9 @@ void TradeSaveToCursor(void){
     // ore
     if(ValidPoint(&rect, mx, my)){
 	tradeTo.select = UNCOSTLY;
-	tradeTo.rect.x = rect.x - 2;
-	tradeTo.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeTo.rect, tradeTo.background, NULL);
-	tradeTo.use = TRUE;
-	SDL_BlitSurface(tradeTo.cursor, NULL, video, &tradeTo.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeTo.selector, &src);
 	tradeTo.resource = ORE;
 	return;
     }
@@ -843,11 +794,9 @@ void TradeSaveToCursor(void){
     // sulfur
     if(ValidPoint(&rect, mx, my)){
 	tradeTo.select = COSTLY;
-	tradeTo.rect.x = rect.x - 2;
-	tradeTo.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeTo.rect, tradeTo.background, NULL);
-	tradeTo.use = TRUE;
-	SDL_BlitSurface(tradeTo.cursor, NULL, video, &tradeTo.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeTo.selector, &src);
 	tradeTo.resource = SULFUR;
 	return;
     }
@@ -855,11 +804,9 @@ void TradeSaveToCursor(void){
     // crystal
     if(ValidPoint(&rect, mx, my)){
 	tradeTo.select = COSTLY;
-	tradeTo.rect.x = rect.x - 2;
-	tradeTo.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeTo.rect, tradeTo.background, NULL);
-	tradeTo.use = TRUE;
-	SDL_BlitSurface(tradeTo.cursor, NULL, video, &tradeTo.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeTo.selector, &src);
 	tradeTo.resource = CRYSTAL;
 	return;
     }
@@ -867,11 +814,9 @@ void TradeSaveToCursor(void){
     // gems
     if(ValidPoint(&rect, mx, my)){
 	tradeTo.select = COSTLY;
-	tradeTo.rect.x = rect.x - 2;
-	tradeTo.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeTo.rect, tradeTo.background, NULL);
-	tradeTo.use = TRUE;
-	SDL_BlitSurface(tradeTo.cursor, NULL, video, &tradeTo.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeTo.selector, &src);
 	tradeTo.resource = GEMS;
 	return;
     }
@@ -881,22 +826,20 @@ void TradeSaveToCursor(void){
     // gold
     if(ValidPoint(&rect, mx, my)){
 	tradeTo.select = GOLD;
-	tradeTo.rect.x = rect.x - 2;
-	tradeTo.rect.y = rect.y - 2;
-	SDL_BlitSurface(video, &tradeTo.rect, tradeTo.background, NULL);
-	tradeTo.use = TRUE;
-	SDL_BlitSurface(tradeTo.cursor, NULL, video, &tradeTo.rect);
+	src.x = rect.x - 2;
+	src.y = rect.y - 2;
+	RedrawSelector(tradeTo.selector, &src);
 	tradeTo.resource = GOLDS;
 	return;
     }
 }
 
-void TradeCostToString(char *string, E_FOCUSTRADE from, E_FOCUSTRADE to){
+void TradeCostToString(char *num, E_FOCUSTRADE from, E_FOCUSTRADE to){
 
-    if(! string) return;
+    if(! num) return;
 
     if(0 == GetTradeFactor(from, to)){
-	sprintf(string, "n/a");
+	snprintf(num, NUMLEN, "n/a");
 	return;
     }
     Uint8 market = GetKingdomCountMarketplace(colorKingdom);
@@ -908,98 +851,98 @@ void TradeCostToString(char *string, E_FOCUSTRADE from, E_FOCUSTRADE to){
 
 	case COSTLY:
 	    if(GOLD == to){
-		if(1 == market) sprintf(string, "%d", SALE_COSTLY1);
-		else if(2 == market) sprintf(string, "%d", SALE_COSTLY2);
-		else if(3 == market) sprintf(string, "%d", SALE_COSTLY3);
-		else if(4 == market) sprintf(string, "%d", SALE_COSTLY4);
-		else if(5 == market) sprintf(string, "%d", SALE_COSTLY5);
-		else if(6 == market) sprintf(string, "%d", SALE_COSTLY6);
-		else if(7 == market) sprintf(string, "%d", SALE_COSTLY7);
-		else if(8 == market) sprintf(string, "%d", SALE_COSTLY8);
-		else if(8 <  market) sprintf(string, "%d", SALE_COSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "%d", SALE_COSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "%d", SALE_COSTLY9);
 	    }
 	    else if(COSTLY == to){
-		if(1 == market) sprintf(string, "1/%d", COSTLY_COSTLY1);
-		else if(2 == market) sprintf(string, "1/%d", COSTLY_COSTLY2);
-		else if(3 == market) sprintf(string, "1/%d", COSTLY_COSTLY3);
-		else if(4 == market) sprintf(string, "1/%d", COSTLY_COSTLY4);
-		else if(5 == market) sprintf(string, "1/%d", COSTLY_COSTLY5);
-		else if(6 == market) sprintf(string, "1/%d", COSTLY_COSTLY6);
-		else if(7 == market) sprintf(string, "1/%d", COSTLY_COSTLY7);
-		else if(8 == market) sprintf(string, "1/%d", COSTLY_COSTLY8);
-		else if(8 <  market) sprintf(string, "1/%d", COSTLY_COSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY9);
 	    }
 	    else if(UNCOSTLY == to){
-		if(1 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY1);
-		else if(2 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY2);
-		else if(3 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY3);
-		else if(4 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY4);
-		else if(5 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY5);
-		else if(6 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY6);
-		else if(7 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY7);
-		else if(8 == market) sprintf(string, "1/%d", COSTLY_UNCOSTLY8);
-		else if(8 <  market) sprintf(string, "1/%d", COSTLY_UNCOSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "1/%d", COSTLY_UNCOSTLY9);
 	    }
 	    break;
 
 	case UNCOSTLY:
 	    if(GOLD == to){
-		if(1 == market) sprintf(string, "%d", SALE_UNCOSTLY1);
-		else if(2 == market) sprintf(string, "%d", SALE_UNCOSTLY2);
-		else if(3 == market) sprintf(string, "%d", SALE_UNCOSTLY3);
-		else if(4 == market) sprintf(string, "%d", SALE_UNCOSTLY4);
-		else if(5 == market) sprintf(string, "%d", SALE_UNCOSTLY5);
-		else if(6 == market) sprintf(string, "%d", SALE_UNCOSTLY6);
-		else if(7 == market) sprintf(string, "%d", SALE_UNCOSTLY7);
-		else if(8 == market) sprintf(string, "%d", SALE_UNCOSTLY8);
-		else if(8 <  market) sprintf(string, "%d", SALE_UNCOSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "%d", SALE_UNCOSTLY9);
 	    }
 	    else if(UNCOSTLY == to){
-		if(1 == market) sprintf(string, "1/%d", COSTLY_COSTLY1);
-		else if(2 == market) sprintf(string, "1/%d", COSTLY_COSTLY2);
-		else if(3 == market) sprintf(string, "1/%d", COSTLY_COSTLY3);
-		else if(4 == market) sprintf(string, "1/%d", COSTLY_COSTLY4);
-		else if(5 == market) sprintf(string, "1/%d", COSTLY_COSTLY5);
-		else if(6 == market) sprintf(string, "1/%d", COSTLY_COSTLY6);
-		else if(7 == market) sprintf(string, "1/%d", COSTLY_COSTLY7);
-		else if(8 == market) sprintf(string, "1/%d", COSTLY_COSTLY8);
-		else if(8 <  market) sprintf(string, "1/%d", COSTLY_COSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "1/%d", COSTLY_COSTLY9);
 	    }
 	    else if(COSTLY == to){
-		if(1 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY1);
-		else if(2 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY2);
-		else if(3 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY3);
-		else if(4 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY4);
-		else if(5 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY5);
-		else if(6 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY6);
-		else if(7 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY7);
-		else if(8 == market) sprintf(string, "1/%d", UNCOSTLY_COSTLY8);
-		else if(8 <  market) sprintf(string, "1/%d", UNCOSTLY_COSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "1/%d", UNCOSTLY_COSTLY9);
 	    }
 	    break;
 
 	case GOLD:
 	    if(UNCOSTLY == to){
-		if(1 == market) sprintf(string, "%d", BUY_UNCOSTLY1);
-		else if(2 == market) sprintf(string, "%d", BUY_UNCOSTLY2);
-		else if(3 == market) sprintf(string, "%d", BUY_UNCOSTLY3);
-		else if(4 == market) sprintf(string, "%d", BUY_UNCOSTLY4);
-		else if(5 == market) sprintf(string, "%d", BUY_UNCOSTLY5);
-		else if(6 == market) sprintf(string, "%d", BUY_UNCOSTLY6);
-		else if(7 == market) sprintf(string, "%d", BUY_UNCOSTLY7);
-		else if(8 == market) sprintf(string, "%d", BUY_UNCOSTLY8);
-		else if(8 <  market) sprintf(string, "%d", BUY_UNCOSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "%d", BUY_UNCOSTLY9);
 	    }
 	    else if(COSTLY == to){
-		if(1 == market) sprintf(string, "%d", BUY_COSTLY1);
-		else if(2 == market) sprintf(string, "%d", BUY_COSTLY2);
-		else if(3 == market) sprintf(string, "%d", BUY_COSTLY3);
-		else if(4 == market) sprintf(string, "%d", BUY_COSTLY4);
-		else if(5 == market) sprintf(string, "%d", BUY_COSTLY5);
-		else if(6 == market) sprintf(string, "%d", BUY_COSTLY6);
-		else if(7 == market) sprintf(string, "%d", BUY_COSTLY7);
-		else if(8 == market) sprintf(string, "%d", BUY_COSTLY8);
-		else if(8 <  market) sprintf(string, "%d", BUY_COSTLY9);
+		if(1 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY1);
+		else if(2 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY2);
+		else if(3 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY3);
+		else if(4 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY4);
+		else if(5 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY5);
+		else if(6 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY6);
+		else if(7 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY7);
+		else if(8 == market) snprintf(num, NUMLEN, "%d", BUY_COSTLY8);
+		else if(8 <  market) snprintf(num, NUMLEN, "%d", BUY_COSTLY9);
 	    }
 	    break;
     }
@@ -1194,7 +1137,7 @@ void RedrawActionTrade(void){
     const char *trade = "TRADPOST.ICN";
     if(GetIntValue(EVILINTERFACE)) trade = "TRADPOSE.ICN";
 
-    char str[64];
+    char str[STRLEN + 1];
 
     INTERFACEACTION action;
     AGGSPRITE sprite;
@@ -1211,7 +1154,7 @@ void RedrawActionTrade(void){
 	return;
     }
     
-    sprintf(str, "I can offer you 1 unit of %s for %d units of %s.", GetStringResource(tradeTo.resource), GetTradeFactor(tradeFrom.select, tradeTo.select), GetStringResource(tradeFrom.resource));
+    snprintf(str, STRLEN, "I can offer you 1 unit of %s for %d units of %s.", GetStringResource(tradeTo.resource), GetTradeFactor(tradeFrom.select, tradeTo.select), GetStringResource(tradeFrom.resource));
     PrintAlignText(video, &rectCur, str, FONT_BIG);
 
     // splite
@@ -1427,14 +1370,14 @@ void RedrawSpriteResource(void){
 	countFrom = GetCurrentSpliter(spliterMarket);
     }
 
-    sprintf(str, "%d", countFrom);
+    snprintf(str, STRLEN, "%d", countFrom);
     rectCur.x = (video->w - GetLengthText(str, FONT_SMALL)) / 2 - 75;
     rectCur.y = video->h / 2 - 53;
     rectCur.w = GetLengthText(str, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
 
-    sprintf(str, "%d", countTo);
+    snprintf(str, STRLEN, "%d", countTo);
     rectCur.x = (video->w - GetLengthText(str, FONT_SMALL)) / 2 + 75;
     rectCur.y = video->h / 2 - 53;
     rectCur.w = GetLengthText(str, FONT_SMALL);

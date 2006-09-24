@@ -33,6 +33,7 @@
 #include "artifact.h"
 #include "monster.h"
 #include "actionevent.h"
+#include "spell.h"
 #include "heroes.h"
 #include "gamedefs.h"
 
@@ -67,31 +68,45 @@
 #define DEFAULT_WZRD_DEFENCE	1
 #define DEFAULT_WZRD_POWER	2
 #define DEFAULT_WZRD_KNOWLEDGE	2
-                                                                                                                                                
+
+#define VISIT_FOUNTAIN		0x0001
+#define VISIT_FAERIERING	0x0002
+#define VISIT_TEMPLE		0x0004
+#define VISIT_IDOL		0x0008
+#define VISIT_BYOU		0x0010
+#define VISIT_OASIS		0x0020
+#define VISIT_WATERINGHOLE	0x0040
+#define VISIT_MERMAID		0x0080
+#define VISIT_PYRAMID		0x0100
+#define VISIT_GRAVEYARD		0x0200
+#define VISIT_SHIPWRECK		0x0400
+#define VISIT_DERELICTSHIP	0x0800
+#define VISIT_MAGICWELL		0x1000
+
 typedef enum {
+		LEVELNONE,
 		BASIC,
 		ADVANCED,
-		EXPERT,
-		LEVELNONE
+		EXPERT
 
 	    } E_LEVELSKILL;
 
 typedef enum {
-		ARCHERY,
-		BALLISTICS,
-		DIPLOMACY,
-		EAGLEEYE,
-		ESTATES,
-		LEADERSHIP,
-		LOGISTICS,
-		LUCK,
-		MYSTICISM,
-		NAVIGATION,
-		NECROMANCY,
+		SKILLNONE,
 		PATHFINDING,
+		ARCHERY,
+		LOGISTICS,
 		SCOUTING,
+		DIPLOMACY,
+		NAVIGATION,
+		LEADERSHIP,
 		WISDOM,
-		SKILLNONE
+		MYSTICISM,
+		LUCK,
+		BALLISTICS,
+		EAGLEEYE,
+		NECROMANCY,
+		ESTATES,
 
 	    } E_SKILL;
 
@@ -194,11 +209,14 @@ typedef struct {
 		Uint16          magicPoint;
 		float           movePoint;
 		S_SKILL		skill[HEROESMAXSKILL];
+		E_SPELL		book[SPELLMAXCOUNT];
 		E_ARTIFACT	artifact[HEROESMAXARTIFACT];
 	        S_ARMY		army[HEROESMAXARMY];
 		E_ARMYFORMAT	af;				// army format
 		Uint8		ax;
 		Uint8		ay;
+		Uint16		visit;
+		SDL_Surface *	image;
 	    } S_HEROES;
 
 BOOL		InitHeroes(void);
@@ -227,5 +245,10 @@ const char *	HeroesGetStringName(E_NAMEHEROES);
 
 E_NAMEHEROES	GetRecrutPrimaryHeroes(void);
 E_NAMEHEROES	GetRecrutSecondaryHeroes(void);
+
+BOOL		HeroesAddSpell(const S_HEROES *, E_SPELL);
+
+Uint8		GetHeroesLevel(const S_HEROES *);
+Uint32		GetHeroesRestLevel(const S_HEROES *);
 
 #endif

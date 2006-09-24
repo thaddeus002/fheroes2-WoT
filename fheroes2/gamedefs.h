@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060908
+#define VERSION 20060915
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -115,6 +115,7 @@ typedef enum {
 	    } E_SIZEMAP;
 
 typedef enum {
+                LUCK_CURSED     = -3,
                 LUCK_AWFUL      = -2,
                 LUCK_BAD        = -1,
                 LUCK_NORMAL     = 0,
@@ -131,7 +132,7 @@ typedef enum {
                 MORALE_NORMAL   = 0,
                 MORALE_GOOD     = 1,
                 MORALE_GREAT    = 2,
-                MORALE_IRISH    = 3
+                MORALE_BLOOD    = 3
                 
             } E_MORALE;
 

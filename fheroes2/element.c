@@ -39,6 +39,9 @@
 #include "box.h"
 #include "element.h"
 
+#define STRLEN	64
+#define NUMLEN	8
+
 ACTION MessageBox(const char *header, const char *message, ENUMFONT font, Uint32 flag){
 
     CursorOff();
@@ -53,12 +56,12 @@ ACTION MessageBox(const char *header, const char *message, ENUMFONT font, Uint32
     SDL_Event event;
     BOOL exit = FALSE;
     ACTION result = NONE;
-    S_BOX box;
+    S_BOX *box = NULL;
     INTERFACEACTION *dialog = NULL;        
 
-    if( ! InitBox(&box, GetHeightText(header, font) + 20 + GetHeightText(message, font), &dialog, flag)) return NONE;
+    if(NULL == (box = InitBox(GetHeightText(header, font) + 20 + GetHeightText(message, font), &dialog, flag))) return NONE;
 
-    rect = box.rectArea;
+    rect = box->rectArea;
 
     // рисуем заголовок
     if(header){
@@ -74,7 +77,7 @@ ACTION MessageBox(const char *header, const char *message, ENUMFONT font, Uint32
 	}
 
     }else if(message){
-	rect = box.rectArea;
+	rect = box->rectArea;
 	rect.y += (rect.h - GetHeightText(message, font)) / 2;
 
 	// рисуем текст
@@ -100,7 +103,8 @@ ACTION MessageBox(const char *header, const char *message, ENUMFONT font, Uint32
 	}
 
     CursorOff();
-    FreeBox(&box);
+
+    FreeBox(box);
 
     SetCursor(cursor);
 
@@ -287,7 +291,7 @@ void ShowQuickInfo(Uint16 index){
     SDL_Rect rectBack, rectCur, rect;
     AGGSPRITE sprite;
     const char *message;
-    char string[64];
+    char str[STRLEN + 1];
 
     const S_CELLMAPS *cell = NULL;
     const S_CASTLE *castle = NULL;
@@ -398,13 +402,13 @@ void ShowQuickInfo(Uint16 index){
 			if(image->h > 32) rect.y -= image->h - 32; else rect.y += 32 - image->h;
         		SDL_BlitSurface(image, NULL, video, &rect);
         		// текст количества
-        		sprintf(string, "%d", castle->army[i].count);
+        		snprintf(str, STRLEN, "%d", castle->army[i].count);
         		rect.x += image->w / 2;
-			rect.x = rect.x - GetLengthText(string, FONT_SMALL) / 2;
+			rect.x = rect.x - GetLengthText(str, FONT_SMALL) / 2;
         		rect.y = rectCur.y + 118;
-			rect.w = GetLengthText(string, FONT_SMALL);
+			rect.w = GetLengthText(str, FONT_SMALL);
         		rect.h = FONT_HEIGHTSMALL;
-        		PrintText(video, &rect, string, FONT_SMALL);
+        		PrintText(video, &rect, str, FONT_SMALL);
         		
         		current++;
     		    }
@@ -420,9 +424,9 @@ void ShowQuickInfo(Uint16 index){
 	    break;
 	
 	case OBJ_MONSTER:
-    	    sprintf(string, "%s of %s", GetStringSizeArmy(GetSizeArmy(cell->count)), GetStringMonster((E_MONSTER) cell->object.monster));
-	    if(rectCur.w < GetLengthText(string, FONT_SMALL)) rectCur.y += 15; else rectCur.y += 20;
-	    PrintAlignText(video, &rectCur, string, FONT_SMALL);
+    	    snprintf(str, STRLEN, "%s of %s", GetStringSizeArmy(GetSizeArmy(cell->count)), GetStringMonster((E_MONSTER) cell->object.monster));
+	    if(rectCur.w < GetLengthText(str, FONT_SMALL)) rectCur.y += 15; else rectCur.y += 20;
+	    PrintAlignText(video, &rectCur, str, FONT_SMALL);
 	    break;
 
 	default:
@@ -471,36 +475,36 @@ Uint16 SelectCountBox(Uint16 max){
     Uint16 result = max / 2;
     BOOL exit = FALSE;
     AGGSPRITE sprite;
-    char number[8];
-            
+    char num[NUMLEN + 1];
+
     INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
-    S_BOX box;
+    S_BOX *box = NULL;
 
-    if( ! InitBox(&box, 60, &dialog, OK|CANCEL)) return NONE;
+    if(NULL == (box = InitBox(60, &dialog, OK|CANCEL))) return NONE;
 
     // рисуем заголовок
-    rect = box.rectArea;
+    rect = box->rectArea;
     PrintAlignText(video, &rect, "Move how many troops?", FONT_BIG);
 
     // edit
     FillSPRITE(&sprite, "TOWNWIND.ICN", 4);
     image = GetICNSprite(&sprite);
-    rect.x = box.rectArea.x + 80;
-    rect.y = box.rectArea.y + 55;
+    rect.x = box->rectArea.x + 80;
+    rect.y = box->rectArea.y + 55;
     rect.w = image->w;
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
     rect.w = image->w;
     rect.h = FONT_HEIGHTBIG;
-    sprintf(number, "%d", result);
-    PrintAlignText(video, &rect, number, FONT_BIG);
+    snprintf(num, NUMLEN, "%d", result);
+    PrintAlignText(video, &rect, num, FONT_BIG);
 
     // UP
     FillSPRITE(&sprite, "TOWNWIND.ICN", 5);
     image = GetICNSprite(&sprite);
-    rect.x = box.rectArea.x + 150;
-    rect.y = box.rectArea.y + 51;
+    rect.x = box->rectArea.x + 150;
+    rect.y = box->rectArea.y + 51;
     rect.w = image->w;
     rect.h = image->h;
     ZeroINTERFACEACTION(&action);
@@ -515,8 +519,8 @@ Uint16 SelectCountBox(Uint16 max){
     // DOWN
     FillSPRITE(&sprite, "TOWNWIND.ICN", 7);
     image = GetICNSprite(&sprite);
-    rect.x = box.rectArea.x + 150;
-    rect.y = box.rectArea.y + 67;
+    rect.x = box->rectArea.x + 150;
+    rect.y = box->rectArea.y + 67;
     rect.w = image->w;
     rect.h = image->h;
     ZeroINTERFACEACTION(&action);
@@ -530,7 +534,7 @@ Uint16 SelectCountBox(Uint16 max){
 
     // WEEL UP
     ZeroINTERFACEACTION(&action);
-    action.rect = box.rectArea;
+    action.rect = box->rectArea;
     action.mouseEvent = MOUSE_UWHEEL;
     action.pf = ActionPressUP;
     AddActionEvent(&dialog, &action);
@@ -538,7 +542,7 @@ Uint16 SelectCountBox(Uint16 max){
 
     // WEEL DOWN
     ZeroINTERFACEACTION(&action);
-    action.rect = box.rectArea;
+    action.rect = box->rectArea;
     action.mouseEvent = MOUSE_DWHEEL;
     action.pf = ActionPressDOWN;
     AddActionEvent(&dialog, &action);
@@ -578,15 +582,15 @@ Uint16 SelectCountBox(Uint16 max){
 		    CursorOff();
 		    FillSPRITE(&sprite, "TOWNWIND.ICN", 4);
 		    image = GetICNSprite(&sprite);
-		    rect.x = box.rectArea.x + 80;
-		    rect.y = box.rectArea.y + 55;
+		    rect.x = box->rectArea.x + 80;
+		    rect.y = box->rectArea.y + 55;
 		    rect.w = image->w;
 		    rect.h = image->h;
 		    SDL_BlitSurface(image, NULL, video, &rect);
 		    rect.w = image->w;
 		    rect.h = FONT_HEIGHTBIG;
-    		    sprintf(number, "%d", result);
-		    PrintAlignText(video, &rect, number, FONT_BIG);
+    		    snprintf(num, NUMLEN, "%d", result);
+		    PrintAlignText(video, &rect, num, FONT_BIG);
 		    CursorOn();
 		}
 		break;
@@ -597,15 +601,15 @@ Uint16 SelectCountBox(Uint16 max){
 		    CursorOff();
 	    	    FillSPRITE(&sprite, "TOWNWIND.ICN", 4);
 	    	    image = GetICNSprite(&sprite);
-		    rect.x = box.rectArea.x + 80;
-		    rect.y = box.rectArea.y + 55;
+		    rect.x = box->rectArea.x + 80;
+		    rect.y = box->rectArea.y + 55;
 	    	    rect.w = image->w;
 	    	    rect.h = image->h;
 	    	    SDL_BlitSurface(image, NULL, video, &rect);
 	    	    rect.w = image->w;
 	    	    rect.h = FONT_HEIGHTBIG;
-	    	    sprintf(number, "%d", result);
-	    	    PrintAlignText(video, &rect, number, FONT_BIG);
+	    	    snprintf(num, NUMLEN, "%d", result);
+	    	    PrintAlignText(video, &rect, num, FONT_BIG);
 		    CursorOn();
 		}
 		break;
@@ -616,7 +620,7 @@ Uint16 SelectCountBox(Uint16 max){
 
     CursorOff();
 
-    FreeBox(&box);
+    FreeBox(box);
 
     SetCursor(cursor);
 

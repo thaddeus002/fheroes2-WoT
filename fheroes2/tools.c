@@ -54,7 +54,7 @@ BOOL CompareRect(SDL_Rect *a, SDL_Rect *b){
 
 void FillSPRITE(AGGSPRITE *sprite, const char *name, Uint16 number){
 
-    strncpy(sprite->name, name, strlen(name) + 1);
+    strncpy(sprite->name, name, AGGSIZENAME - 1);
     sprite->number = number;
 }
 
@@ -251,7 +251,7 @@ void PrintText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFON
 
 void PrintAlignText(SDL_Surface *surface, SDL_Rect *rect, const char *string, ENUMFONT font){
 
-    const char	*first, *end;
+    const char	*first, *end, *ret;
     SDL_Rect cur = *rect;
 
     first = string;
@@ -259,11 +259,17 @@ void PrintAlignText(SDL_Surface *surface, SDL_Rect *rect, const char *string, EN
     
     while(first < end){
     
+	// exist \n
+	//if(NULL != (end = strchr(first, "\n")) && ! (rect->w < GetLengthSubstr(first, end, font)))
+
 	// поиск оптимальной ширины строки
 	while(rect->w < GetLengthSubstr(first, end, font)) --end;
     
+	// exist \n
+	if(NULL != (ret = strchr(first, 0x0A)) && ret < end)
+	    end = ret;
 	// поиск пробела
-	while(*end != 0x20 && end > first && end != &string[strlen(string)]) --end;
+	else while(*end != 0x20 && end > first && end != &string[strlen(string)]) --end;
 
 	if(end == first) end = &string[strlen(string)];
 

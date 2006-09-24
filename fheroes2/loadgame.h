@@ -34,6 +34,7 @@
 #include "object.h"
 #include "castle.h"
 #include "heroes.h"
+#include "selector.h"
 
 typedef struct {
 		Uint8           offsetX;
@@ -49,11 +50,8 @@ typedef struct {
                 Uint8           ay;
                 void            *object;
 		// cursor
-		SDL_Surface	*cursor;
-		SDL_Surface	*background;
-		BOOL		useBack;
-		SDL_Rect	back;
-		SDL_Rect	click;
+		S_SELECT	*selectCastle;
+		S_SELECT	*selectHeroes;
 		S_CASTLE	*firstCastle;
 		S_HEROES	*firstHeroes;
                 } S_FOCUS;

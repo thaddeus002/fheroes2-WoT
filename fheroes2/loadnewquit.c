@@ -27,7 +27,9 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "SDL.h"
+
 #include "agg.h"
 #include "tools.h"
 #include "draw.h"

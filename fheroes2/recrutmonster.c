@@ -38,6 +38,8 @@
 #include "payment.h"
 #include "castleaction.h"
 
+#define STRLEN	32
+
 void RedrawDinamicRecrutMonster(SDL_Surface *, SDL_Rect *, E_MONSTER, Uint16, Uint16, Uint16, Uint32);
 
 Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 available){
@@ -49,7 +51,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     SDL_Rect rectBack, rectCur;
     AGGSPRITE sprite;
     BOOL exit = FALSE;
-    char str[32];
+    char str[STRLEN + 1];
 
     INTERFACEACTION action;
     INTERFACEACTION *dialog = NULL;        
@@ -84,7 +86,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     SDL_BlitSurface(image, NULL, video, &rectBack);
 
     // название монстра
-    sprintf(str, "Recrut %s", GetStringMonster(emonster));
+    snprintf(str, STRLEN, "Recrut %s", GetStringMonster(emonster));
     rectCur.x = rectBack.x + 160;
     rectCur.y = rectBack.y + 25;
     rectCur.w = GetLengthText(str, FONT_BIG);
@@ -116,7 +118,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", payment.gold);
+	snprintf(str, STRLEN, "%d", payment.gold);
 	rectCur.x = rectBack.x + 183;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -139,7 +141,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", payment.gold);
+	snprintf(str, STRLEN, "%d", payment.gold);
 	rectCur.x = rectBack.x + 205;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -165,7 +167,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество crystal (условия)
-	    sprintf(str, "%d", payment.crystal);
+	    snprintf(str, STRLEN, "%d", payment.crystal);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -190,7 +192,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment.mercury);
+	    snprintf(str, STRLEN, "%d", payment.mercury);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -215,7 +217,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment.wood);
+	    snprintf(str, STRLEN, "%d", payment.wood);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -240,7 +242,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment.ore);
+	    snprintf(str, STRLEN, "%d", payment.ore);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -265,7 +267,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество sulfur (условия)
-	    sprintf(str, "%d", payment.sulfur);
+	    snprintf(str, STRLEN, "%d", payment.sulfur);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -290,7 +292,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество gems (условия)
-	    sprintf(str, "%d", payment.gems);
+	    snprintf(str, STRLEN, "%d", payment.gems);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -309,7 +311,7 @@ Uint8 DialogRecrutMonster(E_MONSTER emonster, Uint8 levelMonster, Uint16 availab
     SDL_BlitSurface(image, NULL, video, &rectCur);
 
     // text number to buy
-    sprintf(str, "Number to buy:");
+    snprintf(str, STRLEN, "Number to buy:");
     rectCur.x = rectBack.x + 30;
     rectCur.y = rectBack.y + 163;
     rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -557,14 +559,14 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
     SDL_BlitSurface(stat, NULL, video, rect);
 
     // text available
-    sprintf(str, "Available: %d", available);
+    snprintf(str, STRLEN, "Available: %d", available);
     rectCur.x = rect->x + 40;
     rectCur.y = rect->y + 138;
     rectCur.w = GetLengthText(str, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // text count recrut
-    sprintf(str, "%d", resultRecrutMonster);
+    snprintf(str, STRLEN, "%d", resultRecrutMonster);
     rectCur.x = rect->x + 167;
     rectCur.y = rect->y + 160;
     rectCur.w = GetLengthText(str, FONT_BIG);
@@ -581,7 +583,7 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
         payment. mercury ||
         payment.gems ){
 	// text count gold
-	sprintf(str, "%d", resultCountGold);
+	snprintf(str, STRLEN, "%d", resultCountGold);
 	rectCur.x = rect->x + 133;
 	rectCur.y = rect->y + 228;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -589,7 +591,7 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
 	rectCur.x = rectCur.x - rectCur.w / 2;
 	PrintText(video, &rectCur, str, FONT_SMALL);
 	// text count resource
-	sprintf(str, "%d", resultCountResource);
+	snprintf(str, STRLEN, "%d", resultCountResource);
 	rectCur.x = rect->x + 195;
 	rectCur.y = rect->y + 228;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -598,7 +600,7 @@ void RedrawDinamicRecrutMonster(SDL_Surface *stat, SDL_Rect *rect, E_MONSTER emo
 	PrintText(video, &rectCur, str, FONT_SMALL);
     }else{
 	// text count gold
-	sprintf(str, "%d", resultCountGold);
+	snprintf(str, STRLEN, "%d", resultCountGold);
 	rectCur.x = rect->x + 160;
 	rectCur.y = rect->y + 228;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -653,7 +655,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     // text available
-    sprintf(str, "Available: %d", available);
+    snprintf(str, STRLEN, "Available: %d", available);
     rectCur.y = rectBack.y + 130;
     rectCur.w = GetLengthText(str, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
@@ -677,7 +679,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", payment.gold);
+	snprintf(str, STRLEN, "%d", payment.gold);
 	rectCur.x = rectBack.x + 183;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -694,7 +696,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	rectCur.h = image->h;
 	SDL_BlitSurface(image, NULL, video, &rectCur);
 	// количество золото (условия)
-	sprintf(str, "%d", payment.gold);
+	snprintf(str, STRLEN, "%d", payment.gold);
 	rectCur.x = rectBack.x + 205;
 	rectCur.y = rectBack.y + 103;
 	rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -714,7 +716,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество crystal (условия)
-	    sprintf(str, "%d", payment.crystal);
+	    snprintf(str, STRLEN, "%d", payment.crystal);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -733,7 +735,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment.mercury);
+	    snprintf(str, STRLEN, "%d", payment.mercury);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -752,7 +754,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment.wood);
+	    snprintf(str, STRLEN, "%d", payment.wood);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -771,7 +773,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество mercury (условия)
-	    sprintf(str, "%d", payment.ore);
+	    snprintf(str, STRLEN, "%d", payment.ore);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -790,7 +792,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество sulfur (условия)
-	    sprintf(str, "%d", payment.sulfur);
+	    snprintf(str, STRLEN, "%d", payment.sulfur);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);
@@ -809,7 +811,7 @@ void DialogRecrutMonsterInfo(E_MONSTER emonster, Uint16 available){
 	    rectCur.h = image->h;
 	    SDL_BlitSurface(image, NULL, video, &rectCur);
 	    // количество gems (условия)
-	    sprintf(str, "%d", payment.gems);
+	    snprintf(str, STRLEN, "%d", payment.gems);
 	    rectCur.x = rectBack.x + 240;
 	    rectCur.y = rectBack.y + 103;
 	    rectCur.w = GetLengthText(str, FONT_SMALL);

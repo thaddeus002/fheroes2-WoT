@@ -61,12 +61,12 @@ ACTION ShowTavernInfo(const char *rumor){
     
     const char *info = "A generous tip for the barkeep yields the following rumor:";
     
-    S_BOX box;
+    S_BOX *box = NULL;
 
-    if( ! InitBox(&box, 160 + GetHeightText(info, FONT_BIG) + GetHeightText(rumor, FONT_BIG), &dialog, YES)) return NONE;
+    if(NULL == (box = InitBox(160 + GetHeightText(info, FONT_BIG) + GetHeightText(rumor, FONT_BIG), &dialog, YES))) return NONE;
 
     // text header
-    rect = box.rectArea;
+    rect = box->rectArea;
     PrintAlignText(video, &rect, GetStringBuilding(KNIGHT, BUILD_TAVERN), FONT_BIG);
 
 
@@ -74,7 +74,7 @@ ACTION ShowTavernInfo(const char *rumor){
     FillSPRITE(&sprite, "TAVWIN.ICN", 0);
     image = GetICNSprite(&sprite);
     rect.x = (video->w - image->w) / 2 + 5;
-    rect.y = box.rectArea.y + 30;
+    rect.y = box->rectArea.y + 30;
     rect.w = image->w;
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
@@ -82,14 +82,14 @@ ACTION ShowTavernInfo(const char *rumor){
     FillSPRITE(&sprite, "TAVWIN.ICN", 1);
     image = GetICNSprite(&sprite);
     rect.x = (video->w - image->w) / 2 + 5;
-    rect.y = box.rectArea.y + 30 + 3;
+    rect.y = box->rectArea.y + 30 + 3;
     rect.w = image->w;
     rect.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rect);
 
     // TAVWIN.ICN anim 2 - 20 frame
-    rect.x = box.rectArea.x + 26;
-    rect.y = box.rectArea.y + 33;
+    rect.x = box->rectArea.x + 26;
+    rect.y = box->rectArea.y + 33;
     rect.w = 0;
     rect.h = 0;
     FillSPRITE(&sprite, "TAVWIN.ICN", 2);
@@ -97,8 +97,8 @@ ACTION ShowTavernInfo(const char *rumor){
     AddAnimationEvent(&animTavern, &rect, header, 20);
 
     // text info
-    rect = box.rectArea;
-    rect.y = box.rectArea.y + 140;
+    rect = box->rectArea;
+    rect.y = box->rectArea.y + 140;
     PrintAlignText(video, &rect, info, FONT_BIG);
 
     // text rumor
@@ -138,7 +138,7 @@ ACTION ShowTavernInfo(const char *rumor){
     CursorOff();
 
     FreeAnimationEvent(animTavern);
-    FreeBox(&box);
+    FreeBox(box);
 
     SetCursor(cursor);
 

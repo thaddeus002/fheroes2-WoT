@@ -36,7 +36,7 @@ typedef struct {
     Uint32	name;
     SDL_Surface *image;
     SDL_Surface *background;
-    SDL_Rect 	pos;		// реальная позициа курсора
+    SDL_Rect 	pos;		// реальная позиция курсора
     BOOL 	show;		// флаг рисуем или нет
 } CURSORHEADER;
 
@@ -198,4 +198,3 @@ void CursorOn(void){
 
     return;
 }
-

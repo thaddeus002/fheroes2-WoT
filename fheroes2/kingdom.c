@@ -26,7 +26,9 @@
     Description:
 */
 
+#include <stdlib.h>
 #include "SDL.h"
+
 #include "gamedefs.h"
 #include "string.h"
 #include "config.h"

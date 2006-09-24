@@ -209,7 +209,7 @@ BOOL		CastleNearBoat();
 BOOL		CastlePresentHeroes(const S_CASTLE *);
 
 void		CastleIncreaseArmy(const S_CASTLE *, E_DWELLINGCASTLE, Uint8);
-void		AllCastleIncreaseArmy(void);
+void		AllCastleIncreaseRecrut(void);
 
 Uint8           GetMonsterGrownCastle(const S_CASTLE *, E_MONSTER);
 E_MAGICLEVEL	GetMageGuildLevel(const S_CASTLE *);
@@ -276,6 +276,8 @@ ACTION          UpgradableArmy(const S_ARMY *, E_COLORS, const S_CASTLE *);
 void		UpgradeArmy(S_ARMY *army, E_COLORS color);
 
 void		DrawAmountedCastle(SDL_Surface *, SDL_Rect *, E_RACE, E_GROUND, BOOL);
+void		ResetCastleSelector(void);
+const S_CASTLE *HeroesInCastle(const S_HEROES *);
 
 #endif
 

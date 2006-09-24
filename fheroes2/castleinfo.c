@@ -27,6 +27,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "SDL.h"
 
 #include "gamedefs.h"

@@ -32,6 +32,6 @@
 #include "SDL.h"
 #include "actionevent.h"
 
-ACTION ShowHeroesInfo(E_NAMEHEROES name);
+ACTION ShowHeroesInfo(E_NAMEHEROES, BOOL);
 
 #endif

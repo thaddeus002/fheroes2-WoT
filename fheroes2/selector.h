@@ -26,28 +26,25 @@
     Description:
 */
 
-#ifndef _SPLITER_H
-#define _SPLITER_H
+#ifndef _SELECTOR_H
+#define _SELECTOR_H
 
 typedef struct {
 
     SDL_Surface         *background;
     SDL_Surface         *cursor;
     SDL_Rect            pos;
-    Uint16              step;
-    Uint16		start;
-    Uint16              max;
-    Uint16              cur;
+    Uint16		ax;
+    Uint16		aw;
     BOOL		vertical;
+    BOOL		use;
 
-		} S_SPLITER;
+		} S_SELECT;
 
-S_SPLITER *	InitSpliter(AGGSPRITE *);
-void		FreeSpliter(S_SPLITER *);
-void		SetRangeSpliter(S_SPLITER *, SDL_Rect *, Uint16);
-void		RedrawSpliter(S_SPLITER *);
-void		MoveForwardSpliter(S_SPLITER *);
-void		MoveBackwardSpliter(S_SPLITER *);
-Uint16		GetCurrentSpliter(S_SPLITER *);
+S_SELECT *	InitSelector(AGGSPRITE *, Uint16, Uint16, BOOL);
+void		FreeSelector(S_SELECT *);
+void		RedrawSelector(S_SELECT *, SDL_Rect *);
+void		ResetSelector(S_SELECT *);
+Uint8		GetIndexSelected(const S_SELECT *);
 
 #endif

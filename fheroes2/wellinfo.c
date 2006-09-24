@@ -37,8 +37,23 @@
 #include "actionevent.h"
 #include "element.h"
 #include "castle.h"
+#include "recrutmonster.h"
 #include "monster.h"
 #include "wellinfo.h"
+
+ACTION	ActionWellClickMonster1(void);
+ACTION	ActionWellClickMonster2(void);
+ACTION	ActionWellClickMonster3(void);
+ACTION	ActionWellClickMonster4(void);
+ACTION	ActionWellClickMonster5(void);
+ACTION	ActionWellClickMonster6(void);
+void	RedrawInfoAvailable(void);
+
+#define STRLEN		32
+#define	WELLINFOWIDTH	640
+#define	WELLINFOHEIGHT	480
+
+SDL_Surface	*backWellInfo = NULL;
 
 ACTION ShowWellInfo(void){
 
@@ -52,7 +67,7 @@ ACTION ShowWellInfo(void){
     AGGSPRITE sprite;
     const char *icnname = NULL;
     const char *message = NULL;
-    char str[32];
+    char str[STRLEN + 1];
     BOOL exit = FALSE;
 
     INTERFACEACTION action;
@@ -61,6 +76,7 @@ ACTION ShowWellInfo(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
     const S_MONSTER *monster = NULL;
+    backWellInfo = NULL;
 
     FillSPRITE(&sprite, "WELLBKG.ICN", 0);
     image = GetICNSprite(&sprite);
@@ -194,28 +210,8 @@ ACTION ShowWellInfo(void){
     rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
-    // available
-    if(castle->dwelling & DWELLING_MONSTER1 && castle->monster[level - 1]){
-	message = "Available:";
-	rectCur.x = mx + 70;
-	rectCur.y = my + 122;
-	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(message, FONT_SMALL);
-	rectCur.h = FONT_HEIGHTSMALL;
-	PrintText(video, &rectCur, message, FONT_SMALL);
-
-        sprintf(str, "%d", castle->monster[level - 1]);
-	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
-	rectCur.y = my + 118;
-	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(str, FONT_BIG);
-	rectCur.h = FONT_HEIGHTBIG;
-	PrintText(video, &rectCur, str, FONT_BIG);
-    }
     // attack
-    sprintf(str, "Attack: %d", monster->attack);
+    snprintf(str, STRLEN, "Attack: %d", monster->attack);
     rectCur.x = mx + 270;
     rectCur.y = my + 24;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -224,7 +220,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // defense
-    sprintf(str, "Defense: %d", monster->defence);
+    snprintf(str, STRLEN, "Defense: %d", monster->defence);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -233,7 +229,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // damage
-    sprintf(str, "Damg: %d-%d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damg: %d-%d", monster->damageMin, monster->damageMax);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 2;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -242,7 +238,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // hp
-    sprintf(str, "HP: %d", monster->hp);
+    snprintf(str, STRLEN, "HP: %d", monster->hp);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 3;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -251,7 +247,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // speed
-    sprintf(str, "Speed:");
+    snprintf(str, STRLEN, "Speed:");
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 5;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -269,7 +265,7 @@ ACTION ShowWellInfo(void){
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
     if(castle->dwelling & DWELLING_MONSTER1){
-	sprintf(str, "Growth");
+	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -277,7 +273,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
+	snprintf(str, STRLEN, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -285,6 +281,16 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
+	// action
+	rectCur.x = cx + 12;
+	rectCur.y = cy + 12;
+	rectCur.w = 300;
+	rectCur.h = 135;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionWellClickMonster1;
+	AddActionEvent(&dialog, &action);
     }
 
     // LEVEL 2
@@ -326,28 +332,8 @@ ACTION ShowWellInfo(void){
     rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
-    // available
-    if((castle->dwelling & DWELLING_MONSTER2 || castle->dwelling & DWELLING_UPGRADE2) && castle->monster[level - 1]){
-	message = "Available:";
-	rectCur.x = mx + 70;
-	rectCur.y = my + 122;
-	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(message, FONT_SMALL);
-	rectCur.h = FONT_HEIGHTSMALL;
-	PrintText(video, &rectCur, message, FONT_SMALL);
-
-        sprintf(str, "%d", castle->monster[level - 1]);
-	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
-	rectCur.y = my + 118;
-	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(str, FONT_BIG);
-	rectCur.h = FONT_HEIGHTBIG;
-	PrintText(video, &rectCur, str, FONT_BIG);
-    }
     // attack
-    sprintf(str, "Attack: %d", monster->attack);
+    snprintf(str, STRLEN, "Attack: %d", monster->attack);
     rectCur.x = mx + 270;
     rectCur.y = my + 24;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -356,7 +342,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // defense
-    sprintf(str, "Defense: %d", monster->defence);
+    snprintf(str, STRLEN, "Defense: %d", monster->defence);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -365,7 +351,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // damage
-    sprintf(str, "Damg: %d-%d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damg: %d-%d", monster->damageMin, monster->damageMax);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 2;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -374,7 +360,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // hp
-    sprintf(str, "HP: %d", monster->hp);
+    snprintf(str, STRLEN, "HP: %d", monster->hp);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 3;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -383,7 +369,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // speed
-    sprintf(str, "Speed:");
+    snprintf(str, STRLEN, "Speed:");
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 5;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -401,7 +387,7 @@ ACTION ShowWellInfo(void){
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
     if(castle->dwelling & DWELLING_MONSTER2 || castle->dwelling & DWELLING_UPGRADE2){
-	sprintf(str, "Growth");
+	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -409,7 +395,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
+	snprintf(str, STRLEN, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -417,6 +403,16 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
+	// action
+	rectCur.x = cx + 12;
+	rectCur.y = cy + 160;
+	rectCur.w = 300;
+	rectCur.h = 135;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionWellClickMonster2;
+	AddActionEvent(&dialog, &action);
     }
 
     // LEVEL 3
@@ -458,28 +454,8 @@ ACTION ShowWellInfo(void){
     rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
-    // available
-    if((castle->dwelling & DWELLING_MONSTER3 || castle->dwelling & DWELLING_UPGRADE3) && castle->monster[level - 1]){
-	message = "Available:";
-	rectCur.x = mx + 70;
-	rectCur.y = my + 122;
-	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(message, FONT_SMALL);
-	rectCur.h = FONT_HEIGHTSMALL;
-	PrintText(video, &rectCur, message, FONT_SMALL);
-
-        sprintf(str, "%d", castle->monster[level - 1]);
-	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
-	rectCur.y = my + 118;
-	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(str, FONT_BIG);
-	rectCur.h = FONT_HEIGHTBIG;
-	PrintText(video, &rectCur, str, FONT_BIG);
-    }
     // attack
-    sprintf(str, "Attack: %d", monster->attack);
+    snprintf(str, STRLEN, "Attack: %d", monster->attack);
     rectCur.x = mx + 270;
     rectCur.y = my + 24;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -488,7 +464,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // defense
-    sprintf(str, "Defense: %d", monster->defence);
+    snprintf(str, STRLEN, "Defense: %d", monster->defence);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -497,7 +473,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // damage
-    sprintf(str, "Damg: %d-%d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damg: %d-%d", monster->damageMin, monster->damageMax);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 2;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -506,7 +482,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // hp
-    sprintf(str, "HP: %d", monster->hp);
+    snprintf(str, STRLEN, "HP: %d", monster->hp);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 3;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -515,7 +491,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // speed
-    sprintf(str, "Speed:");
+    snprintf(str, STRLEN, "Speed:");
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 5;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -533,7 +509,7 @@ ACTION ShowWellInfo(void){
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
     if(castle->dwelling & DWELLING_MONSTER3 || castle->dwelling & DWELLING_UPGRADE3){
-	sprintf(str, "Growth");
+	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -541,7 +517,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
+	snprintf(str, STRLEN, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -549,6 +525,16 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
+	// action
+	rectCur.x = cx + 12;
+	rectCur.y = cy + 312;
+	rectCur.w = 300;
+	rectCur.h = 135;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionWellClickMonster3;
+	AddActionEvent(&dialog, &action);
     }
 
     // LEVEL 4
@@ -590,28 +576,8 @@ ACTION ShowWellInfo(void){
     rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
-    // available
-    if((castle->dwelling & DWELLING_MONSTER4 || castle->dwelling & DWELLING_UPGRADE4) && castle->monster[level - 1]){
-	message = "Available:";
-	rectCur.x = mx + 70;
-	rectCur.y = my + 122;
-	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(message, FONT_SMALL);
-	rectCur.h = FONT_HEIGHTSMALL;
-	PrintText(video, &rectCur, message, FONT_SMALL);
-
-        sprintf(str, "%d", castle->monster[level - 1]);
-	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
-	rectCur.y = my + 118;
-	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(str, FONT_BIG);
-	rectCur.h = FONT_HEIGHTBIG;
-	PrintText(video, &rectCur, str, FONT_BIG);
-    }
     // attack
-    sprintf(str, "Attack: %d", monster->attack);
+    snprintf(str, STRLEN, "Attack: %d", monster->attack);
     rectCur.x = mx + 270;
     rectCur.y = my + 24;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -620,7 +586,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // defense
-    sprintf(str, "Defense: %d", monster->defence);
+    snprintf(str, STRLEN, "Defense: %d", monster->defence);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -629,7 +595,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // damage
-    sprintf(str, "Damg: %d-%d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damg: %d-%d", monster->damageMin, monster->damageMax);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 2;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -638,7 +604,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // hp
-    sprintf(str, "HP: %d", monster->hp);
+    snprintf(str, STRLEN, "HP: %d", monster->hp);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 3;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -647,7 +613,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // speed
-    sprintf(str, "Speed:");
+    snprintf(str, STRLEN, "Speed:");
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 5;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -665,7 +631,7 @@ ACTION ShowWellInfo(void){
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
     if(castle->dwelling & DWELLING_MONSTER4 || castle->dwelling & DWELLING_UPGRADE4){
-	sprintf(str, "Growth");
+	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -673,7 +639,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
+	snprintf(str, STRLEN, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -681,6 +647,16 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
+	// action
+	rectCur.x = cx + 330;
+	rectCur.y = cy + 12;
+	rectCur.w = 300;
+	rectCur.h = 135;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionWellClickMonster4;
+	AddActionEvent(&dialog, &action);
     }
 
     // LEVEL 5
@@ -722,28 +698,8 @@ ACTION ShowWellInfo(void){
     rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
-    // available
-    if((castle->dwelling & DWELLING_MONSTER5 || castle->dwelling & DWELLING_UPGRADE5) && castle->monster[level - 1]){
-	message = "Available:";
-	rectCur.x = mx + 70;
-	rectCur.y = my + 122;
-	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(message, FONT_SMALL);
-	rectCur.h = FONT_HEIGHTSMALL;
-	PrintText(video, &rectCur, message, FONT_SMALL);
-
-        sprintf(str, "%d", castle->monster[level - 1]);
-	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
-	rectCur.y = my + 118;
-	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(str, FONT_BIG);
-	rectCur.h = FONT_HEIGHTBIG;
-	PrintText(video, &rectCur, str, FONT_BIG);
-    }
     // attack
-    sprintf(str, "Attack: %d", monster->attack);
+    snprintf(str, STRLEN, "Attack: %d", monster->attack);
     rectCur.x = mx + 270;
     rectCur.y = my + 24;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -752,7 +708,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // defense
-    sprintf(str, "Defense: %d", monster->defence);
+    snprintf(str, STRLEN, "Defense: %d", monster->defence);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -761,7 +717,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // damage
-    sprintf(str, "Damg: %d-%d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damg: %d-%d", monster->damageMin, monster->damageMax);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 2;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -770,7 +726,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // hp
-    sprintf(str, "HP: %d", monster->hp);
+    snprintf(str, STRLEN, "HP: %d", monster->hp);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 3;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -779,7 +735,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // speed
-    sprintf(str, "Speed:");
+    snprintf(str, STRLEN, "Speed:");
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 5;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -797,7 +753,7 @@ ACTION ShowWellInfo(void){
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
     if(castle->dwelling & DWELLING_MONSTER5 || castle->dwelling & DWELLING_UPGRADE5){
-	sprintf(str, "Growth");
+	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -805,7 +761,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
+	snprintf(str, STRLEN, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -813,6 +769,16 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
+	// action
+	rectCur.x = cx + 330;
+	rectCur.y = cy + 160;
+	rectCur.w = 300;
+	rectCur.h = 135;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionWellClickMonster5;
+	AddActionEvent(&dialog, &action);
     }
 
     // LEVEL 6
@@ -864,28 +830,8 @@ ACTION ShowWellInfo(void){
     rectCur.w = GetLengthText(message, FONT_SMALL);
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
-    // available
-    if((castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6 || castle->dwelling & DWELLING_UPGRADE7) && castle->monster[level - 1]){
-	message = "Available:";
-	rectCur.x = mx + 70;
-	rectCur.y = my + 122;
-	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(message, FONT_SMALL);
-	rectCur.h = FONT_HEIGHTSMALL;
-	PrintText(video, &rectCur, message, FONT_SMALL);
-
-        sprintf(str, "%d", castle->monster[level - 1]);
-	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
-	rectCur.y = my + 118;
-	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
-	rectCur.y = rectCur.y - 3;
-	rectCur.w = GetLengthText(str, FONT_BIG);
-	rectCur.h = FONT_HEIGHTBIG;
-	PrintText(video, &rectCur, str, FONT_BIG);
-    }
     // attack
-    sprintf(str, "Attack: %d", monster->attack);
+    snprintf(str, STRLEN, "Attack: %d", monster->attack);
     rectCur.x = mx + 270;
     rectCur.y = my + 24;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -894,7 +840,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // defense
-    sprintf(str, "Defense: %d", monster->defence);
+    snprintf(str, STRLEN, "Defense: %d", monster->defence);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -903,7 +849,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // damage
-    sprintf(str, "Damg: %d-%d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damg: %d-%d", monster->damageMin, monster->damageMax);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 2;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -912,7 +858,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // hp
-    sprintf(str, "HP: %d", monster->hp);
+    snprintf(str, STRLEN, "HP: %d", monster->hp);
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 3;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -921,7 +867,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, str, FONT_SMALL);
     // speed
-    sprintf(str, "Speed:");
+    snprintf(str, STRLEN, "Speed:");
     rectCur.x = mx + 270;
     rectCur.y = my + 24 + FONT_HEIGHTSMALL * 5;
     rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -939,7 +885,7 @@ ACTION ShowWellInfo(void){
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
     if(castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6 || castle->dwelling & DWELLING_UPGRADE7){
-	sprintf(str, "Growth");
+	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -947,7 +893,7 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
-	sprintf(str, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
+	snprintf(str, STRLEN, "+ %d / week", GetMonsterGrownCastle(castle, GetMonsterFromCastle(castle, level)));
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 9;
 	rectCur.x = rectCur.x - GetLengthText(str, FONT_SMALL) / 2;
@@ -955,7 +901,30 @@ ACTION ShowWellInfo(void){
 	rectCur.w = GetLengthText(str, FONT_SMALL);
 	rectCur.h = FONT_HEIGHTSMALL;
 	PrintText(video, &rectCur, str, FONT_SMALL);
+	// action
+	rectCur.x = cx + 330;
+	rectCur.y = cy + 312;
+	rectCur.w = 300;
+	rectCur.h = 135;
+	ZeroINTERFACEACTION(&action);
+	action.rect = rectCur;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.pf = ActionWellClickMonster6;
+	AddActionEvent(&dialog, &action);
     }
+
+    // сохраняем бакгроунд
+    if(NULL == (backWellInfo = SDL_CreateRGBSurface(SDL_SWSURFACE, WELLINFOWIDTH, WELLINFOHEIGHT, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "ShowWellInfo: CreateRGBSurface failed: %s\n", SDL_GetError());
+        return NONE;
+    }
+    rectCur.x = (video->w - WELLINFOWIDTH) / 2;
+    rectCur.y = (video->h - WELLINFOHEIGHT) / 2;
+    rectCur.w = WELLINFOWIDTH;
+    rectCur.h = WELLINFOHEIGHT;
+    SDL_BlitSurface(video, &rectCur, backWellInfo, NULL);
+
+    RedrawInfoAvailable();
 
     // Отрисовка диалога
     CursorOn();
@@ -987,10 +956,274 @@ ACTION ShowWellInfo(void){
     SDL_BlitSurface(back, NULL, video, &rectBack);
 
     FreeActionEvent(dialog);
+    SDL_FreeSurface(backWellInfo);
     SDL_FreeSurface(back);
 
     SetIntValue(ANIM3, TRUE);
     CursorOn();
 
     return result;
+}
+
+void RedrawInfoAvailable(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Rect rectCur;
+    Uint16 cx, cy, mx, my;
+    Uint8 level;
+    const char *message = NULL;
+    char str[STRLEN + 1];
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(GetIntValue(VIDEOMODE)){
+        cx = video->w / 2 - 320;
+        cy = video->h / 2 - 240;
+    }else{
+        cx = 0;
+        cy = 0;
+    }
+
+    CursorOff();
+
+    // restore back
+    rectCur.x = (video->w - WELLINFOWIDTH) / 2;
+    rectCur.y = (video->h - WELLINFOHEIGHT) / 2;
+    rectCur.w = WELLINFOWIDTH;
+    rectCur.h = WELLINFOHEIGHT;
+    SDL_BlitSurface(backWellInfo, NULL, video, &rectCur);
+
+    // available level 1
+    level = 1;
+    mx = cx;
+    my = cy;
+    if(castle->dwelling & DWELLING_MONSTER1 && castle->monster[level - 1]){
+	message = "Available:";
+	rectCur.x = mx + 70;
+	rectCur.y = my + 122;
+	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(message, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
+
+        snprintf(str, STRLEN, "%d", castle->monster[level - 1]);
+	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
+	rectCur.y = my + 118;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_BIG);
+	rectCur.h = FONT_HEIGHTBIG;
+	PrintText(video, &rectCur, str, FONT_BIG);
+    }
+    // available level 2
+    level = 2;
+    mx = cx;
+    my = cy + 150;
+    if((castle->dwelling & DWELLING_MONSTER2 || castle->dwelling & DWELLING_UPGRADE2) && castle->monster[level - 1]){
+	message = "Available:";
+	rectCur.x = mx + 70;
+	rectCur.y = my + 122;
+	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(message, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
+
+        snprintf(str, STRLEN, "%d", castle->monster[level - 1]);
+	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
+	rectCur.y = my + 118;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_BIG);
+	rectCur.h = FONT_HEIGHTBIG;
+	PrintText(video, &rectCur, str, FONT_BIG);
+    }
+    // available level 3
+    level = 3;
+    mx = cx;
+    my = cy + 300;
+    if((castle->dwelling & DWELLING_MONSTER3 || castle->dwelling & DWELLING_UPGRADE3) && castle->monster[level - 1]){
+	message = "Available:";
+	rectCur.x = mx + 70;
+	rectCur.y = my + 122;
+	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(message, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
+
+        snprintf(str, STRLEN, "%d", castle->monster[level - 1]);
+	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
+	rectCur.y = my + 118;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_BIG);
+	rectCur.h = FONT_HEIGHTBIG;
+	PrintText(video, &rectCur, str, FONT_BIG);
+    }
+    // available level 4
+    level = 4;
+    mx = cx + 315;
+    my = cy;
+    if((castle->dwelling & DWELLING_MONSTER4 || castle->dwelling & DWELLING_UPGRADE4) && castle->monster[level - 1]){
+	message = "Available:";
+	rectCur.x = mx + 70;
+	rectCur.y = my + 122;
+	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(message, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
+
+        snprintf(str, STRLEN, "%d", castle->monster[level - 1]);
+	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
+	rectCur.y = my + 118;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_BIG);
+	rectCur.h = FONT_HEIGHTBIG;
+	PrintText(video, &rectCur, str, FONT_BIG);
+    }
+    // available level 5
+    level = 5;
+    mx = cx + 315;
+    my = cy + 150;
+    if((castle->dwelling & DWELLING_MONSTER5 || castle->dwelling & DWELLING_UPGRADE5) && castle->monster[level - 1]){
+	message = "Available:";
+	rectCur.x = mx + 70;
+	rectCur.y = my + 122;
+	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(message, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
+
+        snprintf(str, STRLEN, "%d", castle->monster[level - 1]);
+	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
+	rectCur.y = my + 118;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_BIG);
+	rectCur.h = FONT_HEIGHTBIG;
+	PrintText(video, &rectCur, str, FONT_BIG);
+    }
+    // available level 6
+    level = 6;
+    mx = cx + 315;
+    my = cy + 300;
+    if((castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6 || castle->dwelling & DWELLING_UPGRADE7) && castle->monster[level - 1]){
+	message = "Available:";
+	rectCur.x = mx + 70;
+	rectCur.y = my + 122;
+	rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(message, FONT_SMALL);
+	rectCur.h = FONT_HEIGHTSMALL;
+	PrintText(video, &rectCur, message, FONT_SMALL);
+
+        snprintf(str, STRLEN, "%d", castle->monster[level - 1]);
+	rectCur.x = mx + 55 + GetLengthText(message, FONT_SMALL);
+	rectCur.y = my + 118;
+	rectCur.x = rectCur.x - GetLengthText(str, FONT_BIG) / 2;
+	rectCur.y = rectCur.y - 3;
+	rectCur.w = GetLengthText(str, FONT_BIG);
+	rectCur.h = FONT_HEIGHTBIG;
+	PrintText(video, &rectCur, str, FONT_BIG);
+    }
+}
+
+ACTION	ActionWellClickMonster1(void){
+
+    const Uint8 levelMonster = 1;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(! castle) return NONE;
+
+    if( BuyMonsterFromCastle(castle, levelMonster,
+        DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) )
+	RedrawInfoAvailable();
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionWellClickMonster2(void){
+
+    const Uint8 levelMonster = 2;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(! castle) return NONE;
+
+    if( BuyMonsterFromCastle(castle, levelMonster,
+        DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) )
+	RedrawInfoAvailable();
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionWellClickMonster3(void){
+
+    const Uint8 levelMonster = 3;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(! castle) return NONE;
+
+    if( BuyMonsterFromCastle(castle, levelMonster,
+        DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) )
+	RedrawInfoAvailable();
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionWellClickMonster4(void){
+
+    const Uint8 levelMonster = 4;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(! castle) return NONE;
+
+    if( BuyMonsterFromCastle(castle, levelMonster,
+        DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) )
+	RedrawInfoAvailable();
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionWellClickMonster5(void){
+
+    const Uint8 levelMonster = 5;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(! castle) return NONE;
+
+    if( BuyMonsterFromCastle(castle, levelMonster,
+        DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) )
+	RedrawInfoAvailable();
+
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionWellClickMonster6(void){
+
+    const Uint8 levelMonster = 6;
+    const S_CASTLE *castle = GetCurrentCastle();
+
+    if(! castle) return NONE;
+
+    if( BuyMonsterFromCastle(castle, levelMonster,
+        DialogRecrutMonster(GetMonsterFromCastle(castle, levelMonster), levelMonster, castle->monster[levelMonster - 1])) )
+	RedrawInfoAvailable();
+
+    CursorOn();
+
+    return NONE;
 }

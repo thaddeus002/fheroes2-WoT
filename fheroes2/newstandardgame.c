@@ -31,7 +31,9 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "SDL.h"
+
 #include "agg.h"
 #include "tools.h"
 #include "actionevent.h"
@@ -40,12 +42,10 @@
 #include "config.h"
 #include "newstandardgame.h"
 #include "mp2maps.h"
+#include "selector.h"
 #include "newselectmaps.h"
 
 void	ShowNewStandardGame(void);
-void	SelectCursorRestoreBackground(void);
-void	SelectCursorSaveBackground(SDL_Rect *);
-
 void    DrawMapsOpponents(void);
 void    DrawMapsClass(void);
 
@@ -59,11 +59,7 @@ ACTION	ActionClickSelectColor(void);
 
 INTERFACEACTION *stpenewstandard = NULL;
 
-struct {
-    SDL_Rect		rect;
-    SDL_Surface		*surface;
-    BOOL		use;
-} backCursor;
+S_SELECT *gameDifficulty = NULL;
 
 ACTION DrawSelectNewStandardGame(void){
 
@@ -77,24 +73,11 @@ ACTION DrawSelectNewStandardGame(void){
 
     stpenewstandard = NULL;
     
-    // инициализируем backgroundCursor
+    // инициализируем selector Game Difficulty
     FillSPRITE(&sprite, "NGEXTRA.ICN", 62);
-    image = GetICNSprite(&sprite);
-
-    backCursor.surface = NULL;
-    backCursor.use = FALSE;
-    backCursor.rect.x = 0;
-    backCursor.rect.y = 0;
-    backCursor.rect.w = image->w;
-    backCursor.rect.h = image->h;
-
-    if(NULL == (backCursor.surface = SDL_CreateRGBSurface(SDL_SWSURFACE, image->w, image->h, 16, 0, 0, 0, 0))){
-            fprintf(stderr, "DrawSelectNewStandardGame: CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), image->w, image->h);
-            return EXIT;
-    }
+    if(NULL == (gameDifficulty = InitSelector(&sprite, 225, 77, FALSE))) return EXIT;
 
     // регистрируем события
-
     // кнопка select file
     FillSPRITE(&sprite, "NGEXTRA.ICN", 64);
     image = GetICNSprite(&sprite);
@@ -277,7 +260,7 @@ ACTION DrawSelectNewStandardGame(void){
 
     // освобождаем данные
     FreeActionEvent(stpenewstandard);
-    if(backCursor.surface) SDL_FreeSurface(backCursor.surface);
+    FreeSelector(gameDifficulty);
 
     return result;
 }
@@ -560,7 +543,6 @@ ACTION ActionSelectDifficulty(E_GAMELEVEL level){
     SDL_Surface *image = NULL;
 
     SDL_Rect rect;
-    SDL_Surface *video = SDL_GetVideoSurface();
     
     FillSPRITE(&sprite, "NGEXTRA.ICN", 62);
     image = GetICNSprite(&sprite);
@@ -592,43 +574,10 @@ ACTION ActionSelectDifficulty(E_GAMELEVEL level){
 	    break;
     }
     
-    CursorOff();
-
-    SelectCursorRestoreBackground();
-
-    SelectCursorSaveBackground(&rect);
-    
-    SDL_BlitSurface(image, NULL, video, &rect);
-
-    SDL_Flip(video);
-
+    RedrawSelector(gameDifficulty, &rect);
     CursorOn();
 
     return NONE;
-}
-
-void SelectCursorRestoreBackground(void){
-
-    if(! backCursor.use) return;
-
-    SDL_Surface *video = SDL_GetVideoSurface();
-
-    SDL_BlitSurface(backCursor.surface, NULL, video, &backCursor.rect);
-    SDL_Flip(video);
-    
-    backCursor.use = FALSE;
-}
-
-void SelectCursorSaveBackground(SDL_Rect *rect){
-
-    if(backCursor.use) return;
-
-    SDL_Surface *video = SDL_GetVideoSurface();
-
-    SDL_BlitSurface(video, rect, backCursor.surface, NULL);
-    
-    backCursor.rect = *rect;
-    backCursor.use = TRUE;
 }
 
 ACTION	ActionClickSelectColor(void){

@@ -84,7 +84,7 @@ void PutPixel(SDL_Surface *surface, Uint16 x, Uint16 y, Uint16 pixel){
 void DrawPixel(SDL_Surface *surface, Uint16 x, Uint16 y, Uint8 color){
 
     if(x > surface->w || y > surface->h){
-	if(ICNRLE_DEBUG) fprintf(stderr, "\nSAFE2: MEMORY LEAK. PARACHUTE!\n");
+	if(ICNRLE_DEBUG) fprintf(stderr, "DrawPixel: out of video memory!\n");
 	return;
     }
     SDL_Color *palette = GetPalette();
@@ -112,7 +112,7 @@ void DrawSceneVar2(SDL_Surface *surface, Uint8 *ptr, Uint32 sizesprite){
 
 	// проверка за границу буффера данных
 	if((Uint32) ptr > maxptr){
-	    if(ICNRLE_DEBUG) fprintf(stderr, "\nSAFE1: MEMORY LEAK. PARACHUTE!\n");
+	    if(ICNRLE_DEBUG) fprintf(stderr, "\nSAFE: MEMORY LEAK. PARACHUTE!\n");
 	    break;
 	}
 
@@ -397,4 +397,119 @@ void ScaleSurface(SDL_Surface *src, SDL_Surface *dst){
     free(p_src);
 
     return;
+}
+
+SDL_Surface * CopySurface(SDL_Surface *surface, Uint8 flag){
+
+    SDL_Surface *src = NULL;
+    SDL_Surface *dst = NULL;
+    SDL_Surface *result = NULL;
+    SDL_Rect rect;
+    Sint16 x, y, x2, y2;
+    Uint16 *ptrPixel;
+
+    if(!flag) return NULL;
+
+    if(NULL == (src = SDL_CreateRGBSurface(SDL_SWSURFACE, surface->w, surface->h, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "CopySurface: CreateRGBSurface failed: %s\n", SDL_GetError());
+        return NULL;
+    }
+    rect.x = 0;
+    rect.y = 0;
+    rect.w = surface->w;
+    rect.h = surface->h;
+    SDL_FillRect(src, NULL, COLORKEY);
+    SDL_BlitSurface(surface, &rect, src, &rect);
+
+    if(NULL == (dst = (flag & ANGLE_90 || flag & ANGLE_270 ? SDL_CreateRGBSurface(SDL_SWSURFACE, surface->h, surface->w, 16, 0, 0, 0, 0) : SDL_CreateRGBSurface(SDL_SWSURFACE, surface->w, surface->h, 16, 0, 0, 0, 0)))){
+        fprintf(stderr, "CopySurface: CreateRGBSurface failed: %s\n", SDL_GetError());
+        return NULL;
+    }
+
+    LockSurface(src);
+    switch(flag){
+	case FLIP_HORIZONTAL:
+	    y2 = 0;
+	    for(y = 0; y < dst->h; ++y){
+		x2 = 0;
+		for( x = dst->w - 1; x >= 0; --x){
+		    ptrPixel = (Uint16 *) dst->pixels + y * dst->pitch / 2 + x;
+		    *ptrPixel = *((Uint16 *) src->pixels + y2 * src->pitch / 2 + x2);
+		    ++x2;
+		}
+		++y2;
+	    }
+	    break;
+	case FLIP_VERTICAL:
+	    y2 = 0;
+	    for(y = dst->h - 1; y >= 0; --y){
+		x2 = 0;
+		for( x = 0; x < dst->w; ++x){
+		    ptrPixel = (Uint16 *) dst->pixels + y * dst->pitch / 2 + x;
+		    *ptrPixel = *((Uint16 *) src->pixels + y2 * src->pitch / 2 + x2);
+		    ++x2;
+		}
+		++y2;
+	    }
+	case ANGLE_90:
+	    y2 = 0;
+	    for(x = dst->w - 1; x >= 0; --x){
+		x2 = 0;
+		for(y = 0; y < dst->h; ++y){
+		    ptrPixel = (Uint16 *) dst->pixels + y * dst->pitch / 2 + x;
+		    *ptrPixel = *((Uint16 *) src->pixels + y2 * src->pitch / 2 + x2);
+		    ++x2;
+		}
+		++y2;
+	    }
+	    break;
+	case ANGLE_270:
+	    y2 = 0;
+	    for(x = 0; x < dst->w; ++x){
+		x2 = 0;
+		for(y = dst->h - 1; y >= 0; --y){
+		    ptrPixel = (Uint16 *) dst->pixels + y * dst->pitch / 2 + x;
+		    *ptrPixel = *((Uint16 *) src->pixels + y2 * src->pitch / 2 + x2);
+		    ++x2;
+		}
+		++y2;
+	    }
+	    break;
+	case FLIP_HORIZONTAL | FLIP_VERTICAL:
+	case ANGLE_180:
+	    y2 = 0;
+	    for(y = dst->h - 1; y >= 0; --y){
+		x2 = 0;
+		for(x = dst->w - 1; x >= 0; --x){
+		    ptrPixel = (Uint16 *) dst->pixels + y * dst->pitch / 2 + x;
+		    *ptrPixel = *((Uint16 *) src->pixels + y2 * src->pitch / 2 + x2);
+		    ++x2;
+		}
+		++y2;
+	    }
+	    break;
+	default:
+	    y2 = 0;
+	    for(y = 0; y < dst->h; ++y){
+		x2 = 0;
+		for( x = 0; x < dst->w; ++x){
+		    ptrPixel = (Uint16 *) dst->pixels + y * dst->pitch / 2 + x;
+		    *ptrPixel = *((Uint16 *) src->pixels + y2 * src->pitch / 2 + x2);
+		    ++x2;
+		}
+		++y2;
+	    }
+	    break;
+    }
+    UnlockSurface(src);
+    SDL_FreeSurface(src);
+    SDL_SetColorKey(dst, SDL_SRCCOLORKEY|SDL_RLEACCEL, COLORKEY);
+
+    if(NULL == (result = SDL_DisplayFormatAlpha(dst))){
+        fprintf(stderr, "CopySurface: SDL_DisplayFormatAlpha failed\n");
+        return NULL;
+    }
+    SDL_FreeSurface(dst);
+
+    return result;
 }

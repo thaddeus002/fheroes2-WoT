@@ -34,6 +34,9 @@
 #include "debug.h"
 #include "armyinfo.h"
 
+#define STRLEN	64
+#define NUMLEN	8
+
 ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *castle){
 
     SDL_Surface *video = SDL_GetVideoSurface();
@@ -45,10 +48,11 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     INTERFACEACTION *dialog = NULL;
     ACTION result = NONE;
     SDL_Rect rectBack, rect;
-    char str[64];
-    char message[8];
+    char str[STRLEN + 1];
+    char num[NUMLEN + 1];
     BOOL exit;
 
+    if(MONSTERNONE == army->monster) return NONE;
     if(GetIntValue(EVILINTERFACE)){ icnname = "VIEWARME.ICN"; }else{  icnname = "VIEWARMY.ICN"; }
 
     CursorOff();
@@ -91,15 +95,15 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, monster->descriptions, FONT_BIG);
 
     // количество
-    sprintf(message, "%5d", army->count);
+    snprintf(num, NUMLEN, "%5d", army->count);
     rect.x = rectBack.x + 120;
     rect.y = rectBack.y + 224;
-    rect.w = GetLengthText(message, FONT_BIG);
+    rect.w = GetLengthText(num, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
-    PrintText(video, &rect, message, FONT_BIG);
+    PrintText(video, &rect, num, FONT_BIG);
 
     // attack
-    sprintf(str, "Attack Skill: %d", monster->attack);
+    snprintf(str, STRLEN, "%s: %d", GetStringAttackSkill(), monster->attack);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -108,7 +112,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, str, FONT_BIG);
 
     // defence
-    sprintf(str, "Defense Skill: %d", monster->defence);
+    snprintf(str, STRLEN, "%s: %d", GetStringDefenseSkill(), monster->defence);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG + FONT_HEIGHTBIG / 4;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -117,7 +121,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, str, FONT_BIG);
 
     // shot
-    sprintf(str, "Shots: %d", monster->shots);
+    snprintf(str, STRLEN, "Shots: %d", monster->shots);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 2 + FONT_HEIGHTBIG / 4 * 2;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -126,7 +130,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, str, FONT_BIG);
 
     // damage
-    sprintf(str, "Damage: %d - %d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damage: %d - %d", monster->damageMin, monster->damageMax);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 3 + FONT_HEIGHTBIG / 4 * 3;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -135,7 +139,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, str, FONT_BIG);
 
     // hp
-    sprintf(str, "Hit Points: %d", monster->hp);
+    snprintf(str, STRLEN, "Hit Points: %d", monster->hp);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 4 + FONT_HEIGHTBIG / 4 * 4;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -144,7 +148,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, str, FONT_BIG);
 
     // speed
-    sprintf(str, "Speed: %s", GetStringSpeed(monster->speed));
+    snprintf(str, STRLEN, "Speed: %s", GetStringSpeed(monster->speed));
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 5 + FONT_HEIGHTBIG / 4 * 5;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -153,7 +157,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, str, FONT_BIG);
 
     // morale
-    heroes ? sprintf(str, "Morale: %s", GetStringMorale(CalculateHeroesMorale(heroes))) : sprintf(str, "Morale: Normal");
+    heroes ? snprintf(str, STRLEN, "Morale: %s", GetStringMorale(CalculateHeroesMorale(heroes))) : snprintf(str, STRLEN, "Morale: Normal");
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 6 + FONT_HEIGHTBIG / 4 * 6;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -162,7 +166,7 @@ ACTION ShowArmyInfo(const S_ARMY *army, const S_HEROES *heroes, const S_CASTLE *
     PrintText(video, &rect, str, FONT_BIG);
 
     // luck
-    heroes ? sprintf(str, "Luck: %s", GetStringLuck(CalculateHeroesLuck(heroes))) : sprintf(str, "Luck: Normal");
+    heroes ? snprintf(str, STRLEN, "Luck: %s", GetStringLuck(CalculateHeroesLuck(heroes))) : snprintf(str, STRLEN, "Luck: Normal");
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 7 + FONT_HEIGHTBIG / 4 * 7;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -301,10 +305,11 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     ACTION result = NONE;
     SDL_Rect rectBack, rect;
     SDL_Event event;
-    char str[64];
-    char message[8];
+    char str[STRLEN + 1];
+    char num[NUMLEN + 1];
     BOOL exit;
 
+    if(MONSTERNONE == army->monster) return NONE;
     if(GetIntValue(EVILINTERFACE)){ icnname = "VIEWARME.ICN"; }else{  icnname = "VIEWARMY.ICN"; }
 
     CursorOff();
@@ -347,15 +352,15 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, monster->descriptions, FONT_BIG);
 
     // количество
-    sprintf(message, "%5d", army->count);
+    snprintf(num, NUMLEN, "%5d", army->count);
     rect.x = rectBack.x + 120;
     rect.y = rectBack.y + 224;
-    rect.w = GetLengthText(message, FONT_BIG);
+    rect.w = GetLengthText(num, FONT_BIG);
     rect.h = FONT_HEIGHTBIG;
-    PrintText(video, &rect, message, FONT_BIG);
+    PrintText(video, &rect, num, FONT_BIG);
 
     // attack
-    sprintf(str, "Attack Skill: %d", monster->attack);
+    snprintf(str, STRLEN, "%s: %d", GetStringAttackSkill(), monster->attack);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -364,7 +369,7 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, str, FONT_BIG);
 
     // defence
-    sprintf(str, "Defense Skill: %d", monster->defence);
+    snprintf(str, STRLEN, "%s: %d", GetStringDefenseSkill(), monster->defence);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG + FONT_HEIGHTBIG / 2;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -373,7 +378,7 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, str, FONT_BIG);
 
     // shot
-    sprintf(str, "Shots: %d", monster->shots);
+    snprintf(str, STRLEN, "Shots: %d", monster->shots);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 2 + FONT_HEIGHTBIG / 2 * 2;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -382,7 +387,7 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, str, FONT_BIG);
 
     // damage
-    sprintf(str, "Damage: %d - %d", monster->damageMin, monster->damageMax);
+    snprintf(str, STRLEN, "Damage: %d - %d", monster->damageMin, monster->damageMax);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 3 + FONT_HEIGHTBIG / 2 * 3;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -391,7 +396,7 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, str, FONT_BIG);
 
     // hp
-    sprintf(str, "Hit Points: %d", monster->hp);
+    snprintf(str, STRLEN, "Hit Points: %d", monster->hp);
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 4 + FONT_HEIGHTBIG / 2 * 4;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -400,7 +405,7 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, str, FONT_BIG);
 
     // speed
-    sprintf(str, "Speed: %s", GetStringSpeed(monster->speed));
+    snprintf(str, STRLEN, "Speed: %s", GetStringSpeed(monster->speed));
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 5 + FONT_HEIGHTBIG / 2 * 5;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -409,7 +414,7 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, str, FONT_BIG);
 
     // morale
-    heroes ? sprintf(str, "Morale: %s", GetStringMorale(CalculateHeroesMorale(heroes))) : sprintf(str, "Morale: Normal");
+    heroes ? snprintf(str, STRLEN, "Morale: %s", GetStringMorale(CalculateHeroesMorale(heroes))) : snprintf(str, STRLEN, "Morale: Normal");
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 6 + FONT_HEIGHTBIG / 2 * 6;
     rect.w = GetLengthText(str, FONT_BIG);
@@ -418,7 +423,7 @@ ACTION ShowArmyInfoRight(const S_ARMY *army, const S_HEROES *heroes){
     PrintText(video, &rect, str, FONT_BIG);
 
     // luck
-    heroes ? sprintf(str, "Luck: %s", GetStringLuck(CalculateHeroesLuck(heroes))) : sprintf(str, "Luck: Normal");
+    heroes ? snprintf(str, STRLEN, "Luck: %s", GetStringLuck(CalculateHeroesLuck(heroes))) : snprintf(str, STRLEN, "Luck: Normal");
     rect.x = rectBack.x + 400;
     rect.y = rectBack.y + 35 + FONT_HEIGHTBIG * 7 + FONT_HEIGHTBIG / 2 * 7;
     rect.w = GetLengthText(str, FONT_BIG);

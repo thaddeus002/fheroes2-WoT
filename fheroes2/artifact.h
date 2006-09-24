@@ -46,6 +46,7 @@ typedef enum {
 	    } E_LEVELARTIFACT;
 
 typedef enum {
+		ARTIFACTNONE,
 		ULTIMATE_BOOK,
 		ULTIMATE_SWORD,
 		ULTIMATE_CLOAK,
@@ -155,19 +156,12 @@ typedef enum {
 		RND_ARTIFACT2		= 169,
 		RND_ARTIFACT3		= 171,
 		
-		ARTIFACTNONE
 	    } E_ARTIFACT;
-
-typedef struct {
-		BOOL		use;
-		const char *	name;
-		const char *	descriptions;
-	    } S_ARTIFACT;
 
 BOOL		InitArtifact(void);
 void		FreeArtifact(void);
-S_ARTIFACT *	GetStatArtifact(E_ARTIFACT);
 const char * 	GetStringArtifact(E_ARTIFACT);
+const char * 	GetStringDescriptionsArtifact(E_ARTIFACT);
 E_ARTIFACT	GetRNDArtifact(E_LEVELARTIFACT);
 E_ARTIFACT	CheckValidArtifact(Uint8);
 

@@ -972,9 +972,8 @@ void DrawNCRMMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	    cur.w = 80;
 	    break;
 	case MAGIC_LEVEL2:
-	    cur.x += 260;
+	    cur.x += 250;
 	    cur.w = 80;
-	    cur.h = 70;
 	    break;
 	case MAGIC_LEVEL3:
 	    cur.x += 250;

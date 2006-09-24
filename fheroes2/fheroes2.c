@@ -43,6 +43,8 @@
 #include "spell.h"
 #include "artifact.h"
 
+#define CAPTIONLEN	36
+
 int main(int argc, char **argv){
 
     char *config_file = NULL;
@@ -53,9 +55,10 @@ int main(int argc, char **argv){
     BOOL debug = FALSE;
     int c;
 
-    char caption[64];
-    sprintf(caption, "Free Heroes II, version: %d", VERSION);
-    fprintf(stderr, "Free Heroes II, version: %d\n", VERSION);
+    char caption[CAPTIONLEN + 1];
+    snprintf(caption, CAPTIONLEN, "Free Heroes II, version: %d", VERSION);
+    fprintf(stderr, caption);
+    fprintf(stderr, "\n");
 
     while((c = getopt(argc, argv, "dhc:")) != -1)
 	switch (c){
