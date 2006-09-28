@@ -62,7 +62,7 @@ ACTION  ShowMagicBook(const S_HEROES *hero){
 
     SetIntValue(ANIM2, FALSE);
 
-    SDL_Surface *back, *leftList, *rightList, *image, *video;
+    SDL_Surface *back, *image, *video;
     SDL_Rect rectBack, rect;
     Uint16 cx, cy;
     AGGSPRITE sprite;
@@ -78,12 +78,12 @@ ACTION  ShowMagicBook(const S_HEROES *hero){
 
     // правый лист книги
     FillSPRITE(&sprite, "BOOK.ICN", 0);
-    rightList = GetICNSprite(&sprite);
+    image = GetICNSprite(&sprite);
    // отрисовка диалога по центру экрана
-    rectBack.x = (video->w - 2 * rightList->w) / 2;
-    rectBack.y = (video->h - rightList->h) / 2;
-    rectBack.w = 2 * rightList->w;
-    rectBack.h = rightList->h + 50; // увеличили на высоту закладки
+    rectBack.x = (video->w - 2 * image->w) / 2;
+    rectBack.y = (video->h - image->h) / 2;
+    rectBack.w = 2 * image->w;
+    rectBack.h = image->h + 50; // увеличили на высоту закладки
     cx = rectBack.x;
     cy = rectBack.y;
 
@@ -95,19 +95,19 @@ ACTION  ShowMagicBook(const S_HEROES *hero){
     SDL_BlitSurface(video, &rectBack, back, NULL);
 
     // правый лист книги
-    rect.x = cx + rightList->w;
+    rect.x = cx + image->w;
     rect.y = cy;
-    rect.w = rightList->w;
-    rect.h = rightList->h;
-    SDL_BlitSurface(rightList, NULL, video, &rect);
+    rect.w = image->w;
+    rect.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rect);
 
     // левый лист книги
-    if(NULL == (leftList = CopySurface(rightList, FLIP_HORIZONTAL))) return NONE;
+    image = GetReflectICNSprite(&sprite);
     rect.x = cx;
     rect.y = cy;
-    rect.w = leftList->w;
-    rect.h = leftList->h;
-    SDL_BlitSurface(leftList, NULL, video, &rect);
+    rect.w = image->w;
+    rect.h = image->h;
+    SDL_BlitSurface(image, NULL, video, &rect);
 
     // закладка info spell points
     FillSPRITE(&sprite, "BOOK.ICN", 6);
@@ -221,7 +221,6 @@ ACTION  ShowMagicBook(const S_HEROES *hero){
     SDL_BlitSurface(back, NULL, video, &rectBack);
 
     FreeActionEvent(dialog);
-    SDL_FreeSurface(leftList);
     SDL_FreeSurface(back);
 
     CursorOn();

@@ -261,6 +261,7 @@ BOOL AddICN(void **ptr, INSIDEICNHEADER *hdr, INSIDEICNSPRITE *hdrspr){
 	head->next = NULL;
 	head->offsetX = hdrspr[i].offsetX;
 	head->offsetY = hdrspr[i].offsetY;
+	head->reflect = NULL;
 
 	Uint16 rmask, gmask, bmask, amask;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -455,6 +456,7 @@ void FreeAGG(){
 			hi = ti;
 			ti = (ICNHEADER *) ti->next;
 			if(hi->surface) SDL_FreeSurface(hi->surface);
+			if(hi->reflect) SDL_FreeSurface(hi->reflect);
 			free(hi);
 		    }
 
@@ -629,16 +631,38 @@ void PreloadObject(const char *object){
 void FreeObject(const char *name){
 
     AGGDATA *ptr = GetHeaderAGGName(name);
+    ICNHEADER *hi = NULL, *ti = NULL;
+    SDL_AudioCVT *ptrCVT = NULL;
 
     switch(ptr->type){
     
 	case WAV:
+	    if(NULL == ptr->data) break;
+	    ptrCVT = (SDL_AudioCVT *) ptr->data;
+	    if(ptrCVT->buf) free(ptrCVT->buf);
+	    free(ptr->data);
+	    sizeMemory -= ptr->size;
+	    ptr->data = NULL;
+	    break;
+
+	case ICN:
+	    if(NULL == ptr->data) break;
+	    ti = (ICNHEADER *) ptr->data;
+	    while(ti != NULL){
+		hi = ti;
+		ti = (ICNHEADER *) ti->next;
+		if(hi->surface) SDL_FreeSurface(hi->surface);
+		if(hi->reflect) SDL_FreeSurface(hi->reflect);
+		free(hi);
+	    }
+	    ptr->data = NULL;
+	    sizeMemory -= ptr->size;
 	    break;
 
 	case TIL:
-	    if(ptrAGG->data) free(ptrAGG->data);
-	    ptrAGG->data = NULL;
-	    sizeMemory -= ptrAGG->size;
+	    if(ptr->data) free(ptr->data);
+	    ptr->data = NULL;
+	    sizeMemory -= ptr->size;
 	    break;
 
 	default:
@@ -650,4 +674,89 @@ void FreeObject(const char *name){
 Uint32 GetCurrentSizeMemory(void){
 
     return sizeMemory;
+}
+
+SDL_Surface *GetReflectICNSprite(AGGSPRITE *object){
+
+    AGGDATA *ptrAGGData = NULL;
+    Sint16 y, x, y2, x2;
+    Uint16 *ptrPixel;
+
+    if(1 > strlen(object->name)) return NULL;
+
+    if(NULL == (ptrAGGData = GetHeaderAGGName(object->name))){
+	fprintf(stderr, "GetReflectICNSprite object not found: %s, %d\n", object->name, object->number);
+	return NULL;
+    }
+
+    if(ptrAGGData->type != ICN){
+	fprintf(stderr, "GetReflectICNSprite error: type not ICN, name %s\n", object->name);
+	return NULL;
+    }
+
+    // загружаем
+    if(ptrAGGData->data == NULL) PreloadObject(object->name);
+
+    // если существуют данные
+    if(ptrAGGData->data){
+
+	if(object->number > ptrAGGData->count){
+	    fprintf(stderr, "GetReflectICNSprite error: name %s, number %d, > count %d\n", object->name, object->number, ptrAGGData->count);
+	    object->number = ptrAGGData->count;
+	}
+
+	// увеличиваем приоритет
+	++ptrAGGData->life;
+
+	// возвращаем результат
+	ICNHEADER *ptr = (ICNHEADER *) ptrAGGData->data;
+
+	Uint16 number = object->number;
+
+	while(number--)
+	    if(ptr->next) ptr = (ICNHEADER *) ptr->next;
+
+	if(ptr->reflect) return ptr->reflect;
+	
+	// reflect surface
+	SDL_Surface *src = NULL;
+	if(NULL == (src = SDL_CreateRGBSurface(SDL_SWSURFACE, ptr->surface->w, ptr->surface->h, 16, 0, 0, 0, 0))){
+	    fprintf(stderr, "CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), ptr->surface->w, ptr->surface->h);
+	    return NULL;
+	}
+
+	SDL_FillRect(src, NULL, COLORKEY);
+	SDL_BlitSurface(ptr->surface, NULL, src, NULL);
+
+	SDL_Surface *dst = NULL;
+	if(NULL == (dst = SDL_CreateRGBSurface(SDL_SWSURFACE, src->w, src->h, 16, 0, 0, 0, 0))){
+	    fprintf(stderr, "CreateRGBSurface failed: %s, %d, %d\n", SDL_GetError(), src->w, src->h);
+	    return NULL;
+	}
+
+	LockSurface(src);
+	LockSurface(dst);
+	y2 = 0;
+        for(y = 0; y < dst->h; ++y){
+            x2 = 0;
+            for(x = dst->w - 1; x >= 0; --x){
+                ptrPixel = (Uint16 *) dst->pixels + y * dst->pitch / 2 + x;
+                *ptrPixel = *((Uint16 *) src->pixels + y2 * src->pitch / 2 + x2);
+                ++x2;
+            }
+    	    ++y2;
+        }
+	UnlockSurface(src);
+	UnlockSurface(dst);
+	SDL_FreeSurface(src);
+
+	SDL_SetColorKey(dst, SDL_SRCCOLORKEY|SDL_RLEACCEL, COLORKEY);
+	ptr->reflect = SDL_DisplayFormatAlpha(dst);
+	SDL_FreeSurface(dst);
+
+	return ptr->reflect;
+    }
+
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetReflectICNSprite error: return NULL\n");
+    return NULL;
 }

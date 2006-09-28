@@ -45,6 +45,7 @@ typedef struct {
     Sint16      offsetX;
     Sint16      offsetY;
     SDL_Surface *surface;
+    SDL_Surface *reflect;
     void        *next;
 } ICNHEADER;
 
@@ -56,6 +57,7 @@ void		FreeObject(const char *);
 SDL_Surface *   GetICNSprite(AGGSPRITE *);
 ICNHEADER *     GetICNHeader(AGGSPRITE *);
 Uint8 *		GetTILData(const char *);
+SDL_Surface *   GetReflectICNSprite(AGGSPRITE *);
 
 SDL_AudioCVT *  GetAudioCVT(const char *);
 

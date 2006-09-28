@@ -197,7 +197,6 @@ typedef struct {
 typedef struct { 
 		E_RACE          race;
 		const char *	name;
-		SDL_Surface *	face;
 		E_COLORS	color;
 		Uint8           attack;
 		Uint8           defence;
@@ -216,7 +215,8 @@ typedef struct {
 		Uint8		ax;
 		Uint8		ay;
 		Uint16		visit;
-		SDL_Surface *	image;
+		BOOL		employ;
+		E_VECTOR	vector;
 	    } S_HEROES;
 
 BOOL		InitHeroes(void);
@@ -250,5 +250,8 @@ BOOL		HeroesAddSpell(const S_HEROES *, E_SPELL);
 
 Uint8		GetHeroesLevel(const S_HEROES *);
 Uint32		GetHeroesRestLevel(const S_HEROES *);
+
+SDL_Surface *	GetSpriteHeroes(E_VECTOR, E_RACE);
+E_NAMEHEROES	RecrutHeroes(E_NAMEHEROES, E_RACE);
 
 #endif

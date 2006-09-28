@@ -223,7 +223,6 @@ void	FreeHeroes(void){
 
 void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 
-    AGGSPRITE sprite;
     Uint8 i = 0;
 
     for(i = 0; i < HEROESMAXSKILL; ++i){
@@ -259,7 +258,6 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].monster	= PEASANT;
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ARCHER);
 	    heroes->army[1].monster	= ARCHER;
-	    FillSPRITE(&sprite, "KNGT32.ICN", 18);
 	    break;
 	    
 	case BARBARIAN:
@@ -275,7 +273,6 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[0].monster	= GOBLIN;
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, ORC);
 	    heroes->army[1].monster	= ORC;
-	    FillSPRITE(&sprite, "BARB32.ICN", 18);
 	    break;
 
         case NECROMANCER:
@@ -295,7 +292,6 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[1].monster	= ZOMBIE;
 	    heroes->artifact[0]		= MAGIC_BOOK;
 	    heroes->book[0]		= HASTE;
-	    FillSPRITE(&sprite, "NECR32.ICN", 18);
 	    break;
 
         case SORCERESS:
@@ -315,7 +311,6 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[1].monster	= DWARF;
 	    heroes->artifact[0]		= MAGIC_BOOK;
 	    heroes->book[0]		= BLESS;
-	    FillSPRITE(&sprite, "SORC32.ICN", 18);
 	    break;
 
         case WARLOCK:
@@ -335,7 +330,6 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[1].monster	= GARGOYLE;
 	    heroes->artifact[0]		= MAGIC_BOOK;
 	    heroes->book[0]		= CURSE;
-	    FillSPRITE(&sprite, "WRLK32.ICN", 18);
 	    break;
 
         case WIZARD:
@@ -353,14 +347,12 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
 	    heroes->army[1].count	= GetMonsterGrownCastle(NULL, BOAR);
 	    heroes->army[1].monster	= BOAR;
 	    heroes->book[0]		= STONESKIN;
-	    FillSPRITE(&sprite, "WZRD32.ICN", 18);
 	    break;
 
 	default:
 	    break;
     }
 
-    heroes->image	= GetICNSprite(&sprite);
     heroes->morale	= MORALE_NORMAL;
     heroes->luck	= LUCK_NORMAL;
     heroes->experience	= 0;
@@ -368,6 +360,10 @@ void HeroesDefaultValues(S_HEROES *heroes, E_RACE race){
     heroes->movePoint	= 0;
     heroes->af		= SPREAD;
     heroes->visit	= 0;
+    heroes->vector	= WEST;
+    heroes->ax		= 0xFF;
+    heroes->ay		= 0xFF;
+    heroes->employ	= FALSE;
 }
 
 E_LEVELSKILL HeroesLevelSkill(const S_HEROES *heroes, E_SKILL skill){
@@ -1067,4 +1063,78 @@ BOOL HeroesAddSpell(const S_HEROES *heroes, E_SPELL spell){
     if(ptrSpell < &heroes->book[0] + SPELLMAXCOUNT) *ptrSpell = spell;
 
     return TRUE;
+}
+
+SDL_Surface *GetSpriteHeroes(E_VECTOR vector, E_RACE race){
+
+    AGGSPRITE sprite;
+    Uint8 index = 18;
+    BOOL reflect = FALSE;
+    const char *icnsprite = NULL;
+
+    switch(vector){
+	case NORD:
+	    index = 0;
+	    break;
+	case NORD_WEST:
+	    index = 9;
+	    break;
+	case WEST:
+	    index = 18;
+	    break;
+	case SOUTH_WEST:
+	    index = 27;
+	    break;
+	case SOUTH:
+	    index = 36;
+	    break;
+	case SOUTH_EAST:
+	    index = 27;
+	    reflect = TRUE;
+	    break;
+	case EAST:
+	    index = 18;
+	    reflect = TRUE;
+	    break;
+	case NORD_EAST:
+	    index = 9;
+	    reflect = TRUE;
+	    break;
+    }
+
+    switch(race){
+	case KNIGHT:
+	    icnsprite = "KNGT32.ICN";
+	    break;
+	case BARBARIAN:
+	    icnsprite = "BARB32.ICN";
+	    break;
+	case NECROMANCER:
+	    icnsprite = "NECR32.ICN";
+	    break;
+	case SORCERESS:
+	    icnsprite = "SORC32.ICN";
+	    break;
+	case WARLOCK:
+	    icnsprite = "WRLK32.ICN";
+	    break;
+	case WIZARD:
+	    icnsprite = "WZRD32.ICN";
+	    break;
+	default:
+	    return NULL;
+	    break;
+    }
+
+    FillSPRITE(&sprite, icnsprite, index);
+
+    return (reflect ? GetReflectICNSprite(&sprite) : GetICNSprite(&sprite));
+}
+
+E_NAMEHEROES RecrutHeroes(E_NAMEHEROES name, E_RACE race){
+
+    // HEROESNULL - start game, rnd race heroes
+    // else buy heroes
+
+    return 0;
 }

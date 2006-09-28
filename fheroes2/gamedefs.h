@@ -31,7 +31,7 @@
 
 #include "SDL.h"
 
-#define VERSION 20060915
+#define VERSION 20060928
 
 typedef enum { FALSE=0, TRUE=1 } BOOL;
 
@@ -59,6 +59,18 @@ typedef enum { FALSE=0, TRUE=1 } BOOL;
 #define GOLD_TOWN_DAY		750
 #define GOLD_STATUE_DAY		250
 #define GOLD_DUNGEON_DAY	500
+
+typedef enum {
+                NORD,
+                NORD_WEST,
+                WEST,
+                SOUTH_WEST,
+                SOUTH,
+                SOUTH_EAST,
+                EAST,
+                NORD_EAST
+
+            } E_VECTOR;
 
 typedef enum {
                 DESERT,
