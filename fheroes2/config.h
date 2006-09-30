@@ -57,9 +57,16 @@ typedef enum {
 		ALLOWCOLORS,
 		RNDCOLORS,
 		HUMANCOLORS,
+		RACEBLUE,
+		RACEGREEN,
+		RACERED,
+		RACEYELLOW,
+		RACEORANGE,
+		RACEPURPLE,
 		MONTH,
 		WEEK,
 		DAY,
+		STARTHEROESCASTLE,
 
 		ANIM1,
 		ANIM2,
@@ -70,7 +77,8 @@ typedef enum {
 		CONFIGEND
 } E_CONFIG;
 
-void InitConfig(const char *);
+BOOL InitConfig(const char *);
+void FreeConfig(void);
 
 char	*GetStrValue(E_CONFIG);
 Uint8	GetIntValue(E_CONFIG);

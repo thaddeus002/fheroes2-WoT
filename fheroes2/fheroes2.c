@@ -91,7 +91,9 @@ int main(int argc, char **argv){
 
     // инициализация переопределенных конфигурационных парамертов
     if(NULL == config_file) config_file = "fheroes2.cfg";
-    InitConfig(config_file);
+
+    if(! InitConfig(config_file)) exit(1);
+
     if(debug) SetIntValue(DEBUG, debug);
 
     Uint32 flags;
@@ -182,6 +184,8 @@ int main(int argc, char **argv){
 	FreeSound();
 	FreeAGG();
     }
+
+    FreeConfig();
 
     fprintf(stderr, "Free all resource.\nBye!\n");
     exit(0);

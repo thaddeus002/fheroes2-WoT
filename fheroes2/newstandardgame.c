@@ -56,6 +56,12 @@ ACTION	ActionSelectDifficultyHard(void);
 ACTION	ActionSelectDifficultyExpert(void);
 ACTION	ActionSelectDifficultyImpossible(void);
 ACTION	ActionClickSelectColor(void);
+ACTION	ActionClickSelectRaceBlue(void);
+ACTION	ActionClickSelectRaceGreen(void);
+ACTION	ActionClickSelectRaceRed(void);
+ACTION	ActionClickSelectRaceYellow(void);
+ACTION	ActionClickSelectRaceOrange(void);
+ACTION	ActionClickSelectRacePurple(void);
 
 INTERFACEACTION *stpenewstandard = NULL;
 
@@ -451,12 +457,15 @@ void DrawMapsOpponents(void){
 }
 
 void DrawMapsClass(void){
-/*
+
     SDL_Surface *video = SDL_GetVideoSurface();
     SDL_Surface *image;
     SDL_Rect dest;
 
     AGGSPRITE sprite;
+    INTERFACEACTION action;
+
+    RemoveActionLevelEvent(stpenewstandard, LEVELEVENT_SELECTRACE);
     
     // text
     dest.x = 386;
@@ -468,33 +477,70 @@ void DrawMapsClass(void){
     Uint8 i;
     Uint8 count = 0;
     Uint8 current = 0;
+    E_COLORS color;
     
     for(i = 0; i < 8; ++i)
         if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
 
     if(! count) return;
 
-    for(i = 0; i < 8; ++i)
-        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
+    for(color = BLUE; color < GRAY; ++color){
+    
+	ZeroINTERFACEACTION(&action);
+	switch(color){
+	    case BLUE:
+		i = GetIntValue(RACEBLUE);
+		action.pf = ActionClickSelectRaceBlue;
+		break;
+	    case GREEN:
+		i = GetIntValue(RACEGREEN);
+		action.pf = ActionClickSelectRaceGreen;
+		break;
+	    case RED:
+		i = GetIntValue(RACERED);
+		action.pf = ActionClickSelectRaceRed;
+		break;
+	    case YELLOW:
+		i = GetIntValue(RACEYELLOW);
+		action.pf = ActionClickSelectRaceYellow;
+		break;
+	    case ORANGE:
+		i = GetIntValue(RACEORANGE);
+		action.pf = ActionClickSelectRaceOrange;
+		break;
+	    case PURPLE:
+		i = GetIntValue(RACEPURPLE);
+		action.pf = ActionClickSelectRacePurple;
+		break;
+	    default:
+		i = 0x07;
+		break;
+	}
 
-	    if((GetIntValue(RNDCOLORS) >> i) & 0x01)
-		FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
-	    else if((GetIntValue(ALLOWCOLORS) >> i) & 0x01)
-		FillSPRITE(&sprite, "NGEXTRA.ICN", 51 + i);
-	    else
-		FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + i);
+	// 00 - kngt, 01 - barb, 02 - sorc, 03 - wrlk, 04 - wzrd, 05 - necr, 06 - mult, 07 - rnd, ff - none
+	if(0xFF == i)
+	    continue;
+	else if(0x07 == i)
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	else
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 70 + i);
 
-	    image = GetICNSprite(&sprite);
+	image = GetICNSprite(&sprite);
 
-	    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
-	    dest.y = 314;
-	    dest.w = image->w;
-	    dest.h = image->h;
+	dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+	dest.y = 314;
+	dest.w = image->w;
+	dest.h = image->h;
 
-	    SDL_BlitSurface(image, NULL, video, &dest);
-	    ++current;
+	SDL_BlitSurface(image, NULL, video, &dest);
+
+	action.rect = dest;
+	action.mouseEvent = MOUSE_LCLICK;
+	action.level = LEVELEVENT_SELECTCOLOR;
+	if(i == 0x07) AddActionEvent(&stpenewstandard, &action);
+
+	++current;
     }
-*/
 }
 
 ACTION ActionSelectDifficultyEasy(void){
@@ -629,6 +675,570 @@ ACTION	ActionClickSelectColor(void){
     
     CursorOn();
     SetIntValue(HUMANCOLORS, human);
+
+    return NONE;
+}
+
+ACTION	ActionClickSelectRaceBlue(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+    AGGSPRITE sprite;
+
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    E_COLORS color;
+
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
+
+    if(! count) return NONE;
+
+    for(color = BLUE; color < BLUE; ++color){
+	switch(color){
+	    case BLUE:
+		i = GetIntValue(RACEBLUE);
+		break;
+	    case GREEN:
+		i = GetIntValue(RACEGREEN);
+		break;
+	    case RED:
+		i = GetIntValue(RACERED);
+		break;
+	    case YELLOW:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case ORANGE:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case PURPLE:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    default:
+		i = 0x07;
+		break;
+	}
+	if(0xFF == i) continue;
+	++current;
+    }
+
+    switch(GetIntValue(RACEBLUE)){
+
+	case 0x07:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51);
+	    SetIntValue(RACEBLUE, 0x00);
+	    break;
+	case 0x00:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 52);
+	    SetIntValue(RACEBLUE, 0x01);
+	    break;
+	case 0x01:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 53);
+	    SetIntValue(RACEBLUE, 0x02);
+	    break;
+	case 0x02:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 54);
+	    SetIntValue(RACEBLUE, 0x03);
+	    break;
+	case 0x03:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 55);
+	    SetIntValue(RACEBLUE, 0x04);
+	    break;
+	case 0x04:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 56);
+	    SetIntValue(RACEBLUE, 0x05);
+	    break;
+	case 0x05:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    SetIntValue(RACEBLUE, 0x07);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    image = GetICNSprite(&sprite);
+
+    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+    dest.y = 314;
+    dest.w = image->w;
+    dest.h = image->h;
+
+    CursorOff();
+    SDL_BlitSurface(image, NULL, video, &dest);
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionClickSelectRaceGreen(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+    AGGSPRITE sprite;
+
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    E_COLORS color;
+
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
+
+    if(! count) return NONE;
+
+    for(color = BLUE; color < GREEN; ++color){
+	switch(color){
+	    case BLUE:
+		i = GetIntValue(RACEGREEN);
+		break;
+	    case GREEN:
+		i = GetIntValue(RACEGREEN);
+		break;
+	    case RED:
+		i = GetIntValue(RACERED);
+		break;
+	    case YELLOW:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case ORANGE:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case PURPLE:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    default:
+		i = 0x07;
+		break;
+	}
+	if(0xFF == i) continue;
+	++current;
+    }
+
+    switch(GetIntValue(RACEGREEN)){
+
+	case 0x07:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51);
+	    SetIntValue(RACEGREEN, 0x00);
+	    break;
+	case 0x00:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 52);
+	    SetIntValue(RACEGREEN, 0x01);
+	    break;
+	case 0x01:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 53);
+	    SetIntValue(RACEGREEN, 0x02);
+	    break;
+	case 0x02:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 54);
+	    SetIntValue(RACEGREEN, 0x03);
+	    break;
+	case 0x03:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 55);
+	    SetIntValue(RACEGREEN, 0x04);
+	    break;
+	case 0x04:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 56);
+	    SetIntValue(RACEGREEN, 0x05);
+	    break;
+	case 0x05:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    SetIntValue(RACEGREEN, 0x07);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    image = GetICNSprite(&sprite);
+
+    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+    dest.y = 314;
+    dest.w = image->w;
+    dest.h = image->h;
+
+    CursorOff();
+    SDL_BlitSurface(image, NULL, video, &dest);
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionClickSelectRaceRed(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+    AGGSPRITE sprite;
+
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    E_COLORS color;
+
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
+
+    if(! count) return NONE;
+
+    for(color = BLUE; color < RED; ++color){
+	switch(color){
+	    case BLUE:
+		i = GetIntValue(RACERED);
+		break;
+	    case GREEN:
+		i = GetIntValue(RACEGREEN);
+		break;
+	    case RED:
+		i = GetIntValue(RACERED);
+		break;
+	    case YELLOW:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case ORANGE:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case PURPLE:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    default:
+		i = 0x07;
+		break;
+	}
+	if(0xFF == i) continue;
+	++current;
+    }
+
+    switch(GetIntValue(RACERED)){
+
+	case 0x07:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51);
+	    SetIntValue(RACERED, 0x00);
+	    break;
+	case 0x00:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 52);
+	    SetIntValue(RACERED, 0x01);
+	    break;
+	case 0x01:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 53);
+	    SetIntValue(RACERED, 0x02);
+	    break;
+	case 0x02:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 54);
+	    SetIntValue(RACERED, 0x03);
+	    break;
+	case 0x03:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 55);
+	    SetIntValue(RACERED, 0x04);
+	    break;
+	case 0x04:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 56);
+	    SetIntValue(RACERED, 0x05);
+	    break;
+	case 0x05:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    SetIntValue(RACERED, 0x07);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    image = GetICNSprite(&sprite);
+
+    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+    dest.y = 314;
+    dest.w = image->w;
+    dest.h = image->h;
+
+    CursorOff();
+    SDL_BlitSurface(image, NULL, video, &dest);
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionClickSelectRaceYellow(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+    AGGSPRITE sprite;
+
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    E_COLORS color;
+
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
+
+    if(! count) return NONE;
+
+    for(color = BLUE; color < YELLOW; ++color){
+	switch(color){
+	    case BLUE:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case GREEN:
+		i = GetIntValue(RACEGREEN);
+		break;
+	    case RED:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case YELLOW:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case ORANGE:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case PURPLE:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    default:
+		i = 0x07;
+		break;
+	}
+	if(0xFF == i) continue;
+	++current;
+    }
+
+    switch(GetIntValue(RACEYELLOW)){
+
+	case 0x07:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51);
+	    SetIntValue(RACEYELLOW, 0x00);
+	    break;
+	case 0x00:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 52);
+	    SetIntValue(RACEYELLOW, 0x01);
+	    break;
+	case 0x01:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 53);
+	    SetIntValue(RACEYELLOW, 0x02);
+	    break;
+	case 0x02:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 54);
+	    SetIntValue(RACEYELLOW, 0x03);
+	    break;
+	case 0x03:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 55);
+	    SetIntValue(RACEYELLOW, 0x04);
+	    break;
+	case 0x04:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 56);
+	    SetIntValue(RACEYELLOW, 0x05);
+	    break;
+	case 0x05:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    SetIntValue(RACEYELLOW, 0x07);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    image = GetICNSprite(&sprite);
+
+    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+    dest.y = 314;
+    dest.w = image->w;
+    dest.h = image->h;
+
+    CursorOff();
+    SDL_BlitSurface(image, NULL, video, &dest);
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionClickSelectRaceOrange(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+    AGGSPRITE sprite;
+
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    E_COLORS color;
+
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
+
+    if(! count) return NONE;
+
+    for(color = BLUE; color < ORANGE; ++color){
+	switch(color){
+	    case BLUE:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case GREEN:
+		i = GetIntValue(RACEGREEN);
+		break;
+	    case RED:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case YELLOW:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case ORANGE:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case PURPLE:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    default:
+		i = 0x07;
+		break;
+	}
+	if(0xFF == i) continue;
+	++current;
+    }
+
+    switch(GetIntValue(RACEORANGE)){
+
+	case 0x07:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51);
+	    SetIntValue(RACEORANGE, 0x00);
+	    break;
+	case 0x00:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 52);
+	    SetIntValue(RACEORANGE, 0x01);
+	    break;
+	case 0x01:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 53);
+	    SetIntValue(RACEORANGE, 0x02);
+	    break;
+	case 0x02:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 54);
+	    SetIntValue(RACEORANGE, 0x03);
+	    break;
+	case 0x03:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 55);
+	    SetIntValue(RACEORANGE, 0x04);
+	    break;
+	case 0x04:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 56);
+	    SetIntValue(RACEORANGE, 0x05);
+	    break;
+	case 0x05:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    SetIntValue(RACEORANGE, 0x07);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    image = GetICNSprite(&sprite);
+
+    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+    dest.y = 314;
+    dest.w = image->w;
+    dest.h = image->h;
+
+    CursorOff();
+    SDL_BlitSurface(image, NULL, video, &dest);
+    CursorOn();
+
+    return NONE;
+}
+
+ACTION	ActionClickSelectRacePurple(void){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image;
+    SDL_Rect dest;
+    AGGSPRITE sprite;
+
+    Uint8 i;
+    Uint8 count = 0;
+    Uint8 current = 0;
+    E_COLORS color;
+
+    for(i = 0; i < 8; ++i)
+        if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01) ++count;
+
+    if(! count) return NONE;
+
+    for(color = BLUE; color < PURPLE; ++color){
+	switch(color){
+	    case BLUE:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    case GREEN:
+		i = GetIntValue(RACEGREEN);
+		break;
+	    case RED:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    case YELLOW:
+		i = GetIntValue(RACEYELLOW);
+		break;
+	    case ORANGE:
+		i = GetIntValue(RACEORANGE);
+		break;
+	    case PURPLE:
+		i = GetIntValue(RACEPURPLE);
+		break;
+	    default:
+		i = 0x07;
+		break;
+	}
+	if(0xFF == i) continue;
+	++current;
+    }
+
+    switch(GetIntValue(RACEPURPLE)){
+
+	case 0x07:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 51);
+	    SetIntValue(RACEPURPLE, 0x00);
+	    break;
+	case 0x00:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 52);
+	    SetIntValue(RACEPURPLE, 0x01);
+	    break;
+	case 0x01:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 53);
+	    SetIntValue(RACEPURPLE, 0x02);
+	    break;
+	case 0x02:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 54);
+	    SetIntValue(RACEPURPLE, 0x03);
+	    break;
+	case 0x03:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 55);
+	    SetIntValue(RACEPURPLE, 0x04);
+	    break;
+	case 0x04:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 56);
+	    SetIntValue(RACEPURPLE, 0x05);
+	    break;
+	case 0x05:
+	    FillSPRITE(&sprite, "NGEXTRA.ICN", 58);
+	    SetIntValue(RACEPURPLE, 0x07);
+	    break;
+	default:
+	    return NONE;
+	    break;
+    }
+
+    image = GetICNSprite(&sprite);
+
+    dest.x = 228 + current * image->w * 6 / count + (image->w * (6 - count) / (2 * count));
+    dest.y = 314;
+    dest.w = image->w;
+    dest.h = image->h;
+
+    CursorOff();
+    SDL_BlitSurface(image, NULL, video, &dest);
+    CursorOn();
 
     return NONE;
 }

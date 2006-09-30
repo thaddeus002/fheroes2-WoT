@@ -51,6 +51,12 @@ typedef struct {			// структура заголовка карты с нео
     Uint8	count;			// address: 0x1A
     Uint8	conditionsWins;		// address: 0x1D
     Uint8	conditionsLoss;		// address: 0x22
+    Uint8	raceBlue;		// address: 0x26
+    Uint8	raceGreen;
+    Uint8	raceRed;
+    Uint8	raceYellow;
+    Uint8	raceOrange;
+    Uint8	racePurple;
     Uint8	longname[16];		// address: 0x3A
     Uint8	description[143];	// address: 0x76
 } LOADMP2HEADER;
@@ -401,6 +407,12 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
 		    SetIntValue(KINGDOMCOLORS, currentName->info.kingdomColors);
 		    SetIntValue(ALLOWCOLORS, currentName->info.allowColors);
 		    SetIntValue(RNDCOLORS, currentName->info.rndColors);
+		    SetIntValue(RACEBLUE, currentName->info.raceBlue);
+		    SetIntValue(RACEGREEN, currentName->info.raceGreen);
+		    SetIntValue(RACERED, currentName->info.raceRed);
+		    SetIntValue(RACEYELLOW, currentName->info.raceYellow);
+		    SetIntValue(RACEORANGE, currentName->info.raceOrange);
+		    SetIntValue(RACEPURPLE, currentName->info.racePurple);
 		    result = OK;
 		    exit = TRUE;
 		}
@@ -702,6 +714,14 @@ void ReadFileMapInfo(){
 	    fread(&ptr->info.longname, sizeof(Uint8), 16, fd);
 	    fseek(fd, 0x76, SEEK_SET);
 	    fread(&ptr->info.description, sizeof(Uint8), 143, fd);
+
+	    fseek(fd, 0x26, SEEK_SET);
+	    fread(&ptr->info.raceBlue, sizeof(Uint8), 1, fd);
+	    fread(&ptr->info.raceGreen, sizeof(Uint8), 1, fd);
+	    fread(&ptr->info.raceRed, sizeof(Uint8), 1, fd);
+	    fread(&ptr->info.raceYellow, sizeof(Uint8), 1, fd);
+	    fread(&ptr->info.raceOrange, sizeof(Uint8), 1, fd);
+	    fread(&ptr->info.racePurple, sizeof(Uint8), 1, fd);
 
 	    // закрываем файл
 	    fclose(fd);

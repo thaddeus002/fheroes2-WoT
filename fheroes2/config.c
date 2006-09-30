@@ -31,58 +31,29 @@
 #include "gamedefs.h"
 #include "config.h"
 
-#define MAXSTRLEN 256
+typedef struct { char * string; Uint8 value; } S_CONFIG;
 
-typedef struct {
-    char 	valueStr[MAXSTRLEN];
-    Uint8	valueInt;
-} CONFIGDESC;
+void DefaultSettings(S_CONFIG *);
 
-static CONFIGDESC settings[CONFIGEND] = {
-    { "heroes2.agg",	0 },		// AGGFILE
-    { "maps", 		0 },		// DIRECTORYMAPS
-    { "off",		FALSE },	// DEBUG
-    { "off",		FALSE },	// SOUND
-    { "off", 		FALSE },	// MUSIC
-    { "off",		FALSE },	// ANIMATION
-    { "\0", 		30 },		// ANIMATIONDELAY
-    { "off", 		FALSE },	// FULLSCREEN
-    { "off", 		FALSE },	// EVILINTERFACE
-    { "640x480", 	0 },		// VIDEOMODE
-    { "\0", 		0 },		// LIMITMEMORY
-    { "off", 		FALSE },	// UNIQUEARTIFACT
+static S_CONFIG *ptrSettings = NULL;
 
-    { "\0", 		0 },		// FILEMAPSPATH
-    { "\0",		0 },		// MAPSLONGNAME
-    { "\0",		0 },		// MAPSDESCRIPTION
-    { "\0",		0 },		// MAPSDIFFICULTY
-    { "\0",		0 },		// GAMEDIFFICULTY
-    { "\0",		0 },		// VICTORYCONDITIONS
-    { "\0",		0 },		// LOSSCONDITIONS
-    { "\0",		0 },		// KINGDOMCOLORS
-    { "\0",		0 },		// ALLOWCOLORS
-    { "\0",		0 },		// RNDCOLORS
-    { "\0",		0 },		// HUMANCOLORS
-    { "\0",		1 },		// MONTH
-    { "\0",		1 },		// WEEK
-    { "\0",		1 },		// DAY
-
-    { "on",		TRUE },		// ANIM1 анимация меню
-    { "on",		TRUE },		// ANIM2 анимация карта
-    { "on",		TRUE },		// ANIM3 анимация замок
-    { "on",		TRUE },		// CYCLELOOP
-};
-
-void InitConfig(const char * configFile){
+BOOL InitConfig(const char * configFile){
 
     FILE	*fd;
     char	str[1024], c, *s1, *s2, *e;
     Uint32	value = 0;
 
+    if(NULL == (ptrSettings = (S_CONFIG *) malloc(sizeof(S_CONFIG) * CONFIGEND))){
+        fprintf(stderr, "InitConfig: error malloc: %d\n", sizeof(S_CONFIG) * CONFIGEND);
+        return FALSE;
+    }
+
+    DefaultSettings(ptrSettings);
+
     // открытие файла конфигурации
     if(NULL == (fd = fopen(configFile, "r"))){
 	fprintf(stderr, "InitConfig: %s not found\n", configFile);
-	return;
+	return FALSE;
     }
     
     fprintf(stderr, "InitConfig: read %s\n", configFile);
@@ -169,100 +140,113 @@ void InitConfig(const char * configFile){
 
     // закрытие файла
     fclose(fd);
+    
+    return TRUE;
+}
+
+void FreeConfig(void){
+
+    Uint8 i;
+    
+    if(ptrSettings){
+	for(i = 0; i < CONFIGEND; ++i) if(ptrSettings[i].string) free (ptrSettings[i].string);	
+	free(ptrSettings);
+    }
 }
 
 char *GetStrValue(E_CONFIG key){
 
-    return settings[key].valueStr;
+    return ptrSettings[key].string;
 }
 
 Uint8 GetIntValue(E_CONFIG key){
 
-    return settings[key].valueInt;
+    return ptrSettings[key].value;
 }
 
 void SetStrValue(E_CONFIG key, const char *value){
 
-    if(strlen(value) < MAXSTRLEN){
 
-	settings[key].valueInt = 0;
-	strcpy(settings[key].valueStr, value);
+    if(ptrSettings[key].string) free(ptrSettings[key].string);
 
-    }else
-	fprintf(stderr, "SetStrValue: error, key not found or string limit!\n");
+    ptrSettings[key].string = strdup(value);
 }
 
 void SetIntValue(E_CONFIG key, Uint8 value){
 
     switch(key){
-    
-	case DEBUG:
-	case SOUND:
-	case MUSIC:
-	case FULLSCREEN:
-	case EVILINTERFACE:
-	case ANIMATION:
-	case UNIQUEARTIFACT:
-	//
-	case ANIM1:
-	case ANIM2:
-	case ANIM3:
-	case CYCLELOOP:
-
-	    if(FALSE == value) settings[key].valueInt = FALSE; else settings[key].valueInt = TRUE;
-
-	    break;
-
 	case VIDEOMODE:
-
 	    switch(value){
-	
 		default:
 		case 0:
-		    strcpy(settings[key].valueStr, "640x480");
-		    settings[key].valueInt = 0;
+		    SetStrValue(VIDEOMODE, "640x480");
+		    ptrSettings[key].value = 0;
 		    break;
-	
 		case 1:
-		    strcpy(settings[key].valueStr, "800x600");
-		    settings[key].valueInt = 1;
+		    SetStrValue(VIDEOMODE, "800x600");
+		    ptrSettings[key].value = 1;
 		    break;
-		
 		case 2:
-		    strcpy(settings[key].valueStr, "1024x768");
-		    settings[key].valueInt = 2;
+		    SetStrValue(VIDEOMODE, "1024x768");
+		    ptrSettings[key].value = 2;
 		    break;
-
 		case 3:
-		    strcpy(settings[key].valueStr, "1280x1024");
-		    settings[key].valueInt = 3;
+		    SetStrValue(VIDEOMODE, "1280x1024");
+		    ptrSettings[key].value = 3;
 		    break;
 	    }
 	    break;
 	
-	case MAPSDIFFICULTY:
-	case GAMEDIFFICULTY:
-	case VICTORYCONDITIONS:
-	case LOSSCONDITIONS:
-	case KINGDOMCOLORS:
-	case ALLOWCOLORS:
-	case RNDCOLORS:
-	case HUMANCOLORS:
-	case ANIMATIONDELAY:
-	case MONTH:
-	case WEEK:
-	case DAY:
-	case LIMITMEMORY:
-
-	    settings[key].valueInt = value;
-	    break;
-	
-	case AGGFILE:
-	case DIRECTORYMAPS:
-	case FILEMAPSPATH:
-	case MAPSLONGNAME:
-	case MAPSDESCRIPTION:
-	case CONFIGEND:
+	default:
+	    ptrSettings[key].value = value;
 	    break;
     }
+}
+
+void DefaultSettings(S_CONFIG *ptr){
+
+    if(!ptr) return;
+
+    SetStrValue(AGGFILE, "heroes2.agg");
+    SetStrValue(DIRECTORYMAPS, "maps");
+    SetIntValue(DEBUG, FALSE);
+    SetIntValue(SOUND, FALSE);
+    SetIntValue(MUSIC, FALSE);
+    SetIntValue(ANIMATION, FALSE);
+    SetIntValue(ANIMATIONDELAY, 30);
+    SetIntValue(FULLSCREEN, FALSE);
+    SetIntValue(EVILINTERFACE, FALSE);
+    SetIntValue(VIDEOMODE, 0);
+    SetIntValue(LIMITMEMORY, 0);
+    SetIntValue(UNIQUEARTIFACT, FALSE);
+
+    SetStrValue(FILEMAPSPATH, "\0");
+    SetStrValue(MAPSLONGNAME, "\0");
+    SetStrValue(MAPSDESCRIPTION, "\0");
+    SetIntValue(MAPSDIFFICULTY, 0);
+    SetIntValue(GAMEDIFFICULTY, 0);
+    SetIntValue(VICTORYCONDITIONS, 0);
+    SetIntValue(LOSSCONDITIONS, 0);
+    SetIntValue(KINGDOMCOLORS, 0);
+    SetIntValue(ALLOWCOLORS, 0);
+    SetIntValue(RNDCOLORS, 0);
+    SetIntValue(HUMANCOLORS, 0);
+    SetIntValue(RACEBLUE, 0);
+    SetIntValue(RACEGREEN, 0);
+    SetIntValue(RACERED, 0);
+    SetIntValue(RACEYELLOW, 0);
+    SetIntValue(RACEORANGE, 0);
+    SetIntValue(RACEPURPLE, 0);
+    SetIntValue(STARTHEROESCASTLE, FALSE);
+    SetIntValue(MONTH, 1);
+    SetIntValue(WEEK, 1);
+    SetIntValue(DAY, 1);
+
+    // ANIM1 анимация меню
+    SetIntValue(ANIM1, TRUE);
+    // ANIM2 анимация карта
+    SetIntValue(ANIM2, TRUE);
+    // ANIM3 анимация замок
+    SetIntValue(ANIM3, TRUE);
+    SetIntValue(CYCLELOOP, TRUE);
 }
