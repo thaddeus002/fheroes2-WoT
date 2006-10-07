@@ -30,6 +30,7 @@
 #include "SDL.h"
 
 #include "gamedefs.h"    
+#include "draw.h"  
 #include "tools.h"    
 #include "cursor.h"    
 #include "castle.h"    
@@ -69,7 +70,7 @@ void DrawSCRSCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.w -= 40;
@@ -126,7 +127,7 @@ void DrawSCRSCapitan(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	ZeroINTERFACEACTION(&action);
@@ -170,7 +171,7 @@ void DrawSCRSStatue(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.x += 6;
@@ -216,7 +217,7 @@ void DrawSCRSWell(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	ZeroINTERFACEACTION(&action);
@@ -271,7 +272,7 @@ void DrawSCRSThievesGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.w = 85;
@@ -327,7 +328,7 @@ void DrawSCRSTavern(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.x += 30;
@@ -392,7 +393,7 @@ void DrawSCRSShipyard(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.w = 140;
@@ -438,7 +439,7 @@ void DrawSCRSLTurret(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 }
 
 void DrawSCRSRTurret(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -458,7 +459,7 @@ void DrawSCRSRTurret(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 }
 
 void DrawSCRSMarketplace(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
@@ -479,7 +480,7 @@ void DrawSCRSMarketplace(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	ZeroINTERFACEACTION(&action);
@@ -523,7 +524,7 @@ void DrawSCRSMoat(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.h = 30;
@@ -568,7 +569,7 @@ void DrawSCRSSpec(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.h = 70;
@@ -624,7 +625,7 @@ void DrawSCRSWel2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.y += 10;
@@ -777,7 +778,7 @@ void DrawSCRSDwelling1(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	ZeroINTERFACEACTION(&action);
@@ -811,7 +812,7 @@ void DrawSCRSDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_Rect cur;
     const S_CASTLE *castle = GetCurrentCastle();
     const char *icnname = NULL;
-    if(castle->dwelling & DWELLING_UPGRADE2){ icnname = "TWNSUP_1.ICN"; }else{ icnname = "TWNSDW_1.ICN"; }
+    if(castle->building & DWELLING_UPGRADE2){ icnname = "TWNSUP_1.ICN"; }else{ icnname = "TWNSDW_1.ICN"; }
     INTERFACEACTION action;
     
     Uint16 cx = video->w / 2 - 320;
@@ -835,7 +836,7 @@ void DrawSCRSDwelling2(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.x += 5;
@@ -871,7 +872,7 @@ void DrawSCRSDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_Rect cur;
     const S_CASTLE *castle = GetCurrentCastle();
     const char *icnname = NULL;
-    if(castle->dwelling & DWELLING_UPGRADE3){ icnname = "TWNSUP_2.ICN"; }else{ icnname = "TWNSDW_2.ICN"; }
+    if(castle->building & DWELLING_UPGRADE3){ icnname = "TWNSUP_2.ICN"; }else{ icnname = "TWNSDW_2.ICN"; }
     INTERFACEACTION action;
 
     Uint16 cx = video->w / 2 - 320;
@@ -884,7 +885,7 @@ void DrawSCRSDwelling3(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.w = 80;
@@ -919,7 +920,7 @@ void DrawSCRSDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     SDL_Rect cur;
     const S_CASTLE *castle = GetCurrentCastle();
     const char *icnname = NULL;
-    if(castle->dwelling & DWELLING_UPGRADE4){ icnname = "TWNSUP_3.ICN"; }else{ icnname = "TWNSDW_3.ICN"; }
+    if(castle->building & DWELLING_UPGRADE4){ icnname = "TWNSUP_3.ICN"; }else{ icnname = "TWNSDW_3.ICN"; }
     INTERFACEACTION action;
 
     Uint16 cx = video->w / 2 - 320;
@@ -932,7 +933,7 @@ void DrawSCRSDwelling4(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	ZeroINTERFACEACTION(&action);
@@ -976,7 +977,7 @@ void DrawSCRSDwelling5(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	ZeroINTERFACEACTION(&action);
@@ -1020,7 +1021,7 @@ void DrawSCRSDwelling6(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
 	cur.w = 90;
@@ -1070,7 +1071,7 @@ void DrawSCRSMageGuild(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     cur.y = cy + header->offsetY;
     cur.w = header->surface->w;
     cur.h = header->surface->h;
-    SDL_BlitSurface(header->surface, NULL, video, &cur);
+    GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     switch(GetMageGuildLevel(castle)){
 	case MAGIC_LEVEL1:

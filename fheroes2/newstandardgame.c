@@ -48,6 +48,7 @@
 void	ShowNewStandardGame(void);
 void    DrawMapsOpponents(void);
 void    DrawMapsClass(void);
+Uint8	ReturnSelectRace(Uint8);
 
 ACTION	ActionSelectDifficulty(E_GAMELEVEL);
 ACTION	ActionSelectDifficultyEasy(void);
@@ -255,6 +256,12 @@ ACTION DrawSelectNewStandardGame(void){
     
             case OK:
 		if(strlen(GetStrValue(FILEMAPSPATH))){
+		    SetIntValue(RACEBLUE, ReturnSelectRace(GetIntValue(RACEBLUE)));
+		    SetIntValue(RACEGREEN, ReturnSelectRace(GetIntValue(RACEGREEN)));
+		    SetIntValue(RACERED, ReturnSelectRace(GetIntValue(RACERED)));
+		    SetIntValue(RACEYELLOW, ReturnSelectRace(GetIntValue(RACEYELLOW)));
+		    SetIntValue(RACEORANGE, ReturnSelectRace(GetIntValue(RACEORANGE)));
+		    SetIntValue(RACEPURPLE, ReturnSelectRace(GetIntValue(RACEPURPLE)));
             	    exit = TRUE;
 		    result = InitMaps(GetStrValue(FILEMAPSPATH));
 		}
@@ -1241,4 +1248,42 @@ ACTION	ActionClickSelectRacePurple(void){
     CursorOn();
 
     return NONE;
+}
+
+Uint8 ReturnSelectRace(Uint8 type){
+
+    Uint8 result = 0xFF;
+
+    switch(type){
+
+	case 0x00:
+    	    result = KNIGHT;
+	    break;
+
+	case 0x01:
+            result = BARBARIAN;
+	    break;
+
+	case 0x02:
+            result = SORCERESS;
+	    break;
+
+	case 0x03:
+            result = WARLOCK;
+	    break;
+
+	case 0x04:
+            result = WIZARD;
+	    break;
+
+	case 0x05:
+            result = NECROMANCER;
+	    break;
+
+	default:
+	    result = rand() % BOMG;
+	    break;
+    }
+    
+    return result;
 }

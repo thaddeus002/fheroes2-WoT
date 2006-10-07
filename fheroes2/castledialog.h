@@ -30,7 +30,6 @@
 #define _CASTLEDIALOG_H
 
 ACTION BuyBuildingBox(E_RACE, E_BUILDINGCASTLE, Uint32);
-ACTION BuyDwellingBox(E_RACE, E_DWELLINGCASTLE, Uint32);
 ACTION BuyBoat(void);
 
 #endif

@@ -577,7 +577,7 @@ Uint16 SelectCountBox(Uint16 max){
                 break;
 
 	    case UP:
-		if(result < max){
+		if(result < max - 1){
 		    ++result;
 		    CursorOff();
 		    FillSPRITE(&sprite, "TOWNWIND.ICN", 4);

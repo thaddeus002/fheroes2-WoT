@@ -182,7 +182,7 @@ ACTION ShowCastleInfo(void){
 
     // фон dwelling 2
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE2) &&
-	(castle->dwelling & DWELLING_MONSTER2)) FillSPRITE(&sprite, icnname, 25);
+	(castle->building & DWELLING_MONSTER2)) FillSPRITE(&sprite, icnname, 25);
     else FillSPRITE(&sprite, icnname, 20);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 150;
@@ -199,7 +199,7 @@ ACTION ShowCastleInfo(void){
 
     // фон dwelling 3
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE3) &&
-	(castle->dwelling & DWELLING_MONSTER3)) FillSPRITE(&sprite, icnname, 26);
+	(castle->building & DWELLING_MONSTER3)) FillSPRITE(&sprite, icnname, 26);
     else FillSPRITE(&sprite, icnname, 21);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 294;
@@ -216,7 +216,7 @@ ACTION ShowCastleInfo(void){
 
     // фон dwelling 4
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE4) &&
-	(castle->dwelling & DWELLING_MONSTER4)) FillSPRITE(&sprite, icnname, 27);
+	(castle->building & DWELLING_MONSTER4)) FillSPRITE(&sprite, icnname, 27);
     else FillSPRITE(&sprite, icnname, 22);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 6;
@@ -233,7 +233,7 @@ ACTION ShowCastleInfo(void){
 
     // фон dwelling 5
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE5) &&
-	(castle->dwelling & DWELLING_MONSTER5)) FillSPRITE(&sprite, icnname, 28);
+	(castle->building & DWELLING_MONSTER5)) FillSPRITE(&sprite, icnname, 28);
     else FillSPRITE(&sprite, icnname, 23);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 150;
@@ -250,9 +250,9 @@ ACTION ShowCastleInfo(void){
 
     // фон dwelling 6
     if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE7) &&
-	(castle->dwelling & DWELLING_UPGRADE6)) FillSPRITE(&sprite, icnname, 30);
+	(castle->building & DWELLING_UPGRADE6)) FillSPRITE(&sprite, icnname, 30);
     else if(CastleDwellingUpgradable(castle, DWELLING_UPGRADE6) &&
-	(castle->dwelling & DWELLING_MONSTER6)) FillSPRITE(&sprite, icnname, 29);
+	(castle->building & DWELLING_MONSTER6)) FillSPRITE(&sprite, icnname, 29);
     else FillSPRITE(&sprite, icnname, 24);
     image = GetICNSprite(&sprite);
     rectCur.x = cx + 294;
@@ -854,7 +854,7 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = GetStringDwelling(castle->race, DWELLING_MONSTER1);
+    message = GetStringBuilding(castle->race, DWELLING_MONSTER1);
     rectCur.x = cx + 70;
     rectCur.y = cy + 60;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -944,8 +944,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = (castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2) ?
-	       GetStringDwelling(castle->race, DWELLING_UPGRADE2) : GetStringDwelling(castle->race, DWELLING_MONSTER2));
+    message = (castle->building & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2) ?
+	       GetStringBuilding(castle->race, DWELLING_UPGRADE2) : GetStringBuilding(castle->race, DWELLING_MONSTER2));
     rectCur.x = cx + 215;
     rectCur.y = cy + 60;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1035,8 +1035,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = (castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3) ?
-	       GetStringDwelling(castle->race, DWELLING_UPGRADE3) : GetStringDwelling(castle->race, DWELLING_MONSTER3));
+    message = (castle->building & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3) ?
+	       GetStringBuilding(castle->race, DWELLING_UPGRADE3) : GetStringBuilding(castle->race, DWELLING_MONSTER3));
     rectCur.x = cx + 360;
     rectCur.y = cy + 60;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1126,8 +1126,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = (castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4) ?
-	       GetStringDwelling(castle->race, DWELLING_UPGRADE4) : GetStringDwelling(castle->race, DWELLING_MONSTER4));
+    message = (castle->building & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4) ?
+	       GetStringBuilding(castle->race, DWELLING_UPGRADE4) : GetStringBuilding(castle->race, DWELLING_MONSTER4));
     rectCur.x = cx + 70;
     rectCur.y = cy + 135;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1217,8 +1217,8 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    message = (castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5) ?
-	       GetStringDwelling(castle->race, DWELLING_UPGRADE5) : GetStringDwelling(castle->race, DWELLING_MONSTER5));
+    message = (castle->building & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5) ?
+	       GetStringBuilding(castle->race, DWELLING_UPGRADE5) : GetStringBuilding(castle->race, DWELLING_MONSTER5));
     rectCur.x = cx + 215;
     rectCur.y = cy + 135;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -1308,12 +1308,12 @@ void RedrawCastleStatusBuilding(void){
 	    break;
     }
     // text
-    if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE7);
-    else if(castle->dwelling & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE6);
+    if(castle->building & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
+	message = GetStringBuilding(castle->race, DWELLING_UPGRADE7);
+    else if(castle->building & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
+	message = GetStringBuilding(castle->race, DWELLING_UPGRADE6);
     else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER6);
+	message = GetStringBuilding(castle->race, DWELLING_MONSTER6);
     rectCur.x = cx + 360;
     rectCur.y = cy + 135;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;

@@ -404,3 +404,29 @@ void ScaleSurface(SDL_Surface *src, SDL_Surface *dst){
     return;
 }
 
+void AlphaBlendingObject(SDL_Surface *surface, SDL_Rect *dst, Uint8 level){
+
+    if(!surface || !dst) return;
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *alpha = NULL;
+    SDL_Rect rect;
+
+    if(NULL == (alpha = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCALPHA, surface->w, surface->h, 16, 0, 0, 0, 0))){
+        fprintf(stderr, "AlphaBlendingObject failed: %s, %d, %d\n", SDL_GetError(), surface->w, surface->h);
+        return;
+    }
+
+    rect.x = 0;
+    rect.y = 0;
+    rect.w = alpha->w;
+    rect.h = alpha->h;
+    SDL_FillRect(alpha, NULL, COLORKEY);
+    SDL_SetColorKey(alpha, SDL_SRCCOLORKEY|SDL_RLEACCEL, COLORKEY);
+    SDL_BlitSurface(surface, &rect, alpha, &rect);
+
+    SDL_SetAlpha(alpha, SDL_SRCALPHA|SDL_RLEACCEL, level);
+    SDL_BlitSurface(alpha, NULL, video, dst);
+
+    SDL_FreeSurface(alpha);
+}

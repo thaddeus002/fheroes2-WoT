@@ -203,25 +203,6 @@ const S_PAYMENT * PaymentConditionsBuilding(E_RACE race, E_BUILDINGCASTLE build)
 	    }
 	    break;
 
-	default:
-	    break;
-    }
-    
-    return &paymentObject;
-}
-
-const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelling){
-
-    paymentObject.gold = 0;
-    paymentObject. wood = 0;
-    paymentObject.ore = 0;
-    paymentObject.mercury = 0;
-    paymentObject.crystal = 0;
-    paymentObject.sulfur = 0;
-    paymentObject.gems = 0;
-
-    switch(dwelling){
-
 	case DWELLING_MONSTER1:
 	    switch(race){
 	    
@@ -251,7 +232,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -287,7 +268,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -324,7 +305,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -365,7 +346,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -411,7 +392,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -461,7 +442,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -489,7 +470,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 		
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: upgrade return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: upgrade return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -518,7 +499,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: upgrade return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: upgrade return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -556,7 +537,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -587,7 +568,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -615,7 +596,7 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
@@ -630,12 +611,15 @@ const S_PAYMENT * PaymentConditionsDwelling(E_RACE race, E_DWELLINGCASTLE dwelli
 		    break;
 		
 		default:
-		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsDwelling: return ZERO\n");
+		    if(GetIntValue(DEBUG)) fprintf(stderr, "PaymentConditionsBuilding: return ZERO\n");
 		    break;
 	    }
 	    break;
-    }
 
+	default:
+	    break;
+    }
+    
     return &paymentObject;
 }
 

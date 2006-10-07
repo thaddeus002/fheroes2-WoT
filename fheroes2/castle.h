@@ -125,44 +125,40 @@ typedef struct {
                 } S_MAGEGUILD;
                                                                                                                 
 typedef enum {
-		BUILD_THIEVESGUILD	= 0x00000002,
-		BUILD_TAVERN		= 0x00000004,
-		BUILD_SHIPYARD		= 0x00000008,
-		BUILD_WELL		= 0x00000010,
-		BUILD_STATUE		= 0x00000080,
-		BUILD_LEFTTURRET	= 0x00000100,
-		BUILD_RIGHTTURRET	= 0x00000200,
-		BUILD_MARKETPLACE	= 0x00000400,
-		BUILD_WEL2		= 0x00000800,	// Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
-		BUILD_MOAT		= 0x00001000,
-		BUILD_SPEC		= 0x00002000,	// Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
-		BUILD_CASTLE		= 0x00010000,
-		BUILD_CAPTAIN		= 0x00020000,
-		BUILD_BOAT		= 0x00040000,
-		BUILD_MAGEGUILD1	= 0x00080000,
-		BUILD_MAGEGUILD2	= 0x00100000,
-		BUILD_MAGEGUILD3	= 0x00200000,
-		BUILD_MAGEGUILD4	= 0x00400000,
-		BUILD_MAGEGUILD5	= 0x00800000,
-		BUILD_TENT		= 0x01000000,
+		BUILD_THIEVESGUILD	= 0x00000001,
+		BUILD_TAVERN		= 0x00000002,
+		BUILD_SHIPYARD		= 0x00000004,
+		BUILD_WELL		= 0x00000008,
+		BUILD_STATUE		= 0x00000010,
+		BUILD_LEFTTURRET	= 0x00000020,
+		BUILD_RIGHTTURRET	= 0x00000040,
+		BUILD_MARKETPLACE	= 0x00000080,
+		BUILD_WEL2		= 0x00000100,	// Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
+		BUILD_MOAT		= 0x00000200,
+		BUILD_SPEC		= 0x00000400,	// Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
+		BUILD_CASTLE		= 0x00000800,
+		BUILD_CAPTAIN		= 0x00001000,
+		BUILD_BOAT		= 0x00002000,
+		BUILD_MAGEGUILD1	= 0x00004000,
+		BUILD_MAGEGUILD2	= 0x00008000,
+		BUILD_MAGEGUILD3	= 0x00010000,
+		BUILD_MAGEGUILD4	= 0x00020000,
+		BUILD_MAGEGUILD5	= 0x00040000,
+		BUILD_TENT		= 0x00080000,
+                DWELLING_MONSTER1       = 0x00100000,
+                DWELLING_MONSTER2       = 0x00200000,
+                DWELLING_MONSTER3       = 0x00400000,
+                DWELLING_MONSTER4       = 0x00800000,
+                DWELLING_MONSTER5       = 0x01000000,
+                DWELLING_MONSTER6       = 0x02000000,
+                DWELLING_UPGRADE2       = 0x04000000,
+        	DWELLING_UPGRADE3       = 0x08000000,
+                DWELLING_UPGRADE4       = 0x10000000,
+                DWELLING_UPGRADE5       = 0x20000000,
+                DWELLING_UPGRADE6       = 0x40000000,
+                DWELLING_UPGRADE7       = 0x80000000        // black dragon
 
 	    } E_BUILDINGCASTLE;
-
-typedef enum {
-                DWELLING_MONSTER1       = 0x0008,
-                DWELLING_MONSTER2       = 0x0010,
-                DWELLING_MONSTER3       = 0x0020,
-                DWELLING_MONSTER4       = 0x0040,
-                DWELLING_MONSTER5       = 0x0080,
-                DWELLING_MONSTER6       = 0x0100,
-                DWELLING_UPGRADE2       = 0x0200,
-        	DWELLING_UPGRADE3       = 0x0400,
-                DWELLING_UPGRADE4       = 0x0800,
-                DWELLING_UPGRADE5       = 0x1000,
-                DWELLING_UPGRADE6       = 0x2000,
-                DWELLING_UPGRADE7       = 0x4000        // black dragon
-
-            } E_DWELLINGCASTLE;
 
 typedef struct {
 
@@ -173,7 +169,6 @@ typedef struct {
     Uint8	ay;
     SDL_Rect	pos;
     Uint32	building;
-    Uint16	dwelling;
     S_MAGEGUILD	mageGuild;
     Uint16	monster[CASTLEMAXMONSTER];
     S_ARMY	army[CASTLEMAXARMY];
@@ -203,12 +198,12 @@ E_MONSTER	GetMonsterFromCastle(const S_CASTLE *, Uint8);
 BOOL		BuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
 
 BOOL		CheckBuyMonsterFromCastle(const S_CASTLE *, Uint8, Uint16);
-BOOL		CastleDwellingUpgradable(const S_CASTLE *, E_DWELLINGCASTLE);
+BOOL		CastleDwellingUpgradable(const S_CASTLE *, E_BUILDINGCASTLE);
 BOOL		CastleNearOcean(const S_CASTLE *);
 BOOL		CastleNearBoat();
 BOOL		CastlePresentHeroes(const S_CASTLE *);
 
-void		CastleIncreaseArmy(const S_CASTLE *, E_DWELLINGCASTLE, Uint8);
+void		CastleIncreaseArmy(const S_CASTLE *, E_BUILDINGCASTLE, Uint8);
 void		AllCastleIncreaseRecrut(void);
 
 Uint8           GetMonsterGrownCastle(const S_CASTLE *, E_MONSTER);
@@ -270,7 +265,10 @@ BOOL		BuildUpgrade5(const S_CASTLE *);
 BOOL		BuildUpgrade6(const S_CASTLE *);
 BOOL		BuildUpgrade7(const S_CASTLE *);
 
+BOOL		BuildingIsDwelling(E_BUILDINGCASTLE);
+
 void		EnableCastleUpdateBuilding(void);
+E_BUILDINGCASTLE GetFlagUpdateBuilding(void);
 
 ACTION          UpgradableArmy(const S_ARMY *, E_COLORS, const S_CASTLE *);
 void		UpgradeArmy(S_ARMY *army, E_COLORS color);
@@ -279,5 +277,6 @@ void		DrawAmountedCastle(SDL_Surface *, SDL_Rect *, E_RACE, E_GROUND, BOOL);
 void		ResetCastleSelector(void);
 const S_CASTLE *HeroesInCastle(const S_HEROES *);
 
-#endif
+Uint8		GetCastleAlphaBlending(void);
 
+#endif

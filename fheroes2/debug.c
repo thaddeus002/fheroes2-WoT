@@ -1007,110 +1007,6 @@ const char * GetStringGround(E_GROUND ground){
     return string;
 }
 
-const char * GetStringDwelling(E_RACE race, E_DWELLINGCASTLE level){
-
-    const char  *string = NULL;
-
-    switch(race){
-    
-	case KNIGHT:
-	    if(DWELLING_MONSTER1 == level) string = "Thatched Hut";
-	    if(DWELLING_MONSTER2 == level) string = "Archery Range";
-	    if(DWELLING_MONSTER3 == level) string = "Blacksmith";
-	    if(DWELLING_MONSTER4 == level) string = "Armory";
-	    if(DWELLING_MONSTER5 == level) string = "Jousting Arena";
-	    if(DWELLING_MONSTER6 == level) string = "Cathedral";
-	    if(DWELLING_UPGRADE2 == level) string = "Upg. Archery Range";
-	    if(DWELLING_UPGRADE3 == level) string = "Upg. Blacksmith";
-	    if(DWELLING_UPGRADE4 == level) string = "Upg. Armory";
-	    if(DWELLING_UPGRADE5 == level) string = "Upg. Jousting Arena";
-	    if(DWELLING_UPGRADE6 == level) string = "Upg. Cathedral";
-	    if(DWELLING_UPGRADE7 == level) string = NULL;
-	    break;
-
-	case BARBARIAN:
-	    if(DWELLING_MONSTER1 == level) string = "Hut";
-	    if(DWELLING_MONSTER2 == level) string = "Stick Hut";
-	    if(DWELLING_MONSTER3 == level) string = "Den";
-	    if(DWELLING_MONSTER4 == level) string = "Adobe";
-	    if(DWELLING_MONSTER5 == level) string = "Bridge";
-	    if(DWELLING_MONSTER6 == level) string = "Pyramid";
-	    if(DWELLING_UPGRADE2 == level) string = "Upg. Stick Hut";
-	    if(DWELLING_UPGRADE4 == level) string = "Upg. Adobe";
-	    if(DWELLING_UPGRADE3 == level) string = NULL;
-	    if(DWELLING_UPGRADE5 == level) string = "Upg. Bridge";
-	    if(DWELLING_UPGRADE6 == level) string = NULL;
-	    if(DWELLING_UPGRADE7 == level) string = NULL;
-	    break;
-
-	case SORCERESS:
-	    if(DWELLING_MONSTER1 == level) string = "Treehouse";
-	    if(DWELLING_MONSTER2 == level) string = "Cottage";
-	    if(DWELLING_MONSTER3 == level) string = "Archery Range";
-	    if(DWELLING_MONSTER4 == level) string = "Stonehenge";
-	    if(DWELLING_MONSTER5 == level) string = "Fenced Meadow";
-	    if(DWELLING_MONSTER6 == level) string = "Red Tower";
-	    if(DWELLING_UPGRADE2 == level) string = "Upg. Cottage";
-	    if(DWELLING_UPGRADE3 == level) string = "Upg. Archery Range";
-	    if(DWELLING_UPGRADE4 == level) string = "Upg. Stonehenge";
-	    if(DWELLING_UPGRADE5 == level) string = NULL;
-	    if(DWELLING_UPGRADE6 == level) string = NULL;
-	    if(DWELLING_UPGRADE7 == level) string = NULL;
-	    break;
-
-	case WIZARD:
-	    if(DWELLING_MONSTER1 == level) string = "Habitat";
-	    if(DWELLING_MONSTER2 == level) string = "Pen";
-	    if(DWELLING_MONSTER3 == level) string = "Foundry";
-	    if(DWELLING_MONSTER4 == level) string = "Cliff Nest";
-	    if(DWELLING_MONSTER5 == level) string = "Ivory Tower";
-	    if(DWELLING_MONSTER6 == level) string = "Cloud Castle";
-	    if(DWELLING_UPGRADE2 == level) string = NULL;
-	    if(DWELLING_UPGRADE3 == level) string = "Upg. Foundry";
-	    if(DWELLING_UPGRADE4 == level) string = NULL;
-	    if(DWELLING_UPGRADE5 == level) string = "Upg. Ivory Tower";
-	    if(DWELLING_UPGRADE6 == level) string = "Upg. Cloud Castle";
-	    break;
-
-	case WARLOCK:
-	    if(DWELLING_MONSTER1 == level) string = "Cave";
-	    if(DWELLING_MONSTER2 == level) string = "Crypt";
-	    if(DWELLING_MONSTER3 == level) string = "Nest";
-	    if(DWELLING_MONSTER4 == level) string = "Maze";
-	    if(DWELLING_MONSTER5 == level) string = "Swamp";
-	    if(DWELLING_MONSTER6 == level) string = "Green Tower";
-	    if(DWELLING_UPGRADE2 == level) string = NULL;
-	    if(DWELLING_UPGRADE3 == level) string = NULL;
-	    if(DWELLING_UPGRADE4 == level) string = "Upg. Maze";
-	    if(DWELLING_UPGRADE5 == level) string = NULL;
-	    if(DWELLING_UPGRADE6 == level) string = "Red Tower";
-	    if(DWELLING_UPGRADE7 == level) string = "Black Tower";
-	    break;
-
-	case NECROMANCER:
-	    if(DWELLING_MONSTER1 == level) string = "Excavation";
-	    if(DWELLING_MONSTER2 == level) string = "Graveyard";
-	    if(DWELLING_MONSTER3 == level) string = "Pyramid";
-	    if(DWELLING_MONSTER4 == level) string = "Mansion";
-	    if(DWELLING_MONSTER5 == level) string = "Mausoleum";
-	    if(DWELLING_MONSTER6 == level) string = "Laboratory";
-	    if(DWELLING_UPGRADE2 == level) string = "Upg. Graveyard";
-	    if(DWELLING_UPGRADE3 == level) string = "Upg. Pyramid";
-	    if(DWELLING_UPGRADE4 == level) string = "Upg. Mansion";
-	    if(DWELLING_UPGRADE5 == level) string = "Upg. Mausoleum";
-	    if(DWELLING_UPGRADE6 == level) string = NULL;
-	    if(DWELLING_UPGRADE7 == level) string = NULL;
-	    break;
-
-	default:
-	    string = NULL;
-	    break;
-
-    }
-    
-    return string;
-}
-
 const char * GetStringLevelMageGuild(E_MAGICLEVEL level){
 
     const char *string = NULL;
@@ -1138,64 +1034,11 @@ const char * GetStringLevelMageGuild(E_MAGICLEVEL level){
     return string;
 }
 
-
-const char * GetStringBuilding(E_RACE race, E_BUILDINGCASTLE build){
+const char * GetStringBuilding(E_RACE race, E_BUILDINGCASTLE level){
 
     const char  *string = NULL;
 
-    switch(build){
-
-	case BUILD_WEL2:
-	    switch(race){
-    		case KNIGHT:
-		    string = "Farm";
-		    break;
-		case BARBARIAN:
-		    string = "Garbage Heap";
-		    break;
-		case SORCERESS:
-		    string = "Crystal Garden";
-		    break;
-		case WARLOCK:
-		    string = "Waterfall";
-		    break;
-		case WIZARD:
-		    string = "Orchard";
-		    break;
-		case NECROMANCER:
-		    string = "Skull Pile";
-		    break;
-		default:
-		    string = "";
-		    break;
-	    }
-	    break;
-	
-	case BUILD_SPEC:
-	    switch(race){
-		case KNIGHT:
-		    string = "Fortifications";
-		    break;
-		case BARBARIAN:
-		    string = "Coliseum";
-		    break;
-		case SORCERESS:
-		    string = "Rainbow";
-		    break;
-		case WARLOCK:
-		    string = "Dungeon";
-		    break;
-		case WIZARD:
-		    string = "Library";
-		    break;
-		case NECROMANCER:
-		    string = "Storm";
-		    break;
-		default:
-		    string = "";
-		    break;
-	    }
-	    break;
+    switch(level){
 
 	case BUILD_TAVERN:
 		    string = "Tavern";
@@ -1254,8 +1097,117 @@ const char * GetStringBuilding(E_RACE race, E_BUILDINGCASTLE build){
 		    break;
 
 	default:
-	    string = "";
+	    string = NULL;
 	    break;
+    }
+
+    switch(race){
+    
+	case KNIGHT:
+	    if(DWELLING_MONSTER1 == level) string = "Thatched Hut";
+	    if(DWELLING_MONSTER2 == level) string = "Archery Range";
+	    if(DWELLING_MONSTER3 == level) string = "Blacksmith";
+	    if(DWELLING_MONSTER4 == level) string = "Armory";
+	    if(DWELLING_MONSTER5 == level) string = "Jousting Arena";
+	    if(DWELLING_MONSTER6 == level) string = "Cathedral";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Archery Range";
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Blacksmith";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Armory";
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Jousting Arena";
+	    if(DWELLING_UPGRADE6 == level) string = "Upg. Cathedral";
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    if(BUILD_WEL2 == level) string = "Farm";
+	    if(BUILD_SPEC == level) string = "Fortifications";
+	    break;
+
+	case BARBARIAN:
+	    if(DWELLING_MONSTER1 == level) string = "Hut";
+	    if(DWELLING_MONSTER2 == level) string = "Stick Hut";
+	    if(DWELLING_MONSTER3 == level) string = "Den";
+	    if(DWELLING_MONSTER4 == level) string = "Adobe";
+	    if(DWELLING_MONSTER5 == level) string = "Bridge";
+	    if(DWELLING_MONSTER6 == level) string = "Pyramid";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Stick Hut";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Adobe";
+	    if(DWELLING_UPGRADE3 == level) string = NULL;
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Bridge";
+	    if(DWELLING_UPGRADE6 == level) string = NULL;
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    if(BUILD_WEL2 == level) string = "Garbage Heap";
+	    if(BUILD_SPEC == level) string = "Coliseum";
+	    break;
+
+	case SORCERESS:
+	    if(DWELLING_MONSTER1 == level) string = "Treehouse";
+	    if(DWELLING_MONSTER2 == level) string = "Cottage";
+	    if(DWELLING_MONSTER3 == level) string = "Archery Range";
+	    if(DWELLING_MONSTER4 == level) string = "Stonehenge";
+	    if(DWELLING_MONSTER5 == level) string = "Fenced Meadow";
+	    if(DWELLING_MONSTER6 == level) string = "Red Tower";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Cottage";
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Archery Range";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Stonehenge";
+	    if(DWELLING_UPGRADE5 == level) string = NULL;
+	    if(DWELLING_UPGRADE6 == level) string = NULL;
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    if(BUILD_WEL2 == level) string = "Crystal Garden";
+	    if(BUILD_SPEC == level) string = "Rainbow";
+	    break;
+
+	case WIZARD:
+	    if(DWELLING_MONSTER1 == level) string = "Habitat";
+	    if(DWELLING_MONSTER2 == level) string = "Pen";
+	    if(DWELLING_MONSTER3 == level) string = "Foundry";
+	    if(DWELLING_MONSTER4 == level) string = "Cliff Nest";
+	    if(DWELLING_MONSTER5 == level) string = "Ivory Tower";
+	    if(DWELLING_MONSTER6 == level) string = "Cloud Castle";
+	    if(DWELLING_UPGRADE2 == level) string = NULL;
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Foundry";
+	    if(DWELLING_UPGRADE4 == level) string = NULL;
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Ivory Tower";
+	    if(DWELLING_UPGRADE6 == level) string = "Upg. Cloud Castle";
+	    if(BUILD_WEL2 == level) string = "Orchard";
+	    if(BUILD_SPEC == level) string = "Library";
+	    break;
+
+	case WARLOCK:
+	    if(DWELLING_MONSTER1 == level) string = "Cave";
+	    if(DWELLING_MONSTER2 == level) string = "Crypt";
+	    if(DWELLING_MONSTER3 == level) string = "Nest";
+	    if(DWELLING_MONSTER4 == level) string = "Maze";
+	    if(DWELLING_MONSTER5 == level) string = "Swamp";
+	    if(DWELLING_MONSTER6 == level) string = "Green Tower";
+	    if(DWELLING_UPGRADE2 == level) string = NULL;
+	    if(DWELLING_UPGRADE3 == level) string = NULL;
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Maze";
+	    if(DWELLING_UPGRADE5 == level) string = NULL;
+	    if(DWELLING_UPGRADE6 == level) string = "Red Tower";
+	    if(DWELLING_UPGRADE7 == level) string = "Black Tower";
+	    if(BUILD_WEL2 == level) string = "Waterfall";
+	    if(BUILD_SPEC == level) string = "Dungeon";
+	    break;
+
+	case NECROMANCER:
+	    if(DWELLING_MONSTER1 == level) string = "Excavation";
+	    if(DWELLING_MONSTER2 == level) string = "Graveyard";
+	    if(DWELLING_MONSTER3 == level) string = "Pyramid";
+	    if(DWELLING_MONSTER4 == level) string = "Mansion";
+	    if(DWELLING_MONSTER5 == level) string = "Mausoleum";
+	    if(DWELLING_MONSTER6 == level) string = "Laboratory";
+	    if(DWELLING_UPGRADE2 == level) string = "Upg. Graveyard";
+	    if(DWELLING_UPGRADE3 == level) string = "Upg. Pyramid";
+	    if(DWELLING_UPGRADE4 == level) string = "Upg. Mansion";
+	    if(DWELLING_UPGRADE5 == level) string = "Upg. Mausoleum";
+	    if(DWELLING_UPGRADE6 == level) string = NULL;
+	    if(DWELLING_UPGRADE7 == level) string = NULL;
+	    if(BUILD_WEL2 == level) string = "Skull Pile";
+	    if(BUILD_SPEC == level) string = "Storm";
+	    break;
+
+	default:
+	    string = NULL;
+	    break;
+
     }
     
     return string;
@@ -1426,7 +1378,7 @@ const char * GetStringResource(E_RESOURCE resource){
 }
 
 
-const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
+const char * GetStringDepenceDwelling(E_RACE race,  E_BUILDINGCASTLE dwelling){
 
     static char str[STRLEN];
 
@@ -1440,12 +1392,12 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case NECROMANCER:
 		case WIZARD:
 	        case WARLOCK:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER1));
 		break;
 	    
 		case SORCERESS:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER1),
+			GetStringBuilding(race, DWELLING_MONSTER1),
 			GetStringBuilding(race, BUILD_TAVERN));
 		break;
 	
@@ -1461,8 +1413,8 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case KNIGHT:
 		case BARBARIAN:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER3),
-			GetStringDwelling(race, DWELLING_MONSTER4));
+			GetStringBuilding(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, DWELLING_MONSTER4));
 		break;
 	    
 		case SORCERESS:
@@ -1480,7 +1432,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    switch(race){
 		case KNIGHT:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER1),
+			GetStringBuilding(race, DWELLING_MONSTER1),
 			GetStringBuilding(race, BUILD_WELL));
 		break;
 	    
@@ -1489,7 +1441,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case SORCERESS:
 		case WIZARD:
 		case WARLOCK:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER1));
 		break;
 	
 		default:
@@ -1502,12 +1454,12 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    switch(race){
 		case KNIGHT:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER2),
-			GetStringDwelling(race, DWELLING_MONSTER4) );
+			GetStringBuilding(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, DWELLING_MONSTER4) );
 		break;
 	    
 		case SORCERESS:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER4));
 		break;
 
 		case WIZARD:
@@ -1525,31 +1477,31 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    switch(race){
 		case KNIGHT:
 		    snprintf(str, STRLEN, "%s, %s, %s, %s.", 
-			GetStringDwelling(race, DWELLING_MONSTER1),
-			GetStringDwelling(race, DWELLING_MONSTER2),
-			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, DWELLING_MONSTER1),
+			GetStringBuilding(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, DWELLING_MONSTER3),
 			GetStringBuilding(race, BUILD_TAVERN) );
 		break;
 	    
 		case BARBARIAN:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER1));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER1));
 		break;
 	    
 		case NECROMANCER:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, DWELLING_MONSTER3),
 			GetStringBuilding(race, BUILD_THIEVESGUILD) );
 		break;
 	    
 		case SORCERESS:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, DWELLING_MONSTER2),
 			GetStringBuilding(race, BUILD_MAGEGUILD1) );
 		break;
 
 		case WIZARD:
 		case WARLOCK:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER2));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER2));
 		break;
 	
 		default:
@@ -1564,8 +1516,8 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case KNIGHT:
 		case BARBARIAN:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER2),
-			GetStringDwelling(race, DWELLING_MONSTER3) );
+			GetStringBuilding(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, DWELLING_MONSTER3) );
 		break;
 
 		default:
@@ -1581,29 +1533,29 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 		case KNIGHT:
 		case BARBARIAN:
 		    snprintf(str, STRLEN, "%s, %s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER2),
-			GetStringDwelling(race, DWELLING_MONSTER3),
-			GetStringDwelling(race, DWELLING_MONSTER4) );
+			GetStringBuilding(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, DWELLING_MONSTER4) );
 		break;
 
 		case NECROMANCER:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, DWELLING_MONSTER2),
 			GetStringBuilding(race, BUILD_MAGEGUILD1) );
 		break;
 	    
 		case SORCERESS:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER4));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER4));
 		break;
 
 		case WIZARD:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, DWELLING_MONSTER3),
 			GetStringLevelMageGuild(MAGIC_LEVEL1) );
 		break;
 	
 		case WARLOCK:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER3));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER3));
 		break;
 	
 		default:
@@ -1636,22 +1588,22 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
 	    switch(race){
 		case KNIGHT:
 		    snprintf(str, STRLEN, "%s, %s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER2),
-			GetStringDwelling(race, DWELLING_MONSTER3),
-			GetStringDwelling(race, DWELLING_MONSTER4) );
+			GetStringBuilding(race, DWELLING_MONSTER2),
+			GetStringBuilding(race, DWELLING_MONSTER3),
+			GetStringBuilding(race, DWELLING_MONSTER4) );
 		break;
 	    
 		case BARBARIAN:
 		case NECROMANCER:
 		case SORCERESS:
-		    snprintf(str, STRLEN, "%s.", GetStringDwelling(race, DWELLING_MONSTER5));
+		    snprintf(str, STRLEN, "%s.", GetStringBuilding(race, DWELLING_MONSTER5));
 		break;
 
 		case WIZARD:
 		case WARLOCK:
 		    snprintf(str, STRLEN, "%s, %s.",
-			GetStringDwelling(race, DWELLING_MONSTER4),
-			GetStringDwelling(race, DWELLING_MONSTER5) );
+			GetStringBuilding(race, DWELLING_MONSTER4),
+			GetStringBuilding(race, DWELLING_MONSTER5) );
 		break;
 	
 		default:
@@ -1668,7 +1620,7 @@ const char * GetStringDepenceDwelling(E_RACE race,  E_DWELLINGCASTLE dwelling){
     return str;
 }
 
-const char * GetStringMonsterFromDwelling(E_RACE race, E_DWELLINGCASTLE dwelling){
+const char * GetStringMonsterFromDwelling(E_RACE race, E_BUILDINGCASTLE dwelling){
 
     switch(race){
     

@@ -185,7 +185,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    message = GetStringDwelling(castle->race, DWELLING_MONSTER1);
+    message = GetStringBuilding(castle->race, DWELLING_MONSTER1);
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -264,7 +264,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
-    if(castle->dwelling & DWELLING_MONSTER1){
+    if(castle->building & DWELLING_MONSTER1){
 	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
@@ -299,7 +299,7 @@ ACTION ShowWellInfo(void){
     my = cy + 150;
     monster = GetStatMonster(GetMonsterFromCastle(castle, level));
     // image dwelling
-    castle->dwelling & DWELLING_UPGRADE2 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
+    castle->building & DWELLING_UPGRADE2 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
     image = GetICNSprite(&sprite);
     rectCur.x = mx + 21;
     rectCur.y = my + 35;
@@ -307,7 +307,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    message = (castle->dwelling & DWELLING_UPGRADE2 ? GetStringDwelling(castle->race, DWELLING_UPGRADE2) : GetStringDwelling(castle->race, DWELLING_MONSTER2));
+    message = (castle->building & DWELLING_UPGRADE2 ? GetStringBuilding(castle->race, DWELLING_UPGRADE2) : GetStringBuilding(castle->race, DWELLING_MONSTER2));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -386,7 +386,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
-    if(castle->dwelling & DWELLING_MONSTER2 || castle->dwelling & DWELLING_UPGRADE2){
+    if(castle->building & DWELLING_MONSTER2 || castle->building & DWELLING_UPGRADE2){
 	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
@@ -421,7 +421,7 @@ ACTION ShowWellInfo(void){
     my = cy + 300;
     monster = GetStatMonster(GetMonsterFromCastle(castle, level));
     // image dwelling
-    castle->dwelling & DWELLING_UPGRADE3 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
+    castle->building & DWELLING_UPGRADE3 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
     image = GetICNSprite(&sprite);
     rectCur.x = mx + 21;
     rectCur.y = my + 35;
@@ -429,7 +429,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    message = (castle->dwelling & DWELLING_UPGRADE3 ? GetStringDwelling(castle->race, DWELLING_UPGRADE3) : GetStringDwelling(castle->race, DWELLING_MONSTER3));
+    message = (castle->building & DWELLING_UPGRADE3 ? GetStringBuilding(castle->race, DWELLING_UPGRADE3) : GetStringBuilding(castle->race, DWELLING_MONSTER3));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -508,7 +508,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
-    if(castle->dwelling & DWELLING_MONSTER3 || castle->dwelling & DWELLING_UPGRADE3){
+    if(castle->building & DWELLING_MONSTER3 || castle->building & DWELLING_UPGRADE3){
 	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
@@ -543,7 +543,7 @@ ACTION ShowWellInfo(void){
     my = cy;
     monster = GetStatMonster(GetMonsterFromCastle(castle, level));
     // image dwelling
-    castle->dwelling & DWELLING_UPGRADE4 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
+    castle->building & DWELLING_UPGRADE4 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
     image = GetICNSprite(&sprite);
     rectCur.x = mx + 21;
     rectCur.y = my + 35;
@@ -551,7 +551,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    message = (castle->dwelling & DWELLING_UPGRADE4 ? GetStringDwelling(castle->race, DWELLING_UPGRADE4) : GetStringDwelling(castle->race, DWELLING_MONSTER4));
+    message = (castle->building & DWELLING_UPGRADE4 ? GetStringBuilding(castle->race, DWELLING_UPGRADE4) : GetStringBuilding(castle->race, DWELLING_MONSTER4));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -630,7 +630,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
-    if(castle->dwelling & DWELLING_MONSTER4 || castle->dwelling & DWELLING_UPGRADE4){
+    if(castle->building & DWELLING_MONSTER4 || castle->building & DWELLING_UPGRADE4){
 	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
@@ -665,7 +665,7 @@ ACTION ShowWellInfo(void){
     my = cy + 150;
     monster = GetStatMonster(GetMonsterFromCastle(castle, level));
     // image dwelling
-    castle->dwelling & DWELLING_UPGRADE5 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
+    castle->building & DWELLING_UPGRADE5 ? FillSPRITE(&sprite, icnname, 23 + level) : FillSPRITE(&sprite, icnname, 18 + level);
     image = GetICNSprite(&sprite);
     rectCur.x = mx + 21;
     rectCur.y = my + 35;
@@ -673,7 +673,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    message = (castle->dwelling & DWELLING_UPGRADE5 ? GetStringDwelling(castle->race, DWELLING_UPGRADE5) : GetStringDwelling(castle->race, DWELLING_MONSTER5));
+    message = (castle->building & DWELLING_UPGRADE5 ? GetStringBuilding(castle->race, DWELLING_UPGRADE5) : GetStringBuilding(castle->race, DWELLING_MONSTER5));
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -752,7 +752,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
-    if(castle->dwelling & DWELLING_MONSTER5 || castle->dwelling & DWELLING_UPGRADE5){
+    if(castle->building & DWELLING_MONSTER5 || castle->building & DWELLING_UPGRADE5){
 	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
@@ -787,9 +787,9 @@ ACTION ShowWellInfo(void){
     my = cy + 300;
     monster = GetStatMonster(GetMonsterFromCastle(castle, level));
     // image dwelling
-    if(castle->dwelling & DWELLING_UPGRADE7 && WARLOCK == castle->race)
+    if(castle->building & DWELLING_UPGRADE7 && WARLOCK == castle->race)
 	FillSPRITE(&sprite, icnname, 24 + level);
-    else if(castle->dwelling & DWELLING_UPGRADE6)
+    else if(castle->building & DWELLING_UPGRADE6)
 	FillSPRITE(&sprite, icnname, 23 + level);
     else
 	FillSPRITE(&sprite, icnname, 18 + level);
@@ -800,12 +800,12 @@ ACTION ShowWellInfo(void){
     rectCur.h = image->h;
     SDL_BlitSurface(image, NULL, video, &rectCur);
     //text dwelling
-    if(castle->dwelling & DWELLING_UPGRADE7 && WARLOCK == castle->race)
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE7);
-    else if(castle->dwelling & DWELLING_UPGRADE6)
-	message = GetStringDwelling(castle->race, DWELLING_UPGRADE6);
+    if(castle->building & DWELLING_UPGRADE7 && WARLOCK == castle->race)
+	message = GetStringBuilding(castle->race, DWELLING_UPGRADE7);
+    else if(castle->building & DWELLING_UPGRADE6)
+	message = GetStringBuilding(castle->race, DWELLING_UPGRADE6);
     else
-	message = GetStringDwelling(castle->race, DWELLING_MONSTER6);
+	message = GetStringBuilding(castle->race, DWELLING_MONSTER6);
     rectCur.x = mx + 86;
     rectCur.y = my + 106;
     rectCur.x = rectCur.x - GetLengthText(message, FONT_SMALL) / 2;
@@ -884,7 +884,7 @@ ACTION ShowWellInfo(void){
     rectCur.h = FONT_HEIGHTSMALL;
     PrintText(video, &rectCur, message, FONT_SMALL);
     // growth
-    if(castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6 || castle->dwelling & DWELLING_UPGRADE7){
+    if(castle->building & DWELLING_MONSTER6 || castle->building & DWELLING_UPGRADE6 || castle->building & DWELLING_UPGRADE7){
 	snprintf(str, STRLEN, "Growth");
 	rectCur.x = mx + 270;
 	rectCur.y = my + 24 + FONT_HEIGHTSMALL * 8;
@@ -996,7 +996,7 @@ void RedrawInfoAvailable(void){
     level = 1;
     mx = cx;
     my = cy;
-    if(castle->dwelling & DWELLING_MONSTER1 && castle->monster[level - 1]){
+    if(castle->building & DWELLING_MONSTER1 && castle->monster[level - 1]){
 	message = "Available:";
 	rectCur.x = mx + 70;
 	rectCur.y = my + 122;
@@ -1019,7 +1019,7 @@ void RedrawInfoAvailable(void){
     level = 2;
     mx = cx;
     my = cy + 150;
-    if((castle->dwelling & DWELLING_MONSTER2 || castle->dwelling & DWELLING_UPGRADE2) && castle->monster[level - 1]){
+    if((castle->building & DWELLING_MONSTER2 || castle->building & DWELLING_UPGRADE2) && castle->monster[level - 1]){
 	message = "Available:";
 	rectCur.x = mx + 70;
 	rectCur.y = my + 122;
@@ -1042,7 +1042,7 @@ void RedrawInfoAvailable(void){
     level = 3;
     mx = cx;
     my = cy + 300;
-    if((castle->dwelling & DWELLING_MONSTER3 || castle->dwelling & DWELLING_UPGRADE3) && castle->monster[level - 1]){
+    if((castle->building & DWELLING_MONSTER3 || castle->building & DWELLING_UPGRADE3) && castle->monster[level - 1]){
 	message = "Available:";
 	rectCur.x = mx + 70;
 	rectCur.y = my + 122;
@@ -1065,7 +1065,7 @@ void RedrawInfoAvailable(void){
     level = 4;
     mx = cx + 315;
     my = cy;
-    if((castle->dwelling & DWELLING_MONSTER4 || castle->dwelling & DWELLING_UPGRADE4) && castle->monster[level - 1]){
+    if((castle->building & DWELLING_MONSTER4 || castle->building & DWELLING_UPGRADE4) && castle->monster[level - 1]){
 	message = "Available:";
 	rectCur.x = mx + 70;
 	rectCur.y = my + 122;
@@ -1088,7 +1088,7 @@ void RedrawInfoAvailable(void){
     level = 5;
     mx = cx + 315;
     my = cy + 150;
-    if((castle->dwelling & DWELLING_MONSTER5 || castle->dwelling & DWELLING_UPGRADE5) && castle->monster[level - 1]){
+    if((castle->building & DWELLING_MONSTER5 || castle->building & DWELLING_UPGRADE5) && castle->monster[level - 1]){
 	message = "Available:";
 	rectCur.x = mx + 70;
 	rectCur.y = my + 122;
@@ -1111,7 +1111,7 @@ void RedrawInfoAvailable(void){
     level = 6;
     mx = cx + 315;
     my = cy + 300;
-    if((castle->dwelling & DWELLING_MONSTER6 || castle->dwelling & DWELLING_UPGRADE6 || castle->dwelling & DWELLING_UPGRADE7) && castle->monster[level - 1]){
+    if((castle->building & DWELLING_MONSTER6 || castle->building & DWELLING_UPGRADE6 || castle->building & DWELLING_UPGRADE7) && castle->monster[level - 1]){
 	message = "Available:";
 	rectCur.x = mx + 70;
 	rectCur.y = my + 122;

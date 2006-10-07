@@ -49,4 +49,6 @@ void ScaleSurface(SDL_Surface *, SDL_Surface *);
 void LockSurface(SDL_Surface *);
 void UnlockSurface(SDL_Surface *);
 
+void AlphaBlendingObject(SDL_Surface *, SDL_Rect *, Uint8);
+
 #endif

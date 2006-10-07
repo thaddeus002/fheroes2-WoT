@@ -348,7 +348,6 @@ typedef struct {
             } S_PAYMENT;
                 
 const S_PAYMENT * PaymentConditionsBuilding(E_RACE, E_BUILDINGCASTLE);
-const S_PAYMENT * PaymentConditionsDwelling(E_RACE, E_DWELLINGCASTLE); 
 const S_PAYMENT * PaymentConditionsMonster(E_MONSTER); 
 const S_PAYMENT * PaymentConditionsUpgradeMonster(E_MONSTER, E_MONSTER); 
 const S_PAYMENT * PaymentConditionsRecrutHeroes(void); 

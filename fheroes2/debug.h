@@ -45,7 +45,6 @@ const char * GetStringMorale(E_MORALE);
 const char * GetStringDescriptionsMorale(E_MORALE);
 const char * GetStringSpeed(E_MONSTERSPEED);
 const char * GetStringGround(E_GROUND);
-const char * GetStringDwelling(E_RACE, E_DWELLINGCASTLE);
 const char * GetStringBuilding(E_RACE, E_BUILDINGCASTLE);
 const char * GetStringDescriptionsBuilding(E_RACE, E_BUILDINGCASTLE);
 const char * GetStringResource(E_RESOURCE);
@@ -58,8 +57,8 @@ const char * GetStringSkill(E_SKILL);
 const char * GetStringDescriptionsSkill(E_SKILL, E_LEVELSKILL);
 
 const char * GetStringLevelMageGuild(E_MAGICLEVEL level);
-const char * GetStringDepenceDwelling(E_RACE, E_DWELLINGCASTLE);
-const char * GetStringMonsterFromDwelling(E_RACE, E_DWELLINGCASTLE);
+const char * GetStringDepenceDwelling(E_RACE, E_BUILDINGCASTLE);
+const char * GetStringMonsterFromDwelling(E_RACE, E_BUILDINGCASTLE);
 
 const char * GetStringAttackSkill(void);
 const char * GetStringDefenseSkill(void);

@@ -342,19 +342,19 @@ ACTION ActionOverDwelling2(void){
 
     switch(castle->race){
 	case BARBARIAN:
-	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(CHIEF_ORC) : GetStatMonster(ORC));
+	    monster = (castle->building & DWELLING_UPGRADE2 ? GetStatMonster(CHIEF_ORC) : GetStatMonster(ORC));
 	    break;
 	case KNIGHT:
-	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(ARCHER) : GetStatMonster(RANGER));
+	    monster = (castle->building & DWELLING_UPGRADE2 ? GetStatMonster(ARCHER) : GetStatMonster(RANGER));
 	    break;
 	case WARLOCK:
 	    monster = GetStatMonster(GARGOYLE);
 	    break;
 	case SORCERESS:
-	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(DWARF) : GetStatMonster(BATTLE_DWARF));
+	    monster = (castle->building & DWELLING_UPGRADE2 ? GetStatMonster(DWARF) : GetStatMonster(BATTLE_DWARF));
 	    break;
 	case NECROMANCER:
-	    monster = (castle->dwelling & DWELLING_UPGRADE2 ? GetStatMonster(ZOMBIE) : GetStatMonster(MUTANT_ZOMBIE));
+	    monster = (castle->building & DWELLING_UPGRADE2 ? GetStatMonster(ZOMBIE) : GetStatMonster(MUTANT_ZOMBIE));
 	    break;
 	case WIZARD:
 	    monster = GetStatMonster(BOAR);
@@ -389,19 +389,19 @@ ACTION ActionOverDwelling3(void){
 	    monster = GetStatMonster(WOLF);
 	    break;
 	case KNIGHT:
-	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(PIKEMAN) : GetStatMonster(VETERAN_PIKEMAN));
+	    monster = (castle->building & DWELLING_UPGRADE3 ? GetStatMonster(PIKEMAN) : GetStatMonster(VETERAN_PIKEMAN));
 	    break;
 	case WARLOCK:
 	    monster = GetStatMonster(GRIFFIN);
 	    break;
 	case SORCERESS:
-	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(ELF) : GetStatMonster(GRAND_ELF));
+	    monster = (castle->building & DWELLING_UPGRADE3 ? GetStatMonster(ELF) : GetStatMonster(GRAND_ELF));
 	    break;
 	case NECROMANCER:
-	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(MUMMY) : GetStatMonster(ROYAL_MUMMY));
+	    monster = (castle->building & DWELLING_UPGRADE3 ? GetStatMonster(MUMMY) : GetStatMonster(ROYAL_MUMMY));
 	    break;
 	case WIZARD:
-	    monster = (castle->dwelling & DWELLING_UPGRADE3 ? GetStatMonster(IRON_GOLEM) : GetStatMonster(STEEL_GOLEM));
+	    monster = (castle->building & DWELLING_UPGRADE3 ? GetStatMonster(IRON_GOLEM) : GetStatMonster(STEEL_GOLEM));
 	    break;
 	default:
 	    return NONE;
@@ -430,19 +430,19 @@ ACTION ActionOverDwelling4(void){
 
     switch(castle->race){
 	case BARBARIAN:
-	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(OGRE) : GetStatMonster(LORD_OGRE));
+	    monster = (castle->building & DWELLING_UPGRADE4 ? GetStatMonster(OGRE) : GetStatMonster(LORD_OGRE));
 	    break;
 	case KNIGHT:
-	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(SWORDSMAN) : GetStatMonster(MASTER_SWORDSMAN));
+	    monster = (castle->building & DWELLING_UPGRADE4 ? GetStatMonster(SWORDSMAN) : GetStatMonster(MASTER_SWORDSMAN));
 	    break;
 	case WARLOCK:
-	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(MINOTAUR) : GetStatMonster(KNIGHT_MINOTAUR));
+	    monster = (castle->building & DWELLING_UPGRADE4 ? GetStatMonster(MINOTAUR) : GetStatMonster(KNIGHT_MINOTAUR));
 	    break;
 	case SORCERESS:
-	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(DRUID) : GetStatMonster(GREATER_DRUID));
+	    monster = (castle->building & DWELLING_UPGRADE4 ? GetStatMonster(DRUID) : GetStatMonster(GREATER_DRUID));
 	    break;
 	case NECROMANCER:
-	    monster = (castle->dwelling & DWELLING_UPGRADE4 ? GetStatMonster(VAMPIRE) : GetStatMonster(LORD_VAMPIRE));
+	    monster = (castle->building & DWELLING_UPGRADE4 ? GetStatMonster(VAMPIRE) : GetStatMonster(LORD_VAMPIRE));
 	    break;
 	case WIZARD:
 	    monster = GetStatMonster(ROC);
@@ -474,10 +474,10 @@ ACTION ActionOverDwelling5(void){
 
     switch(castle->race){
 	case BARBARIAN:
-	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(TROLL) : GetStatMonster(WAR_TROLL));
+	    monster = (castle->building & DWELLING_UPGRADE5 ? GetStatMonster(TROLL) : GetStatMonster(WAR_TROLL));
 	    break;
 	case KNIGHT:
-	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(CAVALIRY) : GetStatMonster(CHAMPION));
+	    monster = (castle->building & DWELLING_UPGRADE5 ? GetStatMonster(CAVALIRY) : GetStatMonster(CHAMPION));
 	    break;
 	case WARLOCK:
 	    monster = GetStatMonster(HIDRA);
@@ -486,10 +486,10 @@ ACTION ActionOverDwelling5(void){
 	    monster = GetStatMonster(UNICORN);
 	    break;
 	case NECROMANCER:
-	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(LICH) : GetStatMonster(POWER_LICH));
+	    monster = (castle->building & DWELLING_UPGRADE5 ? GetStatMonster(LICH) : GetStatMonster(POWER_LICH));
 	    break;
 	case WIZARD:
-	    monster = (castle->dwelling & DWELLING_UPGRADE5 ? GetStatMonster(MAGE) : GetStatMonster(ARCHMAGE));
+	    monster = (castle->building & DWELLING_UPGRADE5 ? GetStatMonster(MAGE) : GetStatMonster(ARCHMAGE));
 	    break;
 	default:
 	    return NONE;
@@ -521,12 +521,12 @@ ACTION ActionOverDwelling6(void){
 	    monster = GetStatMonster(CYCLOPS);
 	    break;
 	case KNIGHT:
-	    monster = (castle->dwelling & DWELLING_UPGRADE6 ? GetStatMonster(PALADIN) : GetStatMonster(CRUSADER));
+	    monster = (castle->building & DWELLING_UPGRADE6 ? GetStatMonster(PALADIN) : GetStatMonster(CRUSADER));
 	    break;
 	case WARLOCK:
-	    if(castle->dwelling & DWELLING_UPGRADE7)
+	    if(castle->building & DWELLING_UPGRADE7)
 		monster = GetStatMonster(BLACK_DRAGON);
-	    else if(castle->dwelling & DWELLING_UPGRADE6)
+	    else if(castle->building & DWELLING_UPGRADE6)
 		monster = GetStatMonster(RED_DRAGON);
 	    else
 		monster = GetStatMonster(GREEN_DRAGON);
@@ -538,7 +538,7 @@ ACTION ActionOverDwelling6(void){
 	    monster = GetStatMonster(BONE_DRAGON);
 	    break;
 	case WIZARD:
-	    monster = (castle->dwelling & DWELLING_UPGRADE6 ? GetStatMonster(GIANT) : GetStatMonster(TITAN));
+	    monster = (castle->building & DWELLING_UPGRADE6 ? GetStatMonster(GIANT) : GetStatMonster(TITAN));
 	    break;
 	default:
 	    return NONE;
@@ -1616,15 +1616,15 @@ ACTION ActionCastleOverDwelling1(void){
     switch(AllowBuildDwelling1(castle)){
 
 	case BUILD_OK:
-	    snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_MONSTER1));
 	    break;
 	
 	case CANNOT_BUILD:
-	    snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_MONSTER1));
 	    break;
 	
 	case ALREADY_BUILD:
-	    snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER1));
+	    snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_MONSTER1));
 	    break;
 	
 	case END_TUR:
@@ -1656,20 +1656,20 @@ ACTION ActionCastleOverDwelling2(void){
     switch(AllowBuildDwelling2(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER2 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
-		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	    castle->building & DWELLING_MONSTER2 ? snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE2)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_MONSTER2));
 	    break;
 
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER2 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE2)) :
-		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+	    castle->building & DWELLING_MONSTER2 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE2)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_MONSTER2));
 	    break;
 
 	case ALREADY_BUILD:
-	    if(castle->dwelling & DWELLING_UPGRADE2)
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE2));
+	    if(castle->building & DWELLING_UPGRADE2)
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_UPGRADE2));
 	    else
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER2));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_MONSTER2));
 	    break;
 
 	case END_TUR:
@@ -1700,20 +1700,20 @@ ACTION ActionCastleOverDwelling3(void){
     switch(AllowBuildDwelling3(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER3 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
-		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	    castle->building & DWELLING_MONSTER3 ? snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE3)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_MONSTER3));
 	    break;
 	
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER3 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE3)) :
-		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+	    castle->building & DWELLING_MONSTER3 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE3)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_MONSTER3));
 	    break;
 	
 	case ALREADY_BUILD:
-	    if(castle->dwelling & DWELLING_UPGRADE3)
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE3));
+	    if(castle->building & DWELLING_UPGRADE3)
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_UPGRADE3));
 	    else
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER3));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_MONSTER3));
 	    break;
 	
 	case END_TUR:
@@ -1744,20 +1744,20 @@ ACTION ActionCastleOverDwelling4(void){
     switch(AllowBuildDwelling4(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER4 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
-		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	    castle->building & DWELLING_MONSTER4 ? snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE4)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_MONSTER4));
 	    break;
 	
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER4 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE4)) :
-		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+	    castle->building & DWELLING_MONSTER4 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE4)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_MONSTER4));
 	    break;
 	
 	case ALREADY_BUILD:
-	    if(castle->dwelling & DWELLING_UPGRADE4)
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE4));
+	    if(castle->building & DWELLING_UPGRADE4)
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_UPGRADE4));
 	    else
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER4));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_MONSTER4));
 	    break;
 	
 	case END_TUR:
@@ -1788,20 +1788,20 @@ ACTION ActionCastleOverDwelling5(void){
     switch(AllowBuildDwelling5(castle)){
 
 	case BUILD_OK:
-	    castle->dwelling & DWELLING_MONSTER5 ? snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
-		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	    castle->building & DWELLING_MONSTER5 ? snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE5)) :
+		snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_MONSTER5));
 	    break;
 	
 	case CANNOT_BUILD:
-	    castle->dwelling & DWELLING_MONSTER5 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE5)) :
-		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+	    castle->building & DWELLING_MONSTER5 ? snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE5)) :
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_MONSTER5));
 	    break;
 	
 	case ALREADY_BUILD:
-	    if(castle->dwelling & DWELLING_UPGRADE5)
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE5));
+	    if(castle->building & DWELLING_UPGRADE5)
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_UPGRADE5));
 	    else
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER5));
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_MONSTER5));
 	    break;
 	
 	case END_TUR:
@@ -1832,30 +1832,30 @@ ACTION ActionCastleOverDwelling6(void){
     switch(AllowBuildDwelling6(castle)){
 
 	case BUILD_OK:
-	    if(castle->race == WARLOCK && castle->dwelling & DWELLING_UPGRADE6)
-		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
-	    else if(castle->dwelling & DWELLING_MONSTER6)
-		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+	    if(castle->race == WARLOCK && castle->building & DWELLING_UPGRADE6)
+		snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE7));
+	    else if(castle->building & DWELLING_MONSTER6)
+		snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE6));
 	    else
-		snprintf(message, MESSAGELEN, "Build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+		snprintf(message, MESSAGELEN, "Build %s", GetStringBuilding(castle->race, DWELLING_MONSTER6));
 	    break;
 	
 	case CANNOT_BUILD:
-	    if(castle->race == WARLOCK && castle->dwelling & DWELLING_UPGRADE6)
-		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
-	    else if(castle->dwelling & DWELLING_MONSTER6)
-		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
+	    if(castle->race == WARLOCK && castle->building & DWELLING_UPGRADE6)
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE7));
+	    else if(castle->building & DWELLING_MONSTER6)
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_UPGRADE6));
 	    else
-		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+		snprintf(message, MESSAGELEN, "Cannot build %s", GetStringBuilding(castle->race, DWELLING_MONSTER6));
 	    break;
 	
 	case ALREADY_BUILD:
-	    if(castle->dwelling & DWELLING_UPGRADE7)
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE7));
-	    else if(castle->dwelling & DWELLING_UPGRADE6)
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_UPGRADE6));
-	    else if(castle->dwelling & DWELLING_MONSTER6)
-		snprintf(message, MESSAGELEN, "%s is already build", GetStringDwelling(castle->race, DWELLING_MONSTER6));
+	    if(castle->building & DWELLING_UPGRADE7)
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_UPGRADE7));
+	    else if(castle->building & DWELLING_UPGRADE6)
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_UPGRADE6));
+	    else if(castle->building & DWELLING_MONSTER6)
+		snprintf(message, MESSAGELEN, "%s is already build", GetStringBuilding(castle->race, DWELLING_MONSTER6));
 	    break;
 	
 	case END_TUR:
@@ -2200,7 +2200,7 @@ ACTION ActionCastleClickDwelling1(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(OK == BuyDwellingBox(castle->race, DWELLING_MONSTER1, OK|CANCEL)){
+    if(OK == BuyBuildingBox(castle->race, DWELLING_MONSTER1, OK|CANCEL)){
 
 	BuildDwelling1(castle);
 	CastleIncreaseArmy(castle, DWELLING_MONSTER1, GetMonsterGrown(GetMonsterFromCastle(castle, 1)));
@@ -2217,19 +2217,19 @@ ACTION ActionCastleClickDwelling2(void){
     const S_CASTLE *castle = GetCurrentCastle();
     ACTION result;
 
-    if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
-	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE2, OK|CANCEL);
+    if(castle->building & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
+	result = BuyBuildingBox(castle->race, DWELLING_UPGRADE2, OK|CANCEL);
     else
-	result = BuyDwellingBox(castle->race, DWELLING_MONSTER2, OK|CANCEL);
+	result = BuyBuildingBox(castle->race, DWELLING_MONSTER2, OK|CANCEL);
 
     if(OK == result){
 
-	if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
+	if(castle->building & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
 	    BuildUpgrade2(castle);
 	else
 	    BuildDwelling2(castle);
 
-	if(! castle->dwelling & DWELLING_UPGRADE2) CastleIncreaseArmy(castle, DWELLING_MONSTER2, GetMonsterGrown(GetMonsterFromCastle(castle, 2)));
+	if(! castle->building & DWELLING_UPGRADE2) CastleIncreaseArmy(castle, DWELLING_MONSTER2, GetMonsterGrown(GetMonsterFromCastle(castle, 2)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2243,19 +2243,19 @@ ACTION ActionCastleClickDwelling3(void){
     const S_CASTLE *castle = GetCurrentCastle();
     ACTION result;
 
-    if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
-	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE3, OK|CANCEL);
+    if(castle->building & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
+	result = BuyBuildingBox(castle->race, DWELLING_UPGRADE3, OK|CANCEL);
     else
-	result = BuyDwellingBox(castle->race, DWELLING_MONSTER3, OK|CANCEL);
+	result = BuyBuildingBox(castle->race, DWELLING_MONSTER3, OK|CANCEL);
 
     if(OK == result){
 
-	if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
+	if(castle->building & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
 	    BuildUpgrade3(castle);
 	else
 	    BuildDwelling3(castle);
 
-	if(! castle->dwelling & DWELLING_UPGRADE3) CastleIncreaseArmy(castle, DWELLING_MONSTER3, GetMonsterGrown(GetMonsterFromCastle(castle, 3)));
+	if(! castle->building & DWELLING_UPGRADE3) CastleIncreaseArmy(castle, DWELLING_MONSTER3, GetMonsterGrown(GetMonsterFromCastle(castle, 3)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2269,19 +2269,19 @@ ACTION ActionCastleClickDwelling4(void){
     const S_CASTLE *castle = GetCurrentCastle();
     ACTION result;
 
-    if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
-	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE4, OK|CANCEL);
+    if(castle->building & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
+	result = BuyBuildingBox(castle->race, DWELLING_UPGRADE4, OK|CANCEL);
     else
-	result = BuyDwellingBox(castle->race, DWELLING_MONSTER4, OK|CANCEL);
+	result = BuyBuildingBox(castle->race, DWELLING_MONSTER4, OK|CANCEL);
 
     if(OK == result){
 
-	if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
+	if(castle->building & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
 	    BuildUpgrade4(castle);
 	else
 	    BuildDwelling4(castle);
 
-	if(! castle->dwelling & DWELLING_UPGRADE4) CastleIncreaseArmy(castle, DWELLING_MONSTER4, GetMonsterGrown(GetMonsterFromCastle(castle, 4)));
+	if(! castle->building & DWELLING_UPGRADE4) CastleIncreaseArmy(castle, DWELLING_MONSTER4, GetMonsterGrown(GetMonsterFromCastle(castle, 4)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2295,19 +2295,19 @@ ACTION ActionCastleClickDwelling5(void){
     const S_CASTLE *castle = GetCurrentCastle();
     ACTION result;
 
-    if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
-	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE5, OK|CANCEL);
+    if(castle->building & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
+	result = BuyBuildingBox(castle->race, DWELLING_UPGRADE5, OK|CANCEL);
     else
-	result = BuyDwellingBox(castle->race, DWELLING_MONSTER5, OK|CANCEL);
+	result = BuyBuildingBox(castle->race, DWELLING_MONSTER5, OK|CANCEL);
 
     if(OK == result){
 
-	if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
+	if(castle->building & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
 	    BuildUpgrade5(castle);
 	else
 	    BuildDwelling5(castle);
 
-	if(! castle->dwelling & DWELLING_UPGRADE5) CastleIncreaseArmy(castle, DWELLING_MONSTER5, GetMonsterGrown(GetMonsterFromCastle(castle, 5)));
+	if(! castle->building & DWELLING_UPGRADE5) CastleIncreaseArmy(castle, DWELLING_MONSTER5, GetMonsterGrown(GetMonsterFromCastle(castle, 5)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2321,23 +2321,23 @@ ACTION ActionCastleClickDwelling6(void){
     const S_CASTLE *castle = GetCurrentCastle();
     ACTION result;
 
-    if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
-	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE7, OK|CANCEL);
-    else if(castle->dwelling & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
-	result = BuyDwellingBox(castle->race, DWELLING_UPGRADE6, OK|CANCEL);
+    if(castle->building & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
+	result = BuyBuildingBox(castle->race, DWELLING_UPGRADE7, OK|CANCEL);
+    else if(castle->building & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
+	result = BuyBuildingBox(castle->race, DWELLING_UPGRADE6, OK|CANCEL);
     else
-	result = BuyDwellingBox(castle->race, DWELLING_MONSTER6, OK|CANCEL);
+	result = BuyBuildingBox(castle->race, DWELLING_MONSTER6, OK|CANCEL);
 
     if(OK == result){
 
-	if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
+	if(castle->building & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
 	    BuildUpgrade7(castle);
-	else if(castle->dwelling & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
+	else if(castle->building & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
 	    BuildUpgrade6(castle);
 	else
 	    BuildDwelling6(castle);
 
-	if(!castle->dwelling & DWELLING_UPGRADE6 && !castle->dwelling & DWELLING_UPGRADE7) CastleIncreaseArmy(castle, DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(castle, 6)));
+	if(!castle->building & DWELLING_UPGRADE6 && !castle->building & DWELLING_UPGRADE7) CastleIncreaseArmy(castle, DWELLING_MONSTER6, GetMonsterGrown(GetMonsterFromCastle(castle, 6)));
 	EnableCastleUpdateBuilding();
 
 	return CANCEL;
@@ -2494,7 +2494,7 @@ ACTION ActionCastleRClickDwelling1(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    BuyDwellingBox(castle->race, DWELLING_MONSTER1, NONE);
+    BuyBuildingBox(castle->race, DWELLING_MONSTER1, NONE);
 
     return NONE;
 }
@@ -2503,10 +2503,10 @@ ACTION ActionCastleRClickDwelling2(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->dwelling & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
-	BuyDwellingBox(castle->race, DWELLING_UPGRADE2, NONE);
+    if(castle->building & DWELLING_MONSTER2 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE2))
+	BuyBuildingBox(castle->race, DWELLING_UPGRADE2, NONE);
     else
-	BuyDwellingBox(castle->race, DWELLING_MONSTER2, NONE);
+	BuyBuildingBox(castle->race, DWELLING_MONSTER2, NONE);
 
     return NONE;
 }
@@ -2515,10 +2515,10 @@ ACTION ActionCastleRClickDwelling3(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->dwelling & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
-	BuyDwellingBox(castle->race, DWELLING_UPGRADE3, NONE);
+    if(castle->building & DWELLING_MONSTER3 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE3))
+	BuyBuildingBox(castle->race, DWELLING_UPGRADE3, NONE);
     else
-	BuyDwellingBox(castle->race, DWELLING_MONSTER3, NONE);
+	BuyBuildingBox(castle->race, DWELLING_MONSTER3, NONE);
 
     return NONE;
 }
@@ -2527,10 +2527,10 @@ ACTION ActionCastleRClickDwelling4(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->dwelling & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
-	BuyDwellingBox(castle->race, DWELLING_UPGRADE4, NONE);
+    if(castle->building & DWELLING_MONSTER4 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE4))
+	BuyBuildingBox(castle->race, DWELLING_UPGRADE4, NONE);
     else
-	BuyDwellingBox(castle->race, DWELLING_MONSTER4, NONE);
+	BuyBuildingBox(castle->race, DWELLING_MONSTER4, NONE);
 
     return NONE;
 }
@@ -2539,10 +2539,10 @@ ACTION ActionCastleRClickDwelling5(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->dwelling & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
-	BuyDwellingBox(castle->race, DWELLING_UPGRADE5, NONE);
+    if(castle->building & DWELLING_MONSTER5 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE5))
+	BuyBuildingBox(castle->race, DWELLING_UPGRADE5, NONE);
     else
-	BuyDwellingBox(castle->race, DWELLING_MONSTER5, NONE);
+	BuyBuildingBox(castle->race, DWELLING_MONSTER5, NONE);
 
     return NONE;
 }
@@ -2551,12 +2551,12 @@ ACTION ActionCastleRClickDwelling6(void){
 
     const S_CASTLE *castle = GetCurrentCastle();
 
-    if(castle->dwelling & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
-	BuyDwellingBox(castle->race, DWELLING_UPGRADE7, NONE);
-    else if(castle->dwelling & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
-	BuyDwellingBox(castle->race, DWELLING_UPGRADE6, NONE);
+    if(castle->building & DWELLING_UPGRADE6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE7))
+	BuyBuildingBox(castle->race, DWELLING_UPGRADE7, NONE);
+    else if(castle->building & DWELLING_MONSTER6 && CastleDwellingUpgradable(castle, DWELLING_UPGRADE6))
+	BuyBuildingBox(castle->race, DWELLING_UPGRADE6, NONE);
     else
-	BuyDwellingBox(castle->race, DWELLING_MONSTER6, NONE);
+	BuyBuildingBox(castle->race, DWELLING_MONSTER6, NONE);
 
     return NONE;
 }
