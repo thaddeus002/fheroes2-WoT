@@ -58,6 +58,7 @@ void	DrawCellAreaMapsTile(Uint8, Uint8);
 void	DrawCellAreaMapsLevel1(Uint8, Uint8);
 void	DrawCellAreaMapsLevel2(Uint8, Uint8);
 void	DrawCellAreaMapsUpgrade(Uint8, Uint8);
+void	DrawCellAreaMapsHeroes(Uint8, Uint8);
 void	DrawCellStaticAnimation(Uint8, Uint8);
 void	RedrawMapsAnimation(void);
 void	CheckCursorAreaAction(E_OBJECT);
@@ -624,7 +625,18 @@ ACTION DrawMainDisplay(){
     InitRadar();
     InitCursorFocus();
 
-    S_CASTLE *castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
+    // Recrut Heroes with Castle
+    Uint8 i;
+    S_CASTLE *castle = NULL;
+
+    if(GetIntValue(STARTHEROESCASTLE))
+	for(i = 0; i < 8; ++i) 
+    	    if((GetIntValue(KINGDOMCOLORS) >> i) & 0x01){
+		castle = GetFirstCastle(i);
+		if(castle) RecrutHeroes(HEROESNULL, i, castle->ax, castle->ay + 2);
+    }
+
+    castle = GetFirstCastle(GetIntValue(HUMANCOLORS));
     if(castle)
 	SetGameFocus(castle, OBJ_CASTLE);
     else
@@ -1504,6 +1516,8 @@ void DrawRectAreaMaps(SDL_Rect *rect){
     for(y = rect->y; y < rect->y + rect->h; ++y)
 	for(x = rect->x; x < rect->x + rect->w; ++x){
 
+	    DrawCellAreaMapsHeroes(x, y);
+
 	    ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
 
 	    if(! ptrCell->animation) DrawCellAreaMapsLevel2(x, y);
@@ -1805,6 +1819,27 @@ void DrawCellAreaMapsUpgrade(Uint8 x, Uint8 y){
         SDL_BlitSurface(icn->surface, NULL, video, &dest);
 
         icn = icn->next;
+    }
+}
+
+void DrawCellAreaMapsHeroes(Uint8 x, Uint8 y){
+
+    SDL_Surface *video = SDL_GetVideoSurface();
+    SDL_Surface *image = NULL;
+    SDL_Rect dest;
+
+    S_CELLMAPS *ptrCell = GetCELLMAPS((display.offsetY + y) * GetWidthMaps() + display.offsetX + x);
+    
+    S_HEROES *heroes = GetStatHeroesPos(ptrCell->ax, ptrCell->ay);
+    
+    if(heroes){
+	image = GetSpriteHeroes(heroes->vector, heroes->race);
+	dest.x = BORDERWIDTH + x * TILEWIDTH;
+	dest.y = BORDERWIDTH + y * TILEWIDTH - 18;
+	dest.w = image->w;
+	dest.h = image->h;
+
+        SDL_BlitSurface(image, NULL, video, &dest);
     }
 }
 
@@ -3021,6 +3056,7 @@ void CheckCursorAreaAction(E_OBJECT f){
 		    case OBJ_BIGCRACK:
 		    case OBJ_MOUNTS:
 		    case OBJ_TREES:
+		    case OBJ_FIRTREES:
 		    case OBJN_WAGONCAMP:
 		    case OBJN_SAWMILL:
 		    case OBJN_MINES:
@@ -3247,6 +3283,7 @@ ACTION ClickCursorAreaAction(E_OBJECT f){
 		    case OBJ_BIGCRACK:
 		    case OBJ_MOUNTS:
 		    case OBJ_TREES:
+		    case OBJ_FIRTREES:
 		    case OBJN_WAGONCAMP:
 		    case OBJN_SAWMILL:
 		    case OBJN_MINES:

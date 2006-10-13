@@ -614,6 +614,9 @@ ACTION ActionClickCastle(void){
     else if(! castle->allowCastle)
 	return MessageBox(NULL, "This town may not be upgraded to a castle.", FONT_BIG, OK);
 
+    else if(!KingdomAllowPayment(castle->color, PaymentConditionsBuilding(castle->race, BUILD_CASTLE)))
+	BuyBuildingBox(castle->race, BUILD_CASTLE, CANCEL);
+
     else if(OK == BuyBuildingBox(castle->race, BUILD_CASTLE, OK|CANCEL)){
 
 	BuildCastle(castle);

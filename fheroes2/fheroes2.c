@@ -93,7 +93,7 @@ int main(int argc, char **argv){
     if(NULL == config_file) config_file = "fheroes2.cfg";
 
     if(! InitConfig(config_file)) exit(1);
-
+    if(2 > GetIntValue(ANIMATIONDELAY)) SetIntValue(ANIMATIONDELAY, 2);
     if(debug) SetIntValue(DEBUG, debug);
 
     Uint32 flags;

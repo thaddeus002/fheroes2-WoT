@@ -331,6 +331,10 @@ const char * GetStringObject(E_OBJECT type){
             string = "Trees";
             break;
 
+        case OBJ_FIRTREES:
+            string = "Fir Trees";
+            break;
+
         // горы
         case OBJ_MOUNTS:
             string = "Mountains";

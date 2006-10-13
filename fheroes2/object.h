@@ -95,6 +95,7 @@ typedef enum {
 		OBJ_VEGETATION1		= 0x66,	// цветы, растительность
 		OBJ_WATERLAKE		= 0x68,	// озеро воды
 		OBJ_VEGETATION2		= 0x69,	// цветы, растительность
+		OBJ_FIRTREES		= 0x6A, // зимняя елка
 		OBJ_BIGCRACK		= 0x6C,	// трещина большая
 
 		OBJ_LAVALAKE		= 0x70,	// озеро лавы

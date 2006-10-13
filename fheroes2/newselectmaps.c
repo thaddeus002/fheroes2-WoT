@@ -52,6 +52,7 @@ typedef struct {			// структура заголовка карты с нео
     Uint8	conditionsWins;		// address: 0x1D
     Uint8	conditionsLoss;		// address: 0x22
     Uint8	raceBlue;		// address: 0x26
+    Uint8	withHeroes;
     Uint8	raceGreen;
     Uint8	raceRed;
     Uint8	raceYellow;
@@ -413,6 +414,7 @@ ACTION DrawNewSelectMaps(void){			// типа майн ;)
 		    SetIntValue(RACEYELLOW, currentName->info.raceYellow);
 		    SetIntValue(RACEORANGE, currentName->info.raceOrange);
 		    SetIntValue(RACEPURPLE, currentName->info.racePurple);
+		    if(currentName->info.withHeroes) SetIntValue(STARTHEROESCASTLE, TRUE);
 		    result = OK;
 		    exit = TRUE;
 		}
@@ -714,6 +716,9 @@ void ReadFileMapInfo(){
 	    fread(&ptr->info.longname, sizeof(Uint8), 16, fd);
 	    fseek(fd, 0x76, SEEK_SET);
 	    fread(&ptr->info.description, sizeof(Uint8), 143, fd);
+
+	    fseek(fd, 0x25, SEEK_SET);
+	    fread(&ptr->info.withHeroes, sizeof(Uint8), 1, fd);
 
 	    fseek(fd, 0x26, SEEK_SET);
 	    fread(&ptr->info.raceBlue, sizeof(Uint8), 1, fd);

@@ -38,11 +38,13 @@
 #include "cursor.h"
 #include "debug.h"
 #include "tools.h"
+#include "kingdom.h"
 #include "spell.h"
 #include "monster.h"
 #include "heroes.h"
 
 static S_HEROES *	allHeroes = NULL;
+static S_HEROES *	currentHeroes = NULL;
 static char 		heroesPortrait[13];
 
 S_HEROES *GetStatHeroes(E_NAMEHEROES name){
@@ -1131,10 +1133,152 @@ SDL_Surface *GetSpriteHeroes(E_VECTOR vector, E_RACE race){
     return (reflect ? GetReflectICNSprite(&sprite) : GetICNSprite(&sprite));
 }
 
-E_NAMEHEROES RecrutHeroes(E_NAMEHEROES name, E_RACE race){
+S_HEROES * RecrutHeroes(E_NAMEHEROES name, E_COLORS color, Uint8 ax, Uint8 ay){
 
-    // HEROESNULL - start game, rnd race heroes
-    // else buy heroes
+    // limit KINGDOMMAXHEROES
+    if(KINGDOMMAXHEROES == GetCountHeroes(color)) return NULL;
 
-    return 0;
+    E_RACE race = BOMG;
+    S_HEROES *heroes = NULL;
+    
+    switch(color){
+	case BLUE:
+	    race = GetIntValue(RACEBLUE);
+	    break;
+	case GREEN:
+	    race = GetIntValue(RACEGREEN);
+	    break;
+	case RED:
+	    race = GetIntValue(RACERED);
+	    break;
+	case YELLOW:
+	    race = GetIntValue(RACEYELLOW);
+	    break;
+	case ORANGE:
+	    race = GetIntValue(RACEORANGE);
+	    break;
+	case PURPLE:
+	    race = GetIntValue(RACEPURPLE);
+	    break;
+	default:
+	    return NULL;
+	    break;
+    }
+
+    heroes = (HEROESNULL != name ? &allHeroes[name] : GetFreeHeroes(race));
+
+    if(NULL == (heroes = GetFreeHeroes(race)) || heroes->employ) return NULL;
+
+    // покупаем
+    if(HEROESNULL != name && KingdomAllowPayment(color, PaymentConditionsRecrutHeroes()))
+	KingdomWasteResource(color, PaymentConditionsRecrutHeroes());
+
+    heroes->color = color;
+    heroes->race = race;
+    heroes->employ = TRUE;
+    heroes->ax = ax;
+    heroes->ay = ay;
+
+    return NULL;
+}
+
+
+S_HEROES * GetFirstHeroes(E_COLORS color){
+
+    currentHeroes = allHeroes;
+    
+    if(!currentHeroes) return NULL;
+
+    while(currentHeroes < &allHeroes[HEROESMAXCOUNT])
+	if(currentHeroes->employ && color == currentHeroes->color) return currentHeroes; else ++currentHeroes;
+
+    currentHeroes = NULL;
+    
+    return NULL;
+}
+
+S_HEROES * GetNextHeroes(E_COLORS color){
+
+    if(!currentHeroes) return NULL;
+
+    ++currentHeroes;
+
+    while(currentHeroes < &allHeroes[HEROESMAXCOUNT])
+	if(currentHeroes->employ && color == currentHeroes->color) return currentHeroes; else ++currentHeroes;
+
+    currentHeroes = NULL;
+    
+    return NULL;
+}
+
+S_HEROES * GetPrevHeroes(E_COLORS color){
+
+    if(!currentHeroes) return NULL;
+
+    --currentHeroes;
+
+    while(currentHeroes >= allHeroes)
+	if(currentHeroes->employ && color == currentHeroes->color) return currentHeroes; else --currentHeroes;
+
+    currentHeroes = NULL;
+    
+    return NULL;
+}
+
+S_HEROES * GetEndHeroes(E_COLORS color){
+
+    currentHeroes = &allHeroes[HEROESMAXCOUNT];
+    
+    while(currentHeroes >= allHeroes)
+	if(currentHeroes->employ && color == currentHeroes->color) return currentHeroes; else --currentHeroes;
+    
+    currentHeroes = NULL;
+    
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetEndHeroes: return NULL\n");
+
+    return NULL;
+}
+
+Uint8 GetCountHeroes(E_COLORS color){
+    
+    if(!GetFirstHeroes(color)) return 0;
+
+    Uint8 result = 1;
+    
+    while(GetNextHeroes(color)) ++result;
+
+    return result;
+}
+
+S_HEROES * GetFreeHeroes(E_RACE race){
+
+    S_HEROES * nextHeroes = allHeroes;
+    Uint8 count = 0;
+
+    while(nextHeroes < &allHeroes[HEROESMAXCOUNT]){
+	if(!nextHeroes->employ && race == nextHeroes->race) ++count;
+	++nextHeroes;
+    }
+
+    count = rand() % count;
+    nextHeroes = allHeroes;
+
+    while(nextHeroes < &allHeroes[HEROESMAXCOUNT]){
+	if(!nextHeroes->employ && race == nextHeroes->race && !count--) return nextHeroes;
+	++nextHeroes;
+    }
+    
+    if(GetIntValue(DEBUG)) fprintf(stderr, "GetFreeHeroes: return NULL\n");
+
+    return NULL;
+}
+
+S_HEROES * GetStatHeroesPos(Uint8 ax, Uint8 ay){
+
+    Uint8 i;
+    
+    for(i = 0; i < HEROESMAXCOUNT; ++i)
+	if(ax == allHeroes[i].ax && ay == allHeroes[i].ay) return &allHeroes[i];
+	
+    return NULL;
 }

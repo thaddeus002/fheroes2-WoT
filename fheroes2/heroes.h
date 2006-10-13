@@ -238,6 +238,7 @@ E_LEVELSKILL	HeroesLevelSkill(const S_HEROES *, E_SKILL);
 void		HeroesDefaultValues(S_HEROES *, E_RACE);
 Uint8		HeroesCountArmy(const S_HEROES *);
 S_HEROES       *GetStatHeroes(E_NAMEHEROES);
+S_HEROES       *GetStatHeroesPos(Uint8, Uint8);
 
 const char *	HeroesBigNamePortrait(E_NAMEHEROES);
 const char *	CapitanBigNamePortrait(E_RACE);
@@ -252,6 +253,13 @@ Uint8		GetHeroesLevel(const S_HEROES *);
 Uint32		GetHeroesRestLevel(const S_HEROES *);
 
 SDL_Surface *	GetSpriteHeroes(E_VECTOR, E_RACE);
-E_NAMEHEROES	RecrutHeroes(E_NAMEHEROES, E_RACE);
+
+S_HEROES        *RecrutHeroes(E_NAMEHEROES, E_COLORS, Uint8, Uint8);
+S_HEROES        *GetFirstHeroes(E_COLORS);
+S_HEROES        *GetNextHeroes(E_COLORS);
+S_HEROES        *GetPrevHeroes(E_COLORS);
+S_HEROES        *GetEndHeroes(E_COLORS);
+Uint8		GetCountHeroes(E_COLORS);
+S_HEROES	*GetFreeHeroes(E_RACE);
 
 #endif

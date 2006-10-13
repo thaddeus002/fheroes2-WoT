@@ -287,6 +287,7 @@ ACTION InitMaps(char *filename){
             case OBJ_BIGCRACK:
             case OBJ_MOUNTS:
             case OBJ_TREES:
+            case OBJ_FIRTREES:
             case OBJN_WAGONCAMP:
             case OBJN_SAWMILL:
             case OBJN_MINES:

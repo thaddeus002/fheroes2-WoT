@@ -49,7 +49,7 @@
 #define AREA_WIDTH	234
 #define BUTTON_HEIGHT	50
 
-// draw box && button YES|NO, OK|CANCEL, YES, OK, EXIT
+// draw box && button YES|NO, OK|CANCEL, YES, OK, CANCEL, EXIT
 S_BOX * InitBox(Uint16 height, INTERFACEACTION **ptr, Uint32 flag){
 
     S_BOX *box = NULL;
@@ -255,6 +255,24 @@ S_BOX * InitBox(Uint16 height, INTERFACEACTION **ptr, Uint32 flag){
 	    action.rect = dst;
 	    action.mouseEvent = MOUSE_LCLICK;
 	    action.pf = ActionPressYES;
+	    AddActionEvent(ptr, &action);
+	    SDL_BlitSurface(image, NULL, video, &dst);
+	    break;
+
+	case CANCEL:
+	    // button CANCEL
+	    FillSPRITE(&sprite, button, 3);
+	    image = GetICNSprite(&sprite);
+	    dst.x = box->rectArea.x + (box->rectArea.w - image->w) / 2;
+	    dst.y = box->rectArea.y + box->rectArea.h + BUTTON_HEIGHT - image->h;
+	    dst.w = image->w;
+	    dst.h = image->h;
+	    ZeroINTERFACEACTION(&action);
+	    FillSPRITE(&action.objectUp, button, 3);
+	    FillSPRITE(&action.objectPush, button, 4);
+	    action.rect = dst;
+	    action.mouseEvent = MOUSE_LCLICK;
+	    action.pf = ActionPressCANCEL;
 	    AddActionEvent(ptr, &action);
 	    SDL_BlitSurface(image, NULL, video, &dst);
 	    break;

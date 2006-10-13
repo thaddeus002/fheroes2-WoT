@@ -237,7 +237,7 @@ void DefaultSettings(S_CONFIG *ptr){
     SetIntValue(RACEYELLOW, 0);
     SetIntValue(RACEORANGE, 0);
     SetIntValue(RACEPURPLE, 0);
-    SetIntValue(STARTHEROESCASTLE, FALSE);
+    SetIntValue(STARTHEROESCASTLE, TRUE);
     SetIntValue(MONTH, 1);
     SetIntValue(WEEK, 1);
     SetIntValue(DAY, 1);

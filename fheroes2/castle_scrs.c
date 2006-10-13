@@ -73,8 +73,10 @@ void DrawSCRSCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
     GetFlagUpdateBuilding() ? AlphaBlendingObject(header->surface, &cur, GetCastleAlphaBlending()) : SDL_BlitSurface(header->surface, NULL, video, &cur);
 
     if(actionHead){
-	cur.w -= 40;
-	cur.h -=10;
+	if(castle->building & BUILD_CASTLE){
+	    cur.w -= 40;
+	    cur.h -=10;
+	}
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;
 	action.mouseEvent = MOUSE_PRESENT;

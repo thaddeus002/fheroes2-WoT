@@ -77,11 +77,6 @@ void DrawBRBNCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	if(castle->building & BUILD_CASTLE){
 	    cur.w -= 30;
 	    cur.h -= 45;
-	}else{
-	    cur.x += 20;
-	    cur.y += 20;
-	    cur.w = 70;
-	    cur.h = 50;
 	}
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;

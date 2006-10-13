@@ -63,7 +63,8 @@ void DrawKNGTCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	}
 	// спрайт замка
 	FillSPRITE(&sprite, "TWNKCSTL.ICN", 0);
-    }else FillSPRITE(&sprite, "TWNKTENT.ICN", 0);
+    }
+    else FillSPRITE(&sprite, "TWNKTENT.ICN", 0);
 
     header = GetICNHeader(&sprite);
     cur.x = cx + header->offsetX;
@@ -76,9 +77,6 @@ void DrawKNGTCastle(S_ANIMATION **animHead, INTERFACEACTION **actionHead){
 	if(castle->building & BUILD_CASTLE){
 	    cur.w -= 80;
 	    cur.h -= 25;
-	}else{
-	    cur.w = 50;
-	    cur.h = 50;
 	}
 	ZeroINTERFACEACTION(&action);
 	action.rect = cur;

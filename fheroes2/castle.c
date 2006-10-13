@@ -405,7 +405,7 @@ BOOL	AddCastle(FILE *fd, Uint8 seek, Uint8 ax, Uint8 ay){
 
     if(ptr->capitan) ptrCastle[countCastle].building |= BUILD_CAPTAIN;
 
-    if(ptr->castle) ptrCastle[countCastle].building |= BUILD_CASTLE;
+    ptrCastle[countCastle].building |= (ptr->castle ? BUILD_CASTLE : BUILD_TENT);
 
     ptrCastle[countCastle].allowCastle = (ptr->allowCastle ? FALSE : TRUE);
     
@@ -1708,14 +1708,14 @@ void RedrawHeroesMonster(void){
 
 S_CASTLE *GetFirstCastle(E_COLORS color){
 
-    Uint8 i;
-    currentCastle = NULL;
+    currentCastle = ptrCastle;
 
-    for(i = 0; i < countCastle; ++i)
-	if(ptrCastle[i].color == color){
-	    currentCastle = &ptrCastle[i];
-	    return currentCastle;
-	}
+    if(!currentCastle) return NULL;
+
+    while(currentCastle < &ptrCastle[countCastle])
+        if(color == currentCastle->color) return currentCastle; else ++currentCastle;
+
+    currentCastle = NULL;
 
     if(GetIntValue(DEBUG)) fprintf(stderr, "GetFirstCastle: return NULL\n");
 
@@ -1724,45 +1724,40 @@ S_CASTLE *GetFirstCastle(E_COLORS color){
 
 S_CASTLE *GetNextCastle(E_COLORS color){
 
-    Uint8 i;
-    BOOL  flag = FALSE;
+    if(!currentCastle) return NULL;
 
-    for(i = 0; i < countCastle; ++i)
-	if(ptrCastle[i].color == color){
-	    if(flag){
-		currentCastle = &ptrCastle[i];
-		return currentCastle;
-	    }else if(currentCastle == &ptrCastle[i]) flag = TRUE;
-	}
+    ++currentCastle;
+
+    while(currentCastle < &ptrCastle[countCastle])
+        if(color == currentCastle->color) return currentCastle; else ++currentCastle;
+
+    currentCastle = NULL;
 
     return NULL;
 }
 
 S_CASTLE *GetPrevCastle(E_COLORS color){
 
-    Uint8 i;
-    S_CASTLE *result = NULL;
-    
-    for(i = 0; i < countCastle; ++i)
+    if(!currentCastle) return NULL;
 
-	if(ptrCastle[i].color == color){
-	    if(currentCastle == &ptrCastle[i]){
-		currentCastle = result;
-		return result;
-	    }else
-		result = &ptrCastle[i];
-	}
+    --currentCastle;
+
+    while(currentCastle >= ptrCastle)
+        if(color == currentCastle->color) return currentCastle; else --currentCastle;
+
+    currentCastle = NULL;
 
     return NULL;
 }
 
 S_CASTLE *GetEndCastle(E_COLORS color){
 
-    Uint8 i;
-    currentCastle = NULL;
+    currentCastle = &ptrCastle[countCastle];
 
-    for(i = 0; i < countCastle; ++i)
-	if(ptrCastle[i].color == color) currentCastle = &ptrCastle[i];
+    while(currentCastle >= ptrCastle)
+        if(color == currentCastle->color) return currentCastle; else --currentCastle;
+
+    currentCastle = NULL;
 
     if(!currentCastle && GetIntValue(DEBUG)) fprintf(stderr, "GetEndCastle: return NULL\n");
 
