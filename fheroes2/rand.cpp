@@ -17,34 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
-#include "gamedefs.h"
+#include "rand.h"
 
-class Animation
+
+void Rand::Init(void){ std::srand((u32) std::time(0)); }
+
+u32 Rand::Get(u32 min, u32 max){ return max ? min + (std::rand() % (max - min + 1)) : std::rand() % (min + 1); }
+
+Maps::race_t Rand::Race(void)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    switch(Rand::Get(1, 6)){
+	case 1: return Maps::KNGT;
+	case 2: return Maps::BARB;
+	case 3: return Maps::SORC;
+	case 4: return Maps::WRLK;
+	case 5: return Maps::WZRD;
+	default: break;
+    }
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
-
-    void DrawSprite(void);
-    void Reset(void);
-
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
-
-#endif
+    return Maps::NECR;
+}

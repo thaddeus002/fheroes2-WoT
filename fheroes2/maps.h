@@ -17,34 +17,56 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
+#ifndef H2MAPS_H
+#define H2MAPS_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
 #include "gamedefs.h"
 
-class Animation
+namespace Maps
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    typedef enum {
+	BLUE	= 0x01,
+    	GREEN	= 0x02,
+        RED	= 0x04,
+        YELLOW	= 0x08,
+        ORANGE	= 0x10,
+        PURPLE	= 0x20,
+        GRAY	= 0x40,
+    } color_t;
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    typedef enum {
+	NONE	= 0,
+        SMALL	= 36,
+        MEDIUM	= 72,
+        LARGE	= 108,
+        XLARGE	= 144
+    } mapsize_t;
 
-    void DrawSprite(void);
-    void Reset(void);
+    typedef enum {
+	EASY,
+        NORMAL,
+        HARD,
+        EXPERT,
+        IMPOSSIBLE
+    } difficulty_t;
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
+    typedef enum {
+	KNGT	= 0x01,
+        BARB	= 0x02,
+        SORC	= 0x04,
+        WRLK	= 0x08,
+        WZRD	= 0x10,
+        NECR	= 0x20,
+	MULT	= 0x40,
+	RAND	= 0x80,
+	BOMG	= 0x00
+    } race_t;
+
+    difficulty_t& operator++ (difficulty_t& difficulty);
+    difficulty_t& operator-- (difficulty_t& difficulty);
+
+    color_t& operator++ (color_t& color);
+    color_t& operator-- (color_t& color);
 };
 
 #endif

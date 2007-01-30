@@ -17,34 +17,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
 #include "agg.h"
-#include "cursor.h"
-#include "rect.h"
 #include "sprite.h"
-#include "gamedefs.h"
+#include "event.h"
+#include "button.h"
+#include "game.h"
 
-class Animation
-{
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+#include "error.h"
+Game::menu_t Game::HighScores(void){
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    // preload
+    AGG::PreloadObject("HSBKG.ICN");
+    AGG::PreloadObject("HISCORE.ICN");
 
-    void DrawSprite(void);
-    void Reset(void);
+    // cursor
+    Cursor::Hide();
+    Cursor::Set(Cursor::POINTER);
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+    Display::SetVideoMode(Display::SMALL);
 
-#endif
+    // image background
+    const Sprite &back = AGG::GetICN("HSBKG.ICN", 0);
+    display.Blit(back);
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    Button buttonDismiss(9, 315, "HISCORE.ICN", 0, 1);
+    Button buttonExit(604, 315, "HISCORE.ICN", 4, 5);
+
+    display.Flip();
+    Cursor::Show();
+
+    // highscores loop
+    while(1){
+
+	le.HandleEvents();
+
+	le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
+	le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+
+	if(le.MouseRight()) Error::Verbose(le.MousePressRight());
+
+	//if(le.MouseClickLeft(buttonDismiss)) return MAINMENU;
+	if(le.MouseClickLeft(buttonExit)) return MAINMENU;
+    }
+
+    return QUITGAME;
+}

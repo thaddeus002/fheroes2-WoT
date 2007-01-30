@@ -17,34 +17,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
+#ifndef H2SPRITE_H
+#define H2SPRITE_H
 
 #include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
+#include <iostream>
+#include "error.h"
+#include "config.h"
 #include "gamedefs.h"
 
-class Animation
+class Sprite : public SDLmm::Surface
 {
+
 public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    Sprite() : SDLmm::Surface(){};
+    Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &dataICN);
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
-
-    void DrawSprite(void);
-    void Reset(void);
+    s16 x(void) const{ return offsetX; };
+    s16 y(void) const{ return offsetY; };
 
 private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
+    void DrawPixel(u16 x, u16 y, u8 index);
+    void DrawICN(const std::vector<unsigned char> &vdata);
+
+    s16		offsetX;
+    s16		offsetY;
 };
 
 #endif

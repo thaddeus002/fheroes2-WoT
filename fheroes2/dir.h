@@ -17,34 +17,19 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
+#ifndef H2DIR_H
+#define H2DIR_H
 
 #include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
+#include <string>
 #include "gamedefs.h"
 
-class Animation
+class Dir : public std::vector<std::string>
 {
+
 public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    Dir(const std::string &path, const std::string &filter = "");
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
-
-    void DrawSprite(void);
-    void Reset(void);
-
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
 };
 
 #endif

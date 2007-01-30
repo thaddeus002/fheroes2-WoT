@@ -17,34 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
-#include "gamedefs.h"
+#include "cmdline.h"
 
-class Animation
+std::map<char, std::string> CmdLine::map_params;
+
+/* class CmdLine */
+CmdLine::CmdLine(const char **argv)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    char key;
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    while(argv && *argv){
 
-    void DrawSprite(void);
-    void Reset(void);
+        std::string value(argv[0]);
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
+        // key rule: '-X'
+        if(value.length() == 2 && value[0] == '-')
+            { key = value[1]; map_params[key] = "true"; }
+        else
+            map_params[key] = value;
+
+        *argv++;
+    }
+}
+
+/* true if exists */
+bool CmdLine::Exists(const char key)
+{
+    return (map_params.find(key) != map_params.end());
 };
-
-#endif

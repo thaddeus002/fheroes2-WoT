@@ -17,34 +17,44 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
-#include "gamedefs.h"
+#include "game.h"
 
-class Animation
+/* global event filter */
+int Game::GlobalFilterEvents(const SDL_Event *event)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    // motion
+    if(SDL_MOUSEMOTION == event->type){
+    
+	// redraw cursor
+	Cursor::Redraw(event->motion.x, event->motion.y);
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+        return 1;
+    }
 
-    void DrawSprite(void);
-    void Reset(void);
+    // key
+    if(SDL_KEYDOWN == event->type)
+	switch(event->key.keysym.sym){
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+	    case SDLK_F4:
+		{ SDLmm::Display &display = SDLmm::Display::GetDisplay(); display.ToggleFullScreen(); }
+    		return 0;
 
-#endif
+	    case SDLK_PRINT:
+		if(display.SaveBMP("screenshot.bmp")) Error::Verbose("save: screenshot.bmp");
+		return 0;
+	    
+	    default:
+    		break;
+	}
+
+    return 1;
+}
+
+Game::menu_t Game::NewStandard(void){ return Game::SCENARIOINFO; }
+
+Game::menu_t Game::Credits(void){ Error::Verbose("Credits: under construction."); return Game::MAINMENU; }
+Game::menu_t Game::NewCampain(void){ Error::Verbose("New Campain Game: under construction."); return Game::NEWGAME; }
+Game::menu_t Game::NewMulti(void){ Error::Verbose("New Multi Game: under construction."); return Game::NEWGAME; }
+Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
+Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }

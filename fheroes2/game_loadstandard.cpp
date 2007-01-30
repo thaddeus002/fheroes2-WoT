@@ -17,34 +17,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
 #include "agg.h"
-#include "cursor.h"
-#include "rect.h"
 #include "sprite.h"
-#include "gamedefs.h"
+#include "event.h"
+#include "button.h"
+#include "game.h"
 
-class Animation
-{
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+Game::menu_t Game::LoadStandard(void){
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    // preload
+    AGG::PreloadObject("HEROES.ICN");
+    AGG::PreloadObject("REQBKG.ICN");
+    AGG::PreloadObject("REQUEST.ICN");
 
-    void DrawSprite(void);
-    void Reset(void);
+    // cursor
+    Cursor::Hide();
+    Cursor::Set(Cursor::POINTER);
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+    Display::SetVideoMode(Display::SMALL);
 
-#endif
+    // image background
+    const Sprite &back = AGG::GetICN("HEROES.ICN", 0);
+    display.Blit(back);
+
+    const Sprite &panel = AGG::GetICN("REQBKG.ICN", 0);
+    display.Blit(panel, Point(140, 50));
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    Button buttonOk(174, 365, "REQUEST.ICN", 1, 2);
+    Button buttonCancel(384, 365, "REQUEST.ICN", 3, 4);
+    Button buttonPgUp(467, 105, "REQUEST.ICN", 5, 6);
+    Button buttonPgDn(467, 307, "REQUEST.ICN", 7, 8);
+    display.Flip();
+    Cursor::Show();
+
+    // loadstandard loop
+    while(1){
+
+	le.HandleEvents();
+
+	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
+	le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
+	le.MousePressLeft(buttonPgUp) ? buttonPgUp.Press() : buttonPgUp.Release();
+	le.MousePressLeft(buttonPgDn) ? buttonPgDn.Press() : buttonPgDn.Release();
+
+	if(le.MouseClickLeft(buttonOk)) return MAINMENU;
+	if(le.MouseClickLeft(buttonCancel)) return MAINMENU;
+	//if(le.MouseClickLeft(buttonPgUp)) return MAINMENU;
+	//if(le.MouseClickLeft(buttonPgDn)) return MAINMENU;
+    }
+
+    return QUITGAME;
+}

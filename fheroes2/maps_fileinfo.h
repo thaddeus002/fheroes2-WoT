@@ -17,34 +17,50 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
+#ifndef H2MAPSFILEINFO_H
+#define H2MAPSFILEINFO_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
+#include "maps.h"
 #include "gamedefs.h"
 
-class Animation
+namespace Maps
 {
+
+class FileInfo
+{
+
 public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    FileInfo(const std::string &filemaps);
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
-
-    void DrawSprite(void);
-    void Reset(void);
+    const std::string & GetFileMaps(void) const{ return fileMaps; };
+    const std::string & GetName(void) const{ return name; };
+    const std::string & GetDescription(void) const{ return description; };
+    u8 GetKingdomColors(void) const{ return kingdomColors; };
+    u8 GetKingdomCount(void) const{ return kingdomCount; };
+    u8 GetAllowColors(void) const{ return allowColors; };
+    u8 GetKingdomRace(Maps::color_t color) const;
+    mapsize_t GetSizeMaps(void) const{ return sizeMaps; };
+    u8 GetConditionsWins(void) const{ return conditionsWins; };
+    u8 GetConditionsLoss(void) const{ return conditionsLoss; };
+    difficulty_t GetDifficulty(void) const{ return mapsDifficulty; };
 
 private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
+    std::string fileMaps;
+    mapsize_t sizeMaps;
+    difficulty_t mapsDifficulty;
+    u8 kingdomColors;
+    u8 allowColors;
+    u8 rndColors;
+    u8 kingdomCount;
+    u8 conditionsWins;
+    u8 conditionsLoss;
+    bool withHeroes;
+    std::string name;
+    std::string description;
+
+    u8 raceKingdom[KINGDOMMAX];
+};
+
 };
 
 #endif

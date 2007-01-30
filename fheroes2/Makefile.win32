@@ -1,19 +1,19 @@
 # makefile
-# project: Free Heroes2
 #
 
 TARGET = fheroes2.exe
-LIBS = -lSDLmain -lSDL
-CFLAGS = -O2 -I /cygdrive/c/cygwin/usr/include
-CC = gcc
+LIBS = `sdl-config --libs` `sdlmm-config --libs`
+CFLAGS = -O2 -Wall -fomit-frame-pointer `sdl-config --cflags` `sdlmm-config --cflags`
+
+CC = g++
 
 all: $(TARGET)
 	strip $(TARGET)
 
-fheroes2.exe: $(patsubst %.c, %.o, $(wildcard *.c))
+fheroes2.exe: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 	$(CC) $^ -o $@ $(LIBS)
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) -c -MD $< $(CFLAGS)
 
 include $(wildcard *.d)

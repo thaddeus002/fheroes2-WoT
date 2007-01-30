@@ -17,34 +17,45 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
-#include "gamedefs.h"
+#include "error.h"
 
-class Animation
+/* exception */
+void Error::Except(const std::string & message)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    std::cerr << "error: " << message << std::endl;
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    throw Exception();
+}
 
-    void DrawSprite(void);
-    void Reset(void);
+void Error::Warning(const std::string & message)
+{
+    if(H2Config::Debug()) std::cout << "warning: " << message << std::endl;
+}
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+void Error::Verbose(const std::string & message)
+{
+    if(H2Config::Debug()) std::cout << message << std::endl;
+}
 
-#endif
+void Error::Verbose(const std::string & message, int value)
+{
+    std::string str;
+    String::AddInt(str, value);
+
+    if(H2Config::Debug()) std::cout << message << str << std::endl;
+}
+
+void Error::Verbose(const Rect &rt)
+{
+    Verbose("x: ", rt.x);
+    Verbose("y: ", rt.y);
+    Verbose("w: ", rt.w);
+    Verbose("h: ", rt.h);
+}
+
+void Error::Verbose(const Point &pt)
+{
+    Verbose("x: ", pt.x);
+    Verbose("y: ", pt.y);
+}

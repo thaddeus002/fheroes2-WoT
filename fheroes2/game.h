@@ -17,34 +17,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
+#ifndef H2GAME_H
+#define H2GAME_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
 #include "gamedefs.h"
+#include "cursor.h"
+#include "error.h"
 
-class Animation
+namespace Game
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    typedef enum {
+	QUITGAME,
+	MAINMENU,
+        NEWGAME,
+        LOADGAME,
+        HIGHSCORES,
+        CREDITS,
+        NEWSTANDARD,
+        NEWCAMPAIN,
+        NEWMULTI,
+        LOADSTANDARD,
+        LOADCAMPAIN,
+        LOADMULTI,
+        SCENARIOINFO,
+        SELECTSCENARIO
+    } menu_t;
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    int GlobalFilterEvents(const SDL_Event *event);
 
-    void DrawSprite(void);
-    void Reset(void);
+    menu_t MainMenu(void);
+    menu_t NewGame(void);
+    menu_t LoadGame(void);
+    menu_t HighScores(void);
+    menu_t Credits(void);
+    menu_t NewStandard(void);
+    menu_t NewCampain(void);
+    menu_t NewMulti(void);
+    menu_t LoadStandard(void);
+    menu_t LoadCampain(void);
+    menu_t LoadMulti(void);
+    menu_t ScenarioInfo(void);
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
 };
 
 #endif

@@ -1,156 +1,71 @@
-/*
-    freeHeroes2 engine
-    turn-based game engine (clone of Heroes Of the Might and Magic II)
-    Copyright (C) 2006
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-    3DO, New World Computing, Heroes of Might and Magic, and the related
-    3DO logos are trademarks and or registered trademarks of 3DO Company.
-    All other trademarks belong to their respective owners.
-
-    Web: http://sourceforge.net/projects/fheroes2
-
-    Description:
-*/
-
-#ifndef _GAMEDEFS_H
-#define _GAMEDEFS_H
+/***************************************************************************
+ *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   afletdinov@mail.dc.baikal.ru                                          *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#ifndef H2GAMEDEFS_H
+#define H2GAMEDEFS_H
 
 #include "SDL.h"
+#include "sdlmm.h"
 
-#define VERSION 20061008
+typedef char		s8;
+typedef unsigned char	u8;
+typedef short		s16;
+typedef unsigned short	u16;
+typedef int		s32;
+typedef unsigned int	u32;
 
-typedef enum { FALSE=0, TRUE=1 } BOOL;
+namespace Display
+{
+    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280 } resolution_t;
 
-#define SHADOWWIDTH     16 
+    void SetVideoMode(resolution_t mode);
 
-#define COLORKEY	0xFF
-#define COLORCHANGE	0xFE
+    void HideCursor(void);
+    void ShowCursor(void);
+    void SetCaption(const std::string &caption);
+};
 
-#define RADARCOLOR	0x10
-#define FOCUSCOLOR	0x40
+static SDLmm::Display &display = SDLmm::Display::GetDisplay();
 
-#define RADARWIDTH      144
-#define BORDERWIDTH     16
-#define TILEWIDTH       32
+// PUBLIC
+#define GAME_VERSION		20070129	// Version
 
-#define COLORBLUE	0x01
-#define COLORGREEN	0x02
-#define COLORRED	0x04
-#define COLORYELLOW	0x08
-#define COLORORANGE	0x10
-#define COLORPURPLE	0x20
-#define COLORGRAY	0xFF
 
-#define GOLD_CASTLE_DAY		1000
-#define GOLD_TOWN_DAY		750
-#define GOLD_STATUE_DAY		250
-#define GOLD_DUNGEON_DAY	500
+// PRIVATE
+#define KINGDOMMAX 7 
 
-typedef enum {
-                NORD,
-                NORD_WEST,
-                WEST,
-                SOUTH_WEST,
-                SOUTH,
-                SOUTH_EAST,
-                EAST,
-                NORD_EAST
+#define DEFAULT_DEPTH		16		// Surface use bits color
+#define	INDEX_COLOR_KEY		0xFF		// colorkey     (index palette)
+#define	INDEX_SHADOW_ALPHA	0xFE		// shadow alpha (index palette)
+#define INDEX_CHANGE_COLOR      0xFD
+#define	DEFAULT_SHADOW_ALPHA	0x40		// shadow alpha
 
-            } E_VECTOR;
-
-typedef enum {
-                DESERT,
-                SNOW,
-                SWAMP,
-                WASTELAND,
-                BEACH,
-                LAVA,
-                DIRT,
-                GRASS,
-                WATER,
-                ROAD
-
-            } E_GROUND;
-
-typedef enum {
-		GAME_EASY,
-		GAME_NORMAL,
-		GAME_HARD,
-		GAME_EXPERT,
-		GAME_IMPOSSIBLE
-
-	    } E_GAMELEVEL;
-
-typedef enum {
-        	BLUE,
-        	GREEN,
-        	RED,
-        	YELLOW,
-        	ORANGE,
-        	PURPLE,
-		GRAY,
-
-            } E_COLORS;
-
-typedef enum {
-                KNIGHT,
-                BARBARIAN,
-                SORCERESS,
-                WARLOCK,
-                WIZARD,
-                NECROMANCER,
-                BOMG
-
-            } E_RACE;
-
-typedef enum {
-		MAPS_ALL	= 0, 
-		MAPS_SMALL	= 36, 
-		MAPS_MEDIUM	= 72, 
-		MAPS_LARGE	= 108, 
-		MAPS_XLARGE	= 144
-
-	    } E_SIZEMAP;
-
-typedef enum {
-                LUCK_CURSED     = -3,
-                LUCK_AWFUL      = -2,
-                LUCK_BAD        = -1,
-                LUCK_NORMAL     = 0,
-                LUCK_GOOD       = 1,
-                LUCK_GREAT      = 2,
-                LUCK_IRISH      = 3
-                
-            } E_LUCK;
-                
-typedef enum {
-                MORALE_TREASON  = -3,
-                MORALE_AWFUL    = -2,
-                MORALE_POOR     = -1,
-                MORALE_NORMAL   = 0,
-                MORALE_GOOD     = 1,
-                MORALE_GREAT    = 2,
-                MORALE_BLOOD    = 3
-                
-            } E_MORALE;
-
-typedef enum {
-                SPREAD,
-                GROUPED
-            } E_ARMYFORMAT;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN 
+#define RMASK 0x0000f000 
+#define GMASK 0x00000f00 
+#define BMASK 0x000000f0 
+#define AMASK 0x0000000f 
+#else 
+#define RMASK 0x0000000f 
+#define GMASK 0x000000f0 
+#define BMASK 0x00000f00 
+#define AMASK 0x0000f000 
+#endif 
 
 #endif

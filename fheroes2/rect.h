@@ -17,34 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
+#ifndef H2RECT_H
+#define H2RECT_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
 #include "gamedefs.h"
 
-class Animation
+class Point : public SDLmm::SPoint
 {
 public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    Point() : SDLmm::SPoint(-1, -1){};
+    Point(int x, int y) : SDLmm::SPoint(x, y){};
+    Point(const Point & pt) : SDLmm::SPoint(pt){};
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    Point & operator= (const Point & pt){ x = pt.x; y = pt.y; return *this; };
+    bool operator== (const Point & pt) const{ return (x == pt.x && y == pt.y); };
+};
 
-    void DrawSprite(void);
-    void Reset(void);
+class Rect : public SDLmm::SRect
+{
+public:
+    Rect() : SDLmm::SRect(-1, -1, 0, 0){};
+    Rect(u16 nw, u16 nh) : SDLmm::SRect(nw, nh){};
+    Rect(s16 nx, s16 ny, u16 nw, u16 nh) : SDLmm::SRect(nx, ny, nw, nh){};
+    Rect(const Point & lu, const Point & rb) : SDLmm::SRect(lu, rb){};
+    Rect(const Rect & rt) : SDLmm::SRect(rt){};
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
+    Rect & operator= (const Rect & rt){ x = rt.x; y = rt.y; w = rt.w; h = rt.h; return *this; };
+    bool operator== (const Rect & rt) const{ return (x == rt.x && y == rt.y && w == rt.w && h == rt.h); };
+    // rect include point
+    bool operator& (const Point & pt) const{ return !(pt.x < x || pt.y < y || pt.x > (x + w) || pt.y > (y + h)); };
 };
 
 #endif

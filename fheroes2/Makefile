@@ -1,21 +1,20 @@
 # makefile
-# project: Free Heroes2
 #
 
 TARGET = fheroes2
-LIBS = `sdl-config --libs`
-#CFLAGS = -O0 -g -Wall -fomit-frame-pointer `sdl-config --cflags`
-CFLAGS = -O3 -Wall -fomit-frame-pointer `sdl-config --cflags` -mtune=pentium3 -march=i686
+LIBS = `sdl-config --libs` `sdlmm-config --libs`
+CFLAGS = -O0 -g -Wall -fomit-frame-pointer `sdl-config --cflags` `sdlmm-config --cflags`
+#CFLAGS = -O3 -Wall -fomit-frame-pointer `sdl-config --cflags` `sdlmm-config --cflags` -march=i686
 
-CC = gcc
+CC = g++
 
 all: $(TARGET)
-	strip $(TARGET)
+#	strip $(TARGET)
 
-fheroes2: $(patsubst %.c, %.o, $(wildcard *.c))
+fheroes2: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 	$(CC) $^ -o $@ $(LIBS)
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) -c -MD $< $(CFLAGS)
 
 include $(wildcard *.d)

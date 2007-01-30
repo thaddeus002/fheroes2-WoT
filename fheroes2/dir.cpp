@@ -17,34 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
-#include "gamedefs.h"
+#include <dirent.h> 
+#include "error.h"
+#include "dir.h"
 
-class Animation
+#if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__) 
+#define SEPARATOR       "\\" 
+#else 
+#define SEPARATOR       "/" 
+#endif 
+
+Dir::Dir(const std::string &path, const std::string &filter) : std::vector<std::string>()
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    // read directory
+    DIR *dp;
+    struct dirent *ep;
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    dp = opendir(path.c_str());
 
-    void DrawSprite(void);
-    void Reset(void);
+    if(dp == NULL) Error::Except("error open directory: " + path);
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+    while(NULL != (ep = readdir(dp))){
 
-#endif
+        std::string filename(ep->d_name);
+        if( '.' == filename[0] ) continue;
+	if( !filter.empty() && std::string::npos == filename.find(filter) ) continue;
+
+        push_back(std::string(path + SEPARATOR + filename));
+    }
+
+    closedir(dp);
+}

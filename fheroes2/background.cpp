@@ -17,34 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
-#include "gamedefs.h"
+#include "background.h"
 
-class Animation
+void Background::Save(void)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    // resize background
+    if((surface && rect.w != surface->w()) || (surface && rect.h != surface->h())){ delete surface; surface = NULL; }
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    if(!surface) surface = new SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, rect.w, rect.h, DEFAULT_DEPTH));
 
-    void DrawSprite(void);
-    void Reset(void);
+    surface->Blit(SDLmm::Display::GetDisplay(), rect, Point(0,0));
+}
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+void Background::Restore(void)
+{
+    static SDLmm::Display &display = SDLmm::Display::GetDisplay();
 
-#endif
+    display.Blit(*surface, rect);
+}

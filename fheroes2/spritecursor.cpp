@@ -17,34 +17,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
 #include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
 #include "gamedefs.h"
+#include "spritecursor.h"
 
-class Animation
+void SpriteCursor::Move(const Point &pt)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    if(pt.x < 0 || pt.y < 0) return;
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    rect.x = pt.x;
+    rect.y = pt.y;
 
-    void DrawSprite(void);
-    void Reset(void);
+    bool hide = Cursor::Visible() ? true : false;
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+    if(hide) Cursor::Hide();
 
-#endif
+    background.Restore();
+    background.Save(rect);
+
+    display.Blit(*this, pt);
+
+    if(hide) Cursor::Show();
+}
+
+void SpriteCursor::Redraw(void)
+{
+    bool hide = Cursor::Visible() ? true : false;
+
+    if(hide) Cursor::Hide();
+
+    display.Blit(*this, Point(rect.x, rect.y));
+
+    if(hide) Cursor::Show();
+}

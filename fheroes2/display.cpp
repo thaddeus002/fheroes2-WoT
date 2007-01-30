@@ -17,34 +17,56 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "agg.h"
-#include "cursor.h"
-#include "rect.h"
-#include "sprite.h"
+#include <string>
+#include "config.h"
+#include "error.h"
 #include "gamedefs.h"
 
-class Animation
+void Display::SetVideoMode(Display::resolution_t mode)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    u16 xres, yres;
 
-    Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    switch(mode){
 
-    void DrawSprite(void);
-    void Reset(void);
+	default:
+	case SMALL:
+	    xres = 640;
+	    yres = 480;
+	    break;
 
-private:
-    Rect area;
-    bool disable;
-    bool reset;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    std::vector<const Sprite *> sprites;
-};
+	case MEDIUM:
+	    xres = 800;
+	    yres = 576;
+	    break;
 
-#endif
+	case LARGE:
+	    xres = 1024;
+	    yres = 768;
+	    break;
+
+	case XLARGE:
+	    xres = 1280;
+	    yres = 1024;
+	    break;
+    }
+
+    if(display.valid() && display.w() == xres && display.h() == yres) return;
+
+    u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
+    if(H2Config::FullScreen()) videoflags |= SDL_FULLSCREEN; 
+
+    if(!display.SetVideoMode(xres, yres, DEFAULT_DEPTH, videoflags)){
+	display.SetVideoMode(640, 480, DEFAULT_DEPTH, videoflags);
+	Error::Warning(SDLmm::GetError());
+    }
+}
+
+void Display::SetCaption(const std::string &caption)
+{
+    display.SetCaption(caption, "FHEROES2");
+}
+
+void Display::HideCursor(void){ SDL_ShowCursor(SDL_DISABLE); }
+
+void Display::ShowCursor(void){ SDL_ShowCursor(SDL_ENABLE); }
