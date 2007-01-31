@@ -41,7 +41,7 @@
 #define LISTHEIGHTROW	19
 
 typedef struct {
-    Maps::color_t color;
+    Kingdom::color_t color;
     Rect rect;
 } rectcolor_t;
 
@@ -143,13 +143,13 @@ Game::menu_t Game::ScenarioInfo(void){
 		Cursor::Hide();
 		u8 index = 0;
 		switch(H2Config::GetKingdomRace((*it).color)){
-		    case Maps::KNGT: index = 52; H2Config::SetKingdomRace((*it).color, Maps::BARB); break;
-		    case Maps::BARB: index = 53; H2Config::SetKingdomRace((*it).color, Maps::SORC); break;
-		    case Maps::SORC: index = 54; H2Config::SetKingdomRace((*it).color, Maps::WRLK); break;
-		    case Maps::WRLK: index = 55; H2Config::SetKingdomRace((*it).color, Maps::WZRD); break;
-		    case Maps::WZRD: index = 56; H2Config::SetKingdomRace((*it).color, Maps::NECR); break;
-		    case Maps::NECR: index = 58; H2Config::SetKingdomRace((*it).color, Maps::RAND); break;
-		    case Maps::RAND: index = 51; H2Config::SetKingdomRace((*it).color, Maps::KNGT); break;
+		    case Kingdom::KNGT: index = 52; H2Config::SetKingdomRace((*it).color, Kingdom::BARB); break;
+		    case Kingdom::BARB: index = 53; H2Config::SetKingdomRace((*it).color, Kingdom::SORC); break;
+		    case Kingdom::SORC: index = 54; H2Config::SetKingdomRace((*it).color, Kingdom::WRLK); break;
+		    case Kingdom::WRLK: index = 55; H2Config::SetKingdomRace((*it).color, Kingdom::WZRD); break;
+		    case Kingdom::WZRD: index = 56; H2Config::SetKingdomRace((*it).color, Kingdom::NECR); break;
+		    case Kingdom::NECR: index = 58; H2Config::SetKingdomRace((*it).color, Kingdom::RAND); break;
+		    case Kingdom::RAND: index = 51; H2Config::SetKingdomRace((*it).color, Kingdom::KNGT); break;
 		    default: break;
 		}
     		const Sprite &sprite = AGG::GetICN("NGEXTRA.ICN", index);
@@ -183,13 +183,14 @@ Game::menu_t Game::ScenarioInfo(void){
 	if(le.MouseClickLeft(buttonOk)){
 	    Error::Verbose("select maps: " + H2Config::GetFileMaps());
 	    Error::Verbose("difficulty: " + String::Difficulty(H2Config::GetGameDifficulty()));
-	    for(Maps::color_t color = Maps::BLUE; color != Maps::GRAY; ++color)
+	    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
 		if(H2Config::GetKingdomColors() & color){
-		    if(Maps::RAND == H2Config::GetKingdomRace(color)) H2Config::SetKingdomRace(color, Rand::Race());
+		    if(Kingdom::RAND == H2Config::GetKingdomRace(color)) H2Config::SetKingdomRace(color, Rand::Race());
 		    Error::Verbose(String::Color(color) + ": " + String::Race(H2Config::GetKingdomRace(color)));
 	    }
 	    Error::Verbose("select color: " + String::Color(H2Config::GetHumanColor()));
-	    //return MAINMENU;
+
+	    return STARTGAME;
 	}
     }
 
@@ -198,29 +199,29 @@ Game::menu_t Game::ScenarioInfo(void){
 
 void Scenario::RedrawOpponentColors(const std::vector<rectcolor_t> &vo)
 {
-    std::map<Maps::color_t, const Sprite *> colorHumanSprite;
-    colorHumanSprite[Maps::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 9);
-    colorHumanSprite[Maps::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 10);
-    colorHumanSprite[Maps::RED] = &AGG::GetICN("NGEXTRA.ICN", 11);
-    colorHumanSprite[Maps::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 12);
-    colorHumanSprite[Maps::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 13);
-    colorHumanSprite[Maps::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 14);
+    std::map<Kingdom::color_t, const Sprite *> colorHumanSprite;
+    colorHumanSprite[Kingdom::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 9);
+    colorHumanSprite[Kingdom::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 10);
+    colorHumanSprite[Kingdom::RED] = &AGG::GetICN("NGEXTRA.ICN", 11);
+    colorHumanSprite[Kingdom::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 12);
+    colorHumanSprite[Kingdom::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 13);
+    colorHumanSprite[Kingdom::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 14);
 
-    std::map<Maps::color_t, const Sprite *> colorAllowSprite;
-    colorAllowSprite[Maps::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 3);
-    colorAllowSprite[Maps::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 4);
-    colorAllowSprite[Maps::RED] = &AGG::GetICN("NGEXTRA.ICN", 5);
-    colorAllowSprite[Maps::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 6);
-    colorAllowSprite[Maps::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 7);
-    colorAllowSprite[Maps::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 8);
+    std::map<Kingdom::color_t, const Sprite *> colorAllowSprite;
+    colorAllowSprite[Kingdom::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 3);
+    colorAllowSprite[Kingdom::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 4);
+    colorAllowSprite[Kingdom::RED] = &AGG::GetICN("NGEXTRA.ICN", 5);
+    colorAllowSprite[Kingdom::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 6);
+    colorAllowSprite[Kingdom::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 7);
+    colorAllowSprite[Kingdom::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 8);
 
-    std::map<Maps::color_t, const Sprite *> colorOpponentSprite;
-    colorOpponentSprite[Maps::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 15);
-    colorOpponentSprite[Maps::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 16);
-    colorOpponentSprite[Maps::RED] = &AGG::GetICN("NGEXTRA.ICN", 17);
-    colorOpponentSprite[Maps::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 18);
-    colorOpponentSprite[Maps::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 19);
-    colorOpponentSprite[Maps::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 20);
+    std::map<Kingdom::color_t, const Sprite *> colorOpponentSprite;
+    colorOpponentSprite[Kingdom::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 15);
+    colorOpponentSprite[Kingdom::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 16);
+    colorOpponentSprite[Kingdom::RED] = &AGG::GetICN("NGEXTRA.ICN", 17);
+    colorOpponentSprite[Kingdom::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 18);
+    colorOpponentSprite[Kingdom::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 19);
+    colorOpponentSprite[Kingdom::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 20);
 
     std::vector<rectcolor_t>::const_iterator it = vo.begin();
 
@@ -270,7 +271,7 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     u8 current = 0;
     vo.clear();
 
-    for(Maps::color_t color = Maps::BLUE; color != Maps::GRAY; ++color)
+    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
         if(H2Config::GetKingdomColors() & color){
 
             const Sprite &sprite = AGG::GetICN("NGEXTRA.ICN", 3);
@@ -288,21 +289,21 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     current = 0;
     vc.clear();
 
-    for(Maps::color_t color = Maps::BLUE; color != Maps::GRAY; ++color)
+    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
 	if(H2Config::GetKingdomColors() & color){
 
 	    u8 index = 0;
 	    Point pt;
 
 	    switch(H2Config::GetKingdomRace(color)){
-		case Maps::KNGT: index = 70; break;
-	        case Maps::BARB: index = 71; break;
-	        case Maps::SORC: index = 72; break;
-		case Maps::WRLK: index = 73; break;
-	        case Maps::WZRD: index = 74; break;
-		case Maps::NECR: index = 75; break;
-	        case Maps::MULT: index = 76; break;
-		case Maps::RAND: index = 58; break;
+		case Kingdom::KNGT: index = 70; break;
+	        case Kingdom::BARB: index = 71; break;
+	        case Kingdom::SORC: index = 72; break;
+		case Kingdom::WRLK: index = 73; break;
+	        case Kingdom::WZRD: index = 74; break;
+		case Kingdom::NECR: index = 75; break;
+	        case Kingdom::MULT: index = 76; break;
+		case Kingdom::RAND: index = 58; break;
 		default: continue;
 	    }
 
@@ -435,40 +436,41 @@ void Scenario::SetCurrentSettings(const Maps::FileInfo &maps)
     H2Config::SetKingdomColors(maps.GetKingdomColors());
     H2Config::SetAllowChangeColors(maps.GetAllowColors());
     H2Config::SetAllowChangeRaces(0);
-    for(Maps::color_t color = Maps::BLUE; color != Maps::GRAY; ++color)
+    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
         switch(maps.GetKingdomRace(color)){
             case 0x00:
-                H2Config::SetKingdomRace(color, Maps::KNGT);
+                H2Config::SetKingdomRace(color, Kingdom::KNGT);
                 break;
             case 0x01:
-                H2Config::SetKingdomRace(color, Maps::BARB);
+                H2Config::SetKingdomRace(color, Kingdom::BARB);
                 break;
             case 0x02:
-                H2Config::SetKingdomRace(color, Maps::SORC);
+                H2Config::SetKingdomRace(color, Kingdom::SORC);
                 break;
             case 0x03:
-                H2Config::SetKingdomRace(color, Maps::WRLK);
+                H2Config::SetKingdomRace(color, Kingdom::WRLK);
                 break;
             case 0x04:
-                H2Config::SetKingdomRace(color, Maps::WZRD);
+                H2Config::SetKingdomRace(color, Kingdom::WZRD);
                 break;
             case 0x05:
-                H2Config::SetKingdomRace(color, Maps::NECR);
+                H2Config::SetKingdomRace(color, Kingdom::NECR);
                 break;
             case 0x06:
-                H2Config::SetKingdomRace(color, Maps::MULT);
+                H2Config::SetKingdomRace(color, Kingdom::MULT);
                 break;
             case 0x07:
-                H2Config::SetKingdomRace(color, Maps::RAND);
+                H2Config::SetKingdomRace(color, Kingdom::RAND);
                 H2Config::SetAllowChangeRaces(color | H2Config::GetAllowChangeRaces());
                 break;
             default:
-                H2Config::SetKingdomRace(color, Maps::BOMG);
+                H2Config::SetKingdomRace(color, Kingdom::BOMG);
                 break;
 	}
-    for(Maps::color_t color = Maps::BLUE; color != Maps::GRAY; ++color)
+    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
 	// set first allow color
 	if(maps.GetAllowColors() & color){ H2Config::SetHumanColor(color); break; }
+    H2Config::SetSizeMaps(maps.GetSizeMaps());
     H2Config::SetFileMaps(maps.GetFileMaps());
     H2Config::SetNameMaps(maps.GetName());
     H2Config::SetDescriptionMaps(maps.GetDescription());

@@ -131,78 +131,75 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
 
     // kingdom color blue
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= BLUE;
+    if(byte8) kingdomColors |= Kingdom::BLUE;
 
     // kingdom color green
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= GREEN;
+    if(byte8) kingdomColors |= Kingdom::GREEN;
 
     // kingdom color red
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= RED;
+    if(byte8) kingdomColors |= Kingdom::RED;
 
     // kingdom color yellow
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= YELLOW;
+    if(byte8) kingdomColors |= Kingdom::YELLOW;
 
     // kingdom color orange
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= ORANGE;
+    if(byte8) kingdomColors |= Kingdom::ORANGE;
 
     // kingdom color purple
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= PURPLE;
-
-    // count kingdom
-    //for(int i = 0; i < 8; ++i) if((kingdomColors >> i) & 0x01) ++kingdomCount;
+    if(byte8) kingdomColors |= Kingdom::PURPLE;
 
     // allow color blue
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= BLUE;
+    if(byte8) allowColors |= Kingdom::BLUE;
 
     // allow color green
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= GREEN;
+    if(byte8) allowColors |= Kingdom::GREEN;
 
     // allow color red
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= RED;
+    if(byte8) allowColors |= Kingdom::RED;
 
     // allow color yellow
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= YELLOW;
+    if(byte8) allowColors |= Kingdom::YELLOW;
 
     // allow color orange
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= ORANGE;
+    if(byte8) allowColors |= Kingdom::ORANGE;
 
     // allow color purple
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= PURPLE;
+    if(byte8) allowColors |= Kingdom::PURPLE;
 
     // rnd color blue
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= BLUE;
+    if(byte8) rndColors |= Kingdom::BLUE;
 
     // rnd color green
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= GREEN;
+    if(byte8) rndColors |= Kingdom::GREEN;
 
     // rnd color red
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= RED;
+    if(byte8) rndColors |= Kingdom::RED;
 
     // rnd color yellow
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= YELLOW;
+    if(byte8) rndColors |= Kingdom::YELLOW;
 
     // rnd color orange
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= ORANGE;
+    if(byte8) rndColors |= Kingdom::ORANGE;
 
     // rnd color purple
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= PURPLE;
+    if(byte8) rndColors |= Kingdom::PURPLE;
 
     // count heroes
     fd.seekg(0x1A, std::ios_base::beg);
@@ -256,20 +253,20 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
     fd.close();
 }
 
-u8 Maps::FileInfo::GetKingdomRace(Maps::color_t color) const
+u8 Maps::FileInfo::GetKingdomRace(Kingdom::color_t color) const
 {
     switch(color){
-        case Maps::BLUE:
+        case Kingdom::BLUE:
             return raceKingdom[0];
-        case Maps::GREEN:
+        case Kingdom::GREEN:
             return raceKingdom[1];
-        case Maps::RED:
+        case Kingdom::RED:
             return raceKingdom[2];
-        case Maps::YELLOW:
+        case Kingdom::YELLOW:
             return raceKingdom[3];
-        case Maps::ORANGE:
+        case Kingdom::ORANGE:
             return raceKingdom[4];
-        case Maps::PURPLE:
+        case Kingdom::PURPLE:
             return raceKingdom[5];
         default:
             return 0xFF;

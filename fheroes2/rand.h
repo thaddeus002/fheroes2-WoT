@@ -22,14 +22,14 @@
 
 #include <cstdlib>
 #include <ctime>
-#include "maps.h"
+#include "kingdom.h"
 #include "gamedefs.h"
 
 namespace Rand
 {
     void Init(void);
     u32 Get(u32 min, u32 max = 0);
-    Maps::race_t Race(void);
+    Kingdom::race_t Race(void);
 };
 
 #endif

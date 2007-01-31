@@ -101,7 +101,7 @@ const std::string & String::Difficulty(Maps::difficulty_t difficulty)
     return easy;
 }
 
-const std::string & String::Color(Maps::color_t color)
+const std::string & String::Color(Kingdom::color_t color)
 {
     static std::string blue("Blue");
     static std::string green("Green");
@@ -112,17 +112,17 @@ const std::string & String::Color(Maps::color_t color)
     static std::string gray("Gray");
 
     switch(color){
-        case Maps::BLUE:
+        case Kingdom::BLUE:
 	    return blue;
-        case Maps::GREEN:
+        case Kingdom::GREEN:
 	    return green;
-        case Maps::RED:
+        case Kingdom::RED:
 	    return red;
-        case Maps::YELLOW:
+        case Kingdom::YELLOW:
 	    return yellow;
-        case Maps::ORANGE:
+        case Kingdom::ORANGE:
 	    return orange;
-        case Maps::PURPLE:
+        case Kingdom::PURPLE:
 	    return purple;
         default:
 	    break;
@@ -131,7 +131,7 @@ const std::string & String::Color(Maps::color_t color)
     return gray;
 }
 
-const std::string & String::Race(Maps::race_t race)
+const std::string & String::Race(Kingdom::race_t race)
 {
     static std::string kngt("Knight");
     static std::string barb("Barbarian");
@@ -144,21 +144,21 @@ const std::string & String::Race(Maps::race_t race)
     static std::string bomg("Bomg");
     
     switch(race){
-        case Maps::KNGT:
+        case Kingdom::KNGT:
 	    return kngt;
-        case Maps::BARB:
+        case Kingdom::BARB:
 	    return barb;
-        case Maps::SORC:
+        case Kingdom::SORC:
 	    return sorc;
-        case Maps::WRLK:
+        case Kingdom::WRLK:
 	    return wrlk;
-        case Maps::WZRD:
+        case Kingdom::WZRD:
 	    return wzrd;
-        case Maps::NECR:
+        case Kingdom::NECR:
 	    return necr;
-        case Maps::MULT:
+        case Kingdom::MULT:
 	    return mult;
-        case Maps::RAND:
+        case Kingdom::RAND:
 	    return rand;
 	default:
 	    break;

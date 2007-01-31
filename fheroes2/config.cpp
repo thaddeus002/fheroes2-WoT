@@ -26,12 +26,13 @@ namespace H2Config {
     static std::string pathMapsDirectory("maps");
     static Display::resolution_t videoMode = Display::SMALL;
     static Maps::difficulty_t gameDifficulty = Maps::NORMAL;
-    static Maps::color_t humanColor = Maps::GRAY;
-    static u8 kingdomColors =  0;
+    static Kingdom::color_t humanColor = Kingdom::GRAY;
+    static u8 kingdomColors = 0;
     static u8 kingdomCount = 0;
     static u8 allowColors = 0;
     static u8 allowRaces = 0;
-    static Maps::race_t raceKingdom[KINGDOMMAX];
+    static Kingdom::race_t raceKingdom[KINGDOMMAX];
+    static Maps::mapsize_t sizeMaps(Maps::NONE);
     static std::string pathFileMaps;
     static std::string nameMaps;
     static std::string descriptionMaps;
@@ -120,13 +121,13 @@ const std::string & H2Config::GetAGGFile(void){ return H2Config::pathAGGFile; };
 const std::string & H2Config::GetMapsDirectory(void){ return H2Config::pathMapsDirectory; };
 
 /* return video mode */
-Display::resolution_t H2Config::VideoMode(void){ return H2Config::videoMode; };
+Display::resolution_t H2Config::GetVideoMode(void){ return H2Config::videoMode; };
 
 /* return game difficulty */
 Maps::difficulty_t H2Config::GetGameDifficulty(void){ return H2Config::gameDifficulty; };
 
 /* return human selected colors */
-Maps::color_t H2Config::GetHumanColor(void){ return H2Config::humanColor; };
+Kingdom::color_t H2Config::GetHumanColor(void){ return H2Config::humanColor; };
 
 /* return game kingdom colors */
 u8 H2Config::GetKingdomColors(void){ return H2Config::kingdomColors; };
@@ -138,23 +139,23 @@ u8 H2Config::GetKingdomCount(void){ return H2Config::kingdomCount; };
 u8 H2Config::GetAllowChangeColors(void){ return H2Config::allowColors; };
 
 /* return race kingdom */
-Maps::race_t H2Config::GetKingdomRace(Maps::color_t color)
+Kingdom::race_t H2Config::GetKingdomRace(Kingdom::color_t color)
 {
     switch(color){
-	case Maps::BLUE:
+	case Kingdom::BLUE:
 	    return raceKingdom[0];
-	case Maps::GREEN:
+	case Kingdom::GREEN:
 	    return raceKingdom[1];
-	case Maps::RED:
+	case Kingdom::RED:
 	    return raceKingdom[2];
-	case Maps::YELLOW:
+	case Kingdom::YELLOW:
 	    return raceKingdom[3];
-	case Maps::ORANGE:
+	case Kingdom::ORANGE:
 	    return raceKingdom[4];
-	case Maps::PURPLE:
+	case Kingdom::PURPLE:
 	    return raceKingdom[5];
 	default:
-	    return Maps::BOMG;
+	    return Kingdom::BOMG;
 	break;
     }
 }
@@ -171,6 +172,9 @@ const std::string & H2Config::GetNameMaps(void){ return H2Config::nameMaps; }
 /* get play description maps */
 const std::string & H2Config::GetDescriptionMaps(void){ return H2Config::descriptionMaps; }
 
+/* get size play maps */
+Maps::mapsize_t H2Config::GetSizeMaps(void){ return H2Config::sizeMaps; }
+
 /* set debug */
 void H2Config::SetDebug(void){ H2Config::boolValue |= H2Config::DEBUG; };
 
@@ -181,7 +185,7 @@ void H2Config::SetAGGFile(const std::string & path){ H2Config::pathAGGFile = pat
 void H2Config::SetGameDifficulty(Maps::difficulty_t difficulty){ H2Config::gameDifficulty = difficulty; };
 
 /* set human selected colors */
-void H2Config::SetHumanColor(Maps::color_t color){ H2Config::humanColor = color; };
+void H2Config::SetHumanColor(Kingdom::color_t color){ H2Config::humanColor = color; };
 
 /* set game kingdom colors */
 void H2Config::SetKingdomColors(u8 colors){ H2Config::kingdomColors = colors; };
@@ -193,25 +197,25 @@ void H2Config::SetKingdomCount(u8 count){ H2Config::kingdomCount = count; };
 void H2Config::SetAllowChangeColors(u8 colors){ H2Config::allowColors = colors; };
 
 /* set race kingdom */
-void H2Config::SetKingdomRace(Maps::color_t color, Maps::race_t race)
+void H2Config::SetKingdomRace(Kingdom::color_t color, Kingdom::race_t race)
 {
     switch(color){
-	case Maps::BLUE:
+	case Kingdom::BLUE:
 	    raceKingdom[0] = race;
 	    break;
-	case Maps::GREEN:
+	case Kingdom::GREEN:
 	    raceKingdom[1] = race;
 	    break;
-	case Maps::RED:
+	case Kingdom::RED:
 	    raceKingdom[2] = race;
 	    break;
-	case Maps::YELLOW:
+	case Kingdom::YELLOW:
 	    raceKingdom[3] = race;
 	    break;
-	case Maps::ORANGE:
+	case Kingdom::ORANGE:
 	    raceKingdom[4] = race;
 	    break;
-	case Maps::PURPLE:
+	case Kingdom::PURPLE:
 	    raceKingdom[5] = race;
 	    break;
 	default:
@@ -232,3 +236,5 @@ void H2Config::SetNameMaps(const std::string & name){ H2Config::nameMaps = name;
 /* set play description maps */
 void H2Config::SetDescriptionMaps(const std::string & description){ H2Config::descriptionMaps = description; }
 
+/* set size play maps */
+void H2Config::SetSizeMaps(Maps::mapsize_t size){ H2Config::sizeMaps = size; }

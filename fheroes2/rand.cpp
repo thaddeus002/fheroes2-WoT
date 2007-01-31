@@ -25,16 +25,16 @@ void Rand::Init(void){ std::srand((u32) std::time(0)); }
 
 u32 Rand::Get(u32 min, u32 max){ return max ? min + (std::rand() % (max - min + 1)) : std::rand() % (min + 1); }
 
-Maps::race_t Rand::Race(void)
+Kingdom::race_t Rand::Race(void)
 {
     switch(Rand::Get(1, 6)){
-	case 1: return Maps::KNGT;
-	case 2: return Maps::BARB;
-	case 3: return Maps::SORC;
-	case 4: return Maps::WRLK;
-	case 5: return Maps::WZRD;
+	case 1: return Kingdom::KNGT;
+	case 2: return Kingdom::BARB;
+	case 3: return Kingdom::SORC;
+	case 4: return Kingdom::WRLK;
+	case 5: return Kingdom::WZRD;
 	default: break;
     }
 
-    return Maps::NECR;
+    return Kingdom::NECR;
 }

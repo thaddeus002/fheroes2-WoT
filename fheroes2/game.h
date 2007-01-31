@@ -24,6 +24,9 @@
 #include "cursor.h"
 #include "error.h"
 
+#define RADARWIDTH	144
+#define BORDERWIDTH	16
+
 namespace Game
 {
     typedef enum {
@@ -40,7 +43,8 @@ namespace Game
         LOADCAMPAIN,
         LOADMULTI,
         SCENARIOINFO,
-        SELECTSCENARIO
+        SELECTSCENARIO,
+	STARTGAME
     } menu_t;
 
     int GlobalFilterEvents(const SDL_Event *event);
@@ -57,7 +61,9 @@ namespace Game
     menu_t LoadCampain(void);
     menu_t LoadMulti(void);
     menu_t ScenarioInfo(void);
+    menu_t StartGame(void);
 
+    void DrawInterface(void);
 };
 
 #endif

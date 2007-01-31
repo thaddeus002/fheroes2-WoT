@@ -17,49 +17,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPS_H
-#define H2MAPS_H
+#ifndef H2KINGDOM_H
+#define H2KINGDOM_H
 
 #include "gamedefs.h"
 
-#define TILES_WIDTH     32
-#define TILES_HEIGHT    32
-
-namespace Maps
+namespace Kingdom
 {
     typedef enum {
-        DESERT	= 0x0001,
-        SNOW	= 0x0002,
-        SWAMP	= 0x0004,
-        WASTELAND = 0x0008,
-        BEACH	= 0x0010,
-        LAVA	= 0x0020,
-        DIRT	= 0x0040,
-        GRASS	= 0x0080,
-        WATER	= 0x0100,
-        ROAD	= 0x0200,
-    } ground_t;
+        BLUE    = 0x01,
+        GREEN   = 0x02,
+        RED     = 0x04,
+        YELLOW  = 0x08,
+        ORANGE  = 0x10,
+        PURPLE  = 0x20,
+        GRAY    = 0x40,
+    } color_t;
 
     typedef enum {
-	NONE	= 0,
-        SMALL	= 36,
-        MEDIUM	= 72,
-        LARGE	= 108,
-        XLARGE	= 144
-    } mapsize_t;
+        KNGT    = 0x01,
+        BARB    = 0x02,
+        SORC    = 0x04,
+        WRLK    = 0x08,
+        WZRD    = 0x10,
+        NECR    = 0x20,
+        MULT    = 0x40,
+        RAND    = 0x80,
+        BOMG    = 0x00
+    } race_t;
 
-    typedef enum {
-	EASY,
-        NORMAL,
-        HARD,
-        EXPERT,
-        IMPOSSIBLE
-    } difficulty_t;
-
-    difficulty_t& operator++ (difficulty_t& difficulty);
-    difficulty_t& operator-- (difficulty_t& difficulty);
-    
-    void LoadMP2(const std::string &filename);
+    color_t& operator++ (color_t& color);
+    color_t& operator-- (color_t& color);
 };
 
 #endif

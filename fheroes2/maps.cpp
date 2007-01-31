@@ -20,14 +20,6 @@
 
 #include "maps.h"
 
-// operator ++color_t
-Maps::color_t& Maps::operator++ (Maps::color_t& color)
-{ return color = ( Maps::GRAY == color ? Maps::BLUE : Maps::color_t(color << 1)); };
-
-// operator --color_t
-Maps::color_t& Maps::operator-- (Maps::color_t& color)
-{ return color = ( Maps::BLUE == color ? Maps::GRAY : Maps::color_t(color >> 1)); };
-
 // operator ++difficulty_t
 Maps::difficulty_t& Maps::operator++ (Maps::difficulty_t& difficulty)
 { return difficulty = ( Maps::IMPOSSIBLE == difficulty ? Maps::EASY : Maps::difficulty_t(difficulty + 1)); };

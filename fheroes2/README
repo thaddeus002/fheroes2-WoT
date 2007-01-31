@@ -2,7 +2,7 @@ Free Heroes2 Engine
 
 Prerequisites:
 
-You'll need to have these libraries (with equivalent devel versions) to build fHeroes2:
+You need to have these libraries (with equivalent devel versions) to build fHeroes2:
 
 - libSDL
 - libSDLmm

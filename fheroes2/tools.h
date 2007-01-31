@@ -22,6 +22,7 @@
 
 #include <string>
 #include <sstream>
+#include "kingdom.h"
 #include "maps.h"
 
 namespace String
@@ -33,8 +34,8 @@ namespace String
     void AddInt(std::string &str, int value);
 
     const std::string & Difficulty(Maps::difficulty_t difficulty);
-    const std::string & Color(Maps::color_t color);
-    const std::string & Race(Maps::race_t race);
+    const std::string & Color(Kingdom::color_t color);
+    const std::string & Race(Kingdom::race_t race);
 };
 
 #endif

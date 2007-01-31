@@ -38,7 +38,7 @@ public:
     u8 GetKingdomColors(void) const{ return kingdomColors; };
     u8 GetKingdomCount(void) const{ return kingdomCount; };
     u8 GetAllowColors(void) const{ return allowColors; };
-    u8 GetKingdomRace(Maps::color_t color) const;
+    u8 GetKingdomRace(Kingdom::color_t color) const;
     mapsize_t GetSizeMaps(void) const{ return sizeMaps; };
     u8 GetConditionsWins(void) const{ return conditionsWins; };
     u8 GetConditionsLoss(void) const{ return conditionsLoss; };

@@ -122,6 +122,7 @@ int main(int argc, char **argv)
 	    	    case Game::LOADCAMPAIN:    rs = Game::LoadCampain();	break;
 	    	    case Game::LOADMULTI:      rs = Game::LoadMulti();		break;
 	    	    case Game::SCENARIOINFO:   rs = Game::ScenarioInfo();	break;
+		    case Game::STARTGAME:      rs = Game::StartGame();          break;
 	    	    default: break;
 		}
 
@@ -129,7 +130,7 @@ int main(int argc, char **argv)
 
 	} catch(std::bad_alloc){
 
-	} catch(Error::Exception){ 
+	} catch(Error::Exception){
 
 	}
 

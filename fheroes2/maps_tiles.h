@@ -17,49 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPS_H
-#define H2MAPS_H
+#ifndef H2TILES_H
+#define H2TILES_H
 
 #include "gamedefs.h"
+#include "maps.h"
+#include "rect.h"
 
-#define TILES_WIDTH     32
-#define TILES_HEIGHT    32
+namespace Maps {
 
-namespace Maps
+class Tiles : public Rect
 {
-    typedef enum {
-        DESERT	= 0x0001,
-        SNOW	= 0x0002,
-        SWAMP	= 0x0004,
-        WASTELAND = 0x0008,
-        BEACH	= 0x0010,
-        LAVA	= 0x0020,
-        DIRT	= 0x0040,
-        GRASS	= 0x0080,
-        WATER	= 0x0100,
-        ROAD	= 0x0200,
-    } ground_t;
 
-    typedef enum {
-	NONE	= 0,
-        SMALL	= 36,
-        MEDIUM	= 72,
-        LARGE	= 108,
-        XLARGE	= 144
-    } mapsize_t;
+public:
+    Tiles(u16 x, u16 y, u16 gr) : Rect(x, y, TILES_WIDTH, TILES_HEIGHT), ground(gr){};
 
-    typedef enum {
-	EASY,
-        NORMAL,
-        HARD,
-        EXPERT,
-        IMPOSSIBLE
-    } difficulty_t;
+    u16 GetGrounds(void) const{ return ground; };
 
-    difficulty_t& operator++ (difficulty_t& difficulty);
-    difficulty_t& operator-- (difficulty_t& difficulty);
-    
-    void LoadMP2(const std::string &filename);
+private:
+    u16		ground;
+};
+
 };
 
 #endif

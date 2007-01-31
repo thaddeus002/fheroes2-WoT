@@ -21,7 +21,6 @@
 #define H2SPRITE_H
 
 #include <vector>
-#include <iostream>
 #include "error.h"
 #include "config.h"
 #include "gamedefs.h"

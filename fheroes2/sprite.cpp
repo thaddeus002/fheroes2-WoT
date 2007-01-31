@@ -48,7 +48,7 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
     u32 index = 0;
     u32 size = vdata.size();
 
-    if(H2Config::RLEDebug()) std::cerr << "START RLE DEBUG" << std::endl;
+    //if(H2Config::RLEDebug()) std::cerr << "START RLE DEBUG" << std::endl;
 
     // lock surface
     Lock();
@@ -147,5 +147,5 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
     // unlock surface
     Unlock();
 
-    if(H2Config::RLEDebug()) std::cerr << "END RLE DEBUG" << std::endl;
+    //if(H2Config::RLEDebug()) std::cerr << "END RLE DEBUG" << std::endl;
 }

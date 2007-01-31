@@ -58,3 +58,4 @@ Game::menu_t Game::NewCampain(void){ Error::Verbose("New Campain Game: under con
 Game::menu_t Game::NewMulti(void){ Error::Verbose("New Multi Game: under construction."); return Game::NEWGAME; }
 Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
 Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }
+

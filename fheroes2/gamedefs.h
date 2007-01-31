@@ -48,7 +48,7 @@ static SDLmm::Display &display = SDLmm::Display::GetDisplay();
 
 
 // PRIVATE
-#define KINGDOMMAX 7 
+#define KINGDOMMAX	7
 
 #define DEFAULT_DEPTH		16		// Surface use bits color
 #define	INDEX_COLOR_KEY		0xFF		// colorkey     (index palette)
