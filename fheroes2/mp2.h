@@ -35,7 +35,7 @@ namespace MP2
         u8   quantity2;		// count
         u8   objectName2;	// level 2.0
         u8   indexName2;	// index level 2.0 or 0xFF
-        u8   shape;		// this % 4, 0 none, 1 vertical, 2 horizontal, 3 any
+        u8   shape;		// shape reflect % 4, 0 none, 1 vertical, 2 horizontal, 3 any
         u8   generalObject;	// zero or object
 	u16  indexAddon;	// zero or index addons_t
 	u32  uniqNumber1;	// level 1.0

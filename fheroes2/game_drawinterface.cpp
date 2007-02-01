@@ -23,6 +23,7 @@
 #include "sprite.h"
 #include "game.h"
 
+/* Redraw */
 void Game::DrawInterface(void){
 
     Cursor::Hide();

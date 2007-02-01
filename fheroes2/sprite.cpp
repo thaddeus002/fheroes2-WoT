@@ -22,14 +22,19 @@
 #include "sprite.h"
 
 /* ICN Sprite constructor */
-Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &dataICN) 
+Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &data) 
     : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(ox), offsetY(oy)
 {
     Fill(AGG::GetColor(INDEX_COLOR_KEY));
-    DrawICN(dataICN); 
+    DrawICN(data);
     SetColorKey(SDL_SRCCOLORKEY|SDL_RLEACCEL, AGG::GetColor(INDEX_COLOR_KEY));
     SetDisplayFormatAlpha();
 };
+
+/* TIL Sprite constructor */
+Sprite::Sprite(u16 w, u16 h, u8 shape, const std::vector<unsigned char> &data)
+    : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(0), offsetY(0)
+{ DrawTIL(shape, data); }
 
 /* draw pixel */
 void Sprite::DrawPixel(u16 x, u16 y, u8 index)
@@ -148,4 +153,52 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
     Unlock();
 
     //if(H2Config::RLEDebug()) std::cerr << "END RLE DEBUG" << std::endl;
+}
+
+/* draw TIL sprite to surface with shape */
+void Sprite::DrawTIL(u8 shape, const std::vector<unsigned char> &vdata)
+{
+    s16 x, y;
+    u32 index = 0;
+
+    // lock surface
+    Lock();
+
+    switch(shape % 4){
+
+        // normal
+        case 0:
+            for(y = 0; y < h(); ++y)
+                for(x = 0; x < w(); ++x)
+		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
+                    //DrawPixel(x, y, vdata[index++]);
+            break;
+
+        // vertical reflect
+        case 1:
+            for(y = h() - 1; y >= 0; --y)
+                for(x = 0; x < w(); ++x)
+		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
+                    //DrawPixel(x, y, vdata[index++]);
+            break;
+
+        // horizontal reflect
+        case 2:
+            for(y = 0; y < h(); ++y)
+                for(x = w() - 1; x >= 0; --x)
+		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
+                    //DrawPixel(x, y, vdata[index++]);
+            break;
+
+        // any variant
+        case 3:
+            for(y = h() - 1; y >= 0; --y)
+                for( x = w() - 1; x >= 0; --x)
+		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
+                    //DrawPixel(x, y, vdata[index++]);
+            break;
+    }
+
+    // unlock surface
+    Unlock();
 }

@@ -23,10 +23,13 @@
 #include <vector>
 #include "error.h"
 #include "config.h"
+#include "agg.h"
+#include "game.h"
 #include "mp2.h"
-#include "maps.h"
+#include "error.h"
+#include "mapsdata.h"
 
-void Maps::LoadMP2(const std::string &filename)
+MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
 {
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -39,6 +42,9 @@ void Maps::LoadMP2(const std::string &filename)
     fd.read(reinterpret_cast<char *>(&width), sizeof(u32));
     // height
     fd.read(reinterpret_cast<char *>(&height), sizeof(u32));
+
+    w = width;
+    h = height;
 
     char byte8;
     std::vector<MP2::tile_t> mp2tile;
@@ -97,4 +103,84 @@ void Maps::LoadMP2(const std::string &filename)
     }
 
     fd.close();
+
+    tiles = SDLmm::Surface::CreateSurface(SDL_SWSURFACE, w * TILEWIDTH, h * TILEWIDTH, DEFAULT_DEPTH);
+    if(!tiles.valid()) Error::Except(SDLmm::GetError());
+
+    std::vector<MP2::tile_t>::const_iterator it     = mp2tile.begin();
+    std::vector<MP2::tile_t>::const_iterator it_end = mp2tile.end();
+
+    // fill Maps::Data
+    Point pt;
+    u32 ii = 0;
+
+    while(it != it_end){
+
+        pt.x = ii % width;
+        pt.y = ii / height;
+
+	pt.x *= TILEWIDTH;
+	pt.y *= TILEWIDTH;
+
+	Sprite * tile = AGG::GetTIL("GROUND32.TIL", (*it).tileIndex, (*it).shape);
+	tiles.Blit(*tile, pt);
+	
+	delete tile;
+
+	vec_tiles.push_back(MapsTiles(pt, *it));
+	++ii;
+	++it;
+    }
+    //tiles.SetDisplayFormat();
+    tiles.SaveBMP("screenshot.bmp");
 }
+
+/*
+u16 Maps::GetTypeGround(MP2::tile_t info){
+    u16 index = info.tileIndex;
+
+    // сканируем дорогу ROAD
+    if(0x7A == info.objectName1) return Maps::ROAD;
+
+    u16 indexAddon = info->indexAddon;
+    MP2ADDONTAIL        *ptrAddon = NULL;
+
+    while(indexAddon){
+
+        ptrAddon = GetADDONTAIL(indexAddon);
+
+        if(0x7A == ptrAddon->objectNameN1 * 2) return Maps::ROAD;
+
+        indexAddon = ptrAddon->indexAddon;
+    }
+
+
+    // список поверхностей по индексу из GROUND32.TIL
+    if(30 > index)
+        return Maps::WATER;
+
+    else if(92 > index)
+        return Maps::GRASS;
+
+    else if(146 > index)
+        return Maps::SNOW;
+
+    else if(208 > index)
+        return Maps::SWAMP;
+
+    else if(262 > index)
+        return Maps::LAVA;
+
+    else if(321 > index)
+        return Maps::DESERT;
+
+    else if(361 > index)
+        return Maps::DIRT;
+
+    else if(415 > index)
+        return Maps::WASTELAND;
+
+    //else if(432 > index)
+    return Maps::BEACH;
+}
+*/

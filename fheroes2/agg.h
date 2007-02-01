@@ -68,6 +68,7 @@ namespace AGG {
     u32 GetColor(u8 index);
 
     void LoadICN(const std::string & name);
+    Sprite * GetTIL(const std::string & name, u16 index, u8 shape);
     const Sprite & GetICN(const std::string & name, u16 index);
     void FreeICN(aggfat_t & fat);
 };

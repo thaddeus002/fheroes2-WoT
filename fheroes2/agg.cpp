@@ -135,6 +135,36 @@ void AGG::FreeObject(aggfat_t & fat){
     }
 }
 
+/* get TIL Sprite */
+Sprite * AGG::GetTIL(const std::string & name, u16 index, u8 shape)
+{
+    // check TIL
+    if(AGG::fat[name].blockType != DATA_TIL) Error::Except("unknown til: " + name);
+
+    // offset
+    AGG::fd->seekg(AGG::fat[name].blockOffset, std::ios_base::beg);
+    
+    u16 count, width, height;
+    AGG::fd->read(reinterpret_cast<char *>(&count), sizeof(u16));
+    AGG::fd->read(reinterpret_cast<char *>(&width), sizeof(u16));
+    AGG::fd->read(reinterpret_cast<char *>(&height), sizeof(u16));
+
+    // read icn header
+    u32 sizeData = width * height;
+
+    // skip
+    AGG::fd->ignore(sizeData * index);
+
+    // read
+    char *buf = new char[sizeData];
+    std::memset(buf, 0x80, sizeData);
+    AGG::fd->read(buf, sizeData);
+    std::vector<unsigned char> vdata(buf, &buf[sizeData-1]);
+    delete [] buf;
+
+    return new Sprite(width, height, shape, vdata);
+}
+
 /* load ICN Sprite to map */
 void AGG::LoadICN(const std::string & name)
 {

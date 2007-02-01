@@ -22,8 +22,7 @@
 
 #include "gamedefs.h"
 
-#define TILES_WIDTH     32
-#define TILES_HEIGHT    32
+#define TILEWIDTH 32
 
 namespace Maps
 {
@@ -59,7 +58,6 @@ namespace Maps
     difficulty_t& operator++ (difficulty_t& difficulty);
     difficulty_t& operator-- (difficulty_t& difficulty);
     
-    void LoadMP2(const std::string &filename);
 };
 
 #endif

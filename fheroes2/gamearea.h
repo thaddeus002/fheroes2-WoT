@@ -17,32 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2SPRITE_H
-#define H2SPRITE_H
+#ifndef H2GAMEAREA_H
+#define H2GAMEAREA_H
 
-#include <vector>
-#include "error.h"
-#include "config.h"
 #include "gamedefs.h"
+#include "mapsdata.h"
+#include "game.h"
+#include "rect.h"
 
-class Sprite : public SDLmm::Surface
+class GameArea : private Rect
 {
-
 public:
-    Sprite() : SDLmm::Surface(){};
-    Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &data);
-    Sprite(u16 w, u16 h, u8 shape, const std::vector<unsigned char> &data);
+    GameArea::GameArea(const MapsData & data);
+    
+    typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
-    s16 x(void) const{ return offsetX; };
-    s16 y(void) const{ return offsetY; };
+    void SetPos(const Point &pt){ x = pt.x; y = pt.y; }
+    void SetPos(u8 ax, u8 ay){ x = ax; y = ay; }
+
+    u8 GetWidth(void) const{ return w; }
+    u8 GetHeight(void) const{ return h; }
+    const Rect & GetRect(void) const{ return *this; }
+    Rect GetAbsolut(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, w * TILEWIDTH, h * TILEWIDTH); }
+
+    void Scroll(GameArea::scroll_t scroll);
+
+    void Redraw(void);
+    void Redraw(const Rect &area_rt);
 
 private:
-    void DrawPixel(u16 x, u16 y, u8 index);
-    void DrawICN(const std::vector<unsigned char> &vdata);
-    void DrawTIL(u8 shape, const std::vector<unsigned char> &vdata);
-
-    s16		offsetX;
-    s16		offsetY;
+    const MapsData & maps;
 };
 
 #endif

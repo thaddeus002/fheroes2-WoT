@@ -17,27 +17,45 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TILES_H
-#define H2TILES_H
+#ifndef H2MAPSDATA_H
+#define H2MAPSDATA_H
 
+#include <vector>
 #include "gamedefs.h"
-#include "maps.h"
 #include "rect.h"
+#include "mp2.h"
 
-namespace Maps {
+#define TILEWIDTH     32
+#define TILEWIDTH    32
 
-class Tiles : public Rect
+/* class Tiles */
+class MapsTiles : public Point
 {
-
 public:
-    Tiles(u16 x, u16 y, u16 gr) : Rect(x, y, TILES_WIDTH, TILES_HEIGHT), ground(gr){};
-
+    MapsTiles(Point pt, MP2::tile_t tile) : Point(x, y) {};
     u16 GetGrounds(void) const{ return ground; };
 
 private:
-    u16		ground;
+    u16 ground;
 };
 
+/* class Data */
+class MapsData : private Rect
+{
+public:
+    MapsData::MapsData(const std::string &filename);
+
+    u16 GetWidth(void) const{ return w; }
+    u16 GetHeight(void) const{ return h; }
+
+    const MapsTiles & GetTiles(u16 index) const{ return vec_tiles.size() > index ? vec_tiles[index] : vec_tiles.back(); }
+    const MapsTiles & GetTiles(u32 ax, u32 ay) const{ return vec_tiles.size() > ax * ay ? vec_tiles[ax * w + ay] : vec_tiles.back(); }
+
+    void Redraw(const Rect &rt, const Point &pt) const{ display.Blit(tiles, rt, pt); }
+
+private:
+    SDLmm::Surface tiles;
+    std::vector<MapsTiles> vec_tiles;
 };
 
 #endif

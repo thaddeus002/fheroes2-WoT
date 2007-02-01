@@ -23,28 +23,33 @@
 #include "sprite.h"
 #include "event.h"
 #include "button.h"
-#include "maps.h"
+#include "mapsdata.h"
+#include "gamearea.h"
 #include "game.h"
 
 Game::menu_t Game::StartGame(void){
 
-    Maps::LoadMP2(H2Config::GetFileMaps());
+    // Load maps
+    MapsData maps(H2Config::GetFileMaps());
+    GameArea areaMaps(maps);
 
     Game::DrawInterface();
 
     // cursor
     Cursor::Hide();
-    Cursor::themes_t cursor = Cursor::POINTER;
+    Cursor::themes_t cursor = Cursor::FIGHT;//Cursor::POINTER;
+
+    areaMaps.Redraw();
 
     const std::string &icnscroll = ( H2Config::EvilInterface() ? "SCROLLE.ICN" : "SCROLL.ICN" );
     const std::string &icnbtn = ( H2Config::EvilInterface() ? "ADVEBTNS.ICN" : "ADVBTNS.ICN" );
 
     Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH, display.h() - 2 * BORDERWIDTH);
     Rect areaScrollRight(display.w() - BORDERWIDTH, BORDERWIDTH, BORDERWIDTH, display.h() - 2 * BORDERWIDTH);
-    //Rect areaScrollTop(BORDERWIDTH, 0, (GetWidthArea() - 1) * TILEWIDTH, BORDERWIDTH);
-    //Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH, (GetWidthArea() - 1) * TILEWIDTH, BORDERWIDTH);
-    //Rect areaClickMaps(BORDERWIDTH, BORDERWIDTH, GetWidthArea() * TILEWIDTH, GetHeightArea() * TILEWIDTH);
-    Rect areaClickRadar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH);
+    Rect areaScrollTop(BORDERWIDTH, 0, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH);
+    Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH);
+    Rect areaRadar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH);
+    Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
     Point pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
 
@@ -183,6 +188,15 @@ Game::menu_t Game::StartGame(void){
 
 	le.HandleEvents();
 
+	if(le.MouseCursor(areaScrollLeft))  { Cursor::Set(Cursor::SCROLL_LEFT);   areaMaps.Scroll(GameArea::LEFT);  continue; }
+	if(le.MouseCursor(areaScrollRight)) { Cursor::Set(Cursor::SCROLL_RIGHT);  areaMaps.Scroll(GameArea::RIGHT); continue; }
+	if(le.MouseCursor(areaScrollTop))   { Cursor::Set(Cursor::SCROLL_TOP);    areaMaps.Scroll(GameArea::TOP);   continue; }
+	if(le.MouseCursor(areaScrollBottom)){ Cursor::Set(Cursor::SCROLL_BOTTOM); areaMaps.Scroll(GameArea::BOTTOM);  continue; }
+	// restore game cursor
+	if(le.MouseCursor(areaMaps.GetAbsolut())){ Cursor::Set(cursor); }
+	// pointer cursor on left panel
+	if(le.MouseCursor(areaLeftPanel)){ Cursor::Set(Cursor::POINTER); }
+
 	le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.Press() : buttonScrollHeroesUp.Release();
 	le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.Press() : buttonScrollCastleUp.Release();
 	le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
@@ -196,11 +210,7 @@ Game::menu_t Game::StartGame(void){
 	le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.Press() : buttonScrollHeroesDown.Release();
 	le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.Press() : buttonScrollCastleDown.Release();
 
-	//le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
-	//le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
-
-	//if(le.MouseRight()) Error::Verbose(le.MousePressRight());
-	//if(le.MouseClickLeft(buttonExit)) return MAINMENU;
+	//if(le.MouseClickLeft(areaClickRadar));
     }
 
     return QUITGAME;
