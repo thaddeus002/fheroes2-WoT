@@ -25,9 +25,9 @@
 Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &data) 
     : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(ox), offsetY(oy)
 {
-    Fill(AGG::GetColor(INDEX_COLOR_KEY));
+    Fill(AGG::GetColorKey());
     DrawICN(data);
-    SetColorKey(SDL_SRCCOLORKEY|SDL_RLEACCEL, AGG::GetColor(INDEX_COLOR_KEY));
+    SetColorKey(SDL_SRCCOLORKEY|SDL_RLEACCEL, AGG::GetColorKey());
     SetDisplayFormatAlpha();
 };
 
@@ -35,14 +35,6 @@ Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &d
 Sprite::Sprite(u16 w, u16 h, u8 shape, const std::vector<unsigned char> &data)
     : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(0), offsetY(0)
 { DrawTIL(shape, data); }
-
-/* draw pixel */
-void Sprite::DrawPixel(u16 x, u16 y, u8 index)
-{
-    if(INDEX_COLOR_KEY == index || INDEX_SHADOW_ALPHA == index) index = INDEX_CHANGE_COLOR;
-
-    SetPixel2(x, y, AGG::GetColor(index));
-}
 
 /* draw RLE ICN to surface */
 void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
@@ -75,7 +67,7 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
 	    ++index;
 	    i = 0;
 	    while(i++ < count && index < size){
-		DrawPixel(x++, y, vdata[index++]);
+		SetPixel2(x++, y, AGG::GetColor(vdata[index++]));
 		//if(H2Config::RLEDebug()) fprintf(stderr, ":%hhX", vdata[index]);
 	    }
 	    continue;
@@ -102,7 +94,7 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
 		count = vdata[index];
 		++index;
 		for(i = 0; i < vdata[index]; ++i){
-		    SetPixel2(x++, y, AGG::GetColor(INDEX_SHADOW_ALPHA));
+		    SetPixel2(x++, y, AGG::GetShadowAlpha());
 		    //if(H2Config::RLEDebug()) fprintf(stderr, ":%hhX", count);
 		}
 		++index;
@@ -112,7 +104,7 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
 		//if(H2Config::RLEDebug()) fprintf(stderr, " M4:%hhX:%d ALPHA", vdata[index], vdata[index] % 4);
 		count = vdata[index];
 		for(i = 0; i < vdata[index] % 4; ++i){
-		    SetPixel2(x++, y, AGG::GetColor(INDEX_SHADOW_ALPHA));
+		    SetPixel2(x++, y, AGG::GetShadowAlpha());
 		    //if(H2Config::RLEDebug()) fprintf(stderr, ":%hhX", count);
 		}
 		++index;
@@ -127,7 +119,7 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
 	    //if(H2Config::RLEDebug()) fprintf(stderr, " C:%d:D", count);
 	    ++index;
 	    for(i = 0; i < count; ++i){
-	    	DrawPixel(x++, y, vdata[index]);
+	    	SetPixel2(x++, y, AGG::GetColor(vdata[index]));
 	    	//if(H2Config::RLEDebug()) fprintf(stderr, ":%hhX", vdata[index]);
 	    }
 	    ++index;
@@ -141,7 +133,7 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
 	    //if(H2Config::RLEDebug()) fprintf(stderr, " C:%d:D", count);
 	    ++index;
 	    for(i = 0; i < count; ++i){
-		DrawPixel(x++, y, vdata[index]);
+		SetPixel2(x++, y, AGG::GetColor(vdata[index]));
 		//if(H2Config::RLEDebug()) fprintf(stderr, ":%hhX", vdata[index]);
 	    }
 	    ++index;
@@ -171,7 +163,6 @@ void Sprite::DrawTIL(u8 shape, const std::vector<unsigned char> &vdata)
             for(y = 0; y < h(); ++y)
                 for(x = 0; x < w(); ++x)
 		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-                    //DrawPixel(x, y, vdata[index++]);
             break;
 
         // vertical reflect
@@ -179,7 +170,6 @@ void Sprite::DrawTIL(u8 shape, const std::vector<unsigned char> &vdata)
             for(y = h() - 1; y >= 0; --y)
                 for(x = 0; x < w(); ++x)
 		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-                    //DrawPixel(x, y, vdata[index++]);
             break;
 
         // horizontal reflect
@@ -187,7 +177,6 @@ void Sprite::DrawTIL(u8 shape, const std::vector<unsigned char> &vdata)
             for(y = 0; y < h(); ++y)
                 for(x = w() - 1; x >= 0; --x)
 		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-                    //DrawPixel(x, y, vdata[index++]);
             break;
 
         // any variant
@@ -195,7 +184,6 @@ void Sprite::DrawTIL(u8 shape, const std::vector<unsigned char> &vdata)
             for(y = h() - 1; y >= 0; --y)
                 for( x = w() - 1; x >= 0; --x)
 		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-                    //DrawPixel(x, y, vdata[index++]);
             break;
     }
 

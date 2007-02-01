@@ -21,6 +21,7 @@
 #define H2MAPSFILEINFO_H
 
 #include "maps.h"
+#include "kingdom.h"
 #include "gamedefs.h"
 
 namespace Maps

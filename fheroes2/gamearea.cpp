@@ -71,29 +71,33 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 {
     switch(scroll){
 	case GameArea::LEFT:
+	    if(0 == x) return;
 	    Cursor::Hide();
-	    if(x) --x;
+	    --x;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::RIGHT:
+	    if(maps.GetWidth() - w == x) return;
 	    Cursor::Hide();
-	    if(x < maps.GetWidth() - w) ++x;
+	    ++x;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::TOP:
+	    if(0 == y) return;
 	    Cursor::Hide();
-	    if(y) --y;
+	    --y;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::BOTTOM:
+	    if(maps.GetHeight() - h == y) return;
 	    Cursor::Hide();
-	    if(y < maps.GetHeight() - h) ++y;
+	    ++y;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();

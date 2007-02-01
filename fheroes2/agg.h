@@ -66,6 +66,8 @@ namespace AGG {
 
     void LoadPalette(void);
     u32 GetColor(u8 index);
+    u32 GetShadowAlpha(void);
+    u32 GetColorKey(void);
 
     void LoadICN(const std::string & name);
     Sprite * GetTIL(const std::string & name, u16 index, u8 shape);

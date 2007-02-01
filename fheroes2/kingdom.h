@@ -20,6 +20,8 @@
 #ifndef H2KINGDOM_H
 #define H2KINGDOM_H
 
+#define KINGDOMMAX      7
+
 #include "gamedefs.h"
 
 namespace Kingdom

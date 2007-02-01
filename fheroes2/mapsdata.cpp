@@ -131,8 +131,10 @@ MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
 	++ii;
 	++it;
     }
-    //tiles.SetDisplayFormat();
-    tiles.SaveBMP("screenshot.bmp");
+    tiles.SetDisplayFormat();
+
+    // save maps to big sprite
+    tiles.SaveBMP("maps.bmp");
 }
 
 /*

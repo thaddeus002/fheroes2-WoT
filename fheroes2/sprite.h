@@ -37,7 +37,6 @@ public:
     s16 y(void) const{ return offsetY; };
 
 private:
-    void DrawPixel(u16 x, u16 y, u8 index);
     void DrawICN(const std::vector<unsigned char> &vdata);
     void DrawTIL(u8 shape, const std::vector<unsigned char> &vdata);
 

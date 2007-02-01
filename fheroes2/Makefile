@@ -22,6 +22,6 @@ include $(wildcard *.d)
 .PHONY: clean
 
 clean:
-	rm *.o
-	rm *.d
-	rm $(TARGET)
+	rm -f *.o
+	rm -f *.d
+	rm -f $(TARGET)

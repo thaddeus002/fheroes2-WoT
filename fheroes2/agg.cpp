@@ -24,6 +24,8 @@ namespace AGG {
     static std::fstream                        *fd = NULL;
     static std::map<std::string, AGG::aggfat_t> fat;
     static std::vector<SDLmm::Color>            palette(AGGSIZEPALETTE);
+    static u32 shadowAlpha = 0;
+    static u32 colorKey = 0;
 };
 
 /* AGG init */
@@ -318,25 +320,18 @@ void AGG::LoadPalette(void)
 	AGG::fd->read(&g, 1);
 	AGG::fd->read(&b, 1);
 
-	switch(i){
-	
-	    case INDEX_SHADOW_ALPHA:
-		AGG::palette[i] = pixelFormat.MapRGBA(0, 0, 0, DEFAULT_SHADOW_ALPHA);
-		break;
-
-	    case INDEX_COLOR_KEY:
-		r = 0xFF;
-		g = 0x00;
-		b = 0xFF;
-		AGG::palette[i] = pixelFormat.MapRGB(r, g, b);
-		break;
-	
-	    default:
-		r <<= 2;
-		g <<= 2;
-		b <<= 2;
-		AGG::palette[i] = pixelFormat.MapRGB(r, g, b);
-		break;
-	}
+	r <<= 2;
+	g <<= 2;
+	b <<= 2;
+	AGG::palette[i] = pixelFormat.MapRGB(r, g, b);
     }
+
+    shadowAlpha = pixelFormat.MapRGBA(0, 0, 0, DEFAULT_SHADOW_ALPHA);
+    colorKey = pixelFormat.MapRGB(0xFF, 0x00, 0xFF);
 }
+
+/* return shadow alpha */
+u32 AGG::GetShadowAlpha(void){ return shadowAlpha; }
+
+/* return color key */
+u32 AGG::GetColorKey(void){ return colorKey; }

@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "config.h"
+#include "kingdom.h"
 
 namespace H2Config {
     static u16  boolValue = ANIMATION;

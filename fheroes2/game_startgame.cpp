@@ -44,10 +44,10 @@ Game::menu_t Game::StartGame(void){
     const std::string &icnscroll = ( H2Config::EvilInterface() ? "SCROLLE.ICN" : "SCROLL.ICN" );
     const std::string &icnbtn = ( H2Config::EvilInterface() ? "ADVEBTNS.ICN" : "ADVBTNS.ICN" );
 
-    Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH, display.h() - 2 * BORDERWIDTH);
-    Rect areaScrollRight(display.w() - BORDERWIDTH, BORDERWIDTH, BORDERWIDTH, display.h() - 2 * BORDERWIDTH);
-    Rect areaScrollTop(BORDERWIDTH, 0, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH);
-    Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH);
+    Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
+    Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
+    Rect areaScrollTop(BORDERWIDTH / 2, 0, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH / 2);
     Rect areaRadar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH);
     Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
