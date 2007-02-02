@@ -17,50 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEDEFS_H
-#define H2GAMEDEFS_H
+#ifndef H2RADAR_H
+#define H2RADAR_H
 
-#include "SDL.h"
-#include "sdlmm.h"
+#include "gamedefs.h"
+#include "mapsdata.h"
+#include "spritecursor.h"
+#include "gamearea.h"
+#include "rect.h"
 
-typedef char		s8;
-typedef unsigned char	u8;
-typedef short		s16;
-typedef unsigned short	u16;
-typedef int		s32;
-typedef unsigned int	u32;
-
-namespace Display
+class Radar : private SDLmm::Surface
 {
-    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280 } resolution_t;
+public:
+    Radar(s16 rx, s16 ry, const MapsData & mp);
 
-    void SetVideoMode(resolution_t mode);
+    const Rect & GetRect(void) const{ return area; }
+    
+    void Redraw(void);
 
-    void HideCursor(void);
-    void ShowCursor(void);
-    void SetCaption(const std::string &caption);
+private:
+    void GenerateFrom(const SDLmm::Surface &surface);
+    const MapsData & maps;
+    Rect area;
 };
 
-static SDLmm::Display &display = SDLmm::Display::GetDisplay();
+class RadarCursor : private Rect, SpriteCursor
+{
+public:
+    RadarCursor(const Radar &radar, const MapsData &mp, const GameArea &ga);
 
-// PUBLIC
-#define GAME_VERSION		20070202	// Version
+    void Redraw(void);
 
-
-// PRIVATE
-#define DEFAULT_DEPTH		16		// Surface use bits color
-#define	DEFAULT_SHADOW_ALPHA	0x40		// shadow alpha
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN 
-#define RMASK 0x0000f000 
-#define GMASK 0x00000f00 
-#define BMASK 0x000000f0 
-#define AMASK 0x0000000f 
-#else 
-#define RMASK 0x0000000f 
-#define GMASK 0x000000f0 
-#define BMASK 0x00000f00 
-#define AMASK 0x0000f000 
-#endif 
+private:
+    const MapsData &maps;
+    const GameArea &area;
+};
 
 #endif

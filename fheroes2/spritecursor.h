@@ -26,13 +26,17 @@
 #include "background.h"
 #include "gamedefs.h"
 
-class SpriteCursor : public Sprite
+class SpriteCursor : public SDLmm::Surface
 {
 
 public:
-    SpriteCursor(const Sprite &sprite, const Point &pt = Point(-1, -1)) : Sprite(sprite), rect(pt.x, pt.y, sprite.w(), sprite.h()), background(rect){ Move(pt); };
-    SpriteCursor(const Sprite &sprite, const Rect  &rt) : Sprite(sprite), rect(rt), background(rect){ Move(Point(rt.x, rt.y)); };
+    /* empty sprite cursor */
+    SpriteCursor(const Rect  &rt) : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, rt.w, rt.h, DEFAULT_DEPTH)), rect(rt), background(rect){};
+    /* sprite cursor */
+    SpriteCursor(const Sprite &sprite, const Point &pt = Point(-1, -1)) : SDLmm::Surface(sprite), rect(pt.x, pt.y, sprite.w(), sprite.h()), background(rect){ Move(pt); };
+    SpriteCursor(const Sprite &sprite, const Rect  &rt) : SDLmm::Surface(sprite), rect(rt), background(rect){ Move(Point(rt.x, rt.y)); };
 
+    void Move(s16 ax, s16 ay);
     void Move(const Point &rt);
     void Redraw(void);
 

@@ -24,10 +24,15 @@
 
 void SpriteCursor::Move(const Point &pt)
 {
-    if(pt.x < 0 || pt.y < 0) return;
+    Move(pt.x, pt.y);
+}
 
-    rect.x = pt.x;
-    rect.y = pt.y;
+void SpriteCursor::Move(s16 ax, s16 ay)
+{
+    if(ax < 0 || ay < 0) return;
+
+    rect.x = ax;
+    rect.y = ay;
 
     bool hide = Cursor::Visible() ? true : false;
 
@@ -36,7 +41,7 @@ void SpriteCursor::Move(const Point &pt)
     background.Restore();
     background.Save(rect);
 
-    display.Blit(*this, pt);
+    display.Blit(*this, Point(ax, ay));
 
     if(hide) Cursor::Show();
 }

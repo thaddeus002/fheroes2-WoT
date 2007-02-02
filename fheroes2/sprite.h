@@ -29,16 +29,17 @@ class Sprite : public SDLmm::Surface
 {
 
 public:
-    Sprite() : SDLmm::Surface(){};
-    Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &data);
-    Sprite(u16 w, u16 h, u8 shape, const std::vector<unsigned char> &data);
+    /* icn sprite constructor */
+    Sprite(u16 w, u16 h, s16 ox, s16 oy, u32 size, const u8 *data);
+
+    /* til sprite constructor */
+    Sprite(u8 shape, const u8 *data);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };
 
 private:
-    void DrawICN(const std::vector<unsigned char> &vdata);
-    void DrawTIL(u8 shape, const std::vector<unsigned char> &vdata);
+    void DrawICN(u32 size, const u8 *vdata);
 
     s16		offsetX;
     s16		offsetY;

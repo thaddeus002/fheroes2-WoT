@@ -19,31 +19,78 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "maps.h"
 #include "sprite.h"
 
 /* ICN Sprite constructor */
-Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, const std::vector<unsigned char> &data) 
+Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, u32 size, const u8 *data) 
     : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(ox), offsetY(oy)
 {
     Fill(AGG::GetColorKey());
-    DrawICN(data);
+    DrawICN(size, data);
     SetColorKey(SDL_SRCCOLORKEY|SDL_RLEACCEL, AGG::GetColorKey());
     SetDisplayFormatAlpha();
 };
 
 /* TIL Sprite constructor */
-Sprite::Sprite(u16 w, u16 h, u8 shape, const std::vector<unsigned char> &data)
-    : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(0), offsetY(0)
-{ DrawTIL(shape, data); }
+Sprite::Sprite(u8 shape, const u8 *data)
+    : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, TILEWIDTH, TILEWIDTH, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(0), offsetY(0)
+{
+    s16 x, y;
+
+    // lock surface
+    Lock();
+
+    switch(shape % 4){
+
+        // normal
+        case 0:
+            for(y = 0; y < TILEWIDTH; ++y)
+                for(x = 0; x < TILEWIDTH; ++x){
+		    SetPixel2(x, y, AGG::GetColor(*data));
+		    ++data;
+		}
+            break;
+
+        // vertical reflect
+        case 1:
+            for(y = TILEWIDTH - 1; y >= 0; --y)
+                for(x = 0; x < TILEWIDTH; ++x){
+		    SetPixel2(x, y, AGG::GetColor(*data));
+		    ++data;
+		}
+            break;
+
+        // horizontal reflect
+        case 2:
+            for(y = 0; y < TILEWIDTH; ++y)
+                for(x = TILEWIDTH - 1; x >= 0; --x){
+		    SetPixel2(x, y, AGG::GetColor(*data));
+		    ++data;
+		}
+            break;
+
+        // any variant
+        case 3:
+            for(y = TILEWIDTH - 1; y >= 0; --y)
+                for( x = TILEWIDTH - 1; x >= 0; --x){
+		    SetPixel2(x, y, AGG::GetColor(*data));
+		    ++data;
+		}
+            break;
+    }
+
+    // unlock surface
+    Unlock();
+}
 
 /* draw RLE ICN to surface */
-void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
+void Sprite::DrawICN(u32 size, const u8 *vdata)
 {
     u8 i, count;
     u16 x = 0;
     u16 y = 0;
     u32 index = 0;
-    u32 size = vdata.size();
 
     //if(H2Config::RLEDebug()) std::cerr << "START RLE DEBUG" << std::endl;
 
@@ -147,46 +194,3 @@ void Sprite::DrawICN(const std::vector<unsigned char> &vdata)
     //if(H2Config::RLEDebug()) std::cerr << "END RLE DEBUG" << std::endl;
 }
 
-/* draw TIL sprite to surface with shape */
-void Sprite::DrawTIL(u8 shape, const std::vector<unsigned char> &vdata)
-{
-    s16 x, y;
-    u32 index = 0;
-
-    // lock surface
-    Lock();
-
-    switch(shape % 4){
-
-        // normal
-        case 0:
-            for(y = 0; y < h(); ++y)
-                for(x = 0; x < w(); ++x)
-		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-            break;
-
-        // vertical reflect
-        case 1:
-            for(y = h() - 1; y >= 0; --y)
-                for(x = 0; x < w(); ++x)
-		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-            break;
-
-        // horizontal reflect
-        case 2:
-            for(y = 0; y < h(); ++y)
-                for(x = w() - 1; x >= 0; --x)
-		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-            break;
-
-        // any variant
-        case 3:
-            for(y = h() - 1; y >= 0; --y)
-                for( x = w() - 1; x >= 0; --x)
-		    SetPixel2(x, y, AGG::GetColor(vdata[index++]));
-            break;
-    }
-
-    // unlock surface
-    Unlock();
-}

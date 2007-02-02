@@ -25,7 +25,10 @@
 #include "button.h"
 #include "mapsdata.h"
 #include "gamearea.h"
+#include "radar.h"
 #include "game.h"
+
+#include "error.h"
 
 Game::menu_t Game::StartGame(void){
 
@@ -33,13 +36,19 @@ Game::menu_t Game::StartGame(void){
     MapsData maps(H2Config::GetFileMaps());
     GameArea areaMaps(maps);
 
-    Game::DrawInterface();
+    // Create radar
+    Radar areaRadar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, maps);
 
     // cursor
     Cursor::Hide();
-    Cursor::themes_t cursor = Cursor::FIGHT;//Cursor::POINTER;
+    Cursor::themes_t cursor = Cursor::FIGHT; // test //Cursor::POINTER;
 
+    Game::DrawInterface();
     areaMaps.Redraw();
+    areaRadar.Redraw();
+
+    RadarCursor radarCursor(areaRadar, maps, areaMaps);
+    radarCursor.Redraw();
 
     const std::string &icnscroll = ( H2Config::EvilInterface() ? "SCROLLE.ICN" : "SCROLL.ICN" );
     const std::string &icnbtn = ( H2Config::EvilInterface() ? "ADVEBTNS.ICN" : "ADVBTNS.ICN" );
@@ -48,7 +57,6 @@ Game::menu_t Game::StartGame(void){
     Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
     Rect areaScrollTop(BORDERWIDTH / 2, 0, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH / 2);
     Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetWidth() - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    Rect areaRadar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH);
     Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
     Point pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
@@ -59,6 +67,7 @@ Game::menu_t Game::StartGame(void){
     pt_scu.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
     pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
 
+    // recalculate buttons coordinate
     switch(H2Config::GetVideoMode()){
 
         default:
@@ -181,6 +190,8 @@ Game::menu_t Game::StartGame(void){
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     display.Flip();
+
+
     Cursor::Show();
 
     // startgame loop
@@ -188,10 +199,10 @@ Game::menu_t Game::StartGame(void){
 
 	le.HandleEvents();
 
-	if(le.MouseCursor(areaScrollLeft))  { Cursor::Set(Cursor::SCROLL_LEFT);   areaMaps.Scroll(GameArea::LEFT);  continue; }
-	if(le.MouseCursor(areaScrollRight)) { Cursor::Set(Cursor::SCROLL_RIGHT);  areaMaps.Scroll(GameArea::RIGHT); continue; }
-	if(le.MouseCursor(areaScrollTop))   { Cursor::Set(Cursor::SCROLL_TOP);    areaMaps.Scroll(GameArea::TOP);   continue; }
-	if(le.MouseCursor(areaScrollBottom)){ Cursor::Set(Cursor::SCROLL_BOTTOM); areaMaps.Scroll(GameArea::BOTTOM);  continue; }
+	if(le.MouseCursor(areaScrollLeft))  { Cursor::Set(Cursor::SCROLL_LEFT);   areaMaps.Scroll(GameArea::LEFT); radarCursor.Redraw(); continue; }
+	if(le.MouseCursor(areaScrollRight)) { Cursor::Set(Cursor::SCROLL_RIGHT);  areaMaps.Scroll(GameArea::RIGHT); radarCursor.Redraw(); continue; }
+	if(le.MouseCursor(areaScrollTop))   { Cursor::Set(Cursor::SCROLL_TOP);    areaMaps.Scroll(GameArea::TOP); radarCursor.Redraw();   continue; }
+	if(le.MouseCursor(areaScrollBottom)){ Cursor::Set(Cursor::SCROLL_BOTTOM); areaMaps.Scroll(GameArea::BOTTOM); radarCursor.Redraw();  continue; }
 	// restore game cursor
 	if(le.MouseCursor(areaMaps.GetAbsolut())){ Cursor::Set(cursor); }
 	// pointer cursor on left panel
@@ -210,7 +221,7 @@ Game::menu_t Game::StartGame(void){
 	le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.Press() : buttonScrollHeroesDown.Release();
 	le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.Press() : buttonScrollCastleDown.Release();
 
-	//if(le.MouseClickLeft(areaClickRadar));
+	if(le.MousePressLeft(areaRadar.GetRect())) Error::Verbose("click radar");
     }
 
     return QUITGAME;

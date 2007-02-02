@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "maps.h"
 #include "agg.h"
 
 namespace AGG {
@@ -63,9 +64,10 @@ void AGG::Init(const std::string & aggname)
 	    fat_element.vectorICN = NULL;
 	}else if(std::string::npos != key_name.find(".82M"))
 	    fat_element.blockType = DATA_WAV;
-	else if(std::string::npos != key_name.find(".TIL"))
+	else if(std::string::npos != key_name.find(".TIL")){
 	    fat_element.blockType = DATA_TIL;
-	else if(std::string::npos != key_name.find(".BMP"))
+	    fat_element.ptrTIL = NULL;
+	}else if(std::string::npos != key_name.find(".BMP"))
 	    fat_element.blockType = DATA_BMP;
 	else if(std::string::npos != key_name.find(".XMI"))
 	    fat_element.blockType = DATA_XMI;
@@ -106,6 +108,10 @@ void AGG::PreloadObject(const std::string & name)
 	    AGG::LoadICN(name);
 	    break;
 
+	case DATA_TIL:
+	    AGG::LoadTIL(name);
+	    break;
+
 	case DATA_PAL:
 	    break;
 
@@ -130,6 +136,7 @@ void AGG::FreeObject(aggfat_t & fat){
 	    break;
 
 	case DATA_PAL:
+	    AGG::FreeTIL(fat);
 	    break;
 	
 	default:
@@ -137,11 +144,16 @@ void AGG::FreeObject(aggfat_t & fat){
     }
 }
 
-/* get TIL Sprite */
-Sprite * AGG::GetTIL(const std::string & name, u16 index, u8 shape)
+/* load TIL data */
+void AGG::LoadTIL(const std::string & name)
 {
     // check TIL
     if(AGG::fat[name].blockType != DATA_TIL) Error::Except("unknown til: " + name);
+
+    // object exists
+    if(AGG::fat[name].ptrTIL) return;
+
+    Error::Verbose("AGG::LoadTIL: " + name);
 
     // offset
     AGG::fd->seekg(AGG::fat[name].blockOffset, std::ios_base::beg);
@@ -151,20 +163,25 @@ Sprite * AGG::GetTIL(const std::string & name, u16 index, u8 shape)
     AGG::fd->read(reinterpret_cast<char *>(&width), sizeof(u16));
     AGG::fd->read(reinterpret_cast<char *>(&height), sizeof(u16));
 
-    // read icn header
-    u32 sizeData = width * height;
+    // size
+    u32 sizeData = count * width * height;
+
+    // store
+    AGG::fat[name].ptrTIL = new char[sizeData];
+    AGG::fd->read(AGG::fat[name].ptrTIL, sizeData);
+}
+
+/* get TIL Sprite */
+Sprite * AGG::GetTIL(const std::string & name, u16 index, u8 shape)
+{
+    // check object
+    if(NULL == AGG::fat[name].ptrTIL) PreloadObject(name);
+    if(NULL == AGG::fat[name].ptrTIL) Error::Except("AGG::GetTIL: " + name +", empty ptr");
 
     // skip
-    AGG::fd->ignore(sizeData * index);
+    const char *vdata = AGG::fat[name].ptrTIL + TILEWIDTH * TILEWIDTH * index;
 
-    // read
-    char *buf = new char[sizeData];
-    std::memset(buf, 0x80, sizeData);
-    AGG::fd->read(buf, sizeData);
-    std::vector<unsigned char> vdata(buf, &buf[sizeData-1]);
-    delete [] buf;
-
-    return new Sprite(width, height, shape, vdata);
+    return new Sprite(shape, reinterpret_cast<const u8*>(vdata));
 }
 
 /* load ICN Sprite to map */
@@ -214,7 +231,7 @@ void AGG::LoadICN(const std::string & name)
 
     std::vector<icnheader_t>::iterator it = vectorHeader.begin();
     std::vector<icnheader_t>::iterator it_end = vectorHeader.end();
-    u32 sizeData;
+    u32 sizeData, newSize;
     AGG::fat[name].vectorICN = new std::vector<Sprite *>;
 
     // read icn data
@@ -226,14 +243,15 @@ void AGG::LoadICN(const std::string & name)
 	AGG::fd->seekg(pos + (*it).offsetData, std::ios_base::beg);
 
 	// read
-	char *buf = new char[sizeData + 100];
-	std::memset(buf, 0x80, sizeData + 100);
+	newSize = sizeData + 100;	// hmm, RLE ICN 90% decoding, and 0x80 it's RLE end
+	char *buf = new char[newSize];
+	std::memset(buf, 0x80, newSize);
 	AGG::fd->read(buf, sizeData);
-	std::vector<unsigned char> vdata(buf, &buf[sizeData-1]);
-	delete [] buf;
 
 	if((*it).offsetX < 0 || (*it).offsetY < 0) Error::Warning("AGG: sprite " + name + ": x,y < 0");
-	AGG::fat[name].vectorICN->push_back(new Sprite((*it).width, (*it).height, (*it).offsetX, (*it).offsetY, vdata));
+	AGG::fat[name].vectorICN->push_back(new Sprite((*it).width, (*it).height, (*it).offsetX, (*it).offsetY, sizeData, reinterpret_cast<const u8*>(buf)));
+
+	delete [] buf;
 
 	++it;
     }
@@ -264,6 +282,17 @@ void AGG::FreeICN(aggfat_t & fat)
     delete fat.vectorICN;
 
     fat.vectorICN = NULL;
+}
+
+/* free TIL object */
+void AGG::FreeTIL(aggfat_t & fat)
+{
+    // empty vector
+    if(!fat.ptrTIL) return;
+
+    delete [] fat.ptrTIL;
+
+    fat.ptrTIL = NULL;
 }
 
 /* return Sprite */

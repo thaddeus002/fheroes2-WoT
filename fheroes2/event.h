@@ -75,14 +75,21 @@ public:
 
     bool MouseCursor(const Rect &rt) const{ return rt & mouse_cu; };
 
+    bool KeyPress(SDLKey key) const{ return key == key_value && key_pressed; }
+
 private:
     LocalEvent() : SDLmm::EventHandler(){};
 
     bool HandleMouseMotionEvent(u8 state, u16 x, u16 y, s16 xrel, s16 yrel);
     bool HandleMouseButtonEvent(u8 button, u16 x, u16 y, bool pressed);
+
+    bool HandleKeyboardEvent(SDL_keysym & keysym, bool pressed);
+
     bool HandleQuitEvent(){ Error::Except(" quit event: ok."); return true; };
 
     static bool keep_going;
+    static SDLKey key_value;
+    static bool key_pressed;
     static bool mouse_motion;
     static bool mouse_pressed;
     static u8   mouse_state;

@@ -28,19 +28,22 @@
 class GameArea : private Rect
 {
 public:
-    GameArea::GameArea(const MapsData & data);
+    GameArea(const MapsData & data);
     
     typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
     void SetPos(const Point &pt){ x = pt.x; y = pt.y; }
     void SetPos(u8 ax, u8 ay){ x = ax; y = ay; }
 
-    u8 GetWidth(void) const{ return w; }
-    u8 GetHeight(void) const{ return h; }
     const Rect & GetRect(void) const{ return *this; }
     Rect GetAbsolut(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, w * TILEWIDTH, h * TILEWIDTH); }
 
     void Scroll(GameArea::scroll_t scroll);
+
+    u8 GetWidth(void) const{ return w; };
+    u8 GetHeight(void) const{ return h; };
+    s16 GetOffsetX(void) const{ return x; };
+    s16 GetOffsetY(void) const{ return y; };
 
     void Redraw(void);
     void Redraw(const Rect &area_rt);

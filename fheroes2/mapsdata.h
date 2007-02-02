@@ -43,10 +43,11 @@ private:
 class MapsData : private Rect
 {
 public:
-    MapsData::MapsData(const std::string &filename);
+    MapsData(const std::string &filename);
 
     u16 GetWidth(void) const{ return w; }
     u16 GetHeight(void) const{ return h; }
+    const SDLmm::Surface & GetSurface(void) const{ return tiles; }
 
     const MapsTiles & GetTiles(u16 index) const{ return vec_tiles.size() > index ? vec_tiles[index] : vec_tiles.back(); }
     const MapsTiles & GetTiles(u32 ax, u32 ay) const{ return vec_tiles.size() > ax * ay ? vec_tiles[ax * w + ay] : vec_tiles.back(); }

@@ -34,6 +34,7 @@ MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
+    AGG::PreloadObject("GROUND32.TIL");
 
     u32 width, height;
     // offset data
@@ -104,7 +105,7 @@ MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
 
     fd.close();
 
-    tiles = SDLmm::Surface::CreateSurface(SDL_SWSURFACE, w * TILEWIDTH, h * TILEWIDTH, DEFAULT_DEPTH);
+    tiles = SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_RLEACCEL, w * TILEWIDTH, h * TILEWIDTH, DEFAULT_DEPTH);
     if(!tiles.valid()) Error::Except(SDLmm::GetError());
 
     std::vector<MP2::tile_t>::const_iterator it     = mp2tile.begin();
@@ -131,10 +132,14 @@ MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
 	++ii;
 	++it;
     }
+
+    AGG::FreeObject("GROUND32.TIL");
+
     tiles.SetDisplayFormat();
 
     // save maps to big sprite
-    tiles.SaveBMP("maps.bmp");
+    if(H2Config::Debug() && tiles.SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
+
 }
 
 /*

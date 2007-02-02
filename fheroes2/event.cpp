@@ -34,6 +34,8 @@ Point LocalEvent::mouse_pr(-1, -1);
 Point LocalEvent::mouse_rl(-1, -1);
 Point LocalEvent::mouse_rm(-1, -1);
 Point LocalEvent::mouse_rr(-1, -1);
+bool LocalEvent::key_pressed = false;
+SDLKey LocalEvent::key_value = SDLK_EURO;
 
 LocalEvent & LocalEvent::GetLocalEvent(void)
 {
@@ -52,7 +54,15 @@ void LocalEvent::HandleEvents(void)
     mouse_cu.y = mouse_y;
 
     SDL_Delay(1);
-};
+}
+
+bool LocalEvent::HandleKeyboardEvent(SDL_keysym & keysym, bool pressed)
+{
+    key_pressed = pressed;
+    key_value = keysym.sym;
+
+    return true;
+}
 
 bool LocalEvent::HandleMouseMotionEvent(u8 state, u16 x, u16 y, s16 xrel, s16 yrel)
 {

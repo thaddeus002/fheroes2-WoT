@@ -54,6 +54,7 @@ namespace AGG {
 	aggtype_t blockType;
 	union {
 	    std::vector<Sprite *> *vectorICN;
+	    char *ptrTIL;
 	};
     } aggfat_t;
 
@@ -70,9 +71,13 @@ namespace AGG {
     u32 GetColorKey(void);
 
     void LoadICN(const std::string & name);
+    void LoadTIL(const std::string & name);
+
     Sprite * GetTIL(const std::string & name, u16 index, u8 shape);
     const Sprite & GetICN(const std::string & name, u16 index);
+
     void FreeICN(aggfat_t & fat);
+    void FreeTIL(aggfat_t & fat);
 };
 
 #endif

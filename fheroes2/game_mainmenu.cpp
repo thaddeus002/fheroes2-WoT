@@ -84,6 +84,8 @@ Game::menu_t Game::MainMenu(void)
 	if(le.MouseClickLeft(buttonCredits)) return CREDITS;
 	if(le.MouseClickLeft(buttonQuit)) return QUITGAME;
 
+	if(le.KeyPress(SDLK_ESCAPE)) return QUITGAME;
+
 	animeLantern.DrawSprite();
     }
 
