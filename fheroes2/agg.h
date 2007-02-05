@@ -75,6 +75,7 @@ namespace AGG {
 
     Sprite * GetTIL(const std::string & name, u16 index, u8 shape);
     const Sprite & GetICN(const std::string & name, u16 index);
+    const Sprite & GetLetter(char ch, Font::type_t ft);
 
     void FreeICN(aggfat_t & fat);
     void FreeTIL(aggfat_t & fat);

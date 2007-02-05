@@ -25,33 +25,38 @@
 #include "config.h"
 #include "agg.h"
 #include "game.h"
+#include "gamearea.h"
 #include "mp2.h"
 #include "error.h"
+#include "text.h"
 #include "mapsdata.h"
 
-MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
+u16 MapsData::width = 0;
+u16 MapsData::height = 0;
+
+MapsData::MapsData(const std::string &filename) : tiles()
 {
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
     AGG::PreloadObject("GROUND32.TIL");
 
-    u32 width, height;
+    u32 w, h;
     // offset data
     fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
     // width
-    fd.read(reinterpret_cast<char *>(&width), sizeof(u32));
+    fd.read(reinterpret_cast<char *>(&w), sizeof(u32));
     // height
-    fd.read(reinterpret_cast<char *>(&height), sizeof(u32));
+    fd.read(reinterpret_cast<char *>(&h), sizeof(u32));
 
-    w = width;
-    h = height;
+    width = w;
+    height = h;
 
     char byte8;
     std::vector<MP2::tile_t> mp2tile;
     MP2::tile_t tile;
 
-    for(unsigned int ii = 0; ii < width * height; ++ii){
+    for(u16 ii = 0; ii < width * height; ++ii){
 
 	fd.read(reinterpret_cast<char *>(&tile.tileIndex), sizeof(u16));
 	fd.read(&byte8, 1);
@@ -105,17 +110,25 @@ MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
 
     fd.close();
 
-    tiles = SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_RLEACCEL, w * TILEWIDTH, h * TILEWIDTH, DEFAULT_DEPTH);
+    tiles = SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_RLEACCEL, width * TILEWIDTH, height * TILEWIDTH, DEFAULT_DEPTH);
     if(!tiles.valid()) Error::Except(SDLmm::GetError());
 
-    std::vector<MP2::tile_t>::const_iterator it     = mp2tile.begin();
-    std::vector<MP2::tile_t>::const_iterator it_end = mp2tile.end();
+    //std::vector<MP2::tile_t>::const_iterator it     = mp2tile.begin();
+    //std::vector<MP2::tile_t>::const_iterator it_end = mp2tile.end();
+
+    // loading info
+    display.Fill(0, 0, 0);
+    TextBox(Rect(0, display.h()/2, display.w(), display.h()/2), "Maps Loading...", Font::BIG, true);
+    display.Flip();
 
     // fill Maps::Data
     Point pt;
     u32 ii = 0;
+    u32 size = mp2tile.size();
 
-    while(it != it_end){
+    while(ii < size){
+
+        const MP2::tile_t cell = mp2tile[ii]; 
 
         pt.x = ii % width;
         pt.y = ii / height;
@@ -123,14 +136,13 @@ MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
 	pt.x *= TILEWIDTH;
 	pt.y *= TILEWIDTH;
 
-	Sprite * tile = AGG::GetTIL("GROUND32.TIL", (*it).tileIndex, (*it).shape);
+	Sprite * tile = AGG::GetTIL("GROUND32.TIL", cell.tileIndex, cell.shape);
 	tiles.Blit(*tile, pt);
 	
 	delete tile;
 
-	vec_tiles.push_back(MapsTiles(pt, *it));
+	vec_tiles.push_back(MapsTiles(pt, mp2tile[ii]));
 	++ii;
-	++it;
     }
 
     AGG::FreeObject("GROUND32.TIL");
@@ -138,8 +150,18 @@ MapsData::MapsData(const std::string &filename) : Rect(0, 0, 0, 0), tiles()
     tiles.SetDisplayFormat();
 
     // save maps to big sprite
-    if(H2Config::Debug() && tiles.SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
+    //if(H2Config::Debug() && tiles.SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
 
+}
+    
+void MapsData::Redraw(const Rect &rt, const Point &pt) const
+{
+    if(pt.x >= GameArea::GetRect().w || pt.y >= GameArea::GetRect().h){ Error::Warning("MapsData::Redraw: out of range"); return; }
+    
+    Rect  srcrt(rt.x * TILEWIDTH, rt.y * TILEWIDTH, rt.w * TILEWIDTH, rt.h * TILEWIDTH);
+    Point dstpt(BORDERWIDTH + pt.x * TILEWIDTH, BORDERWIDTH + pt.y * TILEWIDTH);
+
+    display.Blit(tiles, srcrt, dstpt);
 }
 
 /*

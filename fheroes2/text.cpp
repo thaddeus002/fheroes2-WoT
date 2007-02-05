@@ -20,71 +20,60 @@
 
 #include <string>
 #include "agg.h"
-#include "event.h"
-#include "cursor.h"
 #include "text.h"
-
-#define LETTER_BEGIN	0x20
-#define LETTER_END	0x7F
 
 #define WIDTH_BIG	0x0E
 #define WIDTH_SMALL	0x07
 #define HEIGHT_BIG	0x10
 #define HEIGHT_SMALL	0x0B
 
-Text::Text(const Point &pt, const std::string &message, Font::type_t ft) : Rect(), font(ft)
+Text::Text(const Point &pt, const std::string &msg, Font::type_t ft, bool draw) : font(ft), message(msg)
 {
-    x = pt.x;
-    y = pt.y;
-    h = (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG);
-    w = 0;
-    const std::string icn((Font::SMALL == ft ? "SMALFONT.ICN" : "FONT.ICN"));
-    
+    pos.x = pt.x;
+    pos.y = pt.y;
+    pos.h = (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG);
+    pos.w = 0;
+
     std::string::const_iterator it = message.begin();
     std::string::const_iterator it_end = message.end();
 
-    letter_t chr;
+    for(; it != it_end; ++it)
+	if(0x20 == *it) pos.w += (Font::SMALL == ft ? WIDTH_SMALL : WIDTH_BIG);
+	else
+	    pos.w += AGG::GetLetter(*it, ft).w();
 
-    for(; it != it_end; ++it){
-
-	w += (Font::SMALL == ft ? WIDTH_SMALL : WIDTH_BIG);
-
-	chr.letter = *it;
-	chr.sprite = (LETTER_BEGIN >= *it || LETTER_END <= *it ? NULL : &AGG::GetICN(icn, *it - LETTER_BEGIN));
-
-	sprites.push_back(chr);
-    }
-    
-    Redraw();
+    if(draw) Redraw();
 }
 
 void Text::Redraw(void)
 {
-    // hide cursor
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-    bool hide = Cursor::Visible();
-    if(hide && *this & le.MouseCursor()) Cursor::Hide();
+    std::string::const_iterator it = message.begin();
+    std::string::const_iterator it_end = message.end();
 
-    std::vector<letter_t>::const_iterator it = sprites.begin();
-    std::vector<letter_t>::const_iterator it_end = sprites.end();
-
-    Point pt(x, y);
-    u16 y1 = y;
+    Point pt(pos.x, pos.y);
+    u16 y1 = pos.y;
 
     for(; it != it_end; ++it){
 
 	pt.y = y1;
-    
-        // valign
-	const letter_t &lt = *it;
 
-	switch(lt.letter){
+	// space or unknown letter
+	if(*it < 0x21){
+	    pt.x += (Font::SMALL == font ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
+	    continue;
+	}
+
+	const Sprite &sprite = AGG::GetLetter(*it, font);
+        // valign
+	switch(*it){
 
 	    case '-':
     		pt.y += (Font::SMALL == font ? HEIGHT_SMALL / 2 : HEIGHT_BIG / 2);
     	    break;
 
-    	    // '
+    	    // "
+    	    case 0x22:
+	    // '
     	    case 0x27:
     	    break;
 
@@ -93,22 +82,106 @@ void Text::Redraw(void)
     	    case 'p':
     	    case 'q':
     	    case 'j':
-        	pt.y += (Font::SMALL == font ? HEIGHT_SMALL - lt.sprite->h() + 2 : HEIGHT_BIG - lt.sprite->h() + 2);
+        	pt.y += (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + 2 : HEIGHT_BIG - sprite.h() + 2);
     	    break;
 
     	    default:
-        	if(Font::SMALL == font && lt.sprite && lt.sprite->h() < HEIGHT_SMALL) pt.y += HEIGHT_SMALL - lt.sprite->h();
+        	if(Font::SMALL == font && sprite.h() < HEIGHT_SMALL) pt.y += HEIGHT_SMALL - sprite.h();
         	else
-		if(Font::BIG == font && lt.sprite && lt.sprite->h() < HEIGHT_BIG) pt.y += HEIGHT_BIG - lt.sprite->h();
+		if(Font::BIG == font && sprite.h() < HEIGHT_BIG) pt.y += HEIGHT_BIG - sprite.h();
             break;
 	}
 
-	if(lt.sprite) display.Blit(*lt.sprite, pt);
+	display.Blit(sprite, pt);
 
-	if(lt.sprite) pt.x += lt.sprite->w(); else pt.x += (Font::SMALL == font ? WIDTH_SMALL : WIDTH_BIG);
+	pt.x += sprite.w();
 	
-	if(pt.x > x + w){ pt.x = x; y1 += (Font::SMALL == font ? HEIGHT_SMALL : HEIGHT_BIG); }
+	//if(pt.x > pos.x + pos.w){ pt.x = pos.x; y1 += (Font::SMALL == font ? HEIGHT_SMALL : HEIGHT_BIG); }
+    }
+}
+
+u8 Text::width(char ch, Font::type_t ft)
+{
+    if(ch < 0x21)
+	return (Font::SMALL == ft ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
+
+    return AGG::GetLetter(ch, ft).w();
+}
+
+u16 Text::width(const std::string &str, u16 start, u16 count, Font::type_t ft)
+{
+    u16 res = 0;
+
+    for(int ii = start; ii < start + count; ++ii) res += Text::width(str[ii], ft);
+    
+    return res;
+}
+
+u16 Text::height(u16 width, const std::string &str, Font::type_t ft)
+{
+    if(str.empty()) return 0;
+    
+    u16 pos_last = str.size() - 1;
+
+    u16 s_start = 0;
+    u16 s_end = pos_last;
+    u16 res = 0;
+
+    while(s_start < s_end){
+
+	while(s_start < s_end && width < Text::width(str, s_start, s_end - s_start, ft)){
+    
+	    while(s_start < s_end && !isspace(str[s_end])) --s_end;
+
+    	    --s_end;
+	}
+    	++s_end;
+
+	res += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+
+	s_start = s_end + 1;
+	s_end = pos_last;
     }
 
-    if(hide) Cursor::Show();
+    return res;
+}
+
+TextBox::TextBox(const Rect &rt, const std::string &msg, Font::type_t ft, bool draw) : pos(rt)
+{
+
+    u16 pos_last = msg.size() - 1;
+
+    u16 s_start = 0;
+    u16 s_end = pos_last;
+    Point pt(pos.x, pos.y + 2);
+
+    while(s_start < s_end){
+
+	while(s_start < s_end && pos.w < Text::width(msg, s_start, s_end - s_start, ft)){
+    
+	    while(s_start < s_end && !isspace(msg[s_end])) --s_end;
+
+    	    --s_end;
+	}
+    	++s_end;
+
+	pt.x = pos.x + (pos.w - Text::width(msg, s_start, s_end - s_start, ft)) / 2;
+	
+	box.push_back(Text(pt, msg.substr(s_start, s_end - s_start), ft));
+	
+	pt.y += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+
+	s_start = s_end + 1;
+	s_end = pos_last;
+    }
+
+    if(draw) Redraw();
+}
+
+void TextBox::Redraw(void)
+{
+    std::vector<Text>::iterator it = box.begin();
+    std::vector<Text>::iterator it_end = box.end();
+    
+    for(; it != it_end; ++it) (*it).Redraw();
 }

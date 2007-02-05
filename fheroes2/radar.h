@@ -31,26 +31,23 @@ class Radar : private SDLmm::Surface
 public:
     Radar(s16 rx, s16 ry, const MapsData & mp);
 
-    const Rect & GetRect(void) const{ return area; }
+    const Rect & GetRect(void) const{ return pos; }
     
     void Redraw(void);
 
 private:
     void GenerateFrom(const SDLmm::Surface &surface);
     const MapsData & maps;
-    Rect area;
+    Rect pos;
 };
 
 class RadarCursor : private Rect, SpriteCursor
 {
 public:
-    RadarCursor(const Radar &radar, const MapsData &mp, const GameArea &ga);
+    RadarCursor(const Radar &radar);
 
     void Redraw(void);
 
-private:
-    const MapsData &maps;
-    const GameArea &area;
 };
 
 #endif

@@ -27,6 +27,7 @@
 #include "agg.h"
 #include "sprite.h"
 #include "spritecursor.h"
+#include "error.h"
 #include "event.h"
 #include "button.h"
 #include "config.h"
@@ -34,8 +35,6 @@
 #include "text.h"
 #include "tools.h"
 #include "game.h"
-
-#include "error.h"
 
 #define LISTMAXITEM	9
 #define LISTHEIGHTROW	19
@@ -50,7 +49,7 @@ namespace Scenario {
     void RedrawOpponentColors(const std::vector<rectcolor_t> &vo);
     void SelectMaps(const std::vector<Maps::FileInfo> &allmaps);
     void SetCurrentSettings(const Maps::FileInfo &maps);
-    void DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top);
+    void DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 count = LISTMAXITEM);
     void DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_current);
 }
 
@@ -248,23 +247,23 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     display.Blit(panel, Point(204, 33));
 
     // text scenario
-    Text textScenario(Point(376, 53), "Scenario:", Font::BIG);
+    Text textScenario(Point(376, 53), "Scenario:", Font::BIG, true);
 
     // maps name
-    Text textName(Point(260, 78), H2Config::GetNameMaps(), Font::BIG);
+    Text textName(Point(260, 78), H2Config::GetNameMaps(), Font::BIG, true);
     
     // text game difficulty
-    Text textDifficulty(Point(330, 107), "Game Difficulty:", Font::BIG);
+    Text textDifficulty(Point(330, 107), "Game Difficulty:", Font::BIG, true);
 
     //
-    Text textEasy(Point(248, 196), "Easy", Font::SMALL);
-    Text textNormal(Point(316, 196), "Normal", Font::SMALL);
-    Text textHard(Point(395, 196), "Hard", Font::SMALL);
-    Text textExpert(Point(472, 196), "Expert", Font::SMALL);
-    Text textImpossible(Point(536, 196), "Impossible", Font::SMALL);
+    Text textEasy(Point(248, 196), "Easy", Font::SMALL, true);
+    Text textNormal(Point(316, 196), "Normal", Font::SMALL, true);
+    Text textHard(Point(395, 196), "Hard", Font::SMALL, true);
+    Text textExpert(Point(472, 196), "Expert", Font::SMALL, true);
+    Text textImpossible(Point(536, 196), "Impossible", Font::SMALL, true);
 
     // text opponents
-    Text textOpponents(Point(368, 210), "Opponents:", Font::BIG);
+    Text textOpponents(Point(368, 210), "Opponents:", Font::BIG, true);
 
     // draw opponents
     u8 count = H2Config::GetKingdomCount();
@@ -283,7 +282,7 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     }
 
     // text class
-    Text textClass(Point(386, 290), "Class:", Font::BIG);
+    Text textClass(Point(386, 290), "Class:", Font::BIG, true);
 
     // draw class
     current = 0;
@@ -328,6 +327,33 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    std::vector<Maps::FileInfo> smallmaps, mediummaps, largemaps, xlargemaps;
+
+    std::vector<Maps::FileInfo>::const_iterator it = allmaps.begin();
+    std::vector<Maps::FileInfo>::const_iterator it_end = allmaps.end();
+
+    while(it != it_end){
+	switch((*it).GetSizeMaps()){
+    	    case Maps::SMALL:
+		smallmaps.push_back(*it);
+		break;
+    	    case Maps::MEDIUM:
+		mediummaps.push_back(*it);
+		break;
+    	    case Maps::LARGE:
+		largemaps.push_back(*it);
+		break;
+    	    case Maps::XLARGE:
+		xlargemaps.push_back(*it);
+		break;
+	    default:
+		break;
+	}
+	++it;
+    }
+
+    const std::vector<Maps::FileInfo> *curmaps = &allmaps;
+
     // cursor
     Cursor::Hide();
     Cursor::Set(Cursor::POINTER);
@@ -362,10 +388,10 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
     Button buttonSelectXLarge(353, 28, "REQUESTS.ICN", 15, 16);
     Button buttonSelectAll(415, 28, "REQUESTS.ICN", 17, 18);
 
-    std::vector<Maps::FileInfo>::const_iterator it_list_head = allmaps.begin();
+    std::vector<Maps::FileInfo>::const_iterator it_list_head = curmaps->begin();
     std::vector<Maps::FileInfo>::const_iterator it_current = it_list_head;
 
-    Scenario::DrawList(it_list_head);
+    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
     Scenario::DrawSelectInfo(it_current);
 
     display.Flip();
@@ -387,6 +413,76 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	le.MousePressLeft(buttonSelectXLarge) ? buttonSelectXLarge.Press() : buttonSelectXLarge.Release();
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.Press() : buttonSelectAll.Release();
 
+	// click small
+	if(le.MouseClickLeft(buttonSelectSmall)){
+	    curmaps = &smallmaps;
+	    it_list_head = curmaps->begin();
+	    it_current = it_list_head;
+	    Cursor::Hide();
+	    backgroundList.Restore();
+	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
+	    backgroundInfo.Restore();
+	    Scenario::DrawSelectInfo(it_current);
+	    display.Flip();
+	    Cursor::Show();
+	}
+
+	// click medium
+	if(le.MouseClickLeft(buttonSelectMedium)){
+	    curmaps = &mediummaps;
+	    it_list_head = curmaps->begin();
+	    it_current = it_list_head;
+	    Cursor::Hide();
+	    backgroundList.Restore();
+	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
+	    backgroundInfo.Restore();
+	    Scenario::DrawSelectInfo(it_current);
+	    display.Flip();
+	    Cursor::Show();
+	}
+
+	// click large
+	if(le.MouseClickLeft(buttonSelectLarge)){
+	    curmaps = &largemaps;
+	    it_list_head = curmaps->begin();
+	    it_current = it_list_head;
+	    Cursor::Hide();
+	    backgroundList.Restore();
+	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
+	    backgroundInfo.Restore();
+	    Scenario::DrawSelectInfo(it_current);
+	    display.Flip();
+	    Cursor::Show();
+	}
+
+	// click xlarge
+	if(le.MouseClickLeft(buttonSelectXLarge)){
+	    curmaps = &xlargemaps;
+	    it_list_head = curmaps->begin();
+	    it_current = it_list_head;
+	    Cursor::Hide();
+	    backgroundList.Restore();
+	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
+	    backgroundInfo.Restore();
+	    Scenario::DrawSelectInfo(it_current);
+	    display.Flip();
+	    Cursor::Show();
+	}
+
+	// click all
+	if(le.MouseClickLeft(buttonSelectAll)){
+	    curmaps = &allmaps;
+	    it_list_head = curmaps->begin();
+	    it_current = it_list_head;
+	    Cursor::Hide();
+	    backgroundList.Restore();
+	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
+	    backgroundInfo.Restore();
+	    Scenario::DrawSelectInfo(it_current);
+	    display.Flip();
+	    Cursor::Show();
+	}
+
 	// click list
 	if(le.MouseClickLeft(rectAreaList)){
 	    int num = (le.MouseReleaseLeft().y - rectAreaList.y) / LISTHEIGHTROW;
@@ -400,7 +496,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
 	// click up
 	if(le.MouseWheelUp(rectAreaList) ||
-	   (le.MouseClickLeft(buttonPgUp) && allmaps.size() && it_list_head > allmaps.begin())){
+	   (le.MouseClickLeft(buttonPgUp) && curmaps->size() && it_list_head > curmaps->begin())){
 	    Cursor::Hide();
 	    backgroundList.Restore();
 	    Scenario::DrawList(--it_list_head);
@@ -410,7 +506,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
 	// click down
 	if(le.MouseWheelDn(rectAreaList) ||
-	   (le.MouseClickLeft(buttonPgDn) && LISTMAXITEM < allmaps.size() && it_list_head + LISTMAXITEM + 1 < allmaps.end())){
+	   (le.MouseClickLeft(buttonPgDn) && LISTMAXITEM < curmaps->size() && it_list_head + LISTMAXITEM < curmaps->end())){
 	    Cursor::Hide();
 	    backgroundList.Restore();
 	    Scenario::DrawList(++it_list_head);
@@ -476,15 +572,14 @@ void Scenario::SetCurrentSettings(const Maps::FileInfo &maps)
     H2Config::SetDescriptionMaps(maps.GetDescription());
 }
 
-void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top)
+void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 count)
 {
-
     u16 y = 64;
     u16 x = 176;
     u8 index = 0;
     std::vector<Maps::FileInfo>::const_iterator it_head = it_top;
 
-    for(int ii = 0; ii < LISTMAXITEM; ++ii){
+    for(int ii = 0; ii < count; ++ii){
 
 	// sprite count
 	index = 19 + (*it_head).GetKingdomCount();
@@ -513,7 +608,7 @@ void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top)
 	display.Blit(spriteSize, Point(x + spriteCount.w() + 2, y));
 
 	// text longname
-	Text textLongName(Point(x + spriteCount.w() + spriteSize.w() + 18, y), (*it_head).GetName(), Font::BIG);
+	Text textLongName(Point(x + spriteCount.w() + spriteSize.w() + 18, y), (*it_head).GetName(), Font::BIG, true);
 
 	// sprite wins
 	index = 30 + (*it_head).GetConditionsWins();
@@ -563,7 +658,7 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     display.Blit(spriteSize, Point(x + spriteCount.w() + 2, y));
 
     // text longname
-    Text textLongName(Point(x + spriteCount.w() + spriteSize.w() + 22, y), (*it_current).GetName(), Font::BIG);
+    Text textLongName(Point(x + spriteCount.w() + spriteSize.w() + 22, y), (*it_current).GetName(), Font::BIG, true);
 
     // sprite wins
     index = 30 + (*it_current).GetConditionsWins();
@@ -575,6 +670,8 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     const Sprite &spriteLoss = AGG::GetICN("REQUESTS.ICN", index);
     display.Blit(spriteLoss, Point(x + 211 + spriteWins.w(), y));
 
-    Text textLabel(Point(200, 295), "Maps difficulty:", Font::BIG);
-    Text textDifficulty(Point(360, 295), String::Difficulty((*it_current).GetDifficulty()), Font::BIG);
+    Text textLabel(Point(200, 295), "Maps difficulty:", Font::BIG, true);
+    Text textDifficulty(Point(360, 295), String::Difficulty((*it_current).GetDifficulty()), Font::BIG, true);
+    
+    TextBox textDescription(Rect(175, 322, 282, 90), (*it_current).GetDescription(), Font::BIG, true);
 }

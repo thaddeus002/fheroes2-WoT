@@ -30,6 +30,7 @@
 namespace Game
 {
     typedef enum {
+	CANCEL,
 	QUITGAME,
 	MAINMENU,
         NEWGAME,
@@ -44,7 +45,8 @@ namespace Game
         LOADMULTI,
         SCENARIOINFO,
         SELECTSCENARIO,
-	STARTGAME
+	STARTGAME,
+	SAVEGAME
     } menu_t;
 
     int GlobalFilterEvents(const SDL_Event *event);

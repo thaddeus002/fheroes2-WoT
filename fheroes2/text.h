@@ -26,32 +26,38 @@
 #include "rect.h"
 #include "sprite.h"
 
-namespace Font
-{
-    typedef enum { SMALL, BIG } type_t;
-};
-
-class Text : public Rect
+class Text
 {
 public:
 
     typedef enum { LEFT, CENTER, RIGHT } align_t;
 
-    Text(const Point &pt, const std::string &message, Font::type_t ft = Font::SMALL);
-    Text(const Rect &rt, const std::string &message, Font::type_t ft = Font::SMALL);
+    Text(const Point &pt, const std::string &msg, Font::type_t ft = Font::SMALL, bool draw = false);
     
+    u16 w(void) const{ return pos.w; }
+
+    static u8  width(char ch, Font::type_t ft);
+    static u16 width(const std::string &str, u16 start, u16 count, Font::type_t ft);
+    static u16 height(u16 width, const std::string &str, Font::type_t ft);
+
     void Redraw(void);
 
 private:
-
-    typedef struct {
-	char letter;
-	const Sprite *sprite;
-    } letter_t;
-
     Font::type_t font;
+    std::string message;
+    Rect pos;
+};
 
-    std::vector<letter_t> sprites;
+class TextBox
+{
+public:
+    TextBox(const Rect &rt, const std::string &msg, Font::type_t ft = Font::SMALL, bool draw = false);
+
+    void Redraw(void);
+
+private:
+    Rect pos;
+    std::vector<Text> box;
 };
 
 #endif

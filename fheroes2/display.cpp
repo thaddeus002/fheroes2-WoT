@@ -54,7 +54,7 @@ void Display::SetVideoMode(Display::resolution_t mode)
     if(display.valid() && display.w() == xres && display.h() == yres) return;
 
     u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
-    if(H2Config::FullScreen()) videoflags |= SDL_FULLSCREEN; 
+    if(H2Config::FullScreen() || (display.valid() && (display.flags() & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
 
     if(!display.SetVideoMode(xres, yres, DEFAULT_DEPTH, videoflags)){
 	display.SetVideoMode(640, 480, DEFAULT_DEPTH, videoflags);

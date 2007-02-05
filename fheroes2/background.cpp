@@ -27,12 +27,7 @@ void Background::Save(void)
 
     if(!surface) surface = new SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, rect.w, rect.h, DEFAULT_DEPTH));
 
-    surface->Blit(SDLmm::Display::GetDisplay(), rect, Point(0,0));
+    surface->Blit(display, rect, Point(0,0));
 }
 
-void Background::Restore(void)
-{
-    static SDLmm::Display &display = SDLmm::Display::GetDisplay();
-
-    display.Blit(*surface, rect);
-}
+void Background::Restore(void){ display.Blit(*surface, rect); }

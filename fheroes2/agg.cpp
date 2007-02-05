@@ -135,8 +135,11 @@ void AGG::FreeObject(aggfat_t & fat){
 	    AGG::FreeICN(fat);
 	    break;
 
-	case DATA_PAL:
+	case DATA_TIL:
 	    AGG::FreeTIL(fat);
+	    break;
+
+	case DATA_PAL:
 	    break;
 	
 	default:
@@ -364,3 +367,11 @@ u32 AGG::GetShadowAlpha(void){ return shadowAlpha; }
 
 /* return color key */
 u32 AGG::GetColorKey(void){ return colorKey; }
+
+/* return letter sprite */
+const Sprite & AGG::GetLetter(char ch, Font::type_t ft)
+{
+    if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
+
+    return Font::SMALL == ft ? AGG::GetICN("SMALFONT.ICN", ch - 0x20) : AGG::GetICN("FONT.ICN", ch - 0x20);
+}

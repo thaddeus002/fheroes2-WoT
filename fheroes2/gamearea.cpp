@@ -21,31 +21,33 @@
 #include "config.h"
 #include "gamearea.h"
 
+Rect GameArea::pos = Rect(0, 0, 0, 0);
+
 GameArea::GameArea(const MapsData & data) : maps(data)
 {
     // static values
     // width area  = (display.w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH
     // height area = (display.h() - 2 * BORDERWIDTH) / TILEWIDTH
 
-    x = 0;
-    y = 0;
+    pos.x = 0;
+    pos.y = 0;
 
     switch(H2Config::GetVideoMode()){
 	default:
-	    w = 14;
-	    h = 14;
+	    pos.w = 14;
+	    pos.h = 14;
 	    break;
 	case Display::MEDIUM:
-	    w = 19;
-	    h = 17;
+	    pos.w = 19;
+	    pos.h = 17;
 	    break;
 	case Display::LARGE:
-	    w = 26;
-	    h = 23;
+	    pos.w = 26;
+	    pos.h = 23;
 	    break;
 	case Display::XLARGE:
-	    w = 34;
-	    h = 31;
+	    pos.w = 34;
+	    pos.h = 31;
 	    break;
     }
 }
@@ -53,17 +55,13 @@ GameArea::GameArea(const MapsData & data) : maps(data)
 /* readraw all */
 void GameArea::Redraw(void)
 {
-    Rect srcrt(x * TILEWIDTH, y * TILEWIDTH, w * TILEWIDTH, h * TILEWIDTH);
-    Point dstpt(BORDERWIDTH, BORDERWIDTH);
-    maps.Redraw(srcrt, dstpt);
+    maps.Redraw(pos);
 }
 
 /* readraw rect */
 void GameArea::Redraw(const Rect &area_rt)
 {
-    Rect srcrt(area_rt.x * TILEWIDTH, area_rt.y * TILEWIDTH, area_rt.w * TILEWIDTH, area_rt.h * TILEWIDTH);
-    Point dstpt(BORDERWIDTH + area_rt.x * TILEWIDTH, BORDERWIDTH + area_rt.y * TILEWIDTH);
-    maps.Redraw(srcrt, dstpt);
+    maps.Redraw(area_rt, Point(area_rt.x, area_rt.y));
 }
 
 /* scroll area */
@@ -71,36 +69,62 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 {
     switch(scroll){
 	case GameArea::LEFT:
-	    if(0 == x) return;
+	    if(0 == pos.x) return;
 	    Cursor::Hide();
-	    --x;
+	    --pos.x;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::RIGHT:
-	    if(maps.GetWidth() - w == x) return;
+	    if(maps.w() - pos.w == pos.x) return;
 	    Cursor::Hide();
-	    ++x;
+	    ++pos.x;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::TOP:
-	    if(0 == y) return;
+	    if(0 == pos.y) return;
 	    Cursor::Hide();
-	    --y;
+	    --pos.y;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::BOTTOM:
-	    if(maps.GetHeight() - h == y) return;
+	    if(maps.h() - pos.h == pos.y) return;
 	    Cursor::Hide();
-	    ++y;
+	    ++pos.y;
 	    Redraw();
 	    display.Flip();
 	    Cursor::Show();
 	    break;
     }
+}
+
+/* scroll area from radar pos */
+void GameArea::CenterFromRadar(const Point &pt)
+{
+    // left top point
+    pos.x = (pt.x - (display.w() - BORDERWIDTH - RADARWIDTH)) * maps.w() / RADARWIDTH;
+    pos.y = (pt.y - BORDERWIDTH) * maps.h() / RADARWIDTH;
+
+    Center(Point(pos.x, pos.y));
+}
+
+/* scroll area to center point maps */
+void GameArea::Center(const Point &pt)
+{
+    // center
+    pos.x = (0 > pos.x - pos.w / 2 ? 0 : pos.x - pos.w / 2);
+    pos.y = (0 > pos.y - pos.h / 2 ? 0 : pos.y - pos.h / 2);
+
+    // our of range
+    if(pos.y > maps.h() - pos.h) pos.y = maps.h() - pos.h;
+    if(pos.x > maps.w() - pos.w)  pos.x = maps.w() - pos.w;
+
+    if(pt.x == pos.x && pt.y == pos.y) return;
+
+    Redraw();
 }

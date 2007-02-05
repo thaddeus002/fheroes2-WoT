@@ -26,22 +26,26 @@
 #define RADARCOLOR      0x10	// index palette
 
 /* constructor */
-Radar::Radar(s16 rx, s16 ry, const MapsData &mp) : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, RADARWIDTH, RADARWIDTH, DEFAULT_DEPTH)),
-     maps(mp), area(rx, ry, RADARWIDTH, RADARWIDTH)
+Radar::Radar(s16 rx, s16 ry, const MapsData &mp) :
+    SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, RADARWIDTH, RADARWIDTH, DEFAULT_DEPTH)),
+    maps(mp), pos(rx, ry, RADARWIDTH, RADARWIDTH)
 {
     GenerateFrom(maps.GetSurface());
 }
 
 /* redraw radar */
-void Radar::Redraw(void){ display.Blit(*this, Point(area.x, area.y)); }
+void Radar::Redraw(void){
+
+    display.Blit(*this, Point(pos.x, pos.y));
+}
 
 /* generate from surface */
 void Radar::GenerateFrom(const SDLmm::Surface &surface)
 {
     SDLmm::Surface & src = const_cast<SDLmm::Surface &>(surface);
 
-    if(area.w > src.w() || area.h > src.h() ||
-       area.w != area.h || src.w() != src.h()){ Error::Warning("Radar::Generate: incorrect param"); return; }
+    if(pos.w > src.w() || pos.h > src.h() ||
+       src.w() != src.h()){ Error::Warning("Radar::Generate: incorrect param"); return; }
 
     u16 color = 0;
     u32 index = 0;
@@ -66,7 +70,7 @@ void Radar::GenerateFrom(const SDLmm::Surface &surface)
     width = src.w();
     for(;;){
 	++count;
-	if((width >>= 1) <= area.w) break;
+	if((width >>= 1) <= pos.w) break;
     }
     width = src.w() / 2;
     height = src.h() / 2;
@@ -115,47 +119,77 @@ void Radar::GenerateFrom(const SDLmm::Surface &surface)
 
     src.Unlock();
 
+    // correct if LARGE
+    if(Maps::LARGE == MapsData::w()){
+	p_dst = new u16[RADARWIDTH * RADARWIDTH];
+
+	u16 *pd1 = p_dst;
+	u16 *ps1 = p_src;
+	u16 *pd2 = p_dst;
+
+	for(int iy = 0; iy < Maps::LARGE; ++iy){
+	    pd2 = pd1;
+	    for(int ix = 0; ix < Maps::LARGE; ++ix){
+		*pd1 = *ps1;
+		if(0 == (ix % 3)){ ++pd1; *pd1 = *ps1; }
+		++pd1;
+		++ps1;
+	    }
+	    if(0 == (iy % 3)){
+		memcpy(pd1, pd2, sizeof(u16) * RADARWIDTH);
+		pd1 += RADARWIDTH;
+	    }
+	}
+	delete [] p_src;
+	p_src = p_dst;
+	p_dst = NULL;
+    }
+
     // copy color from p_src to sprite radar
     Lock();
     memcpy(pixels(), p_src, sizeof(u16) * RADARWIDTH * RADARWIDTH);
     Unlock();
 
     delete [] p_src;
-
 }
 
 /* cursor radar constructor */
-RadarCursor::RadarCursor(const Radar &radar, const MapsData &mp, const GameArea &ga) :
-    Rect(radar.GetRect().x, radar.GetRect().y, static_cast<u16>(ga.GetWidth() * (RADARWIDTH / static_cast<float>(mp.GetWidth()))), static_cast<u16>(ga.GetHeight() * (RADARWIDTH / static_cast<float>(mp.GetHeight())))),
-    SpriteCursor(static_cast<Rect>(*this)), maps(mp), area(ga)
+RadarCursor::RadarCursor(const Radar &radar) :
+    Rect(radar.GetRect().x,
+         radar.GetRect().y,
+         static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(MapsData::w()))),
+	 static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(MapsData::h())))),
+    SpriteCursor(static_cast<Rect>(*this))
 {
     Fill(AGG::GetColorKey());
     SetColorKey(SDL_SRCCOLORKEY|SDL_RLEACCEL, AGG::GetColorKey());
 
+    u16 width  = static_cast<Rect>(*this).w;
+    u16 height = static_cast<Rect>(*this).h;
+
     // draw cursor
     u32 color = AGG::GetColor(RADARCOLOR);
     Lock();
-    for(u8 i = 0; i < static_cast<Rect>(*this).w; ++i){
+    for(u8 i = 0; i < width; ++i){
 	SetPixel2(i, 0, color);
-	SetPixel2(i + 1, 0, color);
+	if(i + 1 < width) SetPixel2(i + 1, 0, color);
         i += 3;
     }
-    for(u8 i = 0; i < static_cast<Rect>(*this).w; ++i){
-	SetPixel2(i, static_cast<Rect>(*this).h - 1, color);
-	SetPixel2(i + 1, static_cast<Rect>(*this).h - 1, color);
+    for(u8 i = 0; i < width; ++i){
+	SetPixel2(i, height - 1, color);
+	if(i + 1 < width) SetPixel2(i + 1, height - 1, color);
         i += 3;
     }
-    for(u8 i = 0; i < static_cast<Rect>(*this).h; ++i){
+    for(u8 i = 0; i < height; ++i){
 	SetPixel2(0, i, color);
-	SetPixel2(0, i + 1, color);
+	if(i + 1 < height) SetPixel2(0, i + 1, color);
         i += 3;
     }
-    for(u8 i = 0; i < static_cast<Rect>(*this).h; ++i){
-	SetPixel2(static_cast<Rect>(*this).w - 1, i, color);
-	SetPixel2(static_cast<Rect>(*this).w - 1, i + 1, color);
+    for(u8 i = 0; i < height; ++i){
+	SetPixel2(width - 1, i, color);
+	if(i + 1 < height) SetPixel2(width - 1, i + 1, color);
         i += 3;
     }
-
     Unlock();
     SetDisplayFormat();
 }
@@ -163,5 +197,5 @@ RadarCursor::RadarCursor(const Radar &radar, const MapsData &mp, const GameArea 
 /* redraw radar cursor */
 void RadarCursor::Redraw(void)
 {
-    Move(static_cast<Rect>(*this).x + area.GetOffsetX() * RADARWIDTH / maps.GetWidth(), static_cast<Rect>(*this).y + area.GetOffsetY() * RADARWIDTH / maps.GetHeight());
+    Move(static_cast<Rect>(*this).x + GameArea::GetRect().x * RADARWIDTH / MapsData::w(), static_cast<Rect>(*this).y + GameArea::GetRect().y * RADARWIDTH / MapsData::h());
 }

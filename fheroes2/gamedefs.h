@@ -43,8 +43,13 @@ namespace Display
 
 static SDLmm::Display &display = SDLmm::Display::GetDisplay();
 
+namespace Font
+{
+    typedef enum { SMALL, BIG } type_t;
+};
+
 // PUBLIC
-#define GAME_VERSION		20070202	// Version
+#define GAME_VERSION		20070205	// Version
 
 
 // PRIVATE

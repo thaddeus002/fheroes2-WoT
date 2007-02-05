@@ -25,31 +25,29 @@
 #include "game.h"
 #include "rect.h"
 
-class GameArea : private Rect
+class GameArea
 {
 public:
     GameArea(const MapsData & data);
     
     typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
-    void SetPos(const Point &pt){ x = pt.x; y = pt.y; }
-    void SetPos(u8 ax, u8 ay){ x = ax; y = ay; }
+    static const Rect & GetRect(void){ return pos; }
 
-    const Rect & GetRect(void) const{ return *this; }
-    Rect GetAbsolut(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, w * TILEWIDTH, h * TILEWIDTH); }
+    Rect GetPosition(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, pos.w * TILEWIDTH, pos.h * TILEWIDTH); }
 
     void Scroll(GameArea::scroll_t scroll);
 
-    u8 GetWidth(void) const{ return w; };
-    u8 GetHeight(void) const{ return h; };
-    s16 GetOffsetX(void) const{ return x; };
-    s16 GetOffsetY(void) const{ return y; };
+    void Center(const Point &pt);
+    void CenterFromRadar(const Point &pt);
 
     void Redraw(void);
     void Redraw(const Rect &area_rt);
 
 private:
     const MapsData & maps;
+
+    static Rect pos;
 };
 
 #endif

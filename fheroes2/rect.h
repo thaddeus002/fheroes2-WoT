@@ -22,6 +22,8 @@
 
 #include "gamedefs.h"
 
+class Rect;
+
 class Point : public SDLmm::SPoint
 {
 public:
@@ -29,8 +31,8 @@ public:
     Point(int x, int y) : SDLmm::SPoint(x, y){};
     Point(const Point & pt) : SDLmm::SPoint(pt){};
 
-    Point & operator= (const Point & pt){ x = pt.x; y = pt.y; return *this; };
-    bool operator== (const Point & pt) const{ return (x == pt.x && y == pt.y); };
+    inline Point & operator= (const Point & pt){ x = pt.x; y = pt.y; return *this; };
+    inline bool operator== (const Point & pt) const{ return (x == pt.x && y == pt.y); };
 };
 
 class Rect : public SDLmm::SRect
@@ -42,10 +44,11 @@ public:
     Rect(const Point & lu, const Point & rb) : SDLmm::SRect(lu, rb){};
     Rect(const Rect & rt) : SDLmm::SRect(rt){};
 
-    Rect & operator= (const Rect & rt){ x = rt.x; y = rt.y; w = rt.w; h = rt.h; return *this; };
-    bool operator== (const Rect & rt) const{ return (x == rt.x && y == rt.y && w == rt.w && h == rt.h); };
+    inline Rect & operator= (const Rect & rt){ x = rt.x; y = rt.y; w = rt.w; h = rt.h; return *this; };
+    inline bool operator== (const Rect & rt) const{ return (x == rt.x && y == rt.y && w == rt.w && h == rt.h); };
+    inline bool operator!= (const Rect & rt) const{ return !(*this == rt); };
     // rect include point
-    bool operator& (const Point & pt) const{ return !(pt.x < x || pt.y < y || pt.x > (x + w) || pt.y > (y + h)); };
+    inline bool operator& (const Point & pt) const{ return !(pt.x < x || pt.y < y || pt.x > (x + w) || pt.y > (y + h)); };
 };
 
 #endif
