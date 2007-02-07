@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "agg.h"
 #include "config.h"
 #include "cursor.h"
 #include "text.h"
@@ -37,9 +38,9 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     Cursor::themes_t cursor = Cursor::Get();
     Cursor::Set(Cursor::POINTER);
 
-    Box *box = new Box(Text::height(BOXAREA_WIDTH, header, ft) + 20 + Text::height(BOXAREA_WIDTH, message, ft), buttons);
+    Box box(Text::height(BOXAREA_WIDTH, header, ft) + 20 + Text::height(BOXAREA_WIDTH, message, ft), buttons);
 
-    Rect pos = box->GetArea();
+    Rect pos = box.GetArea();
 
     if(header.size()){
 
@@ -60,37 +61,37 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     
     switch(buttons){
 	case YES|NO:
-            pt.x = box->GetArea().x;
-            pt.y = box->GetArea().y + box->GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
+            pt.x = box.GetArea().x;
+            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
 	    button1 = new Button(pt, system, 5, 6);
 	    result1 = YES;
-            pt.x = box->GetArea().x + box->GetArea().w - AGG::GetICN(system, 7).w();
-            pt.y = box->GetArea().y + box->GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 7).h();
+            pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 7).w();
+            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 7).h();
 	    button2 = new Button(pt, system, 7, 8);
 	    result2 = NO;
 	    break;
 
 	case OK|CANCEL:
-            pt.x = box->GetArea().x;
-            pt.y = box->GetArea().y + box->GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+            pt.x = box.GetArea().x;
+            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
 	    button1 = new Button(pt, system, 1, 2);
 	    result1 = OK;
-            pt.x = box->GetArea().x + box->GetArea().w - AGG::GetICN(system, 3).w();
-            pt.y = box->GetArea().y + box->GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+            pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 3).w();
+            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
 	    button2 = new Button(pt, system, 3, 4);
 	    result2 = CANCEL;
 	    break;
 
 	case OK:
-            pt.x = box->GetArea().x + (box->GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-            pt.y = box->GetArea().y + box->GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+            pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
+            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
 	    button1 = new Button(pt, system, 1, 2);
 	    result1 = OK;
 	    break;
 
 	case CANCEL:
-            pt.x = box->GetArea().x + (box->GetArea().w - AGG::GetICN(system, 3).w()) / 2;
-            pt.y = box->GetArea().y + box->GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+            pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 3).w()) / 2;
+            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
 	    button1 = new Button(pt, system, 3, 4);
 	    result1 = CANCEL;
 	    break;
@@ -117,14 +118,15 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
         if(button2 && le.MouseClickLeft(*button2)){ exit = true; result = result2; }
 
 	if(le.KeyPress(SDLK_RETURN)){ exit = true; result = Dialog::YES | Dialog::OK; }
-	//if(le.KeyPress(SDLK_ESCAPE)){ exit = true; result = Dialog::NO | Dialog::CANCEL; }
+	
+	//if(le.KeyPress(SDLK_ESCAPE)){ exit = true; result = Dialog::NO | Dialog::CANCEL; } // recursion
     }
 
     Cursor::Hide();
+
     if(button1) delete button1;
     if(button2) delete button2;
-    delete box;
-    display.Flip();
+
     Cursor::Set(cursor);
     Cursor::Show();
 

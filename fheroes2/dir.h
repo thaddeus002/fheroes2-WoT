@@ -22,11 +22,9 @@
 
 #include <vector>
 #include <string>
-#include "gamedefs.h"
 
 class Dir : public std::vector<std::string>
 {
-
 public:
     Dir(const std::string &path, const std::string &filter = "");
 

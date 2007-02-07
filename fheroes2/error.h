@@ -21,12 +21,6 @@
 #define H2ERROR_H
 
 #include <string>
-#include <stdexcept>
-#include <iostream>
-#include <string>
-
-#include "tools.h"
-#include "config.h"
 #include "rect.h"
 
 class Error

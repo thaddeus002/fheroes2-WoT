@@ -20,10 +20,6 @@
 #ifndef H2GAME_H
 #define H2GAME_H
 
-#include "gamedefs.h"
-#include "cursor.h"
-#include "error.h"
-
 #define RADARWIDTH	144
 #define BORDERWIDTH	16
 

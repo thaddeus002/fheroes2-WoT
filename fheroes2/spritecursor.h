@@ -22,19 +22,19 @@
 
 #include "sprite.h"
 #include "rect.h"
-#include "cursor.h"
+#include "surface.h"
 #include "background.h"
 #include "gamedefs.h"
 
-class SpriteCursor : public SDLmm::Surface
+class SpriteCursor : public Surface
 {
 
 public:
     /* empty sprite cursor */
-    SpriteCursor(const Rect  &rt) : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, rt.w, rt.h, DEFAULT_DEPTH)), rect(rt), background(rect){};
+    SpriteCursor(const Rect  &rt) : Surface(rt.w, rt.h), rect(rt), background(rect){};
     /* sprite cursor */
-    SpriteCursor(const Sprite &sprite, const Point &pt = Point(-1, -1)) : SDLmm::Surface(sprite), rect(pt.x, pt.y, sprite.w(), sprite.h()), background(rect){ Move(pt); };
-    SpriteCursor(const Sprite &sprite, const Rect  &rt) : SDLmm::Surface(sprite), rect(rt), background(rect){ Move(Point(rt.x, rt.y)); };
+    SpriteCursor(const Sprite &sprite, const Point &pt = Point(-1, -1)) : Surface(sprite), rect(pt.x, pt.y, sprite.w(), sprite.h()), background(rect){ Move(pt); };
+    SpriteCursor(const Sprite &sprite, const Rect  &rt) : Surface(sprite), rect(rt), background(rect){ Move(Point(rt.x, rt.y)); };
 
     void Move(s16 ax, s16 ay);
     void Move(const Point &rt);

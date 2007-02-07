@@ -18,7 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "agg.h"
+#include "cursor.h"
 #include "event.h"
+#include "sprite.h"
+#include "display.h"
 #include "animation.h"
 
 #define ANIMATION_HIGH		3
@@ -26,16 +30,9 @@
 #define ANIMATION_LOW		27
 
 Animation::Animation(const std::string &icn, u16 index, u8 count, u8 amode) 
-    : area(0x7FFF, 0x7FFF, 0, 0), disable(false), reset(false), frame(0), ticket(0), mode(amode), sprites()
+    : area(), disable(false), reset(false), frame(0), ticket(0), mode(amode), sprites()
 {
-    for(int ii = index; ii < index + count; ++ii){
-	const Sprite &sprite = AGG::GetICN(icn, ii);
-	if(sprite.x() < area.x) area.x = sprite.x();
-	if(sprite.y() < area.y) area.y = sprite.y();
-	if(sprite.w() > area.w) area.w = sprite.w();
-	if(sprite.h() > area.h) area.h = sprite.h();
-	sprites.push_back(&sprite);
-    }
+    for(int ii = index; ii < index + count; ++ii) sprites.push_back(&AGG::GetICN(icn, ii));
 }
 
 void Animation::DrawSprite(void)
@@ -52,15 +49,16 @@ void Animation::DrawSprite(void)
     if(mode & LOW && (0 != (ticket % ANIMATION_LOW))) return;
 
     // hide cursor
-    if(area & LocalEvent::MouseCursor()) Cursor::Hide();
+    bool localcursor = false;
+    if(area & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     const Sprite & sprite = *sprites[frame % sprites.size()];
 
-    display.Blit(sprite, Point(sprite.x(), sprite.y()));
+    display.Blit(sprite, sprite.x(), sprite.y());
     display.Flip();
 
-    Cursor::Show();
-    
+    if(localcursor) Cursor::Show();
+
     frame++;
 
     reset = false;
@@ -73,10 +71,11 @@ void Animation::Reset(void)
 {
     if(!disable || reset) return;
 
-    Cursor::Hide();
+    bool localcursor = false;
+    if(area & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     const Sprite & sprite = *sprites[0];
-    display.Blit(sprite, Point(sprite.x(), sprite.y()));
+    display.Blit(sprite, sprite.x(), sprite.y());
     display.Flip();
 
     ticket = 0;
@@ -84,5 +83,5 @@ void Animation::Reset(void)
     reset = true;
     disable = false;
 
-    Cursor::Show();
+    if(localcursor) Cursor::Show();
 }

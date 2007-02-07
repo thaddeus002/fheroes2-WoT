@@ -22,29 +22,40 @@
 
 #include "gamedefs.h"
 
-class Rect;
-
-class Point : public SDLmm::SPoint
+class Size
 {
 public:
-    Point() : SDLmm::SPoint(-1, -1){};
-    Point(int x, int y) : SDLmm::SPoint(x, y){};
-    Point(const Point & pt) : SDLmm::SPoint(pt){};
+    u16 w;
+    u16 h;
 
-    inline Point & operator= (const Point & pt){ x = pt.x; y = pt.y; return *this; };
-    inline bool operator== (const Point & pt) const{ return (x == pt.x && y == pt.y); };
+    Size(int sw = 0, int sh = 0) : w(sw), h(sh){};
+
+    inline bool operator== (const Size & sz) const{ return (w == sz.w && h == sz.h); };
+    inline bool operator!= (const Size & sz) const{ return !(*this == sz); };
 };
 
-class Rect : public SDLmm::SRect
+class Point
 {
 public:
-    Rect() : SDLmm::SRect(-1, -1, 0, 0){};
-    Rect(u16 nw, u16 nh) : SDLmm::SRect(nw, nh){};
-    Rect(s16 nx, s16 ny, u16 nw, u16 nh) : SDLmm::SRect(nx, ny, nw, nh){};
-    Rect(const Point & lu, const Point & rb) : SDLmm::SRect(lu, rb){};
-    Rect(const Rect & rt) : SDLmm::SRect(rt){};
+    s16 x;
+    s16 y;
 
-    inline Rect & operator= (const Rect & rt){ x = rt.x; y = rt.y; w = rt.w; h = rt.h; return *this; };
+    Point(int px = -1, int py = -1) : x(px), y(py){};
+
+    inline bool operator== (const Point & pt) const{ return (x == pt.x && y == pt.y); };
+    inline bool operator!= (const Point & pt) const{ return !(*this == pt); };
+};
+
+class Rect : public Point, public Size
+{
+public:
+    Rect(s16 rx = -1, s16 ry = -1, u16 rw = 0, u16 rh = 0) : Point(rx, ry), Size(rw, rh){};
+    Rect(const Point & pt, u16 rw, u16 rh) : Point(pt), Size(rw, rh){};
+    Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz){};
+
+    const Size & size(void) const{ return *this; };
+
+    inline Rect & operator= (const Point & pt){ x = pt.x; y = pt.y; return *this; };
     inline bool operator== (const Rect & rt) const{ return (x == rt.x && y == rt.y && w == rt.w && h == rt.h); };
     inline bool operator!= (const Rect & rt) const{ return !(*this == rt); };
     // rect include point

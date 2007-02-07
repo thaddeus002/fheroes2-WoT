@@ -20,6 +20,7 @@
 
 #include <dirent.h> 
 #include "error.h"
+#include "gamedefs.h"
 #include "dir.h"
 
 #if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__) 
@@ -42,7 +43,7 @@ Dir::Dir(const std::string &path, const std::string &filter) : std::vector<std::
 
         std::string filename(ep->d_name);
         if( '.' == filename[0] ) continue;
-	if( !filter.empty() && std::string::npos == filename.find(filter) ) continue;
+	if( !filter.empty() && std::string::npos == filename.find(filter)) continue;
 
         push_back(std::string(path + SEPARATOR + filename));
     }

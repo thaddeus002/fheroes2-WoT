@@ -30,8 +30,10 @@
 #include "error.h"
 #include "event.h"
 #include "button.h"
+#include "cursor.h"
 #include "config.h"
 #include "maps_fileinfo.h"
+#include "dialog.h"
 #include "text.h"
 #include "tools.h"
 #include "game.h"
@@ -58,12 +60,25 @@ Game::menu_t Game::ScenarioInfo(void){
     std::vector<Maps::FileInfo> info_maps;
 
     // read maps directory
-    Dir dir(H2Config::GetMapsDirectory(), "mp2");
+    Dir dir1(H2Config::GetMapsDirectory(), "mp2");
+    Dir dir2(H2Config::GetMapsDirectory(), "Mp2");
+    Dir dir3(H2Config::GetMapsDirectory(), "MP2");
 
-    Dir::const_iterator itd = dir.begin();
-    Dir::const_iterator itd_end = dir.end();
+    Dir::const_iterator itd1 = dir1.begin();
+    while(itd1 != dir1.end()){ info_maps.push_back(Maps::FileInfo(*itd1)); ++itd1; }
 
-    while(itd != itd_end){ info_maps.push_back(Maps::FileInfo(*itd)); ++itd; }
+    Dir::const_iterator itd2 = dir2.begin();
+    while(itd2 != dir2.end()){ info_maps.push_back(Maps::FileInfo(*itd2)); ++itd2; }
+
+    Dir::const_iterator itd3 = dir3.begin();
+    while(itd3 != dir3.end()){ info_maps.push_back(Maps::FileInfo(*itd3)); ++itd3; }
+
+    // empty maps dir
+    if(!info_maps.size()){
+	H2Config::SetInterface(true);
+	Dialog::Message("Warning", "None maps available!", Font::BIG, Dialog::OK);
+	return QUITGAME;
+    }
 
     // preload
     AGG::PreloadObject("HEROES.ICN");
@@ -152,7 +167,7 @@ Game::menu_t Game::ScenarioInfo(void){
 		    default: break;
 		}
     		const Sprite &sprite = AGG::GetICN("NGEXTRA.ICN", index);
-		display.Blit(sprite, Point((*it).rect.x, (*it).rect.y));
+		display.Blit(sprite, (*it).rect, (*it).rect);
 		display.Flip();
 		Cursor::Show();
 	    }
@@ -227,9 +242,9 @@ void Scenario::RedrawOpponentColors(const std::vector<rectcolor_t> &vo)
     while(it != vo.end()){
 
 	if(H2Config::GetAllowChangeColors() & (*it).color)
-	    display.Blit((H2Config::GetHumanColor() & (*it).color ? *colorHumanSprite[(*it).color] : *colorAllowSprite[(*it).color]), Point((*it).rect.x, (*it).rect.y));
+	    display.Blit((H2Config::GetHumanColor() & (*it).color ? *colorHumanSprite[(*it).color] : *colorAllowSprite[(*it).color]), (*it).rect);
 	else
-	    display.Blit(*colorOpponentSprite[(*it).color], Point((*it).rect.x, (*it).rect.y));
+	    display.Blit(*colorOpponentSprite[(*it).color], (*it).rect);
 	++it;
     }
 }
@@ -242,28 +257,28 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
 
     // image panel
     const Sprite &shadow = AGG::GetICN("NGHSBKG.ICN", 1);
-    display.Blit(shadow, Point(196, 40));
+    display.Blit(shadow, 196, 40);
     const Sprite &panel = AGG::GetICN("NGHSBKG.ICN", 0);
-    display.Blit(panel, Point(204, 33));
+    display.Blit(panel, 204, 33);
 
     // text scenario
-    Text textScenario(Point(376, 53), "Scenario:", Font::BIG, true);
+    Text textScenario(376, 53, "Scenario:", Font::BIG, true);
 
     // maps name
-    Text textName(Point(260, 78), H2Config::GetNameMaps(), Font::BIG, true);
+    Text textName(260, 78, H2Config::GetNameMaps(), Font::BIG, true);
     
     // text game difficulty
-    Text textDifficulty(Point(330, 107), "Game Difficulty:", Font::BIG, true);
+    Text textDifficulty(330, 107, "Game Difficulty:", Font::BIG, true);
 
     //
-    Text textEasy(Point(248, 196), "Easy", Font::SMALL, true);
-    Text textNormal(Point(316, 196), "Normal", Font::SMALL, true);
-    Text textHard(Point(395, 196), "Hard", Font::SMALL, true);
-    Text textExpert(Point(472, 196), "Expert", Font::SMALL, true);
-    Text textImpossible(Point(536, 196), "Impossible", Font::SMALL, true);
+    Text textEasy(248, 196, "Easy", Font::SMALL, true);
+    Text textNormal(316, 196, "Normal", Font::SMALL, true);
+    Text textHard(395, 196, "Hard", Font::SMALL, true);
+    Text textExpert(472, 196, "Expert", Font::SMALL, true);
+    Text textImpossible(536, 196, "Impossible", Font::SMALL, true);
 
     // text opponents
-    Text textOpponents(Point(368, 210), "Opponents:", Font::BIG, true);
+    Text textOpponents(368, 210, "Opponents:", Font::BIG, true);
 
     // draw opponents
     u8 count = H2Config::GetKingdomCount();
@@ -282,7 +297,7 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     }
 
     // text class
-    Text textClass(Point(386, 290), "Class:", Font::BIG, true);
+    Text textClass(386, 290, "Class:", Font::BIG, true);
 
     // draw class
     current = 0;
@@ -365,9 +380,9 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
     // image panel
     const Sprite &shadow = AGG::GetICN("REQSBKG.ICN", 1);
-    display.Blit(shadow, Point(114, 21));
+    display.Blit(shadow, 114, 21);
     const Sprite &panel = AGG::GetICN("REQSBKG.ICN", 0);
-    display.Blit(panel, Point(130, 5));
+    display.Blit(panel, 130, 5);
 
     Background backgroundList(Rect(170, 60, 270, 175));
     backgroundList.Save();
@@ -414,7 +429,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.Press() : buttonSelectAll.Release();
 
 	// click small
-	if(le.MouseClickLeft(buttonSelectSmall)){
+	if(le.MouseClickLeft(buttonSelectSmall) && smallmaps.size()){
 	    curmaps = &smallmaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
@@ -428,7 +443,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	}
 
 	// click medium
-	if(le.MouseClickLeft(buttonSelectMedium)){
+	if(le.MouseClickLeft(buttonSelectMedium) && mediummaps.size()){
 	    curmaps = &mediummaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
@@ -442,7 +457,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	}
 
 	// click large
-	if(le.MouseClickLeft(buttonSelectLarge)){
+	if(le.MouseClickLeft(buttonSelectLarge) && largemaps.size()){
 	    curmaps = &largemaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
@@ -456,7 +471,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	}
 
 	// click xlarge
-	if(le.MouseClickLeft(buttonSelectXLarge)){
+	if(le.MouseClickLeft(buttonSelectXLarge) && xlargemaps.size()){
 	    curmaps = &xlargemaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
@@ -584,7 +599,7 @@ void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 
 	// sprite count
 	index = 19 + (*it_head).GetKingdomCount();
 	const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
-	display.Blit(spriteCount, Point(x, y));
+	display.Blit(spriteCount, x, y);
 
         // sprite size
 	switch((*it_head).GetSizeMaps()){
@@ -605,20 +620,20 @@ void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 
                 break;
         }
 	const Sprite &spriteSize = AGG::GetICN("REQUESTS.ICN", index);
-	display.Blit(spriteSize, Point(x + spriteCount.w() + 2, y));
+	display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
 	// text longname
-	Text textLongName(Point(x + spriteCount.w() + spriteSize.w() + 18, y), (*it_head).GetName(), Font::BIG, true);
+	Text textLongName(x + spriteCount.w() + spriteSize.w() + 18, y, (*it_head).GetName(), Font::BIG, true);
 
 	// sprite wins
 	index = 30 + (*it_head).GetConditionsWins();
 	const Sprite &spriteWins = AGG::GetICN("REQUESTS.ICN", index);
-	display.Blit(spriteWins, Point(x + 224, y));
+	display.Blit(spriteWins, x + 224, y);
 
 	// sprite loss
 	index = 36 + (*it_head).GetConditionsLoss();
 	const Sprite &spriteLoss = AGG::GetICN("REQUESTS.ICN", index);
-	display.Blit(spriteLoss, Point(x + 226 + spriteWins.w(), y));
+	display.Blit(spriteLoss, x + 226 + spriteWins.w(), y);
 
 	y += LISTHEIGHTROW;
 	++it_head;
@@ -634,7 +649,7 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     // sprite count
     index = 19 + (*it_current).GetKingdomCount();
     const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
-    display.Blit(spriteCount, Point(x, y));
+    display.Blit(spriteCount, x, y);
 
     // sprite size
     switch((*it_current).GetSizeMaps()){
@@ -655,23 +670,23 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
             break;
     }
     const Sprite &spriteSize = AGG::GetICN("REQUESTS.ICN", index);
-    display.Blit(spriteSize, Point(x + spriteCount.w() + 2, y));
+    display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
     // text longname
-    Text textLongName(Point(x + spriteCount.w() + spriteSize.w() + 22, y), (*it_current).GetName(), Font::BIG, true);
+    Text textLongName(x + spriteCount.w() + spriteSize.w() + 22, y, (*it_current).GetName(), Font::BIG, true);
 
     // sprite wins
     index = 30 + (*it_current).GetConditionsWins();
     const Sprite &spriteWins = AGG::GetICN("REQUESTS.ICN", index);
-    display.Blit(spriteWins, Point(x + 209, y));
+    display.Blit(spriteWins, x + 209, y);
 
     // sprite loss
     index = 36 + (*it_current).GetConditionsLoss();
     const Sprite &spriteLoss = AGG::GetICN("REQUESTS.ICN", index);
-    display.Blit(spriteLoss, Point(x + 211 + spriteWins.w(), y));
+    display.Blit(spriteLoss, x + 211 + spriteWins.w(), y);
 
-    Text textLabel(Point(200, 295), "Maps difficulty:", Font::BIG, true);
-    Text textDifficulty(Point(360, 295), String::Difficulty((*it_current).GetDifficulty()), Font::BIG, true);
+    Text textLabel(200, 295, "Maps difficulty:", Font::BIG, true);
+    Text textDifficulty(360, 295, String::Difficulty((*it_current).GetDifficulty()), Font::BIG, true);
     
     TextBox textDescription(Rect(175, 322, 282, 90), (*it_current).GetDescription(), Font::BIG, true);
 }

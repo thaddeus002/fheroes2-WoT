@@ -2,8 +2,8 @@
 #
 
 TARGET = fheroes2.exe
-LIBS = `sdl-config --libs` `sdlmm-config --libs`
-CFLAGS = -O2 -Wall -fomit-frame-pointer `sdl-config --cflags` `sdlmm-config --cflags`
+LIBS = `sdl-config --libs`
+CFLAGS = -O2 -Wall -fomit-frame-pointer `sdl-config --cflags`
 
 CC = g++
 

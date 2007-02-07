@@ -21,22 +21,21 @@
 #define H2BACKGROUND_H
 
 #include "rect.h"
-#include "gamedefs.h"
+#include "display.h"
+#include "surface.h"
 
-class Background
+class Background : private Surface
 {
-
 public:
-    Background(const Rect &rback) : surface(NULL), rect(rback){ Save(); };
-    ~Background(){ delete surface; };
+    Background(const Rect &rback = Rect()) : Surface(), back(rback){};
 
-    void Save(const Rect &rback){ rect = rback; Save(); };
+    void Save(const Rect &rback){ back = rback; Save(); };
     void Save(void);
-    void Restore(void);
+    void Restore(void){ display.Blit(*this, back.x, back.y); };
+    const Rect & GetRect(void) const{ return back; };
 
 private:
-    SDLmm::Surface *surface;
-    Rect rect;
+    Rect back;
 };
 
 #endif

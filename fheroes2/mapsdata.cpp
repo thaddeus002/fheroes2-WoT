@@ -34,7 +34,7 @@
 u16 MapsData::width = 0;
 u16 MapsData::height = 0;
 
-MapsData::MapsData(const std::string &filename) : tiles()
+MapsData::MapsData(const std::string &filename)
 {
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -110,11 +110,7 @@ MapsData::MapsData(const std::string &filename) : tiles()
 
     fd.close();
 
-    tiles = SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_RLEACCEL, width * TILEWIDTH, height * TILEWIDTH, DEFAULT_DEPTH);
-    if(!tiles.valid()) Error::Except(SDLmm::GetError());
-
-    //std::vector<MP2::tile_t>::const_iterator it     = mp2tile.begin();
-    //std::vector<MP2::tile_t>::const_iterator it_end = mp2tile.end();
+    tiles = Surface(width * TILEWIDTH, height * TILEWIDTH);
 
     // loading info
     display.Fill(0, 0, 0);
@@ -136,7 +132,7 @@ MapsData::MapsData(const std::string &filename) : tiles()
 	pt.x *= TILEWIDTH;
 	pt.y *= TILEWIDTH;
 
-	Sprite * tile = AGG::GetTIL("GROUND32.TIL", cell.tileIndex, cell.shape);
+	const Sprite * tile = AGG::GetTIL("GROUND32.TIL", cell.tileIndex, cell.shape);
 	tiles.Blit(*tile, pt);
 	
 	delete tile;
@@ -151,9 +147,8 @@ MapsData::MapsData(const std::string &filename) : tiles()
 
     // save maps to big sprite
     //if(H2Config::Debug() && tiles.SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
-
 }
-    
+
 void MapsData::Redraw(const Rect &rt, const Point &pt) const
 {
     if(pt.x >= GameArea::GetRect().w || pt.y >= GameArea::GetRect().h){ Error::Warning("MapsData::Redraw: out of range"); return; }

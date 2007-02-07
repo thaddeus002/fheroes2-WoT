@@ -20,6 +20,8 @@
 
 #include "agg.h"
 #include "rect.h"
+#include "event.h"
+#include "cursor.h"
 #include "config.h"
 #include "dialog.h"
 
@@ -33,7 +35,7 @@
 #define BOXAREA_MIDDLE  45 
 #define BOXAREA_BOTTOM  30 
 
-Dialog::Box::Box(u16 height, bool buttons) : background(NULL)
+Dialog::Box::Box(u16 height, bool buttons) : Background()
 {
     const std::string &buybuild = (H2Config::EvilInterface() ? "BUYBUILE.ICN" : "BUYBUILD.ICN");
 
@@ -44,13 +46,16 @@ Dialog::Box::Box(u16 height, bool buttons) : background(NULL)
     u8 count = (height < BOXAREA_TOP + BOXAREA_BOTTOM ? 0 : 1 + (height - BOXAREA_TOP - BOXAREA_BOTTOM) / BOXAREA_MIDDLE);
 
     u16 byte16 = (H2Config::EvilInterface() ? BOXE_TOP + BOXE_BOTTOM + count * BOXE_MIDDLE : BOX_TOP + BOX_BOTTOM + count * BOX_MIDDLE);
-    pos = Rect((display.w() - BOX_WIDTH) / 2, (display.h() - byte16) / 2, BOX_WIDTH, byte16);
+    Rect pos((display.w() - BOX_WIDTH) / 2, (display.h() - byte16) / 2, BOX_WIDTH, byte16);
 
     byte16 = (H2Config::EvilInterface() ? pos.y + BOXE_TOP - 30 : pos.y + BOX_TOP - 30);
     area = Rect(pos.x + 41, byte16, BOXAREA_WIDTH, BOXAREA_TOP + BOXAREA_BOTTOM + count * BOXAREA_MIDDLE);
     if(buttons) area.h -= BUTTON_HEIGHT;
 
-    background  = new Background(pos);
+    bool localcursor = false;
+    if(pos & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+
+    Save(pos);
 
     Point pt(pos.x, pos.y);
 
@@ -84,10 +89,16 @@ Dialog::Box::Box(u16 height, bool buttons) : background(NULL)
     // right bottom sprite
     display.Blit(AGG::GetICN(buybuild, 2), pt);
 
+    if(localcursor) Cursor::Show();
 }
 
 Dialog::Box::~Box()
 {
-    if(background) background->Restore();
-    delete background;
-}
+    bool localcursor = false;
+
+    if(GetRect() & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    Restore();
+
+    if(localcursor) Cursor::Show();
+    display.Flip();
+};

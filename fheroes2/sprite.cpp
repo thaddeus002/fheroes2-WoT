@@ -18,23 +18,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <vector>
 #include "agg.h"
 #include "maps.h"
+#include "config.h"
+#include "error.h"
 #include "sprite.h"
 
 /* ICN Sprite constructor */
 Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, u32 size, const u8 *data) 
-    : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(ox), offsetY(oy)
+    : Surface(w, h, true), offsetX(ox), offsetY(oy)
 {
     Fill(AGG::GetColorKey());
     DrawICN(size, data);
-    SetColorKey(SDL_SRCCOLORKEY|SDL_RLEACCEL, AGG::GetColorKey());
-    SetDisplayFormatAlpha();
+    SetColorKey(AGG::GetColorKey());
+    SetDisplayFormat();
 };
 
 /* TIL Sprite constructor */
 Sprite::Sprite(u8 shape, const u8 *data)
-    : SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE|SDL_SRCALPHA, TILEWIDTH, TILEWIDTH, DEFAULT_DEPTH, RMASK, GMASK, BMASK, AMASK)), offsetX(0), offsetY(0)
+    : Surface(TILEWIDTH, TILEWIDTH, true), offsetX(0), offsetY(0)
 {
     s16 x, y;
 

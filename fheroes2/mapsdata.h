@@ -22,6 +22,7 @@
 
 #include <vector>
 #include "gamedefs.h"
+#include "surface.h"
 #include "rect.h"
 #include "mp2.h"
 
@@ -48,7 +49,7 @@ public:
     static u16 w(void){ return width; }
     static u16 h(void){ return height; }
 
-    const SDLmm::Surface & GetSurface(void) const{ return tiles; }
+    const Surface & GetSurface(void) const{ return tiles; }
 
     const MapsTiles & GetTiles(u16 index) const{ return vec_tiles.size() > index ? vec_tiles[index] : vec_tiles.back(); }
     const MapsTiles & GetTiles(u32 ax, u32 ay) const{ return vec_tiles.size() > ax * ay ? vec_tiles[ax * width + ay] : vec_tiles.back(); }
@@ -56,7 +57,7 @@ public:
     void Redraw(const Rect &rt, const Point &pt = Point(0, 0)) const;
 
 private:
-    SDLmm::Surface tiles;
+    Surface tiles;
     std::vector<MapsTiles> vec_tiles;
 
     static u16 width;

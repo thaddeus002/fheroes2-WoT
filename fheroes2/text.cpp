@@ -20,6 +20,8 @@
 
 #include <string>
 #include "agg.h"
+#include "sprite.h"
+#include "display.h"
 #include "text.h"
 
 #define WIDTH_BIG	0x0E
@@ -27,10 +29,10 @@
 #define HEIGHT_BIG	0x10
 #define HEIGHT_SMALL	0x0B
 
-Text::Text(const Point &pt, const std::string &msg, Font::type_t ft, bool draw) : font(ft), message(msg)
+Text::Text(u16 ax, u16 ay, const std::string &msg, Font::type_t ft, bool draw) : font(ft), message(msg)
 {
-    pos.x = pt.x;
-    pos.y = pt.y;
+    pos.x = ax;
+    pos.y = ay;
     pos.h = (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG);
     pos.w = 0;
 
@@ -38,14 +40,14 @@ Text::Text(const Point &pt, const std::string &msg, Font::type_t ft, bool draw) 
     std::string::const_iterator it_end = message.end();
 
     for(; it != it_end; ++it)
-	if(0x20 == *it) pos.w += (Font::SMALL == ft ? WIDTH_SMALL : WIDTH_BIG);
-	else
-	    pos.w += AGG::GetLetter(*it, ft).w();
+        if(0x20 == *it) pos.w += (Font::SMALL == ft ? WIDTH_SMALL : WIDTH_BIG);
+        else
+            pos.w += AGG::GetLetter(*it, ft).w();
 
-    if(draw) Redraw();
+    if(draw) Blit();
 }
 
-void Text::Redraw(void)
+void Text::Blit(void)
 {
     std::string::const_iterator it = message.begin();
     std::string::const_iterator it_end = message.end();
@@ -95,8 +97,6 @@ void Text::Redraw(void)
 	display.Blit(sprite, pt);
 
 	pt.x += sprite.w();
-	
-	//if(pt.x > pos.x + pos.w){ pt.x = pos.x; y1 += (Font::SMALL == font ? HEIGHT_SMALL : HEIGHT_BIG); }
     }
 }
 
@@ -167,7 +167,7 @@ TextBox::TextBox(const Rect &rt, const std::string &msg, Font::type_t ft, bool d
 
 	pt.x = pos.x + (pos.w - Text::width(msg, s_start, s_end - s_start, ft)) / 2;
 	
-	box.push_back(Text(pt, msg.substr(s_start, s_end - s_start), ft));
+	box.push_back(Text(pt.x, pt.y, msg.substr(s_start, s_end - s_start), ft));
 	
 	pt.y += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
 
@@ -183,5 +183,5 @@ void TextBox::Redraw(void)
     std::vector<Text>::iterator it = box.begin();
     std::vector<Text>::iterator it_end = box.end();
     
-    for(; it != it_end; ++it) (*it).Redraw();
+    for(; it != it_end; ++it) (*it).Blit();
 }

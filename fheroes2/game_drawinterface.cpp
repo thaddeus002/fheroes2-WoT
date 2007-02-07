@@ -27,8 +27,7 @@
 void Game::DrawInterface(void){
 
     Display::SetVideoMode(H2Config::GetVideoMode());
-    //display.Fill(0x00, 0x00, 0x00);
-    //display.Flip();
+    display.Fill(0x00, 0x00, 0x00);
 
     const std::string &icnadv = ( H2Config::EvilInterface() ? "ADVBORDE.ICN" : "ADVBORD.ICN" );
     const std::string &icnlocator = ( H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN" );

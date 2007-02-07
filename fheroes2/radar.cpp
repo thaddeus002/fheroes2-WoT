@@ -21,28 +21,27 @@
 #include <cstdlib>
 #include "agg.h"
 #include "game.h"
+#include "gamearea.h"
+#include "error.h"
+#include "maps.h"
 #include "radar.h"
 
 #define RADARCOLOR      0x10	// index palette
 
 /* constructor */
 Radar::Radar(s16 rx, s16 ry, const MapsData &mp) :
-    SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, RADARWIDTH, RADARWIDTH, DEFAULT_DEPTH)),
-    maps(mp), pos(rx, ry, RADARWIDTH, RADARWIDTH)
+    Surface(RADARWIDTH, RADARWIDTH), maps(mp), pos(rx, ry, RADARWIDTH, RADARWIDTH)
 {
     GenerateFrom(maps.GetSurface());
 }
 
 /* redraw radar */
-void Radar::Redraw(void){
-
-    display.Blit(*this, Point(pos.x, pos.y));
-}
+void Radar::Redraw(void){ display.Blit(*this, pos); }
 
 /* generate from surface */
-void Radar::GenerateFrom(const SDLmm::Surface &surface)
+void Radar::GenerateFrom(const Surface &surface)
 {
-    SDLmm::Surface & src = const_cast<SDLmm::Surface &>(surface);
+    Surface & src = const_cast<Surface &>(surface);
 
     if(pos.w > src.w() || pos.h > src.h() ||
        src.w() != src.h()){ Error::Warning("Radar::Generate: incorrect param"); return; }
@@ -64,7 +63,7 @@ void Radar::GenerateFrom(const SDLmm::Surface &surface)
     bool first = true;
 
     src.Lock();
-    p_src = static_cast<u16 *>(src.pixels());
+    p_src = static_cast<u16 *>(const_cast<void *>(src.pixels()));
 
     // count min iteration    
     width = src.w();
@@ -147,7 +146,7 @@ void Radar::GenerateFrom(const SDLmm::Surface &surface)
 
     // copy color from p_src to sprite radar
     Lock();
-    memcpy(pixels(), p_src, sizeof(u16) * RADARWIDTH * RADARWIDTH);
+    memcpy(const_cast<void *>(pixels()), p_src, sizeof(u16) * RADARWIDTH * RADARWIDTH);
     Unlock();
 
     delete [] p_src;
@@ -162,7 +161,7 @@ RadarCursor::RadarCursor(const Radar &radar) :
     SpriteCursor(static_cast<Rect>(*this))
 {
     Fill(AGG::GetColorKey());
-    SetColorKey(SDL_SRCCOLORKEY|SDL_RLEACCEL, AGG::GetColorKey());
+    SetColorKey(AGG::GetColorKey());
 
     u16 width  = static_cast<Rect>(*this).w;
     u16 height = static_cast<Rect>(*this).h;

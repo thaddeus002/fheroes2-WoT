@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "display.h"
+#include "cursor.h"
+#include "error.h"
 #include "game.h"
 
 /* global event filter */
@@ -37,7 +40,7 @@ int Game::GlobalFilterEvents(const SDL_Event *event)
 	switch(event->key.keysym.sym){
 
 	    case SDLK_F4:
-		{ SDLmm::Display &display = SDLmm::Display::GetDisplay(); display.ToggleFullScreen(); }
+		display.FullScreen();
     		return 0;
 
 	    case SDLK_PRINT:

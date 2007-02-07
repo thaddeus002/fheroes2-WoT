@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
 #include <iostream>
 #include <string>
 
@@ -27,6 +26,7 @@
 #include "tools.h"
 #include "config.h"
 #include "error.h"
+#include "event.h"
 #include "rand.h"
 #include "agg.h"
 #include "cursor.h"
@@ -64,9 +64,9 @@ int main(int argc, char **argv)
 	Rand::Init();
 
 	try {
-	    // init Display
-	    if(!SDLmm::Display::Init()) Error::Except(SDLmm::GetError());
-    	    atexit(SDLmm::Display::Quit);
+	    // init SDL
+	    if(0 > SDL_Init(SDL_INIT_VIDEO)) Error::Except(std::string(SDL_GetError()));
+    	    atexit(SDL_Quit);
 
 	    Display::SetVideoMode(Display::SMALL);
 	    Display::HideCursor();
@@ -82,27 +82,28 @@ int main(int argc, char **argv)
 	    Cursor::Init(Cursor::POINTER);
 
 	    // enable events
-	    SDLmm::Event::EventState(SDL_USEREVENT, SDL_ENABLE);
-	    SDLmm::Event::EventState(SDL_KEYDOWN, SDL_ENABLE);
-	    SDLmm::Event::EventState(SDL_KEYUP, SDL_ENABLE);
-	    SDLmm::Event::EventState(SDL_MOUSEMOTION, SDL_ENABLE);
-	    SDLmm::Event::EventState(SDL_MOUSEBUTTONDOWN, SDL_ENABLE);
-	    SDLmm::Event::EventState(SDL_MOUSEBUTTONUP, SDL_ENABLE);
-	    SDLmm::Event::EventState(SDL_QUIT, SDL_ENABLE);
+	    LocalEvent::SetState(SDL_USEREVENT, true);
+	
+	    LocalEvent::SetState(SDL_KEYDOWN, true);
+	    LocalEvent::SetState(SDL_KEYUP, true);
+	    LocalEvent::SetState(SDL_MOUSEMOTION, true);
+	    LocalEvent::SetState(SDL_MOUSEBUTTONDOWN, true);
+	    LocalEvent::SetState(SDL_MOUSEBUTTONUP, true);
+	    LocalEvent::SetState(SDL_QUIT, true);
 
 	    // ignore events
-	    SDLmm::Event::EventState(SDL_ACTIVEEVENT, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_JOYAXISMOTION, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_JOYBALLMOTION, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_JOYHATMOTION, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_JOYBUTTONUP, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_JOYBUTTONDOWN, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_SYSWMEVENT, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_VIDEORESIZE, SDL_IGNORE);
-	    SDLmm::Event::EventState(SDL_VIDEOEXPOSE, SDL_IGNORE);
+	    LocalEvent::SetState(SDL_ACTIVEEVENT, false);
+	    LocalEvent::SetState(SDL_JOYAXISMOTION, false);
+	    LocalEvent::SetState(SDL_JOYBALLMOTION, false);
+	    LocalEvent::SetState(SDL_JOYHATMOTION, false);
+	    LocalEvent::SetState(SDL_JOYBUTTONUP, false);
+	    LocalEvent::SetState(SDL_JOYBUTTONDOWN, false);
+	    LocalEvent::SetState(SDL_SYSWMEVENT, false);
+	    LocalEvent::SetState(SDL_VIDEORESIZE, false);
+	    LocalEvent::SetState(SDL_VIDEOEXPOSE, false);
 
 	    // set global events
-	    SDLmm::Event::SetEventFilter(Game::GlobalFilterEvents);
+	    SDL_SetEventFilter(Game::GlobalFilterEvents);
 
 	    // goto main menu
 	    Game::menu_t rs = Game::MAINMENU;

@@ -21,16 +21,13 @@
 #define H2ANIMATION_H
 
 #include <vector>
-#include "agg.h"
-#include "cursor.h"
 #include "rect.h"
-#include "sprite.h"
 #include "gamedefs.h"
 
 class Animation
 {
 public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animatoin_t;
+    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animation_t;
 
     Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
 

@@ -21,6 +21,7 @@
 #include "agg.h"
 #include "event.h"
 #include "button.h"
+#include "cursor.h"
 #include "config.h"
 #include "background.h"
 #include "dialog.h"
@@ -43,6 +44,7 @@ Game::menu_t Dialog::Menu(void)
 
     Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
     Background back(rb);
+    back.Save();
 
     display.Blit(box, rb);
 

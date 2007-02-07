@@ -19,12 +19,15 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "cursor.h"
 #include "animation.h"
 #include "sprite.h"
 #include "event.h"
+#include "display.h"
 #include "button.h"
 #include "game.h"
 
+#include "error.h"
 Game::menu_t Game::MainMenu(void)
 {
     // preload

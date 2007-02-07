@@ -18,8 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+#include <fstream>
+#include <cctype>
+#include "error.h"
+#include "cmdline.h"
+#include "tools.h"
 #include "config.h"
-#include "kingdom.h"
 
 namespace H2Config {
     static u16  boolValue = ANIMATION;
@@ -239,3 +244,6 @@ void H2Config::SetDescriptionMaps(const std::string & description){ H2Config::de
 
 /* set size play maps */
 void H2Config::SetSizeMaps(Maps::mapsize_t size){ H2Config::sizeMaps = size; }
+
+/* set interface */
+void H2Config::SetInterface(bool interface){ interface ? H2Config::boolValue &= ~H2Config::EVILINTERFACE : H2Config::boolValue |= H2Config::EVILINTERFACE; }

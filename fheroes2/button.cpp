@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "agg.h"
+#include "cursor.h"
+#include "display.h"
 #include "button.h"
 
 Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), pressed(false)
@@ -27,7 +30,7 @@ Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), p
     w = sprite1.w();
     h = sprite1.h();
     
-    display.Blit(sprite1, Point(x, y));
+    display.Blit(sprite1, x, y);
 }
 
 Button::Button(const std::string &icn, u16 index1, u16 index2) 
@@ -38,7 +41,7 @@ Button::Button(const std::string &icn, u16 index1, u16 index2)
     w = sprite1.w();
     h = sprite1.h();
     
-    display.Blit(sprite1, Point(x, y));
+    display.Blit(sprite1, x, y);
 }
 
 Button::Button(const Point &pt, const std::string &icn, u16 index1, u16 index2)
@@ -60,7 +63,7 @@ Button::Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2)
     w = sprite1.w();
     h = sprite1.h();
     
-    display.Blit(sprite1, Point(x, y));
+    display.Blit(sprite1, x, y);
 }
 
 void Button::DrawPressButton(void)
@@ -69,7 +72,7 @@ void Button::DrawPressButton(void)
 
     Cursor::Hide();
 
-    display.Blit(sprite2, Point(x, y));
+    display.Blit(sprite2, x, y);
     display.Flip();
 
     Cursor::Show();
@@ -83,30 +86,10 @@ void Button::DrawReleaseButton(void)
 
     Cursor::Hide();
 
-    display.Blit(sprite1,  Point(x, y));
+    display.Blit(sprite1,  x, y);
     display.Flip();
 
     Cursor::Show();
 
     pressed = false;
 }
-
-/*
-void Button::Action(u8 state)
-{
-    switch(state){
-
-	case (MouseState::LEFT | MouseState::DOWN):
-	    DrawPressButton();
-	    break;
-
-	case (MouseState::LEFT | MouseState::UP):
-	    DrawReleaseButton();
-	    break;
-
-	default:
-	    break;
-    }
-    if(!GetFilter() || GetFilter() == state) SetActiveEvent(true);
-}
-*/

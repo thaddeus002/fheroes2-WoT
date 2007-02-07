@@ -21,12 +21,12 @@
 #define H2RADAR_H
 
 #include "gamedefs.h"
+#include "surface.h"
 #include "mapsdata.h"
 #include "spritecursor.h"
-#include "gamearea.h"
 #include "rect.h"
 
-class Radar : private SDLmm::Surface
+class Radar : private Surface
 {
 public:
     Radar(s16 rx, s16 ry, const MapsData & mp);
@@ -36,7 +36,7 @@ public:
     void Redraw(void);
 
 private:
-    void GenerateFrom(const SDLmm::Surface &surface);
+    void GenerateFrom(const Surface &surface);
     const MapsData & maps;
     Rect pos;
 };

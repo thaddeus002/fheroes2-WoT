@@ -22,7 +22,6 @@
 
 #include "gamedefs.h"
 #include "mapsdata.h"
-#include "game.h"
 #include "rect.h"
 
 class GameArea

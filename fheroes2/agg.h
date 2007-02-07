@@ -20,16 +20,8 @@
 #ifndef H2AGG_H
 #define H2AGG_H
 
-#include <map>
 #include <vector>
-#include <fstream>
 #include <string>
-
-#include <cstdlib>
-#include <iostream>
-
-#include "error.h"
-#include "tools.h"
 #include "sprite.h"
 #include "gamedefs.h"
 

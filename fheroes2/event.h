@@ -29,10 +29,12 @@
 #define BUTTON_WHEELUP	0x04
 #define BUTTON_WHEELDN	0x05
 
-class LocalEvent : private SDLmm::EventHandler
+class LocalEvent
 {
 public:
     static LocalEvent & GetLocalEvent(void);
+    static void SetState(u8 type, bool enable){ SDL_EventState(type, enable ? SDL_ENABLE : SDL_IGNORE); };
+    static u8   GetState(u8 type){ return SDL_EventState(type, SDL_QUERY); };
 
     bool operator() (void){ return keep_going; };
 
@@ -78,7 +80,7 @@ public:
     bool KeyPress(SDLKey key) const{ return key == key_value && key_pressed; }
 
 private:
-    LocalEvent() : SDLmm::EventHandler(){};
+    LocalEvent(){};
 
     bool HandleMouseMotionEvent(u8 state, u16 x, u16 y, s16 xrel, s16 yrel);
     bool HandleMouseButtonEvent(u8 button, u16 x, u16 y, bool pressed);

@@ -19,9 +19,11 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "cursor.h"
 #include "sprite.h"
 #include "event.h"
 #include "button.h"
+#include "display.h"
 #include "game.h"
 
 Game::menu_t Game::LoadStandard(void){
@@ -42,7 +44,7 @@ Game::menu_t Game::LoadStandard(void){
     display.Blit(back);
 
     const Sprite &panel = AGG::GetICN("REQBKG.ICN", 0);
-    display.Blit(panel, Point(140, 50));
+    display.Blit(panel, 140, 50);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

@@ -43,10 +43,49 @@ LocalEvent & LocalEvent::GetLocalEvent(void)
 
     return le;
 }
-    
+
 void LocalEvent::HandleEvents(void)
 {
-    SDLmm::Event::HandleEvents(*this);
+    /* from SDLmm-0.1.8 */
+    SDL_Event event;
+
+    while(SDL_PollEvent(&event)){
+
+	bool ev_handled = false;
+
+	switch(event.type){
+    	    case SDL_KEYDOWN:
+		ev_handled = HandleKeyboardEvent(event.key.keysym, true);
+		break;
+    	    case SDL_KEYUP: 
+		ev_handled = HandleKeyboardEvent(event.key.keysym, false);
+		break;
+    	    case SDL_MOUSEMOTION: 
+		ev_handled = HandleMouseMotionEvent(event.motion.state,
+						    event.motion.x,
+						    event.motion.y,
+						    event.motion.xrel,
+						    event.motion.yrel);
+		break;
+    	    case SDL_MOUSEBUTTONDOWN:
+		ev_handled = HandleMouseButtonEvent(event.button.button,
+							 event.button.x,
+							 event.button.y,
+							 true);
+		break;
+    	    case SDL_MOUSEBUTTONUP: 
+		ev_handled = HandleMouseButtonEvent(event.button.button,
+							   event.button.x,
+							   event.button.y,
+							   false);
+		break;
+    	    case SDL_QUIT: 
+		ev_handled = HandleQuitEvent();
+		break;
+	    default:
+		break;
+	}
+    }
 
     mouse_motion = (mouse_cu.x == mouse_x && mouse_cu.y == mouse_y ? false : true);
 
@@ -168,3 +207,4 @@ bool LocalEvent::MouseClickRight(const Rect &rt)
 
     return false;
 }
+

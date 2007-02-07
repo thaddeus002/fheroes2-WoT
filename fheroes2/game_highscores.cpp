@@ -19,12 +19,13 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "cursor.h"
 #include "sprite.h"
 #include "event.h"
+#include "display.h"
 #include "button.h"
 #include "game.h"
 
-#include "error.h"
 Game::menu_t Game::HighScores(void){
 
     // preload
@@ -57,7 +58,7 @@ Game::menu_t Game::HighScores(void){
 	le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
 	le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
 
-	if(le.MouseRight()) Error::Verbose(le.MousePressRight());
+	//if(le.MouseRight()) Error::Verbose(le.MousePressRight());
 
 	//if(le.MouseClickLeft(buttonDismiss)) return MAINMENU;
 	if(le.MouseClickLeft(buttonExit)) return MAINMENU;

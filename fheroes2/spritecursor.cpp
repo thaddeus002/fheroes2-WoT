@@ -20,6 +20,7 @@
 
 #include "cursor.h"
 #include "gamedefs.h"
+#include "cursor.h"
 #include "spritecursor.h"
 
 void SpriteCursor::Move(const Point &pt)

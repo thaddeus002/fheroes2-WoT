@@ -19,8 +19,10 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "cursor.h"
 #include "sprite.h"
 #include "event.h"
+#include "display.h"
 #include "button.h"
 #include "game.h"
 #include "error.h"
@@ -43,7 +45,7 @@ Game::menu_t Game::LoadGame(void){
     display.Blit(back);
 
     const Sprite &panel = AGG::GetICN("REDBACK.ICN", 0);
-    display.Blit(panel, Point(405, 5));
+    display.Blit(panel, 405, 5);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

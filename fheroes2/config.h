@@ -20,16 +20,9 @@
 #ifndef H2CONFIG_H
 #define H2CONFIG_H
 
-#include <map>
 #include <string>
-#include <iostream>
-#include <fstream>
-#include <cctype>
-
-#include "error.h"
-#include "cmdline.h"
-#include "tools.h"
 #include "maps.h"
+#include "display.h"
 #include "kingdom.h"
 #include "gamedefs.h"
 
@@ -73,6 +66,7 @@ namespace H2Config {
     void SetDebug(void);
     void SetAGGFile(const std::string & path);
     void SetGameDifficulty(Maps::difficulty_t difficulty);
+    void SetInterface(bool interface);
     void SetHumanColor(Kingdom::color_t color);
     void SetKingdomColors(u8 colors);
     void SetAllowChangeColors(u8 colors);

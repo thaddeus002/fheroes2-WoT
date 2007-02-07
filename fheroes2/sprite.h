@@ -20,12 +20,10 @@
 #ifndef H2SPRITE_H
 #define H2SPRITE_H
 
-#include <vector>
-#include "error.h"
-#include "config.h"
+#include "surface.h"
 #include "gamedefs.h"
 
-class Sprite : public SDLmm::Surface
+class Sprite : public Surface
 {
 
 public:

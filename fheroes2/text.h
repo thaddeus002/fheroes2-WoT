@@ -24,15 +24,13 @@
 #include <vector>
 #include "gamedefs.h"
 #include "rect.h"
-#include "sprite.h"
 
 class Text
 {
 public:
-
     typedef enum { LEFT, CENTER, RIGHT } align_t;
 
-    Text(const Point &pt, const std::string &msg, Font::type_t ft = Font::SMALL, bool draw = false);
+    Text(u16 ax, u16 ay, const std::string &msg, Font::type_t ft = Font::SMALL, bool draw = false);
     
     u16 w(void) const{ return pos.w; }
 
@@ -40,7 +38,7 @@ public:
     static u16 width(const std::string &str, u16 start, u16 count, Font::type_t ft);
     static u16 height(u16 width, const std::string &str, Font::type_t ft);
 
-    void Redraw(void);
+    void Blit(void);
 
 private:
     Font::type_t font;

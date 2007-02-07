@@ -20,8 +20,6 @@
 #ifndef H2RAND_H
 #define H2RAND_H
 
-#include <cstdlib>
-#include <ctime>
 #include "kingdom.h"
 #include "gamedefs.h"
 

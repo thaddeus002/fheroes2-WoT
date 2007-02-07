@@ -21,7 +21,6 @@
 #define H2GAMEDEFS_H
 
 #include "SDL.h"
-#include "sdlmm.h"
 
 typedef char		s8;
 typedef unsigned char	u8;
@@ -30,42 +29,16 @@ typedef unsigned short	u16;
 typedef int		s32;
 typedef unsigned int	u32;
 
-namespace Display
-{
-    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280 } resolution_t;
-
-    void SetVideoMode(resolution_t mode);
-
-    void HideCursor(void);
-    void ShowCursor(void);
-    void SetCaption(const std::string &caption);
-};
-
-static SDLmm::Display &display = SDLmm::Display::GetDisplay();
-
 namespace Font
 {
     typedef enum { SMALL, BIG } type_t;
 };
 
 // PUBLIC
-#define GAME_VERSION		20070205	// Version
+#define GAME_VERSION		20070208	// Version
 
 
 // PRIVATE
-#define DEFAULT_DEPTH		16		// Surface use bits color
 #define	DEFAULT_SHADOW_ALPHA	0x40		// shadow alpha
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN 
-#define RMASK 0x0000f000 
-#define GMASK 0x00000f00 
-#define BMASK 0x000000f0 
-#define AMASK 0x0000000f 
-#else 
-#define RMASK 0x0000000f 
-#define GMASK 0x000000f0 
-#define BMASK 0x00000f00 
-#define AMASK 0x0000f000 
-#endif 
 
 #endif

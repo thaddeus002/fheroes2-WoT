@@ -20,14 +20,14 @@
 
 #include "background.h"
 
+#include "error.h"
+
 void Background::Save(void)
 {
     // resize background
-    if((surface && rect.w != surface->w()) || (surface && rect.h != surface->h())){ delete surface; surface = NULL; }
+    if(valid() && back.size() != size()) FreeSurface();
 
-    if(!surface) surface = new SDLmm::Surface(SDLmm::Surface::CreateSurface(SDL_SWSURFACE, rect.w, rect.h, DEFAULT_DEPTH));
+    if(! valid()) CreateSurface(back.size(), DEFAULT_DEPTH, SDL_SWSURFACE);
 
-    surface->Blit(display, rect, Point(0,0));
+    Blit(display, back, 0, 0);
 }
-
-void Background::Restore(void){ display.Blit(*surface, rect); }

@@ -26,6 +26,7 @@
 #include "dialog.h"
 #include "mapsdata.h"
 #include "gamearea.h"
+#include "cursor.h"
 #include "radar.h"
 #include "game.h"
 

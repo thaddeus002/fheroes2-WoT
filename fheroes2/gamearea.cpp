@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include "config.h"
+#include "game.h"
+#include "cursor.h"
 #include "gamearea.h"
 
 Rect GameArea::pos = Rect(0, 0, 0, 0);

@@ -17,70 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef H2DISPLAY_H
+#define H2DISPLAY_H
 
 #include <string>
-#include "config.h"
+#include "basesurface.h"
 #include "rect.h"
-#include "gamedefs.h"
-#include "error.h"
-#include "display.h"
 
-void Display::SetVideoMode(Display::resolution_t mode)
+namespace Display
 {
-    u16 xres, yres;
+    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280 } resolution_t;
 
-    switch(mode){
+    void SetVideoMode(resolution_t mode);
 
-	default:
-	case SMALL:
-	    xres = 640;
-	    yres = 480;
-	    break;
+    void HideCursor(void);
+    void ShowCursor(void);
+    void SetCaption(const std::string &caption);
 
-	case MEDIUM:
-	    xres = 800;
-	    yres = 576;
-	    break;
-
-	case LARGE:
-	    xres = 1024;
-	    yres = 768;
-	    break;
-
-	case XLARGE:
-	    xres = 1280;
-	    yres = 1024;
-	    break;
-    }
-
-    if(display.valid() && display.w() == xres && display.h() == yres) return;
-
-    u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
-    if(H2Config::FullScreen() || (display.valid() && (display.flags() & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
-
-    if(!SDL_SetVideoMode(xres, yres, DEFAULT_DEPTH, videoflags)){
-	SDL_SetVideoMode(640, 480, DEFAULT_DEPTH, videoflags);
-	Error::Warning(std::string(SDL_GetError()));
-    }
-    
-    if(!display.valid()) display = Display::VideoSurface::GetDisplay();
-}
-
-/* set caption main window */
-void Display::SetCaption(const std::string &caption){ SDL_WM_SetCaption(caption.c_str(), "FHEROES2"); }
-
-/* hide system cursor */
-void Display::HideCursor(void){ SDL_ShowCursor(SDL_DISABLE); }
-
-/* show system cursor */
-void Display::ShowCursor(void){ SDL_ShowCursor(SDL_ENABLE); }
-
-/* get video display */
-Display::VideoSurface &Display::VideoSurface::GetDisplay(void)
+class VideoSurface : public BaseSurface
 {
-    static Display::VideoSurface inside;
+public:
+    static VideoSurface &GetDisplay(void);
 
-    if(!inside.valid())	inside.surface = SDL_GetVideoSurface();
+    void Flip(void) const{ SDL_Flip(surface); };
+    void FullScreen(void) const{ SDL_WM_ToggleFullScreen(surface); };
 
-    return inside;
-}
+    VideoSurface & operator= (const VideoSurface & vs){ surface = SDL_GetVideoSurface(); return *this; };
+
+private:
+    VideoSurface() : BaseSurface(){ surface = SDL_GetVideoSurface(); };
+    VideoSurface(const VideoSurface & vs) : BaseSurface(){ surface = SDL_GetVideoSurface(); };
+};
+
+};
+
+static Display::VideoSurface &display = Display::VideoSurface::GetDisplay();
+
+#endif
