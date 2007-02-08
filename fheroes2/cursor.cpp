@@ -20,14 +20,13 @@
 
 #include "agg.h"
 #include "rect.h"
-#include "surface.h"
 #include "background.h"
 #include "error.h"
 #include "cursor.h"
 
 namespace Cursor {
     static themes_t      name = NONE;
-    static const Surface *sprite;
+    static Surface       sprite;
     static Background    background;
     static Rect          position;
     static bool          show = true;
@@ -41,7 +40,7 @@ void Cursor::Init(Cursor::themes_t cursor)
     AGG::PreloadObject("ADVMCO.ICN");
 
     SDL_ShowCursor(SDL_DISABLE);
-    //Cursor::show = true;
+    Cursor::show = true;
 
     Cursor::Set(cursor);
 
@@ -49,10 +48,8 @@ void Cursor::Init(Cursor::themes_t cursor)
     SDL_GetMouseState(&x, &y);
     Cursor::position.x = x;
     Cursor::position.y = y;
-    Cursor::position.w = Cursor::sprite->w();
-    Cursor::position.h = Cursor::sprite->h();
-
-    //Cursor::save = false;
+    Cursor::position.w = Cursor::sprite.w();
+    Cursor::position.h = Cursor::sprite.h();
 
     Cursor::Redraw();
 
@@ -96,23 +93,23 @@ void Cursor::Set(Cursor::themes_t cursor)
 	switch(0xF000 & cursor){
 
 	    case 0x3000:
-		Cursor::sprite = &AGG::GetICN("SPELCO.ICN", 0xFF & cursor);
+		Cursor::sprite = AGG::GetICN("SPELCO.ICN", 0xFF & cursor);
 		Error::Verbose("Cursor::Set: SPELCO.ICN, ", 0xFF & cursor);
 		break;
 	    
 	    case 0x2000:
-		Cursor::sprite = &AGG::GetICN("CMSECO.ICN", 0xFF & cursor);
+		Cursor::sprite = AGG::GetICN("CMSECO.ICN", 0xFF & cursor);
 		Error::Verbose("Cursor::Set: CMSECO.ICN, ", 0xFF & cursor);
 		break;
 	    
 	    case 0x1000:
-		Cursor::sprite = &AGG::GetICN("ADVMCO.ICN", 0xFF & cursor);
+		Cursor::sprite = AGG::GetICN("ADVMCO.ICN", 0xFF & cursor);
 		Error::Verbose("Cursor::Set: ADVMCO.ICN, ", 0xFF & cursor);
 		break;
 
 	    default:
 		// default Cursor::POINTER
-		Cursor::sprite = &AGG::GetICN("ADVMCO.ICN", 0);
+		Cursor::sprite = AGG::GetICN("ADVMCO.ICN", 0);
 		break;
 	}
     }
@@ -132,21 +129,25 @@ void Cursor::Redraw(u16 x, u16 y, bool flag)
 {
     if(!flag && Cursor::position.x == x && Cursor::position.y == y) return;
 
-    if(Cursor::save){ Cursor::background.Restore(); save = false; if(!Cursor::show) display.Flip(); }
+    if(save){ Cursor::background.Restore(); save = false; }
 
     Cursor::position.x = x;
     Cursor::position.y = y;
-    Cursor::position.w = (Cursor::position.x + Cursor::position.w > display.w() ? display.w() - Cursor::position.x : Cursor::sprite->w());
-    Cursor::position.h = (Cursor::position.y + Cursor::position.h > display.h() ? display.h() - Cursor::position.y : Cursor::sprite->h());
+    Cursor::position.w = (Cursor::position.x + Cursor::position.w > display.w() ? display.w() - Cursor::position.x : Cursor::sprite.w());
+    Cursor::position.h = (Cursor::position.y + Cursor::position.h > display.h() ? display.h() - Cursor::position.y : Cursor::sprite.h());
 
     // draw cursor
     if(Cursor::show){
+
 	Cursor::background.Save(Cursor::position);
-	display.Blit(*Cursor::sprite, Cursor::position);
+
+	display.Blit(Cursor::sprite, Cursor::position);
 	display.Flip();
 	save = true;
     }
 }
 
-/* is visible */
-bool Cursor::Visible(void){ return show; }
+bool Cursor::Visible(void)
+{
+    return show;
+}

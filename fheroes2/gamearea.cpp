@@ -22,7 +22,6 @@
 #include "game.h"
 #include "cursor.h"
 #include "gamearea.h"
-
 Rect GameArea::pos = Rect(0, 0, 0, 0);
 
 GameArea::GameArea(const MapsData & data) : maps(data)
@@ -75,7 +74,6 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    Cursor::Hide();
 	    --pos.x;
 	    Redraw();
-	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::RIGHT:
@@ -83,7 +81,6 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    Cursor::Hide();
 	    ++pos.x;
 	    Redraw();
-	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::TOP:
@@ -91,7 +88,6 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    Cursor::Hide();
 	    --pos.y;
 	    Redraw();
-	    display.Flip();
 	    Cursor::Show();
 	    break;
 	case GameArea::BOTTOM:
@@ -99,7 +95,6 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    Cursor::Hide();
 	    ++pos.y;
 	    Redraw();
-	    display.Flip();
 	    Cursor::Show();
 	    break;
     }

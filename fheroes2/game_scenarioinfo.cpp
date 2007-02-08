@@ -130,7 +130,7 @@ Game::menu_t Game::ScenarioInfo(void){
 	// select level
 	Maps::difficulty_t difficulty = Maps::EASY;
 	do
-	    if(le.MousePressLeft(pointDifficulty[difficulty], levelCursor.w(), levelCursor.h())){
+	    if(le.MousePressLeft(pointDifficulty[difficulty], levelCursor.GetRect().w, levelCursor.GetRect().h)){
 		levelCursor.Move(pointDifficulty[difficulty]);
 		display.Flip();
 		H2Config::SetGameDifficulty(difficulty);
@@ -154,6 +154,7 @@ Game::menu_t Game::ScenarioInfo(void){
 	it = vc.begin();
 	while(it != vc.end()){
 	    if(le.MouseClickLeft((*it).rect) && (H2Config::GetAllowChangeRaces() & (*it).color)){
+		Error::Verbose("he he");
 		Cursor::Hide();
 		u8 index = 0;
 		switch(H2Config::GetKingdomRace((*it).color)){
@@ -167,7 +168,7 @@ Game::menu_t Game::ScenarioInfo(void){
 		    default: break;
 		}
     		const Sprite &sprite = AGG::GetICN("NGEXTRA.ICN", index);
-		display.Blit(sprite, (*it).rect, (*it).rect);
+		display.Blit(sprite, (*it).rect);
 		display.Flip();
 		Cursor::Show();
 	    }

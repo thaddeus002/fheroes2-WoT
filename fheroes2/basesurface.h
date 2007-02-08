@@ -74,11 +74,11 @@ public:
     void Unlock(void){ if(SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface); };
 
 protected:
-    const SDL_Surface *GetSurface(void) const{ return surface; };
-    const SDL_PixelFormat *GetPixelFormat(void) const{ return surface->format; };
     void CreateSurface(const Size &sz, u8 dp, u32 fl){ CreateSurface(sz.w, sz.h, dp, fl); };
     void CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl);
     void FreeSurface(void){ if(surface) SDL_FreeSurface(surface); surface = NULL; }
+    const SDL_Surface *GetSurface(void) const{ return surface; };
+    const SDL_PixelFormat *GetPixelFormat(void) const{ return surface->format; };
 
     SDL_Surface *surface;
 };

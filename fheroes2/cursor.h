@@ -128,7 +128,7 @@ namespace Cursor
     } themes_t;
 
     void Init(themes_t cursor);
-    void Quit();
+    void Quit(void);
 
     void Redraw(u16 x, u16 y, bool flag = false);
     void Redraw(bool flag = false);

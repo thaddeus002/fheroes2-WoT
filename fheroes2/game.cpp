@@ -30,7 +30,7 @@ int Game::GlobalFilterEvents(const SDL_Event *event)
     if(SDL_MOUSEMOTION == event->type){
     
 	// redraw cursor
-	Cursor::Redraw(event->motion.x, event->motion.y);
+	if(Cursor::Visible()) Cursor::Redraw();
 
         return 1;
     }

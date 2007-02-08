@@ -26,22 +26,19 @@
 #include "background.h"
 #include "gamedefs.h"
 
-class SpriteCursor : public Surface
+class SpriteCursor : private Surface
 {
-
 public:
-    /* empty sprite cursor */
-    SpriteCursor(const Rect  &rt) : Surface(rt.w, rt.h), rect(rt), background(rect){};
     /* sprite cursor */
-    SpriteCursor(const Sprite &sprite, const Point &pt = Point(-1, -1)) : Surface(sprite), rect(pt.x, pt.y, sprite.w(), sprite.h()), background(rect){ Move(pt); };
-    SpriteCursor(const Sprite &sprite, const Rect  &rt) : Surface(sprite), rect(rt), background(rect){ Move(Point(rt.x, rt.y)); };
+    SpriteCursor(const Surface &cursor, const Point &pt) : Surface(cursor), background(pt, cursor.w(), cursor.h()){ Move(pt); };
 
     void Move(s16 ax, s16 ay);
-    void Move(const Point &rt);
+    void Move(const Point &pt){ Move(pt.x, pt.y); };
+
     void Redraw(void);
+    const Rect & GetRect(void) const{ return background.GetRect(); };
 
 private:
-    Rect rect;
     Background background;
 };
 

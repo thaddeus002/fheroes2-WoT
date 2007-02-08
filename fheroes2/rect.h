@@ -54,6 +54,7 @@ public:
     Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz){};
 
     const Size & size(void) const{ return *this; };
+    bool valid(void) const{ return !(x < 0 || y < 0 || w == 0 || h == 0); };
 
     inline Rect & operator= (const Point & pt){ x = pt.x; y = pt.y; return *this; };
     inline bool operator== (const Rect & rt) const{ return (x == rt.x && y == rt.y && w == rt.w && h == rt.h); };

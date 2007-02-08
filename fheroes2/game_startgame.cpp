@@ -45,14 +45,20 @@ Game::menu_t Game::StartGame(void){
     Game::DrawInterface();
 
     // Create radar
-    Radar areaRadar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, maps);
+    Radar radar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, maps);
 
     areaMaps.Redraw();
-    areaRadar.Redraw();
+    radar.Redraw();
 
-    RadarCursor radarCursor(areaRadar);
-    radarCursor.Redraw();
+    // Create radar cursor
+    Surface spriteRadarCursor(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(MapsData::w()))),
+				static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(MapsData::h()))));
+    radar.DrawCursor(spriteRadarCursor);
 
+    SpriteCursor radarCursor(spriteRadarCursor, radar.GetRect());
+    radar.MoveCursor(radarCursor);
+
+    //
     const std::string &icnscroll = ( H2Config::EvilInterface() ? "SCROLLE.ICN" : "SCROLL.ICN" );
     const std::string &icnbtn = ( H2Config::EvilInterface() ? "ADVEBTNS.ICN" : "ADVBTNS.ICN" );
 
@@ -203,10 +209,10 @@ Game::menu_t Game::StartGame(void){
 	le.HandleEvents();
 
 	// scroll area maps
-	if(le.MouseCursor(areaScrollLeft))  { Cursor::Set(Cursor::SCROLL_LEFT);   areaMaps.Scroll(GameArea::LEFT); radarCursor.Redraw(); continue; }
-	if(le.MouseCursor(areaScrollRight)) { Cursor::Set(Cursor::SCROLL_RIGHT);  areaMaps.Scroll(GameArea::RIGHT); radarCursor.Redraw(); continue; }
-	if(le.MouseCursor(areaScrollTop))   { Cursor::Set(Cursor::SCROLL_TOP);    areaMaps.Scroll(GameArea::TOP); radarCursor.Redraw();   continue; }
-	if(le.MouseCursor(areaScrollBottom)){ Cursor::Set(Cursor::SCROLL_BOTTOM); areaMaps.Scroll(GameArea::BOTTOM); radarCursor.Redraw();  continue; }
+	if(le.MouseCursor(areaScrollLeft))  { Cursor::Set(Cursor::SCROLL_LEFT);   areaMaps.Scroll(GameArea::LEFT);   radar.MoveCursor(radarCursor); continue; }
+	if(le.MouseCursor(areaScrollRight)) { Cursor::Set(Cursor::SCROLL_RIGHT);  areaMaps.Scroll(GameArea::RIGHT);  radar.MoveCursor(radarCursor); continue; }
+	if(le.MouseCursor(areaScrollTop))   { Cursor::Set(Cursor::SCROLL_TOP);    areaMaps.Scroll(GameArea::TOP);    radar.MoveCursor(radarCursor); continue; }
+	if(le.MouseCursor(areaScrollBottom)){ Cursor::Set(Cursor::SCROLL_BOTTOM); areaMaps.Scroll(GameArea::BOTTOM); radar.MoveCursor(radarCursor); continue; }
 
 	// restore game cursor
 	if(le.MouseCursor(areaMaps.GetPosition())){ Cursor::Set(cursor); }
@@ -238,12 +244,12 @@ Game::menu_t Game::StartGame(void){
 	le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.Press() : buttonScrollCastleDown.Release();
 
 	// point radar
-	if(le.MousePressLeft(areaRadar.GetRect()) && le.MouseCursor(areaRadar.GetRect())){
+	if(le.MousePressLeft(radar.GetRect()) && le.MouseCursor(radar.GetRect())){
 	    Rect prev(areaMaps.GetRect());
 	    areaMaps.CenterFromRadar(le.MouseCursor());
 	    if(prev != areaMaps.GetRect()){
 		Cursor::Hide();
-		radarCursor.Redraw();
+		radar.MoveCursor(radarCursor);
 		display.Flip();
 		Cursor::Show();
 	    }

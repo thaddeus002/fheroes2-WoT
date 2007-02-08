@@ -35,7 +35,7 @@
 #define BOXAREA_MIDDLE  45 
 #define BOXAREA_BOTTOM  30 
 
-Dialog::Box::Box(u16 height, bool buttons) : Background()
+Dialog::Box::Box(u16 height, bool buttons)
 {
     const std::string &buybuild = (H2Config::EvilInterface() ? "BUYBUILE.ICN" : "BUYBUILD.ICN");
 
@@ -55,7 +55,7 @@ Dialog::Box::Box(u16 height, bool buttons) : Background()
     bool localcursor = false;
     if(pos & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
-    Save(pos);
+    back.Save(pos);
 
     Point pt(pos.x, pos.y);
 
@@ -96,8 +96,8 @@ Dialog::Box::~Box()
 {
     bool localcursor = false;
 
-    if(GetRect() & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
-    Restore();
+    if(Rect(back.GetPos(), back.w(), back.h()) & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    back.Restore();
 
     if(localcursor) Cursor::Show();
     display.Flip();

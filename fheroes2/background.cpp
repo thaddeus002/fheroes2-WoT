@@ -25,9 +25,9 @@
 void Background::Save(void)
 {
     // resize background
-    if(valid() && back.size() != size()) FreeSurface();
+    if(valid() && pos.size() != size()) FreeSurface();
 
-    if(! valid()) CreateSurface(back.size(), DEFAULT_DEPTH, SDL_SWSURFACE);
+    if(! valid()) CreateSurface(pos.size(), DEFAULT_DEPTH, SDL_SWSURFACE);
 
-    Blit(display, back, 0, 0);
+    Blit(display, pos, 0, 0);
 }

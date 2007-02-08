@@ -29,10 +29,19 @@
 #define ANIMATION_MEDIUM	9
 #define ANIMATION_LOW		27
 
+#include "error.h"
+
 Animation::Animation(const std::string &icn, u16 index, u8 count, u8 amode) 
-    : area(), disable(false), reset(false), frame(0), ticket(0), mode(amode), sprites()
+    : area(display.w(), display.h(), 0, 0), disable(false), reset(false), frame(0), ticket(0), mode(amode), sprites()
 {
-    for(int ii = index; ii < index + count; ++ii) sprites.push_back(&AGG::GetICN(icn, ii));
+    for(int ii = index; ii < index + count; ++ii){
+        const Sprite &sprite = AGG::GetICN(icn, ii);
+        if(sprite.x() < area.x) area.x = sprite.x();
+        if(sprite.y() < area.y) area.y = sprite.y();
+        if(sprite.w() > area.w) area.w = sprite.w();
+        if(sprite.h() > area.h) area.h = sprite.h();
+        sprites.push_back(&sprite);
+    }
 }
 
 void Animation::DrawSprite(void)
@@ -76,12 +85,11 @@ void Animation::Reset(void)
 
     const Sprite & sprite = *sprites[0];
     display.Blit(sprite, sprite.x(), sprite.y());
-    display.Flip();
 
     ticket = 0;
     frame = 0;
     reset = true;
     disable = false;
 
-    if(localcursor) Cursor::Show();
+    localcursor ? Cursor::Show() : display.Flip();
 }

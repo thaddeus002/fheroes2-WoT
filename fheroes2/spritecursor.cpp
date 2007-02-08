@@ -23,26 +23,18 @@
 #include "cursor.h"
 #include "spritecursor.h"
 
-void SpriteCursor::Move(const Point &pt)
-{
-    Move(pt.x, pt.y);
-}
-
 void SpriteCursor::Move(s16 ax, s16 ay)
 {
     if(ax < 0 || ay < 0) return;
-
-    rect.x = ax;
-    rect.y = ay;
 
     bool hide = Cursor::Visible() ? true : false;
 
     if(hide) Cursor::Hide();
 
     background.Restore();
-    background.Save(rect);
+    background.Save(ax, ay);
 
-    display.Blit(*this, Point(ax, ay));
+    display.Blit(*this, ax, ay);
 
     if(hide) Cursor::Show();
 }
@@ -53,7 +45,7 @@ void SpriteCursor::Redraw(void)
 
     if(hide) Cursor::Hide();
 
-    display.Blit(*this, Point(rect.x, rect.y));
+    display.Blit(*this, background.GetPos());
 
     if(hide) Cursor::Show();
 }

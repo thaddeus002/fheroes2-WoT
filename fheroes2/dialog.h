@@ -22,6 +22,7 @@
 
 #include "gamedefs.h"
 #include "background.h"
+#include "rect.h"
 #include "game.h"
 
 #define	SHADOWWIDTH	16
@@ -48,7 +49,7 @@ namespace Dialog
     // buttons: OK : CANEL : OK|CANCEL : YES|NO
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons);
 
-class Box : public Background
+class Box
 {
 public:
     Box(u16 height, bool buttons = false);
@@ -57,6 +58,7 @@ public:
     const Rect & GetArea(void){ return area; };
 
 private:
+    Background back;
     Rect area;
 };
 

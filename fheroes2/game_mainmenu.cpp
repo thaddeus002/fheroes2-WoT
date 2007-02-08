@@ -33,6 +33,7 @@ Game::menu_t Game::MainMenu(void)
     // preload
     AGG::PreloadObject("HEROES.ICN");
     AGG::PreloadObject("BTNSHNGL.ICN");
+    AGG::PreloadObject("SHNGANIM.ICN");
 
     // cursor
     Cursor::Hide();

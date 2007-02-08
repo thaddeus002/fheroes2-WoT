@@ -152,49 +152,44 @@ void Radar::GenerateFrom(const Surface &surface)
     delete [] p_src;
 }
 
-/* cursor radar constructor */
-RadarCursor::RadarCursor(const Radar &radar) :
-    Rect(radar.GetRect().x,
-         radar.GetRect().y,
-         static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(MapsData::w()))),
-	 static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(MapsData::h())))),
-    SpriteCursor(static_cast<Rect>(*this))
+/* draw radar cursor */
+void Radar::DrawCursor(Surface &surface)
 {
-    Fill(AGG::GetColorKey());
-    SetColorKey(AGG::GetColorKey());
+    surface.Fill(AGG::GetColorKey());
+    surface.SetColorKey(AGG::GetColorKey());
 
-    u16 width  = static_cast<Rect>(*this).w;
-    u16 height = static_cast<Rect>(*this).h;
+    u16 width  = surface.w();
+    u16 height = surface.h();
 
     // draw cursor
     u32 color = AGG::GetColor(RADARCOLOR);
-    Lock();
+    surface.Lock();
     for(u8 i = 0; i < width; ++i){
-	SetPixel2(i, 0, color);
-	if(i + 1 < width) SetPixel2(i + 1, 0, color);
+	surface.SetPixel2(i, 0, color);
+	if(i + 1 < width) surface.SetPixel2(i + 1, 0, color);
         i += 3;
     }
     for(u8 i = 0; i < width; ++i){
-	SetPixel2(i, height - 1, color);
-	if(i + 1 < width) SetPixel2(i + 1, height - 1, color);
+	surface.SetPixel2(i, height - 1, color);
+	if(i + 1 < width) surface.SetPixel2(i + 1, height - 1, color);
         i += 3;
     }
     for(u8 i = 0; i < height; ++i){
-	SetPixel2(0, i, color);
-	if(i + 1 < height) SetPixel2(0, i + 1, color);
+	surface.SetPixel2(0, i, color);
+	if(i + 1 < height) surface.SetPixel2(0, i + 1, color);
         i += 3;
     }
     for(u8 i = 0; i < height; ++i){
-	SetPixel2(width - 1, i, color);
-	if(i + 1 < height) SetPixel2(width - 1, i + 1, color);
+	surface.SetPixel2(width - 1, i, color);
+	if(i + 1 < height) surface.SetPixel2(width - 1, i + 1, color);
         i += 3;
     }
-    Unlock();
-    SetDisplayFormat();
+    surface.Unlock();
+    surface.SetDisplayFormat();
 }
 
-/* redraw radar cursor */
-void RadarCursor::Redraw(void)
+void Radar::MoveCursor(SpriteCursor &cursor)
 {
-    Move(static_cast<Rect>(*this).x + GameArea::GetRect().x * RADARWIDTH / MapsData::w(), static_cast<Rect>(*this).y + GameArea::GetRect().y * RADARWIDTH / MapsData::h());
+    cursor.Move(pos.x + GameArea::GetRect().x * RADARWIDTH / MapsData::w(),
+                pos.y + GameArea::GetRect().y * RADARWIDTH / MapsData::h());
 }

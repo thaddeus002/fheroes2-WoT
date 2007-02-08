@@ -24,18 +24,23 @@
 #include "display.h"
 #include "surface.h"
 
-class Background : private Surface
+class Background : public Surface
 {
 public:
-    Background(const Rect &rback = Rect()) : Surface(), back(rback){};
+    Background(const Rect &rt = Rect()) : Surface(), pos(rt){};
+    Background(const Point &pt, u16 w, u16 h) : Surface(), pos(pt, w, h){};
 
-    void Save(const Rect &rback){ back = rback; Save(); };
     void Save(void);
-    void Restore(void){ display.Blit(*this, back.x, back.y); };
-    const Rect & GetRect(void) const{ return back; };
+    void Save(s16 ax, s16 ay){ pos.x = ax; pos.y = ay; Save(); };
+    void Save(const Point &pt){ pos = pt; Save(); };
+    void Save(const Rect &rt){ pos = rt; Save(); };
+
+    void Restore(void){ display.Blit(*this, pos); };
+    const Point & GetPos(void) const{ return pos; };
+    const Rect & GetRect(void) const{ return pos; };
 
 private:
-    Rect back;
+    Rect pos;
 };
 
 #endif

@@ -34,20 +34,13 @@ public:
     const Rect & GetRect(void) const{ return pos; }
     
     void Redraw(void);
+    void DrawCursor(Surface &surface);
+    void MoveCursor(SpriteCursor &cursor);
 
 private:
     void GenerateFrom(const Surface &surface);
     const MapsData & maps;
     Rect pos;
-};
-
-class RadarCursor : private Rect, SpriteCursor
-{
-public:
-    RadarCursor(const Radar &radar);
-
-    void Redraw(void);
-
 };
 
 #endif
