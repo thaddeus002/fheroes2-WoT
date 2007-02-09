@@ -24,32 +24,20 @@
 #include "gamedefs.h"
 #include "surface.h"
 #include "rect.h"
+#include "maps_tiles.h"
 #include "mp2.h"
-
-#define TILEWIDTH     32
-#define TILEWIDTH    32
-
-/* class Tiles */
-class MapsTiles : public Point
-{
-public:
-    MapsTiles(Point pt, MP2::tile_t tile) : Point(x, y) {};
-    u16 GetGrounds(void) const{ return ground; };
-
-private:
-    u16 ground;
-};
 
 /* class Data */
 class MapsData
 {
 public:
     MapsData(const std::string &filename);
+    ~MapsData(){ delete tiles; };
 
     static u16 w(void){ return width; }
     static u16 h(void){ return height; }
 
-    const Surface & GetSurface(void) const{ return tiles; }
+    const Surface & GetSurface(void) const{ return *tiles; }
 
     const MapsTiles & GetTiles(u16 index) const{ return vec_tiles.size() > index ? vec_tiles[index] : vec_tiles.back(); }
     const MapsTiles & GetTiles(u32 ax, u32 ay) const{ return vec_tiles.size() > ax * ay ? vec_tiles[ax * width + ay] : vec_tiles.back(); }
@@ -57,7 +45,7 @@ public:
     void Redraw(const Rect &rt, const Point &pt = Point(0, 0)) const;
 
 private:
-    Surface tiles;
+    Surface *tiles;
     std::vector<MapsTiles> vec_tiles;
 
     static u16 width;

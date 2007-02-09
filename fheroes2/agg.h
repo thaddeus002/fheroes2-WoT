@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include "sprite.h"
+#include "surface.h"
 #include "gamedefs.h"
 
 #define AGGSIZENAME     15
@@ -57,6 +58,7 @@ namespace AGG {
     void FreeObject(const std::string & name);
     void FreeObject(aggfat_t & fat);
 
+    const SDL_Color * GetPalette(void);
     void LoadPalette(void);
     u32 GetColor(u8 index);
     u32 GetShadowAlpha(void);
@@ -65,7 +67,7 @@ namespace AGG {
     void LoadICN(const std::string & name);
     void LoadTIL(const std::string & name);
 
-    Sprite * GetTIL(const std::string & name, u16 index, u8 shape);
+    void GetTIL(const std::string & name, u16 index, u8 shape, Surface &surface);
     const Sprite & GetICN(const std::string & name, u16 index);
     const Sprite & GetLetter(char ch, Font::type_t ft);
 

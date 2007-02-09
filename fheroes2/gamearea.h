@@ -21,6 +21,7 @@
 #define H2GAMEAREA_H
 
 #include "gamedefs.h"
+#include "maps.h"
 #include "mapsdata.h"
 #include "rect.h"
 

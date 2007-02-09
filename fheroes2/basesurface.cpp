@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "surface.h"
+#include "agg.h"
 #include "error.h"
 
 /* operator equals */
@@ -27,9 +28,9 @@ BaseSurface & BaseSurface::operator= (const BaseSurface & bs)
     if(! bs.valid()) Error::Except("BaseSurface(const BaseSurface &): empty surface");
 
     if(valid()) FreeSurface();
-
     surface = SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags());
 
+    if(!surface) Error::Except("BaseSurface(const BaseSurface &): " + std::string(SDL_GetError()));
     return *this;
 }
 
@@ -43,7 +44,16 @@ void BaseSurface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 
     surface = SDL_CreateRGBSurface(fl, sw, sh, dp, rmask, gmask, bmask, amask);
 
-    if(!surface) Error::Except(std::string(SDL_GetError()));
+    if(!surface) Error::Except("BaseSurface::CreateSurface: " + std::string(SDL_GetError()));
+}
+
+/* load  palette for 8bit surface */
+void BaseSurface::LoadPalette(const SDL_Color *colors)
+{
+    if(!colors) Error::Except("BaseSurface::LoadPalette: empty palette.");
+    if(!valid()) Error::Except("BaseSurface::LoadPalette: invalid surface.");
+
+    SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, const_cast<SDL_Color *>(colors), 0, AGGSIZEPALETTE);
 }
 
 /* format surface */
@@ -63,6 +73,16 @@ void BaseSurface::SetPixel2(u16 x, u16 y, u32 color)
     u16 *bufp = static_cast<u16 *>(surface->pixels) + y * surface->pitch / 2 + x;
 
     *bufp = static_cast<u16>(color);
+}
+
+/* draw u8 pixel */
+void BaseSurface::SetPixel1(u16 x, u16 y, u8 color)
+{
+    if(x > surface->w || y > surface->h) Error::Except("BaseSurface::SetPixel1: out of range");
+
+    u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x;
+
+    *bufp = color;
 }
 
 /* fill colors surface */

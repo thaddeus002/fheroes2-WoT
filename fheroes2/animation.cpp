@@ -29,8 +29,6 @@
 #define ANIMATION_MEDIUM	9
 #define ANIMATION_LOW		27
 
-#include "error.h"
-
 Animation::Animation(const std::string &icn, u16 index, u8 count, u8 amode) 
     : area(display.w(), display.h(), 0, 0), disable(false), reset(false), frame(0), ticket(0), mode(amode), sprites()
 {

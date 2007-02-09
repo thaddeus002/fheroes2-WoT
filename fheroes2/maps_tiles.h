@@ -17,21 +17,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2SURFACE_H
-#define H2SURFACE_H
+#ifndef H2MAPSTILES_H
+#define H2MAPSTILES_H
 
 #include "gamedefs.h"
-#include "basesurface.h"
+#include "rect.h"
+#include "mp2.h"
 
-class Surface : public BaseSurface
+typedef struct {
+    Point	area;
+    Point	center;
+    u16		ground;
+    u8		object;
+} mapstiles_t;
+
+/* class Tiles */
+class MapsTiles
 {
 public:
-    Surface() : BaseSurface(){};
-    Surface(u16 sw, u16 sh, bool alpha = false) : BaseSurface(sw, sh, alpha){};
-    Surface(u16 sw, u16 sh, u8 depth, u32 fl) : BaseSurface(sw, sh, depth, fl){};
-    Surface(const Surface & sf) : BaseSurface(sf){};
+    MapsTiles(const mapstiles_t & tl) : area(tl.area), center(tl.center), ground(tl.ground), object(tl.object) {};
 
-    ~Surface(){ FreeSurface(); };
+    u16 GetGrounds(void) const{ return ground; };
+    bool Move(void);
+
+private:
+    Point	area;
+    Point	center;
+    u16		ground;
+    u8		object;
 };
 
 #endif

@@ -20,7 +20,6 @@
 
 #include <vector>
 #include "agg.h"
-#include "maps.h"
 #include "config.h"
 #include "error.h"
 #include "sprite.h"
@@ -34,58 +33,6 @@ Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, u32 size, const u8 *data)
     SetColorKey(AGG::GetColorKey());
     SetDisplayFormat();
 };
-
-/* TIL Sprite constructor */
-Sprite::Sprite(u8 shape, const u8 *data)
-    : Surface(TILEWIDTH, TILEWIDTH, true), offsetX(0), offsetY(0)
-{
-    s16 x, y;
-
-    // lock surface
-    Lock();
-
-    switch(shape % 4){
-
-        // normal
-        case 0:
-            for(y = 0; y < TILEWIDTH; ++y)
-                for(x = 0; x < TILEWIDTH; ++x){
-		    SetPixel2(x, y, AGG::GetColor(*data));
-		    ++data;
-		}
-            break;
-
-        // vertical reflect
-        case 1:
-            for(y = TILEWIDTH - 1; y >= 0; --y)
-                for(x = 0; x < TILEWIDTH; ++x){
-		    SetPixel2(x, y, AGG::GetColor(*data));
-		    ++data;
-		}
-            break;
-
-        // horizontal reflect
-        case 2:
-            for(y = 0; y < TILEWIDTH; ++y)
-                for(x = TILEWIDTH - 1; x >= 0; --x){
-		    SetPixel2(x, y, AGG::GetColor(*data));
-		    ++data;
-		}
-            break;
-
-        // any variant
-        case 3:
-            for(y = TILEWIDTH - 1; y >= 0; --y)
-                for( x = TILEWIDTH - 1; x >= 0; --x){
-		    SetPixel2(x, y, AGG::GetColor(*data));
-		    ++data;
-		}
-            break;
-    }
-
-    // unlock surface
-    Unlock();
-}
 
 /* draw RLE ICN to surface */
 void Sprite::DrawICN(u32 size, const u8 *vdata)

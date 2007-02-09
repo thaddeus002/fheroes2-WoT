@@ -35,6 +35,7 @@ namespace AGG {
     static std::vector<u32>                     palette(AGGSIZEPALETTE);
     static u32 shadowAlpha = 0;
     static u32 colorKey = 0;
+    static SDL_Color *colors = NULL;
 };
 
 /* AGG init */
@@ -92,6 +93,9 @@ void AGG::Init(const std::string & aggname)
 	AGG::fat[key_name] = fat_element;
     }
 
+    // palette for 8 bit surface
+    colors = new SDL_Color[AGGSIZEPALETTE];
+
     // quit
     atexit(AGG::Quit);
 }
@@ -105,6 +109,8 @@ void AGG::Quit(void)
 
     AGG::fd->close();
     delete AGG::fd;
+
+    if(colors) delete [] colors;
 }
 
 /* preload object to map */
@@ -183,16 +189,69 @@ void AGG::LoadTIL(const std::string & name)
 }
 
 /* get TIL Sprite */
-Sprite * AGG::GetTIL(const std::string & name, u16 index, u8 shape)
+void AGG::GetTIL(const std::string & name, u16 index, u8 shape, Surface &surface)
 {
     // check object
     if(NULL == AGG::fat[name].ptrTIL) PreloadObject(name);
     if(NULL == AGG::fat[name].ptrTIL) Error::Except("AGG::GetTIL: " + name +", empty ptr");
 
     // skip
-    const char *vdata = AGG::fat[name].ptrTIL + TILEWIDTH * TILEWIDTH * index;
+    const u8 *vdata = reinterpret_cast<const u8 *>(AGG::fat[name].ptrTIL + TILEWIDTH * TILEWIDTH * index);
 
-    return new Sprite(shape, reinterpret_cast<const u8*>(vdata));
+    // valid surface
+    if(!surface.valid() || surface.w() != TILEWIDTH || surface.h() != TILEWIDTH){
+	surface = Surface(TILEWIDTH, 8, SDL_SWSURFACE);
+	surface.LoadPalette(AGG::GetPalette());
+    }
+
+    s16 x, y;
+    u8 *pdst;
+
+    // draw tiles
+    surface.Lock();
+    u8 *pixels = static_cast<u8 *>(const_cast<void *>(surface.pixels()));
+    switch(shape % 4){
+
+        // normal
+	case 0:
+	    surface.Lock();
+	    memcpy(const_cast<void *>(surface.pixels()), vdata, TILEWIDTH * TILEWIDTH);
+	    surface.Unlock();
+            break;
+
+        // vertical reflect
+        case 1:
+	{
+	    pdst = pixels + TILEWIDTH * (TILEWIDTH - 1);
+	    for(int i = 0; i < TILEWIDTH; i++){
+    		memcpy(pdst, vdata, TILEWIDTH);
+    		vdata += TILEWIDTH;
+    		pdst -= TILEWIDTH;
+	    }
+	}
+            break;
+
+        // horizontal reflect
+        case 2:
+            for(y = 0; y < TILEWIDTH; ++y)
+                for(x = TILEWIDTH - 1; x >= 0; --x){
+		    pdst = pixels + y * TILEWIDTH + x;
+		    *pdst = *vdata;
+                    ++vdata;
+                }
+            break;
+
+        // any variant
+        case 3:
+            for(y = TILEWIDTH - 1; y >= 0; --y)
+                for( x = TILEWIDTH - 1; x >= 0; --x){
+		    pdst = pixels + y * TILEWIDTH + x;
+		    *pdst = *vdata;
+                    ++vdata;
+                }
+            break;
+    }
+    surface.Unlock();
 }
 
 /* load ICN Sprite to map */
@@ -361,12 +420,20 @@ void AGG::LoadPalette(void)
 	r <<= 2;
 	g <<= 2;
 	b <<= 2;
+
+	colors[i].r = r;
+	colors[i].g = g;
+	colors[i].b = b;
+	
 	AGG::palette[i] = surface.MapRGB(r, g, b);
     }
 
     shadowAlpha = surface.MapRGB(0, 0, 0, DEFAULT_SHADOW_ALPHA);
     colorKey = surface.MapRGB(0xFF, 0x00, 0xFF);
 }
+
+/* return palette 8bit */
+const SDL_Color * AGG::GetPalette(void){ return colors; }
 
 /* return shadow alpha */
 u32 AGG::GetShadowAlpha(void){ return shadowAlpha; }

@@ -154,7 +154,6 @@ Game::menu_t Game::ScenarioInfo(void){
 	it = vc.begin();
 	while(it != vc.end()){
 	    if(le.MouseClickLeft((*it).rect) && (H2Config::GetAllowChangeRaces() & (*it).color)){
-		Error::Verbose("he he");
 		Cursor::Hide();
 		u8 index = 0;
 		switch(H2Config::GetKingdomRace((*it).color)){

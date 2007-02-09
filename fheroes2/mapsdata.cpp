@@ -26,8 +26,8 @@
 #include "agg.h"
 #include "game.h"
 #include "gamearea.h"
+#include "maps.h"
 #include "mp2.h"
-#include "error.h"
 #include "text.h"
 #include "mapsdata.h"
 
@@ -110,7 +110,8 @@ MapsData::MapsData(const std::string &filename)
 
     fd.close();
 
-    tiles = Surface(width * TILEWIDTH, height * TILEWIDTH);
+    tiles = new Surface(width * TILEWIDTH, height * TILEWIDTH, 8, SDL_SWSURFACE);
+    tiles->LoadPalette(AGG::GetPalette());
 
     // loading info
     display.Fill(0, 0, 0);
@@ -122,6 +123,7 @@ MapsData::MapsData(const std::string &filename)
     u32 ii = 0;
     u32 size = mp2tile.size();
 
+    mapstiles_t tl;
     while(ii < size){
 
         const MP2::tile_t cell = mp2tile[ii]; 
@@ -132,79 +134,52 @@ MapsData::MapsData(const std::string &filename)
 	pt.x *= TILEWIDTH;
 	pt.y *= TILEWIDTH;
 
-	const Sprite * tile = AGG::GetTIL("GROUND32.TIL", cell.tileIndex, cell.shape);
-	tiles.Blit(*tile, pt);
-	
-	delete tile;
+	Surface til(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE);
+	til.LoadPalette(AGG::GetPalette());
+	AGG::GetTIL("GROUND32.TIL", cell.tileIndex, cell.shape, til);
 
-	vec_tiles.push_back(MapsTiles(pt, mp2tile[ii]));
+	tiles->Blit(til, pt);
+
+	// static level 1
+
+	//mp2tile[ii]
+	tl.area		= Point();
+	tl.center	= Point();
+	tl.ground	= Maps::GetTypeGrounds(mp2tile[ii], mp2addons);
+	tl.object	= mp2tile[ii].generalObject;
+
+	vec_tiles.push_back(MapsTiles(tl));
 	++ii;
     }
 
     AGG::FreeObject("GROUND32.TIL");
 
-    tiles.SetDisplayFormat();
+    tiles->SetDisplayFormat();
 
     // save maps to big sprite
-    //if(H2Config::Debug() && tiles.SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
+    //if(H2Config::Debug() && tiles->SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
 }
 
 void MapsData::Redraw(const Rect &rt, const Point &pt) const
 {
-    if(pt.x >= GameArea::GetRect().w || pt.y >= GameArea::GetRect().h){ Error::Warning("MapsData::Redraw: out of range"); return; }
-    
+    if(pt.x < 0 || pt.y < 0 || pt.x >= GameArea::GetRect().w || pt.y >= GameArea::GetRect().h){ Error::Warning("MapsData::Redraw: out of range"); return; }
+
+    // static level 0
     Rect  srcrt(rt.x * TILEWIDTH, rt.y * TILEWIDTH, rt.w * TILEWIDTH, rt.h * TILEWIDTH);
     Point dstpt(BORDERWIDTH + pt.x * TILEWIDTH, BORDERWIDTH + pt.y * TILEWIDTH);
 
-    display.Blit(tiles, srcrt, dstpt);
+    display.Blit(*tiles, srcrt, dstpt);
+
+    // static level 1
+    
+    // dinamic object
+    
+    // animation level 1
+    
+    // heroes
+    
+    // static level 2
+
+    // animation level 2
+
 }
-
-/*
-u16 Maps::GetTypeGround(MP2::tile_t info){
-    u16 index = info.tileIndex;
-
-    // сканируем дорогу ROAD
-    if(0x7A == info.objectName1) return Maps::ROAD;
-
-    u16 indexAddon = info->indexAddon;
-    MP2ADDONTAIL        *ptrAddon = NULL;
-
-    while(indexAddon){
-
-        ptrAddon = GetADDONTAIL(indexAddon);
-
-        if(0x7A == ptrAddon->objectNameN1 * 2) return Maps::ROAD;
-
-        indexAddon = ptrAddon->indexAddon;
-    }
-
-
-    // список поверхностей по индексу из GROUND32.TIL
-    if(30 > index)
-        return Maps::WATER;
-
-    else if(92 > index)
-        return Maps::GRASS;
-
-    else if(146 > index)
-        return Maps::SNOW;
-
-    else if(208 > index)
-        return Maps::SWAMP;
-
-    else if(262 > index)
-        return Maps::LAVA;
-
-    else if(321 > index)
-        return Maps::DESERT;
-
-    else if(361 > index)
-        return Maps::DIRT;
-
-    else if(415 > index)
-        return Maps::WASTELAND;
-
-    //else if(432 > index)
-    return Maps::BEACH;
-}
-*/

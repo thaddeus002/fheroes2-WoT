@@ -21,7 +21,6 @@
 #define H2EVENT_H
 
 #include "gamedefs.h"
-#include "error.h"
 
 #define BUTTON_LEFT	0x01
 #define BUTTON_MIDDLE	0x02
@@ -86,8 +85,6 @@ private:
     bool HandleMouseButtonEvent(u8 button, u16 x, u16 y, bool pressed);
 
     bool HandleKeyboardEvent(SDL_keysym & keysym, bool pressed);
-
-    bool HandleQuitEvent(){ Error::Except(" quit event: ok."); return true; };
 
     static bool keep_going;
     static SDLKey key_value;
