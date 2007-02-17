@@ -36,6 +36,7 @@
 #include "dialog.h"
 #include "text.h"
 #include "tools.h"
+#include "splitter.h"
 #include "game.h"
 
 #define LISTMAXITEM	9
@@ -391,6 +392,10 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
     // area list
     Rect rectAreaList(Rect(170, 60, 270, 175));
+    
+    // Splitter
+    Splitter split(AGG::GetICN("ESCROLL.ICN", 3), Rect(460, 78, 8, 141), Splitter::VERTICAL);
+    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 
     // button
     Button buttonOk(270, 415, "REQUESTS.ICN", 1, 2);
@@ -438,6 +443,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
+	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    display.Flip();
 	    Cursor::Show();
 	}
@@ -452,6 +458,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
+	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    display.Flip();
 	    Cursor::Show();
 	}
@@ -466,6 +473,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
+	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    display.Flip();
 	    Cursor::Show();
 	}
@@ -480,6 +488,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
+	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    display.Flip();
 	    Cursor::Show();
 	}
@@ -494,6 +503,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
+	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    display.Flip();
 	    Cursor::Show();
 	}
@@ -505,6 +515,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundInfo.Restore();
 	    it_current = it_list_head + num;
 	    Scenario::DrawSelectInfo(it_current);
+	    //split.Move(??);
 	    display.Flip();
 	    Cursor::Show();
 	}
@@ -515,6 +526,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Cursor::Hide();
 	    backgroundList.Restore();
 	    Scenario::DrawList(--it_list_head);
+	    split.Backward();
 	    display.Flip();
 	    Cursor::Show();
 	}
@@ -525,9 +537,20 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Cursor::Hide();
 	    backgroundList.Restore();
 	    Scenario::DrawList(++it_list_head);
+	    split.Forward();
 	    display.Flip();
 	    Cursor::Show();
 	}
+
+	// click splitter area
+	if(le.MouseClickLeft(split.GetRect())){
+	    Error::Verbose("click on splitter");
+	}
+
+	// move on splitter
+	if(le.MousePressLeft(split.GetRect()) && le.MouseCursor(split.GetRect())){
+	    Error::Verbose("move on splitter");
+ 	}
 
 	// click ok
 	if(le.MouseClickLeft(buttonOk)) break;

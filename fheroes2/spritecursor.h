@@ -26,7 +26,7 @@
 #include "background.h"
 #include "gamedefs.h"
 
-class SpriteCursor : private Surface
+class SpriteCursor : protected Surface
 {
 public:
     /* sprite cursor */
@@ -36,6 +36,7 @@ public:
     void Move(const Point &pt){ Move(pt.x, pt.y); };
 
     void Redraw(void);
+    const Point & GetPos(void) const{ return background.GetRect(); };
     const Rect & GetRect(void) const{ return background.GetRect(); };
 
 private:

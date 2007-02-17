@@ -17,45 +17,74 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEDEFS_H
-#define H2GAMEDEFS_H
 
-#include "SDL.h"
+#include "splitter.h"
 
-typedef char		s8;
-typedef unsigned char	u8;
-typedef short		s16;
-typedef unsigned short	u16;
-typedef int		s32;
-typedef unsigned int	u32;
-
-namespace Font
+/* splitter constructor */
+Splitter::Splitter(const Surface &sf, const Rect &rt, positions_t pos)
+    : SpriteCursor(sf, rt), area(rt), step(0), min(0), max(0), cur(0), position(pos)
 {
-    typedef enum { SMALL, BIG } type_t;
-};
+}
 
-#define GAME_VERSION		20070219	// Version
+/* set range */
+void Splitter::SetRange(u16 smin, u16 smax)
+{
+    min = smin;
+    max = smax;
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    // recalculate step
+    if(max) step = (Splitter::VERTICAL == position ? 100 * (area.h - h()) / max : 100 * (area.w - w()) / max);
+    
+    Move(min);
+}
 
-#define RMASK 0x0000f000
-#define GMASK 0x00000f00
-#define BMASK 0x000000f0
-#define AMASK 0x0000000f
+/* move splitter to pos */
+void Splitter::Move(u16 pos)
+{
+    if(cur == pos) return;
 
-#define SWAP16(X)    SDL_Swap16(X)
-#define SWAP32(X)    SDL_Swap32(X)
+    Point pt(GetPos());
 
-#else
+    cur = pos;
 
-#define RMASK 0x0000000f
-#define GMASK 0x000000f0
-#define BMASK 0x00000f00
-#define AMASK 0x0000f000
+    if(Splitter::VERTICAL == position)
+        pt.y = area.y + cur * step / 100;
+    else
+        pt.x = area.x + cur * step / 100;
 
-#define SWAP16(X)    (X)
-#define SWAP32(X)    (X)
+    SpriteCursor::Move(pt);
+}
 
-#endif
+/* forward spliter */
+void Splitter::Forward(void)
+{
+    if(cur == max) return;
 
-#endif
+    Point pt(GetPos());
+
+    ++cur;
+
+    if(Splitter::VERTICAL == position)
+        pt.y = area.y + cur * step / 100;
+    else
+        pt.x = area.x + cur * step / 100;
+
+    SpriteCursor::Move(pt);
+}
+
+/* backward spliter */
+void Splitter::Backward(void)
+{
+    if(! cur) return;
+
+    Point pt(GetPos());
+
+    --cur;
+		    
+    if(Splitter::VERTICAL == position)
+	pt.y = area.y + cur * step / 100;
+    else
+        pt.x = area.x + cur * step / 100;
+
+    SpriteCursor::Move(pt);
+}

@@ -17,45 +17,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEDEFS_H
-#define H2GAMEDEFS_H
+#ifndef H2SPLITTER_H
+#define H2SPLITTER_H
 
-#include "SDL.h"
+#include "rect.h"
+#include "spritecursor.h"
+#include "surface.h"
+#include "gamedefs.h"
 
-typedef char		s8;
-typedef unsigned char	u8;
-typedef short		s16;
-typedef unsigned short	u16;
-typedef int		s32;
-typedef unsigned int	u32;
-
-namespace Font
+class Splitter : private SpriteCursor
 {
-    typedef enum { SMALL, BIG } type_t;
+public:
+    typedef enum { HORIZONTAL, VERTICAL } positions_t;
+
+    Splitter(const Surface &sf, const Rect &rt, positions_t pos);
+
+    void Forward(void);
+    void Backward(void);
+    void Move(u16 pos);
+
+    void SetRange(u16 smin, u16 smax);
+
+    u16 GetCurrent(void) const{ return cur; };
+    const Rect & GetRect(void) const{ return area; };
+
+private:
+    const Rect area;
+    u16 step;
+    u16 min;
+    u16 max;
+    u16 cur;
+    positions_t position;
 };
-
-#define GAME_VERSION		20070219	// Version
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-
-#define RMASK 0x0000f000
-#define GMASK 0x00000f00
-#define BMASK 0x000000f0
-#define AMASK 0x0000000f
-
-#define SWAP16(X)    SDL_Swap16(X)
-#define SWAP32(X)    SDL_Swap32(X)
-
-#else
-
-#define RMASK 0x0000000f
-#define GMASK 0x000000f0
-#define BMASK 0x00000f00
-#define AMASK 0x0000f000
-
-#define SWAP16(X)    (X)
-#define SWAP32(X)    (X)
-
-#endif
 
 #endif
