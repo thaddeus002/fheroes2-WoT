@@ -25,18 +25,6 @@
 
 #define DEFAULT_DEPTH           16              // Surface use bits color
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-#define RMASK 0x0000f000
-#define GMASK 0x00000f00
-#define BMASK 0x000000f0
-#define AMASK 0x0000000f
-#else
-#define RMASK 0x0000000f
-#define GMASK 0x000000f0
-#define BMASK 0x00000f00
-#define AMASK 0x0000f000
-#endif
-
 class BaseSurface
 {
 public:
@@ -69,6 +57,7 @@ public:
 
     void LoadPalette(const SDL_Color *colors);
     void SetDisplayFormat(void);
+    void SetColorKey(void);
     void SetColorKey(u32 color){ SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, color); };
     void SetPixel2(u16 x, u16 y, u32 color);
     void SetPixel1(u16 x, u16 y, u8 color);

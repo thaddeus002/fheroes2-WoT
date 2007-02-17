@@ -24,6 +24,7 @@
 #include <sstream>
 #include "kingdom.h"
 #include "maps.h"
+#include "mp2.h"
 
 namespace String
 {
@@ -33,9 +34,14 @@ namespace String
     void Upper(std::string &str);
     void AddInt(std::string &str, int value);
 
-    const std::string & Difficulty(Maps::difficulty_t difficulty);
-    const std::string & Color(Kingdom::color_t color);
-    const std::string & Race(Kingdom::race_t race);
+};
+
+namespace CStr
+{
+    const char * Color(Kingdom::color_t color);
+    const char * Difficulty(Maps::difficulty_t difficulty);
+    const char * Race(Kingdom::race_t race);
+    const char * Object(MP2::object_t object);
 };
 
 #endif

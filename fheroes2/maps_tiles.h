@@ -20,22 +20,26 @@
 #ifndef H2MAPSTILES_H
 #define H2MAPSTILES_H
 
+#include <vector>
 #include "gamedefs.h"
 #include "rect.h"
 #include "mp2.h"
+#include "sprite.h"
 
 typedef struct {
-    Point	area;
-    Point	center;
+    Point	coord;
+    //Point	center;
     u16		ground;
     u8		object;
+    std::vector<const Sprite *> *level1;
+    std::vector<const Sprite *> *level2;
 } mapstiles_t;
 
 /* class Tiles */
 class MapsTiles
 {
 public:
-    MapsTiles(const mapstiles_t & tl) : area(tl.area), center(tl.center), ground(tl.ground), object(tl.object) {};
+    MapsTiles(){};
 
     u16 GetGrounds(void) const{ return ground; };
     bool Move(void);

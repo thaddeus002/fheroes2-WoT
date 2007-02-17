@@ -20,9 +20,12 @@
 #ifndef H2MP2_H
 #define H2MP2_H
 
+#include <vector>
 #include "gamedefs.h"
 
 #define MP2OFFSETDATA	428
+#define SIZEOFMP2TILE	20
+#define SIZEOFMP2ADDON	15
 
 namespace MP2
 {
@@ -40,8 +43,9 @@ namespace MP2
 	u16  indexAddon;	// zero or index addons_t
 	u32  uniqNumber1;	// level 1.0
 	u32  uniqNumber2;	// level 2.0
-    } tile_t;
+    } mp2tile_t;
 
+    // origin mp2
     typedef struct {
 	u16      indexAddon;	// zero or next addons_t
 	u8       objectNameN1;	// level 1.N
@@ -51,7 +55,23 @@ namespace MP2
 	u8       indexNameN2;	// level 1.N or 0xFF
 	u32      uniqNumberN1;	// level 1.N
 	u32      uniqNumberN2;	// level 2.N
-    } addons_t;
+    } mp2addon_t;
+
+    typedef struct {
+        u8      object1;
+        u8      index1;
+        u8      quantity1;
+        u8      object2;
+        u8      index2;
+    } addon_t;
+
+    typedef struct {
+        u16     tile;
+        std::vector<addon_t> addons;
+        u8      quantity2;
+        u8      shape;
+        u8      general;
+    } tile_t;
 
     typedef enum {
 	OBJ_ZERO		= 0x00,
@@ -219,6 +239,10 @@ namespace MP2
 
     } object_t;
 
+    const char *GetICNObject(u8 type);
+    bool StaticObject(u8 type, u8 index);
+    //u16 GetTypeGrounds(const MP2::tile_t &info);
+    bool VectorAddonSort(const MP2::addon_t & lhs, const MP2::addon_t & rhs);
 };
 
 #endif

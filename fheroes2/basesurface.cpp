@@ -85,6 +85,13 @@ void BaseSurface::SetPixel1(u16 x, u16 y, u8 color)
     *bufp = color;
 }
 
+/* set color key */
+void BaseSurface::SetColorKey(void)
+{
+    Fill(AGG::GetColorKey());
+    SetColorKey(AGG::GetColorKey());
+}
+
 /* fill colors surface */
 void BaseSurface::Fill(u32 color)
 {

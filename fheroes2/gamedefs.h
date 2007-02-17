@@ -34,11 +34,28 @@ namespace Font
     typedef enum { SMALL, BIG } type_t;
 };
 
-// PUBLIC
-#define GAME_VERSION		20070208	// Version
+#define GAME_VERSION		20070212	// Version
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
-// PRIVATE
-#define	DEFAULT_SHADOW_ALPHA	0x40		// shadow alpha
+#define RMASK 0x0000f000
+#define GMASK 0x00000f00
+#define BMASK 0x000000f0
+#define AMASK 0x0000000f
+
+#define SWAP16(X)    SDL_Swap16(X)
+#define SWAP32(X)    SDL_Swap32(X)
+
+#else
+
+#define RMASK 0x0000000f
+#define GMASK 0x000000f0
+#define BMASK 0x00000f00
+#define AMASK 0x0000f000
+
+#define SWAP16(X)    (X)
+#define SWAP32(X)    (X)
+
+#endif
 
 #endif

@@ -45,8 +45,9 @@ namespace Dialog
     } answer_t;
 
     Game::menu_t Menu(void);
+    Game::menu_t Info(void);
 
-    // buttons: OK : CANEL : OK|CANCEL : YES|NO
+    // buttons: OK : CANCEL : OK|CANCEL : YES|NO
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons);
 
 class Box

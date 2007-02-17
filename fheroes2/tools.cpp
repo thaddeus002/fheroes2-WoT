@@ -77,92 +77,73 @@ void String::AddInt(std::string &str, int value)
     str += stream.str();
 }
 
-const std::string & String::Difficulty(Maps::difficulty_t difficulty)
+const char * CStr::Difficulty(Maps::difficulty_t difficulty)
 {
-    static std::string easy("Easy");
-    static std::string normal("Normal");
-    static std::string hard("Hard");
-    static std::string expert("Expert");
-    static std::string impossible("Impossible");
-
     switch(difficulty){
-        default:
-	    break;
+        case Maps::EASY:
+	    return "Easy";
         case Maps::NORMAL:
-	    return normal;
+	    return "Normal";
         case Maps::HARD:
-	    return hard;
+	    return "Hard";
         case Maps::EXPERT:
-	    return expert;
+	    return "Expert";
         case Maps::IMPOSSIBLE:
-	    return impossible;
+	    return "Impossible";
     }
     
-    return easy;
+    return "";
 }
 
-const std::string & String::Color(Kingdom::color_t color)
+const char * CStr::Color(Kingdom::color_t color)
 {
-    static std::string blue("Blue");
-    static std::string green("Green");
-    static std::string red("Red");
-    static std::string yellow("Yellow");
-    static std::string orange("Orange");
-    static std::string purple("Purple");
-    static std::string gray("Gray");
-
     switch(color){
         case Kingdom::BLUE:
-	    return blue;
+	    return "Blue";
         case Kingdom::GREEN:
-	    return green;
+	    return "Green";
         case Kingdom::RED:
-	    return red;
+	    return "Red";
         case Kingdom::YELLOW:
-	    return yellow;
+	    return "Yellow";
         case Kingdom::ORANGE:
-	    return orange;
+	    return "Orange";
         case Kingdom::PURPLE:
-	    return purple;
+	    return "Purple";
         default:
 	    break;
     }
 
-    return gray;
+    return "Gray";
 }
 
-const std::string & String::Race(Kingdom::race_t race)
+const char * CStr::Race(Kingdom::race_t race)
 {
-    static std::string kngt("Knight");
-    static std::string barb("Barbarian");
-    static std::string sorc("Sorceress");
-    static std::string wrlk("Warlock");
-    static std::string wzrd("Wizard");
-    static std::string necr("Necromancer");
-    static std::string mult("Multi");
-    static std::string rand("Randomize");
-    static std::string bomg("Bomg");
-    
     switch(race){
         case Kingdom::KNGT:
-	    return kngt;
+	    return "Knight";
         case Kingdom::BARB:
-	    return barb;
+	    return "Barbarian";
         case Kingdom::SORC:
-	    return sorc;
+	    return "Sorceress";
         case Kingdom::WRLK:
-	    return wrlk;
+	    return "Warlock";
         case Kingdom::WZRD:
-	    return wzrd;
+	    return "Wizard";
         case Kingdom::NECR:
-	    return necr;
+	    return "Necromancer";
         case Kingdom::MULT:
-	    return mult;
+	    return "Multi";
         case Kingdom::RAND:
-	    return rand;
+	    return "Randomize";
 	default:
 	    break;
     }
     
-    return bomg;
+    return "Bomg";
+}
+
+const char * CStr::Object(MP2::object_t object)
+{
+    return "ASDASDAS";
 }

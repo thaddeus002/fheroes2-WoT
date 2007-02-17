@@ -26,8 +26,9 @@
 #include "surface.h"
 #include "gamedefs.h"
 
-#define AGGSIZENAME     15
-#define AGGSIZEPALETTE	256
+#define AGGSIZENAME     	15
+#define AGGSIZEPALETTE		256
+#define DEFAULT_SHADOW_ALPHA    0x40            // shadow alpha 
 
 namespace AGG {
 

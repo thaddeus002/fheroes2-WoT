@@ -255,7 +255,14 @@ Game::menu_t Game::StartGame(void){
 	    }
 	}
 
-        // show dialog menu
+        // show dialog info
+	if(le.MouseClickLeft(buttonInfo))
+	{
+	    //Game::menu_t result = 
+	    Dialog::Info();
+        }
+
+	// show dialog menu
 	if(le.MouseClickLeft(buttonMenu))
 	{
 	    Game::menu_t result = Dialog::Menu();

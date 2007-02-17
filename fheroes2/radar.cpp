@@ -32,7 +32,7 @@
 Radar::Radar(s16 rx, s16 ry, const MapsData &mp) :
     Surface(RADARWIDTH, RADARWIDTH), maps(mp), pos(rx, ry, RADARWIDTH, RADARWIDTH)
 {
-    GenerateFrom(maps.GetSurface());
+    GenerateFrom(maps.GetTilesSurface());
 }
 
 /* redraw radar */
@@ -155,8 +155,7 @@ void Radar::GenerateFrom(const Surface &surface)
 /* draw radar cursor */
 void Radar::DrawCursor(Surface &surface)
 {
-    surface.Fill(AGG::GetColorKey());
-    surface.SetColorKey(AGG::GetColorKey());
+    surface.SetColorKey();
 
     u16 width  = surface.w();
     u16 height = surface.h();

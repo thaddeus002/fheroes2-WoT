@@ -18,10 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
-#include "error.h"
-#include "mp2.h"
-#include "maps.h"
 #include "maps_tiles.h"
 
 /* move on tile */
@@ -49,49 +45,4 @@ bool MapsTiles::Move(void)
         }
 
     return true;
-}
-
-u16 Maps::GetTypeGrounds(const MP2::tile_t &info, const std::vector<MP2::addons_t> &addon)
-{
-    u16 index = info.tileIndex;
-
-    // сканируем дорогу ROAD
-    if(0x7A == info.objectName1) return Maps::ROAD;
-
-    u16 indexAddon = info.indexAddon;
-
-    while(indexAddon){
-
-        if(0x7A == addon[indexAddon].objectNameN1 * 2) return Maps::ROAD;
-
-        indexAddon = addon[indexAddon].indexAddon;
-    }
-
-    // list grouns from GROUND32.TIL
-    if(30 > index)
-        return Maps::WATER;
-
-    else if(92 > index)
-        return Maps::GRASS;
-
-    else if(146 > index)
-        return Maps::SNOW;
-
-    else if(208 > index)
-        return Maps::SWAMP;
-
-    else if(262 > index)
-        return Maps::LAVA;
-
-    else if(321 > index)
-        return Maps::DESERT;
-
-    else if(361 > index)
-        return Maps::DIRT;
-
-    else if(415 > index)
-        return Maps::WASTELAND;
-
-    //else if(432 > index)
-    return Maps::BEACH;
 }

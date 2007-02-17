@@ -20,9 +20,7 @@
 #ifndef H2MAPS_H
 #define H2MAPS_H
 
-#include <vector>
 #include "gamedefs.h"
-#include "mp2.h"
 
 #define TILEWIDTH 32
 
@@ -59,8 +57,6 @@ namespace Maps
 
     difficulty_t& operator++ (difficulty_t& difficulty);
     difficulty_t& operator-- (difficulty_t& difficulty);
-
-    u16 GetTypeGrounds(const MP2::tile_t &info, const std::vector<MP2::addons_t> &addon);
 };
 
 #endif

@@ -60,7 +60,7 @@ public:
     inline bool operator== (const Rect & rt) const{ return (x == rt.x && y == rt.y && w == rt.w && h == rt.h); };
     inline bool operator!= (const Rect & rt) const{ return !(*this == rt); };
     // rect include point
-    inline bool operator& (const Point & pt) const{ return !(pt.x < x || pt.y < y || pt.x > (x + w) || pt.y > (y + h)); };
+    inline bool operator& (const Point & pt) const{ return !(pt.x < x || pt.y < y || pt.x >= (x + w) || pt.y >= (y + h)); };
 };
 
 #endif

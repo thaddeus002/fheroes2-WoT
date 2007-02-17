@@ -32,21 +32,23 @@ class MapsData
 {
 public:
     MapsData(const std::string &filename);
-    ~MapsData(){ delete tiles; };
+    ~MapsData();
 
-    static u16 w(void){ return width; }
-    static u16 h(void){ return height; }
+    static u16 w(void){ return width; };
+    static u16 h(void){ return height; };
 
-    const Surface & GetSurface(void) const{ return *tiles; }
+    const Surface & GetTilesSurface(void) const{ return *tiles; };
 
-    const MapsTiles & GetTiles(u16 index) const{ return vec_tiles.size() > index ? vec_tiles[index] : vec_tiles.back(); }
-    const MapsTiles & GetTiles(u32 ax, u32 ay) const{ return vec_tiles.size() > ax * ay ? vec_tiles[ax * width + ay] : vec_tiles.back(); }
+    const mapstiles_t & GetTiles(u16 index) const{ return vec_mapstiles.size() > index ? vec_mapstiles[index] : vec_mapstiles.back(); };
+    const mapstiles_t & GetTiles(u32 ax, u32 ay) const{ return vec_mapstiles.size() > ax * ay ? vec_mapstiles[ax * width + ay] : vec_mapstiles.back(); };
 
     void Redraw(const Rect &rt, const Point &pt = Point(0, 0)) const;
 
 private:
+    typedef struct { Point coord; Surface *sprite; } levelsprite_t;
+
     Surface *tiles;
-    std::vector<MapsTiles> vec_tiles;
+    std::vector<mapstiles_t> vec_mapstiles;
 
     static u16 width;
     static u16 height;

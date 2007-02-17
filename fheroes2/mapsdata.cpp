@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
 #include <fstream>
 #include <vector>
 #include "error.h"
@@ -39,117 +38,183 @@ MapsData::MapsData(const std::string &filename)
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
-    AGG::PreloadObject("GROUND32.TIL");
-
-    u32 w, h;
-    // offset data
-    fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
-    // width
-    fd.read(reinterpret_cast<char *>(&w), sizeof(u32));
-    // height
-    fd.read(reinterpret_cast<char *>(&h), sizeof(u32));
-
-    width = w;
-    height = h;
-
-    char byte8;
-    std::vector<MP2::tile_t> mp2tile;
-    MP2::tile_t tile;
-
-    for(u16 ii = 0; ii < width * height; ++ii){
-
-	fd.read(reinterpret_cast<char *>(&tile.tileIndex), sizeof(u16));
-	fd.read(&byte8, 1);
-	tile.objectName1 = byte8;
-	fd.read(&byte8, 1);
-	tile.indexName1 = byte8;
-	fd.read(&byte8, 1);
-	tile.quantity1 = byte8;
-	fd.read(&byte8, 1);
-	tile.quantity2 = byte8;
-	fd.read(&byte8, 1);
-	tile.objectName2 = byte8;
-	fd.read(&byte8, 1);
-	tile.indexName2 = byte8;
-	fd.read(&byte8, 1);
-	tile.shape = byte8;
-	fd.read(&byte8, 1);
-	tile.generalObject = byte8;
-	fd.read(reinterpret_cast<char *>(&tile.indexAddon), sizeof(u16));
-	fd.read(reinterpret_cast<char *>(&tile.uniqNumber1), sizeof(u32));
-	fd.read(reinterpret_cast<char *>(&tile.uniqNumber2), sizeof(u32));
-
-	mp2tile.push_back(tile);
-    }
-
-    u32 countAddons;
-    std::vector<MP2::addons_t> mp2addons;
-    MP2::addons_t addons;
-
-    // count addons_t
-    fd.read(reinterpret_cast<char *>(&countAddons), sizeof(u32));
-
-    for(unsigned int ii = 0; ii < countAddons; ++ii){
-
-	fd.read(reinterpret_cast<char *>(&addons.indexAddon), sizeof(u16));
-	fd.read(&byte8, 1);
-	addons.objectNameN1 = byte8;
-	fd.read(&byte8, 1);
-	addons.indexNameN1 = byte8;
-	fd.read(&byte8, 1);
-	addons.quantityN = byte8;
-	fd.read(&byte8, 1);
-	addons.objectNameN2 = byte8;
-	fd.read(&byte8, 1);
-	addons.indexNameN2 = byte8;
-	fd.read(reinterpret_cast<char *>(&addons.uniqNumberN1), sizeof(u32));
-	fd.read(reinterpret_cast<char *>(&addons.uniqNumberN2), sizeof(u32));
-
-	mp2addons.push_back(addons);
-    }
-
-    fd.close();
-
-    tiles = new Surface(width * TILEWIDTH, height * TILEWIDTH, 8, SDL_SWSURFACE);
-    tiles->LoadPalette(AGG::GetPalette());
 
     // loading info
     display.Fill(0, 0, 0);
     TextBox(Rect(0, display.h()/2, display.w(), display.h()/2), "Maps Loading...", Font::BIG, true);
     display.Flip();
 
+    AGG::PreloadObject("GROUND32.TIL");
+
+    char byte8;
+    u16  byte16;
+    u32  byte32;
+    
+    // offset data
+    fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
+
+    // width
+    fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
+    width = byte32;
+
+    // height
+    fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
+    height = byte32;
+
+    // seek to ADDONS block
+    fd.ignore(width * height * SIZEOFMP2TILE);
+
+    // count mp2addon_t
+    fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
+
+    // read all addons
+    std::vector<MP2::mp2addon_t> vec_mp2addons;
+
+    for(unsigned int ii = 0; ii < byte32; ++ii){
+
+	MP2::mp2addon_t mp2addon;
+
+	fd.read(reinterpret_cast<char *>(&mp2addon.indexAddon), sizeof(u16));
+	fd.read(&byte8, 1);
+	mp2addon.objectNameN1 = byte8;
+	fd.read(&byte8, 1);
+	mp2addon.indexNameN1 = byte8;
+	fd.read(&byte8, 1);
+	mp2addon.quantityN = byte8;
+	fd.read(&byte8, 1);
+	mp2addon.objectNameN2 = byte8;
+	fd.read(&byte8, 1);
+	mp2addon.indexNameN2 = byte8;
+	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN1), sizeof(u32));
+	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN2), sizeof(u32));
+
+	vec_mp2addons.push_back(mp2addon);
+    }
+
+    // offset data
+    fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
+
+    // read all tiles
+    std::vector<MP2::tile_t> vec_tiles;
+
+    for(u16 ii = 0; ii < width * height; ++ii){
+
+	MP2::tile_t stile;
+	MP2::addon_t saddon;
+
+	fd.read(reinterpret_cast<char *>(&stile.tile), sizeof(u16));
+
+	fd.read(&byte8, 1);
+	saddon.object1   = byte8;
+
+	fd.read(&byte8, 1);
+	saddon.index1    = byte8;
+
+	fd.read(&byte8, 1);
+	saddon.quantity1 = byte8;
+
+	fd.read(&byte8, 1);
+	stile.quantity2  = byte8;
+
+	fd.read(&byte8, 1);
+	saddon.object2   = byte8;
+
+	fd.read(&byte8, 1);
+	saddon.index2    = byte8;
+
+	fd.read(&byte8, 1);
+	stile.shape      = byte8;
+
+	fd.read(&byte8, 1);
+	stile.general    = byte8;
+
+	stile.addons.push_back(saddon);
+
+	// offset first addon
+	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
+
+	// load all addon for current tils
+	while(byte16){
+
+	    //--byte16;
+	    if(vec_mp2addons.size() <= byte16){ Error::Warning("MapsData::MapsData: index addons out of range!"); break; }
+
+	    saddon.object1	= vec_mp2addons[byte16].objectNameN1 * 2;
+	    saddon.index1	= vec_mp2addons[byte16].indexNameN1;
+	    saddon.quantity1	= vec_mp2addons[byte16].quantityN;
+	    saddon.object2	= vec_mp2addons[byte16].objectNameN2;
+	    saddon.index2	= vec_mp2addons[byte16].indexNameN2;
+
+	    stile.addons.push_back(saddon);
+
+	    byte16 = vec_mp2addons[byte16].indexAddon;
+	}
+
+	std::sort(stile.addons.begin(), stile.addons.end(), MP2::VectorAddonSort);
+
+	fd.ignore(sizeof(u32));
+	fd.ignore(sizeof(u32));
+
+	vec_tiles.push_back(stile);
+    }
+
+    fd.close();
+
+    //
+
+    tiles = new Surface(width * TILEWIDTH, height * TILEWIDTH, 8, SDL_SWSURFACE);
+    tiles->LoadPalette(AGG::GetPalette());
+
     // fill Maps::Data
     Point pt;
     u32 ii = 0;
-    u32 size = mp2tile.size();
+    u32 size = vec_tiles.size();
 
     mapstiles_t tl;
-    while(ii < size){
-
-        const MP2::tile_t cell = mp2tile[ii]; 
+    for(; ii < size; ++ii){
 
         pt.x = ii % width;
         pt.y = ii / height;
 
+	//mp2tile[ii]
+	tl.coord	= pt;
+	//tl.center	= Point();
+	//tl.ground	= Maps::GetTypeGrounds(vec_tiles[ii], mp2addons);
+	tl.object	= vec_tiles[ii].general;
+	tl.level1	= NULL;
+	tl.level2	= NULL;
+
+	std::vector<MP2::addon_t>::const_iterator itaddon     = vec_tiles[ii].addons.begin();
+	std::vector<MP2::addon_t>::const_iterator itaddon_end = vec_tiles[ii].addons.end();
+
+	for(; itaddon != itaddon_end; ++itaddon){
+
+	    if((*itaddon).object1 && MP2::StaticObject((*itaddon).object1, (*itaddon).index1)){
+
+		if(NULL == tl.level1) tl.level1 = new std::vector<const Sprite *>;
+
+		tl.level1->push_back(&AGG::GetICN(MP2::GetICNObject((*itaddon).object1), (*itaddon).index1));
+	    }
+
+	    if((*itaddon).object2 && MP2::StaticObject((*itaddon).object2, (*itaddon).index2)){
+
+		if(NULL == tl.level2) tl.level2 = new std::vector<const Sprite *>;
+
+		tl.level2->push_back(&AGG::GetICN(MP2::GetICNObject((*itaddon).object2), (*itaddon).index2));
+	    }
+	}
+
+	vec_mapstiles.push_back(tl);
+
+	// blit tiles to global tiles
 	pt.x *= TILEWIDTH;
 	pt.y *= TILEWIDTH;
 
 	Surface til(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE);
 	til.LoadPalette(AGG::GetPalette());
-	AGG::GetTIL("GROUND32.TIL", cell.tileIndex, cell.shape, til);
+	AGG::GetTIL("GROUND32.TIL", vec_tiles[ii].tile, vec_tiles[ii].shape, til);
 
 	tiles->Blit(til, pt);
-
-	// static level 1
-
-	//mp2tile[ii]
-	tl.area		= Point();
-	tl.center	= Point();
-	tl.ground	= Maps::GetTypeGrounds(mp2tile[ii], mp2addons);
-	tl.object	= mp2tile[ii].generalObject;
-
-	vec_tiles.push_back(MapsTiles(tl));
-	++ii;
     }
 
     AGG::FreeObject("GROUND32.TIL");
@@ -158,6 +223,18 @@ MapsData::MapsData(const std::string &filename)
 
     // save maps to big sprite
     //if(H2Config::Debug() && tiles->SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
+}
+
+MapsData::~MapsData()
+{
+    delete tiles;
+
+    std::vector<mapstiles_t>::const_iterator itl = vec_mapstiles.begin();
+    for(; itl != vec_mapstiles.end(); ++itl){
+	if((*itl).level1) delete (*itl).level1;
+	if((*itl).level2) delete (*itl).level2;
+    }
+
 }
 
 void MapsData::Redraw(const Rect &rt, const Point &pt) const
@@ -171,7 +248,20 @@ void MapsData::Redraw(const Rect &rt, const Point &pt) const
     display.Blit(*tiles, srcrt, dstpt);
 
     // static level 1
-    
+    std::vector<mapstiles_t>::const_iterator itm = vec_mapstiles.begin();
+    std::vector<mapstiles_t>::const_iterator itm_end = vec_mapstiles.end();
+
+    for(; itm != itm_end; ++itm) if((rt & (*itm).coord) && (*itm).level1 && (*itm).level1->size()){
+
+	std::vector<const Sprite *>::const_iterator its     = (*itm).level1->begin();
+	std::vector<const Sprite *>::const_iterator its_end = (*itm).level1->end();
+
+	for(; its != its_end; ++its)
+	    display.Blit(**its,
+		BORDERWIDTH + ((*itm).coord.x - rt.x) * TILEWIDTH + (*its)->x(),
+		BORDERWIDTH + ((*itm).coord.y - rt.y) * TILEWIDTH + (*its)->y());
+    }
+
     // dinamic object
     
     // animation level 1
@@ -179,6 +269,18 @@ void MapsData::Redraw(const Rect &rt, const Point &pt) const
     // heroes
     
     // static level 2
+    itm = vec_mapstiles.begin();
+
+    for(; itm != itm_end; ++itm) if((rt & (*itm).coord) && (*itm).level2 && (*itm).level2->size()){
+
+	std::vector<const Sprite *>::const_iterator its     = (*itm).level2->begin();
+	std::vector<const Sprite *>::const_iterator its_end = (*itm).level2->end();
+
+	for(; its != its_end; ++its)
+	    display.Blit(**its,
+		BORDERWIDTH + ((*itm).coord.x - rt.x) * TILEWIDTH + (*its)->x(),
+		BORDERWIDTH + ((*itm).coord.y - rt.y) * TILEWIDTH + (*its)->y());
+    }
 
     // animation level 2
 

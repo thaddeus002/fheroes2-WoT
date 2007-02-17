@@ -26,14 +26,14 @@
 #include "background.h"
 #include "dialog.h"
 
-Game::menu_t Dialog::Menu(void)
+Game::menu_t Dialog::Info(void)
 {
     // preload
-    const std::string &cpanbkg = H2Config::EvilInterface() ? "CPANBKGE.ICN" : "CPANBKG.ICN";
-    const std::string &cpanel  = H2Config::EvilInterface() ? "CPANELE.ICN" : "CPANEL.ICN";
+    const std::string &apanbkg = H2Config::EvilInterface() ? "APANBKGE.ICN" : "APANBKG.ICN";
+    const std::string &apanel  = H2Config::EvilInterface() ? "APANELE.ICN" : "APANEL.ICN";
 
-    AGG::PreloadObject(cpanbkg);
-    AGG::PreloadObject(cpanel);
+    AGG::PreloadObject(apanbkg);
+    AGG::PreloadObject(apanel);
 
     // cursor
     Cursor::Hide();
@@ -41,7 +41,7 @@ Game::menu_t Dialog::Menu(void)
     Cursor::themes_t cursor = Cursor::Get();
 
     // image box
-    const Sprite &box = AGG::GetICN(cpanbkg, 0);
+    const Sprite &box = AGG::GetICN(apanbkg, 0);
 
     Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
     Background back(rb);
@@ -51,11 +51,11 @@ Game::menu_t Dialog::Menu(void)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonNew(rb.x + 62, rb.y + 31, cpanel, 0, 1);
-    Button buttonLoad(rb.x + 195, rb.y + 31, cpanel, 2, 3);
-    Button buttonSave(rb.x + 62, rb.y + 107, cpanel, 4, 5);
-    Button buttonQuit(rb.x + 195, rb.y + 107, cpanel, 6, 7);
-    Button buttonCancel(rb.x + 128, rb.y + 184, cpanel, 8, 9);
+    Button buttonWorld(rb.x + 62, rb.y + 30, apanel, 0, 1);
+    Button buttonPuzzle(rb.x + 195, rb.y + 30, apanel, 2, 3);
+    Button buttonInfo(rb.x + 62, rb.y + 107, apanel, 4, 5);
+    Button buttonDig(rb.x + 195, rb.y + 107, apanel, 6, 7);
+    Button buttonCancel(rb.x + 128, rb.y + 184, apanel, 8, 9);
 
     display.Flip();
     Cursor::Show();
@@ -68,16 +68,16 @@ Game::menu_t Dialog::Menu(void)
 
         le.HandleEvents();
 
-        le.MousePressLeft(buttonNew) ? buttonNew.Press() : buttonNew.Release();
-        le.MousePressLeft(buttonLoad) ? buttonLoad.Press() : buttonLoad.Release();
-        le.MousePressLeft(buttonSave) ? buttonSave.Press() : buttonSave.Release();
-        le.MousePressLeft(buttonQuit) ? buttonQuit.Press() : buttonQuit.Release();
+        le.MousePressLeft(buttonWorld) ? buttonWorld.Press() : buttonWorld.Release();
+        le.MousePressLeft(buttonPuzzle) ? buttonPuzzle.Press() : buttonPuzzle.Release();
+        le.MousePressLeft(buttonInfo) ? buttonInfo.Press() : buttonInfo.Release();
+        le.MousePressLeft(buttonDig) ? buttonDig.Press() : buttonDig.Release();
         le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
 
-        if(le.MouseClickLeft(buttonNew)) { result = Game::NEWGAME;  exit = true; }
-        if(le.MouseClickLeft(buttonLoad)){ result = Game::LOADGAME; exit = true; }
-        if(le.MouseClickLeft(buttonSave)){ result = Game::SAVEGAME; exit = true; }
-        if(le.MouseClickLeft(buttonQuit)){ result = Game::QUITGAME; exit = true; }
+        if(le.MouseClickLeft(buttonWorld)) { result = Game::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonPuzzle)){ result = Game::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonInfo)){ result = Game::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonDig)){ result = Game::CANCEL; exit = true; }
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = Game::CANCEL; exit = true; }
 
     }

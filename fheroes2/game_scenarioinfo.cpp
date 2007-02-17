@@ -196,13 +196,13 @@ Game::menu_t Game::ScenarioInfo(void){
 	// click ok
 	if(le.MouseClickLeft(buttonOk)){
 	    Error::Verbose("select maps: " + H2Config::GetFileMaps());
-	    Error::Verbose("difficulty: " + String::Difficulty(H2Config::GetGameDifficulty()));
+	    Error::Verbose("difficulty: " + std::string(CStr::Difficulty(H2Config::GetGameDifficulty())));
 	    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
 		if(H2Config::GetKingdomColors() & color){
 		    if(Kingdom::RAND == H2Config::GetKingdomRace(color)) H2Config::SetKingdomRace(color, Rand::Race());
-		    Error::Verbose(String::Color(color) + ": " + String::Race(H2Config::GetKingdomRace(color)));
+		    Error::Verbose(std::string(CStr::Color(color)) + ": " + std::string(CStr::Race(H2Config::GetKingdomRace(color))));
 	    }
-	    Error::Verbose("select color: " + String::Color(H2Config::GetHumanColor()));
+	    Error::Verbose("select color: " + std::string(CStr::Color(H2Config::GetHumanColor())));
 
 	    return STARTGAME;
 	}
@@ -686,7 +686,7 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     display.Blit(spriteLoss, x + 211 + spriteWins.w(), y);
 
     Text textLabel(200, 295, "Maps difficulty:", Font::BIG, true);
-    Text textDifficulty(360, 295, String::Difficulty((*it_current).GetDifficulty()), Font::BIG, true);
+    Text textDifficulty(360, 295, CStr::Difficulty((*it_current).GetDifficulty()), Font::BIG, true);
     
     TextBox textDescription(Rect(175, 322, 282, 90), (*it_current).GetDescription(), Font::BIG, true);
 }

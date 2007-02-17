@@ -28,9 +28,8 @@
 Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, u32 size, const u8 *data) 
     : Surface(w, h, true), offsetX(ox), offsetY(oy)
 {
-    Fill(AGG::GetColorKey());
+    SetColorKey();
     DrawICN(size, data);
-    SetColorKey(AGG::GetColorKey());
     SetDisplayFormat();
 };
 
