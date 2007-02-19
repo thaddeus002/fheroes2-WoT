@@ -50,7 +50,8 @@ void AGG::Init(const std::string & aggname)
     char buf[AGGSIZENAME];
     aggfat_t fat_element;
 
-    AGG::fd->read(reinterpret_cast<char *>(&count), sizeof(count));
+    AGG::fd->read(reinterpret_cast<char *>(&count), sizeof(u16));
+    SWAP16(count);
 
     for(u16 seg = 0; seg < count; ++seg){
 
@@ -64,9 +65,11 @@ void AGG::Init(const std::string & aggname)
 	AGG::fd->seekg(sizeof(u32), std::ios_base::cur);
 
 	// read fat_element
-	AGG::fd->read(reinterpret_cast<char *>(&fat_element.blockOffset), sizeof(fat_element.blockOffset));
-	AGG::fd->read(reinterpret_cast<char *>(&fat_element.blockSize), sizeof(fat_element.blockSize));
-    
+	AGG::fd->read(reinterpret_cast<char *>(&fat_element.blockOffset), sizeof(u32));
+	SWAP32(fat_element.blockOffset);
+	AGG::fd->read(reinterpret_cast<char *>(&fat_element.blockSize), sizeof(u32));
+	SWAP32(fat_element.blockSize);
+
 	// type data
 	if(std::string::npos != key_name.find(".ICN")){
 	    fat_element.blockType = DATA_ICN;
@@ -177,8 +180,11 @@ void AGG::LoadTIL(const std::string & name)
     
     u16 count, width, height;
     AGG::fd->read(reinterpret_cast<char *>(&count), sizeof(u16));
+    SWAP16(count);
     AGG::fd->read(reinterpret_cast<char *>(&width), sizeof(u16));
+    SWAP16(width);
     AGG::fd->read(reinterpret_cast<char *>(&height), sizeof(u16));
+    SWAP16(height);
 
     // size
     u32 sizeData = count * width * height;
@@ -275,8 +281,10 @@ void AGG::LoadICN(const std::string & name)
     u16 countSprite;
     u32 totalSize;
 
-    AGG::fd->read(reinterpret_cast<char *>(&countSprite), sizeof(countSprite));
-    AGG::fd->read(reinterpret_cast<char *>(&totalSize), sizeof(totalSize));
+    AGG::fd->read(reinterpret_cast<char *>(&countSprite), sizeof(u16));
+    SWAP16(countSprite);
+    AGG::fd->read(reinterpret_cast<char *>(&totalSize), sizeof(u32));
+    SWAP32(totalSize);
 
     pos = AGG::fd->tellg();
 
@@ -286,15 +294,20 @@ void AGG::LoadICN(const std::string & name)
     // read icn header
     for(int i = 0; i < countSprite; ++i){
 
-	AGG::fd->read(reinterpret_cast<char *>(&header.offsetX), sizeof(header.offsetX));
-	AGG::fd->read(reinterpret_cast<char *>(&header.offsetY), sizeof(header.offsetY));
+	AGG::fd->read(reinterpret_cast<char *>(&header.offsetX), sizeof(s16));
+	SWAP16(header.offsetX);
+	AGG::fd->read(reinterpret_cast<char *>(&header.offsetY), sizeof(s16));
+	SWAP16(header.offsetY);
 	
-	AGG::fd->read(reinterpret_cast<char *>(&header.width), sizeof(header.width));
-	AGG::fd->read(reinterpret_cast<char *>(&header.height), sizeof(header.height));
+	AGG::fd->read(reinterpret_cast<char *>(&header.width), sizeof(u16));
+	SWAP16(header.width);
+	AGG::fd->read(reinterpret_cast<char *>(&header.height), sizeof(u16));
+	SWAP16(header.height);
 	
 	// skip char
 	AGG::fd->ignore();
-	AGG::fd->read(reinterpret_cast<char *>(&header.offsetData), sizeof(header.offsetData));
+	AGG::fd->read(reinterpret_cast<char *>(&header.offsetData), sizeof(u32));
+	SWAP32(header.offsetData);
 
 	vectorHeader.push_back(header);
     }

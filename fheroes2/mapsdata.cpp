@@ -55,10 +55,12 @@ MapsData::MapsData(const std::string &filename)
 
     // width
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
+    SWAP32(byte32);
     width = byte32;
 
     // height
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
+    SWAP32(byte32);
     height = byte32;
 
     // seek to ADDONS block
@@ -66,6 +68,7 @@ MapsData::MapsData(const std::string &filename)
 
     // count mp2addon_t
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
+    SWAP32(byte32);
 
     // read all addons
     std::vector<MP2::mp2addon_t> vec_mp2addons;
@@ -75,6 +78,7 @@ MapsData::MapsData(const std::string &filename)
 	MP2::mp2addon_t mp2addon;
 
 	fd.read(reinterpret_cast<char *>(&mp2addon.indexAddon), sizeof(u16));
+	SWAP16(mp2addon.indexAddon);
 	fd.read(&byte8, 1);
 	mp2addon.objectNameN1 = byte8;
 	fd.read(&byte8, 1);
@@ -86,7 +90,9 @@ MapsData::MapsData(const std::string &filename)
 	fd.read(&byte8, 1);
 	mp2addon.indexNameN2 = byte8;
 	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN1), sizeof(u32));
+	SWAP32(mp2addon.uniqNumberN1);
 	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN2), sizeof(u32));
+	SWAP32(mp2addon.uniqNumberN2);
 
 	vec_mp2addons.push_back(mp2addon);
     }
@@ -103,6 +109,7 @@ MapsData::MapsData(const std::string &filename)
 	MP2::addon_t saddon;
 
 	fd.read(reinterpret_cast<char *>(&stile.tile), sizeof(u16));
+	SWAP16(stile.tile);
 
 	fd.read(&byte8, 1);
 	saddon.object1   = byte8;
@@ -132,6 +139,7 @@ MapsData::MapsData(const std::string &filename)
 
 	// offset first addon
 	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
+	SWAP16(byte16);
 
 	// load all addon for current tils
 	while(byte16){

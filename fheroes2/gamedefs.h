@@ -56,8 +56,8 @@ namespace Font
 #define BMASK 0x00000f00
 #define AMASK 0x0000f000
 
-#define SWAP16(X)    (X)
-#define SWAP32(X)    (X)
+#define SWAP16(X)    X=X;
+#define SWAP32(X)    X=X;
 
 #endif
 

@@ -43,6 +43,7 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
 
     // magic byte
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(byte32));
+    SWAP32(byte32);
 
     if(byte32 != 0x0000005C){
 	Error::Warning("MapsHeaderInfo: " + filemaps +", incorrect maps file.");
@@ -53,6 +54,7 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
 
     // level
     fd.read(reinterpret_cast<char *>(&byte16), sizeof(byte16));
+    SWAP16(byte16);
 
     switch(byte16){
     
