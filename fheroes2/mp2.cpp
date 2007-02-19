@@ -539,8 +539,7 @@ bool MP2::StaticObject(u8 type, u8 index)
 }
 
 /* Maps::ground from mp2 tile */
-/*
-u16 MP2::GetTypeGrounds(const MP2::tile_t &info)
+Maps::ground_t MP2::GetTypeGrounds(const MP2::tile_t &info)
 {
     // сканируем дорогу ROAD
     std::vector<addon_t>::const_iterator it = info.addons.begin();
@@ -577,4 +576,3 @@ u16 MP2::GetTypeGrounds(const MP2::tile_t &info)
     //else if(432 > index)
     return Maps::BEACH;
 }
-*/

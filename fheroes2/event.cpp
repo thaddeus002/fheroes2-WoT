@@ -47,47 +47,31 @@ LocalEvent & LocalEvent::GetLocalEvent(void)
 
 void LocalEvent::HandleEvents(void)
 {
-    /* from SDLmm-0.1.8 */
     SDL_Event event;
 
     while(SDL_PollEvent(&event)){
 
-	bool ev_handled = false;
+	if(SDL_KEYDOWN == event.type &&
+	    HandleKeyboardEvent(event.key.keysym, true)) break;
+	else
 
-	switch(event.type){
-    	    case SDL_KEYDOWN:
-		ev_handled = HandleKeyboardEvent(event.key.keysym, true);
-		break;
-    	    case SDL_KEYUP: 
-		ev_handled = HandleKeyboardEvent(event.key.keysym, false);
-		break;
-    	    case SDL_MOUSEMOTION: 
-		ev_handled = HandleMouseMotionEvent(event.motion.state,
-						    event.motion.x,
-						    event.motion.y,
-						    event.motion.xrel,
-						    event.motion.yrel);
-		break;
-    	    case SDL_MOUSEBUTTONDOWN:
-		ev_handled = HandleMouseButtonEvent(event.button.button,
-							 event.button.x,
-							 event.button.y,
-							 true);
-		break;
-    	    case SDL_MOUSEBUTTONUP: 
-		ev_handled = HandleMouseButtonEvent(event.button.button,
-							   event.button.x,
-							   event.button.y,
-							   false);
-		break;
-    	    case SDL_QUIT: 
-		//ev_handled = HandleQuitEvent();
-		Error::Except(" quit event: ok.");
-		ev_handled = true;
-		break;
-	    default:
-		break;
-	}
+	if(SDL_KEYUP == event.type &&
+	    HandleKeyboardEvent(event.key.keysym, false)) break;
+	else
+
+	if(SDL_MOUSEMOTION == event.type &&
+	    HandleMouseMotionEvent(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel)) break;
+	else
+
+	if(SDL_MOUSEBUTTONDOWN == event.type &&
+	    HandleMouseButtonEvent(event.button.button, event.button.x, event.button.y, true)) break;
+	else
+
+	if(SDL_MOUSEBUTTONUP == event.type &&
+	    HandleMouseButtonEvent(event.button.button, event.button.x, event.button.y, false)) break;
+	else
+
+	if(SDL_QUIT == event.type){ Error::Except(" quit event: ok."); break; }
     }
 
     mouse_motion = (mouse_cu.x == mouse_x && mouse_cu.y == mouse_y ? false : true);
@@ -127,17 +111,17 @@ bool LocalEvent::HandleMouseButtonEvent(u8 button, u16 x, u16 y, bool pressed)
 
 	switch(button){
 	
-	    case BUTTON_LEFT:
+	    case SDL_BUTTON_LEFT:
 		mouse_pl.x = x;
 		mouse_pl.y = y;
 		break;
 
-	    case BUTTON_MIDDLE:
+	    case SDL_BUTTON_MIDDLE:
 		mouse_pm.x = x;
 		mouse_pm.y = y;
 		break;
 
-	    case BUTTON_RIGHT:
+	    case SDL_BUTTON_RIGHT:
 		mouse_pr.x = x;
 		mouse_pr.y = y;
 		break;
@@ -150,17 +134,17 @@ bool LocalEvent::HandleMouseButtonEvent(u8 button, u16 x, u16 y, bool pressed)
 
 	switch(button){
 	
-	    case BUTTON_LEFT:
+	    case SDL_BUTTON_LEFT:
 		mouse_rl.x = x;
 		mouse_rl.y = y;
 		break;
 
-	    case BUTTON_MIDDLE:
+	    case SDL_BUTTON_MIDDLE:
 		mouse_rm.x = x;
 		mouse_rm.y = y;
 		break;
 
-	    case BUTTON_RIGHT:
+	    case SDL_BUTTON_RIGHT:
 		mouse_rr.x = x;
 		mouse_rr.y = y;
 		break;

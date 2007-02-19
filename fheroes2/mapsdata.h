@@ -24,7 +24,7 @@
 #include "gamedefs.h"
 #include "surface.h"
 #include "rect.h"
-#include "maps_tiles.h"
+#include "maps.h"
 #include "mp2.h"
 
 /* class Data */
@@ -39,8 +39,8 @@ public:
 
     const Surface & GetTilesSurface(void) const{ return *tiles; };
 
-    const mapstiles_t & GetTiles(u16 index) const{ return vec_mapstiles.size() > index ? vec_mapstiles[index] : vec_mapstiles.back(); };
-    const mapstiles_t & GetTiles(u32 ax, u32 ay) const{ return vec_mapstiles.size() > ax * ay ? vec_mapstiles[ax * width + ay] : vec_mapstiles.back(); };
+    bool Movement(u16 ax, u16 ay) const{ return Movement(ax * width + ay); };
+    bool Movement(u16 index) const;
 
     void Redraw(const Rect &rt, const Point &pt = Point(0, 0)) const;
 
@@ -48,7 +48,7 @@ private:
     typedef struct { Point coord; Surface *sprite; } levelsprite_t;
 
     Surface *tiles;
-    std::vector<mapstiles_t> vec_mapstiles;
+    std::vector<Maps::tiles_t> vec_mapstiles;
 
     static u16 width;
     static u16 height;

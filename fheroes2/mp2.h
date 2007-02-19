@@ -241,7 +241,7 @@ namespace MP2
 
     const char *GetICNObject(u8 type);
     bool StaticObject(u8 type, u8 index);
-    //u16 GetTypeGrounds(const MP2::tile_t &info);
+    Maps::ground_t GetTypeGrounds(const MP2::tile_t &info);
     bool VectorAddonSort(const MP2::addon_t & lhs, const MP2::addon_t & rhs);
 };
 

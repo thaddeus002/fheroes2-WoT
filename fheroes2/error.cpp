@@ -37,6 +37,14 @@ void Error::Warning(const std::string & message)
     if(H2Config::Debug()) std::cout << "warning: " << message << std::endl;
 }
 
+void Error::Warning(const std::string & message, int value)
+{
+    std::string str;
+    String::AddInt(str, value);
+
+    if(H2Config::Debug()) std::cout << "warning: " << message << str << std::endl;
+}
+
 void Error::Verbose(const std::string & message)
 {
     if(H2Config::Debug()) std::cout << message << std::endl;

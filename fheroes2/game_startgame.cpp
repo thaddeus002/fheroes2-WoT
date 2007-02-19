@@ -28,6 +28,7 @@
 #include "gamearea.h"
 #include "cursor.h"
 #include "radar.h"
+#include "splitter.h"
 #include "game.h"
 
 #include "error.h"
@@ -70,9 +71,11 @@ Game::menu_t Game::StartGame(void){
 
     Point pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
 
+    // coord button heroes scroll up
     pt_shu.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
     pt_shu.y = RADARWIDTH + 2 * BORDERWIDTH;
 
+    // coord button castle scroll up
     pt_scu.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
     pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
 
@@ -196,6 +199,14 @@ Game::menu_t Game::StartGame(void){
     Button buttonScrollHeroesDown(pt_shd, icnscroll, 2, 3);
     Button buttonScrollCastleDown(pt_scd, icnscroll, 2, 3);
 
+    // splitter heroes
+    Splitter splitHeroes(AGG::GetICN(icnscroll, 4), Rect(pt_shu.x + 3, pt_shu.y + 18, 10, pt_shd.y - pt_shu.y - 20), Splitter::VERTICAL);
+    splitHeroes.SetRange(0, 0); // unknown count heroes
+
+    // splitter castle
+    Splitter splitCastle(AGG::GetICN(icnscroll, 4), Rect(pt_scu.x + 3, pt_scu.y + 18, 10, pt_scd.y - pt_scu.y - 20), Splitter::VERTICAL);
+    splitCastle.SetRange(0, 0); // unknown count castle
+
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     display.Flip();
@@ -219,6 +230,7 @@ Game::menu_t Game::StartGame(void){
 	// pointer cursor on left panel
 	if(le.MouseCursor(areaLeftPanel)){ Cursor::Set(Cursor::POINTER); }
 
+	// insert next event here
 
 
 
@@ -226,8 +238,8 @@ Game::menu_t Game::StartGame(void){
 
 
 
-
-
+	// right mouse on maps - info object
+	if(le.MousePressRight(areaMaps.GetPosition())) Error::Verbose("Dialog Info");
 
 	// draw push buttons
 	le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.Press() : buttonScrollHeroesUp.Release();

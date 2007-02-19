@@ -22,12 +22,6 @@
 
 #include "gamedefs.h"
 
-#define BUTTON_LEFT	0x01
-#define BUTTON_MIDDLE	0x02
-#define BUTTON_RIGHT	0x03
-#define BUTTON_WHEELUP	0x04
-#define BUTTON_WHEELDN	0x05
-
 class LocalEvent
 {
 public:
@@ -41,9 +35,9 @@ public:
 
     bool MouseMotion(void) const{ return mouse_motion; };
     bool MouseMotion(const Rect &rt) const{ return mouse_motion ? rt & mouse_cu : false; };
-    bool MouseLeft(void) const{ return mouse_pressed && BUTTON_LEFT == mouse_button; };
-    bool MouseMiddle(void) const{ return mouse_pressed && BUTTON_MIDDLE  == mouse_button; };
-    bool MouseRight(void) const{ return mouse_pressed && BUTTON_RIGHT == mouse_button; };
+    bool MouseLeft(void) const{ return mouse_pressed && SDL_BUTTON_LEFT == mouse_button; };
+    bool MouseMiddle(void) const{ return mouse_pressed && SDL_BUTTON_MIDDLE  == mouse_button; };
+    bool MouseRight(void) const{ return mouse_pressed && SDL_BUTTON_RIGHT == mouse_button; };
 
     const Point & MousePressLeft(void){ return mouse_pl; };
     const Point & MousePressMiddle(void){ return mouse_pm; };
@@ -57,8 +51,8 @@ public:
     bool MouseClickMiddle(const Rect &rt);
     bool MouseClickRight(const Rect &rt);
 
-    bool MouseWheelUp(void) const{ return mouse_pressed && BUTTON_WHEELUP == mouse_button; };
-    bool MouseWheelDn(void) const{ return mouse_pressed && BUTTON_WHEELDN == mouse_button; };
+    bool MouseWheelUp(void) const{ return mouse_pressed && SDL_BUTTON_WHEELUP == mouse_button; };
+    bool MouseWheelDn(void) const{ return mouse_pressed && SDL_BUTTON_WHEELDOWN == mouse_button; };
 
     static const Point & MouseCursor(void){ return mouse_cu; };
 

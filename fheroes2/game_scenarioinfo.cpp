@@ -510,19 +510,20 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
 	// click list
 	if(le.MouseClickLeft(rectAreaList)){
-	    int num = (le.MouseReleaseLeft().y - rectAreaList.y) / LISTHEIGHTROW;
+	    u16 num = (le.MouseReleaseLeft().y - rectAreaList.y) / LISTHEIGHTROW;
+	    if(num > curmaps->size()) num = curmaps->size() - 1;
 	    Cursor::Hide();
 	    backgroundInfo.Restore();
 	    it_current = it_list_head + num;
 	    Scenario::DrawSelectInfo(it_current);
-	    //split.Move(??);
+	    split.Move(it_list_head - curmaps->begin());
 	    display.Flip();
 	    Cursor::Show();
 	}
 
 	// click up
-	if(le.MouseWheelUp(rectAreaList) ||
-	   (le.MouseClickLeft(buttonPgUp) && curmaps->size() && it_list_head > curmaps->begin())){
+	if((le.MouseWheelUp(rectAreaList) || le.MouseWheelUp(split.GetRect()) || le.MouseClickLeft(buttonPgUp)) &&
+	    curmaps->size() && it_list_head > curmaps->begin()){
 	    Cursor::Hide();
 	    backgroundList.Restore();
 	    Scenario::DrawList(--it_list_head);
@@ -532,8 +533,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	}
 
 	// click down
-	if(le.MouseWheelDn(rectAreaList) ||
-	   (le.MouseClickLeft(buttonPgDn) && LISTMAXITEM < curmaps->size() && it_list_head + LISTMAXITEM < curmaps->end())){
+	if((le.MouseWheelDn(rectAreaList) || le.MouseWheelDn(split.GetRect()) || le.MouseClickLeft(buttonPgDn)) &&
+	    LISTMAXITEM < curmaps->size() && it_list_head + LISTMAXITEM < curmaps->end()){
 	    Cursor::Hide();
 	    backgroundList.Restore();
 	    Scenario::DrawList(++it_list_head);
@@ -543,14 +544,25 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	}
 
 	// click splitter area
-	if(le.MouseClickLeft(split.GetRect())){
-	    Error::Verbose("click on splitter");
+	if(le.MouseClickLeft(split.GetRect()) && curmaps->size() > LISTMAXITEM && le.MouseCursor().y > split.GetRect().y){
+	    u16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
+	    if(seek > curmaps->size() - LISTMAXITEM) seek = curmaps->size() - LISTMAXITEM;
+
+	    it_list_head = curmaps->begin() + seek;
+	    Cursor::Hide();
+	    backgroundList.Restore();
+	    Scenario::DrawList(it_list_head, LISTMAXITEM);
+	    backgroundInfo.Restore();
+	    Scenario::DrawSelectInfo(it_current);
+	    split.Move(seek);
+	    display.Flip();
+	    Cursor::Show();
 	}
 
 	// move on splitter
-	if(le.MousePressLeft(split.GetRect()) && le.MouseCursor(split.GetRect())){
-	    Error::Verbose("move on splitter");
- 	}
+	//if(le.MousePressLeft(split.GetRect()) && le.MouseCursor(split.GetRect())){
+	//    Error::Verbose("move on splitter");
+ 	//}
 
 	// click ok
 	if(le.MouseClickLeft(buttonOk)) break;

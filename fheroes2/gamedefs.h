@@ -36,6 +36,9 @@ namespace Font
 
 #define GAME_VERSION		20070219	// Version
 
+#define MAXU16   65535 
+#define MAXU32   4294967295 
+
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
 #define RMASK 0x0000f000

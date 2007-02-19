@@ -20,6 +20,9 @@
 #ifndef H2MAPS_H
 #define H2MAPS_H
 
+#include <vector>
+#include "rect.h"
+#include "sprite.h"
 #include "gamedefs.h"
 
 #define TILEWIDTH 32
@@ -54,6 +57,15 @@ namespace Maps
         EXPERT,
         IMPOSSIBLE
     } difficulty_t;
+
+    typedef struct {
+	Point    coord;
+	//Point  center;
+	ground_t ground;
+	u8       object;
+	std::vector<const Sprite *> *level1;
+	std::vector<const Sprite *> *level2;
+    } tiles_t;
 
     difficulty_t& operator++ (difficulty_t& difficulty);
     difficulty_t& operator-- (difficulty_t& difficulty);

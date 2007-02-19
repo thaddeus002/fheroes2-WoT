@@ -39,6 +39,7 @@ public:
     void SetRange(u16 smin, u16 smax);
 
     u16 GetCurrent(void) const{ return cur; };
+    u16 GetStep(void) const{ return step; };
     const Rect & GetRect(void) const{ return area; };
 
 private:

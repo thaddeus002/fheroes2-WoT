@@ -37,6 +37,7 @@ public:
     static void Verbose(const std::string & message);
     static void Verbose(const std::string & message, int value);
     static void Warning(const std::string & message);
+    static void Warning(const std::string & message, int value);
     static void Except(const std::string & message);
 };
 

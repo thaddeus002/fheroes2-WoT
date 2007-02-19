@@ -25,9 +25,9 @@
 #include "agg.h"
 #include "game.h"
 #include "gamearea.h"
-#include "maps.h"
 #include "mp2.h"
 #include "text.h"
+#include "rand.h"
 #include "mapsdata.h"
 
 u16 MapsData::width = 0;
@@ -165,25 +165,39 @@ MapsData::MapsData(const std::string &filename)
     tiles = new Surface(width * TILEWIDTH, height * TILEWIDTH, 8, SDL_SWSURFACE);
     tiles->LoadPalette(AGG::GetPalette());
 
-    // fill Maps::Data
+    // MapsData
     Point pt;
     u32 ii = 0;
     u32 size = vec_tiles.size();
 
-    mapstiles_t tl;
+    Maps::tiles_t tl;
     for(; ii < size; ++ii){
 
         pt.x = ii % width;
         pt.y = ii / height;
 
-	//mp2tile[ii]
 	tl.coord	= pt;
 	//tl.center	= Point();
-	//tl.ground	= Maps::GetTypeGrounds(vec_tiles[ii], mp2addons);
+	tl.ground	= MP2::GetTypeGrounds(vec_tiles[ii]);
 	tl.object	= vec_tiles[ii].general;
 	tl.level1	= NULL;
 	tl.level2	= NULL;
 
+	switch(tl.object){
+
+	    case MP2::OBJ_RNDRESOURCE:
+		tl.object = MP2::OBJ_RESOURCE;
+	    case MP2::OBJ_RESOURCE:
+		//ii
+		//vec_tiles[ii].index1;
+		//count
+		break;
+
+	    default:
+		break;
+	}
+
+	// static sprite level1 and level2
 	std::vector<MP2::addon_t>::const_iterator itaddon     = vec_tiles[ii].addons.begin();
 	std::vector<MP2::addon_t>::const_iterator itaddon_end = vec_tiles[ii].addons.end();
 
@@ -206,6 +220,7 @@ MapsData::MapsData(const std::string &filename)
 
 	vec_mapstiles.push_back(tl);
 
+	
 	// blit tiles to global tiles
 	pt.x *= TILEWIDTH;
 	pt.y *= TILEWIDTH;
@@ -229,7 +244,7 @@ MapsData::~MapsData()
 {
     delete tiles;
 
-    std::vector<mapstiles_t>::const_iterator itl = vec_mapstiles.begin();
+    std::vector<Maps::tiles_t>::const_iterator itl = vec_mapstiles.begin();
     for(; itl != vec_mapstiles.end(); ++itl){
 	if((*itl).level1) delete (*itl).level1;
 	if((*itl).level2) delete (*itl).level2;
@@ -248,8 +263,8 @@ void MapsData::Redraw(const Rect &rt, const Point &pt) const
     display.Blit(*tiles, srcrt, dstpt);
 
     // static level 1
-    std::vector<mapstiles_t>::const_iterator itm = vec_mapstiles.begin();
-    std::vector<mapstiles_t>::const_iterator itm_end = vec_mapstiles.end();
+    std::vector<Maps::tiles_t>::const_iterator itm = vec_mapstiles.begin();
+    std::vector<Maps::tiles_t>::const_iterator itm_end = vec_mapstiles.end();
 
     for(; itm != itm_end; ++itm) if((rt & (*itm).coord) && (*itm).level1 && (*itm).level1->size()){
 
@@ -285,3 +300,34 @@ void MapsData::Redraw(const Rect &rt, const Point &pt) const
     // animation level 2
 
 }
+
+/* movement on maps */
+bool MapsData::Movement(u16 index) const
+{
+    if(index >= vec_mapstiles.size()) return false; 
+
+    switch(vec_mapstiles[index].object){
+
+        case MP2::OBJ_STONES:
+        case MP2::OBJ_OILLAKE:
+        case MP2::OBJ_BIGCRACK:
+        case MP2::OBJ_MOUNTS:
+        case MP2::OBJ_TREES:
+        case MP2::OBJ_FIRTREES:
+        case MP2::OBJN_WAGONCAMP:
+        case MP2::OBJN_SAWMILL:
+        case MP2::OBJN_MINES:
+        case MP2::OBJ_WATERLAKE:
+        case MP2::OBJN_ALCHEMYTOWER:
+        case MP2::OBJN_EXCAVATION:
+        case MP2::OBJN_FORT:
+        case MP2::OBJN_DRAGONCITY:
+	    return false;
+	
+	default:
+	    break;
+    }
+    
+    return true;
+}
+
