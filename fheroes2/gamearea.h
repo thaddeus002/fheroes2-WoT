@@ -35,6 +35,13 @@ public:
     static const Rect & GetRect(void){ return pos; }
 
     Rect GetPosition(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, pos.w * TILEWIDTH, pos.h * TILEWIDTH); }
+    const MapsData & GetMapsData(void) const{ return maps; };
+
+    u16  GetIndexMaps(u16 mx, u16 my) const;
+    u16  GetIndexMaps(const Point &pt) const{ return GetIndexMaps(pt.x, pt.y); };
+
+    u8   GetObject(const Point &mp) const{ return maps.GetObject(GetIndexMaps(mp)); };
+    u16  GetGround(const Point &mp) const{ return maps.GetGround(GetIndexMaps(mp)); };
 
     void Scroll(GameArea::scroll_t scroll);
 

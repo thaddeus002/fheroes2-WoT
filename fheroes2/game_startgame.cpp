@@ -33,6 +33,10 @@
 
 #include "error.h"
 
+namespace Game {
+    Cursor::themes_t GetCursor(const GameArea &area, focus_t focus);
+};
+
 Game::menu_t Game::StartGame(void){
 
     // Load maps
@@ -41,7 +45,7 @@ Game::menu_t Game::StartGame(void){
 
     // cursor
     Cursor::Hide();
-    Cursor::themes_t cursor = Cursor::FIGHT; // test //Cursor::POINTER;
+    //Cursor::themes_t cursor = Cursor::FIGHT; // test //Cursor::POINTER;
 
     Game::DrawInterface();
 
@@ -207,6 +211,9 @@ Game::menu_t Game::StartGame(void){
     Splitter splitCastle(AGG::GetICN(icnscroll, 4), Rect(pt_scu.x + 3, pt_scu.y + 18, 10, pt_scd.y - pt_scu.y - 20), Splitter::VERTICAL);
     splitCastle.SetRange(0, 0); // unknown count castle
 
+    // game focus (test)
+    Game::focus_t focus = Game::HEROES;
+
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     display.Flip();
@@ -226,12 +233,13 @@ Game::menu_t Game::StartGame(void){
 	if(le.MouseCursor(areaScrollBottom)){ Cursor::Set(Cursor::SCROLL_BOTTOM); areaMaps.Scroll(GameArea::BOTTOM); radar.MoveCursor(radarCursor); continue; }
 
 	// restore game cursor
-	if(le.MouseCursor(areaMaps.GetPosition())){ Cursor::Set(cursor); }
+	if(le.MouseCursor(areaMaps.GetPosition()))
+	    Cursor::Set(Game::GetCursor(areaMaps, focus));
+	else
 	// pointer cursor on left panel
 	if(le.MouseCursor(areaLeftPanel)){ Cursor::Set(Cursor::POINTER); }
 
 	// insert next event here
-
 
 
 
@@ -299,4 +307,152 @@ Game::menu_t Game::StartGame(void){
     }
 
     return QUITGAME;
+}
+
+/* return game cursor */
+Cursor::themes_t Game::GetCursor(const GameArea &area, Game::focus_t focus)
+{
+    Cursor::themes_t result = Cursor::POINTER;
+
+    switch(area.GetObject(LocalEvent::MouseCursor())){
+
+        case MP2::OBJ_MONSTER:
+            if(Game::HEROES == focus) result = Cursor::FIGHT;
+            break;
+
+        case MP2::OBJN_CASTLE:
+            result = Cursor::CASTLE;
+            break;
+
+        case MP2::OBJ_CASTLE:
+            if(Game::HEROES == focus) result = Cursor::ACTION;
+            break;
+
+	case MP2::OBJ_HEROES:
+            result = Cursor::HEROES;
+            break;
+
+        case MP2::OBJ_BOAT:
+    	    if(Game::HEROES == focus) result = Cursor::BOAT;
+            break;
+
+        case MP2::OBJ_TREASURECHEST:
+            if(Game::HEROES == focus)
+		result = (Maps::WATER == area.GetGround(LocalEvent::MouseCursor()) ? Cursor::POINTER : Cursor::ACTION);
+	    else
+            if(Game::BOAT == focus)
+		result = (Maps::WATER == area.GetGround(LocalEvent::MouseCursor()) ? Cursor::REDBOAT : Cursor::POINTER);
+            break;
+
+        case MP2::OBJ_STONES:
+        case MP2::OBJ_OILLAKE:
+        case MP2::OBJ_BIGCRACK:
+        case MP2::OBJ_MOUNTS:
+        case MP2::OBJ_TREES:
+        case MP2::OBJ_FIRTREES:
+        case MP2::OBJN_WAGONCAMP:
+        case MP2::OBJN_SAWMILL:
+        case MP2::OBJN_MINES:
+        case MP2::OBJ_WATERLAKE:
+        case MP2::OBJN_ALCHEMYTOWER:
+        case MP2::OBJN_EXCAVATION:
+        case MP2::OBJN_FORT:
+        case MP2::OBJN_DRAGONCITY:
+        case MP2::OBJN_SHIPWRECK:
+        case MP2::OBJN_DERELICTSHIP:
+        case MP2::OBJN_MAGELLANMAPS:
+            break;
+
+        case MP2::OBJ_ALCHEMYTOWER:
+        case MP2::OBJ_SIGN:
+        case MP2::OBJ_SKELETON:
+        case MP2::OBJ_DAEMONCAVE:
+        case MP2::OBJ_FAERIERING:
+        case MP2::OBJ_CAMPFIRE:
+        case MP2::OBJ_FOUNTAIN:
+        case MP2::OBJ_GAZEBO:
+        case MP2::OBJ_ANCIENTLAMP:
+        case MP2::OBJ_GRAVEYARD:
+        case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUNT:
+        case MP2::OBJ_DWARFCOTT:
+        case MP2::OBJ_PEASANTHUNT:
+        case MP2::OBJ_PEASANTHUNT2:
+        case MP2::OBJ_DRAGONCITY:
+        case MP2::OBJ_LIGHTHOUSE:
+        case MP2::OBJ_WATERMILL:
+        case MP2::OBJ_MINES:
+	case MP2::OBJ_OBELISK:
+	case MP2::OBJ_OASIS:
+	case MP2::OBJ_RESOURCE:
+	case MP2::OBJ_SAWMILL:
+	case MP2::OBJ_ORACLE:
+	case MP2::OBJ_SHRINE1:
+	case MP2::OBJ_DERELICTSHIP:
+	case MP2::OBJ_DESERTTENT:
+	case MP2::OBJ_STONELITHS:
+	case MP2::OBJ_WAGONCAMP:
+	case MP2::OBJ_WINDMILL:
+	case MP2::OBJ_ARTIFACT:
+	case MP2::OBJ_WATCHTOWER:
+	case MP2::OBJ_TREEHOUSE:
+	case MP2::OBJ_TREECITY:
+	case MP2::OBJ_RUINS:
+	case MP2::OBJ_FORT:
+        case MP2::OBJ_TRADINGPOST:
+        case MP2::OBJ_ABANDONEDMINE:
+        case MP2::OBJ_STANDINGSTONES:
+        case MP2::OBJ_IDOL:
+        case MP2::OBJ_TREEKNOWLEDGE:
+        case MP2::OBJ_DOCTORHUNT:
+        case MP2::OBJ_TEMPLE:
+        case MP2::OBJ_HILLFORT:
+        case MP2::OBJ_HALFLINGHOLE:
+        case MP2::OBJ_MERCENARYCAMP:
+        case MP2::OBJ_SHRINE2:
+        case MP2::OBJ_SHRINE3:
+        case MP2::OBJ_PIRAMID:
+        case MP2::OBJ_CITYDEAD:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_SPHINX:
+        case MP2::OBJ_WAGON:
+        case MP2::OBJ_ARTESIANSPRING:
+        case MP2::OBJ_TROLLBRIDGE:
+        case MP2::OBJ_WITCHHUNT:
+        case MP2::OBJ_XANADU:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_LEANTO:
+        case MP2::OBJ_MAGICWELL:
+        case MP2::OBJ_MAGICGARDEN:
+        case MP2::OBJ_OBSERVATIONTOWER:
+        case MP2::OBJ_FREEMANFOUNDRY:
+            if(Game::HEROES == focus) result = Cursor::ACTION;
+            break;
+
+        case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_WHIRLPOOL:
+        case MP2::OBJ_BUOY:
+        case MP2::OBJ_BOTTLE:
+        case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_FLOTSAM:
+        case MP2::OBJ_MAGELLANMAPS:
+	    if(Game::BOAT == focus) result = Cursor::REDBOAT;
+    	    break;
+																																															
+        case MP2::OBJ_COAST:
+	    if(Game::BOAT == focus) result = Cursor::ANCHOR;
+    	    break;
+
+	default:
+            if(Game::HEROES == focus)
+		result = (Maps::WATER == area.GetGround(LocalEvent::MouseCursor()) ? Cursor::POINTER : Cursor::MOVE);
+	    else
+            if(Game::BOAT == focus)
+		result = (Maps::WATER == area.GetGround(LocalEvent::MouseCursor()) ? Cursor::BOAT : Cursor::POINTER);
+	    else
+            if(Game::CASTLE == focus) result = Cursor::POINTER;
+	    break;
+    }
+
+    return result;
 }

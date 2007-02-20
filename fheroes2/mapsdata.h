@@ -38,6 +38,8 @@ public:
     static u16 h(void){ return height; };
 
     const Surface & GetTilesSurface(void) const{ return *tiles; };
+    u16 GetGround(u16 index) const{ return index < vec_mapstiles.size() ? vec_mapstiles[index].ground : 0; };
+    u8  GetObject(u16 index) const{ return index < vec_mapstiles.size() ? vec_mapstiles[index].object : 0; };
 
     bool Movement(u16 ax, u16 ay) const{ return Movement(ax * width + ay); };
     bool Movement(u16 index) const;

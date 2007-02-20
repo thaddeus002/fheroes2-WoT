@@ -45,6 +45,8 @@ namespace Game
 	SAVEGAME
     } menu_t;
 
+    typedef enum { HEROES, CASTLE, BOAT } focus_t;
+
     int GlobalFilterEvents(const SDL_Event *event);
 
     menu_t MainMenu(void);

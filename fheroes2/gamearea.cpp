@@ -21,7 +21,9 @@
 #include "config.h"
 #include "game.h"
 #include "cursor.h"
+#include "error.h"
 #include "gamearea.h"
+
 Rect GameArea::pos = Rect(0, 0, 0, 0);
 
 GameArea::GameArea(const MapsData & data) : maps(data)
@@ -124,4 +126,22 @@ void GameArea::Center(const Point &pt)
     if(pt.x == pos.x && pt.y == pos.y) return;
 
     Redraw();
+}
+
+/* get index maps from point mouse click on game area */
+u16 GameArea::GetIndexMaps(u16 mx, u16 my) const
+{
+    if(! (GetPosition() & Point(mx, my))){
+	Error::Warning("GameArea::GetIndexMaps: click, out of range.");
+	return 0;
+    }
+
+    u16 result = (pos.y + (my - BORDERWIDTH) / TILEWIDTH) * maps.w() + pos.x + (mx - BORDERWIDTH) / TILEWIDTH;
+
+    if(result >= maps.w() * maps.h()){
+	Error::Warning("GameArea::GetIndexMaps: position, out of range.");
+	return 0;
+    }
+
+    return result;
 }
