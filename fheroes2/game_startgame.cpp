@@ -24,11 +24,12 @@
 #include "event.h"
 #include "button.h"
 #include "dialog.h"
-#include "mapsdata.h"
+#include "world.h"
 #include "gamearea.h"
 #include "cursor.h"
 #include "radar.h"
 #include "splitter.h"
+#include "game_statuswindow.h"
 #include "game.h"
 
 #include "error.h"
@@ -40,24 +41,27 @@ namespace Game {
 Game::menu_t Game::StartGame(void){
 
     // Load maps
-    MapsData maps(H2Config::GetFileMaps());
-    GameArea areaMaps(maps);
+    World &world = World::GetWorld();
+
+    world.LoadMaps(H2Config::GetFileMaps());
+    world.ResetDate();
+
+    GameArea areaMaps(world);
 
     // cursor
     Cursor::Hide();
-    //Cursor::themes_t cursor = Cursor::FIGHT; // test //Cursor::POINTER;
 
     Game::DrawInterface();
 
     // Create radar
-    Radar radar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, maps);
+    Radar radar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, world.GetSpriteMaps());
 
     areaMaps.Redraw();
     radar.Redraw();
 
     // Create radar cursor
-    Surface spriteRadarCursor(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(MapsData::w()))),
-				static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(MapsData::h()))));
+    Surface spriteRadarCursor(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(world.w()))),
+				static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(world.h()))));
     radar.DrawCursor(spriteRadarCursor);
 
     SpriteCursor radarCursor(spriteRadarCursor, radar.GetRect());
@@ -73,7 +77,7 @@ Game::menu_t Game::StartGame(void){
     Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
     Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
-    Point pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
+    Point pt_stw, pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
 
     // coord button heroes scroll up
     pt_shu.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
@@ -87,6 +91,9 @@ Game::menu_t Game::StartGame(void){
     switch(H2Config::GetVideoMode()){
 
         default:
+	    // coord status windows
+	    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
+	    pt_stw.y = 392;
             // coord button next hero
             pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
             pt_her.y = 320;
@@ -121,6 +128,9 @@ Game::menu_t Game::StartGame(void){
 	    break;
 	
 	case Display::MEDIUM:
+	    // coord status windows
+	    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
+	    pt_stw.y = 488;
             // coord button next hero
             pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
             pt_her.y = 416;
@@ -156,6 +166,9 @@ Game::menu_t Game::StartGame(void){
 
 	case Display::LARGE:
 	case Display::XLARGE:
+	    // coord status windows
+	    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
+	    pt_stw.y = 520;
             // coord button next hero
             pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
             pt_her.y = 448;
@@ -193,13 +206,13 @@ Game::menu_t Game::StartGame(void){
     Button buttonScrollHeroesUp(pt_shu, icnscroll, 0, 1);
     Button buttonScrollCastleUp(pt_scu, icnscroll, 0, 1);
     Button buttonNextHero(pt_her, icnbtn, 0, 1);
-    Button buttonAction(pt_act, icnbtn, 2, 3);
-    Button buttonCastle(pt_cas, icnbtn, 4, 5);
-    Button buttonMagic(pt_mag, icnbtn, 6, 7);
+    Button buttonMovement(pt_act, icnbtn, 2, 3);
+    Button buttonKingdom(pt_cas, icnbtn, 4, 5);
+    Button buttonSpell(pt_mag, icnbtn, 6, 7);
     Button buttonEndTur(pt_end, icnbtn, 8, 9);
-    Button buttonInfo(pt_inf, icnbtn, 10, 11);
-    Button buttonMenu(pt_opt, icnbtn, 12, 13);
-    Button buttonSettings(pt_set, icnbtn, 14, 15);
+    Button buttonAdventure(pt_inf, icnbtn, 10, 11);
+    Button buttonFile(pt_opt, icnbtn, 12, 13);
+    Button buttonSystem(pt_set, icnbtn, 14, 15);
     Button buttonScrollHeroesDown(pt_shd, icnscroll, 2, 3);
     Button buttonScrollCastleDown(pt_scd, icnscroll, 2, 3);
 
@@ -214,10 +227,13 @@ Game::menu_t Game::StartGame(void){
     // game focus (test)
     Game::focus_t focus = Game::HEROES;
 
+    // status window
+    Game::StatusWindow statusWindow(pt_stw);
+    statusWindow.Redraw(focus);
+
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     display.Flip();
-
 
     Cursor::Show();
 
@@ -253,13 +269,13 @@ Game::menu_t Game::StartGame(void){
 	le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.Press() : buttonScrollHeroesUp.Release();
 	le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.Press() : buttonScrollCastleUp.Release();
 	le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
-	le.MousePressLeft(buttonAction) ? buttonAction.Press() : buttonAction.Release();
-	le.MousePressLeft(buttonCastle) ? buttonCastle.Press() : buttonCastle.Release();
-	le.MousePressLeft(buttonMagic) ? buttonMagic.Press() : buttonMagic.Release();
+	le.MousePressLeft(buttonMovement) ? buttonMovement.Press() : buttonMovement.Release();
+	le.MousePressLeft(buttonKingdom) ? buttonKingdom.Press() : buttonKingdom.Release();
+	le.MousePressLeft(buttonSpell) ? buttonSpell.Press() : buttonSpell.Release();
 	le.MousePressLeft(buttonEndTur) ? buttonEndTur.Press() : buttonEndTur.Release();
-	le.MousePressLeft(buttonInfo) ? buttonInfo.Press() : buttonInfo.Release();
-	le.MousePressLeft(buttonMenu) ? buttonMenu.Press() : buttonMenu.Release();
-	le.MousePressLeft(buttonSettings) ? buttonSettings.Press() : buttonSettings.Release();
+	le.MousePressLeft(buttonAdventure) ? buttonAdventure.Press() : buttonAdventure.Release();
+	le.MousePressLeft(buttonFile) ? buttonFile.Press() : buttonFile.Release();
+	le.MousePressLeft(buttonSystem) ? buttonSystem.Press() : buttonSystem.Release();
 	le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.Press() : buttonScrollHeroesDown.Release();
 	le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.Press() : buttonScrollCastleDown.Release();
 
@@ -275,17 +291,44 @@ Game::menu_t Game::StartGame(void){
 	    }
 	}
 
-        // show dialog info
-	if(le.MouseClickLeft(buttonInfo))
+	// click Next Hero
+	if(le.MouseClickLeft(buttonNextHero))
 	{
-	    //Game::menu_t result = 
-	    Dialog::Info();
+	}
+
+	// click Continue Movement
+	if(le.MouseClickLeft(buttonMovement))
+	{
+	}
+
+	// click Kingdom Summary
+	if(le.MouseClickLeft(buttonKingdom))
+	{
+	}
+
+	// click Cast Spell
+	if(le.MouseClickLeft(buttonSpell))
+	{
+	}
+
+	// click End Turn
+	if(le.MouseClickLeft(buttonEndTur))
+	{
+	}
+
+        // click AdventureOptions
+	if(le.MouseClickLeft(buttonAdventure))
+	{
+	    switch(Dialog::AdventureOptions()){
+		default:
+		    break;
+	    }
         }
 
-	// show dialog menu
-	if(le.MouseClickLeft(buttonMenu))
+	// click FileOptions
+	if(le.MouseClickLeft(buttonFile))
 	{
-	    Game::menu_t result = Dialog::Menu();
+	    Game::menu_t result = Dialog::FileOptions();
 	    
 	    switch(result){
 
@@ -301,6 +344,24 @@ Game::menu_t Game::StartGame(void){
 		    break;
 	    }
 	}
+
+	// click SystemOptions
+	if(le.MouseClickLeft(buttonSystem)&& Dialog::OK == Dialog::SystemOptions())
+	{
+	    // Change and save system settings
+	}
+	
+	// right info
+	if(le.MousePressRight(radar.GetRect())) Dialog::Message("World Map", "A miniature view of the known world. Left click to move viewing area.", Font::BIG);
+	if(le.MousePressRight(buttonNextHero)) Dialog::Message("Next Hero", "Select the next Hero.", Font::BIG);
+	if(le.MousePressRight(buttonMovement)) Dialog::Message("Continue Movement", "Continue the Hero's movement along the current path.", Font::BIG);
+	if(le.MousePressRight(buttonKingdom)) Dialog::Message("Kingdom Summary", "View a Summary of your Kingdom.", Font::BIG);
+	if(le.MousePressRight(buttonSpell)) Dialog::Message("Cast Spell", "Cast an adventure spell.", Font::BIG);
+	if(le.MousePressRight(buttonEndTur)) Dialog::Message("End Turn", "End your turn and left the computer take its turn.", Font::BIG);
+	if(le.MousePressRight(buttonAdventure)) Dialog::Message("Adventure Options", "Bring up the adventure options menu.", Font::BIG);
+	if(le.MousePressRight(buttonFile)) Dialog::Message("File Options", "Bring up the file options menu, alloving you to load menu, save etc.", Font::BIG);
+	if(le.MousePressRight(buttonSystem)) Dialog::Message("System Options", "Bring up the system options menu, alloving you to customize your game.", Font::BIG);
+	// Dialog::Message("Status Window", "This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows.", Font::BIG);
 
 	// ESC
 	if(le.KeyPress(SDLK_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;

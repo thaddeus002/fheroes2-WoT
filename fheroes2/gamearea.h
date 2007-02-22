@@ -22,26 +22,26 @@
 
 #include "gamedefs.h"
 #include "maps.h"
-#include "mapsdata.h"
+#include "world.h"
 #include "rect.h"
 
 class GameArea
 {
 public:
-    GameArea(const MapsData & data);
+    GameArea(const World & wd);
     
     typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
     static const Rect & GetRect(void){ return pos; }
 
     Rect GetPosition(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, pos.w * TILEWIDTH, pos.h * TILEWIDTH); }
-    const MapsData & GetMapsData(void) const{ return maps; };
+    //const World & GetWorld(void) const{ return world; };
 
     u16  GetIndexMaps(u16 mx, u16 my) const;
     u16  GetIndexMaps(const Point &pt) const{ return GetIndexMaps(pt.x, pt.y); };
 
-    u8   GetObject(const Point &mp) const{ return maps.GetObject(GetIndexMaps(mp)); };
-    u16  GetGround(const Point &mp) const{ return maps.GetGround(GetIndexMaps(mp)); };
+    u8   GetObject(const Point &mp) const{ return world.GetObject(GetIndexMaps(mp)); };
+    u16  GetGround(const Point &mp) const{ return world.GetGround(GetIndexMaps(mp)); };
 
     void Scroll(GameArea::scroll_t scroll);
 
@@ -52,8 +52,7 @@ public:
     void Redraw(const Rect &area_rt);
 
 private:
-    const MapsData & maps;
-
+    const World &world;
     static Rect pos;
 };
 

@@ -28,16 +28,30 @@
 #include "mp2.h"
 #include "text.h"
 #include "rand.h"
-#include "mapsdata.h"
+#include "world.h"
 
-u16 MapsData::width = 0;
-u16 MapsData::height = 0;
+World World::world;
 
-MapsData::MapsData(const std::string &filename)
+void World::LoadMaps(const std::string &filename)
 {
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
+
+    // playing kingdom
+    kingdom[0].color = Color::BLUE;
+    kingdom[0].play = (Color::BLUE & H2Config::GetKingdomColors() ? true : false);
+    kingdom[1].color = Color::GREEN;
+    kingdom[1].play = (Color::GREEN & H2Config::GetKingdomColors() ? true : false);
+    kingdom[2].color = Color::RED;
+    kingdom[2].play = (Color::RED & H2Config::GetKingdomColors() ? true : false);
+    kingdom[3].color = Color::YELLOW;
+    kingdom[3].play = (Color::YELLOW & H2Config::GetKingdomColors() ? true : false);
+    kingdom[4].color = Color::ORANGE;
+    kingdom[4].play = (Color::ORANGE & H2Config::GetKingdomColors() ? true : false);
+    kingdom[5].color = Color::PURPLE;
+    kingdom[5].play = (Color::PURPLE & H2Config::GetKingdomColors() ? true : false);
+    kingdom[6].play = false;
 
     // loading info
     display.Fill(0, 0, 0);
@@ -101,7 +115,7 @@ MapsData::MapsData(const std::string &filename)
     fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
 
     // read all tiles
-    std::vector<MP2::tile_t> vec_tiles;
+    std::vector<MP2::tile_t> vec_mp2tiles;
 
     for(u16 ii = 0; ii < width * height; ++ii){
 
@@ -145,7 +159,7 @@ MapsData::MapsData(const std::string &filename)
 	while(byte16){
 
 	    //--byte16;
-	    if(vec_mp2addons.size() <= byte16){ Error::Warning("MapsData::MapsData: index addons out of range!"); break; }
+	    if(vec_mp2addons.size() <= byte16){ Error::Warning("World::World: index addons out of range!"); break; }
 
 	    saddon.object1	= vec_mp2addons[byte16].objectNameN1 * 2;
 	    saddon.index1	= vec_mp2addons[byte16].indexNameN1;
@@ -158,25 +172,32 @@ MapsData::MapsData(const std::string &filename)
 	    byte16 = vec_mp2addons[byte16].indexAddon;
 	}
 
+	stile.index1 = stile.addons[0].index1;
+
 	std::sort(stile.addons.begin(), stile.addons.end(), MP2::VectorAddonSort);
 
 	fd.ignore(sizeof(u32));
 	fd.ignore(sizeof(u32));
 
-	vec_tiles.push_back(stile);
+	vec_mp2tiles.push_back(stile);
     }
 
+    // read castle
+    
+    // read heroes
+    
+    // read events
+    
     fd.close();
 
     //
+    sprite_maps = new Surface(width * TILEWIDTH, height * TILEWIDTH, 8, SDL_SWSURFACE);
+    sprite_maps->LoadPalette(AGG::GetPalette());
 
-    tiles = new Surface(width * TILEWIDTH, height * TILEWIDTH, 8, SDL_SWSURFACE);
-    tiles->LoadPalette(AGG::GetPalette());
-
-    // MapsData
+    // World
     Point pt;
     u32 ii = 0;
-    u32 size = vec_tiles.size();
+    u32 size = vec_mp2tiles.size();
 
     Maps::tiles_t tl;
     for(; ii < size; ++ii){
@@ -186,8 +207,8 @@ MapsData::MapsData(const std::string &filename)
 
 	tl.coord	= pt;
 	//tl.center	= Point();
-	tl.ground	= MP2::GetTypeGrounds(vec_tiles[ii]);
-	tl.object	= vec_tiles[ii].general;
+	tl.ground	= MP2::GetTypeGrounds(vec_mp2tiles[ii]);
+	tl.object	= vec_mp2tiles[ii].general;
 	tl.level1	= NULL;
 	tl.level2	= NULL;
 
@@ -196,18 +217,31 @@ MapsData::MapsData(const std::string &filename)
 	    case MP2::OBJ_RNDRESOURCE:
 		tl.object = MP2::OBJ_RESOURCE;
 	    case MP2::OBJ_RESOURCE:
-		//ii
-		//vec_tiles[ii].index1;
-		//count
+/*
+		switch(vec_mp2tiles[ii].index1){
+            	    case 1: tl.resource = Resource::WOOD; break;
+		    case 3: tl.resource = Resource::MERCURY; break;
+            	    case 5: tl.resource = Resource::ORE; break;
+                    case 7: tl.resource = Resource::SULFUR; break;
+                    case 9: tl.resource = Resource::CRYSTAL; break;
+                    case 11: tl.resource = Resource::GEMS; break;
+                    case 13: tl.resource = Resource::GOLD; break;
+                    case 17: tl.resource = Resource::Rand(); break;
+		    default:
+			Error::Warning("unknown resource: ", vec_mp2tiles[ii].index1);
+		    break;
+                    //case 15: tl.resource = Maps::LAMP; break;
+                    //case 19: tl.resource = Maps::CHEST; break;
+		}
 		break;
-
+*/
 	    default:
 		break;
 	}
 
 	// static sprite level1 and level2
-	std::vector<MP2::addon_t>::const_iterator itaddon     = vec_tiles[ii].addons.begin();
-	std::vector<MP2::addon_t>::const_iterator itaddon_end = vec_tiles[ii].addons.end();
+	std::vector<MP2::addon_t>::const_iterator itaddon     = vec_mp2tiles[ii].addons.begin();
+	std::vector<MP2::addon_t>::const_iterator itaddon_end = vec_mp2tiles[ii].addons.end();
 
 	for(; itaddon != itaddon_end; ++itaddon){
 
@@ -226,7 +260,7 @@ MapsData::MapsData(const std::string &filename)
 	    }
 	}
 
-	vec_mapstiles.push_back(tl);
+	vec_tiles.push_back(tl);
 
 	
 	// blit tiles to global tiles
@@ -235,44 +269,66 @@ MapsData::MapsData(const std::string &filename)
 
 	Surface til(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE);
 	til.LoadPalette(AGG::GetPalette());
-	AGG::GetTIL("GROUND32.TIL", vec_tiles[ii].tile, vec_tiles[ii].shape, til);
+	AGG::GetTIL("GROUND32.TIL", vec_mp2tiles[ii].tile, vec_mp2tiles[ii].shape, til);
 
-	tiles->Blit(til, pt);
+	sprite_maps->Blit(til, pt);
     }
 
     AGG::FreeObject("GROUND32.TIL");
 
-    tiles->SetDisplayFormat();
+    sprite_maps->SetDisplayFormat();
 
     // save maps to big sprite
-    //if(H2Config::Debug() && tiles->SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
+    //if(H2Config::Debug() && sprite_maps->SaveBMP("maps.bmp")) Error::Verbose("debug maps: save sprite: maps.bmp");
 }
 
-MapsData::~MapsData()
+World::~World()
 {
-    delete tiles;
+    if(sprite_maps) delete sprite_maps;
 
-    std::vector<Maps::tiles_t>::const_iterator itl = vec_mapstiles.begin();
-    for(; itl != vec_mapstiles.end(); ++itl){
+    std::vector<Maps::tiles_t>::const_iterator itl = vec_tiles.begin();
+    for(; itl != vec_tiles.end(); ++itl){
 	if((*itl).level1) delete (*itl).level1;
 	if((*itl).level2) delete (*itl).level2;
     }
 
 }
 
-void MapsData::Redraw(const Rect &rt, const Point &pt) const
+/* end day */
+void World::NextDay(void)
 {
-    if(pt.x < 0 || pt.y < 0 || pt.x >= GameArea::GetRect().w || pt.y >= GameArea::GetRect().h){ Error::Warning("MapsData::Redraw: out of range"); return; }
+    ++World::day;
+
+    if(!(World::day % DAYOFWEEK)) ++World::week;
+    if(!(World::week % WEEKOFMONTH)) ++World::month;
+
+    World::begin_week = (World::day % DAYOFWEEK ? false : true);
+    World::begin_month = (World::week % WEEKOFMONTH ? false : true);
+}
+
+/* set new date */
+void World::ResetDate(void)
+{
+    World::day = 0;
+    World::week = 0;
+    World::month = 0;
+    World::begin_week = true;
+    World::begin_month = true;
+}
+
+void World::Redraw(const Rect &rt, const Point &pt) const
+{
+    if(pt.x < 0 || pt.y < 0 || pt.x >= GameArea::GetRect().w || pt.y >= GameArea::GetRect().h){ Error::Warning("World::Redraw: out of range"); return; }
 
     // static level 0
     Rect  srcrt(rt.x * TILEWIDTH, rt.y * TILEWIDTH, rt.w * TILEWIDTH, rt.h * TILEWIDTH);
     Point dstpt(BORDERWIDTH + pt.x * TILEWIDTH, BORDERWIDTH + pt.y * TILEWIDTH);
 
-    display.Blit(*tiles, srcrt, dstpt);
+    display.Blit(*sprite_maps, srcrt, dstpt);
 
     // static level 1
-    std::vector<Maps::tiles_t>::const_iterator itm = vec_mapstiles.begin();
-    std::vector<Maps::tiles_t>::const_iterator itm_end = vec_mapstiles.end();
+    std::vector<Maps::tiles_t>::const_iterator itm = vec_tiles.begin();
+    std::vector<Maps::tiles_t>::const_iterator itm_end = vec_tiles.end();
 
     for(; itm != itm_end; ++itm) if((rt & (*itm).coord) && (*itm).level1 && (*itm).level1->size()){
 
@@ -292,7 +348,7 @@ void MapsData::Redraw(const Rect &rt, const Point &pt) const
     // heroes
     
     // static level 2
-    itm = vec_mapstiles.begin();
+    itm = vec_tiles.begin();
 
     for(; itm != itm_end; ++itm) if((rt & (*itm).coord) && (*itm).level2 && (*itm).level2->size()){
 
@@ -310,11 +366,11 @@ void MapsData::Redraw(const Rect &rt, const Point &pt) const
 }
 
 /* movement on maps */
-bool MapsData::Movement(u16 index) const
+bool World::Movement(u16 index) const
 {
-    if(index >= vec_mapstiles.size()) return false; 
+    if(index >= vec_tiles.size()) return false; 
 
-    switch(vec_mapstiles[index].object){
+    switch(vec_tiles[index].object){
 
         case MP2::OBJ_STONES:
         case MP2::OBJ_OILLAKE:
@@ -339,3 +395,29 @@ bool MapsData::Movement(u16 index) const
     return true;
 }
 
+const Kingdom & World::GetKingdom(Color::color_t color)
+{
+    switch(color){
+    
+	case Color::BLUE:
+	    return kingdom[0];
+	
+	case Color::GREEN:
+	    return kingdom[1];
+
+	case Color::RED:
+	    return kingdom[2];
+	
+	case Color::YELLOW:
+	    return kingdom[3];
+	
+	case Color::ORANGE:
+	    return kingdom[4];
+	
+	case Color::PURPLE:
+	    return kingdom[5];
+	
+	default:
+	    return kingdom[6];
+    }
+}

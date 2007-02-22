@@ -21,6 +21,7 @@
 #define H2MP2_H
 
 #include <vector>
+#include "maps.h"
 #include "gamedefs.h"
 
 #define MP2OFFSETDATA	428
@@ -71,6 +72,7 @@ namespace MP2
         u8      quantity2;
         u8      shape;
         u8      general;
+	u8	index1;
     } tile_t;
 
     typedef enum {

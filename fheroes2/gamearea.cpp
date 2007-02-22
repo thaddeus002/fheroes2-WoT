@@ -26,7 +26,7 @@
 
 Rect GameArea::pos = Rect(0, 0, 0, 0);
 
-GameArea::GameArea(const MapsData & data) : maps(data)
+GameArea::GameArea(const World &wd) : world(wd)
 {
     // static values
     // width area  = (display.w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH
@@ -58,13 +58,13 @@ GameArea::GameArea(const MapsData & data) : maps(data)
 /* readraw all */
 void GameArea::Redraw(void)
 {
-    maps.Redraw(pos);
+    world.Redraw(pos);
 }
 
 /* readraw rect */
 void GameArea::Redraw(const Rect &area_rt)
 {
-    maps.Redraw(area_rt, Point(area_rt.x, area_rt.y));
+    world.Redraw(area_rt, Point(area_rt.x, area_rt.y));
 }
 
 /* scroll area */
@@ -79,7 +79,7 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    Cursor::Show();
 	    break;
 	case GameArea::RIGHT:
-	    if(maps.w() - pos.w == pos.x) return;
+	    if(world.w() - pos.w == pos.x) return;
 	    Cursor::Hide();
 	    ++pos.x;
 	    Redraw();
@@ -93,7 +93,7 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    Cursor::Show();
 	    break;
 	case GameArea::BOTTOM:
-	    if(maps.h() - pos.h == pos.y) return;
+	    if(world.h() - pos.h == pos.y) return;
 	    Cursor::Hide();
 	    ++pos.y;
 	    Redraw();
@@ -106,8 +106,8 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 void GameArea::CenterFromRadar(const Point &pt)
 {
     // left top point
-    pos.x = (pt.x - (display.w() - BORDERWIDTH - RADARWIDTH)) * maps.w() / RADARWIDTH;
-    pos.y = (pt.y - BORDERWIDTH) * maps.h() / RADARWIDTH;
+    pos.x = (pt.x - (display.w() - BORDERWIDTH - RADARWIDTH)) * world.w() / RADARWIDTH;
+    pos.y = (pt.y - BORDERWIDTH) * world.h() / RADARWIDTH;
 
     Center(Point(pos.x, pos.y));
 }
@@ -120,8 +120,8 @@ void GameArea::Center(const Point &pt)
     pos.y = (0 > pos.y - pos.h / 2 ? 0 : pos.y - pos.h / 2);
 
     // our of range
-    if(pos.y > maps.h() - pos.h) pos.y = maps.h() - pos.h;
-    if(pos.x > maps.w() - pos.w)  pos.x = maps.w() - pos.w;
+    if(pos.y > world.h() - pos.h) pos.y = world.h() - pos.h;
+    if(pos.x > world.w() - pos.w)  pos.x = world.w() - pos.w;
 
     if(pt.x == pos.x && pt.y == pos.y) return;
 
@@ -136,9 +136,9 @@ u16 GameArea::GetIndexMaps(u16 mx, u16 my) const
 	return 0;
     }
 
-    u16 result = (pos.y + (my - BORDERWIDTH) / TILEWIDTH) * maps.w() + pos.x + (mx - BORDERWIDTH) / TILEWIDTH;
+    u16 result = (pos.y + (my - BORDERWIDTH) / TILEWIDTH) * world.w() + pos.x + (mx - BORDERWIDTH) / TILEWIDTH;
 
-    if(result >= maps.w() * maps.h()){
+    if(result >= world.w() * world.h()){
 	Error::Warning("GameArea::GetIndexMaps: position, out of range.");
 	return 0;
     }

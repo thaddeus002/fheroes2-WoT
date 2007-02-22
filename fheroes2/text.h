@@ -31,6 +31,7 @@ public:
     typedef enum { LEFT, CENTER, RIGHT } align_t;
 
     Text(u16 ax, u16 ay, const std::string &msg, Font::type_t ft = Font::SMALL, bool draw = false);
+    Text(u16 ax, u16 ay, u32 textcount, Font::type_t ft = Font::SMALL, bool draw = false);
     
     u16 w(void) const{ return pos.w; }
 

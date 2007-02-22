@@ -20,14 +20,12 @@
 #ifndef H2RAND_H
 #define H2RAND_H
 
-#include "kingdom.h"
 #include "gamedefs.h"
 
 namespace Rand
 {
     void Init(void);
     u32 Get(u32 min, u32 max = 0);
-    Kingdom::race_t Race(void);
 };
 
 #endif

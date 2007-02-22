@@ -17,18 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
 
-#include <string>
+#include "difficulty.h"
 
-namespace String
+// operator ++difficulty_t
+Difficulty::difficulty_t& Difficulty::operator++ (Difficulty::difficulty_t& difficulty)
+{ return difficulty = ( Difficulty::IMPOSSIBLE == difficulty ? Difficulty::EASY : Difficulty::difficulty_t(difficulty + 1)); };
+
+// operator --difficulty_t
+Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& difficulty)
+{ return difficulty = ( Difficulty::EASY == difficulty ? Difficulty::IMPOSSIBLE : Difficulty::difficulty_t(difficulty - 1)); };
+
+
+const std::string & Difficulty::String(Difficulty::difficulty_t difficulty)
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
-};
+    static std::string easy("Easy");
+    static std::string nrml("Normal");
+    static std::string hard("Hard");
+    static std::string expt("Expert");
+    static std::string imps("Impossible");
 
-#endif
+    switch(difficulty){
+        case Difficulty::EASY: return easy;
+        case Difficulty::NORMAL: return nrml;
+	case Difficulty::HARD: return hard;
+	case Difficulty::EXPERT: return expt;
+	default: break;
+    }
+
+    return imps;
+}

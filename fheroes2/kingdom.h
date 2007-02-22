@@ -20,36 +20,24 @@
 #ifndef H2KINGDOM_H
 #define H2KINGDOM_H
 
-#define KINGDOMMAX      7
+#define KINGDOMMAX      6
 
+#include "color.h"
+#include "resource.h"
 #include "gamedefs.h"
 
-namespace Kingdom
+class Kingdom
 {
-    typedef enum {
-        BLUE    = 0x01,
-        GREEN   = 0x02,
-        RED     = 0x04,
-        YELLOW  = 0x08,
-        ORANGE  = 0x10,
-        PURPLE  = 0x20,
-        GRAY    = 0x40,
-    } color_t;
+public:
+    Kingdom();
+    
+    u8 GetCountCastle(void) const{ return 0; };
+    u8 GetCountTown(void) const{ return 0; };
 
-    typedef enum {
-        KNGT    = 0x01,
-        BARB    = 0x02,
-        SORC    = 0x04,
-        WRLK    = 0x08,
-        WZRD    = 0x10,
-        NECR    = 0x20,
-        MULT    = 0x40,
-        RAND    = 0x80,
-        BOMG    = 0x00
-    } race_t;
-
-    color_t& operator++ (color_t& color);
-    color_t& operator-- (color_t& color);
+    Color::color_t color;
+    bool build;
+    bool play;
+    Resource::funds_t resource;
 };
 
 #endif

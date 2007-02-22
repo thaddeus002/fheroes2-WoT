@@ -33,6 +33,7 @@
 #include "cursor.h"
 #include "config.h"
 #include "maps_fileinfo.h"
+#include "difficulty.h"
 #include "dialog.h"
 #include "text.h"
 #include "tools.h"
@@ -43,7 +44,7 @@
 #define LISTHEIGHTROW	19
 
 typedef struct {
-    Kingdom::color_t color;
+    Color::color_t color;
     Rect rect;
 } rectcolor_t;
 
@@ -109,14 +110,14 @@ Game::menu_t Game::ScenarioInfo(void){
     Button buttonCancel(491, 413, "NGEXTRA.ICN", 68, 69);
 
     // set levelCursor (default normal)
-    std::map<Maps::difficulty_t, Point> pointDifficulty;
-    pointDifficulty[Maps::EASY] = Point(225, 124);
-    pointDifficulty[Maps::NORMAL] = Point(302, 124);
-    pointDifficulty[Maps::HARD] = Point(378, 124);
-    pointDifficulty[Maps::EXPERT] = Point(455, 124);
-    pointDifficulty[Maps::IMPOSSIBLE] = Point(532, 124);
-    SpriteCursor levelCursor(AGG::GetICN("NGEXTRA.ICN", 62), pointDifficulty[Maps::NORMAL]);
-    H2Config::SetGameDifficulty(Maps::NORMAL);
+    std::map<Difficulty::difficulty_t, Point> pointDifficulty;
+    pointDifficulty[Difficulty::EASY] = Point(225, 124);
+    pointDifficulty[Difficulty::NORMAL] = Point(302, 124);
+    pointDifficulty[Difficulty::HARD] = Point(378, 124);
+    pointDifficulty[Difficulty::EXPERT] = Point(455, 124);
+    pointDifficulty[Difficulty::IMPOSSIBLE] = Point(532, 124);
+    SpriteCursor levelCursor(AGG::GetICN("NGEXTRA.ICN", 62), pointDifficulty[Difficulty::NORMAL]);
+    H2Config::SetGameDifficulty(Difficulty::NORMAL);
 
     std::vector<rectcolor_t>::const_iterator it;
 
@@ -129,14 +130,14 @@ Game::menu_t Game::ScenarioInfo(void){
 	le.HandleEvents();
 
 	// select level
-	Maps::difficulty_t difficulty = Maps::EASY;
+	Difficulty::difficulty_t difficulty = Difficulty::EASY;
 	do
 	    if(le.MousePressLeft(pointDifficulty[difficulty], levelCursor.GetRect().w, levelCursor.GetRect().h)){
 		levelCursor.Move(pointDifficulty[difficulty]);
 		display.Flip();
 		H2Config::SetGameDifficulty(difficulty);
 	    }
-	while(++difficulty != Maps::EASY);
+	while(++difficulty != Difficulty::EASY);
 
 	// select color
 	it = vo.begin();
@@ -158,13 +159,13 @@ Game::menu_t Game::ScenarioInfo(void){
 		Cursor::Hide();
 		u8 index = 0;
 		switch(H2Config::GetKingdomRace((*it).color)){
-		    case Kingdom::KNGT: index = 52; H2Config::SetKingdomRace((*it).color, Kingdom::BARB); break;
-		    case Kingdom::BARB: index = 53; H2Config::SetKingdomRace((*it).color, Kingdom::SORC); break;
-		    case Kingdom::SORC: index = 54; H2Config::SetKingdomRace((*it).color, Kingdom::WRLK); break;
-		    case Kingdom::WRLK: index = 55; H2Config::SetKingdomRace((*it).color, Kingdom::WZRD); break;
-		    case Kingdom::WZRD: index = 56; H2Config::SetKingdomRace((*it).color, Kingdom::NECR); break;
-		    case Kingdom::NECR: index = 58; H2Config::SetKingdomRace((*it).color, Kingdom::RAND); break;
-		    case Kingdom::RAND: index = 51; H2Config::SetKingdomRace((*it).color, Kingdom::KNGT); break;
+		    case Race::KNGT: index = 52; H2Config::SetKingdomRace((*it).color, Race::BARB); break;
+		    case Race::BARB: index = 53; H2Config::SetKingdomRace((*it).color, Race::SORC); break;
+		    case Race::SORC: index = 54; H2Config::SetKingdomRace((*it).color, Race::WRLK); break;
+		    case Race::WRLK: index = 55; H2Config::SetKingdomRace((*it).color, Race::WZRD); break;
+		    case Race::WZRD: index = 56; H2Config::SetKingdomRace((*it).color, Race::NECR); break;
+		    case Race::NECR: index = 58; H2Config::SetKingdomRace((*it).color, Race::RAND); break;
+		    case Race::RAND: index = 51; H2Config::SetKingdomRace((*it).color, Race::KNGT); break;
 		    default: break;
 		}
     		const Sprite &sprite = AGG::GetICN("NGEXTRA.ICN", index);
@@ -186,9 +187,9 @@ Game::menu_t Game::ScenarioInfo(void){
 	    Scenario::SelectMaps(info_maps);
 	    Scenario::DrawInfo(vo, vc);
 	    Scenario::RedrawOpponentColors(vo);
-	    levelCursor.Move(pointDifficulty[Maps::NORMAL]);
+	    levelCursor.Move(pointDifficulty[Difficulty::NORMAL]);
 	    display.Flip();
-	    H2Config::SetGameDifficulty(Maps::NORMAL);
+	    H2Config::SetGameDifficulty(Difficulty::NORMAL);
 	}
 
 	// click cancel
@@ -197,16 +198,25 @@ Game::menu_t Game::ScenarioInfo(void){
 	// click ok
 	if(le.MouseClickLeft(buttonOk)){
 	    Error::Verbose("select maps: " + H2Config::GetFileMaps());
-	    Error::Verbose("difficulty: " + std::string(CStr::Difficulty(H2Config::GetGameDifficulty())));
-	    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
+	    Error::Verbose("difficulty: " + Difficulty::String(H2Config::GetGameDifficulty()));
+	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 		if(H2Config::GetKingdomColors() & color){
-		    if(Kingdom::RAND == H2Config::GetKingdomRace(color)) H2Config::SetKingdomRace(color, Rand::Race());
-		    Error::Verbose(std::string(CStr::Color(color)) + ": " + std::string(CStr::Race(H2Config::GetKingdomRace(color))));
+		    if(Race::RAND == H2Config::GetKingdomRace(color)) H2Config::SetKingdomRace(color, Race::Rand());
+		    Error::Verbose(Color::String(color) + ": " + Race::String(H2Config::GetKingdomRace(color)));
 	    }
-	    Error::Verbose("select color: " + std::string(CStr::Color(H2Config::GetHumanColor())));
+	    Error::Verbose("select color: " + Color::String(H2Config::GetHumanColor()));
 
 	    return STARTGAME;
 	}
+	
+	// right info
+	if(le.MousePressRight(buttonSelectMaps)) Dialog::Message("Scenario", "Click here to select which scenario to play.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Game Difficulty", "This lets you change the starting difficulty at which you will play. Higher difficulty levels start you of with fewer resources, and at the higher settings, give extra resources to the computer.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Opponents", "This lets you change player starting positions and colors. A particular color will always start in a particular location. Some positions may only be played by a computer player or only by a human player.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Class", "This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alingment.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Difficulty Rating", "The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score.", Font::BIG);
+	if(le.MousePressRight(buttonOk)) Dialog::Message("OK", "Click to accept these settings and start a new game.", Font::BIG);
+	if(le.MousePressRight(buttonCancel)) Dialog::Message("Cancel", "Click to return to the main menu.", Font::BIG);
     }
 
     return QUITGAME;
@@ -214,29 +224,29 @@ Game::menu_t Game::ScenarioInfo(void){
 
 void Scenario::RedrawOpponentColors(const std::vector<rectcolor_t> &vo)
 {
-    std::map<Kingdom::color_t, const Sprite *> colorHumanSprite;
-    colorHumanSprite[Kingdom::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 9);
-    colorHumanSprite[Kingdom::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 10);
-    colorHumanSprite[Kingdom::RED] = &AGG::GetICN("NGEXTRA.ICN", 11);
-    colorHumanSprite[Kingdom::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 12);
-    colorHumanSprite[Kingdom::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 13);
-    colorHumanSprite[Kingdom::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 14);
+    std::map<Color::color_t, const Sprite *> colorHumanSprite;
+    colorHumanSprite[Color::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 9);
+    colorHumanSprite[Color::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 10);
+    colorHumanSprite[Color::RED] = &AGG::GetICN("NGEXTRA.ICN", 11);
+    colorHumanSprite[Color::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 12);
+    colorHumanSprite[Color::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 13);
+    colorHumanSprite[Color::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 14);
 
-    std::map<Kingdom::color_t, const Sprite *> colorAllowSprite;
-    colorAllowSprite[Kingdom::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 3);
-    colorAllowSprite[Kingdom::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 4);
-    colorAllowSprite[Kingdom::RED] = &AGG::GetICN("NGEXTRA.ICN", 5);
-    colorAllowSprite[Kingdom::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 6);
-    colorAllowSprite[Kingdom::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 7);
-    colorAllowSprite[Kingdom::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 8);
+    std::map<Color::color_t, const Sprite *> colorAllowSprite;
+    colorAllowSprite[Color::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 3);
+    colorAllowSprite[Color::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 4);
+    colorAllowSprite[Color::RED] = &AGG::GetICN("NGEXTRA.ICN", 5);
+    colorAllowSprite[Color::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 6);
+    colorAllowSprite[Color::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 7);
+    colorAllowSprite[Color::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 8);
 
-    std::map<Kingdom::color_t, const Sprite *> colorOpponentSprite;
-    colorOpponentSprite[Kingdom::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 15);
-    colorOpponentSprite[Kingdom::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 16);
-    colorOpponentSprite[Kingdom::RED] = &AGG::GetICN("NGEXTRA.ICN", 17);
-    colorOpponentSprite[Kingdom::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 18);
-    colorOpponentSprite[Kingdom::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 19);
-    colorOpponentSprite[Kingdom::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 20);
+    std::map<Color::color_t, const Sprite *> colorOpponentSprite;
+    colorOpponentSprite[Color::BLUE] = &AGG::GetICN("NGEXTRA.ICN", 15);
+    colorOpponentSprite[Color::GREEN] = &AGG::GetICN("NGEXTRA.ICN", 16);
+    colorOpponentSprite[Color::RED] = &AGG::GetICN("NGEXTRA.ICN", 17);
+    colorOpponentSprite[Color::YELLOW] = &AGG::GetICN("NGEXTRA.ICN", 18);
+    colorOpponentSprite[Color::ORANGE] = &AGG::GetICN("NGEXTRA.ICN", 19);
+    colorOpponentSprite[Color::PURPLE] = &AGG::GetICN("NGEXTRA.ICN", 20);
 
     std::vector<rectcolor_t>::const_iterator it = vo.begin();
 
@@ -286,7 +296,7 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     u8 current = 0;
     vo.clear();
 
-    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
         if(H2Config::GetKingdomColors() & color){
 
             const Sprite &sprite = AGG::GetICN("NGEXTRA.ICN", 3);
@@ -304,21 +314,21 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     current = 0;
     vc.clear();
 
-    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	if(H2Config::GetKingdomColors() & color){
 
 	    u8 index = 0;
 	    Point pt;
 
 	    switch(H2Config::GetKingdomRace(color)){
-		case Kingdom::KNGT: index = 70; break;
-	        case Kingdom::BARB: index = 71; break;
-	        case Kingdom::SORC: index = 72; break;
-		case Kingdom::WRLK: index = 73; break;
-	        case Kingdom::WZRD: index = 74; break;
-		case Kingdom::NECR: index = 75; break;
-	        case Kingdom::MULT: index = 76; break;
-		case Kingdom::RAND: index = 58; break;
+		case Race::KNGT: index = 70; break;
+	        case Race::BARB: index = 71; break;
+	        case Race::SORC: index = 72; break;
+		case Race::WRLK: index = 73; break;
+	        case Race::WZRD: index = 74; break;
+		case Race::NECR: index = 75; break;
+	        case Race::MULT: index = 76; break;
+		case Race::RAND: index = 58; break;
 		default: continue;
 	    }
 
@@ -543,8 +553,9 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    Cursor::Show();
 	}
 
-	// click splitter area
-	if(le.MouseClickLeft(split.GetRect()) && curmaps->size() > LISTMAXITEM && le.MouseCursor().y > split.GetRect().y){
+	// move cursor splitter
+	if(le.MousePressLeft(split.GetRect()) && curmaps->size() > LISTMAXITEM && le.MouseCursor(split.GetRect())){
+	//    Error::Verbose("move on splitter");
 	    u16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
 	    if(seek > curmaps->size() - LISTMAXITEM) seek = curmaps->size() - LISTMAXITEM;
 
@@ -557,12 +568,22 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    split.Move(seek);
 	    display.Flip();
 	    Cursor::Show();
-	}
+ 	}
 
-	// move on splitter
-	//if(le.MousePressLeft(split.GetRect()) && le.MouseCursor(split.GetRect())){
-	//    Error::Verbose("move on splitter");
- 	//}
+	// right info
+	if(le.MousePressRight(buttonSelectSmall)) Dialog::Message("Small Maps", "View only maps of size small (36x36).", Font::BIG);
+	if(le.MousePressRight(buttonSelectMedium)) Dialog::Message("Medium Maps", "View only maps of size medium (72x72).", Font::BIG);
+	if(le.MousePressRight(buttonSelectLarge)) Dialog::Message("Large Maps", "View only maps of size large (108x108).", Font::BIG);
+	if(le.MousePressRight(buttonSelectXLarge)) Dialog::Message("Extra Large Maps", "View only maps of size extra large (144x144).", Font::BIG);
+	if(le.MousePressRight(buttonSelectAll)) Dialog::Message("All Maps", "View all maps, regardless of size.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Players Icon", "Indicates how many players total are in the scenario. Any positions not occupied by humans will be occupied by computer players.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Size Icon", "Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144).", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Selected Name", "The name of the currently selected map.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Victory Condition Icon", "There are 6 possiblities:.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Loss Condition Icon", "There are 4 possible loss conditions, as indicated by the following icons:.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Selected Map Difficulty", "The map difficulty of the currently selected map.  The map difficulty is determined by the scenario designer. More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message("Selected Description", "The description of the currently selected map.", Font::BIG);
+	if(le.MousePressRight(buttonOk)) Dialog::Message("OK", "Accept the choice made.", Font::BIG);
 
 	// click ok
 	if(le.MouseClickLeft(buttonOk)) break;
@@ -582,38 +603,38 @@ void Scenario::SetCurrentSettings(const Maps::FileInfo &maps)
     H2Config::SetKingdomColors(maps.GetKingdomColors());
     H2Config::SetAllowChangeColors(maps.GetAllowColors());
     H2Config::SetAllowChangeRaces(0);
-    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
         switch(maps.GetKingdomRace(color)){
             case 0x00:
-                H2Config::SetKingdomRace(color, Kingdom::KNGT);
+                H2Config::SetKingdomRace(color, Race::KNGT);
                 break;
             case 0x01:
-                H2Config::SetKingdomRace(color, Kingdom::BARB);
+                H2Config::SetKingdomRace(color, Race::BARB);
                 break;
             case 0x02:
-                H2Config::SetKingdomRace(color, Kingdom::SORC);
+                H2Config::SetKingdomRace(color, Race::SORC);
                 break;
             case 0x03:
-                H2Config::SetKingdomRace(color, Kingdom::WRLK);
+                H2Config::SetKingdomRace(color, Race::WRLK);
                 break;
             case 0x04:
-                H2Config::SetKingdomRace(color, Kingdom::WZRD);
+                H2Config::SetKingdomRace(color, Race::WZRD);
                 break;
             case 0x05:
-                H2Config::SetKingdomRace(color, Kingdom::NECR);
+                H2Config::SetKingdomRace(color, Race::NECR);
                 break;
             case 0x06:
-                H2Config::SetKingdomRace(color, Kingdom::MULT);
+                H2Config::SetKingdomRace(color, Race::MULT);
                 break;
             case 0x07:
-                H2Config::SetKingdomRace(color, Kingdom::RAND);
+                H2Config::SetKingdomRace(color, Race::RAND);
                 H2Config::SetAllowChangeRaces(color | H2Config::GetAllowChangeRaces());
                 break;
             default:
-                H2Config::SetKingdomRace(color, Kingdom::BOMG);
+                H2Config::SetKingdomRace(color, Race::BOMG);
                 break;
 	}
-    for(Kingdom::color_t color = Kingdom::BLUE; color != Kingdom::GRAY; ++color)
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	// set first allow color
 	if(maps.GetAllowColors() & color){ H2Config::SetHumanColor(color); break; }
     H2Config::SetSizeMaps(maps.GetSizeMaps());
@@ -721,7 +742,7 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     display.Blit(spriteLoss, x + 211 + spriteWins.w(), y);
 
     Text textLabel(200, 295, "Maps difficulty:", Font::BIG, true);
-    Text textDifficulty(360, 295, CStr::Difficulty((*it_current).GetDifficulty()), Font::BIG, true);
+    Text textDifficulty(360, 295, Difficulty::String((*it_current).GetDifficulty()), Font::BIG, true);
     
     TextBox textDescription(Rect(175, 322, 282, 90), (*it_current).GetDescription(), Font::BIG, true);
 }

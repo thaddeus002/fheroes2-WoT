@@ -17,18 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
 
-#include <string>
+#include "color.h"
 
-namespace String
+const std::string & Color::String(Color::color_t color)
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
-};
+    static std::string blue("Blue");
+    static std::string green("Green");
+    static std::string red("Red");
+    static std::string yellow("Yellow");
+    static std::string orange("Orange");
+    static std::string purple("Purple");
+    static std::string gray("Gray");
 
-#endif
+    switch(color){
+        case Color::BLUE: return blue;
+        case Color::GREEN: return green;
+        case Color::RED: return red;
+        case Color::YELLOW: return yellow;
+	case Color::ORANGE: return orange;
+	case Color::PURPLE: return purple;
+	default: break;
+    }
+
+    return gray;
+}

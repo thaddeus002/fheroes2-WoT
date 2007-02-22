@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "dialog.h"
 #include "cursor.h"
 #include "sprite.h"
 #include "event.h"
@@ -70,6 +71,13 @@ Game::menu_t Game::NewGame(void){
 	if(le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
 	if(le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
 	if(le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
+
+        // right info
+	if(le.MousePressRight(buttonStandartGame)) Dialog::Message("Standard Game", "A single player game playing out a single map.", Font::BIG);
+	if(le.MousePressRight(buttonCampainGame)) Dialog::Message("Campaign Game", "A single player game playing through a series of maps.", Font::BIG);
+	if(le.MousePressRight(buttonMultiGame)) Dialog::Message("Multi-Player Game", "A multi-player game, with several human players completing against each other on a single map.", Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Cancel", "Cancel back to the main menu.", Font::BIG);
+		 
     }
 
     return QUITGAME;

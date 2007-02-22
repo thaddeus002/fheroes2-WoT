@@ -24,15 +24,16 @@
 #include "gamearea.h"
 #include "error.h"
 #include "maps.h"
+#include "world.h"
 #include "radar.h"
 
 #define RADARCOLOR      0x10	// index palette
 
 /* constructor */
-Radar::Radar(s16 rx, s16 ry, const MapsData &mp) :
-    Surface(RADARWIDTH, RADARWIDTH), maps(mp), pos(rx, ry, RADARWIDTH, RADARWIDTH)
+Radar::Radar(s16 rx, s16 ry, const Surface &sf) :
+    Surface(RADARWIDTH, RADARWIDTH), pos(rx, ry, RADARWIDTH, RADARWIDTH)
 {
-    GenerateFrom(maps.GetTilesSurface());
+    GenerateFrom(sf);
 }
 
 /* redraw radar */
@@ -119,7 +120,7 @@ void Radar::GenerateFrom(const Surface &surface)
     src.Unlock();
 
     // correct if LARGE
-    if(Maps::LARGE == MapsData::w()){
+    if(Maps::LARGE == World::GetWorld().w()){
 	p_dst = new u16[RADARWIDTH * RADARWIDTH];
 
 	u16 *pd1 = p_dst;
@@ -189,6 +190,6 @@ void Radar::DrawCursor(Surface &surface)
 
 void Radar::MoveCursor(SpriteCursor &cursor)
 {
-    cursor.Move(pos.x + GameArea::GetRect().x * RADARWIDTH / MapsData::w(),
-                pos.y + GameArea::GetRect().y * RADARWIDTH / MapsData::h());
+    cursor.Move(pos.x + GameArea::GetRect().x * RADARWIDTH / World::GetWorld().w(),
+                pos.y + GameArea::GetRect().y * RADARWIDTH / World::GetWorld().h());
 }

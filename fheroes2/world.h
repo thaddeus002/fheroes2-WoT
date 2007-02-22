@@ -23,37 +23,65 @@
 #include <vector>
 #include "gamedefs.h"
 #include "surface.h"
+#include "kingdom.h"
 #include "rect.h"
 #include "maps.h"
 #include "mp2.h"
 
-/* class Data */
-class MapsData
+#define DAYOFWEEK       7
+#define WEEKOFMONTH     4
+
+class World
 {
 public:
-    MapsData(const std::string &filename);
-    ~MapsData();
+    static World & GetWorld(void){ return world; };
+    void LoadMaps(const std::string &filename);
 
-    static u16 w(void){ return width; };
-    static u16 h(void){ return height; };
+    u16 w(void) const{ return width; };
+    u16 h(void) const{ return height; };
 
-    const Surface & GetTilesSurface(void) const{ return *tiles; };
-    u16 GetGround(u16 index) const{ return index < vec_mapstiles.size() ? vec_mapstiles[index].ground : 0; };
-    u8  GetObject(u16 index) const{ return index < vec_mapstiles.size() ? vec_mapstiles[index].object : 0; };
+    const Surface & GetSpriteMaps(void){ return *sprite_maps; };
+    u16 GetGround(u16 index) const{ return index < vec_tiles.size() ? vec_tiles[index].ground : 0; };
+    u8  GetObject(u16 index) const{ return index < vec_tiles.size() ? vec_tiles[index].object : 0; };
 
     bool Movement(u16 ax, u16 ay) const{ return Movement(ax * width + ay); };
     bool Movement(u16 index) const;
 
     void Redraw(const Rect &rt, const Point &pt = Point(0, 0)) const;
 
+    u8 GetDay(void){ return (day % DAYOFWEEK) + 1; };
+    u8 GetWeek(void){ return (week % WEEKOFMONTH) + 1; };
+    u8 GetMonth(void){ return month; };
+    u16 CountDay(void){ return day; };
+    u16 CountWeek(void){ return week; };
+    bool BeginWeek(void){ return begin_week; };
+    bool BeginMonth(void){ return begin_month; };
+    void ResetDate(void);
+    void NextDay(void);
+
+    const Kingdom & GetKingdom(Color::color_t color);
+
 private:
+    World() : sprite_maps(NULL), kingdom(), width(0), height(0) {};
+    ~World();
+
     typedef struct { Point coord; Surface *sprite; } levelsprite_t;
 
-    Surface *tiles;
-    std::vector<Maps::tiles_t> vec_mapstiles;
+    Surface *sprite_maps;
+    std::vector<Maps::tiles_t> vec_tiles;
 
-    static u16 width;
-    static u16 height;
+    Kingdom kingdom[KINGDOMMAX + 1];
+
+    u16 width;
+    u16 height;
+
+    u16 day;
+    u16 week;
+    u8 month;
+    bool begin_week;
+    bool begin_month;
+    
+    static World world;
 };
 
 #endif

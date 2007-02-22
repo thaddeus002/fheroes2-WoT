@@ -26,7 +26,7 @@
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
 
-Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), sizeMaps(Maps::NONE), mapsDifficulty(Maps::EASY),
+Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), sizeMaps(Maps::NONE), mapsDifficulty(Difficulty::EASY),
     kingdomColors(0), allowColors(0), rndColors(0), withHeroes(false)
 {
 
@@ -59,19 +59,19 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
     switch(byte16){
     
 	case 0x00:
-	    mapsDifficulty = Maps::EASY;
+	    mapsDifficulty = Difficulty::EASY;
 	    break;
 
 	case 0x01:
-	    mapsDifficulty = Maps::NORMAL;
+	    mapsDifficulty = Difficulty::NORMAL;
 	    break;
 
 	case 0x02:
-	    mapsDifficulty = Maps::HARD;
+	    mapsDifficulty = Difficulty::HARD;
 	    break;
 	
 	case 0x03:
-	    mapsDifficulty = Maps::EXPERT;
+	    mapsDifficulty = Difficulty::EXPERT;
 	    break;
 	
 	default:
@@ -133,75 +133,75 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
 
     // kingdom color blue
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Kingdom::BLUE;
+    if(byte8) kingdomColors |= Color::BLUE;
 
     // kingdom color green
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Kingdom::GREEN;
+    if(byte8) kingdomColors |= Color::GREEN;
 
     // kingdom color red
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Kingdom::RED;
+    if(byte8) kingdomColors |= Color::RED;
 
     // kingdom color yellow
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Kingdom::YELLOW;
+    if(byte8) kingdomColors |= Color::YELLOW;
 
     // kingdom color orange
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Kingdom::ORANGE;
+    if(byte8) kingdomColors |= Color::ORANGE;
 
     // kingdom color purple
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Kingdom::PURPLE;
+    if(byte8) kingdomColors |= Color::PURPLE;
 
     // allow color blue
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Kingdom::BLUE;
+    if(byte8) allowColors |= Color::BLUE;
 
     // allow color green
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Kingdom::GREEN;
+    if(byte8) allowColors |= Color::GREEN;
 
     // allow color red
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Kingdom::RED;
+    if(byte8) allowColors |= Color::RED;
 
     // allow color yellow
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Kingdom::YELLOW;
+    if(byte8) allowColors |= Color::YELLOW;
 
     // allow color orange
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Kingdom::ORANGE;
+    if(byte8) allowColors |= Color::ORANGE;
 
     // allow color purple
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Kingdom::PURPLE;
+    if(byte8) allowColors |= Color::PURPLE;
 
     // rnd color blue
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Kingdom::BLUE;
+    if(byte8) rndColors |= Color::BLUE;
 
     // rnd color green
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Kingdom::GREEN;
+    if(byte8) rndColors |= Color::GREEN;
 
     // rnd color red
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Kingdom::RED;
+    if(byte8) rndColors |= Color::RED;
 
     // rnd color yellow
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Kingdom::YELLOW;
+    if(byte8) rndColors |= Color::YELLOW;
 
     // rnd color orange
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Kingdom::ORANGE;
+    if(byte8) rndColors |= Color::ORANGE;
 
     // rnd color purple
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Kingdom::PURPLE;
+    if(byte8) rndColors |= Color::PURPLE;
 
     // count heroes
     fd.seekg(0x1A, std::ios_base::beg);
@@ -255,20 +255,20 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
     fd.close();
 }
 
-u8 Maps::FileInfo::GetKingdomRace(Kingdom::color_t color) const
+u8 Maps::FileInfo::GetKingdomRace(Color::color_t color) const
 {
     switch(color){
-        case Kingdom::BLUE:
+        case Color::BLUE:
             return raceKingdom[0];
-        case Kingdom::GREEN:
+        case Color::GREEN:
             return raceKingdom[1];
-        case Kingdom::RED:
+        case Color::RED:
             return raceKingdom[2];
-        case Kingdom::YELLOW:
+        case Color::YELLOW:
             return raceKingdom[3];
-        case Kingdom::ORANGE:
+        case Color::ORANGE:
             return raceKingdom[4];
-        case Kingdom::PURPLE:
+        case Color::PURPLE:
             return raceKingdom[5];
         default:
             return 0xFF;

@@ -103,6 +103,8 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     display.Flip();
     Cursor::Show();
 
+    le.ResetKey();
+
     // message loop
     bool exit = false;
     u16 result = Dialog::ZERO;
@@ -111,7 +113,9 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 
         le.HandleEvents();
 
-        if(button1) le.MousePressLeft(*button1) ? button1->Press() : button1->Release();
+        if(!buttons && !le.MouseRight()) exit = true;
+
+	if(button1) le.MousePressLeft(*button1) ? button1->Press() : button1->Release();
         if(button2) le.MousePressLeft(*button2) ? button2->Press() : button2->Release();
 
         if(button1 && le.MouseClickLeft(*button1)){ exit = true; result = result1; }
@@ -119,8 +123,10 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 
 	if(le.KeyPress(SDLK_RETURN)){ exit = true; result = Dialog::YES | Dialog::OK; }
 	
-	//if(le.KeyPress(SDLK_ESCAPE)){ exit = true; result = Dialog::NO | Dialog::CANCEL; } // recursion
+	if(le.KeyPress(SDLK_ESCAPE)){ exit = true; result = Dialog::NO | Dialog::CANCEL; }
     }
+
+    le.ResetKey();
 
     Cursor::Hide();
 

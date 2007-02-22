@@ -26,7 +26,7 @@
 #include "background.h"
 #include "dialog.h"
 
-Game::menu_t Dialog::Info(void)
+Dialog::answer_t Dialog::AdventureOptions(void)
 {
     // preload
     const std::string &apanbkg = H2Config::EvilInterface() ? "APANBKGE.ICN" : "APANBKG.ICN";
@@ -60,7 +60,7 @@ Game::menu_t Dialog::Info(void)
     display.Flip();
     Cursor::Show();
 
-    Game::menu_t result = Game::QUITGAME;
+    Dialog::answer_t result = Dialog::ZERO;
     bool exit = false;
 
     // dialog menu loop
@@ -74,13 +74,15 @@ Game::menu_t Dialog::Info(void)
         le.MousePressLeft(buttonDig) ? buttonDig.Press() : buttonDig.Release();
         le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
 
-        if(le.MouseClickLeft(buttonWorld)) { result = Game::CANCEL; exit = true; }
-        if(le.MouseClickLeft(buttonPuzzle)){ result = Game::CANCEL; exit = true; }
-        if(le.MouseClickLeft(buttonInfo)){ result = Game::CANCEL; exit = true; }
-        if(le.MouseClickLeft(buttonDig)){ result = Game::CANCEL; exit = true; }
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = Game::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonWorld)) { result = Dialog::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonPuzzle)){ result = Dialog::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonInfo)){ result = Dialog::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonDig)){ result = Dialog::CANCEL; exit = true; }
+        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
 
     }
+
+    le.ResetKey();
 
     // restore background
     Cursor::Hide();

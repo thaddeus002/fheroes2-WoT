@@ -44,11 +44,12 @@ namespace Dialog
         MAX     = 0x0040
     } answer_t;
 
-    Game::menu_t Menu(void);
-    Game::menu_t Info(void);
+    Dialog::answer_t AdventureOptions(void);
+    Game::menu_t FileOptions(void);
+    Dialog::answer_t SystemOptions(void);
 
     // buttons: OK : CANCEL : OK|CANCEL : YES|NO
-    u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons);
+    u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons = 0);
 
 class Box
 {

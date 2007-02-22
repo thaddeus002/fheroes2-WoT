@@ -20,6 +20,7 @@
 
 #include "agg.h"
 #include "cursor.h"
+#include "dialog.h"
 #include "animation.h"
 #include "sprite.h"
 #include "event.h"
@@ -70,7 +71,6 @@ Game::menu_t Game::MainMenu(void)
 	le.HandleEvents();
 
 	le.MousePressLeft(buttonNewGame) ? buttonNewGame.Press() : buttonNewGame.Release();
-	le.MousePressLeft(buttonNewGame) ? buttonNewGame.Press() : buttonNewGame.Release();
 	le.MousePressLeft(buttonLoadGame) ? buttonLoadGame.Press() : buttonLoadGame.Release();
 	le.MousePressLeft(buttonHighScores) ? buttonHighScores.Press() : buttonHighScores.Release();
 	le.MousePressLeft(buttonCredits) ? buttonCredits.Press() : buttonCredits.Release();
@@ -88,6 +88,13 @@ Game::menu_t Game::MainMenu(void)
 	if(le.MouseClickLeft(buttonCredits)) return CREDITS;
 	if(le.MouseClickLeft(buttonQuit)) return QUITGAME;
 
+	// right info
+	if(le.MousePressRight(buttonQuit)) Dialog::Message("Quit", "Quit Heroes of Might and return to the operating system.", Font::BIG);
+	if(le.MousePressRight(buttonLoadGame)) Dialog::Message("Load Game", "Load a previously saved game.", Font::BIG);
+	if(le.MousePressRight(buttonCredits)) Dialog::Message("Credits", "View the credits screen.", Font::BIG);
+	if(le.MousePressRight(buttonHighScores)) Dialog::Message("High Scores", "View the high score screen.", Font::BIG);
+	if(le.MousePressRight(buttonNewGame)) Dialog::Message("New Game", "Start a single or multi-player game.", Font::BIG);
+	
 	if(le.KeyPress(SDLK_ESCAPE)) return QUITGAME;
 
 	animeLantern.DrawSprite();

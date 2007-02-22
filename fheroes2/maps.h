@@ -21,13 +21,13 @@
 #define H2MAPS_H
 
 #include <vector>
+#include <string>
 #include "rect.h"
+#include "resource.h"
 #include "sprite.h"
 #include "gamedefs.h"
 
 #define TILEWIDTH 32
-#define RNDRESOURCEMAX  15 
-#define RNDRESOURCEMIN  5 
 
 namespace Maps
 {
@@ -52,14 +52,6 @@ namespace Maps
         XLARGE	= 144
     } mapsize_t;
 
-    typedef enum {
-	EASY,
-        NORMAL,
-        HARD,
-        EXPERT,
-        IMPOSSIBLE
-    } difficulty_t;
-
     typedef struct {
 	Point    coord;
 	//Point  center;
@@ -67,41 +59,12 @@ namespace Maps
 	u8       object;
 	std::vector<const Sprite *> *level1;
 	std::vector<const Sprite *> *level2;
+
+	//union {
+	//    Resource::resource_t resource;
+	//};
+
     } tiles_t;
-
-    typedef enum {
-	// natural
-        WOOD,
-        MERCURY,
-        ORE,
-        SULFUR,
-        CRYSTAL,
-        GEMS,
-        GOLD,
-	// manual
-        LAMP,
-        CHEST,
-	FLOTSAM,
-	SURVIVOR,
-        FIRE
-    } resource_t;
-
-    typedef struct {
-        u16 wood;
-        u16 mercury;
-        u16 ore;
-        u16 sulfur;
-        u16 crystal;
-        u16 gems;
-        u32 gold;
-    } payment_t;
-
-    difficulty_t& operator++ (difficulty_t& difficulty);
-    difficulty_t& operator-- (difficulty_t& difficulty);
-
-    payment_t operator+ (const payment_t &pm1, const payment_t &pm2);
-    payment_t operator- (const payment_t &pm1, const payment_t &pm2);
-
 };
 
 #endif

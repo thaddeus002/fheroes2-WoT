@@ -26,7 +26,7 @@
 #include "background.h"
 #include "dialog.h"
 
-Game::menu_t Dialog::Menu(void)
+Game::menu_t Dialog::FileOptions(void)
 {
     // preload
     const std::string &cpanbkg = H2Config::EvilInterface() ? "CPANBKGE.ICN" : "CPANBKG.ICN";
@@ -81,6 +81,8 @@ Game::menu_t Dialog::Menu(void)
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = Game::CANCEL; exit = true; }
 
     }
+
+    le.ResetKey();
 
     // restore background
     Cursor::Hide();

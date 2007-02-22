@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sstream>
 #include "error.h"
 #include "tools.h"
 
@@ -78,72 +79,7 @@ void String::AddInt(std::string &str, int value)
     str += stream.str();
 }
 
-const char * CStr::Difficulty(Maps::difficulty_t difficulty)
-{
-    switch(difficulty){
-        case Maps::EASY:
-	    return "Easy";
-        case Maps::NORMAL:
-	    return "Normal";
-        case Maps::HARD:
-	    return "Hard";
-        case Maps::EXPERT:
-	    return "Expert";
-        case Maps::IMPOSSIBLE:
-	    return "Impossible";
-    }
-    
-    return "";
-}
-
-const char * CStr::Color(Kingdom::color_t color)
-{
-    switch(color){
-        case Kingdom::BLUE:
-	    return "Blue";
-        case Kingdom::GREEN:
-	    return "Green";
-        case Kingdom::RED:
-	    return "Red";
-        case Kingdom::YELLOW:
-	    return "Yellow";
-        case Kingdom::ORANGE:
-	    return "Orange";
-        case Kingdom::PURPLE:
-	    return "Purple";
-        default:
-	    break;
-    }
-
-    return "Gray";
-}
-
-const char * CStr::Race(Kingdom::race_t race)
-{
-    switch(race){
-        case Kingdom::KNGT:
-	    return "Knight";
-        case Kingdom::BARB:
-	    return "Barbarian";
-        case Kingdom::SORC:
-	    return "Sorceress";
-        case Kingdom::WRLK:
-	    return "Warlock";
-        case Kingdom::WZRD:
-	    return "Wizard";
-        case Kingdom::NECR:
-	    return "Necromancer";
-        case Kingdom::MULT:
-	    return "Multi";
-        case Kingdom::RAND:
-	    return "Randomize";
-	default:
-	    break;
-    }
-    
-    return "Bomg";
-}
-
+/*
 const char * CStr::Object(MP2::object_t object)
 {
     switch(object){
@@ -302,7 +238,7 @@ const char * CStr::Object(MP2::object_t object)
     
     return "";
 }
-
+*/
 /*
     case FIREBALL:string = "Fireball";break;
     case FIREBLAST:string = "Fireblast";break;

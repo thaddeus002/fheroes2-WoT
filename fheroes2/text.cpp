@@ -22,6 +22,7 @@
 #include "agg.h"
 #include "sprite.h"
 #include "display.h"
+#include "tools.h"
 #include "text.h"
 
 #define WIDTH_BIG	0x0E
@@ -29,8 +30,29 @@
 #define HEIGHT_BIG	0x10
 #define HEIGHT_SMALL	0x0B
 
+/* text string */
 Text::Text(u16 ax, u16 ay, const std::string &msg, Font::type_t ft, bool draw) : font(ft), message(msg)
 {
+    pos.x = ax;
+    pos.y = ay;
+    pos.h = (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG);
+    pos.w = 0;
+
+    std::string::const_iterator it = message.begin();
+    std::string::const_iterator it_end = message.end();
+
+    for(; it != it_end; ++it)
+        if(0x20 == *it) pos.w += (Font::SMALL == ft ? WIDTH_SMALL : WIDTH_BIG);
+        else
+            pos.w += AGG::GetLetter(*it, ft).w();
+
+    if(draw) Blit();
+}
+/* text u32 */
+Text::Text(u16 ax, u16 ay, u32 textcount, Font::type_t ft, bool draw) : font(ft), message()
+{
+    String::AddInt(message, textcount);
+
     pos.x = ax;
     pos.y = ay;
     pos.h = (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG);
@@ -77,6 +99,7 @@ void Text::Blit(void)
     	    case 0x22:
 	    // '
     	    case 0x27:
+        	pt.y += (Font::SMALL == font ? 2 : 3);
     	    break;
 
     	    case 'y':

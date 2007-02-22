@@ -17,18 +17,25 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
+#ifndef H2DIFFICULTY_H
+#define H2DIFFICULTY_H
 
 #include <string>
 
-namespace String
+namespace Difficulty
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
+    typedef enum {
+	EASY,
+        NORMAL,
+        HARD,
+        EXPERT,
+        IMPOSSIBLE
+    } difficulty_t;
+
+    difficulty_t& operator++ (difficulty_t& difficulty);
+    difficulty_t& operator-- (difficulty_t& difficulty);
+    
+    const std::string & String(difficulty_t difficulty);
 };
 
 #endif

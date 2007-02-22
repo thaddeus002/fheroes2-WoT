@@ -17,18 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
 
-#include <string>
+#ifndef H2STATUSWINDOW_H
+#define H2STATUSWINDOW_H
 
-namespace String
+#include "gamedefs.h"
+#include "game.h"
+#include "surface.h"
+#include "rect.h"
+
+namespace Game
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
+
+class StatusWindow
+{
+public:
+    StatusWindow(const Point &pt);
+
+    const Rect & GetRect(void) const{ return pos; }
+    
+    void Redraw(Game::focus_t focus);
+
+private:
+    const Surface &ston;
+    Rect pos;
+};
+
 };
 
 #endif

@@ -22,14 +22,14 @@
 
 #include "gamedefs.h"
 #include "surface.h"
-#include "mapsdata.h"
+#include "world.h"
 #include "spritecursor.h"
 #include "rect.h"
 
 class Radar : private Surface
 {
 public:
-    Radar(s16 rx, s16 ry, const MapsData & mp);
+    Radar(s16 rx, s16 ry, const Surface &sf);
 
     const Rect & GetRect(void) const{ return pos; }
     
@@ -39,7 +39,6 @@ public:
 
 private:
     void GenerateFrom(const Surface &surface);
-    const MapsData & maps;
     Rect pos;
 };
 

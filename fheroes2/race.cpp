@@ -17,18 +17,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
 
-#include <string>
+#include "rand.h"
+#include "race.h"
 
-namespace String
+const std::string & Race::String(Race::race_t race)
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
-};
+    static std::string kngt("Knight");
+    static std::string barb("Barbarian");
+    static std::string sorc("Sorceress");
+    static std::string wrlk("Warlock");
+    static std::string wzrd("Wizard");
+    static std::string necr("Necromancer");
+    static std::string mult("Multi");
+    static std::string random("Randomize");
+    static std::string bomg("Bomg");
 
-#endif
+    switch(race){
+        case Race::KNGT: return kngt;
+        case Race::BARB: return barb;
+        case Race::SORC: return sorc;
+        case Race::WRLK: return wrlk;
+        case Race::WZRD: return wzrd;
+        case Race::NECR: return necr;
+        case Race::MULT: return mult;
+        case Race::RAND: return random;
+        default: break;
+    }
+
+    return bomg;
+}
+
+Race::race_t Race::Rand(void)
+{
+    switch(Rand::Get(1, 6)){
+        case 1: return Race::KNGT;
+        case 2: return Race::BARB;
+        case 3: return Race::SORC;
+        case 4: return Race::WRLK;
+        case 5: return Race::WZRD;
+	default: break;
+    }
+
+    return Race::NECR;
+}

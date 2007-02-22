@@ -17,18 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
+#ifndef H2RACE_H
+#define H2RACE_H
 
 #include <string>
 
-namespace String
+namespace Race
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
+    typedef enum {
+        KNGT    = 0x01,
+        BARB    = 0x02,
+        SORC    = 0x04,
+        WRLK    = 0x08,
+        WZRD    = 0x10,
+        NECR    = 0x20,
+        MULT    = 0x40,
+        RAND    = 0x80,
+        BOMG    = 0x00
+    } race_t;
+
+    const std::string & String(Race::race_t race);
+    race_t Rand(void);
 };
 
 #endif

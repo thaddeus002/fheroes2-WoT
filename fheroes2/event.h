@@ -70,7 +70,9 @@ public:
 
     bool MouseCursor(const Rect &rt) const{ return rt & mouse_cu; };
 
-    bool KeyPress(SDLKey key) const{ return key == key_value && key_pressed; }
+    bool KeyPress(SDLKey key) const{ return key == key_value && key_pressed; };
+    
+    void ResetKey(void){ key_pressed = false; key_value = SDLK_EURO; };
 
 private:
     LocalEvent(){};

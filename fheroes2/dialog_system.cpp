@@ -18,58 +18,67 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "agg.h"
+#include "event.h"
+#include "button.h"
+#include "cursor.h"
 #include "config.h"
-#include "difficulty.h"
-#include "kingdom.h"
+#include "background.h"
+#include "dialog.h"
 
-Kingdom::Kingdom() : color(Color::GRAY), build(false), play(false)
+Dialog::answer_t Dialog::SystemOptions(void)
 {
-    // set starting resource
-    switch(H2Config::GetGameDifficulty()){
-	case Difficulty::EASY:
-	    resource.wood	= 30;
-	    resource.mercury	= 10;
-	    resource.ore	= 10;
-	    resource.sulfur	= 10;
-	    resource.crystal	= 10;
-	    resource.gems	= 10;
-	    resource.gold	= 10000;
-	    break;
-	case Difficulty::NORMAL:
-	    resource.wood	= 20;
-	    resource.mercury	= 5;
-	    resource.ore	= 5;
-	    resource.sulfur	= 5;
-	    resource.crystal	= 5;
-	    resource.gems	= 5;
-	    resource.gold	= 7500;
-	    break;
-	case Difficulty::HARD:
-	    resource.wood	= 10;
-	    resource.mercury	= 2;
-	    resource.ore	= 2;
-	    resource.sulfur	= 2;
-	    resource.crystal	= 2;
-	    resource.gems	= 2;
-	    resource.gold	= 5000;
-	    break;
-	case Difficulty::EXPERT:
-	    resource.wood	= 5;
-	    resource.mercury	= 0;
-	    resource.ore	= 0;
-	    resource.sulfur	= 0;
-	    resource.crystal	= 0;
-	    resource.gems	= 0;
-	    resource.gold	= 2500;
-	    break;
-	case Difficulty::IMPOSSIBLE:
-	    resource.wood	= 0;
-	    resource.mercury	= 0;
-	    resource.ore	= 0;
-	    resource.sulfur	= 0;
-	    resource.crystal	= 0;
-	    resource.gems	= 0;
-	    resource.gold	= 0;
-	    break;
+    // preload
+    const std::string &spanbkg = H2Config::EvilInterface() ? "SPANBKGE.ICN" : "SPANBKG.ICN";
+    const std::string &spanbtn = H2Config::EvilInterface() ? "SPANBTNE.ICN" : "SPANBTN.ICN";
+
+    AGG::PreloadObject(spanbkg);
+    AGG::PreloadObject(spanbtn);
+
+    // cursor
+    Cursor::Hide();
+    Cursor::Set(Cursor::POINTER);
+    Cursor::themes_t cursor = Cursor::Get();
+
+    // image box
+    const Sprite &box = AGG::GetICN(spanbkg, 0);
+
+    Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
+    Background back(rb);
+    back.Save();
+
+    display.Blit(box, rb);
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    Button buttonOk(rb.x + 113, rb.y + 362, spanbtn, 0, 1);
+
+    display.Flip();
+    Cursor::Show();
+
+    Dialog::answer_t result = Dialog::ZERO;
+    bool exit = false;
+
+    // dialog menu loop
+    while(! exit){
+
+        le.HandleEvents();
+
+        le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
+
+        if(le.MouseClickLeft(buttonOk)) { result = Dialog::OK;  exit = true; }
+        if(le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
+
     }
+
+    le.ResetKey();
+
+    // restore background
+    Cursor::Hide();
+    back.Restore();
+    Cursor::Set(cursor);
+    Cursor::Show();
+    display.Flip();
+
+    return result;
 }

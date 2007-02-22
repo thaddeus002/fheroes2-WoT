@@ -17,18 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
+#ifndef H2RESOURCE_H
+#define H2RESOURCE_H
 
-#include <string>
+#include "gamedefs.h"
 
-namespace String
+#define RNDRESOURCEMAX  15 
+#define RNDRESOURCEMIN  5 
+
+namespace Resource
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
+    typedef enum {
+        WOOD,
+        MERCURY,
+        ORE,
+        SULFUR,
+        CRYSTAL,
+        GEMS,
+        GOLD,
+    } resource_t;
+
+    typedef struct {
+        u16 wood;
+        u16 mercury;
+        u16 ore;
+        u16 sulfur;
+        u16 crystal;
+        u16 gems;
+        u32 gold;
+    } funds_t;
+
+    funds_t operator+ (const funds_t &pm1, const funds_t &pm2);
+    funds_t operator- (const funds_t &pm1, const funds_t &pm2);
+
+    resource_t Rand(void);
 };
 
 #endif

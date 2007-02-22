@@ -17,18 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
+#ifndef H2COLOR_H
+#define H2COLOR_H
 
 #include <string>
 
-namespace String
+namespace Color
 {
-    void Trim(std::string &str);
-    bool Comment(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
-    void AddInt(std::string &str, int value);
+    typedef enum {
+        BLUE    = 0x01,
+        GREEN   = 0x02,
+        RED     = 0x04,
+        YELLOW  = 0x08,
+        ORANGE  = 0x10,
+        PURPLE  = 0x20,
+        GRAY    = 0x40,
+    } color_t;
+
+    inline color_t& operator++ (color_t& color){ return color = ( GRAY == color ? BLUE : color_t(color << 1)); };
+    inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); };
+
+    const std::string & String(Color::color_t color);
 };
 
 #endif

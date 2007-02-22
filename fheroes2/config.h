@@ -21,9 +21,12 @@
 #define H2CONFIG_H
 
 #include <string>
+#include "difficulty.h"
 #include "maps.h"
 #include "display.h"
+#include "color.h"
 #include "kingdom.h"
+#include "race.h"
 #include "gamedefs.h"
 
 namespace H2Config {
@@ -51,12 +54,12 @@ namespace H2Config {
     const std::string & GetMapsDirectory(void);
     Display::resolution_t GetVideoMode(void);
 
-    Maps::difficulty_t GetGameDifficulty(void);
-    Kingdom::color_t GetHumanColor(void);
+    Difficulty::difficulty_t GetGameDifficulty(void);
+    Color::color_t GetHumanColor(void);
     u8 GetKingdomColors(void);
     u8 GetKingdomCount(void);
     u8 GetAllowChangeColors(void);
-    Kingdom::race_t GetKingdomRace(Kingdom::color_t color);
+    Race::race_t GetKingdomRace(Color::color_t color);
     u8 GetAllowChangeRaces(void);
     const std::string & GetFileMaps(void);
     const std::string & GetNameMaps(void);
@@ -65,13 +68,13 @@ namespace H2Config {
 
     void SetDebug(void);
     void SetAGGFile(const std::string & path);
-    void SetGameDifficulty(Maps::difficulty_t difficulty);
+    void SetGameDifficulty(Difficulty::difficulty_t difficulty);
     void SetInterface(bool interface);
-    void SetHumanColor(Kingdom::color_t color);
+    void SetHumanColor(Color::color_t color);
     void SetKingdomColors(u8 colors);
     void SetAllowChangeColors(u8 colors);
     void SetKingdomCount(u8 count);
-    void SetKingdomRace(Kingdom::color_t color, Kingdom::race_t race);
+    void SetKingdomRace(Color::color_t color, Race::race_t race);
     void SetAllowChangeRaces(u8 races);
     void SetFileMaps(const std::string & file);
     void SetNameMaps(const std::string & name);

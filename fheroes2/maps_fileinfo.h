@@ -21,6 +21,8 @@
 #define H2MAPSFILEINFO_H
 
 #include "maps.h"
+#include "difficulty.h"
+#include "color.h"
 #include "kingdom.h"
 #include "gamedefs.h"
 
@@ -39,16 +41,16 @@ public:
     u8 GetKingdomColors(void) const{ return kingdomColors; };
     u8 GetKingdomCount(void) const{ return kingdomCount; };
     u8 GetAllowColors(void) const{ return allowColors; };
-    u8 GetKingdomRace(Kingdom::color_t color) const;
+    u8 GetKingdomRace(Color::color_t color) const;
     mapsize_t GetSizeMaps(void) const{ return sizeMaps; };
     u8 GetConditionsWins(void) const{ return conditionsWins; };
     u8 GetConditionsLoss(void) const{ return conditionsLoss; };
-    difficulty_t GetDifficulty(void) const{ return mapsDifficulty; };
+    Difficulty::difficulty_t GetDifficulty(void) const{ return mapsDifficulty; };
 
 private:
     std::string fileMaps;
     mapsize_t sizeMaps;
-    difficulty_t mapsDifficulty;
+    Difficulty::difficulty_t mapsDifficulty;
     u8 kingdomColors;
     u8 allowColors;
     u8 rndColors;
