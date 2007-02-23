@@ -46,8 +46,8 @@ namespace Font
 #define BMASK 0x000000f0
 #define AMASK 0x0000000f
 
-#define SWAP16(X)    SDL_Swap16(X)
-#define SWAP32(X)    SDL_Swap32(X)
+#define SWAP16(X)    X=SDL_Swap16(X)
+#define SWAP32(X)    X=SDL_Swap32(X)
 
 #else
 
@@ -56,8 +56,8 @@ namespace Font
 #define BMASK 0x00000f00
 #define AMASK 0x0000f000
 
-#define SWAP16(X)    X=X;
-#define SWAP32(X)    X=X;
+#define SWAP16(X) ;
+#define SWAP32(X) ;
 
 #endif
 
