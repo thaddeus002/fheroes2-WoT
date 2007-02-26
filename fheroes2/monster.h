@@ -17,27 +17,120 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2RACE_H
-#define H2RACE_H
+#ifndef H2MONSTER_H
+#define H2MONSTER_H
 
 #include <string>
+#include "sprite.h"
+#include "gamedefs.h"
 
-namespace Race
+namespace Monster
 {
     typedef enum {
-        KNGT    = 0x01,
-        BARB    = 0x02,
-        SORC    = 0x04,
-        WRLK    = 0x08,
-        WZRD    = 0x10,
-        NECR    = 0x20,
-        MULT    = 0x40,
-        RAND    = 0x80,
-        BOMG    = 0x00
-    } race_t;
+	CRAWLING,
+        VERYSLOW,
+        SLOW,
+        AVERAGE,
+        FAST,
+        VERYFAST,
+        ULTRAFAST,
+        BLAZING,
+        INSTANT
+    } speed_t;
 
-    const std::string & String(race_t race);
-    race_t Rand(void);
+    typedef enum {
+	PEASANT,
+	ARCHER,
+	RANGER,
+	PIKEMAN,
+	VETERAN_PIKEMAN,
+	SWORDSMAN,
+	MASTER_SWORDSMAN,
+	CAVALRY,
+	CHAMPION,
+	PALADIN,
+	CRUSADER,
+	GOBLIN,
+	ORC,
+	CHIEF_ORC,
+	WOLF,
+	OGRE,
+	LORD_OGRE,
+	TROLL,
+	WAR_TROLL,
+	CYCLOPS,
+	SPRITE,
+	DWARF,
+	BATTLE_DWARF,
+	ELF,
+	GRAND_ELF,
+	DRUID,
+	GREATER_DRUID,
+	UNICORN,
+	PHOENIX,
+	CENTAUR,
+	GARGOYLE,
+	GRIFFIN,
+	MINOTAUR,
+	KNIGHT_MINOTAUR,
+	HIDRA,
+	GREEN_DRAGON,
+	RED_DRAGON,
+	BLACK_DRAGON,
+	HALFLING,
+	BOAR,
+	IRON_GOLEM,
+	STEEL_GOLEM,
+	ROC,
+	MAGE,
+	ARCHMAGE,
+	GIANT,
+	TITAN,
+	SKELETON,
+	ZOMBIE,
+	MUTANT_ZOMBIE,
+	MUMMY,
+	ROYAL_MUMMY,
+	VAMPIRE,
+	LORD_VAMPIRE,
+	LICH,
+	POWER_LICH,
+	BONE_DRAGON,
+
+	ROGUE,
+	NOMAD,
+	GHOST,
+	GENIE,
+	MEDUSA,
+	EARTH_ELEMENT,
+	AIR_ELEMENT,
+	FIRE_ELEMENT,
+	WATER_ELEMENT,
+
+	MONSTER_RND1,
+	MONSTER_RND2,
+	MONSTER_RND3,
+	MONSTER_RND4,
+	MONSTER_RND,
+    } monster_t;
+
+    typedef struct {
+	u8 attack;
+	u8 defence;
+	u8 shots;
+	u8 damageMin;
+	u8 damageMax;
+	u8 hp;
+	speed_t speed;
+	u8 grown;
+	u8 cost;
+    } stats_t;
+
+
+    const std::string & String(monster_t monster);
+
+    //const Sprite & GetSprite(monster_t monster);
+
 };
 
 #endif

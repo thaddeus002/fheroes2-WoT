@@ -22,7 +22,7 @@
 #include "difficulty.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom() : color(Color::GRAY), build(false), play(false)
+Kingdom::Kingdom(bool playing) : build(false), play(playing)
 {
     // set starting resource
     switch(H2Config::GetGameDifficulty()){

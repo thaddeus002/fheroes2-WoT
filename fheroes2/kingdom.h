@@ -22,19 +22,17 @@
 
 #define KINGDOMMAX      6
 
-#include "color.h"
 #include "resource.h"
 #include "gamedefs.h"
 
 class Kingdom
 {
 public:
-    Kingdom();
+    Kingdom(bool playing = false);
     
     u8 GetCountCastle(void) const{ return 0; };
     u8 GetCountTown(void) const{ return 0; };
 
-    Color::color_t color;
     bool build;
     bool play;
     Resource::funds_t resource;

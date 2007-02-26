@@ -140,6 +140,7 @@ namespace Cursor
 
     themes_t Get(void);
     void Set(themes_t cursor);
+    void SetOffset(themes_t cursor);
 };
 
 #endif

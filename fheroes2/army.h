@@ -17,27 +17,26 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2RACE_H
-#define H2RACE_H
+#ifndef H2ARMY_H
+#define H2ARMY_H
 
-#include <string>
-
-namespace Race
+namespace Army
 {
     typedef enum {
-        KNGT    = 0x01,
-        BARB    = 0x02,
-        SORC    = 0x04,
-        WRLK    = 0x08,
-        WZRD    = 0x10,
-        NECR    = 0x20,
-        MULT    = 0x40,
-        RAND    = 0x80,
-        BOMG    = 0x00
-    } race_t;
+	FEW	= 1,
+        SEVERAL	= 5,
+        PACK	= 10,
+        LOTS	= 20,
+        HORDE	= 50,
+        THRONG	= 10,
+        SWARM	= 250,
+        ZOUNDS	= 500,
+        LEGION	= 1000
+    } size_t;
 
-    const std::string & String(race_t race);
-    race_t Rand(void);
+
+
+
 };
 
 #endif

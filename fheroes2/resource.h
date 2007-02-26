@@ -20,7 +20,9 @@
 #ifndef H2RESOURCE_H
 #define H2RESOURCE_H
 
+#include <string>
 #include "gamedefs.h"
+#include "sprite.h"
 
 #define RNDRESOURCEMAX  15 
 #define RNDRESOURCEMIN  5 
@@ -50,7 +52,11 @@ namespace Resource
     funds_t operator+ (const funds_t &pm1, const funds_t &pm2);
     funds_t operator- (const funds_t &pm1, const funds_t &pm2);
 
+    const std::string & String(resource_t resource);
     resource_t Rand(void);
+    resource_t FromMP2(u8 index);
+    
+    const Sprite & GetForMapsSprite(resource_t resource);
 };
 
 #endif

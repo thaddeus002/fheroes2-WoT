@@ -35,7 +35,6 @@ public:
     static const Rect & GetRect(void){ return pos; }
 
     Rect GetPosition(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, pos.w * TILEWIDTH, pos.h * TILEWIDTH); }
-    //const World & GetWorld(void) const{ return world; };
 
     u16  GetIndexMaps(u16 mx, u16 my) const;
     u16  GetIndexMaps(const Point &pt) const{ return GetIndexMaps(pt.x, pt.y); };

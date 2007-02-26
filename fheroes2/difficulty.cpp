@@ -31,11 +31,11 @@ Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& diff
 
 const std::string & Difficulty::String(Difficulty::difficulty_t difficulty)
 {
-    static std::string easy("Easy");
-    static std::string nrml("Normal");
-    static std::string hard("Hard");
-    static std::string expt("Expert");
-    static std::string imps("Impossible");
+    static const std::string easy("Easy");
+    static const std::string nrml("Normal");
+    static const std::string hard("Hard");
+    static const std::string expt("Expert");
+    static const std::string imps("Impossible");
 
     switch(difficulty){
         case Difficulty::EASY: return easy;

@@ -20,12 +20,12 @@
 
 #include "agg.h"
 #include "text.h"
-#include "world.h"
+#include "tools.h"
 #include "config.h"
 #include "game_statuswindow.h"
 
-Game::StatusWindow::StatusWindow(const Point &pt)
-    : ston(AGG::GetICN(H2Config::EvilInterface() ? "STONBAKE.ICN" : "STONBACK.ICN", 0)), pos(pt, ston.w(), ston.h())
+Game::StatusWindow::StatusWindow(const Point &pt, const Kingdom &my)
+    : ston(AGG::GetICN(H2Config::EvilInterface() ? "STONBAKE.ICN" : "STONBACK.ICN", 0)), pos(pt, ston.w(), ston.h()), myKingdom(my)
 {
 }
 
@@ -36,22 +36,40 @@ void Game::StatusWindow::Redraw(Game::focus_t focus)
     // sprite all resource
     display.Blit(AGG::GetICN("RESSMALL.ICN", 0), pos.x + 6, pos.y + 3);
 
+    //const Kingdom &myKingdom = world.GetMyKingdom();
     // count castle
-    Text(pos.x + 26, pos.y + 28, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).GetCountCastle(), Font::SMALL, true);
+    String::AddInt(count, myKingdom.GetCountCastle());
+    Text(pos.x + 26 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
     // count town
-    Text(pos.x + 78, pos.y + 28, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).GetCountTown(), Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.GetCountTown());
+    Text(pos.x + 78 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
     // count gold
-    Text(pos.x + 122, pos.y + 28, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).resource.gold, Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.resource.gold);
+    Text(pos.x + 122 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
     // count wood
-    Text(pos.x + 15, pos.y + 58, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).resource.wood, Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.resource.wood);
+    Text(pos.x + 15 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count mercury
-    Text(pos.x + 37, pos.y + 58, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).resource.mercury, Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.resource.mercury);
+    Text(pos.x + 37 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count ore
-    Text(pos.x + 60, pos.y + 58, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).resource.ore, Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.resource.ore);
+    Text(pos.x + 60 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count sulfur
-    Text(pos.x + 84, pos.y + 58, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).resource.sulfur, Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.resource.sulfur);
+    Text(pos.x + 84 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count crystal
-    Text(pos.x + 108, pos.y + 58, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).resource.crystal, Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.resource.crystal);
+    Text(pos.x + 108 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count gems
-    Text(pos.x + 130, pos.y + 58, World::GetWorld().GetKingdom(H2Config::GetHumanColor()).resource.gems, Font::SMALL, true);
+    count.clear();
+    String::AddInt(count, myKingdom.resource.gems);
+    Text(pos.x + 130 - Text::width(count, count[0], count.size(), Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
 }

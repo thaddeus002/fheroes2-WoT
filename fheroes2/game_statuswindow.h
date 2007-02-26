@@ -23,6 +23,7 @@
 
 #include "gamedefs.h"
 #include "game.h"
+#include "kingdom.h"
 #include "surface.h"
 #include "rect.h"
 
@@ -32,7 +33,7 @@ namespace Game
 class StatusWindow
 {
 public:
-    StatusWindow(const Point &pt);
+    StatusWindow(const Point &pt, const Kingdom &my);
 
     const Rect & GetRect(void) const{ return pos; }
     
@@ -41,6 +42,7 @@ public:
 private:
     const Surface &ston;
     Rect pos;
+    const Kingdom &myKingdom;
 };
 
 };

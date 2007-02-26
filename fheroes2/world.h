@@ -20,7 +20,9 @@
 #ifndef H2MAPSDATA_H
 #define H2MAPSDATA_H
 
+#include <map>
 #include <vector>
+#include "config.h"
 #include "gamedefs.h"
 #include "surface.h"
 #include "kingdom.h"
@@ -34,13 +36,13 @@
 class World
 {
 public:
-    static World & GetWorld(void){ return world; };
-    void LoadMaps(const std::string &filename);
+    World(const std::string &filename);
+    ~World();
 
     u16 w(void) const{ return width; };
     u16 h(void) const{ return height; };
 
-    const Surface & GetSpriteMaps(void){ return *sprite_maps; };
+    const Surface & GetSpriteMaps(void) const{ return *sprite_maps; };
     u16 GetGround(u16 index) const{ return index < vec_tiles.size() ? vec_tiles[index].ground : 0; };
     u8  GetObject(u16 index) const{ return index < vec_tiles.size() ? vec_tiles[index].object : 0; };
 
@@ -56,21 +58,19 @@ public:
     u16 CountWeek(void){ return week; };
     bool BeginWeek(void){ return begin_week; };
     bool BeginMonth(void){ return begin_month; };
-    void ResetDate(void);
     void NextDay(void);
 
-    const Kingdom & GetKingdom(Color::color_t color);
+    const Kingdom & GetMyKingdom(void){ return GetKingdom(H2Config::GetHumanColor()); };
+    const Kingdom & GetKingdom(Color::color_t color){ return kingdom[color]; };
 
 private:
-    World() : sprite_maps(NULL), kingdom(), width(0), height(0) {};
-    ~World();
-
-    typedef struct { Point coord; Surface *sprite; } levelsprite_t;
-
     Surface *sprite_maps;
     std::vector<Maps::tiles_t> vec_tiles;
 
-    Kingdom kingdom[KINGDOMMAX + 1];
+    std::map<Color::color_t, Kingdom> kingdom;
+
+    //std::vector<castle_t> allCastle;
+    //std::vector<heroes_t> allHeroes;
 
     u16 width;
     u16 height;
@@ -80,8 +80,6 @@ private:
     u8 month;
     bool begin_week;
     bool begin_month;
-    
-    static World world;
 };
 
 #endif

@@ -29,7 +29,7 @@
 class Radar : private Surface
 {
 public:
-    Radar(s16 rx, s16 ry, const Surface &sf);
+    Radar(s16 rx, s16 ry, const World &wr);
 
     const Rect & GetRect(void) const{ return pos; }
     
@@ -40,6 +40,7 @@ public:
 private:
     void GenerateFrom(const Surface &surface);
     Rect pos;
+    const World &world;
 };
 
 #endif

@@ -30,7 +30,7 @@
 
 namespace MP2
 {
-    // origin mp2
+    // origin mp2 tile
     typedef struct {
         u16  tileIndex;		// tile (ocean, grass, snow, swamp, lava, desert, dirt, wasteland, beach)
         u8   objectName1;	// level 1.0
@@ -46,7 +46,7 @@ namespace MP2
 	u32  uniqNumber2;	// level 2.0
     } mp2tile_t;
 
-    // origin mp2
+    // origin mp2 addons tile
     typedef struct {
 	u16      indexAddon;	// zero or next addons_t
 	u8       objectNameN1;	// level 1.N
@@ -58,6 +58,109 @@ namespace MP2
 	u32      uniqNumberN2;	// level 2.N
     } mp2addon_t;
 
+    // origin mp2 castle
+    typedef struct {
+	u8	color; 		// 00 blue, 01 green, 02 red, 03 yellow, 04 orange, 05 purpl, ff unknown
+	bool	customBuilding;
+	u16	building;
+		    /*
+			0000 0000 0000 0010	Thieve's Guild
+			0000 0000 0000 0100	Tavern
+			0000 0000 0000 1000	Shipyard
+			0000 0000 0001 0000	Well
+			0000 0000 1000 0000	Statue
+			0000 0001 0000 0000	Left Turret
+			0000 0010 0000 0000	Right Turret
+			0000 0100 0000 0000	Marketplace
+			0000 1000 0000 0000	Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
+			0001 0000 0000 0000	Moat
+			0010 0000 0000 0000	Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
+		    */
+	u16	dwelling;
+		    /*
+			0000 0000 0000 1000	dweling1
+			0000 0000 0001 0000	dweling2
+			0000 0000 0010 0000	dweling3
+			0000 0000 0100 0000	dweling4
+			0000 0000 1000 0000	dweling5
+			0000 0001 0000 0000	dweling6
+			0000 0010 0000 0000	upgDweling2
+			0000 0100 0000 0000	upgDweling3
+			0000 1000 0000 0000	upgDweling4
+			0001 0000 0000 0000	upgDweling5
+			0010 0000 0000 0000	upgDweling6
+		    */
+	u8	magicTower;
+	bool	customTroops;
+	u8	monster1;
+	u8	monster2;
+	u8	monster3;
+	u8	monster4;
+	u8	monster5;
+	u16	count1;
+	u16	count2;
+	u16	count3;
+	u16	count4;
+	u16	count5;
+	bool	capitan;
+	bool	customCastleName;
+	char	castleName[13];	// name + '\0' // 39 byte
+	u8	type;		// 00 knight, 01 barb, 02 sorc, 03 warl, 04 wiz, 05 necr, 06 rnd
+	bool	castle;
+	u8	allowCastle;	// 00 TRUE, 01 FALSE
+	u8	unknown[29];
+    } mp2castle_t;
+
+    // origin mp2 heroes
+    typedef struct {
+	u8	identify;	// 0x4c
+	u16	unknown1;	// 0
+	bool	customTroops;
+	u8	monster1;	// 0xff none
+	u8	monster2;	// 0xff none
+	u8	monster3;	// 0xff none
+	u8	monster4;	// 0xff none
+	u8	monster5;	// 0xff none
+	u16	countMonter1;
+	u16	countMonter2;
+	u16	countMonter3;
+	u16	countMonter4;
+	u16	countMonter5;
+	u8	customPortrate;
+	u8	portrate;
+	u8	artifact1;	// 0xff none
+	u8	artifact2;	// 0xff none
+	u8	artifact3;	// 0xff none
+	u8	unknown2;	// 0
+	u32	exerience;
+	bool	customSkill;
+	u8	skill1;		// 0xff none
+	u8	skill2;		// pathfinding, arcgery, logistic, scouting, 
+	u8	skill3;		// diplomacy, navigation, leadership, wisdom,
+	u8	skill4;		// mysticism, luck, ballistics, eagle, necromance, estate
+	u8	skill5;
+	u8	skill6;
+	u8	skill7;
+	u8	skill8;
+	u8	skillLevel1;
+	u8	skillLevel2;
+	u8	skillLevel3;
+	u8	skillLevel4;
+	u8	skillLevel5;
+	u8	skillLevel6;
+	u8	skillLevel7;
+	u8	skillLevel8;
+	u8	unknown3;	// 0
+	u8	customName;
+	char	name[13];	// name + '\0'
+	bool	patrol;
+	u8	countSquare;	// for patrol
+	u8	unknown4[15];	// 0
+    } mp2heroes_t;
+
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // interim mp2 addon
     typedef struct {
         u8      object1;
         u8      index1;
@@ -66,13 +169,15 @@ namespace MP2
         u8      index2;
     } addon_t;
 
+    // interim mp2 tile
     typedef struct {
         u16     tile;
         std::vector<addon_t> addons;
         u8      quantity2;
         u8      shape;
         u8      general;
-	u8	index1;
+	u8	index1;    // no sorting(addons) value
+	u8	quantity1; // no sorting(addons) value
     } tile_t;
 
     typedef enum {

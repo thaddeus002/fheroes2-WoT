@@ -23,15 +23,15 @@
 
 const std::string & Race::String(Race::race_t race)
 {
-    static std::string kngt("Knight");
-    static std::string barb("Barbarian");
-    static std::string sorc("Sorceress");
-    static std::string wrlk("Warlock");
-    static std::string wzrd("Wizard");
-    static std::string necr("Necromancer");
-    static std::string mult("Multi");
-    static std::string random("Randomize");
-    static std::string bomg("Bomg");
+    static const std::string kngt("Knight");
+    static const std::string barb("Barbarian");
+    static const std::string sorc("Sorceress");
+    static const std::string wrlk("Warlock");
+    static const std::string wzrd("Wizard");
+    static const std::string necr("Necromancer");
+    static const std::string mult("Multi");
+    static const std::string random("Randomize");
+    static const std::string bomg("Bomg");
 
     switch(race){
         case Race::KNGT: return kngt;

@@ -41,10 +41,7 @@ namespace Game {
 Game::menu_t Game::StartGame(void){
 
     // Load maps
-    World &world = World::GetWorld();
-
-    world.LoadMaps(H2Config::GetFileMaps());
-    world.ResetDate();
+    World world(H2Config::GetFileMaps());
 
     GameArea areaMaps(world);
 
@@ -54,7 +51,7 @@ Game::menu_t Game::StartGame(void){
     Game::DrawInterface();
 
     // Create radar
-    Radar radar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, world.GetSpriteMaps());
+    Radar radar(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, world);
 
     areaMaps.Redraw();
     radar.Redraw();
@@ -228,7 +225,7 @@ Game::menu_t Game::StartGame(void){
     Game::focus_t focus = Game::HEROES;
 
     // status window
-    Game::StatusWindow statusWindow(pt_stw);
+    Game::StatusWindow statusWindow(pt_stw, world.GetMyKingdom());
     statusWindow.Redraw(focus);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -361,7 +358,7 @@ Game::menu_t Game::StartGame(void){
 	if(le.MousePressRight(buttonAdventure)) Dialog::Message("Adventure Options", "Bring up the adventure options menu.", Font::BIG);
 	if(le.MousePressRight(buttonFile)) Dialog::Message("File Options", "Bring up the file options menu, alloving you to load menu, save etc.", Font::BIG);
 	if(le.MousePressRight(buttonSystem)) Dialog::Message("System Options", "Bring up the system options menu, alloving you to customize your game.", Font::BIG);
-	// Dialog::Message("Status Window", "This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows.", Font::BIG);
+	if(le.MousePressRight(statusWindow.GetRect())) Dialog::Message("Status Window", "This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows.", Font::BIG);
 
 	// ESC
 	if(le.KeyPress(SDLK_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;

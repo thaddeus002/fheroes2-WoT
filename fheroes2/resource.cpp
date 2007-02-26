@@ -18,7 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "agg.h"
 #include "rand.h"
+#include "error.h"
 #include "resource.h"
 
 Resource::resource_t Resource::Rand(void)
@@ -33,7 +35,7 @@ Resource::resource_t Resource::Rand(void)
         default: break;
     }
 
-    return Resource::GOLD;
+	return Resource::GOLD;
 }
 
 // operator funds_t + funds_t
@@ -66,4 +68,62 @@ Resource::funds_t Resource::operator- (const Resource::funds_t &fd1, const Resou
     fd.gold = (fd2.gold > fd1.gold ? 0 : fd1.gold - fd2.gold);
 	    
     return fd;
+}
+
+/* name resource */
+const std::string & Resource::String(resource_t resource)
+{
+    static const std::string stringWood("Wood");
+    static const std::string stringMercury("Mercury");
+    static const std::string stringOre("Ore");
+    static const std::string stringSulfur("Sulfur");
+    static const std::string stringCrystal("Crystal");
+    static const std::string stringGems("Gems");
+    static const std::string stringGold("Gold");
+
+    switch(resource){
+        case Resource::WOOD:	return stringWood;
+        case Resource::MERCURY:	return stringMercury;
+        case Resource::ORE:	return stringOre;
+        case Resource::SULFUR:	return stringSulfur;
+        case Resource::CRYSTAL: return stringCrystal;
+        case Resource::GEMS:	return stringGems;
+	default: break;
+    }
+
+    return stringGold;
+}
+
+Resource::resource_t Resource::FromMP2(u8 index)
+{
+    switch(index){ 
+	case 1:  return Resource::WOOD;
+        case 3:  return Resource::MERCURY;
+        case 5:  return Resource::ORE;
+        case 7:  return Resource::SULFUR;
+        case 9:  return Resource::CRYSTAL;
+        case 11: return Resource::GEMS;
+        case 13: return Resource::GOLD;
+        case 17: return Resource::Rand();
+        default: 
+	    Error::Warning("Resource::FromMP2: unknown: ", index);
+    }
+    
+    return Resource::WOOD;
+}
+
+/* return sprite resource */
+const Sprite & Resource::GetForMapsSprite(Resource::resource_t resource)
+{
+    switch(resource){
+        case Resource::WOOD:	return AGG::GetICN("OBJNRSRC.ICN", 1);
+        case Resource::MERCURY:	return AGG::GetICN("OBJNRSRC.ICN", 3);
+        case Resource::ORE:	return AGG::GetICN("OBJNRSRC.ICN", 5);
+        case Resource::SULFUR:	return AGG::GetICN("OBJNRSRC.ICN", 7);
+        case Resource::CRYSTAL: return AGG::GetICN("OBJNRSRC.ICN", 9);
+        case Resource::GEMS:	return AGG::GetICN("OBJNRSRC.ICN", 11);
+	default: break;
+    }
+
+    return AGG::GetICN("OBJNRSRC.ICN", 13);
 }

@@ -21,7 +21,6 @@
 #include <fstream>
 #include <vector>
 #include "error.h"
-#include "config.h"
 #include "agg.h"
 #include "game.h"
 #include "gamearea.h"
@@ -30,28 +29,20 @@
 #include "rand.h"
 #include "world.h"
 
-World World::world;
-
-void World::LoadMaps(const std::string &filename)
+World::World(const std::string &filename) : sprite_maps(NULL), day(0), week(0), month(0), begin_week(true), begin_month(true)
 {
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
 
     // playing kingdom
-    kingdom[0].color = Color::BLUE;
-    kingdom[0].play = (Color::BLUE & H2Config::GetKingdomColors() ? true : false);
-    kingdom[1].color = Color::GREEN;
-    kingdom[1].play = (Color::GREEN & H2Config::GetKingdomColors() ? true : false);
-    kingdom[2].color = Color::RED;
-    kingdom[2].play = (Color::RED & H2Config::GetKingdomColors() ? true : false);
-    kingdom[3].color = Color::YELLOW;
-    kingdom[3].play = (Color::YELLOW & H2Config::GetKingdomColors() ? true : false);
-    kingdom[4].color = Color::ORANGE;
-    kingdom[4].play = (Color::ORANGE & H2Config::GetKingdomColors() ? true : false);
-    kingdom[5].color = Color::PURPLE;
-    kingdom[5].play = (Color::PURPLE & H2Config::GetKingdomColors() ? true : false);
-    kingdom[6].play = false;
+    kingdom[Color::BLUE]   = Kingdom(Color::BLUE & H2Config::GetKingdomColors() ? true : false);
+    kingdom[Color::GREEN]  = Kingdom(Color::GREEN & H2Config::GetKingdomColors() ? true : false);
+    kingdom[Color::RED]    = Kingdom(Color::RED & H2Config::GetKingdomColors() ? true : false);
+    kingdom[Color::YELLOW] = Kingdom(Color::YELLOW & H2Config::GetKingdomColors() ? true : false);
+    kingdom[Color::ORANGE] = Kingdom(Color::ORANGE & H2Config::GetKingdomColors() ? true : false);
+    kingdom[Color::PURPLE] = Kingdom(Color::PURPLE & H2Config::GetKingdomColors() ? true : false);
+    kingdom[Color::GRAY]   = Kingdom(false);
 
     // loading info
     display.Fill(0, 0, 0);
@@ -173,6 +164,7 @@ void World::LoadMaps(const std::string &filename)
 	}
 
 	stile.index1 = stile.addons[0].index1;
+	stile.quantity1 = stile.addons[0].quantity1;
 
 	std::sort(stile.addons.begin(), stile.addons.end(), MP2::VectorAddonSort);
 
@@ -214,27 +206,29 @@ void World::LoadMaps(const std::string &filename)
 
 	switch(tl.object){
 
+	    // resource
 	    case MP2::OBJ_RNDRESOURCE:
 		tl.object = MP2::OBJ_RESOURCE;
 	    case MP2::OBJ_RESOURCE:
-/*
-		switch(vec_mp2tiles[ii].index1){
-            	    case 1: tl.resource = Resource::WOOD; break;
-		    case 3: tl.resource = Resource::MERCURY; break;
-            	    case 5: tl.resource = Resource::ORE; break;
-                    case 7: tl.resource = Resource::SULFUR; break;
-                    case 9: tl.resource = Resource::CRYSTAL; break;
-                    case 11: tl.resource = Resource::GEMS; break;
-                    case 13: tl.resource = Resource::GOLD; break;
-                    case 17: tl.resource = Resource::Rand(); break;
-		    default:
-			Error::Warning("unknown resource: ", vec_mp2tiles[ii].index1);
-		    break;
-                    //case 15: tl.resource = Maps::LAMP; break;
-                    //case 19: tl.resource = Maps::CHEST; break;
-		}
+		tl.resource = Resource::FromMP2(vec_mp2tiles[ii].index1);
 		break;
-*/
+
+	    // ultimate artifact
+    	    case MP2::OBJ_RNDULTIMATEARTIFACT:
+		//tl.artifact = Artifact::FromMP2(vec_mp2tiles[ii].index1);
+		break;
+
+	    // artifact
+    	    case MP2::OBJ_RNDARTIFACT:
+    	    case MP2::OBJ_RNDARTIFACT1:
+    	    case MP2::OBJ_RNDARTIFACT2:
+    	    case MP2::OBJ_RNDARTIFACT3:
+		tl.object = MP2::OBJ_ARTIFACT;
+    	    case MP2::OBJ_ARTIFACT:
+		tl.artifact = Artifact::FromMP2(vec_mp2tiles[ii].index1);
+		break;
+
+
 	    default:
 		break;
 	}
@@ -297,57 +291,98 @@ World::~World()
 /* end day */
 void World::NextDay(void)
 {
-    ++World::day;
+    ++day;
 
-    if(!(World::day % DAYOFWEEK)) ++World::week;
-    if(!(World::week % WEEKOFMONTH)) ++World::month;
+    if(!(day % DAYOFWEEK)) ++week;
+    if(!(week % WEEKOFMONTH)) ++month;
 
-    World::begin_week = (World::day % DAYOFWEEK ? false : true);
-    World::begin_month = (World::week % WEEKOFMONTH ? false : true);
-}
-
-/* set new date */
-void World::ResetDate(void)
-{
-    World::day = 0;
-    World::week = 0;
-    World::month = 0;
-    World::begin_week = true;
-    World::begin_month = true;
+    begin_week = (day % DAYOFWEEK ? false : true);
+    begin_month = (week % WEEKOFMONTH ? false : true);
 }
 
 void World::Redraw(const Rect &rt, const Point &pt) const
 {
     if(pt.x < 0 || pt.y < 0 || pt.x >= GameArea::GetRect().w || pt.y >= GameArea::GetRect().h){ Error::Warning("World::Redraw: out of range"); return; }
 
-    // static level 0
+    // static level 0 (tiles)
+    //
     Rect  srcrt(rt.x * TILEWIDTH, rt.y * TILEWIDTH, rt.w * TILEWIDTH, rt.h * TILEWIDTH);
     Point dstpt(BORDERWIDTH + pt.x * TILEWIDTH, BORDERWIDTH + pt.y * TILEWIDTH);
 
     display.Blit(*sprite_maps, srcrt, dstpt);
 
-    // static level 1
+    // static level 1 (relief and other static builds)
+    //
     std::vector<Maps::tiles_t>::const_iterator itm = vec_tiles.begin();
-    std::vector<Maps::tiles_t>::const_iterator itm_end = vec_tiles.end();
+    const std::vector<Maps::tiles_t>::const_iterator itm_end = vec_tiles.end();
 
     for(; itm != itm_end; ++itm) if((rt & (*itm).coord) && (*itm).level1 && (*itm).level1->size()){
 
 	std::vector<const Sprite *>::const_iterator its     = (*itm).level1->begin();
 	std::vector<const Sprite *>::const_iterator its_end = (*itm).level1->end();
 
-	for(; its != its_end; ++its)
-	    display.Blit(**its,
-		BORDERWIDTH + ((*itm).coord.x - rt.x) * TILEWIDTH + (*its)->x(),
-		BORDERWIDTH + ((*itm).coord.y - rt.y) * TILEWIDTH + (*its)->y());
+	u16 offset_x = BORDERWIDTH + ((*itm).coord.x - rt.x) * TILEWIDTH;
+	u16 offset_y = BORDERWIDTH + ((*itm).coord.y - rt.y) * TILEWIDTH;
+
+	for(; its != its_end; ++its) display.Blit(**its, offset_x + (*its)->x(), offset_y + (*its)->y());
     }
 
-    // dinamic object
-    
     // animation level 1
+    //
+
+    // dinamic object level 1
+    //
+    itm = vec_tiles.begin();
+
+    for(; itm != itm_end; ++itm) if((rt & (*itm).coord)){
+
+	u16 offset_x = BORDERWIDTH + ((*itm).coord.x - rt.x) * TILEWIDTH;
+	u16 offset_y = BORDERWIDTH + ((*itm).coord.y - rt.y) * TILEWIDTH;
+
+	switch((*itm).object){
+
+	    // draw resource
+	    case MP2::OBJ_RESOURCE:
+		{
+		    const Sprite & sprite = Resource::GetForMapsSprite((*itm).resource);
+		    display.Blit(sprite, offset_x + sprite.x(), offset_y + sprite.y());
+		}
+		break;
+
+	    // draw artifact
+    	    case MP2::OBJ_ARTIFACT:
+		{
+		    const Sprite & sprite = Artifact::GetForMapsSprite((*itm).artifact);
+		    display.Blit(sprite, offset_x + sprite.x(), offset_y + sprite.y());
+		}
+		break;
+
+	    // draw other resource (lamp, campfire, sea resource e.t.c.)
+	    case MP2::OBJ_TREASURECHEST:
+	    case MP2::OBJ_ANCIENTLAMP:
+	    case MP2::OBJ_CAMPFIRE:
+	    case MP2::OBJ_SHIPWRECKSURVIROR:
+	    case MP2::OBJ_FLOTSAM:
+	    case MP2::OBJ_BOTTLE:
+		break;
+	    
+	    // draw army monster
+    	    case MP2::OBJ_MONSTER:
+		break;
+	    
+	    default:
+		break;
+	}
+    }
     
-    // heroes
+    // heroes, castle and other.....
+    //
     
+    // all flags
+    //
+
     // static level 2
+    //
     itm = vec_tiles.begin();
 
     for(; itm != itm_end; ++itm) if((rt & (*itm).coord) && (*itm).level2 && (*itm).level2->size()){
@@ -355,13 +390,14 @@ void World::Redraw(const Rect &rt, const Point &pt) const
 	std::vector<const Sprite *>::const_iterator its     = (*itm).level2->begin();
 	std::vector<const Sprite *>::const_iterator its_end = (*itm).level2->end();
 
-	for(; its != its_end; ++its)
-	    display.Blit(**its,
-		BORDERWIDTH + ((*itm).coord.x - rt.x) * TILEWIDTH + (*its)->x(),
-		BORDERWIDTH + ((*itm).coord.y - rt.y) * TILEWIDTH + (*its)->y());
+	u16 offset_x = BORDERWIDTH + ((*itm).coord.x - rt.x) * TILEWIDTH;
+	u16 offset_y = BORDERWIDTH + ((*itm).coord.y - rt.y) * TILEWIDTH;
+
+	for(; its != its_end; ++its) display.Blit(**its, offset_x + (*its)->x(), offset_y + (*its)->y());
     }
 
     // animation level 2
+    //
 
 }
 
@@ -393,31 +429,4 @@ bool World::Movement(u16 index) const
     }
     
     return true;
-}
-
-const Kingdom & World::GetKingdom(Color::color_t color)
-{
-    switch(color){
-    
-	case Color::BLUE:
-	    return kingdom[0];
-	
-	case Color::GREEN:
-	    return kingdom[1];
-
-	case Color::RED:
-	    return kingdom[2];
-	
-	case Color::YELLOW:
-	    return kingdom[3];
-	
-	case Color::ORANGE:
-	    return kingdom[4];
-	
-	case Color::PURPLE:
-	    return kingdom[5];
-	
-	default:
-	    return kingdom[6];
-    }
 }

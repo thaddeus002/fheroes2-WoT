@@ -24,6 +24,7 @@
 #include <string>
 #include "rect.h"
 #include "resource.h"
+#include "artifact.h"
 #include "sprite.h"
 #include "gamedefs.h"
 
@@ -60,9 +61,10 @@ namespace Maps
 	std::vector<const Sprite *> *level1;
 	std::vector<const Sprite *> *level2;
 
-	//union {
-	//    Resource::resource_t resource;
-	//};
+	union {
+	    Resource::resource_t resource;
+	    Artifact::artifact_t artifact;
+	};
 
     } tiles_t;
 };

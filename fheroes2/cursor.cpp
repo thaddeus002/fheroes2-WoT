@@ -31,6 +31,8 @@ namespace Cursor {
     static Rect          position;
     static bool          show = true;
     static bool		 save = false;
+    static s16		 offset_x = 0;
+    static s16		 offset_y = 0;
 };
 
 /* init cursor */
@@ -112,6 +114,8 @@ void Cursor::Set(Cursor::themes_t cursor)
 		Cursor::sprite = AGG::GetICN("ADVMCO.ICN", 0);
 		break;
 	}
+	
+	Cursor::SetOffset(cursor);
     }
 }
 
@@ -131,8 +135,8 @@ void Cursor::Redraw(u16 x, u16 y, bool flag)
 
     if(save){ Cursor::background.Restore(); save = false; }
 
-    Cursor::position.x = x;
-    Cursor::position.y = y;
+    Cursor::position.x = x + offset_x;
+    Cursor::position.y = y + offset_y;
     Cursor::position.w = (Cursor::position.x + Cursor::position.w > display.w() ? display.w() - Cursor::position.x : Cursor::sprite.w());
     Cursor::position.h = (Cursor::position.y + Cursor::position.h > display.h() ? display.h() - Cursor::position.y : Cursor::sprite.h());
 
@@ -150,4 +154,37 @@ void Cursor::Redraw(u16 x, u16 y, bool flag)
 bool Cursor::Visible(void)
 {
     return show;
+}
+
+/* set offset big cursor */
+void Cursor::SetOffset(Cursor::themes_t cursor)
+{
+	switch(cursor){
+
+	    case Cursor::MOVE:
+	    case Cursor::MOVE2:
+	    case Cursor::MOVE3:
+	    case Cursor::MOVE4:
+		Cursor::offset_x = -12;
+		Cursor::offset_y = -8;
+		break;
+
+	    case Cursor::ACTION:
+	    case Cursor::ACTION2:
+	    case Cursor::ACTION3:
+	    case Cursor::ACTION4:
+		Cursor::offset_x = -14;
+		Cursor::offset_y = -10;
+		break;
+
+	    case Cursor::CASTLE:
+		Cursor::offset_x = -6;
+		Cursor::offset_y = -4;
+		break;
+
+	    default:
+		Cursor::offset_x = 0;
+		Cursor::offset_y = 0;
+		break;
+	}
 }
