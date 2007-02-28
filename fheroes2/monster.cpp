@@ -21,160 +21,174 @@
 #include "error.h"
 #include "monster.h"
 
-const std::string & Monster::String(monster_t monster)
-{
-    static const std::string strPeasant("Peasant");
-    static const std::string strArcher("Archer");
-    static const std::string strRanger("Ranger");
-    static const std::string strPikeman("Pikeman");
-    static const std::string strVeteranPikeman("Veteran Pikeman");
-    static const std::string strSwordsman("Swordsman");
-    static const std::string strMasterSwordsman("Master Swordman");
-    static const std::string strCavalry("Cavalry");
-    static const std::string strChampion("Champion");
-    static const std::string strPaladin("Paladin");
-    static const std::string strCrusader("Crusader");
-    static const std::string strGoblin("Goblin");
-    static const std::string strOrc("Orc");
-    static const std::string strChiefOrc("Chief Orc");
-    static const std::string strWolf("Wolf");
-    static const std::string strOgre("Ogre");
-    static const std::string strLordOgre("Lord Ogre");
-    static const std::string strTroll("Troll");
-    static const std::string strWarTroll("War Troll");
-    static const std::string strCyclops("Cyclops");
-    static const std::string strSprite("Sprite");
-    static const std::string strDwarf("Dwarf");
-    static const std::string strBattleDwarf("Battle Dwarf");
-    static const std::string strElf("Elf");
-    static const std::string strGrandElf("GrandElf");
-    static const std::string strDruid("Druid");
-    static const std::string strGreaterDruid("Greater Druid");
-    static const std::string strUnicorn("Unicorn");
-    static const std::string strPhoenix("Phoenix");
-    static const std::string strCentaur("Centaur");
-    static const std::string strGargoyle("Gargoyle");
-    static const std::string strGriffin("Griffin");
-    static const std::string strMinotaur("Minotaur");
-    static const std::string strKnightMinotaur("Knight Minotaur");
-    static const std::string strHidra("Hidra");
-    static const std::string strGreenDragon("Green Dragon");
-    static const std::string strRedDragon("Red Dragon");
-    static const std::string strBlackDragon("Black Dragon");
-    static const std::string strHalfling("Halfling");
-    static const std::string strBoar("Boar");
-    static const std::string strIronGolem("Iron Golem");
-    static const std::string strSteelGolem("Steel Golem");
-    static const std::string strRoc("Roc");
-    static const std::string strMage("Mage");
-    static const std::string strArchmage("Archmage");
-    static const std::string strGiant("Giant");
-    static const std::string strTitan("Titan");
-    static const std::string strSkeleton("Skeleton");
-    static const std::string strZombie("Zombie");
-    static const std::string strMutantZombie("Mutant Zombie");
-    static const std::string strMummy("Mummy");
-    static const std::string strRoyalMummy("Royal Mummy");
-    static const std::string strVampire("Vampire");
-    static const std::string strLordVampire("Lord Vampire");
-    static const std::string strLich("Lich");
-    static const std::string strPowerLich("Power Lich");
-    static const std::string strBoneDragon("Bone Dragon");
-    static const std::string strRogue("Rogue");
-    static const std::string strNomad("Nomad");
-    static const std::string strGhost("Ghost");
-    static const std::string strGenie("Genie");
-    static const std::string strMedusa("Medusa");
-    static const std::string strEarthElement("Earth Element");
-    static const std::string strAirElement("Air Element");
-    static const std::string strFireElement("Fire Element");
-    static const std::string strWaterElement("Water Element");
-    static const std::string unknown("unknown");
+namespace Monster {
+    //                                 atck dfnc shts  min  max   hp      speed  cost grwn  name               icn sprite maps
+    static const stats_t peasant    = {   1,   1,   0,   1,   1,   1,  VERYSLOW,    2,  12, "Peasant"        , "PEASANT.ICN" };
+    static const stats_t archer     = {   5,   3,  12,   2,   3,  10,  VERYSLOW,  150,   8, "Archer"         , "ARCHER.ICN" };
+    static const stats_t ranger     = {   5,   3,  24,   2,   3,  10,   AVERAGE,  200,   8, "Ranger"         , "ARCHER2.ICN" };
+    static const stats_t pikeman    = {   5,   9,   0,   3,   4,  15,   AVERAGE,  200,   5, "Pikeman"        , "PIKEMAN.ICN" };
+    static const stats_t pikeman2   = {   5,   9,   0,   3,   4,  20,      FAST,  250,   5, "Veteran Pikeman", "PIKEMAN2.ICN" };
+    static const stats_t swordsman  = {   7,   9,   0,   4,   6,  25,   AVERAGE,  250,   4, "Swordsman"      , "SWORDSMN.ICN" };
+    static const stats_t swordsman2 = {   7,   9,   0,   4,   6,  30,      FAST,  300,   4, "Master Swordman", "SWORDSM2.ICN" };
+    static const stats_t cavalry    = {  10,   9,   0,   5,   9,  30,  VERYFAST,  300,   3, "Cavalry"        , "CAVALRYR.ICN" };
+    static const stats_t champion   = {  10,   9,   0,   5,  10,  40, ULTRAFAST,  375,   3, "Champion"       , "CAVALRYB.ICN" };
+    static const stats_t paladin    = {  11,  12,   0,  10,  20,  50,      FAST,  600,   2, "Paladin"        , "PALADIN.ICN" };
+    static const stats_t crusader   = {  11,  12,   0,  10,  20,  65,  VERYFAST, 1000,   2, "Crusader"       , "PALADIN2.ICN" };
 
+    static const stats_t goblin     = {   3,   1,   0,   1,   2,   3,   AVERAGE,   40,  10, "Goblin"         , "GOBLIN.ICN" };
+    static const stats_t orc        = {   3,   4,   8,   2,   3,  10,  VERYSLOW,  140,   8, "Orc"            , "ORC.ICN" };
+    static const stats_t orc2       = {   3,   4,  16,   3,   4,  15,      SLOW,  175,   8, "Orc Chief"      , "ORC2.ICN" };
+    static const stats_t wolf       = {   6,   2,   0,   3,   5,  20,  VERYFAST,  200,   5, "Wolf"           , "WOLF.ICN" };
+    static const stats_t ogre       = {   9,   5,   0,   4,   6,  40,  VERYSLOW,  300,   4, "Ogre"           , "OGRE.ICN" };
+    static const stats_t ogre2      = {   9,   5,   0,   5,   7,  60,   AVERAGE,  500,   4, "Ogre Lord"      , "OGRE2.ICN" };
+    static const stats_t troll      = {  10,   5,   8,   5,   7,  40,   AVERAGE,  600,   3, "Troll"          , "TROLL.ICN" };
+    static const stats_t troll2     = {  10,   5,  16,   7,   9,  40,      FAST,  700,   3, "War Troll"      , "TROLL2.ICN" };
+    static const stats_t cyclops    = {  12,   9,   0,  12,  24,  80,      FAST,  750,   2, "Cyclops"        , "CYCLOPS.ICN" };
+
+    static const stats_t sprite     = {   4,   2,   0,   1,   2,   2,   AVERAGE,   50,   8, "Sprite"         , "SPRITE.ICN" };
+    static const stats_t dwarf      = {   6,   5,   0,   2,   4,  20,  VERYSLOW,  200,   6, "Dwarf"          , "DWARF.ICN" };
+    static const stats_t dwarf2     = {   6,   6,   0,   2,   4,  20,   AVERAGE,  250,   6, "Battle Dwarf"   , "DWARF2.ICN" };
+    static const stats_t elf        = {   4,   3,  24,   2,   3,  15,   AVERAGE,  250,   4, "Elf"            , "ELF.ICN" };
+    static const stats_t elf2       = {   5,   5,  24,   2,   3,  15,  VERYFAST,  300,   4, "Grand Elf"      , "ELF2.ICN" };
+    static const stats_t druid      = {   7,   5,   8,   5,   8,  25,      FAST,  350,   3, "Druid"          , "DRUID.ICN" };
+    static const stats_t druid2     = {   7,   7,  16,   5,   8,  25,  VERYFAST,  400,   3, "Greater Druid"  , "DRUID2.ICN" };
+    static const stats_t unicorn    = {  10,   9,   0,   7,  14,  40,      FAST,  500,   2, "Unicorn"        , "UNICORN.ICN" };
+    static const stats_t phoenix    = {  12,  10,   0,  20,  40, 100, ULTRAFAST, 1500,   1, "Phoenix"        , "PHOENIX.ICN" };
+
+    static const stats_t centaur    = {   3,   1,   8,   1,   2,   5,   AVERAGE,   60,   8, "Centaur"        , "CENTAUR.ICN" };
+    static const stats_t gargoyle   = {   4,   7,   0,   2,   3,  15,  VERYFAST,  200,   6, "Gargoyle"       , "GARGOYLE.ICN" };
+    static const stats_t griffin    = {   6,   6,   0,   3,   5,  25,   AVERAGE,  300,   4, "Griffin"        , "GRIFFIN.ICN" };
+    static const stats_t minotaur   = {   9,   8,   0,   5,  10,  35,   AVERAGE,  400,   3, "Minotaur"       , "MINOTAUR.ICN" };
+    static const stats_t minotaur2  = {   9,   8,   0,   5,  10,  45,  VERYFAST,  500,   3, "Minotaur King"  , "MINOTAU2.ICN" };
+    static const stats_t hydra      = {   8,   9,   0,   6,  12,  75,  VERYSLOW,  800,   2, "Hydra"          , "HYDRA.ICN" };
+    static const stats_t dragon     = {  12,  12,   0,  25,  50, 200,   AVERAGE, 3000,   1, "Green Dragon"   , "DRAGGREE.ICN" };
+    static const stats_t dragon2    = {  13,  13,   0,  25,  50, 250,      FAST, 3500,   1, "Red Dragon"     , "DRAGRED.ICN" };
+    static const stats_t dragon3    = {  14,  14,   0,  25,  50, 300,  VERYFAST, 4000,   1, "Black Dragon"   , "DRAGBLAK.ICN" };
+
+    static const stats_t halfling   = {   2,   1,  12,   1,   3,   3,      SLOW,   50,   8, "Halfling"       , "HALFLING.ICN" };
+    static const stats_t boar       = {   5,   4,   0,   2,   3,  15,  VERYFAST,  150,   6, "Boar"           , "BOAR.ICN" };
+    static const stats_t golem      = {   5,  10,   0,   4,   5,  30,  VERYSLOW,  300,   4, "Iron Golem"     , "GOLEM.ICN" };
+    static const stats_t golem2     = {   7,  10,   0,   4,   5,  35,      SLOW,  350,   4, "Steel Golem"    , "GOLEM2.ICN" };
+    static const stats_t roc        = {   7,   7,   0,   4,   8,  40,   AVERAGE,  400,   3, "Roc"            , "ROC.ICN" };
+    static const stats_t mage       = {  11,   7,  12,   7,   9,  30,      FAST,  600,   2, "Mage"           , "MAGE1.ICN" };
+    static const stats_t mage2      = {  12,   8,  24,   7,   9,  35,  VERYFAST,  700,   2, "Archmage"       , "MAGE2.ICN" };
+    static const stats_t giant      = {  13,  10,   0,  20,  30, 150,   AVERAGE, 2000,   1, "Giant"          , "TITANBLU.ICN" };
+    static const stats_t titan      = {  15,  15,  24,  20,  30, 300,  VERYFAST, 5000,   1, "Titan"          , "TITANBLA.ICN" };
+
+    static const stats_t skeleton   = {   4,   3,   0,   2,   3,   4,   AVERAGE,   75,   8, "Skeleton"       , "SKELETON.ICN" };
+    static const stats_t zombie     = {   5,   2,   0,   2,   3,  15,  VERYSLOW,  150,   6, "Zombie"         , "ZOMBIE.ICN" };
+    static const stats_t zombie2    = {   5,   2,   0,   2,   3,  25,   AVERAGE,  200,   6, "Mutant Zombie"  , "ZOMBIE2.ICN" };
+    static const stats_t mummy      = {   6,   6,   0,   3,   4,  25,   AVERAGE,  250,   4, "Mummy"          , "MUMMYW.ICN" };
+    static const stats_t mummy2     = {   6,   6,   0,   3,   4,  30,      FAST,  300,   4, "Royal Mummy"    , "MUMMY2.ICN" };
+    static const stats_t vampire    = {   8,   6,   0,   5,   7,  30,   AVERAGE,  500,   3, "Vampire"        , "VAMPIRE.ICN" };
+    static const stats_t vampire2   = {   8,   6,   0,   5,   7,  40,      FAST,  650,   3, "Lord Vampire"   , "VAMPIRE2.ICN" };
+    static const stats_t lich       = {   7,  12,  12,   8,  10,  25,      FAST,  750,   2, "Lich"           , "LICH.ICN" };
+    static const stats_t lich2      = {   7,  13,  24,   8,  10,  35,  VERYFAST,  900,   2, "Power Lich"     , "LICH2.ICN" };
+    static const stats_t dragbone   = {  11,   9,   0,  25,  45, 150,   AVERAGE, 1500,   1, "Bone Dragon"    , "DRAGBONE.ICN" };
+
+    static const stats_t rogue      = {   6,   1,   0,   1,   2,   4,      FAST,   50,   4, "Rogue"          , "ROGUE.ICN" };
+    static const stats_t nomad      = {   7,   6,   0,   2,   5,  20,  VERYFAST,  200,   4, "Nomad"          , "NOMAD.ICN" };
+    static const stats_t ghost      = {   8,   7,   0,   4,   6,  20,      FAST, 1000,   4, "Ghost"          , "GHOST.ICN" };
+    static const stats_t medusa     = {   8,   9,   0,   6,  10,  35,   AVERAGE,  500,   4, "Medusa"         , "MEDUSA.ICN" };
+    static const stats_t genie      = {  10,   9,   0,  20,  30,  50,  VERYFAST,  650,   4, "Genie"          , "GENIE.ICN" };
+    static const stats_t eelement   = {   8,   8,   0,   4,   5,  50,      SLOW,  500,   4, "Earth Element"  , "EELEM.ICN" };
+    static const stats_t aelement   = {   7,   7,   0,   2,   8,  35,  VERYFAST,  500,   4, "Air Element"    , "AELEM.ICN" };
+    static const stats_t felement   = {   8,   6,   0,   4,   6,  40,      FAST,  500,   4, "Fire Element"   , "FELEM.ICN" };
+    static const stats_t welement   = {   6,   8,   0,   3,   7,  45,   AVERAGE,  500,   4, "Water Element"  , "WELEM.ICN" };
+
+    static const stats_t unknown   = {    0,   0,   0,   0,   0,   0,  VERYSLOW, 9999,   0, "Unknown"        , "UNKNOWN.ICN" };
+}
+
+/* get stats monster */
+const Monster::stats_t & Monster::GetStats(monster_t monster)
+{
     switch(monster){
 
 	// knight
-        case Monster::PEASANT:			return strPeasant;
-        case Monster::ARCHER:			return strArcher;
-        case Monster::RANGER:			return strRanger;
-        case Monster::PIKEMAN:			return strPikeman;
-        case Monster::VETERAN_PIKEMAN:		return strVeteranPikeman;
-        case Monster::SWORDSMAN:		return strSwordsman;
-	case Monster::MASTER_SWORDSMAN:		return strMasterSwordsman;
-	case Monster::CAVALRY:			return strCavalry;
-	case Monster::CHAMPION:			return strChampion;
-	case Monster::PALADIN:			return strPaladin;
-	case Monster::CRUSADER:			return strCrusader;
+        case Monster::PEASANT:			return peasant;
+        case Monster::ARCHER:			return archer;
+        case Monster::RANGER:			return ranger;
+        case Monster::PIKEMAN:			return pikeman;
+        case Monster::VETERAN_PIKEMAN:		return pikeman2;
+        case Monster::SWORDSMAN:		return swordsman;
+	case Monster::MASTER_SWORDSMAN:		return swordsman2;
+	case Monster::CAVALRY:			return cavalry;
+	case Monster::CHAMPION:			return champion;
+	case Monster::PALADIN:			return paladin;
+	case Monster::CRUSADER:			return crusader;
 	
 	// barbarian
-	case Monster::GOBLIN:			return strGoblin;
-	case Monster::ORC:			return strOrc;
-	case Monster::CHIEF_ORC:		return strChiefOrc;
-	case Monster::WOLF:			return strWolf;
-	case Monster::OGRE:			return strOgre;
-	case Monster::LORD_OGRE:		return strLordOgre;
-	case Monster::TROLL:			return strTroll;
-	case Monster::WAR_TROLL:		return strWarTroll;
-	case Monster::CYCLOPS:			return strCyclops;
+	case Monster::GOBLIN:			return goblin;
+	case Monster::ORC:			return orc;
+	case Monster::CHIEF_ORC:		return orc2;
+	case Monster::WOLF:			return wolf;
+	case Monster::OGRE:			return ogre;
+	case Monster::LORD_OGRE:		return ogre2;
+	case Monster::TROLL:			return troll;
+	case Monster::WAR_TROLL:		return troll2;
+	case Monster::CYCLOPS:			return cyclops;
 	
 	// sorceress
-	case Monster::SPRITE:			return strSprite;
-	case Monster::DWARF:			return strDwarf;
-	case Monster::BATTLE_DWARF:		return strBattleDwarf;
-	case Monster::ELF:			return strElf;
-	case Monster::GRAND_ELF:		return strGrandElf;
-	case Monster::DRUID:			return strDruid;
-	case Monster::GREATER_DRUID:		return strGreaterDruid;
-	case Monster::UNICORN:			return strUnicorn;
-	case Monster::PHOENIX:			return strPhoenix;
+	case Monster::SPRITE:			return sprite;
+	case Monster::DWARF:			return dwarf;
+	case Monster::BATTLE_DWARF:		return dwarf2;
+	case Monster::ELF:			return elf;
+	case Monster::GRAND_ELF:		return elf2;
+	case Monster::DRUID:			return druid;
+	case Monster::GREATER_DRUID:		return druid2;
+	case Monster::UNICORN:			return unicorn;
+	case Monster::PHOENIX:			return phoenix;
 	
 	// warlock
-	case Monster::CENTAUR:			return strCentaur;
-	case Monster::GARGOYLE:			return strGargoyle;
-	case Monster::GRIFFIN:			return strGriffin;
-	case Monster::MINOTAUR:			return strMinotaur;
-	case Monster::KNIGHT_MINOTAUR:		return strKnightMinotaur;
-	case Monster::HIDRA:			return strHidra;
-	case Monster::GREEN_DRAGON:		return strGreenDragon;
-	case Monster::RED_DRAGON:		return strRedDragon;
-	case Monster::BLACK_DRAGON:		return strBlackDragon;
+	case Monster::CENTAUR:			return centaur;
+	case Monster::GARGOYLE:			return gargoyle;
+	case Monster::GRIFFIN:			return griffin;
+	case Monster::MINOTAUR:			return minotaur;
+	case Monster::KNIGHT_MINOTAUR:		return minotaur2;
+	case Monster::HYDRA:			return hydra;
+	case Monster::GREEN_DRAGON:		return dragon;
+	case Monster::RED_DRAGON:		return dragon2;
+	case Monster::BLACK_DRAGON:		return dragon3;
 	
 	// wizard
-	case Monster::HALFLING:			return strHalfling;
-	case Monster::BOAR:			return strBoar;
-	case Monster::IRON_GOLEM:		return strIronGolem;
-	case Monster::STEEL_GOLEM:		return strSteelGolem;
-	case Monster::ROC:			return strRoc;
-	case Monster::MAGE:			return strMage;
-	case Monster::ARCHMAGE:			return strArchmage;
-	case Monster::GIANT:			return strGiant;
-	case Monster::TITAN:			return strTitan;
+	case Monster::HALFLING:			return halfling;
+	case Monster::BOAR:			return boar;
+	case Monster::IRON_GOLEM:		return golem;
+	case Monster::STEEL_GOLEM:		return golem2;
+	case Monster::ROC:			return roc;
+	case Monster::MAGE:			return mage;
+	case Monster::ARCHMAGE:			return mage2;
+	case Monster::GIANT:			return giant;
+	case Monster::TITAN:			return titan;
 	
 	// necromancer
-	case Monster::SKELETON:			return strSkeleton;
-	case Monster::ZOMBIE:			return strZombie;
-	case Monster::MUTANT_ZOMBIE:		return strMutantZombie;
-	case Monster::MUMMY:			return strMummy;
-	case Monster::ROYAL_MUMMY:		return strRoyalMummy;
-	case Monster::VAMPIRE:			return strVampire;
-	case Monster::LORD_VAMPIRE:		return strLordVampire;
-	case Monster::LICH:			return strLich;
-	case Monster::POWER_LICH:		return strPowerLich;
-	case Monster::BONE_DRAGON:		return strBoneDragon;
+	case Monster::SKELETON:			return skeleton;
+	case Monster::ZOMBIE:			return zombie;
+	case Monster::MUTANT_ZOMBIE:		return zombie2;
+	case Monster::MUMMY:			return mummy;
+	case Monster::ROYAL_MUMMY:		return mummy2;
+	case Monster::VAMPIRE:			return vampire;
+	case Monster::LORD_VAMPIRE:		return vampire2;
+	case Monster::LICH:			return lich;
+	case Monster::POWER_LICH:		return lich2;
+	case Monster::BONE_DRAGON:		return dragbone;
 
 	// bomg
-	case Monster::ROGUE:			return strRogue;
-	case Monster::NOMAD:			return strNomad;
-	case Monster::GHOST:			return strGhost;
-	case Monster::GENIE:			return strGenie;
-	case Monster::MEDUSA:			return strMedusa;
-	case Monster::EARTH_ELEMENT:		return strEarthElement;
-	case Monster::AIR_ELEMENT:		return strAirElement;
-	case Monster::FIRE_ELEMENT:		return strFireElement;
-	case Monster::WATER_ELEMENT:		return strWaterElement;
+	case Monster::ROGUE:			return rogue;
+	case Monster::NOMAD:			return nomad;
+	case Monster::GHOST:			return ghost;
+	case Monster::GENIE:			return genie;
+	case Monster::MEDUSA:			return medusa;
+	case Monster::EARTH_ELEMENT:		return eelement;
+	case Monster::AIR_ELEMENT:		return aelement;
+	case Monster::FIRE_ELEMENT:		return felement;
+	case Monster::WATER_ELEMENT:		return welement;
 	
-	default: Error::Warning("Monster::String: unknown: ", monster); break;
+	default: Error::Warning("Monster::GetStats: unknown: ", monster); break;
     }
 
     return unknown;
 }
+
+/* get string name */
+const std::string & Monster::String(monster_t monster){ return Monster::GetStats(monster).name; }

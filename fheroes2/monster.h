@@ -21,7 +21,6 @@
 #define H2MONSTER_H
 
 #include <string>
-#include "sprite.h"
 #include "gamedefs.h"
 
 namespace Monster
@@ -73,7 +72,7 @@ namespace Monster
 	GRIFFIN,
 	MINOTAUR,
 	KNIGHT_MINOTAUR,
-	HIDRA,
+	HYDRA,
 	GREEN_DRAGON,
 	RED_DRAGON,
 	BLACK_DRAGON,
@@ -122,15 +121,14 @@ namespace Monster
 	u8 damageMax;
 	u8 hp;
 	speed_t speed;
-	u8 grown;
 	u8 cost;
+	u8 grown;
+	const std::string name;
+	const std::string file;
     } stats_t;
 
-
     const std::string & String(monster_t monster);
-
-    //const Sprite & GetSprite(monster_t monster);
-
+    const stats_t & GetStats(monster_t monster);
 };
 
 #endif
