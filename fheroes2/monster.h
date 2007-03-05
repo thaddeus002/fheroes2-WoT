@@ -127,6 +127,7 @@ namespace Monster
 	const std::string file;
     } stats_t;
 
+
     const std::string & String(monster_t monster);
     const stats_t & GetStats(monster_t monster);
 };

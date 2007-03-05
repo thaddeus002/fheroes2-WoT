@@ -20,6 +20,7 @@
 #ifndef H2DIALOG_H
 #define H2DIALOG_H
 
+#include <string>
 #include "gamedefs.h"
 #include "background.h"
 #include "rect.h"
@@ -47,6 +48,9 @@ namespace Dialog
     Dialog::answer_t AdventureOptions(void);
     Game::menu_t FileOptions(void);
     Dialog::answer_t SystemOptions(void);
+
+    // show info cell maps
+    void QuickInfo(const std::string & object);
 
     // buttons: OK : CANCEL : OK|CANCEL : YES|NO
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons = 0);

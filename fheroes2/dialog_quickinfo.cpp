@@ -17,48 +17,63 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEDEFS_H
-#define H2GAMEDEFS_H
 
-#include "SDL.h"
+#include "agg.h"
+#include "event.h"
+#include "text.h"
+#include "cursor.h"
+#include "background.h"
+#include "dialog.h"
 
-typedef char		s8;
-typedef unsigned char	u8;
-typedef short		s16;
-typedef unsigned short	u16;
-typedef int		s32;
-typedef unsigned int	u32;
-
-namespace Font
+void Dialog::QuickInfo(const std::string & object)
 {
-    typedef enum { SMALL, BIG } type_t;
-};
+    // preload
+    const std::string &qwikinfo = "QWIKINFO.ICN";
 
-#define GAME_VERSION		20070305
+    AGG::PreloadObject(qwikinfo);
 
-#define MAXU16   65535 
-#define MAXU32   4294967295 
+    // cursor
+    Cursor::Hide();
+    Cursor::Set(Cursor::POINTER);
+    Cursor::themes_t cursor = Cursor::Get();
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    // image box
+    const Sprite &box = AGG::GetICN(qwikinfo, 0);
 
-#define RMASK 0x0000f000
-#define GMASK 0x00000f00
-#define BMASK 0x000000f0
-#define AMASK 0x0000000f
+    Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
+    Background back(rb);
+    back.Save();
 
-#define SWAP16(X)    X=SDL_Swap16(X)
-#define SWAP32(X)    X=SDL_Swap32(X)
+    display.Blit(box, rb);
 
-#else
+    u16 tx = rb.x + BORDERWIDTH + (rb.w - BORDERWIDTH - Text::width(object, Font::SMALL)) / 2;
+    u16 ty = rb.y + (rb.h - BORDERWIDTH - Text::height(rb.h, object, Font::SMALL)) / 2;
+    Text(tx, ty, object, Font::SMALL, true);
 
-#define RMASK 0x0000000f
-#define GMASK 0x000000f0
-#define BMASK 0x00000f00
-#define AMASK 0x0000f000
+    LocalEvent & le = LocalEvent::GetLocalEvent();
 
-#define SWAP16(X) ;
-#define SWAP32(X) ;
+    display.Flip();
 
-#endif
+    // quick info loop
+    while(le.MouseRight()){ le.HandleEvents(); }
 
-#endif
+    // restore background
+    back.Restore();
+    Cursor::Set(cursor);
+    Cursor::Show();
+    display.Flip();
+}
+
+/*
+void Dialog::QuickInfo(const Castle & castle)
+{
+    const std::string &qwiktown = "QWIKTOWN.ICN";
+    AGG::PreloadObject(qwiktown);
+}
+
+void Dialog::QuickInfo(const Heroes & hero)
+{
+    const std::string &qwikhero = "QWIKHERO.ICN";
+    AGG::PreloadObject(qwikhero);
+}
+*/

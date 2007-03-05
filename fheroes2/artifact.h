@@ -108,8 +108,17 @@ namespace Artifact
 	SPIKED_SHIELD,
 	WHITE_PEARL,
 	BLACK_PEARL,
-	MAGIC_BOOK
+
+	MAGIC_BOOK,
+	UNKNOWN
+
     } artifact_t;
+
+
+    typedef struct {
+        const std::string name;
+        const std::string description;
+    } stats_t;
 
     artifact_t RandUltimate(void);
     artifact_t Rand(void);

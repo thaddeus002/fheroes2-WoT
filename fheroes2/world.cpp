@@ -29,7 +29,7 @@
 #include "rand.h"
 #include "world.h"
 
-World::World(const std::string &filename) : sprite_maps(NULL), day(0), week(0), month(0), begin_week(true), begin_month(true)
+World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), month(1), begin_week(true), begin_month(true)
 {
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -55,6 +55,10 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(0), week(0), 
     u16  byte16;
     u32  byte32;
     
+    // endof
+    fd.seekg(0, std::ios_base::end);
+    const u32 endof = fd.tellg();
+
     // offset data
     fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
 
@@ -174,12 +178,123 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(0), week(0), 
 	vec_mp2tiles.push_back(stile);
     }
 
-    // read castle
+    // count addon
+    fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
+    SWAP32(byte32);
     
-    // read heroes
+    // skip addons
+    fd.ignore(byte32 * SIZEOFMP2ADDON);
+
+    // cood castles
+    // 72 x 3 byte (cx, cy, id)
+    for(u8 ii = 0; ii < 72; ++ii){
+
+	char cx, cy, id;
+
+	fd.read(&cx, 1);
+	fd.read(&cy, 1);
+	fd.read(&id, 1);
+	
+	// empty block
+	if(-1 == cx && -1 == cy) continue;
+
+	switch(id){
+	    case 0x00: break; // tower: knight
+	    case 0x01: break; // tower: barbarian
+	    case 0x02: break; // tower: sorceress
+	    case 0x03: break; // tower: warlock
+	    case 0x04: break; // tower: wizard
+	    case 0x05: break; // tower: necromancer
+	    case 0x06: break; // tower: random
+	    case 0x80: break; // castle: knight
+	    case 0x81: break; // castle: barbarian
+	    case 0x82: break; // castle: sorceress
+	    case 0x83: break; // castle: warlock
+	    case 0x84: break; // castle: wizard
+	    case 0x85: break; // castle: necromancer
+	    case 0x86: break; // castle: random
+	    default: Error::Warning("World::World: castle block, unknown id: ", id); Error::Verbose(Point(cx, cy)); break;
+	}
+    }
+
+    // cood resource kingdoms
+    // 144 x 3 byte (cx, cy, id)
+    for(u8 ii = 0; ii < 144; ++ii){
+
+	char cx, cy, id;
+
+	fd.read(&cx, 1);
+	fd.read(&cy, 1);
+	fd.read(&id, 1);
+	
+	// empty block
+	if(-1 == cx && -1 == cy) continue;
+
+	switch(id){
+	    case 0x00: break; // mines: wood
+	    case 0x01: break; // mines: mercury
+ 	    case 0x02: break; // mines: ore
+	    case 0x03: break; // mines: sulfur
+	    case 0x04: break; // mines: crystal
+	    case 0x05: break; // mines: gems
+	    case 0x06: break; // mines: gold
+	    case 0x64: break; // lighthouse
+	    case 0x65: break; // dragon city
+	    case 0x67: break; // abandoned mines
+	    default: Error::Warning("World::World: kingdom block, unknown id: ", id); Error::Verbose(Point(cx, cy)); break;	
+	}
+    }
     
-    // read events
+    // unknown u16
+    fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
+    SWAP16(byte16);
+
+    // count final mp2 blocks
+    u16 countblock = 0;
+    byte16 = 0xffff;
+    while(byte16){
+
+	// debug
+	if(endof < fd.tellg()) Error::Except("World::World: read maps: out of range.");
+
+	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
+	SWAP16(byte16);
+	if(byte16) countblock = byte16 - 1;
+    }
     
+    // castle or heroes or (events, rumors, etc)
+    for(u16 ii = 0; ii < countblock; ++ii){
+
+	// debug
+	if(endof < fd.tellg()) Error::Except("World::World: read maps: out of range.");
+
+	// size block
+	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
+	SWAP16(byte16);
+
+	// read block
+	fd.ignore(byte16);
+	
+	/*
+	quantity1 && quantity % 0x08 && ii == quantity / 0x08
+	switch(object){
+	    case MP2::OBJ_CASTLE:
+		break;
+	    case MP2::OBJ_HEROES:
+		break;
+	    case MP2::OBJ_SIGN:
+	    case MP2::OBJ_BOTTLE:
+		break;
+	    case MP2::OBJ_EVENT:
+		break;
+	    default:
+		break;
+	}
+	// read event day or rumors
+ 	*/
+    }
+
+    // close mp2
     fd.close();
 
     //
@@ -410,14 +525,14 @@ bool World::Movement(u16 index) const
 
         case MP2::OBJ_STONES:
         case MP2::OBJ_OILLAKE:
-        case MP2::OBJ_BIGCRACK:
+        case MP2::OBJ_CRATER:
         case MP2::OBJ_MOUNTS:
         case MP2::OBJ_TREES:
-        case MP2::OBJ_FIRTREES:
         case MP2::OBJN_WAGONCAMP:
         case MP2::OBJN_SAWMILL:
         case MP2::OBJN_MINES:
         case MP2::OBJ_WATERLAKE:
+	case MP2::OBJN_TROLLBRIDGE:
         case MP2::OBJN_ALCHEMYTOWER:
         case MP2::OBJN_EXCAVATION:
         case MP2::OBJN_FORT:
@@ -429,4 +544,13 @@ bool World::Movement(u16 index) const
     }
     
     return true;
+}
+
+const Kingdom & World::GetKingdom(Color::color_t color) const
+{
+    std::map<Color::color_t, Kingdom>::const_iterator it = kingdom.find(color);
+    
+    if(it == kingdom.end()) Error::Except("World::GetKingdom: unknown.");
+    
+    return it->second;
 }

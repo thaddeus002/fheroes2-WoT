@@ -225,7 +225,7 @@ Game::menu_t Game::StartGame(void){
     Game::focus_t focus = Game::HEROES;
 
     // status window
-    Game::StatusWindow statusWindow(pt_stw, world.GetMyKingdom());
+    Game::StatusWindow statusWindow(pt_stw, world);
     statusWindow.Redraw(focus);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -260,7 +260,9 @@ Game::menu_t Game::StartGame(void){
 
 
 	// right mouse on maps - info object
-	if(le.MousePressRight(areaMaps.GetPosition())) Error::Verbose("Dialog Info");
+	if(le.MousePressRight(areaMaps.GetPosition())){
+	    Dialog::QuickInfo(MP2::StringObject(areaMaps.GetObject(le.MouseCursor())));
+	}
 
 	// draw push buttons
 	le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.Press() : buttonScrollHeroesUp.Release();
@@ -311,6 +313,7 @@ Game::menu_t Game::StartGame(void){
 	// click End Turn
 	if(le.MouseClickLeft(buttonEndTur))
 	{
+	// statusWindow.NextDay;
 	}
 
         // click AdventureOptions
@@ -348,6 +351,16 @@ Game::menu_t Game::StartGame(void){
 	    // Change and save system settings
 	}
 	
+	// click StatusWindow
+	if(le.MouseClickLeft(statusWindow.GetRect()))
+	{
+	    Cursor::Hide();
+	    statusWindow.NextState();
+	    statusWindow.Redraw(focus);
+	    display.Flip();
+	    Cursor::Show();
+	}
+
 	// right info
 	if(le.MousePressRight(radar.GetRect())) Dialog::Message("World Map", "A miniature view of the known world. Left click to move viewing area.", Font::BIG);
 	if(le.MousePressRight(buttonNextHero)) Dialog::Message("Next Hero", "Select the next Hero.", Font::BIG);
@@ -404,10 +417,9 @@ Cursor::themes_t Game::GetCursor(const GameArea &area, Game::focus_t focus)
 
         case MP2::OBJ_STONES:
         case MP2::OBJ_OILLAKE:
-        case MP2::OBJ_BIGCRACK:
+        case MP2::OBJ_CRATER:
         case MP2::OBJ_MOUNTS:
         case MP2::OBJ_TREES:
-        case MP2::OBJ_FIRTREES:
         case MP2::OBJN_WAGONCAMP:
         case MP2::OBJN_SAWMILL:
         case MP2::OBJN_MINES:
@@ -419,6 +431,7 @@ Cursor::themes_t Game::GetCursor(const GameArea &area, Game::focus_t focus)
         case MP2::OBJN_SHIPWRECK:
         case MP2::OBJN_DERELICTSHIP:
         case MP2::OBJN_MAGELLANMAPS:
+	case MP2::OBJN_TROLLBRIDGE:
             break;
 
         case MP2::OBJ_ALCHEMYTOWER:

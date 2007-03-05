@@ -111,9 +111,11 @@ u8 Text::width(char ch, Font::type_t ft)
     return AGG::GetLetter(ch, ft).w();
 }
 
-u16 Text::width(const std::string &str, u16 start, u16 count, Font::type_t ft)
+u16 Text::width(const std::string &str,  Font::type_t ft, u16 start, u16 count)
 {
     u16 res = 0;
+
+    if(0xffff == count) count = str.size();
 
     for(int ii = start; ii < start + count; ++ii) res += Text::width(str[ii], ft);
     
@@ -132,7 +134,7 @@ u16 Text::height(u16 width, const std::string &str, Font::type_t ft)
 
     while(s_start < s_end){
 
-	while(s_start < s_end && width < Text::width(str, s_start, s_end - s_start, ft)){
+	while(s_start < s_end && width < Text::width(str, ft, s_start, s_end - s_start)){
     
 	    while(s_start < s_end && !isspace(str[s_end])) --s_end;
 
@@ -160,7 +162,7 @@ TextBox::TextBox(const Rect &rt, const std::string &msg, Font::type_t ft, bool d
 
     while(s_start < s_end){
 
-	while(s_start < s_end && pos.w < Text::width(msg, s_start, s_end - s_start, ft)){
+	while(s_start < s_end && pos.w < Text::width(msg, ft, s_start, s_end - s_start)){
     
 	    while(s_start < s_end && !isspace(msg[s_end])) --s_end;
 
@@ -168,7 +170,7 @@ TextBox::TextBox(const Rect &rt, const std::string &msg, Font::type_t ft, bool d
 	}
     	++s_end;
 
-	pt.x = pos.x + (pos.w - Text::width(msg, s_start, s_end - s_start, ft)) / 2;
+	pt.x = pos.x + (pos.w - Text::width(msg, ft, s_start, s_end - s_start)) / 2;
 	
 	box.push_back(Text(pt.x, pt.y, msg.substr(s_start, s_end - s_start), ft));
 	

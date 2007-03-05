@@ -23,354 +23,96 @@
 #include "rand.h"
 #include "artifact.h"
 
-/* artifact name */
-const std::string & Artifact::String(artifact_t artifact)
-{
-    static const std::string strUltimateBook("Ultimate Book");
-    static const std::string strUltimateSword("Ultimate Sword");
-    static const std::string strUltimateCloak("Ultimate Cloak");
-    static const std::string strUltimateWand("Ultimate Wand");
-    static const std::string strUltimateShield("Ultimate Shield");
-    static const std::string strUltimateStaff("Ultimate Staff");
-    static const std::string strUltimateCrown("Ultimate Crown");
-    static const std::string strUltimateGoose("Ultimate Goose");
-    static const std::string strArcaneNecklace("Arcane Necklace");
-    static const std::string strCasterBracelet("Caster's Bracelet");
-    static const std::string strMageRing("Mage's Ring");
-    static const std::string strMedalValor("Medal of Valor");
-    static const std::string strWitchesBroach("Witches Broach");
-    static const std::string strMedalCourage("Medal of Courage");
-    static const std::string strMedalHonor("Medal of Honor");
-    static const std::string strMedalDistinction("Medal of Distinction");
-    static const std::string strFizbinMisfortune("Fizbin of Misfortune");
-    static const std::string strThunderMace("Thunder Mace");
-    static const std::string strArmorGauntlet("Armored Gauntlets");
-    static const std::string strDefenderHelm("Defender Helm");
-    static const std::string strGiantFlail("Giant Flail");
-    static const std::string strBallista("Ballista");
-    static const std::string strStealthShield("Stealth Shield");
-    static const std::string strDragonSword("Dragon Sword");
-    static const std::string strPowerAxe("Power Axe");
-    static const std::string strDivineBreastplate("Divine Breastplate");
-    static const std::string strMinorScroll("Minor Scroll");
-    static const std::string strMajorScroll("Major Scroll");
-    static const std::string strSuperiorScroll("Superior Scroll");
-    static const std::string strForemostScroll("Foremost Scroll");
-    static const std::string strSackGold("Endless Sack of Gold");
-    static const std::string strBagGold("Endless Bag of Gold");
-    static const std::string strPurseGold("Endless Purse of Gold");
-    static const std::string strRabbitFoot("Rabbit's Foot");
-    static const std::string strGoldenHorseshoe("Golden Horseshoe");
-    static const std::string strGamblerLucky("Gambler's Lucky Coin");
-    static const std::string strFourClover("Four-Leaf Clover");
-    static const std::string strEvilEye("Evil Eye");
-    static const std::string strEnchantedHourglass("Enchanted Hourglass");
-    static const std::string strGoldWath("Gold Wath");
-    static const std::string strSkullcap("Skullcap");
-    static const std::string strIceCloak("Ice Clock");
-    static const std::string strFireCloak("Fire Cloak");
-    static const std::string strLightningHelm("Lightning Helm");
-    static const std::string strEvercoldIcicle("Evercold Icicle");
-    static const std::string strEverhotRock("Everhot Lava Rock");
-    static const std::string strLightningRod("Lightning Rod");
-    static const std::string strSnakeRing("Snake-Ring");
-    static const std::string strAnkh("Ankh");
-    static const std::string strBookElements("Book of Elements");
-    static const std::string strElementalRing("Elemental Ring");
-    static const std::string strHolyPendant("Holy Pendant");
-    static const std::string strPendantWill("Pendant of Free Will");
-    static const std::string strPendantLife("Pendant of Life");
-    static const std::string strSerenityPedant("Serenity Pendant");
-    static const std::string strSeeingPendant("Seeing-eye Pendant");
-    static const std::string strKineticPendant("Kinetic Pendant");
-    static const std::string strPendantDeath("Pendant of Death");
-    static const std::string strWandNegation("Wand of Negation");
-    static const std::string strGoldenBow("Golden Bow");
-    static const std::string strTelescope("Telescope");
-    static const std::string strStatesmanQuill("Statesman's Quill");
-    static const std::string strWizardHat("Wizard's Hat");
-    static const std::string strPowerRing("Power Ring");
-    static const std::string strAmmoCart("Ammo Cart");
-    static const std::string strTaxLien("Tax Lien");
-    static const std::string strHideousMask("Hideous Mask");
-    static const std::string strPouchSulfur("Endless Pouch of Sulfur");
-    static const std::string strVialMercury("Endless Vial of Mercury");
-    static const std::string strPouchGems("Endless Pouch of Gems");
-    static const std::string strCordWood("Endless Cord of Wood");
-    static const std::string strCartOre("Endless Cart of Ore");
-    static const std::string strPouchCrystal("Endless Pouch of Crystal");
-    static const std::string strSpikedHelm("Spiked Helm");
-    static const std::string strSpikedShield("Spiked Shield");
-    static const std::string strWhitePearl("White Pearl");
-    static const std::string strBlackPearl("Black Pearl");
-    static const std::string strNomadBoots("Nomad Boots of Mobility");
-    static const std::string strTravelBoots("Traveler's Boots of Mobility");
-    static const std::string strCompas("True Compass of Mobility");
-    static const std::string strAstrolabe("Sailor's Astrolabe of Mobility");
-    static const std::string strMagicBook("Magic Book"); 
-    static const std::string strUnknown("Unknown"); 
+namespace Artifact {
 
-    switch(artifact){
-	case ULTIMATE_BOOK:			return strUltimateBook;
-	case ULTIMATE_SWORD:			return strUltimateSword;
-	case ULTIMATE_CLOAK:			return strUltimateCloak;
-	case ULTIMATE_WAND:			return strUltimateWand;
-	case ULTIMATE_SHIELD:			return strUltimateShield;
-	case ULTIMATE_STAFF:			return strUltimateStaff;
-	case ULTIMATE_CROWN:			return strUltimateCrown;
-	case GOLDEN_GOOSE:			return strUltimateGoose;
-	case ARCANE_NECKLACE:			return strArcaneNecklace;
-	case CASTER_BRACELET:			return strCasterBracelet;
-	case MAGE_RING:				return strMageRing;
-	case MEDAL_VALOR:			return strMedalValor;
-	case WITCHES_BROACH:			return strWitchesBroach;
-	case MEDAL_COURAGE:			return strMedalCourage;
-	case MEDAL_HONOR:			return strMedalHonor;
-	case MEDAL_DISTINCTION:			return strMedalDistinction;
-	case FIZBIN_MISFORTUNE:			return strFizbinMisfortune;
-	case THUNDER_MACE:			return strThunderMace;
-	case ARMORED_GAUNTLETS:			return strArmorGauntlet;
-	case DEFENDER_HELM:			return strDefenderHelm;
-	case GIANT_FLAIL:			return strGiantFlail;
-	case BALLISTA:				return strBallista;
-	case STEALTH_SHIELD:			return strStealthShield;
-	case DRAGON_SWORD:			return strDragonSword;
-	case POWER_AXE:				return strPowerAxe;
-	case DIVINE_BREASTPLATE:		return strDivineBreastplate;
-	case MINOR_SCROLL:			return strMinorScroll;
-	case MAJOR_SCROLL:			return strMajorScroll;
-	case SUPERIOR_SCROLL:			return strSuperiorScroll;
-	case FOREMOST_SCROLL:			return strForemostScroll;
-	case ENDLESS_SACK_GOLD:			return strSackGold;
-	case ENDLESS_BAG_GOLD:			return strBagGold;
-	case ENDLESS_PURSE_GOLD:		return strPurseGold;
-	case RABBIT_FOOT:			return strRabbitFoot;
-	case GOLDEN_HORSESHOE:			return strGoldenHorseshoe;
-	case GAMBLER_LUCKY_COIN:		return strGamblerLucky;
-	case FOUR_LEAF_CLOVER:			return strFourClover;
-	case EVIL_EYE:				return strEvilEye;
-	case ENCHANTED_HOURGLASS:		return strEnchantedHourglass;
-	case GOLD_WATCH:			return strGoldWath;
-	case SKULLCAP:				return strSkullcap;
-	case ICE_CLOAK:				return strIceCloak;
-	case FIRE_CLOAK:			return strFireCloak;
-	case LIGHTNING_HELM:			return strLightningHelm;
-	case EVERCOLD_ICICLE:			return strEvercoldIcicle;
-	case EVERHOT_LAVA_ROCK:			return strEverhotRock;
-	case LIGHTNING_ROD:			return strLightningRod;
-	case SNAKE_RING:			return strSnakeRing;
-	case ANKH:				return strAnkh;
-	case BOOK_ELEMENTS:			return strBookElements;
-	case ELEMENTAL_RING:			return strElementalRing;
-	case HOLY_PENDANT:			return strHolyPendant;
-	case PENDANT_FREE_WILL:			return strPendantWill;
-	case PENDANT_LIFE:			return strPendantLife;
-	case SERENITY_PENDANT:			return strSerenityPedant;
-	case SEEING_EYE_PENDANT:		return strSeeingPendant;
-	case KINETIC_PENDANT:			return strKineticPendant;
-	case PENDANT_DEATH:			return strPendantDeath;
-	case WAND_NEGATION:			return strWandNegation;
-	case GOLDEN_BOW:			return strGoldenBow;
-	case TELESCOPE:				return strTelescope;
-	case STATESMAN_QUILL:			return strStatesmanQuill;
-	case WIZARD_HAT:			return strWizardHat;
-	case POWER_RING:			return strPowerRing;
-	case AMMO_CART:				return strAmmoCart;
-	case TAX_LIEN:				return strTaxLien;
-	case HIDEOUS_MASK:			return strHideousMask;
-	case ENDLESS_POUCH_SULFUR:		return strPouchSulfur;
-	case ENDLESS_VIAL_MERCURY:		return strVialMercury;
-	case ENDLESS_POUCH_GEMS:		return strPouchGems;
-	case ENDLESS_CORD_WOOD:			return strCordWood;
-	case ENDLESS_CART_ORE:			return strCartOre;
-	case ENDLESS_POUCH_CRYSTAL:		return strPouchCrystal;
-	case SPIKED_HELM:			return strSpikedHelm;
-	case SPIKED_SHIELD:			return strSpikedShield;
-	case WHITE_PEARL:			return strWhitePearl;
-	case BLACK_PEARL:			return strBlackPearl;
-	case NOMAD_BOOTS_MOBILITY:		return strNomadBoots;
-	case TRAVELER_BOOTS_MOBILITY:		return strTravelBoots;
-	case TRUE_COMPASS_MOBILITY:		return strCompas;
-	case SAILORS_ASTROLABE_MOBILITY:	return strAstrolabe;
-	case MAGIC_BOOK:			return strMagicBook;
-    }
-    
-    return strUnknown;
-}
+    static const stats_t all_artifacts[] = {
+	{ "Ultimate Book", "The Ultimate Book of Knowledge increases your knowledge by 12." },
+	{ "Ultimate Sword", "The Ultimate Sword of Dominion increases your attack skill by 12." },
+	{ "Ultimate Cloak", "The Ultimate Cloak of Protection increases your defense skill by 12." },
+	{ "Ultimate Wand", "The Ultimate Wand of Magic increases your spell power by 12." },
+	{ "Ultimate Shield", "The Ultimate Shield increases your attack and defense skills by 6 each." },
+	{ "Ultimate Staff", "The Ultimate Staff increases your spell power and knowledge by 6 each." },
+	{ "Ultimate Crown", "The Ultimate Crown increases each of your basic skills by 4 points." },
+	{ "Ultimate Goose", "The Golden Goose brings in an income of 10,000 gold per turn." },
+	{ "Arcane Necklace", "The Arcane Necklace of Magic increases your spell power by 4." },
+	{ "Caster's Bracelet", "The Caster's Bracelet of Magic increases your spell power by 2." },
+	{ "Mage's Ring", "The Mage's Ring of Power increases your spell power by 2." },
+	{ "Witches Broach", "The Witch's Broach of Magic increases your spell power by 3." },
+	{ "Medal of Valor", "The Medal of Valor increases your morale." },
+	{ "Medal of Courage", "The Medal of Courage increases your morale." },
+	{ "Medal of Honor", "The Medal of Honor increases your morale." },
+	{ "Medal of Distinction", "The Medal of Distinction increases your morale." },
+	{ "Fizbin of Misfortune", "The Fizbin of Misfortune greatly decreases your morale." },
+	{ "Thunder Mace", "The Thunder Mace of Dominion increases your attack skill by 1." },
+	{ "Armored Gauntlets", "The Armored Gauntlets of Protection increase your defense skill by 1." },
+	{ "Defender Helm", "The Defender Helm of Protection increases your defense skill by 1." },
+	{ "Giant Flail", "The Giant Flail of Dominion increases your attack skill by 1." },
+	{ "Ballista", "The Ballista of Quickness lets your catapult fire twice per combat round." },
+	{ "Stealth Shield", "The Stealth Shield of Protection increases your defense skill by 2." },
+	{ "Dragon Sword", "The Dragon Sword of Dominion increases your attack skill by 3." },
+	{ "Power Axe", "The Power Axe of Dominion increases your attack skill by 2." },
+	{ "Divine Breastplate", "The Divine Breastplate of Protection increases your defense skill by 3." },
+	{ "Minor Scroll", "The Minor Scroll of Knowledge increases your knowledge by 2." },
+	{ "Major Scroll", "The Major Scroll of Knowledge increases your knowledge by 3." },
+	{ "Superior Scroll", "The Superior Scroll of Knowledge increases your knowledge by 4." },
+	{ "Foremost Scroll", "The Foremost Scroll of Knowledge increases your knowledge by 5." },
+	{ "Endless Sack of Gold", "The Endless Sack of Gold provides you with 1000 gold per day." },
+	{ "Endless Bag of Gold", "The Endless Bag of Gold provides you with 750 gold per day." },
+	{ "Endless Purse of Gold", "The Endless Purse of Gold provides you with 500 gold per day." },
+	{ "Nomad Boots of Mobility", "The Nomad Boots of Mobility increase your movement on land." },
+	{ "Traveler's Boots of Mobility", "The Traveler's Boots of Mobility increase your movement on land." },
+	{ "Rabbit's Foot", "The Lucky Rabbit's Foot increases your luck in combat." },
+	{ "Golden Horseshoe", "The Golden Horseshoe increases your luck in combat." },
+	{ "Gambler's Lucky Coin", "The Gambler's Lucky Coin increases your luck in combat." },
+	{ "Four-Leaf Clover", "The Four_Leaf Clover increases your luck in combat." },
+	{ "True Compass of Mobility", "The True Compass of Mobility increases your movement on land and sea." },
+	{ "Sailor's Astrolabe of Mobility", "The Sailors' Astrolabe of Mobility increases your movement on sea." },
+	{ "Evil Eye", "The Evil Eye reduces the casting cost of curse spells by half." },
+	{ "Enchanted Hourglass", "The Enchanted Hourglass extends the duration of all your spells by 2 turns." },
+	{ "Gold Wath", "The Gold Watch doubles the effectiveness of your hypnotize spells." },
+	{ "Skullcap", "The Skullcap halves the casting cost of all mind influencing spells." },
+	{ "Ice Clock", "The Ice Cloak halves all damage your troops take from cold spells." },
+	{ "Fire Cloak", "The Fire Cloak halves all damage your troops take from fire spells." },
+	{ "Lightning Helm", "The Lightning Helm halves all damage your troops take from lightning spells." },
+	{ "Evercold Icicle", "The Evercold Icicle causes your cold spells to do 50% more damage to enemy troops." },
+	{ "Everhot Lava Rock", "The Everhot Lava Rock causes your fire spells to do 50% more damage to enemy troops." },
+	{ "Lightning Rod", "The Lightning Rod causes your lightning spells to do 50% more damage to enemy troops." },
+	{ "Snake-Ring", "The Snake Ring halves the casting cost of all your bless spells." },
+	{ "Ankh", "The Ankh doubles the effectiveness of all your resurrect and animate spells." },
+	{ "Book of Elements", "The Book of Elements doubles the effectiveness of all your summoning spells." },
+	{ "Elemental Ring", "The Elemental Ring halves the casting cost of all summoning spells." },
+	{ "Holy Pendant", "The Holy Pendant makes all your troops immune to curse spells." },
+	{ "Pendant of Free Will", "The Pendant of Free Will makes all your troops immune to hypnotize spells." },
+	{ "Pendant of Life", "The Pendant of Life makes all your troops immune to death spells." },
+	{ "Serenity Pendant", "The Serenity Pendant makes all your troops immune to berserk spells." },
+	{ "Seeing-eye Pendant", "The Seeing-eye Pendant makes all your troops immune to blindness spells." },
+	{ "Kinetic Pendant" , "The Kinetic Pendant makes all your troops immune to paralyze spells." },
+	{ "Pendant of Death", "The Pendant of Death makes all your troops immune to holy spells." },
+	{ "Wand of Negation", "The Wand of Negation protects your troops from the Dispel Magic spell." },
+	{ "Golden Bow", "The Golden Bow eliminates the 50% penalty for your troops shooting past obstacles. (e.g. castle walls)" },
+	{ "Telescope", "The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square." },
+	{ "Statesman's Quill", "The Statesman's Quill reduces the cost of surrender to 10% of the total cost of troops you have in your army." },
+	{ "Wizard's Hat", "The Wizard's Hat increases the duration of your spells by 10 turns!" },
+	{ "Power Ring", "The Power Ring returns 2 extra power points/turn to your hero." },
+	{ "Ammo Cart", "The Ammo Cart provides endless ammunition for all your troops that shoot." },
+	{ "Tax Lien", "The Tax Lien costs you 250 gold pieces/turn." },
+	{ "Hideous Mask", "The Hideous Mask prevents all 'wandering' armies from joining your hero." },
+	{ "Endless Pouch of Sulfur", "The Endless Pouch of Sulfur provides 1 unit of sulfur per day." },
+	{ "Endless Vial of Mercury", "The Endless Vial of Mercury provides 1 unit of mercury per day." },
+	{ "Endless Pouch of Gems", "The Endless Pouch of Gems provides 1 unit of gems per day." },
+	{ "Endless Cord of Wood", "The Endless Cord of Wood provides 1 unit of wood per day." },
+	{ "Endless Cart of Ore", "The Endless Cart of Ore provides 1 unit of ore per day." },
+	{ "Endless Pouch of Crystal", "The Endless Pouch of Crystal provides 1 unit of crystal/day." },
+	{ "Spiked Helm", "The Spiked Helm increases your attack and defense skills by 1 each." },
+	{ "Spiked Shield", "The Spiked Shield increases your attack and defense skills by 2 each." },
+	{ "White Pearl", "The White Pearl increases your spell power and knowledge by 1 each." },
+	{ "Black Pearl", "The Black Pearl increases your spell power and knowledge by 2 each." },
 
-/* artifact description */
-const std::string & Artifact::Description(artifact_t artifact)
-{
-    static const std::string descUltimateBook("The Ultimate Book of Knowledge increases your knowledge by 12.");
-    static const std::string descUltimateSword("The Ultimate Sword of Dominion increases your attack skill by 12.");
-    static const std::string descUltimateCloak("The Ultimate Cloak of Protection increases your defense skill by 12.");
-    static const std::string descUltimateWand("The Ultimate Wand of Magic increases your spell power by 12.");
-    static const std::string descUltimateShield("The Ultimate Shield increases your attack and defense skills by 6 each.");
-    static const std::string descUltimateStaff("The Ultimate Staff increases your spell power and knowledge by 6 each.");
-    static const std::string descUltimateCrown("The Ultimate Crown increases each of your basic skills by 4 points.");
-    static const std::string descUltimateGoose("The Golden Goose brings in an income of 10,000 gold per turn.");
-    static const std::string descArcaneNecklace("The Arcane Necklace of Magic increases your spell power by 4.");
-    static const std::string descCasterBracelet("The Caster's Bracelet of Magic increases your spell power by 2.");
-    static const std::string descMageRing("The Mage's Ring of Power increases your spell power by 2.");
-    static const std::string descMedalValor("The Medal of Valor increases your morale.");
-    static const std::string descWitchesBroach("The Witch's Broach of Magic increases your spell power by 3.");
-    static const std::string descMedalCourage("The Medal of Courage increases your morale.");
-    static const std::string descMedalHonor("The Medal of Honor increases your morale.");
-    static const std::string descMedalDistinction("The Medal of Distinction increases your morale.");
-    static const std::string descFizbinMisfortune("The Fizbin of Misfortune greatly decreases your morale.");
-    static const std::string descThunderMace("The Thunder Mace of Dominion increases your attack skill by 1.");
-    static const std::string descArmorGauntlet("The Armored Gauntlets of Protection increase your defense skill by 1.");
-    static const std::string descDefenderHelm("The Defender Helm of Protection increases your defense skill by 1.");
-    static const std::string descGiantFlail("The Giant Flail of Dominion increases your attack skill by 1.");
-    static const std::string descBallista("The Ballista of Quickness lets your catapult fire twice per combat round.");
-    static const std::string descStealthShield("The Stealth Shield of Protection increases your defense skill by 2.");
-    static const std::string descDragonSword("The Dragon Sword of Dominion increases your attack skill by 3.");
-    static const std::string descPowerAxe("The Power Axe of Dominion increases your attack skill by 2.");
-    static const std::string descDivineBreastplate("The Divine Breastplate of Protection increases your defense skill by 3.");
-    static const std::string descMinorScroll("The Minor Scroll of Knowledge increases your knowledge by 2.");
-    static const std::string descMajorScroll("The Major Scroll of Knowledge increases your knowledge by 3.");
-    static const std::string descSuperiorScroll("The Superior Scroll of Knowledge increases your knowledge by 4.");
-    static const std::string descForemostScroll("The Foremost Scroll of Knowledge increases your knowledge by 5.");
-    static const std::string descSackGold("The Endless Sack of Gold provides you with 1000 gold per day.");
-    static const std::string descBagGold("The Endless Bag of Gold provides you with 750 gold per day.");
-    static const std::string descPurseGold("The Endless Purse of Gold provides you with 500 gold per day.");
-    static const std::string descRabbitFoot("The Lucky Rabbit's Foot increases your luck in combat.");
-    static const std::string descGoldenHorseshoe("The Golden Horseshoe increases your luck in combat.");
-    static const std::string descGamblerLucky("The Gambler's Lucky Coin increases your luck in combat.");
-    static const std::string descFourClover("The Four_Leaf Clover increases your luck in combat.");
-    static const std::string descEvilEye("The Evil Eye reduces the casting cost of curse spells by half.");
-    static const std::string descEnchantedHourglass("The Enchanted Hourglass extends the duration of all your spells by 2 turns.");
-    static const std::string descGoldWath("The Gold Watch doubles the effectiveness of your hypnotize spells.");
-    static const std::string descSkullcap("The Skullcap halves the casting cost of all mind influencing spells.");
-    static const std::string descIceCloak("The Ice Cloak halves all damage your troops take from cold spells.");
-    static const std::string descFireCloak("The Fire Cloak halves all damage your troops take from fire spells.");
-    static const std::string descLightningHelm("The Lightning Helm halves all damage your troops take from lightning spells.");
-    static const std::string descEvercoldIcicle("The Evercold Icicle causes your cold spells to do 50% more damage to enemy troops.");
-    static const std::string descEverhotRock("The Everhot Lava Rock causes your fire spells to do 50% more damage to enemy troops.");
-    static const std::string descLightningRod("The Lightning Rod causes your lightning spells to do 50% more damage to enemy troops.");
-    static const std::string descSnakeRing("The Snake Ring halves the casting cost of all your bless spells.");
-    static const std::string descAnkh("The Ankh doubles the effectiveness of all your resurrect and animate spells.");
-    static const std::string descBookElements("The Book of Elements doubles the effectiveness of all your summoning spells.");
-    static const std::string descElementalRing("The Elemental Ring halves the casting cost of all summoning spells.");
-    static const std::string descHolyPendant("The Holy Pendant makes all your troops immune to curse spells.");
-    static const std::string descPendantWill("The Pendant of Free Will makes all your troops immune to hypnotize spells.");
-    static const std::string descPendantLife("The Pendant of Life makes all your troops immune to death spells.");
-    static const std::string descSerenityPedant("The Serenity Pendant makes all your troops immune to berserk spells.");
-    static const std::string descSeeingPendant("The Seeing_eye Pendant makes all your troops immune to blindness spells.");
-    static const std::string descKineticPendant("The Kinetic Pendant makes all your troops immune to paralyze spells.");
-    static const std::string descPendantDeath("The Pendant of Death makes all your troops immune to holy spells.");
-    static const std::string descWandNegation("The Wand of Negation protects your troops from the Dispel Magic spell.");
-    static const std::string descGoldenBow("The Golden Bow eliminates the 50% penalty for your troops shooting past obstacles. (e.g. castle walls)");
-    static const std::string descTelescope("The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.");
-    static const std::string descStatesmanQuill("The Statesman's Quill reduces the cost of surrender to 10% of the total cost of troops you have in your army.");
-    static const std::string descWizardHat("The Wizard's Hat increases the duration of your spells by 10 turns!");
-    static const std::string descPowerRing("The Power Ring returns 2 extra power points/turn to your hero.");
-    static const std::string descAmmoCart("The Ammo Cart provides endless ammunition for all your troops that shoot.");
-    static const std::string descTaxLien("The Tax Lien costs you 250 gold pieces/turn.");
-    static const std::string descHideousMask("The Hideous Mask prevents all 'wandering' armies from joining your hero.");
-    static const std::string descPouchSulfur("The Endless Pouch of Sulfur provides 1 unit of sulfur per day.");
-    static const std::string descVialMercury("The Endless Vial of Mercury provides 1 unit of mercury per day.");
-    static const std::string descPouchGems("The Endless Pouch of Gems provides 1 unit of gems per day.");
-    static const std::string descCordWood("The Endless Cord of Wood provides 1 unit of wood per day.");
-    static const std::string descCartOre("The Endless Cart of Ore provides 1 unit of ore per day.");
-    static const std::string descPouchCrystal("The Endless Pouch of Crystal provides 1 unit of crystal/day.");
-    static const std::string descSpikedHelm("The Spiked Helm increases your attack and defense skills by 1 each.");
-    static const std::string descSpikedShield("The Spiked Shield increases your attack and defense skills by 2 each.");
-    static const std::string descWhitePearl("The White Pearl increases your spell power and knowledge by 1 each.");
-    static const std::string descBlackPearl("The Black Pearl increases your spell power and knowledge by 2 each.");
-    static const std::string descNomadBoots("The Nomad Boots of Mobility increase your movement on land.");
-    static const std::string descTravelBoots("The Traveler's Boots of Mobility increase your movement on land.");
-    static const std::string descCompas("The True Compass of Mobility increases your movement on land and sea.");
-    static const std::string descAstrolabe("The Sailors' Astrolabe of Mobility increases your movement on sea.");
-    static const std::string descMagicBook("The Magic Book enables you to cast spells.");
-    static const std::string descUnknown("Unknown");
+	{ "Magic Book", "The Magic Book enables you to cast spells." },
 
-    switch(artifact){
-	case ULTIMATE_BOOK:			return descUltimateBook;
-	case ULTIMATE_SWORD:			return descUltimateSword;
-	case ULTIMATE_CLOAK:			return descUltimateCloak;
-	case ULTIMATE_WAND:			return descUltimateWand;
-	case ULTIMATE_SHIELD:			return descUltimateShield;
-	case ULTIMATE_STAFF:			return descUltimateStaff;
-	case ULTIMATE_CROWN:			return descUltimateCrown;
-	case GOLDEN_GOOSE:			return descUltimateGoose;
-	case ARCANE_NECKLACE:			return descArcaneNecklace;
-	case CASTER_BRACELET:			return descCasterBracelet;
-	case MAGE_RING:				return descMageRing;
-	case MEDAL_VALOR:			return descMedalValor;
-	case WITCHES_BROACH:			return descWitchesBroach;
-	case MEDAL_COURAGE:			return descMedalCourage;
-	case MEDAL_HONOR:			return descMedalHonor;
-	case MEDAL_DISTINCTION:			return descMedalDistinction;
-	case FIZBIN_MISFORTUNE:			return descFizbinMisfortune;
-	case THUNDER_MACE:			return descThunderMace;
-	case ARMORED_GAUNTLETS:			return descArmorGauntlet;
-	case DEFENDER_HELM:			return descDefenderHelm;
-	case GIANT_FLAIL:			return descGiantFlail;
-	case BALLISTA:				return descBallista;
-	case STEALTH_SHIELD:			return descStealthShield;
-	case DRAGON_SWORD:			return descDragonSword;
-	case POWER_AXE:				return descPowerAxe;
-	case DIVINE_BREASTPLATE:		return descDivineBreastplate;
-	case MINOR_SCROLL:			return descMinorScroll;
-	case MAJOR_SCROLL:			return descMajorScroll;
-	case SUPERIOR_SCROLL:			return descSuperiorScroll;
-	case FOREMOST_SCROLL:			return descForemostScroll;
-	case ENDLESS_SACK_GOLD:			return descSackGold;
-	case ENDLESS_BAG_GOLD:			return descBagGold;
-	case ENDLESS_PURSE_GOLD:		return descPurseGold;
-	case RABBIT_FOOT:			return descRabbitFoot;
-	case GOLDEN_HORSESHOE:			return descGoldenHorseshoe;
-	case GAMBLER_LUCKY_COIN:		return descGamblerLucky;
-	case FOUR_LEAF_CLOVER:			return descFourClover;
-	case EVIL_EYE:				return descEvilEye;
-	case ENCHANTED_HOURGLASS:		return descEnchantedHourglass;
-	case GOLD_WATCH:			return descGoldWath;
-	case SKULLCAP:				return descSkullcap;
-	case ICE_CLOAK:				return descIceCloak;
-	case FIRE_CLOAK:			return descFireCloak;
-	case LIGHTNING_HELM:			return descLightningHelm;
-	case EVERCOLD_ICICLE:			return descEvercoldIcicle;
-	case EVERHOT_LAVA_ROCK:			return descEverhotRock;
-	case LIGHTNING_ROD:			return descLightningRod;
-	case SNAKE_RING:			return descSnakeRing;
-	case ANKH:				return descAnkh;
-	case BOOK_ELEMENTS:			return descBookElements;
-	case ELEMENTAL_RING:			return descElementalRing;
-	case HOLY_PENDANT:			return descHolyPendant;
-	case PENDANT_FREE_WILL:			return descPendantWill;
-	case PENDANT_LIFE:			return descPendantLife;
-	case SERENITY_PENDANT:			return descSerenityPedant;
-	case SEEING_EYE_PENDANT:		return descSeeingPendant;
-	case KINETIC_PENDANT:			return descKineticPendant;
-	case PENDANT_DEATH:			return descPendantDeath;
-	case WAND_NEGATION:			return descWandNegation;
-	case GOLDEN_BOW:			return descGoldenBow;
-	case TELESCOPE:				return descTelescope;
-	case STATESMAN_QUILL:			return descStatesmanQuill;
-	case WIZARD_HAT:			return descWizardHat;
-	case POWER_RING:			return descPowerRing;
-	case AMMO_CART:				return descAmmoCart;
-	case TAX_LIEN:				return descTaxLien;
-	case HIDEOUS_MASK:			return descHideousMask;
-	case ENDLESS_POUCH_SULFUR:		return descPouchSulfur;
-	case ENDLESS_VIAL_MERCURY:		return descVialMercury;
-	case ENDLESS_POUCH_GEMS:		return descPouchGems;
-	case ENDLESS_CORD_WOOD:			return descCordWood;
-	case ENDLESS_CART_ORE:			return descCartOre;
-	case ENDLESS_POUCH_CRYSTAL:		return descPouchCrystal;
-	case SPIKED_HELM:			return descSpikedHelm;
-	case SPIKED_SHIELD:			return descSpikedShield;
-	case WHITE_PEARL:			return descWhitePearl;
-	case BLACK_PEARL:			return descBlackPearl;
-	case NOMAD_BOOTS_MOBILITY:		return descNomadBoots;
-	case TRAVELER_BOOTS_MOBILITY:		return descTravelBoots;
-	case TRUE_COMPASS_MOBILITY:		return descCompas;
-	case SAILORS_ASTROLABE_MOBILITY:	return descAstrolabe;
-	case MAGIC_BOOK:			return descMagicBook;
-    }
-    
-    return descUnknown;
+	{ "Unknown", "Unknown" },
+    };
+
 }
 
 Artifact::artifact_t Artifact::FromMP2(u8 index)
@@ -462,8 +204,17 @@ Artifact::artifact_t Artifact::FromMP2(u8 index)
 	    Error::Warning("Artifact::FromMP2: unknown: ", index);
     }
     
-    return Artifact::FIZBIN_MISFORTUNE;
+    return Artifact::UNKNOWN;
 }
+
+/* artifact name */
+const std::string & Artifact::String(artifact_t artifact)
+{ return (MAGIC_BOOK < artifact ? all_artifacts[MAGIC_BOOK + 1].name : all_artifacts[artifact].name); }
+
+/* artifact description */
+const std::string & Artifact::Description(artifact_t artifact)
+{ return (MAGIC_BOOK < artifact ? all_artifacts[MAGIC_BOOK + 1].description : all_artifacts[artifact].description); }
+
 
 Artifact::artifact_t Artifact::RandUltimate(void)
 {
@@ -601,7 +352,7 @@ const Sprite & Artifact::GetForMapsSprite(Artifact::artifact_t artifact)
         case Artifact::ULTIMATE_CLOAK:			return AGG::GetICN("OBJNARTI.ICN", 0x05);
 	// null sprite
 	case Artifact::ULTIMATE_WAND:			return AGG::GetICN("OBJNARTI.ICN", 0x07);
-	// ok sprite
+	// sprite artifact
         case Artifact::ULTIMATE_SHIELD:			return AGG::GetICN("OBJNARTI.ICN", 0x09);
         case Artifact::ULTIMATE_STAFF:			return AGG::GetICN("OBJNARTI.ICN", 0x0B);
         case Artifact::ULTIMATE_CROWN:			return AGG::GetICN("OBJNARTI.ICN", 0x0D);
@@ -682,5 +433,7 @@ const Sprite & Artifact::GetForMapsSprite(Artifact::artifact_t artifact)
 	default: Error::Warning("Artifact::GetForMapsSprite: unknown:", artifact); break;
     }
 
+    // null sprite
     return AGG::GetICN("OBJNARTI.ICN", 0x01);
 }
+

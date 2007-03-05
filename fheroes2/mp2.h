@@ -27,6 +27,8 @@
 #define MP2OFFSETDATA	428
 #define SIZEOFMP2TILE	20
 #define SIZEOFMP2ADDON	15
+#define SIZEOFMP2CASTLE 0x46
+#define SIZEOFMP2HEROES 0x4c
 
 namespace MP2
 {
@@ -59,6 +61,7 @@ namespace MP2
     } mp2addon_t;
 
     // origin mp2 castle
+    // 0x0046 - size
     typedef struct {
 	u8	color; 		// 00 blue, 01 green, 02 red, 03 yellow, 04 orange, 05 purpl, ff unknown
 	bool	customBuilding;
@@ -104,7 +107,7 @@ namespace MP2
 	u16	count5;
 	bool	capitan;
 	bool	customCastleName;
-	char	castleName[13];	// name + '\0' // 39 byte
+	char	castleName[13];	// name + '\0'
 	u8	type;		// 00 knight, 01 barb, 02 sorc, 03 warl, 04 wiz, 05 necr, 06 rnd
 	bool	castle;
 	u8	allowCastle;	// 00 TRUE, 01 FALSE
@@ -112,8 +115,8 @@ namespace MP2
     } mp2castle_t;
 
     // origin mp2 heroes
+    // 0x004c - size
     typedef struct {
-	u8	identify;	// 0x4c
 	u16	unknown1;	// 0
 	bool	customTroops;
 	u8	monster1;	// 0xff none
@@ -135,7 +138,7 @@ namespace MP2
 	u32	exerience;
 	bool	customSkill;
 	u8	skill1;		// 0xff none
-	u8	skill2;		// pathfinding, arcgery, logistic, scouting, 
+	u8	skill2;		// pathfinding, archery, logistic, scouting, 
 	u8	skill3;		// diplomacy, navigation, leadership, wisdom,
 	u8	skill4;		// mysticism, luck, ballistics, eagle, necromance, estate
 	u8	skill5;
@@ -157,6 +160,69 @@ namespace MP2
 	u8	countSquare;	// for patrol
 	u8	unknown4[15];	// 0
     } mp2heroes_t;
+
+    // origin mp2 sign or buttle
+    typedef struct {
+	u16	id;		// 0x0001
+	u8	zero[8];	// 8 byte 0x00
+	char	text;		// message
+    } mp2info_t;
+
+    // origin mp2 event for coord
+    typedef struct {
+	u16	id;		// 0x0001
+	u32	wood;
+	u32	mercury;
+	u32	ore;
+	u32	sulfur;
+	u32	crystal;
+	u32	gems;
+	u32	golds;
+	u16	artifact;	// 0xffff - none
+	bool	computer;	// allow events for computer
+	bool	cancel;		// cancel event after first visit
+	u8	zero[10];	// 10 byte 0x00
+	bool	blue;
+	bool	green;
+	bool	red;
+	bool	yellow;
+	bool	orange;
+	bool	purple;
+	char	text;		// text event
+    } mp2eventcoord_t;
+
+
+    // origin mp2 event for day
+    typedef struct {
+	u16	id;		// 0x0000
+	u32	wood;
+	u32	mercury;
+	u32	ore;
+	u32	sulfur;
+	u32	crystal;
+	u32	gems;
+	u32	golds;
+	u16	artifact;	// always 0xffff - none
+	bool	computer;	// allow events for computer
+	u16	first;		// day of first occurent
+	u16	subsequent;	// subsequent occurrences
+	u8	zero[7];	// 6 byte 0x00 and end 0x01
+	bool	blue;
+	bool	green;
+	bool	red;
+	bool	yellow;
+	bool	orange;
+	bool	purple;
+	char	text;		// text event
+    } mp2eventday_t;
+
+    
+    // origin mp2 rumor
+    typedef struct {
+	u16	id;		// 0x0000
+	u8	zero[7];	// 9 byte 0x00
+	char	text;   	// text rumor
+    } mp2rumor_t;
 
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -205,7 +271,7 @@ namespace MP2
 			 
 	OBJN_RNDTOWN		= 0x30,
 	OBJN_RNDCASTLE		= 0x31,
-	OBJ_SMALLCRACK		= 0x38,
+	OBJ_NOTHINGSPECIAL	= 0x38,
 	OBJN_TREECITY		= 0x3C,
 	OBJN_RUINS		= 0x3D,
 	OBJN_FORT		= 0x3E,
@@ -237,14 +303,16 @@ namespace MP2
 	OBJ_MOUNTS		= 0x64,
 	OBJ_VOLCANO		= 0x65,
 	OBJ_STONES		= 0x67,
-	OBJ_VEGETATION1		= 0x66,
+	OBJ_FLOWERS		= 0x66,
 	OBJ_WATERLAKE		= 0x68,
 	OBJ_VEGETATION2		= 0x69,
-	OBJ_FIRTREES		= 0x6A,
-	OBJ_BIGCRACK		= 0x6C,
-			 
+	OBJ_DEADTREE		= 0x6A,
+	OBJ_STUMP		= 0x6B,
+	OBJ_CRATER		= 0x6C,
+	OBJ_CACTUS		= 0x6D,
+
 	OBJ_LAVALAKE		= 0x70,
-	OBJ_VEGETATION3		= 0x71,
+	OBJ_SHRUB		= 0x71,
 			 
 	OBJ_ALCHEMYTOWER	= 0x81,
 	OBJ_SIGN		= 0x82,
@@ -347,6 +415,7 @@ namespace MP2
     } object_t;
 
     const char *GetICNObject(u8 type);
+    const char *StringObject(u8 object);
     bool StaticObject(u8 type, u8 index);
     Maps::ground_t GetTypeGrounds(const MP2::tile_t &info);
     bool VectorAddonSort(const MP2::addon_t & lhs, const MP2::addon_t & rhs);

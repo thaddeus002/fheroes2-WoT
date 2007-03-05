@@ -35,7 +35,7 @@ public:
     u16 w(void) const{ return pos.w; }
 
     static u8  width(char ch, Font::type_t ft);
-    static u16 width(const std::string &str, u16 start, u16 count, Font::type_t ft);
+    static u16 width(const std::string &str, Font::type_t ft, u16 start = 0, u16 count = 0xffff);
     static u16 height(u16 width, const std::string &str, Font::type_t ft);
 
     void Blit(void);

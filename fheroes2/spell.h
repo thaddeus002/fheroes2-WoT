@@ -17,48 +17,91 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEDEFS_H
-#define H2GAMEDEFS_H
+#ifndef H2SPELL_H
+#define H2SPELL_H
 
-#include "SDL.h"
+#include <string>
+#include "gamedefs.h"
 
-typedef char		s8;
-typedef unsigned char	u8;
-typedef short		s16;
-typedef unsigned short	u16;
-typedef int		s32;
-typedef unsigned int	u32;
-
-namespace Font
+namespace Spell
 {
-    typedef enum { SMALL, BIG } type_t;
+    typedef enum {
+	FIREBALL,
+	FIREBLAST,
+	LIGHTNINGBOLT,
+	CHAINLIGHTNING,
+	TELEPORT,
+	CURE,
+	MASSCURE,
+	RESURRECT,
+	RESURRECTTRUE,
+	HASTE,
+	MASSHASTE,
+	SLOW,
+	MASSSLOW,
+	BLIND,
+	BLESS,
+	MASSBLESS,
+	STONESKIN,
+	STEELSKIN,
+	CURSE,
+	MASSCURSE,
+	HOLYWORD,
+	HOLYSHOUT,
+	ANTIMAGIC,
+	DISPEL,
+	MASSDISPEL,
+	ARROW,
+	BERZERKER,
+	ARMAGEDDON,
+	ELEMENTALSTORM,
+	METEORSHOWER,
+	PARALYZE,
+	HYPNOTIZE,
+	COLDRAY,
+	COLDRING,
+	DISRUPTINGRAY,
+	DEATHRIPPLE,
+	DEATHWAVE,
+	DRAGONSLAYER,
+	BLOODLUST,
+	ANIMATEDEAD,
+	MIRRORIMAGE,
+	SHIELD,
+	MASSSHIELD,
+	SUMMONEELEMENT,
+	SUMMONAELEMENT,
+	SUMMONFELEMENT,
+	SUMMONWELEMENT,
+	EARTHQUAKE,
+	VIEWMINES,
+	VIEWRESOURCES,
+	VIEWARTIFACTS,
+	VIEWTOWNS,
+	VIEWHEROES,
+	VIEWALL,
+	IDENTIFYHERO,
+	SUMMONBOAT,
+	DIMENSIONDOOR,
+	TOWNGATE,
+	TOWNPORTAL,
+	VISIONS,
+	HAUNT,
+	SETEHGUARDIAN,
+	SETAGUARDIAN,
+	SETFGUARDIAN,
+	SETWGUARDIAN,
+    } spell_t;
+
+
+    typedef struct {
+        const std::string name;
+        const std::string description;
+    } stats_t;
+
+    const std::string & String(spell_t spell);
+    const std::string & Description(spell_t spell);
+
 };
-
-#define GAME_VERSION		20070305
-
-#define MAXU16   65535 
-#define MAXU32   4294967295 
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-
-#define RMASK 0x0000f000
-#define GMASK 0x00000f00
-#define BMASK 0x000000f0
-#define AMASK 0x0000000f
-
-#define SWAP16(X)    X=SDL_Swap16(X)
-#define SWAP32(X)    X=SDL_Swap32(X)
-
-#else
-
-#define RMASK 0x0000000f
-#define GMASK 0x000000f0
-#define BMASK 0x00000f00
-#define AMASK 0x0000f000
-
-#define SWAP16(X) ;
-#define SWAP32(X) ;
-
-#endif
 
 #endif

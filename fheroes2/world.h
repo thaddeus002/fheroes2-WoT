@@ -51,17 +51,17 @@ public:
 
     void Redraw(const Rect &rt, const Point &pt = Point(0, 0)) const;
 
-    u8 GetDay(void){ return (day % DAYOFWEEK) + 1; };
-    u8 GetWeek(void){ return (week % WEEKOFMONTH) + 1; };
-    u8 GetMonth(void){ return month; };
-    u16 CountDay(void){ return day; };
-    u16 CountWeek(void){ return week; };
-    bool BeginWeek(void){ return begin_week; };
-    bool BeginMonth(void){ return begin_month; };
+    u8 GetDay(void) const{ return day % DAYOFWEEK; };
+    u8 GetWeek(void) const{ return week % WEEKOFMONTH; };
+    u8 GetMonth(void) const{ return month; };
+    u16 CountDay(void) const{ return day; };
+    u16 CountWeek(void) const{ return week; };
+    bool BeginWeek(void) const{ return begin_week; };
+    bool BeginMonth(void) const{ return begin_month; };
     void NextDay(void);
 
-    const Kingdom & GetMyKingdom(void){ return GetKingdom(H2Config::GetHumanColor()); };
-    const Kingdom & GetKingdom(Color::color_t color){ return kingdom[color]; };
+    const Kingdom & GetMyKingdom(void) const{ return GetKingdom(H2Config::GetHumanColor()); };
+    const Kingdom & GetKingdom(Color::color_t color) const;
 
 private:
     Surface *sprite_maps;
@@ -69,8 +69,10 @@ private:
 
     std::map<Color::color_t, Kingdom> kingdom;
 
-    //std::vector<castle_t> allCastle;
+    //std::vector<castle_t> allCastles;
     //std::vector<heroes_t> allHeroes;
+
+    //std::vector<std::string> allRumors;
 
     u16 width;
     u16 height;
