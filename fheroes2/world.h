@@ -69,6 +69,7 @@ private:
 
     std::map<Color::color_t, Kingdom> kingdom;
 
+    std::map<u16, std::string> sign;
     //std::vector<castle_t> allCastles;
     //std::vector<heroes_t> allHeroes;
 

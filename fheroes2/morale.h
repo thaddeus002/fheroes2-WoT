@@ -17,31 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ARMY_H
-#define H2ARMY_H
+#ifndef H2MORALE_H
+#define H2MORALE_H
 
 #include <string>
-#include <utility>
-#include "monster.h"
-#include "gamedefs.h"
 
-namespace Army
+namespace Morale
 {
     typedef enum {
-	FEW	= 1,
-        SEVERAL	= 5,
-        PACK	= 10,
-        LOTS	= 20,
-        HORDE	= 50,
-        THRONG	= 100,
-        SWARM	= 250,
-        ZOUNDS	= 500,
-        LEGION	= 1000
-    } size_t;
+	TREASON  = -3,
+        AWFUL    = -2,
+        POOR     = -1,
+        NORMAL   = 0,
+        GOOD     = 1,
+        GREAT    = 2,
+        BLOOD    = 3
+    } morale_t;
 
-    typedef std::pair<Monster::monster_t, u16> army_t;
-
-    const std::string & String(size_t size);
+    const std::string & String(morale_t morale);
 };
 
 #endif

@@ -117,7 +117,7 @@ namespace MP2
     // origin mp2 heroes
     // 0x004c - size
     typedef struct {
-	u16	unknown1;	// 0
+	u8	id;		// 0x00
 	bool	customTroops;
 	u8	monster1;	// 0xff none
 	u8	monster2;	// 0xff none
@@ -164,7 +164,7 @@ namespace MP2
     // origin mp2 sign or buttle
     typedef struct {
 	u16	id;		// 0x0001
-	u8	zero[8];	// 8 byte 0x00
+	u8	zero[7];	// 7 byte 0x00
 	char	text;		// message
     } mp2info_t;
 
@@ -220,7 +220,7 @@ namespace MP2
     // origin mp2 rumor
     typedef struct {
 	u16	id;		// 0x0000
-	u8	zero[7];	// 9 byte 0x00
+	u8	zero[6];	// 6 byte 0x00
 	char	text;   	// text rumor
     } mp2rumor_t;
 

@@ -17,31 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ARMY_H
-#define H2ARMY_H
 
-#include <string>
-#include <utility>
-#include "monster.h"
-#include "gamedefs.h"
+#include "army.h"
 
-namespace Army
+const std::string & Army::String(Army::size_t size)
 {
-    typedef enum {
-	FEW	= 1,
-        SEVERAL	= 5,
-        PACK	= 10,
-        LOTS	= 20,
-        HORDE	= 50,
-        THRONG	= 100,
-        SWARM	= 250,
-        ZOUNDS	= 500,
-        LEGION	= 1000
-    } size_t;
+    static const std::string few("Few");
+    static const std::string several("Several");
+    static const std::string pack("Pack");
+    static const std::string lots("Lots");
+    static const std::string horde("Horde");
+    static const std::string throng("Throng");
+    static const std::string swarm("Swarm");
+    static const std::string zounds("Zounds");
+    static const std::string legion("Legion");
 
-    typedef std::pair<Monster::monster_t, u16> army_t;
-
-    const std::string & String(size_t size);
-};
-
-#endif
+    switch(size){
+	case Army::FEW:		return few;
+        case Army::SEVERAL:	return several;
+        case Army::PACK:	return pack;
+        case Army::LOTS:	return lots;
+        case Army::HORDE:	return horde;
+        case Army::THRONG:	return throng;
+        case Army::SWARM:	return swarm;
+        case Army::ZOUNDS:	return zounds;
+        default: break;
+    }
+    
+    return legion;
+}

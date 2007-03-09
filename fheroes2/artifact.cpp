@@ -199,6 +199,7 @@ Artifact::artifact_t Artifact::FromMP2(u8 index)
 	case 0xA9: return Artifact::Rand2();
 	case 0xAB: return Artifact::Rand3();
 
+	//
 	// not used
 	default:
 	    Error::Warning("Artifact::FromMP2: unknown: ", index);

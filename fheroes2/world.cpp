@@ -54,6 +54,7 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
     char byte8;
     u16  byte16;
     u32  byte32;
+    std::vector<u16> vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
     
     // endof
     fd.seekg(0, std::ios_base::end);
@@ -144,6 +145,18 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	fd.read(&byte8, 1);
 	stile.general    = byte8;
 
+	switch(stile.general){
+	    case MP2::OBJ_CASTLE:
+	    case MP2::OBJ_HEROES:
+	    case MP2::OBJ_SIGN:
+	    case MP2::OBJ_BOTTLE:
+	    case MP2::OBJ_EVENT:
+		vec_object.push_back(ii);
+		break;
+	    default:
+		break;
+	}
+
 	stile.addons.push_back(saddon);
 
 	// offset first addon
@@ -153,7 +166,6 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	// load all addon for current tils
 	while(byte16){
 
-	    //--byte16;
 	    if(vec_mp2addons.size() <= byte16){ Error::Warning("World::World: index addons out of range!"); break; }
 
 	    saddon.object1	= vec_mp2addons[byte16].objectNameN1 * 2;
@@ -245,9 +257,8 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	}
     }
     
-    // unknown u16
-    fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
-    SWAP16(byte16);
+    // unknown byte
+    fd.ignore();
 
     // count final mp2 blocks
     u16 countblock = 0;
@@ -272,26 +283,55 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
 	SWAP16(byte16);
 
+	char *pblock = new char[byte16];
+
 	// read block
-	fd.ignore(byte16);
-	
-	/*
-	quantity1 && quantity % 0x08 && ii == quantity / 0x08
-	switch(object){
-	    case MP2::OBJ_CASTLE:
-		break;
-	    case MP2::OBJ_HEROES:
-		break;
-	    case MP2::OBJ_SIGN:
-	    case MP2::OBJ_BOTTLE:
-		break;
-	    case MP2::OBJ_EVENT:
-		break;
-	    default:
-		break;
+	fd.read(pblock, byte16);
+
+	std::vector<u16>::const_iterator it_index = vec_object.begin();
+	bool findobject = false;
+
+	while(it_index != vec_object.end()){
+
+	    u8 quantity1 = vec_mp2tiles[*it_index].quantity1;
+	    
+	    if(quantity1 && !(quantity1 % 0x08) && (ii + 1 == quantity1 / 0x08)){ findobject = true; break; }
+
+	    ++it_index;
 	}
-	// read event day or rumors
- 	*/
+	
+	if(findobject){
+	    switch(vec_mp2tiles[*it_index].general){
+		case MP2::OBJ_CASTLE:
+		    // add castle
+		    // pblock
+		    Error::Verbose("add castle");
+		    break;
+		case MP2::OBJ_HEROES:
+		    // add heroes
+		    // pblock
+		    Error::Verbose("add heroes");
+		    break;
+		case MP2::OBJ_SIGN:
+		case MP2::OBJ_BOTTLE:
+		    // add sign or buttle
+		    sign[ii] = &pblock[9];
+		    break;
+		case MP2::OBJ_EVENT:
+		    // add event
+		    // pblock
+		    Error::Verbose("add maps event");
+		    break;
+		default:
+		    break;
+	    }
+	}
+	else{
+	    // add event day or rumors
+	    Error::Verbose("event day or rumors");
+	}
+
+	delete [] pblock;
     }
 
     // close mp2
