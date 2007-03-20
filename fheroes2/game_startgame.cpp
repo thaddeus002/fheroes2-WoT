@@ -21,7 +21,7 @@
 #include "agg.h"
 #include "config.h"
 #include "sprite.h"
-#include "event.h"
+#include "localevent.h"
 #include "button.h"
 #include "dialog.h"
 #include "world.h"

@@ -21,7 +21,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "sprite.h"
-#include "event.h"
+#include "localevent.h"
 #include "button.h"
 #include "display.h"
 #include "game.h"

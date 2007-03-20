@@ -26,7 +26,7 @@
 #include "tools.h"
 #include "config.h"
 #include "error.h"
-#include "event.h"
+#include "localevent.h"
 #include "rand.h"
 #include "agg.h"
 #include "cursor.h"

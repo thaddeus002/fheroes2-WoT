@@ -30,6 +30,11 @@
 #define SIZEOFMP2CASTLE 0x46
 #define SIZEOFMP2HEROES 0x4c
 
+#define SIZEOFMP2SIGN   0x0a
+#define SIZEOFMP2RUMOR  0x09
+#define SIZEOFMP2EVENT  0x33
+#define SIZEOFMP2RIDDLE 0x8a
+
 namespace MP2
 {
     // origin mp2 tile
@@ -216,7 +221,6 @@ namespace MP2
 	char	text;		// text event
     } mp2eventday_t;
 
-    
     // origin mp2 rumor
     typedef struct {
 	u16	id;		// 0x0000
@@ -224,6 +228,29 @@ namespace MP2
 	char	text;   	// text rumor
     } mp2rumor_t;
 
+    // origin mp2 riddle sphinx
+    typedef struct {
+	u16	id;		// 0x0000
+	u32	wood;
+	u32	mercury;
+	u32	ore;
+	u32	sulfur;
+	u32	crystal;
+	u32	gems;
+	u32	golds;
+	u16	artifact;	// 0xffff - none
+	u8	count;		// count answers (1, 8)
+	char	answer1[13];
+	char	answer2[13];
+	char	answer3[13];
+	char	answer4[13];
+	char	answer5[13];
+	char	answer6[13];
+	char	answer7[13];
+	char	answer8[13];
+	char	text;
+    } mp2riddle_t;
+        
     ///////////////////////////////////////////////////////////////////////////////
 
     // interim mp2 addon

@@ -146,11 +146,14 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	stile.general    = byte8;
 
 	switch(stile.general){
+	    case MP2::OBJ_RNDTOWN:
+	    case MP2::OBJ_RNDCASTLE:
 	    case MP2::OBJ_CASTLE:
 	    case MP2::OBJ_HEROES:
 	    case MP2::OBJ_SIGN:
 	    case MP2::OBJ_BOTTLE:
 	    case MP2::OBJ_EVENT:
+	    case MP2::OBJ_SPHINX:
 		vec_object.push_back(ii);
 		break;
 	    default:
@@ -280,22 +283,28 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	if(endof < fd.tellg()) Error::Except("World::World: read maps: out of range.");
 
 	// size block
-	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
-	SWAP16(byte16);
+	u16 sizeblock;
+	fd.read(reinterpret_cast<char *>(&sizeblock), sizeof(u16));
+	SWAP16(sizeblock);
 
-	char *pblock = new char[byte16];
+	char *pblock = new char[sizeblock + 1];
+	// end string '\0'
+	pblock[sizeblock] = 0;
 
 	// read block
-	fd.read(pblock, byte16);
+	fd.read(pblock, sizeblock);
 
 	std::vector<u16>::const_iterator it_index = vec_object.begin();
 	bool findobject = false;
 
 	while(it_index != vec_object.end()){
 
-	    u8 quantity1 = vec_mp2tiles[*it_index].quantity1;
+	    // orders(quantity2, quantity1)
+	    u16 orders = (vec_mp2tiles[*it_index].quantity2 ? vec_mp2tiles[*it_index].quantity2 : 0);
+	    orders <<= 8;
+	    orders |= static_cast<u16>(vec_mp2tiles[*it_index].quantity1);
 	    
-	    if(quantity1 && !(quantity1 % 0x08) && (ii + 1 == quantity1 / 0x08)){ findobject = true; break; }
+	    if(orders && !(orders % 0x08) && (ii + 1 == orders / 0x08)){ findobject = true; break; }
 
 	    ++it_index;
 	}
@@ -303,36 +312,61 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	if(findobject){
 	    switch(vec_mp2tiles[*it_index].general){
 		case MP2::OBJ_CASTLE:
+		case MP2::OBJ_RNDTOWN:
+		case MP2::OBJ_RNDCASTLE:
 		    // add castle
-		    // pblock
+		    //if(SIZEOFMP2CASTLE == sizeblock)
 		    Error::Verbose("add castle");
+		    vec_mp2tiles[*it_index].general = MP2::OBJ_CASTLE;
 		    break;
 		case MP2::OBJ_HEROES:
 		    // add heroes
-		    // pblock
+		    //if(SIZEOFMP2HEROES == sizeblock)
 		    Error::Verbose("add heroes");
 		    break;
 		case MP2::OBJ_SIGN:
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
-		    sign[ii] = &pblock[9];
+		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x0001 == *reinterpret_cast<u16 *>(pblock))
+				    sign.push_back(GameEvent::Sign(*it_index, &pblock[9]));
 		    break;
 		case MP2::OBJ_EVENT:
-		    // add event
-		    // pblock
-		    Error::Verbose("add maps event");
+		    // add event maps
+		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x0001 == *reinterpret_cast<u16 *>(pblock))
+				    event_coord.push_back(GameEvent::Coord(*it_index, pblock));
+		    break;
+		case MP2::OBJ_SPHINX:
+		    // add riddle sphinx
+		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x0000 == *reinterpret_cast<u16 *>(pblock))
+				    riddle.push_back(GameEvent::Riddle(*it_index, pblock));
 		    break;
 		default:
 		    break;
 	    }
 	}
-	else{
-	    // add event day or rumors
-	    Error::Verbose("event day or rumors");
+	// other events
+	else if(0x0000 == *reinterpret_cast<u16 *>(pblock)){
+
+	    // add event day
+	    if(SIZEOFMP2EVENT - 1 < sizeblock && (0 == pblock[32] || 1 == pblock[32]))
+		event_day.push_back(GameEvent::Day(pblock));
+
+	    // add rumors
+	    else if(SIZEOFMP2RUMOR - 1 < sizeblock)
+	    {
+		std::string message(&pblock[8]);
+		rumors.push_back(message);
+		Error::Verbose("add Rumors: " + message);
+	    }
 	}
+	// debug
+	else Error::Warning("World::World: read maps: unknown block addons.");
 
 	delete [] pblock;
     }
+
+    // last rumors
+    rumors.push_back("This game is now in alpha development version.");
 
     // close mp2
     fd.close();

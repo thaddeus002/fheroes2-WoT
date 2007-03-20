@@ -28,7 +28,7 @@
 #include "sprite.h"
 #include "spritecursor.h"
 #include "error.h"
-#include "event.h"
+#include "localevent.h"
 #include "button.h"
 #include "cursor.h"
 #include "config.h"

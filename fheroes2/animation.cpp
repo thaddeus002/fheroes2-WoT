@@ -20,7 +20,7 @@
 
 #include "agg.h"
 #include "cursor.h"
-#include "event.h"
+#include "localevent.h"
 #include "sprite.h"
 #include "display.h"
 #include "animation.h"

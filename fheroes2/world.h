@@ -24,6 +24,7 @@
 #include <vector>
 #include "config.h"
 #include "gamedefs.h"
+#include "gameevent.h"
 #include "surface.h"
 #include "kingdom.h"
 #include "rect.h"
@@ -69,11 +70,15 @@ private:
 
     std::map<Color::color_t, Kingdom> kingdom;
 
-    std::map<u16, std::string> sign;
+    std::vector<GameEvent::Sign> sign;
+    std::vector<GameEvent::Day> event_day;
+    std::vector<GameEvent::Coord> event_coord;
+    std::vector<GameEvent::Riddle> riddle;
+    std::vector<std::string> rumors;
+
     //std::vector<castle_t> allCastles;
     //std::vector<heroes_t> allHeroes;
 
-    //std::vector<std::string> allRumors;
 
     u16 width;
     u16 height;

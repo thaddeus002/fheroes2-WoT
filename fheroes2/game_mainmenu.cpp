@@ -23,7 +23,7 @@
 #include "dialog.h"
 #include "animation.h"
 #include "sprite.h"
-#include "event.h"
+#include "localevent.h"
 #include "display.h"
 #include "button.h"
 #include "game.h"

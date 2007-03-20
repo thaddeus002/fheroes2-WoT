@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "event.h"
+#include "localevent.h"
 #include "button.h"
 #include "cursor.h"
 #include "config.h"

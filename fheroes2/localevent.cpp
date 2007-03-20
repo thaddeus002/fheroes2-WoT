@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "error.h"
-#include "event.h"
+#include "localevent.h"
 
 bool  LocalEvent::keep_going = true;
 bool  LocalEvent::mouse_motion = false;

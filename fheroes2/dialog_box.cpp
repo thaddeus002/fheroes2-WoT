@@ -20,7 +20,7 @@
 
 #include "agg.h"
 #include "rect.h"
-#include "event.h"
+#include "localevent.h"
 #include "cursor.h"
 #include "config.h"
 #include "dialog.h"

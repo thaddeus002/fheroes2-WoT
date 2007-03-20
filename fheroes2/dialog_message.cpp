@@ -22,7 +22,7 @@
 #include "config.h"
 #include "cursor.h"
 #include "text.h"
-#include "event.h"
+#include "localevent.h"
 #include "button.h"
 #include "dialog.h"
 
