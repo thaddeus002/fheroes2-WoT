@@ -36,13 +36,13 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
 
     // playing kingdom
-    kingdom[Color::BLUE]   = Kingdom(Color::BLUE & H2Config::GetKingdomColors() ? true : false);
-    kingdom[Color::GREEN]  = Kingdom(Color::GREEN & H2Config::GetKingdomColors() ? true : false);
-    kingdom[Color::RED]    = Kingdom(Color::RED & H2Config::GetKingdomColors() ? true : false);
-    kingdom[Color::YELLOW] = Kingdom(Color::YELLOW & H2Config::GetKingdomColors() ? true : false);
-    kingdom[Color::ORANGE] = Kingdom(Color::ORANGE & H2Config::GetKingdomColors() ? true : false);
-    kingdom[Color::PURPLE] = Kingdom(Color::PURPLE & H2Config::GetKingdomColors() ? true : false);
-    kingdom[Color::GRAY]   = Kingdom(false);
+    map_kingdoms[Color::BLUE]   = Kingdom(Color::BLUE & H2Config::GetKingdomColors() ? true : false);
+    map_kingdoms[Color::GREEN]  = Kingdom(Color::GREEN & H2Config::GetKingdomColors() ? true : false);
+    map_kingdoms[Color::RED]    = Kingdom(Color::RED & H2Config::GetKingdomColors() ? true : false);
+    map_kingdoms[Color::YELLOW] = Kingdom(Color::YELLOW & H2Config::GetKingdomColors() ? true : false);
+    map_kingdoms[Color::ORANGE] = Kingdom(Color::ORANGE & H2Config::GetKingdomColors() ? true : false);
+    map_kingdoms[Color::PURPLE] = Kingdom(Color::PURPLE & H2Config::GetKingdomColors() ? true : false);
+    map_kingdoms[Color::GRAY]   = Kingdom(false);
 
     // loading info
     display.Fill(0, 0, 0);
@@ -287,9 +287,7 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	fd.read(reinterpret_cast<char *>(&sizeblock), sizeof(u16));
 	SWAP16(sizeblock);
 
-	char *pblock = new char[sizeblock + 1];
-	// end string '\0'
-	pblock[sizeblock] = 0;
+	char *pblock = new char[sizeblock];
 
 	// read block
 	fd.read(pblock, sizeblock);
@@ -312,61 +310,66 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	if(findobject){
 	    switch(vec_mp2tiles[*it_index].general){
 		case MP2::OBJ_CASTLE:
+		    // add castle
+		    if(SIZEOFMP2CASTLE != sizeblock) Error::Except("World::World: read castle: incorrect size block.");
+		    vec_castles.push_back(Castle(*it_index, pblock));
+		    break;
 		case MP2::OBJ_RNDTOWN:
 		case MP2::OBJ_RNDCASTLE:
-		    // add castle
-		    //if(SIZEOFMP2CASTLE == sizeblock)
-		    Error::Verbose("add castle");
+		    // add rnd castle
+		    if(SIZEOFMP2CASTLE != sizeblock) Error::Except("World::World: read castle: incorrect size block.");
+		    vec_castles.push_back(Castle(*it_index, pblock, true));
 		    vec_mp2tiles[*it_index].general = MP2::OBJ_CASTLE;
 		    break;
 		case MP2::OBJ_HEROES:
 		    // add heroes
-		    //if(SIZEOFMP2HEROES == sizeblock)
+		    if(SIZEOFMP2HEROES != sizeblock) Error::Except("World::World: read heroes: incorrect size block.");
 		    Error::Verbose("add heroes");
 		    break;
 		case MP2::OBJ_SIGN:
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
-		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x0001 == *reinterpret_cast<u16 *>(pblock))
-				    sign.push_back(GameEvent::Sign(*it_index, &pblock[9]));
+		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
+				    vec_signs.push_back(GameEvent::Sign(*it_index, &pblock[9]));
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
-		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x0001 == *reinterpret_cast<u16 *>(pblock))
-				    event_coord.push_back(GameEvent::Coord(*it_index, pblock));
+		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x01 == pblock[0])
+				    vec_eventsmap.push_back(GameEvent::Coord(*it_index, pblock));
 		    break;
 		case MP2::OBJ_SPHINX:
 		    // add riddle sphinx
-		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x0000 == *reinterpret_cast<u16 *>(pblock))
-				    riddle.push_back(GameEvent::Riddle(*it_index, pblock));
+		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x00 == pblock[0])
+				    vec_riddles.push_back(GameEvent::Riddle(*it_index, pblock));
 		    break;
 		default:
 		    break;
 	    }
 	}
 	// other events
-	else if(0x0000 == *reinterpret_cast<u16 *>(pblock)){
+	else 
+	if(0x00 == pblock[0]){
 
 	    // add event day
-	    if(SIZEOFMP2EVENT - 1 < sizeblock && (0 == pblock[32] || 1 == pblock[32]))
-		event_day.push_back(GameEvent::Day(pblock));
+	    if(SIZEOFMP2EVENT - 1 < sizeblock && 1 == pblock[42])
+		vec_eventsday.push_back(GameEvent::Day(pblock));
 
 	    // add rumors
 	    else if(SIZEOFMP2RUMOR - 1 < sizeblock)
 	    {
 		std::string message(&pblock[8]);
-		rumors.push_back(message);
+		vec_rumors.push_back(message);
 		Error::Verbose("add Rumors: " + message);
 	    }
 	}
 	// debug
-	else Error::Warning("World::World: read maps: unknown block addons.");
+	else Error::Warning("World::World: read maps: unknown block addons, size: ", sizeblock);
 
 	delete [] pblock;
     }
 
     // last rumors
-    rumors.push_back("This game is now in alpha development version.");
+    vec_rumors.push_back("This game is now in alpha development version.");
 
     // close mp2
     fd.close();
@@ -400,10 +403,12 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 		tl.object = MP2::OBJ_RESOURCE;
 	    case MP2::OBJ_RESOURCE:
 		tl.resource = Resource::FromMP2(vec_mp2tiles[ii].index1);
+		tl.count = Resource::RandCount(tl.resource);
 		break;
 
 	    // ultimate artifact
     	    case MP2::OBJ_RNDULTIMATEARTIFACT:
+		//tl.count = 0;
 		//tl.artifact = Artifact::FromMP2(vec_mp2tiles[ii].index1);
 		break;
 
@@ -414,9 +419,47 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
     	    case MP2::OBJ_RNDARTIFACT3:
 		tl.object = MP2::OBJ_ARTIFACT;
     	    case MP2::OBJ_ARTIFACT:
+		tl.count = 0;
 		tl.artifact = Artifact::FromMP2(vec_mp2tiles[ii].index1);
 		break;
 
+	    // monster
+    	    case MP2::OBJ_RNDMONSTER:
+		tl.monster = Monster::Rand();
+		tl.count = Monster::RandCount(tl.monster);
+		tl.object = MP2::OBJ_MONSTER;
+		break;
+    	    case MP2::OBJ_RNDMONSTER1:
+		tl.monster = Monster::Rand1();
+		tl.count = Monster::RandCount(tl.monster);
+		tl.object = MP2::OBJ_MONSTER;
+		break;
+    	    case MP2::OBJ_RNDMONSTER2:
+		tl.monster = Monster::Rand2();
+		tl.count = Monster::RandCount(tl.monster);
+		tl.object = MP2::OBJ_MONSTER;
+		break;
+    	    case MP2::OBJ_RNDMONSTER3:
+		tl.monster = Monster::Rand3();
+		tl.count = Monster::RandCount(tl.monster);
+		tl.object = MP2::OBJ_MONSTER;
+		break;
+    	    case MP2::OBJ_RNDMONSTER4:
+		tl.monster = Monster::Rand4();
+		tl.count = Monster::RandCount(tl.monster);
+		tl.object = MP2::OBJ_MONSTER;
+		break;
+    	    case MP2::OBJ_MONSTER:
+        	if(Monster::UNKNOWN <= vec_mp2tiles[ii].index1) Error::Except("World::World: read monster: unknown type");
+	        tl.monster = static_cast<Monster::monster_t>(vec_mp2tiles[ii].index1);
+		// calculate count
+		tl.count = vec_mp2tiles[ii].quantity2;
+		tl.count <<= 8;
+		tl.count |= vec_mp2tiles[ii].quantity1;
+		tl.count >>= 3;
+		// rnd count
+		if(! tl.count) tl.count = Monster::RandCount(tl.monster);
+		break;
 
 	    default:
 		break;
@@ -622,9 +665,9 @@ bool World::Movement(u16 index) const
 
 const Kingdom & World::GetKingdom(Color::color_t color) const
 {
-    std::map<Color::color_t, Kingdom>::const_iterator it = kingdom.find(color);
+    std::map<Color::color_t, Kingdom>::const_iterator it = map_kingdoms.find(color);
     
-    if(it == kingdom.end()) Error::Except("World::GetKingdom: unknown.");
+    if(it == map_kingdoms.end()) Error::Except("World::GetKingdom: unknown.");
     
     return it->second;
 }

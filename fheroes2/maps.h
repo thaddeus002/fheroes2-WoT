@@ -26,6 +26,7 @@
 #include "resource.h"
 #include "artifact.h"
 #include "sprite.h"
+#include "monster.h"
 #include "gamedefs.h"
 
 #define TILEWIDTH 32
@@ -61,12 +62,16 @@ namespace Maps
 	std::vector<const Sprite *> *level1;
 	std::vector<const Sprite *> *level2;
 
+	u32	count;
+
 	union {
-	    Resource::resource_t resource;
-	    Artifact::artifact_t artifact;
+	    Resource::resource_t	resource;
+	    Artifact::artifact_t	artifact;
+	    Monster::monster_t		monster;
 	};
 
     } tiles_t;
+    
 };
 
 #endif

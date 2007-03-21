@@ -127,3 +127,7 @@ const Sprite & Resource::GetForMapsSprite(Resource::resource_t resource)
 
     return AGG::GetICN("OBJNRSRC.ICN", 13);
 }
+
+/* return rnd count resource */
+u16 Resource::RandCount(Resource::resource_t res)
+{ return Resource::GOLD == res ? 100 * Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX) : Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX); }

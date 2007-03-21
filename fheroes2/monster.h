@@ -26,6 +26,13 @@
 namespace Monster
 {
     typedef enum {
+	LEVEL1,
+	LEVEL2,
+	LEVEL3,
+	LEVEL4
+    } level_t;
+
+    typedef enum {
 	CRAWLING,
         VERYSLOW,
         SLOW,
@@ -106,14 +113,18 @@ namespace Monster
 	FIRE_ELEMENT,
 	WATER_ELEMENT,
 
+	UNKNOWN,
+
 	MONSTER_RND1,
 	MONSTER_RND2,
 	MONSTER_RND3,
 	MONSTER_RND4,
 	MONSTER_RND,
+
     } monster_t;
 
     typedef struct {
+	level_t level;
 	u8 attack;
 	u8 defence;
 	u8 shots;
@@ -130,6 +141,14 @@ namespace Monster
 
     const std::string & String(monster_t monster);
     const stats_t & GetStats(monster_t monster);
+    
+    monster_t Rand(void);
+    monster_t Rand1(void);
+    monster_t Rand2(void);
+    monster_t Rand3(void);
+    monster_t Rand4(void);
+
+    u16 RandCount(Monster::monster_t monster);
 };
 
 #endif

@@ -17,47 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2RESOURCE_H
-#define H2RESOURCE_H
+#ifndef H2CASTLE_H
+#define H2CASTLE_H
 
 #include <string>
 #include "gamedefs.h"
-#include "sprite.h"
+#include "color.h"
+#include "race.h"
+#include "army.h"
 
-#define RNDRESOURCEMAX  15 
-#define RNDRESOURCEMIN  5 
+#define CASTLEMAXARMY           5 
+#define CASTLEMAXMONSTER        6 
 
-namespace Resource
+class Castle
 {
-    typedef enum {
-        WOOD,
-        MERCURY,
-        ORE,
-        SULFUR,
-        CRYSTAL,
-        GEMS,
-        GOLD,
-    } resource_t;
+public:
+    Castle(u16 index, const void *ptr, bool rnd = false);
 
-    typedef struct {
-        u16 wood;
-        u16 mercury;
-        u16 ore;
-        u16 sulfur;
-        u16 crystal;
-        u16 gems;
-        u32 gold;
-    } funds_t;
-
-    funds_t operator+ (const funds_t &pm1, const funds_t &pm2);
-    funds_t operator- (const funds_t &pm1, const funds_t &pm2);
-
-    const std::string & String(resource_t resource);
-    resource_t Rand(void);
-    resource_t FromMP2(u8 index);
-    u16	RandCount(Resource::resource_t res);
-    
-    const Sprite & GetForMapsSprite(resource_t resource);
+private:
+    Color::color_t	color;
+    Race::race_t	race;
+    std::string		name;
+    u16			index_map;
+    u32			building;
+    bool		allow_castle;
+    bool		army_spread;
+    bool		boat;
+    //MageGuild		guild;
+    u16			dwelling[CASTLEMAXMONSTER];
+    Army::army_t	army[CASTLEMAXARMY];
 };
 
 #endif

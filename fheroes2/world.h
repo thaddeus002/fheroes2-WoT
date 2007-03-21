@@ -27,8 +27,11 @@
 #include "gameevent.h"
 #include "surface.h"
 #include "kingdom.h"
+#include "castle.h"
+#include "heroes.h"
 #include "rect.h"
 #include "maps.h"
+#include "army.h"
 #include "mp2.h"
 
 #define DAYOFWEEK       7
@@ -66,19 +69,15 @@ public:
 
 private:
     Surface *sprite_maps;
-    std::vector<Maps::tiles_t> vec_tiles;
-
-    std::map<Color::color_t, Kingdom> kingdom;
-
-    std::vector<GameEvent::Sign> sign;
-    std::vector<GameEvent::Day> event_day;
-    std::vector<GameEvent::Coord> event_coord;
-    std::vector<GameEvent::Riddle> riddle;
-    std::vector<std::string> rumors;
-
-    //std::vector<castle_t> allCastles;
-    //std::vector<heroes_t> allHeroes;
-
+    std::vector<Maps::tiles_t>		vec_tiles;
+    std::map<Color::color_t, Kingdom>	map_kingdoms;
+    std::vector<GameEvent::Sign>	vec_signs;
+    std::vector<GameEvent::Day> 	vec_eventsday;
+    std::vector<GameEvent::Coord>	vec_eventsmap;
+    std::vector<GameEvent::Riddle>	vec_riddles;
+    std::vector<std::string>		vec_rumors;
+    std::vector<Castle>			vec_castles;
+    //std::vector<Heroes> 		vec_heroes;
 
     u16 width;
     u16 height;

@@ -4,7 +4,7 @@
 TARGET = fheroes2
 LIBS = `sdl-config --libs`
 CFLAGS = -O0 -g -Wall -fomit-frame-pointer `sdl-config --cflags`
-#CFLAGS = -O3 -Wall -fomit-frame-pointer `sdl-config --cflags` --march=i686
+#CFLAGS = -O3 -Wall -fomit-frame-pointer `sdl-config --cflags` -march=i686
 
 CC = g++
 

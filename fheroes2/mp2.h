@@ -122,7 +122,6 @@ namespace MP2
     // origin mp2 heroes
     // 0x004c - size
     typedef struct {
-	u8	id;		// 0x00
 	bool	customTroops;
 	u8	monster1;	// 0xff none
 	u8	monster2;	// 0xff none
@@ -163,19 +162,19 @@ namespace MP2
 	char	name[13];	// name + '\0'
 	bool	patrol;
 	u8	countSquare;	// for patrol
-	u8	unknown4[15];	// 0
+	u8	unknown4[16];	// 0
     } mp2heroes_t;
 
     // origin mp2 sign or buttle
     typedef struct {
-	u16	id;		// 0x0001
-	u8	zero[7];	// 7 byte 0x00
-	char	text;		// message
+	u8	id;		// 0x01
+	u8	zero[8];	// 8 byte 0x00
+	char	text;		// message  + '/0'
     } mp2info_t;
 
     // origin mp2 event for coord
     typedef struct {
-	u16	id;		// 0x0001
+	u8	id;		// 0x01
 	u32	wood;
 	u32	mercury;
 	u32	ore;
@@ -193,13 +192,13 @@ namespace MP2
 	bool	yellow;
 	bool	orange;
 	bool	purple;
-	char	text;		// text event
+	char	text;		// message + '/0'
     } mp2eventcoord_t;
 
 
     // origin mp2 event for day
     typedef struct {
-	u16	id;		// 0x0000
+	u8	id;		// 0x00
 	u32	wood;
 	u32	mercury;
 	u32	ore;
@@ -218,19 +217,19 @@ namespace MP2
 	bool	yellow;
 	bool	orange;
 	bool	purple;
-	char	text;		// text event
+	char	text;		// message + '/0'
     } mp2eventday_t;
 
     // origin mp2 rumor
     typedef struct {
-	u16	id;		// 0x0000
-	u8	zero[6];	// 6 byte 0x00
-	char	text;   	// text rumor
+	u8	id;		// 0x00
+	u8	zero[7];	// 7 byte 0x00
+	char	text;   	// message + '/0'
     } mp2rumor_t;
 
     // origin mp2 riddle sphinx
     typedef struct {
-	u16	id;		// 0x0000
+	u8	id;		// 0x00
 	u32	wood;
 	u32	mercury;
 	u32	ore;
@@ -248,7 +247,7 @@ namespace MP2
 	char	answer6[13];
 	char	answer7[13];
 	char	answer8[13];
-	char	text;
+	char	text;		// message + '/0'
     } mp2riddle_t;
         
     ///////////////////////////////////////////////////////////////////////////////
