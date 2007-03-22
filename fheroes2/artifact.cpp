@@ -115,95 +115,114 @@ namespace Artifact {
 
 }
 
-Artifact::artifact_t Artifact::FromMP2(u8 index)
+Artifact::artifact_t Artifact::Artifact(u8 index)
 {
     switch(index){
-	case 0x11: return Artifact::ARCANE_NECKLACE;
-	case 0x13: return Artifact::CASTER_BRACELET;
-	case 0x15: return Artifact::MAGE_RING;
-	case 0x17: return Artifact::WITCHES_BROACH;
-	case 0x19: return Artifact::MEDAL_VALOR;
-	case 0x1B: return Artifact::MEDAL_COURAGE;
-	case 0x1D: return Artifact::MEDAL_HONOR;
-	case 0x1F: return Artifact::MEDAL_DISTINCTION;
-	case 0x21: return Artifact::FIZBIN_MISFORTUNE;
-	case 0x23: return Artifact::THUNDER_MACE;
-	case 0x25: return Artifact::ARMORED_GAUNTLETS;
-	case 0x27: return Artifact::DEFENDER_HELM;
-	case 0x29: return Artifact::GIANT_FLAIL;
-	case 0x2B: return Artifact::BALLISTA;
-	case 0x2D: return Artifact::STEALTH_SHIELD;
-	case 0x2F: return Artifact::DRAGON_SWORD;
-	case 0x31: return Artifact::POWER_AXE;
-	case 0x33: return Artifact::DIVINE_BREASTPLATE;
-	case 0x35: return Artifact::MINOR_SCROLL;
-	case 0x37: return Artifact::MAJOR_SCROLL;
-	case 0x39: return Artifact::SUPERIOR_SCROLL;
-	case 0x3B: return Artifact::FOREMOST_SCROLL;
-	case 0x3D: return Artifact::ENDLESS_SACK_GOLD;
-	case 0x3F: return Artifact::ENDLESS_BAG_GOLD;
-	case 0x41: return Artifact::ENDLESS_PURSE_GOLD;
-	case 0x43: return Artifact::NOMAD_BOOTS_MOBILITY;
-	case 0x45: return Artifact::TRAVELER_BOOTS_MOBILITY;
-	case 0x47: return Artifact::RABBIT_FOOT;
-	case 0x49: return Artifact::GOLDEN_HORSESHOE;
-	case 0x4B: return Artifact::GAMBLER_LUCKY_COIN;
-	case 0x4D: return Artifact::FOUR_LEAF_CLOVER;
-	case 0x4F: return Artifact::TRUE_COMPASS_MOBILITY;
-	case 0x51: return Artifact::SAILORS_ASTROLABE_MOBILITY;
-	case 0x53: return Artifact::EVIL_EYE;
-	case 0x55: return Artifact::ENCHANTED_HOURGLASS;
-	case 0x57: return Artifact::GOLD_WATCH;
-	case 0x59: return Artifact::SKULLCAP;
-	case 0x5B: return Artifact::ICE_CLOAK;
-	case 0x5D: return Artifact::FIRE_CLOAK;
-	case 0x5F: return Artifact::LIGHTNING_HELM;
-	case 0x61: return Artifact::EVERCOLD_ICICLE;
-	case 0x63: return Artifact::EVERHOT_LAVA_ROCK;
-	case 0x65: return Artifact::LIGHTNING_ROD;
-	case 0x67: return Artifact::SNAKE_RING;
-	case 0x69: return Artifact::ANKH;
-	case 0x6B: return Artifact::BOOK_ELEMENTS;
-	case 0x6D: return Artifact::ELEMENTAL_RING;
-	case 0x6F: return Artifact::HOLY_PENDANT;
-	case 0x71: return Artifact::PENDANT_FREE_WILL;
-	case 0x73: return Artifact::PENDANT_LIFE;
-	case 0x75: return Artifact::SERENITY_PENDANT;
-	case 0x77: return Artifact::SEEING_EYE_PENDANT;
-	case 0x79: return Artifact::KINETIC_PENDANT;
-	case 0x7B: return Artifact::PENDANT_DEATH;
-	case 0x7D: return Artifact::WAND_NEGATION;
-	case 0x7F: return Artifact::GOLDEN_BOW;
-	case 0x81: return Artifact::TELESCOPE;
-	case 0x83: return Artifact::STATESMAN_QUILL;
-	case 0x85: return Artifact::WIZARD_HAT;
-	case 0x87: return Artifact::POWER_RING;
-	case 0x89: return Artifact::AMMO_CART;
-	case 0x8B: return Artifact::TAX_LIEN;
-	case 0x8D: return Artifact::HIDEOUS_MASK;
-	case 0x8F: return Artifact::ENDLESS_POUCH_SULFUR;
-	case 0x91: return Artifact::ENDLESS_VIAL_MERCURY;
-	case 0x93: return Artifact::ENDLESS_POUCH_GEMS;
-	case 0x95: return Artifact::ENDLESS_CORD_WOOD;
-	case 0x97: return Artifact::ENDLESS_CART_ORE;
-	case 0x99: return Artifact::ENDLESS_POUCH_CRYSTAL;
-	case 0x9B: return Artifact::SPIKED_HELM;
-	case 0x9D: return Artifact::SPIKED_SHIELD;
-	case 0x9F: return Artifact::WHITE_PEARL;
-	case 0xA1: return Artifact::BLACK_PEARL;
+        case 0x00: return Artifact::ULTIMATE_BOOK;
+        case 0x01: return Artifact::ULTIMATE_SWORD;
+        case 0x02: return Artifact::ULTIMATE_CLOAK;
+        case 0x03: return Artifact::ULTIMATE_WAND;
+        case 0x04: return Artifact::ULTIMATE_SHIELD;
+        case 0x05: return Artifact::ULTIMATE_STAFF;
+        case 0x06: return Artifact::ULTIMATE_CROWN;
+        case 0x07: return Artifact::GOLDEN_GOOSE;
+	case 0x08: return Artifact::ARCANE_NECKLACE;
+	case 0x09: return Artifact::CASTER_BRACELET;
+	case 0x0A: return Artifact::MAGE_RING;
+	case 0x0B: return Artifact::WITCHES_BROACH;
+	case 0x0C: return Artifact::MEDAL_VALOR;
+	case 0x0D: return Artifact::MEDAL_COURAGE;
+	case 0x0E: return Artifact::MEDAL_HONOR;
+	case 0x0F: return Artifact::MEDAL_DISTINCTION;
+	case 0x10: return Artifact::FIZBIN_MISFORTUNE;
+	case 0x11: return Artifact::THUNDER_MACE;
+	case 0x12: return Artifact::ARMORED_GAUNTLETS;
+	case 0x13: return Artifact::DEFENDER_HELM;
+	case 0x14: return Artifact::GIANT_FLAIL;
+	case 0x15: return Artifact::BALLISTA;
+	case 0x16: return Artifact::STEALTH_SHIELD;
+	case 0x17: return Artifact::DRAGON_SWORD;
+	case 0x18: return Artifact::POWER_AXE;
+	case 0x19: return Artifact::DIVINE_BREASTPLATE;
+	case 0x1A: return Artifact::MINOR_SCROLL;
+	case 0x1B: return Artifact::MAJOR_SCROLL;
+	case 0x1C: return Artifact::SUPERIOR_SCROLL;
+	case 0x1D: return Artifact::FOREMOST_SCROLL;
+	case 0x1E: return Artifact::ENDLESS_SACK_GOLD;
+	case 0x1F: return Artifact::ENDLESS_BAG_GOLD;
+	case 0x20: return Artifact::ENDLESS_PURSE_GOLD;
+	case 0x21: return Artifact::NOMAD_BOOTS_MOBILITY;
+	case 0x22: return Artifact::TRAVELER_BOOTS_MOBILITY;
+	case 0x23: return Artifact::RABBIT_FOOT;
+	case 0x24: return Artifact::GOLDEN_HORSESHOE;
+	case 0x25: return Artifact::GAMBLER_LUCKY_COIN;
+	case 0x26: return Artifact::FOUR_LEAF_CLOVER;
+	case 0x27: return Artifact::TRUE_COMPASS_MOBILITY;
+	case 0x28: return Artifact::SAILORS_ASTROLABE_MOBILITY;
+	case 0x29: return Artifact::EVIL_EYE;
+	case 0x2A: return Artifact::ENCHANTED_HOURGLASS;
+	case 0x2B: return Artifact::GOLD_WATCH;
+	case 0x2C: return Artifact::SKULLCAP;
+	case 0x2D: return Artifact::ICE_CLOAK;
+	case 0x2E: return Artifact::FIRE_CLOAK;
+	case 0x2F: return Artifact::LIGHTNING_HELM;
+	case 0x30: return Artifact::EVERCOLD_ICICLE;
+	case 0x31: return Artifact::EVERHOT_LAVA_ROCK;
+	case 0x32: return Artifact::LIGHTNING_ROD;
+	case 0x33: return Artifact::SNAKE_RING;
+	case 0x34: return Artifact::ANKH;
+	case 0x35: return Artifact::BOOK_ELEMENTS;
+	case 0x36: return Artifact::ELEMENTAL_RING;
+	case 0x37: return Artifact::HOLY_PENDANT;
+	case 0x38: return Artifact::PENDANT_FREE_WILL;
+	case 0x39: return Artifact::PENDANT_LIFE;
+	case 0x3A: return Artifact::SERENITY_PENDANT;
+	case 0x3B: return Artifact::SEEING_EYE_PENDANT;
+	case 0x3C: return Artifact::KINETIC_PENDANT;
+	case 0x3D: return Artifact::PENDANT_DEATH;
+	case 0x3E: return Artifact::WAND_NEGATION;
+	case 0x3F: return Artifact::GOLDEN_BOW;
+	case 0x40: return Artifact::TELESCOPE;
+	case 0x41: return Artifact::STATESMAN_QUILL;
+	case 0x42: return Artifact::WIZARD_HAT;
+	case 0x43: return Artifact::POWER_RING;
+	case 0x44: return Artifact::AMMO_CART;
+	case 0x45: return Artifact::TAX_LIEN;
+	case 0x46: return Artifact::HIDEOUS_MASK;
+	case 0x47: return Artifact::ENDLESS_POUCH_SULFUR;
+	case 0x48: return Artifact::ENDLESS_VIAL_MERCURY;
+	case 0x49: return Artifact::ENDLESS_POUCH_GEMS;
+	case 0x4A: return Artifact::ENDLESS_CORD_WOOD;
+	case 0x4B: return Artifact::ENDLESS_CART_ORE;
+	case 0x4C: return Artifact::ENDLESS_POUCH_CRYSTAL;
+	case 0x4D: return Artifact::SPIKED_HELM;
+	case 0x4E: return Artifact::SPIKED_SHIELD;
+	case 0x4F: return Artifact::WHITE_PEARL;
+	case 0x50: return Artifact::BLACK_PEARL;
 	
-	// special
-	case 0xA3: return Artifact::Rand();
-	case 0xA4: return Artifact::RandUltimate();
-	case 0xA7: return Artifact::Rand1();
-	case 0xA9: return Artifact::Rand2();
-	case 0xAB: return Artifact::Rand3();
-
-	//
 	// not used
 	default:
-	    Error::Warning("Artifact::FromMP2: unknown: ", index);
+	    Error::Warning("Artifact::Artifact: unknown: ", index);
     }
+    
+    return Artifact::UNKNOWN;
+}
+
+Artifact::artifact_t Artifact::FromMP2(u8 index)
+{
+    if(0x10 < index && 0xA2 > index) return Artifact((index - 1)/2);
+    else
+    if(0xA3 == index) return Artifact::Rand();
+    else
+    if(0xA4 == index) return Artifact::RandUltimate();
+    else
+    if(0xA7 == index) return Artifact::Rand1();
+    else
+    if(0xA9 == index) return Artifact::Rand2();
+    else
+    if(0xAB == index) return Artifact::Rand3();
+    else
+	Error::Warning("Artifact::FromMP2: unknown: ", index);
     
     return Artifact::UNKNOWN;
 }

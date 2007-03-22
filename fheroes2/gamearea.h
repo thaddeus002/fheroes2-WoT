@@ -22,6 +22,7 @@
 
 #include "gamedefs.h"
 #include "maps.h"
+#include "game.h"
 #include "world.h"
 #include "rect.h"
 
@@ -34,7 +35,7 @@ public:
 
     static const Rect & GetRect(void){ return pos; }
 
-    Rect GetPosition(void) const{ return Rect(BORDERWIDTH, BORDERWIDTH, pos.w * TILEWIDTH, pos.h * TILEWIDTH); }
+    static Rect GetPosition(void){ return Rect(BORDERWIDTH, BORDERWIDTH, pos.w * TILEWIDTH, pos.h * TILEWIDTH); }
 
     u16  GetIndexMaps(u16 mx, u16 my) const;
     u16  GetIndexMaps(const Point &pt) const{ return GetIndexMaps(pt.x, pt.y); };

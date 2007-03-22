@@ -21,10 +21,13 @@
 #include "agg.h"
 #include "localevent.h"
 #include "text.h"
+#include "maps.h"
 #include "cursor.h"
+#include "gamearea.h"
 #include "background.h"
 #include "dialog.h"
 
+#include "error.h"
 void Dialog::QuickInfo(const std::string & object)
 {
     // preload
@@ -34,20 +37,41 @@ void Dialog::QuickInfo(const std::string & object)
 
     // cursor
     Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
-    Cursor::themes_t cursor = Cursor::Get();
 
     // image box
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
 
-    Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
-    Background back(rb);
+    const Rect & ar = GameArea::GetPosition();
+    const Point & mp = LocalEvent::MouseCursor();
+    
+    Rect pos; 
+    u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    mx *= TILEWIDTH;
+    u16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    my *= TILEWIDTH;
+
+    // top left
+    if(mx <= ar.x + ar.w / 2 && my <= ar.y + ar.h / 2)
+	pos = Rect(mx + TILEWIDTH, my + TILEWIDTH, box.w(), box.h());
+    else
+    // top right
+    if(mx > ar.x + ar.w / 2 && my <= ar.y + ar.h / 2)
+	pos = Rect(mx - box.w(), my + TILEWIDTH, box.w(), box.h());
+    else
+    // bottom left
+    if(mx <= ar.x + ar.w / 2 && my > ar.y + ar.h / 2)
+	pos = Rect(mx + TILEWIDTH, my - box.h(), box.w(), box.h());
+    else
+    // bottom right
+	pos = Rect(mx - box.w(), my - box.h(), box.w(), box.h());
+    
+    Background back(pos);
     back.Save();
 
-    display.Blit(box, rb);
+    display.Blit(box, pos);
 
-    u16 tx = rb.x + BORDERWIDTH + (rb.w - BORDERWIDTH - Text::width(object, Font::SMALL)) / 2;
-    u16 ty = rb.y + (rb.h - BORDERWIDTH - Text::height(rb.h, object, Font::SMALL)) / 2;
+    u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(object, Font::SMALL)) / 2;
+    u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(pos.h, object, Font::SMALL)) / 2;
     Text(tx, ty, object, Font::SMALL, true);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -59,7 +83,6 @@ void Dialog::QuickInfo(const std::string & object)
 
     // restore background
     back.Restore();
-    Cursor::Set(cursor);
     Cursor::Show();
     display.Flip();
 }

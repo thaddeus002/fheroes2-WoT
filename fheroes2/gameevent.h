@@ -22,11 +22,9 @@
 
 #include <vector>
 #include <string>
-#include "dialog.h"
 #include "config.h"
 #include "resource.h"
 #include "artifact.h"
-#include "error.h"
 #include "gamedefs.h"
 
 namespace GameEvent
@@ -35,12 +33,12 @@ namespace GameEvent
 class Sign
 {
 public:
-    Sign(u16 index, const char *str) : index_map(index), message(str){ if(H2Config::Debug()) Error::Verbose("add Sign: " + message); };
+    Sign(u16 index, const char *str);
 
     u16 GetIndex(void) const{ return index_map; };
     const std::string & GetText(void) const{ return message; };
     
-    void Show(void){ Dialog::Message("", message, Font::BIG, Dialog::OK); };
+    void Show(void);
 
 private:
     u16 index_map;
@@ -50,7 +48,7 @@ private:
 class Day
 {
 public:
-    Day(const void *ptr){ if(H2Config::Debug()) Error::Verbose("add EventDay"); };
+    Day(const void *ptr);
 
 private:
     Resource::funds_t resource;
@@ -65,7 +63,7 @@ private:
 class Coord
 {
 public:
-    Coord(u16 index, const void *ptr) : index_map(index){ if(H2Config::Debug()) Error::Verbose("add EventMaps"); };
+    Coord(u16 index, const void *ptr);
 
 private:
     u16 index_map;
@@ -80,7 +78,7 @@ private:
 class Riddle
 {
 public:
-    Riddle(u16 index, const void *ptr) : index_map(index){ if(H2Config::Debug()) Error::Verbose("add Sphinx riddle"); };
+    Riddle(u16 index, const void *ptr);
 
 private:
     u16 index_map;

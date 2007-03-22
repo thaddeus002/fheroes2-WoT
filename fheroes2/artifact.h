@@ -129,6 +129,7 @@ namespace Artifact
     const std::string & String(artifact_t artifact);
     const std::string & Description(artifact_t artifact);
     
+    artifact_t Artifact(u8 index);
     artifact_t FromMP2(u8 index);
     
     const Sprite & GetForMapsSprite(artifact_t artifact);

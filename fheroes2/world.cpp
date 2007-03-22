@@ -358,8 +358,10 @@ World::World(const std::string &filename) : sprite_maps(NULL), day(1), week(1), 
 	    else if(SIZEOFMP2RUMOR - 1 < sizeblock)
 	    {
 		std::string message(&pblock[8]);
-		vec_rumors.push_back(message);
-		Error::Verbose("add Rumors: " + message);
+		if(message.size()){
+		    vec_rumors.push_back(message);
+		    Error::Verbose("add Rumors: " + message);
+		}
 	    }
 	}
 	// debug
