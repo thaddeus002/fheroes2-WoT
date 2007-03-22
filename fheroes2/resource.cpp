@@ -32,10 +32,11 @@ Resource::resource_t Resource::Rand(void)
         case 4: return Resource::SULFUR;
         case 5: return Resource::CRYSTAL;
         case 6: return Resource::GEMS;
+	case 7: return Resource::GOLD;
         default: break;
     }
 
-	return Resource::GOLD;
+    return Resource::WOOD;
 }
 
 // operator funds_t + funds_t
@@ -88,10 +89,12 @@ const std::string & Resource::String(resource_t resource)
         case Resource::SULFUR:	return stringSulfur;
         case Resource::CRYSTAL: return stringCrystal;
         case Resource::GEMS:	return stringGems;
+	case Resource::GOLD:	return stringGold;
 	default: break;
+	    Error::Warning("Resource::String: unknown");
     }
-
-    return stringGold;
+    
+    return stringWood;
 }
 
 Resource::resource_t Resource::FromMP2(u8 index)
@@ -122,10 +125,12 @@ const Sprite & Resource::GetForMapsSprite(Resource::resource_t resource)
         case Resource::SULFUR:	return AGG::GetICN("OBJNRSRC.ICN", 7);
         case Resource::CRYSTAL: return AGG::GetICN("OBJNRSRC.ICN", 9);
         case Resource::GEMS:	return AGG::GetICN("OBJNRSRC.ICN", 11);
-	default: break;
+	case Resource::GOLD:	return AGG::GetICN("OBJNRSRC.ICN", 13);
+        default: 
+	    Error::Warning("Resource::GetForMapsSprite: unknown");
     }
-
-    return AGG::GetICN("OBJNRSRC.ICN", 13);
+    
+    return AGG::GetICN("OBJNRSRC.ICN", 1);
 }
 
 /* return rnd count resource */

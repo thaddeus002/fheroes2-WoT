@@ -593,7 +593,20 @@ void World::Redraw(const Rect &rt, const Point &pt) const
 
 	    // draw other resource (lamp, campfire, sea resource e.t.c.)
 	    case MP2::OBJ_TREASURECHEST:
+		{
+		    // skip water object chest
+		    if(Maps::WATER != (*itm).ground){
+			const Sprite & sprite = AGG::GetICN("OBJNRSRC.ICN", 19);
+			display.Blit(sprite, offset_x + sprite.x(), offset_y + sprite.y());
+		    }
+		}
+		break;
 	    case MP2::OBJ_ANCIENTLAMP:
+		{
+		    const Sprite & sprite = AGG::GetICN("OBJNRSRC.ICN", 15);
+		    display.Blit(sprite, offset_x + sprite.x(), offset_y + sprite.y());
+		}
+		break;
 	    case MP2::OBJ_CAMPFIRE:
 	    case MP2::OBJ_SHIPWRECKSURVIROR:
 	    case MP2::OBJ_FLOTSAM:

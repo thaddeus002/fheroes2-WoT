@@ -207,10 +207,10 @@ namespace MP2
 	u32	gems;
 	u32	golds;
 	u16	artifact;	// always 0xffff - none
-	bool	computer;	// allow events for computer
+	u16	computer;	// allow events for computer
 	u16	first;		// day of first occurent
 	u16	subsequent;	// subsequent occurrences
-	u8	zero[7];	// 6 byte 0x00 and end 0x01
+	u8	zero[6];	// 6 byte 0x00 and end 0x01
 	bool	blue;
 	bool	green;
 	bool	red;

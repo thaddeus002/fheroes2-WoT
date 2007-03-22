@@ -67,19 +67,19 @@ GameEvent::Day::Day(const void *ptr)
     ++byte16;
 
     // allow computer
-    byte8 = reinterpret_cast<const u8 *>(byte16);
-    computer = *byte8;
-    ++byte8;
+    computer = *byte16;
+    ++byte16;
 
     // day of first occurent
-    byte16 = reinterpret_cast<const u16 *>(byte8);
     first = *byte16;
     ++byte16;
 
     // subsequent occurrences
+    subsequent = *byte16;
+    ++byte16;
+
     byte8 = reinterpret_cast<const u8 *>(byte16);
-    subsequent = *byte8;
-    byte8 += 8;
+    byte8 += 6;
 
     colors = 0;
     

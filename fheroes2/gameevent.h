@@ -55,7 +55,7 @@ private:
     Artifact::artifact_t artifact;
     bool computer;
     u16 first;
-    u8 subsequent;
+    u16 subsequent;
     u8 colors;
     std::string message;
 };
