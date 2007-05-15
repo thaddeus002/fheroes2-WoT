@@ -21,7 +21,9 @@
 #define H2ANIMATION_H
 
 #include <vector>
+#include "sprite.h"
 #include "rect.h"
+#include "background.h"
 #include "gamedefs.h"
 
 class Animation
@@ -31,17 +33,26 @@ public:
 
     Animation(const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
 
+    void BlitFirstSprite(void);
     void DrawSprite(void);
-    void Reset(void);
 
-private:
+protected:
     Rect area;
     bool disable;
-    bool reset;
     u32 frame;
     u32 ticket;
     const u8  mode;
+    const Sprite & first;
     std::vector<const Sprite *> sprites;
+    Background background;
+};
+
+class AnimationButton : public Animation
+{
+public:
+    AnimationButton(const std::string &icn, u16 index, u8 count) : Animation(icn, index, count, Animation::HIGH) {};
+
+    void Reset(void);
 };
 
 #endif

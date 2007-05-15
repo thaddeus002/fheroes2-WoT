@@ -38,12 +38,19 @@ namespace H2Config {
 	ANIMATION	= 0x0008,
 	FULLSCREEN	= 0x0010,
 	EVILINTERFACE	= 0x0020,
+	/*
+	...
+	*/
+	ORIGINAL	= 0x2000,
+	EDITOR		= 0x4000,
 	RLEDEBUG	= 0x8000,
     } bool_t;
 
     void Init(const std::string & filename = "");
 
     bool Debug(void);
+    bool Editor(void);
+    bool Original(void);
     bool RLEDebug(void);
     bool Sound(void);
     bool Music(void);
@@ -67,6 +74,8 @@ namespace H2Config {
     Maps::mapsize_t GetSizeMaps(void);
 
     void SetDebug(void);
+    void SetEditor(void);
+    void SetOriginal(void);
     void SetAGGFile(const std::string & path);
     void SetGameDifficulty(Difficulty::difficulty_t difficulty);
     void SetInterface(bool interface);

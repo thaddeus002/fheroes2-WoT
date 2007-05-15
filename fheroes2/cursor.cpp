@@ -188,3 +188,7 @@ void Cursor::SetOffset(Cursor::themes_t cursor)
 		break;
 	}
 }
+
+/* get rect */
+const Rect & Cursor::GetRect(void)
+{ return Cursor::position; }

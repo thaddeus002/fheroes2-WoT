@@ -20,32 +20,105 @@
 #ifndef H2CASTLE_H
 #define H2CASTLE_H
 
+#include <vector>
 #include <string>
 #include "gamedefs.h"
+#include "maps_tiles.h"
 #include "color.h"
+#include "dialog.h"
 #include "race.h"
+#include "rect.h"
 #include "army.h"
 
+#define HEROESMAXARMY           5 
 #define CASTLEMAXARMY           5 
 #define CASTLEMAXMONSTER        6 
 
 class Castle
 {
 public:
-    Castle(u16 index, const void *ptr, bool rnd = false);
+    typedef enum {
+	BUILD_THIEVESGUILD      = 0x00000001,
+        BUILD_TAVERN            = 0x00000002,
+        BUILD_SHIPYARD          = 0x00000004,
+        BUILD_WELL              = 0x00000008,
+        BUILD_STATUE            = 0x00000010,
+        BUILD_LEFTTURRET        = 0x00000020,
+        BUILD_RIGHTTURRET       = 0x00000040,
+        BUILD_MARKETPLACE       = 0x00000080,
+        BUILD_WEL2              = 0x00000100,   // Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile
+        BUILD_MOAT              = 0x00000200,
+        BUILD_SPEC              = 0x00000400,   // Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
+        BUILD_CASTLE            = 0x00000800,
+        BUILD_CAPTAIN           = 0x00001000,
+        BUILD_BOAT              = 0x00002000,
+        BUILD_MAGEGUILD1        = 0x00004000,
+	BUILD_MAGEGUILD2        = 0x00008000,
+	BUILD_MAGEGUILD3        = 0x00010000,
+	BUILD_MAGEGUILD4        = 0x00020000,
+	BUILD_MAGEGUILD5        = 0x00040000,
+	BUILD_TENT              = 0x00080000,
+	DWELLING_MONSTER1       = 0x00100000,
+	DWELLING_MONSTER2       = 0x00200000,
+	DWELLING_MONSTER3       = 0x00400000,
+	DWELLING_MONSTER4       = 0x00800000,
+	DWELLING_MONSTER5       = 0x01000000,
+	DWELLING_MONSTER6       = 0x02000000,
+	DWELLING_UPGRADE2       = 0x04000000,
+	DWELLING_UPGRADE3       = 0x08000000,
+	DWELLING_UPGRADE4       = 0x10000000,
+	DWELLING_UPGRADE5       = 0x20000000,
+	DWELLING_UPGRADE6       = 0x40000000,
+	DWELLING_UPGRADE7       = 0x80000000        // black dragon
+    } building_t;
+
+    Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
+    
+    bool isCastle(void) const{ return castle; };
+    bool isBuild(building_t bd) const{ return building & bd; };
+
+    Race::race_t GetRace(void) const{ return race; };
+    Color::color_t GetColor(void) const{ return color; };
+    const std::string & GetName(void) const{ return name; };
+    u32 GetUniq(void) const{ return uniq; };
+
+    const Army::Army & GetArmy(u8 index) const{ return index < CASTLEMAXARMY ? army[index] : army [0]; };
+    u8 GetCountArmy(void) const;
+
+    const Point & GetCenter(void) const{ return mp; };
+
+    void ChangeColor(Color::color_t cl);
+
+    void ActionNewDay(void);
+    void ActionNewWeek(void);
+    void ActionNewMonth(void);
+
+    Dialog::answer_t OpenDialog(void);
+
+private:
+    void RedrawResourcePanel(void);
+    void PackAutoMonster(void);
+    void CorrectAreaMaps(void);
+    void ModifyTIlesRNDSprite(Maps::Tiles & tile);
+    void ModifyTIlesFlags(Maps::Tiles & tile);
 
 private:
     Color::color_t	color;
     Race::race_t	race;
     std::string		name;
-    u16			index_map;
     u32			building;
+    bool		castle;
+    bool		captain;
     bool		allow_castle;
     bool		army_spread;
-    bool		boat;
     //MageGuild		guild;
     u16			dwelling[CASTLEMAXMONSTER];
-    Army::army_t	army[CASTLEMAXARMY];
+    Army::Army		army[CASTLEMAXARMY];
+
+    const u32		uniq;
+
+    // center point maps
+    const Point		mp;
 };
 
 #endif

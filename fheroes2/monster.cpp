@@ -18,163 +18,107 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cstdlib>
+#include "agg.h"
 #include "rand.h"
 #include "army.h"
+#include "game.h"
+#include "gamearea.h"
+#include "maps.h"
 #include "monster.h"
 
 namespace Monster {
 
     static const stats_t all_monsters[] = {
-	// level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
-	// peasant
-	{ LEVEL1,   1,   1,   0,   1,   1,   1,  VERYSLOW,    2,  12, "Peasant"        , "PEASANT.ICN" },
-	// archer
-	{ LEVEL1,   5,   3,  12,   2,   3,  10,  VERYSLOW,  150,   8, "Archer"         , "ARCHER.ICN" },
-	// ranger
-	{ LEVEL2,   5,   3,  24,   2,   3,  10,   AVERAGE,  200,   8, "Ranger"         , "ARCHER2.ICN" },
-	// pikeman
-	{ LEVEL2,   5,   9,   0,   3,   4,  15,   AVERAGE,  200,   5, "Pikeman"        , "PIKEMAN.ICN" },
-	// veteran pikeman
-	{ LEVEL2,   5,   9,   0,   3,   4,  20,      FAST,  250,   5, "Veteran Pikeman", "PIKEMAN2.ICN" },
-	// swordsman
-	{ LEVEL3,   7,   9,   0,   4,   6,  25,   AVERAGE,  250,   4, "Swordsman"      , "SWORDSMN.ICN" },
-	// master swordsman
-	{ LEVEL3,   7,   9,   0,   4,   6,  30,      FAST,  300,   4, "Master Swordman", "SWORDSM2.ICN" },
-	// cavalry
-	{ LEVEL3,  10,   9,   0,   5,   9,  30,  VERYFAST,  300,   3, "Cavalry"        , "CAVALRYR.ICN" },
-	// champion
-	{ LEVEL3,  10,   9,   0,   5,  10,  40, ULTRAFAST,  375,   3, "Champion"       , "CAVALRYB.ICN" },
-	// paladin
-	{ LEVEL4,  11,  12,   0,  10,  20,  50,      FAST,  600,   2, "Paladin"        , "PALADIN.ICN" },
-	// crusader
-	{ LEVEL4,  11,  12,   0,  10,  20,  65,  VERYFAST, 1000,   2, "Crusader"       , "PALADIN2.ICN" },
+	// monster            level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
+	{ PEASANT,          LEVEL1,   1,   1,   0,   1,   1,   1,  VERYSLOW,    2,  12, "Peasant"        , "PEASANT.ICN" },
+	{ ARCHER,           LEVEL1,   5,   3,  12,   2,   3,  10,  VERYSLOW,  150,   8, "Archer"         , "ARCHER.ICN" },
+	{ RANGER,           LEVEL2,   5,   3,  24,   2,   3,  10,   AVERAGE,  200,   8, "Ranger"         , "ARCHER2.ICN" },
+	{ PIKEMAN,          LEVEL2,   5,   9,   0,   3,   4,  15,   AVERAGE,  200,   5, "Pikeman"        , "PIKEMAN.ICN" },
+	{ VETERAN_PIKEMAN,  LEVEL2,   5,   9,   0,   3,   4,  20,      FAST,  250,   5, "Veteran Pikeman", "PIKEMAN2.ICN" },
+	{ SWORDSMAN,        LEVEL3,   7,   9,   0,   4,   6,  25,   AVERAGE,  250,   4, "Swordsman"      , "SWORDSMN.ICN" },
+	{ MASTER_SWORDSMAN, LEVEL3,   7,   9,   0,   4,   6,  30,      FAST,  300,   4, "Master Swordman", "SWORDSM2.ICN" },
+	{ CAVALRY,          LEVEL3,  10,   9,   0,   5,   9,  30,  VERYFAST,  300,   3, "Cavalry"        , "CAVALRYR.ICN" },
+	{ CHAMPION,         LEVEL3,  10,   9,   0,   5,  10,  40, ULTRAFAST,  375,   3, "Champion"       , "CAVALRYB.ICN" },
+	{ PALADIN,          LEVEL4,  11,  12,   0,  10,  20,  50,      FAST,  600,   2, "Paladin"        , "PALADIN.ICN" },
+	{ CRUSADER,         LEVEL4,  11,  12,   0,  10,  20,  65,  VERYFAST, 1000,   2, "Crusader"       , "PALADIN2.ICN" },
 
-	// level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
-	// goblin
-	{ LEVEL1,   3,   1,   0,   1,   2,   3,   AVERAGE,   40,  10, "Goblin"         , "GOBLIN.ICN" },
-	// orc
-	{ LEVEL1,   3,   4,   8,   2,   3,  10,  VERYSLOW,  140,   8, "Orc"            , "ORC.ICN" },
-	// chief orc
-	{ LEVEL2,   3,   4,  16,   3,   4,  15,      SLOW,  175,   8, "Orc Chief"      , "ORC2.ICN" },
-	// wolf
-	{ LEVEL2,   6,   2,   0,   3,   5,  20,  VERYFAST,  200,   5, "Wolf"           , "WOLF.ICN" },
-	// ogre
-	{ LEVEL3,   9,   5,   0,   4,   6,  40,  VERYSLOW,  300,   4, "Ogre"           , "OGRE.ICN" },
-	// lord ogre
-	{ LEVEL3,   9,   5,   0,   5,   7,  60,   AVERAGE,  500,   4, "Ogre Lord"      , "OGRE2.ICN" },
-	// troll
-	{ LEVEL3,  10,   5,   8,   5,   7,  40,   AVERAGE,  600,   3, "Troll"          , "TROLL.ICN" },
-	// war troll
-	{ LEVEL3,  10,   5,  16,   7,   9,  40,      FAST,  700,   3, "War Troll"      , "TROLL2.ICN" },
-	// cyclops
-	{ LEVEL4,  12,   9,   0,  12,  24,  80,      FAST,  750,   2, "Cyclops"        , "CYCLOPS.ICN" },
+	// monster     level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
+	{ GOBLIN,    LEVEL1,   3,   1,   0,   1,   2,   3,   AVERAGE,   40,  10, "Goblin"         , "GOBLIN.ICN" },
+	{ ORC,       LEVEL1,   3,   4,   8,   2,   3,  10,  VERYSLOW,  140,   8, "Orc"            , "ORC.ICN" },
+	{ CHIEF_ORC, LEVEL2,   3,   4,  16,   3,   4,  15,      SLOW,  175,   8, "Orc Chief"      , "ORC2.ICN" },
+	{ WOLF,      LEVEL2,   6,   2,   0,   3,   5,  20,  VERYFAST,  200,   5, "Wolf"           , "WOLF.ICN" },
+	{ OGRE,      LEVEL3,   9,   5,   0,   4,   6,  40,  VERYSLOW,  300,   4, "Ogre"           , "OGRE.ICN" },
+	{ LORD_OGRE, LEVEL3,   9,   5,   0,   5,   7,  60,   AVERAGE,  500,   4, "Ogre Lord"      , "OGRE2.ICN" },
+	{ TROLL,     LEVEL3,  10,   5,   8,   5,   7,  40,   AVERAGE,  600,   3, "Troll"          , "TROLL.ICN" },
+	{ WAR_TROLL, LEVEL3,  10,   5,  16,   7,   9,  40,      FAST,  700,   3, "War Troll"      , "TROLL2.ICN" },
+	{ CYCLOPS,   LEVEL4,  12,   9,   0,  12,  24,  80,      FAST,  750,   2, "Cyclops"        , "CYCLOPS.ICN" },
 
-	// level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
-	// sprite
-	{ LEVEL1,   4,   2,   0,   1,   2,   2,   AVERAGE,   50,   8, "Sprite"         , "SPRITE.ICN" },
-	// dwarf
-	{ LEVEL2,   6,   5,   0,   2,   4,  20,  VERYSLOW,  200,   6, "Dwarf"          , "DWARF.ICN" },
-	// battle dwarf
-	{ LEVEL2,   6,   6,   0,   2,   4,  20,   AVERAGE,  250,   6, "Battle Dwarf"   , "DWARF2.ICN" },
-	// elf
-	{ LEVEL2,   4,   3,  24,   2,   3,  15,   AVERAGE,  250,   4, "Elf"            , "ELF.ICN" },
-	// grand elf
-	{ LEVEL2,   5,   5,  24,   2,   3,  15,  VERYFAST,  300,   4, "Grand Elf"      , "ELF2.ICN" },
-	// druid
-	{ LEVEL3,   7,   5,   8,   5,   8,  25,      FAST,  350,   3, "Druid"          , "DRUID.ICN" },
-	// greater druid
-	{ LEVEL3,   7,   7,  16,   5,   8,  25,  VERYFAST,  400,   3, "Greater Druid"  , "DRUID2.ICN" },
-	// unicorn
-	{ LEVEL4,  10,   9,   0,   7,  14,  40,      FAST,  500,   2, "Unicorn"        , "UNICORN.ICN" },
-	// phoenix
-	{ LEVEL4,  12,  10,   0,  20,  40, 100, ULTRAFAST, 1500,   1, "Phoenix"        , "PHOENIX.ICN" },
+	// monster         level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
+	{ SPRITE,        LEVEL1,   4,   2,   0,   1,   2,   2,   AVERAGE,   50,   8, "Sprite"         , "SPRITE.ICN" },
+	{ DWARF,         LEVEL2,   6,   5,   0,   2,   4,  20,  VERYSLOW,  200,   6, "Dwarf"          , "DWARF.ICN" },
+	{ BATTLE_DWARF,  LEVEL2,   6,   6,   0,   2,   4,  20,   AVERAGE,  250,   6, "Battle Dwarf"   , "DWARF2.ICN" },
+	{ ELF,           LEVEL2,   4,   3,  24,   2,   3,  15,   AVERAGE,  250,   4, "Elf"            , "ELF.ICN" },
+	{ GRAND_ELF,     LEVEL2,   5,   5,  24,   2,   3,  15,  VERYFAST,  300,   4, "Grand Elf"      , "ELF2.ICN" },
+	{ DRUID,         LEVEL3,   7,   5,   8,   5,   8,  25,      FAST,  350,   3, "Druid"          , "DRUID.ICN" },
+	{ GREATER_DRUID, LEVEL3,   7,   7,  16,   5,   8,  25,  VERYFAST,  400,   3, "Greater Druid"  , "DRUID2.ICN" },
+	{ UNICORN,       LEVEL4,  10,   9,   0,   7,  14,  40,      FAST,  500,   2, "Unicorn"        , "UNICORN.ICN" },
+	{ PHOENIX,       LEVEL4,  12,  10,   0,  20,  40, 100, ULTRAFAST, 1500,   1, "Phoenix"        , "PHOENIX.ICN" },
 
-	// level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
-	// centaur
-	{ LEVEL1,   3,   1,   8,   1,   2,   5,   AVERAGE,   60,   8, "Centaur"        , "CENTAUR.ICN" },
-	// gargoyle
-	{ LEVEL2,   4,   7,   0,   2,   3,  15,  VERYFAST,  200,   6, "Gargoyle"       , "GARGOYLE.ICN" },
-	// griffin
-	{ LEVEL3,   6,   6,   0,   3,   5,  25,   AVERAGE,  300,   4, "Griffin"        , "GRIFFIN.ICN" },
-	// minotaur
-	{ LEVEL3,   9,   8,   0,   5,  10,  35,   AVERAGE,  400,   3, "Minotaur"       , "MINOTAUR.ICN" },
-	// knight minotaur
-	{ LEVEL3,   9,   8,   0,   5,  10,  45,  VERYFAST,  500,   3, "Minotaur King"  , "MINOTAU2.ICN" },
-	// hydra
-	{ LEVEL4,   8,   9,   0,   6,  12,  75,  VERYSLOW,  800,   2, "Hydra"          , "HYDRA.ICN" },
-	// green dragon
-	{ LEVEL4,  12,  12,   0,  25,  50, 200,   AVERAGE, 3000,   1, "Green Dragon"   , "DRAGGREE.ICN" },
-	// red dragon
-	{ LEVEL4,  13,  13,   0,  25,  50, 250,      FAST, 3500,   1, "Red Dragon"     , "DRAGRED.ICN" },
-	// black dragon
-	{ LEVEL4,  14,  14,   0,  25,  50, 300,  VERYFAST, 4000,   1, "Black Dragon"   , "DRAGBLAK.ICN" },
+	// monster           level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
+	{ CENTAUR,         LEVEL1,   3,   1,   8,   1,   2,   5,   AVERAGE,   60,   8, "Centaur"        , "CENTAUR.ICN" },
+	{ GARGOYLE,        LEVEL2,   4,   7,   0,   2,   3,  15,  VERYFAST,  200,   6, "Gargoyle"       , "GARGOYLE.ICN" },
+	{ GRIFFIN,         LEVEL3,   6,   6,   0,   3,   5,  25,   AVERAGE,  300,   4, "Griffin"        , "GRIFFIN.ICN" },
+	{ MINOTAUR,        LEVEL3,   9,   8,   0,   5,  10,  35,   AVERAGE,  400,   3, "Minotaur"       , "MINOTAUR.ICN" },
+	{ KNIGHT_MINOTAUR, LEVEL3,   9,   8,   0,   5,  10,  45,  VERYFAST,  500,   3, "Minotaur King"  , "MINOTAU2.ICN" },
+	{ HYDRA,           LEVEL4,   8,   9,   0,   6,  12,  75,  VERYSLOW,  800,   2, "Hydra"          , "HYDRA.ICN" },
+	{ GREEN_DRAGON,    LEVEL4,  12,  12,   0,  25,  50, 200,   AVERAGE, 3000,   1, "Green Dragon"   , "DRAGGREE.ICN" },
+	{ RED_DRAGON,      LEVEL4,  13,  13,   0,  25,  50, 250,      FAST, 3500,   1, "Red Dragon"     , "DRAGRED.ICN" },
+	{ BLACK_DRAGON,    LEVEL4,  14,  14,   0,  25,  50, 300,  VERYFAST, 4000,   1, "Black Dragon"   , "DRAGBLAK.ICN" },
 
-	// level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
-	// halfling
-	{ LEVEL1,   2,   1,  12,   1,   3,   3,      SLOW,   50,   8, "Halfling"       , "HALFLING.ICN" },
-	// boar
-	{ LEVEL2,   5,   4,   0,   2,   3,  15,  VERYFAST,  150,   6, "Boar"           , "BOAR.ICN" },
-	// iron golem
-	{ LEVEL2,   5,  10,   0,   4,   5,  30,  VERYSLOW,  300,   4, "Iron Golem"     , "GOLEM.ICN" },
-	// steel golem
-	{ LEVEL3,   7,  10,   0,   4,   5,  35,      SLOW,  350,   4, "Steel Golem"    , "GOLEM2.ICN" },
-	// roc
-	{ LEVEL3,   7,   7,   0,   4,   8,  40,   AVERAGE,  400,   3, "Roc"            , "ROC.ICN" },
-	// mage
-	{ LEVEL3,  11,   7,  12,   7,   9,  30,      FAST,  600,   2, "Mage"           , "MAGE1.ICN" },
-	// archi mage
-	{ LEVEL3,  12,   8,  24,   7,   9,  35,  VERYFAST,  700,   2, "Archmage"       , "MAGE2.ICN" },
-	// giant
-	{ LEVEL4,  13,  10,   0,  20,  30, 150,   AVERAGE, 2000,   1, "Giant"          , "TITANBLU.ICN" },
-	// titan
-	{ LEVEL4,  15,  15,  24,  20,  30, 300,  VERYFAST, 5000,   1, "Titan"          , "TITANBLA.ICN" },
+	// monster       level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
+	{ HALFLING,    LEVEL1,   2,   1,  12,   1,   3,   3,      SLOW,   50,   8, "Halfling"       , "HALFLING.ICN" },
+	{ BOAR,        LEVEL2,   5,   4,   0,   2,   3,  15,  VERYFAST,  150,   6, "Boar"           , "BOAR.ICN" },
+	{ IRON_GOLEM,  LEVEL2,   5,  10,   0,   4,   5,  30,  VERYSLOW,  300,   4, "Iron Golem"     , "GOLEM.ICN" },
+	{ STEEL_GOLEM, LEVEL3,   7,  10,   0,   4,   5,  35,      SLOW,  350,   4, "Steel Golem"    , "GOLEM2.ICN" },
+	{ ROC,         LEVEL3,   7,   7,   0,   4,   8,  40,   AVERAGE,  400,   3, "Roc"            , "ROC.ICN" },
+	{ MAGE,        LEVEL3,  11,   7,  12,   7,   9,  30,      FAST,  600,   2, "Mage"           , "MAGE1.ICN" },
+	{ ARCHMAGE,    LEVEL3,  12,   8,  24,   7,   9,  35,  VERYFAST,  700,   2, "Archmage"       , "MAGE2.ICN" },
+	{ GIANT,       LEVEL4,  13,  10,   0,  20,  30, 150,   AVERAGE, 2000,   1, "Giant"          , "TITANBLU.ICN" },
+	{ TITAN,       LEVEL4,  15,  15,  24,  20,  30, 300,  VERYFAST, 5000,   1, "Titan"          , "TITANBLA.ICN" },
 
-	// level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
-	// skeleton
-	{ LEVEL1,   4,   3,   0,   2,   3,   4,   AVERAGE,   75,   8, "Skeleton"       , "SKELETON.ICN" },
-	// zombie
-	{ LEVEL1,   5,   2,   0,   2,   3,  15,  VERYSLOW,  150,   6, "Zombie"         , "ZOMBIE.ICN" },
-	// mutant zombie
-	{ LEVEL2,   5,   2,   0,   2,   3,  25,   AVERAGE,  200,   6, "Mutant Zombie"  , "ZOMBIE2.ICN" },
-	// mummy
-	{ LEVEL2,   6,   6,   0,   3,   4,  25,   AVERAGE,  250,   4, "Mummy"          , "MUMMYW.ICN" },
-	// royal mummy
-	{ LEVEL3,   6,   6,   0,   3,   4,  30,      FAST,  300,   4, "Royal Mummy"    , "MUMMY2.ICN" },
-	// vampire
-	{ LEVEL3,   8,   6,   0,   5,   7,  30,   AVERAGE,  500,   3, "Vampire"        , "VAMPIRE.ICN" },
-	// lord vampire
-	{ LEVEL3,   8,   6,   0,   5,   7,  40,      FAST,  650,   3, "Lord Vampire"   , "VAMPIRE2.ICN" },
-	// lich
-	{ LEVEL3,   7,  12,  12,   8,  10,  25,      FAST,  750,   2, "Lich"           , "LICH.ICN" },
-	// power lich
-	{ LEVEL4,   7,  13,  24,   8,  10,  35,  VERYFAST,  900,   2, "Power Lich"     , "LICH2.ICN" },
-	// bone dragon
-	{ LEVEL4,  11,   9,   0,  25,  45, 150,   AVERAGE, 1500,   1, "Bone Dragon"    , "DRAGBONE.ICN" },
+	// monster         level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
+	{ SKELETON,      LEVEL1,   4,   3,   0,   2,   3,   4,   AVERAGE,   75,   8, "Skeleton"       , "SKELETON.ICN" },
+	{ ZOMBIE,        LEVEL1,   5,   2,   0,   2,   3,  15,  VERYSLOW,  150,   6, "Zombie"         , "ZOMBIE.ICN" },
+	{ MUTANT_ZOMBIE, LEVEL2,   5,   2,   0,   2,   3,  25,   AVERAGE,  200,   6, "Mutant Zombie"  , "ZOMBIE2.ICN" },
+	{ MUMMY,         LEVEL2,   6,   6,   0,   3,   4,  25,   AVERAGE,  250,   4, "Mummy"          , "MUMMYW.ICN" },
+	{ ROYAL_MUMMY,   LEVEL3,   6,   6,   0,   3,   4,  30,      FAST,  300,   4, "Royal Mummy"    , "MUMMY2.ICN" },
+	{ VAMPIRE,       LEVEL3,   8,   6,   0,   5,   7,  30,   AVERAGE,  500,   3, "Vampire"        , "VAMPIRE.ICN" },
+	{ LORD_VAMPIRE,  LEVEL3,   8,   6,   0,   5,   7,  40,      FAST,  650,   3, "Lord Vampire"   , "VAMPIRE2.ICN" },
+	{ LICH,          LEVEL3,   7,  12,  12,   8,  10,  25,      FAST,  750,   2, "Lich"           , "LICH.ICN" },
+	{ POWER_LICH,    LEVEL4,   7,  13,  24,   8,  10,  35,  VERYFAST,  900,   2, "Power Lich"     , "LICH2.ICN" },
+	{ BONE_DRAGON,   LEVEL4,  11,   9,   0,  25,  45, 150,   AVERAGE, 1500,   1, "Bone Dragon"    , "DRAGBONE.ICN" },
 
-	// level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
-	// rogue
-	{ LEVEL1,  6,   1,   0,   1,   2,   4,      FAST,   50,   4, "Rogue"          , "ROGUE.ICN" },
-	// nomad
-	{ LEVEL2,  7,   6,   0,   2,   5,  20,  VERYFAST,  200,   4, "Nomad"          , "NOMAD.ICN" },
-	// ghost
-	{ LEVEL3,  8,   7,   0,   4,   6,  20,      FAST, 1000,   4, "Ghost"          , "GHOST.ICN" },
-	// medusa
-	{ LEVEL3,  8,   9,   0,   6,  10,  35,   AVERAGE,  500,   4, "Medusa"         , "MEDUSA.ICN" },
-	// genie
-	{ LEVEL4, 10,   9,   0,  20,  30,  50,  VERYFAST,  650,   4, "Genie"          , "GENIE.ICN" },
-	// earth element
-	{ LEVEL3,  8,   8,   0,   4,   5,  50,      SLOW,  500,   4, "Earth Element"  , "EELEM.ICN" },
-	// air element
-	{ LEVEL3,  7,   7,   0,   2,   8,  35,  VERYFAST,  500,   4, "Air Element"    , "AELEM.ICN" },
-	// fire element
-	{ LEVEL3,  8,   6,   0,   4,   6,  40,      FAST,  500,   4, "Fire Element"   , "FELEM.ICN" },
-	// water element
-	{ LEVEL3,  6,   8,   0,   3,   7,  45,   AVERAGE,  500,   4, "Water Element"  , "WELEM.ICN" },
+	// monster         level atck dfnc shts  min  max   hp      speed  cost grwn  name            file
+	{ ROGUE,         LEVEL1,  6,   1,   0,   1,   2,   4,      FAST,   50,   4, "Rogue"          , "ROGUE.ICN" },
+	{ NOMAD,         LEVEL2,  7,   6,   0,   2,   5,  20,  VERYFAST,  200,   4, "Nomad"          , "NOMAD.ICN" },
+	{ GHOST,         LEVEL3,  8,   7,   0,   4,   6,  20,      FAST, 1000,   4, "Ghost"          , "GHOST.ICN" },
+	{ MEDUSA,        LEVEL3,  8,   9,   0,   6,  10,  35,   AVERAGE,  500,   4, "Medusa"         , "MEDUSA.ICN" },
+	{ GENIE,         LEVEL4, 10,   9,   0,  20,  30,  50,  VERYFAST,  650,   4, "Genie"          , "GENIE.ICN" },
+	{ EARTH_ELEMENT, LEVEL3,  8,   8,   0,   4,   5,  50,      SLOW,  500,   4, "Earth Element"  , "EELEM.ICN" },
+	{ AIR_ELEMENT,   LEVEL3,  7,   7,   0,   2,   8,  35,  VERYFAST,  500,   4, "Air Element"    , "AELEM.ICN" },
+	{ FIRE_ELEMENT,  LEVEL3,  8,   6,   0,   4,   6,  40,      FAST,  500,   4, "Fire Element"   , "FELEM.ICN" },
+	{ WATER_ELEMENT, LEVEL3,  6,   8,   0,   3,   7,  45,   AVERAGE,  500,   4, "Water Element"  , "WELEM.ICN" },
 	
 	// unknown
-	{ LEVEL1,  0,   0,   0,   0,   0,   0,  VERYSLOW, 9999,   0, "Unknown"       , "UNKNOWN.ICN" }
+	{ UNKNOWN,       LEVEL1,  0,   0,   0,   0,   0,   0,  VERYSLOW, 9999,   0, "Unknown"       , "UNKNOWN.ICN" }
     };
 
+}
+
+Monster::monster_t Monster::Monster(u8 num)
+{
+    return UNKNOWN > num ? all_monsters[num].monster : UNKNOWN;
 }
 
 /* get stats monster */
@@ -295,11 +239,94 @@ Monster::monster_t Monster::Rand4(void)
 u16 Monster::RandCount(Monster::monster_t monster)
 {
     switch(GetStats(monster).level){
-        case Monster::LEVEL1: return Rand::Get(Army::THRONG, Army::LOTS) + Army::LOTS;
-	case Monster::LEVEL2: return Rand::Get(Army::HORDE, Army::PACK) + Army::PACK;
-	case Monster::LEVEL3: return Rand::Get(Army::LOTS, Army::SEVERAL) + Army::SEVERAL;
+        case Monster::LEVEL1: return Rand::Get(Army::Size::THRONG, Army::Size::LOTS) + Army::Size::LOTS;
+	case Monster::LEVEL2: return Rand::Get(Army::Size::HORDE, Army::Size::PACK) + Army::Size::PACK;
+	case Monster::LEVEL3: return Rand::Get(Army::Size::LOTS, Army::Size::SEVERAL) + Army::Size::SEVERAL;
 	default: break;
     }
 
-    return Rand::Get(Army::PACK, Army::FEW) + Army::FEW;
+    return Rand::Get(Army::Size::PACK, Army::Size::FEW) + Army::Size::FEW;
 }
+
+/*
+void Monster::BlitMiniSprite(u16 ox, u16 oy, monster_t monster, bool first)
+{
+    static u32 ticket = 0;
+
+    u16 gaw = GameArea::GetRect().w;
+    u16 gah = GameArea::GetRect().h;
+
+    // draw first sprite
+    const Sprite & sprite_first = AGG::GetICN("MINIMON.ICN", monster * 9);
+
+    s16 dx = ox + TILEWIDTH / 2;
+	dx -= std::abs(sprite_first.x());
+    s16 dy = oy + TILEWIDTH;
+        dy -= std::abs(sprite_first.y());
+	dy -= 5;
+
+    Rect src_rt(0, 0, sprite_first.w(), sprite_first.h());
+
+    // left bound
+    if(dx < BORDERWIDTH){
+	src_rt.x = (dx < 0 ? std::abs(dx) + BORDERWIDTH : BORDERWIDTH - dx);
+	src_rt.w -= src_rt.x;
+        dx = BORDERWIDTH;
+    }
+
+    // top bound
+    if(dy < BORDERWIDTH){
+        src_rt.y = (dy < 0 ? std::abs(dy) + BORDERWIDTH : BORDERWIDTH - dy);
+        src_rt.h -= src_rt.y;
+        dy = BORDERWIDTH;
+    }
+
+    // right bound
+    if(dx + sprite_first.w() > BORDERWIDTH + TILEWIDTH * gaw)
+	src_rt.w -= (dx + sprite_first.w()) - (BORDERWIDTH + TILEWIDTH * gaw);
+
+    // bottom bound
+    if(dy + sprite_first.h() > BORDERWIDTH + TILEWIDTH * gah)
+	src_rt.h -= (dy + sprite_first.h()) - (BORDERWIDTH + TILEWIDTH * gah);
+
+    display.Blit(sprite_first, src_rt, dx, dy);
+
+    // draw first sprite
+    const Sprite & sprite_next = (first ? AGG::GetICN("MINIMON.ICN", monster * 9 + 1) :
+	AGG::GetICN("MINIMON.ICN", monster * 9 + 1 + (ticket % 6)));
+
+    dx = ox + TILEWIDTH / 2;
+    dx -= std::abs(sprite_next.x());
+    dy = oy + TILEWIDTH;
+    dy -= std::abs(sprite_next.y());
+    dy -= 5;
+
+    src_rt = Rect(0, 0, sprite_next.w(), sprite_next.h());
+
+    // left bound
+    if(dx < BORDERWIDTH){
+	src_rt.x = (dx < 0 ? std::abs(dx) + BORDERWIDTH : BORDERWIDTH - dx);
+	src_rt.w -= src_rt.x;
+        dx = BORDERWIDTH;
+    }
+
+    // top bound
+    if(dy < BORDERWIDTH){
+        src_rt.y = (dy < 0 ? std::abs(dy) + BORDERWIDTH : BORDERWIDTH - dy);
+        src_rt.h -= src_rt.y;
+        dy = BORDERWIDTH;
+    }
+
+    // right bound
+    if(dx + sprite_next.w() > BORDERWIDTH + TILEWIDTH * gaw)
+	src_rt.w -= (dx + sprite_next.w()) - (BORDERWIDTH + TILEWIDTH * gaw);
+
+    // bottom bound
+    if(dy + sprite_next.h() > BORDERWIDTH + TILEWIDTH * gah)
+	src_rt.h -= (dy + sprite_next.h()) - (BORDERWIDTH + TILEWIDTH * gah);
+
+    display.Blit(sprite_next, src_rt, dx, dy);
+
+    ++ticket;    
+}
+*/

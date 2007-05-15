@@ -21,7 +21,9 @@
 #define H2ARTIFACT_H
 
 #include <string>
-#include "sprite.h"
+#include <vector>
+#include "maps_tiles.h"
+#include "mp2.h"
 #include "gamedefs.h"
 
 namespace Artifact
@@ -121,6 +123,7 @@ namespace Artifact
     } stats_t;
 
     artifact_t RandUltimate(void);
+    artifact_t Rand(MP2::object_t object);
     artifact_t Rand(void);
     artifact_t Rand1(void);
     artifact_t Rand2(void);
@@ -132,7 +135,9 @@ namespace Artifact
     artifact_t Artifact(u8 index);
     artifact_t FromMP2(u8 index);
     
-    const Sprite & GetForMapsSprite(artifact_t artifact);
+    u8 GetIndexSprite(Artifact::artifact_t artifact);
+    
+    void ChangeTileWithRNDArtifact(std::vector<Maps::Tiles *> & vector, u16 center);
 };
 
 #endif

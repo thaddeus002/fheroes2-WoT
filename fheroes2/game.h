@@ -42,10 +42,17 @@ namespace Game
         SCENARIOINFO,
         SELECTSCENARIO,
 	STARTGAME,
-	SAVEGAME
+	SAVEGAME,
+	EDITNEWMAP,
+	EDITLOADMAP
     } menu_t;
 
     typedef enum { HEROES, CASTLE, BOAT } focus_t;
+
+    typedef struct {
+	focus_t		type;
+	Point		center;
+    } gamefocus_t;
 
     int GlobalFilterEvents(const SDL_Event *event);
 
@@ -64,6 +71,11 @@ namespace Game
     menu_t StartGame(void);
 
     void DrawInterface(void);
+    
+    namespace Editor
+    {
+	Game::menu_t MainMenu(void);
+    };
 };
 
 #endif

@@ -61,6 +61,12 @@ public:
     inline bool operator!= (const Rect & rt) const{ return !(*this == rt); };
     // rect include point
     inline bool operator& (const Point & pt) const{ return !(pt.x < x || pt.y < y || pt.x >= (x + w) || pt.y >= (y + h)); };
+    // rect intersects rect
+    inline bool operator& (const Rect & rt) const{ return
+	*this & Point(rt.x, rt.y) ||
+	*this & Point(rt.x + rt.w, rt.y) ||
+	*this & Point(rt.x, rt.y + rt.h) ||
+	*this & Point(rt.x + rt.w, rt.y + rt.h); };
 };
 
 #endif

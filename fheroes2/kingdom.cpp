@@ -19,10 +19,20 @@
  ***************************************************************************/
 
 #include "config.h"
+#include "castle.h"
+#include "heroes.h"
+#include "error.h"
 #include "difficulty.h"
+#include "game_statuswindow.h" 
 #include "kingdom.h"
 
-Kingdom::Kingdom(bool playing) : build(false), play(playing)
+#define INCOME_CASTLE_GOLD	1000 
+#define INCOME_TOWN_GOLD	750 
+#define INCOME_STATUE_GOLD	250 
+#define INCOME_DUNGEON_GOLD	500 
+
+
+Kingdom::Kingdom(Color::color_t cl) : color(cl), build(false), play(cl & H2Config::GetKingdomColors() ? true : false)
 {
     // set starting resource
     switch(H2Config::GetGameDifficulty()){
@@ -71,5 +81,104 @@ Kingdom::Kingdom(bool playing) : build(false), play(playing)
 	    resource.gems	= 0;
 	    resource.gold	= 0;
 	    break;
+    }
+}
+
+void Kingdom::AITurns(const Game::StatusWindow & status)
+{
+    status.RedrawAITurns(color, 0);
+    status.RedrawAITurns(color, 1);
+    status.RedrawAITurns(color, 2);
+    status.RedrawAITurns(color, 3);
+    status.RedrawAITurns(color, 4);
+    status.RedrawAITurns(color, 5);
+    status.RedrawAITurns(color, 6);
+    status.RedrawAITurns(color, 7);
+    status.RedrawAITurns(color, 8);
+    status.RedrawAITurns(color, 9);
+
+    if(H2Config::Debug()) Error::Verbose("Kingdom::AITurns: " + Color::String(color) + " moved");
+}
+
+void Kingdom::ActionNewDay(void)
+{
+    // castle New Day
+    for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewDay();
+
+    // gold
+    for(u16 ii = 0; ii < castles.size(); ++ii)
+    {
+	// castle or town profit
+	resource.gold += ((*castles[ii]).isCastle() ? INCOME_CASTLE_GOLD : INCOME_TOWN_GOLD);
+
+	// statue
+	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_STATUE) ? INCOME_STATUE_GOLD : 0);
+
+	// dungeon for warlock
+	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_SPEC) && Race::WRLK == (*castles[ii]).GetRace() ? INCOME_STATUE_GOLD : 0);
+    }
+}
+
+void Kingdom::ActionNewWeek(void)
+{
+    // castle New Week
+    for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewWeek();
+}
+
+void Kingdom::ActionNewMonth(void)
+{
+    // castle New Month
+    for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewMonth();
+}
+
+void Kingdom::AddHeroes(const Heroes *hero)
+{
+    if(hero)
+    {
+	std::vector<Heroes *>::const_iterator ith = heroes.begin();
+
+	for(; ith != heroes.end(); ++ith) if(*ith == hero) return;
+
+	heroes.push_back(const_cast<Heroes *>(hero));
+    }
+}
+
+void Kingdom::RemoveHeroes(const Heroes *hero)
+{
+    if(hero && heroes.size())
+    {
+	std::vector<Heroes *>::iterator ith = heroes.begin();
+
+	for(; ith != heroes.end(); ++ith) if(*ith == hero)
+	{
+	    heroes.erase(ith);
+	    break;
+	}
+    }
+}
+
+void Kingdom::AddCastle(const Castle *castle)
+{
+    if(castle)
+    {
+	std::vector<Castle *>::const_iterator itk = castles.begin();
+
+	for(; itk != castles.end(); ++itk) if(*itk == castle) return;
+
+	castles.push_back(const_cast<Castle *>(castle));
+    }
+}
+
+void Kingdom::RemoveCastle(const Castle *castle)
+{
+    if(castle && castles.size())
+    {
+	std::vector<Castle *>::iterator itk = castles.begin();
+
+	for(; itk != castles.end(); ++itk) if(*itk == castle)
+	{
+	    castles.erase(itk);
+	    break;
+	}
     }
 }

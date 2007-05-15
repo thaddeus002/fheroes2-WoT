@@ -20,7 +20,9 @@
 
 #include "army.h"
 
-const std::string & Army::String(Army::size_t size)
+using namespace Army;
+
+const std::string & Size::String(Size::size_t size)
 {
     static const std::string few("Few");
     static const std::string several("Several");
@@ -33,16 +35,17 @@ const std::string & Army::String(Army::size_t size)
     static const std::string legion("Legion");
 
     switch(size){
-	case Army::FEW:		return few;
-        case Army::SEVERAL:	return several;
-        case Army::PACK:	return pack;
-        case Army::LOTS:	return lots;
-        case Army::HORDE:	return horde;
-        case Army::THRONG:	return throng;
-        case Army::SWARM:	return swarm;
-        case Army::ZOUNDS:	return zounds;
+	case Size::FEW:		return few;
+        case Size::SEVERAL:	return several;
+        case Size::PACK:	return pack;
+        case Size::LOTS:	return lots;
+        case Size::HORDE:	return horde;
+        case Size::THRONG:	return throng;
+        case Size::SWARM:	return swarm;
+        case Size::ZOUNDS:	return zounds;
         default: break;
     }
     
     return legion;
 }
+

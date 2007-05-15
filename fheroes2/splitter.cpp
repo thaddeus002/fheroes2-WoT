@@ -25,6 +25,7 @@
 Splitter::Splitter(const Surface &sf, const Rect &rt, positions_t pos)
     : SpriteCursor(sf, rt), area(rt), step(0), min(0), max(0), cur(0), position(pos)
 {
+    SpriteCursor::Move(rt);
 }
 
 /* set range */

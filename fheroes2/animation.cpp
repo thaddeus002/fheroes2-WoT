@@ -20,6 +20,7 @@
 
 #include "agg.h"
 #include "cursor.h"
+#include "config.h"
 #include "localevent.h"
 #include "sprite.h"
 #include "display.h"
@@ -30,9 +31,14 @@
 #define ANIMATION_LOW		27
 
 Animation::Animation(const std::string &icn, u16 index, u8 count, u8 amode) 
-    : area(display.w(), display.h(), 0, 0), disable(false), reset(false), frame(0), ticket(0), mode(amode), sprites()
+    : area(display.w(), display.h(), 0, 0), disable(false), frame(0), ticket(0), mode(amode), first(AGG::GetICN(icn, index))
 {
-    for(int ii = index; ii < index + count; ++ii){
+    if(first.x() < area.x) area.x = first.x();
+    if(first.y() < area.y) area.y = first.y();
+    if(first.w() > area.w) area.w = first.w();
+    if(first.h() > area.h) area.h = first.h();
+
+    for(int ii = index + 1; ii < index + count; ++ii){
         const Sprite &sprite = AGG::GetICN(icn, ii);
         if(sprite.x() < area.x) area.x = sprite.x();
         if(sprite.y() < area.y) area.y = sprite.y();
@@ -40,6 +46,17 @@ Animation::Animation(const std::string &icn, u16 index, u8 count, u8 amode)
         if(sprite.h() > area.h) area.h = sprite.h();
         sprites.push_back(&sprite);
     }
+}
+
+void Animation::BlitFirstSprite(void)
+{
+    const Sprite & sprite = *sprites[0];
+
+    // restore or save background
+    background.valid() ? background.Restore() : background.Save(area);
+
+    display.Blit(first, first.x(), first.y());
+    display.Blit(sprite, sprite.x(), sprite.y());
 }
 
 void Animation::DrawSprite(void)
@@ -57,10 +74,14 @@ void Animation::DrawSprite(void)
 
     // hide cursor
     bool localcursor = false;
-    if(area & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    if(area & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     const Sprite & sprite = *sprites[frame % sprites.size()];
 
+    // restore or save background
+    background.valid() ? background.Restore() : background.Save(area);
+
+    display.Blit(first, first.x(), first.y());
     display.Blit(sprite, sprite.x(), sprite.y());
     display.Flip();
 
@@ -68,25 +89,21 @@ void Animation::DrawSprite(void)
 
     frame++;
 
-    reset = false;
-
     if(!(mode & INFINITY) && frame == sprites.size()) disable = true;
     //if(!(mode & RING))
 }
 
-void Animation::Reset(void)
+void AnimationButton::Reset(void)
 {
-    if(!disable || reset) return;
+    if(!disable || (0 == frame && 0 == ticket)) return;
 
     bool localcursor = false;
-    if(area & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    if(area & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
-    const Sprite & sprite = *sprites[0];
-    display.Blit(sprite, sprite.x(), sprite.y());
+    display.Blit(first, first.x(), first.y());
 
     ticket = 0;
     frame = 0;
-    reset = true;
     disable = false;
 
     localcursor ? Cursor::Show() : display.Flip();

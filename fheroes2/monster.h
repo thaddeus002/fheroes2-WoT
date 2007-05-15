@@ -124,20 +124,22 @@ namespace Monster
     } monster_t;
 
     typedef struct {
+	monster_t monster;
 	level_t level;
 	u8 attack;
 	u8 defence;
 	u8 shots;
 	u8 damageMin;
 	u8 damageMax;
-	u8 hp;
+	u16 hp;
 	speed_t speed;
-	u8 cost;
+	u16 cost;
 	u8 grown;
 	const std::string name;
 	const std::string file;
     } stats_t;
 
+    monster_t Monster(u8 num);
 
     const std::string & String(monster_t monster);
     const stats_t & GetStats(monster_t monster);
@@ -148,7 +150,7 @@ namespace Monster
     monster_t Rand3(void);
     monster_t Rand4(void);
 
-    u16 RandCount(Monster::monster_t monster);
+    u16 RandCount(monster_t monster);
 };
 
 #endif

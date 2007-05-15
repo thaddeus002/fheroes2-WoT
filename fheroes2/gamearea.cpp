@@ -19,129 +19,121 @@
  ***************************************************************************/
 
 #include "config.h"
-#include "game.h"
 #include "cursor.h"
 #include "error.h"
+#include "display.h"
+#include "world.h"
+#include "game.h"
 #include "gamearea.h"
 
-Rect GameArea::pos = Rect(0, 0, 0, 0);
+Rect GameArea::area_pos = Rect(0, 0, 0, 0);
 
-GameArea::GameArea(const World &wd) : world(wd)
+GameArea::GameArea()
 {
-    // static values
-    // width area  = (display.w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH
-    // height area = (display.h() - 2 * BORDERWIDTH) / TILEWIDTH
-
-    pos.x = 0;
-    pos.y = 0;
+    area_pos.x = 0;
+    area_pos.y = 0;
 
     switch(H2Config::GetVideoMode()){
 	default:
-	    pos.w = 14;
-	    pos.h = 14;
+	    area_pos.w = 14;
+	    area_pos.h = 14;
 	    break;
 	case Display::MEDIUM:
-	    pos.w = 19;
-	    pos.h = 17;
+	    area_pos.w = 19;
+	    area_pos.h = 17;
 	    break;
 	case Display::LARGE:
-	    pos.w = 26;
-	    pos.h = 23;
+	    area_pos.w = 26;
+	    area_pos.h = 23;
 	    break;
 	case Display::XLARGE:
-	    pos.w = 34;
-	    pos.h = 31;
+	    area_pos.w = 34;
+	    area_pos.h = 31;
 	    break;
     }
-}
-
-/* readraw all */
-void GameArea::Redraw(void)
-{
-    world.Redraw(pos);
 }
 
 /* readraw rect */
 void GameArea::Redraw(const Rect &area_rt)
 {
-    world.Redraw(area_rt, Point(area_rt.x, area_rt.y));
+    static u32 animation_ticket = 1;
+
+    if(area_rt.x < 0 || area_rt.y < 0 || area_rt.x >= area_pos.x + area_pos.w || area_rt.y >= area_pos.y + area_pos.h) Error::Warning("GameArea::Redraw: coord out of range");
+
+    for(u16 iy = 0; iy < area_rt.h; ++iy)
+	for(u16 ix = 0; ix < area_rt.w; ++ix)
+	    world.GetTiles((area_rt.y + iy) * world.w() + area_rt.x + ix).Blit(BORDERWIDTH + ix * TILEWIDTH, BORDERWIDTH + iy * TILEWIDTH, animation_ticket);
+
+    ++animation_ticket;
 }
+
+/* readraw all */
+void GameArea::Redraw(void)
+{ Redraw(area_pos); }
 
 /* scroll area */
 void GameArea::Scroll(GameArea::scroll_t scroll)
 {
     switch(scroll){
 	case GameArea::LEFT:
-	    if(0 == pos.x) return;
+	    if(0 == area_pos.x) return;
 	    Cursor::Hide();
-	    --pos.x;
+	    --area_pos.x;
 	    Redraw();
 	    Cursor::Show();
 	    break;
 	case GameArea::RIGHT:
-	    if(world.w() - pos.w == pos.x) return;
+	    if(world.w() - area_pos.w == area_pos.x) return;
 	    Cursor::Hide();
-	    ++pos.x;
+	    ++area_pos.x;
 	    Redraw();
 	    Cursor::Show();
 	    break;
 	case GameArea::TOP:
-	    if(0 == pos.y) return;
+	    if(0 == area_pos.y) return;
 	    Cursor::Hide();
-	    --pos.y;
+	    --area_pos.y;
 	    Redraw();
 	    Cursor::Show();
 	    break;
 	case GameArea::BOTTOM:
-	    if(world.h() - pos.h == pos.y) return;
+	    if(world.h() - area_pos.h == area_pos.y) return;
 	    Cursor::Hide();
-	    ++pos.y;
+	    ++area_pos.y;
 	    Redraw();
 	    Cursor::Show();
 	    break;
     }
 }
 
-/* scroll area from radar pos */
+/* scroll area from radar area_pos */
 void GameArea::CenterFromRadar(const Point &pt)
 {
     // left top point
-    pos.x = (pt.x - (display.w() - BORDERWIDTH - RADARWIDTH)) * world.w() / RADARWIDTH;
-    pos.y = (pt.y - BORDERWIDTH) * world.h() / RADARWIDTH;
+    Point pos((pt.x - (display.w() - BORDERWIDTH - RADARWIDTH)) * world.w() / RADARWIDTH, 
+	      (pt.y - BORDERWIDTH) * world.h() / RADARWIDTH);
 
-    Center(Point(pos.x, pos.y));
+    Center(pos);
 }
 
 /* scroll area to center point maps */
 void GameArea::Center(const Point &pt)
 {
+    Point pos;
+
     // center
-    pos.x = (0 > pos.x - pos.w / 2 ? 0 : pos.x - pos.w / 2);
-    pos.y = (0 > pos.y - pos.h / 2 ? 0 : pos.y - pos.h / 2);
+    pos.x = (0 > pt.x - area_pos.w / 2 ? 0 : pt.x - area_pos.w / 2);
+    pos.y = (0 > pt.y - area_pos.h / 2 ? 0 : pt.y - area_pos.h / 2);
 
     // our of range
-    if(pos.y > world.h() - pos.h) pos.y = world.h() - pos.h;
-    if(pos.x > world.w() - pos.w)  pos.x = world.w() - pos.w;
+    if(pos.y > world.h() - area_pos.h) pos.y = world.h() - area_pos.h;
+    if(pos.x > world.w() - area_pos.w) pos.x = world.w() - area_pos.w;
 
-    if(pt.x == pos.x && pt.y == pos.y) return;
+    if(pos.x == area_pos.x && pos.y == area_pos.y) return;
+
+    area_pos.x = pos.x;
+    area_pos.y = pos.y;
 
     Redraw();
 }
 
-/* get index maps from point mouse click on game area */
-u16 GameArea::GetIndexMaps(u16 mx, u16 my) const
-{
-    if(! (GetPosition() & Point(mx, my))){
-	Error::Warning("GameArea::GetIndexMaps: click, out of range.");
-	return 0;
-    }
-
-    u16 result = (pos.y + (my - BORDERWIDTH) / TILEWIDTH) * world.w() + pos.x + (mx - BORDERWIDTH) / TILEWIDTH;
-
-    if(result >= world.w() * world.h()){
-	Error::Warning("GameArea::GetIndexMaps: position, out of range.");
-	return 0;
-    }
-
-    return result;
-}

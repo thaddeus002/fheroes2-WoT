@@ -32,6 +32,8 @@
 #define BOXAREA_WIDTH   234
 #define BUTTON_HEIGHT   50
 
+class Castle;
+
 namespace Dialog
 {
     typedef enum {
@@ -51,7 +53,8 @@ namespace Dialog
 
     // show info cell maps
     void QuickInfo(const std::string & object);
-
+    void QuickInfo(const Castle & castle);
+    
     // buttons: OK : CANCEL : OK|CANCEL : YES|NO
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons = 0);
 
@@ -65,6 +68,18 @@ public:
 
 private:
     Background back;
+    Rect area;
+};
+
+class FrameBorder : private Background
+{
+public:
+    FrameBorder();
+    ~FrameBorder();
+
+    const Rect & GetArea(void) const{ return area; };
+
+private:
     Rect area;
 };
 

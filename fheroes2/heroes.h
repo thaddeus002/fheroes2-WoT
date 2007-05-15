@@ -89,8 +89,9 @@ namespace Skill
     typedef std::pair<types_t, level_t> skill_t;
 };
 
-namespace Heroes
+class Heroes
 {
+public:
     typedef enum {
 	// knight
 	LORDKILBURN, SIRGALLANTH, ECTOR, GVENNETH, TYRO, AMBROSE, RUBY, MAXIMUS, DIMITRY,
@@ -108,26 +109,36 @@ namespace Heroes
 	ROLAND, UNKNOWN1, UNKNOWN2, ARCHIBALD, SANDYSANDY, BRAX,
     } heroes_t;
 
-    typedef struct { 
-	Race::race_t		race;
-	const std::string	name;
-	Color::color_t		color;
-	u8			attack;
-	u8			defence;
-	u8			power;
-	u8			knowledge;
-	u32			experience;
-	u16			magic_point;
-	Morale::morale_t	morale;
-	Luck::luck_t		luck;
-	Skill::skill_t		skill[HEROESMAXSKILL];
-	Artifact::artifact_t	artifact[HEROESMAXARTIFACT];
-	Army::army_t		army[HEROESMAXARMY];
-	bool			format_spread;
-	float			move_point;
-	u16			index_maps;
-	//MagicBook		book
-    } stats_t;
+    Heroes(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
+
+    Race::race_t GetRace(void) const{ return race; };
+    Color::color_t GetColor(void) const{ return color; };
+    const std::string & GetName(void) const{ return name; };
+    const Point & GetCenter(void) const{ return mp; };
+
+private:
+    Race::race_t	race;
+    const std::string	name;
+    Color::color_t	color;
+    u8			attack;
+    u8			defence;
+    u8			power;
+    u8			knowledge;
+    u32			experience;
+    u16			magic_point;
+    Morale::morale_t	morale;
+    Luck::luck_t	luck;
+    Skill::skill_t	skill[HEROESMAXSKILL];
+    Artifact::artifact_t artifact[HEROESMAXARTIFACT];
+    Army::Army		army[HEROESMAXARMY];
+    bool		format_spread;
+    float		move_point;
+    u16			index_maps;
+    //MagicBook		book
+    
+    const u32           uniq;
+
+    Point		mp;
 };
 
 #endif

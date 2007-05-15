@@ -251,6 +251,19 @@ Artifact::artifact_t Artifact::RandUltimate(void)
     return Artifact::GOLDEN_GOOSE;
 }
 
+Artifact::artifact_t Artifact::Rand(MP2::object_t object)
+{
+    switch(object)
+    {
+	case MP2::OBJ_RNDARTIFACT1: return Rand1();
+	case MP2::OBJ_RNDARTIFACT2: return Rand2();
+	case MP2::OBJ_RNDARTIFACT3: return Rand3();
+	default: break;
+    }
+    
+    return Rand();
+}
+
 /* get rand all artifact */
 Artifact::artifact_t Artifact::Rand(void)
 {
@@ -360,100 +373,145 @@ Artifact::artifact_t Artifact::Rand3(void)
     return Artifact::WIZARD_HAT;
 }
 
-/* greturn sprite artifact */
-const Sprite & Artifact::GetForMapsSprite(Artifact::artifact_t artifact)
+/* return index sprite objnarti.icn */
+u8 Artifact::GetIndexSprite(Artifact::artifact_t artifact)
 {
     switch(artifact){
 	// null sprite
-        case Artifact::ULTIMATE_BOOK:			return AGG::GetICN("OBJNARTI.ICN", 0x01);
+        case Artifact::ULTIMATE_BOOK:			return 0x01;
 	// null sprite
-        case Artifact::ULTIMATE_SWORD:			return AGG::GetICN("OBJNARTI.ICN", 0x03);
+        case Artifact::ULTIMATE_SWORD:			return 0x03;
 	// null sprite
-        case Artifact::ULTIMATE_CLOAK:			return AGG::GetICN("OBJNARTI.ICN", 0x05);
+        case Artifact::ULTIMATE_CLOAK:			return 0x05;
 	// null sprite
-	case Artifact::ULTIMATE_WAND:			return AGG::GetICN("OBJNARTI.ICN", 0x07);
+	case Artifact::ULTIMATE_WAND:			return 0x07;
 	// sprite artifact
-        case Artifact::ULTIMATE_SHIELD:			return AGG::GetICN("OBJNARTI.ICN", 0x09);
-        case Artifact::ULTIMATE_STAFF:			return AGG::GetICN("OBJNARTI.ICN", 0x0B);
-        case Artifact::ULTIMATE_CROWN:			return AGG::GetICN("OBJNARTI.ICN", 0x0D);
-        case Artifact::GOLDEN_GOOSE:			return AGG::GetICN("OBJNARTI.ICN", 0x0F);
-	case Artifact::ARCANE_NECKLACE:			return AGG::GetICN("OBJNARTI.ICN", 0x11);
-	case Artifact::CASTER_BRACELET:			return AGG::GetICN("OBJNARTI.ICN", 0x13);
-	case Artifact::MAGE_RING:			return AGG::GetICN("OBJNARTI.ICN", 0x15);
-	case Artifact::WITCHES_BROACH:			return AGG::GetICN("OBJNARTI.ICN", 0x17);
-	case Artifact::MEDAL_VALOR:			return AGG::GetICN("OBJNARTI.ICN", 0x19);
-	case Artifact::MEDAL_COURAGE:			return AGG::GetICN("OBJNARTI.ICN", 0x1B);
-	case Artifact::MEDAL_HONOR:			return AGG::GetICN("OBJNARTI.ICN", 0x1D);
-	case Artifact::MEDAL_DISTINCTION:		return AGG::GetICN("OBJNARTI.ICN", 0x1F);
-	case Artifact::FIZBIN_MISFORTUNE:		return AGG::GetICN("OBJNARTI.ICN", 0x21);
-	case Artifact::THUNDER_MACE:			return AGG::GetICN("OBJNARTI.ICN", 0x23);
-	case Artifact::ARMORED_GAUNTLETS:		return AGG::GetICN("OBJNARTI.ICN", 0x25);
-	case Artifact::DEFENDER_HELM:			return AGG::GetICN("OBJNARTI.ICN", 0x27);
-	case Artifact::GIANT_FLAIL:			return AGG::GetICN("OBJNARTI.ICN", 0x29);
-	case Artifact::BALLISTA:			return AGG::GetICN("OBJNARTI.ICN", 0x2B);
-	case Artifact::STEALTH_SHIELD:			return AGG::GetICN("OBJNARTI.ICN", 0x2D);
-	case Artifact::DRAGON_SWORD:			return AGG::GetICN("OBJNARTI.ICN", 0x2F);
-	case Artifact::POWER_AXE:			return AGG::GetICN("OBJNARTI.ICN", 0x31);
-	case Artifact::DIVINE_BREASTPLATE:		return AGG::GetICN("OBJNARTI.ICN", 0x33);
-	case Artifact::MINOR_SCROLL:			return AGG::GetICN("OBJNARTI.ICN", 0x35);
-	case Artifact::MAJOR_SCROLL:			return AGG::GetICN("OBJNARTI.ICN", 0x37);
-	case Artifact::SUPERIOR_SCROLL:			return AGG::GetICN("OBJNARTI.ICN", 0x39);
-	case Artifact::FOREMOST_SCROLL:			return AGG::GetICN("OBJNARTI.ICN", 0x3B);
-	case Artifact::ENDLESS_SACK_GOLD:		return AGG::GetICN("OBJNARTI.ICN", 0x3D);
-	case Artifact::ENDLESS_BAG_GOLD:		return AGG::GetICN("OBJNARTI.ICN", 0x3F);
-	case Artifact::ENDLESS_PURSE_GOLD:		return AGG::GetICN("OBJNARTI.ICN", 0x41);
-	case Artifact::NOMAD_BOOTS_MOBILITY:		return AGG::GetICN("OBJNARTI.ICN", 0x43);
-	case Artifact::TRAVELER_BOOTS_MOBILITY:		return AGG::GetICN("OBJNARTI.ICN", 0x45);
-	case Artifact::RABBIT_FOOT:			return AGG::GetICN("OBJNARTI.ICN", 0x47);
-	case Artifact::GOLDEN_HORSESHOE:		return AGG::GetICN("OBJNARTI.ICN", 0x49);
-	case Artifact::GAMBLER_LUCKY_COIN:		return AGG::GetICN("OBJNARTI.ICN", 0x4B);
-	case Artifact::FOUR_LEAF_CLOVER:		return AGG::GetICN("OBJNARTI.ICN", 0x4D);
-	case Artifact::TRUE_COMPASS_MOBILITY:		return AGG::GetICN("OBJNARTI.ICN", 0x4F);
-	case Artifact::SAILORS_ASTROLABE_MOBILITY:	return AGG::GetICN("OBJNARTI.ICN", 0x51);
-	case Artifact::EVIL_EYE:			return AGG::GetICN("OBJNARTI.ICN", 0x53);
-	case Artifact::ENCHANTED_HOURGLASS:		return AGG::GetICN("OBJNARTI.ICN", 0x55);
-	case Artifact::GOLD_WATCH:			return AGG::GetICN("OBJNARTI.ICN", 0x57);
-	case Artifact::SKULLCAP:			return AGG::GetICN("OBJNARTI.ICN", 0x59);
-	case Artifact::ICE_CLOAK:			return AGG::GetICN("OBJNARTI.ICN", 0x5B);
-	case Artifact::FIRE_CLOAK:			return AGG::GetICN("OBJNARTI.ICN", 0x5D);
-	case Artifact::LIGHTNING_HELM:			return AGG::GetICN("OBJNARTI.ICN", 0x5F);
-	case Artifact::EVERCOLD_ICICLE:			return AGG::GetICN("OBJNARTI.ICN", 0x61);
-	case Artifact::EVERHOT_LAVA_ROCK:		return AGG::GetICN("OBJNARTI.ICN", 0x63);
-	case Artifact::LIGHTNING_ROD:			return AGG::GetICN("OBJNARTI.ICN", 0x65);
-	case Artifact::SNAKE_RING:			return AGG::GetICN("OBJNARTI.ICN", 0x67);
-	case Artifact::ANKH:				return AGG::GetICN("OBJNARTI.ICN", 0x69);
-	case Artifact::BOOK_ELEMENTS:			return AGG::GetICN("OBJNARTI.ICN", 0x6B);
-	case Artifact::ELEMENTAL_RING:			return AGG::GetICN("OBJNARTI.ICN", 0x6D);
-	case Artifact::HOLY_PENDANT:			return AGG::GetICN("OBJNARTI.ICN", 0x6F);
-	case Artifact::PENDANT_FREE_WILL:		return AGG::GetICN("OBJNARTI.ICN", 0x71);
-	case Artifact::PENDANT_LIFE:			return AGG::GetICN("OBJNARTI.ICN", 0x73);
-	case Artifact::SERENITY_PENDANT:		return AGG::GetICN("OBJNARTI.ICN", 0x75);
-	case Artifact::SEEING_EYE_PENDANT:		return AGG::GetICN("OBJNARTI.ICN", 0x77);
-	case Artifact::KINETIC_PENDANT:			return AGG::GetICN("OBJNARTI.ICN", 0x79);
-	case Artifact::PENDANT_DEATH:			return AGG::GetICN("OBJNARTI.ICN", 0x7B);
-	case Artifact::WAND_NEGATION:			return AGG::GetICN("OBJNARTI.ICN", 0x7D);
-	case Artifact::GOLDEN_BOW:			return AGG::GetICN("OBJNARTI.ICN", 0x7F);
-	case Artifact::TELESCOPE:			return AGG::GetICN("OBJNARTI.ICN", 0x81);
-	case Artifact::STATESMAN_QUILL:			return AGG::GetICN("OBJNARTI.ICN", 0x83);
-	case Artifact::WIZARD_HAT:			return AGG::GetICN("OBJNARTI.ICN", 0x85);
-	case Artifact::POWER_RING:			return AGG::GetICN("OBJNARTI.ICN", 0x87);
-	case Artifact::AMMO_CART:			return AGG::GetICN("OBJNARTI.ICN", 0x89);
-	case Artifact::TAX_LIEN:			return AGG::GetICN("OBJNARTI.ICN", 0x8B);
-	case Artifact::HIDEOUS_MASK:			return AGG::GetICN("OBJNARTI.ICN", 0x8D);
-	case Artifact::ENDLESS_POUCH_SULFUR:		return AGG::GetICN("OBJNARTI.ICN", 0x8F);
-	case Artifact::ENDLESS_VIAL_MERCURY:		return AGG::GetICN("OBJNARTI.ICN", 0x91);
-	case Artifact::ENDLESS_POUCH_GEMS:		return AGG::GetICN("OBJNARTI.ICN", 0x93);
-	case Artifact::ENDLESS_CORD_WOOD:		return AGG::GetICN("OBJNARTI.ICN", 0x95);
-	case Artifact::ENDLESS_CART_ORE:		return AGG::GetICN("OBJNARTI.ICN", 0x97);
-	case Artifact::ENDLESS_POUCH_CRYSTAL:		return AGG::GetICN("OBJNARTI.ICN", 0x99);
-	case Artifact::SPIKED_HELM:			return AGG::GetICN("OBJNARTI.ICN", 0x9B);
-	case Artifact::SPIKED_SHIELD:			return AGG::GetICN("OBJNARTI.ICN", 0x9D);
-	case Artifact::WHITE_PEARL:			return AGG::GetICN("OBJNARTI.ICN", 0x9F);
-	case Artifact::BLACK_PEARL:			return AGG::GetICN("OBJNARTI.ICN", 0xA1);
-	default: Error::Warning("Artifact::GetForMapsSprite: unknown:", artifact); break;
+        case Artifact::ULTIMATE_SHIELD:			return 0x09;
+        case Artifact::ULTIMATE_STAFF:			return 0x0B;
+        case Artifact::ULTIMATE_CROWN:			return 0x0D;
+        case Artifact::GOLDEN_GOOSE:			return 0x0F;
+	case Artifact::ARCANE_NECKLACE:			return 0x11;
+	case Artifact::CASTER_BRACELET:			return 0x13;
+	case Artifact::MAGE_RING:			return 0x15;
+	case Artifact::WITCHES_BROACH:			return 0x17;
+	case Artifact::MEDAL_VALOR:			return 0x19;
+	case Artifact::MEDAL_COURAGE:			return 0x1B;
+	case Artifact::MEDAL_HONOR:			return 0x1D;
+	case Artifact::MEDAL_DISTINCTION:		return 0x1F;
+	case Artifact::FIZBIN_MISFORTUNE:		return 0x21;
+	case Artifact::THUNDER_MACE:			return 0x23;
+	case Artifact::ARMORED_GAUNTLETS:		return 0x25;
+	case Artifact::DEFENDER_HELM:			return 0x27;
+	case Artifact::GIANT_FLAIL:			return 0x29;
+	case Artifact::BALLISTA:			return 0x2B;
+	case Artifact::STEALTH_SHIELD:			return 0x2D;
+	case Artifact::DRAGON_SWORD:			return 0x2F;
+	case Artifact::POWER_AXE:			return 0x31;
+	case Artifact::DIVINE_BREASTPLATE:		return 0x33;
+	case Artifact::MINOR_SCROLL:			return 0x35;
+	case Artifact::MAJOR_SCROLL:			return 0x37;
+	case Artifact::SUPERIOR_SCROLL:			return 0x39;
+	case Artifact::FOREMOST_SCROLL:			return 0x3B;
+	case Artifact::ENDLESS_SACK_GOLD:		return 0x3D;
+	case Artifact::ENDLESS_BAG_GOLD:		return 0x3F;
+	case Artifact::ENDLESS_PURSE_GOLD:		return 0x41;
+	case Artifact::NOMAD_BOOTS_MOBILITY:		return 0x43;
+	case Artifact::TRAVELER_BOOTS_MOBILITY:		return 0x45;
+	case Artifact::RABBIT_FOOT:			return 0x47;
+	case Artifact::GOLDEN_HORSESHOE:		return 0x49;
+	case Artifact::GAMBLER_LUCKY_COIN:		return 0x4B;
+	case Artifact::FOUR_LEAF_CLOVER:		return 0x4D;
+	case Artifact::TRUE_COMPASS_MOBILITY:		return 0x4F;
+	case Artifact::SAILORS_ASTROLABE_MOBILITY:	return 0x51;
+	case Artifact::EVIL_EYE:			return 0x53;
+	case Artifact::ENCHANTED_HOURGLASS:		return 0x55;
+	case Artifact::GOLD_WATCH:			return 0x57;
+	case Artifact::SKULLCAP:			return 0x59;
+	case Artifact::ICE_CLOAK:			return 0x5B;
+	case Artifact::FIRE_CLOAK:			return 0x5D;
+	case Artifact::LIGHTNING_HELM:			return 0x5F;
+	case Artifact::EVERCOLD_ICICLE:			return 0x61;
+	case Artifact::EVERHOT_LAVA_ROCK:		return 0x63;
+	case Artifact::LIGHTNING_ROD:			return 0x65;
+	case Artifact::SNAKE_RING:			return 0x67;
+	case Artifact::ANKH:				return 0x69;
+	case Artifact::BOOK_ELEMENTS:			return 0x6B;
+	case Artifact::ELEMENTAL_RING:			return 0x6D;
+	case Artifact::HOLY_PENDANT:			return 0x6F;
+	case Artifact::PENDANT_FREE_WILL:		return 0x71;
+	case Artifact::PENDANT_LIFE:			return 0x73;
+	case Artifact::SERENITY_PENDANT:		return 0x75;
+	case Artifact::SEEING_EYE_PENDANT:		return 0x77;
+	case Artifact::KINETIC_PENDANT:			return 0x79;
+	case Artifact::PENDANT_DEATH:			return 0x7B;
+	case Artifact::WAND_NEGATION:			return 0x7D;
+	case Artifact::GOLDEN_BOW:			return 0x7F;
+	case Artifact::TELESCOPE:			return 0x81;
+	case Artifact::STATESMAN_QUILL:			return 0x83;
+	case Artifact::WIZARD_HAT:			return 0x85;
+	case Artifact::POWER_RING:			return 0x87;
+	case Artifact::AMMO_CART:			return 0x89;
+	case Artifact::TAX_LIEN:			return 0x8B;
+	case Artifact::HIDEOUS_MASK:			return 0x8D;
+	case Artifact::ENDLESS_POUCH_SULFUR:		return 0x8F;
+	case Artifact::ENDLESS_VIAL_MERCURY:		return 0x91;
+	case Artifact::ENDLESS_POUCH_GEMS:		return 0x93;
+	case Artifact::ENDLESS_CORD_WOOD:		return 0x95;
+	case Artifact::ENDLESS_CART_ORE:		return 0x97;
+	case Artifact::ENDLESS_POUCH_CRYSTAL:		return 0x99;
+	case Artifact::SPIKED_HELM:			return 0x9B;
+	case Artifact::SPIKED_SHIELD:			return 0x9D;
+	case Artifact::WHITE_PEARL:			return 0x9F;
+	case Artifact::BLACK_PEARL:			return 0xA1;
+	default: Error::Warning("Artifact::GetIndexSprite: unknown:", artifact); break;
     }
 
     // null sprite
-    return AGG::GetICN("OBJNARTI.ICN", 0x01);
+    return 0;
 }
 
+void Artifact::ChangeTileWithRNDArtifact(std::vector<Maps::Tiles *> & vector, u16 center)
+{
+    Maps::Tiles & tile = *vector[center];
+    const Maps::TilesAddon *addon = NULL;
+
+    u8 icn_index = 0xFF;
+    u8 index = 0;
+
+    switch(tile.GetObject())
+    {
+	case MP2::OBJ_RNDARTIFACT:
+	    icn_index = 0xA3;
+    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT));
+	    break;
+	case MP2::OBJ_RNDARTIFACT1:
+	    icn_index = 0xA7;
+    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT1));
+	    break;
+	case MP2::OBJ_RNDARTIFACT2:
+	    icn_index = 0xA9;
+    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT2));
+	    break;
+	case MP2::OBJ_RNDARTIFACT3:
+	    icn_index = 0xAB;
+    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT3));
+	    break;
+	default:
+	    return;
+    }
+    
+    if( (addon = tile.FindAddon(0x2C, icn_index)) ||
+        (addon = tile.FindAddon(0x2D, icn_index)) ||
+        (addon = tile.FindAddon(0x2E, icn_index)) ||
+        (addon = tile.FindAddon(0x2F, icn_index)))
+    {
+        u32 uniq = (*addon).GetUniq();
+        (*const_cast<Maps::TilesAddon *>(addon)).SetIndex(index);
+        tile.SetObject(MP2::OBJ_ARTIFACT);
+	
+        // replace shadow resource
+        if(center)
+    	    if(const Maps::TilesAddon *shadow = (*vector[center - 1]).FindAddonLevel1(uniq))
+		(*const_cast<Maps::TilesAddon *>(shadow)).SetIndex(index - 1);
+    }
+}

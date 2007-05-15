@@ -26,20 +26,27 @@
 #include "background.h"
 #include "gamedefs.h"
 
-class SpriteCursor : protected Surface
+class SpriteCursor
 {
 public:
     /* sprite cursor */
-    SpriteCursor(const Surface &cursor, const Point &pt) : Surface(cursor), background(pt, cursor.w(), cursor.h()){ Move(pt); };
+    SpriteCursor(const Surface &cursor, const Point & pt) : spriteCursor(cursor), background(pt, cursor.w(), cursor.h()){};
+
+    u16  w(void) const{ return spriteCursor.w(); };
+    u16  h(void) const{ return spriteCursor.h(); };
 
     void Move(s16 ax, s16 ay);
     void Move(const Point &pt){ Move(pt.x, pt.y); };
+    void Hide(void){ background.Restore(); };
+    void Show(const Point &pt){ Show(pt.x, pt.y); };
+    void Show(s16 ax, s16 ay);
 
     void Redraw(void);
     const Point & GetPos(void) const{ return background.GetRect(); };
     const Rect & GetRect(void) const{ return background.GetRect(); };
 
 private:
+    const Surface & spriteCursor;
     Background background;
 };
 

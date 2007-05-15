@@ -36,9 +36,9 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     AGG::PreloadObject(apanel);
 
     // cursor
+    const Cursor::themes_t cursor = Cursor::Get();
     Cursor::Hide();
     Cursor::Set(Cursor::POINTER);
-    Cursor::themes_t cursor = Cursor::Get();
 
     // image box
     const Sprite &box = AGG::GetICN(apanbkg, 0);

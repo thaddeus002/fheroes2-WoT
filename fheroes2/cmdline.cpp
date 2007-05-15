@@ -25,7 +25,7 @@ std::map<char, std::string> CmdLine::map_params;
 /* class CmdLine */
 CmdLine::CmdLine(const char **argv)
 {
-    char key;
+    char key = 0;
 
     while(argv && *argv){
 

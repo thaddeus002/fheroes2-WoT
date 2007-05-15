@@ -17,50 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ARMY_H
-#define H2ARMY_H
 
-#include <string>
-#include <utility>
-#include "monster.h"
-#include "gamedefs.h"
+#include "ground.h"
 
-namespace Army
+const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
 {
-    namespace Size
-    {
-	typedef enum
-        {
-	    FEW		= 1,
-    	    SEVERAL	= 5,
-    	    PACK	= 10,
-    	    LOTS	= 20,
-    	    HORDE	= 50,
-    	    THRONG	= 100,
-    	    SWARM	= 250,
-    	    ZOUNDS	= 500,
-    	    LEGION	= 1000
-	} size_t;
+    static const std::string str_desert("Desert");
+    static const std::string str_snow("Snow");
+    static const std::string str_swamp("Swamp");
+    static const std::string str_wasteland("Wasteland");
+    static const std::string str_beach("Beach");
+    static const std::string str_lava("Lava");
+    static const std::string str_dirt("Dirt");
+    static const std::string str_grass("Grass");
+    static const std::string str_water("Water");
+    static const std::string str_road("Road");
+    static const std::string str_multi("Multi");
 
-	const std::string & String(size_t size);
-    };
+    switch(ground){
+        case DESERT:	return str_desert;
+	case SNOW:	return str_snow;
+	case SWAMP:	return str_swamp;
+	case WASTELAND:	return str_wasteland;
+	case BEACH:	return str_beach;
+	case LAVA:	return str_lava;
+	case DIRT:	return str_dirt;
+	case GRASS:	return str_grass;
+	case WATER:	return str_water;
+	case ROAD:	return str_road;
+	default:	break;
+    }
 
-    class Army
-    {
-    public:
-	Army(Monster::monster_t ms = Monster::UNKNOWN, u16 num = 0) : monster(ms), count(num){};
-	
-	bool Valid(void) const{ return Monster::UNKNOWN > monster && count; };
-	Monster::monster_t GetMonster(void) const{ return monster; };
-	u16 GetCount(void) const{ return count; };
-
-	void SetMonster(Monster::monster_t ms){ monster = ms; };
-	void SetCount(u16 num){ count = num; };
-
-    private:
-	Monster::monster_t monster;
-	u16 count;
-    };
-};
-
-#endif
+    return str_multi;
+}

@@ -331,7 +331,6 @@ void AGG::LoadICN(const std::string & name)
 	std::memset(buf, 0x80, newSize);
 	AGG::fd->read(buf, sizeData);
 
-	if((*it).offsetX < 0 || (*it).offsetY < 0) Error::Warning("AGG: sprite " + name + ": x,y < 0");
 	AGG::fat[name].vectorICN->push_back(new Sprite((*it).width, (*it).height, (*it).offsetX, (*it).offsetY, sizeData, reinterpret_cast<const u8*>(buf)));
 
 	delete [] buf;

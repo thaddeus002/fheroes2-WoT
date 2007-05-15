@@ -20,8 +20,6 @@
 #ifndef H2MP2_H
 #define H2MP2_H
 
-#include <vector>
-#include "maps.h"
 #include "gamedefs.h"
 
 #define MP2OFFSETDATA	428
@@ -252,26 +250,6 @@ namespace MP2
         
     ///////////////////////////////////////////////////////////////////////////////
 
-    // interim mp2 addon
-    typedef struct {
-        u8      object1;
-        u8      index1;
-        u8      quantity1;
-        u8      object2;
-        u8      index2;
-    } addon_t;
-
-    // interim mp2 tile
-    typedef struct {
-        u16     tile;
-        std::vector<addon_t> addons;
-        u8      quantity2;
-        u8      shape;
-        u8      general;
-	u8	index1;    // no sorting(addons) value
-	u8	quantity1; // no sorting(addons) value
-    } tile_t;
-
     typedef enum {
 	OBJ_ZERO		= 0x00,
 	OBJN_ALCHEMYTOWER	= 0x01,
@@ -442,9 +420,7 @@ namespace MP2
 
     const char *GetICNObject(u8 type);
     const char *StringObject(u8 object);
-    bool StaticObject(u8 type, u8 index);
-    Maps::ground_t GetTypeGrounds(const MP2::tile_t &info);
-    bool VectorAddonSort(const MP2::addon_t & lhs, const MP2::addon_t & rhs);
+    u8 GetAnimationFrame(u8 object, u8 index, u32 frame);
 };
 
 #endif

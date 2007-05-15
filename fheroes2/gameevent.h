@@ -88,5 +88,17 @@ private:
     std::string message;
 };
 
+class Rumor
+{
+public:
+    Rumor(const char * ptr);
+
+    const std::string & GetString(void){ return message; };
+
+private:
+    const std::string message;
 };
+
+};
+
 #endif

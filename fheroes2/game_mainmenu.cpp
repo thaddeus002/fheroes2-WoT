@@ -54,11 +54,11 @@ Game::menu_t Game::MainMenu(void)
     Button buttonCredits("BTNSHNGL.ICN", 12, 15);
     Button buttonQuit("BTNSHNGL.ICN", 16, 19);
 
-    Animation animeButtonNewGame("BTNSHNGL.ICN", 0, 3, Animation::HIGH);
-    Animation animeButtonLoadGame("BTNSHNGL.ICN", 4, 3, Animation::HIGH);
-    Animation animeButtonHighScores("BTNSHNGL.ICN", 8, 3, Animation::HIGH);
-    Animation animeButtonCredits("BTNSHNGL.ICN", 12, 3, Animation::HIGH);
-    Animation animeButtonQuit("BTNSHNGL.ICN", 16, 3, Animation::HIGH);
+    AnimationButton animeButtonNewGame("BTNSHNGL.ICN", 0, 3);
+    AnimationButton animeButtonLoadGame("BTNSHNGL.ICN", 4, 3);
+    AnimationButton animeButtonHighScores("BTNSHNGL.ICN", 8, 3);
+    AnimationButton animeButtonCredits("BTNSHNGL.ICN", 12, 3);
+    AnimationButton animeButtonQuit("BTNSHNGL.ICN", 16, 3);
 
     Animation animeLantern("SHNGANIM.ICN", 0, 40, Animation::INFINITY | Animation::RING | Animation::LOW);
 

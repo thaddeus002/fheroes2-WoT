@@ -18,11 +18,11 @@ Default config fheroes2.cfg options:
 # fullscreen: on off (F4 switch)
 # fullscreen = off
 #
-# animation
-# animation = off
-#
 # interface (good/evil)
 # evilinterface = off
 #
 # debug
 # debug = off
+#
+# original version
+# original = on

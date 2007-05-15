@@ -36,9 +36,9 @@ Game::menu_t Dialog::FileOptions(void)
     AGG::PreloadObject(cpanel);
 
     // cursor
+    const Cursor::themes_t cursor = Cursor::Get();
     Cursor::Hide();
     Cursor::Set(Cursor::POINTER);
-    Cursor::themes_t cursor = Cursor::Get();
 
     // image box
     const Sprite &box = AGG::GetICN(cpanbkg, 0);

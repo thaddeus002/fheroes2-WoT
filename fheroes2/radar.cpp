@@ -18,139 +18,146 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <cstdlib>
+#include "gamedefs.h" 
 #include "agg.h"
+#include "config.h"
 #include "game.h"
 #include "gamearea.h"
-#include "error.h"
-#include "maps.h"
+#include "ground.h"
 #include "world.h"
 #include "radar.h"
 
-#define RADARCOLOR      0x10	// index palette
+#define RADARCOLOR	0x40	// index palette
+#define COLOR_DESERT	0x71
+#define COLOR_SNOW	0x0B
+#define COLOR_SWAMP	0xA6
+#define COLOR_WASTELAND	0xCE
+#define COLOR_BEACH	0xC7
+#define COLOR_LAVA	0x19
+#define COLOR_DIRT	0x31
+#define COLOR_GRASS	0x61
+#define COLOR_WATER	0xF0
+#define COLOR_ROAD	0x7A
 
 /* constructor */
-Radar::Radar(s16 rx, s16 ry, const World &wr) :
-    Surface(RADARWIDTH, RADARWIDTH), pos(rx, ry, RADARWIDTH, RADARWIDTH), world(wr)
+Radar::Radar() :
+    pos(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH), spriteArea(RADARWIDTH, RADARWIDTH),
+    spriteCursor(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(world.w()))),
+                 static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(world.h()))), true),
+    cursor(spriteCursor, pos)
 {
-    GenerateFrom(world.GetSpriteMaps());
+    H2Config::Original() ? GenerateOrigin() : GenerateRealistic();
+
+    DrawCursor(spriteCursor);
 }
 
 /* redraw radar */
-void Radar::Redraw(void){ display.Blit(*this, pos); }
+void Radar::Redraw(void){ display.Blit(spriteArea, pos); }
 
-/* generate from surface */
-void Radar::GenerateFrom(const Surface &surface)
+/* generate mini maps (origin version) */
+void Radar::GenerateOrigin(void)
 {
-    Surface & src = const_cast<Surface &>(surface);
+    Point dst_pt(0, 0);
+    u8  width_til = RADARWIDTH / world.w();
+    u16 index = 0;
 
-    if(pos.w > src.w() || pos.h > src.h() ||
-       src.w() != src.h()){ Error::Warning("Radar::Generate: incorrect param"); return; }
+    Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2, true);
+    
+    for(u16 jj = 0; jj < world.h(); ++jj)
+    {
+	for(u16 ii = 0; ii < world.w(); ++ii)
+	{
+	    const Maps::Tiles & tile = world.GetTiles(index);
 
-    u16 color = 0;
-    u32 index = 0;
-
-    u16 *p_src = NULL;
-    u16 *p_dst = NULL;
-
-    u16 width = 0;
-    u16 height = 0;
-    u16 width2 = 0;
-    u16 dstX2 = 0;
-    u16 dstY2 = 0;
-
-    u8 count = 0;
-
-    bool first = true;
-
-    src.Lock();
-    p_src = static_cast<u16 *>(const_cast<void *>(src.pixels()));
-
-    // count min iteration    
-    width = src.w();
-    for(;;){
-	++count;
-	if((width >>= 1) <= pos.w) break;
-    }
-    width = src.w() / 2;
-    height = src.h() / 2;
-
-    while(count){
-
-	p_dst = new u16[width * height];
-
-	// iteration 2х2 -> 1
-	index = 0;
-	width2 = 2 * width;
-
-	for(u16 dstY = 0; dstY < height; ++dstY)
-	    for(u16 dstX = 0; dstX < width; ++dstX){
-
-		dstX2 = dstX * 2;
-		dstY2 = dstY * 2;
-
-		if((color = p_src[width2 * dstY2 + dstX2]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1] || 
-		    color == p_src[width2 * dstY2 + dstX2 + 1] || color == p_src[width2 * (dstY2 + 1) + dstX2])
-		    p_dst[index] = color;
-
-		else if((color = p_src[width2 * dstY2 + dstX2 + 1]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1] || 
-	    	    color == p_src[width2 * (dstY2 + 1) + dstX2])
-		    p_dst[index] = color;
-
-		else if((color = p_src[width2 * (dstY2 + 1) + dstX2]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1])
-		    p_dst[index] = color;
-	
-		else
-		    p_dst[index] = p_src[width2 * (dstY2 + 1) + dstX2 + 1];
-
-		++index;
+	    switch(tile.GetGround())
+	    {
+		case Maps::Ground::DESERT:	tile_surface.Fill(AGG::GetColor(COLOR_DESERT)); break;
+		case Maps::Ground::SNOW:	tile_surface.Fill(AGG::GetColor(COLOR_SNOW)); break;
+		case Maps::Ground::SWAMP:	tile_surface.Fill(AGG::GetColor(COLOR_SWAMP)); break;
+		case Maps::Ground::WASTELAND:	tile_surface.Fill(AGG::GetColor(COLOR_WASTELAND)); break;
+		case Maps::Ground::BEACH:	tile_surface.Fill(AGG::GetColor(COLOR_BEACH)); break;
+		case Maps::Ground::LAVA:	tile_surface.Fill(AGG::GetColor(COLOR_LAVA)); break;
+		case Maps::Ground::DIRT:	tile_surface.Fill(AGG::GetColor(COLOR_DIRT)); break;
+		case Maps::Ground::GRASS:	tile_surface.Fill(AGG::GetColor(COLOR_GRASS)); break;
+		case Maps::Ground::WATER:	tile_surface.Fill(AGG::GetColor(COLOR_WATER)); break;
+		case Maps::Ground::ROAD:	tile_surface.Fill(AGG::GetColor(COLOR_ROAD)); break;
+		default:			tile_surface.Fill(AGG::GetColor(COLOR_GRASS)); break;
 	    }
 
-	if(!first && NULL != p_src) delete [] p_src;
-	first = false;
-	p_src = p_dst;
-	p_dst = NULL;
-	
-	width = width / 2;
-	height = height / 2;
+	    spriteArea.Blit(tile_surface, dst_pt);
 
-	--count;
-    }
+	    dst_pt.x += width_til;
 
-    src.Unlock();
+	    // X scale large maps
+	    if(Maps::LARGE == world.w() && !(ii % 3))
+	    {
+		spriteArea.Blit(tile_surface, dst_pt);
 
-    // correct if LARGE
-    if(Maps::LARGE == world.w()){
-	p_dst = new u16[RADARWIDTH * RADARWIDTH];
-
-	u16 *pd1 = p_dst;
-	u16 *ps1 = p_src;
-	u16 *pd2 = p_dst;
-
-	for(int iy = 0; iy < Maps::LARGE; ++iy){
-	    pd2 = pd1;
-	    for(int ix = 0; ix < Maps::LARGE; ++ix){
-		*pd1 = *ps1;
-		if(0 == (ix % 3)){ ++pd1; *pd1 = *ps1; }
-		++pd1;
-		++ps1;
+		dst_pt.x += width_til;
 	    }
-	    if(0 == (iy % 3)){
-		memcpy(pd1, pd2, sizeof(u16) * RADARWIDTH);
-		pd1 += RADARWIDTH;
-	    }
+
+	    ++index;
 	}
-	delete [] p_src;
-	p_src = p_dst;
-	p_dst = NULL;
+
+	dst_pt.x = 0;
+	dst_pt.y += width_til;
+
+	// Y scale large maps
+	if(Maps::LARGE == world.h() && !(jj % 3))
+	{
+	    const Rect src_rt(0, dst_pt.y - 1, RADARWIDTH, width_til);
+	    spriteArea.Blit(spriteArea, src_rt, dst_pt);
+
+	    dst_pt.y += width_til;
+	}
     }
+}
 
-    // copy color from p_src to sprite radar
-    Lock();
-    memcpy(const_cast<void *>(pixels()), p_src, sizeof(u16) * RADARWIDTH * RADARWIDTH);
-    Unlock();
+/* generate mini maps (realistic version) */
+void Radar::GenerateRealistic(void)
+{
+    Point dst_pt(0, 0);
+    u8  width_til = RADARWIDTH / world.w();
+    u16 index = 0;
 
-    delete [] p_src;
+    Surface src_surface(TILEWIDTH, TILEWIDTH);
+    Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2);
+
+    for(u16 jj = 0; jj < world.h(); ++jj)
+    {
+	for(u16 ii = 0; ii < world.w(); ++ii)
+	{
+	    src_surface.Blit(world.GetTiles(index).GetSurface());
+
+	    tile_surface.ScaleFrom(src_surface);
+
+	    spriteArea.Blit(tile_surface, dst_pt);
+
+	    dst_pt.x += width_til;
+
+	    // X scale large maps
+	    if(Maps::LARGE == world.w() && !(ii % 3))
+	    {
+		spriteArea.Blit(tile_surface, dst_pt);
+
+		dst_pt.x += width_til;
+	    }
+
+	    ++index;
+	}
+
+	dst_pt.x = 0;
+	dst_pt.y += width_til;
+
+	// Y scale large maps
+	if(Maps::LARGE == world.h() && !(jj % 3))
+	{
+	    const Rect src_rt(0, dst_pt.y - 1, RADARWIDTH, width_til);
+	    spriteArea.Blit(spriteArea, src_rt, dst_pt);
+
+	    dst_pt.y += width_til;
+	}
+    }
 }
 
 /* draw radar cursor */
@@ -188,7 +195,7 @@ void Radar::DrawCursor(Surface &surface)
     surface.SetDisplayFormat();
 }
 
-void Radar::MoveCursor(SpriteCursor &cursor)
+void Radar::UpdatePosition(void)
 {
     cursor.Move(pos.x + GameArea::GetRect().x * RADARWIDTH / world.w(),
                 pos.y + GameArea::GetRect().y * RADARWIDTH / world.h());

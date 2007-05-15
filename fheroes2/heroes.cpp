@@ -18,4 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include "world.h"
 #include "heroes.h"
+
+Heroes::Heroes(u32 gid, u16 mapindex, const void *ptr, bool rnd)
+    : uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
+{
+}

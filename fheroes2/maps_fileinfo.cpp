@@ -26,7 +26,7 @@
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
 
-Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), sizeMaps(Maps::NONE), mapsDifficulty(Difficulty::EASY),
+Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), sizeMaps(Maps::ZERO), mapsDifficulty(Difficulty::EASY),
     kingdomColors(0), allowColors(0), rndColors(0), withHeroes(false)
 {
 

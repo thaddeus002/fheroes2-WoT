@@ -17,70 +17,81 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPSDATA_H
-#define H2MAPSDATA_H
+#ifndef H2WORLD_H
+#define H2WORLD_H
 
-#include <map>
 #include <vector>
-#include "config.h"
-#include "gamedefs.h"
-#include "gameevent.h"
-#include "surface.h"
-#include "kingdom.h"
-#include "castle.h"
-#include "heroes.h"
-#include "rect.h"
+#include <string>
 #include "maps.h"
-#include "army.h"
-#include "mp2.h"
+#include "maps_tiles.h"
+#include "color.h"
 
-#define DAYOFWEEK       7
-#define WEEKOFMONTH     4
+class Heroes;
+class Castle;
+class Kingdom;
+
+namespace GameEvent
+{
+    class Sign;
+    class Day;
+    class Coord;
+    class Riddle;
+    class Rumor;
+};
+
+#define DAYOFWEEK       7 
+#define WEEKOFMONTH     4 
 
 class World
 {
 public:
-    World(const std::string &filename);
-    ~World();
+    ~World(){ FreeOldMaps(); };
 
-    u16 w(void) const{ return width; };
-    u16 h(void) const{ return height; };
+    void LoadMaps(const std::string &filename);
 
-    const Surface & GetSpriteMaps(void) const{ return *sprite_maps; };
-    u16 GetGround(u16 index) const{ return index < vec_tiles.size() ? vec_tiles[index].ground : 0; };
-    u8  GetObject(u16 index) const{ return index < vec_tiles.size() ? vec_tiles[index].object : 0; };
+    static World & GetWorld(void);
 
-    bool Movement(u16 ax, u16 ay) const{ return Movement(ax * width + ay); };
-    bool Movement(u16 index) const;
+    u16 w(void){ return width; };
+    u16 h(void){ return height; };
 
-    void Redraw(const Rect &rt, const Point &pt = Point(0, 0)) const;
-
-    u8 GetDay(void) const{ return day % DAYOFWEEK; };
-    u8 GetWeek(void) const{ return week % WEEKOFMONTH; };
-    u8 GetMonth(void) const{ return month; };
-    u16 CountDay(void) const{ return day; };
-    u16 CountWeek(void) const{ return week; };
-    bool BeginWeek(void) const{ return begin_week; };
-    bool BeginMonth(void) const{ return begin_month; };
-    void NextDay(void);
-
-    const Kingdom & GetMyKingdom(void) const{ return GetKingdom(H2Config::GetHumanColor()); };
+    const Maps::Tiles & GetTiles(u16 index) const{ return *vec_tiles.at(index); };
+    Maps::Tiles & GetTiles(u16 index){ return *vec_tiles.at(index); };
+    const Kingdom & GetMyKingdom(void) const;
     const Kingdom & GetKingdom(Color::color_t color) const;
 
-private:
-    Surface *sprite_maps;
-    std::vector<Maps::tiles_t>		vec_tiles;
-    std::map<Color::color_t, Kingdom>	map_kingdoms;
-    std::vector<GameEvent::Sign>	vec_signs;
-    std::vector<GameEvent::Day> 	vec_eventsday;
-    std::vector<GameEvent::Coord>	vec_eventsmap;
-    std::vector<GameEvent::Riddle>	vec_riddles;
-    std::vector<std::string>		vec_rumors;
-    std::vector<Castle>			vec_castles;
-    //std::vector<Heroes> 		vec_heroes;
+    const Castle * GetCastle(u16 maps_index);
+    const Castle * GetCastle(u8 ax, u8 ay);
 
-    u16 width;
-    u16 height;
+    u8 GetDay(void){ return day % DAYOFWEEK + 1; };
+    u8 GetWeek(void){ return week % WEEKOFMONTH + 1; };
+    u8 GetMonth(void){ return month + 1; };
+    u16 CountDay(void){ return day + 1; };
+    u16 CountWeek(void){ return week + 1; };
+    bool BeginWeek(void){ return begin_week; };
+    bool BeginMonth(void){ return begin_month; };
+    void NextDay(void);
+    
+
+private:
+    World(){};
+    
+    void FreeOldMaps(void);
+
+private:
+    std::vector<Maps::Tiles *>          vec_tiles;
+    std::vector<Kingdom *>              vec_kingdoms;
+    std::vector<GameEvent::Sign *>      vec_signs;
+    std::vector<GameEvent::Day *>       vec_eventsday;
+    std::vector<GameEvent::Coord *>     vec_eventsmap;
+    std::vector<GameEvent::Riddle *>    vec_riddles;
+    std::vector<GameEvent::Rumor *>     vec_rumors;
+    std::vector<Castle *>               vec_castles;
+    std::vector<Heroes *>               vec_heroes;
+
+    u16 ultimate_artifact;
+
+    Maps::mapsize_t width;
+    Maps::mapsize_t height;
 
     u16 day;
     u16 week;
@@ -88,5 +99,7 @@ private:
     bool begin_week;
     bool begin_month;
 };
+
+static World & world = World::GetWorld();
 
 #endif

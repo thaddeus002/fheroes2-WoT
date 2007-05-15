@@ -34,8 +34,8 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     AGG::PreloadObject(system);
 
     // cursor
+    const Cursor::themes_t cursor = Cursor::Get();
     Cursor::Hide();
-    Cursor::themes_t cursor = Cursor::Get();
     Cursor::Set(Cursor::POINTER);
 
     Box box(Text::height(BOXAREA_WIDTH, header, ft) + 20 + Text::height(BOXAREA_WIDTH, message, ft), buttons);

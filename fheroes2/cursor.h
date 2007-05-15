@@ -20,6 +20,7 @@
 #ifndef H2CURSOR_H
 #define H2CURSOR_H
 
+#include "rect.h"
 #include "gamedefs.h"
 
 namespace Cursor
@@ -141,6 +142,8 @@ namespace Cursor
     themes_t Get(void);
     void Set(themes_t cursor);
     void SetOffset(themes_t cursor);
+    
+    const Rect & GetRect(void);
 };
 
 #endif

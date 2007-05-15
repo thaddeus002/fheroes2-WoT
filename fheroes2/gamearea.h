@@ -21,29 +21,18 @@
 #define H2GAMEAREA_H
 
 #include "gamedefs.h"
-#include "maps.h"
-#include "game.h"
-#include "world.h"
 #include "rect.h"
 
 class GameArea
 {
 public:
-    GameArea(const World & wd);
-    
+    GameArea();
+
     typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
-    static const Rect & GetRect(void){ return pos; }
+    static const Rect & GetRect(void){ return area_pos; };
 
-    static Rect GetPosition(void){ return Rect(BORDERWIDTH, BORDERWIDTH, pos.w * TILEWIDTH, pos.h * TILEWIDTH); }
-
-    u16  GetIndexMaps(u16 mx, u16 my) const;
-    u16  GetIndexMaps(const Point &pt) const{ return GetIndexMaps(pt.x, pt.y); };
-
-    u8   GetObject(const Point &mp) const{ return world.GetObject(GetIndexMaps(mp)); };
-    u16  GetGround(const Point &mp) const{ return world.GetGround(GetIndexMaps(mp)); };
-
-    void Scroll(GameArea::scroll_t scroll);
+    void Scroll(scroll_t scroll);
 
     void Center(const Point &pt);
     void CenterFromRadar(const Point &pt);
@@ -52,8 +41,7 @@ public:
     void Redraw(const Rect &area_rt);
 
 private:
-    const World &world;
-    static Rect pos;
+    static Rect area_pos;
 };
 
 #endif

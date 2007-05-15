@@ -74,6 +74,8 @@ namespace AGG {
 
     void FreeICN(aggfat_t & fat);
     void FreeTIL(aggfat_t & fat);
+    
+    bool BlackList(const std::string & name, u16 index);
 };
 
 #endif

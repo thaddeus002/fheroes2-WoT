@@ -20,58 +20,20 @@
 #ifndef H2MAPS_H
 #define H2MAPS_H
 
-#include <vector>
-#include <string>
-#include "rect.h"
-#include "resource.h"
-#include "artifact.h"
-#include "sprite.h"
-#include "monster.h"
 #include "gamedefs.h"
 
 #define TILEWIDTH 32
 
 namespace Maps
 {
-    typedef enum {
-        DESERT	= 0x0001,
-        SNOW	= 0x0002,
-        SWAMP	= 0x0004,
-        WASTELAND = 0x0008,
-        BEACH	= 0x0010,
-        LAVA	= 0x0020,
-        DIRT	= 0x0040,
-        GRASS	= 0x0080,
-        WATER	= 0x0100,
-        ROAD	= 0x0200,
-    } ground_t;
 
     typedef enum {
-	NONE	= 0,
+	ZERO	= 0,
         SMALL	= 36,
         MEDIUM	= 72,
         LARGE	= 108,
         XLARGE	= 144
     } mapsize_t;
-
-    typedef struct {
-	Point    coord;
-	//Point  center;
-	ground_t ground;
-	u8       object;
-	std::vector<const Sprite *> *level1;
-	std::vector<const Sprite *> *level2;
-
-	u32	count;
-
-	union {
-	    Resource::resource_t	resource;
-	    Artifact::artifact_t	artifact;
-	    Monster::monster_t		monster;
-	};
-
-    } tiles_t;
-    
 };
 
 #endif

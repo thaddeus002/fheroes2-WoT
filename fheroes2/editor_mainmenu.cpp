@@ -19,66 +19,62 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "dialog.h"
+#include "cursor.h"
+#include "sprite.h"
 #include "localevent.h"
 #include "button.h"
-#include "cursor.h"
-#include "config.h"
-#include "background.h"
-#include "dialog.h"
+#include "display.h"
+#include "game.h"
 
-Dialog::answer_t Dialog::SystemOptions(void)
-{
+Game::menu_t Game::Editor::MainMenu(void){
+
     // preload
-    const std::string &spanbkg = H2Config::EvilInterface() ? "SPANBKGE.ICN" : "SPANBKG.ICN";
-    const std::string &spanbtn = H2Config::EvilInterface() ? "SPANBTNE.ICN" : "SPANBTN.ICN";
-
-    AGG::PreloadObject(spanbkg);
-    AGG::PreloadObject(spanbtn);
+    AGG::PreloadObject("EDITOR.ICN");
+    AGG::PreloadObject("BTNEMAIN.ICN");
+    AGG::PreloadObject("REDBACK.ICN");
 
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
     Cursor::Hide();
     Cursor::Set(Cursor::POINTER);
 
-    // image box
-    const Sprite &box = AGG::GetICN(spanbkg, 0);
+    Display::SetVideoMode(Display::SMALL);
 
-    Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
-    Background back(rb);
-    back.Save();
+    // image background
+    const Sprite &back = AGG::GetICN("EDITOR.ICN", 0);
+    display.Blit(back);
 
-    display.Blit(box, rb);
+    const Sprite &panel = AGG::GetICN("REDBACK.ICN", 0);
+    display.Blit(panel, 405, 5);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonOk(rb.x + 113, rb.y + 362, spanbtn, 0, 1);
+    Button buttonNewMap(455, 45, "BTNEMAIN.ICN", 0, 1);
+    Button buttonLoadMap(455, 110, "BTNEMAIN.ICN", 2, 3);
+    Button buttonCancelGame(455, 375, "BTNEMAIN.ICN", 6, 7);
 
     display.Flip();
     Cursor::Show();
 
-    Dialog::answer_t result = Dialog::ZERO;
-    bool exit = false;
+    // NewMap loop
+    while(1){
 
-    // dialog menu loop
-    while(! exit){
+	le.HandleEvents();
 
-        le.HandleEvents();
+	le.MousePressLeft(buttonNewMap) ? buttonNewMap.Press() : buttonNewMap.Release();
+	le.MousePressLeft(buttonLoadMap) ? buttonLoadMap.Press() : buttonLoadMap.Release();
+	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.Press() : buttonCancelGame.Release();
 
-        le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
+	if(le.MouseClickLeft(buttonNewMap)) return EDITNEWMAP;
+	if(le.MouseClickLeft(buttonLoadMap)) return EDITLOADMAP;
+	if(le.MouseClickLeft(buttonCancelGame)) return QUITGAME;
 
-        if(le.MouseClickLeft(buttonOk)) { result = Dialog::OK;  exit = true; }
-        if(le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
-
+        // right info
+	//if(le.MousePressRight(buttonNewMap)) Dialog::Message("Standard Game", "A single player game playing out a single map.", Font::BIG);
+	//if(le.MousePressRight(buttonLoadMap)) Dialog::Message("Campaign Game", "A single player game playing through a series of maps.", Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Cancel", "Cancel back to the main menu.", Font::BIG);
+		 
     }
 
-    le.ResetKey();
-
-    // restore background
-    Cursor::Hide();
-    back.Restore();
-    Cursor::Set(cursor);
-    Cursor::Show();
-    display.Flip();
-
-    return result;
+    return QUITGAME;
 }

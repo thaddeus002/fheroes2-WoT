@@ -17,50 +17,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ARMY_H
-#define H2ARMY_H
 
-#include <string>
-#include <utility>
-#include "monster.h"
-#include "gamedefs.h"
+#include "error.h"
+#include "captain.h"
 
-namespace Army
+const std::string & Captain::BigPortraitString(Race::race_t race)
 {
-    namespace Size
+    static const std::string big_portrate_kngt("PORT0089.ICN");
+    static const std::string big_portrate_barb("PORT0090.ICN");
+    static const std::string big_portrate_sorc("PORT0091.ICN");
+    static const std::string big_portrate_wrlk("PORT0092.ICN");
+    static const std::string big_portrate_wzrd("PORT0093.ICN");
+    static const std::string big_portrate_necr("PORT0094.ICN");
+
+    switch(race)
     {
-	typedef enum
-        {
-	    FEW		= 1,
-    	    SEVERAL	= 5,
-    	    PACK	= 10,
-    	    LOTS	= 20,
-    	    HORDE	= 50,
-    	    THRONG	= 100,
-    	    SWARM	= 250,
-    	    ZOUNDS	= 500,
-    	    LEGION	= 1000
-	} size_t;
+	case Race::KNGT:	return big_portrate_kngt;
+	case Race::BARB:	return big_portrate_barb;
+	case Race::SORC:	return big_portrate_sorc;
+	case Race::WRLK:	return big_portrate_wrlk;
+	case Race::WZRD:	return big_portrate_wzrd;
+	case Race::NECR:	return big_portrate_necr;
+	default: break;
+    }
 
-	const std::string & String(size_t size);
-    };
+    Error::Warning("Captain::BigPortraitString: unknown race.");
 
-    class Army
-    {
-    public:
-	Army(Monster::monster_t ms = Monster::UNKNOWN, u16 num = 0) : monster(ms), count(num){};
-	
-	bool Valid(void) const{ return Monster::UNKNOWN > monster && count; };
-	Monster::monster_t GetMonster(void) const{ return monster; };
-	u16 GetCount(void) const{ return count; };
-
-	void SetMonster(Monster::monster_t ms){ monster = ms; };
-	void SetCount(u16 num){ count = num; };
-
-    private:
-	Monster::monster_t monster;
-	u16 count;
-    };
-};
-
-#endif
+    return big_portrate_kngt;
+}

@@ -23,9 +23,11 @@
 
 #include "gamedefs.h"
 #include "game.h"
-#include "world.h"
-#include "surface.h"
+#include "color.h"
 #include "rect.h"
+
+class Surface;
+class Kingdom;
 
 namespace Game
 {
@@ -35,22 +37,24 @@ class StatusWindow
 public:
     typedef enum { DAY, FUNDS, ARMY } info_t;
 
-    StatusWindow(const Point &pt, const World &wd);
+    StatusWindow(const Point &pt, const Kingdom &kd);
 
     const Rect & GetRect(void) const{ return pos; }
     
-    void Redraw(Game::focus_t focus);
+    void Redraw(void);
+    void SetState(info_t info){ state = info; };
     void NextState(void);
-    void NewDay(void);
+    
+    void RedrawAITurns(Color::color_t color, u8 progress) const;
 
 private:
     void DrawKingdomInfo(void);
     void DrawDayInfo(void);
     void DrawArmyInfo(void);
-    
-    const Surface &ston;
+
+    const Surface & ston;
     const Rect pos;
-    const World &world;
+    const Kingdom & myKingdom;
     
     info_t state;
 };

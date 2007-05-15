@@ -49,11 +49,16 @@ public:
     void Blit(const BaseSurface &src, const Rect &src_rt, s16 dst_ox, s16 dst_oy);
     void Blit(const BaseSurface &src, const Rect &src_rt, const Point &dst_pt){ Blit(src, src_rt, dst_pt.x, dst_pt.y); };
 
+    void ScaleFrom(const BaseSurface & bs);
+    
     bool SaveBMP(const char *fn) const{ return SDL_SaveBMP(surface, fn) ? false : true; };
     const void *pixels(void) const{ return surface->pixels; };
 
     void Fill(u32 color);
     void Fill(u8 r, u8 g, u8 b){ Fill(MapRGB(r, g, b)); };
+
+    void FillRect(u32 color, const Rect & src);
+    void FillRect(u8 r, u8 g, u8 b, const Rect & src){ FillRect(MapRGB(r, g, b), src); };
 
     void LoadPalette(const SDL_Color *colors);
     void SetDisplayFormat(void);

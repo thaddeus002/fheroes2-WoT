@@ -20,27 +20,30 @@
 #ifndef H2RADAR_H
 #define H2RADAR_H
 
-#include "gamedefs.h"
 #include "surface.h"
-#include "world.h"
 #include "spritecursor.h"
 #include "rect.h"
 
-class Radar : private Surface
+class Radar
 {
 public:
-    Radar(s16 rx, s16 ry, const World &wr);
+    Radar();
 
     const Rect & GetRect(void) const{ return pos; }
-    
+
     void Redraw(void);
-    void DrawCursor(Surface &surface);
-    void MoveCursor(SpriteCursor &cursor);
+    void UpdatePosition(void);
 
 private:
-    void GenerateFrom(const Surface &surface);
+    void DrawCursor(Surface &surface);
+
+private:
+    void GenerateOrigin(void);
+    void GenerateRealistic(void);
     Rect pos;
-    const World &world;
+    Surface spriteArea;
+    Surface spriteCursor;
+    SpriteCursor cursor;
 };
 
 #endif

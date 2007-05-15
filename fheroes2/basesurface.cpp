@@ -68,8 +68,8 @@ void BaseSurface::SetDisplayFormat(void)
 /* draw u16 pixel */
 void BaseSurface::SetPixel2(u16 x, u16 y, u32 color)
 {
-    if(x > surface->w || y > surface->h) Error::Except("BaseSurface::SetPixel2: out of range");
-
+    if(x > surface->w || y > surface->h) return;
+    
     u16 *bufp = static_cast<u16 *>(surface->pixels) + y * surface->pitch / 2 + x;
 
     *bufp = static_cast<u16>(color);
@@ -100,6 +100,14 @@ void BaseSurface::Fill(u32 color)
     SDL_FillRect(surface, &dstrect, color);
 }
 
+/* rect fill colors surface */
+void BaseSurface::FillRect(u32 color, const Rect & src)
+{
+    SDL_Rect dstrect = {src.x, src.y, src.w, src.h};
+
+    SDL_FillRect(surface, &dstrect, color);
+}
+
 /* blit */
 void BaseSurface::Blit(const BaseSurface &src)
 {
@@ -121,4 +129,86 @@ void BaseSurface::Blit(const BaseSurface &src, const Rect &src_rt, s16 dst_ox, s
     SDL_Rect dstrect = { dst_ox, dst_oy, src_rt.w, src_rt.w };
 
     SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), &srcrect, surface, &dstrect);
+}
+
+/* scaled from surface */
+void BaseSurface::ScaleFrom(const BaseSurface & bs)
+{
+    if(bs.w() <= w() || bs.h() <= h()) Error::Warning("BaseSurface::ScaleFrom: incorrect size.");
+    
+    u16 *p_src = NULL;
+    u16 *p_dst = NULL;
+
+    u16 width = 0;
+    u16 height = 0;
+
+    u8 count = 0;
+
+    BaseSurface & src = const_cast<BaseSurface &>(bs);
+    
+    src.Lock();
+    p_src = static_cast<u16 *>(const_cast<void *>(src.pixels()));
+
+    // count min iteration    
+    width = src.w();
+    for(;;)
+    {
+	++count;
+	if((width >>= 1) <= w()) break;
+    }
+    width = src.w() / 2;
+    height = src.h() / 2;
+
+    bool first = true;
+
+    while(count)
+    {
+	p_dst = new u16[width * height];
+
+	// iteration 2х2 -> 1
+	u32 index = 0;
+	u16 width2 = 2 * width;
+
+	for(u16 dstY = 0; dstY < height; ++dstY)
+	    for(u16 dstX = 0; dstX < width; ++dstX)
+	    {
+		u16 dstX2 = dstX * 2;
+		u16 dstY2 = dstY * 2;
+
+		u16 color = 0;
+
+		if((color = p_src[width2 * dstY2 + dstX2]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1] || 
+		    color == p_src[width2 * dstY2 + dstX2 + 1] || color == p_src[width2 * (dstY2 + 1) + dstX2])
+		    p_dst[index] = color;
+		else
+		if((color = p_src[width2 * dstY2 + dstX2 + 1]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1] || 
+	    	    color == p_src[width2 * (dstY2 + 1) + dstX2])
+		    p_dst[index] = color;
+		else
+		if((color = p_src[width2 * (dstY2 + 1) + dstX2]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1])
+		    p_dst[index] = color;
+		else
+		    p_dst[index] = p_src[width2 * (dstY2 + 1) + dstX2 + 1];
+
+		++index;
+	    }
+
+	if(!first && NULL != p_src) delete [] p_src;
+	first = false;
+	p_src = p_dst;
+	p_dst = NULL;
+
+	width = width / 2;
+	height = height / 2;
+
+	--count;
+    }
+
+    src.Unlock();
+
+    Lock();
+    memcpy(const_cast<void *>(pixels()), p_src, sizeof(u16) * (width * 2) * (height * 2));
+    Unlock();
+
+    delete [] p_src;
 }

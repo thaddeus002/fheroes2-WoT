@@ -117,6 +117,7 @@ Game::menu_t Game::ScenarioInfo(void){
     pointDifficulty[Difficulty::EXPERT] = Point(455, 124);
     pointDifficulty[Difficulty::IMPOSSIBLE] = Point(532, 124);
     SpriteCursor levelCursor(AGG::GetICN("NGEXTRA.ICN", 62), pointDifficulty[Difficulty::NORMAL]);
+    levelCursor.Move(pointDifficulty[Difficulty::NORMAL]);
     H2Config::SetGameDifficulty(Difficulty::NORMAL);
 
     std::vector<rectcolor_t>::const_iterator it;
@@ -427,6 +428,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
     display.Flip();
     Cursor::Show();
 
+    u16 num_select = 0xFFFF;
+
     // newstandard loop
     while(1){
 
@@ -521,7 +524,9 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	// click list
 	if(le.MouseClickLeft(rectAreaList)){
 	    u16 num = (le.MouseReleaseLeft().y - rectAreaList.y) / LISTHEIGHTROW;
-	    if(num > curmaps->size()) num = curmaps->size() - 1;
+	    if(num >= curmaps->size()) num = curmaps->size() - 1;
+	    if(num_select == num) break;
+	    num_select = num;
 	    Cursor::Hide();
 	    backgroundInfo.Restore();
 	    it_current = it_list_head + num;
@@ -529,6 +534,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    split.Move(it_list_head - curmaps->begin());
 	    display.Flip();
 	    Cursor::Show();
+	    num_select = num;
 	}
 
 	// click up

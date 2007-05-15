@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "agg.h"
 #include "rand.h"
 #include "error.h"
 #include "resource.h"
@@ -115,24 +114,46 @@ Resource::resource_t Resource::FromMP2(u8 index)
     return Resource::WOOD;
 }
 
-/* return sprite resource */
-const Sprite & Resource::GetForMapsSprite(Resource::resource_t resource)
+/* return index sprite objnrsrc.icn */
+u8 Resource::GetIndexSprite(Resource::resource_t resource)
 {
     switch(resource){
-        case Resource::WOOD:	return AGG::GetICN("OBJNRSRC.ICN", 1);
-        case Resource::MERCURY:	return AGG::GetICN("OBJNRSRC.ICN", 3);
-        case Resource::ORE:	return AGG::GetICN("OBJNRSRC.ICN", 5);
-        case Resource::SULFUR:	return AGG::GetICN("OBJNRSRC.ICN", 7);
-        case Resource::CRYSTAL: return AGG::GetICN("OBJNRSRC.ICN", 9);
-        case Resource::GEMS:	return AGG::GetICN("OBJNRSRC.ICN", 11);
-	case Resource::GOLD:	return AGG::GetICN("OBJNRSRC.ICN", 13);
+        case Resource::WOOD:	return  1;
+        case Resource::MERCURY:	return  3;
+        case Resource::ORE:	return  5;
+        case Resource::SULFUR:	return  7;
+        case Resource::CRYSTAL: return  9;
+        case Resource::GEMS:	return  11;
+	case Resource::GOLD:	return  13;
         default: 
-	    Error::Warning("Resource::GetForMapsSprite: unknown");
+	    Error::Warning("Resource::GetIndexSprite: unknown");
     }
-    
-    return AGG::GetICN("OBJNRSRC.ICN", 1);
+
+    return 0;
 }
 
 /* return rnd count resource */
 u16 Resource::RandCount(Resource::resource_t res)
 { return Resource::GOLD == res ? 100 * Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX) : Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX); }
+
+void Resource::ChangeTileWithRNDResource(std::vector<Maps::Tiles *> & vector, u16 center)
+{
+    Maps::Tiles & tile = *vector[center];
+    const Maps::TilesAddon *addon = NULL;
+
+    if( (addon = tile.FindAddon(0xB8, 0x11)) ||
+	(addon = tile.FindAddon(0xB9, 0x11)) ||
+        (addon = tile.FindAddon(0xBA, 0x11)) ||
+        (addon = tile.FindAddon(0xBB, 0x11)))
+    {
+	u32 uniq = (*addon).GetUniq();
+        u8 index = Resource::GetIndexSprite(Resource::Rand());
+        (*const_cast<Maps::TilesAddon *>(addon)).SetIndex(index);
+        tile.SetObject(MP2::OBJ_RESOURCE);
+
+        // replace shadow resource
+	if(center)
+	    if(const Maps::TilesAddon *shadow = (*vector[center - 1]).FindAddonLevel1(uniq))
+		(*const_cast<Maps::TilesAddon *>(shadow)).SetIndex(index - 1);
+    }
+}

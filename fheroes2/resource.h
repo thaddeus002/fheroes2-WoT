@@ -21,8 +21,9 @@
 #define H2RESOURCE_H
 
 #include <string>
+#include <vector>
+#include "maps_tiles.h"
 #include "gamedefs.h"
-#include "sprite.h"
 
 #define RNDRESOURCEMAX  15 
 #define RNDRESOURCEMIN  5 
@@ -67,7 +68,10 @@ namespace Resource
     resource_t FromMP2(u8 index);
     u16	RandCount(Resource::resource_t res);
     
-    const Sprite & GetForMapsSprite(resource_t resource);
+    u8 GetIndexSprite(resource_t resource);
+
+    void ChangeTileWithRNDResource(std::vector<Maps::Tiles *> & vector, u16 center);
+
 };
 
 #endif

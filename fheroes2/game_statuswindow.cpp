@@ -21,31 +21,33 @@
 #include "agg.h"
 #include "text.h"
 #include "tools.h"
-#include "kingdom.h"
+#include "world.h"
 #include "config.h"
+#include "surface.h"
+#include "kingdom.h"
 #include "game_statuswindow.h"
 
-Game::StatusWindow::StatusWindow(const Point &pt, const World &wd)
+Game::StatusWindow::StatusWindow(const Point &pt, const Kingdom &kd)
     : ston(AGG::GetICN(H2Config::EvilInterface() ? "STONBAKE.ICN" : "STONBACK.ICN", 0)), 
-      pos(pt, ston.w(), ston.h()), world(wd), state(Game::StatusWindow::DAY)
+      pos(pt, ston.w(), ston.h()), myKingdom(kd), state(Game::StatusWindow::DAY)
 {}
 
-void Game::StatusWindow::Redraw(Game::focus_t focus)
+void Game::StatusWindow::Redraw(void)
 {
-    switch(state){
-    
+    switch(state)
+    {
 	case DAY:
 	    DrawDayInfo();
 	    break;
-	
 	case FUNDS:
 	    DrawKingdomInfo();
 	    break;
-	
+	    break;
 	case ARMY:
 	    DrawArmyInfo();
 	    break;
-    }
+    }	
+
 }
 
 void Game::StatusWindow::NextState(void)
@@ -55,11 +57,6 @@ void Game::StatusWindow::NextState(void)
     if(FUNDS == state) state = ARMY;
     else
     if(ARMY == state) state = DAY;
-}
-
-void Game::StatusWindow::NewDay(void)
-{
-    state = DAY;
 }
 
 void Game::StatusWindow::DrawKingdomInfo(void)
@@ -72,8 +69,6 @@ void Game::StatusWindow::DrawKingdomInfo(void)
     // sprite all resource
     display.Blit(AGG::GetICN("RESSMALL.ICN", 0), pos.x + 6, pos.y + 3);
 
-    const Kingdom &myKingdom = world.GetMyKingdom();
-
     // count castle
     String::AddInt(count, myKingdom.GetCountCastle());
     Text(pos.x + 26 - Text::width(count, Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
@@ -83,31 +78,31 @@ void Game::StatusWindow::DrawKingdomInfo(void)
     Text(pos.x + 78 - Text::width(count, Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
     // count gold
     count.clear();
-    String::AddInt(count, myKingdom.resource.gold);
+    String::AddInt(count, myKingdom.GetFundsGold());
     Text(pos.x + 122 - Text::width(count, Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
     // count wood
     count.clear();
-    String::AddInt(count, myKingdom.resource.wood);
+    String::AddInt(count, myKingdom.GetFundsWood());
     Text(pos.x + 15 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count mercury
     count.clear();
-    String::AddInt(count, myKingdom.resource.mercury);
+    String::AddInt(count, myKingdom.GetFundsMercury());
     Text(pos.x + 37 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count ore
     count.clear();
-    String::AddInt(count, myKingdom.resource.ore);
+    String::AddInt(count, myKingdom.GetFundsOre());
     Text(pos.x + 60 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count sulfur
     count.clear();
-    String::AddInt(count, myKingdom.resource.sulfur);
+    String::AddInt(count, myKingdom.GetFundsSulfur());
     Text(pos.x + 84 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count crystal
     count.clear();
-    String::AddInt(count, myKingdom.resource.crystal);
+    String::AddInt(count, myKingdom.GetFundsCrystal());
     Text(pos.x + 108 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
     // count gems
     count.clear();
-    String::AddInt(count, myKingdom.resource.gems);
+    String::AddInt(count, myKingdom.GetFundsGems());
     Text(pos.x + 130 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
 }
 
@@ -138,3 +133,49 @@ void Game::StatusWindow::DrawArmyInfo(void)
     display.Blit(ston, pos);
 }
 
+void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
+{
+    // restore background
+    display.Blit(ston, pos);
+
+    const Sprite & glass = AGG::GetICN("HOURGLAS.ICN", 0);
+
+    u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
+    u16 dst_y = pos.y + (pos.h - glass.h()) / 2;
+
+    display.Blit(glass, dst_x, dst_y);
+
+    u8 color_index = 0;
+
+    switch(color)
+    {
+	case Color::BLUE:	color_index = 0; break;
+	case Color::GREEN:	color_index = 1; break;
+	case Color::RED:	color_index = 2; break;
+	case Color::YELLOW:	color_index = 3; break;
+	case Color::ORANGE:	color_index = 4; break;
+	case Color::PURPLE:	color_index = 5; break;
+	default: return;
+    }
+
+    const Sprite & crest = AGG::GetICN("BRCREST.ICN", color_index);
+
+    dst_x += 2;
+    dst_y += 2;
+
+    display.Blit(crest, dst_x, dst_y);
+
+    const Sprite & sand = AGG::GetICN("HOURGLAS.ICN", 1 + (progress % 10));
+    
+    dst_x += (glass.w() - sand.w() - sand.x() - 3);
+    dst_y += sand.y();
+
+    display.Blit(sand, dst_x, dst_y);
+    
+    // animation sand
+    //
+    // sprites "HOURGLAS.ICN", 11, 30
+    //
+
+    display.Flip();
+}

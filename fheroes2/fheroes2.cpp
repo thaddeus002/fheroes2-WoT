@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 	    if(cmd.Exists('h')){
 
 		std::cout << "Usage: " << argv[0] << " [OPTIONS]\n" \
+		    << "  -e\teditors mode\n" \
 		    << "  -d\tdebug mode\n" \
 		    << "  -c\tpath to config file (default fheroes2.cfg)\n" \
 		    << "  -h\tprint this help and exit" << std::endl;
@@ -58,6 +59,14 @@ int main(int argc, char **argv)
 
 	    // set debug
 	    if(cmd.Exists('d')) H2Config::SetDebug();
+
+	    // editor mode
+	    if(cmd.Exists('e')){
+
+		H2Config::SetEditor();
+
+		if(H2Config::Debug()) std::cout << "start: editing mode." << std::endl;
+	    }
 	}
 
 	// random init

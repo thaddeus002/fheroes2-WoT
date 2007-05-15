@@ -34,7 +34,7 @@ void SpriteCursor::Move(s16 ax, s16 ay)
     background.Restore();
     background.Save(ax, ay);
 
-    display.Blit(*this, ax, ay);
+    display.Blit(spriteCursor, ax, ay);
 
     if(hide) Cursor::Show();
 }
@@ -45,7 +45,17 @@ void SpriteCursor::Redraw(void)
 
     if(hide) Cursor::Hide();
 
-    display.Blit(*this, background.GetPos());
+    background.Restore();
+    background.Save();
+
+    display.Blit(spriteCursor, background.GetPos());
 
     if(hide) Cursor::Show();
+}
+
+void SpriteCursor::Show(s16 ax, s16 ay)
+{
+    background.Save(ax, ay);
+
+    display.Blit(spriteCursor, background.GetPos());
 }

@@ -27,7 +27,7 @@
 #include "config.h"
 
 namespace H2Config {
-    static u16  boolValue = ANIMATION;
+    static u16  boolValue = ANIMATION | ORIGINAL;
     static std::string pathAGGFile("heroes2.agg");
     static std::string pathMapsDirectory("maps");
     static Display::resolution_t videoMode = Display::SMALL;
@@ -38,7 +38,7 @@ namespace H2Config {
     static u8 allowColors = 0;
     static u8 allowRaces = 0;
     static Race::race_t raceKingdom[KINGDOMMAX];
-    static Maps::mapsize_t sizeMaps(Maps::NONE);
+    static Maps::mapsize_t sizeMaps(Maps::ZERO);
     static std::string pathFileMaps;
     static std::string nameMaps;
     static std::string descriptionMaps;
@@ -48,9 +48,6 @@ namespace H2Config {
 void H2Config::Init(const std::string &filename)
 {
 	if(filename.empty()) return;
-
-	//
-	boolValue = 0;
 
 	Error::Verbose("config file: " + filename);
 	
@@ -81,6 +78,8 @@ void H2Config::Init(const std::string &filename)
  		if(leftKey == "animation" && rightValue == "on") H2Config::boolValue |= H2Config::ANIMATION;
  		if(leftKey == "fullscreen" && rightValue == "on") H2Config::boolValue |= H2Config::FULLSCREEN;
  		if(leftKey == "evilinterface" && rightValue == "on") H2Config::boolValue |= H2Config::EVILINTERFACE;
+		if(leftKey == "original")
+		    rightValue == "on" ? H2Config::boolValue |= H2Config::ORIGINAL : H2Config::boolValue &= ~H2Config::ORIGINAL;
 		if(leftKey == "rledebug" && rightValue == "on") H2Config::boolValue |= H2Config::RLEDEBUG;
 
 		// string
@@ -99,11 +98,17 @@ void H2Config::Init(const std::string &filename)
 	file.close();
 }
 
+/* return editor */
+bool H2Config::Editor(void){ return H2Config::boolValue & H2Config::EDITOR; };
+
 /* return debug */
 bool H2Config::Debug(void){ return H2Config::boolValue & H2Config::DEBUG; };
 
 /* return RLE debug */
 bool H2Config::RLEDebug(void){ return H2Config::boolValue & H2Config::RLEDEBUG; };
+
+/* return original version */
+bool H2Config::Original(void){ return H2Config::boolValue & H2Config::ORIGINAL; };
 
 /* return sound */
 bool H2Config::Sound(void){ return H2Config::boolValue & H2Config::SOUND; };
@@ -181,8 +186,14 @@ const std::string & H2Config::GetDescriptionMaps(void){ return H2Config::descrip
 /* get size play maps */
 Maps::mapsize_t H2Config::GetSizeMaps(void){ return H2Config::sizeMaps; }
 
+/* set editor */
+void H2Config::SetEditor(void){ H2Config::boolValue |= H2Config::EDITOR; };
+
 /* set debug */
 void H2Config::SetDebug(void){ H2Config::boolValue |= H2Config::DEBUG; };
+
+/* set original version */
+void H2Config::SetOriginal(void){ H2Config::boolValue |= H2Config::ORIGINAL; };
 
 /* set path agg data */
 void H2Config::SetAGGFile(const std::string & path){ H2Config::pathAGGFile = path; };

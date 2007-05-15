@@ -34,7 +34,7 @@ namespace Font
     typedef enum { SMALL, BIG } type_t;
 };
 
-#define GAME_VERSION		20070305
+#define GAME_VERSION		20070505
 
 #define MAXU16   65535 
 #define MAXU32   4294967295 

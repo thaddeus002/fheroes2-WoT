@@ -23,6 +23,8 @@
 #include "dialog.h"
 #include "gameevent.h"
 
+#define SIZEMESSAGE 400
+
 GameEvent::Sign::Sign(u16 index, const char *str) : index_map(index), message(str)
 { if(H2Config::Debug()) Error::Verbose("add Sign: " + message); }
 
@@ -42,24 +44,31 @@ GameEvent::Day::Day(const void *ptr)
     byte32 = reinterpret_cast<const u32 *>(& byte8[1]);
 
     resource.wood = *byte32;
+    SWAP32(resource.wood);
     ++byte32;
 
     resource.mercury = *byte32;
+    SWAP32(resource.mercury);
     ++byte32;
 
     resource.ore = *byte32;
+    SWAP32(resource.ore);
     ++byte32;
 
     resource.sulfur = *byte32;
+    SWAP32(resource.sulfur);
     ++byte32;
 
     resource.crystal = *byte32;
+    SWAP32(resource.crystal);
     ++byte32;
 
     resource.gems = *byte32;
+    SWAP32(resource.gems);
     ++byte32;
 
     resource.gold = *byte32;
+    SWAP32(resource.gold);
     ++byte32;
 
     // skip artifact
@@ -68,14 +77,17 @@ GameEvent::Day::Day(const void *ptr)
 
     // allow computer
     computer = *byte16;
+    SWAP16(conputer);
     ++byte16;
 
     // day of first occurent
     first = *byte16;
+    SWAP16(first);
     ++byte16;
 
     // subsequent occurrences
     subsequent = *byte16;
+    SWAP16(subsequent);
     ++byte16;
 
     byte8 = reinterpret_cast<const u8 *>(byte16);
@@ -110,7 +122,7 @@ GameEvent::Day::Day(const void *ptr)
     // message
     message = std::string(reinterpret_cast<const char *>(byte8));
     
-    if(255 < message.size()) Error::Warning("GameEvent::Day: long message, incorrect block?");
+    if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Day: long message, incorrect block?");
 
     if(H2Config::Debug()) Error::Verbose("GameEvent::Day: add: " + message);
 }
@@ -128,29 +140,38 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     byte32 = reinterpret_cast<const u32 *>(& byte8[1]);
 
     resource.wood = *byte32;
+    SWAP32(resource.wood);
     ++byte32;
 
     resource.mercury = *byte32;
+    SWAP32(resource.mercury);
     ++byte32;
 
     resource.ore = *byte32;
+    SWAP32(resource.ore);
     ++byte32;
 
     resource.sulfur = *byte32;
+    SWAP32(resource.sulfur);
     ++byte32;
 
     resource.crystal = *byte32;
+    SWAP32(resource.crystal);
     ++byte32;
 
     resource.gems = *byte32;
+    SWAP32(resource.gems);
     ++byte32;
 
     resource.gold = *byte32;
+    SWAP32(resource.gold);
     ++byte32;
 
     // artifact
     byte16 = reinterpret_cast<const u16 *>(byte32);
-    if(0xffff != *byte16 && Artifact::MAGIC_BOOK > *byte16) artifact = Artifact::Artifact(*byte16);
+    u16 art2 = *byte16;
+    SWAP16(art2);
+    if(0xffff != *byte16 && Artifact::MAGIC_BOOK > art2) artifact = Artifact::Artifact(art2);
     ++byte16;
 
     // allow computer
@@ -191,7 +212,7 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     // message
     message = std::string(reinterpret_cast<const char *>(byte8));
     
-    if(255 < message.size()) Error::Warning("GameEvent::Coord: long message, incorrect block?");
+    if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Coord: long message, incorrect block?");
 
     if(H2Config::Debug()) Error::Verbose("GameEvent::Coord: add: " + message);
 }
@@ -209,29 +230,38 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     byte32 = reinterpret_cast<const u32 *>(& byte8[1]);
 
     resource.wood = *byte32;
+    SWAP32(resource.wood);
     ++byte32;
 
     resource.mercury = *byte32;
+    SWAP32(resource.mercury);
     ++byte32;
 
     resource.ore = *byte32;
+    SWAP32(resource.ore);
     ++byte32;
 
     resource.sulfur = *byte32;
+    SWAP32(resource.sulfur);
     ++byte32;
 
     resource.crystal = *byte32;
+    SWAP32(resource.crystal);
     ++byte32;
 
     resource.gems = *byte32;
+    SWAP32(resource.gems);
     ++byte32;
 
     resource.gold = *byte32;
+    SWAP32(resource.gold);
     ++byte32;
 
     // artifact
     byte16 = reinterpret_cast<const u16 *>(byte32);
-    if(0xffff != *byte16 && Artifact::MAGIC_BOOK > *byte16) artifact = Artifact::Artifact(*byte16);
+    u16 art2 = *byte16;
+    SWAP16(art2);
+    if(0xffff != *byte16 && Artifact::MAGIC_BOOK > art2) artifact = Artifact::Artifact(art2);
     ++byte16;
 
     // count answers
@@ -251,7 +281,11 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     // message
     message = std::string(reinterpret_cast<const char *>(byte8));
     
-    if(255 < message.size()) Error::Warning("GameEvent::Riddle: long message, incorrect block?");
+    if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Riddle: long message, incorrect block?");
 
     if(H2Config::Debug()) Error::Verbose("GameEvent::Riddle: add: " + message);
+}
+
+GameEvent::Rumor::Rumor(const char * ptr) : message(ptr)
+{
 }
