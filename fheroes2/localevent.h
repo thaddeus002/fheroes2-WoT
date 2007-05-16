@@ -29,7 +29,7 @@ public:
     static void SetState(u8 type, bool enable){ SDL_EventState(type, enable ? SDL_ENABLE : SDL_IGNORE); };
     static u8   GetState(u8 type){ return SDL_EventState(type, SDL_QUERY); };
 
-    bool operator() (void){ return keep_going; };
+    bool operator() (void) const{ return keep_going; };
 
     void HandleEvents(void);
 
@@ -39,13 +39,13 @@ public:
     bool MouseMiddle(void) const{ return mouse_pressed && SDL_BUTTON_MIDDLE  == mouse_button; };
     bool MouseRight(void) const{ return mouse_pressed && SDL_BUTTON_RIGHT == mouse_button; };
 
-    const Point & MousePressLeft(void){ return mouse_pl; };
-    const Point & MousePressMiddle(void){ return mouse_pm; };
-    const Point & MousePressRight(void){ return mouse_pr; };
+    const Point & MousePressLeft(void) const{ return mouse_pl; };
+    const Point & MousePressMiddle(void) const{ return mouse_pm; };
+    const Point & MousePressRight(void) const{ return mouse_pr; };
 
-    const Point & MouseReleaseLeft(void){ return mouse_rl; };
-    const Point & MouseReleaseMiddle(void){ return mouse_rm; };
-    const Point & MouseReleaseRight(void){ return mouse_rr; };
+    const Point & MouseReleaseLeft(void) const{ return mouse_rl; };
+    const Point & MouseReleaseMiddle(void) const{ return mouse_rm; };
+    const Point & MouseReleaseRight(void) const{ return mouse_rr; };
 
     bool MouseClickLeft(const Rect &rt);
     bool MouseClickMiddle(const Rect &rt);

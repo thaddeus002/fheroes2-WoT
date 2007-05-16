@@ -67,14 +67,13 @@ Dialog::answer_t Castle::OpenDialog(void)
     Button buttonPrevCastle(dst_pt, "SMALLBAR.ICN", 1, 2);
 
     // bottom small bar
-    dst_pt.x += 21;
-    const Sprite & smallbar = AGG::GetICN("SMALLBAR.ICN", 0);
-    display.Blit(smallbar, dst_pt);
+    Dialog::StatusBar statusBar(Point(cur_pt.x + 21, cur_pt.y + 461), AGG::GetICN("SMALLBAR.ICN", 0), Font::BIG);
+    statusBar.Clear();
 
     u8 index_sprite = 0;
 
     // button next castle
-    dst_pt.x += smallbar.w();
+    dst_pt.x += 640 - 21;
     Button buttonNextCastle(dst_pt, "SMALLBAR.ICN", 3, 4);
 
     // strip grid
@@ -104,40 +103,45 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     display.Blit(crest, dst_pt);
 
-    // castle troops background
-    Rect castle_troops[CASTLEMAXARMY];
-    const Sprite & troops_back = AGG::GetICN(str_icn, 2);
-    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
-    {
-	dst_pt.x = cur_pt.x + 112 + (troops_back.w() + 6) * ii;
-	dst_pt.y = cur_pt.y + 262;
-
-	display.Blit(troops_back, dst_pt);
-	
-	castle_troops[ii] = Rect(dst_pt, troops_back.w(), troops_back.h());
-    }
+    // castle troops selector
+    dst_pt.x = cur_pt.x + 112;
+    dst_pt.y = cur_pt.y + 262;
+    Army::SelectBar selectCastleTroops(dst_pt, army);
+    selectCastleTroops.Reset();
+    selectCastleTroops.Redraw();
+    const std::vector<Rect> & coordsCastleTrops = selectCastleTroops.GetCoords();
 
     // portrait heroes or captain or sign
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 361;
 
+    if(isHeroesPresent())
+    {
+	//display.Blit(AGG::GetICN(Heroes::BigPortraitString(heroes), 0), dst_pt);
+    }
+    else
     if(isBuild(Castle::BUILD_CAPTAIN))
 	display.Blit(AGG::GetICN(Captain::BigPortraitString(race), 0), dst_pt);
     else
     	display.Blit(AGG::GetICN("STRIP.ICN", 3), dst_pt);
 
     // heroes troops background
-    Rect heroes_troops[HEROESMAXARMY];
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+    dst_pt.x = cur_pt.x + 112;
+    dst_pt.y = cur_pt.y + 361;
+/*
     {
-	dst_pt.x = cur_pt.x + 112 + (troops_back.w() + 6) * ii;
-	dst_pt.y = cur_pt.y + 361;
+    Army::SelectBar selectHeroesTroops(dst_pt, heroes.army);
+    selectHeroesTroops.Reset();
+    selectHeroesTroops.Redraw();
+    const std::vector<Rect> & coordsHeroesTrops = selectHeroesTroops.GetCoords();
+*/
 
-	display.Blit(troops_back, dst_pt);
-
-	heroes_troops[ii] = Rect(dst_pt, troops_back.w(), troops_back.h());
+    if(isHeroesPresent())
+    {
     }
-
+    else
+    	display.Blit(AGG::GetICN("STRIP.ICN", 11), dst_pt);
+    
     // resource
     RedrawResourcePanel();
 
@@ -166,7 +170,53 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// castle troops
 	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
 	{
-	    //castle_troops[ii];
+	    if(le.MouseClickLeft(coordsCastleTrops[ii]))
+	    {
+		Cursor::Hide();
+		if(selectCastleTroops.isSelected()) // or selectHeroesTroops.isSelected()
+		{
+		    // show dialog army info
+		    if(army[ii].Valid() && selectCastleTroops.GetCursorIndex() == ii)
+		    {
+			//army[selectCastleTroops.GetCursorIndex()].ShowDialogInfo();
+			selectCastleTroops.Reset();
+			selectCastleTroops.Redraw();
+		    }
+		    else
+		    // change army
+		    if(army[ii].Valid())
+		    {
+			const Monster::monster_t monster = army[selectCastleTroops.GetCursorIndex()].GetMonster();
+			const u16 count = army[selectCastleTroops.GetCursorIndex()].GetCount();
+			army[selectCastleTroops.GetCursorIndex()] = army[ii];
+			army[ii].SetMonster(monster);
+			army[ii].SetCount(count);
+
+			selectCastleTroops.Reset();
+			selectCastleTroops.Redraw();
+		    }
+		    // move to empty position
+		    else
+		    {
+			army[ii] = army[selectCastleTroops.GetCursorIndex()];
+			army[selectCastleTroops.GetCursorIndex()].SetMonster(Monster::UNKNOWN);
+			army[selectCastleTroops.GetCursorIndex()].SetCount(0);
+
+			selectCastleTroops.Reset();
+			selectCastleTroops.Redraw();
+		    }
+		}
+		else
+		// select army
+		if(army[ii].Valid())
+		{
+		    selectCastleTroops.Reset();
+		    selectCastleTroops.Select(ii);
+		    selectCastleTroops.Redraw();
+		}
+		display.Flip();
+		Cursor::Show();
+	    }
 	}
 
 	// heroes troops

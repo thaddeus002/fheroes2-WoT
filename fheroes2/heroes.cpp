@@ -22,6 +22,6 @@
 #include "heroes.h"
 
 Heroes::Heroes(u32 gid, u16 mapindex, const void *ptr, bool rnd)
-    : uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
+    : army(HEROESMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
 {
 }

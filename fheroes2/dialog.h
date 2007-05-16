@@ -33,6 +33,7 @@
 #define BUTTON_HEIGHT   50
 
 class Castle;
+class Surface;
 
 namespace Dialog
 {
@@ -81,6 +82,20 @@ public:
 
 private:
     Rect area;
+};
+
+class StatusBar
+{
+public:
+    StatusBar(const Point & pt, const Surface & sf, const Font::type_t ft) : pos_pt(pt), sprite(sf), font(ft){};
+
+    void ShowMessage(const std::string & message);
+    void Clear(void);
+
+private:
+    const Point pos_pt;
+    const Surface & sprite;
+    const Font::type_t font;
 };
 
 };

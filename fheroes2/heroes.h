@@ -22,6 +22,7 @@
 #define H2HEROES_H
 
 #include <utility>
+#include <vector>
 #include "race.h"
 #include "color.h"
 #include "morale.h"
@@ -130,7 +131,7 @@ private:
     Luck::luck_t	luck;
     Skill::skill_t	skill[HEROESMAXSKILL];
     Artifact::artifact_t artifact[HEROESMAXARTIFACT];
-    Army::Army		army[HEROESMAXARMY];
+    std::vector<Army::Troops> army;
     bool		format_spread;
     float		move_point;
     u16			index_maps;

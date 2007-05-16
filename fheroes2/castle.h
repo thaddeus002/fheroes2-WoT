@@ -76,13 +76,14 @@ public:
     
     bool isCastle(void) const{ return castle; };
     bool isBuild(building_t bd) const{ return building & bd; };
+    bool isHeroesPresent(void) const{ return false; };
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
     u32 GetUniq(void) const{ return uniq; };
 
-    const Army::Army & GetArmy(u8 index) const{ return index < CASTLEMAXARMY ? army[index] : army [0]; };
+    const Army::Troops & GetArmy(u8 index) const{ return index < CASTLEMAXARMY ? army[index] : army [0]; };
     u8 GetCountArmy(void) const;
 
     const Point & GetCenter(void) const{ return mp; };
@@ -101,6 +102,7 @@ private:
     void CorrectAreaMaps(void);
     void ModifyTIlesRNDSprite(Maps::Tiles & tile);
     void ModifyTIlesFlags(Maps::Tiles & tile);
+    void ModifyTilesTownToCastle(Maps::Tiles & tile);
 
 private:
     Color::color_t	color;
@@ -113,7 +115,7 @@ private:
     bool		army_spread;
     //MageGuild		guild;
     u16			dwelling[CASTLEMAXMONSTER];
-    Army::Army		army[CASTLEMAXARMY];
+    std::vector<Army::Troops> army;
 
     const u32		uniq;
 

@@ -17,79 +17,18 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ARMY_H
-#define H2ARMY_H
 
 #include <string>
-#include <vector>
-#include <utility>
-#include "monster.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "gamedefs.h"
+#include "text.h"
+#include "dialog.h"
 
-class Surface;
-
-namespace Army
+void Dialog::StatusBar::ShowMessage(const std::string & message)
 {
-    typedef enum
-    {
-	FEW	= 1,
-	SEVERAL	= 5,
-	PACK	= 10,
-	LOTS	= 20,
-	HORDE	= 50,
-	THRONG	= 100,
-	SWARM	= 250,
-	ZOUNDS	= 500,
-	LEGION	= 1000
-    } size_t;
+    Text(pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
+         pos_pt.y + (sprite.h() - Text::height(sprite.w(), message, font)) / 2, message, font, true);
+}
 
-    const std::string & String(size_t size);
-
-    class Troops
-    {
-    public:
-	Troops(Monster::monster_t ms = Monster::UNKNOWN, u16 num = 0) : monster(ms), count(num){};
-	
-	bool Valid(void) const{ return Monster::UNKNOWN > monster && count; };
-	Monster::monster_t GetMonster(void) const{ return monster; };
-	u16 GetCount(void) const{ return count; };
-
-	void SetMonster(Monster::monster_t ms){ monster = ms; };
-	void SetCount(u16 num){ count = num; };
-
-    private:
-	Monster::monster_t monster;
-	u16 count;
-    };
-
-    class SelectBar
-    {
-    public:
-	SelectBar(const Point & pos, const std::vector<Troops> & troops);
-
-	bool isSelected(void) const{ return selected; };
-
-	const std::vector<Rect> & GetCoords(void) const{ return coords; };
-	
-	u8 GetCursorIndex(void) const{ return cursor_index; };
-
-	void Redraw(void);
-	void Reset(void);
-	void Select(u8 index);
-
-    private:
-	const Point pos_pt;
-	const Surface & empty_back;
-	const u8 step;
-	SpriteCursor cursor;
-	const std::vector<Troops> & army;
-	bool selected;
-	u8 cursor_index;
-	
-	std::vector<Rect> coords;
-    };
-};
-
-#endif
+void Dialog::StatusBar::Clear(void)
+{
+    display.Blit(sprite, pos_pt);
+}

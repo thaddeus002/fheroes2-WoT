@@ -23,7 +23,7 @@
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
-    : building(0), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
+    : building(0), army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
 {
     const u8  *byte8  = static_cast<const u8 *>(ptr);
     const u16 *byte16 = NULL;
@@ -391,6 +391,20 @@ void Castle::ModifyTIlesFlags(Maps::Tiles & tile)
 
 	addon_w.SetIndex(index_sprite);
     }
+}
+
+// modify Town sprite to Castle
+void Castle::ModifyTilesTownToCastle(Maps::Tiles & tile)
+{
+    const Maps::TilesAddon *addon = NULL;
+
+    if( (addon = tile.FindAddon(0x8C)) || (addon = tile.FindAddon(0x8D)) ||
+	(addon = tile.FindAddon(0x8E)) || (addon = tile.FindAddon(0x8F)))
+	{
+            Maps::TilesAddon & addon_w = *const_cast<Maps::TilesAddon *>(addon);
+
+            addon_w.SetIndex((*addon).GetIndex() - 16);
+	}
 }
 
 // return count army in castle

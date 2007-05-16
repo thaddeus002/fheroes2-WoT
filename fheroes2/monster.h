@@ -21,6 +21,7 @@
 #define H2MONSTER_H
 
 #include <string>
+#include "race.h"
 #include "gamedefs.h"
 
 namespace Monster
@@ -125,6 +126,7 @@ namespace Monster
 
     typedef struct {
 	monster_t monster;
+	Race::race_t race;
 	level_t level;
 	u8 attack;
 	u8 defence;
@@ -143,7 +145,7 @@ namespace Monster
 
     const std::string & String(monster_t monster);
     const stats_t & GetStats(monster_t monster);
-    
+
     monster_t Rand(void);
     monster_t Rand1(void);
     monster_t Rand2(void);

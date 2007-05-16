@@ -181,7 +181,7 @@ void Dialog::QuickInfo(const Castle & castle)
 
 	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
         {
-	    const Army::Army & army = castle.GetArmy(ii);
+	    const Army::Troops & army = castle.GetArmy(ii);
 
 	    if(army.Valid())
 	    {
