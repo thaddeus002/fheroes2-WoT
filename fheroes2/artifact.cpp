@@ -199,7 +199,8 @@ Artifact::artifact_t Artifact::Artifact(u8 index)
 	case 0x4E: return Artifact::SPIKED_SHIELD;
 	case 0x4F: return Artifact::WHITE_PEARL;
 	case 0x50: return Artifact::BLACK_PEARL;
-	
+	case 0xFF: return Artifact::UNKNOWN;
+
 	// not used
 	default:
 	    Error::Warning("Artifact::Artifact: unknown: ", index);

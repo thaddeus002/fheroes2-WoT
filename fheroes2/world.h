@@ -70,7 +70,6 @@ public:
     bool BeginWeek(void){ return begin_week; };
     bool BeginMonth(void){ return begin_month; };
     void NextDay(void);
-    
 
 private:
     World(){};

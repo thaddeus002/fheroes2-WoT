@@ -22,6 +22,8 @@
 #include "agg.h"
 #include "rand.h"
 #include "army.h"
+#include "castle.h"
+#include "error.h"
 #include "game.h"
 #include "gamearea.h"
 #include "maps.h"
@@ -246,6 +248,174 @@ u16 Monster::RandCount(Monster::monster_t monster)
     }
 
     return Rand::Get(Army::PACK, Army::FEW) + Army::FEW;
+}
+
+Monster::monster_t Monster::Monster(Race::race_t race, u32 dwelling)
+{
+    switch(dwelling)
+    {
+        case Castle::DWELLING_MONSTER1:
+	    switch(race)
+	    {
+		case Race::KNGT: return PEASANT;
+		case Race::BARB: return GOBLIN;
+		case Race::SORC: return SPRITE;
+		case Race::WRLK: return CENTAUR;
+		case Race::WZRD: return HALFLING;
+		case Race::NECR: return SKELETON;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_MONSTER2:
+	    switch(race)
+	    {
+		case Race::KNGT: return ARCHER;
+		case Race::BARB: return ORC;
+		case Race::SORC: return DWARF;
+		case Race::WRLK: return GARGOYLE;
+		case Race::WZRD: return BOAR;
+		case Race::NECR: return ZOMBIE;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_UPGRADE2:
+	    switch(race)
+	    {
+		case Race::KNGT: return RANGER;
+		case Race::BARB: return CHIEF_ORC;
+		case Race::SORC: return BATTLE_DWARF;
+		case Race::WRLK: return GARGOYLE;
+		case Race::WZRD: return BOAR;
+		case Race::NECR: return MUTANT_ZOMBIE;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_MONSTER3:
+	    switch(race)
+	    {
+		case Race::KNGT: return PIKEMAN;
+		case Race::BARB: return WOLF;
+		case Race::SORC: return ELF;
+		case Race::WRLK: return GRIFFIN;
+		case Race::WZRD: return IRON_GOLEM;
+		case Race::NECR: return MUMMY;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_UPGRADE3:
+	    switch(race)
+	    {
+		case Race::KNGT: return VETERAN_PIKEMAN;
+		case Race::BARB: return WOLF;
+		case Race::SORC: return GRAND_ELF;
+		case Race::WRLK: return GRIFFIN;
+		case Race::WZRD: return STEEL_GOLEM;
+		case Race::NECR: return ROYAL_MUMMY;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_MONSTER4:
+	    switch(race)
+	    {
+		case Race::KNGT: return SWORDSMAN;
+		case Race::BARB: return OGRE;
+		case Race::SORC: return DRUID;
+		case Race::WRLK: return MINOTAUR;
+		case Race::WZRD: return ROC;
+		case Race::NECR: return VAMPIRE;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_UPGRADE4:
+	    switch(race)
+	    {
+		case Race::KNGT: return MASTER_SWORDSMAN;
+		case Race::BARB: return LORD_OGRE;
+		case Race::SORC: return GREATER_DRUID;
+		case Race::WRLK: return KNIGHT_MINOTAUR;
+		case Race::WZRD: return ROC;
+		case Race::NECR: return LORD_VAMPIRE;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_MONSTER5:
+	    switch(race)
+	    {
+		case Race::KNGT: return CAVALRY;
+		case Race::BARB: return TROLL;
+		case Race::SORC: return UNICORN;
+		case Race::WRLK: return HYDRA;
+		case Race::WZRD: return MAGE;
+		case Race::NECR: return LICH;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_UPGRADE5:
+	    switch(race)
+	    {
+		case Race::KNGT: return CHAMPION;
+		case Race::BARB: return WAR_TROLL;
+		case Race::SORC: return UNICORN;
+		case Race::WRLK: return HYDRA;
+		case Race::WZRD: return ARCHMAGE;
+		case Race::NECR: return POWER_LICH;
+		default: break;
+	    }
+	    break;
+
+    	case Castle::DWELLING_MONSTER6:
+	    switch(race)
+	    {
+		case Race::KNGT: return PALADIN;
+		case Race::BARB: return CYCLOPS;
+		case Race::SORC: return PHOENIX;
+		case Race::WRLK: return GREEN_DRAGON;
+		case Race::WZRD: return GIANT;
+		case Race::NECR: return BONE_DRAGON;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_UPGRADE6:
+	    switch(race)
+	    {
+		case Race::KNGT: return CRUSADER;
+		case Race::BARB: return CYCLOPS;
+		case Race::SORC: return PHOENIX;
+		case Race::WRLK: return RED_DRAGON;
+		case Race::WZRD: return TITAN;
+		case Race::NECR: return BONE_DRAGON;
+		default: break;
+	    }
+	    break;
+
+        case Castle::DWELLING_UPGRADE7:
+	    switch(race)
+	    {
+		case Race::KNGT: return CRUSADER;
+		case Race::BARB: return CYCLOPS;
+		case Race::SORC: return PHOENIX;
+		case Race::WRLK: return BLACK_DRAGON;
+		case Race::WZRD: return TITAN;
+		case Race::NECR: return BONE_DRAGON;
+		default: break;
+	    }
+	    break;
+
+        default: break;
+    }
+
+    Error::Warning("Monster::GetMonster: unknown level or race.");
+
+    return Monster::UNKNOWN;
 }
 
 /*

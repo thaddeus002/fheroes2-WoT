@@ -18,31 +18,23 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "army.h"
+#include "uniq.h"
+#include "rand.h"
+#include "error.h"
 
-const std::string & Army::String(Army::size_t size)
+Heroes::heroes_t Uniq::GetHeroes(Race::race_t race)
 {
-    static const std::string few("Few");
-    static const std::string several("Several");
-    static const std::string pack("Pack");
-    static const std::string lots("Lots");
-    static const std::string horde("Horde");
-    static const std::string throng("Throng");
-    static const std::string swarm("Swarm");
-    static const std::string zounds("Zounds");
-    static const std::string legion("Legion");
+        // from race
+        switch(race)
+        {
+            case Race::KNGT: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::LORDKILBURN, Heroes::DIMITRY));
+            case Race::BARB: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::THUNDAX, Heroes::ATLAS));
+            case Race::SORC: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::ASTRA, Heroes::LUNA));
+            case Race::WRLK: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::ARIE, Heroes::WRATHMONT));
+            case Race::WZRD: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::MYRA, Heroes::MANDIGAL));
+            case Race::NECR: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::ZOM, Heroes::CELIA));
+            default: break;
+        }
 
-    switch(size){
-	case FEW:	return few;
-        case SEVERAL:	return several;
-        case PACK:	return pack;
-        case LOTS:	return lots;
-        case HORDE:	return horde;
-        case THRONG:	return throng;
-        case SWARM:	return swarm;
-        case ZOUNDS:	return zounds;
-        default: break;
-    }
-    
-    return legion;
+    return Heroes::SANDYSANDY;
 }

@@ -182,3 +182,24 @@ void Kingdom::RemoveCastle(const Castle *castle)
 	}
     }
 }
+
+u8 Kingdom::GetCountCastle(void) const
+{
+    u8 result = 0;
+
+    if(castles.size())
+    {
+	std::vector<Castle *>::const_iterator it = castles.begin();
+
+	for(; it != castles.end(); ++it) if((**it).isCastle()) ++result;
+    }
+
+    return result;
+}
+
+u8 Kingdom::GetCountTown(void) const
+{
+    if(castles.size()) return castles.size() - GetCountCastle();
+
+    return 0;
+}

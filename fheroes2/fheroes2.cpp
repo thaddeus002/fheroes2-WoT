@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
 		return EXIT_SUCCESS;
 	    }
-	
+
 	    // init config
 	    cmd.Exists('c') ? H2Config::Init(cmd.GetValue('c')) : H2Config::Init("fheroes2.cfg");
 

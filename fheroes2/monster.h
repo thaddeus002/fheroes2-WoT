@@ -141,10 +141,11 @@ namespace Monster
 	const std::string file;
     } stats_t;
 
-    monster_t Monster(u8 num);
-
     const std::string & String(monster_t monster);
     const stats_t & GetStats(monster_t monster);
+    
+    monster_t Monster(u8 num);
+    monster_t Monster(Race::race_t race, u32 dwelling);
 
     monster_t Rand(void);
     monster_t Rand1(void);

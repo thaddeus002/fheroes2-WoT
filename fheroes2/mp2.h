@@ -120,6 +120,7 @@ namespace MP2
     // origin mp2 heroes
     // 0x004c - size
     typedef struct {
+	u8	unknown;
 	bool	customTroops;
 	u8	monster1;	// 0xff none
 	u8	monster2;	// 0xff none
@@ -160,7 +161,7 @@ namespace MP2
 	char	name[13];	// name + '\0'
 	bool	patrol;
 	u8	countSquare;	// for patrol
-	u8	unknown4[16];	// 0
+	u8	unknown4[15];	// 0
     } mp2heroes_t;
 
     // origin mp2 sign or buttle

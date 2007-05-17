@@ -17,32 +17,15 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef H2UNIQ_H
+#define H2UNIQ_H
 
-#include "army.h"
+#include "heroes.h"
+#include "race.h"
 
-const std::string & Army::String(Army::size_t size)
+namespace Uniq
 {
-    static const std::string few("Few");
-    static const std::string several("Several");
-    static const std::string pack("Pack");
-    static const std::string lots("Lots");
-    static const std::string horde("Horde");
-    static const std::string throng("Throng");
-    static const std::string swarm("Swarm");
-    static const std::string zounds("Zounds");
-    static const std::string legion("Legion");
+    Heroes::heroes_t GetHeroes(Race::race_t race);
+};
 
-    switch(size){
-	case FEW:	return few;
-        case SEVERAL:	return several;
-        case PACK:	return pack;
-        case LOTS:	return lots;
-        case HORDE:	return horde;
-        case THRONG:	return throng;
-        case SWARM:	return swarm;
-        case ZOUNDS:	return zounds;
-        default: break;
-    }
-    
-    return legion;
-}
+#endif

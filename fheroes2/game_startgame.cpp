@@ -332,8 +332,18 @@ Game::menu_t Game::StartGame(void)
 			    selectCastles.Redraw();
 			    display.Flip();
 			    Cursor::Show();
-			    // and open dialog
+			    // and open dialog castle
 			    (*castle).OpenDialog();
+
+			    /*
+			    Dialog::answer_t result = (*castle).OpenDialog();
+			    while((Dialog::NEXT | Dialog::PREV) & result)
+			    {
+				// calc castle next or prev
+				
+				// result = (*castle).OpenDialog();
+			    }
+			    */
 			}
 		    }
 		    break;

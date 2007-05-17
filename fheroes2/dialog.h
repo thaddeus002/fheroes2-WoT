@@ -45,7 +45,9 @@ namespace Dialog
         CANCEL  = 0x0008,
         DISMISS = 0x0010,
         UPGRADE = 0x0020,
-        MAX     = 0x0040
+        MAX     = 0x0040,
+	PREV	= 0x0080,
+	NEXT	= 0x0100
     } answer_t;
 
     Dialog::answer_t AdventureOptions(void);

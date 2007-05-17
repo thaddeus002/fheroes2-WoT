@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "difficulty.h"
+#include "config.h"
 #include "error.h"
 #include "world.h"
 #include "castle.h"
@@ -102,8 +104,8 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     }
 
     // custom troops
-    bool custom_troops = true;
-    if(*byte8)
+    bool custom_troops = *byte8;
+    if(custom_troops)
     {
 	++byte8;
 	
@@ -163,7 +165,6 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     else
     {
 	byte8 += 16;
-	custom_troops = false;
     }
     
     // captain
@@ -200,49 +201,38 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     //
 
 
-    // auto pack troops
-    if(!custom_troops) PackAutoMonster();
-    
+    // troops auto pack
+    if(!custom_troops)
+    {
+	const Monster::stats_t mon1 = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
+	const Monster::stats_t mon2 = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER2));
+
+	switch(H2Config::GetGameDifficulty())
+	{
+    	    case Difficulty::EASY:
+        	army[0].SetMonster(mon1.monster);
+        	army[0].SetCount(mon1.grown * 2);
+        	army[1].SetMonster(mon2.monster);
+        	army[1].SetCount(mon2.grown * 2);
+        	break;
+
+    	    case Difficulty::NORMAL:
+        	army[0].SetMonster(mon1.monster);
+        	army[0].SetCount(mon1.grown);
+        	break;
+
+    	    case Difficulty::HARD:
+    	    case Difficulty::EXPERT:
+    	    case Difficulty::IMPOSSIBLE:
+        	break;
+	}
+    }
+
     // modify RND sprites
     if(rnd) CorrectAreaMaps();
 
     // end
     Error::Verbose((castle ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
-}
-
-void Castle::PackAutoMonster(void)
-{
-    switch(race)
-    {
-	case Race::KNGT:
-	    army[0].SetMonster(Monster::PEASANT);
-	    army[1].SetMonster(Monster::ARCHER);
-	    break;
-	case Race::BARB:
-	    army[0].SetMonster(Monster::GOBLIN);
-	    army[1].SetMonster(Monster::ORC);
-	    break;
-	case Race::SORC:
-	    army[0].SetMonster(Monster::SPRITE);
-	    army[1].SetMonster(Monster::DWARF);
-	    break;
-	case Race::WRLK:
-	    army[0].SetMonster(Monster::CENTAUR);
-	    army[1].SetMonster(Monster::GARGOYLE);
-	    break;
-	case Race::WZRD:
-	    army[0].SetMonster(Monster::HALFLING);
-	    army[1].SetMonster(Monster::BOAR);
-	    break;
-	case Race::NECR:
-	    army[0].SetMonster(Monster::SKELETON);
-	    army[1].SetMonster(Monster::ZOMBIE);
-	    break;
-	default: return;
-    }
-
-    army[0].SetCount(1);
-    army[1].SetCount(2);
 }
 
 void Castle::ActionNewDay(void)
@@ -328,7 +318,6 @@ castle size: T and B - sprite, S - shadow, XX - center
 
     // modify all rnd sprites
     std::vector<u16>::const_iterator itc = coords.begin();
-    Error::Verbose("index: ", mp.y * world.h() + mp.x);
     for(; itc != coords.end(); ++itc) ModifyTIlesRNDSprite(world.GetTiles(*itc));
 
     // restore center ID

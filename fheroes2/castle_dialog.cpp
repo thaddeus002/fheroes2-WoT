@@ -220,10 +220,15 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
 
 	// heroes troops
-	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+	if(isHeroesPresent()) for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
 	{
-	    //heroes_troops[ii];
 	}
+
+        // prev castle
+	if(le.MouseClickLeft(buttonPrevCastle)){ return Dialog::PREV; }
+
+        // next castle
+	if(le.MouseClickLeft(buttonNextCastle)){ return Dialog::NEXT; }
 
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }

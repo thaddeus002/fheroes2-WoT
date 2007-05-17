@@ -353,6 +353,7 @@ void World::LoadMaps(const std::string &filename)
 	if(findobject)
 	{
 	    const Maps::Tiles & tile = *vec_tiles.at(*it_index);
+	    const Maps::TilesAddon *addon = NULL;
 
 	    switch(tile.GetObject())
 	    {
@@ -365,12 +366,16 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_RNDCASTLE:
 		    // add rnd castle
 		    if(SIZEOFMP2CASTLE != sizeblock) Error::Except("World::World: read castle: incorrect size block.");
-		    vec_castles.push_back(new Castle(tile.GetUniq1(), *it_index, pblock, true));
+			vec_castles.push_back(new Castle(tile.GetUniq1(), *it_index, pblock, true));
 		    break;
 		case MP2::OBJ_HEROES:
 		    // add heroes
 		    if(SIZEOFMP2HEROES != sizeblock) Error::Except("World::World: read heroes: incorrect size block.");
-		    Error::Verbose("add heroes");
+		    if((addon = tile.FindAddon(0x54)) || (addon = tile.FindAddon(0x55)) ||
+		       (addon = tile.FindAddon(0x56)) || (addon = tile.FindAddon(0x57)))
+		    {
+			vec_heroes.push_back(new Heroes(tile.GetUniq1(), *it_index, pblock, (*addon).GetIndex()));
+		    }
 		    break;
 		case MP2::OBJ_SIGN:
 		case MP2::OBJ_BOTTLE:
@@ -478,6 +483,12 @@ void World::LoadMaps(const std::string &filename)
 	if((*vec_kingdoms[ii]).isPlay()) for(u16 cc = 0; cc < vec_castles.size(); ++cc)
 	    if((*vec_kingdoms[ii]).GetColor() == (*vec_castles[cc]).GetColor())
 		(*vec_kingdoms[ii]).AddCastle(vec_castles[cc]);
+
+    // sort heroes to kingdoms
+    for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
+	if((*vec_kingdoms[ii]).isPlay()) for(u16 cc = 0; cc < vec_heroes.size(); ++cc)
+	    if((*vec_kingdoms[ii]).GetColor() == (*vec_heroes[cc]).GetColor())
+		(*vec_kingdoms[ii]).AddHeroes(vec_heroes[cc]);
 }
 
 /* get human kindom */

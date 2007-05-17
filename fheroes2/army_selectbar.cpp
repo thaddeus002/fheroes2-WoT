@@ -22,6 +22,7 @@
 #include "monster.h"
 #include "error.h"
 #include "tools.h"
+#include "text.h"
 #include "army.h"
 
 Army::SelectBar::SelectBar(const Point & pos, const std::vector<Troops> & troops)
@@ -75,14 +76,21 @@ void Army::SelectBar::Redraw(void)
 	    display.Blit(monster_back, dst_pt);
 
 	    // sprite monster
-	    std::string icn_monster(10 > monster ? "MONH000" : "MONH00");
-	    String::AddInt(icn_monster, monster);
-	    icn_monster += ".ICN";
+	    std::string str(10 > monster ? "MONH000" : "MONH00");
+	    String::AddInt(str, monster);
+	    str += ".ICN";
 
-	    const Sprite & monster_sprite = AGG::GetICN(icn_monster, 0);
-	    dst_pt.x += monster_sprite.x();
-	    dst_pt.y += monster_sprite.y();
+	    const Sprite & monster_sprite = AGG::GetICN(str, 0);
+	    dst_pt.x = pos_pt.x + (monster_back.w() + step) * ii + monster_sprite.x();
+	    dst_pt.y = pos_pt.y + monster_sprite.y();
 	    display.Blit(monster_sprite, dst_pt);
+
+	    // draw count
+	    str.clear();
+	    String::AddInt(str, army.at(ii).GetCount());
+	    dst_pt.x = pos_pt.x + (monster_back.w() + step) * ii + 68;
+	    dst_pt.y = pos_pt.y + 80;
+	    Text(dst_pt.x - Text::width(str, Font::SMALL) / 2, dst_pt.y, str, Font::SMALL, true);
 	}
 	else
 	    display.Blit(empty_back, pos_pt.x + (empty_back.w() + step) * ii, pos_pt.y);

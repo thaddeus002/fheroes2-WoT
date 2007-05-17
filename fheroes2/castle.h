@@ -98,7 +98,6 @@ public:
 
 private:
     void RedrawResourcePanel(void);
-    void PackAutoMonster(void);
     void CorrectAreaMaps(void);
     void ModifyTIlesRNDSprite(Maps::Tiles & tile);
     void ModifyTIlesFlags(Maps::Tiles & tile);

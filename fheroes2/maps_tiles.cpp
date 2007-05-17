@@ -229,12 +229,12 @@ const Maps::TilesAddon * Maps::Tiles::FindAddon(u8 object, u8 index) const
     if(addons_level1.size())
 	for(u8 ii = 0; ii < addons_level1.size(); ++ii)
 	    if(object == addons_level1[ii].GetObject() &&
-		index == addons_level1[ii].GetIndex()) return &addons_level1[ii];
+	      (0xFF == index || index == addons_level1[ii].GetIndex())) return &addons_level1[ii];
 
     if(addons_level2.size())
 	for(u8 ii = 0; ii < addons_level2.size(); ++ii)
 	    if(object == addons_level2[ii].GetObject() &&
-		index == addons_level2[ii].GetIndex()) return &addons_level2[ii];
+	      (0xFF == index || index == addons_level2[ii].GetIndex())) return &addons_level2[ii];
 
     return NULL;
 }

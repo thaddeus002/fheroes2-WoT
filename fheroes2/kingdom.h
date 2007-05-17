@@ -48,8 +48,8 @@ public:
     u16 GetFundsGems(void) const{ return resource.gems; };
     u32 GetFundsGold(void) const{ return resource.gold; };
 
-    u8 GetCountCastle(void) const{ return 0; };
-    u8 GetCountTown(void) const{ return 0; };
+    u8 GetCountCastle(void) const;
+    u8 GetCountTown(void) const;
 
     const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; };
     const std::vector<Castle *> & GetCastles(void) const{ return castles; };

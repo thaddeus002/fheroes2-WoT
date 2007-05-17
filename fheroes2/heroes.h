@@ -22,8 +22,10 @@
 #define H2HEROES_H
 
 #include <utility>
+#include <string>
 #include <vector>
 #include "race.h"
+#include "spell.h"
 #include "color.h"
 #include "morale.h"
 #include "luck.h"
@@ -38,23 +40,24 @@
 /*
 #define HEROESMAXCOUNT		60
 #define SCOUTINGBASE		4
+*/
 
 #define DEFAULT_KNGT_ATTACK	2
 #define DEFAULT_KNGT_DEFENCE	2
 #define DEFAULT_KNGT_POWER	1
 #define DEFAULT_KNGT_KNOWLEDGE	1
-#define DEFAULT_BRBN_ATTACK	3
-#define DEFAULT_BRBN_DEFENCE	1
-#define DEFAULT_BRBN_POWER	1
-#define DEFAULT_BRBN_KNOWLEDGE	1
-#define DEFAULT_NCRM_ATTACK	1
-#define DEFAULT_NCRM_DEFENCE	0
-#define DEFAULT_NCRM_POWER	2
-#define DEFAULT_NCRM_KNOWLEDGE	2
-#define DEFAULT_SCRS_ATTACK	0
-#define DEFAULT_SCRS_DEFENCE	0
-#define DEFAULT_SCRS_POWER	2
-#define DEFAULT_SCRS_KNOWLEDGE	3
+#define DEFAULT_BARB_ATTACK	3
+#define DEFAULT_BARB_DEFENCE	1
+#define DEFAULT_BARB_POWER	1
+#define DEFAULT_BARB_KNOWLEDGE	1
+#define DEFAULT_NECR_ATTACK	1
+#define DEFAULT_NECR_DEFENCE	0
+#define DEFAULT_NECR_POWER	2
+#define DEFAULT_NECR_KNOWLEDGE	2
+#define DEFAULT_SORC_ATTACK	0
+#define DEFAULT_SORC_DEFENCE	0
+#define DEFAULT_SORC_POWER	2
+#define DEFAULT_SORC_KNOWLEDGE	3
 #define DEFAULT_WRLK_ATTACK	0
 #define DEFAULT_WRLK_DEFENCE	0
 #define DEFAULT_WRLK_POWER	3
@@ -63,32 +66,45 @@
 #define DEFAULT_WZRD_DEFENCE	1
 #define DEFAULT_WZRD_POWER	2
 #define DEFAULT_WZRD_KNOWLEDGE	2
-*/
 
-namespace Skill
+class Skill
 {
-    typedef enum { BASIC, ADVANCED, EXPERT } level_t;
+    public:
+	typedef enum { BASIC = 0, ADVANCED = 1, EXPERT = 2 } level_t;
 
-    typedef enum {
-	PATHFINDING,
-	ARCHERY,
-	LOGISTICS,
-	SCOUTING,
-	DIPLOMACY,
-	NAVIGATION,
-	LEADERSHIP,
-	WISDOM,
-	MYSTICISM,
-	LUCK,
-	BALLISTICS,
-	EAGLEEYE,
-	NECROMANCY,
-	ESTATES,
-	NONE
-    } types_t;
-    
-    typedef std::pair<types_t, level_t> skill_t;
+	typedef enum {
+	    PATHFINDING	= 0,
+	    ARCHERY	= 1,
+	    LOGISTICS	= 2,
+	    SCOUTING	= 3,
+	    DIPLOMACY	= 4,
+	    NAVIGATION	= 5,
+	    LEADERSHIP	= 6,
+	    WISDOM	= 7,
+	    MYSTICISM	= 8,
+	    LUCK	= 9,
+	    BALLISTICS	= 10,
+	    EAGLEEYE	= 11,
+	    NECROMANCY	= 12,
+	    ESTATES	= 13,
+	    NONE = 0xFF
+	} skill_t;
+
+	Skill(skill_t type = NONE, level_t level = BASIC) : pair(type, level) {};
+	
+	skill_t GetSkill(void) const{ return pair.first; };
+	level_t GetLevel(void) const{ return pair.second; };
+
+	void SetSkill(skill_t skill){ pair.first = skill; };
+	void SetLevel(level_t level){ pair.second = level; };
+
+	void SetSkill(u8 skill);
+	void SetLevel(u8 level);
+
+    private:
+	std::pair<skill_t, level_t> pair;
 };
+
 
 class Heroes
 {
@@ -110,16 +126,20 @@ public:
 	ROLAND, UNKNOWN1, UNKNOWN2, ARCHIBALD, SANDYSANDY, BRAX,
     } heroes_t;
 
-    Heroes(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
+    Heroes(u32 gid, u16 map_index, const void *ptr, u8 index_name);
 
-    Race::race_t GetRace(void) const{ return race; };
+    Heroes::heroes_t GetHeroes(void) const{ return heroes; };
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
     const Point & GetCenter(void) const{ return mp; };
 
 private:
+    void SetDefaultParameters(Heroes::heroes_t heroes);
+    void SetRacesValues(Race::race_t race);
+
+private:
     Race::race_t	race;
-    const std::string	name;
+    std::string		name;
     Color::color_t	color;
     u8			attack;
     u8			defence;
@@ -129,15 +149,18 @@ private:
     u16			magic_point;
     Morale::morale_t	morale;
     Luck::luck_t	luck;
-    Skill::skill_t	skill[HEROESMAXSKILL];
-    Artifact::artifact_t artifact[HEROESMAXARTIFACT];
+
+    std::vector<Skill> skills;
+    std::vector<Artifact::artifact_t>	artifacts;
     std::vector<Army::Troops> army;
+    //std::vector<Spell::spell_t>	books;
+
     bool		format_spread;
     float		move_point;
     u16			index_maps;
-    //MagicBook		book
     
     const u32           uniq;
+    heroes_t		heroes;
 
     Point		mp;
 };

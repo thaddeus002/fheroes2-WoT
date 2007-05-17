@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include "race.h"
 #include "monster.h"
 #include "rect.h"
 #include "spritecursor.h"
@@ -50,18 +51,17 @@ namespace Army
     class Troops
     {
     public:
-	Troops(Monster::monster_t ms = Monster::UNKNOWN, u16 num = 0) : monster(ms), count(num){};
+	Troops(Monster::monster_t monster = Monster::UNKNOWN, u16 count = 0) : pair(monster, count){};
 	
-	bool Valid(void) const{ return Monster::UNKNOWN > monster && count; };
-	Monster::monster_t GetMonster(void) const{ return monster; };
-	u16 GetCount(void) const{ return count; };
+	bool Valid(void) const{ return Monster::UNKNOWN > pair.first && pair.second; };
+	Monster::monster_t GetMonster(void) const{ return pair.first; };
+	u16 GetCount(void) const{ return pair.second; };
 
-	void SetMonster(Monster::monster_t ms){ monster = ms; };
-	void SetCount(u16 num){ count = num; };
+	void SetMonster(Monster::monster_t monster){ pair.first = monster; };
+	void SetCount(u16 count){ pair.second = count; };
 
     private:
-	Monster::monster_t monster;
-	u16 count;
+        std::pair<Monster::monster_t, u8> pair;
     };
 
     class SelectBar
@@ -90,6 +90,7 @@ namespace Army
 	
 	std::vector<Rect> coords;
     };
+
 };
 
 #endif
