@@ -32,107 +32,86 @@
 #define ICONS_CURSOR_HEIGHT	32
 #define ICONS_CURSOR_COLOR	0x98
 
-Game::SelectFocusObject::SelectFocusObject() : active(false), cursor_index(0),
-    first_icons_index(0), spriteCursor(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT, true),
-    cursor(spriteCursor, Rect(-1, -1, ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT))
+Game::SelectFocusObject::SelectFocusObject(const Point & pt) :pos_pt(pt),
+    empty_back(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", 1)),
+    step(32), sprite_cursor(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT, true), cursor(sprite_cursor, pt),
+    selected(false), top_index(0), cursor_index(0xFF) 
 {
     // draw frame cursor
-    spriteCursor.SetColorKey();
+    sprite_cursor.SetColorKey();
 
     u32 color = AGG::GetColor(ICONS_CURSOR_COLOR);
-    spriteCursor.Lock();
+    sprite_cursor.Lock();
 
-    for(u8 ii = 0; ii < spriteCursor.w(); ++ii)
+    for(u8 ii = 0; ii < sprite_cursor.w(); ++ii)
     {
-        spriteCursor.SetPixel2(ii, 0, color);
-        spriteCursor.SetPixel2(ii, spriteCursor.h() - 1, color);
+        sprite_cursor.SetPixel2(ii, 0, color);
+        sprite_cursor.SetPixel2(ii, sprite_cursor.h() - 1, color);
     }
 
-    for(u8 ii = 0; ii < spriteCursor.h(); ++ii)
+    for(u8 ii = 0; ii < sprite_cursor.h(); ++ii)
     {
-        spriteCursor.SetPixel2(0, ii, color);
-        spriteCursor.SetPixel2(spriteCursor.w() - 1, ii, color);
+        sprite_cursor.SetPixel2(0, ii, color);
+        sprite_cursor.SetPixel2(sprite_cursor.w() - 1, ii, color);
     }
 
-    spriteCursor.Unlock();
-    spriteCursor.SetDisplayFormat();
-}
+    sprite_cursor.Unlock();
+    sprite_cursor.SetDisplayFormat();
 
-void Game::SelectFocusObject::HideCursor(void)
-{
-    if(! active) return;
-    
-    active = false;
-
-    cursor.Hide();
-}
-
-void Game::SelectFocusObject::ShowCursor(void)
-{
-
-    if(first_icons_index <= cursor_index && first_icons_index + coords.size() > cursor_index)
-    {
-	active = true;
-
-	Point dst_pt(coords[cursor_index - first_icons_index]);
-	dst_pt.x -= 5;
-	dst_pt.y -= 5;
-	cursor.Show(dst_pt);
-    }
-}
-
-void Game::SelectFocusObject::MoveCursor(u8 index_icon)
-{
-    if(index_icon < coords.size())
-    {
-	Point dst_pt(coords[index_icon]);
-	dst_pt.x -= 5;
-	dst_pt.y -= 5;
-	active ? cursor.Move(dst_pt) : cursor.Show(dst_pt);
-	
-	cursor_index = first_icons_index + index_icon;
-
-	active = true;
-    }
-}
-
-Game::SelectFocusCastles::SelectFocusCastles(const std::vector<Castle *> & vec) : castles(vec)
-{
     u8 count_icons = 0;
 
     switch(H2Config::GetVideoMode())
     {
-	// 640
-	default:
-	    count_icons = 4;
-	    break;
+        default:
+            count_icons = 4;
+            break;
 
         case Display::MEDIUM:
-	    count_icons = 7;
-	    break;
+            count_icons = 7;
+            break;
 
         case Display::LARGE:
         case Display::XLARGE:
-	    count_icons = 8;
-	    break;
+            count_icons = 8;
+            break;
     }
-
-    const Point top_pt(display.w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21);
 
     for(u8 ii = 0; ii < count_icons; ++ii)
-	coords.push_back(Rect(top_pt.x, top_pt.y + ii * 32, ICONS_WIDTH, ICONS_HEIGHT));
+        coords.push_back(Rect(pos_pt.x, pos_pt.y + ii * step, ICONS_WIDTH, ICONS_HEIGHT));
 
-    max.x = top_pt.x;
-    max.y = top_pt.y;
-    max.w = ICONS_WIDTH;
-    max.h = coords.back().y + ICONS_HEIGHT;
+    max_area.x = pos_pt.x;
+    max_area.y = pos_pt.y;
+    max_area.w = ICONS_WIDTH;
+    max_area.h = coords.back().y + ICONS_HEIGHT;
 }
 
-bool Game::SelectFocusCastles::Prev(void)
+void Game::SelectFocusObject::Reset(void)
 {
-    if(first_icons_index)
+    selected = false;
+
+    top_index = 0;
+
+    cursor_index = 0xFF;
+
+    cursor.Hide();
+}
+
+void Game::SelectFocusObject::Select(u8 index)
+{
+    if(top_index + index < GetSizeObject())
     {
-	--first_icons_index;
+        selected = true;
+
+        cursor_index = top_index + index;
+    }
+}
+
+
+bool Game::SelectFocusObject::Prev(void)
+{
+    if(top_index)
+    {
+	--top_index;
 
 	return true;
     }
@@ -140,32 +119,33 @@ bool Game::SelectFocusCastles::Prev(void)
     return false;
 }
 
-bool Game::SelectFocusCastles::Next(void)
+bool Game::SelectFocusObject::Next(void)
 {
-    if(first_icons_index + coords.size() < castles.size())
+    if(top_index < GetSizeObject() - coords.size())
     {
-	++first_icons_index;
+	++top_index;
 
 	return true;
     }
 
     return false;
 }
+	
+Game::SelectFocusCastles::SelectFocusCastles(const std::vector<Castle *> & vec)
+    : SelectFocusObject(Point(display.w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21)), castles(vec)
+{}
 
 void Game::SelectFocusCastles::Redraw(void)
 {
-    const std::string & locators = (H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN");
+    cursor.Hide();
 
-    HideCursor();
-
+    // redraw back
     for(u8 ii = 0; ii < coords.size(); ++ii)
-    {
-	u8 index_sprite = 0;
-
-	// select castle icons
-	if(first_icons_index + ii < castles.size())
+	// draw icons object
+	if(top_index + ii < castles.size())
 	{
-	    const Castle & castle = *castles[first_icons_index + ii];
+	    const Castle & castle = *castles[top_index + ii];
+	    u8 index_sprite = 1;
 
 	    switch(castle.GetRace())
 	    {
@@ -175,91 +155,86 @@ void Game::SelectFocusCastles::Redraw(void)
 		case Race::WRLK: index_sprite = castle.isCastle() ? 12 : 18; break;
 		case Race::WZRD: index_sprite = castle.isCastle() ? 13 : 19; break;
 		case Race::NECR: index_sprite = castle.isCastle() ? 14 : 20; break;
-		default: Error::Warning("Game::SelectFocusCastles::Redraw: unknown race."); return;
+		default: Error::Warning("Game::SelectFocusCastles::Redraw: unknown race.");
 	    }
 
+	    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", index_sprite), coords[ii]);
 	}
-	// select background icons
-	else index_sprite = 1;
+	// redraw background
+	else
+	    display.Blit(empty_back, coords[ii]);
 
-	display.Blit(AGG::GetICN(locators, index_sprite), coords[ii]);
-    }
-
-    ShowCursor();
+    // redraw cursor
+    if(selected && cursor_index >= top_index && cursor_index < top_index + coords.size())
+	cursor.Show(coords[cursor_index - top_index].x - 5, coords[cursor_index - top_index].y - 5);
 }
 
-const Point & Game::SelectFocusCastles::GetCenter(u8 index_icon)
-{
-    if(! Valid(index_icon)) Error::Except("Game::SelectFocusCastles::GetCenter: out of range.");
-    
-    return (*castles[index_icon + first_icons_index]).GetCenter();
-}
-
-/* set focus panel to center object */
 void Game::SelectFocusCastles::SetCenter(const Point & pt)
 {
     for(u8 ii = 0; ii < castles.size(); ++ii)
 	if(pt == (*castles[ii]).GetCenter())
 	{
+	    top_index = (ii + coords.size() >= castles.size() && castles.size() > coords.size() ?
+	                                                         castles.size() - coords.size() : ii);
 	    cursor_index = ii;
-	    first_icons_index = (cursor_index + coords.size() >= castles.size() && castles.size() > coords.size() ? castles.size() - coords.size() : ii);
+	    
 	    return;
 	}
 }
 
-Game::SelectFocusHeroes::SelectFocusHeroes(const std::vector<Heroes *> & vec) : heroes(vec)
+const Point & Game::SelectFocusCastles::GetCenter(const Point & pt) const
 {
-    u8 count_icons = 0;
-
-    switch(H2Config::GetVideoMode())
-    {
-	// 640
-	default:
-	    count_icons = 4;
-	    break;
-
-        case Display::MEDIUM:
-	    count_icons = 7;
-	    break;
-
-        case Display::LARGE:
-        case Display::XLARGE:
-	    count_icons = 8;
-	    break;
-	
-    }
-    const Point top_pt(display.w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21);
-
-    for(u8 ii = 0; ii < count_icons; ++ii)
-	coords.push_back(Rect(top_pt.x, top_pt.y + ii * 32, ICONS_WIDTH, ICONS_HEIGHT));
-
-    max.x = top_pt.x;
-    max.y = top_pt.y;
-    max.w = ICONS_WIDTH;
-    max.h = coords.back().y + ICONS_HEIGHT;;
+    return (*castles[cursor_index]).GetCenter();
 }
 
-bool Game::SelectFocusHeroes::Prev(void)
-{
-    return false;
-}
-
-bool Game::SelectFocusHeroes::Next(void)
-{
-    return false;
-}
+Game::SelectFocusHeroes::SelectFocusHeroes(const std::vector<Heroes *> & vec)
+    : SelectFocusObject(Point(display.w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21)), heroes(vec)
+{}
 
 void Game::SelectFocusHeroes::Redraw(void)
 {
-}
+    cursor.Hide();
 
-const Point & Game::SelectFocusHeroes::GetCenter(u8 index_icon)
-{
-    if(! Valid(index_icon)) Error::Except("Game::SelectFocusHeroes::GetCenter: out of range.");
-    
-    return (*heroes[index_icon + first_icons_index]).GetCenter();
+    // redraw back
+    for(u8 ii = 0; ii < coords.size(); ++ii)
+	// draw icons object
+	if(top_index + ii < heroes.size())
+	{
+	    const Heroes & hero = *heroes[top_index + ii];
+	    
+	    const Sprite & mobility = AGG::GetICN("MOBILITY.ICN", hero.GetMobilityIndexSprite());
+	    const Sprite & mana = AGG::GetICN("MANA.ICN", hero.GetManaIndexSprite());
+	    const Sprite & port = AGG::GetICN("MINIPORT.ICN", hero.GetHeroes());
+	    // mobility
+	    display.Blit(mobility, coords[ii]);
+	    // portrait
+	    display.Blit(port, coords[ii].x + mobility.w() + 1, coords[ii].y);
+	    // mana
+	    display.Blit(mana, coords[ii].x + mobility.w() + port.w() + 2, coords[ii].y);
+	}
+	// redraw background
+	else
+	    display.Blit(empty_back, coords[ii]);
+
+    // redraw cursor
+    if(selected && cursor_index >= top_index && cursor_index < top_index + coords.size())
+	cursor.Show(coords[cursor_index - top_index].x - 5, coords[cursor_index - top_index].y - 5);
 }
 
 void Game::SelectFocusHeroes::SetCenter(const Point & pt)
 {
+    for(u8 ii = 0; ii < heroes.size(); ++ii)
+	if(pt == (*heroes[ii]).GetCenter())
+	{
+	    top_index = (ii + coords.size() >= heroes.size() && heroes.size() > coords.size() ?
+	                                                        heroes.size() - coords.size() : ii);
+	    cursor_index = ii;
+
+	    return;
+	}
+}
+
+const Point & Game::SelectFocusHeroes::GetCenter(const Point & pt) const
+{
+    return (*heroes[cursor_index]).GetCenter();
 }

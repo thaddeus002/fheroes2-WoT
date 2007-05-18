@@ -26,60 +26,54 @@
 #include "game_statuswindow.h" 
 #include "kingdom.h"
 
-#define INCOME_CASTLE_GOLD	1000 
-#define INCOME_TOWN_GOLD	750 
-#define INCOME_STATUE_GOLD	250 
-#define INCOME_DUNGEON_GOLD	500 
-
-
 Kingdom::Kingdom(Color::color_t cl) : color(cl), build(false), play(cl & H2Config::GetKingdomColors() ? true : false)
 {
     // set starting resource
     switch(H2Config::GetGameDifficulty()){
 	case Difficulty::EASY:
-	    resource.wood	= 30;
-	    resource.mercury	= 10;
-	    resource.ore	= 10;
-	    resource.sulfur	= 10;
-	    resource.crystal	= 10;
-	    resource.gems	= 10;
-	    resource.gold	= 10000;
+	    resource.wood	= START_EASY_WOOD;
+	    resource.ore	= START_EASY_ORE;
+	    resource.mercury	= START_EASY_MERCURY;
+	    resource.sulfur	= START_EASY_SULFUR;
+	    resource.crystal	= START_EASY_CRYSTAL;
+	    resource.gems	= START_EASY_GEMS;
+	    resource.gold	= START_EASY_GOLD;
 	    break;
 	case Difficulty::NORMAL:
-	    resource.wood	= 20;
-	    resource.mercury	= 5;
-	    resource.ore	= 5;
-	    resource.sulfur	= 5;
-	    resource.crystal	= 5;
-	    resource.gems	= 5;
-	    resource.gold	= 7500;
+	    resource.wood	= START_NORMAL_WOOD;
+	    resource.ore	= START_NORMAL_ORE;
+	    resource.mercury	= START_NORMAL_MERCURY;
+	    resource.sulfur	= START_NORMAL_SULFUR;
+	    resource.crystal	= START_NORMAL_CRYSTAL;
+	    resource.gems	= START_NORMAL_GEMS;
+	    resource.gold	= START_NORMAL_GOLD;
 	    break;
 	case Difficulty::HARD:
-	    resource.wood	= 10;
-	    resource.mercury	= 2;
-	    resource.ore	= 2;
-	    resource.sulfur	= 2;
-	    resource.crystal	= 2;
-	    resource.gems	= 2;
-	    resource.gold	= 5000;
+	    resource.wood	= START_HARD_WOOD;
+	    resource.ore	= START_HARD_ORE;
+	    resource.mercury	= START_HARD_MERCURY;
+	    resource.sulfur	= START_HARD_SULFUR;
+	    resource.crystal	= START_HARD_CRYSTAL;
+	    resource.gems	= START_HARD_GEMS;
+	    resource.gold	= START_HARD_GOLD;
 	    break;
 	case Difficulty::EXPERT:
-	    resource.wood	= 5;
-	    resource.mercury	= 0;
-	    resource.ore	= 0;
-	    resource.sulfur	= 0;
-	    resource.crystal	= 0;
-	    resource.gems	= 0;
-	    resource.gold	= 2500;
+	    resource.wood	= START_EXPERT_WOOD;
+	    resource.ore	= START_EXPERT_ORE;
+	    resource.mercury	= START_EXPERT_MERCURY;
+	    resource.sulfur	= START_EXPERT_SULFUR;
+	    resource.crystal	= START_EXPERT_CRYSTAL;
+	    resource.gems	= START_EXPERT_GEMS;
+	    resource.gold	= START_EXPERT_GOLD;
 	    break;
 	case Difficulty::IMPOSSIBLE:
-	    resource.wood	= 0;
-	    resource.mercury	= 0;
-	    resource.ore	= 0;
-	    resource.sulfur	= 0;
-	    resource.crystal	= 0;
-	    resource.gems	= 0;
-	    resource.gold	= 0;
+	    resource.wood	= START_IMPOSSIBLE_WOOD;
+	    resource.ore	= START_IMPOSSIBLE_ORE;
+	    resource.mercury	= START_IMPOSSIBLE_MERCURY;
+	    resource.sulfur	= START_IMPOSSIBLE_SULFUR;
+	    resource.crystal	= START_IMPOSSIBLE_CRYSTAL;
+	    resource.gems	= START_IMPOSSIBLE_GEMS;
+	    resource.gold	= START_IMPOSSIBLE_GOLD;
 	    break;
     }
 }

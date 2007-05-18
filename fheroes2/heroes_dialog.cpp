@@ -25,9 +25,6 @@
 #include "world.h"
 #include "cursor.h"
 #include "config.h"
-#include "captain.h"
-#include "resource.h"
-#include "castle.h"
 #include "heroes.h"
 #include "background.h"
 #include "tools.h"
@@ -35,8 +32,9 @@
 #include "error.h"
 #include "dialog.h"
 
-Dialog::answer_t Castle::OpenDialog(void)
+Dialog::answer_t Heroes::OpenDialog(void)
 {
+/*
     // cursor
     Cursor::Hide();
     Cursor::Set(Cursor::POINTER);
@@ -368,104 +366,6 @@ Dialog::answer_t Castle::OpenDialog(void)
     le.ResetKey();
 
     return result;
+*/
+    return Dialog::CANCEL;
 }
-
-/* redraw resource info panel */
-void Castle::RedrawResourcePanel(void)
-{
-    const Resource::funds_t & resource = world.GetMyKingdom().GetFundsResource();
-
-    Point dst_pt;
-    dst_pt.x = Display::SMALL == display.w() ? 0 : (display.w() - (640 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH + SHADOWWIDTH;
-    dst_pt.y = Display::SMALL == display.w() ? 0 : (display.h() - (480 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH;
-
-    Rect src_rt(dst_pt.x + 552, dst_pt.y + 262, 82, 192);
-    display.FillRect(0, 0, 0, src_rt);
-
-    std::string count;
-
-    // sprite wood
-    dst_pt.x = src_rt.x + 1;
-    dst_pt.y = src_rt.y + 10;
-    const Sprite & wood = AGG::GetICN("RESOURCE.ICN", 0);
-    display.Blit(wood, dst_pt);
-    
-    // count wood
-    count.erase();
-    String::AddInt(count, resource.wood);
-    dst_pt.y += 22;
-    Text(dst_pt.x + (wood.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
-
-    // sprite sulfur
-    dst_pt.x = src_rt.x + 42;
-    dst_pt.y = src_rt.y + 6;
-    const Sprite & sulfur = AGG::GetICN("RESOURCE.ICN", 3);
-    display.Blit(sulfur, dst_pt);
-    
-    // count sulfur
-    count.erase();
-    String::AddInt(count, resource.sulfur);
-    dst_pt.y += 26;
-    Text(dst_pt.x + (sulfur.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
-
-    // sprite crystal
-    dst_pt.x = src_rt.x + 1;
-    dst_pt.y = src_rt.y + 45;
-    const Sprite & crystal = AGG::GetICN("RESOURCE.ICN", 4);
-    display.Blit(crystal, dst_pt);
-    
-    // count crystal
-    count.erase();
-    String::AddInt(count, resource.crystal);
-    dst_pt.y += 33;
-    Text(dst_pt.x + (crystal.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
-
-    // sprite mercury
-    dst_pt.x = src_rt.x + 44;
-    dst_pt.y = src_rt.y + 47;
-    const Sprite & mercury = AGG::GetICN("RESOURCE.ICN", 1);
-    display.Blit(mercury, dst_pt);
-    
-    // count mercury
-    count.erase();
-    String::AddInt(count, resource.mercury);
-    dst_pt.y += 34;
-    Text(dst_pt.x + (mercury.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
-
-    // sprite ore
-    dst_pt.x = src_rt.x + 1;
-    dst_pt.y = src_rt.y + 92;
-    const Sprite & ore = AGG::GetICN("RESOURCE.ICN", 2);
-    display.Blit(ore, dst_pt);
-    
-    // count ore
-    count.erase();
-    String::AddInt(count, resource.ore);
-    dst_pt.y += 26;
-    Text(dst_pt.x + (ore.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
-
-    // sprite gems
-    dst_pt.x = src_rt.x + 45;
-    dst_pt.y = src_rt.y + 92;
-    const Sprite & gems = AGG::GetICN("RESOURCE.ICN", 5);
-    display.Blit(gems, dst_pt);
-    
-    // count gems
-    count.erase();
-    String::AddInt(count, resource.gems);
-    dst_pt.y += 26;
-    Text(dst_pt.x + (gems.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
-
-    // sprite gold
-    dst_pt.x = src_rt.x + 6;
-    dst_pt.y = src_rt.y + 130;
-    const Sprite & gold = AGG::GetICN("RESOURCE.ICN", 6);
-    display.Blit(gold, dst_pt);
-    
-    // count gold
-    count.erase();
-    String::AddInt(count, resource.gold);
-    dst_pt.y += 24;
-    Text(dst_pt.x + (gold.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
-}
-

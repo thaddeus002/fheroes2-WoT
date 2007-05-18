@@ -37,32 +37,35 @@ namespace Game
 class SelectFocusObject
 {
 public:
-    SelectFocusObject();
+    SelectFocusObject(const Point & pt);
     virtual ~SelectFocusObject(){};
 
-    bool isActive(void) const{ return active; };
-
-    void HideCursor(void);
-    void ShowCursor(void);
-    void MoveCursor(u8 index_icon);
-
-    const Rect & GetMaxRect(void) const{ return max; };
-    u8 GetFirstIndex(void) const {return first_icons_index; };
-    u8 GetCursorIndex(void) const {return cursor_index; };
-
-    virtual bool Prev(void) = 0;
-    virtual bool Next(void) = 0;
-    virtual void Redraw(void) = 0;
+    bool isSelected(void) const{ return selected; };
     const std::vector<Rect> & GetCoords(void) const{ return coords; };
+    u8 GetCursorIndex(void) const { return cursor_index; };
+    u8 GetTopIndex(void) const{ return top_index; };
+    u8 GetSelectIndex(void) const{ return top_index - cursor_index; };
+    const Rect & GetMaxRect(void) const{ return max_area; };
+
+    void Reset(void);
+    void Select(u8 index);
+    bool Prev(void);
+    bool Next(void);
+    
+    virtual u8 GetSizeObject(void) const{ return 0; };
+    virtual void Redraw(void) = 0;
 
 protected:
-    bool active;
-    std::vector<Rect> coords;
-    u8 cursor_index;
-    u8 first_icons_index;
-    Surface spriteCursor;
+    const Point pos_pt;
+    const Surface & empty_back;
+    const u8 step;
+    Surface sprite_cursor;
     SpriteCursor cursor;
-    Rect max;
+    bool selected;
+    u8 top_index;
+    u8 cursor_index;
+    std::vector<Rect> coords;
+    Rect max_area;
 };
 
 class SelectFocusCastles : public SelectFocusObject
@@ -70,13 +73,12 @@ class SelectFocusCastles : public SelectFocusObject
 public:
     SelectFocusCastles(const std::vector<Castle *> & vec);
     
-    bool Valid(u8 index_icon){ return first_icons_index + index_icon < castles.size(); };
-    bool Prev(void);
-    bool Next(void);
+    u8 GetSizeObject(void) const{ return castles.size(); };
+
     void Redraw(void);
-    
-    const Point & GetCenter(u8 index_icon);
+
     void SetCenter(const Point & pt);
+    const Point & GetCenter(const Point & pt) const;
 
 private:
     const std::vector<Castle *> & castles;
@@ -86,14 +88,13 @@ class SelectFocusHeroes : public SelectFocusObject
 {
 public:
     SelectFocusHeroes(const std::vector<Heroes *> & vec);
+    
+    u8 GetSizeObject(void) const{ return heroes.size(); };
 
-    bool Valid(u8 index_icon){ return first_icons_index + index_icon < heroes.size(); };
-    bool Prev(void);
-    bool Next(void);
     void Redraw(void);
 
-    const Point & GetCenter(u8 index_icon);
     void SetCenter(const Point & pt);
+    const Point & GetCenter(const Point & pt) const;
 
 private:
     const std::vector<Heroes *> & heroes;

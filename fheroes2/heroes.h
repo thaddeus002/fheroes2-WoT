@@ -29,6 +29,7 @@
 #include "color.h"
 #include "morale.h"
 #include "luck.h"
+#include "dialog.h"
 #include "army.h"
 #include "artifact.h"
 #include "gamedefs.h"
@@ -126,19 +127,23 @@ public:
 	ROLAND, UNKNOWN1, UNKNOWN2, ARCHIBALD, SANDYSANDY, BRAX,
     } heroes_t;
 
-    Heroes(u32 gid, u16 map_index, const void *ptr, u8 index_name);
+    Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
+
+    bool isFreeman(void) const{ return Color::GRAY == color; };
+    void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
 
     Heroes::heroes_t GetHeroes(void) const{ return heroes; };
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
     const Point & GetCenter(void) const{ return mp; };
+    const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
+    
+    u8 GetMobilityIndexSprite(void) const;
+    u8 GetManaIndexSprite(void) const;
+
+    Dialog::answer_t OpenDialog(void);
 
 private:
-    void SetDefaultParameters(Heroes::heroes_t heroes);
-    void SetRacesValues(Race::race_t race);
-
-private:
-    Race::race_t	race;
     std::string		name;
     Color::color_t	color;
     u8			attack;
@@ -155,13 +160,12 @@ private:
     std::vector<Army::Troops> army;
     //std::vector<Spell::spell_t>	books;
 
-    bool		format_spread;
-    float		move_point;
-    u16			index_maps;
-    
-    const u32           uniq;
-    heroes_t		heroes;
+    const heroes_t	heroes;
+    const Race::race_t	race;
 
+    bool		army_spread;
+    float		move_point;
+    
     Point		mp;
 };
 

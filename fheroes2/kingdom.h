@@ -20,7 +20,54 @@
 #ifndef H2KINGDOM_H
 #define H2KINGDOM_H
 
-#define KINGDOMMAX      6
+#define KINGDOMMAX      		6
+#define KINGDOMMAXHEROES      		8
+
+#define INCOME_CASTLE_GOLD      	1000
+#define INCOME_TOWN_GOLD        	750
+#define INCOME_STATUE_GOLD      	250
+#define INCOME_DUNGEON_GOLD     	500
+
+#define START_EASY_WOOD         	30
+#define START_EASY_ORE          	30
+#define START_EASY_MERCURY      	10
+#define START_EASY_SULFUR       	10
+#define START_EASY_CRYSTAL      	10
+#define START_EASY_GEMS         	10
+#define START_EASY_GOLD         	10000
+
+#define START_NORMAL_WOOD       	20
+#define START_NORMAL_ORE        	20
+#define START_NORMAL_MERCURY    	5
+#define START_NORMAL_SULFUR     	5
+#define START_NORMAL_CRYSTAL    	5
+#define START_NORMAL_GEMS       	5
+#define START_NORMAL_GOLD       	7500
+
+#define START_HARD_WOOD         	10
+#define START_HARD_ORE          	10
+#define START_HARD_MERCURY      	2
+#define START_HARD_SULFUR       	2
+#define START_HARD_CRYSTAL      	2
+#define START_HARD_GEMS         	2
+#define START_HARD_GOLD         	5000
+
+#define START_EXPERT_WOOD       	5
+#define START_EXPERT_ORE        	5
+#define START_EXPERT_MERCURY    	0
+#define START_EXPERT_SULFUR     	0
+#define START_EXPERT_CRYSTAL    	0
+#define START_EXPERT_GEMS       	0
+#define START_EXPERT_GOLD       	2500
+
+#define START_IMPOSSIBLE_WOOD           0
+#define START_IMPOSSIBLE_ORE            0
+#define START_IMPOSSIBLE_MERCURY        0
+#define START_IMPOSSIBLE_SULFUR         0
+#define START_IMPOSSIBLE_CRYSTAL        0
+#define START_IMPOSSIBLE_GEMS           0
+#define START_IMPOSSIBLE_GOLD           0
+
 
 #include "color.h"
 #include "resource.h"
@@ -59,7 +106,7 @@ public:
 
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);
-
+    
     void SetDied(void){ play = false; };
     
     void AITurns(const Game::StatusWindow & status);

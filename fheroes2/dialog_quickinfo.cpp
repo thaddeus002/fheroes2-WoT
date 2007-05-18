@@ -23,10 +23,10 @@
 #include "text.h"
 #include "maps.h"
 #include "army.h"
+#include "heroes.h"
 #include "castle.h"
 #include "tools.h"
 #include "monster.h"
-#include "cursor.h"
 #include "gamearea.h"
 #include "background.h"
 #include "error.h"
@@ -38,9 +38,6 @@ void Dialog::QuickInfo(const std::string & object)
     const std::string &qwikinfo = "QWIKINFO.ICN";
 
     AGG::PreloadObject(qwikinfo);
-
-    // cursor
-    Cursor::Hide();
 
     // image box
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
@@ -87,7 +84,6 @@ void Dialog::QuickInfo(const std::string & object)
 
     // restore background
     back.Restore();
-    Cursor::Show();
     display.Flip();
 }
 
@@ -95,9 +91,6 @@ void Dialog::QuickInfo(const Castle & castle)
 {
     const std::string &qwiktown = "QWIKTOWN.ICN";
     AGG::PreloadObject(qwiktown);
-
-    // cursor
-    Cursor::Hide();
 
     // image box
     const Sprite &box = AGG::GetICN(qwiktown, 0);
@@ -178,14 +171,13 @@ void Dialog::QuickInfo(const Castle & castle)
     {
         // рисуем в одну строку
         u8 current = 0;
+	const std::vector<Army::Troops> & army = castle.GetArmy();
 
 	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
         {
-	    const Army::Troops & army = castle.GetArmy(ii);
-
-	    if(army.Valid())
+	    if(army.at(ii).Valid())
 	    {
-		const Sprite & monster = AGG::GetICN("MONS32.ICN", army.GetMonster());
+		const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).GetMonster());
 
                 // align from count
 		dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
@@ -196,7 +188,7 @@ void Dialog::QuickInfo(const Castle & castle)
 
 		// count message
                 message.clear();
-		String::AddInt(message, army.GetCount());
+		String::AddInt(message, army.at(ii).GetCount());
 		dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
 		dst_pt.y = cur_rt.y + 118;
 		Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
@@ -214,14 +206,59 @@ void Dialog::QuickInfo(const Castle & castle)
 
     // restore background
     back.Restore();
-    Cursor::Show();
     display.Flip();
 }
 
-/*
 void Dialog::QuickInfo(const Heroes & hero)
 {
     const std::string &qwikhero = "QWIKHERO.ICN";
     AGG::PreloadObject(qwikhero);
+
+    // image box
+    const Sprite &box = AGG::GetICN(qwikhero, 0);
+
+    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
+    const Point & mp = LocalEvent::MouseCursor();
+    
+    Rect cur_rt; 
+    u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    mx *= TILEWIDTH;
+    u16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    my *= TILEWIDTH;
+
+    // top left
+    if(mx <= ar.x + ar.w / 2 && my <= ar.y + ar.h / 2)
+	cur_rt = Rect(mx + TILEWIDTH, my + TILEWIDTH, box.w(), box.h());
+    else
+    // top right
+    if(mx > ar.x + ar.w / 2 && my <= ar.y + ar.h / 2)
+	cur_rt = Rect(mx - box.w(), my + TILEWIDTH, box.w(), box.h());
+    else
+    // bottom left
+    if(mx <= ar.x + ar.w / 2 && my > ar.y + ar.h / 2)
+	cur_rt = Rect(mx + TILEWIDTH, my - box.h(), box.w(), box.h());
+    else
+    // bottom right
+	cur_rt = Rect(mx - box.w(), my - box.h(), box.w(), box.h());
+    
+    Background back(cur_rt);
+    back.Save();
+
+    display.Blit(box, cur_rt);
+
+
+
+
+
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    display.Flip();
+
+    // quick info loop
+    while(le.MouseRight()){ le.HandleEvents(); }
+
+    // restore background
+    back.Restore();
+    display.Flip();
 }
-*/

@@ -63,6 +63,74 @@ void World::LoadMaps(const std::string &filename)
     // playing kingdom
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) vec_kingdoms.push_back(new Kingdom(color));
 
+    // initialize all heroes
+    vec_heroes.push_back(new Heroes(Heroes::LORDKILBURN, Race::KNGT, "Lord Kilburn"));
+    vec_heroes.push_back(new Heroes(Heroes::SIRGALLANTH, Race::KNGT, "Sir Gallanth"));
+    vec_heroes.push_back(new Heroes(Heroes::ECTOR, Race::KNGT, "Ector"));
+    vec_heroes.push_back(new Heroes(Heroes::GVENNETH, Race::KNGT, "Gvenneth"));
+    vec_heroes.push_back(new Heroes(Heroes::TYRO, Race::KNGT, "Tyro"));
+    vec_heroes.push_back(new Heroes(Heroes::AMBROSE, Race::KNGT, "Ambrose"));
+    vec_heroes.push_back(new Heroes(Heroes::RUBY, Race::KNGT, "Ruby"));
+    vec_heroes.push_back(new Heroes(Heroes::MAXIMUS, Race::KNGT, "Maximus"));
+    vec_heroes.push_back(new Heroes(Heroes::DIMITRY, Race::KNGT, "Dimitry"));
+
+    vec_heroes.push_back(new Heroes(Heroes::THUNDAX, Race::BARB, "Thundax"));
+    vec_heroes.push_back(new Heroes(Heroes::FINEOUS, Race::BARB, "Fineous"));
+    vec_heroes.push_back(new Heroes(Heroes::JOJOSH, Race::BARB, "Jojosh"));
+    vec_heroes.push_back(new Heroes(Heroes::CRAGHACK, Race::BARB, "Crag Hack"));
+    vec_heroes.push_back(new Heroes(Heroes::JEZEBEL, Race::BARB, "Jezebel"));
+    vec_heroes.push_back(new Heroes(Heroes::JACLYN, Race::BARB, "Jaclyn"));
+    vec_heroes.push_back(new Heroes(Heroes::ERGON, Race::BARB, "Ergon"));
+    vec_heroes.push_back(new Heroes(Heroes::TSABU, Race::BARB, "Tsabu"));
+    vec_heroes.push_back(new Heroes(Heroes::ATLAS, Race::BARB, "Atlas"));
+
+    vec_heroes.push_back(new Heroes(Heroes::ASTRA, Race::SORC, "Astra"));
+    vec_heroes.push_back(new Heroes(Heroes::NATASHA, Race::SORC, "Natasha"));
+    vec_heroes.push_back(new Heroes(Heroes::TROYAN, Race::SORC, "Troyan"));
+    vec_heroes.push_back(new Heroes(Heroes::VATAWNA, Race::SORC, "Vatawna"));
+    vec_heroes.push_back(new Heroes(Heroes::REBECCA, Race::SORC, "Rebecca"));
+    vec_heroes.push_back(new Heroes(Heroes::GEM, Race::SORC, "Gem"));
+    vec_heroes.push_back(new Heroes(Heroes::ARIEL, Race::SORC, "Ariel"));
+    vec_heroes.push_back(new Heroes(Heroes::CARLAWN, Race::SORC, "Carlawn"));
+    vec_heroes.push_back(new Heroes(Heroes::LUNA, Race::SORC, "Luna"));
+
+    vec_heroes.push_back(new Heroes(Heroes::ARIE, Race::WRLK, "Arie"));
+    vec_heroes.push_back(new Heroes(Heroes::ALAMAR, Race::WRLK, "Alamar"));
+    vec_heroes.push_back(new Heroes(Heroes::VESPER, Race::WRLK, "Vesper"));
+    vec_heroes.push_back(new Heroes(Heroes::CRODO, Race::WRLK, "Crodo"));
+    vec_heroes.push_back(new Heroes(Heroes::BAROK, Race::WRLK, "Barok"));
+    vec_heroes.push_back(new Heroes(Heroes::KASTORE, Race::WRLK, "Kastore"));
+    vec_heroes.push_back(new Heroes(Heroes::AGAR, Race::WRLK, "Agar"));
+    vec_heroes.push_back(new Heroes(Heroes::FALAGAR, Race::WRLK, "Falagar"));
+    vec_heroes.push_back(new Heroes(Heroes::WRATHMONT, Race::WRLK, "Wrathmont"));
+
+    vec_heroes.push_back(new Heroes(Heroes::MYRA, Race::WZRD, "Myra"));
+    vec_heroes.push_back(new Heroes(Heroes::FLINT, Race::WZRD, "Flint"));
+    vec_heroes.push_back(new Heroes(Heroes::DAWN, Race::WZRD, "Dawn"));
+    vec_heroes.push_back(new Heroes(Heroes::HALON, Race::WZRD, "Halon"));
+    vec_heroes.push_back(new Heroes(Heroes::MYRINI, Race::WZRD, "Myrini"));
+    vec_heroes.push_back(new Heroes(Heroes::WILFREY, Race::WZRD, "Wilfrey"));
+    vec_heroes.push_back(new Heroes(Heroes::SARAKIN, Race::WZRD, "Sarakin"));
+    vec_heroes.push_back(new Heroes(Heroes::KALINDRA, Race::WZRD, "Kalindra"));
+    vec_heroes.push_back(new Heroes(Heroes::MANDIGAL, Race::WZRD, "Mandigal"));
+
+    vec_heroes.push_back(new Heroes(Heroes::ZOM, Race::NECR, "Zom"));
+    vec_heroes.push_back(new Heroes(Heroes::DARLANA, Race::NECR, "Darlana"));
+    vec_heroes.push_back(new Heroes(Heroes::ZAM, Race::NECR, "Zam"));
+    vec_heroes.push_back(new Heroes(Heroes::RANLOO, Race::NECR, "Ranloo"));
+    vec_heroes.push_back(new Heroes(Heroes::CHARITY, Race::NECR, "Charity"));
+    vec_heroes.push_back(new Heroes(Heroes::RIALDO, Race::NECR, "Rialdo"));
+    vec_heroes.push_back(new Heroes(Heroes::ROXANA, Race::NECR, "Roxana"));
+    vec_heroes.push_back(new Heroes(Heroes::SANDRO, Race::NECR, "Sandro"));
+    vec_heroes.push_back(new Heroes(Heroes::CELIA, Race::NECR, "Celia"));
+
+    vec_heroes.push_back(new Heroes(Heroes::ROLAND, Race::KNGT, "Roland"));
+    vec_heroes.push_back(new Heroes(Heroes::UNKNOWN1, Race::KNGT, "Unknown Person 1"));
+    vec_heroes.push_back(new Heroes(Heroes::UNKNOWN2, Race::SORC, "Unknown Person 2"));
+    vec_heroes.push_back(new Heroes(Heroes::ARCHIBALD, Race::KNGT, "Archibald"));
+    vec_heroes.push_back(new Heroes(Heroes::SANDYSANDY, Race::WRLK, H2Config::Debug() ? "Debugger" : "SandySandy"));
+    vec_heroes.push_back(new Heroes(Heroes::BRAX, Race::NECR, "Brax"));
+
     // loading info
     display.Fill(0, 0, 0);
     TextBox(Rect(0, display.h()/2, display.w(), display.h()/2), "Maps Loading...", Font::BIG, true);
@@ -374,7 +442,61 @@ void World::LoadMaps(const std::string &filename)
 		    if((addon = tile.FindAddon(0x54)) || (addon = tile.FindAddon(0x55)) ||
 		       (addon = tile.FindAddon(0x56)) || (addon = tile.FindAddon(0x57)))
 		    {
-			vec_heroes.push_back(new Heroes(tile.GetUniq1(), *it_index, pblock, (*addon).GetIndex()));
+			// calculate color
+			const u8 index_name = (*addon).GetIndex();
+			Color::color_t color = Color::GRAY;
+
+			if( 7 > index_name)
+    			    color = Color::BLUE;
+			else
+			if(14 > index_name)
+    			    color = Color::GREEN;
+			else
+	    		if(21 > index_name)
+		    	    color = Color::RED;
+			else
+			if(28 > index_name)
+			    color = Color::BLUE;
+			else
+			if(35 > index_name)
+			    color = Color::YELLOW;
+			else
+			if(42 > index_name)
+			    color = Color::ORANGE;
+			else
+			    color = Color::PURPLE;
+
+			const Kingdom & kingdom = GetKingdom(color);
+
+			// caclulate race
+			Race::race_t race = Race::BOMG;
+			switch(index_name % 6)
+			{
+			    case 0: race = Race::KNGT; break;
+			    case 1: race = Race::BARB; break;
+			    case 2: race = Race::SORC; break;
+			    case 3: race = Race::WRLK; break;
+			    case 4: race = Race::WZRD; break;
+			    case 5: race = Race::NECR; break;
+			    case 6: race = Race::Rand(); break;
+			}
+
+			// check heroes max count
+			if(kingdom.GetHeroes().size() < KINGDOMMAXHEROES)
+			{
+			    //if custom_portrate && freeman
+			    //else
+			    // find freeman
+			    if(const Heroes * hero = GetFreemanHeroes(race))
+			    {
+				Heroes * herow = const_cast<Heroes *>(hero);
+				Kingdom & kingdomw = const_cast<Kingdom &>(kingdom);
+			    	(*herow).LoadFromMP2(*it_index, pblock, color);
+			    	kingdomw.AddHeroes(herow);
+			    }
+			}
+			else
+			    Error::Warning("World::LoadMaps: load heroes maximum");
 		    }
 		    break;
 		case MP2::OBJ_SIGN:
@@ -484,11 +606,6 @@ void World::LoadMaps(const std::string &filename)
 	    if((*vec_kingdoms[ii]).GetColor() == (*vec_castles[cc]).GetColor())
 		(*vec_kingdoms[ii]).AddCastle(vec_castles[cc]);
 
-    // sort heroes to kingdoms
-    for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
-	if((*vec_kingdoms[ii]).isPlay()) for(u16 cc = 0; cc < vec_heroes.size(); ++cc)
-	    if((*vec_kingdoms[ii]).GetColor() == (*vec_heroes[cc]).GetColor())
-		(*vec_kingdoms[ii]).AddHeroes(vec_heroes[cc]);
 }
 
 /* get human kindom */
@@ -538,10 +655,29 @@ const Castle * World::GetCastle(u8 ax, u8 ay)
     return NULL;
 }
 
+/* get heroes from index maps */
+const Heroes * World::GetHeroes(u16 maps_index)
+{
+    return GetHeroes(maps_index % width, maps_index / height);
+}
 
+/* get heroes from coord maps */
+const Heroes * World::GetHeroes(u8 ax, u8 ay)
+{
+    std::vector<Heroes *>::const_iterator ith = vec_heroes.begin();
 
+    for(; ith != vec_heroes.end(); ++ith)
+    {
+        const Point & pt = (**ith).GetCenter();
 
+        if(pt.x == ax && pt.y == ay) return *ith;
+    }
 
+    //dinamic object
+    //Error::Warning("World::GetHeroes: return NULL pointer");
+
+    return NULL;
+}
 
 /* end day */
 void World::NextDay(void)
@@ -658,4 +794,61 @@ void World::FreeOldMaps(void)
 	for(; it != vec_heroes.end(); ++it) delete *it;
     }
     vec_heroes.clear();
+}
+
+const Heroes * World::GetFreemanHeroes(Race::race_t rc)
+{
+    u8 min = 0;
+    u8 max = 0;
+    
+    switch(rc)
+    {
+	case Race::KNGT:
+	    min = 0;
+	    max = 8;
+	    break;
+	
+	case Race::BARB:
+	    min = 9;
+	    max = 17;
+	    break;
+	
+	case Race::SORC:
+	    min = 18;
+	    max = 26;
+	    break;
+	    
+	case Race::WRLK:
+	    min = 27;
+	    max = 35;
+	    break;
+	
+	case Race::WZRD:
+	    min = 36;
+	    max = 44;
+	    break;
+	
+	case Race::NECR:
+	    min = 45;
+	    max = 53;
+	    break;
+	
+	default:
+	    min = 0;
+	    max = 53;
+	    break;
+    }
+
+    // find freeman in race
+    for(u8 ii = min; ii <= max; ++ii)
+	if((*vec_heroes[ii]).isFreeman()) return vec_heroes[ii];
+
+    // not found, find other race
+    for(u8 ii = 0; ii <= 53; ++ii)
+	if((*vec_heroes[ii]).isFreeman()) return vec_heroes[ii];
+
+    // not found, all heroes busy
+    Error::Warning("World::GetFreemanHeroes: freeman not found, all heroes busy.");
+
+    return NULL;
 }

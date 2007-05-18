@@ -25,7 +25,7 @@
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
-    : building(0), army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
+    : building(0), army_spread(false), army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
 {
     const u8  *byte8  = static_cast<const u8 *>(ptr);
     const u16 *byte16 = NULL;
@@ -235,6 +235,11 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     Error::Verbose((castle ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
+const Heroes * Castle::isHeroesPresent(void)
+{
+    return world.GetHeroes(mp.x, mp.y);
+}
+
 void Castle::ActionNewDay(void)
 {
 }
@@ -396,7 +401,7 @@ void Castle::ModifyTilesTownToCastle(Maps::Tiles & tile)
 	}
 }
 
-// return count army in castle
+// return valid count army in castle
 u8 Castle::GetCountArmy(void) const
 {
     u8 result = 0;

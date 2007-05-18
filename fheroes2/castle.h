@@ -30,9 +30,10 @@
 #include "rect.h"
 #include "army.h"
 
-#define HEROESMAXARMY           5 
 #define CASTLEMAXARMY           5 
 #define CASTLEMAXMONSTER        6 
+
+class Heroes;
 
 class Castle
 {
@@ -76,14 +77,14 @@ public:
     
     bool isCastle(void) const{ return castle; };
     bool isBuild(building_t bd) const{ return building & bd; };
-    bool isHeroesPresent(void) const{ return false; };
+    const Heroes * isHeroesPresent(void);
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
     u32 GetUniq(void) const{ return uniq; };
 
-    const Army::Troops & GetArmy(u8 index) const{ return index < CASTLEMAXARMY ? army[index] : army [0]; };
+    const std::vector<Army::Troops> & GetArmy(void) const{ return army; }; 
     u8 GetCountArmy(void) const;
 
     const Point & GetCenter(void) const{ return mp; };

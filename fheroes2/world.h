@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include "maps.h"
+#include "race.h"
 #include "maps_tiles.h"
 #include "color.h"
 
@@ -61,6 +62,10 @@ public:
 
     const Castle * GetCastle(u16 maps_index);
     const Castle * GetCastle(u8 ax, u8 ay);
+
+    const Heroes * GetHeroes(u16 maps_index);
+    const Heroes * GetHeroes(u8 ax, u8 ay);
+    const Heroes * GetFreemanHeroes(Race::race_t rc);
 
     u8 GetDay(void){ return day % DAYOFWEEK + 1; };
     u8 GetWeek(void){ return week % WEEKOFMONTH + 1; };

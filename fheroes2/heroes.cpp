@@ -18,8 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include "artifact.h"
 #include "uniq.h"
 #include "world.h"
+#include "castle.h"
+#include "config.h"
 #include "error.h"
 #include "heroes.h"
 
@@ -33,41 +36,130 @@ void Skill::SetLevel(u8 level)
     pair.second = static_cast<level_t>((level - 1) % 3);
 }
 
-Heroes::Heroes(u32 gid, u16 map_index, const void *ptr, u8 index_name)
-    : skills(HEROESMAXSKILL), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(HEROESMAXARMY), uniq(gid), mp(map_index % world.w(), map_index / world.h())
+Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
+    morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), 
+    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(false)
 {
-    // calculate color
-    if( 7 > index_name)
-	color = Color::BLUE;
-    else
-    if(14 > index_name)
-	color = Color::GREEN;
-    else
-    if(21 > index_name)
-	color = Color::RED;
-    else
-    if(28 > index_name)
-	color = Color::BLUE;
-    else
-    if(35 > index_name)
-	color = Color::YELLOW;
-    else
-    if(42 > index_name)
-	color = Color::ORANGE;
-    else
-	color = Color::PURPLE;
+    // hero is freeman
+    color = Color::GRAY;
 
-    // calculate race
-    switch(index_name % 7)
+    switch(race)
     {
-	case 0: race = Race::KNGT; break;
-	case 1: race = Race::BARB; break;
-	case 2: race = Race::SORC; break;
-	case 3: race = Race::WRLK; break;
-	case 4: race = Race::WZRD; break;
-	case 5: race = Race::NECR; break;
-	default: race = Race::Rand(); break;
+	case Race::KNGT:
+            attack              = DEFAULT_KNGT_ATTACK;
+            defence             = DEFAULT_KNGT_DEFENCE;
+            power               = DEFAULT_KNGT_POWER;
+            knowledge           = DEFAULT_KNGT_KNOWLEDGE;
+
+	    skills.at(0).SetSkill(Skill::LEADERSHIP);
+	    skills.at(0).SetLevel(Skill::BASIC);
+	    skills.at(1).SetSkill(Skill::BALLISTICS);
+	    skills.at(1).SetLevel(Skill::BASIC);
+
+	    break;
+	    
+	case Race::BARB:
+            attack              = DEFAULT_BARB_ATTACK;
+            defence             = DEFAULT_BARB_DEFENCE;
+            power               = DEFAULT_BARB_POWER;
+            knowledge           = DEFAULT_BARB_KNOWLEDGE;
+
+	    skills.at(0).SetSkill(Skill::PATHFINDING);
+	    skills.at(0).SetLevel(Skill::ADVANCED);
+	    break;
+	    
+	case Race::SORC:
+            attack              = DEFAULT_SORC_ATTACK;
+            defence             = DEFAULT_SORC_DEFENCE;
+            power               = DEFAULT_SORC_POWER;
+            knowledge           = DEFAULT_SORC_KNOWLEDGE;
+
+	    skills.at(0).SetSkill(Skill::NAVIGATION);
+	    skills.at(0).SetLevel(Skill::ADVANCED);
+	    skills.at(1).SetSkill(Skill::WISDOM);
+	    skills.at(1).SetLevel(Skill::BASIC);
+
+	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    break;
+	    
+	case Race::WRLK:
+            attack              = DEFAULT_WRLK_ATTACK;
+            defence             = DEFAULT_WRLK_DEFENCE;
+            power               = DEFAULT_WRLK_POWER;
+            knowledge           = DEFAULT_WRLK_KNOWLEDGE;
+
+	    skills.at(0).SetSkill(Skill::SCOUTING);
+	    skills.at(0).SetLevel(Skill::ADVANCED);
+	    skills.at(1).SetSkill(Skill::WISDOM);
+	    skills.at(1).SetLevel(Skill::BASIC);
+
+	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    break;
+	    
+	case Race::WZRD:
+            attack              = DEFAULT_WZRD_ATTACK;
+            defence             = DEFAULT_WZRD_DEFENCE;
+            power               = DEFAULT_WZRD_POWER;
+            knowledge           = DEFAULT_WZRD_KNOWLEDGE;
+
+	    skills.at(0).SetSkill(Skill::WISDOM);
+	    skills.at(0).SetLevel(Skill::ADVANCED);
+
+	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    break;
+	    
+	case Race::NECR:
+            attack              = DEFAULT_NECR_ATTACK;
+            defence             = DEFAULT_NECR_DEFENCE;
+            power               = DEFAULT_NECR_POWER;
+            knowledge           = DEFAULT_NECR_KNOWLEDGE;
+
+	    skills.at(0).SetSkill(Skill::NECROMANCY);
+	    skills.at(0).SetLevel(Skill::BASIC);
+	    skills.at(1).SetSkill(Skill::WISDOM);
+	    skills.at(1).SetLevel(Skill::BASIC);
+
+	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    break;
+	    
+	default: Error::Warning("Heroes::Heroes: unknown race."); break;
     }
+    
+    // set default army
+    const Monster::stats_t monster = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
+
+    army[0].SetMonster(monster.monster);
+    army[0].SetCount(monster.grown);
+
+    // set debug param
+    if(H2Config::Debug() && SANDYSANDY == heroes)
+    {
+	army[0].SetMonster(Monster::BLACK_DRAGON);
+	army[0].SetCount(2);
+
+        army[1].SetMonster(Monster::RED_DRAGON);
+        army[1].SetCount(3);
+
+	skills.at(2).SetSkill(Skill::PATHFINDING);
+	skills.at(2).SetLevel(Skill::BASIC);
+
+	skills.at(3).SetSkill(Skill::LOGISTICS);
+	skills.at(3).SetLevel(Skill::BASIC);
+	
+	artifacts.push_back(Artifact::MEDAL_VALOR);
+	artifacts.push_back(Artifact::STEALTH_SHIELD);
+	artifacts.push_back(Artifact::DRAGON_SWORD);
+	artifacts.push_back(Artifact::RABBIT_FOOT);
+	artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
+    }
+}
+
+void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl)
+{
+    mp.x = map_index % world.w();
+    mp.y = map_index / world.h();
+
+    color = cl;
 
     const u8  *byte8  = static_cast<const u8 *>(ptr);
     const u16 *byte16 = NULL;
@@ -142,20 +234,12 @@ Heroes::Heroes(u32 gid, u16 map_index, const void *ptr, u8 index_name)
     }
 
     // custom portrate
-    if(*byte8)
-    {
-	++byte8;
-
-	// male female
-	if(BRAX > *byte8) heroes = static_cast<heroes_t>(*byte8);
-    }
-    else
-    {
-	heroes = Uniq::GetHeroes(race);
-	++byte8;
-    }
     ++byte8;
 
+    // index sprite portrate
+    ++byte8;
+
+    // artifacts
     Artifact::artifact_t artifact = Artifact::UNKNOWN;
 
     // artifact 1
@@ -270,171 +354,25 @@ Heroes::Heroes(u32 gid, u16 map_index, const void *ptr, u8 index_name)
     
     // patrol
     ++byte8;
-    
+
     // count square
     ++byte8;
 
     // end
-    SetDefaultParameters(heroes);
 
     Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
-void Heroes::SetDefaultParameters(Heroes::heroes_t heroes)
+u8 Heroes::GetMobilityIndexSprite(void) const
 {
-    switch(heroes)
-    {
-	case LORDKILBURN:	SetRacesValues(Race::KNGT); if(name.empty()) name = "Lord Kilburn"; break;
-	case SIRGALLANTH:	SetRacesValues(Race::KNGT); if(name.empty()) name = "Sir Gallanth"; break;
-	case ECTOR:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Ector"; break;
-	case GVENNETH:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Gvenneth"; break;
-	case TYRO:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Tyro"; break;
-	case AMBROSE:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Ambrose"; break;
-	case RUBY:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Ruby"; break;
-	case MAXIMUS:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Maximus"; break;
-	case DIMITRY:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Dimitry"; break;
-	
-	case THUNDAX:		SetRacesValues(Race::BARB); if(name.empty()) name = "Thundax"; break;
-	case FINEOUS:		SetRacesValues(Race::BARB); if(name.empty()) name = "Fineous"; break;
-	case JOJOSH:		SetRacesValues(Race::BARB); if(name.empty()) name = "Jojosh"; break;
-	case CRAGHACK:		SetRacesValues(Race::BARB); if(name.empty()) name = "Crag Hack"; break;
-	case JEZEBEL:		SetRacesValues(Race::BARB); if(name.empty()) name = "Jezebel"; break;
-	case JACLYN:		SetRacesValues(Race::BARB); if(name.empty()) name = "Jaclyn"; break;
-	case ERGON:		SetRacesValues(Race::BARB); if(name.empty()) name = "Ergon"; break;
-	case TSABU:		SetRacesValues(Race::BARB); if(name.empty()) name = "Tsabu"; break;
-	case ATLAS:		SetRacesValues(Race::BARB); if(name.empty()) name = "Atlas"; break;
+    // 26 sprites
 
-        case ASTRA:		SetRacesValues(Race::SORC); if(name.empty()) name = "Astra"; break;
-	case NATASHA:		SetRacesValues(Race::SORC); if(name.empty()) name = "Natasha"; break;
-	case TROYAN:		SetRacesValues(Race::SORC); if(name.empty()) name = "Troyan"; break;
-	case VATAWNA:		SetRacesValues(Race::SORC); if(name.empty()) name = "Vatawna"; break;
-	case REBECCA:		SetRacesValues(Race::SORC); if(name.empty()) name = "Rebecca"; break;
-	case GEM:		SetRacesValues(Race::SORC); if(name.empty()) name = "Gem"; break;
-	case ARIEL:		SetRacesValues(Race::SORC); if(name.empty()) name = "Ariel"; break;
-	case CARLAWN:		SetRacesValues(Race::SORC); if(name.empty()) name = "Carlawn"; break;
-	case LUNA:		SetRacesValues(Race::SORC); if(name.empty()) name = "Luna"; break;
-
-        case ARIE:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Arie"; break;
-	case ALAMAR:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Alamar"; break;
-	case VESPER:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Vesper"; break;
-	case CRODO:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Crodo"; break;
-	case BAROK:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Barok"; break;
-	case KASTORE:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Kastore"; break;
-	case AGAR:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Agar"; break;
-	case FALAGAR:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Falagar"; break;
-	case WRATHMONT:		SetRacesValues(Race::WRLK); if(name.empty()) name = "Wrathmont"; break;
-
-        case MYRA:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Myra"; break;
-	case FLINT:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Flint"; break;
-	case DAWN:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Dawn"; break;
-	case HALON:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Halon"; break;
-	case MYRINI:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Myrini"; break;
-	case WILFREY:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Wilfrey"; break;
-	case SARAKIN:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Sarakin"; break;
-	case KALINDRA:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Kalindra"; break;
-	case MANDIGAL:		SetRacesValues(Race::WZRD); if(name.empty()) name = "Mandigal"; break;
-
-        case ZOM:		SetRacesValues(Race::NECR); if(name.empty()) name = "Zom"; break;
-	case DARLANA:		SetRacesValues(Race::NECR); if(name.empty()) name = "Darlana"; break;
-	case ZAM:		SetRacesValues(Race::NECR); if(name.empty()) name = "Zan"; break;
-	case RANLOO:		SetRacesValues(Race::NECR); if(name.empty()) name = "Ranloo"; break;
-	case CHARITY:		SetRacesValues(Race::NECR); if(name.empty()) name = "Charity"; break;
-	case RIALDO:		SetRacesValues(Race::NECR); if(name.empty()) name = "Rialdo"; break;
-	case ROXANA:		SetRacesValues(Race::NECR); if(name.empty()) name = "Roxana"; break;
-	case SANDRO:		SetRacesValues(Race::NECR); if(name.empty()) name = "Sandro"; break;
-	case CELIA:		SetRacesValues(Race::NECR); if(name.empty()) name = "Celia"; break;
-
-        case ROLAND:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Roland"; break;
-	case UNKNOWN1:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Unknown Person 1"; break;
-	case UNKNOWN2:		SetRacesValues(Race::SORC); if(name.empty()) name = "Unknown Person 2"; break;
-	case ARCHIBALD:		SetRacesValues(Race::KNGT); if(name.empty()) name = "Archibald"; break;
-	case SANDYSANDY:	SetRacesValues(Race::WRLK); if(name.empty()) name = "SandySandy"; break;
-	case BRAX:		SetRacesValues(Race::NECR); if(name.empty()) name = "Brax"; break;
-
-	default: Error::Warning("Heroes::SetDefaultParameters: unknown heroes."); break;
-    }
+    return 25;
 }
 
-void Heroes::SetRacesValues(Race::race_t race)
+u8 Heroes::GetManaIndexSprite(void) const
 {
-    switch(race)
-    {
-	case Race::KNGT:
-            attack              = DEFAULT_KNGT_ATTACK;
-            defence             = DEFAULT_KNGT_DEFENCE;
-            power               = DEFAULT_KNGT_POWER;
-            knowledge           = DEFAULT_KNGT_KNOWLEDGE;
+    // 26 sprites
 
-	    skills.at(0).SetSkill(Skill::LEADERSHIP);
-	    skills.at(0).SetLevel(Skill::BASIC);
-	    skills.at(1).SetSkill(Skill::BALLISTICS);
-	    skills.at(1).SetLevel(Skill::BASIC);
-	    break;
-	    
-	case Race::BARB:
-            attack              = DEFAULT_BARB_ATTACK;
-            defence             = DEFAULT_BARB_DEFENCE;
-            power               = DEFAULT_BARB_POWER;
-            knowledge           = DEFAULT_BARB_KNOWLEDGE;
-
-	    skills.at(0).SetSkill(Skill::PATHFINDING);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
-	    break;
-	    
-	case Race::SORC:
-            attack              = DEFAULT_SORC_ATTACK;
-            defence             = DEFAULT_SORC_DEFENCE;
-            power               = DEFAULT_SORC_POWER;
-            knowledge           = DEFAULT_SORC_KNOWLEDGE;
-
-	    skills.at(0).SetSkill(Skill::NAVIGATION);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
-	    skills.at(1).SetSkill(Skill::WISDOM);
-	    skills.at(1).SetLevel(Skill::BASIC);
-
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	case Race::WRLK:
-            attack              = DEFAULT_WRLK_ATTACK;
-            defence             = DEFAULT_WRLK_DEFENCE;
-            power               = DEFAULT_WRLK_POWER;
-            knowledge           = DEFAULT_WRLK_KNOWLEDGE;
-
-	    skills.at(0).SetSkill(Skill::SCOUTING);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
-	    skills.at(1).SetSkill(Skill::WISDOM);
-	    skills.at(1).SetLevel(Skill::BASIC);
-
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	case Race::WZRD:
-            attack              = DEFAULT_WZRD_ATTACK;
-            defence             = DEFAULT_WZRD_DEFENCE;
-            power               = DEFAULT_WZRD_POWER;
-            knowledge           = DEFAULT_WZRD_KNOWLEDGE;
-
-	    skills.at(0).SetSkill(Skill::WISDOM);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
-
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	case Race::NECR:
-            attack              = DEFAULT_NECR_ATTACK;
-            defence             = DEFAULT_NECR_DEFENCE;
-            power               = DEFAULT_NECR_POWER;
-            knowledge           = DEFAULT_NECR_KNOWLEDGE;
-
-	    skills.at(0).SetSkill(Skill::NECROMANCY);
-	    skills.at(0).SetLevel(Skill::BASIC);
-	    skills.at(1).SetSkill(Skill::WISDOM);
-	    skills.at(1).SetLevel(Skill::BASIC);
-
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	default: Error::Warning("Heroes::SetRacesValues: unknown race."); break;
-    }
+    return 25;
 }
