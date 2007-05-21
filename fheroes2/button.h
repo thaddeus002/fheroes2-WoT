@@ -35,7 +35,7 @@ public:
     void Press(void){ DrawPressButton(); pressed = true; };
     void Release(void){ DrawReleaseButton(); pressed = false; };
     void Redraw(void){ pressed ? DrawPressButton() : DrawReleaseButton(); };
-
+    
 private:
     void DrawPressButton(void);
     void DrawReleaseButton(void);

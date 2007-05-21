@@ -331,36 +331,52 @@ Game::menu_t Game::StartGame(void)
 			{
 			    // center area to castle
 			    Cursor::Hide();
-			    focus.type = Game::CASTLE;
-			    focus.center = (*castle).GetCenter();
-			    areaMaps.Center(focus.center);
-			    radar.UpdatePosition();
-			    selectCastles.SetCenter((*castle).GetCenter());
-			    selectCastles.Redraw();
 			    if(selectHeroes.isSelected())
 			    {
 				selectHeroes.Reset();
 				selectHeroes.Redraw();
 			    }
+			    focus.type = Game::CASTLE;
+			    focus.center = (*castle).GetCenter();
+			    areaMaps.Center(focus.center);
+			    radar.UpdatePosition();
+			    selectCastles.SelectFromCenter((*castle).GetCenter());
+			    selectCastles.Redraw();
 			    display.Flip();
 			    Cursor::Show();
 			    // and open dialog castle
 			    (*castle).OpenDialog();
-
-			    /*
-			    Dialog::answer_t result = (*castle).OpenDialog();
-			    while((Dialog::NEXT | Dialog::PREV) & result)
-			    {
-				// calc castle next or prev
-				
-				// result = (*castle).OpenDialog();
-			    }
-			    */
 			}
 		    }
 		    break;
 		
 		case MP2::OBJ_HEROES:
+		    // open heroes
+		    if(Heroes *hero = const_cast<Heroes *>(world.GetHeroes(indextile)))
+		    {
+			Color::color_t color = (*hero).GetColor();
+	
+			if(H2Config::GetHumanColor() == color)
+			{
+			    // center area to heroes
+			    Cursor::Hide();
+			    if(selectCastles.isSelected())
+			    {
+				selectCastles.Reset();
+				selectCastles.Redraw();
+			    }
+			    focus.type = Game::HEROES;
+			    focus.center = (*hero).GetCenter();
+			    areaMaps.Center(focus.center);
+			    radar.UpdatePosition();
+			    selectHeroes.SelectFromCenter((*hero).GetCenter());
+			    selectHeroes.Redraw();
+			    display.Flip();
+			    Cursor::Show();
+			    // and open dialog heroes
+			    (*hero).OpenDialog();
+			}
+		    }
 		    break;
 
 		default: break;
@@ -453,7 +469,9 @@ Game::menu_t Game::StartGame(void)
 	// click Scroll Heroes Down
 	if((le.MouseWheelDn(selectHeroes.GetMaxRect()) ||
 	    //le.MouseWheelDn(splitHeroes.GetRect()) ||
-	    le.MouseClickLeft(buttonScrollHeroesDown)) && selectHeroes.Next())
+	    le.MouseClickLeft(buttonScrollHeroesDown)) && 
+	    myHeroes.size() > selectHeroes.GetCoords().size() &&
+	    selectHeroes.Next())
 	{
 	    Cursor::Hide();
 	    selectHeroes.Redraw();
@@ -465,7 +483,9 @@ Game::menu_t Game::StartGame(void)
 	// click Scroll Castle Down
 	if((le.MouseWheelDn(selectCastles.GetMaxRect()) ||
 	    //le.MouseWheelDn(splitCastles.GetRect())  ||
-	    le.MouseClickLeft(buttonScrollCastleDown)) && selectCastles.Next())
+	    le.MouseClickLeft(buttonScrollCastleDown)) &&
+	    myCastles.size() > selectCastles.GetCoords().size() &&
+	    selectCastles.Next())
 	{
 	    Cursor::Hide();
 	    selectCastles.Redraw();
@@ -715,6 +735,8 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile, const Game::gamefocus
 
         case MP2::OBJ_CASTLE:
             if(Game::HEROES == focus.type) result = Cursor::ACTION;
+	    else
+		result = Cursor::CASTLE;
             break;
 
 	case MP2::OBJ_HEROES:

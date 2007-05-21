@@ -70,6 +70,30 @@ Resource::funds_t Resource::operator- (const Resource::funds_t &fd1, const Resou
     return fd;
 }
 
+// operator funds_t < funds_t
+bool Resource::operator< (const funds_t &pm1, const funds_t &pm2)
+{
+    return	pm1.wood < pm2.wood &&
+		pm1.mercury < pm2.mercury &&
+		pm1.ore < pm2.ore &&
+		pm1.sulfur < pm2.sulfur && 
+		pm1.crystal < pm2.crystal &&
+		pm1.gems < pm2.gems &&
+		pm1.gold < pm2.gold;
+}
+
+// operator funds_t > funds_t
+bool Resource::operator> (const funds_t &pm1, const funds_t &pm2)
+{
+    return	pm1.wood > pm2.wood &&
+		pm1.mercury > pm2.mercury &&
+		pm1.ore > pm2.ore &&
+		pm1.sulfur > pm2.sulfur && 
+		pm1.crystal > pm2.crystal &&
+		pm1.gems > pm2.gems &&
+		pm1.gold > pm2.gold;
+}
+
 /* name resource */
 const std::string & Resource::String(resource_t resource)
 {

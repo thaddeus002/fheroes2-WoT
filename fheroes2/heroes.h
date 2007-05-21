@@ -134,10 +134,23 @@ public:
 
     Heroes::heroes_t GetHeroes(void) const{ return heroes; };
     Color::color_t GetColor(void) const{ return color; };
+    Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
     const Point & GetCenter(void) const{ return mp; };
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
-    
+    u8 GetCountArmy(void) const;
+
+    u8 GetAttack(void) const;
+    u8 GetDefense(void) const;
+    u8 GetPower(void) const;
+    u8 GetKnowledge(void) const;
+    u32 GetExperience(void) const;
+    u16 GetMaxSpellPoints(void) const;
+    u16 GetSpellPoints(void) const;
+    Morale::morale_t GetMorale(void) const;
+    Luck::luck_t GetLuck(void) const;
+    u8 GetLevel(void) const{ return 1; };
+
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;
 

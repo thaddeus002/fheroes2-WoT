@@ -126,7 +126,7 @@ void BaseSurface::Blit(const BaseSurface &src, s16 dst_ox, s16 dst_oy)
 void BaseSurface::Blit(const BaseSurface &src, const Rect &src_rt, s16 dst_ox, s16 dst_oy)
 {
     SDL_Rect srcrect = { src_rt.x, src_rt.y, src_rt.w, src_rt.h };
-    SDL_Rect dstrect = { dst_ox, dst_oy, src_rt.w, src_rt.w };
+    SDL_Rect dstrect = { dst_ox, dst_oy, src_rt.w, src_rt.h };
 
     SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), &srcrect, surface, &dstrect);
 }

@@ -24,11 +24,24 @@
 
 void Dialog::StatusBar::ShowMessage(const std::string & message)
 {
+    if(message == status) return;
+
+    if(! status.empty()) Clear();
+
     Text(pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
          pos_pt.y + (sprite.h() - Text::height(sprite.w(), message, font)) / 2, message, font, true);
+
+    status = message;
 }
 
 void Dialog::StatusBar::Clear(void)
 {
     display.Blit(sprite, pos_pt);
+
+    status.clear();
+}
+
+bool Dialog::StatusBar::isEmpty(void)
+{
+    return status.empty();
 }

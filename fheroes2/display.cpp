@@ -57,9 +57,8 @@ void Display::SetVideoMode(Display::resolution_t mode)
 
     u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
     if(H2Config::FullScreen() || (display.valid() && (display.flags() & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
-
-    if(!SDL_SetVideoMode(xres, yres, DEFAULT_DEPTH, videoflags)){
-	SDL_SetVideoMode(640, 480, DEFAULT_DEPTH, videoflags);
+    if(!SDL_SetVideoMode(xres, yres, 0, videoflags)){
+	SDL_SetVideoMode(640, 480, 0, videoflags);
 	Error::Warning(std::string(SDL_GetError()));
     }
     

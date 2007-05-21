@@ -169,7 +169,7 @@ void Game::SelectFocusCastles::Redraw(void)
 	cursor.Show(coords[cursor_index - top_index].x - 5, coords[cursor_index - top_index].y - 5);
 }
 
-void Game::SelectFocusCastles::SetCenter(const Point & pt)
+void Game::SelectFocusCastles::SelectFromCenter(const Point & pt)
 {
     for(u8 ii = 0; ii < castles.size(); ++ii)
 	if(pt == (*castles[ii]).GetCenter())
@@ -177,19 +177,25 @@ void Game::SelectFocusCastles::SetCenter(const Point & pt)
 	    top_index = (ii + coords.size() >= castles.size() && castles.size() > coords.size() ?
 	                                                         castles.size() - coords.size() : ii);
 	    cursor_index = ii;
+
+	    selected = true;
 	    
 	    return;
 	}
 }
 
-const Point & Game::SelectFocusCastles::GetCenter(const Point & pt) const
+const Point & Game::SelectFocusCastles::GetCenter(u8 index) const
 {
-    return (*castles[cursor_index]).GetCenter();
+    return (*castles[top_index + index]).GetCenter();
 }
 
 Game::SelectFocusHeroes::SelectFocusHeroes(const std::vector<Heroes *> & vec)
-    : SelectFocusObject(Point(display.w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21)), heroes(vec)
-{}
+    : SelectFocusObject(Point(display.w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21)), heroes(vec),
+    sprite_blue(7, ICONS_HEIGHT, true)
+{
+    // fill backgroung to blue
+    sprite_blue.Fill(AGG::GetColor(0x4C));
+}
 
 void Game::SelectFocusHeroes::Redraw(void)
 {
@@ -205,12 +211,17 @@ void Game::SelectFocusHeroes::Redraw(void)
 	    const Sprite & mobility = AGG::GetICN("MOBILITY.ICN", hero.GetMobilityIndexSprite());
 	    const Sprite & mana = AGG::GetICN("MANA.ICN", hero.GetManaIndexSprite());
 	    const Sprite & port = AGG::GetICN("MINIPORT.ICN", hero.GetHeroes());
+
 	    // mobility
-	    display.Blit(mobility, coords[ii]);
+	    display.Blit(sprite_blue, coords[ii]);
+	    display.Blit(mobility, coords[ii].x, coords[ii].y + mobility.y());
+
 	    // portrait
 	    display.Blit(port, coords[ii].x + mobility.w() + 1, coords[ii].y);
+
 	    // mana
-	    display.Blit(mana, coords[ii].x + mobility.w() + port.w() + 2, coords[ii].y);
+	    display.Blit(sprite_blue, coords[ii].x + mobility.w() + port.w() + 2, coords[ii].y);
+	    display.Blit(mana, coords[ii].x + mobility.w() + port.w() + 2, coords[ii].y + mana.y());
 	}
 	// redraw background
 	else
@@ -221,7 +232,7 @@ void Game::SelectFocusHeroes::Redraw(void)
 	cursor.Show(coords[cursor_index - top_index].x - 5, coords[cursor_index - top_index].y - 5);
 }
 
-void Game::SelectFocusHeroes::SetCenter(const Point & pt)
+void Game::SelectFocusHeroes::SelectFromCenter(const Point & pt)
 {
     for(u8 ii = 0; ii < heroes.size(); ++ii)
 	if(pt == (*heroes[ii]).GetCenter())
@@ -229,12 +240,14 @@ void Game::SelectFocusHeroes::SetCenter(const Point & pt)
 	    top_index = (ii + coords.size() >= heroes.size() && heroes.size() > coords.size() ?
 	                                                        heroes.size() - coords.size() : ii);
 	    cursor_index = ii;
+	    
+	    selected = true;
 
 	    return;
 	}
 }
 
-const Point & Game::SelectFocusHeroes::GetCenter(const Point & pt) const
+const Point & Game::SelectFocusHeroes::GetCenter(u8 index) const
 {
-    return (*heroes[cursor_index]).GetCenter();
+    return (*heroes[top_index + index]).GetCenter();
 }

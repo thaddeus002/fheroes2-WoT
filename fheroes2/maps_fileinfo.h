@@ -45,6 +45,7 @@ public:
     mapsize_t GetSizeMaps(void) const{ return sizeMaps; };
     u8 GetConditionsWins(void) const{ return conditionsWins; };
     u8 GetConditionsLoss(void) const{ return conditionsLoss; };
+    bool GetPlayWithHeroes(void) const{ return withHeroes; };
     Difficulty::difficulty_t GetDifficulty(void) const{ return mapsDifficulty; };
 
 private:

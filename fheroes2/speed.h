@@ -17,15 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2UNIQ_H
-#define H2UNIQ_H
+#ifndef H2SPEED_H
+#define H2SPEED_H
 
-#include "heroes.h"
-#include "race.h"
+#include <string>
+#include "gamedefs.h"
 
-namespace Uniq
+namespace Speed
 {
-    Heroes::heroes_t GetHeroes(Race::race_t race);
+    typedef enum {
+	CRAWLING,
+        VERYSLOW,
+        SLOW,
+        AVERAGE,
+        FAST,
+        VERYFAST,
+        ULTRAFAST,
+        BLAZING,
+        INSTANT
+    } speed_t;
+
+    const std::string & String(speed_t speed);
 };
 
 #endif

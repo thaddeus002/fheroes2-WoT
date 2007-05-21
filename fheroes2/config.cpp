@@ -125,6 +125,9 @@ bool H2Config::FullScreen(void){ return H2Config::boolValue & H2Config::FULLSCRE
 /* return evil interface */
 bool H2Config::EvilInterface(void){ return H2Config::boolValue & H2Config::EVILINTERFACE; };
 
+/* get play with heroes */
+bool H2Config::PlayWithHeroes(void){ return H2Config::boolValue & H2Config::STARTHEROES; }
+
 /* return path agg data */
 const std::string & H2Config::GetAGGFile(void){ return H2Config::pathAGGFile; };
 
@@ -258,3 +261,6 @@ void H2Config::SetSizeMaps(Maps::mapsize_t size){ H2Config::sizeMaps = size; }
 
 /* set interface */
 void H2Config::SetInterface(bool interface){ interface ? H2Config::boolValue &= ~H2Config::EVILINTERFACE : H2Config::boolValue |= H2Config::EVILINTERFACE; }
+
+/* set play with heroes */
+void H2Config::SetPlayWithHeroes(bool fl){ fl ? H2Config::boolValue &= ~H2Config::STARTHEROES : H2Config::boolValue |= H2Config::STARTHEROES; }

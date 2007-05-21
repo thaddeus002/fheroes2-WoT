@@ -185,7 +185,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	case 0x03: race = Race::WRLK; break;
 	case 0x04: race = Race::WZRD; break;
 	case 0x05: race = Race::NECR; break;
-	default: race = Race::Rand(); break;
+	default: race = (Color::GRAY != color ? H2Config::GetKingdomRace(color) : Race::Rand()); break;
     }
     ++byte8;
 
@@ -273,37 +273,37 @@ castle size: T and B - sprite, S - shadow, XX - center
               T0
       S1S1T1T1T1T1T1
     S2S2S2T2T2T2T2T2
-      S3S3B1B1B1B1B1
-        S4B2B2XXB2B2
+      S3S3B1B1XXB1B1
+        S4B2B2  B2B2
 */
     std::vector<u16> coords;
 
     // T0
-    if(isCastle()) coords.push_back((mp.y - 4) * world.h() + mp.x);
+    if(isCastle()) coords.push_back((mp.y - 3) * world.h() + mp.x);
     // T1
-    coords.push_back((mp.y - 3) * world.h() + mp.x - 2);
-    coords.push_back((mp.y - 3) * world.h() + mp.x - 1);
-    coords.push_back((mp.y - 3) * world.h() + mp.x);
-    coords.push_back((mp.y - 3) * world.h() + mp.x + 1);
-    coords.push_back((mp.y - 3) * world.h() + mp.x + 2);
-    // T2
     coords.push_back((mp.y - 2) * world.h() + mp.x - 2);
     coords.push_back((mp.y - 2) * world.h() + mp.x - 1);
     coords.push_back((mp.y - 2) * world.h() + mp.x);
     coords.push_back((mp.y - 2) * world.h() + mp.x + 1);
     coords.push_back((mp.y - 2) * world.h() + mp.x + 2);
-    // B1
+    // T2
     coords.push_back((mp.y - 1) * world.h() + mp.x - 2);
     coords.push_back((mp.y - 1) * world.h() + mp.x - 1);
     coords.push_back((mp.y - 1) * world.h() + mp.x);
     coords.push_back((mp.y - 1) * world.h() + mp.x + 1);
     coords.push_back((mp.y - 1) * world.h() + mp.x + 2);
-    // B2
+    // B1
     coords.push_back(mp.y * world.h() + mp.x - 2);
     coords.push_back(mp.y * world.h() + mp.x - 1);
     coords.push_back(mp.y * world.h() + mp.x);
     coords.push_back(mp.y * world.h() + mp.x + 1);
     coords.push_back(mp.y * world.h() + mp.x + 2);
+    // B2
+    coords.push_back((mp.y + 1) * world.h() + mp.x - 2);
+    coords.push_back((mp.y + 1) * world.h() + mp.x - 1);
+    coords.push_back((mp.y + 1) * world.h() + mp.x);
+    coords.push_back((mp.y + 1) * world.h() + mp.x + 1);
+    coords.push_back((mp.y + 1) * world.h() + mp.x + 2);
 
     const u16 index_center = mp.y * world.h() + mp.x;
     
@@ -327,6 +327,15 @@ castle size: T and B - sprite, S - shadow, XX - center
 
     // restore center ID
     tile_center.SetObject(MP2::OBJ_CASTLE);
+
+    // restore bottom ID
+    for(s8 ii = -2; ii < 3; ++ii)
+    {
+	const u16 index_bottom  = (mp.y + 1) * world.h() + mp.x + ii;
+	Maps::Tiles & tile_bottom = world.GetTiles(index_bottom);
+
+	tile_bottom.SetObject(MP2::OBJ_ZERO);
+    }
 }
 
 /* modify RND sprites alghoritm */

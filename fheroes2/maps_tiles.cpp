@@ -22,6 +22,11 @@
 #include <iostream>
 #include "agg.h"
 #include "tools.h"
+#include "world.h"
+#include "race.h"
+#include "color.h"
+#include "error.h"
+#include "heroes.h"
 #include "sprite.h"
 #include "maps.h"
 #include "display.h"
@@ -51,7 +56,7 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
     return *this;
 }
 
-Maps::Tiles::Tiles(const MP2::mp2tile_t & mp2tile) : tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
+Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2)
 {
     tile_sprite.LoadPalette(AGG::GetPalette());
@@ -178,6 +183,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	    }
 	}
     }
+
+    // heroes
+    if(MP2::OBJ_HEROES == general) RedrawHeroes(dstx, dsty);
 
     // level 2
     if(addons_level2.size())
@@ -341,4 +349,46 @@ void Maps::Tiles::DebugInfo(u16 index) const
     }
 
     std::cout << "----------------:--------" << std::endl << std::endl;
+}
+
+void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
+{
+    if(const Heroes *heroes = world.GetHeroes(maps_index))
+    {
+	const Race::race_t & race = (*heroes).GetRace();
+	const Color::color_t & color = (*heroes).GetColor();
+	
+	u16 index_sprite = 0;
+
+	switch(color)
+	{
+	    case Color::BLUE:	index_sprite =  0; break;
+	    case Color::GREEN:	index_sprite =  7; break;
+	    case Color::RED:	index_sprite = 14; break;
+	    case Color::YELLOW:	index_sprite = 21; break;
+	    case Color::ORANGE:	index_sprite = 28; break;
+	    case Color::PURPLE:	index_sprite = 35; break;
+	    default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown color hero, maps index: ", maps_index); return;
+	}
+
+	switch(race)
+	{
+	    case Race::KNGT: break;
+	    case Race::BARB: index_sprite += 1; break;
+	    case Race::SORC: index_sprite += 2; break;
+	    case Race::WRLK: index_sprite += 3; break;
+	    case Race::WZRD: index_sprite += 4; break;
+	    case Race::NECR: index_sprite += 5; break;
+	    default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown race hero, maps index: ", maps_index); return;
+	}
+
+	const Sprite & sprite = AGG::GetICN("MINIHERO.ICN", index_sprite);
+
+	const Point dst_pt(dx + sprite.x(), BORDERWIDTH > dy + sprite.y() - 22 ? BORDERWIDTH : dy + sprite.y() - 22);
+	const Rect  src_rt(0,  dst_pt.y > BORDERWIDTH ? 0 : 22, sprite.w(), sprite.h());
+
+	display.Blit(sprite, src_rt, dst_pt);
+    }
+    else
+	Error::Warning("Maps::Tiles::RedrawHeroes: unknown hero, maps index: ", maps_index);
 }

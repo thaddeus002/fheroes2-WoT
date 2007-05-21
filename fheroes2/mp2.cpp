@@ -45,7 +45,6 @@ const char * MP2::GetICNObject(u8 type)
 	// castle flags
 	case 0x38:
 	    return "FLAG32.ICN";
-	    break;
 	    
 	// heroes
 	case 0x54:

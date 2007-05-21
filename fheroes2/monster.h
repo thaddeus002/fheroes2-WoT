@@ -22,6 +22,7 @@
 
 #include <string>
 #include "race.h"
+#include "speed.h"
 #include "gamedefs.h"
 
 namespace Monster
@@ -32,18 +33,6 @@ namespace Monster
 	LEVEL3,
 	LEVEL4
     } level_t;
-
-    typedef enum {
-	CRAWLING,
-        VERYSLOW,
-        SLOW,
-        AVERAGE,
-        FAST,
-        VERYFAST,
-        ULTRAFAST,
-        BLAZING,
-        INSTANT
-    } speed_t;
 
     typedef enum {
 	PEASANT,
@@ -134,7 +123,7 @@ namespace Monster
 	u8 damageMin;
 	u8 damageMax;
 	u16 hp;
-	speed_t speed;
+	Speed::speed_t speed;
 	u16 cost;
 	u8 grown;
 	const std::string name;
@@ -143,6 +132,8 @@ namespace Monster
 
     const std::string & String(monster_t monster);
     const stats_t & GetStats(monster_t monster);
+    
+    monster_t Upgrade(monster_t monster);
     
     monster_t Monster(u8 num);
     monster_t Monster(Race::race_t race, u32 dwelling);

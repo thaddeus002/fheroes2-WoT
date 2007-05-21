@@ -41,6 +41,7 @@ namespace H2Config {
 	/*
 	...
 	*/
+	STARTHEROES	= 0x1000,
 	ORIGINAL	= 0x2000,
 	EDITOR		= 0x4000,
 	RLEDEBUG	= 0x8000,
@@ -57,6 +58,7 @@ namespace H2Config {
     bool Animation(void);
     bool FullScreen(void);
     bool EvilInterface(void);
+    bool PlayWithHeroes(void);
     const std::string & GetAGGFile(void);
     const std::string & GetMapsDirectory(void);
     Display::resolution_t GetVideoMode(void);
@@ -79,6 +81,7 @@ namespace H2Config {
     void SetAGGFile(const std::string & path);
     void SetGameDifficulty(Difficulty::difficulty_t difficulty);
     void SetInterface(bool interface);
+    void SetPlayWithHeroes(bool fl);
     void SetHumanColor(Color::color_t color);
     void SetKingdomColors(u8 colors);
     void SetAllowChangeColors(u8 colors);

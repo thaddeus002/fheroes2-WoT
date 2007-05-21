@@ -77,8 +77,8 @@ public:
 
     void Redraw(void);
 
-    void SetCenter(const Point & pt);
-    const Point & GetCenter(const Point & pt) const;
+    void SelectFromCenter(const Point & pt);
+    const Point & GetCenter(u8 index) const;
 
 private:
     const std::vector<Castle *> & castles;
@@ -93,11 +93,12 @@ public:
 
     void Redraw(void);
 
-    void SetCenter(const Point & pt);
-    const Point & GetCenter(const Point & pt) const;
+    void SelectFromCenter(const Point & pt);
+    const Point & GetCenter(u8 index) const;
 
 private:
     const std::vector<Heroes *> & heroes;
+    Surface sprite_blue;
 };
 
 };

@@ -18,23 +18,32 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "uniq.h"
-#include "rand.h"
-#include "error.h"
+#include "speed.h"
 
-Heroes::heroes_t Uniq::GetHeroes(Race::race_t race)
+const std::string & Speed::String(speed_t speed)
 {
-        // from race
-        switch(race)
-        {
-            case Race::KNGT: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::LORDKILBURN, Heroes::DIMITRY));
-            case Race::BARB: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::THUNDAX, Heroes::ATLAS));
-            case Race::SORC: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::ASTRA, Heroes::LUNA));
-            case Race::WRLK: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::ARIE, Heroes::WRATHMONT));
-            case Race::WZRD: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::MYRA, Heroes::MANDIGAL));
-            case Race::NECR: return static_cast<Heroes::heroes_t>(Rand::Get(Heroes::ZOM, Heroes::CELIA));
-            default: break;
-        }
+    static const std::string str_crawling("Crawling");
+    static const std::string str_veryslow("Very Slow");
+    static const std::string str_slow("Slow");
+    static const std::string str_average("Average");
+    static const std::string str_fast("Fast");
+    static const std::string str_veryfast("Very Fast");
+    static const std::string str_ultrafast("Ultra Fast");
+    static const std::string str_blazing("Blazing");
+    static const std::string str_instant("Instant");
 
-    return Heroes::SANDYSANDY;
+    switch(speed)
+    {
+	case CRAWLING:	return str_crawling;
+        case VERYSLOW:	return str_veryslow;
+        case SLOW:	return str_slow;
+        case AVERAGE:	return str_average;
+        case FAST:	return str_fast;
+        case VERYFAST:	return str_veryfast;
+        case ULTRAFAST:	return str_ultrafast;
+        case BLAZING:	return str_blazing;
+        case INSTANT:	return str_instant;
+    }
+    
+    return str_crawling;
 }

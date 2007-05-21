@@ -91,15 +91,17 @@ private:
 class StatusBar
 {
 public:
-    StatusBar(const Point & pt, const Surface & sf, const Font::type_t ft) : pos_pt(pt), sprite(sf), font(ft){};
+    StatusBar(const Point & pt, const Surface & sf, const Font::type_t ft) : pos_pt(pt), sprite(sf), font(ft) {};
 
     void ShowMessage(const std::string & message);
     void Clear(void);
+    bool isEmpty(void);
 
 private:
     const Point pos_pt;
     const Surface & sprite;
     const Font::type_t font;
+    std::string status;
 };
 
 };

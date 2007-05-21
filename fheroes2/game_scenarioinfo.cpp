@@ -647,6 +647,8 @@ void Scenario::SetCurrentSettings(const Maps::FileInfo &maps)
     H2Config::SetFileMaps(maps.GetFileMaps());
     H2Config::SetNameMaps(maps.GetName());
     H2Config::SetDescriptionMaps(maps.GetDescription());
+    //
+    H2Config::SetPlayWithHeroes(maps.GetPlayWithHeroes());
 }
 
 void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 count)

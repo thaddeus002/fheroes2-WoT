@@ -59,7 +59,7 @@ namespace Maps
     class Tiles
     {
     public:
-	Tiles(const MP2::mp2tile_t & mp2tile);
+	Tiles(u16 mi, const MP2::mp2tile_t & mp2tile);
 	
 	u8 GetObject(void) const{ return general; };
 	u8 GetQuantity1(void) const{ return quantity1; };
@@ -89,6 +89,10 @@ namespace Maps
 	void DebugInfo(u16 index = 0xFFFF) const;
 
     private:
+	void RedrawHeroes(u16 dx, u16 dy) const;
+
+    private:
+	const u16 maps_index;
 	Surface tile_sprite;
 	u16	tile_index;
         u8	shape;

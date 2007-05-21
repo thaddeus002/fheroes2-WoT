@@ -61,6 +61,8 @@ namespace Resource
 
     funds_t operator+ (const funds_t &pm1, const funds_t &pm2);
     funds_t operator- (const funds_t &pm1, const funds_t &pm2);
+    bool operator< (const funds_t &pm1, const funds_t &pm2);
+    bool operator> (const funds_t &pm1, const funds_t &pm2);
 
     const std::string & String(resource_t resource);
 

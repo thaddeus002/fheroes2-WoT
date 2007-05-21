@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "artifact.h"
-#include "uniq.h"
 #include "world.h"
 #include "castle.h"
 #include "config.h"
@@ -365,14 +364,229 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
 u8 Heroes::GetMobilityIndexSprite(void) const
 {
-    // 26 sprites
+    // (0-25) 26 sprites
 
-    return 25;
+    return 15;
 }
 
 u8 Heroes::GetManaIndexSprite(void) const
 {
-    // 26 sprites
+    // (0-25) 26 sprites
 
-    return 25;
+    return 5;
 }
+
+u8 Heroes::GetAttack(void) const
+{
+    u8 result = attack;
+
+    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+
+    for(; it != artifacts.end(); ++it)
+
+	switch(*it)
+	{
+	    case Artifact::SPIKED_HELM:
+	    case Artifact::THUNDER_MACE:
+	    case Artifact::GIANT_FLAIL:
+		result += 1;
+		break;
+
+            case Artifact::SPIKED_SHIELD:
+            case Artifact::POWER_AXE:
+        	result += 2;
+		break;
+	    
+	    case Artifact::DRAGON_SWORD:
+	        result += 3;
+	        break;
+	
+	    case Artifact::ULTIMATE_CROWN:
+	        result += 4;
+	        break;
+	
+	    case Artifact::ULTIMATE_SHIELD:
+	        result += 6;
+	        break;
+	
+	    case Artifact::ULTIMATE_SWORD:
+	        result += 12;
+	        break;
+	
+	    default:
+	        break;
+	}
+	
+    return result;
+}
+
+u8 Heroes::GetDefense(void) const
+{
+    u8 result = defence;
+
+    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+
+    for(; it != artifacts.end(); ++it)
+
+	switch(*it)
+	{
+            case Artifact::SPIKED_HELM:
+            case Artifact::ARMORED_GAUNTLETS:
+            case Artifact::DEFENDER_HELM:
+                result += 1;
+                break;
+
+            case Artifact::SPIKED_SHIELD:
+            case Artifact::STEALTH_SHIELD:
+                result += 2;
+                break;
+
+            case Artifact::DIVINE_BREASTPLATE:
+                result += 3;
+                break;
+
+            case Artifact::ULTIMATE_CROWN:
+                result += 4;
+                break;
+
+            case Artifact::ULTIMATE_SHIELD:
+                result += 6;
+                break;
+
+            case Artifact::ULTIMATE_CLOAK:
+                result += 12;
+                break;
+
+            default:
+                break;
+	}
+
+    return result;
+}
+
+u8 Heroes::GetPower(void) const
+{
+    u8 result = power;
+
+    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+
+    for(; it != artifacts.end(); ++it)
+
+	switch(*it)
+	{
+            case Artifact::WHITE_PEARL:
+                result += 1;
+                break;
+
+            case Artifact::BLACK_PEARL:
+            case Artifact::CASTER_BRACELET:
+            case Artifact::MAGE_RING:
+                result += 2;
+                break;
+
+            case Artifact::WITCHES_BROACH:
+                result += 3;
+                break;
+
+            case Artifact::ULTIMATE_CROWN:
+            case Artifact::ARCANE_NECKLACE:
+                result += 4;
+                break;
+
+            case Artifact::ULTIMATE_STAFF:
+                result += 6;
+                break;
+
+            case Artifact::ULTIMATE_WAND:
+                result += 12;
+                break;
+
+            default:
+                break;
+	}
+
+    return result;
+}
+
+u8 Heroes::GetKnowledge(void) const
+{
+    u8 result = knowledge;
+
+    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+
+    for(; it != artifacts.end(); ++it)
+
+	switch(*it)
+	{
+            case Artifact::WHITE_PEARL:
+                result += 1;
+                break;
+
+            case Artifact::BLACK_PEARL:
+            case Artifact::MINOR_SCROLL:
+                result += 2;
+                break;
+
+            case Artifact::MAJOR_SCROLL:
+                result += 3;
+                break;
+
+            case Artifact::ULTIMATE_CROWN:
+            case Artifact::SUPERIOR_SCROLL:
+                result += 4;
+                break;
+
+            case Artifact::FOREMOST_SCROLL:
+                result += 5;
+                break;
+
+            case Artifact::ULTIMATE_STAFF:
+                result += 6;
+                break;
+
+            case Artifact::ULTIMATE_BOOK:
+                result += 12;
+                break;
+
+            default:
+                break;
+	}
+
+    return result;
+}
+
+u32 Heroes::GetExperience(void) const
+{
+    return experience;
+}
+
+u16 Heroes::GetSpellPoints(void) const
+{
+    return magic_point;
+}
+
+u16 Heroes::GetMaxSpellPoints(void) const
+{
+    return 10 * GetKnowledge();
+}
+
+Morale::morale_t Heroes::GetMorale(void) const
+{
+    return morale;
+}
+
+Luck::luck_t Heroes::GetLuck(void) const
+{
+    return luck;
+}
+
+// return valid count heroes army
+u8 Heroes::GetCountArmy(void) const
+{
+    u8 result = 0;
+
+    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii) if(army[ii].Valid()) ++result;
+
+    return result;
+}
+

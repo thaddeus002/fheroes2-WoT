@@ -279,7 +279,7 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&mp2tile.uniqNumber2), sizeof(u32));
 	SWAP32(mp2tile.uniqNumber2);
 
-	Maps::Tiles * tile = new Maps::Tiles(mp2tile);
+	Maps::Tiles * tile = new Maps::Tiles(ii, mp2tile);
 
 	// load all addon for current tils
 	while(byte16){
@@ -456,12 +456,9 @@ void World::LoadMaps(const std::string &filename)
 		    	    color = Color::RED;
 			else
 			if(28 > index_name)
-			    color = Color::BLUE;
-			else
-			if(35 > index_name)
 			    color = Color::YELLOW;
 			else
-			if(42 > index_name)
+			if(35 > index_name)
 			    color = Color::ORANGE;
 			else
 			    color = Color::PURPLE;
@@ -470,7 +467,7 @@ void World::LoadMaps(const std::string &filename)
 
 			// caclulate race
 			Race::race_t race = Race::BOMG;
-			switch(index_name % 6)
+			switch(index_name % 7)
 			{
 			    case 0: race = Race::KNGT; break;
 			    case 1: race = Race::BARB; break;
@@ -478,16 +475,21 @@ void World::LoadMaps(const std::string &filename)
 			    case 3: race = Race::WRLK; break;
 			    case 4: race = Race::WZRD; break;
 			    case 5: race = Race::NECR; break;
-			    case 6: race = Race::Rand(); break;
+			    case 6: race = (Color::GRAY != color ? H2Config::GetKingdomRace(color) : Race::Rand()); break;
 			}
 
 			// check heroes max count
 			if(kingdom.GetHeroes().size() < KINGDOMMAXHEROES)
 			{
-			    //if custom_portrate && freeman
-			    //else
-			    // find freeman
-			    if(const Heroes * hero = GetFreemanHeroes(race))
+			    const Heroes * hero = NULL;
+
+			    hero = (pblock[17] &&
+				    pblock[18] < Heroes::BRAX &&
+				    static_cast<u8>(pblock[18]) < vec_heroes.size() &&
+				    vec_heroes.at(pblock[18])->isFreeman() ?
+				    vec_heroes[pblock[18]] : GetFreemanHeroes(race));
+
+			    if(hero)
 			    {
 				Heroes * herow = const_cast<Heroes *>(hero);
 				Kingdom & kingdomw = const_cast<Kingdom &>(kingdom);
@@ -606,6 +608,16 @@ void World::LoadMaps(const std::string &filename)
 	    if((*vec_kingdoms[ii]).GetColor() == (*vec_castles[cc]).GetColor())
 		(*vec_kingdoms[ii]).AddCastle(vec_castles[cc]);
 
+    // play with hero
+    if(H2Config::PlayWithHeroes());
+	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
+	    if((*vec_kingdoms[ii]).isPlay() && (*vec_kingdoms[ii]).GetCastles().size())
+	    {
+		// get first castle
+		// place near hero
+	    }
+	
+    if(H2Config::Debug()) Error::Verbose("World::LoadMaps: end load.");
 }
 
 /* get human kindom */
@@ -647,7 +659,7 @@ const Castle * World::GetCastle(u8 ax, u8 ay)
         const Point & pt = (**itc).GetCenter();
 
         if((pt.x == ax && pt.y - 3 == ay) ||
-           (ax >= pt.x - 2 && ax <= pt.x + 2 && ay >= pt.y - 3 && ay <= pt.y)) return *itc;
+           (ax >= pt.x - 2 && ax <= pt.x + 2 && ay >= pt.y - 2 && ay <= pt.y + 1)) return *itc;
     }
 
     Error::Warning("World::GetCastle: return NULL pointer");
@@ -800,7 +812,7 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
 {
     u8 min = 0;
     u8 max = 0;
-    
+
     switch(rc)
     {
 	case Race::KNGT:
@@ -839,16 +851,24 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
 	    break;
     }
 
+    std::vector<Heroes::heroes_t> freeman_heroes;
+    
     // find freeman in race
     for(u8 ii = min; ii <= max; ++ii)
-	if((*vec_heroes[ii]).isFreeman()) return vec_heroes[ii];
+	if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetHeroes());
 
     // not found, find other race
-    for(u8 ii = 0; ii <= 53; ++ii)
-	if((*vec_heroes[ii]).isFreeman()) return vec_heroes[ii];
+    if(freeman_heroes.empty())
+	for(u8 ii = 0; ii <= 53; ++ii)
+	    if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetHeroes());
 
     // not found, all heroes busy
-    Error::Warning("World::GetFreemanHeroes: freeman not found, all heroes busy.");
+    if(freeman_heroes.empty())
+    {
+	Error::Warning("World::GetFreemanHeroes: freeman not found, all heroes busy.");
 
-    return NULL;
+	return NULL;
+    }
+
+    return vec_heroes[ freeman_heroes[Rand::Get(0, freeman_heroes.size() - 1)] ];
 }

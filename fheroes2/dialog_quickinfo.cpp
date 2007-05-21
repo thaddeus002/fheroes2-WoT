@@ -169,7 +169,7 @@ void Dialog::QuickInfo(const Castle & castle)
     }
     else
     {
-        // рисуем в одну строку
+        // draw in one string
         u8 current = 0;
 	const std::vector<Army::Troops> & army = castle.GetArmy();
 
@@ -246,11 +246,110 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     display.Blit(box, cur_rt);
 
+    cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 10, 146, 144);
+    Point dst_pt;
+    std::string message;
 
+    // heroes name
+    message = hero.GetName();
+    dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
+    dst_pt.y = cur_rt.y + 2;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
 
+    // mini port heroes
+    const Surface & port = AGG::GetICN("MINIPORT.ICN", hero.GetHeroes());
+    dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
+    dst_pt.y += 15;
+    display.Blit(port, dst_pt);
 
+    // attack
+    message = "Attack:";
+    dst_pt.x = cur_rt.x + 35;
+    dst_pt.y += port.h() + 4;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
 
+    message.clear();
+    String::AddInt(message, hero.GetAttack());
+    dst_pt.x += 75;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
 
+    // defense
+    message = "Defense:";
+    dst_pt.x = cur_rt.x + 35;
+    dst_pt.y += 12;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    message.clear();
+    String::AddInt(message, hero.GetDefense());
+    dst_pt.x += 75;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    // power
+    message = "Spell Power:";
+    dst_pt.x = cur_rt.x + 35;
+    dst_pt.y += 12;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    message.clear();
+    String::AddInt(message, hero.GetPower());
+    dst_pt.x += 75;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    // knowledge
+    message = "Knowledge:     ";
+    dst_pt.x = cur_rt.x + 35;
+    dst_pt.y += 12;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    message.clear();
+    String::AddInt(message, hero.GetKnowledge());
+    dst_pt.x += 75;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    
+    // spell point
+    message = "Spell Points:  ";
+    dst_pt.x = cur_rt.x + 35;
+    dst_pt.y += 12;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    message.clear();
+    String::AddInt(message, hero.GetSpellPoints());
+    message += "/";
+    String::AddInt(message, 10 * hero.GetMaxSpellPoints());
+    dst_pt.x += 75;
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    // get valid count army
+    u8 count = hero.GetCountArmy();
+
+    // draw monster sprite in one string
+    u8 current = 0;
+    const std::vector<Army::Troops> & army = hero.GetArmy();
+
+    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+    {
+	if(army.at(ii).Valid())
+	{
+	    const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).GetMonster());
+
+            // align from count
+	    dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
+	    dst_pt.y = cur_rt.y + 108;
+	    // alignt from height sprite
+	    dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
+            display.Blit(monster, dst_pt);
+
+	    // count message
+            message.clear();
+	    String::AddInt(message, army.at(ii).GetCount());
+	    dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
+	    dst_pt.y = cur_rt.y + 141;
+	    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+
+    	    current++;
+        }
+    }
+    
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     display.Flip();

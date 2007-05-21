@@ -24,12 +24,14 @@
 #include <vector>
 #include <utility>
 #include "race.h"
+#include "dialog.h"
 #include "monster.h"
 #include "rect.h"
 #include "spritecursor.h"
 #include "gamedefs.h"
 
 class Surface;
+class Heroes;
 
 namespace Army
 {
@@ -52,13 +54,15 @@ namespace Army
     {
     public:
 	Troops(Monster::monster_t monster = Monster::UNKNOWN, u16 count = 0) : pair(monster, count){};
-	
+
 	bool Valid(void) const{ return Monster::UNKNOWN > pair.first && pair.second; };
 	Monster::monster_t GetMonster(void) const{ return pair.first; };
 	u16 GetCount(void) const{ return pair.second; };
 
 	void SetMonster(Monster::monster_t monster){ pair.first = monster; };
 	void SetCount(u16 count){ pair.second = count; };
+
+	Dialog::answer_t ShowDialogInfo(const Heroes * heroes = NULL);
 
     private:
         std::pair<Monster::monster_t, u8> pair;
