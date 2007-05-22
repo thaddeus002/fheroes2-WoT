@@ -55,7 +55,9 @@ public:
     u16 w(void){ return width; };
     u16 h(void){ return height; };
 
+    const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); };
     const Maps::Tiles & GetTiles(u16 index) const{ return *vec_tiles.at(index); };
+    Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); };
     Maps::Tiles & GetTiles(u16 index){ return *vec_tiles.at(index); };
     const Kingdom & GetMyKingdom(void) const;
     const Kingdom & GetKingdom(Color::color_t color) const;

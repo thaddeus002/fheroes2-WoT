@@ -21,16 +21,17 @@
 #ifndef H2HEROES_H
 #define H2HEROES_H
 
-#include <utility>
 #include <string>
 #include <vector>
 #include "race.h"
 #include "spell.h"
 #include "color.h"
 #include "morale.h"
+#include "mp2.h"
 #include "luck.h"
 #include "dialog.h"
 #include "army.h"
+#include "skill.h"
 #include "artifact.h"
 #include "gamedefs.h"
 
@@ -67,45 +68,6 @@
 #define DEFAULT_WZRD_DEFENCE	1
 #define DEFAULT_WZRD_POWER	2
 #define DEFAULT_WZRD_KNOWLEDGE	2
-
-class Skill
-{
-    public:
-	typedef enum { BASIC = 0, ADVANCED = 1, EXPERT = 2 } level_t;
-
-	typedef enum {
-	    PATHFINDING	= 0,
-	    ARCHERY	= 1,
-	    LOGISTICS	= 2,
-	    SCOUTING	= 3,
-	    DIPLOMACY	= 4,
-	    NAVIGATION	= 5,
-	    LEADERSHIP	= 6,
-	    WISDOM	= 7,
-	    MYSTICISM	= 8,
-	    LUCK	= 9,
-	    BALLISTICS	= 10,
-	    EAGLEEYE	= 11,
-	    NECROMANCY	= 12,
-	    ESTATES	= 13,
-	    NONE = 0xFF
-	} skill_t;
-
-	Skill(skill_t type = NONE, level_t level = BASIC) : pair(type, level) {};
-	
-	skill_t GetSkill(void) const{ return pair.first; };
-	level_t GetLevel(void) const{ return pair.second; };
-
-	void SetSkill(skill_t skill){ pair.first = skill; };
-	void SetLevel(level_t level){ pair.second = level; };
-
-	void SetSkill(u8 skill);
-	void SetLevel(u8 level);
-
-    private:
-	std::pair<skill_t, level_t> pair;
-};
-
 
 class Heroes
 {
@@ -156,6 +118,9 @@ public:
 
     Dialog::answer_t OpenDialog(void);
 
+    void Recrut(const Castle & castle);
+    void Move(u16 ax, u16 ay);
+
 private:
     std::string		name;
     Color::color_t	color;
@@ -178,6 +143,8 @@ private:
 
     bool		army_spread;
     float		move_point;
+    
+    MP2::object_t	save_maps_general;
     
     Point		mp;
 };

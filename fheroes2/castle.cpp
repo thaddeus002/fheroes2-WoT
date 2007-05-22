@@ -258,10 +258,10 @@ void Castle::ChangeColor(Color::color_t cl)
     color = cl;
 
     // modify left flag
-    ModifyTIlesFlags(world.GetTiles(mp.y * world.h() + mp.x - 1));
+    ModifyTIlesFlags(world.GetTiles(mp.x - 1, mp.y));
 
     // modify right flag
-    ModifyTIlesFlags(world.GetTiles(mp.y * world.h() + mp.x + 1));
+    ModifyTIlesFlags(world.GetTiles(mp.x + 1, mp.y));
 }
 
 /* correct sprites for RND castles */

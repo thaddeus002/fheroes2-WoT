@@ -62,7 +62,7 @@ void GameArea::Redraw(const Rect &area_rt)
 
     for(u16 iy = 0; iy < area_rt.h; ++iy)
 	for(u16 ix = 0; ix < area_rt.w; ++ix)
-	    world.GetTiles((area_rt.y + iy) * world.w() + area_rt.x + ix).Blit(BORDERWIDTH + ix * TILEWIDTH, BORDERWIDTH + iy * TILEWIDTH, animation_ticket);
+	    world.GetTiles(area_rt.x + ix, area_rt.y + iy).Blit(BORDERWIDTH + ix * TILEWIDTH, BORDERWIDTH + iy * TILEWIDTH, animation_ticket);
 
     ++animation_ticket;
 }

@@ -185,12 +185,14 @@ Game::menu_t Game::ScenarioInfo(void){
 
 	// click select
 	if(le.MouseClickLeft(buttonSelectMaps)){
+	    Cursor::Hide();
 	    Scenario::SelectMaps(info_maps);
 	    Scenario::DrawInfo(vo, vc);
 	    Scenario::RedrawOpponentColors(vo);
 	    levelCursor.Move(pointDifficulty[Difficulty::NORMAL]);
 	    display.Flip();
 	    H2Config::SetGameDifficulty(Difficulty::NORMAL);
+	    Cursor::Show();
 	}
 
 	// click cancel

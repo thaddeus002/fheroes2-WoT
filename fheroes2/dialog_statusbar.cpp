@@ -20,6 +20,7 @@
 
 #include <string>
 #include "text.h"
+#include "cursor.h"
 #include "dialog.h"
 
 void Dialog::StatusBar::ShowMessage(const std::string & message)
@@ -28,17 +29,25 @@ void Dialog::StatusBar::ShowMessage(const std::string & message)
 
     if(! status.empty()) Clear();
 
+    Cursor::Hide();
+
     Text(pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
          pos_pt.y + (sprite.h() - Text::height(sprite.w(), message, font)) / 2, message, font, true);
 
     status = message;
+
+    Cursor::Show();
 }
 
 void Dialog::StatusBar::Clear(void)
 {
+    Cursor::Hide();
+
     display.Blit(sprite, pos_pt);
 
     status.clear();
+
+    Cursor::Show();
 }
 
 bool Dialog::StatusBar::isEmpty(void)

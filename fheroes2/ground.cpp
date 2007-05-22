@@ -22,31 +22,22 @@
 
 const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
 {
-    static const std::string str_desert("Desert");
-    static const std::string str_snow("Snow");
-    static const std::string str_swamp("Swamp");
-    static const std::string str_wasteland("Wasteland");
-    static const std::string str_beach("Beach");
-    static const std::string str_lava("Lava");
-    static const std::string str_dirt("Dirt");
-    static const std::string str_grass("Grass");
-    static const std::string str_water("Water");
-    static const std::string str_road("Road");
-    static const std::string str_multi("Multi");
+    static const std::string str_ground[] = { "Desert", "Snow", "Swamp", "Wasteland", "Beach", 
+	"Lava", "Dirt", "Grass", "Water", "Road", "Multi" };
 
     switch(ground){
-        case DESERT:	return str_desert;
-	case SNOW:	return str_snow;
-	case SWAMP:	return str_swamp;
-	case WASTELAND:	return str_wasteland;
-	case BEACH:	return str_beach;
-	case LAVA:	return str_lava;
-	case DIRT:	return str_dirt;
-	case GRASS:	return str_grass;
-	case WATER:	return str_water;
-	case ROAD:	return str_road;
-	default:	break;
+        case DESERT:	return str_ground[0];
+	case SNOW:	return str_ground[1];
+	case SWAMP:	return str_ground[2];
+	case WASTELAND:	return str_ground[3];
+	case BEACH:	return str_ground[4];
+	case LAVA:	return str_ground[5];
+	case DIRT:	return str_ground[6];
+	case GRASS:	return str_ground[7];
+	case WATER:	return str_ground[8];
+	case ROAD:	return str_ground[9];
+	case MULTI:	return str_ground[10];
     }
 
-    return str_multi;
+    return str_ground[10];
 }

@@ -22,28 +22,21 @@
 
 const std::string & Speed::String(speed_t speed)
 {
-    static const std::string str_crawling("Crawling");
-    static const std::string str_veryslow("Very Slow");
-    static const std::string str_slow("Slow");
-    static const std::string str_average("Average");
-    static const std::string str_fast("Fast");
-    static const std::string str_veryfast("Very Fast");
-    static const std::string str_ultrafast("Ultra Fast");
-    static const std::string str_blazing("Blazing");
-    static const std::string str_instant("Instant");
+    static const std::string str_speed[] = { "Crawling", "Very Slow", "Slow", "Average", "Fast",
+	"Very Fast", "Ultra Fast", "Blazing", "Instant" };
 
     switch(speed)
     {
-	case CRAWLING:	return str_crawling;
-        case VERYSLOW:	return str_veryslow;
-        case SLOW:	return str_slow;
-        case AVERAGE:	return str_average;
-        case FAST:	return str_fast;
-        case VERYFAST:	return str_veryfast;
-        case ULTRAFAST:	return str_ultrafast;
-        case BLAZING:	return str_blazing;
-        case INSTANT:	return str_instant;
+	case CRAWLING:	return str_speed[0];
+        case VERYSLOW:	return str_speed[1];
+        case SLOW:	return str_speed[2];
+        case AVERAGE:	return str_speed[3];
+        case FAST:	return str_speed[4];
+        case VERYFAST:	return str_speed[5];
+        case ULTRAFAST:	return str_speed[6];
+        case BLAZING:	return str_speed[7];
+        case INSTANT:	return str_speed[8];
     }
     
-    return str_crawling;
+    return str_speed[0];
 }

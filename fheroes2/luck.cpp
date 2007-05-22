@@ -22,23 +22,17 @@
 
 const std::string & Luck::String(Luck::luck_t luck)
 {
-    static const std::string cursed("Cursed");
-    static const std::string awful("Awful");
-    static const std::string bad("Bad");
-    static const std::string normal("Normal");
-    static const std::string good("Good");
-    static const std::string great("Great");
-    static const std::string irish("Irish");
+    static const std::string str_luck[] = { "Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish" };
 
     switch(luck){
-        case Luck::CURSED:	return cursed;
-        case Luck::AWFUL:	return awful;
-        case Luck::BAD:		return bad;
-        case Luck::NORMAL:	return normal;
-        case Luck::GOOD:	return good;
-        case Luck::GREAT:	return great;
-	default: break;
+        case Luck::CURSED:	return str_luck[0];
+        case Luck::AWFUL:	return str_luck[1];
+        case Luck::BAD:		return str_luck[2];
+        case Luck::NORMAL:	return str_luck[3];
+        case Luck::GOOD:	return str_luck[4];
+        case Luck::GREAT:	return str_luck[5];
+        case Luck::IRISH:	return str_luck[6];
     }
 
-    return irish;
+    return str_luck[0];
 }

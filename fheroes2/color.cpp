@@ -22,23 +22,18 @@
 
 const std::string & Color::String(Color::color_t color)
 {
-    static const std::string blue("Blue");
-    static const std::string green("Green");
-    static const std::string red("Red");
-    static const std::string yellow("Yellow");
-    static const std::string orange("Orange");
-    static const std::string purple("Purple");
-    static const std::string gray("Gray");
+    static const std::string str_color[] = { "Blue", "Green", "Red", "Yellow", "Orange", "Purple", "Gray" };
 
-    switch(color){
-        case Color::BLUE: return blue;
-        case Color::GREEN: return green;
-        case Color::RED: return red;
-        case Color::YELLOW: return yellow;
-	case Color::ORANGE: return orange;
-	case Color::PURPLE: return purple;
-	default: break;
+    switch(color)
+    {
+        case Color::BLUE: 	return str_color[0];
+        case Color::GREEN: 	return str_color[1];
+        case Color::RED:	return str_color[2];
+        case Color::YELLOW:	return str_color[3];
+	case Color::ORANGE: 	return str_color[4];
+	case Color::PURPLE: 	return str_color[5];
+	case Color::GRAY: 	return str_color[6];
     }
 
-    return gray;
+    return str_color[6];
 }

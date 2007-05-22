@@ -31,19 +31,16 @@ Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& diff
 
 const std::string & Difficulty::String(Difficulty::difficulty_t difficulty)
 {
-    static const std::string easy("Easy");
-    static const std::string nrml("Normal");
-    static const std::string hard("Hard");
-    static const std::string expt("Expert");
-    static const std::string imps("Impossible");
+    static const std::string str_difficulty[] = { "Easy", "Normal", "Hard", "Expert", "Impossible" };
 
-    switch(difficulty){
-        case Difficulty::EASY: return easy;
-        case Difficulty::NORMAL: return nrml;
-	case Difficulty::HARD: return hard;
-	case Difficulty::EXPERT: return expt;
-	default: break;
+    switch(difficulty)
+    {
+        case Difficulty::EASY:		return str_difficulty[0];
+        case Difficulty::NORMAL:	return str_difficulty[1];
+	case Difficulty::HARD: 		return str_difficulty[2];
+	case Difficulty::EXPERT: 	return str_difficulty[3];
+	case Difficulty::IMPOSSIBLE: 	return str_difficulty[4];
     }
 
-    return imps;
+    return str_difficulty[0];
 }

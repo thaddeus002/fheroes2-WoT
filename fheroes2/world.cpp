@@ -613,8 +613,17 @@ void World::LoadMaps(const std::string &filename)
 	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
 	    if((*vec_kingdoms[ii]).isPlay() && (*vec_kingdoms[ii]).GetCastles().size())
 	    {
-		// get first castle
+		// get first castle position
+		const Kingdom & kingdom = *(vec_kingdoms[ii]);
+		const Castle & castle = *(kingdom.GetCastles().at(0));
+
 		// place near hero
+		if(const Heroes *hero = GetFreemanHeroes(castle.GetRace()))
+		{
+		    const_cast<Heroes &>(*hero).Recrut(castle);
+
+		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
+		}
 	    }
 	
     if(H2Config::Debug()) Error::Verbose("World::LoadMaps: end load.");

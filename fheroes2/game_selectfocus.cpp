@@ -212,6 +212,8 @@ void Game::SelectFocusHeroes::Redraw(void)
 	    const Sprite & mana = AGG::GetICN("MANA.ICN", hero.GetManaIndexSprite());
 	    const Sprite & port = AGG::GetICN("MINIPORT.ICN", hero.GetHeroes());
 
+	    display.FillRect(0, 0, 0, coords[ii]);
+
 	    // mobility
 	    display.Blit(sprite_blue, coords[ii]);
 	    display.Blit(mobility, coords[ii].x, coords[ii].y + mobility.y());

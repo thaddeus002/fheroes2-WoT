@@ -25,19 +25,9 @@
 #include "error.h"
 #include "heroes.h"
 
-void Skill::SetSkill(u8 skill)
-{
-    ESTATES >= skill ? pair.first = static_cast<skill_t>(skill) : pair.first = NONE;
-}
-
-void Skill::SetLevel(u8 level)
-{
-    pair.second = static_cast<level_t>((level - 1) % 3);
-}
-
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
     morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), 
-    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(false)
+    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(false), save_maps_general(MP2::OBJ_HEROES)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -590,3 +580,34 @@ u8 Heroes::GetCountArmy(void) const
     return result;
 }
 
+void Heroes::Recrut(const Castle & castle)
+{
+    mp = castle.GetCenter();
+    color = castle.GetColor();
+
+    Maps::Tiles & tiles = world.GetTiles(mp.x, mp.y);
+
+    // save general object
+    save_maps_general = tiles.GetObject();
+    tiles.SetObject(MP2::OBJ_HEROES);
+}
+
+void Heroes::Move(u16 ax, u16 ay)
+{
+    if(MP2::OBJ_HEROES != save_maps_general)
+    {
+        Maps::Tiles & tiles_old = world.GetTiles(mp.x, mp.y);
+
+	// restore general object
+	tiles_old.SetObject(save_maps_general);
+    }
+
+    Maps::Tiles & tiles_new = world.GetTiles(ax, ay);
+
+    // save general object
+    save_maps_general = tiles_new.GetObject();
+    tiles_new.SetObject(MP2::OBJ_HEROES);
+    
+    mp.x = ax;
+    mp.y = ay;
+}

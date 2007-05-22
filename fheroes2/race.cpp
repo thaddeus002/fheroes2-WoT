@@ -23,29 +23,23 @@
 
 const std::string & Race::String(Race::race_t race)
 {
-    static const std::string kngt("Knight");
-    static const std::string barb("Barbarian");
-    static const std::string sorc("Sorceress");
-    static const std::string wrlk("Warlock");
-    static const std::string wzrd("Wizard");
-    static const std::string necr("Necromancer");
-    static const std::string mult("Multi");
-    static const std::string random("Randomize");
-    static const std::string bomg("Bomg");
+    static const std::string str_race[] = { "Knight", "Barbarian", "Sorceress", 
+	"Warlock", "Wizard", "Necromancer", "Multi", "Randomize", "Bomg" };
 
     switch(race){
-        case Race::KNGT: return kngt;
-        case Race::BARB: return barb;
-        case Race::SORC: return sorc;
-        case Race::WRLK: return wrlk;
-        case Race::WZRD: return wzrd;
-        case Race::NECR: return necr;
-        case Race::MULT: return mult;
-        case Race::RAND: return random;
+        case Race::KNGT: return str_race[0];
+        case Race::BARB: return str_race[1];
+        case Race::SORC: return str_race[2];
+        case Race::WRLK: return str_race[3];
+        case Race::WZRD: return str_race[4];
+        case Race::NECR: return str_race[5];
+        case Race::MULT: return str_race[6];
+        case Race::RAND: return str_race[7];
+	case Race::BOMG: return str_race[8];
         default: break;
     }
 
-    return bomg;
+    return str_race[8];
 }
 
 Race::race_t Race::Rand(void)

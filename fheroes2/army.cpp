@@ -22,27 +22,20 @@
 
 const std::string & Army::String(Army::size_t size)
 {
-    static const std::string few("Few");
-    static const std::string several("Several");
-    static const std::string pack("Pack");
-    static const std::string lots("Lots");
-    static const std::string horde("Horde");
-    static const std::string throng("Throng");
-    static const std::string swarm("Swarm");
-    static const std::string zounds("Zounds");
-    static const std::string legion("Legion");
+    static const std::string str_size[] = { "Few", "Several", "Pack", "Lots", "Horde", "Throng", "Swarm", "Zounds", "Legion" };
 
-    switch(size){
-	case FEW:	return few;
-        case SEVERAL:	return several;
-        case PACK:	return pack;
-        case LOTS:	return lots;
-        case HORDE:	return horde;
-        case THRONG:	return throng;
-        case SWARM:	return swarm;
-        case ZOUNDS:	return zounds;
-        default: break;
+    switch(size)
+    {
+	case FEW:	return str_size[0];
+        case SEVERAL:	return str_size[1];
+        case PACK:	return str_size[2];
+        case LOTS:	return str_size[3];
+        case HORDE:	return str_size[4];
+        case THRONG:	return str_size[5];
+        case SWARM:	return str_size[6];
+        case ZOUNDS:	return str_size[7];
+        case LEGION:	return str_size[8];
     }
     
-    return legion;
+    return str_size[0];
 }

@@ -22,23 +22,17 @@
 
 const std::string & Morale::String(Morale::morale_t morale)
 {
-    static const std::string treason("Treason");
-    static const std::string awful("Awful");
-    static const std::string poor("Poor");
-    static const std::string normal("Normal");
-    static const std::string good("Good");
-    static const std::string great("Great");
-    static const std::string blood("Blood");
+    static const std::string str_morale[] = { "Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood" };
 
     switch(morale){
-        case Morale::TREASON:	return treason;
-        case Morale::AWFUL:	return awful;
-        case Morale::POOR:	return poor;
-        case Morale::NORMAL:	return normal;
-        case Morale::GOOD:	return good;
-        case Morale::GREAT:	return great;
-        default: break;
+        case Morale::TREASON:	return str_morale[0];
+        case Morale::AWFUL:	return str_morale[1];
+        case Morale::POOR:	return str_morale[2];
+        case Morale::NORMAL:	return str_morale[3];
+        case Morale::GOOD:	return str_morale[4];
+        case Morale::GREAT:	return str_morale[5];
+        case Morale::BLOOD:	return str_morale[6];
     }
 
-    return blood;
+    return str_morale[0];
 }
