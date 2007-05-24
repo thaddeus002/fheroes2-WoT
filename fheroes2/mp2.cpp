@@ -315,95 +315,118 @@ const char * MP2::StringObject(u8 object)
 {
     switch(object){
         case MP2::OBJ_ZERO:			return "OBJ_ZERO";
-        case MP2::OBJN_ALCHEMYTOWER:		return "Alchemy Tower";
+        case MP2::OBJN_ALCHEMYTOWER:
         case MP2::OBJ_ALCHEMYTOWER:		return "Alchemy Tower";
-        case MP2::OBJN_DAEMONCAVE:		return "Daemon Cave";
+        case MP2::OBJN_DAEMONCAVE:
         case MP2::OBJ_DAEMONCAVE:		return "Daemon Cave";
-        case MP2::OBJN_FAERIERING:		return "Faerie Ring";
+        case MP2::OBJN_FAERIERING:
         case MP2::OBJ_FAERIERING:		return "Faerie Ring";
-        case MP2::OBJN_GRAVEYARD:		return "Graveyard";
+        case MP2::OBJN_GRAVEYARD:
         case MP2::OBJ_GRAVEYARD:		return "Graveyard";
-        case MP2::OBJN_DRAGONCITY:		return "Dragon City";
+        case MP2::OBJN_DRAGONCITY:
         case MP2::OBJ_DRAGONCITY:		return "Dragon City";
-        case MP2::OBJN_LIGHTHOUSE:		return "Lighthouse";
+        case MP2::OBJN_LIGHTHOUSE:
         case MP2::OBJ_LIGHTHOUSE:		return "Lighthouse";
-        case MP2::OBJN_WATERMILL:		return "Watermill";
+        case MP2::OBJN_WATERMILL:
         case MP2::OBJ_WATERMILL:		return "Watermill";
-        case MP2::OBJN_MINES:			return "Mines";
+        case MP2::OBJN_MINES:
         case MP2::OBJ_MINES:			return "Mines";
-        case MP2::OBJN_OBELISK:			return "Obelisk";
+        case MP2::OBJN_OBELISK:
         case MP2::OBJ_OBELISK:			return "Obelisk";
-        case MP2::OBJN_OASIS:			return "Oasis";
+        case MP2::OBJN_OASIS:
         case MP2::OBJ_OASIS:			return "Oasis";
-        case MP2::OBJ_COAST:			return "Coast";
-        case MP2::OBJN_SAWMILL:			return "Sawmill";
+        case MP2::OBJN_SAWMILL:
         case MP2::OBJ_SAWMILL:			return "Sawmill";
-        case MP2::OBJN_ORACLE:			return "Oracle";
+        case MP2::OBJN_ORACLE:
         case MP2::OBJ_ORACLE:			return "Oracle";
-        case MP2::OBJN_SHIPWRECK:		return "Ship Wreck";
+        case MP2::OBJN_SHIPWRECK:
         case MP2::OBJ_SHIPWRECK:		return "Ship Wreck";
-        case MP2::OBJN_DESERTTENT:		return "Desert Tent";
+        case MP2::OBJN_DESERTTENT:
         case MP2::OBJ_DESERTTENT:		return "Desert Tent";
-        case MP2::OBJN_CASTLE:			return "Castle";
+        case MP2::OBJN_CASTLE:
         case MP2::OBJ_CASTLE:			return "Castle";
-        case MP2::OBJN_WAGONCAMP:		return "Wagon Camp";
+        case MP2::OBJN_WAGONCAMP:
         case MP2::OBJ_WAGONCAMP:		return "Wagon Camp";
-        case MP2::OBJN_WINDMILL:		return "Windmill";
+        case MP2::OBJN_WINDMILL:
         case MP2::OBJ_WINDMILL:			return "Windmill";
-        case MP2::OBJN_RNDTOWN:			return "Random Town";
+        case MP2::OBJN_RNDTOWN:
         case MP2::OBJ_RNDTOWN:			return "Random Town";
-        case MP2::OBJN_RNDCASTLE:		return "Random Castle";
+        case MP2::OBJN_RNDCASTLE:
         case MP2::OBJ_RNDCASTLE:		return "Random Castle";
-        case MP2::OBJ_NOTHINGSPECIAL:		return "Nothing Special";
-        case MP2::OBJN_TREECITY:		return "Tree City";
+        case MP2::OBJN_WATCHTOWER:
+        case MP2::OBJ_WATCHTOWER:            	return "Watch Tower";
+        case MP2::OBJN_TREECITY:
         case MP2::OBJ_TREECITY:			return "Tree City";
-        case MP2::OBJN_RUINS:			return "Ruins";
+        case MP2::OBJN_TREEHOUSE:
+        case MP2::OBJ_TREEHOUSE:             	return "Tree House";
+        case MP2::OBJN_RUINS:
         case MP2::OBJ_RUINS:			return "Ruins";
-        case MP2::OBJN_FORT:			return "Fort";
+        case MP2::OBJN_FORT:
         case MP2::OBJ_FORT:			return "Fort";
-        case MP2::OBJN_TRADINGPOST:		return "Trading Post";
+        case MP2::OBJN_TRADINGPOST:
         case MP2::OBJ_TRADINGPOST:		return "Trading Post";
-        case MP2::OBJN_ABANDONEDMINE:		return "Abandone Mine";
+        case MP2::OBJN_ABANDONEDMINE:
         case MP2::OBJ_ABANDONEDMINE:		return "Abandone Mine";
-        case MP2::OBJN_TREEKNOWLEDGE:		return "Tree Knowledge";
+        case MP2::OBJN_TREEKNOWLEDGE:
         case MP2::OBJ_TREEKNOWLEDGE:		return "Tree Knowledge";
-        case MP2::OBJN_DOCTORHUNT:		return "Doctor Hunt";
+        case MP2::OBJN_DOCTORHUNT:
         case MP2::OBJ_DOCTORHUNT:		return "Doctor Hunt";
-        case MP2::OBJN_TEMPLE:			return "Temple";
+        case MP2::OBJN_TEMPLE:
         case MP2::OBJ_TEMPLE:			return "Temple";
+        case MP2::OBJN_HILLFORT:
+        case MP2::OBJ_HILLFORT:			return "Hill Fort";
+        case MP2::OBJN_HALFLINGHOLE:
+        case MP2::OBJ_HALFLINGHOLE:		return "Halfling Hole";
+        case MP2::OBJN_MERCENARYCAMP:
+        case MP2::OBJ_MERCENARYCAMP:		return "Mercenary Camp";
+        case MP2::OBJN_PIRAMID:
+        case MP2::OBJ_PIRAMID:			return "Piramid";
+        case MP2::OBJN_CITYDEAD:
+        case MP2::OBJ_CITYDEAD:			return "City Dead";
+        case MP2::OBJN_EXCAVATION:
+        case MP2::OBJ_EXCAVATION:		return "Excavation";
+        case MP2::OBJN_SPHINX:
+        case MP2::OBJ_SPHINX:			return "Sphinx";
+        case MP2::OBJN_TROLLBRIDGE:
+        case MP2::OBJ_TROLLBRIDGE:		return "Troll Bridge";
+        case MP2::OBJN_WITCHHUNT:
+        case MP2::OBJ_WITCHHUNT:		return "Witch's Hunt";
+        case MP2::OBJN_XANADU:
+        case MP2::OBJ_XANADU:			return "Xanadu";
+        case MP2::OBJN_CAVE:
+        case MP2::OBJ_CAVE:			return "Cave";
+        case MP2::OBJN_MAGELLANMAPS:
+        case MP2::OBJ_MAGELLANMAPS:		return "Magellan Maps";
+        case MP2::OBJN_DERELICTSHIP:
+        case MP2::OBJ_DERELICTSHIP:		return "Derelict Ship";
+        case MP2::OBJN_OBSERVATIONTOWER:
+        case MP2::OBJ_OBSERVATIONTOWER:		return "Observation Tower";
+        case MP2::OBJN_FREEMANFOUNDRY:
+        case MP2::OBJ_FREEMANFOUNDRY:		return "Freeman Foundry";
+        case MP2::OBJN_CRAKEDLAKE:
+        case MP2::OBJ_CRAKEDLAKE:            	return "Watering Hole";
+        case MP2::OBJN_ARTESIANSPRING:
+        case MP2::OBJ_ARTESIANSPRING:        	return "Artesian Spring";
+        case MP2::OBJN_GAZEBO:
+        case MP2::OBJ_GAZEBO:			return "Gazebo";
+        case MP2::OBJN_ARCHERHOUSE:
+        case MP2::OBJ_ARCHERHOUSE:		return "Archer House";
+        case MP2::OBJN_PEASANTHUNT:
+        case MP2::OBJ_PEASANTHUNT:		return "Peasant Hunt";
+        case MP2::OBJN_DWARFCOTT:
+        case MP2::OBJ_DWARFCOTT:		return "Dwarf Cott";
+        case MP2::OBJN_STONELITHS:
+        case MP2::OBJ_STONELITHS:		return "Stonelights";
+        case MP2::OBJN_MAGICWELL:
+        case MP2::OBJ_MAGICWELL:             	return "Magic Well";
         case MP2::OBJ_HEROES:			return "Heroes";
         case MP2::OBJ_SIGN:			return "Sign";
-        case MP2::OBJN_HILLFORT:		return "Hill Fort";
-        case MP2::OBJ_HILLFORT:			return "Hill Fort";
-        case MP2::OBJN_HALFLINGHOLE:		return "Halfling Hole";
-        case MP2::OBJ_HALFLINGHOLE:		return "Halfling Hole";
-        case MP2::OBJN_MERCENARYCAMP:		return "Mercenary Camp";
-        case MP2::OBJ_MERCENARYCAMP:		return "Mercenary Camp";
-        case MP2::OBJN_PIRAMID:			return "Piramid";
-        case MP2::OBJ_PIRAMID:			return "Piramid";
-        case MP2::OBJN_CITYDEAD:		return "City Dead";
-        case MP2::OBJ_CITYDEAD:			return "City Dead";
-        case MP2::OBJN_EXCAVATION:		return "Excavation";
-        case MP2::OBJ_EXCAVATION:		return "Excavation";
-        case MP2::OBJN_SPHINX:			return "Sphinx";
-        case MP2::OBJ_SPHINX:			return "Sphinx";
-        case MP2::OBJ_OILLAKE:			return "Oil Lake";
-        case MP2::OBJN_TROLLBRIDGE:		return "Troll Bridge";
-        case MP2::OBJ_TROLLBRIDGE:		return "Troll Bridge";
-        case MP2::OBJN_WITCHHUNT:		return "Witch's Hunt";
-        case MP2::OBJ_WITCHHUNT:		return "Witch's Hunt";
-        case MP2::OBJN_XANADU:			return "Xanadu";
-        case MP2::OBJ_XANADU:			return "Xanadu";
-        case MP2::OBJN_CAVE:			return "Cave";
-        case MP2::OBJ_CAVE:			return "Cave";
-        case MP2::OBJN_MAGELLANMAPS:		return "Magellan Maps";
-        case MP2::OBJ_MAGELLANMAPS:		return "Magellan Maps";
-        case MP2::OBJN_DERELICTSHIP:		return "Derelict Ship";
-        case MP2::OBJ_DERELICTSHIP:		return "Derelict Ship";
-        case MP2::OBJN_OBSERVATIONTOWER:	return "Observation Tower";
-        case MP2::OBJ_OBSERVATIONTOWER:		return "Observation Tower";
-        case MP2::OBJN_FREEMANFOUNDRY:		return "Freeman Foundry";
-        case MP2::OBJ_FREEMANFOUNDRY:		return "Freeman Foundry";
+        case MP2::OBJ_SHRUB2:			return "Shrub";
+        case MP2::OBJ_NOTHINGSPECIAL:		return "Nothing Special";
+        case MP2::OBJ_OILLAKE:			return "Tar Pit";
+        case MP2::OBJ_COAST:			return "Coast";
+        case MP2::OBJ_MOUND:			return "Mound";
+        case MP2::OBJ_DUNE:			return "Dune";
 	case MP2::OBJ_STUMP:			return "Stump";
 	case MP2::OBJ_CACTUS:			return "Cactus";
         case MP2::OBJ_TREES:			return "Trees";
@@ -422,16 +445,11 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_TREASURECHEST:		return "Treasure Chest";
         case MP2::OBJ_CAMPFIRE:			return "Camp Fire";
         case MP2::OBJ_FOUNTAIN:			return "Fountain";
-        case MP2::OBJ_GAZEBO:			return "Gazebo";
         case MP2::OBJ_ANCIENTLAMP:		return "Ancient Lamp";
-        case MP2::OBJ_ARCHERHOUSE:		return "Archer House";
         case MP2::OBJ_GOBLINHUNT:		return "Goblin Hunt";
-        case MP2::OBJ_DWARFCOTT:		return "Dwarf Cott";
-        case MP2::OBJ_PEASANTHUNT:		return "Peasant Hunt";
         case MP2::OBJ_PEASANTHUNT2:		return "Peasant Hunt";
         case MP2::OBJ_MONSTER:			return "Monster";
         case MP2::OBJ_RESOURCE:			return "Resource";
-        case MP2::OBJ_STONELITHS:		return "Stonelights";
         case MP2::OBJ_WHIRLPOOL:		return "Whirlpool";
         case MP2::OBJ_ARTIFACT:			return "Artifact";
         case MP2::OBJ_BOAT:			return "Boat";
@@ -441,8 +459,6 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_RNDMONSTER2:           	return "OBJ_RNDMONSTER2";
         case MP2::OBJ_RNDMONSTER3:           	return "OBJ_RNDMONSTER3";
         case MP2::OBJ_RNDMONSTER4:           	return "OBJ_RNDMONSTER4";
-        case MP2::OBJ_WATCHTOWER:            	return "Watch Tower";
-        case MP2::OBJ_TREEHOUSE:             	return "Tree House";
         case MP2::OBJ_STANDINGSTONES:        	return "Standing Stones";
         case MP2::OBJ_EVENT:                 	return "OBJ_EVENT";
         case MP2::OBJ_RNDMONSTER:            	return "OBJ_RNDMONSTER";
@@ -452,13 +468,10 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_SHRINE2:               	return "Shrine of Level 2";
         case MP2::OBJ_SHRINE3:               	return "Shrine of Level 3";
         case MP2::OBJ_WAGON:                 	return "Wagon";
-        case MP2::OBJ_ARTESIANSPRING:        	return "Artesian Spring";
-        case MP2::OBJ_CRAKEDLAKE:            	return "Cracked Lake";
         case MP2::OBJ_LEANTO:                	return "Leanto";
         case MP2::OBJ_FLOTSAM:               	return "Flotsam";
         case MP2::OBJ_SHIPWRECKSURVIROR:     	return "Shipwreck Surviror";
         case MP2::OBJ_BOTTLE:                	return "Bottle";
-        case MP2::OBJ_MAGICWELL:             	return "Magic Well";
         case MP2::OBJ_MAGICGARDEN:           	return "Magic Garden";
         case MP2::OBJ_RNDARTIFACT1:          	return "OBJ_RNDARTIFACT1";
         case MP2::OBJ_RNDARTIFACT2:          	return "OBJ_RNDARTIFACT2";

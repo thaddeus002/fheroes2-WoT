@@ -41,13 +41,15 @@ void Dialog::StatusBar::ShowMessage(const std::string & message)
 
 void Dialog::StatusBar::Clear(void)
 {
-    Cursor::Hide();
+    bool localcursor = Cursor::Visible();
+
+    if(localcursor) Cursor::Hide();
 
     display.Blit(sprite, pos_pt);
 
     status.clear();
 
-    Cursor::Show();
+    if(localcursor) Cursor::Show();
 }
 
 bool Dialog::StatusBar::isEmpty(void)

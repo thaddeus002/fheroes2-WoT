@@ -70,6 +70,22 @@ Resource::funds_t Resource::operator- (const Resource::funds_t &fd1, const Resou
     return fd;
 }
 
+// operator funds_t * int
+Resource::funds_t Resource::operator* (const Resource::funds_t &fd1, int mul)
+{
+    funds_t fd;
+
+    fd.wood = fd1.wood * mul;
+    fd.mercury = fd1.mercury * mul;
+    fd.ore = fd1.ore * mul;
+    fd.sulfur = fd1.sulfur * mul;
+    fd.crystal = fd1.crystal * mul;
+    fd.gems = fd1.gems * mul;
+    fd.gold = fd1.gold * mul;
+
+    return fd;
+}
+
 // operator funds_t < funds_t
 bool Resource::operator< (const funds_t &pm1, const funds_t &pm2)
 {

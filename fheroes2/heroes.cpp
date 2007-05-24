@@ -141,6 +141,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
 	artifacts.push_back(Artifact::RABBIT_FOOT);
 	artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
     }
+    
+    magic_point = GetMaxSpellPoints();
 }
 
 void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl)

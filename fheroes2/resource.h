@@ -60,6 +60,7 @@ namespace Resource
     } funds_t;
 
     funds_t operator+ (const funds_t &pm1, const funds_t &pm2);
+    funds_t operator* (const funds_t &pm1, int mul);
     funds_t operator- (const funds_t &pm1, const funds_t &pm2);
     bool operator< (const funds_t &pm1, const funds_t &pm2);
     bool operator> (const funds_t &pm1, const funds_t &pm2);

@@ -21,85 +21,66 @@
 #include "agg.h"
 #include "config.h"
 #include "cursor.h"
+#include "tools.h"
 #include "text.h"
 #include "localevent.h"
 #include "button.h"
 #include "dialog.h"
 
-u16 Dialog::SelectCount(u16 count)
+u16 Dialog::SelectCount(u16 max_count)
 {
-/*
+    if(max_count < 2) return 0;
+
     const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
 
     // preload
     AGG::PreloadObject(system);
 
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
     Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
 
-    Box box(Text::height(BOXAREA_WIDTH, header, ft) + 20 + Text::height(BOXAREA_WIDTH, message, ft), buttons);
+    Box box(60, OK|CANCEL);
 
-    Rect pos = box.GetArea();
+    const Rect & pos = box.GetArea();
+    Point pt;
 
-    if(header.size()){
+    // text
+    std::string message("Move how many troops?");
+    pt.x = pos.x + (pos.w - Text::width(message, Font::BIG)) / 2;
+    pt.y = pos.y;
+    Text(pt.x, pt.y, message, Font::BIG, true);
 
-	TextBox(pos, header, ft, true);
-        pos.y += Text::height(BOXAREA_WIDTH, header, ft) + 20;
-    }
+    // sprite edit
+    const Surface & sprite_edit = AGG::GetICN("TOWNWIND.ICN", 4);
+    pt.x = pos.x + 80;
+    pt.y = pos.y + 55;
+    display.Blit(sprite_edit, pt);
 
-    if(message.size())
-        TextBox(pos, message, ft, true);
+    u16 result = max_count / 2;
+    message.clear();
+    String::AddInt(message, result);
+    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
+    pt.y = pos.y + 56;
+    Text(pt.x, pt.y, message, Font::BIG, true);
+
+    // buttons
+    pt.x = pos.x + 150;
+    pt.y = pos.y + 51;
+    Button buttonUp(pt, "TOWNWIND.ICN", 5, 6);
+
+    pt.x = pos.x + 150;
+    pt.y = pos.y + 67;
+    Button buttonDn(pt, "TOWNWIND.ICN", 7, 8);
+
+    pt.x = pos.x;
+    pt.y = pos.y + pos.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    Button buttonOk(pt, system, 1, 2);
+
+    pt.x = pos.x + pos.w - AGG::GetICN(system, 3).w();
+    pt.y = pos.y + pos.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+    Button buttonCancel(pt, system, 3, 4);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
-
-    Button *button1 = NULL;
-    Button *button2 = NULL;
-    Point pt;
-    answer_t result1 = Dialog::ZERO;
-    answer_t result2 = Dialog::ZERO;
-    
-    switch(buttons){
-	case YES|NO:
-            pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
-	    button1 = new Button(pt, system, 5, 6);
-	    result1 = YES;
-            pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 7).w();
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 7).h();
-	    button2 = new Button(pt, system, 7, 8);
-	    result2 = NO;
-	    break;
-
-	case OK|CANCEL:
-            pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt, system, 1, 2);
-	    result1 = OK;
-            pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 3).w();
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
-	    button2 = new Button(pt, system, 3, 4);
-	    result2 = CANCEL;
-	    break;
-
-	case OK:
-            pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt, system, 1, 2);
-	    result1 = OK;
-	    break;
-
-	case CANCEL:
-            pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 3).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
-	    button1 = new Button(pt, system, 3, 4);
-	    result1 = CANCEL;
-	    break;
-
-	default:
-	    break;
-    }
 
     display.Flip();
     Cursor::Show();
@@ -107,35 +88,58 @@ u16 Dialog::SelectCount(u16 count)
     le.ResetKey();
 
     // message loop
-    bool exit = false;
-    u16 result = Dialog::ZERO;
-
-    while(!exit){
-
+    while(1)
+    {
         le.HandleEvents();
 
-        if(!buttons && !le.MouseRight()) exit = true;
+	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
+        le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
+	le.MousePressLeft(buttonUp) ? buttonUp.Press() : buttonUp.Release();
+	le.MousePressLeft(buttonDn) ? buttonDn.Press() : buttonDn.Release();
 
-	if(button1) le.MousePressLeft(*button1) ? button1->Press() : button1->Release();
-        if(button2) le.MousePressLeft(*button2) ? button2->Press() : button2->Release();
+	// up
+	if((le.MouseWheelUp(pos) ||
+            le.MouseClickLeft(buttonUp)) && result < max_count)
+	{
+	    ++result;
 
-        if(button1 && le.MouseClickLeft(*button1)){ exit = true; result = result1; }
-        if(button2 && le.MouseClickLeft(*button2)){ exit = true; result = result2; }
+	    Cursor::Hide();
+	    pt.x = pos.x + 80;
+	    pt.y = pos.y + 55;
+	    display.Blit(sprite_edit, pt);
 
-	if(le.KeyPress(SDLK_RETURN)){ exit = true; result = Dialog::YES | Dialog::OK; }
-	
-	if(le.KeyPress(SDLK_ESCAPE)){ exit = true; result = Dialog::NO | Dialog::CANCEL; }
+	    message.clear();
+	    String::AddInt(message, result);
+	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
+	    pt.y = pos.y + 56;
+	    Text(pt.x, pt.y, message, Font::BIG, true);
+	    Cursor::Show();
+	}
+
+	// down
+	if((le.MouseWheelDn(pos) ||
+            le.MouseClickLeft(buttonDn)) && 1 < result)
+	{
+	    --result;
+
+	    Cursor::Hide();
+	    pt.x = pos.x + 80;
+	    pt.y = pos.y + 55;
+	    display.Blit(sprite_edit, pt);
+
+	    message.clear();
+	    String::AddInt(message, result);
+	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
+	    pt.y = pos.y + 56;
+	    Text(pt.x, pt.y, message, Font::BIG, true);
+	    Cursor::Show();
+	}
+
+        if(le.KeyPress(SDLK_RETURN) || le.MouseClickLeft(buttonOk)) break;
+	if(le.KeyPress(SDLK_ESCAPE) || le.MouseClickLeft(buttonCancel)) return 0;
     }
 
     le.ResetKey();
 
-    Cursor::Hide();
-
-    if(button1) delete button1;
-    if(button2) delete button2;
-
-    Cursor::Set(cursor);
-    Cursor::Show();
-*/
-    return 0;
+    return result;
 }

@@ -401,8 +401,12 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_ALCHEMYTOWER:	return MP2::OBJN_ALCHEMYTOWER;
 	case MP2::OBJN_DAEMONCAVE:	return MP2::OBJN_DAEMONCAVE;
 	case MP2::OBJN_FAERIERING:	return MP2::OBJN_FAERIERING;
+	case MP2::OBJN_GAZEBO:		return MP2::OBJN_GAZEBO;
 	case MP2::OBJN_GRAVEYARD:	return MP2::OBJN_GRAVEYARD;
+        case MP2::OBJN_ARCHERHOUSE:	return MP2::OBJN_ARCHERHOUSE;
+        case MP2::OBJN_DWARFCOTT:	return MP2::OBJN_DWARFCOTT;
 
+        case MP2::OBJN_PEASANTHUNT:	return MP2::OBJN_PEASANTHUNT;
 	case MP2::OBJN_DRAGONCITY:	return MP2::OBJN_DRAGONCITY;
 	case MP2::OBJN_LIGHTHOUSE:	return MP2::OBJN_LIGHTHOUSE;
 	case MP2::OBJN_WATERMILL:	return MP2::OBJN_WATERMILL;
@@ -416,12 +420,16 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_DERELICTSHIP:	return MP2::OBJN_DERELICTSHIP;
 	case MP2::OBJN_DESERTTENT:	return MP2::OBJN_DESERTTENT;
 	case MP2::OBJN_CASTLE:		return MP2::OBJN_CASTLE;
+        case MP2::OBJN_STONELITHS:	return MP2::OBJN_STONELITHS;
 	case MP2::OBJN_WAGONCAMP:	return MP2::OBJN_WAGONCAMP;
 	case MP2::OBJN_WINDMILL:	return MP2::OBJN_WINDMILL;
 
 	case MP2::OBJN_RNDTOWN:		return MP2::OBJN_RNDTOWN;
 	case MP2::OBJN_RNDCASTLE:	return MP2::OBJN_RNDCASTLE;
+	case MP2::OBJ_SHRUB2:		return MP2::OBJ_SHRUB2;
 	case MP2::OBJ_NOTHINGSPECIAL:	return MP2::OBJ_NOTHINGSPECIAL;
+	case MP2::OBJN_WATCHTOWER:	return MP2::OBJN_WATCHTOWER;
+	case MP2::OBJN_TREEHOUSE:	return MP2::OBJN_TREEHOUSE;
 	case MP2::OBJN_TREECITY:	return MP2::OBJN_TREECITY;
 	case MP2::OBJN_RUINS:		return MP2::OBJN_RUINS;
 	case MP2::OBJN_FORT:		return MP2::OBJN_FORT;
@@ -446,6 +454,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_CAVE:		return MP2::OBJN_CAVE;
 	case MP2::OBJN_MAGELLANMAPS:	return MP2::OBJN_MAGELLANMAPS;
 	case MP2::OBJN_SHIPWRECK:	return MP2::OBJN_SHIPWRECK;
+	case MP2::OBJN_MAGICWELL:	return MP2::OBJN_MAGICWELL;
 
 	case MP2::OBJN_OBSERVATIONTOWER:return MP2::OBJN_OBSERVATIONTOWER;
 	case MP2::OBJN_FREEMANFOUNDRY:	return MP2::OBJN_FREEMANFOUNDRY;
@@ -460,6 +469,8 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_STUMP:		return MP2::OBJ_STUMP;
 	case MP2::OBJ_CRATER:		return MP2::OBJ_CRATER;
 	case MP2::OBJ_CACTUS:		return MP2::OBJ_CACTUS;
+	case MP2::OBJ_MOUND:		return MP2::OBJ_MOUND;
+	case MP2::OBJ_DUNE:		return MP2::OBJ_DUNE;
 
 	case MP2::OBJ_LAVALAKE:		return MP2::OBJ_LAVALAKE;
 	case MP2::OBJ_SHRUB:		return MP2::OBJ_SHRUB;
@@ -540,8 +551,10 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_SPHINX:		return MP2::OBJ_SPHINX;
 
 	case MP2::OBJ_WAGON:		return MP2::OBJ_WAGON;
+	case MP2::OBJN_ARTESIANSPRING:	return MP2::OBJN_ARTESIANSPRING;
 	case MP2::OBJ_ARTESIANSPRING:	return MP2::OBJ_ARTESIANSPRING;
 	case MP2::OBJ_TROLLBRIDGE:	return MP2::OBJ_TROLLBRIDGE;
+	case MP2::OBJN_CRAKEDLAKE:	return MP2::OBJN_CRAKEDLAKE;
 	case MP2::OBJ_CRAKEDLAKE:	return MP2::OBJ_CRAKEDLAKE;
 	case MP2::OBJ_WITCHHUNT:	return MP2::OBJ_WITCHHUNT;
 	case MP2::OBJ_XANADU:		return MP2::OBJ_XANADU;
@@ -562,7 +575,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_RNDARTIFACT2:	return MP2::OBJ_RNDARTIFACT2;
 	case MP2::OBJ_RNDARTIFACT3:	return MP2::OBJ_RNDARTIFACT3;
 	
-	default: Error::Warning("Maps::Tiles::GetObject: unknown object: ", general); break;
+	default: Error::Warning("Maps::Tiles::GetObject: unknown object: ", general); Error::Warning("maps index: ", maps_index); break;
     }
     
     return MP2::OBJ_ZERO;

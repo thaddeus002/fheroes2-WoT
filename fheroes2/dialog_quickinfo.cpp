@@ -315,7 +315,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message.clear();
     String::AddInt(message, hero.GetSpellPoints());
     message += "/";
-    String::AddInt(message, 10 * hero.GetMaxSpellPoints());
+    String::AddInt(message, hero.GetMaxSpellPoints());
     dst_pt.x += 75;
     Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
 

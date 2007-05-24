@@ -343,9 +343,9 @@ Game::menu_t Game::StartGame(void)
 			    selectCastles.SelectFromCenter((*castle).GetCenter());
 			    selectCastles.Redraw();
 			    display.Flip();
-			    Cursor::Show();
 			    // and open dialog castle
 			    (*castle).OpenDialog();
+			    Cursor::Show();
 			}
 		    }
 		    break;
@@ -372,9 +372,9 @@ Game::menu_t Game::StartGame(void)
 			    selectHeroes.SelectFromCenter((*hero).GetCenter());
 			    selectHeroes.Redraw();
 			    display.Flip();
-			    Cursor::Show();
 			    // and open dialog heroes
 			    (*hero).OpenDialog();
+			    Cursor::Show();
 			}
 		    }
 		    break;
