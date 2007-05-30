@@ -104,17 +104,17 @@ PaymentConditions::BuyMonster::BuyMonster(const Monster::monster_t & monster)
 	
 	case Monster::GREEN_DRAGON:
 	    gold = BUY_GREEN_DRAGON_GOLD;
-	    sulfur = BUY_GREENDRAGON_SULFUR;
+	    sulfur = BUY_GREEN_DRAGON_SULFUR;
 	    break;
 
 	case Monster::RED_DRAGON:
 	    gold = BUY_RED_DRAGON_GOLD;
-	    sulfur = BUY_REDDRAGON_SULFUR;
+	    sulfur = BUY_RED_DRAGON_SULFUR;
 	    break;
 
 	case Monster::BLACK_DRAGON:
 	    gold = BUY_BLACK_DRAGON_GOLD;
-	    sulfur = BUY_BLACKDRAGON_SULFUR;
+	    sulfur = BUY_BLACK_DRAGON_SULFUR;
 	    break;
 	
 	case Monster::GIANT:
@@ -142,6 +142,7 @@ PaymentConditions::UpgradeMonster::UpgradeMonster(const Monster::monster_t & mon
     
     gold	= pay.gold;
     wood	= pay.wood;
+    mercury	= pay.mercury;
     ore		= pay.ore;
     sulfur	= pay.sulfur;
     crystal	= pay.crystal;

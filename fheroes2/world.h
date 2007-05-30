@@ -93,6 +93,7 @@ private:
     std::vector<GameEvent::Rumor *>     vec_rumors;
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
+    std::vector<u16>                    vec_stonelights;
 
     u16 ultimate_artifact;
 

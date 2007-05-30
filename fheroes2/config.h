@@ -64,7 +64,7 @@ namespace H2Config {
     Display::resolution_t GetVideoMode(void);
 
     Difficulty::difficulty_t GetGameDifficulty(void);
-    Color::color_t GetHumanColor(void);
+    Color::color_t GetMyColor(void);
     u8 GetKingdomColors(void);
     u8 GetKingdomCount(void);
     u8 GetAllowChangeColors(void);

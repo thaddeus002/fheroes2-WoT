@@ -30,8 +30,8 @@
 #define ANIMATION_MEDIUM	9
 #define ANIMATION_LOW		27
 
-Animation::Animation(const std::string &icn, u16 index, u8 count, u8 amode) 
-    : area(display.w(), display.h(), 0, 0), disable(false), frame(0), ticket(0), mode(amode), first(AGG::GetICN(icn, index))
+Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 count, u8 amode) 
+    : dst_pt(dp), area(display.w(), display.h(), 0, 0), disable(false), frame(0), ticket(0), mode(amode), first(AGG::GetICN(icn, index))
 {
     if(first.x() < area.x) area.x = first.x();
     if(first.y() < area.y) area.y = first.y();
@@ -48,6 +48,7 @@ Animation::Animation(const std::string &icn, u16 index, u8 count, u8 amode)
     }
 }
 
+/*
 void Animation::BlitFirstSprite(void)
 {
     const Sprite & sprite = *sprites[0];
@@ -58,6 +59,7 @@ void Animation::BlitFirstSprite(void)
     display.Blit(first, first.x(), first.y());
     display.Blit(sprite, sprite.x(), sprite.y());
 }
+*/
 
 void Animation::DrawSprite(void)
 {

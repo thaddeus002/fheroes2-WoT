@@ -26,7 +26,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), 
+    morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL), //artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), 
     army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(false), save_maps_general(MP2::OBJ_HEROES)
 {
     // hero is freeman
@@ -356,16 +356,18 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
 u8 Heroes::GetMobilityIndexSprite(void) const
 {
-    // (0-25) 26 sprites
+    // valid range (0 - 25)
 
-    return 15;
+    return 25 >= move_point ? static_cast<u8>(move_point) : 25;
 }
 
 u8 Heroes::GetManaIndexSprite(void) const
 {
-    // (0-25) 26 sprites
+    // valid range (0 - 25)
 
-    return 5;
+    u8 r = magic_point / 5;
+
+    return 25 >= r ? r : 25;
 }
 
 u8 Heroes::GetAttack(void) const

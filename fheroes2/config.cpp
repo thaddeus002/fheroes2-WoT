@@ -141,7 +141,7 @@ Display::resolution_t H2Config::GetVideoMode(void){ return H2Config::videoMode; 
 Difficulty::difficulty_t H2Config::GetGameDifficulty(void){ return H2Config::gameDifficulty; };
 
 /* return human selected colors */
-Color::color_t H2Config::GetHumanColor(void){ return H2Config::humanColor; };
+Color::color_t H2Config::GetMyColor(void){ return H2Config::humanColor; };
 
 /* return game kingdom colors */
 u8 H2Config::GetKingdomColors(void){ return H2Config::kingdomColors; };

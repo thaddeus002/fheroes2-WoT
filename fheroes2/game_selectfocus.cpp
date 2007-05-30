@@ -219,11 +219,11 @@ void Game::SelectFocusHeroes::Redraw(void)
 	    display.Blit(mobility, coords[ii].x, coords[ii].y + mobility.y());
 
 	    // portrait
-	    display.Blit(port, coords[ii].x + mobility.w() + 1, coords[ii].y);
+	    display.Blit(port, coords[ii].x + sprite_blue.w() + 1, coords[ii].y);
 
 	    // mana
-	    display.Blit(sprite_blue, coords[ii].x + mobility.w() + port.w() + 2, coords[ii].y);
-	    display.Blit(mana, coords[ii].x + mobility.w() + port.w() + 2, coords[ii].y + mana.y());
+	    display.Blit(sprite_blue, coords[ii].x + sprite_blue.w() + port.w() + 2, coords[ii].y);
+	    display.Blit(mana, coords[ii].x + sprite_blue.w() + port.w() + 2, coords[ii].y + mana.y());
 	}
 	// redraw background
 	else

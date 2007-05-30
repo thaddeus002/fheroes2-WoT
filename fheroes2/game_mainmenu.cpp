@@ -60,7 +60,7 @@ Game::menu_t Game::MainMenu(void)
     AnimationButton animeButtonCredits("BTNSHNGL.ICN", 12, 3);
     AnimationButton animeButtonQuit("BTNSHNGL.ICN", 16, 3);
 
-    Animation animeLantern("SHNGANIM.ICN", 0, 40, Animation::INFINITY | Animation::RING | Animation::LOW);
+    Animation animeLantern(Point(0, 0), "SHNGANIM.ICN", 0, 40, Animation::INFINITY | Animation::RING | Animation::LOW);
 
     display.Flip();
     Cursor::Show();

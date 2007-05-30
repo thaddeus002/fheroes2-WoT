@@ -188,8 +188,7 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
 	buttonUpgrade = new Button(dst_pt, viewarmy, 5, 6);
 
 	PaymentConditions::payment_t payment(PaymentConditions::UpgradeMonster(monster.monster) * GetCount());
-
-	upgrade = world.GetMyKingdom().GetFundsResource() < payment ? false : true;
+	upgrade = world.GetMyKingdom().GetFundsResource() > payment;
 
 	if(!upgrade) (*buttonUpgrade).Press();
     }

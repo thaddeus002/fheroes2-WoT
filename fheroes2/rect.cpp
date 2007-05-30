@@ -17,43 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ANIMATION_H
-#define H2ANIMATION_H
 
-#include <vector>
-#include "sprite.h"
 #include "rect.h"
-#include "background.h"
-#include "gamedefs.h"
 
-class Animation
+Rect::Rect(const std::vector<Rect> & vect)
 {
-public:
-    typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animation_t;
-
-    Animation(const Point &dp, const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
-
-    //void BlitFirstSprite(void);
-    void DrawSprite(void);
-
-protected:
-    const Point dst_pt;
-    Rect area;
-    bool disable;
-    u32 frame;
-    u32 ticket;
-    const u8  mode;
-    const Sprite & first;
-    std::vector<const Sprite *> sprites;
-    Background background;
-};
-
-class AnimationButton : public Animation
-{
-public:
-    AnimationButton(const std::string &icn, u16 index, u8 count) : Animation(Point(0,0), icn, index, count, Animation::HIGH) {};
-
-    void Reset(void);
-};
-
-#endif
+    x = 32767;
+    y = 32767;
+    w = 0;
+    h = 0;
+       
+    std::vector<Rect>::const_iterator it = vect.begin();
+    
+    for(; it != vect.end(); ++it)
+    {
+	if((*it).x < x) x = (*it).x;
+	if((*it).y < y) y = (*it).y;
+	if((*it).x + (*it).w > x + w) w = (*it).x + (*it).w - x;
+	if((*it).y + (*it).h > y + h) h = (*it).y + (*it).h - y;
+    }
+}

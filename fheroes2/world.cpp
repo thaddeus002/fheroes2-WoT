@@ -561,6 +561,10 @@ void World::LoadMaps(const std::string &filename)
 
 	switch(tile.GetObject())
 	{
+	    case MP2::OBJ_STONELIGHTS:
+		vec_stonelights.push_back(ii);
+		break;
+
 	    case MP2::OBJ_EVENT:
 		// remove event sprite
 		if( (addon = tile.FindAddon(0xA4, 0xA3)) || (addon = tile.FindAddon(0xA5, 0xA3)) ||
@@ -617,6 +621,16 @@ void World::LoadMaps(const std::string &filename)
 		const Kingdom & kingdom = *(vec_kingdoms[ii]);
 		const Castle & castle = *(kingdom.GetCastles().at(0));
 
+		// place debugger hero
+		if(H2Config::Debug() && H2Config::GetMyColor() == kingdom.GetColor() && (*vec_heroes[Heroes::SANDYSANDY]).isFreeman())
+		{
+		    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
+
+		    const_cast<Heroes &>(*hero).Recrut(castle);
+
+		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
+		}
+		else
 		// place near hero
 		if(const Heroes *hero = GetFreemanHeroes(castle.GetRace()))
 		{
@@ -631,7 +645,7 @@ void World::LoadMaps(const std::string &filename)
 
 /* get human kindom */
 const Kingdom & World::GetMyKingdom(void) const
-{ return GetKingdom(H2Config::GetHumanColor()); }
+{ return GetKingdom(H2Config::GetMyColor()); }
 
 /* get kingdom */
 const Kingdom & World::GetKingdom(Color::color_t color) const

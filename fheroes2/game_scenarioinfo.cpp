@@ -207,7 +207,7 @@ Game::menu_t Game::ScenarioInfo(void){
 		    if(Race::RAND == H2Config::GetKingdomRace(color)) H2Config::SetKingdomRace(color, Race::Rand());
 		    Error::Verbose(Color::String(color) + ": " + Race::String(H2Config::GetKingdomRace(color)));
 	    }
-	    Error::Verbose("select color: " + Color::String(H2Config::GetHumanColor()));
+	    Error::Verbose("select color: " + Color::String(H2Config::GetMyColor()));
 
 	    return STARTGAME;
 	}
@@ -256,7 +256,7 @@ void Scenario::RedrawOpponentColors(const std::vector<rectcolor_t> &vo)
     while(it != vo.end()){
 
 	if(H2Config::GetAllowChangeColors() & (*it).color)
-	    display.Blit((H2Config::GetHumanColor() & (*it).color ? *colorHumanSprite[(*it).color] : *colorAllowSprite[(*it).color]), (*it).rect);
+	    display.Blit((H2Config::GetMyColor() & (*it).color ? *colorHumanSprite[(*it).color] : *colorAllowSprite[(*it).color]), (*it).rect);
 	else
 	    display.Blit(*colorOpponentSprite[(*it).color], (*it).rect);
 	++it;

@@ -334,7 +334,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
             // align from count
 	    dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
-	    dst_pt.y = cur_rt.y + 108;
+	    dst_pt.y = cur_rt.y + 112;
 	    // alignt from height sprite
 	    dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
             display.Blit(monster, dst_pt);
@@ -343,7 +343,7 @@ void Dialog::QuickInfo(const Heroes & hero)
             message.clear();
 	    String::AddInt(message, army.at(ii).GetCount());
 	    dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
-	    dst_pt.y = cur_rt.y + 141;
+	    dst_pt.y = cur_rt.y + 142;
 	    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
 
     	    current++;

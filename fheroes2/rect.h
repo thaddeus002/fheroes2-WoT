@@ -20,6 +20,7 @@
 #ifndef H2RECT_H
 #define H2RECT_H
 
+#include <vector>
 #include "gamedefs.h"
 
 class Size
@@ -52,6 +53,7 @@ public:
     Rect(s16 rx = -1, s16 ry = -1, u16 rw = 0, u16 rh = 0) : Point(rx, ry), Size(rw, rh){};
     Rect(const Point & pt, u16 rw, u16 rh) : Point(pt), Size(rw, rh){};
     Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz){};
+    Rect(const std::vector<Rect> & vect);
 
     const Size & size(void) const{ return *this; };
     bool valid(void) const{ return !(x < 0 || y < 0 || w == 0 || h == 0); };
