@@ -25,6 +25,7 @@
 #include "world.h"
 #include "cursor.h"
 #include "config.h"
+#include "payment.h"
 #include "heroes.h"
 #include "background.h"
 #include "tools.h"
@@ -134,14 +135,10 @@ Dialog::answer_t Heroes::OpenDialog(void)
     dst_pt.x = cur_pt.x + 156;
     dst_pt.y = cur_pt.y + 130;
 
-    const Sprite & strip = AGG::GetICN("STRIP.ICN", 2);
-
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
-    {
-	display.Blit(strip, dst_pt);
-
-	dst_pt.x += strip.w() + 6;
-    }
+    Army::SelectBar selectHeroesTroops(dst_pt, army);
+    selectHeroesTroops.Reset();
+    selectHeroesTroops.Redraw();
+    const std::vector<Rect> & coordsHeroesTroops = selectHeroesTroops.GetCoords();
 
     // secskill
     dst_pt.x = cur_pt.x + 3;
@@ -218,6 +215,129 @@ Dialog::answer_t Heroes::OpenDialog(void)
     while(! exit)
     {
         le.HandleEvents();
+
+	// heroes troops
+	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+	{
+	    if(le.MouseClickLeft(coordsHeroesTroops[ii]))
+	    {
+		Cursor::Hide();
+
+		// show dialog army info
+		if(selectHeroesTroops.isSelected() && army[ii].Valid() && selectHeroesTroops.GetCursorIndex() == ii)
+		{
+		    Army::Troops & select_troops = army[ii];
+		    const Monster::monster_t select_monster = select_troops.GetMonster();
+		    const u16 select_count = select_troops.GetCount();
+		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
+
+		    switch(army[ii].ShowDialogInfo(this))
+		    {
+			case Dialog::UPGRADE:
+			    select_troops.SetMonster(Monster::Upgrade(select_monster));
+		            kingdom.OddFundsResource(PaymentConditions::UpgradeMonster(select_monster) * select_count);
+			    break;
+
+			case Dialog::DISMISS:
+			    select_troops.SetMonster(Monster::UNKNOWN);
+			    select_troops.SetCount(0);
+			    break;
+
+			default: break;
+		    }
+		    selectHeroesTroops.Reset();
+		    selectHeroesTroops.Redraw();
+		}
+		else
+		// change or combine army or move to empty
+		if(selectHeroesTroops.isSelected())
+		{
+		    // from castle or heroes
+		    Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
+		    const Monster::monster_t select_monster = select_troops.GetMonster();
+		    const u16 select_count = select_troops.GetCount();
+
+		    // change or combine army
+		    if(army[ii].Valid())
+		    {
+			// change
+			if(army[ii].GetMonster() != select_monster)
+			{
+			    select_troops = army[ii];
+			    army[ii].SetMonster(select_monster);
+			    army[ii].SetCount(select_count);
+			}
+			// combine
+			else
+                        {
+                            army[ii].SetCount(army[ii].GetCount() + select_count);
+                            select_troops.SetMonster(Monster::UNKNOWN);
+                            select_troops.SetCount(0);
+                        }
+
+			selectHeroesTroops.Reset();
+			selectHeroesTroops.Redraw();
+		    }
+		    // move to empty position
+		    else
+		    if(selectHeroesTroops.isSelected())
+		    {
+			army[ii] = select_troops;
+			select_troops.SetMonster(Monster::UNKNOWN);
+			select_troops.SetCount(0);
+
+			selectHeroesTroops.Reset();
+			selectHeroesTroops.Redraw();
+		    }
+		}
+		else
+		// select army
+		if(army[ii].Valid())
+		{
+		    selectHeroesTroops.Reset();
+		    selectHeroesTroops.Select(ii);
+		    selectHeroesTroops.Redraw();
+		}
+
+		display.Flip();
+		Cursor::Show();
+	    }
+	    else
+	    // right click empty troops - redistribute troops
+	    if(le.MouseClickRight(coordsHeroesTroops[ii]) &&
+		!army[ii].Valid() &&
+		selectHeroesTroops.isSelected())
+	    {
+		Cursor::Hide();
+
+		Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
+
+		if(const u16 redistr_count = Dialog::SelectCount(select_troops.GetCount()))
+		{
+		    army[ii].SetMonster(select_troops.GetMonster());
+		    army[ii].SetCount(redistr_count);
+		
+		    select_troops.SetCount(select_troops.GetCount() - redistr_count);
+		}
+
+		Cursor::Hide();
+
+		selectHeroesTroops.Reset();
+		selectHeroesTroops.Redraw();
+
+		Cursor::Show();
+	    }
+	    else
+	    // press right - show quick info
+	    if(le.MousePressRight(coordsHeroesTroops[ii]) && army[ii].Valid())
+	    {
+		Cursor::Hide();
+
+		army[ii].ShowDialogInfo(this, true);
+
+		Cursor::Show();
+	    }
+	}
 
         le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
         le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();

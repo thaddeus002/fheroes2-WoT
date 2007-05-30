@@ -92,6 +92,8 @@ namespace H2Config {
     void SetNameMaps(const std::string & name);
     void SetDescriptionMaps(const std::string & description);
     void SetSizeMaps(Maps::mapsize_t size);
+    
+    void PrintCurrentValues(void);
 };
 
 #endif

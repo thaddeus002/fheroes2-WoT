@@ -609,7 +609,7 @@ void World::LoadMaps(const std::string &filename)
 		(*vec_kingdoms[ii]).AddCastle(vec_castles[cc]);
 
     // play with hero
-    if(H2Config::PlayWithHeroes());
+    if(H2Config::PlayWithHeroes())
 	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
 	    if((*vec_kingdoms[ii]).isPlay() && (*vec_kingdoms[ii]).GetCastles().size())
 	    {

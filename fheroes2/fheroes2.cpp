@@ -48,9 +48,17 @@ int main(int argc, char **argv)
 		std::cout << "Usage: " << argv[0] << " [OPTIONS]\n" \
 		    << "  -e\teditors mode\n" \
 		    << "  -d\tdebug mode\n" \
+		    << "  -p\tprint default config values\n" \
 		    << "  -c\tpath to config file (default fheroes2.cfg)\n" \
 		    << "  -h\tprint this help and exit" << std::endl;
 
+		return EXIT_SUCCESS;
+	    }
+
+	    if(cmd.Exists('p'))
+	    {
+		H2Config::PrintCurrentValues();
+	
 		return EXIT_SUCCESS;
 	    }
 

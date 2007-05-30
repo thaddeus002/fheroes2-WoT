@@ -264,3 +264,27 @@ void H2Config::SetInterface(bool interface){ interface ? H2Config::boolValue &= 
 
 /* set play with heroes */
 void H2Config::SetPlayWithHeroes(bool fl){ fl ? H2Config::boolValue &= ~H2Config::STARTHEROES : H2Config::boolValue |= H2Config::STARTHEROES; }
+
+/* print default values */
+void H2Config::PrintCurrentValues(void)
+{
+    std::cout << "# free heroes2 config, default values:" << std::endl;
+    std::cout << "aggfile = " << pathAGGFile << std::endl;
+    std::cout << "directorymaps = " << pathMapsDirectory << std::endl;
+    std::cout << "videomode = ";
+    
+    switch(videoMode)
+    {
+	case Display::SMALL:	std::cout  << "640x480" << std::endl; break;
+	case Display::MEDIUM:	std::cout  << "800x600" << std::endl; break;
+	case Display::LARGE:	std::cout  << "1024x768" << std::endl; break;
+	case Display::XLARGE:	std::cout  << "1280x1024" << std::endl; break;
+    }
+
+    std::cout << "sound = " << (boolValue & H2Config::SOUND ? "on"  : "off") << std::endl;
+    std::cout << "music = " << (boolValue & H2Config::MUSIC ? "on"  : "off") << std::endl;
+    std::cout << "fullscreen = " << (boolValue & H2Config::FULLSCREEN ? "on"  : "off") << std::endl;
+    std::cout << "evilinterface = " << (boolValue & H2Config::EVILINTERFACE ? "on"  : "off") << std::endl;
+    std::cout << "original = " << (boolValue & H2Config::ORIGINAL ? "on"  : "off") << std::endl;
+    std::cout << "debug = " << (boolValue & H2Config::DEBUG ? "on"  : "off") << std::endl;
+}

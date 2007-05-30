@@ -62,7 +62,7 @@ namespace Army
 	void SetMonster(Monster::monster_t monster){ pair.first = monster; };
 	void SetCount(u16 count){ pair.second = count; };
 
-	Dialog::answer_t ShowDialogInfo(const Heroes * heroes = NULL);
+	Dialog::answer_t ShowDialogInfo(const Heroes * heroes = NULL, bool quickshow = false);
 
     private:
         std::pair<Monster::monster_t, u8> pair;

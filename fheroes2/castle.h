@@ -103,6 +103,7 @@ private:
     void ModifyTIlesRNDSprite(Maps::Tiles & tile);
     void ModifyTIlesFlags(Maps::Tiles & tile);
     void ModifyTilesTownToCastle(Maps::Tiles & tile);
+    void MinimizeAreaMapsID(void);
 
 private:
     Color::color_t	color;

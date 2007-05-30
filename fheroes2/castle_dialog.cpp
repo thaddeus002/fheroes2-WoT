@@ -280,17 +280,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Cursor::Show();
 	    }
 	    else
-	    // right empty click - redistribute troops
+	    // right click empty troops - redistribute troops
 	    if(le.MouseClickRight(coordsCastleTroops[ii]) &&
-	       !army[ii].Valid() &&
-	       (selectCastleTroops.isSelected() || (heroes && selectHeroesTroops.isSelected() && 1 < (*heroes).GetCountArmy())))
+		!army[ii].Valid() &&
+		(selectCastleTroops.isSelected() || (heroes && selectHeroesTroops.isSelected() && 1 < (*heroes).GetCountArmy())))
 	    {
 		Cursor::Hide();
 
 		Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
 		    const_cast<std::vector<Army::Troops> &>((*heroes).GetArmy())[selectHeroesTroops.GetCursorIndex()] );
 
-		if(const u16 redistr_count = Dialog::SelectCount(select_troops.GetCount() - 1))
+		if(const u16 redistr_count = Dialog::SelectCount(select_troops.GetCount()))
 		{
 		    army[ii].SetMonster(select_troops.GetMonster());
 		    army[ii].SetCount(redistr_count);
@@ -308,6 +308,16 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    selectHeroesTroops.Reset();
 		    selectHeroesTroops.Redraw();
 		}
+
+		Cursor::Show();
+	    }
+	    else
+	    // press right - show quick info
+	    if(le.MousePressRight(coordsCastleTroops[ii]) && army[ii].Valid())
+	    {
+		Cursor::Hide();
+
+		army[ii].ShowDialogInfo(NULL, true);
 
 		Cursor::Show();
 	    }
@@ -420,7 +430,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
 		    army2[selectHeroesTroops.GetCursorIndex()] );
 
-		if(const u16 redistr_count = Dialog::SelectCount(select_troops.GetCount() - 1))
+		if(const u16 redistr_count = Dialog::SelectCount(select_troops.GetCount()))
 		{
 		    army2[ii].SetMonster(select_troops.GetMonster());
 		    army2[ii].SetCount(redistr_count);
@@ -438,6 +448,27 @@ Dialog::answer_t Castle::OpenDialog(void)
 
 		Cursor::Show();
 	    }
+	    else
+	    // press right - show quick info
+	    if(le.MousePressRight(coordsHeroesTroops[ii]) && army2[ii].Valid())
+	    {
+		Cursor::Hide();
+
+		army2[ii].ShowDialogInfo(heroes, true);
+
+		Cursor::Show();
+	    }
+	}
+
+	// view hero
+	if(isHeroesPresent() && le.MouseClickLeft(rectHeroPortrait))
+	{
+	    (*const_cast<Heroes *>(heroes)).OpenDialog();
+
+	    Cursor::Hide();
+	    selectHeroesTroops.Reset();
+	    selectHeroesTroops.Redraw();
+	    Cursor::Show();
 	}
 
         // prev castle

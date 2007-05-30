@@ -231,6 +231,9 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     // modify RND sprites
     if(rnd) CorrectAreaMaps();
 
+    // minimize area maps id
+    MinimizeAreaMapsID();
+    
     // end
     Error::Verbose((castle ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
@@ -324,18 +327,35 @@ castle size: T and B - sprite, S - shadow, XX - center
     // modify all rnd sprites
     std::vector<u16>::const_iterator itc = coords.begin();
     for(; itc != coords.end(); ++itc) ModifyTIlesRNDSprite(world.GetTiles(*itc));
+}
+
+void Castle::MinimizeAreaMapsID(void)
+{
+
+    // reset castle ID
+    for(s8 yy = -3; yy < 2; ++yy)
+	for(s8 xx = -2; xx < 3; ++xx)
+    {
+	Maps::Tiles & tile = world.GetTiles((mp.y + yy) * world.h() + mp.x + xx);
+
+	if(MP2::OBJN_RNDCASTLE == tile.GetObject() ||
+     	     MP2::OBJN_RNDTOWN == tile.GetObject() ||
+	     MP2::OBJN_CASTLE  == tile.GetObject()) tile.SetObject(MP2::OBJ_ZERO);
+    }
+
+    // set minimum area castle ID
+    for(s8 yy = -1; yy < 1; ++yy)
+	for(s8 xx = -1; xx < 2; ++xx)
+    {
+	Maps::Tiles & tile = world.GetTiles((mp.y + yy) * world.h() + mp.x + xx);
+
+	tile.SetObject(MP2::OBJN_CASTLE);
+    }
 
     // restore center ID
+    Maps::Tiles & tile_center = world.GetTiles(mp.y * world.h() + mp.x);
+
     tile_center.SetObject(MP2::OBJ_CASTLE);
-
-    // restore bottom ID
-    for(s8 ii = -2; ii < 3; ++ii)
-    {
-	const u16 index_bottom  = (mp.y + 1) * world.h() + mp.x + ii;
-	Maps::Tiles & tile_bottom = world.GetTiles(index_bottom);
-
-	tile_bottom.SetObject(MP2::OBJ_ZERO);
-    }
 }
 
 /* modify RND sprites alghoritm */
@@ -361,9 +381,6 @@ void Castle::ModifyTIlesRNDSprite(Maps::Tiles & tile)
                 default: Error::Warning("Castle::ModifyTIlesRNDSprite: unknown race."); break;
 	    }
 	}
-
-    if(MP2::OBJN_RNDCASTLE == tile.GetObject() ||
-       MP2::OBJN_RNDTOWN == tile.GetObject()) tile.SetObject(MP2::OBJN_CASTLE);
 }
 
 /* modify flags sprite to origin color */

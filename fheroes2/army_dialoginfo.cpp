@@ -36,7 +36,7 @@
 #include "text.h"
 #include "army.h"
 
-Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes)
+Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quickshow)
 {
     const std::string viewarmy(H2Config::EvilInterface() ? "VIEWARME.ICN" : "VIEWARMY.ICN");
 
@@ -76,15 +76,14 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes)
     Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
 
     message.clear();
+    String::AddInt(message, monster.attack);
 
     if(heroes)
     {
-	message += "(";
+	message += " (";
 	String::AddInt(message, monster.attack + (*heroes).GetAttack());
 	message += ")";
     }
-    else
-	String::AddInt(message, monster.attack);
 
     dst_pt.x = pos_rt.x + 420;
     Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
@@ -96,15 +95,14 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes)
     Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
 
     message.clear();
+    String::AddInt(message, monster.defence);
 
     if(heroes)
     {
-	message += "(";
+	message += " (";
 	String::AddInt(message, monster.defence + (*heroes).GetDefense());
 	message += ")";
     }
-    else
-        String::AddInt(message, monster.defence);
 
     dst_pt.x = pos_rt.x + 420;
     Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
@@ -185,27 +183,34 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes)
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 190;
 
-    if(monster.monster != Monster::Upgrade(monster.monster))
+    if(!quickshow && monster.monster != Monster::Upgrade(monster.monster))
     {
 	buttonUpgrade = new Button(dst_pt, viewarmy, 5, 6);
-        
-	upgrade = world.GetMyKingdom().GetFundsResource() > PaymentConditions::UpgradeMonster(Monster::Upgrade(monster.monster)) * GetCount();
 
-	if(! upgrade) (*buttonUpgrade).Press();
+	PaymentConditions::payment_t payment(PaymentConditions::UpgradeMonster(monster.monster) * GetCount());
+
+	upgrade = world.GetMyKingdom().GetFundsResource() < payment ? false : true;
+
+	if(!upgrade) (*buttonUpgrade).Press();
     }
 
     // button dismiss
+    Button *buttonDismiss = NULL;
     bool dismiss = heroes && 1 == (*heroes).GetCountArmy() ? false : true;
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 222;
-    Button buttonDismiss(dst_pt, viewarmy, 1, 2);
-    if(!dismiss) buttonDismiss.Press();
+    if(!quickshow)
+    {
+	buttonDismiss = new Button(dst_pt, viewarmy, 1, 2);
+	if(!dismiss) (*buttonDismiss).Press();
+    }
 
     // button exit
+    Button *buttonExit = NULL;
     dst_pt.x = pos_rt.x + 410;
     dst_pt.y = pos_rt.y + 222;
-    Button buttonExit(dst_pt, viewarmy, 3, 4);
-    
+    if(!quickshow) buttonExit = new Button(dst_pt, viewarmy, 3, 4);
+
     LocalEvent & le = LocalEvent::GetLocalEvent();
     
     display.Flip();
@@ -219,18 +224,25 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes)
     {
         le.HandleEvents();
 
-        if(buttonUpgrade) upgrade && le.MousePressLeft(*buttonUpgrade) ? (*buttonUpgrade).Press() : (*buttonUpgrade).Release();
-        if(dismiss) le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+        if(quickshow)
+	{
+	    if(!le.MouseRight()) exit = true;
+        }
+	else
+	{
+	    if(upgrade && buttonUpgrade) le.MousePressLeft(*buttonUpgrade) ? (*buttonUpgrade).Press() : (*buttonUpgrade).Release();
+    	    if(dismiss && buttonDismiss) le.MousePressLeft(*buttonDismiss) ? (*buttonDismiss).Press() : (*buttonDismiss).Release();
+    	    if(buttonExit) le.MousePressLeft(*buttonExit) ? (*buttonExit).Press() : (*buttonExit).Release();
 
-	// upgrade
-	if(buttonUpgrade && le.MouseClickLeft(*buttonUpgrade)){ result = Dialog::UPGRADE; exit = true; }
+	    // upgrade
+	    if(upgrade && buttonUpgrade && le.MouseClickLeft(*buttonUpgrade)){ result = Dialog::UPGRADE; exit = true; }
 
-        // dismiss
-	if(dismiss && le.MouseClickLeft(buttonDismiss)){ result = Dialog::DISMISS; exit = true; }
+    	    // dismiss
+	    if(dismiss && buttonDismiss && le.MouseClickLeft(*buttonDismiss)){ result = Dialog::DISMISS; exit = true; }
 
-        // exit
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
+    	    // exit
+    	    if(buttonExit && (le.MouseClickLeft(*buttonExit) || le.KeyPress(SDLK_ESCAPE))){ result = Dialog::CANCEL; exit = true; }
+	}
 
 	//animeMonster.DrawSprite();
     }
@@ -238,6 +250,8 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes)
     le.ResetKey();
 
     if(buttonUpgrade) delete buttonUpgrade;
+    if(buttonDismiss) delete buttonDismiss;
+    if(buttonExit) delete buttonExit;
 
     Cursor::Hide();
 
