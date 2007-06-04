@@ -190,7 +190,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     ++byte8;
 
     // castle
-    castle = (*byte8 ? true : false);
+    if(*byte8) building |= BUILD_CASTLE;
     ++byte8;
 
     // allow upgrade to castle (0 - true, 1 - false)
@@ -235,7 +235,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     MinimizeAreaMapsID();
     
     // end
-    Error::Verbose((castle ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
+    Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
 const Heroes * Castle::isHeroesPresent(void)
@@ -435,4 +435,176 @@ u8 Castle::GetCountArmy(void) const
     for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii) if(army[ii].Valid()) ++result;
     
     return result;
+}
+
+// return mage guild level
+u8 Castle::GetLevelMageGuild(void)
+{
+    if(BUILD_MAGEGUILD5 & building)	return 5;
+    else
+    if(BUILD_MAGEGUILD4 & building)	return 4;
+    else
+    if(BUILD_MAGEGUILD3 & building)	return 3;
+    else
+    if(BUILD_MAGEGUILD2 & building)	return 2;
+    else
+    if(BUILD_MAGEGUILD1 & building)	return 1;
+
+    return 0;
+}
+
+const std::string & Castle::GetStringBuilding(const building_t & build, const Race::race_t & race)
+{
+    static const std::string str_build[] = { "Thieves' Guild", "Tavern", "Shipyard", "Well", "Statue", "Left Turret",
+	"Right Turret", "Marketplace", "Moat", "Castle", "Tent", "Captain", "Mage Guild", "Unknown" };
+
+    static const std::string str_wel2[] = { "Farm", "Garbage Heap", "Crystal Garden", "Orchard", "Waterfall", "Skull Pile" };
+
+    static const std::string str_spec[] = { "Fortifications", "Coliseum", "Rainbow", "Library", "Dungeon", "Storm" };
+
+    static const std::string str_dwelling[] = {
+	"Thatched Hut", "Hut", "Treehouse", "Cave", "Habitat", "Excavation",
+	"Archery Range", "Stick Hut", "Cottage", "Crypt", "Pen", "Graveyard",
+	"Blacksmith", "Den", "Archery Range", "Nest", "Foundry", "Pyramid",
+	"Armory", "Adobe", "Stonehenge", "Maze", "Cliff Nest", "Mansion",
+	"Jousting Arena", "Bridge", "Fenced Meadow", "Swamp", "Ivory Tower", "Mausoleum",
+	"Cathedral", "Pyramid", "Red Tower", "Green Tower", "Cloud Castle", "Laboratory" };
+
+    static const std::string str_upgrade[] = {
+	"Upg. Archery Range", "Upg. Stick Hut", "Upg. Cottage", "Crypt", "Pen", "Upg. Graveyard",
+	"Upg. Blacksmith", "Den", "Upg. Archery Range", "Nest", "Upg. Foundry", "Upg. Pyramid",
+	"Upg. Armory", "Upg. Adobe", "Upg. Stonehenge", "Upg. Maze", "Cliff Nest", "Upg. Mansion",
+	"Upg. Jousting Arena", "Upg. Bridge", "Fenced Meadow", "Swamp", "Upg. Ivory Tower", "Upg. Mausoleum",
+	"Upg. Cathedral", "Pyramid", "Red Tower", "Red Tower", "Upg. Cloud Castle", "Laboratory",
+	"Upg. Cathedral", "Pyramid", "Red Tower", "Black Tower", "Upg. Cloud Castle", "Laboratory" };
+
+    u8 offset = 0;
+
+    switch(race)
+    {
+	case Race::KNGT: offset = 0;
+	case Race::BARB: offset = 1;
+	case Race::SORC: offset = 2;
+	case Race::WRLK: offset = 3;
+	case Race::WZRD: offset = 4;
+	case Race::NECR: offset = 5;
+	default: break;
+    }
+
+    switch(build)
+    {
+        case BUILD_THIEVESGUILD:return str_build[0];
+        case BUILD_TAVERN:	return str_build[1];
+        case BUILD_SHIPYARD:	return str_build[2];
+        case BUILD_WELL:	return str_build[3];
+        case BUILD_STATUE:	return str_build[4];
+        case BUILD_LEFTTURRET:	return str_build[5];
+        case BUILD_RIGHTTURRET:	return str_build[6];
+        case BUILD_MARKETPLACE:	return str_build[7];
+        case BUILD_MOAT:	return str_build[8];
+        case BUILD_CASTLE:	return str_build[9];
+        case BUILD_TENT:	return str_build[10];
+        case BUILD_CAPTAIN:	return str_build[11];
+        case BUILD_MAGEGUILD1:
+        case BUILD_MAGEGUILD2:
+        case BUILD_MAGEGUILD3:
+        case BUILD_MAGEGUILD4:
+        case BUILD_MAGEGUILD5:	return str_build[12];
+
+        case BUILD_SPEC:	return str_spec[offset];
+        case BUILD_WEL2:	return str_wel2[offset];
+
+        case DWELLING_MONSTER1:	return str_dwelling[offset];
+        case DWELLING_MONSTER2:	return str_dwelling[6 + offset];
+        case DWELLING_MONSTER3:	return str_dwelling[12 + offset];
+        case DWELLING_MONSTER4:	return str_dwelling[18 + offset];
+        case DWELLING_MONSTER5:	return str_dwelling[24 + offset];
+        case DWELLING_MONSTER6:	return str_dwelling[30 + offset];
+
+        case DWELLING_UPGRADE2: return str_upgrade[offset];
+        case DWELLING_UPGRADE3: return str_upgrade[6 + offset];
+        case DWELLING_UPGRADE4: return str_upgrade[12 + offset];
+        case DWELLING_UPGRADE5: return str_upgrade[18 + offset];
+        case DWELLING_UPGRADE6: return str_upgrade[24 + offset];
+        case DWELLING_UPGRADE7: return str_upgrade[30 + offset];
+
+	default: break;
+    }
+    
+    return str_build[13];
+}
+
+const std::string & Castle::GetDescriptionBuilding(const building_t & build, const Race::race_t & race)
+{
+    static const std::string desc_build[] = {
+	"The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns.",
+	"The Tavern increases morale for troops defending the castle.",
+	"The Shipyard allows ships to be built.",
+	"The Well increases the growth rate of all dwellings by 2 creatures per week.",
+	"The Statue increases your town's income by 250 per day.",
+	"The Left Turret provides extra firepower during castle combat.",
+	"The Right Turret provides extra firepower during castle combat.",
+	"The Marketplace can be used to convert one type of resource into another. The more marketplaces you control, the better the exchange rate.",
+	"The Moat slows attacking units. Any unit entering the moat must end its turn there and becomes more vulnerable to attack.",
+	"The Castle improves town defense and increases income to 1000 gold per day.",
+	"The Tent provides workers to build a castle, provided the materials and the gold are available.",
+	"The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.",
+	"The Mage Guild allows heroes to learn spells and replenish their spell points.", "Unknown" };
+
+    static const std::string desc_wel2[] = {
+	"The Farm increases production of Peasants by 8 per week.",
+	"The Garbage Heap increases production of Goblins by 8 per week.",
+	"The Crystal Garden increases production of Sprites by 8 per week.",
+	"The Waterfall increases production of Centaurs by 8 per week.",
+	"The Orchard increases production of Halflings by 8 per week.",
+	"The Skull Pile increases production of Skeletons by 8 per week." };
+
+    static const std::string desc_spec[] = {
+	"The Fortifications increase the toughness of the walls, increasing the number of turns it takes to knock them down.",
+	"The Coliseum provides inspiring spectacles to defending troops, raising their morale by two during combat.",
+	"The Rainbow increases the luck of the defending units by two.",
+	"The Dungeon increases the income of the town by 500 / day.",
+	"The Library increases the number of spells in the Guild by one for each level of the guild.",
+	"The Storm adds +2 to the power of spells of a defending spell caster." };
+
+    u8 offset = 0;
+
+    switch(race)
+    {
+	case Race::KNGT: offset = 0;
+	case Race::BARB: offset = 1;
+	case Race::SORC: offset = 2;
+	case Race::WRLK: offset = 3;
+	case Race::WZRD: offset = 4;
+	case Race::NECR: offset = 5;
+	default: break;
+    }
+
+    switch(build)
+    {
+        case BUILD_THIEVESGUILD:return desc_build[0];
+        case BUILD_TAVERN:	return desc_build[1];
+        case BUILD_SHIPYARD:	return desc_build[2];
+        case BUILD_WELL:	return desc_build[3];
+        case BUILD_STATUE:	return desc_build[4];
+        case BUILD_LEFTTURRET:	return desc_build[5];
+        case BUILD_RIGHTTURRET:	return desc_build[6];
+        case BUILD_MARKETPLACE:	return desc_build[7];
+        case BUILD_MOAT:	return desc_build[8];
+        case BUILD_CASTLE:	return desc_build[9];
+        case BUILD_TENT:	return desc_build[10];
+        case BUILD_CAPTAIN:	return desc_build[11];
+        case BUILD_MAGEGUILD1:
+        case BUILD_MAGEGUILD2:
+        case BUILD_MAGEGUILD3:
+        case BUILD_MAGEGUILD4:
+        case BUILD_MAGEGUILD5:	return desc_build[12];
+
+        case BUILD_SPEC:	return desc_spec[offset];
+        case BUILD_WEL2:	return desc_wel2[offset];
+
+	default: break;
+    }
+
+    return desc_build[13];
 }

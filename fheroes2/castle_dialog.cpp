@@ -160,6 +160,30 @@ Dialog::answer_t Castle::OpenDialog(void)
     dst_pt.y = cur_pt.y + 428;
     Button buttonExit(dst_pt, "SWAPBTN.ICN", 0, 1);
 
+    // draw building
+    RedrawBuilding(cur_pt);
+
+    const Rect coordBuildingThievesGuild(GetCoordBuilding(BUILD_THIEVESGUILD, cur_pt));
+    const Rect coordBuildingTavern(GetCoordBuilding(BUILD_TAVERN, cur_pt));
+    const Rect coordBuildingShipyard(GetCoordBuilding(BUILD_SHIPYARD, cur_pt));
+    const Rect coordBuildingWell(GetCoordBuilding(BUILD_WELL, cur_pt));
+    const Rect coordBuildingStatue(GetCoordBuilding(BUILD_STATUE, cur_pt));
+    const Rect coordBuildingMarketplace(GetCoordBuilding(BUILD_MARKETPLACE, cur_pt));
+    const Rect coordBuildingWel2(GetCoordBuilding(BUILD_WEL2, cur_pt));
+    const Rect coordBuildingMoat(GetCoordBuilding(BUILD_MOAT, cur_pt));
+    const Rect coordBuildingSpec(GetCoordBuilding(BUILD_SPEC, cur_pt));
+    const Rect coordBuildingCastle(GetCoordBuilding(BUILD_CASTLE, cur_pt));
+    const Rect coordBuildingCaptain(GetCoordBuilding(BUILD_CAPTAIN, cur_pt));
+    const Rect coordBuildingTent(GetCoordBuilding(BUILD_TENT, cur_pt));
+    //const Rect coordBuildingMageGuild(GetCoordBuilding(, cur_pt));
+
+    const Rect coordDwellingMonster1(GetCoordBuilding(DWELLING_MONSTER1, cur_pt));
+    const Rect coordDwellingMonster2(GetCoordBuilding(DWELLING_MONSTER2, cur_pt));
+    const Rect coordDwellingMonster3(GetCoordBuilding(DWELLING_MONSTER3, cur_pt));
+    const Rect coordDwellingMonster4(GetCoordBuilding(DWELLING_MONSTER4, cur_pt));
+    const Rect coordDwellingMonster5(GetCoordBuilding(DWELLING_MONSTER5, cur_pt));
+    const Rect coordDwellingMonster6(GetCoordBuilding(DWELLING_MONSTER6, cur_pt));
+
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     display.Flip();
@@ -480,7 +504,61 @@ Dialog::answer_t Castle::OpenDialog(void)
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
 
+	// left click building
+	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild));
+	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern));
+	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard));
+	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell));
+	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue));
+	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace));
+	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2));
+	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat));
+	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec));
+	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle));
+	else
+	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent));
+	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain));
 
+	// left click dwelling monster
+	if(building & DWELLING_MONSTER1 && le.MouseClickLeft(coordDwellingMonster1));
+	else
+	if(building & DWELLING_MONSTER2 && le.MouseClickLeft(coordDwellingMonster2));
+	else
+	if(building & DWELLING_MONSTER3 && le.MouseClickLeft(coordDwellingMonster3));
+	else
+	if(building & DWELLING_MONSTER4 && le.MouseClickLeft(coordDwellingMonster4));
+	else
+	if(building & DWELLING_MONSTER5 && le.MouseClickLeft(coordDwellingMonster5));
+	else
+	if(building & DWELLING_MONSTER6 && le.MouseClickLeft(coordDwellingMonster6));
+
+	// right press building
+	if(building & BUILD_THIEVESGUILD && le.MousePressRight(coordBuildingThievesGuild));
+	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern));
+	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard));
+	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell));
+	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue));
+	if(building & BUILD_MARKETPLACE && le.MousePressRight(coordBuildingMarketplace));
+	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2));
+	if(building & BUILD_MOAT && le.MousePressRight(coordBuildingMoat));
+	if(building & BUILD_SPEC && le.MousePressRight(coordBuildingSpec));
+	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle));
+	else
+	if(building & BUILD_TENT && le.MousePressRight(coordBuildingTent));
+	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain));
+
+	// right press dwelling monster
+	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1));
+	else
+	if(building & DWELLING_MONSTER2 && le.MousePressRight(coordDwellingMonster2));
+	else
+	if(building & DWELLING_MONSTER3 && le.MousePressRight(coordDwellingMonster3));
+	else
+	if(building & DWELLING_MONSTER4 && le.MousePressRight(coordDwellingMonster4));
+	else
+	if(building & DWELLING_MONSTER5 && le.MousePressRight(coordDwellingMonster5));
+	else
+	if(building & DWELLING_MONSTER6 && le.MousePressRight(coordDwellingMonster6));
 
 	// status message exit
 	if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(isCastle() ? "Exit castle" : "Exit town");
@@ -493,6 +571,44 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	// status message view hero
 	if(isHeroesPresent() && le.MouseCursor(rectHeroPortrait)) statusBar.ShowMessage("View Hero");
+	else
+	// building
+	if(building & BUILD_THIEVESGUILD && le.MouseCursor(coordBuildingThievesGuild)) statusBar.ShowMessage(GetStringBuilding(BUILD_THIEVESGUILD));
+	else
+	if(building & BUILD_TAVERN && le.MouseCursor(coordBuildingTavern)) statusBar.ShowMessage(GetStringBuilding(BUILD_TAVERN));
+	else
+	if(building & BUILD_SHIPYARD && le.MouseCursor(coordBuildingShipyard)) statusBar.ShowMessage(GetStringBuilding(BUILD_SHIPYARD));
+	else
+	if(building & BUILD_WELL && le.MouseCursor(coordBuildingWell)) statusBar.ShowMessage(GetStringBuilding(BUILD_WELL));
+	else
+	if(building & BUILD_STATUE && le.MouseCursor(coordBuildingStatue)) statusBar.ShowMessage(GetStringBuilding(BUILD_STATUE));
+	else
+	if(building & BUILD_MARKETPLACE && le.MouseCursor(coordBuildingMarketplace)) statusBar.ShowMessage(GetStringBuilding(BUILD_MARKETPLACE));
+	else
+	if(building & BUILD_WEL2 && le.MouseCursor(coordBuildingWel2)) statusBar.ShowMessage(GetStringBuilding(BUILD_WEL2, race));
+	else
+	if(building & BUILD_MOAT && le.MouseCursor(coordBuildingMoat)) statusBar.ShowMessage(GetStringBuilding(BUILD_MOAT));
+	else
+	if(building & BUILD_SPEC && le.MouseCursor(coordBuildingSpec)) statusBar.ShowMessage(GetStringBuilding(BUILD_SPEC));
+	else
+	if(building & BUILD_CASTLE && le.MouseCursor(coordBuildingCastle)) statusBar.ShowMessage(GetStringBuilding(BUILD_CASTLE));
+	else
+	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
+	else
+	if(building & BUILD_TENT && le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_BOAT));
+	else
+	// dwelling monster
+	if(building & DWELLING_MONSTER1 && le.MouseCursor(coordDwellingMonster1)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_MONSTER1)));
+	else
+	if(building & DWELLING_MONSTER2 && le.MouseCursor(coordDwellingMonster2)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE2 & building ? DWELLING_UPGRADE2 : DWELLING_MONSTER2)));
+	else
+	if(building & DWELLING_MONSTER3 && le.MouseCursor(coordDwellingMonster3)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE3 & building ? DWELLING_UPGRADE3 : DWELLING_MONSTER3)));
+	else
+	if(building & DWELLING_MONSTER4 && le.MouseCursor(coordDwellingMonster4)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE4 & building ? DWELLING_UPGRADE4 : DWELLING_MONSTER4)));
+	else
+	if(building & DWELLING_MONSTER5 && le.MouseCursor(coordDwellingMonster5)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE5 & building ? DWELLING_UPGRADE5 : DWELLING_MONSTER5)));
+	else
+	if(building & DWELLING_MONSTER6 && le.MouseCursor(coordDwellingMonster6)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE6 & building ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)));
 	else
 	// status message over castle troops
 	if(le.MouseCursor(coordsCastleTroops[0]) ||

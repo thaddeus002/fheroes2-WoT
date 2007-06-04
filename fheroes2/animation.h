@@ -31,29 +31,28 @@ class Animation
 public:
     typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animation_t;
 
-    Animation(const Point &dp, const std::string &icn, u16 index, u8 count, u8 amode = INFINITY | RING | MEDIUM);
+    Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first = false, u8 amode = INFINITY | RING | MEDIUM);
 
-    //void BlitFirstSprite(void);
+    const Rect & GetMaxRect(void) const{ return max_rect; };
+
+    bool Reset(void);
+
     void DrawSprite(void);
 
 protected:
     const Point dst_pt;
-    Rect area;
-    bool disable;
+    bool use_first;
+    const u8 mode;
+
     u32 frame;
     u32 ticket;
-    const u8  mode;
-    const Sprite & first;
+
     std::vector<const Sprite *> sprites;
+    Rect max_rect;
+
+    bool disable;
+    bool reset;
     Background background;
-};
-
-class AnimationButton : public Animation
-{
-public:
-    AnimationButton(const std::string &icn, u16 index, u8 count) : Animation(Point(0,0), icn, index, count, Animation::HIGH) {};
-
-    void Reset(void);
 };
 
 #endif

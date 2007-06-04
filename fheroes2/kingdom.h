@@ -23,11 +23,6 @@
 #define KINGDOMMAX      		6
 #define KINGDOMMAXHEROES      		8
 
-#define INCOME_CASTLE_GOLD      	1000
-#define INCOME_TOWN_GOLD        	750
-#define INCOME_STATUE_GOLD      	250
-#define INCOME_DUNGEON_GOLD     	500
-
 #define START_EASY_WOOD         	30
 #define START_EASY_ORE          	30
 #define START_EASY_MERCURY      	10

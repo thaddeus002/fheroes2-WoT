@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "animation.h"
 #include "background.h"
 #include "button.h"
 #include "cursor.h"
@@ -46,10 +47,10 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     
     Rect pos_rt;
 
-    pos_rt.x = Display::SMALL == display.w() ? 0 : (display.w() - sprite_dialog.w()) / 2;
-    pos_rt.y = Display::SMALL == display.w() ? 0 : (display.h() - sprite_dialog.h()) / 2;
-    pos_rt.w = Display::SMALL == display.w() ? 640 : sprite_dialog.w();
-    pos_rt.h = Display::SMALL == display.w() ? 480 : sprite_dialog.h();
+    pos_rt.x = (display.w() - sprite_dialog.w()) / 2;
+    pos_rt.y = (display.h() - sprite_dialog.h()) / 2;
+    pos_rt.w = sprite_dialog.w();
+    pos_rt.h = sprite_dialog.h();
 
     Background back(pos_rt);
     
@@ -158,7 +159,7 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     dst_pt.y += 18;
     Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
 
-    message = (heroes ? "From Heroes" : Morale::String(Morale::NORMAL));
+    message = (heroes ? Morale::String((*heroes).GetMorale()) : Morale::String(Morale::NORMAL));
     dst_pt.x = pos_rt.x + 420;
     Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
@@ -168,15 +169,13 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     dst_pt.y += 18;
     Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
 
-    message = (heroes ? "From Heroes" : Luck::String(Luck::NORMAL));
+    message = (heroes ? Luck::String((*heroes).GetLuck()) : Luck::String(Luck::NORMAL));
     dst_pt.x = pos_rt.x + 420;
     Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
-    
-    
-    
-    
-    //Animation animeMonster(".ICN", 0, 40, Animation::INFINITY | Animation::RING | Animation::LOW);
-    
+
+    // monster animation
+    //Animation animeMonster(Point(pos_rt.x + 100, pos_rt.y + 180), monster.file, ?, ?, false, Animation::INFINITY | Animation::RING | Animation::LOW);
+
     // button upgrade
     Button *buttonUpgrade = NULL;
     bool upgrade = false;

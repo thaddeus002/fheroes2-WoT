@@ -26,8 +26,8 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL), //artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), 
-    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(false), save_maps_general(MP2::OBJ_HEROES)
+    morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL),
+    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -571,7 +571,23 @@ Morale::morale_t Heroes::GetMorale(void) const
 
 Luck::luck_t Heroes::GetLuck(void) const
 {
-    return luck;
+    Luck::luck_t result = luck;
+
+    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+
+    for(; it != artifacts.end(); ++it)
+
+	switch(*it)
+	{
+    	    case Artifact::RABBIT_FOOT:		++result; break;
+            case Artifact::GOLDEN_HORSESHOE:	++result; break;
+            case Artifact::GAMBLER_LUCKY_COIN:	++result; break;
+            case Artifact::FOUR_LEAF_CLOVER:	++result; break;
+
+            default: break;
+    	}
+
+    return result;
 }
 
 // return valid count heroes army
@@ -614,4 +630,24 @@ void Heroes::Move(u16 ax, u16 ay)
     
     mp.x = ax;
     mp.y = ay;
+}
+
+u32 Heroes::GetNextLevelExperience(u8 level) const
+{
+    switch(level)
+    {
+	case 0:		return 0;
+	case 1:		return 1000;
+	case 2:		return 2000;
+	case 3:		return 3200;
+	case 4:		return 4500;
+	case 5:		return 6000;
+	case 6:		return 7700;
+	case 7:		return 9000;
+	case 8: 	return 11000;
+	case 9:		return 13200;
+	case 10:	return 15500;
+	
+	default: return 0;
+    }
 }

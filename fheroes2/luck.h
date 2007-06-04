@@ -35,6 +35,10 @@ namespace Luck
     } luck_t;
 
     const std::string & String(luck_t luck);
+    const std::string & Description(luck_t luck);
+
+    inline luck_t & operator++ (luck_t & luck){ return luck = IRISH == luck ? IRISH : luck_t(luck + 1); };
+    inline luck_t & operator-- (luck_t & luck){ return luck = CURSED == luck ? CURSED : luck_t(luck - 1); };
 };
 
 #endif

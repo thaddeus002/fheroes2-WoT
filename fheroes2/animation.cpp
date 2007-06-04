@@ -30,36 +30,24 @@
 #define ANIMATION_MEDIUM	9
 #define ANIMATION_LOW		27
 
-Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 count, u8 amode) 
-    : dst_pt(dp), area(display.w(), display.h(), 0, 0), disable(false), frame(0), ticket(0), mode(amode), first(AGG::GetICN(icn, index))
+Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first, u8 amode)
+    : dst_pt(dp), use_first(first), mode(amode), frame(0), ticket(0), max_rect(display.w(), display.h(), 0, 0), disable(false), reset(false)
 {
-    if(first.x() < area.x) area.x = first.x();
-    if(first.y() < area.y) area.y = first.y();
-    if(first.w() > area.w) area.w = first.w();
-    if(first.h() > area.h) area.h = first.h();
-
-    for(int ii = index + 1; ii < index + count; ++ii){
+    std::vector<Rect> vec_rect;
+    
+    for(int ii = index; ii < index + count; ++ii)
+    {
         const Sprite &sprite = AGG::GetICN(icn, ii);
-        if(sprite.x() < area.x) area.x = sprite.x();
-        if(sprite.y() < area.y) area.y = sprite.y();
-        if(sprite.w() > area.w) area.w = sprite.w();
-        if(sprite.h() > area.h) area.h = sprite.h();
+
         sprites.push_back(&sprite);
+
+	vec_rect.push_back(Rect(sprite.x(), sprite.y(), sprite.w(), sprite.h()));
     }
+    
+    max_rect = Rect(vec_rect);
+    max_rect.x += dst_pt.x;
+    max_rect.y += dst_pt.y;
 }
-
-/*
-void Animation::BlitFirstSprite(void)
-{
-    const Sprite & sprite = *sprites[0];
-
-    // restore or save background
-    background.valid() ? background.Restore() : background.Save(area);
-
-    display.Blit(first, first.x(), first.y());
-    display.Blit(sprite, sprite.x(), sprite.y());
-}
-*/
 
 void Animation::DrawSprite(void)
 {
@@ -68,45 +56,56 @@ void Animation::DrawSprite(void)
     ticket++;
 
     // HIGH sleep
-    if(mode & HIGH && (0 != (ticket % ANIMATION_HIGH))) return;
+    if(mode & HIGH && (0 != (ticket % ANIMATION_HIGH)) && !reset) return;
     // MEDIUM sleep
-    if(mode & MEDIUM && (0 != (ticket % ANIMATION_MEDIUM))) return;
+    if(mode & MEDIUM && (0 != (ticket % ANIMATION_MEDIUM)) && !reset) return;
     // LOW sleep
-    if(mode & LOW && (0 != (ticket % ANIMATION_LOW))) return;
+    if(mode & LOW && (0 != (ticket % ANIMATION_LOW)) && !reset) return;
 
     // hide cursor
     bool localcursor = false;
-    if(area & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
-
-    const Sprite & sprite = *sprites[frame % sprites.size()];
+    if(max_rect & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     // restore or save background
-    background.valid() ? background.Restore() : background.Save(area);
+    background.valid() ? background.Restore() : background.Save(max_rect);
 
-    display.Blit(first, first.x(), first.y());
-    display.Blit(sprite, sprite.x(), sprite.y());
+    // blit frame sprites
+    if(use_first)
+    {
+	const Sprite & first_sprite = *sprites[0];
+	const Sprite & sprite = *sprites[1 + frame % (sprites.size() - 1)];
+
+	display.Blit(first_sprite, dst_pt.x + first_sprite.x(), dst_pt.y + first_sprite.y());
+	display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
+    }
+    else
+    {
+	const Sprite & sprite = *sprites[frame % sprites.size()];
+
+	display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
+    }
+
     display.Flip();
 
     if(localcursor) Cursor::Show();
 
-    frame++;
+    if(!reset) frame++;
+
+    if(reset) reset = false;
 
     if(!(mode & INFINITY) && frame == sprites.size()) disable = true;
+
     //if(!(mode & RING))
 }
 
-void AnimationButton::Reset(void)
+bool Animation::Reset(void)
 {
-    if(!disable || (0 == frame && 0 == ticket)) return;
-
-    bool localcursor = false;
-    if(area & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
-
-    display.Blit(first, first.x(), first.y());
+    if(false == disable && 0 == frame) return false;
 
     ticket = 0;
     frame = 0;
     disable = false;
-
-    localcursor ? Cursor::Show() : display.Flip();
+    reset = true;
+    
+    return true;
 }

@@ -28,6 +28,7 @@
 #include "payment.h"
 #include "heroes.h"
 #include "background.h"
+#include "spritecursor.h"
 #include "skill.h"
 #include "tools.h"
 #include "text.h"
@@ -122,6 +123,237 @@ Dialog::answer_t Heroes::OpenDialog(void)
     Text(dst_pt.x - Text::width(message, Font::BIG) / 2, dst_pt.y, message, Font::BIG, true);
 
     const Rect rectKnowledgeSkill(cur_pt.x + 156 + 3 * 88, cur_pt.y + 30, 80, 92);
+
+    // morale
+    dst_pt.x = cur_pt.x + 515;
+    dst_pt.y = cur_pt.y + 35;
+    std::string headerMoraleInfo;
+    
+    const Rect rectMoraleInfo(dst_pt, 34, 26);
+
+    switch(GetMorale())
+    {
+	case Morale::TREASON:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 5);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+
+	    headerMoraleInfo = "Bad Morale";
+	} break;
+
+	case Morale::AWFUL:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 5);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+
+	    headerMoraleInfo = "Bad Morale";
+	} break;
+
+	case Morale::POOR:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 5);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+
+	    headerMoraleInfo = "Bad Morale";
+	} break;
+
+	case Morale::NORMAL:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 7);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+
+	    headerMoraleInfo = "Neutral Morale";
+	} break;
+
+	case Morale::GOOD:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 4);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+
+	    headerMoraleInfo = "Good Morale";
+	} break;
+
+	case Morale::GREAT:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 4);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+
+	    headerMoraleInfo = "Good Morale";
+	} break;
+
+	case Morale::BLOOD:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 4);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+
+	    headerMoraleInfo = "Good Morale";
+	} break;
+
+    }
+
+    // luck
+    dst_pt.x = cur_pt.x + 552;
+    dst_pt.y = cur_pt.y + 35;
+    std::string headerLuckInfo;
+
+    const Rect rectLuckInfo(dst_pt, 34, 26);
+
+    switch(GetLuck())
+    {
+	case Luck::CURSED:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 3);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    
+	    headerLuckInfo = "Bad Luck";
+	} break;
+
+	case Luck::AWFUL:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 3);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+
+	    headerLuckInfo = "Bad Luck";
+	} break;
+
+	case Luck::BAD:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 3);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+
+	    headerLuckInfo = "Bad Luck";
+	} break;
+
+	case Luck::NORMAL:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 6);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+
+	    headerLuckInfo = "Neutral Luck";
+	} break;
+
+	case Luck::GOOD:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 2);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+
+	    headerLuckInfo = "Good Luck";
+	} break;
+
+	case Luck::GREAT:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 2);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+
+	    headerLuckInfo = "Good Luck";
+	} break;
+
+	case Luck::IRISH:
+	{
+	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 2);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+
+	    headerLuckInfo = "Good Luck";
+	} break;
+
+    }
+    
+    // army format spread
+    dst_pt.x = cur_pt.x + 515;
+    dst_pt.y = cur_pt.y + 63;
+    const Sprite & sprite1 = AGG::GetICN("HSICONS.ICN", 9);
+    display.Blit(sprite1, dst_pt);
+
+    const Rect rectSpreadArmyFormat(dst_pt, sprite1.w(), sprite1.h());
+    const std::string descriptionSpreadArmyFormat("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.");
+    const Point army1_pt(dst_pt.x - 1, dst_pt.y - 1);
+    
+    // army format grouped
+    dst_pt.x = cur_pt.x + 552;
+    dst_pt.y = cur_pt.y + 63;
+    const Sprite & sprite2 = AGG::GetICN("HSICONS.ICN", 10);
+    display.Blit(sprite2, dst_pt);
+
+    const Rect rectGroupedArmyFormat(dst_pt, sprite2.w(), sprite2.h());    
+    const std::string descriptionGroupedArmyFormat("'Grouped' combat formation bunches your army together in the center of your side of the battlefield.");
+    const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
+
+    // cursor format
+    SpriteCursor cursorFormat(AGG::GetICN("HSICONS.ICN", 11), army_spread ? army1_pt : army2_pt);
+    cursorFormat.Show(army_spread ? army1_pt : army2_pt);
+
+    // experience
+    dst_pt.x = cur_pt.x + 512;
+    dst_pt.y = cur_pt.y + 85;
+    const Sprite & sprite3 = AGG::GetICN("HSICONS.ICN", 1);
+    const Rect rectExperienceInfo(dst_pt, sprite3.w(), sprite3.h());
+    display.Blit(sprite3, dst_pt);
+
+    message.clear();
+    String::AddInt(message, GetExperience());
+    dst_pt.x = cur_pt.x + 528;
+    dst_pt.y = cur_pt.y + 107;
+    Text(dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y, message, Font::SMALL, true);
+    
+    std::string headerExperience("Level ");
+    String::AddInt(headerExperience, GetLevel());
+    
+    std::string descriptionExperience("Current experience ");
+    String::AddInt(descriptionExperience, GetExperience());
+    descriptionExperience += " Next level ";
+    String::AddInt(descriptionExperience, GetNextLevelExperience(GetLevel()) - GetExperience());
+    descriptionExperience += ".";
+
+    // spell points
+    dst_pt.x = cur_pt.x + 550;
+    dst_pt.y = cur_pt.y + 87;
+    const Sprite & sprite4 = AGG::GetICN("HSICONS.ICN", 8);
+    const Rect rectSpellPointsInfo(dst_pt, sprite4.w(), sprite4.h());
+    display.Blit(sprite4, dst_pt);
+
+    message.clear();
+    String::AddInt(message, GetSpellPoints());
+    message += "/";
+    String::AddInt(message, GetMaxSpellPoints());
+    dst_pt.x = cur_pt.x + 568;
+    dst_pt.y = cur_pt.y + 107;
+    Text(dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y, message, Font::SMALL, true);
+
+    std::string descriptionSpellPoints(name + " currently has ");
+    String::AddInt(descriptionSpellPoints, GetSpellPoints());
+    descriptionSpellPoints += " spell points out of a maximum of ";
+    String::AddInt(descriptionSpellPoints, GetMaxSpellPoints());
+    descriptionSpellPoints += ". The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events.";
 
     // crest
     switch(color)
@@ -373,6 +605,29 @@ Dialog::answer_t Heroes::OpenDialog(void)
         if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message("Spell Power", "Your spell power determines the length or power of a spell.", Font::BIG, Dialog::OK);
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG, Dialog::OK);
 
+        if(le.MouseClickLeft(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectLuckInfo)) Dialog::Message(headerLuckInfo, Luck::Description(GetLuck()), Font::BIG, Dialog::OK);
+        if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG, Dialog::OK);
+
+        if(le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)
+        {
+	    Cursor::Hide();
+	    cursorFormat.Move(army1_pt);
+	    display.Flip();
+	    Cursor::Show();
+    	    army_spread = true;
+        }
+
+        if(le.MouseClickLeft(rectGroupedArmyFormat) && army_spread)
+        {
+	    Cursor::Hide();
+	    cursorFormat.Move(army2_pt);
+	    display.Flip();
+	    Cursor::Show();
+    	    army_spread = false;
+        }
+
 	// left click skill
 	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MouseClickLeft(coordsSkill[ii]))
 	{
@@ -394,6 +649,13 @@ Dialog::answer_t Heroes::OpenDialog(void)
         if(le.MousePressRight(rectDefenseSkill)) Dialog::Message("Defense Skill", "Your defense skill is a bonus added to each creature's defense skill.", Font::BIG);
         if(le.MousePressRight(rectSpellSkill)) Dialog::Message("Spell Power", "Your spell power determines the length or power of a spell.", Font::BIG);
         if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG);
+
+        if(le.MousePressRight(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG);
+        if(le.MousePressRight(rectLuckInfo)) Dialog::Message(headerLuckInfo, Luck::Description(GetLuck()), Font::BIG);
+        if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG);
+        if(le.MousePressRight(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG);
+        if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message("Spread Formation", descriptionSpreadArmyFormat, Font::BIG);
+        if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message("Grouped Formation", descriptionGroupedArmyFormat, Font::BIG);
 
 	// right info skill
 	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MousePressRight(coordsSkill[ii]))
@@ -419,6 +681,18 @@ Dialog::answer_t Heroes::OpenDialog(void)
 	if(le.MouseCursor(rectSpellSkill)) statusBar.ShowMessage("View Spell Power Info");
 	else
 	if(le.MouseCursor(rectKnowledgeSkill)) statusBar.ShowMessage("View Knowledge Info");
+	else
+	if(le.MouseCursor(rectMoraleInfo)) statusBar.ShowMessage("View Morale Info");
+	else
+	if(le.MouseCursor(rectLuckInfo)) statusBar.ShowMessage("View Luck Info");
+	else
+	if(le.MouseCursor(rectExperienceInfo)) statusBar.ShowMessage("View Experience Info");
+	else
+	if(le.MouseCursor(rectSpellPointsInfo)) statusBar.ShowMessage("View Spell Points Info");
+	else
+	if(le.MouseCursor(rectSpreadArmyFormat)) statusBar.ShowMessage("Set army combat formation to 'Spread'");
+	else
+	if(le.MouseCursor(rectGroupedArmyFormat)) statusBar.ShowMessage("Set army combat formation to 'Grouped'");
 	else
         if(le.MouseCursor(buttonExit)) statusBar.ShowMessage("Exit hero");
         else

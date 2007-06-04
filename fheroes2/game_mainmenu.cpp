@@ -54,13 +54,14 @@ Game::menu_t Game::MainMenu(void)
     Button buttonCredits("BTNSHNGL.ICN", 12, 15);
     Button buttonQuit("BTNSHNGL.ICN", 16, 19);
 
-    AnimationButton animeButtonNewGame("BTNSHNGL.ICN", 0, 3);
-    AnimationButton animeButtonLoadGame("BTNSHNGL.ICN", 4, 3);
-    AnimationButton animeButtonHighScores("BTNSHNGL.ICN", 8, 3);
-    AnimationButton animeButtonCredits("BTNSHNGL.ICN", 12, 3);
-    AnimationButton animeButtonQuit("BTNSHNGL.ICN", 16, 3);
+    const Point lt_pt(0, 0);
+    Animation animeButtonNewGame(lt_pt, "BTNSHNGL.ICN", 0, 3, false, Animation::HIGH);
+    Animation animeButtonLoadGame(lt_pt, "BTNSHNGL.ICN", 4, 3, false, Animation::HIGH);
+    Animation animeButtonHighScores(lt_pt, "BTNSHNGL.ICN", 8, 3, false, Animation::HIGH);
+    Animation animeButtonCredits(lt_pt, "BTNSHNGL.ICN", 12, 3, false, Animation::HIGH);
+    Animation animeButtonQuit(lt_pt, "BTNSHNGL.ICN", 16, 3, false, Animation::HIGH);
 
-    Animation animeLantern(Point(0, 0), "SHNGANIM.ICN", 0, 40, Animation::INFINITY | Animation::RING | Animation::LOW);
+    Animation animeLantern(lt_pt, "SHNGANIM.ICN", 0, 40, true, Animation::INFINITY | Animation::RING | Animation::LOW);
 
     display.Flip();
     Cursor::Show();
@@ -76,11 +77,12 @@ Game::menu_t Game::MainMenu(void)
 	le.MousePressLeft(buttonCredits) ? buttonCredits.Press() : buttonCredits.Release();
 	le.MousePressLeft(buttonQuit) ? buttonQuit.Press() : buttonQuit.Release();
 
-	le.MouseCursor(buttonNewGame) ? animeButtonNewGame.DrawSprite() : animeButtonNewGame.Reset();
-	le.MouseCursor(buttonLoadGame) ? animeButtonLoadGame.DrawSprite() : animeButtonLoadGame.Reset();
-	le.MouseCursor(buttonHighScores) ? animeButtonHighScores.DrawSprite() : animeButtonHighScores.Reset();
-	le.MouseCursor(buttonCredits) ? animeButtonCredits.DrawSprite() : animeButtonCredits.Reset();
-	le.MouseCursor(buttonQuit) ? animeButtonQuit.DrawSprite() : animeButtonQuit.Reset();
+	if(le.MouseCursor(buttonNewGame)) animeButtonNewGame.DrawSprite(); else if(animeButtonNewGame.Reset()) animeButtonNewGame.DrawSprite();
+	if(le.MouseCursor(buttonNewGame)) animeButtonNewGame.DrawSprite(); else if(animeButtonNewGame.Reset()) animeButtonNewGame.DrawSprite();
+	if(le.MouseCursor(buttonLoadGame)) animeButtonLoadGame.DrawSprite(); else if(animeButtonLoadGame.Reset()) animeButtonLoadGame.DrawSprite();
+	if(le.MouseCursor(buttonHighScores)) animeButtonHighScores.DrawSprite(); else if(animeButtonHighScores.Reset()) animeButtonHighScores.DrawSprite();
+	if(le.MouseCursor(buttonCredits)) animeButtonCredits.DrawSprite(); else if(animeButtonCredits.Reset()) animeButtonCredits.DrawSprite();
+	if(le.MouseCursor(buttonQuit)) animeButtonQuit.DrawSprite(); else if(animeButtonQuit.Reset()) animeButtonQuit.DrawSprite();
 
 	if(le.MouseClickLeft(buttonNewGame)) return NEWGAME;
 	if(le.MouseClickLeft(buttonLoadGame)) return LOADGAME;

@@ -35,6 +35,7 @@ namespace Morale
     } morale_t;
 
     const std::string & String(morale_t morale);
+    const std::string & Description(morale_t morale);
 };
 
 #endif

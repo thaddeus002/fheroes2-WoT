@@ -24,7 +24,8 @@ const std::string & Morale::String(Morale::morale_t morale)
 {
     static const std::string str_morale[] = { "Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood" };
 
-    switch(morale){
+    switch(morale)
+    {
         case Morale::TREASON:	return str_morale[0];
         case Morale::AWFUL:	return str_morale[1];
         case Morale::POOR:	return str_morale[2];
@@ -35,4 +36,25 @@ const std::string & Morale::String(Morale::morale_t morale)
     }
 
     return str_morale[0];
+}
+
+const std::string & Morale::Description(Morale::morale_t morale)
+{
+    static const std::string str_desc_morale[] = { 
+	"Bad morale may cause your armies to freeze in combat.",
+	"Neutral morale means your armies will never be blessed with extra attacks or freeze in combat.",
+	"Good morale may give your armies extra attacks in combat." };
+
+    switch(morale)
+    {
+        case Morale::TREASON:
+        case Morale::AWFUL:
+        case Morale::POOR:	return str_desc_morale[0];
+        case Morale::NORMAL:	return str_desc_morale[1];
+        case Morale::GOOD:
+        case Morale::GREAT:
+        case Morale::BLOOD:	return str_desc_morale[2];
+    }
+
+    return str_desc_morale[0];
 }

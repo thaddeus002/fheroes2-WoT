@@ -22,18 +22,23 @@
 
 Rect::Rect(const std::vector<Rect> & vect)
 {
-    x = 32767;
-    y = 32767;
-    w = 0;
-    h = 0;
+    int x1 = 32766;
+    int y1 = 32766;
+    int x2 = -32766;
+    int y2 = -32766;
        
     std::vector<Rect>::const_iterator it = vect.begin();
     
     for(; it != vect.end(); ++it)
     {
-	if((*it).x < x) x = (*it).x;
-	if((*it).y < y) y = (*it).y;
-	if((*it).x + (*it).w > x + w) w = (*it).x + (*it).w - x;
-	if((*it).y + (*it).h > y + h) h = (*it).y + (*it).h - y;
+	if((*it).x < x1) x1 = (*it).x;
+	if((*it).y < y1) y1 = (*it).y;
+	if((*it).x + (*it).w > x2) x2 = (*it).x + (*it).w;
+	if((*it).y + (*it).h > y2) y2 = (*it).y + (*it).h;
     }
+    
+    x = x1;
+    y = y1;
+    w = x2 - x1;
+    h = y2 - y1;
 }

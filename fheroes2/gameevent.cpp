@@ -171,7 +171,7 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     byte16 = reinterpret_cast<const u16 *>(byte32);
     u16 art2 = *byte16;
     SWAP16(art2);
-    if(0xffff != *byte16 && Artifact::MAGIC_BOOK > art2) artifact = Artifact::Artifact(art2);
+    artifact = (0xffff != *byte16 && Artifact::MAGIC_BOOK > art2 ? artifact = Artifact::Artifact(art2) : Artifact::UNKNOWN);
     ++byte16;
 
     // allow computer

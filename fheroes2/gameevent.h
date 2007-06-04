@@ -49,10 +49,16 @@ class Day
 {
 public:
     Day(const void *ptr);
+    
+    bool AllowComputer(void) const{ return computer; };
+    const Resource::funds_t & GetResource(void){ return resource; };
+    u16 GetFirst(void) const{ return first; };
+    u16 GetSubsequent(void) const{ return subsequent; };
+    u8  GetColors(void) const{ return colors; };
+    const std::string & GetMessage(void) const{ return message; };
 
 private:
     Resource::funds_t resource;
-    Artifact::artifact_t artifact;
     bool computer;
     u16 first;
     u16 subsequent;

@@ -75,13 +75,15 @@ public:
 
     Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
     
-    bool isCastle(void) const{ return castle; };
+    bool isCastle(void) const{ return building & BUILD_CASTLE; };
     bool isBuild(building_t bd) const{ return building & bd; };
+    bool HaveNearlySea(void) const{ return false; };
     const Heroes * isHeroesPresent(void);
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
+    u8 GetLevelMageGuild(void);
     u32 GetUniq(void) const{ return uniq; };
 
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; }; 
@@ -96,6 +98,9 @@ public:
     void ActionNewMonth(void);
 
     Dialog::answer_t OpenDialog(void);
+    
+    static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
+    static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
 
 private:
     void RedrawResourcePanel(void);
@@ -104,13 +109,15 @@ private:
     void ModifyTIlesFlags(Maps::Tiles & tile);
     void ModifyTilesTownToCastle(Maps::Tiles & tile);
     void MinimizeAreaMapsID(void);
+    
+    Rect GetCoordBuilding(building_t building, const Point & pt);
+    void RedrawBuilding(const Point & dst_pt);
 
 private:
     Color::color_t	color;
     Race::race_t	race;
     std::string		name;
     u32			building;
-    bool		castle;
     bool		captain;
     bool		allow_castle;
     bool		army_spread;

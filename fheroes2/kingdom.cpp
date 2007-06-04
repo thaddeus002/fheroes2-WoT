@@ -23,7 +23,8 @@
 #include "heroes.h"
 #include "error.h"
 #include "difficulty.h"
-#include "game_statuswindow.h" 
+#include "game_statuswindow.h"
+#include "payment.h"
 #include "kingdom.h"
 
 Kingdom::Kingdom(Color::color_t cl) : color(cl), build(false), play(cl & H2Config::GetKingdomColors() ? true : false)
@@ -99,7 +100,7 @@ void Kingdom::ActionNewDay(void)
     // castle New Day
     for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewDay();
 
-    // gold
+    // funds
     for(u16 ii = 0; ii < castles.size(); ++ii)
     {
 	// castle or town profit
@@ -110,6 +111,29 @@ void Kingdom::ActionNewDay(void)
 
 	// dungeon for warlock
 	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_SPEC) && Race::WRLK == (*castles[ii]).GetRace() ? INCOME_STATUE_GOLD : 0);
+    }
+    
+    for(u8 ii = 0; ii < heroes.size(); ++ii)
+    {
+	if(const Heroes * hero = heroes[ii])
+	{
+	    std::vector<Artifact::artifact_t>::const_iterator it = (*hero).GetArtifacts().begin();
+	    
+	    for(; it != (*hero).GetArtifacts().end(); ++it) switch(*it)
+	    {
+		case Artifact::ENDLESS_SACK_GOLD:	resource.gold += INCOME_ENDLESS_SACK_GOLD; break;
+		case Artifact::ENDLESS_BAG_GOLD:	resource.gold += INCOME_ENDLESS_BAG_GOLD; break;
+		case Artifact::ENDLESS_PURSE_GOLD:	resource.gold += INCOME_ENDLESS_PURSE_GOLD; break;
+		case Artifact::ENDLESS_POUCH_SULFUR:	resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR; break;
+		case Artifact::ENDLESS_VIAL_MERCURY:	resource.mercury += INCOME_ENDLESS_VIAL_MERCURY; break;
+		case Artifact::ENDLESS_POUCH_GEMS:	resource.gems += INCOME_ENDLESS_POUCH_GEMS; break;
+		case Artifact::ENDLESS_CORD_WOOD:	resource.wood += INCOME_ENDLESS_CORD_WOOD; break;
+		case Artifact::ENDLESS_CART_ORE:	resource.ore += INCOME_ENDLESS_CART_ORE; break;
+		case Artifact::ENDLESS_POUCH_CRYSTAL:	resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL; break;
+		
+		default: break;
+	    }
+	}
     }
 }
 

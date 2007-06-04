@@ -107,11 +107,13 @@ public:
     u8 GetPower(void) const;
     u8 GetKnowledge(void) const;
     u32 GetExperience(void) const;
+    u32 GetNextLevelExperience(u8 level) const;
     u16 GetMaxSpellPoints(void) const;
     u16 GetSpellPoints(void) const;
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const{ return 1; };
+    const std::vector<Artifact::artifact_t> GetArtifacts(void) const{ return artifacts; };
 
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;

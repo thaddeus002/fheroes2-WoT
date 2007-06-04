@@ -136,9 +136,9 @@ const std::string & Skill::Description(skill_t skill, level_t level)
 
     switch(level)
     {
-	case BASIC:	index = 0;
-	case ADVANCED:	index = 1;
-	case EXPERT:	index = 2;
+	case BASIC:	index = 0; break;
+	case ADVANCED:	index = 1; break;
+	case EXPERT:	index = 2; break;
     }
     switch(skill)
     {
