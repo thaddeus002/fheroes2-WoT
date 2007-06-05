@@ -482,12 +482,12 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
 
     switch(race)
     {
-	case Race::KNGT: offset = 0;
-	case Race::BARB: offset = 1;
-	case Race::SORC: offset = 2;
-	case Race::WRLK: offset = 3;
-	case Race::WZRD: offset = 4;
-	case Race::NECR: offset = 5;
+	case Race::KNGT: offset = 0; break;
+	case Race::BARB: offset = 1; break;
+	case Race::SORC: offset = 2; break;
+	case Race::WRLK: offset = 3; break;
+	case Race::WZRD: offset = 4; break;
+	case Race::NECR: offset = 5; break;
 	default: break;
     }
 
@@ -571,12 +571,12 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
 
     switch(race)
     {
-	case Race::KNGT: offset = 0;
-	case Race::BARB: offset = 1;
-	case Race::SORC: offset = 2;
-	case Race::WRLK: offset = 3;
-	case Race::WZRD: offset = 4;
-	case Race::NECR: offset = 5;
+	case Race::KNGT: offset = 0; break;
+	case Race::BARB: offset = 1; break;
+	case Race::SORC: offset = 2; break;
+	case Race::WRLK: offset = 3; break;
+	case Race::WZRD: offset = 4; break;
+	case Race::NECR: offset = 5; break;
 	default: break;
     }
 

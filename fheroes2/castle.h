@@ -112,6 +112,7 @@ private:
     
     Rect GetCoordBuilding(building_t building, const Point & pt);
     void RedrawBuilding(const Point & dst_pt);
+    void OpenTavern(void);
 
 private:
     Color::color_t	color;

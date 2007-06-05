@@ -893,5 +893,12 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
 	return NULL;
     }
 
-    return vec_heroes[ freeman_heroes[Rand::Get(0, freeman_heroes.size() - 1)] ];
+    return vec_heroes[ freeman_heroes[Rand::Get(freeman_heroes.size() - 1)] ];
+}
+
+const std::string & World::GetRumors(void)
+{
+    //vec_rumors.size();
+
+    return (*vec_rumors[Rand::Get(vec_rumors.size() - 1)]).GetString();
 }

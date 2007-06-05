@@ -20,6 +20,7 @@
 
 #include <string>
 #include "agg.h"
+#include "animation.h"
 #include "localevent.h"
 #include "button.h"
 #include "world.h"
@@ -505,19 +506,23 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
 
 	// left click building
-	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild));
-	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern));
-	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard));
-	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell));
-	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue));
-	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace));
-	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2));
-	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat));
-	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec));
-	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle));
+	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)); // in to
+	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern)) OpenTavern();
+	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // in to
+	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), GetDescriptionBuilding(BUILD_WELL), Font::BIG, Dialog::OK);
+	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
+	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)); // in to
+	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
+	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
+	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG, Dialog::OK);
+	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle)); // in to
 	else
-	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent));
-	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain));
+	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent)); // in to
+	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);
+
+	// left click mage guild
+	if(building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1) &&
+	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))); // in to
 
 	// left click dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MouseClickLeft(coordDwellingMonster1));
@@ -533,19 +538,23 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & DWELLING_MONSTER6 && le.MouseClickLeft(coordDwellingMonster6));
 
 	// right press building
-	if(building & BUILD_THIEVESGUILD && le.MousePressRight(coordBuildingThievesGuild));
-	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern));
-	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard));
-	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell));
-	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue));
-	if(building & BUILD_MARKETPLACE && le.MousePressRight(coordBuildingMarketplace));
-	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2));
-	if(building & BUILD_MOAT && le.MousePressRight(coordBuildingMoat));
-	if(building & BUILD_SPEC && le.MousePressRight(coordBuildingSpec));
-	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle));
+	if(building & BUILD_THIEVESGUILD && le.MousePressRight(coordBuildingThievesGuild)) Dialog::Message(GetStringBuilding(BUILD_THIEVESGUILD), GetDescriptionBuilding(BUILD_THIEVESGUILD), Font::BIG);
+	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_TAVERN), GetDescriptionBuilding(BUILD_TAVERN), Font::BIG);
+	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard)) Dialog::Message(GetStringBuilding(BUILD_SHIPYARD), GetDescriptionBuilding(BUILD_SHIPYARD), Font::BIG);
+	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), GetDescriptionBuilding(BUILD_WELL), Font::BIG);
+	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG);
+	if(building & BUILD_MARKETPLACE && le.MousePressRight(coordBuildingMarketplace)) Dialog::Message(GetStringBuilding(BUILD_MARKETPLACE), GetDescriptionBuilding(BUILD_MARKETPLACE), Font::BIG);
+	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG);
+	if(building & BUILD_MOAT && le.MousePressRight(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG);
+	if(building & BUILD_SPEC && le.MousePressRight(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG);
+	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), GetDescriptionBuilding(BUILD_CASTLE), Font::BIG);
 	else
-	if(building & BUILD_TENT && le.MousePressRight(coordBuildingTent));
-	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain));
+	if(building & BUILD_TENT && le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
+	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG);
+
+	// right press mage guild
+	if(building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1) &&
+	    le.MousePressRight(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) Dialog::Message(GetStringBuilding(BUILD_MAGEGUILD1), GetDescriptionBuilding(BUILD_MAGEGUILD1), Font::BIG);
 
 	// right press dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1));
@@ -596,6 +605,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
 	else
 	if(building & BUILD_TENT && le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_BOAT));
+	else
+	// mage guild
+	if(building & BUILD_MAGEGUILD5 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD5));
+	else
+	if(building & BUILD_MAGEGUILD4 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD4, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD4));
+	else
+	if(building & BUILD_MAGEGUILD3 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD3, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD3));
+	else
+	if(building & BUILD_MAGEGUILD2 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD2, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD2));
+	else
+	if(building & BUILD_MAGEGUILD1 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD1, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD1));
 	else
 	// dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MouseCursor(coordDwellingMonster1)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_MONSTER1)));
@@ -806,3 +826,73 @@ void Castle::RedrawResourcePanel(void)
     display.Blit(exit, dst_pt);
 }
 
+void Castle::OpenTavern(void)
+{
+    const std::string & header = "A generous tip for the barkeep yields the following rumor:";
+    const std::string & system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+    const std::string & tavern = GetStringBuilding(BUILD_TAVERN);
+    const std::string & message = world.GetRumors();
+
+    Cursor::Hide();
+
+    Dialog::Box box(Text::height(BOXAREA_WIDTH, header, Font::BIG) + 130 + Text::height(BOXAREA_WIDTH, message, Font::BIG), true);
+
+    const Rect & pos = box.GetArea();
+    Point dst_pt(pos);
+
+    Text(pos.x + (pos.w - Text::width(tavern, Font::BIG)) / 2, dst_pt.y, tavern, Font::BIG, true);
+
+    const Sprite & s1 = AGG::GetICN("TAVWIN.ICN", 0);
+    dst_pt.x = pos.x + (pos.w - s1.w()) / 2;
+    dst_pt.y = pos.y + 30;
+    display.Blit(s1, dst_pt);
+
+    const Sprite & s2 = AGG::GetICN("TAVWIN.ICN", 1);
+    dst_pt.x += 3;
+    dst_pt.y += 3;
+    display.Blit(s2, dst_pt);
+
+    Rect rt(pos.x, dst_pt.y + s1.h() + 10, pos.w, pos.h);
+    TextBox(rt, header, Font::BIG, true);
+
+    rt.y += 60;
+    TextBox(rt, message, Font::BIG, true);
+
+    Animation animeBeer(dst_pt, "TAVWIN.ICN", 2, 20, false, Animation::INFINITY | Animation::RING | Animation::LOW);
+
+    const Sprite & s3 = animeBeer.GetFirstSprite();
+    dst_pt.x += s3.x();
+    dst_pt.y += s3.y();
+    display.Blit(s3, dst_pt);
+
+    // button yes
+    const Sprite & s4 = AGG::GetICN(system, 5);
+    dst_pt.x = pos.x + (pos.w - s4.w()) / 2;
+    dst_pt.y = pos.y + pos.h + BUTTON_HEIGHT - s4.h();
+    Button buttonYes(dst_pt, system, 5, 6);
+
+    display.Flip();
+    Cursor::Show();
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+   
+    le.ResetKey();
+
+    // message loop
+    bool exit = false;
+
+    while(!exit)
+    {
+        le.HandleEvents();
+
+        le.MousePressLeft(buttonYes) ? buttonYes.Press() : buttonYes.Release();
+
+        if(le.MouseClickLeft(buttonYes) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)){ exit = true; }
+
+	animeBeer.DrawSprite();
+    }
+
+    le.ResetKey();
+
+    Cursor::Show();
+}

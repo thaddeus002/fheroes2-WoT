@@ -34,6 +34,7 @@ public:
     Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first = false, u8 amode = INFINITY | RING | MEDIUM);
 
     const Rect & GetMaxRect(void) const{ return max_rect; };
+    const Sprite & GetFirstSprite(void) const{ return *sprites[0]; };
 
     bool Reset(void);
 

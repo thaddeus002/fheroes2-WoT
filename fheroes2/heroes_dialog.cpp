@@ -607,7 +607,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
 
         if(le.MouseClickLeft(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG, Dialog::OK);
         if(le.MouseClickLeft(rectLuckInfo)) Dialog::Message(headerLuckInfo, Luck::Description(GetLuck()), Font::BIG, Dialog::OK);
-        if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
         if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG, Dialog::OK);
 
         if(le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)

@@ -78,6 +78,8 @@ public:
     bool BeginMonth(void){ return begin_month; };
     void NextDay(void);
 
+    const std::string & GetRumors(void);
+
 private:
     World(){};
     
