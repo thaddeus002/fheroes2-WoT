@@ -50,8 +50,8 @@ void Cursor::Init(Cursor::themes_t cursor)
     SDL_GetMouseState(&x, &y);
     Cursor::position.x = x;
     Cursor::position.y = y;
-    Cursor::position.w = Cursor::sprite.w();
-    Cursor::position.h = Cursor::sprite.h();
+    Cursor::position.w = Cursor::sprite.w() + 1;
+    Cursor::position.h = Cursor::sprite.h() + 1;
 
     Cursor::Redraw();
 

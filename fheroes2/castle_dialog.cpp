@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <string>
+#include <utility>
 #include "agg.h"
 #include "animation.h"
 #include "localevent.h"
@@ -184,6 +185,167 @@ Dialog::answer_t Castle::OpenDialog(void)
     const Rect coordDwellingMonster4(GetCoordBuilding(DWELLING_MONSTER4, cur_pt));
     const Rect coordDwellingMonster5(GetCoordBuilding(DWELLING_MONSTER5, cur_pt));
     const Rect coordDwellingMonster6(GetCoordBuilding(DWELLING_MONSTER6, cur_pt));
+
+    // specifical building animation
+    typedef std::pair<u32, Animation *> specanim_t;
+    std::vector<specanim_t> vect_animation;
+    const u8 amode = Animation::INFINITY | Animation::RING | Animation::LOW;
+    switch(race)
+    {
+	case Race::KNGT:
+	{
+	    // castle
+	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNKCSTL.ICN", 1, 5, false, amode)));
+	    // thieves guild
+	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNKTHIE.ICN", 1, 5, false, amode)));
+	    // tavern
+	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNKTVRN.ICN", 1, 5, false, amode)));
+	    // dock or boat
+	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNKDOCK.ICN", 1, 5, false, amode)));
+	    // left turret
+	    vect_animation.push_back(specanim_t(BUILD_LEFTTURRET, new Animation(cur_pt, "TWNKLTUR.ICN", 1, 5, false, amode)));
+	    // right turret
+	    vect_animation.push_back(specanim_t(BUILD_RIGHTTURRET, new Animation(cur_pt, "TWNKRTUR.ICN", 1, 5, false, amode)));
+	    // ext0
+	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNKEXT0.ICN", 1, 5, false, amode)));
+	    // monster 1
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNKDW_0.ICN", 1, 5, false, amode)));
+	    // monster 3
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER3, new Animation(cur_pt, "TWNKDW_2.ICN", 1, 6, false, amode)));
+	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE3, new Animation(cur_pt, "TWNKUP_2.ICN", 1, 6, false, amode)));
+	    // monster 5
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER5, new Animation(cur_pt, "TWNKDW_4.ICN", 1, 7, false, amode)));
+	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE5, new Animation(cur_pt, "TWNKUP_4.ICN", 1, 7, false, amode)));
+	}
+	    break;
+	case Race::BARB:
+	{
+	    // castle
+	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNBCSTL.ICN", 1, 6, false, amode)));
+	    // captain
+	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNBCAPT.ICN", 1, 5, false, amode)));
+	    // dock or boat
+	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBDOCK.ICN", 1, 5, false, amode)));
+	    //vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBBOAT.ICN", 1, 9, false, amode)));
+	    // moat
+	    vect_animation.push_back(specanim_t(BUILD_MOAT, new Animation(cur_pt, "TWNBMOAT.ICN", 1, 5, false, amode)));
+	    // ext0 (sea)
+	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNBEXT0.ICN", 1, 5, false, amode)));
+	    // ext1 (stream)
+	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNBEXT1.ICN", 1, 5, false, amode)));
+	    // monster 4
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER4, new Animation(cur_pt, "TWNBDW_3.ICN", 1, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE4, new Animation(cur_pt, "TWNBUP_3.ICN", 1, 5, false, amode)));
+	    // monster 5
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER5, new Animation(cur_pt, "TWNBDW_4.ICN", 1, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE5, new Animation(cur_pt, "TWNBUP_4.ICN", 1, 5, false, amode)));
+	    // monster 6
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER6, new Animation(cur_pt, "TWNBDW_5.ICN", 1, 5, false, amode)));
+	    // mage guild
+	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD5, new Animation(cur_pt, "TWNBMAGE.ICN", 5, 8, false, amode)));
+	}
+	    break;
+	case Race::SORC:
+	{
+	    // castle
+	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNSCSTL.ICN", 1, 5, false, amode)));
+	    // captain
+	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNSCAPT.ICN", 1, 5, false, amode)));
+	    // thieves guild
+	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNSTHIE.ICN", 1, 5, false, amode)));
+	    // tavern
+	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNSTVRN.ICN", 1, 5, false, amode)));
+	    // dock or boat
+	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNSDOCK.ICN", 1, 5, false, amode)));
+	    // wel2
+	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNSWEL2.ICN", 1, 5, false, amode)));
+	    // ext1
+	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNSEXT1.ICN", 1, 5, false, amode)));
+	    // ext0
+	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNSEXT0.ICN", 1, 5, false, amode)));
+	    // monster 1
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNSDW_0.ICN", 1, 5, false, amode)));
+	    // monster 2
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER2, new Animation(cur_pt, "TWNSDW_1.ICN", 1, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE2, new Animation(cur_pt, "TWNSUP_1.ICN", 1, 5, false, amode)));
+	}
+	    break;
+	case Race::WRLK:
+	{
+	    // castle
+	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNWCSTL.ICN", 1, 5, false, amode)));
+	    // captain
+	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNWCAPT.ICN", 1, 5, false, amode)));
+	    // dock or boat
+	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNWDOCK.ICN", 1, 5, false, amode)));
+	    // moat
+	    vect_animation.push_back(specanim_t(BUILD_MOAT, new Animation(cur_pt, "TWNWMOAT.ICN", 1, 5, false, amode)));
+	    // wel2
+	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNWWEL2.ICN", 1, 6, false, amode)));
+	    // ext0
+	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNWEXT0.ICN", 1, 5, false, amode)));
+	    // monster 1
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNWDW_0.ICN", 1, 6, false, amode)));
+	}
+	    break;
+	case Race::WZRD:
+	{
+	    // castle
+	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNZCSTL.ICN", 1, 5, false, amode)));
+	    // thieves guild
+	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNZTHIE.ICN", 1, 5, false, amode)));
+	    // tavern
+	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNZTVRN.ICN", 1, 6, false, amode)));
+	    // dock or boat
+	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNZDOCK.ICN", 1, 5, false, amode)));
+	    // ext0
+	    vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNZEXT0.ICN", 1, 5, false, amode)));
+	    // monster 1
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNZDW_0.ICN", 1, 5, false, amode)));
+	    // monster 3
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER3, new Animation(cur_pt, "TWNZDW_2.ICN", 1, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE3, new Animation(cur_pt, "TWNZUP_2.ICN", 1, 5, false, amode)));
+	}
+	    break;
+	case Race::NECR:
+	{
+	    // castle
+	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNNCSTL.ICN", 1, 5, false, amode)));
+	    // dock or boat
+	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNNDOCK.ICN", 1, 5, false, amode)));
+	    // wel2
+	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNNWEL2.ICN", 1, 6, false, amode)));
+	    // ext0
+	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNNEXT0.ICN", 1, 5, false, amode)));
+	    // monster 3
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER3, new Animation(cur_pt, "TWNNDW_2.ICN", 1, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE3, new Animation(cur_pt, "TWNNUP_2.ICN", 1, 5, false, amode)));
+	    // monster 6
+	    vect_animation.push_back(specanim_t(DWELLING_MONSTER6, new Animation(cur_pt, "TWNNDW_5.ICN", 1, 6, false, amode)));
+	    // mage guild
+	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD1, new Animation(cur_pt, "TWNNMAGE.ICN", 1, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD2, new Animation(cur_pt, "TWNNMAGE.ICN", 7, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD3, new Animation(cur_pt, "TWNNMAGE.ICN", 13, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD4, new Animation(cur_pt, "TWNNMAGE.ICN", 19, 5, false, amode)));
+	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD5, new Animation(cur_pt, "TWNNMAGE.ICN", 25, 5, false, amode)));
+	}
+	    break;
+	default: break;
+    }
+
+    const std::vector<specanim_t>::const_iterator it_animation_begin =  vect_animation.begin();
+    const std::vector<specanim_t>::const_iterator it_animation_end   =  vect_animation.end();
+    std::vector<specanim_t>::const_iterator it_animation_current = it_animation_begin;
+    
+    // redraw first sprite animation
+    /*
+    for(it_animation_current = it_animation_begin; it_animation_current != it_animation_end; ++it_animation_current)
+	if((*it_animation_current).first & building)
+    {
+	const Sprite & sp = (*(*it_animation_current).second).GetFirstSprite();
+	display.Blit(sp, cur_pt.x + sp.x(), cur_pt.y + sp.y());
+    }
+    */
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
@@ -506,36 +668,90 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
 
 	// left click building
-	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)); // in to
+	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) OpenThievesGuild();
 	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern)) OpenTavern();
 	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // in to
-	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), GetDescriptionBuilding(BUILD_WELL), Font::BIG, Dialog::OK);
+	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell)) OpenWell();
 	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
 	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)); // in to
 	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
 	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
 	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG, Dialog::OK);
-	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle)); // in to
+	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle)) OpenTown();
 	else
 	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent)); // in to
 	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);
 
 	// left click mage guild
 	if(building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1) &&
-	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))); // in to
+	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) OpenMageGuild();
 
 	// left click dwelling monster
-	if(building & DWELLING_MONSTER1 && le.MouseClickLeft(coordDwellingMonster1));
+	if(building & DWELLING_MONSTER1 && le.MouseClickLeft(coordDwellingMonster1) &&
+	    Castle::RecrutMonster(DWELLING_MONSTER1, Dialog::RecrutMonster(
+		Monster::Monster(race, DWELLING_MONSTER1), dwelling[0])))
+	{
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 	else
-	if(building & DWELLING_MONSTER2 && le.MouseClickLeft(coordDwellingMonster2));
+	if(building & DWELLING_MONSTER2 && le.MouseClickLeft(coordDwellingMonster2) &&
+	    Castle::RecrutMonster(DWELLING_MONSTER2, Dialog::RecrutMonster(
+		Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
+	{
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 	else
-	if(building & DWELLING_MONSTER3 && le.MouseClickLeft(coordDwellingMonster3));
+	if(building & DWELLING_MONSTER3 && le.MouseClickLeft(coordDwellingMonster3) &&
+	    Castle::RecrutMonster(DWELLING_MONSTER3, Dialog::RecrutMonster(
+		Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
+	{
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 	else
-	if(building & DWELLING_MONSTER4 && le.MouseClickLeft(coordDwellingMonster4));
+	if(building & DWELLING_MONSTER4 && le.MouseClickLeft(coordDwellingMonster4) &&
+	    Castle::RecrutMonster(DWELLING_MONSTER4, Dialog::RecrutMonster(
+		Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
+	{
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 	else
-	if(building & DWELLING_MONSTER5 && le.MouseClickLeft(coordDwellingMonster5));
+	if(building & DWELLING_MONSTER5 && le.MouseClickLeft(coordDwellingMonster5) &&
+	    Castle::RecrutMonster(DWELLING_MONSTER5, Dialog::RecrutMonster(
+		Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
+	{
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 	else
-	if(building & DWELLING_MONSTER6 && le.MouseClickLeft(coordDwellingMonster6));
+	if(building & DWELLING_MONSTER6 && le.MouseClickLeft(coordDwellingMonster6) &&
+	    Castle::RecrutMonster(DWELLING_MONSTER6, Dialog::RecrutMonster(
+	    Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
+	{
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 
 	// right press building
 	if(building & BUILD_THIEVESGUILD && le.MousePressRight(coordBuildingThievesGuild)) Dialog::Message(GetStringBuilding(BUILD_THIEVESGUILD), GetDescriptionBuilding(BUILD_THIEVESGUILD), Font::BIG);
@@ -557,17 +773,23 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    le.MousePressRight(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) Dialog::Message(GetStringBuilding(BUILD_MAGEGUILD1), GetDescriptionBuilding(BUILD_MAGEGUILD1), Font::BIG);
 
 	// right press dwelling monster
-	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1));
+	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1))
+	    Dialog::DwellingInfo(Monster::Monster(race, DWELLING_MONSTER1), dwelling[0]);
 	else
-	if(building & DWELLING_MONSTER2 && le.MousePressRight(coordDwellingMonster2));
+	if(building & DWELLING_MONSTER2 && le.MousePressRight(coordDwellingMonster2))
+	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1]);
 	else
-	if(building & DWELLING_MONSTER3 && le.MousePressRight(coordDwellingMonster3));
+	if(building & DWELLING_MONSTER3 && le.MousePressRight(coordDwellingMonster3))
+	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2]);
 	else
-	if(building & DWELLING_MONSTER4 && le.MousePressRight(coordDwellingMonster4));
+	if(building & DWELLING_MONSTER4 && le.MousePressRight(coordDwellingMonster4))
+	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3]);
 	else
-	if(building & DWELLING_MONSTER5 && le.MousePressRight(coordDwellingMonster5));
+	if(building & DWELLING_MONSTER5 && le.MousePressRight(coordDwellingMonster5))
+	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4]);
 	else
-	if(building & DWELLING_MONSTER6 && le.MousePressRight(coordDwellingMonster6));
+	if(building & DWELLING_MONSTER6 && le.MousePressRight(coordDwellingMonster6))
+	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5]);
 
 	// status message exit
 	if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(isCastle() ? "Exit castle" : "Exit town");
@@ -712,9 +934,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	// clear all
 	if(! statusBar.isEmpty()) statusBar.Clear();
+
+	// redraw animation
+	for(it_animation_current = it_animation_begin; it_animation_current != it_animation_end; ++it_animation_current)
+	    if((*it_animation_current).first & building) (*(*it_animation_current).second).DrawSprite();
     }
 
     le.ResetKey();
+
+    // free animation resource
+    for(it_animation_current = it_animation_begin; it_animation_current != it_animation_end; ++it_animation_current)
+	delete (*it_animation_current).second;
 
     Cursor::Show();
 
@@ -824,75 +1054,4 @@ void Castle::RedrawResourcePanel(void)
     dst_pt.y = src_rt.y + 166;
     const Sprite & exit = AGG::GetICN("SWAPBTN.ICN", 0);
     display.Blit(exit, dst_pt);
-}
-
-void Castle::OpenTavern(void)
-{
-    const std::string & header = "A generous tip for the barkeep yields the following rumor:";
-    const std::string & system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
-    const std::string & tavern = GetStringBuilding(BUILD_TAVERN);
-    const std::string & message = world.GetRumors();
-
-    Cursor::Hide();
-
-    Dialog::Box box(Text::height(BOXAREA_WIDTH, header, Font::BIG) + 130 + Text::height(BOXAREA_WIDTH, message, Font::BIG), true);
-
-    const Rect & pos = box.GetArea();
-    Point dst_pt(pos);
-
-    Text(pos.x + (pos.w - Text::width(tavern, Font::BIG)) / 2, dst_pt.y, tavern, Font::BIG, true);
-
-    const Sprite & s1 = AGG::GetICN("TAVWIN.ICN", 0);
-    dst_pt.x = pos.x + (pos.w - s1.w()) / 2;
-    dst_pt.y = pos.y + 30;
-    display.Blit(s1, dst_pt);
-
-    const Sprite & s2 = AGG::GetICN("TAVWIN.ICN", 1);
-    dst_pt.x += 3;
-    dst_pt.y += 3;
-    display.Blit(s2, dst_pt);
-
-    Rect rt(pos.x, dst_pt.y + s1.h() + 10, pos.w, pos.h);
-    TextBox(rt, header, Font::BIG, true);
-
-    rt.y += 60;
-    TextBox(rt, message, Font::BIG, true);
-
-    Animation animeBeer(dst_pt, "TAVWIN.ICN", 2, 20, false, Animation::INFINITY | Animation::RING | Animation::LOW);
-
-    const Sprite & s3 = animeBeer.GetFirstSprite();
-    dst_pt.x += s3.x();
-    dst_pt.y += s3.y();
-    display.Blit(s3, dst_pt);
-
-    // button yes
-    const Sprite & s4 = AGG::GetICN(system, 5);
-    dst_pt.x = pos.x + (pos.w - s4.w()) / 2;
-    dst_pt.y = pos.y + pos.h + BUTTON_HEIGHT - s4.h();
-    Button buttonYes(dst_pt, system, 5, 6);
-
-    display.Flip();
-    Cursor::Show();
-
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-   
-    le.ResetKey();
-
-    // message loop
-    bool exit = false;
-
-    while(!exit)
-    {
-        le.HandleEvents();
-
-        le.MousePressLeft(buttonYes) ? buttonYes.Press() : buttonYes.Release();
-
-        if(le.MouseClickLeft(buttonYes) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)){ exit = true; }
-
-	animeBeer.DrawSprite();
-    }
-
-    le.ResetKey();
-
-    Cursor::Show();
 }

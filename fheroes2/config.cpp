@@ -27,6 +27,8 @@
 #include "config.h"
 
 namespace H2Config {
+    static const u8 major_version = MAJOR_VERSION;
+    static const u8 minor_version = MINOR_VERSION;
     static u16  boolValue = ANIMATION | ORIGINAL;
     static std::string pathAGGFile("heroes2.agg");
     static std::string pathMapsDirectory("maps");

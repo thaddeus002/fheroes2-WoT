@@ -21,11 +21,13 @@
 #include "difficulty.h"
 #include "config.h"
 #include "error.h"
+#include "payment.h"
 #include "world.h"
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
-    : building(0), army_spread(false), army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
+    : building(0), army_spread(false), allow_build(true), dwelling(CASTLEMAXMONSTER, 0),
+      army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
 {
     const u8  *byte8  = static_cast<const u8 *>(ptr);
     const u16 *byte16 = NULL;
@@ -68,7 +70,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	// dwelling
 	swap16 = *byte16;
 	SWAP16(swap16);
-        if(0x0004 & swap16) building |= DWELLING_MONSTER1;
+        if(0x0008 & swap16) building |= DWELLING_MONSTER1;
         if(0x0010 & swap16) building |= DWELLING_MONSTER2;
         if(0x0020 & swap16) building |= DWELLING_MONSTER3;
         if(0x0040 & swap16) building |= DWELLING_MONSTER4;
@@ -227,6 +229,19 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
         	break;
 	}
     }
+    // dwelling pack
+    if(building & DWELLING_MONSTER1) dwelling[0]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1));
+    if(building & DWELLING_MONSTER2) dwelling[1]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2));
+    if(building & DWELLING_UPGRADE2) dwelling[1]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE2));
+    if(building & DWELLING_MONSTER3) dwelling[2]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3));
+    if(building & DWELLING_UPGRADE3) dwelling[2]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE3));
+    if(building & DWELLING_MONSTER4) dwelling[3]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4));
+    if(building & DWELLING_UPGRADE4) dwelling[3]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE4));
+    if(building & DWELLING_MONSTER5) dwelling[4]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5));
+    if(building & DWELLING_UPGRADE5) dwelling[4]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE5));
+    if(building & DWELLING_MONSTER6) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6));
+    if(building & DWELLING_UPGRADE6) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE6));
+    if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7));
 
     // modify RND sprites
     if(rnd) CorrectAreaMaps();
@@ -245,10 +260,39 @@ const Heroes * Castle::isHeroesPresent(void)
 
 void Castle::ActionNewDay(void)
 {
+    allow_build = true;
 }
 
 void Castle::ActionNewWeek(void)
 {
+    u8 well = building & BUILD_WELL ? GROWN_WELL : 0;
+    u8 wel2 = building & BUILD_WEL2 ? GROWN_WEL2 : 0;
+
+    // dw 1
+    if(building & DWELLING_MONSTER1) dwelling[0]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)) + well + wel2;
+    else
+    // dw 2
+    if(building & DWELLING_UPGRADE2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE2)) + well;
+    else
+    if(building & DWELLING_MONSTER2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)) + well;
+    // dw 3
+    if(building & DWELLING_UPGRADE3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE3)) + well;
+    else
+    if(building & DWELLING_MONSTER3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)) + well;
+    // dw 4
+    if(building & DWELLING_UPGRADE4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE4)) + well;
+    else
+    if(building & DWELLING_MONSTER4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4)) + well;
+    // dw 5
+    if(building & DWELLING_UPGRADE5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE5)) + well;
+    else
+    if(building & DWELLING_MONSTER5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5)) + well;
+    // dw 6
+    if(building & DWELLING_UPGRADE7) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7)) + well;
+    else
+    if(building & DWELLING_UPGRADE6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE6)) + well;
+    else
+    if(building & DWELLING_MONSTER6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6)) + well;
 }
 
 void Castle::ActionNewMonth(void)
@@ -607,4 +651,248 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
     }
 
     return desc_build[13];
+}
+
+bool Castle::RecrutMonster(building_t dw, u16 count)
+{
+    Monster::monster_t ms = Monster::UNKNOWN;
+
+    u8 dw_index = 0;
+
+    switch(dw)
+    {
+	case DWELLING_MONSTER1:
+	    ms = Monster::Monster(race, DWELLING_MONSTER1);
+	    dw_index = 0;
+	    break;
+	case DWELLING_MONSTER2:
+	    ms = Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2);
+	    dw_index = 1;
+	    break;
+	case DWELLING_MONSTER3:
+	    ms = Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3);
+	    dw_index = 2;
+	    break;
+	case DWELLING_MONSTER4:
+	    ms = Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4);
+	    dw_index = 3;
+	    break;
+	case DWELLING_MONSTER5:
+	    ms = Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5);
+	    dw_index = 4;
+	    break;
+	case DWELLING_MONSTER6:
+	    ms = Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6));
+	    dw_index = 5;
+	    break;	
+	default: return false;
+    }
+
+    // incorrect count
+    if(dwelling[dw_index] < count) return false;
+
+    // find free cell
+    u8 num_cell = CASTLEMAXARMY;
+    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
+	if(ms == army[ii].GetMonster() || 0 == army[ii].GetCount()){ num_cell = ii; break; }
+
+    // not found
+    if(CASTLEMAXARMY <= num_cell) return false;
+
+    // buy
+    const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms) * count);
+    Kingdom & kingdom = const_cast<Kingdom &>(world.GetKingdom(color));
+    
+    if(paymentCosts > kingdom.GetFundsResource()) return false;
+
+    kingdom.OddFundsResource(paymentCosts);
+    
+    army[num_cell].SetMonster(ms);
+    army[num_cell].SetCount(army[num_cell].GetCount() + count);
+
+    dwelling[dw_index] -= count;
+
+    return true;
+}
+
+bool Castle::AllowBuyBuilding(building_t build)
+{
+    // check allow building
+    if(!allow_build) return false;
+
+    // check valid payment
+    if(PaymentConditions::BuyBuilding(race, build) > world.GetMyKingdom().GetFundsResource()) return false;
+    
+    // check build requirements
+    switch(build)
+    {
+	case DWELLING_MONSTER2:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		case Race::BARB:
+		case Race::WZRD:
+		case Race::WRLK:
+		case Race::NECR:
+		    return DWELLING_MONSTER1 & building;
+
+		case Race::SORC:
+		    return (DWELLING_MONSTER1 & building) && (BUILD_TAVERN & building);
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_MONSTER3:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		    return (DWELLING_MONSTER1 & building) && (BUILD_WELL & building);
+
+		case Race::BARB:
+		case Race::SORC:
+		case Race::WZRD:
+		case Race::WRLK:
+		case Race::NECR:
+		    return DWELLING_MONSTER1 & building;
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_MONSTER4:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		    return (DWELLING_MONSTER1 & building) && (BUILD_TAVERN & building);
+
+		case Race::BARB:
+		    return DWELLING_MONSTER1 & building;
+
+		case Race::SORC:
+		    return (DWELLING_MONSTER2 & building) && (BUILD_MAGEGUILD1 & building);
+
+		case Race::WZRD:
+		case Race::WRLK:
+		    return DWELLING_MONSTER2 & building;
+
+		case Race::NECR:
+		    return (DWELLING_MONSTER3 & building) && (BUILD_THIEVESGUILD & building);
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_MONSTER5:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		case Race::BARB:
+		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+
+		case Race::SORC:
+		    return DWELLING_MONSTER4 & building;
+
+		case Race::WRLK:
+		    return DWELLING_MONSTER3 & building;
+
+		case Race::WZRD:
+		    return (DWELLING_MONSTER3 & building) && (BUILD_MAGEGUILD1 & building);
+
+		case Race::NECR:
+		    return (DWELLING_MONSTER2 & building) && (BUILD_MAGEGUILD1 & building);
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_MONSTER6:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+
+		case Race::BARB:
+		case Race::SORC:
+		case Race::NECR:
+		    return DWELLING_MONSTER5 & building;
+
+		case Race::WRLK:
+		case Race::WZRD:
+		    return (DWELLING_MONSTER4 & building) && (DWELLING_MONSTER5 & building);
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE2:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		case Race::BARB:
+		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+
+		case Race::SORC:
+		    return BUILD_WELL & building;
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE3:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+
+		case Race::SORC:
+		    return DWELLING_MONSTER4 & building;
+
+		case Race::WZRD:
+		    return BUILD_WELL & building;
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE4:
+	    switch(race)
+	    {
+		case Race::BARB:
+		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE5:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+
+		case Race::WZRD:
+		    return BUILD_SPEC & building;
+
+		case Race::NECR:
+		    return BUILD_MAGEGUILD2 & building;
+
+		default: break;
+	    }
+	    break;
+
+	case DWELLING_UPGRADE6:
+	    switch(race)
+	    {
+		case Race::KNGT:
+		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		
+		default: break;
+	    }
+	    break;
+
+	default: break;
+    }
+
+    return true;
 }

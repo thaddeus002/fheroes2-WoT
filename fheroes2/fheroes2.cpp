@@ -35,7 +35,14 @@
 int main(int argc, char **argv)
 {
 	std::string caption("Free Heroes II, version: ");
-	String::AddInt(caption, GAME_VERSION);
+	String::AddInt(caption, MAJOR_VERSION);
+	caption += ".";
+	String::AddInt(caption, MINOR_VERSION);
+
+#ifdef BUILD_DATE
+	caption += ", build: ";
+	String::AddInt(caption, BUILD_DATE);
+#endif
 
 	std::cout << caption << std::endl;
 

@@ -27,7 +27,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
     {
 	case Race::KNGT:
 	{
-	    if(BUILD_CASTLE)
+	    if(BUILD_CASTLE & building)
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNKCSTL.ICN", 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -189,7 +189,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(BUILD_CASTLE)
+	    if(BUILD_CASTLE & building)
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNBCSTL.ICN", 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -312,7 +312,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(BUILD_CASTLE)
+	    if(BUILD_CASTLE & building)
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNSCSTL.ICN", 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -435,7 +435,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(BUILD_CASTLE)
+	    if(BUILD_CASTLE & building)
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNWCSTL.ICN", 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -566,7 +566,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(BUILD_CASTLE)
+	    if(BUILD_CASTLE & building)
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNZCSTL.ICN", 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -695,7 +695,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(BUILD_CASTLE)
+	    if(BUILD_CASTLE & building)
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNNCSTL.ICN", 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -780,7 +780,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(u8 level = GetLevelMageGuild() && ((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5) & building))
 	    {
-		const Sprite & sprite = AGG::GetICN("TWNNMAGE.ICN", level - 1);
+		const Sprite & sprite = AGG::GetICN("TWNNMAGE.ICN", (level - 1) * 6);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
@@ -1029,12 +1029,12 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 	case BUILD_TENT:
 	    switch(race)
 	    {
-		//case Race::KNGT:	return Rect(pt.x + , pt.y +);
-		//case Race::BARB:	return Rect(pt.x + , pt.y +);
-		//case Race::SORC:	return Rect(pt.x + , pt.y +);
-		//case Race::WRLK:	return Rect(pt.x + , pt.y +);
-		//case Race::WZRD:	return Rect(pt.x + , pt.y +);
-		//case Race::NECR:	return Rect(pt.x + , pt.y +);
+                case Race::KNGT:        return Rect(pt.x + 82, pt.y + 132, 42, 30);
+                case Race::BARB:        return Rect(pt.x + 53, pt.y + 119, 67, 35);
+                case Race::SORC:        return Rect(pt.x + 88, pt.y + 145, 62, 36);
+                case Race::WRLK:        return Rect(pt.x + 308, pt.y + 140, 52, 28);
+                case Race::WZRD:        return Rect(pt.x + 60, pt.y + 68, 46, 33);
+                case Race::NECR:        return Rect(pt.x + 333, pt.y + 131, 49, 51);
 		default: break;
 	    }
 	    break;
@@ -1043,7 +1043,7 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 	    switch(race)
 	    {
 		case Race::KNGT:	return Rect(pt.x + 195, pt.y + 175, 50, 40);
-		case Race::BARB:	return Rect(pt.x + 208, pt.y + 142, 71, 41);
+		case Race::BARB:	return Rect(pt.x + 258, pt.y + 142, 71, 41);
 		case Race::SORC:	return Rect(pt.x + 478, pt.y + 70, 92, 62);
 		case Race::WRLK:	return Rect(pt.x, pt.y + 63, 68, 53);
 		case Race::WZRD:	return Rect(pt.x + 459, pt.y + 181, 45, 32);

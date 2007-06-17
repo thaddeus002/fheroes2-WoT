@@ -46,7 +46,7 @@ Dialog::FrameBorder::FrameBorder() : Background()
 
     // cursor
     bool localcursor = false;
-    if(pos & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    if(pos & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     Save(pos);
 
@@ -145,7 +145,7 @@ Dialog::FrameBorder::~FrameBorder()
 {
     bool localcursor = false;
 
-    if(Rect(GetPos(), w(), h()) & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    if(Rect(GetPos(), w(), h()) & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
     Restore();
     
     if(localcursor) Cursor::Show();

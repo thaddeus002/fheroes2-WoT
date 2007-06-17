@@ -49,11 +49,10 @@ void Army::SelectBar::Redraw(void)
 	if(army.at(ii).Valid())
 	{
 	    Monster::monster_t monster = army.at(ii).GetMonster();
-	    const Monster::stats_t & stats = Monster::GetStats(monster);
 
 	    u8 index_sprite = 0xFF;
 
-	    switch(stats.race)
+	    switch(Monster::GetRace(monster))
 	    {
 		case Race::KNGT: index_sprite = 4;  break;
 		case Race::BARB: index_sprite = 5;  break;

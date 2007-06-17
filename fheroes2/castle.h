@@ -33,6 +33,9 @@
 #define CASTLEMAXARMY           5 
 #define CASTLEMAXMONSTER        6 
 
+#define GROWN_WELL		2
+#define GROWN_WEL2		8
+
 class Heroes;
 
 class Castle
@@ -76,9 +79,12 @@ public:
     Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
     
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
+    bool AllowBuild(void) const{ return allow_build; };
     bool isBuild(building_t bd) const{ return building & bd; };
     bool HaveNearlySea(void) const{ return false; };
     const Heroes * isHeroesPresent(void);
+    bool RecrutMonster(building_t dw, u16 count);
+    bool AllowBuyBuilding(building_t build);
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
@@ -112,7 +118,13 @@ private:
     
     Rect GetCoordBuilding(building_t building, const Point & pt);
     void RedrawBuilding(const Point & dst_pt);
+    void OpenTown(void);
     void OpenTavern(void);
+    void OpenThievesGuild(void);
+    void OpenWell(void);
+    void OpenMageGuild(void);
+    
+    Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
 
 private:
     Color::color_t	color;
@@ -122,8 +134,9 @@ private:
     bool		captain;
     bool		allow_castle;
     bool		army_spread;
+    bool		allow_build;
     //MageGuild		guild;
-    u16			dwelling[CASTLEMAXMONSTER];
+    std::vector<u16>    dwelling;
     std::vector<Army::Troops> army;
 
     const u32		uniq;

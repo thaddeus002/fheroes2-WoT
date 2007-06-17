@@ -37,77 +37,139 @@ Resource::resource_t Resource::Rand(void)
 
     return Resource::WOOD;
 }
-
-// operator funds_t + funds_t
-Resource::funds_t Resource::operator+ (const Resource::funds_t &pm1, const Resource::funds_t &pm2)
+// operator funds_t +
+const Resource::funds_t Resource::funds_t::operator+ (const Resource::funds_t & pm) const
 {
-    funds_t pm;
-    
-    pm.wood = (MAXU16 - pm2.wood < pm1.wood ? MAXU16 : pm1.wood + pm2.wood);
-    pm.mercury = (MAXU16 - pm2.mercury < pm1.mercury ? MAXU16 : pm1.mercury + pm2.mercury);
-    pm.ore = (MAXU16 - pm2.ore < pm1.ore ? MAXU16 : pm1.ore + pm2.ore);
-    pm.sulfur = (MAXU16 - pm2.sulfur < pm1.sulfur ? MAXU16 : pm1.sulfur + pm2.sulfur);
-    pm.crystal = (MAXU16 - pm2.crystal < pm1.crystal ? MAXU16 : pm1.crystal + pm2.crystal);
-    pm.gems = (MAXU16 - pm2.gems < pm1.gems ? MAXU16 : pm1.gems + pm2.gems);
-    pm.gold = pm1.gold + pm2.gold;
-				
-    return pm;
+    Resource::funds_t res;
+
+    res.wood = wood + pm.wood;
+    res.mercury = mercury + pm.mercury;
+    res.ore = ore + pm.ore;
+    res.sulfur = sulfur + pm.sulfur;
+    res.crystal = crystal + pm.crystal;
+    res.gems = gems + pm.gems;
+    res.gold = gold + pm.gold;
+
+    return res;
 }
 
-// operator funds_t - funds_t
-Resource::funds_t Resource::operator- (const Resource::funds_t &fd1, const Resource::funds_t &fd2)
+const Resource::funds_t & Resource::funds_t::operator+= (const Resource::funds_t & pm)
 {
-    funds_t fd;
+    wood += pm.wood;
+    mercury += pm.mercury;
+    ore += pm.ore;
+    sulfur += pm.sulfur;
+    crystal += pm.crystal;
+    gems += pm.gems;
+    gold += pm.gold;
 
-    fd.wood = (fd2.wood > fd1.wood ? 0 : fd1.wood - fd2.wood);
-    fd.mercury = (fd2.mercury > fd1.mercury ? 0 : fd1.mercury - fd2.mercury);
-    fd.ore = (fd2.ore > fd1.ore ? 0 : fd1.ore - fd2.ore);
-    fd.sulfur = (fd2.sulfur > fd1.sulfur ? 0 : fd1.sulfur - fd2.sulfur);
-    fd.crystal = (fd2.crystal > fd1.crystal ? 0 : fd1.crystal - fd2.crystal);
-    fd.gems = (fd2.gems > fd1.gems ? 0 : fd1.gems - fd2.gems);
-    fd.gold = (fd2.gold > fd1.gold ? 0 : fd1.gold - fd2.gold);
-	    
-    return fd;
+    return *this;
 }
 
-// operator funds_t * int
-Resource::funds_t Resource::operator* (const Resource::funds_t &fd1, int mul)
+// operator funds_t -
+const Resource::funds_t Resource::funds_t::operator- (const Resource::funds_t & pm) const
 {
-    funds_t fd;
+    Resource::funds_t res;
 
-    fd.wood = fd1.wood * mul;
-    fd.mercury = fd1.mercury * mul;
-    fd.ore = fd1.ore * mul;
-    fd.sulfur = fd1.sulfur * mul;
-    fd.crystal = fd1.crystal * mul;
-    fd.gems = fd1.gems * mul;
-    fd.gold = fd1.gold * mul;
+    res.wood = wood - pm.wood;
+    res.mercury = mercury - pm.mercury;
+    res.ore = ore - pm.ore;
+    res.sulfur = sulfur - pm.sulfur;
+    res.crystal = crystal - pm.crystal;
+    res.gems = gems - pm.gems;
+    res.gold = gold - pm.gold;
 
-    return fd;
+    return res;
 }
 
-// operator funds_t < funds_t
-bool Resource::operator< (const funds_t &pm1, const funds_t &pm2)
+const Resource::funds_t & Resource::funds_t::operator-= (const Resource::funds_t & pm)
 {
-    return	pm1.wood <= pm2.wood &&
-		pm1.mercury <= pm2.mercury &&
-		pm1.ore <= pm2.ore &&
-		pm1.sulfur <= pm2.sulfur && 
-		pm1.crystal <= pm2.crystal &&
-		pm1.gems <= pm2.gems &&
-		pm1.gold <= pm2.gold;
+    wood -= pm.wood;
+    mercury -= pm.mercury;
+    ore -= pm.ore;
+    sulfur -= pm.sulfur;
+    crystal -= pm.crystal;
+    gems -= pm.gems;
+    gold -= pm.gold;
+
+    return *this;
 }
 
-// operator funds_t > funds_t
-bool Resource::operator> (const funds_t &pm1, const funds_t &pm2)
+// operator funds_t *
+const Resource::funds_t Resource::funds_t::operator* (u32 mul) const
 {
-    return	pm1.wood >= pm2.wood &&
-		pm1.mercury >= pm2.mercury &&
-		pm1.ore >= pm2.ore &&
-		pm1.sulfur >= pm2.sulfur && 
-		pm1.crystal >= pm2.crystal &&
-		pm1.gems >= pm2.gems &&
-		pm1.gold >= pm2.gold;
+    Resource::funds_t res;
+
+    res.wood = wood * mul;
+    res.mercury = mercury * mul;
+    res.ore = ore * mul;
+    res.sulfur = sulfur * mul;
+    res.crystal = crystal * mul;
+    res.gems = gems * mul;
+    res.gold = gold * mul;
+
+    return res;
+}
+
+const Resource::funds_t & Resource::funds_t::operator*= (u32 mul)
+{
+    wood *= mul;
+    mercury *= mul;
+    ore *= mul;
+    sulfur *= mul;
+    crystal *= mul;
+    gems *= mul;
+    gold *= mul;
+
+    return *this;
+}
+
+// operator funds_t <
+bool Resource::funds_t::operator< (const funds_t & pm) const
+{
+    return      wood < pm.wood &&
+                mercury < pm.mercury &&
+                ore < pm.ore &&
+                sulfur < pm.sulfur &&
+                crystal < pm.crystal &&
+                gems < pm.gems &&
+                gold < pm.gold;
+}
+
+// operator funds_t <=
+bool Resource::funds_t::operator<= (const funds_t & pm) const
+{
+    return      wood <= pm.wood &&
+                mercury <= pm.mercury &&
+                ore <= pm.ore &&
+                sulfur <= pm.sulfur &&
+                crystal <= pm.crystal &&
+                gems <= pm.gems &&
+                gold <= pm.gold;
+}
+
+// operator funds_t >
+bool Resource::funds_t::operator> (const funds_t & pm) const
+{
+    return      wood > pm.wood ||
+                mercury > pm.mercury ||
+                ore > pm.ore ||
+                sulfur > pm.sulfur ||
+                crystal > pm.crystal ||
+                gems > pm.gems ||
+                gold > pm.gold;
+}
+
+// operator funds_t >=
+bool Resource::funds_t::operator>= (const funds_t & pm) const
+{
+    return      wood >= pm.wood ||
+                mercury >= pm.mercury ||
+                ore >= pm.ore ||
+                sulfur >= pm.sulfur ||
+                crystal >= pm.crystal ||
+                gems >= pm.gems ||
+                gold >= pm.gold;
 }
 
 /* name resource */

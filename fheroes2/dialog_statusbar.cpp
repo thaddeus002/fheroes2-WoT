@@ -52,6 +52,24 @@ void Dialog::StatusBar::Clear(void)
     if(localcursor) Cursor::Show();
 }
 
+void Dialog::StatusBar::Clear(const std::string & message)
+{
+    if(message == status) return;
+
+    bool localcursor = Cursor::Visible();
+
+    if(localcursor) Cursor::Hide();
+
+    display.Blit(sprite, pos_pt);
+
+    status = message;
+
+    Text(pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
+         pos_pt.y + (sprite.h() - Text::height(sprite.w(), message, font)) / 2, message, font, true);
+
+    if(localcursor) Cursor::Show();
+}
+
 bool Dialog::StatusBar::isEmpty(void)
 {
     return status.empty();

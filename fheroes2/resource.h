@@ -49,7 +49,23 @@ namespace Resource
 	BOTTLE,
     } other_t;
 
-    typedef struct {
+    class funds_t
+    {
+    public:
+	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};
+
+	const funds_t operator+ (const funds_t &pm) const;
+	const funds_t operator* (u32 mul) const;
+	const funds_t operator- (const funds_t &pm) const;
+	const funds_t & operator+= (const funds_t &pm);
+	const funds_t & operator*= (u32 mul);
+	const funds_t & operator-= (const funds_t &pm);
+
+	bool operator< (const funds_t &pm) const;
+	bool operator<= (const funds_t &pm) const;
+	bool operator> (const funds_t &pm) const;
+	bool operator>= (const funds_t &pm) const;
+
         u16 wood;
         u16 mercury;
         u16 ore;
@@ -57,13 +73,7 @@ namespace Resource
         u16 crystal;
         u16 gems;
         u32 gold;
-    } funds_t;
-
-    funds_t operator+ (const funds_t &pm1, const funds_t &pm2);
-    funds_t operator* (const funds_t &pm1, int mul);
-    funds_t operator- (const funds_t &pm1, const funds_t &pm2);
-    bool operator< (const funds_t &pm1, const funds_t &pm2);
-    bool operator> (const funds_t &pm1, const funds_t &pm2);
+    };
 
     const std::string & String(resource_t resource);
 

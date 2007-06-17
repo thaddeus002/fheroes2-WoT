@@ -65,10 +65,14 @@ public:
     inline bool operator& (const Point & pt) const{ return !(pt.x < x || pt.y < y || pt.x >= (x + w) || pt.y >= (y + h)); };
     // rect intersects rect
     inline bool operator& (const Rect & rt) const{ return
-	*this & Point(rt.x, rt.y) ||
-	*this & Point(rt.x + rt.w, rt.y) ||
-	*this & Point(rt.x, rt.y + rt.h) ||
-	*this & Point(rt.x + rt.w, rt.y + rt.h); };
+	(rt.x > x && rt.x < x + w ||
+	rt.x + rt.w > x && rt.x + rt.w < x + w ||
+	x > rt.x && x < rt.x + rt.w ||
+	x + w > rt.x && x + w < rt.x + rt.w) &&
+	(rt.y > y && rt.y < y + h ||
+	rt.y + rt.h > y && rt.y + rt.h < y + h ||
+	y > rt.y && y < rt.y + rt.h ||
+	y + h > rt.y && y + h < rt.y + rt.h); };
 };
 
 #endif

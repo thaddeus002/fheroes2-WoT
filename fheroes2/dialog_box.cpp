@@ -53,7 +53,7 @@ Dialog::Box::Box(u16 height, bool buttons)
     if(buttons) area.h -= BUTTON_HEIGHT;
 
     bool localcursor = false;
-    if(pos & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    if(pos & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     back.Save(pos);
 
@@ -96,7 +96,7 @@ Dialog::Box::~Box()
 {
     bool localcursor = false;
 
-    if(Rect(back.GetPos(), back.w(), back.h()) & LocalEvent::MouseCursor() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    if(Rect(back.GetPos(), back.w(), back.h()) & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
     back.Restore();
 
     if(localcursor) Cursor::Show();

@@ -432,7 +432,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
 
     // bottom small bar
     Dialog::StatusBar statusBar(Point(cur_pt.x + 22, cur_pt.y + 460), AGG::GetICN("HSBTNS.ICN", 8), Font::BIG);
-    statusBar.Clear();
+    statusBar.Clear("Hero Screen");
 
     // button prev
     dst_pt.x = cur_pt.x + 1;
@@ -710,7 +710,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
 		if(ii < artifacts.size() && Artifact::UNKNOWN != artifacts[ii])
 		    statusBar.ShowMessage("View " + Artifact::String(artifacts[ii]) + " Info");
 		else
-		    statusBar.Clear();
+		    statusBar.Clear("Hero Screen");
 	    }
 	}
 	else
@@ -725,7 +725,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
 		if(Skill::NONE != skill)
 		    statusBar.ShowMessage("View " + Skill::LevelString(level) + " " + Skill::String(skill) + " Info");
 		else
-		    statusBar.Clear();
+		    statusBar.Clear("Hero Screen");
 	    }
 	}
 	else
@@ -759,7 +759,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
 	}
 	else
         // clear all
-        if(! statusBar.isEmpty()) statusBar.Clear();
+        if(! statusBar.isEmpty()) statusBar.Clear("Hero Screen");
     }
 
     le.ResetKey();

@@ -23,6 +23,7 @@
 #include <string>
 #include "gamedefs.h"
 #include "background.h"
+#include "monster.h"
 #include "rect.h"
 #include "game.h"
 
@@ -66,6 +67,10 @@ namespace Dialog
     // redistribute count
     u16 SelectCount(u16 max);
 
+    // recrut monster
+    u16 RecrutMonster(const Monster::monster_t & monster, u16 available);
+    void DwellingInfo(const Monster::monster_t & monster, u16 available);
+
 class Box
 {
 public:
@@ -98,6 +103,7 @@ public:
 
     void ShowMessage(const std::string & message);
     void Clear(void);
+    void Clear(const std::string & message);
     bool isEmpty(void);
 
 private:
