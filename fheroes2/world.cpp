@@ -731,18 +731,18 @@ void World::NextDay(void)
     begin_month = (begin_week && !(week % WEEKOFMONTH) ? true : false);
 
     // action new day
-    for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) (*vec_kingdoms[ii]).ActionNewDay();
+    for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewDay();
 
     // action new week
     if(begin_week)
     {
-        for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) (*vec_kingdoms[ii]).ActionNewWeek();
+        for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewWeek();
     }
     
     // action new month
     if(begin_month)
     {
-        for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) (*vec_kingdoms[ii]).ActionNewMonth();
+        for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewMonth();
     }
 }
 

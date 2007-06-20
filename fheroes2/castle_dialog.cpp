@@ -200,14 +200,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNKTHIE.ICN", 1, 5, false, amode)));
 	    // tavern
 	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNKTVRN.ICN", 1, 5, false, amode)));
-	    // dock or boat
-	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNKDOCK.ICN", 1, 5, false, amode)));
+	    // sea, dock or boat
+            if(HaveNearlySea())
+            {
+        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNKBOAT.ICN", 1, 9, false, amode)));
+        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNKDOCK.ICN", 1, 5, false, amode)));
+        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNKEXT0.ICN", 1, 5, false, amode)));
+    	    }
 	    // left turret
 	    vect_animation.push_back(specanim_t(BUILD_LEFTTURRET, new Animation(cur_pt, "TWNKLTUR.ICN", 1, 5, false, amode)));
 	    // right turret
 	    vect_animation.push_back(specanim_t(BUILD_RIGHTTURRET, new Animation(cur_pt, "TWNKRTUR.ICN", 1, 5, false, amode)));
-	    // ext0
-	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNKEXT0.ICN", 1, 5, false, amode)));
 	    // monster 1
 	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNKDW_0.ICN", 1, 5, false, amode)));
 	    // monster 3
@@ -224,13 +227,15 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNBCSTL.ICN", 1, 6, false, amode)));
 	    // captain
 	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNBCAPT.ICN", 1, 5, false, amode)));
-	    // dock or boat
-	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBDOCK.ICN", 1, 5, false, amode)));
-	    //vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBBOAT.ICN", 1, 9, false, amode)));
+	    // sea, dock or boat
+            if(HaveNearlySea())
+            {
+        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNBBOAT.ICN", 1, 9, false, amode)));
+        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBDOCK.ICN", 1, 5, false, amode)));
+        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNBEXT0.ICN", 1, 5, false, amode)));
+    	    }
 	    // moat
 	    vect_animation.push_back(specanim_t(BUILD_MOAT, new Animation(cur_pt, "TWNBMOAT.ICN", 1, 5, false, amode)));
-	    // ext0 (sea)
-	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNBEXT0.ICN", 1, 5, false, amode)));
 	    // ext1 (stream)
 	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNBEXT1.ICN", 1, 5, false, amode)));
 	    // monster 4
@@ -255,14 +260,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNSTHIE.ICN", 1, 5, false, amode)));
 	    // tavern
 	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNSTVRN.ICN", 1, 5, false, amode)));
-	    // dock or boat
-	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNSDOCK.ICN", 1, 5, false, amode)));
+	    // sea, dock or boat
+            if(HaveNearlySea())
+            {
+        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNSBOAT.ICN", 1, 9, false, amode)));
+        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNSDOCK.ICN", 1, 5, false, amode)));
+        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNSEXT0.ICN", 1, 5, false, amode)));
+    	    }
 	    // wel2
 	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNSWEL2.ICN", 1, 5, false, amode)));
 	    // ext1
 	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNSEXT1.ICN", 1, 5, false, amode)));
-	    // ext0
-	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNSEXT0.ICN", 1, 5, false, amode)));
 	    // monster 1
 	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNSDW_0.ICN", 1, 5, false, amode)));
 	    // monster 2
@@ -276,14 +284,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNWCSTL.ICN", 1, 5, false, amode)));
 	    // captain
 	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNWCAPT.ICN", 1, 5, false, amode)));
-	    // dock or boat
-	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNWDOCK.ICN", 1, 5, false, amode)));
+	    // sea, dock or boat
+            if(HaveNearlySea())
+            {
+        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNWBOAT.ICN", 1, 9, false, amode)));
+        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNWDOCK.ICN", 1, 5, false, amode)));
+        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNWEXT0.ICN", 1, 5, false, amode)));
+    	    }
 	    // moat
 	    vect_animation.push_back(specanim_t(BUILD_MOAT, new Animation(cur_pt, "TWNWMOAT.ICN", 1, 5, false, amode)));
 	    // wel2
 	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNWWEL2.ICN", 1, 6, false, amode)));
-	    // ext0
-	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNWEXT0.ICN", 1, 5, false, amode)));
 	    // monster 1
 	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNWDW_0.ICN", 1, 6, false, amode)));
 	}
@@ -296,10 +307,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNZTHIE.ICN", 1, 5, false, amode)));
 	    // tavern
 	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNZTVRN.ICN", 1, 6, false, amode)));
-	    // dock or boat
-	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNZDOCK.ICN", 1, 5, false, amode)));
-	    // ext0
-	    vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNZEXT0.ICN", 1, 5, false, amode)));
+	    // sea, dock or boat
+            if(HaveNearlySea())
+            {
+        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNZBOAT.ICN", 1, 9, false, amode)));
+        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNZDOCK.ICN", 1, 5, false, amode)));
+        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNZEXT0.ICN", 1, 5, false, amode)));
+    	    }
 	    // monster 1
 	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNZDW_0.ICN", 1, 5, false, amode)));
 	    // monster 3
@@ -311,12 +325,15 @@ Dialog::answer_t Castle::OpenDialog(void)
 	{
 	    // castle
 	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNNCSTL.ICN", 1, 5, false, amode)));
-	    // dock or boat
-	    vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNNDOCK.ICN", 1, 5, false, amode)));
+	    // sea, dock or boat
+            if(HaveNearlySea())
+            {
+        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNNBOAT.ICN", 1, 9, false, amode)));
+        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNNDOCK.ICN", 1, 5, false, amode)));
+        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNNEXT0.ICN", 1, 5, false, amode)));
+    	    }
 	    // wel2
 	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNNWEL2.ICN", 1, 6, false, amode)));
-	    // ext0
-	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNNEXT0.ICN", 1, 5, false, amode)));
 	    // monster 3
 	    vect_animation.push_back(specanim_t(DWELLING_MONSTER3, new Animation(cur_pt, "TWNNDW_2.ICN", 1, 5, false, amode)));
 	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE3, new Animation(cur_pt, "TWNNUP_2.ICN", 1, 5, false, amode)));

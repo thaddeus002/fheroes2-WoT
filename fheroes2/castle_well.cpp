@@ -50,7 +50,7 @@ void Castle::OpenWell(void)
     str = "Town Population Information and Statistics";
     dst_pt.x = cur_pt.x + 280 - Text::width(str, Font::BIG) / 2;
     dst_pt.y = cur_pt.y + 462;
-    Text::Text(dst_pt.x, dst_pt.y, str, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, str, Font::BIG, true);
 
     // button exit
     dst_pt.x = cur_pt.x + 578;
@@ -141,7 +141,7 @@ void Castle::OpenWell(void)
 	str = GetStringBuilding(dw_orig, race);
 	dst_pt.x = pt.x + 86 - Text::width(str, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 103;
-	Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	// monster
 	str = 10 > monster.monster ? "MONH000" : "MONH00";
 	String::AddInt(str, monster.monster);
@@ -154,19 +154,19 @@ void Castle::OpenWell(void)
 	str = monster.name;
 	dst_pt.x = pt.x + 122 - Text::width(monster.name, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 16;
-	Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	// attack
 	str = "Attack: ";
 	String::AddInt(str, monster.attack);
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 22;
-	Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	// defense
 	str = "Defense: ";
 	String::AddInt(str, monster.defence);
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 34;
-	Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	// damage
 	str = "Damg: ";
 	String::AddInt(str, monster.damageMin);
@@ -174,22 +174,22 @@ void Castle::OpenWell(void)
 	String::AddInt(str, monster.damageMax);
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 46;
-	Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	// hp
 	str = "HP: ";
 	String::AddInt(str, monster.hp);
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
         dst_pt.y = pt.y + 58;
-	Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
         // speed
         str = "Speed:";
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
         dst_pt.y = pt.y + 78;
-        Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+        Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	str = Speed::String(monster.speed);
         dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
         dst_pt.y = pt.y + 90;
-	Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	
 	if(present)
 	{
@@ -200,23 +200,23 @@ void Castle::OpenWell(void)
     	    str = "Growth";
 	    dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
     	    dst_pt.y = pt.y + 110;
-    	    Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    	    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	    str = "+ ";
 	    String::AddInt(str, grown);
     	    str += " / week";
 	    dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
     	    dst_pt.y = pt.y + 122;
-    	    Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    	    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 
     	    str = "Available:";
 	    dst_pt.x = pt.x + 44;
     	    dst_pt.y = pt.y + 122;
-    	    Text::Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);	    
+    	    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
 	    str.clear();
 	    String::AddInt(str, available);
     	    dst_pt.x = pt.x + 129 - Text::width(str, Font::BIG) / 2;
     	    dst_pt.y = pt.y + 119;
-	    Text::Text(dst_pt.x, dst_pt.y, str, Font::BIG, true);
+	    Text(dst_pt.x, dst_pt.y, str, Font::BIG, true);
 	}
 	
 	dw <<= 1;

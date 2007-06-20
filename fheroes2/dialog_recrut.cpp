@@ -61,7 +61,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
     std::string message("Recrut " + Monster::String(monster));
 
     // text recrut monster
-    Text::Text(pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 25, message, Font::BIG, true);
+    Text(pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 25, message, Font::BIG, true);
 
     // sprite monster
     message = 10 > monster ? "MONH000" : "MONH00";
@@ -102,7 +102,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
                         paymentMonster.sulfur ||
                         paymentMonster.gems ? 183 : 205);
     dst_pt.y = pos.y + 103;
-    Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+    Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
 
     // crystal
     if(paymentMonster.crystal)
@@ -120,7 +120,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
         String::AddInt(message, paymentMonster.crystal);
         dst_pt.x = pos.x + 240;
         dst_pt.y = pos.y + 103;
-        Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+        Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // mercury
@@ -139,7 +139,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
         String::AddInt(message, paymentMonster.mercury);
         dst_pt.x = pos.x + 240;
         dst_pt.y = pos.y + 103;
-        Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+        Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // wood
@@ -158,7 +158,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
         String::AddInt(message, paymentMonster.wood);
         dst_pt.x = pos.x + 240;
         dst_pt.y = pos.y + 103;
-        Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+        Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // ore
@@ -177,7 +177,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
         String::AddInt(message, paymentMonster.ore);
         dst_pt.x = pos.x + 240;
         dst_pt.y = pos.y + 103;
-        Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+        Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // sulfur
@@ -196,7 +196,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
         String::AddInt(message, paymentMonster.sulfur);
         dst_pt.x = pos.x + 240;
         dst_pt.y = pos.y + 103;
-        Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+        Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // gems
@@ -215,14 +215,14 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
         String::AddInt(message, paymentMonster.gems);
         dst_pt.x = pos.x + 240;
         dst_pt.y = pos.y + 103;
-        Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+        Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
 
     // text number buy
     message = "Number to buy:";
     dst_pt.x = pos.x + 30;
     dst_pt.y = pos.y + 163;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
 
     Background static_info(Rect(pos.x + 16, pos.y + 125, pos.w - 32, 122));
     static_info.Save();
@@ -230,10 +230,10 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
 #define RedrawCurrentInfo \
     message = "Available: "; \
     String::AddInt(message, available); \
-    Text::Text(pos.x + 70 - Text::width(message, Font::SMALL) / 2, pos.y + 130, message, Font::SMALL, true); \
+    Text(pos.x + 70 - Text::width(message, Font::SMALL) / 2, pos.y + 130, message, Font::SMALL, true); \
     message.clear(); \
     String::AddInt(message, result); \
-    Text::Text(pos.x + 167 - Text::width(message, Font::BIG) / 2, pos.y + 160, message, Font::BIG, true); \
+    Text(pos.x + 167 - Text::width(message, Font::BIG) / 2, pos.y + 160, message, Font::BIG, true); \
     if(paymentMonster.ore || \
        paymentMonster.wood || \
        paymentMonster.mercury || \
@@ -243,7 +243,7 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
     { \
 	message.clear(); \
 	String::AddInt(message, paymentCosts.gold); \
-	Text::Text(pos.x + 133 - Text::width(message, Font::SMALL) / 2, pos.y + 228, message, Font::SMALL, true); \
+	Text(pos.x + 133 - Text::width(message, Font::SMALL) / 2, pos.y + 228, message, Font::SMALL, true); \
 	message.clear(); \
 	if(paymentMonster.ore) String::AddInt(message, paymentCosts.ore); \
         else \
@@ -256,13 +256,13 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
         if(paymentMonster.sulfur) String::AddInt(message, paymentCosts.sulfur); \
         else \
         if(paymentMonster.gems) String::AddInt(message, paymentCosts.gems); \
-	Text::Text(pos.x + 195 - Text::width(message, Font::SMALL) / 2, pos.y + 228, message, Font::SMALL, true); \
+	Text(pos.x + 195 - Text::width(message, Font::SMALL) / 2, pos.y + 228, message, Font::SMALL, true); \
     } \
     else \
     { \
 	message.clear(); \
 	String::AddInt(message, paymentCosts.gold); \
-	Text::Text(pos.x + 160 - Text::width(message, Font::SMALL) / 2, pos.y + 228, message, Font::SMALL, true); \
+	Text(pos.x + 160 - Text::width(message, Font::SMALL) / 2, pos.y + 228, message, Font::SMALL, true); \
     }
 
     RedrawCurrentInfo;
@@ -381,7 +381,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     std::string message("Recrut " + Monster::String(monster));
 
     // text recrut monster
-    Text::Text(pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 25, message, Font::BIG, true);
+    Text(pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 25, message, Font::BIG, true);
 
     // sprite monster
     message = 10 > monster ? "MONH000" : "MONH00";
@@ -413,7 +413,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
                         paymentMonster.sulfur ||
                         paymentMonster.gems ? 183 : 205);
     dst_pt.y = pos.y + 103;
-    Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+    Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     // crystal
     if(paymentMonster.crystal)
     {
@@ -426,7 +426,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 	String::AddInt(message, paymentMonster.crystal);
 	dst_pt.x = pos.x + 240;
 	dst_pt.y = pos.y + 103;
-	Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+	Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // mercury
@@ -441,7 +441,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 	String::AddInt(message, paymentMonster.mercury);
 	dst_pt.x = pos.x + 240;
 	dst_pt.y = pos.y + 103;
-	Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+	Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // wood
@@ -456,7 +456,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 	String::AddInt(message, paymentMonster.wood);
 	dst_pt.x = pos.x + 240;
 	dst_pt.y = pos.y + 103;
-	Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+	Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // ore
@@ -471,7 +471,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 	String::AddInt(message, paymentMonster.ore);
 	dst_pt.x = pos.x + 240;
 	dst_pt.y = pos.y + 103;
-	Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+	Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // sulfur
@@ -486,7 +486,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 	String::AddInt(message, paymentMonster.sulfur);
 	dst_pt.x = pos.x + 240;
 	dst_pt.y = pos.y + 103;
-	Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+	Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
     else
     // gems
@@ -501,13 +501,13 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 	String::AddInt(message, paymentMonster.gems);
 	dst_pt.x = pos.x + 240;
 	dst_pt.y = pos.y + 103;
-	Text::Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
+	Text(dst_pt.x - Text::width(message, Font::SMALL)/2, dst_pt.y, message, Font::SMALL, true);
     }
 
     // text available
     message = "Available: ";
     String::AddInt(message, available);
-    Text::Text(pos.x + 70 - Text::width(message, Font::SMALL) / 2, pos.y + 130, message, Font::SMALL, true);
+    Text(pos.x + 70 - Text::width(message, Font::SMALL) / 2, pos.y + 130, message, Font::SMALL, true);
     message.clear();
 
     display.Flip();

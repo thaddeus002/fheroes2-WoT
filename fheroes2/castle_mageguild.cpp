@@ -53,7 +53,7 @@ void Castle::OpenMageGuild(void)
     message = "The above spells have been added to your book.";
     dst_pt.x = cur_pt.x + 280 - Text::width(message, Font::BIG) / 2;
     dst_pt.y = cur_pt.y + 461;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     // sprite
     switch(race)

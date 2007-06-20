@@ -715,15 +715,33 @@ bool Castle::RecrutMonster(building_t dw, u16 count)
     return true;
 }
 
-bool Castle::AllowBuyBuilding(building_t build)
+u16 Castle::GetDwellingLivedCount(building_t dw)
 {
-    // check allow building
-    if(!allow_build) return false;
+   switch(dw)
+   {
+      case DWELLING_MONSTER1: return dwelling[0];
+      case DWELLING_MONSTER2:
+      case DWELLING_UPGRADE2: return dwelling[1];
+      case DWELLING_MONSTER3:
+      case DWELLING_UPGRADE3: return dwelling[2];
+      case DWELLING_MONSTER4:
+      case DWELLING_UPGRADE4: return dwelling[3];
+      case DWELLING_MONSTER5:
+      case DWELLING_UPGRADE5: return dwelling[4];
+      case DWELLING_MONSTER6:
+      case DWELLING_UPGRADE6:
+      case DWELLING_UPGRADE7: return dwelling[5];
+      
+      default: break;
+    }
 
-    // check valid payment
-    if(PaymentConditions::BuyBuilding(race, build) > world.GetMyKingdom().GetFundsResource()) return false;
-    
-    // check build requirements
+    return 0;                                                                 
+}
+
+void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & build, std::vector<building_t> & requires)
+{
+	requires.clear();
+
     switch(build)
     {
 	case DWELLING_MONSTER2:
@@ -734,10 +752,13 @@ bool Castle::AllowBuyBuilding(building_t build)
 		case Race::WZRD:
 		case Race::WRLK:
 		case Race::NECR:
-		    return DWELLING_MONSTER1 & building;
+		    requires.push_back(DWELLING_MONSTER1);
+			break;
 
 		case Race::SORC:
-		    return (DWELLING_MONSTER1 & building) && (BUILD_TAVERN & building);
+		    requires.push_back(DWELLING_MONSTER1);
+			requires.push_back(BUILD_TAVERN);
+			break;
 
 		default: break;
 	    }
@@ -747,14 +768,17 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    return (DWELLING_MONSTER1 & building) && (BUILD_WELL & building);
+		    requires.push_back(DWELLING_MONSTER1);
+			requires.push_back(BUILD_WELL);
+			break;
 
 		case Race::BARB:
 		case Race::SORC:
 		case Race::WZRD:
 		case Race::WRLK:
 		case Race::NECR:
-		    return DWELLING_MONSTER1 & building;
+		    requires.push_back(DWELLING_MONSTER1);
+			break;
 
 		default: break;
 	    }
@@ -764,20 +788,28 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    return (DWELLING_MONSTER1 & building) && (BUILD_TAVERN & building);
+		    requires.push_back(DWELLING_MONSTER1);
+			requires.push_back(BUILD_TAVERN);
+			break;
 
 		case Race::BARB:
-		    return DWELLING_MONSTER1 & building;
+		    requires.push_back(DWELLING_MONSTER1);
+			break;
 
 		case Race::SORC:
-		    return (DWELLING_MONSTER2 & building) && (BUILD_MAGEGUILD1 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(BUILD_MAGEGUILD1);
+			break;
 
 		case Race::WZRD:
 		case Race::WRLK:
-		    return DWELLING_MONSTER2 & building;
+		    requires.push_back(DWELLING_MONSTER2);
+			break;
 
 		case Race::NECR:
-		    return (DWELLING_MONSTER3 & building) && (BUILD_THIEVESGUILD & building);
+		    requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(BUILD_THIEVESGUILD);
+			break;
 
 		default: break;
 	    }
@@ -788,19 +820,28 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    {
 		case Race::KNGT:
 		case Race::BARB:
-		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(DWELLING_MONSTER4);
+			break;
 
 		case Race::SORC:
-		    return DWELLING_MONSTER4 & building;
+		    requires.push_back(DWELLING_MONSTER4);
+			break;
 
 		case Race::WRLK:
-		    return DWELLING_MONSTER3 & building;
+		    requires.push_back(DWELLING_MONSTER3);
+			break;
 
 		case Race::WZRD:
-		    return (DWELLING_MONSTER3 & building) && (BUILD_MAGEGUILD1 & building);
+		    requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(BUILD_MAGEGUILD1);
+			break;
 
 		case Race::NECR:
-		    return (DWELLING_MONSTER2 & building) && (BUILD_MAGEGUILD1 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(BUILD_MAGEGUILD1);
+			break;
 
 		default: break;
 	    }
@@ -810,16 +851,22 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(DWELLING_MONSTER4);
+			break;
 
 		case Race::BARB:
 		case Race::SORC:
 		case Race::NECR:
-		    return DWELLING_MONSTER5 & building;
+		    requires.push_back(DWELLING_MONSTER5);
+			break;
 
 		case Race::WRLK:
 		case Race::WZRD:
-		    return (DWELLING_MONSTER4 & building) && (DWELLING_MONSTER5 & building);
+		    requires.push_back(DWELLING_MONSTER4);
+			requires.push_back(DWELLING_MONSTER5);
+			break;
 
 		default: break;
 	    }
@@ -830,11 +877,20 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    {
 		case Race::KNGT:
 		case Race::BARB:
-		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(DWELLING_MONSTER4);
+			break;
 
 		case Race::SORC:
-		    return BUILD_WELL & building;
+			requires.push_back(DWELLING_MONSTER2);
+		    requires.push_back(BUILD_WELL);
+			break;
 
+		case Race::NECR:
+			requires.push_back(DWELLING_MONSTER2);
+			break;
+		
 		default: break;
 	    }
 	    break;
@@ -843,13 +899,24 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(DWELLING_MONSTER4);
+			break;
 
 		case Race::SORC:
-		    return DWELLING_MONSTER4 & building;
+			requires.push_back(DWELLING_MONSTER3);
+		    requires.push_back(DWELLING_MONSTER4);
+			break;
 
 		case Race::WZRD:
-		    return BUILD_WELL & building;
+			requires.push_back(DWELLING_MONSTER3);
+		    requires.push_back(BUILD_WELL);
+			break;
+
+		case Race::NECR:
+			requires.push_back(DWELLING_MONSTER3);
+			break;
 
 		default: break;
 	    }
@@ -858,8 +925,18 @@ bool Castle::AllowBuyBuilding(building_t build)
 	case DWELLING_UPGRADE4:
 	    switch(race)
 	    {
+		case Race::KNGT:
 		case Race::BARB:
-		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(DWELLING_MONSTER4);
+			break;
+
+		case Race::SORC:
+		case Race::WRLK:
+		case Race::NECR:
+			requires.push_back(DWELLING_MONSTER4);
+			break;
 
 		default: break;
 	    }
@@ -869,13 +946,25 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(DWELLING_MONSTER4);
+			requires.push_back(DWELLING_MONSTER5);
+			break;
+		
+		case Race::BARB:
+			requires.push_back(DWELLING_MONSTER5);
+			break;
 
 		case Race::WZRD:
-		    return BUILD_SPEC & building;
+		    requires.push_back(BUILD_SPEC);
+			requires.push_back(DWELLING_MONSTER5);
+			break;
 
 		case Race::NECR:
-		    return BUILD_MAGEGUILD2 & building;
+		    requires.push_back(BUILD_MAGEGUILD2);
+			requires.push_back(DWELLING_MONSTER5);
+			break;
 
 		default: break;
 	    }
@@ -885,7 +974,16 @@ bool Castle::AllowBuyBuilding(building_t build)
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    return (DWELLING_MONSTER2 & building) && (DWELLING_MONSTER3 & building) && (DWELLING_MONSTER4 & building);
+		    requires.push_back(DWELLING_MONSTER2);
+			requires.push_back(DWELLING_MONSTER3);
+			requires.push_back(DWELLING_MONSTER4);
+			requires.push_back(DWELLING_MONSTER6);
+			break;
+
+		case Race::WRLK:
+		case Race::WZRD:
+			requires.push_back(DWELLING_MONSTER6);
+			break;
 		
 		default: break;
 	    }
@@ -893,6 +991,56 @@ bool Castle::AllowBuyBuilding(building_t build)
 
 	default: break;
     }
+}
 
-    return true;
+bool Castle::AllowBuyBuilding(building_t build)
+{
+    // check allow building
+    if(!allow_build) return false;
+
+    // check valid payment
+    if(PaymentConditions::BuyBuilding(race, build) > world.GetMyKingdom().GetFundsResource()) return false;
+    
+    // check build requirements
+	std::vector<building_t> requires;
+	Castle::GetBuildingRequires(race, build, requires);
+
+	if(requires.size())
+	{
+		std::vector<building_t>::const_iterator it1 = requires.begin();
+		std::vector<building_t>::const_iterator it2 = requires.end();
+
+		while(it1 != it2)
+		{
+			if(! (building & *it1)) return false;
+		
+			++it1;
+		}
+	}
+    
+	return true;
+}
+
+void Castle::BuyBuilding(building_t build)
+{
+	Error::Verbose("Castle::BuyBuilding");
+	if(! AllowBuyBuilding(build)) return;
+	
+	const_cast<Kingdom &>(world.GetMyKingdom()).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
+
+	// add build
+	building |= build;
+
+	switch(build)
+	{
+	    case DWELLING_MONSTER1: dwelling[0] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)); break;
+	    case DWELLING_MONSTER2: dwelling[1] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)); break;
+	    case DWELLING_MONSTER3: dwelling[2] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)); break;
+	    case DWELLING_MONSTER4: dwelling[3] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4)); break;
+	    case DWELLING_MONSTER5: dwelling[4] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5)); break;
+	    case DWELLING_MONSTER6: dwelling[5] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6)); break;
+	    default: break;
+	}
+	// disable day build
+	allow_build = false;
 }

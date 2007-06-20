@@ -112,14 +112,17 @@ void Kingdom::ActionNewDay(void)
 	// dungeon for warlock
 	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_SPEC) && Race::WRLK == (*castles[ii]).GetRace() ? INCOME_STATUE_GOLD : 0);
     }
-    
+
     for(u8 ii = 0; ii < heroes.size(); ++ii)
     {
-	if(const Heroes * hero = heroes[ii])
+	const Heroes * hero = heroes[ii];
+
+	if((*hero).GetArtifacts().size())
 	{
-	    std::vector<Artifact::artifact_t>::const_iterator it = (*hero).GetArtifacts().begin();
+	    std::vector<Artifact::artifact_t>::const_iterator it1 = (*hero).GetArtifacts().begin();
+	    std::vector<Artifact::artifact_t>::const_iterator it2 = (*hero).GetArtifacts().end();
 	    
-	    for(; it != (*hero).GetArtifacts().end(); ++it) switch(*it)
+	    for(; it1 != it2; ++it1) switch(*it1)
 	    {
 		case Artifact::ENDLESS_SACK_GOLD:	resource.gold += INCOME_ENDLESS_SACK_GOLD; break;
 		case Artifact::ENDLESS_BAG_GOLD:	resource.gold += INCOME_ENDLESS_BAG_GOLD; break;
@@ -130,7 +133,7 @@ void Kingdom::ActionNewDay(void)
 		case Artifact::ENDLESS_CORD_WOOD:	resource.wood += INCOME_ENDLESS_CORD_WOOD; break;
 		case Artifact::ENDLESS_CART_ORE:	resource.ore += INCOME_ENDLESS_CART_ORE; break;
 		case Artifact::ENDLESS_POUCH_CRYSTAL:	resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL; break;
-		
+
 		default: break;
 	    }
 	}

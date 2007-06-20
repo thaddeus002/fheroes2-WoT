@@ -53,7 +53,7 @@ void Castle::OpenThievesGuild(void)
     message = "Thieves' Guild: Player RanKings";
     dst_pt.x = cur_pt.x + 280 - Text::width(message, Font::BIG) / 2;
     dst_pt.y = cur_pt.y + 461;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     // button exit
     dst_pt.x = cur_pt.x + 578;
@@ -63,67 +63,67 @@ void Castle::OpenThievesGuild(void)
     message = "Number of Towns:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 28;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Number of Castles:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 52;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Number of Heroes:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 76;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Gold in Treasury:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 100;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Wood & Ore:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 124;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Gems, Cr, Slf & Mer:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 148;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Obelisks Found:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 172;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Total Army Strength:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 196;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Income:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 220;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Best Hero:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 306;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Best Hero Stats:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 350;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Personality:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 394;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
     message = "Best Monster:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);
     dst_pt.y = cur_pt.y + 438;
-    Text::Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
 
 
     display.Flip();

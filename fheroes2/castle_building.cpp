@@ -98,7 +98,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(u8 level = GetLevelMageGuild() && ((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5) & building))
+	    if(u8 level = GetLevelMageGuild())
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNKMAGE.ICN", level - 1);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -148,7 +148,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_SHIPYARD & building ? "TWNKDOCK.ICN" : "TWNKEXT0.ICN", 0);
+		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNKBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNKDOCK.ICN" : "TWNKEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 	}
@@ -174,7 +174,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(u8 level = GetLevelMageGuild() && ((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5) & building))
+	    if(u8 level = GetLevelMageGuild())
 	    {
 		const Sprite & sprite1 = AGG::GetICN("TWNBMAGE.ICN", level - 1);
 		display.Blit(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
@@ -280,7 +280,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_SHIPYARD & building ? "TWNBDOCK.ICN" : "TWNBEXT0.ICN", 0);
+		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNBBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNBDOCK.ICN" : "TWNBEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 	}
@@ -300,7 +300,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(u8 level = GetLevelMageGuild() && ((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5) & building))
+	    if(u8 level = GetLevelMageGuild())
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNSMAGE.ICN", level - 1);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -349,7 +349,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_SHIPYARD & building ? "TWNSDOCK.ICN" : "TWNSEXT0.ICN", 0);
+		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNSBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNSDOCK.ICN" : "TWNSEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
@@ -383,7 +383,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if((BUILD_WEL2 | BUILD_STATUE) & building)
+	    if((BUILD_WEL2 & building) && (BUILD_STATUE & building))
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNSEXT1.ICN", 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -472,11 +472,11 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_SHIPYARD & building ? "TWNWDOCK.ICN" : "TWNWEXT0.ICN", 0);
+		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNWBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNWDOCK.ICN" : "TWNWEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(u8 level = GetLevelMageGuild() && ((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5) & building))
+	    if(u8 level = GetLevelMageGuild())
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNWMAGE.ICN", level - 1);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -536,18 +536,16 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if((DWELLING_MONSTER6 | DWELLING_UPGRADE6 | DWELLING_UPGRADE7) & building)
+	    if(DWELLING_UPGRADE7 & building)
 	    {
-		if(DWELLING_UPGRADE7 & building)
-		{
-		    const Sprite & sprite = AGG::GetICN("TWNWUP5B.ICN", 0);
-		    display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-		}
-		else
-		{
-		    const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE6 & building ? "TWNWUP_5.ICN" : "TWNWDW_5.ICN", 0);
-		    display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-		}
+		const Sprite & sprite = AGG::GetICN("TWNWUP5B.ICN", 0);
+		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
+	    }
+	    else
+	    if((DWELLING_MONSTER6 | DWELLING_UPGRADE6) & building)
+	    {
+	        const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE6 & building ? "TWNWUP_5.ICN" : "TWNWDW_5.ICN", 0);
+	        display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
 	    if(BUILD_WELL & building)
@@ -621,7 +619,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_SHIPYARD & building ? "TWNZDOCK.ICN" : "TWNZEXT0.ICN", 0);
+		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNZBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNZDOCK.ICN" : "TWNZEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
@@ -649,7 +647,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(u8 level = GetLevelMageGuild() && ((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5) & building))
+	    if(u8 level = GetLevelMageGuild())
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNZMAGE.ICN", level - 1);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -738,7 +736,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_SHIPYARD & building ? "TWNNDOCK.ICN" : "TWNNEXT0.ICN", 0);
+		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNNBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNNDOCK.ICN" : "TWNNEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
@@ -778,7 +776,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
-	    if(u8 level = GetLevelMageGuild() && ((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5) & building))
+	    if(u8 level = GetLevelMageGuild())
 	    {
 		const Sprite & sprite = AGG::GetICN("TWNNMAGE.ICN", (level - 1) * 6);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
@@ -812,7 +810,6 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 	
 	default: return;
     }
-
 }
 
 Rect Castle::GetCoordBuilding(building_t building, const Point & pt)

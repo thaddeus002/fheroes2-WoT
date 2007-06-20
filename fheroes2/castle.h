@@ -81,7 +81,7 @@ public:
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
     bool AllowBuild(void) const{ return allow_build; };
     bool isBuild(building_t bd) const{ return building & bd; };
-    bool HaveNearlySea(void) const{ return false; };
+    bool HaveNearlySea(void) const{ return true; };
     const Heroes * isHeroesPresent(void);
     bool RecrutMonster(building_t dw, u16 count);
     bool AllowBuyBuilding(building_t build);
@@ -94,6 +94,7 @@ public:
 
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; }; 
     u8 GetCountArmy(void) const;
+    u16 GetDwellingLivedCount(building_t dw);
 
     const Point & GetCenter(void) const{ return mp; };
 
@@ -103,10 +104,13 @@ public:
     void ActionNewWeek(void);
     void ActionNewMonth(void);
 
+    void BuyBuilding(building_t build);
+    
     Dialog::answer_t OpenDialog(void);
     
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
+    static void GetBuildingRequires(const Race::race_t & race, const building_t & build, std::vector<building_t> & requires);
 
 private:
     void RedrawResourcePanel(void);
@@ -118,7 +122,7 @@ private:
     
     Rect GetCoordBuilding(building_t building, const Point & pt);
     void RedrawBuilding(const Point & dst_pt);
-    void OpenTown(void);
+    u32 OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
     void OpenWell(void);
