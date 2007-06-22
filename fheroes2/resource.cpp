@@ -234,6 +234,21 @@ u8 Resource::GetIndexSprite(Resource::resource_t resource)
     return 0;
 }
 
+u8 Resource::funds_t::GetValidItems(void)
+{
+	u8 result = 0;
+
+	if(wood) ++result;
+	if(ore) ++result;
+	if(mercury) ++result;
+	if(sulfur) ++result;
+	if(crystal) ++result;
+	if(gems) ++result;
+	if(gold) ++result;
+
+	return result;
+}
+
 /* return rnd count resource */
 u16 Resource::RandCount(Resource::resource_t res)
 { return Resource::GOLD == res ? 100 * Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX) : Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX); }

@@ -109,6 +109,7 @@ public:
     u32 GetExperience(void) const;
     u32 GetNextLevelExperience(u8 level) const;
     u16 GetMaxSpellPoints(void) const;
+    u16 GetMaxMovePoints(void) const;
     u16 GetSpellPoints(void) const;
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
@@ -132,6 +133,7 @@ private:
     u8			knowledge;
     u32			experience;
     u16			magic_point;
+    u16			move_point;
     Morale::morale_t	morale;
     Luck::luck_t	luck;
 
@@ -144,7 +146,6 @@ private:
     const Race::race_t	race;
 
     bool		army_spread;
-    float		move_point;
     
     MP2::object_t	save_maps_general;
     

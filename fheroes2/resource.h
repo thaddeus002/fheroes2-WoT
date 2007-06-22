@@ -66,6 +66,8 @@ namespace Resource
 	bool operator> (const funds_t &pm) const;
 	bool operator>= (const funds_t &pm) const;
 
+	u8 GetValidItems(void);
+
         u16 wood;
         u16 mercury;
         u16 ore;

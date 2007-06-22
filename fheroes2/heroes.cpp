@@ -26,7 +26,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL),
+    move_point(0), morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL),
     army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES)
 {
     // hero is freeman
@@ -143,6 +143,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
     }
     
     magic_point = GetMaxSpellPoints();
+    move_point = GetMaxMovePoints();
 }
 
 void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl)
@@ -564,6 +565,11 @@ u16 Heroes::GetMaxSpellPoints(void) const
     return 10 * GetKnowledge();
 }
 
+u16 Heroes::GetMaxMovePoints(void) const
+{
+    return 10;
+}
+
 Morale::morale_t Heroes::GetMorale(void) const
 {
     return morale;
@@ -647,7 +653,8 @@ u32 Heroes::GetNextLevelExperience(u8 level) const
 	case 8: 	return 11000;
 	case 9:		return 13200;
 	case 10:	return 15500;
-	
+	// FIXME:	calculate alghoritm
+
 	default: return 0;
     }
 }

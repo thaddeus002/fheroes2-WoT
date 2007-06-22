@@ -23,6 +23,7 @@
 #include "error.h"
 #include "payment.h"
 #include "world.h"
+#include "agg.h"
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
@@ -270,23 +271,27 @@ void Castle::ActionNewWeek(void)
 
     // dw 1
     if(building & DWELLING_MONSTER1) dwelling[0]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)) + well + wel2;
-    else
+
     // dw 2
     if(building & DWELLING_UPGRADE2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE2)) + well;
     else
     if(building & DWELLING_MONSTER2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)) + well;
+
     // dw 3
     if(building & DWELLING_UPGRADE3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE3)) + well;
     else
     if(building & DWELLING_MONSTER3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)) + well;
+
     // dw 4
     if(building & DWELLING_UPGRADE4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE4)) + well;
     else
     if(building & DWELLING_MONSTER4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4)) + well;
+
     // dw 5
     if(building & DWELLING_UPGRADE5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE5)) + well;
     else
     if(building & DWELLING_MONSTER5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5)) + well;
+
     // dw 6
     if(building & DWELLING_UPGRADE7) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7)) + well;
     else
@@ -500,7 +505,7 @@ u8 Castle::GetLevelMageGuild(void)
 const std::string & Castle::GetStringBuilding(const building_t & build, const Race::race_t & race)
 {
     static const std::string str_build[] = { "Thieves' Guild", "Tavern", "Shipyard", "Well", "Statue", "Left Turret",
-	"Right Turret", "Marketplace", "Moat", "Castle", "Tent", "Captain", "Mage Guild", "Unknown" };
+	"Right Turret", "Marketplace", "Moat", "Castle", "Tent", "Captain's Quarters", "Mage Guild", "Unknown" };
 
     static const std::string str_wel2[] = { "Farm", "Garbage Heap", "Crystal Garden", "Orchard", "Waterfall", "Skull Pile" };
 
@@ -653,6 +658,7 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
     return desc_build[13];
 }
 
+/* recrut monster from building to castle army */
 bool Castle::RecrutMonster(building_t dw, u16 count)
 {
     Monster::monster_t ms = Monster::UNKNOWN;
@@ -715,6 +721,7 @@ bool Castle::RecrutMonster(building_t dw, u16 count)
     return true;
 }
 
+/* return current count monster in dwelling */
 u16 Castle::GetDwellingLivedCount(building_t dw)
 {
    switch(dw)
@@ -738,6 +745,7 @@ u16 Castle::GetDwellingLivedCount(building_t dw)
     return 0;                                                                 
 }
 
+/* return requires for building */
 void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & build, std::vector<building_t> & requires)
 {
 	requires.clear();
@@ -993,7 +1001,8 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
     }
 }
 
-bool Castle::AllowBuyBuilding(building_t build)
+/* check allow buy building */
+bool Castle::AllowBuyBuilding(building_t build) const
 {
     // check allow building
     if(!allow_build) return false;
@@ -1021,6 +1030,7 @@ bool Castle::AllowBuyBuilding(building_t build)
 	return true;
 }
 
+/* buy building */
 void Castle::BuyBuilding(building_t build)
 {
 	Error::Verbose("Castle::BuyBuilding");
@@ -1043,4 +1053,82 @@ void Castle::BuyBuilding(building_t build)
 	}
 	// disable day build
 	allow_build = false;
+}
+
+/* draw image castle to position */
+void Castle::DrawImageCastle(const Point & pt)
+{
+    const Maps::Tiles & tile = world.GetTiles(mp.x, mp.y);
+    
+    u8 index = 0;
+    Point dst_pt;
+
+    // draw ground
+    switch(tile.GetGround())
+    {
+	case Maps::Ground::GRASS:	index =  0; break;
+	case Maps::Ground::SNOW:	index = 10; break;
+	case Maps::Ground::SWAMP:	index = 20; break;
+	case Maps::Ground::LAVA:	index = 30; break;
+	case Maps::Ground::DESERT:	index = 40; break;
+	case Maps::Ground::DIRT:	index = 50; break;
+	case Maps::Ground::WASTELAND:	index = 60; break;
+	case Maps::Ground::BEACH:	index = 70; break;
+
+	default: return;
+    }
+
+    for(int ii = 0; ii < 5; ++ii)
+    {
+	const Sprite & sprite = AGG::GetICN("OBJNTWBA.ICN", index + ii);
+        dst_pt.x = pt.x + ii * 32 + sprite.x();
+	dst_pt.y = pt.y + 3 * 32 + sprite.y();
+	display.Blit(sprite, dst_pt);
+    }
+
+    for(int ii = 0; ii < 5; ++ii)
+    {
+	const Sprite & sprite = AGG::GetICN("OBJNTWBA.ICN", index + 5 + ii);
+        dst_pt.x = pt.x + ii * 32 + sprite.x();
+	dst_pt.y = pt.y + 4 * 32 + sprite.y();
+	display.Blit(sprite, dst_pt);
+    }
+    
+    // draw castle
+    switch(race)
+    {
+        case Race::KNGT: index = 0; break;
+        case Race::BARB: index = 32; break;
+	case Race::SORC: index = 64; break;
+	case Race::WRLK: index = 96; break;
+	case Race::WZRD: index = 128; break;
+	case Race::NECR: index = 160; break;
+	default: break;
+    }
+    if(! (BUILD_CASTLE & building)) index += 16;
+    const Sprite & sprite2 = AGG::GetICN("OBJNTOWN.ICN", index);
+    dst_pt.x = pt.x + 2 * 32 + sprite2.y();
+    dst_pt.y = pt.y + sprite2.x();
+    display.Blit(sprite2, dst_pt);
+    for(int ii = 0; ii < 5; ++ii)
+    {
+	const Sprite & sprite = AGG::GetICN("OBJNTOWN.ICN", index + 1 + ii);
+        dst_pt.x = pt.x + ii * 32 + sprite.x();
+	dst_pt.y = pt.y + 32 + sprite.y();
+	display.Blit(sprite, dst_pt);
+    }
+    for(int ii = 0; ii < 5; ++ii)
+    {
+	const Sprite & sprite = AGG::GetICN("OBJNTOWN.ICN", index + 6 + ii);
+        dst_pt.x = pt.x + ii * 32 + sprite.x();
+	dst_pt.y = pt.y + 2 * 32 + sprite.y();
+	display.Blit(sprite, dst_pt);
+    }
+    for(int ii = 0; ii < 5; ++ii)
+    {
+	const Sprite & sprite = AGG::GetICN("OBJNTOWN.ICN", index + 11 + ii);
+        dst_pt.x = pt.x + ii * 32 + sprite.x();
+	dst_pt.y = pt.y + 3 * 32 + sprite.y();
+	display.Blit(sprite, dst_pt);
+    }
 }

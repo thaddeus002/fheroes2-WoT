@@ -84,7 +84,7 @@ public:
     bool HaveNearlySea(void) const{ return true; };
     const Heroes * isHeroesPresent(void);
     bool RecrutMonster(building_t dw, u16 count);
-    bool AllowBuyBuilding(building_t build);
+    bool AllowBuyBuilding(building_t build) const;
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
@@ -105,6 +105,7 @@ public:
     void ActionNewMonth(void);
 
     void BuyBuilding(building_t build);
+    void DrawImageCastle(const Point & pt);
     
     Dialog::answer_t OpenDialog(void);
     

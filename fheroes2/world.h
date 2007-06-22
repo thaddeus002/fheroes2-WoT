@@ -67,7 +67,7 @@ public:
 
     const Heroes * GetHeroes(u16 maps_index);
     const Heroes * GetHeroes(u8 ax, u8 ay);
-    const Heroes * GetFreemanHeroes(Race::race_t rc);
+    const Heroes * GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
     u8 GetDay(void){ return day % DAYOFWEEK + 1; };
     u8 GetWeek(void){ return week % WEEKOFMONTH + 1; };

@@ -877,11 +877,12 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
     std::vector<Heroes::heroes_t> freeman_heroes;
     
     // find freeman in race
-    for(u8 ii = min; ii <= max; ++ii)
-	if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetHeroes());
+    if(Race::BOMG != rc)
+	for(u8 ii = min; ii <= max; ++ii)
+	    if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetHeroes());
 
     // not found, find other race
-    if(freeman_heroes.empty())
+    if(Race::BOMG == rc || freeman_heroes.empty())
 	for(u8 ii = 0; ii <= 53; ++ii)
 	    if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetHeroes());
 
