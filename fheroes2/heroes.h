@@ -119,7 +119,7 @@ public:
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;
 
-    Dialog::answer_t OpenDialog(void);
+    Dialog::answer_t OpenDialog(bool readonly = false);
 
     void Recrut(const Castle & castle);
     void Move(u16 ax, u16 ay);

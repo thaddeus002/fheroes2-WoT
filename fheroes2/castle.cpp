@@ -27,7 +27,7 @@
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
-    : building(0), army_spread(false), allow_build(true), dwelling(CASTLEMAXMONSTER, 0),
+    : building(0), army_spread(true), allow_build(true), dwelling(CASTLEMAXMONSTER, 0),
       army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
 {
     const u8  *byte8  = static_cast<const u8 *>(ptr);
@@ -505,7 +505,8 @@ u8 Castle::GetLevelMageGuild(void)
 const std::string & Castle::GetStringBuilding(const building_t & build, const Race::race_t & race)
 {
     static const std::string str_build[] = { "Thieves' Guild", "Tavern", "Shipyard", "Well", "Statue", "Left Turret",
-	"Right Turret", "Marketplace", "Moat", "Castle", "Tent", "Captain's Quarters", "Mage Guild", "Unknown" };
+	"Right Turret", "Marketplace", "Moat", "Castle", "Tent", "Captain's Quarters", "Mage Guild, Level 1", 
+	 "Mage Guild, Level 2",  "Mage Guild, Level 3",  "Mage Guild, Level 4",  "Mage Guild, Level 5", "Unknown" };
 
     static const std::string str_wel2[] = { "Farm", "Garbage Heap", "Crystal Garden", "Orchard", "Waterfall", "Skull Pile" };
 
@@ -554,11 +555,11 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
         case BUILD_CASTLE:	return str_build[9];
         case BUILD_TENT:	return str_build[10];
         case BUILD_CAPTAIN:	return str_build[11];
-        case BUILD_MAGEGUILD1:
-        case BUILD_MAGEGUILD2:
-        case BUILD_MAGEGUILD3:
-        case BUILD_MAGEGUILD4:
-        case BUILD_MAGEGUILD5:	return str_build[12];
+        case BUILD_MAGEGUILD1:	return str_build[12];
+        case BUILD_MAGEGUILD2:	return str_build[13];
+        case BUILD_MAGEGUILD3:	return str_build[14];
+        case BUILD_MAGEGUILD4:	return str_build[15];
+        case BUILD_MAGEGUILD5:	return str_build[16];
 
         case BUILD_SPEC:	return str_spec[offset];
         case BUILD_WEL2:	return str_wel2[offset];
@@ -580,7 +581,7 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
 	default: break;
     }
     
-    return str_build[13];
+    return str_build[17];
 }
 
 const std::string & Castle::GetDescriptionBuilding(const building_t & build, const Race::race_t & race)
@@ -1107,8 +1108,8 @@ void Castle::DrawImageCastle(const Point & pt)
     }
     if(! (BUILD_CASTLE & building)) index += 16;
     const Sprite & sprite2 = AGG::GetICN("OBJNTOWN.ICN", index);
-    dst_pt.x = pt.x + 2 * 32 + sprite2.y();
-    dst_pt.y = pt.y + sprite2.x();
+    dst_pt.x = pt.x + 2 * 32 + sprite2.x();
+    dst_pt.y = pt.y + sprite2.y();
     display.Blit(sprite2, dst_pt);
     for(int ii = 0; ii < 5; ++ii)
     {

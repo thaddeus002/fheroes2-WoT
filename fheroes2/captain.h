@@ -26,6 +26,10 @@
 namespace Captain
 {
     const std::string & BigPortraitString(Race::race_t race);
+    u8 GetAttack(Race::race_t race);
+    u8 GetDefense(Race::race_t race);
+    u8 GetPower(Race::race_t race);
+    u8 GetKnowledge(Race::race_t race);
 };
 
 #endif

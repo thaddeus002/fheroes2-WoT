@@ -26,9 +26,9 @@
 #include "display.h"
 #include "animation.h"
 
-#define ANIMATION_HIGH		3
-#define ANIMATION_MEDIUM	9
-#define ANIMATION_LOW		27
+#define ANIMATION_HIGH		8
+#define ANIMATION_MEDIUM	25
+#define ANIMATION_LOW		50
 
 Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first, u8 amode)
     : dst_pt(dp), use_first(first), mode(amode), frame(0), ticket(0), max_rect(display.w(), display.h(), 0, 0), disable(false), reset(false)

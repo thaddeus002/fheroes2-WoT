@@ -35,7 +35,7 @@
 #include "error.h"
 #include "dialog.h"
 
-Dialog::answer_t Heroes::OpenDialog(void)
+Dialog::answer_t Heroes::OpenDialog(bool readonly)
 {
     // cursor
     Cursor::Hide();
@@ -356,16 +356,28 @@ Dialog::answer_t Heroes::OpenDialog(void)
     descriptionSpellPoints += ". The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events.";
 
     // crest
-    switch(color)
-    {
-	case Color::BLUE:	index_sprite = 0; break;
-	case Color::GREEN:	index_sprite = 1; break;
-	case Color::RED:	index_sprite = 2; break;
-	case Color::YELLOW:	index_sprite = 3; break;
-	case Color::ORANGE:	index_sprite = 4; break;
-	case Color::PURPLE:	index_sprite = 5; break;
-	default: Error::Warning("Heroes::OpenDialog: unknown race"); break;
-    }
+    if(Color::GRAY == color)
+	switch(H2Config::GetMyColor())
+	{
+	    case Color::BLUE:	index_sprite = 0; break;
+	    case Color::GREEN:	index_sprite = 1; break;
+	    case Color::RED:	index_sprite = 2; break;
+	    case Color::YELLOW:	index_sprite = 3; break;
+	    case Color::ORANGE:	index_sprite = 4; break;
+	    case Color::PURPLE:	index_sprite = 5; break;
+	    default: break;
+	}
+    else    
+	switch(color)
+        {
+	    case Color::BLUE:	index_sprite = 0; break;
+	    case Color::GREEN:	index_sprite = 1; break;
+	    case Color::RED:	index_sprite = 2; break;
+	    case Color::YELLOW:	index_sprite = 3; break;
+	    case Color::ORANGE:	index_sprite = 4; break;
+	    case Color::PURPLE:	index_sprite = 5; break;
+	    default: break;
+	}
 
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 130;
@@ -414,12 +426,23 @@ Dialog::answer_t Heroes::OpenDialog(void)
     const Rect rectMaxCoordsSkill(coordsSkill);
 
     // artifact
-    std::vector<Rect> coordsArtifact;
-
     for(u8 ii = 0; ii < HEROESMAXARTIFACT; ii++)
     {
         // sprite
-        const Sprite & art = AGG::GetICN("ARTIFACT.ICN", ii < artifacts.size() && Artifact::UNKNOWN > artifacts[ii] ? artifacts[ii] + 1 : 0);
+        const Sprite & art = AGG::GetICN("ARTIFACT.ICN", 0);
+
+        dst_pt.x = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.x + 51 + ii * (art.w() + 15) : cur_pt.x + 51 + (ii - HEROESMAXARTIFACT / 2) * (art.w() + 15));
+        dst_pt.y = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.y + 308 : cur_pt.y + 387);
+
+        display.Blit(art, dst_pt);
+    }
+
+    std::vector<Rect> coordsArtifact;
+
+    for(u8 ii = 0; ii < artifacts.size(); ii++)
+    {
+        // sprite
+        const Sprite & art = AGG::GetICN("ARTIFACT.ICN", artifacts[ii] + 1);
 
         dst_pt.x = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.x + 51 + ii * (art.w() + 15) : cur_pt.x + 51 + (ii - HEROESMAXARTIFACT / 2) * (art.w() + 15));
         dst_pt.y = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.y + 308 : cur_pt.y + 387);
@@ -468,6 +491,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
         le.HandleEvents();
 
 	// heroes troops
+	if(! readonly)
 	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
 	{
 	    if(le.MouseClickLeft(coordsHeroesTroops[ii]))
@@ -592,9 +616,12 @@ Dialog::answer_t Heroes::OpenDialog(void)
 
         // button click
 	le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
-        le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
-        le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.Press() : buttonPrevHero.Release();
-        le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
+        if(!readonly)
+	{
+	    le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
+    	    le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.Press() : buttonPrevHero.Release();
+    	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
+	}
 
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
@@ -610,7 +637,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
         if(le.MouseClickLeft(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
         if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG, Dialog::OK);
 
-        if(le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)
+        if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)
         {
 	    Cursor::Hide();
 	    cursorFormat.Move(army1_pt);
@@ -619,7 +646,7 @@ Dialog::answer_t Heroes::OpenDialog(void)
     	    army_spread = true;
         }
 
-        if(le.MouseClickLeft(rectGroupedArmyFormat) && army_spread)
+        if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && army_spread)
         {
 	    Cursor::Hide();
 	    cursorFormat.Move(army2_pt);

@@ -45,3 +45,67 @@ const std::string & Captain::BigPortraitString(Race::race_t race)
 
     return big_portrate_kngt;
 }
+
+u8 Captain::GetAttack(Race::race_t race)
+{
+    switch(race)
+    {
+	case Race::KNGT:	return 1;
+	case Race::BARB:	return 1;
+	case Race::SORC:	return 0;
+	case Race::WRLK:	return 0;
+	case Race::WZRD:	return 0;
+	case Race::NECR:	return 0;
+	default: break;
+    }
+
+    return 0;
+}
+
+u8 Captain::GetDefense(Race::race_t race)
+{
+    switch(race)
+    {
+	case Race::KNGT:	return 1;
+	case Race::BARB:	return 1;
+	case Race::SORC:	return 0;
+	case Race::WRLK:	return 0;
+	case Race::WZRD:	return 0;
+	case Race::NECR:	return 0;
+	default: break;
+    }
+
+    return 0;
+}
+
+u8 Captain::GetPower(Race::race_t race)
+{
+    switch(race)
+    {
+	case Race::KNGT:	return 1;
+	case Race::BARB:	return 1;
+	case Race::SORC:	return 2;
+	case Race::WRLK:	return 2;
+	case Race::WZRD:	return 2;
+	case Race::NECR:	return 2;
+	default: break;
+    }
+
+    return 0;
+}
+
+u8 Captain::GetKnowledge(Race::race_t race)
+{
+    switch(race)
+    {
+	case Race::KNGT:	return 1;
+	case Race::BARB:	return 1;
+	case Race::SORC:	return 2;
+	case Race::WRLK:	return 2;
+	case Race::WZRD:	return 2;
+	case Race::NECR:	return 2;
+	default: break;
+    }
+
+    return 0;
+}
