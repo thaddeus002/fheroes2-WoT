@@ -31,13 +31,13 @@
 namespace Resource
 {
     typedef enum {
-        WOOD,
-        MERCURY,
-        ORE,
-        SULFUR,
-        CRYSTAL,
-        GEMS,
-        GOLD,
+        WOOD	= 0x01,
+        MERCURY	= 0x02,
+        ORE	= 0x04,
+        SULFUR	= 0x08,
+        CRYSTAL	= 0x10,
+        GEMS	= 0x20,
+        GOLD	= 0x40,
     } resource_t;
 
     typedef enum {

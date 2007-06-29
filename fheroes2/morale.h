@@ -36,6 +36,9 @@ namespace Morale
 
     const std::string & String(morale_t morale);
     const std::string & Description(morale_t morale);
+
+    inline morale_t & operator++ (morale_t & morale){ return morale = BLOOD == morale ? BLOOD : morale_t(morale + 1); };
+    inline morale_t & operator-- (morale_t & morale){ return morale = TREASON == morale ? TREASON : morale_t(morale - 1); }
 };
 
 #endif

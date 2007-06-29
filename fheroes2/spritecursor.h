@@ -30,7 +30,7 @@ class SpriteCursor
 {
 public:
     /* sprite cursor */
-    SpriteCursor(const Surface &cursor, const Point & pt) : spriteCursor(cursor), background(pt, cursor.w(), cursor.h()){};
+    SpriteCursor(const Surface &cursor, const Point & pt = Point()) : spriteCursor(cursor), background(pt, cursor.w(), cursor.h()){};
 
     u16  w(void) const{ return spriteCursor.w(); };
     u16  h(void) const{ return spriteCursor.h(); };
@@ -38,6 +38,7 @@ public:
     void Move(s16 ax, s16 ay);
     void Move(const Point &pt){ Move(pt.x, pt.y); };
     void Hide(void){ background.Restore(); };
+    void Show(void){  Show(background.GetRect()); };
     void Show(const Point &pt){ Show(pt.x, pt.y); };
     void Show(s16 ax, s16 ay);
 

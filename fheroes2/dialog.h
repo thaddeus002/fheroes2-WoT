@@ -70,6 +70,9 @@ namespace Dialog
     // recrut monster
     u16 RecrutMonster(const Monster::monster_t & monster, u16 available);
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
+    
+    // dialog marketplace
+    void Marketplace(void);
 
 class Box
 {

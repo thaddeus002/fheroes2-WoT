@@ -690,7 +690,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // in to
 	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell)) OpenWell();
 	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
-	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)); // in to
+	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)) Dialog::Marketplace();
 	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
 	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
 	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG, Dialog::OK);

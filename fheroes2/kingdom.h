@@ -95,6 +95,7 @@ public:
 
     u8 GetCountCastle(void) const;
     u8 GetCountTown(void) const;
+    u8 GetCountMarketplace(void) const;
 
     const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; };
     const std::vector<Castle *> & GetCastles(void) const{ return castles; };

@@ -22,6 +22,7 @@
 #include "world.h"
 #include "castle.h"
 #include "config.h"
+#include "monster.h"
 #include "error.h"
 #include "heroes.h"
 
@@ -572,7 +573,124 @@ u16 Heroes::GetMaxMovePoints(void) const
 
 Morale::morale_t Heroes::GetMorale(void) const
 {
-    return morale;
+/* FIXME:
+[-] Knight bonus +1 ???
+[-] Buoy visited +1
+[-] Oasis visited +1
+[-] Temple visited +2
+[-] Graveyard robber -1
+[-] Shipwreck robber -1
+[-] Watering hole visited +1
+[-] Derelict ship robber -1
+[-] Barbarian Coliseum +2
+[-] Tavern +1
+[+] All %s troops +1
+[+] Troops of 3 alignments -1
+[+] Troops of 4 alignments -2
+[+] Troops of 5 alignments -3
+[+] Medal of Valor +1
+[+] Medal of Courage +1
+[+] Medal of Honor +1
+[+] Medal of Distinction +1
+[+] Fizbin of Misfortune -2
+[+] Some undead in group -1
+[+] Basic Leadership +1
+[+] Advanced Leadership +2
+[+] Expert Leadership +3
+*/
+
+    Morale::morale_t result = morale;
+
+    // bonus artifact
+    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+    for(; it != artifacts.end(); ++it)
+
+	switch(*it)
+	{
+            case Artifact::MEDAL_VALOR:
+            case Artifact::MEDAL_COURAGE:
+            case Artifact::MEDAL_HONOR:
+            case Artifact::MEDAL_DISTINCTION:
+                ++result;
+                break;
+
+            case Artifact::FIZBIN_MISFORTUNE:
+                --result;
+                --result;
+                break;
+
+            default:
+		break;
+    	}
+
+    // bonus leadership
+    switch(GetLevelSkill(Skill::LEADERSHIP))
+    {
+        case Skill::EXPERT:
+            ++result;
+            ++result;
+            ++result;
+            break;
+
+        case Skill::ADVANCED:
+            ++result;
+            ++result;
+            break;
+
+        case Skill::BASIC:
+            ++result;
+            break;
+
+        default:
+            break;
+    }
+    // different race penalty
+    std::vector<Army::Troops>::const_iterator it1_army = army.begin();
+    std::vector<Army::Troops>::const_iterator it2_army = army.end();
+    u8 count = 0;
+    u8 count_kngt = 0;
+    u8 count_barb = 0;
+    u8 count_sorc = 0;
+    u8 count_wrlk = 0;
+    u8 count_wzrd = 0;
+    u8 count_necr = 0;
+    u8 count_bomg = 0;
+    for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).GetMonster())
+	switch(Monster::GetRace((*it1_army).GetMonster()))
+	{
+	    case Race::KNGT: ++count_kngt; break;
+	    case Race::BARB: ++count_barb; break;
+	    case Race::SORC: ++count_sorc; break;
+	    case Race::WRLK: ++count_wrlk; break;
+	    case Race::WZRD: ++count_wzrd; break;
+	    case Race::NECR: ++count_necr; break;
+	    case Race::BOMG: ++count_bomg; break;
+	    default: break;
+	}
+    if(count_kngt) ++count;
+    if(count_barb) ++count;
+    if(count_sorc) ++count;
+    if(count_wrlk) ++count;
+    if(count_wzrd) ++count;
+    if(count_necr) ++count;
+    if(count_bomg) ++count;
+
+    switch(count)
+    {
+	case 0: break;
+	case 1: ++result; break;
+	case 3: --result; break;
+	case 4: --result; --result; break;
+	// over 4 different race
+	default: --result; --result; --result; break;
+    }
+
+    // undead in life group
+    if(count_necr && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg)) --result;
+
+
+
+    return result;
 }
 
 Luck::luck_t Heroes::GetLuck(void) const
@@ -581,16 +699,20 @@ Luck::luck_t Heroes::GetLuck(void) const
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
+    // bonus artifact
     for(; it != artifacts.end(); ++it)
 
 	switch(*it)
 	{
-    	    case Artifact::RABBIT_FOOT:		++result; break;
-            case Artifact::GOLDEN_HORSESHOE:	++result; break;
-            case Artifact::GAMBLER_LUCKY_COIN:	++result; break;
-            case Artifact::FOUR_LEAF_CLOVER:	++result; break;
+    	    case Artifact::RABBIT_FOOT:
+            case Artifact::GOLDEN_HORSESHOE:
+            case Artifact::GAMBLER_LUCKY_COIN:
+            case Artifact::FOUR_LEAF_CLOVER:
+	    	++result;
+		break;
 
-            default: break;
+            default:
+		break;
     	}
 
     return result;
@@ -657,4 +779,18 @@ u32 Heroes::GetNextLevelExperience(u8 level) const
 
 	default: return 0;
     }
+}
+
+/* get level skill */
+Skill::level_t Heroes::GetLevelSkill(const Skill::skill_t & skill) const
+{
+    if(skills.size())
+    {
+	std::vector<Skill>::const_iterator it1 = skills.begin();
+	std::vector<Skill>::const_iterator it2 = skills.end();
+	
+	for(; it1 != it2; ++it1) if((*it1).GetSkill() == skill) return (*it1).GetLevel();
+    }
+
+    return Skill::NEVER;;
 }

@@ -224,3 +224,17 @@ u8 Kingdom::GetCountTown(void) const
 
     return 0;
 }
+
+u8 Kingdom::GetCountMarketplace(void) const
+{
+    u8 result = 0;
+
+    if(castles.size())
+    {
+	std::vector<Castle *>::const_iterator it = castles.begin();
+
+	for(; it != castles.end(); ++it) if((**it).isBuild(Castle::BUILD_MARKETPLACE)) ++result;
+    }
+
+    return result;
+}

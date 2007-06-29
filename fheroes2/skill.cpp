@@ -28,18 +28,26 @@ void Skill::SetSkill(u8 skill)
 
 void Skill::SetLevel(u8 level)
 {
-    pair.second = static_cast<level_t>((level - 1) % 3);
+    switch(level)
+    {
+	case 0: pair.second = BASIC;	break;
+	case 1: pair.second = ADVANCED; break;
+	case 2: pair.second = EXPERT;	break;
+	
+	default:  pair.second = NEVER; break;
+    }
 }
 
 const std::string & Skill::LevelString(level_t level)
 {
-    static const std::string str_level[] = { "Basic", "Advanced", "Expert" };
+    static const std::string str_level[] = { "Never", "Basic", "Advanced", "Expert" };
 
     switch(level)
     {
-	case BASIC:	return str_level[0];
-	case ADVANCED:	return str_level[1];
-	case EXPERT:	return str_level[2];
+	case BASIC:	return str_level[1];
+	case ADVANCED:	return str_level[2];
+	case EXPERT:	return str_level[3];
+	default: break;
     }
     
     return str_level[0];
@@ -139,6 +147,7 @@ const std::string & Skill::Description(skill_t skill, level_t level)
 	case BASIC:	index = 0; break;
 	case ADVANCED:	index = 1; break;
 	case EXPERT:	index = 2; break;
+	default: break;
     }
     switch(skill)
     {

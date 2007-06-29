@@ -115,6 +115,7 @@ public:
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const{ return 1; };
     const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
+    Skill::level_t GetLevelSkill(const Skill::skill_t & skill) const;
 
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;

@@ -27,7 +27,7 @@
 class Skill
 {
     public:
-	typedef enum { BASIC = 0, ADVANCED = 1, EXPERT = 2 } level_t;
+	typedef enum { NEVER, BASIC, ADVANCED, EXPERT } level_t;
 
 	typedef enum {
 	    PATHFINDING	= 0,
