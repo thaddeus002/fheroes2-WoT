@@ -25,6 +25,7 @@
 #include "maps.h"
 #include "race.h"
 #include "maps_tiles.h"
+#include "heroes.h"
 #include "color.h"
 
 class Heroes;
@@ -69,6 +70,11 @@ public:
     const Heroes * GetHeroes(u8 ax, u8 ay);
     const Heroes * GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
+    const Heroes::heroes_t & GetFreeRecrut1(void);
+    const Heroes::heroes_t & GetFreeRecrut2(void);
+
+    Heroes & GetHeroes(const Heroes::heroes_t & hero){ return *vec_heroes[hero]; };
+
     u8 GetDay(void){ return day % DAYOFWEEK + 1; };
     u8 GetWeek(void){ return week % WEEKOFMONTH + 1; };
     u8 GetMonth(void){ return month + 1; };
@@ -77,6 +83,9 @@ public:
     bool BeginWeek(void){ return begin_week; };
     bool BeginMonth(void){ return begin_month; };
     void NextDay(void);
+
+    void NewWeek(void);
+    void NewMonth(void);
 
     const std::string & GetRumors(void);
 
@@ -107,6 +116,9 @@ private:
     u8 month;
     bool begin_week;
     bool begin_month;
+
+    Heroes::heroes_t free_recrut_hero1;
+    Heroes::heroes_t free_recrut_hero2;
 };
 
 static World & world = World::GetWorld();

@@ -26,7 +26,8 @@
 #include "tools.h"
 #include "config.h"
 
-namespace H2Config {
+namespace H2Config
+{
     static const u8 major_version = MAJOR_VERSION;
     static const u8 minor_version = MINOR_VERSION;
     static u16  boolValue = ANIMATION | ORIGINAL;
@@ -47,19 +48,27 @@ namespace H2Config {
 };
 
 /* init Config */
-void H2Config::Init(const std::string &filename)
+void H2Config::Defaults(void)
 {
-	if(filename.empty()) return;
+    boolValue = ANIMATION | ORIGINAL;
+    pathAGGFile = "heroes2.agg";
+    pathMapsDirectory = "maps";
+    videoMode = Display::SMALL;
+}
 
-	Error::Verbose("config file: " + filename);
-	
-	// read
-	std::fstream file(filename.c_str(), std::ios::in);
-	if(! file || file.fail()){ Error::Warning("file not found. Load default options."); return; }
+/* load config */
+bool H2Config::Load(const std::string & filename)
+{
+    if(filename.empty()) return false;
 
-	std::string oneString, leftKey, rightValue;
+    // read
+    std::fstream file(filename.c_str(), std::ios::in);
 
-	while(std::getline(file, oneString))
+    if(! file || file.fail()) return false;
+
+    std::string oneString, leftKey, rightValue;
+
+    while(std::getline(file, oneString))
 	    // skip comment
 	    if(!String::Comment(oneString) && oneString.size())
 	    {
@@ -73,23 +82,64 @@ void H2Config::Init(const std::string &filename)
 		// convert to lower case string
 		String::Lower(leftKey);
 
- 		// bool
-		if(leftKey == "debug" && rightValue == "on") H2Config::boolValue |= H2Config::DEBUG;
- 		if(leftKey == "sound" && rightValue == "on") H2Config::boolValue |= H2Config::SOUND;
- 		if(leftKey == "music" && rightValue == "on") H2Config::boolValue |= H2Config::MUSIC;
- 		if(leftKey == "animation" && rightValue == "on") H2Config::boolValue |= H2Config::ANIMATION;
- 		if(leftKey == "fullscreen" && rightValue == "on") H2Config::boolValue |= H2Config::FULLSCREEN;
- 		if(leftKey == "evilinterface" && rightValue == "on") H2Config::boolValue |= H2Config::EVILINTERFACE;
+ 		// debug
+		if(leftKey == "debug")
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::DEBUG;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::DEBUG;
+		}
+		// sound
+ 		if(leftKey == "sound")
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::SOUND;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::SOUND;
+		}
+		// music
+ 		if(leftKey == "music")
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::MUSIC;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::MUSIC;
+ 		}
+		// animation
+		if(leftKey == "animation")
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::ANIMATION;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::ANIMATION;
+ 		}
+		// fullscreen
+		if(leftKey == "fullscreen")
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::FULLSCREEN;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::FULLSCREEN;
+ 		}
+		// interface
+		if(leftKey == "evilinterface")
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::EVILINTERFACE;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::EVILINTERFACE;
+		}
+		// origin version
 		if(leftKey == "original")
-		    rightValue == "on" ? H2Config::boolValue |= H2Config::ORIGINAL : H2Config::boolValue &= ~H2Config::ORIGINAL;
-		if(leftKey == "rledebug" && rightValue == "on") H2Config::boolValue |= H2Config::RLEDEBUG;
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::ORIGINAL;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::ORIGINAL;
+		}
 
-		// string
+		// agg file
  		if(leftKey == "aggfile") H2Config::pathAGGFile.assign(rightValue);
- 		if(leftKey == "directorymaps") H2Config::pathMapsDirectory.assign(rightValue);
+ 		// directory maps
+		if(leftKey == "directorymaps") H2Config::pathMapsDirectory.assign(rightValue);
 
 		// value
- 		if(leftKey == "videomode"){
+ 		if(leftKey == "videomode")
+		{
 		    if(rightValue == "640x480") H2Config::videoMode = Display::SMALL;
 		    if(rightValue == "800x600") H2Config::videoMode = Display::MEDIUM;
 		    if(rightValue == "1024x768") H2Config::videoMode = Display::LARGE;
@@ -97,7 +147,21 @@ void H2Config::Init(const std::string &filename)
 		}
 	    }
 
-	file.close();
+    file.close();
+    
+    return true;
+}
+
+/* save config */
+bool H2Config::Save(const std::string & filename)
+{
+    if(filename.empty()) return false;
+
+    //std::fstream file(filename.c_str(), std::ios::in);
+
+    //if(! file || file.fail()) return false;
+    
+    return true;
 }
 
 /* return editor */
@@ -105,9 +169,6 @@ bool H2Config::Editor(void){ return H2Config::boolValue & H2Config::EDITOR; };
 
 /* return debug */
 bool H2Config::Debug(void){ return H2Config::boolValue & H2Config::DEBUG; };
-
-/* return RLE debug */
-bool H2Config::RLEDebug(void){ return H2Config::boolValue & H2Config::RLEDEBUG; };
 
 /* return original version */
 bool H2Config::Original(void){ return H2Config::boolValue & H2Config::ORIGINAL; };

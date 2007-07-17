@@ -41,18 +41,18 @@ namespace H2Config {
 	/*
 	...
 	*/
-	STARTHEROES	= 0x1000,
-	ORIGINAL	= 0x2000,
-	EDITOR		= 0x4000,
-	RLEDEBUG	= 0x8000,
+	STARTHEROES	= 0x2000,
+	ORIGINAL	= 0x4000,
+	EDITOR		= 0x8000,
     } bool_t;
 
-    void Init(const std::string & filename = "");
+    void Defaults(void);
+    bool Load(const std::string & filename);
+    bool Save(const std::string & filename);
 
     bool Debug(void);
     bool Editor(void);
     bool Original(void);
-    bool RLEDebug(void);
     bool Sound(void);
     bool Music(void);
     bool Animation(void);

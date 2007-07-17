@@ -37,6 +37,7 @@
 #include "tools.h"
 #include "text.h"
 #include "error.h"
+#include "portrait.h"
 #include "dialog.h"
 
 Dialog::answer_t Castle::OpenDialog(void)
@@ -126,16 +127,11 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     if(heroes)
     {
-	Heroes::heroes_t name = (*heroes).GetHeroes();
-	std::string hero_portrate(10 > name ? "PORT000" : "PORT00");
-	String::AddInt(hero_portrate, name);
-	hero_portrate += ".ICN";
-
-	display.Blit(AGG::GetICN(hero_portrate, 0), dst_pt);
+	display.Blit(Portrait::Hero((*heroes).GetHeroes(), Portrait::BIG), dst_pt);
     }
     else
     if(isBuild(Castle::BUILD_CAPTAIN))
-	display.Blit(AGG::GetICN(Captain::BigPortraitString(race), 0), dst_pt);
+	display.Blit(Portrait::Captain(race, Portrait::BIG), dst_pt);
     else
     	display.Blit(AGG::GetICN("STRIP.ICN", 3), dst_pt);
 

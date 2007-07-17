@@ -1034,7 +1034,6 @@ bool Castle::AllowBuyBuilding(building_t build) const
 /* buy building */
 void Castle::BuyBuilding(building_t build)
 {
-	Error::Verbose("Castle::BuyBuilding");
 	if(! AllowBuyBuilding(build)) return;
 	
 	const_cast<Kingdom &>(world.GetMyKingdom()).OddFundsResource(PaymentConditions::BuyBuilding(race, build));

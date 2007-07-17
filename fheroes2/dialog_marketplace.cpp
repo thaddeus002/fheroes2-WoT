@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <string>
+#include <vector>
 #include "agg.h"
 #include "localevent.h"
 #include "button.h"
@@ -34,6 +35,7 @@
 #include "text.h"
 #include "marketplace.h"
 #include "dialog.h"
+#include "error.h"
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs);
 void RedrawToResource(const Point & pt, bool showcost, u8 from_resource = 0);
@@ -83,13 +85,14 @@ void Dialog::Marketplace(void)
     Resource::funds_t fundsFrom = kingdom.GetFundsResource();
     u8 resourceFrom = 0;
     const Point pt1(pos_rt.x, pos_rt.y + 190);
-    const Rect rectFromWood(pt1.x, pt1.y, 34, 34);
-    const Rect rectFromMercury(pt1.x + 37, pt1.y, 34, 34);
-    const Rect rectFromOre(pt1.x + 74, pt1.y, 34, 34);
-    const Rect rectFromSulfur(pt1.x, pt1.y + 37, 34, 34);
-    const Rect rectFromCrystal(pt1.x + 37, pt1.y + 37, 34, 34);
-    const Rect rectFromGems(pt1.x + 74, pt1.y + 37, 34, 34);
-    const Rect rectFromGold(pt1.x + 37, pt1.y + 74, 34, 34);
+    std::vector<Rect> rectsFrom;
+    rectsFrom.push_back(Rect(pt1.x, pt1.y, 34, 34));		// wood
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y, 34, 34));	// mercury
+    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y, 34, 34));	// ore
+    rectsFrom.push_back(Rect(pt1.x, pt1.y + 37, 34, 34));	// sulfur
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 37, 34, 34));	// crystal
+    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y + 37, 34, 34));	// gems
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 74, 34, 34));	// gold
     SpriteCursor cursorFrom(cursor);
     dst_pt.x = pt1.x + (108 - Text::width(header_from, Font::SMALL)) / 2;
     dst_pt.y = pt1.y - 15;
@@ -101,47 +104,45 @@ void Dialog::Marketplace(void)
     Resource::funds_t fundsTo;
     u8 resourceTo = 0;
     const Point pt2(130 + pos_rt.x, pos_rt.y + 190);
-    const Rect rectToWood(pt2.x, pt2.y, 34, 34);
-    const Rect rectToMercury(pt2.x + 37, pt2.y, 34, 34);
-    const Rect rectToOre(pt2.x + 74, pt2.y, 34, 34);
-    const Rect rectToSulfur(pt2.x, pt2.y + 37, 34, 34);
-    const Rect rectToCrystal(pt2.x + 37, pt2.y + 37, 34, 34);
-    const Rect rectToGems(pt2.x + 74, pt2.y + 37, 34, 34);
-    const Rect rectToGold(pt2.x + 37, pt2.y + 74, 34, 34);
+    std::vector<Rect> rectsTo;
+    rectsTo.push_back(Rect(pt2.x, pt2.y, 34, 34));		// wood
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y, 34, 34));		// mercury
+    rectsTo.push_back(Rect(pt2.x + 74, pt2.y, 34, 34));		// ore
+    rectsTo.push_back(Rect(pt2.x, pt2.y + 37, 34, 34));		// sulfur
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 37, 34, 34));	// crystal
+    rectsTo.push_back(Rect(pt2.x + 74, pt2.y + 37, 34, 34));	// gems
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 74, 34, 34));	// gold
     SpriteCursor cursorTo(cursor);
     dst_pt.x = pt2.x + (108 - Text::width(header_to, Font::SMALL)) / 2;
     dst_pt.y = pt2.y - 15;
     Text(dst_pt.x, dst_pt.y, header_to, Font::SMALL, true);
     RedrawToResource(pt2, false);
 
-
-
+    u32 count_sell = 0;
+    u32 count_buy = 0;
+    
     Button *buttonTrade = NULL;
     Button *buttonLeft = NULL;
     Button *buttonRight = NULL;
 
-#define CleanTradeArea \
-    Cursor::Hide(); \
-    back.Restore(); \
-    dst_rt.x = pos_rt.x; \
-    dst_rt.y = pos_rt.y + 30; \
-    dst_rt.w = pos_rt.w; \
-    dst_rt.h = 100; \
-    TextBox(dst_rt, message_info, Font::BIG, true); \
-    if(buttonTrade) delete buttonTrade; \
-    if(buttonLeft) delete buttonLeft; \
-    if(buttonRight) delete buttonRight; \
-    buttonTrade = NULL; \
-    buttonLeft = NULL; \
-    buttonRight = NULL; \
-    display.Flip(); \
-    Cursor::Show();
-
-
 #define ShowTradeArea \
     if(resourceFrom == resourceTo) \
     { \
-	CleanTradeArea; \
+	Cursor::Hide(); \
+	back.Restore(); \
+	dst_rt.x = pos_rt.x; \
+	dst_rt.y = pos_rt.y + 30; \
+	dst_rt.w = pos_rt.w; \
+	dst_rt.h = 100; \
+	TextBox(dst_rt, message_info, Font::BIG, true); \
+	if(buttonTrade) delete buttonTrade; \
+	if(buttonLeft) delete buttonLeft; \
+        if(buttonRight) delete buttonRight; \
+        buttonTrade = NULL; \
+        buttonLeft = NULL; \
+        buttonRight = NULL; \
+        display.Flip(); \
+        Cursor::Show(); \
     } \
     else \
     { \
@@ -184,10 +185,36 @@ void Dialog::Marketplace(void)
 	dst_rt.w = pos_rt.w; \
 	dst_rt.h = 100; \
 	TextBox(dst_rt, message, Font::BIG, true); \
+	const Sprite & sprite_from = AGG::GetICN("RESOURCE.ICN", Resource::GetIndexSprite2(rs_from)); \
+	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2; \
+	dst_pt.y = pos_rt.y + 115 - sprite_from.h(); \
+	display.Blit(sprite_from, dst_pt); \
+	message.clear(); \
+	String::AddInt(message, count_sell); \
+	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2; \
+	dst_pt.y = pos_rt.y + 116; \
+	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true); \
+	const Sprite & sprite_to = AGG::GetICN("RESOURCE.ICN", Resource::GetIndexSprite2(rs_to)); \
+	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2; \
+	dst_pt.y = pos_rt.y + 115 - sprite_to.h(); \
+	display.Blit(sprite_to, dst_pt); \
+	message.clear(); \
+	String::AddInt(message, count_buy); \
+	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2; \
+	dst_pt.y = pos_rt.y + 116; \
+	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true); \
+	const Sprite & sprite_fromto = AGG::GetICN(tradpost, 0); \
+	dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2; \
+	dst_pt.y = pos_rt.y + 90; \
+	display.Blit(sprite_fromto, dst_pt); \
+	const std::string & str_qty = "Qty to trade"; \
+	dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(str_qty, Font::SMALL)) / 2; \
+	dst_pt.y = pos_rt.y + 110; \
+	Text(dst_pt.x, dst_pt.y, str_qty, Font::SMALL, true); \
 	display.Flip(); \
 	Cursor::Show(); \
-    }
-    
+    } \
+
     // button exit
     const Sprite & sprite_exit = AGG::GetICN(tradpost, 17);
     dst_pt.x = pos_rt.x + (pos_rt.w - sprite_exit.w()) / 2;
@@ -217,164 +244,100 @@ void Dialog::Marketplace(void)
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)){ exit = true; }
 	
 	// click from
-	if(le.MouseClickLeft(rectFromWood))
+	for(u8 ii = 0; ii < rectsFrom.size(); ++ii)
 	{
-	    Cursor::Hide();
-	    resourceFrom = Resource::WOOD;
-	    cursorFrom.Move(rectFromWood.x - 2, rectFromWood.y - 2);
-	    if(resourceTo)
+	    const Rect & rect_from = rectsFrom[ii];
+
+	    if(le.MouseClickLeft(rect_from))
 	    {
-		cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
-		cursorTo.Show();
-		ShowTradeArea;
+		switch(ii)
+		{
+		    case 0: resourceFrom = Resource::WOOD; break;
+		    case 1: resourceFrom = Resource::MERCURY; break;
+		    case 2: resourceFrom = Resource::ORE; break;
+		    case 3: resourceFrom = Resource::SULFUR; break;
+		    case 4: resourceFrom = Resource::CRYSTAL; break;
+		    case 5: resourceFrom = Resource::GEMS; break;
+		    case 6: resourceFrom = Resource::GOLD; break;
+		    default: break;
+		}
+
+		Cursor::Hide();
+		cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
+
+		if(resourceTo)
+		{
+		    cursorTo.Hide();
+		    RedrawToResource(pt2, true, resourceFrom);
+		    cursorTo.Show();
+		    ShowTradeArea;
+		}
+		Cursor::Show();
 	    }
-	    Cursor::Show();
-	}
-	else
-	if(le.MouseClickLeft(rectFromMercury))
-	{
-	    Cursor::Hide();
-	    resourceFrom = Resource::MERCURY;
-	    cursorFrom.Move(rectFromMercury.x - 2, rectFromMercury.y - 2);
-	    if(resourceTo)
-	    {
-		cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
-		cursorTo.Show();
-		ShowTradeArea;
-	    }
-	    Cursor::Show();
-	}
-	else
-	if(le.MouseClickLeft(rectFromOre))
-	{
-	    Cursor::Hide();
-	    resourceFrom = Resource::ORE;
-	    cursorFrom.Move(rectFromOre.x - 2, rectFromOre.y - 2);
-	    if(resourceTo)
-	    {
-		cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
-		cursorTo.Show();
-		ShowTradeArea;
-	    }
-	    Cursor::Show();
-	}
-	else
-	if(le.MouseClickLeft(rectFromSulfur))
-	{
-	    Cursor::Hide();
-	    resourceFrom = Resource::SULFUR;
-	    cursorFrom.Move(rectFromSulfur.x - 2, rectFromSulfur.y - 2);
-	    if(resourceTo)
-	    {
-		cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
-		cursorTo.Show();
-		ShowTradeArea;
-	    }
-	    Cursor::Show();
-	}
-	else
-	if(le.MouseClickLeft(rectFromCrystal))
-	{
-	    Cursor::Hide();
-	    resourceFrom = Resource::CRYSTAL;
-	    cursorFrom.Move(rectFromCrystal.x - 2, rectFromCrystal.y - 2);
-	    if(resourceTo)
-	    {
-		cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
-		cursorTo.Show();
-		ShowTradeArea;
-	    }
-	    Cursor::Show();
-	}
-	else
-	if(le.MouseClickLeft(rectFromGems))
-	{
-	    Cursor::Hide();
-	    resourceFrom = Resource::GEMS;
-	    cursorFrom.Move(rectFromGems.x - 2, rectFromGems.y - 2);
-	    if(resourceTo)
-	    {
-		cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
-		cursorTo.Show();
-		ShowTradeArea;
-	    }
-	    Cursor::Show();
-	}
-	else
-	if(le.MouseClickLeft(rectFromGold))
-	{
-	    Cursor::Hide();
-	    resourceFrom = Resource::GOLD;
-	    cursorFrom.Move(rectFromGold.x - 2, rectFromGold.y - 2);
-	    if(resourceTo)
-	    {
-		cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
-		cursorTo.Show();
-		ShowTradeArea;
-	    }
-	    Cursor::Show();
 	}
 
 	// click to
-	if(le.MouseClickLeft(rectToWood))
+	for(u8 ii = 0; ii < rectsTo.size(); ++ii)
 	{
-	    resourceTo = Resource::WOOD;
-	    cursorTo.Move(rectToWood.x - 2, rectToWood.y - 2);
-	    if(resourceFrom) ShowTradeArea;
+	    const Rect & rect_to = rectsTo[ii];
+
+	    if(le.MouseClickLeft(rect_to))
+	    {
+		switch(ii)
+		{
+		    case 0: resourceTo = Resource::WOOD; break;
+		    case 1: resourceTo = Resource::MERCURY; break;
+		    case 2: resourceTo = Resource::ORE; break;
+		    case 3: resourceTo = Resource::SULFUR; break;
+		    case 4: resourceTo = Resource::CRYSTAL; break;
+		    case 5: resourceTo = Resource::GEMS; break;
+		    case 6: resourceTo = Resource::GOLD; break;
+		    default: break;
+		}
+
+		Cursor::Hide();
+		cursorTo.Move(rect_to.x - 2, rect_to.y - 2);
+
+		if(resourceFrom)
+		{
+		    cursorTo.Hide();
+		    RedrawToResource(pt2, true, resourceFrom);
+		    cursorTo.Show();
+		    ShowTradeArea;
+		}
+		Cursor::Show();
+	    }
 	}
-	else
-	if(le.MouseClickLeft(rectToMercury))
+
+	// trade
+	if(buttonTrade && le.MouseClickLeft(*buttonTrade))
 	{
-	    resourceTo = Resource::MERCURY;
-	    cursorTo.Move(rectToMercury.x - 2, rectToMercury.y - 2);
-	    if(resourceFrom) ShowTradeArea;
-	}
-	else
-	if(le.MouseClickLeft(rectToOre))
+/*
+	u32 count_from = 0;
+	switch(rs_from)
 	{
-	    resourceTo = Resource::ORE;
-	    cursorTo.Move(rectToOre.x - 2, rectToOre.y - 2);
-	    if(resourceFrom) ShowTradeArea;
+	    case Resource::WOOD:	count_from = fundsFrom.wood;	break;
+	    case Resource::ORE:		count_from = fundsFrom.ore;	break;
+	    case Resource::MERCURY:	count_from = fundsFrom.mercury; break;
+	    case Resource::SULFUR:	count_from = fundsFrom.sulfur;	break;
+	    case Resource::CRYSTAL:	count_from = fundsFrom.crystal; break;
+	    case Resource::GEMS:	count_from = fundsFrom.gems;	break;
+	    case Resource::GOLD:	count_from = fundsFrom.gold;	break;
 	}
-	else
-	if(le.MouseClickLeft(rectToSulfur))
+	u32 get_count = Resource::GOLD == rs_to ? count_from * exchange_rate : count_from / exchange_rate;
+	Error::Verbose("exchange: ", get_count);
+*/
+	}
+
+	// decrease trade resource
+	if(buttonLeft && le.MouseClickLeft(*buttonLeft))
 	{
-	    resourceTo = Resource::SULFUR;
-	    cursorTo.Move(rectToSulfur.x - 2, rectToSulfur.y - 2);
-	    if(resourceFrom) ShowTradeArea;
 	}
-	else
-	if(le.MouseClickLeft(rectToCrystal))
+
+	// increase trade resource
+	if(buttonRight && le.MouseClickLeft(*buttonRight))
 	{
-	    resourceTo = Resource::CRYSTAL;
-	    cursorTo.Move(rectToCrystal.x - 2, rectToCrystal.y - 2);
-	    if(resourceFrom) ShowTradeArea;
 	}
-	else
-	if(le.MouseClickLeft(rectToGems))
-	{
-	    resourceTo = Resource::GEMS;
-	    cursorTo.Move(rectToGems.x - 2, rectToGems.y - 2);
-	    if(resourceFrom) ShowTradeArea;
-	}
-	else
-	if(le.MouseClickLeft(rectToGold))
-	{
-	    resourceTo = Resource::GOLD;
-	    cursorTo.Move(rectToGold.x - 2, rectToGold.y - 2);
-	    if(resourceFrom) ShowTradeArea;
-	}
-	
-	//if(buttonTrade)
-	//if(buttonLeft)
-	//if(buttonRight)
     }
 
     le.ResetKey();
@@ -791,4 +754,3 @@ u16 GetTradeCosts(u8 rs_from, u8 rs_to)
 
     return 0;
 }
-

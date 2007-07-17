@@ -40,6 +40,12 @@ namespace Font
 #define MAXU16   65535
 #define MAXU32   4294967295
 
+#if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__)
+#define SEPARATOR       "\\"
+#else
+#define SEPARATOR       "/"
+#endif
+
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
 #define RMASK 0x0000f000

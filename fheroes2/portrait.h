@@ -17,19 +17,15 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2CAPTAIN_H
-#define H2CAPTAIN_H
+#ifndef H2PORTRAIT_H
+#define H2PORTRAIT_H
 
-#include <string>
-#include "gamedefs.h"
-#include "race.h"
-
-namespace Captain
+namespace Portrait
 {
-    u8 GetAttack(Race::race_t race);
-    u8 GetDefense(Race::race_t race);
-    u8 GetPower(Race::race_t race);
-    u8 GetKnowledge(Race::race_t race);
+    typedef enum { BIG, MEDIUM, SMALL } size_t;
+    
+    const Surface & Hero(const Heroes::heroes_t & hero, const Portrait::size_t & sz);
+    const Surface & Captain(const Race::race_t & rs, const Portrait::size_t & sz);
 };
 
 #endif

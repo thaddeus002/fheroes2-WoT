@@ -33,6 +33,7 @@
 #include "tools.h"
 #include "text.h"
 #include "error.h"
+#include "portrait.h"
 #include "dialog.h"
 
 Dialog::answer_t Heroes::OpenDialog(bool readonly)
@@ -52,16 +53,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "HEROEXTE.ICN" : "HEROEXTG.ICN", 0), dst_pt);
 
+    std::string message;
+
     // portrait
-    std::string message( heroes < 10 ? "PORT000" : "PORT00");
-    String::AddInt(message, heroes);
-    message += ".ICN";
-    
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 31;
-    
-    display.Blit(AGG::GetICN(message, 0), dst_pt);
-    
+    display.Blit(Portrait::Hero(heroes, Portrait::BIG), dst_pt);
+
     // name
     message = name + " the " + Race::String(race) + " ( Level ";
     String::AddInt(message, GetLevel());

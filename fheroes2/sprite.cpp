@@ -41,7 +41,13 @@ void Sprite::DrawICN(u32 size, const u8 *vdata)
     u16 y = 0;
     u32 index = 0;
 
-    if(H2Config::RLEDebug()) printf("START RLE DEBUG\n");
+    bool rledebug = false;
+
+#ifdef RLEDEBUG
+    rledebug = true;
+#endif
+
+    if(rledebug) printf("START RLE DEBUG\n");
 
     // lock surface
     Lock();
@@ -52,56 +58,56 @@ void Sprite::DrawICN(u32 size, const u8 *vdata)
 	if(0 == vdata[index]){
 	    ++y;
 	    x = 0;
-	    if(H2Config::RLEDebug()) printf(" M:00\n");
+	    if(rledebug) printf(" M:00\n");
 	    ++index;
 	    continue;
 
 	// range 0x01..0x7F XX
 	}else if(0x80 > vdata[index]){
-	    if(H2Config::RLEDebug()) printf(" M:%hhX C:%d:D", vdata[index], vdata[index]);
+	    if(rledebug) printf(" M:%hhX C:%d:D", vdata[index], vdata[index]);
 	    count = vdata[index];
 	    ++index;
 	    i = 0;
 	    while(i++ < count && index < size){
-		if(H2Config::RLEDebug()) printf(":%hhX", vdata[index]);
+		if(rledebug) printf(":%hhX", vdata[index]);
 		SetPixel2(x++, y, AGG::GetColor(vdata[index++]));
 	    }
 	    continue;
 
 	// end data
 	}else if(0x80 == vdata[index]){
-	    if(H2Config::RLEDebug()) printf("\nM:%hhX\n", vdata[index]);
+	    if(rledebug) printf("\nM:%hhX\n", vdata[index]);
 	    break;
 
 	// range 0x81..0xBF 00 
 	}else if(0x80 < vdata[index] && 0xC0 > vdata[index]){
-	    if(H2Config::RLEDebug()) printf(" M:%hhX Z:%d", vdata[index], vdata[index] - 0x80);
+	    if(rledebug) printf(" M:%hhX Z:%d", vdata[index], vdata[index] - 0x80);
 	    x += (vdata[index] - 0x80);
 	    ++index;
 	    continue;
 
 	// 0xC0 - seek
 	}else if(0xC0 == vdata[index]){
-	    if(H2Config::RLEDebug()) printf(" M:C0");
+	    if(rledebug) printf(" M:C0");
 	    ++index;
 
 	    if( 0 == vdata[index] % 4){
-		if(H2Config::RLEDebug()) printf(" M4:%hhX:%d A", vdata[index], vdata[index] % 4);
+		if(rledebug) printf(" M4:%hhX:%d A", vdata[index], vdata[index] % 4);
 		count = vdata[index];
 		++index;
 		for(i = 0; i < vdata[index]; ++i){
 		    SetPixel2(x++, y, AGG::GetShadowAlpha());
-		    if(H2Config::RLEDebug()) printf(":%hhX", count);
+		    if(rledebug) printf(":%hhX", count);
 		}
 		++index;
 		continue;
 
 	    }else{
-		if(H2Config::RLEDebug()) printf(" M4:%hhX:%d A", vdata[index], vdata[index] % 4);
+		if(rledebug) printf(" M4:%hhX:%d A", vdata[index], vdata[index] % 4);
 		count = vdata[index];
 		for(i = 0; i < vdata[index] % 4; ++i){
 		    SetPixel2(x++, y, AGG::GetShadowAlpha());
-		    if(H2Config::RLEDebug()) printf(":%hhX", count);
+		    if(rledebug) printf(":%hhX", count);
 		}
 		++index;
 		continue;
@@ -109,27 +115,27 @@ void Sprite::DrawICN(u32 size, const u8 *vdata)
 
 	// 0xC1 N D count - data
 	}else if(0xC1 == vdata[index]){
-	    if(H2Config::RLEDebug()) printf(" M:%hhX", vdata[index]);
+	    if(rledebug) printf(" M:%hhX", vdata[index]);
 	    ++index;
 	    count = vdata[index];
-	    if(H2Config::RLEDebug()) printf(" C:%d:D", count);
+	    if(rledebug) printf(" C:%d:D", count);
 	    ++index;
 	    for(i = 0; i < count; ++i){
 	    	SetPixel2(x++, y, AGG::GetColor(vdata[index]));
-	    	if(H2Config::RLEDebug()) printf(":%hhX", vdata[index]);
+	    	if(rledebug) printf(":%hhX", vdata[index]);
 	    }
 	    ++index;
 	    continue;
 
 	// 0xC2 more
 	}else if(0xC1 < vdata[index]){
-	    if(H2Config::RLEDebug()) printf(" M:%hhX", vdata[index]);
+	    if(rledebug) printf(" M:%hhX", vdata[index]);
 	    count = vdata[index] - 0xC0;
-	    if(H2Config::RLEDebug()) printf(" C:%d:D", count);
+	    if(rledebug) printf(" C:%d:D", count);
 	    ++index;
 	    for(i = 0; i < count; ++i){
 		SetPixel2(x++, y, AGG::GetColor(vdata[index]));
-		if(H2Config::RLEDebug()) printf(":%hhX", vdata[index]);
+		if(rledebug) printf(":%hhX", vdata[index]);
 	    }
 	    ++index;
 	    continue;
@@ -139,6 +145,6 @@ void Sprite::DrawICN(u32 size, const u8 *vdata)
     // unlock surface
     Unlock();
 
-    if(H2Config::RLEDebug()) printf("END RLE DEBUG\n");
+    if(rledebug) printf("END RLE DEBUG\n");
 }
 

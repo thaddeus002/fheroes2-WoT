@@ -30,6 +30,7 @@
 #include "gamearea.h"
 #include "background.h"
 #include "error.h"
+#include "portrait.h"
 #include "dialog.h"
 
 void Dialog::QuickInfo(const std::string & object)
@@ -257,7 +258,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
 
     // mini port heroes
-    const Surface & port = AGG::GetICN("MINIPORT.ICN", hero.GetHeroes());
+    const Surface & port = Portrait::Hero(hero.GetHeroes(), Portrait::SMALL);
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
     dst_pt.y += 15;
     display.Blit(port, dst_pt);

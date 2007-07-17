@@ -55,6 +55,8 @@ void World::LoadMaps(const std::string &filename)
     begin_week = true;
     begin_month = true;
 
+    free_recrut_hero1 = Heroes::UNKNOWN;
+    free_recrut_hero2 = Heroes::UNKNOWN;
 
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -124,12 +126,14 @@ void World::LoadMaps(const std::string &filename)
     vec_heroes.push_back(new Heroes(Heroes::SANDRO, Race::NECR, "Sandro"));
     vec_heroes.push_back(new Heroes(Heroes::CELIA, Race::NECR, "Celia"));
 
-    vec_heroes.push_back(new Heroes(Heroes::ROLAND, Race::KNGT, "Roland"));
-    vec_heroes.push_back(new Heroes(Heroes::UNKNOWN1, Race::KNGT, "Unknown Person 1"));
-    vec_heroes.push_back(new Heroes(Heroes::UNKNOWN2, Race::SORC, "Unknown Person 2"));
-    vec_heroes.push_back(new Heroes(Heroes::ARCHIBALD, Race::KNGT, "Archibald"));
-    vec_heroes.push_back(new Heroes(Heroes::SANDYSANDY, Race::WRLK, H2Config::Debug() ? "Debugger" : "SandySandy"));
-    vec_heroes.push_back(new Heroes(Heroes::BRAX, Race::NECR, "Brax"));
+    vec_heroes.push_back(new Heroes(Heroes::ROLAND, Race::WZRD, "Roland"));
+    vec_heroes.push_back(new Heroes(Heroes::CORLAGON, Race::KNGT, "Lord Corlagon"));
+    vec_heroes.push_back(new Heroes(Heroes::ELIZA, Race::SORC, "Sister Eliza"));
+    vec_heroes.push_back(new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald"));
+    vec_heroes.push_back(new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton"));
+    vec_heroes.push_back(new Heroes(Heroes::BAX, Race::NECR, "Brother Bax"));
+    vec_heroes.push_back(new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy"));
+    vec_heroes.push_back(new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown"));
 
     // loading info
     display.Fill(0, 0, 0);
@@ -484,7 +488,7 @@ void World::LoadMaps(const std::string &filename)
 			    const Heroes * hero = NULL;
 
 			    hero = (pblock[17] &&
-				    pblock[18] < Heroes::BRAX &&
+				    pblock[18] < Heroes::BAX &&
 				    static_cast<u8>(pblock[18]) < vec_heroes.size() &&
 				    vec_heroes.at(pblock[18])->isFreeman() ?
 				    vec_heroes[pblock[18]] : GetFreemanHeroes(race));
@@ -639,7 +643,7 @@ void World::LoadMaps(const std::string &filename)
 		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
 		}
 	    }
-	
+
     if(H2Config::Debug()) Error::Verbose("World::LoadMaps: end load.");
 }
 
@@ -737,15 +741,30 @@ void World::NextDay(void)
     if(begin_week)
     {
         for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewWeek();
+        
+        NewWeek();
     }
     
     // action new month
     if(begin_month)
     {
         for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewMonth();
+        
+        NewMonth();
     }
 }
 
+void World::NewWeek(void)
+{
+    // change free recrut hero
+    const Race::race_t & rc = H2Config::GetKingdomRace(H2Config::GetMyColor());
+    free_recrut_hero1 = GetFreemanHeroes(rc)->GetHeroes();
+    free_recrut_hero2 = GetFreemanHeroes()->GetHeroes();
+}
+
+void World::NewMonth(void)
+{
+}
 
 void World::FreeOldMaps(void)
 {
@@ -829,6 +848,22 @@ void World::FreeOldMaps(void)
 	for(; it != vec_heroes.end(); ++it) delete *it;
     }
     vec_heroes.clear();
+}
+
+const Heroes::heroes_t & World::GetFreeRecrut1(void)
+{
+    const Race::race_t & rc = H2Config::GetKingdomRace(H2Config::GetMyColor());
+
+    if(Heroes::UNKNOWN == free_recrut_hero1 || !(*vec_heroes[free_recrut_hero1]).isFreeman()) free_recrut_hero1 = GetFreemanHeroes(rc)->GetHeroes();
+
+    return free_recrut_hero1;
+}
+
+const Heroes::heroes_t & World::GetFreeRecrut2(void)
+{
+    if(Heroes::UNKNOWN == free_recrut_hero2 || !(*vec_heroes[free_recrut_hero2]).isFreeman()) free_recrut_hero2 = GetFreemanHeroes()->GetHeroes();
+
+    return free_recrut_hero2;
 }
 
 const Heroes * World::GetFreemanHeroes(Race::race_t rc)

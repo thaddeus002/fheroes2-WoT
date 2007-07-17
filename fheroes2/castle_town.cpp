@@ -35,6 +35,7 @@
 #include "background.h"
 #include "tools.h"
 #include "text.h"
+#include "portrait.h"
 #include "payment.h"
 
 Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
@@ -744,38 +745,28 @@ u32 Castle::OpenTown(void)
     }
 
     // first hero
-    const Heroes * hero1 = world.GetFreemanHeroes(race);
+    const Heroes::heroes_t & hero1 = world.GetFreeRecrut1();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 260;
     const Rect rectHero1(dst_pt, 102, 93);
-    if(hero1)
-    {
-	Heroes::heroes_t hero1_name = (*hero1).GetHeroes();
-	message = 10 > hero1_name ? "PORT000" : "PORT00";
-	String::AddInt(message, hero1_name);
-	message += ".ICN";
-	const Sprite & hero1_sprite = AGG::GetICN(message, 0);
-	display.Blit(hero1_sprite, dst_pt);
-    }
+    if(Heroes::UNKNOWN != hero1)
+	display.Blit(Portrait::Hero(hero1, Portrait::BIG), dst_pt);
     else
 	display.FillRect(0, 0, 0, rectHero1);
 
+    Heroes heroes1 = world.GetHeroes(hero1);
+
     // second hero
-    const Heroes * hero2 = world.GetFreemanHeroes();
+    const Heroes::heroes_t & hero2 = world.GetFreeRecrut2();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 362;
     const Rect rectHero2(dst_pt, 102, 94);
-    if(hero2)
-    {
-	Heroes::heroes_t hero2_name = (*hero2).GetHeroes();
-	message = 10 > hero2_name ? "PORT000" : "PORT00";
-	String::AddInt(message, hero2_name);
-	message += ".ICN";
-	const Sprite & hero2_sprite = AGG::GetICN(message, 0);
-	display.Blit(hero2_sprite, dst_pt);
-    }
+    if(Heroes::UNKNOWN != hero2)
+	display.Blit(Portrait::Hero(hero2, Portrait::BIG), dst_pt);
     else
 	display.FillRect(0, 0, 0, rectHero2);
+
+    Heroes heroes2 = world.GetHeroes(hero2);
 
     // bottom bar
     dst_pt.x = cur_pt.x;
@@ -944,10 +935,10 @@ u32 Castle::OpenTown(void)
             army_spread = false;
         }
 	else
-        if(hero1 && le.MouseClickLeft(rectHero1)); // FIXME: buy heroes
+        if(Heroes::UNKNOWN != hero1 && le.MouseClickLeft(rectHero1)); // FIXME: buy heroes
 	else
-        if(hero2 && le.MouseClickLeft(rectHero2)); // FIXME: buy heroes
-	
+        if(Heroes::UNKNOWN != hero2 && le.MouseClickLeft(rectHero2)); // FIXME: buy heroes
+
 
 	// right
 	if(!(DWELLING_MONSTER1 & building) && le.MousePressRight(rectDwelling1)) DialogBuyBuilding(DWELLING_MONSTER1, false);
@@ -992,9 +983,9 @@ u32 Castle::OpenTown(void)
         else
 	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message("Grouped Formation", descriptionGroupedArmyFormat, Font::BIG);
 	else
-	if(hero1 && le.MousePressRight(rectHero1)) (*const_cast<Heroes *>(hero1)).OpenDialog(true);
+	if(Heroes::UNKNOWN != hero1 && le.MousePressRight(rectHero1)) heroes1.OpenDialog(true);
 	else
-	if(hero2 && le.MousePressRight(rectHero2)) (*const_cast<Heroes *>(hero2)).OpenDialog(true);
+	if(Heroes::UNKNOWN != hero2 && le.MousePressRight(rectHero2)) heroes2.OpenDialog(true);
 
 
         // status info
@@ -1213,14 +1204,14 @@ u32 Castle::OpenTown(void)
     			statusBar.ShowMessage("Cannot build " + stringCaptain);
 	}
 	else
-	if(hero1 && le.MouseCursor(rectHero1))
+	if(Heroes::UNKNOWN != hero1 && le.MouseCursor(rectHero1))
 	{
-	    statusBar.ShowMessage("Recrut " + (*hero1).GetName() + " the " + Race::String((*hero1).GetRace()));
+	    statusBar.ShowMessage("Recrut " + heroes1.GetName() + " the " + Race::String(heroes1.GetRace()));
 	}
 	else
-	if(hero2 && le.MouseCursor(rectHero2))
+	if(Heroes::UNKNOWN != hero2 && le.MouseCursor(rectHero2))
 	{
-	    statusBar.ShowMessage("Recrut " + (*hero2).GetName() + " the " + Race::String((*hero2).GetRace()));
+	    statusBar.ShowMessage("Recrut " + heroes2.GetName() + " the " + Race::String(heroes2.GetRace()));
 	}
 	else
 	if(le.MouseCursor(rectSpreadArmyFormat))

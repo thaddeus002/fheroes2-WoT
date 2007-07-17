@@ -24,6 +24,7 @@
 #include "race.h"
 #include "config.h"
 #include "agg.h"
+#include "portrait.h"
 #include "game_selectfocus.h"
 
 #define ICONS_WIDTH		46
@@ -210,7 +211,7 @@ void Game::SelectFocusHeroes::Redraw(void)
 	    
 	    const Sprite & mobility = AGG::GetICN("MOBILITY.ICN", hero.GetMobilityIndexSprite());
 	    const Sprite & mana = AGG::GetICN("MANA.ICN", hero.GetManaIndexSprite());
-	    const Sprite & port = AGG::GetICN("MINIPORT.ICN", hero.GetHeroes());
+	    const Surface & port = Portrait::Hero(hero.GetHeroes(), Portrait::SMALL);
 
 	    display.FillRect(0, 0, 0, coords[ii]);
 

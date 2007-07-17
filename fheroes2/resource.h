@@ -83,7 +83,11 @@ namespace Resource
     resource_t FromMP2(u8 index);
     u16	RandCount(Resource::resource_t res);
     
+    /* return index sprite objnrsrc.icn */
     u8 GetIndexSprite(resource_t resource);
+
+    /* return index sprite resource.icn */
+    u8 GetIndexSprite2(resource_t resource);
 
     void ChangeTileWithRNDResource(std::vector<Maps::Tiles *> & vector, u16 center);
 

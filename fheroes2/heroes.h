@@ -86,7 +86,9 @@ public:
 	// necromancer
 	ZOM, DARLANA, ZAM, RANLOO, CHARITY, RIALDO, ROXANA, SANDRO, CELIA,
 	// from campain
-	ROLAND, UNKNOWN1, UNKNOWN2, ARCHIBALD, SANDYSANDY, BRAX,
+	ROLAND, CORLAGON, ELIZA, ARCHIBALD, HALTON, BAX,
+	// debugger
+	SANDYSANDY, UNKNOWN
     } heroes_t;
 
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);

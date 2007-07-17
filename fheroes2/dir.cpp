@@ -23,12 +23,6 @@
 #include "gamedefs.h"
 #include "dir.h"
 
-#if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__) 
-#define SEPARATOR       "\\" 
-#else 
-#define SEPARATOR       "/" 
-#endif 
-
 Dir::Dir(const std::string &path, const std::string &filter) : std::vector<std::string>()
 {
     // read directory

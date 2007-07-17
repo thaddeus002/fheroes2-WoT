@@ -18,33 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
 #include "captain.h"
-
-const std::string & Captain::BigPortraitString(Race::race_t race)
-{
-    static const std::string big_portrate_kngt("PORT0089.ICN");
-    static const std::string big_portrate_barb("PORT0090.ICN");
-    static const std::string big_portrate_sorc("PORT0091.ICN");
-    static const std::string big_portrate_wrlk("PORT0092.ICN");
-    static const std::string big_portrate_wzrd("PORT0093.ICN");
-    static const std::string big_portrate_necr("PORT0094.ICN");
-
-    switch(race)
-    {
-	case Race::KNGT:	return big_portrate_kngt;
-	case Race::BARB:	return big_portrate_barb;
-	case Race::SORC:	return big_portrate_sorc;
-	case Race::WRLK:	return big_portrate_wrlk;
-	case Race::WZRD:	return big_portrate_wzrd;
-	case Race::NECR:	return big_portrate_necr;
-	default: break;
-    }
-
-    Error::Warning("Captain::BigPortraitString: unknown race.");
-
-    return big_portrate_kngt;
-}
 
 u8 Captain::GetAttack(Race::race_t race)
 {

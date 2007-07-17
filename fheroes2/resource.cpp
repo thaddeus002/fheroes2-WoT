@@ -234,6 +234,24 @@ u8 Resource::GetIndexSprite(Resource::resource_t resource)
     return 0;
 }
 
+/* return index sprite resource.icn */
+u8 Resource::GetIndexSprite2(Resource::resource_t resource)
+{
+    switch(resource){
+        case Resource::WOOD:	return  0;
+        case Resource::MERCURY:	return  1;
+        case Resource::ORE:	return  2;
+        case Resource::SULFUR:	return  3;
+        case Resource::CRYSTAL: return  4;
+        case Resource::GEMS:	return  5;
+	case Resource::GOLD:	return  6;
+        default: 
+	    Error::Warning("Resource::GetIndexSprite2: unknown");
+    }
+
+    return 0;
+}
+
 u8 Resource::funds_t::GetValidItems(void)
 {
 	u8 result = 0;

@@ -46,12 +46,20 @@ int main(int argc, char **argv)
 
 	std::cout << caption << std::endl;
 
+	// load defaults
+	H2Config::Defaults();
+	std::cout << "config: defaults load" << std::endl;
+
+	// load fheroes2.cfg
+	const std::string & fheroes2_cfg = "fheroes2.cfg";
+	std::cout << "config: " << fheroes2_cfg << (H2Config::Load(fheroes2_cfg) ? " load" : " not found") << std::endl;
+
 	{
 	    // parse cmd params
 	    CmdLine cmd((const char **) argv);
 
-	    if(cmd.Exists('h')){
-
+	    if(cmd.Exists('h'))
+	    {
 		std::cout << "Usage: " << argv[0] << " [OPTIONS]\n" \
 		    << "  -e\teditors mode\n" \
 		    << "  -d\tdebug mode\n" \
@@ -69,15 +77,19 @@ int main(int argc, char **argv)
 		return EXIT_SUCCESS;
 	    }
 
-	    // init config
-	    cmd.Exists('c') ? H2Config::Init(cmd.GetValue('c')) : H2Config::Init("fheroes2.cfg");
+	    // load cmd config
+	    if(cmd.Exists('c'))
+	    {
+		const std::string & cmd_config = cmd.GetValue('c');
+		std::cout << "config: " << cmd_config << (H2Config::Load(cmd_config) ? " load" : " not found") << std::endl;
+	    }
 
 	    // set debug
 	    if(cmd.Exists('d')) H2Config::SetDebug();
 
 	    // editor mode
-	    if(cmd.Exists('e')){
-
+	    if(cmd.Exists('e'))
+	    {
 		H2Config::SetEditor();
 
 		if(H2Config::Debug()) std::cout << "start: editing mode." << std::endl;
