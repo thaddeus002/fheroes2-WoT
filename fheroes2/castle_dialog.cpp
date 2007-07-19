@@ -40,6 +40,17 @@
 #include "portrait.h"
 #include "dialog.h"
 
+void Castle::DisplayName(const Point & src_pt)
+{
+    const Sprite & ramka = AGG::GetICN("TOWNNAME.ICN", 0);
+    Point dst_pt(src_pt.x + 320 - ramka.w() / 2, src_pt.y + 248);
+    display.Blit(ramka, dst_pt);
+
+    dst_pt.x = src_pt.x + 320 - Text::width(name, Font::SMALL) / 2;
+    dst_pt.y = src_pt.y + 248;
+    Text(dst_pt.x, dst_pt.y, name, Font::SMALL, true);
+}
+
 Dialog::answer_t Castle::OpenDialog(void)
 {
     // cursor
@@ -160,6 +171,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     // draw building
     RedrawBuilding(cur_pt);
+    DisplayName(cur_pt);
 
     const Rect coordBuildingThievesGuild(GetCoordBuilding(BUILD_THIEVESGUILD, cur_pt));
     const Rect coordBuildingTavern(GetCoordBuilding(BUILD_TAVERN, cur_pt));
@@ -683,16 +695,30 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// left click building
 	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) OpenThievesGuild();
 	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern)) OpenTavern();
-	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // in to
+	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // FIXME dialog buy boat
 	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell)) OpenWell();
 	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
 	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)) Dialog::Marketplace();
 	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
 	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
 	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG, Dialog::OK);
-	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle)) OpenTown();
+	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle))
+	{
+	    const building_t build = OpenTown();
+	    
+	    if(Castle::BUILD_NOTHING != build)
+	    {
+		Cursor::Hide();
+		BuyBuilding(build);
+		RedrawResourcePanel();
+		// FIXME RedrawNewBuyBuildingAnimation
+		RedrawBuilding(cur_pt);
+		Cursor::Show();
+		display.Flip();
+	    }
+	}
 	else
-	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent)); // in to
+	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent)); // FIXME dialog buy castle
 	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);
 
 	// left click mage guild

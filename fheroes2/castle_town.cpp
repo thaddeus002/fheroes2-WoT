@@ -405,7 +405,7 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
 
 }
 
-u32 Castle::OpenTown(void)
+Castle::building_t Castle::OpenTown(void)
 {
     // cursor
     Cursor::Hide();
@@ -445,7 +445,7 @@ u32 Castle::OpenTown(void)
         case Race::SORC: message = "CSTLSORC.ICN"; break;
         case Race::WRLK: message = "CSTLWRLK.ICN"; break;
         case Race::WZRD: message = "CSTLWZRD.ICN"; break;
-	default: return 0;
+	default: return BUILD_NOTHING;
     }
 
     u8 index = 0;
@@ -682,7 +682,7 @@ u32 Castle::OpenTown(void)
         case Race::SORC: message = "CSTLCAPS.ICN"; break;
         case Race::WRLK: message = "CSTLCAPW.ICN"; break;
         case Race::WZRD: message = "CSTLCAPZ.ICN"; break;
-	default: return 0;
+	default: return BUILD_NOTHING;
     }
     dst_pt.x = cur_pt.x + 444;
     dst_pt.y = cur_pt.y + 165;
@@ -807,113 +807,95 @@ u32 Castle::OpenTown(void)
 	if(!((allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2) & building) && le.MouseClickLeft(rectDwelling2) && allowBuyBuildDwelling2 &&
 		Dialog::OK == DialogBuyBuilding(allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2, true))
 	{
-		BuyBuilding(allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2);
 		return allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2;
 	}
 	else
 	if(!((allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3) & building) && le.MouseClickLeft(rectDwelling3) && allowBuyBuildDwelling3 &&
 		Dialog::OK == DialogBuyBuilding(allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3, true))
 	{
-		BuyBuilding(allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3);
 		return allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3;
 	}
 	else
 	if(!((allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4) & building) && le.MouseClickLeft(rectDwelling4) && allowBuyBuildDwelling4 &&
 		Dialog::OK == DialogBuyBuilding(allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4, true))
 	{
-		BuyBuilding(allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4);
 		return allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4;
 	}
 	else
 	if(!((allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5) & building) && le.MouseClickLeft(rectDwelling5) && allowBuyBuildDwelling5 &&
 		Dialog::OK == DialogBuyBuilding(allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5, true))
 	{
-		BuyBuilding(allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5);
 		return allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5;
 	}
 	else
 	if(!((allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)) & building) && le.MouseClickLeft(rectDwelling6) && allowBuyBuildDwelling6 &&
 		Dialog::OK == DialogBuyBuilding(allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6), true))
 	{
-		BuyBuilding(allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6));
 		return allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6);
 	}
 	else
 	if(!(BUILD_MAGEGUILD5 & building) && le.MouseClickLeft(rectMageGuild) && allowBuyBuildMageGuild && Dialog::OK == DialogBuyBuilding(nextLevelMageGuild, true))
 	{
-		BuyBuilding(nextLevelMageGuild);
 		return nextLevelMageGuild;
 	}
 	else
 	if(!(BUILD_TAVERN & building) && Race::NECR != race && le.MouseClickLeft(rectTavern) && allowBuyBuildTavern && Dialog::OK == DialogBuyBuilding(BUILD_TAVERN, true))
 	{
-		BuyBuilding(BUILD_TAVERN);
 		return BUILD_TAVERN;
 	}
 	else
 	if(!(BUILD_THIEVESGUILD & building) && le.MouseClickLeft(rectThievesGuild) && allowBuyBuildThievesGuild && Dialog::OK == DialogBuyBuilding(BUILD_THIEVESGUILD, true))
 	{
-		BuyBuilding(BUILD_THIEVESGUILD);
 		return BUILD_THIEVESGUILD;
 	}
 	else
 	if(!(BUILD_SHIPYARD & building) && le.MouseClickLeft(rectShipyard) && allowBuyBuildShipyard && Dialog::OK == DialogBuyBuilding(BUILD_SHIPYARD, true))
 	{
-		BuyBuilding(BUILD_SHIPYARD);
 		return BUILD_SHIPYARD;
 	}
 	else
 	if(!(BUILD_STATUE & building) && le.MouseClickLeft(rectStatue) && allowBuyBuildStatue && Dialog::OK == DialogBuyBuilding(BUILD_STATUE, true))
 	{
-		BuyBuilding(BUILD_STATUE);
 		return BUILD_STATUE;
 	}
 	else
 	if(!(BUILD_MARKETPLACE & building) && le.MouseClickLeft(rectMarketplace) && allowBuyBuildMarketplace && Dialog::OK == DialogBuyBuilding(BUILD_MARKETPLACE, true))
 	{
-		BuyBuilding(BUILD_MARKETPLACE);
 		return BUILD_MARKETPLACE;
 	}
 	else
 	if(!(BUILD_WELL & building) && le.MouseClickLeft(rectWell) && allowBuyBuildWell && Dialog::OK == DialogBuyBuilding(BUILD_WELL, true))
 	{
-		BuyBuilding(BUILD_WELL);
 		return BUILD_WELL;
 	}
 	else
 	if(!(BUILD_WEL2 & building) && le.MouseClickLeft(rectWel2) && allowBuyBuildWel2 && Dialog::OK == DialogBuyBuilding(BUILD_WEL2, true))
 	{
-		BuyBuilding(BUILD_WEL2);
 		return BUILD_WEL2;
 	}
 	else
 	if(!(BUILD_SPEC & building) && le.MouseClickLeft(rectSpec) && allowBuyBuildSpec && Dialog::OK == DialogBuyBuilding(BUILD_SPEC, true))
 	{
-		BuyBuilding(BUILD_SPEC);
 		return BUILD_SPEC;
 	}
 	else
 	if(!(BUILD_LEFTTURRET & building) && le.MouseClickLeft(rectLTurret) && allowBuyBuildLTurret && Dialog::OK == DialogBuyBuilding(BUILD_LEFTTURRET, true))
 	{
-		BuyBuilding(BUILD_LEFTTURRET);
 		return BUILD_LEFTTURRET;
 	}
 	else
 	if(!(BUILD_RIGHTTURRET & building) && le.MouseClickLeft(rectRTurret) && allowBuyBuildRTurret && Dialog::OK == DialogBuyBuilding(BUILD_RIGHTTURRET, true))
 	{
-		BuyBuilding(BUILD_RIGHTTURRET);
 		return BUILD_RIGHTTURRET;
 	}
 	else
 	if(!(BUILD_MOAT & building) && le.MouseClickLeft(rectMoat) && allowBuyBuildMoat && Dialog::OK == DialogBuyBuilding(BUILD_MOAT, true))
 	{
-		BuyBuilding(BUILD_MOAT);
 		return BUILD_MOAT;
 	}
 	else
 	if(!(BUILD_CAPTAIN & building) && le.MouseClickLeft(rectCaptain) && allowBuyBuildCaptain && Dialog::OK == DialogBuyBuilding(BUILD_CAPTAIN, true))
 	{
-		BuyBuilding(BUILD_CAPTAIN);
 		return BUILD_CAPTAIN;
 	}
         else
@@ -1228,5 +1210,5 @@ u32 Castle::OpenTown(void)
 
     Cursor::Show();
 
-	return 0;
+    return BUILD_NOTHING;
 }

@@ -42,6 +42,7 @@ class Castle
 {
 public:
     typedef enum {
+	BUILD_NOTHING		= 0x00000000,
 	BUILD_THIEVESGUILD      = 0x00000001,
         BUILD_TAVERN            = 0x00000002,
         BUILD_SHIPYARD          = 0x00000004,
@@ -106,9 +107,9 @@ public:
 
     void BuyBuilding(building_t build);
     void DrawImageCastle(const Point & pt);
-    
+
     Dialog::answer_t OpenDialog(void);
-    
+
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static void GetBuildingRequires(const Race::race_t & race, const building_t & build, std::vector<building_t> & requires);
@@ -123,12 +124,13 @@ private:
     
     Rect GetCoordBuilding(building_t building, const Point & pt);
     void RedrawBuilding(const Point & dst_pt);
-    u32 OpenTown(void);
+    building_t OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
     void OpenWell(void);
     void OpenMageGuild(void);
-    
+    void DisplayName(const Point & src_pt);
+
     Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
 
 private:
