@@ -76,7 +76,7 @@ void Castle::OpenWell(void)
 	bool present = false;
 	building_t dw_orig = DWELLING_MONSTER1;
 	u8 icnindex = 0;
-	u8 available = 0;
+	u16 available = 0;
 
 	switch(dw)
 	{

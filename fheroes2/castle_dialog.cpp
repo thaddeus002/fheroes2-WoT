@@ -169,9 +169,6 @@ Dialog::answer_t Castle::OpenDialog(void)
     dst_pt.y = cur_pt.y + 428;
     Button buttonExit(dst_pt, "SWAPBTN.ICN", 0, 1);
 
-    // draw building
-    RedrawBuilding(cur_pt);
-    DisplayName(cur_pt);
 
     const Rect coordBuildingThievesGuild(GetCoordBuilding(BUILD_THIEVESGUILD, cur_pt));
     const Rect coordBuildingTavern(GetCoordBuilding(BUILD_TAVERN, cur_pt));
@@ -211,8 +208,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // sea, dock or boat
             if(HaveNearlySea())
             {
-        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNKBOAT.ICN", 1, 9, false, amode)));
-        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNKDOCK.ICN", 1, 5, false, amode)));
+        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNKBOAT.ICN", 1, 9, false, amode)));
+        	//else 
+		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNKDOCK.ICN", 1, 5, false, amode)));
         	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNKEXT0.ICN", 1, 5, false, amode)));
     	    }
 	    // left turret
@@ -238,8 +236,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // sea, dock or boat
             if(HaveNearlySea())
             {
-        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNBBOAT.ICN", 1, 9, false, amode)));
-        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBDOCK.ICN", 1, 5, false, amode)));
+        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNBBOAT.ICN", 1, 9, false, amode)));
+        	//else 
+		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBDOCK.ICN", 1, 5, false, amode)));
         	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNBEXT0.ICN", 1, 5, false, amode)));
     	    }
 	    // moat
@@ -271,8 +270,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // sea, dock or boat
             if(HaveNearlySea())
             {
-        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNSBOAT.ICN", 1, 9, false, amode)));
-        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNSDOCK.ICN", 1, 5, false, amode)));
+        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNSBOAT.ICN", 1, 9, false, amode)));
+        	//else 
+		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNSDOCK.ICN", 1, 5, false, amode)));
         	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNSEXT0.ICN", 1, 5, false, amode)));
     	    }
 	    // wel2
@@ -295,8 +295,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // sea, dock or boat
             if(HaveNearlySea())
             {
-        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNWBOAT.ICN", 1, 9, false, amode)));
-        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNWDOCK.ICN", 1, 5, false, amode)));
+        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNWBOAT.ICN", 1, 9, false, amode)));
+        	//else 
+		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNWDOCK.ICN", 1, 5, false, amode)));
         	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNWEXT0.ICN", 1, 5, false, amode)));
     	    }
 	    // moat
@@ -318,8 +319,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // sea, dock or boat
             if(HaveNearlySea())
             {
-        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNZBOAT.ICN", 1, 9, false, amode)));
-        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNZDOCK.ICN", 1, 5, false, amode)));
+        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNZBOAT.ICN", 1, 9, false, amode)));
+        	//else 
+		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNZDOCK.ICN", 1, 5, false, amode)));
         	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNZEXT0.ICN", 1, 5, false, amode)));
     	    }
 	    // monster 1
@@ -336,8 +338,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // sea, dock or boat
             if(HaveNearlySea())
             {
-        	if(BUILD_BOAT & building) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNNBOAT.ICN", 1, 9, false, amode)));
-        	else if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNNDOCK.ICN", 1, 5, false, amode)));
+        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNNBOAT.ICN", 1, 9, false, amode)));
+        	//else 
+		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNNDOCK.ICN", 1, 5, false, amode)));
         	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNNEXT0.ICN", 1, 5, false, amode)));
     	    }
 	    // wel2
@@ -362,6 +365,10 @@ Dialog::answer_t Castle::OpenDialog(void)
     const std::vector<specanim_t>::const_iterator it_animation_end   =  vect_animation.end();
     std::vector<specanim_t>::const_iterator it_animation_current = it_animation_begin;
     
+    // draw building
+    RedrawBuilding(cur_pt);
+    DisplayName(cur_pt);
+
     // redraw first sprite animation
     /*
     for(it_animation_current = it_animation_begin; it_animation_current != it_animation_end; ++it_animation_current)
@@ -698,7 +705,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // FIXME dialog buy boat
 	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell)) OpenWell();
 	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
-	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)) Dialog::Marketplace();
+	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)){ Dialog::Marketplace(); RedrawResourcePanel(); }
 	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
 	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
 	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG, Dialog::OK);
@@ -865,7 +872,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
 	else
-	if(building & BUILD_TENT && le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_BOAT));
+	if(building & BUILD_TENT && le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_TENT));
 	else
 	// mage guild
 	if(building & BUILD_MAGEGUILD5 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD5));

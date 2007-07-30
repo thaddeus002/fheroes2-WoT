@@ -53,6 +53,7 @@ namespace Resource
     {
     public:
 	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};
+	funds_t(const resource_t & rs, u32 count);
 
 	const funds_t operator+ (const funds_t &pm) const;
 	const funds_t operator* (u32 mul) const;
@@ -68,12 +69,12 @@ namespace Resource
 
 	u8 GetValidItems(void);
 
-        u16 wood;
-        u16 mercury;
-        u16 ore;
-        u16 sulfur;
-        u16 crystal;
-        u16 gems;
+        u32 wood;
+        u32 mercury;
+        u32 ore;
+        u32 sulfur;
+        u32 crystal;
+        u32 gems;
         u32 gold;
     };
 

@@ -65,7 +65,7 @@ namespace Army
 	Dialog::answer_t ShowDialogInfo(const Heroes * heroes = NULL, bool quickshow = false);
 
     private:
-        std::pair<Monster::monster_t, u8> pair;
+        std::pair<Monster::monster_t, u16> pair;
     };
 
     class SelectBar

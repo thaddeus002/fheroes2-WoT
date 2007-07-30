@@ -56,7 +56,7 @@ public:
         BUILD_SPEC              = 0x00000400,   // Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
         BUILD_CASTLE            = 0x00000800,
         BUILD_CAPTAIN           = 0x00001000,
-        BUILD_BOAT              = 0x00002000,
+//        BUILD_BOAT              = 0x00002000,
         BUILD_MAGEGUILD1        = 0x00004000,
 	BUILD_MAGEGUILD2        = 0x00008000,
 	BUILD_MAGEGUILD3        = 0x00010000,
@@ -130,7 +130,7 @@ private:
     void OpenWell(void);
     void OpenMageGuild(void);
     void DisplayName(const Point & src_pt);
-
+    
     Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
 
 private:
@@ -142,6 +142,7 @@ private:
     bool		allow_castle;
     bool		army_spread;
     bool		allow_build;
+    bool		present_boat;
     //MageGuild		guild;
     std::vector<u16>    dwelling;
     std::vector<Army::Troops> army;

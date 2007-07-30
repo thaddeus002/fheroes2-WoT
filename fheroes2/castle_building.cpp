@@ -21,6 +21,179 @@
 #include "agg.h"
 #include "castle.h"
 
+/*
+const Sprite & Castle::SpriteBuilding(const Castle::building_t & build, u8 level)
+{
+    std::string icn("TWN");
+    u8 index = 0;
+
+    switch(race)
+    {
+	case Race::KNGT: icn += "K"; break;
+	case Race::BARB: icn += "B"; break;
+	case Race::SORC: icn += "S"; break;
+	case Race::WRLK: icn += "W"; break;
+	case Race::WZRD: icn += "Z"; break;
+	case Race::NECR: icn += "N"; break;
+	default: icn += "K"; break;
+    }
+
+    switch(build)
+    {
+	case BUILD_CASTLE:	icn += "CSTL.ICN"; break;
+	case BUILD_TENT:	icn += "TENT.ICN"; break;
+	case BUILD_SPEC:	icn += "SPEC.ICN"; break;
+	case BUILD_CAPTAIN:	icn += "CAPT.ICN"; break;
+	case BUILD_WEL2:	icn += "WEL2.ICN"; break;
+	case BUILD_LEFTTURRET:	icn += "LTUR.ICN"; break;
+	case BUILD_RIGHTTURRET:	icn += "RTUR.ICN"; break;
+	case BUILD_MOAT:	icn += "MOAT.ICN"; break
+	case BUILD_MARKETPLACE:	icn += "MARK.ICN"; break;
+	case BUILD_THIEVESGUILD:icn += "THIE.ICN"; break;
+	case BUILD_TAVERN:	icn += "TVRN.ICN"; break;
+	case BUILD_WELL:	icn += "WELL.ICN"; break;
+	case BUILD_STATUE:	icn += "STAT.ICN"; break;
+	//case BUILD_BOAT:	icn += "BOAT.ICN"; break;
+	case BUILD_SHIPYARD:	icn += "DOCK.ICN"; break;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	icn += "MAGE.ICN"; break;
+	case DWELLING_MONSTER1:	icn += "DW_0.ICN"; break;
+	case DWELLING_MONSTER2:	icn += "DW_1.ICN"; break;
+	case DWELLING_UPGRADE2: icn += "UP_1.ICN"; break;
+	case DWELLING_MONSTER3:	icn += "DW_2.ICN"; break;
+	case DWELLING_UPGRADE3: icn += "UP_2.ICN"; break;
+	case DWELLING_MONSTER4:	icn += "DW_3.ICN"; break;
+	case DWELLING_UPGRADE4: icn += "UP_3.ICN"; break;
+	case DWELLING_MONSTER5:	icn += "DW_4.ICN"; break;
+	case DWELLING_UPGRADE5: icn += "UP_4.ICN"; break;
+	case DWELLING_MONSTER6:	icn += "DW_5.ICN"; break;
+	case DWELLING_UPGRADE6: icn += "UP_5.ICN"; break;
+	default: break;
+    }
+		const Sprite & sprite = AGG::GetICN("TWNKMAGE.ICN", level - 1);
+
+    return AGG::GetICN(icn, index);
+}
+*/
+
+/*
+u32 Castle::GetDependenceRedrawBuilding(building_t build)
+{
+    switch(build)
+    {
+	case BUILD_CASTLE:
+	    if(Race::KNGT == race) return BUILD_SPEC | BUILD_LEFTTURRET | BUILD_RIGHTTURRET;
+	    if(Race::BARB == race) return BUILD_LEFTTURRET | BUILD_RIGHTTURRET;
+	    if(Race::SORC == race) return BUILD_SPEC | BUILD_LEFTTURRET | BUILD_RIGHTTURRET | BUILD_STATUE | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | DWELLING_MONSTER4 | DWELLING_UPGRADE4;
+	    return 0;
+
+	case BUILD_TENT:
+	    return 0;
+
+	case BUILD_SPEC:
+	    if(Race::BARB == race) return BUILD_WELL;
+	    if(Race::SORC == race) return DWELLING_MONSTER6 | BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5;
+	    return 0;
+
+	case BUILD_CAPTAIN:
+	    if(Race::KNGT == race) return BUILD_WEL2;
+	    if(Race::SORC == race) return BUILD_CASTLE;
+	    return 0;
+
+	case BUILD_WEL2:
+	    return 0;
+
+	case BUILD_LEFTTURRET:
+	    if(Race::KNGT == race) return BUILD_THIEVESGUILD;
+	    return 0;
+
+	case BUILD_RIGHTTURRET:
+	    return 0;
+
+	case BUILD_MOAT:
+	    if(Race::KNGT == race) return BUILD_THIEVESGUILD | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | BUILD_MARKETPLACE;
+	    if(Race::BARB == race) return BUILD_TAVERN | DWELLING_MONSTER2 | DWELLING_UPGRADE2;
+	    return 0;
+
+	case BUILD_MARKETPLACE:
+	    if(Race::KNGT == race) return DWELLING_MONSTER3 | DWELLING_UPGRADE3;
+	    if(Race::BARB == race) return BUILD_WELL;
+	    return 0;
+
+	case BUILD_THIEVESGUILD:
+	    if(Race::KNGT == race) return DWELLING_MONSTER5 | DWELLING_UPGRADE5;
+	    if(Race::BARB == race) return DWELLING_MONSTER4 | DWELLING_UPGRADE4;
+	    return 0;
+
+	case BUILD_TAVERN:
+	    if(Race::KNGT == race) return BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5;
+	    return 0;
+
+
+	case BUILD_WELL:
+	    return 0;
+
+	case BUILD_STATUE:
+	    return 0;
+
+	//case BUILD_BOAT:
+	//    return 0;
+
+	case BUILD_SHIPYARD:
+	    return 0;
+
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:
+	    if(Race::KNGT == race) return DWELLING_MONSTER1 | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | DWELLING_MONSTER4 | DWELLING_UPGRADE4 | DWELLING_MONSTER6 | DWELLING_UPGRADE6;
+	    if(Race::BARB == race) return BUILD_WELL;
+	    return 0;
+
+	case DWELLING_MONSTER1:
+	    if(Race::KNGT == race) return BUILD_WELL | DWELLING_MONSTER3 | DWELLING_UPGRADE3;
+	    if(Race::BARB == race) return BUILD_WELL;
+	    return 0;
+
+	case DWELLING_MONSTER2:
+	case DWELLING_UPGRADE2:
+	    if(Race::KNGT == race) return BUILD_WELL;
+	    if(Race::BARB == race) return BUILD_WELL;
+	    return 0;
+
+	case DWELLING_MONSTER3:
+	case DWELLING_UPGRADE3:
+	    if(Race::KNGT == race) return BUILD_WELL | DWELLING_MONSTER4 | DWELLING_UPGRADE4;
+	    if(Race::BARB == race) return DWELLING_MONSTER4 | DWELLING_UPGRADE4;
+	    return 0;
+
+	case DWELLING_MONSTER4:
+	case DWELLING_UPGRADE4:
+	    if(Race::KNGT == race) return BUILD_WELL;
+	    if(Race::BARB == race) return BUILD_STATUE;
+	    return 0;
+
+	case DWELLING_MONSTER5:
+	case DWELLING_UPGRADE5:
+	    if(Race::BARB == race) return BUILD_WELL;
+	    return 0;
+
+	case DWELLING_MONSTER6:
+	case DWELLING_UPGRADE6:
+	case DWELLING_UPGRADE7:
+	    if(Race::KNGT == race) return BUILD_STATUE | DWELLING_MONSTER1 | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | DWELLING_MONSTER4 | DWELLING_UPGRADE4;
+	    if(Race::BARB == race) return BUILD_WELL | BUILD_THIEVESGUILD;
+	    return 0;
+
+	default: break;
+    }
+}
+*/
+
 void Castle::RedrawBuilding(const Point & dst_pt)
 {
     switch(race)
@@ -148,7 +321,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNKBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNKDOCK.ICN" : "TWNKEXT0.ICN"), 0);
+		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNKBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNKDOCK.ICN" : "TWNKEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 	}
@@ -280,7 +453,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNBBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNBDOCK.ICN" : "TWNBEXT0.ICN"), 0);
+		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNBBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNBDOCK.ICN" : "TWNBEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 	}
@@ -349,7 +522,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNSBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNSDOCK.ICN" : "TWNSEXT0.ICN"), 0);
+		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNSBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNSDOCK.ICN" : "TWNSEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
@@ -472,7 +645,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNWBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNWDOCK.ICN" : "TWNWEXT0.ICN"), 0);
+		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNWBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNWDOCK.ICN" : "TWNWEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
@@ -619,7 +792,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNZBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNZDOCK.ICN" : "TWNZEXT0.ICN"), 0);
+		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNZBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNZDOCK.ICN" : "TWNZEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 
@@ -736,7 +909,7 @@ void Castle::RedrawBuilding(const Point & dst_pt)
 
 	    if(HaveNearlySea())
 	    {
-		const Sprite & sprite = AGG::GetICN(BUILD_BOAT & building ? "TWNNBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNNDOCK.ICN" : "TWNNEXT0.ICN"), 0);
+		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNNBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNNDOCK.ICN" : "TWNNEXT0.ICN"), 0);
 		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
 	    }
 

@@ -41,10 +41,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
             power               = DEFAULT_KNGT_POWER;
             knowledge           = DEFAULT_KNGT_KNOWLEDGE;
 
-	    skills.at(0).SetSkill(Skill::LEADERSHIP);
-	    skills.at(0).SetLevel(Skill::BASIC);
-	    skills.at(1).SetSkill(Skill::BALLISTICS);
-	    skills.at(1).SetLevel(Skill::BASIC);
+	    skills[0] = Skill::Skill(Skill::LEADERSHIP, Skill::BASIC);
+	    skills[1] = Skill::Skill(Skill::BALLISTICS, Skill::BASIC);
 
 	    break;
 	    
@@ -54,8 +52,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
             power               = DEFAULT_BARB_POWER;
             knowledge           = DEFAULT_BARB_KNOWLEDGE;
 
-	    skills.at(0).SetSkill(Skill::PATHFINDING);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
+	    skills[0] = Skill::Skill(Skill::PATHFINDING, Skill::ADVANCED);
 	    break;
 	    
 	case Race::SORC:
@@ -64,10 +61,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
             power               = DEFAULT_SORC_POWER;
             knowledge           = DEFAULT_SORC_KNOWLEDGE;
 
-	    skills.at(0).SetSkill(Skill::NAVIGATION);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
-	    skills.at(1).SetSkill(Skill::WISDOM);
-	    skills.at(1).SetLevel(Skill::BASIC);
+	    skills[0] = Skill::Skill(Skill::NAVIGATION, Skill::ADVANCED);
+	    skills[1] = Skill::Skill(Skill::WISDOM, Skill::BASIC);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -78,10 +73,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
             power               = DEFAULT_WRLK_POWER;
             knowledge           = DEFAULT_WRLK_KNOWLEDGE;
 
-	    skills.at(0).SetSkill(Skill::SCOUTING);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
-	    skills.at(1).SetSkill(Skill::WISDOM);
-	    skills.at(1).SetLevel(Skill::BASIC);
+	    skills[0] = Skill::Skill(Skill::SCOUTING, Skill::ADVANCED);
+	    skills[1] = Skill::Skill(Skill::WISDOM, Skill::BASIC);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -92,8 +85,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
             power               = DEFAULT_WZRD_POWER;
             knowledge           = DEFAULT_WZRD_KNOWLEDGE;
 
-	    skills.at(0).SetSkill(Skill::WISDOM);
-	    skills.at(0).SetLevel(Skill::ADVANCED);
+	    skills[0] = Skill::Skill(Skill::WISDOM, Skill::ADVANCED);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -104,10 +96,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
             power               = DEFAULT_NECR_POWER;
             knowledge           = DEFAULT_NECR_KNOWLEDGE;
 
-	    skills.at(0).SetSkill(Skill::NECROMANCY);
-	    skills.at(0).SetLevel(Skill::BASIC);
-	    skills.at(1).SetSkill(Skill::WISDOM);
-	    skills.at(1).SetLevel(Skill::BASIC);
+	    skills[0] = Skill::Skill(Skill::NECROMANCY, Skill::BASIC);
+	    skills[1] = Skill::Skill(Skill::WISDOM, Skill::BASIC);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -130,12 +120,13 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
         army[1].SetMonster(Monster::RED_DRAGON);
         army[1].SetCount(3);
 
-	skills.at(2).SetSkill(Skill::PATHFINDING);
-	skills.at(2).SetLevel(Skill::BASIC);
+	skills[2] = Skill::Skill(Skill::PATHFINDING, Skill::BASIC);
+	skills[3] = Skill::Skill(Skill::LOGISTICS, Skill::BASIC);
+	skills[4] = Skill::Skill(Skill::MYSTICISM, Skill::BASIC);
+	skills[5] = Skill::Skill(Skill::NAVIGATION, Skill::BASIC);
+	skills[6] = Skill::Skill(Skill::LEADERSHIP, Skill::BASIC);
+	skills[7] = Skill::Skill(Skill::LUCK, Skill::BASIC);
 
-	skills.at(3).SetSkill(Skill::LOGISTICS);
-	skills.at(3).SetLevel(Skill::BASIC);
-	
 	artifacts.push_back(Artifact::MEDAL_VALOR);
 	artifacts.push_back(Artifact::STEALTH_SHIELD);
 	artifacts.push_back(Artifact::DRAGON_SWORD);

@@ -30,6 +30,7 @@
 #include "kingdom.h"
 #include "background.h"
 #include "spritecursor.h"
+#include "splitter.h"
 #include "tools.h"
 #include "rect.h"
 #include "text.h"
@@ -121,9 +122,14 @@ void Dialog::Marketplace(void)
     u32 count_sell = 0;
     u32 count_buy = 0;
     
+    u32 max_sell = 0;
+    u32 max_buy = 0;
+
     Button *buttonTrade = NULL;
     Button *buttonLeft = NULL;
     Button *buttonRight = NULL;
+
+    Splitter *splitter = NULL;
 
 #define ShowTradeArea \
     if(resourceFrom == resourceTo) \
@@ -138,9 +144,11 @@ void Dialog::Marketplace(void)
 	if(buttonTrade) delete buttonTrade; \
 	if(buttonLeft) delete buttonLeft; \
         if(buttonRight) delete buttonRight; \
+        if(splitter) delete splitter; \
         buttonTrade = NULL; \
         buttonLeft = NULL; \
         buttonRight = NULL; \
+        splitter = NULL; \
         display.Flip(); \
         Cursor::Show(); \
     } \
@@ -158,6 +166,12 @@ void Dialog::Marketplace(void)
 	dst_pt.x = pos_rt.x + (pos_rt.w - bar.w()) / 2 - 2; \
 	dst_pt.y = pos_rt.y + 128; \
 	display.Blit(bar, dst_pt); \
+	dst_rt.x = dst_pt.x + 24; \
+	dst_rt.y = dst_pt.y + 4; \
+	dst_rt.w = 188; \
+	dst_rt.h = 10; \
+	splitter = new Splitter(AGG::GetICN(tradpost, 2), dst_rt, Splitter::HORIZONTAL); \
+	splitter->SetRange(0, (Resource::GOLD == resourceTo ? max_sell : max_buy)); \
 	dst_pt.x = pos_rt.x + 6; \
 	dst_pt.y = pos_rt.y + 129; \
 	buttonLeft = new Button(dst_pt, tradpost, 3, 4); \
@@ -252,26 +266,54 @@ void Dialog::Marketplace(void)
 	    {
 		switch(ii)
 		{
-		    case 0: resourceFrom = Resource::WOOD; break;
-		    case 1: resourceFrom = Resource::MERCURY; break;
-		    case 2: resourceFrom = Resource::ORE; break;
-		    case 3: resourceFrom = Resource::SULFUR; break;
-		    case 4: resourceFrom = Resource::CRYSTAL; break;
-		    case 5: resourceFrom = Resource::GEMS; break;
-		    case 6: resourceFrom = Resource::GOLD; break;
+		    case 0:
+			resourceFrom = Resource::WOOD;
+			max_sell = fundsFrom.wood;
+			break;
+		    case 1:
+			resourceFrom = Resource::MERCURY;
+			max_sell = fundsFrom.mercury;
+			break;
+		    case 2:
+			resourceFrom = Resource::ORE;
+			max_sell = fundsFrom.ore;
+			break;
+		    case 3:
+			resourceFrom = Resource::SULFUR;
+			max_sell = fundsFrom.sulfur;
+			break;
+		    case 4:
+			resourceFrom = Resource::CRYSTAL;
+			max_sell = fundsFrom.crystal;
+			break;
+		    case 5:
+			resourceFrom = Resource::GEMS;
+			max_sell = fundsFrom.gems;
+			break;
+		    case 6:
+			resourceFrom = Resource::GOLD;
+			max_sell = fundsFrom.gold;
+			break;
 		    default: break;
 		}
+
+		if(GetTradeCosts(resourceFrom, resourceTo))
+		{
+		    max_buy = Resource::GOLD == resourceTo ? 
+			max_sell * GetTradeCosts(resourceFrom, resourceTo) : max_sell / GetTradeCosts(resourceFrom, resourceTo);
+		}
+
+		count_sell = 0;
+		count_buy = 0;
 
 		Cursor::Hide();
 		cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
 
-		if(resourceTo)
-		{
-		    cursorTo.Hide();
-		    RedrawToResource(pt2, true, resourceFrom);
-		    cursorTo.Show();
-		    ShowTradeArea;
-		}
+		if(resourceTo) cursorTo.Hide();
+		RedrawToResource(pt2, true, resourceFrom);
+		if(resourceTo) cursorTo.Show();
+		if(resourceTo) ShowTradeArea;
+
 		Cursor::Show();
 	    }
 	}
@@ -295,6 +337,15 @@ void Dialog::Marketplace(void)
 		    default: break;
 		}
 
+		if(GetTradeCosts(resourceFrom, resourceTo))
+		{
+		    max_buy = Resource::GOLD == resourceTo ? 
+			max_sell * GetTradeCosts(resourceFrom, resourceTo) : max_sell / GetTradeCosts(resourceFrom, resourceTo);
+		}
+
+		count_sell = 0;
+		count_buy = 0;
+
 		Cursor::Hide();
 		cursorTo.Move(rect_to.x - 2, rect_to.y - 2);
 
@@ -309,34 +360,58 @@ void Dialog::Marketplace(void)
 	    }
 	}
 
+	// move splitter
+        if(splitter && max_buy && le.MousePressLeft(splitter->GetRect()) && le.MouseCursor(splitter->GetRect()))
+        {
+            u32 seek = (le.MouseCursor().x - splitter->GetRect().x) * 100 / splitter->GetStep();
+
+            if(seek > max_sell) seek = max_sell;
+
+	    count_buy = seek * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo) : 1);
+
+	    count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo));
+
+            Cursor::Hide();
+            splitter->Move(seek);
+            display.Flip();
+            Cursor::Show();
+        }
+
 	// trade
-	if(buttonTrade && le.MouseClickLeft(*buttonTrade))
+	if(buttonTrade && le.MouseClickLeft(*buttonTrade) && count_sell && count_buy)
 	{
-/*
-	u32 count_from = 0;
-	switch(rs_from)
-	{
-	    case Resource::WOOD:	count_from = fundsFrom.wood;	break;
-	    case Resource::ORE:		count_from = fundsFrom.ore;	break;
-	    case Resource::MERCURY:	count_from = fundsFrom.mercury; break;
-	    case Resource::SULFUR:	count_from = fundsFrom.sulfur;	break;
-	    case Resource::CRYSTAL:	count_from = fundsFrom.crystal; break;
-	    case Resource::GEMS:	count_from = fundsFrom.gems;	break;
-	    case Resource::GOLD:	count_from = fundsFrom.gold;	break;
-	}
-	u32 get_count = Resource::GOLD == rs_to ? count_from * exchange_rate : count_from / exchange_rate;
-	Error::Verbose("exchange: ", get_count);
-*/
+	    const_cast<Kingdom &>(kingdom).OddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceFrom), count_sell));
+    	    const_cast<Kingdom &>(kingdom).AddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceTo), count_buy));
+
+    	    exit = true;
 	}
 
 	// decrease trade resource
-	if(buttonLeft && le.MouseClickLeft(*buttonLeft))
+	if(count_buy &&
+	    ((buttonLeft && le.MouseClickLeft(*buttonLeft)) ||
+	    le.MouseWheelDn(splitter->GetRect())))
 	{
+	    count_buy -= Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo) : 1;
+
+	    count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
+
+	    splitter->Backward();
+
+	    //RedrawInfoBuySell
 	}
 
 	// increase trade resource
-	if(buttonRight && le.MouseClickLeft(*buttonRight))
+	if( count_buy < max_buy &&
+	    ((buttonRight && le.MouseClickLeft(*buttonRight)) ||
+	    le.MouseWheelUp(splitter->GetRect())))
 	{
+	    count_buy += Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo) : 1;
+
+	    count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
+
+	    splitter->Forward();
+
+	    //RedrawInfoBuySell
 	}
     }
 
@@ -345,6 +420,7 @@ void Dialog::Marketplace(void)
     if(buttonTrade) delete buttonTrade;
     if(buttonLeft) delete buttonLeft;
     if(buttonRight) delete buttonRight;
+    if(splitter) delete splitter;
 
     Cursor::Show();
 }

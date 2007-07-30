@@ -250,6 +250,8 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     // minimize area maps id
     MinimizeAreaMapsID();
     
+    present_boat = false;
+    
     // end
     Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }

@@ -22,6 +22,20 @@
 #include "error.h"
 #include "resource.h"
 
+Resource::funds_t::funds_t(const resource_t & rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
+{
+    switch(rs)
+    {
+	case ORE:	ore = count;	break;
+	case WOOD:	wood = count;	break;
+	case MERCURY:	mercury = count;break;
+	case SULFUR:	sulfur = count;	break;
+	case GEMS:	gems = count;	break;
+	case CRYSTAL:	crystal = count;break;
+	case GOLD:	gold = count;	break;
+    }
+}
+
 Resource::resource_t Resource::Rand(void)
 {
     switch(Rand::Get(1, 7)){
