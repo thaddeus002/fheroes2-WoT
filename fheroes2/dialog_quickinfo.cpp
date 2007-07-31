@@ -73,8 +73,8 @@ void Dialog::QuickInfo(const std::string & object)
     display.Blit(box, pos);
 
     u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(object, Font::SMALL)) / 2;
-    u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(pos.h, object, Font::SMALL)) / 2;
-    Text(tx, ty, object, Font::SMALL, true);
+    u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(object, Font::SMALL)) / 2;
+    Text(object, Font::SMALL, tx, ty);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
@@ -133,7 +133,7 @@ void Dialog::QuickInfo(const Castle & castle)
     message = castle.GetName();
     dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
     dst_pt.y = cur_rt.y + 5;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     u8 index = 0;
 
@@ -157,7 +157,7 @@ void Dialog::QuickInfo(const Castle & castle)
     message = std::string("Defenders:");
     dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
     dst_pt.y += sprite.h() + 5;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     u8 count = castle.GetCountArmy();
 
@@ -166,7 +166,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	message = std::string("None");
 	dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
 	dst_pt.y += 45;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
     }
     else
     {
@@ -192,7 +192,7 @@ void Dialog::QuickInfo(const Castle & castle)
 		String::AddInt(message, army.at(ii).GetCount());
 		dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
 		dst_pt.y = cur_rt.y + 118;
-		Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+		Text(message, Font::SMALL, dst_pt);
 
         	current++;
             }
@@ -255,7 +255,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = hero.GetName();
     dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
     dst_pt.y = cur_rt.y + 2;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     // mini port heroes
     const Surface & port = Portrait::Hero(hero.GetHeroes(), Portrait::SMALL);
@@ -267,58 +267,58 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = "Attack:";
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += port.h() + 4;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetAttack());
     dst_pt.x += 75;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     // defense
     message = "Defense:";
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetDefense());
     dst_pt.x += 75;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     // power
     message = "Spell Power:";
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetPower());
     dst_pt.x += 75;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     // knowledge
     message = "Knowledge:     ";
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetKnowledge());
     dst_pt.x += 75;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
     
     // spell point
     message = "Spell Points:  ";
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetSpellPoints());
     message += "/";
     String::AddInt(message, hero.GetMaxSpellPoints());
     dst_pt.x += 75;
-    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+    Text(message, Font::SMALL, dst_pt);
 
     // get valid count army
     u8 count = hero.GetCountArmy();
@@ -345,7 +345,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 	    String::AddInt(message, army.at(ii).GetCount());
 	    dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
 	    dst_pt.y = cur_rt.y + 142;
-	    Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	    Text(message, Font::SMALL, dst_pt);
 
     	    current++;
         }

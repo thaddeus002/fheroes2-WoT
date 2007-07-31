@@ -137,7 +137,7 @@ void World::LoadMaps(const std::string &filename)
 
     // loading info
     display.Fill(0, 0, 0);
-    TextBox(Rect(0, display.h()/2, display.w(), display.h()/2), "Maps Loading...", Font::BIG, true);
+    TextBox("Maps Loading...", Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
     display.Flip();
 
     AGG::PreloadObject("GROUND32.TIL");

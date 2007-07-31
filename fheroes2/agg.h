@@ -24,6 +24,7 @@
 #include <string>
 #include "sprite.h"
 #include "surface.h"
+#include "text.h"
 #include "gamedefs.h"
 
 #define AGGSIZENAME     	15

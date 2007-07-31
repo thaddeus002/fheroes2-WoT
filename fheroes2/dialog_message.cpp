@@ -38,18 +38,18 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     Cursor::Hide();
     Cursor::Set(Cursor::POINTER);
 
-    Box box(Text::height(BOXAREA_WIDTH, header, ft) + 20 + Text::height(BOXAREA_WIDTH, message, ft), buttons);
+    Box box(Text::height(header, ft, BOXAREA_WIDTH) + 20 + Text::height(message, ft, BOXAREA_WIDTH), buttons);
 
     Rect pos = box.GetArea();
 
-    if(header.size()){
-
-	TextBox(pos, header, ft, true);
-        pos.y += Text::height(BOXAREA_WIDTH, header, ft) + 20;
+    if(header.size())
+    {
+	TextBox(header, ft, pos);
+        pos.y += Text::height(header, ft, BOXAREA_WIDTH) + 20;
     }
 
     if(message.size())
-        TextBox(pos, message, ft, true);
+        TextBox(message, ft, pos);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

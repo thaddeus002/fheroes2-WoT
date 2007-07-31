@@ -31,8 +31,8 @@ void Dialog::StatusBar::ShowMessage(const std::string & message)
 
     Cursor::Hide();
 
-    Text(pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
-         pos_pt.y + (sprite.h() - Text::height(sprite.w(), message, font)) / 2, message, font, true);
+    Text(message, font, pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
+         pos_pt.y + (sprite.h() - Text::height(message, font)) / 2);
 
     status = message;
 
@@ -64,8 +64,8 @@ void Dialog::StatusBar::Clear(const std::string & message)
 
     status = message;
 
-    Text(pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
-         pos_pt.y + (sprite.h() - Text::height(sprite.w(), message, font)) / 2, message, font, true);
+    Text(message, font, pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
+         pos_pt.y + (sprite.h() - Text::height(message, font)) / 2);
 
     if(localcursor) Cursor::Show();
 }

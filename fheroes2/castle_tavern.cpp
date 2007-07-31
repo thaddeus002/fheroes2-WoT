@@ -44,12 +44,12 @@ void Castle::OpenTavern(void)
 
     Cursor::Hide();
 
-    Dialog::Box box(Text::height(BOXAREA_WIDTH, header, Font::BIG) + 130 + Text::height(BOXAREA_WIDTH, message, Font::BIG), true);
+    Dialog::Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 130 + Text::height(message, Font::BIG, BOXAREA_WIDTH), true);
 
     const Rect & pos = box.GetArea();
     Point dst_pt(pos);
 
-    Text(pos.x + (pos.w - Text::width(tavern, Font::BIG)) / 2, dst_pt.y, tavern, Font::BIG, true);
+    Text(tavern, Font::BIG, pos.x + (pos.w - Text::width(tavern, Font::BIG)) / 2, dst_pt.y);
 
     const Sprite & s1 = AGG::GetICN("TAVWIN.ICN", 0);
     dst_pt.x = pos.x + (pos.w - s1.w()) / 2;
@@ -62,10 +62,10 @@ void Castle::OpenTavern(void)
     display.Blit(s2, dst_pt);
 
     Rect rt(pos.x, dst_pt.y + s1.h() + 10, pos.w, pos.h);
-    TextBox(rt, header, Font::BIG, true);
+    TextBox(header, Font::BIG, rt);
 
     rt.y += 60;
-    TextBox(rt, message, Font::BIG, true);
+    TextBox(message, Font::BIG, rt);
 
     Animation animeBeer(dst_pt, "TAVWIN.ICN", 2, 20, false, Animation::INFINITY | Animation::RING | Animation::LOW);
 

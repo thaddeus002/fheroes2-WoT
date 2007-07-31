@@ -29,11 +29,6 @@ typedef unsigned short	u16;
 typedef int		s32;
 typedef unsigned int	u32;
 
-namespace Font
-{
-    typedef enum { SMALL, BIG } type_t;
-};
-
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 1
 

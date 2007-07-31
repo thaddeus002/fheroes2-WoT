@@ -62,19 +62,21 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     std::string message;
 
     // name
-    Text(dst_pt.x + 140 - Text::width(monster.name, Font::BIG) / 2, dst_pt.y + 40, monster.name, Font::BIG, true);
+    dst_pt.x = pos_rt.x  + 140 - Text::width(monster.name, Font::BIG) / 2;
+    dst_pt.y = pos_rt.y + 40;
+    Text(monster.name, Font::BIG, dst_pt);
     
     // count
     String::AddInt(message, GetCount());
-    dst_pt.x = pos_rt.x + 140;
+    dst_pt.x = pos_rt.x + 140 - Text::width(message, Font::BIG) / 2;
     dst_pt.y = pos_rt.y + 225;
-    Text(dst_pt.x - Text::width(message, Font::BIG) / 2, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
     
     // attack
     message = "Attack:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y = pos_rt.y + 40;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message.clear();
     String::AddInt(message, monster.attack);
@@ -87,13 +89,13 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     }
 
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // defense
     message = "Defense:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y += 18;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message.clear();
     String::AddInt(message, monster.defence);
@@ -106,72 +108,72 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     }
 
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // shot
     message = "Shots:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y += 18;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message.clear();
     String::AddInt(message, monster.shots);
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // damage
     message = "Damage:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y += 18;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message.clear();
     String::AddInt(message, monster.damageMin);
     message += " - ";
     String::AddInt(message, monster.damageMax);
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // hp
     message = "Hit Points:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y += 18;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message.clear();
     String::AddInt(message, monster.hp);
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // speed
     message = "Speed:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y += 18;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message = Speed::String(monster.speed);
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // morale
     message = "Morale:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y += 18;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message = (heroes ? Morale::String((*heroes).GetMorale()) : Morale::String(Morale::NORMAL));
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // luck
     message = "Luck:";
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
     dst_pt.y += 18;
-    Text(dst_pt.x - Text::width(message, Font::BIG), dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     message = (heroes ? Luck::String((*heroes).GetLuck()) : Luck::String(Luck::NORMAL));
     dst_pt.x = pos_rt.x + 420;
-    Text(dst_pt.x, dst_pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, dst_pt);
 
     // monster animation
     //Animation animeMonster(Point(pos_rt.x + 100, pos_rt.y + 180), monster.file, ?, ?, false, Animation::INFINITY | Animation::RING | Animation::LOW);

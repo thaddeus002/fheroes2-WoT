@@ -276,23 +276,23 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     display.Blit(panel, 204, 33);
 
     // text scenario
-    Text textScenario(376, 53, "Scenario:", Font::BIG, true);
+    Text("Scenario:", Font::BIG, 376, 53);
 
     // maps name
-    Text textName(260, 78, H2Config::GetNameMaps(), Font::BIG, true);
+    Text(H2Config::GetNameMaps(), Font::BIG, 260, 78);
     
     // text game difficulty
-    Text textDifficulty(330, 107, "Game Difficulty:", Font::BIG, true);
+    Text("Game Difficulty:", Font::BIG, 330, 107);
 
     //
-    Text textEasy(248, 196, "Easy", Font::SMALL, true);
-    Text textNormal(316, 196, "Normal", Font::SMALL, true);
-    Text textHard(395, 196, "Hard", Font::SMALL, true);
-    Text textExpert(472, 196, "Expert", Font::SMALL, true);
-    Text textImpossible(536, 196, "Impossible", Font::SMALL, true);
+    Text("Easy", Font::SMALL, 248, 196);
+    Text("Normal", Font::SMALL, 316, 196);
+    Text("Hard", Font::SMALL, 395, 196);
+    Text("Expert", Font::SMALL, 472, 196);
+    Text("Impossible", Font::SMALL, 536, 196);
 
     // text opponents
-    Text textOpponents(368, 210, "Opponents:", Font::BIG, true);
+    Text("Opponents:", Font::BIG, 368, 210);
 
     // draw opponents
     u8 count = H2Config::GetKingdomCount();
@@ -311,7 +311,7 @@ void Scenario::DrawInfo(std::vector<rectcolor_t> &vo, std::vector<rectcolor_t> &
     }
 
     // text class
-    Text textClass(386, 290, "Class:", Font::BIG, true);
+    Text("Class:", Font::BIG, 386, 290);
 
     // draw class
     current = 0;
@@ -689,7 +689,7 @@ void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 
 	display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
 	// text longname
-	Text textLongName(x + spriteCount.w() + spriteSize.w() + 18, y, (*it_head).GetName(), Font::BIG, true);
+	Text((*it_head).GetName(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 18, y);
 
 	// sprite wins
 	index = 30 + (*it_head).GetConditionsWins();
@@ -739,7 +739,7 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
     // text longname
-    Text textLongName(x + spriteCount.w() + spriteSize.w() + 22, y, (*it_current).GetName(), Font::BIG, true);
+    Text((*it_current).GetName(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 22, y);
 
     // sprite wins
     index = 30 + (*it_current).GetConditionsWins();
@@ -751,8 +751,8 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     const Sprite &spriteLoss = AGG::GetICN("REQUESTS.ICN", index);
     display.Blit(spriteLoss, x + 211 + spriteWins.w(), y);
 
-    Text textLabel(200, 295, "Maps difficulty:", Font::BIG, true);
-    Text textDifficulty(360, 295, Difficulty::String((*it_current).GetDifficulty()), Font::BIG, true);
+    Text("Maps difficulty:", Font::BIG, 200, 295);
+    Text(Difficulty::String((*it_current).GetDifficulty()), Font::BIG, 360, 295);
     
-    TextBox textDescription(Rect(175, 322, 282, 90), (*it_current).GetDescription(), Font::BIG, true);
+    TextBox((*it_current).GetDescription(), Font::BIG, Rect(175, 322, 282, 90));
 }

@@ -87,9 +87,9 @@ void Army::SelectBar::Redraw(void)
 	    // draw count
 	    str.clear();
 	    String::AddInt(str, army.at(ii).GetCount());
-	    dst_pt.x = pos_pt.x + (monster_back.w() + step) * ii + 68;
+	    dst_pt.x = pos_pt.x + (monster_back.w() + step) * ii + 68  - Text::width(str, Font::SMALL) / 2;
 	    dst_pt.y = pos_pt.y + 80;
-	    Text(dst_pt.x - Text::width(str, Font::SMALL) / 2, dst_pt.y, str, Font::SMALL, true);
+	    Text(str, Font::SMALL, dst_pt);
 	}
 	else
 	    display.Blit(empty_back, pos_pt.x + (empty_back.w() + step) * ii, pos_pt.y);

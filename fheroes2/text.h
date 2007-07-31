@@ -24,38 +24,67 @@
 #include <vector>
 #include "gamedefs.h"
 #include "rect.h"
+#include "background.h"
+
+namespace Font
+{
+    typedef enum { SMALL, BIG } type_t;
+};
+
+namespace Char
+{
+    u8 width(char ch, Font::type_t ft);
+};
 
 class Text
 {
 public:
     typedef enum { LEFT, CENTER, RIGHT } align_t;
 
-    Text(u16 ax, u16 ay, const std::string &msg, Font::type_t ft = Font::SMALL, bool draw = false);
-    
-    u16 w(void) const{ return pos.w; }
+    Text(const std::string & msg, Font::type_t ft);
 
-    static u8  width(char ch, Font::type_t ft);
+    void SetText(const std::string & msg){ message = msg; };
+    void SetFont(const Font::type_t & ft){ font = ft; };
+
+    // with blit
+    Text(const std::string & msg, Font::type_t ft, const Point & dst_pt);
+    Text(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
+
+    u16 width(u16 start = 0, u16 count = 0xffff){ return Text::width(message, font, start, count); };
+    u16 height(u16 width = 0){ return Text::height(message, font, width); };
+
     static u16 width(const std::string &str, Font::type_t ft, u16 start = 0, u16 count = 0xffff);
-    static u16 height(u16 width, const std::string &str, Font::type_t ft);
+    static u16 height(const std::string &str, Font::type_t ft, u16 width = 0);
 
-    void Blit(void);
+    void Blit(u16 ax, u16 ay);
+    void Blit(const Point & dst_pt);
 
 private:
     Font::type_t font;
     std::string message;
-    Rect pos;
+};
+
+class Text2 : public Text
+{
+public:
+    Text2(const std::string & msg, Font::type_t ft, const Point & pt);
+    Text2(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
+
+    void SetPos(const Point & pt){ SetPos(pt.x, pt.y); };
+    void SetPos(u16 ax, u16 ay);
+
+    void Show(void);
+    void Hide(void);
+
+private:
+    Background back;
 };
 
 class TextBox
 {
 public:
-    TextBox(const Rect &rt, const std::string &msg, Font::type_t ft = Font::SMALL, bool draw = false);
+    TextBox(const std::string & msg, Font::type_t ft, const Rect & rt);
 
-    void Redraw(void);
-
-private:
-    Rect pos;
-    std::vector<Text> box;
 };
 
 #endif

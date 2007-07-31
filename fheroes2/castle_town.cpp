@@ -60,7 +60,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 			 std::string("The " + GetStringBuilding(build, race) + " produces " + Monster::String(Monster::Monster(race, build)) + ".") :
 			 GetDescriptionBuilding(build, race);
 	
-	u8 height_description = Text::height(BOXAREA_WIDTH, building_description, Font::BIG);
+	u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
 
 	std::vector<building_t> requires;
 	Castle::GetBuildingRequires(race, build, requires);
@@ -85,7 +85,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		}
 	}
 	
-	u8 height_requires = string_requires.empty() ? 0 : Text::height(BOXAREA_WIDTH, string_requires, Font::BIG);
+	u8 height_requires = string_requires.empty() ? 0 : Text::height(string_requires, Font::BIG, BOXAREA_WIDTH);
 
 
 	PaymentConditions::BuyBuilding paymentBuild(race, build);
@@ -177,26 +177,26 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     const std::string & building_name = GetStringBuilding(build, race);
 	dst_pt.x = box_rt.x + (box_rt.w - Text::width(building_name, Font::SMALL)) / 2;
 	dst_pt.y = box_rt.y + 70;
-    Text(dst_pt.x, dst_pt.y, building_name, Font::SMALL, true);
+    Text(building_name, Font::SMALL, dst_pt);
 
 	src_rt.x = box_rt.x;
 	src_rt.y = box_rt.y + 100;
 	src_rt.w = BOXAREA_WIDTH;
 	src_rt.h = 200;
-    TextBox(src_rt, building_description, Font::BIG, true);
+    TextBox(building_description, Font::BIG, src_rt);
 
 	if(height_requires)
 	{
 		str = "Requires:";
 		dst_pt.x = box_rt.x + (box_rt.w - Text::width(str, Font::BIG)) / 2;
 		dst_pt.y = box_rt.y + 100 + height_description + 20;
-		Text(dst_pt.x, dst_pt.y, str, Font::BIG, true);
+		Text(str, Font::BIG, dst_pt);
 
 		src_rt.x = box_rt.x;
 		src_rt.y = box_rt.y + 100 + height_description + 35;
 		src_rt.w = BOXAREA_WIDTH;
 		src_rt.h = 200;
-    	TextBox(src_rt, string_requires, Font::BIG, true);
+    	TextBox(string_requires, Font::BIG, src_rt);
 	}
 
 	index = 2 < valid_resource ? box_rt.w / 3 : box_rt.w / valid_resource;
@@ -214,7 +214,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		String::AddInt(str, paymentBuild.wood);
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
-		Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+		Text(str, Font::SMALL, dst_pt);
 
 		++count;
 	}
@@ -230,7 +230,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		String::AddInt(str, paymentBuild.ore);
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
-		Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+		Text(str, Font::SMALL, dst_pt);
 
 		++count;
 	}
@@ -246,7 +246,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		String::AddInt(str, paymentBuild.mercury);
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
-		Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+		Text(str, Font::SMALL, dst_pt);
 
 		++count;
 	}
@@ -263,7 +263,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		String::AddInt(str, paymentBuild.sulfur);
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
-		Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+		Text(str, Font::SMALL, dst_pt);
 
 		++count;
 	}
@@ -280,7 +280,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		String::AddInt(str, paymentBuild.crystal);
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
-		Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+		Text(str, Font::SMALL, dst_pt);
 
 		++count;
 	}
@@ -297,7 +297,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		String::AddInt(str, paymentBuild.gems);
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
-		Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+		Text(str, Font::SMALL, dst_pt);
 
 		++count;
 	}
@@ -315,7 +315,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		String::AddInt(str, paymentBuild.gold);
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
-		Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+		Text(str, Font::SMALL, dst_pt);
 	}
 	
 	display.Flip();
@@ -401,7 +401,7 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
     const std::string & stringBuilding = Castle::GetStringBuilding(build, castle.GetRace());
     dst_pt.x = pt.x + 68 - Text::width(stringBuilding, Font::SMALL) / 2;
     dst_pt.y = pt.y + 58;
-    Text(dst_pt.x, dst_pt.y, stringBuilding, Font::SMALL, true);
+    Text(stringBuilding, Font::SMALL, dst_pt);
 
 }
 
@@ -705,38 +705,38 @@ Castle::building_t Castle::OpenTown(void)
 	message = "Attack Skill";
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y = cur_pt.y + 168;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 	message.clear();
 	String::AddInt(message, Captain::GetAttack(race));
 	dst_pt.x += 90;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 	
 	message = "Defense Skill ";
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 	message.clear();
 	String::AddInt(message, Captain::GetDefense(race));
 	dst_pt.x += 90;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 
 	message = "Spell Power ";
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 	message.clear();
 	String::AddInt(message, Captain::GetPower(race));
 	dst_pt.x += 90;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 
 	message = "Knowledge ";
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 	message.clear();
 	String::AddInt(message, Captain::GetKnowledge(race));
 	dst_pt.x += 90;
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true);
+	Text(message, Font::SMALL, dst_pt);
 	
 	display.Blit(spriteSpreadArmyFormat, rectSpreadArmyFormat);
 	display.Blit(spriteGroupedArmyFormat, rectGroupedArmyFormat);

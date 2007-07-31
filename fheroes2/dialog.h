@@ -25,6 +25,7 @@
 #include "background.h"
 #include "monster.h"
 #include "rect.h"
+#include "text.h"
 #include "game.h"
 
 #define	SHADOWWIDTH	16

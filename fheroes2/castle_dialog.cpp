@@ -48,7 +48,7 @@ void Castle::DisplayName(const Point & src_pt)
 
     dst_pt.x = src_pt.x + 320 - Text::width(name, Font::SMALL) / 2;
     dst_pt.y = src_pt.y + 248;
-    Text(dst_pt.x, dst_pt.y, name, Font::SMALL, true);
+    Text(name, Font::SMALL, dst_pt);
 }
 
 Dialog::answer_t Castle::OpenDialog(void)
@@ -1021,7 +1021,7 @@ void Castle::RedrawResourcePanel(void)
     count.erase();
     String::AddInt(count, resource.wood);
     dst_pt.y += 22;
-    Text(dst_pt.x + (wood.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
+    Text(count, Font::SMALL, dst_pt.x + (wood.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
 
     // sprite sulfur
     dst_pt.x = src_rt.x + 42;
@@ -1033,7 +1033,7 @@ void Castle::RedrawResourcePanel(void)
     count.erase();
     String::AddInt(count, resource.sulfur);
     dst_pt.y += 26;
-    Text(dst_pt.x + (sulfur.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
+    Text(count, Font::SMALL, dst_pt.x + (sulfur.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
 
     // sprite crystal
     dst_pt.x = src_rt.x + 1;
@@ -1045,7 +1045,7 @@ void Castle::RedrawResourcePanel(void)
     count.erase();
     String::AddInt(count, resource.crystal);
     dst_pt.y += 33;
-    Text(dst_pt.x + (crystal.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
+    Text(count, Font::SMALL, dst_pt.x + (crystal.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
 
     // sprite mercury
     dst_pt.x = src_rt.x + 44;
@@ -1057,7 +1057,7 @@ void Castle::RedrawResourcePanel(void)
     count.erase();
     String::AddInt(count, resource.mercury);
     dst_pt.y += 34;
-    Text(dst_pt.x + (mercury.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
+    Text(count, Font::SMALL, dst_pt.x + (mercury.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
 
     // sprite ore
     dst_pt.x = src_rt.x + 1;
@@ -1069,7 +1069,7 @@ void Castle::RedrawResourcePanel(void)
     count.erase();
     String::AddInt(count, resource.ore);
     dst_pt.y += 26;
-    Text(dst_pt.x + (ore.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
+    Text(count, Font::SMALL, dst_pt.x + (ore.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
 
     // sprite gems
     dst_pt.x = src_rt.x + 45;
@@ -1081,7 +1081,7 @@ void Castle::RedrawResourcePanel(void)
     count.erase();
     String::AddInt(count, resource.gems);
     dst_pt.y += 26;
-    Text(dst_pt.x + (gems.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
+    Text(count, Font::SMALL, dst_pt.x + (gems.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
 
     // sprite gold
     dst_pt.x = src_rt.x + 6;
@@ -1093,7 +1093,7 @@ void Castle::RedrawResourcePanel(void)
     count.erase();
     String::AddInt(count, resource.gold);
     dst_pt.y += 24;
-    Text(dst_pt.x + (gold.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y, count, Font::SMALL, true);
+    Text(count, Font::SMALL, dst_pt.x + (gold.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
     
     // sprite button exit
     dst_pt.x = src_rt.x + 1;

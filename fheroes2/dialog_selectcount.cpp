@@ -48,7 +48,7 @@ u16 Dialog::SelectCount(u16 max_count)
     std::string message("Move how many troops?");
     pt.x = pos.x + (pos.w - Text::width(message, Font::BIG)) / 2;
     pt.y = pos.y;
-    Text(pt.x, pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, pt);
 
     // sprite edit
     const Surface & sprite_edit = AGG::GetICN("TOWNWIND.ICN", 4);
@@ -61,7 +61,7 @@ u16 Dialog::SelectCount(u16 max_count)
     String::AddInt(message, result);
     pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
     pt.y = pos.y + 56;
-    Text(pt.x, pt.y, message, Font::BIG, true);
+    Text(message, Font::BIG, pt);
 
     // buttons
     pt.x = pos.x + 150;
@@ -112,7 +112,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	    String::AddInt(message, result);
 	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
 	    pt.y = pos.y + 56;
-	    Text(pt.x, pt.y, message, Font::BIG, true);
+	    Text(message, Font::BIG, pt);
 	    Cursor::Show();
 	}
 
@@ -131,7 +131,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	    String::AddInt(message, result);
 	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
 	    pt.y = pos.y + 56;
-	    Text(pt.x, pt.y, message, Font::BIG, true);
+	    Text(message, Font::BIG, pt);
 	    Cursor::Show();
 	}
 

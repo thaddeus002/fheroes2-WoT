@@ -30,39 +30,49 @@
 #define HEIGHT_BIG	0x10
 #define HEIGHT_SMALL	0x0B
 
-/* text string */
-Text::Text(u16 ax, u16 ay, const std::string &msg, Font::type_t ft, bool draw) : font(ft), message(msg)
+u8 Char::width(char ch, Font::type_t ft)
 {
-    pos.x = ax;
-    pos.y = ay;
-    pos.h = (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG);
-    pos.w = 0;
+    if(ch < 0x21)
+	return (Font::SMALL == ft ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
 
-    std::string::const_iterator it = message.begin();
-    std::string::const_iterator it_end = message.end();
-
-    for(; it != it_end; ++it)
-        if(0x20 == *it) pos.w += (Font::SMALL == ft ? WIDTH_SMALL : WIDTH_BIG);
-        else
-            pos.w += AGG::GetLetter(*it, ft).w();
-
-    if(draw) Blit();
+    return AGG::GetLetter(ch, ft).w();
 }
 
-void Text::Blit(void)
+/* text string */
+Text::Text(const std::string & msg, Font::type_t ft) : font(ft), message(msg)
+{
+}
+
+Text::Text(const std::string &msg, Font::type_t ft, u16 ax, u16 ay) : font(ft), message(msg)
+{
+    Blit(ax, ay);
+}
+
+Text::Text(const std::string &msg, Font::type_t ft, const Point & pt) : font(ft), message(msg)
+{
+    Blit(pt.x, pt.y);
+}
+
+void Text::Blit(const Point & dst_pt)
+{
+    Blit(dst_pt.x, dst_pt.y);
+}
+
+void Text::Blit(u16 ax, u16 ay)
 {
     std::string::const_iterator it = message.begin();
     std::string::const_iterator it_end = message.end();
 
-    Point pt(pos.x, pos.y);
-    u16 y1 = pos.y;
+    Point pt(ax, ay);
+    u16 y1 = ay;
 
     for(; it != it_end; ++it){
 
 	pt.y = y1;
 
 	// space or unknown letter
-	if(*it < 0x21){
+	if(*it < 0x21)
+	{
 	    pt.x += (Font::SMALL == font ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
 	    continue;
 	}
@@ -103,39 +113,33 @@ void Text::Blit(void)
     }
 }
 
-u8 Text::width(char ch, Font::type_t ft)
-{
-    if(ch < 0x21)
-	return (Font::SMALL == ft ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
-
-    return AGG::GetLetter(ch, ft).w();
-}
-
 u16 Text::width(const std::string &str,  Font::type_t ft, u16 start, u16 count)
 {
     u16 res = 0;
 
     if(0xffff == count) count = str.size();
 
-    for(int ii = start; ii < start + count; ++ii) res += Text::width(str[ii], ft);
+    for(int ii = start; ii < start + count; ++ii) res += Char::width(str[ii], ft);
     
     return res;
 }
 
-u16 Text::height(u16 width, const std::string &str, Font::type_t ft)
+u16 Text::height(const std::string &str, Font::type_t ft, u16 width)
 {
     if(str.empty()) return 0;
-    
+
+    if(! width) return (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+
     u16 pos_last = str.size() - 1;
 
     u16 s_start = 0;
     u16 s_end = pos_last;
     u16 res = 0;
 
-    while(s_start < s_end){
-
-	while(s_start < s_end && width < Text::width(str, ft, s_start, s_end - s_start)){
-    
+    while(s_start < s_end)
+    {
+	while(s_start < s_end && width < Text::width(str, ft, s_start, s_end - s_start))
+	{
 	    while(s_start < s_end && !isspace(str[s_end])) --s_end;
 
     	    --s_end;
@@ -151,42 +155,59 @@ u16 Text::height(u16 width, const std::string &str, Font::type_t ft)
     return res;
 }
 
-TextBox::TextBox(const Rect &rt, const std::string &msg, Font::type_t ft, bool draw) : pos(rt)
+TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
 {
 
     u16 pos_last = msg.size() - 1;
 
     u16 s_start = 0;
     u16 s_end = pos_last;
-    Point pt(pos.x, pos.y + 2);
+    Point pt(rt.x, rt.y + 2);
 
-    while(s_start < s_end){
-
-	while(s_start < s_end && pos.w < Text::width(msg, ft, s_start, s_end - s_start)){
-    
+    while(s_start < s_end)
+    {
+	while(s_start < s_end && rt.w < Text::width(msg, ft, s_start, s_end - s_start))
+	{
 	    while(s_start < s_end && !isspace(msg[s_end])) --s_end;
 
     	    --s_end;
 	}
     	++s_end;
 
-	pt.x = pos.x + (pos.w - Text::width(msg, ft, s_start, s_end - s_start)) / 2;
+	pt.x = rt.x + (rt.w - Text::width(msg, ft, s_start, s_end - s_start)) / 2;
 	
-	box.push_back(Text(pt.x, pt.y, msg.substr(s_start, s_end - s_start), ft));
+	Text(msg.substr(s_start, s_end - s_start), ft, pt);
 	
 	pt.y += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
 
 	s_start = s_end + 1;
 	s_end = pos_last;
     }
-
-    if(draw) Redraw();
 }
 
-void TextBox::Redraw(void)
+Text2::Text2(const std::string & msg, Font::type_t ft, const Point & pt) : Text(msg, ft)
 {
-    std::vector<Text>::iterator it = box.begin();
-    std::vector<Text>::iterator it_end = box.end();
+    back.Save(Rect(pt, Text::width(msg, ft), Text::height(msg, ft, Text::width(msg, ft))));
+}
+
+Text2::Text2(const std::string & msg, Font::type_t ft, u16 ax, u16 ay) : Text(msg, ft)
+{
+    back.Save(Rect(ax, ay, Text::width(msg, ft), Text::height(msg, ft, Text::width(msg, ft))));
+}
+
+void Text2::Show(void)
+{
+    Blit(back.GetPos());
+}
+
+void Text2::Hide(void)
+{
+    back.Restore();
+}
+
+void Text2::SetPos(u16 ax, u16 ay)
+{
+    back.Restore();
     
-    for(; it != it_end; ++it) (*it).Blit();
+    back.Save(Rect(ax, ay, width(), height()));
 }

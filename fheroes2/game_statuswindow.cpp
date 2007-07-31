@@ -71,39 +71,39 @@ void Game::StatusWindow::DrawKingdomInfo(void)
 
     // count castle
     String::AddInt(count, myKingdom.GetCountCastle());
-    Text(pos.x + 26 - Text::width(count, Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 26 - Text::width(count, Font::SMALL) / 2, pos.y + 28);
     // count town
     count.clear();
     String::AddInt(count, myKingdom.GetCountTown());
-    Text(pos.x + 78 - Text::width(count, Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 78 - Text::width(count, Font::SMALL) / 2, pos.y + 28);
     // count gold
     count.clear();
     String::AddInt(count, myKingdom.GetFundsGold());
-    Text(pos.x + 122 - Text::width(count, Font::SMALL) / 2, pos.y + 28, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 122 - Text::width(count, Font::SMALL) / 2, pos.y + 28);
     // count wood
     count.clear();
     String::AddInt(count, myKingdom.GetFundsWood());
-    Text(pos.x + 15 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 15 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
     // count mercury
     count.clear();
     String::AddInt(count, myKingdom.GetFundsMercury());
-    Text(pos.x + 37 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 37 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
     // count ore
     count.clear();
     String::AddInt(count, myKingdom.GetFundsOre());
-    Text(pos.x + 60 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 60 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
     // count sulfur
     count.clear();
     String::AddInt(count, myKingdom.GetFundsSulfur());
-    Text(pos.x + 84 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 84 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
     // count crystal
     count.clear();
     String::AddInt(count, myKingdom.GetFundsCrystal());
-    Text(pos.x + 108 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 108 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
     // count gems
     count.clear();
     String::AddInt(count, myKingdom.GetFundsGems());
-    Text(pos.x + 130 - Text::width(count, Font::SMALL) / 2, pos.y + 58, count, Font::SMALL, true);
+    Text(count, Font::SMALL, pos.x + 130 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
 }
 
 void Game::StatusWindow::DrawDayInfo(void)
@@ -120,11 +120,11 @@ void Game::StatusWindow::DrawDayInfo(void)
 
     message += " Week: ";
     String::AddInt(message, world.GetWeek());
-    Text(pos.x + (pos.w - Text::width(message, Font::SMALL)) / 2, pos.y + 30, message, Font::SMALL, true);
+    Text(message, Font::SMALL, pos.x + (pos.w - Text::width(message, Font::SMALL)) / 2, pos.y + 30);
 
     message = "Day: ";
     String::AddInt(message, world.GetDay());
-    Text(pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 46, message, Font::BIG, true);
+    Text(message, Font::BIG, pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 46);
 }
 
 void Game::StatusWindow::DrawArmyInfo(void)

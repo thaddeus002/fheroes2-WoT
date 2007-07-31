@@ -60,7 +60,7 @@ void Dialog::Marketplace(void)
     // header
     dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(header, Font::BIG)) / 2;
     dst_pt.y = pos_rt.y;
-    Text(dst_pt.x, dst_pt.y, header, Font::BIG, true);
+    Text(header, Font::BIG, dst_pt);
 
     // save background
     dst_rt.x = pos_rt.x - 5;
@@ -76,7 +76,7 @@ void Dialog::Marketplace(void)
     dst_rt.y = pos_rt.y + 30;
     dst_rt.w = pos_rt.w;
     dst_rt.h = 100;
-    TextBox(dst_rt, message_info, Font::BIG, true);
+    TextBox(message_info, Font::BIG, dst_rt);
 
     const Kingdom & kingdom = world.GetMyKingdom();
     const Sprite & cursor = AGG::GetICN(tradpost, 14);
@@ -97,7 +97,7 @@ void Dialog::Marketplace(void)
     SpriteCursor cursorFrom(cursor);
     dst_pt.x = pt1.x + (108 - Text::width(header_from, Font::SMALL)) / 2;
     dst_pt.y = pt1.y - 15;
-    Text(dst_pt.x, dst_pt.y, header_from, Font::SMALL, true);
+    Text(header_from, Font::SMALL, dst_pt);
     RedrawFromResource(pt1, fundsFrom);
 
     const std::string & header_to = "Available Trades";
@@ -116,7 +116,7 @@ void Dialog::Marketplace(void)
     SpriteCursor cursorTo(cursor);
     dst_pt.x = pt2.x + (108 - Text::width(header_to, Font::SMALL)) / 2;
     dst_pt.y = pt2.y - 15;
-    Text(dst_pt.x, dst_pt.y, header_to, Font::SMALL, true);
+    Text(header_to, Font::SMALL, dst_pt);
     RedrawToResource(pt2, false);
 
     u32 count_sell = 0;
@@ -130,9 +130,14 @@ void Dialog::Marketplace(void)
     Button *buttonRight = NULL;
 
     Splitter *splitter = NULL;
+    
+    Text2 *textSell = NULL;
+    Text2 *textBuy = NULL;
+
+    std::string message;
 
 #define ShowTradeArea \
-    if(resourceFrom == resourceTo) \
+    if(resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy)) \
     { \
 	Cursor::Hide(); \
 	back.Restore(); \
@@ -140,14 +145,18 @@ void Dialog::Marketplace(void)
 	dst_rt.y = pos_rt.y + 30; \
 	dst_rt.w = pos_rt.w; \
 	dst_rt.h = 100; \
-	TextBox(dst_rt, message_info, Font::BIG, true); \
+	TextBox(message_info, Font::BIG, dst_rt); \
 	if(buttonTrade) delete buttonTrade; \
 	if(buttonLeft) delete buttonLeft; \
         if(buttonRight) delete buttonRight; \
         if(splitter) delete splitter; \
+        if(textSell) delete textSell; \
+        if(textBuy) delete textBuy; \
         buttonTrade = NULL; \
         buttonLeft = NULL; \
         buttonRight = NULL; \
+        textSell = NULL; \
+        textBuy = NULL; \
         splitter = NULL; \
         display.Flip(); \
         Cursor::Show(); \
@@ -181,7 +190,6 @@ void Dialog::Marketplace(void)
 	Resource::resource_t rs_from = static_cast<Resource::resource_t>(resourceFrom); \
 	Resource::resource_t rs_to   = static_cast<Resource::resource_t>(resourceTo); \
 	u16 exchange_rate = GetTradeCosts(resourceFrom, resourceTo); \
-	std::string message; \
 	if(Resource::GOLD == resourceTo) \
 	{ \
 	    message = "I can offer you "; \
@@ -198,7 +206,7 @@ void Dialog::Marketplace(void)
 	dst_rt.y = pos_rt.y + 30; \
 	dst_rt.w = pos_rt.w; \
 	dst_rt.h = 100; \
-	TextBox(dst_rt, message, Font::BIG, true); \
+	TextBox(message, Font::BIG, dst_rt); \
 	const Sprite & sprite_from = AGG::GetICN("RESOURCE.ICN", Resource::GetIndexSprite2(rs_from)); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2; \
 	dst_pt.y = pos_rt.y + 115 - sprite_from.h(); \
@@ -207,7 +215,7 @@ void Dialog::Marketplace(void)
 	String::AddInt(message, count_sell); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2; \
 	dst_pt.y = pos_rt.y + 116; \
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true); \
+	textSell = new Text2(message, Font::SMALL, dst_pt); \
 	const Sprite & sprite_to = AGG::GetICN("RESOURCE.ICN", Resource::GetIndexSprite2(rs_to)); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2; \
 	dst_pt.y = pos_rt.y + 115 - sprite_to.h(); \
@@ -216,7 +224,7 @@ void Dialog::Marketplace(void)
 	String::AddInt(message, count_buy); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2; \
 	dst_pt.y = pos_rt.y + 116; \
-	Text(dst_pt.x, dst_pt.y, message, Font::SMALL, true); \
+	textBuy = new Text2(message, Font::SMALL, dst_pt); \
 	const Sprite & sprite_fromto = AGG::GetICN(tradpost, 0); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2; \
 	dst_pt.y = pos_rt.y + 90; \
@@ -224,10 +232,39 @@ void Dialog::Marketplace(void)
 	const std::string & str_qty = "Qty to trade"; \
 	dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(str_qty, Font::SMALL)) / 2; \
 	dst_pt.y = pos_rt.y + 110; \
-	Text(dst_pt.x, dst_pt.y, str_qty, Font::SMALL, true); \
+	Text(str_qty, Font::SMALL, dst_pt); \
 	display.Flip(); \
 	Cursor::Show(); \
+	RedrawInfoBuySell; \
     } \
+
+#define RedrawInfoBuySell \
+	Cursor::Hide(); \
+	if(textSell) \
+	{ \
+		message.clear(); \
+		String::AddInt(message, count_sell); \
+		dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2; \
+		dst_pt.y = pos_rt.y + 116; \
+		textSell->Hide(); \
+		textSell->SetText(message); \
+		textSell->SetPos(dst_pt); \
+		textSell->Show(); \
+	} \
+	if(textBuy) \
+	{ \
+		message.clear(); \
+		String::AddInt(message, count_sell); \
+		dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2; \
+		dst_pt.y = pos_rt.y + 116; \
+		textBuy->Hide(); \
+		textBuy->SetText(message); \
+		textBuy->SetPos(dst_pt); \
+		textBuy->Show(); \
+	} \
+	Cursor::Show(); \
+	display.Flip(); \
+
 
     // button exit
     const Sprite & sprite_exit = AGG::GetICN(tradpost, 17);
@@ -373,6 +410,7 @@ void Dialog::Marketplace(void)
 
             Cursor::Hide();
             splitter->Move(seek);
+	    RedrawInfoBuySell;
             display.Flip();
             Cursor::Show();
         }
@@ -397,7 +435,7 @@ void Dialog::Marketplace(void)
 
 	    splitter->Backward();
 
-	    //RedrawInfoBuySell
+	    RedrawInfoBuySell;
 	}
 
 	// increase trade resource
@@ -411,7 +449,7 @@ void Dialog::Marketplace(void)
 
 	    splitter->Forward();
 
-	    //RedrawInfoBuySell
+	    RedrawInfoBuySell;
 	}
     }
 
@@ -421,6 +459,8 @@ void Dialog::Marketplace(void)
     if(buttonLeft) delete buttonLeft;
     if(buttonRight) delete buttonRight;
     if(splitter) delete splitter;
+    if(textSell) delete textSell;
+    if(textBuy) delete textBuy;
 
     Cursor::Show();
 }
@@ -439,7 +479,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     String::AddInt(str, rs.wood);
     dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
     dst_pt.y += 21;
-    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    Text(str, Font::SMALL, dst_pt);
     
     // mercury
     dst_pt.x = pt.x + 37;
@@ -449,7 +489,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     String::AddInt(str, rs.mercury);
     dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
     dst_pt.y += 21;
-    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    Text(str, Font::SMALL, dst_pt);
 
     // ore
     dst_pt.x = pt.x + 74;
@@ -459,7 +499,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     String::AddInt(str, rs.ore);
     dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
     dst_pt.y += 21;
-    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    Text(str, Font::SMALL, dst_pt);
 
     // sulfur
     dst_pt.x = pt.x;
@@ -469,7 +509,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     String::AddInt(str, rs.sulfur);
     dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
     dst_pt.y += 21;
-    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    Text(str, Font::SMALL, dst_pt);
 
     // crystal
     dst_pt.x = pt.x + 37;
@@ -479,7 +519,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     String::AddInt(str, rs.crystal);
     dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
     dst_pt.y += 21;
-    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    Text(str, Font::SMALL, dst_pt);
 
     // gems
     dst_pt.x = pt.x + 74;
@@ -489,7 +529,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     String::AddInt(str, rs.gems);
     dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
     dst_pt.y += 21;
-    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    Text(str, Font::SMALL, dst_pt);
 
     // gold
     dst_pt.x = pt.x + 37;
@@ -499,7 +539,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     String::AddInt(str, rs.gold);
     dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
     dst_pt.y += 21;
-    Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+    Text(str, Font::SMALL, dst_pt);
 }
 
 void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
@@ -517,7 +557,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 	GetStringTradeCosts(str, from_resource, Resource::WOOD);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
-	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(str, Font::SMALL, dst_pt);
     }
     
     // mercury
@@ -529,7 +569,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 	GetStringTradeCosts(str, from_resource, Resource::MERCURY);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
-        Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+        Text(str, Font::SMALL, dst_pt);
     }
 
     // ore
@@ -541,7 +581,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 	GetStringTradeCosts(str, from_resource, Resource::ORE);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
-	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(str, Font::SMALL, dst_pt);
     }
 
     // sulfur
@@ -553,7 +593,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 	GetStringTradeCosts(str, from_resource, Resource::SULFUR);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
-	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(str, Font::SMALL, dst_pt);
     }
 
     // crystal
@@ -565,7 +605,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 	GetStringTradeCosts(str, from_resource, Resource::CRYSTAL);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
-	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(str, Font::SMALL, dst_pt);
     }
 
     // gems
@@ -577,7 +617,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 	GetStringTradeCosts(str, from_resource, Resource::GEMS);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
-	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(str, Font::SMALL, dst_pt);
     }
 
     // gold
@@ -589,7 +629,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 	GetStringTradeCosts(str, from_resource, Resource::GOLD);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
-	Text(dst_pt.x, dst_pt.y, str, Font::SMALL, true);
+	Text(str, Font::SMALL, dst_pt);
     }
 }
 
