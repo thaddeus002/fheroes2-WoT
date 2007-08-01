@@ -31,7 +31,7 @@ Dir::Dir(const std::string &path, const std::string &filter) : std::vector<std::
 
     dp = opendir(path.c_str());
 
-    if(dp == NULL) Error::Except("error open directory: " + path);
+    if(dp == NULL) Error::Except("open directory: " + path);
 
     while(NULL != (ep = readdir(dp))){
 

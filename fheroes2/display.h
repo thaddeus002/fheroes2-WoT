@@ -21,7 +21,7 @@
 #define H2DISPLAY_H
 
 #include <string>
-#include "basesurface.h"
+#include "surface.h"
 #include "rect.h"
 
 namespace Display
@@ -32,7 +32,8 @@ namespace Display
 
     void HideCursor(void);
     void ShowCursor(void);
-    void SetCaption(const std::string &caption);
+    void SetCaption(const std::string & caption);
+    void SetIcons(const Surface & icons);
 
 class VideoSurface : public BaseSurface
 {

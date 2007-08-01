@@ -30,7 +30,7 @@ namespace H2Config
 {
     static const u8 major_version = MAJOR_VERSION;
     static const u8 minor_version = MINOR_VERSION;
-    static u16  boolValue = ANIMATION | ORIGINAL;
+    static u16  boolValue = ANIMATION | ORIGINAL | LOGO;
     static std::string pathAGGFile("heroes2.agg");
     static std::string pathMapsDirectory("maps");
     static Display::resolution_t videoMode = Display::SMALL;
@@ -50,8 +50,8 @@ namespace H2Config
 /* init Config */
 void H2Config::Defaults(void)
 {
-    boolValue = ANIMATION | ORIGINAL;
-    pathAGGFile = "heroes2.agg";
+    boolValue = ANIMATION | ORIGINAL | LOGO;
+    pathAGGFile = "data/heroes2.agg";
     pathMapsDirectory = "maps";
     videoMode = Display::SMALL;
 }
@@ -131,6 +131,13 @@ bool H2Config::Load(const std::string & filename)
 		    else
 		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::ORIGINAL;
 		}
+		// show logo
+		if(leftKey == "logo")
+		{
+		    if(rightValue == "on") H2Config::boolValue |= H2Config::LOGO;
+		    else
+		    if(rightValue == "off") H2Config::boolValue &= ~H2Config::LOGO;
+		}
 
 		// agg file
  		if(leftKey == "aggfile") H2Config::pathAGGFile.assign(rightValue);
@@ -190,6 +197,9 @@ bool H2Config::EvilInterface(void){ return H2Config::boolValue & H2Config::EVILI
 
 /* get play with heroes */
 bool H2Config::PlayWithHeroes(void){ return H2Config::boolValue & H2Config::STARTHEROES; }
+
+/* get show logo */
+bool H2Config::Logo(void){ return H2Config::boolValue & H2Config::LOGO; }
 
 /* return path agg data */
 const std::string & H2Config::GetAGGFile(void){ return H2Config::pathAGGFile; };
@@ -331,6 +341,7 @@ void H2Config::SetPlayWithHeroes(bool fl){ fl ? H2Config::boolValue &= ~H2Config
 /* print default values */
 void H2Config::PrintCurrentValues(void)
 {
+    std::cout << std::endl;
     std::cout << "# free heroes2 config, default values:" << std::endl;
     std::cout << "aggfile = " << pathAGGFile << std::endl;
     std::cout << "directorymaps = " << pathMapsDirectory << std::endl;
@@ -350,4 +361,5 @@ void H2Config::PrintCurrentValues(void)
     std::cout << "evilinterface = " << (boolValue & H2Config::EVILINTERFACE ? "on"  : "off") << std::endl;
     std::cout << "original = " << (boolValue & H2Config::ORIGINAL ? "on"  : "off") << std::endl;
     std::cout << "debug = " << (boolValue & H2Config::DEBUG ? "on"  : "off") << std::endl;
+    std::cout << std::endl;
 }

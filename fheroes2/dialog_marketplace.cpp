@@ -254,7 +254,7 @@ void Dialog::Marketplace(void)
 	if(textBuy) \
 	{ \
 		message.clear(); \
-		String::AddInt(message, count_sell); \
+		String::AddInt(message, count_buy); \
 		dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2; \
 		dst_pt.y = pos_rt.y + 116; \
 		textBuy->Hide(); \

@@ -31,6 +31,8 @@
 #include "agg.h"
 #include "cursor.h"
 #include "game.h"
+#include "image_logo.h"
+#include "image_icons.h"
 
 int main(int argc, char **argv)
 {
@@ -63,17 +65,9 @@ int main(int argc, char **argv)
 		std::cout << "Usage: " << argv[0] << " [OPTIONS]\n" \
 		    << "  -e\teditors mode\n" \
 		    << "  -d\tdebug mode\n" \
-		    << "  -p\tprint default config values\n" \
 		    << "  -c\tpath to config file (default fheroes2.cfg)\n" \
 		    << "  -h\tprint this help and exit" << std::endl;
 
-		return EXIT_SUCCESS;
-	    }
-
-	    if(cmd.Exists('p'))
-	    {
-		H2Config::PrintCurrentValues();
-	
 		return EXIT_SUCCESS;
 	    }
 
@@ -108,11 +102,44 @@ int main(int argc, char **argv)
 	    Display::HideCursor();
 	    Display::SetCaption(caption);
 
+    	    Surface icons(image_icons.pixel_data, image_icons.width, image_icons.height, image_icons.bytes_per_pixel, true);
+	    Display::SetIcons(icons);
+
 	    // init AGG
 	    AGG::Init(H2Config::GetAGGFile());
 
 	    // load palette
 	    AGG::LoadPalette();
+
+#ifdef BUILD_SDL_LOGO
+	    // SDL logo
+	    if(H2Config::Logo())
+	    {
+    		Surface logo(image_logo.pixel_data, image_logo.width, image_logo.height, image_logo.bytes_per_pixel, false);
+
+		const u32 black = logo.MapRGB(0, 0, 0);
+
+		u8 ii = 0;
+
+		while(ii < 250)
+		{
+		    logo.SetAlpha(ii);
+		    display.Blit(logo);
+		    display.Flip();
+		    display.Fill(black);
+		    ii += 10;
+		}
+
+		while(ii > 0)
+		{
+		    logo.SetAlpha(ii);
+		    display.Blit(logo);
+		    display.Flip();
+		    display.Fill(black);
+		    ii -= 10;
+		}
+	    }
+#endif
 
 	    // init cursor
 	    Cursor::Init(Cursor::POINTER);
@@ -165,10 +192,11 @@ int main(int argc, char **argv)
 
 	    Display::ShowCursor();
 
-	} catch(std::bad_alloc){
-
-	} catch(Error::Exception){
-
+	} catch(std::bad_alloc)
+	{
+	} catch(Error::Exception)
+	{
+	    H2Config::PrintCurrentValues();
 	}
 
 	std::cout << "Bye." << std::endl;

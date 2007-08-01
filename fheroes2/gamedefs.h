@@ -48,6 +48,11 @@ typedef unsigned int	u32;
 #define BMASK 0x000000f0
 #define AMASK 0x0000000f
 
+#define RMASK32 0xff000000
+#define GMASK32 0x00ff0000
+#define BMASK32 0x0000ff00
+#define AMASK32 0x000000ff
+
 #define SWAP16(X)    X=SDL_Swap16(X)
 #define SWAP32(X)    X=SDL_Swap32(X)
 
@@ -57,6 +62,11 @@ typedef unsigned int	u32;
 #define GMASK 0x000000f0
 #define BMASK 0x00000f00
 #define AMASK 0x0000f000
+
+#define RMASK32 0x000000ff
+#define GMASK32 0x0000ff00
+#define BMASK32 0x00ff0000
+#define AMASK32 0xff000000
 
 #define SWAP16(X) ;
 #define SWAP32(X) ;

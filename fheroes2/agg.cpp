@@ -41,11 +41,13 @@ namespace AGG {
 /* AGG init */
 void AGG::Init(const std::string & aggname)
 {
-    Error::Verbose("AGG data: " + aggname);
-    
     AGG::fd = new std::fstream(aggname.c_str(), std::ios::in | std::ios::binary);
-    if(! AGG::fd || ! *AGG::fd || AGG::fd->fail()) Error::Except("file not found.");
-    
+
+    if(! AGG::fd || ! *AGG::fd || AGG::fd->fail())
+	Error::Except(aggname + " file not found.");
+    else
+	Error::Verbose("AGG data: " + aggname);
+
     u16 count;
     char buf[AGGSIZENAME];
     aggfat_t fat_element;

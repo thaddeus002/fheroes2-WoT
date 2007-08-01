@@ -41,7 +41,8 @@ namespace H2Config {
 	/*
 	...
 	*/
-	STARTHEROES	= 0x2000,
+	STARTHEROES	= 0x1000,
+	LOGO		= 0x2000,
 	ORIGINAL	= 0x4000,
 	EDITOR		= 0x8000,
     } bool_t;
@@ -59,6 +60,7 @@ namespace H2Config {
     bool FullScreen(void);
     bool EvilInterface(void);
     bool PlayWithHeroes(void);
+    bool Logo(void);
     const std::string & GetAGGFile(void);
     const std::string & GetMapsDirectory(void);
     Display::resolution_t GetVideoMode(void);

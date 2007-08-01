@@ -30,6 +30,7 @@ public:
     Surface(u16 sw, u16 sh, bool alpha = false) : BaseSurface(sw, sh, alpha){};
     Surface(u16 sw, u16 sh, u8 depth, u32 fl) : BaseSurface(sw, sh, depth, fl){};
     Surface(const Surface & sf) : BaseSurface(sf){};
+    Surface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha) : BaseSurface(pixels, width, height, bytes_per_pixel * 8, width * bytes_per_pixel, alpha){};
 
     ~Surface(){ FreeSurface(); };
 };

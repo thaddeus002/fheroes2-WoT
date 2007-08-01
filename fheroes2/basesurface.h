@@ -29,6 +29,7 @@ class BaseSurface
 {
 public:
     BaseSurface() : surface(NULL){};
+    BaseSurface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char depth, unsigned int pitch, bool alpha);
     BaseSurface(u16 sw, u16 sh, u8 depth, u32 fl){ CreateSurface(sw, sh, depth,  fl); };
     BaseSurface(u16 sw, u16 sh, bool alpha = false){ CreateSurface(sw, sh, DEFAULT_DEPTH, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE); };
     BaseSurface(const BaseSurface & bs){ if(bs.valid()) surface = SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags()); };
@@ -53,6 +54,7 @@ public:
     
     bool SaveBMP(const char *fn) const{ return SDL_SaveBMP(surface, fn) ? false : true; };
     const void *pixels(void) const{ return surface->pixels; };
+    const SDL_Surface *GetSurface(void) const{ return surface; };
 
     void Fill(u32 color);
     void Fill(u8 r, u8 g, u8 b){ Fill(MapRGB(r, g, b)); };
@@ -64,6 +66,7 @@ public:
     void SetDisplayFormat(void);
     void SetColorKey(void);
     void SetColorKey(u32 color){ SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, color); };
+    void SetAlpha(u8 level){ SDL_SetAlpha(surface, SDL_SRCALPHA|SDL_RLEACCEL, level); };
     void SetPixel2(u16 x, u16 y, u32 color);
     void SetPixel1(u16 x, u16 y, u8 color);
 
@@ -74,7 +77,6 @@ protected:
     void CreateSurface(const Size &sz, u8 dp, u32 fl){ CreateSurface(sz.w, sz.h, dp, fl); };
     void CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl);
     void FreeSurface(void){ if(surface) SDL_FreeSurface(surface); surface = NULL; }
-    const SDL_Surface *GetSurface(void) const{ return surface; };
     const SDL_PixelFormat *GetPixelFormat(void) const{ return surface->format; };
 
     SDL_Surface *surface;

@@ -68,6 +68,12 @@ void Display::SetVideoMode(Display::resolution_t mode)
 /* set caption main window */
 void Display::SetCaption(const std::string &caption){ SDL_WM_SetCaption(caption.c_str(), "FHEROES2"); }
 
+/* set icons window */
+void Display::SetIcons(const Surface & icons)
+{
+    SDL_WM_SetIcon(const_cast<SDL_Surface *>(icons.GetSurface()), NULL);
+}
+
 /* hide system cursor */
 void Display::HideCursor(void){ SDL_ShowCursor(SDL_DISABLE); }
 

@@ -22,6 +22,14 @@
 #include "agg.h"
 #include "error.h"
 
+BaseSurface::BaseSurface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char depth, unsigned int pitch, bool alpha)
+{
+    surface = SDL_CreateRGBSurfaceFrom((void *) pixels, width, height, depth, pitch,
+		alpha ? RMASK32 : 0, alpha ? GMASK32 : 0, alpha ? BMASK32 : 0, alpha ? AMASK32 : 0);
+
+    if(!surface) Error::Except("BaseSurfaceFrom: " + std::string(SDL_GetError()));
+}
+
 /* operator equals */
 BaseSurface & BaseSurface::operator= (const BaseSurface & bs)
 {
