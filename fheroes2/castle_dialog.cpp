@@ -40,7 +40,7 @@
 #include "portrait.h"
 #include "dialog.h"
 
-void Castle::DisplayName(const Point & src_pt)
+void Castle::RedrawNameTown(const Point & src_pt)
 {
     const Sprite & ramka = AGG::GetICN("TOWNNAME.ICN", 0);
     Point dst_pt(src_pt.x + 320 - ramka.w() / 2, src_pt.y + 248);
@@ -63,21 +63,6 @@ Dialog::answer_t Castle::OpenDialog(void)
     Point dst_pt(cur_pt);
 
     std::string str_icn;
-
-    // town background
-    switch(race)
-    {
-	case Race::KNGT: str_icn = "TOWNBKG0.ICN"; break;
-	case Race::BARB: str_icn = "TOWNBKG1.ICN"; break;
-	case Race::SORC: str_icn = "TOWNBKG2.ICN"; break;
-	case Race::WRLK: str_icn = "TOWNBKG3.ICN"; break;
-	case Race::WZRD: str_icn = "TOWNBKG4.ICN"; break;
-	case Race::NECR: str_icn = "TOWNBKG5.ICN"; break;
-	default: Error::Warning("Dialog::OpenCastle: unknown race."); return Dialog::CANCEL;
-    }
-
-    const Sprite & townbkg = AGG::GetICN(str_icn, 0);
-    display.Blit(townbkg, dst_pt);
 
     // button prev castle
     dst_pt.y += 480 - 19;
@@ -182,7 +167,6 @@ Dialog::answer_t Castle::OpenDialog(void)
     const Rect coordBuildingCastle(GetCoordBuilding(BUILD_CASTLE, cur_pt));
     const Rect coordBuildingCaptain(GetCoordBuilding(BUILD_CAPTAIN, cur_pt));
     const Rect coordBuildingTent(GetCoordBuilding(BUILD_TENT, cur_pt));
-    //const Rect coordBuildingMageGuild(GetCoordBuilding(, cur_pt));
 
     const Rect coordDwellingMonster1(GetCoordBuilding(DWELLING_MONSTER1, cur_pt));
     const Rect coordDwellingMonster2(GetCoordBuilding(DWELLING_MONSTER2, cur_pt));
@@ -191,205 +175,162 @@ Dialog::answer_t Castle::OpenDialog(void)
     const Rect coordDwellingMonster5(GetCoordBuilding(DWELLING_MONSTER5, cur_pt));
     const Rect coordDwellingMonster6(GetCoordBuilding(DWELLING_MONSTER6, cur_pt));
 
-    // specifical building animation
-    typedef std::pair<u32, Animation *> specanim_t;
-    std::vector<specanim_t> vect_animation;
-    const u8 amode = Animation::INFINITY | Animation::RING | Animation::LOW;
+
+    // orders draw building
+    std::vector<building_t> orders_building;
     switch(race)
     {
 	case Race::KNGT:
-	{
-	    // castle
-	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNKCSTL.ICN", 1, 5, false, amode)));
-	    // thieves guild
-	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNKTHIE.ICN", 1, 5, false, amode)));
-	    // tavern
-	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNKTVRN.ICN", 1, 5, false, amode)));
-	    // sea, dock or boat
-            if(HaveNearlySea())
-            {
-        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNKBOAT.ICN", 1, 9, false, amode)));
-        	//else 
-		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNKDOCK.ICN", 1, 5, false, amode)));
-        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNKEXT0.ICN", 1, 5, false, amode)));
-    	    }
-	    // left turret
-	    vect_animation.push_back(specanim_t(BUILD_LEFTTURRET, new Animation(cur_pt, "TWNKLTUR.ICN", 1, 5, false, amode)));
-	    // right turret
-	    vect_animation.push_back(specanim_t(BUILD_RIGHTTURRET, new Animation(cur_pt, "TWNKRTUR.ICN", 1, 5, false, amode)));
-	    // monster 1
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNKDW_0.ICN", 1, 5, false, amode)));
-	    // monster 3
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER3, new Animation(cur_pt, "TWNKDW_2.ICN", 1, 6, false, amode)));
-	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE3, new Animation(cur_pt, "TWNKUP_2.ICN", 1, 6, false, amode)));
-	    // monster 5
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER5, new Animation(cur_pt, "TWNKDW_4.ICN", 1, 7, false, amode)));
-	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE5, new Animation(cur_pt, "TWNKUP_4.ICN", 1, 7, false, amode)));
-	}
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_SHIPYARD);
 	    break;
 	case Race::BARB:
-	{
-	    // castle
-	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNBCSTL.ICN", 1, 6, false, amode)));
-	    // captain
-	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNBCAPT.ICN", 1, 5, false, amode)));
-	    // sea, dock or boat
-            if(HaveNearlySea())
-            {
-        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNBBOAT.ICN", 1, 9, false, amode)));
-        	//else 
-		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNBDOCK.ICN", 1, 5, false, amode)));
-        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNBEXT0.ICN", 1, 5, false, amode)));
-    	    }
-	    // moat
-	    vect_animation.push_back(specanim_t(BUILD_MOAT, new Animation(cur_pt, "TWNBMOAT.ICN", 1, 5, false, amode)));
-	    // ext1 (stream)
-	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNBEXT1.ICN", 1, 5, false, amode)));
-	    // monster 4
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER4, new Animation(cur_pt, "TWNBDW_3.ICN", 1, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE4, new Animation(cur_pt, "TWNBUP_3.ICN", 1, 5, false, amode)));
-	    // monster 5
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER5, new Animation(cur_pt, "TWNBDW_4.ICN", 1, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE5, new Animation(cur_pt, "TWNBUP_4.ICN", 1, 5, false, amode)));
-	    // monster 6
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER6, new Animation(cur_pt, "TWNBDW_5.ICN", 1, 5, false, amode)));
-	    // mage guild
-	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD5, new Animation(cur_pt, "TWNBMAGE.ICN", 5, 8, false, amode)));
-	}
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_SHIPYARD);
 	    break;
 	case Race::SORC:
-	{
-	    // castle
-	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNSCSTL.ICN", 1, 5, false, amode)));
-	    // captain
-	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNSCAPT.ICN", 1, 5, false, amode)));
-	    // thieves guild
-	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNSTHIE.ICN", 1, 5, false, amode)));
-	    // tavern
-	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNSTVRN.ICN", 1, 5, false, amode)));
-	    // sea, dock or boat
-            if(HaveNearlySea())
-            {
-        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNSBOAT.ICN", 1, 9, false, amode)));
-        	//else 
-		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNSDOCK.ICN", 1, 5, false, amode)));
-        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNSEXT0.ICN", 1, 5, false, amode)));
-    	    }
-	    // wel2
-	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNSWEL2.ICN", 1, 5, false, amode)));
-	    // ext1
-	    //vect_animation.push_back(specanim_t(BUILD_, new Animation(cur_pt, "TWNSEXT1.ICN", 1, 5, false, amode)));
-	    // monster 1
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNSDW_0.ICN", 1, 5, false, amode)));
-	    // monster 2
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER2, new Animation(cur_pt, "TWNSDW_1.ICN", 1, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE2, new Animation(cur_pt, "TWNSUP_1.ICN", 1, 5, false, amode)));
-	}
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(DWELLING_MONSTER5);
 	    break;
 	case Race::WRLK:
-	{
-	    // castle
-	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNWCSTL.ICN", 1, 5, false, amode)));
-	    // captain
-	    vect_animation.push_back(specanim_t(BUILD_CAPTAIN, new Animation(cur_pt, "TWNWCAPT.ICN", 1, 5, false, amode)));
-	    // sea, dock or boat
-            if(HaveNearlySea())
-            {
-        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNWBOAT.ICN", 1, 9, false, amode)));
-        	//else 
-		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNWDOCK.ICN", 1, 5, false, amode)));
-        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNWEXT0.ICN", 1, 5, false, amode)));
-    	    }
-	    // moat
-	    vect_animation.push_back(specanim_t(BUILD_MOAT, new Animation(cur_pt, "TWNWMOAT.ICN", 1, 5, false, amode)));
-	    // wel2
-	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNWWEL2.ICN", 1, 6, false, amode)));
-	    // monster 1
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNWDW_0.ICN", 1, 6, false, amode)));
-	}
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_WELL);
 	    break;
 	case Race::WZRD:
-	{
-	    // castle
-	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNZCSTL.ICN", 1, 5, false, amode)));
-	    // thieves guild
-	    vect_animation.push_back(specanim_t(BUILD_THIEVESGUILD, new Animation(cur_pt, "TWNZTHIE.ICN", 1, 5, false, amode)));
-	    // tavern
-	    vect_animation.push_back(specanim_t(BUILD_TAVERN, new Animation(cur_pt, "TWNZTVRN.ICN", 1, 6, false, amode)));
-	    // sea, dock or boat
-            if(HaveNearlySea())
-            {
-        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNZBOAT.ICN", 1, 9, false, amode)));
-        	//else 
-		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNZDOCK.ICN", 1, 5, false, amode)));
-        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNZEXT0.ICN", 1, 5, false, amode)));
-    	    }
-	    // monster 1
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER1, new Animation(cur_pt, "TWNZDW_0.ICN", 1, 5, false, amode)));
-	    // monster 3
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER3, new Animation(cur_pt, "TWNZDW_2.ICN", 1, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE3, new Animation(cur_pt, "TWNZUP_2.ICN", 1, 5, false, amode)));
-	}
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(BUILD_WEL2);
 	    break;
 	case Race::NECR:
-	{
-	    // castle
-	    vect_animation.push_back(specanim_t(BUILD_CASTLE, new Animation(cur_pt, "TWNNCSTL.ICN", 1, 5, false, amode)));
-	    // sea, dock or boat
-            if(HaveNearlySea())
-            {
-        	//if(present_boat) vect_animation.push_back(specanim_t(BUILD_BOAT, new Animation(cur_pt, "TWNNBOAT.ICN", 1, 9, false, amode)));
-        	//else 
-		if(BUILD_SHIPYARD & building) vect_animation.push_back(specanim_t(BUILD_SHIPYARD, new Animation(cur_pt, "TWNNDOCK.ICN", 1, 5, false, amode)));
-        	else vect_animation.push_back(specanim_t(0xFFFFFFFF, new Animation(cur_pt, "TWNNEXT0.ICN", 1, 5, false, amode)));
-    	    }
-	    // wel2
-	    vect_animation.push_back(specanim_t(BUILD_WEL2, new Animation(cur_pt, "TWNNWEL2.ICN", 1, 6, false, amode)));
-	    // monster 3
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER3, new Animation(cur_pt, "TWNNDW_2.ICN", 1, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(DWELLING_UPGRADE3, new Animation(cur_pt, "TWNNUP_2.ICN", 1, 5, false, amode)));
-	    // monster 6
-	    vect_animation.push_back(specanim_t(DWELLING_MONSTER6, new Animation(cur_pt, "TWNNDW_5.ICN", 1, 6, false, amode)));
-	    // mage guild
-	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD1, new Animation(cur_pt, "TWNNMAGE.ICN", 1, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD2, new Animation(cur_pt, "TWNNMAGE.ICN", 7, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD3, new Animation(cur_pt, "TWNNMAGE.ICN", 13, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD4, new Animation(cur_pt, "TWNNMAGE.ICN", 19, 5, false, amode)));
-	    vect_animation.push_back(specanim_t(BUILD_MAGEGUILD5, new Animation(cur_pt, "TWNNMAGE.ICN", 25, 5, false, amode)));
-	}
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_WELL);
 	    break;
 	default: break;
     }
 
-    const std::vector<specanim_t>::const_iterator it_animation_begin =  vect_animation.begin();
-    const std::vector<specanim_t>::const_iterator it_animation_end   =  vect_animation.end();
-    std::vector<specanim_t>::const_iterator it_animation_current = it_animation_begin;
-    
     // draw building
-    RedrawBuilding(cur_pt);
-    DisplayName(cur_pt);
-
-    // redraw first sprite animation
-    /*
-    for(it_animation_current = it_animation_begin; it_animation_current != it_animation_end; ++it_animation_current)
-	if((*it_animation_current).first & building)
-    {
-	const Sprite & sp = (*(*it_animation_current).second).GetFirstSprite();
-	display.Blit(sp, cur_pt.x + sp.x(), cur_pt.y + sp.y());
-    }
-    */
+    RedrawAllBuilding(cur_pt, orders_building);
+    RedrawNameTown(cur_pt);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    display.Flip();
     Cursor::Show();
+
+    display.Flip();
 
     Dialog::answer_t result = Dialog::ZERO;
     bool exit = false;
 
-    // dialog menu loop
-    while(! exit){
+    u32 ticket = 0;
 
+    // dialog menu loop
+    while(! exit)
+    {
         le.HandleEvents();
 
         le.MousePressLeft(buttonPrevCastle) ? buttonPrevCastle.Press() : buttonPrevCastle.Release();
@@ -495,8 +436,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    selectCastleTroops.Redraw();
 		}
 
-		display.Flip();
 		Cursor::Show();
+
+		display.Flip();
 	    }
 	    else
 	    // right click empty troops - redistribute troops
@@ -529,6 +471,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		}
 
 		Cursor::Show();
+
+		display.Flip();
 	    }
 	    else
 	    // press right - show quick info
@@ -539,6 +483,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		army[ii].ShowDialogInfo(NULL, true);
 
 		Cursor::Show();
+
+		display.Flip();
 	    }
 	}
 
@@ -635,8 +581,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    selectHeroesTroops.Redraw();
 		}
 
-		display.Flip();
 		Cursor::Show();
+
+		display.Flip();
 	    }
 	    else
 	    // right empty click - redistribute troops
@@ -666,6 +613,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		selectHeroesTroops.Redraw();
 
 		Cursor::Show();
+
+		display.Flip();
 	    }
 	    else
 	    // press right - show quick info
@@ -676,6 +625,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		army2[ii].ShowDialogInfo(heroes, true);
 
 		Cursor::Show();
+
+		display.Flip();
 	    }
 	}
 
@@ -688,6 +639,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    selectHeroesTroops.Reset();
 	    selectHeroesTroops.Redraw();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
         // prev castle
@@ -703,7 +655,15 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) OpenThievesGuild();
 	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern)) OpenTavern();
 	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // FIXME dialog buy boat
-	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell)) OpenWell();
+	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell))
+	{
+	    OpenWell();
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
 	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace)){ Dialog::Marketplace(); RedrawResourcePanel(); }
 	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
@@ -718,14 +678,25 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Cursor::Hide();
 		BuyBuilding(build);
 		RedrawResourcePanel();
-		// FIXME RedrawNewBuyBuildingAnimation
-		RedrawBuilding(cur_pt);
+	        RedrawAllBuilding(cur_pt, orders_building);
+	        RedrawNameTown(cur_pt);
 		Cursor::Show();
 		display.Flip();
 	    }
 	}
 	else
-	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent)); // FIXME dialog buy castle
+	// buy castle
+	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent) && Dialog::OK == DialogBuyBuilding(BUILD_CASTLE, true))
+	{
+		Cursor::Hide();
+		BuyBuilding(BUILD_CASTLE);
+		RedrawResourcePanel();
+	        RedrawAllBuilding(cur_pt, orders_building);
+	        RedrawNameTown(cur_pt);
+		Cursor::Show();
+		display.Flip();
+	}
+	// captain
 	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);
 
 	// left click mage guild
@@ -804,6 +775,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_TAVERN), GetDescriptionBuilding(BUILD_TAVERN), Font::BIG);
 	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard)) Dialog::Message(GetStringBuilding(BUILD_SHIPYARD), GetDescriptionBuilding(BUILD_SHIPYARD), Font::BIG);
 	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), GetDescriptionBuilding(BUILD_WELL), Font::BIG);
+	{
+	    Cursor::Hide();
+	    selectCastleTroops.Redraw();
+	    RedrawResourcePanel();
+	    Cursor::Show();
+	    display.Flip();
+	}
 	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG);
 	if(building & BUILD_MARKETPLACE && le.MousePressRight(coordBuildingMarketplace)) Dialog::Message(GetStringBuilding(BUILD_MARKETPLACE), GetDescriptionBuilding(BUILD_MARKETPLACE), Font::BIG);
 	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG);
@@ -866,7 +844,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_MOAT && le.MouseCursor(coordBuildingMoat)) statusBar.ShowMessage(GetStringBuilding(BUILD_MOAT));
 	else
-	if(building & BUILD_SPEC && le.MouseCursor(coordBuildingSpec)) statusBar.ShowMessage(GetStringBuilding(BUILD_SPEC));
+	if(building & BUILD_SPEC && le.MouseCursor(coordBuildingSpec)) statusBar.ShowMessage(GetStringBuilding(BUILD_SPEC, race));
 	else
 	if(building & BUILD_CASTLE && le.MouseCursor(coordBuildingCastle)) statusBar.ShowMessage(GetStringBuilding(BUILD_CASTLE));
 	else
@@ -981,16 +959,18 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// clear all
 	if(! statusBar.isEmpty()) statusBar.Clear();
 
-	// redraw animation
-	for(it_animation_current = it_animation_begin; it_animation_current != it_animation_end; ++it_animation_current)
-	    if((*it_animation_current).first & building) (*(*it_animation_current).second).DrawSprite();
+	// animation sprite
+	if(!(++ticket % 50)) // FIXME: speed animation low
+	{
+	    Cursor::Hide();
+	    RedrawAllBuilding(cur_pt, orders_building);
+	    RedrawNameTown(cur_pt);
+	    Cursor::Show();
+	    display.Flip();
+	}
     }
 
     le.ResetKey();
-
-    // free animation resource
-    for(it_animation_current = it_animation_begin; it_animation_current != it_animation_end; ++it_animation_current)
-	delete (*it_animation_current).second;
 
     Cursor::Show();
 

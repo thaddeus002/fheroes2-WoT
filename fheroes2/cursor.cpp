@@ -146,7 +146,6 @@ void Cursor::Redraw(u16 x, u16 y, bool flag)
 	Cursor::background.Save(Cursor::position);
 
 	display.Blit(Cursor::sprite, Cursor::position);
-	display.Flip();
 	save = true;
     }
 }

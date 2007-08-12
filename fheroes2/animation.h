@@ -38,7 +38,7 @@ public:
 
     bool Reset(void);
 
-    void DrawSprite(void);
+    bool DrawSprite(u32 ticket, bool forceredraw = false);
 
 protected:
     const Point dst_pt;
@@ -46,7 +46,6 @@ protected:
     const u8 mode;
 
     u32 frame;
-    u32 ticket;
 
     std::vector<const Sprite *> sprites;
     Rect max_rect;

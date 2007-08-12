@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	caption += ".";
 	String::AddInt(caption, MINOR_VERSION);
 
-#ifdef BUILD_DATE
+#ifndef BUILD_RELEASE
 	caption += ", build: ";
 	String::AddInt(caption, BUILD_DATE);
 #endif
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
 	    // load palette
 	    AGG::LoadPalette();
 
-#ifdef BUILD_SDL_LOGO
+#ifdef BUILD_RELEASE
 	    // SDL logo
 	    if(H2Config::Logo())
 	    {

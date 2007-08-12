@@ -31,7 +31,7 @@
 #define ANIMATION_LOW		50
 
 Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first, u8 amode)
-    : dst_pt(dp), use_first(first), mode(amode), frame(0), ticket(0), max_rect(display.w(), display.h(), 0, 0), disable(false), reset(false)
+    : dst_pt(dp), use_first(first), mode(amode), frame(0), max_rect(display.w(), display.h(), 0, 0), disable(false), reset(false)
 {
     std::vector<Rect> vec_rect;
     
@@ -49,18 +49,19 @@ Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 coun
     max_rect.y += dst_pt.y;
 }
 
-void Animation::DrawSprite(void)
+bool Animation::DrawSprite(u32 ticket, bool forceredraw)
 {
-    if(disable) return;
+    if(disable) return false;
 
-    ticket++;
-
-    // HIGH sleep
-    if(mode & HIGH && (0 != (ticket % ANIMATION_HIGH)) && !reset) return;
-    // MEDIUM sleep
-    if(mode & MEDIUM && (0 != (ticket % ANIMATION_MEDIUM)) && !reset) return;
-    // LOW sleep
-    if(mode & LOW && (0 != (ticket % ANIMATION_LOW)) && !reset) return;
+    if(false == forceredraw)
+    {
+	// HIGH sleep
+	if(mode & HIGH && (0 != (ticket % ANIMATION_HIGH)) && !reset) return false;
+	// MEDIUM sleep
+	if(mode & MEDIUM && (0 != (ticket % ANIMATION_MEDIUM)) && !reset) return false;
+	// LOW sleep
+	if(mode & LOW && (0 != (ticket % ANIMATION_LOW)) && !reset) return false;
+    }
 
     // hide cursor
     bool localcursor = false;
@@ -85,8 +86,6 @@ void Animation::DrawSprite(void)
 	display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
     }
 
-    display.Flip();
-
     if(localcursor) Cursor::Show();
 
     if(!reset) frame++;
@@ -96,13 +95,14 @@ void Animation::DrawSprite(void)
     if(!(mode & INFINITY) && frame == sprites.size()) disable = true;
 
     //if(!(mode & RING))
+    
+    return true;
 }
 
 bool Animation::Reset(void)
 {
     if(false == disable && 0 == frame) return false;
 
-    ticket = 0;
     frame = 0;
     disable = false;
     reset = true;

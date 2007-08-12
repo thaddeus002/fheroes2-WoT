@@ -21,7 +21,9 @@
 #define H2CASTLE_H
 
 #include <vector>
+#include <bitset>
 #include <string>
+#include "animation.h"
 #include "gamedefs.h"
 #include "maps_tiles.h"
 #include "color.h"
@@ -56,7 +58,7 @@ public:
         BUILD_SPEC              = 0x00000400,   // Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
         BUILD_CASTLE            = 0x00000800,
         BUILD_CAPTAIN           = 0x00001000,
-//        BUILD_BOAT              = 0x00002000,
+        BUILD_BOAT              = 0x00002000,
         BUILD_MAGEGUILD1        = 0x00004000,
 	BUILD_MAGEGUILD2        = 0x00008000,
 	BUILD_MAGEGUILD3        = 0x00010000,
@@ -112,7 +114,7 @@ public:
 
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
-    static void GetBuildingRequires(const Race::race_t & race, const building_t & build, std::vector<building_t> & requires);
+    static void PrepareICNString(const Castle::building_t & build, const Race::race_t & race, std::string & result);
 
 private:
     void RedrawResourcePanel(void);
@@ -121,16 +123,18 @@ private:
     void ModifyTIlesFlags(Maps::Tiles & tile);
     void ModifyTilesTownToCastle(Maps::Tiles & tile);
     void MinimizeAreaMapsID(void);
-    
+    u32 GetBuildingRequires(const building_t & build) const;
+
     Rect GetCoordBuilding(building_t building, const Point & pt);
-    void RedrawBuilding(const Point & dst_pt);
+    void RedrawAllBuilding(const Point & dst_pt, const std::vector<building_t> & orders);
     building_t OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
     void OpenWell(void);
     void OpenMageGuild(void);
-    void DisplayName(const Point & src_pt);
-    
+    void RedrawNameTown(const Point & src_pt);
+    void WellRedrawInfoArea(const Point & cur_pt);
+
     Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
 
 private:

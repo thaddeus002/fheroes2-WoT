@@ -158,8 +158,8 @@ void Dialog::Marketplace(void)
         textSell = NULL; \
         textBuy = NULL; \
         splitter = NULL; \
-        display.Flip(); \
         Cursor::Show(); \
+        display.Flip(); \
     } \
     else \
     { \
@@ -233,8 +233,8 @@ void Dialog::Marketplace(void)
 	dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(str_qty, Font::SMALL)) / 2; \
 	dst_pt.y = pos_rt.y + 110; \
 	Text(str_qty, Font::SMALL, dst_pt); \
-	display.Flip(); \
 	Cursor::Show(); \
+	display.Flip(); \
 	RedrawInfoBuySell; \
     } \
 
@@ -262,8 +262,8 @@ void Dialog::Marketplace(void)
 		textBuy->SetPos(dst_pt); \
 		textBuy->Show(); \
 	} \
-	Cursor::Show(); \
 	display.Flip(); \
+	Cursor::Show(); \
 
 
     // button exit
@@ -272,8 +272,8 @@ void Dialog::Marketplace(void)
     dst_pt.y = pos_rt.y + pos_rt.h + BUTTON_HEIGHT - sprite_exit.h();
     Button buttonExit(dst_pt, tradpost, 17, 18);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
    
@@ -352,6 +352,7 @@ void Dialog::Marketplace(void)
 		if(resourceTo) ShowTradeArea;
 
 		Cursor::Show();
+		display.Flip();
 	    }
 	}
 
@@ -394,6 +395,7 @@ void Dialog::Marketplace(void)
 		    ShowTradeArea;
 		}
 		Cursor::Show();
+		display.Flip();
 	    }
 	}
 
@@ -411,8 +413,8 @@ void Dialog::Marketplace(void)
             Cursor::Hide();
             splitter->Move(seek);
 	    RedrawInfoBuySell;
-            display.Flip();
             Cursor::Show();
+            display.Flip();
         }
 
 	// trade

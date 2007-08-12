@@ -53,8 +53,8 @@ Dialog::answer_t Dialog::SystemOptions(void)
 
     Button buttonOk(rb.x + 113, rb.y + 362, spanbtn, 0, 1);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     Dialog::answer_t result = Dialog::ZERO;
     bool exit = false;

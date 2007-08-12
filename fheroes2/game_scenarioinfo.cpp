@@ -147,8 +147,8 @@ Game::menu_t Game::ScenarioInfo(void){
 		Cursor::Hide();
 		H2Config::SetHumanColor((*it).color);
 		Scenario::RedrawOpponentColors(vo);
-		display.Flip();
 		Cursor::Show();
+		display.Flip();
 	    }
 	    ++it;
 	}
@@ -171,8 +171,8 @@ Game::menu_t Game::ScenarioInfo(void){
 		}
     		const Sprite &sprite = AGG::GetICN("NGEXTRA.ICN", index);
 		display.Blit(sprite, (*it).rect);
-		display.Flip();
 		Cursor::Show();
+		display.Flip();
 	    }
 
 	    ++it;
@@ -190,9 +190,9 @@ Game::menu_t Game::ScenarioInfo(void){
 	    Scenario::DrawInfo(vo, vc);
 	    Scenario::RedrawOpponentColors(vo);
 	    levelCursor.Move(pointDifficulty[Difficulty::NORMAL]);
-	    display.Flip();
 	    H2Config::SetGameDifficulty(Difficulty::NORMAL);
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click cancel
@@ -427,8 +427,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
     Scenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
     Scenario::DrawSelectInfo(it_current);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     u16 num_select = 0xFFFF;
 
@@ -459,8 +459,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click medium
@@ -474,8 +474,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click large
@@ -489,8 +489,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click xlarge
@@ -504,8 +504,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click all
@@ -519,8 +519,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click list
@@ -534,8 +534,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    it_current = it_list_head + num;
 	    Scenario::DrawSelectInfo(it_current);
 	    split.Move(it_list_head - curmaps->begin());
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	    num_select = num;
 	}
 
@@ -546,8 +546,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundList.Restore();
 	    Scenario::DrawList(--it_list_head);
 	    split.Backward();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click down
@@ -557,8 +557,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundList.Restore();
 	    Scenario::DrawList(++it_list_head);
 	    split.Forward();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// move cursor splitter
@@ -574,8 +574,8 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 	    backgroundInfo.Restore();
 	    Scenario::DrawSelectInfo(it_current);
 	    split.Move(seek);
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
  	}
 
 	// right info

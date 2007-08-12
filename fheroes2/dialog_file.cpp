@@ -57,8 +57,8 @@ Game::menu_t Dialog::FileOptions(void)
     Button buttonQuit(rb.x + 195, rb.y + 107, cpanel, 6, 7);
     Button buttonCancel(rb.x + 128, rb.y + 184, cpanel, 8, 9);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     Game::menu_t result = Game::QUITGAME;
     bool exit = false;

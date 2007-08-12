@@ -52,8 +52,8 @@ Game::menu_t Game::LoadStandard(void){
     Button buttonCancel(384, 365, "REQUEST.ICN", 3, 4);
     Button buttonPgUp(467, 105, "REQUEST.ICN", 5, 6);
     Button buttonPgDn(467, 307, "REQUEST.ICN", 7, 8);
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     // loadstandard loop
     while(1){

@@ -100,8 +100,8 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 	    break;
     }
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     le.ResetKey();
 

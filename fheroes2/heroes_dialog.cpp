@@ -477,8 +477,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     Dialog::answer_t result = Dialog::ZERO;
     bool exit = false;
@@ -572,8 +572,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    selectHeroesTroops.Redraw();
 		}
 
-		display.Flip();
 		Cursor::Show();
+		display.Flip();
 	    }
 	    else
 	    // right click empty troops - redistribute troops
@@ -599,6 +599,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		selectHeroesTroops.Redraw();
 
 		Cursor::Show();
+		display.Flip();
 	    }
 	    else
 	    // press right - show quick info
@@ -609,6 +610,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		army[ii].ShowDialogInfo(this, true);
 
 		Cursor::Show();
+		display.Flip();
 	    }
 	}
 
@@ -639,8 +641,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         {
 	    Cursor::Hide();
 	    cursorFormat.Move(army1_pt);
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
     	    army_spread = true;
         }
 
@@ -648,8 +650,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         {
 	    Cursor::Hide();
 	    cursorFormat.Move(army2_pt);
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
     	    army_spread = false;
         }
 

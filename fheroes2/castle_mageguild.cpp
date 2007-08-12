@@ -76,8 +76,8 @@ void Castle::OpenMageGuild(void)
     dst_pt.y = cur_pt.y + 461;
     Button buttonExit(dst_pt, "WELLXTRA.ICN", 0, 1);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
    

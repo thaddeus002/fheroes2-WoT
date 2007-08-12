@@ -144,6 +144,20 @@ void Kingdom::ActionNewWeek(void)
 {
     // castle New Week
     for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewWeek();
+
+    // debug an gift
+    if(H2Config::Debug() && color == H2Config::GetMyColor())
+    {
+	Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
+
+	resource.wood += 20;
+	resource.ore += 20;
+	resource.sulfur += 10;
+	resource.crystal += 10;
+	resource.gems += 10;
+	resource.mercury += 10;
+	resource.gold += 5000;
+    }
 }
 
 void Kingdom::ActionNewMonth(void)

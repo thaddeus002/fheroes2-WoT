@@ -290,8 +290,8 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
     dst_pt.y = pos.y + 171;
     Button buttonDn(dst_pt, "RECRUIT.ICN", 2, 3);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     le.ResetKey();
 
@@ -353,8 +353,8 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
     back.Restore();
     Cursor::Set(cursor);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     return result;
 }
@@ -512,8 +512,8 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     Text(message, Font::SMALL, pos.x + 70 - Text::width(message, Font::SMALL) / 2, pos.y + 130);
     message.clear();
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     le.ResetKey();
 
@@ -534,6 +534,6 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     back.Restore();
     Cursor::Set(cursor);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 }

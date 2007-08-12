@@ -39,34 +39,122 @@ void Castle::OpenWell(void)
     Dialog::FrameBorder background;
 
     const Point & cur_pt(background.GetArea());
+
+    const std::string & str_msg = "Town Population Information and Statistics";
+
     Point dst_pt(cur_pt);
 
-    display.Blit(AGG::GetICN("WELLBKG.ICN", 0), dst_pt);
-
-    std::string str;
-    std::string icnname;
-
     // text
-    str = "Town Population Information and Statistics";
-    dst_pt.x = cur_pt.x + 280 - Text::width(str, Font::BIG) / 2;
+    dst_pt.x = cur_pt.x + 280 - Text::width(str_msg, Font::BIG) / 2;
     dst_pt.y = cur_pt.y + 462;
-    Text(str, Font::BIG, dst_pt);
+    Text(str_msg, Font::BIG, dst_pt);
 
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
     Button buttonExit(dst_pt, "WELLXTRA.ICN", 0, 1);
 
-    switch(race)
+    const Rect rectMonster1(cur_pt.x + 20, cur_pt.y + 18, 288, 124);
+    const Rect rectMonster2(cur_pt.x + 20, cur_pt.y + 168, 288, 124);
+    const Rect rectMonster3(cur_pt.x + 20, cur_pt.y + 318, 288, 124);
+    const Rect rectMonster4(cur_pt.x + 334, cur_pt.y + 18, 288, 124);
+    const Rect rectMonster5(cur_pt.x + 334, cur_pt.y + 168, 288, 124);
+    const Rect rectMonster6(cur_pt.x + 334, cur_pt.y + 318, 288, 124);
+    
+
+    WellRedrawInfoArea(cur_pt);
+
+    Cursor::Show();
+    display.Flip();
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    le.ResetKey();
+
+    // loop
+    bool exit = false;
+
+    while(!exit)
     {
-        case Race::BARB: icnname = "CSTLBARB.ICN"; break;
-        case Race::KNGT: icnname = "CSTLKNGT.ICN"; break;
-        case Race::SORC: icnname = "CSTLSORC.ICN"; break;
-        case Race::WRLK: icnname = "CSTLWRLK.ICN"; break;
-        case Race::WZRD: icnname = "CSTLWZRD.ICN"; break;
-        case Race::NECR: icnname = "CSTLNECR.ICN"; break;
-        default: break;
+        le.HandleEvents();
+
+        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+
+        if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)){ exit = true; }
+
+        // extended version (click - buy dialog monster)
+        if(! H2Config::Original())
+        {
+    	    if(building & DWELLING_MONSTER1 && le.MouseClickLeft(rectMonster1) &&
+    		Castle::RecrutMonster(DWELLING_MONSTER1, Dialog::RecrutMonster(
+            	    Monster::Monster(race, DWELLING_MONSTER1), dwelling[0])))
+    	    {
+        	Cursor::Hide();
+		WellRedrawInfoArea(cur_pt);
+		Cursor::Show();
+        	display.Flip();
+    	    }
+    	    else
+    	    if(building & DWELLING_MONSTER2 && le.MouseClickLeft(rectMonster2) &&
+    		Castle::RecrutMonster(DWELLING_MONSTER2, Dialog::RecrutMonster(
+            	    Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
+    	    {
+        	Cursor::Hide();
+		WellRedrawInfoArea(cur_pt);
+		Cursor::Show();
+        	display.Flip();
+    	    }
+    	    else
+    	    if(building & DWELLING_MONSTER3 && le.MouseClickLeft(rectMonster3) &&
+    		Castle::RecrutMonster(DWELLING_MONSTER3, Dialog::RecrutMonster(
+            	    Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
+    	    {
+        	Cursor::Hide();
+		WellRedrawInfoArea(cur_pt);
+		Cursor::Show();
+        	display.Flip();
+    	    }
+    	    else
+    	    if(building & DWELLING_MONSTER4 && le.MouseClickLeft(rectMonster4) &&
+    		Castle::RecrutMonster(DWELLING_MONSTER4, Dialog::RecrutMonster(
+            	    Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
+    	    {
+        	Cursor::Hide();
+		WellRedrawInfoArea(cur_pt);
+		Cursor::Show();
+        	display.Flip();
+    	    }
+    	    else
+    	    if(building & DWELLING_MONSTER5 && le.MouseClickLeft(rectMonster5) &&
+    		Castle::RecrutMonster(DWELLING_MONSTER5, Dialog::RecrutMonster(
+            	    Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
+    	    {
+        	Cursor::Hide();
+		WellRedrawInfoArea(cur_pt);
+		Cursor::Show();
+        	display.Flip();
+    	    }
+    	    else
+    	    if(building & DWELLING_MONSTER6 && le.MouseClickLeft(rectMonster6) &&
+                Castle::RecrutMonster(DWELLING_MONSTER6, Dialog::RecrutMonster(
+                    Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
+    	    {
+        	Cursor::Hide();
+		WellRedrawInfoArea(cur_pt);
+		Cursor::Show();
+        	display.Flip();
+    	    }
+	}        
     }
+
+    le.ResetKey();
+
+    Cursor::Show();
+}
+
+void Castle::WellRedrawInfoArea(const Point & cur_pt)
+{
+    display.Blit(AGG::GetICN("WELLBKG.ICN", 0), cur_pt);
 
     u32 dw = DWELLING_MONSTER1;
 
@@ -132,6 +220,21 @@ void Castle::OpenWell(void)
 	}
 
 	const Monster::stats_t & monster = Monster::GetStats(Monster::Monster(race, dw_orig));
+
+	Point dst_pt;
+	std::string str;
+	std::string icnname;
+
+	switch(race)
+	{
+    	    case Race::BARB: icnname = "CSTLBARB.ICN"; break;
+    	    case Race::KNGT: icnname = "CSTLKNGT.ICN"; break;
+    	    case Race::SORC: icnname = "CSTLSORC.ICN"; break;
+    	    case Race::WRLK: icnname = "CSTLWRLK.ICN"; break;
+    	    case Race::WZRD: icnname = "CSTLWZRD.ICN"; break;
+    	    case Race::NECR: icnname = "CSTLNECR.ICN"; break;
+    	    default: break;
+	}
 
 	// sprite
 	dst_pt.x = pt.x + 21;
@@ -221,27 +324,4 @@ void Castle::OpenWell(void)
 	
 	dw <<= 1;
     }
-
-    display.Flip();
-    Cursor::Show();
-
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-
-    le.ResetKey();
-
-    // loop
-    bool exit = false;
-
-    while(!exit)
-    {
-        le.HandleEvents();
-
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
-
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)){ exit = true; }
-    }
-
-    le.ResetKey();
-
-    Cursor::Show();
 }

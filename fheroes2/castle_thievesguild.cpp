@@ -126,8 +126,8 @@ void Castle::OpenThievesGuild(void)
     Text(message, Font::BIG, dst_pt);
 
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
    

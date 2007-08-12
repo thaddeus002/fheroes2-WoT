@@ -47,8 +47,8 @@ Game::menu_t Game::HighScores(void){
     Button buttonDismiss(9, 315, "HISCORE.ICN", 0, 1);
     Button buttonExit(604, 315, "HISCORE.ICN", 4, 5);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     // highscores loop
     while(1){

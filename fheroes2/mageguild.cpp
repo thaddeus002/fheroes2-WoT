@@ -18,47 +18,18 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "display.h"
-#include "cursor.h"
-#include "error.h"
-#include "game.h"
+#include "mageguild.h"
 
-/* global event filter */
-int Game::GlobalFilterEvents(const SDL_Event *event)
+MageGuild::MageGuild() : level(0)
 {
-    // motion
-    if(SDL_MOUSEMOTION == event->type){
-    
-	// redraw cursor
-	if(Cursor::Visible()){ Cursor::Redraw(); display.Flip(); }
-
-        return 1;
-    }
-
-    // key
-    if(SDL_KEYDOWN == event->type)
-	switch(event->key.keysym.sym){
-
-	    case SDLK_F4:
-		display.FullScreen();
-    		return 0;
-
-	    case SDLK_PRINT:
-		if(display.SaveBMP("screenshot.bmp")) Error::Verbose("save: screenshot.bmp");
-		return 0;
-	    
-	    default:
-    		break;
-	}
-
-    return 1;
 }
 
-Game::menu_t Game::NewStandard(void){ return Game::SCENARIOINFO; }
+u8 MageGuild::GetLevel(void) const
+{
+    return level;
+}
 
-Game::menu_t Game::Credits(void){ Error::Verbose("Credits: under construction."); return Game::MAINMENU; }
-Game::menu_t Game::NewCampain(void){ Error::Verbose("New Campain Game: under construction."); return Game::NEWGAME; }
-Game::menu_t Game::NewMulti(void){ Error::Verbose("New Multi Game: under construction."); return Game::NEWGAME; }
-Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
-Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }
-
+void MageGuild::Upgrade(void)
+{
+    if(5 < level) ++level;
+}

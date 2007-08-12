@@ -82,8 +82,8 @@ u16 Dialog::SelectCount(u16 max_count)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     le.ResetKey();
 
@@ -114,6 +114,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	    pt.y = pos.y + 56;
 	    Text(message, Font::BIG, pt);
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// down
@@ -133,6 +134,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	    pt.y = pos.y + 56;
 	    Text(message, Font::BIG, pt);
 	    Cursor::Show();
+	    display.Flip();
 	}
 
         if(le.KeyPress(SDLK_RETURN) || le.MouseClickLeft(buttonOk)) break;

@@ -212,8 +212,8 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     
-    display.Flip();
     Cursor::Show();
+    display.Flip();
     
     Dialog::answer_t result = Dialog::ZERO;
     bool exit = false;

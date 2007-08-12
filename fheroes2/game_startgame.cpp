@@ -277,9 +277,8 @@ Game::menu_t Game::StartGame(void)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    display.Flip();
-
     Cursor::Show();
+    display.Flip();
 
     u32 ticket = 0;
     // startgame loop
@@ -343,8 +342,8 @@ Game::menu_t Game::StartGame(void)
 			    // and open dialog castle
 			    (*castle).OpenDialog();
 			    statusWindow.Redraw();
-			    display.Flip();
 			    Cursor::Show();
+			    display.Flip();
 			}
 		    }
 		    break;
@@ -374,8 +373,8 @@ Game::menu_t Game::StartGame(void)
 			    // and open dialog heroes
 			    (*hero).OpenDialog();
 			    statusWindow.Redraw();
-			    display.Flip();
 			    Cursor::Show();
+			    display.Flip();
 			}
 		    }
 		    break;
@@ -415,6 +414,7 @@ Game::menu_t Game::StartGame(void)
 		    break;
 	    }
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// draw push buttons
@@ -438,8 +438,8 @@ Game::menu_t Game::StartGame(void)
 	    if(prev != areaMaps.GetRect()){
 		Cursor::Hide();
 		radar.UpdatePosition();
-		display.Flip();
 		Cursor::Show();
+		display.Flip();
 	    }
 	}
 	
@@ -451,8 +451,8 @@ Game::menu_t Game::StartGame(void)
 	    Cursor::Hide();
 	    selectHeroes.Redraw();
 	    splitHeroes.Backward();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click Scroll Castle Up
@@ -463,8 +463,8 @@ Game::menu_t Game::StartGame(void)
 	    Cursor::Hide();
 	    selectCastles.Redraw();
 	    splitCastles.Backward();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click Scroll Heroes Down
@@ -477,8 +477,8 @@ Game::menu_t Game::StartGame(void)
 	    Cursor::Hide();
 	    selectHeroes.Redraw();
 	    splitHeroes.Forward();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// click Scroll Castle Down
@@ -491,8 +491,8 @@ Game::menu_t Game::StartGame(void)
 	    Cursor::Hide();
 	    selectCastles.Redraw();
 	    splitCastles.Forward();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 
@@ -511,8 +511,8 @@ Game::menu_t Game::StartGame(void)
     	    backgroundInfo.Restore();
     	    Scenario::DrawSelectInfo(it_current);
     	    split.Move(seek);
-    	    display.Flip();
     	    Cursor::Show();
+    	    display.Flip();
 */
 	}
 
@@ -536,8 +536,8 @@ Game::menu_t Game::StartGame(void)
 			Cursor::Hide();
 			areaMaps.Center(center);
 			radar.UpdatePosition();
-			display.Flip();
 			Cursor::Show();
+			display.Flip();
 			// and open dialog
 			(*hero).OpenDialog();
 		    }
@@ -555,8 +555,8 @@ Game::menu_t Game::StartGame(void)
 			focus.center = selectHeroes.GetCenter(ii);
 			areaMaps.Center(focus.center);
 			radar.UpdatePosition();
-			display.Flip();
 			Cursor::Show();
+			display.Flip();
 		    }
 		}
 		else
@@ -570,6 +570,7 @@ Game::menu_t Game::StartGame(void)
 			Cursor::Hide();
 			Dialog::QuickInfo(*hero);
 			Cursor::Show();
+			display.Flip();
 		    }
 		}
 	    }
@@ -595,8 +596,8 @@ Game::menu_t Game::StartGame(void)
 			Cursor::Hide();
 			areaMaps.Center(center);
 			radar.UpdatePosition();
-			display.Flip();
 			Cursor::Show();
+			display.Flip();
 			// and open dialog
 			(*castle).OpenDialog();
 		    }
@@ -614,8 +615,8 @@ Game::menu_t Game::StartGame(void)
 			focus.center = selectCastles.GetCenter(ii);
 			areaMaps.Center(focus.center);
 			radar.UpdatePosition();
-			display.Flip();
 			Cursor::Show();
+			display.Flip();
 		    }
 		}
 		else
@@ -630,6 +631,7 @@ Game::menu_t Game::StartGame(void)
 			Cursor::Hide();
 			Dialog::QuickInfo(*castle);
 			Cursor::Show();
+			display.Flip();
 		    }
 		}
 	    }
@@ -668,8 +670,8 @@ Game::menu_t Game::StartGame(void)
 
 	    statusWindow.SetState(Game::StatusWindow::DAY);
 	    statusWindow.Redraw();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
         // click AdventureOptions
@@ -714,8 +716,8 @@ Game::menu_t Game::StartGame(void)
 	    Cursor::Hide();
 	    statusWindow.NextState();
 	    statusWindow.Redraw();
-	    display.Flip();
 	    Cursor::Show();
+	    display.Flip();
 	}
 
 	// right info

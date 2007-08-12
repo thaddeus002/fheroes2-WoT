@@ -80,8 +80,8 @@ void Castle::OpenTavern(void)
     dst_pt.y = pos.y + pos.h + BUTTON_HEIGHT - s4.h();
     Button buttonYes(dst_pt, system, 5, 6);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
    
@@ -89,6 +89,7 @@ void Castle::OpenTavern(void)
 
     // message loop
     bool exit = false;
+    u32 ticket = 0;
 
     while(!exit)
     {
@@ -98,7 +99,9 @@ void Castle::OpenTavern(void)
 
         if(le.MouseClickLeft(buttonYes) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)){ exit = true; }
 
-	animeBeer.DrawSprite();
+	animeBeer.DrawSprite(ticket);
+	
+	++ticket;
     }
 
     le.ResetKey();

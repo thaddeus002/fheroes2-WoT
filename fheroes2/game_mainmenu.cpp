@@ -63,8 +63,10 @@ Game::menu_t Game::MainMenu(void)
 
     Animation animeLantern(lt_pt, "SHNGANIM.ICN", 0, 40, true, Animation::INFINITY | Animation::RING | Animation::LOW);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
+
+    u32 ticket = 0;
 
     // mainmenu loop
     while(1){
@@ -77,12 +79,29 @@ Game::menu_t Game::MainMenu(void)
 	le.MousePressLeft(buttonCredits) ? buttonCredits.Press() : buttonCredits.Release();
 	le.MousePressLeft(buttonQuit) ? buttonQuit.Press() : buttonQuit.Release();
 
-	if(le.MouseCursor(buttonNewGame)) animeButtonNewGame.DrawSprite(); else if(animeButtonNewGame.Reset()) animeButtonNewGame.DrawSprite();
-	if(le.MouseCursor(buttonNewGame)) animeButtonNewGame.DrawSprite(); else if(animeButtonNewGame.Reset()) animeButtonNewGame.DrawSprite();
-	if(le.MouseCursor(buttonLoadGame)) animeButtonLoadGame.DrawSprite(); else if(animeButtonLoadGame.Reset()) animeButtonLoadGame.DrawSprite();
-	if(le.MouseCursor(buttonHighScores)) animeButtonHighScores.DrawSprite(); else if(animeButtonHighScores.Reset()) animeButtonHighScores.DrawSprite();
-	if(le.MouseCursor(buttonCredits)) animeButtonCredits.DrawSprite(); else if(animeButtonCredits.Reset()) animeButtonCredits.DrawSprite();
-	if(le.MouseCursor(buttonQuit)) animeButtonQuit.DrawSprite(); else if(animeButtonQuit.Reset()) animeButtonQuit.DrawSprite();
+	if((le.MouseCursor(buttonNewGame) ||
+	   (!le.MouseCursor(buttonNewGame) && animeButtonNewGame.Reset())) &&
+	   animeButtonNewGame.DrawSprite(ticket)) display.Flip();
+
+	if((le.MouseCursor(buttonNewGame) ||
+	   (!le.MouseCursor(buttonNewGame) && animeButtonNewGame.Reset()))  && 
+	   animeButtonNewGame.DrawSprite(ticket)) display.Flip();
+
+	if((le.MouseCursor(buttonLoadGame) ||
+	  (!le.MouseCursor(buttonLoadGame) && animeButtonLoadGame.Reset())) &&
+	  animeButtonLoadGame.DrawSprite(ticket)) display.Flip();
+
+	if((le.MouseCursor(buttonHighScores) ||
+	  (!le.MouseCursor(buttonHighScores) && animeButtonHighScores.Reset())) &&
+	  animeButtonHighScores.DrawSprite(ticket)) display.Flip();
+
+	if((le.MouseCursor(buttonCredits) ||
+	  (!le.MouseCursor(buttonCredits) && animeButtonCredits.Reset())) &&
+	  animeButtonCredits.DrawSprite(ticket)) display.Flip();
+
+	if((le.MouseCursor(buttonQuit) ||
+	  (!le.MouseCursor(buttonQuit) && animeButtonQuit.Reset())) &&
+	  animeButtonQuit.DrawSprite(ticket)) display.Flip();
 
 	if(le.MouseClickLeft(buttonNewGame)) return NEWGAME;
 	if(le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
@@ -99,7 +118,9 @@ Game::menu_t Game::MainMenu(void)
 	
 	if(le.KeyPress(SDLK_ESCAPE)) return QUITGAME;
 
-	animeLantern.DrawSprite();
+	if(animeLantern.DrawSprite(ticket)) display.Flip();
+	
+	++ticket;
     }
 
     return QUITGAME;

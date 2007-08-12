@@ -54,8 +54,8 @@ Game::menu_t Game::NewGame(void){
     Button buttonMultiGame(455, 175, "BTNNEWGM.ICN", 4, 5);
     Button buttonCancelGame(455, 375, "BTNNEWGM.ICN", 6, 7);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     // newgame loop
     while(1){

@@ -57,8 +57,8 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     Button buttonDig(rb.x + 195, rb.y + 107, apanel, 6, 7);
     Button buttonCancel(rb.x + 128, rb.y + 184, apanel, 8, 9);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     Dialog::answer_t result = Dialog::ZERO;
     bool exit = false;

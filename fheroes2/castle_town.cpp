@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <bitset>
 #include "agg.h"
 #include "world.h"
 #include "animation.h"
@@ -62,31 +63,36 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 	
 	u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
 
-	std::vector<building_t> requires;
-	Castle::GetBuildingRequires(race, build, requires);
-	
+	// prepare requires build string
 	std::string string_requires;
 
-	if(requires.size())
-	{
-		std::vector<building_t>::const_iterator it1 = requires.begin();
-		std::vector<building_t>::const_iterator it2 = requires.end();
-
-		while(it1 != it2)
-		{
-			if(! (building & *it1))
-			{
-				string_requires += GetStringBuilding(*it1, race);
-
-				if(it1 + 1 < it2) string_requires += ", ";
-			}
-		
-			++it1;
-		}
-	}
+	std::bitset<32> requires(Castle::GetBuildingRequires(build));
+	std::bitset<32> building2(building);
 	
-	u8 height_requires = string_requires.empty() ? 0 : Text::height(string_requires, Font::BIG, BOXAREA_WIDTH);
+	if(requires.any())
+	{
+	    u8 count = 0;
 
+	    for(u8 pos = 0; pos < requires.size(); ++pos)
+	    {
+		if(requires.test(pos))
+		{
+		    u32 value = 1;
+		    value <<= pos;
+		    
+		    ++count;
+
+		    if(! (building & value))
+		    {
+			string_requires += GetStringBuilding(static_cast<building_t>(value), race);
+
+			if(count < requires.count()) string_requires += ", ";
+		    }
+		}
+	    }
+	}
+
+	u8 height_requires = string_requires.empty() ? 0 : Text::height(string_requires, Font::BIG, BOXAREA_WIDTH);
 
 	PaymentConditions::BuyBuilding paymentBuild(race, build);
 	const u8 & valid_resource = paymentBuild.GetValidItems();
@@ -318,8 +324,8 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		Text(str, Font::SMALL, dst_pt);
 	}
 	
-	display.Flip();
     Cursor::Show();
+    display.Flip();
 
     le.ResetKey();
 
@@ -568,6 +574,11 @@ Castle::building_t Castle::OpenTown(void)
 	    default: break;
 	}
     }
+    else
+    {
+	stringMageGuild = GetStringBuilding(BUILD_MAGEGUILD5, race);
+	RedrawInfoDwelling(dst_pt, *this, BUILD_MAGEGUILD5);
+    }
 
     // tavern
     dst_pt.x = cur_pt.x + 150;
@@ -782,8 +793,8 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.y = cur_pt.y + 428;
     Button buttonExit(dst_pt, "SWAPBTN.ICN", 0, 1);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
    
@@ -802,7 +813,10 @@ Castle::building_t Castle::OpenTown(void)
 
 	// click left
 	if(!(DWELLING_MONSTER1 & building) && le.MouseClickLeft(rectDwelling1) && allowBuyBuildDwelling1 &&
-		Dialog::OK == DialogBuyBuilding(DWELLING_MONSTER1, true));
+		Dialog::OK == DialogBuyBuilding(DWELLING_MONSTER1, true))
+	{
+		return DWELLING_MONSTER1;
+	}
 	else
 	if(!((allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2) & building) && le.MouseClickLeft(rectDwelling2) && allowBuyBuildDwelling2 &&
 		Dialog::OK == DialogBuyBuilding(allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2, true))
@@ -903,8 +917,8 @@ Castle::building_t Castle::OpenTown(void)
         {
             Cursor::Hide();
             cursorFormat.Move(pointSpreadArmyFormat);
-            display.Flip();
             Cursor::Show();
+            display.Flip();
             army_spread = true;
         }
 	else
@@ -912,8 +926,8 @@ Castle::building_t Castle::OpenTown(void)
         {
             Cursor::Hide();
             cursorFormat.Move(pointGroupedArmyFormat);
-            display.Flip();
             Cursor::Show();
+            display.Flip();
             army_spread = false;
         }
 	else

@@ -17,48 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef H2MAGEGUILD_H
+#define H2MAGEGUILD_H
 
-#include "display.h"
-#include "cursor.h"
-#include "error.h"
-#include "game.h"
+#include <vector>
+#include "gamedefs.h"
+#include "spell.h"
 
-/* global event filter */
-int Game::GlobalFilterEvents(const SDL_Event *event)
+class MageGuild
 {
-    // motion
-    if(SDL_MOUSEMOTION == event->type){
-    
-	// redraw cursor
-	if(Cursor::Visible()){ Cursor::Redraw(); display.Flip(); }
+    public:
+	MageGuild();
 
-        return 1;
-    }
+	u8 GetLevel(void) const;
+	//const std::vector<Spell::spell_t> & GetSpells(u8 lvl);
 
-    // key
-    if(SDL_KEYDOWN == event->type)
-	switch(event->key.keysym.sym){
+	void Upgrade(void);
 
-	    case SDLK_F4:
-		display.FullScreen();
-    		return 0;
+    private:
+	u8 level;
 
-	    case SDLK_PRINT:
-		if(display.SaveBMP("screenshot.bmp")) Error::Verbose("save: screenshot.bmp");
-		return 0;
-	    
-	    default:
-    		break;
-	}
+	std::vector<Spell::spell_t>	level1;
+	std::vector<Spell::spell_t>	level2;
+	std::vector<Spell::spell_t>	level3;
+	std::vector<Spell::spell_t>	level4;
+	std::vector<Spell::spell_t>	level5;
+	std::vector<Spell::spell_t>	level6;
+};
 
-    return 1;
-}
-
-Game::menu_t Game::NewStandard(void){ return Game::SCENARIOINFO; }
-
-Game::menu_t Game::Credits(void){ Error::Verbose("Credits: under construction."); return Game::MAINMENU; }
-Game::menu_t Game::NewCampain(void){ Error::Verbose("New Campain Game: under construction."); return Game::NEWGAME; }
-Game::menu_t Game::NewMulti(void){ Error::Verbose("New Multi Game: under construction."); return Game::NEWGAME; }
-Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
-Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }
-
+#endif

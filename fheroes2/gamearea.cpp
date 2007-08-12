@@ -81,6 +81,7 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    --area_pos.x;
 	    Redraw();
 	    Cursor::Show();
+	    display.Flip();
 	    break;
 	case GameArea::RIGHT:
 	    if(world.w() - area_pos.w == area_pos.x) return;
@@ -88,6 +89,7 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    ++area_pos.x;
 	    Redraw();
 	    Cursor::Show();
+	    display.Flip();
 	    break;
 	case GameArea::TOP:
 	    if(0 == area_pos.y) return;
@@ -95,6 +97,7 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    --area_pos.y;
 	    Redraw();
 	    Cursor::Show();
+	    display.Flip();
 	    break;
 	case GameArea::BOTTOM:
 	    if(world.h() - area_pos.h == area_pos.y) return;
@@ -102,6 +105,7 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 	    ++area_pos.y;
 	    Redraw();
 	    Cursor::Show();
+	    display.Flip();
 	    break;
     }
 }

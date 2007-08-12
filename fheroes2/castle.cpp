@@ -196,6 +196,8 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     if(*byte8) building |= BUILD_CASTLE;
     ++byte8;
 
+    building |= (building & BUILD_CASTLE ? BUILD_CASTLE : BUILD_TENT);
+
     // allow upgrade to castle (0 - true, 1 - false)
     allow_castle = (*byte8 ? false : true);
     ++byte8;
@@ -749,9 +751,9 @@ u16 Castle::GetDwellingLivedCount(building_t dw)
 }
 
 /* return requires for building */
-void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & build, std::vector<building_t> & requires)
+u32 Castle::GetBuildingRequires(const building_t & build) const
 {
-	requires.clear();
+    u32 requires = 0;
 
     switch(build)
     {
@@ -763,15 +765,16 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 		case Race::WZRD:
 		case Race::WRLK:
 		case Race::NECR:
-		    requires.push_back(DWELLING_MONSTER1);
-			break;
+		    requires |= DWELLING_MONSTER1;
+		    break;
 
 		case Race::SORC:
-		    requires.push_back(DWELLING_MONSTER1);
-			requires.push_back(BUILD_TAVERN);
-			break;
+		    requires |= DWELLING_MONSTER1;
+		    requires |= BUILD_TAVERN;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -779,19 +782,20 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    requires.push_back(DWELLING_MONSTER1);
-			requires.push_back(BUILD_WELL);
-			break;
+		    requires |= DWELLING_MONSTER1;
+		    requires |= BUILD_WELL;
+		    break;
 
 		case Race::BARB:
 		case Race::SORC:
 		case Race::WZRD:
 		case Race::WRLK:
 		case Race::NECR:
-		    requires.push_back(DWELLING_MONSTER1);
-			break;
+		    requires |= DWELLING_MONSTER1;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -799,30 +803,31 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    requires.push_back(DWELLING_MONSTER1);
-			requires.push_back(BUILD_TAVERN);
-			break;
+		    requires |= DWELLING_MONSTER1;
+		    requires |= BUILD_TAVERN;
+		    break;
 
 		case Race::BARB:
-		    requires.push_back(DWELLING_MONSTER1);
+		    requires |= DWELLING_MONSTER1;
 			break;
 
 		case Race::SORC:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(BUILD_MAGEGUILD1);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= BUILD_MAGEGUILD1;
+		    break;
 
 		case Race::WZRD:
 		case Race::WRLK:
-		    requires.push_back(DWELLING_MONSTER2);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    break;
 
 		case Race::NECR:
-		    requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(BUILD_THIEVESGUILD);
-			break;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= BUILD_THIEVESGUILD;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -831,30 +836,31 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    {
 		case Race::KNGT:
 		case Race::BARB:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
 		case Race::SORC:
-		    requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
 		case Race::WRLK:
-		    requires.push_back(DWELLING_MONSTER3);
-			break;
+		    requires |= DWELLING_MONSTER3;
+		    break;
 
 		case Race::WZRD:
-		    requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(BUILD_MAGEGUILD1);
-			break;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= BUILD_MAGEGUILD1;
+		    break;
 
 		case Race::NECR:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(BUILD_MAGEGUILD1);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= BUILD_MAGEGUILD1;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -862,24 +868,25 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
 		case Race::BARB:
 		case Race::SORC:
 		case Race::NECR:
-		    requires.push_back(DWELLING_MONSTER5);
-			break;
+		    requires |= DWELLING_MONSTER5;
+		    break;
 
 		case Race::WRLK:
 		case Race::WZRD:
-		    requires.push_back(DWELLING_MONSTER4);
-			requires.push_back(DWELLING_MONSTER5);
-			break;
+		    requires |= DWELLING_MONSTER4;
+		    requires |= DWELLING_MONSTER5;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -888,21 +895,22 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    {
 		case Race::KNGT:
 		case Race::BARB:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
 		case Race::SORC:
-			requires.push_back(DWELLING_MONSTER2);
-		    requires.push_back(BUILD_WELL);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= BUILD_WELL;
+		    break;
 
 		case Race::NECR:
-			requires.push_back(DWELLING_MONSTER2);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    break;
 		
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -910,26 +918,27 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
 		case Race::SORC:
-			requires.push_back(DWELLING_MONSTER3);
-		    requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
 		case Race::WZRD:
-			requires.push_back(DWELLING_MONSTER3);
-		    requires.push_back(BUILD_WELL);
-			break;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= BUILD_WELL;
+		    break;
 
 		case Race::NECR:
-			requires.push_back(DWELLING_MONSTER3);
-			break;
+		    requires |= DWELLING_MONSTER3;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -938,18 +947,19 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    {
 		case Race::KNGT:
 		case Race::BARB:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
 		case Race::SORC:
 		case Race::WRLK:
 		case Race::NECR:
-			requires.push_back(DWELLING_MONSTER4);
-			break;
+		    requires |= DWELLING_MONSTER4;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -957,27 +967,28 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(DWELLING_MONSTER4);
-			requires.push_back(DWELLING_MONSTER5);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    requires |= DWELLING_MONSTER5;
+		    break;
 		
 		case Race::BARB:
-			requires.push_back(DWELLING_MONSTER5);
-			break;
+		    requires |= DWELLING_MONSTER5;
+		    break;
 
 		case Race::WZRD:
-		    requires.push_back(BUILD_SPEC);
-			requires.push_back(DWELLING_MONSTER5);
-			break;
+		    requires |= BUILD_SPEC;
+		    requires |= DWELLING_MONSTER5;
+		    break;
 
 		case Race::NECR:
-		    requires.push_back(BUILD_MAGEGUILD2);
-			requires.push_back(DWELLING_MONSTER5);
-			break;
+		    requires |= BUILD_MAGEGUILD2;
+		    requires |= DWELLING_MONSTER5;
+		    break;
 
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
@@ -985,23 +996,26 @@ void Castle::GetBuildingRequires(const Race::race_t & race, const building_t & b
 	    switch(race)
 	    {
 		case Race::KNGT:
-		    requires.push_back(DWELLING_MONSTER2);
-			requires.push_back(DWELLING_MONSTER3);
-			requires.push_back(DWELLING_MONSTER4);
-			requires.push_back(DWELLING_MONSTER6);
-			break;
+		    requires |= DWELLING_MONSTER2;
+		    requires |= DWELLING_MONSTER3;
+		    requires |= DWELLING_MONSTER4;
+		    requires |= DWELLING_MONSTER6;
+		    break;
 
 		case Race::WRLK:
 		case Race::WZRD:
-			requires.push_back(DWELLING_MONSTER6);
-			break;
+		    requires |= DWELLING_MONSTER6;
+		    break;
 		
-		default: break;
+		default:
+		    break;
 	    }
 	    break;
 
 	default: break;
     }
+    
+    return requires;
 }
 
 /* check allow buy building */
@@ -1014,23 +1028,23 @@ bool Castle::AllowBuyBuilding(building_t build) const
     if(PaymentConditions::BuyBuilding(race, build) > world.GetMyKingdom().GetFundsResource()) return false;
     
     // check build requirements
-	std::vector<building_t> requires;
-	Castle::GetBuildingRequires(race, build, requires);
-
-	if(requires.size())
-	{
-		std::vector<building_t>::const_iterator it1 = requires.begin();
-		std::vector<building_t>::const_iterator it2 = requires.end();
-
-		while(it1 != it2)
-		{
-			if(! (building & *it1)) return false;
-		
-			++it1;
-		}
-	}
+    std::bitset<32> requires(Castle::GetBuildingRequires(build));
     
-	return true;
+    if(requires.any())
+    {
+        for(u8 pos = 0; pos < requires.size(); ++pos)
+        {
+            if(requires.test(pos))
+            {
+                u32 value = 1;
+                value <<= pos;
+
+                if(! (building & value)) return false;
+	    }
+	}
+    }
+
+    return true;
 }
 
 /* buy building */
@@ -1045,6 +1059,7 @@ void Castle::BuyBuilding(building_t build)
 
 	switch(build)
 	{
+	    case BUILD_CASTLE: building &= ~BUILD_TENT; break;
 	    case DWELLING_MONSTER1: dwelling[0] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)); break;
 	    case DWELLING_MONSTER2: dwelling[1] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)); break;
 	    case DWELLING_MONSTER3: dwelling[2] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)); break;
@@ -1055,6 +1070,8 @@ void Castle::BuyBuilding(building_t build)
 	}
 	// disable day build
 	allow_build = false;
+	
+	Error::Verbose("Castle::BuyBuilding: " + GetStringBuilding(build, race));
 }
 
 /* draw image castle to position */
@@ -1132,5 +1149,58 @@ void Castle::DrawImageCastle(const Point & pt)
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 3 * 32 + sprite.y();
 	display.Blit(sprite, dst_pt);
+    }
+}
+
+/* prepare building name ICN string */
+void Castle::PrepareICNString(const Castle::building_t & build, const Race::race_t & race, std::string & result)
+{
+    result = "TWN";
+
+    switch(race)
+    {
+	case Race::KNGT: result += "K"; break;
+	case Race::BARB: result += "B"; break;
+	case Race::SORC: result += "S"; break;
+	case Race::WRLK: result += "W"; break;
+	case Race::WZRD: result += "Z"; break;
+	case Race::NECR: result += "N"; break;
+	default: result += "K"; break;
+    }
+
+    switch(build)
+    {
+	case BUILD_CASTLE:	result += "CSTL.ICN"; break;
+	case BUILD_TENT:	result += "TENT.ICN"; break;
+	case BUILD_SPEC:	result += "SPEC.ICN"; break;
+	case BUILD_CAPTAIN:	result += "CAPT.ICN"; break;
+	case BUILD_WEL2:	result += "WEL2.ICN"; break;
+	case BUILD_LEFTTURRET:	result += "LTUR.ICN"; break;
+	case BUILD_RIGHTTURRET:	result += "RTUR.ICN"; break;
+	case BUILD_MOAT:	result += "MOAT.ICN"; break;
+	case BUILD_MARKETPLACE:	result += "MARK.ICN"; break;
+	case BUILD_THIEVESGUILD:result += "THIE.ICN"; break;
+	case BUILD_TAVERN:	result += "TVRN.ICN"; break;
+	case BUILD_WELL:	result += "WELL.ICN"; break;
+	case BUILD_STATUE:	result += "STAT.ICN"; break;
+	case BUILD_BOAT:	result += "BOAT.ICN"; break;
+	case BUILD_SHIPYARD:	result += "DOCK.ICN"; break;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	result += "MAGE.ICN"; break;
+	case DWELLING_MONSTER1:	result += "DW_0.ICN"; break;
+	case DWELLING_MONSTER2:	result += "DW_1.ICN"; break;
+	case DWELLING_UPGRADE2: result += "UP_1.ICN"; break;
+	case DWELLING_MONSTER3:	result += "DW_2.ICN"; break;
+	case DWELLING_UPGRADE3: result += "UP_2.ICN"; break;
+	case DWELLING_MONSTER4:	result += "DW_3.ICN"; break;
+	case DWELLING_UPGRADE4: result += "UP_3.ICN"; break;
+	case DWELLING_MONSTER5:	result += "DW_4.ICN"; break;
+	case DWELLING_UPGRADE5: result += "UP_4.ICN"; break;
+	case DWELLING_MONSTER6:	result += "DW_5.ICN"; break;
+	case DWELLING_UPGRADE6: result += "UP_5.ICN"; break;
+	default: break;
     }
 }

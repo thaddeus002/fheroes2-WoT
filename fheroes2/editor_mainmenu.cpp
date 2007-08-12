@@ -53,8 +53,8 @@ Game::menu_t Game::Editor::MainMenu(void){
     Button buttonLoadMap(455, 110, "BTNEMAIN.ICN", 2, 3);
     Button buttonCancelGame(455, 375, "BTNEMAIN.ICN", 6, 7);
 
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     // NewMap loop
     while(1){

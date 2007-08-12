@@ -53,8 +53,8 @@ Game::menu_t Game::LoadGame(void){
     Button buttonCampainGame(455, 110, "BTNNEWGM.ICN", 2, 3);
     Button buttonMultiGame(455, 175, "BTNNEWGM.ICN", 4, 5);
     Button buttonCancelGame(455, 375, "BTNNEWGM.ICN", 6, 7);
-    display.Flip();
     Cursor::Show();
+    display.Flip();
 
     // loadgame loop
     while(1){

@@ -135,7 +135,7 @@ void AGG::PreloadObject(const std::string & name)
 	    break;
 
 	default:
-	    Error::Warning("unknown object: " + name);
+	    Error::Warning("AGG::PreloadObject: unknown object: " + name);
 	    break;
     }
 }

@@ -74,9 +74,10 @@ void Button::DrawPressButton(void)
     if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     display.Blit(sprite2, x, y);
-    display.Flip();
 
     if(localcursor) Cursor::Show();
+
+    display.Flip();
     
     pressed = true;
 }
@@ -89,9 +90,10 @@ void Button::DrawReleaseButton(void)
     if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     display.Blit(sprite1,  x, y);
-    display.Flip();
 
     if(localcursor) Cursor::Show();
+
+    display.Flip();
 
     pressed = false;
 }

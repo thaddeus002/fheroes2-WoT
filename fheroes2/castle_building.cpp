@@ -20,970 +20,7 @@
 
 #include "agg.h"
 #include "castle.h"
-
-/*
-const Sprite & Castle::SpriteBuilding(const Castle::building_t & build, u8 level)
-{
-    std::string icn("TWN");
-    u8 index = 0;
-
-    switch(race)
-    {
-	case Race::KNGT: icn += "K"; break;
-	case Race::BARB: icn += "B"; break;
-	case Race::SORC: icn += "S"; break;
-	case Race::WRLK: icn += "W"; break;
-	case Race::WZRD: icn += "Z"; break;
-	case Race::NECR: icn += "N"; break;
-	default: icn += "K"; break;
-    }
-
-    switch(build)
-    {
-	case BUILD_CASTLE:	icn += "CSTL.ICN"; break;
-	case BUILD_TENT:	icn += "TENT.ICN"; break;
-	case BUILD_SPEC:	icn += "SPEC.ICN"; break;
-	case BUILD_CAPTAIN:	icn += "CAPT.ICN"; break;
-	case BUILD_WEL2:	icn += "WEL2.ICN"; break;
-	case BUILD_LEFTTURRET:	icn += "LTUR.ICN"; break;
-	case BUILD_RIGHTTURRET:	icn += "RTUR.ICN"; break;
-	case BUILD_MOAT:	icn += "MOAT.ICN"; break
-	case BUILD_MARKETPLACE:	icn += "MARK.ICN"; break;
-	case BUILD_THIEVESGUILD:icn += "THIE.ICN"; break;
-	case BUILD_TAVERN:	icn += "TVRN.ICN"; break;
-	case BUILD_WELL:	icn += "WELL.ICN"; break;
-	case BUILD_STATUE:	icn += "STAT.ICN"; break;
-	//case BUILD_BOAT:	icn += "BOAT.ICN"; break;
-	case BUILD_SHIPYARD:	icn += "DOCK.ICN"; break;
-	case BUILD_MAGEGUILD1:
-	case BUILD_MAGEGUILD2:
-	case BUILD_MAGEGUILD3:
-	case BUILD_MAGEGUILD4:
-	case BUILD_MAGEGUILD5:	icn += "MAGE.ICN"; break;
-	case DWELLING_MONSTER1:	icn += "DW_0.ICN"; break;
-	case DWELLING_MONSTER2:	icn += "DW_1.ICN"; break;
-	case DWELLING_UPGRADE2: icn += "UP_1.ICN"; break;
-	case DWELLING_MONSTER3:	icn += "DW_2.ICN"; break;
-	case DWELLING_UPGRADE3: icn += "UP_2.ICN"; break;
-	case DWELLING_MONSTER4:	icn += "DW_3.ICN"; break;
-	case DWELLING_UPGRADE4: icn += "UP_3.ICN"; break;
-	case DWELLING_MONSTER5:	icn += "DW_4.ICN"; break;
-	case DWELLING_UPGRADE5: icn += "UP_4.ICN"; break;
-	case DWELLING_MONSTER6:	icn += "DW_5.ICN"; break;
-	case DWELLING_UPGRADE6: icn += "UP_5.ICN"; break;
-	default: break;
-    }
-		const Sprite & sprite = AGG::GetICN("TWNKMAGE.ICN", level - 1);
-
-    return AGG::GetICN(icn, index);
-}
-*/
-
-/*
-u32 Castle::GetDependenceRedrawBuilding(building_t build)
-{
-    switch(build)
-    {
-	case BUILD_CASTLE:
-	    if(Race::KNGT == race) return BUILD_SPEC | BUILD_LEFTTURRET | BUILD_RIGHTTURRET;
-	    if(Race::BARB == race) return BUILD_LEFTTURRET | BUILD_RIGHTTURRET;
-	    if(Race::SORC == race) return BUILD_SPEC | BUILD_LEFTTURRET | BUILD_RIGHTTURRET | BUILD_STATUE | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | DWELLING_MONSTER4 | DWELLING_UPGRADE4;
-	    return 0;
-
-	case BUILD_TENT:
-	    return 0;
-
-	case BUILD_SPEC:
-	    if(Race::BARB == race) return BUILD_WELL;
-	    if(Race::SORC == race) return DWELLING_MONSTER6 | BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5;
-	    return 0;
-
-	case BUILD_CAPTAIN:
-	    if(Race::KNGT == race) return BUILD_WEL2;
-	    if(Race::SORC == race) return BUILD_CASTLE;
-	    return 0;
-
-	case BUILD_WEL2:
-	    return 0;
-
-	case BUILD_LEFTTURRET:
-	    if(Race::KNGT == race) return BUILD_THIEVESGUILD;
-	    return 0;
-
-	case BUILD_RIGHTTURRET:
-	    return 0;
-
-	case BUILD_MOAT:
-	    if(Race::KNGT == race) return BUILD_THIEVESGUILD | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | BUILD_MARKETPLACE;
-	    if(Race::BARB == race) return BUILD_TAVERN | DWELLING_MONSTER2 | DWELLING_UPGRADE2;
-	    return 0;
-
-	case BUILD_MARKETPLACE:
-	    if(Race::KNGT == race) return DWELLING_MONSTER3 | DWELLING_UPGRADE3;
-	    if(Race::BARB == race) return BUILD_WELL;
-	    return 0;
-
-	case BUILD_THIEVESGUILD:
-	    if(Race::KNGT == race) return DWELLING_MONSTER5 | DWELLING_UPGRADE5;
-	    if(Race::BARB == race) return DWELLING_MONSTER4 | DWELLING_UPGRADE4;
-	    return 0;
-
-	case BUILD_TAVERN:
-	    if(Race::KNGT == race) return BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5;
-	    return 0;
-
-
-	case BUILD_WELL:
-	    return 0;
-
-	case BUILD_STATUE:
-	    return 0;
-
-	//case BUILD_BOAT:
-	//    return 0;
-
-	case BUILD_SHIPYARD:
-	    return 0;
-
-	case BUILD_MAGEGUILD1:
-	case BUILD_MAGEGUILD2:
-	case BUILD_MAGEGUILD3:
-	case BUILD_MAGEGUILD4:
-	case BUILD_MAGEGUILD5:
-	    if(Race::KNGT == race) return DWELLING_MONSTER1 | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | DWELLING_MONSTER4 | DWELLING_UPGRADE4 | DWELLING_MONSTER6 | DWELLING_UPGRADE6;
-	    if(Race::BARB == race) return BUILD_WELL;
-	    return 0;
-
-	case DWELLING_MONSTER1:
-	    if(Race::KNGT == race) return BUILD_WELL | DWELLING_MONSTER3 | DWELLING_UPGRADE3;
-	    if(Race::BARB == race) return BUILD_WELL;
-	    return 0;
-
-	case DWELLING_MONSTER2:
-	case DWELLING_UPGRADE2:
-	    if(Race::KNGT == race) return BUILD_WELL;
-	    if(Race::BARB == race) return BUILD_WELL;
-	    return 0;
-
-	case DWELLING_MONSTER3:
-	case DWELLING_UPGRADE3:
-	    if(Race::KNGT == race) return BUILD_WELL | DWELLING_MONSTER4 | DWELLING_UPGRADE4;
-	    if(Race::BARB == race) return DWELLING_MONSTER4 | DWELLING_UPGRADE4;
-	    return 0;
-
-	case DWELLING_MONSTER4:
-	case DWELLING_UPGRADE4:
-	    if(Race::KNGT == race) return BUILD_WELL;
-	    if(Race::BARB == race) return BUILD_STATUE;
-	    return 0;
-
-	case DWELLING_MONSTER5:
-	case DWELLING_UPGRADE5:
-	    if(Race::BARB == race) return BUILD_WELL;
-	    return 0;
-
-	case DWELLING_MONSTER6:
-	case DWELLING_UPGRADE6:
-	case DWELLING_UPGRADE7:
-	    if(Race::KNGT == race) return BUILD_STATUE | DWELLING_MONSTER1 | DWELLING_MONSTER3 | DWELLING_UPGRADE3 | DWELLING_MONSTER4 | DWELLING_UPGRADE4;
-	    if(Race::BARB == race) return BUILD_WELL | BUILD_THIEVESGUILD;
-	    return 0;
-
-	default: break;
-    }
-}
-*/
-
-void Castle::RedrawBuilding(const Point & dst_pt)
-{
-    switch(race)
-    {
-	case Race::KNGT:
-	{
-	    if(BUILD_CASTLE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKCSTL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKTENT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_SPEC & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKSPEC.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    
-	    if(BUILD_CAPTAIN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKCAPT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    
-	    if( BUILD_WEL2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKWEL2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    
-	    if(BUILD_LEFTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKLTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_RIGHTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKRTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    
-	    if(BUILD_MOAT & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKMOAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MARKETPLACE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKMARK.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    
-	    if((DWELLING_MONSTER2 | DWELLING_UPGRADE2) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE2 & building ? "TWNKUP_1.ICN" : "TWNKDW_1.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    
-	    if(BUILD_THIEVESGUILD & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKTHIE.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_TAVERN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKTVRN.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(u8 level = GetLevelMageGuild())
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKMAGE.ICN", level - 1);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER5 | DWELLING_UPGRADE5) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE5 & building ? "TWNKUP_4.ICN" : "TWNKDW_4.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER6 | DWELLING_UPGRADE6) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE6 & building ? "TWNKUP_5.ICN" : "TWNKDW_5.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER1 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKDW_0.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER3 | DWELLING_UPGRADE3) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE3 & building ? "TWNKUP_2.ICN" : "TWNKDW_2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER4 | DWELLING_UPGRADE4) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE4 & building ? "TWNKUP_3.ICN" : "TWNKDW_3.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WELL & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKWELL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_STATUE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNKSTAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(HaveNearlySea())
-	    {
-		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNKBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNKDOCK.ICN" : "TWNKEXT0.ICN"), 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	}
-	    break;
-	
-	case Race::BARB:
-	{
-	    if(BUILD_SPEC & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBSPEC.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if( BUILD_WEL2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBWEL2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER6 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBDW_5.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(u8 level = GetLevelMageGuild())
-	    {
-		const Sprite & sprite1 = AGG::GetICN("TWNBMAGE.ICN", level - 1);
-		display.Blit(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
-
-		const Sprite & sprite2 = AGG::GetICN("TWNBEXT2.ICN", 0);
-		display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
-	    }
-
-	    if(BUILD_CAPTAIN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBCAPT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CASTLE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBCSTL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBTENT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_LEFTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBLTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_RIGHTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBRTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MOAT & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBMOAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER3 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBDW_2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_THIEVESGUILD & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBTHIE.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_TAVERN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBTVRN.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER1 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBDW_0.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MARKETPLACE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBMARK.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER2 | DWELLING_UPGRADE2) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE2 & building ? "TWNBUP_1.ICN" : "TWNBDW_1.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER4 | DWELLING_UPGRADE4) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE4 & building ? "TWNBUP_3.ICN" : "TWNBDW_3.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER5 | DWELLING_UPGRADE5) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE5 & building ? "TWNBUP_4.ICN" : "TWNBDW_4.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WELL & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBWELL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_STATUE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNBSTAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(HaveNearlySea())
-	    {
-		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNBBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNBDOCK.ICN" : "TWNBEXT0.ICN"), 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	}
-	    break;
-	
-	case Race::SORC:
-	{
-	    if(BUILD_SPEC & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSSPEC.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER6 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSDW_5.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(u8 level = GetLevelMageGuild())
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSMAGE.ICN", level - 1);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    
-	    if(BUILD_CAPTAIN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSCAPT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CASTLE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSCSTL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSTENT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_LEFTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSLTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_RIGHTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSRTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MOAT & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSMOAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER3 | DWELLING_UPGRADE3) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE3 & building ? "TWNSUP_2.ICN" : "TWNSDW_2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(HaveNearlySea())
-	    {
-		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNSBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNSDOCK.ICN" : "TWNSEXT0.ICN"), 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MARKETPLACE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSMARK.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER2 | DWELLING_UPGRADE2) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE2 & building ? "TWNSUP_1.ICN" : "TWNSDW_1.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_THIEVESGUILD & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSTHIE.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER1 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSDW_0.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_TAVERN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSTVRN.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((BUILD_WEL2 & building) && (BUILD_STATUE & building))
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSEXT1.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    if(BUILD_STATUE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSSTAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    if(BUILD_WEL2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSWEL2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER4 | DWELLING_UPGRADE4) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE4 & building ? "TWNSUP_3.ICN" : "TWNSDW_3.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WELL & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSWELL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER5 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNSDW_4.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	}
-	    break;
-	
-	case Race::WRLK:
-	{
-	    if(DWELLING_MONSTER5 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWDW_4.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER3 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWDW_2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CASTLE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWCSTL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWTENT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_LEFTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWLTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_RIGHTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWRTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CAPTAIN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWCAPT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MOAT & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWMOAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(HaveNearlySea())
-	    {
-		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNWBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNWDOCK.ICN" : "TWNWEXT0.ICN"), 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(u8 level = GetLevelMageGuild())
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWMAGE.ICN", level - 1);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_TAVERN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWTVRN.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_THIEVESGUILD & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWTHIE.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MARKETPLACE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWMARK.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_STATUE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWSTAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER1 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWDW_0.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WEL2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWWEL2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_SPEC & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWSPEC.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER4 | DWELLING_UPGRADE4) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE4 & building ? "TWNWUP_3.ICN" : "TWNWDW_3.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWDW_1.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_UPGRADE7 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWUP5B.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    if((DWELLING_MONSTER6 | DWELLING_UPGRADE6) & building)
-	    {
-	        const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE6 & building ? "TWNWUP_5.ICN" : "TWNWDW_5.ICN", 0);
-	        display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WELL & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNWWELL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	}
-	    break;
-	
-	case Race::WZRD:
-	{
-	    if((DWELLING_MONSTER6 | DWELLING_UPGRADE6) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE6 & building ? "TWNZUP_5.ICN" : "TWNZDW_5.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CASTLE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZCSTL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZTENT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_LEFTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZLTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_RIGHTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZRTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MOAT & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZMOAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CAPTAIN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZCAPT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZDW_1.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_THIEVESGUILD & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZTHIE.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_TAVERN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZTVRN.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(HaveNearlySea())
-	    {
-		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNZBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNZDOCK.ICN" : "TWNZEXT0.ICN"), 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WELL & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZWELL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_SPEC & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZSPEC.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER3 | DWELLING_UPGRADE3) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE3 ? "TWNZUP_2.ICN" : "TWNZDW_2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER5 | DWELLING_UPGRADE5) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE5 ? "TWNZUP_4.ICN" : "TWNZDW_4.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(u8 level = GetLevelMageGuild())
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZMAGE.ICN", level - 1);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_STATUE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZSTAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER1 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZDW_0.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER4 | DWELLING_UPGRADE4) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE4 ? "TWNZUP_3.ICN" : "TWNZDW_3.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MARKETPLACE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZMARK.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WEL2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNZWEL2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	}
-	    break;
-	
-	case Race::NECR:
-	{
-	    if(BUILD_SPEC & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNSPEC.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CASTLE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNCSTL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	    else
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNTENT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_CAPTAIN & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNCAPT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_LEFTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNLTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_RIGHTTURRET & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNRTUR.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER6 | DWELLING_UPGRADE6) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE6 ? "TWNNUP_5.ICN" : "TWNNDW_5.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MOAT & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNMOAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(HaveNearlySea())
-	    {
-		const Sprite & sprite = AGG::GetICN(present_boat ? "TWNNBOAT.ICN" : (BUILD_SHIPYARD & building ? "TWNNDOCK.ICN" : "TWNNEXT0.ICN"), 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_THIEVESGUILD & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNTHIE.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER3 | DWELLING_UPGRADE3) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE3 ? "TWNNUP_2.ICN" : "TWNNDW_2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER5 | DWELLING_UPGRADE5) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE5 ? "TWNNUP_4.ICN" : "TWNNDW_4.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER2 | DWELLING_UPGRADE2) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE2 ? "TWNNUP_1.ICN" : "TWNNDW_1.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if((DWELLING_MONSTER4 | DWELLING_UPGRADE4) & building)
-	    {
-		const Sprite & sprite = AGG::GetICN(DWELLING_UPGRADE4 ? "TWNNUP_3.ICN" : "TWNNDW_3.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(DWELLING_MONSTER1 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNDW_0.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(u8 level = GetLevelMageGuild())
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNMAGE.ICN", (level - 1) * 6);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WEL2 & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNWEL2.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_MARKETPLACE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNMARK.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_STATUE & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNSTAT.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-
-	    if(BUILD_WELL & building)
-	    {
-		const Sprite & sprite = AGG::GetICN("TWNNWELL.ICN", 0);
-		display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
-	    }
-	}
-	    break;
-	
-	default: return;
-    }
-}
+#include "cursor.h"
 
 Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 {
@@ -995,7 +32,7 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 		case Race::KNGT:	return Rect(pt.x + 0, pt.y + 130, 50, 60);
 		case Race::BARB:	return Rect(pt.x + 478, pt.y + 100, 76, 42);
 		case Race::SORC:	return Rect(pt.x + 423, pt.y + 165, 65, 49);
-		case Race::WRLK:	return Rect(pt.x + 479, pt.y + 100, 39, 52);
+		case Race::WRLK:	return Rect(pt.x + 525, pt.y + 109, 60, 48);
 		case Race::WZRD:	return Rect(pt.x + 507, pt.y + 55, 47, 42);
 		case Race::NECR:	return Rect(pt.x + 291, pt.y + 134, 43, 59);
 		default: break;
@@ -1008,7 +45,7 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 		case Race::KNGT:	return Rect(pt.x + 350, pt.y + 110, 46, 56);
 		case Race::BARB:	return Rect(pt.x + 0, pt.y + 205, 125, 60);
 		case Race::SORC:	return Rect(pt.x + 494, pt.y + 140, 131, 87);
-		case Race::WRLK:	return Rect(pt.x + 525, pt.y + 109, 60, 48);
+		case Race::WRLK:	return Rect(pt.x + 479, pt.y + 100, 39, 52);
 		case Race::WZRD:	return Rect(pt.x, pt.y + 160, 118, 50);
 		default: break;
 	    }
@@ -1297,4 +334,311 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
     }
 
     return Rect();
+}
+
+/* redraw town area */
+void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_t> & orders)
+{
+    static u32 ticket = 0;
+
+    std::string icn;
+
+    // before redraw
+    switch(race)
+    {
+	case Race::KNGT:
+	{
+	    const Sprite & townbkg = AGG::GetICN("TOWNBKG0.ICN", 0);
+	    display.Blit(townbkg, dst_pt);
+	}
+	break;
+	case Race::BARB:
+	{
+	    const Sprite & townbkg = AGG::GetICN("TOWNBKG1.ICN", 0);
+	    display.Blit(townbkg, dst_pt);
+
+    	    const Sprite & sprite0 = AGG::GetICN("TWNBEXT1.ICN", 1 + ticket % 5);
+	    display.Blit(sprite0, dst_pt.x + sprite0.x(), dst_pt.y + sprite0.y());
+	}
+	break;
+	case Race::SORC:
+	{
+	    const Sprite & townbkg = AGG::GetICN("TOWNBKG2.ICN", 0);
+	    display.Blit(townbkg, dst_pt);
+	}
+	break;
+	case Race::WRLK:
+	{
+	    const Sprite & townbkg = AGG::GetICN("TOWNBKG3.ICN", 0);
+	    display.Blit(townbkg, dst_pt);
+	}
+	break;
+	case Race::WZRD:
+	{
+	    const Sprite & townbkg = AGG::GetICN("TOWNBKG4.ICN", 0);
+	    display.Blit(townbkg, dst_pt);
+	}
+	break;
+	case Race::NECR:
+	{
+	    const Sprite & townbkg = AGG::GetICN("TOWNBKG5.ICN", 0);
+	    display.Blit(townbkg, dst_pt);
+	}
+	break;
+	default: break;
+    }
+
+    // sea anime
+    if(Race::WZRD == race || (!(BUILD_SHIPYARD & building) && HaveNearlySea()))
+    {
+	PrepareICNString(BUILD_NOTHING, race, icn);
+	    
+	icn += "EXT0.ICN";
+
+    	const Sprite & sprite50 = AGG::GetICN(icn, 0);
+	display.Blit(sprite50, dst_pt.x + sprite50.x(), dst_pt.y + sprite50.y());
+
+    	const Sprite & sprite51 = AGG::GetICN(icn, 1 + ticket % 5);
+	display.Blit(sprite51, dst_pt.x + sprite51.x(), dst_pt.y + sprite51.y());
+    }
+
+    // redraw builds
+    for(u8 ii = 0; ii < orders.size(); ++ii)
+    {
+	building_t build = orders[ii];
+
+	if(! isBuild(build)) continue;
+	
+	// correct build
+	switch(build)
+	{
+	    case DWELLING_MONSTER2: if(DWELLING_UPGRADE2 & building) build = DWELLING_UPGRADE2; break;
+	    case DWELLING_MONSTER3: if(DWELLING_UPGRADE3 & building) build = DWELLING_UPGRADE3; break;
+	    case DWELLING_MONSTER4: if(DWELLING_UPGRADE4 & building) build = DWELLING_UPGRADE4; break;
+	    case DWELLING_MONSTER5: if(DWELLING_UPGRADE5 & building) build = DWELLING_UPGRADE5; break;
+	    case DWELLING_MONSTER6: if(DWELLING_UPGRADE7 & building) build = DWELLING_UPGRADE7;
+				    else
+				    if(DWELLING_UPGRADE6 & building) build = DWELLING_UPGRADE6; break;
+
+            case BUILD_MAGEGUILD1:  if(BUILD_MAGEGUILD5 & building) build = BUILD_MAGEGUILD5;
+        			    else
+        			    if(BUILD_MAGEGUILD4 & building) build = BUILD_MAGEGUILD4;
+        			    else
+        			    if(BUILD_MAGEGUILD3 & building) build = BUILD_MAGEGUILD3;
+        			    else
+        			    if(BUILD_MAGEGUILD2 & building) build = BUILD_MAGEGUILD2; break;
+	    default: break;
+	}
+    	PrepareICNString(build, race, icn);
+    	    
+    	u8 index = 0;
+    	    
+    	// correct index
+	switch(build)
+        {
+                case BUILD_MAGEGUILD1: index = 0; break;
+                case BUILD_MAGEGUILD2: index = Race::NECR == race ? 6 : 1; break;
+                case BUILD_MAGEGUILD3: index = Race::NECR == race ? 12 : 2; break;
+                case BUILD_MAGEGUILD4: index = Race::NECR == race ? 18 : 3; break;
+                case BUILD_MAGEGUILD5: index = Race::NECR == race ? 24 : 4; break;
+                default: break;
+        }
+
+    	// simple first sprite
+    	const Sprite & sprite1 = AGG::GetICN(icn, index);
+	display.Blit(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
+
+    	// second anime sprite
+    	switch(race)
+    	{
+    		case Race::KNGT:
+		    switch(build)
+		    {
+			case BUILD_CASTLE:
+			case BUILD_THIEVESGUILD:
+			case BUILD_TAVERN:
+			case BUILD_LEFTTURRET:
+			case BUILD_RIGHTTURRET:
+			case DWELLING_MONSTER1:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 5);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			case DWELLING_MONSTER3:
+			case DWELLING_UPGRADE3:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 6);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			case DWELLING_MONSTER5:
+			case DWELLING_UPGRADE5:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 7);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			default: break;
+		    }
+		    break;
+     		case Race::BARB:
+		    switch(build)
+		    {
+			case BUILD_CAPTAIN:
+			case BUILD_MOAT:
+			case DWELLING_MONSTER4:
+			case DWELLING_UPGRADE4:
+			case DWELLING_MONSTER5:
+			case DWELLING_UPGRADE5:
+			case DWELLING_MONSTER6:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 5);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			case BUILD_CASTLE:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 6);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			case BUILD_MAGEGUILD5:
+			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 5 + ticket % 8);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			default: break;
+		    }
+		    break;
+    		case Race::SORC:
+		    switch(build)
+		    {
+			case BUILD_CASTLE:
+			case BUILD_CAPTAIN:
+			case BUILD_THIEVESGUILD:
+			case BUILD_TAVERN:
+			case DWELLING_MONSTER1:
+			case DWELLING_MONSTER2:
+			case DWELLING_UPGRADE2:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 5);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			default: break;
+		    }
+		    break;
+    		case Race::WRLK:
+		    switch(build)
+		    {
+			case BUILD_CASTLE:
+			case BUILD_CAPTAIN:
+			case BUILD_MOAT:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 5);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			case BUILD_WEL2:
+			case DWELLING_MONSTER1:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 6);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			default: break;
+		    }
+		    break;
+    		case Race::WZRD:
+		    switch(build)
+		    {
+			case BUILD_CASTLE:
+			case BUILD_THIEVESGUILD:
+			case DWELLING_MONSTER1:
+			case DWELLING_MONSTER3:
+			case DWELLING_UPGRADE3:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 5);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			case BUILD_TAVERN:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 6);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			default: break;
+		    }
+		    break;
+    		case Race::NECR:
+		    switch(build)
+		    {
+			case BUILD_CASTLE:
+			case DWELLING_MONSTER3:
+			case DWELLING_UPGRADE3:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 5);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			case BUILD_WEL2:
+			case DWELLING_MONSTER6:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, 1 + ticket % 6);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+			default: break;
+			case BUILD_MAGEGUILD1:
+			case BUILD_MAGEGUILD2:
+			case BUILD_MAGEGUILD3:
+			case BUILD_MAGEGUILD4:
+			case BUILD_MAGEGUILD5:
+    			{
+    			    const Sprite & sprite2 = AGG::GetICN(icn, index + 1 + ticket % 5);
+			    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+			}
+			break;
+		    }
+		    break;
+    		default: break;
+	}
+
+	// shipyard
+	if(BUILD_SHIPYARD == build)
+    	{
+	    // boat
+	    if(BUILD_BOAT & building)
+	    {
+		PrepareICNString(BUILD_BOAT, race, icn);
+
+    		const Sprite & sprite40 = AGG::GetICN(icn, 0);
+		display.Blit(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y());
+
+    		const Sprite & sprite41 = AGG::GetICN(icn, 1 + ticket % 9);
+		display.Blit(sprite41, dst_pt.x + sprite41.x(), dst_pt.y + sprite41.y());
+	    }
+	    else
+	    {
+    		const Sprite & sprite3 = AGG::GetICN(icn, 1 + ticket % 5);
+		display.Blit(sprite3, dst_pt.x + sprite3.x(), dst_pt.y + sprite3.y());
+	    }
+	}
+	else
+	// sorc and anime wel2 or statue
+	if(Race::SORC == race && BUILD_WEL2 == build)
+	{
+    	    const Sprite & sprite20 = AGG::GetICN(BUILD_STATUE & building ? "TWNSEXT1.ICN" : icn, 0);
+	    display.Blit(sprite20, dst_pt.x + sprite20.x(), dst_pt.y + sprite20.y());
+
+    	    const Sprite & sprite21 = AGG::GetICN(BUILD_STATUE & building ? "TWNSEXT1.ICN" : icn, 1 + ticket % 5);
+	    display.Blit(sprite21, dst_pt.x + sprite21.x(), dst_pt.y + sprite21.y());
+	}
+	
+    }
+
+    ++ticket;
 }
