@@ -18,39 +18,25 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "cursor.h"
 #include "gamedefs.h"
-#include "cursor.h"
 #include "spritecursor.h"
 
 void SpriteCursor::Move(s16 ax, s16 ay)
 {
     if(ax < 0 || ay < 0) return;
 
-    bool hide = Cursor::Visible() ? true : false;
-
-    if(hide) Cursor::Hide();
-
     background.Restore();
     background.Save(ax, ay);
 
     display.Blit(spriteCursor, ax, ay);
-
-    if(hide) Cursor::Show();
 }
 
 void SpriteCursor::Redraw(void)
 {
-    bool hide = Cursor::Visible() ? true : false;
-
-    if(hide) Cursor::Hide();
-
     background.Restore();
     background.Save();
 
     display.Blit(spriteCursor, background.GetPos());
-
-    if(hide) Cursor::Show();
 }
 
 void SpriteCursor::Show(s16 ax, s16 ay)

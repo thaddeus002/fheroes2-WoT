@@ -970,10 +970,6 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
     }
 
-    le.ResetKey();
-
-    Cursor::Show();
-
     return result;
 }
 

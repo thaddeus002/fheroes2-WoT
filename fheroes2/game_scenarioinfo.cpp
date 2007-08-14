@@ -133,8 +133,11 @@ Game::menu_t Game::ScenarioInfo(void){
 	// select level
 	Difficulty::difficulty_t difficulty = Difficulty::EASY;
 	do
-	    if(le.MousePressLeft(pointDifficulty[difficulty], levelCursor.GetRect().w, levelCursor.GetRect().h)){
+	    if(le.MousePressLeft(pointDifficulty[difficulty], levelCursor.GetRect().w, levelCursor.GetRect().h))
+	    {
+		Cursor::Hide();
 		levelCursor.Move(pointDifficulty[difficulty]);
+		Cursor::Show();
 		display.Flip();
 		H2Config::SetGameDifficulty(difficulty);
 	    }

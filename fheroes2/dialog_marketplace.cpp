@@ -262,8 +262,8 @@ void Dialog::Marketplace(void)
 		textBuy->SetPos(dst_pt); \
 		textBuy->Show(); \
 	} \
-	display.Flip(); \
 	Cursor::Show(); \
+	display.Flip();
 
 
     // button exit
@@ -435,7 +435,10 @@ void Dialog::Marketplace(void)
 
 	    count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
 
+            Cursor::Hide();
 	    splitter->Backward();
+            Cursor::Show();
+            display.Flip();
 
 	    RedrawInfoBuySell;
 	}
@@ -449,7 +452,10 @@ void Dialog::Marketplace(void)
 
 	    count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
 
+            Cursor::Hide();
 	    splitter->Forward();
+            Cursor::Show();
+            display.Flip();
 
 	    RedrawInfoBuySell;
 	}
