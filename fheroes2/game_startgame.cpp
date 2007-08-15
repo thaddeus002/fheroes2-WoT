@@ -43,6 +43,10 @@ namespace Game
 {
     Cursor::themes_t GetCursor(const gamefocus_t & focus);
     u16 GetIndexMaps(const Point &pt);
+    void OpenCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles);
+    void OpenHeroes(Heroes *heroes, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes);
+    void FocusToCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles);
+    void FocusToHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes);
 };
 
 Game::menu_t Game::StartGame(void)
@@ -313,74 +317,180 @@ Game::menu_t Game::StartGame(void)
 	{
 	    const u16 indextile = GetIndexMaps(le.MouseCursor());
 	    const Maps::Tiles & tile = world.GetTiles(indextile);
-	    
-	    switch(tile.GetObject())
-	    {
-		case MP2::OBJ_CASTLE:
-		case MP2::OBJN_CASTLE:
-		    // open castle
-		    if(Castle *castle = const_cast<Castle *>(world.GetCastle(indextile)))
-		    {
-			Color::color_t color = (*castle).GetColor();
-	
-			if(H2Config::GetMyColor() == color)
-			{
-			    // center area to castle
-			    Cursor::Hide();
-			    if(selectHeroes.isSelected())
-			    {
-				selectHeroes.Reset();
-				selectHeroes.Redraw();
-			    }
-			    focus.type = Game::CASTLE;
-			    focus.center = (*castle).GetCenter();
-			    areaMaps.Center(focus.center);
-			    radar.UpdatePosition();
-			    selectCastles.SelectFromCenter((*castle).GetCenter());
-			    selectCastles.Redraw();
-			    display.Flip();
-			    // and open dialog castle
-			    (*castle).OpenDialog();
-			    statusWindow.Redraw();
-			    Cursor::Show();
-			    display.Flip();
-			}
-		    }
-		    break;
-		
-		case MP2::OBJ_HEROES:
-		    // open heroes
-		    if(Heroes *hero = const_cast<Heroes *>(world.GetHeroes(indextile)))
-		    {
-			Color::color_t color = (*hero).GetColor();
-	
-			if(H2Config::GetMyColor() == color)
-			{
-			    // center area to heroes
-			    Cursor::Hide();
-			    if(selectCastles.isSelected())
-			    {
-				selectCastles.Reset();
-				selectCastles.Redraw();
-			    }
-			    focus.type = Game::HEROES;
-			    focus.center = (*hero).GetCenter();
-			    areaMaps.Center(focus.center);
-			    radar.UpdatePosition();
-			    selectHeroes.SelectFromCenter((*hero).GetCenter());
-			    selectHeroes.Redraw();
-			    display.Flip();
-			    // and open dialog heroes
-			    (*hero).OpenDialog();
-			    statusWindow.Redraw();
-			    Cursor::Show();
-			    display.Flip();
-			}
-		    }
-		    break;
 
-		default: break;
+	    switch(focus.type)
+	    {
+		case Game::HEROES:
+		    switch(tile.GetObject())
+		    {
+			// heroes -> castle
+			case MP2::OBJ_CASTLE:
+			{
+			    Castle *castle = const_cast<Castle *>(world.GetCastle(indextile));
+	
+			    if(castle && H2Config::GetMyColor() == (*castle).GetColor())
+			    {
+				// FIXME heroes go to castle
+			    }
+			    else
+			    {
+				// FIXME heroes attack other castle
+			    }
+			}
+			break;
+			
+			// heroes -> castle
+			case MP2::OBJN_CASTLE:
+			{
+			    Castle *castle = const_cast<Castle *>(world.GetCastle(indextile));
+	
+			    if(castle && H2Config::GetMyColor() == (*castle).GetColor())
+			    {
+				if(selectHeroes.isSelected())
+				{
+				    selectHeroes.Reset();
+				    selectHeroes.Redraw();
+				}
+
+				// is selected open dialog
+				if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
+				{
+				    OpenCastle(castle, focus, areaMaps, radar, selectCastles);
+
+				    statusWindow.Redraw();
+				    display.Flip();
+				}
+				// select other castle
+				else
+				{
+				    FocusToCastle(castle, focus, areaMaps, radar, selectCastles);
+				    display.Flip();
+				}
+			    }
+			    // heroes attack other castle (to center) FIXME
+			    else
+			    {
+			    }
+			}
+			break;
+
+			// heroes -> heroes
+			case MP2::OBJ_HEROES:
+			{
+			    Heroes *hero = const_cast<Heroes *>(world.GetHeroes(indextile));
+	
+			    if(hero && H2Config::GetMyColor() == (*hero).GetColor())
+			    {
+				// is selected open dialog
+				if(hero->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
+				{
+				    OpenHeroes(hero, focus, areaMaps, radar, selectHeroes);
+
+				    statusWindow.Redraw();
+				    display.Flip();
+				}
+				// heroes dialog changed items FIXME
+				else
+				{
+				}
+			    }
+			    // attack other hero FIXME
+			    else
+			    {
+			    }
+			}
+			break;
+
+			// heroes -> boat FIXME
+			case MP2::OBJ_BOAT:
+			{
+			}
+			break;
+
+			default: break;
+		    }
+		break;
+
+		case Game::BOAT:
+		{
+		    // boat -> castle
+		    // boat -> hero
+		    // FIXME
+		}
+		break;
+
+		case Game::CASTLE:
+		    switch(tile.GetObject())
+		    {
+		    	// castle -> castle
+			case MP2::OBJ_CASTLE:
+			case MP2::OBJN_CASTLE:
+			{
+			    Castle *castle = const_cast<Castle *>(world.GetCastle(indextile));
+	
+			    if(castle && H2Config::GetMyColor() == (*castle).GetColor())
+			    {
+				// is selected open dialog
+				if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
+				{
+				    OpenCastle(castle, focus, areaMaps, radar, selectCastles);
+
+				    statusWindow.Redraw();
+				    display.Flip();
+				}
+				// select other castle
+				else
+				{
+				    FocusToCastle(castle, focus, areaMaps, radar, selectCastles);
+				    display.Flip();
+				}
+			    }
+			}
+			break;
+
+		    	// castle -> heroes
+			case MP2::OBJ_HEROES:
+			{
+			    Heroes *hero = const_cast<Heroes *>(world.GetHeroes(indextile));
+	
+			    if(hero && H2Config::GetMyColor() == (*hero).GetColor())
+			    {
+				if(selectCastles.isSelected())
+				{
+				    selectCastles.Reset();
+				    selectCastles.Redraw();
+				}
+
+				// is selected open dialog
+				if(hero->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
+				{
+				    OpenHeroes(hero, focus, areaMaps, radar, selectHeroes);
+
+				    statusWindow.Redraw();
+				    display.Flip();
+				}
+				// select other hero
+				else
+				{
+				    FocusToHeroes(hero, focus, areaMaps, radar, selectHeroes);
+				    display.Flip();
+				}
+			    }
+			}
+			break;
+
+		    	// castle -> boat FIXME
+			case MP2::OBJ_BOAT:
+			{
+			}
+			break;
+
+			default: break;
+		    }
+		break;
 	    }
+
+	// endif left mouse on maps - action
 	}
 
 	// right mouse on maps - info object
@@ -495,25 +605,38 @@ Game::menu_t Game::StartGame(void)
 	    display.Flip();
 	}
 
-
         // move splitter cursor castle
         if(le.MousePressLeft(splitCastles.GetRect()) && myCastles.size() > icon_count && le.MouseCursor(splitCastles.GetRect()))
         {
-/*
-    	    //    Error::Verbose("move on splitter");
-    	    u16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
-    	    if(seek > curmaps->size() - LISTMAXITEM) seek = curmaps->size() - LISTMAXITEM;
+    	    u32 seek = (le.MouseCursor().y - splitCastles.GetRect().y) * 100 / splitCastles.GetStep();
 
-    	    it_list_head = curmaps->begin() + seek;
-    	    Cursor::Hide();
-    	    backgroundList.Restore();
-	    Scenario::DrawList(it_list_head, LISTMAXITEM);
-    	    backgroundInfo.Restore();
-    	    Scenario::DrawSelectInfo(it_current);
-    	    split.Move(seek);
-    	    Cursor::Show();
-    	    display.Flip();
-*/
+            if(seek > myCastles.size() - 1) seek = myCastles.size() - 1;
+
+            Cursor::Hide();
+
+            splitCastles.Move(seek);
+	    selectCastles.SetTop(seek);
+	    selectCastles.Redraw();
+
+            Cursor::Show();
+            display.Flip();
+	}
+
+        // move splitter cursor heroes
+        if(le.MousePressLeft(splitHeroes.GetRect()) && myHeroes.size() > icon_count && le.MouseCursor(splitHeroes.GetRect()))
+        {
+    	    u32 seek = (le.MouseCursor().y - splitHeroes.GetRect().y) * 100 / splitHeroes.GetStep();
+
+            if(seek > myHeroes.size() - 1) seek = myHeroes.size() - 1;
+
+            Cursor::Hide();
+
+            splitHeroes.Move(seek);
+	    selectHeroes.SetTop(seek);
+	    selectHeroes.Redraw();
+
+            Cursor::Show();
+            display.Flip();
 	}
 
 	// click Heroes Icons
@@ -532,31 +655,39 @@ Game::menu_t Game::StartGame(void)
 		    {
 			const Point & center = selectHeroes.GetCenter(ii);
 			Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
-			// center area to castle
-			Cursor::Hide();
-			areaMaps.Center(center);
-			radar.UpdatePosition();
-			Cursor::Show();
-			display.Flip();
-			// and open dialog
-			(*hero).OpenDialog();
+
+			// open hero
+			if(hero && H2Config::GetMyColor() == (*hero).GetColor())
+			{
+			    if(selectCastles.isSelected())
+			    {
+				selectCastles.Reset();
+				selectCastles.Redraw();
+			    }
+
+			    OpenHeroes(hero, focus, areaMaps, radar, selectHeroes);
+
+			    statusWindow.Redraw();
+			    display.Flip();
+			}
 		    }
 		    else
 		    {
-			Cursor::Hide();
 			if(selectCastles.isSelected())
 			{
 			    selectCastles.Reset();
 			    selectCastles.Redraw();
 			}
-			selectHeroes.Select(ii);
-			selectHeroes.Redraw();
-			focus.type = Game::HEROES;
-			focus.center = selectHeroes.GetCenter(ii);
-			areaMaps.Center(focus.center);
-			radar.UpdatePosition();
-			Cursor::Show();
-			display.Flip();
+
+			const Point & center = selectHeroes.GetCenter(ii);
+			Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
+
+			// open hero
+			if(hero && H2Config::GetMyColor() == (*hero).GetColor())
+			{
+			    FocusToHeroes(hero, focus, areaMaps, radar, selectHeroes);
+			    display.Flip();
+			}
 		    }
 		}
 		else
@@ -592,31 +723,38 @@ Game::menu_t Game::StartGame(void)
 		    {
 			const Point & center = selectCastles.GetCenter(ii);
 			Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
-			// center area to castle
-			Cursor::Hide();
-			areaMaps.Center(center);
-			radar.UpdatePosition();
-			Cursor::Show();
-			display.Flip();
-			// and open dialog
-			(*castle).OpenDialog();
+
+			// open castle
+			if(castle && H2Config::GetMyColor() == (*castle).GetColor())
+			{
+			    if(selectHeroes.isSelected())
+			    {
+				selectHeroes.Reset();
+				selectHeroes.Redraw();
+			    }
+
+			    OpenCastle(castle, focus, areaMaps, radar, selectCastles);
+
+			    statusWindow.Redraw();
+			    display.Flip();
+			}
 		    }
 		    else
 		    {
-			Cursor::Hide();
 			if(selectHeroes.isSelected())
 			{
 			    selectHeroes.Reset();
 			    selectHeroes.Redraw();
 			}
-			selectCastles.Select(ii);
-			selectCastles.Redraw();
-			focus.type = Game::CASTLE;
-			focus.center = selectCastles.GetCenter(ii);
-			areaMaps.Center(focus.center);
-			radar.UpdatePosition();
-			Cursor::Show();
-			display.Flip();
+
+			const Point & center = selectCastles.GetCenter(ii);
+			Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
+
+			if(castle && H2Config::GetMyColor() == (*castle).GetColor())
+			{
+			    FocusToCastle(castle, focus, areaMaps, radar, selectCastles);
+			    display.Flip();
+			}
 		    }
 		}
 		else
@@ -914,4 +1052,106 @@ u16 Game::GetIndexMaps(const Point & pt)
     if(result > world.w() * world.h() - 1) Error::Except("Game::GetIndexMaps: position, out of range.");
 
     return result;
+}
+
+/* open castle wrapper */
+void Game::OpenCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles)
+{
+    if(! castle) return;
+
+    const Kingdom & myKingdom = world.GetMyKingdom();
+    const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
+    
+    Dialog::answer_t result = Dialog::ZERO;
+
+    while(Dialog::CANCEL != result)
+    {
+	FocusToCastle(castle, focus, areaMaps, radar, selectCastles);
+
+	Cursor::Hide();
+
+	result = castle->OpenDialog();
+
+	const u32 cursor_index = selectCastles.GetCursorIndex();
+
+	if(Dialog::PREV == result)
+	{
+	     castle = cursor_index ? myCastles.at(cursor_index - 1) : myCastles.back();
+	}
+	else
+	if(Dialog::NEXT == result)
+	{
+	     castle = myCastles.size() == cursor_index + 1 ? myCastles.front() : myCastles.at(cursor_index + 1);
+	}
+
+	Cursor::Show();
+    }
+}
+
+/* focus to castle */
+void Game::FocusToCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles)
+{
+    Cursor::Hide();
+
+    focus.type = Game::CASTLE;
+    focus.center = castle->GetCenter();
+
+    areaMaps.Center(focus.center);
+    radar.UpdatePosition();
+
+    selectCastles.SelectFromCenter(castle->GetCenter());
+    selectCastles.Redraw();
+
+    Cursor::Show();
+}
+
+/* open heroes wrapper */
+void Game::OpenHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes)
+{
+    if(! hero) return;
+
+    const Kingdom & myKingdom = world.GetMyKingdom();
+    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+    
+    Dialog::answer_t result = Dialog::ZERO;
+
+    while(Dialog::CANCEL != result)
+    {
+	FocusToHeroes(hero, focus, areaMaps, radar, selectHeroes);
+
+	Cursor::Hide();
+
+	result = hero->OpenDialog();
+
+	const u32 cursor_index = selectHeroes.GetCursorIndex();
+
+	if(Dialog::PREV == result)
+	{
+	     hero = cursor_index ? myHeroes.at(cursor_index - 1) : myHeroes.back();
+	}
+	else
+	if(Dialog::NEXT == result)
+	{
+	     hero = myHeroes.size() == cursor_index + 1 ? myHeroes.front() : myHeroes.at(cursor_index + 1);
+	}
+
+	Cursor::Show();
+    }
+}
+
+/* focus to heroes */
+void Game::FocusToHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes)
+{
+    Cursor::Hide();
+
+    focus.type = Game::HEROES;
+    focus.center = hero->GetCenter();
+
+    areaMaps.Center(focus.center);
+    radar.UpdatePosition();
+
+    selectHeroes.SelectFromCenter(hero->GetCenter());
+    selectHeroes.Redraw();
+
+    Cursor::Show();
 }

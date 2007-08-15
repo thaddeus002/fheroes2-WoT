@@ -51,6 +51,7 @@ public:
     void Select(u8 index);
     bool Prev(void);
     bool Next(void);
+    bool SetTop(u8 index);
     
     virtual u8 GetSizeObject(void) const{ return 0; };
     virtual void Redraw(void) = 0;

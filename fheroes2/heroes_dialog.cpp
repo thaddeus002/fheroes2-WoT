@@ -623,6 +623,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
 	}
 
+        // prev hero
+        if(le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
+
+        // next hero
+        if(le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
+
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; exit = true; }
 
@@ -791,7 +797,5 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     le.ResetKey();
     
-    Cursor::Show();
-
     return result;
 }

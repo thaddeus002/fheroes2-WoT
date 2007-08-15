@@ -605,7 +605,6 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
     Cursor::Hide();
     background.Restore();
-    Cursor::Show();
 }
 
 void Scenario::SetCurrentSettings(const Maps::FileInfo &maps)

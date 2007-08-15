@@ -131,6 +131,18 @@ bool Game::SelectFocusObject::Next(void)
 
     return false;
 }
+
+bool Game::SelectFocusObject::SetTop(u8 index)
+{
+    if(index <= GetSizeObject() - coords.size())
+    {
+	top_index = index;
+
+	return true;
+    }
+
+    return false;
+}
 	
 Game::SelectFocusCastles::SelectFocusCastles(const std::vector<Castle *> & vec)
     : SelectFocusObject(Point(display.w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21)), castles(vec)
@@ -176,7 +188,7 @@ void Game::SelectFocusCastles::SelectFromCenter(const Point & pt)
 	if(pt == (*castles[ii]).GetCenter())
 	{
 	    top_index = (ii + coords.size() >= castles.size() && castles.size() > coords.size() ?
-	                                                         castles.size() - coords.size() : ii);
+	                                                         castles.size() - coords.size() : 0);
 	    cursor_index = ii;
 
 	    selected = true;
@@ -241,7 +253,7 @@ void Game::SelectFocusHeroes::SelectFromCenter(const Point & pt)
 	if(pt == (*heroes[ii]).GetCenter())
 	{
 	    top_index = (ii + coords.size() >= heroes.size() && heroes.size() > coords.size() ?
-	                                                        heroes.size() - coords.size() : ii);
+	                                                        heroes.size() - coords.size() : 0);
 	    cursor_index = ii;
 	    
 	    selected = true;
