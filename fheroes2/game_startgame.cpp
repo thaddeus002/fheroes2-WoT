@@ -285,6 +285,7 @@ Game::menu_t Game::StartGame(void)
     display.Flip();
 
     u32 ticket = 0;
+
     // startgame loop
     while(1){
 
@@ -873,7 +874,14 @@ Game::menu_t Game::StartGame(void)
 	// ESC
 	if(le.KeyPress(SDLK_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 	
-	++ticket;
+        // animation
+        if(!(++ticket % 50)) // FIXME: speed animation low
+        {
+            Cursor::Hide();
+            areaMaps.RedrawAnimation();
+            Cursor::Show();
+            display.Flip();
+        }
     }
 
     return QUITGAME;

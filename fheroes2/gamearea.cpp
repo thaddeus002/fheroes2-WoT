@@ -27,6 +27,7 @@
 #include "gamearea.h"
 
 Rect GameArea::area_pos = Rect(0, 0, 0, 0);
+u32 GameArea::animation_ticket = 0;
 
 GameArea::GameArea()
 {
@@ -54,22 +55,30 @@ GameArea::GameArea()
 }
 
 /* readraw rect */
-void GameArea::Redraw(const Rect &area_rt)
+void GameArea::Redraw(const Rect & area_rt)
 {
-    static u32 animation_ticket = 1;
-
     if(area_rt.x < 0 || area_rt.y < 0 || area_rt.x >= area_pos.x + area_pos.w || area_rt.y >= area_pos.y + area_pos.h) Error::Warning("GameArea::Redraw: coord out of range");
 
     for(u16 iy = 0; iy < area_rt.h; ++iy)
 	for(u16 ix = 0; ix < area_rt.w; ++ix)
 	    world.GetTiles(area_rt.x + ix, area_rt.y + iy).Blit(BORDERWIDTH + ix * TILEWIDTH, BORDERWIDTH + iy * TILEWIDTH, animation_ticket);
+}
+
+/* redraw animation tiles */
+void GameArea::RedrawAnimation(void)
+{
+    for(u16 iy = 0; iy < area_pos.h; ++iy)
+	for(u16 ix = 0; ix < area_pos.w; ++ix)
+    {
+	const Maps::Tiles & tile = world.GetTiles(area_pos.x + ix, area_pos.y + iy);
+	const u16 ax = BORDERWIDTH + ix * TILEWIDTH;
+	const u16 ay = BORDERWIDTH + iy * TILEWIDTH;
+
+	if(tile.isAnimation(ax, ay)) tile.Blit(ax, ay, animation_ticket);
+    }
 
     ++animation_ticket;
 }
-
-/* readraw all */
-void GameArea::Redraw(void)
-{ Redraw(area_pos); }
 
 /* scroll area */
 void GameArea::Scroll(GameArea::scroll_t scroll)

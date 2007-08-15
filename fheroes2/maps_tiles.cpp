@@ -215,6 +215,47 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
     }
 }
 
+bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
+{
+    // level 0
+    // none
+    
+    // level 1
+    if(addons_level1.size())
+    {
+	std::vector<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::vector<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    u8 object = (*it1).GetObject();
+	    u8 index  = (*it1).GetIndex();
+
+	    if(MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
+	}
+    }
+
+    // heroes
+    // unknown FIXME
+
+    // level 2
+    if(addons_level2.size())
+    {
+	std::vector<TilesAddon>::const_iterator it1 = addons_level2.begin();
+	std::vector<TilesAddon>::const_iterator it2 = addons_level2.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    u8 object = (*it1).GetObject();
+	    u8 index  = (*it1).GetIndex();
+	    
+	    if(MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
+	}
+    }
+    
+    return false;
+}
+
 const Maps::TilesAddon * Maps::Tiles::FindAddon(u8 object, u8 index_min, u8 index_max) const
 {
     if(addons_level1.size())

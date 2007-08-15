@@ -69,6 +69,8 @@ namespace Maps
 	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1[0].GetUniq() : 0; };
 	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2[0].GetUniq() : 0; };
 
+	bool isAnimation(u16 dstx, u16 dsty) const;
+
 	const TilesAddon * FindAddon(u8 object, u8 index_min, u8 index_max) const;
 	const TilesAddon * FindAddon(u8 object, u8 index = 0xFF) const;
 	const TilesAddon * FindAddonLevel1(u32 uniq1) const;

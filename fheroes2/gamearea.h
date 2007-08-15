@@ -37,11 +37,12 @@ public:
     void Center(const Point &pt);
     void CenterFromRadar(const Point &pt);
 
-    void Redraw(void);
-    void Redraw(const Rect &area_rt);
+    void Redraw(const Rect & area_rt = area_pos);
+    void RedrawAnimation(void);
 
 private:
     static Rect area_pos;
+    static u32 animation_ticket;
 };
 
 #endif
