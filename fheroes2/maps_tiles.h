@@ -92,6 +92,7 @@ namespace Maps
 
     private:
 	void RedrawHeroes(u16 dx, u16 dy) const;
+	void RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const;
 
     private:
 	const u16 maps_index;

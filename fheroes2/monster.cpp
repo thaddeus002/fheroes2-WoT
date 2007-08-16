@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <cstdlib>
 #include "agg.h"
 #include "rand.h"
 #include "army.h"
@@ -474,85 +473,47 @@ bool Monster::AllowUpgrade(monster_t monster)
     return monster != Upgrade(monster);
 }
 
-/*
-void Monster::BlitMiniSprite(u16 ox, u16 oy, monster_t monster, bool first)
+void Monster::ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 center)
 {
-    static u32 ticket = 0;
+    Maps::Tiles & tile = *vector[center];
+    const Maps::TilesAddon *addon = NULL;
 
-    u16 gaw = GameArea::GetRect().w;
-    u16 gah = GameArea::GetRect().h;
+    u8 icn_index = 0xFF;
+    u8 index = 0;
 
-    // draw first sprite
-    const Sprite & sprite_first = AGG::GetICN("MINIMON.ICN", monster * 9);
-
-    s16 dx = ox + TILEWIDTH / 2;
-	dx -= std::abs(sprite_first.x());
-    s16 dy = oy + TILEWIDTH;
-        dy -= std::abs(sprite_first.y());
-	dy -= 5;
-
-    Rect src_rt(0, 0, sprite_first.w(), sprite_first.h());
-
-    // left bound
-    if(dx < BORDERWIDTH){
-	src_rt.x = (dx < 0 ? std::abs(dx) + BORDERWIDTH : BORDERWIDTH - dx);
-	src_rt.w -= src_rt.x;
-        dx = BORDERWIDTH;
+    switch(tile.GetObject())
+    {
+	case MP2::OBJ_RNDMONSTER:
+	icn_index = 0x42;
+	index = Monster::Rand();
+	break;
+	case MP2::OBJ_RNDMONSTER1:
+	icn_index = 0x43;
+	index = Monster::Rand1();
+	break;
+	case MP2::OBJ_RNDMONSTER2:
+	icn_index = 0x44;
+	index = Monster::Rand2();
+	break;
+	case MP2::OBJ_RNDMONSTER3:
+	icn_index = 0x45;
+	index = Monster::Rand3();
+	break;
+	case MP2::OBJ_RNDMONSTER4:
+	icn_index = 0x46;
+	index = Monster::Rand4();
+	break;
+	default:
+	return;
     }
-
-    // top bound
-    if(dy < BORDERWIDTH){
-        src_rt.y = (dy < 0 ? std::abs(dy) + BORDERWIDTH : BORDERWIDTH - dy);
-        src_rt.h -= src_rt.y;
-        dy = BORDERWIDTH;
+    
+    if( (addon = tile.FindAddon(0x30, icn_index)) ||
+	(addon = tile.FindAddon(0x31, icn_index)) ||
+	(addon = tile.FindAddon(0x32, icn_index)) ||
+	(addon = tile.FindAddon(0x33, icn_index)))
+    {
+	//u32 uniq = (*addon).GetUniq();
+	(*const_cast<Maps::TilesAddon *>(addon)).SetIndex(index);
+	tile.SetObject(MP2::OBJ_MONSTER);
     }
-
-    // right bound
-    if(dx + sprite_first.w() > BORDERWIDTH + TILEWIDTH * gaw)
-	src_rt.w -= (dx + sprite_first.w()) - (BORDERWIDTH + TILEWIDTH * gaw);
-
-    // bottom bound
-    if(dy + sprite_first.h() > BORDERWIDTH + TILEWIDTH * gah)
-	src_rt.h -= (dy + sprite_first.h()) - (BORDERWIDTH + TILEWIDTH * gah);
-
-    display.Blit(sprite_first, src_rt, dx, dy);
-
-    // draw first sprite
-    const Sprite & sprite_next = (first ? AGG::GetICN("MINIMON.ICN", monster * 9 + 1) :
-	AGG::GetICN("MINIMON.ICN", monster * 9 + 1 + (ticket % 6)));
-
-    dx = ox + TILEWIDTH / 2;
-    dx -= std::abs(sprite_next.x());
-    dy = oy + TILEWIDTH;
-    dy -= std::abs(sprite_next.y());
-    dy -= 5;
-
-    src_rt = Rect(0, 0, sprite_next.w(), sprite_next.h());
-
-    // left bound
-    if(dx < BORDERWIDTH){
-	src_rt.x = (dx < 0 ? std::abs(dx) + BORDERWIDTH : BORDERWIDTH - dx);
-	src_rt.w -= src_rt.x;
-        dx = BORDERWIDTH;
-    }
-
-    // top bound
-    if(dy < BORDERWIDTH){
-        src_rt.y = (dy < 0 ? std::abs(dy) + BORDERWIDTH : BORDERWIDTH - dy);
-        src_rt.h -= src_rt.y;
-        dy = BORDERWIDTH;
-    }
-
-    // right bound
-    if(dx + sprite_next.w() > BORDERWIDTH + TILEWIDTH * gaw)
-	src_rt.w -= (dx + sprite_next.w()) - (BORDERWIDTH + TILEWIDTH * gaw);
-
-    // bottom bound
-    if(dy + sprite_next.h() > BORDERWIDTH + TILEWIDTH * gah)
-	src_rt.h -= (dy + sprite_next.h()) - (BORDERWIDTH + TILEWIDTH * gah);
-
-    display.Blit(sprite_next, src_rt, dx, dy);
-
-    ++ticket;    
 }
-*/

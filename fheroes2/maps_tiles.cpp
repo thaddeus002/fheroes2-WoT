@@ -24,6 +24,7 @@
 #include "tools.h"
 #include "world.h"
 #include "race.h"
+#include "config.h"
 #include "color.h"
 #include "error.h"
 #include "heroes.h"
@@ -184,9 +185,22 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	}
     }
 
-    // heroes
-    if(MP2::OBJ_HEROES == general) RedrawHeroes(dstx, dsty);
+    switch(general)
+    {
+	 // heroes
+	case MP2::OBJ_HEROES:
+	    RedrawHeroes(dstx, dsty);
+	    break;
 
+	// monster
+	case MP2::OBJ_MONSTER:
+	    RedrawMonster(dstx, dsty, anime_frame);
+	    break;
+	
+	default:
+	    break;
+    }
+    
     // level 2
     if(addons_level2.size())
     {
@@ -213,12 +227,29 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	    }
 	}
     }
+
+    // put point for grid
+    /*
+    if(H2Config::Debug())
+    {
+	display.Lock();
+	display.SetPixel2(dstx, dsty, AGG::GetColor(0x40));
+	display.Unlock();
+    }
+    */
 }
 
 bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 {
-    // level 0
-    // none
+    // check object
+    switch(general)
+    {
+	case MP2::OBJ_HEROES:
+	case MP2::OBJ_MONSTER:
+	    return true;
+	
+	default: break;
+    }
     
     // level 1
     if(addons_level1.size())
@@ -234,9 +265,6 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 	    if(MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
 	}
     }
-
-    // heroes
-    // unknown FIXME
 
     // level 2
     if(addons_level2.size())
@@ -390,6 +418,90 @@ void Maps::Tiles::DebugInfo(u16 index) const
     }
 
     std::cout << "----------------:--------" << std::endl << std::endl;
+}
+
+void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
+{
+    const TilesAddon * addons = NULL;
+
+    if((addons = FindAddon(0x30)) ||
+       (addons = FindAddon(0x31)) ||
+       (addons = FindAddon(0x32)) ||
+       (addons = FindAddon(0x33)))
+    {
+	Monster::monster_t monster = Monster::Monster(addons->GetIndex());
+
+	if(Monster::UNKNOWN <= monster)
+	{
+	    Error::Warning("Maps::Tiles::RedrawMonster: unknown monster, ", monster);
+
+	    return;
+	}
+
+	// redraw top tiles
+	if(BORDERWIDTH < dy)
+	{
+	    world.GetTiles(maps_index - world.w()).Blit(dx, dy - TILEWIDTH, anime_sprite);
+	}
+
+	// redraw left tiles
+	if(BORDERWIDTH < dx)
+	{
+	    world.GetTiles(maps_index - 1).Blit(dx - TILEWIDTH, dy, anime_sprite);
+	}
+
+	// draw first sprite
+	const Sprite & sprite_first = AGG::GetICN("MINIMON.ICN", monster * 9);
+
+	s16 ax = dx + TILEWIDTH - std::abs(sprite_first.x()) - 19;
+	s16 ay = dy + TILEWIDTH - std::abs(sprite_first.y()) - 4;
+
+	Rect src_rt(0, 0, sprite_first.w(), sprite_first.h());
+
+	// left bound
+	if(ax < BORDERWIDTH)
+	{
+	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
+	    src_rt.w -= src_rt.x;
+	    ax = BORDERWIDTH;
+	}
+
+	// top bound
+	if(ay < BORDERWIDTH)
+	{
+	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
+	    src_rt.h -= src_rt.y;
+	    ay = BORDERWIDTH;
+	}
+
+	display.Blit(sprite_first, src_rt, ax, ay);
+
+	// draw second sprite
+	const Sprite & sprite_next = AGG::GetICN("MINIMON.ICN", monster * 9 + 1 + (anime_sprite % 6));
+
+	ax = dx + TILEWIDTH - std::abs(sprite_next.x()) - 19;
+	ay = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
+
+	src_rt = Rect(0, 0, sprite_next.w(), sprite_next.h());
+
+	// left bound
+	if(ax < BORDERWIDTH)
+	{
+	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
+	    src_rt.w -= src_rt.x;
+	    ax = BORDERWIDTH;
+	}
+
+	// top bound
+	if(ay < BORDERWIDTH)
+	{
+	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
+	    src_rt.h -= src_rt.y;
+	    ay = BORDERWIDTH;
+	}
+
+	display.Blit(sprite_next, src_rt, ax, ay);
+    }
 }
 
 void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const

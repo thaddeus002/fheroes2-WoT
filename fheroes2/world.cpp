@@ -602,6 +602,14 @@ void World::LoadMaps(const std::string &filename)
 		Resource::ChangeTileWithRNDResource(vec_tiles, ii);
 		break;
 
+	    case MP2::OBJ_RNDMONSTER:
+	    case MP2::OBJ_RNDMONSTER1:
+	    case MP2::OBJ_RNDMONSTER2:
+	    case MP2::OBJ_RNDMONSTER3:
+	    case MP2::OBJ_RNDMONSTER4:
+		// modify rnd monster sprite
+		Monster::ChangeTileWithRNDMonster(vec_tiles, ii);
+		break;
 
 	    default:
 		break;
