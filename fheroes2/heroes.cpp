@@ -344,6 +344,9 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
     // end
 
+    // save general object
+    save_maps_general = world.GetTiles(mp.x, mp.y).GetObject();
+
     Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
@@ -741,14 +744,21 @@ void Heroes::Move(u16 ax, u16 ay)
 	tiles_old.SetObject(save_maps_general);
     }
 
+    // redraw old tile
+
+    // redraw sprite move hero
+    // center area maps
+
     Maps::Tiles & tiles_new = world.GetTiles(ax, ay);
 
     // save general object
     save_maps_general = tiles_new.GetObject();
     tiles_new.SetObject(MP2::OBJ_HEROES);
-    
+
     mp.x = ax;
     mp.y = ay;
+
+    // redraw new tile
 }
 
 u32 Heroes::GetNextLevelExperience(u8 level) const

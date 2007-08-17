@@ -29,12 +29,15 @@
 #include "monster.h"
 #include "gamearea.h"
 #include "background.h"
+#include "cursor.h"
 #include "error.h"
 #include "portrait.h"
 #include "dialog.h"
 
 void Dialog::QuickInfo(const std::string & object)
 {
+    Cursor::Hide();
+
     // preload
     const std::string &qwikinfo = "QWIKINFO.ICN";
 
@@ -78,18 +81,23 @@ void Dialog::QuickInfo(const std::string & object)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    Cursor::Show();
     display.Flip();
 
     // quick info loop
     while(le.MouseRight()){ le.HandleEvents(); }
 
     // restore background
+    Cursor::Hide();
     back.Restore();
+    Cursor::Show();
     display.Flip();
 }
 
 void Dialog::QuickInfo(const Castle & castle)
 {
+    Cursor::Hide();
+
     const std::string &qwiktown = "QWIKTOWN.ICN";
     AGG::PreloadObject(qwiktown);
 
@@ -122,7 +130,6 @@ void Dialog::QuickInfo(const Castle & castle)
     
     Background back(cur_rt);
     back.Save();
-
     display.Blit(box, cur_rt);
 
     cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 12, 178, 140);
@@ -148,12 +155,34 @@ void Dialog::QuickInfo(const Castle & castle)
 	default: Error::Warning(": unknown race."); return;
     }
     
+    // castle icon
     const Sprite & sprite = AGG::GetICN("LOCATORS.ICN", index);
 
     dst_pt.x = cur_rt.x + (cur_rt.w - sprite.w()) / 2;
     dst_pt.y += 18;
     display.Blit(sprite, dst_pt);
 
+    // color flags
+    switch(castle.GetColor())
+    {
+	case Color::BLUE:	index = 0; break;
+	case Color::GREEN:	index = 2; break;
+	case Color::RED:	index = 4; break;
+	case Color::YELLOW:	index = 6; break;
+	case Color::ORANGE:	index = 8; break;
+	case Color::PURPLE:	index = 10; break;
+	case Color::GRAY:	index = 12; break;
+    }
+
+    const Sprite & l_flag = AGG::GetICN("FLAG32.ICN", index);
+    dst_pt.x = cur_rt.x + (cur_rt.w - 60) / 2 - l_flag.w();
+    display.Blit(l_flag, dst_pt);
+
+    const Sprite & r_flag = AGG::GetICN("FLAG32.ICN", index + 1);
+    dst_pt.x = cur_rt.x + (cur_rt.w + 60) / 2;
+    display.Blit(r_flag, dst_pt);
+
+    // info
     message = std::string("Defenders:");
     dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
     dst_pt.y += sprite.h() + 5;
@@ -200,18 +229,23 @@ void Dialog::QuickInfo(const Castle & castle)
     }																																																																																			
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    Cursor::Show();
     display.Flip();
 
     // quick info loop
     while(le.MouseRight()){ le.HandleEvents(); }
 
     // restore background
+    Cursor::Hide();
     back.Restore();
+    Cursor::Show();
     display.Flip();
 }
 
 void Dialog::QuickInfo(const Heroes & hero)
 {
+    Cursor::Hide();
+
     const std::string &qwikhero = "QWIKHERO.ICN";
     AGG::PreloadObject(qwikhero);
 
@@ -262,6 +296,28 @@ void Dialog::QuickInfo(const Heroes & hero)
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
     dst_pt.y += 15;
     display.Blit(port, dst_pt);
+
+    // color flags
+    u8 index = 0;
+
+    switch(hero.GetColor())
+    {
+	case Color::BLUE:	index = 0; break;
+	case Color::GREEN:	index = 2; break;
+	case Color::RED:	index = 4; break;
+	case Color::YELLOW:	index = 6; break;
+	case Color::ORANGE:	index = 8; break;
+	case Color::PURPLE:	index = 10; break;
+	case Color::GRAY:	index = 12; break;
+    }
+
+    const Sprite & l_flag = AGG::GetICN("FLAG32.ICN", index);
+    dst_pt.x = cur_rt.x + (cur_rt.w - 40) / 2 - l_flag.w();
+    display.Blit(l_flag, dst_pt);
+
+    const Sprite & r_flag = AGG::GetICN("FLAG32.ICN", index + 1);
+    dst_pt.x = cur_rt.x + (cur_rt.w + 40) / 2;
+    display.Blit(r_flag, dst_pt);
 
     // attack
     message = "Attack:";
@@ -353,12 +409,15 @@ void Dialog::QuickInfo(const Heroes & hero)
     
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    Cursor::Show();
     display.Flip();
 
     // quick info loop
     while(le.MouseRight()){ le.HandleEvents(); }
 
     // restore background
+    Cursor::Hide();
     back.Restore();
+    Cursor::Show();
     display.Flip();
 }

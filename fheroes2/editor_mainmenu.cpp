@@ -51,29 +51,28 @@ Game::menu_t Game::Editor::MainMenu(void){
 
     Button buttonNewMap(455, 45, "BTNEMAIN.ICN", 0, 1);
     Button buttonLoadMap(455, 110, "BTNEMAIN.ICN", 2, 3);
-    Button buttonCancelGame(455, 375, "BTNEMAIN.ICN", 6, 7);
+    Button buttonCancelGame(455, 375, "BTNEMAIN.ICN", 4, 5);
 
     Cursor::Show();
     display.Flip();
 
     // NewMap loop
-    while(1){
-
+    while(1)
+    {
 	le.HandleEvents();
 
 	le.MousePressLeft(buttonNewMap) ? buttonNewMap.Press() : buttonNewMap.Release();
 	le.MousePressLeft(buttonLoadMap) ? buttonLoadMap.Press() : buttonLoadMap.Release();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.Press() : buttonCancelGame.Release();
 
-	if(le.MouseClickLeft(buttonNewMap)) return EDITNEWMAP;
-	if(le.MouseClickLeft(buttonLoadMap)) return EDITLOADMAP;
+	//if(le.MouseClickLeft(buttonNewMap)) return EDITNEWMAP;
+	//if(le.MouseClickLeft(buttonLoadMap)) return EDITLOADMAP;
 	if(le.MouseClickLeft(buttonCancelGame)) return QUITGAME;
 
         // right info
-	//if(le.MousePressRight(buttonNewMap)) Dialog::Message("Standard Game", "A single player game playing out a single map.", Font::BIG);
-	//if(le.MousePressRight(buttonLoadMap)) Dialog::Message("Campaign Game", "A single player game playing through a series of maps.", Font::BIG);
-	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Cancel", "Cancel back to the main menu.", Font::BIG);
-		 
+	if(le.MousePressRight(buttonNewMap)) Dialog::Message("New Map", "Create a new map, either from scratch or using the random map generator.", Font::BIG);
+	if(le.MousePressRight(buttonLoadMap)) Dialog::Message("Load Map", "Load an existing map.", Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Quit", "Quit out of the map editor.", Font::BIG);
     }
 
     return QUITGAME;

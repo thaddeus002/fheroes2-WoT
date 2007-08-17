@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 	    {
 		H2Config::SetEditor();
 
-		if(H2Config::Debug()) std::cout << "start: editing mode." << std::endl;
+		if(H2Config::Debug()) std::cout << "start: editor mode." << std::endl;
 	    }
 	}
 
@@ -172,23 +172,40 @@ int main(int argc, char **argv)
 	    Game::menu_t rs = Game::MAINMENU;
 
 	    while(rs != Game::QUITGAME)
+	    {
+		if(H2Config::Editor())
+		{
+		    switch(rs)
+		    {
+	    		case Game::MAINMENU:       rs = Game::Editor::MainMenu();	break;
+	    		//case Game::EDITNEWMAP:     rs = Game::Editor::NewMap();	  break;
+	    		//case Game::EDITLOADMAP:    rs = Game::Editor::LoadMap();        break;
 
-		switch(rs){
-	    	    case Game::MAINMENU:       rs = Game::MainMenu();		break;
-	    	    case Game::NEWGAME:        rs = Game::NewGame();		break;
-	    	    case Game::LOADGAME:       rs = Game::LoadGame();		break;
-	    	    case Game::HIGHSCORES:     rs = Game::HighScores();		break;
-	    	    case Game::CREDITS:        rs = Game::Credits();		break;
-	    	    case Game::NEWSTANDARD:    rs = Game::NewStandard();	break;
-	    	    case Game::NEWCAMPAIN:     rs = Game::NewCampain();		break;
-	    	    case Game::NEWMULTI:       rs = Game::NewMulti();		break;
-	    	    case Game::LOADSTANDARD:   rs = Game::LoadStandard();	break;
-	    	    case Game::LOADCAMPAIN:    rs = Game::LoadCampain();	break;
-	    	    case Game::LOADMULTI:      rs = Game::LoadMulti();		break;
-	    	    case Game::SCENARIOINFO:   rs = Game::ScenarioInfo();	break;
-		    case Game::STARTGAME:      rs = Game::StartGame();          break;
-	    	    default: break;
+			default: break;
+		    }
 		}
+		else
+		{
+		    switch(rs)
+		    {
+	    		case Game::MAINMENU:       rs = Game::MainMenu();		break;
+	    		case Game::NEWGAME:        rs = Game::NewGame();		break;
+	    		case Game::LOADGAME:       rs = Game::LoadGame();		break;
+	    		case Game::HIGHSCORES:     rs = Game::HighScores();		break;
+	    		case Game::CREDITS:        rs = Game::Credits();		break;
+	    		case Game::NEWSTANDARD:    rs = Game::NewStandard();		break;
+	    		case Game::NEWCAMPAIN:     rs = Game::NewCampain();		break;
+	    		case Game::NEWMULTI:       rs = Game::NewMulti();		break;
+	    		case Game::LOADSTANDARD:   rs = Game::LoadStandard();		break;
+	    		case Game::LOADCAMPAIN:    rs = Game::LoadCampain();		break;
+	    		case Game::LOADMULTI:      rs = Game::LoadMulti();		break;
+	    		case Game::SCENARIOINFO:   rs = Game::ScenarioInfo();		break;
+			case Game::STARTGAME:      rs = Game::StartGame();      	break;
+
+	    		default: break;
+		    }
+		}
+	    }
 
 	    Display::ShowCursor();
 

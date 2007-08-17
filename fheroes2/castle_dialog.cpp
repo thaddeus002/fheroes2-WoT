@@ -307,6 +307,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    orders_building.push_back(DWELLING_MONSTER1);
 	    orders_building.push_back(BUILD_MAGEGUILD1);
 	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(BUILD_MARKETPLACE);
 	    orders_building.push_back(BUILD_STATUE);
 	    orders_building.push_back(BUILD_WELL);
 	    break;
