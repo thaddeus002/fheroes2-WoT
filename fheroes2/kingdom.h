@@ -115,7 +115,6 @@ public:
 
 private:
     const Color::color_t color;
-    bool build;
     bool play;
     Resource::funds_t resource;
 

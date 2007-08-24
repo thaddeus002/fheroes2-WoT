@@ -18,11 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "rand.h"
 #include "spell.h"
 
 namespace Spell
 {
     static const stats_t all_spells[] = {
+	{ "Unknown", "Unknown spell." },
 	{ "Fireball", "Causes a giant fireball to strike the selected area, damaging all nearby creatures." },
 	{ "Fireblast", "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one." }, 
 	{ "Lightning Bolt", "Causes a bolt of electrical energy to strike the selected creature." }, 
@@ -97,3 +99,331 @@ const std::string & Spell::String(spell_t spell)
 
 const std::string & Spell::Description(spell_t spell)
 { return Spell::all_spells[spell].description; }
+
+u8 Spell::Level(spell_t spell)
+{
+    switch(spell)
+    {
+	case BLESS:
+	case BLOODLUST:
+	case CURE:
+	case CURSE:
+	case DISPEL:
+	case HASTE:
+	case ARROW:
+	case SHIELD:
+	case SLOW:
+	case STONESKIN:
+
+	case VIEWMINES:
+	case VIEWRESOURCES:
+		return 1;
+
+	case BLIND:
+	case COLDRAY:
+	case DEATHRIPPLE:
+	case DISRUPTINGRAY:
+	case DRAGONSLAYER:
+	case LIGHTNINGBOLT:
+	case STEELSKIN:
+
+	case HAUNT:
+	case SUMMONBOAT:
+	case VIEWARTIFACTS:
+	case VISIONS:
+		return 2;
+
+	case ANIMATEDEAD:
+	case ANTIMAGIC:
+	case COLDRING:
+	case DEATHWAVE:
+	case EARTHQUAKE:
+	case FIREBALL:
+	case HOLYWORD:
+	case MASSBLESS:
+	case MASSCURSE:
+	case MASSDISPEL:
+	case MASSHASTE:
+	case PARALYZE:
+	case TELEPORT:
+
+	case IDENTIFYHERO:
+	case VIEWHEROES:
+	case VIEWTOWNS:
+		return 3;
+
+	case BERZERKER:
+	case CHAINLIGHTNING:
+	case ELEMENTALSTORM:
+	case FIREBLAST:
+	case HOLYSHOUT:
+	case MASSCURE:
+	case MASSSHIELD:
+	case MASSSLOW:
+	case METEORSHOWER:
+	case RESURRECT:
+
+	case SETEGUARDIAN:
+	case SETAGUARDIAN:
+	case SETFGUARDIAN:
+	case SETWGUARDIAN:
+	case TOWNGATE:
+	case VIEWALL:
+		return 4;
+
+	case ARMAGEDDON:
+	case HYPNOTIZE:
+	case MIRRORIMAGE:
+	case RESURRECTTRUE:
+	case SUMMONEELEMENT:
+	case SUMMONAELEMENT:
+	case SUMMONFELEMENT:
+	case SUMMONWELEMENT:
+
+	case DIMENSIONDOOR:
+	case TOWNPORTAL:
+		return 5;
+
+	default: break;
+    }
+
+    return 0;
+}
+
+Spell::spell_t Spell::Rand1(void)
+{
+    switch(Rand::Get(1, 12))
+    {
+	case 1:  return BLESS;
+	case 2:  return BLOODLUST;
+	case 3:  return CURE;
+	case 4:  return CURSE;
+	case 5:  return DISPEL;
+	case 6:  return HASTE;
+	case 7:  return ARROW;
+	case 8:  return SHIELD;
+	case 9:  return SLOW;
+	case 10: return STONESKIN;
+	case 11: return VIEWMINES;
+	case 12: return VIEWRESOURCES;
+
+	default: break;
+    }
+    
+    return Spell::NONE;
+}
+
+Spell::spell_t Spell::Rand2(void)
+{
+    switch(Rand::Get(1, 11))
+    {
+	case 1: return BLIND;
+	case 2: return COLDRAY;
+	case 3: return DEATHRIPPLE;
+	case 4: return DISRUPTINGRAY;
+	case 5: return DRAGONSLAYER;
+	case 6: return LIGHTNINGBOLT;
+	case 7: return STEELSKIN;
+	case 8: return HAUNT;
+	case 9: return SUMMONBOAT;
+	case 10: return VIEWARTIFACTS;
+	case 11: return VISIONS;
+
+	default: break;
+    }
+    
+    return Spell::NONE;
+}
+
+Spell::spell_t Spell::Rand3(void)
+{
+    switch(Rand::Get(1, 16))
+    {
+	case 1: return ANIMATEDEAD;
+	case 2: return ANTIMAGIC;
+	case 3: return COLDRING;
+	case 4: return DEATHWAVE;
+	case 5: return EARTHQUAKE;
+	case 6: return FIREBALL;
+	case 7: return HOLYWORD;
+	case 8: return MASSBLESS;
+	case 9: return MASSCURSE;
+	case 10: return MASSDISPEL;
+	case 11: return MASSHASTE;
+	case 12: return PARALYZE;
+	case 13: return TELEPORT;
+	case 14: return IDENTIFYHERO;
+	case 15: return VIEWHEROES;
+	case 16: return VIEWTOWNS;
+
+	default: break;
+    }
+    
+    return Spell::NONE;
+}
+
+Spell::spell_t Spell::Rand4(void)
+{
+    switch(Rand::Get(1, 16))
+    {
+	case 1: return BERZERKER;
+	case 2: return CHAINLIGHTNING;
+	case 3: return ELEMENTALSTORM;
+	case 4: return FIREBLAST;
+	case 5: return HOLYSHOUT;
+	case 6: return MASSCURE;
+	case 7: return MASSSHIELD;
+	case 8: return MASSSLOW;
+	case 9: return METEORSHOWER;
+	case 10: return RESURRECT;
+	case 11: return SETEGUARDIAN;
+	case 12: return SETAGUARDIAN;
+	case 13: return SETFGUARDIAN;
+	case 14: return SETWGUARDIAN;
+	case 15: return TOWNGATE;
+	case 16: return VIEWALL;
+
+	default: break;
+    }
+    
+    return Spell::NONE;
+}
+
+Spell::spell_t Spell::Rand5(void)
+{
+    switch(Rand::Get(1, 10))
+    {
+	case 1: return ARMAGEDDON;
+	case 2: return HYPNOTIZE;
+	case 3: return MIRRORIMAGE;
+	case 4: return RESURRECTTRUE;
+	case 5: return SUMMONEELEMENT;
+	case 6: return SUMMONAELEMENT;
+	case 7: return SUMMONFELEMENT;
+	case 8: return SUMMONWELEMENT;
+	case 9: return DIMENSIONDOOR;
+	case 10: return TOWNPORTAL;
+
+	default: break;
+    }
+    
+    return Spell::NONE;
+}
+
+bool Spell::isCombat(spell_t spell)
+{
+    switch(spell)
+    {
+	case VIEWMINES:
+	case VIEWRESOURCES:
+
+	case HAUNT:
+	case SUMMONBOAT:
+	case VIEWARTIFACTS:
+	case VISIONS:
+
+	case IDENTIFYHERO:
+	case VIEWHEROES:
+	case VIEWTOWNS:
+
+	case SETEGUARDIAN:
+	case SETAGUARDIAN:
+	case SETFGUARDIAN:
+	case SETWGUARDIAN:
+	case TOWNGATE:
+	case VIEWALL:
+
+	case DIMENSIONDOOR:
+	case TOWNPORTAL:
+	    return false;
+
+	default: break;
+    }
+    
+    return true;
+}
+
+bool Spell::Uniq(const std::vector<spell_t> & spells, spell_t spell)
+{
+    if(Spell::NONE == spell) return false;
+
+    return spells.end() == std::find(spells.begin(), spells.end(), spell);
+}
+
+u8 Spell::GetIndexSprite(spell_t spell)
+{
+    switch(spell)
+    {
+	case SLOW:		return 1;
+	case MASSCURE:		return 2;
+	case CURSE:		return 3;
+	case LIGHTNINGBOLT:	return 4;
+	case CHAINLIGHTNING:	return 5;
+	case CURE:		return 6;
+	case BLESS:		return 7;
+	case FIREBALL:		return 8;
+	case FIREBLAST:		return 9;
+	case TELEPORT:		return 10;
+	case ELEMENTALSTORM:	return 11;
+	case RESURRECT:		return 12;
+	case RESURRECTTRUE:	return 13;
+	case HASTE:		return 14;
+	case SHIELD:		return 15;
+	case ARMAGEDDON:	return 16;
+	case ANTIMAGIC:		return 17;
+	case DISPEL:		return 18;
+	case BERZERKER:		return 19;
+	case PARALYZE:		return 20;
+	case BLIND:		return 21;
+	case HOLYWORD:		return 22;
+	case HOLYSHOUT:		return 23;
+	case METEORSHOWER:	return 24;
+	case ANIMATEDEAD:	return 25;
+	case MIRRORIMAGE:	return 26;
+	case BLOODLUST:		return 27;
+	case DEATHRIPPLE:	return 28;
+	case DEATHWAVE:		return 29;
+	case STEELSKIN:		return 30;
+	case STONESKIN:		return 31;
+	case DRAGONSLAYER:	return 32;
+	case EARTHQUAKE:	return 33;
+	case DISRUPTINGRAY:	return 34;
+	case COLDRAY:		return 35;
+	case COLDRING:		return 36;
+	case HYPNOTIZE:		return 37;
+	case ARROW:		return 38;
+	case VIEWMINES:		return 39;
+	case VIEWRESOURCES:	return 40;
+	case VIEWARTIFACTS:	return 41;
+	case VIEWTOWNS:		return 42;
+	case VIEWHEROES:	return 43;
+	case VIEWALL:		return 44;
+	case IDENTIFYHERO:	return 45;
+	case SUMMONBOAT:	return 46;
+	case DIMENSIONDOOR:	return 47;
+	case TOWNGATE:		return 48;
+	case TOWNPORTAL:	return 49;
+	case VISIONS:		return 50;
+	case HAUNT:		return 51;
+	case SETEGUARDIAN:	return 52;
+	case SETAGUARDIAN:	return 53;
+	case SETFGUARDIAN:	return 54;
+	case SETWGUARDIAN:	return 55;
+	case SUMMONEELEMENT:	return 56;
+	case SUMMONAELEMENT:	return 57;
+	case SUMMONFELEMENT:	return 58;
+	case SUMMONWELEMENT:	return 59;
+		
+	case MASSBLESS:		return 7;
+	case MASSCURSE: 	return 3;
+	case MASSDISPEL:	return 18;
+	case MASSHASTE:		return 14;
+	case MASSSHIELD:	return 15;
+	case MASSSLOW:		return 1;
+
+	default: break;
+    }
+
+    return 0;
+}
+

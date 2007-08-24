@@ -229,14 +229,12 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
     }
 
     // put point for grid
-    /*
     if(H2Config::Debug())
     {
 	display.Lock();
 	display.SetPixel2(dstx, dsty, AGG::GetColor(0x40));
 	display.Unlock();
     }
-    */
 }
 
 bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
@@ -453,7 +451,7 @@ void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
 	// draw first sprite
 	const Sprite & sprite_first = AGG::GetICN("MINIMON.ICN", monster * 9);
 
-	s16 ax = dx + TILEWIDTH - std::abs(sprite_first.x()) - 19;
+	s16 ax = dx + TILEWIDTH - std::abs(sprite_first.x()) - 22;
 	s16 ay = dy + TILEWIDTH - std::abs(sprite_first.y()) - 4;
 
 	Rect src_rt(0, 0, sprite_first.w(), sprite_first.h());
@@ -479,7 +477,7 @@ void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
 	// draw second sprite
 	const Sprite & sprite_next = AGG::GetICN("MINIMON.ICN", monster * 9 + 1 + (anime_sprite % 6));
 
-	ax = dx + TILEWIDTH - std::abs(sprite_next.x()) - 19;
+	ax = dx + TILEWIDTH - std::abs(sprite_next.x()) - 22;
 	ay = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
 
 	src_rt = Rect(0, 0, sprite_next.w(), sprite_next.h());

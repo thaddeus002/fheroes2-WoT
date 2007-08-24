@@ -37,7 +37,7 @@ public:
     void Center(const Point &pt);
     void CenterFromRadar(const Point &pt);
 
-    void Redraw(const Rect & area_rt = area_pos);
+    void Redraw(const Rect & area_rt = Rect(0, 0, area_pos.w, area_pos.h));
     void RedrawAnimation(void);
 
 private:

@@ -687,8 +687,15 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
 	else
 	// buy castle
-	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent) && Dialog::OK == DialogBuyBuilding(BUILD_CASTLE, true))
+	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent))
 	{
+	    if(!allow_castle)
+	    {
+		Dialog::Message("Town", "This town may not be upgraded to a castle.", Font::BIG, Dialog::OK);
+	    }
+	    else
+	    if(Dialog::OK == DialogBuyBuilding(BUILD_CASTLE, true))
+	    {
 		Cursor::Hide();
 		BuyBuilding(BUILD_CASTLE);
 		RedrawResourcePanel();
@@ -696,6 +703,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	        RedrawNameTown(cur_pt);
 		Cursor::Show();
 		display.Flip();
+	    }
 	}
 	// captain
 	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);

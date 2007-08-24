@@ -44,7 +44,7 @@ public:
     const std::vector<Rect> & GetCoords(void) const{ return coords; };
     u8 GetCursorIndex(void) const { return cursor_index; };
     u8 GetTopIndex(void) const{ return top_index; };
-    u8 GetSelectIndex(void) const{ return top_index - cursor_index; };
+    u8 GetSelectIndex(void) const{ return cursor_index - top_index; };
     const Rect & GetMaxRect(void) const{ return max_area; };
 
     void Reset(void);

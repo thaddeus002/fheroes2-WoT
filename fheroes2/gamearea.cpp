@@ -54,14 +54,14 @@ GameArea::GameArea()
     }
 }
 
-/* readraw rect */
+/* readraw rect, default all (0, 0, area_pos.w ,area_pos.h)  */
 void GameArea::Redraw(const Rect & area_rt)
 {
-    if(area_rt.x < 0 || area_rt.y < 0 || area_rt.x >= area_pos.x + area_pos.w || area_rt.y >= area_pos.y + area_pos.h) Error::Warning("GameArea::Redraw: coord out of range");
+    if(area_rt.x < 0 || area_rt.y < 0 || area_rt.w > area_pos.w || area_rt.h > area_pos.h) Error::Warning("GameArea::Redraw: coord out of range");
 
-    for(u16 iy = 0; iy < area_rt.h; ++iy)
-	for(u16 ix = 0; ix < area_rt.w; ++ix)
-	    world.GetTiles(area_rt.x + ix, area_rt.y + iy).Blit(BORDERWIDTH + ix * TILEWIDTH, BORDERWIDTH + iy * TILEWIDTH, animation_ticket);
+    for(u16 iy = area_rt.y; iy < area_rt.y + area_rt.h; ++iy)
+	for(u16 ix = area_rt.x; ix < area_rt.x + area_rt.w; ++ix)
+	    world.GetTiles(area_pos.x + ix, area_pos.y + iy).Blit(BORDERWIDTH + ix * TILEWIDTH, BORDERWIDTH + iy * TILEWIDTH, animation_ticket);
 }
 
 /* redraw animation tiles */
@@ -83,38 +83,59 @@ void GameArea::RedrawAnimation(void)
 /* scroll area */
 void GameArea::Scroll(GameArea::scroll_t scroll)
 {
-    switch(scroll){
+    switch(scroll)
+    {
 	case GameArea::LEFT:
+	{
 	    if(0 == area_pos.x) return;
-	    Cursor::Hide();
+
 	    --area_pos.x;
-	    Redraw();
-	    Cursor::Show();
-	    display.Flip();
+
+	    const Rect new_rt(BORDERWIDTH, BORDERWIDTH, TILEWIDTH * (area_pos.w - 1), TILEWIDTH * area_pos.h);
+	    const Rect rdw_rt(0, 0, 1, area_pos.h);
+
+	    display.Blit(display, new_rt, BORDERWIDTH + TILEWIDTH, BORDERWIDTH);
+	    Redraw(rdw_rt);
+	}
 	    break;
 	case GameArea::RIGHT:
+	{
 	    if(world.w() - area_pos.w == area_pos.x) return;
-	    Cursor::Hide();
+
 	    ++area_pos.x;
-	    Redraw();
-	    Cursor::Show();
-	    display.Flip();
+
+	    const Rect new_rt(BORDERWIDTH + TILEWIDTH, BORDERWIDTH, TILEWIDTH * (area_pos.w - 1), TILEWIDTH * area_pos.h);
+	    const Rect rdw_rt(area_pos.w - 1, 0, 1, area_pos.h);
+
+	    display.Blit(display, new_rt, BORDERWIDTH, BORDERWIDTH);
+	    Redraw(rdw_rt);
+	}
 	    break;
 	case GameArea::TOP:
+	{
 	    if(0 == area_pos.y) return;
-	    Cursor::Hide();
+
 	    --area_pos.y;
-	    Redraw();
-	    Cursor::Show();
-	    display.Flip();
+
+	    const Rect new_rt(BORDERWIDTH, BORDERWIDTH, TILEWIDTH * area_pos.w, TILEWIDTH * (area_pos.h - 1));
+	    const Rect rdw_rt(0, 0, area_pos.w, 1);
+
+	    display.Blit(display, new_rt, BORDERWIDTH, BORDERWIDTH + TILEWIDTH);
+	    Redraw(rdw_rt);
+	}
 	    break;
 	case GameArea::BOTTOM:
+	{
 	    if(world.h() - area_pos.h == area_pos.y) return;
-	    Cursor::Hide();
+
 	    ++area_pos.y;
-	    Redraw();
-	    Cursor::Show();
-	    display.Flip();
+
+	    const Rect new_rt(BORDERWIDTH, BORDERWIDTH + TILEWIDTH, TILEWIDTH * area_pos.w, TILEWIDTH * (area_pos.h - 1));
+	    const Rect rdw_rt(0, area_pos.h - 1, area_pos.w, 1);
+
+	    display.Blit(display, new_rt, BORDERWIDTH, BORDERWIDTH);
+	    Redraw(rdw_rt);
+	}
 	    break;
     }
 }
@@ -144,9 +165,20 @@ void GameArea::Center(const Point &pt)
 
     if(pos.x == area_pos.x && pos.y == area_pos.y) return;
 
-    area_pos.x = pos.x;
-    area_pos.y = pos.y;
+    // possible fast scroll
+    if(pos.y == area_pos.y && 1 == (pos.x - area_pos.x)) Scroll(GameArea::RIGHT);
+    else
+    if(pos.y == area_pos.y && -1 == (pos.x - area_pos.x)) Scroll(GameArea::LEFT);
+    else
+    if(pos.x == area_pos.x && 1 == (pos.y - area_pos.y)) Scroll(GameArea::BOTTOM);
+    else
+    if(pos.x == area_pos.x && -1 == (pos.y - area_pos.y)) Scroll(GameArea::TOP);
+    
+    else
+    {
+	area_pos.x = pos.x;
+	area_pos.y = pos.y;
 
-    Redraw();
+	Redraw();
+    }
 }
-

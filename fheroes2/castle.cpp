@@ -480,6 +480,43 @@ void Castle::ModifyTilesTownToCastle(Maps::Tiles & tile)
 	}
 }
 
+void Castle::TownUpgradeToCastle(void)
+{
+    // correct area maps sprites
+    std::vector<u16> coords;
+
+    // T0
+    coords.push_back((mp.y - 3) * world.h() + mp.x);
+    // T1
+    coords.push_back((mp.y - 2) * world.h() + mp.x - 2);
+    coords.push_back((mp.y - 2) * world.h() + mp.x - 1);
+    coords.push_back((mp.y - 2) * world.h() + mp.x);
+    coords.push_back((mp.y - 2) * world.h() + mp.x + 1);
+    coords.push_back((mp.y - 2) * world.h() + mp.x + 2);
+    // T2
+    coords.push_back((mp.y - 1) * world.h() + mp.x - 2);
+    coords.push_back((mp.y - 1) * world.h() + mp.x - 1);
+    coords.push_back((mp.y - 1) * world.h() + mp.x);
+    coords.push_back((mp.y - 1) * world.h() + mp.x + 1);
+    coords.push_back((mp.y - 1) * world.h() + mp.x + 2);
+    // B1
+    coords.push_back(mp.y * world.h() + mp.x - 2);
+    coords.push_back(mp.y * world.h() + mp.x - 1);
+    coords.push_back(mp.y * world.h() + mp.x);
+    coords.push_back(mp.y * world.h() + mp.x + 1);
+    coords.push_back(mp.y * world.h() + mp.x + 2);
+
+    // modify all rnd sprites
+    std::vector<u16>::const_iterator itc = coords.begin();
+    for(; itc != coords.end(); ++itc) ModifyTilesTownToCastle(world.GetTiles(*itc));
+
+
+
+
+    // remove tent
+    building &= ~BUILD_TENT;
+}
+
 // return valid count army in castle
 u8 Castle::GetCountArmy(void) const
 {
@@ -493,17 +530,7 @@ u8 Castle::GetCountArmy(void) const
 // return mage guild level
 u8 Castle::GetLevelMageGuild(void)
 {
-    if(BUILD_MAGEGUILD5 & building)	return 5;
-    else
-    if(BUILD_MAGEGUILD4 & building)	return 4;
-    else
-    if(BUILD_MAGEGUILD3 & building)	return 3;
-    else
-    if(BUILD_MAGEGUILD2 & building)	return 2;
-    else
-    if(BUILD_MAGEGUILD1 & building)	return 1;
-
-    return 0;
+    return mageguild.GetLevel();
 }
 
 const std::string & Castle::GetStringBuilding(const building_t & build, const Race::race_t & race)
@@ -1059,7 +1086,17 @@ void Castle::BuyBuilding(building_t build)
 
 	switch(build)
 	{
-	    case BUILD_CASTLE: building &= ~BUILD_TENT; break;
+	    case BUILD_CASTLE: TownUpgradeToCastle(); break;
+
+	    case BUILD_MAGEGUILD1:
+	    case BUILD_MAGEGUILD2:
+	    case BUILD_MAGEGUILD3:
+	    case BUILD_MAGEGUILD4:
+	    case BUILD_MAGEGUILD5: mageguild.BuildNextLevel(); break;
+            
+            // build library
+            case BUILD_SPEC: if(Race::WZRD == race) mageguild.UpgradeExt(); break;
+
 	    case DWELLING_MONSTER1: dwelling[0] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)); break;
 	    case DWELLING_MONSTER2: dwelling[1] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)); break;
 	    case DWELLING_MONSTER3: dwelling[2] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)); break;
@@ -1068,6 +1105,7 @@ void Castle::BuyBuilding(building_t build)
 	    case DWELLING_MONSTER6: dwelling[5] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6)); break;
 	    default: break;
 	}
+
 	// disable day build
 	allow_build = false;
 	
@@ -1203,4 +1241,17 @@ void Castle::PrepareICNString(const Castle::building_t & build, const Race::race
 	case DWELLING_UPGRADE6: result += "UP_5.ICN"; break;
 	default: break;
     }
+}
+
+bool Castle::HaveNearlySea(void) const
+{
+    if(world.h() <= mp.y + 2) return false;
+
+    const u16 index_c = (mp.y + 2 ) * world.h() + mp.x;
+
+    const Maps::Tiles & tile_c = world.GetTiles(index_c);
+    const Maps::Tiles & tile_l = world.GetTiles(index_c - 1);
+    const Maps::Tiles & tile_r = world.GetTiles(index_c + 2);
+
+    return Maps::Ground::WATER == tile_c.GetGround() || Maps::Ground::WATER == tile_l.GetGround() || Maps::Ground::WATER == tile_r.GetGround();
 }

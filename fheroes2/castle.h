@@ -26,6 +26,7 @@
 #include "animation.h"
 #include "gamedefs.h"
 #include "maps_tiles.h"
+#include "mageguild.h"
 #include "color.h"
 #include "dialog.h"
 #include "race.h"
@@ -84,7 +85,7 @@ public:
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
     bool AllowBuild(void) const{ return allow_build; };
     bool isBuild(building_t bd) const{ return building & bd; };
-    bool HaveNearlySea(void) const{ return true; };
+    bool HaveNearlySea(void) const;
     const Heroes * isHeroesPresent(void);
     bool RecrutMonster(building_t dw, u16 count);
     bool AllowBuyBuilding(building_t build) const;
@@ -119,6 +120,7 @@ public:
 private:
     void RedrawResourcePanel(void);
     void CorrectAreaMaps(void);
+    void TownUpgradeToCastle(void);
     void ModifyTIlesRNDSprite(Maps::Tiles & tile);
     void ModifyTIlesFlags(Maps::Tiles & tile);
     void ModifyTilesTownToCastle(Maps::Tiles & tile);
@@ -147,7 +149,7 @@ private:
     bool		army_spread;
     bool		allow_build;
     bool		present_boat;
-    //MageGuild		guild;
+    MageGuild		mageguild;
     std::vector<u16>    dwelling;
     std::vector<Army::Troops> army;
 

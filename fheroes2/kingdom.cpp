@@ -27,7 +27,7 @@
 #include "payment.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(Color::color_t cl) : color(cl), build(false), play(cl & H2Config::GetKingdomColors() ? true : false)
+Kingdom::Kingdom(Color::color_t cl) : color(cl), play(cl & H2Config::GetKingdomColors() ? true : false)
 {
     // set starting resource
     switch(H2Config::GetGameDifficulty()){

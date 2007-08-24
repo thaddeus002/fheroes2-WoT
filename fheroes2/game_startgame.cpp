@@ -290,11 +290,49 @@ Game::menu_t Game::StartGame(void)
 
 	le.HandleEvents();
 
-	// scroll area maps
-	if(le.MouseCursor(areaScrollLeft))  { Cursor::Set(Cursor::SCROLL_LEFT);   areaMaps.Scroll(GameArea::LEFT);   radar.UpdatePosition(); continue; }
-	if(le.MouseCursor(areaScrollRight)) { Cursor::Set(Cursor::SCROLL_RIGHT);  areaMaps.Scroll(GameArea::RIGHT);  radar.UpdatePosition(); continue; }
-	if(le.MouseCursor(areaScrollTop))   { Cursor::Set(Cursor::SCROLL_TOP);    areaMaps.Scroll(GameArea::TOP);    radar.UpdatePosition(); continue; }
-	if(le.MouseCursor(areaScrollBottom)){ Cursor::Set(Cursor::SCROLL_BOTTOM); areaMaps.Scroll(GameArea::BOTTOM); radar.UpdatePosition(); continue; }
+	// scroll area maps left
+	if(le.MouseCursor(areaScrollLeft))
+	{
+	    Cursor::Hide();
+	    Cursor::Set(Cursor::SCROLL_LEFT);
+	    areaMaps.Scroll(GameArea::LEFT);
+	    radar.UpdatePosition();
+	    Cursor::Show();
+	    display.Flip();
+	    continue;
+	}
+	// scroll area maps right
+	if(le.MouseCursor(areaScrollRight))
+	{
+	    Cursor::Hide();
+	    Cursor::Set(Cursor::SCROLL_RIGHT);
+	    areaMaps.Scroll(GameArea::RIGHT);
+	    radar.UpdatePosition();
+	    Cursor::Show();
+	    display.Flip();
+	    continue;
+	}
+	// scroll area maps top
+	if(le.MouseCursor(areaScrollTop))
+	{
+	    Cursor::Hide();
+	    Cursor::Set(Cursor::SCROLL_TOP);
+	    areaMaps.Scroll(GameArea::TOP);
+	    radar.UpdatePosition();
+	    Cursor::Show();
+	    display.Flip();
+	    continue;
+	}
+	// scroll area maps bottom
+	if(le.MouseCursor(areaScrollBottom)){
+	    Cursor::Hide();
+	    Cursor::Set(Cursor::SCROLL_BOTTOM);
+	    areaMaps.Scroll(GameArea::BOTTOM);
+	    radar.UpdatePosition();
+	    Cursor::Show();
+	    display.Flip();
+	    continue;
+	}
 
 	// pointer cursor on left panel
 	if(le.MouseCursor(areaLeftPanel)){ Cursor::Set(Cursor::POINTER); }
@@ -347,7 +385,7 @@ Game::menu_t Game::StartGame(void)
 					}
 
 					// is selected open dialog
-					if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
+					if(selectCastles.isSelected() && castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
 					{
 					    OpenCastle(const_cast<Castle *>(castle), focus, areaMaps, radar, selectCastles);
 
@@ -427,7 +465,7 @@ Game::menu_t Game::StartGame(void)
     			    {
 				if(H2Config::GetMyColor() == heroes->GetColor())
 				{
-				    Cursor::Set(Cursor::HEROES);
+				    Cursor::Set(heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()) ? Cursor::HEROES : Cursor::CHANGE);
 
 				    if(le.MouseClickLeft(area_pos))
 				    {
@@ -708,7 +746,7 @@ Game::menu_t Game::StartGame(void)
 					}
 
 					// is selected open dialog
-					if(heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
+					if(selectHeroes.isSelected() && heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
 					{
 					    OpenHeroes(const_cast<Heroes *>(heroes), focus, areaMaps, radar, selectHeroes);
 
@@ -1171,6 +1209,8 @@ void Game::OpenCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, 
 
 	Cursor::Show();
     }
+
+    areaMaps.Redraw();
 }
 
 /* focus to castle */

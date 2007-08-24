@@ -22,6 +22,7 @@
 
 #include <vector>
 #include "gamedefs.h"
+#include "race.h"
 #include "spell.h"
 
 class MageGuild
@@ -29,20 +30,22 @@ class MageGuild
     public:
 	MageGuild();
 
-	u8 GetLevel(void) const;
-	//const std::vector<Spell::spell_t> & GetSpells(u8 lvl);
+	u8 GetLevel(void) const{ return level; };
 
-	void Upgrade(void);
+	const std::vector<Spell::spell_t> & GetSpells(void) const{ return spells; };
+	Spell::spell_t GetSpell(u8 level, u8 index) const;
 
+	void BuildNextLevel(void);
+	void UpgradeExt(void);
+	
+	bool isUpgrade(void) const{ return upgrade; };
+	
     private:
 	u8 level;
+	
+	bool upgrade;
 
-	std::vector<Spell::spell_t>	level1;
-	std::vector<Spell::spell_t>	level2;
-	std::vector<Spell::spell_t>	level3;
-	std::vector<Spell::spell_t>	level4;
-	std::vector<Spell::spell_t>	level5;
-	std::vector<Spell::spell_t>	level6;
+	std::vector<Spell::spell_t>	spells;
 };
 
 #endif
