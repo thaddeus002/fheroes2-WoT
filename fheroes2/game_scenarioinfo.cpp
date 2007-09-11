@@ -62,24 +62,34 @@ Game::menu_t Game::ScenarioInfo(void){
     std::vector<Maps::FileInfo> info_maps;
 
     // read maps directory
-    Dir dir1(H2Config::GetMapsDirectory(), "mp2");
-    Dir dir2(H2Config::GetMapsDirectory(), "Mp2");
-    Dir dir3(H2Config::GetMapsDirectory(), "MP2");
+	Dir * dir1 = NULL;
+	Dir * dir2 = NULL;
+	Dir * dir3 = NULL;
+	try {
+		dir1 = new Dir(H2Config::GetMapsDirectory(), "mp2");
+		dir2 = new Dir(H2Config::GetMapsDirectory(), "Mp2");
+		dir3 = new Dir(H2Config::GetMapsDirectory(), "MP2");
+	}
+	catch (...) {
+		if(!dir1) dir1 = new Dir();
+		if(!dir2) dir2 = new Dir();
+		if(!dir3) dir3 = new Dir();
+	}
 
-    Dir::const_iterator itd1 = dir1.begin();
-    while(itd1 != dir1.end()){ info_maps.push_back(Maps::FileInfo(*itd1)); ++itd1; }
+    Dir::const_iterator itd1 = dir1->begin();
+    while(itd1 != dir1->end()){ info_maps.push_back(Maps::FileInfo(*itd1)); ++itd1; }
 
-    Dir::const_iterator itd2 = dir2.begin();
-    while(itd2 != dir2.end()){ info_maps.push_back(Maps::FileInfo(*itd2)); ++itd2; }
+    Dir::const_iterator itd2 = dir2->begin();
+    while(itd2 != dir2->end()){ info_maps.push_back(Maps::FileInfo(*itd2)); ++itd2; }
 
-    Dir::const_iterator itd3 = dir3.begin();
-    while(itd3 != dir3.end()){ info_maps.push_back(Maps::FileInfo(*itd3)); ++itd3; }
+    Dir::const_iterator itd3 = dir3->begin();
+    while(itd3 != dir3->end()){ info_maps.push_back(Maps::FileInfo(*itd3)); ++itd3; }
 
     // empty maps dir
     if(!info_maps.size()){
 	H2Config::SetInterface(true);
 	Dialog::Message("Warning", "None maps available!", Font::BIG, Dialog::OK);
-	return QUITGAME;
+	return MAINMENU;
     }
 
     // preload
