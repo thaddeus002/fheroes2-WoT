@@ -340,8 +340,10 @@ Game::menu_t Game::StartGame(void)
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
 	{
-	    const u16 index_maps = GetIndexMaps(le.MouseCursor());
+	    const Point & mouse_coord = le.MouseCursor();
+	    const u16 index_maps = GetIndexMaps(mouse_coord);
 	    const Maps::Tiles & tile = world.GetTiles(index_maps);
+	    const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
 	    const Castle * castle = NULL;
 	    const Heroes * heroes = NULL;
 	    u8 object = tile.GetObject();
@@ -357,11 +359,11 @@ Game::menu_t Game::StartGame(void)
     			    Cursor::Set(Cursor::FIGHT);
 
 			    // FIXME heroes attack monster
-			    if(le.MouseClickLeft(area_pos))
+			    if(le.MouseClickLeft(tile_pos))
 			    {
 			    }
 			    else
-			    if(le.MousePressRight(area_pos))
+			    if(le.MousePressRight(tile_pos))
 			    {
 				Monster::monster_t monster = Monster::Monster(tile);
 
@@ -377,7 +379,7 @@ Game::menu_t Game::StartGame(void)
 				{
 	    			    Cursor::Set(Cursor::CASTLE);
 
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 					if(selectHeroes.isSelected())
 					{
@@ -401,7 +403,7 @@ Game::menu_t Game::StartGame(void)
 					}
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -412,11 +414,11 @@ Game::menu_t Game::StartGame(void)
 	    			    Cursor::Set(Cursor::FIGHT);
 
 				    // FIXME heroes attack castle
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -433,11 +435,11 @@ Game::menu_t Game::StartGame(void)
         			    Cursor::Set(Cursor::ACTION);
 
 				    // FIXME heroes go to castle
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -448,11 +450,11 @@ Game::menu_t Game::StartGame(void)
 				    Cursor::Set(Cursor::FIGHT);
 
 				    // FIXME heroes attack other castle
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -468,7 +470,7 @@ Game::menu_t Game::StartGame(void)
 				{
 				    Cursor::Set(heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()) ? Cursor::HEROES : Cursor::CHANGE);
 
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 					// is selected open dialog
 					if(heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
@@ -485,7 +487,7 @@ Game::menu_t Game::StartGame(void)
 					}
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*heroes);
 				    }
@@ -496,11 +498,11 @@ Game::menu_t Game::StartGame(void)
 				    Cursor::Set(Cursor::FIGHT);
 
 				    // FIXME hero attack hero
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*heroes);
 				    }
@@ -605,7 +607,7 @@ Game::menu_t Game::StartGame(void)
 				{
 			    	    Cursor::Set(Cursor::CASTLE);
 
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 					// is selected open dialog
 				        if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
@@ -623,7 +625,7 @@ Game::menu_t Game::StartGame(void)
 					}
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -633,7 +635,7 @@ Game::menu_t Game::StartGame(void)
 				{
 			    	    Cursor::Set(Cursor::POINTER);
 
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -694,7 +696,7 @@ Game::menu_t Game::StartGame(void)
     				{
     			    	    Cursor::Set(Cursor::CASTLE);
 
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 					// is selected open dialog
 					if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
@@ -712,7 +714,7 @@ Game::menu_t Game::StartGame(void)
 					}
 				    }
 				    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -722,7 +724,7 @@ Game::menu_t Game::StartGame(void)
 				{
     			    	    Cursor::Set(Cursor::POINTER);
 
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*castle);
 				    }
@@ -738,7 +740,7 @@ Game::menu_t Game::StartGame(void)
     				{
     			    	    Cursor::Set(Cursor::HEROES);
 
-				    if(le.MouseClickLeft(area_pos))
+				    if(le.MouseClickLeft(tile_pos))
 				    {
 					if(selectCastles.isSelected())
 					{
@@ -762,7 +764,7 @@ Game::menu_t Game::StartGame(void)
 					}
         			    }
         			    else
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*heroes);
 				    }
@@ -771,7 +773,7 @@ Game::menu_t Game::StartGame(void)
         			{
     			    	    Cursor::Set(Cursor::POINTER);
 
-				    if(le.MousePressRight(area_pos))
+				    if(le.MousePressRight(tile_pos))
 				    {
 					Dialog::QuickInfo(*heroes);
 				    }
@@ -793,7 +795,7 @@ Game::menu_t Game::StartGame(void)
 		break;
 	    }
 
-	    if(le.MousePressRight(area_pos))
+	    if(le.MouseRight())
 	    {
 		if(H2Config::Debug()) tile.DebugInfo(index_maps);
 
