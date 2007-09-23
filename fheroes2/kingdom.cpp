@@ -110,7 +110,7 @@ void Kingdom::ActionNewDay(void)
 	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_STATUE) ? INCOME_STATUE_GOLD : 0);
 
 	// dungeon for warlock
-	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_SPEC) && Race::WRLK == (*castles[ii]).GetRace() ? INCOME_STATUE_GOLD : 0);
+	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_SPEC) && Race::WRLK == (*castles[ii]).GetRace() ? INCOME_DUNGEON_GOLD : 0);
     }
 
     for(u8 ii = 0; ii < heroes.size(); ++ii)

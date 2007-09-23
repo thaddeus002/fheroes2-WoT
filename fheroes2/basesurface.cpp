@@ -73,6 +73,37 @@ void BaseSurface::SetDisplayFormat(void)
     SDL_FreeSurface(osurface);
 }
 
+/* draw u32 pixel */
+void BaseSurface::SetPixel4(u16 x, u16 y, u32 color)
+{
+    if(x > surface->w || y > surface->h) return;
+    
+    u32 *bufp = static_cast<u32 *>(surface->pixels) + y * surface->pitch / 4 + x;
+
+    *bufp = color;
+}
+
+/* draw u24 pixel */
+void BaseSurface::SetPixel3(u16 x, u16 y, u32 color)
+{
+    if(x > surface->w || y > surface->h) return;
+
+    u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x * 3; 
+
+    if(SDL_BYTEORDER == SDL_LIL_ENDIAN)
+    {
+        bufp[0] = color;
+        bufp[1] = color >> 8;
+        bufp[2] = color >> 16;
+    }
+    else
+    { 
+	bufp[2] = color;
+	bufp[1] = color >> 8;
+        bufp[0] = color >> 16;
+    }
+}
+
 /* draw u16 pixel */
 void BaseSurface::SetPixel2(u16 x, u16 y, u32 color)
 {
@@ -91,6 +122,19 @@ void BaseSurface::SetPixel1(u16 x, u16 y, u8 color)
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x;
 
     *bufp = color;
+}
+
+/* draw pixel */
+void BaseSurface::SetPixel(u16 x, u16 y, u32 color)
+{
+    switch(surface->format->BytesPerPixel)
+    {
+	case 1:	SetPixel1(x, y, color);	break;
+	case 2:	SetPixel2(x, y, color);	break;
+	case 3:	SetPixel3(x, y, color);	break;
+	case 4:	SetPixel4(x, y, color);	break;
+	default: break;
+    }
 }
 
 /* set color key */

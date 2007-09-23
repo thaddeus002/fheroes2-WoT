@@ -49,6 +49,7 @@ namespace Army
     } size_t;
 
     const std::string & String(size_t size);
+    size_t GetSize(u16 count);
 
     class Troops
     {

@@ -67,8 +67,11 @@ public:
     void SetColorKey(void);
     void SetColorKey(u32 color){ SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, color); };
     void SetAlpha(u8 level){ SDL_SetAlpha(surface, SDL_SRCALPHA|SDL_RLEACCEL, level); };
+    void SetPixel4(u16 x, u16 y, u32 color);
+    void SetPixel3(u16 x, u16 y, u32 color);
     void SetPixel2(u16 x, u16 y, u32 color);
     void SetPixel1(u16 x, u16 y, u8 color);
+    void SetPixel(u16 x, u16 y, u32 color);
 
     void Lock(void){ if(SDL_MUSTLOCK(surface)) SDL_LockSurface(surface); };
     void Unlock(void){ if(SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface); };

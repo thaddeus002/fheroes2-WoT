@@ -118,7 +118,6 @@ namespace Monster
 
     typedef struct {
 	monster_t monster;
-	level_t level;
 	u8 attack;
 	u8 defence;
 	u8 shots;
@@ -135,12 +134,14 @@ namespace Monster
     const stats_t & GetStats(monster_t monster);
     u8 GetGrown(monster_t monster);
     Race::race_t GetRace(monster_t monster);
+    level_t GetLevel(monster_t monster);
 
     monster_t Upgrade(monster_t monster);
     bool AllowUpgrade(monster_t monster);
 
     monster_t Monster(u8 num);
     monster_t Monster(Race::race_t race, u32 dwelling);
+    monster_t Monster(const Maps::Tiles & tile);
 
     monster_t Rand(void);
     monster_t Rand1(void);
@@ -148,9 +149,11 @@ namespace Monster
     monster_t Rand3(void);
     monster_t Rand4(void);
 
-    u16 RandCount(monster_t monster);
-    
+    u16 GetRNDSize(monster_t monster);
+    u16 GetSize(const Maps::Tiles & tile);
+
     void ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 center);
+    void ChangeTileWithRNDSize(Maps::Tiles & tile);
 };
 
 #endif

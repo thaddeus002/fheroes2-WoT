@@ -45,6 +45,8 @@ namespace Maps
 	u32 GetUniq(void) const{ return uniq; };
 	level_t GetLevel(void) const{ return level; };
 
+	bool isPassable(void) const;
+
 	void SetUniq(u32 gid){ uniq = gid; };
 	void SetObject(u8 obj){ object = obj; };
 	void SetIndex(u8 ii){ index = ii; };
@@ -70,12 +72,15 @@ namespace Maps
 	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2[0].GetUniq() : 0; };
 
 	bool isAnimation(u16 dstx, u16 dsty) const;
+	bool isPassable(void) const;
 
 	const TilesAddon * FindAddon(u8 object, u8 index_min, u8 index_max) const;
 	const TilesAddon * FindAddon(u8 object, u8 index = 0xFF) const;
 	const TilesAddon * FindAddonLevel1(u32 uniq1) const;
 	const TilesAddon * FindAddonLevel2(u32 uniq2) const;
 
+	void SetQuantity1(u8 val){ quantity1 = val; };
+	void SetQuantity2(u8 val){ quantity2 = val; };
 	void SetObject(MP2::object_t object){ general = object; };
 
 	void Blit(u16 dstx, u16 dsty, u32 anime_frame = 0) const;

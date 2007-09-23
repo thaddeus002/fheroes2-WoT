@@ -232,7 +232,7 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
     if(H2Config::Debug())
     {
 	display.Lock();
-	display.SetPixel2(dstx, dsty, AGG::GetColor(0x40));
+	display.SetPixel(dstx, dsty, AGG::GetColor(0x40));
 	display.Unlock();
     }
 }
@@ -332,6 +332,170 @@ const Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2) const
     return NULL;
 }
 
+bool Maps::TilesAddon::isPassable(void) const
+{
+    // check from sprite
+    switch(object)
+    {
+	// mtncrck
+	case 0x7C:
+	case 0x7D:
+	case 0x7E:
+	case 0x7F:
+	// mtndirt
+	case 0x68:
+	case 0x69:
+	case 0x6A:
+	case 0x6B:
+	    // xlarge right mounts
+	    if((6 <= index && 9 >= index) ||
+	       (12 <= index && 16 >= index) ||
+	       (18 <= index && 20 >= index)) return false;
+	    // xlarge left mounts
+	    if((28 <= index && 31 >= index) ||
+	       (33 <= index && 37 >= index) ||
+	       (39 <= index && 41 >= index)) return false;
+	    // large rigth mounts
+	    if((48 <= index && 50 >= index) ||
+	       (54 <= index && 56 >= index)) return false;
+	    // large left mounts
+	    if((65 <= index && 67 >= index) ||
+	       (69 <= index && 71 >= index)) return false;
+	    // middle right mounts
+	    if((76 <= index && 78 >= index) ||
+	       (80 <= index && 81 >= index)) return false;
+	    // middle left mounts
+	    if((87 <= index && 88 >= index) ||
+	       (90 <= index && 91 >= index)) return false;
+	    // small right mounts
+	    if((93 <= index && 94 >= index) ||
+	       (96 <= index && 97 >= index)) return false;
+	    // small left mounts
+	    if((99 <= index && 100 >= index) ||
+	       (102 <= index && 103 >= index)) return false;
+	    // mines
+	    if((111 <= index && 113 >= index)) return false;
+
+	// mtndsrt
+	case 0x64:
+	case 0x65:
+	case 0x66:
+	case 0x67:
+	// mtngras
+	case 0x80:
+	case 0x81:
+	case 0x82:
+	case 0x83:
+	// mtnlava
+	case 0x60:
+	case 0x61:
+	case 0x62:
+	case 0x63:
+	// mtnmult
+	case 0x6C:
+	case 0x6D:
+	case 0x6E:
+	case 0x6F:
+	// mtnsnow
+	case 0x58:
+	case 0x59:
+	case 0x5A:
+	case 0x5B:
+	// mtnswmp
+	case 0x5C:
+	case 0x5D:
+	case 0x5E:
+	case 0x5F:
+	    // xlarge right mounts
+	    if((6 <= index && 9 >= index) ||
+	       (12 <= index && 16 >= index) ||
+	       (18 <= index && 20 >= index)) return false;
+	    // xlarge left mounts
+	    if((28 <= index && 31 >= index) ||
+	       (33 <= index && 37 >= index) ||
+	       (39 <= index && 41 >= index)) return false;
+	    // large rigth mounts
+	    if((46 <= index && 47 >= index) ||
+	       (50 <= index && 51 >= index)) return false;
+	    // large left mounts
+	    if((57 <= index && 58 >= index) ||
+    	       (60 <= index && 61 >= index)) return false;
+	    // small right mounts
+	    if((63 <= index && 64 >= index) ||
+	       (66 <= index && 67 >= index)) return false;
+	    // small left mounts
+	    if((69 <= index && 70 >= index) ||
+	       (72 <= index && 73 >= index)) return false;
+	    // mines
+	    if((81 <= index && 83 >= index)) return false;
+
+	// objncrck
+	case 0xE4:
+	case 0xE5:
+	case 0xE6:
+	case 0xE7:
+	    if(10 == index ||
+	       11 == index ||
+	       14 == index ||
+	       16 == index ||
+	       17 == index ||
+	       18 == index ||
+	       21 == index ||
+	       22 == index ||
+	       24 == index ||
+	       25 == index ||
+	       29 == index ||
+	       30 == index ||
+	       31 == index ||
+	       32 == index ||
+	       34 == index ||
+	       35 == index ||
+	       37 == index ||
+	       38 == index ||
+	       40 == index ||
+	       41 == index ||
+	       42 == index ||
+	       43 == index ||
+	       46 == index ||
+	       49 == index ||
+	       52 == index ||
+	       55 == index ||
+	       57 == index ||
+	       58 == index ||
+	       59 == index ||
+	       62 == index ||
+	       63 == index ||
+	       64 == index ||
+	       65 == index ||
+	       68 == index ||
+	       69 == index ||
+	       71 == index ||
+	       72 == index ||
+	       76 == index ||
+	       77 == index ||
+	       78 == index ||
+	       (81 <= index && 181 >= index) ||
+	       (182<= index && 188 >= index) ||
+	       202 == index ||
+	       (221<= index && 225 >= index) ||
+	       (227<= index && 232 >= index) ||
+	       (233<= index && 235 >= index) ||
+	       (241<= index && 244 >= index) ||
+	       246 == index) return false;
+
+	/*
+	.
+	.
+	.
+	*/
+
+	default:
+	    break;
+    }
+
+    return true;
+}
+
 void Maps::Tiles::DebugInfo(u16 index) const
 {
     std::cout << std::endl << "----------------:--------" << std::endl;
@@ -420,86 +584,108 @@ void Maps::Tiles::DebugInfo(u16 index) const
 
 void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
 {
-    const TilesAddon * addons = NULL;
+    Monster::monster_t monster = Monster::Monster(*this);
 
-    if((addons = FindAddon(0x30)) ||
-       (addons = FindAddon(0x31)) ||
-       (addons = FindAddon(0x32)) ||
-       (addons = FindAddon(0x33)))
+    if(Monster::UNKNOWN <= monster)
     {
-	Monster::monster_t monster = Monster::Monster(addons->GetIndex());
+	Error::Warning("Maps::Tiles::RedrawMonster: unknown monster, ", monster);
 
-	if(Monster::UNKNOWN <= monster)
-	{
-	    Error::Warning("Maps::Tiles::RedrawMonster: unknown monster, ", monster);
-
-	    return;
-	}
-
-	// redraw top tiles
-	if(BORDERWIDTH < dy)
-	{
-	    world.GetTiles(maps_index - world.w()).Blit(dx, dy - TILEWIDTH, anime_sprite);
-	}
-
-	// redraw left tiles
-	if(BORDERWIDTH < dx)
-	{
-	    world.GetTiles(maps_index - 1).Blit(dx - TILEWIDTH, dy, anime_sprite);
-	}
-
-	// draw first sprite
-	const Sprite & sprite_first = AGG::GetICN("MINIMON.ICN", monster * 9);
-
-	s16 ax = dx + TILEWIDTH - std::abs(sprite_first.x()) - 22;
-	s16 ay = dy + TILEWIDTH - std::abs(sprite_first.y()) - 4;
-
-	Rect src_rt(0, 0, sprite_first.w(), sprite_first.h());
-
-	// left bound
-	if(ax < BORDERWIDTH)
-	{
-	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
-	    src_rt.w -= src_rt.x;
-	    ax = BORDERWIDTH;
-	}
-
-	// top bound
-	if(ay < BORDERWIDTH)
-	{
-	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
-	    src_rt.h -= src_rt.y;
-	    ay = BORDERWIDTH;
-	}
-
-	display.Blit(sprite_first, src_rt, ax, ay);
-
-	// draw second sprite
-	const Sprite & sprite_next = AGG::GetICN("MINIMON.ICN", monster * 9 + 1 + (anime_sprite % 6));
-
-	ax = dx + TILEWIDTH - std::abs(sprite_next.x()) - 22;
-	ay = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
-
-	src_rt = Rect(0, 0, sprite_next.w(), sprite_next.h());
-
-	// left bound
-	if(ax < BORDERWIDTH)
-	{
-	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
-	    src_rt.w -= src_rt.x;
-	    ax = BORDERWIDTH;
-	}
-
-	// top bound
-	if(ay < BORDERWIDTH)
-	{
-	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
-	    src_rt.h -= src_rt.y;
-	    ay = BORDERWIDTH;
-	}
-
-	display.Blit(sprite_next, src_rt, ax, ay);
+	return;
     }
+	
+    u8 align_x = 0;
+	
+    switch(monster)
+    {
+	    case Monster::CAVALRY:
+	    case Monster::CHAMPION:
+	    case Monster::UNICORN:
+	    case Monster::PHOENIX:
+	    case Monster::CENTAUR:
+	    case Monster::HYDRA:
+	    case Monster::GREEN_DRAGON:
+	    case Monster::RED_DRAGON:
+	    case Monster::BLACK_DRAGON:
+	    case Monster::BOAR:
+	    case Monster::ROC:
+	    case Monster::BONE_DRAGON:
+	    case Monster::NOMAD:
+		align_x = 22;
+		break;
+
+	    case Monster::WOLF:
+	    case Monster::GRIFFIN:
+		align_x = 18;
+		break;
+
+	    default:
+		align_x = 16;
+		break;
+    }
+
+    // redraw top tiles
+    if(BORDERWIDTH < dy)
+    {
+	    world.GetTiles(maps_index - world.w()).Blit(dx, dy - TILEWIDTH, anime_sprite);
+    }
+
+    // redraw left tiles
+    if(BORDERWIDTH < dx)
+    {
+	    world.GetTiles(maps_index - 1).Blit(dx - TILEWIDTH, dy, anime_sprite);
+    }
+
+    // draw first sprite
+    const Sprite & sprite_first = AGG::GetICN("MINIMON.ICN", monster * 9);
+
+    s16 ax = dx + TILEWIDTH - std::abs(sprite_first.x()) - align_x;
+    s16 ay = dy + TILEWIDTH - std::abs(sprite_first.y()) - 4;
+
+    Rect src_rt(0, 0, sprite_first.w(), sprite_first.h());
+
+    // left bound
+    if(ax < BORDERWIDTH)
+    {
+	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
+	    src_rt.w -= src_rt.x;
+	    ax = BORDERWIDTH;
+    }
+
+    // top bound
+    if(ay < BORDERWIDTH)
+    {
+	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
+	    src_rt.h -= src_rt.y;
+	    ay = BORDERWIDTH;
+    }
+
+    display.Blit(sprite_first, src_rt, ax, ay);
+
+    // draw second sprite
+    const Sprite & sprite_next = AGG::GetICN("MINIMON.ICN", monster * 9 + 1 + (anime_sprite % 6));
+
+    ax = dx + TILEWIDTH - std::abs(sprite_next.x()) - align_x;
+    ay = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
+
+    src_rt = Rect(0, 0, sprite_next.w(), sprite_next.h());
+
+    // left bound
+    if(ax < BORDERWIDTH)
+    {
+	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
+	    src_rt.w -= src_rt.x;
+	    ax = BORDERWIDTH;
+    }
+
+    // top bound
+    if(ay < BORDERWIDTH)
+    {
+	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
+	    src_rt.h -= src_rt.y;
+	    ay = BORDERWIDTH;
+    }
+
+    display.Blit(sprite_next, src_rt, ax, ay);
 }
 
 void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
@@ -730,4 +916,21 @@ MP2::object_t Maps::Tiles::GetObject(void) const
     }
     
     return MP2::OBJ_ZERO;
+}
+
+/* accept move */
+bool Maps::Tiles::isPassable(void) const
+{
+    if(addons_level1.size())
+    {
+	std::vector<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::vector<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	    if( Maps::TilesAddon::SHADOW != (*it1).GetLevel() &&
+		Maps::TilesAddon::UPPER != (*it1).GetLevel() &&
+		(! (*it1).isPassable())) return false;
+    }
+
+    return true;
 }

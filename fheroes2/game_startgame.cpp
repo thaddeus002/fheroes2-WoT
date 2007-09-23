@@ -356,16 +356,17 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_MONSTER:
     			    Cursor::Set(Cursor::FIGHT);
 
-			    // FIXME heroes attack castle
+			    // FIXME heroes attack monster
 			    if(le.MouseClickLeft(area_pos))
 			    {
 			    }
-			    //else
-			    //if(le.MousePressRight(area_pos))
-			    //{
-				// lots of archers
-				//Dialog::QuickInfo(*castle); FIXME: quick info monster
-			    //}
+			    else
+			    if(le.MousePressRight(area_pos))
+			    {
+				Monster::monster_t monster = Monster::Monster(tile);
+
+				if(Monster::UNKNOWN > monster) Dialog::QuickInfo(Army::String(Army::GetSize(Monster::GetSize(tile))) + " of " + Monster::String(monster));
+			    }
 			    break;
 
 			// focus from hero to castle
@@ -477,10 +478,10 @@ Game::menu_t Game::StartGame(void)
 					    statusWindow.Redraw();
 					    display.Flip();
 					}
-					// heroes dialog changed items
+					// heroes dialog meeting
 					else
 					{
-					    // FIXME heroes dialog changed items
+					    // FIXME heroes dialog meeting
 					}
 				    }
 				    else
@@ -586,7 +587,7 @@ Game::menu_t Game::StartGame(void)
 			    break;
 
 			default:
-				Cursor::Set(Maps::Ground::WATER != tile.GetGround() ? Cursor::MOVE : Cursor::POINTER);
+				Cursor::Set(Maps::Ground::WATER != tile.GetGround() && tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
 			    break;
 		    }
 		break;

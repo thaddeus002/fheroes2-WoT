@@ -39,3 +39,24 @@ const std::string & Army::String(Army::size_t size)
     
     return str_size[0];
 }
+
+Army::size_t Army::GetSize(u16 count)
+{
+    if(LEGION <= count)		return LEGION;
+    else
+    if(ZOUNDS <= count)		return ZOUNDS;
+    else
+    if(SWARM <= count)		return SWARM;
+    else
+    if(THRONG <= count)		return THRONG;
+    else
+    if(HORDE <= count)		return HORDE;
+    else
+    if(LOTS <= count)		return LOTS;
+    else
+    if(PACK <= count)		return PACK;
+    else
+    if(SEVERAL <= count)	return SEVERAL;
+
+    return FEW;
+}
