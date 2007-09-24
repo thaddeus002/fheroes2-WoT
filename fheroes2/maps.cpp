@@ -18,4 +18,45 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "world.h"
 #include "maps.h"
+
+u16 Maps::GetTopIndex(u16 from)
+{
+    return from - world.w();
+}
+
+u16 Maps::GetTopRightIndex(u16 from)
+{
+    return from - world.w() + 1;    
+}
+
+u16 Maps::GetRightIndex(u16 from)
+{
+    return from + 1;
+}
+
+u16 Maps::GetBottomRightIndex(u16 from)
+{
+    return from + world.w() + 1;
+}
+
+u16 Maps::GetBottomIndex(u16 from)
+{
+    return from + world.w();
+}
+
+u16 Maps::GetBottomLeftIndex(u16 from)
+{
+    return from + world.w() - 1;
+}
+
+u16 Maps::GetLeftIndex(u16 from)
+{
+    return from - 1;
+}
+
+u16 Maps::GetTopLeftIndex(u16 from)
+{
+    return from - world.w() - 1;
+}

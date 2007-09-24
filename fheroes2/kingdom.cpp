@@ -100,6 +100,9 @@ void Kingdom::ActionNewDay(void)
     // castle New Day
     for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewDay();
 
+    // heroes New Day
+    for(u16 ii = 0; ii < heroes.size(); ++ii) (*heroes[ii]).ActionNewDay();
+
     // funds
     for(u16 ii = 0; ii < castles.size(); ++ii)
     {
@@ -145,6 +148,9 @@ void Kingdom::ActionNewWeek(void)
     // castle New Week
     for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewWeek();
 
+    // heroes New Week
+    for(u16 ii = 0; ii < heroes.size(); ++ii) (*heroes[ii]).ActionNewWeek();
+
     // debug an gift
     if(H2Config::Debug() && color == H2Config::GetMyColor())
     {
@@ -164,6 +170,9 @@ void Kingdom::ActionNewMonth(void)
 {
     // castle New Month
     for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewMonth();
+
+    // heroes New Month
+    for(u16 ii = 0; ii < heroes.size(); ++ii) (*heroes[ii]).ActionNewMonth();
 }
 
 void Kingdom::AddHeroes(const Heroes *hero)

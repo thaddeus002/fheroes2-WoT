@@ -63,6 +63,7 @@ namespace Maps
     public:
 	Tiles(u16 mi, const MP2::mp2tile_t & mp2tile);
 	
+	u16 GetIndex(void) const{ return maps_index; };
 	MP2::object_t GetObject(void) const;
 	u8 GetQuantity1(void) const{ return quantity1; };
 	u8 GetQuantity2(void) const{ return quantity2; };

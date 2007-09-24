@@ -17,35 +17,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPSGROUND_H
-#define H2MAPSGROUND_H
 
-#include <string>
-#include "gamedefs.h"
-#include "skill.h"
+#include "maps.h"
+#include "world.h"
 #include "direction.h"
+#include "algorithm.h"
 
-namespace Maps
+// find path  - is valid return length path
+u16 Algorithm::PathFinding(u16 index0, u16 index9, const Skill::level_t & pathfinding, std::vector<u16> & path0)
 {
-    namespace Ground
-    {
-	typedef enum {
-    	    DESERT	= 0x0001,
-    	    SNOW	= 0x0002,
-    	    SWAMP	= 0x0004,
-    	    WASTELAND   = 0x0008,
-    	    BEACH	= 0x0010,
-    	    LAVA	= 0x0020,
-    	    DIRT	= 0x0040,
-    	    GRASS	= 0x0080,
-    	    WATER	= 0x0100,
-    	    ROAD	= 0x0200,
-	    MULTI	= 0x0400
-	} ground_t;
+/*
+    std::vector<u16> path_i;
+    
+    u16 index_i = index0;
 
-	const std::string & String(ground_t ground);
-	u16 GetPenalty(const ground_t & ground, const Skill::level_t & pathfinding, const Direction::vector_t & direct);
-    };
-};
+    if(!(index_i < world.w()) && (index_i % world.w()))
+				path_i.push_back(Maps::GetTopLeftIndex(index_i));
 
-#endif
+    if(!(index_i < world.w()))
+    	    			path_i.push_back(Maps::GetTopIndex(index_i));
+
+    if(!(index_i < world.w()) && (world.w() - 1 > (index_i % world.w())))
+				path_i.push_back(Maps::GetTopRightIndex(index_i));
+
+    if(world.w() - 1 > (index_i % world.w()))
+    				path_i.push_back(Maps::GetRightIndex(index_i));
+
+    if((index_i < world.w() * (world.h() - 1)) && (world.w() - 1 > (index_i % world.w())))
+				path_i.push_back(Maps::GetBottomRightIndex(index_i));
+
+    if(index_i < world.w() * (world.h() - 1))
+				path_i.push_back(Maps::GetBottomIndex(index_i));
+
+    if((index_i < world.w() * (world.h() - 1)) && (index_i % world.w()))
+				path_i.push_back(Maps::GetBottomLeftIndex(index_i));
+
+    if(index_i % world.w())
+				path_i.push_back(Maps::GetLeftIndex(index_i));
+
+    // const Maps::Tiles & tile = world.GetTiles(index);
+    // tile.isPassable()
+    // tile.GetGround()
+    // Ground::GetPenalty() / 100;
+*/
+    return 0;
+}

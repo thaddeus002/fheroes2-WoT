@@ -56,6 +56,7 @@ public:
     u16 w(void){ return width; };
     u16 h(void){ return height; };
 
+    const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); };
     const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); };
     const Maps::Tiles & GetTiles(u16 index) const{ return *vec_tiles.at(index); };
     Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); };
@@ -68,6 +69,7 @@ public:
 
     const Heroes * GetHeroes(u16 maps_index);
     const Heroes * GetHeroes(u8 ax, u8 ay);
+    const Heroes * GetHeroes(const Point & pt){ return GetHeroes(pt.x, pt.y); };
     const Heroes * GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
     const Heroes::heroes_t & GetFreeRecrut1(void);

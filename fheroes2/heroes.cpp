@@ -347,6 +347,10 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     // save general object
     save_maps_general = world.GetTiles(mp.x, mp.y).GetObject();
 
+    // other param
+    magic_point = GetMaxSpellPoints();
+    move_point = GetMaxMovePoints();
+
     Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
@@ -555,6 +559,11 @@ u16 Heroes::GetSpellPoints(void) const
     return magic_point;
 }
 
+u16 Heroes::GetMovePoints(void) const
+{
+    return move_point;
+}
+
 u16 Heroes::GetMaxSpellPoints(void) const
 {
     return 10 * GetKnowledge();
@@ -562,7 +571,9 @@ u16 Heroes::GetMaxSpellPoints(void) const
 
 u16 Heroes::GetMaxMovePoints(void) const
 {
-    return 10;
+    // use Logistics
+
+    return 10;		// FIXME: calculate move points
 }
 
 Morale::morale_t Heroes::GetMorale(void) const
@@ -795,3 +806,17 @@ Skill::level_t Heroes::GetLevelSkill(const Skill::skill_t & skill) const
 
     return Skill::NEVER;;
 }
+
+void Heroes::ActionNewDay(void)
+{
+    move_point = GetMaxMovePoints();
+}
+
+void Heroes::ActionNewWeek(void)
+{
+}
+
+void Heroes::ActionNewMonth(void)
+{
+}
+

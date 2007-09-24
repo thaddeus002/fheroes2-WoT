@@ -28,7 +28,7 @@
 
 Rect GameArea::area_pos = Rect(0, 0, 0, 0);
 u32 GameArea::animation_ticket = 0;
-
+    
 GameArea::GameArea()
 {
     area_pos.x = 0;
@@ -52,6 +52,11 @@ GameArea::GameArea()
 	    area_pos.h = 31;
 	    break;
     }
+}
+
+u16 GameArea::GetLeftTopIndexMaps(void)
+{
+    return world.w() * area_pos.y + area_pos.x;
 }
 
 /* readraw rect, default all (0, 0, area_pos.w ,area_pos.h)  */

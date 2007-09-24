@@ -17,35 +17,64 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPSGROUND_H
-#define H2MAPSGROUND_H
 
-#include <string>
-#include "gamedefs.h"
-#include "skill.h"
+#include "agg.h"
+#include "world.h"
+#include "heroes.h"
+#include "algorithm.h"
 #include "direction.h"
+#include "game.h"
+#include "gamearea.h"
+#include "route.h"
 
-namespace Maps
+Route::Route(const Heroes & from) : hero(from)
 {
-    namespace Ground
+}
+
+// return length path
+u16 Route::Calculate(u16 dst_index)
+{
+    if(path.size()) path.clear();
+
+    return Algorithm::PathFinding(world.GetTiles(hero.GetCenter()).GetIndex(), dst_index, hero.GetLevelSkill(Skill::PATHFINDING), path);
+}
+
+void Route::Blit(void)
+{
+    // sprites in ROUTE.ICN
+}
+
+void Route::Hide(void)
+{
+    if(path.size())
     {
-	typedef enum {
-    	    DESERT	= 0x0001,
-    	    SNOW	= 0x0002,
-    	    SWAMP	= 0x0004,
-    	    WASTELAND   = 0x0008,
-    	    BEACH	= 0x0010,
-    	    LAVA	= 0x0020,
-    	    DIRT	= 0x0040,
-    	    GRASS	= 0x0080,
-    	    WATER	= 0x0100,
-    	    ROAD	= 0x0200,
-	    MULTI	= 0x0400
-	} ground_t;
+	// redraw tiles
+	std::vector<u16>::const_iterator it1 = path.begin();
+	std::vector<u16>::const_iterator it2 = path.end();
 
-	const std::string & String(ground_t ground);
-	u16 GetPenalty(const ground_t & ground, const Skill::level_t & pathfinding, const Direction::vector_t & direct);
-    };
-};
+	const Rect & area = GameArea::GetRect();
+	const u16 index_lt = GameArea::GetLeftTopIndexMaps();
+	
+	for(; it1 != it2; ++it1)
+	{
+	    bool enditer = false;
 
-#endif
+	    for(u16 iy = 0; iy < area.h; ++iy)
+	    {
+		if(enditer) break;
+
+		for(u16 ix = 0; iy < area.w; ++iy)
+		{
+		    if(enditer) break;
+
+		    if(index_lt + (world.w() * iy) + ix == *it1)
+		    {
+			world.GetTiles(*it1).Blit(BORDERWIDTH + TILEWIDTH * ix, BORDERWIDTH + TILEWIDTH * iy);
+			
+			enditer = true;
+		    }
+		}
+	    }
+	}
+    }
+}

@@ -34,6 +34,15 @@ namespace Maps
         LARGE	= 108,
         XLARGE	= 144
     } mapsize_t;
+
+    u16 GetTopIndex(u16 from);
+    u16 GetTopRightIndex(u16 from);
+    u16 GetRightIndex(u16 from);
+    u16 GetBottomRightIndex(u16 from);
+    u16 GetBottomIndex(u16 from);
+    u16 GetBottomLeftIndex(u16 from);
+    u16 GetLeftIndex(u16 from);
+    u16 GetTopLeftIndex(u16 from);
 };
 
 #endif

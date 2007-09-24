@@ -17,35 +17,16 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPSGROUND_H
-#define H2MAPSGROUND_H
+#ifndef H2ALGORITHM_H
+#define H2ALGORITHM_H
 
-#include <string>
+#include <vector>
 #include "gamedefs.h"
-#include "skill.h"
-#include "direction.h"
 
-namespace Maps
+namespace Algorithm
 {
-    namespace Ground
-    {
-	typedef enum {
-    	    DESERT	= 0x0001,
-    	    SNOW	= 0x0002,
-    	    SWAMP	= 0x0004,
-    	    WASTELAND   = 0x0008,
-    	    BEACH	= 0x0010,
-    	    LAVA	= 0x0020,
-    	    DIRT	= 0x0040,
-    	    GRASS	= 0x0080,
-    	    WATER	= 0x0100,
-    	    ROAD	= 0x0200,
-	    MULTI	= 0x0400
-	} ground_t;
+    u16 PathFinding(u16 index0, u16 index9, const Skill::level_t & pathfinding, std::vector<u16> & path0);
 
-	const std::string & String(ground_t ground);
-	u16 GetPenalty(const ground_t & ground, const Skill::level_t & pathfinding, const Direction::vector_t & direct);
-    };
 };
 
 #endif

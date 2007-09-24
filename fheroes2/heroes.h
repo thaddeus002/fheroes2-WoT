@@ -113,6 +113,7 @@ public:
     u16 GetMaxSpellPoints(void) const;
     u16 GetMaxMovePoints(void) const;
     u16 GetSpellPoints(void) const;
+    u16 GetMovePoints(void) const;
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const{ return 1; };
@@ -126,6 +127,10 @@ public:
 
     void Recrut(const Castle & castle);
     void Move(u16 ax, u16 ay);
+
+    void ActionNewDay(void);
+    void ActionNewWeek(void);
+    void ActionNewMonth(void);
 
 private:
     std::string		name;

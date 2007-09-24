@@ -37,6 +37,7 @@
 #include "ground.h"
 #include "error.h"
 #include "game_selectfocus.h"
+#include "route.h"
 #include "game.h"
 
 namespace Game
@@ -589,7 +590,20 @@ Game::menu_t Game::StartGame(void)
 			    break;
 
 			default:
-				Cursor::Set(Maps::Ground::WATER != tile.GetGround() && tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
+                            if(Maps::Ground::WATER != tile.GetGround() && tile.isPassable()
+                        		&& (NULL != (heroes = world.GetHeroes(focus.center))))
+                            {
+                            	    Route path(*heroes);
+				    path.Calculate(GetIndexMaps(mouse_coord));
+                            	    // div heroes.GetMovePoint()
+
+                            	    // FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
+                            	    Cursor::Set(Cursor::MOVE);
+                            }
+                            else
+                            {
+                                Cursor::Set(Cursor::POINTER);
+                            }
 			    break;
 		    }
 		break;
