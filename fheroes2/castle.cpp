@@ -384,7 +384,6 @@ castle size: T and B - sprite, S - shadow, XX - center
 
 void Castle::MinimizeAreaMapsID(void)
 {
-
     // reset castle ID
     for(s8 yy = -3; yy < 2; ++yy)
 	for(s8 xx = -2; xx < 3; ++xx)
@@ -398,7 +397,7 @@ void Castle::MinimizeAreaMapsID(void)
 
     // set minimum area castle ID
     for(s8 yy = -1; yy < 1; ++yy)
-	for(s8 xx = -1; xx < 2; ++xx)
+	for(s8 xx = -2; xx < 3; ++xx)
     {
 	Maps::Tiles & tile = world.GetTiles((mp.y + yy) * world.h() + mp.x + xx);
 

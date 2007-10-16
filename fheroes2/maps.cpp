@@ -19,8 +19,47 @@
  ***************************************************************************/
 
 #include "world.h"
+#include "gamearea.h"
+#include "error.h"
 #include "maps.h"
 
+u16 Maps::GetDirectionIndex(u16 from, Direction::vector_t vector)
+{
+    switch(vector)
+    {
+	case Direction::TOP:		return GetTopIndex(from);
+	case Direction::TOP_RIGHT:	return GetTopRightIndex(from);
+	case Direction::RIGHT:		return GetRightIndex(from);
+	case Direction::BOTTOM_RIGHT:	return GetBottomRightIndex(from);
+	case Direction::BOTTOM:		return GetBottomIndex(from);
+	case Direction::BOTTOM_LEFT:	return GetBottomLeftIndex(from);
+	case Direction::LEFT:		return GetLeftIndex(from);
+	case Direction::TOP_LEFT:	return GetTopLeftIndex(from);
+	default: break;
+    }
+
+    return MAXU16;
+}
+
+// check bound
+bool Maps::isValidDirection(u16 from, Direction::vector_t vector)
+{
+    switch(vector)
+    {
+	case Direction::TOP:		return (!(from < world.w()));
+	case Direction::TOP_RIGHT:	return (!(from < world.w()) && (world.w() - 1 > (from % world.w())));
+	case Direction::RIGHT:		return (world.w() - 1 > (from % world.w()));
+	case Direction::BOTTOM_RIGHT:	return ((from < world.w() * (world.h() - 1)) && (world.w() - 1 > (from % world.w())));
+	case Direction::BOTTOM:		return (from < world.w() * (world.h() - 1));
+	case Direction::BOTTOM_LEFT:	return ((from < world.w() * (world.h() - 1)) && (from % world.w()));
+	case Direction::LEFT:		return (from % world.w());
+	case Direction::TOP_LEFT:	return (!(from < world.w()) && (from % world.w()));
+	default: break;
+    }
+
+    return false;
+}
+    
 u16 Maps::GetTopIndex(u16 from)
 {
     return from - world.w();
@@ -59,4 +98,22 @@ u16 Maps::GetLeftIndex(u16 from)
 u16 Maps::GetTopLeftIndex(u16 from)
 {
     return from - world.w() - 1;
+}
+
+/* convert maps point to index maps */
+u16 Maps::GetIndexFromAbsPoint(const Point & mp)
+{
+    return mp.y * world.w() + mp.x;
+}
+
+/* convert area point to index maps */
+u16 Maps::GetIndexFromAreaPoint(const Point & pt)
+{
+    const Rect & area_pos = GameArea::GetRect();
+
+    u16 result = (area_pos.y + (pt.y - BORDERWIDTH) / TILEWIDTH) * world.w() + area_pos.x + (pt.x - BORDERWIDTH) / TILEWIDTH;
+
+    if(result > world.w() * world.h() - 1) Error::Except("Game::GetIndexMaps: position, out of range.");
+
+    return result;
 }

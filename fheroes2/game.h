@@ -54,6 +54,10 @@ namespace Game
 	Point		center;
     } gamefocus_t;
 
+    static gamefocus_t	globalfocus;
+
+    const gamefocus_t & GetFocus(void);
+
     int GlobalFilterEvents(const SDL_Event *event);
 
     menu_t MainMenu(void);

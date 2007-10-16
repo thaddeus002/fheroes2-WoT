@@ -30,6 +30,8 @@
 #include "heroes.h"
 #include "sprite.h"
 #include "maps.h"
+#include "game.h"
+#include "gamearea.h"
 #include "display.h"
 #include "maps_tiles.h"
 
@@ -58,7 +60,7 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
-    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2)
+    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), extra(NULL)
 {
     tile_sprite.LoadPalette(AGG::GetPalette());
     AGG::GetTIL("GROUND32.TIL", mp2tile.tileIndex, mp2tile.shape, tile_sprite); 
@@ -174,15 +176,23 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
-		
+
 		// possible anime
 		if(u8 anime_index = MP2::GetAnimationFrame(object, index, anime_frame))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
+		    display.Blit(anime_sprite, dstx - anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
 	}
+    }
+
+    // extra sprite
+    if(extra)
+    {
+	//Error::Verbose("x: ", extra->x());
+	//Error::Verbose("н: ", extra->y());
+	display.Blit(*extra, dstx + 16 - extra->w() / 2, dsty + 16 - extra->h() / 2);
     }
 
     switch(general)
@@ -235,6 +245,16 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	display.SetPixel(dstx, dsty, AGG::GetColor(0x40));
 	display.Unlock();
     }
+}
+
+void Maps::Tiles::Redraw(void) const
+{
+    const Rect & area = GameArea::GetRect();
+
+    const Point mp(maps_index % world.w(), maps_index / world.w());
+
+    // FIX ME: anime_frame ??
+    if(area & mp) Blit(BORDERWIDTH + TILEWIDTH * (mp.x - area.x), BORDERWIDTH + TILEWIDTH * (mp.y - area.y));
 }
 
 bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
@@ -330,170 +350,6 @@ const Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2) const
 	    if(uniq2 == addons_level2[ii].GetUniq()) return &addons_level2[ii];
 
     return NULL;
-}
-
-bool Maps::TilesAddon::isPassable(void) const
-{
-    // check from sprite
-    switch(object)
-    {
-	// mtncrck
-	case 0x7C:
-	case 0x7D:
-	case 0x7E:
-	case 0x7F:
-	// mtndirt
-	case 0x68:
-	case 0x69:
-	case 0x6A:
-	case 0x6B:
-	    // xlarge right mounts
-	    if((6 <= index && 9 >= index) ||
-	       (12 <= index && 16 >= index) ||
-	       (18 <= index && 20 >= index)) return false;
-	    // xlarge left mounts
-	    if((28 <= index && 31 >= index) ||
-	       (33 <= index && 37 >= index) ||
-	       (39 <= index && 41 >= index)) return false;
-	    // large rigth mounts
-	    if((48 <= index && 50 >= index) ||
-	       (54 <= index && 56 >= index)) return false;
-	    // large left mounts
-	    if((65 <= index && 67 >= index) ||
-	       (69 <= index && 71 >= index)) return false;
-	    // middle right mounts
-	    if((76 <= index && 78 >= index) ||
-	       (80 <= index && 81 >= index)) return false;
-	    // middle left mounts
-	    if((87 <= index && 88 >= index) ||
-	       (90 <= index && 91 >= index)) return false;
-	    // small right mounts
-	    if((93 <= index && 94 >= index) ||
-	       (96 <= index && 97 >= index)) return false;
-	    // small left mounts
-	    if((99 <= index && 100 >= index) ||
-	       (102 <= index && 103 >= index)) return false;
-	    // mines
-	    if((111 <= index && 113 >= index)) return false;
-
-	// mtndsrt
-	case 0x64:
-	case 0x65:
-	case 0x66:
-	case 0x67:
-	// mtngras
-	case 0x80:
-	case 0x81:
-	case 0x82:
-	case 0x83:
-	// mtnlava
-	case 0x60:
-	case 0x61:
-	case 0x62:
-	case 0x63:
-	// mtnmult
-	case 0x6C:
-	case 0x6D:
-	case 0x6E:
-	case 0x6F:
-	// mtnsnow
-	case 0x58:
-	case 0x59:
-	case 0x5A:
-	case 0x5B:
-	// mtnswmp
-	case 0x5C:
-	case 0x5D:
-	case 0x5E:
-	case 0x5F:
-	    // xlarge right mounts
-	    if((6 <= index && 9 >= index) ||
-	       (12 <= index && 16 >= index) ||
-	       (18 <= index && 20 >= index)) return false;
-	    // xlarge left mounts
-	    if((28 <= index && 31 >= index) ||
-	       (33 <= index && 37 >= index) ||
-	       (39 <= index && 41 >= index)) return false;
-	    // large rigth mounts
-	    if((46 <= index && 47 >= index) ||
-	       (50 <= index && 51 >= index)) return false;
-	    // large left mounts
-	    if((57 <= index && 58 >= index) ||
-    	       (60 <= index && 61 >= index)) return false;
-	    // small right mounts
-	    if((63 <= index && 64 >= index) ||
-	       (66 <= index && 67 >= index)) return false;
-	    // small left mounts
-	    if((69 <= index && 70 >= index) ||
-	       (72 <= index && 73 >= index)) return false;
-	    // mines
-	    if((81 <= index && 83 >= index)) return false;
-
-	// objncrck
-	case 0xE4:
-	case 0xE5:
-	case 0xE6:
-	case 0xE7:
-	    if(10 == index ||
-	       11 == index ||
-	       14 == index ||
-	       16 == index ||
-	       17 == index ||
-	       18 == index ||
-	       21 == index ||
-	       22 == index ||
-	       24 == index ||
-	       25 == index ||
-	       29 == index ||
-	       30 == index ||
-	       31 == index ||
-	       32 == index ||
-	       34 == index ||
-	       35 == index ||
-	       37 == index ||
-	       38 == index ||
-	       40 == index ||
-	       41 == index ||
-	       42 == index ||
-	       43 == index ||
-	       46 == index ||
-	       49 == index ||
-	       52 == index ||
-	       55 == index ||
-	       57 == index ||
-	       58 == index ||
-	       59 == index ||
-	       62 == index ||
-	       63 == index ||
-	       64 == index ||
-	       65 == index ||
-	       68 == index ||
-	       69 == index ||
-	       71 == index ||
-	       72 == index ||
-	       76 == index ||
-	       77 == index ||
-	       78 == index ||
-	       (81 <= index && 181 >= index) ||
-	       (182<= index && 188 >= index) ||
-	       202 == index ||
-	       (221<= index && 225 >= index) ||
-	       (227<= index && 232 >= index) ||
-	       (233<= index && 235 >= index) ||
-	       (241<= index && 244 >= index) ||
-	       246 == index) return false;
-
-	/*
-	.
-	.
-	.
-	*/
-
-	default:
-	    break;
-    }
-
-    return true;
 }
 
 void Maps::Tiles::DebugInfo(u16 index) const
@@ -919,18 +775,206 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 }
 
 /* accept move */
-bool Maps::Tiles::isPassable(void) const
+bool Maps::Tiles::isPassable() const
 {
-    if(addons_level1.size())
-    {
-	std::vector<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::vector<TilesAddon>::const_iterator it2 = addons_level1.end();
+    const Game::gamefocus_t & focus = Game::GetFocus();
 
-	for(; it1 != it2; ++it1)
-	    if( Maps::TilesAddon::SHADOW != (*it1).GetLevel() &&
-		Maps::TilesAddon::UPPER != (*it1).GetLevel() &&
-		(! (*it1).isPassable())) return false;
+    if(Game::BOAT == focus.type)
+    {
+	if(Ground::WATER != GetGround()) return false;
+
+        switch(general)
+	{
+	    case MP2::OBJ_BOAT:
+	    case MP2::OBJ_STONES:
+	    case MP2::OBJN_MAGELLANMAPS:
+	    case MP2::OBJ_DERELICTSHIP:
+	    case MP2::OBJN_DERELICTSHIP:
+	    case MP2::OBJN_SHIPWRECK:
+		return false;
+	    
+	    default: return true;
+	}
     }
+    else
+    if(Game::HEROES == focus.type)
+    {
+	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
+
+        switch(general)
+	{
+/*
+	case MP2::OBJ_ABANDONEDMINE:	
+	case MP2::OBJ_ALCHEMYTOWER:	
+	case MP2::OBJ_ANCIENTLAMP:	
+	case MP2::OBJ_ARCHERHOUSE:	
+	case MP2::OBJ_ARTESIANSPRING:	
+	case MP2::OBJ_ARTIFACT:		
+	case MP2::OBJ_BOAT:		
+	case MP2::OBJ_BOTTLE:		
+	case MP2::OBJ_BUOY:		
+	case MP2::OBJ_CACTUS:		
+	case MP2::OBJ_CAMPFIRE:		
+	case MP2::OBJ_CASTLE:		
+	case MP2::OBJ_CAVE:		
+	case MP2::OBJ_CITYDEAD:		
+	case MP2::OBJ_CRAKEDLAKE:	
+	case MP2::OBJ_CRATER:		
+	case MP2::OBJ_DAEMONCAVE:	
+	case MP2::OBJ_DEADTREE:		
+	case MP2::OBJ_DERELICTSHIP:	
+	case MP2::OBJ_DESERTTENT:	
+	case MP2::OBJ_DOCTORHUNT:	
+	case MP2::OBJ_DRAGONCITY:	
+	case MP2::OBJ_DWARFCOTT:	
+	case MP2::OBJ_EVENT:		
+	case MP2::OBJ_EXCAVATION:	
+	case MP2::OBJ_FAERIERING:	
+	case MP2::OBJ_FLOTSAM:		
+	case MP2::OBJ_FORT:		
+	case MP2::OBJ_FOUNTAIN:		
+	case MP2::OBJ_FREEMANFOUNDRY:	
+	case MP2::OBJ_GAZEBO:		
+	case MP2::OBJ_GOBLINHUNT:	
+	case MP2::OBJ_GRAVEYARD:	
+	case MP2::OBJ_HALFLINGHOLE:	
+	case MP2::OBJ_HEROES:		
+	case MP2::OBJ_HILLFORT:		
+	case MP2::OBJ_IDOL:		
+	case MP2::OBJ_LAVALAKE:		
+	case MP2::OBJ_LEANTO:		
+	case MP2::OBJ_LIGHTHOUSE:	
+	case MP2::OBJ_MAGELLANMAPS:	
+	case MP2::OBJ_MAGICGARDEN:	
+	case MP2::OBJ_MAGICWELL:	
+	case MP2::OBJ_MERCENARYCAMP:	
+	case MP2::OBJ_MINES:		
+	case MP2::OBJ_MONSTER:		
+	case MP2::OBJ_MOUND:		
+	case MP2::OBJ_MOUNTS:		
+	case MP2::OBJN_ABANDONEDMINE:	
+	case MP2::OBJN_ALCHEMYTOWER:	
+        case MP2::OBJN_ARCHERHOUSE:	
+	case MP2::OBJN_ARTESIANSPRING:	
+	case MP2::OBJN_CASTLE:		
+	case MP2::OBJN_CAVE:		
+	case MP2::OBJN_CITYDEAD:	
+	case MP2::OBJN_CRAKEDLAKE:	
+	case MP2::OBJN_DAEMONCAVE:	
+	case MP2::OBJN_DERELICTSHIP:	
+	case MP2::OBJN_DESERTTENT:	
+	case MP2::OBJN_DOCTORHUNT:	
+	case MP2::OBJN_DRAGONCITY:	
+        case MP2::OBJN_DWARFCOTT:	
+	case MP2::OBJN_EXCAVATION:	
+	case MP2::OBJN_FAERIERING:	
+	case MP2::OBJN_FORT:		
+	case MP2::OBJN_FREEMANFOUNDRY:	
+	case MP2::OBJN_GAZEBO:		
+	case MP2::OBJN_GRAVEYARD:	
+	case MP2::OBJN_HALFLINGHOLE:	
+	case MP2::OBJN_HILLFORT:	
+	case MP2::OBJN_LIGHTHOUSE:	
+	case MP2::OBJN_MAGELLANMAPS:	
+	case MP2::OBJN_MAGICWELL:	
+	case MP2::OBJN_MERCENARYCAMP:	
+	case MP2::OBJN_MINES:		
+	case MP2::OBJN_OASIS:		
+	case MP2::OBJN_OBELISK:		
+	case MP2::OBJN_OBSERVATIONTOWER:
+	case MP2::OBJN_ORACLE:		
+	case MP2::OBJ_NOTHINGSPECIAL:	
+        case MP2::OBJN_PEASANTHUNT:	
+	case MP2::OBJN_PIRAMID:		
+	case MP2::OBJN_RNDCASTLE:	
+	case MP2::OBJN_RNDTOWN:		
+	case MP2::OBJN_RUINS:		
+	case MP2::OBJN_SAWMILL:		
+	case MP2::OBJN_SHIPWRECK:	
+	case MP2::OBJN_SPHINX:		
+        case MP2::OBJN_STONELIGHTS:	
+	case MP2::OBJN_TEMPLE:		
+	case MP2::OBJN_TRADINGPOST:	
+	case MP2::OBJN_TREECITY:	
+	case MP2::OBJN_TREEHOUSE:	
+	case MP2::OBJN_TREEKNOWLEDGE:	
+	case MP2::OBJN_TROLLBRIDGE:	
+	case MP2::OBJN_WAGONCAMP:	
+	case MP2::OBJN_WATCHTOWER:	
+	case MP2::OBJN_WATERMILL:	
+	case MP2::OBJN_WINDMILL:	
+	case MP2::OBJN_WITCHHUNT:	
+	case MP2::OBJN_XANADU:		
+	case MP2::OBJ_OASIS:		
+	case MP2::OBJ_OBELISK:		
+	case MP2::OBJ_OBSERVATIONTOWER:	
+	case MP2::OBJ_OILLAKE:		
+	case MP2::OBJ_ORACLE:		
+	case MP2::OBJ_PEASANTHUNT:	
+	case MP2::OBJ_PEASANTHUNT2:	
+	case MP2::OBJ_PIRAMID:		
+	case MP2::OBJ_RESOURCE:		
+	case MP2::OBJ_RNDARTIFACT:	
+	case MP2::OBJ_RNDARTIFACT1:	
+	case MP2::OBJ_RNDARTIFACT2:	
+	case MP2::OBJ_RNDARTIFACT3:	
+	case MP2::OBJ_RNDCASTLE:	
+	case MP2::OBJ_RNDMONSTER:	
+	case MP2::OBJ_RNDMONSTER1:	
+	case MP2::OBJ_RNDMONSTER2:	
+	case MP2::OBJ_RNDMONSTER3:	
+	case MP2::OBJ_RNDMONSTER4:	
+	case MP2::OBJ_RNDRESOURCE:	
+	case MP2::OBJ_RNDTOWN:		
+	case MP2::OBJ_RNDULTIMATEARTIFACT:
+	case MP2::OBJ_RUINS:		
+	case MP2::OBJ_SAWMILL:		
+	case MP2::OBJ_SHIPWRECK:	
+	case MP2::OBJ_SHIPWRECKSURVIROR:
+	case MP2::OBJ_SHRINE1:		
+	case MP2::OBJ_SHRINE2:		
+	case MP2::OBJ_SHRINE3:		
+	case MP2::OBJ_SIGN:		
+	case MP2::OBJ_SKELETON:		
+	case MP2::OBJ_SPHINX:		
+	case MP2::OBJ_STANDINGSTONES:	
+	case MP2::OBJ_STONELIGHTS:	
+	case MP2::OBJ_STONES:		
+	case MP2::OBJ_TEMPLE:		
+	case MP2::OBJ_TRADINGPOST:	
+	case MP2::OBJ_TREASURECHEST:	
+	case MP2::OBJ_TREECITY:		
+	case MP2::OBJ_TREEHOUSE:	
+	case MP2::OBJ_TREEKNOWLEDGE:	
+	case MP2::OBJ_TREES:		
+	case MP2::OBJ_TROLLBRIDGE:	
+	case MP2::OBJ_VEGETATION2:	
+	case MP2::OBJ_VOLCANO:		
+	case MP2::OBJ_WAGON:		
+	case MP2::OBJ_WAGONCAMP:	
+	case MP2::OBJ_WATCHTOWER:	
+	case MP2::OBJ_WATERLAKE:	
+	case MP2::OBJ_WATERMILL:	
+	case MP2::OBJ_WHIRLPOOL:	
+	case MP2::OBJ_WINDMILL:		
+	case MP2::OBJ_WITCHHUNT:	
+	case MP2::OBJ_XANADU:		
+*/
+	    case MP2::OBJ_COAST:
+	    case MP2::OBJ_DUNE:
+	    case MP2::OBJ_FLOWERS:		
+	    case MP2::OBJ_SHRUB:
+	    case MP2::OBJ_SHRUB2:
+	    case MP2::OBJ_STUMP:
+	    case MP2::OBJ_ZERO:		
+
+		return true;
+	    
+	    default: return false;
+	}
+    }
+    else
+	return false;
 
     return true;
 }

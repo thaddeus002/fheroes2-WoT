@@ -21,8 +21,11 @@
 #define H2MAPS_H
 
 #include "gamedefs.h"
+#include "direction.h"
 
 #define TILEWIDTH 32
+
+class Point;
 
 namespace Maps
 {
@@ -35,6 +38,9 @@ namespace Maps
         XLARGE	= 144
     } mapsize_t;
 
+    u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
+    bool isValidDirection(u16 from, Direction::vector_t vector);
+
     u16 GetTopIndex(u16 from);
     u16 GetTopRightIndex(u16 from);
     u16 GetRightIndex(u16 from);
@@ -43,6 +49,9 @@ namespace Maps
     u16 GetBottomLeftIndex(u16 from);
     u16 GetLeftIndex(u16 from);
     u16 GetTopLeftIndex(u16 from);
+
+    u16 GetIndexFromAbsPoint(const Point & mp);
+    u16 GetIndexFromAreaPoint(const Point & pt);
 };
 
 #endif

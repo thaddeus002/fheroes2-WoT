@@ -23,12 +23,13 @@
 #include "error.h"
 #include "display.h"
 #include "world.h"
+#include "maps.h"
 #include "game.h"
 #include "gamearea.h"
 
 Rect GameArea::area_pos = Rect(0, 0, 0, 0);
 u32 GameArea::animation_ticket = 0;
-    
+
 GameArea::GameArea()
 {
     area_pos.x = 0;
@@ -56,7 +57,7 @@ GameArea::GameArea()
 
 u16 GameArea::GetLeftTopIndexMaps(void)
 {
-    return world.w() * area_pos.y + area_pos.x;
+    return Maps::GetIndexFromAbsPoint(area_pos);
 }
 
 /* readraw rect, default all (0, 0, area_pos.w ,area_pos.h)  */
@@ -178,7 +179,7 @@ void GameArea::Center(const Point &pt)
     if(pos.x == area_pos.x && 1 == (pos.y - area_pos.y)) Scroll(GameArea::BOTTOM);
     else
     if(pos.x == area_pos.x && -1 == (pos.y - area_pos.y)) Scroll(GameArea::TOP);
-    
+
     else
     {
 	area_pos.x = pos.x;

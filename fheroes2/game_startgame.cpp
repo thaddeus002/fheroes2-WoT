@@ -42,11 +42,10 @@
 
 namespace Game
 {
-    u16 GetIndexMaps(const Point &pt);
-    void OpenCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles);
-    void OpenHeroes(Heroes *heroes, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes);
-    void FocusToCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles);
-    void FocusToHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes);
+    void OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles);
+    void OpenHeroes(Heroes *heroes, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes);
+    void FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles);
+    void FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes);
 };
 
 Game::menu_t Game::StartGame(void)
@@ -243,22 +242,19 @@ Game::menu_t Game::StartGame(void)
     splitHeroes.SetRange(0, myHeroes.size() > icon_count ? myHeroes.size() - icon_count : 0);
     splitCastles.SetRange(0, myCastles.size() > icon_count ? myCastles.size() - icon_count : 0);
 
-    // game focus
-    Game::gamefocus_t focus;
-
     // focus set to castle
     if(myCastles.size())
     {
-	focus.type = Game::CASTLE;
-	focus.center = (*myCastles.front()).GetCenter();
+	globalfocus.type = Game::CASTLE;
+	globalfocus.center = (*myCastles.front()).GetCenter();
 	selectCastles.Select(0);
     }
     else
     // focus set to heroes
     if(myHeroes.size())
     {
-	focus.type = Game::HEROES;
-	focus.center = (*myHeroes.front()).GetCenter();
+	globalfocus.type = Game::HEROES;
+	globalfocus.center = (*myHeroes.front()).GetCenter();
 	selectHeroes.Select(0);
     }
     // unknown focus
@@ -272,12 +268,14 @@ Game::menu_t Game::StartGame(void)
     selectHeroes.Redraw();
 
     // center to focus
-    areaMaps.Center(focus.center);
+    areaMaps.Center(globalfocus.center);
     radar.UpdatePosition();
 
     // status window
     Game::StatusWindow statusWindow(pt_stw, myKingdom);
     statusWindow.Redraw();
+
+    Route path;
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
@@ -342,14 +340,14 @@ Game::menu_t Game::StartGame(void)
 	if(le.MouseCursor(area_pos))
 	{
 	    const Point & mouse_coord = le.MouseCursor();
-	    const u16 index_maps = GetIndexMaps(mouse_coord);
+	    const u16 index_maps = Maps::GetIndexFromAreaPoint(mouse_coord);
 	    const Maps::Tiles & tile = world.GetTiles(index_maps);
 	    const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
 	    const Castle * castle = NULL;
 	    const Heroes * heroes = NULL;
 	    u8 object = tile.GetObject();
 
-	    switch(focus.type)
+	    switch(globalfocus.type)
 	    {
 		// focus from hero
 		case Game::HEROES:
@@ -391,7 +389,7 @@ Game::menu_t Game::StartGame(void)
 					// is selected open dialog
 					if(selectCastles.isSelected() && castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
 					{
-					    OpenCastle(const_cast<Castle *>(castle), focus, areaMaps, radar, selectCastles);
+					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar, selectCastles);
 
 					    statusWindow.Redraw();
 					    display.Flip();
@@ -399,7 +397,8 @@ Game::menu_t Game::StartGame(void)
 					// select other castle
 					else
 					{
-					    FocusToCastle(const_cast<Castle *>(castle), focus, areaMaps, radar, selectCastles);
+					    path.Reset();
+					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar, selectCastles);
 					    display.Flip();
 					}
 				    }
@@ -476,7 +475,7 @@ Game::menu_t Game::StartGame(void)
 					// is selected open dialog
 					if(heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
 					{
-					    OpenHeroes(const_cast<Heroes *>(heroes), focus, areaMaps, radar, selectHeroes);
+					    OpenHeroes(const_cast<Heroes *>(heroes), areaMaps, radar, selectHeroes);
 
 					    statusWindow.Redraw();
 					    display.Flip();
@@ -591,21 +590,40 @@ Game::menu_t Game::StartGame(void)
 
 			default:
                             if(Maps::Ground::WATER != tile.GetGround() && tile.isPassable()
-                        		&& (NULL != (heroes = world.GetHeroes(focus.center))))
+                        		&& (NULL != (heroes = world.GetHeroes(globalfocus.center))))
                             {
-                            	    Route path(*heroes);
-				    path.Calculate(GetIndexMaps(mouse_coord));
-                            	    // div heroes.GetMovePoint()
+                            	// FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
+                            	Cursor::Set(Cursor::MOVE);
 
-                            	    // FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
-                            	    Cursor::Set(Cursor::MOVE);
-                            }
+				if(le.MouseClickLeft(tile_pos))
+				{
+				    Cursor::Hide();
+				    if(path.Length()) path.Hide();
+				    path.Calculate(Maps::GetIndexFromAreaPoint(mouse_coord));
+				    path.Show();
+				    path.Dump();
+				    Cursor::Show();
+				    display.Flip();
+
+				    //heroes.Goto();
+				    Error::Verbose("path length: ", path.Length());
+                        	}
+                    	    }
                             else
                             {
                                 Cursor::Set(Cursor::POINTER);
                             }
 			    break;
 		    }
+            
+            	    // hide path
+            	    if(le.MouseRight() && path.Length())
+                    {
+			Cursor::Hide();
+                        path.Hide();
+			Cursor::Show();
+			display.Flip();
+                    }
 		break;
 
 		// focus from boat
@@ -626,7 +644,7 @@ Game::menu_t Game::StartGame(void)
 					// is selected open dialog
 				        if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
 					{
-					    OpenCastle(const_cast<Castle *>(castle), focus, areaMaps, radar, selectCastles);
+					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar, selectCastles);
 
 					    statusWindow.Redraw();
 					    display.Flip();
@@ -634,7 +652,8 @@ Game::menu_t Game::StartGame(void)
 					// select other castle
 					else
 					{
-					    FocusToCastle(const_cast<Castle *>(castle), focus, areaMaps, radar, selectCastles);
+					    path.Reset();
+					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar, selectCastles);
 					    display.Flip();
 					}
 				    }
@@ -715,7 +734,7 @@ Game::menu_t Game::StartGame(void)
 					// is selected open dialog
 					if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
 					{
-					    OpenCastle(const_cast<Castle *>(castle), focus, areaMaps, radar, selectCastles);
+					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar, selectCastles);
 
 					    statusWindow.Redraw();
 					    display.Flip();
@@ -723,7 +742,8 @@ Game::menu_t Game::StartGame(void)
 					// select other castle
 					else
 					{
-					    FocusToCastle(const_cast<Castle *>(castle), focus, areaMaps, radar, selectCastles);
+					    path.Reset();
+					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar, selectCastles);
 					    display.Flip();
 					}
 				    }
@@ -765,7 +785,7 @@ Game::menu_t Game::StartGame(void)
 					// is selected open dialog
 					if(selectHeroes.isSelected() && heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
 					{
-					    OpenHeroes(const_cast<Heroes *>(heroes), focus, areaMaps, radar, selectHeroes);
+					    OpenHeroes(const_cast<Heroes *>(heroes), areaMaps, radar, selectHeroes);
 
 					    statusWindow.Redraw();
 					    display.Flip();
@@ -773,7 +793,9 @@ Game::menu_t Game::StartGame(void)
 					// select other hero
 					else
 					{
-					    FocusToHeroes(const_cast<Heroes *>(heroes), focus, areaMaps, radar, selectHeroes);
+					    path.Reset();
+					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar, selectHeroes);
+					    path.FromHeroes(heroes);
 					    display.Flip();
 					}
         			    }
@@ -961,7 +983,7 @@ Game::menu_t Game::StartGame(void)
 				selectCastles.Redraw();
 			    }
 
-			    OpenHeroes(hero, focus, areaMaps, radar, selectHeroes);
+			    OpenHeroes(hero, areaMaps, radar, selectHeroes);
 
 			    statusWindow.Redraw();
 			    display.Flip();
@@ -981,7 +1003,9 @@ Game::menu_t Game::StartGame(void)
 			// open hero
 			if(hero && H2Config::GetMyColor() == (*hero).GetColor())
 			{
-			    FocusToHeroes(hero, focus, areaMaps, radar, selectHeroes);
+			    path.Reset();
+			    FocusToHeroes(hero, areaMaps, radar, selectHeroes);
+			    path.FromHeroes(hero);
 			    display.Flip();
 			}
 		    }
@@ -1029,7 +1053,7 @@ Game::menu_t Game::StartGame(void)
 				selectHeroes.Redraw();
 			    }
 
-			    OpenCastle(castle, focus, areaMaps, radar, selectCastles);
+			    OpenCastle(castle, areaMaps, radar, selectCastles);
 
 			    statusWindow.Redraw();
 			    display.Flip();
@@ -1048,7 +1072,8 @@ Game::menu_t Game::StartGame(void)
 
 			if(castle && H2Config::GetMyColor() == (*castle).GetColor())
 			{
-			    FocusToCastle(castle, focus, areaMaps, radar, selectCastles);
+			    path.Reset();
+			    FocusToCastle(castle, areaMaps, radar, selectCastles);
 			    display.Flip();
 			}
 		    }
@@ -1182,20 +1207,8 @@ Game::menu_t Game::StartGame(void)
     return QUITGAME;
 }
 
-/* convert coord to index map */
-u16 Game::GetIndexMaps(const Point & pt)
-{
-    const Rect & area_pos = GameArea::GetRect();
-
-    u16 result = (area_pos.y + (pt.y - BORDERWIDTH) / TILEWIDTH) * world.w() + area_pos.x + (pt.x - BORDERWIDTH) / TILEWIDTH;
-
-    if(result > world.w() * world.h() - 1) Error::Except("Game::GetIndexMaps: position, out of range.");
-
-    return result;
-}
-
 /* open castle wrapper */
-void Game::OpenCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles)
+void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles)
 {
     if(! castle) return;
 
@@ -1206,7 +1219,7 @@ void Game::OpenCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, 
 
     while(Dialog::CANCEL != result)
     {
-	FocusToCastle(castle, focus, areaMaps, radar, selectCastles);
+	FocusToCastle(castle, areaMaps, radar, selectCastles);
 
 	Cursor::Hide();
 
@@ -1231,14 +1244,14 @@ void Game::OpenCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, 
 }
 
 /* focus to castle */
-void Game::FocusToCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles)
+void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar, SelectFocusCastles & selectCastles)
 {
     Cursor::Hide();
 
-    focus.type = Game::CASTLE;
-    focus.center = castle->GetCenter();
+    globalfocus.type = Game::CASTLE;
+    globalfocus.center = castle->GetCenter();
 
-    areaMaps.Center(focus.center);
+    areaMaps.Center(globalfocus.center);
     radar.UpdatePosition();
 
     selectCastles.SelectFromCenter(castle->GetCenter());
@@ -1248,7 +1261,7 @@ void Game::FocusToCastle(Castle *castle, gamefocus_t & focus, GameArea & areaMap
 }
 
 /* open heroes wrapper */
-void Game::OpenHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes)
+void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes)
 {
     if(! hero) return;
 
@@ -1259,7 +1272,7 @@ void Game::OpenHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Ra
 
     while(Dialog::CANCEL != result)
     {
-	FocusToHeroes(hero, focus, areaMaps, radar, selectHeroes);
+	FocusToHeroes(hero, areaMaps, radar, selectHeroes);
 
 	Cursor::Hide();
 
@@ -1282,14 +1295,14 @@ void Game::OpenHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Ra
 }
 
 /* focus to heroes */
-void Game::FocusToHeroes(Heroes *hero, gamefocus_t & focus, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes)
+void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar, SelectFocusHeroes & selectHeroes)
 {
     Cursor::Hide();
 
-    focus.type = Game::HEROES;
-    focus.center = hero->GetCenter();
+    globalfocus.type = Game::HEROES;
+    globalfocus.center = hero->GetCenter();
 
-    areaMaps.Center(focus.center);
+    areaMaps.Center(globalfocus.center);
     radar.UpdatePosition();
 
     selectHeroes.SelectFromCenter(hero->GetCenter());

@@ -23,25 +23,184 @@
 #include "heroes.h"
 #include "algorithm.h"
 #include "direction.h"
+#include "maps.h"
 #include "game.h"
-#include "gamearea.h"
+#include "config.h"
+#include "error.h"
 #include "route.h"
 
-Route::Route(const Heroes & from) : hero(from)
+void Route::FromHeroes(const Heroes *from)
 {
+    hero = from;
 }
 
 // return length path
 u16 Route::Calculate(u16 dst_index)
 {
-    if(path.size()) path.clear();
+    if(! hero) return 0;
 
-    return Algorithm::PathFinding(world.GetTiles(hero.GetCenter()).GetIndex(), dst_index, hero.GetLevelSkill(Skill::PATHFINDING), path);
+    if(dst != dst_index)
+    {
+	path.clear();
+
+	Algorithm::PathFinding(world.GetTiles(hero->GetCenter()).GetIndex(), dst_index, hero->GetLevelSkill(Skill::PATHFINDING), path);
+
+	dst = dst_index;
+    }
+
+    return path.size();
 }
 
-void Route::Blit(void)
+void Route::Show(void)
 {
-    // sprites in ROUTE.ICN
+    if(hero)
+    {
+	std::vector<u16>::const_iterator it1 = path.begin();
+	std::vector<u16>::const_iterator it2 = path.end();
+
+	u16 from = Maps::GetIndexFromAbsPoint(hero->GetCenter());
+
+	for(; it1 != it2; ++it1)
+	{
+	    const Sprite & sprite = (it1 == it2 ? GetSprite(Direction::CENTER, Direction::CENTER) : GetSprite(Direction::Get(from, *it1), Direction::Get(*it1, *(it1 + 1))));
+
+	    Maps::Tiles & tile = world.GetTiles(*it1);
+
+	    tile.AddExtraSprite(&sprite);
+	    tile.Redraw();
+
+	    from = *it1;
+	}
+    }
+}
+
+void Route::Dump(void)
+{
+    if(hero && H2Config::Debug())
+    {
+	std::vector<u16>::const_iterator it1 = path.begin();
+	std::vector<u16>::const_iterator it2 = path.end();
+
+	u16 from = Maps::GetIndexFromAbsPoint(hero->GetCenter());
+
+	// dump route
+	for(; it1 != it2; ++it1)
+	{
+	    Error::Verbose("route: " + Direction::String(Direction::Get(from, *it1)));
+
+	    from = *it1;
+	}
+    }
+
+    Error::Verbose("route: end");
+}
+
+const Sprite & Route::GetSprite(const Direction::vector_t & from, const Direction::vector_t & to)
+{
+    u16 index = 0;
+
+    switch(from)
+    {
+	case Direction::TOP:
+	    switch(to)
+	    {
+		case Direction::TOP:		index +=  9; break;
+		case Direction::TOP_RIGHT:	index += 18; break;
+		case Direction::RIGHT:		index += 19; break;
+		case Direction::LEFT:		index +=  7; break;
+		case Direction::TOP_LEFT:	index +=  8; break;
+		default: break;
+	    }
+	    break;
+
+	case Direction::TOP_RIGHT:
+	    switch(to)
+	    {
+		case Direction::TOP:		index +=  1; break;
+		case Direction::TOP_RIGHT:	index += 10; break;
+		case Direction::RIGHT:		index += 19; break;
+		case Direction::BOTTOM_RIGHT:	index += 20; break;
+		case Direction::TOP_LEFT:	index +=  8; break;
+		default: break;
+	    }
+	    break;
+
+	case Direction::RIGHT:
+	    switch(to)
+	    {
+		case Direction::TOP:		index +=  1; break;
+		case Direction::BOTTOM:		index += 21; break;
+		case Direction::BOTTOM_RIGHT:	index += 20; break;
+		case Direction::RIGHT:		index += 11; break;
+		case Direction::TOP_RIGHT:	index += 2; break;
+		default: break;
+	    }
+	    break;
+
+	case Direction::BOTTOM_RIGHT:
+	    switch(to)
+	    {
+		case Direction::TOP_RIGHT:	index +=  2; break;
+		case Direction::RIGHT:		index +=  3; break;
+		case Direction::BOTTOM_RIGHT:	index += 12; break;
+		case Direction::BOTTOM:		index += 21; break;
+		case Direction::BOTTOM_LEFT:	index += 22; break;
+		default: break;
+	    }
+	    break;
+
+	case Direction::BOTTOM:
+	    switch(to)
+	    {
+		case Direction::RIGHT:		index +=  3; break;
+		case Direction::BOTTOM_RIGHT:	index +=  4; break;
+		case Direction::BOTTOM:		index += 13; break;
+		case Direction::BOTTOM_LEFT:	index += 22; break;
+		case Direction::LEFT:		index += 23; break;
+		default: break;
+	    }
+	    break;
+
+	case Direction::BOTTOM_LEFT:
+	    switch(to)
+	    {
+		case Direction::BOTTOM_RIGHT:	index +=  4; break;
+		case Direction::BOTTOM:		index +=  5; break;
+		case Direction::BOTTOM_LEFT:	index += 14; break;
+		case Direction::LEFT:		index += 23; break;
+		case Direction::TOP_LEFT:	index += 24; break;
+		default: break;
+	    }
+	    break;
+
+	case Direction::LEFT:
+	    switch(to)
+	    {
+		case Direction::TOP:		index += 17; break;
+		case Direction::BOTTOM:		index +=  5; break;
+		case Direction::BOTTOM_LEFT:	index +=  6; break;
+		case Direction::LEFT:		index += 15; break;
+		case Direction::TOP_LEFT:	index += 24; break;
+		default: break;
+	    }
+	    break;
+
+	case Direction::TOP_LEFT:
+	    switch(to)
+	    {
+		case Direction::TOP:		index += 17; break;
+		case Direction::TOP_RIGHT:	index += 18; break;
+		case Direction::BOTTOM_LEFT:	index +=  6; break;
+		case Direction::LEFT:		index +=  7; break;
+		case Direction::TOP_LEFT:	index += 16; break;
+		default: break;
+	    }
+	    break;
+
+	default: break;
+    }
+
+    return AGG::GetICN("ROUTE.ICN", index);
 }
 
 void Route::Hide(void)
@@ -52,29 +211,22 @@ void Route::Hide(void)
 	std::vector<u16>::const_iterator it1 = path.begin();
 	std::vector<u16>::const_iterator it2 = path.end();
 
-	const Rect & area = GameArea::GetRect();
-	const u16 index_lt = GameArea::GetLeftTopIndexMaps();
-	
 	for(; it1 != it2; ++it1)
 	{
-	    bool enditer = false;
+	    Maps::Tiles & tile = world.GetTiles(*it1);
 
-	    for(u16 iy = 0; iy < area.h; ++iy)
-	    {
-		if(enditer) break;
-
-		for(u16 ix = 0; iy < area.w; ++iy)
-		{
-		    if(enditer) break;
-
-		    if(index_lt + (world.w() * iy) + ix == *it1)
-		    {
-			world.GetTiles(*it1).Blit(BORDERWIDTH + TILEWIDTH * ix, BORDERWIDTH + TILEWIDTH * iy);
-			
-			enditer = true;
-		    }
-		}
-	    }
+	    tile.DelExtraSprite();
+	    tile.Redraw();
 	}
     }
+}
+
+void Route::Reset(void)
+{
+    if(hero) Hide();
+
+    hero = NULL;
+    dst = MAXU16;
+
+    path.clear();
 }

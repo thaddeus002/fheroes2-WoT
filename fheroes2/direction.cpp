@@ -17,16 +17,60 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ALGORITHM_H
-#define H2ALGORITHM_H
 
-#include <vector>
-#include "gamedefs.h"
+#include "maps.h"
+#include "direction.h"
 
-namespace Algorithm
+const std::string & Direction::String(vector_t direct)
 {
-    u16 PathFinding(u16 index1, u16 index2, const Skill::level_t & pathfinding, std::vector<u16> & result);
+   static const std::string str_direct[] = { "center", "top", "top right", "right", "bottom right", "bottom", "bottom left", "left", "top left", "unknown" };
+   
+   switch(direct)
+   {
+	case CENTER:		return str_direct[0];
+	case TOP:		return str_direct[1];
+	case TOP_RIGHT:		return str_direct[2];
+	case RIGHT:		return str_direct[3];
+	case BOTTOM_RIGHT:	return str_direct[4];
+	case BOTTOM:		return str_direct[5];
+	case BOTTOM_LEFT:	return str_direct[6];
+	case LEFT:		return str_direct[7];
+	case TOP_LEFT:		return str_direct[8];
+	default:	break;
+   }
+ 
+    return str_direct[9];
+}
 
-};
 
-#endif
+Direction::vector_t Direction::Get(u16 from, u16 to)
+{
+    if(to == from)
+	return CENTER;
+    else
+    if(to == Maps::GetTopIndex(from))
+	return TOP;
+    else
+    if(to == Maps::GetTopRightIndex(from))
+    	return TOP_RIGHT;
+    else
+    if(to == Maps::GetRightIndex(from))
+    	return RIGHT;
+    else
+    if(to == Maps::GetBottomRightIndex(from))
+    	return BOTTOM_RIGHT;
+    else
+    if(to == Maps::GetBottomIndex(from))
+    	return BOTTOM;
+    else
+    if(to == Maps::GetBottomLeftIndex(from))
+    	return BOTTOM_LEFT;
+    else
+    if(to == Maps::GetLeftIndex(from))
+    	return LEFT;
+    else
+    if(to == Maps::GetTopLeftIndex(from))
+    	return TOP_LEFT;
+
+    return UNKNOWN;
+}

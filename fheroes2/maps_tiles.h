@@ -26,6 +26,8 @@
 #include "surface.h"
 #include "gamedefs.h"
 
+class Sprite;
+
 namespace Maps
 {
     class TilesAddon
@@ -44,8 +46,6 @@ namespace Maps
 	u8 GetIndex(void) const{ return index; };
 	u32 GetUniq(void) const{ return uniq; };
 	level_t GetLevel(void) const{ return level; };
-
-	bool isPassable(void) const;
 
 	void SetUniq(u32 gid){ uniq = gid; };
 	void SetObject(u8 obj){ object = obj; };
@@ -84,7 +84,11 @@ namespace Maps
 	void SetQuantity2(u8 val){ quantity2 = val; };
 	void SetObject(MP2::object_t object){ general = object; };
 
+	void AddExtraSprite(const Sprite * sprite){ extra = sprite; };
+	void DelExtraSprite(void){ extra = NULL; };
+
 	void Blit(u16 dstx, u16 dsty, u32 anime_frame = 0) const;
+	void Redraw(void) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);
@@ -110,6 +114,8 @@ namespace Maps
         u8      quantity2;
         std::vector<TilesAddon> addons_level1;
         std::vector<TilesAddon> addons_level2;
+        
+        const Sprite *extra;
     };
 };
 

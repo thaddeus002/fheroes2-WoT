@@ -20,9 +20,19 @@
 #ifndef H2DIRECTION_H
 #define H2DIRECTION_H
 
+#include <string>
+#include "gamedefs.h"
+
 namespace Direction
 {
-    typedef enum { TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT } vector_t;
+    typedef enum { CENTER, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT, UNKNOWN } vector_t;
+
+    inline vector_t& operator++ (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct + 1)); };
+    inline vector_t& operator-- (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct - 1)); };
+
+    const std::string & String(vector_t direct);
+
+    vector_t Get(u16 from, u16 to);
 };
 
 #endif
