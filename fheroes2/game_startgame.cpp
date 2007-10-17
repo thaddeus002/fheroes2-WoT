@@ -518,7 +518,23 @@ Game::menu_t Game::StartGame(void)
 			// focus from hero to object
     			case MP2::OBJ_TREASURECHEST:
     			    if(Maps::Ground::WATER != tile.GetGround())
-    				    Cursor::Set(Cursor::ACTION);
+    			    {
+    			        Cursor::Set(Cursor::ACTION);
+
+				if(le.MouseClickLeft(tile_pos))
+				{
+				    Cursor::Hide();
+				    if(path.Length()) path.Hide();
+				    path.Calculate(Maps::GetIndexFromAreaPoint(mouse_coord));
+				    path.Show();
+				    path.Dump();
+				    Cursor::Show();
+				    display.Flip();
+
+				    //heroes.Goto();
+				    Error::Verbose("path length: ", path.Length());
+                        	}
+    			    }
     			    break;
 
 			// focus from hero to object
@@ -585,7 +601,22 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_MAGICGARDEN:
     			case MP2::OBJ_OBSERVATIONTOWER:
     			case MP2::OBJ_FREEMANFOUNDRY:
+
 				Cursor::Set(Cursor::ACTION);
+
+				if(le.MouseClickLeft(tile_pos))
+				{
+				    Cursor::Hide();
+				    if(path.Length()) path.Hide();
+				    path.Calculate(Maps::GetIndexFromAreaPoint(mouse_coord));
+				    path.Show();
+				    path.Dump();
+				    Cursor::Show();
+				    display.Flip();
+
+				    //heroes.Goto();
+				    Error::Verbose("path length: ", path.Length());
+                        	}
 			    break;
 
 			default:

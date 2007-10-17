@@ -60,7 +60,7 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
-    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), extra(NULL)
+    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL)
 {
     tile_sprite.LoadPalette(AGG::GetPalette());
     AGG::GetTIL("GROUND32.TIL", mp2tile.tileIndex, mp2tile.shape, tile_sprite); 
@@ -187,14 +187,6 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	}
     }
 
-    // extra sprite
-    if(extra)
-    {
-	//Error::Verbose("x: ", extra->x());
-	//Error::Verbose("н: ", extra->y());
-	display.Blit(*extra, dstx + 16 - extra->w() / 2, dsty + 16 - extra->h() / 2);
-    }
-
     switch(general)
     {
 	 // heroes
@@ -237,6 +229,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	    }
 	}
     }
+
+    // route path sprite
+    if(path_sprite) display.Blit(*path_sprite, dstx + 16 - path_sprite->w() / 2, dsty + path_sprite->y());
 
     // put point for grid
     if(H2Config::Debug())

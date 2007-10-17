@@ -84,8 +84,8 @@ namespace Maps
 	void SetQuantity2(u8 val){ quantity2 = val; };
 	void SetObject(MP2::object_t object){ general = object; };
 
-	void AddExtraSprite(const Sprite * sprite){ extra = sprite; };
-	void DelExtraSprite(void){ extra = NULL; };
+	void AddPathSprite(const Sprite * sprite){ path_sprite = sprite; };
+	void DelPathSprite(void){ path_sprite = NULL; };
 
 	void Blit(u16 dstx, u16 dsty, u32 anime_frame = 0) const;
 	void Redraw(void) const;
@@ -115,7 +115,7 @@ namespace Maps
         std::vector<TilesAddon> addons_level1;
         std::vector<TilesAddon> addons_level2;
         
-        const Sprite *extra;
+        const Sprite *path_sprite;
     };
 };
 

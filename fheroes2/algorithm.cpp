@@ -74,7 +74,7 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::level_t & pathfi
 		const Maps::Tiles & tile = world.GetTiles(index_w);
 		cellinfo_t & cell = work_map[index_w];
 
-		if(tile.isPassable() && (cell.cost == MAXU16))
+		if((tile.isPassable() || index_w == index2) && (cell.cost == MAXU16))
 		{
 		    cell.cost = GetPenalty(tile.GetGround(), pathfinding, direct) +
 			    100 * (std::abs((index2 % width) - (index_i % width)) + std::abs(static_cast<u16>(index2 / width) - static_cast<u16>(index_i / width)));
