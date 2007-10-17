@@ -76,12 +76,16 @@ void Route::Show(void)
 	    from = *it1;
 	}
     }
+
+    if(H2Config::Debug()) Dump();
 }
 
 void Route::Dump(void)
 {
-    if(hero && H2Config::Debug())
+    if(hero)
     {
+	Error::Verbose("route start index: ", Maps::GetIndexFromAbsPoint(hero->GetCenter()));
+
 	std::vector<u16>::const_iterator it1 = path.begin();
 	std::vector<u16>::const_iterator it2 = path.end();
 
@@ -94,9 +98,10 @@ void Route::Dump(void)
 
 	    from = *it1;
 	}
-    }
 
-    Error::Verbose("route: end");
+	Error::Verbose("route end index: ", dst);
+	Error::Verbose("route size: ", path.size());
+    }
 }
 
 const Sprite & Route::GetSprite(const Direction::vector_t & from, const Direction::vector_t & to)

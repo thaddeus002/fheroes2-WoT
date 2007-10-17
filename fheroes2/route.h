@@ -33,15 +33,15 @@ class Route
 
 	u16	Calculate(u16 dst_index);
 	u16	Length(void) const{ return path.size(); };
+	u16	GetDestinationPoint(void) const{ return dst; };
 
 	void	Show(void);
 	void	Hide(void);
 	void	Reset(void);
 
-	void	Dump(void);
-
     private:
 	const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
+	void	Dump(void);
 
     private:
 	const Heroes * hero;

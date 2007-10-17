@@ -523,16 +523,23 @@ Game::menu_t Game::StartGame(void)
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    Cursor::Hide();
-				    if(path.Length()) path.Hide();
-				    path.Calculate(Maps::GetIndexFromAreaPoint(mouse_coord));
-				    path.Show();
-				    path.Dump();
-				    Cursor::Show();
-				    display.Flip();
-
-				    //heroes.Goto();
-				    Error::Verbose("path length: ", path.Length());
+				    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
+				    if(path.GetDestinationPoint() != new_dst_point)
+				    {
+					Cursor::Hide();
+					if(path.Length()) path.Hide();
+					path.Calculate(new_dst_point);
+					path.Show();
+				        Cursor::Show();
+					display.Flip();
+				    }
+				    else
+				    {
+				        //heroes.Goto();
+				        Error::Verbose("hero goto: ", Maps::GetIndexFromAreaPoint(mouse_coord));
+				        // heroes action object
+				        Error::Verbose("hero action: " + std::string(MP2::StringObject(tile.GetObject())));
+				    }
                         	}
     			    }
     			    break;
@@ -606,16 +613,23 @@ Game::menu_t Game::StartGame(void)
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    Cursor::Hide();
-				    if(path.Length()) path.Hide();
-				    path.Calculate(Maps::GetIndexFromAreaPoint(mouse_coord));
-				    path.Show();
-				    path.Dump();
-				    Cursor::Show();
-				    display.Flip();
-
-				    //heroes.Goto();
-				    Error::Verbose("path length: ", path.Length());
+				    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
+				    if(path.GetDestinationPoint() != new_dst_point)
+				    {
+					Cursor::Hide();
+					if(path.Length()) path.Hide();
+					path.Calculate(new_dst_point);
+					path.Show();
+				        Cursor::Show();
+					display.Flip();
+				    }
+				    else
+				    {
+				        //heroes.Goto();
+				        Error::Verbose("hero goto: ", Maps::GetIndexFromAreaPoint(mouse_coord));
+				        // heroes action object
+				        Error::Verbose("hero action: " + std::string(MP2::StringObject(tile.GetObject())));
+				    }
                         	}
 			    break;
 
@@ -628,16 +642,21 @@ Game::menu_t Game::StartGame(void)
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    Cursor::Hide();
-				    if(path.Length()) path.Hide();
-				    path.Calculate(Maps::GetIndexFromAreaPoint(mouse_coord));
-				    path.Show();
-				    path.Dump();
-				    Cursor::Show();
-				    display.Flip();
-
-				    //heroes.Goto();
-				    Error::Verbose("path length: ", path.Length());
+				    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
+				    if(path.GetDestinationPoint() != new_dst_point)
+				    {
+					Cursor::Hide();
+					if(path.Length()) path.Hide();
+					path.Calculate(new_dst_point);
+					path.Show();
+				        Cursor::Show();
+					display.Flip();
+				    }
+				    else
+				    {
+				        //heroes.Goto();
+				        Error::Verbose("hero goto: ", Maps::GetIndexFromAreaPoint(mouse_coord));
+				    }
                         	}
                     	    }
                             else
