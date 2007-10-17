@@ -24,28 +24,30 @@
 #include "gamedefs.h"
 #include "rect.h"
 
+class Heroes;
+
 class Route
 {
     public:
-	Route() : hero(NULL), dst(MAXU16){};
-	
-	void	FromHeroes(const Heroes *from);
+	Route(const Heroes & h);
+
+	void	DestinationIndex(u16 index){ dst = index; };
+	u16	GetDestinationIndex(void) const{ return dst; };
 
 	u16	Calculate(u16 dst_index);
 	u16	Length(void) const{ return path.size(); };
-	u16	GetDestinationPoint(void) const{ return dst; };
 
-	void	Show(void);
-	void	Hide(void);
+	void	Show(void) const;
+	void	Hide(void) const;
 	void	Reset(void);
 
     private:
-	const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
-	void	Dump(void);
+	static const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
+	void	Dump(void) const;
 
     private:
-	const Heroes * hero;
-	u16   dst;
+	const Heroes & hero;
+	u16	dst;
 	std::vector<u16> path;
 };
 

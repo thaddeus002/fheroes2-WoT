@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "maps.h"
+#include "error.h"
 #include "direction.h"
 
 const std::string & Direction::String(vector_t direct)
@@ -71,6 +72,10 @@ Direction::vector_t Direction::Get(u16 from, u16 to)
     else
     if(to == Maps::GetTopLeftIndex(from))
     	return TOP_LEFT;
+
+    //Error::Warning("Direction::Get: from: ", from);
+    //Error::Warning("Direction::Get:   to: ", to);
+    //Error::Warning("Direction::Get: return UNKNOWN");
 
     return UNKNOWN;
 }

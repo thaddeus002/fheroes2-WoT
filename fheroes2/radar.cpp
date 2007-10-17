@@ -69,6 +69,9 @@ void Radar::GenerateOrigin(void)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(index);
 
+	    if(tile.isRoad())
+		tile_surface.Fill(AGG::GetColor(COLOR_ROAD));
+	    else
 	    switch(tile.GetGround())
 	    {
 		case Maps::Ground::DESERT:	tile_surface.Fill(AGG::GetColor(COLOR_DESERT)); break;
@@ -80,7 +83,6 @@ void Radar::GenerateOrigin(void)
 		case Maps::Ground::DIRT:	tile_surface.Fill(AGG::GetColor(COLOR_DIRT)); break;
 		case Maps::Ground::GRASS:	tile_surface.Fill(AGG::GetColor(COLOR_GRASS)); break;
 		case Maps::Ground::WATER:	tile_surface.Fill(AGG::GetColor(COLOR_WATER)); break;
-		case Maps::Ground::ROAD:	tile_surface.Fill(AGG::GetColor(COLOR_ROAD)); break;
 		default:			tile_surface.Fill(AGG::GetColor(COLOR_GRASS)); break;
 	    }
 

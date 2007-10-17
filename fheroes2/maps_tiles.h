@@ -23,6 +23,7 @@
 #include <vector>
 #include "ground.h"
 #include "mp2.h"
+#include "direction.h"
 #include "surface.h"
 #include "gamedefs.h"
 
@@ -39,7 +40,7 @@ namespace Maps
 
 	TilesAddon & operator= (const TilesAddon & ta);
 
-	static bool isRoad(const TilesAddon & ta){ return 0x7A == ta.object; };
+	static bool isRoad(const TilesAddon & ta);
 	static bool RulesCompare(const TilesAddon & ta1, const TilesAddon & ta2){ return ta1.GetLevel() > ta2.GetLevel(); };
 
 	u8 GetObject(void) const{ return object; };
@@ -74,6 +75,8 @@ namespace Maps
 
 	bool isAnimation(u16 dstx, u16 dsty) const;
 	bool isPassable(void) const;
+	bool isRoad(void) const;
+	bool isRoad(const Direction::vector_t & direct) const;
 
 	const TilesAddon * FindAddon(u8 object, u8 index_min, u8 index_max) const;
 	const TilesAddon * FindAddon(u8 object, u8 index = 0xFF) const;

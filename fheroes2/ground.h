@@ -23,13 +23,15 @@
 #include <string>
 #include "gamedefs.h"
 #include "skill.h"
-#include "direction.h"
 
 namespace Maps
 {
+    class Tiles;
+
     namespace Ground
     {
-	typedef enum {
+	typedef enum
+	{
     	    DESERT	= 0x0001,
     	    SNOW	= 0x0002,
     	    SWAMP	= 0x0004,
@@ -39,12 +41,11 @@ namespace Maps
     	    DIRT	= 0x0040,
     	    GRASS	= 0x0080,
     	    WATER	= 0x0100,
-    	    ROAD	= 0x0200,
-	    MULTI	= 0x0400
+	    MULTI	= 0x0200
 	} ground_t;
 
 	const std::string & String(ground_t ground);
-	u16 GetPenalty(const ground_t & ground, const Skill::level_t & pathfinding, const Direction::vector_t & direct);
+	u16 GetPenalty(u16 from, u16 to, const Skill::level_t & pathfinding);
     };
 };
 

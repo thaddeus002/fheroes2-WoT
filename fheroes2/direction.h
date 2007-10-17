@@ -25,7 +25,19 @@
 
 namespace Direction
 {
-    typedef enum { CENTER, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT, UNKNOWN } vector_t;
+    typedef enum
+    {
+	UNKNOWN		= 0x00,
+	CENTER		= 0x01,
+	TOP		= 0x02,
+	TOP_RIGHT	= 0x04,
+	RIGHT		= 0x08,
+	BOTTOM_RIGHT	= 0x10,
+	BOTTOM		= 0x11,
+	BOTTOM_LEFT	= 0x12,
+	LEFT		= 0x14,
+	TOP_LEFT	= 0x18
+    } vector_t;
 
     inline vector_t& operator++ (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct + 1)); };
     inline vector_t& operator-- (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct - 1)); };

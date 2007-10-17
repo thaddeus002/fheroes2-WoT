@@ -33,6 +33,7 @@
 #include "army.h"
 #include "skill.h"
 #include "artifact.h"
+#include "route.h"
 #include "gamedefs.h"
 
 #define HEROESMAXSKILL		8
@@ -132,6 +133,9 @@ public:
     void ActionNewWeek(void);
     void ActionNewMonth(void);
 
+    const Route & GetPath(void) const{ return path; };
+    u16 FindPath(u16 dst_index);
+
 private:
     std::string		name;
     Color::color_t	color;
@@ -156,8 +160,9 @@ private:
     bool		army_spread;
     
     MP2::object_t	save_maps_general;
-    
+
     Point		mp;
+    Route		path;
 };
 
 #endif

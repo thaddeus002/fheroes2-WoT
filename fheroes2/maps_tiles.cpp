@@ -59,6 +59,53 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
     return *this;
 }
 
+bool Maps::TilesAddon::isRoad(const TilesAddon & ta)
+{
+    switch(ta.object)
+    {
+	// castle and tower (gate)
+    	case 0x8C:
+	case 0x8D:
+	case 0x8E:
+	case 0x8F:
+	    return (13 == ta.index ||
+		    29 == ta.index ||
+	    	    45 == ta.index ||
+	    	    61 == ta.index ||
+	    	    77 == ta.index ||
+	    	    93 == ta.index ||
+	    	    109 == ta.index ||
+	    	    125 == ta.index ||
+	    	    141 == ta.index ||
+	    	    157 == ta.index ||
+	    	    173 == ta.index ||
+	    	    189 == ta.index ? true : false);
+
+	// castle lands (gate)
+        case 0x90:
+	case 0x91:
+	case 0x92:
+	case 0x93:
+	    return ( 7 == ta.index ||
+		    17 == ta.index ||
+		    27 == ta.index ||
+		    37 == ta.index ||
+		    47 == ta.index ||
+		    57 == ta.index ||
+		    67 == ta.index ||
+		    77 == ta.index ? true : false);
+
+	// from sprite road
+	case 0x7A:
+	    return true;
+	
+	default:
+	    break;
+    }
+
+    return false;
+}
+
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL)
 {
@@ -102,11 +149,7 @@ void Maps::Tiles::AddonsSort(void)
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
 {
-    // maybe it is ROAD
-    if(addons_level1.end() != find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRoad))
-	return Maps::Ground::ROAD;
-    
-    // list grouns from GROUND32.TIL
+    // list grounds from GROUND32.TIL
     if(30 > tile_index)
         return Maps::Ground::WATER;
         
@@ -181,7 +224,7 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 		if(u8 anime_index = MP2::GetAnimationFrame(object, index, anime_frame))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-		    display.Blit(anime_sprite, dstx - anime_sprite.x(), dsty + anime_sprite.y());
+		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
 	}
@@ -366,6 +409,17 @@ void Maps::Tiles::DebugInfo(u16 index) const
 
     std::cout << "tile            : " << value << std::endl;
     
+    value.clear();
+
+    value = Ground::String(GetGround());
+    if(isRoad()) value += ", (road)";
+    std::cout << "ground          : " << value << std::endl;
+
+    value.clear();
+
+    value = isPassable() ? "true" : "false";
+    std::cout << "passable        : " << value << std::endl;
+
     value.clear();
     
     String::AddInt(value, general);
@@ -970,6 +1024,31 @@ bool Maps::Tiles::isPassable() const
     }
     else
 	return false;
+
+    return true;
+}
+
+/* check road */
+bool Maps::Tiles::isRoad(void) const
+{
+    return addons_level1.end() != find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRoad);
+}
+
+/* check road */
+bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
+{
+    // FIXME: check road direction
+    if(! isRoad()) return false;
+
+    switch(direct)
+    {
+        case Direction::TOP_RIGHT:
+        case Direction::BOTTOM_RIGHT:
+        case Direction::BOTTOM_LEFT:
+        case Direction::TOP_LEFT:	return false;
+        
+        default: break;
+    }
 
     return true;
 }

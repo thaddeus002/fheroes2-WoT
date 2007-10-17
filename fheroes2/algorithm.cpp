@@ -22,15 +22,18 @@
 #include "maps.h"
 #include "world.h"
 #include "direction.h"
+#include "config.h"
+#include "tools.h"
 #include "error.h"
 #include "algorithm.h"
 
 struct cellinfo_t
 {
-    cellinfo_t() : cost(MAXU16), parent(MAXU16), open_list(true) {};
-    cellinfo_t(const u16 c, const u16 p, const Direction::vector_t & d, bool f) : cost(c), parent(p), direct(d), open_list(f){};
+    cellinfo_t() : cost_g(MAXU16),cost_h(MAXU16), parent(MAXU16), open_list(true) {};
+    cellinfo_t(const u16 g, const u16 h, const u16 p, const Direction::vector_t & d, bool f) : cost_g(g), cost_h(h), parent(p), direct(d), open_list(f){};
 
-    u16		cost;
+    u16		cost_g;
+    u16		cost_h;
     u16		parent;
     Direction::vector_t direct;
     bool	open_list;
@@ -58,7 +61,7 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::level_t & pathfi
     u32 count_itr = 0;
 
     u16 index_i = index1;
-    work_map[index_i] = cellinfo_t(MAXU16, MAXU16, Direction::CENTER, false);
+    work_map[index_i] = cellinfo_t(MAXU16, MAXU16, MAXU16, Direction::CENTER, false);
 
     while(index_i != index2 && !notfound)
     {
@@ -67,42 +70,96 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::level_t & pathfi
 
 	for(; it1 != it2; ++it1)
 	{
-	    const Direction::vector_t & direct = *it1;
-	    if(Maps::isValidDirection(index_i, direct))
+	    if(Maps::isValidDirection(index_i, *it1))
 	    {
-		const u16 index_w = Maps::GetDirectionIndex(index_i, direct);
-		const Maps::Tiles & tile = world.GetTiles(index_w);
+		const u16 index_w = Maps::GetDirectionIndex(index_i, *it1);
 		cellinfo_t & cell = work_map[index_w];
 
-		if((tile.isPassable() || index_w == index2) && (cell.cost == MAXU16))
+		if((world.GetTiles(index_w).isPassable() || index_w == index2) && (cell.cost_g == MAXU16))
 		{
-		    cell.cost = GetPenalty(tile.GetGround(), pathfinding, direct) +
-			    100 * (std::abs((index2 % width) - (index_i % width)) + std::abs(static_cast<u16>(index2 / width) - static_cast<u16>(index_i / width)));
+		    cell.cost_g = Maps::Ground::GetPenalty(index_i, index_w, pathfinding);
+		    cell.cost_h = 50 * (std::abs(static_cast<s16>(index2 % width) - static_cast<s16>(index_w % width)) +
+			                 std::abs(static_cast<s16>(index2 / width) - static_cast<s16>(index_w / width)));
 
-		    cell.parent = index_i;
-		    cell.direct = direct;
+		    cell.direct = *it1;
 		    cell.open_list = true;
+		    cell.parent = index_i;
 		}
+
 	    }
 	}
 
-	// goto minimal cost
+	if(H2Config::Debug()) Error::Verbose("dump penalty, from index: ", index_i);
+
 	std::map<u16, cellinfo_t>::iterator im1 = work_map.begin();
         std::map<u16, cellinfo_t>::iterator im2 = work_map.end();
+
+	// check min from current
+        for(; im1 != im2; ++im1)
+    	    if((*im1).second.open_list &&
+    		Direction::UNKNOWN != Direction::Get(index_i, (*im1).first) &&
+    		(*im1).second.cost_g > work_map[index_i].cost_g + Maps::Ground::GetPenalty(index_i, (*im1).first, pathfinding))
+    	    {
+    		(*im1).second.cost_g = work_map[index_i].cost_g + Maps::Ground::GetPenalty(index_i, (*im1).first, pathfinding);
+    		(*im1).second.parent = index_i;
+
+		if(H2Config::Debug())
+		{
+		    std::string value = "                to index: ";
+		    String::AddInt(value, (*im1).first);
+		    value += ", correct minimal cost_g";
+
+		    Error::Verbose(value);
+    		}
+	    }
+
+
+	// dump open list
+	im1 = work_map.begin();
+        for(; im1 != im2; ++im1)
+    	    if((*im1).second.open_list)
+    	    {
+		if(H2Config::Debug() && Direction::UNKNOWN != Direction::Get(index_i, (*im1).first))
+		{
+		    std::string value = "                to index: ";
+		    String::AddInt(value, (*im1).first);
+		    value += ", direct: " + Direction::String((*im1).second.direct);
+		    value += ", status: " + std::string(((*im1).second.open_list ? "true" : "false"));
+		    value += ", cost_g: ";
+		    String::AddInt(value, (*im1).second.cost_g);
+		    value += ", cost_h: ";
+		    String::AddInt(value, (*im1).second.cost_h);
+
+		    Error::Verbose(value);
+		}
+	    }
+
+	// goto minimal cost
+	im1 = work_map.begin();
 	u16 cost = MAXU16;
 	u16 newindex = index_i;
-        for(; im1 != im2; ++im1) if((*im1).second.open_list && (*im1).second.cost < cost){ cost = (*im1).second.cost; newindex = (*im1).first; }
+        for(; im1 != im2; ++im1)
+    	    if((*im1).second.open_list &&
+    		(*im1).second.cost_g + (*im1).second.cost_h < cost)
+    	    {
+    		cost = (*im1).second.cost_g + (*im1).second.cost_h;
+    		newindex = (*im1).first;
+    	    }
 
+	// check not found
 	if(newindex != index_i)
 	{
 	    index_i = newindex;
 	    work_map[index_i].open_list = false;
+
+	    if(H2Config::Debug()) Error::Verbose("                  select: ", index_i);
 	}
 	else
 	    notfound = true;
 
 	++count_itr;
 
+	// exception (invalid algorithm)
 	if(count_itr > 65000)
 	{
 	    Error::Warning("Algorithm::PathFinding: unknown path finding, check algorithm.");

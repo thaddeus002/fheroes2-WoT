@@ -18,14 +18,18 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "maps_tiles.h"
+#include "direction.h"
+#include "world.h"
 #include "ground.h"
 
 const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
 {
     static const std::string str_ground[] = { "Desert", "Snow", "Swamp", "Wasteland", "Beach", 
-	"Lava", "Dirt", "Grass", "Water", "Road", "Multi" };
+	"Lava", "Dirt", "Grass", "Water", "Multi" };
 
-    switch(ground){
+    switch(ground)
+    {
         case DESERT:	return str_ground[0];
 	case SNOW:	return str_ground[1];
 	case SWAMP:	return str_ground[2];
@@ -35,15 +39,20 @@ const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
 	case DIRT:	return str_ground[6];
 	case GRASS:	return str_ground[7];
 	case WATER:	return str_ground[8];
-	case ROAD:	return str_ground[9];
-	case MULTI:	return str_ground[10];
+	default: break;
     }
 
-    return str_ground[10];
+    return str_ground[9];
 }
 
-u16 Maps::Ground::GetPenalty(const ground_t & ground, const Skill::level_t & pathfinding, const Direction::vector_t & direct)
+u16 Maps::Ground::GetPenalty(u16 from, u16 to, const Skill::level_t & pathfinding)
 {
+    //const Maps::Tiles & tile_from = world.GetTiles(from);
+    const Maps::Tiles & tile_to = world.GetTiles(to);
+    const Direction::vector_t direct = Direction::Get(from, to);
+
+    if(Direction::UNKNOWN == direct) return MAXU16;
+
     u16 result = 0;
 /*
             none   basc   advd   expr
@@ -59,7 +68,20 @@ u16 Maps::Ground::GetPenalty(const ground_t & ground, const Skill::level_t & pat
     Road    0.75   0.75   0.75   0.75
 */
 
-    switch(ground)
+    if(tile_to.isRoad(direct))
+    {
+	switch(direct)
+	{
+    	    case Direction::TOP_RIGHT:
+    	    case Direction::BOTTOM_RIGHT:
+    	    case Direction::BOTTOM_LEFT:
+    	    case Direction::TOP_LEFT:		result = 110;	break;
+	
+	    default:				result = 70;	break;
+	}
+    }
+    else
+    switch(tile_to.GetGround())
     {
 
 	case DESERT:
@@ -84,8 +106,6 @@ u16 Maps::Ground::GetPenalty(const ground_t & ground, const Skill::level_t & pat
 	case WASTELAND:
 	case BEACH:
 						result = (Skill::NEVER == pathfinding ? 125 : 100); break;
-
-	case ROAD:				result = 75;  break;
 
 	case LAVA:
 	case DIRT:

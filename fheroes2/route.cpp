@@ -29,33 +29,29 @@
 #include "error.h"
 #include "route.h"
 
-void Route::FromHeroes(const Heroes *from)
+/* construct */
+Route::Route(const Heroes & h)
+    : hero(h), dst(Maps::GetIndexFromAbsPoint(h.GetCenter()))
 {
-    hero = from;
 }
 
-// return length path
+/* return length path */
 u16 Route::Calculate(u16 dst_index)
 {
-    if(! hero) return 0;
+    path.clear();
 
-    if(dst != dst_index)
-    {
-	path.clear();
+    Algorithm::PathFinding(Maps::GetIndexFromAbsPoint(hero.GetCenter()), dst_index, hero.GetLevelSkill(Skill::PATHFINDING), path);
 
-	Algorithm::PathFinding(world.GetTiles(hero->GetCenter()).GetIndex(), dst_index, hero->GetLevelSkill(Skill::PATHFINDING), path);
-
-	dst = dst_index;
-    }
+    dst = dst_index;
 
     return path.size();
 }
 
-void Route::Show(void)
+void Route::Show(void) const
 {
-    if(hero)
+    if(path.size())
     {
-	u16 from = Maps::GetIndexFromAbsPoint(hero->GetCenter());
+	u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
 	std::vector<u16>::const_iterator it1 = path.begin();
 	std::vector<u16>::const_iterator it2 = path.end();
@@ -75,33 +71,57 @@ void Route::Show(void)
 
 	    from = *it1;
 	}
-    }
 
-    if(H2Config::Debug()) Dump();
+	if(H2Config::Debug()) Dump();
+    }
 }
 
-void Route::Dump(void)
+void Route::Dump(void) const
 {
-    if(hero)
-    {
-	Error::Verbose("route start index: ", Maps::GetIndexFromAbsPoint(hero->GetCenter()));
+    Error::Verbose("route start index: ", Maps::GetIndexFromAbsPoint(hero.GetCenter()));
 
+    std::vector<u16>::const_iterator it1 = path.begin();
+    std::vector<u16>::const_iterator it2 = path.end();
+
+    u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+
+    // dump route
+    for(; it1 != it2; ++it1)
+    {
+	Error::Verbose("route: " + Direction::String(Direction::Get(from, *it1)));
+
+	from = *it1;
+    }
+
+    Error::Verbose("route end index: ", dst);
+    Error::Verbose("route size: ", path.size());
+}
+
+void Route::Hide(void) const
+{
+    if(path.size())
+    {
+	// redraw tiles
 	std::vector<u16>::const_iterator it1 = path.begin();
 	std::vector<u16>::const_iterator it2 = path.end();
 
-	u16 from = Maps::GetIndexFromAbsPoint(hero->GetCenter());
-
-	// dump route
 	for(; it1 != it2; ++it1)
 	{
-	    Error::Verbose("route: " + Direction::String(Direction::Get(from, *it1)));
+	    Maps::Tiles & tile = world.GetTiles(*it1);
 
-	    from = *it1;
+	    tile.DelPathSprite();
+	    tile.Redraw();
 	}
-
-	Error::Verbose("route end index: ", dst);
-	Error::Verbose("route size: ", path.size());
     }
+}
+
+void Route::Reset(void)
+{
+    Hide();
+
+    dst = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+
+    path.clear();
 }
 
 const Sprite & Route::GetSprite(const Direction::vector_t & from, const Direction::vector_t & to)
@@ -211,32 +231,4 @@ const Sprite & Route::GetSprite(const Direction::vector_t & from, const Directio
     }
 
     return AGG::GetICN("ROUTE.ICN", index);
-}
-
-void Route::Hide(void)
-{
-    if(path.size())
-    {
-	// redraw tiles
-	std::vector<u16>::const_iterator it1 = path.begin();
-	std::vector<u16>::const_iterator it2 = path.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    Maps::Tiles & tile = world.GetTiles(*it1);
-
-	    tile.DelPathSprite();
-	    tile.Redraw();
-	}
-    }
-}
-
-void Route::Reset(void)
-{
-    if(hero) Hide();
-
-    hero = NULL;
-    dst = MAXU16;
-
-    path.clear();
 }

@@ -28,7 +28,7 @@
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
     move_point(0), morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL),
-    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES)
+    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES), path(*this)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -120,8 +120,9 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
         army[1].SetMonster(Monster::RED_DRAGON);
         army[1].SetCount(3);
 
-	skills[2] = Skill::Skill(Skill::PATHFINDING, Skill::BASIC);
-	skills[3] = Skill::Skill(Skill::LOGISTICS, Skill::BASIC);
+	// path finding audit
+	//skills[2] = Skill::Skill(Skill::PATHFINDING, Skill::BASIC);
+	//skills[3] = Skill::Skill(Skill::LOGISTICS, Skill::BASIC);
 	skills[4] = Skill::Skill(Skill::MYSTICISM, Skill::BASIC);
 	skills[5] = Skill::Skill(Skill::NAVIGATION, Skill::BASIC);
 	skills[6] = Skill::Skill(Skill::LEADERSHIP, Skill::BASIC);
@@ -820,3 +821,7 @@ void Heroes::ActionNewMonth(void)
 {
 }
 
+u16 Heroes::FindPath(u16 dst_index)
+{
+    return path.Calculate(dst_index);
+}
