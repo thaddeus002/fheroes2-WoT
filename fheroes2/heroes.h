@@ -36,8 +36,8 @@
 #include "route.h"
 #include "gamedefs.h"
 
-#define HEROESMAXSKILL		8
 #define HEROESMAXARTIFACT	14
+#define HEROESMAXSKILL		8
 #define HEROESMAXARMY		5
 
 /*
@@ -73,7 +73,8 @@
 class Heroes
 {
 public:
-    typedef enum {
+    typedef enum
+    {
 	// knight
 	LORDKILBURN, SIRGALLANTH, ECTOR, GVENNETH, TYRO, AMBROSE, RUBY, MAXIMUS, DIMITRY,
 	// barbarian
@@ -119,7 +120,7 @@ public:
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const{ return 1; };
     const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
-    Skill::level_t GetLevelSkill(const Skill::skill_t & skill) const;
+    Skill::Level::type_t GetLevelSkill(Skill::secondary_t type) const{ return secondary_skills.GetLevel(type); };
 
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;
@@ -139,17 +140,15 @@ public:
 private:
     std::string		name;
     Color::color_t	color;
-    u8			attack;
-    u8			defence;
-    u8			power;
-    u8			knowledge;
+    Skill::Primary	primary_skills;
     u32			experience;
     u16			magic_point;
     u16			move_point;
     Morale::morale_t	morale;
     Luck::luck_t	luck;
 
-    std::vector<Skill> skills;
+    Skill::Secondary	secondary_skills;
+
     std::vector<Artifact::artifact_t>	artifacts;
     std::vector<Army::Troops> army;
     //std::vector<Spell::spell_t>	books;

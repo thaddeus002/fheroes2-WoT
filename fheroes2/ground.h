@@ -45,7 +45,7 @@ namespace Maps
 	} ground_t;
 
 	const std::string & String(ground_t ground);
-	u16 GetPenalty(u16 from, u16 to, const Skill::level_t & pathfinding);
+	u16 GetPenalty(u16 from, u16 to, const Skill::Level::type_t & pathfinding);
     };
 };
 

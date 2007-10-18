@@ -22,48 +22,89 @@
 #define H2SKILL_H
 
 #include <string>
+#include <vector>
+#include <map>
 #include <utility>
 
-class Skill
+#define MAXPRIMARYSKILL		6
+#define MAXSECONDARYSKILL	14
+
+class Sprite;
+
+namespace Skill
 {
-    public:
-	typedef enum { NEVER, BASIC, ADVANCED, EXPERT } level_t;
+    typedef enum
+    {
+	ATTACK		= 0,
+	DEFENCE		= 1,
+	POWER		= 2,
+	KNOWLEDGE	= 3
+    } primary_t;
 
-	typedef enum {
-	    PATHFINDING	= 0,
-	    ARCHERY	= 1,
-	    LOGISTICS	= 2,
-	    SCOUTING	= 3,
-	    DIPLOMACY	= 4,
-	    NAVIGATION	= 5,
-	    LEADERSHIP	= 6,
-	    WISDOM	= 7,
-	    MYSTICISM	= 8,
-	    LUCK	= 9,
-	    BALLISTICS	= 10,
-	    EAGLEEYE	= 11,
-	    NECROMANCY	= 12,
-	    ESTATES	= 13,
-	    NONE = 0xFF
-	} skill_t;
+    typedef enum
+    {
+	PATHFINDING	= 0x0001,
+	ARCHERY		= 0x0002,
+	LOGISTICS	= 0x0004,
+	SCOUTING	= 0x0008,
+	DIPLOMACY	= 0x0010,
+	NAVIGATION	= 0x0020,
+	LEADERSHIP	= 0x0040,
+	WISDOM		= 0x0080,
+	MYSTICISM	= 0x0100,
+	LUCK		= 0x0200,
+	BALLISTICS	= 0x0400,
+	EAGLEEYE	= 0x0800,
+	NECROMANCY	= 0x1000,
+	ESTATES		= 0x2000,
+	UNKNOWN		= 0xFFFF,
+    } secondary_t;
 
-	Skill(skill_t type = NONE, level_t level = BASIC) : pair(type, level) {};
+    inline secondary_t & operator++ (secondary_t & skill){ return skill = ( ESTATES == skill ? UNKNOWN : secondary_t(skill << 1)); };
+    inline secondary_t & operator-- (secondary_t & skill){ return skill = ( UNKNOWN == skill ? ESTATES : secondary_t(skill >> 1)); };
+
+    namespace Level
+    {
+	typedef enum { NONE, BASIC, ADVANCED, EXPERT } type_t;
 	
-	skill_t GetSkill(void) const{ return pair.first; };
-	level_t GetLevel(void) const{ return pair.second; };
+	type_t FromMP2(u8 byte);
 
-	void SetSkill(skill_t skill){ pair.first = skill; };
-	void SetLevel(level_t level){ pair.second = level; };
+	const std::string & String(type_t level);
+    };
 
-	void SetSkill(u8 skill);
-	void SetLevel(u8 level);
+    const std::string & String(primary_t skill);
+    const std::string & String(secondary_t skill);
+    const std::string & Description(secondary_t skill, Level::type_t level);
 
-	static const std::string & LevelString(level_t level);
-	static const std::string & String(skill_t skill);
-	static const std::string & Description(skill_t skill, level_t level);
+    class Primary
+    {
+	public:
+	Primary();
 
-    private:
-	std::pair<skill_t, level_t> pair;
+	std::vector<u8> skills;
+
+	u8	& attack;
+	u8	& defence;
+	u8	& power;
+	u8	& knowledge;
+    };
+
+    class Secondary
+    {
+	public:
+	Secondary();
+
+	void		Level(secondary_t skill, Level::type_t level);
+	Level::type_t	GetLevel(secondary_t skill) const;
+	secondary_t	GetSkill(u8 index) const;
+
+	static secondary_t 	FromMP2(u8 byte);
+	static const Sprite &	GetSprite(secondary_t skill);
+
+	private:
+	std::map<secondary_t, Level::type_t> skills;
+	u8 count;
+    };
 };
 
 #endif

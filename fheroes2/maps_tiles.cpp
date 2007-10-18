@@ -59,7 +59,7 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
     return *this;
 }
 
-bool Maps::TilesAddon::isRoad(const TilesAddon & ta)
+u8 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
 {
     switch(ta.object)
     {
@@ -79,7 +79,7 @@ bool Maps::TilesAddon::isRoad(const TilesAddon & ta)
 	    	    141 == ta.index ||
 	    	    157 == ta.index ||
 	    	    173 == ta.index ||
-	    	    189 == ta.index ? true : false);
+	    	    189 == ta.index ? Direction::TOP | Direction::BOTTOM : 0);
 
 	// castle lands (gate)
         case 0x90:
@@ -93,17 +93,41 @@ bool Maps::TilesAddon::isRoad(const TilesAddon & ta)
 		    47 == ta.index ||
 		    57 == ta.index ||
 		    67 == ta.index ||
-		    77 == ta.index ? true : false);
+		    77 == ta.index ? Direction::TOP | Direction::BOTTOM : 0);
 
 	// from sprite road
 	case 0x7A:
-	    return true;
+	    if(0  == ta.index ||
+	       4  == ta.index ||
+	       5  == ta.index ||
+	       7  == ta.index ||
+	       9  == ta.index ||
+	       12 == ta.index ||
+	       13 == ta.index ||
+	       16 == ta.index ||
+	       19 == ta.index ||
+	       20 == ta.index ||
+	       26 == ta.index)	return Direction::TOP | Direction::BOTTOM;
+	    else
+	    if(2  == ta.index ||
+	       21 == ta.index ||
+	       28 == ta.index)	return Direction::RIGHT | Direction::LEFT;
+	    else
+	    if(3  == ta.index ||
+	       6  == ta.index ||
+	       14 == ta.index)	return Direction::TOP | Direction::BOTTOM | Direction::RIGHT | Direction::LEFT;
+	    else
+	    if(17 == ta.index ||
+	       29 == ta.index)	return Direction::TOP_LEFT | Direction::BOTTOM_RIGHT;
+	    else
+	    if(18 == ta.index ||
+	       30 == ta.index)	return Direction::TOP_RIGHT | Direction::BOTTOM_LEFT;
 	
 	default:
 	    break;
     }
 
-    return false;
+    return 0;
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
@@ -1029,26 +1053,18 @@ bool Maps::Tiles::isPassable() const
 }
 
 /* check road */
-bool Maps::Tiles::isRoad(void) const
-{
-    return addons_level1.end() != find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRoad);
-}
-
-/* check road */
 bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
 {
-    // FIXME: check road direction
-    if(! isRoad()) return false;
-
     switch(direct)
     {
-        case Direction::TOP_RIGHT:
-        case Direction::BOTTOM_RIGHT:
-        case Direction::BOTTOM_LEFT:
-        case Direction::TOP_LEFT:	return false;
-        
-        default: break;
+	case Direction::UNKNOWN:
+	case Direction::CENTER:	return addons_level1.end() != find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRoad);
+	
+	default: break;
     }
 
-    return true;
+    for(u8 ii = 0; ii < addons_level1.size(); ++ii)
+	if(TilesAddon::isRoad(addons_level1[ii], direct)) return true;
+
+    return false;
 }

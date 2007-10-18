@@ -18,29 +18,83 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include "agg.h"
 #include "gamedefs.h"
+#include "heroes.h"
 #include "skill.h"
 
-void Skill::SetSkill(u8 skill)
+Skill::Primary::Primary()
+    : skills(MAXPRIMARYSKILL),
+    attack(skills[ATTACK]), defence(skills[DEFENCE]), power(skills[POWER]), knowledge(skills[KNOWLEDGE])
 {
-    ESTATES >= skill ? pair.first = static_cast<skill_t>(skill) : pair.first = NONE;
+    attack	= 0;
+    defence	= 0;
+    power	= 0;
+    knowledge	= 0;
 }
 
-void Skill::SetLevel(u8 level)
+Skill::Secondary::Secondary() : count(0)
 {
-    switch(level)
+    skills[PATHFINDING]	= Skill::Level::NONE;
+    skills[ARCHERY]	= Skill::Level::NONE;
+    skills[LOGISTICS]	= Skill::Level::NONE;
+    skills[SCOUTING]	= Skill::Level::NONE;
+    skills[DIPLOMACY]	= Skill::Level::NONE;
+    skills[NAVIGATION]	= Skill::Level::NONE;
+    skills[LEADERSHIP]	= Skill::Level::NONE;
+    skills[WISDOM]	= Skill::Level::NONE;
+    skills[MYSTICISM]	= Skill::Level::NONE;
+    skills[LUCK]	= Skill::Level::NONE;
+    skills[BALLISTICS]	= Skill::Level::NONE;
+    skills[EAGLEEYE]	= Skill::Level::NONE;
+    skills[NECROMANCY]	= Skill::Level::NONE;
+    skills[ESTATES]	= Skill::Level::NONE;
+}
+
+void Skill::Secondary::Level(secondary_t skill, Level::type_t level)
+{
+    if(Level::NONE == level || UNKNOWN == skill) return;
+
+    if(Level::NONE != GetLevel(skill))
+	skills[skill] = level;
+    else
+    if(count < HEROESMAXSKILL)
     {
-	case 0: pair.second = BASIC;	break;
-	case 1: pair.second = ADVANCED; break;
-	case 2: pair.second = EXPERT;	break;
-	
-	default:  pair.second = NEVER; break;
+    	skills[skill] = level;
+    	++count;
     }
 }
 
-const std::string & Skill::LevelString(level_t level)
+Skill::Level::type_t Skill::Secondary::GetLevel(secondary_t skill) const
 {
-    static const std::string str_level[] = { "Never", "Basic", "Advanced", "Expert" };
+    if(UNKNOWN != skill)
+    {
+	std::map<secondary_t, Level::type_t>::const_iterator it1 = skills.begin();
+	std::map<secondary_t, Level::type_t>::const_iterator it2 = skills.end();
+
+	for(; it1 != it2; ++it1) if(skill == (*it1).first) return (*it1).second;
+    }
+    
+    return Skill::Level::NONE;
+}
+
+Skill::Level::type_t Skill::Level::FromMP2(u8 byte)
+{
+    switch(byte)
+    {
+       case 0: return BASIC;
+       case 1: return ADVANCED;
+       case 2: return EXPERT;
+
+	default: break;
+    }
+
+    return NONE;
+}
+
+const std::string & Skill::Level::String(type_t level)
+{
+    static const std::string str_level[] = { "None", "Basic", "Advanced", "Expert" };
 
     switch(level)
     {
@@ -53,10 +107,25 @@ const std::string & Skill::LevelString(level_t level)
     return str_level[0];
 }
 
-const std::string & Skill::String(skill_t skill)
+const std::string & Skill::String(primary_t skill)
+{
+    static const std::string str_skill[] = { "Attack", "Defence", "Power", "Knowledge" };
+
+    switch(skill)
+    {
+	case ATTACK:	return str_skill[0];
+        case DEFENCE:	return str_skill[1];
+        case POWER:	return str_skill[2];
+        case KNOWLEDGE:	return str_skill[3];
+    }
+
+    return str_skill[0];
+}
+
+const std::string & Skill::String(secondary_t skill)
 {
     static const std::string str_skill[] = { "Pathfinding", "Archery", "Logistics", "Scouting", "Diplomacy", "Navigation", 
-	"Leadership", "Wisdom", "Mysticism", "Luck", "Ballistics", "Eagle Eye", "Necromancy", "Estates" };
+	"Leadership", "Wisdom", "Mysticism", "Luck", "Ballistics", "Eagle Eye", "Necromancy", "Estates", "Unknown"  };
 
     switch(skill)
     {
@@ -78,12 +147,13 @@ const std::string & Skill::String(skill_t skill)
 	default: break;
     }
 
-    return str_skill[0];
+    return str_skill[14];
 }
 
-const std::string & Skill::Description(skill_t skill, level_t level)
+const std::string & Skill::Description(secondary_t skill, Level::type_t level)
 {
-    static const std::string description_skill[] = {
+    static const std::string description_skill[] =
+    {
 	"Basic Pathfinding reduces the movement penalty for rough terrain by 25 percent.",
 	"Advanced Pathfinding reduces the movement penalty for rough terrain by 50 percent.",
 	"Expert Pathfinding eliminates the movement penalty for rough terrain.",
@@ -144,9 +214,9 @@ const std::string & Skill::Description(skill_t skill, level_t level)
 
     switch(level)
     {
-	case BASIC:	index = 0; break;
-	case ADVANCED:	index = 1; break;
-	case EXPERT:	index = 2; break;
+	case Level::BASIC:	index = 0; break;
+	case Level::ADVANCED:	index = 1; break;
+	case Level::EXPERT:	index = 2; break;
 	default: break;
     }
     switch(skill)
@@ -170,4 +240,66 @@ const std::string & Skill::Description(skill_t skill, level_t level)
     }
     
     return description_skill[index];
+}
+
+Skill::secondary_t Skill::Secondary::GetSkill(u8 index) const
+{
+    std::map<secondary_t, Level::type_t>::const_iterator it1 = skills.begin();
+    std::map<secondary_t, Level::type_t>::const_iterator it2 = skills.end();
+
+    for(; it1 != it2; ++it1) if((*it1).first != UNKNOWN && (*it1).second != Level::NONE && !index--) return (*it1).first;
+
+    return UNKNOWN;
+}
+
+Skill::secondary_t Skill::Secondary::FromMP2(u8 byte)
+{
+    switch(byte)
+    {
+	case 0:		return PATHFINDING;
+        case 1:		return ARCHERY;
+        case 2:		return LOGISTICS;
+        case 3:		return SCOUTING;
+        case 4:		return DIPLOMACY;
+        case 5:		return NAVIGATION;
+        case 6:		return LEADERSHIP;
+        case 7:		return WISDOM;
+        case 8:		return MYSTICISM;
+        case 9:		return LUCK;
+        case 10:	return BALLISTICS;
+        case 11:	return EAGLEEYE;
+        case 12:	return NECROMANCY;
+        case 13:	return ESTATES;
+        
+        default: break;
+    }
+    
+    return UNKNOWN;
+}
+
+const Sprite & Skill::Secondary::GetSprite(secondary_t skill)
+{
+    u8 index = 0;
+
+    switch(skill)
+    {
+    	case PATHFINDING:	index = 1; break;
+        case ARCHERY:		index = 2; break;
+        case LOGISTICS:		index = 3; break;
+        case SCOUTING:		index = 4; break;
+        case DIPLOMACY:		index = 5; break;
+        case NAVIGATION:	index = 6; break;
+        case LEADERSHIP:	index = 7; break;
+        case WISDOM:		index = 8; break;
+        case MYSTICISM:		index = 9; break;
+        case LUCK:		index = 10; break;
+        case BALLISTICS:	index = 11; break;
+        case EAGLEEYE:		index = 12; break;
+        case NECROMANCY:	index = 13; break;
+        case ESTATES:		index = 14; break;
+
+        default: break;
+    }
+
+    return AGG::GetICN("SECSKILL.ICN", index);
 }

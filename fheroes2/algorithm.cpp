@@ -40,7 +40,7 @@ struct cellinfo_t
 };
 
 // find path (A* implementation) - is valid return length path
-u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::level_t & pathfinding, std::vector<u16> & result)
+u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::vector<u16> & result)
 {
     const u16 width = world.w();
     

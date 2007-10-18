@@ -27,7 +27,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    move_point(0), morale(Morale::NORMAL), luck(Luck::NORMAL), skills(HEROESMAXSKILL),
+    move_point(0), morale(Morale::NORMAL), luck(Luck::NORMAL),
     army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES), path(*this)
 {
     // hero is freeman
@@ -36,68 +36,67 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
     switch(race)
     {
 	case Race::KNGT:
-            attack              = DEFAULT_KNGT_ATTACK;
-            defence             = DEFAULT_KNGT_DEFENCE;
-            power               = DEFAULT_KNGT_POWER;
-            knowledge           = DEFAULT_KNGT_KNOWLEDGE;
+            primary_skills.attack      = DEFAULT_KNGT_ATTACK;
+            primary_skills.defence     = DEFAULT_KNGT_DEFENCE;
+            primary_skills.power       = DEFAULT_KNGT_POWER;
+            primary_skills.knowledge   = DEFAULT_KNGT_KNOWLEDGE;
 
-	    skills[0] = Skill::Skill(Skill::LEADERSHIP, Skill::BASIC);
-	    skills[1] = Skill::Skill(Skill::BALLISTICS, Skill::BASIC);
-
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::BALLISTICS, Skill::Level::BASIC);
 	    break;
 	    
 	case Race::BARB:
-            attack              = DEFAULT_BARB_ATTACK;
-            defence             = DEFAULT_BARB_DEFENCE;
-            power               = DEFAULT_BARB_POWER;
-            knowledge           = DEFAULT_BARB_KNOWLEDGE;
+            primary_skills.attack              = DEFAULT_BARB_ATTACK;
+            primary_skills.defence             = DEFAULT_BARB_DEFENCE;
+            primary_skills.power               = DEFAULT_BARB_POWER;
+            primary_skills.knowledge           = DEFAULT_BARB_KNOWLEDGE;
 
-	    skills[0] = Skill::Skill(Skill::PATHFINDING, Skill::ADVANCED);
+	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::ADVANCED);
 	    break;
 	    
 	case Race::SORC:
-            attack              = DEFAULT_SORC_ATTACK;
-            defence             = DEFAULT_SORC_DEFENCE;
-            power               = DEFAULT_SORC_POWER;
-            knowledge           = DEFAULT_SORC_KNOWLEDGE;
+            primary_skills.attack              = DEFAULT_SORC_ATTACK;
+            primary_skills.defence             = DEFAULT_SORC_DEFENCE;
+            primary_skills.power               = DEFAULT_SORC_POWER;
+            primary_skills.knowledge           = DEFAULT_SORC_KNOWLEDGE;
 
-	    skills[0] = Skill::Skill(Skill::NAVIGATION, Skill::ADVANCED);
-	    skills[1] = Skill::Skill(Skill::WISDOM, Skill::BASIC);
+	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
 	    
 	case Race::WRLK:
-            attack              = DEFAULT_WRLK_ATTACK;
-            defence             = DEFAULT_WRLK_DEFENCE;
-            power               = DEFAULT_WRLK_POWER;
-            knowledge           = DEFAULT_WRLK_KNOWLEDGE;
+            primary_skills.attack              = DEFAULT_WRLK_ATTACK;
+            primary_skills.defence             = DEFAULT_WRLK_DEFENCE;
+            primary_skills.power               = DEFAULT_WRLK_POWER;
+            primary_skills.knowledge           = DEFAULT_WRLK_KNOWLEDGE;
 
-	    skills[0] = Skill::Skill(Skill::SCOUTING, Skill::ADVANCED);
-	    skills[1] = Skill::Skill(Skill::WISDOM, Skill::BASIC);
+	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
 	    
 	case Race::WZRD:
-            attack              = DEFAULT_WZRD_ATTACK;
-            defence             = DEFAULT_WZRD_DEFENCE;
-            power               = DEFAULT_WZRD_POWER;
-            knowledge           = DEFAULT_WZRD_KNOWLEDGE;
+            primary_skills.attack              = DEFAULT_WZRD_ATTACK;
+            primary_skills.defence             = DEFAULT_WZRD_DEFENCE;
+            primary_skills.power               = DEFAULT_WZRD_POWER;
+            primary_skills.knowledge           = DEFAULT_WZRD_KNOWLEDGE;
 
-	    skills[0] = Skill::Skill(Skill::WISDOM, Skill::ADVANCED);
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
 	    
 	case Race::NECR:
-            attack              = DEFAULT_NECR_ATTACK;
-            defence             = DEFAULT_NECR_DEFENCE;
-            power               = DEFAULT_NECR_POWER;
-            knowledge           = DEFAULT_NECR_KNOWLEDGE;
+            primary_skills.attack              = DEFAULT_NECR_ATTACK;
+            primary_skills.defence             = DEFAULT_NECR_DEFENCE;
+            primary_skills.power               = DEFAULT_NECR_POWER;
+            primary_skills.knowledge           = DEFAULT_NECR_KNOWLEDGE;
 
-	    skills[0] = Skill::Skill(Skill::NECROMANCY, Skill::BASIC);
-	    skills[1] = Skill::Skill(Skill::WISDOM, Skill::BASIC);
+	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -121,12 +120,12 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
         army[1].SetCount(3);
 
 	// path finding audit
-	//skills[2] = Skill::Skill(Skill::PATHFINDING, Skill::BASIC);
-	//skills[3] = Skill::Skill(Skill::LOGISTICS, Skill::BASIC);
-	skills[4] = Skill::Skill(Skill::MYSTICISM, Skill::BASIC);
-	skills[5] = Skill::Skill(Skill::NAVIGATION, Skill::BASIC);
-	skills[6] = Skill::Skill(Skill::LEADERSHIP, Skill::BASIC);
-	skills[7] = Skill::Skill(Skill::LUCK, Skill::BASIC);
+	//secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
+	secondary_skills.Level(Skill::LOGISTICS, Skill::Level::BASIC);
+	secondary_skills.Level(Skill::MYSTICISM, Skill::Level::BASIC);
+	secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
+	secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
 
 	artifacts.push_back(Artifact::MEDAL_VALOR);
 	artifacts.push_back(Artifact::STEALTH_SHIELD);
@@ -242,7 +241,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     // unknown byte
     ++byte8;
 
-    // experienc
+    // experience
     byte32 = reinterpret_cast<const u32 *>(byte8);
     experience = *byte32;
     SWAP32(experience);
@@ -255,69 +254,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     {
 	++byte8;
 
-	// skill 1
-	skills.at(0).SetSkill(*byte8);
-	++byte8;
+	// skills
+	for(u8 ii = 0; ii < 8; ++ii)
+	    secondary_skills.Level(Skill::Secondary::FromMP2(*byte8 + ii), Skill::Level::FromMP2(*(byte8 + ii + 8)));
 
-	// skill 2
-	skills.at(1).SetSkill(*byte8);
-	++byte8;
-
-	// skill 3
-	skills.at(2).SetSkill(*byte8);
-	++byte8;
-
-	// skill 4
-	skills.at(3).SetSkill(*byte8);
-	++byte8;
-
-	// skill 5
-	skills.at(4).SetSkill(*byte8);
-	++byte8;
-
-	// skill 6
-	skills.at(5).SetSkill(*byte8);
-	++byte8;
-
-	// skill 7
-	skills.at(6).SetSkill(*byte8);
-	++byte8;
-
-	// skill 8
-	skills.at(7).SetSkill(*byte8);
-	++byte8;
-	
-	// level skill 1
-	skills.at(0).SetLevel(*byte8);
-	++byte8;
-	
-	// level skill 2
-	skills.at(1).SetLevel(*byte8);
-	++byte8;
-	
-	// level skill 3
-	skills.at(2).SetLevel(*byte8);
-	++byte8;
-	
-	// level skill 4
-	skills.at(3).SetLevel(*byte8);
-	++byte8;
-	
-	// level skill 5
-	skills.at(4).SetLevel(*byte8);
-	++byte8;
-	
-	// level skill 6
-	skills.at(5).SetLevel(*byte8);
-	++byte8;
-	
-	// level skill 7
-	skills.at(6).SetLevel(*byte8);
-	++byte8;
-	
-	// level skill 8
-	skills.at(7).SetLevel(*byte8);
-	++byte8;
+	byte8 += 15;
     }
     else
     {
@@ -373,7 +314,7 @@ u8 Heroes::GetManaIndexSprite(void) const
 
 u8 Heroes::GetAttack(void) const
 {
-    u8 result = attack;
+    u8 result = primary_skills.attack;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -411,13 +352,13 @@ u8 Heroes::GetAttack(void) const
 	    default:
 	        break;
 	}
-	
+
     return result;
 }
 
 u8 Heroes::GetDefense(void) const
 {
-    u8 result = defence;
+    u8 result = primary_skills.defence;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -461,7 +402,7 @@ u8 Heroes::GetDefense(void) const
 
 u8 Heroes::GetPower(void) const
 {
-    u8 result = power;
+    u8 result = primary_skills.power;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -505,7 +446,7 @@ u8 Heroes::GetPower(void) const
 
 u8 Heroes::GetKnowledge(void) const
 {
-    u8 result = knowledge;
+    u8 result = primary_skills.knowledge;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -632,18 +573,18 @@ Morale::morale_t Heroes::GetMorale(void) const
     // bonus leadership
     switch(GetLevelSkill(Skill::LEADERSHIP))
     {
-        case Skill::EXPERT:
+        case Skill::Level::EXPERT:
             ++result;
             ++result;
             ++result;
             break;
 
-        case Skill::ADVANCED:
+        case Skill::Level::ADVANCED:
             ++result;
             ++result;
             break;
 
-        case Skill::BASIC:
+        case Skill::Level::BASIC:
             ++result;
             break;
 
@@ -794,23 +735,10 @@ u32 Heroes::GetNextLevelExperience(u8 level) const
     }
 }
 
-/* get level skill */
-Skill::level_t Heroes::GetLevelSkill(const Skill::skill_t & skill) const
-{
-    if(skills.size())
-    {
-	std::vector<Skill>::const_iterator it1 = skills.begin();
-	std::vector<Skill>::const_iterator it2 = skills.end();
-	
-	for(; it1 != it2; ++it1) if((*it1).GetSkill() == skill) return (*it1).GetLevel();
-    }
-
-    return Skill::NEVER;;
-}
-
 void Heroes::ActionNewDay(void)
 {
     move_point = GetMaxMovePoints();
+    path.Reset();
 }
 
 void Heroes::ActionNewWeek(void)

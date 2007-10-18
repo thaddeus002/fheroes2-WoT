@@ -40,7 +40,7 @@ namespace Maps
 
 	TilesAddon & operator= (const TilesAddon & ta);
 
-	static bool isRoad(const TilesAddon & ta);
+	static u8 isRoad(const TilesAddon & ta, u8 direct = 0xFF);
 	static bool RulesCompare(const TilesAddon & ta1, const TilesAddon & ta2){ return ta1.GetLevel() > ta2.GetLevel(); };
 
 	u8 GetObject(void) const{ return object; };
@@ -75,8 +75,7 @@ namespace Maps
 
 	bool isAnimation(u16 dstx, u16 dsty) const;
 	bool isPassable(void) const;
-	bool isRoad(void) const;
-	bool isRoad(const Direction::vector_t & direct) const;
+	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 
 	const TilesAddon * FindAddon(u8 object, u8 index_min, u8 index_max) const;
 	const TilesAddon * FindAddon(u8 object, u8 index = 0xFF) const;

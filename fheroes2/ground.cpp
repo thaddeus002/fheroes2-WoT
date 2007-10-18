@@ -45,7 +45,7 @@ const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
     return str_ground[9];
 }
 
-u16 Maps::Ground::GetPenalty(u16 from, u16 to, const Skill::level_t & pathfinding)
+u16 Maps::Ground::GetPenalty(u16 from, u16 to, const Skill::Level::type_t & pathfinding)
 {
     //const Maps::Tiles & tile_from = world.GetTiles(from);
     const Maps::Tiles & tile_to = world.GetTiles(to);
@@ -85,27 +85,27 @@ u16 Maps::Ground::GetPenalty(u16 from, u16 to, const Skill::level_t & pathfindin
     {
 
 	case DESERT:
-	    if(Skill::EXPERT == pathfinding)	result = 100;
+	    if(Skill::Level::EXPERT == pathfinding)	result = 100;
 	    else
-	    if(Skill::ADVANCED == pathfinding)	result = 150;
+	    if(Skill::Level::ADVANCED == pathfinding)	result = 150;
 	    else
-	    if(Skill::BASIC == pathfinding)	result = 175;
+	    if(Skill::Level::BASIC == pathfinding)	result = 175;
 	    else				result = 200;
 	    break;
 
 	case SNOW:
 	case SWAMP:
-	    if(Skill::EXPERT == pathfinding)	result = 100;
+	    if(Skill::Level::EXPERT == pathfinding)	result = 100;
 	    else
-	    if(Skill::ADVANCED == pathfinding)	result = 125;
+	    if(Skill::Level::ADVANCED == pathfinding)	result = 125;
 	    else
-	    if(Skill::BASIC == pathfinding)	result = 150;
+	    if(Skill::Level::BASIC == pathfinding)	result = 150;
 	    else				result = 175;
 	    break;
 
 	case WASTELAND:
 	case BEACH:
-						result = (Skill::NEVER == pathfinding ? 125 : 100); break;
+						result = (Skill::Level::NONE == pathfinding ? 125 : 100); break;
 
 	case LAVA:
 	case DIRT:

@@ -399,20 +399,20 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
     {
-	const Skill & skill = skills[ii];
+	Skill::secondary_t skill = secondary_skills.GetSkill(ii);
 
-	const Sprite & sprite_skill = AGG::GetICN("SECSKILL.ICN", Skill::NONE == skill.GetSkill() ? 0 : skill.GetSkill() + 1);
+	const Sprite & sprite_skill = Skill::Secondary::GetSprite(skill);
 
 	display.Blit(sprite_skill, dst_pt);
 
-	if(Skill::NONE != skill.GetSkill())
+	if(Skill::UNKNOWN != skill)
 	{
 	    // string skill
-	    message = Skill::String(skill.GetSkill());
+	    message = Skill::String(skill);
 	    Text(message, Font::SMALL, dst_pt.x + (sprite_skill.w() - Text::width(message, Font::SMALL)) / 2, dst_pt.y + 3);
 
 	    // string level
-	    message = Skill::LevelString(skill.GetLevel());
+	    message = Skill::Level::String(secondary_skills.GetLevel(skill));
 	    Text(message, Font::SMALL, dst_pt.x + (sprite_skill.w() - Text::width(message, Font::SMALL)) / 2, dst_pt.y + 50);
 	}
 
@@ -664,10 +664,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	// left click skill
 	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MouseClickLeft(coordsSkill[ii]))
 	{
-	    const Skill::skill_t skill = skills[ii].GetSkill();
-	    const Skill::level_t level = skills[ii].GetLevel();
+	    const Skill::secondary_t skill = secondary_skills.GetSkill(ii);
+	    const Skill::Level::type_t level = secondary_skills.GetLevel(skill);
 
-	    if(Skill::NONE != skill) Dialog::Message(Skill::LevelString(level) + " " + Skill::String(skill), Skill::Description(skill, level), Font::BIG, Dialog::OK);
+	    if(Skill::UNKNOWN != skill) Dialog::Message(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), Font::BIG, Dialog::OK);
 	}
 
 	// left click artifact
@@ -693,10 +693,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	// right info skill
 	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MousePressRight(coordsSkill[ii]))
 	{
-	    const Skill::skill_t skill = skills[ii].GetSkill();
-	    const Skill::level_t level = skills[ii].GetLevel();
+	    const Skill::secondary_t skill = secondary_skills.GetSkill(ii);
+	    const Skill::Level::type_t level = secondary_skills.GetLevel(skill);
 
-	    if(Skill::NONE != skill) Dialog::Message(Skill::LevelString(level) + " " + Skill::String(skill), Skill::Description(skill, level), Font::BIG);
+	    if(Skill::UNKNOWN != skill) Dialog::Message(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), Font::BIG);
 	}
 
 	// right info artifact
@@ -752,11 +752,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	{
 	    for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MouseCursor(coordsSkill[ii]))
 	    {
-		const Skill::skill_t skill = skills[ii].GetSkill();
-		const Skill::level_t level = skills[ii].GetLevel();
+		const Skill::secondary_t skill = secondary_skills.GetSkill(ii);
+		const Skill::Level::type_t level = secondary_skills.GetLevel(skill);
 
-		if(Skill::NONE != skill)
-		    statusBar.ShowMessage("View " + Skill::LevelString(level) + " " + Skill::String(skill) + " Info");
+		if(Skill::UNKNOWN != skill)
+		    statusBar.ShowMessage("View " + Skill::Level::String(level) + " " + Skill::String(skill) + " Info");
 		else
 		    statusBar.Clear("Hero Screen");
 	    }
