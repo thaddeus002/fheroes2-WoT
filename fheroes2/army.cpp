@@ -36,7 +36,7 @@ const std::string & Army::String(Army::size_t size)
         case ZOUNDS:	return str_size[7];
         case LEGION:	return str_size[8];
     }
-    
+
     return str_size[0];
 }
 
@@ -59,4 +59,9 @@ Army::size_t Army::GetSize(u16 count)
     if(SEVERAL <= count)	return SEVERAL;
 
     return FEW;
+}
+
+bool Army::isValid(const Troops & army)
+{
+    return Monster::UNKNOWN > army.monster && army.count;
 }

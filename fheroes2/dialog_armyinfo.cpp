@@ -30,20 +30,21 @@
 #include "animation.h"
 #include "localevent.h"
 #include "monster.h"
-#include "heroes.h"
 #include "morale.h"
 #include "luck.h"
 #include "tools.h"
 #include "text.h"
 #include "army.h"
+#include "skill.h"
+#include "dialog.h"
 
-Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quickshow)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primary *skills, bool dismiss, bool quickshow)
 {
     const std::string viewarmy(H2Config::EvilInterface() ? "VIEWARME.ICN" : "VIEWARMY.ICN");
 
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
 
-    const Monster::stats_t monster = Monster::GetStats(GetMonster());
+    const Monster::stats_t monster = Monster::GetStats(army.monster);
     
     Rect pos_rt;
 
@@ -67,7 +68,7 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     Text(monster.name, Font::BIG, dst_pt);
     
     // count
-    String::AddInt(message, GetCount());
+    String::AddInt(message, army.count);
     dst_pt.x = pos_rt.x + 140 - Text::width(message, Font::BIG) / 2;
     dst_pt.y = pos_rt.y + 225;
     Text(message, Font::BIG, dst_pt);
@@ -81,10 +82,10 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     message.clear();
     String::AddInt(message, monster.attack);
 
-    if(heroes)
+    if(skills)
     {
 	message += " (";
-	String::AddInt(message, monster.attack + (*heroes).GetAttack());
+	String::AddInt(message, monster.attack + (*skills).attack);
 	message += ")";
     }
 
@@ -100,10 +101,10 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     message.clear();
     String::AddInt(message, monster.defence);
 
-    if(heroes)
+    if(skills)
     {
 	message += " (";
-	String::AddInt(message, monster.defence + (*heroes).GetDefense());
+	String::AddInt(message, monster.defence + (*skills).defence);
 	message += ")";
     }
 
@@ -161,7 +162,7 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     dst_pt.y += 18;
     Text(message, Font::BIG, dst_pt);
 
-    message = (heroes ? Morale::String((*heroes).GetMorale()) : Morale::String(Morale::NORMAL));
+    message = (skills ? Morale::String((*skills).morale) : Morale::String(Morale::NORMAL));
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -171,7 +172,7 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     dst_pt.y += 18;
     Text(message, Font::BIG, dst_pt);
 
-    message = (heroes ? Luck::String((*heroes).GetLuck()) : Luck::String(Luck::NORMAL));
+    message = (skills ? Luck::String((*skills).luck) : Luck::String(Luck::NORMAL));
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -188,14 +189,13 @@ Dialog::answer_t Army::Troops::ShowDialogInfo(const Heroes * heroes, bool quicks
     {
 	buttonUpgrade = new Button(dst_pt, viewarmy, 5, 6);
 
-	upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * GetCount()) <= world.GetMyKingdom().GetFundsResource();
+	upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * army.count) <= world.GetMyKingdom().GetFundsResource();
 
 	if(!upgrade) (*buttonUpgrade).Press();
     }
 
     // button dismiss
     Button *buttonDismiss = NULL;
-    bool dismiss = heroes && 1 == (*heroes).GetCountArmy() ? false : true;
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 222;
     if(!quickshow)

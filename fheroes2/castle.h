@@ -28,6 +28,7 @@
 #include "maps_tiles.h"
 #include "mageguild.h"
 #include "color.h"
+#include "captain.h"
 #include "dialog.h"
 #include "race.h"
 #include "rect.h"
@@ -81,7 +82,7 @@ public:
     } building_t;
 
     Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
-    
+
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
     bool AllowBuild(void) const{ return allow_build; };
     bool isBuild(building_t bd) const{ return building & bd; };
@@ -144,7 +145,6 @@ private:
     Race::race_t	race;
     std::string		name;
     u32			building;
-    bool		captain;
     bool		allow_castle;
     bool		army_spread;
     bool		allow_build;
@@ -152,6 +152,8 @@ private:
     MageGuild		mageguild;
     std::vector<u16>    dwelling;
     std::vector<Army::Troops> army;
+
+    Captain		captain;
 
     const u32		uniq;
 

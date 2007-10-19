@@ -18,68 +18,74 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "morale.h"
+#include "luck.h"
 #include "captain.h"
 
-u8 Captain::GetAttack(Race::race_t race)
+Captain::Captain() : Skill::Primary()
 {
-    switch(race)
-    {
-	case Race::KNGT:	return 1;
-	case Race::BARB:	return 1;
-	case Race::SORC:	return 0;
-	case Race::WRLK:	return 0;
-	case Race::WZRD:	return 0;
-	case Race::NECR:	return 0;
-	default: break;
-    }
-
-    return 0;
 }
 
-u8 Captain::GetDefense(Race::race_t race)
+void Captain::SetRace(Race::race_t race)
 {
     switch(race)
     {
-	case Race::KNGT:	return 1;
-	case Race::BARB:	return 1;
-	case Race::SORC:	return 0;
-	case Race::WRLK:	return 0;
-	case Race::WZRD:	return 0;
-	case Race::NECR:	return 0;
-	default: break;
+	case Race::KNGT:
+	    attack	= 1;
+	    defence	= 1;
+	    power	= 1;
+	    knowledge	= 1;
+	    morale	= Morale::NORMAL;
+	    luck	= Luck::NORMAL;
+	    break;
+
+	case Race::BARB:
+	    attack	= 1;
+	    defence	= 1;
+	    power	= 1;
+	    knowledge	= 1;
+	    morale	= Morale::NORMAL;
+	    luck	= Luck::NORMAL;
+	    break;
+
+	case Race::SORC:
+	    attack	= 0;
+	    defence	= 0;
+	    power	= 2;
+	    knowledge	= 2;
+	    morale	= Morale::NORMAL;
+	    luck	= Luck::NORMAL;
+	    break;
+
+	case Race::WRLK:
+	    attack	= 0;
+	    defence	= 0;
+	    power	= 2;
+	    knowledge	= 2;
+	    morale	= Morale::NORMAL;
+	    luck	= Luck::NORMAL;
+	    break;
+
+	case Race::WZRD:
+	    attack	= 0;
+	    defence	= 0;
+	    power	= 2;
+	    knowledge	= 2;
+	    morale	= Morale::NORMAL;
+	    luck	= Luck::NORMAL;
+	    break;
+
+	case Race::NECR:
+	    attack	= 0;
+	    defence	= 0;
+	    power	= 2;
+	    knowledge	= 2;
+	    morale	= Morale::NORMAL;
+	    luck	= Luck::NORMAL;
+	    break;
+
+	default:
+	    break;
     }
 
-    return 0;
-}
-
-u8 Captain::GetPower(Race::race_t race)
-{
-    switch(race)
-    {
-	case Race::KNGT:	return 1;
-	case Race::BARB:	return 1;
-	case Race::SORC:	return 2;
-	case Race::WRLK:	return 2;
-	case Race::WZRD:	return 2;
-	case Race::NECR:	return 2;
-	default: break;
-    }
-
-    return 0;
-}
-
-u8 Captain::GetKnowledge(Race::race_t race)
-{
-    switch(race)
-    {
-	case Race::KNGT:	return 1;
-	case Race::BARB:	return 1;
-	case Race::SORC:	return 2;
-	case Race::WRLK:	return 2;
-	case Race::WZRD:	return 2;
-	case Race::NECR:	return 2;
-	default: break;
-    }
-
-    return 0;
 }

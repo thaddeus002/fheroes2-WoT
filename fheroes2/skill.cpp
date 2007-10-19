@@ -23,14 +23,8 @@
 #include "heroes.h"
 #include "skill.h"
 
-Skill::Primary::Primary()
-    : skills(MAXPRIMARYSKILL),
-    attack(skills[ATTACK]), defence(skills[DEFENCE]), power(skills[POWER]), knowledge(skills[KNOWLEDGE])
+Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0), morale(Morale::NORMAL), luck(Luck::NORMAL)
 {
-    attack	= 0;
-    defence	= 0;
-    power	= 0;
-    knowledge	= 0;
 }
 
 Skill::Secondary::Secondary() : count(0)

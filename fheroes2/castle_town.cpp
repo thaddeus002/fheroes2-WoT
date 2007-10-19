@@ -718,7 +718,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y = cur_pt.y + 168;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, Captain::GetAttack(race));
+	String::AddInt(message, captain.attack);
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 	
@@ -727,7 +727,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y += 12;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, Captain::GetDefense(race));
+	String::AddInt(message, captain.defence);
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 
@@ -736,7 +736,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y += 12;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, Captain::GetPower(race));
+	String::AddInt(message, captain.power);
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 
@@ -745,7 +745,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y += 12;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, Captain::GetKnowledge(race));
+	String::AddInt(message, captain.knowledge);
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 	

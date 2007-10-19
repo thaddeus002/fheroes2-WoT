@@ -421,7 +421,7 @@ Monster::monster_t Monster::Monster(Race::race_t race, u32 dwelling)
         default: break;
     }
 
-    Error::Warning("Monster::GetMonster: unknown level or race.");
+    Error::Warning("Monster::Monster: unknown level or race.");
 
     return Monster::UNKNOWN;
 }

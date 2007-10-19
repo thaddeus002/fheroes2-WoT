@@ -54,20 +54,27 @@ namespace Army
     class Troops
     {
     public:
-	Troops(Monster::monster_t monster = Monster::UNKNOWN, u16 count = 0) : pair(monster, count){};
+	Troops(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0) : monster(m), count(c){};
 
-	bool Valid(void) const{ return Monster::UNKNOWN > pair.first && pair.second; };
-	Monster::monster_t GetMonster(void) const{ return pair.first; };
-	u16 GetCount(void) const{ return pair.second; };
+        void Set(Monster::monster_t m, u16 c){ monster = m; count = c; };
 
-	void SetMonster(Monster::monster_t monster){ pair.first = monster; };
-	void SetCount(u16 count){ pair.second = count; };
-
-	Dialog::answer_t ShowDialogInfo(const Heroes * heroes = NULL, bool quickshow = false);
-
-    private:
-        std::pair<Monster::monster_t, u16> pair;
+        Monster::monster_t	monster;
+        u16			count;
     };
+
+    bool isValid(const Troops & army);
+
+    Dialog::answer_t ArmyInfo(const Troops & army, const Skill::Primary & skills, bool quickshow = false);
+
+
+
+
+
+
+
+
+
+
 
     class SelectBar
     {
@@ -95,7 +102,6 @@ namespace Army
 	
 	std::vector<Rect> coords;
     };
-
 };
 
 #endif

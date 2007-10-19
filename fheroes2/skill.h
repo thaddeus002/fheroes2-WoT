@@ -25,6 +25,9 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include "morale.h"
+#include "luck.h"
+#include "gamedefs.h"
 
 #define MAXPRIMARYSKILL		6
 #define MAXSECONDARYSKILL	14
@@ -81,12 +84,12 @@ namespace Skill
 	public:
 	Primary();
 
-	std::vector<u8> skills;
-
-	u8	& attack;
-	u8	& defence;
-	u8	& power;
-	u8	& knowledge;
+	u8			attack;
+	u8			defence;
+	u8			power;
+	u8			knowledge;
+	Morale::morale_t	morale;
+        Luck::luck_t		luck;
     };
 
     class Secondary

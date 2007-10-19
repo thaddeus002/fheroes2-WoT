@@ -113,54 +113,54 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	++byte8;
 	
 	// monster1
-	army[0].SetMonster(Monster::Monster(*byte8));
+	army[0].monster = Monster::Monster(*byte8);
 	++byte8;
 
 	// monster2
-	army[1].SetMonster(Monster::Monster(*byte8));
+	army[1].monster = Monster::Monster(*byte8);
 	++byte8;
 
 	// monster3
-	army[2].SetMonster(Monster::Monster(*byte8));
+	army[2].monster = Monster::Monster(*byte8);
 	++byte8;
 
 	// monster4
-	army[3].SetMonster(Monster::Monster(*byte8));
+	army[3].monster = Monster::Monster(*byte8);
 	++byte8;
 
 	// monster5
-	army[4].SetMonster(Monster::Monster(*byte8));
+	army[4].monster = Monster::Monster(*byte8);
 	++byte8;
 
 	// count1
 	byte16 = reinterpret_cast<const u16 *>(byte8);
 	swap16 = *byte16;
 	SWAP16(swap16);
-	army[0].SetCount(swap16);
+	army[0].count = swap16;
 	++byte16;
 
 	// count2
 	swap16 = *byte16;
 	SWAP16(swap16);
-	army[1].SetCount(swap16);
+	army[1].count = swap16;
 	++byte16;
 
 	// count3
 	swap16 = *byte16;
 	SWAP16(swap16);
-	army[2].SetCount(swap16);
+	army[2].count = swap16;
 	++byte16;
 
 	// count4
 	swap16 = *byte16;
 	SWAP16(swap16);
-	army[3].SetCount(swap16);
+	army[3].count = swap16;
 	++byte16;
 
 	// count5
 	swap16 = *byte16;
 	SWAP16(swap16);
-	army[4].SetCount(swap16);
+	army[4].count = swap16;
 	++byte16;
 
 	byte8 = reinterpret_cast<const u8 *>(byte16);
@@ -171,7 +171,11 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     }
     
     // captain
-    captain = (*byte8 ? true : false);
+    if(*byte8)
+    {
+	building |= BUILD_CAPTAIN;
+	captain.SetRace(race);
+    }
     ++byte8;
     
     // custom name
@@ -215,15 +219,15 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	switch(H2Config::GetGameDifficulty())
 	{
     	    case Difficulty::EASY:
-        	army[0].SetMonster(mon1.monster);
-        	army[0].SetCount(mon1.grown * 2);
-        	army[1].SetMonster(mon2.monster);
-        	army[1].SetCount(mon2.grown * 2);
+        	army[0].monster = mon1.monster;
+        	army[0].count = mon1.grown * 2;
+        	army[1].monster = mon2.monster;
+        	army[1].count = mon2.grown * 2;
         	break;
 
     	    case Difficulty::NORMAL:
-        	army[0].SetMonster(mon1.monster);
-        	army[0].SetCount(mon1.grown);
+        	army[0].monster = mon1.monster;
+        	army[0].count = mon1.grown;
         	break;
 
     	    case Difficulty::HARD:
@@ -253,7 +257,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     MinimizeAreaMapsID();
     
     present_boat = false;
-    
+
     // end
     Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
@@ -521,8 +525,8 @@ u8 Castle::GetCountArmy(void) const
 {
     u8 result = 0;
 
-    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii) if(army[ii].Valid()) ++result;
-    
+    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii) if(Army::isValid(army[ii])) ++result;
+
     return result;
 }
 
@@ -731,7 +735,7 @@ bool Castle::RecrutMonster(building_t dw, u16 count)
     // find free cell
     u8 num_cell = CASTLEMAXARMY;
     for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
-	if(ms == army[ii].GetMonster() || 0 == army[ii].GetCount()){ num_cell = ii; break; }
+	if(ms == army[ii].monster || 0 == army[ii].count){ num_cell = ii; break; }
 
     // not found
     if(CASTLEMAXARMY <= num_cell) return false;
@@ -744,8 +748,7 @@ bool Castle::RecrutMonster(building_t dw, u16 count)
 
     kingdom.OddFundsResource(paymentCosts);
     
-    army[num_cell].SetMonster(ms);
-    army[num_cell].SetCount(army[num_cell].GetCount() + count);
+    army[num_cell].Set(ms, army[num_cell].count + count);
 
     dwelling[dw_index] -= count;
 
@@ -1086,6 +1089,7 @@ void Castle::BuyBuilding(building_t build)
 	switch(build)
 	{
 	    case BUILD_CASTLE: TownUpgradeToCastle(); break;
+	    case BUILD_CAPTAIN: captain.SetRace(race); break;
 
 	    case BUILD_MAGEGUILD1:
 	    case BUILD_MAGEGUILD2:

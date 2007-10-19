@@ -106,6 +106,7 @@ public:
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
     u8 GetCountArmy(void) const;
 
+    const Skill::Primary & GetPrimarySkill(void) const{ return primary_skills; };
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
@@ -144,8 +145,6 @@ private:
     u32			experience;
     u16			magic_point;
     u16			move_point;
-    Morale::morale_t	morale;
-    Luck::luck_t	luck;
 
     Skill::Secondary	secondary_skills;
 

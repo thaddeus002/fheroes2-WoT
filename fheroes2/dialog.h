@@ -38,6 +38,16 @@ class Castle;
 class Heroes;
 class Surface;
 
+namespace Army
+{
+    class Troops;
+};
+
+namespace Skill
+{
+    class Primary;
+};
+
 namespace Dialog
 {
     typedef enum {
@@ -71,7 +81,10 @@ namespace Dialog
     // recrut monster
     u16 RecrutMonster(const Monster::monster_t & monster, u16 available);
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
-    
+
+    // army info
+    Dialog::answer_t ArmyInfo(const Army::Troops & army, const Skill::Primary *skills, bool dissmiss, bool quickshow);
+
     // dialog marketplace
     void Marketplace(void);
 

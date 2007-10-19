@@ -205,9 +205,9 @@ void Dialog::QuickInfo(const Castle & castle)
 
 	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
         {
-	    if(army.at(ii).Valid())
+	    if(Army::isValid(army.at(ii)))
 	    {
-		const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).GetMonster());
+		const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).monster);
 
                 // align from count
 		dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
@@ -218,7 +218,7 @@ void Dialog::QuickInfo(const Castle & castle)
 
 		// count message
                 message.clear();
-		String::AddInt(message, army.at(ii).GetCount());
+		String::AddInt(message, army.at(ii).count);
 		dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
 		dst_pt.y = cur_rt.y + 118;
 		Text(message, Font::SMALL, dst_pt);
@@ -385,9 +385,9 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
     {
-	if(army.at(ii).Valid())
+	if(Army::isValid(army.at(ii)))
 	{
-	    const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).GetMonster());
+	    const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).monster);
 
             // align from count
 	    dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
@@ -398,7 +398,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
 	    // count message
             message.clear();
-	    String::AddInt(message, army.at(ii).GetCount());
+	    String::AddInt(message, army.at(ii).count);
 	    dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
 	    dst_pt.y = cur_rt.y + 142;
 	    Text(message, Font::SMALL, dst_pt);

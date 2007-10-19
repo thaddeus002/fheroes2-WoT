@@ -27,8 +27,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    move_point(0), morale(Morale::NORMAL), luck(Luck::NORMAL),
-    army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES), path(*this)
+    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES), path(*this)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -107,17 +106,14 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
     // set default army
     const Monster::stats_t monster = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
 
-    army[0].SetMonster(monster.monster);
-    army[0].SetCount(monster.grown);
+    army[0].Set(monster.monster, monster.grown);
 
     // set debug param
     if(H2Config::Debug() && SANDYSANDY == heroes)
     {
-	army[0].SetMonster(Monster::BLACK_DRAGON);
-	army[0].SetCount(2);
+	army[0].Set(Monster::BLACK_DRAGON, 2);
 
-        army[1].SetMonster(Monster::RED_DRAGON);
-        army[1].SetCount(3);
+        army[1].Set(Monster::RED_DRAGON, 3);
 
 	// path finding audit
 	//secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
@@ -160,54 +156,54 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
         ++byte8;
 
         // monster1
-        army[0].SetMonster(Monster::Monster(*byte8));
+        army[0].monster = Monster::Monster(*byte8);
         ++byte8;
 
         // monster2
-        army[1].SetMonster(Monster::Monster(*byte8));
+        army[1].monster = Monster::Monster(*byte8);
         ++byte8;
 
         // monster3
-        army[2].SetMonster(Monster::Monster(*byte8));
+        army[2].monster = Monster::Monster(*byte8);
         ++byte8;
 
         // monster4
-        army[3].SetMonster(Monster::Monster(*byte8));
+        army[3].monster = Monster::Monster(*byte8);
         ++byte8;
 
         // monster5
-        army[4].SetMonster(Monster::Monster(*byte8));
+        army[4].monster = Monster::Monster(*byte8);
         ++byte8;
 
         // count1
         byte16 = reinterpret_cast<const u16 *>(byte8);
         swap16 = *byte16;
         SWAP16(swap16);
-        army[0].SetCount(swap16);
+        army[0].count = swap16;
         ++byte16;
 
         // count2
         swap16 = *byte16;
         SWAP16(swap16);
-        army[1].SetCount(swap16);
+        army[1].count = swap16;
         ++byte16;
 
         // count3
         swap16 = *byte16;
         SWAP16(swap16);
-        army[2].SetCount(swap16);
+        army[2].count = swap16;
         ++byte16;
 
         // count4
         swap16 = *byte16;
         SWAP16(swap16);
-        army[3].SetCount(swap16);
+        army[3].count = swap16;
         ++byte16;
 
         // count5
         swap16 = *byte16;
         SWAP16(swap16);
-        army[4].SetCount(swap16);
+        army[4].count = swap16;
         ++byte16;
 
         byte8 = reinterpret_cast<const u8 *>(byte16);
@@ -546,7 +542,7 @@ Morale::morale_t Heroes::GetMorale(void) const
 [+] Expert Leadership +3
 */
 
-    Morale::morale_t result = morale;
+    Morale::morale_t result = primary_skills.morale;
 
     // bonus artifact
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
@@ -602,8 +598,8 @@ Morale::morale_t Heroes::GetMorale(void) const
     u8 count_wzrd = 0;
     u8 count_necr = 0;
     u8 count_bomg = 0;
-    for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).GetMonster())
-	switch(Monster::GetRace((*it1_army).GetMonster()))
+    for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).monster)
+	switch(Monster::GetRace((*it1_army).monster))
 	{
 	    case Race::KNGT: ++count_kngt; break;
 	    case Race::BARB: ++count_barb; break;
@@ -642,7 +638,7 @@ Morale::morale_t Heroes::GetMorale(void) const
 
 Luck::luck_t Heroes::GetLuck(void) const
 {
-    Luck::luck_t result = luck;
+    Luck::luck_t result = primary_skills.luck;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -670,7 +666,7 @@ u8 Heroes::GetCountArmy(void) const
 {
     u8 result = 0;
 
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii) if(army[ii].Valid()) ++result;
+    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii) if(Army::isValid(army[ii])) ++result;
 
     return result;
 }

@@ -20,16 +20,16 @@
 #ifndef H2CAPTAIN_H
 #define H2CAPTAIN_H
 
-#include <string>
-#include "gamedefs.h"
 #include "race.h"
+#include "skill.h"
+#include "gamedefs.h"
 
-namespace Captain
+class Captain : public Skill::Primary
 {
-    u8 GetAttack(Race::race_t race);
-    u8 GetDefense(Race::race_t race);
-    u8 GetPower(Race::race_t race);
-    u8 GetKnowledge(Race::race_t race);
+    public:
+	Captain();
+
+	void SetRace(Race::race_t race);
 };
 
 #endif
