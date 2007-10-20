@@ -674,7 +674,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	        RedrawAllBuilding(cur_pt, orders_building);
 	        RedrawNameTown(cur_pt);
 
-		if(Castle::BUILD_CAPTAIN == build)
+		if(Castle::BUILD_CAPTAIN == build && NULL == isHeroesPresent())
 		    display.Blit(Portrait::Captain(race, Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
 
 		Cursor::Show();

@@ -172,10 +172,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     
     // captain
     if(*byte8)
-    {
 	building |= BUILD_CAPTAIN;
-	captain.SetRace(race);
-    }
     ++byte8;
     
     // custom name
@@ -257,6 +254,12 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     MinimizeAreaMapsID();
     
     present_boat = false;
+
+    // init captain
+    captain.SetRace(race);
+
+    // remove tavern from necromancer castle
+    if(Race::NECR == race)	building &= ~BUILD_TAVERN;
 
     // end
     Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
