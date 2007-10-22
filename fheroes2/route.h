@@ -41,6 +41,8 @@ class Route
 	void	Hide(void) const;
 	void	Reset(void);
 
+	const std::vector<u16> & Get(void) const { return path; };
+
     private:
 	static const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
 	void	Dump(void) const;

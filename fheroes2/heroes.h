@@ -129,7 +129,6 @@ public:
     Dialog::answer_t OpenDialog(bool readonly = false);
 
     void Recrut(const Castle & castle);
-    void Move(u16 ax, u16 ay);
 
     void ActionNewDay(void);
     void ActionNewWeek(void);
@@ -137,6 +136,9 @@ public:
 
     const Route & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
+
+    void Goto(u16 dst_index);
+    void Action(u16 dst_index);
 
 private:
     std::string		name;

@@ -178,6 +178,8 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 	    index_i = work_map[index_i].parent;
 	}
     }
+    else
+	    Error::Warning("Algorithm::PathFinding: not found...");
 
     return result.size();
 }

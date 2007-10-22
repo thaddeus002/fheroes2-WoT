@@ -66,6 +66,7 @@ public:
 
     const Castle * GetCastle(u16 maps_index);
     const Castle * GetCastle(u8 ax, u8 ay);
+    const Castle * GetCastle(const Point & pt){ return GetCastle(pt.x, pt.y); };
 
     const Heroes * GetHeroes(u16 maps_index);
     const Heroes * GetHeroes(u8 ax, u8 ay);

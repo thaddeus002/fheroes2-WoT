@@ -27,7 +27,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_HEROES), path(*this)
+    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), path(*this)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -283,7 +283,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     // end
 
     // save general object
-    save_maps_general = world.GetTiles(mp.x, mp.y).GetObject();
+    save_maps_general = MP2::OBJ_ZERO;
 
     // other param
     magic_point = GetMaxSpellPoints();
@@ -683,33 +683,6 @@ void Heroes::Recrut(const Castle & castle)
     tiles.SetObject(MP2::OBJ_HEROES);
 }
 
-void Heroes::Move(u16 ax, u16 ay)
-{
-    if(MP2::OBJ_HEROES != save_maps_general)
-    {
-        Maps::Tiles & tiles_old = world.GetTiles(mp.x, mp.y);
-
-	// restore general object
-	tiles_old.SetObject(save_maps_general);
-    }
-
-    // redraw old tile
-
-    // redraw sprite move hero
-    // center area maps
-
-    Maps::Tiles & tiles_new = world.GetTiles(ax, ay);
-
-    // save general object
-    save_maps_general = tiles_new.GetObject();
-    tiles_new.SetObject(MP2::OBJ_HEROES);
-
-    mp.x = ax;
-    mp.y = ay;
-
-    // redraw new tile
-}
-
 u32 Heroes::GetNextLevelExperience(u8 level) const
 {
     switch(level)
@@ -748,4 +721,45 @@ void Heroes::ActionNewMonth(void)
 u16 Heroes::FindPath(u16 dst_index)
 {
     return path.Calculate(dst_index);
+}
+
+void Heroes::Goto(u16 dst_index)
+{
+    if(MP2::OBJ_HEROES != save_maps_general)
+    {
+        Maps::Tiles & tiles_old = world.GetTiles(mp.x, mp.y);
+
+	// restore general object
+	tiles_old.SetObject(save_maps_general);
+	
+	// redraw old tile
+	tiles_old.Redraw();
+    }
+
+
+    // redraw sprite move hero
+    // center area maps
+
+    Maps::Tiles & tiles_new = world.GetTiles(dst_index);
+
+    // save general object
+    save_maps_general = tiles_new.GetObject();
+    tiles_new.SetObject(MP2::OBJ_HEROES);
+
+    mp.x = dst_index % world.w();
+    mp.y = dst_index / world.w();
+
+    //Game::globalfocus.center = mp;
+
+    // redraw new tile
+    tiles_new.Redraw();
+
+    Error::Verbose("Heroes::Goto: ", dst_index);
+}
+
+void Heroes::Action(u16 dst_index)
+{
+    Maps::Tiles & tiles_new = world.GetTiles(dst_index);
+
+    Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(tiles_new.GetObject())));
 }
