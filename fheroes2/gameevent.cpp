@@ -33,94 +33,96 @@ void GameEvent::Sign::Show(void)
 
 GameEvent::Day::Day(const void *ptr)
 {
-    const u8  *byte8  = static_cast<const u8 *>(ptr);
-    const u16 *byte16 = NULL;
-    const u32 *byte32 = NULL;
+    const u8  *ptr8  = static_cast<const u8 *>(ptr);
+    u16 byte16 = 0;
+    u32 byte32 = 0;
 
     // id
-    if(0x00 != byte8[0]) Error::Except("GameEvent::Day: unknown magic id");
+    if(0x00 != *ptr8) Error::Except("GameEvent::Day: unknown magic id");
+    ++ptr8;
 
     // resource
-    byte32 = reinterpret_cast<const u32 *>(& byte8[1]);
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.wood = byte32;
 
-    resource.wood = *byte32;
-    SWAP32(resource.wood);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.mercury = byte32;
 
-    resource.mercury = *byte32;
-    SWAP32(resource.mercury);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.ore = byte32;
 
-    resource.ore = *byte32;
-    SWAP32(resource.ore);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.sulfur = byte32;
 
-    resource.sulfur = *byte32;
-    SWAP32(resource.sulfur);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.crystal = byte32;
 
-    resource.crystal = *byte32;
-    SWAP32(resource.crystal);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.gems = byte32;
 
-    resource.gems = *byte32;
-    SWAP32(resource.gems);
-    ++byte32;
-
-    resource.gold = *byte32;
-    SWAP32(resource.gold);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.gold = byte32;
 
     // skip artifact
-    byte16 = reinterpret_cast<const u16 *>(byte32);
-    ++byte16;
+    LOAD16(ptr8, byte16);
+    ++ptr8;
+    ++ptr8;
 
     // allow computer
-    computer = *byte16;
-    SWAP16(conputer);
-    ++byte16;
+    LOAD16(ptr8, byte16);
+    ++ptr8;
+    ++ptr8;
+    computer = byte16;
 
     // day of first occurent
-    first = *byte16;
-    SWAP16(first);
-    ++byte16;
+    LOAD16(ptr8, byte16);
+    ++ptr8;
+    ++ptr8;
+    first = byte16;
 
     // subsequent occurrences
-    subsequent = *byte16;
-    SWAP16(subsequent);
-    ++byte16;
+    LOAD16(ptr8, byte16);
+    ++ptr8;
+    ++ptr8;
+    subsequent = byte16;
 
-    byte8 = reinterpret_cast<const u8 *>(byte16);
-    byte8 += 6;
+    ptr8 += 6;
 
     colors = 0;
     
     // blue
-    if(*byte8) colors |= Color::BLUE;
-    ++byte8;
+    if(*ptr8) colors |= Color::BLUE;
+    ++ptr8;
 
     // green
-    if(*byte8) colors |= Color::GREEN;
-    ++byte8;
+    if(*ptr8) colors |= Color::GREEN;
+    ++ptr8;
 
     // red
-    if(*byte8) colors |= Color::RED;
-    ++byte8;
+    if(*ptr8) colors |= Color::RED;
+    ++ptr8;
 
     // yellow
-    if(*byte8) colors |= Color::YELLOW;
-    ++byte8;
+    if(*ptr8) colors |= Color::YELLOW;
+    ++ptr8;
 
     // orange
-    if(*byte8) colors |= Color::ORANGE;
-    ++byte8;
+    if(*ptr8) colors |= Color::ORANGE;
+    ++ptr8;
 
     // purple
-    if(*byte8) colors |= Color::PURPLE;
-    ++byte8;
+    if(*ptr8) colors |= Color::PURPLE;
+    ++ptr8;
 
     // message
-    message = std::string(reinterpret_cast<const char *>(byte8));
+    message = std::string(reinterpret_cast<const char *>(ptr8));
     
     if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Day: long message, incorrect block?");
 
@@ -129,88 +131,85 @@ GameEvent::Day::Day(const void *ptr)
 
 GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
 {
-    const u8  *byte8  = static_cast<const u8 *>(ptr);
-    const u16 *byte16 = NULL;
-    const u32 *byte32 = NULL;
+    const u8  *ptr8  = static_cast<const u8 *>(ptr);
+    u16 byte16 = 0;
+    u32 byte32 = 0;
 
     // id
-    if(0x01 != byte8[0]) Error::Except("GameEvent::Coord: unknown magic id");
+    if(0x01 != *ptr8) Error::Except("GameEvent::Coord: unknown magic id");
+    ++ptr8;
 
     // resource
-    byte32 = reinterpret_cast<const u32 *>(& byte8[1]);
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.wood = byte32;
 
-    resource.wood = *byte32;
-    SWAP32(resource.wood);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.mercury = byte32;
 
-    resource.mercury = *byte32;
-    SWAP32(resource.mercury);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.ore = byte32;
 
-    resource.ore = *byte32;
-    SWAP32(resource.ore);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.sulfur = byte32;
 
-    resource.sulfur = *byte32;
-    SWAP32(resource.sulfur);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.crystal = byte32;
 
-    resource.crystal = *byte32;
-    SWAP32(resource.crystal);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.gems = byte32;
 
-    resource.gems = *byte32;
-    SWAP32(resource.gems);
-    ++byte32;
-
-    resource.gold = *byte32;
-    SWAP32(resource.gold);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.gold = byte32;
 
     // artifact
-    byte16 = reinterpret_cast<const u16 *>(byte32);
-    u16 art2 = *byte16;
-    SWAP16(art2);
-    artifact = (0xffff != *byte16 && Artifact::MAGIC_BOOK > art2 ? artifact = Artifact::Artifact(art2) : Artifact::UNKNOWN);
-    ++byte16;
+    LOAD16(ptr8, byte16);
+    ++ptr8;
+    ++ptr8;
+    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? artifact = Artifact::Artifact(byte16) : Artifact::UNKNOWN);
 
     // allow computer
-    byte8 = reinterpret_cast<const u8 *>(byte16);
-    computer = *byte8;
-    ++byte8;
+    computer = *ptr8;
+    ++ptr8;
 
     // cancel event after first visit
-    cancel = *byte8;
-    byte8 += 11;
+    cancel = *ptr8;
+    ptr8 += 11;
 
     colors = 0;
     
     // blue
-    if(*byte8) colors |= Color::BLUE;
-    ++byte8;
+    if(*ptr8) colors |= Color::BLUE;
+    ++ptr8;
 
     // green
-    if(*byte8) colors |= Color::GREEN;
-    ++byte8;
+    if(*ptr8) colors |= Color::GREEN;
+    ++ptr8;
 
     // red
-    if(*byte8) colors |= Color::RED;
-    ++byte8;
+    if(*ptr8) colors |= Color::RED;
+    ++ptr8;
 
     // yellow
-    if(*byte8) colors |= Color::YELLOW;
-    ++byte8;
+    if(*ptr8) colors |= Color::YELLOW;
+    ++ptr8;
 
     // orange
-    if(*byte8) colors |= Color::ORANGE;
-    ++byte8;
+    if(*ptr8) colors |= Color::ORANGE;
+    ++ptr8;
 
     // purple
-    if(*byte8) colors |= Color::PURPLE;
-    ++byte8;
+    if(*ptr8) colors |= Color::PURPLE;
+    ++ptr8;
 
     // message
-    message = std::string(reinterpret_cast<const char *>(byte8));
+    message = std::string(reinterpret_cast<const char *>(ptr8));
     
     if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Coord: long message, incorrect block?");
 
@@ -219,67 +218,64 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
 
 GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
 {
-    const u8  *byte8  = static_cast<const u8 *>(ptr);
-    const u16 *byte16 = NULL;
-    const u32 *byte32 = NULL;
+    const u8  *ptr8  = static_cast<const u8 *>(ptr);
+    u16 byte16 = 0;
+    u32 byte32 = 0;
 
     // id
-    if(0x00 != byte8[0]) Error::Except("GameEvent::Day: unknown magic id");
+    if(0x00 != *ptr8) Error::Except("GameEvent::Day: unknown magic id");
+    ++ptr8;
 
     // resource
-    byte32 = reinterpret_cast<const u32 *>(& byte8[1]);
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.wood = byte32;
 
-    resource.wood = *byte32;
-    SWAP32(resource.wood);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.mercury = byte32;
 
-    resource.mercury = *byte32;
-    SWAP32(resource.mercury);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.ore = byte32;
 
-    resource.ore = *byte32;
-    SWAP32(resource.ore);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.sulfur = byte32;
 
-    resource.sulfur = *byte32;
-    SWAP32(resource.sulfur);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.crystal = byte32;
 
-    resource.crystal = *byte32;
-    SWAP32(resource.crystal);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.gems = byte32;
 
-    resource.gems = *byte32;
-    SWAP32(resource.gems);
-    ++byte32;
-
-    resource.gold = *byte32;
-    SWAP32(resource.gold);
-    ++byte32;
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;;
+    resource.gold = byte32;
 
     // artifact
-    byte16 = reinterpret_cast<const u16 *>(byte32);
-    u16 art2 = *byte16;
-    SWAP16(art2);
-    if(0xffff != *byte16 && Artifact::MAGIC_BOOK > art2) artifact = Artifact::Artifact(art2);
-    ++byte16;
+    LOAD16(ptr8, byte16);
+    ++ptr8;
+    ++ptr8;
+    if(0xffff != byte16 && Artifact::MAGIC_BOOK > byte16) artifact = Artifact::Artifact(byte16);
 
     // count answers
-    byte8 = reinterpret_cast<const u8 *>(byte16);
-    u8 count = *byte8;
-    ++byte8;
+    u8 count = *ptr8;
+    ++ptr8;
 
     // answers
     for(u8 i = 0; i < 8; ++i){
 
-	std::string str(reinterpret_cast<const char *>(byte8));
+	std::string str(reinterpret_cast<const char *>(ptr8));
 	if(count-- && str.size()) answers.push_back(str);
 	
-	byte8 += 13;
+	ptr8 += 13;
     }
 
     // message
-    message = std::string(reinterpret_cast<const char *>(byte8));
+    message = std::string(reinterpret_cast<const char *>(ptr8));
     
     if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Riddle: long message, incorrect block?");
 

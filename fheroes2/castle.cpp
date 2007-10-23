@@ -30,11 +30,10 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     : building(0), army_spread(true), allow_build(true), dwelling(CASTLEMAXMONSTER, 0),
       army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
 {
-    const u8  *byte8  = static_cast<const u8 *>(ptr);
-    const u16 *byte16 = NULL;
-    u16 swap16 = 0;
+    const u8  *ptr8  = static_cast<const u8 *>(ptr);
+    u16 byte16 = 0;
 
-    switch(*byte8)
+    switch(*ptr8)
     {
 	case 0x00: color = Color::BLUE;   break;
 	case 0x01: color = Color::GREEN;  break;
@@ -44,59 +43,57 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
         case 0x05: color = Color::PURPLE; break;
         default:   color = Color::GRAY;   break;
     }
-    ++byte8;
+    ++ptr8;
     
     // custom building
-    if(*byte8)
+    if(*ptr8)
     {
-	++byte8;
+	++ptr8;
 	
 	// building
-	byte16 = reinterpret_cast<const u16 *>(byte8);
-	swap16 = *byte16;
-	SWAP16(swap16);
-        if(0x0002 & swap16) building |= BUILD_THIEVESGUILD;
-        if(0x0004 & swap16) building |= BUILD_TAVERN;
-        if(0x0008 & swap16) building |= BUILD_SHIPYARD;
-        if(0x0010 & swap16) building |= BUILD_WELL;
-        if(0x0080 & swap16) building |= BUILD_STATUE;
-        if(0x0100 & swap16) building |= BUILD_LEFTTURRET;
-        if(0x0200 & swap16) building |= BUILD_RIGHTTURRET;
-        if(0x0400 & swap16) building |= BUILD_MARKETPLACE;
-        if(0x1000 & swap16) building |= BUILD_MOAT;
-        if(0x0800 & swap16) building |= BUILD_WEL2;
-        if(0x2000 & swap16) building |= BUILD_SPEC;
-	++byte16;
+	LOAD16(ptr8, byte16);
+	++ptr8;
+	++ptr8;
+        if(0x0002 & byte16) building |= BUILD_THIEVESGUILD;
+        if(0x0004 & byte16) building |= BUILD_TAVERN;
+        if(0x0008 & byte16) building |= BUILD_SHIPYARD;
+        if(0x0010 & byte16) building |= BUILD_WELL;
+        if(0x0080 & byte16) building |= BUILD_STATUE;
+        if(0x0100 & byte16) building |= BUILD_LEFTTURRET;
+        if(0x0200 & byte16) building |= BUILD_RIGHTTURRET;
+        if(0x0400 & byte16) building |= BUILD_MARKETPLACE;
+        if(0x1000 & byte16) building |= BUILD_MOAT;
+        if(0x0800 & byte16) building |= BUILD_WEL2;
+        if(0x2000 & byte16) building |= BUILD_SPEC;
 
 	// dwelling
-	swap16 = *byte16;
-	SWAP16(swap16);
-        if(0x0008 & swap16) building |= DWELLING_MONSTER1;
-        if(0x0010 & swap16) building |= DWELLING_MONSTER2;
-        if(0x0020 & swap16) building |= DWELLING_MONSTER3;
-        if(0x0040 & swap16) building |= DWELLING_MONSTER4;
-        if(0x0080 & swap16) building |= DWELLING_MONSTER5;
-        if(0x0100 & swap16) building |= DWELLING_MONSTER6;
-        if(0x0200 & swap16) building |= DWELLING_UPGRADE2;
-        if(0x0400 & swap16) building |= DWELLING_UPGRADE3;
-        if(0x0800 & swap16) building |= DWELLING_UPGRADE4;
-        if(0x1000 & swap16) building |= DWELLING_UPGRADE5;
-        if(0x2000 & swap16) building |= DWELLING_UPGRADE6;
-	++byte16;
+	LOAD16(ptr8, byte16);
+	++ptr8;
+	++ptr8;
+        if(0x0008 & byte16) building |= DWELLING_MONSTER1;
+        if(0x0010 & byte16) building |= DWELLING_MONSTER2;
+        if(0x0020 & byte16) building |= DWELLING_MONSTER3;
+        if(0x0040 & byte16) building |= DWELLING_MONSTER4;
+        if(0x0080 & byte16) building |= DWELLING_MONSTER5;
+        if(0x0100 & byte16) building |= DWELLING_MONSTER6;
+        if(0x0200 & byte16) building |= DWELLING_UPGRADE2;
+        if(0x0400 & byte16) building |= DWELLING_UPGRADE3;
+        if(0x0800 & byte16) building |= DWELLING_UPGRADE4;
+        if(0x1000 & byte16) building |= DWELLING_UPGRADE5;
+        if(0x2000 & byte16) building |= DWELLING_UPGRADE6;
 
 	
 	// magic tower
-	byte8 = reinterpret_cast<const u8 *>(byte16);
-	if(0 < *byte8) building |= BUILD_MAGEGUILD1;
-	if(1 < *byte8) building |= BUILD_MAGEGUILD2;
-	if(2 < *byte8) building |= BUILD_MAGEGUILD3;
-	if(3 < *byte8) building |= BUILD_MAGEGUILD4;
-	if(4 < *byte8) building |= BUILD_MAGEGUILD5;
-	++byte8;
+	if(0 < *ptr8) building |= BUILD_MAGEGUILD1;
+	if(1 < *ptr8) building |= BUILD_MAGEGUILD2;
+	if(2 < *ptr8) building |= BUILD_MAGEGUILD3;
+	if(3 < *ptr8) building |= BUILD_MAGEGUILD4;
+	if(4 < *ptr8) building |= BUILD_MAGEGUILD5;
+	++ptr8;
     }
     else
     {
-	byte8 += 6;
+	ptr8 += 6;
 
 	// default building
         building |= BUILD_TAVERN;
@@ -107,81 +104,77 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     }
 
     // custom troops
-    bool custom_troops = *byte8;
+    bool custom_troops = *ptr8;
     if(custom_troops)
     {
-	++byte8;
+	++ptr8;
 	
 	// monster1
-	army[0].monster = Monster::Monster(*byte8);
-	++byte8;
+	army[0].monster = Monster::Monster(*ptr8);
+	++ptr8;
 
 	// monster2
-	army[1].monster = Monster::Monster(*byte8);
-	++byte8;
+	army[1].monster = Monster::Monster(*ptr8);
+	++ptr8;
 
 	// monster3
-	army[2].monster = Monster::Monster(*byte8);
-	++byte8;
+	army[2].monster = Monster::Monster(*ptr8);
+	++ptr8;
 
 	// monster4
-	army[3].monster = Monster::Monster(*byte8);
-	++byte8;
+	army[3].monster = Monster::Monster(*ptr8);
+	++ptr8;
 
 	// monster5
-	army[4].monster = Monster::Monster(*byte8);
-	++byte8;
+	army[4].monster = Monster::Monster(*ptr8);
+	++ptr8;
 
 	// count1
-	byte16 = reinterpret_cast<const u16 *>(byte8);
-	swap16 = *byte16;
-	SWAP16(swap16);
-	army[0].count = swap16;
-	++byte16;
+	LOAD16(ptr8, byte16);
+	++ptr8;
+	++ptr8;
+	army[0].count = byte16;
 
 	// count2
-	swap16 = *byte16;
-	SWAP16(swap16);
-	army[1].count = swap16;
-	++byte16;
+	LOAD16(ptr8, byte16);
+	++ptr8;
+	++ptr8;
+	army[1].count = byte16;
 
 	// count3
-	swap16 = *byte16;
-	SWAP16(swap16);
-	army[2].count = swap16;
-	++byte16;
+	LOAD16(ptr8, byte16);
+	++ptr8;
+	++ptr8;
+	army[2].count = byte16;
 
 	// count4
-	swap16 = *byte16;
-	SWAP16(swap16);
-	army[3].count = swap16;
-	++byte16;
+	LOAD16(ptr8, byte16);
+	++ptr8;
+	++ptr8;
+	army[3].count = byte16;
 
 	// count5
-	swap16 = *byte16;
-	SWAP16(swap16);
-	army[4].count = swap16;
-	++byte16;
-
-	byte8 = reinterpret_cast<const u8 *>(byte16);
+	LOAD16(ptr8, byte16);
+	++ptr8;
+	++ptr8;
+	army[4].count = byte16;
     }
     else
     {
-	byte8 += 16;
+	ptr8 += 16;
     }
     
     // captain
-    if(*byte8)
-	building |= BUILD_CAPTAIN;
-    ++byte8;
+    if(*ptr8) building |= BUILD_CAPTAIN;
+    ++ptr8;
     
     // custom name
-    ++byte8;
-    name = std::string(reinterpret_cast<const char *>(byte8));
-    byte8 += 13;
+    ++ptr8;
+    name = std::string(reinterpret_cast<const char *>(ptr8));
+    ptr8 += 13;
 
     // race
-    switch(*byte8)
+    switch(*ptr8)
     {
 	case 0x00: race = Race::KNGT; break;
 	case 0x01: race = Race::BARB; break;
@@ -191,17 +184,17 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	case 0x05: race = Race::NECR; break;
 	default: race = (Color::GRAY != color ? H2Config::GetKingdomRace(color) : Race::Rand()); break;
     }
-    ++byte8;
+    ++ptr8;
 
     // castle
-    if(*byte8) building |= BUILD_CASTLE;
-    ++byte8;
+    if(*ptr8) building |= BUILD_CASTLE;
+    ++ptr8;
 
     building |= (building & BUILD_CASTLE ? BUILD_CASTLE : BUILD_TENT);
 
     // allow upgrade to castle (0 - true, 1 - false)
-    allow_castle = (*byte8 ? false : true);
-    ++byte8;
+    allow_castle = (*ptr8 ? false : true);
+    ++ptr8;
 
     // unknown 29 byte
     //

@@ -141,144 +141,137 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
     color = cl;
 
-    const u8  *byte8  = static_cast<const u8 *>(ptr);
-    const u16 *byte16 = NULL;
-    const u32 *byte32 = NULL;
-    u16 swap16 = 0;
+    const u8  *ptr8  = static_cast<const u8 *>(ptr);
+    u16 byte16 = 0;
+    u32 byte32 = 0;
 
     // unknown
-    ++byte8;
+    ++ptr8;
 
     // custom troops
-    bool custom_troops = *byte8;
+    bool custom_troops = *ptr8;
     if(custom_troops)
     {
-        ++byte8;
+        ++ptr8;
 
         // monster1
-        army[0].monster = Monster::Monster(*byte8);
-        ++byte8;
+        army[0].monster = Monster::Monster(*ptr8);
+        ++ptr8;
 
         // monster2
-        army[1].monster = Monster::Monster(*byte8);
-        ++byte8;
+        army[1].monster = Monster::Monster(*ptr8);
+        ++ptr8;
 
         // monster3
-        army[2].monster = Monster::Monster(*byte8);
-        ++byte8;
+        army[2].monster = Monster::Monster(*ptr8);
+        ++ptr8;
 
         // monster4
-        army[3].monster = Monster::Monster(*byte8);
-        ++byte8;
+        army[3].monster = Monster::Monster(*ptr8);
+        ++ptr8;
 
         // monster5
-        army[4].monster = Monster::Monster(*byte8);
-        ++byte8;
+        army[4].monster = Monster::Monster(*ptr8);
+        ++ptr8;
 
         // count1
-        byte16 = reinterpret_cast<const u16 *>(byte8);
-        swap16 = *byte16;
-        SWAP16(swap16);
-        army[0].count = swap16;
-        ++byte16;
+        LOAD16(ptr8, byte16);
+        ++ptr8;
+        ++ptr8;
+        army[0].count = byte16;
 
         // count2
-        swap16 = *byte16;
-        SWAP16(swap16);
-        army[1].count = swap16;
-        ++byte16;
+        LOAD16(ptr8, byte16);
+        ++ptr8;
+        ++ptr8;
+        army[1].count = byte16;
 
         // count3
-        swap16 = *byte16;
-        SWAP16(swap16);
-        army[2].count = swap16;
-        ++byte16;
+        LOAD16(ptr8, byte16);
+        ++ptr8;
+        ++ptr8;
+        army[2].count = byte16;
 
         // count4
-        swap16 = *byte16;
-        SWAP16(swap16);
-        army[3].count = swap16;
-        ++byte16;
+        LOAD16(ptr8, byte16);
+        ++ptr8;
+        ++ptr8;
+        army[3].count = byte16;
 
         // count5
-        swap16 = *byte16;
-        SWAP16(swap16);
-        army[4].count = swap16;
-        ++byte16;
-
-        byte8 = reinterpret_cast<const u8 *>(byte16);
+        LOAD16(ptr8, byte16);
+        ++ptr8;
+        ++ptr8;
+        army[4].count = byte16;
     }
     else
     {
-        byte8 += 16;
+        ptr8 += 16;
     }
 
     // custom portrate
-    ++byte8;
+    ++ptr8;
 
     // index sprite portrate
-    ++byte8;
+    ++ptr8;
 
     // artifacts
     Artifact::artifact_t artifact = Artifact::UNKNOWN;
 
     // artifact 1
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*byte8))) artifacts.push_back(artifact);
-    ++byte8;
+    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) artifacts.push_back(artifact);
+    ++ptr8;
 
     // artifact 2
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*byte8))) artifacts.push_back(artifact);
-    ++byte8;
+    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) artifacts.push_back(artifact);
+    ++ptr8;
 
     // artifact 3
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*byte8))) artifacts.push_back(artifact);
-    ++byte8;
+    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) artifacts.push_back(artifact);
+    ++ptr8;
 
     // unknown byte
-    ++byte8;
+    ++ptr8;
 
     // experience
-    byte32 = reinterpret_cast<const u32 *>(byte8);
-    experience = *byte32;
-    SWAP32(experience);
-    ++byte32;
-
+    LOAD32(ptr8, byte32);
+    ptr8 += 4;
+    experience = byte32;
 
     // custom skill
-    byte8 = reinterpret_cast<const u8 *>(byte32);
-    if(*byte8)
+    if(*ptr8)
     {
-	++byte8;
+	++ptr8;
 
 	// skills
 	for(u8 ii = 0; ii < 8; ++ii)
-	    secondary_skills.Level(Skill::Secondary::FromMP2(*byte8 + ii), Skill::Level::FromMP2(*(byte8 + ii + 8)));
+	    secondary_skills.Level(Skill::Secondary::FromMP2(*ptr8 + ii), Skill::Level::FromMP2(*(ptr8 + ii + 8)));
 
-	byte8 += 15;
+	ptr8 += 15;
     }
     else
     {
-	++byte8;
+	++ptr8;
 
-        byte8 += 16;
+        ptr8 += 16;
     }
     
     // unknown
-    ++byte8;
+    ++ptr8;
 
     // custom name
-    ++byte8;
+    ++ptr8;
 
     //name hero
-    if(*byte8) name = std::string(reinterpret_cast<const char *>(byte8));
+    if(*ptr8) name = std::string(reinterpret_cast<const char *>(ptr8));
     
-    byte8 += 13;
+    ptr8 += 13;
     
     // patrol
-    ++byte8;
+    ++ptr8;
 
     // count square
-    ++byte8;
+    ++ptr8;
 
     // end
 

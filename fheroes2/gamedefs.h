@@ -22,12 +22,12 @@
 
 #include "SDL.h"
 
-typedef char		s8;
-typedef unsigned char	u8;
-typedef short		s16;
-typedef unsigned short	u16;
-typedef int		s32;
-typedef unsigned int	u32;
+typedef int8_t		s8;
+typedef uint8_t		u8;
+typedef int16_t		s16;
+typedef uint16_t	u16;
+typedef int32_t		s32;
+typedef uint32_t	u32;
 
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 1
@@ -56,6 +56,11 @@ typedef unsigned int	u32;
 #define SWAP16(X)    X=SDL_Swap16(X)
 #define SWAP32(X)    X=SDL_Swap32(X)
 
+// slow implementation uint16_t = *(uint8_t *)
+#define LOAD16(p, b)	b=(((uint16_t)(((b) & 0) | *(p)) << 8) | *((p) + 1))
+// slow implementation uint32_t = *(uint8_t *)
+#define LOAD32(p, b)	b=(((((((uint32_t)(((b) & 0) | *(p)) << 8) | *((p) + 1)) << 8) | *((p) + 2)) << 8) | *((p) + 3))
+
 #else
 
 #define RMASK 0x0000000f
@@ -70,6 +75,11 @@ typedef unsigned int	u32;
 
 #define SWAP16(X) ;
 #define SWAP32(X) ;
+
+// slow implementation uint16_t = *(uint8_t *)
+#define LOAD16(p, b)	b=(((uint16_t)(((b) & 0) | *((p) + 1)) << 8) | *((p)))
+// slow implementation uint32_t = *(uint8_t *)
+#define LOAD32(p, b)	b=(((((((uint32_t)(((b) & 0) | *((p) + 3)) << 8) | *((p) + 2)) << 8) | *((p) + 1)) << 8) | *(p))
 
 #endif
 
