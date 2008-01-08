@@ -57,7 +57,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
     // read maps directory
     Dir dir1(H2Config::GetMapsDirectory(), "mp2");
     Dir dir2(H2Config::GetMapsDirectory(), "Mp2");
-    dir dir3(H2Config::GetMapsDirectory(), "MP2");
+    Dir dir3(H2Config::GetMapsDirectory(), "MP2");
 
     if(dir1.size())
     {
