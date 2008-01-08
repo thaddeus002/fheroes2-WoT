@@ -18,6 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__)
+#include <io.h>
+#define MKDIR(X)    mkdir(X)
+#else
+#define MKDIR(X)    mkdir(X, S_IRWXU)
+#endif
+
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -54,7 +61,7 @@ int main(int argc, char **argv)
     
     prefix += SEPARATOR + shortname;
 
-    if(0 != mkdir(prefix.c_str(), S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IWGRP|S_IXGRP|S_IROTH|S_IXOTH))
+    if(0 != MKDIR(prefix.c_str()))
     {
 	std::cout << "error mkdir: " << prefix << std::endl;
 

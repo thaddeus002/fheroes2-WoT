@@ -3,7 +3,7 @@
 #
 
 TARGETS := extractor 82m2wav til2bmp icn2bmp
-LIBS := $(shell sdl-config --libs) ../engine/libengine.a
+LIBS := ../engine/libengine.a $(shell sdl-config --libs)
 CFLAGS := -O2 -Wall -I ../system -I ../engine $(shell sdl-config --cflags)
 
 CC := g++
@@ -14,10 +14,10 @@ libengine:
 	make -C ../engine
 
 extractor: extractor.o
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ $(LIBS)
 
 82m2wav: 82m2wav.o
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ $(LIBS)
 
 til2bmp: til2bmp.o
 	$(CC) $^ -o $@ $(LIBS)
@@ -33,4 +33,4 @@ include $(wildcard *.d)
 .PHONY: clean
 
 clean:
-	rm -f *.o *.d $(TARGETS)
+	rm -f *.o *.d *.exe $(TARGETS)

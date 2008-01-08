@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include <libgen.h>
 
 #include "gamedefs.h"

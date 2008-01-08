@@ -3,10 +3,10 @@
 #
 
 TARGET := fheroes2
-LIBS := $(shell sdl-config --libs) ./engine/libengine.a
-#CFLAGS = $(CFLAGS) -O0 -g -Wall $(shell sdl-config --cflags) -I ./engine
-#CFLAGS = $(CFLAGS) -O2 -Wall $(shell sdl-config --cflags) -I ./engine -DBUILD_RELEASE
-CFLAGS := $(CFLAGS) -O2 -Wall $(shell sdl-config --cflags) -I ./engine
+LIBS := ./engine/libengine.a $(shell sdl-config --libs)
+CFLAGS := -O0 -g -Wall $(shell sdl-config --cflags) -I ./engine
+#CFLAGS := -O2 -Wall $(shell sdl-config --cflags) -I ./engine -DBUILD_RELEASE
+#CFLAGS := -O2 -Wall $(shell sdl-config --cflags) -I ./engine
 
 CC := g++
 
@@ -40,6 +40,6 @@ include $(wildcard *.d)
 .PHONY: clean
 
 clean:
-	rm -f *.o *.d $(TARGET)
+	rm -f *.o *.d *.exe $(TARGET)
 	make -C engine clean
 	make -C tools clean
