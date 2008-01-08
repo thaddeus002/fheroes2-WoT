@@ -1,4 +1,4 @@
-Free Heroes2 Engine
+Free Heroes2 Engine (is not playable version.)
 
 Prerequisites:
 
@@ -9,3 +9,38 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 SDL libraries can be found at http://www.libsdl.org .
 
 Sourcecode: you can get it here: http://sourceforge.net/projects/fheroes2/
+
+Copy origin heroes2.agg in to data directory.
+Copy maps files (*.mp2) in to maps directory.
+
+Default config fheroes2.cfg options:
+#
+# path to heroes2.agg
+# aggfile = data/heroes2.agg
+#
+# directory maps
+# directorymaps = maps
+#
+# sound: on off
+# sound = off
+#
+# music: on off
+# music = off
+#
+# video mode (640x480, 800x600, 1024x768, 1280x1024)
+# videomode = 640x480
+#
+# fullscreen: on off (F4 switch)
+# fullscreen = off
+#
+# interface (good/evil)
+# evilinterface = off
+#
+# shadow
+# shadow = on
+#
+# debug
+# debug = off
+#
+# original version
+# original = on

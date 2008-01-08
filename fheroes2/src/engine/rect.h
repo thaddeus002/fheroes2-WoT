@@ -1,0 +1,58 @@
+/***************************************************************************
+ *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   afletdinov@mail.dc.baikal.ru                                          *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#ifndef H2RECT_H
+#define H2RECT_H
+
+#include <vector>
+#include "gamedefs.h"
+
+class Point
+{
+public:
+    s16 x;
+    s16 y;
+
+    Point(int px = -1, int py = -1);
+
+    bool operator== (const Point & pt) const;
+    bool operator!= (const Point & pt) const;
+};
+
+class Rect : public SDL_Rect
+{
+public:
+    Rect(s16 rx = -1, s16 ry = -1, u16 rw = 0, u16 rh = 0);
+    Rect(const Point & pt, u16 rw, u16 rh);
+    Rect(const std::vector<Rect> & vect);
+
+    bool valid(void) const;
+
+    Rect & operator= (const Point & pt);
+    bool operator== (const Rect & rt) const;
+    bool operator!= (const Rect & rt) const;
+
+    // rect include point
+    bool operator& (const Point & pt) const;
+
+    // rect intersects rect
+    bool operator& (const Rect & rt) const;
+};
+
+#endif
