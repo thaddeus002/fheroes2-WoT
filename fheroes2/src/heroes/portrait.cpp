@@ -33,12 +33,12 @@ const Surface & Portrait::Captain(const Race::race_t & rc, const Portrait::size_
 	case BIG:
 	    switch(rc)
 	    {
-    		case Race::KNGT:        return AGG::GetICN("PORT0089.ICN", 0);
-    		case Race::BARB:        return AGG::GetICN("PORT0090.ICN", 0);
-    		case Race::SORC:        return AGG::GetICN("PORT0091.ICN", 0);
-    		case Race::WRLK:        return AGG::GetICN("PORT0092.ICN", 0);
-    		case Race::WZRD:        return AGG::GetICN("PORT0093.ICN", 0);
-    		case Race::NECR:        return AGG::GetICN("PORT0094.ICN", 0);
+    		case Race::KNGT:        return AGG::GetICN("PORT0090.ICN", 0);
+    		case Race::BARB:        return AGG::GetICN("PORT0091.ICN", 0);
+    		case Race::SORC:        return AGG::GetICN("PORT0092.ICN", 0);
+    		case Race::WRLK:        return AGG::GetICN("PORT0093.ICN", 0);
+    		case Race::WZRD:        return AGG::GetICN("PORT0094.ICN", 0);
+    		case Race::NECR:        return AGG::GetICN("PORT0095.ICN", 0);
     		default: break;
 	    }
 	    break;
@@ -60,7 +60,7 @@ const Surface & Portrait::Captain(const Race::race_t & rc, const Portrait::size_
 
     Error::Warning("Portrait::Captain: unknown race.");
 
-    return AGG::GetICN("PORT0089.ICN", 0);
+    return AGG::GetICN("PORT0090.ICN", 0);
 }
 
 const Surface & Portrait::Hero(const Heroes::heroes_t & hero, const Portrait::size_t & sz)
