@@ -32,18 +32,25 @@ public:
     Button(const Point &pt, const std::string &icn, u16 index1, u16 index2);
     Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2);
 
-    void Press(void){ DrawPressButton(); pressed = true; };
-    void Release(void){ DrawReleaseButton(); pressed = false; };
+    void Disable(bool fl);
+    bool isEnable(void) const{ return !disable; };
+    bool isDisable(void) const{ return disable; };
+    bool isPressed(void) const{ return pressed; };
+    bool isReleased(void) const{ return !pressed; };
+
+    void Press(void);
+    void Release(void);
     void Redraw(void){ pressed ? DrawPressButton() : DrawReleaseButton(); };
-    
-private:
+
     void DrawPressButton(void);
     void DrawReleaseButton(void);
+private:
 
     const Sprite &sprite1;
     const Sprite &sprite2;
 
     bool pressed;
+    bool disable;
 };
 
 #endif

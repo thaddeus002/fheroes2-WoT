@@ -23,7 +23,7 @@
 #include "display.h"
 #include "button.h"
 
-Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), pressed(false)
+Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), pressed(false), disable(false)
 {
     x = sprite1.x();
     y = sprite1.y();
@@ -34,7 +34,7 @@ Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), p
 }
 
 Button::Button(const std::string &icn, u16 index1, u16 index2) 
-    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false)
+    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
 {
     x = sprite1.x();
     y = sprite1.y();
@@ -45,7 +45,7 @@ Button::Button(const std::string &icn, u16 index1, u16 index2)
 }
 
 Button::Button(const Point &pt, const std::string &icn, u16 index1, u16 index2)
-    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false)
+    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
 {
     x = pt.x;
     y = pt.y;
@@ -56,7 +56,7 @@ Button::Button(const Point &pt, const std::string &icn, u16 index1, u16 index2)
 }
 
 Button::Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2)
-    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false)
+    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
 {
     x = ox;
     y = oy;
@@ -66,34 +66,58 @@ Button::Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2)
     display.Blit(sprite1, x, y);
 }
 
+void Button::Disable(bool fl)
+{
+    disable = fl;
+
+    bool localcursor = false;
+    if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+
+    display.Blit(fl ? sprite2 : sprite1, x, y);
+
+    if(localcursor) Cursor::Show();
+
+    pressed = fl;
+}
+
+void Button::Press(void)
+{
+    if(disable || pressed) return;
+
+    DrawPressButton();
+
+    pressed = true;
+
+    display.Flip();
+}
+
+void Button::Release(void)
+{
+    if(disable || !pressed) return;
+
+    DrawReleaseButton();
+
+    pressed = false;
+
+    display.Flip();
+}
+
 void Button::DrawPressButton(void)
 {
-    if(pressed) return;
-
     bool localcursor = false;
     if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     display.Blit(sprite2, x, y);
 
     if(localcursor) Cursor::Show();
-
-    display.Flip();
-    
-    pressed = true;
 }
 
 void Button::DrawReleaseButton(void)
 {
-    if(!pressed) return;
-
     bool localcursor = false;
     if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
     display.Blit(sprite1,  x, y);
 
     if(localcursor) Cursor::Show();
-
-    display.Flip();
-
-    pressed = false;
 }
