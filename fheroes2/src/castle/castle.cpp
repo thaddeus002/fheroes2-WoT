@@ -30,6 +30,8 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     : building(0), army_spread(true), allow_build(true), dwelling(CASTLEMAXMONSTER, 0),
       army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
 {
+    castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
+
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
 
@@ -258,9 +260,11 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
-const Heroes * Castle::isHeroesPresent(void)
+bool Castle::isHeroesPresent(void)
 {
-    return world.GetHeroes(mp.x, mp.y);
+    castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp));
+
+    return castle_heroes;
 }
 
 void Castle::ActionNewDay(void)
@@ -361,9 +365,7 @@ castle size: T and B - sprite, S - shadow, XX - center
     coords.push_back((mp.y + 1) * world.h() + mp.x + 1);
     coords.push_back((mp.y + 1) * world.h() + mp.x + 2);
 
-    const u16 index_center = mp.y * world.h() + mp.x;
-    
-    Maps::Tiles & tile_center = world.GetTiles(index_center);
+    Maps::Tiles & tile_center = world.GetTiles(mp);
 
     // correct only RND town and castle
     switch(tile_center.GetObject())
@@ -373,7 +375,7 @@ castle size: T and B - sprite, S - shadow, XX - center
 	    break;
 	
 	default:
-	    Error::Warning("Castle::CorrectAreaMaps: correct only RND town and castle. index: ", index_center);
+	    Error::Warning("Castle::CorrectAreaMaps: correct only RND town and castle. index: ", mp.y * world.w() + mp.x);
 	    return;
     }
 
@@ -405,9 +407,7 @@ void Castle::MinimizeAreaMapsID(void)
     }
 
     // restore center ID
-    Maps::Tiles & tile_center = world.GetTiles(mp.y * world.h() + mp.x);
-
-    tile_center.SetObject(MP2::OBJ_CASTLE);
+    world.GetTiles(mp).SetObject(MP2::OBJ_CASTLE);
 }
 
 /* modify RND sprites alghoritm */
@@ -538,9 +538,9 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
 	"Right Turret", "Marketplace", "Moat", "Castle", "Tent", "Captain's Quarters", "Mage Guild, Level 1", 
 	 "Mage Guild, Level 2",  "Mage Guild, Level 3",  "Mage Guild, Level 4",  "Mage Guild, Level 5", "Unknown" };
 
-    static const std::string str_wel2[] = { "Farm", "Garbage Heap", "Crystal Garden", "Orchard", "Waterfall", "Skull Pile" };
+    static const std::string str_wel2[] = { "Farm", "Garbage Heap", "Crystal Garden", "Waterfall", "Orchard", "Skull Pile" };
 
-    static const std::string str_spec[] = { "Fortifications", "Coliseum", "Rainbow", "Library", "Dungeon", "Storm" };
+    static const std::string str_spec[] = { "Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm" };
 
     static const std::string str_dwelling[] = {
 	"Thatched Hut", "Hut", "Treehouse", "Cave", "Habitat", "Excavation",
@@ -687,6 +687,41 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
     }
 
     return desc_build[13];
+}
+
+bool Castle::AllowBuyHero(void)
+{
+    if(isHeroesPresent()) return false;
+
+    const Kingdom & kingdom = world.GetKingdom(color);
+
+    if(kingdom.GetHeroes().size() >= KINGDOMMAXHEROES) return false;
+
+    const Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
+
+    if(paymentCosts > kingdom.GetFundsResource()) return false;
+    
+    return true;
+}
+
+void Castle::RecrutHero(const Heroes::heroes_t hero)
+{
+    if(! AllowBuyHero()) return;
+
+    Kingdom & kingdom = const_cast<Kingdom &>(world.GetKingdom(color));
+
+    const Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
+
+    kingdom.OddFundsResource(paymentCosts);
+
+    Heroes & heroes = world.GetHeroes(hero);
+
+    heroes.SetCenter(GetCenter());
+    heroes.Recrut(*this);
+
+    kingdom.AddHeroes(&heroes);
+    
+    castle_heroes = &heroes;
 }
 
 /* recrut monster from building to castle army */
@@ -1247,6 +1282,7 @@ void Castle::PrepareICNString(const Castle::building_t & build, const Race::race
 	case DWELLING_UPGRADE5: result += "UP_4.ICN"; break;
 	case DWELLING_MONSTER6:	result += "DW_5.ICN"; break;
 	case DWELLING_UPGRADE6: result += "UP_5.ICN"; break;
+	case DWELLING_UPGRADE7: result += "UP5B.ICN"; break;
 	default: break;
     }
 }

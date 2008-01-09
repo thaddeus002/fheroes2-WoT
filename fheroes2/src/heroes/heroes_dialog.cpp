@@ -455,20 +455,29 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     Dialog::StatusBar statusBar(Point(cur_pt.x + 22, cur_pt.y + 460), AGG::GetICN("HSBTNS.ICN", 8), Font::BIG);
     statusBar.Clear("Hero Screen");
 
+    u16 index1 = readonly ? 5 : 4;
+    u16 index2 = 5;
+
     // button prev
     dst_pt.x = cur_pt.x + 1;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonPrevHero(dst_pt, "HSBTNS.ICN", 4, 5);
+    Button buttonPrevHero(dst_pt, "HSBTNS.ICN", index1, index2);
+
+    index1 = readonly ? 7 : 6;
+    index2 = 7;
 
     // button next
     dst_pt.x = cur_pt.x + 640 - 23;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonNextHero(dst_pt, "HSBTNS.ICN", 6, 7);
+    Button buttonNextHero(dst_pt, "HSBTNS.ICN", index1, index2);
     
+    index1 = readonly ? 1 : 0;
+    index2 = 1;
+
     // button dismiss
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 318;
-    Button buttonDismiss(dst_pt, "HSBTNS.ICN", 0, 1);
+    Button buttonDismiss(dst_pt, "HSBTNS.ICN", index1, index2);
 
     // button exit
     dst_pt.x = cur_pt.x + 603;
@@ -487,7 +496,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)) return Dialog::CANCEL;
 
 	// heroes troops
-	if(! readonly)
 	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
 	{
 	    if(le.MouseClickLeft(coordsHeroesTroops[ii]))
@@ -522,40 +530,56 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		// change or combine army or move to empty
 		if(selectHeroesTroops.isSelected())
 		{
-		    // from castle or heroes
-		    Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
-		    const Monster::monster_t select_monster = select_troops.monster;
-		    const u16 select_count = select_troops.count;
-
-		    // change or combine army
-		    if(Army::isValid(army[ii]))
+		    if(! readonly)
 		    {
-			// change
-			if(army[ii].monster != select_monster)
+			// from castle or heroes
+			Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
+			const Monster::monster_t select_monster = select_troops.monster;
+			const u16 select_count = select_troops.count;
+
+			// change or combine army
+			if(Army::isValid(army[ii]))
 			{
-			    select_troops = army[ii];
-			    army[ii].Set(select_monster, select_count);
+			    // change
+			    if(army[ii].monster != select_monster)
+			    {
+				select_troops = army[ii];
+				army[ii].Set(select_monster, select_count);
+			    }
+			    // combine
+			    else
+                    	    {
+                        	army[ii].count = army[ii].count + select_count;
+
+                        	select_troops.Set(Monster::UNKNOWN, 0);
+                    	    }
+
+			    selectHeroesTroops.Reset();
+			    selectHeroesTroops.Redraw();
 			}
-			// combine
+			// move to empty position
 			else
-                        {
-                            army[ii].count = army[ii].count + select_count;
+			if(selectHeroesTroops.isSelected())
+			{
+			    army[ii] = select_troops;
+			    select_troops.Set(Monster::UNKNOWN, 0);
 
-                            select_troops.Set(Monster::UNKNOWN, 0);
-                        }
-
-			selectHeroesTroops.Reset();
-			selectHeroesTroops.Redraw();
+			    selectHeroesTroops.Reset();
+			    selectHeroesTroops.Redraw();
+			}
 		    }
-		    // move to empty position
 		    else
-		    if(selectHeroesTroops.isSelected())
 		    {
-			army[ii] = select_troops;
-			select_troops.Set(Monster::UNKNOWN, 0);
+			// select army
+			if(Army::isValid(army[ii]))
+			{
+			    selectHeroesTroops.Reset();
+			    selectHeroesTroops.Select(ii);
+			    selectHeroesTroops.Redraw();
+			}
 
-			selectHeroesTroops.Reset();
-			selectHeroesTroops.Redraw();
+			Cursor::Show();
+			display.Flip();
 		    }
 		}
 		else
@@ -574,7 +598,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    // right click empty troops - redistribute troops
 	    if(le.MouseClickRight(coordsHeroesTroops[ii]) &&
 		!Army::isValid(army[ii]) &&
-		selectHeroesTroops.isSelected())
+		selectHeroesTroops.isSelected() &&
+		!readonly)
 	    {
 		Cursor::Hide();
 
@@ -615,13 +640,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
     	    le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.Press() : buttonPrevHero.Release();
     	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
+
+    	    // prev hero
+	    if(le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
+
+    	    // next hero
+    	    if(le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
 	}
-
-        // prev hero
-        if(le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
-
-        // next hero
-        if(le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
 
 	// left click info
         if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message("Attack Skill", "Your attack skill is a bonus added to each creature's attack skill.", Font::BIG, Dialog::OK);

@@ -27,7 +27,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), path(*this)
+    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_ZERO), path(*this)
 {
     // hero is freeman
     color = Color::GRAY;

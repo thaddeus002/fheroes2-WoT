@@ -37,7 +37,7 @@ namespace Game
 class SelectFocusObject
 {
 public:
-    SelectFocusObject(const Point & pt);
+    SelectFocusObject(s16 px, s16 py);
     virtual ~SelectFocusObject(){};
 
     bool isSelected(void) const{ return selected; };
@@ -72,33 +72,43 @@ protected:
 class SelectFocusCastles : public SelectFocusObject
 {
 public:
-    SelectFocusCastles(const std::vector<Castle *> & vec);
-    
-    u8 GetSizeObject(void) const{ return castles.size(); };
+    static SelectFocusCastles & Get(void);
+
+    void SetCastles(const std::vector<Castle *> & vec);
+
+    u8 GetSizeObject(void) const{ return castles ? castles->size() : 0; };
 
     void Redraw(void);
 
     void SelectFromCenter(const Point & pt);
     const Point & GetCenter(u8 index) const;
 
+protected:
+    SelectFocusCastles();
+
 private:
-    const std::vector<Castle *> & castles;
+    const std::vector<Castle *> *castles;
 };
 
 class SelectFocusHeroes : public SelectFocusObject
 {
 public:
-    SelectFocusHeroes(const std::vector<Heroes *> & vec);
-    
-    u8 GetSizeObject(void) const{ return heroes.size(); };
+    static SelectFocusHeroes & Get(void);
+
+    void SetHeroes(const std::vector<Heroes *> & vec);
+
+    u8 GetSizeObject(void) const{ return heroes ? heroes->size() : 0; };
 
     void Redraw(void);
 
     void SelectFromCenter(const Point & pt);
     const Point & GetCenter(u8 index) const;
 
+protected:
+    SelectFocusHeroes();
+
 private:
-    const std::vector<Heroes *> & heroes;
+    const std::vector<Heroes *> *heroes;
     Surface sprite_blue;
 };
 

@@ -354,6 +354,12 @@ namespace PaymentConditions
 	BuyBuilding(const Race::race_t & race, const Castle::building_t & build);
     };
 
+    class BuyHero : public payment_t
+    {
+    public:
+	BuyHero();
+    };
+
     class BuyMonster : public payment_t
     {
     public:

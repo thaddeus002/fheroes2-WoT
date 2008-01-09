@@ -120,6 +120,7 @@ public:
     StatusBar(const Point & pt, const Surface & sf, const Font::type_t ft) : pos_pt(pt), sprite(sf), font(ft) {};
 
     void ShowMessage(const std::string & message);
+    void ShowBuildMessage(bool isBuilt, bool allowBuild, const std::string & message, const Castle & castle, const u32 building);
     void Clear(void);
     void Clear(const std::string & message);
     bool isEmpty(void);

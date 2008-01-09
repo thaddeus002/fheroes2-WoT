@@ -39,6 +39,90 @@
 #include "portrait.h"
 #include "payment.h"
 
+Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
+{
+    const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+
+    const Heroes & heroes = world.GetHeroes(hero);
+
+    Cursor::Hide();
+    Dialog::Box box(200, true);
+    const Rect & box_rt = box.GetArea();
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    Point dst_pt;
+    std::string str;
+
+    str = "Recruit Hero";
+    u8 height_title = Text::height(str, Font::BIG, BOXAREA_WIDTH);
+    Rect tit_rt(box_rt.x + 5, box_rt.y - height_title / 2, BOXAREA_WIDTH, height_title);
+    TextBox(str, Font::BIG, tit_rt);
+
+    //portrait and frame
+    const Sprite & portrait_frame = AGG::GetICN("SURRENDR.ICN", 4);
+    dst_pt.x = box_rt.x + 10 + (box_rt.w - portrait_frame.w()) / 2;
+    dst_pt.y = box_rt.y + tit_rt.h + 5;
+    display.Blit(Portrait::Hero(hero, Portrait::BIG), dst_pt);
+
+    dst_pt.x = box_rt.x + 5 + (box_rt.w  - portrait_frame.w()) / 2;
+    dst_pt.y = box_rt.y + tit_rt.h;
+    display.Blit(portrait_frame, dst_pt);
+
+    str = heroes.GetName() + " is a level ";
+    String::AddInt(str, heroes.GetLevel());
+    str += " " + Race::String(heroes.GetRace()) + " with ";
+    String::AddInt(str, heroes.GetArtifacts().size());
+    str += " artifacts.";
+
+    Rect src_rt(box_rt.x, box_rt.y + portrait_frame.w() + tit_rt.h - 5, BOXAREA_WIDTH, 200);
+    TextBox(str, Font::BIG, src_rt);
+
+    Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
+
+    if(! paymentCosts.GetValidItems()) return Dialog::CANCEL;
+
+    if(paymentCosts.gold)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 6);
+	dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
+	dst_pt.y = box_rt.y + box_rt.h - sprite.h();
+	display.Blit(sprite, dst_pt);
+	str.clear();
+	String::AddInt(str, paymentCosts.gold);
+	dst_pt.x = box_rt.x + (box_rt.w - Text::width(str, Font::SMALL)) / 2;
+	dst_pt.y = box_rt.y + box_rt.h + 5;
+	Text(str, Font::SMALL, dst_pt);
+    }
+
+    dst_pt.x = box_rt.x;
+    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    Button button1(dst_pt, system, 1, 2);
+
+    if(! AllowBuyHero()) button1.Disable(true);
+
+    dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
+    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+    Button button2(dst_pt, system, 3, 4);
+
+    Cursor::Show();
+    display.Flip();
+
+    // message loop
+    while(le.HandleEvents())
+    {
+        le.MousePressLeft(button1) ? button1.Press() : button1.Release();
+        le.MousePressLeft(button2) ? button2.Press() : button2.Release();
+
+        if(button1.isEnable() &&
+    	    (le.MouseClickLeft(button1) ||
+    	    le.KeyPress(SDLK_RETURN))) return Dialog::OK;
+
+        if(le.MouseClickLeft(button2) ||
+    	    le.KeyPress(SDLK_ESCAPE)) break;
+    }
+
+    return Dialog::CANCEL;
+}
+
 Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 {
     const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
@@ -122,7 +206,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     Point dst_pt;
     if(buttons)
     {
-		dst_pt.x = box_rt.x;
+	dst_pt.x = box_rt.x;
         dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
         button1 = new Button(dst_pt, system, 1, 2);
         dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
@@ -131,7 +215,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     }
 
 	u8 index = 0;
-	
+
 	// sprite
 	switch(build)
 	{
@@ -141,19 +225,19 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		case BUILD_MAGEGUILD4:
 		case BUILD_MAGEGUILD5:	index = 0; break;
 		case BUILD_THIEVESGUILD:index = 1; break;
-		case BUILD_TAVERN:		index = 2; break;
+		case BUILD_TAVERN:	index = 2; break;
 		case BUILD_SHIPYARD:	index = 3; break;
-		case BUILD_WELL:		index = 4; break;
-		case BUILD_TENT:		index = 5; break;
-		case BUILD_CASTLE:		index = 6; break;
-		case BUILD_STATUE:		index = 7; break;
+		case BUILD_WELL:	index = 4; break;
+		case BUILD_TENT:	index = 5; break;
+		case BUILD_CASTLE:	index = 6; break;
+		case BUILD_STATUE:	index = 7; break;
 		case BUILD_LEFTTURRET:	index = 8; break;
 		case BUILD_RIGHTTURRET:	index = 9; break;
 		case BUILD_MARKETPLACE:	index = 10; break;
-		case BUILD_WEL2:		index = 11; break;
-		case BUILD_MOAT:		index = 12; break;
-		case BUILD_SPEC:		index = 13; break;
-		case BUILD_CAPTAIN:		index = 15; break;
+		case BUILD_WEL2:	index = 11; break;
+		case BUILD_MOAT:	index = 12; break;
+		case BUILD_SPEC:	index = 13; break;
+		case BUILD_CAPTAIN:	index = 15; break;
 		case DWELLING_MONSTER1: index = 19; break;
 		case DWELLING_MONSTER2: index = 20; break;
 		case DWELLING_MONSTER3: index = 21; break;
@@ -918,9 +1002,21 @@ Castle::building_t Castle::OpenTown(void)
             army_spread = false;
         }
 	else
-        if(Heroes::UNKNOWN != hero1 && le.MouseClickLeft(rectHero1)); // FIXME: buy heroes
+	if(Heroes::UNKNOWN != hero1 && le.MouseClickLeft(rectHero1) &&
+	    Dialog::OK == DialogBuyHero(hero1))
+        {
+    	    RecrutHero(hero1);
+
+    	    return BUILD_NOTHING;
+        }
 	else
-        if(Heroes::UNKNOWN != hero2 && le.MouseClickLeft(rectHero2)); // FIXME: buy heroes
+	if(Heroes::UNKNOWN != hero2 && le.MouseClickLeft(rectHero2) &&
+	    Dialog::OK == DialogBuyHero(hero2))
+        {
+    	    RecrutHero(hero2);
+
+	    return BUILD_NOTHING;
+        }
 
 
 	// right
@@ -970,231 +1066,123 @@ Castle::building_t Castle::OpenTown(void)
 	else
 	if(Heroes::UNKNOWN != hero2 && le.MousePressRight(rectHero2)) heroes2.OpenDialog(true);
 
-
         // status info
 	if(le.MouseCursor(rectDwelling1))
-	{
-	    if(DWELLING_MONSTER1 & building)
-			statusBar.ShowMessage(stringDwelling1 + " is already built");
-	    else
-	    if(allowBuyBuildDwelling1)
-			statusBar.ShowMessage("Build " + stringDwelling1);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringDwelling1);
-	}
+	    statusBar.ShowBuildMessage(DWELLING_MONSTER1 & building, allowBuyBuildDwelling1, stringDwelling1, *this, DWELLING_MONSTER1);
 	else
 	if(le.MouseCursor(rectDwelling2))
 	{
-	    if((allowUpgrade2 && (DWELLING_UPGRADE2 & building)) ||
-	       (!allowUpgrade2 && (DWELLING_MONSTER2 & building)))
-			statusBar.ShowMessage(stringDwelling2 + " is already built");
+	    if(isBuild(DWELLING_MONSTER2) && allowUpgrade2)
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE2), allowBuyBuildDwelling2, stringDwelling2, *this, DWELLING_UPGRADE2);
 	    else
-	    if(allowBuyBuildDwelling2)
-			statusBar.ShowMessage("Build " + stringDwelling2);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringDwelling2);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER2), allowBuyBuildDwelling2, stringDwelling2, *this, DWELLING_MONSTER2);
 	}
 	else
 	if(le.MouseCursor(rectDwelling3))
 	{
-	    if((allowUpgrade3 && (DWELLING_UPGRADE3 & building)) ||
-	       (!allowUpgrade3 && (DWELLING_MONSTER3 & building)))
-			statusBar.ShowMessage(stringDwelling3 + " is already built");
+	    if(isBuild(DWELLING_MONSTER3) && allowUpgrade3)
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE3), allowBuyBuildDwelling3, stringDwelling3, *this, DWELLING_UPGRADE3);
 	    else
-	    if(allowBuyBuildDwelling3)
-			statusBar.ShowMessage("Build " + stringDwelling3);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringDwelling3);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER3), allowBuyBuildDwelling3, stringDwelling3, *this, DWELLING_MONSTER3);
 	}
 	else
 	if(le.MouseCursor(rectDwelling4))
 	{
-	    if((allowUpgrade4 && (DWELLING_UPGRADE4 & building)) ||
-	       (!allowUpgrade4 && (DWELLING_MONSTER4 & building)))
-			statusBar.ShowMessage(stringDwelling4 + " is already built");
+	    if(isBuild(DWELLING_MONSTER4) && allowUpgrade4)
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE4), allowBuyBuildDwelling4, stringDwelling4, *this, DWELLING_UPGRADE4);
 	    else
-	    if(allowBuyBuildDwelling4)
-			statusBar.ShowMessage("Build " + stringDwelling4);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringDwelling4);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER4), allowBuyBuildDwelling4, stringDwelling4, *this, DWELLING_MONSTER4);
 	}
 	else
 	if(le.MouseCursor(rectDwelling5))
 	{
-	    if((allowUpgrade5 && (DWELLING_UPGRADE5 & building)) ||
-	       (!allowUpgrade5 && (DWELLING_MONSTER5 & building)))
-			statusBar.ShowMessage(stringDwelling5 + " is already built");
+	    if(isBuild(DWELLING_MONSTER5) && allowUpgrade5)
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE5), allowBuyBuildDwelling5, stringDwelling5, *this, DWELLING_UPGRADE5);
 	    else
-	    if(allowBuyBuildDwelling5)
-			statusBar.ShowMessage("Build " + stringDwelling5);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringDwelling5);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER5), allowBuyBuildDwelling5, stringDwelling5, *this, DWELLING_MONSTER5);
 	}
 	else
 	if(le.MouseCursor(rectDwelling6))
 	{
-	    if((allowUpgrade7 && (DWELLING_UPGRADE7 & building)) ||
-	       (!allowUpgrade7 && allowUpgrade6 && (DWELLING_UPGRADE6 & building)) ||
-	       (!allowUpgrade6 && (DWELLING_MONSTER6 & building)))
-			statusBar.ShowMessage(stringDwelling6 + " is already built");
+	    if(isBuild(DWELLING_MONSTER6) && allowUpgrade6)
+	    {
+		if(isBuild(DWELLING_UPGRADE6) && allowUpgrade7)
+		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE7), allowBuyBuildDwelling6, stringDwelling6, *this, DWELLING_UPGRADE7);
+		else
+		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE6), allowBuyBuildDwelling6, stringDwelling6, *this, DWELLING_UPGRADE6);
+	    }
 	    else
-	    if(allowBuyBuildDwelling6)
-			statusBar.ShowMessage("Build " + stringDwelling6);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringDwelling6);
+		    statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER6), allowBuyBuildDwelling6, stringDwelling6, *this, DWELLING_MONSTER6);
 	}
 	else
 	if(le.MouseCursor(rectMageGuild))
 	{
-	    if(BUILD_MAGEGUILD5 & building)
-			statusBar.ShowMessage(stringMageGuild + " is already built");
-	    else
-	    if(allowBuyBuildMageGuild)
-			statusBar.ShowMessage("Build " + stringMageGuild);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringMageGuild);
+	    switch(GetLevelMageGuild())
+	    {
+		case 0: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD1); break;
+		case 1: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD2); break;
+                case 2: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD3); break;
+                case 3: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD4); break;
+                case 4: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
+                case 5: statusBar.ShowBuildMessage(true,  allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
+
+		default: break;
+	    }
 	}
 	else
 	if(Race::NECR != race && le.MouseCursor(rectTavern))
-	{
-	    if(BUILD_TAVERN & building)
-			statusBar.ShowMessage(stringTavern + " is already built");
-	    else
-	    if(allowBuyBuildTavern)
-			statusBar.ShowMessage("Build " + stringTavern);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringTavern);
-	}
+	    statusBar.ShowBuildMessage(BUILD_TAVERN & building, allowBuyBuildTavern, stringTavern, *this, BUILD_TAVERN);
 	else
 	if(le.MouseCursor(rectThievesGuild))
-	{
-	    if(BUILD_THIEVESGUILD & building)
-			statusBar.ShowMessage(stringThievesGuild + " is already built");
-	    else
-	    if(allowBuyBuildThievesGuild)
-			statusBar.ShowMessage("Build " + stringThievesGuild);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringThievesGuild);
-	}
+	    statusBar.ShowBuildMessage(BUILD_THIEVESGUILD & building, allowBuyBuildThievesGuild, stringThievesGuild, *this, BUILD_THIEVESGUILD);
 	else
 	if(le.MouseCursor(rectShipyard))
-	{
-	    if(BUILD_SHIPYARD & building)
-			statusBar.ShowMessage(stringShipyard + " is already built");
-	    else
-	    if(allowBuyBuildShipyard)
-			statusBar.ShowMessage("Build " + stringShipyard);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringShipyard);
-	}
+	    statusBar.ShowBuildMessage(BUILD_SHIPYARD & building, allowBuyBuildShipyard, stringShipyard, *this, BUILD_SHIPYARD);
 	else
 	if(le.MouseCursor(rectStatue))
-	{
-	    if(BUILD_STATUE & building)
-			statusBar.ShowMessage(stringStatue + " is already built");
-	    else
-	    if(allowBuyBuildStatue)
-			statusBar.ShowMessage("Build " + stringStatue);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringStatue);
-	}
+	    statusBar.ShowBuildMessage(BUILD_STATUE & building, allowBuyBuildStatue, stringStatue, *this, BUILD_STATUE);
 	else
 	if(le.MouseCursor(rectMarketplace))
-	{
-	    if(BUILD_MARKETPLACE & building)
-			statusBar.ShowMessage(stringMarketplace + " is already built");
-	    else
-	    if(allowBuyBuildMarketplace)
-			statusBar.ShowMessage("Build " + stringMarketplace);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringMarketplace);
-	}
+	    statusBar.ShowBuildMessage(BUILD_MARKETPLACE & building, allowBuyBuildMarketplace, stringMarketplace, *this, BUILD_MARKETPLACE);
 	else
 	if(le.MouseCursor(rectWell))
-	{
-	    if(BUILD_WELL & building)
-			statusBar.ShowMessage(stringWell + " is already built");
-	    else
-	    if(allowBuyBuildWell)
-			statusBar.ShowMessage("Build " + stringWell);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringWell);
-	}
+	    statusBar.ShowBuildMessage(BUILD_WELL & building, allowBuyBuildWell, stringWell, *this, BUILD_WELL);
 	else
 	if(le.MouseCursor(rectWel2))
-	{
-	    if(BUILD_WEL2 & building)
-			statusBar.ShowMessage(stringWel2 + " is already built");
-	    else
-	    if(allowBuyBuildWel2)
-			statusBar.ShowMessage("Build " + stringWel2);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringWel2);
-	}
+	    statusBar.ShowBuildMessage(BUILD_WEL2 & building, allowBuyBuildWel2, stringWel2, *this, BUILD_WEL2);
 	else
 	if(le.MouseCursor(rectSpec))
-	{
-	    if(BUILD_SPEC & building)
-			statusBar.ShowMessage(stringSpec + " is already built");
-	    else
-	    if(allowBuyBuildSpec)
-			statusBar.ShowMessage("Build " + stringSpec);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringSpec);
-	}
+	    statusBar.ShowBuildMessage(BUILD_SPEC & building, allowBuyBuildSpec, stringSpec, *this, BUILD_SPEC);
 	else
 	if(le.MouseCursor(rectLTurret))
-	{
-	    if(BUILD_LEFTTURRET & building)
-			statusBar.ShowMessage(stringLTurret + " is already built");
-	    else
-	    if(allowBuyBuildLTurret)
-			statusBar.ShowMessage("Build " + stringLTurret);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringLTurret);
-	}
+	    statusBar.ShowBuildMessage(BUILD_LEFTTURRET & building, allowBuyBuildLTurret, stringLTurret, *this, BUILD_LEFTTURRET);
 	else
 	if(le.MouseCursor(rectRTurret))
-	{
-	    if(BUILD_RIGHTTURRET & building)
-			statusBar.ShowMessage(stringRTurret + " is already built");
-	    else
-	    if(allowBuyBuildRTurret)
-			statusBar.ShowMessage("Build " + stringRTurret);
-	    else
-			statusBar.ShowMessage("Cannot build " + stringRTurret);
-	}
+	    statusBar.ShowBuildMessage(BUILD_RIGHTTURRET & building, allowBuyBuildRTurret, stringRTurret, *this, BUILD_RIGHTTURRET);
 	else
 	if(le.MouseCursor(rectMoat))
-	{
-	   	if(BUILD_MOAT & building)
-			statusBar.ShowMessage(stringMoat + " is already built");
-	   	else
-	   	if(allowBuyBuildMoat)
-			statusBar.ShowMessage("Build " + stringMoat);
-	   	else
-			statusBar.ShowMessage("Cannot build " + stringMoat);
-	}
+	    statusBar.ShowBuildMessage(BUILD_MOAT & building, allowBuyBuildMoat, stringMoat, *this, BUILD_MOAT);
 	else
 	if(le.MouseCursor(rectCaptain))
-	{
-		if(BUILD_CAPTAIN & building)
-			statusBar.ShowMessage(stringCaptain + " is already built");
-		else
-		if(allowBuyBuildCaptain)
-			statusBar.ShowMessage("Build " + stringCaptain);
-		else
-    			statusBar.ShowMessage("Cannot build " + stringCaptain);
-	}
+	    statusBar.ShowBuildMessage(BUILD_CAPTAIN & building, allowBuyBuildCaptain, stringCaptain, *this, BUILD_CAPTAIN);
 	else
-	if(Heroes::UNKNOWN != hero1 && le.MouseCursor(rectHero1))
+	if((Heroes::UNKNOWN != hero1 && le.MouseCursor(rectHero1)) ||
+	   (Heroes::UNKNOWN != hero2 && le.MouseCursor(rectHero2)))
 	{
-	    statusBar.ShowMessage("Recrut " + heroes1.GetName() + " the " + Race::String(heroes1.GetRace()));
-	}
-	else
-	if(Heroes::UNKNOWN != hero2 && le.MouseCursor(rectHero2))
-	{
-	    statusBar.ShowMessage("Recrut " + heroes2.GetName() + " the " + Race::String(heroes2.GetRace()));
+	    if(world.GetMyKingdom().GetHeroes().size() == KINGDOMMAXHEROES)
+		statusBar.ShowMessage("Cannot recruit - you have to many Heroes.");
+	    else
+	    if(castle_heroes)
+		statusBar.ShowMessage("Cannot recruit - you already have a Hero in this town.");
+	    else
+	    if(! AllowBuyHero())
+		statusBar.ShowMessage("Cannot afford a Hero");
+	    else
+	    if(le.MouseCursor(rectHero1))
+		statusBar.ShowMessage("Recrut " + heroes1.GetName() + " the " + Race::String(heroes1.GetRace()));
+	    else
+	    if(le.MouseCursor(rectHero2))
+		statusBar.ShowMessage("Recrut " + heroes2.GetName() + " the " + Race::String(heroes2.GetRace()));
 	}
 	else
 	if(le.MouseCursor(rectSpreadArmyFormat))

@@ -21,6 +21,11 @@
 #include "error.h"
 #include "payment.h"
 
+PaymentConditions::BuyHero::BuyHero()
+{
+    gold = RECRUT_HEROES_GOLD;
+}
+
 PaymentConditions::BuyMonster::BuyMonster(const Monster::monster_t & monster)
 {
     gold	= 0;
@@ -627,7 +632,7 @@ PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const Cas
 		    gems = UPGRADE_MANSION_GEMS;
 		    break;
 		
-		case Race::WZRD:
+		case Race::WRLK:
 		    gold = UPGRADE_MAZE_GOLD;
 		    gems = UPGRADE_MAZE_GEMS;
 		    break;

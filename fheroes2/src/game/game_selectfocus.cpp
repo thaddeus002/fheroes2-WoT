@@ -33,9 +33,9 @@
 #define ICONS_CURSOR_HEIGHT	32
 #define ICONS_CURSOR_COLOR	0x98
 
-Game::SelectFocusObject::SelectFocusObject(const Point & pt) :pos_pt(pt),
+Game::SelectFocusObject::SelectFocusObject(s16 px, s16 py) : pos_pt(px, py),
     empty_back(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", 1)),
-    step(32), sprite_cursor(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT), cursor(sprite_cursor, pt),
+    step(32), sprite_cursor(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT), cursor(sprite_cursor, px, py),
     selected(false), top_index(0), cursor_index(0xFF) 
 {
     // draw frame cursor
@@ -142,21 +142,35 @@ bool Game::SelectFocusObject::SetTop(u8 index)
 
     return false;
 }
-	
-Game::SelectFocusCastles::SelectFocusCastles(const std::vector<Castle *> & vec)
-    : SelectFocusObject(Point(display.w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21)), castles(vec)
+
+Game::SelectFocusCastles::SelectFocusCastles()
+    : SelectFocusObject(display.w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21), castles(NULL)
 {}
+
+Game::SelectFocusCastles & Game::SelectFocusCastles::Get(void)
+{
+    static SelectFocusCastles instance;
+
+    return instance;
+}
+
+void Game::SelectFocusCastles::SetCastles(const std::vector<Castle *> & vec)
+{
+    castles = & vec;
+}
 
 void Game::SelectFocusCastles::Redraw(void)
 {
+    if(! castles) return;
+
     cursor.Hide();
 
     // redraw back
     for(u8 ii = 0; ii < coords.size(); ++ii)
 	// draw icons object
-	if(top_index + ii < castles.size())
+	if(top_index + ii < castles->size())
 	{
-	    const Castle & castle = *castles[top_index + ii];
+	    const Castle & castle = *castles->at(top_index + ii);
 	    u8 index_sprite = 1;
 
 	    switch(castle.GetRace())
@@ -183,11 +197,13 @@ void Game::SelectFocusCastles::Redraw(void)
 
 void Game::SelectFocusCastles::SelectFromCenter(const Point & pt)
 {
-    for(u8 ii = 0; ii < castles.size(); ++ii)
-	if(pt == (*castles[ii]).GetCenter())
+    if(! castles) return;
+
+    for(u8 ii = 0; ii < castles->size(); ++ii)
+	if(pt == (*castles->at(ii)).GetCenter())
 	{
-	    top_index = (ii + coords.size() >= castles.size() && castles.size() > coords.size() ?
-	                                                         castles.size() - coords.size() : 0);
+	    top_index = (ii + coords.size() >= castles->size() && castles->size() > coords.size() ?
+	                                                         castles->size() - coords.size() : 0);
 	    cursor_index = ii;
 
 	    selected = true;
@@ -198,27 +214,43 @@ void Game::SelectFocusCastles::SelectFromCenter(const Point & pt)
 
 const Point & Game::SelectFocusCastles::GetCenter(u8 index) const
 {
-    return (*castles[top_index + index]).GetCenter();
+    if(! castles) Error::Except("Game::SelectFocusCastles::GetCenter: castles is NULL.");
+
+    return (*castles->at(top_index + index)).GetCenter();
 }
 
-Game::SelectFocusHeroes::SelectFocusHeroes(const std::vector<Heroes *> & vec)
-    : SelectFocusObject(Point(display.w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21)), heroes(vec),
+Game::SelectFocusHeroes::SelectFocusHeroes()
+    : SelectFocusObject(display.w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21), heroes(NULL),
     sprite_blue(7, ICONS_HEIGHT, true)
 {
     // fill backgroung to blue
     sprite_blue.Fill(AGG::GetColor(0x4C));
 }
 
+Game::SelectFocusHeroes & Game::SelectFocusHeroes::Get(void)
+{
+    static SelectFocusHeroes instance;
+
+    return instance;
+}
+
+void Game::SelectFocusHeroes::SetHeroes(const std::vector<Heroes *> & vec)
+{
+    heroes = & vec;
+}
+
 void Game::SelectFocusHeroes::Redraw(void)
 {
+    if(! heroes) return;
+
     cursor.Hide();
 
     // redraw back
     for(u8 ii = 0; ii < coords.size(); ++ii)
 	// draw icons object
-	if(top_index + ii < heroes.size())
+	if(top_index + ii < heroes->size())
 	{
-	    const Heroes & hero = *heroes[top_index + ii];
+	    const Heroes & hero = *heroes->at(top_index + ii);
 	    
 	    const Sprite & mobility = AGG::GetICN("MOBILITY.ICN", hero.GetMobilityIndexSprite());
 	    const Sprite & mana = AGG::GetICN("MANA.ICN", hero.GetManaIndexSprite());
@@ -248,11 +280,13 @@ void Game::SelectFocusHeroes::Redraw(void)
 
 void Game::SelectFocusHeroes::SelectFromCenter(const Point & pt)
 {
-    for(u8 ii = 0; ii < heroes.size(); ++ii)
-	if(pt == (*heroes[ii]).GetCenter())
+    if(! heroes) return;
+
+    for(u8 ii = 0; ii < heroes->size(); ++ii)
+	if(pt == (*heroes->at(ii)).GetCenter())
 	{
-	    top_index = (ii + coords.size() >= heroes.size() && heroes.size() > coords.size() ?
-	                                                        heroes.size() - coords.size() : 0);
+	    top_index = (ii + coords.size() >= heroes->size() && heroes->size() > coords.size() ?
+	                                                        heroes->size() - coords.size() : 0);
 	    cursor_index = ii;
 	    
 	    selected = true;
@@ -263,5 +297,7 @@ void Game::SelectFocusHeroes::SelectFromCenter(const Point & pt)
 
 const Point & Game::SelectFocusHeroes::GetCenter(u8 index) const
 {
-    return (*heroes[top_index + index]).GetCenter();
+    if(! heroes) Error::Except("Game::SelectFocusHeroes::GetCenter: heroes is NULL.");
+
+    return (*heroes->at(top_index + index)).GetCenter();
 }

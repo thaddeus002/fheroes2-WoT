@@ -33,6 +33,7 @@
 #include "race.h"
 #include "rect.h"
 #include "army.h"
+#include "heroes.h"
 
 #define CASTLEMAXARMY           5 
 #define CASTLEMAXMONSTER        6 
@@ -79,6 +80,7 @@ public:
 	DWELLING_UPGRADE5       = 0x20000000,
 	DWELLING_UPGRADE6       = 0x40000000,
 	DWELLING_UPGRADE7       = 0x80000000        // black dragon
+//	TRAIN_HERO              = 0x90000000
     } building_t;
 
     Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
@@ -87,9 +89,13 @@ public:
     bool AllowBuild(void) const{ return allow_build; };
     bool isBuild(building_t bd) const{ return building & bd; };
     bool HaveNearlySea(void) const;
-    const Heroes * isHeroesPresent(void);
+    bool isHeroesPresent(void);
     bool RecrutMonster(building_t dw, u16 count);
     bool AllowBuyBuilding(building_t build) const;
+    bool AllowBuyHero(void);
+
+    void RecrutHero(const Heroes::heroes_t hero);
+    const Heroes* GetHeroes(void){ return castle_heroes; };
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
@@ -138,6 +144,7 @@ private:
     void RedrawNameTown(const Point & src_pt);
     void WellRedrawInfoArea(const Point & cur_pt);
 
+    Dialog::answer_t DialogBuyHero(const Heroes::heroes_t hero);
     Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
 
 private:
@@ -152,6 +159,7 @@ private:
     MageGuild		mageguild;
     std::vector<u16>    dwelling;
     std::vector<Army::Troops> army;
+    Heroes * 		castle_heroes;
 
     Captain		captain;
 

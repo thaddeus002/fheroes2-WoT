@@ -22,8 +22,36 @@
 #include "text.h"
 #include "cursor.h"
 #include "display.h"
+#include "castle.h"
+#include "payment.h"
+#include "kingdom.h"
+#include "world.h"
 #include "dialog.h"
 
+void Dialog::StatusBar::ShowBuildMessage(bool isBuilt, bool allowBuild, const std::string & message, const Castle & castle, const u32 building)
+{
+    if(isBuilt)
+	ShowMessage(message + " is already built");
+    else
+    {
+	const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), static_cast<Castle::building_t>(building));
+
+	if(!castle.AllowBuild())
+    	    ShowMessage("Cannot build. Already built here this turn.");
+        else
+        if(castle.AllowBuild() && paymentBuild > world.GetMyKingdom().GetFundsResource())
+    	    ShowMessage("Cannot afford " + message);
+        else
+        if(Castle::BUILD_SHIPYARD == building && !castle.HaveNearlySea())
+    	    ShowMessage("Cannot build " + message + " because castle is to far from water.");
+        else
+        if(!castle.AllowBuyBuilding(static_cast<Castle::building_t>(building)))
+    	    ShowMessage("Cannot build " + message);
+        else
+    	    ShowMessage("Build " + message);
+    }
+}
+ 
 void Dialog::StatusBar::ShowMessage(const std::string & message)
 {
     if(message == status) return;

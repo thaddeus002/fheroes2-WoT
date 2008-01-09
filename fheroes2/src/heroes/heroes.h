@@ -137,6 +137,7 @@ public:
     const Route & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
 
+    void SetCenter(const Point& pt){ mp = pt; };
     void Goto(u16 dst_index);
     void Action(u16 dst_index);
 
