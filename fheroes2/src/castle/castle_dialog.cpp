@@ -318,6 +318,15 @@ Dialog::answer_t Castle::OpenDialog(void)
     RedrawAllBuilding(cur_pt, orders_building);
     RedrawNameTown(cur_pt);
 
+    if(2 > world.GetMyKingdom().GetCastles().size())
+    {
+	buttonPrevCastle.Press();
+        buttonPrevCastle.SetDisable(true);
+
+        buttonNextCastle.Press();
+        buttonNextCastle.SetDisable(true);
+    }
+
     buttonPrevCastle.Draw();
     buttonNextCastle.Draw();
     buttonExit.Draw();
@@ -338,8 +347,8 @@ Dialog::answer_t Castle::OpenDialog(void)
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }
 
-        le.MousePressLeft(buttonPrevCastle) ? buttonPrevCastle.PressDraw() : buttonPrevCastle.ReleaseDraw();
-        le.MousePressLeft(buttonNextCastle) ? buttonNextCastle.PressDraw() : buttonNextCastle.ReleaseDraw();
+        if(buttonPrevCastle.isEnable()) le.MousePressLeft(buttonPrevCastle) ? buttonPrevCastle.PressDraw() : buttonPrevCastle.ReleaseDraw();
+        if(buttonNextCastle.isEnable()) le.MousePressLeft(buttonNextCastle) ? buttonNextCastle.PressDraw() : buttonNextCastle.ReleaseDraw();
 
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
@@ -649,10 +658,10 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
 
         // prev castle
-	if(le.MouseClickLeft(buttonPrevCastle)){ result = Dialog::PREV; break; }
+	if(buttonPrevCastle.isEnable() && le.MouseClickLeft(buttonPrevCastle)){ result = Dialog::PREV; break; }
 
         // next castle
-	if(le.MouseClickLeft(buttonNextCastle)){ result = Dialog::NEXT; break; }
+	if(buttonNextCastle.isEnable() && le.MouseClickLeft(buttonNextCastle)){ result = Dialog::NEXT; break; }
 
 	// left click building
 	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) OpenThievesGuild();

@@ -86,11 +86,11 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 
 	
 	// magic tower
-	if(0 < *ptr8) building |= BUILD_MAGEGUILD1;
-	if(1 < *ptr8) building |= BUILD_MAGEGUILD2;
-	if(2 < *ptr8) building |= BUILD_MAGEGUILD3;
-	if(3 < *ptr8) building |= BUILD_MAGEGUILD4;
-	if(4 < *ptr8) building |= BUILD_MAGEGUILD5;
+	if(0 < *ptr8){ building |= BUILD_MAGEGUILD1; mageguild.BuildNextLevel(); }
+	if(1 < *ptr8){ building |= BUILD_MAGEGUILD2; mageguild.BuildNextLevel(); }
+	if(2 < *ptr8){ building |= BUILD_MAGEGUILD3; mageguild.BuildNextLevel(); }
+	if(3 < *ptr8){ building |= BUILD_MAGEGUILD4; mageguild.BuildNextLevel(); }
+	if(4 < *ptr8){ building |= BUILD_MAGEGUILD5; mageguild.BuildNextLevel(); }
 	++ptr8;
     }
     else

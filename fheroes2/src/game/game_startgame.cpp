@@ -1661,14 +1661,34 @@ void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 
 	const u32 cursor_index = selectHeroes.GetCursorIndex();
 
-	if(Dialog::PREV == result)
+	switch(result)
 	{
-	     hero = cursor_index ? myHeroes.at(cursor_index - 1) : myHeroes.back();
-	}
-	else
-	if(Dialog::NEXT == result)
-	{
-	     hero = myHeroes.size() == cursor_index + 1 ? myHeroes.front() : myHeroes.at(cursor_index + 1);
+	    case Dialog::PREV:
+		hero = cursor_index ? myHeroes.at(cursor_index - 1) : myHeroes.back();
+		break;
+	
+	    case Dialog::NEXT:
+		hero = myHeroes.size() == cursor_index + 1 ? myHeroes.front() : myHeroes.at(cursor_index + 1);
+		break;
+	
+	    case Dialog::DISMISS:
+	    {
+		//Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
+		//const Maps::Tiles & tile = world.GetTiles((*hero).GetCenter());
+
+                //kingdom.RemoveHeroes(hero);
+	    /*
+		// FIX redraw:
+		// 	tile
+		// 	top tile
+		// 	selectHeroes
+		//	selectCastle if selectHeroes = 0
+    	    */
+	    }
+		result = Dialog::CANCEL;
+	    	break;
+	
+	    default: break;
 	}
 
 	Cursor::Show();

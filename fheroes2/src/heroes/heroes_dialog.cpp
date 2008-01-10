@@ -486,6 +486,27 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    if(2 > world.GetMyKingdom().GetHeroes().size())
+    {
+	buttonPrevHero.Press();
+	buttonPrevHero.SetDisable(true);
+
+	buttonNextHero.Press();
+	buttonNextHero.SetDisable(true);
+    }
+
+    if(inCastle())
+    {
+	buttonPrevHero.Press();
+	buttonPrevHero.SetDisable(true);
+
+	buttonNextHero.Press();
+	buttonNextHero.SetDisable(true);
+
+	buttonDismiss.Press();
+	buttonDismiss.SetDisable(true);
+    }
+
     buttonPrevHero.Draw();
     buttonNextHero.Draw();
     buttonDismiss.Draw();
@@ -515,7 +536,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    const u16 select_count = select_troops.count;
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-                    switch(Dialog::ArmyInfo(army[ii], &GetPrimarySkill(), (1 == GetCountArmy() ? false : true), false))
+                    switch(Dialog::ArmyInfo(army[ii], &GetPrimarySkill(), readonly? false : (1 == GetCountArmy() ? false : true), false))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.monster = Monster::Upgrade(select_monster);
@@ -631,7 +652,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    {
 		Cursor::Hide();
 
-		Dialog::ArmyInfo(army[ii], &GetPrimarySkill(), (1 == GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army[ii], &GetPrimarySkill(), readonly ? false : (1 == GetCountArmy() ? false : true), true);
 
 		Cursor::Show();
 		display.Flip();
@@ -642,15 +663,18 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(!readonly)
 	{
-	    le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
-    	    le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.PressDraw() : buttonPrevHero.ReleaseDraw();
-    	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
+	    if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
+    	    if(buttonPrevHero.isEnable()) le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.PressDraw() : buttonPrevHero.ReleaseDraw();
+    	    if(buttonNextHero.isEnable()) le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
 
     	    // prev hero
-	    if(le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
+	    if(buttonPrevHero.isEnable() && le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
 
     	    // next hero
-    	    if(le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
+    	    if(buttonNextHero.isEnable() && le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
+    	    
+    	    // dismiss
+    	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)){ return Dialog::DISMISS; }
 	}
 
 	// left click info

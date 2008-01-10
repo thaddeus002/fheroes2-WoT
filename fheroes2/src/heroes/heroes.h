@@ -96,6 +96,7 @@ public:
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
 
     bool isFreeman(void) const{ return Color::GRAY == color; };
+    bool inCastle(void) const;
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
 
     Heroes::heroes_t GetHeroes(void) const{ return heroes; };

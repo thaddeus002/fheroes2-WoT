@@ -757,3 +757,17 @@ void Heroes::Action(u16 dst_index)
 
     if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(tiles_new.GetObject())));
 }
+
+bool Heroes::inCastle(void) const
+{
+    if(Color::GRAY == color) return false;
+
+    const std::vector<Castle *> & castles = world.GetKingdom(color).GetCastles();
+    
+    std::vector<Castle *>::const_iterator it1 = castles.begin();
+    std::vector<Castle *>::const_iterator it2 = castles.end();
+
+    for(; it1 != it2; ++it1) if((**it1).GetCenter() == mp) return true;
+
+    return false;
+}
