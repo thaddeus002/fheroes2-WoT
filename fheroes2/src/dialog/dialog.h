@@ -83,7 +83,7 @@ namespace Dialog
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
 
     // army info
-    Dialog::answer_t ArmyInfo(const Army::Troops & army, const Skill::Primary *skills, bool dissmiss, bool quickshow);
+    Dialog::answer_t ArmyInfo(const Army::Troops & army, const Skill::Primary *skills, bool dismiss, bool quickshow);
 
     // dialog marketplace
     void Marketplace(void);

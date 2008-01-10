@@ -233,6 +233,9 @@ void Dialog::Marketplace(void)
 	dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(str_qty, Font::SMALL)) / 2; \
 	dst_pt.y = pos_rt.y + 110; \
 	Text(str_qty, Font::SMALL, dst_pt); \
+	(*buttonTrade).Draw(); \
+	(*buttonLeft).Draw(); \
+	(*buttonRight).Draw(); \
 	Cursor::Show(); \
 	display.Flip(); \
 	RedrawInfoBuySell; \
@@ -272,6 +275,8 @@ void Dialog::Marketplace(void)
     dst_pt.y = pos_rt.y + pos_rt.h + BUTTON_HEIGHT - sprite_exit.h();
     Button buttonExit(dst_pt, tradpost, 17, 18);
 
+    buttonExit.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -280,11 +285,11 @@ void Dialog::Marketplace(void)
     // message loop
     while(le.HandleEvents())
     {
-        if(buttonTrade) le.MousePressLeft(*buttonTrade) ? (*buttonTrade).Press() : (*buttonTrade).Release();
-        if(buttonLeft) le.MousePressLeft(*buttonLeft) ? (*buttonLeft).Press() : (*buttonLeft).Release();
-        if(buttonRight) le.MousePressLeft(*buttonRight) ? (*buttonRight).Press() : (*buttonRight).Release();
+        if(buttonTrade) le.MousePressLeft(*buttonTrade) ? (*buttonTrade).PressDraw() : (*buttonTrade).ReleaseDraw();
+        if(buttonLeft) le.MousePressLeft(*buttonLeft) ? (*buttonLeft).PressDraw() : (*buttonLeft).ReleaseDraw();
+        if(buttonRight) le.MousePressLeft(*buttonRight) ? (*buttonRight).PressDraw() : (*buttonRight).ReleaseDraw();
 
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
 	

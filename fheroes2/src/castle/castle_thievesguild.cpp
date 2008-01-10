@@ -125,6 +125,7 @@ void Castle::OpenThievesGuild(void)
     dst_pt.y = cur_pt.y + 438;
     Text(message, Font::BIG, dst_pt);
 
+    buttonExit.Draw();
 
     Cursor::Show();
     display.Flip();
@@ -134,7 +135,7 @@ void Castle::OpenThievesGuild(void)
     // message loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
     }

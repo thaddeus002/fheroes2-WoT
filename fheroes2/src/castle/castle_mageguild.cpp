@@ -206,6 +206,8 @@ void Castle::OpenMageGuild(void)
     dst_pt.y = cur_pt.y + 461;
     Button buttonExit(dst_pt, "WELLXTRA.ICN", 0, 1);
 
+    buttonExit.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -214,7 +216,7 @@ void Castle::OpenMageGuild(void)
     // message loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
         

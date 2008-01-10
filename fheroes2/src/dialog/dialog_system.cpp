@@ -53,6 +53,8 @@ Dialog::answer_t Dialog::SystemOptions(void)
 
     Button buttonOk(rb.x + 113, rb.y + 362, spanbtn, 0, 1);
 
+    buttonOk.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -61,7 +63,7 @@ Dialog::answer_t Dialog::SystemOptions(void)
     // dialog menu loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
+        le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonOk)) { result = Dialog::OK; break; }
         if(le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }

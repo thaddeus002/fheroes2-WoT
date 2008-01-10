@@ -61,6 +61,7 @@ void Castle::OpenWell(void)
     const Rect rectMonster5(cur_pt.x + 334, cur_pt.y + 168, 288, 124);
     const Rect rectMonster6(cur_pt.x + 334, cur_pt.y + 318, 288, 124);
     
+    buttonExit.Draw();
 
     WellRedrawInfoArea(cur_pt);
 
@@ -72,7 +73,7 @@ void Castle::OpenWell(void)
     // loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
 

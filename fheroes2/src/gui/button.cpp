@@ -29,8 +29,6 @@ Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), p
     y = sprite1.y();
     w = sprite1.w();
     h = sprite1.h();
-    
-    display.Blit(sprite1, x, y);
 }
 
 Button::Button(const std::string &icn, u16 index1, u16 index2) 
@@ -40,8 +38,6 @@ Button::Button(const std::string &icn, u16 index1, u16 index2)
     y = sprite1.y();
     w = sprite1.w();
     h = sprite1.h();
-    
-    display.Blit(sprite1, x, y);
 }
 
 Button::Button(const Point &pt, const std::string &icn, u16 index1, u16 index2)
@@ -51,8 +47,6 @@ Button::Button(const Point &pt, const std::string &icn, u16 index1, u16 index2)
     y = pt.y;
     w = sprite1.w();
     h = sprite1.h();
-    
-    display.Blit(sprite1, pt);
 }
 
 Button::Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2)
@@ -62,62 +56,50 @@ Button::Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2)
     y = oy;
     w = sprite1.w();
     h = sprite1.h();
-    
-    display.Blit(sprite1, x, y);
-}
-
-void Button::Disable(bool fl)
-{
-    disable = fl;
-
-    bool localcursor = false;
-    if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
-
-    display.Blit(fl ? sprite2 : sprite1, x, y);
-
-    if(localcursor) Cursor::Show();
-
-    pressed = fl;
 }
 
 void Button::Press(void)
 {
     if(disable || pressed) return;
 
-    DrawPressButton();
-
     pressed = true;
-
-    display.Flip();
 }
 
 void Button::Release(void)
 {
     if(disable || !pressed) return;
 
-    DrawReleaseButton();
-
     pressed = false;
+}
+
+void Button::PressDraw(void)
+{
+    if(disable || pressed) return;
+
+    Press();
+
+    Draw();
 
     display.Flip();
 }
 
-void Button::DrawPressButton(void)
+void Button::ReleaseDraw(void)
 {
-    bool localcursor = false;
-    if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    if(disable || !pressed) return;
 
-    display.Blit(sprite2, x, y);
+    Release();
 
-    if(localcursor) Cursor::Show();
+    Draw();
+
+    display.Flip();
 }
 
-void Button::DrawReleaseButton(void)
+void Button::Draw(void)
 {
     bool localcursor = false;
     if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
 
-    display.Blit(sprite1,  x, y);
+    display.Blit(pressed ? sprite2 : sprite1, x, y);
 
     if(localcursor) Cursor::Show();
 }

@@ -80,6 +80,8 @@ void Castle::OpenTavern(void)
     dst_pt.y = pos.y + pos.h + BUTTON_HEIGHT - s4.h();
     Button buttonYes(dst_pt, system, 5, 6);
 
+    buttonYes.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -90,7 +92,7 @@ void Castle::OpenTavern(void)
     // message loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonYes) ? buttonYes.Press() : buttonYes.Release();
+        le.MousePressLeft(buttonYes) ? buttonYes.PressDraw() : buttonYes.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonYes) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
 

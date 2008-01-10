@@ -179,36 +179,49 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
     // monster animation
     //Animation animeMonster(Point(pos_rt.x + 100, pos_rt.y + 180), monster.file, ?, ?, false, Animation::INFINITY | Animation::RING | Animation::LOW);
 
-    // button upgrade
-    Button *buttonUpgrade = NULL;
     bool upgrade = false;
+
+    // button upgrade
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 190;
-
-    if(!quickshow && monster.monster != Monster::Upgrade(monster.monster))
-    {
-	buttonUpgrade = new Button(dst_pt, viewarmy, 5, 6);
-
-	upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * army.count) <= world.GetMyKingdom().GetFundsResource();
-
-	if(!upgrade) (*buttonUpgrade).Press();
-    }
+    Button buttonUpgrade(dst_pt, viewarmy, 5, 6);
 
     // button dismiss
-    Button *buttonDismiss = NULL;
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 222;
-    if(!quickshow)
-    {
-	buttonDismiss = new Button(dst_pt, viewarmy, 1, 2);
-	if(!dismiss) (*buttonDismiss).Press();
-    }
+    Button buttonDismiss(dst_pt, viewarmy, 1, 2);
 
     // button exit
-    Button *buttonExit = NULL;
     dst_pt.x = pos_rt.x + 410;
     dst_pt.y = pos_rt.y + 222;
-    if(!quickshow) buttonExit = new Button(dst_pt, viewarmy, 3, 4);
+    Button buttonExit(dst_pt, viewarmy, 3, 4);
+
+    if(!quickshow)
+    {
+	if(monster.monster != Monster::Upgrade(monster.monster))
+	{
+	    upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * army.count) <= world.GetMyKingdom().GetFundsResource();
+
+	    if(!upgrade)
+	    {
+		buttonUpgrade.Press();
+		buttonUpgrade.SetDisable(true);
+	    }
+	    
+	    buttonUpgrade.Draw();
+	}
+	else
+	    buttonUpgrade.SetDisable(true);
+
+	if(!dismiss)
+	{
+	    buttonDismiss.Press();
+	    buttonDismiss.SetDisable(true);
+	}
+
+	buttonDismiss.Draw();
+	buttonExit.Draw();
+    }
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     
@@ -226,26 +239,23 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
         }
 	else
 	{
-	    if(upgrade && buttonUpgrade) le.MousePressLeft(*buttonUpgrade) ? (*buttonUpgrade).Press() : (*buttonUpgrade).Release();
-    	    if(dismiss && buttonDismiss) le.MousePressLeft(*buttonDismiss) ? (*buttonDismiss).Press() : (*buttonDismiss).Release();
-    	    if(buttonExit) le.MousePressLeft(*buttonExit) ? (*buttonExit).Press() : (*buttonExit).Release();
+	    if(buttonUpgrade.isEnable()) le.MousePressLeft(buttonUpgrade) ? (buttonUpgrade).PressDraw() : (buttonUpgrade).ReleaseDraw();
+    	    if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? (buttonDismiss).PressDraw() : (buttonDismiss).ReleaseDraw();
+    	    le.MousePressLeft(buttonExit) ? (buttonExit).PressDraw() : (buttonExit).ReleaseDraw();
 
 	    // upgrade
-	    if(upgrade && buttonUpgrade && le.MouseClickLeft(*buttonUpgrade)){ result = Dialog::UPGRADE; break; }
+	    if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade)){ result = Dialog::UPGRADE; break; }
 
     	    // dismiss
-	    if(dismiss && buttonDismiss && le.MouseClickLeft(*buttonDismiss)){ result = Dialog::DISMISS; break; }
+	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)){ result = Dialog::DISMISS; break; }
 
     	    // exit
-    	    if(buttonExit && (le.MouseClickLeft(*buttonExit) || le.KeyPress(SDLK_ESCAPE))){ result = Dialog::CANCEL; break; }
+    	    if(le.MouseClickLeft(buttonExit) ||
+    		le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }
 	}
 
 	//animeMonster.DrawSprite();
     }
-
-    if(buttonUpgrade) delete buttonUpgrade;
-    if(buttonDismiss) delete buttonDismiss;
-    if(buttonExit) delete buttonExit;
 
     Cursor::Hide();
 

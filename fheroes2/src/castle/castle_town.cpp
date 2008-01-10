@@ -97,11 +97,18 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
     Button button1(dst_pt, system, 1, 2);
 
-    if(! AllowBuyHero()) button1.Disable(true);
+    if(! AllowBuyHero())
+    {
+	button1.Press();
+	button1.SetDisable(true);
+    }
 
     dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
     dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
     Button button2(dst_pt, system, 3, 4);
+
+    button1.Draw();
+    button2.Draw();
 
     Cursor::Show();
     display.Flip();
@@ -109,8 +116,8 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     // message loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(button1) ? button1.Press() : button1.Release();
-        le.MousePressLeft(button2) ? button2.Press() : button2.Release();
+        le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
+        le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
         if(button1.isEnable() &&
     	    (le.MouseClickLeft(button1) ||
@@ -200,25 +207,21 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button *button1 = NULL;
-    Button *button2 = NULL;
-
     Point dst_pt;
-    if(buttons)
+
+    dst_pt.x = box_rt.x;
+    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    Button button1(dst_pt, system, 1, 2);
+
+    dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
+    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+    Button button2(dst_pt, system, 3, 4);
+
+    u8 index = 0;
+
+    // sprite
+    switch(build)
     {
-	dst_pt.x = box_rt.x;
-        dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-        button1 = new Button(dst_pt, system, 1, 2);
-        dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
-        dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
-        button2 = new Button(dst_pt, system, 3, 4);
-    }
-
-	u8 index = 0;
-
-	// sprite
-	switch(build)
-	{
 		case BUILD_MAGEGUILD1:
 		case BUILD_MAGEGUILD2:
 		case BUILD_MAGEGUILD3:
@@ -251,32 +254,32 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		case DWELLING_UPGRADE6: index = 29; break;
 		case DWELLING_UPGRADE7: index = 30; break;
 		default: return Dialog::CANCEL;
-	}
+    }
 
     const Sprite & window_icons = AGG::GetICN("CASLWIND.ICN", 0);
     Rect src_rt(5, 2, 137, 72);
-	dst_pt.x = box_rt.x + (box_rt.w - src_rt.w) / 2;
-	dst_pt.y = box_rt.y + 12;
-	display.Blit(window_icons, src_rt, dst_pt);
+    dst_pt.x = box_rt.x + (box_rt.w - src_rt.w) / 2;
+    dst_pt.y = box_rt.y + 12;
+    display.Blit(window_icons, src_rt, dst_pt);
 
-	const Sprite & building_icons = AGG::GetICN(str, index);
-	dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
-	dst_pt.y = box_rt.y + 13;
-	display.Blit(building_icons, dst_pt);
+    const Sprite & building_icons = AGG::GetICN(str, index);
+    dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
+    dst_pt.y = box_rt.y + 13;
+    display.Blit(building_icons, dst_pt);
 
     const std::string & building_name = GetStringBuilding(build, race);
-	dst_pt.x = box_rt.x + (box_rt.w - Text::width(building_name, Font::SMALL)) / 2;
-	dst_pt.y = box_rt.y + 70;
+    dst_pt.x = box_rt.x + (box_rt.w - Text::width(building_name, Font::SMALL)) / 2;
+    dst_pt.y = box_rt.y + 70;
     Text(building_name, Font::SMALL, dst_pt);
 
-	src_rt.x = box_rt.x;
-	src_rt.y = box_rt.y + 100;
-	src_rt.w = BOXAREA_WIDTH;
-	src_rt.h = 200;
+    src_rt.x = box_rt.x;
+    src_rt.y = box_rt.y + 100;
+    src_rt.w = BOXAREA_WIDTH;
+    src_rt.h = 200;
     TextBox(building_description, Font::BIG, src_rt);
 
-	if(height_requires)
-	{
+    if(height_requires)
+    {
 		str = "Requires:";
 		dst_pt.x = box_rt.x + (box_rt.w - Text::width(str, Font::BIG)) / 2;
 		dst_pt.y = box_rt.y + 100 + height_description + 20;
@@ -286,15 +289,15 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		src_rt.y = box_rt.y + 100 + height_description + 35;
 		src_rt.w = BOXAREA_WIDTH;
 		src_rt.h = 200;
-    	TextBox(string_requires, Font::BIG, src_rt);
-	}
+		TextBox(string_requires, Font::BIG, src_rt);
+    }
 
-	index = 2 < valid_resource ? box_rt.w / 3 : box_rt.w / valid_resource;
-	src_rt.y = height_requires ? box_rt.y + 100 + height_description + 35 + height_requires + 45 : box_rt.y + 100 + height_description + 50;
-	u8 count = 0;
+    index = 2 < valid_resource ? box_rt.w / 3 : box_rt.w / valid_resource;
+    src_rt.y = height_requires ? box_rt.y + 100 + height_description + 35 + height_requires + 45 : box_rt.y + 100 + height_description + 50;
+    u8 count = 0;
 	
-	if(paymentBuild.wood)
-	{
+    if(paymentBuild.wood)
+    {
 		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 0);
 		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
 		dst_pt.y = src_rt.y - sprite.h();
@@ -307,10 +310,10 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		Text(str, Font::SMALL, dst_pt);
 
 		++count;
-	}
+    }
 	
-	if(paymentBuild.ore)
-	{
+    if(paymentBuild.ore)
+    {
 		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 2);
 		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
 		dst_pt.y = src_rt.y - sprite.h();
@@ -323,10 +326,10 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		Text(str, Font::SMALL, dst_pt);
 
 		++count;
-	}
+    }
 
-	if(paymentBuild.mercury)
-	{
+    if(paymentBuild.mercury)
+    {
 		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 1);
 		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
 		dst_pt.y = src_rt.y - sprite.h();
@@ -339,11 +342,11 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		Text(str, Font::SMALL, dst_pt);
 
 		++count;
-	}
+    }
     
-	if(2 < count){ count = 0; src_rt.y += 50; }
-	if(paymentBuild.sulfur)
-	{
+    if(2 < count){ count = 0; src_rt.y += 50; }
+    if(paymentBuild.sulfur)
+    {
 		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 3);
 		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
 		dst_pt.y = src_rt.y - sprite.h();
@@ -356,11 +359,11 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		Text(str, Font::SMALL, dst_pt);
 
 		++count;
-	}
+    }
 	
-	if(2 < count){ count = 0; src_rt.y += 50; }
-	if(paymentBuild.crystal)
-	{
+    if(2 < count){ count = 0; src_rt.y += 50; }
+    if(paymentBuild.crystal)
+    {
 		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 4);
 		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
 		dst_pt.y = src_rt.y - sprite.h();
@@ -373,11 +376,11 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		Text(str, Font::SMALL, dst_pt);
 
 		++count;
-	}
+    }
 	
-	if(2 < count){ count = 0; src_rt.y += 50; }
-	if(paymentBuild.gems)
-	{
+    if(2 < count){ count = 0; src_rt.y += 50; }
+    if(paymentBuild.gems)
+    {
 		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 5);
 		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
 		dst_pt.y = src_rt.y - sprite.h();
@@ -390,11 +393,11 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		Text(str, Font::SMALL, dst_pt);
 
 		++count;
-	}
+    }
 
-	if(2 < count){ count = 0; src_rt.y += 50; }
-	if(paymentBuild.gold)
-	{
+    if(2 < count){ count = 0; src_rt.y += 50; }
+    if(paymentBuild.gold)
+    {
 		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 6);
 		if(! count) index = box_rt.w;
 		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
@@ -406,37 +409,33 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
 		dst_pt.y = src_rt.y + 2;
 		Text(str, Font::SMALL, dst_pt);
-	}
+    }
+
+    if(buttons)
+    {
+	button1.Draw();
+	button2.Draw();
+    }
 	
     Cursor::Show();
     display.Flip();
 
     // message loop
-    Dialog::answer_t result = Dialog::ZERO;
-
     while(le.HandleEvents())
     {
         if(!buttons && !le.MouseRight()) break;
 
-        if(button1) le.MousePressLeft(*button1) ? button1->Press() : button1->Release();
-        if(button2) le.MousePressLeft(*button2) ? button2->Press() : button2->Release();
+        le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
+        le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
-        if(button1 && le.MouseClickLeft(*button1)){ result = Dialog::OK; break; }
-        if(button2 && le.MouseClickLeft(*button2)){ result = Dialog::CANCEL; break; }
+        if(le.KeyPress(SDLK_RETURN) ||
+    	    le.MouseClickLeft(button1)) return Dialog::OK;
 
-        if(le.KeyPress(SDLK_RETURN)){ result = Dialog::OK; break; }
-
-        if(le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }
+        if(le.KeyPress(SDLK_ESCAPE) ||
+    	    le.MouseClickLeft(button2)) return Dialog::CANCEL;
     }
 
-    Cursor::Hide();
-
-    if(button1) delete button1;
-    if(button2) delete button2;
-
-    Cursor::Show();
-
-    return result;
+    return Dialog::ZERO;
 }
 
 void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::building_t & build)
@@ -870,6 +869,8 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.y = cur_pt.y + 428;
     Button buttonExit(dst_pt, "SWAPBTN.ICN", 0, 1);
 
+    buttonExit.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -878,7 +879,7 @@ Castle::building_t Castle::OpenTown(void)
     // message loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
 

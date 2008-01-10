@@ -127,6 +127,10 @@ Game::menu_t Game::ScenarioInfo(void)
     const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
 
+    buttonSelectMaps.Draw();
+    buttonOk.Draw();
+    buttonCancel.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -218,9 +222,9 @@ Game::menu_t Game::ScenarioInfo(void)
 	    }
 
 	// press button
-	le.MousePressLeft(buttonSelectMaps) ? buttonSelectMaps.Press() : buttonSelectMaps.Release();
-	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
-	le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
+	le.MousePressLeft(buttonSelectMaps) ? buttonSelectMaps.PressDraw() : buttonSelectMaps.ReleaseDraw();
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
 	// click select
 	if(le.MouseClickLeft(buttonSelectMaps))
@@ -477,6 +481,15 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
     Button buttonSelectXLarge(353, 28, "REQUESTS.ICN", 15, 16);
     Button buttonSelectAll(415, 28, "REQUESTS.ICN", 17, 18);
 
+    buttonOk.Draw();
+    buttonPgUp.Draw();
+    buttonPgDn.Draw();
+    buttonSelectSmall.Draw();
+    buttonSelectMedium.Draw();
+    buttonSelectLarge.Draw();
+    buttonSelectXLarge.Draw();
+    buttonSelectAll.Draw();
+
     std::vector<Maps::FileInfo>::const_iterator it_list_head = curmaps->begin();
     std::vector<Maps::FileInfo>::const_iterator it_current = it_list_head;
 
@@ -492,15 +505,15 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
     while(le.HandleEvents())
     {
 	// press button
-	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
-	le.MousePressLeft(buttonPgUp) ? buttonPgUp.Press() : buttonPgUp.Release();
-	le.MousePressLeft(buttonPgDn) ? buttonPgDn.Press() : buttonPgDn.Release();
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
+	le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
-	le.MousePressLeft(buttonSelectSmall) ? buttonSelectSmall.Press() : buttonSelectSmall.Release();
-	le.MousePressLeft(buttonSelectMedium) ? buttonSelectMedium.Press() : buttonSelectMedium.Release();
-	le.MousePressLeft(buttonSelectLarge) ? buttonSelectLarge.Press() : buttonSelectLarge.Release();
-	le.MousePressLeft(buttonSelectXLarge) ? buttonSelectXLarge.Press() : buttonSelectXLarge.Release();
-	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.Press() : buttonSelectAll.Release();
+	le.MousePressLeft(buttonSelectSmall) ? buttonSelectSmall.PressDraw() : buttonSelectSmall.ReleaseDraw();
+	le.MousePressLeft(buttonSelectMedium) ? buttonSelectMedium.PressDraw() : buttonSelectMedium.ReleaseDraw();
+	le.MousePressLeft(buttonSelectLarge) ? buttonSelectLarge.PressDraw() : buttonSelectLarge.ReleaseDraw();
+	le.MousePressLeft(buttonSelectXLarge) ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
+	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
 	// click small
 	if(le.MouseClickLeft(buttonSelectSmall) && smallmaps.size()){

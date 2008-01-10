@@ -100,6 +100,9 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 	    break;
     }
 
+    if(button1) (*button1).Draw();
+    if(button2) (*button2).Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -110,8 +113,8 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     {
         if(!buttons && !le.MouseRight()) break;
 
-	if(button1) le.MousePressLeft(*button1) ? button1->Press() : button1->Release();
-        if(button2) le.MousePressLeft(*button2) ? button2->Press() : button2->Release();
+	if(button1) le.MousePressLeft(*button1) ? button1->PressDraw() : button1->ReleaseDraw();
+        if(button2) le.MousePressLeft(*button2) ? button2->PressDraw() : button2->ReleaseDraw();
 
         if(button1 && le.MouseClickLeft(*button1)){ result = result1; break; }
         if(button2 && le.MouseClickLeft(*button2)){ result = result2; break; }

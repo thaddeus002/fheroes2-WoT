@@ -53,15 +53,19 @@ Game::menu_t Game::Editor::MainMenu(void){
     Button buttonLoadMap(455, 110, "BTNEMAIN.ICN", 2, 3);
     Button buttonCancelGame(455, 375, "BTNEMAIN.ICN", 4, 5);
 
+    buttonNewMap.Draw();
+    buttonLoadMap.Draw();
+    buttonCancelGame.Draw();
+
     Cursor::Show();
     display.Flip();
 
     // NewMap loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonNewMap) ? buttonNewMap.Press() : buttonNewMap.Release();
-	le.MousePressLeft(buttonLoadMap) ? buttonLoadMap.Press() : buttonLoadMap.Release();
-	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.Press() : buttonCancelGame.Release();
+	le.MousePressLeft(buttonNewMap) ? buttonNewMap.PressDraw() : buttonNewMap.ReleaseDraw();
+	le.MousePressLeft(buttonLoadMap) ? buttonLoadMap.PressDraw() : buttonLoadMap.ReleaseDraw();
+	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
 	if(le.MouseClickLeft(buttonNewMap)) return EDITNEWMAP;
 	if(le.MouseClickLeft(buttonLoadMap)) return EDITLOADMAP;

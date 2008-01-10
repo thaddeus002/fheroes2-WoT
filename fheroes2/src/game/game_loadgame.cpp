@@ -53,16 +53,22 @@ Game::menu_t Game::LoadGame(void){
     Button buttonCampainGame(455, 110, "BTNNEWGM.ICN", 2, 3);
     Button buttonMultiGame(455, 175, "BTNNEWGM.ICN", 4, 5);
     Button buttonCancelGame(455, 375, "BTNNEWGM.ICN", 6, 7);
+
+    buttonStandartGame.Draw();
+    buttonCampainGame.Draw();
+    buttonMultiGame.Draw();
+    buttonCancelGame.Draw();
+
     Cursor::Show();
     display.Flip();
 
     // loadgame loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonStandartGame) ? buttonStandartGame.Press() : buttonStandartGame.Release();
-	le.MousePressLeft(buttonCampainGame) ? buttonCampainGame.Press() : buttonCampainGame.Release();
-	le.MousePressLeft(buttonMultiGame) ? buttonMultiGame.Press() : buttonMultiGame.Release();
-	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.Press() : buttonCancelGame.Release();
+	le.MousePressLeft(buttonStandartGame) ? buttonStandartGame.PressDraw() : buttonStandartGame.ReleaseDraw();
+	le.MousePressLeft(buttonCampainGame) ? buttonCampainGame.PressDraw() : buttonCampainGame.ReleaseDraw();
+	le.MousePressLeft(buttonMultiGame) ? buttonMultiGame.PressDraw() : buttonMultiGame.ReleaseDraw();
+	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
 	if(le.MouseClickLeft(buttonStandartGame)) return LOADSTANDARD;
 	if(le.MouseClickLeft(buttonCampainGame)) return LOADCAMPAIN;

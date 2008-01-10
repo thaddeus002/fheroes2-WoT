@@ -281,7 +281,6 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
     dst_pt.x = pos.x + 230;
     dst_pt.y = pos.y + 155;
     Button buttonMax(dst_pt, "RECRUIT.ICN", 4, 5);
-
     dst_pt.x = pos.x + 208;
     dst_pt.y = pos.y + 156;
     Button buttonUp(dst_pt, "RECRUIT.ICN", 0, 1);
@@ -290,17 +289,23 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
     dst_pt.y = pos.y + 171;
     Button buttonDn(dst_pt, "RECRUIT.ICN", 2, 3);
 
+    buttonOk.Draw();
+    buttonCancel.Draw();
+    buttonMax.Draw();
+    buttonUp.Draw();
+    buttonDn.Draw();
+
     Cursor::Show();
     display.Flip();
 
     // message loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
-	le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
-	le.MousePressLeft(buttonMax) ? buttonMax.Press() : buttonMax.Release();
-	le.MousePressLeft(buttonUp) ? buttonUp.Press() : buttonUp.Release();
-	le.MousePressLeft(buttonDn) ? buttonDn.Press() : buttonDn.Release();
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+	le.MousePressLeft(buttonMax) ? buttonMax.PressDraw() : buttonMax.ReleaseDraw();
+	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
+	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
 
 	if(le.MouseClickLeft(buttonUp) && result < max)
 	{

@@ -57,6 +57,12 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     Button buttonDig(rb.x + 195, rb.y + 107, apanel, 6, 7);
     Button buttonCancel(rb.x + 128, rb.y + 184, apanel, 8, 9);
 
+    buttonWorld.Draw();
+    buttonPuzzle.Draw();
+    buttonInfo.Draw();
+    buttonDig.Draw();
+    buttonCancel.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -65,11 +71,11 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     // dialog menu loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonWorld) ? buttonWorld.Press() : buttonWorld.Release();
-        le.MousePressLeft(buttonPuzzle) ? buttonPuzzle.Press() : buttonPuzzle.Release();
-        le.MousePressLeft(buttonInfo) ? buttonInfo.Press() : buttonInfo.Release();
-        le.MousePressLeft(buttonDig) ? buttonDig.Press() : buttonDig.Release();
-        le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
+        le.MousePressLeft(buttonWorld) ? buttonWorld.PressDraw() : buttonWorld.ReleaseDraw();
+        le.MousePressLeft(buttonPuzzle) ? buttonPuzzle.PressDraw() : buttonPuzzle.ReleaseDraw();
+        le.MousePressLeft(buttonInfo) ? buttonInfo.PressDraw() : buttonInfo.ReleaseDraw();
+        le.MousePressLeft(buttonDig) ? buttonDig.PressDraw() : buttonDig.ReleaseDraw();
+        le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonWorld)){ result = Dialog::CANCEL; break; }
         if(le.MouseClickLeft(buttonPuzzle)){ result = Dialog::CANCEL; break; }

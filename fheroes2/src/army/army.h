@@ -64,18 +64,6 @@ namespace Army
 
     bool isValid(const Troops & army);
 
-    Dialog::answer_t ArmyInfo(const Troops & army, const Skill::Primary & skills, bool quickshow = false);
-
-
-
-
-
-
-
-
-
-
-
     class SelectBar
     {
     public:

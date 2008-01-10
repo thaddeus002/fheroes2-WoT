@@ -63,6 +63,12 @@ Game::menu_t Game::MainMenu(void)
 
     Animation animeLantern(lt_pt, "SHNGANIM.ICN", 0, 40, true, Animation::INFINITY | Animation::RING | Animation::LOW);
 
+    buttonNewGame.Draw();
+    buttonLoadGame.Draw();
+    buttonHighScores.Draw();
+    buttonCredits.Draw();
+    buttonQuit.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -71,11 +77,11 @@ Game::menu_t Game::MainMenu(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonNewGame) ? buttonNewGame.Press() : buttonNewGame.Release();
-	le.MousePressLeft(buttonLoadGame) ? buttonLoadGame.Press() : buttonLoadGame.Release();
-	le.MousePressLeft(buttonHighScores) ? buttonHighScores.Press() : buttonHighScores.Release();
-	le.MousePressLeft(buttonCredits) ? buttonCredits.Press() : buttonCredits.Release();
-	le.MousePressLeft(buttonQuit) ? buttonQuit.Press() : buttonQuit.Release();
+	le.MousePressLeft(buttonNewGame) ? buttonNewGame.PressDraw() : buttonNewGame.ReleaseDraw();
+	le.MousePressLeft(buttonLoadGame) ? buttonLoadGame.PressDraw() : buttonLoadGame.ReleaseDraw();
+	le.MousePressLeft(buttonHighScores) ? buttonHighScores.PressDraw() : buttonHighScores.ReleaseDraw();
+	le.MousePressLeft(buttonCredits) ? buttonCredits.PressDraw() : buttonCredits.ReleaseDraw();
+	le.MousePressLeft(buttonQuit) ? buttonQuit.PressDraw() : buttonQuit.ReleaseDraw();
 
 	if((le.MouseCursor(buttonNewGame) ||
 	   (!le.MouseCursor(buttonNewGame) && animeButtonNewGame.Reset())) &&

@@ -47,14 +47,17 @@ Game::menu_t Game::HighScores(void){
     Button buttonDismiss(9, 315, "HISCORE.ICN", 0, 1);
     Button buttonExit(604, 315, "HISCORE.ICN", 4, 5);
 
+    buttonDismiss.Draw();
+    buttonExit.Draw();
+
     Cursor::Show();
     display.Flip();
 
     // highscores loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
-	le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+	le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
+	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
 	//if(le.MouseRight()) Error::Verbose(le.MousePressRight());
 

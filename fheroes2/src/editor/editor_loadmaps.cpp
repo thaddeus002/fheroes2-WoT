@@ -168,6 +168,15 @@ Game::menu_t Game::Editor::LoadMaps(void)
     EditScenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
     EditScenario::DrawSelectInfo(it_current);
 
+    buttonOk.Draw();
+    buttonPgUp.Draw();
+    buttonPgDn.Draw();
+    buttonSelectSmall.Draw();
+    buttonSelectMedium.Draw();
+    buttonSelectLarge.Draw();
+    buttonSelectXLarge.Draw();
+    buttonSelectAll.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -177,15 +186,15 @@ Game::menu_t Game::Editor::LoadMaps(void)
     while(le.HandleEvents())
     {
 	// press button
-	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
-	le.MousePressLeft(buttonPgUp) ? buttonPgUp.Press() : buttonPgUp.Release();
-	le.MousePressLeft(buttonPgDn) ? buttonPgDn.Press() : buttonPgDn.Release();
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
+	le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
-	le.MousePressLeft(buttonSelectSmall) ? buttonSelectSmall.Press() : buttonSelectSmall.Release();
-	le.MousePressLeft(buttonSelectMedium) ? buttonSelectMedium.Press() : buttonSelectMedium.Release();
-	le.MousePressLeft(buttonSelectLarge) ? buttonSelectLarge.Press() : buttonSelectLarge.Release();
-	le.MousePressLeft(buttonSelectXLarge) ? buttonSelectXLarge.Press() : buttonSelectXLarge.Release();
-	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.Press() : buttonSelectAll.Release();
+	le.MousePressLeft(buttonSelectSmall) ? buttonSelectSmall.PressDraw() : buttonSelectSmall.ReleaseDraw();
+	le.MousePressLeft(buttonSelectMedium) ? buttonSelectMedium.PressDraw() : buttonSelectMedium.ReleaseDraw();
+	le.MousePressLeft(buttonSelectLarge) ? buttonSelectLarge.PressDraw() : buttonSelectLarge.ReleaseDraw();
+	le.MousePressLeft(buttonSelectXLarge) ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
+	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
 	// click small
 	if(le.MouseClickLeft(buttonSelectSmall) && smallmaps.size()){

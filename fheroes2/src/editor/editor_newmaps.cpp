@@ -54,17 +54,23 @@ Game::menu_t Game::Editor::NewMaps(void)
     Button buttonXLarge(455, 240, "BTNESIZE.ICN", 6, 7);
     Button buttonCancel(455, 375, "BTNESIZE.ICN", 8, 9);
 
+    buttonSmall.Draw();
+    buttonMedium.Draw();
+    buttonLarge.Draw();
+    buttonXLarge.Draw();
+    buttonCancel.Draw();
+
     Cursor::Show();
     display.Flip();
 
     // NewMap loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonSmall) ? buttonSmall.Press() : buttonSmall.Release();
-	le.MousePressLeft(buttonMedium) ? buttonMedium.Press() : buttonMedium.Release();
-	le.MousePressLeft(buttonLarge) ? buttonLarge.Press() : buttonLarge.Release();
-	le.MousePressLeft(buttonXLarge) ? buttonXLarge.Press() : buttonXLarge.Release();
-	le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
+	le.MousePressLeft(buttonSmall) ? buttonSmall.PressDraw() : buttonSmall.ReleaseDraw();
+	le.MousePressLeft(buttonMedium) ? buttonMedium.PressDraw() : buttonMedium.ReleaseDraw();
+	le.MousePressLeft(buttonLarge) ? buttonLarge.PressDraw() : buttonLarge.ReleaseDraw();
+	le.MousePressLeft(buttonXLarge) ? buttonXLarge.PressDraw() : buttonXLarge.ReleaseDraw();
+	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
 	//if(le.MouseClickLeft(buttonSmall)) return ;
 	//if(le.MouseClickLeft(buttonMedium)) return ;

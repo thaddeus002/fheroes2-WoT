@@ -279,6 +279,19 @@ Game::menu_t Game::StartGame(void)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    buttonScrollHeroesUp.Draw();
+    buttonScrollCastleUp.Draw();
+    buttonNextHero.Draw();
+    buttonMovement.Draw();
+    buttonKingdom.Draw();
+    buttonSpell.Draw();
+    buttonEndTur.Draw();
+    buttonAdventure.Draw();
+    buttonFile.Draw();
+    buttonSystem.Draw();
+    buttonScrollHeroesDown.Draw();
+    buttonScrollCastleDown.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -1185,18 +1198,18 @@ Game::menu_t Game::StartGame(void)
 
 
 	// draw push buttons
-	le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.Press() : buttonScrollHeroesUp.Release();
-	le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.Press() : buttonScrollCastleUp.Release();
-	le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
-	le.MousePressLeft(buttonMovement) ? buttonMovement.Press() : buttonMovement.Release();
-	le.MousePressLeft(buttonKingdom) ? buttonKingdom.Press() : buttonKingdom.Release();
-	le.MousePressLeft(buttonSpell) ? buttonSpell.Press() : buttonSpell.Release();
-	le.MousePressLeft(buttonEndTur) ? buttonEndTur.Press() : buttonEndTur.Release();
-	le.MousePressLeft(buttonAdventure) ? buttonAdventure.Press() : buttonAdventure.Release();
-	le.MousePressLeft(buttonFile) ? buttonFile.Press() : buttonFile.Release();
-	le.MousePressLeft(buttonSystem) ? buttonSystem.Press() : buttonSystem.Release();
-	le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.Press() : buttonScrollHeroesDown.Release();
-	le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.Press() : buttonScrollCastleDown.Release();
+	le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.PressDraw() : buttonScrollHeroesUp.ReleaseDraw();
+	le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.PressDraw() : buttonScrollCastleUp.ReleaseDraw();
+	le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
+	le.MousePressLeft(buttonMovement) ? buttonMovement.PressDraw() : buttonMovement.ReleaseDraw();
+	le.MousePressLeft(buttonKingdom) ? buttonKingdom.PressDraw() : buttonKingdom.ReleaseDraw();
+	le.MousePressLeft(buttonSpell) ? buttonSpell.PressDraw() : buttonSpell.ReleaseDraw();
+	le.MousePressLeft(buttonEndTur) ? buttonEndTur.PressDraw() : buttonEndTur.ReleaseDraw();
+	le.MousePressLeft(buttonAdventure) ? buttonAdventure.PressDraw() : buttonAdventure.ReleaseDraw();
+	le.MousePressLeft(buttonFile) ? buttonFile.PressDraw() : buttonFile.ReleaseDraw();
+	le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
+	le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.PressDraw() : buttonScrollHeroesDown.ReleaseDraw();
+	le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.PressDraw() : buttonScrollCastleDown.ReleaseDraw();
 
 	// point radar
 	if(le.MouseCursor(radar.GetRect()) &&

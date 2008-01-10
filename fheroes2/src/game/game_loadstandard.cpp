@@ -52,16 +52,22 @@ Game::menu_t Game::LoadStandard(void){
     Button buttonCancel(384, 365, "REQUEST.ICN", 3, 4);
     Button buttonPgUp(467, 105, "REQUEST.ICN", 5, 6);
     Button buttonPgDn(467, 307, "REQUEST.ICN", 7, 8);
+
+    buttonOk.Draw();
+    buttonCancel.Draw();
+    buttonPgUp.Draw();
+    buttonPgDn.Draw();
+
     Cursor::Show();
     display.Flip();
 
     // loadstandard loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
-	le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
-	le.MousePressLeft(buttonPgUp) ? buttonPgUp.Press() : buttonPgUp.Release();
-	le.MousePressLeft(buttonPgDn) ? buttonPgDn.Press() : buttonPgDn.Release();
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+	le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
+	le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
 	if(le.MouseClickLeft(buttonOk)) return MAINMENU;
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)) return MAINMENU;

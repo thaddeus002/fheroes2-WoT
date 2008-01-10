@@ -486,6 +486,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    buttonPrevHero.Draw();
+    buttonNextHero.Draw();
+    buttonDismiss.Draw();
+    buttonExit.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -634,12 +639,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	}
 
         // button click
-	le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(!readonly)
 	{
-	    le.MousePressLeft(buttonDismiss) ? buttonDismiss.Press() : buttonDismiss.Release();
-    	    le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.Press() : buttonPrevHero.Release();
-    	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.Press() : buttonNextHero.Release();
+	    le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
+    	    le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.PressDraw() : buttonPrevHero.ReleaseDraw();
+    	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
 
     	    // prev hero
 	    if(le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }

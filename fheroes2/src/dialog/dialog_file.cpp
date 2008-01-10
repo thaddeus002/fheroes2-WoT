@@ -57,6 +57,12 @@ Game::menu_t Dialog::FileOptions(void)
     Button buttonQuit(rb.x + 195, rb.y + 107, cpanel, 6, 7);
     Button buttonCancel(rb.x + 128, rb.y + 184, cpanel, 8, 9);
 
+    buttonNew.Draw();
+    buttonLoad.Draw();
+    buttonSave.Draw();
+    buttonQuit.Draw();
+    buttonCancel.Draw();
+
     Cursor::Show();
     display.Flip();
 
@@ -65,11 +71,11 @@ Game::menu_t Dialog::FileOptions(void)
     // dialog menu loop
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonNew) ? buttonNew.Press() : buttonNew.Release();
-        le.MousePressLeft(buttonLoad) ? buttonLoad.Press() : buttonLoad.Release();
-        le.MousePressLeft(buttonSave) ? buttonSave.Press() : buttonSave.Release();
-        le.MousePressLeft(buttonQuit) ? buttonQuit.Press() : buttonQuit.Release();
-        le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
+        le.MousePressLeft(buttonNew) ? buttonNew.PressDraw() : buttonNew.ReleaseDraw();
+        le.MousePressLeft(buttonLoad) ? buttonLoad.PressDraw() : buttonLoad.ReleaseDraw();
+        le.MousePressLeft(buttonSave) ? buttonSave.PressDraw() : buttonSave.ReleaseDraw();
+        le.MousePressLeft(buttonQuit) ? buttonQuit.PressDraw() : buttonQuit.ReleaseDraw();
+        le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonNew)) { result = Game::NEWGAME;  break; }
         if(le.MouseClickLeft(buttonLoad)){ result = Game::LOADGAME; break; }

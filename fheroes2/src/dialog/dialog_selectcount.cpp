@@ -82,16 +82,21 @@ u16 Dialog::SelectCount(u16 max_count)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    buttonUp.Draw();
+    buttonDn.Draw();
+    buttonOk.Draw();
+    buttonCancel.Draw();
+
     Cursor::Show();
     display.Flip();
 
     // message loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonOk) ? buttonOk.Press() : buttonOk.Release();
-        le.MousePressLeft(buttonCancel) ? buttonCancel.Press() : buttonCancel.Release();
-	le.MousePressLeft(buttonUp) ? buttonUp.Press() : buttonUp.Release();
-	le.MousePressLeft(buttonDn) ? buttonDn.Press() : buttonDn.Release();
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+        le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
+	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
 
 	// up
 	if((le.MouseWheelUp(pos) ||

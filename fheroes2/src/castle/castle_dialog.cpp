@@ -318,6 +318,10 @@ Dialog::answer_t Castle::OpenDialog(void)
     RedrawAllBuilding(cur_pt, orders_building);
     RedrawNameTown(cur_pt);
 
+    buttonPrevCastle.Draw();
+    buttonNextCastle.Draw();
+    buttonExit.Draw();
+
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     Cursor::Show();
@@ -334,10 +338,10 @@ Dialog::answer_t Castle::OpenDialog(void)
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }
 
-        le.MousePressLeft(buttonPrevCastle) ? buttonPrevCastle.Press() : buttonPrevCastle.Release();
-        le.MousePressLeft(buttonNextCastle) ? buttonNextCastle.Press() : buttonNextCastle.Release();
+        le.MousePressLeft(buttonPrevCastle) ? buttonPrevCastle.PressDraw() : buttonPrevCastle.ReleaseDraw();
+        le.MousePressLeft(buttonNextCastle) ? buttonNextCastle.PressDraw() : buttonNextCastle.ReleaseDraw();
 
-        le.MousePressLeft(buttonExit) ? buttonExit.Press() : buttonExit.Release();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
 	// castle troops
 	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
@@ -362,7 +366,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 			    Castle::RedrawResourcePanel();
 
     			    // RedrawResourcePanel destroy sprite buttonExit
-			    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+			    if(buttonExit.isPressed()) buttonExit.Draw();
 			    break;
 
 			case Dialog::DISMISS:
@@ -507,7 +511,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const u16 select_count = select_troops.count;
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-		    switch(Dialog::ArmyInfo(army2[ii], &(*castle_heroes).GetPrimarySkill(), (1 == GetCountArmy() ? false : true), false))
+		    switch(Dialog::ArmyInfo(army2[ii], &(*castle_heroes).GetPrimarySkill(), (1 == (*castle_heroes).GetCountArmy() ? false : true), false))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.monster = Monster::Upgrade(select_monster);
@@ -515,7 +519,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 			    Castle::RedrawResourcePanel();
 
     			    // RedrawResourcePanel destroy sprite buttonExit
-			    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+			    if(buttonExit.isPressed()) buttonExit.Draw();
 			    break;
 
 			case Dialog::DISMISS:
@@ -624,7 +628,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		Cursor::Hide();
 
-		Dialog::ArmyInfo(army2[ii], &(*castle_heroes).GetPrimarySkill(), (1 == GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army2[ii], &(*castle_heroes).GetPrimarySkill(), (1 == (*castle_heroes).GetCountArmy() ? false : true), true);
 
 		Cursor::Show();
 
@@ -662,7 +666,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
     	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 	    Cursor::Show();
 	    display.Flip();
 	}
@@ -673,7 +677,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 	}
 	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
 	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
@@ -694,7 +698,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    display.Blit(Portrait::Captain(race, Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
 
     		// RedrawResourcePanel destroy sprite buttonExit
-		if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+		if(buttonExit.isPressed()) buttonExit.Draw();
 
 		Cursor::Show();
 		display.Flip();
@@ -745,7 +749,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	        RedrawNameTown(cur_pt);
 
 		// RedrawResourcePanel destroy sprite buttonExit
-		if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+		if(buttonExit.isPressed()) buttonExit.Draw();
 
 		Cursor::Show();
 		display.Flip();
@@ -768,7 +772,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 
 	    Cursor::Show();
 	    display.Flip();
@@ -783,7 +787,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 
 	    Cursor::Show();
 	    display.Flip();
@@ -798,7 +802,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 
 	    Cursor::Show();
 	    display.Flip();
@@ -813,7 +817,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 
 	    Cursor::Show();
 	    display.Flip();
@@ -828,7 +832,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 
 	    Cursor::Show();
 	    display.Flip();
@@ -843,7 +847,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 
 	    Cursor::Show();
 	    display.Flip();
@@ -860,7 +864,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.DrawPressButton();
+	    if(buttonExit.isPressed()) buttonExit.Draw();
 
 	    Cursor::Show();
 	    display.Flip();
