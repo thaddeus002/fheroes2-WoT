@@ -17,26 +17,55 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2CAPTAIN_H
-#define H2CAPTAIN_H
 
-#include "race.h"
-#include "skill.h"
-#include "gamedefs.h"
+#include "world.h"
+#include "maps_tiles.h"
+#include "object.h"
 
-class Captain : public Skill::Primary
+bool Maps::Object::isDayLife(const MP2::object_t obj)
 {
-    public:
-	Captain();
+    // FIXME: list day object life
+    switch(obj)
+    {
+	default: break;
+    }
 
-        u8 GetAttack(void) const;
-        u8 GetDefense(void) const;
-        u8 GetPower(void) const;
-        u8 GetKnowledge(void) const;
-        Morale::morale_t GetMorale(void) const;
-        Luck::luck_t GetLuck(void) const;
+    return false;
+}
 
-	void SetRace(Race::race_t race);
-};
+bool Maps::Object::isWeekLife(const MP2::object_t obj)
+{
+    // FIXME: list week object life
+    switch(obj)
+    {
+	default: break;
+    }
 
-#endif
+    return false;
+}
+
+bool Maps::Object::isMonthLife(const MP2::object_t obj)
+{
+    // FIXME: list month object life
+    switch(obj)
+    {
+	default: break;
+    }
+
+    return false;
+}
+
+bool Maps::VisitIndexObject::isDayLife(const VisitIndexObject & visit)
+{
+    return Maps::Object::isDayLife(visit.second);
+}
+
+bool Maps::VisitIndexObject::isWeekLife(const VisitIndexObject & visit)
+{
+    return Maps::Object::isWeekLife(visit.second);
+}
+
+bool Maps::VisitIndexObject::isMonthLife(const VisitIndexObject & visit)
+{
+    return Maps::Object::isMonthLife(visit.second);
+}

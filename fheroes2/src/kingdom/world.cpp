@@ -880,6 +880,13 @@ const Heroes::heroes_t & World::GetFreeRecrut2(void)
 {
     if(Heroes::UNKNOWN == free_recrut_hero2 || !(*vec_heroes[free_recrut_hero2]).isFreeman()) free_recrut_hero2 = GetFreemanHeroes()->GetHeroes();
 
+    while(free_recrut_hero1 == free_recrut_hero2)
+    {
+	Error::Verbose("World::GetFreeRecrut2: hero1 equal hero2");
+
+	free_recrut_hero2 = GetFreemanHeroes()->GetHeroes();
+    }
+
     return free_recrut_hero2;
 }
 

@@ -17,26 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2CAPTAIN_H
-#define H2CAPTAIN_H
+#ifndef H2MAPSOBJECT_H
+#define H2MAPSOBJECT_H
 
-#include "race.h"
-#include "skill.h"
+#include <utility>
+#include "mp2.h"
+#include "maps_tiles.h"
 #include "gamedefs.h"
 
-class Captain : public Skill::Primary
+namespace Maps
 {
-    public:
-	Captain();
+    class VisitIndexObject : public std::pair<u16, MP2::object_t>
+    {
+	public:
+	VisitIndexObject() : std::pair<u16, MP2::object_t>(MAXU16, MP2::OBJ_ZERO) {};
+	VisitIndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair) {};
+	VisitIndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object) {};
+	VisitIndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject()) {};
 
-        u8 GetAttack(void) const;
-        u8 GetDefense(void) const;
-        u8 GetPower(void) const;
-        u8 GetKnowledge(void) const;
-        Morale::morale_t GetMorale(void) const;
-        Luck::luck_t GetLuck(void) const;
+	static bool isDayLife(const VisitIndexObject & visit);
+	static bool isWeekLife(const VisitIndexObject & visit);
+	static bool isMonthLife(const VisitIndexObject & visit);
+    };
 
-	void SetRace(Race::race_t race);
+    namespace Object
+    {
+	bool isDayLife(const MP2::object_t obj);
+	bool isWeekLife(const MP2::object_t obj);
+	bool isMonthLife(const MP2::object_t obj);
+    };
 };
 
 #endif

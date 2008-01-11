@@ -80,7 +80,6 @@ public:
 	DWELLING_UPGRADE5       = 0x20000000,
 	DWELLING_UPGRADE6       = 0x40000000,
 	DWELLING_UPGRADE7       = 0x80000000        // black dragon
-//	TRAIN_HERO              = 0x90000000
     } building_t;
 
     Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);

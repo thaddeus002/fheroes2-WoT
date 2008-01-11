@@ -520,7 +520,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const u16 select_count = select_troops.count;
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-		    switch(Dialog::ArmyInfo(army2[ii], &(*castle_heroes).GetPrimarySkill(), (1 == (*castle_heroes).GetCountArmy() ? false : true), false))
+		    switch(Dialog::ArmyInfo(army2[ii], castle_heroes, (1 == (*castle_heroes).GetCountArmy() ? false : true), false))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.monster = Monster::Upgrade(select_monster);
@@ -637,7 +637,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		Cursor::Hide();
 
-		Dialog::ArmyInfo(army2[ii], &(*castle_heroes).GetPrimarySkill(), (1 == (*castle_heroes).GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army2[ii], castle_heroes, (1 == (*castle_heroes).GetCountArmy() ? false : true), true);
 
 		Cursor::Show();
 
@@ -649,6 +649,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(castle_heroes && selectHeroesTroops && le.MouseClickLeft(rectHeroPortrait))
 	{
 	    (*const_cast<Heroes *>(castle_heroes)).OpenDialog();
+
+	    // FIXME check return value: next hero, prev hero
 
 	    Cursor::Hide();
 	    selectHeroesTroops->Reset();

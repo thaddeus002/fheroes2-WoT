@@ -266,7 +266,7 @@ u8 Resource::GetIndexSprite2(Resource::resource_t resource)
     return 0;
 }
 
-u8 Resource::funds_t::GetValidItems(void)
+u8 Resource::funds_t::GetValidItems(void) const
 {
 	u8 result = 0;
 

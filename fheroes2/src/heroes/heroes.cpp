@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include <algorithm>
 #include "artifact.h"
 #include "world.h"
 #include "castle.h"
@@ -26,7 +27,7 @@
 #include "error.h"
 #include "heroes.h"
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
+Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
     move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_ZERO), path(*this)
 {
     // hero is freeman
@@ -35,29 +36,29 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
     switch(race)
     {
 	case Race::KNGT:
-            primary_skills.attack      = DEFAULT_KNGT_ATTACK;
-            primary_skills.defence     = DEFAULT_KNGT_DEFENCE;
-            primary_skills.power       = DEFAULT_KNGT_POWER;
-            primary_skills.knowledge   = DEFAULT_KNGT_KNOWLEDGE;
+            attack      = DEFAULT_KNGT_ATTACK;
+            defence     = DEFAULT_KNGT_DEFENCE;
+            power       = DEFAULT_KNGT_POWER;
+            knowledge   = DEFAULT_KNGT_KNOWLEDGE;
 
 	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
 	    secondary_skills.Level(Skill::BALLISTICS, Skill::Level::BASIC);
 	    break;
 	    
 	case Race::BARB:
-            primary_skills.attack              = DEFAULT_BARB_ATTACK;
-            primary_skills.defence             = DEFAULT_BARB_DEFENCE;
-            primary_skills.power               = DEFAULT_BARB_POWER;
-            primary_skills.knowledge           = DEFAULT_BARB_KNOWLEDGE;
+            attack              = DEFAULT_BARB_ATTACK;
+            defence             = DEFAULT_BARB_DEFENCE;
+            power               = DEFAULT_BARB_POWER;
+            knowledge           = DEFAULT_BARB_KNOWLEDGE;
 
 	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::ADVANCED);
 	    break;
 	    
 	case Race::SORC:
-            primary_skills.attack              = DEFAULT_SORC_ATTACK;
-            primary_skills.defence             = DEFAULT_SORC_DEFENCE;
-            primary_skills.power               = DEFAULT_SORC_POWER;
-            primary_skills.knowledge           = DEFAULT_SORC_KNOWLEDGE;
+            attack              = DEFAULT_SORC_ATTACK;
+            defence             = DEFAULT_SORC_DEFENCE;
+            power               = DEFAULT_SORC_POWER;
+            knowledge           = DEFAULT_SORC_KNOWLEDGE;
 
 	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::ADVANCED);
 	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
@@ -66,10 +67,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
 	    break;
 	    
 	case Race::WRLK:
-            primary_skills.attack              = DEFAULT_WRLK_ATTACK;
-            primary_skills.defence             = DEFAULT_WRLK_DEFENCE;
-            primary_skills.power               = DEFAULT_WRLK_POWER;
-            primary_skills.knowledge           = DEFAULT_WRLK_KNOWLEDGE;
+            attack              = DEFAULT_WRLK_ATTACK;
+            defence             = DEFAULT_WRLK_DEFENCE;
+            power               = DEFAULT_WRLK_POWER;
+            knowledge           = DEFAULT_WRLK_KNOWLEDGE;
 
 	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::ADVANCED);
 	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
@@ -78,10 +79,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
 	    break;
 	    
 	case Race::WZRD:
-            primary_skills.attack              = DEFAULT_WZRD_ATTACK;
-            primary_skills.defence             = DEFAULT_WZRD_DEFENCE;
-            primary_skills.power               = DEFAULT_WZRD_POWER;
-            primary_skills.knowledge           = DEFAULT_WZRD_KNOWLEDGE;
+            attack              = DEFAULT_WZRD_ATTACK;
+            defence             = DEFAULT_WZRD_DEFENCE;
+            power               = DEFAULT_WZRD_POWER;
+            knowledge           = DEFAULT_WZRD_KNOWLEDGE;
 
 	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
 
@@ -89,10 +90,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
 	    break;
 	    
 	case Race::NECR:
-            primary_skills.attack              = DEFAULT_NECR_ATTACK;
-            primary_skills.defence             = DEFAULT_NECR_DEFENCE;
-            primary_skills.power               = DEFAULT_NECR_POWER;
-            primary_skills.knowledge           = DEFAULT_NECR_KNOWLEDGE;
+            attack              = DEFAULT_NECR_ATTACK;
+            defence             = DEFAULT_NECR_DEFENCE;
+            power               = DEFAULT_NECR_POWER;
+            knowledge           = DEFAULT_NECR_KNOWLEDGE;
 
 	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::BASIC);
 	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
@@ -304,7 +305,7 @@ u8 Heroes::GetManaIndexSprite(void) const
 
 u8 Heroes::GetAttack(void) const
 {
-    u8 result = primary_skills.attack;
+    u8 result = attack;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -348,7 +349,7 @@ u8 Heroes::GetAttack(void) const
 
 u8 Heroes::GetDefense(void) const
 {
-    u8 result = primary_skills.defence;
+    u8 result = defence;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -392,7 +393,7 @@ u8 Heroes::GetDefense(void) const
 
 u8 Heroes::GetPower(void) const
 {
-    u8 result = primary_skills.power;
+    u8 result = power;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -436,7 +437,7 @@ u8 Heroes::GetPower(void) const
 
 u8 Heroes::GetKnowledge(void) const
 {
-    u8 result = primary_skills.knowledge;
+    u8 result = knowledge;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -512,15 +513,15 @@ Morale::morale_t Heroes::GetMorale(void) const
 {
 /* FIXME:
 [-] Knight bonus +1 ???
-[-] Buoy visited +1
-[-] Oasis visited +1
-[-] Temple visited +2
-[-] Graveyard robber -1
-[-] Shipwreck robber -1
-[-] Watering hole visited +1
-[-] Derelict ship robber -1
-[-] Barbarian Coliseum +2
-[-] Tavern +1
+[-] Watering hole visited +1 ???
+[+] Buoy visited +1
+[+] Oasis visited +1
+[+] Temple visited +2
+[+] Graveyard robber -1
+[+] Shipwreck robber -1
+[+] Derelict ship robber -1
+[+] Barbarian Coliseum +2
+[+] Tavern +1
 [+] All %s troops +1
 [+] Troops of 3 alignments -1
 [+] Troops of 4 alignments -2
@@ -536,24 +537,23 @@ Morale::morale_t Heroes::GetMorale(void) const
 [+] Expert Leadership +3
 */
 
-    Morale::morale_t result = primary_skills.morale;
+    s8 result = morale;
 
     // bonus artifact
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
-    for(; it != artifacts.end(); ++it)
 
+    for(; it != artifacts.end(); ++it)
 	switch(*it)
 	{
             case Artifact::MEDAL_VALOR:
             case Artifact::MEDAL_COURAGE:
             case Artifact::MEDAL_HONOR:
             case Artifact::MEDAL_DISTINCTION:
-                ++result;
+                result += 1;
                 break;
 
             case Artifact::FIZBIN_MISFORTUNE:
-                --result;
-                --result;
+                result -= 2;
                 break;
 
             default:
@@ -564,23 +564,41 @@ Morale::morale_t Heroes::GetMorale(void) const
     switch(GetLevelSkill(Skill::LEADERSHIP))
     {
         case Skill::Level::EXPERT:
-            ++result;
-            ++result;
-            ++result;
+            result += 3;
             break;
 
         case Skill::Level::ADVANCED:
-            ++result;
-            ++result;
+            result += 2;
             break;
 
         case Skill::Level::BASIC:
-            ++result;
+            result += 1;
             break;
 
         default:
             break;
     }
+    
+    const Castle* castle = inCastle();
+
+    // bonus in castle
+    if(castle)
+    {
+	// and tavern
+	if(castle->isBuild(Castle::BUILD_TAVERN)) result += 1;
+
+	// and barbarian coliseum
+        if(Race::BARB == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC)) result += 2;
+    }
+
+    // object visited
+    if(isVisited(MP2::OBJ_BUOY)) ++result;
+    if(isVisited(MP2::OBJ_OASIS)) ++result;
+    if(isVisited(MP2::OBJ_TEMPLE)) result += 2;
+    if(isVisited(MP2::OBJ_GRAVEYARD)) --result;
+    if(isVisited(MP2::OBJ_SHIPWRECK)) --result;
+    if(isVisited(MP2::OBJ_DERELICTSHIP)) --result;
+
     // different race penalty
     std::vector<Army::Troops>::const_iterator it1_army = army.begin();
     std::vector<Army::Troops>::const_iterator it2_army = army.end();
@@ -615,24 +633,34 @@ Morale::morale_t Heroes::GetMorale(void) const
     switch(count)
     {
 	case 0: break;
-	case 1: ++result; break;
-	case 3: --result; break;
-	case 4: --result; --result; break;
+	case 1: result += 1; break;
+	case 3: result -= 1; break;
+	case 4: result -= 2; break;
 	// over 4 different race
-	default: --result; --result; --result; break;
+	default: result -=3; break;
     }
 
     // undead in life group
     if(count_necr && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg)) --result;
 
+    if(result < Morale::AWFUL)	return Morale::TREASON;
+    else
+    if(result < Morale::POOR)	return Morale::AWFUL;
+    else
+    if(result < Morale::NORMAL)	return Morale::POOR;
+    else
+    if(result < Morale::GOOD)	return Morale::NORMAL;
+    else
+    if(result < Morale::GREAT)	return Morale::GOOD;
+    else
+    if(result < Morale::BLOOD)	return Morale::GREAT;
 
-
-    return result;
+    return Morale::BLOOD;
 }
 
 Luck::luck_t Heroes::GetLuck(void) const
 {
-    Luck::luck_t result = primary_skills.luck;
+    s8 result = luck;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -652,7 +680,19 @@ Luck::luck_t Heroes::GetLuck(void) const
 		break;
     	}
 
-    return result;
+    if(result < Luck::AWFUL)	return Luck::CURSED;
+    else
+    if(result < Luck::BAD)	return Luck::AWFUL;
+    else
+    if(result < Luck::NORMAL)	return Luck::BAD;
+    else
+    if(result < Luck::GOOD)	return Luck::NORMAL;
+    else
+    if(result < Luck::GREAT)	return Luck::GOOD;
+    else
+    if(result < Luck::IRISH)	return Luck::GREAT;
+
+    return Luck::IRISH;
 }
 
 // return valid count heroes army
@@ -702,14 +742,21 @@ void Heroes::ActionNewDay(void)
 {
     move_point = GetMaxMovePoints();
     path.Reset();
+
+    // remove day visit object
+    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isDayLife);
 }
 
 void Heroes::ActionNewWeek(void)
 {
+    // remove week visit object
+    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isWeekLife);
 }
 
 void Heroes::ActionNewMonth(void)
 {
+    // remove month visit object
+    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isMonthLife);
 }
 
 u16 Heroes::FindPath(u16 dst_index)
@@ -758,7 +805,8 @@ void Heroes::Action(u16 dst_index)
     if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(tiles_new.GetObject())));
 }
 
-bool Heroes::inCastle(void) const
+/* if hero in castle */
+const Castle* Heroes::inCastle(void) const
 {
     if(Color::GRAY == color) return false;
 
@@ -767,7 +815,43 @@ bool Heroes::inCastle(void) const
     std::vector<Castle *>::const_iterator it1 = castles.begin();
     std::vector<Castle *>::const_iterator it2 = castles.end();
 
-    for(; it1 != it2; ++it1) if((**it1).GetCenter() == mp) return true;
+    for(; it1 != it2; ++it1) if((**it1).GetCenter() == mp) return *it1;
+
+    return NULL;
+}
+
+/* is visited cell */
+bool Heroes::isVisited(const Maps::Tiles & tile) const
+{
+    std::list<Maps::VisitIndexObject>::const_iterator end = visit_object.end();
+
+    return end != std::find(visit_object.begin(), end, Maps::VisitIndexObject(tile));
 
     return false;
+}
+
+bool Heroes::isVisited(const MP2::object_t & object) const
+{
+    std::list<Maps::VisitIndexObject>::const_iterator it1 = visit_object.begin();
+    std::list<Maps::VisitIndexObject>::const_iterator it2 = visit_object.end();
+
+    for(; it1 != it2; ++it1) if((*it1).second == object) return true;
+
+    return false;
+}
+
+/* set visited cell */
+void Heroes::SetVisited(const u32 index)
+{
+    const Maps::Tiles & tile = world.GetTiles(index);
+
+    if(isVisited(tile)) return;
+
+    const MP2::object_t object = tile.GetObject();
+
+    // valid
+    if(Maps::Object::isDayLife(object) ||
+	Maps::Object::isWeekLife(object) ||
+	Maps::Object::isMonthLife(object))
+	    visit_object.push_front(Maps::VisitIndexObject(index, object));
 }

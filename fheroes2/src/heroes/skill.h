@@ -83,7 +83,16 @@ namespace Skill
     {
 	public:
 	Primary();
+	virtual ~Primary(){};
 
+    	virtual u8 GetAttack(void) const = 0;
+	virtual u8 GetDefense(void) const = 0;
+        virtual u8 GetPower(void) const = 0;
+        virtual u8 GetKnowledge(void) const = 0;
+	virtual Morale::morale_t GetMorale(void) const = 0;
+	virtual Luck::luck_t GetLuck(void) const = 0;
+
+	protected:
 	u8			attack;
 	u8			defence;
 	u8			power;

@@ -73,25 +73,13 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     String::AddInt(str, heroes.GetArtifacts().size());
     str += " artifacts.";
 
-    Rect src_rt(box_rt.x, box_rt.y + portrait_frame.w() + tit_rt.h - 5, BOXAREA_WIDTH, 200);
+    Rect src_rt(box_rt.x, box_rt.y + portrait_frame.w() + tit_rt.h - 3, BOXAREA_WIDTH, 200);
     TextBox(str, Font::BIG, src_rt);
 
     Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
 
-    if(! paymentCosts.GetValidItems()) return Dialog::CANCEL;
-
-    if(paymentCosts.gold)
-    {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 6);
-	dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
-	dst_pt.y = box_rt.y + box_rt.h - sprite.h();
-	display.Blit(sprite, dst_pt);
-	str.clear();
-	String::AddInt(str, paymentCosts.gold);
-	dst_pt.x = box_rt.x + (box_rt.w - Text::width(str, Font::SMALL)) / 2;
-	dst_pt.y = box_rt.y + box_rt.h + 5;
-	Text(str, Font::SMALL, dst_pt);
-    }
+    src_rt.y += 50;
+    PaymentConditions::AlignDraw(paymentCosts, src_rt);
 
     dst_pt.x = box_rt.x;
     dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
@@ -136,7 +124,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
     Cursor::Hide();
 
-	const std::string & building_description =
+    const std::string & building_description =
 			(DWELLING_MONSTER1 |
 			 DWELLING_MONSTER2 |
 			 DWELLING_MONSTER3 |
@@ -152,16 +140,16 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 			 std::string("The " + GetStringBuilding(build, race) + " produces " + Monster::String(Monster::Monster(race, build)) + ".") :
 			 GetDescriptionBuilding(build, race);
 	
-	u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
+    u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
 
-	// prepare requires build string
-	std::string string_requires;
+    // prepare requires build string
+    std::string string_requires;
 
-	std::bitset<32> requires(Castle::GetBuildingRequires(build));
-	std::bitset<32> building2(building);
+    std::bitset<32> requires(Castle::GetBuildingRequires(build));
+    std::bitset<32> building2(building);
 	
-	if(requires.any())
-	{
+    if(requires.any())
+    {
 	    u8 count = 0;
 
 	    for(u8 pos = 0; pos < requires.size(); ++pos)
@@ -181,14 +169,14 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		    }
 		}
 	    }
-	}
+    }
 
-	u8 height_requires = string_requires.empty() ? 0 : Text::height(string_requires, Font::BIG, BOXAREA_WIDTH);
+    u8 height_requires = string_requires.empty() ? 0 : Text::height(string_requires, Font::BIG, BOXAREA_WIDTH);
 
-	PaymentConditions::BuyBuilding paymentBuild(race, build);
-	const u8 & valid_resource = paymentBuild.GetValidItems();
+    PaymentConditions::BuyBuilding paymentBuild(race, build);
+    const u8 & valid_resource = paymentBuild.GetValidItems();
     
-	Dialog::Box box(60 + 30 + height_description + 15 + (height_requires ? 30 + height_requires : 0) + (7 == valid_resource ? 150 : (3 < valid_resource ? 100 : 50)), buttons);
+    Dialog::Box box(60 + 30 + height_description + 15 + (height_requires ? 30 + height_requires : 0) + (7 == valid_resource ? 150 : (3 < valid_resource ? 100 : 50)), buttons);
 
     const Rect & box_rt = box.GetArea();
 
@@ -280,136 +268,24 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
     if(height_requires)
     {
-		str = "Requires:";
-		dst_pt.x = box_rt.x + (box_rt.w - Text::width(str, Font::BIG)) / 2;
-		dst_pt.y = box_rt.y + 100 + height_description + 20;
-		Text(str, Font::BIG, dst_pt);
+	str = "Requires:";
+	dst_pt.x = box_rt.x + (box_rt.w - Text::width(str, Font::BIG)) / 2;
+	dst_pt.y = box_rt.y + 100 + height_description + 20;
+	Text(str, Font::BIG, dst_pt);
 
-		src_rt.x = box_rt.x;
-		src_rt.y = box_rt.y + 100 + height_description + 35;
-		src_rt.w = BOXAREA_WIDTH;
-		src_rt.h = 200;
-		TextBox(string_requires, Font::BIG, src_rt);
-    }
-
-    index = 2 < valid_resource ? box_rt.w / 3 : box_rt.w / valid_resource;
-    src_rt.y = height_requires ? box_rt.y + 100 + height_description + 35 + height_requires + 45 : box_rt.y + 100 + height_description + 50;
-    u8 count = 0;
-	
-    if(paymentBuild.wood)
-    {
-		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 0);
-		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
-		dst_pt.y = src_rt.y - sprite.h();
-		display.Blit(sprite, dst_pt);
-
-		str.clear();
-		String::AddInt(str, paymentBuild.wood);
-		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-		dst_pt.y = src_rt.y + 2;
-		Text(str, Font::SMALL, dst_pt);
-
-		++count;
+	src_rt.x = box_rt.x;
+	src_rt.y = box_rt.y + 100 + height_description + 35;
+	src_rt.w = BOXAREA_WIDTH;
+	src_rt.h = 200;
+	TextBox(string_requires, Font::BIG, src_rt);
     }
 	
-    if(paymentBuild.ore)
-    {
-		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 2);
-		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
-		dst_pt.y = src_rt.y - sprite.h();
-		display.Blit(sprite, dst_pt);
+    src_rt.x = box_rt.x;
+    src_rt.y = height_requires ? box_rt.y + 100 + height_description + 30 + height_requires : box_rt.y + 100 + height_description;
+    src_rt.w = BOXAREA_WIDTH;
+    src_rt.h = box_rt.h - src_rt.y;
 
-		str.clear();
-		String::AddInt(str, paymentBuild.ore);
-		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-		dst_pt.y = src_rt.y + 2;
-		Text(str, Font::SMALL, dst_pt);
-
-		++count;
-    }
-
-    if(paymentBuild.mercury)
-    {
-		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 1);
-		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
-		dst_pt.y = src_rt.y - sprite.h();
-		display.Blit(sprite, dst_pt);
-
-		str.clear();
-		String::AddInt(str, paymentBuild.mercury);
-		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-		dst_pt.y = src_rt.y + 2;
-		Text(str, Font::SMALL, dst_pt);
-
-		++count;
-    }
-    
-    if(2 < count){ count = 0; src_rt.y += 50; }
-    if(paymentBuild.sulfur)
-    {
-		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 3);
-		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
-		dst_pt.y = src_rt.y - sprite.h();
-		display.Blit(sprite, dst_pt);
-
-		str.clear();
-		String::AddInt(str, paymentBuild.sulfur);
-		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-		dst_pt.y = src_rt.y + 2;
-		Text(str, Font::SMALL, dst_pt);
-
-		++count;
-    }
-	
-    if(2 < count){ count = 0; src_rt.y += 50; }
-    if(paymentBuild.crystal)
-    {
-		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 4);
-		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
-		dst_pt.y = src_rt.y - sprite.h();
-		display.Blit(sprite, dst_pt);
-
-		str.clear();
-		String::AddInt(str, paymentBuild.crystal);
-		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-		dst_pt.y = src_rt.y + 2;
-		Text(str, Font::SMALL, dst_pt);
-
-		++count;
-    }
-	
-    if(2 < count){ count = 0; src_rt.y += 50; }
-    if(paymentBuild.gems)
-    {
-		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 5);
-		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
-		dst_pt.y = src_rt.y - sprite.h();
-		display.Blit(sprite, dst_pt);
-
-		str.clear();
-		String::AddInt(str, paymentBuild.gems);
-		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-		dst_pt.y = src_rt.y + 2;
-		Text(str, Font::SMALL, dst_pt);
-
-		++count;
-    }
-
-    if(2 < count){ count = 0; src_rt.y += 50; }
-    if(paymentBuild.gold)
-    {
-		const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 6);
-		if(! count) index = box_rt.w;
-		dst_pt.x = box_rt.x + index / 2 + count * index - sprite.w() / 2;
-		dst_pt.y = src_rt.y - sprite.h();
-		display.Blit(sprite, dst_pt);
-
-		str.clear();
-		String::AddInt(str, paymentBuild.gold);
-		dst_pt.x = box_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-		dst_pt.y = src_rt.y + 2;
-		Text(str, Font::SMALL, dst_pt);
-    }
+    PaymentConditions::AlignDraw(paymentBuild, src_rt);
 
     if(buttons)
     {
@@ -794,7 +670,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y = cur_pt.y + 168;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, captain.attack);
+	String::AddInt(message, captain.GetAttack());
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 	
@@ -803,7 +679,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y += 12;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, captain.defence);
+	String::AddInt(message, captain.GetDefense());
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 
@@ -812,7 +688,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y += 12;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, captain.power);
+	String::AddInt(message, captain.GetPower());
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 
@@ -821,7 +697,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.y += 12;
 	Text(message, Font::SMALL, dst_pt);
 	message.clear();
-	String::AddInt(message, captain.knowledge);
+	String::AddInt(message, captain.GetKnowledge());
 	dst_pt.x += 90;
 	Text(message, Font::SMALL, dst_pt);
 	

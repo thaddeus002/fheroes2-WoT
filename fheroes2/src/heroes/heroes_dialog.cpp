@@ -497,12 +497,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     if(inCastle())
     {
-	buttonPrevHero.Press();
-	buttonPrevHero.SetDisable(true);
-
-	buttonNextHero.Press();
-	buttonNextHero.SetDisable(true);
-
 	buttonDismiss.Press();
 	buttonDismiss.SetDisable(true);
     }
@@ -536,7 +530,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    const u16 select_count = select_troops.count;
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-                    switch(Dialog::ArmyInfo(army[ii], &GetPrimarySkill(), readonly? false : (1 == GetCountArmy() ? false : true), false))
+                    switch(Dialog::ArmyInfo(army[ii], this, readonly? false : (1 == GetCountArmy() ? false : true), false))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.monster = Monster::Upgrade(select_monster);
@@ -652,7 +646,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    {
 		Cursor::Hide();
 
-		Dialog::ArmyInfo(army[ii], &GetPrimarySkill(), readonly ? false : (1 == GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army[ii], this, readonly ? false : (1 == GetCountArmy() ? false : true), true);
 
 		Cursor::Show();
 		display.Flip();

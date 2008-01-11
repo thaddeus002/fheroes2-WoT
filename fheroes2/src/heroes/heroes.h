@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include "race.h"
 #include "spell.h"
 #include "color.h"
@@ -34,6 +35,7 @@
 #include "skill.h"
 #include "artifact.h"
 #include "route.h"
+#include "object.h"
 #include "gamedefs.h"
 
 #define HEROESMAXARTIFACT	14
@@ -70,7 +72,7 @@
 #define DEFAULT_WZRD_POWER	2
 #define DEFAULT_WZRD_KNOWLEDGE	2
 
-class Heroes
+class Heroes : public Skill::Primary
 {
 public:
     typedef enum
@@ -96,7 +98,11 @@ public:
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
 
     bool isFreeman(void) const{ return Color::GRAY == color; };
-    bool inCastle(void) const;
+    bool isVisited(const MP2::object_t & object) const;
+    bool isVisited(const Maps::Tiles & tile) const;
+
+    const Castle* inCastle(void) const;
+
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
 
     Heroes::heroes_t GetHeroes(void) const{ return heroes; };
@@ -107,7 +113,7 @@ public:
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
     u8 GetCountArmy(void) const;
 
-    const Skill::Primary & GetPrimarySkill(void) const{ return primary_skills; };
+    //const Skill::Primary & GetPrimarySkill(void) const{ return primary_skills; };
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
@@ -138,6 +144,7 @@ public:
     const Route & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
 
+    void SetVisited(const u32 index);
     void SetCenter(const Point& pt){ mp = pt; };
     void Goto(u16 dst_index);
     void Action(u16 dst_index);
@@ -145,7 +152,7 @@ public:
 private:
     std::string		name;
     Color::color_t	color;
-    Skill::Primary	primary_skills;
+    //Skill::Primary	primary_skills;
     u32			experience;
     u16			magic_point;
     u16			move_point;
@@ -165,6 +172,8 @@ private:
 
     Point		mp;
     Route		path;
+
+    std::list<Maps::VisitIndexObject> visit_object;
 };
 
 #endif

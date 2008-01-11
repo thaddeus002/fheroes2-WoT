@@ -23,8 +23,9 @@
 
 #include "resource.h"
 #include "race.h" 
-#include "castle.h" 
 #include "monster.h" 
+
+class Rect;
 
 #define RATE_DIFFERENCE_UPGRADE		2
 
@@ -351,7 +352,7 @@ namespace PaymentConditions
     class BuyBuilding : public payment_t
     {
     public:
-	BuyBuilding(const Race::race_t & race, const Castle::building_t & build);
+	BuyBuilding(const Race::race_t & race, const u32 build);
     };
 
     class BuyHero : public payment_t
@@ -372,7 +373,7 @@ namespace PaymentConditions
 	UpgradeMonster(const Monster::monster_t & monster);
     };
 
-    //const S_PAYMENT * PaymentConditionsRecrutHeroes(void);
+    void AlignDraw(const payment_t & payment, const Rect & dst_rt);
 };
 
 #endif

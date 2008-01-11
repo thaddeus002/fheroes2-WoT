@@ -18,7 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include "rect.h"
+#include "agg.h"
+#include "display.h"
+#include "castle.h"
 #include "error.h"
+#include "text.h"
+#include "tools.h"
 #include "payment.h"
 
 PaymentConditions::BuyHero::BuyHero()
@@ -154,7 +160,7 @@ PaymentConditions::UpgradeMonster::UpgradeMonster(const Monster::monster_t & mon
     gems	= pay.gems;
 }
 
-PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const Castle::building_t & build)
+PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const u32 build)
 {
     gold	= 0;
     wood	= 0;
@@ -710,5 +716,134 @@ PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const Cas
 	    break;
 																						
 	default: Error::Warning("PaymentConditions::BuyBuilding: unknown building."); break;
+    }
+}
+
+void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt)
+{
+    const u8 valid_resource = payment.GetValidItems();
+
+    u16 index = 2 < valid_resource ? dst_rt.w / 3 : dst_rt.w / valid_resource;
+
+    u8 count = 0;
+    u8 offset = 50;
+
+    std::string str;
+    Point dst_pt;
+
+    if(payment.wood)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 0);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, payment.wood);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(payment.ore)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 2);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, payment.ore);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(payment.mercury)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 1);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, payment.mercury);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+
+    if(payment.sulfur)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 3);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, payment.sulfur);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+    if(payment.crystal)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 4);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h()  + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, payment.crystal);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+    if(payment.gems)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 5);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, payment.gems);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+    if(payment.gold)
+    {
+	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 6);
+	if(! count) index = dst_rt.w;
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, payment.gold);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
     }
 }

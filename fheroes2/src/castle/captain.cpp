@@ -89,3 +89,33 @@ void Captain::SetRace(Race::race_t race)
     }
 
 }
+
+u8 Captain::GetAttack(void) const
+{
+    return attack;
+}
+
+u8 Captain::GetDefense(void) const
+{
+    return defence;
+}
+
+u8 Captain::GetPower(void) const
+{
+    return power;
+}
+
+u8 Captain::GetKnowledge(void) const
+{
+    return knowledge;
+}
+
+Morale::morale_t Captain::GetMorale(void) const
+{
+    return morale;
+}
+
+Luck::luck_t Captain::GetLuck(void) const
+{
+    return luck;
+}

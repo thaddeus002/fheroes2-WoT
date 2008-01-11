@@ -85,7 +85,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
     if(skills)
     {
 	message += " (";
-	String::AddInt(message, monster.attack + (*skills).attack);
+	String::AddInt(message, monster.attack + (*skills).GetAttack());
 	message += ")";
     }
 
@@ -104,7 +104,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
     if(skills)
     {
 	message += " (";
-	String::AddInt(message, monster.defence + (*skills).defence);
+	String::AddInt(message, monster.defence + (*skills).GetDefense());
 	message += ")";
     }
 
@@ -162,7 +162,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
     dst_pt.y += 18;
     Text(message, Font::BIG, dst_pt);
 
-    message = (skills ? Morale::String((*skills).morale) : Morale::String(Morale::NORMAL));
+    message = (skills ? Morale::String((*skills).GetMorale()) : Morale::String(Morale::NORMAL));
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -172,7 +172,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
     dst_pt.y += 18;
     Text(message, Font::BIG, dst_pt);
 
-    message = (skills ? Luck::String((*skills).luck) : Luck::String(Luck::NORMAL));
+    message = (skills ? Luck::String((*skills).GetLuck()) : Luck::String(Luck::NORMAL));
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
