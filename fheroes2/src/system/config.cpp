@@ -37,7 +37,6 @@ namespace H2Config
     static Difficulty::difficulty_t gameDifficulty = Difficulty::NORMAL;
     static Color::color_t humanColor = Color::GRAY;
     static u8 kingdomColors = 0;
-    static u8 kingdomCount = 0;
     static u8 allowColors = 0;
     static u8 allowRaces = 0;
     static Race::race_t raceKingdom[KINGDOMMAX];
@@ -230,7 +229,7 @@ Color::color_t H2Config::GetMyColor(void){ return H2Config::humanColor; };
 u8 H2Config::GetKingdomColors(void){ return H2Config::kingdomColors; };
 
 /* return game count kingdom */
-u8 H2Config::GetKingdomCount(void){ return H2Config::kingdomCount; };
+u8 H2Config::GetKingdomCount(void){ return 0; };
 
 /* get allow change color */
 u8 H2Config::GetAllowChangeColors(void){ return H2Config::allowColors; };
@@ -293,9 +292,6 @@ void H2Config::SetHumanColor(Color::color_t color){ H2Config::humanColor = color
 /* set game kingdom colors */
 void H2Config::SetKingdomColors(u8 colors){ H2Config::kingdomColors = colors; };
 
-/* set game count kingdom */
-void H2Config::SetKingdomCount(u8 count){ H2Config::kingdomCount = count; };
-
 /* set allow change color */
 void H2Config::SetAllowChangeColors(u8 colors){ H2Config::allowColors = colors; };
 
@@ -352,7 +348,7 @@ void H2Config::SetPlayWithHeroes(bool fl){ fl ? H2Config::boolValue &= ~H2Config
 void H2Config::PrintCurrentValues(void)
 {
     std::cout << std::endl;
-    std::cout << "# free heroes2 config, current values:" << std::endl;
+    std::cout << "# dump config, current values:" << std::endl;
     std::cout << "aggfile = " << pathAGGFile << std::endl;
     std::cout << "directorymaps = " << pathMapsDirectory << std::endl;
     std::cout << "videomode = ";

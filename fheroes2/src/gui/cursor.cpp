@@ -96,7 +96,7 @@ Cursor::themes_t Cursor::Get(void)
 }
 
 /* set cursor theme */
-void Cursor::Set(Cursor::themes_t cursor)
+bool Cursor::Set(Cursor::themes_t cursor)
 {
     if(name != cursor)
     {
@@ -126,7 +126,11 @@ void Cursor::Set(Cursor::themes_t cursor)
 	}
 
 	SetOffset(cursor);
+	
+	return true;
     }
+
+    return false;
 }
 
 /* redraw cursor wrapper for local event */

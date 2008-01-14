@@ -25,7 +25,11 @@
 #include "localevent.h"
 #include "button.h"
 #include "display.h"
+#include "config.h"
+#include "maps.h"
 #include "game.h"
+
+#include "error.h"
 
 Game::menu_t Game::Editor::NewMaps(void)
 {
@@ -72,14 +76,22 @@ Game::menu_t Game::Editor::NewMaps(void)
 	le.MousePressLeft(buttonXLarge) ? buttonXLarge.PressDraw() : buttonXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-	//if(le.MouseClickLeft(buttonSmall)) return ;
-	//if(le.MouseClickLeft(buttonMedium)) return ;
-	//if(le.MouseClickLeft(buttonLarge)) return ;
-	//if(le.MouseClickLeft(buttonXLarge)) return ;
+	if(le.MouseClickLeft(buttonSmall)){ H2Config::SetSizeMaps(Maps::SMALL); return EDITSTART; }
+	if(le.MouseClickLeft(buttonMedium)){ H2Config::SetSizeMaps(Maps::MEDIUM); return EDITSTART; }
+	if(le.MouseClickLeft(buttonLarge)){ H2Config::SetSizeMaps(Maps::LARGE); return EDITSTART; }
+	if(le.MouseClickLeft(buttonXLarge)){ H2Config::SetSizeMaps(Maps::XLARGE); return EDITSTART; }
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)) return MAINMENU;
 
         // right info
-	//if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Quit", "Quit out of the map editor.", Font::BIG);
+	if(le.MousePressRight(buttonSmall)) Dialog::Message("", "Create a map that is 36 squares wide by 36 squares high. (For reference, all the maps in Heroes where 72 x 72)", Font::BIG);
+	else
+	if(le.MousePressRight(buttonMedium)) Dialog::Message("", "Create a map that is 72 squares wide by 72 squares high. (For reference, all the maps in Heroes where 72 x 72)", Font::BIG);
+	else
+	if(le.MousePressRight(buttonLarge)) Dialog::Message("", "Create a map that is 108 squares wide by 108 squares high. (For reference, all the maps in Heroes where 72 x 72)", Font::BIG);
+	else
+	if(le.MousePressRight(buttonXLarge)) Dialog::Message("", "Create a map that is 144 squares wide by 144 squares high. (For reference, all the maps in Heroes where 72 x 72)", Font::BIG);
+	else
+	if(le.MousePressRight(buttonCancel)) Dialog::Message("", "Cancel back to the main menu.", Font::BIG);
     }
 
     return MAINMENU;

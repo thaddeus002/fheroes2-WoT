@@ -82,6 +82,16 @@ Game::menu_t Dialog::FileOptions(void)
         if(le.MouseClickLeft(buttonSave)){ result = Game::SAVEGAME; break; }
         if(le.MouseClickLeft(buttonQuit)){ result = Game::QUITGAME; break; }
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = Game::CANCEL; break; }
+
+	if(le.MousePressRight(buttonNew)) Dialog::Message("", "Start a single or multi-player game.", Font::BIG);
+	else
+	if(le.MousePressRight(buttonLoad)) Dialog::Message("", "Load a previously saved game.", Font::BIG);
+	else
+	if(le.MousePressRight(buttonSave)) Dialog::Message("", "Save the current game.", Font::BIG);
+	else
+	if(le.MousePressRight(buttonQuit)) Dialog::Message("", "Quit out of Heroes of Might and Magick II.", Font::BIG);
+	else
+	if(le.MousePressRight(buttonCancel)) Dialog::Message("", "Exit this menu without doing anything.", Font::BIG);
     }
 
     // restore background

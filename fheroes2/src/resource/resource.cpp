@@ -22,7 +22,7 @@
 #include "error.h"
 #include "resource.h"
 
-Resource::funds_t::funds_t(const resource_t & rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
+Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
 {
     switch(rs)
     {
@@ -33,6 +33,8 @@ Resource::funds_t::funds_t(const resource_t & rs, u32 count) : wood(0), mercury(
 	case GEMS:	gems = count;	break;
 	case CRYSTAL:	crystal = count;break;
 	case GOLD:	gold = count;	break;
+
+	default:	Error::Warning("Resource::funds_t::funds_t: unknown resource, ", rs); break;
     }
 }
 
@@ -212,6 +214,7 @@ const std::string & Resource::String(resource_t resource)
     return stringWood;
 }
 
+/*
 Resource::resource_t Resource::FromMP2(u8 index)
 {
     switch(index){ 
@@ -229,6 +232,7 @@ Resource::resource_t Resource::FromMP2(u8 index)
     
     return Resource::WOOD;
 }
+*/
 
 /* return index sprite objnrsrc.icn */
 u8 Resource::GetIndexSprite(Resource::resource_t resource)

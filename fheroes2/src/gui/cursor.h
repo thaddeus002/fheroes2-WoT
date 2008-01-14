@@ -139,7 +139,7 @@ namespace Cursor
     bool Visible(void);
 
     themes_t Get(void);
-    void Set(themes_t cursor);
+    bool Set(themes_t cursor);
     
     const Rect & GetRect(void);
 };

@@ -46,7 +46,8 @@ namespace Game
 	STARTGAME,
 	SAVEGAME,
 	EDITNEWMAP,
-	EDITLOADMAP
+	EDITLOADMAP,
+	EDITSTART
     } menu_t;
 
     typedef enum { HEROES, CASTLE, BOAT } focus_t;
@@ -81,6 +82,7 @@ namespace Game
 	Game::menu_t MainMenu(void);
 	Game::menu_t NewMaps(void);
 	Game::menu_t LoadMaps(void);
+	Game::menu_t StartGame(void);
     };
 };
 

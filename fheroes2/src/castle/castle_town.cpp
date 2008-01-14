@@ -464,8 +464,8 @@ Castle::building_t Castle::OpenTown(void)
     // dwelling 6
     dst_pt.x = cur_pt.x + 294;
     dst_pt.y = cur_pt.y + 78;
-    bool allowUpgrade6 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER6)) && building & DWELLING_UPGRADE6;
-    bool allowUpgrade7 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_UPGRADE6)) && building & DWELLING_MONSTER6;
+    bool allowUpgrade6 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER6)) && building & DWELLING_MONSTER6;
+    bool allowUpgrade7 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_UPGRADE6)) && building & DWELLING_UPGRADE6;
     index = allowUpgrade7 ? 30 :
            (allowUpgrade6 ? 29 : 24);
     display.Blit(AGG::GetICN(message, index), dst_pt);

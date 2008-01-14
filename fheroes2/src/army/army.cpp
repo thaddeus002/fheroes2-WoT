@@ -61,7 +61,24 @@ Army::size_t Army::GetSize(u16 count)
     return FEW;
 }
 
+Army::Troops::Troops(const Army::Troops & troops) : monster(troops.Monster()), count(troops.Count()), master_skill(NULL)
+{
+}
+
+Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
+{
+    monster = troops.Monster();
+    count = troops.Count();
+
+    return *this;
+}
+
+bool Army::Troops::isValid(void) const
+{
+    return Monster::UNKNOWN > monster && count;
+}
+
 bool Army::isValid(const Troops & army)
 {
-    return Monster::UNKNOWN > army.monster && army.count;
+    return army.isValid();
 }

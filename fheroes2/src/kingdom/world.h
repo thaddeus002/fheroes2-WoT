@@ -50,6 +50,7 @@ public:
     ~World(){ FreeOldMaps(); };
 
     void LoadMaps(const std::string &filename);
+    void NewMaps(Maps::mapsize_t w, Maps::mapsize_t h);
 
     static World & GetWorld(void);
 

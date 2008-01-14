@@ -89,7 +89,6 @@ namespace H2Config {
     void SetHumanColor(Color::color_t color);
     void SetKingdomColors(u8 colors);
     void SetAllowChangeColors(u8 colors);
-    void SetKingdomCount(u8 count);
     void SetKingdomRace(Color::color_t color, Race::race_t race);
     void SetAllowChangeRaces(u8 races);
     void SetFileMaps(const std::string & file);

@@ -109,6 +109,11 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 
     army[0].Set(monster.monster, monster.grown);
 
+    // set master primary skill to army
+    std::vector<Army::Troops>::iterator it1 = army.begin();
+    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) (*it1).SetMasterSkill(this);
+
     // set debug param
     if(H2Config::Debug() && SANDYSANDY == heroes)
     {
@@ -116,8 +121,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 
         army[1].Set(Monster::RED_DRAGON, 3);
 
-	// path finding audit
-	//secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
+	secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
 	secondary_skills.Level(Skill::LOGISTICS, Skill::Level::BASIC);
 	secondary_skills.Level(Skill::MYSTICISM, Skill::Level::BASIC);
 	secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
@@ -156,52 +160,52 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
         ++ptr8;
 
         // monster1
-        army[0].monster = Monster::Monster(*ptr8);
+        army[0].SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster2
-        army[1].monster = Monster::Monster(*ptr8);
+        army[1].SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster3
-        army[2].monster = Monster::Monster(*ptr8);
+        army[2].SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster4
-        army[3].monster = Monster::Monster(*ptr8);
+        army[3].SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster5
-        army[4].monster = Monster::Monster(*ptr8);
+        army[4].SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // count1
         LOAD16(ptr8, byte16);
-        army[0].count = byte16;
+        army[0].SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count2
         LOAD16(ptr8, byte16);
-        army[1].count = byte16;
+        army[1].SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count3
         LOAD16(ptr8, byte16);
-        army[2].count = byte16;
+        army[2].SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count4
         LOAD16(ptr8, byte16);
-        army[3].count = byte16;
+        army[3].SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count5
         LOAD16(ptr8, byte16);
-        army[4].count = byte16;
+        army[4].SetCount(byte16);
         ++ptr8;
         ++ptr8;
     }
@@ -511,32 +515,6 @@ u16 Heroes::GetMaxMovePoints(void) const
 
 Morale::morale_t Heroes::GetMorale(void) const
 {
-/* FIXME:
-[-] Knight bonus +1 ???
-[-] Watering hole visited +1 ???
-[+] Buoy visited +1
-[+] Oasis visited +1
-[+] Temple visited +2
-[+] Graveyard robber -1
-[+] Shipwreck robber -1
-[+] Derelict ship robber -1
-[+] Barbarian Coliseum +2
-[+] Tavern +1
-[+] All %s troops +1
-[+] Troops of 3 alignments -1
-[+] Troops of 4 alignments -2
-[+] Troops of 5 alignments -3
-[+] Medal of Valor +1
-[+] Medal of Courage +1
-[+] Medal of Honor +1
-[+] Medal of Distinction +1
-[+] Fizbin of Misfortune -2
-[+] Some undead in group -1
-[+] Basic Leadership +1
-[+] Advanced Leadership +2
-[+] Expert Leadership +3
-*/
-
     s8 result = morale;
 
     // bonus artifact
@@ -610,8 +588,8 @@ Morale::morale_t Heroes::GetMorale(void) const
     u8 count_wzrd = 0;
     u8 count_necr = 0;
     u8 count_bomg = 0;
-    for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).monster)
-	switch(Monster::GetRace((*it1_army).monster))
+    for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).Monster())
+	switch(Monster::GetRace((*it1_army).Monster()))
 	{
 	    case Race::KNGT: ++count_kngt; break;
 	    case Race::BARB: ++count_barb; break;
@@ -633,7 +611,7 @@ Morale::morale_t Heroes::GetMorale(void) const
     switch(count)
     {
 	case 0: break;
-	case 1: result += 1; break;
+	case 1: result += (count_necr ? 0 : 1); break;
 	case 3: result -= 1; break;
 	case 4: result -= 2; break;
 	// over 4 different race
@@ -679,6 +657,34 @@ Luck::luck_t Heroes::GetLuck(void) const
             default:
 		break;
     	}
+
+    // bonus luck
+    switch(GetLevelSkill(Skill::LUCK))
+    {
+        case Skill::Level::EXPERT:
+            result += 3;
+            break;
+
+        case Skill::Level::ADVANCED:
+            result += 2;
+            break;
+
+        case Skill::Level::BASIC:
+            result += 1;
+            break;
+
+        default:
+            break;
+    }
+
+    // object visited
+    if(isVisited(MP2::OBJ_FAERIERING)) ++result;
+    if(isVisited(MP2::OBJ_FOUNTAIN)) ++result;
+
+    // bonus in castle and sorceress rainbow
+    const Castle* castle = inCastle();
+    if(castle && Race::SORC == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC)) result += 2;
+
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else
@@ -757,6 +763,13 @@ void Heroes::ActionNewMonth(void)
 {
     // remove month visit object
     std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isMonthLife);
+}
+
+
+void Heroes::ActionAfterBattle(void)
+{
+    // remove month visit object
+    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isBattleLife);
 }
 
 u16 Heroes::FindPath(u16 dst_index)
@@ -852,6 +865,7 @@ void Heroes::SetVisited(const u32 index)
     // valid
     if(Maps::Object::isDayLife(object) ||
 	Maps::Object::isWeekLife(object) ||
-	Maps::Object::isMonthLife(object))
+	Maps::Object::isMonthLife(object) ||
+	Maps::Object::isBattleLife(object))
 	    visit_object.push_front(Maps::VisitIndexObject(index, object));
 }

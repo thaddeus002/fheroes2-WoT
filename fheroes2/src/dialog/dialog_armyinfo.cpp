@@ -38,14 +38,15 @@
 #include "skill.h"
 #include "dialog.h"
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primary *skills, bool dismiss, bool quickshow)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow)
 {
     const std::string viewarmy(H2Config::EvilInterface() ? "VIEWARME.ICN" : "VIEWARMY.ICN");
 
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
 
-    const Monster::stats_t monster = Monster::GetStats(army.monster);
-    
+    const Monster::stats_t monster = Monster::GetStats(army.Monster());
+    const Skill::Primary *skills = army.MasterSkill();
+
     Rect pos_rt;
 
     pos_rt.x = (display.w() - sprite_dialog.w()) / 2;
@@ -68,7 +69,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
     Text(monster.name, Font::BIG, dst_pt);
     
     // count
-    String::AddInt(message, army.count);
+    String::AddInt(message, army.Count());
     dst_pt.x = pos_rt.x + 140 - Text::width(message, Font::BIG) / 2;
     dst_pt.y = pos_rt.y + 225;
     Text(message, Font::BIG, dst_pt);
@@ -200,7 +201,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, const Skill::Primar
     {
 	if(monster.monster != Monster::Upgrade(monster.monster))
 	{
-	    upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * army.count) <= world.GetMyKingdom().GetFundsResource();
+	    upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * army.Count()) <= world.GetMyKingdom().GetFundsResource();
 
 	    if(!upgrade)
 	    {

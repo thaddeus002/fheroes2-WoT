@@ -27,6 +27,7 @@
 #include "dialog.h"
 #include "monster.h"
 #include "rect.h"
+#include "skill.h"
 #include "spritecursor.h"
 #include "gamedefs.h"
 
@@ -54,12 +55,25 @@ namespace Army
     class Troops
     {
     public:
-	Troops(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0) : monster(m), count(c){};
+	Troops(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0) : monster(m), count(c), master_skill(NULL){};
+	Troops(const Troops & troops);
 
         void Set(Monster::monster_t m, u16 c){ monster = m; count = c; };
+        void SetMonster(Monster::monster_t m){ monster = m; };
+        void SetCount(u16 c){ count = c; };
+        void SetMasterSkill(const Skill::Primary* p){ master_skill = p; };
+	Troops & operator= (const Troops & troops);
 
+        bool isValid(void) const;
+
+        Monster::monster_t Monster(void) const{ return monster; };
+        u16 Count(void) const{ return count; };
+        const Skill::Primary* MasterSkill(void) const{ return master_skill; };
+
+    private:
         Monster::monster_t	monster;
         u16			count;
+        const Skill::Primary*	master_skill;
     };
 
     bool isValid(const Troops & army);

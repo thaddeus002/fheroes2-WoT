@@ -39,7 +39,6 @@ public:
     const std::string & GetName(void) const{ return name; };
     const std::string & GetDescription(void) const{ return description; };
     u8 GetKingdomColors(void) const{ return kingdomColors; };
-    u8 GetKingdomCount(void) const{ return kingdomCount; };
     u8 GetAllowColors(void) const{ return allowColors; };
     u8 GetKingdomRace(Color::color_t color) const;
     mapsize_t GetSizeMaps(void) const{ return sizeMaps; };
@@ -55,7 +54,6 @@ private:
     u8 kingdomColors;
     u8 allowColors;
     u8 rndColors;
-    u8 kingdomCount;
     u8 conditionsWins;
     u8 conditionsLoss;
     bool withHeroes;

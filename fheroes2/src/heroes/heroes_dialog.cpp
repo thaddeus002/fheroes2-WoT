@@ -526,14 +526,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		if(selectHeroesTroops.isSelected() && Army::isValid(army[ii]) && selectHeroesTroops.GetCursorIndex() == ii)
 		{
 		    Army::Troops & select_troops = army[ii];
-		    const Monster::monster_t select_monster = select_troops.monster;
-		    const u16 select_count = select_troops.count;
+		    const Monster::monster_t select_monster = select_troops.Monster();
+		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-                    switch(Dialog::ArmyInfo(army[ii], this, readonly? false : (1 == GetCountArmy() ? false : true), false))
+                    switch(Dialog::ArmyInfo(army[ii], readonly? false : (1 == GetCountArmy() ? false : true), false))
 		    {
 			case Dialog::UPGRADE:
-			    select_troops.monster = Monster::Upgrade(select_monster);
+			    select_troops.SetMonster(Monster::Upgrade(select_monster));
 		            kingdom.OddFundsResource(PaymentConditions::UpgradeMonster(select_monster) * select_count);
 			    break;
 
@@ -554,14 +554,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    {
 			// from castle or heroes
 			Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
-			const Monster::monster_t select_monster = select_troops.monster;
-			const u16 select_count = select_troops.count;
+			const Monster::monster_t select_monster = select_troops.Monster();
+			const u16 select_count = select_troops.Count();
 
 			// change or combine army
 			if(Army::isValid(army[ii]))
 			{
 			    // change
-			    if(army[ii].monster != select_monster)
+			    if(army[ii].Monster() != select_monster)
 			    {
 				select_troops = army[ii];
 				army[ii].Set(select_monster, select_count);
@@ -569,7 +569,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 			    // combine
 			    else
                     	    {
-                        	army[ii].count = army[ii].count + select_count;
+                        	army[ii].SetCount(army[ii].Count() + select_count);
 
                         	select_troops.Set(Monster::UNKNOWN, 0);
                     	    }
@@ -625,11 +625,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 		Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
 
-		if(const u16 redistr_count = Dialog::SelectCount(select_troops.count))
+		if(const u16 redistr_count = Dialog::SelectCount(select_troops.Count()))
 		{
-		    army[ii].Set(select_troops.monster, redistr_count);
+		    army[ii].Set(select_troops.Monster(), redistr_count);
 		
-		    select_troops.count = select_troops.count - redistr_count;
+		    select_troops.SetCount(select_troops.Count() - redistr_count);
 		}
 
 		Cursor::Hide();
@@ -646,7 +646,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    {
 		Cursor::Hide();
 
-		Dialog::ArmyInfo(army[ii], this, readonly ? false : (1 == GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == GetCountArmy() ? false : true), true);
 
 		Cursor::Show();
 		display.Flip();
@@ -813,18 +813,18 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    for(u8 ii = 0; ii < coordsHeroesTroops.size(); ++ii) if(le.MouseCursor(coordsHeroesTroops[ii]))
 	    {
 		if(selectHeroesTroops.isSelected() && ii == heroes_select)
-		    statusBar.ShowMessage("View " + Monster::String(army[ii].monster));
+		    statusBar.ShowMessage("View " + Monster::String(army[ii].Monster()));
 		else
 		if(selectHeroesTroops.isSelected() && Army::isValid(army[ii]) && Army::isValid(army[heroes_select]))
-		    army[heroes_select].monster == army[ii].monster ?
-		    	statusBar.ShowMessage("Combine " + Monster::String(army[ii].monster) + " armies") :
-			statusBar.ShowMessage("Exchange " + Monster::String(army[ii].monster) + " with " + Monster::String(army[heroes_select].monster));
+		    army[heroes_select].Monster() == army[ii].Monster() ?
+		    	statusBar.ShowMessage("Combine " + Monster::String(army[ii].Monster()) + " armies") :
+			statusBar.ShowMessage("Exchange " + Monster::String(army[ii].Monster()) + " with " + Monster::String(army[heroes_select].Monster()));
 		else
 		if(selectHeroesTroops.isSelected())
-		    statusBar.ShowMessage("Move and right click Redistribute " + Monster::String(army[heroes_select].monster));
+		    statusBar.ShowMessage("Move and right click Redistribute " + Monster::String(army[heroes_select].Monster()));
 		else
 		if(Army::isValid(army[ii]))
-		    statusBar.ShowMessage("Select " + Monster::String(army[ii].monster));
+		    statusBar.ShowMessage("Select " + Monster::String(army[ii].Monster()));
 		else
 		    statusBar.ShowMessage("Empty");
 	    }

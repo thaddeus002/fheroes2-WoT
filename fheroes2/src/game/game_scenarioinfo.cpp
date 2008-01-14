@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <bitset>
 #include <map>
 #include <vector>
 #include <string>
@@ -358,7 +359,8 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors, std::vector<Rect> & coo
     Text("Opponents:", Font::BIG, 368, 210);
 
     // draw opponents
-    u8 count = H2Config::GetKingdomCount();
+    const std::bitset<8> colors(H2Config::GetKingdomColors());
+    const u8 count = colors.count();
     u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
@@ -673,7 +675,6 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
 
 void Scenario::SetCurrentSettings(const Maps::FileInfo &maps)
 {
-    H2Config::SetKingdomCount(maps.GetKingdomCount());
     H2Config::SetKingdomColors(maps.GetKingdomColors());
     H2Config::SetAllowChangeColors(maps.GetAllowColors());
     H2Config::SetAllowChangeRaces(0);
@@ -729,7 +730,8 @@ void Scenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 
     for(int ii = 0; ii < count; ++ii){
 
 	// sprite count
-	index = 19 + (*it_head).GetKingdomCount();
+	const std::bitset<8> colors((*it_head).GetKingdomColors());
+	index = 19 + colors.count();
 	const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
 	display.Blit(spriteCount, x, y);
 
@@ -779,7 +781,8 @@ void Scenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_cu
     u8 index = 0;
 
     // sprite count
-    index = 19 + (*it_current).GetKingdomCount();
+    const std::bitset<8> colors((*it_current).GetKingdomColors());
+    index = 19 + colors.count();
     const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
     display.Blit(spriteCount, x, y);
 

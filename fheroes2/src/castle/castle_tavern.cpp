@@ -96,8 +96,10 @@ void Castle::OpenTavern(void)
 
         if(le.MouseClickLeft(buttonYes) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
 
-	animeBeer.DrawSprite(ticket);
-	
+
+        // animation
+	if(animeBeer.DrawSprite(ticket)) display.Flip();
+
 	++ticket;
     }
 }

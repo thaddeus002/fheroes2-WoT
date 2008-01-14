@@ -23,9 +23,9 @@
 namespace Portrait
 {
     typedef enum { BIG, MEDIUM, SMALL } size_t;
-    
-    const Surface & Hero(const Heroes::heroes_t & hero, const Portrait::size_t & sz);
-    const Surface & Captain(const Race::race_t & rs, const Portrait::size_t & sz);
+
+    const Surface & Hero(const Heroes::heroes_t hero, const Portrait::size_t sz);
+    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
 };
 
 #endif

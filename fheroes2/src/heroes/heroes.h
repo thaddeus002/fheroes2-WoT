@@ -113,7 +113,6 @@ public:
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
     u8 GetCountArmy(void) const;
 
-    //const Skill::Primary & GetPrimarySkill(void) const{ return primary_skills; };
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
@@ -134,12 +133,14 @@ public:
     u8 GetManaIndexSprite(void) const;
 
     Dialog::answer_t OpenDialog(bool readonly = false);
+    void MeetingDialog(Heroes & heroes2);
 
     void Recrut(const Castle & castle);
 
     void ActionNewDay(void);
     void ActionNewWeek(void);
     void ActionNewMonth(void);
+    void ActionAfterBattle(void);
 
     const Route & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);

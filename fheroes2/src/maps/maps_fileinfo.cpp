@@ -203,10 +203,9 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
     fd.read(&byte8, 1);
     if(byte8) rndColors |= Color::PURPLE;
 
-    // count heroes
-    fd.seekg(0x1A, std::ios_base::beg);
-    fd.read(&byte8, 1);
-    kingdomCount = byte8;
+    // kingdom count
+    // fd.seekg(0x1A, std::ios_base::beg);
+    // fd.read(&byte8, 1);
 
     // wins
     fd.seekg(0x1D, std::ios_base::beg);

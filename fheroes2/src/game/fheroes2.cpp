@@ -80,8 +80,6 @@ int main(int argc, char **argv)
 	    {
 		const std::string & cmd_config = cmd.GetValue('c');
 
-		chdir(dirname(const_cast<char *>(cmd_config.c_str())));
-
 		std::cout << "config: " << cmd_config << (H2Config::Load(cmd_config) ? " load" : " not found") << std::endl;
 	    }
 
@@ -183,6 +181,7 @@ int main(int argc, char **argv)
 	    		case Game::MAINMENU:       rs = Game::Editor::MainMenu();	break;
 	    		case Game::EDITNEWMAP:     rs = Game::Editor::NewMaps();	break;
 	    		case Game::EDITLOADMAP:    rs = Game::Editor::LoadMaps();       break;
+	    		case Game::EDITSTART:      rs = Game::Editor::StartGame();      break;
 
 			default: break;
 		    }

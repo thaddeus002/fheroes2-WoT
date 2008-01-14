@@ -38,13 +38,25 @@ namespace Maps
 	static bool isDayLife(const VisitIndexObject & visit);
 	static bool isWeekLife(const VisitIndexObject & visit);
 	static bool isMonthLife(const VisitIndexObject & visit);
+	static bool isBattleLife(const VisitIndexObject & visit);
     };
 
-    namespace Object
+    class Object
     {
-	bool isDayLife(const MP2::object_t obj);
-	bool isWeekLife(const MP2::object_t obj);
-	bool isMonthLife(const MP2::object_t obj);
+	public:
+	Object();
+	Object(const MP2::object_t obj);
+
+	static bool isDayLife(const MP2::object_t obj);
+	static bool isWeekLife(const MP2::object_t obj);
+	static bool isMonthLife(const MP2::object_t obj);
+	static bool isBattleLife(const MP2::object_t obj);
+
+	private:
+	MP2::object_t	type;
+	const u32	id;
+
+	static u32	uniq;
     };
 };
 

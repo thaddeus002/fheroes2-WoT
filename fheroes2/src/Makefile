@@ -4,9 +4,9 @@
 
 TARGET := fheroes2
 LIBS := ./engine/libengine.a $(shell sdl-config --libs)
-CFLAGS := -O0 -g -Wall $(shell sdl-config --cflags) -I ./engine
+#CFLAGS := -O0 -g -Wall $(shell sdl-config --cflags) -I ./engine
 #CFLAGS := -O2 -Wall $(shell sdl-config --cflags) -I ./engine -DBUILD_RELEASE
-#CFLAGS := -O2 -Wall $(shell sdl-config --cflags) -I ./engine
+CFLAGS := -O2 -Wall $(shell sdl-config --cflags) -I ./engine
 
 CC := g++
 

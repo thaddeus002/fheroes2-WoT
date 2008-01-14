@@ -22,6 +22,16 @@
 #include "maps_tiles.h"
 #include "object.h"
 
+u32 Maps::Object::uniq = 0;
+
+Maps::Object::Object() : type(MP2::OBJ_ZERO), id(++uniq)
+{
+}
+
+Maps::Object::Object(const MP2::object_t obj) : type(obj), id(++uniq)
+{
+}
+
 bool Maps::Object::isDayLife(const MP2::object_t obj)
 {
     // FIXME: list day object life
@@ -55,6 +65,21 @@ bool Maps::Object::isMonthLife(const MP2::object_t obj)
     return false;
 }
 
+bool Maps::Object::isBattleLife(const MP2::object_t obj)
+{
+    // FIXME: list month object life
+    switch(obj)
+    {
+	case MP2::OBJ_IDOL:
+	case MP2::OBJ_FOUNTAIN:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
 bool Maps::VisitIndexObject::isDayLife(const VisitIndexObject & visit)
 {
     return Maps::Object::isDayLife(visit.second);
@@ -68,4 +93,9 @@ bool Maps::VisitIndexObject::isWeekLife(const VisitIndexObject & visit)
 bool Maps::VisitIndexObject::isMonthLife(const VisitIndexObject & visit)
 {
     return Maps::Object::isMonthLife(visit.second);
+}
+
+bool Maps::VisitIndexObject::isBattleLife(const VisitIndexObject & visit)
+{
+    return Maps::Object::isBattleLife(visit.second);
 }

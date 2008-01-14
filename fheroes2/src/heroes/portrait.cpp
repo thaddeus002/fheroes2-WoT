@@ -26,7 +26,7 @@
 #include "surface.h"
 #include "portrait.h"
 
-const Surface & Portrait::Captain(const Race::race_t & rc, const Portrait::size_t & sz)
+const Surface & Portrait::Captain(const Race::race_t rc, const Portrait::size_t sz)
 {
     switch(sz)
     {
@@ -63,7 +63,7 @@ const Surface & Portrait::Captain(const Race::race_t & rc, const Portrait::size_
     return AGG::GetICN("PORT0090.ICN", 0);
 }
 
-const Surface & Portrait::Hero(const Heroes::heroes_t & hero, const Portrait::size_t & sz)
+const Surface & Portrait::Hero(const Heroes::heroes_t hero, const Portrait::size_t sz)
 {
     switch(sz)
     {

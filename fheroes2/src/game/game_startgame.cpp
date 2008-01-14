@@ -74,11 +74,11 @@ Game::menu_t Game::StartGame(void)
     const std::string &icnscroll = ( H2Config::EvilInterface() ? "SCROLLE.ICN" : "SCROLL.ICN" );
     const std::string &icnbtn = ( H2Config::EvilInterface() ? "ADVEBTNS.ICN" : "ADVBTNS.ICN" );
 
-    Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
-    Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
-    Rect areaScrollTop(BORDERWIDTH / 2, 0, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
+    const Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
+    const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
+    const Rect areaScrollTop(BORDERWIDTH / 2, 0, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    const Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
     Point pt_stw, pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
 
@@ -359,7 +359,7 @@ Game::menu_t Game::StartGame(void)
 	    const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
 	    const Castle * castle = NULL;
 	    const Heroes * heroes = NULL;
-	    u8 object = tile.GetObject();
+	    const u8 object = tile.GetObject();
 
 	    switch(globalfocus.type)
 	    {
@@ -432,6 +432,8 @@ Game::menu_t Game::StartGame(void)
 			    else
 			    if(le.MousePressRight(tile_pos))
 			    {
+				if(H2Config::Debug()) tile.DebugInfo(index_maps);
+
 				Monster::monster_t monster = Monster::Monster(tile);
 
 				if(Monster::UNKNOWN > monster) Dialog::QuickInfo(Army::String(Army::GetSize(Monster::GetSize(tile))) + " of " + Monster::String(monster));
@@ -473,6 +475,8 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -522,6 +526,8 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -574,6 +580,8 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -623,6 +631,8 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -686,12 +696,15 @@ Game::menu_t Game::StartGame(void)
 
 						// FIXME: hero meeting dialog
 				    		Error::Verbose("Game: FIXME: hero meeting other hero");
+				    		const_cast<Heroes &>(*heroes).MeetingDialog(const_cast<Heroes &>(*heroes2));
 					    }
 					}
 				    }
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*heroes2);
 				    }
 				}
@@ -741,6 +754,8 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*heroes2);
 				    }
 				}
@@ -993,6 +1008,8 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -1003,6 +1020,8 @@ Game::menu_t Game::StartGame(void)
 
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -1089,6 +1108,8 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -1099,6 +1120,8 @@ Game::menu_t Game::StartGame(void)
 
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*castle);
 				    }
 				}
@@ -1153,6 +1176,8 @@ Game::menu_t Game::StartGame(void)
         			    else
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*heroes);
 				    }
         			}
@@ -1162,6 +1187,8 @@ Game::menu_t Game::StartGame(void)
 
 				    if(le.MousePressRight(tile_pos))
 				    {
+					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+					
 					Dialog::QuickInfo(*heroes);
 				    }
         			}
@@ -1673,6 +1700,7 @@ void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 	
 	    case Dialog::DISMISS:
 	    {
+		Error::Verbose("Game::OpenHeroes: FIXME dismiss hero.");
 		//Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 		//const Maps::Tiles & tile = world.GetTiles((*hero).GetCenter());
 

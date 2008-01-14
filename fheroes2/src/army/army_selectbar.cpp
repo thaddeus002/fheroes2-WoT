@@ -49,7 +49,7 @@ void Army::SelectBar::Redraw(void)
     for(u8 ii = 0; ii < army.size(); ++ii)
 	if(Army::isValid(army.at(ii)))
 	{
-	    Monster::monster_t monster = army.at(ii).monster;
+	    Monster::monster_t monster = army.at(ii).Monster();
 
 	    u8 index_sprite = 0xFF;
 
@@ -87,7 +87,7 @@ void Army::SelectBar::Redraw(void)
 
 	    // draw count
 	    str.clear();
-	    String::AddInt(str, army.at(ii).count);
+	    String::AddInt(str, army.at(ii).Count());
 	    dst_pt.x = pos_pt.x + (monster_back.w() + step) * ii + 68  - Text::width(str, Font::SMALL) / 2;
 	    dst_pt.y = pos_pt.y + 80;
 	    Text(str, Font::SMALL, dst_pt);

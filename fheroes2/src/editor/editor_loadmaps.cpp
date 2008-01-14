@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <bitset>
 #include <map>
 #include <vector>
 #include <string>
@@ -356,7 +357,6 @@ Game::menu_t Game::Editor::LoadMaps(void)
 
 void EditScenario::SetCurrentSettings(const Maps::FileInfo &maps)
 {
-    H2Config::SetKingdomCount(maps.GetKingdomCount());
     H2Config::SetKingdomColors(maps.GetKingdomColors());
     H2Config::SetAllowChangeColors(maps.GetAllowColors());
     H2Config::SetAllowChangeRaces(0);
@@ -412,7 +412,8 @@ void EditScenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top,
     for(int ii = 0; ii < count; ++ii){
 
 	// sprite count
-	index = 19 + (*it_head).GetKingdomCount();
+	const std::bitset<8> colors((*it_head).GetKingdomColors());
+	index = 19 + colors.count();
 	const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
 	display.Blit(spriteCount, x, y);
 
@@ -462,7 +463,8 @@ void EditScenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &i
     u8 index = 0;
 
     // sprite count
-    index = 19 + (*it_current).GetKingdomCount();
+    const std::bitset<8> colors((*it_current).GetKingdomColors());
+    index = 19 + colors.count();
     const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
     display.Blit(spriteCount, x, y);
 

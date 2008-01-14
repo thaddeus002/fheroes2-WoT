@@ -112,52 +112,52 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	++ptr8;
 	
 	// monster1
-	army[0].monster = Monster::Monster(*ptr8);
+	army[0].SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster2
-	army[1].monster = Monster::Monster(*ptr8);
+	army[1].SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster3
-	army[2].monster = Monster::Monster(*ptr8);
+	army[2].SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster4
-	army[3].monster = Monster::Monster(*ptr8);
+	army[3].SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster5
-	army[4].monster = Monster::Monster(*ptr8);
+	army[4].SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// count1
 	LOAD16(ptr8, byte16);
-	army[0].count = byte16;
+	army[0].SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count2
 	LOAD16(ptr8, byte16);
-	army[1].count = byte16;
+	army[1].SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count3
 	LOAD16(ptr8, byte16);
-	army[2].count = byte16;
+	army[2].SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count4
 	LOAD16(ptr8, byte16);
-	army[3].count = byte16;
+	army[3].SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count5
 	LOAD16(ptr8, byte16);
-	army[4].count = byte16;
+	army[4].SetCount(byte16);
 	++ptr8;
 	++ptr8;
     }
@@ -211,15 +211,12 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	switch(H2Config::GetGameDifficulty())
 	{
     	    case Difficulty::EASY:
-        	army[0].monster = mon1.monster;
-        	army[0].count = mon1.grown * 2;
-        	army[1].monster = mon2.monster;
-        	army[1].count = mon2.grown * 2;
+        	army[0].Set(mon1.monster, mon1.grown * 2);
+        	army[1].Set(mon2.monster, mon2.grown * 2);
         	break;
 
     	    case Difficulty::NORMAL:
-        	army[0].monster = mon1.monster;
-        	army[0].count = mon1.grown;
+        	army[0].Set(mon1.monster, mon1.grown);
         	break;
 
     	    case Difficulty::HARD:
@@ -250,8 +247,13 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     
     present_boat = false;
 
+    // set master primary skill to army
+    std::vector<Army::Troops>::iterator it1 = army.begin();
+    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) (*it1).SetMasterSkill(&captain);
+
     // init captain
-    captain.SetRace(race);
+    if(building & BUILD_CAPTAIN) captain.SetRace(race);
 
     // remove tavern from necromancer castle
     if(Race::NECR == race)	building &= ~BUILD_TAVERN;
@@ -766,7 +768,7 @@ bool Castle::RecrutMonster(building_t dw, u16 count)
     // find free cell
     u8 num_cell = CASTLEMAXARMY;
     for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
-	if(ms == army[ii].monster || 0 == army[ii].count){ num_cell = ii; break; }
+	if(ms == army[ii].Monster() || 0 == army[ii].Count()){ num_cell = ii; break; }
 
     // not found
     if(CASTLEMAXARMY <= num_cell) return false;
@@ -779,7 +781,7 @@ bool Castle::RecrutMonster(building_t dw, u16 count)
 
     kingdom.OddFundsResource(paymentCosts);
     
-    army[num_cell].Set(ms, army[num_cell].count + count);
+    army[num_cell].Set(ms, army[num_cell].Count() + count);
 
     dwelling[dw_index] -= count;
 
