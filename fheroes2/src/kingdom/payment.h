@@ -29,7 +29,7 @@ class Rect;
 
 #define RATE_DIFFERENCE_UPGRADE		2
 
-#define RECRUT_HEROES_GOLD		2500
+#define RECRUIT_HEROES_GOLD		2500
 
 // profit
 #define INCOME_CASTLE_GOLD              1000

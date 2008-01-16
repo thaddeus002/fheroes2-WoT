@@ -706,7 +706,7 @@ bool Castle::AllowBuyHero(void)
     return true;
 }
 
-void Castle::RecrutHero(const Heroes::heroes_t hero)
+void Castle::RecruitHero(const Heroes::heroes_t hero)
 {
     if(! AllowBuyHero()) return;
 
@@ -719,15 +719,15 @@ void Castle::RecrutHero(const Heroes::heroes_t hero)
     Heroes & heroes = world.GetHeroes(hero);
 
     heroes.SetCenter(GetCenter());
-    heroes.Recrut(*this);
+    heroes.Recruit(*this);
 
     kingdom.AddHeroes(&heroes);
     
     castle_heroes = &heroes;
 }
 
-/* recrut monster from building to castle army */
-bool Castle::RecrutMonster(building_t dw, u16 count)
+/* recruit monster from building to castle army */
+bool Castle::RecruitMonster(building_t dw, u16 count)
 {
     Monster::monster_t ms = Monster::UNKNOWN;
 

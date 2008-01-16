@@ -29,10 +29,24 @@ public:
     s16 x;
     s16 y;
 
-    Point(int px = -1, int py = -1);
+    Point(s16 px = 0, s16 py = 0);
 
     bool operator== (const Point & pt) const;
     bool operator!= (const Point & pt) const;
+};
+
+class Size
+{
+public:
+    u16 w;
+    u16 h;
+
+    Size(u16 sw = 0, u16 sh = 0);
+
+    bool valid(void) const;
+
+    bool operator== (const Size & sz) const;
+    bool operator!= (const Size & sz) const;
 };
 
 class Rect : public SDL_Rect

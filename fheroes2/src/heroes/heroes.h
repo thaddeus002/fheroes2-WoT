@@ -135,7 +135,7 @@ public:
     Dialog::answer_t OpenDialog(bool readonly = false);
     void MeetingDialog(Heroes & heroes2);
 
-    void Recrut(const Castle & castle);
+    void Recruit(const Castle & castle);
 
     void ActionNewDay(void);
     void ActionNewWeek(void);

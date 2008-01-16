@@ -708,7 +708,7 @@ Castle::building_t Castle::OpenTown(void)
     }
 
     // first hero
-    const Heroes::heroes_t & hero1 = world.GetFreeRecrut1();
+    const Heroes::heroes_t & hero1 = world.GetFreeRecruit1();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 260;
     const Rect rectHero1(dst_pt, 102, 93);
@@ -720,7 +720,7 @@ Castle::building_t Castle::OpenTown(void)
     Heroes heroes1 = world.GetHeroes(hero1);
 
     // second hero
-    const Heroes::heroes_t & hero2 = world.GetFreeRecrut2();
+    const Heroes::heroes_t & hero2 = world.GetFreeRecruit2();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 362;
     const Rect rectHero2(dst_pt, 102, 94);
@@ -882,7 +882,7 @@ Castle::building_t Castle::OpenTown(void)
 	if(Heroes::UNKNOWN != hero1 && le.MouseClickLeft(rectHero1) &&
 	    Dialog::OK == DialogBuyHero(hero1))
         {
-    	    RecrutHero(hero1);
+    	    RecruitHero(hero1);
 
     	    return BUILD_NOTHING;
         }
@@ -890,7 +890,7 @@ Castle::building_t Castle::OpenTown(void)
 	if(Heroes::UNKNOWN != hero2 && le.MouseClickLeft(rectHero2) &&
 	    Dialog::OK == DialogBuyHero(hero2))
         {
-    	    RecrutHero(hero2);
+    	    RecruitHero(hero2);
 
 	    return BUILD_NOTHING;
         }
@@ -1056,10 +1056,10 @@ Castle::building_t Castle::OpenTown(void)
 		statusBar.ShowMessage("Cannot afford a Hero");
 	    else
 	    if(le.MouseCursor(rectHero1))
-		statusBar.ShowMessage("Recrut " + heroes1.GetName() + " the " + Race::String(heroes1.GetRace()));
+		statusBar.ShowMessage("Recruit " + heroes1.GetName() + " the " + Race::String(heroes1.GetRace()));
 	    else
 	    if(le.MouseCursor(rectHero2))
-		statusBar.ShowMessage("Recrut " + heroes2.GetName() + " the " + Race::String(heroes2.GetRace()));
+		statusBar.ShowMessage("Recruit " + heroes2.GetName() + " the " + Race::String(heroes2.GetRace()));
 	}
 	else
 	if(le.MouseCursor(rectSpreadArmyFormat))

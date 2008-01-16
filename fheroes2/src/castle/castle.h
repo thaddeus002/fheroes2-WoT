@@ -89,11 +89,11 @@ public:
     bool isBuild(building_t bd) const{ return building & bd; };
     bool HaveNearlySea(void) const;
     bool isHeroesPresent(void);
-    bool RecrutMonster(building_t dw, u16 count);
+    bool RecruitMonster(building_t dw, u16 count);
     bool AllowBuyBuilding(building_t build) const;
     bool AllowBuyHero(void);
 
-    void RecrutHero(const Heroes::heroes_t hero);
+    void RecruitHero(const Heroes::heroes_t hero);
     const Heroes* GetHeroes(void){ return castle_heroes; };
 
     Race::race_t GetRace(void) const{ return race; };

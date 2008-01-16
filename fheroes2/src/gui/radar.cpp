@@ -165,6 +165,8 @@ void Radar::GenerateRealistic(void)
 /* draw radar cursor */
 void Radar::DrawCursor(Surface &surface)
 {
+    if(! surface.valid()) return;
+
     surface.SetColorKey();
 
     u16 width  = surface.w();

@@ -82,7 +82,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
     if(!info_maps.size())
     {
 	H2Config::SetInterface(true);
-	Dialog::Message("Warning", "None maps available!", Font::BIG, Dialog::OK);
+	Dialog::Message("Warning", "No maps available!", Font::BIG, Dialog::OK);
 	return MAINMENU;
     }
 

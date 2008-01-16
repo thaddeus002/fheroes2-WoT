@@ -17,36 +17,88 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPSGROUND_H
-#define H2MAPSGROUND_H
 
-#include <string>
-#include "gamedefs.h"
-#include "skill.h"
+#include "rect.h"
+#include "spritecursor.h"
+#include "error.h"
+#include "maps.h"
+#include "radar.h"
+#include "gamearea.h"
+#include "sizecursor.h"
 
-namespace Maps
+SizeCursor::SizeCursor() : sf(NULL), sc(NULL), hide(false)
 {
-    class Tiles;
+}
 
-    namespace Ground
+SizeCursor::~SizeCursor()
+{
+    if(sc) delete sc;
+    if(sf) delete sf;
+}
+
+void SizeCursor::Hide(void)
+{
+    if(hide || !sc) return;
+
+    sc->Hide();
+}
+
+void SizeCursor::Show(void)
+{
+    if(!hide || !sc) return;
+    
+    sc->Show();
+}
+
+void SizeCursor::Move(const Point & pt)
+{
+    Move(pt.x, pt.y);
+}
+
+void SizeCursor::Move(const u16 px, const u16 py)
+{
+    if(hide || !sc) return;
+
+    sc->Move(px, py);
+}
+
+u8 SizeCursor::w(void)
+{
+    return sf ? sf->w() / TILEWIDTH : 0;
+}
+
+u8 SizeCursor::h(void)
+{
+    return sf ? sf->h() / TILEWIDTH : 0;
+}
+
+void SizeCursor::ModifySize(const Size & sz)
+{
+    ModifySize(sz.w, sz.h);
+}
+
+void SizeCursor::ModifySize(const u8 w, const u8 h)
+{
+    if(w > GameArea::GetRect().w || h > GameArea::GetRect().h)
     {
-	typedef enum
-	{
-	    UNKNOWN	= 0x0000,
-    	    DESERT	= 0x0001,
-    	    SNOW	= 0x0002,
-    	    SWAMP	= 0x0004,
-    	    WASTELAND   = 0x0008,
-    	    BEACH	= 0x0010,
-    	    LAVA	= 0x0020,
-    	    DIRT	= 0x0040,
-    	    GRASS	= 0x0080,
-    	    WATER	= 0x0100,
-	} ground_t;
+    	Error::Warning("SizeCursor::SizeCursor: size out of range.");
+	ModifyCursor(1, 1);
+    }
+    else
+	ModifyCursor(w, h);
+}
 
-	const std::string & String(ground_t ground);
-	u16 GetPenalty(u16 from, u16 to, const Skill::Level::type_t & pathfinding);
-    };
-};
+void SizeCursor::ModifyCursor(const u8 w, const u8 h)
+{
+    if(sf && sc && sf->w() == w && sf->h() == h) return;
 
-#endif
+    if(sc) delete sc;
+    if(sf) delete sf;
+    
+    sf = new Surface(w * TILEWIDTH, h * TILEWIDTH);
+    
+    sf->SetColorKey();
+    Radar::DrawCursor(*sf);
+    
+    sc = new SpriteCursor(*sf);
+}

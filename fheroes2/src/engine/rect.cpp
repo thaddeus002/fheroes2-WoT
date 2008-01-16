@@ -20,7 +20,7 @@
 
 #include "rect.h"
 
-Point::Point(int px, int py) : x(px), y(py)
+Point::Point(s16 px, s16 py) : x(px), y(py)
 {
 }
 
@@ -32,6 +32,25 @@ bool Point::operator== (const Point & pt) const
 bool Point::operator!= (const Point & pt) const
 {
     return !(*this == pt);
+}
+
+Size::Size(u16 sw, u16 sh) : w(sw), h(sh)
+{
+}
+
+bool Size::operator== (const Size & sz) const
+{
+    return (w == sz.w && h == sz.h);
+}
+
+bool Size::operator!= (const Size & sz) const
+{
+    return !(*this == sz);
+}
+
+bool Size::valid(void) const
+{
+    return w & h;
 }
 
 Rect::Rect(s16 rx, s16 ry, u16 rw, u16 rh)

@@ -78,8 +78,8 @@ namespace Dialog
     // redistribute count
     u16 SelectCount(u16 max);
 
-    // recrut monster
-    u16 RecrutMonster(const Monster::monster_t & monster, u16 available);
+    // recruit monster
+    u16 RecruitMonster(const Monster::monster_t & monster, u16 available);
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
 
     // army info

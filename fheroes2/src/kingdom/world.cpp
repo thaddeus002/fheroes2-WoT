@@ -58,8 +58,8 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
     begin_week = true;
     begin_month = true;
 
-    free_recrut_hero1 = Heroes::UNKNOWN;
-    free_recrut_hero2 = Heroes::UNKNOWN;
+    free_recruit_hero1 = Heroes::UNKNOWN;
+    free_recruit_hero2 = Heroes::UNKNOWN;
 
     // playing kingdom
     H2Config::SetKingdomColors(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE);
@@ -178,8 +178,8 @@ void World::LoadMaps(const std::string &filename)
     begin_week = true;
     begin_month = true;
 
-    free_recrut_hero1 = Heroes::UNKNOWN;
-    free_recrut_hero2 = Heroes::UNKNOWN;
+    free_recruit_hero1 = Heroes::UNKNOWN;
+    free_recruit_hero2 = Heroes::UNKNOWN;
 
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -774,7 +774,7 @@ void World::LoadMaps(const std::string &filename)
 		{
 		    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
 
-		    const_cast<Heroes &>(*hero).Recrut(castle);
+		    const_cast<Heroes &>(*hero).Recruit(castle);
 
 		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
 		}
@@ -782,7 +782,7 @@ void World::LoadMaps(const std::string &filename)
 		// place near hero
 		if(const Heroes *hero = GetFreemanHeroes(castle.GetRace()))
 		{
-		    const_cast<Heroes &>(*hero).Recrut(castle);
+		    const_cast<Heroes &>(*hero).Recruit(castle);
 
 		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
 		}
@@ -900,10 +900,10 @@ void World::NextDay(void)
 
 void World::NewWeek(void)
 {
-    // change free recrut hero
+    // change free recruit hero
     const Race::race_t & rc = H2Config::GetKingdomRace(H2Config::GetMyColor());
-    free_recrut_hero1 = GetFreemanHeroes(rc)->GetHeroes();
-    free_recrut_hero2 = GetFreemanHeroes()->GetHeroes();
+    free_recruit_hero1 = GetFreemanHeroes(rc)->GetHeroes();
+    free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
 }
 
 void World::NewMonth(void)
@@ -994,27 +994,27 @@ void World::FreeOldMaps(void)
     vec_heroes.clear();
 }
 
-const Heroes::heroes_t & World::GetFreeRecrut1(void)
+const Heroes::heroes_t & World::GetFreeRecruit1(void)
 {
     const Race::race_t & rc = H2Config::GetKingdomRace(H2Config::GetMyColor());
 
-    if(Heroes::UNKNOWN == free_recrut_hero1 || !(*vec_heroes[free_recrut_hero1]).isFreeman()) free_recrut_hero1 = GetFreemanHeroes(rc)->GetHeroes();
+    if(Heroes::UNKNOWN == free_recruit_hero1 || !(*vec_heroes[free_recruit_hero1]).isFreeman()) free_recruit_hero1 = GetFreemanHeroes(rc)->GetHeroes();
 
-    return free_recrut_hero1;
+    return free_recruit_hero1;
 }
 
-const Heroes::heroes_t & World::GetFreeRecrut2(void)
+const Heroes::heroes_t & World::GetFreeRecruit2(void)
 {
-    if(Heroes::UNKNOWN == free_recrut_hero2 || !(*vec_heroes[free_recrut_hero2]).isFreeman()) free_recrut_hero2 = GetFreemanHeroes()->GetHeroes();
+    if(Heroes::UNKNOWN == free_recruit_hero2 || !(*vec_heroes[free_recruit_hero2]).isFreeman()) free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
 
-    while(free_recrut_hero1 == free_recrut_hero2)
+    while(free_recruit_hero1 == free_recruit_hero2)
     {
-	Error::Verbose("World::GetFreeRecrut2: hero1 equal hero2");
+	Error::Verbose("World::GetFreeRecruit2: hero1 equal hero2");
 
-	free_recrut_hero2 = GetFreemanHeroes()->GetHeroes();
+	free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
     }
 
-    return free_recrut_hero2;
+    return free_recruit_hero2;
 }
 
 const Heroes * World::GetFreemanHeroes(Race::race_t rc)

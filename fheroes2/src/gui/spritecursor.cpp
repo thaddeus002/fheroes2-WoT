@@ -25,6 +25,8 @@
 void SpriteCursor::Move(s16 ax, s16 ay)
 {
     if(ax < 0 || ay < 0) return;
+    
+    if(background.GetRect().x == ax && background.GetRect().x == ay) return;
 
     background.Restore();
     background.Save(ax, ay);

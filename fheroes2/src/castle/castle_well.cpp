@@ -81,7 +81,7 @@ void Castle::OpenWell(void)
         if(! H2Config::Original())
         {
     	    if(building & DWELLING_MONSTER1 && le.MouseClickLeft(rectMonster1) &&
-    		Castle::RecrutMonster(DWELLING_MONSTER1, Dialog::RecrutMonster(
+    		Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
             	    Monster::Monster(race, DWELLING_MONSTER1), dwelling[0])))
     	    {
         	Cursor::Hide();
@@ -91,7 +91,7 @@ void Castle::OpenWell(void)
     	    }
     	    else
     	    if(building & DWELLING_MONSTER2 && le.MouseClickLeft(rectMonster2) &&
-    		Castle::RecrutMonster(DWELLING_MONSTER2, Dialog::RecrutMonster(
+    		Castle::RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
             	    Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
     	    {
         	Cursor::Hide();
@@ -101,7 +101,7 @@ void Castle::OpenWell(void)
     	    }
     	    else
     	    if(building & DWELLING_MONSTER3 && le.MouseClickLeft(rectMonster3) &&
-    		Castle::RecrutMonster(DWELLING_MONSTER3, Dialog::RecrutMonster(
+    		Castle::RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
             	    Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
     	    {
         	Cursor::Hide();
@@ -111,7 +111,7 @@ void Castle::OpenWell(void)
     	    }
     	    else
     	    if(building & DWELLING_MONSTER4 && le.MouseClickLeft(rectMonster4) &&
-    		Castle::RecrutMonster(DWELLING_MONSTER4, Dialog::RecrutMonster(
+    		Castle::RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
             	    Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
     	    {
         	Cursor::Hide();
@@ -121,7 +121,7 @@ void Castle::OpenWell(void)
     	    }
     	    else
     	    if(building & DWELLING_MONSTER5 && le.MouseClickLeft(rectMonster5) &&
-    		Castle::RecrutMonster(DWELLING_MONSTER5, Dialog::RecrutMonster(
+    		Castle::RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
             	    Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
     	    {
         	Cursor::Hide();
@@ -131,7 +131,7 @@ void Castle::OpenWell(void)
     	    }
     	    else
     	    if(building & DWELLING_MONSTER6 && le.MouseClickLeft(rectMonster6) &&
-                Castle::RecrutMonster(DWELLING_MONSTER6, Dialog::RecrutMonster(
+                Castle::RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
                     Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
     	    {
         	Cursor::Hide();

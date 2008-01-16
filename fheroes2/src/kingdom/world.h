@@ -75,8 +75,8 @@ public:
     const Heroes * GetHeroes(const Point & pt){ return GetHeroes(pt.x, pt.y); };
     const Heroes * GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
-    const Heroes::heroes_t & GetFreeRecrut1(void);
-    const Heroes::heroes_t & GetFreeRecrut2(void);
+    const Heroes::heroes_t & GetFreeRecruit1(void);
+    const Heroes::heroes_t & GetFreeRecruit2(void);
 
     Heroes & GetHeroes(const Heroes::heroes_t & hero){ return *vec_heroes[hero]; };
 
@@ -122,8 +122,8 @@ private:
     bool begin_week;
     bool begin_month;
 
-    Heroes::heroes_t free_recrut_hero1;
-    Heroes::heroes_t free_recrut_hero2;
+    Heroes::heroes_t free_recruit_hero1;
+    Heroes::heroes_t free_recruit_hero2;
 };
 
 static World & world = World::GetWorld();

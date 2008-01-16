@@ -29,7 +29,7 @@
 
 PaymentConditions::BuyHero::BuyHero()
 {
-    gold = RECRUT_HEROES_GOLD;
+    gold = RECRUIT_HEROES_GOLD;
 }
 
 PaymentConditions::BuyMonster::BuyMonster(const Monster::monster_t & monster)

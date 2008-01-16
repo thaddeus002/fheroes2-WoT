@@ -34,8 +34,7 @@ public:
     void Redraw(void);
     void UpdatePosition(void);
 
-private:
-    void DrawCursor(Surface &surface);
+    static void DrawCursor(Surface &surface);
 
 private:
     void GenerateOrigin(void);

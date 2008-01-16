@@ -17,36 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2MAPSGROUND_H
-#define H2MAPSGROUND_H
+#ifndef H2SIZECURSOR_H
+#define H2SIZECURSOR_H
 
-#include <string>
 #include "gamedefs.h"
-#include "skill.h"
 
-namespace Maps
+class Size;
+
+class SizeCursor
 {
-    class Tiles;
+public:
+    SizeCursor();
+    ~SizeCursor();
 
-    namespace Ground
-    {
-	typedef enum
-	{
-	    UNKNOWN	= 0x0000,
-    	    DESERT	= 0x0001,
-    	    SNOW	= 0x0002,
-    	    SWAMP	= 0x0004,
-    	    WASTELAND   = 0x0008,
-    	    BEACH	= 0x0010,
-    	    LAVA	= 0x0020,
-    	    DIRT	= 0x0040,
-    	    GRASS	= 0x0080,
-    	    WATER	= 0x0100,
-	} ground_t;
+    void ModifySize(const u8 w, const u8 h);
+    void ModifySize(const Size & sz);
 
-	const std::string & String(ground_t ground);
-	u16 GetPenalty(u16 from, u16 to, const Skill::Level::type_t & pathfinding);
-    };
+    void Hide(void);
+    void Show(void);
+
+    bool isHide(void){ return hide; };
+
+    u8 w(void);
+    u8 h(void);
+
+    void Move(const u16 px, const u16 py);
+    void Move(const Point & pt);
+
+private:
+    void ModifyCursor(const u8 w, const u8 h);
+
+    Surface		*sf;
+    SpriteCursor	*sc;
+    
+    bool		hide;
 };
 
 #endif

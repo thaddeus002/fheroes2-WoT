@@ -26,7 +26,7 @@
 const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
 {
     static const std::string str_ground[] = { "Desert", "Snow", "Swamp", "Wasteland", "Beach", 
-	"Lava", "Dirt", "Grass", "Water", "Multi" };
+	"Lava", "Dirt", "Grass", "Water", "Unknown" };
 
     switch(ground)
     {

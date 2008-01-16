@@ -29,7 +29,7 @@
 #include "button.h"
 #include "dialog.h"
 
-u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
+u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 {
     // cursor
     const Cursor::themes_t cursor = Cursor::Get();
@@ -58,9 +58,9 @@ u16 Dialog::RecrutMonster(const Monster::monster_t & monster, u16 available)
 
     Point dst_pt;
 
-    std::string message("Recrut " + Monster::String(monster));
+    std::string message("Recruit " + Monster::String(monster));
 
-    // text recrut monster
+    // text recruit monster
     dst_pt.x = pos.x + (pos.w - Text::width(message, Font::BIG)) / 2;
     dst_pt.y = pos.y + 25;
     Text(message, Font::BIG, dst_pt);
@@ -377,9 +377,9 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 
     Point dst_pt;
 
-    std::string message("Recrut " + Monster::String(monster));
+    std::string message("Recruit " + Monster::String(monster));
 
-    // text recrut monster
+    // text recruit monster
     Text(message, Font::BIG, pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 25);
 
     // sprite monster

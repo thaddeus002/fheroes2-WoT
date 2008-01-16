@@ -711,7 +711,7 @@ u8 Heroes::GetCountArmy(void) const
     return result;
 }
 
-void Heroes::Recrut(const Castle & castle)
+void Heroes::Recruit(const Castle & castle)
 {
     mp = castle.GetCenter();
     color = castle.GetColor();
