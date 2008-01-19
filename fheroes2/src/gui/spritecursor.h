@@ -37,13 +37,15 @@ public:
     u16  h(void) const{ return spriteCursor.h(); };
 
     void Move(s16 ax, s16 ay);
-    void Move(const Point &pt){ Move(pt.x, pt.y); };
-    void Hide(void){ background.Restore(); };
-    void Show(void){ Show(background.GetRect().x, background.GetRect().y); };
-    void Show(const Point &pt){ Show(pt.x, pt.y); };
+    void Move(const Point &pt);
+    void Move(const Rect &rt);
+    void Hide(void);
+    void Show(void);
+    void Show(const Point &pt);
     void Show(s16 ax, s16 ay);
 
     void Redraw(void);
+    void Change(const Surface &cursor);
     const Rect & GetRect(void) const{ return background.GetRect(); };
 
 private:

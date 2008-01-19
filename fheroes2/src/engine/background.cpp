@@ -23,53 +23,65 @@
 #include "display.h"
 #include "error.h"
 
-Background::Background(const Rect &rt) : Surface(), pos(rt)
+Background::Background(const Rect &rt) : Surface(),Rect(rt)
 {
 }
 
-Background::Background(s16 x, s16 y, u16 w, u16 h) : Surface(), pos(x, y, w, h)
+Background::Background(s16 x, s16 y, u16 w, u16 h) : Surface(), Rect(x, y, w, h)
 {
 }
 
-Background::Background(const Point &pt, u16 w, u16 h) : Surface(), pos(pt, w, h)
+Background::Background(const Point &pt, u16 w, u16 h) : Surface(), Rect(pt, w, h)
 {
+}
+
+bool Background::valid(void)
+{
+    return Surface::valid();
 }
 
 void Background::Save(void)
 {
     // resize background
-    if(valid() && (pos.w != w() || pos.h != h())) FreeSurface();
+    if(Surface::valid() && (Size::w != Surface::w() || Size::h != Surface::h())) FreeSurface();
 
-    if(! valid()) CreateSurface(pos, DEFAULT_DEPTH, SDL_SWSURFACE);
+    if(! Surface::valid()) CreateSurface(*this, DEFAULT_DEPTH, SDL_SWSURFACE);
 
-    Blit(display, pos, 0, 0);
+    Blit(display, *this, 0, 0);
 }
 
 void Background::Save(s16 ax, s16 ay)
 {
-    pos.x = ax;
-    pos.y = ay;
+    x = ax;
+    y = ay;
+
     Save();
 }
 
 void Background::Save(const Point &pt)
 {
-    pos = pt;
+    x = pt.x;
+    y = pt.y;
+
     Save();
 }
 
 void Background::Save(const Rect &rt)
 {
-    pos = rt;
+    x = rt.x;
+    y = rt.y;
+    Size::w = rt.w;
+    Size::h = rt.h;
+
     Save();
 }
 
 void Background::Restore(void)
 {
-    display.Blit(*this, pos.x, pos.y);
+    display.Blit(*this, x, y);
 }
 
 const Rect & Background::GetRect(void) const
 {
-    return pos;
+    return *this;
 }

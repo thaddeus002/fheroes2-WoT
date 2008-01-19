@@ -22,13 +22,14 @@
 
 #include "gamedefs.h"
 
+class SpriteCursor;
+class Surface;
 class Size;
 
 class SizeCursor
 {
 public:
     SizeCursor();
-    ~SizeCursor();
 
     void ModifySize(const u8 w, const u8 h);
     void ModifySize(const Size & sz);
@@ -47,8 +48,8 @@ public:
 private:
     void ModifyCursor(const u8 w, const u8 h);
 
-    Surface		*sf;
-    SpriteCursor	*sc;
+    Surface		sf;
+    SpriteCursor	sc;
     
     bool		hide;
 };

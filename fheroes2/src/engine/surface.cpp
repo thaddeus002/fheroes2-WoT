@@ -207,13 +207,13 @@ void Surface::Fill(u32 color)
 {
     Rect dstrect(0, 0, surface->w, surface->h);
 
-    SDL_FillRect(surface, &dstrect, color);
+    SDL_FillRect(surface, dstrect.SDLRect(), color);
 }
 
 /* rect fill colors surface */
 void Surface::FillRect(u32 color, const Rect & src)
 {
-    SDL_FillRect(surface, const_cast<Rect *>(&src), color);
+    SDL_FillRect(surface, const_cast<Rect &>(src).SDLRect(), color);
 }
 
 /* blit */
@@ -227,7 +227,7 @@ void Surface::Blit(const Surface &src, s16 dst_ox, s16 dst_oy)
 {
     Rect dstrect(dst_ox, dst_oy, surface->w, surface->h);
 
-    SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), NULL, surface, &dstrect);
+    SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), NULL, surface, dstrect.SDLRect());
 }
 
 /* blit */
@@ -235,7 +235,7 @@ void Surface::Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_o
 {
     Rect dstrect(dst_ox, dst_oy, src_rt.w, src_rt.h);
 
-    SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), const_cast<Rect *>(&src_rt), surface, &dstrect);
+    SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), const_cast<Rect &>(src_rt).SDLRect(), surface, dstrect.SDLRect());
 }
 
 /* scaled from surface */

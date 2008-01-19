@@ -23,12 +23,14 @@
 #include "rect.h"
 #include "surface.h"
 
-class Background : public Surface
+class Background : private Surface, private Rect
 {
 public:
     Background(const Rect &rt = Rect());
     Background(s16 x, s16 y, u16 w, u16 h);
     Background(const Point &pt, u16 w, u16 h);
+
+    bool valid(void);
 
     void Save(void);
     void Save(s16 ax, s16 ay);
@@ -37,9 +39,6 @@ public:
 
     void Restore(void);
     const Rect & GetRect(void) const;
-
-private:
-    Rect pos;
 };
 
 #endif

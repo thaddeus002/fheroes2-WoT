@@ -49,12 +49,16 @@ public:
     bool operator!= (const Size & sz) const;
 };
 
-class Rect : public SDL_Rect
+class Rect : public Point, public Size
 {
 public:
     Rect(s16 rx = -1, s16 ry = -1, u16 rw = 0, u16 rh = 0);
+    Rect(const SDL_Rect & rt);
     Rect(const Point & pt, u16 rw, u16 rh);
+    Rect(const Point & pt, const Size & sz);
     Rect(const std::vector<Rect> & vect);
+
+    SDL_Rect* SDLRect(void);
 
     bool valid(void) const;
 

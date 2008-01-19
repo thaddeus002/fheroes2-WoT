@@ -22,6 +22,21 @@
 #include "display.h"
 #include "spritecursor.h"
 
+void SpriteCursor::Move(const Point &pt)
+{
+    Move(pt.x, pt.y);
+}
+
+void SpriteCursor::Move(const Rect &rt)
+{
+    if(!rt.valid() || background.GetRect() == rt) return;
+
+    background.Restore();
+    background.Save(rt);
+
+    display.Blit(spriteCursor, rt);
+}
+
 void SpriteCursor::Move(s16 ax, s16 ay)
 {
     if(ax < 0 || ay < 0) return;
@@ -34,12 +49,27 @@ void SpriteCursor::Move(s16 ax, s16 ay)
     display.Blit(spriteCursor, ax, ay);
 }
 
+void SpriteCursor::Hide(void)
+{
+    background.Restore();
+}
+
 void SpriteCursor::Redraw(void)
 {
     background.Restore();
     background.Save();
 
     display.Blit(spriteCursor, background.GetRect().x, background.GetRect().y);
+}
+
+void SpriteCursor::Show(void)
+{
+    Show(background.GetRect().x, background.GetRect().y);
+}
+
+void SpriteCursor::Show(const Point &pt)
+{
+    Show(pt.x, pt.y);
 }
 
 void SpriteCursor::Show(s16 ax, s16 ay)

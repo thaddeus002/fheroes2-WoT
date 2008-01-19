@@ -26,28 +26,22 @@
 #include "gamearea.h"
 #include "sizecursor.h"
 
-SizeCursor::SizeCursor() : sf(NULL), sc(NULL), hide(false)
+SizeCursor::SizeCursor() : sf(), sc(sf), hide(false)
 {
-}
-
-SizeCursor::~SizeCursor()
-{
-    if(sc) delete sc;
-    if(sf) delete sf;
 }
 
 void SizeCursor::Hide(void)
 {
-    if(hide || !sc) return;
+    if(hide) return;
 
-    sc->Hide();
+    sc.Hide();
 }
 
 void SizeCursor::Show(void)
 {
-    if(!hide || !sc) return;
+    if(!hide) return;
     
-    sc->Show();
+    sc.Show();
 }
 
 void SizeCursor::Move(const Point & pt)
@@ -57,19 +51,19 @@ void SizeCursor::Move(const Point & pt)
 
 void SizeCursor::Move(const u16 px, const u16 py)
 {
-    if(hide || !sc) return;
+    if(hide) return;
 
-    sc->Move(px, py);
+    sc.Move(px, py);
 }
 
 u8 SizeCursor::w(void)
 {
-    return sf ? sf->w() / TILEWIDTH : 0;
+    return sf.w() / TILEWIDTH;
 }
 
 u8 SizeCursor::h(void)
 {
-    return sf ? sf->h() / TILEWIDTH : 0;
+    return sf.h() / TILEWIDTH;
 }
 
 void SizeCursor::ModifySize(const Size & sz)
@@ -90,15 +84,14 @@ void SizeCursor::ModifySize(const u8 w, const u8 h)
 
 void SizeCursor::ModifyCursor(const u8 w, const u8 h)
 {
-    if(sf && sc && sf->w() == w && sf->h() == h) return;
+    if(sf.w() == w && sf.h() == h) return;
 
-    if(sc) delete sc;
-    if(sf) delete sf;
-    
-    sf = new Surface(w * TILEWIDTH, h * TILEWIDTH);
-    
-    sf->SetColorKey();
-    Radar::DrawCursor(*sf);
-    
-    sc = new SpriteCursor(*sf);
+    sf = Surface(w * TILEWIDTH, h * TILEWIDTH);
+
+    sf.SetColorKey();
+    Radar::DrawCursor(sf);
+
+    const Rect size(sc.GetRect().x, sc.GetRect().y, w * TILEWIDTH, h * TILEWIDTH);
+
+    sc.Move(size);
 }

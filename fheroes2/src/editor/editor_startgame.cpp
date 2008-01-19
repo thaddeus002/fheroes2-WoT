@@ -518,11 +518,15 @@ Game::menu_t Game::Editor::StartGame(void)
 
 	    if(sizeCursor.isHide()) sizeCursor.Show();
 
-	    const u16 div_x = ((u16) (mouse_coord.x - BORDERWIDTH) / 32) * 32 + BORDERWIDTH;
-	    const u16 div_y = ((u16) (mouse_coord.y - BORDERWIDTH) / 32) * 32 + BORDERWIDTH;
+	    const u16 div_x = mouse_coord.x < BORDERWIDTH + TILEWIDTH * (GameArea::GetRect().w - sizeCursor.w()) ?
+			    ((u16) (mouse_coord.x - BORDERWIDTH) / 32) * 32 + BORDERWIDTH :
+			    BORDERWIDTH + (GameArea::GetRect().w - sizeCursor.w()) * TILEWIDTH;
+	    const u16 div_y = mouse_coord.y < BORDERWIDTH + TILEWIDTH * (GameArea::GetRect().h - sizeCursor.h()) ?
+			    ((u16) (mouse_coord.y - BORDERWIDTH) / 32) * 32 + BORDERWIDTH :
+			    BORDERWIDTH + (GameArea::GetRect().h - sizeCursor.h()) * TILEWIDTH;
 
-	    if((div_x + sizeCursor.w() * TILEWIDTH <= BORDERWIDTH + TILEWIDTH * GameArea::GetRect().w) &&
-		(div_y + sizeCursor.h() * TILEWIDTH <= BORDERWIDTH + TILEWIDTH * GameArea::GetRect().h))
+	    if((mouse_coord.x <= BORDERWIDTH + TILEWIDTH * GameArea::GetRect().w) &&
+		(mouse_coord.y <= BORDERWIDTH + TILEWIDTH * GameArea::GetRect().h))
 	    {
 		Cursor::Hide();
 		sizeCursor.Move(div_x, div_y);
@@ -531,9 +535,16 @@ Game::menu_t Game::Editor::StartGame(void)
 		display.Flip();
 	    }
 
-	    if(le.MouseClickRight(tile_pos))
+	    if(le.MouseLeft())
+	    {
+	    }
+	    else
+	    if(le.MouseRight())
 	    {
 		if(H2Config::Debug()) tile.DebugInfo(index_maps);
+
+		// wait
+		while(le.HandleEvents() && le.MouseRight());
 
 		//const std::string & info = (MP2::OBJ_ZERO == object || MP2::OBJ_EVENT == object ?
 		//    Maps::Ground::String(tile.GetGround()) : MP2::StringObject(object));

@@ -53,20 +53,20 @@ bool Size::valid(void) const
     return w & h;
 }
 
-Rect::Rect(s16 rx, s16 ry, u16 rw, u16 rh)
+Rect::Rect(s16 rx, s16 ry, u16 rw, u16 rh) : Point(rx, ry), Size(rw, rh)
 {
-    x = rx;
-    y = ry;
-    w = rw;
-    h = rh;
 }
 
-Rect::Rect(const Point & pt, u16 rw, u16 rh)
+Rect::Rect(const SDL_Rect & rt) : Point(rt.x, rt.y), Size(rt.w, rt.h)
 {
-    x = pt.x;
-    y = pt.y;
-    w = rw;
-    h = rh;
+}
+
+Rect::Rect(const Point & pt, u16 rw, u16 rh) : Point(pt), Size(rw, rh)
+{
+}
+
+Rect::Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz)
+{
 }
         
 Rect::Rect(const std::vector<Rect> & vect)
@@ -90,6 +90,11 @@ Rect::Rect(const std::vector<Rect> & vect)
     y = y1;
     w = x2 - x1;
     h = y2 - y1;
+}
+
+SDL_Rect* Rect::SDLRect(void)
+{
+    return reinterpret_cast<SDL_Rect *>(this);
 }
 
 Rect & Rect::operator= (const Point & pt)
