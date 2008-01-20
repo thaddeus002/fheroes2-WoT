@@ -47,6 +47,7 @@ namespace Game
 	SAVEGAME,
 	EDITNEWMAP,
 	EDITLOADMAP,
+	EDITSAVEMAP,
 	EDITSTART
     } menu_t;
 

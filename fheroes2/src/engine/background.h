@@ -23,7 +23,7 @@
 #include "rect.h"
 #include "surface.h"
 
-class Background : private Surface, private Rect
+class Background : protected Surface, protected Rect
 {
 public:
     Background(const Rect &rt = Rect());
@@ -34,11 +34,14 @@ public:
 
     void Save(void);
     void Save(s16 ax, s16 ay);
+    void Save(s16 ax, s16 ay, u16 aw ,u16 ah);
     void Save(const Point &pt);
     void Save(const Rect &rt);
 
     void Restore(void);
     const Rect & GetRect(void) const;
+    const Point & GetPos(void) const;
+    const Size & GetSize(void) const;
 };
 
 #endif

@@ -37,6 +37,7 @@
 #include "ground.h"
 #include "error.h"
 #include "tools.h"
+#include "rand.h"
 #include "game.h"
 
 namespace Game
@@ -46,6 +47,7 @@ namespace Game
 	void RedrawTopNumberCell(const Rect & area);
 	void RedrawLeftNumberCell(const Rect & area);
 	void ModifyAllTilesAbroad(void);
+	void SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::ground_t ground);
     };
 };
 
@@ -510,26 +512,26 @@ Game::menu_t Game::Editor::StartGame(void)
 	{
             const Point & mouse_coord = le.MouseCursor();
             const u16 index_maps = Maps::GetIndexFromAreaPoint(mouse_coord);
-            const Maps::Tiles & tile = world.GetTiles(index_maps);
+            Maps::Tiles & tile = world.GetTiles(index_maps);
             const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
             //u8 object = tile.GetObject();
 
     	    Cursor::Set(Cursor::POINTER);
 
-	    if(sizeCursor.isHide()) sizeCursor.Show();
-
 	    const u16 div_x = mouse_coord.x < BORDERWIDTH + TILEWIDTH * (GameArea::GetRect().w - sizeCursor.w()) ?
-			    ((u16) (mouse_coord.x - BORDERWIDTH) / 32) * 32 + BORDERWIDTH :
+			    (u16) ((mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH + BORDERWIDTH :
 			    BORDERWIDTH + (GameArea::GetRect().w - sizeCursor.w()) * TILEWIDTH;
 	    const u16 div_y = mouse_coord.y < BORDERWIDTH + TILEWIDTH * (GameArea::GetRect().h - sizeCursor.h()) ?
-			    ((u16) (mouse_coord.y - BORDERWIDTH) / 32) * 32 + BORDERWIDTH :
+			    (u16) ((mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH + BORDERWIDTH :
 			    BORDERWIDTH + (GameArea::GetRect().h - sizeCursor.h()) * TILEWIDTH;
 
-	    if((mouse_coord.x <= BORDERWIDTH + TILEWIDTH * GameArea::GetRect().w) &&
-		(mouse_coord.y <= BORDERWIDTH + TILEWIDTH * GameArea::GetRect().h))
+	    if(! sizeCursor.isVisible() || sizeCursor.GetPos().x != div_x || sizeCursor.GetPos().y != div_y)
 	    {
 		Cursor::Hide();
-		sizeCursor.Move(div_x, div_y);
+
+		sizeCursor.Hide();
+
+		sizeCursor.Show(div_x, div_y);
 
 		Cursor::Show();
 		display.Flip();
@@ -537,6 +539,64 @@ Game::menu_t Game::Editor::StartGame(void)
 
 	    if(le.MouseLeft())
 	    {
+		Cursor::Hide();
+		sizeCursor.Hide();
+
+
+		const Point topleft(GameArea::GetRect().x + (div_x - BORDERWIDTH) / 32,
+				    GameArea::GetRect().y + (div_y - BORDERWIDTH) / 32);
+
+		
+		for(u8 iy = 0; iy < sizeCursor.h(); ++iy)
+		{
+		    for(u8 ix = 0; ix < sizeCursor.w(); ++ix)
+		    {
+                	Maps::Tiles & newtile = world.GetTiles(topleft.x + ix, topleft.y + iy);
+
+			switch(selectTerrain)
+			{
+			    case 0: SetGroundToTile(newtile, Maps::Ground::WATER);	break;
+			    case 1: SetGroundToTile(newtile, Maps::Ground::GRASS);	break;
+			    case 2: SetGroundToTile(newtile, Maps::Ground::SNOW);	break;
+			    case 3: SetGroundToTile(newtile, Maps::Ground::SWAMP);	break;
+			    case 4: SetGroundToTile(newtile, Maps::Ground::LAVA);	break;
+			    case 5: SetGroundToTile(newtile, Maps::Ground::DESERT);	break;
+			    case 6: SetGroundToTile(newtile, Maps::Ground::DIRT);	break;
+			    case 7: SetGroundToTile(newtile, Maps::Ground::WASTELAND);	break;
+			    case 8: SetGroundToTile(newtile, Maps::Ground::BEACH);	break;
+
+			    default: break;
+			}
+
+			newtile.Redraw();
+		    }
+		}
+		
+		//GetIndexFromAbsPoint(
+		//Error::Verbose("X: ", GameArea::GetRect().x + (div_x - BORDERWIDTH) / 32);
+		//Error::Verbose("Y: ", GameArea::GetRect().y + (div_y - BORDERWIDTH) / 32);
+		//Maps::Tiles & tile = world.GetTiles(topleft);
+		//for(u8 ii = 0; ii < sizeCursor.w(); ++ii)
+		//{
+		    //from + ii;
+
+		    //if(! isValidDirection(from + ii, Direction::LEFT)) break;
+		//}
+
+		//u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
+		//bool isValidDirection(u16 from, Direction::vector_t vector);    
+		//sizeCursor.GetPos();
+
+		ModifyAllTilesAbroad();
+
+		sizeCursor.Show();
+		Cursor::Show();
+
+		display.Flip();
+
+		// wait
+		while(le.HandleEvents() && le.MouseLeft());
+
 	    }
 	    else
 	    if(le.MouseRight())
@@ -999,7 +1059,15 @@ Game::menu_t Game::Editor::StartGame(void)
 	}
 	if(le.MouseClickLeft(btnFile))
 	{
-	    Error::Verbose("Game::Editor::StartGame: FIXME: click button System");
+	    switch(Dialog::FileOptions())
+	    {
+		case Game::NEWGAME:	return EDITNEWMAP;
+		case Game::LOADGAME:	return EDITLOADMAP;
+		case Game::SAVEGAME:	return EDITSAVEMAP;
+		case Game::QUITGAME:	return QUITGAME;
+		
+		default: break;
+	    }
 	}
 	if(le.MouseClickLeft(btnSystem))
 	{
@@ -1199,7 +1267,7 @@ void Game::Editor::ModifyAllTilesAbroad(void)
 	    if(Maps::isValidDirection(ii, direct))
 	    {
 		const Maps::Tiles & opposition = world.GetTiles(Maps::GetDirectionIndex(ii, direct));
-		
+
 		if(center.GetGround() != opposition.GetGround())
 		{
 		    skip = false;
@@ -1235,4 +1303,43 @@ Direction::BOTTOM_LEFT
 Direction::LEFT
 Direction::TOP_LEFT
 */
+}
+
+/* set ground to tile */
+void Game::Editor::SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::ground_t ground)
+{
+    u16 index_ground = 0;
+
+    switch(ground)
+    {
+	case Maps::Ground::WATER:	return; //index_ground =  16; break;
+	case Maps::Ground::GRASS:	index_ground =  68; break;
+	case Maps::Ground::SNOW:	index_ground = 130; break;
+	case Maps::Ground::SWAMP:	index_ground = 184; break;
+	case Maps::Ground::LAVA:	index_ground = 246; break;
+	case Maps::Ground::DESERT:	index_ground = 300; break;
+	case Maps::Ground::DIRT:	index_ground = 337; break;
+	case Maps::Ground::WASTELAND:	index_ground = 399; break;
+	case Maps::Ground::BEACH:	index_ground = 415; break;
+	
+	default: break;
+    }
+
+    switch(Rand::Get(1, 7))
+    {
+	// 85% simple ground
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+	    tile.SetTile(Rand::Get(index_ground, index_ground + 7), 0);
+	    break;
+
+        // 15% extended ground
+        default:
+	    tile.SetTile(Rand::Get(index_ground + 8, index_ground + 15), 0);
+	    break;
+    }
 }

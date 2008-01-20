@@ -20,38 +20,27 @@
 #ifndef H2SIZECURSOR_H
 #define H2SIZECURSOR_H
 
+#include "spritecursor.h"
 #include "gamedefs.h"
 
-class SpriteCursor;
 class Surface;
 class Size;
 
-class SizeCursor
+class SizeCursor : public SpriteCursor
 {
 public:
-    SizeCursor();
+    SizeCursor(u8 sw = 1, u8 sh = 1);
 
     void ModifySize(const u8 w, const u8 h);
     void ModifySize(const Size & sz);
 
-    void Hide(void);
-    void Show(void);
-
-    bool isHide(void){ return hide; };
-
     u8 w(void);
     u8 h(void);
-
-    void Move(const u16 px, const u16 py);
-    void Move(const Point & pt);
 
 private:
     void ModifyCursor(const u8 w, const u8 h);
 
-    Surface		sf;
-    SpriteCursor	sc;
-    
-    bool		hide;
+    Surface cursor;
 };
 
 #endif

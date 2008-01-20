@@ -58,6 +58,16 @@ void Background::Save(s16 ax, s16 ay)
     Save();
 }
 
+void Background::Save(s16 ax, s16 ay, u16 aw, u16 ah)
+{
+    x = ax;
+    y = ay;
+    Size::w = aw;
+    Size::h = ah;
+
+    Save();
+}
+
 void Background::Save(const Point &pt)
 {
     x = pt.x;
@@ -68,12 +78,7 @@ void Background::Save(const Point &pt)
 
 void Background::Save(const Rect &rt)
 {
-    x = rt.x;
-    y = rt.y;
-    Size::w = rt.w;
-    Size::h = rt.h;
-
-    Save();
+    Save(rt.x, rt.y, rt.w, rt.h);
 }
 
 void Background::Restore(void)
@@ -82,6 +87,16 @@ void Background::Restore(void)
 }
 
 const Rect & Background::GetRect(void) const
+{
+    return *this;
+}
+
+const Point & Background::GetPos(void) const
+{
+    return *this;
+}
+
+const Size & Background::GetSize(void) const
 {
     return *this;
 }

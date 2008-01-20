@@ -119,7 +119,7 @@ Game::menu_t Game::ScenarioInfo(void)
     // set levelCursor (default normal)
     const Point pointDifficultyNormal(302, 124);
     SpriteCursor levelCursor(AGG::GetICN("NGEXTRA.ICN", 62), pointDifficultyNormal);
-    levelCursor.Move(pointDifficultyNormal);
+    levelCursor.Show(pointDifficultyNormal);
     H2Config::SetGameDifficulty(Difficulty::NORMAL);
 
     const Rect rectDifficultyEs(225, 124, levelCursor.w(), levelCursor.h());

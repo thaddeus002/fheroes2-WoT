@@ -134,10 +134,16 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL)
 {
     tile_sprite.LoadPalette(AGG::GetPalette(), AGGSIZEPALETTE);
-    AGG::GetTIL("GROUND32.TIL", mp2tile.tileIndex, mp2tile.shape, tile_sprite); 
+
+    SetTile(mp2tile.tileIndex, mp2tile.shape);
 
     AddonsPushLevel1(mp2tile);
     AddonsPushLevel2(mp2tile);
+}
+
+void Maps::Tiles::SetTile(u16 index, u8 shape)
+{
+    AGG::GetTIL("GROUND32.TIL", index, shape, tile_sprite); 
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)

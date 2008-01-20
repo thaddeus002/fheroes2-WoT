@@ -20,37 +20,41 @@
 #ifndef H2SPRITECURSOR_H
 #define H2SPRITECURSOR_H
 
-#include "sprite.h"
-#include "rect.h"
-#include "surface.h"
 #include "background.h"
 #include "gamedefs.h"
 
-class SpriteCursor
+class Point;
+class Surface;
+
+class SpriteCursor : public Background
 {
 public:
     /* sprite cursor */
-    SpriteCursor(const Surface &cursor, const Point & pt = Point()) : spriteCursor(cursor), background(pt, cursor.w(), cursor.h()){};
-    SpriteCursor(const Surface &cursor, s16 x, s16 y) : spriteCursor(cursor), background(x, y, cursor.w(), cursor.h()){};
+    SpriteCursor();
+    SpriteCursor(const Surface &cursor, const Point & pt = Point());
+    SpriteCursor(const Surface &cursor, s16 x, s16 y);
 
-    u16  w(void) const{ return spriteCursor.w(); };
-    u16  h(void) const{ return spriteCursor.h(); };
+    u16  w(void) const;
+    u16  h(void) const;
+
+    void SetSprite(const Surface & sf);
 
     void Move(s16 ax, s16 ay);
     void Move(const Point &pt);
-    void Move(const Rect &rt);
+
     void Hide(void);
-    void Show(void);
-    void Show(const Point &pt);
+
     void Show(s16 ax, s16 ay);
+    void Show(const Point &pt);
+    void Show(void);
 
     void Redraw(void);
-    void Change(const Surface &cursor);
-    const Rect & GetRect(void) const{ return background.GetRect(); };
+    
+    bool isVisible(void);
 
 private:
-    const Surface & spriteCursor;
-    Background background;
+    const Surface* sprite;
+    bool visible;
 };
 
 #endif

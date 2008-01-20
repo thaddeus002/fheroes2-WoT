@@ -26,44 +26,19 @@
 #include "gamearea.h"
 #include "sizecursor.h"
 
-SizeCursor::SizeCursor() : sf(), sc(sf), hide(false)
+SizeCursor::SizeCursor(u8 sw, u8 sh) : SpriteCursor(), cursor()
 {
-}
-
-void SizeCursor::Hide(void)
-{
-    if(hide) return;
-
-    sc.Hide();
-}
-
-void SizeCursor::Show(void)
-{
-    if(!hide) return;
-    
-    sc.Show();
-}
-
-void SizeCursor::Move(const Point & pt)
-{
-    Move(pt.x, pt.y);
-}
-
-void SizeCursor::Move(const u16 px, const u16 py)
-{
-    if(hide) return;
-
-    sc.Move(px, py);
+    ModifyCursor(sw, sh);
 }
 
 u8 SizeCursor::w(void)
 {
-    return sf.w() / TILEWIDTH;
+    return cursor.w() / TILEWIDTH;
 }
 
 u8 SizeCursor::h(void)
 {
-    return sf.h() / TILEWIDTH;
+    return cursor.h() / TILEWIDTH;
 }
 
 void SizeCursor::ModifySize(const Size & sz)
@@ -84,14 +59,13 @@ void SizeCursor::ModifySize(const u8 w, const u8 h)
 
 void SizeCursor::ModifyCursor(const u8 w, const u8 h)
 {
-    if(sf.w() == w && sf.h() == h) return;
+    if(cursor.w() == w && cursor.h() == h) return;
 
-    sf = Surface(w * TILEWIDTH, h * TILEWIDTH);
+    cursor = Surface(w * TILEWIDTH, h * TILEWIDTH);
 
-    sf.SetColorKey();
-    Radar::DrawCursor(sf);
+    cursor.SetColorKey();
 
-    const Rect size(sc.GetRect().x, sc.GetRect().y, w * TILEWIDTH, h * TILEWIDTH);
+    Radar::DrawCursor(cursor);
 
-    sc.Move(size);
+    SetSprite(cursor);
 }

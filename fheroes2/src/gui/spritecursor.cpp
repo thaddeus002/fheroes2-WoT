@@ -18,53 +18,76 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "gamedefs.h"
+#include "rect.h"
+#include "surface.h"
 #include "display.h"
 #include "spritecursor.h"
+
+SpriteCursor::SpriteCursor() : Background(), sprite(NULL), visible(false)
+{
+}
+
+SpriteCursor::SpriteCursor(const Surface &cursor, const Point & pt) : Background(pt, cursor.w(), cursor.h()), sprite(&cursor), visible(false)
+{
+}
+
+SpriteCursor::SpriteCursor(const Surface &cursor, s16 x, s16 y) : Background(x, y, cursor.w(), cursor.h()), sprite(&cursor), visible(false)
+{
+}
+
+u16  SpriteCursor::w(void) const
+{
+    return sprite ? sprite->w() : 0;
+}
+
+u16  SpriteCursor::h(void) const
+{
+    return sprite ? sprite->h() : 0;
+}
+
+void SpriteCursor::SetSprite(const Surface & sf)
+{
+    Restore();
+
+    Save(Background::x, Background::y, sf.w(), sf.h());
+
+    sprite = &sf;
+}
 
 void SpriteCursor::Move(const Point &pt)
 {
     Move(pt.x, pt.y);
 }
 
-void SpriteCursor::Move(const Rect &rt)
-{
-    if(!rt.valid() || background.GetRect() == rt) return;
-
-    background.Restore();
-    background.Save(rt);
-
-    display.Blit(spriteCursor, rt);
-}
-
 void SpriteCursor::Move(s16 ax, s16 ay)
 {
     if(ax < 0 || ay < 0) return;
     
-    if(background.GetRect().x == ax && background.GetRect().x == ay) return;
+    if(Background::x == ax && Background::y == ay) return;
 
-    background.Restore();
-    background.Save(ax, ay);
+    if(visible) Hide();
 
-    display.Blit(spriteCursor, ax, ay);
+    Show(ax, ay);
 }
 
 void SpriteCursor::Hide(void)
 {
-    background.Restore();
+    if(!visible) return;
+
+    Restore();
+
+    visible = false;
 }
 
 void SpriteCursor::Redraw(void)
 {
-    background.Restore();
-    background.Save();
-
-    display.Blit(spriteCursor, background.GetRect().x, background.GetRect().y);
+    Hide();
+    Show();
 }
 
 void SpriteCursor::Show(void)
 {
-    Show(background.GetRect().x, background.GetRect().y);
+    Show(GetPos());
 }
 
 void SpriteCursor::Show(const Point &pt)
@@ -74,7 +97,16 @@ void SpriteCursor::Show(const Point &pt)
 
 void SpriteCursor::Show(s16 ax, s16 ay)
 {
-    background.Save(ax, ay);
+    if(visible) return;
 
-    display.Blit(spriteCursor, background.GetRect().x, background.GetRect().y);
+    Save(ax, ay);
+
+    if(sprite) display.Blit(*sprite, ax, ay);
+    
+    visible = true;
+}
+
+bool SpriteCursor::isVisible(void)
+{
+    return visible;
 }
