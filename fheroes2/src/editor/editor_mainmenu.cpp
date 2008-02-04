@@ -27,7 +27,9 @@
 #include "display.h"
 #include "game.h"
 
-Game::menu_t Game::Editor::MainMenu(void){
+Game::menu_t Game::Editor::MainMenu(void)
+{
+    Display & display = Display::Get();
 
     // preload
     AGG::PreloadObject("EDITOR.ICN");
@@ -35,8 +37,9 @@ Game::menu_t Game::Editor::MainMenu(void){
     AGG::PreloadObject("REDBACK.ICN");
 
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Display::SetVideoMode(Display::SMALL);
 
@@ -57,7 +60,7 @@ Game::menu_t Game::Editor::MainMenu(void){
     buttonLoadMap.Draw();
     buttonCancelGame.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // NewMap loop

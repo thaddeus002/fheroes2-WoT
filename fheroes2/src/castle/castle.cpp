@@ -1161,7 +1161,8 @@ void Castle::BuyBuilding(building_t build)
 void Castle::DrawImageCastle(const Point & pt)
 {
     const Maps::Tiles & tile = world.GetTiles(mp.x, mp.y);
-    
+    Display & display = Display::Get();
+
     u8 index = 0;
     Point dst_pt;
 

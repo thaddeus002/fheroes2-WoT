@@ -24,9 +24,10 @@
 #include "game.h"
 
 /* Redraw */
-void Game::DrawInterface(void){
-
-    Display::SetVideoMode(H2Config::GetVideoMode());
+void Game::DrawInterface(void)
+{
+    Display & display = Display::Get();
+    display.SetVideoMode(H2Config::GetVideoMode());
     display.Fill(0x00, 0x00, 0x00);
 
     const std::string &icnadv = ( H2Config::EvilInterface() ? "ADVBORDE.ICN" : "ADVBORD.ICN" );

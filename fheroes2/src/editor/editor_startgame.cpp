@@ -53,9 +53,12 @@ namespace Game
 
 Game::menu_t Game::Editor::StartGame(void)
 {
+    Display & display = Display::Get();
+
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     // new maps
     const Maps::mapsize_t & sizemap = H2Config::GetSizeMaps();
@@ -404,7 +407,7 @@ Game::menu_t Game::Editor::StartGame(void)
     bool selectTerrainEnable = true;
     bool selectObjectEnable = false;
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     //u32 ticket = 0;
@@ -418,14 +421,14 @@ Game::menu_t Game::Editor::StartGame(void)
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    sizeCursor.Hide();
-	    Cursor::Set(Cursor::SCROLL_LEFT);
+	    cursor.SetThemes(cursor.SCROLL_LEFT);
 	    areaMaps.Scroll(GameArea::LEFT);
 	    split_h.Backward();
 	    radar.UpdatePosition();
 	    RedrawTopNumberCell(areaMaps.GetRect());
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
@@ -433,14 +436,14 @@ Game::menu_t Game::Editor::StartGame(void)
 	// scroll area maps right
 	if(le.MouseCursor(areaScrollRight))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    sizeCursor.Hide();
-	    Cursor::Set(Cursor::SCROLL_RIGHT);
+	    cursor.SetThemes(cursor.SCROLL_RIGHT);
 	    areaMaps.Scroll(GameArea::RIGHT);
 	    split_h.Forward();
 	    radar.UpdatePosition();
 	    RedrawTopNumberCell(areaMaps.GetRect());
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
@@ -448,14 +451,14 @@ Game::menu_t Game::Editor::StartGame(void)
 	// scroll area maps top
 	if(le.MouseCursor(areaScrollTop))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    sizeCursor.Hide();
-	    Cursor::Set(Cursor::SCROLL_TOP);
+	    cursor.SetThemes(cursor.SCROLL_TOP);
 	    areaMaps.Scroll(GameArea::TOP);
 	    split_v.Backward();
 	    radar.UpdatePosition();
 	    RedrawLeftNumberCell(areaMaps.GetRect());
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
@@ -463,14 +466,14 @@ Game::menu_t Game::Editor::StartGame(void)
 	// scroll area maps bottom
 	if(le.MouseCursor(areaScrollBottom))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    sizeCursor.Hide();
-	    Cursor::Set(Cursor::SCROLL_BOTTOM);
+	    cursor.SetThemes(cursor.SCROLL_BOTTOM);
 	    areaMaps.Scroll(GameArea::BOTTOM);
 	    split_v.Forward();
 	    radar.UpdatePosition();
 	    RedrawLeftNumberCell(areaMaps.GetRect());
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
@@ -484,15 +487,15 @@ Game::menu_t Game::Editor::StartGame(void)
 	    areaMaps.CenterFromRadar(le.MouseCursor());
 	    if(prev != areaMaps.GetRect())
 	    {
-		Cursor::Hide();
-		Cursor::Set(Cursor::POINTER);
+		cursor.Hide();
+		cursor.SetThemes(cursor.POINTER);
 		sizeCursor.Hide();
 		split_h.Move(areaMaps.GetRect().x);
 		split_v.Move(areaMaps.GetRect().y);
 		radar.UpdatePosition();
 		RedrawTopNumberCell(areaMaps.GetRect());
 		RedrawLeftNumberCell(areaMaps.GetRect());
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	}
@@ -500,10 +503,10 @@ Game::menu_t Game::Editor::StartGame(void)
 	// pointer cursor on left panel
 	if(le.MouseCursor(areaLeftPanel))
 	{
-	    Cursor::Hide();
-	    Cursor::Set(Cursor::POINTER);
+	    cursor.Hide();
+	    cursor.SetThemes(cursor.POINTER);
 	    sizeCursor.Hide();
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	else
@@ -516,7 +519,7 @@ Game::menu_t Game::Editor::StartGame(void)
             const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
             //u8 object = tile.GetObject();
 
-    	    Cursor::Set(Cursor::POINTER);
+    	    cursor.SetThemes(cursor.POINTER);
 
 	    const u16 div_x = mouse_coord.x < BORDERWIDTH + TILEWIDTH * (GameArea::GetRect().w - sizeCursor.w()) ?
 			    (u16) ((mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH + BORDERWIDTH :
@@ -527,19 +530,19 @@ Game::menu_t Game::Editor::StartGame(void)
 
 	    if(! sizeCursor.isVisible() || sizeCursor.GetPos().x != div_x || sizeCursor.GetPos().y != div_y)
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		sizeCursor.Hide();
 
 		sizeCursor.Show(div_x, div_y);
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 
 	    if(le.MouseLeft())
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 		sizeCursor.Hide();
 
 
@@ -590,7 +593,7 @@ Game::menu_t Game::Editor::StartGame(void)
 		ModifyAllTilesAbroad();
 
 		sizeCursor.Show();
-		Cursor::Show();
+		cursor.Show();
 
 		display.Flip();
 
@@ -641,7 +644,7 @@ Game::menu_t Game::Editor::StartGame(void)
 	    le.MouseClickLeft(btnSelectRoad) ||
 	    le.MouseClickLeft(btnSelectClear))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 
 	    if(btnSelectGround.isPressed()){ btnSelectGround.Release(); btnSelectGround.Draw(); }
 	    else
@@ -774,7 +777,7 @@ Game::menu_t Game::Editor::StartGame(void)
 	    if(btnSizeLarge.isEnable()) btnSizeLarge.Draw();
 	    if(btnSizeManual.isEnable()) btnSizeManual.Draw();
 
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -784,7 +787,7 @@ Game::menu_t Game::Editor::StartGame(void)
 	   (btnSizeLarge.isEnable() && le.MouseClickLeft(btnSizeLarge)) ||
 	   (btnSizeManual.isEnable() && le.MouseClickLeft(btnSizeManual)))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 
 	    btnSizeSmall.Release();
 	    btnSizeMedium.Release();
@@ -804,7 +807,7 @@ Game::menu_t Game::Editor::StartGame(void)
 	    btnSizeLarge.Draw();
 	    btnSizeManual.Draw();
 		
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -812,9 +815,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainWater))
 	{
 	    selectTerrain = 0;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainWater.x - 1, rectTerrainWater.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: water");
 	}
@@ -822,9 +825,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainGrass))
 	{
 	    selectTerrain = 1;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainGrass.x - 1, rectTerrainGrass.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: grass");
 	}
@@ -832,9 +835,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainSnow))
 	{
 	    selectTerrain = 2;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainSnow.x - 1, rectTerrainSnow.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: snow");
 	}
@@ -842,9 +845,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainSwamp))
 	{
 	    selectTerrain = 3;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainSwamp.x - 1, rectTerrainSwamp.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: swamp");
 	}
@@ -852,9 +855,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainLava))
 	{
 	    selectTerrain = 4;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainLava.x - 1, rectTerrainLava.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: lava");
 	}
@@ -862,9 +865,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainBeach))
 	{
 	    selectTerrain = 5;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainBeach.x - 1, rectTerrainBeach.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: beach");
 	}
@@ -872,9 +875,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainDirt))
 	{
 	    selectTerrain = 6;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainDirt.x - 1, rectTerrainDirt.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: dirt");
 	}
@@ -882,9 +885,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainWasteland))
 	{
 	    selectTerrain = 7;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainWasteland.x - 1, rectTerrainWasteland.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip(); 
 	    Error::Verbose("Game::Editor::StartGame: select terrain: wasteland");
 	}
@@ -892,9 +895,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainDesert))
 	{
 	    selectTerrain = 8;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectTerrainCursor.Move(rectTerrainDesert.x - 1, rectTerrainDesert.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select terrain: desert");
 	}
@@ -903,9 +906,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectWater))
 	{
 	    selectObject = 0;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectWater.x - 1, rectObjectWater.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: water");
 	}
@@ -913,9 +916,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectGrass))
 	{
 	    selectObject = 1;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectGrass.x - 1, rectObjectGrass.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: grass");
 	}
@@ -923,9 +926,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectSnow))
 	{
 	    selectObject = 2;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectSnow.x - 1, rectObjectSnow.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: snow");
 	}
@@ -933,9 +936,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectSwamp))
 	{
 	    selectObject = 3;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectSwamp.x - 1, rectObjectSwamp.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: swamp");
 	}
@@ -943,9 +946,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectLava))
 	{
 	    selectObject = 4;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectLava.x - 1, rectObjectLava.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: lava");
 	}
@@ -953,9 +956,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectDesert))
 	{
 	    selectObject = 5;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectDesert.x - 1, rectObjectDesert.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: desert");
 	}
@@ -963,9 +966,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectDirt))
 	{
 	    selectObject = 6;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectDirt.x - 1, rectObjectDirt.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: dirt");
 	}
@@ -973,9 +976,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectWasteland))
 	{
 	    selectObject = 7;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectWasteland.x - 1, rectObjectWasteland.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: wasteland");
 	}
@@ -983,9 +986,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectBeach))
 	{
 	    selectObject = 8;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectBeach.x - 1, rectObjectBeach.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: beach");
 	}
@@ -993,9 +996,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectTown))
 	{
 	    selectObject = 9;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectTown.x - 1, rectObjectTown.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: town");
 	}
@@ -1003,9 +1006,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectMonster))
 	{
 	    selectObject = 10;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectMonster.x - 1, rectObjectMonster.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: monster");
 	}
@@ -1013,9 +1016,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectHero))
 	{
 	    selectObject = 11;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectHero.x - 1, rectObjectHero.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: hero");
 	}
@@ -1023,9 +1026,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectArtifact))
 	{
 	    selectObject = 12;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectArtifact.x - 1, rectObjectArtifact.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: artifact");
 	}
@@ -1033,9 +1036,9 @@ Game::menu_t Game::Editor::StartGame(void)
 	if(selectObjectEnable && le.MouseClickLeft(rectObjectResource))
 	{
 	    selectObject = 13;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectObjectCursor.Move(rectObjectResource.x - 1, rectObjectResource.y - 1);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    Error::Verbose("Game::Editor::StartGame: select object: resource");
 	}
@@ -1184,9 +1187,9 @@ Game::menu_t Game::Editor::StartGame(void)
         // animation
         if(!(++ticket % 50)) // FIXME: speed animation low
         {
-            Cursor::Hide();
+            cursor.Hide();
             areaMaps.RedrawAnimation();
-            Cursor::Show();
+            cursor.Show();
             display.Flip();
         }
 */
@@ -1205,7 +1208,7 @@ void Game::Editor::RedrawTopNumberCell(const Rect & area)
 	dst_pt.x = BORDERWIDTH + ii * TILEWIDTH;
 	dst_pt.y = 0;
 
-	display.Blit(AGG::GetICN("EDITBTNS.ICN", 34), dst_pt);
+	Display::Get().Blit(AGG::GetICN("EDITBTNS.ICN", 34), dst_pt);
 
 	std::string number;
 	String::AddInt(number, area.x + ii);
@@ -1227,7 +1230,7 @@ void Game::Editor::RedrawLeftNumberCell(const Rect & area)
 	dst_pt.x = 0;
 	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH;
 
-	display.Blit(AGG::GetICN("EDITBTNS.ICN", 33), dst_pt);
+	Display::Get().Blit(AGG::GetICN("EDITBTNS.ICN", 33), dst_pt);
 
 	std::string number;
 	String::AddInt(number, area.y + ii);

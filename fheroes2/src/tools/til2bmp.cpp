@@ -33,7 +33,7 @@
 #include <sstream>
 
 #include "palette.h"
-#include "gamedefs.h"
+#include "types.h"
 #include "surface.h"
 #include "display.h"
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 	colors[ii].b <<= 2;
     }
 
-    Display::Initialize();
+    SDL::Init();
 
     for(u16 cur = 0; cur < count; ++cur)
     {
@@ -152,6 +152,8 @@ int main(int argc, char **argv)
     fd_data.close();
 
     std::cout << "expand to: " << prefix << std::endl;
+
+    SDL::Quit();
 
     return EXIT_SUCCESS;
 }

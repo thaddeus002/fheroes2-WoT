@@ -20,7 +20,7 @@
 #ifndef H2LOCALEVENT_H
 #define H2LOCALEVENT_H
 
-#include "gamedefs.h"
+#include "types.h"
 
 class LocalEvent
 {

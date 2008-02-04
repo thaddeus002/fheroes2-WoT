@@ -21,7 +21,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "gamedefs.h"
+#include "types.h"
 
 class wavhead
 {

@@ -20,6 +20,7 @@
 #ifndef H2BACKGROUND_H
 #define H2BACKGROUND_H
 
+#include "types.h"
 #include "rect.h"
 #include "surface.h"
 

@@ -35,10 +35,12 @@ Game::menu_t Game::LoadGame(void){
     AGG::PreloadObject("REDBACK.ICN");
 
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(Display::SMALL);
+    Display & display = Display::Get();
+    display.SetVideoMode(Display::SMALL);
 
     // image background
     const Sprite &back = AGG::GetICN("HEROES.ICN", 0);
@@ -59,7 +61,7 @@ Game::menu_t Game::LoadGame(void){
     buttonMultiGame.Draw();
     buttonCancelGame.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // loadgame loop

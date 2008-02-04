@@ -4,7 +4,7 @@
 
 TARGET = libengine
 LIBS = $(shell sdl-config --libs)
-CFLAGS = -O2 -Wall $(shell sdl-config --cflags) -I . -I ../system
+CFLAGS = -O2 -Wall $(shell sdl-config --cflags) -I .
 
 CC = g++
 

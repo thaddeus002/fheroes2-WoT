@@ -45,11 +45,13 @@ u16 GetTradeCosts(u8 rs_from, u8 rs_to);
 
 void Dialog::Marketplace(void)
 {
+    Display & display = Display::Get();
     const std::string & tradpost = (H2Config::EvilInterface() ? "TRADPOSE.ICN" : "TRADPOST.ICN");
     const std::string & header = "Marketplace";
     const std::string & message_info = "Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for.";
 
-    Cursor::Hide();
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     Dialog::Box box(250, true);
 
@@ -79,7 +81,7 @@ void Dialog::Marketplace(void)
     TextBox(message_info, Font::BIG, dst_rt);
 
     const Kingdom & kingdom = world.GetMyKingdom();
-    const Sprite & cursor = AGG::GetICN(tradpost, 14);
+    const Sprite & spritecursor = AGG::GetICN(tradpost, 14);
 
     const std::string & header_from = "Your Resources";
 
@@ -94,7 +96,7 @@ void Dialog::Marketplace(void)
     rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 37, 34, 34));	// crystal
     rectsFrom.push_back(Rect(pt1.x + 74, pt1.y + 37, 34, 34));	// gems
     rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 74, 34, 34));	// gold
-    SpriteCursor cursorFrom(cursor);
+    SpriteCursor cursorFrom(spritecursor);
     dst_pt.x = pt1.x + (108 - Text::width(header_from, Font::SMALL)) / 2;
     dst_pt.y = pt1.y - 15;
     Text(header_from, Font::SMALL, dst_pt);
@@ -113,7 +115,7 @@ void Dialog::Marketplace(void)
     rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 37, 34, 34));	// crystal
     rectsTo.push_back(Rect(pt2.x + 74, pt2.y + 37, 34, 34));	// gems
     rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 74, 34, 34));	// gold
-    SpriteCursor cursorTo(cursor);
+    SpriteCursor cursorTo(spritecursor);
     dst_pt.x = pt2.x + (108 - Text::width(header_to, Font::SMALL)) / 2;
     dst_pt.y = pt2.y - 15;
     Text(header_to, Font::SMALL, dst_pt);
@@ -139,7 +141,7 @@ void Dialog::Marketplace(void)
 #define ShowTradeArea \
     if(resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy)) \
     { \
-	Cursor::Hide(); \
+	cursor.Hide(); \
 	back.Restore(); \
 	dst_rt.x = pos_rt.x; \
 	dst_rt.y = pos_rt.y + 30; \
@@ -158,12 +160,12 @@ void Dialog::Marketplace(void)
         textSell = NULL; \
         textBuy = NULL; \
         splitter = NULL; \
-        Cursor::Show(); \
+        cursor.Show(); \
         display.Flip(); \
     } \
     else \
     { \
-	Cursor::Hide(); \
+	cursor.Hide(); \
 	back.Restore(); \
 	if(buttonTrade) delete buttonTrade; \
 	if(buttonLeft) delete buttonLeft; \
@@ -236,13 +238,13 @@ void Dialog::Marketplace(void)
 	(*buttonTrade).Draw(); \
 	(*buttonLeft).Draw(); \
 	(*buttonRight).Draw(); \
-	Cursor::Show(); \
+	cursor.Show(); \
 	display.Flip(); \
 	RedrawInfoBuySell; \
     } \
 
 #define RedrawInfoBuySell \
-	Cursor::Hide(); \
+	cursor.Hide(); \
 	if(textSell) \
 	{ \
 		message.clear(); \
@@ -265,7 +267,7 @@ void Dialog::Marketplace(void)
 		textBuy->SetPos(dst_pt); \
 		textBuy->Show(); \
 	} \
-	Cursor::Show(); \
+	cursor.Show(); \
 	display.Flip();
 
 
@@ -277,7 +279,7 @@ void Dialog::Marketplace(void)
 
     buttonExit.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -342,7 +344,7 @@ void Dialog::Marketplace(void)
 		count_sell = 0;
 		count_buy = 0;
 
-		Cursor::Hide();
+		cursor.Hide();
 		cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
 
 		if(resourceTo) cursorTo.Hide();
@@ -350,7 +352,7 @@ void Dialog::Marketplace(void)
 		if(resourceTo) cursorTo.Show();
 		if(resourceTo) ShowTradeArea;
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	}
@@ -383,7 +385,7 @@ void Dialog::Marketplace(void)
 		count_sell = 0;
 		count_buy = 0;
 
-		Cursor::Hide();
+		cursor.Hide();
 		cursorTo.Move(rect_to.x - 2, rect_to.y - 2);
 
 		if(resourceFrom)
@@ -393,7 +395,7 @@ void Dialog::Marketplace(void)
 		    cursorTo.Show();
 		    ShowTradeArea;
 		}
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	}
@@ -409,10 +411,10 @@ void Dialog::Marketplace(void)
 
 	    count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo));
 
-            Cursor::Hide();
+            cursor.Hide();
             splitter->Move(seek);
 	    RedrawInfoBuySell;
-            Cursor::Show();
+            cursor.Show();
             display.Flip();
         }
 
@@ -435,9 +437,9 @@ void Dialog::Marketplace(void)
 
 	    count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
 
-            Cursor::Hide();
+            cursor.Hide();
 	    splitter->Backward();
-            Cursor::Show();
+            cursor.Show();
             display.Flip();
 
 	    RedrawInfoBuySell;
@@ -452,9 +454,9 @@ void Dialog::Marketplace(void)
 
 	    count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
 
-            Cursor::Hide();
+            cursor.Hide();
 	    splitter->Forward();
-            Cursor::Show();
+            cursor.Show();
             display.Flip();
 
 	    RedrawInfoBuySell;
@@ -471,6 +473,7 @@ void Dialog::Marketplace(void)
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
 {
+    Display & display = Display::Get();
     const std::string & tradpost = (H2Config::EvilInterface() ? "TRADPOSE.ICN" : "TRADPOST.ICN");
     std::string str;
     Point dst_pt;
@@ -548,6 +551,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
 
 void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 {
+    Display & display = Display::Get();
     const std::string & tradpost = (H2Config::EvilInterface() ? "TRADPOSE.ICN" : "TRADPOST.ICN");
     std::string str;
     Point dst_pt;

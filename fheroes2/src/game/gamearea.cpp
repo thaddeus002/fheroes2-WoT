@@ -89,6 +89,8 @@ void GameArea::RedrawAnimation(void)
 /* scroll area */
 void GameArea::Scroll(GameArea::scroll_t scroll)
 {
+    Display & display = Display::Get();
+
     switch(scroll)
     {
 	case GameArea::LEFT:
@@ -150,7 +152,7 @@ void GameArea::Scroll(GameArea::scroll_t scroll)
 void GameArea::CenterFromRadar(const Point &pt)
 {
     // left top point
-    Point pos((pt.x - (display.w() - BORDERWIDTH - RADARWIDTH)) * world.w() / RADARWIDTH, 
+    Point pos((pt.x - (Display::Get().w() - BORDERWIDTH - RADARWIDTH)) * world.w() / RADARWIDTH, 
 	      (pt.y - BORDERWIDTH) * world.h() / RADARWIDTH);
 
     Center(pos);

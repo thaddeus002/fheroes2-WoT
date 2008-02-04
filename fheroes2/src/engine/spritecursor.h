@@ -21,7 +21,7 @@
 #define H2SPRITECURSOR_H
 
 #include "background.h"
-#include "gamedefs.h"
+#include "types.h"
 
 class Point;
 class Surface;
@@ -38,6 +38,7 @@ public:
     u16  h(void) const;
 
     void SetSprite(const Surface & sf);
+    const Surface* Sprite(void);
 
     void Move(s16 ax, s16 ay);
     void Move(const Point &pt);

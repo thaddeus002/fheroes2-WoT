@@ -28,6 +28,8 @@
 
 Dialog::answer_t Dialog::SystemOptions(void)
 {
+    Display & display = Display::Get();
+
     // preload
     const std::string &spanbkg = H2Config::EvilInterface() ? "SPANBKGE.ICN" : "SPANBKG.ICN";
     const std::string &spanbtn = H2Config::EvilInterface() ? "SPANBTNE.ICN" : "SPANBTN.ICN";
@@ -36,9 +38,10 @@ Dialog::answer_t Dialog::SystemOptions(void)
     AGG::PreloadObject(spanbtn);
 
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    const Cursor::themes_t oldcursor = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     // image box
     const Sprite &box = AGG::GetICN(spanbkg, 0);
@@ -55,7 +58,7 @@ Dialog::answer_t Dialog::SystemOptions(void)
 
     buttonOk.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     Dialog::answer_t result = Dialog::ZERO;
@@ -70,10 +73,10 @@ Dialog::answer_t Dialog::SystemOptions(void)
     }
 
     // restore background
-    Cursor::Hide();
+    cursor.Hide();
     back.Restore();
-    Cursor::Set(cursor);
-    Cursor::Show();
+    cursor.SetThemes(oldcursor);
+    cursor.Show();
     display.Flip();
 
     return result;

@@ -54,6 +54,11 @@ void SpriteCursor::SetSprite(const Surface & sf)
     sprite = &sf;
 }
 
+const Surface* SpriteCursor::Sprite(void)
+{
+    return sprite && sprite->valid() ? sprite : NULL;
+}
+
 void SpriteCursor::Move(const Point &pt)
 {
     Move(pt.x, pt.y);
@@ -101,7 +106,7 @@ void SpriteCursor::Show(s16 ax, s16 ay)
 
     Save(ax, ay);
 
-    if(sprite) display.Blit(*sprite, ax, ay);
+    if(sprite) Display::Get().Blit(*sprite, ax, ay);
     
     visible = true;
 }

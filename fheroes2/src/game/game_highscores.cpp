@@ -26,17 +26,19 @@
 #include "button.h"
 #include "game.h"
 
-Game::menu_t Game::HighScores(void){
-
+Game::menu_t Game::HighScores(void)
+{
     // preload
     AGG::PreloadObject("HSBKG.ICN");
     AGG::PreloadObject("HISCORE.ICN");
 
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(Display::SMALL);
+    Display & display = Display::Get();
+    display.SetVideoMode(Display::SMALL);
 
     // image background
     const Sprite &back = AGG::GetICN("HSBKG.ICN", 0);
@@ -50,7 +52,7 @@ Game::menu_t Game::HighScores(void){
     buttonDismiss.Draw();
     buttonExit.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // highscores loop

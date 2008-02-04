@@ -45,7 +45,10 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 
     const Heroes & heroes = world.GetHeroes(hero);
 
-    Cursor::Hide();
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+
+    cursor.Hide();
     Dialog::Box box(200, true);
     const Rect & box_rt = box.GetArea();
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -98,7 +101,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     button1.Draw();
     button2.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // message loop
@@ -120,9 +123,12 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 
 Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 {
+    Display & display = Display::Get();
+
     const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
 
-    Cursor::Hide();
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     const std::string & building_description =
 			(DWELLING_MONSTER1 |
@@ -293,7 +299,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 	button2.Draw();
     }
 	
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // message loop
@@ -316,6 +322,8 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
 void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::building_t & build)
 {
+    Display & display = Display::Get();
+
     std::string icnsprite;
 
     switch(castle.GetRace())
@@ -365,8 +373,11 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
 
 Castle::building_t Castle::OpenTown(void)
 {
+    Display & display = Display::Get();
+
     // cursor
-    Cursor::Hide();
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     Dialog::FrameBorder background;
 
@@ -747,7 +758,7 @@ Castle::building_t Castle::OpenTown(void)
 
     buttonExit.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -863,18 +874,18 @@ Castle::building_t Castle::OpenTown(void)
         else
 	if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)
         {
-            Cursor::Hide();
+            cursor.Hide();
             cursorFormat.Move(pointSpreadArmyFormat);
-            Cursor::Show();
+            cursor.Show();
             display.Flip();
             army_spread = true;
         }
 	else
         if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectGroupedArmyFormat) && army_spread)
         {
-            Cursor::Hide();
+            cursor.Hide();
             cursorFormat.Move(pointGroupedArmyFormat);
-            Cursor::Show();
+            cursor.Show();
             display.Flip();
             army_spread = false;
         }

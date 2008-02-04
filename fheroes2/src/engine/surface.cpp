@@ -21,39 +21,46 @@
 #include "surface.h"
 #include "error.h"
 
-Surface::Surface() : surface(NULL)
+Surface::Surface() : surface(NULL), videosurface(false)
 {
 }
 
-Surface::Surface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha)
+Surface::Surface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha) : videosurface(false)
 {
     surface = SDL_CreateRGBSurfaceFrom((void *) pixels, width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
 		RMASK32, GMASK32, BMASK32, alpha ? AMASK32 : 0);
 
-    if(!surface) Error::Warning("SurfaceFrom: empty surface, error: " + std::string(SDL_GetError()));
+    if(!surface) Error::Warning("Surface: empty surface, error: " + std::string(SDL_GetError()));
 }
 
-Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl)
+Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl) : videosurface(false)
 {
     CreateSurface(sw, sh, depth,  fl);
 }
 
-Surface::Surface(u16 sw, u16 sh, bool alpha)
+Surface::Surface(u16 sw, u16 sh, bool alpha) : videosurface(false)
 {
     CreateSurface(sw, sh, DEFAULT_DEPTH, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
 }
 
-Surface::Surface(const Surface & bs)
+Surface::Surface(const Surface & bs) : videosurface(false)
 {
-    if(bs.valid())
-	surface = SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags());
+    surface = bs.valid() ?
+	SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags()) : NULL;
+
+    if(!surface) Error::Warning("Surface: empty surface, error: " + std::string(SDL_GetError()));
 }
 
+Surface::Surface(SDL_Surface * sf) : videosurface(false)
+{
+    surface = sf ? sf : NULL;
+
+    if(!surface) Error::Warning("Surface: empty surface, error: " + std::string(SDL_GetError()));
+}
 
 Surface::~Surface()
 {
-    if(surface)
-	SDL_FreeSurface(surface);
+    if(surface && !videosurface) SDL_FreeSurface(surface);
 
     surface = NULL;
 }

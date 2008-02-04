@@ -23,7 +23,7 @@
 #include <vector>
 #include <cctype>
 
-#include "gamedefs.h"
+#include "types.h"
 
 #define AGGSIZENAME	15
 

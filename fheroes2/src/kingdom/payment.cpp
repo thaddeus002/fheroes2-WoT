@@ -731,6 +731,8 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
     std::string str;
     Point dst_pt;
 
+    Display & display = Display::Get();
+
     if(payment.wood)
     {
 	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 0);

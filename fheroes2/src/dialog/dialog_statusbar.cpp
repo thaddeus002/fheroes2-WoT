@@ -58,45 +58,48 @@ void Dialog::StatusBar::ShowMessage(const std::string & message)
 
     if(! status.empty()) Clear();
 
-    Cursor::Hide();
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     Text(message, font, pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
          pos_pt.y + (sprite.h() - Text::height(message, font)) / 2);
 
     status = message;
 
-    Cursor::Show();
+    cursor.Show();
 }
 
 void Dialog::StatusBar::Clear(void)
 {
-    bool localcursor = Cursor::Visible();
+    Cursor & cursor = Cursor::Get();
+    bool localcursor = cursor.isVisible();
 
-    if(localcursor) Cursor::Hide();
+    if(localcursor) cursor.Hide();
 
-    display.Blit(sprite, pos_pt);
+    Display::Get().Blit(sprite, pos_pt);
 
     status.clear();
 
-    if(localcursor) Cursor::Show();
+    if(localcursor) cursor.Show();
 }
 
 void Dialog::StatusBar::Clear(const std::string & message)
 {
     if(message == status) return;
 
-    bool localcursor = Cursor::Visible();
+    Cursor & cursor = Cursor::Get();
+    bool localcursor = cursor.isVisible();
 
-    if(localcursor) Cursor::Hide();
+    if(localcursor) cursor.Hide();
 
-    display.Blit(sprite, pos_pt);
+    Display::Get().Blit(sprite, pos_pt);
 
     status = message;
 
     Text(message, font, pos_pt.x + (sprite.w() - Text::width(message, font)) / 2,
          pos_pt.y + (sprite.h() - Text::height(message, font)) / 2);
 
-    if(localcursor) Cursor::Show();
+    if(localcursor) cursor.Show();
 }
 
 bool Dialog::StatusBar::isEmpty(void)

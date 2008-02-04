@@ -44,8 +44,9 @@ void Army::SelectBar::Reset(void)
 
 void Army::SelectBar::Redraw(void)
 {
+    Display & display = Display::Get();
+    
     // redraw monster or background
-
     for(u8 ii = 0; ii < army.size(); ++ii)
 	if(Army::isValid(army.at(ii)))
 	{

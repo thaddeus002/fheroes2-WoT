@@ -31,8 +31,12 @@
 
 void Castle::OpenMageGuild(void)
 {
+    Display & display = Display::Get();
+
     // cursor
-    Cursor::Hide();
+    Cursor & cursor = Cursor::Get();
+
+    cursor.Hide();
 
     Dialog::FrameBorder background;
 
@@ -208,7 +212,7 @@ void Castle::OpenMageGuild(void)
 
     buttonExit.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();

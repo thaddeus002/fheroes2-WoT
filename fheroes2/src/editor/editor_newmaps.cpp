@@ -33,13 +33,16 @@
 
 Game::menu_t Game::Editor::NewMaps(void)
 {
+    Display & display = Display::Get();
+
     // preload
     AGG::PreloadObject("BTNESIZE.ICN");
     AGG::PreloadObject("REDBACK.ICN");
 
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Display::SetVideoMode(Display::SMALL);
 
@@ -64,7 +67,7 @@ Game::menu_t Game::Editor::NewMaps(void)
     buttonXLarge.Draw();
     buttonCancel.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // NewMap loop

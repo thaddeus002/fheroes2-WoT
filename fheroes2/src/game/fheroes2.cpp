@@ -108,11 +108,9 @@ int main(int argc, char **argv)
 	// random init
 	Rand::Init();
 
-	try {
-	    // init SDL
-	    if(0 > SDL_Init(SDL_INIT_VIDEO)) Error::Except(std::string(SDL_GetError()));
-    	    atexit(SDL_Quit);
-
+	if(SDL::Init())
+	try
+	{
 	    Display::SetVideoMode(Display::SMALL);
 	    Display::HideCursor();
 	    Display::SetCaption(caption);
@@ -130,6 +128,8 @@ int main(int argc, char **argv)
 	    // SDL logo
 	    if(H2Config::Logo())
 	    {
+		Display & display = Display::Get();
+
     		Surface logo(image_logo.pixel_data, image_logo.width, image_logo.height, image_logo.bytes_per_pixel, false);
     		
     		logo.SetDisplayFormat();
@@ -161,7 +161,8 @@ int main(int argc, char **argv)
 #endif
 
 	    // init cursor
-	    Cursor::Init(Cursor::POINTER);
+	    AGG::PreloadObject("ADVMCO.ICN");
+	    Cursor::Get().SetThemes(Cursor::POINTER);
 
 	    // default events
 	    LocalEvent::SetStateDefaults();
@@ -217,6 +218,8 @@ int main(int argc, char **argv)
 	{
 	    H2Config::PrintCurrentValues();
 	}
+
+	SDL::Quit();
 
 	std::cout << "Bye." << std::endl;
 	

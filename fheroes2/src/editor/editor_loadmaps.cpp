@@ -53,6 +53,8 @@ namespace EditScenario
 
 Game::menu_t Game::Editor::LoadMaps(void)
 {
+    Display & display = Display::Get();
+
     std::vector<Maps::FileInfo> info_maps;
 
     // read maps directory
@@ -126,8 +128,9 @@ Game::menu_t Game::Editor::LoadMaps(void)
     const std::vector<Maps::FileInfo> *curmaps = &allmaps;
 
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Display::SetVideoMode(Display::SMALL);
 
@@ -178,7 +181,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
     buttonSelectXLarge.Draw();
     buttonSelectAll.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     u16 num_select = 0xFFFF;
@@ -202,13 +205,13 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	    curmaps = &smallmaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    EditScenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -217,13 +220,13 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	    curmaps = &mediummaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    EditScenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -232,13 +235,13 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	    curmaps = &largemaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    EditScenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -247,13 +250,13 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	    curmaps = &xlargemaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    EditScenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -262,13 +265,13 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	    curmaps = &allmaps;
 	    it_list_head = curmaps->begin();
 	    it_current = it_list_head;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
 	    EditScenario::DrawSelectInfo(it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -278,12 +281,12 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	    if(num >= curmaps->size()) num = curmaps->size() - 1;
 	    if(num_select == num) break;
 	    num_select = num;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundInfo.Restore();
 	    it_current = it_list_head + num;
 	    EditScenario::DrawSelectInfo(it_current);
 	    split.Move(it_list_head - curmaps->begin());
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	    num_select = num;
 	}
@@ -291,22 +294,22 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	// click up
 	if((le.MouseWheelUp(rectAreaList) || le.MouseWheelUp(split.GetRect()) || le.MouseClickLeft(buttonPgUp)) &&
 	    curmaps->size() && it_list_head > curmaps->begin()){
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(--it_list_head);
 	    split.Backward();
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
 	// click down
 	if((le.MouseWheelDn(rectAreaList) || le.MouseWheelDn(split.GetRect()) || le.MouseClickLeft(buttonPgDn)) &&
 	    LISTMAXITEM < curmaps->size() && it_list_head + LISTMAXITEM < curmaps->end()){
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(++it_list_head);
 	    split.Forward();
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -317,13 +320,13 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	    if(seek > curmaps->size() - LISTMAXITEM) seek = curmaps->size() - LISTMAXITEM;
 
 	    it_list_head = curmaps->begin() + seek;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    backgroundList.Restore();
 	    EditScenario::DrawList(it_list_head, LISTMAXITEM);
 	    backgroundInfo.Restore();
 	    EditScenario::DrawSelectInfo(it_current);
 	    split.Move(seek);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
  	}
 
@@ -349,7 +352,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
     // set current settings
     EditScenario::SetCurrentSettings(*it_current);
 
-    Cursor::Hide();
+    cursor.Hide();
     background.Restore();
     
     return Game::MAINMENU;
@@ -404,6 +407,8 @@ void EditScenario::SetCurrentSettings(const Maps::FileInfo &maps)
 
 void EditScenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 count)
 {
+    Display & display = Display::Get();
+
     u16 y = 64;
     u16 x = 176;
     u8 index = 0;
@@ -458,6 +463,8 @@ void EditScenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top,
 
 void EditScenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_current)
 {
+    Display & display = Display::Get();
+
     u16 x = 196;
     u16 y = 269;
     u8 index = 0;

@@ -24,36 +24,35 @@
 #include "surface.h"
 #include "rect.h"
 
-namespace Display
+namespace SDL
 {
-    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280 } resolution_t;
+    bool Init(void);
+    void Quit(void);
+};
 
-    void Initialize(void);
-
-    void SetVideoMode(resolution_t mode, bool fullscreen = false);
-
-    void HideCursor(void);
-    void ShowCursor(void);
-    void SetCaption(const std::string & caption);
-    void SetIcons(const Surface & icons);
-
-class VideoSurface : public Surface
+class Display : public Surface
 {
 public:
-    static VideoSurface &GetDisplay(void);
+    ~Display();
 
-    void Flip(void) const{ SDL_Flip(surface); };
-    void FullScreen(void) const{ SDL_WM_ToggleFullScreen(surface); };
+    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280 } resolution_t;
 
-    VideoSurface & operator= (const VideoSurface & vs){ surface = SDL_GetVideoSurface(); return *this; };
+    static Display &	Get(void);
+
+    static void		SetVideoMode(resolution_t mode, bool fullscreen = false);
+
+    static void		HideCursor(void);
+    static void		ShowCursor(void);
+    static void		SetCaption(const std::string & caption);
+    static void		SetIcons(const Surface & icons);
+
+    static void		Flip(void);
+    static void		FullScreen(void);
+
+    Display &		operator= (const Display & dp);
 
 private:
-    VideoSurface() : Surface(){ surface = SDL_GetVideoSurface(); };
-    VideoSurface(const VideoSurface & vs) : Surface(){ surface = SDL_GetVideoSurface(); };
+    Display();
 };
-
-};
-
-static Display::VideoSurface &display = Display::VideoSurface::GetDisplay();                      
 
 #endif

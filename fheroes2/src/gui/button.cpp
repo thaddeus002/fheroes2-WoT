@@ -80,7 +80,7 @@ void Button::PressDraw(void)
 
     Draw();
 
-    display.Flip();
+    Display::Get().Flip();
 }
 
 void Button::ReleaseDraw(void)
@@ -91,15 +91,16 @@ void Button::ReleaseDraw(void)
 
     Draw();
 
-    display.Flip();
+    Display::Get().Flip();
 }
 
 void Button::Draw(void)
 {
     bool localcursor = false;
-    if(*this & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    Cursor & cursor = Cursor::Get();
+    if(*this & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
 
-    display.Blit(pressed ? sprite2 : sprite1, x, y);
+    Display::Get().Blit(pressed ? sprite2 : sprite1, x, y);
 
-    if(localcursor) Cursor::Show();
+    if(localcursor) cursor.Show();
 }

@@ -20,14 +20,34 @@
 
 #include <string>
 #include "rect.h"
-#include "gamedefs.h"
+#include "types.h"
 #include "error.h"
 #include "display.h"
 
-void Display::Initialize(void)
+bool SDL::Init(void)
 {
-    if(0 > SDL_Init(SDL_INIT_VIDEO)) Error::Except(std::string(SDL_GetError()));              
-    atexit(SDL_Quit);                                                                         
+    return 0 > SDL_Init(SDL_INIT_VIDEO) ? false : true;
+}
+
+void SDL::Quit(void)
+{
+    SDL_Quit();
+}
+
+Display::Display()
+{
+    videosurface = true;
+}
+
+Display::~Display()
+{
+}
+
+Display & Display::operator= (const Display & dp)
+{
+    surface = SDL_GetVideoSurface();
+
+    return *this;
 }
 
 void Display::SetVideoMode(Display::resolution_t mode, bool fullscreen)
@@ -58,22 +78,43 @@ void Display::SetVideoMode(Display::resolution_t mode, bool fullscreen)
 	    break;
     }
 
-    Display::VideoSurface & display = Display::VideoSurface::GetDisplay();
+    Display & display = Display::Get();
 
     if(display.valid() && display.w() == xres && display.h() == yres) return;
 
     u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
+
     if(fullscreen || (display.valid() && (display.flags() & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
-    if(!SDL_SetVideoMode(xres, yres, 0, videoflags)){
+
+    if(!SDL_SetVideoMode(xres, yres, 0, videoflags))
+    {
 	SDL_SetVideoMode(640, 480, 0, videoflags);
+
 	Error::Warning(std::string(SDL_GetError()));
     }
-    
-    if(!display.valid()) display = Display::VideoSurface::GetDisplay();
+}
+
+/* flip */
+void Display::Flip(void)
+{
+    Display & display = Display::Get();
+
+    SDL_Flip(display.surface);
+}
+
+/* full screen */
+void Display::FullScreen(void)
+{
+    Display & display = Display::Get();
+
+    SDL_WM_ToggleFullScreen(display.surface);
 }
 
 /* set caption main window */
-void Display::SetCaption(const std::string &caption){ SDL_WM_SetCaption(caption.c_str(), "FHEROES2"); }
+void Display::SetCaption(const std::string & caption)
+{
+    SDL_WM_SetCaption(caption.c_str(), NULL);
+}
 
 /* set icons window */
 void Display::SetIcons(const Surface & icons)
@@ -82,17 +123,23 @@ void Display::SetIcons(const Surface & icons)
 }
 
 /* hide system cursor */
-void Display::HideCursor(void){ SDL_ShowCursor(SDL_DISABLE); }
+void Display::HideCursor(void)
+{
+    SDL_ShowCursor(SDL_DISABLE);
+}
 
 /* show system cursor */
-void Display::ShowCursor(void){ SDL_ShowCursor(SDL_ENABLE); }
+void Display::ShowCursor(void)
+{
+    SDL_ShowCursor(SDL_ENABLE);
+}
 
 /* get video display */
-Display::VideoSurface &Display::VideoSurface::GetDisplay(void)
+Display & Display::Get(void)
 {
-    static Display::VideoSurface inside;
+    static Display inside;
 
-    if(!inside.valid())	inside.surface = SDL_GetVideoSurface();
+    if(! inside.surface) inside.surface = SDL_GetVideoSurface();
 
     return inside;
 }

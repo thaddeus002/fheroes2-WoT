@@ -21,7 +21,7 @@
 #define H2RECT_H
 
 #include <vector>
-#include "gamedefs.h"
+#include "types.h"
 
 class Point
 {

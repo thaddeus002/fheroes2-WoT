@@ -37,10 +37,12 @@ Game::menu_t Game::MainMenu(void)
     AGG::PreloadObject("SHNGANIM.ICN");
 
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(Display::SMALL);
+    Display & display = Display::Get();
+    display.SetVideoMode(Display::SMALL);
 
     // image background
     const Sprite &sprite = AGG::GetICN("HEROES.ICN", 0);
@@ -69,7 +71,7 @@ Game::menu_t Game::MainMenu(void)
     buttonCredits.Draw();
     buttonQuit.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     u32 ticket = 0;

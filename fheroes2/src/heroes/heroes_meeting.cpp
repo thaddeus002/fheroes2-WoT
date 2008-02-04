@@ -32,9 +32,12 @@
 
 void Heroes::MeetingDialog(Heroes & heroes2)
 {
+    Display & display = Display::Get();
+
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Dialog::FrameBorder background;
 
@@ -160,7 +163,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
     buttonExit.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();

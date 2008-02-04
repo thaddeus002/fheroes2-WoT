@@ -343,6 +343,7 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
     static u32 ticket = 0;
 
     std::string icn;
+    Display & display = Display::Get();
 
     // before redraw
     switch(race)

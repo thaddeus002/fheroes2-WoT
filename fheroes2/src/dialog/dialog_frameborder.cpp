@@ -30,6 +30,7 @@
 
 Dialog::FrameBorder::FrameBorder()
 {
+    Display & display = Display::Get();
     const Sprite & surdbkg = (H2Config::EvilInterface() ? AGG::GetICN("SURDRBKE.ICN", 0) : AGG::GetICN("SURDRBKG.ICN", 0));
     
     Rect pos;
@@ -46,7 +47,8 @@ Dialog::FrameBorder::FrameBorder()
 
     // cursor
     bool localcursor = false;
-    if(pos & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    Cursor & cursor = Cursor::Get();
+    if(pos & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
 
     back.Save(pos);
 
@@ -144,13 +146,13 @@ Dialog::FrameBorder::FrameBorder()
 Dialog::FrameBorder::~FrameBorder()
 {
     bool localcursor = false;
-
-    if(Cursor::Visible() &&
-	(back.GetRect() & Cursor::GetRect() ||
-        area & Cursor::GetRect())){ Cursor::Hide(); localcursor = true; }
+    Cursor & cursor = Cursor::Get();
+    if(cursor.isVisible() &&
+	(back.GetRect() & cursor.GetRect() ||
+        area & cursor.GetRect())){ cursor.Hide(); localcursor = true; }
 
     back.Restore();
     
-    if(localcursor) Cursor::Show();
-    display.Flip();
+    if(localcursor) cursor.Show();
+    Display::Get().Flip();
 }

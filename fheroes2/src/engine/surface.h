@@ -21,7 +21,7 @@
 #define H2SURFACE_H
 
 #include "rect.h"
-#include "gamedefs.h"
+#include "types.h"
 
 #define DEFAULT_DEPTH           16              // Surface use bits color
 
@@ -33,6 +33,7 @@ public:
     Surface(u16 sw, u16 sh, u8 depth, u32 fl);
     Surface(u16 sw, u16 sh, bool alpha = false);
     Surface(const Surface & bs);
+    Surface(SDL_Surface * sf);
 
     ~Surface();
 
@@ -86,6 +87,8 @@ protected:
     const SDL_PixelFormat *GetPixelFormat(void) const{ return surface->format; };
 
     SDL_Surface *surface;
+    
+    bool videosurface;
 };
 
 #endif

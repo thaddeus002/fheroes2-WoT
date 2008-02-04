@@ -38,9 +38,12 @@
 
 Dialog::answer_t Heroes::OpenDialog(bool readonly)
 {
+    Display & display = Display::Get();
+
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Dialog::FrameBorder frameborder;
 
@@ -506,7 +509,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     buttonDismiss.Draw();
     buttonExit.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // dialog menu loop
@@ -520,7 +523,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	{
 	    if(le.MouseClickLeft(coordsHeroesTroops[ii]))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		// show dialog army info
 		if(selectHeroesTroops.isSelected() && Army::isValid(army[ii]) && selectHeroesTroops.GetCursorIndex() == ii)
@@ -598,7 +601,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 			    selectHeroesTroops.Redraw();
 			}
 
-			Cursor::Show();
+			cursor.Show();
 			display.Flip();
 		    }
 		}
@@ -611,7 +614,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    selectHeroesTroops.Redraw();
 		}
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	    else
@@ -621,7 +624,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		selectHeroesTroops.isSelected() &&
 		!readonly)
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
 
@@ -632,23 +635,23 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    select_troops.SetCount(select_troops.Count() - redistr_count);
 		}
 
-		Cursor::Hide();
+		cursor.Hide();
 
 		selectHeroesTroops.Reset();
 		selectHeroesTroops.Redraw();
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	    else
 	    // press right - show quick info
 	    if(le.MousePressRight(coordsHeroesTroops[ii]) && Army::isValid(army[ii]))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == GetCountArmy() ? false : true), true);
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	}
@@ -684,18 +687,18 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
         if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)
         {
-	    Cursor::Hide();
+	    cursor.Hide();
 	    cursorFormat.Move(army1_pt);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
     	    army_spread = true;
         }
 
         if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && army_spread)
         {
-	    Cursor::Hide();
+	    cursor.Hide();
 	    cursorFormat.Move(army2_pt);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
     	    army_spread = false;
         }

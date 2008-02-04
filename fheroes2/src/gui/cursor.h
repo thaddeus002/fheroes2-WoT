@@ -20,12 +20,15 @@
 #ifndef H2CURSOR_H
 #define H2CURSOR_H
 
-#include "rect.h"
+#include "spritecursor.h"
 #include "gamedefs.h"
 
-namespace Cursor
+class Cursor : public SpriteCursor
 {
-    typedef enum {
+public:
+
+    typedef enum
+    {
 	NONE               = 0x0000,
 	// ADVMCO.ICN
 	POINTER            = 0x1000,
@@ -128,20 +131,20 @@ namespace Cursor
         MAGICARROW         = 0x3026,
     } themes_t;
 
-    void Init(themes_t cursor);
+	static Cursor &	Get(void);
 
-    void Redraw(u16 x, u16 y);
-    void Redraw(u16 x, u16 y, bool flag);
+	static void	Redraw(u16 x, u16 y);
 
-    void Show(void);
-    void Hide(void);
-    
-    bool Visible(void);
+	themes_t	Themes(void);
+	bool		SetThemes(themes_t cursor);
 
-    themes_t Get(void);
-    bool Set(themes_t cursor);
-    
-    const Rect & GetRect(void);
+private:
+	Cursor();
+	void		SetOffset(const themes_t name);
+
+	themes_t	theme;
+        s16		offset_x;
+        s16		offset_y;
 };
 
 #endif

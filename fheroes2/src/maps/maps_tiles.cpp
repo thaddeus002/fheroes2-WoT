@@ -230,6 +230,8 @@ void Maps::Tiles::Remove(u32 uniq)
 
 void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 {
+    Display & display = Display::Get();
+
     // level 0
     display.Blit(tile_sprite, dstx, dsty);
     
@@ -519,6 +521,8 @@ void Maps::Tiles::DebugInfo(u16 index) const
 
 void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
 {
+    Display & display = Display::Get();
+
     Monster::monster_t monster = Monster::Monster(*this);
 
     if(Monster::UNKNOWN <= monster)
@@ -625,6 +629,8 @@ void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
 
 void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 {
+    Display & display = Display::Get();
+
     if(const Heroes *heroes = world.GetHeroes(maps_index))
     {
 	// heroes

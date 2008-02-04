@@ -31,10 +31,13 @@
 
 u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 {
+    Display & display = Display::Get();
+
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    const Cursor::themes_t oldcursor = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(Cursor::POINTER);
     
     // calculate max count
     u16 max = 0;
@@ -295,7 +298,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     buttonUp.Draw();
     buttonDn.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // message loop
@@ -311,10 +314,10 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 	{
 	    ++result;
 	    paymentCosts += paymentMonster;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    static_info.Restore();
 	    RedrawCurrentInfo;
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -322,10 +325,10 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 	{
 	    --result;
 	    paymentCosts -= paymentMonster;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    static_info.Restore();
 	    RedrawCurrentInfo;
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -333,10 +336,10 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 	{
 	    result = max;
 	    paymentCosts = paymentMonster * max;
-	    Cursor::Hide();
+	    cursor.Hide();
 	    static_info.Restore();
 	    RedrawCurrentInfo;
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	
@@ -345,12 +348,12 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = 0; break; }
     }
 
-    Cursor::Hide();
+    cursor.Hide();
 
     back.Restore();
-    Cursor::Set(cursor);
+    cursor.SetThemes(oldcursor);
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     return result;
@@ -358,10 +361,13 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 
 void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 {
+    Display & display = Display::Get();
+
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    const Cursor::themes_t oldcursor = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
     
     const PaymentConditions::BuyMonster paymentMonster(monster);
 
@@ -509,17 +515,17 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     Text(message, Font::SMALL, pos.x + 70 - Text::width(message, Font::SMALL) / 2, pos.y + 130);
     message.clear();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     //
     while(le.HandleEvents() && le.MouseRight());
 
-    Cursor::Hide();
+    cursor.Hide();
 
     back.Restore();
-    Cursor::Set(cursor);
+    cursor.SetThemes(oldcursor);
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 }

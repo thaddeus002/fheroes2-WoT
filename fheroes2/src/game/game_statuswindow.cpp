@@ -63,6 +63,8 @@ void Game::StatusWindow::DrawKingdomInfo(void)
 {
     std::string count;
 
+    Display & display = Display::Get();
+
     // restore background
     display.Blit(ston, pos.x, pos.y);
 
@@ -110,6 +112,8 @@ void Game::StatusWindow::DrawDayInfo(void)
 {
     std::string message;
 
+    Display & display = Display::Get();
+
     // restore background
     display.Blit(ston, pos.x, pos.y);
 
@@ -130,11 +134,13 @@ void Game::StatusWindow::DrawDayInfo(void)
 void Game::StatusWindow::DrawArmyInfo(void)
 {
     // restore background
-    display.Blit(ston, pos.x, pos.y);
+    Display::Get().Blit(ston, pos.x, pos.y);
 }
 
 void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
 {
+    Display & display = Display::Get();
+
     // restore background
     display.Blit(ston, pos.x, pos.y);
 

@@ -29,6 +29,8 @@
 
 u16 Dialog::SelectCount(u16 max_count)
 {
+    Display & display = Display::Get();
+
     if(max_count < 2) return 0;
 
     const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
@@ -37,7 +39,8 @@ u16 Dialog::SelectCount(u16 max_count)
     AGG::PreloadObject(system);
 
     // cursor
-    Cursor::Hide();
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     Box box(60, OK|CANCEL);
 
@@ -87,7 +90,7 @@ u16 Dialog::SelectCount(u16 max_count)
     buttonOk.Draw();
     buttonCancel.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // message loop
@@ -104,7 +107,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	{
 	    ++result;
 
-	    Cursor::Hide();
+	    cursor.Hide();
 	    pt.x = pos.x + 80;
 	    pt.y = pos.y + 55;
 	    display.Blit(sprite_edit, pt);
@@ -114,7 +117,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
 	    pt.y = pos.y + 56;
 	    Text(message, Font::BIG, pt);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -124,7 +127,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	{
 	    --result;
 
-	    Cursor::Hide();
+	    cursor.Hide();
 	    pt.x = pos.x + 80;
 	    pt.y = pos.y + 55;
 	    display.Blit(sprite_edit, pt);
@@ -134,7 +137,7 @@ u16 Dialog::SelectCount(u16 max_count)
 	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
 	    pt.y = pos.y + 56;
 	    Text(message, Font::BIG, pt);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 

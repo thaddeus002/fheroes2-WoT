@@ -46,7 +46,7 @@ void Castle::RedrawNameTown(const Point & src_pt)
 
     const Sprite & ramka = AGG::GetICN("TOWNNAME.ICN", 0);
     Point dst_pt(src_pt.x + 320 - ramka.w() / 2, src_pt.y + 248);
-    display.Blit(ramka, dst_pt);
+    Display::Get().Blit(ramka, dst_pt);
 
     dst_pt.x = src_pt.x + 320 - Text::width(name, Font::SMALL) / 2;
     dst_pt.y = src_pt.y + 248;
@@ -55,11 +55,14 @@ void Castle::RedrawNameTown(const Point & src_pt)
 
 Dialog::answer_t Castle::OpenDialog(void)
 {
+    Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
 
     // cursor
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Dialog::FrameBorder background;
 
@@ -333,7 +336,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Cursor::Show();
+    cursor.Show();
 
     display.Flip();
 
@@ -357,7 +360,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	{
 	    if(le.MouseClickLeft(coordsCastleTroops[ii]))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		// show dialog army info
 		if(selectCastleTroops.isSelected() && Army::isValid(army[ii]) && selectCastleTroops.GetCursorIndex() == ii)
@@ -451,7 +454,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    selectCastleTroops.Redraw();
 		}
 
-		Cursor::Show();
+		cursor.Show();
 
 		display.Flip();
 	    }
@@ -461,7 +464,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		!Army::isValid(army[ii]) &&
 		(selectCastleTroops.isSelected() || (castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && 1 < (*castle_heroes).GetCountArmy())))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
 		    const_cast<std::vector<Army::Troops> &>((*castle_heroes).GetArmy())[selectHeroesTroops->GetCursorIndex()] );
@@ -473,7 +476,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    select_troops.SetCount(select_troops.Count() - redistr_count);
 		}
 
-		Cursor::Hide();
+		cursor.Hide();
 
 		selectCastleTroops.Reset();
 		selectCastleTroops.Redraw();
@@ -484,7 +487,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    selectHeroesTroops->Redraw();
 		}
 
-		Cursor::Show();
+		cursor.Show();
 
 		display.Flip();
 	    }
@@ -492,11 +495,11 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // press right - show quick info
 	    if(le.MousePressRight(coordsCastleTroops[ii]) && Army::isValid(army[ii]))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		Dialog::ArmyInfo(army[ii], (1 == GetCountArmy() ? false : true), true);
 
-		Cursor::Show();
+		cursor.Show();
 
 		display.Flip();
 	    }
@@ -510,7 +513,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
 		if(coordsHeroesTroops && le.MouseClickLeft(coordsHeroesTroops->at(ii)))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		// show dialog army info
 		if(selectHeroesTroops && selectHeroesTroops->isSelected() && Army::isValid(army2[ii]) && selectHeroesTroops->GetCursorIndex() == ii)
@@ -596,7 +599,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    selectHeroesTroops->Redraw();
 		}
 
-		Cursor::Show();
+		cursor.Show();
 
 		display.Flip();
 	    }
@@ -608,7 +611,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	       selectHeroesTroops &&
 	       (selectHeroesTroops->isSelected() || selectCastleTroops.isSelected()))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
 		    army2[selectHeroesTroops->GetCursorIndex()] );
@@ -620,7 +623,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    select_troops.SetCount(select_troops.Count() - redistr_count);
 		}
 
-		Cursor::Hide();
+		cursor.Hide();
 
 		selectCastleTroops.Reset();
 		selectCastleTroops.Redraw();
@@ -628,18 +631,18 @@ Dialog::answer_t Castle::OpenDialog(void)
 		selectHeroesTroops->Reset();
 		selectHeroesTroops->Redraw();
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	    else
 	    // press right - show quick info
 	    if(coordsHeroesTroops && le.MousePressRight(coordsHeroesTroops->at(ii)) && Army::isValid(army2[ii]))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 
 		Dialog::ArmyInfo(army2[ii], (1 == (*castle_heroes).GetCountArmy() ? false : true), true);
 
-		Cursor::Show();
+		cursor.Show();
 
 		display.Flip();
 	    }
@@ -652,10 +655,10 @@ Dialog::answer_t Castle::OpenDialog(void)
 
 	    // FIXME check return value: next hero, prev hero
 
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectHeroesTroops->Reset();
 	    selectHeroesTroops->Redraw();
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -672,13 +675,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell))
 	{
 	    OpenWell();
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectCastleTroops.Redraw();
 	    RedrawResourcePanel();
 
     	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
@@ -699,7 +702,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    
 	    if(Castle::BUILD_NOTHING != build)
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 		BuyBuilding(build);
 		RedrawResourcePanel();
 	        RedrawAllBuilding(cur_pt, orders_building);
@@ -711,13 +714,13 @@ Dialog::answer_t Castle::OpenDialog(void)
     		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	    else
 	    if(castle_heroes)
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 		RedrawResourcePanel();
 
 		display.Blit(Portrait::Hero((*castle_heroes).GetHeroes(), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
@@ -738,7 +741,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		selectHeroesTroops->Reset();
 		selectHeroesTroops->Redraw();
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	}
@@ -753,7 +756,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    else
 	    if(Dialog::OK == DialogBuyBuilding(BUILD_CASTLE, true))
 	    {
-		Cursor::Hide();
+		cursor.Hide();
 		BuyBuilding(BUILD_CASTLE);
 		RedrawResourcePanel();
 	        RedrawAllBuilding(cur_pt, orders_building);
@@ -762,7 +765,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
 
-		Cursor::Show();
+		cursor.Show();
 		display.Flip();
 	    }
 	}
@@ -778,14 +781,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
 		Monster::Monster(race, DWELLING_MONSTER1), dwelling[0])))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectCastleTroops.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	else
@@ -793,14 +796,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Castle::RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
 		Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectCastleTroops.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	else
@@ -808,14 +811,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Castle::RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
 		Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectCastleTroops.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	else
@@ -823,14 +826,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Castle::RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
 		Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectCastleTroops.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	else
@@ -838,14 +841,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Castle::RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
 		Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectCastleTroops.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 	else
@@ -853,14 +856,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Castle::RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
 	    Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    selectCastleTroops.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
 
@@ -869,17 +872,6 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_TAVERN), GetDescriptionBuilding(BUILD_TAVERN), Font::BIG);
 	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard)) Dialog::Message(GetStringBuilding(BUILD_SHIPYARD), GetDescriptionBuilding(BUILD_SHIPYARD), Font::BIG);
 	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), GetDescriptionBuilding(BUILD_WELL), Font::BIG);
-	{
-	    Cursor::Hide();
-	    selectCastleTroops.Redraw();
-	    RedrawResourcePanel();
-
-	    // RedrawResourcePanel destroy sprite buttonExit
-	    if(buttonExit.isPressed()) buttonExit.Draw();
-
-	    Cursor::Show();
-	    display.Flip();
-	}
 	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG);
 	if(building & BUILD_MARKETPLACE && le.MousePressRight(coordBuildingMarketplace)) Dialog::Message(GetStringBuilding(BUILD_MARKETPLACE), GetDescriptionBuilding(BUILD_MARKETPLACE), Font::BIG);
 	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG);
@@ -1062,10 +1054,10 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// animation sprite
 	if(!(++ticket % 50)) // FIXME: speed animation low
 	{
-	    Cursor::Hide();
+	    cursor.Hide();
 	    RedrawAllBuilding(cur_pt, orders_building);
 	    RedrawNameTown(cur_pt);
-	    Cursor::Show();
+	    cursor.Show();
 	    display.Flip();
 	}
     }
@@ -1078,6 +1070,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 /* redraw resource info panel */
 void Castle::RedrawResourcePanel(void)
 {
+    Display & display = Display::Get();
     const Resource::funds_t & resource = world.GetMyKingdom().GetFundsResource();
 
     Point dst_pt;

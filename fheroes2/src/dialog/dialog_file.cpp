@@ -28,6 +28,7 @@
 
 Game::menu_t Dialog::FileOptions(void)
 {
+    Display & display = Display::Get();
     // preload
     const std::string &cpanbkg = H2Config::EvilInterface() ? "CPANBKGE.ICN" : "CPANBKG.ICN";
     const std::string &cpanel  = H2Config::EvilInterface() ? "CPANELE.ICN" : "CPANEL.ICN";
@@ -36,9 +37,10 @@ Game::menu_t Dialog::FileOptions(void)
     AGG::PreloadObject(cpanel);
 
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    const Cursor::themes_t oldcursor = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(Cursor::POINTER);
 
     // image box
     const Sprite &box = AGG::GetICN(cpanbkg, 0);
@@ -63,7 +65,7 @@ Game::menu_t Dialog::FileOptions(void)
     buttonQuit.Draw();
     buttonCancel.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     Game::menu_t result = Game::QUITGAME;
@@ -85,10 +87,10 @@ Game::menu_t Dialog::FileOptions(void)
     }
 
     // restore background
-    Cursor::Hide();
+    cursor.Hide();
     back.Restore();
-    Cursor::Set(cursor);
-    Cursor::Show();
+    cursor.SetThemes(oldcursor);
+    cursor.Show();
     display.Flip();
 
     return result;

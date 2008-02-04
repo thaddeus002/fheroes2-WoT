@@ -37,7 +37,10 @@
 
 void Dialog::QuickInfo(const std::string & object)
 {
-    Cursor::Hide();
+    Display & display = Display::Get();
+
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     // preload
     const std::string &qwikinfo = "QWIKINFO.ICN";
@@ -82,22 +85,25 @@ void Dialog::QuickInfo(const std::string & object)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // quick info loop
     while(le.HandleEvents() && le.MouseRight());
 
     // restore background
-    Cursor::Hide();
+    cursor.Hide();
     back.Restore();
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 }
 
 void Dialog::QuickInfo(const Castle & castle)
 {
-    Cursor::Hide();
+    Display & display = Display::Get();
+
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     const std::string &qwiktown = "QWIKTOWN.ICN";
     AGG::PreloadObject(qwiktown);
@@ -230,22 +236,25 @@ void Dialog::QuickInfo(const Castle & castle)
     }																																																																																			
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // quick info loop
     while(le.HandleEvents() && le.MouseRight());
 
     // restore background
-    Cursor::Hide();
+    cursor.Hide();
     back.Restore();
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 }
 
 void Dialog::QuickInfo(const Heroes & hero)
 {
-    Cursor::Hide();
+    Display & display = Display::Get();
+
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     const std::string &qwikhero = "QWIKHERO.ICN";
     AGG::PreloadObject(qwikhero);
@@ -410,15 +419,15 @@ void Dialog::QuickInfo(const Heroes & hero)
     
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // quick info loop
     while(le.HandleEvents() && le.MouseRight());
 
     // restore background
-    Cursor::Hide();
+    cursor.Hide();
     back.Restore();
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 }

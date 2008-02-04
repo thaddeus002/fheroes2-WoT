@@ -135,6 +135,8 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
     vec_heroes.push_back(new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy"));
     vec_heroes.push_back(new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown"));
 
+    Display & display = Display::Get();
+
     // loading info
     display.Fill(0, 0, 0);
     TextBox("Maps Loading...", Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
@@ -257,6 +259,8 @@ void World::LoadMaps(const std::string &filename)
     vec_heroes.push_back(new Heroes(Heroes::BAX, Race::NECR, "Brother Bax"));
     vec_heroes.push_back(new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy"));
     vec_heroes.push_back(new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown"));
+
+    Display & display = Display::Get();
 
     // loading info
     display.Fill(0, 0, 0);

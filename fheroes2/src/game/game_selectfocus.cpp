@@ -144,7 +144,7 @@ bool Game::SelectFocusObject::SetTop(u8 index)
 }
 
 Game::SelectFocusCastles::SelectFocusCastles()
-    : SelectFocusObject(display.w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21), castles(NULL)
+    : SelectFocusObject(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21), castles(NULL)
 {}
 
 Game::SelectFocusCastles & Game::SelectFocusCastles::Get(void)
@@ -163,6 +163,7 @@ void Game::SelectFocusCastles::Redraw(void)
 {
     if(! castles) return;
 
+    Display & display = Display::Get();
     cursor.Hide();
 
     // redraw back
@@ -220,7 +221,7 @@ const Point & Game::SelectFocusCastles::GetCenter(u8 index) const
 }
 
 Game::SelectFocusHeroes::SelectFocusHeroes()
-    : SelectFocusObject(display.w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21), heroes(NULL),
+    : SelectFocusObject(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21), heroes(NULL),
     sprite_blue(7, ICONS_HEIGHT, true)
 {
     // fill backgroung to blue
@@ -243,6 +244,7 @@ void Game::SelectFocusHeroes::Redraw(void)
 {
     if(! heroes) return;
 
+    Display & display = Display::Get();
     cursor.Hide();
 
     // redraw back

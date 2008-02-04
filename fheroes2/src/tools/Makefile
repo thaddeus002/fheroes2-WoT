@@ -4,7 +4,7 @@
 
 TARGETS := extractor 82m2wav til2bmp icn2bmp
 LIBS := ../engine/libengine.a $(shell sdl-config --libs)
-CFLAGS := -O2 -Wall -I ../system -I ../engine $(shell sdl-config --cflags)
+CFLAGS := -O2 -Wall -I ../engine $(shell sdl-config --cflags)
 
 CC := g++
 

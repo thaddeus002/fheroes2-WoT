@@ -33,7 +33,7 @@
 #include <sstream>
 
 #include "palette.h"
-#include "gamedefs.h"
+#include "types.h"
 #include "surface.h"
 #include "display.h"
 
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 	palette[ii] = surface.MapRGB(colors[ii].r, colors[ii].g, colors[ii].b);
     }
 
-    Display::Initialize();
+    SDL::Init();
 
     u16 count_sprite;
     u32 total_size;
@@ -199,6 +199,8 @@ int main(int argc, char **argv)
     fd_data.close();
 
     std::cout << "expand to: " << prefix << std::endl;
+
+    SDL::Quit();
 
     return EXIT_SUCCESS;
 }

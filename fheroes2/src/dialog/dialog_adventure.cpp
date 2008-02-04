@@ -28,6 +28,8 @@
 
 Dialog::answer_t Dialog::AdventureOptions(void)
 {
+    Display & display = Display::Get();
+
     // preload
     const std::string &apanbkg = H2Config::EvilInterface() ? "APANBKGE.ICN" : "APANBKG.ICN";
     const std::string &apanel  = H2Config::EvilInterface() ? "APANELE.ICN" : "APANEL.ICN";
@@ -36,9 +38,11 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     AGG::PreloadObject(apanel);
 
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    const Cursor::themes_t oldcursor = cursor.Themes();
+
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     // image box
     const Sprite &box = AGG::GetICN(apanbkg, 0);
@@ -63,7 +67,7 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     buttonDig.Draw();
     buttonCancel.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     Dialog::answer_t result = Dialog::ZERO;
@@ -85,10 +89,10 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     }
 
     // restore background
-    Cursor::Hide();
+    cursor.Hide();
     back.Restore();
-    Cursor::Set(cursor);
-    Cursor::Show();
+    cursor.SetThemes(oldcursor);
+    cursor.Show();
     display.Flip();
 
     return result;

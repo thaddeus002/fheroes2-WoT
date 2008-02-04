@@ -47,7 +47,7 @@ void Background::Save(void)
 
     if(! Surface::valid()) CreateSurface(*this, DEFAULT_DEPTH, SDL_SWSURFACE);
 
-    Blit(display, *this, 0, 0);
+    Blit(Display::Get(), *this, 0, 0);
 }
 
 void Background::Save(s16 ax, s16 ay)
@@ -83,7 +83,7 @@ void Background::Save(const Rect &rt)
 
 void Background::Restore(void)
 {
-    display.Blit(*this, x, y);
+    Display::Get().Blit(*this, x, y);
 }
 
 const Rect & Background::GetRect(void) const

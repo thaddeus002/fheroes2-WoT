@@ -214,6 +214,8 @@ void LocalEvent::SetGlobalFilterEvents(void (*pf)(u16, u16))
 
 int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
 {
+    Display & display = Display::Get();
+
     // motion
     if(SDL_MOUSEMOTION == event->type)
     {

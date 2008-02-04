@@ -40,6 +40,8 @@
 
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow)
 {
+    Display & display = Display::Get();
+
     const std::string viewarmy(H2Config::EvilInterface() ? "VIEWARME.ICN" : "VIEWARMY.ICN");
 
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
@@ -53,6 +55,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
     pos_rt.y = (display.h() - sprite_dialog.h()) / 2;
     pos_rt.w = sprite_dialog.w();
     pos_rt.h = sprite_dialog.h();
+
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
 
     Background back(pos_rt);
     
@@ -226,7 +231,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
     
     Dialog::answer_t result = Dialog::ZERO;
@@ -258,7 +263,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
 	//animeMonster.DrawSprite();
     }
 
-    Cursor::Hide();
+    cursor.Hide();
 
     back.Restore();
 

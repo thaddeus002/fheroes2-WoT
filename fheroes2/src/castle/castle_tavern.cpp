@@ -42,7 +42,10 @@ void Castle::OpenTavern(void)
     const std::string & tavern = GetStringBuilding(BUILD_TAVERN);
     const std::string & message = world.GetRumors();
 
-    Cursor::Hide();
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+
+    cursor.Hide();
 
     Dialog::Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 130 + Text::height(message, Font::BIG, BOXAREA_WIDTH), true);
 
@@ -82,7 +85,7 @@ void Castle::OpenTavern(void)
 
     buttonYes.Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();

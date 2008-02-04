@@ -28,15 +28,17 @@
 
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
+    Display & display = Display::Get();
     const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
 
     // preload
     AGG::PreloadObject(system);
 
     // cursor
-    const Cursor::themes_t cursor = Cursor::Get();
-    Cursor::Hide();
-    Cursor::Set(Cursor::POINTER);
+    Cursor & cursor = Cursor::Get();
+    const Cursor::themes_t oldcursor = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Box box(Text::height(header, ft, BOXAREA_WIDTH) + 20 + Text::height(message, ft, BOXAREA_WIDTH), buttons);
 
@@ -103,7 +105,7 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     if(button1) (*button1).Draw();
     if(button2) (*button2).Draw();
 
-    Cursor::Show();
+    cursor.Show();
     display.Flip();
 
     // message loop
@@ -124,13 +126,13 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 	if(le.KeyPress(SDLK_ESCAPE)){ result = Dialog::NO | Dialog::CANCEL; break; }
     }
 
-    Cursor::Hide();
+    cursor.Hide();
 
     if(button1) delete button1;
     if(button2) delete button2;
 
-    Cursor::Set(cursor);
-    Cursor::Show();
+    cursor.SetThemes(oldcursor);
+    cursor.Show();
 
     return result;
 }

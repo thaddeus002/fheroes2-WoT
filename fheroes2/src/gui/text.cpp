@@ -112,7 +112,7 @@ void Text::Blit(u16 ax, u16 ay)
             break;
 	}
 
-	display.Blit(sprite, pt);
+	Display::Get().Blit(sprite, pt);
 
 	pt.x += sprite.w();
     }

@@ -37,6 +37,7 @@
 
 Dialog::Box::Box(u16 height, bool buttons)
 {
+    Display & display = Display::Get();
     const std::string &buybuild = (H2Config::EvilInterface() ? "BUYBUILE.ICN" : "BUYBUILD.ICN");
 
     AGG::PreloadObject(buybuild);
@@ -53,7 +54,8 @@ Dialog::Box::Box(u16 height, bool buttons)
     if(buttons) area.h -= BUTTON_HEIGHT;
 
     bool localcursor = false;
-    if(pos & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    Cursor & cursor = Cursor::Get();
+    if(pos & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
 
     back.Save(pos);
 
@@ -89,19 +91,19 @@ Dialog::Box::Box(u16 height, bool buttons)
     // right bottom sprite
     display.Blit(AGG::GetICN(buybuild, 2), pt);
 
-    if(localcursor) Cursor::Show();
+    if(localcursor) cursor.Show();
 }
 
 Dialog::Box::~Box()
 {
     bool localcursor = false;
-
-    if(Cursor::Visible() &&
-	(back.GetRect() & Cursor::GetRect() ||
-	area & Cursor::GetRect())){ Cursor::Hide(); localcursor = true; }
+    Cursor & cursor = Cursor::Get();
+    if(cursor.isVisible() &&
+	(back.GetRect() & cursor.GetRect() ||
+	area & cursor.GetRect())){ cursor.Hide(); localcursor = true; }
 
     back.Restore();
 
-    if(localcursor) Cursor::Show();
-    display.Flip();
+    if(localcursor) cursor.Show();
+    Display::Get().Flip();
 };

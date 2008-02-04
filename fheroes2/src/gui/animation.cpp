@@ -31,7 +31,7 @@
 #define ANIMATION_LOW		50
 
 Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first, u8 amode)
-    : dst_pt(dp), use_first(first), mode(amode), frame(0), max_rect(display.w(), display.h(), 0, 0), disable(false), reset(false)
+    : dst_pt(dp), use_first(first), mode(amode), frame(0), max_rect(Display::Get().w(), Display::Get().h(), 0, 0), disable(false), reset(false)
 {
     std::vector<Rect> vec_rect;
     
@@ -65,7 +65,10 @@ bool Animation::DrawSprite(u32 ticket, bool forceredraw)
 
     // hide cursor
     bool localcursor = false;
-    if(max_rect & Cursor::GetRect() && Cursor::Visible()){ Cursor::Hide(); localcursor = true; }
+    Cursor & cursor = Cursor::Get();
+    if(max_rect & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
+
+    Display & display = Display::Get();
 
     // restore or save background
     background.valid() ? background.Restore() : background.Save(max_rect);
@@ -86,7 +89,7 @@ bool Animation::DrawSprite(u32 ticket, bool forceredraw)
 	display.Blit(sprite, dst_pt.x + sprite.x(), dst_pt.y + sprite.y());
     }
 
-    if(localcursor) Cursor::Show();
+    if(localcursor) cursor.Show();
 
     if(!reset) frame++;
 

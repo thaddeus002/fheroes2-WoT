@@ -41,7 +41,7 @@
 
 /* constructor */
 Radar::Radar() :
-    pos(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH), spriteArea(RADARWIDTH, RADARWIDTH),
+    pos(Display::Get().w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH), spriteArea(RADARWIDTH, RADARWIDTH),
     spriteCursor(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(world.w()))),
                  static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(world.h())))),
     cursor(spriteCursor, pos.x, pos.y)
@@ -52,7 +52,7 @@ Radar::Radar() :
 }
 
 /* redraw radar */
-void Radar::Redraw(void){ display.Blit(spriteArea, pos.x, pos.y); }
+void Radar::Redraw(void){ Display::Get().Blit(spriteArea, pos.x, pos.y); }
 
 /* generate mini maps (origin version) */
 void Radar::GenerateOrigin(void)
