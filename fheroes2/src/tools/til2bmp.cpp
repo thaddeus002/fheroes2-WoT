@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 {
     if(argc != 3)
     {
-	std::cout << argv[0] << " infile.til extract_to_dir" << std::endl;
+	std::cout << argv[0] << " [-d] infile.til extract_to_dir" << std::endl;
 
 	return EXIT_SUCCESS;
     }
@@ -57,6 +57,11 @@ int main(int argc, char **argv)
 
     std::string prefix(argv[2]);
     std::string shortname(argv[1]);
+    
+    if(shortname == "-d")
+    {
+    }
+
     shortname.replace(shortname.find("."), 4, "");
     
     prefix += SEPARATOR + shortname;

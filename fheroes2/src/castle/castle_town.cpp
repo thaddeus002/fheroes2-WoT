@@ -32,7 +32,6 @@
 #include "captain.h"
 #include "dialog.h"
 #include "heroes.h"
-#include "localevent.h"
 #include "background.h"
 #include "tools.h"
 #include "text.h"

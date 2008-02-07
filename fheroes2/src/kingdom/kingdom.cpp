@@ -27,7 +27,7 @@
 #include "payment.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(Color::color_t cl) : color(cl), play(cl & H2Config::GetKingdomColors() ? true : false)
+Kingdom::Kingdom(const Color::color_t cl) : color(cl), play(cl & H2Config::GetKingdomColors() ? true : false)
 {
     // set starting resource
     switch(H2Config::GetGameDifficulty()){
@@ -260,4 +260,9 @@ u8 Kingdom::GetCountMarketplace(void) const
     }
 
     return result;
+}
+
+Race::race_t Kingdom::GetRace(void) const
+{
+    return H2Config::GetKingdomRace(color);
 }

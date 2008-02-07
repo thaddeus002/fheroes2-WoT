@@ -664,14 +664,36 @@ Dialog::answer_t Castle::OpenDialog(void)
 
         // prev castle
 	if(buttonPrevCastle.isEnable() && le.MouseClickLeft(buttonPrevCastle)){ result = Dialog::PREV; break; }
-
+	else
         // next castle
 	if(buttonNextCastle.isEnable() && le.MouseClickLeft(buttonNextCastle)){ result = Dialog::NEXT; break; }
-
+	else
 	// left click building
 	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) OpenThievesGuild();
+	else
 	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern)) OpenTavern();
-	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard)); // FIXME dialog buy boat
+	else
+	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard))
+	{
+	    cursor.Hide();
+
+	    // check payment and present other boat
+	    //bool enable = ((PaymentConditions::BuyBuilding(race, BUILD_BOAT) > world.GetMyKingdom().GetFundsResource()) ||
+	    //		   (building & BUILD_BOAT)) ? false : true;
+
+	    if(Dialog::OK == Dialog::BuyBoat(false))
+	    {
+		BuyBuilding(BUILD_BOAT);
+
+		RedrawResourcePanel();
+
+    		// RedrawResourcePanel destroy sprite buttonExit
+		if(buttonExit.isPressed()) buttonExit.Draw();
+	    }
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
 	if(building & BUILD_WELL && le.MouseClickLeft(coordBuildingWell))
 	{
 	    OpenWell();
@@ -684,7 +706,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    cursor.Show();
 	    display.Flip();
 	}
+	else
 	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
+	else
 	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace))
 	{
 	    Dialog::Marketplace();
@@ -693,9 +717,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 	}
+	else
 	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
+	else
 	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
+	else
 	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG, Dialog::OK);
+	else
 	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle))
 	{
 	    const building_t build = OpenTown();
@@ -769,13 +797,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 		display.Flip();
 	    }
 	}
+	else
 	// captain
 	if(building & BUILD_CAPTAIN && le.MouseClickLeft(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);
-
+	else
 	// left click mage guild
 	if(building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1) &&
 	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) OpenMageGuild();
-
+	else
 	// left click dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MouseClickLeft(coordDwellingMonster1) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
@@ -869,23 +898,33 @@ Dialog::answer_t Castle::OpenDialog(void)
 
 	// right press building
 	if(building & BUILD_THIEVESGUILD && le.MousePressRight(coordBuildingThievesGuild)) Dialog::Message(GetStringBuilding(BUILD_THIEVESGUILD), GetDescriptionBuilding(BUILD_THIEVESGUILD), Font::BIG);
+	else
 	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_TAVERN), GetDescriptionBuilding(BUILD_TAVERN), Font::BIG);
+	else
 	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard)) Dialog::Message(GetStringBuilding(BUILD_SHIPYARD), GetDescriptionBuilding(BUILD_SHIPYARD), Font::BIG);
+	else
 	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), GetDescriptionBuilding(BUILD_WELL), Font::BIG);
+	else
 	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG);
+	else
 	if(building & BUILD_MARKETPLACE && le.MousePressRight(coordBuildingMarketplace)) Dialog::Message(GetStringBuilding(BUILD_MARKETPLACE), GetDescriptionBuilding(BUILD_MARKETPLACE), Font::BIG);
+	else
 	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG);
+	else
 	if(building & BUILD_MOAT && le.MousePressRight(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG);
+	else
 	if(building & BUILD_SPEC && le.MousePressRight(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG);
+	else
 	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), GetDescriptionBuilding(BUILD_CASTLE), Font::BIG);
 	else
 	if(building & BUILD_TENT && le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
+	else
 	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG);
-
+	else
 	// right press mage guild
 	if(building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1) &&
 	    le.MousePressRight(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) Dialog::Message(GetStringBuilding(BUILD_MAGEGUILD1), GetDescriptionBuilding(BUILD_MAGEGUILD1), Font::BIG);
-
+	else
 	// right press dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1))
 	    Dialog::DwellingInfo(Monster::Monster(race, DWELLING_MONSTER1), dwelling[0]);

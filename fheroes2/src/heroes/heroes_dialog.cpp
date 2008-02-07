@@ -676,15 +676,21 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	// left click info
         if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message("Attack Skill", "Your attack skill is a bonus added to each creature's attack skill.", Font::BIG, Dialog::OK);
+        else
         if(le.MouseClickLeft(rectDefenseSkill)) Dialog::Message("Defense Skill", "Your defense skill is a bonus added to each creature's defense skill.", Font::BIG, Dialog::OK);
+        else
         if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message("Spell Power", "Your spell power determines the length or power of a spell.", Font::BIG, Dialog::OK);
+        else
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG, Dialog::OK);
-
-        if(le.MouseClickLeft(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG, Dialog::OK);
+	else
+	if(le.MouseClickLeft(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG, Dialog::OK);
+        else
         if(le.MouseClickLeft(rectLuckInfo)) Dialog::Message(headerLuckInfo, Luck::Description(GetLuck()), Font::BIG, Dialog::OK);
+        else
         if(le.MouseClickLeft(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
+        else
         if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG, Dialog::OK);
-
+	else
         if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)
         {
 	    cursor.Hide();
@@ -693,7 +699,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    display.Flip();
     	    army_spread = true;
         }
-
+	else
         if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && army_spread)
         {
 	    cursor.Hide();
@@ -721,15 +727,23 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	// right info
         if(le.MousePressRight(rectAttackSkill)) Dialog::Message("Attack Skill", "Your attack skill is a bonus added to each creature's attack skill.", Font::BIG);
+        else
         if(le.MousePressRight(rectDefenseSkill)) Dialog::Message("Defense Skill", "Your defense skill is a bonus added to each creature's defense skill.", Font::BIG);
+        else
         if(le.MousePressRight(rectSpellSkill)) Dialog::Message("Spell Power", "Your spell power determines the length or power of a spell.", Font::BIG);
+        else
         if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG);
-
+	else
         if(le.MousePressRight(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG);
+        else
         if(le.MousePressRight(rectLuckInfo)) Dialog::Message(headerLuckInfo, Luck::Description(GetLuck()), Font::BIG);
+        else
         if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG);
+        else
         if(le.MousePressRight(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG);
+        else
         if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message("Spread Formation", descriptionSpreadArmyFormat, Font::BIG);
+        else
         if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message("Grouped Formation", descriptionGroupedArmyFormat, Font::BIG);
 
 	// right info skill

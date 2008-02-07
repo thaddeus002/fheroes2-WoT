@@ -64,6 +64,7 @@
 #define START_IMPOSSIBLE_GOLD           0
 
 
+#include "race.h"
 #include "color.h"
 #include "resource.h"
 #include "gamedefs.h"
@@ -75,11 +76,12 @@ class Heroes;
 class Kingdom
 {
 public:
-    Kingdom(Color::color_t cl);
+    Kingdom(const Color::color_t cl);
 
     bool isPlay(void) const{ return play; };
 
     Color::color_t GetColor(void) const{ return color; };
+    Race::race_t GetRace(void) const;
 
     const Resource::funds_t & GetFundsResource(void) const{ return resource; };
     u16 GetFundsWood(void) const{ return resource.wood; };

@@ -37,7 +37,7 @@
 #include "surface.h"
 #include "display.h"
 
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & palette);
+void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & palette, bool rledebug);
 
 class icnheader
 {
@@ -75,24 +75,34 @@ class icnheader
                                                 
 int main(int argc, char **argv)
 {
-    if(argc != 3)
+    if(argc < 3)
     {
-	std::cout << argv[0] << " infile.icn extract_to_dir" << std::endl;
-
-	return EXIT_SUCCESS;
-    }
-
-    std::fstream fd_data(argv[1], std::ios::in | std::ios::binary);
-
-    if(fd_data.fail())
-    {
-	std::cout << "error open file: " << argv[1] << std::endl;
+	std::cout << argv[0] << " [-d] infile.icn extract_to_dir" << std::endl;
 
 	return EXIT_SUCCESS;
     }
 
     std::string prefix(argv[2]);
     std::string shortname(argv[1]);
+    
+    bool debug = false;
+    
+    if(shortname == "-d")
+    {
+	shortname = prefix;
+	prefix = std::string(argv[3]);
+	debug = true;
+    }
+
+    std::fstream fd_data(shortname.c_str(), std::ios::in | std::ios::binary);
+
+    if(fd_data.fail())
+    {
+	std::cout << "error open file: " << shortname << std::endl;
+
+	return EXIT_SUCCESS;
+    }
+    
     shortname.replace(shortname.find(".icn"), 4, "");
     
     prefix += SEPARATOR + shortname;
@@ -163,7 +173,7 @@ int main(int argc, char **argv)
 
 	sf.Fill(0xff, 0xff, 0xff);
 
-	DrawICN(sf, data_size, reinterpret_cast<const u8*>(buf), palette);
+	DrawICN(sf, data_size, reinterpret_cast<const u8*>(buf), palette, debug);
 
         delete [] buf;
 
@@ -206,7 +216,7 @@ int main(int argc, char **argv)
 }
 
 /* draw RLE ICN to surface */
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & palette)
+void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & palette, bool rledebug)
 {
     u8 i, count;
     u16 x = 0;
@@ -214,12 +224,6 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & p
     u32 index = 0;
 
     u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : DEFAULT_COLOR_KEY16;
-
-    bool rledebug = false;
-
-#ifdef RLEDEBUG
-    rledebug = true;
-#endif
 
     if(rledebug) printf("START RLE DEBUG\n");
 

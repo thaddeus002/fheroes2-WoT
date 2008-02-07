@@ -186,6 +186,10 @@ void Game::SelectFocusCastles::Redraw(void)
 	    }
 
 	    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", index_sprite), coords[ii].x, coords[ii].y);
+	    
+	    // castle build marker
+	    if(! castle.AllowBuild())
+		display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", 24), coords[ii].x + 39, coords[ii].y + 1);
 	}
 	// redraw background
 	else

@@ -63,9 +63,9 @@ namespace Dialog
 	NEXT	= 0x0100
     } answer_t;
 
-    Dialog::answer_t AdventureOptions(void);
+    answer_t AdventureOptions(void);
     Game::menu_t FileOptions(void);
-    Dialog::answer_t SystemOptions(void);
+    answer_t SystemOptions(void);
 
     // show info cell maps
     void QuickInfo(const std::string & object);
@@ -83,10 +83,13 @@ namespace Dialog
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
 
     // army info
-    Dialog::answer_t ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow);
+    answer_t ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow);
 
     // dialog marketplace
     void Marketplace(void);
+
+    // dialog buy boat
+    answer_t BuyBoat(bool enable);
 
 class Box
 {
