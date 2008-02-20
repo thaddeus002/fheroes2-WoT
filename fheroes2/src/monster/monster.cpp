@@ -521,7 +521,6 @@ Monster::level_t Monster::GetLevel(monster_t monster)
 	case SKELETON:
 	case ZOMBIE:
 	case ROGUE:
-	case UNKNOWN:
 	case MONSTER_RND1:
 			return LEVEL1;
 
@@ -598,6 +597,8 @@ Monster::level_t Monster::GetLevel(monster_t monster)
 		case 2: return LEVEL3;
 		case 3: return LEVEL4;
 	    }
+
+	default: break;
     }
     
     return LEVEL1;
@@ -674,4 +675,95 @@ u16 Monster::GetSize(const Maps::Tiles & tile)
     }
 
     return size;
+}
+
+u32 Monster::Dwelling(const monster_t monster)
+{
+    switch(monster)
+    {
+	case PEASANT:
+	case GOBLIN:
+	case SPRITE:
+	case CENTAUR:
+	case HALFLING:
+	case SKELETON:
+	    return Castle::DWELLING_MONSTER1;
+
+	case ARCHER:
+	case ORC:
+	case ZOMBIE:
+	case DWARF:
+	case GARGOYLE:
+	case BOAR:
+	    return Castle::DWELLING_MONSTER2;
+
+	case RANGER:
+	case CHIEF_ORC:
+	case BATTLE_DWARF:
+	case MUTANT_ZOMBIE:
+	    return Castle::DWELLING_UPGRADE2;
+
+	case PIKEMAN:
+	case WOLF:
+	case ELF:
+	case IRON_GOLEM:
+	case MUMMY:
+	case GRIFFIN:
+	    return Castle::DWELLING_MONSTER3;
+
+	case VETERAN_PIKEMAN:
+	case GRAND_ELF:
+	case STEEL_GOLEM:
+	case ROYAL_MUMMY:
+	    return Castle::DWELLING_UPGRADE3;
+
+	case SWORDSMAN:
+	case OGRE:
+	case DRUID:
+	case MINOTAUR:
+	case ROC:
+	case VAMPIRE:
+	    return Castle::DWELLING_MONSTER4;
+
+	case MASTER_SWORDSMAN:
+	case LORD_OGRE:
+	case GREATER_DRUID:
+	case KNIGHT_MINOTAUR:
+	case LORD_VAMPIRE:
+	    return Castle::DWELLING_UPGRADE4;
+
+	case CAVALRY:
+	case TROLL:
+	case MAGE:
+	case LICH:
+	case UNICORN:
+	case HYDRA:
+	    return Castle::DWELLING_MONSTER5;
+
+	case CHAMPION:
+	case WAR_TROLL:
+	case ARCHMAGE:
+	case POWER_LICH:
+	    return Castle::DWELLING_UPGRADE5;
+
+	case PALADIN:
+	case CYCLOPS:
+	case PHOENIX:
+	case GREEN_DRAGON:
+	case GIANT:
+	case BONE_DRAGON:
+	    return Castle::DWELLING_MONSTER6;
+
+	case CRUSADER:
+	case RED_DRAGON:
+	case TITAN:
+	    return Castle::DWELLING_UPGRADE6;
+
+	case BLACK_DRAGON:
+	    return Castle::DWELLING_UPGRADE7;
+	
+	default: break;
+    }
+
+    return 0;
 }

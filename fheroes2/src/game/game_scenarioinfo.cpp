@@ -205,7 +205,6 @@ Game::menu_t Game::ScenarioInfo(void)
 	    if((conf.FileInfo().KingdomColors() & rnd_color & color) &&
 		le.MouseClickLeft(coordClass[Color::GetIndex(color)]))
 	    {
-		Error::Verbose("color: " + Color::String(color) + ", race: " + Race::String(conf.FileInfo().KingdomRace(color)));
 		cursor.Hide();
 		u8 index = 0;
 		switch(conf.FileInfo().KingdomRace(color))
@@ -223,7 +222,6 @@ Game::menu_t Game::ScenarioInfo(void)
 		display.Blit(sprite, coordClass[Color::GetIndex(color)].x, coordClass[Color::GetIndex(color)].y);
 		cursor.Show();
 		display.Flip();
-		Error::Verbose("color: " + Color::String(color) + ", race: " + Race::String(conf.FileInfo().KingdomRace(color)));
 	    }
 
 	// press button

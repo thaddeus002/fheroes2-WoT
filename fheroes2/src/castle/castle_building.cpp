@@ -392,11 +392,42 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
     // sea anime
     if(Race::WZRD == race || (!(BUILD_SHIPYARD & building) && HaveNearlySea()))
     {
-    	const Sprite & sprite50 = AGG::GetICN(ICN::TWNZEXT0, 0);
-	display.Blit(sprite50, dst_pt.x + sprite50.x(), dst_pt.y + sprite50.y());
+    	const Sprite * sprite50 = NULL;
+    	const Sprite * sprite51 = NULL;
 
-    	const Sprite & sprite51 = AGG::GetICN(ICN::TWNZEXT0, 1 + ticket % 5);
-	display.Blit(sprite51, dst_pt.x + sprite51.x(), dst_pt.y + sprite51.y());
+    	switch(race)
+    	{
+    	    case Race::KNGT:
+    		sprite50 = &AGG::GetICN(ICN::TWNKEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNKEXT0, 1 + ticket % 5);
+    		break;
+    	    case Race::BARB:
+    		sprite50 = &AGG::GetICN(ICN::TWNBEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNBEXT0, 1 + ticket % 5);
+    		break;
+    	    case Race::SORC:
+    		sprite50 = &AGG::GetICN(ICN::TWNSEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNSEXT0, 1 + ticket % 5);
+    		break;
+    	    case Race::NECR:
+    		sprite50 = &AGG::GetICN(ICN::TWNNEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNNEXT0, 1 + ticket % 5);
+    		break;
+    	    case Race::WRLK:
+    		sprite50 = &AGG::GetICN(ICN::TWNWEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNWEXT0, 1 + ticket % 5);
+    		break;
+    	    case Race::WZRD:
+    		sprite50 = &AGG::GetICN(ICN::TWNZEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNZEXT0, 1 + ticket % 5);
+    		break;
+    	    default:
+    		break;
+    	}
+
+	if(sprite50) display.Blit(*sprite50, dst_pt.x + sprite50->x(), dst_pt.y + sprite50->y());
+
+	if(sprite51) display.Blit(*sprite51, dst_pt.x + sprite51->x(), dst_pt.y + sprite51->y());
     }
 
     // redraw builds

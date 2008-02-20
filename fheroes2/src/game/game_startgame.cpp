@@ -465,6 +465,8 @@ Game::menu_t Game::StartGame(void)
 					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
 
 					    statusWindow.Redraw();
+					    selectCastles.Redraw();
+
 					    display.Flip();
 					}
 					// select other castle
@@ -576,6 +578,8 @@ Game::menu_t Game::StartGame(void)
 						OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
 
 						statusWindow.Redraw();
+						selectCastles.Redraw();
+				
 						display.Flip();
 					    }
 					}
@@ -998,6 +1002,8 @@ Game::menu_t Game::StartGame(void)
 					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
 
 					    statusWindow.Redraw();
+					    selectCastles.Redraw();
+
 					    display.Flip();
 					}
 					// select other castle
@@ -1094,6 +1100,8 @@ Game::menu_t Game::StartGame(void)
 					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
 
 					    statusWindow.Redraw();
+					    selectCastles.Redraw();
+		    
 					    display.Flip();
 					}
 					// select other castle
@@ -1453,6 +1461,8 @@ Game::menu_t Game::StartGame(void)
 			    OpenCastle(castle, areaMaps, radar);
 
 			    statusWindow.Redraw();
+			    selectCastles.Redraw();
+
 			    display.Flip();
 			}
 		    }
@@ -1531,6 +1541,9 @@ Game::menu_t Game::StartGame(void)
 
 	    statusWindow.SetState(Game::StatusWindow::DAY);
 	    statusWindow.Redraw();
+	    
+	    selectCastles.Redraw();
+
 	    cursor.Show();
 	    display.Flip();
 	}

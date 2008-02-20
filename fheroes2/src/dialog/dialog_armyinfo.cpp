@@ -38,7 +38,7 @@
 #include "skill.h"
 #include "dialog.h"
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade)
 {
     Display & display = Display::Get();
 
@@ -204,7 +204,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
 
     if(!quickshow)
     {
-	if(monster.monster != Monster::Upgrade(monster.monster))
+	if(show_upgrade && monster.monster != Monster::Upgrade(monster.monster))
 	{
 	    upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * army.Count()) <= world.GetMyKingdom().GetFundsResource();
 

@@ -365,8 +365,12 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
+		    
+		    const bool show_upgrade = Monster::AllowUpgrade(select_monster) &&
+			    Monster::GetRace(select_monster) == race &&
+			    (building & GetUpgradeBuilding(Monster::Dwelling(select_monster), race));
 
-		    switch(Dialog::ArmyInfo(army[ii], true, false))
+		    switch(Dialog::ArmyInfo(army[ii], true, false, show_upgrade))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
@@ -493,7 +497,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-		Dialog::ArmyInfo(army[ii], (1 == GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army[ii], (1 == GetCountArmy() ? false : true), true, false);
 
 		cursor.Show();
 
@@ -519,7 +523,11 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-		    switch(Dialog::ArmyInfo(army2[ii], (1 == (*castle_heroes).GetCountArmy() ? false : true), false))
+		    const bool show_upgrade = Monster::AllowUpgrade(select_monster) &&
+			    Monster::GetRace(select_monster) == race &&
+			    (building & GetUpgradeBuilding(Monster::Dwelling(select_monster), race));
+
+		    switch(Dialog::ArmyInfo(army2[ii], (1 == (*castle_heroes).GetCountArmy() ? false : true), false, show_upgrade))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
@@ -636,7 +644,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-		Dialog::ArmyInfo(army2[ii], (1 == (*castle_heroes).GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army2[ii], (1 == (*castle_heroes).GetCountArmy() ? false : true), true, false);
 
 		cursor.Show();
 

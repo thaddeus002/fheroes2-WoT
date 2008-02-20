@@ -33,6 +33,7 @@
 #include "tools.h"
 #include "text.h"
 #include "error.h"
+#include "castle.h"
 #include "portrait.h"
 #include "dialog.h"
 
@@ -533,7 +534,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-                    switch(Dialog::ArmyInfo(army[ii], readonly? false : (1 == GetCountArmy() ? false : true), false))
+                    const Castle *castle = inCastle();
+                    const bool show_upgrade = castle && Monster::AllowUpgrade(select_monster) &&
+                    	    Monster::GetRace(select_monster) == castle->GetRace() &&
+                            castle->isBuild(Castle::GetUpgradeBuilding(Monster::Dwelling(select_monster), castle->GetRace()));
+
+                    switch(Dialog::ArmyInfo(army[ii], readonly? false : (1 == GetCountArmy() ? false : true), false, show_upgrade))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
@@ -649,7 +655,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    {
 		cursor.Hide();
 
-		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == GetCountArmy() ? false : true), true);
+		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == GetCountArmy() ? false : true), true, false);
 
 		cursor.Show();
 		display.Flip();

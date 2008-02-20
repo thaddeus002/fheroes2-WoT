@@ -1481,3 +1481,87 @@ bool Castle::HaveNearlySea(void) const
 
     return Maps::Ground::WATER == tile_c.GetGround() || Maps::Ground::WATER == tile_l.GetGround() || Maps::Ground::WATER == tile_r.GetGround();
 }
+
+u32 Castle::GetUpgradeBuilding(const u32 build, const Race::race_t & race)
+{
+    switch(build)
+    {
+	case BUILD_TENT:	return BUILD_CASTLE;
+	case BUILD_MAGEGUILD1:	return BUILD_MAGEGUILD2;
+	case BUILD_MAGEGUILD2:	return BUILD_MAGEGUILD3;
+	case BUILD_MAGEGUILD3:	return BUILD_MAGEGUILD4;
+	case BUILD_MAGEGUILD4:	return BUILD_MAGEGUILD5;
+	default: break;
+    }
+
+    if(Race::BARB == race)
+    {
+	switch(build)
+	{
+	    case DWELLING_MONSTER2:	return DWELLING_UPGRADE2;
+	    case DWELLING_MONSTER4:	return DWELLING_UPGRADE4;
+	    case DWELLING_MONSTER5:	return DWELLING_UPGRADE5;
+	    default: break;
+	}
+    }
+    else
+    if(Race::KNGT == race)
+    {
+	switch(build)
+	{
+	    case DWELLING_MONSTER2:	return DWELLING_UPGRADE2;
+	    case DWELLING_MONSTER3:	return DWELLING_UPGRADE3;
+	    case DWELLING_MONSTER4:	return DWELLING_UPGRADE4;
+	    case DWELLING_MONSTER5:	return DWELLING_UPGRADE5;
+	    case DWELLING_MONSTER6:	return DWELLING_UPGRADE6;
+	    default: break;
+	}
+    }
+    else
+    if(Race::NECR == race)
+    {
+	switch(build)
+	{
+	    case DWELLING_MONSTER2:	return DWELLING_UPGRADE2;
+	    case DWELLING_MONSTER3:	return DWELLING_UPGRADE3;
+	    case DWELLING_MONSTER4:	return DWELLING_UPGRADE4;
+	    case DWELLING_MONSTER5:	return DWELLING_UPGRADE5;
+	    default: break;
+	}
+    }
+    else
+    if(Race::SORC == race)
+    {
+	switch(build)
+	{
+	    case DWELLING_MONSTER2:	return DWELLING_UPGRADE2;
+	    case DWELLING_MONSTER3:	return DWELLING_UPGRADE3;
+	    case DWELLING_MONSTER4:	return DWELLING_UPGRADE4;
+	    default: break;
+	}
+    }
+    else
+    if(Race::WRLK == race)
+    {
+	switch(build)
+	{
+	    case DWELLING_MONSTER4:	return DWELLING_UPGRADE4;
+	    case DWELLING_MONSTER6:	return DWELLING_UPGRADE6;
+	    case DWELLING_UPGRADE6: return DWELLING_UPGRADE7;
+	    default: break;
+	}
+    }
+    else
+    if(Race::WZRD == race)
+    {
+	switch(build)
+	{
+	    case DWELLING_MONSTER3:	return DWELLING_UPGRADE3;
+	    case DWELLING_MONSTER5:	return DWELLING_UPGRADE5;
+	    case DWELLING_MONSTER6:	return DWELLING_UPGRADE6;
+	    default: break;
+	}
+    }
+
+    return build;
+}

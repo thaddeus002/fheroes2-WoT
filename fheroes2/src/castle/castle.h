@@ -86,7 +86,7 @@ public:
 
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
     bool AllowBuild(void) const{ return allow_build; };
-    bool isBuild(building_t bd) const{ return building & bd; };
+    bool isBuild(u32 bd) const{ return building & bd; };
     bool HaveNearlySea(void) const;
     bool isHeroesPresent(void);
     bool RecruitMonster(building_t dw, u16 count);
@@ -121,7 +121,8 @@ public:
 
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
-    static ICN::icn_t GetICNBuilding(const Castle::building_t & build, const Race::race_t & race);
+    static ICN::icn_t GetICNBuilding(const building_t & build, const Race::race_t & race);
+    static u32 GetUpgradeBuilding(const u32 build, const Race::race_t & race);
 
 private:
     void RedrawResourcePanel(void);
