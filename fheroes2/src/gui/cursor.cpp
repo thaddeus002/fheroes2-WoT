@@ -22,6 +22,7 @@
 #include "rect.h"
 #include "error.h"
 #include "config.h"
+#include "sprite.h"
 #include "cursor.h"
 
 /* constructor */
@@ -52,23 +53,23 @@ bool Cursor::SetThemes(const Cursor::themes_t name)
 	switch(0xF000 & name)
 	{
 	    case 0x3000:
-		SetSprite(AGG::GetICN("SPELCO.ICN", 0xFF & name));
+		SetSprite(AGG::GetICN(ICN::SPELCO, 0xFF & name));
 		if(H2Config::Debug()) Error::Verbose("Cursor::Set: SPELCO.ICN, ", 0xFF & name);
 		break;
 	    
 	    case 0x2000:
-		SetSprite(AGG::GetICN("CMSECO.ICN", 0xFF & name));
+		SetSprite(AGG::GetICN(ICN::CMSECO, 0xFF & name));
 		if(H2Config::Debug()) Error::Verbose("Cursor::Set: CMSECO.ICN, ", 0xFF & name);
 		break;
 	    
 	    case 0x1000:
-		SetSprite(AGG::GetICN("ADVMCO.ICN", 0xFF & name));
+		SetSprite(AGG::GetICN(ICN::ADVMCO, 0xFF & name));
 		if(H2Config::Debug()) Error::Verbose("Cursor::Set: ADVMCO.ICN, ", 0xFF & name);
 		break;
 
 	    default:
 		// default Cursor::POINTER
-		SetSprite(AGG::GetICN("ADVMCO.ICN", 0));
+		SetSprite(AGG::GetICN(ICN::ADVMCO, 0));
 		break;
 	}
 
@@ -85,6 +86,12 @@ void Cursor::Redraw(u16 x, u16 y)
 {
     Cursor & cursor = Cursor::Get();
     cursor.Move(x, y);
+}
+
+/* move cursor */
+void Cursor::Move(u16 x, u16 y)
+{
+    SpriteCursor::Move(x + offset_x, y + offset_y);
 }
 
 /* set offset big cursor */

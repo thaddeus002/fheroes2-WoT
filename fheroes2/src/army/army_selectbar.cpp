@@ -23,14 +23,16 @@
 #include "error.h"
 #include "tools.h"
 #include "text.h"
+#include "sprite.h"
 #include "display.h"
 #include "army.h"
 
 Army::SelectBar::SelectBar(const Point & pos, const std::vector<Troops> & troops)
-    : pos_pt(pos), empty_back(AGG::GetICN("STRIP.ICN", 2)), step(6), cursor(AGG::GetICN("STRIP.ICN", 1), pos), army(troops), selected(false), cursor_index(0xFF)
+    : pos_pt(pos), empty_back(AGG::GetICN(ICN::STRIP, 2)), step(6), cursor(AGG::GetICN(ICN::STRIP, 1), pos),
+    army(troops), selected(false), cursor_index(0xFF), coords(army.size())
 {
     for(u8 ii = 0; ii < army.size(); ++ii)
-        coords.push_back(Rect(pos_pt.x + (empty_back.w() + step) * ii, pos_pt.y, empty_back.w(), empty_back.h()));
+        coords[ii] = Rect(pos_pt.x + (empty_back.w() + step) * ii, pos_pt.y, empty_back.w(), empty_back.h());
 }
 
 void Army::SelectBar::Reset(void)
@@ -66,7 +68,7 @@ void Army::SelectBar::Redraw(void)
 		default: Error::Warning("Army::SelectBar::Redraw: unknown race."); return;
 	    }
 
-	    const Surface & monster_back = AGG::GetICN("STRIP.ICN", index_sprite);
+	    const Surface & monster_back = AGG::GetICN(ICN::STRIP, index_sprite);
 
 	    Point dst_pt;
 
@@ -76,18 +78,13 @@ void Army::SelectBar::Redraw(void)
 	    // monster background
 	    display.Blit(monster_back, dst_pt);
 
-	    // sprite monster
-	    std::string str(10 > monster ? "MONH000" : "MONH00");
-	    String::AddInt(str, monster);
-	    str += ".ICN";
-
-	    const Sprite & monster_sprite = AGG::GetICN(str, 0);
+	    const Sprite & monster_sprite = AGG::GetICN(Monster::GetStats(monster).monh_icn, 0);
 	    dst_pt.x = pos_pt.x + (monster_back.w() + step) * ii + monster_sprite.x();
 	    dst_pt.y = pos_pt.y + monster_sprite.y();
 	    display.Blit(monster_sprite, dst_pt);
 
 	    // draw count
-	    str.clear();
+	    std::string str;
 	    String::AddInt(str, army.at(ii).Count());
 	    dst_pt.x = pos_pt.x + (monster_back.w() + step) * ii + 68  - Text::width(str, Font::SMALL) / 2;
 	    dst_pt.y = pos_pt.y + 80;

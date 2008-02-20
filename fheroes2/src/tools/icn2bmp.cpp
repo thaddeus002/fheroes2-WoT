@@ -32,7 +32,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "palette.h"
+#include "kbpal.h"
 #include "types.h"
 #include "surface.h"
 #include "display.h"

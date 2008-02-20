@@ -24,7 +24,11 @@
 #include "config.h"
 #include "dir.h"
 
-Dir::Dir(const std::string &path, const std::string &filter) : std::vector<std::string>()
+Dir::Dir()
+{
+}
+
+void Dir::Read(const std::string &path, const std::string &filter)
 {
     // read directory
     DIR *dp;

@@ -31,8 +31,8 @@ Dialog::answer_t Dialog::SystemOptions(void)
     Display & display = Display::Get();
 
     // preload
-    const std::string &spanbkg = H2Config::EvilInterface() ? "SPANBKGE.ICN" : "SPANBKG.ICN";
-    const std::string &spanbtn = H2Config::EvilInterface() ? "SPANBTNE.ICN" : "SPANBTN.ICN";
+    const ICN::icn_t spanbkg = H2Config::EvilInterface() ? ICN::SPANBKGE : ICN::SPANBKG;
+    const ICN::icn_t spanbtn = H2Config::EvilInterface() ? ICN::SPANBTNE : ICN::SPANBTN;
 
     AGG::PreloadObject(spanbkg);
     AGG::PreloadObject(spanbtn);

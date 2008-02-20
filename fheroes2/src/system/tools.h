@@ -29,6 +29,7 @@ namespace String
     void Lower(std::string &str);
     void Upper(std::string &str);
     void AddInt(std::string &str, int value);
+    int  ToInt(const std::string &str);
 };
 
 #endif

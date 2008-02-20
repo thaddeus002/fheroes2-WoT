@@ -26,17 +26,124 @@
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
 
-Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), sizeMaps(Maps::ZERO), mapsDifficulty(Difficulty::EASY),
-    kingdomColors(0), allowColors(0), rndColors(0), withHeroes(false)
+Maps::FileInfo::FileInfo() : size(Maps::ZERO), difficulty(Difficulty::EASY),
+    kingdom_colors(0), allow_colors(0), rnd_colors(0), with_heroes(false), races(KINGDOMMAX)
 {
+}
 
-    std::fstream fd(filemaps.c_str(), std::ios::in | std::ios::binary);
+const std::string & Maps::FileInfo::FileMaps(void) const
+{
+    return file;
+}
 
-    if(! fd || fd.fail()){
-	Error::Warning("MapsHeaderInfo: " + filemaps +", file not found.");
-	return;
+const std::string & Maps::FileInfo::Name(void) const
+{
+    return name;
+}
+
+const std::string & Maps::FileInfo::Description(void) const
+{
+    return description;
+}
+
+Maps::mapsize_t Maps::FileInfo::SizeMaps(void) const
+{
+    return size;
+}
+
+Difficulty::difficulty_t Maps::FileInfo::Difficulty(void) const
+{
+    return difficulty;
+}
+
+u8 Maps::FileInfo::KingdomColors(void) const
+{
+    return kingdom_colors;
+}
+
+u8 Maps::FileInfo::AllowColors(void) const
+{
+    return allow_colors;
+}
+
+u8 Maps::FileInfo::ConditionsWins(void) const
+{
+    return conditions_wins;
+}
+
+u8 Maps::FileInfo::ConditionsLoss(void) const
+{
+    return conditions_loss;
+}
+
+Race::race_t Maps::FileInfo::KingdomRace(const Color::color_t color) const
+{
+    switch(color)
+    {
+        case Color::BLUE:	return races[0];
+        case Color::GREEN:	return races[1];
+        case Color::RED:	return races[2];
+        case Color::YELLOW:	return races[3];
+        case Color::ORANGE:	return races[4];
+        case Color::PURPLE:	return races[5];
+
+        default: break;
     }
-    
+
+    return Race::BOMG;
+}
+
+void Maps::FileInfo::SetKingdomRace(const Color::color_t color, const Race::race_t race)
+{
+    switch(color)
+    {
+        case Color::BLUE:	races[0] = race; break;
+        case Color::GREEN:	races[1] = race; break;
+        case Color::RED:	races[2] = race; break;
+        case Color::YELLOW:	races[3] = race; break;
+        case Color::ORANGE:	races[4] = race; break;
+        case Color::PURPLE:	races[5] = race; break;
+
+        default: break;
+    }
+}
+
+void Maps::FileInfo::SetKingdomColors(const u8 colors)
+{
+    kingdom_colors = colors;
+}
+
+bool Maps::FileInfo::PlayWithHeroes(void) const
+{
+    return with_heroes;
+}
+
+bool Maps::FileInfo::Read(const std::string &filename)
+{
+    size = Maps::ZERO;
+    difficulty = Difficulty::EASY;
+    kingdom_colors = 0;
+    allow_colors = 0;
+    rnd_colors = 0;
+    with_heroes = false;
+    races[0] = Race::BOMG;
+    races[1] = Race::BOMG;
+    races[2] = Race::BOMG;
+    races[3] = Race::BOMG;
+    races[4] = Race::BOMG;
+    races[5] = Race::BOMG;
+
+    file = filename;
+
+    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
+
+    if(! fd || fd.fail())
+    {
+	Error::Warning("Maps::FileInfo: " + filename +", file not found.");
+
+	return false;
+    }
+
     char byte8;
     u16 byte16;
     u32 byte32;
@@ -45,163 +152,163 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(byte32));
     SWAP32(byte32);
 
-    if(byte32 != 0x0000005C){
-	Error::Warning("MapsHeaderInfo: " + filemaps +", incorrect maps file.");
+    if(byte32 != 0x0000005C)
+    {
+	Error::Warning("Maps::FileInfo: " + filename +", incorrect maps file.");
 	fd.close();
-	return;
-
+	return false;
     }
 
     // level
     fd.read(reinterpret_cast<char *>(&byte16), sizeof(byte16));
     SWAP16(byte16);
 
-    switch(byte16){
-    
+    switch(byte16)
+    {
 	case 0x00:
-	    mapsDifficulty = Difficulty::EASY;
+	    difficulty = Difficulty::EASY;
 	    break;
 
 	case 0x01:
-	    mapsDifficulty = Difficulty::NORMAL;
+	    difficulty = Difficulty::NORMAL;
 	    break;
 
 	case 0x02:
-	    mapsDifficulty = Difficulty::HARD;
+	    difficulty = Difficulty::HARD;
 	    break;
-	
+
 	case 0x03:
-	    mapsDifficulty = Difficulty::EXPERT;
+	    difficulty = Difficulty::EXPERT;
 	    break;
-	
+
 	default:
-	    Error::Warning("MapsHeaderInfo: incorrect Difficulty maps: " + filemaps + ". Load EASY default.");
+	    Error::Warning("Maps::FileInfo: incorrect difficulty maps: " + filename + ". Load EASY default.");
 	break;
     }
 
     // width
     fd.read(&byte8, 1);
 
-    switch(byte8){
-
+    switch(byte8)
+    {
 	case Maps::SMALL:
-	    sizeMaps = Maps::SMALL;
+	    size = Maps::SMALL;
 	    break;
 
 	case Maps::MEDIUM:
-	    sizeMaps = Maps::MEDIUM;
+	    size = Maps::MEDIUM;
 	    break;
 
 	case Maps::LARGE:
-	    sizeMaps = Maps::LARGE;
+	    size = Maps::LARGE;
 	    break;
 
 	case Maps::XLARGE:
-	    sizeMaps = Maps::XLARGE;
+	    size = Maps::XLARGE;
 	    break;
 	
 	default:
-	    Error::Warning("MapsHeaderInfo: width unknown");
+	    Error::Warning("Maps::FileInfo: width unknown");
 	    break;
     }
 
     // height
     fd.read(&byte8, 1);
 
-    switch(byte8){
-
+    switch(byte8)
+    {
 	case Maps::SMALL:
-	    if(sizeMaps != Maps::SMALL) Error::Warning("MapsHeaderInfo: incorrect height");
+	    if(size != Maps::SMALL) Error::Warning("Maps::FileInfo: incorrect height");
 	    break;
 
 	case Maps::MEDIUM:
-	    if(sizeMaps != Maps::MEDIUM) Error::Warning("MapsHeaderInfo: incorrect height");
+	    if(size != Maps::MEDIUM) Error::Warning("Maps::FileInfo: incorrect height");
 	    break;
 
 	case Maps::LARGE:
-	    if(sizeMaps != Maps::LARGE) Error::Warning("MapsHeaderInfo: incorrect height");
+	    if(size != Maps::LARGE) Error::Warning("Maps::FileInfo: incorrect height");
 	    break;
 
 	case Maps::XLARGE:
-	    if(sizeMaps != Maps::XLARGE) Error::Warning("MapsHeaderInfo: incorrect height");
+	    if(size != Maps::XLARGE) Error::Warning("Maps::FileInfo: incorrect height");
 	    break;
 	
 	default:
-	    Error::Warning("MapsHeaderInfo: height unknown");
+	    Error::Warning("Maps::FileInfo: height unknown");
 	    break;
     }
 
     // kingdom color blue
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Color::BLUE;
+    if(byte8) kingdom_colors |= Color::BLUE;
 
     // kingdom color green
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Color::GREEN;
+    if(byte8) kingdom_colors |= Color::GREEN;
 
     // kingdom color red
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Color::RED;
+    if(byte8) kingdom_colors |= Color::RED;
 
     // kingdom color yellow
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Color::YELLOW;
+    if(byte8) kingdom_colors |= Color::YELLOW;
 
     // kingdom color orange
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Color::ORANGE;
+    if(byte8) kingdom_colors |= Color::ORANGE;
 
     // kingdom color purple
     fd.read(&byte8, 1);
-    if(byte8) kingdomColors |= Color::PURPLE;
+    if(byte8) kingdom_colors |= Color::PURPLE;
 
     // allow color blue
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Color::BLUE;
+    if(byte8) allow_colors |= Color::BLUE;
 
     // allow color green
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Color::GREEN;
+    if(byte8) allow_colors |= Color::GREEN;
 
     // allow color red
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Color::RED;
+    if(byte8) allow_colors |= Color::RED;
 
     // allow color yellow
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Color::YELLOW;
+    if(byte8) allow_colors |= Color::YELLOW;
 
     // allow color orange
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Color::ORANGE;
+    if(byte8) allow_colors |= Color::ORANGE;
 
     // allow color purple
     fd.read(&byte8, 1);
-    if(byte8) allowColors |= Color::PURPLE;
+    if(byte8) allow_colors |= Color::PURPLE;
 
     // rnd color blue
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Color::BLUE;
+    if(byte8) rnd_colors |= Color::BLUE;
 
     // rnd color green
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Color::GREEN;
+    if(byte8) rnd_colors |= Color::GREEN;
 
     // rnd color red
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Color::RED;
+    if(byte8) rnd_colors |= Color::RED;
 
     // rnd color yellow
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Color::YELLOW;
+    if(byte8) rnd_colors |= Color::YELLOW;
 
     // rnd color orange
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Color::ORANGE;
+    if(byte8) rnd_colors |= Color::ORANGE;
 
     // rnd color purple
     fd.read(&byte8, 1);
-    if(byte8) rndColors |= Color::PURPLE;
+    if(byte8) rnd_colors |= Color::PURPLE;
 
     // kingdom count
     // fd.seekg(0x1A, std::ios_base::beg);
@@ -210,32 +317,31 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
     // wins
     fd.seekg(0x1D, std::ios_base::beg);
     fd.read(&byte8, 1);
-    conditionsWins = byte8;
+    conditions_wins = byte8;
 
     // loss
     fd.seekg(0x22, std::ios_base::beg);
     fd.read(&byte8, 1);
-    conditionsLoss = byte8;
+    conditions_loss = byte8;
 
     // start with hero
     fd.seekg(0x25, std::ios_base::beg);
     fd.read(&byte8, 1);
-    if(byte8) withHeroes = true;
+    if(byte8) with_heroes = true;
 
     // race color
-    // 00 - kngt, 01 - barb, 02 - sorc, 03 - wrlk, 04 - wzrd, 05 - necr, 06 - mult, 07 - rnd, ff - none
     fd.read(&byte8, 1);
-    raceKingdom[0] = byte8;
+    races[0] = ByteToRace(byte8);
     fd.read(&byte8, 1);
-    raceKingdom[1] = byte8;
+    races[1] = ByteToRace(byte8);
     fd.read(&byte8, 1);
-    raceKingdom[2] = byte8;
+    races[2] = ByteToRace(byte8);
     fd.read(&byte8, 1);
-    raceKingdom[3] = byte8;
+    races[3] = ByteToRace(byte8);
     fd.read(&byte8, 1);
-    raceKingdom[4] = byte8;
+    races[4] = ByteToRace(byte8);
     fd.read(&byte8, 1);
-    raceKingdom[5] = byte8;
+    races[5] = ByteToRace(byte8);
 
     // name
     char bufname[LENGTHNAME];
@@ -252,25 +358,25 @@ Maps::FileInfo::FileInfo(const std::string &filemaps) : fileMaps(filemaps), size
     description = bufdescription;
 
     fd.close();
+    
+    return true;
 }
 
-u8 Maps::FileInfo::GetKingdomRace(Color::color_t color) const
+Race::race_t Maps::FileInfo::ByteToRace(u8 byte)
 {
-    switch(color){
-        case Color::BLUE:
-            return raceKingdom[0];
-        case Color::GREEN:
-            return raceKingdom[1];
-        case Color::RED:
-            return raceKingdom[2];
-        case Color::YELLOW:
-            return raceKingdom[3];
-        case Color::ORANGE:
-            return raceKingdom[4];
-        case Color::PURPLE:
-            return raceKingdom[5];
-        default:
-            return 0xFF;
-        break;
+    switch(byte)
+    {
+	case 0x00:	return Race::KNGT;
+	case 0x01:	return Race::BARB;
+	case 0x02:	return Race::SORC;
+	case 0x03:	return Race::WRLK;
+	case 0x04:	return Race::WZRD;
+	case 0x05:	return Race::NECR;
+	case 0x06:	return Race::MULT;
+	case 0x07:	return Race::RAND;
+
+	default: 	break;
     }
+
+    return Race::BOMG;
 }

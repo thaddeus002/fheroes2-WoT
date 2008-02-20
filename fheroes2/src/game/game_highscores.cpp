@@ -29,8 +29,8 @@
 Game::menu_t Game::HighScores(void)
 {
     // preload
-    AGG::PreloadObject("HSBKG.ICN");
-    AGG::PreloadObject("HISCORE.ICN");
+    AGG::PreloadObject(ICN::HSBKG);
+    AGG::PreloadObject(ICN::HISCORE);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -41,13 +41,13 @@ Game::menu_t Game::HighScores(void)
     display.SetVideoMode(Display::SMALL);
 
     // image background
-    const Sprite &back = AGG::GetICN("HSBKG.ICN", 0);
+    const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
     display.Blit(back);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonDismiss(9, 315, "HISCORE.ICN", 0, 1);
-    Button buttonExit(604, 315, "HISCORE.ICN", 4, 5);
+    Button buttonDismiss(9, 315, ICN::HISCORE, 0, 1);
+    Button buttonExit(604, 315, ICN::HISCORE, 4, 5);
 
     buttonDismiss.Draw();
     buttonExit.Draw();

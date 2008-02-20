@@ -27,11 +27,11 @@
 #define DEFAULT_SHADOW_ALPHA    0x40
 
 /* ICN Sprite constructor */
-Sprite::Sprite(u16 w, u16 h, s16 ox, s16 oy, u32 size, const u8 *data) 
-    : Surface(w, h, H2Config::Shadow()), offsetX(ox), offsetY(oy)
+Sprite::Sprite(const ICN::Header & header, const char *data, u32 size)
+    : Surface(header.Width(), header.Height(), H2Config::Shadow()), offsetX(header.OffsetX()), offsetY(header.OffsetY())
 {
     SetColorKey();
-    DrawICN(*this, size, data);
+    DrawICN(*this, size, reinterpret_cast<const u8 *>(data));
     if(H2Config::Shadow()) SetDisplayFormat();
 }
 
@@ -146,4 +146,3 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
     // unlock surface
     sf.Unlock();
 }
-

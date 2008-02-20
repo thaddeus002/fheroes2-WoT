@@ -43,14 +43,14 @@ void Castle::OpenThievesGuild(void)
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
-    display.Blit(AGG::GetICN("STONEBAK.ICN", 0), dst_pt);
+    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
 
     std::string message;
 
     // bar
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    display.Blit(AGG::GetICN("WELLXTRA.ICN", 2), dst_pt);
+    display.Blit(AGG::GetICN(ICN::WELLXTRA, 2), dst_pt);
 
     // text bar
     message = "Thieves' Guild: Player RanKings";
@@ -61,7 +61,7 @@ void Castle::OpenThievesGuild(void)
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
-    Button buttonExit(dst_pt, "WELLXTRA.ICN", 0, 1);
+    Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
 
     message = "Number of Towns:";
     dst_pt.x = cur_pt.x + 208 - Text::width(message, Font::BIG);

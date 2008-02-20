@@ -47,16 +47,16 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
     
     std::map<u16, cellinfo_t>	work_map;
     
-    std::vector<Direction::vector_t> directs;
+    std::vector<Direction::vector_t> directs(8);
 
-    directs.push_back(Direction::TOP);
-    directs.push_back(Direction::TOP_LEFT);
-    directs.push_back(Direction::TOP_RIGHT);
-    directs.push_back(Direction::RIGHT);
-    directs.push_back(Direction::BOTTOM_RIGHT);
-    directs.push_back(Direction::BOTTOM);
-    directs.push_back(Direction::BOTTOM_LEFT);
-    directs.push_back(Direction::LEFT);
+    directs[0] = Direction::TOP;
+    directs[1] = Direction::TOP_LEFT;
+    directs[2] = Direction::TOP_RIGHT;
+    directs[3] = Direction::RIGHT;
+    directs[4] = Direction::BOTTOM_RIGHT;
+    directs[5] = Direction::BOTTOM;
+    directs[6] = Direction::BOTTOM_LEFT;
+    directs[7] = Direction::LEFT;
 
     bool notfound = false;
     u32 count_itr = 0;

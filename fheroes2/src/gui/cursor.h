@@ -141,6 +141,7 @@ public:
 private:
 	Cursor();
 	void		SetOffset(const themes_t name);
+	void		Move(u16 x, u16 y);
 
 	themes_t	theme;
         s16		offset_x;

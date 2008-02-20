@@ -121,7 +121,7 @@ public:
 
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
-    static void PrepareICNString(const Castle::building_t & build, const Race::race_t & race, std::string & result);
+    static ICN::icn_t GetICNBuilding(const Castle::building_t & build, const Race::race_t & race);
 
 private:
     void RedrawResourcePanel(void);

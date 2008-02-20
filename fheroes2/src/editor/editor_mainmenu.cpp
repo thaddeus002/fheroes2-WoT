@@ -32,9 +32,9 @@ Game::menu_t Game::Editor::MainMenu(void)
     Display & display = Display::Get();
 
     // preload
-    AGG::PreloadObject("EDITOR.ICN");
-    AGG::PreloadObject("BTNEMAIN.ICN");
-    AGG::PreloadObject("REDBACK.ICN");
+    AGG::PreloadObject(ICN::EDITOR);
+    AGG::PreloadObject(ICN::BTNEMAIN);
+    AGG::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -44,17 +44,17 @@ Game::menu_t Game::Editor::MainMenu(void)
     Display::SetVideoMode(Display::SMALL);
 
     // image background
-    const Sprite &back = AGG::GetICN("EDITOR.ICN", 0);
+    const Sprite &back = AGG::GetICN(ICN::EDITOR, 0);
     display.Blit(back);
 
-    const Sprite &panel = AGG::GetICN("REDBACK.ICN", 0);
+    const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonNewMap(455, 45, "BTNEMAIN.ICN", 0, 1);
-    Button buttonLoadMap(455, 110, "BTNEMAIN.ICN", 2, 3);
-    Button buttonCancelGame(455, 375, "BTNEMAIN.ICN", 4, 5);
+    Button buttonNewMap(455, 45, ICN::BTNEMAIN, 0, 1);
+    Button buttonLoadMap(455, 110, ICN::BTNEMAIN, 2, 3);
+    Button buttonCancelGame(455, 375, ICN::BTNEMAIN, 4, 5);
 
     buttonNewMap.Draw();
     buttonLoadMap.Draw();

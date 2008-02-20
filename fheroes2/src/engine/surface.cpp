@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "surface.h"
+#include "palette.h"
 #include "error.h"
 
 Surface::Surface() : surface(NULL), videosurface(false)
@@ -108,6 +109,11 @@ void Surface::LoadPalette(const SDL_Color *colors, u32 ncolor)
     else
 
     SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, const_cast<SDL_Color *>(colors), 0, ncolor);
+}
+
+void Surface::LoadPalette(const Palette & pal)
+{
+    LoadPalette(pal.SDLColors(), pal.Size());
 }
 
 /* format surface */

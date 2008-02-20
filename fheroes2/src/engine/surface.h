@@ -25,6 +25,8 @@
 
 #define DEFAULT_DEPTH           16              // Surface use bits color
 
+class Palette;
+
 class Surface
 {
 public:
@@ -41,6 +43,7 @@ public:
 
     u16 w(void) const{ return surface ? surface->w : 0; };
     u16 h(void) const{ return surface ? surface->h : 0; };
+    u8  depth(void) const{ return surface ? surface->format->BitsPerPixel : 0; };
 
     bool valid(void) const{ return surface ? true : false; };
     bool alpha(void) const{ return  SDL_SRCALPHA & surface->flags; };
@@ -65,6 +68,7 @@ public:
     void FillRect(u32 color, const Rect & src);
     void FillRect(u8 r, u8 g, u8 b, const Rect & src){ FillRect(MapRGB(r, g, b), src); };
 
+    void LoadPalette(const Palette & pal);
     void LoadPalette(const SDL_Color *colors, u32 ncolor);
     void SetDisplayFormat(void);
     void SetColorKey(void);

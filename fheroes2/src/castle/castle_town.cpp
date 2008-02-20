@@ -40,7 +40,7 @@
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 {
-    const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+    const ICN::icn_t system = (H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     const Heroes & heroes = world.GetHeroes(hero);
 
@@ -60,7 +60,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     TextBox(str, Font::BIG, tit_rt);
 
     //portrait and frame
-    const Sprite & portrait_frame = AGG::GetICN("SURRENDR.ICN", 4);
+    const Sprite & portrait_frame = AGG::GetICN(ICN::SURRENDR, 4);
     dst_pt.x = box_rt.x + 10 + (box_rt.w - portrait_frame.w()) / 2;
     dst_pt.y = box_rt.y + tit_rt.h + 5;
     display.Blit(Portrait::Hero(hero, Portrait::BIG), dst_pt);
@@ -124,7 +124,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 {
     Display & display = Display::Get();
 
-    const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+    const ICN::icn_t system = (H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -185,16 +185,16 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
     const Rect & box_rt = box.GetArea();
 
-    std::string str;
+    ICN::icn_t cstl_icn = ICN::UNKNOWN;
 
     switch(race)
     {
-        case Race::KNGT: str = "CSTLKNGT.ICN"; break;
-        case Race::BARB: str = "CSTLBARB.ICN"; break;
-        case Race::SORC: str = "CSTLSORC.ICN"; break;
-        case Race::WRLK: str = "CSTLWRLK.ICN"; break;
-        case Race::WZRD: str = "CSTLWZRD.ICN"; break;
-        case Race::NECR: str = "CSTLNECR.ICN"; break;
+        case Race::KNGT: cstl_icn = ICN::CSTLKNGT; break;
+        case Race::BARB: cstl_icn = ICN::CSTLBARB; break;
+        case Race::SORC: cstl_icn = ICN::CSTLSORC; break;
+        case Race::WRLK: cstl_icn = ICN::CSTLWRLK; break;
+        case Race::WZRD: cstl_icn = ICN::CSTLWZRD; break;
+        case Race::NECR: cstl_icn = ICN::CSTLNECR; break;
         default: return Dialog::CANCEL;
     }
 
@@ -249,13 +249,13 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		default: return Dialog::CANCEL;
     }
 
-    const Sprite & window_icons = AGG::GetICN("CASLWIND.ICN", 0);
+    const Sprite & window_icons = AGG::GetICN(ICN::CASLWIND, 0);
     Rect src_rt(5, 2, 137, 72);
     dst_pt.x = box_rt.x + (box_rt.w - src_rt.w) / 2;
     dst_pt.y = box_rt.y + 12;
     display.Blit(window_icons, src_rt, dst_pt);
 
-    const Sprite & building_icons = AGG::GetICN(str, index);
+    const Sprite & building_icons = AGG::GetICN(cstl_icn, index);
     dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
     dst_pt.y = box_rt.y + 13;
     display.Blit(building_icons, dst_pt);
@@ -264,6 +264,8 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     dst_pt.x = box_rt.x + (box_rt.w - Text::width(building_name, Font::SMALL)) / 2;
     dst_pt.y = box_rt.y + 70;
     Text(building_name, Font::SMALL, dst_pt);
+
+    std::string str;
 
     src_rt.x = box_rt.x;
     src_rt.y = box_rt.y + 100;
@@ -323,22 +325,9 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
 {
     Display & display = Display::Get();
 
-    std::string icnsprite;
-
-    switch(castle.GetRace())
-    {
-        case Race::BARB: icnsprite = "CSTLBARB.ICN"; break;
-        case Race::KNGT: icnsprite = "CSTLKNGT.ICN"; break;
-        case Race::NECR: icnsprite = "CSTLNECR.ICN"; break;
-        case Race::SORC: icnsprite = "CSTLSORC.ICN"; break;
-        case Race::WRLK: icnsprite = "CSTLWRLK.ICN"; break;
-        case Race::WZRD: icnsprite = "CSTLWZRD.ICN"; break;
-	default: return;
-    }
-
-    const Sprite & sprite_allow = AGG::GetICN("TOWNWIND.ICN", 11);
-    const Sprite & sprite_deny  = AGG::GetICN("TOWNWIND.ICN", 12);
-    const Sprite & sprite_money = AGG::GetICN("TOWNWIND.ICN", 13);
+    const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
+    const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
+    const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
     
     Point dst_pt(pt);
 
@@ -359,7 +348,7 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
     {
 	dst_pt.x = pt.x - 1;
 	dst_pt.y = pt.y + 57;
-	display.Blit(AGG::GetICN("CASLXTRA.ICN", allowBuyBuilding ? 1 : 2), dst_pt);
+	display.Blit(AGG::GetICN(ICN::CASLXTRA, allowBuyBuilding ? 1 : 2), dst_pt);
     }
 
     // name
@@ -383,7 +372,7 @@ Castle::building_t Castle::OpenTown(void)
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
-    display.Blit(AGG::GetICN("CASLWIND.ICN", 0), dst_pt);
+    display.Blit(AGG::GetICN(ICN::CASLWIND, 0), dst_pt);
 
     // hide captain options
     if(! (building & BUILD_CAPTAIN))
@@ -394,7 +383,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.x += cur_pt.x;
 	dst_pt.y += cur_pt.y;
 		
-	display.Blit(AGG::GetICN("STONEBAK.ICN", 0), rect, dst_pt);
+	display.Blit(AGG::GetICN(ICN::STONEBAK, 0), rect, dst_pt);
     }
 
     // draw castle sprite
@@ -403,16 +392,16 @@ Castle::building_t Castle::OpenTown(void)
     DrawImageCastle(dst_pt);
 
     //
-    std::string message;
+    ICN::icn_t icn = ICN::UNKNOWN;
     
     switch(race)
     {
-        case Race::BARB: message = "CSTLBARB.ICN"; break;
-        case Race::KNGT: message = "CSTLKNGT.ICN"; break;
-        case Race::NECR: message = "CSTLNECR.ICN"; break;
-        case Race::SORC: message = "CSTLSORC.ICN"; break;
-        case Race::WRLK: message = "CSTLWRLK.ICN"; break;
-        case Race::WZRD: message = "CSTLWZRD.ICN"; break;
+        case Race::BARB: icn = ICN::CSTLBARB; break;
+        case Race::KNGT: icn = ICN::CSTLKNGT; break;
+        case Race::NECR: icn = ICN::CSTLNECR; break;
+        case Race::SORC: icn = ICN::CSTLSORC; break;
+        case Race::WRLK: icn = ICN::CSTLWRLK; break;
+        case Race::WZRD: icn = ICN::CSTLWZRD; break;
 	default: return BUILD_NOTHING;
     }
 
@@ -421,7 +410,7 @@ Castle::building_t Castle::OpenTown(void)
     // dwelling 1
     dst_pt.x = cur_pt.x + 6;
     dst_pt.y = cur_pt.y + 3;
-    display.Blit(AGG::GetICN(message, 19), dst_pt);
+    display.Blit(AGG::GetICN(icn, 19), dst_pt);
     const Rect rectDwelling1(dst_pt, 135, 57);
     const std::string & stringDwelling1 = GetStringBuilding(DWELLING_MONSTER1, race);
     bool allowBuyBuildDwelling1 = AllowBuyBuilding(DWELLING_MONSTER1);
@@ -432,7 +421,7 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.y = cur_pt.y + 3;
     bool allowUpgrade2 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER2)) && building & DWELLING_MONSTER2;
     index = allowUpgrade2  ? 25 : 20;
-    display.Blit(AGG::GetICN(message, index), dst_pt);
+    display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling2(dst_pt, 135, 57);
     bool allowBuyBuildDwelling2 = (allowUpgrade2 && (DWELLING_MONSTER2 & building) ? AllowBuyBuilding(DWELLING_UPGRADE2) : AllowBuyBuilding(DWELLING_MONSTER2));
     const std::string & stringDwelling2 = GetStringBuilding(allowUpgrade2 && (DWELLING_MONSTER2 & building) ? DWELLING_UPGRADE2 : DWELLING_MONSTER2, race);
@@ -443,7 +432,7 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.y = cur_pt.y + 3;
     bool allowUpgrade3 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER3)) && building & DWELLING_MONSTER3;
     index = allowUpgrade3 ? 26 : 21;
-    display.Blit(AGG::GetICN(message, index), dst_pt);
+    display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling3(dst_pt, 135, 57);
     bool allowBuyBuildDwelling3 = (allowUpgrade3 && (DWELLING_MONSTER3 & building) ? AllowBuyBuilding(DWELLING_UPGRADE3) : AllowBuyBuilding(DWELLING_MONSTER3));
     const std::string & stringDwelling3 = GetStringBuilding(allowUpgrade3 && (DWELLING_MONSTER3 & building) ? DWELLING_UPGRADE3 : DWELLING_MONSTER3, race);
@@ -454,7 +443,7 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.y = cur_pt.y + 78;
     bool allowUpgrade4 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER4)) && building & DWELLING_MONSTER4;
     index = allowUpgrade4 ? 27 : 22;
-    display.Blit(AGG::GetICN(message, index), dst_pt);
+    display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling4(dst_pt, 135, 57);
     bool allowBuyBuildDwelling4 = (allowUpgrade4 && (DWELLING_MONSTER4 & building) ? AllowBuyBuilding(DWELLING_UPGRADE4) : AllowBuyBuilding(DWELLING_MONSTER4));
     const std::string & stringDwelling4 = GetStringBuilding(allowUpgrade4 && (DWELLING_MONSTER4 & building) ? DWELLING_UPGRADE4 : DWELLING_MONSTER4, race);
@@ -465,7 +454,7 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.y = cur_pt.y + 78;
     bool allowUpgrade5 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER5)) && building & DWELLING_MONSTER5;
     index = allowUpgrade5 ? 28 : 23;
-    display.Blit(AGG::GetICN(message, index), dst_pt);
+    display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling5(dst_pt, 135, 57);
     bool allowBuyBuildDwelling5 = (allowUpgrade5 && (DWELLING_MONSTER5 & building) ? AllowBuyBuilding(DWELLING_UPGRADE5) : AllowBuyBuilding(DWELLING_MONSTER5));
     const std::string & stringDwelling5 = GetStringBuilding(allowUpgrade5 && (DWELLING_MONSTER5 & building) ? DWELLING_UPGRADE5 : DWELLING_MONSTER5, race);
@@ -478,7 +467,7 @@ Castle::building_t Castle::OpenTown(void)
     bool allowUpgrade7 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_UPGRADE6)) && building & DWELLING_UPGRADE6;
     index = allowUpgrade7 ? 30 :
            (allowUpgrade6 ? 29 : 24);
-    display.Blit(AGG::GetICN(message, index), dst_pt);
+    display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling6(dst_pt, 135, 57);
     bool allowBuyBuildDwelling6 = (allowUpgrade7 && (DWELLING_UPGRADE6 & building) ?
 	AllowBuyBuilding(DWELLING_UPGRADE7) :
@@ -493,7 +482,7 @@ Castle::building_t Castle::OpenTown(void)
     // mage guild
     dst_pt.x = cur_pt.x + 6;
     dst_pt.y = cur_pt.y + 158;
-    display.Blit(AGG::GetICN(message, 0), dst_pt);
+    display.Blit(AGG::GetICN(icn, 0), dst_pt);
     const Rect rectMageGuild(dst_pt, 135, 57);
     std::string stringMageGuild;
     bool allowBuyBuildMageGuild = false;
@@ -552,14 +541,14 @@ Castle::building_t Castle::OpenTown(void)
 	display.FillRect(0, 0, 0, Rect(dst_pt, 135, 57));
     else
     {
-    	display.Blit(AGG::GetICN(message, 2), dst_pt);
+    	display.Blit(AGG::GetICN(icn, 2), dst_pt);
 	RedrawInfoDwelling(dst_pt, *this, BUILD_TAVERN);
     }
 
     // thieves guild
     dst_pt.x = cur_pt.x + 294;
     dst_pt.y = cur_pt.y + 158;
-    display.Blit(AGG::GetICN(message, 1), dst_pt);
+    display.Blit(AGG::GetICN(icn, 1), dst_pt);
     const Rect rectThievesGuild(dst_pt, 135, 57);
     bool allowBuyBuildThievesGuild = AllowBuyBuilding(BUILD_THIEVESGUILD);
     const std::string & stringThievesGuild = GetStringBuilding(BUILD_THIEVESGUILD, race);
@@ -568,7 +557,7 @@ Castle::building_t Castle::OpenTown(void)
     // shipyard
     dst_pt.x = cur_pt.x + 6;
     dst_pt.y = cur_pt.y + 233;
-    display.Blit(AGG::GetICN(message, 3), dst_pt);
+    display.Blit(AGG::GetICN(icn, 3), dst_pt);
     const Rect rectShipyard(dst_pt, 135, 57);
     bool allowBuyBuildShipyard = AllowBuyBuilding(BUILD_SHIPYARD);
     const std::string & stringShipyard = GetStringBuilding(BUILD_SHIPYARD, race);
@@ -577,7 +566,7 @@ Castle::building_t Castle::OpenTown(void)
     // statue
     dst_pt.x = cur_pt.x + 150;
     dst_pt.y = cur_pt.y + 233;
-    display.Blit(AGG::GetICN(message, 7), dst_pt);
+    display.Blit(AGG::GetICN(icn, 7), dst_pt);
     const Rect rectStatue(dst_pt, 135, 57);
     bool allowBuyBuildStatue = AllowBuyBuilding(BUILD_STATUE);
     const std::string & stringStatue = GetStringBuilding(BUILD_STATUE, race);
@@ -586,7 +575,7 @@ Castle::building_t Castle::OpenTown(void)
     // marketplace
     dst_pt.x = cur_pt.x + 294;
     dst_pt.y = cur_pt.y + 233;
-    display.Blit(AGG::GetICN(message, 10), dst_pt);
+    display.Blit(AGG::GetICN(icn, 10), dst_pt);
     const Rect rectMarketplace(dst_pt, 135, 57);
     bool allowBuyBuildMarketplace = AllowBuyBuilding(BUILD_MARKETPLACE);
     const std::string & stringMarketplace = GetStringBuilding(BUILD_MARKETPLACE, race);
@@ -595,7 +584,7 @@ Castle::building_t Castle::OpenTown(void)
     // well
     dst_pt.x = cur_pt.x + 6;
     dst_pt.y = cur_pt.y + 308;
-    display.Blit(AGG::GetICN(message, 4), dst_pt);
+    display.Blit(AGG::GetICN(icn, 4), dst_pt);
     const Rect rectWell(dst_pt, 135, 57);
     bool allowBuyBuildWell = AllowBuyBuilding(BUILD_WELL);
     const std::string & stringWell = GetStringBuilding(BUILD_WELL, race);
@@ -604,7 +593,7 @@ Castle::building_t Castle::OpenTown(void)
     // wel2
     dst_pt.x = cur_pt.x + 150;
     dst_pt.y = cur_pt.y + 308;
-    display.Blit(AGG::GetICN(message, 11), dst_pt);
+    display.Blit(AGG::GetICN(icn, 11), dst_pt);
     const Rect rectWel2(dst_pt, 135, 57);
     bool allowBuyBuildWel2 = AllowBuyBuilding(BUILD_WEL2);
     const std::string & stringWel2 = GetStringBuilding(BUILD_WEL2, race);
@@ -613,7 +602,7 @@ Castle::building_t Castle::OpenTown(void)
     // spec
     dst_pt.x = cur_pt.x + 294;
     dst_pt.y = cur_pt.y + 308;
-    display.Blit(AGG::GetICN(message, 13), dst_pt);
+    display.Blit(AGG::GetICN(icn, 13), dst_pt);
     const Rect rectSpec(dst_pt, 135, 57);
     bool allowBuyBuildSpec = AllowBuyBuilding(BUILD_SPEC);
     const std::string & stringSpec = GetStringBuilding(BUILD_SPEC, race);
@@ -622,7 +611,7 @@ Castle::building_t Castle::OpenTown(void)
     // left turret
     dst_pt.x = cur_pt.x + 6;
     dst_pt.y = cur_pt.y + 388;
-    display.Blit(AGG::GetICN(message, 8), dst_pt);
+    display.Blit(AGG::GetICN(icn, 8), dst_pt);
     const Rect rectLTurret(dst_pt, 135, 57);
     bool allowBuyBuildLTurret = AllowBuyBuilding(BUILD_LEFTTURRET);
     const std::string & stringLTurret = GetStringBuilding(BUILD_LEFTTURRET, race);
@@ -631,7 +620,7 @@ Castle::building_t Castle::OpenTown(void)
     // right turret
     dst_pt.x = cur_pt.x + 150;
     dst_pt.y = cur_pt.y + 388;
-    display.Blit(AGG::GetICN(message, 9), dst_pt);
+    display.Blit(AGG::GetICN(icn, 9), dst_pt);
     const Rect rectRTurret(dst_pt, 135, 57);
     bool allowBuyBuildRTurret = AllowBuyBuilding(BUILD_RIGHTTURRET);
     const std::string & stringRTurret = GetStringBuilding(BUILD_RIGHTTURRET, race);
@@ -640,7 +629,7 @@ Castle::building_t Castle::OpenTown(void)
     // moat
     dst_pt.x = cur_pt.x + 294;
     dst_pt.y = cur_pt.y + 388;
-    display.Blit(AGG::GetICN(message, 12), dst_pt);
+    display.Blit(AGG::GetICN(icn, 12), dst_pt);
     const Rect rectMoat(dst_pt, 135, 57);
     bool allowBuyBuildMoat = AllowBuyBuilding(BUILD_MOAT);
     const std::string & stringMoat = GetStringBuilding(BUILD_MOAT, race);
@@ -649,33 +638,33 @@ Castle::building_t Castle::OpenTown(void)
     // captain
     switch(race)
     {
-        case Race::BARB: message = "CSTLCAPB.ICN"; break;
-        case Race::KNGT: message = "CSTLCAPK.ICN"; break;
-        case Race::NECR: message = "CSTLCAPN.ICN"; break;
-        case Race::SORC: message = "CSTLCAPS.ICN"; break;
-        case Race::WRLK: message = "CSTLCAPW.ICN"; break;
-        case Race::WZRD: message = "CSTLCAPZ.ICN"; break;
+        case Race::BARB: icn = ICN::CSTLCAPB; break;
+        case Race::KNGT: icn = ICN::CSTLCAPK; break;
+        case Race::NECR: icn = ICN::CSTLCAPN; break;
+        case Race::SORC: icn = ICN::CSTLCAPS; break;
+        case Race::WRLK: icn = ICN::CSTLCAPW; break;
+        case Race::WZRD: icn = ICN::CSTLCAPZ; break;
 	default: return BUILD_NOTHING;
     }
     dst_pt.x = cur_pt.x + 444;
     dst_pt.y = cur_pt.y + 165;
     index = building & BUILD_CAPTAIN ? 1 : 0;
-    display.Blit(AGG::GetICN(message, index), dst_pt);
-    const Rect rectCaptain(dst_pt, AGG::GetICN(message, index).w(), AGG::GetICN(message, index).h());
+    display.Blit(AGG::GetICN(icn, index), dst_pt);
+    const Rect rectCaptain(dst_pt, AGG::GetICN(icn, index).w(), AGG::GetICN(icn, index).h());
     bool allowBuyBuildCaptain = AllowBuyBuilding(BUILD_CAPTAIN);
     const std::string & stringCaptain = GetStringBuilding(BUILD_CAPTAIN, race);
-    const Sprite & spriteSpreadArmyFormat = AGG::GetICN("HSICONS.ICN", 9);
-    const Sprite & spriteGroupedArmyFormat = AGG::GetICN("HSICONS.ICN", 10);
+    const Sprite & spriteSpreadArmyFormat = AGG::GetICN(ICN::HSICONS, 9);
+    const Sprite & spriteGroupedArmyFormat = AGG::GetICN(ICN::HSICONS, 10);
     const Rect rectSpreadArmyFormat(cur_pt.x + 550, cur_pt.y + 220, spriteSpreadArmyFormat.w(), spriteSpreadArmyFormat.h());
     const Rect rectGroupedArmyFormat(cur_pt.x + 585, cur_pt.y + 220, spriteGroupedArmyFormat.w(), spriteGroupedArmyFormat.h());
     const std::string descriptionSpreadArmyFormat("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.");
     const std::string descriptionGroupedArmyFormat("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield.");
     const Point pointSpreadArmyFormat(rectSpreadArmyFormat.x - 1, rectSpreadArmyFormat.y - 1);
     const Point pointGroupedArmyFormat(rectGroupedArmyFormat.x - 1, rectGroupedArmyFormat.y - 1);
-    SpriteCursor cursorFormat(AGG::GetICN("HSICONS.ICN", 11), army_spread ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army_spread ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     if(BUILD_CAPTAIN &building)
     {
-	message = "Attack Skill";
+	std::string message("Attack Skill");
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y = cur_pt.y + 168;
 	Text(message, Font::SMALL, dst_pt);
@@ -744,7 +733,7 @@ Castle::building_t Castle::OpenTown(void)
     // bottom bar
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    Dialog::StatusBar statusBar(dst_pt, AGG::GetICN("CASLBAR.ICN", 0), Font::BIG);
+    Dialog::StatusBar statusBar(dst_pt, AGG::GetICN(ICN::CASLBAR, 0), Font::BIG);
     statusBar.Clear("Castle Options");
 
     // redraw resource panel
@@ -753,7 +742,7 @@ Castle::building_t Castle::OpenTown(void)
     // button exit
     dst_pt.x = cur_pt.x + 554;
     dst_pt.y = cur_pt.y + 428;
-    Button buttonExit(dst_pt, "SWAPBTN.ICN", 0, 1);
+    Button buttonExit(dst_pt, ICN::SWAPBTN, 0, 1);
 
     buttonExit.Draw();
 

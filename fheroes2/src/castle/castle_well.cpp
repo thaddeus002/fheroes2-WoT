@@ -55,7 +55,7 @@ void Castle::OpenWell(void)
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
-    Button buttonExit(dst_pt, "WELLXTRA.ICN", 0, 1);
+    Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
 
     const Rect rectMonster1(cur_pt.x + 20, cur_pt.y + 18, 288, 124);
     const Rect rectMonster2(cur_pt.x + 20, cur_pt.y + 168, 288, 124);
@@ -81,7 +81,7 @@ void Castle::OpenWell(void)
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
 
         // extended version (click - buy dialog monster)
-        if(! H2Config::Original())
+        if(! Settings::Get().Original())
         {
     	    if(building & DWELLING_MONSTER1 && le.MouseClickLeft(rectMonster1) &&
     		Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
@@ -149,7 +149,7 @@ void Castle::OpenWell(void)
 void Castle::WellRedrawInfoArea(const Point & cur_pt)
 {
     Display & display = Display::Get();
-    display.Blit(AGG::GetICN("WELLBKG.ICN", 0), cur_pt);
+    display.Blit(AGG::GetICN(ICN::WELLBKG, 0), cur_pt);
 
     u32 dw = DWELLING_MONSTER1;
 
@@ -218,16 +218,16 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 
 	Point dst_pt;
 	std::string str;
-	std::string icnname;
+	ICN::icn_t icnname = ICN::UNKNOWN;
 
 	switch(race)
 	{
-    	    case Race::BARB: icnname = "CSTLBARB.ICN"; break;
-    	    case Race::KNGT: icnname = "CSTLKNGT.ICN"; break;
-    	    case Race::SORC: icnname = "CSTLSORC.ICN"; break;
-    	    case Race::WRLK: icnname = "CSTLWRLK.ICN"; break;
-    	    case Race::WZRD: icnname = "CSTLWZRD.ICN"; break;
-    	    case Race::NECR: icnname = "CSTLNECR.ICN"; break;
+    	    case Race::BARB: icnname = ICN::CSTLBARB; break;
+    	    case Race::KNGT: icnname = ICN::CSTLKNGT; break;
+    	    case Race::SORC: icnname = ICN::CSTLSORC; break;
+    	    case Race::WRLK: icnname = ICN::CSTLWRLK; break;
+    	    case Race::WZRD: icnname = ICN::CSTLWZRD; break;
+    	    case Race::NECR: icnname = ICN::CSTLNECR; break;
     	    default: break;
 	}
 
@@ -241,10 +241,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	dst_pt.y = pt.y + 103;
 	Text(str, Font::SMALL, dst_pt);
 	// monster
-	str = 10 > monster.monster ? "MONH000" : "MONH00";
-	String::AddInt(str, monster.monster);
-	str += ".ICN";
-	const Sprite & smonster = AGG::GetICN(str, 0);
+	const Sprite & smonster = AGG::GetICN(monster.monh_icn, 0);
 	dst_pt.x = pt.x + 193 - smonster.w() / 2;
 	dst_pt.y = pt.y + 124 - smonster.h();
 	display.Blit(smonster, dst_pt);

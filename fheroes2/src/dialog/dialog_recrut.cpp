@@ -49,7 +49,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 
     PaymentConditions::payment_t paymentCosts(paymentMonster * result);
 
-    const Sprite & box = AGG::GetICN("RECRBKG.ICN", 0);
+    const Sprite & box = AGG::GetICN(ICN::RECRBKG, 0);
     const Rect pos((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
 
     Background back(pos);
@@ -69,17 +69,14 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     Text(message, Font::BIG, dst_pt);
 
     // sprite monster
-    message = 10 > monster ? "MONH000" : "MONH00";
-    String::AddInt(message, monster);
-    message += ".ICN";
-    const Sprite & smon = AGG::GetICN(message, 0);
+    const Sprite & smon = AGG::GetICN(Monster::GetStats(monster).monh_icn, 0);
     dst_pt.x = pos.x + 70 - smon.w() / 2;
     dst_pt.y = pos.y + 120 - smon.h();
     display.Blit(smon, dst_pt);
 
     // info resource
     // gold
-    const Sprite & sgold = AGG::GetICN("RESOURCE.ICN", 6);
+    const Sprite & sgold = AGG::GetICN(ICN::RESOURCE, 6);
     dst_pt.x = pos.x + (paymentMonster.ore ||
                         paymentMonster.wood ||
                         paymentMonster.mercury ||
@@ -112,7 +109,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     // crystal
     if(paymentMonster.crystal)
     {
-        const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 4);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 4);
         dst_pt.x = pos.x + 225;
         dst_pt.y = pos.y + 75;
         display.Blit(sres, dst_pt);
@@ -131,7 +128,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     // mercury
     if(paymentMonster.mercury)
     {
-        const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 1);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 1);
         dst_pt.x = pos.x + 225;
         dst_pt.y = pos.y + 72;
         display.Blit(sres, dst_pt);
@@ -150,7 +147,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     // wood
     if(paymentMonster.wood)
     {
-        const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 0);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 0);
         dst_pt.x = pos.x + 225;
         dst_pt.y = pos.y + 72;
         display.Blit(sres, dst_pt);
@@ -169,7 +166,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     // ore
     if(paymentMonster.ore)
     {
-        const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 2);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 2);
         dst_pt.x = pos.x + 225;
         dst_pt.y = pos.y + 72;
         display.Blit(sres, dst_pt);
@@ -188,7 +185,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     // sulfur
     if(paymentMonster.sulfur)
     {
-        const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 3);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 3);
         dst_pt.x = pos.x + 225;
         dst_pt.y = pos.y + 75;
         display.Blit(sres, dst_pt);
@@ -207,7 +204,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     // gems
     if(paymentMonster.gems)
     {
-        const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 5);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 5);
         dst_pt.x = pos.x + 225;
         dst_pt.y = pos.y + 75;
         display.Blit(sres, dst_pt);
@@ -275,22 +272,22 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     // buttons
     dst_pt.x = pos.x + 34;
     dst_pt.y = pos.y + 249;
-    Button buttonOk(dst_pt, "RECRUIT.ICN", 8, 9);
+    Button buttonOk(dst_pt, ICN::RECRUIT, 8, 9);
 
     dst_pt.x = pos.x + 187;
     dst_pt.y = pos.y + 249;
-    Button buttonCancel(dst_pt, "RECRUIT.ICN", 6, 7);
+    Button buttonCancel(dst_pt, ICN::RECRUIT, 6, 7);
 
     dst_pt.x = pos.x + 230;
     dst_pt.y = pos.y + 155;
-    Button buttonMax(dst_pt, "RECRUIT.ICN", 4, 5);
+    Button buttonMax(dst_pt, ICN::RECRUIT, 4, 5);
     dst_pt.x = pos.x + 208;
     dst_pt.y = pos.y + 156;
-    Button buttonUp(dst_pt, "RECRUIT.ICN", 0, 1);
+    Button buttonUp(dst_pt, ICN::RECRUIT, 0, 1);
 
     dst_pt.x = pos.x + 208;
     dst_pt.y = pos.y + 171;
-    Button buttonDn(dst_pt, "RECRUIT.ICN", 2, 3);
+    Button buttonDn(dst_pt, ICN::RECRUIT, 2, 3);
 
     buttonOk.Draw();
     buttonCancel.Draw();
@@ -371,7 +368,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     
     const PaymentConditions::BuyMonster paymentMonster(monster);
 
-    const Sprite & box = AGG::GetICN("RECR2BKG.ICN", 0);
+    const Sprite & box = AGG::GetICN(ICN::RECR2BKG, 0);
     const Rect pos((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
 
     Background back(pos);
@@ -389,17 +386,14 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     Text(message, Font::BIG, pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 25);
 
     // sprite monster
-    message = 10 > monster ? "MONH000" : "MONH00";
-    String::AddInt(message, monster);
-    message += ".ICN";
-    const Sprite & smon = AGG::GetICN(message, 0);
+    const Sprite & smon = AGG::GetICN(Monster::GetStats(monster).monh_icn, 0);
     dst_pt.x = pos.x + 70 - smon.w() / 2;
     dst_pt.y = pos.y + 120 - smon.h();
     display.Blit(smon, dst_pt);
 
     // info resource
     // gold
-    const Sprite & sgold = AGG::GetICN("RESOURCE.ICN", 6);
+    const Sprite & sgold = AGG::GetICN(ICN::RESOURCE, 6);
     dst_pt.x = pos.x + (paymentMonster.ore ||
                         paymentMonster.wood ||
                         paymentMonster.mercury ||
@@ -422,7 +416,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     // crystal
     if(paymentMonster.crystal)
     {
-	const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 4);
+	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 4);
 	dst_pt.x = pos.x + 225;
 	dst_pt.y = pos.y + 75;
 	display.Blit(sres, dst_pt);
@@ -437,7 +431,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     // mercury
     if(paymentMonster.mercury)
     {
-	const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 1);
+	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 1);
 	dst_pt.x = pos.x + 225;
 	dst_pt.y = pos.y + 72;
 	display.Blit(sres, dst_pt);
@@ -452,7 +446,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     // wood
     if(paymentMonster.wood)
     {
-	const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 0);
+	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 0);
 	dst_pt.x = pos.x + 225;
 	dst_pt.y = pos.y + 72;
 	display.Blit(sres, dst_pt);
@@ -467,7 +461,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     // ore
     if(paymentMonster.ore)
     {
-	const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 2);
+	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 2);
 	dst_pt.x = pos.x + 225;
 	dst_pt.y = pos.y + 72;
 	display.Blit(sres, dst_pt);
@@ -482,7 +476,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     // sulfur
     if(paymentMonster.sulfur)
     {
-	const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 3);
+	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 3);
 	dst_pt.x = pos.x + 225;
 	dst_pt.y = pos.y + 75;
 	display.Blit(sres, dst_pt);
@@ -497,7 +491,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     // gems
     if(paymentMonster.gems)
     {
-	const Sprite & sres = AGG::GetICN("RESOURCE.ICN", 5);
+	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 5);
 	dst_pt.x = pos.x + 225;
 	dst_pt.y = pos.y + 75;
 	display.Blit(sres, dst_pt);

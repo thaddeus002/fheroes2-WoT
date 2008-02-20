@@ -35,7 +35,7 @@ class Display : public Surface
 public:
     ~Display();
 
-    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280 } resolution_t;
+    typedef enum { SMALL = 640, MEDIUM = 800, LARGE = 1024, XLARGE = 1280, CUSTOM = MAXU16 } resolution_t;
 
     static Display &	Get(void);
 

@@ -30,6 +30,7 @@
 #include "error.h"
 #include "localevent.h"
 #include "rand.h"
+#include "dir.h"
 #include "agg.h"
 #include "cursor.h"
 #include "game.h"
@@ -40,25 +41,23 @@ int main(int argc, char **argv)
 {
 	chdir(dirname(argv[0]));
 
+	Settings & conf = Settings::Get();
+
 	std::string caption("Free Heroes II, version: ");
-	String::AddInt(caption, MAJOR_VERSION);
+	String::AddInt(caption, conf.MajorVersion());
 	caption += ".";
-	String::AddInt(caption, MINOR_VERSION);
+	String::AddInt(caption, conf.MinorVersion());
 
 #ifndef BUILD_RELEASE
 	caption += ", build: ";
-	String::AddInt(caption, BUILD_DATE);
+	String::AddInt(caption, conf.DateBuild());
 #endif
 
 	std::cout << caption << std::endl;
 
-	// load defaults
-	H2Config::Defaults();
-	std::cout << "config: defaults load" << std::endl;
-
 	// load fheroes2.cfg
 	const std::string & fheroes2_cfg = "fheroes2.cfg";
-	std::cout << "config: " << fheroes2_cfg << (H2Config::Load(fheroes2_cfg) ? " load" : " not found") << std::endl;
+	std::cout << "config: " << fheroes2_cfg << (conf.Read(fheroes2_cfg) ? " load" : " not found") << std::endl;
 
 	{
 	    // parse cmd params
@@ -80,27 +79,27 @@ int main(int argc, char **argv)
 	    {
 		const std::string & cmd_config = cmd.GetValue('c');
 
-		std::cout << "config: " << cmd_config << (H2Config::Load(cmd_config) ? " load" : " not found") << std::endl;
+		std::cout << "config: " << cmd_config << (conf.Read(cmd_config) ? " load" : " not found") << std::endl;
 	    }
 
 	    // set debug
-	    if(cmd.Exists('d')) H2Config::SetDebug();
+	    if(cmd.Exists('d')) conf.SetDebug(String::ToInt(cmd.GetValue('d')));
 
 	    // editor mode
 	    if(cmd.Exists('e'))
 	    {
-		H2Config::SetEditor();
+		conf.SetModes(Settings::EDITOR);
 
-		if(H2Config::Debug()) std::cout << "start: editor mode." << std::endl;
+		if(conf.Debug()) std::cout << "start: editor mode." << std::endl;
 
 		caption = "Free Heroes II (Editor), version: ";
-		String::AddInt(caption, MAJOR_VERSION);
+		String::AddInt(caption, conf.MajorVersion());
 		caption += ".";
-		String::AddInt(caption, MINOR_VERSION);
+		String::AddInt(caption, conf.MinorVersion());
 
 #ifndef BUILD_RELEASE
 		caption += ", build: ";
-		String::AddInt(caption, BUILD_DATE);
+		String::AddInt(caption, conf.DateBuild());
 #endif
 	    }
 	}
@@ -118,11 +117,49 @@ int main(int argc, char **argv)
     	    Surface icons(image_icons.pixel_data, image_icons.width, image_icons.height, image_icons.bytes_per_pixel, true);
 	    Display::SetIcons(icons);
 
-	    // init AGG
-	    AGG::Init(H2Config::GetAGGFile());
+	    AGG::Cache & cache = AGG::Cache::Get();
+
+	    // read data directory
+    	    Dir dir;
+    	    
+    	    dir.Read(conf.DataDirectory(), "agg");
+    	    dir.Read(conf.DataDirectory(), "Agg");
+            dir.Read(conf.DataDirectory(), "AGG");
+
+	    const u16 count_agg = dir.size();
+
+	    // not found agg, exit
+	    if(0 == count_agg) Error::Except("AGG data files not found.");
+
+    	    std::string agg_heroes2;
+    	    std::string agg_heroes2x;
+
+    	    // attach agg files
+    	    for(u16 ii = 0; ii < count_agg; ++ii)
+    	    {
+    		std::string filename(basename(const_cast<char *>(dir[ii].c_str())));
+
+    		// skip original version heroes2.agg
+    		if(0 == strncasecmp("heroes2.agg", filename.c_str(), 11))
+    		    agg_heroes2 = dir[ii];
+    		else
+    		// skip price loyality version heroes2x.agg
+    		if(0 == strncasecmp("heroes2x.agg", filename.c_str(), 12))
+    		{
+    		    agg_heroes2x = dir[ii];
+    		}
+    		else
+    		    cache.AttachFile(dir[ii]);
+	    }
+
+    	    // loyality version heroes2x.agg attach
+	    if(agg_heroes2x.size()) cache.AttachFile(agg_heroes2x);
+
+	    // original version heroes2.agg need to last attach
+	    if(agg_heroes2.size()) cache.AttachFile(agg_heroes2);
 
 	    // load palette
-	    AGG::LoadPalette();
+	    cache.LoadPAL();
 
 #ifdef BUILD_RELEASE
 	    // SDL logo
@@ -161,7 +198,7 @@ int main(int argc, char **argv)
 #endif
 
 	    // init cursor
-	    AGG::PreloadObject("ADVMCO.ICN");
+	    AGG::PreloadObject(ICN::ADVMCO);
 	    Cursor::Get().SetThemes(Cursor::POINTER);
 
 	    // default events
@@ -175,7 +212,7 @@ int main(int argc, char **argv)
 
 	    while(rs != Game::QUITGAME)
 	    {
-		if(H2Config::Editor())
+		if(conf.Editor())
 		{
 		    switch(rs)
 		    {
@@ -216,7 +253,7 @@ int main(int argc, char **argv)
 	{
 	} catch(Error::Exception)
 	{
-	    H2Config::PrintCurrentValues();
+	    conf.Dump();
 	}
 
 	SDL::Quit();

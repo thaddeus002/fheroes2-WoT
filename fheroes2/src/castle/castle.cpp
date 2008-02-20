@@ -184,7 +184,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	case 0x03: race = Race::WRLK; break;
 	case 0x04: race = Race::WZRD; break;
 	case 0x05: race = Race::NECR; break;
-	default: race = (Color::GRAY != color ? H2Config::GetKingdomRace(color) : Race::Rand()); break;
+	default: race = (Color::GRAY != color ? Settings::Get().FileInfo().KingdomRace(color) : Race::Rand()); break;
     }
     ++ptr8;
 
@@ -208,7 +208,7 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 	const Monster::stats_t mon1 = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
 	const Monster::stats_t mon2 = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER2));
 
-	switch(H2Config::GetGameDifficulty())
+	switch(Settings::Get().GameDifficulty())
 	{
     	    case Difficulty::EASY:
         	army[0].Set(mon1.monster, mon1.grown * 2);
@@ -1183,7 +1183,7 @@ void Castle::DrawImageCastle(const Point & pt)
 
     for(int ii = 0; ii < 5; ++ii)
     {
-	const Sprite & sprite = AGG::GetICN("OBJNTWBA.ICN", index + ii);
+	const Sprite & sprite = AGG::GetICN(ICN::OBJNTWBA, index + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 3 * 32 + sprite.y();
 	display.Blit(sprite, dst_pt);
@@ -1191,7 +1191,7 @@ void Castle::DrawImageCastle(const Point & pt)
 
     for(int ii = 0; ii < 5; ++ii)
     {
-	const Sprite & sprite = AGG::GetICN("OBJNTWBA.ICN", index + 5 + ii);
+	const Sprite & sprite = AGG::GetICN(ICN::OBJNTWBA, index + 5 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 4 * 32 + sprite.y();
 	display.Blit(sprite, dst_pt);
@@ -1209,85 +1209,264 @@ void Castle::DrawImageCastle(const Point & pt)
 	default: break;
     }
     if(! (BUILD_CASTLE & building)) index += 16;
-    const Sprite & sprite2 = AGG::GetICN("OBJNTOWN.ICN", index);
+    const Sprite & sprite2 = AGG::GetICN(ICN::OBJNTOWN, index);
     dst_pt.x = pt.x + 2 * 32 + sprite2.x();
     dst_pt.y = pt.y + sprite2.y();
     display.Blit(sprite2, dst_pt);
     for(int ii = 0; ii < 5; ++ii)
     {
-	const Sprite & sprite = AGG::GetICN("OBJNTOWN.ICN", index + 1 + ii);
+	const Sprite & sprite = AGG::GetICN(ICN::OBJNTOWN, index + 1 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 32 + sprite.y();
 	display.Blit(sprite, dst_pt);
     }
     for(int ii = 0; ii < 5; ++ii)
     {
-	const Sprite & sprite = AGG::GetICN("OBJNTOWN.ICN", index + 6 + ii);
+	const Sprite & sprite = AGG::GetICN(ICN::OBJNTOWN, index + 6 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 2 * 32 + sprite.y();
 	display.Blit(sprite, dst_pt);
     }
     for(int ii = 0; ii < 5; ++ii)
     {
-	const Sprite & sprite = AGG::GetICN("OBJNTOWN.ICN", index + 11 + ii);
+	const Sprite & sprite = AGG::GetICN(ICN::OBJNTOWN, index + 11 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 3 * 32 + sprite.y();
 	display.Blit(sprite, dst_pt);
     }
 }
 
-/* prepare building name ICN string */
-void Castle::PrepareICNString(const Castle::building_t & build, const Race::race_t & race, std::string & result)
+/* get building name ICN */
+ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::race_t & race)
 {
-    result = "TWN";
-
-    switch(race)
+    if(Race::BARB == race)
     {
-	case Race::KNGT: result += "K"; break;
-	case Race::BARB: result += "B"; break;
-	case Race::SORC: result += "S"; break;
-	case Race::WRLK: result += "W"; break;
-	case Race::WZRD: result += "Z"; break;
-	case Race::NECR: result += "N"; break;
-	default: result += "K"; break;
-    }
-
-    switch(build)
-    {
-	case BUILD_CASTLE:	result += "CSTL.ICN"; break;
-	case BUILD_TENT:	result += "TENT.ICN"; break;
-	case BUILD_SPEC:	result += "SPEC.ICN"; break;
-	case BUILD_CAPTAIN:	result += "CAPT.ICN"; break;
-	case BUILD_WEL2:	result += "WEL2.ICN"; break;
-	case BUILD_LEFTTURRET:	result += "LTUR.ICN"; break;
-	case BUILD_RIGHTTURRET:	result += "RTUR.ICN"; break;
-	case BUILD_MOAT:	result += "MOAT.ICN"; break;
-	case BUILD_MARKETPLACE:	result += "MARK.ICN"; break;
-	case BUILD_THIEVESGUILD:result += "THIE.ICN"; break;
-	case BUILD_TAVERN:	result += "TVRN.ICN"; break;
-	case BUILD_WELL:	result += "WELL.ICN"; break;
-	case BUILD_STATUE:	result += "STAT.ICN"; break;
-	case BUILD_BOAT:	result += "BOAT.ICN"; break;
-	case BUILD_SHIPYARD:	result += "DOCK.ICN"; break;
+	switch(build)
+	{
+	case BUILD_CASTLE:	return ICN::TWNBCSTL;
+	case BUILD_TENT:	return ICN::TWNBTENT;
+	case BUILD_SPEC:	return ICN::TWNBSPEC;
+	case BUILD_CAPTAIN:	return ICN::TWNBCAPT;
+	case BUILD_WEL2:	return ICN::TWNBWEL2;
+	case BUILD_LEFTTURRET:	return ICN::TWNBLTUR;
+	case BUILD_RIGHTTURRET:	return ICN::TWNBRTUR;
+	case BUILD_MOAT:	return ICN::TWNBMOAT;
+	case BUILD_MARKETPLACE:	return ICN::TWNBMARK;
+	case BUILD_THIEVESGUILD:return ICN::TWNBTHIE;
+	case BUILD_TAVERN:	return ICN::TWNBTVRN;
+	case BUILD_WELL:	return ICN::TWNBWELL;
+	case BUILD_STATUE:	return ICN::TWNBSTAT;
+	case BUILD_BOAT:	return ICN::TWNBBOAT;
+	case BUILD_SHIPYARD:	return ICN::TWNBDOCK;
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
 	case BUILD_MAGEGUILD3:
 	case BUILD_MAGEGUILD4:
-	case BUILD_MAGEGUILD5:	result += "MAGE.ICN"; break;
-	case DWELLING_MONSTER1:	result += "DW_0.ICN"; break;
-	case DWELLING_MONSTER2:	result += "DW_1.ICN"; break;
-	case DWELLING_UPGRADE2: result += "UP_1.ICN"; break;
-	case DWELLING_MONSTER3:	result += "DW_2.ICN"; break;
-	case DWELLING_UPGRADE3: result += "UP_2.ICN"; break;
-	case DWELLING_MONSTER4:	result += "DW_3.ICN"; break;
-	case DWELLING_UPGRADE4: result += "UP_3.ICN"; break;
-	case DWELLING_MONSTER5:	result += "DW_4.ICN"; break;
-	case DWELLING_UPGRADE5: result += "UP_4.ICN"; break;
-	case DWELLING_MONSTER6:	result += "DW_5.ICN"; break;
-	case DWELLING_UPGRADE6: result += "UP_5.ICN"; break;
-	case DWELLING_UPGRADE7: result += "UP5B.ICN"; break;
+	case BUILD_MAGEGUILD5:	return ICN::TWNBMAGE;
+	case DWELLING_MONSTER1:	return ICN::TWNBDW_0;
+	case DWELLING_MONSTER2:	return ICN::TWNBDW_1;
+	case DWELLING_UPGRADE2: return ICN::TWNBUP_1;
+	case DWELLING_MONSTER3:	return ICN::TWNBDW_2;
+	case DWELLING_MONSTER4:	return ICN::TWNBDW_3;
+	case DWELLING_UPGRADE4: return ICN::TWNBUP_3;
+	case DWELLING_MONSTER5:	return ICN::TWNBDW_4;
+	case DWELLING_UPGRADE5: return ICN::TWNBUP_4;
+	case DWELLING_MONSTER6:	return ICN::TWNBDW_5;
 	default: break;
+	}
     }
+    else
+    if(Race::KNGT == race)
+    {
+	switch(build)
+	{
+	case BUILD_CASTLE:	return ICN::TWNKCSTL;
+	case BUILD_TENT:	return ICN::TWNKTENT;
+	case BUILD_SPEC:	return ICN::TWNKSPEC;
+	case BUILD_CAPTAIN:	return ICN::TWNKCAPT;
+	case BUILD_WEL2:	return ICN::TWNKWEL2;
+	case BUILD_LEFTTURRET:	return ICN::TWNKLTUR;
+	case BUILD_RIGHTTURRET:	return ICN::TWNKRTUR;
+	case BUILD_MOAT:	return ICN::TWNKMOAT;
+	case BUILD_MARKETPLACE:	return ICN::TWNKMARK;
+	case BUILD_THIEVESGUILD:return ICN::TWNKTHIE;
+	case BUILD_TAVERN:	return ICN::TWNKTVRN;
+	case BUILD_WELL:	return ICN::TWNKWELL;
+	case BUILD_STATUE:	return ICN::TWNKSTAT;
+	case BUILD_BOAT:	return ICN::TWNKBOAT;
+	case BUILD_SHIPYARD:	return ICN::TWNKDOCK;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	return ICN::TWNKMAGE;
+	case DWELLING_MONSTER1:	return ICN::TWNKDW_0;
+	case DWELLING_MONSTER2:	return ICN::TWNKDW_1;
+	case DWELLING_UPGRADE2: return ICN::TWNKUP_1;
+	case DWELLING_MONSTER3:	return ICN::TWNKDW_2;
+	case DWELLING_UPGRADE3: return ICN::TWNKUP_2;
+	case DWELLING_MONSTER4:	return ICN::TWNKDW_3;
+	case DWELLING_UPGRADE4: return ICN::TWNKUP_3;
+	case DWELLING_MONSTER5:	return ICN::TWNKDW_4;
+	case DWELLING_UPGRADE5: return ICN::TWNKUP_4;
+	case DWELLING_MONSTER6:	return ICN::TWNKDW_5;
+	case DWELLING_UPGRADE6: return ICN::TWNKUP_5;
+	default: break;
+	}
+    }
+    else
+    if(Race::NECR == race)
+    {
+	switch(build)
+	{
+	case BUILD_CASTLE:	return ICN::TWNNCSTL;
+	case BUILD_TENT:	return ICN::TWNNTENT;
+	case BUILD_SPEC:	return ICN::TWNNSPEC;
+	case BUILD_CAPTAIN:	return ICN::TWNNCAPT;
+	case BUILD_WEL2:	return ICN::TWNNWEL2;
+	case BUILD_LEFTTURRET:	return ICN::TWNNLTUR;
+	case BUILD_RIGHTTURRET:	return ICN::TWNNRTUR;
+	case BUILD_MOAT:	return ICN::TWNNMOAT;
+	case BUILD_MARKETPLACE:	return ICN::TWNNMARK;
+	case BUILD_THIEVESGUILD:return ICN::TWNNTHIE;
+	//case BUILD_TAVERN:	return ICN::TWNNTVRN;
+	case BUILD_WELL:	return ICN::TWNNWELL;
+	case BUILD_STATUE:	return ICN::TWNNSTAT;
+	case BUILD_BOAT:	return ICN::TWNNBOAT;
+	case BUILD_SHIPYARD:	return ICN::TWNNDOCK;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	return ICN::TWNNMAGE;
+	case DWELLING_MONSTER1:	return ICN::TWNNDW_0;
+	case DWELLING_MONSTER2:	return ICN::TWNNDW_1;
+	case DWELLING_UPGRADE2: return ICN::TWNNUP_1;
+	case DWELLING_MONSTER3:	return ICN::TWNNDW_2;
+	case DWELLING_UPGRADE3: return ICN::TWNNUP_2;
+	case DWELLING_MONSTER4:	return ICN::TWNNDW_3;
+	case DWELLING_UPGRADE4: return ICN::TWNNUP_3;
+	case DWELLING_MONSTER5:	return ICN::TWNNDW_4;
+	case DWELLING_UPGRADE5: return ICN::TWNNUP_4;
+	case DWELLING_MONSTER6:	return ICN::TWNNDW_5;
+	default: break;
+	}
+    }
+    else
+    if(Race::SORC == race)
+    {
+	switch(build)
+	{
+	case BUILD_CASTLE:	return ICN::TWNSCSTL;
+	case BUILD_TENT:	return ICN::TWNSTENT;
+	case BUILD_SPEC:	return ICN::TWNSSPEC;
+	case BUILD_CAPTAIN:	return ICN::TWNSCAPT;
+	case BUILD_WEL2:	return ICN::TWNSWEL2;
+	case BUILD_LEFTTURRET:	return ICN::TWNSLTUR;
+	case BUILD_RIGHTTURRET:	return ICN::TWNSRTUR;
+	case BUILD_MOAT:	return ICN::TWNSMOAT;
+	case BUILD_MARKETPLACE:	return ICN::TWNSMARK;
+	case BUILD_THIEVESGUILD:return ICN::TWNSTHIE;
+	case BUILD_TAVERN:	return ICN::TWNSTVRN;
+	case BUILD_WELL:	return ICN::TWNSWELL;
+	case BUILD_STATUE:	return ICN::TWNSSTAT;
+	case BUILD_BOAT:	return ICN::TWNSBOAT;
+	case BUILD_SHIPYARD:	return ICN::TWNSDOCK;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	return ICN::TWNSMAGE;
+	case DWELLING_MONSTER1:	return ICN::TWNSDW_0;
+	case DWELLING_MONSTER2:	return ICN::TWNSDW_1;
+	case DWELLING_UPGRADE2: return ICN::TWNSUP_1;
+	case DWELLING_MONSTER3:	return ICN::TWNSDW_2;
+	case DWELLING_UPGRADE3: return ICN::TWNSUP_2;
+	case DWELLING_MONSTER4:	return ICN::TWNSDW_3;
+	case DWELLING_UPGRADE4: return ICN::TWNSUP_3;
+	case DWELLING_MONSTER5:	return ICN::TWNSDW_4;
+	case DWELLING_MONSTER6:	return ICN::TWNSDW_5;
+	default: break;
+	}
+    }
+    else
+    if(Race::WRLK == race)
+    {
+	switch(build)
+	{
+	case BUILD_CASTLE:	return ICN::TWNWCSTL;
+	case BUILD_TENT:	return ICN::TWNWTENT;
+	case BUILD_SPEC:	return ICN::TWNWSPEC;
+	case BUILD_CAPTAIN:	return ICN::TWNWCAPT;
+	case BUILD_WEL2:	return ICN::TWNWWEL2;
+	case BUILD_LEFTTURRET:	return ICN::TWNWLTUR;
+	case BUILD_RIGHTTURRET:	return ICN::TWNWRTUR;
+	case BUILD_MOAT:	return ICN::TWNWMOAT;
+	case BUILD_MARKETPLACE:	return ICN::TWNWMARK;
+	case BUILD_THIEVESGUILD:return ICN::TWNWTHIE;
+	case BUILD_TAVERN:	return ICN::TWNWTVRN;
+	case BUILD_WELL:	return ICN::TWNWWELL;
+	case BUILD_STATUE:	return ICN::TWNWSTAT;
+	case BUILD_BOAT:	return ICN::TWNWBOAT;
+	case BUILD_SHIPYARD:	return ICN::TWNWDOCK;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	return ICN::TWNWMAGE;
+	case DWELLING_MONSTER1:	return ICN::TWNWDW_0;
+	case DWELLING_MONSTER2:	return ICN::TWNWDW_1;
+	case DWELLING_MONSTER3:	return ICN::TWNWDW_2;
+	case DWELLING_MONSTER4:	return ICN::TWNWDW_3;
+	case DWELLING_UPGRADE4: return ICN::TWNWUP_3;
+	case DWELLING_MONSTER5:	return ICN::TWNWDW_4;
+	case DWELLING_MONSTER6:	return ICN::TWNWDW_5;
+	case DWELLING_UPGRADE6: return ICN::TWNWUP_5;
+	case DWELLING_UPGRADE7: return ICN::TWNWUP5B;
+	default: break;
+	}
+    }
+    else
+    if(Race::WZRD == race)
+    {
+	switch(build)
+	{
+	case BUILD_CASTLE:	return ICN::TWNZCSTL;
+	case BUILD_TENT:	return ICN::TWNZTENT;
+	case BUILD_SPEC:	return ICN::TWNZSPEC;
+	case BUILD_CAPTAIN:	return ICN::TWNZCAPT;
+	case BUILD_WEL2:	return ICN::TWNZWEL2;
+	case BUILD_LEFTTURRET:	return ICN::TWNZLTUR;
+	case BUILD_RIGHTTURRET:	return ICN::TWNZRTUR;
+	case BUILD_MOAT:	return ICN::TWNZMOAT;
+	case BUILD_MARKETPLACE:	return ICN::TWNZMARK;
+	case BUILD_THIEVESGUILD:return ICN::TWNZTHIE;
+	case BUILD_TAVERN:	return ICN::TWNZTVRN;
+	case BUILD_WELL:	return ICN::TWNZWELL;
+	case BUILD_STATUE:	return ICN::TWNZSTAT;
+	case BUILD_BOAT:	return ICN::TWNZBOAT;
+	case BUILD_SHIPYARD:	return ICN::TWNZDOCK;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	return ICN::TWNZMAGE;
+	case DWELLING_MONSTER1:	return ICN::TWNZDW_0;
+	case DWELLING_MONSTER2:	return ICN::TWNZDW_1;
+	case DWELLING_MONSTER3:	return ICN::TWNZDW_2;
+	case DWELLING_UPGRADE3: return ICN::TWNZUP_2;
+	case DWELLING_MONSTER4:	return ICN::TWNZDW_3;
+	case DWELLING_MONSTER5:	return ICN::TWNZDW_4;
+	case DWELLING_UPGRADE5: return ICN::TWNZUP_4;
+	case DWELLING_MONSTER6:	return ICN::TWNZDW_5;
+	case DWELLING_UPGRADE6: return ICN::TWNZUP_5;
+	default: break;
+	}
+    }
+
+    Error::Warning("Castle::GetICNBuilding: return unknown, " + Castle::GetStringBuilding(build, race));
+
+    return ICN::UNKNOWN;
 }
 
 bool Castle::HaveNearlySea(void) const

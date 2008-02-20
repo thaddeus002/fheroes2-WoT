@@ -31,7 +31,7 @@ Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), p
     h = sprite1.h();
 }
 
-Button::Button(const std::string &icn, u16 index1, u16 index2) 
+Button::Button(const ICN::icn_t icn, u16 index1, u16 index2)
     : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
 {
     x = sprite1.x();
@@ -40,7 +40,7 @@ Button::Button(const std::string &icn, u16 index1, u16 index2)
     h = sprite1.h();
 }
 
-Button::Button(const Point &pt, const std::string &icn, u16 index1, u16 index2)
+Button::Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2)
     : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
 {
     x = pt.x;
@@ -49,7 +49,7 @@ Button::Button(const Point &pt, const std::string &icn, u16 index1, u16 index2)
     h = sprite1.h();
 }
 
-Button::Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2)
+Button::Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2)
     : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
 {
     x = ox;

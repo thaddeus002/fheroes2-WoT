@@ -27,10 +27,11 @@
 #include "payment.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(const Color::color_t cl) : color(cl), play(cl & H2Config::GetKingdomColors() ? true : false)
+Kingdom::Kingdom(const Color::color_t cl) : color(cl), play(cl & Settings::Get().FileInfo().KingdomColors() ? true : false)
 {
     // set starting resource
-    switch(H2Config::GetGameDifficulty()){
+    switch(Settings::Get().GameDifficulty())
+    {
 	case Difficulty::EASY:
 	    resource.wood	= START_EASY_WOOD;
 	    resource.ore	= START_EASY_ORE;
@@ -152,7 +153,7 @@ void Kingdom::ActionNewWeek(void)
     for(u16 ii = 0; ii < heroes.size(); ++ii) (*heroes[ii]).ActionNewWeek();
 
     // debug an gift
-    if(H2Config::Debug() && color == H2Config::GetMyColor())
+    if(H2Config::Debug() && color == Settings::Get().MyColor())
     {
 	Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
 
@@ -264,5 +265,5 @@ u8 Kingdom::GetCountMarketplace(void) const
 
 Race::race_t Kingdom::GetRace(void) const
 {
-    return H2Config::GetKingdomRace(color);
+    return Settings::Get().FileInfo().KingdomRace(color);
 }

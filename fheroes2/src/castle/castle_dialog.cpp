@@ -44,7 +44,7 @@ void Castle::RedrawNameTown(const Point & src_pt)
 {
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
 
-    const Sprite & ramka = AGG::GetICN("TOWNNAME.ICN", 0);
+    const Sprite & ramka = AGG::GetICN(ICN::TOWNNAME, 0);
     Point dst_pt(src_pt.x + 320 - ramka.w() / 2, src_pt.y + 248);
     Display::Get().Blit(ramka, dst_pt);
 
@@ -69,29 +69,25 @@ Dialog::answer_t Castle::OpenDialog(void)
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
-    std::string str_icn;
-
     // button prev castle
     dst_pt.y += 480 - 19;
-    Button buttonPrevCastle(dst_pt, "SMALLBAR.ICN", 1, 2);
+    Button buttonPrevCastle(dst_pt, ICN::SMALLBAR, 1, 2);
 
     // bottom small bar
-    Dialog::StatusBar statusBar(Point(cur_pt.x + 21, cur_pt.y + 461), AGG::GetICN("SMALLBAR.ICN", 0), Font::BIG);
+    Dialog::StatusBar statusBar(Point(cur_pt.x + 21, cur_pt.y + 461), AGG::GetICN(ICN::SMALLBAR, 0), Font::BIG);
     statusBar.Clear();
 
     u8 index_sprite = 0;
 
     // button next castle
     dst_pt.x += 640 - 21;
-    Button buttonNextCastle(dst_pt, "SMALLBAR.ICN", 3, 4);
+    Button buttonNextCastle(dst_pt, ICN::SMALLBAR, 3, 4);
 
     // strip grid
-    str_icn = "STRIP.ICN";
-    
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 256;
 
-    display.Blit(AGG::GetICN(str_icn, 0), dst_pt);
+    display.Blit(AGG::GetICN(ICN::STRIP, 0), dst_pt);
 
     // color crest
     switch(color)
@@ -105,7 +101,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	default: Error::Warning("Dialog::OpenCastle: unknown color."); return Dialog::CANCEL;
     }
 
-    const Sprite & crest = AGG::GetICN("CREST.ICN", index_sprite);
+    const Sprite & crest = AGG::GetICN(ICN::CREST, index_sprite);
 
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 262;
@@ -133,7 +129,7 @@ Dialog::answer_t Castle::OpenDialog(void)
     if(isBuild(Castle::BUILD_CAPTAIN))
 	display.Blit(Portrait::Captain(race, Portrait::BIG), dst_pt);
     else
-    	display.Blit(AGG::GetICN("STRIP.ICN", 3), dst_pt);
+    	display.Blit(AGG::GetICN(ICN::STRIP, 3), dst_pt);
 
     // castle_heroes troops background
     dst_pt.x = cur_pt.x + 112;
@@ -148,7 +144,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	selectHeroesTroops->Redraw();
     }
     else
-    	display.Blit(AGG::GetICN("STRIP.ICN", 11), dst_pt);
+    	display.Blit(AGG::GetICN(ICN::STRIP, 11), dst_pt);
     
     // resource
     RedrawResourcePanel();
@@ -156,7 +152,7 @@ Dialog::answer_t Castle::OpenDialog(void)
     // button exit
     dst_pt.x = cur_pt.x + 553;
     dst_pt.y = cur_pt.y + 428;
-    Button buttonExit(dst_pt, "SWAPBTN.ICN", 0, 1);
+    Button buttonExit(dst_pt, ICN::SWAPBTN, 0, 1);
 
     const Rect coordBuildingThievesGuild(GetCoordBuilding(BUILD_THIEVESGUILD, cur_pt));
     const Rect coordBuildingTavern(GetCoordBuilding(BUILD_TAVERN, cur_pt));
@@ -370,7 +366,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
 
-		    switch(Dialog::ArmyInfo(army[ii], (1 == GetCountArmy() ? false : true), false))
+		    switch(Dialog::ArmyInfo(army[ii], true, false))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
@@ -755,10 +751,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 
 		if(selectHeroesTroops) delete selectHeroesTroops;
 
-		str_icn = "STRIP.ICN";
     		dst_pt.x = cur_pt.x;
         	dst_pt.y = cur_pt.y + 256;
-                display.Blit(AGG::GetICN(str_icn, 0), dst_pt);
+                display.Blit(AGG::GetICN(ICN::STRIP, 0), dst_pt);
 
 		dst_pt.x = cur_pt.x + 112;
 		dst_pt.y = cur_pt.y + 361;
@@ -1124,7 +1119,7 @@ void Castle::RedrawResourcePanel(void)
     // sprite wood
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 10;
-    const Sprite & wood = AGG::GetICN("RESOURCE.ICN", 0);
+    const Sprite & wood = AGG::GetICN(ICN::RESOURCE, 0);
     display.Blit(wood, dst_pt);
     
     // count wood
@@ -1136,7 +1131,7 @@ void Castle::RedrawResourcePanel(void)
     // sprite sulfur
     dst_pt.x = src_rt.x + 42;
     dst_pt.y = src_rt.y + 6;
-    const Sprite & sulfur = AGG::GetICN("RESOURCE.ICN", 3);
+    const Sprite & sulfur = AGG::GetICN(ICN::RESOURCE, 3);
     display.Blit(sulfur, dst_pt);
     
     // count sulfur
@@ -1148,7 +1143,7 @@ void Castle::RedrawResourcePanel(void)
     // sprite crystal
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 45;
-    const Sprite & crystal = AGG::GetICN("RESOURCE.ICN", 4);
+    const Sprite & crystal = AGG::GetICN(ICN::RESOURCE, 4);
     display.Blit(crystal, dst_pt);
     
     // count crystal
@@ -1160,7 +1155,7 @@ void Castle::RedrawResourcePanel(void)
     // sprite mercury
     dst_pt.x = src_rt.x + 44;
     dst_pt.y = src_rt.y + 47;
-    const Sprite & mercury = AGG::GetICN("RESOURCE.ICN", 1);
+    const Sprite & mercury = AGG::GetICN(ICN::RESOURCE, 1);
     display.Blit(mercury, dst_pt);
     
     // count mercury
@@ -1172,7 +1167,7 @@ void Castle::RedrawResourcePanel(void)
     // sprite ore
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 92;
-    const Sprite & ore = AGG::GetICN("RESOURCE.ICN", 2);
+    const Sprite & ore = AGG::GetICN(ICN::RESOURCE, 2);
     display.Blit(ore, dst_pt);
     
     // count ore
@@ -1184,7 +1179,7 @@ void Castle::RedrawResourcePanel(void)
     // sprite gems
     dst_pt.x = src_rt.x + 45;
     dst_pt.y = src_rt.y + 92;
-    const Sprite & gems = AGG::GetICN("RESOURCE.ICN", 5);
+    const Sprite & gems = AGG::GetICN(ICN::RESOURCE, 5);
     display.Blit(gems, dst_pt);
     
     // count gems
@@ -1196,7 +1191,7 @@ void Castle::RedrawResourcePanel(void)
     // sprite gold
     dst_pt.x = src_rt.x + 6;
     dst_pt.y = src_rt.y + 130;
-    const Sprite & gold = AGG::GetICN("RESOURCE.ICN", 6);
+    const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     display.Blit(gold, dst_pt);
     
     // count gold
@@ -1208,6 +1203,6 @@ void Castle::RedrawResourcePanel(void)
     // sprite button exit
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 166;
-    const Sprite & exit = AGG::GetICN("SWAPBTN.ICN", 0);
+    const Sprite & exit = AGG::GetICN(ICN::SWAPBTN, 0);
     display.Blit(exit, dst_pt);
 }

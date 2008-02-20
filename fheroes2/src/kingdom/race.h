@@ -24,7 +24,8 @@
 
 namespace Race
 {
-    typedef enum {
+    typedef enum
+    {
         KNGT    = 0x01,
         BARB    = 0x02,
         SORC    = 0x04,

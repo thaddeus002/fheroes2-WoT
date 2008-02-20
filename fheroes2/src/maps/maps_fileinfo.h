@@ -20,9 +20,12 @@
 #ifndef H2MAPSFILEINFO_H
 #define H2MAPSFILEINFO_H
 
+#include <vector>
+
 #include "maps.h"
 #include "difficulty.h"
 #include "color.h"
+#include "race.h"
 #include "kingdom.h"
 #include "gamedefs.h"
 
@@ -33,34 +36,49 @@ class FileInfo
 {
 
 public:
-    FileInfo(const std::string &filemaps);
+    FileInfo();
 
-    const std::string & GetFileMaps(void) const{ return fileMaps; };
-    const std::string & GetName(void) const{ return name; };
-    const std::string & GetDescription(void) const{ return description; };
-    u8 GetKingdomColors(void) const{ return kingdomColors; };
-    u8 GetAllowColors(void) const{ return allowColors; };
-    u8 GetKingdomRace(Color::color_t color) const;
-    mapsize_t GetSizeMaps(void) const{ return sizeMaps; };
-    u8 GetConditionsWins(void) const{ return conditionsWins; };
-    u8 GetConditionsLoss(void) const{ return conditionsLoss; };
-    bool GetPlayWithHeroes(void) const{ return withHeroes; };
-    Difficulty::difficulty_t GetDifficulty(void) const{ return mapsDifficulty; };
+    bool Read(const std::string &filename);
+
+    const std::string & FileMaps(void) const;
+    const std::string & Name(void) const;
+    const std::string & Description(void) const;
+
+    u8 KingdomColors(void) const;
+    u8 AllowColors(void) const;
+    u8 ConditionsWins(void) const;
+    u8 ConditionsLoss(void) const;
+
+    Race::race_t KingdomRace(const Color::color_t color) const;
+
+    bool PlayWithHeroes(void) const;
+
+    mapsize_t SizeMaps(void) const;
+    Difficulty::difficulty_t Difficulty(void) const;
+
+    void SetKingdomColors(const u8 colors);
+    void SetKingdomRace(const Color::color_t color, const Race::race_t race);
+
+protected:
+    static Race::race_t ByteToRace(u8 byte);
 
 private:
-    std::string fileMaps;
-    mapsize_t sizeMaps;
-    Difficulty::difficulty_t mapsDifficulty;
-    u8 kingdomColors;
-    u8 allowColors;
-    u8 rndColors;
-    u8 conditionsWins;
-    u8 conditionsLoss;
-    bool withHeroes;
+    std::string file;
     std::string name;
     std::string description;
 
-    u8 raceKingdom[KINGDOMMAX];
+    mapsize_t size;
+    Difficulty::difficulty_t difficulty;
+
+    u8 kingdom_colors;
+    u8 allow_colors;
+    u8 rnd_colors;
+    u8 conditions_wins;
+    u8 conditions_loss;
+
+    bool with_heroes;
+
+    std::vector<Race::race_t> races;
 };
 
 };

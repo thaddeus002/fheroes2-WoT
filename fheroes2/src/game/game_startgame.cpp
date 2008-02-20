@@ -51,7 +51,7 @@ namespace Game
 Game::menu_t Game::StartGame(void)
 {
     // Load maps
-    world.LoadMaps(H2Config::GetFileMaps());
+    world.LoadMaps(Settings::Get().FileInfo().FileMaps());
 
     GameArea areaMaps;
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
@@ -74,8 +74,8 @@ Game::menu_t Game::StartGame(void)
     radar.UpdatePosition();
 
     //
-    const std::string &icnscroll = ( H2Config::EvilInterface() ? "SCROLLE.ICN" : "SCROLL.ICN" );
-    const std::string &icnbtn = ( H2Config::EvilInterface() ? "ADVEBTNS.ICN" : "ADVBTNS.ICN" );
+    const ICN::icn_t icnscroll = H2Config::EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
+    const ICN::icn_t icnbtn = H2Config::EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
     const Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
     const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
@@ -96,8 +96,8 @@ Game::menu_t Game::StartGame(void)
     u8 icon_count = 0;
 
     // recalculate buttons coordinate
-    switch(H2Config::GetVideoMode()){
-
+    switch(H2Config::VideoMode())
+    {
         default:
 	    // coord status windows
 	    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
@@ -447,7 +447,7 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJN_CASTLE:
     			    if(NULL != (castle = world.GetCastle(index_maps)))
     			    {
-				if(H2Config::GetMyColor() == castle->GetColor())
+				if(H2Config::MyColor() == castle->GetColor())
 				{
 	    			    cursor.SetThemes(cursor.CASTLE);
 
@@ -541,7 +541,7 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_CASTLE:
     			    if(NULL != (castle = world.GetCastle(index_maps)))
 			    {
-				if(H2Config::GetMyColor() == castle->GetColor())
+				if(H2Config::MyColor() == castle->GetColor())
 				{
         			    cursor.SetThemes(cursor.ACTION);
 
@@ -648,7 +648,7 @@ Game::menu_t Game::StartGame(void)
 			    const Heroes * heroes2 = world.GetHeroes(index_maps);
     			    if(NULL != heroes2)
     			    {
-				if(H2Config::GetMyColor() == heroes2->GetColor())
+				if(H2Config::MyColor() == heroes2->GetColor())
 				{
 				    cursor.SetThemes(heroes2->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()) ? cursor.HEROES : cursor.CHANGE);
 
@@ -986,7 +986,7 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_CASTLE:
     			    if(NULL != (castle = world.GetCastle(index_maps)))
 			    {
-				if((*castle).GetColor() == H2Config::GetMyColor())
+				if((*castle).GetColor() == H2Config::MyColor())
 				{
 			    	    cursor.SetThemes(cursor.CASTLE);
 
@@ -1033,14 +1033,14 @@ Game::menu_t Game::StartGame(void)
 
 			// focus from boat to hero
 			//case MP2::OBJ_HEROES:
-    			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::GetMyColor())
+    			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::MyColor())
     			//			cursor.SetThemes(cursor.HEROES);
         		//    break;
 
 			// focus from boat to boat
     			case MP2::OBJ_BOAT:
     			    if(NULL != (heroes = world.GetHeroes(index_maps)))
-					cursor.SetThemes((*heroes).GetColor() == H2Config::GetMyColor() ? cursor.HEROES : cursor.FIGHT);
+					cursor.SetThemes((*heroes).GetColor() == H2Config::MyColor() ? cursor.HEROES : cursor.FIGHT);
     			    break;
 
 			// focus from boat to object
@@ -1082,7 +1082,7 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_CASTLE:
     			    if(NULL != (castle = world.GetCastle(index_maps)))
     			    {
-    				if(castle->GetColor() == H2Config::GetMyColor())
+    				if(castle->GetColor() == H2Config::MyColor())
     				{
     			    	    cursor.SetThemes(cursor.CASTLE);
 
@@ -1135,7 +1135,7 @@ Game::menu_t Game::StartGame(void)
 			case MP2::OBJ_HEROES:
     			    if(NULL != (heroes = world.GetHeroes(index_maps)))
     			    {
-    				if(heroes->GetColor() == H2Config::GetMyColor())
+    				if(heroes->GetColor() == H2Config::MyColor())
     				{
     			    	    cursor.SetThemes(cursor.HEROES);
 
@@ -1200,7 +1200,7 @@ Game::menu_t Game::StartGame(void)
 
 			// focus from castle to boat
     			//case MP2::OBJ_BOAT:
-    			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::GetMyColor())
+    			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::MyColor())
     			//			cursor.SetThemes(cursor.HEROES);
         		//    break;
 
@@ -1360,7 +1360,7 @@ Game::menu_t Game::StartGame(void)
 			Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
 
 			// open hero
-			if(hero && H2Config::GetMyColor() == (*hero).GetColor())
+			if(hero && H2Config::MyColor() == (*hero).GetColor())
 			{
 			    if(selectCastles.isSelected())
 			    {
@@ -1386,7 +1386,7 @@ Game::menu_t Game::StartGame(void)
 			Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
 
 			// open hero
-			if(hero && H2Config::GetMyColor() == (*hero).GetColor())
+			if(hero && H2Config::MyColor() == (*hero).GetColor())
 			{
 			    if(HEROES == globalfocus.type || BOAT == globalfocus.type)
 			    {
@@ -1442,7 +1442,7 @@ Game::menu_t Game::StartGame(void)
 			Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
 
 			// open castle
-			if(castle && H2Config::GetMyColor() == (*castle).GetColor())
+			if(castle && H2Config::MyColor() == (*castle).GetColor())
 			{
 			    if(selectHeroes.isSelected())
 			    {
@@ -1467,7 +1467,7 @@ Game::menu_t Game::StartGame(void)
 			const Point & center = selectCastles.GetCenter(ii);
 			Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
 
-			if(castle && H2Config::GetMyColor() == (*castle).GetColor())
+			if(castle && H2Config::MyColor() == (*castle).GetColor())
 			{
 			    if(HEROES == globalfocus.type || BOAT == globalfocus.type)
 			    {
@@ -1523,7 +1523,7 @@ Game::menu_t Game::StartGame(void)
 	    cursor.Hide();
 	    world.NextDay();
 
-	    Color::color_t human = H2Config::GetMyColor();
+	    Color::color_t human = H2Config::MyColor();
 
 	    // AI move
 	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color != human)

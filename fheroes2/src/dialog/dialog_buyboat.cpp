@@ -37,7 +37,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 {
     Display & display = Display::Get();
 
-    const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -56,7 +56,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     dst_pt.y = box_rt.y;
     Text(string_header, Font::BIG, dst_pt);
 
-    const Sprite & sprite = AGG::GetICN("BOATWIND.ICN", 0);
+    const Sprite & sprite = AGG::GetICN(ICN::BOATWIND, 0);
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
     dst_pt.y = box_rt.y + 25;
     display.Blit(sprite, dst_pt);

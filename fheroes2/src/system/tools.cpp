@@ -78,3 +78,13 @@ void String::AddInt(std::string &str, int value)
 
     str += stream.str();
 }
+
+int String::ToInt(const std::string &str)
+{
+    std::istringstream stream(str);
+    int res;
+
+    stream >> res;
+
+    return res;
+}

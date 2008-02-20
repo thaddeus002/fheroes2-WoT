@@ -49,7 +49,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
 
 
-    display.Blit(AGG::GetICN("STONEBAK.ICN", 0), dst_pt);
+    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
 
     u8 w = 22;
 
@@ -58,7 +58,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // background
     dst_pt.x = cur_pt.x + w;
     dst_pt.y = cur_pt.y + w;
-    display.Blit(AGG::GetICN("SWAPWIN.ICN", 0), src_rt, dst_pt);
+    display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), src_rt, dst_pt);
 
     // header
     message = GetName() + " meets " + heroes2.GetName();
@@ -152,14 +152,14 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     Text(message, Font::SMALL, dst_pt);
 
     // seconfary skill
-    //"MINISS.ICN"
+    // ICN::MINISS
 
 
 
     // button exit
     dst_pt.x = cur_pt.x + 280;
     dst_pt.y = cur_pt.y + 428;
-    Button buttonExit(dst_pt, "SWAPBTN.ICN", 0, 1);
+    Button buttonExit(dst_pt, ICN::SWAPBTN, 0, 1);
 
     buttonExit.Draw();
 

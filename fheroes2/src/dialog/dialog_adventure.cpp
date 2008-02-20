@@ -31,8 +31,8 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     Display & display = Display::Get();
 
     // preload
-    const std::string &apanbkg = H2Config::EvilInterface() ? "APANBKGE.ICN" : "APANBKG.ICN";
-    const std::string &apanel  = H2Config::EvilInterface() ? "APANELE.ICN" : "APANEL.ICN";
+    const ICN::icn_t apanbkg = H2Config::EvilInterface() ? ICN::APANBKGE : ICN::APANBKG;
+    const ICN::icn_t apanel  = H2Config::EvilInterface() ? ICN::APANELE : ICN::APANEL;
 
     AGG::PreloadObject(apanbkg);
     AGG::PreloadObject(apanel);

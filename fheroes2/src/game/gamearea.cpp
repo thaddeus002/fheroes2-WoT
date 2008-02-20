@@ -35,7 +35,8 @@ GameArea::GameArea()
     area_pos.x = 0;
     area_pos.y = 0;
 
-    switch(H2Config::GetVideoMode()){
+    switch(H2Config::VideoMode())
+    {
 	default:
 	    area_pos.w = 14;
 	    area_pos.h = 14;

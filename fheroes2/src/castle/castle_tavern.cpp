@@ -38,7 +38,8 @@
 void Castle::OpenTavern(void)
 {
     const std::string & header = "A generous tip for the barkeep yields the following rumor:";
-    const std::string & system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+    const ICN::icn_t system = (H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    const ICN::icn_t tavwin = ICN::TAVWIN;
     const std::string & tavern = GetStringBuilding(BUILD_TAVERN);
     const std::string & message = world.GetRumors();
 
@@ -54,12 +55,12 @@ void Castle::OpenTavern(void)
 
     Text(tavern, Font::BIG, pos.x + (pos.w - Text::width(tavern, Font::BIG)) / 2, dst_pt.y);
 
-    const Sprite & s1 = AGG::GetICN("TAVWIN.ICN", 0);
+    const Sprite & s1 = AGG::GetICN(tavwin, 0);
     dst_pt.x = pos.x + (pos.w - s1.w()) / 2;
     dst_pt.y = pos.y + 30;
     display.Blit(s1, dst_pt);
 
-    const Sprite & s2 = AGG::GetICN("TAVWIN.ICN", 1);
+    const Sprite & s2 = AGG::GetICN(tavwin, 1);
     dst_pt.x += 3;
     dst_pt.y += 3;
     display.Blit(s2, dst_pt);
@@ -70,7 +71,7 @@ void Castle::OpenTavern(void)
     rt.y += 60;
     TextBox(message, Font::BIG, rt);
 
-    Animation animeBeer(dst_pt, "TAVWIN.ICN", 2, 20, false, Animation::INFINITY | Animation::RING | Animation::LOW);
+    Animation animeBeer(dst_pt, tavwin, 2, 20, false, Animation::INFINITY | Animation::RING | Animation::LOW);
 
     const Sprite & s3 = animeBeer.GetFirstSprite();
     dst_pt.x += s3.x();

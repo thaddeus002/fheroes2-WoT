@@ -46,7 +46,6 @@
 
 namespace EditScenario
 {
-    void SetCurrentSettings(const Maps::FileInfo &maps);
     void DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 count = LISTMAXITEM);
     void DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &it_current);
 }
@@ -58,41 +57,37 @@ Game::menu_t Game::Editor::LoadMaps(void)
     std::vector<Maps::FileInfo> info_maps;
 
     // read maps directory
-    Dir dir1(H2Config::GetMapsDirectory(), "mp2");
-    Dir dir2(H2Config::GetMapsDirectory(), "Mp2");
-    Dir dir3(H2Config::GetMapsDirectory(), "MP2");
+    Dir dir;
+    Settings & conf = Settings::Get();
 
-    if(dir1.size())
-    {
-	Dir::const_iterator itd1 = dir1.begin();
-	while(itd1 != dir1.end()){ info_maps.push_back(Maps::FileInfo(*itd1)); ++itd1; }
-    }
+    dir.Read(conf.MapsDirectory(), "mp2");
+    dir.Read(conf.MapsDirectory(), "Mp2");
+    dir.Read(conf.MapsDirectory(), "MP2");
 
-    if(dir2.size())
-    {
-	Dir::const_iterator itd2 = dir2.begin();
-	while(itd2 != dir2.end()){ info_maps.push_back(Maps::FileInfo(*itd2)); ++itd2; }
-    }
+    // FIXME:: loyality version
+    dir.Read(conf.MapsDirectory(), "mx2");
+    dir.Read(conf.MapsDirectory(), "Mx2");
+    dir.Read(conf.MapsDirectory(), "MX2");
 
-    if(dir3.size())
-    {
-	Dir::const_iterator itd3 = dir3.begin();
-	while(itd3 != dir3.end()){ info_maps.push_back(Maps::FileInfo(*itd3)); ++itd3; }
-    }
+    const u16 count_mp2 = dir.size();
 
     // empty maps dir
-    if(!info_maps.size())
+    if(0 == count_mp2)
     {
-	H2Config::SetInterface(true);
-	Dialog::Message("Warning", "No maps available!", Font::BIG, Dialog::OK);
-	return MAINMENU;
+        Dialog::Message("Warning", "No maps available!", Font::BIG, Dialog::OK);
+        return MAINMENU;
     }
 
+    info_maps.resize(count_mp2);
+
+    for(u16 ii = 0; ii < count_mp2; ++ii)
+        info_maps[ii].Read(dir[ii]);
+
     // preload
-    AGG::PreloadObject("REQSBKG.ICN");
+    AGG::PreloadObject(ICN::REQSBKG);
 
 
-    EditScenario::SetCurrentSettings(info_maps.front());
+    conf.LoadFileMaps(info_maps.front().FileMaps());
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
@@ -105,7 +100,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
 
     while(it != it_end)
     {
-	switch((*it).GetSizeMaps())
+	switch((*it).SizeMaps())
 	{
     	    case Maps::SMALL:
 		smallmaps.push_back(*it);
@@ -138,9 +133,9 @@ Game::menu_t Game::Editor::LoadMaps(void)
     background.Save();
 
     // image panel
-    const Sprite &shadow = AGG::GetICN("REQSBKG.ICN", 1);
+    const Sprite &shadow = AGG::GetICN(ICN::REQSBKG, 1);
     display.Blit(shadow, 114, 21);
-    const Sprite &panel = AGG::GetICN("REQSBKG.ICN", 0);
+    const Sprite &panel = AGG::GetICN(ICN::REQSBKG, 0);
     display.Blit(panel, 130, 5);
 
     Background backgroundList(Rect(170, 60, 270, 175));
@@ -152,19 +147,19 @@ Game::menu_t Game::Editor::LoadMaps(void)
     Rect rectAreaList(Rect(170, 60, 270, 175));
     
     // Splitter
-    Splitter split(AGG::GetICN("ESCROLL.ICN", 3), Rect(460, 78, 8, 141), Splitter::VERTICAL);
+    Splitter split(AGG::GetICN(ICN::ESCROLL, 3), Rect(460, 78, 8, 141), Splitter::VERTICAL);
     split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 
     // button
-    Button buttonOk(270, 415, "REQUESTS.ICN", 1, 2);
-    Button buttonPgUp(457, 60, "REQUESTS.ICN", 5, 6);
-    Button buttonPgDn(457, 222, "REQUESTS.ICN", 7, 8);
+    Button buttonOk(270, 415, ICN::REQUESTS, 1, 2);
+    Button buttonPgUp(457, 60, ICN::REQUESTS, 5, 6);
+    Button buttonPgDn(457, 222, ICN::REQUESTS, 7, 8);
 
-    Button buttonSelectSmall(167, 28, "REQUESTS.ICN", 9, 10);
-    Button buttonSelectMedium(229, 28, "REQUESTS.ICN", 11, 12);
-    Button buttonSelectLarge(291, 28, "REQUESTS.ICN", 13, 14);
-    Button buttonSelectXLarge(353, 28, "REQUESTS.ICN", 15, 16);
-    Button buttonSelectAll(415, 28, "REQUESTS.ICN", 17, 18);
+    Button buttonSelectSmall(167, 28, ICN::REQUESTS, 9, 10);
+    Button buttonSelectMedium(229, 28, ICN::REQUESTS, 11, 12);
+    Button buttonSelectLarge(291, 28, ICN::REQUESTS, 13, 14);
+    Button buttonSelectXLarge(353, 28, ICN::REQUESTS, 15, 16);
+    Button buttonSelectAll(415, 28, ICN::REQUESTS, 17, 18);
 
     std::vector<Maps::FileInfo>::const_iterator it_list_head = curmaps->begin();
     std::vector<Maps::FileInfo>::const_iterator it_current = it_list_head;
@@ -350,59 +345,12 @@ Game::menu_t Game::Editor::LoadMaps(void)
     }
 
     // set current settings
-    EditScenario::SetCurrentSettings(*it_current);
+    conf.LoadFileMaps((*it_current).FileMaps());
 
     cursor.Hide();
     background.Restore();
     
     return Game::MAINMENU;
-}
-
-void EditScenario::SetCurrentSettings(const Maps::FileInfo &maps)
-{
-    H2Config::SetKingdomColors(maps.GetKingdomColors());
-    H2Config::SetAllowChangeColors(maps.GetAllowColors());
-    H2Config::SetAllowChangeRaces(0);
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-        switch(maps.GetKingdomRace(color)){
-            case 0x00:
-                H2Config::SetKingdomRace(color, Race::KNGT);
-                break;
-            case 0x01:
-                H2Config::SetKingdomRace(color, Race::BARB);
-                break;
-            case 0x02:
-                H2Config::SetKingdomRace(color, Race::SORC);
-                break;
-            case 0x03:
-                H2Config::SetKingdomRace(color, Race::WRLK);
-                break;
-            case 0x04:
-                H2Config::SetKingdomRace(color, Race::WZRD);
-                break;
-            case 0x05:
-                H2Config::SetKingdomRace(color, Race::NECR);
-                break;
-            case 0x06:
-                H2Config::SetKingdomRace(color, Race::MULT);
-                break;
-            case 0x07:
-                H2Config::SetKingdomRace(color, Race::RAND);
-                H2Config::SetAllowChangeRaces(color | H2Config::GetAllowChangeRaces());
-                break;
-            default:
-                H2Config::SetKingdomRace(color, Race::BOMG);
-                break;
-	}
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	// set first allow color
-	if(maps.GetAllowColors() & color){ H2Config::SetHumanColor(color); break; }
-    H2Config::SetSizeMaps(maps.GetSizeMaps());
-    H2Config::SetFileMaps(maps.GetFileMaps());
-    H2Config::SetNameMaps(maps.GetName());
-    H2Config::SetDescriptionMaps(maps.GetDescription());
-    //
-    H2Config::SetPlayWithHeroes(maps.GetPlayWithHeroes());
 }
 
 void EditScenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 count)
@@ -414,16 +362,17 @@ void EditScenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top,
     u8 index = 0;
     std::vector<Maps::FileInfo>::const_iterator it_head = it_top;
 
-    for(int ii = 0; ii < count; ++ii){
-
+    for(int ii = 0; ii < count; ++ii)
+    {
 	// sprite count
-	const std::bitset<8> colors((*it_head).GetKingdomColors());
+	const std::bitset<8> colors((*it_head).KingdomColors());
 	index = 19 + colors.count();
-	const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
+	const Sprite &spriteCount = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteCount, x, y);
 
         // sprite size
-	switch((*it_head).GetSizeMaps()){
+	switch((*it_head).SizeMaps())
+	{
             case Maps::SMALL:
     		index = 26;
                 break;
@@ -440,20 +389,20 @@ void EditScenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top,
     		index = 30;
                 break;
         }
-	const Sprite &spriteSize = AGG::GetICN("REQUESTS.ICN", index);
+	const Sprite &spriteSize = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
 	// text longname
-	Text((*it_head).GetName(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 18, y);
+	Text((*it_head).Name(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 18, y);
 
 	// sprite wins
-	index = 30 + (*it_head).GetConditionsWins();
-	const Sprite &spriteWins = AGG::GetICN("REQUESTS.ICN", index);
+	index = 30 + (*it_head).ConditionsWins();
+	const Sprite &spriteWins = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteWins, x + 224, y);
 
 	// sprite loss
-	index = 36 + (*it_head).GetConditionsLoss();
-	const Sprite &spriteLoss = AGG::GetICN("REQUESTS.ICN", index);
+	index = 36 + (*it_head).ConditionsLoss();
+	const Sprite &spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteLoss, x + 226 + spriteWins.w(), y);
 
 	y += LISTHEIGHTROW;
@@ -470,13 +419,14 @@ void EditScenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &i
     u8 index = 0;
 
     // sprite count
-    const std::bitset<8> colors((*it_current).GetKingdomColors());
+    const std::bitset<8> colors((*it_current).KingdomColors());
     index = 19 + colors.count();
-    const Sprite &spriteCount = AGG::GetICN("REQUESTS.ICN", index);
+    const Sprite &spriteCount = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteCount, x, y);
 
     // sprite size
-    switch((*it_current).GetSizeMaps()){
+    switch((*it_current).SizeMaps())
+    {
         case Maps::SMALL:
     	    index = 26;
             break;
@@ -493,24 +443,24 @@ void EditScenario::DrawSelectInfo(std::vector<Maps::FileInfo>::const_iterator &i
     	    index = 30;
             break;
     }
-    const Sprite &spriteSize = AGG::GetICN("REQUESTS.ICN", index);
+    const Sprite &spriteSize = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
     // text longname
-    Text((*it_current).GetName(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 22, y);
+    Text((*it_current).Name(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 22, y);
 
     // sprite wins
-    index = 30 + (*it_current).GetConditionsWins();
-    const Sprite &spriteWins = AGG::GetICN("REQUESTS.ICN", index);
+    index = 30 + (*it_current).ConditionsWins();
+    const Sprite &spriteWins = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteWins, x + 209, y);
 
     // sprite loss
-    index = 36 + (*it_current).GetConditionsLoss();
-    const Sprite &spriteLoss = AGG::GetICN("REQUESTS.ICN", index);
+    index = 36 + (*it_current).ConditionsLoss();
+    const Sprite &spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteLoss, x + 211 + spriteWins.w(), y);
 
     Text("Maps difficulty:", Font::BIG, 200, 295);
-    Text(Difficulty::String((*it_current).GetDifficulty()), Font::BIG, 360, 295);
+    Text(Difficulty::String((*it_current).Difficulty()), Font::BIG, 360, 295);
     
-    TextBox((*it_current).GetDescription(), Font::BIG, Rect(175, 322, 282, 90));
+    TextBox((*it_current).Description(), Font::BIG, Rect(175, 322, 282, 90));
 }

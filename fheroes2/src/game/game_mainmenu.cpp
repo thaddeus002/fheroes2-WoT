@@ -28,13 +28,12 @@
 #include "button.h"
 #include "game.h"
 
-#include "error.h"
 Game::menu_t Game::MainMenu(void)
 {
     // preload
-    AGG::PreloadObject("HEROES.ICN");
-    AGG::PreloadObject("BTNSHNGL.ICN");
-    AGG::PreloadObject("SHNGANIM.ICN");
+    AGG::PreloadObject(ICN::HEROES);
+    AGG::PreloadObject(ICN::BTNSHNGL);
+    AGG::PreloadObject(ICN::SHNGANIM);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -45,25 +44,25 @@ Game::menu_t Game::MainMenu(void)
     display.SetVideoMode(Display::SMALL);
 
     // image background
-    const Sprite &sprite = AGG::GetICN("HEROES.ICN", 0);
+    const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     display.Blit(sprite);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonNewGame("BTNSHNGL.ICN", 0, 3);
-    Button buttonLoadGame("BTNSHNGL.ICN", 4, 7);
-    Button buttonHighScores("BTNSHNGL.ICN", 8, 11);
-    Button buttonCredits("BTNSHNGL.ICN", 12, 15);
-    Button buttonQuit("BTNSHNGL.ICN", 16, 19);
+    Button buttonNewGame(ICN::BTNSHNGL, 0, 3);
+    Button buttonLoadGame(ICN::BTNSHNGL, 4, 7);
+    Button buttonHighScores(ICN::BTNSHNGL, 8, 11);
+    Button buttonCredits(ICN::BTNSHNGL, 12, 15);
+    Button buttonQuit(ICN::BTNSHNGL, 16, 19);
 
     const Point lt_pt(0, 0);
-    Animation animeButtonNewGame(lt_pt, "BTNSHNGL.ICN", 0, 3, false, Animation::HIGH);
-    Animation animeButtonLoadGame(lt_pt, "BTNSHNGL.ICN", 4, 3, false, Animation::HIGH);
-    Animation animeButtonHighScores(lt_pt, "BTNSHNGL.ICN", 8, 3, false, Animation::HIGH);
-    Animation animeButtonCredits(lt_pt, "BTNSHNGL.ICN", 12, 3, false, Animation::HIGH);
-    Animation animeButtonQuit(lt_pt, "BTNSHNGL.ICN", 16, 3, false, Animation::HIGH);
+    Animation animeButtonNewGame(lt_pt, ICN::BTNSHNGL, 0, 3, false, Animation::HIGH);
+    Animation animeButtonLoadGame(lt_pt, ICN::BTNSHNGL, 4, 3, false, Animation::HIGH);
+    Animation animeButtonHighScores(lt_pt, ICN::BTNSHNGL, 8, 3, false, Animation::HIGH);
+    Animation animeButtonCredits(lt_pt, ICN::BTNSHNGL, 12, 3, false, Animation::HIGH);
+    Animation animeButtonQuit(lt_pt, ICN::BTNSHNGL, 16, 3, false, Animation::HIGH);
 
-    Animation animeLantern(lt_pt, "SHNGANIM.ICN", 0, 40, true, Animation::INFINITY | Animation::RING | Animation::LOW);
+    Animation animeLantern(lt_pt, ICN::SHNGANIM, 0, 40, true, Animation::INFINITY | Animation::RING | Animation::LOW);
 
     buttonNewGame.Draw();
     buttonLoadGame.Draw();

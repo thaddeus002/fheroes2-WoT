@@ -26,8 +26,9 @@
 class Dir : public std::vector<std::string>
 {
 public:
-    Dir(const std::string &path = "", const std::string &filter = "");
+    Dir();
 
+    void Read(const std::string &path = "", const std::string &filter = "");
 };
 
 #endif

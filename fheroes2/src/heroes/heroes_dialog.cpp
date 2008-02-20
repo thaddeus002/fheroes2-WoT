@@ -52,9 +52,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
-    display.Blit(AGG::GetICN("HEROBKG.ICN", 0), dst_pt);
+    display.Blit(AGG::GetICN(ICN::HEROBKG, 0), dst_pt);
 
-    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "HEROEXTE.ICN" : "HEROEXTG.ICN", 0), dst_pt);
+    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::HEROEXTE : ICN::HEROEXTG, 0), dst_pt);
 
     std::string message;
 
@@ -136,7 +136,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     {
 	case Morale::TREASON:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 5);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 5;
 	    display.Blit(sprite, dst_pt);
@@ -148,7 +148,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Morale::AWFUL:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 5);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 7;
 	    display.Blit(sprite, dst_pt);
@@ -158,7 +158,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Morale::POOR:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 5);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
 	    dst_pt.x += (34 - sprite.w()) / 2;
 	    display.Blit(sprite, dst_pt);
 
@@ -167,7 +167,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Morale::NORMAL:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 7);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 7);
 	    dst_pt.x += (34 - sprite.w()) / 2;
 	    display.Blit(sprite, dst_pt);
 
@@ -176,7 +176,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Morale::GOOD:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 4);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
 	    dst_pt.x += (34 - sprite.w()) / 2;
 	    display.Blit(sprite, dst_pt);
 
@@ -185,7 +185,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Morale::GREAT:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 4);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 7;
 	    display.Blit(sprite, dst_pt);
@@ -195,7 +195,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Morale::BLOOD:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 4);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 5;
 	    display.Blit(sprite, dst_pt);
@@ -218,7 +218,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     {
 	case Luck::CURSED:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 3);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 5;
 	    display.Blit(sprite, dst_pt);
@@ -230,7 +230,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Luck::AWFUL:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 3);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 7;
 	    display.Blit(sprite, dst_pt);
@@ -240,7 +240,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Luck::BAD:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 3);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
 	    dst_pt.x += (34 - sprite.w()) / 2;
 	    display.Blit(sprite, dst_pt);
 
@@ -249,7 +249,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Luck::NORMAL:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 6);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 6);
 	    dst_pt.x += (34 - sprite.w()) / 2;
 	    display.Blit(sprite, dst_pt);
 
@@ -258,7 +258,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Luck::GOOD:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 2);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
 	    dst_pt.x += (34 - sprite.w()) / 2;
 	    display.Blit(sprite, dst_pt);
 
@@ -267,7 +267,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Luck::GREAT:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 2);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 7;
 	    display.Blit(sprite, dst_pt);
@@ -277,7 +277,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
 	case Luck::IRISH:
 	{
-	    const Sprite & sprite = AGG::GetICN("HSICONS.ICN", 2);
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
 	    display.Blit(sprite, dst_pt);
 	    dst_pt.x += 5;
 	    display.Blit(sprite, dst_pt);
@@ -292,7 +292,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // army format spread
     dst_pt.x = cur_pt.x + 515;
     dst_pt.y = cur_pt.y + 63;
-    const Sprite & sprite1 = AGG::GetICN("HSICONS.ICN", 9);
+    const Sprite & sprite1 = AGG::GetICN(ICN::HSICONS, 9);
     display.Blit(sprite1, dst_pt);
 
     const Rect rectSpreadArmyFormat(dst_pt, sprite1.w(), sprite1.h());
@@ -302,7 +302,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // army format grouped
     dst_pt.x = cur_pt.x + 552;
     dst_pt.y = cur_pt.y + 63;
-    const Sprite & sprite2 = AGG::GetICN("HSICONS.ICN", 10);
+    const Sprite & sprite2 = AGG::GetICN(ICN::HSICONS, 10);
     display.Blit(sprite2, dst_pt);
 
     const Rect rectGroupedArmyFormat(dst_pt, sprite2.w(), sprite2.h());    
@@ -310,13 +310,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
 
     // cursor format
-    SpriteCursor cursorFormat(AGG::GetICN("HSICONS.ICN", 11), army_spread ? army1_pt : army2_pt);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army_spread ? army1_pt : army2_pt);
     cursorFormat.Show(army_spread ? army1_pt : army2_pt);
 
     // experience
     dst_pt.x = cur_pt.x + 512;
     dst_pt.y = cur_pt.y + 85;
-    const Sprite & sprite3 = AGG::GetICN("HSICONS.ICN", 1);
+    const Sprite & sprite3 = AGG::GetICN(ICN::HSICONS, 1);
     const Rect rectExperienceInfo(dst_pt, sprite3.w(), sprite3.h());
     display.Blit(sprite3, dst_pt);
 
@@ -338,7 +338,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // spell points
     dst_pt.x = cur_pt.x + 550;
     dst_pt.y = cur_pt.y + 87;
-    const Sprite & sprite4 = AGG::GetICN("HSICONS.ICN", 8);
+    const Sprite & sprite4 = AGG::GetICN(ICN::HSICONS, 8);
     const Rect rectSpellPointsInfo(dst_pt, sprite4.w(), sprite4.h());
     display.Blit(sprite4, dst_pt);
 
@@ -358,7 +358,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     // crest
     if(Color::GRAY == color)
-	switch(H2Config::GetMyColor())
+	switch(Settings::Get().MyColor())
 	{
 	    case Color::BLUE:	index_sprite = 0; break;
 	    case Color::GREEN:	index_sprite = 1; break;
@@ -383,7 +383,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 130;
 
-    display.Blit(AGG::GetICN("CREST.ICN", index_sprite), dst_pt);
+    display.Blit(AGG::GetICN(ICN::CREST, index_sprite), dst_pt);
     
     // monster
     dst_pt.x = cur_pt.x + 156;
@@ -430,7 +430,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     for(u8 ii = 0; ii < HEROESMAXARTIFACT; ii++)
     {
         // sprite
-        const Sprite & art = AGG::GetICN("ARTIFACT.ICN", 0);
+        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, 0);
 
         dst_pt.x = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.x + 51 + ii * (art.w() + 15) : cur_pt.x + 51 + (ii - HEROESMAXARTIFACT / 2) * (art.w() + 15));
         dst_pt.y = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.y + 308 : cur_pt.y + 387);
@@ -443,7 +443,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     for(u8 ii = 0; ii < artifacts.size(); ii++)
     {
         // sprite
-        const Sprite & art = AGG::GetICN("ARTIFACT.ICN", artifacts[ii] + 1);
+        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, artifacts[ii] + 1);
 
         dst_pt.x = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.x + 51 + ii * (art.w() + 15) : cur_pt.x + 51 + (ii - HEROESMAXARTIFACT / 2) * (art.w() + 15));
         dst_pt.y = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.y + 308 : cur_pt.y + 387);
@@ -455,7 +455,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     const Rect rectMaxCoordsArtifact(coordsArtifact);
 
     // bottom small bar
-    Dialog::StatusBar statusBar(Point(cur_pt.x + 22, cur_pt.y + 460), AGG::GetICN("HSBTNS.ICN", 8), Font::BIG);
+    Dialog::StatusBar statusBar(Point(cur_pt.x + 22, cur_pt.y + 460), AGG::GetICN(ICN::HSBTNS, 8), Font::BIG);
     statusBar.Clear("Hero Screen");
 
     u16 index1 = readonly ? 5 : 4;
@@ -464,7 +464,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // button prev
     dst_pt.x = cur_pt.x + 1;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonPrevHero(dst_pt, "HSBTNS.ICN", index1, index2);
+    Button buttonPrevHero(dst_pt, ICN::HSBTNS, index1, index2);
 
     index1 = readonly ? 7 : 6;
     index2 = 7;
@@ -472,7 +472,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // button next
     dst_pt.x = cur_pt.x + 640 - 23;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonNextHero(dst_pt, "HSBTNS.ICN", index1, index2);
+    Button buttonNextHero(dst_pt, ICN::HSBTNS, index1, index2);
     
     index1 = readonly ? 1 : 0;
     index2 = 1;
@@ -480,12 +480,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // button dismiss
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 318;
-    Button buttonDismiss(dst_pt, "HSBTNS.ICN", index1, index2);
+    Button buttonDismiss(dst_pt, ICN::HSBTNS, index1, index2);
 
     // button exit
     dst_pt.x = cur_pt.x + 603;
     dst_pt.y = cur_pt.y + 318;
-    Button buttonExit(dst_pt, "HSBTNS.ICN", 2, 3);
+    Button buttonExit(dst_pt, ICN::HSBTNS, 2, 3);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

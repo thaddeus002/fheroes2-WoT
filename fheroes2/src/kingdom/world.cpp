@@ -62,78 +62,85 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
     free_recruit_hero2 = Heroes::UNKNOWN;
 
     // playing kingdom
-    H2Config::SetKingdomColors(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE);
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) vec_kingdoms.push_back(new Kingdom(color));
+    Settings::Get().FileInfo().SetKingdomColors(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE);
+    vec_kingdoms.resize(KINGDOMMAX);
+    vec_kingdoms[0] = new Kingdom(Color::BLUE);
+    vec_kingdoms[1] = new Kingdom(Color::GREEN);
+    vec_kingdoms[2] = new Kingdom(Color::RED);
+    vec_kingdoms[3] = new Kingdom(Color::YELLOW);
+    vec_kingdoms[4] = new Kingdom(Color::ORANGE);
+    vec_kingdoms[5] = new Kingdom(Color::PURPLE);
 
     // initialize all heroes
-    vec_heroes.push_back(new Heroes(Heroes::LORDKILBURN, Race::KNGT, "Lord Kilburn"));
-    vec_heroes.push_back(new Heroes(Heroes::SIRGALLANTH, Race::KNGT, "Sir Gallanth"));
-    vec_heroes.push_back(new Heroes(Heroes::ECTOR, Race::KNGT, "Ector"));
-    vec_heroes.push_back(new Heroes(Heroes::GVENNETH, Race::KNGT, "Gvenneth"));
-    vec_heroes.push_back(new Heroes(Heroes::TYRO, Race::KNGT, "Tyro"));
-    vec_heroes.push_back(new Heroes(Heroes::AMBROSE, Race::KNGT, "Ambrose"));
-    vec_heroes.push_back(new Heroes(Heroes::RUBY, Race::KNGT, "Ruby"));
-    vec_heroes.push_back(new Heroes(Heroes::MAXIMUS, Race::KNGT, "Maximus"));
-    vec_heroes.push_back(new Heroes(Heroes::DIMITRY, Race::KNGT, "Dimitry"));
+    vec_heroes.resize(HEROESMAXCOUNT + 2);
+    vec_heroes[0] = new Heroes(Heroes::LORDKILBURN, Race::KNGT, "Lord Kilburn");
+    vec_heroes[1] = new Heroes(Heroes::SIRGALLANTH, Race::KNGT, "Sir Gallanth");
+    vec_heroes[2] = new Heroes(Heroes::ECTOR, Race::KNGT, "Ector");
+    vec_heroes[3] = new Heroes(Heroes::GVENNETH, Race::KNGT, "Gvenneth");
+    vec_heroes[4] = new Heroes(Heroes::TYRO, Race::KNGT, "Tyro");
+    vec_heroes[5] = new Heroes(Heroes::AMBROSE, Race::KNGT, "Ambrose");
+    vec_heroes[6] = new Heroes(Heroes::RUBY, Race::KNGT, "Ruby");
+    vec_heroes[7] = new Heroes(Heroes::MAXIMUS, Race::KNGT, "Maximus");
+    vec_heroes[8] = new Heroes(Heroes::DIMITRY, Race::KNGT, "Dimitry");
 
-    vec_heroes.push_back(new Heroes(Heroes::THUNDAX, Race::BARB, "Thundax"));
-    vec_heroes.push_back(new Heroes(Heroes::FINEOUS, Race::BARB, "Fineous"));
-    vec_heroes.push_back(new Heroes(Heroes::JOJOSH, Race::BARB, "Jojosh"));
-    vec_heroes.push_back(new Heroes(Heroes::CRAGHACK, Race::BARB, "Crag Hack"));
-    vec_heroes.push_back(new Heroes(Heroes::JEZEBEL, Race::BARB, "Jezebel"));
-    vec_heroes.push_back(new Heroes(Heroes::JACLYN, Race::BARB, "Jaclyn"));
-    vec_heroes.push_back(new Heroes(Heroes::ERGON, Race::BARB, "Ergon"));
-    vec_heroes.push_back(new Heroes(Heroes::TSABU, Race::BARB, "Tsabu"));
-    vec_heroes.push_back(new Heroes(Heroes::ATLAS, Race::BARB, "Atlas"));
+    vec_heroes[9] = new Heroes(Heroes::THUNDAX, Race::BARB, "Thundax");
+    vec_heroes[10] = new Heroes(Heroes::FINEOUS, Race::BARB, "Fineous");
+    vec_heroes[11] = new Heroes(Heroes::JOJOSH, Race::BARB, "Jojosh");
+    vec_heroes[12] = new Heroes(Heroes::CRAGHACK, Race::BARB, "Crag Hack");
+    vec_heroes[13] = new Heroes(Heroes::JEZEBEL, Race::BARB, "Jezebel");
+    vec_heroes[14] = new Heroes(Heroes::JACLYN, Race::BARB, "Jaclyn");
+    vec_heroes[15] = new Heroes(Heroes::ERGON, Race::BARB, "Ergon");
+    vec_heroes[16] = new Heroes(Heroes::TSABU, Race::BARB, "Tsabu");
+    vec_heroes[17] = new Heroes(Heroes::ATLAS, Race::BARB, "Atlas");
 
-    vec_heroes.push_back(new Heroes(Heroes::ASTRA, Race::SORC, "Astra"));
-    vec_heroes.push_back(new Heroes(Heroes::NATASHA, Race::SORC, "Natasha"));
-    vec_heroes.push_back(new Heroes(Heroes::TROYAN, Race::SORC, "Troyan"));
-    vec_heroes.push_back(new Heroes(Heroes::VATAWNA, Race::SORC, "Vatawna"));
-    vec_heroes.push_back(new Heroes(Heroes::REBECCA, Race::SORC, "Rebecca"));
-    vec_heroes.push_back(new Heroes(Heroes::GEM, Race::SORC, "Gem"));
-    vec_heroes.push_back(new Heroes(Heroes::ARIEL, Race::SORC, "Ariel"));
-    vec_heroes.push_back(new Heroes(Heroes::CARLAWN, Race::SORC, "Carlawn"));
-    vec_heroes.push_back(new Heroes(Heroes::LUNA, Race::SORC, "Luna"));
+    vec_heroes[18] = new Heroes(Heroes::ASTRA, Race::SORC, "Astra");
+    vec_heroes[19] = new Heroes(Heroes::NATASHA, Race::SORC, "Natasha");
+    vec_heroes[20] = new Heroes(Heroes::TROYAN, Race::SORC, "Troyan");
+    vec_heroes[21] = new Heroes(Heroes::VATAWNA, Race::SORC, "Vatawna");
+    vec_heroes[22] = new Heroes(Heroes::REBECCA, Race::SORC, "Rebecca");
+    vec_heroes[23] = new Heroes(Heroes::GEM, Race::SORC, "Gem");
+    vec_heroes[24] = new Heroes(Heroes::ARIEL, Race::SORC, "Ariel");
+    vec_heroes[25] = new Heroes(Heroes::CARLAWN, Race::SORC, "Carlawn");
+    vec_heroes[26] = new Heroes(Heroes::LUNA, Race::SORC, "Luna");
 
-    vec_heroes.push_back(new Heroes(Heroes::ARIE, Race::WRLK, "Arie"));
-    vec_heroes.push_back(new Heroes(Heroes::ALAMAR, Race::WRLK, "Alamar"));
-    vec_heroes.push_back(new Heroes(Heroes::VESPER, Race::WRLK, "Vesper"));
-    vec_heroes.push_back(new Heroes(Heroes::CRODO, Race::WRLK, "Crodo"));
-    vec_heroes.push_back(new Heroes(Heroes::BAROK, Race::WRLK, "Barok"));
-    vec_heroes.push_back(new Heroes(Heroes::KASTORE, Race::WRLK, "Kastore"));
-    vec_heroes.push_back(new Heroes(Heroes::AGAR, Race::WRLK, "Agar"));
-    vec_heroes.push_back(new Heroes(Heroes::FALAGAR, Race::WRLK, "Falagar"));
-    vec_heroes.push_back(new Heroes(Heroes::WRATHMONT, Race::WRLK, "Wrathmont"));
+    vec_heroes[27] = new Heroes(Heroes::ARIE, Race::WRLK, "Arie");
+    vec_heroes[28] = new Heroes(Heroes::ALAMAR, Race::WRLK, "Alamar");
+    vec_heroes[29] = new Heroes(Heroes::VESPER, Race::WRLK, "Vesper");
+    vec_heroes[30] = new Heroes(Heroes::CRODO, Race::WRLK, "Crodo");
+    vec_heroes[31] = new Heroes(Heroes::BAROK, Race::WRLK, "Barok");
+    vec_heroes[32] = new Heroes(Heroes::KASTORE, Race::WRLK, "Kastore");
+    vec_heroes[33] = new Heroes(Heroes::AGAR, Race::WRLK, "Agar");
+    vec_heroes[34] = new Heroes(Heroes::FALAGAR, Race::WRLK, "Falagar");
+    vec_heroes[35] = new Heroes(Heroes::WRATHMONT, Race::WRLK, "Wrathmont");
 
-    vec_heroes.push_back(new Heroes(Heroes::MYRA, Race::WZRD, "Myra"));
-    vec_heroes.push_back(new Heroes(Heroes::FLINT, Race::WZRD, "Flint"));
-    vec_heroes.push_back(new Heroes(Heroes::DAWN, Race::WZRD, "Dawn"));
-    vec_heroes.push_back(new Heroes(Heroes::HALON, Race::WZRD, "Halon"));
-    vec_heroes.push_back(new Heroes(Heroes::MYRINI, Race::WZRD, "Myrini"));
-    vec_heroes.push_back(new Heroes(Heroes::WILFREY, Race::WZRD, "Wilfrey"));
-    vec_heroes.push_back(new Heroes(Heroes::SARAKIN, Race::WZRD, "Sarakin"));
-    vec_heroes.push_back(new Heroes(Heroes::KALINDRA, Race::WZRD, "Kalindra"));
-    vec_heroes.push_back(new Heroes(Heroes::MANDIGAL, Race::WZRD, "Mandigal"));
+    vec_heroes[36] = new Heroes(Heroes::MYRA, Race::WZRD, "Myra");
+    vec_heroes[37] = new Heroes(Heroes::FLINT, Race::WZRD, "Flint");
+    vec_heroes[38] = new Heroes(Heroes::DAWN, Race::WZRD, "Dawn");
+    vec_heroes[39] = new Heroes(Heroes::HALON, Race::WZRD, "Halon");
+    vec_heroes[40] = new Heroes(Heroes::MYRINI, Race::WZRD, "Myrini");
+    vec_heroes[41] = new Heroes(Heroes::WILFREY, Race::WZRD, "Wilfrey");
+    vec_heroes[42] = new Heroes(Heroes::SARAKIN, Race::WZRD, "Sarakin");
+    vec_heroes[43] = new Heroes(Heroes::KALINDRA, Race::WZRD, "Kalindra");
+    vec_heroes[44] = new Heroes(Heroes::MANDIGAL, Race::WZRD, "Mandigal");
 
-    vec_heroes.push_back(new Heroes(Heroes::ZOM, Race::NECR, "Zom"));
-    vec_heroes.push_back(new Heroes(Heroes::DARLANA, Race::NECR, "Darlana"));
-    vec_heroes.push_back(new Heroes(Heroes::ZAM, Race::NECR, "Zam"));
-    vec_heroes.push_back(new Heroes(Heroes::RANLOO, Race::NECR, "Ranloo"));
-    vec_heroes.push_back(new Heroes(Heroes::CHARITY, Race::NECR, "Charity"));
-    vec_heroes.push_back(new Heroes(Heroes::RIALDO, Race::NECR, "Rialdo"));
-    vec_heroes.push_back(new Heroes(Heroes::ROXANA, Race::NECR, "Roxana"));
-    vec_heroes.push_back(new Heroes(Heroes::SANDRO, Race::NECR, "Sandro"));
-    vec_heroes.push_back(new Heroes(Heroes::CELIA, Race::NECR, "Celia"));
+    vec_heroes[45] = new Heroes(Heroes::ZOM, Race::NECR, "Zom");
+    vec_heroes[46] = new Heroes(Heroes::DARLANA, Race::NECR, "Darlana");
+    vec_heroes[47] = new Heroes(Heroes::ZAM, Race::NECR, "Zam");
+    vec_heroes[48] = new Heroes(Heroes::RANLOO, Race::NECR, "Ranloo");
+    vec_heroes[49] = new Heroes(Heroes::CHARITY, Race::NECR, "Charity");
+    vec_heroes[50] = new Heroes(Heroes::RIALDO, Race::NECR, "Rialdo");
+    vec_heroes[51] = new Heroes(Heroes::ROXANA, Race::NECR, "Roxana");
+    vec_heroes[52] = new Heroes(Heroes::SANDRO, Race::NECR, "Sandro");
+    vec_heroes[53] = new Heroes(Heroes::CELIA, Race::NECR, "Celia");
 
-    vec_heroes.push_back(new Heroes(Heroes::ROLAND, Race::WZRD, "Roland"));
-    vec_heroes.push_back(new Heroes(Heroes::CORLAGON, Race::KNGT, "Lord Corlagon"));
-    vec_heroes.push_back(new Heroes(Heroes::ELIZA, Race::SORC, "Sister Eliza"));
-    vec_heroes.push_back(new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald"));
-    vec_heroes.push_back(new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton"));
-    vec_heroes.push_back(new Heroes(Heroes::BAX, Race::NECR, "Brother Bax"));
-    vec_heroes.push_back(new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy"));
-    vec_heroes.push_back(new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown"));
+    vec_heroes[54] = new Heroes(Heroes::ROLAND, Race::WZRD, "Roland");
+    vec_heroes[55] = new Heroes(Heroes::CORLAGON, Race::KNGT, "Lord Corlagon");
+    vec_heroes[56] = new Heroes(Heroes::ELIZA, Race::SORC, "Sister Eliza");
+    vec_heroes[57] = new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald");
+    vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton");
+    vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR, "Brother Bax");
+    vec_heroes[60] = new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy");
+    vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 
     Display & display = Display::Get();
 
@@ -142,7 +149,9 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
     TextBox("Maps Loading...", Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
     display.Flip();
 
-    AGG::PreloadObject("GROUND32.TIL");
+    AGG::PreloadObject(TIL::GROUND32);
+
+    vec_tiles.resize(width * height);
 
     // init all tiles
     for(u16 ii = 0; ii < width * height; ++ii)
@@ -162,7 +171,7 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
         mp2tile.uniqNumber1	= 0;
         mp2tile.uniqNumber2	= 0;
 
-	vec_tiles.push_back(new Maps::Tiles(ii, mp2tile));
+	vec_tiles[ii] = new Maps::Tiles(ii, mp2tile);
     }
 }
 
@@ -188,77 +197,84 @@ void World::LoadMaps(const std::string &filename)
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
 
     // playing kingdom
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) vec_kingdoms.push_back(new Kingdom(color));
+    vec_kingdoms.resize(KINGDOMMAX);
+    vec_kingdoms[0] = new Kingdom(Color::BLUE);
+    vec_kingdoms[1] = new Kingdom(Color::GREEN);
+    vec_kingdoms[2] = new Kingdom(Color::RED);
+    vec_kingdoms[3] = new Kingdom(Color::YELLOW);
+    vec_kingdoms[4] = new Kingdom(Color::ORANGE);
+    vec_kingdoms[5] = new Kingdom(Color::PURPLE);
 
     // initialize all heroes
-    vec_heroes.push_back(new Heroes(Heroes::LORDKILBURN, Race::KNGT, "Lord Kilburn"));
-    vec_heroes.push_back(new Heroes(Heroes::SIRGALLANTH, Race::KNGT, "Sir Gallanth"));
-    vec_heroes.push_back(new Heroes(Heroes::ECTOR, Race::KNGT, "Ector"));
-    vec_heroes.push_back(new Heroes(Heroes::GVENNETH, Race::KNGT, "Gvenneth"));
-    vec_heroes.push_back(new Heroes(Heroes::TYRO, Race::KNGT, "Tyro"));
-    vec_heroes.push_back(new Heroes(Heroes::AMBROSE, Race::KNGT, "Ambrose"));
-    vec_heroes.push_back(new Heroes(Heroes::RUBY, Race::KNGT, "Ruby"));
-    vec_heroes.push_back(new Heroes(Heroes::MAXIMUS, Race::KNGT, "Maximus"));
-    vec_heroes.push_back(new Heroes(Heroes::DIMITRY, Race::KNGT, "Dimitry"));
+    vec_heroes.resize(HEROESMAXCOUNT + 2);
+    vec_heroes[0] = new Heroes(Heroes::LORDKILBURN, Race::KNGT, "Lord Kilburn");
+    vec_heroes[1] = new Heroes(Heroes::SIRGALLANTH, Race::KNGT, "Sir Gallanth");
+    vec_heroes[2] = new Heroes(Heroes::ECTOR, Race::KNGT, "Ector");
+    vec_heroes[3] = new Heroes(Heroes::GVENNETH, Race::KNGT, "Gvenneth");
+    vec_heroes[4] = new Heroes(Heroes::TYRO, Race::KNGT, "Tyro");
+    vec_heroes[5] = new Heroes(Heroes::AMBROSE, Race::KNGT, "Ambrose");
+    vec_heroes[6] = new Heroes(Heroes::RUBY, Race::KNGT, "Ruby");
+    vec_heroes[7] = new Heroes(Heroes::MAXIMUS, Race::KNGT, "Maximus");
+    vec_heroes[8] = new Heroes(Heroes::DIMITRY, Race::KNGT, "Dimitry");
 
-    vec_heroes.push_back(new Heroes(Heroes::THUNDAX, Race::BARB, "Thundax"));
-    vec_heroes.push_back(new Heroes(Heroes::FINEOUS, Race::BARB, "Fineous"));
-    vec_heroes.push_back(new Heroes(Heroes::JOJOSH, Race::BARB, "Jojosh"));
-    vec_heroes.push_back(new Heroes(Heroes::CRAGHACK, Race::BARB, "Crag Hack"));
-    vec_heroes.push_back(new Heroes(Heroes::JEZEBEL, Race::BARB, "Jezebel"));
-    vec_heroes.push_back(new Heroes(Heroes::JACLYN, Race::BARB, "Jaclyn"));
-    vec_heroes.push_back(new Heroes(Heroes::ERGON, Race::BARB, "Ergon"));
-    vec_heroes.push_back(new Heroes(Heroes::TSABU, Race::BARB, "Tsabu"));
-    vec_heroes.push_back(new Heroes(Heroes::ATLAS, Race::BARB, "Atlas"));
+    vec_heroes[9] = new Heroes(Heroes::THUNDAX, Race::BARB, "Thundax");
+    vec_heroes[10] = new Heroes(Heroes::FINEOUS, Race::BARB, "Fineous");
+    vec_heroes[11] = new Heroes(Heroes::JOJOSH, Race::BARB, "Jojosh");
+    vec_heroes[12] = new Heroes(Heroes::CRAGHACK, Race::BARB, "Crag Hack");
+    vec_heroes[13] = new Heroes(Heroes::JEZEBEL, Race::BARB, "Jezebel");
+    vec_heroes[14] = new Heroes(Heroes::JACLYN, Race::BARB, "Jaclyn");
+    vec_heroes[15] = new Heroes(Heroes::ERGON, Race::BARB, "Ergon");
+    vec_heroes[16] = new Heroes(Heroes::TSABU, Race::BARB, "Tsabu");
+    vec_heroes[17] = new Heroes(Heroes::ATLAS, Race::BARB, "Atlas");
 
-    vec_heroes.push_back(new Heroes(Heroes::ASTRA, Race::SORC, "Astra"));
-    vec_heroes.push_back(new Heroes(Heroes::NATASHA, Race::SORC, "Natasha"));
-    vec_heroes.push_back(new Heroes(Heroes::TROYAN, Race::SORC, "Troyan"));
-    vec_heroes.push_back(new Heroes(Heroes::VATAWNA, Race::SORC, "Vatawna"));
-    vec_heroes.push_back(new Heroes(Heroes::REBECCA, Race::SORC, "Rebecca"));
-    vec_heroes.push_back(new Heroes(Heroes::GEM, Race::SORC, "Gem"));
-    vec_heroes.push_back(new Heroes(Heroes::ARIEL, Race::SORC, "Ariel"));
-    vec_heroes.push_back(new Heroes(Heroes::CARLAWN, Race::SORC, "Carlawn"));
-    vec_heroes.push_back(new Heroes(Heroes::LUNA, Race::SORC, "Luna"));
+    vec_heroes[18] = new Heroes(Heroes::ASTRA, Race::SORC, "Astra");
+    vec_heroes[19] = new Heroes(Heroes::NATASHA, Race::SORC, "Natasha");
+    vec_heroes[20] = new Heroes(Heroes::TROYAN, Race::SORC, "Troyan");
+    vec_heroes[21] = new Heroes(Heroes::VATAWNA, Race::SORC, "Vatawna");
+    vec_heroes[22] = new Heroes(Heroes::REBECCA, Race::SORC, "Rebecca");
+    vec_heroes[23] = new Heroes(Heroes::GEM, Race::SORC, "Gem");
+    vec_heroes[24] = new Heroes(Heroes::ARIEL, Race::SORC, "Ariel");
+    vec_heroes[25] = new Heroes(Heroes::CARLAWN, Race::SORC, "Carlawn");
+    vec_heroes[26] = new Heroes(Heroes::LUNA, Race::SORC, "Luna");
 
-    vec_heroes.push_back(new Heroes(Heroes::ARIE, Race::WRLK, "Arie"));
-    vec_heroes.push_back(new Heroes(Heroes::ALAMAR, Race::WRLK, "Alamar"));
-    vec_heroes.push_back(new Heroes(Heroes::VESPER, Race::WRLK, "Vesper"));
-    vec_heroes.push_back(new Heroes(Heroes::CRODO, Race::WRLK, "Crodo"));
-    vec_heroes.push_back(new Heroes(Heroes::BAROK, Race::WRLK, "Barok"));
-    vec_heroes.push_back(new Heroes(Heroes::KASTORE, Race::WRLK, "Kastore"));
-    vec_heroes.push_back(new Heroes(Heroes::AGAR, Race::WRLK, "Agar"));
-    vec_heroes.push_back(new Heroes(Heroes::FALAGAR, Race::WRLK, "Falagar"));
-    vec_heroes.push_back(new Heroes(Heroes::WRATHMONT, Race::WRLK, "Wrathmont"));
+    vec_heroes[27] = new Heroes(Heroes::ARIE, Race::WRLK, "Arie");
+    vec_heroes[28] = new Heroes(Heroes::ALAMAR, Race::WRLK, "Alamar");
+    vec_heroes[29] = new Heroes(Heroes::VESPER, Race::WRLK, "Vesper");
+    vec_heroes[30] = new Heroes(Heroes::CRODO, Race::WRLK, "Crodo");
+    vec_heroes[31] = new Heroes(Heroes::BAROK, Race::WRLK, "Barok");
+    vec_heroes[32] = new Heroes(Heroes::KASTORE, Race::WRLK, "Kastore");
+    vec_heroes[33] = new Heroes(Heroes::AGAR, Race::WRLK, "Agar");
+    vec_heroes[34] = new Heroes(Heroes::FALAGAR, Race::WRLK, "Falagar");
+    vec_heroes[35] = new Heroes(Heroes::WRATHMONT, Race::WRLK, "Wrathmont");
 
-    vec_heroes.push_back(new Heroes(Heroes::MYRA, Race::WZRD, "Myra"));
-    vec_heroes.push_back(new Heroes(Heroes::FLINT, Race::WZRD, "Flint"));
-    vec_heroes.push_back(new Heroes(Heroes::DAWN, Race::WZRD, "Dawn"));
-    vec_heroes.push_back(new Heroes(Heroes::HALON, Race::WZRD, "Halon"));
-    vec_heroes.push_back(new Heroes(Heroes::MYRINI, Race::WZRD, "Myrini"));
-    vec_heroes.push_back(new Heroes(Heroes::WILFREY, Race::WZRD, "Wilfrey"));
-    vec_heroes.push_back(new Heroes(Heroes::SARAKIN, Race::WZRD, "Sarakin"));
-    vec_heroes.push_back(new Heroes(Heroes::KALINDRA, Race::WZRD, "Kalindra"));
-    vec_heroes.push_back(new Heroes(Heroes::MANDIGAL, Race::WZRD, "Mandigal"));
+    vec_heroes[36] = new Heroes(Heroes::MYRA, Race::WZRD, "Myra");
+    vec_heroes[37] = new Heroes(Heroes::FLINT, Race::WZRD, "Flint");
+    vec_heroes[38] = new Heroes(Heroes::DAWN, Race::WZRD, "Dawn");
+    vec_heroes[39] = new Heroes(Heroes::HALON, Race::WZRD, "Halon");
+    vec_heroes[40] = new Heroes(Heroes::MYRINI, Race::WZRD, "Myrini");
+    vec_heroes[41] = new Heroes(Heroes::WILFREY, Race::WZRD, "Wilfrey");
+    vec_heroes[42] = new Heroes(Heroes::SARAKIN, Race::WZRD, "Sarakin");
+    vec_heroes[43] = new Heroes(Heroes::KALINDRA, Race::WZRD, "Kalindra");
+    vec_heroes[44] = new Heroes(Heroes::MANDIGAL, Race::WZRD, "Mandigal");
 
-    vec_heroes.push_back(new Heroes(Heroes::ZOM, Race::NECR, "Zom"));
-    vec_heroes.push_back(new Heroes(Heroes::DARLANA, Race::NECR, "Darlana"));
-    vec_heroes.push_back(new Heroes(Heroes::ZAM, Race::NECR, "Zam"));
-    vec_heroes.push_back(new Heroes(Heroes::RANLOO, Race::NECR, "Ranloo"));
-    vec_heroes.push_back(new Heroes(Heroes::CHARITY, Race::NECR, "Charity"));
-    vec_heroes.push_back(new Heroes(Heroes::RIALDO, Race::NECR, "Rialdo"));
-    vec_heroes.push_back(new Heroes(Heroes::ROXANA, Race::NECR, "Roxana"));
-    vec_heroes.push_back(new Heroes(Heroes::SANDRO, Race::NECR, "Sandro"));
-    vec_heroes.push_back(new Heroes(Heroes::CELIA, Race::NECR, "Celia"));
+    vec_heroes[45] = new Heroes(Heroes::ZOM, Race::NECR, "Zom");
+    vec_heroes[46] = new Heroes(Heroes::DARLANA, Race::NECR, "Darlana");
+    vec_heroes[47] = new Heroes(Heroes::ZAM, Race::NECR, "Zam");
+    vec_heroes[48] = new Heroes(Heroes::RANLOO, Race::NECR, "Ranloo");
+    vec_heroes[49] = new Heroes(Heroes::CHARITY, Race::NECR, "Charity");
+    vec_heroes[50] = new Heroes(Heroes::RIALDO, Race::NECR, "Rialdo");
+    vec_heroes[51] = new Heroes(Heroes::ROXANA, Race::NECR, "Roxana");
+    vec_heroes[52] = new Heroes(Heroes::SANDRO, Race::NECR, "Sandro");
+    vec_heroes[53] = new Heroes(Heroes::CELIA, Race::NECR, "Celia");
 
-    vec_heroes.push_back(new Heroes(Heroes::ROLAND, Race::WZRD, "Roland"));
-    vec_heroes.push_back(new Heroes(Heroes::CORLAGON, Race::KNGT, "Lord Corlagon"));
-    vec_heroes.push_back(new Heroes(Heroes::ELIZA, Race::SORC, "Sister Eliza"));
-    vec_heroes.push_back(new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald"));
-    vec_heroes.push_back(new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton"));
-    vec_heroes.push_back(new Heroes(Heroes::BAX, Race::NECR, "Brother Bax"));
-    vec_heroes.push_back(new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy"));
-    vec_heroes.push_back(new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown"));
+    vec_heroes[54] = new Heroes(Heroes::ROLAND, Race::WZRD, "Roland");
+    vec_heroes[55] = new Heroes(Heroes::CORLAGON, Race::KNGT, "Lord Corlagon");
+    vec_heroes[56] = new Heroes(Heroes::ELIZA, Race::SORC, "Sister Eliza");
+    vec_heroes[57] = new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald");
+    vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton");
+    vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR, "Brother Bax");
+    vec_heroes[60] = new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy");
+    vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 
     Display & display = Display::Get();
 
@@ -267,7 +283,7 @@ void World::LoadMaps(const std::string &filename)
     TextBox("Maps Loading...", Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
     display.Flip();
 
-    AGG::PreloadObject("GROUND32.TIL");
+    AGG::PreloadObject(TIL::GROUND32);
 
     char byte8;
     u16  byte16;
@@ -349,6 +365,8 @@ void World::LoadMaps(const std::string &filename)
     // offset data
     fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
 
+    vec_tiles.resize(width * height);
+
     // read all tiles
     for(u16 ii = 0; ii < width * height; ++ii)
     {
@@ -425,7 +443,7 @@ void World::LoadMaps(const std::string &filename)
 
 	(*tile).AddonsSort();
 
-	vec_tiles.push_back(tile);
+	vec_tiles[ii] = tile;
     }
 
     if(H2Config::Debug()) Error::Verbose("World::World: read all tiles, tellg: ", fd.tellg());
@@ -504,7 +522,13 @@ void World::LoadMaps(const std::string &filename)
     if(H2Config::Debug()) Error::Verbose("World::World: read coord other resource, tellg: ", fd.tellg());
 
     // unknown byte
-    fd.ignore();
+    char unk_byte;
+    fd.read(&unk_byte, 1);
+    if(4 < H2Config::Debug() && unk_byte)
+	printf("World::World: dump unknown byte: %hhX\n", unk_byte);
+
+    if(4 < H2Config::Debug())
+	    printf("World::World: dump final block: ");
 
     // count final mp2 blocks
     u16 countblock = 0;
@@ -517,8 +541,14 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
 	SWAP16(byte16);
 
+	if(4 < H2Config::Debug())
+	    printf("%hX", byte16);
+
 	if(byte16) countblock = byte16 - 1;
     }
+
+    if(4 < H2Config::Debug())
+	printf("\n");
 
     if(H2Config::Debug()) Error::Verbose("World::World: read find final mp2 blocks, tellg: ", fd.tellg());
 
@@ -615,7 +645,7 @@ void World::LoadMaps(const std::string &filename)
 			    case 3: race = Race::WRLK; break;
 			    case 4: race = Race::WZRD; break;
 			    case 5: race = Race::NECR; break;
-			    case 6: race = (Color::GRAY != color ? H2Config::GetKingdomRace(color) : Race::Rand()); break;
+			    case 6: race = (Color::GRAY != color ? Settings::Get().FileInfo().KingdomRace(color) : Race::Rand()); break;
 			}
 
 			// check heroes max count
@@ -756,7 +786,7 @@ void World::LoadMaps(const std::string &filename)
 	}
     }
 
-    AGG::FreeObject("GROUND32.TIL");
+    AGG::FreeObject(TIL::GROUND32);
 
     // sort castles to kingdoms
     for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
@@ -765,7 +795,7 @@ void World::LoadMaps(const std::string &filename)
 		(*vec_kingdoms[ii]).AddCastle(vec_castles[cc]);
 
     // play with hero
-    if(H2Config::PlayWithHeroes())
+    if(Settings::Get().FileInfo().PlayWithHeroes())
 	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
 	    if((*vec_kingdoms[ii]).isPlay() && (*vec_kingdoms[ii]).GetCastles().size())
 	    {
@@ -774,7 +804,7 @@ void World::LoadMaps(const std::string &filename)
 		const Castle & castle = *(kingdom.GetCastles().at(0));
 
 		// place debugger hero
-		if(H2Config::Debug() && H2Config::GetMyColor() == kingdom.GetColor() && (*vec_heroes[Heroes::SANDYSANDY]).isFreeman())
+		if(H2Config::Debug() && Settings::Get().MyColor() == kingdom.GetColor() && (*vec_heroes[Heroes::SANDYSANDY]).isFreeman())
 		{
 		    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
 
@@ -797,7 +827,7 @@ void World::LoadMaps(const std::string &filename)
 
 /* get human kindom */
 const Kingdom & World::GetMyKingdom(void) const
-{ return GetKingdom(H2Config::GetMyColor()); }
+{ return GetKingdom(Settings::Get().MyColor()); }
 
 /* get kingdom */
 const Kingdom & World::GetKingdom(Color::color_t color) const
@@ -905,7 +935,7 @@ void World::NextDay(void)
 void World::NewWeek(void)
 {
     // change free recruit hero
-    const Race::race_t & rc = H2Config::GetKingdomRace(H2Config::GetMyColor());
+    const Race::race_t & rc = Settings::Get().FileInfo().KingdomRace(Settings::Get().MyColor());
     free_recruit_hero1 = GetFreemanHeroes(rc)->GetHeroes();
     free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
 }
@@ -1000,7 +1030,7 @@ void World::FreeOldMaps(void)
 
 const Heroes::heroes_t & World::GetFreeRecruit1(void)
 {
-    const Race::race_t & rc = H2Config::GetKingdomRace(H2Config::GetMyColor());
+    const Race::race_t & rc = Settings::Get().FileInfo().KingdomRace(Settings::Get().MyColor());
 
     if(Heroes::UNKNOWN == free_recruit_hero1 || !(*vec_heroes[free_recruit_hero1]).isFreeman()) free_recruit_hero1 = GetFreemanHeroes(rc)->GetHeroes();
 

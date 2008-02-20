@@ -21,6 +21,7 @@
 #define H2MP2_H
 
 #include "gamedefs.h"
+#include "icn.h"
 
 #define MP2OFFSETDATA	428
 #define SIZEOFMP2TILE	20
@@ -432,7 +433,7 @@ namespace MP2
 
     } object_t;
 
-    const char *GetICNObject(u8 type);
+    ICN::icn_t GetICNObject(const u8 type);
     const char *StringObject(u8 object);
     u8 GetAnimationFrame(u8 object, u8 index, u32 frame);
 };

@@ -29,7 +29,7 @@ $(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH))))
 
 VPATH := $(SOURCEDIR)
 
-fheroes2.o: fheroes2.cpp
+settings.o: settings.cpp
 	$(CC) -c -MD $(addprefix -I, $(SOURCEDIR)) $< $(CFLAGS) -DBUILD_DATE=$(shell date +%Y%m%d)
 
 %.o: %.cpp

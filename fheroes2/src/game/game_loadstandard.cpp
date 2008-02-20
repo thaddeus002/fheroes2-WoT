@@ -29,9 +29,9 @@
 Game::menu_t Game::LoadStandard(void)
 {
     // preload
-    AGG::PreloadObject("HEROES.ICN");
-    AGG::PreloadObject("REQBKG.ICN");
-    AGG::PreloadObject("REQUEST.ICN");
+    AGG::PreloadObject(ICN::HEROES);
+    AGG::PreloadObject(ICN::REQBKG);
+    AGG::PreloadObject(ICN::REQUEST);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -42,18 +42,18 @@ Game::menu_t Game::LoadStandard(void)
     display.SetVideoMode(Display::SMALL);
 
     // image background
-    const Sprite &back = AGG::GetICN("HEROES.ICN", 0);
+    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     display.Blit(back);
 
-    const Sprite &panel = AGG::GetICN("REQBKG.ICN", 0);
+    const Sprite &panel = AGG::GetICN(ICN::REQBKG, 0);
     display.Blit(panel, 140, 50);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonOk(174, 365, "REQUEST.ICN", 1, 2);
-    Button buttonCancel(384, 365, "REQUEST.ICN", 3, 4);
-    Button buttonPgUp(467, 105, "REQUEST.ICN", 5, 6);
-    Button buttonPgDn(467, 307, "REQUEST.ICN", 7, 8);
+    Button buttonOk(174, 365, ICN::REQUEST, 1, 2);
+    Button buttonCancel(384, 365, ICN::REQUEST, 3, 4);
+    Button buttonPgUp(467, 105, ICN::REQUEST, 5, 6);
+    Button buttonPgDn(467, 307, ICN::REQUEST, 7, 8);
 
     buttonOk.Draw();
     buttonCancel.Draw();

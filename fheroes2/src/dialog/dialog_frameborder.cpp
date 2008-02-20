@@ -22,6 +22,7 @@
 #include "rect.h"
 #include "localevent.h"
 #include "cursor.h"
+#include "sprite.h"
 #include "config.h"
 #include "dialog.h"
 
@@ -31,7 +32,7 @@
 Dialog::FrameBorder::FrameBorder()
 {
     Display & display = Display::Get();
-    const Sprite & surdbkg = (H2Config::EvilInterface() ? AGG::GetICN("SURDRBKE.ICN", 0) : AGG::GetICN("SURDRBKG.ICN", 0));
+    const Sprite & surdbkg = (H2Config::EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
     
     Rect pos;
 

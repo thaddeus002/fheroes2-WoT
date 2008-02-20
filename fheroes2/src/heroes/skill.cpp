@@ -295,5 +295,5 @@ const Sprite & Skill::Secondary::GetSprite(secondary_t skill)
         default: break;
     }
 
-    return AGG::GetICN("SECSKILL.ICN", index);
+    return AGG::GetICN(ICN::SECSKILL, index);
 }

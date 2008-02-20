@@ -36,8 +36,8 @@ Game::menu_t Game::Editor::NewMaps(void)
     Display & display = Display::Get();
 
     // preload
-    AGG::PreloadObject("BTNESIZE.ICN");
-    AGG::PreloadObject("REDBACK.ICN");
+    AGG::PreloadObject(ICN::BTNESIZE);
+    AGG::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -47,19 +47,19 @@ Game::menu_t Game::Editor::NewMaps(void)
     Display::SetVideoMode(Display::SMALL);
 
     // image background
-    const Sprite &back = AGG::GetICN("EDITOR.ICN", 0);
+    const Sprite &back = AGG::GetICN(ICN::EDITOR, 0);
     display.Blit(back);
 
-    const Sprite &panel = AGG::GetICN("REDBACK.ICN", 0);
+    const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonSmall(455, 45, "BTNESIZE.ICN", 0, 1);
-    Button buttonMedium(455, 110, "BTNESIZE.ICN", 2, 3);
-    Button buttonLarge(455, 175, "BTNESIZE.ICN", 4, 5);
-    Button buttonXLarge(455, 240, "BTNESIZE.ICN", 6, 7);
-    Button buttonCancel(455, 375, "BTNESIZE.ICN", 8, 9);
+    Button buttonSmall(455, 45, ICN::BTNESIZE, 0, 1);
+    Button buttonMedium(455, 110, ICN::BTNESIZE, 2, 3);
+    Button buttonLarge(455, 175, ICN::BTNESIZE, 4, 5);
+    Button buttonXLarge(455, 240, ICN::BTNESIZE, 6, 7);
+    Button buttonCancel(455, 375, ICN::BTNESIZE, 8, 9);
 
     buttonSmall.Draw();
     buttonMedium.Draw();
@@ -79,10 +79,10 @@ Game::menu_t Game::Editor::NewMaps(void)
 	le.MousePressLeft(buttonXLarge) ? buttonXLarge.PressDraw() : buttonXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonSmall)){ H2Config::SetSizeMaps(Maps::SMALL); return EDITSTART; }
-	if(le.MouseClickLeft(buttonMedium)){ H2Config::SetSizeMaps(Maps::MEDIUM); return EDITSTART; }
-	if(le.MouseClickLeft(buttonLarge)){ H2Config::SetSizeMaps(Maps::LARGE); return EDITSTART; }
-	if(le.MouseClickLeft(buttonXLarge)){ H2Config::SetSizeMaps(Maps::XLARGE); return EDITSTART; }
+	if(le.MouseClickLeft(buttonSmall)) return StartGame(Maps::SMALL);
+	if(le.MouseClickLeft(buttonMedium)) return StartGame(Maps::MEDIUM);
+	if(le.MouseClickLeft(buttonLarge)) return StartGame(Maps::LARGE);
+	if(le.MouseClickLeft(buttonXLarge)) return StartGame(Maps::XLARGE);
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)) return MAINMENU;
 
         // right info

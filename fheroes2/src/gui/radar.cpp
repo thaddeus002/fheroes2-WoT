@@ -46,7 +46,7 @@ Radar::Radar() :
                  static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(world.h())))),
     cursor(spriteCursor, pos.x, pos.y)
 {
-    H2Config::Original() ? GenerateOrigin() : GenerateRealistic();
+    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
 
     DrawCursor(spriteCursor);
 }

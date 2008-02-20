@@ -29,7 +29,7 @@
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
     Display & display = Display::Get();
-    const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);

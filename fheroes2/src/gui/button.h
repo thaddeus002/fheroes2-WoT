@@ -22,15 +22,16 @@
 
 #include "rect.h"
 #include "sprite.h"
+#include "icn.h"
 #include "gamedefs.h"
 
 class Button : public Rect
 {
 public:
     Button(const Sprite &s1, const Sprite &s2);
-    Button(const std::string &icn, u16 index1, u16 index2);
-    Button(const Point &pt, const std::string &icn, u16 index1, u16 index2);
-    Button(u16 ox, u16 oy, const std::string &icn, u16 index1, u16 index2);
+    Button(const ICN::icn_t icn, u16 index1, u16 index2);
+    Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2);
+    Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2);
     bool isEnable(void) const{ return !disable; };
     bool isDisable(void) const{ return disable; };
     bool isPressed(void) const{ return pressed; };

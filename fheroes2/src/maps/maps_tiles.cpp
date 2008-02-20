@@ -133,7 +133,7 @@ u8 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL)
 {
-    tile_sprite.LoadPalette(AGG::GetPalette(), AGGSIZEPALETTE);
+    tile_sprite.LoadPalette(AGG::Cache::Get().GetPAL());
 
     SetTile(mp2tile.tileIndex, mp2tile.shape);
 
@@ -141,9 +141,9 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
     AddonsPushLevel2(mp2tile);
 }
 
-void Maps::Tiles::SetTile(u16 index, u8 shape)
+void Maps::Tiles::SetTile(const u16 index, const u8 shape)
 {
-    AGG::GetTIL("GROUND32.TIL", index, shape, tile_sprite); 
+    AGG::GetTIL(TIL::GROUND32, index, shape, tile_sprite);
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
@@ -245,9 +245,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	{
 	    u8 object = (*it1).GetObject();
 	    u8 index  = (*it1).GetIndex();
-	    const char *icn = MP2::GetICNObject(object);
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(icn)
+	    if(ICN::UNKNOWN != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
@@ -288,9 +288,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	{
 	    u8 object = (*it1).GetObject();
 	    u8 index  = (*it1).GetIndex();
-	    const char *icn = MP2::GetICNObject(object);
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(icn)
+	    if(ICN::UNKNOWN != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
@@ -350,7 +350,7 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 	    u8 object = (*it1).GetObject();
 	    u8 index  = (*it1).GetIndex();
 
-	    if(MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
+	    if(ICN::UNKNOWN != MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
 	}
     }
 
@@ -365,7 +365,7 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 	    u8 object = (*it1).GetObject();
 	    u8 index  = (*it1).GetIndex();
 	    
-	    if(MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
+	    if(ICN::UNKNOWN != MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
 	}
     }
     
@@ -575,7 +575,7 @@ void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
     }
 
     // draw first sprite
-    const Sprite & sprite_first = AGG::GetICN("MINIMON.ICN", monster * 9);
+    const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9);
 
     s16 ax = dx + TILEWIDTH - std::abs(sprite_first.x()) - align_x;
     s16 ay = dy + TILEWIDTH - std::abs(sprite_first.y()) - 4;
@@ -601,7 +601,7 @@ void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
     display.Blit(sprite_first, src_rt, ax, ay);
 
     // draw second sprite
-    const Sprite & sprite_next = AGG::GetICN("MINIMON.ICN", monster * 9 + 1 + (anime_sprite % 6));
+    const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster * 9 + 1 + (anime_sprite % 6));
 
     ax = dx + TILEWIDTH - std::abs(sprite_next.x()) - align_x;
     ay = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
@@ -663,7 +663,7 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 		default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown race hero, maps index: ", maps_index); return;
 	    }
 
-	    const Sprite & sprite = AGG::GetICN("MINIHERO.ICN", index_sprite);
+	    const Sprite & sprite = AGG::GetICN(ICN::MINIHERO, index_sprite);
 
 	    const Point dst_pt(dx + sprite.x(), BORDERWIDTH > dy + sprite.y() - 22 ? BORDERWIDTH : dy + sprite.y() - 22);
 	    const Rect  src_rt(0,  dst_pt.y > BORDERWIDTH ? 0 : 22, sprite.w(), sprite.h());

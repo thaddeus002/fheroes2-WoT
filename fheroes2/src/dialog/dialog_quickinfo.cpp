@@ -43,7 +43,7 @@ void Dialog::QuickInfo(const std::string & object)
     cursor.Hide();
 
     // preload
-    const std::string &qwikinfo = "QWIKINFO.ICN";
+    const ICN::icn_t qwikinfo = ICN::QWIKINFO;
 
     AGG::PreloadObject(qwikinfo);
 
@@ -105,7 +105,7 @@ void Dialog::QuickInfo(const Castle & castle)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    const std::string &qwiktown = "QWIKTOWN.ICN";
+    const ICN::icn_t qwiktown = ICN::QWIKTOWN;
     AGG::PreloadObject(qwiktown);
 
     // image box
@@ -163,7 +163,7 @@ void Dialog::QuickInfo(const Castle & castle)
     }
     
     // castle icon
-    const Sprite & sprite = AGG::GetICN("LOCATORS.ICN", index);
+    const Sprite & sprite = AGG::GetICN(ICN::LOCATORS, index);
 
     dst_pt.x = cur_rt.x + (cur_rt.w - sprite.w()) / 2;
     dst_pt.y += 18;
@@ -181,11 +181,11 @@ void Dialog::QuickInfo(const Castle & castle)
 	case Color::GRAY:	index = 12; break;
     }
 
-    const Sprite & l_flag = AGG::GetICN("FLAG32.ICN", index);
+    const Sprite & l_flag = AGG::GetICN(ICN::FLAG32, index);
     dst_pt.x = cur_rt.x + (cur_rt.w - 60) / 2 - l_flag.w();
     display.Blit(l_flag, dst_pt);
 
-    const Sprite & r_flag = AGG::GetICN("FLAG32.ICN", index + 1);
+    const Sprite & r_flag = AGG::GetICN(ICN::FLAG32, index + 1);
     dst_pt.x = cur_rt.x + (cur_rt.w + 60) / 2;
     display.Blit(r_flag, dst_pt);
 
@@ -214,7 +214,7 @@ void Dialog::QuickInfo(const Castle & castle)
         {
 	    if(Army::isValid(army.at(ii)))
 	    {
-		const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).Monster());
+		const Sprite & monster = AGG::GetICN(ICN::MONS32, army.at(ii).Monster());
 
                 // align from count
 		dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
@@ -256,7 +256,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    const std::string &qwikhero = "QWIKHERO.ICN";
+    const ICN::icn_t qwikhero = ICN::QWIKHERO;
     AGG::PreloadObject(qwikhero);
 
     // image box
@@ -321,11 +321,11 @@ void Dialog::QuickInfo(const Heroes & hero)
 	case Color::GRAY:	index = 12; break;
     }
 
-    const Sprite & l_flag = AGG::GetICN("FLAG32.ICN", index);
+    const Sprite & l_flag = AGG::GetICN(ICN::FLAG32, index);
     dst_pt.x = cur_rt.x + (cur_rt.w - 40) / 2 - l_flag.w();
     display.Blit(l_flag, dst_pt);
 
-    const Sprite & r_flag = AGG::GetICN("FLAG32.ICN", index + 1);
+    const Sprite & r_flag = AGG::GetICN(ICN::FLAG32, index + 1);
     dst_pt.x = cur_rt.x + (cur_rt.w + 40) / 2;
     display.Blit(r_flag, dst_pt);
 
@@ -397,7 +397,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     {
 	if(Army::isValid(army.at(ii)))
 	{
-	    const Sprite & monster = AGG::GetICN("MONS32.ICN", army.at(ii).Monster());
+	    const Sprite & monster = AGG::GetICN(ICN::MONS32, army.at(ii).Monster());
 
             // align from count
 	    dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));

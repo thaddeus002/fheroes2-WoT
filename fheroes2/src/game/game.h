@@ -21,6 +21,7 @@
 #define H2GAME_H
 
 #include "rect.h"
+#include "maps.h"
 
 #define RADARWIDTH	144
 #define BORDERWIDTH	16
@@ -83,7 +84,7 @@ namespace Game
 	Game::menu_t MainMenu(void);
 	Game::menu_t NewMaps(void);
 	Game::menu_t LoadMaps(void);
-	Game::menu_t StartGame(void);
+	Game::menu_t StartGame(const Maps::mapsize_t sizemap = Maps::SMALL);
     };
 };
 

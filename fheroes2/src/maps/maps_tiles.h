@@ -82,7 +82,8 @@ namespace Maps
 	const TilesAddon * FindAddonLevel1(u32 uniq1) const;
 	const TilesAddon * FindAddonLevel2(u32 uniq2) const;
 
-	void SetTile(u16 index, u8 shape);
+	void SetTile(const u16 index, const u8 shape);
+
 	void SetQuantity1(u8 val){ quantity1 = val; };
 	void SetQuantity2(u8 val){ quantity2 = val; };
 	void SetObject(MP2::object_t object){ general = object; };

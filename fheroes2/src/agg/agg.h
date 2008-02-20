@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,64 +17,109 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #ifndef H2AGG_H
 #define H2AGG_H
 
-#include <vector>
 #include <string>
-#include "sprite.h"
-#include "surface.h"
-#include "text.h"
+#include <vector>
+#include <map>
+
 #include "gamedefs.h"
+#include "icn.h"
+#include "til.h"
+#include "pal.h"
+#include "xmi.h"
+#include "m82.h"
+#include "palette.h"
+#include "text.h"
 
-#define AGGSIZENAME     	15
-#define AGGSIZEPALETTE		256
-#define DEFAULT_SHADOW_ALPHA    0x40            // shadow alpha 
+class Surface;
+class Sprite;
 
-namespace AGG {
+namespace AGG
+{	
+    class FAT
+    {
+    public:
+	FAT() : crc(0), offset(0), size(0) {};
 
-    typedef enum { DATA_UNK, DATA_ICN, DATA_WAV, DATA_TIL, DATA_BMP, DATA_XMI, DATA_BIN, DATA_PAL, DATA_FNT } aggtype_t;
-                         
-    typedef struct {
-	s16         offsetX;
-	s16         offsetY;
-	u16         width;
-	u16         height;
-	u32         offsetData;
-    } icnheader_t;
+	u32 crc;
+	u32 offset;
+	u32 size;
 
-    typedef struct {
-	u32	blockOffset;
-	u32	blockSize;
-	aggtype_t blockType;
-	union {
-	    std::vector<Sprite *> *vectorICN;
-	    char *ptrTIL;
-	};
-    } aggfat_t;
+	void Dump(const std::string & n) const;
+    };
 
-    void Init(const std::string & aggname);
-    void Quit(void);
+    class File
+    {
+    public:
+	File(const std::string & fname);
+	~File();
 
-    void PreloadObject(const std::string & name);
-    void FreeObject(const std::string & name);
-    void FreeObject(aggfat_t & fat);
+	const std::string & Name(void) const;
+	const FAT & Fat(const std::string & key);
+	u16 CountItems(void);
 
-    const SDL_Color * GetPalette(void);
-    void LoadPalette(void);
-    u32 GetColor(u8 index);
+	bool Read(const std::string & key, std::vector<char> & body);
 
-    void LoadICN(const std::string & name);
-    void LoadTIL(const std::string & name);
+	void Dump(void) const;
 
-    void GetTIL(const std::string & name, u16 index, u8 shape, Surface &surface);
-    const Sprite & GetICN(const std::string & name, u16 index);
+    private:
+	const std::string filename;
+	std::map<std::string, FAT> fat;
+	u16 count_items;
+	std::fstream * stream;
+    };
+
+    class Cache
+    {
+    public:
+	~Cache();
+
+	static Cache & Get(void);
+
+	bool AttachFile(const std::string & fname);
+
+	const Sprite & GetICN(const ICN::icn_t icn, u16 index);
+	const Surface & GetTIL(const TIL::til_t til, u16 index);
+	const Palette & GetPAL(void);
+
+	void LoadICN(const ICN::icn_t icn);
+	void LoadTIL(const TIL::til_t til);
+	void LoadPAL(void);
+
+	void FreeICN(const ICN::icn_t icn);
+	void FreeTIL(const TIL::til_t til);
+
+    private:
+	Cache();
+
+	std::vector<File *> agg_cache;
+
+	std::map<ICN::icn_t, std::vector<Sprite *> > icn_cache;
+	std::map<TIL::til_t, std::vector<Surface *> > til_cache;
+
+	Palette palette;
+
+    };
+
+    // wrapper AGG::PreloadObject
+    void PreloadObject(const ICN::icn_t icn);
+    void PreloadObject(const TIL::til_t til);
+
+    // wrapper AGG::FreeObject
+    void FreeObject(const ICN::icn_t icn);
+    void FreeObject(const TIL::til_t til);
+
+    // wrapper AGG::GetXXX
+    const Sprite & GetICN(const ICN::icn_t icn, const u16 index);
+    void GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst);
+
+    // wrapper AGG::GetColor
+    u32 GetColor(const u16 index);
+
     const Sprite & GetLetter(char ch, Font::type_t ft);
-
-    void FreeICN(aggfat_t & fat);
-    void FreeTIL(aggfat_t & fat);
-    
-    bool BlackList(const std::string & name, u16 index);
 };
 
 #endif

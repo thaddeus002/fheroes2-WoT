@@ -34,7 +34,7 @@
 #define ICONS_CURSOR_COLOR	0x98
 
 Game::SelectFocusObject::SelectFocusObject(s16 px, s16 py) : pos_pt(px, py),
-    empty_back(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", 1)),
+    empty_back(AGG::GetICN(H2Config::EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, 1)),
     step(32), sprite_cursor(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT), cursor(sprite_cursor, px, py),
     selected(false), top_index(0), cursor_index(0xFF) 
 {
@@ -60,7 +60,7 @@ Game::SelectFocusObject::SelectFocusObject(s16 px, s16 py) : pos_pt(px, py),
 
     u8 count_icons = 0;
 
-    switch(H2Config::GetVideoMode())
+    switch(H2Config::VideoMode())
     {
         default:
             count_icons = 4;
@@ -76,8 +76,10 @@ Game::SelectFocusObject::SelectFocusObject(s16 px, s16 py) : pos_pt(px, py),
             break;
     }
 
+    coords.resize(count_icons);
+
     for(u8 ii = 0; ii < count_icons; ++ii)
-        coords.push_back(Rect(pos_pt.x, pos_pt.y + ii * step, ICONS_WIDTH, ICONS_HEIGHT));
+        coords[ii] = Rect(pos_pt.x, pos_pt.y + ii * step, ICONS_WIDTH, ICONS_HEIGHT);
 
     max_area.x = pos_pt.x;
     max_area.y = pos_pt.y;
@@ -185,11 +187,11 @@ void Game::SelectFocusCastles::Redraw(void)
 		default: Error::Warning("Game::SelectFocusCastles::Redraw: unknown race.");
 	    }
 
-	    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", index_sprite), coords[ii].x, coords[ii].y);
+	    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, index_sprite), coords[ii].x, coords[ii].y);
 	    
 	    // castle build marker
 	    if(! castle.AllowBuild())
-		display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN", 24), coords[ii].x + 39, coords[ii].y + 1);
+		display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, 24), coords[ii].x + 39, coords[ii].y + 1);
 	}
 	// redraw background
 	else
@@ -258,8 +260,8 @@ void Game::SelectFocusHeroes::Redraw(void)
 	{
 	    const Heroes & hero = *heroes->at(top_index + ii);
 	    
-	    const Sprite & mobility = AGG::GetICN("MOBILITY.ICN", hero.GetMobilityIndexSprite());
-	    const Sprite & mana = AGG::GetICN("MANA.ICN", hero.GetManaIndexSprite());
+	    const Sprite & mobility = AGG::GetICN(ICN::MOBILITY, hero.GetMobilityIndexSprite());
+	    const Sprite & mana = AGG::GetICN(ICN::MANA, hero.GetManaIndexSprite());
 	    const Surface & port = Portrait::Hero(hero.GetHeroes(), Portrait::SMALL);
 
 	    display.FillRect(0, 0, 0, coords[ii]);

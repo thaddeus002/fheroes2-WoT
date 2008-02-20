@@ -21,6 +21,7 @@
 #define H2SPRITE_H
 
 #include "surface.h"
+#include "icn.h"
 #include "gamedefs.h"
 
 class Sprite : public Surface
@@ -28,7 +29,7 @@ class Sprite : public Surface
 
 public:
     /* icn sprite constructor */
-    Sprite(u16 w, u16 h, s16 ox, s16 oy, u32 size, const u8 *data);
+    Sprite(const ICN::Header & header, const char *data, u32 size);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };

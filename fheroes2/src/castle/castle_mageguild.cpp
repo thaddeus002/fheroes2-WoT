@@ -43,14 +43,14 @@ void Castle::OpenMageGuild(void)
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
-    display.Blit(AGG::GetICN("STONEBAK.ICN", 0), dst_pt);
+    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
 
     std::string message;
 
     // bar
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    display.Blit(AGG::GetICN("WELLXTRA.ICN", 2), dst_pt);
+    display.Blit(AGG::GetICN(ICN::WELLXTRA, 2), dst_pt);
 
     // text bar
     message = "The above spells have been added to your book.";
@@ -60,25 +60,24 @@ void Castle::OpenMageGuild(void)
 
     const u8 level = mageguild.GetLevel();
     // sprite
-    message = "MAGEGLD";
+    ICN::icn_t icn = ICN::UNKNOWN;
     switch(race)
     {
-        case Race::KNGT: message += "K"; break;
-        case Race::BARB: message += "B"; break;
-        case Race::SORC: message += "S"; break;
-        case Race::WRLK: message += "W"; break;
-        case Race::WZRD: message += "Z"; break;
-        case Race::NECR: message += "N"; break;
+        case Race::KNGT: icn = ICN::MAGEGLDK; break;
+        case Race::BARB: icn = ICN::MAGEGLDB; break;
+        case Race::SORC: icn = ICN::MAGEGLDS; break;
+        case Race::WRLK: icn = ICN::MAGEGLDW; break;
+        case Race::WZRD: icn = ICN::MAGEGLDZ; break;
+        case Race::NECR: icn = ICN::MAGEGLDN; break;
 	default: break;
     }
-    message += ".ICN";
-    const Sprite & sprite = AGG::GetICN(message, level - 1);
+    const Sprite & sprite = AGG::GetICN(icn, level - 1);
     dst_pt.x = cur_pt.x + 90 - sprite.w() / 2;
     dst_pt.y = cur_pt.y + 290 - sprite.h();
     display.Blit(sprite, dst_pt);
 
-    const Sprite & roll_hide = AGG::GetICN("TOWNWIND.ICN", 1);
-    const Sprite & roll_show = AGG::GetICN("TOWNWIND.ICN", 0);
+    const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
+    const Sprite & roll_show = AGG::GetICN(ICN::TOWNWIND, 0);
 
     // level 5
     std::vector<Rect> rectsLevel5;
@@ -94,7 +93,7 @@ void Castle::OpenMageGuild(void)
 	if(4 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(5, ii);
-	    const Sprite & icon = AGG::GetICN("SPELLS.ICN", Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
@@ -119,7 +118,7 @@ void Castle::OpenMageGuild(void)
 	if(3 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(4, ii);
-	    const Sprite & icon = AGG::GetICN("SPELLS.ICN", Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
@@ -144,7 +143,7 @@ void Castle::OpenMageGuild(void)
 	if(2 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(3, ii);
-	    const Sprite & icon = AGG::GetICN("SPELLS.ICN", Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
@@ -169,7 +168,7 @@ void Castle::OpenMageGuild(void)
 	if(1 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(2, ii);
-	    const Sprite & icon = AGG::GetICN("SPELLS.ICN", Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
 	    
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
@@ -194,7 +193,7 @@ void Castle::OpenMageGuild(void)
 	if(level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(1, ii);
-	    const Sprite & icon = AGG::GetICN("SPELLS.ICN", Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
@@ -208,7 +207,7 @@ void Castle::OpenMageGuild(void)
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
-    Button buttonExit(dst_pt, "WELLXTRA.ICN", 0, 1);
+    Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
 
     buttonExit.Draw();
 

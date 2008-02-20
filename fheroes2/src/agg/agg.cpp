@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,437 +18,515 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
-#include <map>
 #include <fstream>
-#include <cstdlib>
 #include <iostream>
 
 #include "error.h"
-#include "tools.h"
-#include "maps.h"
 #include "config.h"
+#include "surface.h"
+#include "sprite.h"
 #include "agg.h"
 
-namespace AGG {
-    static std::fstream                        *fd = NULL;
-    static std::map<std::string, AGG::aggfat_t> fat;
-    static std::vector<u32>                     palette(AGGSIZEPALETTE);
-    static SDL_Color *colors = NULL;
-};
+#define FATSIZENAME	15
 
-/* AGG init */
-void AGG::Init(const std::string & aggname)
+/*AGG::File constructor */
+AGG::File::File(const std::string & fname) : filename(fname), count_items(0), stream(NULL)
 {
-    AGG::fd = new std::fstream(aggname.c_str(), std::ios::in | std::ios::binary);
+    stream = new std::fstream(filename.c_str(), std::ios::in | std::ios::binary);
 
-    if(! AGG::fd || ! *AGG::fd || AGG::fd->fail())
-	Error::Except(aggname + " file not found.");
-    else
-    if(H2Config::Debug()) Error::Verbose("AGG data: " + aggname);
-
-    u16 count;
-    char buf[AGGSIZENAME];
-    aggfat_t fat_element;
-
-    AGG::fd->read(reinterpret_cast<char *>(&count), sizeof(u16));
-    SWAP16(count);
-
-    for(u16 seg = 0; seg < count; ++seg){
-
-	// name fat_element
-	AGG::fd->seekg(-AGGSIZENAME * (count - seg), std::ios_base::end);
-	AGG::fd->read(buf, AGGSIZENAME);
-	std::string key_name(buf);
-
-	// seek fat_element
-	AGG::fd->seekg(sizeof(u16) + seg * (3 * sizeof(u32)), std::ios_base::beg);
-	AGG::fd->seekg(sizeof(u32), std::ios_base::cur);
-
-	// read fat_element
-	AGG::fd->read(reinterpret_cast<char *>(&fat_element.blockOffset), sizeof(u32));
-	SWAP32(fat_element.blockOffset);
-	AGG::fd->read(reinterpret_cast<char *>(&fat_element.blockSize), sizeof(u32));
-	SWAP32(fat_element.blockSize);
-
-	// type data
-	if(std::string::npos != key_name.find(".ICN")){
-	    fat_element.blockType = DATA_ICN;
-	    fat_element.vectorICN = NULL;
-	}else if(std::string::npos != key_name.find(".82M"))
-	    fat_element.blockType = DATA_WAV;
-	else if(std::string::npos != key_name.find(".TIL")){
-	    fat_element.blockType = DATA_TIL;
-	    fat_element.ptrTIL = NULL;
-	}else if(std::string::npos != key_name.find(".BMP"))
-	    fat_element.blockType = DATA_BMP;
-	else if(std::string::npos != key_name.find(".XMI"))
-	    fat_element.blockType = DATA_XMI;
-	else if(std::string::npos != key_name.find(".BIN"))
-	    fat_element.blockType = DATA_BIN;
-	else if(std::string::npos != key_name.find(".PAL")){
-	    fat_element.blockType = DATA_PAL;
-	}else if(std::string::npos != key_name.find(".FNT"))
-	    fat_element.blockType = DATA_FNT;
-	else
-	    fat_element.blockType = DATA_UNK;
-
-	//
-	AGG::fat[key_name] = fat_element;
-    }
-
-    // palette for 8 bit surface
-    colors = new SDL_Color[AGGSIZEPALETTE];
-
-    // quit
-    atexit(AGG::Quit);
-}
-
-void AGG::Quit(void)
-{
-    std::map<std::string, aggfat_t>::iterator itMap = AGG::fat.begin();
-    std::map<std::string, aggfat_t>::iterator itMapEnd = AGG::fat.end();
-	
-    while(itMap != itMapEnd){ AGG::FreeObject(itMap->second); ++itMap; }
-
-    AGG::fd->close();
-    delete AGG::fd;
-
-    if(colors) delete [] colors;
-}
-
-/* preload object to map */
-void AGG::PreloadObject(const std::string & name)
-{
-    switch(AGG::fat[name].blockType){
-    
-	case DATA_ICN:
-	    AGG::LoadICN(name);
-	    break;
-
-	case DATA_TIL:
-	    AGG::LoadTIL(name);
-	    break;
-
-	case DATA_PAL:
-	    break;
-
-	default:
-	    Error::Warning("AGG::PreloadObject: unknown object: " + name);
-	    break;
-    }
-}
-
-/* free object from map */
-void AGG::FreeObject(const std::string & name)
-{
-    AGG::FreeObject(AGG::fat[name]);
-}
-
-void AGG::FreeObject(aggfat_t & fat){
-
-    switch(fat.blockType){
-    
-	case DATA_ICN:
-	    AGG::FreeICN(fat);
-	    break;
-
-	case DATA_TIL:
-	    AGG::FreeTIL(fat);
-	    break;
-
-	case DATA_PAL:
-	    break;
-	
-	default:
-	    break;
-    }
-}
-
-/* load TIL data */
-void AGG::LoadTIL(const std::string & name)
-{
-    // check TIL
-    if(AGG::fat[name].blockType != DATA_TIL) Error::Except("unknown til: " + name);
-
-    // object exists
-    if(AGG::fat[name].ptrTIL) return;
-
-    if(H2Config::Debug()) Error::Verbose("AGG::LoadTIL: " + name);
-
-    // offset
-    AGG::fd->seekg(AGG::fat[name].blockOffset, std::ios_base::beg);
-    
-    u16 count, width, height;
-    AGG::fd->read(reinterpret_cast<char *>(&count), sizeof(u16));
-    SWAP16(count);
-    AGG::fd->read(reinterpret_cast<char *>(&width), sizeof(u16));
-    SWAP16(width);
-    AGG::fd->read(reinterpret_cast<char *>(&height), sizeof(u16));
-    SWAP16(height);
-
-    // size
-    u32 sizeData = count * width * height;
-
-    // store
-    AGG::fat[name].ptrTIL = new char[sizeData];
-    AGG::fd->read(AGG::fat[name].ptrTIL, sizeData);
-}
-
-/* get TIL Sprite */
-void AGG::GetTIL(const std::string & name, u16 index, u8 shape, Surface &surface)
-{
-    // check object
-    if(NULL == AGG::fat[name].ptrTIL) PreloadObject(name);
-    if(NULL == AGG::fat[name].ptrTIL) Error::Except("AGG::GetTIL: " + name +", empty ptr");
-
-    // skip
-    const u8 *vdata = reinterpret_cast<const u8 *>(AGG::fat[name].ptrTIL + TILEWIDTH * TILEWIDTH * index);
-
-    // valid surface
-    if(!surface.valid() || surface.w() != TILEWIDTH || surface.h() != TILEWIDTH)
+    if(!stream || stream->fail())
     {
-	surface = Surface(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE);
-	surface.LoadPalette(AGG::GetPalette(), AGGSIZEPALETTE);
+	Error::Warning("AGG::File: error read file: " + filename + ", skipping...");
+
+	return;
     }
 
-    s16 x, y;
-    u8 *pdst;
+    if(H2Config::Debug()) Error::Verbose("AGG::File: load: " + filename);
 
-    // draw tiles
-    surface.Lock();
-    u8 *pixels = static_cast<u8 *>(const_cast<void *>(surface.pixels()));
-    switch(shape % 4)
+    stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
+    SWAP16(count_items);
+
+    if(H2Config::Debug()) Error::Verbose("AGG::File: count items: ", count_items);
+
+    char buf[FATSIZENAME + 1];
+    buf[FATSIZENAME] = 0;
+
+    for(u16 ii = 0; ii < count_items; ++ii)
     {
-        // normal
-	case 0:
-	    memcpy(const_cast<void *>(surface.pixels()), vdata, TILEWIDTH * TILEWIDTH);
-            break;
+	const u32 pos = stream->tellg();
 
-        // vertical reflect
-        case 1:
+	stream->seekg(-FATSIZENAME * (count_items - ii), std::ios_base::end);
+	stream->read(buf, FATSIZENAME);
+
+	const std::string key(buf);
+
+	FAT & f = fat[key];
+		
+	stream->seekg(pos, std::ios_base::beg);
+
+	stream->read(reinterpret_cast<char *>(&f.crc), sizeof(u32));
+	SWAP32(f.crc);
+
+	stream->read(reinterpret_cast<char *>(&f.offset), sizeof(u32));
+	SWAP32(f.offset);
+
+	stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
+	SWAP32(f.size);
+    }
+}
+
+AGG::File::~File()
+{
+    if(stream)
+    {
+	stream->close();
+	
+	delete stream;
+    }
+}
+
+/* get AGG file name */
+const std::string & AGG::File::Name(void) const
+{
+    return filename;
+}
+
+/* get FAT element */
+const AGG::FAT & AGG::File::Fat(const std::string & key)
+{
+    return fat[key];
+}
+
+/* get count elements */
+u16 AGG::File::CountItems(void)
+{
+    return count_items;
+}
+
+/* dump FAT */
+void AGG::FAT::Dump(const std::string & n) const
+{
+    printf("%s\t%lX\t%lX\t%lX\n", n.c_str(), static_cast<long unsigned int>(crc), static_cast<long unsigned int>(offset), static_cast<long unsigned int>(size));
+}
+
+/* read element to body */
+bool AGG::File::Read(const std::string & key, std::vector<char> & body)
+{
+    const FAT & f = fat[key];
+
+    body.clear();
+
+    if(H2Config::Debug() > 3) f.Dump(key);
+
+    if(f.size)
+    {
+	if(2 < H2Config::Debug()) Error::Verbose("AGG::File::Read: " + key);
+
+	body.resize(f.size);
+
+	stream->seekg(f.offset, std::ios_base::beg);
+
+	stream->read(& body.at(0), f.size);
+
+	return true;
+    }
+
+    return false;
+}
+
+/* dump AGG file */
+void AGG::File::Dump(void) const
+{
+    std::map<std::string, FAT>::const_iterator it1 = fat.begin();
+    std::map<std::string, FAT>::const_iterator it2 = fat.end();
+
+    for(; it1 != it2; ++it1)
+    {
+	const std::string & n = (*it1).first;
+	const FAT & f = (*it1).second;
+
+	f.Dump(n);
+    }
+}
+
+/* AGG::Cache constructor */
+AGG::Cache::Cache()
+{
+}
+
+AGG::Cache::~Cache()
+{
+    // free agg cache
+    std::vector<File *>::const_iterator agg_it1 = agg_cache.begin();
+    std::vector<File *>::const_iterator agg_it2 = agg_cache.end();
+
+    for(; agg_it1 != agg_it2; ++agg_it1) delete *agg_it1;
+
+
+    // free icn cache
+    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator icn_it1 = icn_cache.begin();
+    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator icn_it2 = icn_cache.end();
+
+    for(; icn_it1 != icn_it2; ++icn_it1)
+    {
+	const std::vector<Sprite *> & v = (*icn_it1).second;
+
+	if(v.size())
 	{
-	    pdst = pixels + TILEWIDTH * (TILEWIDTH - 1);
-	    for(int i = 0; i < TILEWIDTH; i++){
-    		memcpy(pdst, vdata, TILEWIDTH);
-    		vdata += TILEWIDTH;
-    		pdst -= TILEWIDTH;
-	    }
+	    std::vector<Sprite *>::const_iterator it1 = v.begin();
+	    std::vector<Sprite *>::const_iterator it2 = v.end();
+
+	    for(; it1 != it2; ++it1) delete *it1;
 	}
-            break;
-
-        // horizontal reflect
-        case 2:
-            for(y = 0; y < TILEWIDTH; ++y)
-                for(x = TILEWIDTH - 1; x >= 0; --x){
-		    pdst = pixels + y * TILEWIDTH + x;
-		    *pdst = *vdata;
-                    ++vdata;
-                }
-            break;
-
-        // any variant
-        case 3:
-            for(y = TILEWIDTH - 1; y >= 0; --y)
-                for( x = TILEWIDTH - 1; x >= 0; --x){
-		    pdst = pixels + y * TILEWIDTH + x;
-		    *pdst = *vdata;
-                    ++vdata;
-                }
-            break;
-    }
-    surface.Unlock();
-}
-
-/* load ICN Sprite to map */
-void AGG::LoadICN(const std::string & name)
-{
-    // check ICN
-    if(AGG::fat[name].blockType != DATA_ICN) Error::Except("unknown icn: " + name);
-
-    // object exists
-    if(AGG::fat[name].vectorICN) return;
-
-    if(H2Config::Debug()) Error::Verbose("AGG::LoadICN: " + name);
-
-    // offset
-    AGG::fd->seekg(AGG::fat[name].blockOffset, std::ios_base::beg);
-
-    u32 pos, debug_pos1, debug_pos2;
-
-    debug_pos1 = AGG::fd->tellg();
-
-    u16 countSprite;
-    u32 totalSize;
-
-    AGG::fd->read(reinterpret_cast<char *>(&countSprite), sizeof(u16));
-    SWAP16(countSprite);
-    AGG::fd->read(reinterpret_cast<char *>(&totalSize), sizeof(u32));
-    SWAP32(totalSize);
-
-    pos = AGG::fd->tellg();
-
-    std::vector<icnheader_t> vectorHeader;
-    icnheader_t header;
-
-    // read icn header
-    for(int i = 0; i < countSprite; ++i){
-
-	AGG::fd->read(reinterpret_cast<char *>(&header.offsetX), sizeof(s16));
-	SWAP16(header.offsetX);
-	AGG::fd->read(reinterpret_cast<char *>(&header.offsetY), sizeof(s16));
-	SWAP16(header.offsetY);
-	
-	AGG::fd->read(reinterpret_cast<char *>(&header.width), sizeof(u16));
-	SWAP16(header.width);
-	AGG::fd->read(reinterpret_cast<char *>(&header.height), sizeof(u16));
-	SWAP16(header.height);
-	
-	// skip char
-	AGG::fd->ignore();
-	AGG::fd->read(reinterpret_cast<char *>(&header.offsetData), sizeof(u32));
-	SWAP32(header.offsetData);
-
-	vectorHeader.push_back(header);
     }
 
-    std::vector<icnheader_t>::iterator it = vectorHeader.begin();
-    std::vector<icnheader_t>::iterator it_end = vectorHeader.end();
-    u32 sizeData, newSize;
-    AGG::fat[name].vectorICN = new std::vector<Sprite *>;
+    // free til cache
+    std::map<TIL::til_t, std::vector<Surface *> >::const_iterator til_it1 = til_cache.begin();
+    std::map<TIL::til_t, std::vector<Surface *> >::const_iterator til_it2 = til_cache.end();
 
-    // read icn data
-    while(it != it_end){
-
-	sizeData = (it + 1 != it_end ? (*(it + 1)).offsetData - (*it).offsetData : totalSize - (*it).offsetData);
-
-	// offset
-	AGG::fd->seekg(pos + (*it).offsetData, std::ios_base::beg);
-
-	// read
-	newSize = sizeData + 100;	// hmm, RLE ICN 90% decoding, and 0x80 it's RLE end
-	char *buf = new char[newSize];
-	std::memset(buf, 0x80, newSize);
-	AGG::fd->read(buf, sizeData);
-
-	AGG::fat[name].vectorICN->push_back(new Sprite((*it).width, (*it).height, (*it).offsetX, (*it).offsetY, sizeData, reinterpret_cast<const u8*>(buf)));
-
-	delete [] buf;
-
-	++it;
-    }
-
-    debug_pos2 = AGG::fd->tellg();
-
-    // warning
-    if(debug_pos2 != debug_pos1 + AGG::fat[name].blockSize) Error::Warning("incorrect size.");
-}
-
-/* free ICN object */
-void AGG::FreeICN(aggfat_t & fat)
-{
-    // empty vector
-    if(!fat.vectorICN) return;
-
-    std::vector<Sprite *>::iterator it = fat.vectorICN->begin();
-    std::vector<Sprite *>::iterator it_end = fat.vectorICN->end();
-
-    // read icn data
-    while(it != it_end){
-
-	delete *it;
-
-	++it;
-    }
-
-    delete fat.vectorICN;
-
-    fat.vectorICN = NULL;
-}
-
-/* free TIL object */
-void AGG::FreeTIL(aggfat_t & fat)
-{
-    // empty vector
-    if(!fat.ptrTIL) return;
-
-    delete [] fat.ptrTIL;
-
-    fat.ptrTIL = NULL;
-}
-
-/* return Sprite */
-const Sprite & AGG::GetICN(const std::string & name, u16 index)
-{
-    // check object
-    if(!AGG::fat[name].vectorICN) PreloadObject(name);
-
-    // empty vector
-    if(AGG::fat[name].vectorICN->empty()) Error::Except("AGG::GetICN: " + name +", empty vector");
-
-    // out of range
-    if(AGG::fat[name].vectorICN->size() <= index){
-	std::string sindex, range;
-	String::AddInt(range, AGG::fat[name].vectorICN->size());
-	String::AddInt(sindex, index);
-	Error::Warning("AGG::GetICN: " + name + ", index(" + sindex + ") out of range(" + range + ").");
-	index = AGG::fat[name].vectorICN->size() - 1;
-    }
-
-    return *(AGG::fat[name].vectorICN->at(index));
-}
-
-/* get color palette */
-u32 AGG::GetColor(u8 index)
-{
-    // empty vector
-    return AGG::palette[index];
-}
-
-/* load palette */
-void AGG::LoadPalette(void)
-{
-    const std::string name("KB.PAL");
-
-    if(H2Config::Debug()) Error::Verbose("Load palette: " + name);
-
-    // check PAL
-    if(AGG::fat[name].blockType != DATA_PAL) Error::Except("AGG::LoadPalette: unknown " + name);
-
-    // offset
-    AGG::fd->seekg(AGG::fat[name].blockOffset, std::ios_base::beg);
-
-    Surface surface(1, 1, true);
-    surface.SetAlpha(255);
-
-    // read
-    char r, g, b;
-
-    for(int i = 0; i < AGGSIZEPALETTE; ++i)
+    for(; til_it1 != til_it2; ++til_it1)
     {
-	AGG::fd->read(&r, 1);
-	AGG::fd->read(&g, 1);
-	AGG::fd->read(&b, 1);
+	const std::vector<Surface *> & v = (*til_it1).second;
+	    
+	if(v.size())
+	{
+	    std::vector<Surface *>::const_iterator it1 = v.begin();
+	    std::vector<Surface *>::const_iterator it2 = v.end();
 
-	r <<= 2;
-	g <<= 2;
-	b <<= 2;
-
-	colors[i].r = r;
-	colors[i].g = g;
-	colors[i].b = b;
-
-	AGG::palette[i] = surface.MapRGB(r, g, b);
+	    for(; it1 != it2; ++it1) delete *it1;
+	}
     }
 }
 
-/* return palette 8bit */
-const SDL_Color * AGG::GetPalette(void){ return colors; }
+/* get AGG::Cache object */
+AGG::Cache & AGG::Cache::Get(void)
+{
+    static Cache agg_cache;
+
+    return agg_cache;
+}
+
+/* attach AGG::File to AGG::Cache */
+bool AGG::Cache::AttachFile(const std::string & fname)
+{
+    std::vector<File *>::const_iterator it1 = agg_cache.begin();
+    std::vector<File *>::const_iterator it2 = agg_cache.end();
+
+    for(; it1 != it2; ++it1)
+    {
+	const File & agg_file = **it1;
+
+	if(agg_file.Name() == fname)
+	{
+	    Error::Warning("AGG::Cache::AttachFile: already present: " + fname);
+
+	    break;
+	}
+    }
+
+    AGG::File *file = new File(fname);
+    
+    if(file->CountItems())
+    {
+	agg_cache.push_back(file);
+
+	return true;
+    }
+
+    delete file;
+
+    return false;
+}
+
+/* load ICN object to AGG::Cache */
+void AGG::Cache::LoadICN(const ICN::icn_t icn)
+{
+    std::vector<Sprite *> & v = icn_cache[icn];
+
+    if(v.size()) return;
+
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+
+    if(agg_cache.size())
+    {
+	std::vector<char> body;
+
+	std::vector<File *>::const_iterator it1 = agg_cache.begin();
+	std::vector<File *>::const_iterator it2 = agg_cache.end();
+
+	for(; it1 != it2; ++it1)
+
+	    // read only first found
+	    if((**it1).Read(ICN::GetString(icn), body))
+	    {
+		u16 count_sprite;
+		u32 total_size;
+
+		LOAD16(&body[0], count_sprite);
+
+		LOAD32(&body[2], total_size);
+
+		v.resize(count_sprite);
+
+		std::vector<ICN::Header> icn_headers(count_sprite);
+
+		// read icn headers
+		for(u16 ii = 0; ii < count_sprite; ++ii)
+		    icn_headers[ii].Load(&body[6 + ii * ICN::Header::SizeOf()]);
+
+		std::vector<ICN::Header>::const_iterator it1 = icn_headers.begin();
+    		std::vector<ICN::Header>::const_iterator it2 = icn_headers.end();
+
+		// read icn data
+		for(u16 ii = 0; ii < count_sprite; ++ii)
+		{
+		    const ICN::Header & header = icn_headers[ii];
+
+		    const u32 size_data = (ii + 1 != count_sprite ? icn_headers[ii + 1].OffsetData() - header.OffsetData() : total_size - header.OffsetData());
+
+		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data);
+		}
+
+		return;
+	    }
+
+	Error::Warning("AGG::Cache::LoadICN: not found: " + ICN::GetString(icn));
+    }
+}
+
+/* load TIL object to AGG::Cache */
+void AGG::Cache::LoadTIL(const TIL::til_t til)
+{
+    std::vector<Surface *> & v = til_cache[til];
+
+    if(v.size()) return;
+
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadTIL: " + TIL::GetString(til));
+
+    if(agg_cache.size())
+    {
+	std::vector<char> body;
+
+	std::vector<File *>::const_iterator it1 = agg_cache.begin();
+	std::vector<File *>::const_iterator it2 = agg_cache.end();
+
+	for(; it1 != it2; ++it1)
+
+	    // read only first found
+	    if((**it1).Read(TIL::GetString(til), body))
+	    {
+		u16 count, width, height;
+
+		LOAD16(&body.at(0), count);
+
+		LOAD16(&body.at(2), width);
+
+		LOAD16(&body.at(4), height);
+
+		const u32 tile_size = width * height;
+		const u32 body_size = 6 + count * tile_size;
+
+		// check size
+		if(body.size() != body_size)
+		{
+		    Error::Warning("AGG::Cache::LoadTIL: size mismach, skipping...");
+
+		    break;
+		}
+
+		v.resize(count);
+		
+		for(u16 ii = 0; ii < count; ++ii)
+		{
+		    v[ii] = new Surface(width, height, 8, SDL_SWSURFACE);
+		    
+		    Surface & sf = *v[ii];
+
+		    sf.LoadPalette(palette);
+
+    		    sf.Lock();
+
+            	    memcpy(const_cast<void *>(sf.pixels()), &body[6 + ii * tile_size], tile_size);
+
+                    sf.Unlock();
+		}
+
+		return;
+	    }
+
+	Error::Warning("AGG::Cache::LoadTIL: not found: " + TIL::GetString(til));
+    }
+}
+
+/* load PAL object to AGG::Cache */
+void AGG::Cache::LoadPAL(void)
+{
+    const PAL::pal_t pal = PAL::KB;
+
+    if(palette.Size()) return;
+
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadPAL: " + PAL::GetString(pal));
+
+    if(agg_cache.size())
+    {
+	std::vector<char> body;
+
+	std::vector<File *>::const_iterator it1 = agg_cache.begin();
+	std::vector<File *>::const_iterator it2 = agg_cache.end();
+
+	for(; it1 != it2; ++it1)
+
+	    // read only first found
+	    if((**it1).Read(PAL::GetString(pal), body))
+	    {
+		palette.Load(body);
+
+		return;
+	    }
+    }
+}
+
+/* free ICN object in AGG::Cache */
+void AGG::Cache::FreeICN(const ICN::icn_t icn)
+{
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::FreeICN: " + ICN::GetString(icn));
+
+    std::vector<Sprite *> & v = icn_cache[icn];
+
+    if(v.size())
+    {
+	std::vector<Sprite *>::const_iterator it1 = v.begin();
+	std::vector<Sprite *>::const_iterator it2 = v.end();
+
+	for(; it1 != it2; ++it1) delete *it1;
+
+	v.clear();
+    }
+}
+
+/* free TIL object in AGG::Cache */
+void AGG::Cache::FreeTIL(const TIL::til_t til)
+{
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::FreeTIL: " + TIL::GetString(til));
+
+    std::vector<Surface *> & v = til_cache[til];
+
+    if(v.size())
+    {
+	std::vector<Surface *>::const_iterator it1 = v.begin();
+	std::vector<Surface *>::const_iterator it2 = v.end();
+
+	for(; it1 != it2; ++it1) delete *it1;
+
+	v.clear();
+    }
+}
+
+/* return ICN sprite from AGG::Cache */
+const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index)
+{
+    const std::vector<Sprite *> & v = icn_cache[icn];
+
+    if(0 == v.size()) LoadICN(icn);
+
+    if(index >= v.size())
+    {
+	Error::Warning("AGG::GetICN: " + ICN::GetString(icn) + ", index out of range: ", index);
+
+	index = 0;
+    }
+
+    const Sprite * sprite = v[index];
+	
+    if(NULL == sprite)
+    {
+	Error::Warning("AGG::GetICN: icn: ", icn);
+	Error::Warning("AGG::GetICN: icn name: " + ICN::GetString(icn));
+	Error::Warning("AGG::GetICN: index: ", index);
+	Error::Except("AGG::GetICN: return is NULL");
+    }
+
+    return *sprite;
+}
+
+/* return TIL surface from AGG::Cache */
+const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index)
+{
+    const std::vector<Surface *> & v = til_cache[til];
+
+    if(0 == v.size()) LoadTIL(til);
+
+    if(index >= v.size())
+    {
+	Error::Warning("AGG::GetTIL: " + TIL::GetString(til) + ", index out of range: ", index);
+
+	index = 0;
+    }
+
+    const Surface * surface = v[index];
+
+    if(NULL == surface)
+    {
+	Error::Warning("AGG::GetTIL: icn: ", til);
+	Error::Warning("AGG::GetTIL: icn name: " + TIL::GetString(til));
+	Error::Warning("AGG::GetTIL: index: ", index);
+	Error::Except("AGG::GetTIL: return is NULL");
+    }
+
+    return *surface;
+}
+
+/* return Palette from AGG::Cache */
+const Palette & AGG::Cache::GetPAL(void)
+{
+    return palette;
+}
+
+// wrapper AGG::PreloadObject
+void AGG::PreloadObject(const ICN::icn_t icn)
+{
+    return AGG::Cache::Get().LoadICN(icn);
+}
+
+void AGG::PreloadObject(const TIL::til_t til)
+{
+    return AGG::Cache::Get().LoadTIL(til);
+}
+
+// wrapper AGG::FreeObject
+void AGG::FreeObject(const ICN::icn_t icn)
+{
+    return AGG::Cache::Get().FreeICN(icn);
+}
+
+void AGG::FreeObject(const TIL::til_t til)
+{
+    return AGG::Cache::Get().FreeTIL(til);
+}
+
+// wrapper AGG::GetXXX
+const Sprite & AGG::GetICN(const ICN::icn_t icn, const u16 index)
+{
+    return AGG::Cache::Get().GetICN(icn, index);
+}
+
+void AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst)
+{
+    const Surface & src = AGG::Cache::Get().GetTIL(til, index);
+
+    TIL::Reflect(dst, src, shape);
+}
+
+// wrapper AGG::GetColor
+u32 AGG::GetColor(const u16 index)
+{
+    return AGG::Cache::Get().GetPAL().Color(index);
+}
 
 /* return letter sprite */
 const Sprite & AGG::GetLetter(char ch, Font::type_t ft)
 {
     if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
-
-    return Font::SMALL == ft ? AGG::GetICN("SMALFONT.ICN", ch - 0x20) : AGG::GetICN("FONT.ICN", ch - 0x20);
+    
+    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
 }

@@ -33,7 +33,7 @@ u16 Dialog::SelectCount(u16 max_count)
 
     if(max_count < 2) return 0;
 
-    const std::string &system = (H2Config::EvilInterface() ? "SYSTEME.ICN" : "SYSTEM.ICN");
+    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);
@@ -54,7 +54,7 @@ u16 Dialog::SelectCount(u16 max_count)
     Text(message, Font::BIG, pt);
 
     // sprite edit
-    const Surface & sprite_edit = AGG::GetICN("TOWNWIND.ICN", 4);
+    const Surface & sprite_edit = AGG::GetICN(ICN::TOWNWIND, 4);
     pt.x = pos.x + 80;
     pt.y = pos.y + 55;
     display.Blit(sprite_edit, pt);
@@ -69,11 +69,11 @@ u16 Dialog::SelectCount(u16 max_count)
     // buttons
     pt.x = pos.x + 150;
     pt.y = pos.y + 51;
-    Button buttonUp(pt, "TOWNWIND.ICN", 5, 6);
+    Button buttonUp(pt, ICN::TOWNWIND, 5, 6);
 
     pt.x = pos.x + 150;
     pt.y = pos.y + 67;
-    Button buttonDn(pt, "TOWNWIND.ICN", 7, 8);
+    Button buttonDn(pt, ICN::TOWNWIND, 7, 8);
 
     pt.x = pos.x;
     pt.y = pos.y + pos.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();

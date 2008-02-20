@@ -65,7 +65,7 @@ void Route::Show(void) const
 	    if(it3 != it2)
 		tile.AddPathSprite(& GetSprite(Direction::Get(from, *it1), Direction::Get(*it1, *it3)));
 	    else
-		tile.AddPathSprite(& AGG::GetICN("ROUTE.ICN", 0));
+		tile.AddPathSprite(& AGG::GetICN(ICN::ROUTE, 0));
 	    
 	    tile.Redraw();
 
@@ -230,5 +230,5 @@ const Sprite & Route::GetSprite(const Direction::vector_t & from, const Directio
 	default: 		   	        index  =  0; break;
     }
 
-    return AGG::GetICN("ROUTE.ICN", index);
+    return AGG::GetICN(ICN::ROUTE, index);
 }

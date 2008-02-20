@@ -46,7 +46,7 @@ u16 GetTradeCosts(u8 rs_from, u8 rs_to);
 void Dialog::Marketplace(void)
 {
     Display & display = Display::Get();
-    const std::string & tradpost = (H2Config::EvilInterface() ? "TRADPOSE.ICN" : "TRADPOST.ICN");
+    const ICN::icn_t tradpost = H2Config::EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     const std::string & header = "Marketplace";
     const std::string & message_info = "Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for.";
 
@@ -88,14 +88,14 @@ void Dialog::Marketplace(void)
     Resource::funds_t fundsFrom = kingdom.GetFundsResource();
     u8 resourceFrom = 0;
     const Point pt1(pos_rt.x, pos_rt.y + 190);
-    std::vector<Rect> rectsFrom;
-    rectsFrom.push_back(Rect(pt1.x, pt1.y, 34, 34));		// wood
-    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y, 34, 34));	// mercury
-    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y, 34, 34));	// ore
-    rectsFrom.push_back(Rect(pt1.x, pt1.y + 37, 34, 34));	// sulfur
-    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 37, 34, 34));	// crystal
-    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y + 37, 34, 34));	// gems
-    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 74, 34, 34));	// gold
+    std::vector<Rect> rectsFrom(7);
+    rectsFrom[0] = Rect(pt1.x, pt1.y, 34, 34);		// wood
+    rectsFrom[1] = Rect(pt1.x + 37, pt1.y, 34, 34);	// mercury
+    rectsFrom[2] = Rect(pt1.x + 74, pt1.y, 34, 34);	// ore
+    rectsFrom[3] = Rect(pt1.x, pt1.y + 37, 34, 34);	// sulfur
+    rectsFrom[4] = Rect(pt1.x + 37, pt1.y + 37, 34, 34);// crystal
+    rectsFrom[5] = Rect(pt1.x + 74, pt1.y + 37, 34, 34);// gems
+    rectsFrom[6] = Rect(pt1.x + 37, pt1.y + 74, 34, 34);// gold
     SpriteCursor cursorFrom(spritecursor);
     dst_pt.x = pt1.x + (108 - Text::width(header_from, Font::SMALL)) / 2;
     dst_pt.y = pt1.y - 15;
@@ -107,14 +107,14 @@ void Dialog::Marketplace(void)
     Resource::funds_t fundsTo;
     u8 resourceTo = 0;
     const Point pt2(130 + pos_rt.x, pos_rt.y + 190);
-    std::vector<Rect> rectsTo;
-    rectsTo.push_back(Rect(pt2.x, pt2.y, 34, 34));		// wood
-    rectsTo.push_back(Rect(pt2.x + 37, pt2.y, 34, 34));		// mercury
-    rectsTo.push_back(Rect(pt2.x + 74, pt2.y, 34, 34));		// ore
-    rectsTo.push_back(Rect(pt2.x, pt2.y + 37, 34, 34));		// sulfur
-    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 37, 34, 34));	// crystal
-    rectsTo.push_back(Rect(pt2.x + 74, pt2.y + 37, 34, 34));	// gems
-    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 74, 34, 34));	// gold
+    std::vector<Rect> rectsTo(7);
+    rectsTo[0] = Rect(pt2.x, pt2.y, 34, 34);		// wood
+    rectsTo[1] = Rect(pt2.x + 37, pt2.y, 34, 34);	// mercury
+    rectsTo[2] = Rect(pt2.x + 74, pt2.y, 34, 34);	// ore
+    rectsTo[3] = Rect(pt2.x, pt2.y + 37, 34, 34);	// sulfur
+    rectsTo[4] = Rect(pt2.x + 37, pt2.y + 37, 34, 34);	// crystal
+    rectsTo[5] = Rect(pt2.x + 74, pt2.y + 37, 34, 34);	// gems
+    rectsTo[6] = Rect(pt2.x + 37, pt2.y + 74, 34, 34);	// gold
     SpriteCursor cursorTo(spritecursor);
     dst_pt.x = pt2.x + (108 - Text::width(header_to, Font::SMALL)) / 2;
     dst_pt.y = pt2.y - 15;
@@ -209,7 +209,7 @@ void Dialog::Marketplace(void)
 	dst_rt.w = pos_rt.w; \
 	dst_rt.h = 100; \
 	TextBox(message, Font::BIG, dst_rt); \
-	const Sprite & sprite_from = AGG::GetICN("RESOURCE.ICN", Resource::GetIndexSprite2(rs_from)); \
+	const Sprite & sprite_from = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_from)); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2; \
 	dst_pt.y = pos_rt.y + 115 - sprite_from.h(); \
 	display.Blit(sprite_from, dst_pt); \
@@ -218,7 +218,7 @@ void Dialog::Marketplace(void)
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2; \
 	dst_pt.y = pos_rt.y + 116; \
 	textSell = new Text2(message, Font::SMALL, dst_pt); \
-	const Sprite & sprite_to = AGG::GetICN("RESOURCE.ICN", Resource::GetIndexSprite2(rs_to)); \
+	const Sprite & sprite_to = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_to)); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2; \
 	dst_pt.y = pos_rt.y + 115 - sprite_to.h(); \
 	display.Blit(sprite_to, dst_pt); \
@@ -474,7 +474,7 @@ void Dialog::Marketplace(void)
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
 {
     Display & display = Display::Get();
-    const std::string & tradpost = (H2Config::EvilInterface() ? "TRADPOSE.ICN" : "TRADPOST.ICN");
+    const ICN::icn_t tradpost = H2Config::EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     std::string str;
     Point dst_pt;
 
@@ -552,7 +552,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
 void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
 {
     Display & display = Display::Get();
-    const std::string & tradpost = (H2Config::EvilInterface() ? "TRADPOSE.ICN" : "TRADPOST.ICN");
+    const ICN::icn_t tradpost = H2Config::EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     std::string str;
     Point dst_pt;
 

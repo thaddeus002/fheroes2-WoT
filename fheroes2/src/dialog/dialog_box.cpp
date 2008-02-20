@@ -22,6 +22,7 @@
 #include "rect.h"
 #include "localevent.h"
 #include "cursor.h"
+#include "sprite.h"
 #include "config.h"
 #include "dialog.h"
 
@@ -38,7 +39,8 @@
 Dialog::Box::Box(u16 height, bool buttons)
 {
     Display & display = Display::Get();
-    const std::string &buybuild = (H2Config::EvilInterface() ? "BUYBUILE.ICN" : "BUYBUILD.ICN");
+
+    const ICN::icn_t buybuild = H2Config::EvilInterface() ? ICN::BUYBUILE : ICN::BUYBUILD;
 
     AGG::PreloadObject(buybuild);
 

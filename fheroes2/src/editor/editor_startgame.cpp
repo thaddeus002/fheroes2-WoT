@@ -51,7 +51,7 @@ namespace Game
     };
 };
 
-Game::menu_t Game::Editor::StartGame(void)
+Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
 {
     Display & display = Display::Get();
 
@@ -61,10 +61,9 @@ Game::menu_t Game::Editor::StartGame(void)
     cursor.SetThemes(cursor.POINTER);
 
     // new maps
-    const Maps::mapsize_t & sizemap = H2Config::GetSizeMaps();
     world.NewMaps(sizemap, sizemap);
 
-    Display::SetVideoMode(H2Config::GetVideoMode());
+    Display::SetVideoMode(H2Config::VideoMode());
     display.Fill(0x00, 0x00, 0x00);
 
     GameArea areaMaps;
@@ -76,15 +75,15 @@ Game::menu_t Game::Editor::StartGame(void)
     const Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
-    const std::string icnscroll("ESCROLL.ICN");
-    const std::string icnbtns("EDITBTNS.ICN");
-    const std::string icnpanel("EDITPANL.ICN");
+    const ICN::icn_t icnscroll = ICN::ESCROLL;
+    const ICN::icn_t icnbtns = ICN::EDITBTNS;
+    const ICN::icn_t icnpanel = ICN::EDITPANL;
     Rect src_rt;
     Point dst_pt;
 
     // draw interface
-    const Sprite & spriteAdv = AGG::GetICN("ADVBORD.ICN", 0);
-    const Sprite & spriteBac = AGG::GetICN("STONBACK.ICN", 0);
+    const Sprite & spriteAdv = AGG::GetICN(ICN::ADVBORD, 0);
+    const Sprite & spriteBac = AGG::GetICN(ICN::STONBACK, 0);
     // bottom scroll bar indicator
     const Sprite & spriteBottomBar(AGG::GetICN(icnscroll, 0));
     dst_pt.x = BORDERWIDTH * 2;
@@ -150,7 +149,7 @@ Game::menu_t Game::Editor::StartGame(void)
     src_rt.h = TILEWIDTH;
     dst_pt.y = 250;
     u8 var1 = 0;
-    switch(H2Config::GetVideoMode())
+    switch(H2Config::VideoMode())
     {
         default:
 	    var1 = 4;
@@ -273,7 +272,7 @@ Game::menu_t Game::Editor::StartGame(void)
     Button btnSystem(dst_pt, icnbtns, 22, 23);
 
     // bottom static
-    switch(H2Config::GetVideoMode())
+    switch(H2Config::VideoMode())
     {
         default:
 	    var1 = 0;
@@ -396,10 +395,10 @@ Game::menu_t Game::Editor::StartGame(void)
     const Rect rectObjectArtifact(dstPanel.x + 14, dstPanel.y + 95, 28, 28);
     const Rect rectObjectResource(dstPanel.x + 101, dstPanel.y + 95, 28, 28);
 
-    SpriteCursor selectTerrainCursor(AGG::GetICN("TERRAINS.ICN", 9), rectTerrainWater.x - 1, rectTerrainWater.y - 1);
+    SpriteCursor selectTerrainCursor(AGG::GetICN(ICN::TERRAINS, 9), rectTerrainWater.x - 1, rectTerrainWater.y - 1);
     selectTerrainCursor.Show();
 
-    SpriteCursor selectObjectCursor(AGG::GetICN("TERRAINS.ICN", 9), rectObjectWater.x - 1, rectObjectWater.y - 1);
+    SpriteCursor selectObjectCursor(AGG::GetICN(ICN::TERRAINS, 9), rectObjectWater.x - 1, rectObjectWater.y - 1);
 
     u8 selectTerrain = 0;
     u8 selectObject = 0;
@@ -1208,7 +1207,7 @@ void Game::Editor::RedrawTopNumberCell(const Rect & area)
 	dst_pt.x = BORDERWIDTH + ii * TILEWIDTH;
 	dst_pt.y = 0;
 
-	Display::Get().Blit(AGG::GetICN("EDITBTNS.ICN", 34), dst_pt);
+	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 34), dst_pt);
 
 	std::string number;
 	String::AddInt(number, area.x + ii);
@@ -1230,7 +1229,7 @@ void Game::Editor::RedrawLeftNumberCell(const Rect & area)
 	dst_pt.x = 0;
 	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH;
 
-	Display::Get().Blit(AGG::GetICN("EDITBTNS.ICN", 33), dst_pt);
+	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 33), dst_pt);
 
 	std::string number;
 	String::AddInt(number, area.y + ii);

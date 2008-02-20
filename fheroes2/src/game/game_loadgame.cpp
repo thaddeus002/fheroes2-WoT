@@ -27,12 +27,12 @@
 #include "game.h"
 #include "error.h"
 
-Game::menu_t Game::LoadGame(void){
-
+Game::menu_t Game::LoadGame(void)
+{
     // preload
-    AGG::PreloadObject("HEROES.ICN");
-    AGG::PreloadObject("BTNNEWGM.ICN");
-    AGG::PreloadObject("REDBACK.ICN");
+    AGG::PreloadObject(ICN::HEROES);
+    AGG::PreloadObject(ICN::BTNNEWGM);
+    AGG::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -43,18 +43,18 @@ Game::menu_t Game::LoadGame(void){
     display.SetVideoMode(Display::SMALL);
 
     // image background
-    const Sprite &back = AGG::GetICN("HEROES.ICN", 0);
+    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     display.Blit(back);
 
-    const Sprite &panel = AGG::GetICN("REDBACK.ICN", 0);
+    const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonStandartGame(455, 45, "BTNNEWGM.ICN", 0, 1);
-    Button buttonCampainGame(455, 110, "BTNNEWGM.ICN", 2, 3);
-    Button buttonMultiGame(455, 175, "BTNNEWGM.ICN", 4, 5);
-    Button buttonCancelGame(455, 375, "BTNNEWGM.ICN", 6, 7);
+    Button buttonStandartGame(455, 45, ICN::BTNNEWGM, 0, 1);
+    Button buttonCampainGame(455, 110, ICN::BTNNEWGM, 2, 3);
+    Button buttonMultiGame(455, 175, ICN::BTNNEWGM, 4, 5);
+    Button buttonCancelGame(455, 375, ICN::BTNNEWGM, 6, 7);
 
     buttonStandartGame.Draw();
     buttonCampainGame.Draw();

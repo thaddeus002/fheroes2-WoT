@@ -27,14 +27,14 @@
 void Game::DrawInterface(void)
 {
     Display & display = Display::Get();
-    display.SetVideoMode(H2Config::GetVideoMode());
+    display.SetVideoMode(H2Config::VideoMode());
     display.Fill(0x00, 0x00, 0x00);
 
-    const std::string &icnadv = ( H2Config::EvilInterface() ? "ADVBORDE.ICN" : "ADVBORD.ICN" );
-    const std::string &icnlocator = ( H2Config::EvilInterface() ? "LOCATORE.ICN" : "LOCATORS.ICN" );
-    const std::string &icnston = ( H2Config::EvilInterface() ? "STONBAKE.ICN" : "STONBACK.ICN" );
-    const std::string &icnbtn = ( H2Config::EvilInterface() ? "ADVEBTNS.ICN" : "ADVBTNS.ICN" );
-    const std::string &icnscroll = ( H2Config::EvilInterface() ? "SCROLLE.ICN" : "SCROLL.ICN" );
+    const ICN::icn_t icnadv = H2Config::EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD;
+    const ICN::icn_t icnlocator = H2Config::EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS;
+    const ICN::icn_t icnston = H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK;
+    const ICN::icn_t icnbtn = H2Config::EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+    const ICN::icn_t icnscroll = H2Config::EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
 
     Rect srcrt;
     Point dstpt;
@@ -47,8 +47,8 @@ void Game::DrawInterface(void)
     dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
     display.Blit(AGG::GetICN(icnscroll, 0), dstpt);
 
-    switch(H2Config::GetVideoMode()){
-
+    switch(H2Config::VideoMode())
+    {
 	default:
 	    dstpt.x = 0;
 	    dstpt.y = 0;

@@ -735,7 +735,7 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
 
     if(payment.wood)
     {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 0);
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
 	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
 	dst_pt.y = dst_rt.y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
@@ -751,7 +751,7 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
 
     if(payment.ore)
     {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 2);
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
 	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
 	dst_pt.y = dst_rt.y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
@@ -767,7 +767,7 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
 
     if(payment.mercury)
     {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 1);
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
 	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
 	dst_pt.y = dst_rt.y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
@@ -785,7 +785,7 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
 
     if(payment.sulfur)
     {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 3);
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
 	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
 	dst_pt.y = dst_rt.y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
@@ -802,7 +802,7 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
     if(2 < count){ count = 0; offset += 50; }
     if(payment.crystal)
     {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 4);
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
 	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
 	dst_pt.y = dst_rt.y - sprite.h()  + offset;
 	display.Blit(sprite, dst_pt);
@@ -819,7 +819,7 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
     if(2 < count){ count = 0; offset += 50; }
     if(payment.gems)
     {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 5);
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
 	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
 	dst_pt.y = dst_rt.y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
@@ -836,7 +836,7 @@ void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt
     if(2 < count){ count = 0; offset += 50; }
     if(payment.gold)
     {
-	const Sprite & sprite = AGG::GetICN("RESOURCE.ICN", 6);
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
 	if(! count) index = dst_rt.w;
 	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
 	dst_pt.y = dst_rt.y - sprite.h() + offset;

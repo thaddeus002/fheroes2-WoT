@@ -342,7 +342,6 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
 {
     static u32 ticket = 0;
 
-    std::string icn;
     Display & display = Display::Get();
 
     // before redraw
@@ -350,40 +349,40 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
     {
 	case Race::KNGT:
 	{
-	    const Sprite & townbkg = AGG::GetICN("TOWNBKG0.ICN", 0);
+	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG0, 0);
 	    display.Blit(townbkg, dst_pt);
 	}
 	break;
 	case Race::BARB:
 	{
-	    const Sprite & townbkg = AGG::GetICN("TOWNBKG1.ICN", 0);
+	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG1, 0);
 	    display.Blit(townbkg, dst_pt);
 
-    	    const Sprite & sprite0 = AGG::GetICN("TWNBEXT1.ICN", 1 + ticket % 5);
+    	    const Sprite & sprite0 = AGG::GetICN(ICN::TWNBEXT1, 1 + ticket % 5);
 	    display.Blit(sprite0, dst_pt.x + sprite0.x(), dst_pt.y + sprite0.y());
 	}
 	break;
 	case Race::SORC:
 	{
-	    const Sprite & townbkg = AGG::GetICN("TOWNBKG2.ICN", 0);
+	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG2, 0);
 	    display.Blit(townbkg, dst_pt);
 	}
 	break;
 	case Race::WRLK:
 	{
-	    const Sprite & townbkg = AGG::GetICN("TOWNBKG3.ICN", 0);
+	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG3, 0);
 	    display.Blit(townbkg, dst_pt);
 	}
 	break;
 	case Race::WZRD:
 	{
-	    const Sprite & townbkg = AGG::GetICN("TOWNBKG4.ICN", 0);
+	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG4, 0);
 	    display.Blit(townbkg, dst_pt);
 	}
 	break;
 	case Race::NECR:
 	{
-	    const Sprite & townbkg = AGG::GetICN("TOWNBKG5.ICN", 0);
+	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG5, 0);
 	    display.Blit(townbkg, dst_pt);
 	}
 	break;
@@ -393,14 +392,10 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
     // sea anime
     if(Race::WZRD == race || (!(BUILD_SHIPYARD & building) && HaveNearlySea()))
     {
-	PrepareICNString(BUILD_NOTHING, race, icn);
-	    
-	icn += "EXT0.ICN";
-
-    	const Sprite & sprite50 = AGG::GetICN(icn, 0);
+    	const Sprite & sprite50 = AGG::GetICN(ICN::TWNZEXT0, 0);
 	display.Blit(sprite50, dst_pt.x + sprite50.x(), dst_pt.y + sprite50.y());
 
-    	const Sprite & sprite51 = AGG::GetICN(icn, 1 + ticket % 5);
+    	const Sprite & sprite51 = AGG::GetICN(ICN::TWNZEXT0, 1 + ticket % 5);
 	display.Blit(sprite51, dst_pt.x + sprite51.x(), dst_pt.y + sprite51.y());
     }
 
@@ -431,8 +426,9 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
         			    if(BUILD_MAGEGUILD2 & building) build = BUILD_MAGEGUILD2; break;
 	    default: break;
 	}
-    	PrepareICNString(build, race, icn);
-    	    
+
+    	const ICN::icn_t icn = GetICNBuilding(build, race);
+
     	u8 index = 0;
     	    
     	// correct index
@@ -615,7 +611,7 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
 	    // boat
 	    if(BUILD_BOAT & building)
 	    {
-		PrepareICNString(BUILD_BOAT, race, icn);
+		const ICN::icn_t icn = GetICNBuilding(BUILD_BOAT, race);
 
     		const Sprite & sprite40 = AGG::GetICN(icn, 0);
 		display.Blit(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y());
@@ -633,10 +629,10 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
 	// sorc and anime wel2 or statue
 	if(Race::SORC == race && BUILD_WEL2 == build)
 	{
-    	    const Sprite & sprite20 = AGG::GetICN(BUILD_STATUE & building ? "TWNSEXT1.ICN" : icn, 0);
+    	    const Sprite & sprite20 = AGG::GetICN(BUILD_STATUE & building ? ICN::TWNSEXT1 : icn, 0);
 	    display.Blit(sprite20, dst_pt.x + sprite20.x(), dst_pt.y + sprite20.y());
 
-    	    const Sprite & sprite21 = AGG::GetICN(BUILD_STATUE & building ? "TWNSEXT1.ICN" : icn, 1 + ticket % 5);
+    	    const Sprite & sprite21 = AGG::GetICN(BUILD_STATUE & building ? ICN::TWNSEXT1 : icn, 1 + ticket % 5);
 	    display.Blit(sprite21, dst_pt.x + sprite21.x(), dst_pt.y + sprite21.y());
 	}
 	

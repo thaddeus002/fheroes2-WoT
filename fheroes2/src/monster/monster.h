@@ -25,6 +25,7 @@
 #include "mp2.h"
 #include "maps_tiles.h"
 #include "race.h"
+#include "icn.h"
 #include "speed.h"
 #include "gamedefs.h"
 
@@ -127,7 +128,8 @@ namespace Monster
 	Speed::speed_t speed;
 	u8 grown;
 	const std::string name;
-	const std::string file;
+	const ICN::icn_t file_icn;
+	const ICN::icn_t monh_icn;
     } stats_t;
 
     const std::string & String(monster_t monster);

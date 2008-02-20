@@ -23,6 +23,7 @@
 #include <vector>
 #include "sprite.h"
 #include "rect.h"
+#include "icn.h"
 #include "background.h"
 #include "gamedefs.h"
 
@@ -31,7 +32,7 @@ class Animation
 public:
     typedef enum { INFINITY = 0x01, RING = 0x02, LOW = 0x04, MEDIUM = 0x08, HIGH = 0x10 } animation_t;
 
-    Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first = false, u8 amode = INFINITY | RING | MEDIUM);
+    Animation(const Point &dp, const ICN::icn_t icn, u16 index, u8 count, bool first = false, u8 amode = INFINITY | RING | MEDIUM);
 
     const Rect & GetMaxRect(void) const{ return max_rect; };
     const Sprite & GetFirstSprite(void) const{ return *sprites[0]; };

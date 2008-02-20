@@ -30,18 +30,18 @@
 #define ANIMATION_MEDIUM	25
 #define ANIMATION_LOW		50
 
-Animation::Animation(const Point &dp, const std::string &icn, u16 index, u8 count, bool first, u8 amode)
-    : dst_pt(dp), use_first(first), mode(amode), frame(0), max_rect(Display::Get().w(), Display::Get().h(), 0, 0), disable(false), reset(false)
+Animation::Animation(const Point &dp, const ICN::icn_t icn, u16 index, u8 count, bool first, u8 amode)
+    : dst_pt(dp), use_first(first), mode(amode), frame(0), sprites(count), max_rect(Display::Get().w(), Display::Get().h(), 0, 0), disable(false), reset(false)
 {
-    std::vector<Rect> vec_rect;
+    std::vector<Rect> vec_rect(count);
     
     for(int ii = index; ii < index + count; ++ii)
     {
         const Sprite &sprite = AGG::GetICN(icn, ii);
 
-        sprites.push_back(&sprite);
+        sprites[ii - index] = &sprite;
 
-	vec_rect.push_back(Rect(sprite.x(), sprite.y(), sprite.w(), sprite.h()));
+	vec_rect[ii - index] = Rect(sprite.x(), sprite.y(), sprite.w(), sprite.h());
     }
     
     max_rect = Rect(vec_rect);

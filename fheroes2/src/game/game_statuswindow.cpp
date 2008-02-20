@@ -23,12 +23,12 @@
 #include "tools.h"
 #include "world.h"
 #include "config.h"
-#include "surface.h"
+#include "sprite.h"
 #include "kingdom.h"
 #include "game_statuswindow.h"
 
 Game::StatusWindow::StatusWindow(const Point &pt, const Kingdom &kd)
-    : ston(AGG::GetICN(H2Config::EvilInterface() ? "STONBAKE.ICN" : "STONBACK.ICN", 0)), 
+    : ston(AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0)), 
       pos(pt, ston.w(), ston.h()), myKingdom(kd), state(Game::StatusWindow::DAY)
 {}
 
@@ -69,7 +69,7 @@ void Game::StatusWindow::DrawKingdomInfo(void)
     display.Blit(ston, pos.x, pos.y);
 
     // sprite all resource
-    display.Blit(AGG::GetICN("RESSMALL.ICN", 0), pos.x + 6, pos.y + 3);
+    display.Blit(AGG::GetICN(ICN::RESSMALL, 0), pos.x + 6, pos.y + 3);
 
     // count castle
     String::AddInt(count, myKingdom.GetCountCastle());
@@ -117,7 +117,7 @@ void Game::StatusWindow::DrawDayInfo(void)
     // restore background
     display.Blit(ston, pos.x, pos.y);
 
-    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? "SUNMOONE.ICN" : "SUNMOON.ICN", (world.GetWeek() - 1) % 5), pos.x, pos.y + 1);
+    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), pos.x, pos.y + 1);
 
     message = "Month: ";
     String::AddInt(message, world.GetMonth());
@@ -144,7 +144,7 @@ void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
     // restore background
     display.Blit(ston, pos.x, pos.y);
 
-    const Sprite & glass = AGG::GetICN("HOURGLAS.ICN", 0);
+    const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
 
     u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
     u16 dst_y = pos.y + (pos.h - glass.h()) / 2;
@@ -164,15 +164,15 @@ void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
 	default: return;
     }
 
-    const Sprite & crest = AGG::GetICN("BRCREST.ICN", color_index);
+    const Sprite & crest = AGG::GetICN(ICN::BRCREST, color_index);
 
     dst_x += 2;
     dst_y += 2;
 
     display.Blit(crest, dst_x, dst_y);
 
-    const Sprite & sand = AGG::GetICN("HOURGLAS.ICN", 1 + (progress % 10));
-    
+    const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (progress % 10));
+
     dst_x += (glass.w() - sand.w() - sand.x() - 3);
     dst_y += sand.y();
 
@@ -180,7 +180,7 @@ void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
     
     // animation sand
     //
-    // sprites "HOURGLAS.ICN", 11, 30
+    // sprites ICN::HOURGLAS, 11, 30
     //
 
     display.Flip();
