@@ -290,6 +290,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    break;
 	case Race::NECR:
 	    orders_building.push_back(BUILD_SPEC);
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) orders_building.push_back(BUILD_TAVERN); // shrine
 	    orders_building.push_back(BUILD_CASTLE);
 	    orders_building.push_back(BUILD_CAPTAIN);
 	    orders_building.push_back(BUILD_LEFTTURRET);
@@ -675,8 +676,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// left click building
 	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) OpenThievesGuild();
 	else
-	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern)) OpenTavern();
-	else
+	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern))
+	{
+	    if(Race::NECR == race && Settings::Get().Modes(Settings::PRICELOYALTY))
+		Dialog::Message(GetStringBuilding(BUILD_TAVERN, race), GetDescriptionBuilding(BUILD_TAVERN, race), Font::BIG, Dialog::OK);
+	    else
+		OpenTavern();
+	}else
 	if(building & BUILD_SHIPYARD && le.MouseClickLeft(coordBuildingShipyard))
 	{
 	    cursor.Hide();
@@ -902,7 +908,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// right press building
 	if(building & BUILD_THIEVESGUILD && le.MousePressRight(coordBuildingThievesGuild)) Dialog::Message(GetStringBuilding(BUILD_THIEVESGUILD), GetDescriptionBuilding(BUILD_THIEVESGUILD), Font::BIG);
 	else
-	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_TAVERN), GetDescriptionBuilding(BUILD_TAVERN), Font::BIG);
+	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_TAVERN, race), GetDescriptionBuilding(BUILD_TAVERN, race), Font::BIG);
 	else
 	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard)) Dialog::Message(GetStringBuilding(BUILD_SHIPYARD), GetDescriptionBuilding(BUILD_SHIPYARD), Font::BIG);
 	else
@@ -962,7 +968,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// building
 	if(building & BUILD_THIEVESGUILD && le.MouseCursor(coordBuildingThievesGuild)) statusBar.ShowMessage(GetStringBuilding(BUILD_THIEVESGUILD));
 	else
-	if(building & BUILD_TAVERN && le.MouseCursor(coordBuildingTavern)) statusBar.ShowMessage(GetStringBuilding(BUILD_TAVERN));
+	if(building & BUILD_TAVERN && le.MouseCursor(coordBuildingTavern)) statusBar.ShowMessage(GetStringBuilding(BUILD_TAVERN, race));
 	else
 	if(building & BUILD_SHIPYARD && le.MouseCursor(coordBuildingShipyard)) statusBar.ShowMessage(GetStringBuilding(BUILD_SHIPYARD));
 	else

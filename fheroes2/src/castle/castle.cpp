@@ -256,7 +256,8 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     if(building & BUILD_CAPTAIN) captain.SetRace(race);
 
     // remove tavern from necromancer castle
-    if(Race::NECR == race)	building &= ~BUILD_TAVERN;
+    if(Race::NECR == race && !Settings::Get().Modes(Settings::PRICELOYALTY))
+    	building &= ~BUILD_TAVERN;
 
     // end
     if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
@@ -560,6 +561,8 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
 	"Upg. Cathedral", "Pyramid", "Red Tower", "Red Tower", "Upg. Cloud Castle", "Laboratory",
 	"Upg. Cathedral", "Pyramid", "Red Tower", "Black Tower", "Upg. Cloud Castle", "Laboratory" };
 
+    static const std::string shrine = "Shrine";
+
     u8 offset = 0;
 
     switch(race)
@@ -572,6 +575,8 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
 	case Race::NECR: offset = 5; break;
 	default: break;
     }
+
+    if(Settings::Get().Modes(Settings::PRICELOYALTY) && race == Race::NECR && build == BUILD_TAVERN) return shrine;
 
     switch(build)
     {
@@ -649,6 +654,8 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
 	"The Library increases the number of spells in the Guild by one for each level of the guild.",
 	"The Storm adds +2 to the power of spells of a defending spell caster." };
 
+    static const std::string shrine_descr = "The Shrine increases the necromancy skill of all your necromancers by 10 percent.";
+
     u8 offset = 0;
 
     switch(race)
@@ -662,6 +669,8 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
 	default: break;
     }
 
+    if(Settings::Get().Modes(Settings::PRICELOYALTY) && race == Race::NECR && build == BUILD_TAVERN) return shrine_descr;
+    
     switch(build)
     {
         case BUILD_THIEVESGUILD:return desc_build[0];
@@ -1329,7 +1338,9 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 	case BUILD_MOAT:	return ICN::TWNNMOAT;
 	case BUILD_MARKETPLACE:	return ICN::TWNNMARK;
 	case BUILD_THIEVESGUILD:return ICN::TWNNTHIE;
-	//case BUILD_TAVERN:	return ICN::TWNNTVRN;
+	// shrine
+	case BUILD_TAVERN:	if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::TWNNTVRN;
+				break;
 	case BUILD_WELL:	return ICN::TWNNWELL;
 	case BUILD_STATUE:	return ICN::TWNNSTAT;
 	case BUILD_BOAT:	return ICN::TWNNBOAT;

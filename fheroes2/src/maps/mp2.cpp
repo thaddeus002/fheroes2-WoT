@@ -27,6 +27,11 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 {
     switch(type)
     {
+	// FIXME: LOYALITY VERSION:
+	// ICN::X_LOC1
+	// ICN::X_LOC2
+	// ICN::X_LOC3
+
 	// artifact
 	case 0x2C:
 	case 0x2D:

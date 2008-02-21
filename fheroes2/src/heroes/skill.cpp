@@ -297,3 +297,8 @@ const Sprite & Skill::Secondary::GetSprite(secondary_t skill)
 
     return AGG::GetICN(ICN::SECSKILL, index);
 }
+
+/* reset all skill */
+void Skill::Secondary::Reset(void)
+{
+}

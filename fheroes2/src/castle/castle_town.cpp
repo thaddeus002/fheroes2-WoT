@@ -537,7 +537,7 @@ Castle::building_t Castle::OpenTown(void)
     const Rect rectTavern(dst_pt, 135, 57);
     bool allowBuyBuildTavern = AllowBuyBuilding(BUILD_TAVERN);
     const std::string & stringTavern = GetStringBuilding(BUILD_TAVERN, race);
-    if(Race::NECR == race)
+    if(Race::NECR == race && !Settings::Get().Modes(Settings::PRICELOYALTY))
 	display.FillRect(0, 0, 0, Rect(dst_pt, 135, 57));
     else
     {
@@ -800,7 +800,8 @@ Castle::building_t Castle::OpenTown(void)
 		return nextLevelMageGuild;
 	}
 	else
-	if(!(BUILD_TAVERN & building) && Race::NECR != race && le.MouseClickLeft(rectTavern) && allowBuyBuildTavern && Dialog::OK == DialogBuyBuilding(BUILD_TAVERN, true))
+	if(!(BUILD_TAVERN & building) && (Race::NECR != race || Settings::Get().Modes(Settings::PRICELOYALTY)) &&
+	    le.MouseClickLeft(rectTavern) && allowBuyBuildTavern && Dialog::OK == DialogBuyBuilding(BUILD_TAVERN, true))
 	{
 		return BUILD_TAVERN;
 	}
@@ -910,7 +911,7 @@ Castle::building_t Castle::OpenTown(void)
 	else
 	if(!(BUILD_MAGEGUILD5 & building) && le.MousePressRight(rectMageGuild)) DialogBuyBuilding(nextLevelMageGuild, false);
 	else
-	if(!(BUILD_TAVERN & building) && Race::NECR != race && le.MousePressRight(rectTavern)) DialogBuyBuilding(BUILD_TAVERN, false);
+	if(!(BUILD_TAVERN & building) && (Race::NECR != race || Settings::Get().Modes(Settings::PRICELOYALTY)) && le.MousePressRight(rectTavern)) DialogBuyBuilding(BUILD_TAVERN, false);
 	else
 	if(!(BUILD_THIEVESGUILD & building) && le.MousePressRight(rectThievesGuild)) DialogBuyBuilding(BUILD_THIEVESGUILD, false);
 	else
@@ -1006,7 +1007,7 @@ Castle::building_t Castle::OpenTown(void)
 	    }
 	}
 	else
-	if(Race::NECR != race && le.MouseCursor(rectTavern))
+	if((Race::NECR != race || Settings::Get().Modes(Settings::PRICELOYALTY)) && le.MouseCursor(rectTavern))
 	    statusBar.ShowBuildMessage(BUILD_TAVERN & building, allowBuyBuildTavern, stringTavern, *this, BUILD_TAVERN);
 	else
 	if(le.MouseCursor(rectThievesGuild))

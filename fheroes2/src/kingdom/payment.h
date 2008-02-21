@@ -123,6 +123,9 @@ class Rect;
 #define BUILD_LIBRARY_GEMS		5
 #define BUILD_LIBRARY_MERCURY		5
 #define BUILD_LIBRARY_SULFUR		5
+#define BUILD_SHRINE_GOLD		4000
+#define BUILD_SHRINE_WOOD		10
+#define BUILD_SHRINE_CRYSTAL		10
 // dwelling level 1 
 #define BUILD_THATCHEDHUT_GOLD          200 
 #define BUILD_EXCAVATION_GOLD           400 

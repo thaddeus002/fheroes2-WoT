@@ -139,8 +139,37 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
     vec_heroes[57] = new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald");
     vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton");
     vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR, "Brother Bax");
-    vec_heroes[60] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-    vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+
+    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+    {
+	vec_heroes[60] = new Heroes(Heroes::SOLMYR, Race::WZRD, "Solmyr");
+	vec_heroes[61] = new Heroes(Heroes::DAINWIN, Race::WRLK, "Dainwin");
+	vec_heroes[62] = new Heroes(Heroes::MOG, Race::NECR, "Mog");
+	vec_heroes[63] = new Heroes(Heroes::UNCLEIVAN, Race::BARB, "Uncle Ivan");
+	vec_heroes[64] = new Heroes(Heroes::JOSEPH, Race::KNGT, "Joseph");
+	vec_heroes[65] = new Heroes(Heroes::GALLAVANT, Race::KNGT, "Gallavant");
+	vec_heroes[66] = new Heroes(Heroes::ELDERIAN, Race::WRLK, "Elderian");
+	vec_heroes[67] = new Heroes(Heroes::CEALLACH, Race::KNGT, "Ceallach");
+	vec_heroes[68] = new Heroes(Heroes::DRAKONIA, Race::WZRD, "Drakonia");
+	vec_heroes[69] = new Heroes(Heroes::MARTINE, Race::SORC, "Martine");
+	vec_heroes[70] = new Heroes(Heroes::JARKONAS, Race::BARB, "Jarkonas");
+	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+    }
+    else
+    {
+	vec_heroes[60] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[62] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[63] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[64] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[65] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[66] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[67] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[68] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+    }
 
     Display & display = Display::Get();
 
@@ -274,8 +303,36 @@ void World::LoadMaps(const std::string &filename)
     vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton");
     vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR, "Brother Bax");
 
-    vec_heroes[60] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-    vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+    {
+	vec_heroes[60] = new Heroes(Heroes::SOLMYR, Race::WZRD, "Solmyr");
+	vec_heroes[61] = new Heroes(Heroes::DAINWIN, Race::WRLK, "Dainwin");
+	vec_heroes[62] = new Heroes(Heroes::MOG, Race::NECR, "Mog");
+	vec_heroes[63] = new Heroes(Heroes::UNCLEIVAN, Race::BARB, "Uncle Ivan");
+	vec_heroes[64] = new Heroes(Heroes::JOSEPH, Race::KNGT, "Joseph");
+	vec_heroes[65] = new Heroes(Heroes::GALLAVANT, Race::KNGT, "Gallavant");
+	vec_heroes[66] = new Heroes(Heroes::ELDERIAN, Race::WRLK, "Elderian");
+	vec_heroes[67] = new Heroes(Heroes::CEALLACH, Race::KNGT, "Ceallach");
+	vec_heroes[68] = new Heroes(Heroes::DRAKONIA, Race::WZRD, "Drakonia");
+	vec_heroes[69] = new Heroes(Heroes::MARTINE, Race::SORC, "Martine");
+	vec_heroes[70] = new Heroes(Heroes::JARKONAS, Race::BARB, "Jarkonas");
+	vec_heroes[71] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+    }
+    else
+    {
+	vec_heroes[60] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[62] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[63] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[64] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[65] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[66] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[67] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[68] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+    }
 
     Display & display = Display::Get();
 

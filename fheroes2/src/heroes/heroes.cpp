@@ -114,25 +114,148 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     std::vector<Army::Troops>::const_iterator it2 = army.end();
     for(; it1 != it2; ++it1) (*it1).SetMasterSkill(this);
 
-    // set debug hero
-    if(SANDYSANDY == heroes)
+    // extra hero
+    switch(heroes)
     {
-	army[0].Set(Monster::BLACK_DRAGON, 2);
+        case ROLAND:
+            attack    = 0;
+            defence   = 1;
+            power     = 4;
+            knowledge = 5;
 
-        army[1].Set(Monster::RED_DRAGON, 3);
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::EXPERT);
+	    secondary_skills.Level(Skill::ARCHERY, Skill::Level::BASIC);
+    	    break;
 
-	secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
-	secondary_skills.Level(Skill::LOGISTICS, Skill::Level::BASIC);
-	secondary_skills.Level(Skill::MYSTICISM, Skill::Level::BASIC);
-	secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
-	secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
-	secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
+        case CORLAGON:
+            attack    = 5;
+            defence   = 3;
+            power     = 1;
+            knowledge = 1;
 
-	artifacts.push_back(Artifact::MEDAL_VALOR);
-	artifacts.push_back(Artifact::STEALTH_SHIELD);
-	artifacts.push_back(Artifact::DRAGON_SWORD);
-	artifacts.push_back(Artifact::RABBIT_FOOT);
-	artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::EXPERT);
+	    secondary_skills.Level(Skill::BALLISTICS, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
+    	    break;
+        
+        case ELIZA:
+            attack    = 0;
+            defence   = 1;
+            power     = 2;
+            knowledge = 6;
+
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::EXPERT);
+	    secondary_skills.Level(Skill::ARCHERY, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
+    	    break;
+
+    	case ARCHIBALD:
+            attack    = 1;
+            defence   = 1;
+            power     = 4;
+            knowledge = 4;
+
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::EXPERT);
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::EXPERT);
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
+    	    break;
+
+    	case HALTON:
+            attack    = 3;
+            defence   = 3;
+            power     = 3;
+            knowledge = 2;
+
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::BALLISTICS, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::DIPLOMACY, Skill::Level::BASIC);
+    	    break;
+    	
+    	case BAX:
+            attack    = 1;
+            defence   = 1;
+            power     = 4;
+            knowledge = 3;
+
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::EXPERT);
+	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
+    	    break;
+
+	case SOLMYR:
+	case DRAKONIA:
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    break;
+
+	case DAINWIN:
+	case ELDERIAN:
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::BASIC);
+	    break;
+
+	case MOG:
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::ADVANCED);
+	    break;
+	
+	case UNCLEIVAN:
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::ADVANCED);
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    break;
+	
+	case JOSEPH:
+	    secondary_skills.Reset();
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::BASIC);
+	    break;
+	
+	case GALLAVANT:
+	    break;
+	
+	case CEALLACH:
+	    break;
+	
+	case MARTINE:
+	    break;
+
+	case JARKONAS:
+	    break;
+
+    	case SANDYSANDY:
+	    army[0].Set(Monster::BLACK_DRAGON, 2);
+    	    army[1].Set(Monster::RED_DRAGON, 3);
+
+	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::LOGISTICS, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::MYSTICISM, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
+
+	    artifacts.push_back(Artifact::MEDAL_VALOR);
+	    artifacts.push_back(Artifact::STEALTH_SHIELD);
+	    artifacts.push_back(Artifact::DRAGON_SWORD);
+	    artifacts.push_back(Artifact::RABBIT_FOOT);
+	    artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
+	    break;
+	
+	default: break;
     }
 
     magic_point = GetMaxSpellPoints();

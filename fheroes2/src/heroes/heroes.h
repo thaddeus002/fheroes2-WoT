@@ -41,7 +41,7 @@
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXSKILL		8
 #define HEROESMAXARMY		5
-#define HEROESMAXCOUNT		60
+#define HEROESMAXCOUNT		70
 
 /*
 #define SCOUTINGBASE		4
@@ -92,7 +92,7 @@ public:
 	// from campain
 	ROLAND, CORLAGON, ELIZA, ARCHIBALD, HALTON, BAX,
 	// from extended
-	// 60 - , 61 -, 62 -, 63 -, 64 -, 65 - GALLAVANT, 66 -, 67 -, 68 -, 69 -, 70 -
+	SOLMYR, DAINWIN, MOG, UNCLEIVAN, JOSEPH, GALLAVANT, ELDERIAN, CEALLACH, DRAKONIA, MARTINE, JARKONAS,
 	// debugger
 	SANDYSANDY, UNKNOWN
     } heroes_t;

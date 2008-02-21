@@ -23,6 +23,7 @@
 #include "display.h"
 #include "castle.h"
 #include "error.h"
+#include "settings.h"
 #include "text.h"
 #include "tools.h"
 #include "payment.h"
@@ -184,8 +185,18 @@ PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const u32
             break;
 
         case Castle::BUILD_TAVERN:
-            gold = BUILD_TAVERN_GOLD;
-            wood = BUILD_TAVERN_WOOD;
+            if(Race::NECR == race && Settings::Get().Modes(Settings::PRICELOYALTY))
+            {
+		gold = BUILD_SHRINE_GOLD;
+		wood = BUILD_SHRINE_WOOD;
+		crystal = BUILD_SHRINE_CRYSTAL;
+            }
+            else
+            if(Race::NECR != race)
+            {
+        	gold = BUILD_TAVERN_GOLD;
+        	wood = BUILD_TAVERN_WOOD;
+            }
             break;
 
         case Castle::BUILD_SHIPYARD:

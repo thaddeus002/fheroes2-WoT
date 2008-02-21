@@ -106,6 +106,7 @@ namespace Skill
 	public:
 	Secondary();
 
+	void		Reset(void);
 	void		Level(secondary_t skill, Level::type_t level);
 	Level::type_t	GetLevel(secondary_t skill) const;
 	secondary_t	GetSkill(u8 index) const;
