@@ -60,14 +60,17 @@ Game::menu_t Game::Editor::LoadMaps(void)
     Dir dir;
     Settings & conf = Settings::Get();
 
-    dir.Read(conf.MapsDirectory(), "mp2");
-    dir.Read(conf.MapsDirectory(), "Mp2");
-    dir.Read(conf.MapsDirectory(), "MP2");
+    dir.Read(conf.MapsDirectory(), ".mp2");
+    dir.Read(conf.MapsDirectory(), ".Mp2");
+    dir.Read(conf.MapsDirectory(), ".MP2");
 
-    // FIXME:: loyality version
-    dir.Read(conf.MapsDirectory(), "mx2");
-    dir.Read(conf.MapsDirectory(), "Mx2");
-    dir.Read(conf.MapsDirectory(), "MX2");
+    // loyality version
+    if(conf.Modes(Settings::PRICELOYALTY))
+    {
+    	dir.Read(conf.MapsDirectory(), ".mx2");
+	dir.Read(conf.MapsDirectory(), ".Mx2");
+	dir.Read(conf.MapsDirectory(), ".MX2");
+    }
 
     const u16 count_mp2 = dir.size();
 

@@ -39,7 +39,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	case 0x31:
 	case 0x32:
 	case 0x33:
-	    return ICN::UNKNOWN;
+	    return ICN::MONS32;
 
 	// castle flags
 	case 0x38:
@@ -50,7 +50,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	case 0x55:
 	case 0x56:
 	case 0x57:
-	    break;
+	    return ICN::MINIHERO;
 
 	// relief: snow
 	case 0x58:
@@ -305,7 +305,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	    break;
     }
 
-    if(H2Config::Debug()) Error::Warning("GetICNObject: unknown type: ", type);
+    if(H2Config::Debug()) Error::Warning("MP2::GetICNObject: unknown type: ", type);
 
     return ICN::UNKNOWN;
 }

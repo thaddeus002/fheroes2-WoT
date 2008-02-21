@@ -47,8 +47,6 @@ public:
         EVILINTERFACE   = 0x00040000,
         SHADOW          = 0x00080000,
 
-        STARTHEROES	= 0x00100000,
-
     } settings_t;
 
     static Settings & Get(void);
@@ -81,8 +79,9 @@ public:
     bool FullScreen(void) const;
     bool EvilInterface(void) const;
     bool Shadow(void) const;
-    bool PlayWithHeroes(void) const;
     bool Logo(void) const;
+
+    bool Modes(const settings_t s) const;
 
     Size & VideoMode(void);
 

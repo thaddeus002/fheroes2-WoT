@@ -155,7 +155,6 @@ public:
 private:
     std::string		name;
     Color::color_t	color;
-    //Skill::Primary	primary_skills;
     u32			experience;
     u16			magic_point;
     u16			move_point;

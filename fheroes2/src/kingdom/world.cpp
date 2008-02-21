@@ -139,7 +139,7 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
     vec_heroes[57] = new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald");
     vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton");
     vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR, "Brother Bax");
-    vec_heroes[60] = new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy");
+    vec_heroes[60] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 
     Display & display = Display::Get();
@@ -273,7 +273,8 @@ void World::LoadMaps(const std::string &filename)
     vec_heroes[57] = new Heroes(Heroes::ARCHIBALD, Race::WRLK, "Archibald");
     vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT, "Lord Halton");
     vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR, "Brother Bax");
-    vec_heroes[60] = new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy");
+
+    vec_heroes[60] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 
     Display & display = Display::Get();
@@ -794,6 +795,26 @@ void World::LoadMaps(const std::string &filename)
 	    if((*vec_kingdoms[ii]).GetColor() == (*vec_castles[cc]).GetColor())
 		(*vec_kingdoms[ii]).AddCastle(vec_castles[cc]);
 
+    // play with debug hero
+    if(H2Config::Debug())
+	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
+	    if((*vec_kingdoms[ii]).isPlay() && Settings::Get().MyColor() == (*vec_kingdoms[ii]).GetColor())
+	    {
+		// get first castle position
+		const Kingdom & kingdom = *(vec_kingdoms[ii]);
+		const Castle & castle = *(kingdom.GetCastles().at(0));
+
+		// place hero
+		if((*vec_heroes[Heroes::SANDYSANDY]).isFreeman())
+		{
+		    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
+
+		    const_cast<Heroes &>(*hero).Recruit(castle);
+
+		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
+		}
+	    }
+    else
     // play with hero
     if(Settings::Get().FileInfo().PlayWithHeroes())
 	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
@@ -803,17 +824,7 @@ void World::LoadMaps(const std::string &filename)
 		const Kingdom & kingdom = *(vec_kingdoms[ii]);
 		const Castle & castle = *(kingdom.GetCastles().at(0));
 
-		// place debugger hero
-		if(H2Config::Debug() && Settings::Get().MyColor() == kingdom.GetColor() && (*vec_heroes[Heroes::SANDYSANDY]).isFreeman())
-		{
-		    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
-
-		    const_cast<Heroes &>(*hero).Recruit(castle);
-
-		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
-		}
-		else
-		// place near hero
+		// place hero
 		if(const Heroes *hero = GetFreemanHeroes(castle.GetRace()))
 		{
 		    const_cast<Heroes &>(*hero).Recruit(castle);

@@ -114,8 +114,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     std::vector<Army::Troops>::const_iterator it2 = army.end();
     for(; it1 != it2; ++it1) (*it1).SetMasterSkill(this);
 
-    // set debug param
-    if(H2Config::Debug() && SANDYSANDY == heroes)
+    // set debug hero
+    if(SANDYSANDY == heroes)
     {
 	army[0].Set(Monster::BLACK_DRAGON, 2);
 

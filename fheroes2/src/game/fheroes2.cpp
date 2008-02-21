@@ -147,6 +147,8 @@ int main(int argc, char **argv)
     		if(0 == strncasecmp("heroes2x.agg", filename.c_str(), 12))
     		{
     		    agg_heroes2x = dir[ii];
+    		    
+    		    conf.SetModes(Settings::PRICELOYALTY);
     		}
     		else
     		    cache.AttachFile(dir[ii]);

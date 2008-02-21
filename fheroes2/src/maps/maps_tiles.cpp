@@ -247,7 +247,7 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	    u8 index  = (*it1).GetIndex();
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(ICN::UNKNOWN != icn)
+	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
@@ -290,7 +290,7 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 	    u8 index  = (*it1).GetIndex();
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(ICN::UNKNOWN != icn)
+	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());

@@ -20,12 +20,12 @@
 #ifndef H2ALGORITHM_H
 #define H2ALGORITHM_H
 
-#include <vector>
+#include <list>
 #include "gamedefs.h"
 
 namespace Algorithm
 {
-    u16 PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::vector<u16> & result);
+    u16 PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<u16> & result);
 
 };
 

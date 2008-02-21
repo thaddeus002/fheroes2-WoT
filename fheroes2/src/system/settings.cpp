@@ -173,6 +173,8 @@ Difficulty::difficulty_t Settings::GameDifficulty(void) const { return game_diff
 
 Color::color_t Settings::MyColor(void) const { return my_color; }
 
+bool Settings::Modes(const settings_t s) const { return modes & s; }
+
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
 
@@ -202,9 +204,6 @@ bool Settings::EvilInterface(void) const { return modes & EVILINTERFACE; }
 
 /* return shadow */
 bool Settings::Shadow(void) const { return modes & SHADOW; }
-
-/* get play with heroes */
-bool Settings::PlayWithHeroes(void) const { return modes & STARTHEROES; }
 
 /* get show logo */
 bool Settings::Logo(void) const { return modes & LOGO; }

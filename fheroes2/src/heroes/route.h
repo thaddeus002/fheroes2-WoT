@@ -20,7 +20,7 @@
 #ifndef H2HEROPATH_H
 #define H2HEROPATH_H
 
-#include <vector>
+#include <list>
 #include "gamedefs.h"
 #include "rect.h"
 
@@ -41,7 +41,8 @@ class Route
 	void	Hide(void) const;
 	void	Reset(void);
 
-	const std::vector<u16> & Get(void) const { return path; };
+	const std::list<u16> & Get(void) const { return path; };
+	u16	NextToLast(void) const;
 
     private:
 	static const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
@@ -50,7 +51,7 @@ class Route
     private:
 	const Heroes & hero;
 	u16	dst;
-	std::vector<u16> path;
+	std::list<u16> path;
 };
 
 #endif

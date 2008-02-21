@@ -41,7 +41,7 @@ struct cellinfo_t
 };
 
 // find path (A* implementation) - is valid return length path
-u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::vector<u16> & result)
+u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<u16> & result)
 {
     const u16 width = world.w();
     
@@ -91,7 +91,15 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 	    }
 	}
 
-	if(H2Config::Debug()) Error::Verbose("dump penalty, from index: ", index_i);
+	if(H2Config::Debug())
+	{
+	    std::string value  = "dump penalty, from index: ";
+	    String::AddInt(value, index_i);
+	    value += ", to index: ";
+	    String::AddInt(value, index2);
+
+	    Error::Verbose(value);
+	}
 
 	std::map<u16, cellinfo_t>::iterator im1 = work_map.begin();
         std::map<u16, cellinfo_t>::iterator im2 = work_map.end();
@@ -159,10 +167,18 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 	// check not found
 	if(newindex != index_i)
 	{
+	    if(H2Config::Debug())
+	    {
+		std::string value = "                  select: ";
+		String::AddInt(value, newindex);
+		value += ", direction: " + Direction::String(Direction::Get(index_i, newindex));;
+
+		Error::Verbose(value);
+	    }
+
 	    index_i = newindex;
 	    work_map[index_i].open_list = false;
 
-	    if(H2Config::Debug()) Error::Verbose("                  select: ", index_i);
 	}
 	else
 	    notfound = true;
@@ -183,7 +199,8 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 	while(index_i != index1)
 	{
 	    // push_front
-	    result.insert(result.begin(), index_i);
+	    //result.insert(result.begin(), index_i);
+	    result.push_front(index_i);
 
 	    index_i = work_map[index_i].parent;
 	}

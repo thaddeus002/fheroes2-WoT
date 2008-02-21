@@ -409,10 +409,10 @@ Game::menu_t Game::StartGame(void)
 				    else
 				    {
 				        // hero goto near monster
-					if(path.Get().size() > 1)
+					if(path.Length() > 1)
 					{
 					    cursor.Hide();
-				    	    const_cast<Heroes &>(*heroes).Goto(path.Get().at(path.Get().size() - 2));
+				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    	    const_cast<Route &>(path).Reset();
@@ -506,10 +506,10 @@ Game::menu_t Game::StartGame(void)
 					else
 					{
 				    	    // hero goto near castle
-					    if(path.Get().size() > 1)
+					    if(path.Length() > 1)
 					    {
 						cursor.Hide();
-				    		const_cast<Heroes &>(*heroes).Goto(path.Get().at(path.Get().size() - 2));
+				    		const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    		globalfocus.center = heroes->GetCenter();
     						FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    		const_cast<Route &>(path).Reset();
@@ -613,10 +613,10 @@ Game::menu_t Game::StartGame(void)
 					else
 					{
 				    	    // hero goto near castle
-					    if(path.Get().size() > 1)
+					    if(path.Length() > 1)
 					    {
 						cursor.Hide();
-				    		const_cast<Heroes &>(*heroes).Goto(path.Get().at(path.Get().size() - 2));
+				    		const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    		globalfocus.center = heroes->GetCenter();
     						FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    		const_cast<Route &>(path).Reset();
@@ -683,10 +683,10 @@ Game::menu_t Game::StartGame(void)
 					    else
 					    {
 				    		// hero goto near hero
-						if(path.Get().size() > 1)
+						if(path.Length() > 1)
 						{
 						    cursor.Hide();
-				    		    const_cast<Heroes &>(*heroes).Goto(path.Get().at(path.Get().size() - 2));
+				    		    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    		    globalfocus.center = heroes->GetCenter();
     						    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    		    const_cast<Route &>(path).Reset();
@@ -736,10 +736,10 @@ Game::menu_t Game::StartGame(void)
 					else
 					{
 				    	    // hero goto near monster
-					    if(path.Get().size() > 1)
+					    if(path.Length() > 1)
 					    {
 						cursor.Hide();
-				    	        const_cast<Heroes &>(*heroes).Goto(path.Get().at(path.Get().size() - 2));
+				    	        const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    		globalfocus.center = heroes->GetCenter();
     					        FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    		const_cast<Route &>(path).Reset();
@@ -800,10 +800,10 @@ Game::menu_t Game::StartGame(void)
 					const u16 dst_index = path.GetDestinationIndex();
 
 				        //hero goto near object
-					if(path.Get().size() > 1)
+					if(path.Length() > 1)
 					{
 					    cursor.Hide();
-				    	    const_cast<Heroes &>(*heroes).Goto(path.Get().at(path.Get().size() - 2));
+				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    	    const_cast<Route &>(path).Reset();
@@ -910,10 +910,10 @@ Game::menu_t Game::StartGame(void)
 					const u16 dst_index =path.GetDestinationIndex();
 
 				        //hero goto near object
-					if(path.Get().size() > 1)
+					if(path.Length() > 1)
 					{
 					    cursor.Hide();
-				    	    const_cast<Heroes &>(*heroes).Goto(path.Get().at(path.Get().size() - 2));
+				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    	    const_cast<Route &>(path).Reset();

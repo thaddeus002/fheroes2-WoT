@@ -53,14 +53,15 @@ void Route::Show(void) const
     {
 	u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
-	std::vector<u16>::const_iterator it1 = path.begin();
-	std::vector<u16>::const_iterator it2 = path.end();
+	std::list<u16>::const_iterator it1 = path.begin();
+	std::list<u16>::const_iterator it2 = path.end();
+	std::list<u16>::const_iterator it3 = it1;
 
 	for(; it1 != it2; ++it1)
 	{
 	    Maps::Tiles & tile = world.GetTiles(*it1);
 
-	    std::vector<u16>::const_iterator it3 = it1 + 1;
+	    ++it3;
 
 	    if(it3 != it2)
 		tile.AddPathSprite(& GetSprite(Direction::Get(from, *it1), Direction::Get(*it1, *it3)));
@@ -80,8 +81,8 @@ void Route::Dump(void) const
 {
     if(H2Config::Debug()) Error::Verbose("route start index: ", Maps::GetIndexFromAbsPoint(hero.GetCenter()));
 
-    std::vector<u16>::const_iterator it1 = path.begin();
-    std::vector<u16>::const_iterator it2 = path.end();
+    std::list<u16>::const_iterator it1 = path.begin();
+    std::list<u16>::const_iterator it2 = path.end();
 
     u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
@@ -102,8 +103,8 @@ void Route::Hide(void) const
     if(path.size())
     {
 	// redraw tiles
-	std::vector<u16>::const_iterator it1 = path.begin();
-	std::vector<u16>::const_iterator it2 = path.end();
+	std::list<u16>::const_iterator it1 = path.begin();
+	std::list<u16>::const_iterator it2 = path.end();
 
 	for(; it1 != it2; ++it1)
 	{
@@ -231,4 +232,19 @@ const Sprite & Route::GetSprite(const Direction::vector_t & from, const Directio
     }
 
     return AGG::GetICN(ICN::ROUTE, index);
+}
+
+/* get next to last path element */
+u16 Route::NextToLast(void) const
+{
+    if(2 > path.size())
+    {
+	Error::Warning("Route::NextToLast: path size is short, return 0");
+
+	return 0;
+    }
+
+    std::list<u16>::const_reverse_iterator it = path.rbegin();
+
+    return *(++it);
 }
