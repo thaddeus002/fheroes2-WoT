@@ -305,7 +305,31 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	case 0xF2:
 	case 0xF3:
 	    return ICN::OBJNLAV2;
-	    
+
+	// extra objects for loyalty version
+	case 0xF4:
+	case 0xF5:
+	case 0xF6:
+	case 0xF7:
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::X_LOC1;
+	    break;
+
+	// extra objects for loyalty version
+	case 0xF8:
+	case 0xF9:
+	case 0xFA:
+	case 0xFB:
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::X_LOC2;
+	    break;
+
+	// extra objects for loyalty version
+	case 0xFC:
+	case 0xFD:
+	case 0xFE:
+	case 0xFF:
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::X_LOC3;
+	    break;
+
 	default:
 	    break;
     }
@@ -480,6 +504,101 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_RNDARTIFACT1:          	return "OBJ_RNDARTIFACT1";
         case MP2::OBJ_RNDARTIFACT2:          	return "OBJ_RNDARTIFACT2";
         case MP2::OBJ_RNDARTIFACT3:          	return "OBJ_RNDARTIFACT3";
+
+	case MP2::OBJN_JAIL:
+	case MP2::OBJ_JAIL:			return "Jail";
+	case MP2::OBJN_TRAVELLERTENT:
+	case MP2::OBJ_TRAVELLERTENT:		return "Traveller's Tent";
+	case MP2::OBJ_BARRIER:			return "Barrier";
+
+	case MP2::OBJ_UNKNW_02:		return "OBJ_UNKNW_02";
+	case MP2::OBJ_UNKNW_03:		return "OBJ_UNKNW_03";
+	case MP2::OBJ_UNKNW_04:		return "OBJ_UNKNW_04";
+	case MP2::OBJ_UNKNW_06:		return "OBJ_UNKNW_06";
+	case MP2::OBJ_UNKNW_08:		return "OBJ_UNKNW_08";
+	case MP2::OBJ_UNKNW_09:		return "OBJ_UNKNW_09";
+	case MP2::OBJ_UNKNW_0B:		return "OBJ_UNKNW_0B";
+	case MP2::OBJ_UNKNW_0E:		return "OBJ_UNKNW_0E";
+	case MP2::OBJ_UNKNW_11:		return "OBJ_UNKNW_11";
+	case MP2::OBJ_UNKNW_12:		return "OBJ_UNKNW_12";
+	case MP2::OBJ_UNKNW_13:		return "OBJ_UNKNW_13";
+	case MP2::OBJ_UNKNW_18:		return "OBJ_UNKNW_18";
+	case MP2::OBJ_UNKNW_1B:		return "OBJ_UNKNW_1B";
+	case MP2::OBJ_UNKNW_1F:		return "OBJ_UNKNW_1F";
+	case MP2::OBJ_UNKNW_21:		return "OBJ_UNKNW_21";
+	case MP2::OBJ_UNKNW_26:		return "OBJ_UNKNW_26";
+	case MP2::OBJ_UNKNW_27:		return "OBJ_UNKNW_27";
+	case MP2::OBJ_UNKNW_29:		return "OBJ_UNKNW_29";
+	case MP2::OBJ_UNKNW_2A:		return "OBJ_UNKNW_2A";
+	case MP2::OBJ_UNKNW_2B:		return "OBJ_UNKNW_2B";
+	case MP2::OBJ_UNKNW_2C:		return "OBJ_UNKNW_2C";
+	case MP2::OBJ_UNKNW_2D:		return "OBJ_UNKNW_2D";
+	case MP2::OBJ_UNKNW_2E:		return "OBJ_UNKNW_2E";
+	case MP2::OBJ_UNKNW_2F:		return "OBJ_UNKNW_2F";
+	case MP2::OBJ_UNKNW_32:		return "OBJ_UNKNW_32";
+	case MP2::OBJ_UNKNW_33:		return "OBJ_UNKNW_33";
+	case MP2::OBJ_UNKNW_34:		return "OBJ_UNKNW_34";
+	case MP2::OBJ_UNKNW_35:		return "OBJ_UNKNW_35";
+	case MP2::OBJ_UNKNW_36:		return "OBJ_UNKNW_36";
+	case MP2::OBJ_UNKNW_37:		return "OBJ_UNKNW_37";
+	case MP2::OBJ_UNKNW_41:		return "OBJ_UNKNW_41";
+	case MP2::OBJ_UNKNW_42:		return "OBJ_UNKNW_42";
+	case MP2::OBJ_UNKNW_43:		return "OBJ_UNKNW_43";
+	case MP2::OBJ_UNKNW_4A:		return "OBJ_UNKNW_4A";
+	case MP2::OBJ_UNKNW_4B:		return "OBJ_UNKNW_4B";
+	case MP2::OBJ_UNKNW_50:		return "OBJ_UNKNW_50";
+	case MP2::OBJ_UNKNW_58:		return "OBJ_UNKNW_58";
+	case MP2::OBJ_UNKNW_5A:		return "OBJ_UNKNW_5A";
+	case MP2::OBJ_UNKNW_5C:		return "OBJ_UNKNW_5C";
+	case MP2::OBJ_UNKNW_5D:		return "OBJ_UNKNW_5D";
+	case MP2::OBJ_UNKNW_5F:		return "OBJ_UNKNW_5F";
+	case MP2::OBJ_UNKNW_62:		return "OBJ_UNKNW_62";
+	case MP2::OBJ_UNKNW_72:		return "OBJ_UNKNW_72";
+	case MP2::OBJ_UNKNW_73:		return "OBJ_UNKNW_73";
+	case MP2::OBJ_UNKNW_74:		return "OBJ_UNKNW_74";
+	case MP2::OBJ_UNKNW_75:		return "OBJ_UNKNW_75";
+	case MP2::OBJ_UNKNW_76:		return "OBJ_UNKNW_76";
+	case MP2::OBJ_UNKNW_77:		return "OBJ_UNKNW_77";
+	case MP2::OBJ_UNKNW_79:		return "OBJ_UNKNW_79";
+	case MP2::OBJ_UNKNW_7A:		return "OBJ_UNKNW_7A";
+	case MP2::OBJ_UNKNW_7C:		return "OBJ_UNKNW_7C";
+	case MP2::OBJ_UNKNW_7D:		return "OBJ_UNKNW_7D";
+	case MP2::OBJ_UNKNW_7E:		return "OBJ_UNKNW_7E";
+	case MP2::OBJ_UNKNW_7F:		return "OBJ_UNKNW_7F";
+	case MP2::OBJ_UNKNW_80:		return "OBJ_UNKNW_80";
+	case MP2::OBJ_UNKNW_91:		return "OBJ_UNKNW_91";
+	case MP2::OBJ_UNKNW_92:		return "OBJ_UNKNW_92";
+	case MP2::OBJ_UNKNW_A1:		return "OBJ_UNKNW_A1";
+	case MP2::OBJ_UNKNW_A6:		return "OBJ_UNKNW_A6";
+	case MP2::OBJ_UNKNW_AA:		return "OBJ_UNKNW_AA";
+	case MP2::OBJ_UNKNW_B2:		return "OBJ_UNKNW_B2";
+	case MP2::OBJ_UNKNW_B8:		return "OBJ_UNKNW_B8";
+	case MP2::OBJ_UNKNW_B9:		return "OBJ_UNKNW_B9";
+	case MP2::OBJ_UNKNW_D1:		return "OBJ_UNKNW_D1";
+	case MP2::OBJ_UNKNW_E2:		return "OBJ_UNKNW_E2";
+	case MP2::OBJ_UNKNW_E3:		return "OBJ_UNKNW_E3";
+	case MP2::OBJ_UNKNW_E4:		return "OBJ_UNKNW_E4";
+	case MP2::OBJ_UNKNW_E5:		return "OBJ_UNKNW_E5";
+	case MP2::OBJ_UNKNW_E6:		return "OBJ_UNKNW_E6";
+	case MP2::OBJ_UNKNW_E7:		return "OBJ_UNKNW_E7";
+	case MP2::OBJ_UNKNW_E8:		return "OBJ_UNKNW_E8";
+	case MP2::OBJ_UNKNW_E9:		return "OBJ_UNKNW_E9";
+	case MP2::OBJ_UNKNW_EA:		return "OBJ_UNKNW_EA";
+	case MP2::OBJ_UNKNW_EB:		return "OBJ_UNKNW_EB";
+	case MP2::OBJ_UNKNW_EC:		return "OBJ_UNKNW_EC";
+	case MP2::OBJ_UNKNW_ED:		return "OBJ_UNKNW_ED";
+	case MP2::OBJ_UNKNW_EE:		return "OBJ_UNKNW_EE";
+	case MP2::OBJ_UNKNW_EF:		return "OBJ_UNKNW_EF";
+	case MP2::OBJ_UNKNW_F0:		return "OBJ_UNKNW_F0";
+	case MP2::OBJ_UNKNW_F1:		return "OBJ_UNKNW_F1";
+	case MP2::OBJ_UNKNW_F2:		return "OBJ_UNKNW_F2";
+	case MP2::OBJ_UNKNW_F3:		return "OBJ_UNKNW_F3";
+	case MP2::OBJ_UNKNW_F9:		return "OBJ_UNKNW_F9";
+	case MP2::OBJ_UNKNW_FA:		return "OBJ_UNKNW_FA";
+	case MP2::OBJ_UNKNW_FC:		return "OBJ_UNKNW_FC";
+	case MP2::OBJ_UNKNW_FD:		return "OBJ_UNKNW_FD";
+	case MP2::OBJ_UNKNW_FE:		return "OBJ_UNKNW_FE";
+	case MP2::OBJ_UNKNW_FF:		return "OBJ_UNKNW_FF";
 	
 	default:
 	    Error::Warning("MP2::Object: unknown, ", object);
@@ -909,6 +1028,96 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+
+	// x_loc1: extra objects for loyalty version
+	case 0xF4:
+	case 0xF5:
+	case 0xF6:
+	case 0xF7:
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+	    switch(index)
+	    {
+		// alchemist tower
+		case 0x04:
+		case 0x0D:
+		case 0x16:
+		// arena
+		case 0x1F:
+		case 0x28:
+		case 0x32:
+		case 0x3B:
+		// earth altar
+		case 0x55:
+		case 0x5E:
+		case 0x67:
+		    return index + (frame % 8) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// x_loc2: extra objects for loyalty version
+	case 0xF8:
+	case 0xF9:
+	case 0xFA:
+	case 0xFB:
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+	    switch(index)
+	    {
+		// mermaid
+		case 0x0A:
+		case 0x13:
+		case 0x1C:
+		case 0x25:
+		// sirens
+		case 0x2F:
+		case 0x38:
+		case 0x41:
+		case 0x4A:
+		case 0x53:
+		case 0x5C:
+		case 0x66:
+		    return index + (frame % 8) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// x_loc3: extra objects for loyalty version
+	case 0xFC:
+	case 0xFD:
+	case 0xFE:
+	case 0xFF:
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+	    switch(index)
+	    {
+		// hut magi
+		case 0x00:
+		case 0x0A:
+		case 0x14:
+		// eye magi
+		case 0x20:
+		case 0x29:
+		case 0x32:
+		    return index + (frame % 8) + 1;
+
+		// barrier
+		case 0x3C:
+		case 0x42:
+		case 0x48:
+		case 0x4E:
+		case 0x54:
+		case 0x5A:
+		case 0x60:
+		case 0x66:
+		    return index + (frame % 4) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
 
 	default:
 	    break;

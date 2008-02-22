@@ -31,8 +31,8 @@ public:
 
     const Rect & GetRect(void) const{ return pos; }
 
-    void Redraw(void);
-    void UpdatePosition(void);
+    void RedrawArea(void);
+    void RedrawCursor(void);
 
     static void DrawCursor(Surface &surface);
 

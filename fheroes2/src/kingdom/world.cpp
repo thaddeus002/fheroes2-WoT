@@ -854,23 +854,20 @@ void World::LoadMaps(const std::string &filename)
 
     // play with debug hero
     if(H2Config::Debug())
-	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
-	    if((*vec_kingdoms[ii]).isPlay() && Settings::Get().MyColor() == (*vec_kingdoms[ii]).GetColor())
-	    {
-		// get first castle position
-		const Kingdom & kingdom = *(vec_kingdoms[ii]);
-		const Castle & castle = *(kingdom.GetCastles().at(0));
+    {
+	// get first castle position
+	const Kingdom & kingdom = GetMyKingdom();
+	const Castle & castle = *(kingdom.GetCastles().at(0));
+	const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
 
-		// place hero
-		if((*vec_heroes[Heroes::SANDYSANDY]).isFreeman())
-		{
-		    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
+	// place hero
+	if(hero && (*hero).isFreeman())
+	{
+	    const_cast<Heroes &>(*hero).Recruit(castle);
 
-		    const_cast<Heroes &>(*hero).Recruit(castle);
-
-		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
-		}
-	    }
+	    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
+	}
+    }
     else
     // play with hero
     if(Settings::Get().FileInfo().PlayWithHeroes())

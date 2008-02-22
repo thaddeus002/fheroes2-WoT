@@ -67,14 +67,21 @@ bool LocalEvent::HandleEvents(void)
 
 	// mouse motion
 	if(SDL_MOUSEMOTION == event.type)
-	    HandleMouseMotionEvent(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+	    HandleMouseMotionEvent(event.motion);
 
 	// mouse button
-	if(SDL_MOUSEBUTTONDOWN == event.type)
-	    HandleMouseButtonEvent(event.button.button, event.button.x, event.button.y, true);
-	else
-	if(SDL_MOUSEBUTTONUP == event.type)
-	    HandleMouseButtonEvent(event.button.button, event.button.x, event.button.y, false);
+	if(SDL_MOUSEBUTTONDOWN == event.type || SDL_MOUSEBUTTONUP == event.type)
+	{
+	    // mouse wheel
+	    if(SDL_BUTTON_WHEELDOWN == event.button.button || SDL_BUTTON_WHEELUP == event.button.button)
+	    {
+		HandleMouseWheelEvent(event.button);
+		
+		break;
+	    }
+	    else
+		HandleMouseButtonEvent(event.button);
+	}
 
 	// exit
 	if(SDL_QUIT == event.type){ Error::Except(" quit event: ok."); return false; }
@@ -91,66 +98,88 @@ void LocalEvent::HandleKeyboardEvent(SDL_keysym & keysym, bool pressed)
     key_value = keysym.sym;
 }
 
-void LocalEvent::HandleMouseMotionEvent(u8 state, u16 x, u16 y, s16 xrel, s16 yrel)
+void LocalEvent::HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion)
 {
-    mouse_state = state;
+    mouse_state = motion.state;
     mouse_motion = true;
-    mouse_cu.x = x;
-    mouse_cu.y = y;
+    mouse_cu.x = motion.x;
+    mouse_cu.y = motion.y;
 }
 
-void LocalEvent::HandleMouseButtonEvent(u8 button, u16 x, u16 y, bool pressed)
+void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
 {
-    mouse_pressed = pressed;
-    mouse_button = button;
+    mouse_pressed = (button.state == SDL_PRESSED);
+    mouse_button = button.button;
 
-    mouse_cu.x = x;
-    mouse_cu.y = y;
+    mouse_cu.x = button.x;
+    mouse_cu.y = button.y;
     
-    if(pressed)
-	switch(button)
+    if(mouse_pressed)
+	switch(button.button)
 	{
 	    case SDL_BUTTON_LEFT:
-		mouse_pl.x = x;
-		mouse_pl.y = y;
+		mouse_pl.x = button.x;
+		mouse_pl.y = button.y;
 		break;
 
 	    case SDL_BUTTON_MIDDLE:
-		mouse_pm.x = x;
-		mouse_pm.y = y;
+		mouse_pm.x = button.x;
+		mouse_pm.y = button.y;
 		break;
 
+
 	    case SDL_BUTTON_RIGHT:
-		mouse_pr.x = x;
-		mouse_pr.y = y;
+		mouse_pr.x = button.x;
+		mouse_pr.y = button.y;
 		break;
 
 	    default:
 		break;
 	}
     else
-	switch(button)
+	switch(button.button)
 	{
 	    case SDL_BUTTON_LEFT:
-		mouse_rl.x = x;
-		mouse_rl.y = y;
+		mouse_rl.x = button.x;
+		mouse_rl.y = button.y;
 		break;
 
 	    case SDL_BUTTON_MIDDLE:
-		mouse_rm.x = x;
-		mouse_rm.y = y;
+		mouse_rm.x = button.x;
+		mouse_rm.y = button.y;
 		break;
 
+
 	    case SDL_BUTTON_RIGHT:
-		mouse_rr.x = x;
-		mouse_rr.y = y;
+		mouse_rr.x = button.x;
+		mouse_rr.y = button.y;
 		break;
 
 	    default:
 		break;
 	}
 }
-    
+
+void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
+{
+    mouse_pressed = (button.state == SDL_PRESSED);
+    mouse_button = button.button;
+
+    mouse_cu.x = button.x;
+    mouse_cu.y = button.y;
+
+    if(mouse_pressed)
+    {
+	mouse_pm.x = button.x;
+	mouse_pm.y = button.y;
+    }
+    else
+    {
+	mouse_rm.x = button.x;
+	mouse_rm.y = button.y;
+    }
+}
+
 bool LocalEvent::MouseClickLeft(const Rect &rt)
 {
     if(!MouseLeft() && (rt & mouse_pl) && (rt & mouse_rl))

@@ -51,9 +51,6 @@ Radar::Radar() :
     DrawCursor(spriteCursor);
 }
 
-/* redraw radar */
-void Radar::Redraw(void){ Display::Get().Blit(spriteArea, pos.x, pos.y); }
-
 /* generate mini maps (origin version) */
 void Radar::GenerateOrigin(void)
 {
@@ -198,8 +195,14 @@ void Radar::DrawCursor(Surface &surface)
     surface.Unlock();
 }
 
-void Radar::UpdatePosition(void)
+/* redraw radar area */
+void Radar::RedrawArea(void){ Display::Get().Blit(spriteArea, pos.x, pos.y); }
+
+/* redraw radar cursor */
+void Radar::RedrawCursor(void)
 {
+    cursor.Hide();
     cursor.Move(pos.x + GameArea::GetRect().x * RADARWIDTH / world.w(),
                 pos.y + GameArea::GetRect().y * RADARWIDTH / world.h());
+    cursor.Show();
 }

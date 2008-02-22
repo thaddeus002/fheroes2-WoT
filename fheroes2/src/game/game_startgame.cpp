@@ -68,10 +68,7 @@ Game::menu_t Game::StartGame(void)
     Radar radar;
 
     areaMaps.Redraw();
-    radar.Redraw();
-
-    // Create radar cursor
-    radar.UpdatePosition();
+    radar.RedrawArea();
 
     //
     const ICN::icn_t icnscroll = H2Config::EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
@@ -274,7 +271,7 @@ Game::menu_t Game::StartGame(void)
 
     // center to focus
     areaMaps.Center(globalfocus.center);
-    radar.UpdatePosition();
+    radar.RedrawCursor();
 
     // status window
     Game::StatusWindow statusWindow(pt_stw, myKingdom);
@@ -312,7 +309,7 @@ Game::menu_t Game::StartGame(void)
 	    cursor.Hide();
 	    cursor.SetThemes(cursor.SCROLL_LEFT);
 	    areaMaps.Scroll(GameArea::LEFT);
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
@@ -323,7 +320,7 @@ Game::menu_t Game::StartGame(void)
 	    cursor.Hide();
 	    cursor.SetThemes(cursor.SCROLL_RIGHT);
 	    areaMaps.Scroll(GameArea::RIGHT);
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
@@ -334,7 +331,7 @@ Game::menu_t Game::StartGame(void)
 	    cursor.Hide();
 	    cursor.SetThemes(cursor.SCROLL_TOP);
 	    areaMaps.Scroll(GameArea::TOP);
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
@@ -344,7 +341,7 @@ Game::menu_t Game::StartGame(void)
 	    cursor.Hide();
 	    cursor.SetThemes(cursor.SCROLL_BOTTOM);
 	    areaMaps.Scroll(GameArea::BOTTOM);
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
@@ -415,6 +412,7 @@ Game::menu_t Game::StartGame(void)
 				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
+					    splitHeroes.Move(selectHeroes.GetTopIndex());
 				    	    const_cast<Route &>(path).Reset();
 					    cursor.Show();
 					    display.Flip();
@@ -474,6 +472,7 @@ Game::menu_t Game::StartGame(void)
 					{
 					    path.Hide();
 					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
+					    splitCastles.Move(selectCastles.GetTopIndex());
 					    display.Flip();
 					}
 				    }
@@ -512,6 +511,7 @@ Game::menu_t Game::StartGame(void)
 				    		const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
 				    		globalfocus.center = heroes->GetCenter();
     						FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
+						splitHeroes.Move(selectHeroes.GetTopIndex());
 				    		const_cast<Route &>(path).Reset();
 						cursor.Show();
 						display.Flip();
@@ -569,6 +569,7 @@ Game::menu_t Game::StartGame(void)
 				    	    const_cast<Route &>(path).Reset();
 				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
+					    splitHeroes.Move(selectHeroes.GetTopIndex());
 					    cursor.Show();
 					    display.Flip();
 
@@ -1011,6 +1012,7 @@ Game::menu_t Game::StartGame(void)
 					{
 					    path.Hide();
 					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
+					    splitCastles.Move(selectCastles.GetTopIndex());
 					    display.Flip();
 					}
 				    }
@@ -1113,6 +1115,7 @@ Game::menu_t Game::StartGame(void)
 						path.Hide();
 					    }
 					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
+					    splitCastles.Move(selectCastles.GetTopIndex());
 					    display.Flip();
 					}
 				    }
@@ -1258,7 +1261,7 @@ Game::menu_t Game::StartGame(void)
 	    areaMaps.CenterFromRadar(le.MouseCursor());
 	    if(prev != areaMaps.GetRect()){
 		cursor.Hide();
-		radar.UpdatePosition();
+		radar.RedrawCursor();
 		cursor.Show();
 		display.Flip();
 	    }
@@ -1669,14 +1672,13 @@ void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
     SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
     SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
 
-    selectCastles.Reset();
     selectHeroes.Reset();
 
     globalfocus.type = Game::CASTLE;
     globalfocus.center = castle->GetCenter();
 
     areaMaps.Center(globalfocus.center);
-    radar.UpdatePosition();
+    radar.RedrawCursor();
 
     selectCastles.SelectFromCenter(castle->GetCenter());
     selectCastles.Redraw();
@@ -1752,13 +1754,12 @@ void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
     SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
 
     selectCastles.Reset();
-    selectHeroes.Reset();
 
     globalfocus.type = Game::HEROES;
     globalfocus.center = hero->GetCenter();
 
     areaMaps.Center(globalfocus.center);
-    radar.UpdatePosition();
+    radar.RedrawCursor();
 
     selectHeroes.SelectFromCenter(hero->GetCenter());
     selectHeroes.Redraw();

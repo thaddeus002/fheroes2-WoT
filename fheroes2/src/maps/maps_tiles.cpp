@@ -860,7 +860,108 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_RNDARTIFACT1:	return MP2::OBJ_RNDARTIFACT1;
 	case MP2::OBJ_RNDARTIFACT2:	return MP2::OBJ_RNDARTIFACT2;
 	case MP2::OBJ_RNDARTIFACT3:	return MP2::OBJ_RNDARTIFACT3;
-	
+
+
+        // loyality version
+        case MP2::OBJN_JAIL:		return MP2::OBJN_JAIL;
+        case MP2::OBJ_JAIL:		return MP2::OBJ_JAIL;
+        case MP2::OBJN_TRAVELLERTENT:	return MP2::OBJN_TRAVELLERTENT;
+        case MP2::OBJ_TRAVELLERTENT:	return MP2::OBJ_TRAVELLERTENT;
+        case MP2::OBJ_BARRIER:		return MP2::OBJ_BARRIER;
+    
+
+
+
+	case MP2::OBJ_UNKNW_02:		return MP2::OBJ_UNKNW_02;
+	case MP2::OBJ_UNKNW_03:		return MP2::OBJ_UNKNW_03;
+	case MP2::OBJ_UNKNW_04:		return MP2::OBJ_UNKNW_04;
+	case MP2::OBJ_UNKNW_06:		return MP2::OBJ_UNKNW_06;
+	case MP2::OBJ_UNKNW_08:		return MP2::OBJ_UNKNW_08;
+	case MP2::OBJ_UNKNW_09:		return MP2::OBJ_UNKNW_09;
+	case MP2::OBJ_UNKNW_0B:		return MP2::OBJ_UNKNW_0B;
+	case MP2::OBJ_UNKNW_0E:		return MP2::OBJ_UNKNW_0E;
+	case MP2::OBJ_UNKNW_11:		return MP2::OBJ_UNKNW_11;
+	case MP2::OBJ_UNKNW_12:		return MP2::OBJ_UNKNW_12;
+	case MP2::OBJ_UNKNW_13:		return MP2::OBJ_UNKNW_13;
+	case MP2::OBJ_UNKNW_18:		return MP2::OBJ_UNKNW_18;
+	case MP2::OBJ_UNKNW_1B:		return MP2::OBJ_UNKNW_1B;
+	case MP2::OBJ_UNKNW_1F:		return MP2::OBJ_UNKNW_1F;
+	case MP2::OBJ_UNKNW_21:		return MP2::OBJ_UNKNW_21;
+	case MP2::OBJ_UNKNW_26:		return MP2::OBJ_UNKNW_26;
+	case MP2::OBJ_UNKNW_27:		return MP2::OBJ_UNKNW_27;
+	case MP2::OBJ_UNKNW_29:		return MP2::OBJ_UNKNW_29;
+	case MP2::OBJ_UNKNW_2A:		return MP2::OBJ_UNKNW_2A;
+	case MP2::OBJ_UNKNW_2B:		return MP2::OBJ_UNKNW_2B;
+	case MP2::OBJ_UNKNW_2C:		return MP2::OBJ_UNKNW_2C;
+	case MP2::OBJ_UNKNW_2D:		return MP2::OBJ_UNKNW_2D;
+	case MP2::OBJ_UNKNW_2E:		return MP2::OBJ_UNKNW_2E;
+	case MP2::OBJ_UNKNW_2F:		return MP2::OBJ_UNKNW_2F;
+	case MP2::OBJ_UNKNW_32:		return MP2::OBJ_UNKNW_32;
+	case MP2::OBJ_UNKNW_33:		return MP2::OBJ_UNKNW_33;
+	case MP2::OBJ_UNKNW_34:		return MP2::OBJ_UNKNW_34;
+	case MP2::OBJ_UNKNW_35:		return MP2::OBJ_UNKNW_35;
+	case MP2::OBJ_UNKNW_36:		return MP2::OBJ_UNKNW_36;
+	case MP2::OBJ_UNKNW_37:		return MP2::OBJ_UNKNW_37;
+	case MP2::OBJ_UNKNW_41:		return MP2::OBJ_UNKNW_41;
+	case MP2::OBJ_UNKNW_42:		return MP2::OBJ_UNKNW_42;
+	case MP2::OBJ_UNKNW_43:		return MP2::OBJ_UNKNW_43;
+	case MP2::OBJ_UNKNW_4A:		return MP2::OBJ_UNKNW_4A;
+	case MP2::OBJ_UNKNW_4B:		return MP2::OBJ_UNKNW_4B;
+	case MP2::OBJ_UNKNW_50:		return MP2::OBJ_UNKNW_50;
+	case MP2::OBJ_UNKNW_58:		return MP2::OBJ_UNKNW_58;
+	case MP2::OBJ_UNKNW_5A:		return MP2::OBJ_UNKNW_5A;
+	case MP2::OBJ_UNKNW_5C:		return MP2::OBJ_UNKNW_5C;
+	case MP2::OBJ_UNKNW_5D:		return MP2::OBJ_UNKNW_5D;
+	case MP2::OBJ_UNKNW_5F:		return MP2::OBJ_UNKNW_5F;
+	case MP2::OBJ_UNKNW_62:		return MP2::OBJ_UNKNW_62;
+	case MP2::OBJ_UNKNW_72:		return MP2::OBJ_UNKNW_72;
+	case MP2::OBJ_UNKNW_73:		return MP2::OBJ_UNKNW_73;
+	case MP2::OBJ_UNKNW_74:		return MP2::OBJ_UNKNW_74;
+	case MP2::OBJ_UNKNW_75:		return MP2::OBJ_UNKNW_75;
+	case MP2::OBJ_UNKNW_76:		return MP2::OBJ_UNKNW_76;
+	case MP2::OBJ_UNKNW_77:		return MP2::OBJ_UNKNW_77;
+	case MP2::OBJ_UNKNW_79:		return MP2::OBJ_UNKNW_79;
+	case MP2::OBJ_UNKNW_7A:		return MP2::OBJ_UNKNW_7A;
+	case MP2::OBJ_UNKNW_7C:		return MP2::OBJ_UNKNW_7C;
+	case MP2::OBJ_UNKNW_7D:		return MP2::OBJ_UNKNW_7D;
+	case MP2::OBJ_UNKNW_7E:		return MP2::OBJ_UNKNW_7E;
+	case MP2::OBJ_UNKNW_7F:		return MP2::OBJ_UNKNW_7F;
+	case MP2::OBJ_UNKNW_80:		return MP2::OBJ_UNKNW_80;
+	case MP2::OBJ_UNKNW_91:		return MP2::OBJ_UNKNW_91;
+	case MP2::OBJ_UNKNW_92:		return MP2::OBJ_UNKNW_92;
+	case MP2::OBJ_UNKNW_A1:		return MP2::OBJ_UNKNW_A1;
+	case MP2::OBJ_UNKNW_A6:		return MP2::OBJ_UNKNW_A6;
+	case MP2::OBJ_UNKNW_AA:		return MP2::OBJ_UNKNW_AA;
+	case MP2::OBJ_UNKNW_B2:		return MP2::OBJ_UNKNW_B2;
+	case MP2::OBJ_UNKNW_B8:		return MP2::OBJ_UNKNW_B8;
+	case MP2::OBJ_UNKNW_B9:		return MP2::OBJ_UNKNW_B9;
+	case MP2::OBJ_UNKNW_D1:		return MP2::OBJ_UNKNW_D1;
+	case MP2::OBJ_UNKNW_E2:		return MP2::OBJ_UNKNW_E2;
+	case MP2::OBJ_UNKNW_E3:		return MP2::OBJ_UNKNW_E3;
+	case MP2::OBJ_UNKNW_E4:		return MP2::OBJ_UNKNW_E4;
+	case MP2::OBJ_UNKNW_E5:		return MP2::OBJ_UNKNW_E5;
+	case MP2::OBJ_UNKNW_E6:		return MP2::OBJ_UNKNW_E6;
+	case MP2::OBJ_UNKNW_E7:		return MP2::OBJ_UNKNW_E7;
+	case MP2::OBJ_UNKNW_E8:		return MP2::OBJ_UNKNW_E8;
+	case MP2::OBJ_UNKNW_E9:		return MP2::OBJ_UNKNW_E9;
+	case MP2::OBJ_UNKNW_EA:		return MP2::OBJ_UNKNW_EA;
+	case MP2::OBJ_UNKNW_EB:		return MP2::OBJ_UNKNW_EB;
+	case MP2::OBJ_UNKNW_EC:		return MP2::OBJ_UNKNW_EC;
+	case MP2::OBJ_UNKNW_ED:		return MP2::OBJ_UNKNW_ED;
+	case MP2::OBJ_UNKNW_EE:		return MP2::OBJ_UNKNW_EE;
+	case MP2::OBJ_UNKNW_EF:		return MP2::OBJ_UNKNW_EF;
+	case MP2::OBJ_UNKNW_F0:		return MP2::OBJ_UNKNW_F0;
+	case MP2::OBJ_UNKNW_F1:		return MP2::OBJ_UNKNW_F1;
+	case MP2::OBJ_UNKNW_F2:		return MP2::OBJ_UNKNW_F2;
+	case MP2::OBJ_UNKNW_F3:		return MP2::OBJ_UNKNW_F3;
+	case MP2::OBJ_UNKNW_F9:		return MP2::OBJ_UNKNW_F9;
+	case MP2::OBJ_UNKNW_FA:		return MP2::OBJ_UNKNW_FA;
+	case MP2::OBJ_UNKNW_FC:		return MP2::OBJ_UNKNW_FC;
+	case MP2::OBJ_UNKNW_FD:		return MP2::OBJ_UNKNW_FD;
+	case MP2::OBJ_UNKNW_FE:		return MP2::OBJ_UNKNW_FE;
+	case MP2::OBJ_UNKNW_FF:		return MP2::OBJ_UNKNW_FF;
+
+
 	default: Error::Warning("Maps::Tiles::GetObject: unknown object: ", general); Error::Warning("maps index: ", maps_index); break;
     }
     

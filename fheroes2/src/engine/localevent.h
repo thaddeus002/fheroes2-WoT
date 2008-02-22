@@ -78,8 +78,9 @@ public:
 private:
     LocalEvent();
 
-    void HandleMouseMotionEvent(u8 state, u16 x, u16 y, s16 xrel, s16 yrel);
-    void HandleMouseButtonEvent(u8 button, u16 x, u16 y, bool pressed);
+    void HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion);
+    void HandleMouseButtonEvent(const SDL_MouseButtonEvent & button);
+    void HandleMouseWheelEvent(const SDL_MouseButtonEvent & button);
 
     void HandleKeyboardEvent(SDL_keysym & keysym, bool pressed);
 

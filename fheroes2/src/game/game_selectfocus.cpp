@@ -209,7 +209,8 @@ void Game::SelectFocusCastles::SelectFromCenter(const Point & pt)
     for(u8 ii = 0; ii < castles->size(); ++ii)
 	if(pt == (*castles->at(ii)).GetCenter())
 	{
-	    top_index = (ii + coords.size() >= castles->size() && castles->size() > coords.size() ?
+	    if(ii < top_index || ii >= top_index + coords.size())
+		top_index = (ii + coords.size() >= castles->size() && castles->size() > coords.size() ?
 	                                                         castles->size() - coords.size() : 0);
 	    cursor_index = ii;
 
@@ -293,7 +294,8 @@ void Game::SelectFocusHeroes::SelectFromCenter(const Point & pt)
     for(u8 ii = 0; ii < heroes->size(); ++ii)
 	if(pt == (*heroes->at(ii)).GetCenter())
 	{
-	    top_index = (ii + coords.size() >= heroes->size() && heroes->size() > coords.size() ?
+	    if(ii < top_index || ii >= top_index + coords.size())
+		top_index = (ii + coords.size() >= heroes->size() && heroes->size() > coords.size() ?
 	                                                        heroes->size() - coords.size() : 0);
 	    cursor_index = ii;
 	    

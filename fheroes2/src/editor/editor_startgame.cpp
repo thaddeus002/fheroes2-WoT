@@ -321,10 +321,10 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
     Radar radar;
 
     areaMaps.Redraw();
-    radar.Redraw();
+    radar.RedrawArea();
 
     // Create radar cursor
-    radar.UpdatePosition();
+    radar.RedrawCursor();
 
     RedrawTopNumberCell(areaMaps.GetRect());
     RedrawLeftNumberCell(areaMaps.GetRect());
@@ -425,7 +425,7 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
 	    cursor.SetThemes(cursor.SCROLL_LEFT);
 	    areaMaps.Scroll(GameArea::LEFT);
 	    split_h.Backward();
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    RedrawTopNumberCell(areaMaps.GetRect());
 	    cursor.Show();
 	    display.Flip();
@@ -440,7 +440,7 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
 	    cursor.SetThemes(cursor.SCROLL_RIGHT);
 	    areaMaps.Scroll(GameArea::RIGHT);
 	    split_h.Forward();
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    RedrawTopNumberCell(areaMaps.GetRect());
 	    cursor.Show();
 	    display.Flip();
@@ -455,7 +455,7 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
 	    cursor.SetThemes(cursor.SCROLL_TOP);
 	    areaMaps.Scroll(GameArea::TOP);
 	    split_v.Backward();
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    RedrawLeftNumberCell(areaMaps.GetRect());
 	    cursor.Show();
 	    display.Flip();
@@ -470,7 +470,7 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
 	    cursor.SetThemes(cursor.SCROLL_BOTTOM);
 	    areaMaps.Scroll(GameArea::BOTTOM);
 	    split_v.Forward();
-	    radar.UpdatePosition();
+	    radar.RedrawCursor();
 	    RedrawLeftNumberCell(areaMaps.GetRect());
 	    cursor.Show();
 	    display.Flip();
@@ -491,7 +491,7 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
 		sizeCursor.Hide();
 		split_h.Move(areaMaps.GetRect().x);
 		split_v.Move(areaMaps.GetRect().y);
-		radar.UpdatePosition();
+		radar.RedrawCursor();
 		RedrawTopNumberCell(areaMaps.GetRect());
 		RedrawLeftNumberCell(areaMaps.GetRect());
 		cursor.Show();
