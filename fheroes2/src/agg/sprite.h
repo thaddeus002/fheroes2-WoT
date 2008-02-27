@@ -29,12 +29,12 @@ class Sprite : public Surface
 
 public:
     /* icn sprite constructor */
-    Sprite(const ICN::Header & header, const char *data, u32 size);
+    Sprite(const ICN::Header & header, const char *data, u32 size, bool reflect = false);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };
 
-    static void DrawICN(Surface & sf, u32 size, const u8 *vdata);
+    static void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool reflect);
 
 private:
     s16		offsetX;

@@ -387,12 +387,13 @@ Game::menu_t Game::StartGame(void)
 				    if(path.Length()) path.Hide();
 				    const_cast<Route &>(path).Calculate(new_dst_point);
 				    path.Show();
+				    world.GetTiles((*heroes).GetCenter()).Redraw();
 				    cursor.Show();
 				    display.Flip();
 				}
 				else
 				{
-				    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
+				    //const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
 
 				    if(path.GetDestinationIndex() != new_dst_point)
 				    {
@@ -400,6 +401,7 @@ Game::menu_t Game::StartGame(void)
 					if(path.Length()) path.Hide();
 					const_cast<Route &>(path).Calculate(new_dst_point);
 					path.Show();
+					world.GetTiles((*heroes).GetCenter()).Redraw();
 					cursor.Show();
 					display.Flip();
 				    }
@@ -499,6 +501,7 @@ Game::menu_t Game::StartGame(void)
 					    if(path.Length()) path.Hide();
 					    const_cast<Route &>(path).Calculate(new_dst_point);
 					    path.Show();
+					    world.GetTiles((*heroes).GetCenter()).Redraw();
 					    cursor.Show();
 					    display.Flip();
 					}
@@ -558,6 +561,7 @@ Game::menu_t Game::StartGame(void)
 					    if(path.Length()) path.Hide();
 					    const_cast<Route &>(path).Calculate(new_dst_point);
 					    path.Show();
+					    world.GetTiles((*heroes).GetCenter()).Redraw();
 					    cursor.Show();
 					    display.Flip();
 					}
@@ -608,6 +612,7 @@ Game::menu_t Game::StartGame(void)
 					    if(path.Length()) path.Hide();
 					    const_cast<Route &>(path).Calculate(new_dst_point);
 					    path.Show();
+					    world.GetTiles((*heroes).GetCenter()).Redraw();
 					    cursor.Show();
 					    display.Flip();
 					}
@@ -678,6 +683,7 @@ Game::menu_t Game::StartGame(void)
 						if(path.Length()) path.Hide();
 						const_cast<Route &>(path).Calculate(new_dst_point);
 						path.Show();
+						world.GetTiles((*heroes).GetCenter()).Redraw();
 						cursor.Show();
 						display.Flip();
 					    }
@@ -731,6 +737,7 @@ Game::menu_t Game::StartGame(void)
 					    if(path.Length()) path.Hide();
 					    const_cast<Route &>(path).Calculate(new_dst_point);
 					    path.Show();
+					    world.GetTiles((*heroes).GetCenter()).Redraw();
 					    cursor.Show();
 					    display.Flip();
 					}
@@ -793,6 +800,7 @@ Game::menu_t Game::StartGame(void)
 					if(path.Length()) path.Hide();
 					const_cast<Route &>(path).Calculate(new_dst_point);
 					path.Show();
+					world.GetTiles((*heroes).GetCenter()).Redraw();
 					cursor.Show();
 					display.Flip();
 				    }
@@ -903,6 +911,7 @@ Game::menu_t Game::StartGame(void)
 					if(path.Length()) path.Hide();
 					const_cast<Route &>(path).Calculate(new_dst_point);
 					path.Show();
+					world.GetTiles((*heroes).GetCenter()).Redraw();
 					cursor.Show();
 					display.Flip();
 				    }
@@ -952,6 +961,7 @@ Game::menu_t Game::StartGame(void)
 					if(path.Length()) path.Hide();
 					const_cast<Route &>(path).Calculate(new_dst_point);
 					path.Show();
+					world.GetTiles((*heroes).GetCenter()).Redraw();
 					cursor.Show();
 					display.Flip();
 				    }
@@ -1181,6 +1191,7 @@ Game::menu_t Game::StartGame(void)
 					    {
 						cursor.Hide();
 						path.Show();
+						world.GetTiles((*heroes).GetCenter()).Redraw();
 						cursor.Show();
 					    }
 
@@ -1411,6 +1422,7 @@ Game::menu_t Game::StartGame(void)
 			    {
 				cursor.Hide();
 				path.Show();
+				world.GetTiles((*hero).GetCenter()).Redraw();
 				cursor.Show();
 			    }
 

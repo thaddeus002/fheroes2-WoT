@@ -36,12 +36,13 @@
 #include "artifact.h"
 #include "route.h"
 #include "object.h"
+#include "direction.h"
 #include "gamedefs.h"
 
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXSKILL		8
 #define HEROESMAXARMY		5
-#define HEROESMAXCOUNT		70
+#define HEROESMAXCOUNT		71
 
 /*
 #define SCOUTINGBASE		4
@@ -146,6 +147,8 @@ public:
 
     const Route & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
+    
+    Direction::vector_t GetDirection(void) const{ return direction; };
 
     void SetVisited(const u32 index);
     void SetCenter(const Point& pt){ mp = pt; };
@@ -174,6 +177,8 @@ private:
 
     Point		mp;
     Route		path;
+
+    Direction::vector_t direction;
 
     std::list<Maps::VisitIndexObject> visit_object;
 };

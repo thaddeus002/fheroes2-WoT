@@ -81,15 +81,15 @@ namespace AGG
 
 	bool AttachFile(const std::string & fname);
 
-	const Sprite & GetICN(const ICN::icn_t icn, u16 index);
+	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
 	const Surface & GetTIL(const TIL::til_t til, u16 index);
 	const Palette & GetPAL(void);
 
-	void LoadICN(const ICN::icn_t icn);
+	void LoadICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
 	void LoadPAL(void);
 
-	void FreeICN(const ICN::icn_t icn);
+	void FreeICN(const ICN::icn_t icn, bool reflect = false);
 	void FreeTIL(const TIL::til_t til);
 
     private:
@@ -98,6 +98,7 @@ namespace AGG
 	std::vector<File *> agg_cache;
 
 	std::map<ICN::icn_t, std::vector<Sprite *> > icn_cache;
+	std::map<ICN::icn_t, std::vector<Sprite *> > reflect_icn_cache;
 	std::map<TIL::til_t, std::vector<Surface *> > til_cache;
 
 	Palette palette;
@@ -105,15 +106,15 @@ namespace AGG
     };
 
     // wrapper AGG::PreloadObject
-    void PreloadObject(const ICN::icn_t icn);
+    void PreloadObject(const ICN::icn_t icn, bool reflect = false);
     void PreloadObject(const TIL::til_t til);
 
     // wrapper AGG::FreeObject
-    void FreeObject(const ICN::icn_t icn);
+    void FreeObject(const ICN::icn_t icn, bool reflect = false);
     void FreeObject(const TIL::til_t til);
 
     // wrapper AGG::GetXXX
-    const Sprite & GetICN(const ICN::icn_t icn, const u16 index);
+    const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
     void GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst);
 
     // wrapper AGG::GetColor

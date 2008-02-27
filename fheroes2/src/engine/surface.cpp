@@ -215,6 +215,75 @@ void Surface::SetPixel(u16 x, u16 y, u32 color)
     }
 }
 
+u32 Surface::GetPixel4(u16 x, u16 y)
+{
+    if(x > surface->w || y > surface->h) return 0;
+    
+    u32 *bufp = static_cast<u32 *>(surface->pixels) + y * surface->pitch / 4 + x;
+
+    return *bufp;
+}
+
+u32 Surface::GetPixel3(u16 x, u16 y)
+{
+    if(x > surface->w || y > surface->h) return 0;
+
+    u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x * 3; 
+
+    u32 color = 0;
+
+    if(SDL_BYTEORDER == SDL_LIL_ENDIAN)
+    {
+        color |= bufp[2];
+        color <<= 8;
+        color |= bufp[1];
+        color <<= 8;
+        color |= bufp[0];
+    }
+    else
+    { 
+        color |= bufp[0];
+        color <<= 8;
+        color |= bufp[1];
+        color <<= 8;
+        color |= bufp[2];
+    }
+    
+    return color;
+}
+
+u32 Surface::GetPixel2(u16 x, u16 y)
+{
+    if(x > surface->w || y > surface->h) return 0;
+    
+    u16 *bufp = static_cast<u16 *>(surface->pixels) + y * surface->pitch / 2 + x;
+
+    return static_cast<u32>(*bufp);
+}
+
+u32 Surface::GetPixel1(u16 x, u16 y)
+{
+    if(x > surface->w || y > surface->h) return 0;
+
+    u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x;
+
+    return static_cast<u32>(*bufp);
+}
+
+u32 Surface::GetPixel(u16 x, u16 y)
+{
+    switch(surface->format->BytesPerPixel)
+    {
+	case 1:	return GetPixel1(x, y);
+	case 2:	return GetPixel2(x, y);
+	case 3:	return GetPixel3(x, y);
+	case 4:	return GetPixel4(x, y);
+	default: break;
+    }
+    
+    return 0;
+}
+
 /* fill colors surface */
 void Surface::Fill(u32 color)
 {

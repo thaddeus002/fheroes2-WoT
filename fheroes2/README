@@ -15,11 +15,11 @@ Copy maps files (*.mp2) in to maps directory.
 
 Default config fheroes2.cfg options:
 #
-# path to heroes2.agg
-# aggfile = data/heroes2.agg
+# path to directory data
+# data = data
 #
-# directory maps
-# directorymaps = maps
+# path to directory maps
+# maps = maps
 #
 # sound: on off
 # sound = off

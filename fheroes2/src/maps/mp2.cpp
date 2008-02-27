@@ -27,11 +27,6 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 {
     switch(type)
     {
-	// FIXME: LOYALITY VERSION:
-	// ICN::X_LOC1
-	// ICN::X_LOC2
-	// ICN::X_LOC3
-
 	// artifact
 	case 0x2C:
 	case 0x2D:
@@ -608,23 +603,15 @@ const char * MP2::StringObject(u8 object)
     return "";
 }
 
-u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
+u8 MP2::GetAnimationFrame(const ICN::icn_t & icn, u8 index, u32 frame)
 {
-    switch(object)
+    switch(icn)
     {
-	// minimon
-	case 0x30:
-	case 0x31:
-	case 0x32:
-	case 0x33:
+	case ICN::MONS32:
 
 	    return index % 9 ? 0 : index + (frame % 6) + 1;
 
-	// objnwatr
-	case 0xC8:
-	case 0xC9:
-	case 0xCA:
-	case 0xCB:
+	case ICN::OBJNWATR:
 
 	    switch(index)
 	    {
@@ -685,11 +672,7 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 	    }
 	    break;
 
-	// objnwtr2
-	case 0xA0:
-	case 0xA1:
-	case 0xA2:
-	case 0xA3:
+	case ICN::OBJNWAT2:
 
 	    switch(index)
 	    {
@@ -701,12 +684,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objncrck
-	case 0xE4:
-	case 0xE5:
-	case 0xE6:
-	case 0xE7:
+	case ICN::OBJNCRCK:
 
 	    switch(index)
 	    {
@@ -729,12 +709,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objndirt
-	case 0xE0:
-	case 0xE1:
-	case 0xE2:
-	case 0xE3:
+	case ICN::OBJNDIRT:
 
 	    switch(index)
 	    {
@@ -754,12 +731,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objndsrt
-	case 0xDC:
-	case 0xDD:
-	case 0xDE:
-	case 0xDF:
+	case ICN::OBJNDSRT:
 
 	    switch(index)
 	    {
@@ -771,12 +745,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objngras
-	case 0xC0:
-	case 0xC1:
-	case 0xC2:
-	case 0xC3:
+	case ICN::OBJNGRA2:
 
 	    switch(index)
 	    {
@@ -810,14 +781,10 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 
 		default:
 		    return 0;
-		    break;
 	    }
+	    break;
 
-	// objnlav2
-	case 0xF0:
-	case 0xF1:
-	case 0xF2:
-	case 0xF3:
+	case ICN::OBJNLAV2:
 
 	    switch(index)
 	    {
@@ -842,12 +809,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objnlav3
-	case 0xE8:
-	case 0xE9:
-	case 0xEA:
-	case 0xEB:
+	case ICN::OBJNLAV3:
 
 	    // big volcano
 	    switch(index)
@@ -875,12 +839,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objnlava
-	case 0xD8:
-	case 0xD9:
-	case 0xDA:
-	case 0xDB:
+	case ICN::OBJNLAVA:
 
 	    switch(index)
 	    {
@@ -893,12 +854,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objnmul2
-	case 0xA4:
-	case 0xA5:
-	case 0xA6:
-	case 0xA7:
+	case ICN::OBJNMUL2:
 
 	    switch(index)
 	    {
@@ -929,13 +887,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
-	    
+	    break;
 
-	// objnmult
-	case 0xEC:
-	case 0xED:
-	case 0xEE:
-	case 0xEF:
+	case ICN::OBJNMULT:
 
 	    switch(index)
 	    {
@@ -965,12 +919,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objnsnow
-	case 0xD0:
-	case 0xD1:
-	case 0xD2:
-	case 0xD3:
+	case ICN::OBJNSNOW:
 
 	    switch(index)
 	    {
@@ -1001,12 +952,9 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
+	    break;
 
-	// objnswamp
-	case 0xD4:
-	case 0xD5:
-	case 0xD6:
-	case 0xD7:
+	case ICN::OBJNSWMP:
 
 	    switch(index)
 	    {
@@ -1028,95 +976,90 @@ u8 MP2::GetAnimationFrame(u8 object, u8 index, u32 frame)
 		default:
 		    return 0;
 	    }
-
-	// x_loc1: extra objects for loyalty version
-	case 0xF4:
-	case 0xF5:
-	case 0xF6:
-	case 0xF7:
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
-	    switch(index)
-	    {
-		// alchemist tower
-		case 0x04:
-		case 0x0D:
-		case 0x16:
-		// arena
-		case 0x1F:
-		case 0x28:
-		case 0x32:
-		case 0x3B:
-		// earth altar
-		case 0x55:
-		case 0x5E:
-		case 0x67:
-		    return index + (frame % 8) + 1;
-
-		default:
-		    return 0;
-	    }
 	    break;
 
-	// x_loc2: extra objects for loyalty version
-	case 0xF8:
-	case 0xF9:
-	case 0xFA:
-	case 0xFB:
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
-	    switch(index)
-	    {
-		// mermaid
-		case 0x0A:
-		case 0x13:
-		case 0x1C:
-		case 0x25:
-		// sirens
-		case 0x2F:
-		case 0x38:
-		case 0x41:
-		case 0x4A:
-		case 0x53:
-		case 0x5C:
-		case 0x66:
-		    return index + (frame % 8) + 1;
+	// extra objects for loyalty version
+	case ICN::X_LOC1:
 
-		default:
-		    return 0;
-	    }
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+		switch(index)
+		{
+		    // alchemist tower
+		    case 0x04:
+	    	    case 0x0D:
+		    case 0x16:
+		    // arena
+		    case 0x1F:
+		    case 0x28:
+		    case 0x32:
+		    case 0x3B:
+		    // earth altar
+		    case 0x55:
+		    case 0x5E:
+		    case 0x67:
+			return index + (frame % 8) + 1;
+
+		    default:
+			return 0;
+		}
 	    break;
 
-	// x_loc3: extra objects for loyalty version
-	case 0xFC:
-	case 0xFD:
-	case 0xFE:
-	case 0xFF:
+	// extra objects for loyalty version
+	case ICN::X_LOC2:
+
 	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
-	    switch(index)
-	    {
-		// hut magi
-		case 0x00:
-		case 0x0A:
-		case 0x14:
-		// eye magi
-		case 0x20:
-		case 0x29:
-		case 0x32:
-		    return index + (frame % 8) + 1;
+		switch(index)
+		{
+		    // mermaid
+		    case 0x0A:
+		    case 0x13:
+		    case 0x1C:
+		    case 0x25:
+		    // sirens
+		    case 0x2F:
+		    case 0x38:
+		    case 0x41:
+		    case 0x4A:
+		    case 0x53:
+		    case 0x5C:
+		    case 0x66:
+		        return index + (frame % 8) + 1;
 
-		// barrier
-		case 0x3C:
-		case 0x42:
-		case 0x48:
-		case 0x4E:
-		case 0x54:
-		case 0x5A:
-		case 0x60:
-		case 0x66:
-		    return index + (frame % 4) + 1;
+		    default:
+			return 0;
+		}
+	    break;
 
-		default:
-		    return 0;
-	    }
+	// extra objects for loyalty version
+	case ICN::X_LOC3:
+
+	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+		switch(index)
+	        {
+		    // hut magi
+		    case 0x00:
+		    case 0x0A:
+		    case 0x14:
+		    // eye magi
+		    case 0x20:
+		    case 0x29:
+		    case 0x32:
+		        return index + (frame % 8) + 1;
+
+		    // barrier
+		    case 0x3C:
+		    case 0x42:
+		    case 0x48:
+		    case 0x4E:
+		    case 0x54:
+		    case 0x5A:
+		    case 0x60:
+		    case 0x66:
+		        return index + (frame % 4) + 1;
+
+		    default:
+			return 0;
+		}
 	    break;
 
 	default:

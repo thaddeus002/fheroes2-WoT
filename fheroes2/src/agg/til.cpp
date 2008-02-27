@@ -58,11 +58,12 @@ void TIL::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
     }
 
     const u8 tile_width = sf_src.w();
+    const u8 tile_height = sf_src.h();
 
     // valid sf_dst
-    if(!sf_dst.valid() || sf_dst.w() != tile_width || sf_dst.h() != tile_width)
+    if(!sf_dst.valid() || sf_dst.w() != tile_width || sf_dst.h() != tile_height)
     {
-        sf_dst = Surface(tile_width, tile_width, 8, SDL_SWSURFACE);
+        sf_dst = Surface(tile_width, tile_height, 8, SDL_SWSURFACE);
         sf_dst.LoadPalette(AGG::Cache::Get().GetPAL());
     }
 
@@ -80,15 +81,15 @@ void TIL::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
     {
         // normal
 	case 0:
-	    memcpy(dst, src, tile_width * tile_width);
+	    memcpy(dst, src, tile_width * tile_height);
             break;
 
         // vertical reflect
         case 1:
 	{
-	    dst2 = dst + tile_width * (tile_width - 1);
+	    dst2 = dst + tile_width * (tile_height - 1);
 
-	    for(int i = 0; i < tile_width; i++)
+	    for(int i = 0; i < tile_height; i++)
 	    {
     		memcpy(dst2, src, tile_width);
 
@@ -100,7 +101,7 @@ void TIL::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
 
         // horizontal reflect
         case 2:
-            for(y = 0; y < tile_width; ++y)
+            for(y = 0; y < tile_height; ++y)
                 for(x = tile_width - 1; x >= 0; --x)
                 {
 		    dst2 = dst + y * tile_width + x;
@@ -111,7 +112,7 @@ void TIL::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
 
         // any variant
         case 3:
-            for(y = tile_width - 1; y >= 0; --y)
+            for(y = tile_height - 1; y >= 0; --y)
                 for( x = tile_width - 1; x >= 0; --x)
                 {
 		    dst2 = dst + y * tile_width + x;

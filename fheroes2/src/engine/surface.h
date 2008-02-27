@@ -81,6 +81,12 @@ public:
     void SetPixel1(u16 x, u16 y, u8 color);
     void SetPixel(u16 x, u16 y, u32 color);
 
+    u32 GetPixel4(u16 x, u16 y);
+    u32 GetPixel3(u16 x, u16 y);
+    u32 GetPixel2(u16 x, u16 y);
+    u32 GetPixel1(u16 x, u16 y);
+    u32 GetPixel(u16 x, u16 y);
+
     void Lock(void){ if(SDL_MUSTLOCK(surface)) SDL_LockSurface(surface); };
     void Unlock(void){ if(SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface); };
 

@@ -28,7 +28,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_ZERO), path(*this)
+    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -913,6 +913,9 @@ void Heroes::Goto(u16 dst_index)
 	tiles_old.Redraw();
     }
 
+
+    //
+    direction = 2 > path.Get().size() ? Direction::Get(Maps::GetIndexFromAbsPoint(mp), path.GetDestinationIndex()) : Direction::Get(path.NextToLast(), path.GetDestinationIndex());
 
     // redraw sprite move hero
     // center area maps

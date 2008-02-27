@@ -180,6 +180,23 @@ AGG::Cache::~Cache()
 	}
     }
 
+    // free icn reflect cache
+    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator reflect_icn_it1 = reflect_icn_cache.begin();
+    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator reflect_icn_it2 = reflect_icn_cache.end();
+
+    for(; reflect_icn_it1 != reflect_icn_it2; ++reflect_icn_it1)
+    {
+	const std::vector<Sprite *> & v = (*reflect_icn_it1).second;
+
+	if(v.size())
+	{
+	    std::vector<Sprite *>::const_iterator it1 = v.begin();
+	    std::vector<Sprite *>::const_iterator it2 = v.end();
+
+	    for(; it1 != it2; ++it1) delete *it1;
+	}
+    }
+
     // free til cache
     std::map<TIL::til_t, std::vector<Surface *> >::const_iterator til_it1 = til_cache.begin();
     std::map<TIL::til_t, std::vector<Surface *> >::const_iterator til_it2 = til_cache.end();
@@ -239,9 +256,9 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 }
 
 /* load ICN object to AGG::Cache */
-void AGG::Cache::LoadICN(const ICN::icn_t icn)
+void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 {
-    std::vector<Sprite *> & v = icn_cache[icn];
+    std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
     if(v.size()) return;
 
@@ -284,7 +301,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn)
 
 		    const u32 size_data = (ii + 1 != count_sprite ? icn_headers[ii + 1].OffsetData() - header.OffsetData() : total_size - header.OffsetData());
 
-		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data);
+		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data, reflect);
 		}
 
 		return;
@@ -387,11 +404,11 @@ void AGG::Cache::LoadPAL(void)
 }
 
 /* free ICN object in AGG::Cache */
-void AGG::Cache::FreeICN(const ICN::icn_t icn)
+void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 {
     if(H2Config::Debug()) Error::Verbose("AGG::Cache::FreeICN: " + ICN::GetString(icn));
 
-    std::vector<Sprite *> & v = icn_cache[icn];
+    std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
     if(v.size())
     {
@@ -423,11 +440,11 @@ void AGG::Cache::FreeTIL(const TIL::til_t til)
 }
 
 /* return ICN sprite from AGG::Cache */
-const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index)
+const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
-    const std::vector<Sprite *> & v = icn_cache[icn];
+    const std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
-    if(0 == v.size()) LoadICN(icn);
+    if(0 == v.size()) LoadICN(icn, reflect);
 
     if(index >= v.size())
     {
@@ -483,9 +500,9 @@ const Palette & AGG::Cache::GetPAL(void)
 }
 
 // wrapper AGG::PreloadObject
-void AGG::PreloadObject(const ICN::icn_t icn)
+void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
-    return AGG::Cache::Get().LoadICN(icn);
+    return AGG::Cache::Get().LoadICN(icn, reflect);
 }
 
 void AGG::PreloadObject(const TIL::til_t til)
@@ -494,9 +511,9 @@ void AGG::PreloadObject(const TIL::til_t til)
 }
 
 // wrapper AGG::FreeObject
-void AGG::FreeObject(const ICN::icn_t icn)
+void AGG::FreeObject(const ICN::icn_t icn, bool reflect)
 {
-    return AGG::Cache::Get().FreeICN(icn);
+    return AGG::Cache::Get().FreeICN(icn, reflect);
 }
 
 void AGG::FreeObject(const TIL::til_t til)
@@ -505,9 +522,9 @@ void AGG::FreeObject(const TIL::til_t til)
 }
 
 // wrapper AGG::GetXXX
-const Sprite & AGG::GetICN(const ICN::icn_t icn, const u16 index)
+const Sprite & AGG::GetICN(const ICN::icn_t icn, const u16 index, bool reflect)
 {
-    return AGG::Cache::Get().GetICN(icn, index);
+    return AGG::Cache::Get().GetICN(icn, index, reflect);
 }
 
 void AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst)

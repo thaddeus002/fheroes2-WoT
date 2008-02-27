@@ -253,7 +253,7 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		// possible anime
-		if(u8 anime_index = MP2::GetAnimationFrame(object, index, anime_frame))
+		if(u8 anime_index = MP2::GetAnimationFrame(icn, index, anime_frame))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
@@ -296,7 +296,7 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		// possible anime
-		if(u8 anime_index = MP2::GetAnimationFrame(object, index, anime_frame))
+		if(u8 anime_index = MP2::GetAnimationFrame(icn, index, anime_frame))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
@@ -347,10 +347,11 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 
 	for(; it1 != it2; ++it1)
 	{
-	    u8 object = (*it1).GetObject();
-	    u8 index  = (*it1).GetIndex();
+	    const u8 object = (*it1).GetObject();
+	    const u8 index  = (*it1).GetIndex();
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(ICN::UNKNOWN != MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
+	    if(ICN::UNKNOWN != icn && MP2::GetAnimationFrame(icn, index, 0)) return true;
 	}
     }
 
@@ -362,10 +363,11 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 
 	for(; it1 != it2; ++it1)
 	{
-	    u8 object = (*it1).GetObject();
-	    u8 index  = (*it1).GetIndex();
-	    
-	    if(ICN::UNKNOWN != MP2::GetICNObject(object) && MP2::GetAnimationFrame(object, index, 0)) return true;
+	    const u8 object = (*it1).GetObject();
+	    const u8 index  = (*it1).GetIndex();
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
+
+	    if(ICN::UNKNOWN != icn && MP2::GetAnimationFrame(icn, index, 0)) return true;
 	}
     }
     
@@ -637,10 +639,11 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 	if(Ground::WATER != GetGround())
 	{
 	    const Race::race_t & race = (*heroes).GetRace();
-	    const Color::color_t & color = (*heroes).GetColor();
+	    //const Color::color_t & color = (*heroes).GetColor();
+	    const Direction::vector_t & direct = (*heroes).GetDirection();
 	
 	    u16 index_sprite = 0;
-
+/*
 	    switch(color)
 	    {
 		case Color::BLUE:	index_sprite =  0; break;
@@ -662,11 +665,44 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 		case Race::NECR: index_sprite += 5; break;
 		default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown race hero, maps index: ", maps_index); return;
 	    }
+*/
 
-	    const Sprite & sprite = AGG::GetICN(ICN::MINIHERO, index_sprite);
+	    ICN::icn_t icn = ICN::MINIHERO;
 
-	    const Point dst_pt(dx + sprite.x(), BORDERWIDTH > dy + sprite.y() - 22 ? BORDERWIDTH : dy + sprite.y() - 22);
-	    const Rect  src_rt(0,  dst_pt.y > BORDERWIDTH ? 0 : 22, sprite.w(), sprite.h());
+	    switch(race)
+	    {
+		case Race::KNGT: icn = ICN::KNGT32; break;
+		case Race::BARB: icn = ICN::BARB32; break;
+		case Race::SORC: icn = ICN::SORC32; break;
+		case Race::WRLK: icn = ICN::WRLK32; break;
+		case Race::WZRD: icn = ICN::WZRD32; break;
+		case Race::NECR: icn = ICN::NECR32; break;
+
+		default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown race hero, maps index: ", maps_index); return;
+	    }
+
+	    bool reflect = false;
+
+	    switch(direct)
+	    {
+		case Direction::TOP:		index_sprite =  0; break;
+		case Direction::TOP_RIGHT:	index_sprite =  9; break;
+		case Direction::RIGHT:		index_sprite = 18; break;
+		case Direction::BOTTOM_RIGHT:	index_sprite = 27; break;
+		case Direction::BOTTOM:		index_sprite = 36; break;
+		case Direction::BOTTOM_LEFT:	index_sprite = 27; reflect = true; break;
+		case Direction::LEFT:		index_sprite = 18; reflect = true; break;
+		case Direction::TOP_LEFT:	index_sprite =  9; reflect = true; break;
+
+		default: break;
+	    }
+
+	    const Sprite & sprite = AGG::GetICN(icn, index_sprite, reflect);
+
+	    const s16 dy2 = dy + TILEWIDTH - sprite.h() - (sprite.h() + sprite.y());
+
+	    const Point dst_pt(dx + sprite.x(), BORDERWIDTH > dy2 ? BORDERWIDTH : dy2);
+	    const Rect  src_rt(0,  dy2 > BORDERWIDTH ? 0 : BORDERWIDTH - dy2, sprite.w(), sprite.h());
 
 	    display.Blit(sprite, src_rt, dst_pt);
 	}

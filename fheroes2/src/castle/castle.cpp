@@ -828,6 +828,18 @@ u32 Castle::GetBuildingRequires(const building_t & build) const
 
     switch(build)
     {
+	case BUILD_SPEC:
+	    switch(race)
+	    {
+		case Race::WZRD:
+		    requires |= BUILD_MAGEGUILD1;
+		    break;
+
+		default:
+	        break;
+	    }
+	    break;
+
 	case DWELLING_MONSTER2:
 	    switch(race)
 	    {

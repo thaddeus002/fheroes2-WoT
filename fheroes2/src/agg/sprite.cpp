@@ -27,19 +27,19 @@
 #define DEFAULT_SHADOW_ALPHA    0x40
 
 /* ICN Sprite constructor */
-Sprite::Sprite(const ICN::Header & header, const char *data, u32 size)
+Sprite::Sprite(const ICN::Header & header, const char *data, u32 size, bool reflect)
     : Surface(header.Width(), header.Height(), H2Config::Shadow()), offsetX(header.OffsetX()), offsetY(header.OffsetY())
 {
     SetColorKey();
-    DrawICN(*this, size, reinterpret_cast<const u8 *>(data));
+    DrawICN(*this, size, reinterpret_cast<const u8 *>(data), reflect);
     if(H2Config::Shadow()) SetDisplayFormat();
 }
 
 /* draw RLE ICN to surface */
-void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
+void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata, bool reflect)
 {
     u8 i, count;
-    u16 x = 0;
+    u16 x = reflect ? sf.w() - 1 : 0;
     u16 y = 0;
     u32 index = 0;
 
@@ -55,7 +55,7 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
 	if(0 == vdata[index])
 	{
 	    ++y;
-	    x = 0;
+	    x = reflect ? sf.w() - 1 : 0;
 	    ++index;
 	    continue;
 	}
@@ -68,7 +68,8 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
 	    i = 0;
 	    while(i++ < count && index < size)
 	    {
-		sf.SetPixel2(x++, y, AGG::GetColor(vdata[index++]));
+		sf.SetPixel2(x, y, AGG::GetColor(vdata[index++]));
+		reflect ? x-- : x++;
 	    }
 	    continue;
 	}
@@ -82,7 +83,7 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
 	// range 0x81..0xBF 00 
 	if(0x80 < vdata[index] && 0xC0 > vdata[index])
 	{
-	    x += (vdata[index] - 0x80);
+	    reflect ? x -= (vdata[index] - 0x80) : x += (vdata[index] - 0x80);
 	    ++index;
 	    continue;
 	}
@@ -98,7 +99,8 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
 		++index;
 		for(i = 0; i < vdata[index]; ++i)
 		{
-		    sf.SetPixel2(x++, y, shadow);
+		    sf.SetPixel2(x, y, shadow);
+		    reflect ? x-- : x++;
 		}
 		++index;
 		continue;
@@ -108,7 +110,8 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
 		count = vdata[index];
 		for(i = 0; i < vdata[index] % 4; ++i)
 		{
-		    sf.SetPixel2(x++, y, shadow);
+		    sf.SetPixel2(x, y, shadow);
+		    reflect ? x-- : x++;
 		}
 		++index;
 		continue;
@@ -123,7 +126,8 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
 	    ++index;
 	    for(i = 0; i < count; ++i)
 	    {
-	    	sf.SetPixel2(x++, y, AGG::GetColor(vdata[index]));
+	    	sf.SetPixel2(x, y, AGG::GetColor(vdata[index]));
+		reflect ? x-- : x++;
 	    }
 	    ++index;
 	    continue;
@@ -136,7 +140,8 @@ void Sprite::DrawICN(Surface & sf, u32 size, const u8 *vdata)
 	    ++index;
 	    for(i = 0; i < count; ++i)
 	    {
-		sf.SetPixel2(x++, y, AGG::GetColor(vdata[index]));
+		sf.SetPixel2(x, y, AGG::GetColor(vdata[index]));
+		reflect ? x-- : x++;
 	    }
 	    ++index;
 	    continue;

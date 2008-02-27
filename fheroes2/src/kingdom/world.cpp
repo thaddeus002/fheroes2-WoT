@@ -154,6 +154,7 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
 	vec_heroes[69] = new Heroes(Heroes::MARTINE, Race::SORC, "Martine");
 	vec_heroes[70] = new Heroes(Heroes::JARKONAS, Race::BARB, "Jarkonas");
 	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
     else
     {
@@ -168,6 +169,7 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
 	vec_heroes[68] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
 
@@ -317,10 +319,11 @@ void World::LoadMaps(const std::string &filename)
 	vec_heroes[69] = new Heroes(Heroes::MARTINE, Race::SORC, "Martine");
 	vec_heroes[70] = new Heroes(Heroes::JARKONAS, Race::BARB, "Jarkonas");
 	vec_heroes[71] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
     else
     {
-	vec_heroes[60] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[60] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[62] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[63] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
@@ -331,7 +334,8 @@ void World::LoadMaps(const std::string &filename)
 	vec_heroes[68] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
 
     Display & display = Display::Get();
