@@ -710,8 +710,8 @@ bool Castle::AllowBuyHero(void)
 
     const Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
 
-    if(paymentCosts > kingdom.GetFundsResource()) return false;
-    
+    if(! kingdom.AllowPayment(paymentCosts)) return false;
+
     return true;
 }
 
@@ -719,7 +719,7 @@ void Castle::RecruitHero(const Heroes::heroes_t hero)
 {
     if(! AllowBuyHero()) return;
 
-    Kingdom & kingdom = const_cast<Kingdom &>(world.GetKingdom(color));
+    Kingdom & kingdom = world.GetKingdom(color);
 
     const Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
 
@@ -784,9 +784,9 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
 
     // buy
     const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms) * count);
-    Kingdom & kingdom = const_cast<Kingdom &>(world.GetKingdom(color));
+    Kingdom & kingdom = world.GetKingdom(color);
     
-    if(paymentCosts > kingdom.GetFundsResource()) return false;
+    if(! kingdom.AllowPayment(paymentCosts)) return false;
 
     kingdom.OddFundsResource(paymentCosts);
     
@@ -1108,8 +1108,8 @@ bool Castle::AllowBuyBuilding(building_t build) const
     if(!allow_build) return false;
 
     // check valid payment
-    if(PaymentConditions::BuyBuilding(race, build) > world.GetMyKingdom().GetFundsResource()) return false;
-    
+    if(! world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBuilding(race, build))) return false;
+
     // check build requirements
     std::bitset<32> requires(Castle::GetBuildingRequires(build));
     
@@ -1144,7 +1144,7 @@ void Castle::BuyBuilding(building_t build)
 {
 	if(! AllowBuyBuilding(build)) return;
 	
-	const_cast<Kingdom &>(world.GetMyKingdom()).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
+	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBuilding(race, build));
 
 	// add build
 	building |= build;

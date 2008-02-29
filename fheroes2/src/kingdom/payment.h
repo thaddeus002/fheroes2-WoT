@@ -348,6 +348,8 @@ class Rect;
 #define BUY_FIRE_ELEMENT_GOLD 		500
 #define BUY_WATER_ELEMENT_GOLD 		500
 
+#define BUY_SPELL_BOOK_GOLD		500
+
 namespace PaymentConditions
 {
     typedef Resource::funds_t payment_t;
@@ -356,6 +358,12 @@ namespace PaymentConditions
     {
     public:
 	BuyBuilding(const Race::race_t & race, const u32 build);
+    };
+
+    class BuySpellBook : public payment_t
+    {
+    public:
+	BuySpellBook();
     };
 
     class BuyHero : public payment_t

@@ -695,7 +695,7 @@ void World::LoadMaps(const std::string &filename)
 			else
 			    color = Color::PURPLE;
 
-			const Kingdom & kingdom = GetKingdom(color);
+			Kingdom & kingdom = GetKingdom(color);
 
 			// caclulate race
 			Race::race_t race = Race::BOMG;
@@ -724,9 +724,8 @@ void World::LoadMaps(const std::string &filename)
 			    if(hero)
 			    {
 				Heroes * herow = const_cast<Heroes *>(hero);
-				Kingdom & kingdomw = const_cast<Kingdom &>(kingdom);
 			    	(*herow).LoadFromMP2(*it_index, pblock, color);
-			    	kingdomw.AddHeroes(herow);
+			    	kingdom.AddHeroes(herow);
 			    }
 			}
 			else
@@ -860,7 +859,7 @@ void World::LoadMaps(const std::string &filename)
     if(H2Config::Debug())
     {
 	// get first castle position
-	const Kingdom & kingdom = GetMyKingdom();
+	Kingdom & kingdom = GetMyKingdom();
 	const Castle & castle = *(kingdom.GetCastles().at(0));
 	const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
 
@@ -869,7 +868,7 @@ void World::LoadMaps(const std::string &filename)
 	{
 	    const_cast<Heroes &>(*hero).Recruit(castle);
 
-	    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
+	    kingdom.AddHeroes(const_cast<Heroes *>(hero));
 	}
     }
     else
@@ -879,7 +878,7 @@ void World::LoadMaps(const std::string &filename)
 	    if((*vec_kingdoms[ii]).isPlay() && (*vec_kingdoms[ii]).GetCastles().size())
 	    {
 		// get first castle position
-		const Kingdom & kingdom = *(vec_kingdoms[ii]);
+		Kingdom & kingdom = *(vec_kingdoms[ii]);
 		const Castle & castle = *(kingdom.GetCastles().at(0));
 
 		// place hero
@@ -887,7 +886,7 @@ void World::LoadMaps(const std::string &filename)
 		{
 		    const_cast<Heroes &>(*hero).Recruit(castle);
 
-		    const_cast<Kingdom &>(kingdom).AddHeroes(const_cast<Heroes *>(hero));
+		    kingdom.AddHeroes(const_cast<Heroes *>(hero));
 		}
 	    }
 
@@ -895,10 +894,31 @@ void World::LoadMaps(const std::string &filename)
 }
 
 /* get human kindom */
+Kingdom & World::GetMyKingdom(void)
+{ return GetKingdom(Settings::Get().MyColor()); }
+
 const Kingdom & World::GetMyKingdom(void) const
 { return GetKingdom(Settings::Get().MyColor()); }
 
 /* get kingdom */
+Kingdom & World::GetKingdom(Color::color_t color)
+{
+    switch(color)
+    {
+        case Color::BLUE:       return *vec_kingdoms[0]; break;
+        case Color::GREEN:      return *vec_kingdoms[1]; break;
+        case Color::RED:        return *vec_kingdoms[2]; break;
+        case Color::YELLOW:     return *vec_kingdoms[3]; break;
+        case Color::ORANGE:     return *vec_kingdoms[4]; break;
+        case Color::PURPLE:     return *vec_kingdoms[5]; break;
+        case Color::GRAY:       break;
+    }
+
+    Error::Warning("World::GetKingdom: return Color::GRAY.");
+
+    return *vec_kingdoms[0];
+}
+
 const Kingdom & World::GetKingdom(Color::color_t color) const
 {
     switch(color)

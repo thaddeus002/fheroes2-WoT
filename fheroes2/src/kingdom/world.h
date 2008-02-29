@@ -63,6 +63,9 @@ public:
     Maps::Tiles & GetTiles(const Point & pt) { return GetTiles(pt.y * width + pt.x); };
     Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); };
     Maps::Tiles & GetTiles(u16 index){ return *vec_tiles.at(index); };
+
+    Kingdom & GetMyKingdom(void);
+    Kingdom & GetKingdom(Color::color_t color);
     const Kingdom & GetMyKingdom(void) const;
     const Kingdom & GetKingdom(Color::color_t color) const;
 

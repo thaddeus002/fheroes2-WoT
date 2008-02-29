@@ -39,7 +39,7 @@ void Dialog::StatusBar::ShowBuildMessage(bool isBuilt, bool allowBuild, const st
 	if(!castle.AllowBuild())
     	    ShowMessage("Cannot build. Already built here this turn.");
         else
-        if(castle.AllowBuild() && paymentBuild > world.GetMyKingdom().GetFundsResource())
+        if(castle.AllowBuild() && ! world.GetMyKingdom().AllowPayment(paymentBuild))
     	    ShowMessage("Cannot afford " + message);
         else
         if(Castle::BUILD_SHIPYARD == building && !castle.HaveNearlySea())

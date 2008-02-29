@@ -80,7 +80,7 @@ void Dialog::Marketplace(void)
     dst_rt.h = 100;
     TextBox(message_info, Font::BIG, dst_rt);
 
-    const Kingdom & kingdom = world.GetMyKingdom();
+    Kingdom & kingdom = world.GetMyKingdom();
     const Sprite & spritecursor = AGG::GetICN(tradpost, 14);
 
     const std::string & header_from = "Your Resources";
@@ -421,8 +421,8 @@ void Dialog::Marketplace(void)
 	// trade
 	if(buttonTrade && le.MouseClickLeft(*buttonTrade) && count_sell && count_buy)
 	{
-	    const_cast<Kingdom &>(kingdom).OddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceFrom), count_sell));
-    	    const_cast<Kingdom &>(kingdom).AddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceTo), count_buy));
+	    kingdom.OddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceFrom), count_sell));
+    	    kingdom.AddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceTo), count_buy));
 
     	    // exit
     	    break;

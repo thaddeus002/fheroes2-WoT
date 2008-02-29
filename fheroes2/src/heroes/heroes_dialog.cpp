@@ -333,7 +333,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     std::string descriptionExperience("Current experience ");
     String::AddInt(descriptionExperience, GetExperience());
     descriptionExperience += " Next level ";
-    String::AddInt(descriptionExperience, GetNextLevelExperience(GetLevel()) - GetExperience());
+    String::AddInt(descriptionExperience, GetExperienceFromLevel(GetLevelFromExperience(experience)));
     descriptionExperience += ".";
 
     // spell points
@@ -532,7 +532,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    Army::Troops & select_troops = army[ii];
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
-		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
+		    Kingdom & kingdom = world.GetMyKingdom();
 
                     const Castle *castle = inCastle();
                     const bool show_upgrade = castle && Monster::AllowUpgrade(select_monster) &&

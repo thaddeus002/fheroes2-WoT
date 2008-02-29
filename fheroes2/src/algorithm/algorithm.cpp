@@ -186,7 +186,7 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 	++count_itr;
 
 	// exception (invalid algorithm)
-	if(count_itr > 65000)
+	if(count_itr > MAXU16)
 	{
 	    Error::Warning("Algorithm::PathFinding: unknown path finding, check algorithm.");
 
@@ -199,7 +199,6 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 	while(index_i != index1)
 	{
 	    // push_front
-	    //result.insert(result.begin(), index_i);
 	    result.push_front(index_i);
 
 	    index_i = work_map[index_i].parent;

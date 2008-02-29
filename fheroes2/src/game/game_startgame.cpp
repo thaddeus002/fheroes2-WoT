@@ -1552,7 +1552,7 @@ Game::menu_t Game::StartGame(void)
 
 	    // AI move
 	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color != human)
-		const_cast<Kingdom &>(world.GetKingdom(color)).AITurns(statusWindow);
+		world.GetKingdom(color).AITurns(statusWindow);
 
 	    statusWindow.SetState(Game::StatusWindow::DAY);
 	    statusWindow.Redraw();
@@ -1734,7 +1734,7 @@ void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 	    case Dialog::DISMISS:
 	    {
 		Error::Verbose("Game::OpenHeroes: FIXME dismiss hero.");
-		//Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
+		//Kingdom & kingdom = world.GetMyKingdom();
 		//const Maps::Tiles & tile = world.GetTiles((*hero).GetCenter());
 
                 //kingdom.RemoveHeroes(hero);

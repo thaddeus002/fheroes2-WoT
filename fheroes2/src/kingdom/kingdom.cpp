@@ -267,3 +267,8 @@ Race::race_t Kingdom::GetRace(void) const
 {
     return Settings::Get().FileInfo().KingdomRace(color);
 }
+
+bool Kingdom::AllowPayment(const Resource::funds_t & funds) const
+{
+    return funds > resource ? false : true;
+}

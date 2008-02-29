@@ -1243,11 +1243,29 @@ void Game::Editor::RedrawLeftNumberCell(const Rect & area)
 /* modify all tiles maps for correct abroad direction */
 void Game::Editor::ModifyAllTilesAbroad(void)
 {
+    std::vector<Direction::vector_t> directs_frnt(4);
+    std::vector<Direction::vector_t> directs_diag(4);
+
+    std::vector<Direction::vector_t>::const_iterator it1;
+    std::vector<Direction::vector_t>::const_iterator it2;
+    
+    directs_frnt[0] = Direction::TOP;
+    directs_frnt[1] = Direction::RIGHT;
+    directs_frnt[2] = Direction::BOTTOM;
+    directs_frnt[3] = Direction::LEFT;
+
+    directs_diag[0] = Direction::TOP_LEFT;
+    directs_diag[1] = Direction::TOP_RIGHT;
+    directs_diag[2] = Direction::BOTTOM_RIGHT;
+    directs_diag[3] = Direction::BOTTOM_LEFT;
+
     for(u16 ii = 0; ii < world.w() * world.h(); ++ii)
     {
 	Maps::Tiles & center = world.GetTiles(ii);
 
-	u8 around_direct = 0;
+	u16 around_frnt = 0;
+	u16 around_diag = 0;
+
 	//u8 around_ground = 0;
 
 	//u8 count_desert = 0;
@@ -1255,7 +1273,7 @@ void Game::Editor::ModifyAllTilesAbroad(void)
 	//u8 count_swamp = 0;
 	//u8 count_wasteland = 0;
 	//u8 count_beach = 0;
-	//u8 count_lave = 0;
+	//u8 count_lava = 0;
 	//u8 count_dirt = 0;
 	//u8 count_grass = 0;
 	//u8 count_water = 0;
@@ -1264,8 +1282,14 @@ void Game::Editor::ModifyAllTilesAbroad(void)
 
 	bool skip = true;
 
-	for(Direction::vector_t direct = Direction::TOP; direct <= Direction::TOP_LEFT; ++direct)
+	// frontal
+	it1 = directs_frnt.begin();
+	it2 = directs_frnt.end();
+
+	for(; it1 != it2; ++it1)
 	{
+	    const Direction::vector_t & direct = *it1;
+
 	    if(Maps::isValidDirection(ii, direct))
 	    {
 		const Maps::Tiles & opposition = world.GetTiles(Maps::GetDirectionIndex(ii, direct));
@@ -1274,8 +1298,28 @@ void Game::Editor::ModifyAllTilesAbroad(void)
 		{
 		    skip = false;
 
-		    around_direct |= direct;
-		    //around_ground |= opposition.GetGround();
+		    around_frnt |= direct;
+		}
+	    }
+	}
+
+	// diagonal
+	it1 = directs_diag.begin();
+	it2 = directs_diag.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    const Direction::vector_t & direct = *it1;
+
+	    if(Maps::isValidDirection(ii, direct))
+	    {
+		const Maps::Tiles & opposition = world.GetTiles(Maps::GetDirectionIndex(ii, direct));
+
+		if(center.GetGround() != opposition.GetGround())
+		{
+		    skip = false;
+
+		    around_diag |= direct;
 		}
 	    }
 	}
@@ -1283,19 +1327,28 @@ void Game::Editor::ModifyAllTilesAbroad(void)
 	// skip if all around ground equalent
 	if(skip) continue;
 	
-	std::bitset<16> around_bits(around_direct);
+	// if
+	std::bitset<16> around_bits(around_frnt);
 
-	if(Maps::Ground::WATER == center.GetGround())
+	if(2 > around_bits.count())
 	{
-	    if(3 > around_bits.count())
-	    {
-	    }
 	}
+
 	// modify opposite tile
 	// center.ModifyTileSprite(around, );
     }
 
 /*
+Maps::Ground::WATER:
+Maps::Ground::GRASS:
+Maps::Ground::SNOW:
+Maps::Ground::SWAMP:
+Maps::Ground::LAVA:
+Maps::Ground::DESERT:
+Maps::Ground::DIRT:
+Maps::Ground::WASTELAND:
+Maps::Ground::BEACH:
+
 Direction::TOP
 Direction::TOP_RIGHT
 Direction::RIGHT

@@ -27,16 +27,16 @@ namespace Direction
 {
     typedef enum
     {
-	UNKNOWN		= 0x00,
-	CENTER		= 0x01,
-	TOP		= 0x02,
-	TOP_RIGHT	= 0x04,
-	RIGHT		= 0x08,
-	BOTTOM_RIGHT	= 0x10,
-	BOTTOM		= 0x11,
-	BOTTOM_LEFT	= 0x12,
-	LEFT		= 0x14,
-	TOP_LEFT	= 0x18
+	UNKNOWN		= 0x0000,
+	CENTER		= 0x0001,
+	TOP		= 0x0002,
+	TOP_RIGHT	= 0x0004,
+	RIGHT		= 0x0008,
+	BOTTOM_RIGHT	= 0x0010,
+	BOTTOM		= 0x0020,
+	BOTTOM_LEFT	= 0x0040,
+	LEFT		= 0x0080,
+	TOP_LEFT	= 0x0100,
     } vector_t;
 
     inline vector_t& operator++ (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct << 1)); };

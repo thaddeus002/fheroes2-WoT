@@ -20,7 +20,7 @@
 #ifndef H2TILES_H
 #define H2TILES_H
 
-#include <vector>
+#include <list>
 #include "ground.h"
 #include "mp2.h"
 #include "direction.h"
@@ -40,7 +40,7 @@ namespace Maps
 
 	TilesAddon & operator= (const TilesAddon & ta);
 
-	static u8 isRoad(const TilesAddon & ta, u8 direct = 0xFF);
+	static u16 isRoad(const TilesAddon & ta, u8 direct = 0xFF);
 	static bool RulesCompare(const TilesAddon & ta1, const TilesAddon & ta2){ return ta1.GetLevel() > ta2.GetLevel(); };
 
 	u8 GetObject(void) const{ return object; };
@@ -70,8 +70,8 @@ namespace Maps
 	u8 GetQuantity2(void) const{ return quantity2; };
 	Ground::ground_t GetGround(void) const;
 	const Surface & GetSurface(void) const{ return tile_sprite; };
-	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1[0].GetUniq() : 0; };
-	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2[0].GetUniq() : 0; };
+	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().GetUniq() : 0; };
+	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().GetUniq() : 0; };
 
 	bool isAnimation(u16 dstx, u16 dsty) const;
 	bool isPassable(void) const;
@@ -116,9 +116,9 @@ namespace Maps
         u8      general;
         u8      quantity1;
         u8      quantity2;
-        std::vector<TilesAddon> addons_level1;
-        std::vector<TilesAddon> addons_level2;
-        
+        std::list<TilesAddon> addons_level1;
+        std::list<TilesAddon> addons_level2;
+
         const Sprite *path_sprite;
     };
 };

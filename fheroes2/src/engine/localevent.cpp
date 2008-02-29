@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sstream>
 #include "error.h"
 #include "display.h"
 #include "localevent.h"
@@ -268,8 +269,17 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
 		return 0;
 
 	    case SDLK_PRINT:
-		if(display.SaveBMP("screenshot.bmp")) Error::Verbose("save: screenshot.bmp");
-		return 0;
+	    {
+		std::ostringstream stream;
+    		stream << std::time(0);
+        
+        	std::string name("screenshot_");
+        	name += stream.str();
+        	name += ".bmp";
+
+            	if(display.SaveBMP(name.c_str())) Error::Verbose("save: " + name);
+	    }
+	    	return 0;
 
 	    default:
 		break;

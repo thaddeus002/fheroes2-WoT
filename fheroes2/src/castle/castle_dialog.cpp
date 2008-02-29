@@ -365,7 +365,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    Army::Troops & select_troops = army[ii];
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
-		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
+		    Kingdom & kingdom = world.GetMyKingdom();
 		    
 		    const bool show_upgrade = Monster::AllowUpgrade(select_monster) &&
 			    Monster::GetRace(select_monster) == race &&
@@ -522,7 +522,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    Army::Troops & select_troops = army2[ii];
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
-		    Kingdom & kingdom = const_cast<Kingdom &>(world.GetMyKingdom());
+		    Kingdom & kingdom = world.GetMyKingdom();
 
 		    const bool show_upgrade = Monster::AllowUpgrade(select_monster) &&
 			    Monster::GetRace(select_monster) == race &&
@@ -688,7 +688,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    cursor.Hide();
 
 	    // check payment and present other boat
-	    //bool enable = ((PaymentConditions::BuyBuilding(race, BUILD_BOAT) > world.GetMyKingdom().GetFundsResource()) ||
+	    //bool enable = ! world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBuilding(race, BUILD_BOAT)) ||
 	    //		   (building & BUILD_BOAT)) ? false : true;
 
 	    if(Dialog::OK == Dialog::BuyBoat(false))
@@ -812,7 +812,24 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	// left click mage guild
 	if(building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1) &&
-	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) OpenMageGuild();
+	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt)))
+	{
+	    // buy spell book
+	    if(!castle_heroes || (*castle_heroes).HasArtifact(Artifact::MAGIC_BOOK))
+		OpenMageGuild();
+	    else
+	    if(Dialog::YES == Dialog::BuySpellBook(world.GetMyKingdom().AllowPayment(PaymentConditions::BuySpellBook())) && (*castle_heroes).BuySpellBook())
+	    {
+		cursor.Hide();
+		selectCastleTroops.Redraw();
+		RedrawResourcePanel();
+
+		if(buttonExit.isPressed()) buttonExit.Draw();
+
+		cursor.Show();
+		display.Flip();
+	    }
+	}
 	else
 	// left click dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MouseClickLeft(coordDwellingMonster1) &&

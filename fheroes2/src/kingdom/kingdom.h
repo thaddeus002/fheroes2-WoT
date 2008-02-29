@@ -79,6 +79,7 @@ public:
     Kingdom(const Color::color_t cl);
 
     bool isPlay(void) const{ return play; };
+    bool AllowPayment(const Resource::funds_t & funds) const;
 
     Color::color_t GetColor(void) const{ return color; };
     Race::race_t GetRace(void) const;

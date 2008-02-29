@@ -25,6 +25,7 @@
 #include "config.h"
 #include "monster.h"
 #include "error.h"
+#include "payment.h"
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
@@ -253,6 +254,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    artifacts.push_back(Artifact::DRAGON_SWORD);
 	    artifacts.push_back(Artifact::RABBIT_FOOT);
 	    artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
+	    
+	    experience = 777;
 	    break;
 	
 	default: break;
@@ -834,37 +837,22 @@ u8 Heroes::GetCountArmy(void) const
     return result;
 }
 
-void Heroes::Recruit(const Castle & castle)
+/* recrut hero */
+void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
 {
-    mp = castle.GetCenter();
-    color = castle.GetColor();
+    color = cl;
+    mp = pt;
 
-    Maps::Tiles & tiles = world.GetTiles(mp.x, mp.y);
+    Maps::Tiles & tiles = world.GetTiles(mp);
 
     // save general object
     save_maps_general = tiles.GetObject();
     tiles.SetObject(MP2::OBJ_HEROES);
 }
 
-u32 Heroes::GetNextLevelExperience(u8 level) const
+void Heroes::Recruit(const Castle & castle)
 {
-    switch(level)
-    {
-	case 0:		return 0;
-	case 1:		return 1000;
-	case 2:		return 2000;
-	case 3:		return 3200;
-	case 4:		return 4500;
-	case 5:		return 6000;
-	case 6:		return 7700;
-	case 7:		return 9000;
-	case 8: 	return 11000;
-	case 9:		return 13200;
-	case 10:	return 15500;
-	// FIXME:	calculate alghoritm
-
-	default: return 0;
-    }
+    Recruit(castle.GetColor(), castle.GetCenter());
 }
 
 void Heroes::ActionNewDay(void)
@@ -994,4 +982,64 @@ void Heroes::SetVisited(const u32 index)
 	Maps::Object::isMonthLife(object) ||
 	Maps::Object::isBattleLife(object))
 	    visit_object.push_front(Maps::VisitIndexObject(index, object));
+}
+
+bool Heroes::HasArtifact(const Artifact::artifact_t & art) const
+{
+    return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), art);
+}
+
+/* return level hero */
+u8 Heroes::GetLevel(void) const
+{
+    return GetLevelFromExperience(experience);
+}
+
+/* calc level from exp */
+u8 Heroes::GetLevelFromExperience(u32 exp)
+{
+    for(u8 lvl = 1; lvl < 255; ++ lvl) if(exp < GetExperienceFromLevel(lvl)) return lvl;
+
+    return 0;
+}
+
+/* calc exp from level */
+u32 Heroes::GetExperienceFromLevel(u8 lvl)
+{
+    switch(lvl)
+    {
+	case 0:		return 0;
+	case 1:		return 1000;
+	case 2:		return 2000;
+	case 3:		return 3200;
+	case 4:		return 4500;
+	case 5:		return 6000;
+	case 6:		return 7700;
+	case 7:		return 9000;
+	case 8: 	return 11000;
+	case 9:		return 13200;
+	case 10:	return 15500;
+
+	// FIXME:	calculate alghoritm
+
+	default:	return MAXU16;
+    }
+
+    return 0;
+}
+
+bool Heroes::BuySpellBook(void)
+{
+    if(HasArtifact(Artifact::MAGIC_BOOK) || Color::GRAY == color) return false;
+
+    PaymentConditions::BuySpellBook payment;
+    Kingdom & kingdom = world.GetKingdom(color);
+
+    if( ! kingdom.AllowPayment(payment)) return false;
+
+    kingdom.OddFundsResource(payment);
+
+    artifacts.push_back(Artifact::MAGIC_BOOK);
+    
+    return true;
 }

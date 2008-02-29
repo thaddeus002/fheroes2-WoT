@@ -91,6 +91,9 @@ namespace Dialog
     // dialog buy boat
     answer_t BuyBoat(bool enable);
 
+    // dialog buy spell book
+    answer_t BuySpellBook(bool enable);
+
 class Box
 {
 public:

@@ -121,16 +121,17 @@ public:
     u8 GetPower(void) const;
     u8 GetKnowledge(void) const;
     u32 GetExperience(void) const;
-    u32 GetNextLevelExperience(u8 level) const;
     u16 GetMaxSpellPoints(void) const;
     u16 GetMaxMovePoints(void) const;
     u16 GetSpellPoints(void) const;
     u16 GetMovePoints(void) const;
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
-    u8 GetLevel(void) const{ return 1; };
+    u8 GetLevel(void) const;
     const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
     Skill::Level::type_t GetLevelSkill(Skill::secondary_t type) const{ return secondary_skills.GetLevel(type); };
+
+    bool HasArtifact(const Artifact::artifact_t & art) const;
 
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;
@@ -138,12 +139,15 @@ public:
     Dialog::answer_t OpenDialog(bool readonly = false);
     void MeetingDialog(Heroes & heroes2);
 
+    void Recruit(const Color::color_t & cl, const Point & pt);
     void Recruit(const Castle & castle);
 
     void ActionNewDay(void);
     void ActionNewWeek(void);
     void ActionNewMonth(void);
     void ActionAfterBattle(void);
+
+    bool BuySpellBook(void);
 
     const Route & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
@@ -154,6 +158,9 @@ public:
     void SetCenter(const Point& pt){ mp = pt; };
     void Goto(u16 dst_index);
     void Action(u16 dst_index);
+
+    static u8 GetLevelFromExperience(u32 exp);
+    static u32 GetExperienceFromLevel(u8 lvl);
 
 private:
     std::string		name;
