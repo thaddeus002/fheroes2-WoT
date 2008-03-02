@@ -64,7 +64,7 @@ Game::menu_t Game::HighScores(void)
 	//if(le.MouseRight()) Error::Verbose(le.MousePressRight());
 
 	//if(le.MouseClickLeft(buttonDismiss)) return MAINMENU;
-	if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_ESCAPE)) return MAINMENU;
+	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
     }
 
     return QUITGAME;

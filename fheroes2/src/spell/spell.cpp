@@ -190,9 +190,10 @@ u8 Spell::Level(spell_t spell)
     return 0;
 }
 
-Spell::spell_t Spell::Rand1(void)
+Spell::spell_t Spell::RandCombat(const u8 lvl)
 {
-    switch(Rand::Get(1, 12))
+    if(1 == lvl)
+    switch(Rand::Get(1, 10))
     {
 	case 1:  return BLESS;
 	case 2:  return BLOODLUST;
@@ -204,18 +205,11 @@ Spell::spell_t Spell::Rand1(void)
 	case 8:  return SHIELD;
 	case 9:  return SLOW;
 	case 10: return STONESKIN;
-	case 11: return VIEWMINES;
-	case 12: return VIEWRESOURCES;
-
 	default: break;
     }
-    
-    return Spell::NONE;
-}
-
-Spell::spell_t Spell::Rand2(void)
-{
-    switch(Rand::Get(1, 11))
+    else
+    if(2 == lvl)
+    switch(Rand::Get(1, 7))
     {
 	case 1: return BLIND;
 	case 2: return COLDRAY;
@@ -224,20 +218,11 @@ Spell::spell_t Spell::Rand2(void)
 	case 5: return DRAGONSLAYER;
 	case 6: return LIGHTNINGBOLT;
 	case 7: return STEELSKIN;
-	case 8: return HAUNT;
-	case 9: return SUMMONBOAT;
-	case 10: return VIEWARTIFACTS;
-	case 11: return VISIONS;
-
 	default: break;
     }
-    
-    return Spell::NONE;
-}
-
-Spell::spell_t Spell::Rand3(void)
-{
-    switch(Rand::Get(1, 16))
+    else
+    if(3 == lvl)
+    switch(Rand::Get(1, 13))
     {
 	case 1: return ANIMATEDEAD;
 	case 2: return ANTIMAGIC;
@@ -252,19 +237,11 @@ Spell::spell_t Spell::Rand3(void)
 	case 11: return MASSHASTE;
 	case 12: return PARALYZE;
 	case 13: return TELEPORT;
-	case 14: return IDENTIFYHERO;
-	case 15: return VIEWHEROES;
-	case 16: return VIEWTOWNS;
-
 	default: break;
     }
-    
-    return Spell::NONE;
-}
-
-Spell::spell_t Spell::Rand4(void)
-{
-    switch(Rand::Get(1, 16))
+    else
+    if(4 == lvl)
+    switch(Rand::Get(1, 10))
     {
 	case 1: return BERZERKER;
 	case 2: return CHAINLIGHTNING;
@@ -276,22 +253,11 @@ Spell::spell_t Spell::Rand4(void)
 	case 8: return MASSSLOW;
 	case 9: return METEORSHOWER;
 	case 10: return RESURRECT;
-	case 11: return SETEGUARDIAN;
-	case 12: return SETAGUARDIAN;
-	case 13: return SETFGUARDIAN;
-	case 14: return SETWGUARDIAN;
-	case 15: return TOWNGATE;
-	case 16: return VIEWALL;
-
 	default: break;
     }
-    
-    return Spell::NONE;
-}
-
-Spell::spell_t Spell::Rand5(void)
-{
-    switch(Rand::Get(1, 10))
+    else
+    if(5 == lvl)
+    switch(Rand::Get(1, 8))
     {
 	case 1: return ARMAGEDDON;
 	case 2: return HYPNOTIZE;
@@ -301,12 +267,62 @@ Spell::spell_t Spell::Rand5(void)
 	case 6: return SUMMONAELEMENT;
 	case 7: return SUMMONFELEMENT;
 	case 8: return SUMMONWELEMENT;
-	case 9: return DIMENSIONDOOR;
-	case 10: return TOWNPORTAL;
+	default: break;
+    }
+
+    return Spell::NONE;    
+}
+
+Spell::spell_t Spell::RandAdventure(const u8 lvl)
+{
+    if(1 == lvl)
+    switch(Rand::Get(1, 2))
+    {
+	case 1: return VIEWMINES;
+	case 2: return VIEWRESOURCES;
+	default: break;
+    }
+    else
+    if(2 == lvl)
+    switch(Rand::Get(1, 4))
+    {
+	case 1: return HAUNT;
+	case 2: return SUMMONBOAT;
+	case 3: return VIEWARTIFACTS;
+	case 4: return VISIONS;
+	default: break;
+    }
+    else
+    if(3 == lvl)
+    switch(Rand::Get(1, 3))
+    {
+	case 1: return IDENTIFYHERO;
+	case 2: return VIEWHEROES;
+	case 3: return VIEWTOWNS;
+	default: break;
+    }
+    else
+    if(4 == lvl)
+    switch(Rand::Get(1, 6))
+    {
+	case 1: return SETEGUARDIAN;
+	case 2: return SETAGUARDIAN;
+	case 3: return SETFGUARDIAN;
+	case 4: return SETWGUARDIAN;
+	case 5: return TOWNGATE;
+	case 6: return VIEWALL;
 
 	default: break;
     }
-    
+    else
+    if(5 == lvl)
+    switch(Rand::Get(1, 2))
+    {
+	case 1: return DIMENSIONDOOR;
+	case 2: return TOWNPORTAL;
+	default: break;
+    }
+
     return Spell::NONE;
 }
 
@@ -341,13 +357,6 @@ bool Spell::isCombat(spell_t spell)
     }
     
     return true;
-}
-
-bool Spell::Uniq(const std::vector<spell_t> & spells, spell_t spell)
-{
-    if(Spell::NONE == spell) return false;
-
-    return spells.end() == std::find(spells.begin(), spells.end(), spell);
 }
 
 u8 Spell::GetIndexSprite(spell_t spell)

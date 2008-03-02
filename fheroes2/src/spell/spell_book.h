@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,25 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ERROR_H
-#define H2ERROR_H
 
-#include <string>
+#ifndef H2SPELLBOOK_H
+#define H2SPELLBOOK_H
 
-class Error
+#include "spell_storage.h"
+#include "gamedefs.h"
+
+namespace Spell
 {
+    class Book : public Storage
+    {
+    public:
+	Book();
 
-public:
-    Error(){};
-    ~Error(){};
+        void Appends(const Storage & st);
 
-    class Exception{};
-
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
-
-    static const std::string & SDLError(void);
+    private:
+	u8 list_count;
+    };
 };
 
 #endif

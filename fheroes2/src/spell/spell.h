@@ -104,13 +104,10 @@ namespace Spell
     const std::string & String(spell_t spell);
     const std::string & Description(spell_t spell);
     u8 Level(spell_t spell);
-    spell_t Rand1(void);
-    spell_t Rand2(void);
-    spell_t Rand3(void);
-    spell_t Rand4(void);
-    spell_t Rand5(void);
     bool isCombat(spell_t spell);
-    bool Uniq(const std::vector<spell_t> & spells, spell_t spell);
+
+    spell_t RandCombat(const u8 lvl);
+    spell_t RandAdventure(const u8 lvl);
     
     /* return index sprite spells.icn */
     u8 GetIndexSprite(spell_t spell);

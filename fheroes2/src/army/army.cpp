@@ -73,6 +73,11 @@ Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
     return *this;
 }
 
+bool Army::Troops::PredicateIsValid(const Army::Troops & t)
+{
+    return Monster::UNKNOWN > t.Monster() && t.Count();
+}
+
 bool Army::Troops::isValid(void) const
 {
     return Monster::UNKNOWN > monster && count;

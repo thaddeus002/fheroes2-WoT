@@ -64,6 +64,8 @@ namespace Army
         void SetMasterSkill(const Skill::Primary* p){ master_skill = p; };
 	Troops & operator= (const Troops & troops);
 
+        static bool PredicateIsValid(const Troops & t);
+
         bool isValid(void) const;
 
         Monster::monster_t Monster(void) const{ return monster; };

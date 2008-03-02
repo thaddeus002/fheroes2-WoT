@@ -12,7 +12,7 @@ CC := g++
 
 SOURCEDIR := ./agg ./algorithm ./army ./castle ./dialog ./editor \
 	./game ./gui ./heroes ./image ./kingdom ./maps ./monster \
-	./resource ./system
+	./resource ./system ./spell
 
 SEARCH := $(addsuffix /*.cpp, $(SOURCEDIR))
 

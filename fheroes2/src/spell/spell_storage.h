@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ERROR_H
-#define H2ERROR_H
 
-#include <string>
+#ifndef H2SPELLSTORAGE_H
+#define H2SPELLSTORAGE_H
 
-class Error
+#include <list>
+#include "spell.h"
+#include "gamedefs.h"
+
+namespace Spell
 {
+    class Storage
+    {
+    public:
+	Storage();
 
-public:
-    Error(){};
-    ~Error(){};
+	u8 Size(const u8 lvl) const;
+	u8 Size1(void) const;
+	u8 Size2(void) const;
+	u8 Size3(void) const;
+	u8 Size4(void) const;
+	u8 Size5(void) const;
 
-    class Exception{};
+	const std::list<Spell::spell_t> & Spells(const u8 lvl) const;
+	const std::list<Spell::spell_t> & Spells1(void) const;
+	const std::list<Spell::spell_t> & Spells2(void) const;
+	const std::list<Spell::spell_t> & Spells3(void) const;
+	const std::list<Spell::spell_t> & Spells4(void) const;
+	const std::list<Spell::spell_t> & Spells5(void) const;
 
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
-
-    static const std::string & SDLError(void);
+    protected:
+	std::list<Spell::spell_t>	spells_level1;
+	std::list<Spell::spell_t>	spells_level2;
+	std::list<Spell::spell_t>	spells_level3;
+	std::list<Spell::spell_t>	spells_level4;
+	std::list<Spell::spell_t>	spells_level5;
+    };
 };
 
 #endif

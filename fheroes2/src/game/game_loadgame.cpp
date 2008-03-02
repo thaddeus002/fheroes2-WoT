@@ -75,7 +75,7 @@ Game::menu_t Game::LoadGame(void)
 	if(le.MouseClickLeft(buttonStandartGame)) return LOADSTANDARD;
 	if(le.MouseClickLeft(buttonCampainGame)) return LOADCAMPAIN;
 	if(le.MouseClickLeft(buttonMultiGame)) return LOADMULTI;
-	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(SDLK_ESCAPE)) return MAINMENU;
+	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
     }
 
     return QUITGAME;

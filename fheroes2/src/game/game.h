@@ -17,10 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #ifndef H2GAME_H
 #define H2GAME_H
 
-#include "rect.h"
 #include "maps.h"
 
 #define RADARWIDTH	144
@@ -28,7 +28,8 @@
 
 namespace Game
 {
-    typedef enum {
+    typedef enum
+    {
 	CANCEL,
 	QUITGAME,
 	MAINMENU,
@@ -51,17 +52,6 @@ namespace Game
 	EDITSAVEMAP,
 	EDITSTART
     } menu_t;
-
-    typedef enum { HEROES, CASTLE, BOAT } focus_t;
-
-    typedef struct {
-	focus_t		type;
-	Point		center;
-    } gamefocus_t;
-
-    static gamefocus_t	globalfocus;
-
-    const gamefocus_t & GetFocus(void);
 
     menu_t MainMenu(void);
     menu_t NewGame(void);

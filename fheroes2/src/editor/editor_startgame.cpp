@@ -415,7 +415,7 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
     while(le.HandleEvents())
     {
 	// ESC
-	if(le.KeyPress(SDLK_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
+	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft))

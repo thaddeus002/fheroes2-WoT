@@ -24,16 +24,6 @@
 #include "error.h"
 #include "display.h"
 
-bool SDL::Init(void)
-{
-    return 0 > SDL_Init(SDL_INIT_VIDEO) ? false : true;
-}
-
-void SDL::Quit(void)
-{
-    SDL_Quit();
-}
-
 Display::Display()
 {
     videosurface = true;

@@ -63,7 +63,7 @@
 #define START_IMPOSSIBLE_GEMS           0
 #define START_IMPOSSIBLE_GOLD           0
 
-
+#include <vector>
 #include "race.h"
 #include "color.h"
 #include "resource.h"

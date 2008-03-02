@@ -85,7 +85,7 @@ Dialog::answer_t Dialog::AdventureOptions(void)
         if(le.MouseClickLeft(buttonPuzzle)){ result = Dialog::CANCEL; break; }
         if(le.MouseClickLeft(buttonInfo)){ result = Dialog::CANCEL; break; }
         if(le.MouseClickLeft(buttonDig)){ result = Dialog::CANCEL; break; }
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }
+        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
     }
 
     // restore background

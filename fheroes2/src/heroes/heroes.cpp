@@ -246,8 +246,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.Level(Skill::LOGISTICS, Skill::Level::BASIC);
 	    secondary_skills.Level(Skill::MYSTICISM, Skill::Level::BASIC);
 	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
+	    //secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    //secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
 
 	    artifacts.push_back(Artifact::MEDAL_VALOR);
 	    artifacts.push_back(Artifact::STEALTH_SHIELD);
@@ -375,10 +375,16 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     {
 	++ptr8;
 
+	secondary_skills.Reset();
+
 	// skills
 	for(u8 ii = 0; ii < 8; ++ii)
-	    secondary_skills.Level(Skill::Secondary::FromMP2(*ptr8 + ii), Skill::Level::FromMP2(*(ptr8 + ii + 8)));
+	{
+	    const Skill::secondary_t skill = Skill::Secondary::FromMP2(*(ptr8 + ii));
+	    const Skill::Level::type_t lvl = Skill::Level::FromMP2(*(ptr8 + ii + 8));
 
+	    if(Skill::UNKNOWN != skill && Skill::Level::NONE != lvl) secondary_skills.Level(skill, lvl);
+	}
 	ptr8 += 15;
     }
     else
@@ -415,6 +421,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     move_point = GetMaxMovePoints();
 
     if(H2Config::Debug()) Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
+}
+
+bool Heroes::operator== (const Heroes & h) const
+{
+    return heroes == h.heroes;
 }
 
 u8 Heroes::GetMobilityIndexSprite(void) const
@@ -1042,4 +1053,9 @@ bool Heroes::BuySpellBook(void)
     artifacts.push_back(Artifact::MAGIC_BOOK);
     
     return true;
+}
+
+void Heroes::AppendSpellsToBook(const Spell::Storage & spells)
+{
+    spell_book.Appends(spells);
 }

@@ -72,7 +72,7 @@ Game::menu_t Game::LoadStandard(void)
 	le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
 	if(le.MouseClickLeft(buttonOk)) return MAINMENU;
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)) return MAINMENU;
+	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 	//if(le.MouseClickLeft(buttonPgUp)) return MAINMENU;
 	//if(le.MouseClickLeft(buttonPgDn)) return MAINMENU;
     }

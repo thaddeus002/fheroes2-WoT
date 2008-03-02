@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include "error.h"
+#include "engine.h"
 #include "config.h"
 #include "surface.h"
 #include "sprite.h"
@@ -213,6 +214,17 @@ AGG::Cache::~Cache()
 	    for(; it1 != it2; ++it1) delete *it1;
 	}
     }
+
+    // free wav cache
+    std::map<M82::m82_t, Audio::CVT>::const_iterator cvt_it1 = m82_cache.begin();
+    std::map<M82::m82_t, Audio::CVT>::const_iterator cvt_it2 = m82_cache.end();
+
+    for(; cvt_it1 != cvt_it2; ++cvt_it1)
+    {
+	const Audio::CVT & cvt = (*cvt_it1).second;
+	
+	if(cvt.valid && cvt.buf) delete [] cvt.buf;
+    }
 }
 
 /* get AGG::Cache object */
@@ -403,6 +415,47 @@ void AGG::Cache::LoadPAL(void)
     }
 }
 
+/* load 82M object to AGG::Cache in Audio::CVT */
+void AGG::Cache::LoadWAV(const M82::m82_t m82)
+{
+    Audio::CVT & cvt = m82_cache[m82];
+
+    if(cvt.valid) return;
+
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadWAV: " + M82::GetString(m82));
+
+    const Audio::Spec & hardware = Audio::HardwareSpec();
+
+    if(agg_cache.size())
+    {
+	std::vector<char> body;
+
+	std::vector<File *>::const_iterator it1 = agg_cache.begin();
+	std::vector<File *>::const_iterator it2 = agg_cache.end();
+
+	for(; it1 != it2; ++it1)
+
+	    // read only first found
+	    if((**it1).Read(M82::GetString(m82), body))
+	    {
+		cvt.valid = true;
+
+		if(-1 == SDL_BuildAudioCVT(&cvt, 8, 1, 22050, hardware.format, hardware.channels, hardware.freq))
+		{
+		    Error::Warning("AGG::Cache::LoadWAV: SDL_BuildAudioCVT: " + Error::SDLError());
+
+		    return;
+		}
+
+		cvt.buf = new u8[cvt.len_mult * body.size()];
+		cvt.len = body.size();
+		memcpy(cvt.buf, &body[0], body.size());
+		
+		SDL_ConvertAudio(&cvt);
+	    }
+    }
+}
+
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 {
@@ -437,6 +490,18 @@ void AGG::Cache::FreeTIL(const TIL::til_t til)
 
 	v.clear();
     }
+}
+
+/* free 82M object in AGG::Cache */
+void AGG::Cache::FreeWAV(const M82::m82_t m82)
+{
+    Audio::CVT & cvt = m82_cache[m82];
+
+    if(! cvt.valid) return;
+
+    if(cvt.buf) delete [] cvt.buf;
+    
+    cvt = Audio::CVT();
 }
 
 /* return ICN sprite from AGG::Cache */
@@ -499,6 +564,16 @@ const Palette & AGG::Cache::GetPAL(void)
     return palette;
 }
 
+/* return CVT from AGG::Cache */
+const Audio::CVT & AGG::Cache::GetWAV(const M82::m82_t m82)
+{
+    const Audio::CVT & cvt = m82_cache[m82];
+
+    if(! cvt.valid && SDL::SubSystem(INIT_AUDIO)) LoadWAV(m82);
+
+    return cvt;
+}
+
 // wrapper AGG::PreloadObject
 void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
@@ -532,6 +607,11 @@ void AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface 
     const Surface & src = AGG::Cache::Get().GetTIL(til, index);
 
     TIL::Reflect(dst, src, shape);
+}
+
+const Audio::CVT & AGG::GetWAV(const M82::m82_t m82)
+{
+    return AGG::Cache::Get().GetWAV(m82);
 }
 
 // wrapper AGG::GetColor

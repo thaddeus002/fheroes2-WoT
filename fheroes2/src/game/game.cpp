@@ -29,4 +29,3 @@ Game::menu_t Game::NewMulti(void){ Error::Verbose("New Multi Game: under constru
 Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
 Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }
 
-const Game::gamefocus_t & Game::GetFocus(void){ return Game::globalfocus; }

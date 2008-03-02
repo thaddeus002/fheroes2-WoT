@@ -32,6 +32,7 @@
 #include "xmi.h"
 #include "m82.h"
 #include "palette.h"
+#include "audio.h"
 #include "text.h"
 
 class Surface;
@@ -84,13 +85,16 @@ namespace AGG
 	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
 	const Surface & GetTIL(const TIL::til_t til, u16 index);
 	const Palette & GetPAL(void);
+	const Audio::CVT & GetWAV(const M82::m82_t m82);
 
 	void LoadICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
+	void LoadWAV(const M82::m82_t m82);
 	void LoadPAL(void);
 
 	void FreeICN(const ICN::icn_t icn, bool reflect = false);
 	void FreeTIL(const TIL::til_t til);
+	void FreeWAV(const M82::m82_t m82);
 
     private:
 	Cache();
@@ -100,6 +104,7 @@ namespace AGG
 	std::map<ICN::icn_t, std::vector<Sprite *> > icn_cache;
 	std::map<ICN::icn_t, std::vector<Sprite *> > reflect_icn_cache;
 	std::map<TIL::til_t, std::vector<Surface *> > til_cache;
+	std::map<M82::m82_t, Audio::CVT> m82_cache;
 
 	Palette palette;
 
@@ -116,6 +121,7 @@ namespace AGG
     // wrapper AGG::GetXXX
     const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
     void GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst);
+    const Audio::CVT & GetWAV(const M82::m82_t m82);
 
     // wrapper AGG::GetColor
     u32 GetColor(const u16 index);

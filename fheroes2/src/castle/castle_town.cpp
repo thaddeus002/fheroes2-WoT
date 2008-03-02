@@ -111,10 +111,10 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 
         if(button1.isEnable() &&
     	    (le.MouseClickLeft(button1) ||
-    	    le.KeyPress(SDLK_RETURN))) return Dialog::OK;
+    	    le.KeyPress(KEY_RETURN))) return Dialog::OK;
 
         if(le.MouseClickLeft(button2) ||
-    	    le.KeyPress(SDLK_ESCAPE)) break;
+    	    le.KeyPress(KEY_ESCAPE)) break;
     }
 
     return Dialog::CANCEL;
@@ -311,10 +311,10 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
         le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
-        if(le.KeyPress(SDLK_RETURN) ||
+        if(le.KeyPress(KEY_RETURN) ||
     	    le.MouseClickLeft(button1)) return Dialog::OK;
 
-        if(le.KeyPress(SDLK_ESCAPE) ||
+        if(le.KeyPress(KEY_ESCAPE) ||
     	    le.MouseClickLeft(button2)) return Dialog::CANCEL;
     }
 
@@ -756,7 +756,7 @@ Castle::building_t Castle::OpenTown(void)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
+        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
 
 	// click left
 	if(!(DWELLING_MONSTER1 & building) && le.MouseClickLeft(rectDwelling1) && allowBuyBuildDwelling1 &&

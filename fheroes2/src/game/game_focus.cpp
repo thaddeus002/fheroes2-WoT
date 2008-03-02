@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,68 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ERROR_H
-#define H2ERROR_H
 
-#include <string>
+#include "error.h"
+#include "castle.h"
+#include "heroes.h"
+#include "game_focus.h"
 
-class Error
+Game::Focus::Focus() : type(UNSEL), castle(NULL), heroes(NULL)
 {
+}
 
-public:
-    Error(){};
-    ~Error(){};
+Game::Focus & Game::Focus::Get(void)
+{
+    static Game::Focus gfocus;
+    
+    return gfocus;
+}
 
-    class Exception{};
+void Game::Focus::Set(const Heroes & hr)
+{
+    type = HEROES;
+    heroes = &hr;
+    castle = NULL;
+}
 
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
+void Game::Focus::Set(const Castle & cs)
+{
+    type = CASTLE;
+    castle = & cs;
+    heroes = NULL;
+}
 
-    static const std::string & SDLError(void);
-};
+const Game::Focus::focus_t & Game::Focus::Type(void) const
+{
+    return type;
+}
 
-#endif
+const Castle & Game::Focus::GetCastle(void) const
+{
+    if(NULL == castle) Error::Warning("Game::Focus::GetCastle: is NULL");
+
+    return *castle;
+}
+
+const Heroes & Game::Focus::GetHeroes(void) const
+{
+    if(NULL == heroes) Error::Warning("Game::Focus::GetHeroes: is NULL");
+
+    return *heroes;
+}
+
+const Point & Game::Focus::Center(void) const
+{
+    const Point *pt = NULL;
+
+    switch(type)
+    {
+	case CASTLE:	if(castle) pt = &(*castle).GetCenter(); break;
+	case BOAT:
+	case HEROES:	if(heroes) pt = &(*heroes).GetCenter(); break;
+
+	default:	Error::Warning("Game::Focus::GetCenter: is NULL"); break;
+    }
+
+    return *pt;
+}

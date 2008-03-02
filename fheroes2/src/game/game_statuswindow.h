@@ -27,7 +27,8 @@
 #include "rect.h"
 
 class Surface;
-class Kingdom;
+class Castle;
+class Heroes;
 
 namespace Game
 {
@@ -37,14 +38,14 @@ class StatusWindow
 public:
     typedef enum { DAY, FUNDS, ARMY } info_t;
 
-    StatusWindow(const Point &pt, const Kingdom &kd);
+    StatusWindow(const Point &pt);
 
-    const Rect & GetRect(void) const{ return pos; }
+    const Rect & GetRect(void) const;
     
     void Redraw(void);
-    void SetState(info_t info){ state = info; };
+    void SetState(const info_t info);
     void NextState(void);
-    
+
     void RedrawAITurns(Color::color_t color, u8 progress) const;
 
 private:
@@ -54,8 +55,7 @@ private:
 
     const Surface & ston;
     const Rect pos;
-    const Kingdom & myKingdom;
-    
+
     info_t state;
 };
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ERROR_H
-#define H2ERROR_H
 
-#include <string>
+#include "spell_book.h"
 
-class Error
+Spell::Book::Book() : list_count(0)
 {
+}
 
-public:
-    Error(){};
-    ~Error(){};
+void Spell::Book::Appends(const Storage & st)
+{
+    if(st.Size1())
+    {
+	spells_level1.insert(spells_level1.begin(), st.Spells1().begin(), st.Spells1().end());
+	spells_level1.sort();
+	spells_level1.unique();
+    }
 
-    class Exception{};
+    if(st.Size2())
+    {
+	spells_level2.insert(spells_level2.begin(), st.Spells2().begin(), st.Spells2().end());
+	spells_level2.sort();
+	spells_level2.unique();
+    }
 
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
+    if(st.Size3())
+    {
+	spells_level3.insert(spells_level3.begin(), st.Spells3().begin(), st.Spells3().end());
+	spells_level3.sort();
+	spells_level3.unique();
+    }
 
-    static const std::string & SDLError(void);
-};
+    if(st.Size4())
+    {
+	spells_level4.insert(spells_level4.begin(), st.Spells4().begin(), st.Spells4().end());
+	spells_level4.sort();
+	spells_level4.unique();
+    }
 
-#endif
+    if(st.Size5())
+    {
+	spells_level5.insert(spells_level5.begin(), st.Spells5().begin(), st.Spells5().end());
+	spells_level5.sort();
+	spells_level5.unique();
+    }
+}

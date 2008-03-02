@@ -340,9 +340,9 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 	    display.Flip();
 	}
 	
-	if(le.MouseClickLeft(buttonOk) || le.KeyPress(SDLK_RETURN)) break;
+	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN)) break;
 	
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = 0; break; }
+	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ result = 0; break; }
     }
 
     cursor.Hide();

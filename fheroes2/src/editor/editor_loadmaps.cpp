@@ -344,7 +344,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	if(le.MousePressRight(buttonOk)) Dialog::Message("OK", "Accept the choice made.", Font::BIG);
 
 	// click ok
-	if(le.MouseClickLeft(buttonOk) || le.KeyPress(SDLK_RETURN) || le.KeyPress(SDLK_ESCAPE)) break;
+	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
     }
 
     // set current settings

@@ -81,6 +81,7 @@ public:
     void Redraw(void);
 
     void SelectFromCenter(const Point & pt);
+
     const Point & GetCenter(u8 index) const;
 
 protected:

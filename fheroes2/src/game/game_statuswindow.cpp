@@ -25,36 +25,43 @@
 #include "config.h"
 #include "sprite.h"
 #include "kingdom.h"
+#include "castle.h"
+#include "heroes.h"
+#include "army.h"
+#include "game_focus.h"
 #include "game_statuswindow.h"
 
-Game::StatusWindow::StatusWindow(const Point &pt, const Kingdom &kd)
+Game::StatusWindow::StatusWindow(const Point &pt)
     : ston(AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0)), 
-      pos(pt, ston.w(), ston.h()), myKingdom(kd), state(Game::StatusWindow::DAY)
-{}
+      pos(pt, ston.w(), ston.h()), state(Game::StatusWindow::DAY)
+{
+}
+
+const Rect & Game::StatusWindow::GetRect(void) const
+{
+    return pos;
+}
+
+void Game::StatusWindow::SetState(const info_t info)
+{
+    state = info;
+}
 
 void Game::StatusWindow::Redraw(void)
 {
     switch(state)
     {
-	case DAY:
-	    DrawDayInfo();
-	    break;
-	case FUNDS:
-	    DrawKingdomInfo();
-	    break;
-	    break;
-	case ARMY:
-	    DrawArmyInfo();
-	    break;
-    }	
-
+	case DAY:	DrawDayInfo();		break;
+	case FUNDS:	DrawKingdomInfo();	break;
+	case ARMY:	DrawArmyInfo();		break;
+    }
 }
 
 void Game::StatusWindow::NextState(void)
 {
     if(DAY == state) state = FUNDS;
     else
-    if(FUNDS == state) state = ARMY;
+    if(FUNDS == state) state = (Game::Focus::CASTLE == Game::Focus::Get().Type() ? DAY : ARMY);
     else
     if(ARMY == state) state = DAY;
 }
@@ -62,6 +69,8 @@ void Game::StatusWindow::NextState(void)
 void Game::StatusWindow::DrawKingdomInfo(void)
 {
     std::string count;
+
+    Kingdom & myKingdom = world.GetMyKingdom();
 
     Display & display = Display::Get();
 
@@ -133,8 +142,94 @@ void Game::StatusWindow::DrawDayInfo(void)
 
 void Game::StatusWindow::DrawArmyInfo(void)
 {
+    const Game::Focus & focus = Game::Focus::Get();
+
+    if(Game::Focus::HEROES != focus.Type() && Game::Focus::BOAT != focus.Type()) return;
+
+    const std::vector<Army::Troops> & armies = focus.GetHeroes().GetArmy();
+
+    Display & display = Display::Get();
+    
     // restore background
-    Display::Get().Blit(ston, pos.x, pos.y);
+    display.Blit(ston, pos.x, pos.y);
+    
+    // valid count army
+    u16 count = std::count_if(armies.begin(), armies.end(), Army::Troops::PredicateIsValid);
+
+    Point dst_pt;
+    u8 current = 0;
+    std::string str;
+
+    const u8 one_line = 3;
+
+    // one lines
+    if(4 > count)
+    {
+	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+	    if(armies[ii].isValid())
+	    {
+		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
+
+		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
+		dst_pt.y = pos.y + 55 - sprite.h();
+
+		display.Blit(sprite, dst_pt);
+
+		str.clear();
+		String::AddInt(str, armies[ii].Count());
+		Text(str, Font::SMALL, dst_pt.x + (sprite.w() - Text::width(str, Font::SMALL)) / 2, dst_pt.y + sprite.h() + 2);
+
+		++current;
+	    }
+    }
+    else
+    // two lines
+    {
+	// top
+	u8 ii = 0;
+	count = ( 4 < count ? 3 : 2);
+
+	for(; ii < HEROESMAXARMY; ++ii)
+	    if(armies[ii].isValid())
+	    {
+		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
+
+		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
+		dst_pt.y = pos.y + 42 - sprite.h();
+
+		display.Blit(sprite, dst_pt);
+
+		str.clear();
+		String::AddInt(str, armies[ii].Count());
+		Text(str, Font::SMALL, dst_pt.x + (sprite.w() - Text::width(str, Font::SMALL)) / 2, dst_pt.y + sprite.h() - 6);
+
+		++current;
+
+		if(current == count) break;
+	    }
+
+	// bottom
+	count = 2;
+	current = 0;
+	++ii;
+
+	for(; ii < HEROESMAXARMY; ++ii)
+	    if(armies[ii].isValid())
+	    {
+		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
+
+		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
+		dst_pt.y = pos.y + 65 - sprite.h();
+
+		display.Blit(sprite, dst_pt);
+
+		str.clear();
+		String::AddInt(str, armies[ii].Count());
+		Text(str, Font::SMALL, dst_pt.x + (sprite.w() - Text::width(str, Font::SMALL)) / 2, dst_pt.y + sprite.h() - 6);
+
+		++current;
+	    }
+    }
 }
 
 void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const

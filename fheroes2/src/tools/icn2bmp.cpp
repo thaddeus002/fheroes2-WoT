@@ -36,6 +36,7 @@
 #include "types.h"
 #include "surface.h"
 #include "display.h"
+#include "engine.h"
 
 void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & palette, bool rledebug);
 

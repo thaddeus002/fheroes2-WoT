@@ -90,10 +90,10 @@ Dialog::answer_t Dialog::BuySpellBook(bool enable)
         if(button1.isEnable()) le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
-        if(le.KeyPress(SDLK_RETURN) ||
+        if(le.KeyPress(KEY_RETURN) ||
     	    (button1.isEnable() && le.MouseClickLeft(button1))) return Dialog::YES;
 
-        if(le.KeyPress(SDLK_ESCAPE) ||
+        if(le.KeyPress(KEY_ESCAPE) ||
     	    le.MouseClickLeft(button2)) return Dialog::NO;
     }
 

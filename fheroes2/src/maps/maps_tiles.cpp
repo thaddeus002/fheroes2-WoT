@@ -30,7 +30,7 @@
 #include "heroes.h"
 #include "sprite.h"
 #include "maps.h"
-#include "game.h"
+#include "game_focus.h"
 #include "gamearea.h"
 #include "display.h"
 #include "maps_tiles.h"
@@ -57,6 +57,11 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
     uniq = ta.GetUniq();
     
     return *this;
+}
+
+bool Maps::TilesAddon::PredicateSortRules(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
+{
+    return ta1.GetLevel() > ta2.GetLevel();
 }
 
 u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
@@ -172,9 +177,9 @@ void Maps::Tiles::AddonsPushLevel2(const MP2::mp2addon_t & ma)
 
 void Maps::Tiles::AddonsSort(void)
 {
-    if(addons_level1.size()) addons_level1.sort(TilesAddon::RulesCompare);
+    if(addons_level1.size()) addons_level1.sort(Maps::TilesAddon::PredicateSortRules);
 
-    if(addons_level2.size()) addons_level2.sort(TilesAddon::RulesCompare);
+    if(addons_level2.size()) addons_level2.sort(Maps::TilesAddon::PredicateSortRules);
 }
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
@@ -216,7 +221,11 @@ void Maps::Tiles::Remove(u32 uniq)
 	std::list<TilesAddon>::iterator       it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
-	for(; it1 != it2; ++it1) if(uniq == (*it1).GetUniq()) addons_level1.erase(it1);
+	while(it1 != it2)
+	    if(uniq == (*it1).GetUniq())
+		it1 = addons_level1.erase(it1);
+	    else
+		++it1;
     }
 
     if(addons_level2.size())
@@ -224,7 +233,11 @@ void Maps::Tiles::Remove(u32 uniq)
 	std::list<TilesAddon>::iterator       it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
 
-	for(; it1 != it2; ++it1) if(uniq == (*it1).GetUniq()) addons_level1.erase(it1);
+	while(it1 != it2)
+	    if(uniq == (*it1).GetUniq())
+		it1 = addons_level2.erase(it1);
+	    else
+		++it1;
     }
 }
 
@@ -1086,9 +1099,9 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 /* accept move */
 bool Maps::Tiles::isPassable() const
 {
-    const Game::gamefocus_t & focus = Game::GetFocus();
+    const Game::Focus::focus_t focus = Game::Focus::Get().Type();
 
-    if(Game::BOAT == focus.type)
+    if(Game::Focus::BOAT == focus)
     {
 	if(Ground::WATER != GetGround()) return false;
 
@@ -1106,7 +1119,7 @@ bool Maps::Tiles::isPassable() const
 	}
     }
     else
-    if(Game::HEROES == focus.type)
+    if(Game::Focus::HEROES == focus)
     {
 	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
 

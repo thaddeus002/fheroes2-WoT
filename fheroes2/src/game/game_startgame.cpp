@@ -38,7 +38,7 @@
 #include "error.h"
 #include "game_selectfocus.h"
 #include "route.h"
-#include "game.h"
+#include "game_focus.h"
 
 namespace Game
 {
@@ -244,19 +244,19 @@ Game::menu_t Game::StartGame(void)
     splitHeroes.SetRange(0, myHeroes.size() > icon_count ? myHeroes.size() - icon_count : 0);
     splitCastles.SetRange(0, myCastles.size() > icon_count ? myCastles.size() - icon_count : 0);
 
+    Game::Focus & global_focus = Focus::Get();
+
     // focus set to castle
     if(myCastles.size())
     {
-	globalfocus.type = Game::CASTLE;
-	globalfocus.center = (*myCastles.front()).GetCenter();
+	global_focus.Set(*myCastles.front());
 	selectCastles.Select(0);
     }
     else
     // focus set to heroes
     if(myHeroes.size())
     {
-	globalfocus.type = Game::HEROES;
-	globalfocus.center = (*myHeroes.front()).GetCenter();
+	global_focus.Set(*myHeroes.front());
 	selectHeroes.Select(0);
     }
     // unknown focus
@@ -267,14 +267,17 @@ Game::menu_t Game::StartGame(void)
     }
 
     selectCastles.Redraw();
+    cursor.Hide();
     selectHeroes.Redraw();
+    cursor.Hide();
 
     // center to focus
-    areaMaps.Center(globalfocus.center);
+    areaMaps.Center(global_focus.Center());
     radar.RedrawCursor();
+    cursor.Hide();
 
     // status window
-    Game::StatusWindow statusWindow(pt_stw, myKingdom);
+    Game::StatusWindow statusWindow(pt_stw);
     statusWindow.Redraw();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -301,54 +304,54 @@ Game::menu_t Game::StartGame(void)
     while(le.HandleEvents())
     {
 	// ESC
-	if(le.KeyPress(SDLK_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
+	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft))
 	{
 	    cursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_LEFT);
+	    cursor.SetThemes(Cursor::SCROLL_LEFT);
 	    areaMaps.Scroll(GameArea::LEFT);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
+	else
 	// scroll area maps right
 	if(le.MouseCursor(areaScrollRight))
 	{
 	    cursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_RIGHT);
+	    cursor.SetThemes(Cursor::SCROLL_RIGHT);
 	    areaMaps.Scroll(GameArea::RIGHT);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
+	else
 	// scroll area maps top
 	if(le.MouseCursor(areaScrollTop))
 	{
 	    cursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_TOP);
+	    cursor.SetThemes(Cursor::SCROLL_TOP);
 	    areaMaps.Scroll(GameArea::TOP);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
+	else
 	// scroll area maps bottom
 	if(le.MouseCursor(areaScrollBottom)){
 	    cursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_BOTTOM);
+	    cursor.SetThemes(Cursor::SCROLL_BOTTOM);
 	    areaMaps.Scroll(GameArea::BOTTOM);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
 	    continue;
 	}
-
-	// pointer cursor on left panel
-	if(le.MouseCursor(areaLeftPanel)){ cursor.SetThemes(cursor.POINTER); }
 	else
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
@@ -361,12 +364,12 @@ Game::menu_t Game::StartGame(void)
 	    const Heroes * heroes = NULL;
 	    const u8 object = tile.GetObject();
 
-	    switch(globalfocus.type)
+	    switch(global_focus.Type())
 	    {
 		// focus from hero
-		case Game::HEROES:
+		case Game::Focus::HEROES:
 		{
-		    if(NULL == (heroes = world.GetHeroes(globalfocus.center))) break;
+		    if(NULL == (heroes = world.GetHeroes(global_focus.Center()))) break;
 
 		    const Route & path = (*heroes).GetPath();
 
@@ -374,18 +377,15 @@ Game::menu_t Game::StartGame(void)
 		    {
 			// focus from hero to monster
     			case MP2::OBJ_MONSTER:
-    			    cursor.SetThemes(cursor.FIGHT);
+    			    cursor.SetThemes(Cursor::FIGHT);
 
-			    // FIXME heroes attack monster
 			    if(le.MouseClickLeft(tile_pos))
 			    {
-				const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-				if(path.GetDestinationIndex() != new_dst_point)
+				if(path.GetDestinationIndex() != index_maps)
 				{
 				    cursor.Hide();
 				    if(path.Length()) path.Hide();
-				    const_cast<Route &>(path).Calculate(new_dst_point);
+				    const_cast<Route &>(path).Calculate(index_maps);
 				    path.Show();
 				    world.GetTiles((*heroes).GetCenter()).Redraw();
 				    cursor.Show();
@@ -393,43 +393,27 @@ Game::menu_t Game::StartGame(void)
 				}
 				else
 				{
-				    //const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-				    if(path.GetDestinationIndex() != new_dst_point)
+				    // hero goto near monster
+				    if(path.Length() > 1)
 				    {
 					cursor.Hide();
-					if(path.Length()) path.Hide();
-					const_cast<Route &>(path).Calculate(new_dst_point);
-					path.Show();
-					world.GetTiles((*heroes).GetCenter()).Redraw();
+				    	const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
+    					FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
+					splitHeroes.Move(selectHeroes.GetTopIndex());
+				    	const_cast<Route &>(path).Reset();
 					cursor.Show();
 					display.Flip();
 				    }
 				    else
 				    {
-				        // hero goto near monster
-					if(path.Length() > 1)
-					{
-					    cursor.Hide();
-				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-				    	    globalfocus.center = heroes->GetCenter();
-    					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-					    splitHeroes.Move(selectHeroes.GetTopIndex());
-				    	    const_cast<Route &>(path).Reset();
-					    cursor.Show();
-					    display.Flip();
-				    	}
-				    	else
-				    	{
-					    cursor.Hide();
-				    	    const_cast<Route &>(path).Reset();
-					    cursor.Show();
-					    display.Flip();
-				    	}
-
-				    	// FIXME: hero attack monster
-				    	Error::Verbose("Game: FIXME: hero attack monster");
+					cursor.Hide();
+				    	const_cast<Route &>(path).Reset();
+					cursor.Show();
+					display.Flip();
 				    }
+
+				    // FIXME: hero attack monster
+				    Error::Verbose("Game: FIXME: hero attack monster");
 				}
 			    }
 			    else
@@ -449,7 +433,7 @@ Game::menu_t Game::StartGame(void)
     			    {
 				if(H2Config::MyColor() == castle->GetColor())
 				{
-	    			    cursor.SetThemes(cursor.CASTLE);
+	    			    cursor.SetThemes(Cursor::CASTLE);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
@@ -472,7 +456,6 @@ Game::menu_t Game::StartGame(void)
 					// select other castle
 					else
 					{
-					    path.Hide();
 					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
 					    splitCastles.Move(selectCastles.GetTopIndex());
 					    display.Flip();
@@ -489,7 +472,7 @@ Game::menu_t Game::StartGame(void)
 				// over enemy castle
 				else
 				{
-	    			    cursor.SetThemes(cursor.FIGHT);
+	    			    cursor.SetThemes(Cursor::FIGHT);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
@@ -512,7 +495,6 @@ Game::menu_t Game::StartGame(void)
 					    {
 						cursor.Hide();
 				    		const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-				    		globalfocus.center = heroes->GetCenter();
     						FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 						splitHeroes.Move(selectHeroes.GetTopIndex());
 				    		const_cast<Route &>(path).Reset();
@@ -548,18 +530,16 @@ Game::menu_t Game::StartGame(void)
 			    {
 				if(H2Config::MyColor() == castle->GetColor())
 				{
-        			    cursor.SetThemes(cursor.ACTION);
+        			    cursor.SetThemes(Cursor::ACTION);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
-					const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-					if(path.GetDestinationIndex() != new_dst_point)
+					if(path.GetDestinationIndex() != index_maps)
 					{
 					    // hero show path
 					    cursor.Hide();
 					    if(path.Length()) path.Hide();
-					    const_cast<Route &>(path).Calculate(new_dst_point);
+					    const_cast<Route &>(path).Calculate(index_maps);
 					    path.Show();
 					    world.GetTiles((*heroes).GetCenter()).Redraw();
 					    cursor.Show();
@@ -571,7 +551,6 @@ Game::menu_t Game::StartGame(void)
 					    cursor.Hide();
 				    	    const_cast<Heroes &>(*heroes).Goto(Maps::GetIndexFromAreaPoint(mouse_coord));
 				    	    const_cast<Route &>(path).Reset();
-				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 					    splitHeroes.Move(selectHeroes.GetTopIndex());
 					    cursor.Show();
@@ -600,7 +579,7 @@ Game::menu_t Game::StartGame(void)
 				// over enemy castle
 				else
 				{
-				    cursor.SetThemes(cursor.FIGHT);
+				    cursor.SetThemes(Cursor::FIGHT);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
@@ -623,7 +602,6 @@ Game::menu_t Game::StartGame(void)
 					    {
 						cursor.Hide();
 				    		const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-				    		globalfocus.center = heroes->GetCenter();
     						FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    		const_cast<Route &>(path).Reset();
 						cursor.Show();
@@ -660,7 +638,7 @@ Game::menu_t Game::StartGame(void)
     			    {
 				if(H2Config::MyColor() == heroes2->GetColor())
 				{
-				    cursor.SetThemes(heroes2->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()) ? cursor.HEROES : cursor.CHANGE);
+				    cursor.SetThemes(heroes2->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()) ? Cursor::HEROES : Cursor::CHANGE);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
@@ -675,13 +653,11 @@ Game::menu_t Game::StartGame(void)
 					// heroes dialog meeting
 					else
 					{
-					    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-					    if(path.GetDestinationIndex() != new_dst_point)
+					    if(path.GetDestinationIndex() != index_maps)
 					    {
 						cursor.Hide();
 						if(path.Length()) path.Hide();
-						const_cast<Route &>(path).Calculate(new_dst_point);
+						const_cast<Route &>(path).Calculate(index_maps);
 						path.Show();
 						world.GetTiles((*heroes).GetCenter()).Redraw();
 						cursor.Show();
@@ -694,7 +670,6 @@ Game::menu_t Game::StartGame(void)
 						{
 						    cursor.Hide();
 				    		    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-				    		    globalfocus.center = heroes->GetCenter();
     						    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    		    const_cast<Route &>(path).Reset();
 						    cursor.Show();
@@ -725,17 +700,15 @@ Game::menu_t Game::StartGame(void)
 				// over enemy hero
 				else
 				{
-				    cursor.SetThemes(cursor.FIGHT);
+				    cursor.SetThemes(Cursor::FIGHT);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
-					const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-					if(path.GetDestinationIndex() != new_dst_point)
+					if(path.GetDestinationIndex() != index_maps)
 					{
 					    cursor.Hide();
 					    if(path.Length()) path.Hide();
-					    const_cast<Route &>(path).Calculate(new_dst_point);
+					    const_cast<Route &>(path).Calculate(index_maps);
 					    path.Show();
 					    world.GetTiles((*heroes).GetCenter()).Redraw();
 					    cursor.Show();
@@ -748,7 +721,6 @@ Game::menu_t Game::StartGame(void)
 					    {
 						cursor.Hide();
 				    	        const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-				    		globalfocus.center = heroes->GetCenter();
     					        FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    		const_cast<Route &>(path).Reset();
 					        cursor.Show();
@@ -780,25 +752,23 @@ Game::menu_t Game::StartGame(void)
 
 			// focus from hero to boat
     			//case MP2::OBJ_BOAT:
-    			//		cursor.SetThemes(cursor.BOAT);
+    			//		cursor.SetThemes(Cursor::BOAT);
 			//    break;
 
 			// focus from hero to object
     			case MP2::OBJ_TREASURECHEST:
     			    if(Maps::Ground::WATER != tile.GetGround())
     			    {
-    			        cursor.SetThemes(cursor.ACTION);
+    			        cursor.SetThemes(Cursor::ACTION);
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
 				    // show path
-				    if(path.GetDestinationIndex() != new_dst_point)
+				    if(path.GetDestinationIndex() != index_maps)
 				    {
 					cursor.Hide();
 					if(path.Length()) path.Hide();
-					const_cast<Route &>(path).Calculate(new_dst_point);
+					const_cast<Route &>(path).Calculate(index_maps);
 					path.Show();
 					world.GetTiles((*heroes).GetCenter()).Redraw();
 					cursor.Show();
@@ -813,7 +783,6 @@ Game::menu_t Game::StartGame(void)
 					{
 					    cursor.Hide();
 				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    	    const_cast<Route &>(path).Reset();
 					    cursor.Show();
@@ -899,17 +868,15 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_OBSERVATIONTOWER:
     			case MP2::OBJ_FREEMANFOUNDRY:
 
-				cursor.SetThemes(cursor.ACTION);
+				cursor.SetThemes(Cursor::ACTION);
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-				    if(path.GetDestinationIndex() != new_dst_point)
+				    if(path.GetDestinationIndex() != index_maps)
 				    {
 					cursor.Hide();
 					if(path.Length()) path.Hide();
-					const_cast<Route &>(path).Calculate(new_dst_point);
+					const_cast<Route &>(path).Calculate(index_maps);
 					path.Show();
 					world.GetTiles((*heroes).GetCenter()).Redraw();
 					cursor.Show();
@@ -924,7 +891,6 @@ Game::menu_t Game::StartGame(void)
 					{
 					    cursor.Hide();
 				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-				    	    globalfocus.center = heroes->GetCenter();
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 				    	    const_cast<Route &>(path).Reset();
 					    cursor.Show();
@@ -948,18 +914,16 @@ Game::menu_t Game::StartGame(void)
                             if(Maps::Ground::WATER != tile.GetGround() && tile.isPassable())
                             {
                             	// FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
-                            	cursor.SetThemes(cursor.MOVE);
+                            	cursor.SetThemes(Cursor::MOVE);
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-				    if(path.GetDestinationIndex() != new_dst_point)
+				    if(path.GetDestinationIndex() != index_maps)
 				    {
 					// hero show path
 					cursor.Hide();
 					if(path.Length()) path.Hide();
-					const_cast<Route &>(path).Calculate(new_dst_point);
+					const_cast<Route &>(path).Calculate(index_maps);
 					path.Show();
 					world.GetTiles((*heroes).GetCenter()).Redraw();
 					cursor.Show();
@@ -971,7 +935,6 @@ Game::menu_t Game::StartGame(void)
 					cursor.Hide();
 				        const_cast<Heroes &>(*heroes).Goto(Maps::GetIndexFromAreaPoint(mouse_coord));
 				        const_cast<Route &>(path).Reset();
-				        globalfocus.center = heroes->GetCenter();
     					FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 					cursor.Show();
 					display.Flip();
@@ -980,7 +943,7 @@ Game::menu_t Game::StartGame(void)
                     	    }
                             else
                             {
-                                cursor.SetThemes(cursor.POINTER);
+                                cursor.SetThemes(Cursor::POINTER);
                             }
 			    break;
 		    }
@@ -988,11 +951,9 @@ Game::menu_t Game::StartGame(void)
 		break;
 
 		// focus from boat
-    		case Game::BOAT:
+    		case Game::Focus::BOAT:
 		{
     		    if(NULL == (heroes = world.GetHeroes(index_maps))) break;
-
-		    const Route & path = (*heroes).GetPath();
 
 		    switch(object)
 		    {
@@ -1003,7 +964,7 @@ Game::menu_t Game::StartGame(void)
 			    {
 				if((*castle).GetColor() == H2Config::MyColor())
 				{
-			    	    cursor.SetThemes(cursor.CASTLE);
+			    	    cursor.SetThemes(Cursor::CASTLE);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
@@ -1020,7 +981,6 @@ Game::menu_t Game::StartGame(void)
 					// select other castle
 					else
 					{
-					    path.Hide();
 					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
 					    splitCastles.Move(selectCastles.GetTopIndex());
 					    display.Flip();
@@ -1037,7 +997,7 @@ Game::menu_t Game::StartGame(void)
 				// over enemy castle
 				else
 				{
-			    	    cursor.SetThemes(cursor.POINTER);
+			    	    cursor.SetThemes(Cursor::POINTER);
 
 				    if(le.MousePressRight(tile_pos))
 				    {
@@ -1052,19 +1012,19 @@ Game::menu_t Game::StartGame(void)
 			// focus from boat to hero
 			//case MP2::OBJ_HEROES:
     			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::MyColor())
-    			//			cursor.SetThemes(cursor.HEROES);
+    			//			cursor.SetThemes(Cursor::HEROES);
         		//    break;
 
 			// focus from boat to boat
     			case MP2::OBJ_BOAT:
     			    if(NULL != (heroes = world.GetHeroes(index_maps)))
-					cursor.SetThemes((*heroes).GetColor() == H2Config::MyColor() ? cursor.HEROES : cursor.FIGHT);
+					cursor.SetThemes((*heroes).GetColor() == H2Config::MyColor() ? Cursor::HEROES : Cursor::FIGHT);
     			    break;
 
 			// focus from boat to object
     			case MP2::OBJ_TREASURECHEST:
 			    if(Maps::Ground::WATER == tile.GetGround())
-					cursor.SetThemes(cursor.REDBOAT);
+					cursor.SetThemes(Cursor::REDBOAT);
 			    break;
 
 			// focus from boat to object
@@ -1075,23 +1035,23 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_SHIPWRECKSURVIROR:
     			case MP2::OBJ_FLOTSAM:
     			case MP2::OBJ_MAGELLANMAPS:
-					cursor.SetThemes(cursor.REDBOAT);
+					cursor.SetThemes(Cursor::REDBOAT);
 			    break;
 
 			// focus from boat to object
     			case MP2::OBJ_COAST:
-					cursor.SetThemes(cursor.ANCHOR);
+					cursor.SetThemes(Cursor::ANCHOR);
 			    break;
 
 			default:
-			    cursor.SetThemes(Maps::Ground::WATER == tile.GetGround() ? cursor.BOAT : cursor.POINTER);
+			    cursor.SetThemes(Maps::Ground::WATER == tile.GetGround() ? Cursor::BOAT : Cursor::POINTER);
 			    break;
 		    }
 		}
 		break;
 
 		// focus from castle
-		case Game::CASTLE:
+		case Game::Focus::CASTLE:
 		{
 		    switch(object)
 		    {
@@ -1102,7 +1062,7 @@ Game::menu_t Game::StartGame(void)
     			    {
     				if(castle->GetColor() == H2Config::MyColor())
     				{
-    			    	    cursor.SetThemes(cursor.CASTLE);
+    			    	    cursor.SetThemes(Cursor::CASTLE);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
@@ -1119,11 +1079,6 @@ Game::menu_t Game::StartGame(void)
 					// select other castle
 					else
 					{
-					    if(HEROES == globalfocus.type || BOAT == globalfocus.type)
-					    {
-						const Route & path = (*world.GetHeroes(globalfocus.center)).GetPath();
-						path.Hide();
-					    }
 					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
 					    splitCastles.Move(selectCastles.GetTopIndex());
 					    display.Flip();
@@ -1140,7 +1095,7 @@ Game::menu_t Game::StartGame(void)
 				// over enemy castle
 				else
 				{
-    			    	    cursor.SetThemes(cursor.POINTER);
+    			    	    cursor.SetThemes(Cursor::POINTER);
 
 				    if(le.MousePressRight(tile_pos))
 				    {
@@ -1158,7 +1113,7 @@ Game::menu_t Game::StartGame(void)
     			    {
     				if(heroes->GetColor() == H2Config::MyColor())
     				{
-    			    	    cursor.SetThemes(cursor.HEROES);
+    			    	    cursor.SetThemes(Cursor::HEROES);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
@@ -1179,14 +1134,10 @@ Game::menu_t Game::StartGame(void)
 					// select other hero
 					else
 					{
-					    if(HEROES == globalfocus.type || BOAT == globalfocus.type)
-					    {
-						const Route & path = (*world.GetHeroes(globalfocus.center)).GetPath();
-						path.Hide();
-					    }
     					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
 
-					    const Route & path = (*world.GetHeroes(globalfocus.center)).GetPath();
+					    const Route & path = global_focus.GetHeroes().GetPath();
+
 					    if(path.Length())
 					    {
 						cursor.Hide();
@@ -1208,7 +1159,7 @@ Game::menu_t Game::StartGame(void)
         			}
         			else
         			{
-    			    	    cursor.SetThemes(cursor.POINTER);
+    			    	    cursor.SetThemes(Cursor::POINTER);
 
 				    if(le.MousePressRight(tile_pos))
 				    {
@@ -1223,16 +1174,19 @@ Game::menu_t Game::StartGame(void)
 			// focus from castle to boat
     			//case MP2::OBJ_BOAT:
     			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::MyColor())
-    			//			cursor.SetThemes(cursor.HEROES);
+    			//			cursor.SetThemes(Cursor::HEROES);
         		//    break;
 
 			default:
 			    // default cursor
-			    cursor.SetThemes(cursor.POINTER);
+			    cursor.SetThemes(Cursor::POINTER);
 			    break;
 		    }
 		}
 		break;
+
+    		case Game::Focus::UNSEL:
+    		break;
 	    }
 
 	    if(le.MouseRight())
@@ -1247,142 +1201,160 @@ Game::menu_t Game::StartGame(void)
 
 	// end cursor over game area
 	}
-
-
-	// draw push buttons
-	le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.PressDraw() : buttonScrollHeroesUp.ReleaseDraw();
-	le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.PressDraw() : buttonScrollCastleUp.ReleaseDraw();
-	le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
-	le.MousePressLeft(buttonMovement) ? buttonMovement.PressDraw() : buttonMovement.ReleaseDraw();
-	le.MousePressLeft(buttonKingdom) ? buttonKingdom.PressDraw() : buttonKingdom.ReleaseDraw();
-	le.MousePressLeft(buttonSpell) ? buttonSpell.PressDraw() : buttonSpell.ReleaseDraw();
-	le.MousePressLeft(buttonEndTur) ? buttonEndTur.PressDraw() : buttonEndTur.ReleaseDraw();
-	le.MousePressLeft(buttonAdventure) ? buttonAdventure.PressDraw() : buttonAdventure.ReleaseDraw();
-	le.MousePressLeft(buttonFile) ? buttonFile.PressDraw() : buttonFile.ReleaseDraw();
-	le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
-	le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.PressDraw() : buttonScrollHeroesDown.ReleaseDraw();
-	le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.PressDraw() : buttonScrollCastleDown.ReleaseDraw();
-
-	// point radar
-	if(le.MouseCursor(radar.GetRect()) &&
-	    (le.MouseClickLeft(radar.GetRect()) ||
-		le.MousePressLeft(radar.GetRect())))
+	else
+	// cursor over left panel
+	if(le.MouseCursor(areaLeftPanel))
 	{
-	    Rect prev(areaMaps.GetRect());
-	    areaMaps.CenterFromRadar(le.MouseCursor());
-	    if(prev != areaMaps.GetRect()){
+	    cursor.SetThemes(Cursor::POINTER);
+
+	    // draw push buttons
+	    le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.PressDraw() : buttonScrollHeroesUp.ReleaseDraw();
+	    le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.PressDraw() : buttonScrollCastleUp.ReleaseDraw();
+	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
+	    le.MousePressLeft(buttonMovement) ? buttonMovement.PressDraw() : buttonMovement.ReleaseDraw();
+	    le.MousePressLeft(buttonKingdom) ? buttonKingdom.PressDraw() : buttonKingdom.ReleaseDraw();
+	    le.MousePressLeft(buttonSpell) ? buttonSpell.PressDraw() : buttonSpell.ReleaseDraw();
+	    le.MousePressLeft(buttonEndTur) ? buttonEndTur.PressDraw() : buttonEndTur.ReleaseDraw();
+	    le.MousePressLeft(buttonAdventure) ? buttonAdventure.PressDraw() : buttonAdventure.ReleaseDraw();
+	    le.MousePressLeft(buttonFile) ? buttonFile.PressDraw() : buttonFile.ReleaseDraw();
+	    le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
+	    le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.PressDraw() : buttonScrollHeroesDown.ReleaseDraw();
+	    le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.PressDraw() : buttonScrollCastleDown.ReleaseDraw();
+
+	    // point radar
+	    if(le.MouseCursor(radar.GetRect()) &&
+		(le.MouseClickLeft(radar.GetRect()) ||
+		    le.MousePressLeft(radar.GetRect())))
+	    {
+		Rect prev(areaMaps.GetRect());
+		areaMaps.CenterFromRadar(le.MouseCursor());
+		if(prev != areaMaps.GetRect()){
+		    cursor.Hide();
+		    radar.RedrawCursor();
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+	
+	    // click Scroll Heroes Up
+	    if((le.MouseWheelUp(selectHeroes.GetMaxRect()) ||
+		le.MouseWheelUp(splitHeroes.GetRect()) ||
+		le.MouseClickLeft(buttonScrollHeroesUp))  && selectHeroes.Prev())
+	    {
 		cursor.Hide();
-		radar.RedrawCursor();
+		selectHeroes.Redraw();
+		splitHeroes.Backward();
 		cursor.Show();
 		display.Flip();
 	    }
-	}
-	
-	// click Scroll Heroes Up
-	if((le.MouseWheelUp(selectHeroes.GetMaxRect()) ||
-	    le.MouseWheelUp(splitHeroes.GetRect()) ||
-	    le.MouseClickLeft(buttonScrollHeroesUp))  && selectHeroes.Prev())
-	{
-	    cursor.Hide();
-	    selectHeroes.Redraw();
-	    splitHeroes.Backward();
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click Scroll Castle Up
-	if((le.MouseWheelUp(selectCastles.GetMaxRect()) ||
-	    le.MouseWheelUp(splitCastles.GetRect()) ||
-	    le.MouseClickLeft(buttonScrollCastleUp)) && selectCastles.Prev())
-	{
-	    cursor.Hide();
-	    selectCastles.Redraw();
-	    splitCastles.Backward();
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click Scroll Heroes Down
-	if((le.MouseWheelDn(selectHeroes.GetMaxRect()) ||
-	    le.MouseWheelDn(splitHeroes.GetRect()) ||
-	    le.MouseClickLeft(buttonScrollHeroesDown)) && 
-	    myHeroes.size() > selectHeroes.GetCoords().size() &&
-	    selectHeroes.Next())
-	{
-	    cursor.Hide();
-	    selectHeroes.Redraw();
-	    splitHeroes.Forward();
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click Scroll Castle Down
-	if((le.MouseWheelDn(selectCastles.GetMaxRect()) ||
-	    le.MouseWheelDn(splitCastles.GetRect())  ||
-	    le.MouseClickLeft(buttonScrollCastleDown)) &&
-	    myCastles.size() > selectCastles.GetCoords().size() &&
-	    selectCastles.Next())
-	{
-	    cursor.Hide();
-	    selectCastles.Redraw();
-	    splitCastles.Forward();
-	    cursor.Show();
-	    display.Flip();
-	}
-
-        // move splitter cursor castle
-        if(le.MousePressLeft(splitCastles.GetRect()) && myCastles.size() > icon_count && le.MouseCursor(splitCastles.GetRect()))
-        {
-    	    u32 seek = (le.MouseCursor().y - splitCastles.GetRect().y) * 100 / splitCastles.GetStep();
-
-            if(seek > myCastles.size() - 1) seek = myCastles.size() - 1;
-
-            cursor.Hide();
-
-            splitCastles.Move(seek);
-	    selectCastles.SetTop(seek);
-	    selectCastles.Redraw();
-
-            cursor.Show();
-            display.Flip();
-	}
-
-        // move splitter cursor heroes
-        if(le.MousePressLeft(splitHeroes.GetRect()) && myHeroes.size() > icon_count && le.MouseCursor(splitHeroes.GetRect()))
-        {
-    	    u32 seek = (le.MouseCursor().y - splitHeroes.GetRect().y) * 100 / splitHeroes.GetStep();
-
-            if(seek > myHeroes.size() - 1) seek = myHeroes.size() - 1;
-
-            cursor.Hide();
-
-            splitHeroes.Move(seek);
-	    selectHeroes.SetTop(seek);
-	    selectHeroes.Redraw();
-
-            cursor.Show();
-            display.Flip();
-	}
-
-	// click Heroes Icons
-	if(u8 count_icons = coordsHeroesIcon.size())
-	{
-	    for(u8 ii = 0; ii < count_icons; ++ii)
+	    else
+	    // click Scroll Castle Up
+	    if((le.MouseWheelUp(selectCastles.GetMaxRect()) ||
+		le.MouseWheelUp(splitCastles.GetRect()) ||
+		le.MouseClickLeft(buttonScrollCastleUp)) && selectCastles.Prev())
 	    {
-		const Rect & coord = coordsHeroesIcon[ii];
-		const u8 icons_index = selectHeroes.GetTopIndex() + ii;
+		cursor.Hide();
+		selectCastles.Redraw();
+		splitCastles.Backward();
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+	    // click Scroll Heroes Down
+	    if((le.MouseWheelDn(selectHeroes.GetMaxRect()) ||
+		le.MouseWheelDn(splitHeroes.GetRect()) ||
+		le.MouseClickLeft(buttonScrollHeroesDown)) && 
+		myHeroes.size() > selectHeroes.GetCoords().size() &&
+		selectHeroes.Next())
+	    {
+		cursor.Hide();
+		selectHeroes.Redraw();
+		splitHeroes.Forward();
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+	    // click Scroll Castle Down
+	    if((le.MouseWheelDn(selectCastles.GetMaxRect()) ||
+		le.MouseWheelDn(splitCastles.GetRect())  ||
+		le.MouseClickLeft(buttonScrollCastleDown)) &&
+		myCastles.size() > selectCastles.GetCoords().size() &&
+		selectCastles.Next())
+	    {
+		cursor.Hide();
+		selectCastles.Redraw();
+		splitCastles.Forward();
+		cursor.Show();
+		display.Flip();
+	    }
 
-		// left click (center to hero)
-		if(le.MouseClickLeft(coord) && icons_index < myHeroes.size())
+    	    // move splitter cursor castle
+    	    if(le.MousePressLeft(splitCastles.GetRect()) && myCastles.size() > icon_count && le.MouseCursor(splitCastles.GetRect()))
+    	    {
+    		u32 seek = (le.MouseCursor().y - splitCastles.GetRect().y) * 100 / splitCastles.GetStep();
+
+        	if(seek > myCastles.size() - 1) seek = myCastles.size() - 1;
+
+        	cursor.Hide();
+
+        	splitCastles.Move(seek);
+		selectCastles.SetTop(seek);
+		selectCastles.Redraw();
+
+        	cursor.Show();
+        	display.Flip();
+	    }
+	    else
+    	    // move splitter cursor heroes
+    	    if(le.MousePressLeft(splitHeroes.GetRect()) && myHeroes.size() > icon_count && le.MouseCursor(splitHeroes.GetRect()))
+    	    {
+    		u32 seek = (le.MouseCursor().y - splitHeroes.GetRect().y) * 100 / splitHeroes.GetStep();
+
+        	if(seek > myHeroes.size() - 1) seek = myHeroes.size() - 1;
+
+        	cursor.Hide();
+
+        	splitHeroes.Move(seek);
+		selectHeroes.SetTop(seek);
+		selectHeroes.Redraw();
+
+        	cursor.Show();
+        	display.Flip();
+	    }
+
+	    // click Heroes Icons
+	    if(u8 count_icons = coordsHeroesIcon.size())
+	    {
+		for(u8 ii = 0; ii < count_icons; ++ii)
 		{
-		    //double click
-		    if(icons_index == selectHeroes.GetCursorIndex())
-		    {
-			const Point & center = selectHeroes.GetCenter(ii);
-			Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
+		    const Rect & coord = coordsHeroesIcon[ii];
+		    const u8 icons_index = selectHeroes.GetTopIndex() + ii;
 
-			// open hero
-			if(hero && H2Config::MyColor() == (*hero).GetColor())
+		    // left click (center to hero)
+		    if(le.MouseClickLeft(coord) && icons_index < myHeroes.size())
+		    {
+			//double click
+		        if(icons_index == selectHeroes.GetCursorIndex())
+			{
+			    const Point & center = selectHeroes.GetCenter(ii);
+			    Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
+
+			    // open hero
+			    if(hero && H2Config::MyColor() == (*hero).GetColor())
+			    {
+				if(selectCastles.isSelected())
+				{
+				    selectCastles.Reset();
+				    selectCastles.Redraw();
+				}
+
+				OpenHeroes(hero, areaMaps, radar);
+
+				statusWindow.Redraw();
+				display.Flip();
+			    }
+			}
+			else
 			{
 			    if(selectCastles.isSelected())
 			    {
@@ -1390,82 +1362,80 @@ Game::menu_t Game::StartGame(void)
 				selectCastles.Redraw();
 			    }
 
-			    OpenHeroes(hero, areaMaps, radar);
+			    const Point & center = selectHeroes.GetCenter(ii);
+			    Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
 
-			    statusWindow.Redraw();
-			    display.Flip();
+			    // open hero
+			    if(hero && H2Config::MyColor() == (*hero).GetColor())
+			    {
+				FocusToHeroes(hero, areaMaps, radar);
+
+				const Route & path = global_focus.GetHeroes().GetPath();
+				if(path.Length())
+				{
+				    cursor.Hide();
+				    path.Show();
+				    world.GetTiles((*hero).GetCenter()).Redraw();
+				    cursor.Show();
+				}
+
+				display.Flip();
+			    }
 			}
 		    }
 		    else
+		    // right click (show info heroes)
+		    if(le.MousePressRight(coord) && icons_index < myHeroes.size())
 		    {
-			if(selectCastles.isSelected())
-			{
-			    selectCastles.Reset();
-			    selectCastles.Redraw();
-			}
-
 			const Point & center = selectHeroes.GetCenter(ii);
-			Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
-
-			// open hero
-			if(hero && H2Config::MyColor() == (*hero).GetColor())
+			const Heroes *hero = world.GetHeroes(center.x, center.y);
+			if(hero)
 			{
-			    if(HEROES == globalfocus.type || BOAT == globalfocus.type)
-			    {
-				const Route & path = (*world.GetHeroes(globalfocus.center)).GetPath();
-				path.Hide();
-			    }
-			    FocusToHeroes(hero, areaMaps, radar);
-
-			    const Route & path = (*world.GetHeroes(globalfocus.center)).GetPath();
-			    if(path.Length())
-			    {
-				cursor.Hide();
-				path.Show();
-				world.GetTiles((*hero).GetCenter()).Redraw();
-				cursor.Show();
-			    }
-
+			    cursor.Hide();
+			    Dialog::QuickInfo(*hero);
+			    cursor.Show();
 			    display.Flip();
 			}
 		    }
 		}
-		else
-		// right click (show info heroes)
-		if(le.MousePressRight(coord) && icons_index < myHeroes.size())
-		{
-		    const Point & center = selectHeroes.GetCenter(ii);
-		    const Heroes *hero = world.GetHeroes(center.x, center.y);
-		    if(hero)
-		    {
-			cursor.Hide();
-			Dialog::QuickInfo(*hero);
-			cursor.Show();
-			display.Flip();
-		    }
-		}
+	    // end click Heroes Icons
 	    }
-	}
 
-	// click Castle Icons
-	if(u8 count_icons = coordsCastlesIcon.size())
-	{
-	    for(u8 ii = 0; ii < count_icons; ++ii)
+	    // click Castle Icons
+	    if(u8 count_icons = coordsCastlesIcon.size())
 	    {
-		const Rect & coord = coordsCastlesIcon[ii];
-		const u8 icons_index = selectCastles.GetTopIndex() + ii;
-
-		// left click (center to castle)
-		if(le.MouseClickLeft(coord) && icons_index < myCastles.size())
+		for(u8 ii = 0; ii < count_icons; ++ii)
 		{
-		    // double click
-		    if(icons_index == selectCastles.GetCursorIndex())
-		    {
-			const Point & center = selectCastles.GetCenter(ii);
-			Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
+		    const Rect & coord = coordsCastlesIcon[ii];
+		    const u8 icons_index = selectCastles.GetTopIndex() + ii;
 
-			// open castle
-			if(castle && H2Config::MyColor() == (*castle).GetColor())
+		    // left click (center to castle)
+		    if(le.MouseClickLeft(coord) && icons_index < myCastles.size())
+		    {
+			// double click
+			if(icons_index == selectCastles.GetCursorIndex())
+			{
+			    const Point & center = selectCastles.GetCenter(ii);
+			    Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
+
+			    // open castle
+			    if(castle && H2Config::MyColor() == (*castle).GetColor())
+			    {
+				if(selectHeroes.isSelected())
+				{
+				    selectHeroes.Reset();
+				    selectHeroes.Redraw();
+				}
+
+				OpenCastle(castle, areaMaps, radar);
+
+				statusWindow.Redraw();
+				selectCastles.Redraw();
+
+				display.Flip();
+			    }
+			}
+			else
 			{
 			    if(selectHeroes.isSelected())
 			    {
@@ -1473,154 +1443,147 @@ Game::menu_t Game::StartGame(void)
 				selectHeroes.Redraw();
 			    }
 
-			    OpenCastle(castle, areaMaps, radar);
+			    const Point & center = selectCastles.GetCenter(ii);
+			    Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
 
-			    statusWindow.Redraw();
-			    selectCastles.Redraw();
-
-			    display.Flip();
+			    if(castle && H2Config::MyColor() == (*castle).GetColor())
+			    {
+				FocusToCastle(castle, areaMaps, radar);
+				display.Flip();
+			    }
 			}
 		    }
 		    else
+		    // right click (show info castle)
+		    if(le.MousePressRight(coord) && icons_index < myCastles.size())
 		    {
-			if(selectHeroes.isSelected())
-			{
-			    selectHeroes.Reset();
-			    selectHeroes.Redraw();
-			}
-
 			const Point & center = selectCastles.GetCenter(ii);
 			Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
-
-			if(castle && H2Config::MyColor() == (*castle).GetColor())
+		    
+			if(castle)
 			{
-			    if(HEROES == globalfocus.type || BOAT == globalfocus.type)
-			    {
-				const Route & path = (*world.GetHeroes(globalfocus.center)).GetPath();
-				path.Hide();
-			    }
-			    FocusToCastle(castle, areaMaps, radar);
+			    cursor.Hide();
+			    Dialog::QuickInfo(*castle);
+			    cursor.Show();
 			    display.Flip();
 			}
-		    }
+	    	    }
 		}
-		else
-		// right click (show info castle)
-		if(le.MousePressRight(coord) && icons_index < myCastles.size())
-		{
-		    const Point & center = selectCastles.GetCenter(ii);
-		    Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
-		    
-		    if(castle)
-		    {
-			cursor.Hide();
-			Dialog::QuickInfo(*castle);
-			cursor.Show();
-			display.Flip();
-		    }
-		}
+	    // end click Castle Icons
 	    }
-	}
 
-	// click Next Hero
-	if(le.MouseClickLeft(buttonNextHero))
-	{
-	}
-
-	// click Continue Movement
-	if(le.MouseClickLeft(buttonMovement))
-	{
-	}
-
-	// click Kingdom Summary
-	if(le.MouseClickLeft(buttonKingdom))
-	{
-	}
-
-	// click Cast Spell
-	if(le.MouseClickLeft(buttonSpell))
-	{
-	}
-
-	// click End Turn
-	if(le.MouseClickLeft(buttonEndTur))
-	{
-	    cursor.Hide();
-	    world.NextDay();
-
-	    Color::color_t human = H2Config::MyColor();
-
-	    // AI move
-	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color != human)
-		world.GetKingdom(color).AITurns(statusWindow);
-
-	    statusWindow.SetState(Game::StatusWindow::DAY);
-	    statusWindow.Redraw();
-	    
-	    selectCastles.Redraw();
-
-	    cursor.Show();
-	    display.Flip();
-	}
-
-        // click AdventureOptions
-	if(le.MouseClickLeft(buttonAdventure))
-	{
-	    switch(Dialog::AdventureOptions())
+	    // click Next Hero
+	    if(le.MouseClickLeft(buttonNextHero))
 	    {
-		default:
-		    break;
 	    }
-        }
+	    else
+	    // click Continue Movement
+	    if(le.MouseClickLeft(buttonMovement))
+	    {
+	    }
+	    else
+	    // click Kingdom Summary
+	    if(le.MouseClickLeft(buttonKingdom))
+	    {
+	    }
+	    else
+	    // click Cast Spell
+	    if(le.MouseClickLeft(buttonSpell))
+	    {
+	    }
+	    else
+	    // click End Turn
+	    if(le.MouseClickLeft(buttonEndTur))
+	    {
+		cursor.Hide();
+		world.NextDay();
 
-	// click FileOptions
-	if(le.MouseClickLeft(buttonFile))
-	{
-	    Game::menu_t result = Dialog::FileOptions();
+		Color::color_t human = H2Config::MyColor();
+
+		// AI move
+		for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color != human)
+		    world.GetKingdom(color).AITurns(statusWindow);
+
+		statusWindow.SetState(Game::StatusWindow::DAY);
+		statusWindow.Redraw();
 	    
-	    switch(result){
+		selectCastles.Redraw();
 
-		case Game::NEWGAME:
-		case Game::LOADGAME:
-		case Game::QUITGAME:
-		    return result;
-
-		case Game::SAVEGAME:
-		    break;
-
-		default:
-		    break;
+		cursor.Show();
+		display.Flip();
 	    }
+	    else
+    	    // click AdventureOptions
+	    if(le.MouseClickLeft(buttonAdventure))
+	    {
+		switch(Dialog::AdventureOptions())
+		{
+		    default:
+			break;
+		}
+    	    }
+	    else
+	    // click FileOptions
+	    if(le.MouseClickLeft(buttonFile))
+	    {
+		Game::menu_t result = Dialog::FileOptions();
+	    
+		switch(result)
+		{
+		    case Game::NEWGAME:
+		    case Game::LOADGAME:
+		    case Game::QUITGAME:
+			return result;
+
+		    case Game::SAVEGAME:
+			break;
+
+		    default:
+			break;
+		}
+	    }
+	    else
+	    // click SystemOptions
+	    if(le.MouseClickLeft(buttonSystem)&& Dialog::OK == Dialog::SystemOptions())
+	    {
+		// Change and save system settings
+	    }
+	    else
+	    // click StatusWindow
+	    if(le.MouseClickLeft(statusWindow.GetRect()))
+	    {
+		cursor.Hide();
+		statusWindow.NextState();
+		statusWindow.Redraw();
+		cursor.Show();
+		display.Flip();
+	    }
+
+	    // right info
+	    if(le.MousePressRight(radar.GetRect())) Dialog::Message("World Map", "A miniature view of the known world. Left click to move viewing area.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonNextHero)) Dialog::Message("Next Hero", "Select the next Hero.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonMovement)) Dialog::Message("Continue Movement", "Continue the Hero's movement along the current path.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonKingdom)) Dialog::Message("Kingdom Summary", "View a Summary of your Kingdom.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonSpell)) Dialog::Message("Cast Spell", "Cast an adventure spell.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonEndTur)) Dialog::Message("End Turn", "End your turn and left the computer take its turn.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonAdventure)) Dialog::Message("Adventure Options", "Bring up the adventure options menu.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonFile)) Dialog::Message("File Options", "Bring up the file options menu, alloving you to load menu, save etc.", Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonSystem)) Dialog::Message("System Options", "Bring up the system options menu, alloving you to customize your game.", Font::BIG);
+	    else
+	    if(le.MousePressRight(statusWindow.GetRect())) Dialog::Message("Status Window", "This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows.", Font::BIG);
+
+	// end cursor over left panel
 	}
 
-	// click SystemOptions
-	if(le.MouseClickLeft(buttonSystem)&& Dialog::OK == Dialog::SystemOptions())
-	{
-	    // Change and save system settings
-	}
-	
-	// click StatusWindow
-	if(le.MouseClickLeft(statusWindow.GetRect()))
-	{
-	    cursor.Hide();
-	    statusWindow.NextState();
-	    statusWindow.Redraw();
-	    cursor.Show();
-	    display.Flip();
-	}
 
-	// right info
-	if(le.MousePressRight(radar.GetRect())) Dialog::Message("World Map", "A miniature view of the known world. Left click to move viewing area.", Font::BIG);
-	if(le.MousePressRight(buttonNextHero)) Dialog::Message("Next Hero", "Select the next Hero.", Font::BIG);
-	if(le.MousePressRight(buttonMovement)) Dialog::Message("Continue Movement", "Continue the Hero's movement along the current path.", Font::BIG);
-	if(le.MousePressRight(buttonKingdom)) Dialog::Message("Kingdom Summary", "View a Summary of your Kingdom.", Font::BIG);
-	if(le.MousePressRight(buttonSpell)) Dialog::Message("Cast Spell", "Cast an adventure spell.", Font::BIG);
-	if(le.MousePressRight(buttonEndTur)) Dialog::Message("End Turn", "End your turn and left the computer take its turn.", Font::BIG);
-	if(le.MousePressRight(buttonAdventure)) Dialog::Message("Adventure Options", "Bring up the adventure options menu.", Font::BIG);
-	if(le.MousePressRight(buttonFile)) Dialog::Message("File Options", "Bring up the file options menu, alloving you to load menu, save etc.", Font::BIG);
-	if(le.MousePressRight(buttonSystem)) Dialog::Message("System Options", "Bring up the system options menu, alloving you to customize your game.", Font::BIG);
-	if(le.MousePressRight(statusWindow.GetRect())) Dialog::Message("Status Window", "This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows.", Font::BIG);
-	
         // animation
         if(!(++ticket % 50)) // FIXME: speed animation low
         {
@@ -1678,6 +1641,8 @@ void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 /* focus to castle */
 void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 {
+    if(! castle) return;
+
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
@@ -1686,10 +1651,14 @@ void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 
     selectHeroes.Reset();
 
-    globalfocus.type = Game::CASTLE;
-    globalfocus.center = castle->GetCenter();
+    Game::Focus & globalfocus = Game::Focus::Get();
 
-    areaMaps.Center(globalfocus.center);
+    // hide path
+    if(Game::Focus::HEROES == globalfocus.Type() || Game::Focus::BOAT == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+
+    globalfocus.Set(*castle);
+
+    areaMaps.Center(castle->GetCenter());
     radar.RedrawCursor();
 
     selectCastles.SelectFromCenter(castle->GetCenter());
@@ -1767,10 +1736,14 @@ void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 
     selectCastles.Reset();
 
-    globalfocus.type = Game::HEROES;
-    globalfocus.center = hero->GetCenter();
+    Game::Focus & globalfocus = Game::Focus::Get();
 
-    areaMaps.Center(globalfocus.center);
+    // hide path
+    if(Game::Focus::HEROES == globalfocus.Type() || Game::Focus::BOAT == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+
+    globalfocus.Set(*hero);
+
+    areaMaps.Center(hero->GetCenter());
     radar.RedrawCursor();
 
     selectHeroes.SelectFromCenter(hero->GetCenter());

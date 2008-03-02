@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
+
 #include "config.h"
 #include "castle.h"
 #include "heroes.h"
@@ -99,46 +101,58 @@ void Kingdom::AITurns(const Game::StatusWindow & status)
 void Kingdom::ActionNewDay(void)
 {
     // castle New Day
-    for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewDay();
+    std::vector<Castle *>::const_iterator itc = castles.begin();
+    for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewDay();
 
     // heroes New Day
-    for(u16 ii = 0; ii < heroes.size(); ++ii) (*heroes[ii]).ActionNewDay();
+    std::vector<Heroes *>::const_iterator ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewDay();
 
     // funds
-    for(u16 ii = 0; ii < castles.size(); ++ii)
+    itc = castles.begin();
+    for(; itc != castles.end(); ++itc)
     {
-	// castle or town profit
-	resource.gold += ((*castles[ii]).isCastle() ? INCOME_CASTLE_GOLD : INCOME_TOWN_GOLD);
+	if(*itc)
+	{
+	    const Castle & castle = **itc;
 
-	// statue
-	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_STATUE) ? INCOME_STATUE_GOLD : 0);
+	    // castle or town profit
+	    resource.gold += (castle.isCastle() ? INCOME_CASTLE_GOLD : INCOME_TOWN_GOLD);
 
-	// dungeon for warlock
-	resource.gold += ((*castles[ii]).isBuild(Castle::BUILD_SPEC) && Race::WRLK == (*castles[ii]).GetRace() ? INCOME_DUNGEON_GOLD : 0);
+	    // statue
+	    resource.gold += (castle.isBuild(Castle::BUILD_STATUE) ? INCOME_STATUE_GOLD : 0);
+
+	    // dungeon for warlock
+	    resource.gold += (castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == castle.GetRace() ? INCOME_DUNGEON_GOLD : 0);
+	}
     }
 
-    for(u8 ii = 0; ii < heroes.size(); ++ii)
+    ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith)
     {
-	const Heroes * hero = heroes[ii];
-
-	if((*hero).GetArtifacts().size())
+	if(*ith)
 	{
-	    std::vector<Artifact::artifact_t>::const_iterator it1 = (*hero).GetArtifacts().begin();
-	    std::vector<Artifact::artifact_t>::const_iterator it2 = (*hero).GetArtifacts().end();
-	    
-	    for(; it1 != it2; ++it1) switch(*it1)
-	    {
-		case Artifact::ENDLESS_SACK_GOLD:	resource.gold += INCOME_ENDLESS_SACK_GOLD; break;
-		case Artifact::ENDLESS_BAG_GOLD:	resource.gold += INCOME_ENDLESS_BAG_GOLD; break;
-		case Artifact::ENDLESS_PURSE_GOLD:	resource.gold += INCOME_ENDLESS_PURSE_GOLD; break;
-		case Artifact::ENDLESS_POUCH_SULFUR:	resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR; break;
-		case Artifact::ENDLESS_VIAL_MERCURY:	resource.mercury += INCOME_ENDLESS_VIAL_MERCURY; break;
-		case Artifact::ENDLESS_POUCH_GEMS:	resource.gems += INCOME_ENDLESS_POUCH_GEMS; break;
-		case Artifact::ENDLESS_CORD_WOOD:	resource.wood += INCOME_ENDLESS_CORD_WOOD; break;
-		case Artifact::ENDLESS_CART_ORE:	resource.ore += INCOME_ENDLESS_CART_ORE; break;
-		case Artifact::ENDLESS_POUCH_CRYSTAL:	resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL; break;
+	    const Heroes & heroes = **ith;
 
-		default: break;
+	    if(heroes.GetArtifacts().size())
+	    {
+		std::vector<Artifact::artifact_t>::const_iterator it1 = heroes.GetArtifacts().begin();
+		std::vector<Artifact::artifact_t>::const_iterator it2 = heroes.GetArtifacts().end();
+
+		for(; it1 != it2; ++it1) switch(*it1)
+		{
+		    case Artifact::ENDLESS_SACK_GOLD:		resource.gold += INCOME_ENDLESS_SACK_GOLD; break;
+		    case Artifact::ENDLESS_BAG_GOLD:		resource.gold += INCOME_ENDLESS_BAG_GOLD; break;
+		    case Artifact::ENDLESS_PURSE_GOLD:		resource.gold += INCOME_ENDLESS_PURSE_GOLD; break;
+		    case Artifact::ENDLESS_POUCH_SULFUR:	resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR; break;
+		    case Artifact::ENDLESS_VIAL_MERCURY:	resource.mercury += INCOME_ENDLESS_VIAL_MERCURY; break;
+		    case Artifact::ENDLESS_POUCH_GEMS:		resource.gems += INCOME_ENDLESS_POUCH_GEMS; break;
+		    case Artifact::ENDLESS_CORD_WOOD:		resource.wood += INCOME_ENDLESS_CORD_WOOD; break;
+		    case Artifact::ENDLESS_CART_ORE:		resource.ore += INCOME_ENDLESS_CART_ORE; break;
+		    case Artifact::ENDLESS_POUCH_CRYSTAL:	resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL; break;
+
+		    default: break;
+		}
 	    }
 	}
     }
@@ -146,11 +160,14 @@ void Kingdom::ActionNewDay(void)
 
 void Kingdom::ActionNewWeek(void)
 {
+
     // castle New Week
-    for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewWeek();
+    std::vector<Castle *>::const_iterator itc = castles.begin();
+    for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewWeek();
 
     // heroes New Week
-    for(u16 ii = 0; ii < heroes.size(); ++ii) (*heroes[ii]).ActionNewWeek();
+    std::vector<Heroes *>::const_iterator ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewWeek();
 
     // debug an gift
     if(H2Config::Debug() && color == Settings::Get().MyColor())
@@ -170,97 +187,51 @@ void Kingdom::ActionNewWeek(void)
 void Kingdom::ActionNewMonth(void)
 {
     // castle New Month
-    for(u16 ii = 0; ii < castles.size(); ++ii) (*castles[ii]).ActionNewMonth();
+    std::vector<Castle *>::const_iterator itc = castles.begin();
+    for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewMonth();
 
     // heroes New Month
-    for(u16 ii = 0; ii < heroes.size(); ++ii) (*heroes[ii]).ActionNewMonth();
+    std::vector<Heroes *>::const_iterator ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewMonth();
 }
 
 void Kingdom::AddHeroes(const Heroes *hero)
 {
-    if(hero)
-    {
-	std::vector<Heroes *>::const_iterator ith = heroes.begin();
-
-	for(; ith != heroes.end(); ++ith) if(*ith == hero) return;
-
+    if(hero && heroes.end() == std::find(heroes.begin(), heroes.end(), hero))
 	heroes.push_back(const_cast<Heroes *>(hero));
-    }
 }
 
 void Kingdom::RemoveHeroes(const Heroes *hero)
 {
     if(hero && heroes.size())
-    {
-	std::vector<Heroes *>::iterator ith = heroes.begin();
-
-	for(; ith != heroes.end(); ++ith) if(*ith == hero)
-	{
-	    heroes.erase(ith);
-	    break;
-	}
-    }
+	heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
 }
 
 void Kingdom::AddCastle(const Castle *castle)
 {
-    if(castle)
-    {
-	std::vector<Castle *>::const_iterator itk = castles.begin();
-
-	for(; itk != castles.end(); ++itk) if(*itk == castle) return;
-
+    if(castle && castles.end() == std::find(castles.begin(), castles.end(), castle))
 	castles.push_back(const_cast<Castle *>(castle));
-    }
 }
 
 void Kingdom::RemoveCastle(const Castle *castle)
 {
     if(castle && castles.size())
-    {
-	std::vector<Castle *>::iterator itk = castles.begin();
-
-	for(; itk != castles.end(); ++itk) if(*itk == castle)
-	{
-	    castles.erase(itk);
-	    break;
-	}
-    }
+	castles.erase(std::find(castles.begin(), castles.end(), castle));
 }
 
 u8 Kingdom::GetCountCastle(void) const
 {
-    u8 result = 0;
-
-    if(castles.size())
-    {
-	std::vector<Castle *>::const_iterator it = castles.begin();
-
-	for(; it != castles.end(); ++it) if((**it).isCastle()) ++result;
-    }
-
-    return result;
+    return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsCastle);
 }
 
 u8 Kingdom::GetCountTown(void) const
 {
-    if(castles.size()) return castles.size() - GetCountCastle();
-
-    return 0;
+    return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsTown);
 }
 
 u8 Kingdom::GetCountMarketplace(void) const
 {
-    u8 result = 0;
-
-    if(castles.size())
-    {
-	std::vector<Castle *>::const_iterator it = castles.begin();
-
-	for(; it != castles.end(); ++it) if((**it).isBuild(Castle::BUILD_MARKETPLACE)) ++result;
-    }
-
-    return result;
+    return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsBuildMarketplace);
 }
 
 Race::race_t Kingdom::GetRace(void) const

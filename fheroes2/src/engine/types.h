@@ -38,6 +38,11 @@ typedef uint32_t	u32;
 #define SEPARATOR       "/"
 #endif
 
+
+#define KEY_RETURN	SDLK_RETURN
+#define KEY_ESCAPE	SDLK_ESCAPE
+
+
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
 #define DEFAULT_COLOR_KEY16	0xf0f0

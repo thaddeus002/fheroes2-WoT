@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ERROR_H
-#define H2ERROR_H
 
-#include <string>
+#include "error.h"
+#include "audio.h"
+#include "engine.h"
 
-class Error
+bool SDL::Init(const u32 system)
 {
+    if(0 > SDL_Init(system))
+    {
+	Error::Warning("SDL::Init: error: " + std::string(SDL_GetError()));
 
-public:
-    Error(){};
-    ~Error(){};
+	return false;
+    }
 
-    class Exception{};
+    if(system & SDL_INIT_AUDIO && !Audio::OpenDevice()) return false;
 
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
+    return true;
+}
 
-    static const std::string & SDLError(void);
-};
+void SDL::Quit(void)
+{
+    if(SDL_WasInit(SDL_INIT_AUDIO) != 0) Audio::CloseDevice();
 
-#endif
+    SDL_Quit();
+}
+
+bool SDL::SubSystem(const u32 system)
+{
+    return system & SDL_WasInit(system);
+}

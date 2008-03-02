@@ -83,7 +83,7 @@ Game::menu_t Dialog::FileOptions(void)
         if(le.MouseClickLeft(buttonLoad)){ result = Game::LOADGAME; break; }
         if(le.MouseClickLeft(buttonSave)){ result = Game::SAVEGAME; break; }
         if(le.MouseClickLeft(buttonQuit)){ result = Game::QUITGAME; break; }
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(SDLK_ESCAPE)){ result = Game::CANCEL; break; }
+        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ result = Game::CANCEL; break; }
     }
 
     // restore background

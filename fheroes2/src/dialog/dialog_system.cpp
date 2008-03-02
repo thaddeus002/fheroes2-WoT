@@ -69,7 +69,7 @@ Dialog::answer_t Dialog::SystemOptions(void)
         le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonOk)) { result = Dialog::OK; break; }
-        if(le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }
+        if(le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
     }
 
     // restore background

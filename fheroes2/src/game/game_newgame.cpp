@@ -75,7 +75,7 @@ Game::menu_t Game::NewGame(void){
 	if(le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
 	if(le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
 	if(le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
-	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(SDLK_ESCAPE)) return MAINMENU;
+	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info
 	if(le.MousePressRight(buttonStandartGame)) Dialog::Message("Standard Game", "A single player game playing out a single map.", Font::BIG);

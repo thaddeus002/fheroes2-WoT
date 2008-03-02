@@ -112,7 +112,7 @@ Game::menu_t Game::MainMenu(void)
 	if(le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
 	if(le.MouseClickLeft(buttonHighScores)) return HIGHSCORES;
 	if(le.MouseClickLeft(buttonCredits)) return CREDITS;
-	if(le.MouseClickLeft(buttonQuit) || le.KeyPress(SDLK_ESCAPE)) return QUITGAME;
+	if(le.MouseClickLeft(buttonQuit) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
 
 	// right info
 	if(le.MousePressRight(buttonQuit)) Dialog::Message("Quit", "Quit Heroes of Might and return to the operating system.", Font::BIG);

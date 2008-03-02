@@ -34,6 +34,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "game.h"
+#include "engine.h"
 #include "image_logo.h"
 #include "image_icons.h"
 
@@ -106,8 +107,10 @@ int main(int argc, char **argv)
 
 	// random init
 	Rand::Init();
+	
+	const u32 subsystem = conf.Sound() || conf.Music() ? INIT_VIDEO | INIT_AUDIO : INIT_VIDEO;
 
-	if(SDL::Init())
+	if(SDL::Init(subsystem))
 	try
 	{
 	    Display::SetVideoMode(Display::SMALL);

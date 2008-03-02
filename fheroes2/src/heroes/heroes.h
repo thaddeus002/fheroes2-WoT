@@ -37,6 +37,7 @@
 #include "route.h"
 #include "object.h"
 #include "direction.h"
+#include "spell_book.h"
 #include "gamedefs.h"
 
 #define HEROESMAXARTIFACT	14
@@ -104,6 +105,8 @@ public:
     bool isVisited(const MP2::object_t & object) const;
     bool isVisited(const Maps::Tiles & tile) const;
 
+    bool operator== (const Heroes & h) const;
+
     const Castle* inCastle(void) const;
 
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
@@ -148,6 +151,7 @@ public:
     void ActionAfterBattle(void);
 
     bool BuySpellBook(void);
+    void AppendSpellsToBook(const Spell::Storage & spells);
 
     const Route & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
@@ -173,7 +177,7 @@ private:
 
     std::vector<Artifact::artifact_t>	artifacts;
     std::vector<Army::Troops> army;
-    //std::vector<Spell::spell_t>	books;
+    Spell::Book		spell_book;
 
     const heroes_t	heroes;
     const Race::race_t	race;

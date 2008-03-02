@@ -41,7 +41,7 @@ namespace Maps
 	TilesAddon & operator= (const TilesAddon & ta);
 
 	static u16 isRoad(const TilesAddon & ta, u8 direct = 0xFF);
-	static bool RulesCompare(const TilesAddon & ta1, const TilesAddon & ta2){ return ta1.GetLevel() > ta2.GetLevel(); };
+	static bool PredicateSortRules(const TilesAddon & ta1, const TilesAddon & ta2);
 
 	u8 GetObject(void) const{ return object; };
 	u8 GetIndex(void) const{ return index; };

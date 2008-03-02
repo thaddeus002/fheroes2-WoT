@@ -72,7 +72,7 @@ Game::menu_t Game::Editor::MainMenu(void)
 
 	if(le.MouseClickLeft(buttonNewMap)) return EDITNEWMAP;
 	if(le.MouseClickLeft(buttonLoadMap)) return EDITLOADMAP;
-	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(SDLK_ESCAPE)) return QUITGAME;
+	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
 
         // right info
 	if(le.MousePressRight(buttonNewMap)) Dialog::Message("New Map", "Create a new map, either from scratch or using the random map generator.", Font::BIG);

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ERROR_H
-#define H2ERROR_H
 
-#include <string>
+#ifndef H2AUDIO_H
+#define H2AUDIO_H
 
-class Error
+#include "types.h"
+
+namespace Audio
 {
+    struct Spec : public SDL_AudioSpec
+    {
+	Spec();
+    };
 
-public:
-    Error(){};
-    ~Error(){};
+    struct CVT : public SDL_AudioCVT
+    {
+	CVT();
 
-    class Exception{};
+	bool valid;
+    };
 
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
+    bool OpenDevice(void);
+    void CloseDevice(void);
 
-    static const std::string & SDLError(void);
+    void Lock(void);
+    void Unlock(void);
+
+    void Play(const CVT & cvt);
+    
+    const Spec & HardwareSpec(void);
 };
 
 #endif

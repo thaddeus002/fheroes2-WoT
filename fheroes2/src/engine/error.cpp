@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include "types.h"
 #include "error.h"
 
 /* exception */
@@ -61,4 +62,13 @@ void Error::Verbose(const std::string & message, int value)
     str += stream.str();
 
     std::cout << message << str << std::endl;
+}
+
+const std::string & Error::SDLError(void)
+{
+    static std::string sdl_error;
+    
+    sdl_error = std::string(SDL_GetError());
+    
+    return sdl_error;
 }

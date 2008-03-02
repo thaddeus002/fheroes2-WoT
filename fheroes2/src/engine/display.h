@@ -24,12 +24,6 @@
 #include "surface.h"
 #include "rect.h"
 
-namespace SDL
-{
-    bool Init(void);
-    void Quit(void);
-};
-
 class Display : public Surface
 {
 public:

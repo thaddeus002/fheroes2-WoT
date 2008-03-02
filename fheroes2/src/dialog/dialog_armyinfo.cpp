@@ -257,7 +257,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
 
     	    // exit
     	    if(le.MouseClickLeft(buttonExit) ||
-    		le.KeyPress(SDLK_ESCAPE)){ result = Dialog::CANCEL; break; }
+    		le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
 	}
 
 	//animeMonster.DrawSprite();

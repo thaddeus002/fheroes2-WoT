@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ERROR_H
-#define H2ERROR_H
 
-#include <string>
+#ifndef H2GAMEFOCUS_H
+#define H2GAMEFOCUS_H
 
-class Error
+#include "rect.h"
+#include "game.h"
+
+class Castle;
+class Heroes;
+
+namespace Game
 {
+    class Focus
+    {
+    public:
+	typedef enum { UNSEL, HEROES, CASTLE, BOAT } focus_t;
 
-public:
-    Error(){};
-    ~Error(){};
+   	static Focus &	Get(void);
 
-    class Exception{};
+	void		Set(const Heroes & hr);
+	void		Set(const Castle & cs);
+	
+	const Point &	Center(void) const;
 
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
+	const focus_t &	Type(void) const;
 
-    static const std::string & SDLError(void);
+	const Castle &	GetCastle(void) const;
+	const Heroes &	GetHeroes(void) const;
+
+    private:
+	Focus();
+
+	focus_t		type;
+	const Castle *	castle;
+	const Heroes *	heroes;	
+    };
 };
 
 #endif

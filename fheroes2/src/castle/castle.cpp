@@ -24,6 +24,7 @@
 #include "payment.h"
 #include "world.h"
 #include "agg.h"
+#include "audio.h"
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
@@ -86,11 +87,11 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
 
 	
 	// magic tower
-	if(0 < *ptr8){ building |= BUILD_MAGEGUILD1; mageguild.BuildNextLevel(); }
-	if(1 < *ptr8){ building |= BUILD_MAGEGUILD2; mageguild.BuildNextLevel(); }
-	if(2 < *ptr8){ building |= BUILD_MAGEGUILD3; mageguild.BuildNextLevel(); }
-	if(3 < *ptr8){ building |= BUILD_MAGEGUILD4; mageguild.BuildNextLevel(); }
-	if(4 < *ptr8){ building |= BUILD_MAGEGUILD5; mageguild.BuildNextLevel(); }
+	if(0 < *ptr8) building |= BUILD_MAGEGUILD1;
+	if(1 < *ptr8) building |= BUILD_MAGEGUILD2;
+	if(2 < *ptr8) building |= BUILD_MAGEGUILD3;
+	if(3 < *ptr8) building |= BUILD_MAGEGUILD4;
+	if(4 < *ptr8) building |= BUILD_MAGEGUILD5;
 	++ptr8;
     }
     else
@@ -239,6 +240,15 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     if(building & DWELLING_UPGRADE6) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE6));
     if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7));
 
+    // MageGuild
+    mageguild.SetRace(race);
+    if(building & BUILD_MAGEGUILD1) mageguild.BuildNextLevel();
+    if(building & BUILD_MAGEGUILD2) mageguild.BuildNextLevel();
+    if(building & BUILD_MAGEGUILD3) mageguild.BuildNextLevel();
+    if(building & BUILD_MAGEGUILD4) mageguild.BuildNextLevel();
+    if(building & BUILD_MAGEGUILD5) mageguild.BuildNextLevel();
+    if(Race::WZRD == race && building & BUILD_SPEC) mageguild.UpgradeExt();
+
     // modify RND sprites
     if(rnd) CorrectAreaMaps();
 
@@ -272,6 +282,9 @@ bool Castle::isHeroesPresent(void)
 
 void Castle::ActionNewDay(void)
 {
+    // for learns new spells need today
+    if(isHeroesPresent() && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);
+
     allow_build = true;
 }
 
@@ -1158,7 +1171,8 @@ void Castle::BuyBuilding(building_t build)
 	    case BUILD_MAGEGUILD2:
 	    case BUILD_MAGEGUILD3:
 	    case BUILD_MAGEGUILD4:
-	    case BUILD_MAGEGUILD5: mageguild.BuildNextLevel(); break;
+	    case BUILD_MAGEGUILD5: mageguild.BuildNextLevel();
+		break;
 
             // build library
             case BUILD_SPEC: if(Race::WZRD == race) mageguild.UpgradeExt(); break;
@@ -1174,6 +1188,9 @@ void Castle::BuyBuilding(building_t build)
 
 	// disable day build
 	allow_build = false;
+	
+	// play sound
+	Audio::Play(AGG::GetWAV(M82::BUILDTWN));
 	
 	if(H2Config::Debug()) Error::Verbose("Castle::BuyBuilding: " + GetStringBuilding(build, race));
 }
@@ -1587,4 +1604,19 @@ u32 Castle::GetUpgradeBuilding(const u32 build, const Race::race_t & race)
     }
 
     return build;
+}
+
+bool Castle::PredicateIsCastle(const Castle* castle)
+{
+    return castle && castle->isCastle();
+}
+
+bool Castle::PredicateIsTown(const Castle* castle)
+{
+    return castle && !castle->isCastle();
+}
+
+bool Castle::PredicateIsBuildMarketplace(const Castle* castle)
+{
+    return castle && castle->isBuild(Castle::BUILD_MARKETPLACE);
 }

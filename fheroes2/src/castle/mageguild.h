@@ -23,16 +23,16 @@
 #include <vector>
 #include "gamedefs.h"
 #include "race.h"
-#include "spell.h"
+#include "spell_storage.h"
 
-class MageGuild
+class MageGuild : public Spell::Storage
 {
     public:
 	MageGuild();
+	
+	void SetRace(const Race::race_t rc);
 
-	u8 GetLevel(void) const{ return level; };
-
-	const std::vector<Spell::spell_t> & GetSpells(void) const{ return spells; };
+	u8 GetLevel(void) const;
 	Spell::spell_t GetSpell(u8 level, u8 index) const;
 
 	void BuildNextLevel(void);
@@ -40,12 +40,18 @@ class MageGuild
 	
 	bool isUpgrade(void) const{ return upgrade; };
 	
+    protected:
+	void PackSpells(const u8 lvl);
+	void AddExtSpells(const u8 lvl);
+
+	static Spell::spell_t GetSpellRace(const Race::race_t rc, const u8 lvl);
+
     private:
+	Race::race_t race;
+
 	u8 level;
 	
 	bool upgrade;
-
-	std::vector<Spell::spell_t>	spells;
 };
 
 #endif

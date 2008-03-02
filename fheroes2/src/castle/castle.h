@@ -123,6 +123,10 @@ public:
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static ICN::icn_t GetICNBuilding(const building_t & build, const Race::race_t & race);
     static u32 GetUpgradeBuilding(const u32 build, const Race::race_t & race);
+    
+    static bool PredicateIsCastle(const Castle *castle);
+    static bool PredicateIsTown(const Castle *castle);
+    static bool PredicateIsBuildMarketplace(const Castle *castle);
 
 private:
     void RedrawResourcePanel(void);
