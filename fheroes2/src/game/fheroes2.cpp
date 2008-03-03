@@ -35,6 +35,7 @@
 #include "cursor.h"
 #include "game.h"
 #include "engine.h"
+#include "audio.h"
 #include "image_logo.h"
 #include "image_icons.h"
 
@@ -113,6 +114,12 @@ int main(int argc, char **argv)
 	if(SDL::Init(subsystem))
 	try
 	{
+	    if((conf.Sound() || conf.Music()) && ! Audio::Mixer::Get().isValid())
+	    {
+		conf.ResetModes(Settings::SOUND);
+		conf.ResetModes(Settings::MUSIC);
+	    }
+
 	    Display::SetVideoMode(Display::SMALL);
 	    Display::HideCursor();
 	    Display::SetCaption(caption);
@@ -168,7 +175,7 @@ int main(int argc, char **argv)
 
 #ifdef BUILD_RELEASE
 	    // SDL logo
-	    if(H2Config::Logo())
+	    if(conf.Logo())
 	    {
 		Display & display = Display::Get();
 

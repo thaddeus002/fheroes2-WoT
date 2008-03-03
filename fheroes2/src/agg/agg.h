@@ -32,6 +32,7 @@
 #include "xmi.h"
 #include "m82.h"
 #include "palette.h"
+#include "settings.h"
 #include "audio.h"
 #include "text.h"
 
@@ -127,6 +128,9 @@ namespace AGG
     u32 GetColor(const u16 index);
 
     const Sprite & GetLetter(char ch, Font::type_t ft);
+    
+    // wrapper Audio::Play
+    void PlaySound(const M82::m82_t m82);
 };
 
 #endif

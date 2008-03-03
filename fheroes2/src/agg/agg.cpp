@@ -26,6 +26,7 @@
 #include "config.h"
 #include "surface.h"
 #include "sprite.h"
+#include "audio.h"
 #include "agg.h"
 
 #define FATSIZENAME	15
@@ -424,7 +425,16 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
     if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadWAV: " + M82::GetString(m82));
 
-    const Audio::Spec & hardware = Audio::HardwareSpec();
+    const Audio::Mixer & mixer = Audio::Mixer::Get();
+    
+    if(! mixer.isValid()) return;
+
+    Audio::Spec wav_spec;
+    wav_spec.format = 8;
+    wav_spec.channels = 1;
+    wav_spec.freq = 22050;
+
+    const Audio::Spec & hardware = mixer.HardwareSpec();
 
     if(agg_cache.size())
     {
@@ -440,18 +450,14 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 	    {
 		cvt.valid = true;
 
-		if(-1 == SDL_BuildAudioCVT(&cvt, 8, 1, 22050, hardware.format, hardware.channels, hardware.freq))
+		if(cvt.Build(wav_spec, hardware))
 		{
-		    Error::Warning("AGG::Cache::LoadWAV: SDL_BuildAudioCVT: " + Error::SDLError());
-
-		    return;
-		}
-
-		cvt.buf = new u8[cvt.len_mult * body.size()];
-		cvt.len = body.size();
-		memcpy(cvt.buf, &body[0], body.size());
+		    cvt.buf = new u8[cvt.len_mult * body.size()];
+		    cvt.len = body.size();
+		    memcpy(cvt.buf, &body[0], body.size());
 		
-		SDL_ConvertAudio(&cvt);
+		    cvt.Convert();
+		}
 	    }
     }
 }
@@ -626,4 +632,21 @@ const Sprite & AGG::GetLetter(char ch, Font::type_t ft)
     if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
     
     return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
+}
+
+/* wrapper Audio::Play */
+void AGG::PlaySound(const M82::m82_t m82)
+{
+    Audio::Mixer & mixer = Audio::Mixer::Get();
+
+    if(! mixer.isValid()) return;
+
+    const Settings & conf = Settings::Get();
+
+    if(conf.Sound())
+    {
+	if(H2Config::Debug()) Error::Verbose("AGG::PlaySound: " + M82::GetString(m82));
+
+	mixer.Play(GetWAV(m82));
+    }
 }

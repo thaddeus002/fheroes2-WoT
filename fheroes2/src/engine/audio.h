@@ -21,6 +21,7 @@
 #ifndef H2AUDIO_H
 #define H2AUDIO_H
 
+#include <vector>
 #include "types.h"
 
 namespace Audio
@@ -33,19 +34,44 @@ namespace Audio
     struct CVT : public SDL_AudioCVT
     {
 	CVT();
+	
+	bool Build(const Spec & src, const Spec & dst);
+	bool Convert(void);
 
 	bool valid;
     };
 
-    bool OpenDevice(void);
-    void CloseDevice(void);
+    class Mixer
+    {
+    public:
+	~Mixer();
 
-    void Lock(void);
-    void Unlock(void);
+	static Mixer & Get(void);
 
-    void Play(const CVT & cvt);
-    
-    const Spec & HardwareSpec(void);
+	bool isValid(void) const;
+	const Spec & HardwareSpec(void) const;
+
+	void Play(const CVT & cvt);
+
+    private:
+	struct mixer_t
+        {
+            mixer_t() : data(NULL), size(0), pos(0) {};
+
+    	    u8 *    data;
+    	    u32     size;
+    	    u32     pos;
+        };
+
+	Mixer();
+
+	static void CallBack(void *unused, u8 *stream, int size);
+	static bool PredicateIsFreeSound(const mixer_t & header);
+
+	Spec hardware;
+	std::vector<mixer_t> sounds;
+	bool valid;
+    };
 };
 
 #endif

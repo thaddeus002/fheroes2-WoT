@@ -31,15 +31,11 @@ bool SDL::Init(const u32 system)
 	return false;
     }
 
-    if(system & SDL_INIT_AUDIO && !Audio::OpenDevice()) return false;
-
     return true;
 }
 
 void SDL::Quit(void)
 {
-    if(SDL_WasInit(SDL_INIT_AUDIO) != 0) Audio::CloseDevice();
-
     SDL_Quit();
 }
 

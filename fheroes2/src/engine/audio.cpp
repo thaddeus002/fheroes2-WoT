@@ -19,31 +19,12 @@
  ***************************************************************************/
 
 #include <string>
-#include <vector>
 
 #include "engine.h"
 #include "error.h"
 #include "audio.h"
 
 #define		NUM_SOUNDS	16
-
-namespace Audio
-{
-    struct mixer_t
-    {
-	mixer_t() : data(NULL), size(0), pos(0) {};
-
-	u8 *	data;
-	u32	size;
-	u32	pos;
-    };
-
-    void Mixer(void *unused, u8 *stream, int size);
-    bool PredicateIsFreeSound(const mixer_t & header);
-
-    static std::vector<mixer_t> sounds;
-    static Spec hard;
-};
 
 Audio::Spec::Spec()
 {
@@ -81,52 +62,91 @@ Audio::CVT::CVT() : valid(false)
     filter_index = 0;
 }
 
-const Audio::Spec & Audio::HardwareSpec(void)
+bool Audio::CVT::Build(const Audio::Spec & src, const Audio::Spec & dst)
 {
-    return hard;
+    if(1 == SDL_BuildAudioCVT(this, src.format, src.channels, src.freq, dst.format, dst.channels, dst.freq)) return true;
+
+    Error::Warning("Audio::CVT::Build: " + Error::SDLError());
+
+    return false;
 }
 
-bool Audio::OpenDevice(void)
+bool Audio::CVT::Convert(void)
 {
-    if(! SDL::SubSystem(INIT_AUDIO))
-    {
-	Error::Warning("Audio::OpenDevice: audio subsystem not initialize");
+    if(0 == SDL_ConvertAudio(this)) return true;
+    
+    Error::Warning("Audio::CVT::Convert: " + Error::SDLError());
 
-	return false;
-    }
-
-    Spec fmt;
-
-    fmt.freq = 22050;
-    fmt.format = AUDIO_S16;
-    fmt.channels = 1;
-    fmt.samples = 8192;
-    fmt.callback = Audio::Mixer;
-    fmt.userdata = NULL;
-
-    if(0 > SDL_OpenAudio(&fmt, &hard))
-    {
-	Error::Warning("Audio::OpenDevice: " + std::string(SDL_GetError()));
-
-	return false;
-    }
-
-    SDL_PauseAudio(0);
-
-    sounds.resize(NUM_SOUNDS);
-
-    return true;
+    return false;
 }
 
-void Audio::CloseDevice(void)
+Audio::Mixer::Mixer() : valid(true)
+{
+    if(SDL::SubSystem(INIT_AUDIO))
+    {
+	SDL_AudioSpec fmt;
+
+	fmt.freq = 22050;
+	fmt.format = AUDIO_S16;
+        fmt.channels = 1;
+	fmt.samples = 8192;
+        fmt.callback = CallBack;
+	fmt.userdata = NULL;
+
+	if(0 > SDL_OpenAudio(&fmt, &hardware))
+	{
+	    Error::Warning("Audio::Mixer: " + std::string(SDL_GetError()));
+	    
+	    valid = false;
+	}
+	else
+	{
+	    SDL_PauseAudio(0);
+
+	    sounds.resize(NUM_SOUNDS);
+	}
+    }
+    else
+    {
+	Error::Warning("Audio::Mixer: audio subsystem not initialize");
+
+	valid = false;
+    }
+}
+
+Audio::Mixer::~Mixer()
 {
     SDL_CloseAudio();
 
     sounds.clear();
 }
 
-void Audio::Mixer(void *unused, u8 *stream, int size)
+Audio::Mixer & Audio::Mixer::Get(void)
 {
+    static Audio::Mixer mix;
+
+    return mix;
+}
+
+bool Audio::Mixer::isValid(void) const
+{
+    return valid;
+}
+
+const Audio::Spec & Audio::Mixer::HardwareSpec(void) const
+{
+    return hardware;
+}
+
+bool Audio::Mixer::PredicateIsFreeSound(const mixer_t & header)
+{
+    return header.size == header.pos;
+}
+
+void Audio::Mixer::CallBack(void *unused, u8 *stream, int size)
+{
+    std::vector<mixer_t> & sounds = Audio::Mixer::Get().sounds;
+
     int amount = 0;
 
     for(u8 ii = 0; ii < sounds.size(); ++ii)
@@ -143,27 +163,12 @@ void Audio::Mixer(void *unused, u8 *stream, int size)
     }
 }
 
-void Audio::Lock(void)
+void Audio::Mixer::Play(const CVT & cvt)
 {
-    SDL_LockAudio();
-}
+    if(! valid) return;
 
-void Audio::Unlock(void)
-{
-    SDL_UnlockAudio();
-}
+    std::vector<mixer_t>::iterator it = std::find_if(sounds.begin(), sounds.end(), PredicateIsFreeSound);
 
-void Audio::Play(const CVT & cvt)
-{
-    if(! SDL::SubSystem(INIT_AUDIO))
-    {
-	Error::Warning("Audio::Play: audio subsystem not initialize");
-
-	return;
-    }
-
-    std::vector<mixer_t>::iterator it = std::find_if(sounds.begin(), sounds.end(), Audio::PredicateIsFreeSound);
-    
     if(sounds.end() == it)
     {
 	Error::Warning("Audio::Play: mixer is full, increase NUM_SOUNDS");
@@ -180,9 +185,4 @@ void Audio::Play(const CVT & cvt)
     mixer.pos = 0;
 
     SDL_UnlockAudio();
-}
-
-bool Audio::PredicateIsFreeSound(const mixer_t & header)
-{
-    return header.size == header.pos;
 }
