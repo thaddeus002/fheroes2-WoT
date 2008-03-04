@@ -10,7 +10,7 @@ SDL libraries can be found at http://www.libsdl.org .
 
 Sourcecode: you can get it here: http://sourceforge.net/projects/fheroes2/
 
-Copy origin heroes2.agg in to data directory.
+Copy origin data/*.agg in to data directory.
 Copy maps files (*.mp2) in to maps directory.
 
 Default config fheroes2.cfg options:

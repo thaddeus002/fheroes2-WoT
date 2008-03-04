@@ -163,6 +163,10 @@ public:
     void Goto(u16 dst_index);
     void Action(u16 dst_index);
 
+    void StartMove(void);
+    void StopMove(void);
+    bool isNeedMove(void) const;
+
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
 
@@ -183,7 +187,8 @@ private:
     const Race::race_t	race;
 
     bool		army_spread;
-    
+    bool		move;
+
     MP2::object_t	save_maps_general;
 
     Point		mp;

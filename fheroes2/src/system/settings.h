@@ -84,12 +84,18 @@ public:
     bool Modes(const settings_t s) const;
 
     Size & VideoMode(void);
+    
+    u8   SoundVolume(void) const;
+    u8   MusicVolume(void) const;
 
     void SetDebug(const u8 d);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
     void SetMyColor(const Color::color_t c);
     void SetModes(const settings_t s);
     void ResetModes(const settings_t s);
+
+    void SetSoundVolume(const u8 v);
+    void SetMusicVolume(const u8 v);
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -115,6 +121,9 @@ private:
     std::string path_maps_directory;
     
     Maps::FileInfo current_maps_file;
+    
+    u8 sound_volume;
+    u8 music_volume;
 };
 
 #endif

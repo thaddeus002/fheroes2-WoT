@@ -59,6 +59,16 @@ bool Maps::isValidDirection(u16 from, Direction::vector_t vector)
 
     return false;
 }
+
+bool Maps::isValidAbsPoint(const Point & pt)
+{
+    return isValidAbsPoint(pt.x, pt.y);
+}
+
+bool Maps::isValidAbsPoint(const s16 x, const s16 y)
+{
+    return 0 <= x && world.w() > x && 0 <= y && world.h() > y;
+}
     
 u16 Maps::GetTopIndex(u16 from)
 {

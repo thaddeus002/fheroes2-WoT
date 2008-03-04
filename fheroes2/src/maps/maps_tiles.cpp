@@ -886,7 +886,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_MOUND:		return MP2::OBJ_MOUND;
 	case MP2::OBJ_DUNE:		return MP2::OBJ_DUNE;
 
-	case MP2::OBJ_LAVALAKE:		return MP2::OBJ_LAVALAKE;
+	case MP2::OBJ_LAVAPOOL:		return MP2::OBJ_LAVAPOOL;
 	case MP2::OBJ_SHRUB:		return MP2::OBJ_SHRUB;
 
 	case MP2::OBJ_ALCHEMYTOWER:	return MP2::OBJ_ALCHEMYTOWER;

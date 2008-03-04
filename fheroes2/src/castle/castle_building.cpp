@@ -85,7 +85,7 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 	    switch(race)
 	    {
 		case Race::KNGT:	return Rect(pt.x + 480, pt.y + 205, 45, 50);
-		case Race::BARB:	return Rect(pt.x + 467, pt.y + 102, 31, 49);
+		case Race::BARB:	return Rect(pt.x + 470, pt.y + 180, 30, 58);
 		case Race::SORC:	return Rect(pt.x + 158, pt.y + 173, 17, 58);
 		case Race::WRLK:	return Rect(pt.x + 473, pt.y + 172, 45, 51);
 		case Race::WZRD:	return Rect(pt.x + 464, pt.y + 58, 26, 62);

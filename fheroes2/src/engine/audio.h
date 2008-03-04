@@ -24,6 +24,8 @@
 #include <vector>
 #include "types.h"
 
+#define MIX_MAXVOLUME	SDL_MIX_MAXVOLUME
+
 namespace Audio
 {
     struct Spec : public SDL_AudioSpec
@@ -37,8 +39,6 @@ namespace Audio
 	
 	bool Build(const Spec & src, const Spec & dst);
 	bool Convert(void);
-
-	bool valid;
     };
 
     class Mixer
@@ -51,22 +51,27 @@ namespace Audio
 	bool isValid(void) const;
 	const Spec & HardwareSpec(void) const;
 
-	void Play(const CVT & cvt);
+	void Play(const std::vector<u8> & body, const u8 volume = MIX_MAXVOLUME, bool loop = false);
+	void Clear(void);
 
     private:
 	struct mixer_t
         {
-            mixer_t() : data(NULL), size(0), pos(0) {};
+            mixer_t() : data(NULL), length(0), position(0), volume(0), loop(false), active(false) {};
 
-    	    u8 *    data;
-    	    u32     size;
-    	    u32     pos;
+	    const u8 *	data;
+	    u32		length;
+    	    u32		position;
+    	    u8		volume;
+    	    bool	loop;
+    	    bool	active;
         };
 
 	Mixer();
 
 	static void CallBack(void *unused, u8 *stream, int size);
 	static bool PredicateIsFreeSound(const mixer_t & header);
+	static void PredicateStopSound(mixer_t & header);
 
 	Spec hardware;
 	std::vector<mixer_t> sounds;

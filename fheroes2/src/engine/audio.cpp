@@ -38,7 +38,7 @@ Audio::Spec::Spec()
     userdata = NULL;
 }
 
-Audio::CVT::CVT() : valid(false)
+Audio::CVT::CVT()
 {
     needed = 0;
     src_format = 0;
@@ -89,7 +89,7 @@ Audio::Mixer::Mixer() : valid(true)
 	fmt.freq = 22050;
 	fmt.format = AUDIO_S16;
         fmt.channels = 1;
-	fmt.samples = 8192;
+	fmt.samples = 4096;
         fmt.callback = CallBack;
 	fmt.userdata = NULL;
 
@@ -140,7 +140,12 @@ const Audio::Spec & Audio::Mixer::HardwareSpec(void) const
 
 bool Audio::Mixer::PredicateIsFreeSound(const mixer_t & header)
 {
-    return header.size == header.pos;
+    return !header.active || (!header.loop && header.length == header.position);
+}
+
+void Audio::Mixer::PredicateStopSound(mixer_t & header)
+{
+    header.active = false;
 }
 
 void Audio::Mixer::CallBack(void *unused, u8 *stream, int size)
@@ -153,36 +158,77 @@ void Audio::Mixer::CallBack(void *unused, u8 *stream, int size)
     {
 	mixer_t & header = sounds[ii];
 	
-        amount = header.size - header.pos;
+        if(header.active)
+        {
+    	    amount = header.length - header.position;
 
-	if(amount > size) amount = size;
+	    if(amount > size) amount = size;
 
-        SDL_MixAudio(stream, &header.data[header.pos], amount, SDL_MIX_MAXVOLUME);
+    	    SDL_MixAudio(stream, &header.data[header.position], amount, header.volume);
 
-        header.pos += amount;
+    	    header.position += amount;
+    	    
+    	    if(header.loop && header.length - amount <= header.position) header.position = 0;
+	}
     }
 }
 
-void Audio::Mixer::Play(const CVT & cvt)
+void Audio::Mixer::Clear(void)
 {
     if(! valid) return;
 
-    std::vector<mixer_t>::iterator it = std::find_if(sounds.begin(), sounds.end(), PredicateIsFreeSound);
+    SDL_PauseAudio(1);
 
-    if(sounds.end() == it)
+    std::for_each(sounds.begin(), sounds.end(), PredicateStopSound);
+
+    SDL_PauseAudio(0);
+}
+
+/* play sound */
+void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, bool loop)
+{
+    if(! valid || body.empty()) return;
+
+    // find same sound
+    std::vector<mixer_t>::iterator it1 = sounds.begin();
+    std::vector<mixer_t>::const_iterator it2 = sounds.end();
+    
+    const u8 * data = &body[0];
+
+    for(; it1 != it2; ++it1)
     {
-	Error::Warning("Audio::Play: mixer is full, increase NUM_SOUNDS");
+	const mixer_t & header = *it1;
 
-	return;
+	if(header.data == data) break;
+    }
+    
+    // find free
+    if(it2 == it1)
+    {
+	it1 = std::find_if(sounds.begin(), sounds.end(), PredicateIsFreeSound);
+
+	if(it2 == it1)
+	{
+	    Error::Warning("Audio::Play: mixer is full, increase NUM_SOUNDS");
+
+	    return;
+	}
     }
 
-    mixer_t & mixer = *it;
+    mixer_t & mixer = *it1;
 
     SDL_LockAudio();
 
-    mixer.data = cvt.buf;
-    mixer.size = cvt.len_cvt;
-    mixer.pos = 0;
+    if(mixer.data != data)
+    {
+	mixer.data = data;
+	mixer.length = body.size();
+	mixer.position = 0;
+    }
+
+    mixer.loop = loop;
+    mixer.volume = volume;
+    mixer.active = true;
 
     SDL_UnlockAudio();
 }

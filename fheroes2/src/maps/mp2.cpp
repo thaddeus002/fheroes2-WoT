@@ -437,7 +437,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJN_PEASANTHUNT:
         case MP2::OBJ_PEASANTHUNT:		return "Peasant Hunt";
         case MP2::OBJN_DWARFCOTT:
-        case MP2::OBJ_DWARFCOTT:		return "Dwarf Cott";
+        case MP2::OBJ_DWARFCOTT:		return "Dwarf Cottadge";
         case MP2::OBJN_STONELIGHTS:
         case MP2::OBJ_STONELIGHTS:		return "Stonelights";
         case MP2::OBJN_MAGICWELL:
@@ -456,12 +456,12 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_DEADTREE:			return "Dead Tree";
         case MP2::OBJ_MOUNTS:			return "Mountains";
         case MP2::OBJ_VOLCANO:			return "Volcano";
-        case MP2::OBJ_STONES:			return "Stones";
+        case MP2::OBJ_STONES:			return "Rock";
         case MP2::OBJ_FLOWERS:			return "Flowers";
         case MP2::OBJ_WATERLAKE:		return "Water Lake";
         case MP2::OBJ_VEGETATION2:		return "Vegetation";
         case MP2::OBJ_CRATER:			return "Crater";
-        case MP2::OBJ_LAVALAKE:			return "Lava Lake";
+        case MP2::OBJ_LAVAPOOL:			return "Lava Pool";
         case MP2::OBJ_SHRUB:			return "Shrub";
         case MP2::OBJ_BUOY:			return "Buoy";
         case MP2::OBJ_SKELETON:			return "Skeleton";

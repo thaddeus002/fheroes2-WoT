@@ -216,16 +216,6 @@ AGG::Cache::~Cache()
 	}
     }
 
-    // free wav cache
-    std::map<M82::m82_t, Audio::CVT>::const_iterator cvt_it1 = m82_cache.begin();
-    std::map<M82::m82_t, Audio::CVT>::const_iterator cvt_it2 = m82_cache.end();
-
-    for(; cvt_it1 != cvt_it2; ++cvt_it1)
-    {
-	const Audio::CVT & cvt = (*cvt_it1).second;
-	
-	if(cvt.valid && cvt.buf) delete [] cvt.buf;
-    }
 }
 
 /* get AGG::Cache object */
@@ -419,14 +409,14 @@ void AGG::Cache::LoadPAL(void)
 /* load 82M object to AGG::Cache in Audio::CVT */
 void AGG::Cache::LoadWAV(const M82::m82_t m82)
 {
-    Audio::CVT & cvt = m82_cache[m82];
+    std::vector<u8> & v = wav_cache[m82];
 
-    if(cvt.valid) return;
+    if(v.size()) return;
 
     if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadWAV: " + M82::GetString(m82));
 
     const Audio::Mixer & mixer = Audio::Mixer::Get();
-    
+
     if(! mixer.isValid()) return;
 
     Audio::Spec wav_spec;
@@ -436,7 +426,9 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
     const Audio::Spec & hardware = mixer.HardwareSpec();
 
-    if(agg_cache.size())
+    Audio::CVT cvt;
+
+    if(agg_cache.size() && cvt.Build(wav_spec, hardware))
     {
 	std::vector<char> body;
 
@@ -448,16 +440,18 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 	    // read only first found
 	    if((**it1).Read(M82::GetString(m82), body))
 	    {
-		cvt.valid = true;
+		    const u32 size = cvt.len_mult * body.size();
 
-		if(cvt.Build(wav_spec, hardware))
-		{
-		    cvt.buf = new u8[cvt.len_mult * body.size()];
+		    cvt.buf = new u8[size];
 		    cvt.len = body.size();
+
 		    memcpy(cvt.buf, &body[0], body.size());
-		
+
 		    cvt.Convert();
-		}
+
+		    v.assign(cvt.buf, cvt.buf + size - 1);
+
+		    delete [] cvt.buf;
 	    }
     }
 }
@@ -501,13 +495,9 @@ void AGG::Cache::FreeTIL(const TIL::til_t til)
 /* free 82M object in AGG::Cache */
 void AGG::Cache::FreeWAV(const M82::m82_t m82)
 {
-    Audio::CVT & cvt = m82_cache[m82];
+    std::vector<u8> & v = wav_cache[m82];
 
-    if(! cvt.valid) return;
-
-    if(cvt.buf) delete [] cvt.buf;
-    
-    cvt = Audio::CVT();
+    if(v.size()) v.clear();
 }
 
 /* return ICN sprite from AGG::Cache */
@@ -571,13 +561,15 @@ const Palette & AGG::Cache::GetPAL(void)
 }
 
 /* return CVT from AGG::Cache */
-const Audio::CVT & AGG::Cache::GetWAV(const M82::m82_t m82)
+const std::vector<u8> & AGG::Cache::GetWAV(const M82::m82_t m82)
 {
-    const Audio::CVT & cvt = m82_cache[m82];
+    const std::vector<u8> & v = wav_cache[m82];
 
-    if(! cvt.valid && SDL::SubSystem(INIT_AUDIO)) LoadWAV(m82);
+    const Audio::Mixer & mixer = Audio::Mixer::Get();
 
-    return cvt;
+    if(v.empty() && mixer.isValid()) LoadWAV(m82);
+
+    return v;
 }
 
 // wrapper AGG::PreloadObject
@@ -615,7 +607,7 @@ void AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface 
     TIL::Reflect(dst, src, shape);
 }
 
-const Audio::CVT & AGG::GetWAV(const M82::m82_t m82)
+const std::vector<u8> & AGG::GetWAV(const M82::m82_t m82)
 {
     return AGG::Cache::Get().GetWAV(m82);
 }
@@ -634,19 +626,17 @@ const Sprite & AGG::GetLetter(char ch, Font::type_t ft)
     return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
 }
 
-/* wrapper Audio::Play */
-void AGG::PlaySound(const M82::m82_t m82)
+/* wrapper Audio::Play, volume: 0 - 10 */
+void AGG::PlaySound(const M82::m82_t m82, const u8 volume, bool loop)
 {
-    Audio::Mixer & mixer = Audio::Mixer::Get();
-
-    if(! mixer.isValid()) return;
-
     const Settings & conf = Settings::Get();
 
     if(conf.Sound())
     {
-	if(H2Config::Debug()) Error::Verbose("AGG::PlaySound: " + M82::GetString(m82));
+	if(conf.Debug()) Error::Verbose("AGG::PlaySound: " + M82::GetString(m82));
 
-	mixer.Play(GetWAV(m82));
+	const u8 vol = (10 <= volume ? MIX_MAXVOLUME : volume * MIX_MAXVOLUME / 10) * conf.SoundVolume() / 10;
+
+	Audio::Mixer::Get().Play(AGG::Cache::Get().GetWAV(m82), vol, loop);
     }
 }

@@ -29,7 +29,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
+    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), move(false), save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -1058,4 +1058,19 @@ bool Heroes::BuySpellBook(void)
 void Heroes::AppendSpellsToBook(const Spell::Storage & spells)
 {
     spell_book.Appends(spells);
+}
+
+void Heroes::StartMove(void)
+{
+    move = false;
+}
+
+void Heroes::StopMove(void)
+{
+    move = false;
+}
+
+bool Heroes::isNeedMove(void) const
+{
+    return false;
 }

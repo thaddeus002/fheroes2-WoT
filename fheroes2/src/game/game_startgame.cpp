@@ -850,6 +850,7 @@ Game::menu_t Game::StartGame(void)
     			case MP2::OBJ_HILLFORT:
     			case MP2::OBJ_HALFLINGHOLE:
     			case MP2::OBJ_MERCENARYCAMP:
+    			case MP2::OBJ_CRAKEDLAKE:
     			case MP2::OBJ_SHRINE2:
     			case MP2::OBJ_SHRINE3:
     			case MP2::OBJ_PIRAMID:
@@ -1583,6 +1584,16 @@ Game::menu_t Game::StartGame(void)
 	// end cursor over left panel
 	}
 
+	// mix all sound from focus
+	Game::EnvironmentSoundMixer();
+
+        // draw heroes movement (in focus)
+        if(Game::Focus::HEROES == global_focus.Type())
+        {
+    	    //const Heroes hero = global_focus.GetHeroes();
+    	    //if(hero.isNeedMove())
+    	    //const std::vector<Heroes *> & myHeroes
+	}
 
         // animation
         if(!(++ticket % 50)) // FIXME: speed animation low

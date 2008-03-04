@@ -69,6 +69,8 @@ namespace Game
 
     void DrawInterface(void);
     
+    void EnvironmentSoundMixer(void);
+    
     namespace Editor
     {
 	Game::menu_t MainMenu(void);

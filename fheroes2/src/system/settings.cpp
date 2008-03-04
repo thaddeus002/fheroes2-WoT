@@ -25,7 +25,7 @@
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(ANIMATION | SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps")
+    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), sound_volume(10), music_volume(10)
 {
 }
 
@@ -343,4 +343,24 @@ void Settings::ResetModes(const std::string & key)
     else
     // show logo
     if(key == "logo")		ResetModes(LOGO);
+}
+
+u8   Settings::SoundVolume(void) const
+{
+    return sound_volume;
+}
+
+u8   Settings::MusicVolume(void) const
+{
+    return music_volume;
+}
+
+void Settings::SetSoundVolume(const u8 v)
+{
+    sound_volume = 10 <= v ? 10 : v;
+}
+
+void Settings::SetMusicVolume(const u8 v)
+{
+    music_volume = 10 <= v ? 10 : v;
 }

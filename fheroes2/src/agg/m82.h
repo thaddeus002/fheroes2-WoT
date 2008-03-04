@@ -336,6 +336,8 @@ namespace M82
 	ZOMBKILL,
 	ZOMBMOVE,
 	ZOMBWNCE,
+	
+	UNKNOWN
 
     } m82_t;
 

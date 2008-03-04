@@ -372,7 +372,7 @@ namespace MP2
 	OBJ_MOUND		= 0x6E,
 	OBJ_DUNE		= 0x6F,
 
-	OBJ_LAVALAKE		= 0x70,
+	OBJ_LAVAPOOL		= 0x70,
 	OBJ_SHRUB		= 0x71,
 	OBJ_UNKNW_72		= 0x72,
 	OBJ_UNKNW_73		= 0x73,
