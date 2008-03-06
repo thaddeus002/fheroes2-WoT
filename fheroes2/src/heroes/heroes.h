@@ -160,15 +160,26 @@ public:
 
     void SetVisited(const u32 index);
     void SetCenter(const Point& pt){ mp = pt; };
-    void Goto(u16 dst_index);
-    void Action(u16 dst_index);
 
-    void StartMove(void);
+    void Action(const u16 dst_index, const MP2::object_t object);
+
+    bool isEnableMove(void) const;
     void StopMove(void);
     bool isNeedMove(void) const;
+    void Move(void);
+    void ShowPathOrStartMove(const u16 dst_index);
+
+    bool isShipMaster(void) const;
+    void SetShipMaster(bool captain);
 
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
+
+protected:
+    void ActionToCastle(const u16 dst_index);
+    void ActionToHeroes(const u16 dst_index);
+    void ActionToMonster(const u16 dst_index);
+    bool isNeedStopNextToLast(void);
 
 private:
     std::string		name;
@@ -188,6 +199,7 @@ private:
 
     bool		army_spread;
     bool		move;
+    bool 		shipmaster;
 
     MP2::object_t	save_maps_general;
 

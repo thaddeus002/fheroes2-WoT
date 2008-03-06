@@ -45,6 +45,9 @@ namespace Game
 
 	const Castle &	GetCastle(void) const;
 	const Heroes &	GetHeroes(void) const;
+	
+	Heroes & GetHeroes(void);
+	Castle & GetCastle(void);
 
     private:
 	Focus();

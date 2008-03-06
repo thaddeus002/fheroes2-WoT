@@ -26,7 +26,7 @@
 
 class Heroes;
 
-class Route
+class Route : public std::list<u16>
 {
     public:
 	Route(const Heroes & h);
@@ -35,13 +35,11 @@ class Route
 	u16	GetDestinationIndex(void) const{ return dst; };
 
 	u16	Calculate(u16 dst_index);
-	u16	Length(void) const{ return path.size(); };
 
 	void	Show(void) const;
 	void	Hide(void) const;
 	void	Reset(void);
 
-	const std::list<u16> & Get(void) const { return path; };
 	u16	NextToLast(void) const;
 
     private:
@@ -51,7 +49,6 @@ class Route
     private:
 	const Heroes & hero;
 	u16	dst;
-	std::list<u16> path;
 };
 
 #endif

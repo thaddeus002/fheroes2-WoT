@@ -319,7 +319,7 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
     }
 
     // route path sprite
-    if(path_sprite) display.Blit(*path_sprite, dstx + 16 - path_sprite->w() / 2, dsty + path_sprite->y());
+    if(path_sprite) display.Blit(*path_sprite, dstx + 16 - path_sprite->w() / 2, dsty + path_sprite->y() - 3);
 
     // put point for grid
     if(H2Config::Debug())

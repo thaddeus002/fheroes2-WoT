@@ -60,11 +60,25 @@ const Castle & Game::Focus::GetCastle(void) const
     return *castle;
 }
 
+Castle & Game::Focus::GetCastle(void)
+{
+    if(NULL == castle) Error::Warning("Game::Focus::GetCastle: is NULL");
+
+    return *const_cast<Castle *>(castle);
+}
+
 const Heroes & Game::Focus::GetHeroes(void) const
 {
     if(NULL == heroes) Error::Warning("Game::Focus::GetHeroes: is NULL");
 
     return *heroes;
+}
+
+Heroes & Game::Focus::GetHeroes(void)
+{
+    if(NULL == heroes) Error::Warning("Game::Focus::GetHeroes: is NULL");
+
+    return *const_cast<Heroes *>(heroes);
 }
 
 const Point & Game::Focus::Center(void) const

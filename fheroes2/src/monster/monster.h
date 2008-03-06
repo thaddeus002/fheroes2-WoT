@@ -153,7 +153,7 @@ namespace Monster
 
     u16 GetRNDSize(monster_t monster);
     u16 GetSize(const Maps::Tiles & tile);
-    
+
     u32 Dwelling(const monster_t monster);
 
     void ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 center);

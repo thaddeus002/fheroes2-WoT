@@ -26,10 +26,13 @@
 #include "monster.h"
 #include "error.h"
 #include "payment.h"
+#include "cursor.h"
+#include "display.h"
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), move(false), save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
+    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), move(false), shipmaster(false),
+    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -899,6 +902,7 @@ u16 Heroes::FindPath(u16 dst_index)
     return path.Calculate(dst_index);
 }
 
+/*
 void Heroes::Goto(u16 dst_index)
 {
     if(MP2::OBJ_HEROES != save_maps_general)
@@ -914,7 +918,7 @@ void Heroes::Goto(u16 dst_index)
 
 
     //
-    direction = 2 > path.Get().size() ? Direction::Get(Maps::GetIndexFromAbsPoint(mp), path.GetDestinationIndex()) : Direction::Get(path.NextToLast(), path.GetDestinationIndex());
+    direction = 2 > path.size() ? Direction::Get(Maps::GetIndexFromAbsPoint(mp), path.GetDestinationIndex()) : Direction::Get(path.NextToLast(), path.GetDestinationIndex());
 
     // redraw sprite move hero
     // center area maps
@@ -935,13 +939,7 @@ void Heroes::Goto(u16 dst_index)
 
     if(H2Config::Debug()) Error::Verbose("Heroes::Goto: ", dst_index);
 }
-
-void Heroes::Action(u16 dst_index)
-{
-    Maps::Tiles & tiles_new = world.GetTiles(dst_index);
-
-    if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(tiles_new.GetObject())));
-}
+*/
 
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
@@ -968,6 +966,7 @@ bool Heroes::isVisited(const Maps::Tiles & tile) const
     return false;
 }
 
+/* return true if object visited */
 bool Heroes::isVisited(const MP2::object_t & object) const
 {
     std::list<Maps::VisitIndexObject>::const_iterator it1 = visit_object.begin();
@@ -995,6 +994,7 @@ void Heroes::SetVisited(const u32 index)
 	    visit_object.push_front(Maps::VisitIndexObject(index, object));
 }
 
+/* return true if artifact present */
 bool Heroes::HasArtifact(const Artifact::artifact_t & art) const
 {
     return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), art);
@@ -1039,6 +1039,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
     return 0;
 }
 
+/* buy book */
 bool Heroes::BuySpellBook(void)
 {
     if(HasArtifact(Artifact::MAGIC_BOOK) || Color::GRAY == color) return false;
@@ -1055,22 +1056,180 @@ bool Heroes::BuySpellBook(void)
     return true;
 }
 
+/* add new spell to book from storage */
 void Heroes::AppendSpellsToBook(const Spell::Storage & spells)
 {
     spell_book.Appends(spells);
 }
 
-void Heroes::StartMove(void)
+/* return true is move enable */
+bool Heroes::isEnableMove(void) const
 {
-    move = false;
+    return move;
 }
 
+/* set enable move */
 void Heroes::StopMove(void)
 {
     move = false;
 }
 
+/* return true is need move */
 bool Heroes::isNeedMove(void) const
 {
+    return path.size() && path.GetDestinationIndex() != Maps::GetIndexFromAbsPoint(mp);
+}
+
+/* draw move to next cell */
+void Heroes::Move(void)
+{
+    if(path.empty()) return;
+
+    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
+    const u16 index_to = path.front();
+    const Direction::vector_t direction2 = Direction::Get(index_from, index_to);
+
+    if(Direction::UNKNOWN == direction || Direction::CENTER == direction) return;
+
+    Maps::Tiles & tiles_from = world.GetTiles(index_from);
+    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+
+
+    // redraw top cell
+    if(Maps::isValidDirection(index_from, Direction::TOP))
+	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP)).Redraw();
+
+    // change through the circle
+    if(direction != direction2)
+    {
+	// FIXME: rotate animation heroes
+	direction = direction2;
+
+	cursor.Hide();
+	tiles_from.Redraw();
+	cursor.Show();
+	display.Flip();
+    }
+    else
+    // next to last
+    if(isNeedStopNextToLast() && path.GetDestinationIndex() == index_to)
+    {
+	move = false;
+
+	cursor.Hide();
+	path.Hide();
+	path.Reset();
+	cursor.Show();
+	display.Flip();
+
+	Action(index_to, tiles_to.GetObject());
+    }
+    else
+    // goto next cell
+    {
+	// restore from cell
+	if(MP2::OBJ_HEROES != save_maps_general)
+	{
+	    tiles_from.SetObject(save_maps_general);
+	    tiles_from.Redraw();
+	}
+
+	save_maps_general = tiles_to.GetObject();
+	tiles_to.SetObject(MP2::OBJ_HEROES);
+
+	mp.x = index_to % world.w();
+	mp.y = index_to / world.w();
+
+	cursor.Hide();
+	path.Hide();
+	path.pop_front();
+	path.Show();
+	tiles_to.Redraw();
+	cursor.Show();
+	display.Flip();
+
+	if(path.GetDestinationIndex() == index_to)
+	{
+	    move = false;
+
+	    cursor.Hide();
+	    path.Hide();
+	    path.Reset();
+	    cursor.Show();
+	    display.Flip();
+
+	    Action(index_to, save_maps_general);
+	}
+    }
+}
+
+/* show path */
+void Heroes::ShowPathOrStartMove(const u16 dst_index)
+{
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+
+    // show path
+    if(path.GetDestinationIndex() != dst_index)
+    {
+	move = false;
+
+	cursor.Hide();
+		
+	if(path.size()) path.Hide();
+
+	path.Calculate(dst_index);
+	path.Show();
+	world.GetTiles(mp).Redraw();
+		
+	cursor.Show();
+	display.Flip();
+    }
+    // start move
+    else
+    {
+	move = true;
+    }
+}
+
+bool Heroes::isNeedStopNextToLast(void)
+{
+    if(path.empty()) return false;
+
+    const u16 dst_index = path.GetDestinationIndex();
+    const Castle *castle = NULL;
+
+    switch(world.GetTiles(dst_index).GetObject())
+    {
+	case MP2::OBJ_MONSTER:
+	case MP2::OBJ_HEROES:
+	case MP2::OBJ_RESOURCE:
+	case MP2::OBJ_ANCIENTLAMP:
+	case MP2::OBJ_TREASURECHEST:
+        case MP2::OBJ_CAMPFIRE:
+        case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_FLOTSAM:
+        case MP2::OBJ_BOTTLE:
+            		return true;
+	
+	case MP2::OBJ_CASTLE:
+	    if(NULL != (castle = world.GetCastle(dst_index)) && color != castle->GetColor()) return true;
+
+	default: break;
+    }
+
     return false;
+}
+
+bool Heroes::isShipMaster(void) const
+{
+    return shipmaster;
+}
+
+void Heroes::SetShipMaster(bool captain)
+{
+    shipmaster = captain;
 }

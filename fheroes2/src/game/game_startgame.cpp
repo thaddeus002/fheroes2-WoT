@@ -304,8 +304,16 @@ Game::menu_t Game::StartGame(void)
     while(le.HandleEvents())
     {
 	// ESC
-	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
-
+	if(le.KeyPress(KEY_ESCAPE))
+	{
+    	    // stop hero
+    	    if(Game::Focus::HEROES == global_focus.Type() &&
+    		global_focus.GetHeroes().isNeedMove() && 
+    		global_focus.GetHeroes().isEnableMove())
+    		    global_focus.GetHeroes().StopMove();
+    	    else
+    	    if(Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
+	}
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft))
 	{
@@ -369,9 +377,7 @@ Game::menu_t Game::StartGame(void)
 		// focus from hero
 		case Game::Focus::HEROES:
 		{
-		    if(NULL == (heroes = world.GetHeroes(global_focus.Center()))) break;
-
-		    const Route & path = (*heroes).GetPath();
+		    Heroes & from_hero = global_focus.GetHeroes();
 
 		    switch(object)
 		    {
@@ -381,40 +387,7 @@ Game::menu_t Game::StartGame(void)
 
 			    if(le.MouseClickLeft(tile_pos))
 			    {
-				if(path.GetDestinationIndex() != index_maps)
-				{
-				    cursor.Hide();
-				    if(path.Length()) path.Hide();
-				    const_cast<Route &>(path).Calculate(index_maps);
-				    path.Show();
-				    world.GetTiles((*heroes).GetCenter()).Redraw();
-				    cursor.Show();
-				    display.Flip();
-				}
-				else
-				{
-				    // hero goto near monster
-				    if(path.Length() > 1)
-				    {
-					cursor.Hide();
-				    	const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-    					FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-					splitHeroes.Move(selectHeroes.GetTopIndex());
-				    	const_cast<Route &>(path).Reset();
-					cursor.Show();
-					display.Flip();
-				    }
-				    else
-				    {
-					cursor.Hide();
-				    	const_cast<Route &>(path).Reset();
-					cursor.Show();
-					display.Flip();
-				    }
-
-				    // FIXME: hero attack monster
-				    Error::Verbose("Game: FIXME: hero attack monster");
-				}
+				from_hero.ShowPathOrStartMove(index_maps);
 			    }
 			    else
 			    if(le.MousePressRight(tile_pos))
@@ -476,42 +449,7 @@ Game::menu_t Game::StartGame(void)
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
-					const u16 new_dst_point = Maps::GetIndexFromAbsPoint(castle->GetCenter());
-
-					if(path.GetDestinationIndex() != new_dst_point)
-					{
-					    cursor.Hide();
-					    if(path.Length()) path.Hide();
-					    const_cast<Route &>(path).Calculate(new_dst_point);
-					    path.Show();
-					    world.GetTiles((*heroes).GetCenter()).Redraw();
-					    cursor.Show();
-					    display.Flip();
-					}
-					else
-					{
-				    	    // hero goto near castle
-					    if(path.Length() > 1)
-					    {
-						cursor.Hide();
-				    		const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-    						FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-						splitHeroes.Move(selectHeroes.GetTopIndex());
-				    		const_cast<Route &>(path).Reset();
-						cursor.Show();
-						display.Flip();
-				    	    }
-				    	    else
-				    	    {
-						cursor.Hide();
-				    		const_cast<Route &>(path).Reset();
-						cursor.Show();
-						display.Flip();
-				    	    }
-
-				    	    // FIXME: hero attack castle
-				    	    Error::Verbose("Game: FIXME: hero attack castle");
-					}
+					from_hero.ShowPathOrStartMove(Maps::GetIndexFromAbsPoint(castle->GetCenter()));
 				    }
 				    else
 				    if(le.MousePressRight(tile_pos))
@@ -534,39 +472,7 @@ Game::menu_t Game::StartGame(void)
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
-					if(path.GetDestinationIndex() != index_maps)
-					{
-					    // hero show path
-					    cursor.Hide();
-					    if(path.Length()) path.Hide();
-					    const_cast<Route &>(path).Calculate(index_maps);
-					    path.Show();
-					    world.GetTiles((*heroes).GetCenter()).Redraw();
-					    cursor.Show();
-					    display.Flip();
-					}
-					else
-					{
-					    // heroes goto in castle
-					    cursor.Hide();
-				    	    const_cast<Heroes &>(*heroes).Goto(Maps::GetIndexFromAreaPoint(mouse_coord));
-				    	    const_cast<Route &>(path).Reset();
-    					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-					    splitHeroes.Move(selectHeroes.GetTopIndex());
-					    cursor.Show();
-					    display.Flip();
-
-    					    // castle dialog
-    					    if(NULL != (castle = world.GetCastle(heroes->GetCenter())))
-    					    {
-						OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
-
-						statusWindow.Redraw();
-						selectCastles.Redraw();
-				
-						display.Flip();
-					    }
-					}
+					from_hero.ShowPathOrStartMove(index_maps);
 				    }
 				    else
 				    if(le.MousePressRight(tile_pos))
@@ -583,41 +489,7 @@ Game::menu_t Game::StartGame(void)
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
-					const u16 new_dst_point = Maps::GetIndexFromAreaPoint(mouse_coord);
-
-					if(path.GetDestinationIndex() != new_dst_point)
-					{
-					    cursor.Hide();
-					    if(path.Length()) path.Hide();
-					    const_cast<Route &>(path).Calculate(new_dst_point);
-					    path.Show();
-					    world.GetTiles((*heroes).GetCenter()).Redraw();
-					    cursor.Show();
-					    display.Flip();
-					}
-					else
-					{
-				    	    // hero goto near castle
-					    if(path.Length() > 1)
-					    {
-						cursor.Hide();
-				    		const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-    						FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-				    		const_cast<Route &>(path).Reset();
-						cursor.Show();
-						display.Flip();
-				    	    }
-				    	    else
-				    	    {
-						cursor.Hide();
-				    		const_cast<Route &>(path).Reset();
-						cursor.Show();
-						display.Flip();
-				    	    }
-
-				    	    // FIXME: hero attack castle
-				    	    Error::Verbose("Game: FIXME: hero attack castle");
-					}
+					from_hero.ShowPathOrStartMove(index_maps);
 				    }
 				    else
 				    if(le.MousePressRight(tile_pos))
@@ -634,18 +506,19 @@ Game::menu_t Game::StartGame(void)
 			case MP2::OBJ_HEROES:
 			{
 			    const Heroes * heroes2 = world.GetHeroes(index_maps);
+
     			    if(NULL != heroes2)
     			    {
 				if(H2Config::MyColor() == heroes2->GetColor())
 				{
-				    cursor.SetThemes(heroes2->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()) ? Cursor::HEROES : Cursor::CHANGE);
+				    cursor.SetThemes(heroes2->GetCenter() == from_hero.GetCenter() ? Cursor::HEROES : Cursor::CHANGE);
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
-					// is selected open dialog
-					if(heroes2->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
+					// same from_hero open dialog
+					if(heroes2->GetCenter() == from_hero.GetCenter())
 					{
-					    OpenHeroes(const_cast<Heroes *>(heroes2), areaMaps, radar);
+					    OpenHeroes(&from_hero, areaMaps, radar);
 
 					    statusWindow.Redraw();
 					    display.Flip();
@@ -653,40 +526,7 @@ Game::menu_t Game::StartGame(void)
 					// heroes dialog meeting
 					else
 					{
-					    if(path.GetDestinationIndex() != index_maps)
-					    {
-						cursor.Hide();
-						if(path.Length()) path.Hide();
-						const_cast<Route &>(path).Calculate(index_maps);
-						path.Show();
-						world.GetTiles((*heroes).GetCenter()).Redraw();
-						cursor.Show();
-						display.Flip();
-					    }
-					    else
-					    {
-				    		// hero goto near hero
-						if(path.Length() > 1)
-						{
-						    cursor.Hide();
-				    		    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-    						    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-				    		    const_cast<Route &>(path).Reset();
-						    cursor.Show();
-						    display.Flip();
-				    		}
-				    		else
-				    		{
-						    cursor.Hide();
-				    		    const_cast<Route &>(path).Reset();
-						    cursor.Show();
-						    display.Flip();
-				    		}
-
-						// FIXME: hero meeting dialog
-				    		Error::Verbose("Game: FIXME: hero meeting other hero");
-				    		const_cast<Heroes &>(*heroes).MeetingDialog(const_cast<Heroes &>(*heroes2));
-					    }
+					    from_hero.ShowPathOrStartMove(index_maps);
 					}
 				    }
 				    else
@@ -704,41 +544,10 @@ Game::menu_t Game::StartGame(void)
 
 				    if(le.MouseClickLeft(tile_pos))
 				    {
-					if(path.GetDestinationIndex() != index_maps)
-					{
-					    cursor.Hide();
-					    if(path.Length()) path.Hide();
-					    const_cast<Route &>(path).Calculate(index_maps);
-					    path.Show();
-					    world.GetTiles((*heroes).GetCenter()).Redraw();
-					    cursor.Show();
-					    display.Flip();
-					}
-					else
-					{
-				    	    // hero goto near monster
-					    if(path.Length() > 1)
-					    {
-						cursor.Hide();
-				    	        const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-    					        FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-				    		const_cast<Route &>(path).Reset();
-					        cursor.Show();
-					        display.Flip();
-				    	    }
-				    	    else
-				    	    {
-					        cursor.Hide();
-				    		const_cast<Route &>(path).Reset();
-					        cursor.Show();
-					        display.Flip();
-				    	    }
-
-				    	    // FIXME: hero attack other hero
-				    	    Error::Verbose("Game: FIXME: hero attack other hero");
-					}
+					from_hero.ShowPathOrStartMove(index_maps);
 				    }
 				    else
+				    // show info enemy hero
 				    if(le.MousePressRight(tile_pos))
 				    {
 					if(H2Config::Debug()) tile.DebugInfo(index_maps);
@@ -763,42 +572,7 @@ Game::menu_t Game::StartGame(void)
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    // show path
-				    if(path.GetDestinationIndex() != index_maps)
-				    {
-					cursor.Hide();
-					if(path.Length()) path.Hide();
-					const_cast<Route &>(path).Calculate(index_maps);
-					path.Show();
-					world.GetTiles((*heroes).GetCenter()).Redraw();
-					cursor.Show();
-					display.Flip();
-				    }
-				    else
-				    {
-					const u16 dst_index = path.GetDestinationIndex();
-
-				        //hero goto near object
-					if(path.Length() > 1)
-					{
-					    cursor.Hide();
-				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-    					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-				    	    const_cast<Route &>(path).Reset();
-					    cursor.Show();
-					    display.Flip();
-				    	}
-				    	else
-				    	{
-					    cursor.Hide();
-				    	    const_cast<Route &>(path).Reset();
-					    cursor.Show();
-					    display.Flip();
-				    	}
-
-				    	// hero action
-				    	const_cast<Heroes &>(*heroes).Action(dst_index);
-				    }
+				    from_hero.ShowPathOrStartMove(index_maps);
 				}
     			    }
     			    break;
@@ -873,41 +647,7 @@ Game::menu_t Game::StartGame(void)
 
 				if(le.MouseClickLeft(tile_pos))
 				{
-				    if(path.GetDestinationIndex() != index_maps)
-				    {
-					cursor.Hide();
-					if(path.Length()) path.Hide();
-					const_cast<Route &>(path).Calculate(index_maps);
-					path.Show();
-					world.GetTiles((*heroes).GetCenter()).Redraw();
-					cursor.Show();
-					display.Flip();
-				    }
-				    else
-				    {
-					const u16 dst_index =path.GetDestinationIndex();
-
-				        //hero goto near object
-					if(path.Length() > 1)
-					{
-					    cursor.Hide();
-				    	    const_cast<Heroes &>(*heroes).Goto(path.NextToLast());
-    					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-				    	    const_cast<Route &>(path).Reset();
-					    cursor.Show();
-					    display.Flip();
-				    	}
-				    	else
-				    	{
-					    cursor.Hide();
-				    	    const_cast<Route &>(path).Reset();
-					    cursor.Show();
-					    display.Flip();
-				    	}
-
-				    	// hero action
-				    	const_cast<Heroes &>(*heroes).Action(dst_index);
-				    }
+				    from_hero.ShowPathOrStartMove(index_maps);
                         	}
 			    break;
 
@@ -918,29 +658,7 @@ Game::menu_t Game::StartGame(void)
                             	cursor.SetThemes(Cursor::MOVE);
 
 				if(le.MouseClickLeft(tile_pos))
-				{
-				    if(path.GetDestinationIndex() != index_maps)
-				    {
-					// hero show path
-					cursor.Hide();
-					if(path.Length()) path.Hide();
-					const_cast<Route &>(path).Calculate(index_maps);
-					path.Show();
-					world.GetTiles((*heroes).GetCenter()).Redraw();
-					cursor.Show();
-					display.Flip();
-				    }
-				    else
-				    {
-					// hero goto
-					cursor.Hide();
-				        const_cast<Heroes &>(*heroes).Goto(Maps::GetIndexFromAreaPoint(mouse_coord));
-				        const_cast<Route &>(path).Reset();
-    					FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-					cursor.Show();
-					display.Flip();
-				    }
-                        	}
+				    from_hero.ShowPathOrStartMove(index_maps);
                     	    }
                             else
                             {
@@ -1139,7 +857,7 @@ Game::menu_t Game::StartGame(void)
 
 					    const Route & path = global_focus.GetHeroes().GetPath();
 
-					    if(path.Length())
+					    if(path.size())
 					    {
 						cursor.Hide();
 						path.Show();
@@ -1372,7 +1090,7 @@ Game::menu_t Game::StartGame(void)
 				FocusToHeroes(hero, areaMaps, radar);
 
 				const Route & path = global_focus.GetHeroes().GetPath();
-				if(path.Length())
+				if(path.size())
 				{
 				    cursor.Hide();
 				    path.Show();
@@ -1588,21 +1306,31 @@ Game::menu_t Game::StartGame(void)
 	Game::EnvironmentSoundMixer();
 
         // draw heroes movement (in focus)
-        if(Game::Focus::HEROES == global_focus.Type())
-        {
-    	    //const Heroes hero = global_focus.GetHeroes();
-    	    //if(hero.isNeedMove())
-    	    //const std::vector<Heroes *> & myHeroes
-	}
+    	if(Game::Focus::HEROES == global_focus.Type() &&
+    	    global_focus.GetHeroes().isNeedMove() && 
+    	    global_focus.GetHeroes().isEnableMove() &&
+    	    !(ticket % 100))	// FIXME: speed animation configurable
+    	    {
+    		global_focus.GetHeroes().Move();
+		
+		// center area map to hero
+		cursor.Hide();
+		areaMaps.Center(global_focus.Center());
+		radar.RedrawCursor();
+		cursor.Show();
+		display.Flip();
+	    }
 
         // animation
-        if(!(++ticket % 50)) // FIXME: speed animation low
+        if(!(ticket % 50)) 	// FIXME: speed animation configurable
         {
             cursor.Hide();
             areaMaps.RedrawAnimation();
             cursor.Show();
             display.Flip();
         }
+
+        ++ticket;
     }
 
     return QUITGAME;
