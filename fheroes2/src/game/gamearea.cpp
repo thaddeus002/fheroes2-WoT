@@ -182,6 +182,31 @@ void GameArea::Center(const Point &pt)
     if(pos.x == area_pos.x && 1 == (pos.y - area_pos.y)) Scroll(GameArea::BOTTOM);
     else
     if(pos.x == area_pos.x && -1 == (pos.y - area_pos.y)) Scroll(GameArea::TOP);
+    else
+    // diagonal
+    if(-1 == (pos.y - area_pos.y) && 1 == (pos.x - area_pos.x))
+    {
+	Scroll(GameArea::TOP);
+	Scroll(GameArea::RIGHT);
+    }
+    else
+    if(-1 == (pos.y - area_pos.y) && -1 == (pos.x - area_pos.x))
+    {
+	Scroll(GameArea::TOP);
+	Scroll(GameArea::LEFT);
+    }
+    else
+    if(1 == (pos.y - area_pos.y) && 1 == (pos.x - area_pos.x))
+    {
+	Scroll(GameArea::BOTTOM);
+	Scroll(GameArea::RIGHT);
+    }
+    else
+    if(1 == (pos.y - area_pos.y) && -1 == (pos.x - area_pos.x))
+    {
+	Scroll(GameArea::BOTTOM);
+	Scroll(GameArea::LEFT);
+    }
 
     else
     {

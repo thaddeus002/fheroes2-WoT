@@ -36,6 +36,8 @@ void Heroes::Action(const u16 dst_index, const MP2::object_t object)
 
         case MP2::OBJ_CASTLE:	ActionToCastle(dst_index); break;
         case MP2::OBJ_HEROES:	ActionToHeroes(dst_index); break;
+        
+        case MP2::OBJ_BOAT:
 
         // resource
         case MP2::OBJ_ARTIFACT:

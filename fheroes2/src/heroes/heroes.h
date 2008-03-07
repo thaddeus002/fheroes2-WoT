@@ -169,8 +169,7 @@ public:
     void Move(void);
     void ShowPathOrStartMove(const u16 dst_index);
 
-    bool isShipMaster(void) const;
-    void SetShipMaster(bool captain);
+    MP2::object_t GetUnderObject(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);

@@ -731,44 +731,35 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 	if(Ground::WATER != GetGround())
 	{
 	    const Race::race_t & race = (*heroes).GetRace();
-	    //const Color::color_t & color = (*heroes).GetColor();
+	    const Color::color_t & color = (*heroes).GetColor();
 	    const Direction::vector_t & direct = (*heroes).GetDirection();
 	
 	    u16 index_sprite = 0;
-/*
+
+	    ICN::icn_t icn_flag = ICN::UNKNOWN;
+
 	    switch(color)
 	    {
-		case Color::BLUE:	index_sprite =  0; break;
-		case Color::GREEN:	index_sprite =  7; break;
-		case Color::RED:	index_sprite = 14; break;
-		case Color::YELLOW:	index_sprite = 21; break;
-		case Color::ORANGE:	index_sprite = 28; break;
-		case Color::PURPLE:	index_sprite = 35; break;
+		case Color::BLUE:	icn_flag = ICN::B_FLAG32; break;
+		case Color::GREEN:	icn_flag = ICN::G_FLAG32; break;
+		case Color::RED:	icn_flag = ICN::R_FLAG32; break;
+		case Color::YELLOW:	icn_flag = ICN::Y_FLAG32; break;
+		case Color::ORANGE:	icn_flag = ICN::O_FLAG32; break;
+		case Color::PURPLE:	icn_flag = ICN::P_FLAG32; break;
+
 		default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown color hero, maps index: ", maps_index); return;
 	    }
 
-	    switch(race)
-	    {
-		case Race::KNGT: break;
-		case Race::BARB: index_sprite += 1; break;
-		case Race::SORC: index_sprite += 2; break;
-		case Race::WRLK: index_sprite += 3; break;
-		case Race::WZRD: index_sprite += 4; break;
-		case Race::NECR: index_sprite += 5; break;
-		default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown race hero, maps index: ", maps_index); return;
-	    }
-*/
-
-	    ICN::icn_t icn = ICN::MINIHERO;
+	    ICN::icn_t icn_hero = ICN::UNKNOWN;
 
 	    switch(race)
 	    {
-		case Race::KNGT: icn = ICN::KNGT32; break;
-		case Race::BARB: icn = ICN::BARB32; break;
-		case Race::SORC: icn = ICN::SORC32; break;
-		case Race::WRLK: icn = ICN::WRLK32; break;
-		case Race::WZRD: icn = ICN::WZRD32; break;
-		case Race::NECR: icn = ICN::NECR32; break;
+		case Race::KNGT: icn_hero = ICN::KNGT32; break;
+		case Race::BARB: icn_hero = ICN::BARB32; break;
+		case Race::SORC: icn_hero = ICN::SORC32; break;
+		case Race::WRLK: icn_hero = ICN::WRLK32; break;
+		case Race::WZRD: icn_hero = ICN::WZRD32; break;
+		case Race::NECR: icn_hero = ICN::NECR32; break;
 
 		default: Error::Warning("Maps::Tiles::RedrawHeroes: unknown race hero, maps index: ", maps_index); return;
 	    }
@@ -789,6 +780,45 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 		default: break;
 	    }
 
+	    const Sprite & sprite_hero = AGG::GetICN(icn_hero, index_sprite, reflect);
+	    const Sprite & sprite_flag = AGG::GetICN(icn_flag, index_sprite, reflect);
+
+	    const s16 dy1 = dy + TILEWIDTH - sprite_hero.h() - (sprite_hero.h() + sprite_hero.y()) + 5;
+
+	    const Point dst_pt1(dx + sprite_hero.x(), BORDERWIDTH > dy1 ? BORDERWIDTH : dy1);
+	    const Rect  src_rt(0,  dy1 > BORDERWIDTH ? 0 : BORDERWIDTH - dy1, sprite_hero.w(), sprite_hero.h());
+
+	    const Point dst_pt2(reflect ? dx + sprite_hero.x() - sprite_flag.x() + TILEWIDTH - sprite_flag.w() : dx + sprite_flag.x(), dy + sprite_flag.y() + 24);
+
+	    display.Blit(sprite_hero, src_rt, dst_pt1);
+	    if(dst_pt2.y > BORDERWIDTH) display.Blit(sprite_flag, dst_pt2);
+	}
+	// boat
+	else
+	{
+	    const Direction::vector_t & direct = (*heroes).GetDirection();
+	
+	    u16 index_sprite = 0;
+
+	    //const ICN::icn_t icn = ICN::BOAT32;
+
+	    bool reflect = false;
+
+	    switch(direct)
+	    {
+		case Direction::TOP:		index_sprite =  0; break;
+		case Direction::TOP_RIGHT:	index_sprite =  9; break;
+		case Direction::RIGHT:		index_sprite = 18; break;
+		case Direction::BOTTOM_RIGHT:	index_sprite = 27; break;
+		case Direction::BOTTOM:		index_sprite = 36; break;
+		case Direction::BOTTOM_LEFT:	index_sprite = 27; reflect = true; break;
+		case Direction::LEFT:		index_sprite = 18; reflect = true; break;
+		case Direction::TOP_LEFT:	index_sprite =  9; reflect = true; break;
+
+		default: break;
+	    }
+
+/*
 	    const Sprite & sprite = AGG::GetICN(icn, index_sprite, reflect);
 
 	    const s16 dy2 = dy + TILEWIDTH - sprite.h() - (sprite.h() + sprite.y());
@@ -797,10 +827,7 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 	    const Rect  src_rt(0,  dy2 > BORDERWIDTH ? 0 : BORDERWIDTH - dy2, sprite.w(), sprite.h());
 
 	    display.Blit(sprite, src_rt, dst_pt);
-	}
-	// boat
-	else
-	{
+*/
 	}
     }
     else

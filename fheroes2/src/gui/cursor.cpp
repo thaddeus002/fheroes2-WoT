@@ -84,14 +84,13 @@ bool Cursor::SetThemes(const Cursor::themes_t name)
 /* redraw cursor wrapper for local event */
 void Cursor::Redraw(u16 x, u16 y)
 {
-    Cursor & cursor = Cursor::Get();
-    cursor.Move(x, y);
+    Cursor::Get().Move(x, y);
 }
 
 /* move cursor */
 void Cursor::Move(u16 x, u16 y)
 {
-    SpriteCursor::Move(x + offset_x, y + offset_y);
+    if(isVisible()) SpriteCursor::Move(x + offset_x, y + offset_y);
 }
 
 /* set offset big cursor */

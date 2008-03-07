@@ -267,14 +267,11 @@ Game::menu_t Game::StartGame(void)
     }
 
     selectCastles.Redraw();
-    cursor.Hide();
     selectHeroes.Redraw();
-    cursor.Hide();
 
     // center to focus
     areaMaps.Center(global_focus.Center());
     radar.RedrawCursor();
-    cursor.Hide();
 
     // status window
     Game::StatusWindow statusWindow(pt_stw);
@@ -560,9 +557,14 @@ Game::menu_t Game::StartGame(void)
     			    break;
 
 			// focus from hero to boat
-    			//case MP2::OBJ_BOAT:
-    			//		cursor.SetThemes(Cursor::BOAT);
-			//    break;
+    			case MP2::OBJ_BOAT:
+    			    cursor.SetThemes(Cursor::BOAT);
+
+			    if(le.MouseClickLeft(tile_pos))
+			    {
+				from_hero.ShowPathOrStartMove(index_maps);
+			    }
+			    break;
 
 			// focus from hero to object
     			case MP2::OBJ_TREASURECHEST:
@@ -1309,16 +1311,18 @@ Game::menu_t Game::StartGame(void)
     	if(Game::Focus::HEROES == global_focus.Type() &&
     	    global_focus.GetHeroes().isNeedMove() && 
     	    global_focus.GetHeroes().isEnableMove() &&
-    	    !(ticket % 100))	// FIXME: speed animation configurable
+    	    !(ticket % 80))	// FIXME: speed animation configurable
     	    {
     		global_focus.GetHeroes().Move();
-		
+
 		// center area map to hero
+		/*
 		cursor.Hide();
 		areaMaps.Center(global_focus.Center());
 		radar.RedrawCursor();
 		cursor.Show();
 		display.Flip();
+		*/
 	    }
 
         // animation

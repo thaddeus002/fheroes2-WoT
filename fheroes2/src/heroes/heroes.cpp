@@ -902,45 +902,6 @@ u16 Heroes::FindPath(u16 dst_index)
     return path.Calculate(dst_index);
 }
 
-/*
-void Heroes::Goto(u16 dst_index)
-{
-    if(MP2::OBJ_HEROES != save_maps_general)
-    {
-        Maps::Tiles & tiles_old = world.GetTiles(mp.x, mp.y);
-
-	// restore general object
-	tiles_old.SetObject(save_maps_general);
-	
-	// redraw old tile
-	tiles_old.Redraw();
-    }
-
-
-    //
-    direction = 2 > path.size() ? Direction::Get(Maps::GetIndexFromAbsPoint(mp), path.GetDestinationIndex()) : Direction::Get(path.NextToLast(), path.GetDestinationIndex());
-
-    // redraw sprite move hero
-    // center area maps
-
-    Maps::Tiles & tiles_new = world.GetTiles(dst_index);
-
-    // save general object
-    save_maps_general = tiles_new.GetObject();
-    tiles_new.SetObject(MP2::OBJ_HEROES);
-
-    mp.x = dst_index % world.w();
-    mp.y = dst_index / world.w();
-
-    //Game::globalfocus.center = mp;
-
-    // redraw new tile
-    tiles_new.Redraw();
-
-    if(H2Config::Debug()) Error::Verbose("Heroes::Goto: ", dst_index);
-}
-*/
-
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
 {
@@ -1089,6 +1050,10 @@ void Heroes::Move(void)
     const u16 index_to = path.front();
     const Direction::vector_t direction2 = Direction::Get(index_from, index_to);
 
+    bool action = false;
+    u16 action_tiles = MAXU16;
+    MP2::object_t action_obj = MP2::OBJ_ZERO;
+
     if(Direction::UNKNOWN == direction || Direction::CENTER == direction) return;
 
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
@@ -1101,6 +1066,14 @@ void Heroes::Move(void)
     // redraw top cell
     if(Maps::isValidDirection(index_from, Direction::TOP))
 	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP)).Redraw();
+    // redraw top left cell (for flag)
+    if(Maps::isValidDirection(index_from, Direction::TOP_LEFT))
+	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_LEFT)).Redraw();
+    // redraw top right cell (for flag)
+    if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
+	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
+
+    cursor.Hide();
 
     // change through the circle
     if(direction != direction2)
@@ -1108,10 +1081,7 @@ void Heroes::Move(void)
 	// FIXME: rotate animation heroes
 	direction = direction2;
 
-	cursor.Hide();
 	tiles_from.Redraw();
-	cursor.Show();
-	display.Flip();
     }
     else
     // next to last
@@ -1119,13 +1089,12 @@ void Heroes::Move(void)
     {
 	move = false;
 
-	cursor.Hide();
 	path.Hide();
 	path.Reset();
-	cursor.Show();
-	display.Flip();
 
-	Action(index_to, tiles_to.GetObject());
+	action = true;
+	action_tiles = index_to;
+	action_obj = tiles_to.GetObject();
     }
     else
     // goto next cell
@@ -1143,27 +1112,26 @@ void Heroes::Move(void)
 	mp.x = index_to % world.w();
 	mp.y = index_to / world.w();
 
-	cursor.Hide();
 	path.Hide();
 	path.pop_front();
-	path.Show();
+	path.size() && path.GetDestinationIndex() != index_to ? path.Show() : path.Reset();
+
 	tiles_to.Redraw();
-	cursor.Show();
-	display.Flip();
 
 	if(path.GetDestinationIndex() == index_to)
 	{
 	    move = false;
 
-	    cursor.Hide();
-	    path.Hide();
-	    path.Reset();
-	    cursor.Show();
-	    display.Flip();
-
-	    Action(index_to, save_maps_general);
+	    action = true;
+	    action_tiles = index_to;
+	    action_obj = save_maps_general;
 	}
     }
+
+    cursor.Show();
+    display.Flip();
+
+    if(action) Action(action_tiles, action_obj);
 }
 
 /* show path */
@@ -1224,12 +1192,7 @@ bool Heroes::isNeedStopNextToLast(void)
     return false;
 }
 
-bool Heroes::isShipMaster(void) const
+MP2::object_t Heroes::GetUnderObject(void) const
 {
-    return shipmaster;
-}
-
-void Heroes::SetShipMaster(bool captain)
-{
-    shipmaster = captain;
+    return save_maps_general;
 }

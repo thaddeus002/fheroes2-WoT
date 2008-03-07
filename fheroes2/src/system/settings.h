@@ -87,6 +87,7 @@ public:
     
     u8   SoundVolume(void) const;
     u8   MusicVolume(void) const;
+    u8   AnimationSpeed(void) const;
 
     void SetDebug(const u8 d);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
@@ -96,6 +97,7 @@ public:
 
     void SetSoundVolume(const u8 v);
     void SetMusicVolume(const u8 v);
+    void SetAnimationSpeed(const u8 s);
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -124,6 +126,7 @@ private:
     
     u8 sound_volume;
     u8 music_volume;
+    u8 animation_speed;
 };
 
 #endif

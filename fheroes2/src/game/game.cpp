@@ -25,6 +25,7 @@
 #include "audio.h"
 #include "game_focus.h"
 #include "maps_tiles.h"
+#include "ground.h"
 #include "world.h"
 #include "m82.h"
 #include "mp2.h"
@@ -62,9 +63,9 @@ void Game::EnvironmentSoundMixer(void)
 	mixer.Clear();
 
         // scan 4x4 square from focus
-        for(s16 yy = abs_pt.y - 4; yy < abs_pt.y + 4; ++yy)
+        for(s16 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)
     	{
-    	    for(s16 xx = abs_pt.x - 4; xx < abs_pt.x + 4; ++xx)
+    	    for(s16 xx = abs_pt.x - 3; xx <= abs_pt.x + 3; ++xx)
 	    {
 		if(Maps::isValidAbsPoint(xx, yy))
 		{
@@ -72,13 +73,21 @@ void Game::EnvironmentSoundMixer(void)
 		    
     		    // calculation volume
     		    const u8 length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
-		    const u8 volume = (3 < length ? 2 : (3 < length ? 5 : (1 < length ? 7 : 9))) * conf.SoundVolume() / 10;
-		    
-		    M82::m82_t m82 = M82::UNKNOWN;
+		    const u8 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * MIX_MAXVOLUME / 10 * conf.SoundVolume() / 10;
 
-		    switch(tile.GetObject())
+		    M82::m82_t m82 = M82::UNKNOWN;
+		    MP2::object_t object = tile.GetObject();
+		    
+		    if(MP2::OBJ_HEROES == object)
 		    {
-			//case MP2:::	m82 = M82::LOOP0000; break;
+			const Heroes *hero = world.GetHeroes(xx, yy);
+			
+			if(hero) object = hero->GetUnderObject();
+		    }
+
+		    switch(object)
+		    {
+			case MP2::OBJ_BUOY:		m82 = M82::LOOP0000; break;
 			case MP2::OBJ_DERELICTSHIP:
 			case MP2::OBJ_SHIPWRECK:	m82 = M82::LOOP0001; break;
 			case MP2::OBJ_COAST:		m82 = M82::LOOP0002; break;
@@ -102,7 +111,7 @@ void Game::EnvironmentSoundMixer(void)
 			case MP2::OBJ_SHRINE1:
 			case MP2::OBJ_SHRINE2:
 			case MP2::OBJ_SHRINE3:		m82 = M82::LOOP0018; break;
-			//case MP2:::	m82 = M82::LOOP0019; break;
+			//case MP2::OBJ_STONES:		if(Maps::Ground::WATER == tile.GetGround()) m82 = M82::LOOP0019; break;
 			//case MP2:::	m82 = M82::LOOP0020; break;
 			case MP2::OBJ_OILLAKE:		m82 = M82::LOOP0021; break;
 			case MP2::OBJ_TRADINGPOST:	m82 = M82::LOOP0022; break;

@@ -184,7 +184,7 @@ void Audio::Mixer::Clear(void)
     SDL_PauseAudio(0);
 }
 
-/* play sound */
+/* play sound, volume MIX_MAXVOLUME */
 void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, bool loop)
 {
     if(! valid || body.empty()) return;
@@ -227,7 +227,7 @@ void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, bool loop
     }
 
     mixer.loop = loop;
-    mixer.volume = volume;
+    mixer.volume = MIX_MAXVOLUME < volume ? MIX_MAXVOLUME : volume;
     mixer.active = true;
 
     SDL_UnlockAudio();
