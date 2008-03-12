@@ -20,7 +20,6 @@
 
 #include <string>
 #include "agg.h"
-#include "animation.h"
 #include "localevent.h"
 #include "button.h"
 #include "cursor.h"

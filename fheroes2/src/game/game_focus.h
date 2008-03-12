@@ -32,7 +32,7 @@ namespace Game
     class Focus
     {
     public:
-	typedef enum { UNSEL, HEROES, CASTLE, BOAT } focus_t;
+	typedef enum { UNSEL, HEROES, CASTLE } focus_t;
 
    	static Focus &	Get(void);
 

@@ -529,7 +529,8 @@ namespace MP2
 
     ICN::icn_t GetICNObject(const u8 type);
     const char *StringObject(u8 object);
-    u8 GetAnimationFrame(const ICN::icn_t & icn, u8 index, u32 frame);
+    
+    bool isActionObject(const object_t obj, const bool water);
 };
 
 #endif

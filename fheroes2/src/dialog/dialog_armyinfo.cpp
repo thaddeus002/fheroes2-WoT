@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "animation.h"
 #include "background.h"
 #include "button.h"
 #include "cursor.h"
@@ -27,7 +26,6 @@
 #include "payment.h"
 #include "world.h"
 #include "kingdom.h"
-#include "animation.h"
 #include "localevent.h"
 #include "monster.h"
 #include "morale.h"

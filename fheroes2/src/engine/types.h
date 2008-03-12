@@ -42,6 +42,7 @@ typedef uint32_t	u32;
 #define KEY_RETURN	SDLK_RETURN
 #define KEY_ESCAPE	SDLK_ESCAPE
 
+#define DELAY(X)	SDL_Delay(X)
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 

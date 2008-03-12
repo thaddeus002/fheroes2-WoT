@@ -79,3 +79,109 @@ Direction::vector_t Direction::Get(u16 from, u16 to)
 
     return UNKNOWN;
 }
+
+bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
+{
+   switch(from)
+   {
+	case TOP:
+	    switch(from)
+	    {
+		case TOP_RIGHT:
+		case RIGHT:
+		case BOTTOM_RIGHT:
+		case BOTTOM:		return true;
+
+		default: break;
+	    }
+	    break;
+
+	case TOP_RIGHT:
+	    switch(from)
+	    {
+		case RIGHT:
+		case BOTTOM_RIGHT:
+		case BOTTOM:
+		case BOTTOM_LEFT:	return true;
+
+		default: break;
+	    }
+	    break;
+
+	case RIGHT:
+	    switch(from)
+	    {
+		case BOTTOM_RIGHT:
+		case BOTTOM:
+		case BOTTOM_LEFT:
+		case LEFT:		return true;
+
+		default: break;
+	    }
+	    break;
+
+	case BOTTOM_RIGHT:
+	    switch(from)
+	    {
+		case BOTTOM:
+		case BOTTOM_LEFT:
+		case LEFT:
+		case TOP_LEFT:		return true;
+
+		default: break;
+	    }
+	    break;
+
+	case BOTTOM:
+	    switch(from)
+	    {
+		case TOP:
+		case BOTTOM_LEFT:
+		case LEFT:
+		case TOP_LEFT:		return true;
+
+		default: break;
+	    }
+	    break;
+
+	case BOTTOM_LEFT:
+	    switch(from)
+	    {
+		case TOP:
+		case TOP_RIGHT:
+		case LEFT:
+		case TOP_LEFT:		return true;
+
+		default: break;
+	    }
+	    break;
+
+	case LEFT:
+	    switch(from)
+	    {
+		case TOP:
+		case TOP_RIGHT:
+		case RIGHT:
+		case TOP_LEFT:		return true;
+
+		default: break;
+	    }
+	    break;
+
+	case TOP_LEFT:
+	    switch(from)
+	    {
+		case TOP:
+		case TOP_RIGHT:
+		case RIGHT:
+		case BOTTOM_RIGHT:	return true;
+
+		default: break;
+	    }
+	    break;
+
+	default: break;
+   }
+
+    return false;
+}

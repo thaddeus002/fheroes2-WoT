@@ -88,7 +88,6 @@ const Point & Game::Focus::Center(void) const
     switch(type)
     {
 	case CASTLE:	if(castle) pt = &(*castle).GetCenter(); break;
-	case BOAT:
 	case HEROES:	if(heroes) pt = &(*heroes).GetCenter(); break;
 
 	default:	Error::Warning("Game::Focus::GetCenter: is NULL"); break;

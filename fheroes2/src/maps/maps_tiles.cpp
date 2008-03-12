@@ -21,6 +21,7 @@
 #include <list>
 #include <iostream>
 #include "agg.h"
+#include "icn.h"
 #include "tools.h"
 #include "world.h"
 #include "race.h"
@@ -30,8 +31,8 @@
 #include "heroes.h"
 #include "sprite.h"
 #include "maps.h"
-#include "game_focus.h"
 #include "gamearea.h"
+#include "game_focus.h"
 #include "display.h"
 #include "maps_tiles.h"
 
@@ -136,7 +137,7 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
-    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL)
+    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL), animation(false)
 {
     tile_sprite.LoadPalette(AGG::Cache::Get().GetPAL());
 
@@ -266,9 +267,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		// possible anime
-		if(u8 anime_index = MP2::GetAnimationFrame(icn, index, anime_frame))
+		if(animation)
 		{
-		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
+		    const Sprite & anime_sprite = AGG::GetICN(icn, ICN::AnimationFrame(icn, index, anime_frame));
 		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
@@ -277,7 +278,12 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 
     switch(general)
     {
-	 // heroes
+	// boat
+	case MP2::OBJ_BOAT:
+	    RedrawBoat(dstx, dsty);
+	    break;
+
+	// heroes
 	case MP2::OBJ_HEROES:
 	    RedrawHeroes(dstx, dsty);
 	    break;
@@ -309,9 +315,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		// possible anime
-		if(u8 anime_index = MP2::GetAnimationFrame(icn, index, anime_frame))
+		if(animation)
 		{
-		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
+		    const Sprite & anime_sprite = AGG::GetICN(icn, ICN::AnimationFrame(icn, index, anime_frame));
 		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
@@ -336,7 +342,6 @@ void Maps::Tiles::Redraw(void) const
 
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    // FIX ME: anime_frame ??
     if(area & mp) Blit(BORDERWIDTH + TILEWIDTH * (mp.x - area.x), BORDERWIDTH + TILEWIDTH * (mp.y - area.y));
 }
 
@@ -346,14 +351,18 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
     switch(general)
     {
 	case MP2::OBJ_HEROES:
-	case MP2::OBJ_MONSTER:
-	    return true;
-	
+	case MP2::OBJ_MONSTER:	return true;
+
 	default: break;
     }
-    
+
+    return animation;
+}
+
+void Maps::Tiles::FixAnimation(void)
+{
     // level 1
-    if(addons_level1.size())
+    if(!animation && addons_level1.size())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -364,12 +373,17 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 	    const u8 index  = (*it1).GetIndex();
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(ICN::UNKNOWN != icn && MP2::GetAnimationFrame(icn, index, 0)) return true;
+	    if(ICN::UNKNOWN != icn && ICN::AnimationFrame(icn, index))
+	    {
+		animation = true;
+		
+		break;
+	    }
 	}
     }
 
     // level 2
-    if(addons_level2.size())
+    if(!animation && addons_level2.size())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -380,11 +394,14 @@ bool Maps::Tiles::isAnimation(u16 dstx, u16 dsty) const
 	    const u8 index  = (*it1).GetIndex();
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(ICN::UNKNOWN != icn && MP2::GetAnimationFrame(icn, index, 0)) return true;
+	    if(ICN::UNKNOWN != icn && ICN::AnimationFrame(icn, index))
+	    {
+		animation = true;
+		
+		break;
+	    }
 	}
     }
-    
-    return false;
 }
 
 const Maps::TilesAddon * Maps::Tiles::FindAddon(u8 object, u8 index_min, u8 index_max) const
@@ -721,6 +738,14 @@ void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
     display.Blit(sprite_next, src_rt, ax, ay);
 }
 
+void Maps::Tiles::RedrawBoat(u16 dx, u16 dy) const
+{
+    Display & display = Display::Get();
+
+    const Sprite & sprite = AGG::GetICN(ICN::OBJNWAT2, 23);
+    display.Blit(sprite, dx, dy);
+}
+
 void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 {
     Display & display = Display::Get();
@@ -828,6 +853,7 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 
 	    display.Blit(sprite, src_rt, dst_pt);
 */
+	    RedrawBoat(dx, dy);
 	}
     }
     else
@@ -1124,13 +1150,13 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 }
 
 /* accept move */
-bool Maps::Tiles::isPassable() const
+bool Maps::Tiles::isPassable(void) const
 {
-    const Game::Focus::focus_t focus = Game::Focus::Get().Type();
+    if(Game::Focus::Get().Type() != Game::Focus::HEROES) return false;
 
-    if(Game::Focus::BOAT == focus)
+    if(Game::Focus::Get().GetHeroes().isShipMaster())
     {
-	if(Ground::WATER != GetGround()) return false;
+    	if(Ground::WATER != Maps::Tiles::GetGround()) return false;
 
         switch(general)
 	{
@@ -1140,175 +1166,23 @@ bool Maps::Tiles::isPassable() const
 	    case MP2::OBJ_DERELICTSHIP:
 	    case MP2::OBJN_DERELICTSHIP:
 	    case MP2::OBJN_SHIPWRECK:
-		return false;
+
+            case MP2::OBJ_WHIRLPOOL:
+            case MP2::OBJ_BUOY:
+            case MP2::OBJ_BOTTLE:
+    	    case MP2::OBJ_SHIPWRECKSURVIROR:
+            case MP2::OBJ_FLOTSAM:
+    		return false;
 	    
 	    default: return true;
 	}
     }
     else
-    if(Game::Focus::HEROES == focus)
     {
 	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
 
         switch(general)
 	{
-/*
-	case MP2::OBJ_ABANDONEDMINE:	
-	case MP2::OBJ_ALCHEMYTOWER:	
-	case MP2::OBJ_ANCIENTLAMP:	
-	case MP2::OBJ_ARCHERHOUSE:	
-	case MP2::OBJ_ARTESIANSPRING:	
-	case MP2::OBJ_ARTIFACT:		
-	case MP2::OBJ_BOAT:		
-	case MP2::OBJ_BOTTLE:		
-	case MP2::OBJ_BUOY:		
-	case MP2::OBJ_CACTUS:		
-	case MP2::OBJ_CAMPFIRE:		
-	case MP2::OBJ_CASTLE:		
-	case MP2::OBJ_CAVE:		
-	case MP2::OBJ_CITYDEAD:		
-	case MP2::OBJ_CRAKEDLAKE:	
-	case MP2::OBJ_CRATER:		
-	case MP2::OBJ_DAEMONCAVE:	
-	case MP2::OBJ_DEADTREE:		
-	case MP2::OBJ_DERELICTSHIP:	
-	case MP2::OBJ_DESERTTENT:	
-	case MP2::OBJ_DOCTORHUNT:	
-	case MP2::OBJ_DRAGONCITY:	
-	case MP2::OBJ_DWARFCOTT:	
-	case MP2::OBJ_EVENT:		
-	case MP2::OBJ_EXCAVATION:	
-	case MP2::OBJ_FAERIERING:	
-	case MP2::OBJ_FLOTSAM:		
-	case MP2::OBJ_FORT:		
-	case MP2::OBJ_FOUNTAIN:		
-	case MP2::OBJ_FREEMANFOUNDRY:	
-	case MP2::OBJ_GAZEBO:		
-	case MP2::OBJ_GOBLINHUNT:	
-	case MP2::OBJ_GRAVEYARD:	
-	case MP2::OBJ_HALFLINGHOLE:	
-	case MP2::OBJ_HEROES:		
-	case MP2::OBJ_HILLFORT:		
-	case MP2::OBJ_IDOL:		
-	case MP2::OBJ_LAVALAKE:		
-	case MP2::OBJ_LEANTO:		
-	case MP2::OBJ_LIGHTHOUSE:	
-	case MP2::OBJ_MAGELLANMAPS:	
-	case MP2::OBJ_MAGICGARDEN:	
-	case MP2::OBJ_MAGICWELL:	
-	case MP2::OBJ_MERCENARYCAMP:	
-	case MP2::OBJ_MINES:		
-	case MP2::OBJ_MONSTER:		
-	case MP2::OBJ_MOUND:		
-	case MP2::OBJ_MOUNTS:		
-	case MP2::OBJN_ABANDONEDMINE:	
-	case MP2::OBJN_ALCHEMYTOWER:	
-        case MP2::OBJN_ARCHERHOUSE:	
-	case MP2::OBJN_ARTESIANSPRING:	
-	case MP2::OBJN_CASTLE:		
-	case MP2::OBJN_CAVE:		
-	case MP2::OBJN_CITYDEAD:	
-	case MP2::OBJN_CRAKEDLAKE:	
-	case MP2::OBJN_DAEMONCAVE:	
-	case MP2::OBJN_DERELICTSHIP:	
-	case MP2::OBJN_DESERTTENT:	
-	case MP2::OBJN_DOCTORHUNT:	
-	case MP2::OBJN_DRAGONCITY:	
-        case MP2::OBJN_DWARFCOTT:	
-	case MP2::OBJN_EXCAVATION:	
-	case MP2::OBJN_FAERIERING:	
-	case MP2::OBJN_FORT:		
-	case MP2::OBJN_FREEMANFOUNDRY:	
-	case MP2::OBJN_GAZEBO:		
-	case MP2::OBJN_GRAVEYARD:	
-	case MP2::OBJN_HALFLINGHOLE:	
-	case MP2::OBJN_HILLFORT:	
-	case MP2::OBJN_LIGHTHOUSE:	
-	case MP2::OBJN_MAGELLANMAPS:	
-	case MP2::OBJN_MAGICWELL:	
-	case MP2::OBJN_MERCENARYCAMP:	
-	case MP2::OBJN_MINES:		
-	case MP2::OBJN_OASIS:		
-	case MP2::OBJN_OBELISK:		
-	case MP2::OBJN_OBSERVATIONTOWER:
-	case MP2::OBJN_ORACLE:		
-	case MP2::OBJ_NOTHINGSPECIAL:	
-        case MP2::OBJN_PEASANTHUNT:	
-	case MP2::OBJN_PIRAMID:		
-	case MP2::OBJN_RNDCASTLE:	
-	case MP2::OBJN_RNDTOWN:		
-	case MP2::OBJN_RUINS:		
-	case MP2::OBJN_SAWMILL:		
-	case MP2::OBJN_SHIPWRECK:	
-	case MP2::OBJN_SPHINX:		
-        case MP2::OBJN_STONELIGHTS:	
-	case MP2::OBJN_TEMPLE:		
-	case MP2::OBJN_TRADINGPOST:	
-	case MP2::OBJN_TREECITY:	
-	case MP2::OBJN_TREEHOUSE:	
-	case MP2::OBJN_TREEKNOWLEDGE:	
-	case MP2::OBJN_TROLLBRIDGE:	
-	case MP2::OBJN_WAGONCAMP:	
-	case MP2::OBJN_WATCHTOWER:	
-	case MP2::OBJN_WATERMILL:	
-	case MP2::OBJN_WINDMILL:	
-	case MP2::OBJN_WITCHHUNT:	
-	case MP2::OBJN_XANADU:		
-	case MP2::OBJ_OASIS:		
-	case MP2::OBJ_OBELISK:		
-	case MP2::OBJ_OBSERVATIONTOWER:	
-	case MP2::OBJ_OILLAKE:		
-	case MP2::OBJ_ORACLE:		
-	case MP2::OBJ_PEASANTHUNT:	
-	case MP2::OBJ_PEASANTHUNT2:	
-	case MP2::OBJ_PIRAMID:		
-	case MP2::OBJ_RESOURCE:		
-	case MP2::OBJ_RNDARTIFACT:	
-	case MP2::OBJ_RNDARTIFACT1:	
-	case MP2::OBJ_RNDARTIFACT2:	
-	case MP2::OBJ_RNDARTIFACT3:	
-	case MP2::OBJ_RNDCASTLE:	
-	case MP2::OBJ_RNDMONSTER:	
-	case MP2::OBJ_RNDMONSTER1:	
-	case MP2::OBJ_RNDMONSTER2:	
-	case MP2::OBJ_RNDMONSTER3:	
-	case MP2::OBJ_RNDMONSTER4:	
-	case MP2::OBJ_RNDRESOURCE:	
-	case MP2::OBJ_RNDTOWN:		
-	case MP2::OBJ_RNDULTIMATEARTIFACT:
-	case MP2::OBJ_RUINS:		
-	case MP2::OBJ_SAWMILL:		
-	case MP2::OBJ_SHIPWRECK:	
-	case MP2::OBJ_SHIPWRECKSURVIROR:
-	case MP2::OBJ_SHRINE1:		
-	case MP2::OBJ_SHRINE2:		
-	case MP2::OBJ_SHRINE3:		
-	case MP2::OBJ_SIGN:		
-	case MP2::OBJ_SKELETON:		
-	case MP2::OBJ_SPHINX:		
-	case MP2::OBJ_STANDINGSTONES:	
-	case MP2::OBJ_STONELIGHTS:	
-	case MP2::OBJ_STONES:		
-	case MP2::OBJ_TEMPLE:		
-	case MP2::OBJ_TRADINGPOST:	
-	case MP2::OBJ_TREASURECHEST:	
-	case MP2::OBJ_TREECITY:		
-	case MP2::OBJ_TREEHOUSE:	
-	case MP2::OBJ_TREEKNOWLEDGE:	
-	case MP2::OBJ_TREES:		
-	case MP2::OBJ_TROLLBRIDGE:	
-	case MP2::OBJ_VEGETATION2:	
-	case MP2::OBJ_VOLCANO:		
-	case MP2::OBJ_WAGON:		
-	case MP2::OBJ_WAGONCAMP:	
-	case MP2::OBJ_WATCHTOWER:	
-	case MP2::OBJ_WATERLAKE:	
-	case MP2::OBJ_WATERMILL:	
-	case MP2::OBJ_WHIRLPOOL:	
-	case MP2::OBJ_WINDMILL:		
-	case MP2::OBJ_WITCHHUNT:	
-	case MP2::OBJ_XANADU:		
-*/
 	    case MP2::OBJ_COAST:
 	    case MP2::OBJ_DUNE:
 	    case MP2::OBJ_FLOWERS:		
@@ -1316,16 +1190,13 @@ bool Maps::Tiles::isPassable() const
 	    case MP2::OBJ_SHRUB2:
 	    case MP2::OBJ_STUMP:
 	    case MP2::OBJ_ZERO:		
-
 		return true;
-	    
+
 	    default: return false;
 	}
     }
-    else
-	return false;
 
-    return true;
+    return false;
 }
 
 /* check road */

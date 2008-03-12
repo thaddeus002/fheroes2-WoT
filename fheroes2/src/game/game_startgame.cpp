@@ -42,6 +42,7 @@
 
 namespace Game
 {
+    Cursor::themes_t GetCursor(const Focus & focus, const Maps::Tiles & tile);
     void OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar);
     void OpenHeroes(Heroes *heroes, GameArea & areaMaps, Radar & radar);
     void FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar);
@@ -365,561 +366,171 @@ Game::menu_t Game::StartGame(void)
 	    const u16 index_maps = Maps::GetIndexFromAreaPoint(mouse_coord);
 	    const Maps::Tiles & tile = world.GetTiles(index_maps);
 	    const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
-	    const Castle * castle = NULL;
-	    const Heroes * heroes = NULL;
-	    const u8 object = tile.GetObject();
 
-	    switch(global_focus.Type())
+	    cursor.SetThemes(GetCursor(global_focus, tile));
+
+	    if(le.MouseClickLeft(tile_pos))
 	    {
-		// focus from hero
-		case Game::Focus::HEROES:
+		switch(global_focus.Type())
 		{
-		    Heroes & from_hero = global_focus.GetHeroes();
-
-		    switch(object)
+		    case Focus::HEROES:
 		    {
-			// focus from hero to monster
-    			case MP2::OBJ_MONSTER:
-    			    cursor.SetThemes(Cursor::FIGHT);
-
-			    if(le.MouseClickLeft(tile_pos))
-			    {
-				from_hero.ShowPathOrStartMove(index_maps);
-			    }
-			    else
-			    if(le.MousePressRight(tile_pos))
-			    {
-				if(H2Config::Debug()) tile.DebugInfo(index_maps);
-
-				Monster::monster_t monster = Monster::Monster(tile);
-
-				if(Monster::UNKNOWN > monster) Dialog::QuickInfo(Army::String(Army::GetSize(Monster::GetSize(tile))) + " of " + Monster::String(monster));
-			    }
-			    break;
-
-			// focus from hero to castle
-    			case MP2::OBJN_CASTLE:
-    			    if(NULL != (castle = world.GetCastle(index_maps)))
+			Heroes & from_hero = global_focus.GetHeroes();
+			
+			switch(tile.GetObject())
+			{
+    			    // from hero to castle
+    			    case MP2::OBJN_CASTLE:
     			    {
-				if(H2Config::MyColor() == castle->GetColor())
-				{
-	    			    cursor.SetThemes(Cursor::CASTLE);
+    				const Castle *to_castle = world.GetCastle(index_maps);
 
-				    if(le.MouseClickLeft(tile_pos))
+    				if(NULL != to_castle)
+    				{
+				    if(from_hero.GetColor() == to_castle->GetColor())
 				    {
 					if(selectHeroes.isSelected())
 					{
 					    selectHeroes.Reset();
 					    selectHeroes.Redraw();
+					    splitHeroes.Move(selectHeroes.GetTopIndex());
 					}
 
-					// is selected open dialog
-					if(selectCastles.isSelected() && castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
-					{
-					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
-
-					    statusWindow.Redraw();
-					    selectCastles.Redraw();
-
-					    display.Flip();
-					}
-					// select other castle
-					else
-					{
-					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
-					    splitCastles.Move(selectCastles.GetTopIndex());
-					    display.Flip();
-					}
+					FocusToCastle(const_cast<Castle *>(to_castle), areaMaps, radar);
+					splitCastles.Move(selectCastles.GetTopIndex());
+					display.Flip();
 				    }
-				    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
+    				}
+			    }
+			    break;
 
-					Dialog::QuickInfo(*castle);
-				    }
-				}
-				// over enemy castle
-				else
+    			    // from hero to hero
+    			    case MP2::OBJ_HEROES:
+    			    {
+			        const Heroes * to_hero = world.GetHeroes(index_maps);
+
+			        if(NULL != to_hero &&
+					from_hero.GetColor() == to_hero->GetColor() &&
+					from_hero.GetCenter() == to_hero->GetCenter())
 				{
-	    			    cursor.SetThemes(Cursor::FIGHT);
-
-				    if(le.MouseClickLeft(tile_pos))
-				    {
-					from_hero.ShowPathOrStartMove(Maps::GetIndexFromAbsPoint(castle->GetCenter()));
-				    }
-				    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*castle);
-				    }
-				}
+				    OpenHeroes(&from_hero, areaMaps, radar);
+				    statusWindow.Redraw();
+				    display.Flip();
+    				}
     			    }
     			    break;
 
-			// focus from hero to castle
-    			case MP2::OBJ_CASTLE:
-    			    if(NULL != (castle = world.GetCastle(index_maps)))
-			    {
-				if(H2Config::MyColor() == castle->GetColor())
-				{
-        			    cursor.SetThemes(Cursor::ACTION);
+			    break;
 
-				    if(le.MouseClickLeft(tile_pos))
-				    {
-					from_hero.ShowPathOrStartMove(index_maps);
-				    }
-				    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*castle);
-				    }
-				}
-				// over enemy castle
-				else
-				{
-				    cursor.SetThemes(Cursor::FIGHT);
+			    default:
+				if(tile.isPassable() || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
+				    from_hero.ShowPathOrStartMove(index_maps);
+			    break;
+			}
+		    }
+		    break;
 
-				    if(le.MouseClickLeft(tile_pos))
-				    {
-					from_hero.ShowPathOrStartMove(index_maps);
-				    }
-				    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*castle);
-				    }
-				}
-			    }
-        		    break;
+		    case Focus::CASTLE:
+		    {
+			Castle & from_castle = global_focus.GetCastle();
 
-			// focus from hero to hero
-			case MP2::OBJ_HEROES:
+			switch(tile.GetObject())
 			{
-			    const Heroes * heroes2 = world.GetHeroes(index_maps);
-
-    			    if(NULL != heroes2)
-    			    {
-				if(H2Config::MyColor() == heroes2->GetColor())
-				{
-				    cursor.SetThemes(heroes2->GetCenter() == from_hero.GetCenter() ? Cursor::HEROES : Cursor::CHANGE);
-
-				    if(le.MouseClickLeft(tile_pos))
-				    {
-					// same from_hero open dialog
-					if(heroes2->GetCenter() == from_hero.GetCenter())
-					{
-					    OpenHeroes(&from_hero, areaMaps, radar);
-
-					    statusWindow.Redraw();
-					    display.Flip();
-					}
-					// heroes dialog meeting
-					else
-					{
-					    from_hero.ShowPathOrStartMove(index_maps);
-					}
-				    }
-				    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*heroes2);
-				    }
-				}
-				// over enemy hero
-				else
-				{
-				    cursor.SetThemes(Cursor::FIGHT);
-
-				    if(le.MouseClickLeft(tile_pos))
-				    {
-					from_hero.ShowPathOrStartMove(index_maps);
-				    }
-				    else
-				    // show info enemy hero
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*heroes2);
-				    }
-				}
-    			    }
-    			}
-    			    break;
-
-			// focus from hero to boat
-    			case MP2::OBJ_BOAT:
-    			    cursor.SetThemes(Cursor::BOAT);
-
-			    if(le.MouseClickLeft(tile_pos))
+			    // from castle to castle
+			    case MP2::OBJN_CASTLE:
+			    case MP2::OBJ_CASTLE:
 			    {
-				from_hero.ShowPathOrStartMove(index_maps);
+    				const Castle *to_castle = world.GetCastle(index_maps);
+
+    				if(NULL != to_castle &&
+    				    from_castle.GetColor() == to_castle->GetColor())
+    				{
+				    // is selected open dialog
+				    if(from_castle.GetCenter() == to_castle->GetCenter())
+				    {
+					OpenCastle(&from_castle, areaMaps, radar);
+					statusWindow.Redraw();
+				    }
+				    // select other castle
+				    else
+				    {
+					FocusToCastle(const_cast<Castle *>(to_castle), areaMaps, radar);
+					splitCastles.Move(selectCastles.GetTopIndex());
+				    }
+
+				    selectCastles.Redraw();
+				    display.Flip();
+				}
 			    }
 			    break;
 
-			// focus from hero to object
-    			case MP2::OBJ_TREASURECHEST:
-    			    if(Maps::Ground::WATER != tile.GetGround())
-    			    {
-    			        cursor.SetThemes(Cursor::ACTION);
-
-				if(le.MouseClickLeft(tile_pos))
-				{
-				    from_hero.ShowPathOrStartMove(index_maps);
-				}
-    			    }
-    			    break;
-
-			// focus from hero to object
-    			case MP2::OBJ_ALCHEMYTOWER:
-    			case MP2::OBJ_SIGN:
-    			case MP2::OBJ_SKELETON:
-    			case MP2::OBJ_DAEMONCAVE:
-    			case MP2::OBJ_FAERIERING:
-    			case MP2::OBJ_CAMPFIRE:
-    			case MP2::OBJ_FOUNTAIN:
-    			case MP2::OBJ_GAZEBO:
-    			case MP2::OBJ_ANCIENTLAMP:
-    			case MP2::OBJ_GRAVEYARD:
-    			case MP2::OBJ_ARCHERHOUSE:
-    			case MP2::OBJ_GOBLINHUNT:
-    			case MP2::OBJ_DWARFCOTT:
-    			case MP2::OBJ_PEASANTHUNT:
-    			case MP2::OBJ_PEASANTHUNT2:
-    			case MP2::OBJ_DRAGONCITY:
-    			case MP2::OBJ_LIGHTHOUSE:
-    			case MP2::OBJ_WATERMILL:
-    			case MP2::OBJ_MINES:
-			case MP2::OBJ_OBELISK:
-			case MP2::OBJ_OASIS:
-			case MP2::OBJ_RESOURCE:
-			case MP2::OBJ_SAWMILL:
-			case MP2::OBJ_ORACLE:
-			case MP2::OBJ_SHRINE1:
-			case MP2::OBJ_DERELICTSHIP:
-			case MP2::OBJ_DESERTTENT:
-			case MP2::OBJ_STONELIGHTS:
-			case MP2::OBJ_WAGONCAMP:
-			case MP2::OBJ_WINDMILL:
-			case MP2::OBJ_ARTIFACT:
-			case MP2::OBJ_WATCHTOWER:
-			case MP2::OBJ_TREEHOUSE:
-			case MP2::OBJ_TREECITY:
-			case MP2::OBJ_RUINS:
-			case MP2::OBJ_FORT:
-    			case MP2::OBJ_TRADINGPOST:
-    			case MP2::OBJ_ABANDONEDMINE:
-    			case MP2::OBJ_STANDINGSTONES:
-    			case MP2::OBJ_IDOL:
-    			case MP2::OBJ_TREEKNOWLEDGE:
-    			case MP2::OBJ_DOCTORHUNT:
-    			case MP2::OBJ_TEMPLE:
-    			case MP2::OBJ_HILLFORT:
-    			case MP2::OBJ_HALFLINGHOLE:
-    			case MP2::OBJ_MERCENARYCAMP:
-    			case MP2::OBJ_CRAKEDLAKE:
-    			case MP2::OBJ_SHRINE2:
-    			case MP2::OBJ_SHRINE3:
-    			case MP2::OBJ_PIRAMID:
-    			case MP2::OBJ_CITYDEAD:
-    			case MP2::OBJ_EXCAVATION:
-    			case MP2::OBJ_SPHINX:
-    			case MP2::OBJ_WAGON:
-    			case MP2::OBJ_ARTESIANSPRING:
-    			case MP2::OBJ_TROLLBRIDGE:
-    			case MP2::OBJ_WITCHHUNT:
-    			case MP2::OBJ_XANADU:
-    			case MP2::OBJ_CAVE:
-    			case MP2::OBJ_LEANTO:
-    			case MP2::OBJ_MAGICWELL:
-    			case MP2::OBJ_MAGICGARDEN:
-    			case MP2::OBJ_OBSERVATIONTOWER:
-    			case MP2::OBJ_FREEMANFOUNDRY:
-
-				cursor.SetThemes(Cursor::ACTION);
-
-				if(le.MouseClickLeft(tile_pos))
-				{
-				    from_hero.ShowPathOrStartMove(index_maps);
-                        	}
-			    break;
-
-			default:
-                            if(Maps::Ground::WATER != tile.GetGround() && tile.isPassable())
-                            {
-                            	// FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
-                            	cursor.SetThemes(Cursor::MOVE);
-
-				if(le.MouseClickLeft(tile_pos))
-				    from_hero.ShowPathOrStartMove(index_maps);
-                    	    }
-                            else
-                            {
-                                cursor.SetThemes(Cursor::POINTER);
-                            }
-			    break;
-		    }
-		}
-		break;
-
-		// focus from boat
-    		case Game::Focus::BOAT:
-		{
-    		    if(NULL == (heroes = world.GetHeroes(index_maps))) break;
-
-		    switch(object)
-		    {
-			// focus from boat to castle
-    			case MP2::OBJN_CASTLE:
-    			case MP2::OBJ_CASTLE:
-    			    if(NULL != (castle = world.GetCastle(index_maps)))
+			    // from castle to heroes
+			    case MP2::OBJ_HEROES:
 			    {
-				if((*castle).GetColor() == H2Config::MyColor())
-				{
-			    	    cursor.SetThemes(Cursor::CASTLE);
+    				const Heroes *to_hero = world.GetHeroes(index_maps);
 
-				    if(le.MouseClickLeft(tile_pos))
-				    {
-					// is selected open dialog
-				        if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
-					{
-					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
-
-					    statusWindow.Redraw();
-					    selectCastles.Redraw();
-
-					    display.Flip();
-					}
-					// select other castle
-					else
-					{
-					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
-					    splitCastles.Move(selectCastles.GetTopIndex());
-					    display.Flip();
-					}
-				    }
-				    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*castle);
-				    }
-				}
-				// over enemy castle
-				else
-				{
-			    	    cursor.SetThemes(Cursor::POINTER);
-
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*castle);
-				    }
-				}
-    			    }
-    			    break;
-
-			// focus from boat to hero
-			//case MP2::OBJ_HEROES:
-    			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::MyColor())
-    			//			cursor.SetThemes(Cursor::HEROES);
-        		//    break;
-
-			// focus from boat to boat
-    			case MP2::OBJ_BOAT:
-    			    if(NULL != (heroes = world.GetHeroes(index_maps)))
-					cursor.SetThemes((*heroes).GetColor() == H2Config::MyColor() ? Cursor::HEROES : Cursor::FIGHT);
-    			    break;
-
-			// focus from boat to object
-    			case MP2::OBJ_TREASURECHEST:
-			    if(Maps::Ground::WATER == tile.GetGround())
-					cursor.SetThemes(Cursor::REDBOAT);
-			    break;
-
-			// focus from boat to object
-    			case MP2::OBJ_SHIPWRECK:
-    			case MP2::OBJ_WHIRLPOOL:
-    			case MP2::OBJ_BUOY:
-    			case MP2::OBJ_BOTTLE:
-    			case MP2::OBJ_SHIPWRECKSURVIROR:
-    			case MP2::OBJ_FLOTSAM:
-    			case MP2::OBJ_MAGELLANMAPS:
-					cursor.SetThemes(Cursor::REDBOAT);
-			    break;
-
-			// focus from boat to object
-    			case MP2::OBJ_COAST:
-					cursor.SetThemes(Cursor::ANCHOR);
-			    break;
-
-			default:
-			    cursor.SetThemes(Maps::Ground::WATER == tile.GetGround() ? Cursor::BOAT : Cursor::POINTER);
-			    break;
-		    }
-		}
-		break;
-
-		// focus from castle
-		case Game::Focus::CASTLE:
-		{
-		    switch(object)
-		    {
-			// focus from castle to castle
-    			case MP2::OBJN_CASTLE:
-    			case MP2::OBJ_CASTLE:
-    			    if(NULL != (castle = world.GetCastle(index_maps)))
-    			    {
-    				if(castle->GetColor() == H2Config::MyColor())
+				if(NULL != to_hero &&
+    				    from_castle.GetColor() == to_hero->GetColor())
     				{
-    			    	    cursor.SetThemes(Cursor::CASTLE);
-
-				    if(le.MouseClickLeft(tile_pos))
+				    if(selectCastles.isSelected())
 				    {
-					// is selected open dialog
-					if(castle->GetCenter() == selectCastles.GetCenter(selectCastles.GetSelectIndex()))
-					{
-					    OpenCastle(const_cast<Castle *>(castle), areaMaps, radar);
+					selectCastles.Reset();
+					selectCastles.Redraw();
+					splitCastles.Move(selectCastles.GetTopIndex());
+				    }
 
-					    statusWindow.Redraw();
-					    selectCastles.Redraw();
+    				    FocusToHeroes(const_cast<Heroes *>(to_hero), areaMaps, radar);
+				    splitHeroes.Move(selectHeroes.GetTopIndex());
+				    display.Flip();
+        			}
+			    }
+			    break;
+
+			    default:
+			    break;
+			}
+		    }
+		    break;
 		    
-					    display.Flip();
-					}
-					// select other castle
-					else
-					{
-					    FocusToCastle(const_cast<Castle *>(castle), areaMaps, radar);
-					    splitCastles.Move(selectCastles.GetTopIndex());
-					    display.Flip();
-					}
-				    }
-				    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*castle);
-				    }
-				}
-				// over enemy castle
-				else
-				{
-    			    	    cursor.SetThemes(Cursor::POINTER);
-
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*castle);
-				    }
-				}
-			    }
-			    break;
-
-			// focus from castle to heroes
-			case MP2::OBJ_HEROES:
-    			    if(NULL != (heroes = world.GetHeroes(index_maps)))
-    			    {
-    				if(heroes->GetColor() == H2Config::MyColor())
-    				{
-    			    	    cursor.SetThemes(Cursor::HEROES);
-
-				    if(le.MouseClickLeft(tile_pos))
-				    {
-					if(selectCastles.isSelected())
-					{
-					    selectCastles.Reset();
-					    selectCastles.Redraw();
-					}
-
-					// is selected open dialog
-					if(selectHeroes.isSelected() && heroes->GetCenter() == selectHeroes.GetCenter(selectHeroes.GetSelectIndex()))
-					{
-					    OpenHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-
-					    statusWindow.Redraw();
-					    display.Flip();
-					}
-					// select other hero
-					else
-					{
-    					    FocusToHeroes(const_cast<Heroes *>(heroes), areaMaps, radar);
-
-					    const Route & path = global_focus.GetHeroes().GetPath();
-
-					    if(path.size())
-					    {
-						cursor.Hide();
-						path.Show();
-						world.GetTiles((*heroes).GetCenter()).Redraw();
-						cursor.Show();
-					    }
-
-					    display.Flip();
-					}
-        			    }
-        			    else
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*heroes);
-				    }
-        			}
-        			else
-        			{
-    			    	    cursor.SetThemes(Cursor::POINTER);
-
-				    if(le.MousePressRight(tile_pos))
-				    {
-					if(H2Config::Debug()) tile.DebugInfo(index_maps);
-					
-					Dialog::QuickInfo(*heroes);
-				    }
-        			}
-        		    }
-        		    break;
-
-			// focus from castle to boat
-    			//case MP2::OBJ_BOAT:
-    			//    if(NULL != (heroes = world.GetHeroes(index_maps)) && (*heroes).GetColor() == H2Config::MyColor())
-    			//			cursor.SetThemes(Cursor::HEROES);
-        		//    break;
-
-			default:
-			    // default cursor
-			    cursor.SetThemes(Cursor::POINTER);
-			    break;
-		    }
+		    default:
+		    break;
 		}
-		break;
-
-    		case Game::Focus::UNSEL:
-    		break;
 	    }
-
-	    if(le.MouseRight())
+	    else
+	    if(le.MousePressRight(tile_pos))
 	    {
 		if(H2Config::Debug()) tile.DebugInfo(index_maps);
 
-		const std::string & info = (MP2::OBJ_ZERO == object || MP2::OBJ_EVENT == object ?
-		    Maps::Ground::String(tile.GetGround()) : MP2::StringObject(object));
+		switch(tile.GetObject())
+		{
+		    case MP2::OBJ_MONSTER:
+			Dialog::QuickInfo(Army::String(Army::GetSize(Monster::GetSize(tile))) + " of " + Monster::String(Monster::Monster(tile)));
+		    break;
 
-		Dialog::QuickInfo(info);
+		    case MP2::OBJN_CASTLE:
+		    case MP2::OBJ_CASTLE:
+    		    {
+    		    	const Castle *castle = world.GetCastle(tile.GetIndex());
+			if(castle) Dialog::QuickInfo(*castle);
+		    }
+		    break;
+
+		    case MP2::OBJ_HEROES:
+    		    {
+    		    	const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+			if(heroes) Dialog::QuickInfo(*heroes);
+		    }
+		    break;
+
+		    case MP2::OBJ_EVENT:
+		    case MP2::OBJ_ZERO:
+			Dialog::QuickInfo(Maps::Ground::String(tile.GetGround()));
+		    break;
+
+		    default:
+			Dialog::QuickInfo(std::string(MP2::StringObject(tile.GetObject())));
+		    break;
+		}
 	    }
-
 	// end cursor over game area
 	}
 	else
@@ -1311,7 +922,7 @@ Game::menu_t Game::StartGame(void)
     	if(Game::Focus::HEROES == global_focus.Type() &&
     	    global_focus.GetHeroes().isNeedMove() && 
     	    global_focus.GetHeroes().isEnableMove() &&
-    	    !(ticket % 80))	// FIXME: speed animation configurable
+    	    !(ticket % ANIMATION_LOW))
     	    {
     		global_focus.GetHeroes().Move();
 
@@ -1326,7 +937,7 @@ Game::menu_t Game::StartGame(void)
 	    }
 
         // animation
-        if(!(ticket % 50)) 	// FIXME: speed animation configurable
+        if(!(ticket % ANIMATION_LOW))
         {
             cursor.Hide();
             areaMaps.RedrawAnimation();
@@ -1397,7 +1008,7 @@ void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
     Game::Focus & globalfocus = Game::Focus::Get();
 
     // hide path
-    if(Game::Focus::HEROES == globalfocus.Type() || Game::Focus::BOAT == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
 
     globalfocus.Set(*castle);
 
@@ -1481,11 +1092,16 @@ void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 
     Game::Focus & globalfocus = Game::Focus::Get();
 
-    // hide path
-    if(Game::Focus::HEROES == globalfocus.Type() || Game::Focus::BOAT == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+    // hide old path
+    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
 
     globalfocus.Set(*hero);
 
+    // show new path
+    globalfocus.GetHeroes().GetPath().Show();
+    //world.GetTiles((*heroes).GetCenter()).Redraw();
+
+    // center
     areaMaps.Center(hero->GetCenter());
     radar.RedrawCursor();
 
@@ -1494,4 +1110,151 @@ void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
     selectCastles.Redraw();
 
     cursor.Show();
+}
+
+/* return changee cursor */
+Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
+{
+    switch(focus.Type())
+    {
+	case Focus::HEROES:
+	{
+	    const Heroes & from_hero = focus.GetHeroes();
+	    
+	    if(from_hero.isShipMaster())
+	    {
+		switch(tile.GetObject())
+		{
+		    case MP2::OBJN_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+        	    }
+        	    break;
+
+		    case MP2::OBJ_HEROES:
+		    {
+			const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
+
+    			if(NULL != to_hero && to_hero->isShipMaster())
+    			{
+			    if(to_hero->GetCenter() == from_hero.GetCenter())
+				return Cursor::HEROES;
+			    else
+				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+			}
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_TREASURECHEST:
+                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT : Cursor::POINTER;
+
+		    case MP2::OBJ_COAST:
+			return Cursor::ANCHOR;
+
+		    default:
+                        // FIXME: select BOAT cursor or BOAT2 or BOAT3 or BOAT4
+                        return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT : (tile.isPassable() ? Cursor::BOAT : Cursor::POINTER);
+		}
+	    }
+	    else
+	    {
+		switch(tile.GetObject())
+		{
+    		    case MP2::OBJ_MONSTER:
+    			return Cursor::FIGHT;
+
+		    case MP2::OBJN_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT;
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+			    return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION : Cursor::FIGHT;
+        	    }
+        	    break;
+
+		    case MP2::OBJ_HEROES:
+		    {
+			const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
+
+    			if(NULL != to_hero && !to_hero->isShipMaster())
+    			{
+			    if(to_hero->GetCenter() == from_hero.GetCenter())
+				return Cursor::HEROES;
+			    else
+				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+			}
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_BOAT:
+            		return Cursor::BOAT;
+
+    		    case MP2::OBJ_TREASURECHEST:
+                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION;
+
+		    default:
+                    	// FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
+			return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION : (tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
+		}
+	    }
+	}
+	break;
+
+	case Focus::CASTLE:
+	{
+	    const Castle & from_castle = focus.GetCastle();
+
+	    switch(tile.GetObject())
+	    {
+    		case MP2::OBJN_CASTLE:
+    		case MP2::OBJ_CASTLE:
+    		{
+    		    const Castle *to_castle = world.GetCastle(tile.GetIndex());
+
+    		    if(NULL != to_castle)
+    			return to_castle->GetColor() == from_castle.GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+		}
+		break;
+
+		case MP2::OBJ_HEROES:
+    		{
+    		    const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+
+		    if(NULL != heroes)
+    			return heroes->GetColor() == from_castle.GetColor() ? Cursor::HEROES : Cursor::POINTER;
+		}
+		break;
+
+		default:
+		    return Cursor::POINTER;
+	    }
+	}
+	break;
+
+    	default:
+    	break;
+    }
+
+    return Cursor::POINTER;
 }

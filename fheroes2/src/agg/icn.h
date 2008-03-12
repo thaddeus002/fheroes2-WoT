@@ -24,6 +24,8 @@
 #include <string>
 #include "gamedefs.h"
 
+class Sprite;
+
 namespace ICN
 {
     typedef enum
@@ -925,9 +927,9 @@ namespace ICN
         std::string	string;
 
     } icnmap_t;
-    
-    const std::string  & GetString(const icn_t icn);
 
+    const std::string  & GetString(const icn_t icn);
+    u16 AnimationFrame(const icn_t icn, const u16 start, const u32 ticket = 0);
 };
 
 #endif

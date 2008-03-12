@@ -24,6 +24,8 @@
 #include "payment.h"
 #include "world.h"
 #include "agg.h"
+#include "display.h"
+#include "sprite.h"
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
@@ -1188,9 +1190,6 @@ void Castle::BuyBuilding(building_t build)
 	// disable day build
 	allow_build = false;
 	
-	// play sound
-	AGG::PlaySound(M82::BUILDTWN);
-
 	if(H2Config::Debug()) Error::Verbose("Castle::BuyBuilding: " + GetStringBuilding(build, race));
 }
 

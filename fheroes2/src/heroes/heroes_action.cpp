@@ -36,8 +36,10 @@ void Heroes::Action(const u16 dst_index, const MP2::object_t object)
 
         case MP2::OBJ_CASTLE:	ActionToCastle(dst_index); break;
         case MP2::OBJ_HEROES:	ActionToHeroes(dst_index); break;
-        
-        case MP2::OBJ_BOAT:
+
+        case MP2::OBJ_BOAT:	if(! isShipMaster()) SetShipMaster(true); break;
+
+	case MP2::OBJ_COAST:	if(isShipMaster()) SetShipMaster(false); break;
 
         // resource
         case MP2::OBJ_ARTIFACT:
@@ -125,7 +127,7 @@ void Heroes::ActionToMonster(const u16 dst_index)
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: " + GetName() + " attack monster " + Monster::String(monster));
 
-    Error::Verbose("Heroes::ActionToMonster: FIXME: attack monster");
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: attack monster");
 }
 
 void Heroes::ActionToHeroes(const u16 dst_index)
@@ -144,7 +146,7 @@ void Heroes::ActionToHeroes(const u16 dst_index)
     {
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: " + GetName() + " attack enemy hero " + other_hero->GetName());
 
-	Error::Verbose("Heroes::ActionToHeroes: FIXME: attack enemy hero");
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: FIXME: attack enemy hero");
     }
 }
 
@@ -164,6 +166,6 @@ void Heroes::ActionToCastle(const u16 dst_index)
     {
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: " + GetName() + " attack enemy castle " + castle->GetName());
 
-	Error::Verbose("Heroes::ActiontoCastle: FIXME: attack enemy castle");
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActiontoCastle: FIXME: attack enemy castle");
     }
 }

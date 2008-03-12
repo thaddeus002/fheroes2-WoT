@@ -251,14 +251,10 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
     {
         // redraw cursor
         if(redraw_cursor_func)
-        {
     	    (*redraw_cursor_func)(event->motion.x, event->motion.y);
 
-    	    display.Flip();
-	}
-
-        return 1;                                                                                                                 
-    }                                                                                                                             
+        return 1;
+    }
 
     // key
     if(SDL_KEYDOWN == event->type)

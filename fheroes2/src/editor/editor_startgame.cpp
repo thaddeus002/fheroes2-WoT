@@ -1182,16 +1182,6 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
 	if(selectObjectEnable && le.MousePressRight(rectObjectResource))
 	    Dialog::Message("Treasures", "Used to place a resource or treasure.", Font::BIG);
 
-/*
-        // animation
-        if(!(++ticket % 50)) // FIXME: speed animation low
-        {
-            cursor.Hide();
-            areaMaps.RedrawAnimation();
-            cursor.Show();
-            display.Flip();
-        }
-*/
     }
 
     return QUITGAME;

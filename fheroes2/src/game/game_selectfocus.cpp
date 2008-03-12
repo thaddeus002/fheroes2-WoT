@@ -24,6 +24,7 @@
 #include "race.h"
 #include "config.h"
 #include "agg.h"
+#include "sprite.h"
 #include "portrait.h"
 #include "game_selectfocus.h"
 

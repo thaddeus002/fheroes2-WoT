@@ -23,7 +23,6 @@
 #include <vector>
 #include <bitset>
 #include <string>
-#include "animation.h"
 #include "gamedefs.h"
 #include "maps_tiles.h"
 #include "mageguild.h"
@@ -140,6 +139,7 @@ private:
 
     Rect GetCoordBuilding(building_t building, const Point & pt);
     void RedrawAllBuilding(const Point & dst_pt, const std::vector<building_t> & orders);
+    void RedrawBuilding(const building_t build, const Point & dst_pt, const u32 ticket);
     building_t OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
@@ -147,6 +147,7 @@ private:
     void OpenMageGuild(void);
     void RedrawNameTown(const Point & src_pt);
     void WellRedrawInfoArea(const Point & cur_pt);
+    void RedrawAnimationBuilding(const Point & dst_pt, const building_t build);
 
     Dialog::answer_t DialogBuyHero(const Heroes::heroes_t hero);
     Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);

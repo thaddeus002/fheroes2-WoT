@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 		    ii += 10;
 		}
 		
-		SDL_Delay(500);
+		DELAY(500);
 
 		while(ii > 0)
 		{

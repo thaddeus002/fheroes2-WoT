@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "text.h"
 #include "tools.h"
+#include "sprite.h"
 #include "payment.h"
 
 PaymentConditions::BuySpellBook::BuySpellBook()

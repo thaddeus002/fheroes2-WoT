@@ -21,7 +21,7 @@
 #include <string>
 #include <utility>
 #include "agg.h"
-#include "animation.h"
+#include "audio.h"
 #include "localevent.h"
 #include "button.h"
 #include "world.h"
@@ -57,6 +57,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 {
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
+
+    // clear mixer
+    Audio::Mixer::Get().Clear();
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -742,7 +745,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 		BuyBuilding(build);
-		RedrawResourcePanel();
+
+		// play sound
+		AGG::PlaySound(M82::BUILDTWN);
+		
+		RedrawAnimationBuilding(cur_pt, build);
+
+		RedrawResourcePanel();		                
 	        RedrawAllBuilding(cur_pt, orders_building);
 	        RedrawNameTown(cur_pt);
 
@@ -1117,7 +1126,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(! statusBar.isEmpty()) statusBar.Clear();
 
 	// animation sprite
-	if(!(++ticket % 50)) // FIXME: speed animation low
+	if(!(++ticket % ANIMATION_LOW))
 	{
 	    cursor.Hide();
 	    RedrawAllBuilding(cur_pt, orders_building);

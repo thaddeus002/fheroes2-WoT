@@ -219,7 +219,7 @@ void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, bool loop
 
     SDL_LockAudio();
 
-    if(mixer.data != data)
+    if(mixer.data != data || !loop)
     {
 	mixer.data = data;
 	mixer.length = body.size();

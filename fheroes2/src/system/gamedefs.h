@@ -25,4 +25,8 @@
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 1
 
+#define ANIMATION_HIGH          8
+#define ANIMATION_MEDIUM        25
+#define ANIMATION_LOW           50
+
 #endif

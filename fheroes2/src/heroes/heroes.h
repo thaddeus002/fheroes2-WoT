@@ -169,6 +169,9 @@ public:
     void Move(void);
     void ShowPathOrStartMove(const u16 dst_index);
 
+    bool isShipMaster(void) const;
+    void SetShipMaster(bool f);
+
     MP2::object_t GetUnderObject(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);
@@ -179,6 +182,7 @@ protected:
     void ActionToHeroes(const u16 dst_index);
     void ActionToMonster(const u16 dst_index);
     bool isNeedStopNextToLast(void);
+    void RedrawRotate(bool clockwise);
 
 private:
     std::string		name;

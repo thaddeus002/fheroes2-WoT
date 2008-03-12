@@ -32,6 +32,7 @@
 #include "cursor.h"
 #include "error.h"
 #include "display.h"
+#include "sprite.h"
 #include "portrait.h"
 #include "dialog.h"
 

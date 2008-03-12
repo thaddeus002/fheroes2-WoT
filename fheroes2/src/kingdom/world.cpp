@@ -504,6 +504,7 @@ void World::LoadMaps(const std::string &filename)
 	}
 
 	(*tile).AddonsSort();
+	(*tile).FixAnimation();
 
 	vec_tiles[ii] = tile;
     }
@@ -824,6 +825,15 @@ void World::LoadMaps(const std::string &filename)
 		}
 		break;
 
+    	    case MP2::OBJ_BOAT:
+		// remove small sprite boat
+		if( (addon = tile.FindAddon(0xA0, 0x17)) || (addon = tile.FindAddon(0xA1, 0x17)) ||
+		    (addon = tile.FindAddon(0xA2, 0x17)) || (addon = tile.FindAddon(0xA3, 0x17)))
+		{
+		    tile.Remove((*addon).GetUniq());
+		}
+		break;
+
 	    case MP2::OBJ_RESOURCE:
 		    //tile.SetQuantity1();
 		break;
@@ -860,15 +870,19 @@ void World::LoadMaps(const std::string &filename)
     {
 	// get first castle position
 	Kingdom & kingdom = GetMyKingdom();
-	const Castle & castle = *(kingdom.GetCastles().at(0));
-	const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
 
-	// place hero
-	if(hero && (*hero).isFreeman())
+	if(kingdom.GetCastles().size())
 	{
-	    const_cast<Heroes &>(*hero).Recruit(castle);
+	    const Castle & castle = *(kingdom.GetCastles().at(0));
+	    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
 
-	    kingdom.AddHeroes(const_cast<Heroes *>(hero));
+	    // place hero
+	    if(hero && (*hero).isFreeman())
+	    {
+		const_cast<Heroes &>(*hero).Recruit(castle);
+
+		kingdom.AddHeroes(const_cast<Heroes *>(hero));
+	    }
 	}
     }
     else

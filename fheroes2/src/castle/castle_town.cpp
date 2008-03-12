@@ -23,7 +23,6 @@
 #include <bitset>
 #include "agg.h"
 #include "world.h"
-#include "animation.h"
 #include "localevent.h"
 #include "button.h"
 #include "cursor.h"

@@ -144,7 +144,7 @@ void Game::StatusWindow::DrawArmyInfo(void)
 {
     const Game::Focus & focus = Game::Focus::Get();
 
-    if(Game::Focus::HEROES != focus.Type() && Game::Focus::BOAT != focus.Type()) return;
+    if(Game::Focus::HEROES != focus.Type()) return;
 
     const std::vector<Army::Troops> & armies = focus.GetHeroes().GetArmy();
 

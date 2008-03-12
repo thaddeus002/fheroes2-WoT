@@ -23,11 +23,13 @@
 #include "world.h"
 #include "castle.h"
 #include "config.h"
+#include "agg.h"
 #include "monster.h"
 #include "error.h"
 #include "payment.h"
 #include "cursor.h"
 #include "display.h"
+#include "sprite.h"
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
@@ -1078,8 +1080,21 @@ void Heroes::Move(void)
     // change through the circle
     if(direction != direction2)
     {
+	Direction::vector_t to1 = direction;
+	Direction::vector_t to2 = direction2;
+
+	while(to1 != to2)
+	{
+	    Direction::ShortDistanceClockWise(to1, to2) ? ++to1 : --to1;
+	    if(Direction::CENTER == to1) Direction::ShortDistanceClockWise(to1, to2) ? ++to1 : --to1;
+
+	    RedrawRotate(Direction::ShortDistanceClockWise(to1, to2));
+
+	    direction = to1;
+	}
+
 	// FIXME: rotate animation heroes
-	direction = direction2;
+	//direction = direction2;
 
 	tiles_from.Redraw();
     }
@@ -1126,8 +1141,16 @@ void Heroes::Move(void)
 	    action_tiles = index_to;
 	    action_obj = save_maps_general;
 	}
-    }
 
+	// fix boat
+	if(!shipmaster && MP2::OBJ_BOAT == save_maps_general) save_maps_general = MP2::OBJ_ZERO;
+	else
+	if(shipmaster && MP2::OBJ_COAST == save_maps_general)
+	{
+	    tiles_from.SetObject(MP2::OBJ_BOAT);
+	    tiles_from.Redraw();
+	}
+    }
     cursor.Show();
     display.Flip();
 
@@ -1174,6 +1197,7 @@ bool Heroes::isNeedStopNextToLast(void)
     {
 	case MP2::OBJ_MONSTER:
 	case MP2::OBJ_HEROES:
+	case MP2::OBJ_ARTIFACT:
 	case MP2::OBJ_RESOURCE:
 	case MP2::OBJ_ANCIENTLAMP:
 	case MP2::OBJ_TREASURECHEST:
@@ -1195,4 +1219,89 @@ bool Heroes::isNeedStopNextToLast(void)
 MP2::object_t Heroes::GetUnderObject(void) const
 {
     return save_maps_general;
+}
+
+
+void Heroes::RedrawRotate(bool clockwise)
+{
+    const Sprite *sprite1 = NULL;
+    const Sprite *sprite2 = NULL;
+    ICN::icn_t icn = ICN::UNKNOWN;
+
+    switch(race)
+    {
+	case Race::KNGT:	icn = ICN::KNGT32; break;
+	case Race::BARB:	icn = ICN::BARB32; break;
+	case Race::SORC:	icn = ICN::SORC32; break;
+	case Race::WRLK:	icn = ICN::WRLK32; break;
+	case Race::WZRD:	icn = ICN::WZRD32; break;
+	case Race::NECR:	icn = ICN::NECR32; break;
+	default: return;
+    }
+
+    switch(direction)
+    {
+	case Direction::TOP:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 45 : 55);
+	    sprite2 = &AGG::GetICN(icn, 46, !clockwise);
+	    break;
+
+	case Direction::TOP_RIGHT:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 47 : 46);
+	    sprite2 = &AGG::GetICN(icn, clockwise ? 48 : 45);
+	    break;
+
+	case Direction::RIGHT:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 49 : 48);
+	    sprite2 = &AGG::GetICN(icn, clockwise ? 50 : 47);
+	    break;
+
+	case Direction::BOTTOM_RIGHT:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 51 : 50);
+	    sprite2 = &AGG::GetICN(icn, clockwise ? 52 : 49);
+	    break;
+
+	case Direction::BOTTOM:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 53 : 52);
+	    sprite2 = &AGG::GetICN(icn, 51, !clockwise);
+	    break;
+
+	case Direction::BOTTOM_LEFT:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 50 : 51, true);
+	    sprite2 = &AGG::GetICN(icn, clockwise ? 49 : 52, clockwise);
+	    break;
+
+	case Direction::LEFT:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 48 : 49, true);
+	    sprite2 = &AGG::GetICN(icn, clockwise ? 47 : 50, true);
+	    break;
+
+	case Direction::TOP_LEFT:
+	    sprite1 = &AGG::GetICN(icn, clockwise ? 46 : 47, true);
+	    sprite2 = &AGG::GetICN(icn, clockwise ? 55 : 48, !clockwise);
+	    break;
+
+	default: return;
+    }
+
+/*
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+
+    cursor.Hide();
+    DELAY(ANIMATION_LOW);
+
+    cursor.Show();
+    display.Flip();    
+*/
+}
+
+bool Heroes::isShipMaster(void) const
+{
+    return shipmaster;
+}
+
+void Heroes::SetShipMaster(bool f)
+{
+    shipmaster = f;
 }

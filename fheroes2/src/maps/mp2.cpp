@@ -603,468 +603,110 @@ const char * MP2::StringObject(u8 object)
     return "";
 }
 
-u8 MP2::GetAnimationFrame(const ICN::icn_t & icn, u8 index, u32 frame)
+bool MP2::isActionObject(const object_t obj, const bool water)
 {
-    switch(icn)
+    if(water)
     {
-	case ICN::MONS32:
+	switch(obj)
+	{
+    	    case OBJ_TREASURECHEST:
+	    case OBJ_SHIPWRECK:
+	    case OBJ_WHIRLPOOL:
+	    case OBJ_BUOY:
+	    case OBJ_BOTTLE:
+	    case OBJ_SHIPWRECKSURVIROR:
+	    case OBJ_FLOTSAM:
+	    case OBJ_MAGELLANMAPS:
+	    case OBJ_COAST:
 
-	    return index % 9 ? 0 : index + (frame % 6) + 1;
+    	    case OBJ_HEROES:
+		return true;
 
-	case ICN::OBJNWATR:
+	    default: break;
+	}
+    }
+    else
+    {
+	switch(obj)
+	{
+    	    case OBJ_TREASURECHEST:
+    	    case OBJ_ALCHEMYTOWER:
+    	    case OBJ_SIGN:
+    	    case OBJ_SKELETON:
+    	    case OBJ_DAEMONCAVE:
+    	    case OBJ_FAERIERING:
+    	    case OBJ_CAMPFIRE:
+    	    case OBJ_FOUNTAIN:
+    	    case OBJ_GAZEBO:
+    	    case OBJ_ANCIENTLAMP:
+    	    case OBJ_GRAVEYARD:
+    	    case OBJ_ARCHERHOUSE:
+    	    case OBJ_GOBLINHUNT:
+    	    case OBJ_DWARFCOTT:
+    	    case OBJ_PEASANTHUNT:
+    	    case OBJ_PEASANTHUNT2:
+    	    case OBJ_DRAGONCITY:
+    	    case OBJ_LIGHTHOUSE:
+    	    case OBJ_WATERMILL:
+    	    case OBJ_MINES:
+	    case OBJ_OBELISK:
+	    case OBJ_OASIS:
+	    case OBJ_RESOURCE:
+	    case OBJ_SAWMILL:
+	    case OBJ_ORACLE:
+	    case OBJ_DERELICTSHIP:
+	    case OBJ_DESERTTENT:
+	    case OBJ_STONELIGHTS:
+	    case OBJ_WAGONCAMP:
+	    case OBJ_WINDMILL:
+	    case OBJ_ARTIFACT:
+	    case OBJ_WATCHTOWER:
+	    case OBJ_TREEHOUSE:
+	    case OBJ_TREECITY:
+	    case OBJ_RUINS:
+	    case OBJ_FORT:
+    	    case OBJ_TRADINGPOST:
+    	    case OBJ_ABANDONEDMINE:
+    	    case OBJ_STANDINGSTONES:
+    	    case OBJ_IDOL:
+    	    case OBJ_TREEKNOWLEDGE:
+    	    case OBJ_DOCTORHUNT:
+    	    case OBJ_TEMPLE:
+    	    case OBJ_HILLFORT:
+    	    case OBJ_HALFLINGHOLE:
+    	    case OBJ_MERCENARYCAMP:
+    	    case OBJ_CRAKEDLAKE:
+	    case OBJ_SHRINE1:
+    	    case OBJ_SHRINE2:
+    	    case OBJ_SHRINE3:
+    	    case OBJ_PIRAMID:
+    	    case OBJ_CITYDEAD:
+    	    case OBJ_EXCAVATION:
+    	    case OBJ_SPHINX:
+    	    case OBJ_WAGON:
+    	    case OBJ_ARTESIANSPRING:
+    	    case OBJ_TROLLBRIDGE:
+    	    case OBJ_WITCHHUNT:
+    	    case OBJ_XANADU:
+    	    case OBJ_CAVE:
+    	    case OBJ_LEANTO:
+    	    case OBJ_MAGICWELL:
+    	    case OBJ_MAGICGARDEN:
+    	    case OBJ_OBSERVATIONTOWER:
+    	    case OBJ_FREEMANFOUNDRY:
+    	    case OBJ_BARRIER:
+    	    
+    	    case OBJ_MONSTER:
+    	    case OBJ_CASTLE:
+    	    case OBJ_HEROES:
+    	    case OBJ_BOAT:
+		return true;
 
-	    switch(index)
-	    {
-		// buttle
-		case 0x00:
-		    return index + (frame % 11) + 1;
-
-		// shadow
-		case 0x0C:
-		// chest
-		case 0x13:
-		// shadow
-		case 0x26:
-		// flotsam
-		case 0x2D:
-		// unkn
-		case 0x37:
-		// boat
-		case 0x3E:
-		// waves
-		case 0x45:
-		// seaweed
-		case 0x4C:
-		case 0x53:
-		case 0x5A:
-		case 0x61:
-		case 0x68:
-		// sailor-man
-		case 0x6F:
-		// shadow
-		case 0xBC:
-		// buoy
-		case 0xC3:
-		// broken ship (right)
-		case 0xE2:
-		case 0xE9:
-		case 0xF1:
-		case 0xF8:
-		    return index + (frame % 6) + 1;
-
-		// seagull on stones
-		case 0x76:
-		case 0x86:
-		case 0x96:
-		    return index + (frame % 15) + 1;
-
-		// whirlpool
-		case 0xCA:
-		case 0xCE:
-		case 0xD2:
-		case 0xD6:
-		case 0xDA:
-		case 0xDE:
-		    return index + (frame % 3) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNWAT2:
-
-	    switch(index)
-	    {
-		// sail broken ship (left)
-		case 0x03:
-		case 0x0C:
-		    return index + (frame % 6) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNCRCK:
-
-	    switch(index)
-	    {
-		// pool of oil
-		case 0x50:
-		case 0x5B:
-		case 0x66:
-		case 0x71:
-		case 0x7C:
-		case 0x89:
-		case 0x94:
-		case 0x9F:
-		case 0xAA:
-		// smoke from chimney
-		case 0xBE:
-		// shadow smoke
-		case 0xCA:
-		    return index + (frame % 10) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNDIRT:
-
-	    switch(index)
-	    {
-		// mill
-		case 0x99:
-		case 0x9D:
-		case 0xA1:
-		case 0xA5:
-		case 0xA9:
-		case 0xAD:
-		case 0xB1:
-		case 0xB5:
-		case 0xB9:
-		case 0xBD:
-		    return index + (frame % 3) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNDSRT:
-
-	    switch(index)
-	    {
-		// campfire
-		case 0x36:
-		case 0x3D:
-		    return index + (frame % 6) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNGRA2:
-
-	    switch(index)
-	    {
-		// mill
-		case 0x17:
-		case 0x1B:
-		case 0x1F:
-		case 0x23:
-		case 0x27:
-		case 0x2B:
-		case 0x2F:
-		case 0x33:
-		case 0x37:
-		case 0x3B:
-		    return index + (frame % 3) + 1;
-
-		// smoke from chimney
-		case 0x3F:
-		case 0x46:
-		case 0x4D:
-		// archerhouse
-		case 0x54:
-		// smoke from chimney
-		case 0x5D:
-		case 0x64:
-		// shadow smoke
-		case 0x6B:
-		// peasanthunt
-		case 0x72:
-		    return index + (frame % 6) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNLAV2:
-
-	    switch(index)
-	    {
-		// middle volcano
-		case 0x00:
-		// shadow
-		case 0x07:
-		case 0x0E:
-		// lava
-		case 0x15:
-		    return index + (frame % 6) + 1;
-
-		// small volcano
-		// shadow
-		case 0x21:
-		case 0x2C:
-		// lava
-		case 0x37:
-		case 0x43:
-		    return index + (frame % 10) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNLAV3:
-
-	    // big volcano
-	    switch(index)
-	    {
-		// smoke
-		case 0x00:
-		case 0x0F:
-		case 0x1E:
-		case 0x2D:
-		case 0x3C:
-		case 0x4B:
-		case 0x5A:
-		case 0x69:
-		case 0x87:
-		case 0x96:
-		case 0xA5:
-		// shadow
-		case 0x78:
-		case 0xB4:
-		case 0xC3:
-		case 0xD2:
-		case 0xE1:
-		    return index + (frame % 14) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNLAVA:
-
-	    switch(index)
-	    {
-		// shadow of lava
-		case 0x4F:
-		case 0x58:
-		case 0x62:
-		    return index + (frame % 9) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNMUL2:
-
-	    switch(index)
-	    {
-		// lighthouse
-		case 0x3D:
-		    return index + (frame % 9) + 1;
-
-		// alchemytower
-		case 0x1B:
-		// watermill
-		case 0x53:
-		case 0x5A:
-		case 0x62:
-		case 0x69:
-		// fire in wagoncamp
-		case 0x81:
-		// smoke smithy (2 chimney)
-		case 0xA6:
-		// smoke smithy (1 chimney)
-		case 0xAD:
-		// shadow smoke
-		case 0xB4:
-		// magic garden
-		case 0xBE:
-
-		    return index + (frame % 6) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNMULT:
-
-	    switch(index)
-	    {
-		// smoke
-		case 0x05:
-		// shadow
-		case 0x0F:
-		case 0x19:
-		    return index + (frame % 9) + 1;
-
-		// smoke
-		case 0x24:
-		// shadow
-		case 0x2D:
-		    return index + (frame % 8) + 1;
-
-		// smoke
-		case 0x5A:
-		// shadow
-		case 0x61:
-		case 0x68:
-		case 0x7C:
-		// campfire
-		case 0x83:
-		    return index + (frame % 6) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNSNOW:
-
-	    switch(index)
-	    {
-		// firecamp
-		case 0x04:
-		// alchemytower
-		case 0x97:
-		// watermill
-		case 0xA2:
-		case 0xA9:
-		case 0xB1:
-		case 0xB8:
-		    return index + (frame % 6) + 1;
-
-		// mill
-		case 0x60:
-		case 0x64:
-		case 0x68:
-		case 0x6C:
-		case 0x70:
-		case 0x74:
-		case 0x78:
-		case 0x7C:
-		case 0x80:
-		case 0x84:
-		    return index + (frame % 3) + 1;
-
-		default:
-		    return 0;
-	    }
-	    break;
-
-	case ICN::OBJNSWMP:
-
-	    switch(index)
-	    {
-		// shadow
-		case 0x00:
-		case 0x0E:
-		case 0x2B:
-		// smoke
-		case 0x07:
-		case 0x22:
-		case 0x33:
-		// light in window
-		case 0x16:
-		case 0x3A:
-		case 0x43:
-		case 0x4A:
-		    return index + (frame % 6) + 1;
-    
-		default:
-		    return 0;
-	    }
-	    break;
-
-	// extra objects for loyalty version
-	case ICN::X_LOC1:
-
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
-		switch(index)
-		{
-		    // alchemist tower
-		    case 0x04:
-	    	    case 0x0D:
-		    case 0x16:
-		    // arena
-		    case 0x1F:
-		    case 0x28:
-		    case 0x32:
-		    case 0x3B:
-		    // earth altar
-		    case 0x55:
-		    case 0x5E:
-		    case 0x67:
-			return index + (frame % 8) + 1;
-
-		    default:
-			return 0;
-		}
-	    break;
-
-	// extra objects for loyalty version
-	case ICN::X_LOC2:
-
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
-		switch(index)
-		{
-		    // mermaid
-		    case 0x0A:
-		    case 0x13:
-		    case 0x1C:
-		    case 0x25:
-		    // sirens
-		    case 0x2F:
-		    case 0x38:
-		    case 0x41:
-		    case 0x4A:
-		    case 0x53:
-		    case 0x5C:
-		    case 0x66:
-		        return index + (frame % 8) + 1;
-
-		    default:
-			return 0;
-		}
-	    break;
-
-	// extra objects for loyalty version
-	case ICN::X_LOC3:
-
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
-		switch(index)
-	        {
-		    // hut magi
-		    case 0x00:
-		    case 0x0A:
-		    case 0x14:
-		    // eye magi
-		    case 0x20:
-		    case 0x29:
-		    case 0x32:
-		        return index + (frame % 8) + 1;
-
-		    // barrier
-		    case 0x3C:
-		    case 0x42:
-		    case 0x48:
-		    case 0x4E:
-		    case 0x54:
-		    case 0x5A:
-		    case 0x60:
-		    case 0x66:
-		        return index + (frame % 4) + 1;
-
-		    default:
-			return 0;
-		}
-	    break;
-
-	default:
-	    break;
+	    default: break;
+	}
     }
 
-    return 0;
+    return false;
 }
+
+

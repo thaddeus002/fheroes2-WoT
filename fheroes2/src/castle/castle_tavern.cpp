@@ -20,7 +20,6 @@
 
 #include <string>
 #include "agg.h"
-#include "animation.h"
 #include "localevent.h"
 #include "button.h"
 #include "world.h"
@@ -60,10 +59,17 @@ void Castle::OpenTavern(void)
     dst_pt.y = pos.y + 30;
     display.Blit(s1, dst_pt);
 
-    const Sprite & s2 = AGG::GetICN(tavwin, 1);
     dst_pt.x += 3;
     dst_pt.y += 3;
-    display.Blit(s2, dst_pt);
+
+    const Sprite & s20 = AGG::GetICN(tavwin, 1);
+    display.Blit(s20, dst_pt);
+
+    if(const u16 index = ICN::AnimationFrame(tavwin, 0))
+    {
+	const Sprite & s21 = AGG::GetICN(tavwin, index);
+	display.Blit(s21, dst_pt.x + s21.x(), dst_pt.y + s21.y());
+    }
 
     Rect rt(pos.x, dst_pt.y + s1.h() + 10, pos.w, pos.h);
     TextBox(header, Font::BIG, rt);
@@ -71,18 +77,9 @@ void Castle::OpenTavern(void)
     rt.y += 60;
     TextBox(message, Font::BIG, rt);
 
-    Animation animeBeer(dst_pt, tavwin, 2, 20, false, Animation::INFINITY | Animation::RING | Animation::LOW);
-
-    const Sprite & s3 = animeBeer.GetFirstSprite();
-    dst_pt.x += s3.x();
-    dst_pt.y += s3.y();
-    display.Blit(s3, dst_pt);
-
     // button yes
     const Sprite & s4 = AGG::GetICN(system, 5);
-    dst_pt.x = pos.x + (pos.w - s4.w()) / 2;
-    dst_pt.y = pos.y + pos.h + BUTTON_HEIGHT - s4.h();
-    Button buttonYes(dst_pt, system, 5, 6);
+    Button buttonYes(pos.x + (pos.w - s4.w()) / 2, pos.y + pos.h + BUTTON_HEIGHT - s4.h(), system, 5, 6);
 
     buttonYes.Draw();
 
@@ -91,6 +88,7 @@ void Castle::OpenTavern(void)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    u32 speed = 0;
     u32 ticket = 0;
 
     // message loop
@@ -102,8 +100,22 @@ void Castle::OpenTavern(void)
 
 
         // animation
-	if(animeBeer.DrawSprite(ticket)) display.Flip();
+	if(0 == (speed % ANIMATION_LOW))
+	{
+	    cursor.Hide();
 
-	++ticket;
+	    display.Blit(s20, dst_pt);
+
+	    if(const u16 index = ICN::AnimationFrame(tavwin, 0, ticket++))
+	    {
+		const Sprite & s22 = AGG::GetICN(tavwin, index);
+		display.Blit(s22, dst_pt.x + s22.x(), dst_pt.y + s22.y());
+	    }
+
+	    cursor.Show();
+	    display.Flip();
+	}
+
+	++speed;
     }
 }

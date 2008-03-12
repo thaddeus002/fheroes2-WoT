@@ -102,9 +102,12 @@ namespace Maps
 	void AddonsSort(void);
 	void Remove(u32 uniq);
 
+	void FixAnimation(void);
+
 	void DebugInfo(u16 index = 0xFFFF) const;
 
     private:
+	void RedrawBoat(u16 dx, u16 dy) const;
 	void RedrawHeroes(u16 dx, u16 dy) const;
 	void RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const;
 
@@ -120,6 +123,8 @@ namespace Maps
         std::list<TilesAddon> addons_level2;
 
         const Sprite *path_sprite;
+        
+        bool	animation;
     };
 };
 
