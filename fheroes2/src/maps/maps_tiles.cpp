@@ -38,12 +38,12 @@
 
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(GROUND), uniq(gid), object(obj), index(ii)
 {
-    switch(lv)
+    switch(lv % 4)
     {
-	case GROUND:	level = GROUND;	break;
-	case DOWN:	level = DOWN;	break;
-	case SHADOW:	level = SHADOW;	break;
-	case UPPER:	level = UPPER;	break;
+	case 0:	level = GROUND;	break;
+	case 1:	level = DOWN;	break;
+	case 2:	level = SHADOW;	break;
+	case 3:	level = UPPER;	break;
     }
 }
 
@@ -60,9 +60,14 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
     return *this;
 }
 
-bool Maps::TilesAddon::PredicateSortRules(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
+bool Maps::TilesAddon::PredicateSortRules1(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
 {
     return ta1.GetLevel() > ta2.GetLevel();
+}
+
+bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
+{
+    return ta1.GetLevel() < ta2.GetLevel();
 }
 
 u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
@@ -102,7 +107,10 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
 		    77 == ta.index ? Direction::TOP | Direction::BOTTOM : 0);
 
 	// from sprite road
+	case 0x78:
+	case 0x79:
 	case 0x7A:
+	case 0x7B:
 	    if(0  == ta.index ||
 	       4  == ta.index ||
 	       5  == ta.index ||
@@ -178,9 +186,9 @@ void Maps::Tiles::AddonsPushLevel2(const MP2::mp2addon_t & ma)
 
 void Maps::Tiles::AddonsSort(void)
 {
-    if(addons_level1.size()) addons_level1.sort(Maps::TilesAddon::PredicateSortRules);
+    if(addons_level1.size()) addons_level1.sort(Maps::TilesAddon::PredicateSortRules1);
 
-    if(addons_level2.size()) addons_level2.sort(Maps::TilesAddon::PredicateSortRules);
+    if(addons_level2.size()) addons_level2.sort(Maps::TilesAddon::PredicateSortRules2);
 }
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
@@ -267,9 +275,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		// possible anime
-		if(animation)
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, anime_frame))
 		{
-		    const Sprite & anime_sprite = AGG::GetICN(icn, ICN::AnimationFrame(icn, index, anime_frame));
+		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
@@ -315,9 +323,9 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 		display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		// possible anime
-		if(animation)
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, anime_frame))
 		{
-		    const Sprite & anime_sprite = AGG::GetICN(icn, ICN::AnimationFrame(icn, index, anime_frame));
+		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
@@ -397,7 +405,7 @@ void Maps::Tiles::FixAnimation(void)
 	    if(ICN::UNKNOWN != icn && ICN::AnimationFrame(icn, index))
 	    {
 		animation = true;
-		
+
 		break;
 	    }
 	}
@@ -593,6 +601,12 @@ void Maps::Tiles::DebugInfo(u16 index) const
 	    String::AddInt(value, addon.GetUniq());
     
 	    std::cout << "uniq            : " << value << std::endl;
+
+	    value.clear();
+    
+	    String::AddInt(value, addon.GetLevel());
+    
+	    std::cout << "level           : " << value << std::endl;
 	}
     }
 
@@ -624,6 +638,12 @@ void Maps::Tiles::DebugInfo(u16 index) const
 	    String::AddInt(value, addon.GetUniq());
     
 	    std::cout << "uniq            : " << value << std::endl;
+
+	    value.clear();
+    
+	    String::AddInt(value, addon.GetLevel());
+    
+	    std::cout << "level           : " << value << std::endl;
 	}
     }
 

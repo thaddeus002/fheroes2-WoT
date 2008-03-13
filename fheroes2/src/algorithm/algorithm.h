@@ -25,7 +25,7 @@
 
 namespace Algorithm
 {
-    u16 PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<u16> & result);
+    u16 PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<Route::Step> & result);
 
 };
 

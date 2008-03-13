@@ -26,29 +26,41 @@
 
 class Heroes;
 
-class Route : public std::list<u16>
+namespace Route
 {
-    public:
-	Route(const Heroes & h);
+    struct Step
+    {
+	Step() : to_index(MAXU16), penalty(MAXU16) {};
+	Step(const u16 t, const u16 p) : to_index(t), penalty(p) {};
 
-	void	DestinationIndex(u16 index){ dst = index; };
-	u16	GetDestinationIndex(void) const{ return dst; };
+	const u16 to_index;
+	const u16 penalty;
+    };
 
-	u16	Calculate(u16 dst_index);
+    class Path : public std::list<Step>
+    {
+	public:
+	    Path(const Heroes & h);
 
-	void	Show(void) const;
-	void	Hide(void) const;
-	void	Reset(void);
+	    void	DestinationIndex(u16 index){ dst = index; };
+	    u16		GetDestinationIndex(void) const{ return dst; };
 
-	u16	NextToLast(void) const;
+	    u16		Calculate(u16 dst_index);
 
-    private:
-	static const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
-	void	Dump(void) const;
+	    void	Show(void) const;
+	    void	Hide(void) const;
+	    void	Reset(void);
 
-    private:
-	const Heroes & hero;
-	u16	dst;
+	    u16		NextToLast(void) const;
+
+	private:
+	    static const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
+	    void	Dump(void) const;
+
+	private:
+	    const Heroes & hero;
+	    u16		dst;
+    };
 };
 
 #endif

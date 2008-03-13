@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include <cmath>
 #include <algorithm>
 #include "artifact.h"
 #include "world.h"
@@ -436,8 +437,9 @@ bool Heroes::operator== (const Heroes & h) const
 u8 Heroes::GetMobilityIndexSprite(void) const
 {
     // valid range (0 - 25)
+    const double floor = std::floor(move_point / 100);
 
-    return 25 >= move_point ? static_cast<u8>(move_point) : 25;
+    return 25 >= floor ? static_cast<u8>(floor) : 25;
 }
 
 u8 Heroes::GetManaIndexSprite(void) const
@@ -650,9 +652,51 @@ u16 Heroes::GetMaxSpellPoints(void) const
 
 u16 Heroes::GetMaxMovePoints(void) const
 {
-    // use Logistics
+    u16 point = DEFAULT_MOVE_POINTS * 100;
 
-    return 10;		// FIXME: calculate move points
+    // skill logistics
+    switch(GetLevelSkill(Skill::LOGISTICS))
+    {
+	// bonus: 10%
+	case Skill::Level::BASIC:       point += (point * 10) / 100; break;
+        // bonus: 20%
+        case Skill::Level::ADVANCED:    point += (point * 20) / 100; break;
+        // bonus: 30%
+        case Skill::Level::EXPERT:      point += (point * 30) / 100; break;
+
+        default: break;
+    }
+
+    if(isShipMaster())
+    {
+	switch(GetLevelSkill(Skill::NAVIGATION))
+	{
+	    // bonus: 1/3
+	    case Skill::Level::BASIC:       point += point / 3; break;
+    	    // bonus: 2/3
+    	    case Skill::Level::ADVANCED:    point += (point * 2) / 3; break;
+    	    // bonus: double
+    	    case Skill::Level::EXPERT:      point *= 2; break;
+
+    	    default: break;
+	}
+
+        // artifact bonus: FIXME: SAILORS_ASTROLABE_MOBILITY 20% ?
+        if(HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY)) point += (point * 20) / 100;
+    }
+    else
+    {
+        // artifact bonus: FIXME: NOMAD_BOOTS_MOBILITY 20% ?
+	if(HasArtifact(Artifact::NOMAD_BOOTS_MOBILITY)) point += (point * 20) / 100;
+
+        // artifact bonus: FIXME: TRAVELER_BOOTS_MOBILITY 20% ?
+	if(HasArtifact(Artifact::TRAVELER_BOOTS_MOBILITY)) point += (point * 20) / 100;
+    }
+
+    // artifact bonus: FIXME: TRUE_COMPASS_MOBILITY 20% ?
+    if(HasArtifact(Artifact::TRUE_COMPASS_MOBILITY)) point += (point * 20) / 100;
+
+    return point;
 }
 
 Morale::morale_t Heroes::GetMorale(void) const
@@ -874,7 +918,6 @@ void Heroes::Recruit(const Castle & castle)
 void Heroes::ActionNewDay(void)
 {
     move_point = GetMaxMovePoints();
-    path.Reset();
 
     // remove day visit object
     std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isDayLife);
@@ -1037,6 +1080,11 @@ void Heroes::StopMove(void)
     move = false;
 }
 
+void Heroes::StartMove(void)
+{
+    move = true;
+}
+
 /* return true is need move */
 bool Heroes::isNeedMove(void) const
 {
@@ -1046,10 +1094,11 @@ bool Heroes::isNeedMove(void) const
 /* draw move to next cell */
 void Heroes::Move(void)
 {
-    if(path.empty()) return;
+    if(path.empty() || !move) return;
 
+    const Route::Step & step = path.front();
     const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    const u16 index_to = path.front();
+    const u16 index_to = step.to_index;
     const Direction::vector_t direction2 = Direction::Get(index_from, index_to);
 
     bool action = false;
@@ -1064,6 +1113,13 @@ void Heroes::Move(void)
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
+    // move point deficiency
+    if(move_point < step.penalty)
+    {
+	move = false;
+	
+	return;
+    }
 
     // redraw top cell
     if(Maps::isValidDirection(index_from, Direction::TOP))
@@ -1127,6 +1183,8 @@ void Heroes::Move(void)
 	mp.x = index_to % world.w();
 	mp.y = index_to / world.w();
 
+	move_point -= step.penalty;
+
 	path.Hide();
 	path.pop_front();
 	path.size() && path.GetDestinationIndex() != index_to ? path.Show() : path.Reset();
@@ -1150,6 +1208,7 @@ void Heroes::Move(void)
 	    tiles_from.SetObject(MP2::OBJ_BOAT);
 	    tiles_from.Redraw();
 	}
+
     }
     cursor.Show();
     display.Flip();

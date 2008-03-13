@@ -154,6 +154,16 @@ void Kingdom::ActionNewDay(void)
 		    default: break;
 		}
 	    }
+	    
+	    // estates skill bonus
+	    switch(heroes.GetLevelSkill(Skill::ESTATES))
+	    {
+		case Skill::Level::BASIC:	resource.gold += 100; break;
+		case Skill::Level::ADVANCED:	resource.gold += 250; break;
+		case Skill::Level::EXPERT:	resource.gold += 500; break;
+
+		default: break;
+	    }
 	}
     }
 }

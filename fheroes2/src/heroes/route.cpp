@@ -30,13 +30,13 @@
 #include "route.h"
 
 /* construct */
-Route::Route(const Heroes & h)
+Route::Path::Path(const Heroes & h)
     : hero(h), dst(Maps::GetIndexFromAbsPoint(h.GetCenter()))
 {
 }
 
 /* return length path */
-u16 Route::Calculate(u16 dst_index)
+u16 Route::Path::Calculate(u16 dst_index)
 {
     clear();
 
@@ -47,74 +47,75 @@ u16 Route::Calculate(u16 dst_index)
     return size();
 }
 
-void Route::Show(void) const
+void Route::Path::Show(void) const
 {
     if(empty()) return;
 
     u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
-    std::list<u16>::const_iterator it1 = begin();
-    std::list<u16>::const_iterator it2 = end();
-    std::list<u16>::const_iterator it3 = it1;
+    std::list<Step>::const_iterator it1 = begin();
+    std::list<Step>::const_iterator it2 = end();
+    std::list<Step>::const_iterator it3 = it1;
 
     for(; it1 != it2; ++it1)
     {
-	Maps::Tiles & tile = world.GetTiles(*it1);
+	Maps::Tiles & tile = world.GetTiles((*it1).to_index);
 
 	++it3;
 
 	if(it3 != it2)
-	    tile.AddPathSprite(& GetSprite(Direction::Get(from, *it1), Direction::Get(*it1, *it3)));
+	    tile.AddPathSprite(& GetSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index)));
 	else
 	    tile.AddPathSprite(& AGG::GetICN(ICN::ROUTE, 0));
 	    
 	tile.Redraw();
 
-	from = *it1;
+	from = (*it1).to_index;
     }
 
     if(H2Config::Debug()) Dump();
 }
 
-void Route::Dump(void) const
+void Route::Path::Dump(void) const
 {
-    if(H2Config::Debug()) Error::Verbose("route start index: ", Maps::GetIndexFromAbsPoint(hero.GetCenter()));
+    if(H2Config::Debug()) Error::Verbose("Route::Path: move point: ", hero.GetMovePoints());
+    if(H2Config::Debug()) Error::Verbose("Route::Path: start index: ", Maps::GetIndexFromAbsPoint(hero.GetCenter()));
 
-    std::list<u16>::const_iterator it1 = begin();
-    std::list<u16>::const_iterator it2 = end();
+    std::list<Step>::const_iterator it1 = begin();
+    std::list<Step>::const_iterator it2 = end();
 
     u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
     // dump route
     for(; it1 != it2; ++it1)
     {
-	if(H2Config::Debug()) Error::Verbose("route: " + Direction::String(Direction::Get(from, *it1)));
+	if(H2Config::Debug()) Error::Verbose("Route::Path: " + Direction::String(Direction::Get(from, (*it1).to_index)) + ", penalty: ", (*it1).penalty);
 
-	from = *it1;
+	from = (*it1).to_index;
     }
 
-    if(H2Config::Debug()) Error::Verbose("route end index: ", dst);
-    if(H2Config::Debug()) Error::Verbose("route size: ", size());
+    if(H2Config::Debug()) Error::Verbose("Route::Path: end index: ", dst);
+    if(H2Config::Debug()) Error::Verbose("Route::Path: size: ", size());
 }
 
-void Route::Hide(void) const
+void Route::Path::Hide(void) const
 {
     if(empty()) return;
 
     // redraw tiles
-    std::list<u16>::const_iterator it1 = begin();
-    std::list<u16>::const_iterator it2 = end();
+    std::list<Step>::const_iterator it1 = begin();
+    std::list<Step>::const_iterator it2 = end();
 
     for(; it1 != it2; ++it1)
     {
-	Maps::Tiles & tile = world.GetTiles(*it1);
+	Maps::Tiles & tile = world.GetTiles((*it1).to_index);
 
 	tile.DelPathSprite();
 	tile.Redraw();
     }
 }
 
-void Route::Reset(void)
+void Route::Path::Reset(void)
 {
     Hide();
 
@@ -123,7 +124,7 @@ void Route::Reset(void)
     clear();
 }
 
-const Sprite & Route::GetSprite(const Direction::vector_t & from, const Direction::vector_t & to)
+const Sprite & Route::Path::GetSprite(const Direction::vector_t & from, const Direction::vector_t & to)
 {
     // start index 1, 25, 49, 73, 97, 121 (size arrow path)
     u16 index = 1;
@@ -233,7 +234,7 @@ const Sprite & Route::GetSprite(const Direction::vector_t & from, const Directio
 }
 
 /* get next to last path element */
-u16 Route::NextToLast(void) const
+u16 Route::Path::NextToLast(void) const
 {
     if(2 > size())
     {
@@ -242,7 +243,7 @@ u16 Route::NextToLast(void) const
 	return 0;
     }
 
-    std::list<u16>::const_reverse_iterator it = rbegin();
+    std::list<Step>::const_reverse_iterator it = rbegin();
 
-    return *(++it);
+    return (*(++it)).to_index;
 }

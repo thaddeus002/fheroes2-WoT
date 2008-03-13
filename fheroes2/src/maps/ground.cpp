@@ -70,7 +70,7 @@ u16 Maps::Ground::GetPenalty(u16 from, u16 to, const Skill::Level::type_t & path
 
     if(tile_to.isRoad(direct))
     {
-    	result = 50;
+    	return 75;
     }
     else
     switch(tile_to.GetGround())
@@ -112,7 +112,7 @@ u16 Maps::Ground::GetPenalty(u16 from, u16 to, const Skill::Level::type_t & path
         case Direction::TOP_RIGHT:
         case Direction::BOTTOM_RIGHT:
         case Direction::BOTTOM_LEFT:
-        case Direction::TOP_LEFT:			result = static_cast<u16>(1.5 * result); break;
+        case Direction::TOP_LEFT:			result = static_cast<u16>(1.44 * result); break;
     	
     	default: break;
      }

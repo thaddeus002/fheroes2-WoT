@@ -702,7 +702,7 @@ Game::menu_t Game::StartGame(void)
 			    {
 				FocusToHeroes(hero, areaMaps, radar);
 
-				const Route & path = global_focus.GetHeroes().GetPath();
+				const Route::Path & path = global_focus.GetHeroes().GetPath();
 				if(path.size())
 				{
 				    cursor.Hide();
@@ -812,6 +812,9 @@ Game::menu_t Game::StartGame(void)
 	    // click Continue Movement
 	    if(le.MouseClickLeft(buttonMovement))
 	    {
+    		if(Game::Focus::HEROES == global_focus.Type() &&
+    		    global_focus.GetHeroes().isNeedMove())
+    		    global_focus.GetHeroes().isEnableMove() ? global_focus.GetHeroes().StopMove() : global_focus.GetHeroes().StartMove();
 	    }
 	    else
 	    // click Kingdom Summary
@@ -838,8 +841,9 @@ Game::menu_t Game::StartGame(void)
 
 		statusWindow.SetState(Game::StatusWindow::DAY);
 		statusWindow.Redraw();
-	    
+
 		selectCastles.Redraw();
+		selectHeroes.Redraw();
 
 		cursor.Show();
 		display.Flip();
@@ -926,14 +930,13 @@ Game::menu_t Game::StartGame(void)
     	    {
     		global_focus.GetHeroes().Move();
 
-		// center area map to hero
-		/*
 		cursor.Hide();
-		areaMaps.Center(global_focus.Center());
-		radar.RedrawCursor();
+		selectHeroes.Redraw();
+		// center area map to hero
+		// areaMaps.Center(global_focus.Center());
+		// radar.RedrawCursor();
 		cursor.Show();
 		display.Flip();
-		*/
 	    }
 
         // animation

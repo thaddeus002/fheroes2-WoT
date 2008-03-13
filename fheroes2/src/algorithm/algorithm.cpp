@@ -41,7 +41,7 @@ struct cellinfo_t
 };
 
 // find path (A* implementation) - is valid return length path
-u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<u16> & result)
+u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<Route::Step> & result)
 {
     const u16 width = world.w();
     
@@ -106,11 +106,14 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 
 	// check min from current
         for(; im1 != im2; ++im1)
+        {
+    	    const u16 cost_g = work_map[index_i].cost_g + Maps::Ground::GetPenalty(index_i, (*im1).first, pathfinding);
+
     	    if((*im1).second.open_list &&
     		Direction::UNKNOWN != Direction::Get(index_i, (*im1).first) &&
-    		(*im1).second.cost_g > work_map[index_i].cost_g + Maps::Ground::GetPenalty(index_i, (*im1).first, pathfinding))
+    		(*im1).second.cost_g > cost_g)
     	    {
-    		(*im1).second.cost_g = work_map[index_i].cost_g + Maps::Ground::GetPenalty(index_i, (*im1).first, pathfinding);
+    		(*im1).second.cost_g = cost_g;
     		(*im1).second.parent = index_i;
 
 		if(H2Config::Debug())
@@ -122,7 +125,7 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 		    Error::Verbose(value);
     		}
 	    }
-
+	}
 
 	// dump open list
 	im1 = work_map.begin();
@@ -199,7 +202,7 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 	while(index_i != index1)
 	{
 	    // push_front
-	    result.push_front(index_i);
+	    result.push_front(Route::Step(index_i, work_map[index_i].cost_g));
 
 	    index_i = work_map[index_i].parent;
 	}

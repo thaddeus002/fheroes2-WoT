@@ -45,6 +45,8 @@
 #define HEROESMAXARMY		5
 #define HEROESMAXCOUNT		71
 
+#define DEFAULT_MOVE_POINTS	11
+
 /*
 #define SCOUTINGBASE		4
 */
@@ -153,7 +155,7 @@ public:
     bool BuySpellBook(void);
     void AppendSpellsToBook(const Spell::Storage & spells);
 
-    const Route & GetPath(void) const{ return path; };
+    const Route::Path & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
     
     Direction::vector_t GetDirection(void) const{ return direction; };
@@ -165,6 +167,7 @@ public:
 
     bool isEnableMove(void) const;
     void StopMove(void);
+    void StartMove(void);
     bool isNeedMove(void) const;
     void Move(void);
     void ShowPathOrStartMove(const u16 dst_index);
@@ -207,7 +210,7 @@ private:
     MP2::object_t	save_maps_general;
 
     Point		mp;
-    Route		path;
+    Route::Path		path;
 
     Direction::vector_t direction;
 

@@ -63,9 +63,9 @@ typedef uint32_t	u32;
 #define SWAP32(X)    X=SDL_Swap32(X)
 
 // slow implementation uint16_t = *(uint8_t *)
-#define LOAD16(p, b)	b=(((uint16_t)(((b) & 0) | *((uint8_t *)p)) << 8) | *(((uint8_t *)p) + 1))
+#define LOAD16(p, b)	b=(((uint16_t)(((b) & 0) | *(((uint8_t *)p) + 1)) << 8) | *(((uint8_t *)p)))
 // slow implementation uint32_t = *(uint8_t *)
-#define LOAD32(p, b)	b=(((((((uint32_t)(((b) & 0) | *((uint8_t *)p)) << 8) | *(((uint8_t *)p) + 1)) << 8) | *(((uint8_t *)p) + 2)) << 8) | *(((uint8_t *)p) + 3))
+#define LOAD32(p, b)	b=(((((((uint32_t)(((b) & 0) | *(((uint8_t *)p) + 3)) << 8) | *(((uint8_t *)p) + 2)) << 8) | *(((uint8_t *)p) + 1)) << 8) | *((uint8_t *)p))
 
 #else
 
@@ -85,10 +85,11 @@ typedef uint32_t	u32;
 #define SWAP16(X) ;
 #define SWAP32(X) ;
 
-// slow implementation uint16_t = *(uint8_t *)
-#define LOAD16(p, b)	b=(((uint16_t)(((b) & 0) | *(((uint8_t *)p) + 1)) << 8) | *(((uint8_t *)p)))
-// slow implementation uint32_t = *(uint8_t *)
-#define LOAD32(p, b)	b=(((((((uint32_t)(((b) & 0) | *(((uint8_t *)p) + 3)) << 8) | *(((uint8_t *)p) + 2)) << 8) | *(((uint8_t *)p) + 1)) << 8) | *((uint8_t *)p))
+// implementation uint16_t = *(uint8_t *)
+#define LOAD16(p, b)	b=(*(uint16_t *)(p))
+
+// implementation uint32_t = *(uint8_t *)
+#define LOAD32(p, b)	b=(*(uint32_t *)(p))
 
 #endif
 
