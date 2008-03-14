@@ -51,23 +51,34 @@ void Route::Path::Show(void) const
 {
     if(empty()) return;
 
+    // path only human players
+    if(hero.GetColor() != H2Config::MyColor()) return;
+
     u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
     std::list<Step>::const_iterator it1 = begin();
     std::list<Step>::const_iterator it2 = end();
     std::list<Step>::const_iterator it3 = it1;
 
+    u16 move_point = hero.GetMovePoints();
+
+    bool red_sprite = move_point ? false : true;
+
     for(; it1 != it2; ++it1)
     {
 	Maps::Tiles & tile = world.GetTiles((*it1).to_index);
 
-	++it3;
+	u16 index = 0;
 
-	if(it3 != it2)
-	    tile.AddPathSprite(& GetSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index)));
-	else
-	    tile.AddPathSprite(& AGG::GetICN(ICN::ROUTE, 0));
-	    
+	if(!red_sprite)
+	{
+	    if(move_point >= (*it1).penalty)	move_point -= (*it1).penalty;
+	    else	red_sprite = true;
+	}
+
+	if(++it3 != it2) index = GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index));
+
+	tile.AddPathSprite(& AGG::GetICN(red_sprite ? ICN::ROUTERED : ICN::ROUTE, index));
 	tile.Redraw();
 
 	from = (*it1).to_index;
@@ -102,6 +113,9 @@ void Route::Path::Hide(void) const
 {
     if(empty()) return;
 
+    // path only human players
+    if(hero.GetColor() != H2Config::MyColor()) return;
+
     // redraw tiles
     std::list<Step>::const_iterator it1 = begin();
     std::list<Step>::const_iterator it2 = end();
@@ -124,7 +138,7 @@ void Route::Path::Reset(void)
     clear();
 }
 
-const Sprite & Route::Path::GetSprite(const Direction::vector_t & from, const Direction::vector_t & to)
+u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to)
 {
     // start index 1, 25, 49, 73, 97, 121 (size arrow path)
     u16 index = 1;
@@ -230,7 +244,7 @@ const Sprite & Route::Path::GetSprite(const Direction::vector_t & from, const Di
 	default: 		   	        index  =  0; break;
     }
 
-    return AGG::GetICN(ICN::ROUTE, index);
+    return index;
 }
 
 /* get next to last path element */

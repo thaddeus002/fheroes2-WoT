@@ -408,13 +408,16 @@ Game::menu_t Game::StartGame(void)
     			    {
 			        const Heroes * to_hero = world.GetHeroes(index_maps);
 
-			        if(NULL != to_hero &&
-					from_hero.GetColor() == to_hero->GetColor() &&
-					from_hero.GetCenter() == to_hero->GetCenter())
-				{
-				    OpenHeroes(&from_hero, areaMaps, radar);
-				    statusWindow.Redraw();
-				    display.Flip();
+			        if(NULL != to_hero)
+			        {
+			    	    if(from_hero.GetCenter() == to_hero->GetCenter())
+				    {
+					OpenHeroes(&from_hero, areaMaps, radar);
+					statusWindow.Redraw();
+					display.Flip();
+				    }
+				    else
+					from_hero.ShowPathOrStartMove(index_maps);
     				}
     			    }
     			    break;
@@ -844,6 +847,12 @@ Game::menu_t Game::StartGame(void)
 
 		selectCastles.Redraw();
 		selectHeroes.Redraw();
+
+    		if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().size())
+    		{
+    		    global_focus.GetHeroes().GetPath().Hide();
+    		    global_focus.GetHeroes().GetPath().Show();
+		}
 
 		cursor.Show();
 		display.Flip();

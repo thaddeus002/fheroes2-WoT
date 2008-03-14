@@ -124,7 +124,7 @@ namespace AGG
     const std::vector<u8> & GetWAV(const M82::m82_t m82);
 
     // wrapper AGG::GetColor
-    u32 GetColor(const u16 index);
+    u32 GetColor(const u16 index, const u8 flag = 0);
 
     const Sprite & GetLetter(char ch, Font::type_t ft);
     

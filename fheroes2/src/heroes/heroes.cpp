@@ -1121,6 +1121,8 @@ void Heroes::Move(void)
 	return;
     }
 
+    cursor.Hide();
+
     // redraw top cell
     if(Maps::isValidDirection(index_from, Direction::TOP))
 	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP)).Redraw();
@@ -1130,8 +1132,6 @@ void Heroes::Move(void)
     // redraw top right cell (for flag)
     if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
 	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
-
-    cursor.Hide();
 
     // change through the circle
     if(direction != direction2)

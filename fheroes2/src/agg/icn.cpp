@@ -886,6 +886,8 @@ namespace ICN
 	{ YINYANG,	"YINYANG.ICN" },
 	{ ZOMBIE2,	"ZOMBIE2.ICN" },
 	{ ZOMBIE,	"ZOMBIE.ICN" },
+	{ ROUTERED,	"ROUTE.ICN" },
+	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
 };
 

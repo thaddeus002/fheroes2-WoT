@@ -892,6 +892,9 @@ namespace ICN
 	ZOMBIE2,
 	ZOMBIE,
 	
+	// system
+	ROUTERED,
+
 	UNKNOWN
 
     } icn_t;

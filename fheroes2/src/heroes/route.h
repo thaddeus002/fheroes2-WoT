@@ -54,7 +54,7 @@ namespace Route
 	    u16		NextToLast(void) const;
 
 	private:
-	    static const Sprite & GetSprite(const Direction::vector_t & from, const Direction::vector_t & to);
+	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to);
 	    void	Dump(void) const;
 
 	private:

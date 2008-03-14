@@ -304,7 +304,19 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 
 		    const u32 size_data = (ii + 1 != count_sprite ? icn_headers[ii + 1].OffsetData() - header.OffsetData() : total_size - header.OffsetData());
 
-		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data, reflect);
+		    u8 flag = 0;
+		    
+		    if(reflect) flag |= Sprite::REFLECT;
+
+		    // system
+		    switch(icn)
+		    {
+			case ICN::ROUTERED:	flag |= Sprite::GREEN2RED; break;
+
+			default: break;
+		    }
+
+		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data, flag);
 		}
 
 		return;
@@ -312,6 +324,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 
 	Error::Warning("AGG::Cache::LoadICN: not found: " + ICN::GetString(icn));
     }
+
 }
 
 /* load TIL object to AGG::Cache */
@@ -613,8 +626,12 @@ const std::vector<u8> & AGG::GetWAV(const M82::m82_t m82)
 }
 
 // wrapper AGG::GetColor
-u32 AGG::GetColor(const u16 index)
+u32 AGG::GetColor(const u16 index, const u8 flag)
 {
+    if(Sprite::GREEN2RED & flag) return AGG::Cache::Get().GetPAL().Color(index + 0x5C);
+    else
+    if(Sprite::WHITE2YELLOW & flag) return AGG::Cache::Get().GetPAL().Color(index + 0xC0);
+    else
     return AGG::Cache::Get().GetPAL().Color(index);
 }
 
