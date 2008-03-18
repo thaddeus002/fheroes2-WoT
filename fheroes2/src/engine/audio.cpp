@@ -140,12 +140,24 @@ const Audio::Spec & Audio::Mixer::HardwareSpec(void) const
 
 bool Audio::Mixer::PredicateIsFreeSound(const mixer_t & header)
 {
-    return !header.active || (!header.loop && header.length == header.position);
+    return !(header.state & PLAY) || (!(header.state & LOOP) && header.length == header.position);
 }
 
 void Audio::Mixer::PredicateStopSound(mixer_t & header)
 {
-    header.active = false;
+    header.state &= ~PLAY;
+}
+
+void Audio::Mixer::PredicateReduceSound(mixer_t & header)
+{
+    header.state &= ~ENHANCE;
+    header.state |= REDUCE;
+}
+
+void Audio::Mixer::PredicateEnhanceSound(mixer_t & header)
+{
+    header.state &= ~REDUCE;
+    header.state |= ENHANCE;
 }
 
 void Audio::Mixer::CallBack(void *unused, u8 *stream, int size)
@@ -157,18 +169,40 @@ void Audio::Mixer::CallBack(void *unused, u8 *stream, int size)
     for(u8 ii = 0; ii < sounds.size(); ++ii)
     {
 	mixer_t & header = sounds[ii];
-	
-        if(header.active)
+
+        if(header.volume1 && header.state & PLAY)
         {
     	    amount = header.length - header.position;
 
 	    if(amount > size) amount = size;
 
-    	    SDL_MixAudio(stream, &header.data[header.position], amount, header.volume);
+    	    if(header.state & REDUCE)
+    	    {
+    		if(10 < header.volume2)
+    		    header.volume2 -= 10;
+    		else
+    		{
+    		    header.volume2 = 0;
+    		    header.state &= ~REDUCE;
+		}
+	    }
+	    else
+    	    if(header.state & ENHANCE)
+    	    {
+    		if(header.volume1 > header.volume2 + 10)
+    		    header.volume2 += 10;
+    		else
+    		{
+    		    header.volume2 = header.volume1;
+    		    header.state &= ~ENHANCE;
+    		}
+    	    }
+
+    	    SDL_MixAudio(stream, &header.data[header.position], amount, header.volume2);
 
     	    header.position += amount;
     	    
-    	    if(header.loop && header.length - amount <= header.position) header.position = 0;
+    	    if((header.state & LOOP) && header.length - amount <= header.position) header.position = 0;
 	}
     }
 }
@@ -177,15 +211,11 @@ void Audio::Mixer::Clear(void)
 {
     if(! valid) return;
 
-    SDL_PauseAudio(1);
-
     std::for_each(sounds.begin(), sounds.end(), PredicateStopSound);
-
-    SDL_PauseAudio(0);
 }
 
 /* play sound, volume MIX_MAXVOLUME */
-void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, bool loop)
+void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, const u8 state)
 {
     if(! valid || body.empty()) return;
 
@@ -219,16 +249,34 @@ void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, bool loop
 
     SDL_LockAudio();
 
-    if(mixer.data != data || !loop)
+    mixer.state = state;
+    mixer.state |= PLAY;
+
+    mixer.volume1 = MIX_MAXVOLUME < volume ? MIX_MAXVOLUME : volume;
+    mixer.volume2 = mixer.volume1;
+
+    if(mixer.data != data || !(state & LOOP))
     {
 	mixer.data = data;
 	mixer.length = body.size();
 	mixer.position = 0;
+
+	mixer.volume2 = state & ENHANCE ? 10 : mixer.volume1;
     }
 
-    mixer.loop = loop;
-    mixer.volume = MIX_MAXVOLUME < volume ? MIX_MAXVOLUME : volume;
-    mixer.active = true;
-
     SDL_UnlockAudio();
+}
+
+void Audio::Mixer::Reduce(void)
+{
+    if(! valid) return;
+
+    std::for_each(sounds.begin(), sounds.end(), PredicateReduceSound);
+}
+
+void Audio::Mixer::Enhance(void)
+{
+    if(! valid) return;
+
+    std::for_each(sounds.begin(), sounds.end(), PredicateEnhanceSound);
 }

@@ -126,6 +126,8 @@ namespace Maps
         const Sprite *path_sprite;
         
         bool	animation;
+        
+        u8	fogs;
     };
 };
 

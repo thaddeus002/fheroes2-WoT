@@ -46,25 +46,30 @@ namespace Audio
     public:
 	~Mixer();
 
+	enum { PLAY = 0x01, LOOP = 0x02, REDUCE = 0x04, ENHANCE = 0x08 } flag_t;
+
 	static Mixer & Get(void);
 
 	bool isValid(void) const;
 	const Spec & HardwareSpec(void) const;
 
-	void Play(const std::vector<u8> & body, const u8 volume = MIX_MAXVOLUME, bool loop = false);
+	void Play(const std::vector<u8> & body, const u8 volume = MIX_MAXVOLUME, const u8 state = 0);
 	void Clear(void);
+
+	void Reduce(void);
+	void Enhance(void);
 
     private:
 	struct mixer_t
         {
-            mixer_t() : data(NULL), length(0), position(0), volume(0), loop(false), active(false) {};
+            mixer_t() : data(NULL), length(0), position(0), volume1(0), volume2(0), state(0) {};
 
 	    const u8 *	data;
 	    u32		length;
     	    u32		position;
-    	    u8		volume;
-    	    bool	loop;
-    	    bool	active;
+    	    u8		volume1;
+    	    u8		volume2;
+    	    u8		state;
         };
 
 	Mixer();
@@ -72,6 +77,8 @@ namespace Audio
 	static void CallBack(void *unused, u8 *stream, int size);
 	static bool PredicateIsFreeSound(const mixer_t & header);
 	static void PredicateStopSound(mixer_t & header);
+	static void PredicateReduceSound(mixer_t & header);
+	static void PredicateEnhanceSound(mixer_t & header);
 
 	Spec hardware;
 	std::vector<mixer_t> sounds;

@@ -41,7 +41,7 @@ Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under c
 Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }
 
 /* play all sound from focus area game */
-void Game::EnvironmentSoundMixer(void)
+void Game::EnvironmentSoundMixer(bool forced)
 {
     static u16 previous_index = MAXU16;
 
@@ -51,7 +51,7 @@ void Game::EnvironmentSoundMixer(void)
 
     const u16 new_index = Maps::GetIndexFromAbsPoint(abs_pt);
 
-    if(previous_index != new_index && conf.Sound())
+    if(conf.Sound() && (previous_index != new_index || forced))
     {
 	previous_index = new_index;
 
@@ -137,6 +137,6 @@ void Game::EnvironmentSoundMixer(void)
 	std::map<M82::m82_t, u8>::const_iterator it2 = maps_sound.end();
 	
 	for(; it1 != it2; ++it1)
-	    mixer.Play(AGG::Cache::Get().GetWAV((*it1).first), (*it1).second, true);
+	    mixer.Play(AGG::Cache::Get().GetWAV((*it1).first), (*it1).second, Audio::Mixer::PLAY | Audio::Mixer::LOOP | Audio::Mixer::ENHANCE);
     }
 }

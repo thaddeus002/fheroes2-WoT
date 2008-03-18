@@ -145,7 +145,8 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
-    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL), animation(false)
+    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL),
+    animation(false), fogs(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE)
 {
     tile_sprite.LoadPalette(AGG::Cache::Get().GetPAL());
 

@@ -65,7 +65,7 @@ namespace Dialog
 
     answer_t AdventureOptions(void);
     Game::menu_t FileOptions(void);
-    answer_t SystemOptions(void);
+    bool SystemOptions(void);
 
     // show info cell maps
     void QuickInfo(const std::string & object);

@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "agg.h"
+#include "audio.h"
 #include "config.h"
 #include "sprite.h"
 #include "localevent.h"
@@ -58,6 +59,8 @@ Game::menu_t Game::StartGame(void)
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
 
     Display & display = Display::Get();
+
+    Audio::Mixer & mixer = Audio::Mixer::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -297,6 +300,8 @@ Game::menu_t Game::StartGame(void)
     display.Flip();
 
     u32 ticket = 0;
+
+    bool change_settings = false;
 
     // startgame loop
     while(le.HandleEvents())
@@ -833,6 +838,8 @@ Game::menu_t Game::StartGame(void)
 	    // click End Turn
 	    if(le.MouseClickLeft(buttonEndTur))
 	    {
+		mixer.Reduce();
+
 		cursor.Hide();
 		world.NextDay();
 
@@ -856,21 +863,29 @@ Game::menu_t Game::StartGame(void)
 
 		cursor.Show();
 		display.Flip();
+
+		mixer.Enhance();
 	    }
 	    else
     	    // click AdventureOptions
 	    if(le.MouseClickLeft(buttonAdventure))
 	    {
+		mixer.Reduce();
+
 		switch(Dialog::AdventureOptions())
 		{
 		    default:
 			break;
 		}
+
+		mixer.Enhance();
     	    }
 	    else
 	    // click FileOptions
 	    if(le.MouseClickLeft(buttonFile))
 	    {
+		mixer.Reduce();
+
 		Game::menu_t result = Dialog::FileOptions();
 	    
 		switch(result)
@@ -886,12 +901,19 @@ Game::menu_t Game::StartGame(void)
 		    default:
 			break;
 		}
+
+		mixer.Enhance();
 	    }
 	    else
 	    // click SystemOptions
-	    if(le.MouseClickLeft(buttonSystem)&& Dialog::OK == Dialog::SystemOptions())
+	    if(le.MouseClickLeft(buttonSystem))
 	    {
+		mixer.Reduce();
+
 		// Change and save system settings
+		change_settings = Dialog::SystemOptions();
+
+		mixer.Enhance();
 	    }
 	    else
 	    // click StatusWindow
@@ -929,7 +951,7 @@ Game::menu_t Game::StartGame(void)
 	}
 
 	// mix all sound from focus
-	Game::EnvironmentSoundMixer();
+	Game::EnvironmentSoundMixer(change_settings);
 
         // draw heroes movement (in focus)
     	if(Game::Focus::HEROES == global_focus.Type() &&
