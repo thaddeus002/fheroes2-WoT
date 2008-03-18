@@ -140,10 +140,15 @@ const Audio::Spec & Audio::Mixer::HardwareSpec(void) const
 
 bool Audio::Mixer::PredicateIsFreeSound(const mixer_t & header)
 {
-    return !(header.state & PLAY) || (!(header.state & LOOP) && header.length == header.position);
+    return !(header.state & PLAY) || (!(header.state & REPEATE) && header.length == header.position);
 }
 
-void Audio::Mixer::PredicateStopSound(mixer_t & header)
+void Audio::Mixer::PredicateStopRepeateSound(mixer_t & header)
+{
+    if(header.state & REPEATE) header.state &= ~PLAY;
+}
+
+void Audio::Mixer::PredicateStopAllSound(mixer_t & header)
 {
     header.state &= ~PLAY;
 }
@@ -202,16 +207,23 @@ void Audio::Mixer::CallBack(void *unused, u8 *stream, int size)
 
     	    header.position += amount;
     	    
-    	    if((header.state & LOOP) && header.length - amount <= header.position) header.position = 0;
+    	    if((header.state & REPEATE) && header.length - amount <= header.position) header.position = 0;
 	}
     }
 }
 
-void Audio::Mixer::Clear(void)
+void Audio::Mixer::StopAll(void)
 {
     if(! valid) return;
 
-    std::for_each(sounds.begin(), sounds.end(), PredicateStopSound);
+    std::for_each(sounds.begin(), sounds.end(), PredicateStopAllSound);
+}
+
+void Audio::Mixer::StopRepeate(void)
+{
+    if(! valid) return;
+
+    std::for_each(sounds.begin(), sounds.end(), PredicateStopRepeateSound);
 }
 
 /* play sound, volume MIX_MAXVOLUME */
@@ -255,7 +267,7 @@ void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, const u8 
     mixer.volume1 = MIX_MAXVOLUME < volume ? MIX_MAXVOLUME : volume;
     mixer.volume2 = mixer.volume1;
 
-    if(mixer.data != data || !(state & LOOP))
+    if(mixer.data != data || !(state & REPEATE))
     {
 	mixer.data = data;
 	mixer.length = body.size();

@@ -959,13 +959,14 @@ Game::menu_t Game::StartGame(void)
     	    global_focus.GetHeroes().isEnableMove() &&
     	    !(ticket % ANIMATION_LOW))
     	    {
+    		global_focus.GetHeroes().PlayWalkSound();
     		global_focus.GetHeroes().Move();
 
 		cursor.Hide();
 		selectHeroes.Redraw();
 		// center area map to hero
-		// areaMaps.Center(global_focus.Center());
-		// radar.RedrawCursor();
+		areaMaps.Center(global_focus.Center());
+		radar.RedrawCursor();
 		cursor.Show();
 		display.Flip();
 	    }

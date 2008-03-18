@@ -171,6 +171,7 @@ public:
     bool isNeedMove(void) const;
     void Move(void);
     void ShowPathOrStartMove(const u16 dst_index);
+    void PlayWalkSound(void);
 
     bool isShipMaster(void) const;
     void SetShipMaster(bool f);
@@ -204,7 +205,7 @@ private:
     const Race::race_t	race;
 
     bool		army_spread;
-    bool		move;
+    bool		enable_move;
     bool 		shipmaster;
 
     MP2::object_t	save_maps_general;

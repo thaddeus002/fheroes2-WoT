@@ -654,7 +654,7 @@ void AGG::PlaySound(const M82::m82_t m82, const u8 volume, bool loop)
 
 	const u8 vol = (10 <= volume ? MIX_MAXVOLUME : volume * MIX_MAXVOLUME / 10) * conf.SoundVolume() / 10;
 
-	const u8 state = loop ? Audio::Mixer::PLAY | Audio::Mixer::LOOP : Audio::Mixer::PLAY;
+	const u8 state = loop ? Audio::Mixer::PLAY | Audio::Mixer::REPEATE : Audio::Mixer::PLAY;
 
 	Audio::Mixer::Get().Play(AGG::Cache::Get().GetWAV(m82), vol, state);
     }

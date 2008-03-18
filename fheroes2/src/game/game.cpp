@@ -59,8 +59,8 @@ void Game::EnvironmentSoundMixer(bool forced)
 
 	std::map<M82::m82_t, u8> maps_sound;
 
-        // reset all sound
-	mixer.Clear();
+        // reset all loop sound
+	mixer.StopRepeate();
 
         // scan 4x4 square from focus
         for(s16 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)
@@ -137,6 +137,6 @@ void Game::EnvironmentSoundMixer(bool forced)
 	std::map<M82::m82_t, u8>::const_iterator it2 = maps_sound.end();
 	
 	for(; it1 != it2; ++it1)
-	    mixer.Play(AGG::Cache::Get().GetWAV((*it1).first), (*it1).second, Audio::Mixer::PLAY | Audio::Mixer::LOOP | Audio::Mixer::ENHANCE);
+	    mixer.Play(AGG::Cache::Get().GetWAV((*it1).first), (*it1).second, Audio::Mixer::PLAY | Audio::Mixer::REPEATE | Audio::Mixer::ENHANCE);
     }
 }

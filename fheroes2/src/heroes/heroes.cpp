@@ -34,7 +34,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), move(false), shipmaster(false),
+    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
 {
     // hero is freeman
@@ -1071,18 +1071,18 @@ void Heroes::AppendSpellsToBook(const Spell::Storage & spells)
 /* return true is move enable */
 bool Heroes::isEnableMove(void) const
 {
-    return move;
+    return enable_move;
 }
 
 /* set enable move */
 void Heroes::StopMove(void)
 {
-    move = false;
+    enable_move = false;
 }
 
 void Heroes::StartMove(void)
 {
-    move = true;
+    enable_move = true;
 }
 
 /* return true is need move */
@@ -1094,7 +1094,7 @@ bool Heroes::isNeedMove(void) const
 /* draw move to next cell */
 void Heroes::Move(void)
 {
-    if(path.empty() || !move) return;
+    if(path.empty() || !enable_move) return;
 
     const Route::Step & step = path.front();
     const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
@@ -1116,8 +1116,8 @@ void Heroes::Move(void)
     // move point deficiency
     if(move_point < step.penalty)
     {
-	move = false;
-	
+	enable_move = false;
+
 	return;
     }
 
@@ -1158,7 +1158,7 @@ void Heroes::Move(void)
     // next to last
     if(isNeedStopNextToLast() && path.GetDestinationIndex() == index_to)
     {
-	move = false;
+	enable_move = false;
 
 	path.Hide();
 	path.Reset();
@@ -1193,7 +1193,7 @@ void Heroes::Move(void)
 
 	if(path.GetDestinationIndex() == index_to)
 	{
-	    move = false;
+	    enable_move = false;
 
 	    action = true;
 	    action_tiles = index_to;
@@ -1225,7 +1225,7 @@ void Heroes::ShowPathOrStartMove(const u16 dst_index)
     // show path
     if(path.GetDestinationIndex() != dst_index)
     {
-	move = false;
+	enable_move = false;
 
 	cursor.Hide();
 		
@@ -1240,8 +1240,9 @@ void Heroes::ShowPathOrStartMove(const u16 dst_index)
     }
     // start move
     else
+    if(path.size() && move_point >= path.front().penalty)
     {
-	move = true;
+	enable_move = true;
     }
 }
 
@@ -1363,4 +1364,29 @@ bool Heroes::isShipMaster(void) const
 void Heroes::SetShipMaster(bool f)
 {
     shipmaster = f;
+}
+
+void Heroes::PlayWalkSound(void)
+{
+    M82::m82_t wav = M82::UNKNOWN;
+    
+    const u8 speed = 3;
+
+    // play sound
+    switch(world.GetTiles(mp).GetGround())
+    {
+        case Maps::Ground::WATER:	wav = (1 == speed ? M82::WSND00 : (2 == speed ? M82::WSND10 : M82::WSND20)); break;
+        case Maps::Ground::GRASS:	wav = (1 == speed ? M82::WSND01 : (2 == speed ? M82::WSND11 : M82::WSND21)); break;
+        case Maps::Ground::WASTELAND:	wav = (1 == speed ? M82::WSND02 : (2 == speed ? M82::WSND12 : M82::WSND22)); break;
+        case Maps::Ground::SWAMP:
+        case Maps::Ground::BEACH:	wav = (1 == speed ? M82::WSND03 : (2 == speed ? M82::WSND13 : M82::WSND23)); break;
+        case Maps::Ground::LAVA:	wav = (1 == speed ? M82::WSND04 : (2 == speed ? M82::WSND14 : M82::WSND24)); break;
+        case Maps::Ground::DESERT:
+        case Maps::Ground::SNOW:	wav = (1 == speed ? M82::WSND05 : (2 == speed ? M82::WSND15 : M82::WSND25)); break;
+        case Maps::Ground::DIRT:	wav = (1 == speed ? M82::WSND06 : (2 == speed ? M82::WSND16 : M82::WSND26)); break;
+
+        default: return;
+    }
+
+    AGG::PlaySound(wav);
 }
