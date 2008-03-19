@@ -465,44 +465,39 @@ bool Monster::AllowUpgrade(monster_t monster)
 void Monster::ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 center)
 {
     Maps::Tiles & tile = *vector[center];
-    const Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = NULL;
 
-    u8 icn_index = 0xFF;
     u8 index = 0;
 
     switch(tile.GetObject())
     {
 	case MP2::OBJ_RNDMONSTER:
-	icn_index = 0x42;
+	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER);
 	index = Monster::Rand();
 	break;
 	case MP2::OBJ_RNDMONSTER1:
-	icn_index = 0x43;
+	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER1);
 	index = Monster::Rand1();
 	break;
 	case MP2::OBJ_RNDMONSTER2:
-	icn_index = 0x44;
+	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER2);
 	index = Monster::Rand2();
 	break;
 	case MP2::OBJ_RNDMONSTER3:
-	icn_index = 0x45;
+	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER3);
 	index = Monster::Rand3();
 	break;
 	case MP2::OBJ_RNDMONSTER4:
-	icn_index = 0x46;
+	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER4);
 	index = Monster::Rand4();
 	break;
 	default:
 	return;
     }
     
-    if( (addon = tile.FindAddon(0x30, icn_index)) ||
-	(addon = tile.FindAddon(0x31, icn_index)) ||
-	(addon = tile.FindAddon(0x32, icn_index)) ||
-	(addon = tile.FindAddon(0x33, icn_index)))
+    if(addon)
     {
-	//u32 uniq = (*addon).GetUniq();
-	(*const_cast<Maps::TilesAddon *>(addon)).SetIndex(index);
+	addon->index = index;
 	tile.SetObject(MP2::OBJ_MONSTER);
     }
 }
@@ -635,12 +630,9 @@ u16 Monster::GetRNDSize(monster_t monster)
 
 Monster::monster_t Monster::Monster(const Maps::Tiles & tile)
 {
-    const Maps::TilesAddon * addons = NULL;
-    
-    return ((addons = tile.FindAddon(0x30)) ||
-	    (addons = tile.FindAddon(0x31)) ||
-            (addons = tile.FindAddon(0x32)) ||
-            (addons = tile.FindAddon(0x33)) ? Monster::Monster(addons->GetIndex()) : Monster::UNKNOWN);
+    Maps::TilesAddon * addons = const_cast<Maps::Tiles &>(tile).FindMonster();
+
+    return (addons ? Monster::Monster(addons->index) : Monster::UNKNOWN);
 }
 
 void Monster::ChangeTileWithRNDSize(Maps::Tiles & tile)

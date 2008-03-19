@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include "audio.h"
 #include "mp2.h"
 #include "world.h"
 #include "config.h"
@@ -26,42 +27,39 @@
 #include "monster.h"
 #include "heroes.h"
 
-void Heroes::Action(const u16 dst_index, const MP2::object_t object)
+// action to next cell
+void Heroes::Action(void)
 {
+    if(path.empty()) return;
+
+    const u16 dst_index = path.front().to_index;
+    const MP2::object_t object = world.GetTiles(dst_index).GetObject();
+
     switch(object)
     {
-	case MP2::OBJ_ZERO:	return;
+	case MP2::OBJ_ZERO:	MoveNext(); return;
 
 	case MP2::OBJ_MONSTER:	ActionToMonster(dst_index); break;
 
         case MP2::OBJ_CASTLE:	ActionToCastle(dst_index); break;
         case MP2::OBJ_HEROES:	ActionToHeroes(dst_index); break;
 
-        case MP2::OBJ_BOAT:
-    	    if(! isShipMaster())
-    	    {
-    		shipmaster = true;
-    		move_point = 0;
-    	    }
-    	break;
-
-	case MP2::OBJ_COAST:
-	    if(isShipMaster())
-	    {
-		shipmaster = false;
-		move_point = 0;
-	    }
-	break;
+        case MP2::OBJ_BOAT:	ActionToBoat(); break;
+	case MP2::OBJ_COAST:	ActionToCoast(); break;
 
         // resource
+        case MP2::OBJ_RESOURCE:	ActionToResource(dst_index); break;
         case MP2::OBJ_ARTIFACT:
-        case MP2::OBJ_RESOURCE:
         case MP2::OBJ_ANCIENTLAMP:
         case MP2::OBJ_TREASURECHEST:
         case MP2::OBJ_CAMPFIRE:
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_FLOTSAM:
         case MP2::OBJ_BOTTLE:
+    	    path.Hide();
+    	    path.Reset();
+	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(object)));
+	    break;
 
         // object
         case MP2::OBJ_ALCHEMYTOWER:
@@ -124,9 +122,12 @@ void Heroes::Action(const u16 dst_index, const MP2::object_t object)
         case MP2::OBJ_MAGICGARDEN:
 	case MP2::OBJ_OBSERVATIONTOWER:
         case MP2::OBJ_FREEMANFOUNDRY:
+    	    MoveNext();
+	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(object)));
+	    break;
 
 	default:
-	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(object)));
+	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: unknown object: " + std::string(MP2::StringObject(object)));
 	    break;
     }
 }
@@ -170,14 +171,93 @@ void Heroes::ActionToCastle(const u16 dst_index)
     
     if(color == castle->GetColor())
     {
+	MoveNext();
+
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: " + GetName() + " goto castle " + castle->GetName());
 
+	Audio::Mixer::Get().Reduce();
+
 	const_cast<Castle *>(castle)->OpenDialog();
+
+	Audio::Mixer::Get().Enhance();
     }
     else
     {
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: " + GetName() + " attack enemy castle " + castle->GetName());
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActiontoCastle: FIXME: attack enemy castle");
+    }
+}
+
+void Heroes::ActionToBoat(void)
+{
+    if(isShipMaster()) return;
+
+    MoveNext();
+    SetShipMaster(true);
+    move_point = 0;
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToBoat: " + GetName() + " to boat");
+}
+
+void Heroes::ActionToCoast(void)
+{
+    if(! isShipMaster()) return;
+
+    MoveNext();
+    SetShipMaster(false);
+    move_point = 0;
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCoast: " + GetName() + " to coast");
+}
+
+void Heroes::ActionToResource(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const Maps::TilesAddon *addon = tile.FindResource();
+
+    path.Hide();
+    path.Reset();
+
+    if(addon)
+    {
+	Resource::funds_t resource;
+	u16 count = 0;
+	const u32 uniq = addon->uniq;
+
+	switch(addon->index)
+        {
+    	    case 1:	count = Resource::RandCount(Resource::WOOD); resource.wood += count;  break;
+    	    case 3:	count = Resource::RandCount(Resource::MERCURY); resource.mercury += count; break;
+    	    case 5:	count = Resource::RandCount(Resource::ORE); resource.ore += count; break;
+    	    case 7:	count = Resource::RandCount(Resource::SULFUR); resource.sulfur += count; break;
+    	    case 9:	count = Resource::RandCount(Resource::CRYSTAL); resource.crystal += count; break;
+    	    case 11:	count = Resource::RandCount(Resource::GEMS); resource.gems += count; break;
+    	    case 13:	count = Resource::RandCount(Resource::GOLD); resource.gold += count; break;
+
+	    default:
+		if(H2Config::Debug()) Error::Warning("Heroes::ActionToResource: unknown resource, from tile: ", dst_index);
+		return;
+        }
+
+	PlayPickupSound();
+
+	world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+	tile.Remove(uniq);
+	tile.SetObject(MP2::OBJ_ZERO);
+
+	// remove shadow from left cell
+	if(Maps::isValidDirection(dst_index, Direction::LEFT))
+	{
+	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
+
+	    left_tile.Remove(uniq);
+	    left_tile.Redraw();
+        }
+
+	tile.Redraw();
+
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
     }
 }

@@ -58,9 +58,6 @@ Dialog::answer_t Castle::OpenDialog(void)
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
 
-    // reduce mixer
-    Audio::Mixer::Get().Reduce();
-
     // cursor
     Cursor & cursor = Cursor::Get();
     
@@ -1137,9 +1134,6 @@ Dialog::answer_t Castle::OpenDialog(void)
     }
 
     if(selectHeroesTroops) delete selectHeroesTroops;
-
-    // enhance mixer
-    Audio::Mixer::Get().Enhance();
 
     return result;
 }

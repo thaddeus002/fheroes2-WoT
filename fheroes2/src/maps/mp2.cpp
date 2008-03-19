@@ -43,6 +43,9 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 
 	// castle flags
 	case 0x38:
+	case 0x39:
+	case 0x3A:
+	case 0x3B:
 	    return ICN::FLAG32;
 
 	// heroes

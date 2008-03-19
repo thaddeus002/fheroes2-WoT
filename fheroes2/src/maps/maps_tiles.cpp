@@ -49,25 +49,25 @@ Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(GROUND), uni
 
 Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
 {
-    level = ta.GetLevel();
+    level = ta.level;
 
-    object = ta.GetObject();
+    object = ta.object;
 
-    index = ta.GetIndex();
+    index = ta.index;
 
-    uniq = ta.GetUniq();
+    uniq = ta.uniq;
     
     return *this;
 }
 
 bool Maps::TilesAddon::PredicateSortRules1(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
 {
-    return ta1.GetLevel() > ta2.GetLevel();
+    return ta1.level > ta2.level;
 }
 
 bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
 {
-    return ta1.GetLevel() < ta2.GetLevel();
+    return ta1.level < ta2.level;
 }
 
 u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
@@ -232,7 +232,7 @@ void Maps::Tiles::Remove(u32 uniq)
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
 	while(it1 != it2)
-	    if(uniq == (*it1).GetUniq())
+	    if(uniq == (*it1).uniq)
 		it1 = addons_level1.erase(it1);
 	    else
 		++it1;
@@ -244,7 +244,7 @@ void Maps::Tiles::Remove(u32 uniq)
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
 
 	while(it1 != it2)
-	    if(uniq == (*it1).GetUniq())
+	    if(uniq == (*it1).uniq)
 		it1 = addons_level2.erase(it1);
 	    else
 		++it1;
@@ -266,8 +266,8 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 
 	for(; it1 != it2; ++it1)
 	{
-	    u8 object = (*it1).GetObject();
-	    u8 index  = (*it1).GetIndex();
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
@@ -314,8 +314,8 @@ void Maps::Tiles::Blit(u16 dstx, u16 dsty, u32 anime_frame) const
 
 	for(; it1 != it2; ++it1)
 	{
-	    u8 object = (*it1).GetObject();
-	    u8 index  = (*it1).GetIndex();
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
@@ -378,8 +378,8 @@ void Maps::Tiles::FixAnimation(void)
 
 	for(; it1 != it2; ++it1)
 	{
-	    const u8 object = (*it1).GetObject();
-	    const u8 index  = (*it1).GetIndex();
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::UNKNOWN != icn && ICN::AnimationFrame(icn, index))
@@ -399,8 +399,8 @@ void Maps::Tiles::FixAnimation(void)
 
 	for(; it1 != it2; ++it1)
 	{
-	    const u8 object = (*it1).GetObject();
-	    const u8 index  = (*it1).GetIndex();
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::UNKNOWN != icn && ICN::AnimationFrame(icn, index))
@@ -413,110 +413,36 @@ void Maps::Tiles::FixAnimation(void)
     }
 }
 
-const Maps::TilesAddon * Maps::Tiles::FindAddon(u8 object, u8 index_min, u8 index_max) const
-{
-    std::list<TilesAddon>::const_iterator it1;
-    std::list<TilesAddon>::const_iterator it2;
-
-    if(addons_level1.size())
-    {
-	it1 = addons_level1.begin();
-	it2 = addons_level1.end();
-	
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
-	    
-	    if(object == addon.GetObject() &&
-		index_min <= addon.GetIndex() &&
-		index_max >= addon.GetIndex()) return &addon;
-	}
-    }
-
-    if(addons_level2.size())
-    {
-	it1 = addons_level2.begin();
-	it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
-	    
-	    if(object == addon.GetObject() &&
-		index_min <= addon.GetIndex() &&
-		index_max >= addon.GetIndex()) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-const Maps::TilesAddon * Maps::Tiles::FindAddon(u8 object, u8 index) const
-{
-    std::list<TilesAddon>::const_iterator it1;
-    std::list<TilesAddon>::const_iterator it2;
-
-    if(addons_level1.size())
-    {
-	it1 = addons_level1.begin();
-	it2 = addons_level1.end();
-	
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
-	    
-	    if(object == addon.GetObject() &&
-	      (0xFF == index || index == addon.GetIndex())) return &addon;
-	}
-    }
-
-    if(addons_level2.size())
-    {
-	it1 = addons_level2.begin();
-	it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
-	    
-	    if(object == addon.GetObject() &&
-	      (0xFF == index || index == addon.GetIndex())) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-const Maps::TilesAddon * Maps::Tiles::FindAddonLevel1(u32 uniq1) const
+Maps::TilesAddon * Maps::Tiles::FindAddonLevel1(u32 uniq1)
 {
     if(addons_level1.size())
     {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
 	for(; it1 != it2; ++it1)
 	{
-	    const TilesAddon & addon = *it1;
+	    TilesAddon & addon = *it1;
 
-	    if(uniq1 == addon.GetUniq()) return &addon;
+	    if(uniq1 == addon.uniq) return &addon;
 	}
     }
 
     return NULL;
 }
 
-const Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2) const
+Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2)
 {
     if(addons_level2.size())
     {
-	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
+	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
 
 	for(; it1 != it2; ++it1)
 	{
-	    const TilesAddon & addon = *it1;
+	    TilesAddon & addon = *it1;
 
-	    if(uniq2 == addon.GetUniq()) return &addon;
+	    if(uniq2 == addon.uniq) return &addon;
 	}
     }
 
@@ -587,25 +513,25 @@ void Maps::Tiles::DebugInfo(u16 index) const
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetObject());
+	    String::AddInt(value, addon.object);
     
 	    std::cout << "object          : " << value << std::endl;
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetIndex());
+	    String::AddInt(value, addon.index);
     
 	    std::cout << "index           : " << value << std::endl;
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetUniq());
+	    String::AddInt(value, addon.uniq);
     
 	    std::cout << "uniq            : " << value << std::endl;
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetLevel());
+	    String::AddInt(value, addon.level);
     
 	    std::cout << "level           : " << value << std::endl;
 	}
@@ -624,25 +550,25 @@ void Maps::Tiles::DebugInfo(u16 index) const
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetObject());
+	    String::AddInt(value, addon.object);
     
 	    std::cout << "object          : " << value << std::endl;
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetIndex());
+	    String::AddInt(value, addon.index);
     
 	    std::cout << "index           : " << value << std::endl;
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetUniq());
+	    String::AddInt(value, addon.uniq);
     
 	    std::cout << "uniq            : " << value << std::endl;
 
 	    value.clear();
     
-	    String::AddInt(value, addon.GetLevel());
+	    String::AddInt(value, addon.level);
     
 	    std::cout << "level           : " << value << std::endl;
 	}
@@ -1227,7 +1153,7 @@ bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
     {
 	case Direction::UNKNOWN:
 	case Direction::CENTER:	return addons_level1.end() != find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRoad);
-	
+
 	default: break;
     }
 
@@ -1240,4 +1166,281 @@ bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
     }
 
     return false;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindResource(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNRSRC
+	    if(0xB7 < addon.object && 0xBC > addon.object && (addon.index % 2)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindRNDResource(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNRSRC
+	    if(0xB7 < addon.object && 0xBC > addon.object && 17 == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindRNDArtifact(const u8 level)
+{
+    u8 index = 0xA3;
+
+    switch(level)
+    {
+	case MP2::OBJ_RNDARTIFACT1: index = 0xA7; break;
+	case MP2::OBJ_RNDARTIFACT2: index = 0xA9; break;
+	case MP2::OBJ_RNDARTIFACT3: index = 0xAB; break;
+	default: break;
+    }
+
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNARTI
+	    if(0x2B < addon.object && 0x30 > addon.object && index == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindUltimateArtifact(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNARTI
+	    if(0x2B < addon.object && 0x30 > addon.object && 0xA4 == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindMiniHero(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // MINIHERO
+	    if(0x53 < addon.object && 0x58 > addon.object) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindEvent(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNMUL2
+            if(0xA3 < addon.object && 0xA8 > addon.object && 0xA3 == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindBoat(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNWAT2
+            if(0x9F < addon.object && 0xA4 > addon.object && 0x17 == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindCastle(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNTOWN
+            if(0x8B < addon.object && 0x90 > addon.object) return &addon;
+	}
+    }
+
+    if(addons_level2.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNTOWN
+            if(0x8B < addon.object && 0x90 > addon.object) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindRNDCastle(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNTWRD
+            if(0x97 < addon.object && 0x9C > addon.object && 32 > addon.index) return &addon;
+	}
+    }
+
+    if(addons_level2.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNTWRD
+            if(0x97 < addon.object && 0x9C > addon.object && 32 > addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindFlags(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // FLAG32
+            if(0x37 < addon.object && 0x3C > addon.object) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindRNDMonster(const u8 level)
+{
+    u8 index = 0x42;
+
+    switch(level)
+    {
+	case MP2::OBJ_RNDMONSTER1: index = 0x43; break;
+	case MP2::OBJ_RNDMONSTER2: index = 0x44; break;
+	case MP2::OBJ_RNDMONSTER3: index = 0x45; break;
+	case MP2::OBJ_RNDMONSTER4: index = 0x46; break;
+	default: break;
+    }
+
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // MONS32
+	    if(0x2F < addon.object && 0x34 > addon.object && index == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindMonster(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // MONS32
+	    if(0x2F < addon.object && 0x34 > addon.object) return &addon;
+	}
+    }
+
+    return NULL;
 }

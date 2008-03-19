@@ -313,7 +313,7 @@ Game::menu_t Game::StartGame(void)
     	    if(Game::Focus::HEROES == global_focus.Type() &&
     		global_focus.GetHeroes().isNeedMove() && 
     		global_focus.GetHeroes().isEnableMove())
-    		    global_focus.GetHeroes().StopMove();
+    		    global_focus.GetHeroes().SetMove(false);
     	    else
     	    if(Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
 	}
@@ -417,9 +417,11 @@ Game::menu_t Game::StartGame(void)
 			        {
 			    	    if(from_hero.GetCenter() == to_hero->GetCenter())
 				    {
+					mixer.Reduce();
 					OpenHeroes(&from_hero, areaMaps, radar);
 					statusWindow.Redraw();
 					display.Flip();
+					mixer.Enhance();
 				    }
 				    else
 					from_hero.ShowPathOrStartMove(index_maps);
@@ -455,8 +457,10 @@ Game::menu_t Game::StartGame(void)
 				    // is selected open dialog
 				    if(from_castle.GetCenter() == to_castle->GetCenter())
 				    {
+					mixer.Reduce();
 					OpenCastle(&from_castle, areaMaps, radar);
 					statusWindow.Redraw();
+					mixer.Enhance();
 				    }
 				    // select other castle
 				    else
@@ -822,7 +826,7 @@ Game::menu_t Game::StartGame(void)
 	    {
     		if(Game::Focus::HEROES == global_focus.Type() &&
     		    global_focus.GetHeroes().isNeedMove())
-    		    global_focus.GetHeroes().isEnableMove() ? global_focus.GetHeroes().StopMove() : global_focus.GetHeroes().StartMove();
+    		    global_focus.GetHeroes().isEnableMove() ? global_focus.GetHeroes().SetMove(false) : global_focus.GetHeroes().SetMove(true);
 	    }
 	    else
 	    // click Kingdom Summary
@@ -959,14 +963,16 @@ Game::menu_t Game::StartGame(void)
     	    global_focus.GetHeroes().isEnableMove() &&
     	    !(ticket % ANIMATION_LOW))
     	    {
-    		global_focus.GetHeroes().PlayWalkSound();
-    		global_focus.GetHeroes().Move();
+    		if(1 < global_focus.GetHeroes().GetPath().size()) global_focus.GetHeroes().PlayWalkSound();
 
 		cursor.Hide();
+
+    		if(global_focus.GetHeroes().Move()) global_focus.GetHeroes().Action();
+
 		selectHeroes.Redraw();
-		// center area map to hero
 		areaMaps.Center(global_focus.Center());
 		radar.RedrawCursor();
+
 		cursor.Show();
 		display.Flip();
 	    }
@@ -990,6 +996,8 @@ Game::menu_t Game::StartGame(void)
 void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 {
     if(! castle) return;
+
+    Audio::Mixer::Get().Reduce();
 
     Cursor & cursor = Cursor::Get();
     const Kingdom & myKingdom = world.GetMyKingdom();
@@ -1025,6 +1033,8 @@ void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 	    FocusToHeroes(hero, areaMaps, radar);
 
     areaMaps.Redraw();
+
+    Audio::Mixer::Get().Enhance();
 }
 
 /* focus to castle */
@@ -1061,6 +1071,8 @@ void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 {
     if(! hero) return;
+
+    Audio::Mixer::Get().Reduce();
 
     Cursor & cursor = Cursor::Get();
     const Kingdom & myKingdom = world.GetMyKingdom();
@@ -1112,6 +1124,8 @@ void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 
 	cursor.Show();
     }
+
+    Audio::Mixer::Get().Enhance();
 }
 
 /* focus to heroes */

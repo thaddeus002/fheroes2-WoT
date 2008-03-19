@@ -160,7 +160,7 @@ namespace Artifact
     
     u8 GetIndexSprite(Artifact::artifact_t artifact);
     
-    void ChangeTileWithRNDArtifact(std::vector<Maps::Tiles *> & vector, u16 center);
+    void ChangeTileWithRNDArtifact(Maps::Tiles & tile);
 };
 
 #endif

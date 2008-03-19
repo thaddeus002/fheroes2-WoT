@@ -44,16 +44,6 @@ namespace Maps
 	static bool PredicateSortRules1(const TilesAddon & ta1, const TilesAddon & ta2);
 	static bool PredicateSortRules2(const TilesAddon & ta1, const TilesAddon & ta2);
 
-	u8 GetObject(void) const{ return object; };
-	u8 GetIndex(void) const{ return index; };
-	u32 GetUniq(void) const{ return uniq; };
-	level_t GetLevel(void) const{ return level; };
-
-	void SetUniq(u32 gid){ uniq = gid; };
-	void SetObject(u8 obj){ object = obj; };
-	void SetIndex(u8 ii){ index = ii; };
-
-    private:
         level_t level;
         u32	uniq;
         u8	object;
@@ -71,17 +61,28 @@ namespace Maps
 	u8 GetQuantity2(void) const{ return quantity2; };
 	Ground::ground_t GetGround(void) const;
 	const Surface & GetSurface(void) const{ return tile_sprite; };
-	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().GetUniq() : 0; };
-	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().GetUniq() : 0; };
+	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().uniq : 0; };
+	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().uniq : 0; };
 
 	bool isAnimation(u16 dstx, u16 dsty) const;
 	bool isPassable(void) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 
-	const TilesAddon * FindAddon(u8 object, u8 index_min, u8 index_max) const;
-	const TilesAddon * FindAddon(u8 object, u8 index = 0xFF) const;
-	const TilesAddon * FindAddonLevel1(u32 uniq1) const;
-	const TilesAddon * FindAddonLevel2(u32 uniq2) const;
+	TilesAddon * FindAddonLevel1(u32 uniq1);
+	TilesAddon * FindAddonLevel2(u32 uniq2);
+
+	TilesAddon * FindResource(void);
+	TilesAddon * FindRNDResource(void);
+	TilesAddon * FindRNDArtifact(const u8 level = 0);
+	TilesAddon * FindUltimateArtifact(void);
+	TilesAddon * FindMiniHero(void);
+	TilesAddon * FindEvent(void);
+	TilesAddon * FindBoat(void);
+	TilesAddon * FindCastle(void);
+	TilesAddon * FindRNDCastle(void);
+	TilesAddon * FindFlags(void);
+	TilesAddon * FindRNDMonster(const u8 level = 0);
+	TilesAddon * FindMonster(void);
 
 	void SetTile(const u16 index, const u8 shape);
 

@@ -5,8 +5,10 @@
 TARGET := fheroes2
 
 all:
-	make -C src
-	cp src/$(TARGET) .
+	make -C dist
+	cp dist/$(TARGET) .
 
 clean:
-	make -C src clean
+	make -C dist clean
+	make -C src/engine clean
+	make -C src/tools clean

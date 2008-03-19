@@ -430,39 +430,34 @@ void Castle::MinimizeAreaMapsID(void)
 /* modify RND sprites alghoritm */
 void Castle::ModifyTIlesRNDSprite(Maps::Tiles & tile)
 {
-    const Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = tile.FindRNDCastle();
 
-    if( (addon = tile.FindAddon(0x98, 0, 31)) || (addon = tile.FindAddon(0x99, 0, 31)) ||
-	(addon = tile.FindAddon(0x9A, 0, 31)) || (addon = tile.FindAddon(0x9B, 0, 31)))
-	{
-            Maps::TilesAddon & addon_w = *const_cast<Maps::TilesAddon *>(addon);
+    if(addon)
+    {
+        addon->object -= 12;
 
-            addon_w.SetObject((*addon).GetObject() - 12);
-
-            switch(race)
-            {
-        	case Race::KNGT: break; //addon_w.SetIndex((*addon).GetIndex()); break;
-                case Race::BARB: addon_w.SetIndex((*addon).GetIndex() + 32); break;
-                case Race::SORC: addon_w.SetIndex((*addon).GetIndex() + 64); break;
-                case Race::WRLK: addon_w.SetIndex((*addon).GetIndex() + 96); break;
-                case Race::WZRD: addon_w.SetIndex((*addon).GetIndex() + 128); break;
-                case Race::NECR: addon_w.SetIndex((*addon).GetIndex() + 160); break;
-                default: Error::Warning("Castle::ModifyTIlesRNDSprite: unknown race."); break;
-	    }
+        switch(race)
+        {
+    	    case Race::KNGT: break;
+            case Race::BARB: addon->index += 32; break;
+            case Race::SORC: addon->index += 64; break;
+            case Race::WRLK: addon->index += 96; break;
+            case Race::WZRD: addon->index += 128; break;
+            case Race::NECR: addon->index += 160; break;
+            default: Error::Warning("Castle::ModifyTIlesRNDSprite: unknown race."); break;
 	}
+    }
 }
 
 /* modify flags sprite to origin color */
 void Castle::ModifyTIlesFlags(Maps::Tiles & tile)
 {
-    const Maps::TilesAddon *addon = tile.FindAddon(0x38);
+    Maps::TilesAddon *addon = tile.FindFlags();
 
     if(addon)
     {
-        Maps::TilesAddon & addon_w = *const_cast<Maps::TilesAddon *>(addon);
-
 	// right flag - event index
-	bool right_event = (*addon).GetIndex() % 2 ? true : false;
+	bool right_event = addon->index % 2 ? true : false;
 
 	u8 index_sprite = 0;
 
@@ -478,22 +473,17 @@ void Castle::ModifyTIlesFlags(Maps::Tiles & tile)
 	    default: Error::Warning("Castle::ModifyTIlesFlags: unknown color."); break;
 	}
 
-	addon_w.SetIndex(index_sprite);
+	addon->index = index_sprite;
     }
 }
 
 // modify Town sprite to Castle
 void Castle::ModifyTilesTownToCastle(Maps::Tiles & tile)
 {
-    const Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = tile.FindCastle();
 
-    if( (addon = tile.FindAddon(0x8C)) || (addon = tile.FindAddon(0x8D)) ||
-	(addon = tile.FindAddon(0x8E)) || (addon = tile.FindAddon(0x8F)))
-	{
-            Maps::TilesAddon & addon_w = *const_cast<Maps::TilesAddon *>(addon);
-
-            addon_w.SetIndex((*addon).GetIndex() - 16);
-	}
+    if(addon)
+            addon->index -= 16;
 }
 
 void Castle::TownUpgradeToCastle(void)

@@ -90,8 +90,7 @@ namespace Resource
     /* return index sprite resource.icn */
     u8 GetIndexSprite2(resource_t resource);
 
-    void ChangeTileWithRNDResource(std::vector<Maps::Tiles *> & vector, u16 center);
-
+    void ChangeTileWithRNDResource(Maps::Tiles & tile);
 };
 
 #endif

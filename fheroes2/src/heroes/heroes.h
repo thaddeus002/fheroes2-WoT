@@ -163,15 +163,17 @@ public:
     void SetVisited(const u32 index);
     void SetCenter(const Point& pt){ mp = pt; };
 
-    void Action(const u16 dst_index, const MP2::object_t object);
-
     bool isEnableMove(void) const;
-    void StopMove(void);
-    void StartMove(void);
+    void SetMove(bool f);
     bool isNeedMove(void) const;
-    void Move(void);
+    bool Move(void);
     void ShowPathOrStartMove(const u16 dst_index);
-    void PlayWalkSound(void);
+    bool isAllowMove(const u16 dst_index);
+    void MoveNext(void);
+    void Action(void);
+
+    void PlayWalkSound(void) const;
+    void PlayPickupSound(void) const;
 
     bool isShipMaster(void) const;
     void SetShipMaster(bool f);
@@ -185,7 +187,9 @@ protected:
     void ActionToCastle(const u16 dst_index);
     void ActionToHeroes(const u16 dst_index);
     void ActionToMonster(const u16 dst_index);
-    bool isNeedStopNextToLast(void);
+    void ActionToBoat(void);
+    void ActionToCoast(void);
+    void ActionToResource(const u16 dst_index);
     void RedrawRotate(bool clockwise);
 
 private:

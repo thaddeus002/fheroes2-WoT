@@ -22,6 +22,7 @@
 #include "error.h"
 #include "settings.h"
 #include "rand.h"
+#include "world.h"
 #include "artifact.h"
 
 namespace Artifact {
@@ -560,48 +561,48 @@ u8 Artifact::GetIndexSprite(Artifact::artifact_t artifact)
     return 0;
 }
 
-void Artifact::ChangeTileWithRNDArtifact(std::vector<Maps::Tiles *> & vector, u16 center)
+void Artifact::ChangeTileWithRNDArtifact(Maps::Tiles & tile)
 {
-    Maps::Tiles & tile = *vector[center];
-    const Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = NULL;
 
-    u8 icn_index = 0xFF;
     u8 index = 0;
 
     switch(tile.GetObject())
     {
 	case MP2::OBJ_RNDARTIFACT:
-	    icn_index = 0xA3;
+	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT);
     	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT));
 	    break;
 	case MP2::OBJ_RNDARTIFACT1:
-	    icn_index = 0xA7;
+	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT1);
     	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT1));
 	    break;
 	case MP2::OBJ_RNDARTIFACT2:
-	    icn_index = 0xA9;
+	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT2);
     	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT2));
 	    break;
 	case MP2::OBJ_RNDARTIFACT3:
-	    icn_index = 0xAB;
+	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT3);
     	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT3));
 	    break;
 	default:
 	    return;
     }
     
-    if( (addon = tile.FindAddon(0x2C, icn_index)) ||
-        (addon = tile.FindAddon(0x2D, icn_index)) ||
-        (addon = tile.FindAddon(0x2E, icn_index)) ||
-        (addon = tile.FindAddon(0x2F, icn_index)))
+    if(addon)
     {
-        u32 uniq = (*addon).GetUniq();
-        (*const_cast<Maps::TilesAddon *>(addon)).SetIndex(index);
+	const u16 center = tile.GetIndex();
+        const u32 uniq = addon->uniq;
+        addon->index = index;
         tile.SetObject(MP2::OBJ_ARTIFACT);
-	
-        // replace shadow resource
-        if(center)
-    	    if(const Maps::TilesAddon *shadow = (*vector[center - 1]).FindAddonLevel1(uniq))
-		(*const_cast<Maps::TilesAddon *>(shadow)).SetIndex(index - 1);
+
+        // replace shadow artifact
+        if(Maps::isValidDirection(center, Direction::LEFT))
+        {
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(center, Direction::LEFT));
+            Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(uniq);
+
+	    if(shadow) shadow->index = index - 1;
+        }
     }
 }

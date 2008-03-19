@@ -20,6 +20,7 @@
 
 #include "rand.h"
 #include "error.h"
+#include "world.h"
 #include "resource.h"
 
 Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
@@ -289,24 +290,26 @@ u8 Resource::funds_t::GetValidItems(void) const
 u16 Resource::RandCount(Resource::resource_t res)
 { return Resource::GOLD == res ? 100 * Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX) : Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX); }
 
-void Resource::ChangeTileWithRNDResource(std::vector<Maps::Tiles *> & vector, u16 center)
+void Resource::ChangeTileWithRNDResource(Maps::Tiles & tile)
 {
-    Maps::Tiles & tile = *vector[center];
-    const Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = tile.FindRNDResource();
 
-    if( (addon = tile.FindAddon(0xB8, 0x11)) ||
-	(addon = tile.FindAddon(0xB9, 0x11)) ||
-        (addon = tile.FindAddon(0xBA, 0x11)) ||
-        (addon = tile.FindAddon(0xBB, 0x11)))
+    if(addon)
     {
-	u32 uniq = (*addon).GetUniq();
-        u8 index = Resource::GetIndexSprite(Resource::Rand());
-        (*const_cast<Maps::TilesAddon *>(addon)).SetIndex(index);
+	const u16 center = tile.GetIndex();
+       	const u32 uniq = addon->uniq;
+        const u8 index = Resource::GetIndexSprite(Resource::Rand());
+
+        addon->index = index;
         tile.SetObject(MP2::OBJ_RESOURCE);
 
-        // replace shadow resource
-	if(center)
-	    if(const Maps::TilesAddon *shadow = (*vector[center - 1]).FindAddonLevel1(uniq))
-		(*const_cast<Maps::TilesAddon *>(shadow)).SetIndex(index - 1);
+        // replace shadow artifact
+        if(Maps::isValidDirection(center, Direction::LEFT))
+        {
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(center, Direction::LEFT));
+            Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(uniq);
+
+            if(shadow) shadow->index = index - 1;
+        }
     }
 }

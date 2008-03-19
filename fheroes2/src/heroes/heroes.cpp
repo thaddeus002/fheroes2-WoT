@@ -31,6 +31,7 @@
 #include "cursor.h"
 #include "display.h"
 #include "sprite.h"
+#include "rand.h"
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
@@ -1074,15 +1075,16 @@ bool Heroes::isEnableMove(void) const
     return enable_move;
 }
 
-/* set enable move */
-void Heroes::StopMove(void)
+/* return true isn allow move to dst tile */
+bool Heroes::isAllowMove(const u16 dst_index)
 {
-    enable_move = false;
+    return path.Calculate(dst_index);
 }
 
-void Heroes::StartMove(void)
+/* set enable move */
+void Heroes::SetMove(bool f)
 {
-    enable_move = true;
+    enable_move = f;
 }
 
 /* return true is need move */
@@ -1091,37 +1093,28 @@ bool Heroes::isNeedMove(void) const
     return path.size() && path.GetDestinationIndex() != Maps::GetIndexFromAbsPoint(mp);
 }
 
-/* draw move to next cell */
-void Heroes::Move(void)
+/* move heroes to next path cell */
+void Heroes::MoveNext(void)
 {
-    if(path.empty() || !enable_move) return;
-
+    if(path.empty()) return;
+    
     const Route::Step & step = path.front();
-    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    const u16 index_to = step.to_index;
-    const Direction::vector_t direction2 = Direction::Get(index_from, index_to);
-
-    bool action = false;
-    u16 action_tiles = MAXU16;
-    MP2::object_t action_obj = MP2::OBJ_ZERO;
-
-    if(Direction::UNKNOWN == direction || Direction::CENTER == direction) return;
-
-    Maps::Tiles & tiles_from = world.GetTiles(index_from);
-    Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
 
     // move point deficiency
     if(move_point < step.penalty)
     {
-	enable_move = false;
+	SetMove(false);
 
 	return;
     }
 
-    cursor.Hide();
+    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
+    const u16 index_to = step.to_index;
+
+    Maps::Tiles & tiles_from = world.GetTiles(index_from);
+    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+    path.Hide();
 
     // redraw top cell
     if(Maps::isValidDirection(index_from, Direction::TOP))
@@ -1133,9 +1126,60 @@ void Heroes::Move(void)
     if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
 	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
 
+    if(MP2::OBJ_HEROES != save_maps_general)
+    {
+	tiles_from.SetObject(save_maps_general);
+	tiles_from.Redraw();
+    }
+
+    save_maps_general = tiles_to.GetObject();
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+    mp.x = index_to % world.w();
+    mp.y = index_to / world.w();
+
+    move_point -= step.penalty;
+
+    path.pop_front();
+
+    path.size() ? path.Show() : path.Reset();
+
+    tiles_to.Redraw();
+
+    // fix boat
+    if(!shipmaster && MP2::OBJ_BOAT == save_maps_general) save_maps_general = MP2::OBJ_ZERO;
+    else
+    if(shipmaster && MP2::OBJ_COAST == save_maps_general)
+    {
+	tiles_from.SetObject(MP2::OBJ_BOAT);
+	tiles_from.Redraw();
+    }
+}
+
+/* draw move to next cell, return true if end way */
+bool Heroes::Move(void)
+{
+    if(path.empty()) return false;
+
+    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
+    const u16 & index_to = path.front().to_index;
+    const Direction::vector_t direction2 = Direction::Get(index_from, index_to);
+
+    if(Direction::UNKNOWN == direction || Direction::CENTER == direction) return false;
+
     // change through the circle
     if(direction != direction2)
     {
+	// redraw top cell
+	if(Maps::isValidDirection(index_from, Direction::TOP))
+	    world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP)).Redraw();
+	// redraw top left cell (for flag)
+	if(Maps::isValidDirection(index_from, Direction::TOP_LEFT))
+	    world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_LEFT)).Redraw();
+	// redraw top right cell (for flag)
+	if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
+	    world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
+
 	Direction::vector_t to1 = direction;
 	Direction::vector_t to2 = direction2;
 
@@ -1149,92 +1193,42 @@ void Heroes::Move(void)
 	    direction = to1;
 	}
 
-	// FIXME: rotate animation heroes
-	//direction = direction2;
-
-	tiles_from.Redraw();
+	world.GetTiles(index_from).Redraw();
     }
-    else
-    // next to last
-    if(isNeedStopNextToLast() && path.GetDestinationIndex() == index_to)
+
+    // end: next last
+    if(path.GetDestinationIndex() == index_to)
     {
-	enable_move = false;
+	SetMove(false);
 
-	path.Hide();
-	path.Reset();
-
-	action = true;
-	action_tiles = index_to;
-	action_obj = tiles_to.GetObject();
+	return true;
     }
-    else
-    // goto next cell
-    {
-	// restore from cell
-	if(MP2::OBJ_HEROES != save_maps_general)
-	{
-	    tiles_from.SetObject(save_maps_general);
-	    tiles_from.Redraw();
-	}
 
-	save_maps_general = tiles_to.GetObject();
-	tiles_to.SetObject(MP2::OBJ_HEROES);
+    MoveNext();
 
-	mp.x = index_to % world.w();
-	mp.y = index_to / world.w();
-
-	move_point -= step.penalty;
-
-	path.Hide();
-	path.pop_front();
-	path.size() && path.GetDestinationIndex() != index_to ? path.Show() : path.Reset();
-
-	tiles_to.Redraw();
-
-	if(path.GetDestinationIndex() == index_to)
-	{
-	    enable_move = false;
-
-	    action = true;
-	    action_tiles = index_to;
-	    action_obj = save_maps_general;
-	}
-
-	// fix boat
-	if(!shipmaster && MP2::OBJ_BOAT == save_maps_general) save_maps_general = MP2::OBJ_ZERO;
-	else
-	if(shipmaster && MP2::OBJ_COAST == save_maps_general)
-	{
-	    tiles_from.SetObject(MP2::OBJ_BOAT);
-	    tiles_from.Redraw();
-	}
-
-    }
-    cursor.Show();
-    display.Flip();
-
-    if(action) Action(action_tiles, action_obj);
+    return false;
 }
 
 /* show path */
 void Heroes::ShowPathOrStartMove(const u16 dst_index)
 {
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-
     // show path
     if(path.GetDestinationIndex() != dst_index)
     {
-	enable_move = false;
+	Cursor & cursor = Cursor::Get();
+	Display & display = Display::Get();
+
+	SetMove(false);
 
 	cursor.Hide();
-		
+
 	if(path.size()) path.Hide();
 
 	path.Calculate(dst_index);
 	path.Show();
+
 	world.GetTiles(mp).Redraw();
-		
+
 	cursor.Show();
 	display.Flip();
     }
@@ -1242,45 +1236,14 @@ void Heroes::ShowPathOrStartMove(const u16 dst_index)
     else
     if(path.size() && move_point >= path.front().penalty)
     {
-	enable_move = true;
+	SetMove(true);
     }
-}
-
-bool Heroes::isNeedStopNextToLast(void)
-{
-    if(path.empty()) return false;
-
-    const u16 dst_index = path.GetDestinationIndex();
-    const Castle *castle = NULL;
-
-    switch(world.GetTiles(dst_index).GetObject())
-    {
-	case MP2::OBJ_MONSTER:
-	case MP2::OBJ_HEROES:
-	case MP2::OBJ_ARTIFACT:
-	case MP2::OBJ_RESOURCE:
-	case MP2::OBJ_ANCIENTLAMP:
-	case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_CAMPFIRE:
-        case MP2::OBJ_SHIPWRECKSURVIROR:
-        case MP2::OBJ_FLOTSAM:
-        case MP2::OBJ_BOTTLE:
-            		return true;
-	
-	case MP2::OBJ_CASTLE:
-	    if(NULL != (castle = world.GetCastle(dst_index)) && color != castle->GetColor()) return true;
-
-	default: break;
-    }
-
-    return false;
 }
 
 MP2::object_t Heroes::GetUnderObject(void) const
 {
     return save_maps_general;
 }
-
 
 void Heroes::RedrawRotate(bool clockwise)
 {
@@ -1366,8 +1329,10 @@ void Heroes::SetShipMaster(bool f)
     shipmaster = f;
 }
 
-void Heroes::PlayWalkSound(void)
+void Heroes::PlayWalkSound(void) const
 {
+    if(GetColor() != H2Config::MyColor()) return;
+
     M82::m82_t wav = M82::UNKNOWN;
     
     const u8 speed = 3;
@@ -1386,6 +1351,28 @@ void Heroes::PlayWalkSound(void)
         case Maps::Ground::DIRT:	wav = (1 == speed ? M82::WSND06 : (2 == speed ? M82::WSND16 : M82::WSND26)); break;
 
         default: return;
+    }
+
+    AGG::PlaySound(wav);
+}
+
+void Heroes::PlayPickupSound(void) const
+{
+    if(GetColor() != H2Config::MyColor()) return;
+
+    M82::m82_t wav = M82::UNKNOWN;
+
+    switch(Rand::Get(1, 7))
+    {
+	case 1:	wav = M82::PICKUP01; break;
+	case 2:	wav = M82::PICKUP02; break;
+	case 3:	wav = M82::PICKUP03; break;
+	case 4:	wav = M82::PICKUP04; break;
+	case 5:	wav = M82::PICKUP05; break;
+	case 6:	wav = M82::PICKUP06; break;
+	case 7:	wav = M82::PICKUP07; break;
+
+	default: return;
     }
 
     AGG::PlaySound(wav);

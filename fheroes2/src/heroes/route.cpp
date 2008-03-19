@@ -131,7 +131,7 @@ void Route::Path::Hide(void) const
 
 void Route::Path::Reset(void)
 {
-    Hide();
+    if(empty()) return;
 
     dst = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 

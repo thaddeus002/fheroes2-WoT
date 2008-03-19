@@ -650,7 +650,7 @@ void World::LoadMaps(const std::string &filename)
 
 	if(findobject)
 	{
-	    const Maps::Tiles & tile = *vec_tiles.at(*it_index);
+	    Maps::Tiles & tile = *vec_tiles.at(*it_index);
 	    const Maps::TilesAddon *addon = NULL;
 
 	    switch(tile.GetObject())
@@ -672,11 +672,10 @@ void World::LoadMaps(const std::string &filename)
 		    // add heroes
 		    if(SIZEOFMP2HEROES != sizeblock) Error::Warning("World::World: read heroes: incorrect size block.");
 		    else
-		    if((addon = tile.FindAddon(0x54)) || (addon = tile.FindAddon(0x55)) ||
-		       (addon = tile.FindAddon(0x56)) || (addon = tile.FindAddon(0x57)))
+		    if(NULL != (addon = tile.FindMiniHero()))
 		    {
 			// calculate color
-			const u8 index_name = (*addon).GetIndex();
+			const u8 index_name = addon->index;
 			Color::color_t color = Color::GRAY;
 
 			if( 7 > index_name)
@@ -799,10 +798,9 @@ void World::LoadMaps(const std::string &filename)
 
 	    case MP2::OBJ_EVENT:
 		// remove event sprite
-		if( (addon = tile.FindAddon(0xA4, 0xA3)) || (addon = tile.FindAddon(0xA5, 0xA3)) ||
-		    (addon = tile.FindAddon(0xA6, 0xA3)) || (addon = tile.FindAddon(0xA7, 0xA3)))
+		if(NULL != (addon = tile.FindEvent()))
 		{
-		    tile.Remove((*addon).GetUniq());
+		    tile.Remove(addon->uniq);
 		}
 		break;
 	
@@ -811,15 +809,14 @@ void World::LoadMaps(const std::string &filename)
     	    case MP2::OBJ_RNDARTIFACT2:
     	    case MP2::OBJ_RNDARTIFACT3:
 		// modify rnd artifact sprite
-		Artifact::ChangeTileWithRNDArtifact(vec_tiles, ii);
+		Artifact::ChangeTileWithRNDArtifact(tile);
 		break;
 
     	    case MP2::OBJ_RNDULTIMATEARTIFACT:
 		// remove ultimate artifact sprite
-		if( (addon = tile.FindAddon(0x2C, 0xA4)) || (addon = tile.FindAddon(0x2D, 0xA4)) ||
-		    (addon = tile.FindAddon(0x2E, 0xA4)) || (addon = tile.FindAddon(0x2F, 0xA4)))
+		if(NULL != (addon = tile.FindUltimateArtifact()))
 		{
-		    tile.Remove((*addon).GetUniq());
+		    tile.Remove(addon->uniq);
 		    tile.SetObject(MP2::OBJ_ZERO);
 		    ultimate_artifact = ii;
 		}
@@ -827,10 +824,9 @@ void World::LoadMaps(const std::string &filename)
 
     	    case MP2::OBJ_BOAT:
 		// remove small sprite boat
-		if( (addon = tile.FindAddon(0xA0, 0x17)) || (addon = tile.FindAddon(0xA1, 0x17)) ||
-		    (addon = tile.FindAddon(0xA2, 0x17)) || (addon = tile.FindAddon(0xA3, 0x17)))
+		if(NULL != (addon = tile.FindBoat()))
 		{
-		    tile.Remove((*addon).GetUniq());
+		    tile.Remove(addon->uniq);
 		}
 		break;
 
@@ -840,7 +836,7 @@ void World::LoadMaps(const std::string &filename)
 
 	    case MP2::OBJ_RNDRESOURCE:
 		// modify rnd resource sprite
-		Resource::ChangeTileWithRNDResource(vec_tiles, ii);
+		Resource::ChangeTileWithRNDResource(tile);
 		break;
 
 	    case MP2::OBJ_RNDMONSTER:
