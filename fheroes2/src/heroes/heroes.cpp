@@ -252,9 +252,6 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
 	    secondary_skills.Level(Skill::LOGISTICS, Skill::Level::BASIC);
 	    secondary_skills.Level(Skill::MYSTICISM, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
-	    //secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
-	    //secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
 
 	    artifacts.push_back(Artifact::MEDAL_VALOR);
 	    artifacts.push_back(Artifact::STEALTH_SHIELD);

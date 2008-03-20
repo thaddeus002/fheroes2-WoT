@@ -105,3 +105,100 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     cursor.Hide();
     if(button) delete button;
 }
+
+void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::primary_t skill)
+{
+    Display & display = Display::Get();
+    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+
+    // preload
+    AGG::PreloadObject(system);
+
+    // cursor
+    Cursor & cursor = Cursor::Get();
+
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    u8 index = 0;
+    std::string skill_name;
+
+    switch(skill)
+    {
+	case Skill::ATTACK:
+	    index = 0;
+	    skill_name = Skill::String(skill) + " Skill";
+	    break;
+
+	case Skill::DEFENCE:
+	    index = 1;
+	    skill_name = Skill::String(skill) + " Skill";
+	    break;
+
+	case Skill::POWER:
+	    index = 2;
+	    skill_name = "Spell " + Skill::String(skill);
+	    break;
+
+	case Skill::KNOWLEDGE:
+	    index = 3;
+	    skill_name = Skill::String(skill);
+	    break;
+    }
+    const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, index);
+
+    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20 + Text::height(message, Font::BIG, BOXAREA_WIDTH) + 10 + sprite.h(), Dialog::OK);
+
+    Rect pos = box.GetArea();
+
+    if(header.size())
+    {
+	TextBox(header, Font::BIG, pos);
+        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20;
+    }
+
+    if(message.size())
+    {
+        TextBox(message, Font::BIG, pos);
+        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 20;
+    }
+
+    // blit sprite
+    const Sprite & border = AGG::GetICN(ICN::PRIMSKIL, 4);
+    pos.x = box.GetArea().x + (pos.w - border.w()) / 2;
+    display.Blit(border, pos.x, pos.y);
+    pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
+    display.Blit(sprite, pos.x, pos.y + 6);
+
+    // small text
+    const std::string skill_level("+1");
+    pos.x = box.GetArea().x + (pos.w - Text::width(skill_name, Font::SMALL)) / 2;
+    Text(skill_name, Font::SMALL, pos.x, pos.y + 8);
+    pos.x = box.GetArea().x + (pos.w - Text::width(skill_level, Font::BIG)) / 2;
+    Text(skill_level, Font::BIG, pos.x, pos.y + 80);
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    Point pt;
+    
+    pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
+    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    Button button(pt, system, 1, 2);
+
+    button.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    // message loop
+    while(le.HandleEvents())
+    {
+	le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
+
+        if(le.MouseClickLeft(button)){ break; }
+
+	if(le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)){ break; }
+    }
+
+    cursor.Hide();
+}

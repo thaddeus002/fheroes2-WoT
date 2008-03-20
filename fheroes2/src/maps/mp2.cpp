@@ -396,7 +396,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJN_TREEKNOWLEDGE:
         case MP2::OBJ_TREEKNOWLEDGE:		return "Tree Knowledge";
         case MP2::OBJN_DOCTORHUT:
-        case MP2::OBJ_DOCTORHUT:		return "Doctor Hut";
+        case MP2::OBJ_DOCTORHUT:		return "Witch Doctor's Hut";
         case MP2::OBJN_TEMPLE:
         case MP2::OBJ_TEMPLE:			return "Temple";
         case MP2::OBJN_HILLFORT:

@@ -73,9 +73,19 @@ bool Maps::Object::isBattleLife(const MP2::object_t obj)
     // FIXME: list battle object life
     switch(obj)
     {
+	// luck modificators
 	case MP2::OBJ_IDOL:
 	case MP2::OBJ_FOUNTAIN:
 	case MP2::OBJ_FAERIERING:
+
+	// morale modificators
+	case MP2::OBJ_BUOY:
+	case MP2::OBJ_OASIS:
+	case MP2::OBJ_TEMPLE:
+	case MP2::OBJ_GRAVEYARD:
+        case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_DERELICTSHIP:
+            
 	    return true;
 
 	default: break;

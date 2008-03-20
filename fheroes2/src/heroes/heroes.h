@@ -202,6 +202,8 @@ protected:
     void ActionToBottle(const u16 dst_index);
     void ActionToMagicWell(const u16 dst_index);
     void ActionToTradingPost(const u16 dst_index);
+    void ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj);
     void RedrawRotate(bool clockwise);
 
 private:

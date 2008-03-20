@@ -83,6 +83,15 @@ void Heroes::Action(void)
 
         case MP2::OBJ_TRADINGPOST: ActionToTradingPost(dst_index); break;
 
+        case MP2::OBJ_FORT:		ActionToPrimarySkillObject(dst_index, MP2::OBJ_FORT); break;
+        case MP2::OBJ_MERCENARYCAMP:	ActionToPrimarySkillObject(dst_index, MP2::OBJ_MERCENARYCAMP); break;
+        case MP2::OBJ_DOCTORHUT:	ActionToPrimarySkillObject(dst_index, MP2::OBJ_DOCTORHUT); break;
+        case MP2::OBJ_STANDINGSTONES:	ActionToPrimarySkillObject(dst_index, MP2::OBJ_STANDINGSTONES); break;
+
+        case MP2::OBJ_OASIS:		ActionToMoraleObject(dst_index, MP2::OBJ_OASIS); break;
+        case MP2::OBJ_TEMPLE:		ActionToMoraleObject(dst_index, MP2::OBJ_TEMPLE); break;
+        case MP2::OBJ_BUOY:		ActionToMoraleObject(dst_index, MP2::OBJ_BUOY); break;
+
         // object
         case MP2::OBJ_ALCHEMYTOWER:
         case MP2::OBJ_MINES:
@@ -92,10 +101,6 @@ void Heroes::Action(void)
         case MP2::OBJ_WATERMILL:
         case MP2::OBJ_WINDMILL:
 
-        case MP2::OBJ_FORT:
-        case MP2::OBJ_MERCENARYCAMP:
-        case MP2::OBJ_DOCTORHUT:
-        case MP2::OBJ_STANDINGSTONES:
 
 	case MP2::OBJ_ARCHERHOUSE:
         case MP2::OBJ_GOBLINHUNT:
@@ -110,7 +115,6 @@ void Heroes::Action(void)
         case MP2::OBJ_GRAVEYARD:
         case MP2::OBJ_DRAGONCITY:
         case MP2::OBJ_OBELISK:
-        case MP2::OBJ_OASIS:
 	case MP2::OBJ_ORACLE:
 	case MP2::OBJ_DERELICTSHIP:
 	case MP2::OBJ_STONELIGHTS:
@@ -121,7 +125,6 @@ void Heroes::Action(void)
         case MP2::OBJ_RUINS:
         case MP2::OBJ_ABANDONEDMINE:
         case MP2::OBJ_TREEKNOWLEDGE:
-        case MP2::OBJ_TEMPLE:
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_HALFLINGHOLE:
         case MP2::OBJ_CRAKEDLAKE:
@@ -139,11 +142,11 @@ void Heroes::Action(void)
 	case MP2::OBJ_OBSERVATIONTOWER:
         case MP2::OBJ_FREEMANFOUNDRY:
     	    MoveNext();
-	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(object)));
+	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
 
 	default:
-	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: unknown object: " + std::string(MP2::StringObject(object)));
+	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: unknown: " + std::string(MP2::StringObject(object)));
 	    break;
     }
 }
@@ -410,7 +413,7 @@ void Heroes::ActionToLuckObject(const u16 dst_index, const MP2::object_t obj)
 	return;
     }
 
-    // increase luck
+    // modify luck
     SetVisited(dst_index);
 
     if(H2Config::MyColor() == GetColor())
@@ -504,5 +507,134 @@ void Heroes::ActionToTradingPost(const u16 dst_index)
 
     if(H2Config::MyColor() == GetColor()) Dialog::Marketplace();
 
-    if(H2Config::Debug()) Error::Verbose("Heroes::ActionTotradingPost: " + GetName());
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTradingPost: " + GetName());
+}
+
+void Heroes::ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t obj)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    const char *body_true = NULL;
+    const char *body_false = NULL;
+    
+    Skill::primary_t skill = Skill::ATTACK;
+
+    switch(obj)
+    {
+        case MP2::OBJ_FORT:
+    	    skill = Skill::DEFENCE;
+    	    body_false = "\"I'm sorry sir,\" The leader of the soldiers says, \"but you already know everything we have to teach.\"";
+    	    body_true = "The soldiers living in the fort teach you a few new defensive tricks.";
+    	    break;
+
+        case MP2::OBJ_MERCENARYCAMP:
+    	    skill = Skill::ATTACK;
+    	    body_false = "You've come upon a mercenary camp practicing their tactics. \"You're too advanced for us,\" the mercenary captain says. \"We can teach nothing more.\"";
+    	    body_true = "You've come upon a mercenary camp practicing their tactics. The mercenaries welcome you and your troops and invite you to train with them.";
+    	    break;
+
+        case MP2::OBJ_DOCTORHUT:
+    	    skill = Skill::KNOWLEDGE;
+    	    body_false = "\"Go 'way!\", the witch doctor barks, \"you know all I know.\"";
+    	    body_true = "An Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.";
+    	    break;
+
+        case MP2::OBJ_STANDINGSTONES:
+    	    skill = Skill::POWER;
+    	    body_false = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, the Druids turn you away, indicating they have nothing new to teach you.";
+    	    body_true = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, they teach you new ways to cast spells.";
+    	    break;
+
+    	default: return;
+    }
+
+    const std::string header(MP2::StringObject(obj));
+
+    // check already visited
+    if(isVisited(obj))
+    {
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    // increase skill
+    SetVisited(dst_index);
+
+    switch(skill)
+    {
+        case Skill::DEFENCE:		++defence; break;
+        case Skill::ATTACK:		++attack; break;
+        case Skill::KNOWLEDGE:		++knowledge; break;
+        case Skill::POWER:		++power; break;
+    }
+
+    if(H2Config::MyColor() == GetColor()) Dialog::SkillInfo(header, body_true, skill);
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToPrimarySkillObject: " + GetName());
+}
+
+void Heroes::ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    const char *body_true = NULL;
+    const char *body_false = NULL;
+
+    switch(obj)
+    {
+        case MP2::OBJ_BUOY:
+    	    body_false = "Your men spot a navigational buoy, confirming that you are on course.";
+    	    body_true = "Your men spot a navigational buoy, confirming that you are on course and increasing their morale.";
+    	    break;
+
+        case MP2::OBJ_OASIS:
+    	    body_false = "The drink at the oasis is refreshing, but offers no further benefit. The oasis might help again if you fought a battle first.";
+    	    body_true = "A drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.";
+    	    break;
+
+        case MP2::OBJ_TEMPLE:
+    	    body_false = "It doesn't help to pray twice before a battle. Come back after you've fought.";
+    	    body_true = "A visit and a prayer at the temple raises the morale of your troops.";
+    	    break;
+
+/*
+        case MP2::OBJ_GRAVEYARD:
+    	    body_false = "";
+    	    body_true = "";
+    	    break;
+
+        case MP2::OBJ_SHIPWRECK:
+    	    body_false = "";
+    	    body_true = "";
+    	    break;
+
+        case MP2::OBJ_DERELICTSHIP:
+    	    body_false = "";
+    	    body_true = "";
+    	    break;
+*/
+    	default: return;
+    }
+
+    const std::string header(MP2::StringObject(obj));
+
+    // check already visited
+    if(isVisited(obj))
+    {
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    // modify morale
+    SetVisited(dst_index);
+
+    if(H2Config::MyColor() == GetColor())
+    {
+	AGG::PlaySound(M82::GOODMRLE);
+	Dialog::SpriteInfo(header, body_true, AGG::GetICN(ICN::EXPMRL, 2));
+    }
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMoraleObject: " + GetName());
 }
