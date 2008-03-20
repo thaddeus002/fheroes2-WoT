@@ -32,6 +32,7 @@ namespace Spell
 	Book();
 
         void Appends(const Storage & st);
+        void Append(const Spell::spell_t sp);
 
     private:
 	u8 list_count;

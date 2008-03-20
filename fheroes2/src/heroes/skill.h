@@ -46,6 +46,7 @@ namespace Skill
 
     typedef enum
     {
+	UNKNOWN		= 0x0000,
 	PATHFINDING	= 0x0001,
 	ARCHERY		= 0x0002,
 	LOGISTICS	= 0x0004,
@@ -60,25 +61,24 @@ namespace Skill
 	EAGLEEYE	= 0x0800,
 	NECROMANCY	= 0x1000,
 	ESTATES		= 0x2000,
-	UNKNOWN		= 0xFFFF,
     } secondary_t;
 
-    inline secondary_t & operator++ (secondary_t & skill){ return skill = ( ESTATES == skill ? UNKNOWN : secondary_t(skill << 1)); };
-    inline secondary_t & operator-- (secondary_t & skill){ return skill = ( UNKNOWN == skill ? ESTATES : secondary_t(skill >> 1)); };
+    inline secondary_t & operator++ (secondary_t & skill){ return skill = ( ESTATES == skill ? PATHFINDING : secondary_t(skill << 1)); };
+    inline secondary_t & operator-- (secondary_t & skill){ return skill = ( PATHFINDING == skill ? ESTATES : secondary_t(skill >> 1)); };
 
     namespace Level
     {
 	typedef enum { NONE, BASIC, ADVANCED, EXPERT } type_t;
 	
-	type_t FromMP2(u8 byte);
+	type_t FromMP2(const u8 byte);
 
-	const std::string & String(type_t level);
+	const std::string & String(const type_t level);
     };
 
-    const std::string & String(primary_t skill);
-    const std::string & String(secondary_t skill);
-    const std::string & Description(secondary_t skill, Level::type_t level);
-
+    const std::string & String(const primary_t skill);
+    const std::string & String(const secondary_t skill);
+    const std::string & Description(const secondary_t skill, const Level::type_t level);
+    
     class Primary
     {
 	public:
@@ -106,13 +106,15 @@ namespace Skill
 	public:
 	Secondary();
 
+	bool		isFull(void) const;
 	void		Reset(void);
-	void		Level(secondary_t skill, Level::type_t level);
-	Level::type_t	GetLevel(secondary_t skill) const;
-	secondary_t	GetSkill(u8 index) const;
+	void		Level(const secondary_t skill, const Level::type_t level);
+	Level::type_t	GetLevel(const secondary_t skill) const;
+	secondary_t	GetSkill(const u8 index) const;
 
-	static secondary_t 	FromMP2(u8 byte);
-	static const Sprite &	GetSprite(secondary_t skill);
+	static secondary_t 	FromMP2(const u8 byte);
+	static secondary_t 	RandForWitchsHut(void);
+	static const Sprite &	GetSprite(const secondary_t skill);
 
 	private:
 	std::map<secondary_t, Level::type_t> skills;

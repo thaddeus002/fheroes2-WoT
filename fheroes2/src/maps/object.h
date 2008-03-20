@@ -27,6 +27,7 @@
 
 namespace Maps
 {
+
     class VisitIndexObject : public std::pair<u16, MP2::object_t>
     {
 	public:

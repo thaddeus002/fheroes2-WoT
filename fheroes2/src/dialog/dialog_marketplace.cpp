@@ -52,6 +52,7 @@ void Dialog::Marketplace(void)
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Dialog::Box box(250, true);
 
@@ -469,6 +470,8 @@ void Dialog::Marketplace(void)
     if(splitter) delete splitter;
     if(textSell) delete textSell;
     if(textBuy) delete textBuy;
+
+    cursor.Hide();
 }
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)

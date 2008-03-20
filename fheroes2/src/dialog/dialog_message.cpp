@@ -36,7 +36,6 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    const Cursor::themes_t oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
@@ -130,9 +129,6 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 
     if(button1) delete button1;
     if(button2) delete button2;
-
-    cursor.SetThemes(oldcursor);
-    cursor.Show();
 
     return result;
 }

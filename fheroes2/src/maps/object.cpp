@@ -37,6 +37,9 @@ bool Maps::Object::isDayLife(const MP2::object_t obj)
     // FIXME: list day object life
     switch(obj)
     {
+	case MP2::OBJ_MAGICWELL:
+	    return true;
+
 	default: break;
     }
 
@@ -67,11 +70,12 @@ bool Maps::Object::isMonthLife(const MP2::object_t obj)
 
 bool Maps::Object::isBattleLife(const MP2::object_t obj)
 {
-    // FIXME: list month object life
+    // FIXME: list battle object life
     switch(obj)
     {
 	case MP2::OBJ_IDOL:
 	case MP2::OBJ_FOUNTAIN:
+	case MP2::OBJ_FAERIERING:
 	    return true;
 
 	default: break;

@@ -721,7 +721,11 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace))
 	{
+	    cursor.Hide();
 	    Dialog::Marketplace();
+	    cursor.Show();
+	    display.Flip();
+
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit

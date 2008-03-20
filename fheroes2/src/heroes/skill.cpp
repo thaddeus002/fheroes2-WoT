@@ -21,6 +21,7 @@
 #include "agg.h"
 #include "gamedefs.h"
 #include "heroes.h"
+#include "rand.h"
 #include "skill.h"
 
 Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0), morale(Morale::NORMAL), luck(Luck::NORMAL)
@@ -45,11 +46,13 @@ Skill::Secondary::Secondary() : count(0)
     skills[ESTATES]	= Skill::Level::NONE;
 }
 
-void Skill::Secondary::Level(secondary_t skill, Level::type_t level)
+void Skill::Secondary::Level(const secondary_t skill, const Level::type_t level)
 {
     if(Level::NONE == level || UNKNOWN == skill) return;
 
-    if(Level::NONE != GetLevel(skill))
+    const Level::type_t cur_level = GetLevel(skill);
+
+    if(Level::NONE != cur_level && cur_level < level)
 	skills[skill] = level;
     else
     if(count < HEROESMAXSKILL)
@@ -59,7 +62,7 @@ void Skill::Secondary::Level(secondary_t skill, Level::type_t level)
     }
 }
 
-Skill::Level::type_t Skill::Secondary::GetLevel(secondary_t skill) const
+Skill::Level::type_t Skill::Secondary::GetLevel(const secondary_t skill) const
 {
     if(UNKNOWN != skill)
     {
@@ -72,7 +75,7 @@ Skill::Level::type_t Skill::Secondary::GetLevel(secondary_t skill) const
     return Skill::Level::NONE;
 }
 
-Skill::Level::type_t Skill::Level::FromMP2(u8 byte)
+Skill::Level::type_t Skill::Level::FromMP2(const u8 byte)
 {
     switch(byte)
     {
@@ -86,7 +89,7 @@ Skill::Level::type_t Skill::Level::FromMP2(u8 byte)
     return NONE;
 }
 
-const std::string & Skill::Level::String(type_t level)
+const std::string & Skill::Level::String(const type_t level)
 {
     static const std::string str_level[] = { "None", "Basic", "Advanced", "Expert" };
 
@@ -101,7 +104,7 @@ const std::string & Skill::Level::String(type_t level)
     return str_level[0];
 }
 
-const std::string & Skill::String(primary_t skill)
+const std::string & Skill::String(const primary_t skill)
 {
     static const std::string str_skill[] = { "Attack", "Defence", "Power", "Knowledge" };
 
@@ -116,7 +119,7 @@ const std::string & Skill::String(primary_t skill)
     return str_skill[0];
 }
 
-const std::string & Skill::String(secondary_t skill)
+const std::string & Skill::String(const secondary_t skill)
 {
     static const std::string str_skill[] = { "Pathfinding", "Archery", "Logistics", "Scouting", "Diplomacy", "Navigation", 
 	"Leadership", "Wisdom", "Mysticism", "Luck", "Ballistics", "Eagle Eye", "Necromancy", "Estates", "Unknown"  };
@@ -144,7 +147,7 @@ const std::string & Skill::String(secondary_t skill)
     return str_skill[14];
 }
 
-const std::string & Skill::Description(secondary_t skill, Level::type_t level)
+const std::string & Skill::Description(const secondary_t skill, const Level::type_t level)
 {
     static const std::string description_skill[] =
     {
@@ -236,17 +239,19 @@ const std::string & Skill::Description(secondary_t skill, Level::type_t level)
     return description_skill[index];
 }
 
-Skill::secondary_t Skill::Secondary::GetSkill(u8 index) const
+Skill::secondary_t Skill::Secondary::GetSkill(const u8 index) const
 {
+    u8 index2 = index;
+
     std::map<secondary_t, Level::type_t>::const_iterator it1 = skills.begin();
     std::map<secondary_t, Level::type_t>::const_iterator it2 = skills.end();
 
-    for(; it1 != it2; ++it1) if((*it1).first != UNKNOWN && (*it1).second != Level::NONE && !index--) return (*it1).first;
+    for(; it1 != it2; ++it1) if((*it1).first != UNKNOWN && (*it1).second != Level::NONE && !index2--) return (*it1).first;
 
     return UNKNOWN;
 }
 
-Skill::secondary_t Skill::Secondary::FromMP2(u8 byte)
+Skill::secondary_t Skill::Secondary::FromMP2(const u8 byte)
 {
     switch(byte)
     {
@@ -271,7 +276,32 @@ Skill::secondary_t Skill::Secondary::FromMP2(u8 byte)
     return UNKNOWN;
 }
 
-const Sprite & Skill::Secondary::GetSprite(secondary_t skill)
+Skill::secondary_t Skill::Secondary::RandForWitchsHut(void)
+{
+    switch(Rand::Get(13))
+    {
+	case 0:		return PATHFINDING;
+        case 1:		return ARCHERY;
+        case 2:		return LOGISTICS;
+        case 3:		return SCOUTING;
+        case 4:		return DIPLOMACY;
+        case 5:		return NAVIGATION;
+        case 6:		return LEADERSHIP;
+        case 7:		return WISDOM;
+        case 8:		return MYSTICISM;
+        case 9:		return LUCK;
+        case 10:	return BALLISTICS;
+        case 11:	return EAGLEEYE;
+        case 12:	return NECROMANCY;	// FIXME: check Witch's Hut and necromancy skill ???
+        case 13:	return ESTATES;
+
+        default: break;
+    }
+
+    return UNKNOWN;
+}
+
+const Sprite & Skill::Secondary::GetSprite(const secondary_t skill)
 {
     u8 index = 0;
 
@@ -301,4 +331,9 @@ const Sprite & Skill::Secondary::GetSprite(secondary_t skill)
 /* reset all skill */
 void Skill::Secondary::Reset(void)
 {
+}
+
+bool Skill::Secondary::isFull(void) const
+{
+    return count == MAXSECONDARYSKILL;
 }

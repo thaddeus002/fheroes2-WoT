@@ -721,7 +721,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    const Skill::secondary_t skill = secondary_skills.GetSkill(ii);
 	    const Skill::Level::type_t level = secondary_skills.GetLevel(skill);
 
-	    if(Skill::UNKNOWN != skill) Dialog::Message(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), Font::BIG, Dialog::OK);
+	    if(Skill::UNKNOWN != skill)
+	    {
+		cursor.Hide();
+		Dialog::SkillInfo(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), skill, level, true);
+		cursor.Show();
+		display.Flip();
+	    }
 	}
 
 	// left click artifact
@@ -758,7 +764,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    const Skill::secondary_t skill = secondary_skills.GetSkill(ii);
 	    const Skill::Level::type_t level = secondary_skills.GetLevel(skill);
 
-	    if(Skill::UNKNOWN != skill) Dialog::Message(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), Font::BIG);
+	    if(Skill::UNKNOWN != skill)
+	    {
+		cursor.Hide();
+		Dialog::SkillInfo(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), skill, level, false);
+		cursor.Show();
+		display.Flip();
+	    }
 	}
 
 	// right info artifact

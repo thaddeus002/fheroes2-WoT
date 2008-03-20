@@ -25,6 +25,8 @@
 #include "background.h"
 #include "monster.h"
 #include "rect.h"
+#include "spell.h"
+#include "skill.h"
 #include "text.h"
 #include "game.h"
 
@@ -74,6 +76,11 @@ namespace Dialog
     
     // buttons: OK : CANCEL : OK|CANCEL : YES|NO
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons = 0);
+
+    // other info
+    void SpellInfo(const std::string &header, const std::string &message, const Spell::spell_t spell, const bool ok_button = true);
+    void SkillInfo(const std::string &header, const std::string &message, const Skill::secondary_t skill, const Skill::Level::type_t level, const bool ok_button = true);
+    void SpriteInfo(const std::string &header, const std::string &message, const Sprite & sprite);
 
     // redistribute count
     u16 SelectCount(u16 max);

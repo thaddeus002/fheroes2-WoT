@@ -867,6 +867,7 @@ Luck::luck_t Heroes::GetLuck(void) const
     // object visited
     if(isVisited(MP2::OBJ_FAERIERING)) ++result;
     if(isVisited(MP2::OBJ_FOUNTAIN)) ++result;
+    if(isVisited(MP2::OBJ_IDOL)) ++result;
 
     // bonus in castle and sorceress rainbow
     const Castle* castle = inCastle();
@@ -966,9 +967,13 @@ const Castle* Heroes::inCastle(void) const
 /* is visited cell */
 bool Heroes::isVisited(const Maps::Tiles & tile) const
 {
-    std::list<Maps::VisitIndexObject>::const_iterator end = visit_object.end();
+    std::list<Maps::VisitIndexObject>::const_iterator it1 = visit_object.begin();
+    std::list<Maps::VisitIndexObject>::const_iterator it2 = visit_object.end();
 
-    return end != std::find(visit_object.begin(), end, Maps::VisitIndexObject(tile));
+    const u16 & index = tile.GetIndex();
+    const MP2::object_t & object = tile.GetObject();
+                 
+    for(; it1 != it2; ++it1) if(index == (*it1).first && object == (*it2).second) return true;
 
     return false;
 }
@@ -985,20 +990,15 @@ bool Heroes::isVisited(const MP2::object_t & object) const
 }
 
 /* set visited cell */
-void Heroes::SetVisited(const u32 index)
+void Heroes::SetVisited(const u16 index)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
 
     if(isVisited(tile)) return;
 
-    const MP2::object_t object = tile.GetObject();
+    const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
 
-    // valid
-    if(Maps::Object::isDayLife(object) ||
-	Maps::Object::isWeekLife(object) ||
-	Maps::Object::isMonthLife(object) ||
-	Maps::Object::isBattleLife(object))
-	    visit_object.push_front(Maps::VisitIndexObject(index, object));
+    if(MP2::OBJ_ZERO != object) visit_object.push_front(Maps::VisitIndexObject(index, object));
 }
 
 /* return true if artifact present */
@@ -1067,6 +1067,11 @@ bool Heroes::BuySpellBook(void)
 void Heroes::AppendSpellsToBook(const Spell::Storage & spells)
 {
     spell_book.Appends(spells);
+}
+
+void Heroes::AppendSpellToBook(const Spell::spell_t spell)
+{
+    spell_book.Append(spell);
 }
 
 /* return true is move enable */
@@ -1376,4 +1381,19 @@ void Heroes::PlayPickupSound(void) const
     }
 
     AGG::PlaySound(wav);
+}
+
+bool Heroes::HasSecondarySkill(const Skill::secondary_t skill) const
+{
+    return Skill::Level::NONE != secondary_skills.GetLevel(skill);
+}
+
+Skill::Level::type_t Heroes::GetLevelSkill(const Skill::secondary_t skill) const
+{
+    return secondary_skills.GetLevel(skill);
+}
+
+void Heroes::LearnBasicSkill(const Skill::secondary_t skill)
+{
+    return secondary_skills.Level(skill, Skill::Level::BASIC);
 }

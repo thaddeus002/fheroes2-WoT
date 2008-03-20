@@ -345,6 +345,7 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 void Castle::RedrawAnimationBuilding(const Point & dst_pt, const building_t build)
 {
     Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
 
     const ICN::icn_t icn = GetICNBuilding(build, race);
 
@@ -384,7 +385,9 @@ void Castle::RedrawAnimationBuilding(const Point & dst_pt, const building_t buil
     {
         display.Blit(bg, src_rt);
         sf.SetAlpha(ii);
+        cursor.Hide();
         display.Blit(sf, src_rt);
+        cursor.Show();
         display.Flip();
         DELAY(80);
 	ii += 10;

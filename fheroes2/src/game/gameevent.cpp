@@ -25,12 +25,6 @@
 
 #define SIZEMESSAGE 400
 
-GameEvent::Sign::Sign(u16 index, const char *str) : index_map(index), message(str)
-{ if(H2Config::Debug()) Error::Verbose("add Sign: " + message); }
-
-void GameEvent::Sign::Show(void)
-{ Dialog::Message("", message, Font::BIG, Dialog::OK); }
-
 GameEvent::Day::Day(const void *ptr)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);

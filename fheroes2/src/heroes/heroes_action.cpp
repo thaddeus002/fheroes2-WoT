@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include "agg.h"
 #include "audio.h"
 #include "mp2.h"
 #include "world.h"
@@ -49,64 +50,81 @@ void Heroes::Action(void)
 
         // resource
         case MP2::OBJ_RESOURCE:	ActionToResource(dst_index); break;
+
         case MP2::OBJ_ARTIFACT:
         case MP2::OBJ_ANCIENTLAMP:
         case MP2::OBJ_TREASURECHEST:
         case MP2::OBJ_CAMPFIRE:
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_FLOTSAM:
-        case MP2::OBJ_BOTTLE:
     	    path.Hide();
     	    path.Reset();
 	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(object)));
 	    break;
 
+        // shrine circle
+	case MP2::OBJ_SHRINE1:
+	case MP2::OBJ_SHRINE2:
+        case MP2::OBJ_SHRINE3:	ActionToShrine(dst_index); break;
+
+        // witchs hut
+        case MP2::OBJ_WITCHSHUT: ActionToWitchsHut(dst_index); break;
+
+        // message
+        case MP2::OBJ_SIGN:	ActionToSign(dst_index); break;
+        case MP2::OBJ_BOTTLE:	ActionToBottle(dst_index); break;
+
+        // luck object
+        case MP2::OBJ_FOUNTAIN: ActionToLuckObject(dst_index, MP2::OBJ_FOUNTAIN); break;
+        case MP2::OBJ_FAERIERING: ActionToLuckObject(dst_index, MP2::OBJ_FAERIERING); break;
+        case MP2::OBJ_IDOL:	ActionToLuckObject(dst_index, MP2::OBJ_IDOL); break;
+
+        case MP2::OBJ_MAGICWELL: ActionToMagicWell(dst_index); break;
+
+        case MP2::OBJ_TRADINGPOST: ActionToTradingPost(dst_index); break;
+
         // object
         case MP2::OBJ_ALCHEMYTOWER:
-        case MP2::OBJ_SIGN:
-        case MP2::OBJ_SKELETON:
-        case MP2::OBJ_DAEMONCAVE:
-        case MP2::OBJ_FAERIERING:
-        case MP2::OBJ_FOUNTAIN:
-        case MP2::OBJ_GAZEBO:
-        case MP2::OBJ_GRAVEYARD:
+        case MP2::OBJ_MINES:
+	case MP2::OBJ_SAWMILL:
+        case MP2::OBJ_LIGHTHOUSE:
+
+        case MP2::OBJ_WATERMILL:
+        case MP2::OBJ_WINDMILL:
+
+        case MP2::OBJ_FORT:
+        case MP2::OBJ_MERCENARYCAMP:
+        case MP2::OBJ_DOCTORHUT:
+        case MP2::OBJ_STANDINGSTONES:
+
 	case MP2::OBJ_ARCHERHOUSE:
         case MP2::OBJ_GOBLINHUNT:
         case MP2::OBJ_DWARFCOTT:
 	case MP2::OBJ_PEASANTHUNT:
         case MP2::OBJ_PEASANTHUNT2:
+	case MP2::OBJ_DESERTTENT:
+
+        case MP2::OBJ_SKELETON:
+        case MP2::OBJ_DAEMONCAVE:
+        case MP2::OBJ_GAZEBO:
+        case MP2::OBJ_GRAVEYARD:
         case MP2::OBJ_DRAGONCITY:
-        case MP2::OBJ_LIGHTHOUSE:
-        case MP2::OBJ_WATERMILL:
-        case MP2::OBJ_MINES:
         case MP2::OBJ_OBELISK:
         case MP2::OBJ_OASIS:
-	case MP2::OBJ_SAWMILL:
 	case MP2::OBJ_ORACLE:
 	case MP2::OBJ_DERELICTSHIP:
-	case MP2::OBJ_DESERTTENT:
 	case MP2::OBJ_STONELIGHTS:
         case MP2::OBJ_WAGONCAMP:
-        case MP2::OBJ_WINDMILL:
         case MP2::OBJ_WATCHTOWER:
         case MP2::OBJ_TREEHOUSE:
         case MP2::OBJ_TREECITY:
         case MP2::OBJ_RUINS:
-        case MP2::OBJ_FORT:
-        case MP2::OBJ_TRADINGPOST:
         case MP2::OBJ_ABANDONEDMINE:
-        case MP2::OBJ_STANDINGSTONES:
-        case MP2::OBJ_IDOL:
         case MP2::OBJ_TREEKNOWLEDGE:
-        case MP2::OBJ_DOCTORHUNT:
         case MP2::OBJ_TEMPLE:
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_HALFLINGHOLE:
-        case MP2::OBJ_MERCENARYCAMP:
         case MP2::OBJ_CRAKEDLAKE:
-	case MP2::OBJ_SHRINE1:
-	case MP2::OBJ_SHRINE2:
-        case MP2::OBJ_SHRINE3:
 	case MP2::OBJ_PIRAMID:
         case MP2::OBJ_CITYDEAD:
         case MP2::OBJ_EXCAVATION:
@@ -114,11 +132,9 @@ void Heroes::Action(void)
         case MP2::OBJ_WAGON:
         case MP2::OBJ_ARTESIANSPRING:
         case MP2::OBJ_TROLLBRIDGE:
-        case MP2::OBJ_WITCHHUNT:
         case MP2::OBJ_XANADU:
         case MP2::OBJ_CAVE:
         case MP2::OBJ_LEANTO:
-        case MP2::OBJ_MAGICWELL:
         case MP2::OBJ_MAGICGARDEN:
 	case MP2::OBJ_OBSERVATIONTOWER:
         case MP2::OBJ_FREEMANFOUNDRY:
@@ -260,4 +276,233 @@ void Heroes::ActionToResource(const u16 dst_index)
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
     }
+}
+
+void Heroes::ActionToShrine(const u16 dst_index)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    const Spell::spell_t spell = world.SpellFromShrine(dst_index);
+
+    const std::string & spell_name = Spell::String(spell);
+    const u8 spell_level = Spell::Level(spell);
+
+    std::string head;
+    std::string body("You come across");
+
+    switch(spell_level)
+    {
+	case 1:
+	    head = "Shrine of the 1st Circle";
+	    body += " a small shrine attended by a group of novice acolytes. In exchange for your protection, they agree to teach you a simple spell -";
+	    break;
+	case 2:
+	    head = "Shrine of the 2st Circle";
+	    body += " an ornate shrine attended by a group of rotund friars. In exchange for your protection, they agree to teach you a spell -";
+	    break;
+	case 3:
+	    head = "Shrine of the 3st Circle";
+	    body += " a lavish shrine attended by a group of high priests. In exchange for your protection, they agree to teach you a sophisticated spell -";
+	    break;
+	default: return;
+    }
+    
+    body += "'" + spell_name + "'.";
+
+    // check spell book
+    if(!HasArtifact(Artifact::MAGIC_BOOK))
+    {
+	body += " Unfortunately, you have no Magic Book to record the spell with.";
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    // check valid level spell and wisdom skill
+    if(3 == spell_level && Skill::Level::NONE == GetLevelSkill(Skill::WISDOM))
+    {
+	body += " Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.";
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    AppendSpellToBook(spell);
+
+    if(H2Config::MyColor() == GetColor())
+    {
+	AGG::PlaySound(M82::TREASURE);
+	Dialog::SpellInfo(spell_name, body, spell);
+    }
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToShrine: " + GetName());
+}
+
+void Heroes::ActionToWitchsHut(const u16 dst_index)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    const Skill::secondary_t skill = world.SkillFromWitchsHut(dst_index);
+    const std::string & skill_name = Skill::String(skill);
+    const std::string head("Witch's Hut");
+
+    // check full
+    if(secondary_skills.isFull())
+    {
+	const std::string body("You approach the hut and observe a witch inside studying an ancient tome on " + skill_name + ". As you approach, she turns and focuses her one glass eye on you. \"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\"");
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    // check present skill
+    if(HasSecondarySkill(skill))
+    {
+	const std::string body("You approach the hut and observe a witch inside studying an ancient tome on " + skill_name + ". As you approach, she turns and speaks. \"You already know that which I would teach you. I can help you no further.\"");
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    LearnBasicSkill(skill);
+
+    if(H2Config::MyColor() == GetColor())
+    {
+	const std::string body("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you " + skill_name + " for her own inscrutable purposes.");
+	Dialog::SkillInfo(skill_name, body, skill, Skill::Level::BASIC);
+    }
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToWitchsHut: " + GetName());
+}
+
+void Heroes::ActionToLuckObject(const u16 dst_index, const MP2::object_t obj)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    const char *body_true = NULL;
+    const char *body_false = NULL;
+
+    switch(obj)
+    {
+        case MP2::OBJ_FOUNTAIN:
+    	    body_false = "You drink from the enchanted fountain, but nothing happens.";
+    	    body_true = "As you drink the sweet water, you gain luck for your next battle.";
+    	    break;
+
+        case MP2::OBJ_FAERIERING:
+    	    body_false = "You enter the faerie ring, but nothing happens.";
+    	    body_true = "Upon entering the mystical faerie ring, your army gains luck for its next battle.";
+    	    break;
+
+        case MP2::OBJ_IDOL:
+	    body_false = "You've found an ancient and weathered stone idol. It is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.";
+	    body_true = "You've found an ancient and weathered stone idol. Kissing it is supposed to be lucky, so you do. The stone is very cold to the touch.";
+    	    break;
+
+    	default: return;
+    }
+
+    const std::string header(MP2::StringObject(obj));
+
+    // check already visited
+    if(isVisited(obj))
+    {
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    // increase luck
+    SetVisited(dst_index);
+
+    if(H2Config::MyColor() == GetColor())
+    {
+	AGG::PlaySound(M82::GOODLUCK);
+	Dialog::SpriteInfo(header, body_true, AGG::GetICN(ICN::EXPMRL, 0));
+    }
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToLuckObject: " + GetName());
+}
+
+void Heroes::ActionToSign(const u16 dst_index)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    if(H2Config::MyColor() == GetColor())
+	Dialog::Message("Sign", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToSign: " + GetName());
+}
+
+void Heroes::ActionToBottle(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const Maps::TilesAddon *addon = tile.FindBottle();
+
+    path.Hide();
+    path.Reset();
+
+    if(addon)
+    {
+	const u32 uniq = addon->uniq;
+
+	if(H2Config::MyColor() == GetColor())
+	    Dialog::Message("Bottle", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
+
+	PlayPickupSound();
+
+	tile.Remove(uniq);
+	tile.SetObject(MP2::OBJ_ZERO);
+
+	// remove shadow from left cell
+	if(Maps::isValidDirection(dst_index, Direction::LEFT))
+	{
+	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
+
+	    left_tile.Remove(uniq);
+	    left_tile.Redraw();
+        }
+
+	tile.Redraw();
+
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToBottle: " + GetName() + " pickup bottle");
+    }
+}
+
+void Heroes::ActionToMagicWell(const u16 dst_index)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    const std::string header(MP2::StringObject(MP2::OBJ_MAGICWELL));
+    const u16 max_point = GetMaxSpellPoints();
+
+    if(magic_point == max_point)
+    {
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, "A drink at the well is supposed to restore your spell points, but you are already at maximum.", Font::BIG, Dialog::OK);
+	return;
+    }
+
+    // check already visited
+    if(isVisited(MP2::OBJ_MAGICWELL))
+    {
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, "A second drink at the well in one day will not help you.", Font::BIG, Dialog::OK);
+	return;
+    }
+
+    SetVisited(dst_index);
+    magic_point = max_point;
+
+    if(H2Config::MyColor() == GetColor()) Dialog::Message(header, "A drink from the well has restored your spell points to maximum.", Font::BIG, Dialog::OK);
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMagicWell: " + GetName());
+}
+
+void Heroes::ActionToTradingPost(const u16 dst_index)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    if(H2Config::MyColor() == GetColor()) Dialog::Marketplace();
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionTotradingPost: " + GetName());
 }

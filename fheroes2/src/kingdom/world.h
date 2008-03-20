@@ -96,6 +96,11 @@ public:
     void NewMonth(void);
 
     const std::string & GetRumors(void);
+    
+    Spell::spell_t SpellFromShrine(const u16 index);
+    u16 NextTeleport(const u16 index) const;
+    Skill::secondary_t SkillFromWitchsHut(const u16 index);
+    const std::string & MessageSign(const u16 index);
 
 private:
     World(){};
@@ -105,14 +110,17 @@ private:
 private:
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;
-    std::vector<GameEvent::Sign *>      vec_signs;
     std::vector<GameEvent::Day *>       vec_eventsday;
     std::vector<GameEvent::Coord *>     vec_eventsmap;
     std::vector<GameEvent::Riddle *>    vec_riddles;
     std::vector<GameEvent::Rumor *>     vec_rumors;
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
-    std::vector<u16>                    vec_stonelights;
+    std::vector<u16>                    vec_teleports;
+
+    std::map<u16, std::string>		map_sign;
+    std::map<u16, Spell::spell_t>	map_shrine;
+    std::map<u16, Skill::secondary_t>	map_witchshut;
 
     u16 ultimate_artifact;
 

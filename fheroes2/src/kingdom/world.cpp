@@ -736,7 +736,7 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
 		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
-				    vec_signs.push_back(new GameEvent::Sign(*it_index, &pblock[9]));
+			map_sign[*it_index] = std::string(&pblock[9]);
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
@@ -792,8 +792,22 @@ void World::LoadMaps(const std::string &filename)
 
 	switch(tile.GetObject())
 	{
+	    case MP2::OBJ_WITCHSHUT:
+		map_witchshut[ii] = Skill::Secondary::RandForWitchsHut();
+		break;
+
+	    case MP2::OBJ_SHRINE1:
+		map_shrine[ii] = Rand::Get(10) % 2 ? Spell::RandCombat(1) : Spell::RandAdventure(1);
+		break;
+	    case MP2::OBJ_SHRINE2:
+		map_shrine[ii] = Rand::Get(10) % 2 ? Spell::RandCombat(2) : Spell::RandAdventure(2);
+		break;
+	    case MP2::OBJ_SHRINE3:
+		map_shrine[ii] = Rand::Get(10) % 2 ? Spell::RandCombat(3) : Spell::RandAdventure(3);
+		break;
+
 	    case MP2::OBJ_STONELIGHTS:
-		vec_stonelights.push_back(ii);
+		vec_teleports.push_back(ii);
 		break;
 
 	    case MP2::OBJ_EVENT:
@@ -1063,15 +1077,6 @@ void World::FreeOldMaps(void)
     }
     vec_kingdoms.clear();
 
-    // signs
-    if(vec_signs.size())
-    {
-	std::vector<GameEvent::Sign *>::const_iterator it = vec_signs.begin();
-	
-	for(; it != vec_signs.end(); ++it) delete *it;
-    }
-    vec_signs.clear();
-
     // event day
     if(vec_eventsday.size())
     {
@@ -1221,4 +1226,39 @@ const std::string & World::GetRumors(void)
     //vec_rumors.size();
 
     return (*vec_rumors[Rand::Get(vec_rumors.size() - 1)]).GetString();
+}
+
+/* return spell from shrine circle */
+Spell::spell_t World::SpellFromShrine(const u16 index)
+{
+    return map_shrine[index];
+}
+
+/* return random teleport destination */
+u16 World::NextTeleport(const u16 index) const
+{
+    if(vec_teleports.empty())
+    {
+	Error::Warning("World::NextTeleport: is empty.");
+
+	return index;
+    }
+
+    u16 result;
+
+    while((result = Rand::Get(vec_teleports.size() - 1)) == index) result = Rand::Get(vec_teleports.size() - 1);
+    
+    return result;
+}
+
+/* return skill from witchs hut */
+Skill::secondary_t World::SkillFromWitchsHut(const u16 index)
+{
+    return map_witchshut[index];
+}
+
+/* return message from sign */
+const std::string & World::MessageSign(const u16 index)
+{
+    return map_sign[index];
 }

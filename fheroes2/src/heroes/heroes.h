@@ -104,8 +104,6 @@ public:
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
 
     bool isFreeman(void) const{ return Color::GRAY == color; };
-    bool isVisited(const MP2::object_t & object) const;
-    bool isVisited(const Maps::Tiles & tile) const;
 
     bool operator== (const Heroes & h) const;
 
@@ -134,7 +132,10 @@ public:
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const;
     const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
-    Skill::Level::type_t GetLevelSkill(Skill::secondary_t type) const{ return secondary_skills.GetLevel(type); };
+
+    bool HasSecondarySkill(const Skill::secondary_t skill) const;
+    Skill::Level::type_t GetLevelSkill(const Skill::secondary_t skill) const;
+    void LearnBasicSkill(const Skill::secondary_t skill);
 
     bool HasArtifact(const Artifact::artifact_t & art) const;
 
@@ -154,13 +155,17 @@ public:
 
     bool BuySpellBook(void);
     void AppendSpellsToBook(const Spell::Storage & spells);
+    void AppendSpellToBook(const Spell::spell_t spell);
 
     const Route::Path & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
     
     Direction::vector_t GetDirection(void) const{ return direction; };
 
-    void SetVisited(const u32 index);
+    void SetVisited(const u16 index);
+    bool isVisited(const MP2::object_t & object) const;
+    bool isVisited(const Maps::Tiles & tile) const;
+
     void SetCenter(const Point& pt){ mp = pt; };
 
     bool isEnableMove(void) const;
@@ -190,6 +195,13 @@ protected:
     void ActionToBoat(void);
     void ActionToCoast(void);
     void ActionToResource(const u16 dst_index);
+    void ActionToShrine(const u16 dst_index);
+    void ActionToWitchsHut(const u16 dst_index);
+    void ActionToLuckObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToSign(const u16 dst_index);
+    void ActionToBottle(const u16 dst_index);
+    void ActionToMagicWell(const u16 dst_index);
+    void ActionToTradingPost(const u16 dst_index);
     void RedrawRotate(bool clockwise);
 
 private:

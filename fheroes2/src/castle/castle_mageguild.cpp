@@ -230,10 +230,20 @@ void Castle::OpenMageGuild(void)
     		const Spell::spell_t & spell = mageguild.GetSpell(1, ii);
 
     		if(le.MouseClickLeft(rectsLevel1[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG, Dialog::OK);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     		else
     		if(le.MousePressRight(rectsLevel1[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     	    }
         }
 
@@ -245,10 +255,20 @@ void Castle::OpenMageGuild(void)
     		const Spell::spell_t & spell = mageguild.GetSpell(2, ii);
 
     		if(le.MouseClickLeft(rectsLevel2[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG, Dialog::OK);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     		else
     		if(le.MousePressRight(rectsLevel2[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     	    }
         }
 
@@ -260,10 +280,20 @@ void Castle::OpenMageGuild(void)
     		const Spell::spell_t & spell = mageguild.GetSpell(3, ii);
 
     		if(le.MouseClickLeft(rectsLevel3[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG, Dialog::OK);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     		else
     		if(le.MousePressRight(rectsLevel3[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     	    }
         }
 
@@ -275,10 +305,20 @@ void Castle::OpenMageGuild(void)
     		const Spell::spell_t & spell = mageguild.GetSpell(4, ii);
 
     		if(le.MouseClickLeft(rectsLevel4[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG, Dialog::OK);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     		else
     		if(le.MousePressRight(rectsLevel4[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     	    }
         }
 
@@ -290,10 +330,20 @@ void Castle::OpenMageGuild(void)
     		const Spell::spell_t & spell = mageguild.GetSpell(5, ii);
 
     		if(le.MouseClickLeft(rectsLevel5[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG, Dialog::OK);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     		else
     		if(le.MousePressRight(rectsLevel5[ii]))
-    		    Dialog::Message(Spell::String(spell), Spell::Description(spell), Font::BIG);
+    		{
+    		    cursor.Hide();
+    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    cursor.Show();
+    		    display.Flip();
+    		}
     	    }
         }
 

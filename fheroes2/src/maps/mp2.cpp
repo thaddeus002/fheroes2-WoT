@@ -395,8 +395,8 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_ABANDONEDMINE:		return "Abandone Mine";
         case MP2::OBJN_TREEKNOWLEDGE:
         case MP2::OBJ_TREEKNOWLEDGE:		return "Tree Knowledge";
-        case MP2::OBJN_DOCTORHUNT:
-        case MP2::OBJ_DOCTORHUNT:		return "Doctor Hunt";
+        case MP2::OBJN_DOCTORHUT:
+        case MP2::OBJ_DOCTORHUT:		return "Doctor Hut";
         case MP2::OBJN_TEMPLE:
         case MP2::OBJ_TEMPLE:			return "Temple";
         case MP2::OBJN_HILLFORT:
@@ -415,8 +415,8 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_SPHINX:			return "Sphinx";
         case MP2::OBJN_TROLLBRIDGE:
         case MP2::OBJ_TROLLBRIDGE:		return "Troll Bridge";
-        case MP2::OBJN_WITCHHUNT:
-        case MP2::OBJ_WITCHHUNT:		return "Witch's Hunt";
+        case MP2::OBJN_WITCHSHUT:
+        case MP2::OBJ_WITCHSHUT:		return "Witch's Hut";
         case MP2::OBJN_XANADU:
         case MP2::OBJ_XANADU:			return "Xanadu";
         case MP2::OBJN_CAVE:
@@ -673,7 +673,7 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     	    case OBJ_STANDINGSTONES:
     	    case OBJ_IDOL:
     	    case OBJ_TREEKNOWLEDGE:
-    	    case OBJ_DOCTORHUNT:
+    	    case OBJ_DOCTORHUT:
     	    case OBJ_TEMPLE:
     	    case OBJ_HILLFORT:
     	    case OBJ_HALFLINGHOLE:
@@ -689,7 +689,7 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     	    case OBJ_WAGON:
     	    case OBJ_ARTESIANSPRING:
     	    case OBJ_TROLLBRIDGE:
-    	    case OBJ_WITCHHUNT:
+    	    case OBJ_WITCHSHUT:
     	    case OBJ_XANADU:
     	    case OBJ_CAVE:
     	    case OBJ_LEANTO:

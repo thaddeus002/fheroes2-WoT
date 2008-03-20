@@ -851,7 +851,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 
 	case MP2::OBJN_ABANDONEDMINE:	return MP2::OBJN_ABANDONEDMINE;
 	case MP2::OBJN_TREEKNOWLEDGE:	return MP2::OBJN_TREEKNOWLEDGE;
-	case MP2::OBJN_DOCTORHUNT:	return MP2::OBJN_DOCTORHUNT;
+	case MP2::OBJN_DOCTORHUT:	return MP2::OBJN_DOCTORHUT;
 	case MP2::OBJN_TEMPLE:		return MP2::OBJN_TEMPLE;
 	case MP2::OBJN_HILLFORT:	return MP2::OBJN_HILLFORT;
 	case MP2::OBJN_HALFLINGHOLE:	return MP2::OBJN_HALFLINGHOLE;
@@ -863,7 +863,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 
 	case MP2::OBJ_OILLAKE:		return MP2::OBJ_OILLAKE;
 	case MP2::OBJN_TROLLBRIDGE:	return MP2::OBJN_TROLLBRIDGE;
-	case MP2::OBJN_WITCHHUNT:	return MP2::OBJN_WITCHHUNT;
+	case MP2::OBJN_WITCHSHUT:	return MP2::OBJN_WITCHSHUT;
 	case MP2::OBJN_XANADU:		return MP2::OBJN_XANADU;
 	case MP2::OBJN_CAVE:		return MP2::OBJN_CAVE;
 	case MP2::OBJN_MAGELLANMAPS:	return MP2::OBJN_MAGELLANMAPS;
@@ -952,7 +952,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_STANDINGSTONES:	return MP2::OBJ_STANDINGSTONES;
 	case MP2::OBJ_IDOL:		return MP2::OBJ_IDOL;
 	case MP2::OBJ_TREEKNOWLEDGE:	return MP2::OBJ_TREEKNOWLEDGE;
-	case MP2::OBJ_DOCTORHUNT:	return MP2::OBJ_DOCTORHUNT;
+	case MP2::OBJ_DOCTORHUT:	return MP2::OBJ_DOCTORHUT;
 	case MP2::OBJ_TEMPLE:		return MP2::OBJ_TEMPLE;
 	case MP2::OBJ_HILLFORT:		return MP2::OBJ_HILLFORT;
 	case MP2::OBJ_HALFLINGHOLE:	return MP2::OBJ_HALFLINGHOLE;
@@ -970,7 +970,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_TROLLBRIDGE:	return MP2::OBJ_TROLLBRIDGE;
 	case MP2::OBJN_CRAKEDLAKE:	return MP2::OBJN_CRAKEDLAKE;
 	case MP2::OBJ_CRAKEDLAKE:	return MP2::OBJ_CRAKEDLAKE;
-	case MP2::OBJ_WITCHHUNT:	return MP2::OBJ_WITCHHUNT;
+	case MP2::OBJ_WITCHSHUT:	return MP2::OBJ_WITCHSHUT;
 	case MP2::OBJ_XANADU:		return MP2::OBJ_XANADU;
 	case MP2::OBJ_CAVE:		return MP2::OBJ_CAVE;
 	case MP2::OBJ_LEANTO:		return MP2::OBJ_LEANTO;
@@ -1439,6 +1439,25 @@ Maps::TilesAddon * Maps::Tiles::FindMonster(void)
 
 	    // MONS32
 	    if(0x2F < addon.object && 0x34 > addon.object) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindBottle(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNWAT
+	    if(0xC7 < addon.object && 0xCC > addon.object && 0 == addon.index) return &addon;
 	}
     }
 

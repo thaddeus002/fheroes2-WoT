@@ -61,3 +61,51 @@ void Spell::Book::Appends(const Storage & st)
 	spells_level5.unique();
     }
 }
+
+void Spell::Book::Append(const Spell::spell_t sp)
+{
+    switch(Spell::Level(sp))
+    {
+	case 1:
+	    if(spells_level1.end() == std::find(spells_level1.begin(), spells_level1.end(), sp))
+	    {
+		spells_level1.push_back(sp);
+		spells_level1.sort();
+	    }
+	break;
+	
+	case 2:
+	    if(spells_level2.end() == std::find(spells_level2.begin(), spells_level2.end(), sp))
+	    {
+		spells_level2.push_back(sp);
+		spells_level2.sort();
+	    }
+	break;
+	
+	case 3:
+	    if(spells_level3.end() == std::find(spells_level3.begin(), spells_level3.end(), sp))
+	    {
+		spells_level3.push_back(sp);
+		spells_level3.sort();
+	    }
+	break;
+
+	case 4:
+	    if(spells_level4.end() == std::find(spells_level4.begin(), spells_level4.end(), sp))
+	    {
+		spells_level4.push_back(sp);
+		spells_level4.sort();
+	    }
+	break;
+
+	case 5:
+	    if(spells_level5.end() == std::find(spells_level5.begin(), spells_level5.end(), sp))
+	    {
+		spells_level5.push_back(sp);
+		spells_level5.sort();
+	    }
+	break;
+	
+	default: break;
+    }
+}

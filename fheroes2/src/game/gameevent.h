@@ -30,21 +30,6 @@
 namespace GameEvent
 {
 
-class Sign
-{
-public:
-    Sign(u16 index, const char *str);
-
-    u16 GetIndex(void) const{ return index_map; };
-    const std::string & GetText(void) const{ return message; };
-    
-    void Show(void);
-
-private:
-    u16 index_map;
-    std::string message;
-};
-
 class Day
 {
 public:
