@@ -967,7 +967,9 @@ Game::menu_t Game::StartGame(void)
 
 		cursor.Hide();
 
-    		if(global_focus.GetHeroes().Move()) global_focus.GetHeroes().Action();
+    		if(global_focus.GetHeroes().Move())
+    		    // action, and modify sound evironment
+    		    global_focus.GetHeroes().Action();
 
 		selectHeroes.Redraw();
 		areaMaps.Center(global_focus.Center());

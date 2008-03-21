@@ -19,13 +19,9 @@
  ***************************************************************************/
 
 #include "rect.h"
-#include "agg.h"
-#include "display.h"
 #include "castle.h"
 #include "error.h"
 #include "settings.h"
-#include "text.h"
-#include "tools.h"
 #include "sprite.h"
 #include "payment.h"
 
@@ -733,136 +729,5 @@ PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const u32
 	    break;
 																						
 	default: Error::Warning("PaymentConditions::BuyBuilding: unknown building."); break;
-    }
-}
-
-void PaymentConditions::AlignDraw(const payment_t & payment, const Rect & dst_rt)
-{
-    const u8 valid_resource = payment.GetValidItems();
-
-    u16 index = 2 < valid_resource ? dst_rt.w / 3 : dst_rt.w / valid_resource;
-
-    u8 count = 0;
-    u8 offset = 50;
-
-    std::string str;
-    Point dst_pt;
-
-    Display & display = Display::Get();
-
-    if(payment.wood)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, payment.wood);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
-
-	++count;
-    }
-
-    if(payment.ore)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, payment.ore);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
-
-	++count;
-    }
-
-    if(payment.mercury)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, payment.mercury);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
-
-	++count;
-    }
-
-    if(2 < count){ count = 0; offset += 50; }
-
-    if(payment.sulfur)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, payment.sulfur);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
-
-	++count;
-    }
-
-    if(2 < count){ count = 0; offset += 50; }
-    if(payment.crystal)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h()  + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, payment.crystal);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
-
-	++count;
-    }
-
-    if(2 < count){ count = 0; offset += 50; }
-    if(payment.gems)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, payment.gems);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
-
-	++count;
-    }
-
-    if(2 < count){ count = 0; offset += 50; }
-    if(payment.gold)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
-	if(! count) index = dst_rt.w;
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, payment.gold);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
     }
 }

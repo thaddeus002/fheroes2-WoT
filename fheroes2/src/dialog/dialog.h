@@ -28,6 +28,7 @@
 #include "spell.h"
 #include "skill.h"
 #include "text.h"
+#include "resource.h"
 #include "game.h"
 
 #define	SHADOWWIDTH	16
@@ -82,6 +83,8 @@ namespace Dialog
     void SkillInfo(const std::string &header, const std::string &message, const Skill::secondary_t skill, const Skill::Level::type_t level, const bool ok_button = true);
     void SkillInfo(const std::string &header, const std::string &message, const Skill::primary_t skill);
     void SpriteInfo(const std::string &header, const std::string &message, const Sprite & sprite);
+    void ExperienceInfo(const std::string &header, const std::string &message, const u16 exp);
+    void ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs);
 
     // redistribute count
     u16 SelectCount(u16 max);

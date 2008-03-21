@@ -20,7 +20,12 @@
 
 #include "rand.h"
 #include "error.h"
+#include "mp2.h"
 #include "world.h"
+#include "agg.h"
+#include "sprite.h"
+#include "tools.h"
+#include "display.h"
 #include "resource.h"
 
 Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
@@ -39,9 +44,34 @@ Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0)
     }
 }
 
+Resource::funds_t::funds_t(const u8 obj) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
+{
+    const u8 count = Rand::Get(4, 6);
+
+    switch(obj)
+    {
+	case MP2::OBJ_CAMPFIRE:
+	    switch(Rand::Get(1, 6))
+	    {
+    		case 1: wood = count; break;
+    		case 2: mercury = count; break;
+    		case 3: ore = count; break;
+    		case 4: sulfur = count; break;
+    		case 5: crystal = count; break;
+    		case 6: gems = count; break;
+    		default: break;
+	    }
+	    gold = count * 100;
+	    break;
+
+	default: break;
+    }
+}
+
 Resource::resource_t Resource::Rand(void)
 {
-    switch(Rand::Get(1, 7)){
+    switch(Rand::Get(1, 7))
+    {
         case 1: return Resource::WOOD;
         case 2: return Resource::MERCURY;
         case 3: return Resource::ORE;
@@ -54,6 +84,7 @@ Resource::resource_t Resource::Rand(void)
 
     return Resource::WOOD;
 }
+
 // operator funds_t +
 const Resource::funds_t Resource::funds_t::operator+ (const Resource::funds_t & pm) const
 {
@@ -311,5 +342,136 @@ void Resource::ChangeTileWithRNDResource(Maps::Tiles & tile)
 
             if(shadow) shadow->index = index - 1;
         }
+    }
+}
+
+void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
+{
+    const u8 valid_resource = rs.GetValidItems();
+
+    u16 index = 2 < valid_resource ? dst_rt.w / 3 : dst_rt.w / valid_resource;
+
+    u8 count = 0;
+    u8 offset = 50;
+
+    std::string str;
+    Point dst_pt;
+
+    Display & display = Display::Get();
+
+    if(rs.wood)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, rs.wood);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(rs.ore)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, rs.ore);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(rs.mercury)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, rs.mercury);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+
+    if(rs.sulfur)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, rs.sulfur);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+    if(rs.crystal)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h()  + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, rs.crystal);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+    if(rs.gems)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, rs.gems);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
+
+	++count;
+    }
+
+    if(2 < count){ count = 0; offset += 50; }
+    if(rs.gold)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
+	if(! count) index = dst_rt.w;
+	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
+	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	display.Blit(sprite, dst_pt);
+
+	str.clear();
+	String::AddInt(str, rs.gold);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	dst_pt.y = dst_rt.y + 2 + offset;
+	Text(str, Font::SMALL, dst_pt);
     }
 }

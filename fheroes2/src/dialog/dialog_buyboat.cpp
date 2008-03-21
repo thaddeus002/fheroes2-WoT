@@ -69,7 +69,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 
     const PaymentConditions::BuyBuilding payment(world.GetMyKingdom().GetRace(), Castle::BUILD_BOAT);
     
-    PaymentConditions::AlignDraw(payment, src_rt);
+    Resource::AlignDraw(payment, src_rt);
 
     // buttons
     dst_pt.x = box_rt.x;

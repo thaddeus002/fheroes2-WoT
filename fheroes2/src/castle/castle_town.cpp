@@ -80,7 +80,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
 
     src_rt.y += 50;
-    PaymentConditions::AlignDraw(paymentCosts, src_rt);
+    Resource::AlignDraw(paymentCosts, src_rt);
 
     dst_pt.x = box_rt.x;
     dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
@@ -291,7 +291,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     src_rt.w = BOXAREA_WIDTH;
     src_rt.h = box_rt.h - src_rt.y;
 
-    PaymentConditions::AlignDraw(paymentBuild, src_rt);
+    Resource::AlignDraw(paymentBuild, src_rt);
 
     if(buttons)
     {

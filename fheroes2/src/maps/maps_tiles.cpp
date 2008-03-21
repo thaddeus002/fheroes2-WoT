@@ -1463,3 +1463,28 @@ Maps::TilesAddon * Maps::Tiles::FindBottle(void)
 
     return NULL;
 }
+
+Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNDSRT
+            if(0x63 < addon.object && 0x68 > addon.object && 61 == addon.index) return &addon;
+	    else
+	    // OBJNMULT
+            if(0xEB < addon.object && 0xF0 > addon.object && 131 == addon.index) return &addon;
+	    else
+	    // OBJNSNOW
+            if(0x57 < addon.object && 0x5C > addon.object && 4 == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}

@@ -383,8 +383,6 @@ namespace PaymentConditions
     public:
 	UpgradeMonster(const Monster::monster_t & monster);
     };
-
-    void AlignDraw(const payment_t & payment, const Rect & dst_rt);
 };
 
 #endif

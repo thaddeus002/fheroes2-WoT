@@ -195,6 +195,7 @@ protected:
     void ActionToBoat(void);
     void ActionToCoast(void);
     void ActionToResource(const u16 dst_index);
+    void ActionToResource(const u16 dst_index, const MP2::object_t obj);
     void ActionToShrine(const u16 dst_index);
     void ActionToWitchsHut(const u16 dst_index);
     void ActionToLuckObject(const u16 dst_index, const MP2::object_t obj);
@@ -204,6 +205,7 @@ protected:
     void ActionToTradingPost(const u16 dst_index);
     void ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t obj);
     void ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToExperienceObject(const u16 dst_index, const MP2::object_t obj);
     void RedrawRotate(bool clockwise);
 
 private:

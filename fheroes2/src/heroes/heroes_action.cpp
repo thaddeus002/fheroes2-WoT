@@ -49,12 +49,12 @@ void Heroes::Action(void)
 	case MP2::OBJ_COAST:	ActionToCoast(); break;
 
         // resource
-        case MP2::OBJ_RESOURCE:	ActionToResource(dst_index); break;
+        case MP2::OBJ_RESOURCE:	ActionToResource(dst_index, MP2::OBJ_RESOURCE); break;
+        case MP2::OBJ_CAMPFIRE: ActionToResource(dst_index, MP2::OBJ_CAMPFIRE); break;
 
         case MP2::OBJ_ARTIFACT:
         case MP2::OBJ_ANCIENTLAMP:
         case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_CAMPFIRE:
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_FLOTSAM:
     	    path.Hide();
@@ -70,11 +70,11 @@ void Heroes::Action(void)
         // witchs hut
         case MP2::OBJ_WITCHSHUT: ActionToWitchsHut(dst_index); break;
 
-        // message
+        // info message
         case MP2::OBJ_SIGN:	ActionToSign(dst_index); break;
         case MP2::OBJ_BOTTLE:	ActionToBottle(dst_index); break;
 
-        // luck object
+        // luck modification
         case MP2::OBJ_FOUNTAIN: ActionToLuckObject(dst_index, MP2::OBJ_FOUNTAIN); break;
         case MP2::OBJ_FAERIERING: ActionToLuckObject(dst_index, MP2::OBJ_FAERIERING); break;
         case MP2::OBJ_IDOL:	ActionToLuckObject(dst_index, MP2::OBJ_IDOL); break;
@@ -83,14 +83,19 @@ void Heroes::Action(void)
 
         case MP2::OBJ_TRADINGPOST: ActionToTradingPost(dst_index); break;
 
+        // primary skill modification
         case MP2::OBJ_FORT:		ActionToPrimarySkillObject(dst_index, MP2::OBJ_FORT); break;
         case MP2::OBJ_MERCENARYCAMP:	ActionToPrimarySkillObject(dst_index, MP2::OBJ_MERCENARYCAMP); break;
         case MP2::OBJ_DOCTORHUT:	ActionToPrimarySkillObject(dst_index, MP2::OBJ_DOCTORHUT); break;
         case MP2::OBJ_STANDINGSTONES:	ActionToPrimarySkillObject(dst_index, MP2::OBJ_STANDINGSTONES); break;
 
+        // morale modification
         case MP2::OBJ_OASIS:		ActionToMoraleObject(dst_index, MP2::OBJ_OASIS); break;
         case MP2::OBJ_TEMPLE:		ActionToMoraleObject(dst_index, MP2::OBJ_TEMPLE); break;
         case MP2::OBJ_BUOY:		ActionToMoraleObject(dst_index, MP2::OBJ_BUOY); break;
+
+        // experience modification
+        case MP2::OBJ_GAZEBO:		ActionToExperienceObject(dst_index, MP2::OBJ_GAZEBO); break;
 
         // object
         case MP2::OBJ_ALCHEMYTOWER:
@@ -111,7 +116,6 @@ void Heroes::Action(void)
 
         case MP2::OBJ_SKELETON:
         case MP2::OBJ_DAEMONCAVE:
-        case MP2::OBJ_GAZEBO:
         case MP2::OBJ_GRAVEYARD:
         case MP2::OBJ_DRAGONCITY:
         case MP2::OBJ_OBELISK:
@@ -149,6 +153,8 @@ void Heroes::Action(void)
 	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: unknown: " + std::string(MP2::StringObject(object)));
 	    break;
     }
+
+    return;
 }
 
 void Heroes::ActionToMonster(const u16 dst_index)
@@ -233,6 +239,7 @@ void Heroes::ActionToCoast(void)
 void Heroes::ActionToResource(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+
     const Maps::TilesAddon *addon = tile.FindResource();
 
     path.Hide();
@@ -278,6 +285,58 @@ void Heroes::ActionToResource(const u16 dst_index)
 	tile.Redraw();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
+    }
+}
+
+void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    const Maps::TilesAddon *addon = NULL;
+
+    std::string header;
+    std::string body;
+
+    switch(obj)
+    {
+	case MP2::OBJ_CAMPFIRE:
+	    addon = tile.FindCampFire();
+	    header = std::string(MP2::StringObject(obj));
+	    body = "Ransacking an enemy camp, you discover a hidden cache of treasures.";
+	    break;
+
+	default: Error::Warning("Heroes::ActionToResource: unknown object: ", dst_index); return;
+    }
+
+    path.Hide();
+    path.Reset();
+
+    if(addon)
+    {
+	Resource::funds_t resource(obj);
+	const u32 uniq = addon->uniq;
+
+	PlayPickupSound();
+
+	world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+	if(H2Config::Debug()) Dialog::ResourceInfo(header, body, resource);
+
+	tile.Remove(uniq);
+	tile.SetObject(MP2::OBJ_ZERO);
+
+	// remove shadow from left cell
+	if(Maps::isValidDirection(dst_index, Direction::LEFT))
+	{
+	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
+
+	    left_tile.Remove(uniq);
+	    left_tile.Redraw();
+        }
+
+	tile.Redraw();
+
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: "  + GetName() + ": " + MP2::StringObject(obj));
     }
 }
 
@@ -600,6 +659,7 @@ void Heroes::ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj)
     	    break;
 
 /*
+	FIXME bud morale modification
         case MP2::OBJ_GRAVEYARD:
     	    body_false = "";
     	    body_true = "";
@@ -637,4 +697,47 @@ void Heroes::ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj)
     }
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMoraleObject: " + GetName());
+}
+
+void Heroes::ActionToExperienceObject(const u16 dst_index, const MP2::object_t obj)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    const char *body_true = NULL;
+    const char *body_false = NULL;
+    
+    u16 exp = 0;
+
+    switch(obj)
+    {
+        case MP2::OBJ_GAZEBO:
+    	    body_false = "An old Knight appears on the steps of the gazebo. \"I am sorry, my liege, I have taught you all I can.\"";
+    	    body_true = "An old Knight appears on the steps of the gazebo. \"My liege, I will teach you all that I know to aid you in your travels.\"";
+    	    exp = 1000;
+    	    break;
+
+    	default: return;
+    }
+
+    const std::string header(MP2::StringObject(obj));
+
+    // check already visited
+    if(isVisited(obj))
+    {
+	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+	return;
+    }
+
+    // visit
+    SetVisited(dst_index);
+
+    // increase experience
+    experience += exp;
+
+    if(H2Config::MyColor() == GetColor()) Dialog::ExperienceInfo(header, body_true, exp);
+
+    // FIXME: check level up
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToExperienceObject: " + GetName());
 }

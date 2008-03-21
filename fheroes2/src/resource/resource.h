@@ -54,6 +54,7 @@ namespace Resource
     public:
 	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};
 	funds_t(const resource_t rs, u32 count);
+	funds_t(const u8 obj);
 
 	const funds_t operator+ (const funds_t &pm) const;
 	const funds_t operator* (u32 mul) const;
@@ -82,6 +83,7 @@ namespace Resource
     const std::string & String(resource_t resource);
 
     resource_t Rand(void);
+    resource_t Rand2(void);
     u16	RandCount(Resource::resource_t res);
     
     /* return index sprite objnrsrc.icn */
@@ -91,6 +93,8 @@ namespace Resource
     u8 GetIndexSprite2(resource_t resource);
 
     void ChangeTileWithRNDResource(Maps::Tiles & tile);
+
+    void AlignDraw(const funds_t & rs, const Rect & dst_rt);
 };
 
 #endif
