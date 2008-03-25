@@ -46,11 +46,12 @@ Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0)
 
 Resource::funds_t::funds_t(const u8 obj) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
 {
-    const u8 count = Rand::Get(4, 6);
+    u8 count = 0;
 
     switch(obj)
     {
 	case MP2::OBJ_CAMPFIRE:
+	    count = Rand::Get(4, 6);
 	    switch(Rand::Get(1, 6))
 	    {
     		case 1: wood = count; break;
@@ -62,6 +63,20 @@ Resource::funds_t::funds_t(const u8 obj) : wood(0), mercury(0), ore(0), sulfur(0
     		default: break;
 	    }
 	    gold = count * 100;
+	    break;
+
+	case MP2::OBJ_LEANTO:
+	    count = Rand::Get(1, 4);
+	    switch(Rand::Get(1, 6))
+	    {
+    		case 1: wood = count; break;
+    		case 2: mercury = count; break;
+    		case 3: ore = count; break;
+    		case 4: sulfur = count; break;
+    		case 5: crystal = count; break;
+    		case 6: gems = count; break;
+    		default: break;
+	    }
 	    break;
 
 	default: break;

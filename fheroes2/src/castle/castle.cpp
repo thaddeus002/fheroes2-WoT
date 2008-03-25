@@ -274,6 +274,11 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
+bool Castle::ContainCoord(const u16 ax, const u16 ay) const
+{
+    return ((mp.x == ax && mp.y - 3 == ay) || (ax >= mp.x - 2 && ax <= mp.x + 2 && ay >= mp.y - 2 && ay <= mp.y + 1));
+}
+
 bool Castle::isHeroesPresent(void)
 {
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp));

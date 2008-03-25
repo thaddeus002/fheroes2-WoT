@@ -970,15 +970,11 @@ const Castle * World::GetCastle(u16 maps_index)
 /* get castle from coord maps */
 const Castle * World::GetCastle(u8 ax, u8 ay)
 {
-    std::vector<Castle *>::const_iterator itc = vec_castles.begin();
+    std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
+    std::vector<Castle *>::const_iterator it2 = vec_castles.end();
 
-    for(; itc != vec_castles.end(); ++itc)
-    {
-        const Point & pt = (**itc).GetCenter();
-
-        if((pt.x == ax && pt.y - 3 == ay) ||
-           (ax >= pt.x - 2 && ax <= pt.x + 2 && ay >= pt.y - 2 && ay <= pt.y + 1)) return *itc;
-    }
+    for(; it1 != it2; ++it1)
+        if(*it1 && (*it1)->ContainCoord(ax, ay)) return *it1;
 
     Error::Warning("World::GetCastle: return NULL pointer");
 
@@ -994,14 +990,11 @@ const Heroes * World::GetHeroes(u16 maps_index)
 /* get heroes from coord maps */
 const Heroes * World::GetHeroes(u8 ax, u8 ay)
 {
-    std::vector<Heroes *>::const_iterator ith = vec_heroes.begin();
+    std::vector<Heroes *>::const_iterator it1 = vec_heroes.begin();
+    std::vector<Heroes *>::const_iterator it2 = vec_heroes.end();
 
-    for(; ith != vec_heroes.end(); ++ith)
-    {
-        const Point & pt = (**ith).GetCenter();
-
-        if(pt.x == ax && pt.y == ay) return *ith;
-    }
+    for(; it1 != it2; ++it1)
+        if(*it1 && (*it1)->GetCenter().x == ax && (*it1)->GetCenter().y == ay) return *it1;
 
     //dinamic object
     //Error::Warning("World::GetHeroes: return NULL pointer");

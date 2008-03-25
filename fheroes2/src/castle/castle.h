@@ -91,6 +91,7 @@ public:
     bool RecruitMonster(building_t dw, u16 count);
     bool AllowBuyBuilding(building_t build) const;
     bool AllowBuyHero(void);
+    bool ContainCoord(const u16 ax, const u16 ay) const;
 
     void RecruitHero(const Heroes::heroes_t hero);
     const Heroes* GetHeroes(void){ return castle_heroes; };

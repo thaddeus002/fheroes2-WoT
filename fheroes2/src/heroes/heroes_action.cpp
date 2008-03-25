@@ -299,6 +299,10 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 
     switch(obj)
     {
+	case MP2::OBJ_RESOURCE:
+	    ActionToResource(dst_index);
+	    return;
+
 	case MP2::OBJ_CAMPFIRE:
 	    addon = tile.FindCampFire();
 	    header = std::string(MP2::StringObject(obj));
