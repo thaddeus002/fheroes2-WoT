@@ -36,8 +36,9 @@
 #include "display.h"
 #include "maps_tiles.h"
 
-Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(GROUND), uniq(gid), object(obj), index(ii)
+Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
 {
+/*
     switch(lv % 4)
     {
 	case 0:	level = GROUND;	break;
@@ -45,6 +46,7 @@ Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(GROUND), uni
 	case 2:	level = SHADOW;	break;
 	case 3:	level = UPPER;	break;
     }
+*/
 }
 
 Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
@@ -62,12 +64,12 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
 
 bool Maps::TilesAddon::PredicateSortRules1(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
 {
-    return ta1.level > ta2.level;
+    return ((ta1.level % 4) > (ta2.level % 4));
 }
 
 bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
 {
-    return ta1.level < ta2.level;
+    return ((ta1.level % 4) < (ta2.level % 4));
 }
 
 u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
@@ -170,7 +172,7 @@ void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2addon_t & ma)
 {
     if(ma.objectNameN1 && ma.indexNameN1 < 0xFF)
-	addons_level1.push_back(TilesAddon(ma.quantityN % 4, ma.uniqNumberN1, ma.objectNameN1, ma.indexNameN1));
+	addons_level1.push_back(TilesAddon(ma.quantityN, ma.uniqNumberN1, ma.objectNameN1, ma.indexNameN1));
 }
 
 void Maps::Tiles::AddonsPushLevel2(const MP2::mp2tile_t & mt)
@@ -182,7 +184,7 @@ void Maps::Tiles::AddonsPushLevel2(const MP2::mp2tile_t & mt)
 void Maps::Tiles::AddonsPushLevel2(const MP2::mp2addon_t & ma)
 {
     if(ma.objectNameN2 && ma.indexNameN2 < 0xFF)
-	addons_level2.push_back(TilesAddon(ma.quantityN % 4, ma.uniqNumberN2, ma.objectNameN2, ma.indexNameN2));
+	addons_level2.push_back(TilesAddon(ma.quantityN, ma.uniqNumberN2, ma.objectNameN2, ma.indexNameN2));
 }
 
 void Maps::Tiles::AddonsSort(void)
@@ -1101,6 +1103,12 @@ bool Maps::Tiles::isPassable(void) const
 {
     if(Game::Focus::Get().Type() != Game::Focus::HEROES) return false;
 
+    std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+    std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+    for(; it1 != it2; ++it1)
+    	if((*it1).level == 0 && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
+/*
     if(Game::Focus::Get().GetHeroes().isShipMaster())
     {
     	if(Ground::WATER != Maps::Tiles::GetGround()) return false;
@@ -1142,8 +1150,8 @@ bool Maps::Tiles::isPassable(void) const
 	    default: return false;
 	}
     }
-
-    return false;
+*/
+    return true;
 }
 
 /* check road */

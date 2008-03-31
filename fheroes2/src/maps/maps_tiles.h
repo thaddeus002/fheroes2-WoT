@@ -44,7 +44,7 @@ namespace Maps
 	static bool PredicateSortRules1(const TilesAddon & ta1, const TilesAddon & ta2);
 	static bool PredicateSortRules2(const TilesAddon & ta1, const TilesAddon & ta2);
 
-        level_t level;
+        u8	level;
         u32	uniq;
         u8	object;
         u8	index;
