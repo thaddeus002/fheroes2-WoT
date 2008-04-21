@@ -31,15 +31,18 @@ ENGINE := $(addprefix $(SOURCEROOT)/, $(addsuffix /*.cpp, engine))
 all: $(TARGET)
 
 $(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH))))
-	$(CC) $^ -o $@ $(LIBS)
+	@echo "lnk: $@"
+	@$(CC) $^ -o $@ $(LIBS)
 
 VPATH := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
 
 settings.o: settings.cpp
-	$(CC) -c -MD $(addprefix -I$(SOURCEROOT)/, $(SOURCEDIR)) $< $(CFLAGS) -DBUILD_DATE=$(shell date +%Y%m%d)
+	@echo "cxx: $@"
+	@$(CC) -c -MD $(addprefix -I$(SOURCEROOT)/, $(SOURCEDIR)) $< $(CFLAGS) -DBUILD_DATE=$(shell date +%Y%m%d)
 
 %.o: %.cpp
-	$(CC) -c -MD $(addprefix -I$(SOURCEROOT)/, $(SOURCEDIR)) $< $(CFLAGS)
+	@echo "cxx: $@"
+	@$(CC) -c -MD $(addprefix -I$(SOURCEROOT)/, $(SOURCEDIR)) $< $(CFLAGS)
 
 include $(wildcard *.d)
 

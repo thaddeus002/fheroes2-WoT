@@ -20,6 +20,15 @@
 #ifndef H2ENGINE_H
 #define H2ENGINE_H
 
+#include "audio.h"
+#include "background.h"
+#include "display.h"
+#include "error.h"
+#include "localevent.h"
+#include "rect.h"
+#include "spritecursor.h"
+#include "surface.h"
+#include "palette.h"
 #include "types.h"
 
 #define INIT_VIDEO	SDL_INIT_VIDEO

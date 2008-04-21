@@ -13,24 +13,11 @@ all: libengine $(TARGETS)
 libengine:
 	make -C ../engine
 
-extractor: extractor.o
-	$(CC) $^ -o $@ $(LIBS)
-
-82m2wav: 82m2wav.o
-	$(CC) $^ -o $@ $(LIBS)
-
-til2bmp: til2bmp.o
-	$(CC) $^ -o $@ $(LIBS)
-
-icn2bmp: icn2bmp.o
-	$(CC) $^ -o $@ $(LIBS)
-
-%.o: %.cpp
-	$(CC) -c -MD $< $(CFLAGS)
-
-include $(wildcard *.d)
+$(TARGETS): $(addsuffix .cpp, $(TARGETS))
+	$(CC) -c $@.cpp $(CFLAGS)
+	$(CC) -o $@ $@.o $(LIBS)
 
 .PHONY: clean
 
 clean:
-	rm -f *.o *.d *.exe $(TARGETS)
+	rm -f *.o *.exe $(TARGETS)

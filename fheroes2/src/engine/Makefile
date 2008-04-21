@@ -8,7 +8,7 @@ CFLAGS = -O2 -Wall $(shell sdl-config --cflags) -I .
 
 CC = g++
 
-all: $(TARGET).a
+all: $(TARGET).a $(TARGET).so
 
 $(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 	$(CC) -shared -fPIC -o $@ $^ $(LIBS)
@@ -24,7 +24,4 @@ include $(wildcard *.d)
 .PHONY: clean
 
 clean:
-	rm -f *.a
-	rm -f *.so
-	rm -f *.d
-	rm -f *.o
+	rm -f *.a *.so *.d *.o
