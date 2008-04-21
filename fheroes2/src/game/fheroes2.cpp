@@ -39,6 +39,27 @@
 #include "image_logo.h"
 #include "image_icons.h"
 
+#ifdef WIN32
+#warning Fixme libgen.h
+char *dirname(char *path) {
+	static char buff[PATH_MAX];
+	strcpy(buff, path);
+	char *c = strrchr(buff, '\\');
+	if(!c) strcpy(path, ".");
+	else *c = 0;
+	return buff;
+}
+
+char *basename(char *path) {
+	static char buff[PATH_MAX];
+	char *c = strrchr(path, '\\');
+	if(!c) strcpy(buff, path);
+	else strcpy(buff, c);
+	return buff;
+}
+
+#endif
+
 int main(int argc, char **argv)
 {
 	chdir(dirname(argv[0]));
