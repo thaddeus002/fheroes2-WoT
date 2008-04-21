@@ -36,6 +36,8 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 
     // cursor
     Cursor & cursor = Cursor::Get();
+    bool oldvisible = cursor.isVisible();
+    Cursor::themes_t oldthemes = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
@@ -125,7 +127,8 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 	if(le.KeyPress(KEY_ESCAPE)){ result = Dialog::NO | Dialog::CANCEL; break; }
     }
 
-    cursor.Hide();
+    cursor.SetThemes(oldthemes);
+    if(!oldvisible) cursor.Hide();
 
     if(button1) delete button1;
     if(button2) delete button2;
