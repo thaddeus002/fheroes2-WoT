@@ -26,6 +26,7 @@
 #include "direction.h"
 #include "surface.h"
 #include "gamedefs.h"
+#include "color.h"
 
 class Sprite;
 
@@ -85,6 +86,7 @@ namespace Maps
 	TilesAddon * FindFlags(void);
 	TilesAddon * FindRNDMonster(const u8 level = 0);
 	TilesAddon * FindMonster(void);
+	TilesAddon * FindMines(void);
 
 	void SetTile(const u16 index, const u8 shape);
 
@@ -109,6 +111,10 @@ namespace Maps
 	void FixAnimation(void);
 
 	void DebugInfo(u16 index = 0xFFFF) const;
+	
+	bool GetFog(Color::color_t color){ return fogs & color; };
+	void SetFog(Color::color_t color){ fogs |= color; };
+	void ClearFog(Color::color_t color){ fogs &= ~color; };
 
     private:
 	void RedrawBoat(u16 dx, u16 dy) const;

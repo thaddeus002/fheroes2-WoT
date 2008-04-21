@@ -26,7 +26,6 @@
 #include "world.h"
 #include "race.h"
 #include "config.h"
-#include "color.h"
 #include "error.h"
 #include "heroes.h"
 #include "sprite.h"
@@ -1491,6 +1490,25 @@ Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
 	    else
 	    // OBJNSNOW
             if(0x57 < addon.object && 0x5C > addon.object && 4 == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindMines(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // EXTRAOVR
+	    if(0x74 == addon.object) return &addon;
 	}
     }
 

@@ -47,9 +47,9 @@
 
 #define DEFAULT_MOVE_POINTS	11
 
-/*
+
 #define SCOUTINGBASE		4
-*/
+
 
 #define DEFAULT_KNGT_ATTACK	2
 #define DEFAULT_KNGT_DEFENCE	2
@@ -207,6 +207,7 @@ protected:
     void ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj);
     void ActionToExperienceObject(const u16 dst_index, const MP2::object_t obj);
     void RedrawRotate(bool clockwise);
+    void Scoute(void);
 
 private:
     std::string		name;

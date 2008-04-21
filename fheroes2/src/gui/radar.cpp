@@ -25,6 +25,7 @@
 #include "gamearea.h"
 #include "ground.h"
 #include "world.h"
+#include "castle.h"
 #include "radar.h"
 
 #define RADARCOLOR	0x40	// index palette
@@ -38,6 +39,14 @@
 #define COLOR_GRASS	0x61
 #define COLOR_WATER	0xF0
 #define COLOR_ROAD	0x7A
+
+#define COLOR_BLUE	0x47
+#define COLOR_GREEN	0x67
+#define COLOR_RED	0xbd
+#define COLOR_YELLOW	0x70
+#define COLOR_ORANGE	0xcd
+#define COLOR_PURPLE	0x87
+
 
 /* constructor */
 Radar::Radar() :
@@ -59,28 +68,72 @@ void Radar::GenerateOrigin(void)
     u16 index = 0;
 
     Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2, true);
+	Color::color_t mycolor = world.GetMyKingdom().GetColor();
     
     for(u16 jj = 0; jj < world.h(); ++jj)
     {
 	for(u16 ii = 0; ii < world.w(); ++ii)
 	{
-	    const Maps::Tiles & tile = world.GetTiles(index);
+	    Maps::Tiles & tile = world.GetTiles(index);
 
+	    int pass;
+	    switch (tile.GetObject()) {
+	        case MP2::OBJ_TREES:
+	        case MP2::OBJ_MOUNTS:
+	        case MP2::OBJ_DUNE:
+	            pass = 2;
+	            break;
+	        default:
+	            pass = 0;
+	    }
+		if(!H2Config::Debug() && tile.GetFog(mycolor)) {
+			tile_surface.Fill(0);
+		} else 
+	    if(tile.FindCastle()) {
+			const Castle *castle = world.GetCastle(index);
+			switch(castle->GetColor()) {
+			  case Color::BLUE:
+		        tile_surface.Fill(AGG::GetColor(COLOR_BLUE));
+			    break;
+			  case Color::GREEN:
+		        tile_surface.Fill(AGG::GetColor(COLOR_GREEN));
+			    break;
+			  case Color::RED:
+		        tile_surface.Fill(AGG::GetColor(COLOR_RED));
+			    break;
+			  case Color::YELLOW:
+		        tile_surface.Fill(AGG::GetColor(COLOR_YELLOW));
+			    break;
+			  case Color::ORANGE:
+		        tile_surface.Fill(AGG::GetColor(COLOR_ORANGE));
+			    break;
+			  case Color::PURPLE:
+		        tile_surface.Fill(AGG::GetColor(COLOR_PURPLE));
+			    break;
+			  case Color::GRAY:
+		        tile_surface.Fill(0xffffffff);
+			    break;
+			}
+	    } else
+		if(tile.FindMines()) {
+		// TODO correct color for mine
+	        tile_surface.Fill(0xffffffff);
+		} else
 	    if(tile.isRoad())
 		tile_surface.Fill(AGG::GetColor(COLOR_ROAD));
-	    else
+	    else if(pass >= 0)
 	    switch(tile.GetGround())
 	    {
-		case Maps::Ground::DESERT:	tile_surface.Fill(AGG::GetColor(COLOR_DESERT)); break;
-		case Maps::Ground::SNOW:	tile_surface.Fill(AGG::GetColor(COLOR_SNOW)); break;
-		case Maps::Ground::SWAMP:	tile_surface.Fill(AGG::GetColor(COLOR_SWAMP)); break;
-		case Maps::Ground::WASTELAND:	tile_surface.Fill(AGG::GetColor(COLOR_WASTELAND)); break;
-		case Maps::Ground::BEACH:	tile_surface.Fill(AGG::GetColor(COLOR_BEACH)); break;
-		case Maps::Ground::LAVA:	tile_surface.Fill(AGG::GetColor(COLOR_LAVA)); break;
-		case Maps::Ground::DIRT:	tile_surface.Fill(AGG::GetColor(COLOR_DIRT)); break;
-		case Maps::Ground::GRASS:	tile_surface.Fill(AGG::GetColor(COLOR_GRASS)); break;
-		case Maps::Ground::WATER:	tile_surface.Fill(AGG::GetColor(COLOR_WATER)); break;
-		default:			tile_surface.Fill(AGG::GetColor(COLOR_GRASS)); break;
+		case Maps::Ground::DESERT:	tile_surface.Fill(AGG::GetColor(COLOR_DESERT+pass)); break;
+		case Maps::Ground::SNOW:	tile_surface.Fill(AGG::GetColor(COLOR_SNOW+pass)); break;
+		case Maps::Ground::SWAMP:	tile_surface.Fill(AGG::GetColor(COLOR_SWAMP+pass)); break;
+		case Maps::Ground::WASTELAND:	tile_surface.Fill(AGG::GetColor(COLOR_WASTELAND+pass)); break;
+		case Maps::Ground::BEACH:	tile_surface.Fill(AGG::GetColor(COLOR_BEACH+pass)); break;
+		case Maps::Ground::LAVA:	tile_surface.Fill(AGG::GetColor(COLOR_LAVA+pass)); break;
+		case Maps::Ground::DIRT:	tile_surface.Fill(AGG::GetColor(COLOR_DIRT+pass)); break;
+		case Maps::Ground::GRASS:	tile_surface.Fill(AGG::GetColor(COLOR_GRASS+pass)); break;
+		case Maps::Ground::WATER:	tile_surface.Fill(AGG::GetColor(COLOR_WATER+pass)); break;
+		default:			tile_surface.Fill(AGG::GetColor(COLOR_GRASS+pass)); break;
 	    }
 
 	    spriteArea.Blit(tile_surface, dst_pt);
@@ -196,12 +249,18 @@ void Radar::DrawCursor(Surface &surface)
 }
 
 /* redraw radar area */
-void Radar::RedrawArea(void){ Display::Get().Blit(spriteArea, pos.x, pos.y); }
+void Radar::RedrawArea(void)
+{ 
+    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
+    Display::Get().Blit(spriteArea, pos.x, pos.y); 
+}
 
 /* redraw radar cursor */
 void Radar::RedrawCursor(void)
 {
     cursor.Hide();
+    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
+    Display::Get().Blit(spriteArea, pos.x, pos.y); 
     cursor.Move(pos.x + GameArea::GetRect().x * RADARWIDTH / world.w(),
                 pos.y + GameArea::GetRect().y * RADARWIDTH / world.h());
     cursor.Show();

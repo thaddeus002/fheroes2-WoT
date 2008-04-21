@@ -1156,6 +1156,7 @@ void Heroes::MoveNext(void)
 	tiles_from.SetObject(MP2::OBJ_BOAT);
 	tiles_from.Redraw();
     }
+    Scoute();
 }
 
 /* draw move to next cell, return true if end way */
@@ -1393,4 +1394,15 @@ Skill::Level::type_t Heroes::GetLevelSkill(const Skill::secondary_t skill) const
 void Heroes::LearnBasicSkill(const Skill::secondary_t skill)
 {
     return secondary_skills.Level(skill, Skill::Level::BASIC);
+}
+
+void Heroes::Scoute(void)
+{
+    int scouting = SCOUTINGBASE + secondary_skills.GetLevel(Skill::SCOUTING);
+    Point p = GetCenter();
+    for(int x = -scouting; x <= scouting; x ++)
+        for(int y = -scouting; y <= scouting; y ++)
+            if(abs(x)+abs(y) <= scouting+2)
+                if(p.x+x >=0 && p.y+y >= 0)
+                    world.GetTiles(p.x+x, p.y+y).ClearFog(GetColor());
 }
