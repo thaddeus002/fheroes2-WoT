@@ -76,7 +76,7 @@ namespace Game
 	Game::menu_t MainMenu(void);
 	Game::menu_t NewMaps(void);
 	Game::menu_t LoadMaps(void);
-	Game::menu_t StartGame(const Maps::mapsize_t sizemap = Maps::SMALL);
+	Game::menu_t StartGame(void);
     };
 };
 

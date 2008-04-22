@@ -28,6 +28,7 @@
 #include "config.h"
 #include "maps.h"
 #include "game.h"
+#include "world.h"
 
 #include "error.h"
 
@@ -79,10 +80,22 @@ Game::menu_t Game::Editor::NewMaps(void)
 	le.MousePressLeft(buttonXLarge) ? buttonXLarge.PressDraw() : buttonXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonSmall)) return StartGame(Maps::SMALL);
-	if(le.MouseClickLeft(buttonMedium)) return StartGame(Maps::MEDIUM);
-	if(le.MouseClickLeft(buttonLarge)) return StartGame(Maps::LARGE);
-	if(le.MouseClickLeft(buttonXLarge)) return StartGame(Maps::XLARGE);
+	if(le.MouseClickLeft(buttonSmall)) {
+		world.NewMaps(Maps::SMALL, Maps::SMALL);
+		return EDITSTART;
+	}
+	if(le.MouseClickLeft(buttonMedium)) {
+		world.NewMaps(Maps::MEDIUM, Maps::MEDIUM);
+		return EDITSTART;
+	}
+	if(le.MouseClickLeft(buttonLarge)) {
+		world.NewMaps(Maps::LARGE, Maps::LARGE);
+		return EDITSTART;
+	}
+	if(le.MouseClickLeft(buttonXLarge)) {
+		world.NewMaps(Maps::XLARGE, Maps::XLARGE);
+		return EDITSTART;
+	}
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info

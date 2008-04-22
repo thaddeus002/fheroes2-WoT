@@ -51,7 +51,7 @@ namespace Game
     };
 };
 
-Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
+Game::menu_t Game::Editor::StartGame()
 {
     Display & display = Display::Get();
 
@@ -59,9 +59,6 @@ Game::menu_t Game::Editor::StartGame(const Maps::mapsize_t sizemap)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-
-    // new maps
-    world.NewMaps(sizemap, sizemap);
 
     Display::SetVideoMode(H2Config::VideoMode());
     display.Fill(0x00, 0x00, 0x00);

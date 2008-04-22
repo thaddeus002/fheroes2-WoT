@@ -40,6 +40,7 @@
 #include "tools.h"
 #include "splitter.h"
 #include "game.h"
+#include "world.h"
 
 #define LISTMAXITEM	9
 #define LISTHEIGHTROW	19
@@ -343,8 +344,11 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	//if(le.MousePressRight(?)) Dialog::Message("Selected Description", "The description of the currently selected map.", Font::BIG);
 	if(le.MousePressRight(buttonOk)) Dialog::Message("OK", "Accept the choice made.", Font::BIG);
 
+	if(le.KeyPress(KEY_ESCAPE)) 
+		return Game::MAINMENU;
 	// click ok
-	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN)) 
+		break;
     }
 
     // set current settings
@@ -353,7 +357,8 @@ Game::menu_t Game::Editor::LoadMaps(void)
     cursor.Hide();
     background.Restore();
     
-    return Game::MAINMENU;
+	world.LoadMaps((*it_current).FileMaps());
+	return EDITSTART;
 }
 
 void EditScenario::DrawList(std::vector<Maps::FileInfo>::const_iterator &it_top, u8 count)
