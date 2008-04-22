@@ -38,10 +38,11 @@ namespace Game
 
 	void		Set(const Heroes & hr);
 	void		Set(const Castle & cs);
+	void		Update(void);
 	
 	const Point &	Center(void) const;
 
-	const focus_t &	Type(void) const;
+	focus_t		Type(void) const;
 
 	const Castle &	GetCastle(void) const;
 	const Heroes &	GetHeroes(void) const;
@@ -52,7 +53,6 @@ namespace Game
     private:
 	Focus();
 
-	focus_t		type;
 	const Castle *	castle;
 	const Heroes *	heroes;
 	Point		center;

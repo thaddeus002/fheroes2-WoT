@@ -37,15 +37,6 @@
 
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
 {
-/*
-    switch(lv % 4)
-    {
-	case 0:	level = GROUND;	break;
-	case 1:	level = DOWN;	break;
-	case 2:	level = SHADOW;	break;
-	case 3:	level = UPPER;	break;
-    }
-*/
 }
 
 Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
@@ -1107,7 +1098,7 @@ bool Maps::Tiles::isPassable(void) const
 
     for(; it1 != it2; ++it1)
     	if((*it1).level == 0 && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
-/*
+
     if(Game::Focus::Get().GetHeroes().isShipMaster())
     {
     	if(Ground::WATER != Maps::Tiles::GetGround()) return false;
@@ -1128,13 +1119,13 @@ bool Maps::Tiles::isPassable(void) const
             case MP2::OBJ_FLOTSAM:
     		return false;
 	    
-	    default: return true;
+	    default: break;
 	}
     }
     else
     {
 	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
-
+/*
         switch(general)
 	{
 	    case MP2::OBJ_COAST:
@@ -1148,8 +1139,9 @@ bool Maps::Tiles::isPassable(void) const
 
 	    default: return false;
 	}
-    }
 */
+    }
+
     return true;
 }
 

@@ -124,7 +124,6 @@ Game::menu_t Game::StartGame(void)
             // coord button option
             pt_opt.x = pt_inf.x + AGG::GetICN(icnbtn, 0).w();
             pt_opt.y = 320 + AGG::GetICN(icnbtn, 0).h();
-            // coord button settings
             pt_set.x = pt_opt.x + AGG::GetICN(icnbtn, 0).w();
             pt_set.y = 320 + AGG::GetICN(icnbtn, 0).h();
 	    icon_count = 4;
@@ -962,8 +961,13 @@ Game::menu_t Game::StartGame(void)
 		cursor.Hide();
 
     		if(global_focus.GetHeroes().Move())
+		{
+		    global_focus.Update();
     		    // action, and modify sound evironment
     		    global_focus.GetHeroes().Action();
+		}
+		else
+		    global_focus.Update();
 
 		selectHeroes.Redraw();
 		areaMaps.Center(global_focus.Center());

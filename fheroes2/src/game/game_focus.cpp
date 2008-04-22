@@ -23,7 +23,7 @@
 #include "heroes.h"
 #include "game_focus.h"
 
-Game::Focus::Focus() : type(UNSEL), castle(NULL), heroes(NULL)
+Game::Focus::Focus() : castle(NULL), heroes(NULL)
 {
 }
 
@@ -36,7 +36,6 @@ Game::Focus & Game::Focus::Get(void)
 
 void Game::Focus::Set(const Heroes & hr)
 {
-    type = HEROES;
     heroes = &hr;
     castle = NULL;
 
@@ -45,16 +44,19 @@ void Game::Focus::Set(const Heroes & hr)
 
 void Game::Focus::Set(const Castle & cs)
 {
-    type = CASTLE;
     castle = & cs;
     heroes = NULL;
 
     center = cs.GetCenter();
 }
 
-const Game::Focus::focus_t & Game::Focus::Type(void) const
+Game::Focus::focus_t Game::Focus::Type(void) const
 {
-    return type;
+    if(heroes) return HEROES;
+    else
+    if(castle) return CASTLE;
+
+    return UNSEL;
 }
 
 const Castle & Game::Focus::GetCastle(void) const
@@ -88,4 +90,11 @@ Heroes & Game::Focus::GetHeroes(void)
 const Point & Game::Focus::Center(void) const
 {
     return center;
+}
+
+void Game::Focus::Update(void)
+{
+    if(heroes) center = heroes->GetCenter();
+    else
+    if(castle) center = castle->GetCenter();
 }
