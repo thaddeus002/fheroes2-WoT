@@ -23,7 +23,7 @@ CC := g++
 
 SOURCEROOT := ../src
 SOURCEDIR := engine agg algorithm army castle dialog editor game gui \
-	heroes image kingdom maps monster resource system spell
+	heroes image kingdom maps monster objects resource system spell
 
 SEARCH := $(addprefix $(SOURCEROOT)/, $(addsuffix /*.cpp, $(SOURCEDIR)))
 ENGINE := $(addprefix $(SOURCEROOT)/, $(addsuffix /*.cpp, engine))
