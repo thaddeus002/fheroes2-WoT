@@ -734,6 +734,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	for(u8 ii = 0; ii < coordsArtifact.size(); ++ii) if(le.MouseClickLeft(coordsArtifact[ii]))
 	{
 	    const Artifact::artifact_t art = artifacts[ii];
+
+	    if(Artifact::MAGIC_BOOK == art) spell_book.Open();
+	    else
 	    if(Artifact::UNKNOWN != art) Dialog::Message(Artifact::String(art), Artifact::Description(art), Font::BIG, Dialog::OK);
 	}
 

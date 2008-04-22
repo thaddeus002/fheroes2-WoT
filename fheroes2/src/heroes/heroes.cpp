@@ -1063,12 +1063,12 @@ bool Heroes::BuySpellBook(void)
 /* add new spell to book from storage */
 void Heroes::AppendSpellsToBook(const Spell::Storage & spells)
 {
-    spell_book.Appends(spells);
+    spell_book.Appends(spells, GetLevelSkill(Skill::WISDOM));
 }
 
 void Heroes::AppendSpellToBook(const Spell::spell_t spell)
 {
-    spell_book.Append(spell);
+    spell_book.Append(spell, GetLevelSkill(Skill::WISDOM));
 }
 
 /* return true is move enable */
