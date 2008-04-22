@@ -31,10 +31,15 @@ namespace Spell
     public:
 	Book();
 
-        void Appends(const Storage & st);
-        void Append(const Spell::spell_t sp);
+        void Appends(const Storage & st, const Skill::Level::type_t & wisdom);
+        void Append(const Spell::spell_t sp, const Skill::Level::type_t & wisdom);
+
+	Spell::spell_t Open(void);
 
     private:
+	static void RedrawLists(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt);
+	void Filter(std::vector<Spell::spell_t> & spells, bool adv_mode);
+
 	u8 list_count;
     };
 };
