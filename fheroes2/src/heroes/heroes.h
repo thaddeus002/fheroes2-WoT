@@ -35,7 +35,7 @@
 #include "skill.h"
 #include "artifact.h"
 #include "route.h"
-#include "object.h"
+#include "visit.h"
 #include "direction.h"
 #include "spell_book.h"
 #include "gamedefs.h"

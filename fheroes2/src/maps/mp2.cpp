@@ -713,3 +713,64 @@ bool MP2::isActionObject(const object_t obj, const bool water)
 }
 
 
+bool MP2::isDayLife(const MP2::object_t obj)
+{
+    // FIXME: list day object life
+    switch(obj)
+    {
+	case OBJ_MAGICWELL:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool MP2::isWeekLife(const MP2::object_t obj)
+{
+    // FIXME: list week object life
+    switch(obj)
+    {
+	default: break;
+    }
+
+    return false;
+}
+
+bool MP2::isMonthLife(const MP2::object_t obj)
+{
+    // FIXME: list month object life
+    switch(obj)
+    {
+	default: break;
+    }
+
+    return false;
+}
+
+bool MP2::isBattleLife(const MP2::object_t obj)
+{
+    // FIXME: list battle object life
+    switch(obj)
+    {
+	// luck modificators
+	case OBJ_IDOL:
+	case OBJ_FOUNTAIN:
+	case OBJ_FAERIERING:
+
+	// morale modificators
+	case OBJ_BUOY:
+	case OBJ_OASIS:
+	case OBJ_TEMPLE:
+	case OBJ_GRAVEYARD:
+        case OBJ_SHIPWRECK:
+        case OBJ_DERELICTSHIP:
+            
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}

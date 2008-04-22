@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,96 +20,40 @@
 
 #include "world.h"
 #include "maps_tiles.h"
-#include "object.h"
+#include "visit.h"
 
-u32 Maps::Object::uniq = 0;
-
-Maps::Object::Object() : type(MP2::OBJ_ZERO), id(++uniq)
+Maps::VisitIndexObject::VisitIndexObject() : std::pair<u16, MP2::object_t>(MAXU16, MP2::OBJ_ZERO)
 {
 }
 
-Maps::Object::Object(const MP2::object_t obj) : type(obj), id(++uniq)
+Maps::VisitIndexObject::VisitIndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair)
 {
 }
 
-bool Maps::Object::isDayLife(const MP2::object_t obj)
+Maps::VisitIndexObject::VisitIndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object)
 {
-    // FIXME: list day object life
-    switch(obj)
-    {
-	case MP2::OBJ_MAGICWELL:
-	    return true;
-
-	default: break;
-    }
-
-    return false;
 }
 
-bool Maps::Object::isWeekLife(const MP2::object_t obj)
+Maps::VisitIndexObject::VisitIndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject())
 {
-    // FIXME: list week object life
-    switch(obj)
-    {
-	default: break;
-    }
-
-    return false;
-}
-
-bool Maps::Object::isMonthLife(const MP2::object_t obj)
-{
-    // FIXME: list month object life
-    switch(obj)
-    {
-	default: break;
-    }
-
-    return false;
-}
-
-bool Maps::Object::isBattleLife(const MP2::object_t obj)
-{
-    // FIXME: list battle object life
-    switch(obj)
-    {
-	// luck modificators
-	case MP2::OBJ_IDOL:
-	case MP2::OBJ_FOUNTAIN:
-	case MP2::OBJ_FAERIERING:
-
-	// morale modificators
-	case MP2::OBJ_BUOY:
-	case MP2::OBJ_OASIS:
-	case MP2::OBJ_TEMPLE:
-	case MP2::OBJ_GRAVEYARD:
-        case MP2::OBJ_SHIPWRECK:
-        case MP2::OBJ_DERELICTSHIP:
-            
-	    return true;
-
-	default: break;
-    }
-
-    return false;
 }
 
 bool Maps::VisitIndexObject::isDayLife(const VisitIndexObject & visit)
 {
-    return Maps::Object::isDayLife(visit.second);
+    return MP2::isDayLife(visit.second);
 }
 
 bool Maps::VisitIndexObject::isWeekLife(const VisitIndexObject & visit)
 {
-    return Maps::Object::isWeekLife(visit.second);
+    return MP2::isWeekLife(visit.second);
 }
 
 bool Maps::VisitIndexObject::isMonthLife(const VisitIndexObject & visit)
 {
-    return Maps::Object::isMonthLife(visit.second);
+    return MP2::isMonthLife(visit.second);
 }
 
 bool Maps::VisitIndexObject::isBattleLife(const VisitIndexObject & visit)
 {
-    return Maps::Object::isBattleLife(visit.second);
+    return MP2::isBattleLife(visit.second);
 }

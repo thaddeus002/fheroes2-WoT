@@ -531,6 +531,11 @@ namespace MP2
     const char *StringObject(u8 object);
     
     bool isActionObject(const object_t obj, const bool water);
+
+    bool isDayLife(const MP2::object_t obj);
+    bool isWeekLife(const MP2::object_t obj);
+    bool isMonthLife(const MP2::object_t obj);
+    bool isBattleLife(const MP2::object_t obj);
 };
 
 #endif
