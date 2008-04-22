@@ -263,12 +263,6 @@ Game::menu_t Game::StartGame(void)
 	global_focus.Set(*myHeroes.front());
 	selectHeroes.Select(0);
     }
-    // unknown focus
-    else
-    {
-	Error::Warning("Game::StartGame: unknown game focus. exiting.");
-	return QUITGAME;
-    }
 
     selectCastles.Redraw();
     selectHeroes.Redraw();

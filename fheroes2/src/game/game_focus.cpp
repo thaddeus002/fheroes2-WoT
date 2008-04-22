@@ -39,6 +39,8 @@ void Game::Focus::Set(const Heroes & hr)
     type = HEROES;
     heroes = &hr;
     castle = NULL;
+
+    center = hr.GetCenter();
 }
 
 void Game::Focus::Set(const Castle & cs)
@@ -46,6 +48,8 @@ void Game::Focus::Set(const Castle & cs)
     type = CASTLE;
     castle = & cs;
     heroes = NULL;
+
+    center = cs.GetCenter();
 }
 
 const Game::Focus::focus_t & Game::Focus::Type(void) const
@@ -83,15 +87,5 @@ Heroes & Game::Focus::GetHeroes(void)
 
 const Point & Game::Focus::Center(void) const
 {
-    const Point *pt = NULL;
-
-    switch(type)
-    {
-	case CASTLE:	if(castle) pt = &(*castle).GetCenter(); break;
-	case HEROES:	if(heroes) pt = &(*heroes).GetCenter(); break;
-
-	default:	Error::Warning("Game::Focus::GetCenter: is NULL"); break;
-    }
-
-    return *pt;
+    return center;
 }

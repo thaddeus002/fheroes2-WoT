@@ -54,7 +54,8 @@ namespace Game
 
 	focus_t		type;
 	const Castle *	castle;
-	const Heroes *	heroes;	
+	const Heroes *	heroes;
+	Point		center;
     };
 };
 
