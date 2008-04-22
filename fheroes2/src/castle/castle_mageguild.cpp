@@ -97,7 +97,17 @@ void Castle::OpenMageGuild(void)
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
 	    const std::string & str = Spell::String(spell);
-	    Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    size_t pos;
+	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
+	    {
+		std::string str1 = str.substr(0, pos);
+		std::string str2 = str.substr(pos);
+
+		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
+		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+	    }
+	    else
+		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
 
 	    rectsLevel5.push_back(Rect(dst_pt.x - roll5.w() / 2, dst_pt.y, roll5.w(), roll5.h()));
 	}
@@ -122,7 +132,17 @@ void Castle::OpenMageGuild(void)
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
 	    const std::string & str = Spell::String(spell);
-	    Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    size_t pos;
+	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
+	    {
+		std::string str1 = str.substr(0, pos);
+		std::string str2 = str.substr(pos);
+
+		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
+		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+	    }
+	    else
+		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
 
 	    rectsLevel4.push_back(Rect(dst_pt.x - roll4.w() / 2, dst_pt.y, roll4.w(), roll4.h()));
 	}
@@ -147,7 +167,17 @@ void Castle::OpenMageGuild(void)
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
 	    const std::string & str = Spell::String(spell);
-	    Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    size_t pos;
+	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
+	    {
+		std::string str1 = str.substr(0, pos);
+		std::string str2 = str.substr(pos);
+
+		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
+		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+	    }
+	    else
+		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
 
 	    rectsLevel3.push_back(Rect(dst_pt.x - roll3.w() / 2, dst_pt.y, roll3.w(), roll3.h()));
 	}
@@ -172,7 +202,17 @@ void Castle::OpenMageGuild(void)
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
 	    const std::string & str = Spell::String(spell);
-	    Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    size_t pos;
+	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
+	    {
+		std::string str1 = str.substr(0, pos);
+		std::string str2 = str.substr(pos);
+
+		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
+		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+	    }
+	    else
+		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
 
 	    rectsLevel2.push_back(Rect(dst_pt.x - roll2.w() / 2, dst_pt.y, roll2.w(), roll2.h()));
 	}
@@ -197,7 +237,17 @@ void Castle::OpenMageGuild(void)
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
 	    const std::string & str = Spell::String(spell);
-	    Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    size_t pos;
+	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
+	    {
+		std::string str1 = str.substr(0, pos);
+		std::string str2 = str.substr(pos);
+
+		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
+		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+	    }
+	    else
+		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
 
 	    rectsLevel1.push_back(Rect(dst_pt.x - roll1.w() / 2, dst_pt.y, roll1.w(), roll1.h()));
 	}
