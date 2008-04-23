@@ -50,8 +50,11 @@ namespace Game
 	EDITNEWMAP,
 	EDITLOADMAP,
 	EDITSAVEMAP,
-	EDITSTART
+	EDITSTART,
+	ENDTURN
     } menu_t;
+
+    typedef enum { Human=0, Network, AI } control_t;
 
     menu_t MainMenu(void);
     menu_t NewGame(void);

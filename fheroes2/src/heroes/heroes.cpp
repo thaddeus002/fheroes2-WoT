@@ -1419,6 +1419,6 @@ void Heroes::Scoute(void)
     for(int x = -scouting; x <= scouting; x ++)
         for(int y = -scouting; y <= scouting; y ++)
             if(abs(x)+abs(y) <= scouting+2)
-                if(p.x+x >=0 && p.y+y >= 0)
+                if(p.x+x >= 0 && p.y+y >= 0 && p.x+x < world.w() && p.y+y < world.h())
                     world.GetTiles(p.x+x, p.y+y).ClearFog(GetColor());
 }

@@ -3,8 +3,8 @@
 # libSDL C++ wrapper engine
 
 TARGET = libengine
-LIBS = $(shell sdl-config --libs)
-CFLAGS = -O2 -Wall $(shell sdl-config --cflags) -I .
+LIBS = $(SDL_LIBS)
+CFLAGS = -O2 -Wall $(SDL_FLAGS) -I .
 
 CC = g++
 

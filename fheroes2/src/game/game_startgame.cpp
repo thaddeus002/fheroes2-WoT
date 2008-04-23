@@ -40,6 +40,7 @@
 #include "game_selectfocus.h"
 #include "route.h"
 #include "game_focus.h"
+#include "scripting.h"
 
 namespace Game
 {
@@ -48,15 +49,37 @@ namespace Game
     void OpenHeroes(Heroes *heroes, GameArea & areaMaps, Radar & radar);
     void FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar);
     void FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar);
+    Game::menu_t HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & statusWindow, bool message);
 };
+
+Button *_buttonScrollHeroesUp;
+Button *_buttonScrollCastleUp;
+Button *_buttonNextHero;
+Button *_buttonMovement;
+Button *_buttonKingdom;
+Button *_buttonSpell;
+Button *_buttonEndTur;
+Button *_buttonAdventure;
+Button *_buttonFile;
+Button *_buttonSystem;
+Button *_buttonScrollHeroesDown;
+Button *_buttonScrollCastleDown;
+
+Splitter *_splitHeroes;
+Splitter *_splitCastles;
+
+u8 icon_count = 0;
 
 Game::menu_t Game::StartGame(void)
 {
     // Load maps
     world.LoadMaps(Settings::Get().FileInfo().FileMaps());
 
+    // single player
+    // FIXME for hotseat
+    world.GetKingdom(Settings::Get().MyColor()).SetControl(Game::Human);
+
     GameArea areaMaps;
-    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
 
     Display & display = Display::Get();
 
@@ -78,12 +101,6 @@ Game::menu_t Game::StartGame(void)
     const ICN::icn_t icnscroll = H2Config::EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
     const ICN::icn_t icnbtn = H2Config::EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
-    const Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
-    const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
-    const Rect areaScrollTop(BORDERWIDTH / 2, 0, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    const Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
-
     Point pt_stw, pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
 
     // coord button heroes scroll up
@@ -93,8 +110,6 @@ Game::menu_t Game::StartGame(void)
     // coord button castle scroll up
     pt_scu.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
     pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
-
-    u8 icon_count = 0;
 
     // recalculate buttons coordinate
     switch(H2Config::VideoMode())
@@ -211,18 +226,474 @@ Game::menu_t Game::StartGame(void)
 	    break;
     }
 
-    Button buttonScrollHeroesUp(pt_shu, icnscroll, 0, 1);
-    Button buttonScrollCastleUp(pt_scu, icnscroll, 0, 1);
-    Button buttonNextHero(pt_her, icnbtn, 0, 1);
-    Button buttonMovement(pt_act, icnbtn, 2, 3);
-    Button buttonKingdom(pt_cas, icnbtn, 4, 5);
-    Button buttonSpell(pt_mag, icnbtn, 6, 7);
-    Button buttonEndTur(pt_end, icnbtn, 8, 9);
-    Button buttonAdventure(pt_inf, icnbtn, 10, 11);
-    Button buttonFile(pt_opt, icnbtn, 12, 13);
-    Button buttonSystem(pt_set, icnbtn, 14, 15);
-    Button buttonScrollHeroesDown(pt_shd, icnscroll, 2, 3);
-    Button buttonScrollCastleDown(pt_scd, icnscroll, 2, 3);
+    _buttonScrollHeroesUp = new Button(pt_shu, icnscroll, 0, 1);
+    _buttonScrollCastleUp = new Button(pt_scu, icnscroll, 0, 1);
+    _buttonNextHero = new Button(pt_her, icnbtn, 0, 1);
+    _buttonMovement = new Button(pt_act, icnbtn, 2, 3);
+    _buttonKingdom = new Button(pt_cas, icnbtn, 4, 5);
+    _buttonSpell = new Button(pt_mag, icnbtn, 6, 7);
+    _buttonEndTur = new Button(pt_end, icnbtn, 8, 9);
+    _buttonAdventure = new Button(pt_inf, icnbtn, 10, 11);
+    _buttonFile = new Button(pt_opt, icnbtn, 12, 13);
+    _buttonSystem = new Button(pt_set, icnbtn, 14, 15);
+    _buttonScrollHeroesDown = new Button(pt_shd, icnscroll, 2, 3);
+    _buttonScrollCastleDown = new Button(pt_scd, icnscroll, 2, 3);
+
+    Button &buttonScrollHeroesUp = *_buttonScrollHeroesUp;
+    Button &buttonScrollCastleUp = *_buttonScrollCastleUp;
+    Button &buttonNextHero = *_buttonNextHero;
+    Button &buttonMovement = *_buttonMovement;
+    Button &buttonKingdom = *_buttonKingdom;
+    Button &buttonSpell = *_buttonSpell;
+    Button &buttonEndTur = *_buttonEndTur;
+    Button &buttonAdventure = *_buttonAdventure;
+    Button &buttonFile = *_buttonFile;
+    Button &buttonSystem = *_buttonSystem;
+    Button &buttonScrollHeroesDown = *_buttonScrollHeroesDown;
+    Button &buttonScrollCastleDown = *_buttonScrollCastleDown;
+
+    // splitter
+    _splitHeroes = new Splitter(AGG::GetICN(icnscroll, 4), Rect(pt_shu.x + 3, pt_shu.y + 18, 10, pt_shd.y - pt_shu.y - 20), Splitter::VERTICAL);
+    _splitCastles = new Splitter(AGG::GetICN(icnscroll, 4), Rect(pt_scu.x + 3, pt_scu.y + 18, 10, pt_scd.y - pt_scu.y - 20), Splitter::VERTICAL);
+    Splitter &splitHeroes = *_splitHeroes;
+    Splitter &splitCastles = *_splitCastles;
+
+    splitHeroes.SetRange(0, 0);
+    splitCastles.SetRange(0, 0);
+
+    Game::Focus & global_focus = Focus::Get();
+
+    // status window
+    Game::StatusWindow statusWindow(pt_stw);
+    statusWindow.Redraw();
+
+    buttonScrollHeroesUp.Draw();
+    buttonScrollCastleUp.Draw();
+    buttonNextHero.Draw();
+    buttonMovement.Draw();
+    buttonKingdom.Draw();
+    buttonSpell.Draw();
+    buttonEndTur.Draw();
+    buttonAdventure.Draw();
+    buttonFile.Draw();
+    buttonSystem.Draw();
+    buttonScrollHeroesDown.Draw();
+    buttonScrollCastleDown.Draw();
+
+    display.Flip();
+
+    Game::menu_t m = ENDTURN;
+    int humans = 0;
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	if(world.GetKingdom(color).isPlay() && world.GetKingdom(color).Control() == Game::Human) 
+	    humans ++;
+
+    while(1) {
+	// AI move
+	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) {
+	    if(world.GetKingdom(color).isPlay()) switch(world.GetKingdom(color).Control()) {
+	        case Game::Human:
+		    mixer.Enhance();
+		    cursor.Show();
+		    display.Flip();
+		    statusWindow.SetState(Game::StatusWindow::DAY);
+		    statusWindow.Redraw();
+
+		    //Color::color_t human = H2Config::MyColor();
+		    Settings::Get().SetMyColor(color);
+    		    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().size())
+    		    {
+    		        global_focus.GetHeroes().GetPath().Hide();
+    		        global_focus.GetHeroes().GetPath().Show();
+		    }
+
+		    m = HumanTurn(areaMaps, radar, statusWindow, humans > 1);
+
+		    cursor.Hide();
+		    mixer.Reduce();
+		    if(m != ENDTURN) break;
+		    break;
+	        case Game::Network:
+	            // TODO network game
+		    break;
+	        case Game::AI:
+		    world.GetKingdom(color).AITurns(statusWindow);
+		    break;
+	    }
+	    if(m != ENDTURN) break;
+	}
+	if(m != ENDTURN) break;
+	world.NextDay();
+    }
+
+    delete _buttonScrollHeroesUp;
+    delete _buttonScrollCastleUp;
+    delete _buttonNextHero;
+    delete _buttonMovement;
+    delete _buttonKingdom;
+    delete _buttonSpell;
+    delete _buttonEndTur;
+    delete _buttonAdventure;
+    delete _buttonFile;
+    delete _buttonSystem;
+    delete _buttonScrollHeroesDown;
+    delete _buttonScrollCastleDown;
+
+    return m == ENDTURN ? QUITGAME : m;
+}
+
+/* open castle wrapper */
+void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
+{
+    if(! castle) return;
+
+    Audio::Mixer::Get().Reduce();
+
+    Cursor & cursor = Cursor::Get();
+    const Kingdom & myKingdom = world.GetMyKingdom();
+    const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
+    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
+
+    Dialog::answer_t result = Dialog::ZERO;
+
+    while(Dialog::CANCEL != result)
+    {
+	FocusToCastle(castle, areaMaps, radar);
+
+	cursor.Hide();
+
+	result = castle->OpenDialog();
+
+	const u32 cursor_index = selectCastles.GetCursorIndex();
+
+	if(Dialog::PREV == result)
+	{
+	     castle = cursor_index ? myCastles.at(cursor_index - 1) : myCastles.back();
+	}
+	else
+	if(Dialog::NEXT == result)
+	{
+	     castle = myCastles.size() == cursor_index + 1 ? myCastles.front() : myCastles.at(cursor_index + 1);
+	}
+
+	cursor.Show();
+    }
+
+    if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes()))
+	    FocusToHeroes(hero, areaMaps, radar);
+
+    areaMaps.Redraw();
+
+    Audio::Mixer::Get().Enhance();
+}
+
+/* focus to castle */
+void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
+{
+    if(! castle) return;
+
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+
+    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
+    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
+
+    selectHeroes.Reset();
+
+    Game::Focus & globalfocus = Game::Focus::Get();
+
+    // hide path
+    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+
+    globalfocus.Set(*castle);
+
+    areaMaps.Center(castle->GetCenter());
+    radar.RedrawCursor();
+
+    selectCastles.SelectFromCenter(castle->GetCenter());
+    selectCastles.Redraw();
+    selectHeroes.Redraw();
+
+    cursor.Show();
+}
+
+/* open heroes wrapper */
+void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
+{
+    if(! hero) return;
+
+    Audio::Mixer::Get().Reduce();
+
+    Cursor & cursor = Cursor::Get();
+    const Kingdom & myKingdom = world.GetMyKingdom();
+    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
+
+    Dialog::answer_t result = Dialog::ZERO;
+
+    while(Dialog::CANCEL != result)
+    {
+	FocusToHeroes(hero, areaMaps, radar);
+
+	cursor.Hide();
+
+	result = hero->OpenDialog();
+
+	const u32 cursor_index = selectHeroes.GetCursorIndex();
+
+	switch(result)
+	{
+	    case Dialog::PREV:
+		hero = cursor_index ? myHeroes.at(cursor_index - 1) : myHeroes.back();
+		break;
+	
+	    case Dialog::NEXT:
+		hero = myHeroes.size() == cursor_index + 1 ? myHeroes.front() : myHeroes.at(cursor_index + 1);
+		break;
+	
+	    case Dialog::DISMISS:
+	    {
+		Error::Verbose("Game::OpenHeroes: FIXME dismiss hero.");
+		//Kingdom & kingdom = world.GetMyKingdom();
+		//const Maps::Tiles & tile = world.GetTiles((*hero).GetCenter());
+
+                //kingdom.RemoveHeroes(hero);
+	    /*
+		// FIX redraw:
+		// 	tile
+		// 	top tile
+		// 	selectHeroes
+		//	selectCastle if selectHeroes = 0
+    	    */
+	    }
+		result = Dialog::CANCEL;
+	    	break;
+	
+	    default: break;
+	}
+
+	cursor.Show();
+    }
+
+    Audio::Mixer::Get().Enhance();
+}
+
+/* focus to heroes */
+void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
+{
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+
+    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
+    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
+
+    selectCastles.Reset();
+
+    Game::Focus & globalfocus = Game::Focus::Get();
+
+    // hide old path
+    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+
+    globalfocus.Set(*hero);
+
+    // show new path
+    globalfocus.GetHeroes().GetPath().Show();
+    //world.GetTiles((*heroes).GetCenter()).Redraw();
+
+    // center
+    areaMaps.Center(hero->GetCenter());
+    radar.RedrawCursor();
+
+    selectHeroes.SelectFromCenter(hero->GetCenter());
+    selectHeroes.Redraw();
+    selectCastles.Redraw();
+
+    cursor.Show();
+}
+
+/* return changee cursor */
+Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
+{
+    switch(focus.Type())
+    {
+	case Focus::HEROES:
+	{
+	    const Heroes & from_hero = focus.GetHeroes();
+	    
+	    if(from_hero.isShipMaster())
+	    {
+		switch(tile.GetObject())
+		{
+		    case MP2::OBJN_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+        	    }
+        	    break;
+
+		    case MP2::OBJ_HEROES:
+		    {
+			const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
+
+    			if(NULL != to_hero && to_hero->isShipMaster())
+    			{
+			    if(to_hero->GetCenter() == from_hero.GetCenter())
+				return Cursor::HEROES;
+			    else
+				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+			}
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_TREASURECHEST:
+                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT : Cursor::POINTER;
+
+		    case MP2::OBJ_COAST:
+			return Cursor::ANCHOR;
+
+		    default:
+                        // FIXME: select BOAT cursor or BOAT2 or BOAT3 or BOAT4
+                        return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT : (tile.isPassable() ? Cursor::BOAT : Cursor::POINTER);
+		}
+	    }
+	    else
+	    {
+		switch(tile.GetObject())
+		{
+    		    case MP2::OBJ_MONSTER:
+    			return Cursor::FIGHT;
+
+		    case MP2::OBJN_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT;
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_CASTLE:
+    		    {
+    			const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    			if(NULL != castle)
+			    return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION : Cursor::FIGHT;
+        	    }
+        	    break;
+
+		    case MP2::OBJ_HEROES:
+		    {
+			const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
+
+    			if(NULL != to_hero && !to_hero->isShipMaster())
+    			{
+			    if(to_hero->GetCenter() == from_hero.GetCenter())
+				return Cursor::HEROES;
+			    else
+				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+			}
+    		    }
+    		    break;
+
+    		    case MP2::OBJ_BOAT:
+            		return Cursor::BOAT;
+
+    		    case MP2::OBJ_TREASURECHEST:
+                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION;
+
+		    default:
+                    	// FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
+			return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION : (tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
+		}
+	    }
+	}
+	break;
+
+	case Focus::CASTLE:
+	{
+	    const Castle & from_castle = focus.GetCastle();
+
+	    switch(tile.GetObject())
+	    {
+    		case MP2::OBJN_CASTLE:
+    		case MP2::OBJ_CASTLE:
+    		{
+    		    const Castle *to_castle = world.GetCastle(tile.GetIndex());
+
+    		    if(NULL != to_castle)
+    			return to_castle->GetColor() == from_castle.GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+		}
+		break;
+
+		case MP2::OBJ_HEROES:
+    		{
+    		    const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+
+		    if(NULL != heroes)
+    			return heroes->GetColor() == from_castle.GetColor() ? Cursor::HEROES : Cursor::POINTER;
+		}
+		break;
+
+		default:
+		    return Cursor::POINTER;
+	    }
+	}
+	break;
+
+    	default:
+    	break;
+    }
+
+    return Cursor::POINTER;
+}
+
+Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & statusWindow, bool message)
+{
+    Game::Focus & global_focus = Focus::Get();
+
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    Audio::Mixer & mixer = Audio::Mixer::Get();
+
+    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
+    const Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
+    const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
+    const Rect areaScrollTop(BORDERWIDTH / 2, 0, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    const Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    u32 ticket = 0;
+
+    bool change_settings = false;
+
+    Button &buttonScrollHeroesUp = *_buttonScrollHeroesUp;
+    Button &buttonScrollCastleUp = *_buttonScrollCastleUp;
+    Button &buttonNextHero = *_buttonNextHero;
+    Button &buttonMovement = *_buttonMovement;
+    Button &buttonKingdom = *_buttonKingdom;
+    Button &buttonSpell = *_buttonSpell;
+    Button &buttonEndTur = *_buttonEndTur;
+    Button &buttonAdventure = *_buttonAdventure;
+    Button &buttonFile = *_buttonFile;
+    Button &buttonSystem = *_buttonSystem;
+    Button &buttonScrollHeroesDown = *_buttonScrollHeroesDown;
+    Button &buttonScrollCastleDown = *_buttonScrollCastleDown;
+
+    Splitter &splitHeroes = *_splitHeroes;
+    Splitter &splitCastles = *_splitCastles;
 
     const Kingdom & myKingdom = world.GetMyKingdom();
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
@@ -231,23 +702,17 @@ Game::menu_t Game::StartGame(void)
     Game::SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
     Game::SelectFocusHeroes  & selectHeroes = SelectFocusHeroes::Get();
 
+    const std::vector<Rect> & coordsCastlesIcon = selectCastles.GetCoords();
+    const std::vector<Rect> & coordsHeroesIcon = selectHeroes.GetCoords();
+
+    splitHeroes.SetRange(0, myHeroes.size() > icon_count ? myHeroes.size() - icon_count : 0);
+    splitCastles.SetRange(0, myCastles.size() > icon_count ? myCastles.size() - icon_count : 0);
+
     selectCastles.SetCastles(myCastles);
     selectCastles.Reset();
 
     selectHeroes.SetHeroes(myHeroes);
     selectHeroes.Reset();
-
-    const std::vector<Rect> & coordsCastlesIcon = selectCastles.GetCoords();
-    const std::vector<Rect> & coordsHeroesIcon = selectHeroes.GetCoords();
-
-    // splitter
-    Splitter splitHeroes(AGG::GetICN(icnscroll, 4), Rect(pt_shu.x + 3, pt_shu.y + 18, 10, pt_shd.y - pt_shu.y - 20), Splitter::VERTICAL);
-    Splitter splitCastles(AGG::GetICN(icnscroll, 4), Rect(pt_scu.x + 3, pt_scu.y + 18, 10, pt_scd.y - pt_scu.y - 20), Splitter::VERTICAL);
-
-    splitHeroes.SetRange(0, myHeroes.size() > icon_count ? myHeroes.size() - icon_count : 0);
-    splitCastles.SetRange(0, myCastles.size() > icon_count ? myCastles.size() - icon_count : 0);
-
-    Game::Focus & global_focus = Focus::Get();
 
     // focus set to castle
     if(myCastles.size())
@@ -263,38 +728,15 @@ Game::menu_t Game::StartGame(void)
 	selectHeroes.Select(0);
     }
 
-    selectCastles.Redraw();
-    selectHeroes.Redraw();
-
     // center to focus
     areaMaps.Center(global_focus.Center());
     radar.RedrawCursor();
 
-    // status window
-    Game::StatusWindow statusWindow(pt_stw);
-    statusWindow.Redraw();
+    selectCastles.Redraw();
+    selectHeroes.Redraw();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-
-    buttonScrollHeroesUp.Draw();
-    buttonScrollCastleUp.Draw();
-    buttonNextHero.Draw();
-    buttonMovement.Draw();
-    buttonKingdom.Draw();
-    buttonSpell.Draw();
-    buttonEndTur.Draw();
-    buttonAdventure.Draw();
-    buttonFile.Draw();
-    buttonSystem.Draw();
-    buttonScrollHeroesDown.Draw();
-    buttonScrollCastleDown.Draw();
-
-    cursor.Show();
-    display.Flip();
-
-    u32 ticket = 0;
-
-    bool change_settings = false;
+    if(message)
+        Dialog::Message("", Color::String(myKingdom.GetColor()) + " player's turn", Font::BIG, Dialog::OK);
 
     // startgame loop
     while(le.HandleEvents())
@@ -825,6 +1267,10 @@ Game::menu_t Game::StartGame(void)
 	    // click Kingdom Summary
 	    if(le.MouseClickLeft(buttonKingdom))
 	    {
+	        Lua::DoString("alert()");
+	        Lua::DoString("alert1('test')");
+	        Lua::DoString("msg('header', 'text')");
+	        Lua::DoString("message('header', 'text', 0, 2)");
 	    }
 	    else
 	    // click Cast Spell
@@ -835,33 +1281,7 @@ Game::menu_t Game::StartGame(void)
 	    // click End Turn
 	    if(le.MouseClickLeft(buttonEndTur))
 	    {
-		mixer.Reduce();
-
-		cursor.Hide();
-		world.NextDay();
-
-		Color::color_t human = H2Config::MyColor();
-
-		// AI move
-		for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color != human)
-		    world.GetKingdom(color).AITurns(statusWindow);
-
-		statusWindow.SetState(Game::StatusWindow::DAY);
-		statusWindow.Redraw();
-
-		selectCastles.Redraw();
-		selectHeroes.Redraw();
-
-    		if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().size())
-    		{
-    		    global_focus.GetHeroes().GetPath().Hide();
-    		    global_focus.GetHeroes().GetPath().Show();
-		}
-
-		cursor.Show();
-		display.Flip();
-
-		mixer.Enhance();
+	        break;
 	    }
 	    else
     	    // click AdventureOptions
@@ -989,321 +1409,5 @@ Game::menu_t Game::StartGame(void)
         ++ticket;
     }
 
-    return QUITGAME;
-}
-
-/* open castle wrapper */
-void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
-{
-    if(! castle) return;
-
-    Audio::Mixer::Get().Reduce();
-
-    Cursor & cursor = Cursor::Get();
-    const Kingdom & myKingdom = world.GetMyKingdom();
-    const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
-    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-
-    Dialog::answer_t result = Dialog::ZERO;
-
-    while(Dialog::CANCEL != result)
-    {
-	FocusToCastle(castle, areaMaps, radar);
-
-	cursor.Hide();
-
-	result = castle->OpenDialog();
-
-	const u32 cursor_index = selectCastles.GetCursorIndex();
-
-	if(Dialog::PREV == result)
-	{
-	     castle = cursor_index ? myCastles.at(cursor_index - 1) : myCastles.back();
-	}
-	else
-	if(Dialog::NEXT == result)
-	{
-	     castle = myCastles.size() == cursor_index + 1 ? myCastles.front() : myCastles.at(cursor_index + 1);
-	}
-
-	cursor.Show();
-    }
-
-    if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes()))
-	    FocusToHeroes(hero, areaMaps, radar);
-
-    areaMaps.Redraw();
-
-    Audio::Mixer::Get().Enhance();
-}
-
-/* focus to castle */
-void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
-{
-    if(! castle) return;
-
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-
-    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
-
-    selectHeroes.Reset();
-
-    Game::Focus & globalfocus = Game::Focus::Get();
-
-    // hide path
-    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
-
-    globalfocus.Set(*castle);
-
-    areaMaps.Center(castle->GetCenter());
-    radar.RedrawCursor();
-
-    selectCastles.SelectFromCenter(castle->GetCenter());
-    selectCastles.Redraw();
-    selectHeroes.Redraw();
-
-    cursor.Show();
-}
-
-/* open heroes wrapper */
-void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
-{
-    if(! hero) return;
-
-    Audio::Mixer::Get().Reduce();
-
-    Cursor & cursor = Cursor::Get();
-    const Kingdom & myKingdom = world.GetMyKingdom();
-    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
-    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
-
-    Dialog::answer_t result = Dialog::ZERO;
-
-    while(Dialog::CANCEL != result)
-    {
-	FocusToHeroes(hero, areaMaps, radar);
-
-	cursor.Hide();
-
-	result = hero->OpenDialog();
-
-	const u32 cursor_index = selectHeroes.GetCursorIndex();
-
-	switch(result)
-	{
-	    case Dialog::PREV:
-		hero = cursor_index ? myHeroes.at(cursor_index - 1) : myHeroes.back();
-		break;
-	
-	    case Dialog::NEXT:
-		hero = myHeroes.size() == cursor_index + 1 ? myHeroes.front() : myHeroes.at(cursor_index + 1);
-		break;
-	
-	    case Dialog::DISMISS:
-	    {
-		Error::Verbose("Game::OpenHeroes: FIXME dismiss hero.");
-		//Kingdom & kingdom = world.GetMyKingdom();
-		//const Maps::Tiles & tile = world.GetTiles((*hero).GetCenter());
-
-                //kingdom.RemoveHeroes(hero);
-	    /*
-		// FIX redraw:
-		// 	tile
-		// 	top tile
-		// 	selectHeroes
-		//	selectCastle if selectHeroes = 0
-    	    */
-	    }
-		result = Dialog::CANCEL;
-	    	break;
-	
-	    default: break;
-	}
-
-	cursor.Show();
-    }
-
-    Audio::Mixer::Get().Enhance();
-}
-
-/* focus to heroes */
-void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
-{
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-
-    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
-
-    selectCastles.Reset();
-
-    Game::Focus & globalfocus = Game::Focus::Get();
-
-    // hide old path
-    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
-
-    globalfocus.Set(*hero);
-
-    // show new path
-    globalfocus.GetHeroes().GetPath().Show();
-    //world.GetTiles((*heroes).GetCenter()).Redraw();
-
-    // center
-    areaMaps.Center(hero->GetCenter());
-    radar.RedrawCursor();
-
-    selectHeroes.SelectFromCenter(hero->GetCenter());
-    selectHeroes.Redraw();
-    selectCastles.Redraw();
-
-    cursor.Show();
-}
-
-/* return changee cursor */
-Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
-{
-    switch(focus.Type())
-    {
-	case Focus::HEROES:
-	{
-	    const Heroes & from_hero = focus.GetHeroes();
-	    
-	    if(from_hero.isShipMaster())
-	    {
-		switch(tile.GetObject())
-		{
-		    case MP2::OBJN_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(tile.GetIndex());
-
-    			if(NULL != castle)
-    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
-    		    }
-    		    break;
-
-    		    case MP2::OBJ_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(tile.GetIndex());
-
-    			if(NULL != castle)
-			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
-        	    }
-        	    break;
-
-		    case MP2::OBJ_HEROES:
-		    {
-			const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
-
-    			if(NULL != to_hero && to_hero->isShipMaster())
-    			{
-			    if(to_hero->GetCenter() == from_hero.GetCenter())
-				return Cursor::HEROES;
-			    else
-				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
-			}
-    		    }
-    		    break;
-
-    		    case MP2::OBJ_TREASURECHEST:
-                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT : Cursor::POINTER;
-
-		    case MP2::OBJ_COAST:
-			return Cursor::ANCHOR;
-
-		    default:
-                        // FIXME: select BOAT cursor or BOAT2 or BOAT3 or BOAT4
-                        return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT : (tile.isPassable() ? Cursor::BOAT : Cursor::POINTER);
-		}
-	    }
-	    else
-	    {
-		switch(tile.GetObject())
-		{
-    		    case MP2::OBJ_MONSTER:
-    			return Cursor::FIGHT;
-
-		    case MP2::OBJN_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(tile.GetIndex());
-
-    			if(NULL != castle)
-    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT;
-    		    }
-    		    break;
-
-    		    case MP2::OBJ_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(tile.GetIndex());
-
-    			if(NULL != castle)
-			    return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION : Cursor::FIGHT;
-        	    }
-        	    break;
-
-		    case MP2::OBJ_HEROES:
-		    {
-			const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
-
-    			if(NULL != to_hero && !to_hero->isShipMaster())
-    			{
-			    if(to_hero->GetCenter() == from_hero.GetCenter())
-				return Cursor::HEROES;
-			    else
-				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
-			}
-    		    }
-    		    break;
-
-    		    case MP2::OBJ_BOAT:
-            		return Cursor::BOAT;
-
-    		    case MP2::OBJ_TREASURECHEST:
-                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION;
-
-		    default:
-                    	// FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
-			return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION : (tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
-		}
-	    }
-	}
-	break;
-
-	case Focus::CASTLE:
-	{
-	    const Castle & from_castle = focus.GetCastle();
-
-	    switch(tile.GetObject())
-	    {
-    		case MP2::OBJN_CASTLE:
-    		case MP2::OBJ_CASTLE:
-    		{
-    		    const Castle *to_castle = world.GetCastle(tile.GetIndex());
-
-    		    if(NULL != to_castle)
-    			return to_castle->GetColor() == from_castle.GetColor() ? Cursor::CASTLE : Cursor::POINTER;
-		}
-		break;
-
-		case MP2::OBJ_HEROES:
-    		{
-    		    const Heroes *heroes = world.GetHeroes(tile.GetIndex());
-
-		    if(NULL != heroes)
-    			return heroes->GetColor() == from_castle.GetColor() ? Cursor::HEROES : Cursor::POINTER;
-		}
-		break;
-
-		default:
-		    return Cursor::POINTER;
-	    }
-	}
-	break;
-
-    	default:
-    	break;
-    }
-
-    return Cursor::POINTER;
+    return ENDTURN;
 }

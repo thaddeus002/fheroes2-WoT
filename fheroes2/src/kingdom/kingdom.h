@@ -68,6 +68,7 @@
 #include "color.h"
 #include "resource.h"
 #include "gamedefs.h"
+#include "game.h"
 
 namespace Game { class StatusWindow; };
 class Castle;
@@ -76,9 +77,11 @@ class Heroes;
 class Kingdom
 {
 public:
-    Kingdom(const Color::color_t cl);
+    Kingdom(const Color::color_t cl, const Game::control_t con = Game::AI);
 
-    bool isPlay(void) const{ return play; };
+    Game::control_t Control() const{ return control; };
+    void SetControl(const Game::control_t con) { control = con; };
+    bool isPlay(void) const{ return play && ( castles.size() || heroes.size()); };
     bool AllowPayment(const Resource::funds_t & funds) const;
 
     Color::color_t GetColor(void) const{ return color; };
@@ -118,6 +121,7 @@ public:
 
 private:
     const Color::color_t color;
+    Game::control_t control;
     bool play;
     Resource::funds_t resource;
 

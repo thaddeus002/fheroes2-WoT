@@ -3,12 +3,18 @@
 #
 
 TARGET := fheroes2
+SDL_LIBS := $(shell sdl-config --libs)
+SDL_FLAGS := $(shell sdl-config --cflags)
+BUILD_DATE := $(shell date +%Y%m%d)
+#BUILD_DATE := 20080418
+
+export SDL_FLAGS SDL_LIBS BUILD_DATE
 
 all:
-	make -C dist
-	cp dist/$(TARGET) .
+	$(MAKE) -C dist
+	cp dist/$(TARGET).exe .
 
 clean:
-	make -C dist clean
-	make -C src/engine clean
-	make -C src/tools clean
+	$(MAKE) -C dist clean
+	$(MAKE) -C src/engine clean
+	$(MAKE) -C src/tools clean

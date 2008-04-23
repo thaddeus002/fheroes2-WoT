@@ -29,7 +29,7 @@
 #include "payment.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(const Color::color_t cl) : color(cl), play(cl & Settings::Get().FileInfo().KingdomColors() ? true : false)
+Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), play(cl & Settings::Get().FileInfo().KingdomColors() ? true : false)
 {
     // set starting resource
     switch(Settings::Get().GameDifficulty())
