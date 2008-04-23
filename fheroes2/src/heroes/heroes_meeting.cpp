@@ -20,15 +20,19 @@
 
 #include <string>
 #include "agg.h"
-#include "localevent.h"
+#include "engine.h"
 #include "button.h"
 #include "cursor.h"
 #include "config.h"
-#include "background.h"
 #include "tools.h"
 #include "text.h"
+#include "army.h"
 #include "heroes.h"
 #include "portrait.h"
+
+void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> & skills);
+void RedrawArmy(const Point & pt, const std::vector<Army::Troops> & army);
+void RedrawArtifact(const Point & pt, const std::vector<Artifact::artifact_t> & artifacts);
 
 void Heroes::MeetingDialog(Heroes & heroes2)
 {
@@ -151,10 +155,32 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.y = cur_pt.y + 160;
     Text(message, Font::SMALL, dst_pt);
 
-    // seconfary skill
-    // ICN::MINISS
+    // secondary skill
+    dst_pt.x = cur_pt.x + 23;
+    dst_pt.y = cur_pt.y + 200;
+    RedrawSecondarySkill(dst_pt, secondary_skills);
 
+    dst_pt.x = cur_pt.x + 354;
+    dst_pt.y = cur_pt.y + 200;
+    RedrawSecondarySkill(dst_pt, heroes2.secondary_skills);
 
+    // army
+    dst_pt.x = cur_pt.x + 36;
+    dst_pt.y = cur_pt.y + 267;
+    RedrawArmy(dst_pt, army);
+
+    dst_pt.x = cur_pt.x + 381;
+    dst_pt.y = cur_pt.y + 267;
+    RedrawArmy(dst_pt, heroes2.army);
+
+    // artifact
+    dst_pt.x = cur_pt.x + 23;
+    dst_pt.y = cur_pt.y + 347;
+    RedrawArtifact(dst_pt, artifacts);
+
+    dst_pt.x = cur_pt.x + 367;
+    dst_pt.y = cur_pt.y + 347;
+    RedrawArtifact(dst_pt, heroes2.artifacts);
 
     // button exit
     dst_pt.x = cur_pt.x + 280;
@@ -167,12 +193,73 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     display.Flip();
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
-   
+
     // message loop
     while(le.HandleEvents())
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+    }
+}
+
+void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> & skills)
+{
+    Display & display = Display::Get();
+
+    Point dst_pt(pt);
+
+    for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
+    {
+        const Skill::secondary_t skill = ii < skills.size() ? skills[ii].Skill() : Skill::UNKNOWN;
+        const Skill::Level::type_t level = ii < skills.size() ? skills[ii].Level() : Skill::Level::NONE;
+
+        if(Skill::UNKNOWN != skill && Skill::Level::NONE != level)
+        {
+    	    const Sprite & sprite_skill = AGG::GetICN(ICN::MINISS, Skill::Secondary::GetIndexSprite2(skill));
+    	    display.Blit(sprite_skill, dst_pt);
+
+            std::string message;
+            String::AddInt(message, level);
+            Text(message, Font::SMALL, dst_pt.x + (sprite_skill.w() - Text::width(message, Font::SMALL)) - 3, dst_pt.y + sprite_skill.h() - 12);
+
+            dst_pt.x += sprite_skill.w() + 1;
+        }
+    }
+}
+
+void RedrawArmy(const Point & pt, const std::vector<Army::Troops> & army)
+{
+    Display & display = Display::Get();
+
+    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+    {
+	if(army[ii].isValid())
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::MONS32, army[ii].Monster());
+
+	    const u16 ox = pt.x + (44 - sprite.w()) / 2 + ii * 45;
+	    const u16 oy = pt.y + 40 - sprite.h();
+
+	    display.Blit(sprite, ox, oy);
+	}
+    }
+}
+
+void RedrawArtifact(const Point & pt, const std::vector<Artifact::artifact_t> & artifacts)
+{
+    Display & display = Display::Get();
+
+    for(u8 ii = 0; ii < HEROESMAXARTIFACT; ++ii)
+    {
+	if(ii < artifacts.size())
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::ARTFX, artifacts[ii]);
+
+	    const u16 ox = pt.x + (34 - sprite.w()) / 2 + (ii % (HEROESMAXARTIFACT / 2)) * 36;
+	    const u16 oy = ii < HEROESMAXARTIFACT / 2 ? pt.y + 1 : pt.y + 37;
+
+	    display.Blit(sprite, ox, oy);
+	}
     }
 }
