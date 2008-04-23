@@ -274,6 +274,9 @@ int main(int argc, char **argv)
 	    		case Game::LOADMULTI:      rs = Game::LoadMulti();		break;
 	    		case Game::SCENARIOINFO:   rs = Game::ScenarioInfo();		break;
 			case Game::STARTGAME:      rs = Game::StartGame();      	break;
+			case Game::NEWHOTSEAT:     rs = Game::NewHotSeat();		break;
+		        case Game::NEWNETWORK:     rs = Game::NewNetwork();		break;
+
 
 	    		default: break;
 		    }

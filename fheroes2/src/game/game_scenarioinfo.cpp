@@ -59,6 +59,8 @@ Game::menu_t Game::ScenarioInfo(void)
     std::vector<Maps::FileInfo> info_maps;
 
     Settings & conf = Settings::Get();
+
+    conf.SetPlayers(Color::BLUE);
     // read maps directory
     Dir dir;
 
@@ -197,7 +199,15 @@ Game::menu_t Game::ScenarioInfo(void)
 		le.MouseClickLeft(coordColors[Color::GetIndex(color)]))
 	{
 	    cursor.Hide();
-	    conf.SetMyColor(color);
+	    if(conf.HotSeat()) 
+	        if(conf.Players() & color)
+	            conf.SetPlayers(conf.Players() & ~color);
+	        else
+	            conf.SetPlayers(conf.Players() | color);
+	    else {
+	        conf.SetPlayers(color);
+	        conf.SetMyColor(color);
+	    }
 	    Scenario::RedrawOpponentColors(coordColors);
 	    cursor.Show();
 	    display.Flip();
@@ -331,7 +341,7 @@ void Scenario::RedrawOpponentColors(const std::vector<Rect> & coordColors)
 
 	if(conf.FileInfo().KingdomColors() & color)
 	    Display::Get().Blit(conf.FileInfo().AllowColors() & color ?
-		(conf.MyColor() & color ?
+		(conf.Players() & color ?
 		    *colorHumanSprite[color] : *colorAllowSprite[color]) : *colorOpponentSprite[color], rect.x, rect.y);
     }
 }

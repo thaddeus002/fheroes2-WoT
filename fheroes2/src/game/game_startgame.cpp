@@ -75,9 +75,15 @@ Game::menu_t Game::StartGame(void)
     // Load maps
     world.LoadMaps(Settings::Get().FileInfo().FileMaps());
 
-    // single player
-    // FIXME for hotseat
-    world.GetKingdom(Settings::Get().MyColor()).SetControl(Game::Human);
+    if(Settings::Get().HotSeat()) {
+        for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) 
+            if(color & Settings::Get().Players())
+                world.GetKingdom(color).SetControl(Game::Human);
+    } else {
+        // single player
+        world.GetKingdom(Settings::Get().MyColor()).SetControl(Game::Human);
+    }
+    Settings::Get().SetHotSeat(false);
 
     GameArea areaMaps;
 

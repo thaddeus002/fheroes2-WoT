@@ -40,6 +40,8 @@ namespace Game
         NEWSTANDARD,
         NEWCAMPAIN,
         NEWMULTI,
+        NEWHOTSEAT,
+        NEWNETWORK,
         LOADSTANDARD,
         LOADCAMPAIN,
         LOADMULTI,
@@ -64,6 +66,8 @@ namespace Game
     menu_t NewStandard(void);
     menu_t NewCampain(void);
     menu_t NewMulti(void);
+    menu_t NewHotSeat(void);
+    menu_t NewNetwork(void);
     menu_t LoadStandard(void);
     menu_t LoadCampain(void);
     menu_t LoadMulti(void);

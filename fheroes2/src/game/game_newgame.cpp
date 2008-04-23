@@ -87,3 +87,59 @@ Game::menu_t Game::NewGame(void){
 
     return QUITGAME;
 }
+
+Game::menu_t Game::NewMulti(void){
+
+    // preload
+    AGG::PreloadObject(ICN::HEROES);
+    AGG::PreloadObject(ICN::BTNHOTST);
+    AGG::PreloadObject(ICN::REDBACK);
+
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    Display & display = Display::Get();
+    display.SetVideoMode(Display::SMALL);
+
+    // image background
+    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+    display.Blit(back);
+
+    const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
+    display.Blit(panel, 405, 5);
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    Button buttonHotSeat(455, 45, ICN::BTNMP, 0, 1);
+    Button buttonNetwork(455, 110, ICN::BTNMP, 2, 3);
+    Button buttonCancelGame(455, 375, ICN::BTNMP, 8, 9);
+
+    buttonHotSeat.Draw();
+    buttonNetwork.Draw();
+    buttonCancelGame.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    // newgame loop
+    while(le.HandleEvents())
+    {
+	le.MousePressLeft(buttonHotSeat) ? buttonHotSeat.PressDraw() : buttonHotSeat.ReleaseDraw();
+	le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
+	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
+
+	if(le.MouseClickLeft(buttonHotSeat)) return NEWHOTSEAT;
+	if(le.MouseClickLeft(buttonNetwork)) return NEWNETWORK;
+	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
+
+        // right info
+	if(le.MousePressRight(buttonHotSeat)) Dialog::Message("Hot Seat", "Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn.", Font::BIG);
+	if(le.MousePressRight(buttonNetwork)) Dialog::Message("Network", "Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network).", Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Cancel", "Cancel back to the main menu.", Font::BIG);
+		 
+    }
+
+    return QUITGAME;
+}
