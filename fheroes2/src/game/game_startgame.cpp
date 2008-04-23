@@ -298,7 +298,8 @@ Game::menu_t Game::StartGame(void)
     while(1) {
 	// AI move
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) {
-	    if(world.GetKingdom(color).isPlay()) switch(world.GetKingdom(color).Control()) {
+	    if(world.GetKingdom(color).isPlay() && !world.GetKingdom(color).isEmpty()) 
+	    switch(world.GetKingdom(color).Control()) {
 	        case Game::Human:
 		    mixer.Enhance();
 		    //cursor.Show();
@@ -321,10 +322,15 @@ Game::menu_t Game::StartGame(void)
 		    if(m != ENDTURN) break;
 		    break;
 	        case Game::Network:
+	            display.Flip();
 	            // TODO network game
 		    break;
 	        case Game::AI:
+	            display.Flip();
 		    world.GetKingdom(color).AITurns(statusWindow);
+		    break;
+		default:
+		    Dialog::Message(Color::String(color), "default", Font::BIG, Dialog::OK);
 		    break;
 	    }
 	    if(m != ENDTURN) break;
