@@ -40,7 +40,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const Sprite & sprite = Skill::Secondary::GetSprite(skill);
+    const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(skill));
 
     Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20 + Text::height(message, Font::BIG, BOXAREA_WIDTH) + 20 + sprite.h(), ok_button ? Dialog::OK : 0);
 

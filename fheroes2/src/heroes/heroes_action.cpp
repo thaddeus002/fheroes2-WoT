@@ -413,7 +413,7 @@ void Heroes::ActionToWitchsHut(const u16 dst_index)
     const std::string head("Witch's Hut");
 
     // check full
-    if(secondary_skills.isFull())
+    if(HEROESMAXSKILL == secondary_skills.size())
     {
 	const std::string body("You approach the hut and observe a witch inside studying an ancient tome on " + skill_name + ". As you approach, she turns and focuses her one glass eye on you. \"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\"");
 	if(H2Config::MyColor() == GetColor()) Dialog::Message(head, body, Font::BIG, Dialog::OK);

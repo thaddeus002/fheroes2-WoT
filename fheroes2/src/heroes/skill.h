@@ -22,8 +22,6 @@
 #define H2SKILL_H
 
 #include <string>
-#include <vector>
-#include <map>
 #include <utility>
 #include "morale.h"
 #include "luck.h"
@@ -31,8 +29,6 @@
 
 #define MAXPRIMARYSKILL		6
 #define MAXSECONDARYSKILL	14
-
-class Sprite;
 
 namespace Skill
 {
@@ -46,25 +42,22 @@ namespace Skill
 
     typedef enum
     {
-	UNKNOWN		= 0x0000,
-	PATHFINDING	= 0x0001,
-	ARCHERY		= 0x0002,
-	LOGISTICS	= 0x0004,
-	SCOUTING	= 0x0008,
-	DIPLOMACY	= 0x0010,
-	NAVIGATION	= 0x0020,
-	LEADERSHIP	= 0x0040,
-	WISDOM		= 0x0080,
-	MYSTICISM	= 0x0100,
-	LUCK		= 0x0200,
-	BALLISTICS	= 0x0400,
-	EAGLEEYE	= 0x0800,
-	NECROMANCY	= 0x1000,
-	ESTATES		= 0x2000,
+	UNKNOWN		= 0,
+	PATHFINDING	= 1,
+	ARCHERY		= 2,
+	LOGISTICS	= 3,
+	SCOUTING	= 4,
+	DIPLOMACY	= 5,
+	NAVIGATION	= 6,
+	LEADERSHIP	= 7,
+	WISDOM		= 8,
+	MYSTICISM	= 9,
+	LUCK		= 10,
+	BALLISTICS	= 11,
+	EAGLEEYE	= 12,
+	NECROMANCY	= 13,
+	ESTATES		= 14,
     } secondary_t;
-
-    inline secondary_t & operator++ (secondary_t & skill){ return skill = ( ESTATES == skill ? PATHFINDING : secondary_t(skill << 1)); };
-    inline secondary_t & operator-- (secondary_t & skill){ return skill = ( PATHFINDING == skill ? ESTATES : secondary_t(skill >> 1)); };
 
     namespace Level
     {
@@ -101,24 +94,25 @@ namespace Skill
         Luck::luck_t		luck;
     };
 
-    class Secondary
+    class Secondary : private std::pair<secondary_t, Level::type_t>
     {
 	public:
 	Secondary();
+	Secondary(const secondary_t & s, const Level::type_t & t);
 
-	bool		isFull(void) const;
-	void		Reset(void);
-	void		Level(const secondary_t skill, const Level::type_t level);
-	Level::type_t	GetLevel(const secondary_t skill) const;
-	secondary_t	GetSkill(const u8 index) const;
+	void		SetLevel(const Level::type_t level);
+
+	Level::type_t	Level(void) const;
+	secondary_t	Skill(void) const;
 
 	static secondary_t 	FromMP2(const u8 byte);
 	static secondary_t 	RandForWitchsHut(void);
-	static const Sprite &	GetSprite(const secondary_t skill);
 
-	private:
-	std::map<secondary_t, Level::type_t> skills;
-	u8 count;
+	/* index sprite from SECSKILL */
+	static u8 GetIndexSprite1(const secondary_t skill);
+
+	/* index sprite from MINISS */
+	static u8 GetIndexSprite2(const secondary_t skill);
     };
 };
 

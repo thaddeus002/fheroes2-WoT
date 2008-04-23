@@ -18,62 +18,15 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
-#include "agg.h"
 #include "gamedefs.h"
-#include "heroes.h"
 #include "rand.h"
+#include "error.h"
 #include "skill.h"
 
 Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0), morale(Morale::NORMAL), luck(Luck::NORMAL)
 {
 }
 
-Skill::Secondary::Secondary() : count(0)
-{
-    skills[PATHFINDING]	= Skill::Level::NONE;
-    skills[ARCHERY]	= Skill::Level::NONE;
-    skills[LOGISTICS]	= Skill::Level::NONE;
-    skills[SCOUTING]	= Skill::Level::NONE;
-    skills[DIPLOMACY]	= Skill::Level::NONE;
-    skills[NAVIGATION]	= Skill::Level::NONE;
-    skills[LEADERSHIP]	= Skill::Level::NONE;
-    skills[WISDOM]	= Skill::Level::NONE;
-    skills[MYSTICISM]	= Skill::Level::NONE;
-    skills[LUCK]	= Skill::Level::NONE;
-    skills[BALLISTICS]	= Skill::Level::NONE;
-    skills[EAGLEEYE]	= Skill::Level::NONE;
-    skills[NECROMANCY]	= Skill::Level::NONE;
-    skills[ESTATES]	= Skill::Level::NONE;
-}
-
-void Skill::Secondary::Level(const secondary_t skill, const Level::type_t level)
-{
-    if(Level::NONE == level || UNKNOWN == skill) return;
-
-    const Level::type_t cur_level = GetLevel(skill);
-
-    if(Level::NONE != cur_level && cur_level < level)
-	skills[skill] = level;
-    else
-    if(count < HEROESMAXSKILL)
-    {
-    	skills[skill] = level;
-    	++count;
-    }
-}
-
-Skill::Level::type_t Skill::Secondary::GetLevel(const secondary_t skill) const
-{
-    if(UNKNOWN != skill)
-    {
-	std::map<secondary_t, Level::type_t>::const_iterator it1 = skills.begin();
-	std::map<secondary_t, Level::type_t>::const_iterator it2 = skills.end();
-
-	for(; it1 != it2; ++it1) if(skill == (*it1).first) return (*it1).second;
-    }
-    
-    return Skill::Level::NONE;
-}
 
 Skill::Level::type_t Skill::Level::FromMP2(const u8 byte)
 {
@@ -239,16 +192,29 @@ const std::string & Skill::Description(const secondary_t skill, const Level::typ
     return description_skill[index];
 }
 
-Skill::secondary_t Skill::Secondary::GetSkill(const u8 index) const
+Skill::Secondary::Secondary() : std::pair<secondary_t, Level::type_t>(Skill::UNKNOWN, Skill::Level::NONE)
 {
-    u8 index2 = index;
+}
 
-    std::map<secondary_t, Level::type_t>::const_iterator it1 = skills.begin();
-    std::map<secondary_t, Level::type_t>::const_iterator it2 = skills.end();
+Skill::Secondary::Secondary(const secondary_t & s, const Level::type_t & t) : std::pair<secondary_t, Level::type_t>(s, t)
+{
+}
 
-    for(; it1 != it2; ++it1) if((*it1).first != UNKNOWN && (*it1).second != Level::NONE && !index2--) return (*it1).first;
+void Skill::Secondary::SetLevel(const Level::type_t level)
+{
+    if(Level::NONE == level) return;
 
-    return UNKNOWN;
+    second = level;
+}
+
+Skill::Level::type_t Skill::Secondary::Level(void) const
+{
+    return second;
+}
+
+Skill::secondary_t Skill::Secondary::Skill(void) const
+{
+    return first;
 }
 
 Skill::secondary_t Skill::Secondary::FromMP2(const u8 byte)
@@ -301,39 +267,56 @@ Skill::secondary_t Skill::Secondary::RandForWitchsHut(void)
     return UNKNOWN;
 }
 
-const Sprite & Skill::Secondary::GetSprite(const secondary_t skill)
+/* index sprite from SECSKILL */
+u8 Skill::Secondary::GetIndexSprite1(const secondary_t skill)
 {
-    u8 index = 0;
-
     switch(skill)
     {
-    	case PATHFINDING:	index = 1; break;
-        case ARCHERY:		index = 2; break;
-        case LOGISTICS:		index = 3; break;
-        case SCOUTING:		index = 4; break;
-        case DIPLOMACY:		index = 5; break;
-        case NAVIGATION:	index = 6; break;
-        case LEADERSHIP:	index = 7; break;
-        case WISDOM:		index = 8; break;
-        case MYSTICISM:		index = 9; break;
-        case LUCK:		index = 10; break;
-        case BALLISTICS:	index = 11; break;
-        case EAGLEEYE:		index = 12; break;
-        case NECROMANCY:	index = 13; break;
-        case ESTATES:		index = 14; break;
+    	case PATHFINDING:	return 1;
+        case ARCHERY:		return 2;
+        case LOGISTICS:		return 3;
+        case SCOUTING:		return 4;
+        case DIPLOMACY:		return 5;
+        case NAVIGATION:	return 6;
+        case LEADERSHIP:	return 7;
+        case WISDOM:		return 8;
+        case MYSTICISM:		return 9;
+        case LUCK:		return 10;
+        case BALLISTICS:	return 11;
+        case EAGLEEYE:		return 12;
+        case NECROMANCY:	return 13;
+        case ESTATES:		return 14;
 
         default: break;
     }
 
-    return AGG::GetICN(ICN::SECSKILL, index);
+    return 0;
 }
 
-/* reset all skill */
-void Skill::Secondary::Reset(void)
+/* index sprite from MINISS */
+u8 Skill::Secondary::GetIndexSprite2(const secondary_t skill)
 {
-}
+    switch(skill)
+    {
+    	case PATHFINDING:	return 0;
+        case ARCHERY:		return 1;
+        case LOGISTICS:		return 2;
+        case SCOUTING:		return 3;
+        case DIPLOMACY:		return 4;
+        case NAVIGATION:	return 5;
+        case LEADERSHIP:	return 6;
+        case WISDOM:		return 7;
+        case MYSTICISM:		return 8;
+        case LUCK:		return 9;
+        case BALLISTICS:	return 10;
+        case EAGLEEYE:		return 11;
+        case NECROMANCY:	return 12;
+        case ESTATES:		return 13;
 
-bool Skill::Secondary::isFull(void) const
-{
-    return count == MAXSECONDARYSKILL;
+        default: break;
+    }
+
+    Error::Warning("Skill::Secondary::GetIndexSprite2: unknown skill, index out of range");
+
+    return 0xff;
 }

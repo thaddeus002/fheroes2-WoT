@@ -49,8 +49,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power       = DEFAULT_KNGT_POWER;
             knowledge   = DEFAULT_KNGT_KNOWLEDGE;
 
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::BALLISTICS, Skill::Level::BASIC);
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::BALLISTICS, Skill::Level::BASIC));
 	    break;
 	    
 	case Race::BARB:
@@ -59,7 +59,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power               = DEFAULT_BARB_POWER;
             knowledge           = DEFAULT_BARB_KNOWLEDGE;
 
-	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::ADVANCED);
+	    secondary_skills.push_back(Skill::Secondary(Skill::PATHFINDING, Skill::Level::ADVANCED));
 	    break;
 	    
 	case Race::SORC:
@@ -68,8 +68,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power               = DEFAULT_SORC_POWER;
             knowledge           = DEFAULT_SORC_KNOWLEDGE;
 
-	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
+	    secondary_skills.push_back(Skill::Secondary(Skill::NAVIGATION, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -80,8 +80,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power               = DEFAULT_WRLK_POWER;
             knowledge           = DEFAULT_WRLK_KNOWLEDGE;
 
-	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
+	    secondary_skills.push_back(Skill::Secondary(Skill::SCOUTING, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -92,7 +92,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power               = DEFAULT_WZRD_POWER;
             knowledge           = DEFAULT_WZRD_KNOWLEDGE;
 
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::ADVANCED));
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -103,8 +103,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power               = DEFAULT_NECR_POWER;
             knowledge           = DEFAULT_NECR_KNOWLEDGE;
 
-	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
+	    secondary_skills.push_back(Skill::Secondary(Skill::NECROMANCY, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
 
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
@@ -131,10 +131,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power     = 4;
             knowledge = 5;
 
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::EXPERT);
-	    secondary_skills.Level(Skill::ARCHERY, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::ARCHERY, Skill::Level::BASIC));
     	    break;
 
         case CORLAGON:
@@ -143,12 +143,12 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power     = 1;
             knowledge = 1;
 
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::EXPERT);
-	    secondary_skills.Level(Skill::BALLISTICS, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::NECROMANCY, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::BALLISTICS, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::PATHFINDING, Skill::Level::BASIC));
     	    break;
         
         case ELIZA:
@@ -157,11 +157,11 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power     = 2;
             knowledge = 6;
 
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::EXPERT);
-	    secondary_skills.Level(Skill::ARCHERY, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::LUCK, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::NAVIGATION, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::ARCHERY, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LUCK, Skill::Level::BASIC));
     	    break;
 
     	case ARCHIBALD:
@@ -170,10 +170,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power     = 4;
             knowledge = 4;
 
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::EXPERT);
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::EXPERT);
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::SCOUTING, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::ADVANCED));
     	    break;
 
     	case HALTON:
@@ -182,10 +182,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power     = 3;
             knowledge = 2;
 
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::BALLISTICS, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::DIPLOMACY, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::BALLISTICS, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::DIPLOMACY, Skill::Level::BASIC));
     	    break;
     	
     	case BAX:
@@ -194,43 +194,43 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
             power     = 4;
             knowledge = 3;
 
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::EXPERT);
-	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::NAVIGATION, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::NECROMANCY, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::NAVIGATION, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::PATHFINDING, Skill::Level::BASIC));
     	    break;
 
 	case SOLMYR:
 	case DRAKONIA:
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::BASIC));
 	    break;
 
 	case DAINWIN:
 	case ELDERIAN:
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::SCOUTING, Skill::Level::BASIC));
 	    break;
 
 	case MOG:
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::WISDOM, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::NECROMANCY, Skill::Level::ADVANCED);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::NECROMANCY, Skill::Level::ADVANCED));
 	    break;
 	
 	case UNCLEIVAN:
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::ADVANCED);
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::PATHFINDING, Skill::Level::ADVANCED));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::BASIC));
 	    break;
 	
 	case JOSEPH:
-	    secondary_skills.Reset();
-	    secondary_skills.Level(Skill::LEADERSHIP, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::SCOUTING, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::LEADERSHIP, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::SCOUTING, Skill::Level::BASIC));
 	    break;
 	
 	case GALLAVANT:
@@ -249,19 +249,20 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    army[0].Set(Monster::BLACK_DRAGON, 2);
     	    army[1].Set(Monster::RED_DRAGON, 3);
 
-	    secondary_skills.Level(Skill::PATHFINDING, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::LOGISTICS, Skill::Level::BASIC);
-	    secondary_skills.Level(Skill::MYSTICISM, Skill::Level::BASIC);
+	    secondary_skills.clear();
+	    secondary_skills.push_back(Skill::Secondary(Skill::PATHFINDING, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::LOGISTICS, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::MYSTICISM, Skill::Level::BASIC));
 
 	    artifacts.push_back(Artifact::MEDAL_VALOR);
 	    artifacts.push_back(Artifact::STEALTH_SHIELD);
 	    artifacts.push_back(Artifact::DRAGON_SWORD);
 	    artifacts.push_back(Artifact::RABBIT_FOOT);
 	    artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
-	    
+
 	    experience = 777;
 	    break;
-	
+
 	default: break;
     }
 
@@ -379,7 +380,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     {
 	++ptr8;
 
-	secondary_skills.Reset();
+	secondary_skills.clear();
 
 	// skills
 	for(u8 ii = 0; ii < 8; ++ii)
@@ -387,7 +388,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 	    const Skill::secondary_t skill = Skill::Secondary::FromMP2(*(ptr8 + ii));
 	    const Skill::Level::type_t lvl = Skill::Level::FromMP2(*(ptr8 + ii + 8));
 
-	    if(Skill::UNKNOWN != skill && Skill::Level::NONE != lvl) secondary_skills.Level(skill, lvl);
+	    if(Skill::UNKNOWN != skill && Skill::Level::NONE != lvl) secondary_skills.push_back(Skill::Secondary(skill, lvl));
 	}
 	ptr8 += 15;
     }
@@ -1383,22 +1384,37 @@ void Heroes::PlayPickupSound(void) const
 
 bool Heroes::HasSecondarySkill(const Skill::secondary_t skill) const
 {
-    return Skill::Level::NONE != secondary_skills.GetLevel(skill);
+    return Skill::Level::NONE != GetLevelSkill(skill);
 }
 
 Skill::Level::type_t Heroes::GetLevelSkill(const Skill::secondary_t skill) const
 {
-    return secondary_skills.GetLevel(skill);
+    std::vector<Skill::Secondary>::const_iterator it1 = secondary_skills.begin();
+    std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
+    
+    for(; it1 != it2; ++it1)
+	if((*it1).Skill() == skill) return (*it1).Level();
+
+    return Skill::Level::NONE;
 }
 
 void Heroes::LearnBasicSkill(const Skill::secondary_t skill)
 {
-    return secondary_skills.Level(skill, Skill::Level::BASIC);
+    std::vector<Skill::Secondary>::iterator it1 = secondary_skills.begin();
+    std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
+
+    // find_if
+    for(; it1 != it2; ++it1) if((*it1).Skill() == skill) break;
+
+    if(it1 != it2)
+	(*it1).SetLevel(Skill::Level::BASIC);
+    else
+	secondary_skills.push_back(Skill::Secondary(skill, Skill::Level::BASIC));
 }
 
 void Heroes::Scoute(void)
 {
-    int scouting = SCOUTINGBASE + secondary_skills.GetLevel(Skill::SCOUTING);
+    int scouting = SCOUTINGBASE + GetLevelSkill(Skill::SCOUTING);
     Point p = GetCenter();
     for(int x = -scouting; x <= scouting; x ++)
         for(int y = -scouting; y <= scouting; y ++)

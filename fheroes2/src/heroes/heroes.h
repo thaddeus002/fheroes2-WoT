@@ -216,7 +216,7 @@ private:
     u16			magic_point;
     u16			move_point;
 
-    Skill::Secondary	secondary_skills;
+    std::vector<Skill::Secondary>	secondary_skills;
 
     std::vector<Artifact::artifact_t>	artifacts;
     std::vector<Army::Troops> army;
