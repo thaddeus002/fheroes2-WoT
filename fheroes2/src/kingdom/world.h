@@ -21,6 +21,7 @@
 #define H2WORLD_H
 
 #include <vector>
+#include <map>
 #include <string>
 #include "maps.h"
 #include "race.h"
