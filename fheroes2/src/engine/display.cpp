@@ -24,6 +24,8 @@
 #include "error.h"
 #include "display.h"
 
+bool needrise = false;
+
 Display::Display()
 {
     videosurface = true;
@@ -89,7 +91,8 @@ void Display::Flip(void)
 {
     Display & display = Display::Get();
 
-    SDL_Flip(display.surface);
+    if(needrise) display.Rise();
+    else SDL_Flip(display.surface);
 }
 
 /* full screen */
@@ -122,6 +125,51 @@ void Display::HideCursor(void)
 void Display::ShowCursor(void)
 {
     SDL_ShowCursor(SDL_ENABLE);
+}
+
+void Display::Fade()
+{
+    Display & display = Display::Get();
+    Surface temp(display);
+    temp.SetDisplayFormat();
+    temp.Blit(display);
+    const u32 black = temp.MapRGB(0, 0, 0);
+    u8 ii = 250;
+    while(ii > 0)
+    {
+	display.Fill(black);
+	temp.SetAlpha(ii);
+	display.Blit(temp);
+        display.Flip();
+	ii -= 10;
+	DELAY(10);
+    }
+    temp.SetAlpha(255);
+    display.Blit(temp);
+    needrise = true;
+}
+
+void Display::Rise()
+{
+    needrise = false;
+    Display & display = Display::Get();
+    Surface temp(display);
+    temp.SetDisplayFormat();
+    temp.Blit(display);
+    const u32 black = temp.MapRGB(0, 0, 0);
+    u8 ii = 0;
+    while(ii < 250)
+    {
+	display.Fill(black);
+	temp.SetAlpha(ii);
+	display.Blit(temp);
+        display.Flip();
+	ii += 10;
+	DELAY(10);
+    }
+    temp.SetAlpha(255);
+    display.Blit(temp);
+    display.Flip();
 }
 
 /* get video display */

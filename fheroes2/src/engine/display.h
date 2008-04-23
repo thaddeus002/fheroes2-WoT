@@ -42,6 +42,9 @@ public:
 
     static void		Flip(void);
     static void		FullScreen(void);
+    
+    static void		Fade();
+    static void		Rise();
 
     Display &		operator= (const Display & dp);
 

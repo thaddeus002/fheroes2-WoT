@@ -1139,6 +1139,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     if(selectHeroesTroops) delete selectHeroesTroops;
 
+    Display::Get().Fade();
+
     return result;
 }
 

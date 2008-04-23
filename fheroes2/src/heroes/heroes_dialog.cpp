@@ -518,7 +518,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     while(le.HandleEvents())
     {
         // exit
-	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return Dialog::CANCEL;
+	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) {
+	    Display::Get().Fade();
+	    return Dialog::CANCEL;
+	}
 
 	// heroes troops
 	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)

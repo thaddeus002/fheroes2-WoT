@@ -72,6 +72,13 @@ u8 icon_count = 0;
 
 Game::menu_t Game::StartGame(void)
 {
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+
+    Display & display = Display::Get();
+    display.Fade();
+
     // Load maps
     world.LoadMaps(Settings::Get().FileInfo().FileMaps());
 
@@ -87,13 +94,7 @@ Game::menu_t Game::StartGame(void)
 
     GameArea areaMaps;
 
-    Display & display = Display::Get();
-
     Audio::Mixer & mixer = Audio::Mixer::Get();
-
-    // cursor
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
 
     Game::DrawInterface();
 
@@ -286,7 +287,7 @@ Game::menu_t Game::StartGame(void)
     buttonScrollHeroesDown.Draw();
     buttonScrollCastleDown.Draw();
 
-    display.Flip();
+    //display.Flip();
 
     Game::menu_t m = ENDTURN;
     int humans = 0;
@@ -300,8 +301,8 @@ Game::menu_t Game::StartGame(void)
 	    if(world.GetKingdom(color).isPlay()) switch(world.GetKingdom(color).Control()) {
 	        case Game::Human:
 		    mixer.Enhance();
-		    cursor.Show();
-		    display.Flip();
+		    //cursor.Show();
+		    //display.Flip();
 		    statusWindow.SetState(Game::StatusWindow::DAY);
 		    statusWindow.Redraw();
 
@@ -361,6 +362,8 @@ void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
     SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
 
     Dialog::answer_t result = Dialog::ZERO;
+
+    Display::Get().Fade();
 
     while(Dialog::CANCEL != result)
     {
@@ -436,6 +439,8 @@ void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
     SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
 
     Dialog::answer_t result = Dialog::ZERO;
+
+    Display::Get().Fade();
 
     while(Dialog::CANCEL != result)
     {
@@ -740,6 +745,9 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 
     selectCastles.Redraw();
     selectHeroes.Redraw();
+
+    display.Flip();
+    cursor.Show();
 
     if(message)
         Dialog::Message("", Color::String(myKingdom.GetColor()) + " player's turn", Font::BIG, Dialog::OK);

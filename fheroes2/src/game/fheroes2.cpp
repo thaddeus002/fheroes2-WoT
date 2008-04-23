@@ -284,6 +284,7 @@ int main(int argc, char **argv)
 	    }
 
 	    Display::ShowCursor();
+	    Display::Fade();
 
 	} catch(std::bad_alloc)
 	{
