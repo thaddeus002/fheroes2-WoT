@@ -28,6 +28,7 @@
 #include "monster.h"
 #include "heroes.h"
 #include "battle.h"
+#include "m82.h"
 
 // action to next cell
 void Heroes::Action(void)
@@ -753,9 +754,11 @@ void Heroes::ActionToExperienceObject(const u16 dst_index, const MP2::object_t o
     // increase experience
     experience += exp;
 
+    AGG::PlaySound(M82::EXPERNCE);
     if(H2Config::MyColor() == GetColor()) Dialog::ExperienceInfo(header, body_true, exp);
 
     // FIXME: check level up
+    AGG::PlaySound(M82::NWHEROLV);
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToExperienceObject: " + GetName());
 }

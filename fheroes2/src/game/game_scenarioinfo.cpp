@@ -248,8 +248,8 @@ Game::menu_t Game::ScenarioInfo(void)
 	    cursor.Hide();
 	    levelCursor.Hide();
 	    Scenario::SelectMaps(info_maps);
-	    conf.SetPlayers(Color::BLUE);
-	    conf.SetMyColor(Color::BLUE);
+	    conf.SetPlayers(0);  // TODO select first available color
+	    //conf.SetMyColor(Color::BLUE);
 	    Scenario::DrawInfo(coordColors, coordClass);
 	    Scenario::RedrawOpponentColors(coordColors);
 	    levelCursor.Move(pointDifficultyNormal);
