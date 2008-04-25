@@ -27,6 +27,7 @@
 #include "error.h"
 #include "monster.h"
 #include "heroes.h"
+#include "battle.h"
 
 // action to next cell
 void Heroes::Action(void)
@@ -161,11 +162,24 @@ void Heroes::ActionToMonster(const u16 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
-    //const u16 count = Monster::GetSize(tile);
-
+    const u16 count = Monster::GetSize(tile);
+	 std::vector<Army::Troops> army;
+	 int tr_c = count > 5 ? 5 : count;
+	 for(int i=0; i< tr_c; i++) {
+		 Army::Troops troop(monster, (int)(count/tr_c));
+		 army.push_back(troop);
+	 }
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: " + GetName() + " attack monster " + Monster::String(monster));
 
-    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: attack monster");
+    Display::Fade();
+    if(Army::Battle(*this, army, tile)) {
+       // TODO victory and expirience
+       if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: victory");
+    } else {
+       // TODO fail
+       if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: fail");
+    }
+
 }
 
 void Heroes::ActionToHeroes(const u16 dst_index)
