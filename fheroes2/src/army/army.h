@@ -71,11 +71,15 @@ namespace Army
         Monster::monster_t Monster(void) const{ return monster; };
         u16 Count(void) const{ return count; };
         const Skill::Primary* MasterSkill(void) const{ return master_skill; };
+	
+	void SetPosition(const Point & pt) { pos = pt; };
+	const Point& Position() const { return pos; };
 
     private:
         Monster::monster_t	monster;
         u16			count;
         const Skill::Primary*	master_skill;
+	Point                   pos;
     };
 
     bool isValid(const Troops & army);

@@ -61,7 +61,7 @@ Army::size_t Army::GetSize(u16 count)
     return FEW;
 }
 
-Army::Troops::Troops(const Army::Troops & troops) : monster(troops.Monster()), count(troops.Count()), master_skill(NULL)
+Army::Troops::Troops(const Army::Troops & troops) : monster(troops.Monster()), count(troops.Count()), master_skill(NULL), pos(0,0)
 {
 }
 
@@ -69,6 +69,7 @@ Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
 {
     monster = troops.Monster();
     count = troops.Count();
+    pos = troops.Position();
 
     return *this;
 }

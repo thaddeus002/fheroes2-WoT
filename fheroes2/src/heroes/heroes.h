@@ -117,6 +117,7 @@ public:
     const std::string & GetName(void) const{ return name; };
     const Point & GetCenter(void) const{ return mp; };
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
+    std::vector<Army::Troops> & Army(void) { return army; };
     u8 GetCountArmy(void) const;
 
     u8 GetAttack(void) const;
