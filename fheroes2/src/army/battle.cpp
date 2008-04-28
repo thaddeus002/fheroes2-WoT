@@ -211,9 +211,10 @@ void Army::DrawMonster(const Army::Troops & troop, const Point & dst_pt, u16 ani
     if(H2Config::Debug()) Error::Verbose(Monster::String(troop.Monster()));
     Display & display = Display::Get();
     const Sprite & sp = AGG::GetICN(Monster::GetStats(troop.Monster()).file_icn, animframe, reflect);
-    Point tp = troop.Position();
-    Point p(dst_pt.x + BFX + tp.x*CELLW - (tp.y % 2 ? CELLW/2 : 0), dst_pt.y + BFY + tp.y*CELLH - sp.h());
-    display.Blit(sp, p);
+    Point tp = Bf2Scr(troop.Position()) + dst_pt;
+    tp.y -= sp.h();
+    //Point p(dst_pt.x + BFX + tp.x*CELLW - (tp.y % 2 ? CELLW/2 : 0), dst_pt.y + BFY + tp.y*CELLH - sp.h());
+    display.Blit(sp, tp);
 }
 
 void Army::InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool reflect)
@@ -228,13 +229,13 @@ void Army::InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool
 }
 
 // translate coordinate to batle field
-inline Point Scr2Bf(const Point & pt)
+inline Point Army::Scr2Bf(const Point & pt)
 {
     return Point((pt.x - BFX + (pt.y % 2 ? CELLW/2 : 0))/CELLW , (pt.y - BFY)/CELLH);
 }
 
 // translate to screen (offset to frame border)
-inline Point Bf2Scr(const Point & pt)
+inline Point Army::Bf2Scr(const Point & pt)
 {
     return Point(BFX + pt.x*CELLW - (pt.y % 2 ? CELLW/2 : 0), BFY + pt.y*CELLH);
 }

@@ -35,6 +35,10 @@ public:
     bool operator!= (const Point & pt) const;
 };
 
+Point operator+(const Point& pt1, const Point& pt2);
+
+Point operator-(const Point& pt1, const Point& pt2);
+
 class Size
 {
 public:

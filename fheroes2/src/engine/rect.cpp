@@ -38,6 +38,16 @@ Size::Size(u16 sw, u16 sh) : w(sw), h(sh)
 {
 }
 
+Point operator+(const Point& pt1, const Point& pt2)
+{
+    return Point(pt1.x + pt2.x, pt1.y + pt2.y);
+}
+
+Point operator-(const Point& pt1, const Point& pt2)
+{
+    return Point(pt1.x - pt2.x, pt1.y - pt2.y);
+}
+
 bool Size::operator== (const Size & sz) const
 {
     return (w == sz.w && h == sz.h);
