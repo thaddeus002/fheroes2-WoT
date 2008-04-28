@@ -1422,3 +1422,12 @@ void Heroes::Scoute(void)
                 if(p.x+x >= 0 && p.y+y >= 0 && p.x+x < world.w() && p.y+y < world.h())
                     world.GetTiles(p.x+x, p.y+y).ClearFog(GetColor());
 }
+
+bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
+{
+    if(HasArtifact(art) || HEROESMAXARTIFACT <= artifacts.size()) return false;
+    
+    artifacts.push_back(art);
+    
+    return true;
+}

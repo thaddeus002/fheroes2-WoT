@@ -1205,6 +1205,25 @@ Maps::TilesAddon * Maps::Tiles::FindRNDResource(void)
     return NULL;
 }
 
+Maps::TilesAddon * Maps::Tiles::FindArtifact(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNARTI
+	    if(0x2B < addon.object && 0x30 > addon.object && (addon.index % 2)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
 Maps::TilesAddon * Maps::Tiles::FindRNDArtifact(const u8 level)
 {
     u8 index = 0xA3;

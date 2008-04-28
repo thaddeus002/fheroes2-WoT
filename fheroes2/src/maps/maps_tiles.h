@@ -76,6 +76,7 @@ namespace Maps
 	TilesAddon * FindResource(void);
 	TilesAddon * FindRNDResource(void);
 	TilesAddon * FindBottle(void);
+	TilesAddon * FindArtifact(void);
 	TilesAddon * FindRNDArtifact(const u8 level = 0);
 	TilesAddon * FindUltimateArtifact(void);
 	TilesAddon * FindMiniHero(void);

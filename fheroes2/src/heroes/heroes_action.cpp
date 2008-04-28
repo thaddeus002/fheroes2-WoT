@@ -28,6 +28,7 @@
 #include "monster.h"
 #include "heroes.h"
 #include "battle.h"
+#include "rand.h"
 #include "m82.h"
 
 // action to next cell
@@ -54,9 +55,10 @@ void Heroes::Action(void)
         case MP2::OBJ_RESOURCE:	ActionToResource(dst_index, MP2::OBJ_RESOURCE); break;
         case MP2::OBJ_CAMPFIRE: ActionToResource(dst_index, MP2::OBJ_CAMPFIRE); break;
 
-        case MP2::OBJ_ARTIFACT:
-        case MP2::OBJ_ANCIENTLAMP:
-        case MP2::OBJ_TREASURECHEST:
+        case MP2::OBJ_TREASURECHEST: ActionToTreasureChest(dst_index); break;
+        case MP2::OBJ_ANCIENTLAMP: ActionToAncientLamp(dst_index); break;
+        case MP2::OBJ_ARTIFACT: ActionToArtifact(dst_index); break;
+
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_FLOTSAM:
     	    path.Hide();
@@ -693,6 +695,19 @@ void Heroes::ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj)
     	    body_false = "";
     	    body_true = "";
     	    break;
+
+	{Graveyard}
+	You tentatively approach the burial ground of ancient warriors.  Do you want to search the graves?
+	Upon defeating the Zombies you spend several hours searching the graves and find nothing.  Such a despicable act reduces your army's morale.
+	Upon defeating the zomies you search the graves and find something!
+	{Shipwreck}
+	The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.  Do you wish to search the shipwreck?
+	Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.
+	Upon defeating the Ghosts you sift through the debris and find something!
+	{Derelict Ship}
+	The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.  Do you wish to search the ship?
+	Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.
+	Upon defeating the Skeletons you sift through the debris and find something!
 */
     	default: return;
     }
@@ -761,4 +776,160 @@ void Heroes::ActionToExperienceObject(const u16 dst_index, const MP2::object_t o
     AGG::PlaySound(M82::NWHEROLV);
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToExperienceObject: " + GetName());
+}
+
+void Heroes::ActionToArtifact(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    const Maps::TilesAddon *addon = tile.FindArtifact();
+
+    path.Hide();
+    path.Reset();
+
+    if(addon)
+    {
+	const u32 uniq = addon->uniq;
+	const Artifact::artifact_t art = Artifact::FromMP2(addon->index);
+
+	if(Artifact::UNKNOWN == art) return;
+
+/* FIXME: pickup artifact variants
+    {Artifact}
+    You come upon an ancient artifact.  As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.
+    {Artifact}
+    Through a clearing you observe an ancient artifact.  Unfortunately, it's guarded by a nearby %s.  Do you want to fight the %s for the artifact?
+    Victorious, you take your prize, the %s
+    Discretion is the better part of valor, and you decide to avoid this fight for today.
+    {Artifact}
+    You've found the humble dwelling of a withered hermit.  The hermit tells you that he is willing to give the %s to the first wise person he meets.
+    {Artifact}
+    You've come across the spartan quarters of a retired soldier.  The soldier tells you that he is willing to pass on the %s to the first true leader he meets.
+    {Artifact}
+    A leprechaun offers you the %s for the small price of 2000 gold.  Do you wish to buy this artifact?
+    You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
+    Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
+    {Artifact}
+    A leprechaun offers you the %s for the small price of 2500 gold and 3 %s.  Do you wish to buy this artifact?
+    You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
+    Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
+    {Artifact}
+    A leprechaun offers you the %s for the small price of 3000 gold and 5 %s.  Do you wish to buy this artifact?
+    You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
+    Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
+*/
+	PlayPickupSound();
+
+	PickupArtifact(art);
+
+	// dialog
+	//if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+
+	tile.Remove(uniq);
+	tile.SetObject(MP2::OBJ_ZERO);
+
+	// remove shadow from left cell
+	if(Maps::isValidDirection(dst_index, Direction::LEFT))
+	{
+	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
+
+	    left_tile.Remove(uniq);
+	    left_tile.Redraw();
+        }
+
+	tile.Redraw();
+
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToArtifact: " + GetName() + " pickup artifact");
+    }
+}
+
+void Heroes::ActionToTreasureChest(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    const Maps::TilesAddon *addon = tile.FindResource();
+
+    path.Hide();
+    path.Reset();
+
+    if(addon)
+    {
+	const u32 uniq = addon->uniq;
+
+/* FIXME: pickup chest variants
+    {Chest}
+    After scouring the area, you fall upon a hidden chest, containing the ancient artifact '%s'
+    {Chest}
+    After scouring the area, you fall upon a hidden treasure cache.  You may take the gold or distribute the gold to the peasants for experience.  Do you wish to keep the gold?
+
+    {Chest}
+    After spending hours trying to fish the chest out of the sea, you open it and find 1000 gold and the %s
+    {Chest}
+    After spending hours trying to fish the chest out of the sea, you open it and find 1500 gold pieces.
+    {Chest}
+    After spending hours trying to fish the chest out of the sea, you open it, only to find it empty.
+*/
+	PlayPickupSound();
+
+	Resource::funds_t resource;
+	resource.gold = 1500;
+
+	world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+	// dialog
+	//if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+
+	tile.Remove(uniq);
+	tile.SetObject(MP2::OBJ_ZERO);
+
+	// remove shadow from left cell
+	if(Maps::isValidDirection(dst_index, Direction::LEFT))
+	{
+	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
+
+	    left_tile.Remove(uniq);
+	    left_tile.Redraw();
+        }
+
+	tile.Redraw();
+
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
+    }
+}
+
+void Heroes::ActionToAncientLamp(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    const Maps::TilesAddon *addon = tile.FindResource();
+
+    path.Hide();
+    path.Reset();
+
+    if(addon)
+    {
+	const u32 uniq = addon->uniq;
+
+	PlayPickupSound();
+
+	// dialog
+	// message: You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?
+	//if(H2Config::MyColor() == GetColor()) Dialog::BuyMonster(Monster::GENIE);
+
+	tile.Remove(uniq);
+	tile.SetObject(MP2::OBJ_ZERO);
+
+	// remove shadow from left cell
+	if(Maps::isValidDirection(dst_index, Direction::LEFT))
+	{
+	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
+
+	    left_tile.Remove(uniq);
+	    left_tile.Redraw();
+        }
+
+	tile.Redraw();
+
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
+    }
 }

@@ -131,12 +131,13 @@ public:
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const;
-    const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
 
     bool HasSecondarySkill(const Skill::secondary_t skill) const;
     Skill::Level::type_t GetLevelSkill(const Skill::secondary_t skill) const;
     void LearnBasicSkill(const Skill::secondary_t skill);
 
+    const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
+    bool PickupArtifact(const Artifact::artifact_t & art);
     bool HasArtifact(const Artifact::artifact_t & art) const;
 
     u8 GetMobilityIndexSprite(void) const;
@@ -196,6 +197,7 @@ protected:
     void ActionToCoast(void);
     void ActionToResource(const u16 dst_index);
     void ActionToResource(const u16 dst_index, const MP2::object_t obj);
+    void ActionToArtifact(const u16 dst_index);
     void ActionToShrine(const u16 dst_index);
     void ActionToWitchsHut(const u16 dst_index);
     void ActionToLuckObject(const u16 dst_index, const MP2::object_t obj);
@@ -206,6 +208,8 @@ protected:
     void ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t obj);
     void ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj);
     void ActionToExperienceObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToTreasureChest(const u16 dst_index);
+    void ActionToAncientLamp(const u16 dst_index);
     void RedrawRotate(bool clockwise);
     void Scoute(void);
 
