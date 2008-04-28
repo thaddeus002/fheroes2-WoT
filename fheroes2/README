@@ -5,8 +5,10 @@ Prerequisites:
 You need to have these libraries (with equivalent devel versions) to build fHeroes2:
 
 - libSDL
+- Lua 5.1 or above (for building only)
 
 SDL libraries can be found at http://www.libsdl.org .
+Lua libraries can be found at http://www.lua.org .
 
 Sourcecode: you can get it here: http://sourceforge.net/projects/fheroes2/
 
