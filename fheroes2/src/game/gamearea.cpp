@@ -30,7 +30,18 @@
 Rect GameArea::area_pos = Rect(0, 0, 0, 0);
 u32 GameArea::animation_ticket = 0;
 
+GameArea & GameArea::Get(void)
+{
+    static GameArea ga;
+
+    return ga;
+}
+
 GameArea::GameArea()
+{
+}
+
+void GameArea::Build(void)
 {
     area_pos.x = 0;
     area_pos.y = 0;

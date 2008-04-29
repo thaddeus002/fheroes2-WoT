@@ -63,7 +63,9 @@ Game::menu_t Game::Editor::StartGame()
     Display::SetVideoMode(H2Config::VideoMode());
     display.Fill(0x00, 0x00, 0x00);
 
-    GameArea areaMaps;
+    GameArea & areaMaps = GameArea::Get();
+    areaMaps.Build();
+
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
     
     const Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
@@ -315,7 +317,8 @@ Game::menu_t Game::Editor::StartGame()
     split_v.Move(areaMaps.GetRect().y);
 
     // Create radar
-    Radar radar;
+    Radar & radar = Radar::Get();
+    radar.Build();
 
     areaMaps.Redraw();
     radar.RedrawArea();

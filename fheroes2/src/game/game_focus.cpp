@@ -21,6 +21,10 @@
 #include "error.h"
 #include "castle.h"
 #include "heroes.h"
+#include "cursor.h"
+#include "radar.h"
+#include "gamearea.h"
+#include "game_selectfocus.h"
 #include "game_focus.h"
 
 Game::Focus::Focus() : castle(NULL), heroes(NULL)
@@ -48,6 +52,12 @@ void Game::Focus::Set(const Castle & cs)
     heroes = NULL;
 
     center = cs.GetCenter();
+}
+
+void Game::Focus::Reset(void)
+{
+    castle = NULL;
+    heroes = NULL;
 }
 
 Game::Focus::focus_t Game::Focus::Type(void) const
@@ -97,4 +107,36 @@ void Game::Focus::Update(void)
     if(heroes) center = heroes->GetCenter();
     else
     if(castle) center = castle->GetCenter();
+}
+
+void Game::Focus::Redraw(void)
+{
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+
+    Radar & radar = Radar::Get();
+    GameArea & areaMaps = GameArea::Get();
+    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
+    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
+
+    if(heroes)
+    {
+	selectCastles.Reset();
+        selectHeroes.SelectFromCenter(center);
+
+        heroes->GetPath().Show();
+    }
+    else
+    if(castle)
+    {
+	selectHeroes.Reset();
+        selectCastles.SelectFromCenter(center);
+    }
+
+    areaMaps.Center(center);
+    radar.RedrawCursor();
+    selectCastles.Redraw();
+    selectHeroes.Redraw();
+
+    cursor.Show();                                                                
 }

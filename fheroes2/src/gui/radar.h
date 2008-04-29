@@ -20,29 +20,31 @@
 #ifndef H2RADAR_H
 #define H2RADAR_H
 
-#include "surface.h"
-#include "spritecursor.h"
 #include "rect.h"
 
 class Radar
 {
 public:
-    Radar();
+    static Radar & Get(void);
+    ~Radar();
 
     const Rect & GetRect(void) const{ return pos; }
 
+    void Build(void);
     void RedrawArea(void);
     void RedrawCursor(void);
 
     static void DrawCursor(Surface &surface);
 
 private:
+    Radar();
+
     void GenerateOrigin(void);
     void GenerateRealistic(void);
     Rect pos;
-    Surface spriteArea;
-    Surface spriteCursor;
-    SpriteCursor cursor;
+    Surface *spriteArea;
+    Surface *spriteCursor;
+    SpriteCursor *cursor;
 };
 
 #endif

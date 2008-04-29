@@ -45,11 +45,11 @@
 namespace Game
 {
     Cursor::themes_t GetCursor(const Focus & focus, const Maps::Tiles & tile);
-    void OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar);
-    void OpenHeroes(Heroes *heroes, GameArea & areaMaps, Radar & radar);
-    void FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar);
-    void FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar);
-    Game::menu_t HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & statusWindow, bool message);
+    void OpenCastle(Castle *castle);
+    void OpenHeroes(Heroes *heroes);
+    void FocusToCastle(Castle *castle);
+    void FocusToHeroes(Heroes *hero);
+    Game::menu_t HumanTurn(StatusWindow & statusWindow, bool message);
 };
 
 Button *_buttonScrollHeroesUp;
@@ -92,14 +92,16 @@ Game::menu_t Game::StartGame(void)
     }
     Settings::Get().SetHotSeat(false);
 
-    GameArea areaMaps;
+    GameArea & areaMaps = GameArea::Get();
+    areaMaps.Build();
 
     Audio::Mixer & mixer = Audio::Mixer::Get();
 
     Game::DrawInterface();
 
     // Create radar
-    Radar radar;
+    Radar & radar = Radar::Get();
+    radar.Build();
 
     areaMaps.Redraw();
     radar.RedrawArea();
@@ -269,6 +271,7 @@ Game::menu_t Game::StartGame(void)
     splitCastles.SetRange(0, 0);
 
     Game::Focus & global_focus = Focus::Get();
+    global_focus.Reset();
 
     // status window
     Game::StatusWindow statusWindow(pt_stw);
@@ -315,7 +318,7 @@ Game::menu_t Game::StartGame(void)
     		        global_focus.GetHeroes().GetPath().Show();
 		    }
 
-		    m = HumanTurn(areaMaps, radar, statusWindow, humans > 1);
+		    m = HumanTurn(statusWindow, humans > 1);
 
 		    cursor.Hide();
 		    mixer.Reduce();
@@ -352,11 +355,14 @@ Game::menu_t Game::StartGame(void)
     delete _buttonScrollHeroesDown;
     delete _buttonScrollCastleDown;
 
+    delete _splitHeroes;
+    delete _splitCastles;
+
     return m == ENDTURN ? QUITGAME : m;
 }
 
 /* open castle wrapper */
-void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
+void Game::OpenCastle(Castle *castle)
 {
     if(! castle) return;
 
@@ -366,6 +372,7 @@ void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
     const Kingdom & myKingdom = world.GetMyKingdom();
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
+    GameArea & areaMaps = GameArea::Get();
 
     Dialog::answer_t result = Dialog::ZERO;
 
@@ -373,7 +380,7 @@ void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 
     while(Dialog::CANCEL != result)
     {
-	FocusToCastle(castle, areaMaps, radar);
+	FocusToCastle(castle);
 
 	cursor.Hide();
 
@@ -395,7 +402,7 @@ void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
     }
 
     if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes()))
-	    FocusToHeroes(hero, areaMaps, radar);
+	    FocusToHeroes(hero);
 
     areaMaps.Redraw();
 
@@ -403,37 +410,20 @@ void Game::OpenCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
 }
 
 /* focus to castle */
-void Game::FocusToCastle(Castle *castle, GameArea & areaMaps, Radar & radar)
+void Game::FocusToCastle(Castle *castle)
 {
     if(! castle) return;
 
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-
-    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
-
-    selectHeroes.Reset();
-
     Game::Focus & globalfocus = Game::Focus::Get();
 
-    // hide path
     if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
 
     globalfocus.Set(*castle);
-
-    areaMaps.Center(castle->GetCenter());
-    radar.RedrawCursor();
-
-    selectCastles.SelectFromCenter(castle->GetCenter());
-    selectCastles.Redraw();
-    selectHeroes.Redraw();
-
-    cursor.Show();
+    globalfocus.Redraw();
 }
 
 /* open heroes wrapper */
-void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
+void Game::OpenHeroes(Heroes *hero)
 {
     if(! hero) return;
 
@@ -450,7 +440,7 @@ void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 
     while(Dialog::CANCEL != result)
     {
-	FocusToHeroes(hero, areaMaps, radar);
+	FocusToHeroes(hero);
 
 	cursor.Hide();
 
@@ -496,36 +486,16 @@ void Game::OpenHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
 }
 
 /* focus to heroes */
-void Game::FocusToHeroes(Heroes *hero, GameArea & areaMaps, Radar & radar)
+void Game::FocusToHeroes(Heroes *hero)
 {
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-
-    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
-
-    selectCastles.Reset();
+    if(! hero) return;
 
     Game::Focus & globalfocus = Game::Focus::Get();
 
-    // hide old path
     if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
 
     globalfocus.Set(*hero);
-
-    // show new path
-    globalfocus.GetHeroes().GetPath().Show();
-    //world.GetTiles((*heroes).GetCenter()).Redraw();
-
-    // center
-    areaMaps.Center(hero->GetCenter());
-    radar.RedrawCursor();
-
-    selectHeroes.SelectFromCenter(hero->GetCenter());
-    selectHeroes.Redraw();
-    selectCastles.Redraw();
-
-    cursor.Show();
+    globalfocus.Redraw();
 }
 
 /* return changee cursor */
@@ -675,9 +645,11 @@ Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
     return Cursor::POINTER;
 }
 
-Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & statusWindow, bool message)
+Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 {
     Game::Focus & global_focus = Focus::Get();
+    Radar & radar = Radar::Get();
+    GameArea & areaMaps = GameArea::Get();
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -731,18 +703,30 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
     selectHeroes.SetHeroes(myHeroes);
     selectHeroes.Reset();
 
-    // focus set to castle
-    if(myCastles.size())
+    switch(global_focus.Type())
     {
-	global_focus.Set(*myCastles.front());
-	selectCastles.Select(0);
-    }
-    else
-    // focus set to heroes
-    if(myHeroes.size())
-    {
-	global_focus.Set(*myHeroes.front());
-	selectHeroes.Select(0);
+	// start game
+	case Focus::UNSEL:
+	    if(myCastles.size())
+	    {
+		global_focus.Set(*myCastles.front());
+		selectCastles.Select(0);
+	    }
+	    else
+	    if(myHeroes.size())
+	    {
+		global_focus.Set(*myHeroes.front());
+		selectHeroes.Select(0);
+	    }
+	    break;
+
+	case Focus::HEROES:
+	    selectHeroes.Select(0);
+	    break;
+
+	case Focus::CASTLE:
+	    selectCastles.Select(0);
+	    break;
     }
 
     // center to focus
@@ -855,7 +839,7 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 					    splitHeroes.Move(selectHeroes.GetTopIndex());
 					}
 
-					FocusToCastle(const_cast<Castle *>(to_castle), areaMaps, radar);
+					FocusToCastle(const_cast<Castle *>(to_castle));
 					splitCastles.Move(selectCastles.GetTopIndex());
 					display.Flip();
 				    }
@@ -873,7 +857,7 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 			    	    if(from_hero.GetCenter() == to_hero->GetCenter())
 				    {
 					mixer.Reduce();
-					OpenHeroes(&from_hero, areaMaps, radar);
+					OpenHeroes(&from_hero);
 					statusWindow.Redraw();
 					display.Flip();
 					mixer.Enhance();
@@ -913,14 +897,14 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 				    if(from_castle.GetCenter() == to_castle->GetCenter())
 				    {
 					mixer.Reduce();
-					OpenCastle(&from_castle, areaMaps, radar);
+					OpenCastle(&from_castle);
 					statusWindow.Redraw();
 					mixer.Enhance();
 				    }
 				    // select other castle
 				    else
 				    {
-					FocusToCastle(const_cast<Castle *>(to_castle), areaMaps, radar);
+					FocusToCastle(const_cast<Castle *>(to_castle));
 					splitCastles.Move(selectCastles.GetTopIndex());
 				    }
 
@@ -945,7 +929,7 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 					splitCastles.Move(selectCastles.GetTopIndex());
 				    }
 
-    				    FocusToHeroes(const_cast<Heroes *>(to_hero), areaMaps, radar);
+    				    FocusToHeroes(const_cast<Heroes *>(to_hero));
 				    splitHeroes.Move(selectHeroes.GetTopIndex());
 				    display.Flip();
         			}
@@ -1147,7 +1131,7 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 				    selectCastles.Redraw();
 				}
 
-				OpenHeroes(hero, areaMaps, radar);
+				OpenHeroes(hero);
 
 				statusWindow.Redraw();
 				display.Flip();
@@ -1167,7 +1151,7 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 			    // open hero
 			    if(hero && H2Config::MyColor() == (*hero).GetColor())
 			    {
-				FocusToHeroes(hero, areaMaps, radar);
+				FocusToHeroes(hero);
 
 				const Route::Path & path = global_focus.GetHeroes().GetPath();
 				if(path.size())
@@ -1226,7 +1210,7 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 				    selectHeroes.Redraw();
 				}
 
-				OpenCastle(castle, areaMaps, radar);
+				OpenCastle(castle);
 
 				statusWindow.Redraw();
 				selectCastles.Redraw();
@@ -1247,7 +1231,7 @@ Game::menu_t Game::HumanTurn(GameArea & areaMaps, Radar & radar, StatusWindow & 
 
 			    if(castle && H2Config::MyColor() == (*castle).GetColor())
 			    {
-				FocusToCastle(castle, areaMaps, radar);
+				FocusToCastle(castle);
 				display.Flip();
 			    }
 			}

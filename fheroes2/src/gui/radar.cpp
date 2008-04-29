@@ -26,6 +26,8 @@
 #include "ground.h"
 #include "world.h"
 #include "castle.h"
+#include "surface.h"
+#include "spritecursor.h"
 #include "radar.h"
 
 #define RADARCOLOR	0x40	// index palette
@@ -49,15 +51,40 @@
 
 
 /* constructor */
-Radar::Radar() :
-    pos(Display::Get().w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH), spriteArea(RADARWIDTH, RADARWIDTH),
-    spriteCursor(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(world.w()))),
-                 static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(world.h())))),
-    cursor(spriteCursor, pos.x, pos.y)
+Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL)
 {
-    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
+}
 
-    DrawCursor(spriteCursor);
+Radar::~Radar()
+{
+    if(cursor) delete cursor;
+    if(spriteArea) delete spriteArea;
+    if(spriteCursor) delete spriteCursor;
+}
+
+/* construct gui */
+void Radar::Build(void)
+{
+    pos = Rect(Display::Get().w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH);
+
+    if(cursor) delete cursor;
+    if(spriteArea) delete spriteArea;
+    if(spriteCursor) delete spriteCursor;
+
+    spriteArea = new Surface(RADARWIDTH, RADARWIDTH);
+    spriteCursor = new Surface(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(world.w()))),
+                	static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(world.h()))));
+    cursor = new SpriteCursor(*spriteCursor, pos.x, pos.y);
+
+    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
+    DrawCursor(*spriteCursor);
+}
+
+Radar & Radar::Get(void)
+{
+    static Radar radar0;
+
+    return radar0;
 }
 
 /* generate mini maps (origin version) */
@@ -136,14 +163,14 @@ void Radar::GenerateOrigin(void)
 		default:			tile_surface.Fill(AGG::GetColor(COLOR_GRASS+pass)); break;
 	    }
 
-	    spriteArea.Blit(tile_surface, dst_pt);
+	    spriteArea->Blit(tile_surface, dst_pt);
 
 	    dst_pt.x += width_til;
 
 	    // X scale large maps
 	    if(Maps::LARGE == world.w() && !(ii % 3))
 	    {
-		spriteArea.Blit(tile_surface, dst_pt);
+		spriteArea->Blit(tile_surface, dst_pt);
 
 		dst_pt.x += width_til;
 	    }
@@ -158,7 +185,7 @@ void Radar::GenerateOrigin(void)
 	if(Maps::LARGE == world.h() && !(jj % 3))
 	{
 	    const Rect src_rt(0, dst_pt.y - 1, RADARWIDTH, width_til);
-	    spriteArea.Blit(spriteArea, src_rt, dst_pt);
+	    spriteArea->Blit(*spriteArea, src_rt, dst_pt);
 
 	    dst_pt.y += width_til;
 	}
@@ -183,14 +210,14 @@ void Radar::GenerateRealistic(void)
 
 	    tile_surface.ScaleFrom(src_surface);
 
-	    spriteArea.Blit(tile_surface, dst_pt);
+	    spriteArea->Blit(tile_surface, dst_pt);
 
 	    dst_pt.x += width_til;
 
 	    // X scale large maps
 	    if(Maps::LARGE == world.w() && !(ii % 3))
 	    {
-		spriteArea.Blit(tile_surface, dst_pt);
+		spriteArea->Blit(tile_surface, dst_pt);
 
 		dst_pt.x += width_til;
 	    }
@@ -205,7 +232,7 @@ void Radar::GenerateRealistic(void)
 	if(Maps::LARGE == world.h() && !(jj % 3))
 	{
 	    const Rect src_rt(0, dst_pt.y - 1, RADARWIDTH, width_til);
-	    spriteArea.Blit(spriteArea, src_rt, dst_pt);
+	    spriteArea->Blit(*spriteArea, src_rt, dst_pt);
 
 	    dst_pt.y += width_til;
 	}
@@ -252,16 +279,16 @@ void Radar::DrawCursor(Surface &surface)
 void Radar::RedrawArea(void)
 { 
     Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
-    Display::Get().Blit(spriteArea, pos.x, pos.y); 
+    Display::Get().Blit(*spriteArea, pos.x, pos.y); 
 }
 
 /* redraw radar cursor */
 void Radar::RedrawCursor(void)
 {
-    cursor.Hide();
+    cursor->Hide();
     Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
-    Display::Get().Blit(spriteArea, pos.x, pos.y); 
-    cursor.Move(pos.x + GameArea::GetRect().x * RADARWIDTH / world.w(),
+    Display::Get().Blit(*spriteArea, pos.x, pos.y); 
+    cursor->Move(pos.x + GameArea::GetRect().x * RADARWIDTH / world.w(),
                 pos.y + GameArea::GetRect().y * RADARWIDTH / world.h());
-    cursor.Show();
+    cursor->Show();
 }

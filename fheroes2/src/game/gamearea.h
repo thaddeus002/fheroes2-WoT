@@ -26,7 +26,8 @@
 class GameArea
 {
 public:
-    GameArea();
+    static GameArea & Get(void);
+    void Build(void);
 
     typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
@@ -42,6 +43,8 @@ public:
     void RedrawAnimation(void);
 
 private:
+    GameArea();
+
     static Rect area_pos;
     static u32 animation_ticket;
 };

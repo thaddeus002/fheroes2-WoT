@@ -30,6 +30,7 @@
 #include "battle.h"
 #include "rand.h"
 #include "m82.h"
+#include "game_focus.h"
 
 // action to next cell
 void Heroes::Action(void)
@@ -967,6 +968,11 @@ void Heroes::ActionToTeleports(const u16 index_from)
     tiles_to.SetObject(MP2::OBJ_HEROES);
 
     tiles_to.Redraw();
+
+    Game::Focus & globalfocus = Game::Focus::Get();
+
+    globalfocus.Set(*this);
+    globalfocus.Redraw();
 
     // FIXME: teleport: remove move points
 
