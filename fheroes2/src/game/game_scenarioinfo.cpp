@@ -250,6 +250,13 @@ Game::menu_t Game::ScenarioInfo(void)
 	    Scenario::SelectMaps(info_maps);
 	    conf.SetPlayers(0);  // TODO select first available color
 	    //conf.SetMyColor(Color::BLUE);
+	    for(Color::color_t col = Color::BLUE; col < Color::GRAY; ++col) {
+		if(conf.FileInfo().AllowColors() & col) {
+		    conf.SetPlayers(col);
+		    conf.SetMyColor(col);
+		    break;
+		}
+	    }
 	    Scenario::DrawInfo(coordColors, coordClass);
 	    Scenario::RedrawOpponentColors(coordColors);
 	    levelCursor.Move(pointDifficultyNormal);
