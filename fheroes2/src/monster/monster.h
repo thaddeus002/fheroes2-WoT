@@ -118,6 +118,37 @@ namespace Monster
     } monster_t;
 
     typedef struct {
+	u8 walk_start;
+	u8 walk_count;
+	u8 idle_start;
+	u8 idle_count;
+	u8 attprep_start;
+	u8 attprep_count;
+	u8 attack1_start;
+	u8 attack1_count;
+	u8 attack2_start;
+	u8 attack2_count;
+	u8 attack3_start;
+	u8 attack3_count;
+	u8 pain_start;
+	u8 pain_count;
+	u8 die_start;
+	u8 die_count;
+    } anim_t;
+    
+    typedef enum { 
+	AS_NONE=0, 
+	AS_IDLE=1, 
+	AS_WALK=2, 
+	AS_ATTPREP=16, 
+	AS_ATT1=3, 
+	AS_ATT2=4, 
+	AS_ATT3=5, 
+	AS_PAIN=6, 
+	AS_DIE=7 
+    } animstate_t;
+
+    typedef struct {
 	monster_t monster;
 	u8 attack;
 	u8 defence;
@@ -130,6 +161,7 @@ namespace Monster
 	const std::string name;
 	const ICN::icn_t file_icn;
 	const ICN::icn_t monh_icn;
+	anim_t animation;
     } stats_t;
 
     const std::string & String(monster_t monster);
@@ -137,6 +169,7 @@ namespace Monster
     u8 GetGrown(monster_t monster);
     Race::race_t GetRace(monster_t monster);
     level_t GetLevel(monster_t monster);
+    void GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length);
 
     monster_t Upgrade(monster_t monster);
     bool AllowUpgrade(monster_t monster);

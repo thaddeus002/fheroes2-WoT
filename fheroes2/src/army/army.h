@@ -75,6 +75,9 @@ namespace Army
 	void SetPosition(const Point & pt) { pos = pt; };
 	const Point& Position() const { return pos; };
 
+	Monster::animstate_t    astate;
+	u16                     aframe;
+
     private:
         Monster::monster_t	monster;
         u16			count;

@@ -31,6 +31,8 @@
 #include "cursor.h"
 #include "config.h"
 #include "error.h"
+#include "tools.h"
+#include "rand.h"
 
 #define CELLW 44
 #define CELLH 42
@@ -41,11 +43,12 @@ namespace Army {
     void DrawBackground(const Maps::Tiles & tile, const Point & dst_pt);
     void DrawCaptain(const Race::race_t race, const Point & dst_pt, u16 animframe, bool reflect=false);
     void DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bool reflect=false);
-    void DrawArmy(const std::vector<Army::Troops> & army, const Point & dst_pt, u16 animframe, bool reflect=false);
-    void DrawMonster(const Army::Troops & troop, const Point & dst_pt, u16 animframe, bool reflect=false);
+    void DrawArmy(const std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect=false, int animframe=-1);
+    void DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect=false, int animframe=-1);
     void InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool reflect=false);
     inline Point Scr2Bf(const Point & pt); // translate coordinate to batle field
     inline Point Bf2Scr(const Point & pt); // translate to screen (offset to frame border)
+    void AnimateMonster(Army::Troops & troop, Monster::animstate_t as = Monster::AS_NONE);
 }
 
 bool Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
@@ -72,8 +75,8 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
     Cursor & cursor = Cursor::Get();
     cursor.SetThemes(cursor.POINTER);
 
-    const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
-    Point dst_pt(cur_pt);
+    const Point dst_pt(frameborder.GetArea().x, frameborder.GetArea().y);
+    //Point dst_pt(cur_pt);
 
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
@@ -81,21 +84,29 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
     DrawHero(hero, dst_pt, 1);
     InitArmyPosition(hero.Army(), false);
     InitArmyPosition(army, false, true);
-    DrawArmy(hero.GetArmy(), dst_pt, 1);
-    DrawArmy(army, dst_pt, 1, true);
+    DrawArmy(hero.GetArmy(), dst_pt, false, 1);
+    DrawArmy(army, dst_pt, true, 1);
 
-    Dialog::StatusBar statusBar(Point(cur_pt.x + 22, cur_pt.y + 440), AGG::GetICN(ICN::HSBTNS, 8), Font::BIG);
-    statusBar.Clear("Hero Screen");
+    Button buttonSkip(dst_pt.x + 640-48, dst_pt.y + 480-36, ICN::TEXTBAR, 0, 1);
+    Button buttonAuto(dst_pt.x, dst_pt.y + 480-36, ICN::TEXTBAR, 4, 5);
+    Button buttonSettings(dst_pt.x, dst_pt.y + 480-18, ICN::TEXTBAR, 6, 7);
 
-    Button button1(200, 200, ICN::CMBTMISC, 2, 3);
+    Dialog::StatusBar statusBar1(Point(dst_pt.x + 48, dst_pt.y + 480-36), AGG::GetICN(ICN::TEXTBAR, 8), Font::BIG);
+    statusBar1.Clear(" ");
+    Dialog::StatusBar statusBar2(Point(dst_pt.x + 48, dst_pt.y + 480-18), AGG::GetICN(ICN::TEXTBAR, 9), Font::BIG);
+    statusBar2.Clear(" ");
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     
-    button1.Draw();
+    buttonSkip.Draw();
+    buttonAuto.Draw();
+    buttonSettings.Draw();
+
     cursor.Show();
     display.Flip();
 
-    int i = 1;
+    int i = 0;
+    u16 animat = 0;
     // dialog menu loop
     while(le.HandleEvents()) {
 	// exit
@@ -103,12 +114,25 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
 	    Display::Get().Fade();
 	    return true;
 	}
-	le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
 	if(le.KeyPress(KEY_RETURN)) {
-	    //display.Blit(AGG::GetICN(ICN::CFLGSMAL, i++), dst_pt);
-	    //DrawArmy(hero.Army(), dst_pt, i);
-	    DrawArmy(army, dst_pt, i++, true);
+	    DrawBackground(tile, dst_pt);
+	    //display.Blit(AGG::GetICN(ICN::TEXTBAR, i), dst_pt);
+	    army[0].SetCount(i);
+	    DrawHero(hero, dst_pt, i);
+	    DrawArmy(hero.GetArmy(), dst_pt, false, i);
+	    DrawArmy(army, dst_pt, true, i++);
 	}
+	if(!(++animat%ANIMATION_LOW) && !i) {
+	    DrawBackground(tile, dst_pt);
+	    DrawHero(hero, dst_pt, 1);
+	    for(unsigned int i=0; i < army.size(); i++) AnimateMonster(army[i]);
+	    for(unsigned int i=0; i < hero.Army().size(); i++) AnimateMonster(hero.Army()[i]);
+	    DrawArmy(hero.GetArmy(), dst_pt, false);
+	    DrawArmy(army, dst_pt, true);
+	}
+	le.MousePressLeft(buttonSkip) ? buttonSkip.PressDraw() : buttonSkip.ReleaseDraw();
+	le.MousePressLeft(buttonAuto) ? buttonAuto.PressDraw() : buttonAuto.ReleaseDraw();
+	le.MousePressLeft(buttonSettings) ? buttonSettings.PressDraw() : buttonSettings.ReleaseDraw();
 	display.Flip();
     }
     return false;	
@@ -198,23 +222,44 @@ void Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bo
     display.Blit(AGG::GetICN(ICN::CFLGSMAL, Color::GetIndex(hero.GetColor())), dst_pt.x + (reflect?550:18), dst_pt.y + 80);
 }
 
-void Army::DrawArmy(const std::vector<Army::Troops> & army, const Point & dst_pt, u16 animframe, bool reflect)
+void Army::DrawArmy(const std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect, int animframe)
 {
     for(std::vector<Army::Troops>::const_iterator it = army.begin(); it != army.end(); it++) {
 	if(it->Monster() < Monster::UNKNOWN)
-	DrawMonster(*it, dst_pt, animframe, reflect);
+	    DrawMonster(*it, dst_pt, reflect, animframe);
     }
 }
 
-void Army::DrawMonster(const Army::Troops & troop, const Point & dst_pt, u16 animframe, bool reflect)
+void Army::DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect, int animframe)
 {
     if(H2Config::Debug()) Error::Verbose(Monster::String(troop.Monster()));
     Display & display = Display::Get();
-    const Sprite & sp = AGG::GetICN(Monster::GetStats(troop.Monster()).file_icn, animframe, reflect);
+    const Sprite & sp = AGG::GetICN(Monster::GetStats(troop.Monster()).file_icn, animframe<0?troop.aframe:animframe, reflect);
     Point tp = Bf2Scr(troop.Position()) + dst_pt;
     tp.y -= sp.h();
     //Point p(dst_pt.x + BFX + tp.x*CELLW - (tp.y % 2 ? CELLW/2 : 0), dst_pt.y + BFY + tp.y*CELLH - sp.h());
     display.Blit(sp, tp);
+    // draw count
+    tp.x += reflect ? -10 : sp.w() - 10;
+    tp.y += sp.h() - 10;
+    // TODO color
+    u16 ind = 10;  // blue
+    // ind = 11;  // blue 2
+    // ind = 12;  // green
+    // ind = 13;  // yellow
+    // ind = 14;  // red
+    display.Blit(AGG::GetICN(ICN::TEXTBAR, ind), tp);
+    std::string str;
+    int count = troop.Count();
+    if(count < 1000)
+	String::AddInt(str, count);
+    else if(count < 1000000)
+	String::AddInt(str, count / 1000), str += "K";
+    else 
+	String::AddInt(str, count / 1000000), str += "M";
+    tp.x += 10 - Text::width(str, Font::SMALL) / 2;
+    tp.y -= 1;
+    Text(str, Font::SMALL, tp);
 }
 
 void Army::InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool reflect)
@@ -224,6 +269,8 @@ void Army::InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool
     for(unsigned int i=0; i < army.size(); i++) {
     //for(std::vector<Army::Troops>::iterator it = army.begin(); it != army.end(); it++) {
 	army[i].SetPosition(Point(x, y));
+	army[i].aframe = 1;
+	army[i].astate = Monster::AS_NONE;
 	y += compact ? 1 : 2;
     }
 }
@@ -238,4 +285,25 @@ inline Point Army::Scr2Bf(const Point & pt)
 inline Point Army::Bf2Scr(const Point & pt)
 {
     return Point(BFX + pt.x*CELLW - (pt.y % 2 ? CELLW/2 : 0), BFY + pt.y*CELLH);
+}
+
+void Army::AnimateMonster(Army::Troops & troop, Monster::animstate_t as)
+{
+    u8 start, count;
+    if(as != Monster::AS_NONE) {
+	troop.astate = as;
+	Monster::GetAnimFrames(troop.Monster(), as & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : as, start, count);
+	troop.aframe = start;
+    } else {
+	Monster::GetAnimFrames(troop.Monster(), troop.astate & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : troop.astate, start, count);
+	troop.aframe++;
+	if(troop.aframe >= start+count) {
+	    if(troop.astate & Monster::AS_ATTPREP) 
+		troop.astate = (Monster::animstate_t)(troop.astate & ~Monster::AS_ATTPREP);
+	    else
+		troop.astate = Rand::Get(0, 30) ? Monster::AS_NONE : Monster::AS_IDLE;
+	    Monster::GetAnimFrames(troop.Monster(), troop.astate, start, count);
+	    troop.aframe = start;
+	}
+    }
 }
