@@ -1431,3 +1431,10 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
     
     return true;
 }
+
+/* set cente from index maps */
+void Heroes::SetCenter(const u16 index)
+{
+    mp.x = index % world.w();
+    mp.y = index / world.h();
+}

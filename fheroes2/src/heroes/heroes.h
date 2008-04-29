@@ -169,6 +169,7 @@ public:
     bool isVisited(const Maps::Tiles & tile) const;
 
     void SetCenter(const Point& pt){ mp = pt; };
+    void SetCenter(const u16 index);
 
     bool isEnableMove(void) const;
     void SetMove(bool f);
@@ -211,6 +212,7 @@ protected:
     void ActionToExperienceObject(const u16 dst_index, const MP2::object_t obj);
     void ActionToTreasureChest(const u16 dst_index);
     void ActionToAncientLamp(const u16 dst_index);
+    void ActionToTeleports(const u16 dst_index);
     void RedrawRotate(bool clockwise);
     void Scoute(void);
 

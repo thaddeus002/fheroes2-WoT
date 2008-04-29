@@ -1230,7 +1230,7 @@ Spell::spell_t World::SpellFromShrine(const u16 index)
 /* return random teleport destination */
 u16 World::NextTeleport(const u16 index) const
 {
-    if(vec_teleports.empty())
+    if(vec_teleports.empty() || 1 == vec_teleports.size())
     {
 	Error::Warning("World::NextTeleport: is empty.");
 
@@ -1240,8 +1240,8 @@ u16 World::NextTeleport(const u16 index) const
     u16 result;
 
     while((result = Rand::Get(vec_teleports.size() - 1)) == index) result = Rand::Get(vec_teleports.size() - 1);
-    
-    return result;
+
+    return vec_teleports.at(result);
 }
 
 /* return skill from witchs hut */

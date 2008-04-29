@@ -101,6 +101,9 @@ void Heroes::Action(void)
         // experience modification
         case MP2::OBJ_GAZEBO:		ActionToExperienceObject(dst_index, MP2::OBJ_GAZEBO); break;
 
+        // teleports
+	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(dst_index); break;
+
         // object
         case MP2::OBJ_ALCHEMYTOWER:
         case MP2::OBJ_MINES:
@@ -125,7 +128,6 @@ void Heroes::Action(void)
         case MP2::OBJ_OBELISK:
 	case MP2::OBJ_ORACLE:
 	case MP2::OBJ_DERELICTSHIP:
-	case MP2::OBJ_STONELIGHTS:
         case MP2::OBJ_WAGONCAMP:
         case MP2::OBJ_WATCHTOWER:
         case MP2::OBJ_TREEHOUSE:
@@ -932,4 +934,42 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
     }
+}
+
+void Heroes::ActionToTeleports(const u16 index_from)
+{
+    const u16 index_to = world.NextTeleport(index_from);
+
+    MoveNext();
+    Display::Get().Flip();
+
+    Maps::Tiles & tiles_from = world.GetTiles(index_from);
+    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+    if(Maps::isValidDirection(index_from, Direction::TOP))
+        world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP)).Redraw();
+
+    if(Maps::isValidDirection(index_from, Direction::TOP_LEFT))
+        world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_LEFT)).Redraw();
+
+    if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
+        world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
+
+    if(MP2::OBJ_HEROES != save_maps_general)
+    {
+	tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
+        tiles_from.Redraw();
+    }
+
+    SetCenter(index_to);
+
+    save_maps_general = MP2::OBJ_STONELIGHTS;
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+    tiles_to.Redraw();
+
+    // FIXME: teleport: remove move points
+
+    Scoute();
+    Display::Get().Flip();
 }
