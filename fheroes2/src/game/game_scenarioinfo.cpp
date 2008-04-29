@@ -248,7 +248,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    cursor.Hide();
 	    levelCursor.Hide();
 	    Scenario::SelectMaps(info_maps);
-	    conf.SetPlayers(0);  // TODO select first available color
+	    conf.SetPlayers(0);  
 	    //conf.SetMyColor(Color::BLUE);
 	    for(Color::color_t col = Color::BLUE; col < Color::GRAY; ++col) {
 		if(conf.FileInfo().AllowColors() & col) {

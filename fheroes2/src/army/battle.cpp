@@ -69,11 +69,12 @@ bool Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
 
 bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile)
 {
-    Display & display = Display::Get();
-    Dialog::FrameBorder frameborder;
-
     Cursor & cursor = Cursor::Get();
     cursor.SetThemes(cursor.POINTER);
+    cursor.Hide();
+
+    Display & display = Display::Get();
+    Dialog::FrameBorder frameborder;
 
     const Point dst_pt(frameborder.GetArea().x, frameborder.GetArea().y);
     //Point dst_pt(cur_pt);
@@ -102,8 +103,8 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
     buttonAuto.Draw();
     buttonSettings.Draw();
 
-    cursor.Show();
     display.Flip();
+    cursor.Show();
 
     int i = 0;
     u16 animat = 0;
@@ -236,12 +237,12 @@ void Army::DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool re
     Display & display = Display::Get();
     const Sprite & sp = AGG::GetICN(Monster::GetStats(troop.Monster()).file_icn, animframe<0?troop.aframe:animframe, reflect);
     Point tp = Bf2Scr(troop.Position()) + dst_pt;
-    tp.y -= sp.h();
+    //tp.y -= sp.h();
     //Point p(dst_pt.x + BFX + tp.x*CELLW - (tp.y % 2 ? CELLW/2 : 0), dst_pt.y + BFY + tp.y*CELLH - sp.h());
-    display.Blit(sp, tp);
+    display.Blit(sp, tp.x + sp.x(), tp.y + sp.y());
     // draw count
     tp.x += reflect ? -10 : sp.w() - 10;
-    tp.y += sp.h() - 10;
+    tp.y += /*sp.h()*/ - 10;
     // TODO color
     u16 ind = 10;  // blue
     // ind = 11;  // blue 2

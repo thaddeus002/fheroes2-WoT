@@ -118,10 +118,6 @@ namespace Monster
     } monster_t;
 
     typedef struct {
-	u8 walk_start;
-	u8 walk_count;
-	u8 idle_start;
-	u8 idle_count;
 	u8 attprep_start;
 	u8 attprep_count;
 	u8 attack1_start;
@@ -130,10 +126,19 @@ namespace Monster
 	u8 attack2_count;
 	u8 attack3_start;
 	u8 attack3_count;
+    } animattack_t;
+
+    typedef struct {
+	u8 walk_start;
+	u8 walk_count;
+	u8 idle_start;
+	u8 idle_count;
 	u8 pain_start;
 	u8 pain_count;
 	u8 die_start;
 	u8 die_count;
+	animattack_t a1;
+	animattack_t a2;
     } anim_t;
     
     typedef enum { 
@@ -169,7 +174,7 @@ namespace Monster
     u8 GetGrown(monster_t monster);
     Race::race_t GetRace(monster_t monster);
     level_t GetLevel(monster_t monster);
-    void GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length);
+    void GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length, bool altatt=false);
 
     monster_t Upgrade(monster_t monster);
     bool AllowUpgrade(monster_t monster);
