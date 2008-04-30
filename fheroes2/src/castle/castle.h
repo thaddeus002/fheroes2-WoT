@@ -133,7 +133,6 @@ private:
     void CorrectAreaMaps(void);
     void TownUpgradeToCastle(void);
     void ModifyTIlesRNDSprite(Maps::Tiles & tile);
-    void ModifyTIlesFlags(Maps::Tiles & tile);
     void ModifyTilesTownToCastle(Maps::Tiles & tile);
     void MinimizeAreaMapsID(void);
     u32 GetBuildingRequires(const building_t & build) const;

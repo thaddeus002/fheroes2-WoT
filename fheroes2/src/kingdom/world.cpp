@@ -34,6 +34,8 @@
 #include "rand.h" 
 #include "world.h"
 
+u32 World::uniq0 = 0;
+
 World & World::GetWorld(void)
 {
     static World insideWorld;
@@ -352,9 +354,15 @@ void World::LoadMaps(const std::string &filename)
     u32  byte32;
     std::vector<u16> vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
 
+
     // endof
     fd.seekg(0, std::ios_base::end);
     const u32 endof_mp2 = fd.tellg();
+
+    // read uniq
+    fd.seekg(endof_mp2 - sizeof(u32), std::ios_base::beg);
+    fd.read(reinterpret_cast<char *>(&uniq0), sizeof(u32));
+    SWAP32(uniq0);
 
     // offset data
     fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
@@ -1328,3 +1336,4 @@ Color::color_t World::ColorCapturedObject(const u16 index) const
 
     return Color::GRAY;
 }
+

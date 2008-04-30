@@ -110,6 +110,8 @@ void Heroes::Action(void)
         case MP2::OBJ_MINES:		ActionToCaptureObject(dst_index, MP2::OBJ_MINES); break;
 	case MP2::OBJ_SAWMILL:		ActionToCaptureObject(dst_index, MP2::OBJ_SAWMILL); break;
         case MP2::OBJ_LIGHTHOUSE:	ActionToCaptureObject(dst_index, MP2::OBJ_LIGHTHOUSE); break;
+        case MP2::OBJ_DRAGONCITY:	ActionToCaptureObject(dst_index, MP2::OBJ_DRAGONCITY); break;
+        case MP2::OBJ_ABANDONEDMINE:	ActionToCaptureObject(dst_index, MP2::OBJ_ABANDONEDMINE); break;
 
         // object
         case MP2::OBJ_WATERMILL:
@@ -125,7 +127,6 @@ void Heroes::Action(void)
         case MP2::OBJ_SKELETON:
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_GRAVEYARD:
-        case MP2::OBJ_DRAGONCITY:
         case MP2::OBJ_OBELISK:
 	case MP2::OBJ_ORACLE:
 	case MP2::OBJ_DERELICTSHIP:
@@ -134,7 +135,6 @@ void Heroes::Action(void)
         case MP2::OBJ_TREEHOUSE:
         case MP2::OBJ_TREECITY:
         case MP2::OBJ_RUINS:
-        case MP2::OBJ_ABANDONEDMINE:
         case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_HALFLINGHOLE:
@@ -986,16 +986,107 @@ void Heroes::ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj)
     MoveNext();
     Display::Get().Flip();
 
+    std::string header;
+    std::string body;
+
+    Resource::resource_t res = Resource::UNKNOWN;
+    const Sprite *sprite = NULL;
+
     switch(obj)
     {
 	case MP2::OBJ_ALCHEMYTOWER:
+	    sprite = &AGG::GetICN(ICN::RESOURCE, 1);
+	    res = Resource::MERCURY;
+	    header = MP2::StringObject(obj);
+	    body = "You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.";
+	    break;
         case MP2::OBJ_MINES:
-	case MP2::OBJ_SAWMILL:
-        case MP2::OBJ_LIGHTHOUSE:
-		world.CaptureObject(dst_index, GetColor());
-		break;
+    	{
+    	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
 
-        default:break;
+            // ore
+            if(0 == taddon->index)
+            {
+		sprite = &AGG::GetICN(ICN::RESOURCE, 2);
+        	res = Resource::ORE;
+        	header = "Ore Mine";
+        	body = "You gain control of an ore mine. It will provide you with two units of ore per day.";
+            }
+            else
+            // sulfur
+            if(1 == taddon->index)
+            {
+		sprite = &AGG::GetICN(ICN::RESOURCE, 3);
+        	res = Resource::SULFUR;
+        	header = "Sulfur Mine";
+		body = "You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.";
+            }
+            else
+            // crystal
+            if(2 == taddon->index)
+            {
+		sprite = &AGG::GetICN(ICN::RESOURCE, 4);
+        	res = Resource::CRYSTAL;
+        	header = "Crystal Mine";
+		body = "You gain control of a crystal mine. It will provide you with one unit of crystal per day.";
+            }
+            else
+            // gems
+            if(3 == taddon->index)
+            {
+		sprite = &AGG::GetICN(ICN::RESOURCE, 5);
+        	res = Resource::GEMS;
+        	header = "Gems Mine";
+		body = "You gain control of a gem mine. It will provide you with one unit of gems per day.";
+            }
+            else
+            // gold
+            if(4 == taddon->index)
+            {
+		sprite = &AGG::GetICN(ICN::RESOURCE, 6);
+        	res = Resource::GOLD;
+        	header = "Gold Mine";
+		body = "You gain control of a gold mine. It will provide you with 1000 gold per day.";
+            }
+    	}
+    	    break;
+	case MP2::OBJ_SAWMILL:
+	    sprite = &AGG::GetICN(ICN::RESOURCE, 0);
+    	    res = Resource::WOOD;
+	    header = MP2::StringObject(obj);
+	    body = "You gain control of a sawmill. It will provide you with two units of wood per day.";
+	    break;
+
+        case MP2::OBJ_LIGHTHOUSE:
+	    header = MP2::StringObject(obj);
+    	    body = "The lighthouse is now under your control, and all of your ships will now move further each turn.";
+	    break;
+
+	case MP2::OBJ_ABANDONEDMINE:
+    	    Error::Warning("Heroes::ActionToCaptureObject: FIXME: Abandone Mine");
+	    break;
+
+	case MP2::OBJ_DRAGONCITY:
+    	    Error::Warning("Heroes::ActionToCaptureObject: FIXME: Dragon City");
+    	    // message variant:
+	    //The Dragon city has no Dragons willing to join you this week.  Perhaps a Dragon will become available next week.
+	    //You stand before the Dragon City, a place off-limits to mere humans.  Do you wish to violate this rule and challenge the Dragons to a fight?
+	    //Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.  Do you wish to recruit Dragons?
+	    //The Dragon city is willing to offer some Dragons for your army for a price.  Do you wish to recruit Dragons?
+	    break;
+
+        default:
+    	    Error::Warning("Heroes::ActionToCaptureObject: unknown captured: " + std::string(MP2::StringObject(obj)));
+    	    return;
+    }
+
+    // capture object
+    if(GetColor() != world.ColorCapturedObject(dst_index))
+    {
+	world.CaptureObject(dst_index, GetColor());
+	world.GetTiles(dst_index).CaptureFlags32(obj, GetColor());
+	if(H2Config::MyColor() == GetColor() && sprite) Dialog::SpriteInfo(header, body, *sprite);
+	Display::Get().Flip();
     }
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCaptureObject: " + GetName() + " captured: " + std::string(MP2::StringObject(obj)));

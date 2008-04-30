@@ -261,26 +261,6 @@ const std::string & Resource::String(resource_t resource)
     return stringWood;
 }
 
-/*
-Resource::resource_t Resource::FromMP2(u8 index)
-{
-    switch(index){ 
-	case 1:  return Resource::WOOD;
-        case 3:  return Resource::MERCURY;
-        case 5:  return Resource::ORE;
-        case 7:  return Resource::SULFUR;
-        case 9:  return Resource::CRYSTAL;
-        case 11: return Resource::GEMS;
-        case 13: return Resource::GOLD;
-        case 17: return Resource::Rand();
-        default: 
-	    Error::Warning("Resource::FromMP2: unknown: ", index);
-    }
-    
-    return Resource::WOOD;
-}
-*/
-
 /* return index sprite objnrsrc.icn */
 u8 Resource::GetIndexSprite(Resource::resource_t resource)
 {

@@ -1525,3 +1525,88 @@ const Maps::TilesAddon * Maps::Tiles::FindMines(void) const
 
     return NULL;
 }
+
+/* ICN::FLAGS32 version */
+void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t col)
+{
+    u8 index = 0;
+
+    switch(col)
+    {
+	case Color::BLUE:	index = 0; break;
+	case Color::GREEN:	index = 1; break;
+	case Color::RED:	index = 2; break;
+	case Color::YELLOW:	index = 3; break;
+	case Color::ORANGE:	index = 4; break;
+	case Color::PURPLE:	index = 5; break;
+	case Color::GRAY:	index = 6; break;
+
+	default: break;
+    }
+
+    switch(obj)
+    {
+	case MP2::OBJ_MINES:		index += 14; CorrectFlags32(index); Redraw(); break;
+	//case MP2::OBJ_DRAGONCITY:	index += 35; CorrectFlags32(index); Redraw(); break; unused
+        case MP2::OBJ_LIGHTHOUSE:	index += 42; CorrectFlags32(index); Redraw(); break;
+
+	case MP2::OBJ_ALCHEMYTOWER:
+	{
+	    index += 21;
+	    if(Maps::isValidDirection(maps_index, Direction::TOP))
+	    {
+		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
+		tile.CorrectFlags32(index);
+		tile.Redraw();
+	    }
+	}
+	break;
+
+	case MP2::OBJ_SAWMILL:
+	{
+	    index += 28;
+	    if(Maps::isValidDirection(maps_index, Direction::TOP_RIGHT))
+    	    {
+    		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP_RIGHT));
+    		tile.CorrectFlags32(index);
+		tile.Redraw();
+	    }
+	}
+	break;
+
+	case MP2::OBJ_CASTLE:
+	{
+	    index *= 2;
+
+	    if(Maps::isValidDirection(maps_index, Direction::LEFT))
+	    {
+		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+    		tile.CorrectFlags32(index);
+		tile.Redraw();
+	    }
+
+	    if(Maps::isValidDirection(maps_index, Direction::RIGHT))
+	    {
+		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
+    		tile.CorrectFlags32(index);
+		tile.Redraw();
+	    }
+	}
+	break;
+
+	default: return;
+    }
+}
+
+/* correct flags, ICN::FLAGS32 vesion */
+void Maps::Tiles::CorrectFlags32(const u8 index)
+{
+    TilesAddon * taddon = FindFlags();
+
+    // replace flag
+    if(NULL != taddon)
+	taddon->index = index;
+    else
+    // or new flag
+	addons_level2.push_back(TilesAddon(TilesAddon::UPPER, world.GetUniq(), 0x38, index));
+}

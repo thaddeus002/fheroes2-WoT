@@ -95,6 +95,8 @@ namespace Maps
 	void SetQuantity2(u8 val){ quantity2 = val; };
 	void SetObject(MP2::object_t object){ general = object; };
 
+	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
+
 	void AddPathSprite(const Sprite * sprite){ path_sprite = sprite; };
 	void DelPathSprite(void){ path_sprite = NULL; };
 
@@ -121,6 +123,7 @@ namespace Maps
 	void RedrawBoat(u16 dx, u16 dy) const;
 	void RedrawHeroes(u16 dx, u16 dy) const;
 	void RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const;
+	void CorrectFlags32(const u8 index);
 
     private:
 	const u16 maps_index;

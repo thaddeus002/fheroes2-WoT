@@ -31,6 +31,7 @@
 namespace Resource
 {
     typedef enum {
+	UNKNOWN = 0x00,
         WOOD	= 0x01,
         MERCURY	= 0x02,
         ORE	= 0x04,

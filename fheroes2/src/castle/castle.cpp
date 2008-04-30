@@ -339,11 +339,7 @@ void Castle::ChangeColor(Color::color_t cl)
 {
     color = cl;
 
-    // modify left flag
-    ModifyTIlesFlags(world.GetTiles(mp.x - 1, mp.y));
-
-    // modify right flag
-    ModifyTIlesFlags(world.GetTiles(mp.x + 1, mp.y));
+    world.GetTiles(mp).CaptureFlags32(MP2::OBJ_CASTLE, color);
 }
 
 /* correct sprites for RND castles */
@@ -451,34 +447,6 @@ void Castle::ModifyTIlesRNDSprite(Maps::Tiles & tile)
             case Race::NECR: addon->index += 160; break;
             default: Error::Warning("Castle::ModifyTIlesRNDSprite: unknown race."); break;
 	}
-    }
-}
-
-/* modify flags sprite to origin color */
-void Castle::ModifyTIlesFlags(Maps::Tiles & tile)
-{
-    Maps::TilesAddon *addon = tile.FindFlags();
-
-    if(addon)
-    {
-	// right flag - event index
-	bool right_event = addon->index % 2 ? true : false;
-
-	u8 index_sprite = 0;
-
-	switch(color)
-	{
-	    case Color::BLUE:	index_sprite = right_event ? 0 : 1; break;
-	    case Color::GREEN:	index_sprite = right_event ? 2 : 3; break;
-	    case Color::RED:	index_sprite = right_event ? 4 : 5; break;
-	    case Color::YELLOW:	index_sprite = right_event ? 6 : 7; break;
-	    case Color::ORANGE:	index_sprite = right_event ? 8 : 9; break;
-	    case Color::PURPLE:	index_sprite = right_event ? 10 : 11; break;
-	    case Color::GRAY:	index_sprite = right_event ? 12 : 13; break;
-	    default: Error::Warning("Castle::ModifyTIlesFlags: unknown color."); break;
-	}
-
-	addon->index = index_sprite;
     }
 }
 

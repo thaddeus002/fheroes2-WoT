@@ -108,6 +108,8 @@ public:
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;
     Color::color_t ColorCapturedObject(const u16 index) const;
 
+    u32 GetUniq(void){ return ++uniq0; };
+
 private:
     World(){};
     
@@ -144,6 +146,8 @@ private:
 
     Heroes::heroes_t free_recruit_hero1;
     Heroes::heroes_t free_recruit_hero2;
+    
+    static u32 uniq0;
 };
 
 static World & world = World::GetWorld();
