@@ -1269,10 +1269,36 @@ u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col
     return result;
 }
 
-/**/
+/* return count captured mines */
 u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const
 {
-    return 0;
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+
+    u16 result = 0;
+
+    for(; it1 != it2; ++it1)
+	if(MP2::OBJ_MINES == (*it1).second.first || MP2::OBJ_HEROES == (*it1).second.first)
+    {
+	    // scan for find mines
+	    const Maps::TilesAddon * addon = GetTiles((*it1).first).FindMines();
+
+	    if(addon)
+	    {
+		// index sprite EXTRAOVR
+		if(0 == addon->index && Resource::ORE == res && (*it1).second.second == col) ++result;
+		else
+		if(1 == addon->index && Resource::SULFUR == res && (*it1).second.second == col) ++result;
+		else
+		if(2 == addon->index && Resource::CRYSTAL == res && (*it1).second.second == col) ++result;
+		else
+		if(3 == addon->index && Resource::GEMS == res && (*it1).second.second == col) ++result;
+		else
+		if(4 == addon->index && Resource::GOLD == res && (*it1).second.second == col) ++result;
+	    }
+    }
+    
+    return result;
 }
 
 /* capture object */

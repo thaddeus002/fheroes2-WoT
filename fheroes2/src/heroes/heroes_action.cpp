@@ -105,15 +105,15 @@ void Heroes::Action(void)
         // teleports
 	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(dst_index); break;
 
-        // object
-        case MP2::OBJ_ALCHEMYTOWER:
-        case MP2::OBJ_MINES:
-	case MP2::OBJ_SAWMILL:
-        case MP2::OBJ_LIGHTHOUSE:
+	// capture color object
+	case MP2::OBJ_ALCHEMYTOWER:	ActionToCaptureObject(dst_index, MP2::OBJ_ALCHEMYTOWER); break;
+        case MP2::OBJ_MINES:		ActionToCaptureObject(dst_index, MP2::OBJ_MINES); break;
+	case MP2::OBJ_SAWMILL:		ActionToCaptureObject(dst_index, MP2::OBJ_SAWMILL); break;
+        case MP2::OBJ_LIGHTHOUSE:	ActionToCaptureObject(dst_index, MP2::OBJ_LIGHTHOUSE); break;
 
+        // object
         case MP2::OBJ_WATERMILL:
         case MP2::OBJ_WINDMILL:
-
 
 	case MP2::OBJ_ARCHERHOUSE:
         case MP2::OBJ_GOBLINHUNT:
@@ -979,3 +979,25 @@ void Heroes::ActionToTeleports(const u16 index_from)
     Scoute();
     Display::Get().Flip();
 }
+
+/* capture color object */
+void Heroes::ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj)
+{
+    MoveNext();
+    Display::Get().Flip();
+
+    switch(obj)
+    {
+	case MP2::OBJ_ALCHEMYTOWER:
+        case MP2::OBJ_MINES:
+	case MP2::OBJ_SAWMILL:
+        case MP2::OBJ_LIGHTHOUSE:
+		world.CaptureObject(dst_index, GetColor());
+		break;
+
+        default:break;
+    }
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCaptureObject: " + GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+}
+

@@ -87,7 +87,7 @@ namespace Maps
 	TilesAddon * FindFlags(void);
 	TilesAddon * FindRNDMonster(const u8 level = 0);
 	TilesAddon * FindMonster(void);
-	TilesAddon * FindMines(void);
+	const TilesAddon * FindMines(void) const;
 
 	void SetTile(const u16 index, const u8 shape);
 

@@ -1507,16 +1507,16 @@ Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
     return NULL;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindMines(void)
+const Maps::TilesAddon * Maps::Tiles::FindMines(void) const
 {
     if(addons_level1.size())
     {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
 	for(; it1 != it2; ++it1)
 	{
-	    TilesAddon & addon = *it1;
+	    const TilesAddon & addon = *it1;
 
 	    // EXTRAOVR
 	    if(0x74 == addon.object) return &addon;

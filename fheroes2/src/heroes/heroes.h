@@ -213,6 +213,7 @@ protected:
     void ActionToTreasureChest(const u16 dst_index);
     void ActionToAncientLamp(const u16 dst_index);
     void ActionToTeleports(const u16 dst_index);
+    void ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj);
     void RedrawRotate(bool clockwise);
     void Scoute(void);
 

@@ -112,7 +112,7 @@ void Kingdom::ActionNewDay(void)
     // captured object
     resource.wood += DAY_PROFIT_WOOD * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
     resource.ore += DAY_PROFIT_ORE * world.CountCapturedMines(Resource::ORE, color);
-    resource.mercury += DAY_PROFIT_MERCURY * world.CountCapturedMines(Resource::MERCURY, color);
+    resource.mercury += DAY_PROFIT_MERCURY * world.CountCapturedObject(MP2::OBJ_ALCHEMYTOWER, color);
     resource.sulfur += DAY_PROFIT_SULFUR * world.CountCapturedMines(Resource::SULFUR, color);
     resource.crystal += DAY_PROFIT_CRYSTAL * world.CountCapturedMines(Resource::CRYSTAL, color);
     resource.gems += DAY_PROFIT_GEMS * world.CountCapturedMines(Resource::GEMS, color);
