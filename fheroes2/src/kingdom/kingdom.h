@@ -63,6 +63,14 @@
 #define START_IMPOSSIBLE_GEMS           0
 #define START_IMPOSSIBLE_GOLD           0
 
+#define DAY_PROFIT_WOOD                 2
+#define DAY_PROFIT_ORE                  2
+#define DAY_PROFIT_MERCURY              1
+#define DAY_PROFIT_SULFUR               1
+#define DAY_PROFIT_CRYSTAL              1
+#define DAY_PROFIT_GEMS                 1
+#define DAY_PROFIT_GOLD                 1000
+
 #include <vector>
 #include "race.h"
 #include "color.h"

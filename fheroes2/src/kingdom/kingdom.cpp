@@ -27,6 +27,7 @@
 #include "difficulty.h"
 #include "game_statuswindow.h"
 #include "payment.h"
+#include "world.h"
 #include "kingdom.h"
 
 Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), play(cl & Settings::Get().FileInfo().KingdomColors() ? true : false)
@@ -107,6 +108,15 @@ void Kingdom::ActionNewDay(void)
     // heroes New Day
     std::vector<Heroes *>::const_iterator ith = heroes.begin();
     for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewDay();
+
+    // captured object
+    resource.wood += DAY_PROFIT_WOOD * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
+    resource.ore += DAY_PROFIT_ORE * world.CountCapturedMines(Resource::ORE, color);
+    resource.mercury += DAY_PROFIT_MERCURY * world.CountCapturedMines(Resource::MERCURY, color);
+    resource.sulfur += DAY_PROFIT_SULFUR * world.CountCapturedMines(Resource::SULFUR, color);
+    resource.crystal += DAY_PROFIT_CRYSTAL * world.CountCapturedMines(Resource::CRYSTAL, color);
+    resource.gems += DAY_PROFIT_GEMS * world.CountCapturedMines(Resource::GEMS, color);
+    resource.gold += DAY_PROFIT_GOLD * world.CountCapturedMines(Resource::GOLD, color);
 
     // funds
     itc = castles.begin();

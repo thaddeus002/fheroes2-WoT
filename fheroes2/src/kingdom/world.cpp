@@ -1255,3 +1255,50 @@ const std::string & World::MessageSign(const u16 index)
 {
     return map_sign[index];
 }
+
+/* return count captured object */
+u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const
+{
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+
+    u16 result = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).second.first == obj && (*it1).second.second == col) ++result;
+
+    return result;
+}
+
+/**/
+u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const
+{
+    return 0;
+}
+
+/* capture object */
+void World::CaptureObject(const u16 index, const Color::color_t col)
+{
+    MP2::object_t obj = GetTiles(index).GetObject();
+    
+    if(MP2::OBJ_HEROES == obj)
+    {
+	const Heroes * hero = GetHeroes(index);
+	if(NULL == hero) return;
+
+	obj = hero->GetUnderObject();
+    }
+
+    map_captureobj[index].first = obj;
+    map_captureobj[index].second = col;
+}
+
+/* return color captured object */
+Color::color_t World::ColorCapturedObject(const u16 index) const
+{
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+
+    for(; it1 != it2; ++it1) if((*it1).first == index) return (*it1).second.second;
+
+    return Color::GRAY;
+}
