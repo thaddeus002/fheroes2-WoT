@@ -267,7 +267,10 @@ Game::menu_t Game::ScenarioInfo(void)
 	}
 
 	// click cancel
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
+	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) {
+	    Settings::Get().SetHotSeat(false);
+	    return MAINMENU;
+	}
 
 	// click ok
 	if(le.MouseClickLeft(buttonOk))
