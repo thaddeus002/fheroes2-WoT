@@ -1128,6 +1128,20 @@ void Heroes::MoveNext(void)
     // redraw top right cell (for flag)
     if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
 	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
+    // redraw bottom
+    if(Maps::isValidDirection(index_from, Direction::BOTTOM))
+	world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::BOTTOM)).Redraw();
+
+    if(isShipMaster())
+    {
+	// redraw left
+	if(Maps::isValidDirection(index_from, Direction::LEFT))
+	    world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::LEFT)).Redraw();
+
+	// redraw right
+	if(Maps::isValidDirection(index_from, Direction::RIGHT))
+	    world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::RIGHT)).Redraw();
+    }
 
     if(MP2::OBJ_HEROES != save_maps_general)
     {
@@ -1183,6 +1197,20 @@ bool Heroes::Move(void)
 	// redraw top right cell (for flag)
 	if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
 	    world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
+	// redraw bottom
+	if(Maps::isValidDirection(index_from, Direction::BOTTOM))
+	    world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::BOTTOM)).Redraw();
+
+	if(isShipMaster())
+	{
+	    // redraw left
+	    if(Maps::isValidDirection(index_from, Direction::LEFT))
+		world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::LEFT)).Redraw();
+
+	    // redraw right
+	    if(Maps::isValidDirection(index_from, Direction::RIGHT))
+		world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::RIGHT)).Redraw();
+	}
 
 	Direction::vector_t to1 = direction;
 	Direction::vector_t to2 = direction2;

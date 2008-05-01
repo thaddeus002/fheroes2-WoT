@@ -613,68 +613,31 @@ void Maps::Tiles::RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const
     }
 
     // redraw top tiles
-    if(BORDERWIDTH < dy)
-    {
-	    world.GetTiles(maps_index - world.w()).Blit(dx, dy - TILEWIDTH, anime_sprite);
-    }
+    if(BORDERWIDTH < dy) world.GetTiles(maps_index - world.w()).Blit(dx, dy - TILEWIDTH, anime_sprite);
 
     // redraw left tiles
-    if(BORDERWIDTH < dx)
-    {
-	    world.GetTiles(maps_index - 1).Blit(dx - TILEWIDTH, dy, anime_sprite);
-    }
+    if(BORDERWIDTH < dx) world.GetTiles(maps_index - 1).Blit(dx - TILEWIDTH, dy, anime_sprite);
 
     // draw first sprite
     const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9);
 
-    s16 ax = dx + TILEWIDTH - std::abs(sprite_first.x()) - align_x;
-    s16 ay = dy + TILEWIDTH - std::abs(sprite_first.y()) - 4;
+    Point dst_pt(dx + TILEWIDTH - std::abs(sprite_first.x()) - align_x,
+                 dy + TILEWIDTH - std::abs(sprite_first.y()) - 4);
+    Rect src_rt;
 
-    Rect src_rt(0, 0, sprite_first.w(), sprite_first.h());
+    GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
 
-    // left bound
-    if(ax < BORDERWIDTH)
-    {
-	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
-	    src_rt.w -= src_rt.x;
-	    ax = BORDERWIDTH;
-    }
-
-    // top bound
-    if(ay < BORDERWIDTH)
-    {
-	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
-	    src_rt.h -= src_rt.y;
-	    ay = BORDERWIDTH;
-    }
-
-    display.Blit(sprite_first, src_rt, ax, ay);
+    display.Blit(sprite_first, src_rt, dst_pt);
 
     // draw second sprite
     const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster * 9 + 1 + (anime_sprite % 6));
 
-    ax = dx + TILEWIDTH - std::abs(sprite_next.x()) - align_x;
-    ay = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
+    dst_pt.x = dx + TILEWIDTH - std::abs(sprite_next.x()) - align_x;
+    dst_pt.y = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
 
-    src_rt = Rect(0, 0, sprite_next.w(), sprite_next.h());
+    GameArea::SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
 
-    // left bound
-    if(ax < BORDERWIDTH)
-    {
-	    src_rt.x = (ax < 0 ? std::abs(ax) + BORDERWIDTH : BORDERWIDTH - ax);
-	    src_rt.w -= src_rt.x;
-	    ax = BORDERWIDTH;
-    }
-
-    // top bound
-    if(ay < BORDERWIDTH)
-    {
-	    src_rt.y = (ay < 0 ? std::abs(ay) + BORDERWIDTH : BORDERWIDTH - ay);
-	    src_rt.h -= src_rt.y;
-	    ay = BORDERWIDTH;
-    }
-
-    display.Blit(sprite_next, src_rt, ax, ay);
+    display.Blit(sprite_next, src_rt, dst_pt);
 }
 
 void Maps::Tiles::RedrawBoat(u16 dx, u16 dy) const
@@ -744,18 +707,20 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 		default: break;
 	    }
 
-	    const Sprite & sprite_hero = AGG::GetICN(icn_hero, index_sprite, reflect);
-	    const Sprite & sprite_flag = AGG::GetICN(icn_flag, index_sprite, reflect);
+	    const Sprite & sprite1 = AGG::GetICN(icn_hero, index_sprite, reflect);
+	    const Sprite & sprite2 = AGG::GetICN(icn_flag, index_sprite, reflect);
 
-	    const s16 dy1 = dy + TILEWIDTH - sprite_hero.h() - (sprite_hero.h() + sprite_hero.y()) + 5;
+	    Point dst_pt1(reflect ? dx + TILEWIDTH - sprite1.x() - sprite1.w() : dx + sprite1.x(), dy + sprite1.y() + TILEWIDTH);
+	    Point dst_pt2(reflect ? dx + TILEWIDTH - sprite2.x() - sprite2.w() : dx + sprite2.x(), dy + sprite2.y() + TILEWIDTH);
 
-	    const Point dst_pt1(dx + sprite_hero.x(), BORDERWIDTH > dy1 ? BORDERWIDTH : dy1);
-	    const Rect  src_rt(0,  dy1 > BORDERWIDTH ? 0 : BORDERWIDTH - dy1, sprite_hero.w(), sprite_hero.h());
+	    Rect src_rt1;
+	    Rect src_rt2;
 
-	    const Point dst_pt2(reflect ? dx + sprite_hero.x() - sprite_flag.x() + TILEWIDTH - sprite_flag.w() : dx + sprite_flag.x(), dy + sprite_flag.y() + 24);
+	    GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
+	    GameArea::SrcRectFixed(src_rt2, dst_pt2, sprite2.w(), sprite2.h());
 
-	    display.Blit(sprite_hero, src_rt, dst_pt1);
-	    if(dst_pt2.y > BORDERWIDTH) display.Blit(sprite_flag, dst_pt2);
+	    display.Blit(sprite1, src_rt1, dst_pt1);
+	    display.Blit(sprite2, src_rt2, dst_pt2);
 	}
 	// boat
 	else
@@ -764,7 +729,7 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 	
 	    u16 index_sprite = 0;
 
-	    //const ICN::icn_t icn = ICN::BOAT32;
+	    const ICN::icn_t icn = ICN::BOAT32;
 
 	    bool reflect = false;
 
@@ -782,17 +747,15 @@ void Maps::Tiles::RedrawHeroes(u16 dx, u16 dy) const
 		default: break;
 	    }
 
-/*
 	    const Sprite & sprite = AGG::GetICN(icn, index_sprite, reflect);
 
-	    const s16 dy2 = dy + TILEWIDTH - sprite.h() - (sprite.h() + sprite.y());
+	    Point dst_pt(reflect ? dx + TILEWIDTH - sprite.x() - sprite.w() : dx + sprite.x(), dy + sprite.y() + TILEWIDTH);
 
-	    const Point dst_pt(dx + sprite.x(), BORDERWIDTH > dy2 ? BORDERWIDTH : dy2);
-	    const Rect  src_rt(0,  dy2 > BORDERWIDTH ? 0 : BORDERWIDTH - dy2, sprite.w(), sprite.h());
+	    Rect src_rt;
+
+	    GameArea::SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
 
 	    display.Blit(sprite, src_rt, dst_pt);
-*/
-	    RedrawBoat(dx, dy);
 	}
     }
     else

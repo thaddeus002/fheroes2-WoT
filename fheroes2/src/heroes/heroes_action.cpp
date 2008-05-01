@@ -42,6 +42,11 @@ void Heroes::Action(void)
 
     switch(object)
     {
+        case MP2::OBJ_DUNE:
+        case MP2::OBJ_FLOWERS:
+        case MP2::OBJ_SHRUB:
+        case MP2::OBJ_SHRUB2:
+        case MP2::OBJ_STUMP:
 	case MP2::OBJ_ZERO:	MoveNext(); return;
 
 	case MP2::OBJ_MONSTER:	ActionToMonster(dst_index); break;
@@ -247,9 +252,10 @@ void Heroes::ActionToBoat(void)
 
 void Heroes::ActionToCoast(void)
 {
+    MoveNext();
+
     if(! isShipMaster()) return;
 
-    MoveNext();
     SetShipMaster(false);
     move_point = 0;
 

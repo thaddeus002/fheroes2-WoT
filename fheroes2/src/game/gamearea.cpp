@@ -227,3 +227,31 @@ void GameArea::Center(const Point &pt)
 	Redraw();
     }
 }
+
+/* fixed src rect image */
+void GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 w, const u16 h)
+{
+    src = Rect(0, 0, w, h);
+
+    if(dst.x < BORDERWIDTH)
+    {
+        src.x = BORDERWIDTH - dst.y;
+        dst.x = BORDERWIDTH;
+    }
+
+    if(dst.y < BORDERWIDTH)
+    {
+        src.y = BORDERWIDTH - dst.y;
+        dst.y = BORDERWIDTH;
+    }
+
+    if(dst.x + w > TILEWIDTH * area_pos.w)
+    {
+	src.w = TILEWIDTH * area_pos.w - dst.x;
+    }
+
+    if(dst.y + h > TILEWIDTH * area_pos.h)
+    {
+	src.h = TILEWIDTH * area_pos.h - dst.y;
+    }
+}

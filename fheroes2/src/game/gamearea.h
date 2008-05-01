@@ -32,7 +32,9 @@ public:
     typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
     static const Rect & GetRect(void){ return area_pos; };
+
     static u16 GetLeftTopIndexMaps(void);
+    static void SrcRectFixed(Rect & src, Point & dst, const u16 w, const u16 h);
 
     void Scroll(scroll_t scroll);
 
