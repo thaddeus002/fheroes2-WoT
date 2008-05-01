@@ -721,11 +721,11 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	    break;
 
 	case Focus::HEROES:
-	    selectHeroes.Select(0);
+		selectHeroes.Select();
 	    break;
 
 	case Focus::CASTLE:
-	    selectCastles.Select(0);
+		selectCastles.Select();
 	    break;
     }
 

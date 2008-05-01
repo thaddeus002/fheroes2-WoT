@@ -122,7 +122,7 @@ void Game::Focus::Redraw(void)
     if(heroes)
     {
 	selectCastles.Reset();
-        selectHeroes.SelectFromCenter(center);
+        selectHeroes.Select();
 
         heroes->GetPath().Show();
     }
@@ -130,7 +130,7 @@ void Game::Focus::Redraw(void)
     if(castle)
     {
 	selectHeroes.Reset();
-        selectCastles.SelectFromCenter(center);
+        selectCastles.Select();
     }
 
     areaMaps.Center(center);

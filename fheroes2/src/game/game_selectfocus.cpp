@@ -26,6 +26,7 @@
 #include "agg.h"
 #include "sprite.h"
 #include "portrait.h"
+#include "game_focus.h"
 #include "game_selectfocus.h"
 
 #define ICONS_WIDTH		46
@@ -203,22 +204,26 @@ void Game::SelectFocusCastles::Redraw(void)
 	cursor.Show(coords[cursor_index - top_index].x - 5, coords[cursor_index - top_index].y - 5);
 }
 
-void Game::SelectFocusCastles::SelectFromCenter(const Point & pt)
+/* select from focus */
+void Game::SelectFocusCastles::Select(void)
 {
-    if(! castles) return;
+    const Game::Focus & focus = Game::Focus::Get();
 
-    for(u8 ii = 0; ii < castles->size(); ++ii)
-	if(pt == (*castles->at(ii)).GetCenter())
-	{
-	    if(ii < top_index || ii >= top_index + coords.size())
-		top_index = (ii + coords.size() >= castles->size() && castles->size() > coords.size() ?
-	                                                         castles->size() - coords.size() : 0);
-	    cursor_index = ii;
+    if(Game::Focus::CASTLE != focus.Type() || NULL == castles) return;
 
-	    selected = true;
-	    
-	    return;
-	}
+    for(u8 ii = 0; ii < castles->size(); ++ii) if(&focus.GetCastle() == castles->at(ii))
+    {
+	cursor_index = ii;
+
+	selected = true;
+
+	break;
+    }
+}
+
+void Game::SelectFocusCastles::Select(u8 index)
+{
+    SelectFocusObject::Select(index);
 }
 
 const Point & Game::SelectFocusCastles::GetCenter(u8 index) const
@@ -288,22 +293,26 @@ void Game::SelectFocusHeroes::Redraw(void)
 	cursor.Show(coords[cursor_index - top_index].x - 5, coords[cursor_index - top_index].y - 5);
 }
 
-void Game::SelectFocusHeroes::SelectFromCenter(const Point & pt)
+/* select from focus */
+void Game::SelectFocusHeroes::Select(void)
 {
-    if(! heroes) return;
+    const Game::Focus & focus = Game::Focus::Get();
 
-    for(u8 ii = 0; ii < heroes->size(); ++ii)
-	if(pt == (*heroes->at(ii)).GetCenter())
-	{
-	    if(ii < top_index || ii >= top_index + coords.size())
-		top_index = (ii + coords.size() >= heroes->size() && heroes->size() > coords.size() ?
-	                                                        heroes->size() - coords.size() : 0);
-	    cursor_index = ii;
-	    
-	    selected = true;
+    if(Game::Focus::HEROES != focus.Type() || NULL == heroes) return;
 
-	    return;
-	}
+    for(u8 ii = 0; ii < heroes->size(); ++ii) if(&focus.GetHeroes() == heroes->at(ii))
+    {
+	cursor_index = ii;
+
+	selected = true;
+
+	break;
+    }
+}
+
+void Game::SelectFocusHeroes::Select(u8 index)
+{
+    SelectFocusObject::Select(index);
 }
 
 const Point & Game::SelectFocusHeroes::GetCenter(u8 index) const

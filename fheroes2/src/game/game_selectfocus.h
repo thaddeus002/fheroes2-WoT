@@ -52,7 +52,7 @@ public:
     bool Prev(void);
     bool Next(void);
     bool SetTop(u8 index);
-    
+
     virtual u8 GetSizeObject(void) const{ return 0; };
     virtual void Redraw(void) = 0;
 
@@ -80,7 +80,8 @@ public:
 
     void Redraw(void);
 
-    void SelectFromCenter(const Point & pt);
+    void Select(void);
+    void Select(u8 index);
 
     const Point & GetCenter(u8 index) const;
 
@@ -102,7 +103,9 @@ public:
 
     void Redraw(void);
 
-    void SelectFromCenter(const Point & pt);
+    void Select(void);
+    void Select(u8 index);
+
     const Point & GetCenter(u8 index) const;
 
 protected:
