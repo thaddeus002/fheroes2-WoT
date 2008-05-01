@@ -34,8 +34,20 @@ bool Point::operator!= (const Point & pt) const
     return !(*this == pt);
 }
 
-Size::Size(u16 sw, u16 sh) : w(sw), h(sh)
+Point & Point::operator+=(const Point & pt)
 {
+    x += pt.x;
+    y += pt.y;
+
+    return *this;
+}
+
+Point & Point::operator-=(const Point & pt)
+{
+    x -= pt.x;
+    y -= pt.y;
+
+    return *this;
 }
 
 Point operator+(const Point& pt1, const Point& pt2)
@@ -46,6 +58,10 @@ Point operator+(const Point& pt1, const Point& pt2)
 Point operator-(const Point& pt1, const Point& pt2)
 {
     return Point(pt1.x - pt2.x, pt1.y - pt2.y);
+}
+
+Size::Size(u16 sw, u16 sh) : w(sw), h(sh)
+{
 }
 
 bool Size::operator== (const Size & sz) const

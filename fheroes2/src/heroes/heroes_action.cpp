@@ -42,13 +42,6 @@ void Heroes::Action(void)
 
     switch(object)
     {
-        case MP2::OBJ_DUNE:
-        case MP2::OBJ_FLOWERS:
-        case MP2::OBJ_SHRUB:
-        case MP2::OBJ_SHRUB2:
-        case MP2::OBJ_STUMP:
-	case MP2::OBJ_ZERO:	MoveNext(); return;
-
 	case MP2::OBJ_MONSTER:	ActionToMonster(dst_index); break;
 
         case MP2::OBJ_CASTLE:	ActionToCastle(dst_index); break;
@@ -161,12 +154,8 @@ void Heroes::Action(void)
 	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
 
-	default:
-	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: unknown: " + std::string(MP2::StringObject(object)));
-	    break;
+	default: MoveNext(); break;
     }
-
-    return;
 }
 
 void Heroes::ActionToMonster(const u16 dst_index)
@@ -305,10 +294,10 @@ void Heroes::ActionToResource(const u16 dst_index)
 	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
 
 	    left_tile.Remove(uniq);
-	    left_tile.Redraw();
+	    left_tile.RedrawAll();
         }
 
-	tile.Redraw();
+	tile.RedrawAll();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
     }
@@ -361,10 +350,10 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
 
 	    left_tile.Remove(uniq);
-	    left_tile.Redraw();
+	    left_tile.RedrawAll();
         }
 
-	tile.Redraw();
+	tile.RedrawAll();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: "  + GetName() + ": " + MP2::StringObject(obj));
     }
@@ -551,10 +540,10 @@ void Heroes::ActionToBottle(const u16 dst_index)
 	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
 
 	    left_tile.Remove(uniq);
-	    left_tile.Redraw();
+	    left_tile.RedrawAll();
         }
 
-	tile.Redraw();
+	tile.RedrawAll();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToBottle: " + GetName() + " pickup bottle");
     }
@@ -843,10 +832,10 @@ void Heroes::ActionToArtifact(const u16 dst_index)
 	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
 
 	    left_tile.Remove(uniq);
-	    left_tile.Redraw();
+	    left_tile.RedrawAll();
         }
 
-	tile.Redraw();
+	tile.RedrawAll();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToArtifact: " + GetName() + " pickup artifact");
     }
@@ -897,10 +886,10 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
 
 	    left_tile.Remove(uniq);
-	    left_tile.Redraw();
+	    left_tile.RedrawAll();
         }
 
-	tile.Redraw();
+	tile.RedrawAll();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
     }
@@ -934,10 +923,10 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
 
 	    left_tile.Remove(uniq);
-	    left_tile.Redraw();
+	    left_tile.RedrawAll();
         }
 
-	tile.Redraw();
+	tile.RedrawAll();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
     }
@@ -953,19 +942,12 @@ void Heroes::ActionToTeleports(const u16 index_from)
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-    if(Maps::isValidDirection(index_from, Direction::TOP))
-        world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP)).Redraw();
-
-    if(Maps::isValidDirection(index_from, Direction::TOP_LEFT))
-        world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_LEFT)).Redraw();
-
-    if(Maps::isValidDirection(index_from, Direction::TOP_RIGHT))
-        world.GetTiles(Maps::GetDirectionIndex(index_from, Direction::TOP_RIGHT)).Redraw();
+    RedrawAllDependentTiles();
 
     if(MP2::OBJ_HEROES != save_maps_general)
     {
 	tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
-        tiles_from.Redraw();
+        tiles_from.RedrawAll();
     }
 
     SetCenter(index_to);
@@ -973,7 +955,7 @@ void Heroes::ActionToTeleports(const u16 index_from)
     save_maps_general = MP2::OBJ_STONELIGHTS;
     tiles_to.SetObject(MP2::OBJ_HEROES);
 
-    tiles_to.Redraw();
+    tiles_to.RedrawAll();
 
     Game::Focus & globalfocus = Game::Focus::Get();
 

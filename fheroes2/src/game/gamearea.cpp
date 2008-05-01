@@ -79,7 +79,7 @@ void GameArea::Redraw(const Rect & area_rt)
 
     for(u16 iy = area_rt.y; iy < area_rt.y + area_rt.h; ++iy)
 	for(u16 ix = area_rt.x; ix < area_rt.x + area_rt.w; ++ix)
-	    world.GetTiles(area_pos.x + ix, area_pos.y + iy).Blit(BORDERWIDTH + ix * TILEWIDTH, BORDERWIDTH + iy * TILEWIDTH, animation_ticket);
+	    world.GetTiles(area_pos.x + ix, area_pos.y + iy).RedrawAll();
 }
 
 /* redraw animation tiles */
@@ -89,10 +89,8 @@ void GameArea::RedrawAnimation(void)
 	for(u16 ix = 0; ix < area_pos.w; ++ix)
     {
 	const Maps::Tiles & tile = world.GetTiles(area_pos.x + ix, area_pos.y + iy);
-	const u16 ax = BORDERWIDTH + ix * TILEWIDTH;
-	const u16 ay = BORDERWIDTH + iy * TILEWIDTH;
 
-	if(tile.isAnimation(ax, ay)) tile.Blit(ax, ay, animation_ticket);
+	if(tile.isAnimation()) tile.RedrawAll(animation_ticket);
     }
 
     ++animation_ticket;
@@ -245,13 +243,13 @@ void GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 w, const u16 h)
         dst.y = BORDERWIDTH;
     }
 
-    if(dst.x + w > TILEWIDTH * area_pos.w)
+    if(dst.x + w > BORDERWIDTH + TILEWIDTH * area_pos.w)
     {
-	src.w = TILEWIDTH * area_pos.w - dst.x;
+	src.w =BORDERWIDTH + TILEWIDTH * area_pos.w - dst.x;
     }
 
-    if(dst.y + h > TILEWIDTH * area_pos.h)
+    if(dst.y + h > BORDERWIDTH + TILEWIDTH * area_pos.h)
     {
-	src.h = TILEWIDTH * area_pos.h - dst.y;
+	src.h = BORDERWIDTH + TILEWIDTH * area_pos.h - dst.y;
     }
 }

@@ -570,7 +570,7 @@ Game::menu_t Game::Editor::StartGame()
 			    default: break;
 			}
 
-			newtile.Redraw();
+			newtile.RedrawAll();
 		    }
 		}
 		

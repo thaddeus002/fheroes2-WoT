@@ -1158,7 +1158,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 				{
 				    cursor.Hide();
 				    path.Show();
-				    world.GetTiles((*hero).GetCenter()).Redraw();
+				    world.GetTiles((*hero).GetCenter()).RedrawAll();
 				    cursor.Show();
 				}
 

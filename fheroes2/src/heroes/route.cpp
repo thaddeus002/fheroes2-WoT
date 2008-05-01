@@ -79,7 +79,7 @@ void Route::Path::Show(void) const
 	if(++it3 != it2) index = GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index));
 
 	tile.AddPathSprite(& AGG::GetICN(red_sprite ? ICN::ROUTERED : ICN::ROUTE, index));
-	tile.Redraw();
+	tile.RedrawAll();
 
 	from = (*it1).to_index;
     }
@@ -125,7 +125,7 @@ void Route::Path::Hide(void) const
 	Maps::Tiles & tile = world.GetTiles((*it1).to_index);
 
 	tile.DelPathSprite();
-	tile.Redraw();
+	tile.RedrawAll();
     }
 }
 

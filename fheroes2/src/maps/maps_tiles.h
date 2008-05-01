@@ -65,7 +65,7 @@ namespace Maps
 	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().uniq : 0; };
 	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().uniq : 0; };
 
-	bool isAnimation(u16 dstx, u16 dsty) const;
+	bool isAnimation(void) const;
 	bool isPassable(void) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 
@@ -100,8 +100,10 @@ namespace Maps
 	void AddPathSprite(const Sprite * sprite){ path_sprite = sprite; };
 	void DelPathSprite(void){ path_sprite = NULL; };
 
-	void Blit(u16 dstx, u16 dsty, u32 anime_frame = 0) const;
-	void Redraw(void) const;
+	void RedrawAll(const u32 frame = 0) const;
+	void RedrawTile(void) const;
+	void RedrawBottom(const u32 frame = 0) const;
+	void RedrawTop(const u32 frame = 0) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);
@@ -120,9 +122,11 @@ namespace Maps
 	void ClearFog(Color::color_t color){ fogs &= ~color; };
 
     private:
-	void RedrawBoat(u16 dx, u16 dy) const;
-	void RedrawHeroes(u16 dx, u16 dy) const;
-	void RedrawMonster(u16 dx, u16 dy, u32 anime_sprite) const;
+	void RedrawBoat(void) const;
+	void RedrawHeroes(void) const;
+	void RedrawMonster(const u32 anime_sprite) const;
+	void RedrawRoute(void) const;
+	void RedrawGrid(void) const;
 	void CorrectFlags32(const u8 index);
 
     private:

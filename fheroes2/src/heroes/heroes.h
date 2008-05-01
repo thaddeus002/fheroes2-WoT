@@ -188,10 +188,16 @@ public:
 
     MP2::object_t GetUnderObject(void) const;
 
+    const Sprite & SpriteHero(const u8 index) const;
+    const Sprite & SpriteFlag(const u8 index) const;
+    bool ReflectSprite(void) const;
+    void RedrawAllDependentTiles(void) const;
+
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
 
 protected:
+    void MoveNextAnimation(void);
     void ActionToCastle(const u16 dst_index);
     void ActionToHeroes(const u16 dst_index);
     void ActionToMonster(const u16 dst_index);
