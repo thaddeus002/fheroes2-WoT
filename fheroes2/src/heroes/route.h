@@ -30,28 +30,36 @@ namespace Route
 {
     struct Step
     {
-	Step() : to_index(MAXU16), penalty(MAXU16) {};
-	Step(const u16 t, const u16 p) : to_index(t), penalty(p) {};
+	Step() : to_index(MAXU16), penalty(MAXU16), green_color(false) {};
+	Step(const u16 t, const u16 p) : to_index(t), penalty(p), green_color(false) {};
 
 	const u16 to_index;
 	const u16 penalty;
+	bool green_color;
     };
 
-    class Path : public std::list<Step>
+    class Path : protected std::list<Step>
     {
 	public:
 	    Path(const Heroes & h);
 
 	    void	DestinationIndex(u16 index){ dst = index; };
 	    u16		GetDestinationIndex(void) const{ return dst; };
+	    u16		GetFrontIndex(void) const{ return size() ? front().to_index : 0; };
+	    u16		GetFrontPenalty(void) const{ return size() ? front().penalty : 0; };
 
 	    u16		Calculate(u16 dst_index);
 
 	    void	Show(void) const;
 	    void	Hide(void) const;
 	    void	Reset(void);
+	    void	Rescan(void);
+	    void	PopFront(void){ pop_front(); };
 
 	    u16		NextToLast(void) const;
+	    bool	isValid(void) const;
+	    bool	EnableMove(void) const;
+	    u32		TotalPenalty(void) const;
 
 	private:
 	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to);

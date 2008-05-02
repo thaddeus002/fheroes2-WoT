@@ -918,6 +918,7 @@ void Heroes::Recruit(const Castle & castle)
 void Heroes::ActionNewDay(void)
 {
     move_point = GetMaxMovePoints();
+    path.Rescan();
 
     // remove day visit object
     std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isDayLife);
@@ -1075,7 +1076,7 @@ void Heroes::AppendSpellToBook(const Spell::spell_t spell)
 /* return true is move enable */
 bool Heroes::isEnableMove(void) const
 {
-    return enable_move;
+    return enable_move && path.EnableMove();
 }
 
 /* return true isn allow move to dst tile */
@@ -1093,18 +1094,16 @@ void Heroes::SetMove(bool f)
 /* return true is need move */
 bool Heroes::isNeedMove(void) const
 {
-    return path.size() && path.GetDestinationIndex() != Maps::GetIndexFromAbsPoint(mp);
+    return path.isValid() && path.GetDestinationIndex() != Maps::GetIndexFromAbsPoint(mp);
 }
 
 /* move heroes to next path cell */
 void Heroes::MoveNext(void)
 {
-    if(path.empty()) return;
+    if(!path.isValid()) return;
     
-    const Route::Step & step = path.front();
-
     // move point deficiency
-    if(move_point < step.penalty)
+    if(!path.EnableMove())
     {
 	SetMove(false);
 
@@ -1114,7 +1113,7 @@ void Heroes::MoveNext(void)
     MoveNextAnimation();
 
     const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    const u16 index_to = step.to_index;
+    const u16 index_to = path.GetFrontIndex();
 
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
@@ -1135,11 +1134,11 @@ void Heroes::MoveNext(void)
     mp.x = index_to % world.w();
     mp.y = index_to / world.w();
 
-    move_point -= step.penalty;
+    move_point -= path.GetFrontPenalty();
 
-    path.pop_front();
+    path.PopFront();
 
-    path.size() ? path.Show() : path.Reset();
+    path.isValid() ? path.Show() : path.Reset();
 
     tiles_to.RedrawAll();
 
@@ -1157,10 +1156,10 @@ void Heroes::MoveNext(void)
 /* draw move to next cell, return true if end way */
 bool Heroes::Move(void)
 {
-    if(path.empty()) return false;
+    if(!path.isValid()) return false;
 
     const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    const u16 & index_to = path.front().to_index;
+    const u16 & index_to = path.GetFrontIndex();
     const Direction::vector_t direction2 = Direction::Get(index_from, index_to);
 
     if(Direction::UNKNOWN == direction || Direction::CENTER == direction) return false;
@@ -1212,7 +1211,7 @@ void Heroes::ShowPathOrStartMove(const u16 dst_index)
 
 	cursor.Hide();
 
-	if(path.size()) path.Hide();
+	if(path.isValid()) path.Hide();
 
 	path.Calculate(dst_index);
 	path.Show();
@@ -1224,7 +1223,7 @@ void Heroes::ShowPathOrStartMove(const u16 dst_index)
     }
     // start move
     else
-    if(path.size() && move_point >= path.front().penalty)
+    if(path.EnableMove())
     {
 	SetMove(true);
     }

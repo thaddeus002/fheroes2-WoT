@@ -44,6 +44,8 @@ u16 Route::Path::Calculate(u16 dst_index)
 
     dst = dst_index;
 
+    Rescan();
+
     return size();
 }
 
@@ -60,25 +62,15 @@ void Route::Path::Show(void) const
     std::list<Step>::const_iterator it2 = end();
     std::list<Step>::const_iterator it3 = it1;
 
-    u16 move_point = hero.GetMovePoints();
-
-    bool red_sprite = move_point ? false : true;
-
     for(; it1 != it2; ++it1)
     {
 	Maps::Tiles & tile = world.GetTiles((*it1).to_index);
 
 	u16 index = 0;
 
-	if(!red_sprite)
-	{
-	    if(move_point >= (*it1).penalty)	move_point -= (*it1).penalty;
-	    else	red_sprite = true;
-	}
-
 	if(++it3 != it2) index = GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index));
 
-	tile.AddPathSprite(& AGG::GetICN(red_sprite ? ICN::ROUTERED : ICN::ROUTE, index));
+	tile.AddPathSprite(& AGG::GetICN(!(*it1).green_color ? ICN::ROUTERED : ICN::ROUTE, index));
 	tile.RedrawAll();
 
 	from = (*it1).to_index;
@@ -260,4 +252,45 @@ u16 Route::Path::NextToLast(void) const
     std::list<Step>::const_reverse_iterator it = rbegin();
 
     return (*(++it)).to_index;
+}
+
+bool Route::Path::isValid(void) const
+{
+    return size();
+}
+
+bool Route::Path::EnableMove(void) const
+{
+    return size() && front().green_color;
+}
+
+/* total penalty cast */
+u32 Route::Path::TotalPenalty(void) const
+{
+    u32 result = 0;
+
+    std::list<Step>::const_iterator it1 = begin();
+    std::list<Step>::const_iterator it2 = end();
+
+    for(; it1 != it2; ++it1) result += (*it1).penalty;
+
+    return result;
+}
+
+void Route::Path::Rescan(void)
+{
+    // fill green color
+    std::list<Step>::iterator it1 = begin();
+    std::list<Step>::const_iterator it2 = end();
+    u16 move_point = hero.GetMovePoints();
+
+    for(; it1 != it2; ++it1)
+    {
+	if(move_point >= (*it1).penalty)
+	{
+	    move_point -= (*it1).penalty;
+	    (*it1).green_color = true;
+	}
+	else break;
+    }
 }

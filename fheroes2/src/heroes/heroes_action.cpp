@@ -35,9 +35,9 @@
 // action to next cell
 void Heroes::Action(void)
 {
-    if(path.empty()) return;
+    if(! path.isValid()) return;
 
-    const u16 dst_index = path.front().to_index;
+    const u16 dst_index = path.GetFrontIndex();
     const MP2::object_t object = world.GetTiles(dst_index).GetObject();
 
     switch(object)

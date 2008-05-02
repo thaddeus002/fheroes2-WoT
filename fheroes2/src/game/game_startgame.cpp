@@ -312,7 +312,7 @@ Game::menu_t Game::StartGame(void)
 
 		    //Color::color_t human = H2Config::MyColor();
 		    Settings::Get().SetMyColor(color);
-    		    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().size())
+    		    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().isValid())
     		    {
     		        global_focus.GetHeroes().GetPath().Hide();
     		        global_focus.GetHeroes().GetPath().Show();
@@ -1154,7 +1154,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 				FocusToHeroes(hero);
 
 				const Route::Path & path = global_focus.GetHeroes().GetPath();
-				if(path.size())
+				if(path.isValid())
 				{
 				    cursor.Hide();
 				    path.Show();
@@ -1380,7 +1380,8 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
     	    global_focus.GetHeroes().isEnableMove() &&
     	    !(ticket % ANIMATION_LOW))
     	    {
-    		if(1 < global_focus.GetHeroes().GetPath().size()) global_focus.GetHeroes().PlayWalkSound();
+		// FIXME: play sound only if move
+    		if(global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().PlayWalkSound();
 
 		cursor.Hide();
 
