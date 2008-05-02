@@ -408,6 +408,7 @@ void Heroes::ActionToShrine(const u16 dst_index)
     }
 
     AppendSpellToBook(spell);
+    SetVisited(dst_index, Visit::GLOBAL);
 
     if(H2Config::MyColor() == GetColor())
     {
@@ -444,6 +445,7 @@ void Heroes::ActionToWitchsHut(const u16 dst_index)
     }
 
     LearnBasicSkill(skill);
+    SetVisited(dst_index, Visit::GLOBAL);
 
     if(H2Config::MyColor() == GetColor())
     {

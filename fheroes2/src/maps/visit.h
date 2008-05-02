@@ -25,21 +25,22 @@
 #include "mp2.h"
 #include "gamedefs.h"
 
-namespace Maps
+namespace Visit
 {
+    typedef enum { LOCAL, GLOBAL } type_t;
 
-    class VisitIndexObject : public std::pair<u16, MP2::object_t>
+    class IndexObject : public std::pair<u16, MP2::object_t>
     {
 	public:
-	VisitIndexObject();
-	VisitIndexObject(const std::pair<u16, MP2::object_t> & pair);
-	VisitIndexObject(const u16 index, const MP2::object_t object);
-	VisitIndexObject(const Maps::Tiles & tile);
+	IndexObject();
+	IndexObject(const std::pair<u16, MP2::object_t> & pair);
+	IndexObject(const u16 index, const MP2::object_t object);
+	IndexObject(const Maps::Tiles & tile);
 
-	static bool isDayLife(const VisitIndexObject & visit);
-	static bool isWeekLife(const VisitIndexObject & visit);
-	static bool isMonthLife(const VisitIndexObject & visit);
-	static bool isBattleLife(const VisitIndexObject & visit);
+	static bool isDayLife(const IndexObject & visit);
+	static bool isWeekLife(const IndexObject & visit);
+	static bool isMonthLife(const IndexObject & visit);
+	static bool isBattleLife(const IndexObject & visit);
     };
 };
 

@@ -921,26 +921,26 @@ void Heroes::ActionNewDay(void)
     path.Rescan();
 
     // remove day visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isDayLife);
+    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isDayLife);
 }
 
 void Heroes::ActionNewWeek(void)
 {
     // remove week visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isWeekLife);
+    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isWeekLife);
 }
 
 void Heroes::ActionNewMonth(void)
 {
     // remove month visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isMonthLife);
+    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isMonthLife);
 }
 
 
 void Heroes::ActionAfterBattle(void)
 {
     // remove month visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Maps::VisitIndexObject::isBattleLife);
+    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isBattleLife);
 }
 
 u16 Heroes::FindPath(u16 dst_index)
@@ -964,24 +964,28 @@ const Castle* Heroes::inCastle(void) const
 }
 
 /* is visited cell */
-bool Heroes::isVisited(const Maps::Tiles & tile) const
+bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 {
-    std::list<Maps::VisitIndexObject>::const_iterator it1 = visit_object.begin();
-    std::list<Maps::VisitIndexObject>::const_iterator it2 = visit_object.end();
+    if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(tile);
+
+    std::list<Visit::IndexObject>::const_iterator it1 = visit_object.begin();
+    std::list<Visit::IndexObject>::const_iterator it2 = visit_object.end();
 
     const u16 & index = tile.GetIndex();
     const MP2::object_t & object = tile.GetObject();
-                 
-    for(; it1 != it2; ++it1) if(index == (*it1).first && object == (*it2).second) return true;
+
+    for(; it1 != it2; ++it1) if(index == (*it1).first && object == (*it1).second) return true;
 
     return false;
 }
 
 /* return true if object visited */
-bool Heroes::isVisited(const MP2::object_t & object) const
+bool Heroes::isVisited(const MP2::object_t & object, const Visit::type_t type) const
 {
-    std::list<Maps::VisitIndexObject>::const_iterator it1 = visit_object.begin();
-    std::list<Maps::VisitIndexObject>::const_iterator it2 = visit_object.end();
+    if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(object);
+
+    std::list<Visit::IndexObject>::const_iterator it1 = visit_object.begin();
+    std::list<Visit::IndexObject>::const_iterator it2 = visit_object.end();
 
     for(; it1 != it2; ++it1) if((*it1).second == object) return true;
 
@@ -989,15 +993,19 @@ bool Heroes::isVisited(const MP2::object_t & object) const
 }
 
 /* set visited cell */
-void Heroes::SetVisited(const u16 index)
+void Heroes::SetVisited(const u16 index, const Visit::type_t type)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
 
-    if(isVisited(tile)) return;
-
     const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
 
-    if(MP2::OBJ_ZERO != object) visit_object.push_front(Maps::VisitIndexObject(index, object));
+    if(Visit::GLOBAL == type)
+	world.GetKingdom(color).SetVisited(index, object);
+    else
+    if(isVisited(tile))
+	return;
+    else
+    if(MP2::OBJ_ZERO != object) visit_object.push_front(Visit::IndexObject(index, object));
 }
 
 /* return true if artifact present */

@@ -77,6 +77,7 @@
 #include "resource.h"
 #include "gamedefs.h"
 #include "game.h"
+#include "visit.h"
 
 namespace Game { class StatusWindow; };
 class Castle;
@@ -128,6 +129,10 @@ public:
     void ActionNewWeek(void);
     void ActionNewMonth(void);
 
+    void SetVisited(const u16 index, const MP2::object_t & object = MP2::OBJ_ZERO);
+    bool isVisited(const MP2::object_t & object) const;
+    bool isVisited(const Maps::Tiles & tile) const;
+
 private:
     const Color::color_t color;
     Game::control_t control;
@@ -136,6 +141,8 @@ private:
 
     std::vector<Castle *> castles;
     std::vector<Heroes *> heroes;
+
+    std::list<Visit::IndexObject> visit_object;
 };
 
 #endif

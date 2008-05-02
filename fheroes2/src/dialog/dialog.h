@@ -71,7 +71,7 @@ namespace Dialog
     bool SystemOptions(void);
 
     // show info cell maps
-    void QuickInfo(const std::string & object);
+    void QuickInfo(const Maps::Tiles & tile);
     void QuickInfo(const Castle & castle);
     void QuickInfo(const Heroes & heroes);
     

@@ -953,10 +953,6 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 
 		switch(tile.GetObject())
 		{
-		    case MP2::OBJ_MONSTER:
-			Dialog::QuickInfo(Army::String(Army::GetSize(Monster::GetSize(tile))) + " of " + Monster::String(Monster::Monster(tile)));
-		    break;
-
 		    case MP2::OBJN_CASTLE:
 		    case MP2::OBJ_CASTLE:
     		    {
@@ -972,13 +968,8 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 		    }
 		    break;
 
-		    case MP2::OBJ_EVENT:
-		    case MP2::OBJ_ZERO:
-			Dialog::QuickInfo(Maps::Ground::String(tile.GetGround()));
-		    break;
-
 		    default:
-			Dialog::QuickInfo(std::string(MP2::StringObject(tile.GetObject())));
+			Dialog::QuickInfo(tile);
 		    break;
 		}
 	    }

@@ -34,9 +34,14 @@
 #include "display.h"
 #include "sprite.h"
 #include "portrait.h"
+#include "game_focus.h"
+#include "spell.h"
+#include "skill.h"
+#include "world.h"
+#include "settings.h"
 #include "dialog.h"
 
-void Dialog::QuickInfo(const std::string & object)
+void Dialog::QuickInfo(const Maps::Tiles & tile)
 {
     Display & display = Display::Get();
 
@@ -80,9 +85,64 @@ void Dialog::QuickInfo(const std::string & object)
 
     display.Blit(box, pos.x, pos.y);
 
-    u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(object, Font::SMALL)) / 2;
-    u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(object, Font::SMALL)) / 2;
-    Text(object, Font::SMALL, tx, ty);
+    std::string name_object(MP2::StringObject(tile.GetObject()));
+    std::string visit_status;
+    const Settings & settings = Settings::Get();
+
+    switch(tile.GetObject())
+    {
+        case MP2::OBJ_MONSTER:
+            name_object = Army::String(Army::GetSize(Monster::GetSize(tile))) + " of " + Monster::String(Monster::Monster(tile));
+    	    break;
+
+        case MP2::OBJ_EVENT:
+        case MP2::OBJ_ZERO:
+    	    name_object = Maps::Ground::String(tile.GetGround());
+    	    break;
+
+	case MP2::OBJ_GAZEBO:
+	case MP2::OBJ_FOUNTAIN:
+	case MP2::OBJ_FAERIERING:
+	case MP2::OBJ_IDOL:
+	case MP2::OBJ_FORT:
+	case MP2::OBJ_MERCENARYCAMP:
+	case MP2::OBJ_DOCTORHUT:
+	case MP2::OBJ_STANDINGSTONES:
+	case MP2::OBJ_OASIS:
+	case MP2::OBJ_TEMPLE:
+	case MP2::OBJ_BUOY:
+	    // check visited
+	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
+		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile) ? "(already visited)" : "(not visited)";
+	    break;
+
+	case MP2::OBJ_SHRINE1:
+	case MP2::OBJ_SHRINE2:
+	case MP2::OBJ_SHRINE3:
+	    // addons pack
+	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
+		visit_status = "(" + Spell::String(world.SpellFromShrine(tile.GetIndex())) + ")";
+	    break;
+
+	case MP2::OBJ_WITCHSHUT:
+	    // addons pack
+	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
+		visit_status = "(" + Skill::String(world.SkillFromWitchsHut(tile.GetIndex())) + ")";
+	    break;
+
+        default: break;
+    }
+
+    u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(name_object, Font::SMALL)) / 2;
+    u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(name_object, Font::SMALL)) / 2;
+    Text(name_object, Font::SMALL, tx, ty);
+
+    if(visit_status.size())
+    {
+	tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(visit_status, Font::SMALL)) / 2;
+	ty += 15;
+	Text(visit_status, Font::SMALL, tx, ty);
+    }
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

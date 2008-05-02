@@ -172,7 +172,7 @@ void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
 	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
 
     Display & display = Display::Get();

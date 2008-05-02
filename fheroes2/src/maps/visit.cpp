@@ -22,38 +22,38 @@
 #include "maps_tiles.h"
 #include "visit.h"
 
-Maps::VisitIndexObject::VisitIndexObject() : std::pair<u16, MP2::object_t>(MAXU16, MP2::OBJ_ZERO)
+Visit::IndexObject::IndexObject() : std::pair<u16, MP2::object_t>(MAXU16, MP2::OBJ_ZERO)
 {
 }
 
-Maps::VisitIndexObject::VisitIndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair)
+Visit::IndexObject::IndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair)
 {
 }
 
-Maps::VisitIndexObject::VisitIndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object)
+Visit::IndexObject::IndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object)
 {
 }
 
-Maps::VisitIndexObject::VisitIndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject())
+Visit::IndexObject::IndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject())
 {
 }
 
-bool Maps::VisitIndexObject::isDayLife(const VisitIndexObject & visit)
+bool Visit::IndexObject::isDayLife(const Visit::IndexObject & visit)
 {
     return MP2::isDayLife(visit.second);
 }
 
-bool Maps::VisitIndexObject::isWeekLife(const VisitIndexObject & visit)
+bool Visit::IndexObject::isWeekLife(const Visit::IndexObject & visit)
 {
     return MP2::isWeekLife(visit.second);
 }
 
-bool Maps::VisitIndexObject::isMonthLife(const VisitIndexObject & visit)
+bool Visit::IndexObject::isMonthLife(const Visit::IndexObject & visit)
 {
     return MP2::isMonthLife(visit.second);
 }
 
-bool Maps::VisitIndexObject::isBattleLife(const VisitIndexObject & visit)
+bool Visit::IndexObject::isBattleLife(const Visit::IndexObject & visit)
 {
     return MP2::isBattleLife(visit.second);
 }
