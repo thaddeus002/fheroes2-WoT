@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <map>
+#include <cstdlib>
 #include "maps.h"
 #include "world.h"
 #include "direction.h"

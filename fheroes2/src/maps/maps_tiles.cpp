@@ -20,6 +20,7 @@
 
 #include <list>
 #include <iostream>
+#include <algorithm>
 #include "agg.h"
 #include "icn.h"
 #include "tools.h"

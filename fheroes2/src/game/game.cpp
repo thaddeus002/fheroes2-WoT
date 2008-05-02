@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <map>
+#include <cstdlib>
 
 #include "error.h"
 #include "settings.h"

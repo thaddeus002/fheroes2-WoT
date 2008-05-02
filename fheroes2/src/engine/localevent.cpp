@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <sstream>
+#include <ctime>
 #include "error.h"
 #include "display.h"
 #include "localevent.h"
