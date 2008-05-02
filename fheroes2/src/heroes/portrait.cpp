@@ -133,7 +133,19 @@ const Surface & Portrait::Hero(const Heroes::heroes_t hero, const Portrait::size
                 case Heroes::ARCHIBALD:		icn = ICN::PORT0057; break;
                 case Heroes::HALTON:		icn = ICN::PORT0058; break;
                 case Heroes::BAX:		icn = ICN::PORT0059; break;
-                
+
+		case Heroes::SOLMYR:		icn = ICN::PORT0060; break;
+		case Heroes::DAINWIN:		icn = ICN::PORT0061; break;
+		case Heroes::MOG:		icn = ICN::PORT0062; break;
+		case Heroes::UNCLEIVAN:		icn = ICN::PORT0063; break;
+		case Heroes::JOSEPH:		icn = ICN::PORT0064; break;
+		case Heroes::GALLAVANT:		icn = ICN::PORT0065; break;
+		case Heroes::ELDERIAN:		icn = ICN::PORT0066; break;
+		case Heroes::CEALLACH:		icn = ICN::PORT0067; break;
+		case Heroes::DRAKONIA:		icn = ICN::PORT0068; break;
+		case Heroes::MARTINE:		icn = ICN::PORT0069; break;
+		case Heroes::JARKONAS:		icn = ICN::PORT0070; break;
+
                 default: break;
 	    }
 
