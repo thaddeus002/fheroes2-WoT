@@ -161,6 +161,7 @@ public:
 
     const Route::Path & GetPath(void) const{ return path; };
     u16 FindPath(u16 dst_index);
+    u8 GetRangeRouteDays(void) const;
     
     Direction::vector_t GetDirection(void) const{ return direction; };
 

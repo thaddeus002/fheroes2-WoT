@@ -1620,3 +1620,30 @@ void Heroes::RedrawAllDependentTiles(void) const
 	if((redraw & ii) && Maps::isValidDirection(index_from, ii))
 	    world.GetTiles(Maps::GetDirectionIndex(index_from, ii)).RedrawAll();
 }
+
+/* return route range in days */
+u8 Heroes::GetRangeRouteDays(void) const
+{
+    if(path.isValid())
+    {
+	u8 result = 0;
+	s32 total = path.TotalPenalty();
+	const u16 max = GetMaxMovePoints();
+
+	// current day
+	if(move_point > total) return 1;
+	++result;
+	total -= move_point;
+
+	// next days cast
+	while(1)
+	{
+	    ++result;
+
+	    if(max < total) total -= max;
+	    else return result;
+	}
+    }
+
+    return 0;
+}

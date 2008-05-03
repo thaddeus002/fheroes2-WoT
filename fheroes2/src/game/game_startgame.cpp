@@ -44,7 +44,7 @@
 
 namespace Game
 {
-    Cursor::themes_t GetCursor(const Focus & focus, const Maps::Tiles & tile);
+    Cursor::themes_t GetCursor(const Focus & focus, const Maps::Tiles & tile, const u8 days = 0);
     void OpenCastle(Castle *castle);
     void OpenHeroes(Heroes *heroes);
     void FocusToCastle(Castle *castle);
@@ -499,7 +499,7 @@ void Game::FocusToHeroes(Heroes *hero)
 }
 
 /* return changee cursor */
-Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
+Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile, const u8 days)
 {
     switch(focus.Type())
     {
@@ -538,20 +538,50 @@ Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
 			    if(to_hero->GetCenter() == from_hero.GetCenter())
 				return Cursor::HEROES;
 			    else
-				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+				switch(days)
+				{
+				    case 0:
+				    case 1:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+				    case 2:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE2 : Cursor::FIGHT2;
+				    case 3:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE3 : Cursor::FIGHT3;
+				    default:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE4 : Cursor::FIGHT4;
+				}
 			}
     		    }
     		    break;
 
     		    case MP2::OBJ_TREASURECHEST:
-                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT : Cursor::POINTER;
+			switch(days)
+			{
+			    case 0:
+			    case 1:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT : Cursor::POINTER;
+			    case 2:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT2 : Cursor::POINTER;
+			    case 3:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT3 : Cursor::POINTER;
+			    default:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT4 : Cursor::POINTER;
+			}
+			break;
 
 		    case MP2::OBJ_COAST:
-			return Cursor::ANCHOR;
+			switch(days)
+			{
+			    case 0:
+			    case 1:	return Cursor::ANCHOR;
+			    case 2:	return Cursor::ANCHOR2;
+			    case 3:	return Cursor::ANCHOR3;
+			    default:	return Cursor::ANCHOR4;
+			}
+			break;
 
 		    default:
-                        // FIXME: select BOAT cursor or BOAT2 or BOAT3 or BOAT4
-                        return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT : (tile.isPassable() ? Cursor::BOAT : Cursor::POINTER);
+			switch(days)
+			{
+			    case 0:
+			    case 1:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT : (tile.isPassable() ? Cursor::BOAT : Cursor::POINTER);
+			    case 2:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT2 : (tile.isPassable() ? Cursor::BOAT2 : Cursor::POINTER);
+			    case 3:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT3 : (tile.isPassable() ? Cursor::BOAT3 : Cursor::POINTER);
+			    default:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT4 : (tile.isPassable() ? Cursor::BOAT4 : Cursor::POINTER);
+			}
+			break;                        
 		}
 	    }
 	    else
@@ -559,14 +589,30 @@ Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
 		switch(tile.GetObject())
 		{
     		    case MP2::OBJ_MONSTER:
-    			return Cursor::FIGHT;
+			switch(days)
+			{
+			    case 0:
+			    case 1:	return Cursor::FIGHT;
+			    case 2:	return Cursor::FIGHT2;
+			    case 3:	return Cursor::FIGHT3;
+			    default:	return Cursor::FIGHT4;
+			}
+			break;
 
 		    case MP2::OBJN_CASTLE:
     		    {
     			const Castle *castle = world.GetCastle(tile.GetIndex());
 
     			if(NULL != castle)
-    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT;
+			    switch(days)
+			    {
+				case 0:
+				case 1:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT;
+				case 2:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT2;
+				case 3:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT3;
+				default:return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT4;
+			    }
+			    break;
     		    }
     		    break;
 
@@ -575,7 +621,15 @@ Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
     			const Castle *castle = world.GetCastle(tile.GetIndex());
 
     			if(NULL != castle)
-			    return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION : Cursor::FIGHT;
+			    switch(days)
+			    {
+				case 0:
+				case 1:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION : Cursor::FIGHT;
+				case 2:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION2 : Cursor::FIGHT2;
+				case 3:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION3 : Cursor::FIGHT3;
+				default:return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION4 : Cursor::FIGHT4;
+			    }
+			    break;
         	    }
         	    break;
 
@@ -588,20 +642,51 @@ Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile)
 			    if(to_hero->GetCenter() == from_hero.GetCenter())
 				return Cursor::HEROES;
 			    else
-				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+				switch(days)
+				{
+				    case 0:
+				    case 1:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
+				    case 2:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE2 : Cursor::FIGHT2;
+				    case 3:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE3 : Cursor::FIGHT3;
+				    default:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE4 : Cursor::FIGHT4;
+				}
+				break;
 			}
     		    }
     		    break;
 
     		    case MP2::OBJ_BOAT:
-            		return Cursor::BOAT;
+			switch(days)
+			{
+			    case 0:
+			    case 1:	return Cursor::BOAT;
+			    case 2:	return Cursor::BOAT2;
+			    case 3:	return Cursor::BOAT3;
+			    default:	return Cursor::BOAT4;
+			}
+			break;
 
     		    case MP2::OBJ_TREASURECHEST:
-                	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION;
+			switch(days)
+			{
+			    case 0:
+			    case 1:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION;
+			    case 2:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION2;
+			    case 3:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION3;
+			    default:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION4;
+			}
+			break;
 
 		    default:
-                    	// FIXME: select MOVE cursor or MOVE2 or MOVE3 or MOVE4
-			return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION : (tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
+			switch(days)
+			{
+			    case 0:
+			    case 1:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION : (tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
+			    case 2:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION2 : (tile.isPassable() ? Cursor::MOVE2 : Cursor::POINTER);
+			    case 3:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION3 : (tile.isPassable() ? Cursor::MOVE3 : Cursor::POINTER);
+			    default:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION4 : (tile.isPassable() ? Cursor::MOVE4 : Cursor::POINTER);
+			}
+			break;
 		}
 	    }
 	}
@@ -742,6 +827,8 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
     if(message)
         Dialog::Message("", Color::String(myKingdom.GetColor()) + " player's turn", Font::BIG, Dialog::OK);
 
+    u8 route_days = 0;
+
     // startgame loop
     while(le.HandleEvents())
     {
@@ -811,7 +898,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	    const Maps::Tiles & tile = world.GetTiles(index_maps);
 	    const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
 
-	    cursor.SetThemes(GetCursor(global_focus, tile));
+	    cursor.SetThemes(GetCursor(global_focus, tile, route_days));
 
 	    if(le.MouseClickLeft(tile_pos))
 	    {
@@ -863,7 +950,10 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 					mixer.Enhance();
 				    }
 				    else
+				    {
 					from_hero.ShowPathOrStartMove(index_maps);
+					route_days = from_hero.GetRangeRouteDays();
+				    }
     				}
     			    }
     			    break;
@@ -872,7 +962,10 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 
 			    default:
 				if(tile.isPassable() || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
+				{
 				    from_hero.ShowPathOrStartMove(index_maps);
+				    route_days = from_hero.GetRangeRouteDays();
+				}
 			    break;
 			}
 		    }
