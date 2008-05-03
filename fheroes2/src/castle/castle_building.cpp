@@ -20,7 +20,7 @@
 
 #include "agg.h"
 #include "castle.h"
-#include "display.h"
+#include "engine.h"
 #include "sprite.h"
 #include "settings.h"
 #include "cursor.h"
@@ -379,18 +379,24 @@ void Castle::RedrawAnimationBuilding(const Point & dst_pt, const building_t buil
 	sf.Blit(sprite2, sprite2.x() - sprite.x(), sprite2.y() - sprite.y());
     }
 
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    u32 ticket = 0;
     u8 ii = 0;
 
-    while(ii < 250)
+    while(le.HandleEvents() && ii < 250)
     {
-        display.Blit(bg, src_rt);
-        sf.SetAlpha(ii);
-        cursor.Hide();
-        display.Blit(sf, src_rt);
-        cursor.Show();
-        display.Flip();
-        DELAY(80);
-	ii += 10;
+        if(!(ticket % ANIMATION_MEDIUM))
+        {
+    	    display.Blit(bg, src_rt);
+    	    sf.SetAlpha(ii);
+    	    cursor.Hide();
+    	    display.Blit(sf, src_rt);
+	    cursor.Show();
+    	    display.Flip();
+	    ii += 10;
+	}
+
+	++ticket;
     }
 }
 

@@ -1461,8 +1461,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
         // draw heroes movement (in focus)
     	if(Game::Focus::HEROES == global_focus.Type() &&
     	    global_focus.GetHeroes().isNeedMove() && 
-    	    global_focus.GetHeroes().isEnableMove()) // &&
-    	//    !(ticket % ANIMATION_LOW))
+    	    global_focus.GetHeroes().isEnableMove())
     	    {
 		// FIXME: play sound only if move
     		if(global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().PlayWalkSound();
