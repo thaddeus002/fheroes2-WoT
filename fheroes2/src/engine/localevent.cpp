@@ -228,6 +228,7 @@ const Point & LocalEvent::MouseCursor(void)
 {
     int x, y;
 
+    SDL_PumpEvents();
     SDL_GetMouseState(&x, &y);
 
     mouse_cu.x = x;

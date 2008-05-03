@@ -1443,15 +1443,15 @@ void Heroes::MoveNextAnimation(void)
 
     while(le.HandleEvents())
     {
-	cursor.Hide();
-
         // exit
         if(9 == frame) break;
 
         // FIXME: speed animation
         if(!(ticket % ANIMATION_MEDIUM))
         {
-    	    const Sprite & sprite1 = SpriteHero(frame);
+	    cursor.Hide();
+
+	    const Sprite & sprite1 = SpriteHero(frame);
     	    const Sprite & sprite2 = SpriteFlag(frame);
 	    const Maps::Tiles & tile = world.GetTiles(index_from);
 
@@ -1497,9 +1497,8 @@ void Heroes::MoveNextAnimation(void)
     	    display.Blit(sprite2, src_rt2, dst_pt2);
 
 	    tile.RedrawTop();
-
 	    cursor.Show();
-            display.Flip();
+    	    display.Flip();
 
 	    ++frame;
         }
