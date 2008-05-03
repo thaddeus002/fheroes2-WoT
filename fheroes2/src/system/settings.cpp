@@ -50,7 +50,7 @@ bool Settings::Read(const std::string & filename)
 
     while(std::getline(file, str))
     {
-	if(String::Comment(str) || 0 == str.size()) break;
+	if(String::Comment(str) || 0 == str.size()) continue;
 
 	const size_t pos = str.find('=');
 
