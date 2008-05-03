@@ -41,7 +41,7 @@ namespace Maps
 
 	TilesAddon & operator= (const TilesAddon & ta);
 
-	static u16 isRoad(const TilesAddon & ta, u8 direct = 0xFF);
+	static u16 isRoad(const TilesAddon & ta);
 	static bool PredicateSortRules1(const TilesAddon & ta1, const TilesAddon & ta2);
 	static bool PredicateSortRules2(const TilesAddon & ta1, const TilesAddon & ta2);
 

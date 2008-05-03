@@ -63,7 +63,7 @@ bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const M
     return ((ta1.level % 4) < (ta2.level % 4));
 }
 
-u16 Maps::TilesAddon::isRoad(const TilesAddon & ta, u8 direct)
+u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
 {
     switch(ta.object)
     {
@@ -1050,7 +1050,7 @@ bool Maps::Tiles::isPassable(void) const
     std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
     for(; it1 != it2; ++it1)
-    	if((*it1).level == 0 && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
+    	if((*it1).level == 0 && !TilesAddon::isRoad(*it1) && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
 
     if(Game::Focus::Get().GetHeroes().isShipMaster())
     {
@@ -1114,7 +1114,7 @@ bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
-	for(; it1 != it2; ++it1) if(TilesAddon::isRoad(*it1, direct)) return true;
+	for(; it1 != it2; ++it1) if(direct & TilesAddon::isRoad(*it1)) return true;
     }
 
     return false;
