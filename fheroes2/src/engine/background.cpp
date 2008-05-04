@@ -48,6 +48,7 @@ void Background::Save(void)
     if(! Surface::valid()) CreateSurface(*this, DEFAULT_DEPTH, SDL_SWSURFACE);
 
     Blit(Display::Get(), *this, 0, 0);
+    SetDisplayFormat();
 }
 
 void Background::Save(s16 ax, s16 ay)
