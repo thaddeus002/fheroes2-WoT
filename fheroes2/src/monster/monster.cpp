@@ -35,88 +35,88 @@
 namespace Monster {
 
     static const stats_t all_monsters[] = {
-	// monster         atck dfnc shts  min  max   hp             speed grwn  name            file                             walk  idle  pain   die     attpr  att1   att2   att3   
-	{ PEASANT,           1,   1,   0,   1,   1,   1,  Speed::VERYSLOW,  12, "Peasant"        , ICN::PEASANT , ICN::MONH0000, {5, 8, 1, 4, 13, 3, 34, 4, {16, 3, 19, 4, 23, 6, 29, 5}, ANIMATTNONE } },
-	{ ARCHER,            5,   3,  12,   2,   3,  10,  Speed::VERYSLOW,   8, "Archer"         , ICN::ARCHER  , ICN::MONH0001, {5, 8, 1, 4, 13, 3, 45, 6, {16, 4, 20, 4, 24, 4, 28, 4}, {32, 4, 36, 3, 39, 3, 42, 3}} },
-	{ RANGER,            5,   3,  24,   2,   3,  10,   Speed::AVERAGE,   8, "Ranger"         , ICN::ARCHER2 , ICN::MONH0002, {5, 8, 1, 4, 13, 3, 45, 6, {16, 4, 20, 4, 24, 4, 28, 4}, {32, 4, 36, 3, 39, 3, 42, 3}} },
-	{ PIKEMAN,           5,   9,   0,   3,   4,  15,   Speed::AVERAGE,   5, "Pikeman"        , ICN::PIKEMAN , ICN::MONH0003, {5, 8, 1, 4, 13, 4, 30, 6, {1, 1, 17, 3, 20, 4, 24, 6}, ANIMATTNONE } },
-	{ VETERAN_PIKEMAN,   5,   9,   0,   3,   4,  20,      Speed::FAST,   5, "Veteran Pikeman", ICN::PIKEMAN2, ICN::MONH0004, {5, 8, 1, 4, 13, 4, 30, 6, {1, 1, 17, 3, 20, 4, 24, 6}, ANIMATTNONE } },
-	{ SWORDSMAN,         7,   9,   0,   4,   6,  25,   Speed::AVERAGE,   4, "Swordsman"      , ICN::SWORDSMN, ICN::MONH0005, {1, 11, 39, 6, 36, 3, 29, 7, {1, 1, 19, 5, 12, 7, 24, 5}, ANIMATTNONE } },
-	{ MASTER_SWORDSMAN,  7,   9,   0,   4,   6,  30,      Speed::FAST,   4, "Master Swordman", ICN::SWORDSM2, ICN::MONH0006, {1, 11, 39, 6, 36, 3, 29, 7, {1, 1, 19, 5, 12, 7, 24, 5}, ANIMATTNONE } },
-	{ CAVALRY,          10,   9,   0,   5,   9,  30,  Speed::VERYFAST,   3, "Cavalry"        , ICN::CAVALRYR, ICN::MONH0007, {1, 7, 19, 4, 17, 2, 23, 5, {8, 2, 12, 3, 10, 2, 15, 2}, ANIMATTNONE } },
-	{ CHAMPION,         10,   9,   0,   5,  10,  40, Speed::ULTRAFAST,   3, "Champion"       , ICN::CAVALRYB, ICN::MONH0008, {1, 7, 19, 4, 17, 2, 23, 5, {8, 2, 12, 3, 10, 2, 15, 2}, ANIMATTNONE } },
-	{ PALADIN,          11,  12,   0,  10,  20,  50,      Speed::FAST,   2, "Paladin"        , ICN::PALADIN , ICN::MONH0009, {12, 8, 1, 11, 32, 2, 34, 5, {20, 4, 24, 2, 26, 3, 29, 3}, ANIMATTNONE } },
-	{ CRUSADER,         11,  12,   0,  10,  20,  65,  Speed::VERYFAST,   2, "Crusader"       , ICN::PALADIN2, ICN::MONH0010, {12, 8, 1, 11, 32, 2, 34, 5, {20, 4, 24, 2, 26, 3, 29, 3}, ANIMATTNONE } },
+	// fly   wide   monster         atck dfnc shts  min  max   hp             speed grwn  name            file                                            walk  idle  pain   die     attpr  att1   att2   att3   
+	{ false, false, PEASANT,           1,   1,   0,   1,   1,   1,  Speed::VERYSLOW,  12, "Peasant"        , ICN::PEASANT , ICN::MONH0000, ICN::UNKNOWN, {5, 8, 1, 4, 13, 3, 34, 4, {16, 3, 19, 4, 23, 6, 29, 5}, ANIMATTNONE } },
+	{ false, false, ARCHER,            5,   3,  12,   2,   3,  10,  Speed::VERYSLOW,   8, "Archer"         , ICN::ARCHER  , ICN::MONH0001, ICN::ARCH_MSL, {5, 8, 1, 4, 13, 3, 45, 6, {32, 4, 36, 3, 39, 3, 42, 3}, {16, 4, 20, 4, 24, 4, 28, 4} } },
+	{ false, false, RANGER,            5,   3,  24,   2,   3,  10,   Speed::AVERAGE,   8, "Ranger"         , ICN::ARCHER2 , ICN::MONH0002, ICN::ARCH_MSL, {5, 8, 1, 4, 13, 3, 45, 6, {32, 4, 36, 3, 39, 3, 42, 3}, {16, 4, 20, 4, 24, 4, 28, 4} } },
+	{ false, false, PIKEMAN,           5,   9,   0,   3,   4,  15,   Speed::AVERAGE,   5, "Pikeman"        , ICN::PIKEMAN , ICN::MONH0003, ICN::UNKNOWN, {5, 8, 1, 4, 13, 4, 30, 6, {1, 1, 17, 3, 20, 4, 24, 6}, ANIMATTNONE } },
+	{ false, false, VETERAN_PIKEMAN,   5,   9,   0,   3,   4,  20,      Speed::FAST,   5, "Veteran Pikeman", ICN::PIKEMAN2, ICN::MONH0004, ICN::UNKNOWN, {5, 8, 1, 4, 13, 4, 30, 6, {1, 1, 17, 3, 20, 4, 24, 6}, ANIMATTNONE } },
+	{ false, false, SWORDSMAN,         7,   9,   0,   4,   6,  25,   Speed::AVERAGE,   4, "Swordsman"      , ICN::SWORDSMN, ICN::MONH0005, ICN::UNKNOWN, {1, 11, 39, 6, 36, 3, 29, 7, {1, 1, 19, 5, 12, 7, 24, 5}, ANIMATTNONE } },
+	{ false, false, MASTER_SWORDSMAN,  7,   9,   0,   4,   6,  30,      Speed::FAST,   4, "Master Swordman", ICN::SWORDSM2, ICN::MONH0006, ICN::UNKNOWN, {1, 11, 39, 6, 36, 3, 29, 7, {1, 1, 19, 5, 12, 7, 24, 5}, ANIMATTNONE } },
+	{ false, true,  CAVALRY,          10,   9,   0,   5,   9,  30,  Speed::VERYFAST,   3, "Cavalry"        , ICN::CAVALRYR, ICN::MONH0007, ICN::UNKNOWN, {1, 7, 19, 4, 17, 2, 23, 5, {8, 2, 12, 3, 10, 2, 15, 2}, ANIMATTNONE } },
+	{ false, true,  CHAMPION,         10,   9,   0,   5,  10,  40, Speed::ULTRAFAST,   3, "Champion"       , ICN::CAVALRYB, ICN::MONH0008, ICN::UNKNOWN, {1, 7, 19, 4, 17, 2, 23, 5, {8, 2, 12, 3, 10, 2, 15, 2}, ANIMATTNONE } },
+	{ false, false, PALADIN,          11,  12,   0,  10,  20,  50,      Speed::FAST,   2, "Paladin"        , ICN::PALADIN , ICN::MONH0009, ICN::UNKNOWN, {12, 8, 1, 11, 32, 2, 34, 5, {20, 4, 24, 2, 26, 3, 29, 3}, ANIMATTNONE } },
+	{ false, false, CRUSADER,         11,  12,   0,  10,  20,  65,  Speed::VERYFAST,   2, "Crusader"       , ICN::PALADIN2, ICN::MONH0010, ICN::UNKNOWN, {12, 8, 1, 11, 32, 2, 34, 5, {20, 4, 24, 2, 26, 3, 29, 3}, ANIMATTNONE } },
 
-	// monster         atck dfnc shts  min  max   hp             speed grwn  name            file
-	{ GOBLIN,            3,   1,   0,   1,   2,   3,   Speed::AVERAGE,  10, "Goblin"         , ICN::GOBLIN  , ICN::MONH0011, {1, 9, 33, 7, 25, 3, 28, 5, {10, 3, 17, 4, 13, 4, 21, 4}, ANIMATTNONE } },
-	{ ORC,               3,   4,   8,   2,   3,  10,  Speed::VERYSLOW,   8, "Orc"            , ICN::ORC     , ICN::MONH0012, {5, 8, 1, 4, 13, 3, 40, 4, {1, 1, 16, 12, 16, 12, 16, 12}, {28, 2, 30, 3, 33, 3, 36, 4} } },
-	{ CHIEF_ORC,         3,   4,  16,   3,   4,  15,      Speed::SLOW,   8, "Orc Chief"      , ICN::ORC2    , ICN::MONH0013, {5, 8, 1, 4, 13, 3, 40, 4, {1, 1, 16, 12, 16, 12, 16, 12}, {28, 2, 30, 3, 33, 3, 36, 4} } },
-	{ WOLF,              6,   2,   0,   3,   5,  20,  Speed::VERYFAST,   5, "Wolf"           , ICN::WOLF    , ICN::MONH0014, {7, 6, 20, 6, 13, 4, 26, 7, {1, 3, 4, 3, 4, 3, 17, 3}, ANIMATTNONE } },
-	{ OGRE,              9,   5,   0,   4,   6,  40,  Speed::VERYSLOW,   4, "Ogre"           , ICN::OGRE    , ICN::MONH0015, {5, 8, 1, 4, 13, 3, 37, 4, {1, 1, 16, 6, 22, 7, 29, 8}, ANIMATTNONE } },
-	{ LORD_OGRE,         9,   5,   0,   5,   7,  60,   Speed::AVERAGE,   4, "Ogre Lord"      , ICN::OGRE2   , ICN::MONH0016, {5, 8, 1, 4, 13, 3, 37, 4, {1, 1, 16, 6, 22, 7, 29, 8}, ANIMATTNONE } },
-	{ TROLL,            10,   5,   8,   5,   7,  40,   Speed::AVERAGE,   3, "Troll"          , ICN::TROLL   , ICN::MONH0017, {1, 15, 16, 7, 53, 3, 56, 10, {34, 14, 23, 6, 23, 6, 29, 5}, {1, 1, 48, 5, 48, 5, 48, 5} } },
-	{ WAR_TROLL,        10,   5,  16,   7,   9,  40,      Speed::FAST,   3, "War Troll"      , ICN::TROLL2  , ICN::MONH0018, {1, 15, 16, 7, 53, 3, 56, 10, {34, 14, 23, 6, 23, 6, 29, 5}, {1, 1, 48, 5, 48, 5, 48, 5} } },
-	{ CYCLOPS,          12,   9,   0,  12,  24,  80,      Speed::FAST,   2, "Cyclops"        , ICN::CYCLOPS , ICN::MONH0019, {1, 7, 30, 9, 23, 2, 25, 5, {1, 1, 13, 5, 8, 5, 18, 5}, ANIMATTNONE } },
+	// fly   wide   monster         atck dfnc shts  min  max   hp             speed grwn  name            file
+	{ false, false, GOBLIN,            3,   1,   0,   1,   2,   3,   Speed::AVERAGE,  10, "Goblin"         , ICN::GOBLIN  , ICN::MONH0011, ICN::UNKNOWN, {1, 9, 33, 7, 25, 3, 28, 5, {10, 3, 17, 4, 13, 4, 21, 4}, ANIMATTNONE } },
+	{ false, false, ORC,               3,   4,   8,   2,   3,  10,  Speed::VERYSLOW,   8, "Orc"            , ICN::ORC     , ICN::MONH0012, ICN::ORC__MSL, {5, 8, 1, 4, 13, 3, 40, 4, {28, 2, 30, 3, 33, 3, 36, 4}, {1, 1, 16, 12, 16, 12, 16, 12} } },
+	{ false, false, CHIEF_ORC,         3,   4,  16,   3,   4,  15,      Speed::SLOW,   8, "Orc Chief"      , ICN::ORC2    , ICN::MONH0013, ICN::ORC__MSL, {5, 8, 1, 4, 13, 3, 40, 4, {28, 2, 30, 3, 33, 3, 36, 4}, {1, 1, 16, 12, 16, 12, 16, 12} } },
+	{ false, true,  WOLF,              6,   2,   0,   3,   5,  20,  Speed::VERYFAST,   5, "Wolf"           , ICN::WOLF    , ICN::MONH0014, ICN::UNKNOWN, {7, 6, 20, 6, 13, 4, 26, 7, {1, 3, 4, 3, 4, 3, 17, 3}, ANIMATTNONE } },
+	{ false, false, OGRE,              9,   5,   0,   4,   6,  40,  Speed::VERYSLOW,   4, "Ogre"           , ICN::OGRE    , ICN::MONH0015, ICN::UNKNOWN, {5, 8, 1, 4, 13, 3, 37, 4, {1, 1, 16, 6, 22, 7, 29, 8}, ANIMATTNONE } },
+	{ false, false, LORD_OGRE,         9,   5,   0,   5,   7,  60,   Speed::AVERAGE,   4, "Ogre Lord"      , ICN::OGRE2   , ICN::MONH0016, ICN::UNKNOWN, {5, 8, 1, 4, 13, 3, 37, 4, {1, 1, 16, 6, 22, 7, 29, 8}, ANIMATTNONE } },
+	{ false, false, TROLL,            10,   5,   8,   5,   7,  40,   Speed::AVERAGE,   3, "Troll"          , ICN::TROLL   , ICN::MONH0017, ICN::TROLLMSL, {1, 15, 16, 7, 53, 3, 56, 10, {1, 1, 48, 5, 48, 5, 48, 5}, {34, 14, 23, 6, 23, 6, 29, 5} } },
+	{ false, false, WAR_TROLL,        10,   5,  16,   7,   9,  40,      Speed::FAST,   3, "War Troll"      , ICN::TROLL2  , ICN::MONH0018, ICN::TROLLMSL, {1, 15, 16, 7, 53, 3, 56, 10, {1, 1, 48, 5, 48, 5, 48, 5}, {34, 14, 23, 6, 23, 6, 29, 5} } },
+	{ false, false, CYCLOPS,          12,   9,   0,  12,  24,  80,      Speed::FAST,   2, "Cyclops"        , ICN::CYCLOPS , ICN::MONH0019, ICN::UNKNOWN, {1, 7, 30, 9, 23, 2, 25, 5, {1, 1, 13, 5, 8, 5, 18, 5}, ANIMATTNONE } },
 
-	// monster        atck dfnc shts  min  max   hp             speed grwn  name            file
-	{ SPRITE,            4,   2,   0,   1,   2,   2,   Speed::AVERAGE,   8, "Sprite"         , ICN::SPRITE  , ICN::MONH0020, {1, 8, 16, 9, 9, 2, 11, 5, {25, 1, 31, 5, 26, 5, 36, 5}, ANIMATTNONE } },
-	{ DWARF,             6,   5,   0,   2,   4,  20,  Speed::VERYSLOW,   6, "Dwarf"          , ICN::DWARF   , ICN::MONH0021, {1, 9, 45, 4, 38, 7, 49, 7, {1, 1, 19, 8, 10, 9, 27, 11 }, ANIMATTNONE } },
-	{ BATTLE_DWARF,      6,   6,   0,   2,   4,  20,   Speed::AVERAGE,   6, "Battle Dwarf"   , ICN::DWARF2  , ICN::MONH0022, {1, 9, 45, 4, 38, 7, 49, 7, {1, 1, 19, 8, 10, 9, 27, 11 }, ANIMATTNONE } },
-	{ ELF,               4,   3,  24,   2,   3,  15,   Speed::AVERAGE,   4, "Elf"            , ICN::ELF     , ICN::MONH0023, {1, 12, 42, 6, 36, 2, 36, 6, {1, 1, 13, 10, 13, 10, 13, 10}, {23, 3, 26, 3, 29, 4, 33, 3} } },
-	{ GRAND_ELF,         5,   5,  24,   2,   3,  15,  Speed::VERYFAST,   4, "Grand Elf"      , ICN::ELF2    , ICN::MONH0024, {1, 12, 42, 6, 36, 2, 36, 6, {1, 1, 13, 10, 13, 10, 13, 10}, {23, 3, 26, 3, 29, 4, 33, 3} } },
-	{ DRUID,             7,   5,   8,   5,   8,  25,      Speed::FAST,   3, "Druid"          , ICN::DRUID   , ICN::MONH0025, {1, 13, 46, 4, 44, 2, 26, 9, {14, 8, 35, 4, 22, 4, 39, 5}, {14, 8, 35, 4, 22, 4, 39, 5} } },
-	{ GREATER_DRUID,     7,   7,  16,   5,   8,  25,  Speed::VERYFAST,   3, "Greater Druid"  , ICN::DRUID2  , ICN::MONH0026, {1, 13, 46, 4, 44, 2, 26, 9, {14, 8, 35, 4, 22, 4, 39, 5}, {14, 8, 35, 4, 22, 4, 39, 5} } },
-	{ UNICORN,          10,   9,   0,   7,  14,  40,      Speed::FAST,   2, "Unicorn"        , ICN::UNICORN , ICN::MONH0027, {10, 8, 1, 9, 41, 3, 44, 8, {18, 2, 20, 7, 27, 7, 34, 7}, ANIMATTNONE } },
-	{ PHOENIX,          12,  10,   0,  20,  40, 100, Speed::ULTRAFAST,   1, "Phoenix"        , ICN::PHOENIX , ICN::MONH0028, {1, 9, 30, 5, 35, 1, 35, 13, {10, 1, 14, 4, 11, 3, 18, 5 }, ANIMATTNONE } },
+	// fly   wide   monster        atck dfnc shts  min  max   hp             speed grwn  name            file
+	{ true,  false, SPRITE,            4,   2,   0,   1,   2,   2,   Speed::AVERAGE,   8, "Sprite"         , ICN::SPRITE  , ICN::MONH0020, ICN::UNKNOWN, {1, 8, 16, 9, 9, 2, 11, 5, {25, 1, 31, 5, 26, 5, 36, 5}, ANIMATTNONE } },
+	{ false, false, DWARF,             6,   5,   0,   2,   4,  20,  Speed::VERYSLOW,   6, "Dwarf"          , ICN::DWARF   , ICN::MONH0021, ICN::UNKNOWN, {1, 9, 45, 4, 38, 7, 49, 7, {1, 1, 19, 8, 10, 9, 27, 11 }, ANIMATTNONE } },
+	{ false, false, BATTLE_DWARF,      6,   6,   0,   2,   4,  20,   Speed::AVERAGE,   6, "Battle Dwarf"   , ICN::DWARF2  , ICN::MONH0022, ICN::UNKNOWN, {1, 9, 45, 4, 38, 7, 49, 7, {1, 1, 19, 8, 10, 9, 27, 11 }, ANIMATTNONE } },
+	{ false, false, ELF,               4,   3,  24,   2,   3,  15,   Speed::AVERAGE,   4, "Elf"            , ICN::ELF     , ICN::MONH0023, ICN::ELF__MSL, {1, 12, 42, 6, 36, 2, 36, 6, {23, 3, 26, 3, 29, 4, 33, 3}, {1, 1, 13, 10, 13, 10, 13, 10} } },
+	{ false, false, GRAND_ELF,         5,   5,  24,   2,   3,  15,  Speed::VERYFAST,   4, "Grand Elf"      , ICN::ELF2    , ICN::MONH0024, ICN::ELF__MSL, {1, 12, 42, 6, 36, 2, 36, 6, {23, 3, 26, 3, 29, 4, 33, 3}, {1, 1, 13, 10, 13, 10, 13, 10} } },
+	{ false, false, DRUID,             7,   5,   8,   5,   8,  25,      Speed::FAST,   3, "Druid"          , ICN::DRUID   , ICN::MONH0025, ICN::DRUIDMSL, {1, 13, 46, 4, 44, 2, 26, 9, {14, 8, 35, 4, 22, 4, 39, 5}, {14, 8, 35, 4, 22, 4, 39, 5} } },
+	{ false, false, GREATER_DRUID,     7,   7,  16,   5,   8,  25,  Speed::VERYFAST,   3, "Greater Druid"  , ICN::DRUID2  , ICN::MONH0026, ICN::DRUIDMSL, {1, 13, 46, 4, 44, 2, 26, 9, {14, 8, 35, 4, 22, 4, 39, 5}, {14, 8, 35, 4, 22, 4, 39, 5} } },
+	{ false, true,  UNICORN,          10,   9,   0,   7,  14,  40,      Speed::FAST,   2, "Unicorn"        , ICN::UNICORN , ICN::MONH0027, ICN::UNKNOWN, {10, 8, 1, 9, 41, 3, 44, 8, {18, 2, 20, 7, 27, 7, 34, 7}, ANIMATTNONE } },
+	{ true,  true,  PHOENIX,          12,  10,   0,  20,  40, 100, Speed::ULTRAFAST,   1, "Phoenix"        , ICN::PHOENIX , ICN::MONH0028, ICN::UNKNOWN, {1, 9, 30, 5, 35, 1, 35, 13, {10, 1, 14, 4, 11, 3, 18, 5 }, ANIMATTNONE } },
 
-	// monster         atck dfnc shts  min  max   hp             speed grwn  name            file
-	{ CENTAUR,           3,   1,   8,   1,   2,   5,   Speed::AVERAGE,   8, "Centaur"        , ICN::CENTAUR , ICN::MONH0029, ANIM_NONE },
-	{ GARGOYLE,          4,   7,   0,   2,   3,  15,  Speed::VERYFAST,   6, "Gargoyle"       , ICN::GARGOYLE, ICN::MONH0030, ANIM_NONE },
-	{ GRIFFIN,           6,   6,   0,   3,   5,  25,   Speed::AVERAGE,   4, "Griffin"        , ICN::GRIFFIN , ICN::MONH0031, ANIM_NONE },
-	{ MINOTAUR,          9,   8,   0,   5,  10,  35,   Speed::AVERAGE,   3, "Minotaur"       , ICN::MINOTAUR, ICN::MONH0032, ANIM_NONE },
-	{ KNIGHT_MINOTAUR,   9,   8,   0,   5,  10,  45,  Speed::VERYFAST,   3, "Minotaur King"  , ICN::MINOTAU2, ICN::MONH0033, ANIM_NONE },
-	{ HYDRA,             8,   9,   0,   6,  12,  75,  Speed::VERYSLOW,   2, "Hydra"          , ICN::HYDRA   , ICN::MONH0034, ANIM_NONE },
-	{ GREEN_DRAGON,     12,  12,   0,  25,  50, 200,   Speed::AVERAGE,   1, "Green Dragon"   , ICN::DRAGGREE, ICN::MONH0035, {1, 12, 41, 13, 32, 4, 36, 5, {1, 1, 13, 7, 20, 6, 26, 8}, ANIMATTNONE } },
-	{ RED_DRAGON,       13,  13,   0,  25,  50, 250,      Speed::FAST,   1, "Red Dragon"     , ICN::DRAGRED , ICN::MONH0036, {1, 12, 41, 13, 32, 4, 36, 5, {1, 1, 13, 7, 20, 6, 26, 8}, ANIMATTNONE } },
-	{ BLACK_DRAGON,     14,  14,   0,  25,  50, 300,  Speed::VERYFAST,   1, "Black Dragon"   , ICN::DRAGBLAK, ICN::MONH0037, {1, 12, 41, 13, 32, 4, 36, 5, {1, 1, 13, 7, 20, 6, 26, 8}, ANIMATTNONE } },
+	// fly   wide   monster         atck dfnc shts  min  max   hp             speed grwn  name            file
+	{ false, true,  CENTAUR,           3,   1,   8,   1,   2,   5,   Speed::AVERAGE,   8, "Centaur"        , ICN::CENTAUR , ICN::MONH0029, ICN::ORC__MSL, {1, 7, 64, 7, 58, 4, 46, 9, {1, 1, 38, 4, 34, 4, 42, 4 }, {18, 4, 27, 3, 22, 5, 30, 4} } },
+	{ true,  false, GARGOYLE,          4,   7,   0,   2,   3,  15,  Speed::VERYFAST,   6, "Gargoyle"       , ICN::GARGOYLE, ICN::MONH0030, ICN::UNKNOWN, {5, 7, 1, 4, 12, 3, 27, 5, {1, 1, 15, 4, 19, 4, 23, 4}, ANIMATTNONE } },
+	{ true,  true,  GRIFFIN,           6,   6,   0,   3,   5,  25,   Speed::AVERAGE,   4, "Griffin"        , ICN::GRIFFIN , ICN::MONH0031, ICN::UNKNOWN, {1, 6, 16, 9, 25, 3, 25, 9, {7, 1, 8, 3, 15, 1, 11, 4}, ANIMATTNONE } },
+	{ false, false, MINOTAUR,          9,   8,   0,   5,  10,  35,   Speed::AVERAGE,   3, "Minotaur"       , ICN::MINOTAUR, ICN::MONH0032, ICN::UNKNOWN, {6, 7, 1, 5, 27, 3, 30, 5, {13, 3, 23, 4, 16, 4, 20, 3}, ANIMATTNONE } },
+	{ false, false, KNIGHT_MINOTAUR,   9,   8,   0,   5,  10,  45,  Speed::VERYFAST,   3, "Minotaur King"  , ICN::MINOTAU2, ICN::MONH0033, ICN::UNKNOWN, {6, 7, 1, 5, 27, 3, 30, 5, {13, 3, 23, 4, 16, 4, 20, 3}, ANIMATTNONE } },
+	{ false, false, HYDRA,             8,   9,   0,   6,  12,  75,  Speed::VERYSLOW,   2, "Hydra"          , ICN::HYDRA   , ICN::MONH0034, ICN::UNKNOWN, {1, 8, 28, 15, 16, 6, 22, 6, {1, 1, 9, 7, 9, 7, 9, 7 }, ANIMATTNONE } },
+	{ true,  true,  GREEN_DRAGON,     12,  12,   0,  25,  50, 200,   Speed::AVERAGE,   1, "Green Dragon"   , ICN::DRAGGREE, ICN::MONH0035, ICN::UNKNOWN, {1, 12, 41, 13, 32, 4, 36, 5, {1, 1, 13, 7, 20, 6, 26, 8}, ANIMATTNONE } },
+	{ true,  true,  RED_DRAGON,       13,  13,   0,  25,  50, 250,      Speed::FAST,   1, "Red Dragon"     , ICN::DRAGRED , ICN::MONH0036, ICN::UNKNOWN, {1, 12, 41, 13, 32, 4, 36, 5, {1, 1, 13, 7, 20, 6, 26, 8}, ANIMATTNONE } },
+	{ true,  true,  BLACK_DRAGON,     14,  14,   0,  25,  50, 300,  Speed::VERYFAST,   1, "Black Dragon"   , ICN::DRAGBLAK, ICN::MONH0037, ICN::UNKNOWN, {1, 12, 41, 13, 32, 4, 36, 5, {1, 1, 13, 7, 20, 6, 26, 8}, ANIMATTNONE } },
 
-	// monster         atck dfnc shts  min  max   hp             speed grwn  name            file
-	{ HALFLING,          2,   1,  12,   1,   3,   3,      Speed::SLOW,   8, "Halfling"       , ICN::HALFLING, ICN::MONH0038, ANIM_NONE },
-	{ BOAR,              5,   4,   0,   2,   3,  15,  Speed::VERYFAST,   6, "Boar"           , ICN::BOAR    , ICN::MONH0039, ANIM_NONE },
-	{ IRON_GOLEM,        5,  10,   0,   4,   5,  30,  Speed::VERYSLOW,   4, "Iron Golem"     , ICN::GOLEM   , ICN::MONH0040, ANIM_NONE },
-	{ STEEL_GOLEM,       7,  10,   0,   4,   5,  35,      Speed::SLOW,   4, "Steel Golem"    , ICN::GOLEM2  , ICN::MONH0041, ANIM_NONE },
-	{ ROC,               7,   7,   0,   4,   8,  40,   Speed::AVERAGE,   3, "Roc"            , ICN::ROC     , ICN::MONH0042, ANIM_NONE },
-	{ MAGE,             11,   7,  12,   7,   9,  30,      Speed::FAST,   2, "Mage"           , ICN::MAGE1   , ICN::MONH0043, ANIM_NONE },
-	{ ARCHMAGE,         12,   8,  24,   7,   9,  35,  Speed::VERYFAST,   2, "Archmage"       , ICN::MAGE2   , ICN::MONH0044, ANIM_NONE },
-	{ GIANT,            13,  10,   0,  20,  30, 150,   Speed::AVERAGE,   1, "Giant"          , ICN::TITANBLU, ICN::MONH0045, ANIM_NONE },
-	{ TITAN,            15,  15,  24,  20,  30, 300,  Speed::VERYFAST,   1, "Titan"          , ICN::TITANBLA, ICN::MONH0046, ANIM_NONE },
+	// fly   wide   monster         atck dfnc shts  min  max   hp             speed grwn  name            file
+	{ false, false, HALFLING,          2,   1,  12,   1,   3,   3,      Speed::SLOW,   8, "Halfling"       , ICN::HALFLING, ICN::MONH0038, ICN::HALFLMSL, {5, 8, 1, 4, 13, 4, 37, 4, {1, 1, 29, 3, 32, 3, 35, 2}, {17, 6, 23, 3, 26, 1, 27, 2} } },
+	{ false, true,  BOAR,              5,   4,   0,   2,   3,  15,  Speed::VERYFAST,   6, "Boar"           , ICN::BOAR    , ICN::MONH0039, ICN::UNKNOWN, {5, 8, 1, 4, 13, 3, 24, 5, {16, 1, 17, 2, 19, 3, 22, 2}, ANIMATTNONE } },
+	{ false, false, IRON_GOLEM,        5,  10,   0,   4,   5,  30,  Speed::VERYSLOW,   4, "Iron Golem"     , ICN::GOLEM   , ICN::MONH0040, ICN::UNKNOWN, {1, 12, 34, 6, 32, 2, 26, 6, {13, 3, 16, 3, 19, 4, 23, 3}, ANIMATTNONE } },
+	{ false, false, STEEL_GOLEM,       7,  10,   0,   4,   5,  35,      Speed::SLOW,   4, "Steel Golem"    , ICN::GOLEM2  , ICN::MONH0041, ICN::UNKNOWN, {1, 12, 34, 6, 32, 2, 26, 6, {13, 3, 16, 3, 19, 4, 23, 3}, ANIMATTNONE } },
+	{ true,  true,  ROC,               7,   7,   0,   4,   8,  40,   Speed::AVERAGE,   3, "Roc"            , ICN::ROC     , ICN::MONH0042, ICN::UNKNOWN, {1, 8, 18, 4, 22, 2, 24, 10, {1, 1, 15, 3, 9, 2, 11, 4, }, ANIMATTNONE } },
+	{ false, false, MAGE,             11,   7,  12,   7,   9,  30,      Speed::FAST,   2, "Mage"           , ICN::MAGE1   , ICN::MONH0043, ICN::DRUIDMSL, {43, 8, 1, 7, 8, 4, 12, 6, {27, 2, 34, 3, 29, 5, 37, 6}, {18, 1, 21, 2, 19, 2, 23, 4} } },
+	{ false, false, ARCHMAGE,         12,   8,  24,   7,   9,  35,  Speed::VERYFAST,   2, "Archmage"       , ICN::MAGE2   , ICN::MONH0044, ICN::DRUIDMSL, {43, 8, 1, 7, 8, 4, 12, 6, {27, 2, 34, 3, 29, 5, 37, 6}, {18, 1, 21, 2, 19, 2, 23, 4} } },
+	{ false, false, GIANT,            13,  10,   0,  20,  30, 150,   Speed::AVERAGE,   1, "Giant"          , ICN::TITANBLU, ICN::MONH0045, ICN::UNKNOWN, {7, 7, 1, 6, 29, 3, 32, 6, {1, 1, 19, 5, 14, 5, 24, 5}, ANIMATTNONE } },
+	{ false, false, TITAN,            15,  15,  24,  20,  30, 300,  Speed::VERYFAST,   1, "Titan"          , ICN::TITANBLA, ICN::MONH0046, ICN::TITANMSL, {7, 7, 1, 6, 29, 3, 32, 6, {1, 1, 19, 5, 14, 5, 24, 5}, {1, 1, 45, 5, 38, 6, 50, 6} } },
 
-	// monster         atck dfnc shts  min  max   hp             speed grwn  name            file
-	{ SKELETON,          4,   3,   0,   2,   3,   4,   Speed::AVERAGE,   8, "Skeleton"       , ICN::SKELETON, ICN::MONH0047, ANIM_NONE },
-	{ ZOMBIE,            5,   2,   0,   2,   3,  15,  Speed::VERYSLOW,   6, "Zombie"         , ICN::ZOMBIE  , ICN::MONH0048, ANIM_NONE },
-	{ MUTANT_ZOMBIE,     5,   2,   0,   2,   3,  25,   Speed::AVERAGE,   6, "Mutant Zombie"  , ICN::ZOMBIE2 , ICN::MONH0049, ANIM_NONE },
-	{ MUMMY,             6,   6,   0,   3,   4,  25,   Speed::AVERAGE,   4, "Mummy"          , ICN::MUMMYW  , ICN::MONH0050, ANIM_NONE },
-	{ ROYAL_MUMMY,       6,   6,   0,   3,   4,  30,      Speed::FAST,   4, "Royal Mummy"    , ICN::MUMMY2  , ICN::MONH0051, ANIM_NONE },
-	{ VAMPIRE,           8,   6,   0,   5,   7,  30,   Speed::AVERAGE,   3, "Vampire"        , ICN::VAMPIRE , ICN::MONH0052, ANIM_NONE },
-	{ LORD_VAMPIRE,      8,   6,   0,   5,   7,  40,      Speed::FAST,   3, "Lord Vampire"   , ICN::VAMPIRE2, ICN::MONH0053, ANIM_NONE },
-	{ LICH,              7,  12,  12,   8,  10,  25,      Speed::FAST,   2, "Lich"           , ICN::LICH    , ICN::MONH0054, ANIM_NONE },
-	{ POWER_LICH,        7,  13,  24,   8,  10,  35,  Speed::VERYFAST,   2, "Power Lich"     , ICN::LICH2   , ICN::MONH0055, ANIM_NONE },
-	{ BONE_DRAGON,      11,   9,   0,  25,  45, 150,   Speed::AVERAGE,   1, "Bone Dragon"    , ICN::DRAGBONE, ICN::MONH0056, ANIM_NONE },
+	// fly   wide   monster         atck dfnc shts  min  max   hp             speed grwn  name            file
+	{ false, false, SKELETON,          4,   3,   0,   2,   3,   4,   Speed::AVERAGE,   8, "Skeleton"       , ICN::SKELETON, ICN::MONH0047, ICN::UNKNOWN, {1, 11, 35, 4, 25, 3, 28, 7, {1, 1, 20, 5, 12, 4, 16, 4}, ANIMATTNONE } },
+	{ false, false, ZOMBIE,            5,   2,   0,   2,   3,  15,  Speed::VERYSLOW,   6, "Zombie"         , ICN::ZOMBIE  , ICN::MONH0048, ICN::UNKNOWN, {1, 13, 14, 12, 40, 7, 47, 7, {1, 1, 26, 6, 32, 5, 37, 3}, ANIMATTNONE } },
+	{ false, false, MUTANT_ZOMBIE,     5,   2,   0,   2,   3,  25,   Speed::AVERAGE,   6, "Mutant Zombie"  , ICN::ZOMBIE2 , ICN::MONH0049, ICN::UNKNOWN, {1, 13, 14, 12, 40, 7, 47, 7, {1, 1, 26, 6, 32, 5, 37, 3}, ANIMATTNONE } },
+	{ false, false, MUMMY,             6,   6,   0,   3,   4,  25,   Speed::AVERAGE,   4, "Mummy"          , ICN::MUMMYW  , ICN::MONH0050, ICN::UNKNOWN, {5, 12, 1, 4, 17, 4, 30, 10, {1, 1, 21, 3, 24, 3, 27, 3}, ANIMATTNONE } },
+	{ false, false, ROYAL_MUMMY,       6,   6,   0,   3,   4,  30,      Speed::FAST,   4, "Royal Mummy"    , ICN::MUMMY2  , ICN::MONH0051, ICN::UNKNOWN, {5, 12, 1, 4, 17, 4, 30, 10, {1, 1, 21, 3, 24, 3, 27, 3}, ANIMATTNONE } },
+	{ true,  false, VAMPIRE,           8,   6,   0,   5,   7,  30,   Speed::AVERAGE,   3, "Vampire"        , ICN::VAMPIRE , ICN::MONH0052, ICN::UNKNOWN, {5, 8, 1, 4, 13, 2, 28, 8, {1, 1, 15, 4, 19, 4, 23, 5}, ANIMATTNONE } },
+	{ true,  false, LORD_VAMPIRE,      8,   6,   0,   5,   7,  40,      Speed::FAST,   3, "Lord Vampire"   , ICN::VAMPIRE2, ICN::MONH0053, ICN::UNKNOWN, {5, 8, 1, 4, 13, 2, 28, 8, {1, 1, 15, 4, 19, 4, 23, 5}, ANIMATTNONE } },
+	{ false, false, LICH,              7,  12,  12,   8,  10,  25,      Speed::FAST,   2, "Lich"           , ICN::LICH    , ICN::MONH0054, ICN::LICH_MSL, {5, 8, 1, 4, 28, 3, 31, 7, {1, 1, 13, 5, 18, 5, 24, 4}, ANIMATTNONE } },
+	{ false, false, POWER_LICH,        7,  13,  24,   8,  10,  35,  Speed::VERYFAST,   2, "Power Lich"     , ICN::LICH2   , ICN::MONH0055, ICN::LICH_MSL, {5, 8, 1, 4, 28, 3, 31, 7, {1, 1, 13, 5, 18, 5, 24, 4}, ANIMATTNONE } },
+	{ true,  true,  BONE_DRAGON,      11,   9,   0,  25,  45, 150,   Speed::AVERAGE,   1, "Bone Dragon"    , ICN::DRAGBONE, ICN::MONH0056, ICN::UNKNOWN, {1, 12, 22, 7, 20, 2, 29, 12, {1, 1, 48, 4, 13, 3, 16, 4, }, ANIMATTNONE } },
 
-	// monster         atck dfnc shts  min  max   hp            speed grwn  name            file
-	{ ROGUE,             6,   1,   0,   1,   2,   4,      Speed::FAST,   4, "Rogue"          , ICN::ROGUE   , ICN::MONH0057, ANIM_NONE },
-	{ NOMAD,             7,   6,   0,   2,   5,  20,  Speed::VERYFAST,   4, "Nomad"          , ICN::NOMAD   , ICN::MONH0058, ANIM_NONE },
-	{ GHOST,             8,   7,   0,   4,   6,  20,      Speed::FAST,   4, "Ghost"          , ICN::GHOST   , ICN::MONH0059, ANIM_NONE },
-	{ MEDUSA,            8,   9,   0,   6,  10,  35,   Speed::AVERAGE,   4, "Medusa"         , ICN::MEDUSA  , ICN::MONH0060, ANIM_NONE },
-	{ GENIE,            10,   9,   0,  20,  30,  50,  Speed::VERYFAST,   4, "Genie"          , ICN::GENIE   , ICN::MONH0061, ANIM_NONE },
-	{ EARTH_ELEMENT,     8,   8,   0,   4,   5,  50,      Speed::SLOW,   4, "Earth Element"  , ICN::EELEM   , ICN::MONH0062, ANIM_NONE },
-	{ AIR_ELEMENT,       7,   7,   0,   2,   8,  35,  Speed::VERYFAST,   4, "Air Element"    , ICN::AELEM   , ICN::MONH0063, ANIM_NONE },
-	{ FIRE_ELEMENT,      8,   6,   0,   4,   6,  40,      Speed::FAST,   4, "Fire Element"   , ICN::FELEM   , ICN::MONH0064, ANIM_NONE },
-	{ WATER_ELEMENT,     6,   8,   0,   3,   7,  45,   Speed::AVERAGE,   4, "Water Element"  , ICN::WELEM   , ICN::MONH0065, ANIM_NONE },
+	// fly   wide   monster         atck dfnc shts  min  max   hp            speed grwn  name            file
+	{ false, false, ROGUE,             6,   1,   0,   1,   2,   4,      Speed::FAST,   4, "Rogue"          , ICN::ROGUE   , ICN::MONH0057, ICN::UNKNOWN, ANIM_NONE },
+	{ false, true,  NOMAD,             7,   6,   0,   2,   5,  20,  Speed::VERYFAST,   4, "Nomad"          , ICN::NOMAD   , ICN::MONH0058, ICN::UNKNOWN, ANIM_NONE },
+	{ true,  false, GHOST,             8,   7,   0,   4,   6,  20,      Speed::FAST,   4, "Ghost"          , ICN::GHOST   , ICN::MONH0059, ICN::UNKNOWN, ANIM_NONE },
+	{ false, true,  MEDUSA,            8,   9,   0,   6,  10,  35,   Speed::AVERAGE,   4, "Medusa"         , ICN::MEDUSA  , ICN::MONH0060, ICN::UNKNOWN, ANIM_NONE },
+	{ true,  false, GENIE,            10,   9,   0,  20,  30,  50,  Speed::VERYFAST,   4, "Genie"          , ICN::GENIE   , ICN::MONH0061, ICN::UNKNOWN, ANIM_NONE },
+	{ false, false, EARTH_ELEMENT,     8,   8,   0,   4,   5,  50,      Speed::SLOW,   4, "Earth Element"  , ICN::EELEM   , ICN::MONH0062, ICN::UNKNOWN, ANIM_NONE },
+	{ false, false, AIR_ELEMENT,       7,   7,   0,   2,   8,  35,  Speed::VERYFAST,   4, "Air Element"    , ICN::AELEM   , ICN::MONH0063, ICN::UNKNOWN, ANIM_NONE },
+	{ false, false, FIRE_ELEMENT,      8,   6,   0,   4,   6,  40,      Speed::FAST,   4, "Fire Element"   , ICN::FELEM   , ICN::MONH0064, ICN::UNKNOWN, ANIM_NONE },
+	{ false, false, WATER_ELEMENT,     6,   8,   0,   3,   7,  45,   Speed::AVERAGE,   4, "Water Element"  , ICN::WELEM   , ICN::MONH0065, ICN::UNKNOWN, ANIM_NONE },
 	
-	// unknown
-	{ UNKNOWN,           0,   0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Unknown"        , ICN::UNKNOWN , ICN::UNKNOWN, ANIM_NONE }
+	// fly   wide   unknown
+	{ false, false, UNKNOWN,           0,   0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Unknown"        , ICN::UNKNOWN , ICN::UNKNOWN, ICN::UNKNOWN, ANIM_NONE }
     };
 }
 
@@ -154,7 +154,7 @@ Race::race_t Monster::GetRace(monster_t monster)
     return Race::BOMG;
 }
 
-void Monster::GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length, bool altatt)
+void Monster::GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length, bool attranged)
 {
     switch(anim) {
     case Monster::AS_NONE:
@@ -178,20 +178,20 @@ void Monster::GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 
 	length = all_monsters[monster].animation.die_count;
 	break;
     case Monster::AS_ATTPREP:
-	start = altatt ? all_monsters[monster].animation.a2.attprep_start : all_monsters[monster].animation.a1.attprep_start;
-	length = altatt ? all_monsters[monster].animation.a2.attprep_count : all_monsters[monster].animation.a1.attprep_count;
+	start = attranged ? all_monsters[monster].animation.ar.attprep_start : all_monsters[monster].animation.a.attprep_start;
+	length = attranged ? all_monsters[monster].animation.ar.attprep_count : all_monsters[monster].animation.a.attprep_count;
 	break;
     case Monster::AS_ATT1:
-	start = altatt ? all_monsters[monster].animation.a2.attack1_start : all_monsters[monster].animation.a1.attack1_start;
-	length = altatt ? all_monsters[monster].animation.a2.attack1_count : all_monsters[monster].animation.a1.attack1_count;
+	start = attranged ? all_monsters[monster].animation.ar.attack1_start : all_monsters[monster].animation.a.attack1_start;
+	length = attranged ? all_monsters[monster].animation.ar.attack1_count : all_monsters[monster].animation.a.attack1_count;
 	break;
     case Monster::AS_ATT2:
-	start = altatt ? all_monsters[monster].animation.a2.attack2_start : all_monsters[monster].animation.a1.attack2_start;
-	length = altatt ? all_monsters[monster].animation.a2.attack2_count : all_monsters[monster].animation.a1.attack2_count;
+	start = attranged ? all_monsters[monster].animation.ar.attack2_start : all_monsters[monster].animation.a.attack2_start;
+	length = attranged ? all_monsters[monster].animation.ar.attack2_count : all_monsters[monster].animation.a.attack2_count;
 	break;
     case Monster::AS_ATT3:
-	start = altatt ? all_monsters[monster].animation.a2.attack3_start : all_monsters[monster].animation.a1.attack3_start;
-	length = altatt ? all_monsters[monster].animation.a2.attack3_count : all_monsters[monster].animation.a1.attack3_count;
+	start = attranged ? all_monsters[monster].animation.ar.attack3_start : all_monsters[monster].animation.a.attack3_start;
+	length = attranged ? all_monsters[monster].animation.ar.attack3_count : all_monsters[monster].animation.a.attack3_count;
 	break;
     default:
 	start = 1;

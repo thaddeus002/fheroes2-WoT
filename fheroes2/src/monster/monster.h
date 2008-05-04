@@ -137,23 +137,28 @@ namespace Monster
 	u8 pain_count;
 	u8 die_start;
 	u8 die_count;
-	animattack_t a1;
-	animattack_t a2;
+	animattack_t a;
+	animattack_t ar;
     } anim_t;
     
     typedef enum { 
 	AS_NONE=0, 
 	AS_IDLE=1, 
 	AS_WALK=2, 
-	AS_ATTPREP=16, 
 	AS_ATT1=3, 
 	AS_ATT2=4, 
 	AS_ATT3=5, 
 	AS_PAIN=6, 
-	AS_DIE=7 
+	AS_DIE=7, 
+	AS_ATTPREP=16, 
+	AS_ATT1P=16+3,
+	AS_ATT2P=16+4,
+	AS_ATT3P=16+5
     } animstate_t;
 
     typedef struct {
+	bool fly;
+	bool wide;
 	monster_t monster;
 	u8 attack;
 	u8 defence;
@@ -166,6 +171,7 @@ namespace Monster
 	const std::string name;
 	const ICN::icn_t file_icn;
 	const ICN::icn_t monh_icn;
+	const ICN::icn_t miss_icn;
 	anim_t animation;
     } stats_t;
 
@@ -174,7 +180,7 @@ namespace Monster
     u8 GetGrown(monster_t monster);
     Race::race_t GetRace(monster_t monster);
     level_t GetLevel(monster_t monster);
-    void GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length, bool altatt=false);
+    void GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length, bool attranged=false);
 
     monster_t Upgrade(monster_t monster);
     bool AllowUpgrade(monster_t monster);

@@ -75,6 +75,9 @@ namespace Army
 	void SetPosition(const Point & pt) { pos = pt; };
 	const Point& Position() const { return pos; };
 
+	void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
+	void Animate(Monster::animstate_t as = Monster::AS_NONE);
+
 	Monster::animstate_t    astate;
 	u16                     aframe;
 

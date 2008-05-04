@@ -122,6 +122,8 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
 	    DrawHero(hero, dst_pt, i);
 	    DrawArmy(hero.GetArmy(), dst_pt, false, i);
 	    DrawArmy(army, dst_pt, true, i++);
+	    cursor.Show();
+	    display.Flip();
 	}
 	if(!(++animat%ANIMATION_LOW) && !i) {
 	    DrawBackground(tile, dst_pt);
@@ -129,12 +131,13 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
 	    for(unsigned int i=0; i < army.size(); i++) AnimateMonster(army[i]);
 	    for(unsigned int i=0; i < hero.Army().size(); i++) AnimateMonster(hero.Army()[i]);
 	    DrawArmy(hero.GetArmy(), dst_pt, false);
-	    DrawArmy(army, dst_pt, true);
+	    DrawArmy(army, dst_pt, true);	
+	    cursor.Show();
+	    display.Flip();
 	}
 	le.MousePressLeft(buttonSkip) ? buttonSkip.PressDraw() : buttonSkip.ReleaseDraw();
 	le.MousePressLeft(buttonAuto) ? buttonAuto.PressDraw() : buttonAuto.ReleaseDraw();
 	le.MousePressLeft(buttonSettings) ? buttonSettings.PressDraw() : buttonSettings.ReleaseDraw();
-	display.Flip();
     }
     return false;	
 }
@@ -233,7 +236,6 @@ void Army::DrawArmy(const std::vector<Army::Troops> & army, const Point & dst_pt
 
 void Army::DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect, int animframe)
 {
-    if(H2Config::Debug()) Error::Verbose(Monster::String(troop.Monster()));
     Display & display = Display::Get();
     const Sprite & sp = AGG::GetICN(Monster::GetStats(troop.Monster()).file_icn, animframe<0?troop.aframe:animframe, reflect);
     Point tp = Bf2Scr(troop.Position()) + dst_pt;

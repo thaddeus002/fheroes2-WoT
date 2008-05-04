@@ -234,6 +234,12 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
     
     Dialog::answer_t result = Dialog::ZERO;
         
+    u16 animat = 0;
+    Point anim_rt(pos_rt.x + 100, pos_rt.y + 180);
+    Army::Troops troop(army.Monster(), 0);
+    troop.astate = Monster::AS_NONE;
+    troop.aframe = 0;
+    int animcount=0;
     // dialog menu loop
     while(le.HandleEvents())
     {
@@ -256,6 +262,25 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
     	    // exit
     	    if(le.MouseClickLeft(buttonExit) ||
     		le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
+	}
+	if(!(animat++%ANIMATION_LOW)) {
+	    troop.Animate();
+	    if(troop.astate == Monster::AS_NONE) {
+		switch(animcount) {
+		case 0: troop.Animate(Monster::AS_IDLE),  animcount++; break;
+		case 1: troop.Animate(Monster::AS_WALK),  animcount++; break;
+ 		case 2: troop.Animate(Monster::AS_ATT1P), animcount++; break;
+		case 3: troop.Animate(Monster::AS_WALK),  animcount++; break;
+ 		case 4: troop.Animate(Monster::AS_ATT2P), animcount++; break;
+		case 5: troop.Animate(Monster::AS_WALK),  animcount++; break;
+ 		case 6: troop.Animate(Monster::AS_ATT3P), animcount++; break;
+		case 7: troop.Animate(Monster::AS_PAIN),  animcount++; break;
+ 		case 8: troop.Animate(Monster::AS_PAIN),  animcount++; break;
+ 		case 9: troop.Animate(Monster::AS_DIE),   animcount=0; break;
+		}
+	    }
+	    troop.Blit(anim_rt);
+	    display.Flip();
 	}
 
 	//animeMonster.DrawSprite();

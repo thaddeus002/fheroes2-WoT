@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include "army.h"
+#include "display.h"
+#include "agg.h"
+#include "sprite.h"
 
 const std::string & Army::String(Army::size_t size)
 {
@@ -87,4 +90,38 @@ bool Army::Troops::isValid(void) const
 bool Army::isValid(const Troops & army)
 {
     return army.isValid();
+}
+
+void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
+{
+    Display & display = Display::Get();
+    static Background bg(0,0,0,0);
+    static bool saved = false;
+    if(saved) bg.Restore();
+    const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
+    saved = true;
+    bg.Save(dst_pt.x + sp.x(), dst_pt.y + sp.y(), sp.w(), sp.h());
+    display.Blit(sp, dst_pt.x + sp.x(), dst_pt.y + sp.y());
+}
+
+void Army::Troops::Animate(Monster::animstate_t as)
+{
+    bool ranged = Monster::GetStats(monster).miss_icn != ICN::UNKNOWN;
+    u8 start, count;
+    if(as != Monster::AS_NONE) {
+	astate = as;
+	Monster::GetAnimFrames(monster, as & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : as, start, count, ranged);
+	aframe = start;
+    } else {
+	Monster::GetAnimFrames(monster, astate & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : astate, start, count, ranged);
+	aframe++;
+	if(aframe >= start+count) {
+	    if(astate & Monster::AS_ATTPREP) 
+		astate = (Monster::animstate_t)(astate & ~Monster::AS_ATTPREP);
+	    else
+		astate = Monster::AS_NONE;
+	    Monster::GetAnimFrames(monster, astate, start, count, ranged);
+	    aframe = start;
+	}
+    }
 }
