@@ -930,6 +930,12 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 					splitCastles.Move(selectCastles.GetTopIndex());
 					display.Flip();
 				    }
+				    else
+				    {
+					const u16 castle_center = Maps::GetIndexFromAbsPoint(to_castle->GetCenter());
+					from_hero.ShowPathOrStartMove(castle_center);
+					route_days = from_hero.GetRangeRouteDays();
+				    }
     				}
 			    }
 			    break;
