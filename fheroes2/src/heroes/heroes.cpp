@@ -972,7 +972,8 @@ bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
     std::list<Visit::IndexObject>::const_iterator it2 = visit_object.end();
 
     const u16 & index = tile.GetIndex();
-    const MP2::object_t & object = tile.GetObject();
+    const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
+    //const MP2::object_t & object = tile.GetObject();
 
     for(; it1 != it2; ++it1) if(index == (*it1).first && object == (*it1).second) return true;
 

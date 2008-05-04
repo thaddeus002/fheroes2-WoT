@@ -632,7 +632,7 @@ void Heroes::ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t
     const std::string header(MP2::StringObject(obj));
 
     // check already visited
-    if(isVisited(obj))
+    if(isVisited(world.GetTiles(dst_index)))
     {
 	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
 	return;
@@ -757,7 +757,7 @@ void Heroes::ActionToExperienceObject(const u16 dst_index, const MP2::object_t o
     const std::string header(MP2::StringObject(obj));
 
     // check already visited
-    if(isVisited(obj))
+    if(isVisited(world.GetTiles(dst_index)))
     {
 	if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
 	return;
