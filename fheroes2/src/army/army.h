@@ -75,6 +75,7 @@ namespace Army
 	void SetPosition(const Point & pt) { pos = pt; };
 	const Point& Position() const { return pos; };
 
+	void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
 	void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
 	void Animate(Monster::animstate_t as = Monster::AS_NONE);
 
@@ -86,6 +87,8 @@ namespace Army
         u16			count;
         const Skill::Primary*	master_skill;
 	Point                   pos;
+	Background bg;
+	bool saved;
     };
 
     bool isValid(const Troops & army);

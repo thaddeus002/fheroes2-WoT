@@ -36,29 +36,46 @@
 
 #define CELLW 44
 #define CELLH 42
-#define BFX 88
+#define BFX 86
 #define BFY 108
 
+#define display Display::Get()
+
+#define do_button(b, lf, rt) \
+if(LocalEvent::GetLocalEvent().MousePressLeft(b)) b.PressDraw(); \
+else b.ReleaseDraw(); \
+if(LocalEvent::GetLocalEvent().MouseClickLeft(b)) lf; \
+if(LocalEvent::GetLocalEvent().MousePressRight(b)) rt;
+
+#define do_rbutton(b, lf, rt) \
+if(LocalEvent::GetLocalEvent().MouseClickLeft(b)) { b.isPressed() ? b.ReleaseDraw() : b.PressDraw(); lf; } \
+if(LocalEvent::GetLocalEvent().MousePressRight(b)) rt;
+
 namespace Army {
+    bool O_GRID = false, O_SHADM = false, O_SHADC = false;
     void DrawBackground(const Maps::Tiles & tile, const Point & dst_pt);
     void DrawCaptain(const Race::race_t race, const Point & dst_pt, u16 animframe, bool reflect=false);
-    void DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bool reflect=false);
-    void DrawArmy(const std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect=false, int animframe=-1);
-    void DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect=false, int animframe=-1);
+    Rect DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bool reflect=false);
+    void DrawArmy(std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect=false, int animframe=-1);
+    //void DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect=false, int animframe=-1);
     void InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool reflect=false);
     inline Point Scr2Bf(const Point & pt); // translate coordinate to batle field
     inline Point Bf2Scr(const Point & pt); // translate to screen (offset to frame border)
-    void AnimateMonster(Army::Troops & troop, Monster::animstate_t as = Monster::AS_NONE);
+    //void AnimateMonster(Army::Troops & troop, Monster::animstate_t as = Monster::AS_NONE);
+    void SettingsDialog();
+    void HeroStatus();
+
+    void Temp(int, int, Point);
 }
 
 bool Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
 {
-//CreateBackground(tile);
+    //CreateBackground(tile);
     LocalEvent & le = LocalEvent::GetLocalEvent();
-// dialog menu loop
+    // dialog menu loop
     while(le.HandleEvents())
 	{
-// exit
+	    // exit
 	    if(le.KeyPress(KEY_ESCAPE)) {
 		Display::Get().Fade();
 		return true;
@@ -70,10 +87,10 @@ bool Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
 bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile)
 {
     Cursor & cursor = Cursor::Get();
-    cursor.SetThemes(cursor.POINTER);
+    cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
 
-    Display & display = Display::Get();
+    //Display & display = Display::Get();
     Dialog::FrameBorder frameborder;
 
     const Point dst_pt(frameborder.GetArea().x, frameborder.GetArea().y);
@@ -82,10 +99,10 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
     DrawBackground(tile, dst_pt);
-    DrawHero(hero, dst_pt, 1);
+    const Rect rectHero = DrawHero(hero, dst_pt, 1);
     InitArmyPosition(hero.Army(), false);
     InitArmyPosition(army, false, true);
-    DrawArmy(hero.GetArmy(), dst_pt, false, 1);
+    DrawArmy(hero.Army(), dst_pt, false, 1);
     DrawArmy(army, dst_pt, true, 1);
 
     Button buttonSkip(dst_pt.x + 640-48, dst_pt.y + 480-36, ICN::TEXTBAR, 0, 1);
@@ -117,27 +134,63 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
 	}
 	if(le.KeyPress(KEY_RETURN)) {
 	    DrawBackground(tile, dst_pt);
-	    //display.Blit(AGG::GetICN(ICN::TEXTBAR, i), dst_pt);
+	    display.Blit(AGG::GetICN(ICN::TEXTBAR, i), dst_pt);
 	    army[0].SetCount(i);
 	    DrawHero(hero, dst_pt, i);
-	    DrawArmy(hero.GetArmy(), dst_pt, false, i);
+	    DrawArmy(hero.Army(), dst_pt, false, i);
 	    DrawArmy(army, dst_pt, true, i++);
 	    cursor.Show();
 	    display.Flip();
 	}
+	if(le.KeyPress(SDLK_SPACE)) {
+	    DrawBackground(tile, dst_pt);
+	    Temp(0, 1, dst_pt);
+	    i = 1;
+	    display.Flip();
+	}
+	if(le.KeyPress(SDLK_KP_PLUS)) {
+	    DrawBackground(tile, dst_pt);
+	    Temp(1, 0, dst_pt);
+	    i = 1;
+	    display.Flip();
+	}
+	if(le.KeyPress(SDLK_KP_MINUS)) {
+	    DrawBackground(tile, dst_pt);
+	    Temp(-1, 0, dst_pt);
+	    i = 1;
+	    display.Flip();
+	}
 	if(!(++animat%ANIMATION_LOW) && !i) {
+	    cursor.Hide();
 	    DrawBackground(tile, dst_pt);
 	    DrawHero(hero, dst_pt, 1);
-	    for(unsigned int i=0; i < army.size(); i++) AnimateMonster(army[i]);
-	    for(unsigned int i=0; i < hero.Army().size(); i++) AnimateMonster(hero.Army()[i]);
-	    DrawArmy(hero.GetArmy(), dst_pt, false);
+	    //for(unsigned int i=0; i < army.size(); i++) AnimateMonster(army[i]);
+	    //for(unsigned int i=0; i < hero.Army().size(); i++) AnimateMonster(hero.Army()[i]);
+	    DrawArmy(hero.Army(), dst_pt, false);
 	    DrawArmy(army, dst_pt, true);	
 	    cursor.Show();
 	    display.Flip();
 	}
-	le.MousePressLeft(buttonSkip) ? buttonSkip.PressDraw() : buttonSkip.ReleaseDraw();
-	le.MousePressLeft(buttonAuto) ? buttonAuto.PressDraw() : buttonAuto.ReleaseDraw();
-	le.MousePressLeft(buttonSettings) ? buttonSettings.PressDraw() : buttonSettings.ReleaseDraw();
+	do_button(buttonSkip, {}, {});
+	do_button(buttonAuto, {}, {});
+	do_button(buttonSettings, SettingsDialog(), {});
+	if(le.MouseClickLeft(rectHero)) HeroStatus();
+        if(le.MouseCursor(buttonSkip)) {
+	    statusBar2.ShowMessage("Skip this unit");
+	    cursor.SetThemes(cursor.WAR_POINTER);
+        }else if(le.MouseCursor(buttonAuto)) {
+	    statusBar2.ShowMessage("Auto combat");
+	    cursor.SetThemes(cursor.WAR_POINTER);
+        } else if(le.MouseCursor(buttonSettings)) {
+	    statusBar2.ShowMessage("Customize system options");
+	    cursor.SetThemes(cursor.WAR_POINTER);
+        } else if(le.MouseCursor(rectHero)) {
+	    statusBar2.ShowMessage("Hero's Options");
+	    cursor.SetThemes(cursor.WAR_HELMET);
+	} else {
+	    statusBar2.ShowMessage(" ");
+	    cursor.SetThemes(cursor.WAR_POINTER);
+	}
     }
     return false;	
 }
@@ -161,7 +214,7 @@ bool Army::Battle(std::vector<Army::Troops>& army1, std::vector<Army::Troops> ar
 void Army::DrawBackground(const Maps::Tiles & tile, const Point & dst_pt)
 {
     AGG::PlaySound(M82::PREBATTL);
-    Display & display = Display::Get();
+    //Display & display = Display::Get();
     ICN::icn_t icn;
     bool trees = false;
     u16 index = tile.GetIndex();
@@ -190,12 +243,15 @@ void Army::DrawBackground(const Maps::Tiles & tile, const Point & dst_pt)
 	    return;
 	}
     display.Blit(AGG::GetICN(icn, 0), dst_pt);
-
+    // draw grid
+    if(O_GRID) {
+	// TODO
+    }
 }
 
 void Army::DrawCaptain(const Race::race_t race, const Point & dst_pt, u16 animframe, bool reflect)
 {
-    Display & display = Display::Get();
+    //Display & display = Display::Get();
     ICN::icn_t cap;
     switch(race) {
     case Race::BARB: cap = ICN::CMBTCAPB; break;
@@ -209,9 +265,10 @@ void Army::DrawCaptain(const Race::race_t race, const Point & dst_pt, u16 animfr
     display.Blit(AGG::GetICN(cap, animframe, reflect), dst_pt.x + (reflect?550:0), dst_pt.y + 75);
 }
 
-void Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bool reflect)
+Rect Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bool reflect)
 {
-    Display & display = Display::Get();
+    Rect r;
+    //Display & display = Display::Get();
     ICN::icn_t cap;
     switch(hero.GetRace()) {
     case Race::BARB: cap = ICN::CMBTHROB; break;
@@ -220,50 +277,97 @@ void Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bo
     case Race::SORC: cap = ICN::CMBTHROS; break;
     case Race::WRLK: cap = ICN::CMBTHROW; break;
     case Race::WZRD: cap = ICN::CMBTHROZ; break;
-    default: return;
+    default: return r;
     }
-    display.Blit(AGG::GetICN(cap, animframe, reflect), dst_pt.x + (reflect?550:0), dst_pt.y + 75);
-    display.Blit(AGG::GetICN(ICN::CFLGSMAL, Color::GetIndex(hero.GetColor())), dst_pt.x + (reflect?550:18), dst_pt.y + 80);
+    const Sprite & sp = AGG::GetICN(cap, animframe, reflect);
+    r.x = dst_pt.x + (reflect?550:0);
+    r.y = dst_pt.y + 75;
+    r.w = sp.w();
+    r.h = sp.h();
+    display.Blit(sp, r.x, r.y);
+    ICN::icn_t flag;
+    switch(hero.GetColor()) {
+    case Color::BLUE: flag = ICN::HEROFL00; break;
+    case Color::GREEN: flag = ICN::HEROFL01; break;
+    case Color::RED: flag = ICN::HEROFL02; break;
+    case Color::YELLOW: flag = ICN::HEROFL03; break;
+    case Color::ORANGE: flag = ICN::HEROFL04; break;
+    case Color::PURPLE: flag = ICN::HEROFL05; break;
+    case Color::GRAY: flag = ICN::HEROFL06; break;
+    }
+    display.Blit(AGG::GetICN(flag, animframe), dst_pt.x + (reflect?550:18), dst_pt.y + 80);
+    return r;
 }
 
-void Army::DrawArmy(const std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect, int animframe)
+void Army::DrawArmy(std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect, int animframe)
 {
-    for(std::vector<Army::Troops>::const_iterator it = army.begin(); it != army.end(); it++) {
-	if(it->Monster() < Monster::UNKNOWN)
-	    DrawMonster(*it, dst_pt, reflect, animframe);
+    //Display & display = Display::Get();
+    for(unsigned int i=0; i < army.size(); i++) {
+	//for(std::vector<Army::Troops>::const_iterator it = army.begin(); it != army.end(); it++) {
+	if(army[i].Monster() < Monster::UNKNOWN) {
+	    //DrawMonster(*it, dst_pt, reflect, animframe);
+	    army[i].Animate();
+	    if(army[i].astate == Monster::AS_NONE && !Rand::Get(0, 30))
+		army[i].Animate(Monster::AS_IDLE);
+	    
+	    Point tp = Bf2Scr(army[i].Position()) + dst_pt;
+	    army[i].Blit(tp, reflect, animframe);
+	    // draw count
+	    int offset = Monster::GetStats(army[i].Monster()).wide ? CELLW : 0;
+	    tp.x += reflect ? -10 - offset : 10 + offset;
+	    tp.y -= 10;
+	    // TODO color
+	    u16 ind = 10;  // blue
+	    // ind = 11;  // blue 2
+	    // ind = 12;  // green
+	    // ind = 13;  // yellow
+	    // ind = 14;  // red
+	    display.Blit(AGG::GetICN(ICN::TEXTBAR, ind), tp);
+	    std::string str;
+	    int count = army[i].Count();
+	    if(count < 1000)
+		String::AddInt(str, count);
+	    else if(count < 1000000)
+		String::AddInt(str, count / 1000), str += "K";
+	    else 
+		String::AddInt(str, count / 1000000), str += "M";
+	    tp.x += 10 - Text::width(str, Font::SMALL) / 2;
+	    tp.y -= 1;
+	    Text(str, Font::SMALL, tp);
+	}
     }
 }
 
-void Army::DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect, int animframe)
-{
-    Display & display = Display::Get();
-    const Sprite & sp = AGG::GetICN(Monster::GetStats(troop.Monster()).file_icn, animframe<0?troop.aframe:animframe, reflect);
-    Point tp = Bf2Scr(troop.Position()) + dst_pt;
-    //tp.y -= sp.h();
-    //Point p(dst_pt.x + BFX + tp.x*CELLW - (tp.y % 2 ? CELLW/2 : 0), dst_pt.y + BFY + tp.y*CELLH - sp.h());
-    display.Blit(sp, tp.x + sp.x(), tp.y + sp.y());
-    // draw count
-    tp.x += reflect ? -10 : sp.w() - 10;
-    tp.y += /*sp.h()*/ - 10;
-    // TODO color
-    u16 ind = 10;  // blue
-    // ind = 11;  // blue 2
-    // ind = 12;  // green
-    // ind = 13;  // yellow
-    // ind = 14;  // red
-    display.Blit(AGG::GetICN(ICN::TEXTBAR, ind), tp);
-    std::string str;
-    int count = troop.Count();
-    if(count < 1000)
-	String::AddInt(str, count);
-    else if(count < 1000000)
-	String::AddInt(str, count / 1000), str += "K";
-    else 
-	String::AddInt(str, count / 1000000), str += "M";
-    tp.x += 10 - Text::width(str, Font::SMALL) / 2;
-    tp.y -= 1;
-    Text(str, Font::SMALL, tp);
-}
+// void Army::DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect, int animframe)
+// {
+//     Display & display = Display::Get();
+//     const Sprite & sp = AGG::GetICN(Monster::GetStats(troop.Monster()).file_icn, animframe<0?troop.aframe:animframe, reflect);
+//     Point tp = Bf2Scr(troop.Position()) + dst_pt;
+//     //tp.y -= sp.h();
+//     //Point p(dst_pt.x + BFX + tp.x*CELLW - (tp.y % 2 ? CELLW/2 : 0), dst_pt.y + BFY + tp.y*CELLH - sp.h());
+//     display.Blit(sp, tp.x + sp.x(), tp.y + sp.y());
+//     // draw count
+//     tp.x += reflect ? -10 : sp.w() - 10;
+//     tp.y += /*sp.h()*/ - 10;
+//     // TODO color
+//     u16 ind = 10;  // blue
+//     // ind = 11;  // blue 2
+//     // ind = 12;  // green
+//     // ind = 13;  // yellow
+//     // ind = 14;  // red
+//     display.Blit(AGG::GetICN(ICN::TEXTBAR, ind), tp);
+//     std::string str;
+//     int count = troop.Count();
+//     if(count < 1000)
+// 	String::AddInt(str, count);
+//     else if(count < 1000000)
+// 	String::AddInt(str, count / 1000), str += "K";
+//     else 
+// 	String::AddInt(str, count / 1000000), str += "M";
+//     tp.x += 10 - Text::width(str, Font::SMALL) / 2;
+//     tp.y -= 1;
+//     Text(str, Font::SMALL, tp);
+// }
 
 void Army::InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool reflect)
 {
@@ -290,23 +394,158 @@ inline Point Army::Bf2Scr(const Point & pt)
     return Point(BFX + pt.x*CELLW - (pt.y % 2 ? CELLW/2 : 0), BFY + pt.y*CELLH);
 }
 
-void Army::AnimateMonster(Army::Troops & troop, Monster::animstate_t as)
-{
-    u8 start, count;
-    if(as != Monster::AS_NONE) {
-	troop.astate = as;
-	Monster::GetAnimFrames(troop.Monster(), as & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : as, start, count);
-	troop.aframe = start;
-    } else {
-	Monster::GetAnimFrames(troop.Monster(), troop.astate & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : troop.astate, start, count);
-	troop.aframe++;
-	if(troop.aframe >= start+count) {
-	    if(troop.astate & Monster::AS_ATTPREP) 
-		troop.astate = (Monster::animstate_t)(troop.astate & ~Monster::AS_ATTPREP);
-	    else
-		troop.astate = Rand::Get(0, 30) ? Monster::AS_NONE : Monster::AS_IDLE;
-	    Monster::GetAnimFrames(troop.Monster(), troop.astate, start, count);
-	    troop.aframe = start;
-	}
+// void Army::AnimateMonster(Army::Troops & troop, Monster::animstate_t as)
+// {
+//     u8 start, count;
+//     if(as != Monster::AS_NONE) {
+// 	troop.astate = as;
+// 	Monster::GetAnimFrames(troop.Monster(), as & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : as, start, count);
+// 	troop.aframe = start;
+//     } else {
+// 	Monster::GetAnimFrames(troop.Monster(), troop.astate & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : troop.astate, start, count);
+// 	troop.aframe++;
+// 	if(troop.aframe >= start+count) {
+// 	    if(troop.astate & Monster::AS_ATTPREP) 
+// 		troop.astate = (Monster::animstate_t)(troop.astate & ~Monster::AS_ATTPREP);
+// 	    else
+// 		troop.astate = Rand::Get(0, 30) ? Monster::AS_NONE : Monster::AS_IDLE;
+// 	    Monster::GetAnimFrames(troop.Monster(), troop.astate, start, count);
+// 	    troop.aframe = start;
+// 	}
+//     }
+// }
+
+void Army::SettingsDialog()
+{ 
+    //Display & display = Display::Get();
+    const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::CSPANBKE : ICN::CSPANBKG;
+    const ICN::icn_t butt = H2Config::EvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN;
+    const Surface & dialog = AGG::GetICN(sett, 0);
+
+    Rect pos_rt;
+    pos_rt.x = (display.w() - dialog.w()) / 2;
+    pos_rt.y = (display.h() - dialog.h()) / 2;
+    pos_rt.w = dialog.w();
+    pos_rt.h = dialog.h();
+
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+
+    Background back(pos_rt);
+    back.Save();
+
+    display.Blit(dialog, pos_rt.x, pos_rt.y);
+    
+    // 0-2 speed
+    // 3-5 monster info
+    // 6,7 auto spell
+    // 8,9 grid
+    // 10,11 shadow movement
+    // 12,13 shadow cursor
+    Button buttonOK(pos_rt.x + 113, pos_rt.y + 252, butt, 0, 1);
+    Button optGrid(pos_rt.x + 36, pos_rt.y + 157, ICN::CSPANEL, 8, 9);
+    Button optSM(pos_rt.x + 128, pos_rt.y + 157, ICN::CSPANEL, 10, 11);
+    Button optSC(pos_rt.x + 220, pos_rt.y + 157, ICN::CSPANEL, 12, 13);
+    buttonOK.Draw();
+    optGrid.Draw();
+    optSM.Draw();
+    optSC.Draw();
+    if(O_GRID) optGrid.PressDraw();
+    if(O_SHADM) optSM.PressDraw();
+    if(O_SHADC) optSC.PressDraw();
+
+    display.Flip();
+    cursor.Show();
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    // dialog menu loop
+    while(le.HandleEvents()) {
+	// exit
+	if(le.KeyPress(KEY_ESCAPE)) {
+	    return;
+	}	
+	do_button(buttonOK, return, {});
+	do_rbutton(optGrid, O_GRID = !O_GRID, {});
+	do_rbutton(optSM, O_SHADM = !O_SHADM, {});
+	do_rbutton(optSC, O_SHADC = !O_SHADC, {});
     }
+}
+
+void Army::HeroStatus()
+{
+    //Display & display = Display::Get();
+    const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
+    const ICN::icn_t butt = ICN::VIEWGEN;
+    const Surface & dialog = AGG::GetICN(sett, 0);
+
+    Rect pos_rt;
+    pos_rt.x = (display.w() - dialog.w()) / 2;
+    pos_rt.y = (display.h() - dialog.h()) / 2;
+    pos_rt.w = dialog.w();
+    pos_rt.h = dialog.h();
+
+    Cursor & cursor = Cursor::Get();
+    cursor.SetThemes(cursor.WAR_POINTER);
+    cursor.Hide();
+
+    Background back(pos_rt);
+    back.Save();
+
+    display.Blit(dialog, pos_rt.x, pos_rt.y);
+    
+    Button buttonOK(pos_rt.x + 113, pos_rt.y + 252, butt, 0, 1);
+    buttonOK.Draw();
+
+    display.Flip();
+    cursor.Show();
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    // dialog menu loop
+    while(le.HandleEvents()) {
+	// exit
+	if(le.KeyPress(KEY_ESCAPE)) {
+	    return;
+	}	
+	do_button(buttonOK, return, {});
+    }
+}
+
+void Army::Temp(int dicn, int dindex, Point pt)
+{
+    static int icn=0, index=0;
+    if(dicn) {
+	icn += dicn;
+	index = 0;
+    }
+    index += dindex;
+    if(icn < 0) icn = 0;
+    if(icn >= ICN::UNKNOWN) icn = ICN::UNKNOWN-1;
+    if(index < 0) index = 0;
+    std::string str = ICN::GetString((ICN::icn_t)icn);
+    str += " ";
+    String::AddInt(str, index);
+    str += "-";
+    int dh = 0, x = 0, y = 0;
+    while(1) {
+	const Sprite &sp = AGG::GetICN((ICN::icn_t)icn, index);
+	if(sp.w() == 0 || sp.h() == 0) {
+	    index --;
+	    break;
+	}
+	if(dh < sp.h()) dh = sp.h();
+	if(x + sp.w() > 640) {
+	    x = 0;
+	    y += dh;
+	    if(y + sp.h() > 480) {
+		index --;
+		break;
+	    }
+	    dh = sp.h();
+	}
+	display.Blit(sp, pt.x + x, pt.y + y);
+	x += sp.w();
+	index ++;
+    }
+    String::AddInt(str, index);
+    Text(str, Font::SMALL, pt);
 }

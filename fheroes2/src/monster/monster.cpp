@@ -105,15 +105,15 @@ namespace Monster {
 	{ true,  true,  BONE_DRAGON,      11,   9,   0,  25,  45, 150,   Speed::AVERAGE,   1, "Bone Dragon"    , ICN::DRAGBONE, ICN::MONH0056, ICN::UNKNOWN, {1, 12, 22, 7, 20, 2, 29, 12, {1, 1, 48, 4, 13, 3, 16, 4, }, ANIMATTNONE } },
 
 	// fly   wide   monster         atck dfnc shts  min  max   hp            speed grwn  name            file
-	{ false, false, ROGUE,             6,   1,   0,   1,   2,   4,      Speed::FAST,   4, "Rogue"          , ICN::ROGUE   , ICN::MONH0057, ICN::UNKNOWN, ANIM_NONE },
-	{ false, true,  NOMAD,             7,   6,   0,   2,   5,  20,  Speed::VERYFAST,   4, "Nomad"          , ICN::NOMAD   , ICN::MONH0058, ICN::UNKNOWN, ANIM_NONE },
-	{ true,  false, GHOST,             8,   7,   0,   4,   6,  20,      Speed::FAST,   4, "Ghost"          , ICN::GHOST   , ICN::MONH0059, ICN::UNKNOWN, ANIM_NONE },
-	{ false, true,  MEDUSA,            8,   9,   0,   6,  10,  35,   Speed::AVERAGE,   4, "Medusa"         , ICN::MEDUSA  , ICN::MONH0060, ICN::UNKNOWN, ANIM_NONE },
-	{ true,  false, GENIE,            10,   9,   0,  20,  30,  50,  Speed::VERYFAST,   4, "Genie"          , ICN::GENIE   , ICN::MONH0061, ICN::UNKNOWN, ANIM_NONE },
-	{ false, false, EARTH_ELEMENT,     8,   8,   0,   4,   5,  50,      Speed::SLOW,   4, "Earth Element"  , ICN::EELEM   , ICN::MONH0062, ICN::UNKNOWN, ANIM_NONE },
-	{ false, false, AIR_ELEMENT,       7,   7,   0,   2,   8,  35,  Speed::VERYFAST,   4, "Air Element"    , ICN::AELEM   , ICN::MONH0063, ICN::UNKNOWN, ANIM_NONE },
-	{ false, false, FIRE_ELEMENT,      8,   6,   0,   4,   6,  40,      Speed::FAST,   4, "Fire Element"   , ICN::FELEM   , ICN::MONH0064, ICN::UNKNOWN, ANIM_NONE },
-	{ false, false, WATER_ELEMENT,     6,   8,   0,   3,   7,  45,   Speed::AVERAGE,   4, "Water Element"  , ICN::WELEM   , ICN::MONH0065, ICN::UNKNOWN, ANIM_NONE },
+	{ false, false, ROGUE,             6,   1,   0,   1,   2,   4,      Speed::FAST,   4, "Rogue"          , ICN::ROGUE   , ICN::MONH0057, ICN::UNKNOWN, {5, 8, 1, 4, 13, 3, 43, 7, {1, 1, 16, 7, 23, 9, 32, 11}, ANIMATTNONE } },
+	{ false, true,  NOMAD,             7,   6,   0,   2,   5,  20,  Speed::VERYFAST,   4, "Nomad"          , ICN::NOMAD   , ICN::MONH0058, ICN::UNKNOWN, {10, 8, 1, 9, 35, 2, 35, 7, {18, 2, 26, 5, 20, 6, 31, 4}, ANIMATTNONE } },
+	{ true,  false, GHOST,             8,   7,   0,   4,   6,  20,      Speed::FAST,   4, "Ghost"          , ICN::GHOST   , ICN::MONH0059, ICN::UNKNOWN, {1, 9, 1, 9, 20, 1, 20, 6, {10, 1, 11, 3, 14, 2, 16, 4}, ANIMATTNONE } },
+	{ false, true,  MEDUSA,            8,   9,   0,   6,  10,  35,   Speed::AVERAGE,   4, "Medusa"         , ICN::MEDUSA  , ICN::MONH0060, ICN::UNKNOWN, {1, 16, 17, 7, 36, 6, 24, 12, {42, 1, 65, 10, 43, 11, 54, 11}, ANIMATTNONE } },
+	{ true,  false, GENIE,            10,   9,   0,  20,  30,  50,  Speed::VERYFAST,   4, "Genie"          , ICN::GENIE   , ICN::MONH0061, ICN::UNKNOWN, {10, 5, 1, 9, 31, 2, 31, 9, {15, 3, 26, 5, 18, 3, 21, 5}, ANIMATTNONE } },
+	{ false, false, EARTH_ELEMENT,     8,   8,   0,   4,   5,  50,      Speed::SLOW,   4, "Earth Element"  , ICN::EELEM   , ICN::MONH0062, ICN::UNKNOWN, {5, 8, 1, 4, 13, 4, 31, 10, {1, 1, 17, 3, 20, 5, 25, 6}, ANIMATTNONE } },
+	{ false, false, AIR_ELEMENT,       7,   7,   0,   2,   8,  35,  Speed::VERYFAST,   4, "Air Element"    , ICN::AELEM   , ICN::MONH0063, ICN::UNKNOWN, {5, 8, 1, 4, 13, 4, 31, 10, {1, 1, 17, 3, 20, 5, 25, 6}, ANIMATTNONE } },
+	{ false, false, FIRE_ELEMENT,      8,   6,   0,   4,   6,  40,      Speed::FAST,   4, "Fire Element"   , ICN::FELEM   , ICN::MONH0064, ICN::UNKNOWN, {5, 8, 1, 4, 13, 4, 31, 10, {1, 1, 17, 3, 20, 5, 25, 6}, ANIMATTNONE } },
+	{ false, false, WATER_ELEMENT,     6,   8,   0,   3,   7,  45,   Speed::AVERAGE,   4, "Water Element"  , ICN::WELEM   , ICN::MONH0065, ICN::UNKNOWN, {5, 8, 1, 4, 13, 4, 31, 10, {1, 1, 17, 3, 20, 5, 25, 6}, ANIMATTNONE } },
 	
 	// fly   wide   unknown
 	{ false, false, UNKNOWN,           0,   0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Unknown"        , ICN::UNKNOWN , ICN::UNKNOWN, ICN::UNKNOWN, ANIM_NONE }

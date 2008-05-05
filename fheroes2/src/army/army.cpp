@@ -64,7 +64,7 @@ Army::size_t Army::GetSize(u16 count)
     return FEW;
 }
 
-Army::Troops::Troops(const Army::Troops & troops) : monster(troops.Monster()), count(troops.Count()), master_skill(NULL), pos(0,0)
+Army::Troops::Troops(const Army::Troops & troops) : monster(troops.Monster()), count(troops.Count()), master_skill(NULL), pos(0,0), saved(false)
 {
 }
 
@@ -92,12 +92,19 @@ bool Army::isValid(const Troops & army)
     return army.isValid();
 }
 
+void Army::Troops::BlitR(const Point& dst_pt, bool reflect, int frame)
+{
+    Display & display = Display::Get();
+    if(saved) bg.Restore();
+    const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
+    saved = true;
+    bg.Save(dst_pt.x + sp.x(), dst_pt.y + sp.y(), sp.w(), sp.h());
+    display.Blit(sp, dst_pt.x + sp.x(), dst_pt.y + sp.y());
+}
+
 void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
 {
     Display & display = Display::Get();
-    static Background bg(0,0,0,0);
-    static bool saved = false;
-    if(saved) bg.Restore();
     const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
     saved = true;
     bg.Save(dst_pt.x + sp.x(), dst_pt.y + sp.y(), sp.w(), sp.h());

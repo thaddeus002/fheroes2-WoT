@@ -239,6 +239,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
     Army::Troops troop(army.Monster(), 0);
     troop.astate = Monster::AS_NONE;
     troop.aframe = 0;
+    troop.Blit(anim_rt);
     int animcount=0;
     // dialog menu loop
     while(le.HandleEvents())
@@ -279,7 +280,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
  		case 9: troop.Animate(Monster::AS_DIE),   animcount=0; break;
 		}
 	    }
-	    troop.Blit(anim_rt);
+	    troop.BlitR(anim_rt);
 	    display.Flip();
 	}
 
