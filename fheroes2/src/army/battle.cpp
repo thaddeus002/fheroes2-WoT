@@ -33,6 +33,7 @@
 #include "error.h"
 #include "tools.h"
 #include "rand.h"
+#include "portrait.h"
 
 #define CELLW 44
 #define CELLH 42
@@ -40,19 +41,24 @@
 #define BFY 108
 
 #define display Display::Get()
+#define le LocalEvent::GetLocalEvent()
+#define cursor Cursor::Get()
 
 #define do_button(b, lf, rt) \
-if(LocalEvent::GetLocalEvent().MousePressLeft(b)) b.PressDraw(); \
+if(le.MousePressLeft(b)) b.PressDraw();	\
 else b.ReleaseDraw(); \
-if(LocalEvent::GetLocalEvent().MouseClickLeft(b)) lf; \
-if(LocalEvent::GetLocalEvent().MousePressRight(b)) rt;
+if(le.MouseClickLeft(b) && !b.isDisable()) lf; \
+if(le.MousePressRight(b)&& !b.isDisable()) rt;
 
 #define do_rbutton(b, lf, rt) \
-if(LocalEvent::GetLocalEvent().MouseClickLeft(b)) { b.isPressed() ? b.ReleaseDraw() : b.PressDraw(); lf; } \
-if(LocalEvent::GetLocalEvent().MousePressRight(b)) rt;
+if(le.MouseClickLeft(b) && !b.isDisable()) { b.isPressed() ? b.ReleaseDraw() : b.PressDraw(); lf; } \
+if(le.MousePressRight(b) && !b.isDisable()) rt;
 
 namespace Army {
-    bool O_GRID = false, O_SHADM = false, O_SHADC = false;
+    bool O_GRID = false, O_SHADM = false, O_SHADC = false, O_AUTO = false;
+    battle_t BattleInt(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile);
+    battle_t HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile, int troopN);
+    battle_t CompTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile, int troopN);
     void DrawBackground(const Maps::Tiles & tile, const Point & dst_pt);
     void DrawCaptain(const Race::race_t race, const Point & dst_pt, u16 animframe, bool reflect=false);
     Rect DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bool reflect=false);
@@ -63,30 +69,29 @@ namespace Army {
     inline Point Bf2Scr(const Point & pt); // translate to screen (offset to frame border)
     //void AnimateMonster(Army::Troops & troop, Monster::animstate_t as = Monster::AS_NONE);
     void SettingsDialog();
-    void HeroStatus();
+    battle_t HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool quickshow, bool cansurrender=false, bool locked=false);
 
     void Temp(int, int, Point);
 }
 
-bool Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
+Army::battle_t Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
 {
-    //CreateBackground(tile);
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-    // dialog menu loop
-    while(le.HandleEvents())
-	{
-	    // exit
-	    if(le.KeyPress(KEY_ESCAPE)) {
-		Display::Get().Fade();
-		return true;
-	    }	
-	}
-    return false;	
+    return BattleInt(&hero1, &hero2, hero1.Army(), hero2.Army(), tile);
 }
 
-bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile)
+Army::battle_t Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile)
 {
-    Cursor & cursor = Cursor::Get();
+    return BattleInt(&hero, 0, hero.Army(), army, tile);
+}
+
+Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile)
+{
+    return LOSE; // TODO
+}
+
+Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile)
+{
+    //Cursor & cursor = Cursor::Get();
     cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
 
@@ -99,11 +104,12 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
     DrawBackground(tile, dst_pt);
-    const Rect rectHero = DrawHero(hero, dst_pt, 1);
-    InitArmyPosition(hero.Army(), false);
-    InitArmyPosition(army, false, true);
-    DrawArmy(hero.Army(), dst_pt, false, 1);
-    DrawArmy(army, dst_pt, true, 1);
+    if(hero1) DrawHero(*hero1, dst_pt, 1);
+    if(hero2) DrawHero(*hero2, dst_pt, 1);
+    InitArmyPosition(army1, false);
+    InitArmyPosition(army2, false, true);
+    DrawArmy(army1, dst_pt, false, 1);
+    DrawArmy(army2, dst_pt, true, 1);
 
     Button buttonSkip(dst_pt.x + 640-48, dst_pt.y + 480-36, ICN::TEXTBAR, 0, 1);
     Button buttonAuto(dst_pt.x, dst_pt.y + 480-36, ICN::TEXTBAR, 4, 5);
@@ -114,7 +120,89 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
     Dialog::StatusBar statusBar2(Point(dst_pt.x + 48, dst_pt.y + 480-18), AGG::GetICN(ICN::TEXTBAR, 9), Font::BIG);
     statusBar2.Clear(" ");
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    //LocalEvent & le = LocalEvent::GetLocalEvent();
+    
+    buttonSkip.Draw();
+    buttonAuto.Draw();
+    buttonSettings.Draw();
+
+    display.Flip();
+
+    while(1) {
+	if(hero1) hero1->spellCasted = false;
+	if(hero2) hero2->spellCasted = false;
+	Speed::speed_t cursp = Speed::INSTANT;
+	while(1) {
+	    for(unsigned int i=0; i < army1.size(); i++) {
+		if(Monster::GetStats(army1[i].Monster()).speed == cursp && army1[i].Count() > 0) {
+		    battle_t s;
+		    if(hero1 && World::GetWorld().GetKingdom(hero1->GetColor()).Control() == Game::Human && !O_AUTO) {
+			s = HumanTurn(hero1, hero2, army1, army2, tile, i);
+			if( s == RETREAT || s == SURRENDER) return s;
+		    } else {
+			s = CompTurn(hero1, hero2, army1, army2, tile, i);
+			if( s == RETREAT || s == SURRENDER) return s;
+		    }
+		}
+	    }
+	    for(unsigned int i=0; i < army2.size(); i++) {
+		if(Monster::GetStats(army2[i].Monster()).speed == cursp && army2[i].Count() > 0) {
+		    battle_t s;
+		    if(hero2 && World::GetWorld().GetKingdom(hero2->GetColor()).Control() == Game::Human && !O_AUTO) {
+			s = HumanTurn(hero1, hero2, army1, army2, tile, -i-1);
+			if(s == RETREAT || s == SURRENDER) return WIN;
+		    } else {
+			s = CompTurn(hero1, hero2, army1, army2, tile, -i-1);
+			if(s == RETREAT || s == SURRENDER) return WIN;
+		    }
+		}
+	    }
+	    int c1 = 0, c2 = 0;
+	    for(unsigned int i=0; i < army1.size(); i++) c1 += army1[i].Count();
+	    for(unsigned int i=0; i < army2.size(); i++) c2 += army2[i].Count();
+	    if(c1 <= 0) return LOSE;
+	    if(c2 <= 0) return WIN;
+	    if(cursp == Speed::CRAWLING) break;
+	    else --cursp;
+	}
+    }
+
+    return WIN;
+}
+
+Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile, int troopN)
+{
+    //Cursor & cursor = Cursor::Get();
+    cursor.SetThemes(cursor.WAR_POINTER);
+    cursor.Hide();
+
+    //Display & display = Display::Get();
+    Dialog::FrameBorder frameborder;
+
+    const Point dst_pt(frameborder.GetArea().x, frameborder.GetArea().y);
+    //Point dst_pt(cur_pt);
+
+    display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
+
+    DrawBackground(tile, dst_pt);
+    Rect rectHero1, rectHero2;
+    if(hero1) rectHero1 = DrawHero(*hero1, dst_pt, 1);
+    if(hero2) rectHero2 = DrawHero(*hero2, dst_pt, 1);
+    InitArmyPosition(army1, false);
+    InitArmyPosition(army2, false, true);
+    DrawArmy(army1, dst_pt, false, 1);
+    DrawArmy(army2, dst_pt, true, 1);
+
+    Button buttonSkip(dst_pt.x + 640-48, dst_pt.y + 480-36, ICN::TEXTBAR, 0, 1);
+    Button buttonAuto(dst_pt.x, dst_pt.y + 480-36, ICN::TEXTBAR, 4, 5);
+    Button buttonSettings(dst_pt.x, dst_pt.y + 480-18, ICN::TEXTBAR, 6, 7);
+
+    Dialog::StatusBar statusBar1(Point(dst_pt.x + 48, dst_pt.y + 480-36), AGG::GetICN(ICN::TEXTBAR, 8), Font::BIG);
+    statusBar1.Clear(" ");
+    Dialog::StatusBar statusBar2(Point(dst_pt.x + 48, dst_pt.y + 480-18), AGG::GetICN(ICN::TEXTBAR, 9), Font::BIG);
+    statusBar2.Clear(" ");
+
+    //LocalEvent & le = LocalEvent::GetLocalEvent();
     
     buttonSkip.Draw();
     buttonAuto.Draw();
@@ -127,54 +215,66 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
     u16 animat = 0;
     // dialog menu loop
     while(le.HandleEvents()) {
-	// exit
-	if(le.KeyPress(KEY_ESCAPE)) {
-	    Display::Get().Fade();
-	    return true;
-	}
 	if(le.KeyPress(KEY_RETURN)) {
 	    DrawBackground(tile, dst_pt);
-	    display.Blit(AGG::GetICN(ICN::TEXTBAR, i), dst_pt);
-	    army[0].SetCount(i);
-	    DrawHero(hero, dst_pt, i);
-	    DrawArmy(hero.Army(), dst_pt, false, i);
-	    DrawArmy(army, dst_pt, true, i++);
+	    army1[0].SetCount(i);
+	    if(hero1) DrawHero(*hero1, dst_pt, i);
+	    if(hero2) DrawHero(*hero2, dst_pt, i);
+	    DrawArmy(army1, dst_pt, false, i);
+	    DrawArmy(army2, dst_pt, true, i++);
 	    cursor.Show();
 	    display.Flip();
 	}
-	if(le.KeyPress(SDLK_SPACE)) {
-	    DrawBackground(tile, dst_pt);
-	    Temp(0, 1, dst_pt);
-	    i = 1;
-	    display.Flip();
-	}
-	if(le.KeyPress(SDLK_KP_PLUS)) {
-	    DrawBackground(tile, dst_pt);
-	    Temp(1, 0, dst_pt);
-	    i = 1;
-	    display.Flip();
-	}
-	if(le.KeyPress(SDLK_KP_MINUS)) {
-	    DrawBackground(tile, dst_pt);
-	    Temp(-1, 0, dst_pt);
-	    i = 1;
-	    display.Flip();
-	}
+	if(le.KeyPress(SDLK_SPACE)) return WIN;
+// 	if(le.KeyPress(SDLK_SPACE)) {
+// 	    DrawBackground(tile, dst_pt);
+// 	    Temp(0, 1, dst_pt);
+// 	    i = 1;
+// 	    display.Flip();
+// 	}
+// 	if(le.KeyPress(SDLK_KP_PLUS)) {
+// 	    DrawBackground(tile, dst_pt);
+// 	    Temp(1, 0, dst_pt);
+// 	    i = 1;
+// 	    display.Flip();
+// 	}
+// 	if(le.KeyPress(SDLK_KP_MINUS)) {
+// 	    DrawBackground(tile, dst_pt);
+// 	    Temp(-1, 0, dst_pt);
+// 	    i = 1;
+// 	    display.Flip();
+// 	}
 	if(!(++animat%ANIMATION_LOW) && !i) {
 	    cursor.Hide();
 	    DrawBackground(tile, dst_pt);
-	    DrawHero(hero, dst_pt, 1);
-	    //for(unsigned int i=0; i < army.size(); i++) AnimateMonster(army[i]);
-	    //for(unsigned int i=0; i < hero.Army().size(); i++) AnimateMonster(hero.Army()[i]);
-	    DrawArmy(hero.Army(), dst_pt, false);
-	    DrawArmy(army, dst_pt, true);	
+	    if(hero1) DrawHero(*hero1, dst_pt, 1);
+	    if(hero2) DrawHero(*hero2, dst_pt, 1);
+	    DrawArmy(army1, dst_pt, false);
+	    DrawArmy(army2, dst_pt, true);	
 	    cursor.Show();
 	    display.Flip();
 	}
-	do_button(buttonSkip, {}, {});
-	do_button(buttonAuto, {}, {});
+	do_button(buttonSkip, return WIN, {});
+	do_button(buttonAuto, O_AUTO=true, {});
 	do_button(buttonSettings, SettingsDialog(), {});
-	if(le.MouseClickLeft(rectHero)) HeroStatus();
+	if(le.MouseClickLeft(rectHero1)) {
+	    battle_t s = HeroStatus(*hero1, statusBar2, false, hero2, troopN < 0);
+	    if(s == RETREAT) {
+		if(Dialog::Message("", "Are you sure you want to retreat?", Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
+		    return s;
+	    }
+	    if(s == SURRENDER) return s;
+	}
+	if(le.MouseClickLeft(rectHero2)) {
+	    battle_t s = HeroStatus(*hero2, statusBar2, false, hero1, troopN >= 0);
+	    if(s == RETREAT) {
+		if(Dialog::Message("", "Are you sure you want to retreat?", Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
+		    return s;
+	    }
+	    if(s == SURRENDER) return s;
+	}
+	if(le.MousePressRight(rectHero1)) HeroStatus(*hero1, statusBar2, true, false, false);
+	if(le.MousePressRight(rectHero2)) HeroStatus(*hero2, statusBar2, true, false, false);
         if(le.MouseCursor(buttonSkip)) {
 	    statusBar2.ShowMessage("Skip this unit");
 	    cursor.SetThemes(cursor.WAR_POINTER);
@@ -184,7 +284,7 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
         } else if(le.MouseCursor(buttonSettings)) {
 	    statusBar2.ShowMessage("Customize system options");
 	    cursor.SetThemes(cursor.WAR_POINTER);
-        } else if(le.MouseCursor(rectHero)) {
+        } else if(le.MouseCursor(rectHero1) || le.MouseCursor(rectHero2)) {
 	    statusBar2.ShowMessage("Hero's Options");
 	    cursor.SetThemes(cursor.WAR_HELMET);
 	} else {
@@ -192,23 +292,12 @@ bool Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Til
 	    cursor.SetThemes(cursor.WAR_POINTER);
 	}
     }
-    return false;	
+    return WIN;
 }
 
-bool Army::Battle(std::vector<Army::Troops>& army1, std::vector<Army::Troops> army2, const Maps::Tiles & tile)
+Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile, int troopN)
 {
-   //CreateBackground(tile);
-	LocalEvent & le = LocalEvent::GetLocalEvent();
-	// dialog menu loop
-	while(le.HandleEvents())
-	   {
-	      // exit
-	      if(le.KeyPress(KEY_ESCAPE)) {
-		 Display::Get().Fade();
-		 return true;
-	      }
-	   }
-	return false;	
+    return WIN;
 }
 
 void Army::DrawBackground(const Maps::Tiles & tile, const Point & dst_pt)
@@ -285,7 +374,7 @@ Rect Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bo
     r.w = sp.w();
     r.h = sp.h();
     display.Blit(sp, r.x, r.y);
-    ICN::icn_t flag;
+    ICN::icn_t flag = ICN::UNKNOWN;
     switch(hero.GetColor()) {
     case Color::BLUE: flag = ICN::HEROFL00; break;
     case Color::GREEN: flag = ICN::HEROFL01; break;
@@ -428,7 +517,7 @@ void Army::SettingsDialog()
     pos_rt.w = dialog.w();
     pos_rt.h = dialog.h();
 
-    Cursor & cursor = Cursor::Get();
+    //Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
     Background back(pos_rt);
@@ -457,7 +546,7 @@ void Army::SettingsDialog()
     display.Flip();
     cursor.Show();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    //LocalEvent & le = LocalEvent::GetLocalEvent();
     // dialog menu loop
     while(le.HandleEvents()) {
 	// exit
@@ -471,7 +560,7 @@ void Army::SettingsDialog()
     }
 }
 
-void Army::HeroStatus()
+Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool quickshow, bool cansurrender, bool locked)
 {
     //Display & display = Display::Get();
     const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
@@ -484,7 +573,7 @@ void Army::HeroStatus()
     pos_rt.w = dialog.w();
     pos_rt.h = dialog.h();
 
-    Cursor & cursor = Cursor::Get();
+    //Cursor & cursor = Cursor::Get();
     cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
 
@@ -492,22 +581,93 @@ void Army::HeroStatus()
     back.Save();
 
     display.Blit(dialog, pos_rt.x, pos_rt.y);
+    display.Blit(Portrait::Hero(hero.GetHeroes(), Portrait::BIG), pos_rt.x + 27, pos_rt.y + 42);
+    display.Blit(AGG::GetICN(butt, Color::GetIndex(hero.GetColor())+1), pos_rt.x + 148, pos_rt.y + 36);
+    Point tp(pos_rt);
+    std::string str;
+    str = hero.GetName() + " the " + Race::String(hero.GetRace());
+    tp.x += 8 + pos_rt.w/2 - Text::width(str, Font::SMALL)/2;
+    tp.y += 10;
+    Text(str, Font::SMALL, tp);
+    str = "Attack: ";
+    String::AddInt(str, hero.GetAttack());
+    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    tp.y = pos_rt.y + 40;
+    Text(str, Font::SMALL, tp);
+    str = "Defense: ";
+    String::AddInt(str, hero.GetDefense());
+    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    tp.y = pos_rt.y + 51;
+    Text(str, Font::SMALL, tp);
+    str = "Spell Power: ";
+    String::AddInt(str, hero.GetPower());
+    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    tp.y = pos_rt.y + 62;
+    Text(str, Font::SMALL, tp);
+    str = "Knowledge: ";
+    String::AddInt(str, hero.GetKnowledge());
+    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    tp.y = pos_rt.y + 73;
+    Text(str, Font::SMALL, tp);
+    str = "Morale: " + Morale::String(hero.GetMorale());
+    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    tp.y = pos_rt.y + 84;
+    Text(str, Font::SMALL, tp);
+    str = "Luck: " + Luck::String(hero.GetLuck());
+    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    tp.y = pos_rt.y + 95;
+    Text(str, Font::SMALL, tp);
+    str = "Spell Points: ";
+    String::AddInt(str, hero.GetSpellPoints());
+    str += "/";
+    String::AddInt(str, hero.GetMaxSpellPoints());
+    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    tp.y = pos_rt.y + 117;
+    Text(str, Font::SMALL, tp);
     
-    Button buttonOK(pos_rt.x + 113, pos_rt.y + 252, butt, 0, 1);
+    Button buttonMag(pos_rt.x + 30, pos_rt.y + 148, butt, 9, 10);
+    Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);
+    Button buttonSur(pos_rt.x + 148, pos_rt.y + 148, butt, 13, 14);
+    Button buttonOK(pos_rt.x + 207, pos_rt.y + 148, butt, 15, 16);
+    buttonMag.SetDisable(hero.spellCasted || locked || quickshow);
+    buttonRet.SetDisable(locked || quickshow);
+    buttonSur.SetDisable(!cansurrender || locked || quickshow);
+    buttonMag.Draw();
+    buttonRet.Draw();
+    buttonSur.Draw();
     buttonOK.Draw();
 
     display.Flip();
     cursor.Show();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    //LocalEvent & le = LocalEvent::GetLocalEvent();
     // dialog menu loop
     while(le.HandleEvents()) {
-	// exit
-	if(le.KeyPress(KEY_ESCAPE)) {
-	    return;
-	}	
-	do_button(buttonOK, return, {});
+        if(quickshow) {
+	    if(!le.MouseRight()) break;
+        } else {
+	    // exit
+	    if(le.KeyPress(KEY_ESCAPE)) {
+		return WIN;
+	    }
+	    do_button(buttonMag, {}, Dialog::Message("Cast Spell", "Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn.", Font::BIG));
+	    do_button(buttonRet, return RETREAT, Dialog::Message("Retreat", "Retreat your hero, abandoning your creatures. Your hero will be available for you to recrut again, however, the hero will have only a novice hero's forces.", Font::BIG));
+	    do_button(buttonSur, return SURRENDER, Dialog::Message("Surrender", "Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again.", Font::BIG));
+	    do_button(buttonOK, return WIN, Dialog::Message("Cancel", "Return to the battle.", Font::BIG));
+	    if(le.MouseCursor(buttonMag)) {
+		statusBar.ShowMessage("Cast Spell");
+	    } else if(le.MouseCursor(buttonRet)) {
+		statusBar.ShowMessage("Retreat");
+	    } else if(le.MouseCursor(buttonSur)) {
+		statusBar.ShowMessage("Surrender");
+	    } else if(le.MouseCursor(buttonOK)) {
+		statusBar.ShowMessage("Cancel");
+	    } else {
+		statusBar.ShowMessage("Hero's Options");
+	    }
+	}
     }
+    return WIN;
 }
 
 void Army::Temp(int dicn, int dindex, Point pt)

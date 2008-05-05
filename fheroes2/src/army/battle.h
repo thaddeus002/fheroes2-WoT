@@ -20,16 +20,19 @@
 
 #include <vector>
 #include "heroes.h"
+#include "castle.h"
 #include "maps_tiles.h"
 
 #ifndef BATTLE_H
 #define BATTLE_H
 
 namespace Army {
-	
-	bool Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile);
-	bool Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile);
-	bool Battle(std::vector<Army::Troops>& army1, std::vector<Army::Troops> army2, const Maps::Tiles & tile);
+    
+    typedef enum { WIN, LOSE, RETREAT, SURRENDER } battle_t;
+
+    battle_t Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile);
+    battle_t Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile);
+    battle_t Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile);
 	
 };
 

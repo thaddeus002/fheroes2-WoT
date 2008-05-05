@@ -172,12 +172,16 @@ void Heroes::ActionToMonster(const u16 dst_index)
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: " + GetName() + " attack monster " + Monster::String(monster));
 
     Display::Fade();
-    if(Army::Battle(*this, army, tile)) {
+    Army::battle_t b = Army::Battle(*this, army, tile);
+    if(b == Army::WIN) {
        // TODO victory and expirience
        if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: victory");
-    } else {
+    } else if(b == Army::LOSE) {
        // TODO fail
        if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: fail");
+    } else {
+	// TODO retreat
+       if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: retreat");
     }
 
 }

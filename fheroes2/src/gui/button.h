@@ -40,7 +40,7 @@ public:
     void Press(void);
     void Release(void);
 
-    void SetDisable(bool fl){ disable = fl; };
+    void SetDisable(bool fl){ disable = fl; pressed = fl; };
 
     void Draw(void);
     void PressDraw(void);

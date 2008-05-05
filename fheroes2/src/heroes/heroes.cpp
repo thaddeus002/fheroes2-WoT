@@ -34,7 +34,7 @@
 #include "gamearea.h"
 #include "heroes.h"
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
+Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), spell_casted(false), name(str), experience(0), magic_point(0),
     move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
 {

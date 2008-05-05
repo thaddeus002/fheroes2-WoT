@@ -40,3 +40,19 @@ const std::string & Speed::String(speed_t speed)
     
     return str_speed[0];
 }
+
+const int Speed::Move(speed_t speed)
+{
+    switch(speed) {
+    case CRAWLING: return 1;
+    case VERYSLOW: return 2;
+    case SLOW: return 3;
+    case AVERAGE: return 4;
+    case FAST: return 5;
+    case VERYFAST: return 6;
+    case ULTRAFAST: return 7;
+    case BLAZING: return 8;
+    case INSTANT: return 9;
+    }
+    return 0;
+}

@@ -197,6 +197,8 @@ public:
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
 
+    bool spellCasted;
+
 protected:
     void MoveNextAnimation(void);
     void ActionToCastle(const u16 dst_index);
