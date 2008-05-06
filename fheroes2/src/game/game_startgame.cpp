@@ -806,11 +806,13 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	    break;
 
 	case Focus::HEROES:
-		selectHeroes.Select();
+	    selectHeroes.Select(0);
+	    FocusToHeroes(myHeroes.front());
 	    break;
 
 	case Focus::CASTLE:
-		selectCastles.Select();
+	    selectCastles.Select(0);
+	    FocusToCastle(myCastles.front());
 	    break;
     }
 
@@ -1503,5 +1505,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
         ++ticket;
     }
 
+    Game::Focus & globalfocus = Game::Focus::Get();
+    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
     return ENDTURN;
 }
