@@ -1050,7 +1050,7 @@ bool Maps::Tiles::isPassable(void) const
     std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
     for(; it1 != it2; ++it1)
-    	if((*it1).level == 0 && !TilesAddon::isRoad(*it1) && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
+    	if((*it1).level == 0 /*&& !TilesAddon::isRoad(*it1)*/ && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
 
     if(Game::Focus::Get().GetHeroes().isShipMaster())
     {

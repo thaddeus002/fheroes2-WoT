@@ -1468,9 +1468,8 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 
         // draw heroes movement (in focus)
     	if(Game::Focus::HEROES == global_focus.Type() &&
-    	    global_focus.GetHeroes().isNeedMove() && 
-    	    global_focus.GetHeroes().isEnableMove())
-    	    {
+	   global_focus.GetHeroes().isNeedMove()) {
+    	    if(global_focus.GetHeroes().isEnableMove()) {
 		// FIXME: play sound only if move
     		if(global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().PlayWalkSound();
 
@@ -1491,7 +1490,8 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 
 		cursor.Show();
 		display.Flip();
-	    }
+	    } else global_focus.GetHeroes().SetMove(false);
+	}
 
         // animation
         if(!(ticket % ANIMATION_LOW))

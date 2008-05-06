@@ -200,6 +200,8 @@ void Heroes::ActionToHeroes(const u16 dst_index)
     }
     else
     {
+	Army::battle_t b = Army::Battle(*this, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
+
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: " + GetName() + " attack enemy hero " + other_hero->GetName());
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: FIXME: attack enemy hero");

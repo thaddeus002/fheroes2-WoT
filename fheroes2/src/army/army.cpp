@@ -98,8 +98,9 @@ void Army::Troops::BlitR(const Point& dst_pt, bool reflect, int frame)
     if(saved) bg.Restore();
     const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
     saved = true;
-    bg.Save(dst_pt.x + sp.x(), dst_pt.y + sp.y(), sp.w(), sp.h());
-    display.Blit(sp, dst_pt.x + sp.x(), dst_pt.y + sp.y());
+    Point p(dst_pt.x + (reflect ? -sp.w()-sp.x() : sp.x()), dst_pt.y + sp.y());
+    bg.Save(p.x, p.y, sp.w(), sp.h());
+    display.Blit(sp, p);
 }
 
 void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
@@ -107,8 +108,9 @@ void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
     Display & display = Display::Get();
     const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
     saved = true;
-    bg.Save(dst_pt.x + sp.x(), dst_pt.y + sp.y(), sp.w(), sp.h());
-    display.Blit(sp, dst_pt.x + sp.x(), dst_pt.y + sp.y());
+    Point p(dst_pt.x + (reflect ? -sp.w()-sp.x() : sp.x()), dst_pt.y + sp.y());
+    bg.Save(p.x, p.y, sp.w(), sp.h());
+    display.Blit(sp, p);
 }
 
 void Army::Troops::Animate(Monster::animstate_t as)

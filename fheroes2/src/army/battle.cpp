@@ -43,6 +43,7 @@
 #define display Display::Get()
 #define le LocalEvent::GetLocalEvent()
 #define cursor Cursor::Get()
+#define world World::GetWorld()
 
 #define do_button(b, lf, rt) \
 if(le.MousePressLeft(b)) b.PressDraw();	\
@@ -65,23 +66,26 @@ namespace Army {
     void DrawArmy(std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect=false, int animframe=-1);
     //void DrawMonster(const Army::Troops & troop, const Point & dst_pt, bool reflect=false, int animframe=-1);
     void InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool reflect=false);
-    inline Point Scr2Bf(const Point & pt); // translate coordinate to batle field
+    inline Point Scr2Bf(const Point & pt); // translate coordinate to battle field
     inline Point Bf2Scr(const Point & pt); // translate to screen (offset to frame border)
+    inline bool BfValid(const Point & pt); // check battle field point
+    int FindTroop(const std::vector<Army::Troops> &army, const Point &p);
     //void AnimateMonster(Army::Troops & troop, Monster::animstate_t as = Monster::AS_NONE);
     void SettingsDialog();
     battle_t HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool quickshow, bool cansurrender=false, bool locked=false);
+    void ShadowCursor(const Point &pt, const Point &dst_pt);
 
     void Temp(int, int, Point);
 }
 
 Army::battle_t Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
 {
-    return BattleInt(&hero1, &hero2, hero1.Army(), hero2.Army(), tile);
+    return BattleInt(&hero1, &hero2, const_cast<std::vector<Army::Troops>&>(hero1.GetArmy()), const_cast<std::vector<Army::Troops>&>(hero2.GetArmy()), tile);
 }
 
 Army::battle_t Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile)
 {
-    return BattleInt(&hero, 0, hero.Army(), army, tile);
+    return BattleInt(&hero, 0, const_cast<std::vector<Army::Troops>&>(hero.GetArmy()), army, tile);
 }
 
 Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile)
@@ -91,11 +95,10 @@ Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &til
 
 Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile)
 {
-    //Cursor & cursor = Cursor::Get();
+    AGG::PlaySound(M82::PREBATTL);
     cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
 
-    //Display & display = Display::Get();
     Dialog::FrameBorder frameborder;
 
     const Point dst_pt(frameborder.GetArea().x, frameborder.GetArea().y);
@@ -105,26 +108,20 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, std::vector<Army::T
 
     DrawBackground(tile, dst_pt);
     if(hero1) DrawHero(*hero1, dst_pt, 1);
-    if(hero2) DrawHero(*hero2, dst_pt, 1);
+    if(hero2) DrawHero(*hero2, dst_pt, 1, true);
     InitArmyPosition(army1, false);
     InitArmyPosition(army2, false, true);
     DrawArmy(army1, dst_pt, false, 1);
     DrawArmy(army2, dst_pt, true, 1);
 
-    Button buttonSkip(dst_pt.x + 640-48, dst_pt.y + 480-36, ICN::TEXTBAR, 0, 1);
-    Button buttonAuto(dst_pt.x, dst_pt.y + 480-36, ICN::TEXTBAR, 4, 5);
-    Button buttonSettings(dst_pt.x, dst_pt.y + 480-18, ICN::TEXTBAR, 6, 7);
+    display.Blit(AGG::GetICN(ICN::TEXTBAR, 0), dst_pt.x + 640-48, dst_pt.y + 480-36);
+    display.Blit(AGG::GetICN(ICN::TEXTBAR, 4), dst_pt.x, dst_pt.y + 480-36);
+    display.Blit(AGG::GetICN(ICN::TEXTBAR, 6), dst_pt.x, dst_pt.y + 480-18);
 
     Dialog::StatusBar statusBar1(Point(dst_pt.x + 48, dst_pt.y + 480-36), AGG::GetICN(ICN::TEXTBAR, 8), Font::BIG);
     statusBar1.Clear(" ");
     Dialog::StatusBar statusBar2(Point(dst_pt.x + 48, dst_pt.y + 480-18), AGG::GetICN(ICN::TEXTBAR, 9), Font::BIG);
     statusBar2.Clear(" ");
-
-    //LocalEvent & le = LocalEvent::GetLocalEvent();
-    
-    buttonSkip.Draw();
-    buttonAuto.Draw();
-    buttonSettings.Draw();
 
     display.Flip();
 
@@ -136,7 +133,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, std::vector<Army::T
 	    for(unsigned int i=0; i < army1.size(); i++) {
 		if(Monster::GetStats(army1[i].Monster()).speed == cursp && army1[i].Count() > 0) {
 		    battle_t s;
-		    if(hero1 && World::GetWorld().GetKingdom(hero1->GetColor()).Control() == Game::Human && !O_AUTO) {
+		    if(hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::Human && !O_AUTO) {
 			s = HumanTurn(hero1, hero2, army1, army2, tile, i);
 			if( s == RETREAT || s == SURRENDER) return s;
 		    } else {
@@ -148,7 +145,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, std::vector<Army::T
 	    for(unsigned int i=0; i < army2.size(); i++) {
 		if(Monster::GetStats(army2[i].Monster()).speed == cursp && army2[i].Count() > 0) {
 		    battle_t s;
-		    if(hero2 && World::GetWorld().GetKingdom(hero2->GetColor()).Control() == Game::Human && !O_AUTO) {
+		    if(hero2 && world.GetKingdom(hero2->GetColor()).Control() == Game::Human && !O_AUTO) {
 			s = HumanTurn(hero1, hero2, army1, army2, tile, -i-1);
 			if(s == RETREAT || s == SURRENDER) return WIN;
 		    } else {
@@ -166,17 +163,16 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, std::vector<Army::T
 	    else --cursp;
 	}
     }
-
     return WIN;
 }
 
 Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, const Maps::Tiles &tile, int troopN)
 {
-    //Cursor & cursor = Cursor::Get();
+    std::vector<Army::Troops> &myArmy = troopN >= 0 ? army1 : army2;
+    std::vector<Army::Troops> &enemyArmy = troopN >= 0 ? army2 : army1;
     cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
 
-    //Display & display = Display::Get();
     Dialog::FrameBorder frameborder;
 
     const Point dst_pt(frameborder.GetArea().x, frameborder.GetArea().y);
@@ -187,7 +183,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::T
     DrawBackground(tile, dst_pt);
     Rect rectHero1, rectHero2;
     if(hero1) rectHero1 = DrawHero(*hero1, dst_pt, 1);
-    if(hero2) rectHero2 = DrawHero(*hero2, dst_pt, 1);
+    if(hero2) rectHero2 = DrawHero(*hero2, dst_pt, 1, true);
     InitArmyPosition(army1, false);
     InitArmyPosition(army2, false, true);
     DrawArmy(army1, dst_pt, false, 1);
@@ -202,8 +198,6 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::T
     Dialog::StatusBar statusBar2(Point(dst_pt.x + 48, dst_pt.y + 480-18), AGG::GetICN(ICN::TEXTBAR, 9), Font::BIG);
     statusBar2.Clear(" ");
 
-    //LocalEvent & le = LocalEvent::GetLocalEvent();
-    
     buttonSkip.Draw();
     buttonAuto.Draw();
     buttonSettings.Draw();
@@ -213,13 +207,14 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::T
 
     int i = 0;
     u16 animat = 0;
+    Point cur_pt(-1,-1);
     // dialog menu loop
     while(le.HandleEvents()) {
 	if(le.KeyPress(KEY_RETURN)) {
 	    DrawBackground(tile, dst_pt);
 	    army1[0].SetCount(i);
 	    if(hero1) DrawHero(*hero1, dst_pt, i);
-	    if(hero2) DrawHero(*hero2, dst_pt, i);
+	    if(hero2) DrawHero(*hero2, dst_pt, i, true);
 	    DrawArmy(army1, dst_pt, false, i);
 	    DrawArmy(army2, dst_pt, true, i++);
 	    cursor.Show();
@@ -248,7 +243,8 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::T
 	    cursor.Hide();
 	    DrawBackground(tile, dst_pt);
 	    if(hero1) DrawHero(*hero1, dst_pt, 1);
-	    if(hero2) DrawHero(*hero2, dst_pt, 1);
+	    if(hero2) DrawHero(*hero2, dst_pt, 1, true);
+	    if(O_SHADC && BfValid(cur_pt)) ShadowCursor(cur_pt, dst_pt);
 	    DrawArmy(army1, dst_pt, false);
 	    DrawArmy(army2, dst_pt, true);	
 	    cursor.Show();
@@ -284,12 +280,31 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::T
         } else if(le.MouseCursor(buttonSettings)) {
 	    statusBar2.ShowMessage("Customize system options");
 	    cursor.SetThemes(cursor.WAR_POINTER);
-        } else if(le.MouseCursor(rectHero1) || le.MouseCursor(rectHero2)) {
+        } else if(le.MouseCursor(troopN >= 0 ? rectHero1 : rectHero2)) {
 	    statusBar2.ShowMessage("Hero's Options");
 	    cursor.SetThemes(cursor.WAR_HELMET);
+	} else if(le.MouseCursor(troopN >= 0 ? rectHero2 : rectHero1)) {
+	    statusBar2.ShowMessage("View Oppositing Hero");
+	    cursor.SetThemes(cursor.WAR_INFO);
 	} else {
-	    statusBar2.ShowMessage(" ");
-	    cursor.SetThemes(cursor.WAR_POINTER);
+	    int t = -1;
+	    cur_pt = Scr2Bf(le.MouseCursor()-dst_pt);
+	    if(BfValid(cur_pt)) {
+		if(t = FindTroop(myArmy, cur_pt), t >= 0) {
+		    statusBar2.ShowMessage("View "+Monster::String(myArmy[t].Monster())+" info.");
+		    cursor.SetThemes(cursor.WAR_INFO);
+		} else if(t = FindTroop(enemyArmy, cur_pt), t >= 0) {
+		    statusBar2.ShowMessage("Attack "+Monster::String(enemyArmy[t].Monster()));
+		    cursor.SetThemes(cursor.SWORD_TOPRIGHT);
+		} else {
+		    statusBar2.ShowMessage(" ");
+		    cursor.SetThemes(cursor.WAR_NONE);
+		}
+		//if(O_SHADC) ShadowCursor(cur_pt, dst_pt);
+	    } else {
+		statusBar2.ShowMessage(" ");
+		cursor.SetThemes(cursor.WAR_NONE);
+	    }
 	}
     }
     return WIN;
@@ -302,8 +317,6 @@ Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, std::vector<Army::Tr
 
 void Army::DrawBackground(const Maps::Tiles & tile, const Point & dst_pt)
 {
-    AGG::PlaySound(M82::PREBATTL);
-    //Display & display = Display::Get();
     ICN::icn_t icn;
     bool trees = false;
     u16 index = tile.GetIndex();
@@ -340,7 +353,6 @@ void Army::DrawBackground(const Maps::Tiles & tile, const Point & dst_pt)
 
 void Army::DrawCaptain(const Race::race_t race, const Point & dst_pt, u16 animframe, bool reflect)
 {
-    //Display & display = Display::Get();
     ICN::icn_t cap;
     switch(race) {
     case Race::BARB: cap = ICN::CMBTCAPB; break;
@@ -357,7 +369,6 @@ void Army::DrawCaptain(const Race::race_t race, const Point & dst_pt, u16 animfr
 Rect Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bool reflect)
 {
     Rect r;
-    //Display & display = Display::Get();
     ICN::icn_t cap;
     switch(hero.GetRace()) {
     case Race::BARB: cap = ICN::CMBTHROB; break;
@@ -369,7 +380,7 @@ Rect Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bo
     default: return r;
     }
     const Sprite & sp = AGG::GetICN(cap, animframe, reflect);
-    r.x = dst_pt.x + (reflect?550:0);
+    r.x = dst_pt.x + (reflect?640-sp.w():0);
     r.y = dst_pt.y + 75;
     r.w = sp.w();
     r.h = sp.h();
@@ -384,13 +395,12 @@ Rect Army::DrawHero(const Heroes & hero, const Point & dst_pt, u16 animframe, bo
     case Color::PURPLE: flag = ICN::HEROFL05; break;
     case Color::GRAY: flag = ICN::HEROFL06; break;
     }
-    display.Blit(AGG::GetICN(flag, animframe), dst_pt.x + (reflect?550:18), dst_pt.y + 80);
+    display.Blit(AGG::GetICN(flag, animframe, reflect), dst_pt.x + (reflect?640-sp.w()-17:17), dst_pt.y + 80);
     return r;
 }
 
 void Army::DrawArmy(std::vector<Army::Troops> & army, const Point & dst_pt, bool reflect, int animframe)
 {
-    //Display & display = Display::Get();
     for(unsigned int i=0; i < army.size(); i++) {
 	//for(std::vector<Army::Troops>::const_iterator it = army.begin(); it != army.end(); it++) {
 	if(army[i].Monster() < Monster::UNKNOWN) {
@@ -398,7 +408,6 @@ void Army::DrawArmy(std::vector<Army::Troops> & army, const Point & dst_pt, bool
 	    army[i].Animate();
 	    if(army[i].astate == Monster::AS_NONE && !Rand::Get(0, 30))
 		army[i].Animate(Monster::AS_IDLE);
-	    
 	    Point tp = Bf2Scr(army[i].Position()) + dst_pt;
 	    army[i].Blit(tp, reflect, animframe);
 	    // draw count
@@ -462,7 +471,7 @@ void Army::InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool
 {
     int x = reflect ? 10 : 0;
     int y = compact ? 2 : 0;
-    for(unsigned int i=0; i < army.size(); i++) {
+    for(unsigned int i=0; i < army.size(); i++) if(army[i].Monster() != Monster::UNKNOWN) {
     //for(std::vector<Army::Troops>::iterator it = army.begin(); it != army.end(); it++) {
 	army[i].SetPosition(Point(x, y));
 	army[i].aframe = 1;
@@ -474,13 +483,27 @@ void Army::InitArmyPosition(std::vector<Army::Troops> & army, bool compact, bool
 // translate coordinate to batle field
 inline Point Army::Scr2Bf(const Point & pt)
 {
-    return Point((pt.x - BFX + (pt.y % 2 ? CELLW/2 : 0))/CELLW , (pt.y - BFY)/CELLH);
+    return Point((pt.x - BFX + (pt.y % 2 ? CELLW/2 : 0))/CELLW , (pt.y - BFY + CELLH)/CELLH);
 }
 
 // translate to screen (offset to frame border)
 inline Point Army::Bf2Scr(const Point & pt)
 {
-    return Point(BFX + pt.x*CELLW - (pt.y % 2 ? CELLW/2 : 0), BFY + pt.y*CELLH);
+    return Point(BFX + pt.x*CELLW + (pt.y % 2 ? 0 : CELLW/2), BFY + pt.y*CELLH);
+}
+
+inline bool Army::BfValid(const Point & pt)
+{
+    return pt.x >= 0 && pt.x < 11 && pt.y >= 0 && pt.y < 9;
+}
+
+// find troop at the position
+int Army::FindTroop(const std::vector<Army::Troops> &army, const Point &p)
+{
+    for(unsigned int i=0; i<army.size(); i++) 
+	if(army[i].Monster() != Monster::UNKNOWN && p == army[i].Position()) 
+	    return i;
+    return -1;
 }
 
 // void Army::AnimateMonster(Army::Troops & troop, Monster::animstate_t as)
@@ -506,7 +529,6 @@ inline Point Army::Bf2Scr(const Point & pt)
 
 void Army::SettingsDialog()
 { 
-    //Display & display = Display::Get();
     const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::CSPANBKE : ICN::CSPANBKG;
     const ICN::icn_t butt = H2Config::EvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN;
     const Surface & dialog = AGG::GetICN(sett, 0);
@@ -517,7 +539,6 @@ void Army::SettingsDialog()
     pos_rt.w = dialog.w();
     pos_rt.h = dialog.h();
 
-    //Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
     Background back(pos_rt);
@@ -546,7 +567,6 @@ void Army::SettingsDialog()
     display.Flip();
     cursor.Show();
 
-    //LocalEvent & le = LocalEvent::GetLocalEvent();
     // dialog menu loop
     while(le.HandleEvents()) {
 	// exit
@@ -562,7 +582,6 @@ void Army::SettingsDialog()
 
 Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool quickshow, bool cansurrender, bool locked)
 {
-    //Display & display = Display::Get();
     const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
     const ICN::icn_t butt = ICN::VIEWGEN;
     const Surface & dialog = AGG::GetICN(sett, 0);
@@ -573,7 +592,6 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool
     pos_rt.w = dialog.w();
     pos_rt.h = dialog.h();
 
-    //Cursor & cursor = Cursor::Get();
     cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
 
@@ -640,7 +658,6 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool
     display.Flip();
     cursor.Show();
 
-    //LocalEvent & le = LocalEvent::GetLocalEvent();
     // dialog menu loop
     while(le.HandleEvents()) {
         if(quickshow) {
@@ -668,6 +685,22 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool
 	}
     }
     return WIN;
+}
+
+void Army::ShadowCursor(const Point &pt, const Point &dst_pt)
+{
+    static Surface shadow(CELLW, CELLH);
+    static bool prep = true;
+    if(prep) {
+	prep = false;
+	//shadow.SetPixel(0, 0, 0);
+	shadow.Fill(0x80808080);
+	shadow.SetAlpha(0x80);
+    }
+    Point p = Bf2Scr(pt) + dst_pt;
+    p.y -= shadow.h();
+    p.x -= shadow.w()/2;
+    display.Blit(shadow, p);
 }
 
 void Army::Temp(int dicn, int dindex, Point pt)
