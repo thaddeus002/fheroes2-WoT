@@ -36,7 +36,7 @@
 #include "skill.h"
 #include "dialog.h"
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
 {
     Display & display = Display::Get();
 
@@ -116,16 +116,29 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
     Text(message, Font::BIG, dst_pt);
 
     // shot
-    message = "Shots:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
-    dst_pt.y += 18;
-    Text(message, Font::BIG, dst_pt);
+    if(monster.shots) {
+	message = "Shots:";
+	dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+	dst_pt.y += 18;
+	Text(message, Font::BIG, dst_pt);
 
-    message.clear();
-    String::AddInt(message, monster.shots);
-    dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+	message.clear();
+	String::AddInt(message, monster.shots);
+	dst_pt.x = pos_rt.x + 420;
+	Text(message, Font::BIG, dst_pt);
 
+	if(battle) {
+	    message = "Shots Left:";
+	    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+	    dst_pt.y += 18;
+	    Text(message, Font::BIG, dst_pt);
+
+	    message.clear();
+	    String::AddInt(message, army.shots);
+	    dst_pt.x = pos_rt.x + 420;
+	    Text(message, Font::BIG, dst_pt);
+	}
+    }
     // damage
     message = "Damage:";
     dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
@@ -149,6 +162,18 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
     String::AddInt(message, monster.hp);
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
+
+    if(battle) {
+	message = "Hit Points Left:";
+	dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+	dst_pt.y += 18;
+	Text(message, Font::BIG, dst_pt);
+	
+	message.clear();
+	String::AddInt(message, army.hp);
+	dst_pt.x = pos_rt.x + 420;
+	Text(message, Font::BIG, dst_pt);
+    }
 
     // speed
     message = "Speed:";

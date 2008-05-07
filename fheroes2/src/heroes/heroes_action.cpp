@@ -31,6 +31,7 @@
 #include "rand.h"
 #include "m82.h"
 #include "game_focus.h"
+#include "tools.h"
 
 // action to next cell
 void Heroes::Action(void)
@@ -163,13 +164,16 @@ void Heroes::ActionToMonster(const u16 dst_index)
     const Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = Monster::GetSize(tile);
-	 std::vector<Army::Troops> army;
-	 int tr_c = count > 5 ? 5 : count;
-	 for(int i=0; i< tr_c; i++) {
-		 Army::Troops troop(monster, (int)(count/tr_c));
-		 army.push_back(troop);
-	 }
-    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: " + GetName() + " attack monster " + Monster::String(monster));
+    std::vector<Army::Troops> army;
+    int tr_c = count > 5 ? 5 : count;
+    for(int i=0; i< tr_c; i++) {
+	Army::Troops troop(monster, (int)(count/tr_c));
+	army.push_back(troop);
+    }
+    std::string str = "Heroes::ActionToMonster: " + GetName() + " attack monster " + Monster::String(monster)+" (";
+    String::AddInt(str, count);
+    str += ")";
+    if(H2Config::Debug()) Error::Verbose(str);
 
     Display::Fade();
     Army::battle_t b = Army::Battle(*this, army, tile);

@@ -94,7 +94,7 @@ namespace Dialog
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
 
     // army info
-    answer_t ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade);
+    answer_t ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle=false);
 
     // dialog marketplace
     void Marketplace(void);

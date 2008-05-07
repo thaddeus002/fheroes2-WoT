@@ -649,7 +649,7 @@ Monster::level_t Monster::GetLevel(monster_t monster)
 /* get rnd count monster */
 u16 Monster::GetRNDSize(monster_t monster)
 {
-    u8 level = 0;
+    float level = 0;
 
     switch(Settings::Get().GameDifficulty())
     {

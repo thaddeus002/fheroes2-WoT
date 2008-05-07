@@ -81,6 +81,8 @@ namespace Army
 
 	Monster::animstate_t    astate;
 	u16                     aframe;
+	u8                      shots;
+	u16                     hp;
 
     private:
         Monster::monster_t	monster;
@@ -119,6 +121,8 @@ namespace Army
 	
 	std::vector<Rect> coords;
     };
+
+    typedef std::vector<Troops> army_t;
 };
 
 #endif
