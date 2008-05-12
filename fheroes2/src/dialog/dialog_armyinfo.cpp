@@ -117,28 +117,17 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
 
     // shot
     if(monster.shots) {
-	message = "Shots:";
+	message = battle ? "Shots Left:" : "Shots:";
 	dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
 	dst_pt.y += 18;
 	Text(message, Font::BIG, dst_pt);
 
 	message.clear();
-	String::AddInt(message, monster.shots);
+	String::AddInt(message, battle ? army.shots : monster.shots);
 	dst_pt.x = pos_rt.x + 420;
 	Text(message, Font::BIG, dst_pt);
-
-	if(battle) {
-	    message = "Shots Left:";
-	    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
-	    dst_pt.y += 18;
-	    Text(message, Font::BIG, dst_pt);
-
-	    message.clear();
-	    String::AddInt(message, army.shots);
-	    dst_pt.x = pos_rt.x + 420;
-	    Text(message, Font::BIG, dst_pt);
-	}
     }
+
     // damage
     message = "Damage:";
     dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
