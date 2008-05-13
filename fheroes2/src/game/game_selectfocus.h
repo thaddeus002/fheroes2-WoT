@@ -37,7 +37,7 @@ namespace Game
 class SelectFocusObject
 {
 public:
-    SelectFocusObject(s16 px, s16 py);
+    SelectFocusObject(const s16 px, const s16 py);
     virtual ~SelectFocusObject(){};
 
     bool isSelected(void) const{ return selected; };

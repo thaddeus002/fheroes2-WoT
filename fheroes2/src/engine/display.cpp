@@ -42,43 +42,22 @@ Display & Display::operator= (const Display & dp)
     return *this;
 }
 
-void Display::SetVideoMode(Display::resolution_t mode, bool fullscreen)
+void Display::SetVideoMode(const Size & mode, bool fullscreen)
 {
-    u16 xres, yres;
+    SetVideoMode(mode.w, mode.h, fullscreen);
+}
 
-    switch(mode)
-    {
-	default:
-	case SMALL:
-	    xres = 640;
-	    yres = 480;
-	    break;
-
-	case MEDIUM:
-	    xres = 800;
-	    yres = 576;
-	    break;
-
-	case LARGE:
-	    xres = 1024;
-	    yres = 768;
-	    break;
-
-	case XLARGE:
-	    xres = 1280;
-	    yres = 1024;
-	    break;
-    }
-
+void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
+{
     Display & display = Display::Get();
 
-    if(display.valid() && display.w() == xres && display.h() == yres) return;
+    if(display.valid() && display.w() == w && display.h() == h) return;
 
     u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
 
     if(fullscreen || (display.valid() && (display.flags() & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
 
-    if(!SDL_SetVideoMode(xres, yres, 0, videoflags))
+    if(!SDL_SetVideoMode(w, h, 0, videoflags))
     {
 	SDL_SetVideoMode(640, 480, 0, videoflags);
 

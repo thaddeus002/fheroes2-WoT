@@ -75,22 +75,22 @@ Game::menu_t Game::StartGame(void)
     // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
-
+    Settings & conf = Settings::Get();
     Display & display = Display::Get();
     display.Fade();
 
     // Load maps
-    world.LoadMaps(Settings::Get().FileInfo().FileMaps());
+    world.LoadMaps(conf.FileInfo().FileMaps());
 
-    if(Settings::Get().HotSeat()) {
+    if(conf.HotSeat()) {
         for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) 
-            if(color & Settings::Get().Players())
+            if(color & conf.Players())
                 world.GetKingdom(color).SetControl(Game::Human);
     } else {
         // single player
-        world.GetKingdom(Settings::Get().MyColor()).SetControl(Game::Human);
+        world.GetKingdom(conf.MyColor()).SetControl(Game::Human);
     }
-    Settings::Get().SetHotSeat(false);
+    conf.SetHotSeat(false);
 
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
@@ -121,119 +121,45 @@ Game::menu_t Game::StartGame(void)
     pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
 
     // recalculate buttons coordinate
-    switch(H2Config::VideoMode())
-    {
-        default:
-	    // coord status windows
-	    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    pt_stw.y = 392;
-            // coord button next hero
-            pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            pt_her.y = 320;
-            // coord button action
-            pt_act.x = pt_her.x + AGG::GetICN(icnbtn, 0).w();
-            pt_act.y = 320;
-            // coord button castle
-            pt_cas.x = pt_act.x + AGG::GetICN(icnbtn, 0).w();
-            pt_cas.y = 320;
-            // coord button magic
-            pt_mag.x = pt_cas.x + AGG::GetICN(icnbtn, 0).w();
-            pt_mag.y = 320;
-            // coord button end tur
-            pt_end.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            pt_end.y = 320 + AGG::GetICN(icnbtn, 0).h();
-            // coord button info
-            pt_inf.x = pt_end.x + AGG::GetICN(icnbtn, 0).w();
-            pt_inf.y = 320 + AGG::GetICN(icnbtn, 0).h();
-            // coord button option
-            pt_opt.x = pt_inf.x + AGG::GetICN(icnbtn, 0).w();
-            pt_opt.y = 320 + AGG::GetICN(icnbtn, 0).h();
-            pt_set.x = pt_opt.x + AGG::GetICN(icnbtn, 0).w();
-            pt_set.y = 320 + AGG::GetICN(icnbtn, 0).h();
-	    icon_count = 4;
-            // coord button heroes scroll down
-            pt_shd.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-            pt_shd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-            // coord button castle scroll down
-            pt_scd.x = display.w() - BORDERWIDTH - 15;
-            pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-	    break;
-	
-	case Display::MEDIUM:
-	    // coord status windows
-	    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    pt_stw.y = 488;
-            // coord button next hero
-            pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            pt_her.y = 416;
-            // coord button action
-            pt_act.x = pt_her.x + AGG::GetICN(icnbtn, 0).w();
-            pt_act.y = 416;
-            // coord button castle
-            pt_cas.x = pt_act.x + AGG::GetICN(icnbtn, 0).w();
-            pt_cas.y = 416;
-            // coord button magic
-            pt_mag.x = pt_cas.x + AGG::GetICN(icnbtn, 0).w();
-            pt_mag.y = 416;
-            // coord button end tur
-            pt_end.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            pt_end.y = 416 + AGG::GetICN(icnbtn, 0).h();
-            // coord button info
-            pt_inf.x = pt_end.x + AGG::GetICN(icnbtn, 0).w();
-            pt_inf.y = 416 + AGG::GetICN(icnbtn, 0).h();
-            // coord button option
-            pt_opt.x = pt_inf.x + AGG::GetICN(icnbtn, 0).w();
-            pt_opt.y = 416 + AGG::GetICN(icnbtn, 0).h();
-            // coord button settings
-            pt_set.x = pt_opt.x + AGG::GetICN(icnbtn, 0).w();
-            pt_set.y = 416 + AGG::GetICN(icnbtn, 0).h();
-	    icon_count = 7;
-            // coord button heroes scroll down
-            pt_shd.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-            pt_shd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-            // coord button castle scroll down
-            pt_scd.x = display.w() - BORDERWIDTH - 15;
-            pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-    	    break;
+    const u8 count_h = (display.h() - 480) / TILEWIDTH;
+    icon_count = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
+    const u16 last_coord = RADARWIDTH + BORDERWIDTH * 2 + icon_count * 32 + BORDERWIDTH;
+    const u8 button_w = AGG::GetICN(icnbtn, 0).w();
+    const u8 button_h = AGG::GetICN(icnbtn, 0).h();
 
-	case Display::LARGE:
-	case Display::XLARGE:
-	    // coord status windows
-	    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    pt_stw.y = 520;
-            // coord button next hero
-            pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            pt_her.y = 448;
-            // coord button action
-            pt_act.x = pt_her.x + AGG::GetICN(icnbtn, 0).w();
-            pt_act.y = 448;
-            // coord button castle
-            pt_cas.x = pt_act.x + AGG::GetICN(icnbtn, 0).w();
-            pt_cas.y = 448;
-            // coord button magic
-            pt_mag.x = pt_cas.x + AGG::GetICN(icnbtn, 0).w();
-            pt_mag.y = 448;
-            // coord button end tur
-            pt_end.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            pt_end.y = 448 + AGG::GetICN(icnbtn, 0).h();
-            // coord button info
-            pt_inf.x = pt_end.x + AGG::GetICN(icnbtn, 0).w();
-            pt_inf.y = 448 + AGG::GetICN(icnbtn, 0).h();
-            // coord button option
-            pt_opt.x = pt_inf.x + AGG::GetICN(icnbtn, 0).w();
-            pt_opt.y = 448 + AGG::GetICN(icnbtn, 0).h();
-            // coord button settings
-            pt_set.x = pt_opt.x + AGG::GetICN(icnbtn, 0).w();
-            pt_set.y = 448 + AGG::GetICN(icnbtn, 0).h();
-	    icon_count = 8;
-            // coord heroes scroll down
-            pt_shd.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-            pt_shd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-            // coord castle scroll down
-            pt_scd.x = display.w() - BORDERWIDTH - 15;
-            pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-	    break;
-    }
+    // coord status windows
+    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    pt_stw.y = last_coord + 2 * button_h;
+    // coord button next hero
+    pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    pt_her.y = last_coord;
+    // coord button action
+    pt_act.x = pt_her.x + button_w;
+    pt_act.y = last_coord;
+    // coord button castle
+    pt_cas.x = pt_act.x + button_w;
+    pt_cas.y = last_coord;
+    // coord button magic
+    pt_mag.x = pt_cas.x + button_w;
+    pt_mag.y = last_coord;
+    // coord button end tur
+    pt_end.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    pt_end.y = last_coord + button_h;
+    // coord button info
+    pt_inf.x = pt_end.x + button_w;
+    pt_inf.y = last_coord + button_h;
+    // coord button option
+    pt_opt.x = pt_inf.x + button_w;
+    pt_opt.y = last_coord + button_h;
+    // coord button settings
+    pt_set.x = pt_opt.x + button_w;
+    pt_set.y = last_coord + button_h;
+    // coord button heroes scroll down
+    pt_shd.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
+    pt_shd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
+    // coord button castle scroll down
+    pt_scd.x = display.w() - BORDERWIDTH - 15;
+    pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
 
     _buttonScrollHeroesUp = new Button(pt_shu, icnscroll, 0, 1);
     _buttonScrollCastleUp = new Button(pt_scu, icnscroll, 0, 1);
@@ -311,7 +237,7 @@ Game::menu_t Game::StartGame(void)
 		    statusWindow.Redraw();
 
 		    //Color::color_t human = H2Config::MyColor();
-		    Settings::Get().SetMyColor(color);
+		    conf.SetMyColor(color);
     		    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().isValid())
     		    {
     		        global_focus.GetHeroes().GetPath().Hide();

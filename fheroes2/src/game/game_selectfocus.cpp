@@ -35,7 +35,7 @@
 #define ICONS_CURSOR_HEIGHT	32
 #define ICONS_CURSOR_COLOR	0x98
 
-Game::SelectFocusObject::SelectFocusObject(s16 px, s16 py) : pos_pt(px, py),
+Game::SelectFocusObject::SelectFocusObject(const s16 px, const s16 py) : pos_pt(px, py),
     empty_back(AGG::GetICN(H2Config::EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, 1)),
     step(32), sprite_cursor(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT), cursor(sprite_cursor, px, py),
     selected(false), top_index(0), cursor_index(0xFF) 
@@ -60,23 +60,8 @@ Game::SelectFocusObject::SelectFocusObject(s16 px, s16 py) : pos_pt(px, py),
 
     sprite_cursor.Unlock();
 
-    u8 count_icons = 0;
-
-    switch(H2Config::VideoMode())
-    {
-        default:
-            count_icons = 4;
-            break;
-
-        case Display::MEDIUM:
-            count_icons = 7;
-            break;
-
-        case Display::LARGE:
-        case Display::XLARGE:
-            count_icons = 8;
-            break;
-    }
+    const u8 count_h = (Display::Get().h() - 480) / TILEWIDTH;
+    const u8 count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
 
     coords.resize(count_icons);
 

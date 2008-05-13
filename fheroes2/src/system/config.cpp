@@ -24,21 +24,4 @@ u8 H2Config::Debug(void) { return Settings::Get().Debug(); }
 
 bool H2Config::Shadow(void) { return Settings::Get().Shadow(); }
 bool H2Config::EvilInterface(void) { return Settings::Get().EvilInterface(); }
-
-Display::resolution_t H2Config::VideoMode(void)
-{
-    const Size & size = Settings::Get().VideoMode();
-    
-    if(640 == size.w && 480 == size.h)	return Display::SMALL;
-    else
-    if(800 == size.w && 600 == size.h)	return Display::MEDIUM;
-    else
-    if(1024 == size.w && 768 == size.h)	return Display::LARGE;
-    else
-    if(1280 == size.w && 1024 == size.h)return Display::XLARGE;
-
-    return Display::CUSTOM;
-}
-
 Color::color_t H2Config::MyColor(void) { return Settings::Get().MyColor(); }
-

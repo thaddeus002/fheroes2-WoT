@@ -33,7 +33,8 @@ public:
 
     static Display &	Get(void);
 
-    static void		SetVideoMode(resolution_t mode, bool fullscreen = false);
+    static void		SetVideoMode(const u16 w, const u16 h, bool fullscreen = false);
+    static void		SetVideoMode(const Size & mode, bool fullscreen = false);
 
     static void		HideCursor(void);
     static void		ShowCursor(void);

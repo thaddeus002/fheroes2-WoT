@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "settings.h"
 #include "config.h"
 #include "sprite.h"
 #include "game.h"
@@ -27,638 +28,189 @@
 void Game::DrawInterface(void)
 {
     Display & display = Display::Get();
-    display.SetVideoMode(H2Config::VideoMode());
+    display.SetVideoMode(Settings::Get().VideoMode());
     display.Fill(0x00, 0x00, 0x00);
 
-    const ICN::icn_t icnadv = H2Config::EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD;
     const ICN::icn_t icnlocator = H2Config::EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS;
-    const ICN::icn_t icnston = H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK;
-    const ICN::icn_t icnbtn = H2Config::EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
-    const ICN::icn_t icnscroll = H2Config::EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
+
+    const Sprite & icnston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & icnadv = AGG::GetICN(H2Config::EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD, 0);
 
     Rect srcrt;
     Point dstpt;
 
-    // sprite portret heroes scroll up
-    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-    dstpt.y = RADARWIDTH + 2 * BORDERWIDTH;
-    display.Blit(AGG::GetICN(icnscroll, 0), dstpt);
-    // sprite portret castle scroll up
-    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
-    display.Blit(AGG::GetICN(icnscroll, 0), dstpt);
+    const u8 count_w = (display.w() - 640) / TILEWIDTH;
+    const u8 count_h = (display.h() - 480) / TILEWIDTH;
 
-    switch(H2Config::VideoMode())
+    // TOP BORDER
+    srcrt.x = 0;
+    srcrt.y = 0;
+    srcrt.w = 223;
+    srcrt.h = BORDERWIDTH;
+    dstpt.x = srcrt.x;
+    dstpt.y = srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.x = 223;
+    srcrt.w = TILEWIDTH;
+    dstpt.x = srcrt.x;
+    dstpt.y = 0;
+    for(u8 ii = 0; ii < count_w + 1; ++ii)
     {
-	default:
-	    dstpt.x = 0;
-	    dstpt.y = 0;
-	    display.Blit(AGG::GetICN(icnadv, 0), dstpt);
+        display.Blit(icnadv, srcrt, dstpt);
+	dstpt.x += TILEWIDTH;
+    }
+    srcrt.x += TILEWIDTH;
+    srcrt.w = icnadv.w() - srcrt.x;
+    display.Blit(icnadv, srcrt, dstpt);
 
-            // TOP PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 5;    // background panel.heroes
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 4; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 77;   // background panel.castle
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 4; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
+    // BOTTOM BORDER
+    srcrt.x = 0;
+    srcrt.y = icnadv.h() - BORDERWIDTH;
+    srcrt.w = 223;
+    srcrt.h = BORDERWIDTH;
+    dstpt.x = srcrt.x;
+    dstpt.y = display.h() - BORDERWIDTH;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.x = 223;
+    srcrt.w = TILEWIDTH;
+    dstpt.x = srcrt.x;
+    dstpt.y = display.h() - BORDERWIDTH;
+    for(u8 ii = 0; ii < count_w + 1; ++ii)
+    {
+        display.Blit(icnadv, srcrt, dstpt);
+	dstpt.x += TILEWIDTH;
+    }
+    srcrt.x += TILEWIDTH;
+    srcrt.w = icnadv.w() - srcrt.x;
+    display.Blit(icnadv, srcrt, dstpt);
 
-            // BOTTOM PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = 392;
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-	    
-	    // sprite button next hero
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 320;
-	    display.Blit(AGG::GetICN(icnbtn, 0), dstpt);
-	    // sprite button action
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 2), dstpt);
-	    // sprite button castle
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 4), dstpt);
-	    // sprite button magic
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 6), dstpt);
-	    // sprite button end tur
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 320 + AGG::GetICN(icnbtn, 0).h();
-	    display.Blit(AGG::GetICN(icnbtn, 8), dstpt);
-	    // sprite button info
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 10), dstpt);
-	    // sprite button option
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 12), dstpt);
-	    // sprite button settings
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 14), dstpt);
+    // LEFT BORDER
+    srcrt.x = 0;
+    srcrt.y = 0;
+    srcrt.w = BORDERWIDTH;
+    srcrt.h = 255;
+    dstpt.x = srcrt.x;
+    dstpt.y = srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.y = 255;
+    srcrt.h = TILEWIDTH;
+    dstpt.x = srcrt.x;
+    dstpt.y = srcrt.y;
+    for(u8 ii = 0; ii < count_h + 1; ++ii)
+    {
+        display.Blit(icnadv, srcrt, dstpt);
+	dstpt.y += TILEWIDTH;
+    }
+    srcrt.y += TILEWIDTH;
+    srcrt.h = icnadv.h() - srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
 
-	    // sprite portret heroes scroll down
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-            dstpt.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * 4 - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    // sprite portret castle scroll down
-            dstpt.x = display.w() - BORDERWIDTH - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    break;
-	    
-	case Display::MEDIUM:
+    // MIDDLE BORDER
+    srcrt.x = icnadv.w() - RADARWIDTH - 2 * BORDERWIDTH;
+    srcrt.y = 0;
+    srcrt.w = BORDERWIDTH;
+    srcrt.h = 255;
+    dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
+    dstpt.y = srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.y = 255;
+    srcrt.h = TILEWIDTH;
+    dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
+    dstpt.y = srcrt.y;
+    for(u8 ii = 0; ii < count_h + 1; ++ii)
+    {
+        display.Blit(icnadv, srcrt, dstpt);
+	dstpt.y += TILEWIDTH;
+    }
+    srcrt.y += TILEWIDTH;
+    srcrt.h = icnadv.h() - srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
 
-            // TOP BORDER
-            srcrt.x = 0;
-            srcrt.y = 0;
-            srcrt.w = 196;
-            srcrt.h = BORDERWIDTH;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.x += srcrt.w;
-            srcrt.w = 80;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-            srcrt.w = AGG::GetICN(icnadv, 0).w() - srcrt.x;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // BOTTOM BORDER
-            srcrt.x = 0;
-            srcrt.y = AGG::GetICN(icnadv, 0).h() - BORDERWIDTH;
-            srcrt.w = 196;
-            srcrt.h = BORDERWIDTH;
-            dstpt.x = srcrt.x;
-            dstpt.y = display.h() - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.x += srcrt.w;
-            srcrt.w = 80;
-            dstpt.x = srcrt.x;
-            dstpt.y = display.h() - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-	    dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-    	    dstpt.x += srcrt.w;
-            srcrt.w = AGG::GetICN(icnadv, 0).w() - srcrt.x;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // LEFT BORDER
-            srcrt.x = 0;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 176;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 32;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // RIGHT BORDER
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - BORDERWIDTH;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 176;
-            dstpt.x = display.w() - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 32;
-            dstpt.x = display.w() - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // MIDDLE BORDER
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - RADARWIDTH - 2 * BORDERWIDTH;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 176;
-            dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 32;
-            dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // TOP PANEL
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - RADARWIDTH - BORDERWIDTH;
-            srcrt.y = RADARWIDTH + BORDERWIDTH;
-            srcrt.w = RADARWIDTH;
-            srcrt.h = 64;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 32;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.y += 32;
-            srcrt.h = 64;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
+    // RIGHT BORDER
+    srcrt.x = icnadv.w() - BORDERWIDTH;
+    srcrt.y = 0;
+    srcrt.w = BORDERWIDTH;
+    srcrt.h = 255;
+    dstpt.x = display.w() - BORDERWIDTH;
+    dstpt.y = srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.y = 255;
+    srcrt.h = TILEWIDTH;
+    dstpt.x = display.w() - BORDERWIDTH;
+    dstpt.y = srcrt.y;
+    for(u8 ii = 0; ii < count_h + 1; ++ii)
+    {
+        display.Blit(icnadv, srcrt, dstpt);
+	dstpt.y += TILEWIDTH;
+    }
+    srcrt.y += TILEWIDTH;
+    srcrt.h = icnadv.h() - srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
 
-            // TOP PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 5;    // background panel heroes
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 7; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 77;   // background panel castle
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 7; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
+    // ICON PANEL
+    srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;
+    srcrt.y = RADARWIDTH + BORDERWIDTH;
+    srcrt.w = RADARWIDTH;
+    srcrt.h = 48;
+    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    dstpt.y = srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.y = srcrt.y + srcrt.h;
+    dstpt.y = dstpt.y + srcrt.h;
+    srcrt.h = 32;
+    const u8 ext_icon = count_h > 3 ? 6 : ( count_h < 3 ? 2 : 5);
+    for(u8 ii = 0; ii < ext_icon; ++ii)
+    {
+	display.Blit(icnadv, srcrt, dstpt);
+	dstpt.y += srcrt.h;
+    }
+    srcrt.y = srcrt.y + 64;
+    srcrt.h = 48;
+    display.Blit(icnadv, srcrt, dstpt);
 
-            // BOTTOM PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = 488;
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
+    const u16 button_coord = dstpt.y + srcrt.h;
 
-	    // sprite button next hero
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 416;
-	    display.Blit(AGG::GetICN(icnbtn, 0), dstpt);
-	    // sprite button action
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 2), dstpt);
-	    // sprite button castle
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 4), dstpt);
-	    // sprite button magic
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 6), dstpt);
-	    // sprite button end tur
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 416 + AGG::GetICN(icnbtn, 0).h();
-	    display.Blit(AGG::GetICN(icnbtn, 8), dstpt);
-	    // sprite button info
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 10), dstpt);
-	    // sprite button option
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 12), dstpt);
-	    // sprite button settings
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 14), dstpt);
-
-	    // sprite portret heroes scroll down
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-            dstpt.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * 7 - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    // sprite portret castle scroll down
-            dstpt.x = display.w() - BORDERWIDTH - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    break;
-
-	case Display::LARGE:
-
-            // TOP BORDER
-            srcrt.x = 0;
-            srcrt.y = 0;
-            srcrt.w = 140;
-            srcrt.h = BORDERWIDTH;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.x += srcrt.w;
-            srcrt.w = 192;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-            srcrt.w = AGG::GetICN(icnadv, 0).w() - srcrt.x;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // BOTTOM BORDER
-            srcrt.x = 0;
-            srcrt.y = AGG::GetICN(icnadv, 0).h() - BORDERWIDTH;
-            srcrt.w = 140;
-            srcrt.h = BORDERWIDTH;
-            dstpt.x = srcrt.x;
-            dstpt.y = display.h() - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.x += srcrt.w;
-            srcrt.w = 192;
-            dstpt.x = srcrt.x;
-            dstpt.y = display.h() - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-            srcrt.w = AGG::GetICN(icnadv, 0).w() - srcrt.x;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // LEFT BORDER
-            srcrt.x = 0;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 166;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 144;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // RIGHT BORDER
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - BORDERWIDTH;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 166;
-            dstpt.x = display.w() - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 144;
-            dstpt.x = display.w() - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // MIDDLE BORDER
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - RADARWIDTH - 2 * BORDERWIDTH;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 166;
-            dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 144;
-            dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // TOP PANEL
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - RADARWIDTH - BORDERWIDTH;
-            srcrt.y = RADARWIDTH + BORDERWIDTH;
-            srcrt.w = RADARWIDTH;
-            srcrt.h = 64;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 32;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.y += 32;
-            srcrt.h = 64;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-
-            // TOP PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 5;    // background panel heroes
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 8; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 77;   // background panel castle
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 8; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
-
-            // BOTTOM PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = 520;
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-
-	    // sprite button next hero
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 448;
-	    display.Blit(AGG::GetICN(icnbtn, 0), dstpt);
-	    // sprite button action
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 2), dstpt);
-	    // sprite button castle
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 4), dstpt);
-	    // sprite button magic
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 6), dstpt);
-	    // sprite button end tur
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 448 + AGG::GetICN(icnbtn, 0).h();
-	    display.Blit(AGG::GetICN(icnbtn, 8), dstpt);
-	    // sprite button info
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 10), dstpt);
-	    // sprite button option
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 12), dstpt);
-	    // sprite button settings
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 14), dstpt);
-
-	    // sprite portret heroes scroll down
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-            dstpt.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * 8 - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    // sprite portret castle scroll down
-            dstpt.x = display.w() - BORDERWIDTH - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    break;
-
-	case Display::XLARGE:
-            // TOP BORDER
-            srcrt.x = 0;
-            srcrt.y = 0;
-            srcrt.w = 128;
-            srcrt.h = BORDERWIDTH;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.x += srcrt.w;
-            srcrt.w = 214;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w - 1;
-            srcrt.w = AGG::GetICN(icnadv, 0).w() - srcrt.x;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // BOTTOM BORDER
-            srcrt.x = 0;
-            srcrt.y = AGG::GetICN(icnadv, 0).h() - BORDERWIDTH;
-            srcrt.w = 140;
-            srcrt.h = BORDERWIDTH;
-            dstpt.x = srcrt.x;
-            dstpt.y = display.h() - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.x += srcrt.w;
-            srcrt.w = 214;
-            dstpt.x = srcrt.x;
-            dstpt.y = display.h() - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.x += srcrt.w - 1;
-            srcrt.w = AGG::GetICN(icnadv, 0).w() - srcrt.x;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // LEFT BORDER
-            srcrt.x = 0;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 160;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 181;
-            dstpt.x = srcrt.x;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // RIGHT BORDER
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - BORDERWIDTH;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 160;
-            dstpt.x = display.w() - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 181;
-            dstpt.x = display.w() - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // MIDDLE BORDER
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - RADARWIDTH - 2 * BORDERWIDTH;
-            srcrt.y = 0;
-            srcrt.w = BORDERWIDTH;
-            srcrt.h = 160;
-            dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 181;
-            dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.h = AGG::GetICN(icnadv, 0).h() - srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            // TOP PANEL
-            srcrt.x = AGG::GetICN(icnadv, 0).w() - RADARWIDTH - BORDERWIDTH;
-            srcrt.y = RADARWIDTH + BORDERWIDTH;
-            srcrt.w = RADARWIDTH;
-            srcrt.h = 64;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            srcrt.y += srcrt.h;
-            srcrt.h = 32;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = srcrt.y;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-            dstpt.y += srcrt.h;
-            srcrt.y += 32;
-            srcrt.h = 64;
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    display.Blit(AGG::GetICN(icnadv, 0), srcrt, dstpt);
-
-            // TOP PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 5;    // background panel heroes
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 8; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 77;   // background panel castle
-            dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
-            for(int i = 0; i < 8; ++i){
-		display.Blit(AGG::GetICN(icnlocator, i + 1), dstpt);
-                dstpt.y += 32;
-            }
-
-            // BOTTOM PANEL BACKGROUND ELEMENT
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-            dstpt.y = 520;
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-            dstpt.y += AGG::GetICN(icnston, 0).h();
-	    display.Blit(AGG::GetICN(icnston, 0), dstpt);
-
-	    // sprite button next hero
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 448;
-	    display.Blit(AGG::GetICN(icnbtn, 0), dstpt);
-	    // sprite button action
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 2), dstpt);
-	    // sprite button castle
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 4), dstpt);
-	    // sprite button magic
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 6), dstpt);
-	    // sprite button end tur
-	    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-	    dstpt.y = 448 + AGG::GetICN(icnbtn, 0).h();
-	    display.Blit(AGG::GetICN(icnbtn, 8), dstpt);
-	    // sprite button info
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 10), dstpt);
-	    // sprite button option
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 12), dstpt);
-	    // sprite button settings
-	    dstpt.x += AGG::GetICN(icnbtn, 0).w();
-	    display.Blit(AGG::GetICN(icnbtn, 14), dstpt);
-
-	    // sprite portret heroes scroll down
-            dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-            dstpt.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * 8 - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    // sprite portret castle scroll down
-            dstpt.x = display.w() - BORDERWIDTH - 15;
-	    display.Blit(AGG::GetICN(icnscroll, 2), dstpt);
-	    break;
+    // ICON PANEL BACKGROUND
+    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 5;    // background panel heroes
+    dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
+    for(u8 ii = 0; ii < ext_icon + 2; ++ii)
+    {
+	display.Blit(AGG::GetICN(icnlocator, ii + 1), dstpt);
+            dstpt.y += 32;
+    }
+    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH + 77;   // background panel castle
+    dstpt.y = RADARWIDTH + BORDERWIDTH + 21;
+    for(u8 ii = 0; ii < ext_icon + 2; ++ii)
+    {
+	display.Blit(AGG::GetICN(icnlocator, ii + 1), dstpt);
+        dstpt.y += 32;
     }
 
+    // BOTTOM PANEL BACKGROUND
+    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    dstpt.y = button_coord + 2 * 36;
+    if(display.h() - BORDERWIDTH - icnston.h() > dstpt.y)
+    {
+	const u8 count_item = (display.h() - BORDERWIDTH - dstpt.y) / TILEWIDTH;
+	if(2 < count_item)
+	{
+	    srcrt.x = 0;
+	    srcrt.y = 0;
+	    srcrt.w = icnston.w();
+	    srcrt.h = 12;
+	    display.Blit(icnston, srcrt, dstpt);
+	    srcrt.y = 12;
+	    srcrt.h = 32;
+	    dstpt.y = dstpt.y + srcrt.h;
+	    for(u8 ii = 0; ii < count_item - 1; ++ii)
+	    {
+		display.Blit(icnston, srcrt, dstpt);
+		dstpt.y = dstpt.y + TILEWIDTH;
+	    }
+	    srcrt.y = icnston.h() - 12;
+	    display.Blit(icnston, srcrt, dstpt);
+	}
+    }
+    else
+	display.Blit(icnston, dstpt);
 }

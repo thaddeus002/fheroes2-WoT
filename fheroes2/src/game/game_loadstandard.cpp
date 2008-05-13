@@ -39,7 +39,7 @@ Game::menu_t Game::LoadStandard(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(Display::SMALL);
+    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);

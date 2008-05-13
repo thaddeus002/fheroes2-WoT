@@ -20,6 +20,7 @@
 
 #include <fstream>
 #include "tools.h"
+#include "error.h"
 #include "config.h"
 
 /* constructor */
@@ -216,7 +217,7 @@ void Settings::SetModes(const settings_t s) { modes |= s; }
 void Settings::ResetModes(const settings_t s) { modes &= ~s; }
 
 /* get video mode */
-Size & Settings::VideoMode(void) { return video_mode; }
+const Size & Settings::VideoMode(void) const { return video_mode; }
 
 void Settings::Parse(const std::string & left, const std::string & right)
 {
@@ -232,49 +233,42 @@ void Settings::Parse(const std::string & left, const std::string & right)
     // value
     if(left == "videomode")
     {
-	if(right == "640x480")
-	{
-	    video_mode.w = 640;
-	    video_mode.h = 480;
-	}
-	else
-	if(right == "800x600")
+	// default
+	video_mode.w = 640;
+	video_mode.h = 480;
+
+	std::string str(right);
+
+	String::Lower(str);
+
+	const size_t pos = str.find('x');
+
+	if("800x600" == right)
 	{
 	    video_mode.w = 800;
-	    video_mode.h = 600;
+	    video_mode.h = 576;
 	}
 	else
-	if(right == "1024x768")
+	if(std::string::npos != pos)
 	{
-	    video_mode.w = 1024;
-	    video_mode.h = 768;
-	}
-	else
-	if(right == "1280x1024")
-	{
-	    video_mode.w = 1280;
-	    video_mode.h = 1024;
-	}
-	else
-	{
-	    std::string str(right);
+	    std::string left2(str.substr(0, pos));
+	    std::string right2(str.substr(pos + 1, str.length() - pos - 1));
 
-	    String::Lower(str);
-
-	    const size_t pos = str.find('x');
-
-	    if(std::string::npos != pos)
-	    {
-		std::string left2(str.substr(0, pos - 1));
-		std::string right2(str.substr(pos + 1, str.length() - pos - 1));
-
-		String::Trim(left2);
-		String::Trim(right2);
+	    String::Trim(left2);
+	    String::Trim(right2);
 		
-		video_mode.w = String::ToInt(left2);
-		video_mode.h = String::ToInt(right2);
+	    video_mode.w = String::ToInt(left2);
+	    video_mode.h = String::ToInt(right2);
+
+	    if((video_mode.w % 32) || (video_mode.h % 32) || video_mode.w < 640 || video_mode.h < 480)
+	    {
+		video_mode.w = 640;
+		video_mode.h = 480;
+
+	        Error::Warning("Settings: unknown video mode, use default: 640x480");
 	    }
 	}
+	else Error::Warning("Settings: unknown video mode: " + right);
     }
 }
 

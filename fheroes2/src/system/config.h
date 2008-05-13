@@ -33,7 +33,6 @@ namespace H2Config
     bool Shadow(void);
     bool EvilInterface(void);
     
-    Display::resolution_t VideoMode(void);
     Color::color_t MyColor(void);
 };
 

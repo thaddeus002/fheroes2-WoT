@@ -103,7 +103,7 @@ Game::menu_t Game::ScenarioInfo(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(Display::SMALL);
+    display.SetVideoMode(640, 480);
 
     // vector coord colors opponent
     std::vector<Rect> coordColors(KINGDOMMAX);
@@ -488,7 +488,7 @@ void Scenario::SelectMaps(const std::vector<Maps::FileInfo> &allmaps)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(Display::SMALL);
+    display.SetVideoMode(640, 480);
 
     Background background(Rect(110, 0, 510, 480));
     background.Save();

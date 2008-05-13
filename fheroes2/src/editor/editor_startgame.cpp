@@ -59,24 +59,21 @@ Game::menu_t Game::Editor::StartGame()
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-
-    Display::SetVideoMode(H2Config::VideoMode());
+    const Size & videomode = Settings::Get().VideoMode();
+    Display::SetVideoMode(videomode);
     display.Fill(0x00, 0x00, 0x00);
 
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
 
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
-    
+
     const Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     const Rect areaScrollTop(BORDERWIDTH, 0, areaMaps.GetRect().w * TILEWIDTH, BORDERWIDTH / 2);
     const Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
-    const ICN::icn_t icnscroll = ICN::ESCROLL;
-    const ICN::icn_t icnbtns = ICN::EDITBTNS;
-    const ICN::icn_t icnpanel = ICN::EDITPANL;
     Rect src_rt;
     Point dst_pt;
 
@@ -84,7 +81,7 @@ Game::menu_t Game::Editor::StartGame()
     const Sprite & spriteAdv = AGG::GetICN(ICN::ADVBORD, 0);
     const Sprite & spriteBac = AGG::GetICN(ICN::STONBACK, 0);
     // bottom scroll bar indicator
-    const Sprite & spriteBottomBar(AGG::GetICN(icnscroll, 0));
+    const Sprite & spriteBottomBar(AGG::GetICN(ICN::ESCROLL, 0));
     dst_pt.x = BORDERWIDTH * 2;
     dst_pt.y = BORDERWIDTH + areaMaps.GetRect().h * TILEWIDTH;
     src_rt.x = 0;
@@ -102,7 +99,7 @@ Game::menu_t Game::Editor::StartGame()
     src_rt.x = spriteBottomBar.w() - TILEWIDTH;
     display.Blit(spriteBottomBar, src_rt, dst_pt);
     // left scroll bar indicator
-    const Sprite & spriteLeftBar(AGG::GetICN(icnscroll, 1));
+    const Sprite & spriteLeftBar(AGG::GetICN(ICN::ESCROLL, 1));
     dst_pt.x = BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
     dst_pt.y = BORDERWIDTH * 2;
     src_rt.x = 0;
@@ -147,25 +144,9 @@ Game::menu_t Game::Editor::StartGame()
     src_rt.y = 250;
     src_rt.h = TILEWIDTH;
     dst_pt.y = 250;
-    u8 var1 = 0;
-    switch(H2Config::VideoMode())
-    {
-        default:
-	    var1 = 4;
-	    break;
-	
-	case Display::MEDIUM:
-	    var1 = 7;
-	    break;
+    //
+    u8 var1 = 4 + (videomode.h - 480) / TILEWIDTH;
 
-	case Display::LARGE:
-	    var1 = 13;
-	    break;
-		
-	case Display::XLARGE:
-	    var1 = 21;
-	    break;
-    }
     for(u8 ii = 0; ii < var1; ++ii)
     {
 	display.Blit(spriteAdv, src_rt, dst_pt);
@@ -180,115 +161,99 @@ Game::menu_t Game::Editor::StartGame()
     // buttons
     dst_pt.x = 0;
     dst_pt.y = 0;
-    Button btnLeftTopScroll(dst_pt, icnscroll, 12, 13);
+    Button btnLeftTopScroll(dst_pt, ICN::ESCROLL, 12, 13);
 
     dst_pt.x = BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
-    Button btnRightTopScroll(dst_pt, icnscroll, 14, 15);
+    Button btnRightTopScroll(dst_pt, ICN::ESCROLL, 14, 15);
 	
     dst_pt.y = BORDERWIDTH;
-    Button btnTopScroll(dst_pt, icnscroll, 4, 5);
+    Button btnTopScroll(dst_pt, ICN::ESCROLL, 4, 5);
 
     dst_pt.x = 0;
     dst_pt.y = BORDERWIDTH + areaMaps.GetRect().h * TILEWIDTH;
-    Button btnLeftBottomScroll(dst_pt, icnscroll, 18, 19);
+    Button btnLeftBottomScroll(dst_pt, ICN::ESCROLL, 18, 19);
 
     dst_pt.x = BORDERWIDTH;
-    Button btnLeftScroll(dst_pt, icnscroll, 8, 9);
+    Button btnLeftScroll(dst_pt, ICN::ESCROLL, 8, 9);
 
     dst_pt.x = 2 * BORDERWIDTH + (areaMaps.GetRect().w - 1) * TILEWIDTH;
-    Button btnRightScroll(dst_pt, icnscroll, 10, 11);
+    Button btnRightScroll(dst_pt, ICN::ESCROLL, 10, 11);
 
     dst_pt.x = BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
-    Button btnRightBottomScroll(dst_pt, icnscroll, 16, 17);
+    Button btnRightBottomScroll(dst_pt, ICN::ESCROLL, 16, 17);
 
     dst_pt.y = areaMaps.GetRect().h * TILEWIDTH;
-    Button btnBottomScroll(dst_pt, icnscroll, 6, 7);
+    Button btnBottomScroll(dst_pt, ICN::ESCROLL, 6, 7);
     
     dst_pt.x = display.w() - BORDERWIDTH - RADARWIDTH;
     dst_pt.y = BORDERWIDTH + RADARWIDTH;
-    Button btnSelectGround(dst_pt, icnbtns, 0, 1);
+    Button btnSelectGround(dst_pt, ICN::EDITBTNS, 0, 1);
 
     dst_pt.x = btnSelectGround.x + btnSelectGround.w;
     dst_pt.y = btnSelectGround.y;
-    Button btnSelectObject(dst_pt, icnbtns, 2, 3);
+    Button btnSelectObject(dst_pt, ICN::EDITBTNS, 2, 3);
 
     dst_pt.x = btnSelectObject.x + btnSelectObject.w;
     dst_pt.y = btnSelectObject.y;
-    Button btnSelectInfo(dst_pt, icnbtns, 4, 5);
+    Button btnSelectInfo(dst_pt, ICN::EDITBTNS, 4, 5);
 
     dst_pt.x = btnSelectGround.x;
     dst_pt.y = btnSelectGround.y + btnSelectGround.h;
-    Button btnSelectRiver(dst_pt, icnbtns, 6, 7);
+    Button btnSelectRiver(dst_pt, ICN::EDITBTNS, 6, 7);
 
     dst_pt.x = btnSelectRiver.x + btnSelectRiver.w;
     dst_pt.y = btnSelectRiver.y;
-    Button btnSelectRoad(dst_pt, icnbtns, 8, 9);
+    Button btnSelectRoad(dst_pt, ICN::EDITBTNS, 8, 9);
 
     dst_pt.x = btnSelectRoad.x + btnSelectRoad.w;
     dst_pt.y = btnSelectRoad.y;
-    Button btnSelectClear(dst_pt, icnbtns, 10, 11);
+    Button btnSelectClear(dst_pt, ICN::EDITBTNS, 10, 11);
 
     const Point dstPanel(btnSelectRiver.x, btnSelectRiver.y + btnSelectRiver.h);
-    const Sprite & spritePanelGround = AGG::GetICN(icnpanel, 0);
-    const Sprite & spritePanelObject = AGG::GetICN(icnpanel, 1);
-    const Sprite & spritePanelInfo = AGG::GetICN(icnpanel, 2);
-    const Sprite & spritePanelRiver = AGG::GetICN(icnpanel, 3);
-    const Sprite & spritePanelRoad = AGG::GetICN(icnpanel, 4);
-    const Sprite & spritePanelClear = AGG::GetICN(icnpanel, 5);
+    const Sprite & spritePanelGround = AGG::GetICN(ICN::EDITPANL, 0);
+    const Sprite & spritePanelObject = AGG::GetICN(ICN::EDITPANL, 1);
+    const Sprite & spritePanelInfo = AGG::GetICN(ICN::EDITPANL, 2);
+    const Sprite & spritePanelRiver = AGG::GetICN(ICN::EDITPANL, 3);
+    const Sprite & spritePanelRoad = AGG::GetICN(ICN::EDITPANL, 4);
+    const Sprite & spritePanelClear = AGG::GetICN(ICN::EDITPANL, 5);
 
     dst_pt.x = dstPanel.x + 14;
     dst_pt.y = dstPanel.y + 127;
-    Button btnSizeSmall(dst_pt, icnbtns, 24, 25);
+    Button btnSizeSmall(dst_pt, ICN::EDITBTNS, 24, 25);
     dst_pt.x = dstPanel.x + 44;
-    Button btnSizeMedium(dst_pt, icnbtns, 26, 27);
+    Button btnSizeMedium(dst_pt, ICN::EDITBTNS, 26, 27);
     dst_pt.x = dstPanel.x + 74;
-    Button btnSizeLarge(dst_pt, icnbtns, 28, 29);
+    Button btnSizeLarge(dst_pt, ICN::EDITBTNS, 28, 29);
     dst_pt.x = dstPanel.x + 104;
-    Button btnSizeManual(dst_pt, icnbtns, 30, 31);
+    Button btnSizeManual(dst_pt, ICN::EDITBTNS, 30, 31);
 
     dst_pt.x = dstPanel.x;
     dst_pt.y = dstPanel.y + spritePanelGround.h();
-    Button btnZoom(dst_pt, icnbtns, 12, 13);
+    Button btnZoom(dst_pt, ICN::EDITBTNS, 12, 13);
 
     dst_pt.x = btnZoom.x + btnZoom.w;
     dst_pt.y = btnZoom.y;
-    Button btnUndo(dst_pt, icnbtns, 14, 15);
+    Button btnUndo(dst_pt, ICN::EDITBTNS, 14, 15);
 
     dst_pt.x = btnUndo.x + btnUndo.w;
     dst_pt.y = btnUndo.y;
-    Button btnNew(dst_pt, icnbtns, 16, 17);
+    Button btnNew(dst_pt, ICN::EDITBTNS, 16, 17);
 
     dst_pt.x = btnZoom.x;
     dst_pt.y = btnZoom.y + btnZoom.h;
-    Button btnSpec(dst_pt, icnbtns, 18, 19);
+    Button btnSpec(dst_pt, ICN::EDITBTNS, 18, 19);
 
     dst_pt.x = btnSpec.x + btnSpec.w;
     dst_pt.y = btnSpec.y;
-    Button btnFile(dst_pt, icnbtns, 20, 21);
+    Button btnFile(dst_pt, ICN::EDITBTNS, 20, 21);
 
     dst_pt.x = btnFile.x + btnFile.w;
     dst_pt.y = btnFile.y;
-    Button btnSystem(dst_pt, icnbtns, 22, 23);
+    Button btnSystem(dst_pt, ICN::EDITBTNS, 22, 23);
 
     // bottom static
-    switch(H2Config::VideoMode())
-    {
-        default:
-	    var1 = 0;
-	    break;
-	
-	case Display::MEDIUM:
-	    var1 = 1;
-	    break;
+    var1 = (videomode.h - 480) / TILEWIDTH - 2;
 
-	case Display::LARGE:
-	    var1 = 7;
-	    break;
-		
-	case Display::XLARGE:
-	    var1 = 15;
-	    break;
-    }
     src_rt.x = 0;
     src_rt.y = 0;
     src_rt.w = spriteBac.w();
@@ -307,8 +272,8 @@ Game::menu_t Game::Editor::StartGame()
     if(var1) display.Blit(spriteBac, src_rt, dst_pt);
 
     // splitter
-    Splitter split_h(AGG::GetICN(icnscroll, 2), Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRect().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8), Splitter::HORIZONTAL);
-    Splitter split_v(AGG::GetICN(icnscroll, 3), Rect(BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRect().h - 1) * TILEWIDTH - 6), Splitter::VERTICAL);
+    Splitter split_h(AGG::GetICN(ICN::ESCROLL, 2), Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRect().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8), Splitter::HORIZONTAL);
+    Splitter split_v(AGG::GetICN(ICN::ESCROLL, 3), Rect(BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRect().h - 1) * TILEWIDTH - 6), Splitter::VERTICAL);
 
     split_h.SetRange(0, world.w() - areaMaps.GetRect().w);
     split_v.SetRange(0, world.h() - areaMaps.GetRect().h);

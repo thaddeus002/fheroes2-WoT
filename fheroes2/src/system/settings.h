@@ -83,8 +83,8 @@ public:
 
     bool Modes(const settings_t s) const;
 
-    Size & VideoMode(void);
-    
+    const Size & VideoMode(void) const;
+
     u8   SoundVolume(void) const;
     u8   MusicVolume(void) const;
     u8   AnimationSpeed(void) const;

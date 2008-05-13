@@ -40,7 +40,7 @@ Game::menu_t Game::NewGame(void){
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(Display::SMALL);
+    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
@@ -101,7 +101,7 @@ Game::menu_t Game::NewMulti(void){
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(Display::SMALL);
+    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);

@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 		conf.ResetModes(Settings::MUSIC);
 	    }
 
-	    Display::SetVideoMode(Display::SMALL);
+	    Display::SetVideoMode(640, 480);
 	    Display::HideCursor();
 	    Display::SetCaption(caption);
 

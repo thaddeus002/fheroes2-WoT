@@ -131,7 +131,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(Display::SMALL);
+    Display::SetVideoMode(640, 480);
 
     Background background(Rect(110, 0, 510, 480));
     background.Save();

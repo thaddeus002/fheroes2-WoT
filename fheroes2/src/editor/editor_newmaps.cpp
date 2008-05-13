@@ -45,7 +45,7 @@ Game::menu_t Game::Editor::NewMaps(void)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(Display::SMALL);
+    Display::SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::EDITOR, 0);
