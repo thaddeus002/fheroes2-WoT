@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "settings.h"
 #include "config.h"
 #include "sprite.h"
 #include "game.h"
@@ -28,7 +27,6 @@
 void Game::DrawInterface(void)
 {
     Display & display = Display::Get();
-    display.SetVideoMode(Settings::Get().VideoMode());
     display.Fill(0x00, 0x00, 0x00);
 
     const ICN::icn_t icnlocator = H2Config::EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS;

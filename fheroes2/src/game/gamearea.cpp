@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "settings.h"
 #include "cursor.h"
 #include "error.h"
 #include "display.h"
@@ -43,13 +42,11 @@ GameArea::GameArea()
 
 void GameArea::Build(void)
 {
-    const Size & videomode = Settings::Get().VideoMode();
-
     area_pos.x = 0;
     area_pos.y = 0;
 
-    area_pos.w = (videomode.w - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH;
-    area_pos.h = (videomode.h - 2 * BORDERWIDTH) / TILEWIDTH;
+    area_pos.w = (Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH;
+    area_pos.h = (Display::Get().h() - 2 * BORDERWIDTH) / TILEWIDTH;
 }
 
 u16 GameArea::GetLeftTopIndexMaps(void)

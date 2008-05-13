@@ -77,6 +77,7 @@ Game::menu_t Game::StartGame(void)
     cursor.Hide();
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
+    display.SetVideoMode(conf.VideoMode());
     display.Fade();
 
     // Load maps

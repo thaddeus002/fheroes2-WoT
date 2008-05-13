@@ -59,8 +59,7 @@ Game::menu_t Game::Editor::StartGame()
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-    const Size & videomode = Settings::Get().VideoMode();
-    Display::SetVideoMode(videomode);
+    Display::SetVideoMode(Settings::Get().VideoMode());
     display.Fill(0x00, 0x00, 0x00);
 
     GameArea & areaMaps = GameArea::Get();
@@ -145,7 +144,7 @@ Game::menu_t Game::Editor::StartGame()
     src_rt.h = TILEWIDTH;
     dst_pt.y = 250;
     //
-    u8 var1 = 4 + (videomode.h - 480) / TILEWIDTH;
+    u8 var1 = 4 + (display.h() - 480) / TILEWIDTH;
 
     for(u8 ii = 0; ii < var1; ++ii)
     {
@@ -252,7 +251,7 @@ Game::menu_t Game::Editor::StartGame()
     Button btnSystem(dst_pt, ICN::EDITBTNS, 22, 23);
 
     // bottom static
-    var1 = (videomode.h - 480) / TILEWIDTH - 2;
+    var1 = (display.h() - 480) / TILEWIDTH - 2;
 
     src_rt.x = 0;
     src_rt.y = 0;
