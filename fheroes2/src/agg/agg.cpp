@@ -540,6 +540,16 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     return *sprite;
 }
 
+/* return count of sprites from specific ICN */
+int AGG::Cache::GetICNCount(const ICN::icn_t icn)
+{
+    const std::vector<Sprite *> & v = icn_cache[icn];
+
+    if(0 == v.size()) LoadICN(icn, false);
+
+    return v.size();
+}
+
 /* return TIL surface from AGG::Cache */
 const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index)
 {
@@ -608,6 +618,11 @@ void AGG::FreeObject(const TIL::til_t til)
 }
 
 // wrapper AGG::GetXXX
+int AGG::GetICNCount(const ICN::icn_t icn)
+{
+    return AGG::Cache::Get().GetICNCount(icn);
+}
+
 const Sprite & AGG::GetICN(const ICN::icn_t icn, const u16 index, bool reflect)
 {
     return AGG::Cache::Get().GetICN(icn, index, reflect);

@@ -106,3 +106,18 @@ bool Dialog::StatusBar::isEmpty(void)
 {
     return status.empty();
 }
+
+void Dialog::StatusBar::Redraw()
+{
+    Cursor & cursor = Cursor::Get();
+    bool localcursor = cursor.isVisible();
+
+    if(localcursor) cursor.Hide();
+
+    Display::Get().Blit(sprite, pos_pt);
+
+    Text(status, font, pos_pt.x + (sprite.w() - Text::width(status, font)) / 2,
+         pos_pt.y + (sprite.h() - Text::height(status, font)) / 2);
+
+    if(localcursor) cursor.Show();
+}

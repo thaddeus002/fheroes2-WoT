@@ -141,6 +141,7 @@ public:
     void Clear(void);
     void Clear(const std::string & message);
     bool isEmpty(void);
+    void Redraw();
 
 private:
     const Point pos_pt;

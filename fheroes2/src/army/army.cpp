@@ -115,7 +115,7 @@ void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
 
 void Army::Troops::Animate(Monster::animstate_t as)
 {
-    bool ranged = Monster::GetStats(monster).miss_icn != ICN::UNKNOWN;
+    bool ranged = aranged && Monster::GetStats(monster).miss_icn != ICN::UNKNOWN;
     u8 start, count;
     if(as != Monster::AS_NONE) {
 	astate = as;
@@ -125,12 +125,17 @@ void Army::Troops::Animate(Monster::animstate_t as)
 	Monster::GetAnimFrames(monster, astate & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : astate, start, count, ranged);
 	aframe++;
 	if(aframe >= start+count) {
-	    if(astate & Monster::AS_ATTPREP) 
+	    if(astate & Monster::AS_ATTPREP) {
 		astate = (Monster::animstate_t)(astate & ~Monster::AS_ATTPREP);
-	    else
+		Monster::GetAnimFrames(monster, astate, start, count, ranged);
+		aframe = start;
+	    } else if(astate == Monster::AS_DIE) {
+		aframe --;
+	    } else {
 		astate = Monster::AS_NONE;
-	    Monster::GetAnimFrames(monster, astate, start, count, ranged);
-	    aframe = start;
+		Monster::GetAnimFrames(monster, astate, start, count, ranged);
+		aframe = start;
+	    }
 	}
     }
 }
