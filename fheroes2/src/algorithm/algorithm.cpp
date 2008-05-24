@@ -48,17 +48,6 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
     
     std::map<u16, cellinfo_t>	work_map;
     
-    std::vector<Direction::vector_t> directs(8);
-
-    directs[0] = Direction::TOP;
-    directs[1] = Direction::TOP_LEFT;
-    directs[2] = Direction::TOP_RIGHT;
-    directs[3] = Direction::RIGHT;
-    directs[4] = Direction::BOTTOM_RIGHT;
-    directs[5] = Direction::BOTTOM;
-    directs[6] = Direction::BOTTOM_LEFT;
-    directs[7] = Direction::LEFT;
-
     bool notfound = false;
     u32 count_itr = 0;
 
@@ -67,17 +56,14 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
 
     while(index_i != index2 && !notfound)
     {
-	std::vector<Direction::vector_t>::const_iterator it1 = directs.begin();
-	std::vector<Direction::vector_t>::const_iterator it2 = directs.end();
-
-	for(; it1 != it2; ++it1)
+	for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
 	{
-	    if(Maps::isValidDirection(index_i, *it1))
+	    if(Maps::isValidDirection(index_i, direct))
 	    {
-		const u16 index_w = Maps::GetDirectionIndex(index_i, *it1);
+		const u16 index_w = Maps::GetDirectionIndex(index_i, direct);
 		cellinfo_t & cell = work_map[index_w];
 
-		cell.direct = *it1;
+		cell.direct = direct;
 		cell.move = (world.GetTiles(index_w).isPassable() || index_w == index2);
 
 		if(cell.move && MAXU16 == cell.cost_g)

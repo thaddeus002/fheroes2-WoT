@@ -94,7 +94,15 @@ Rect::Rect(const Point & pt, u16 rw, u16 rh) : Point(pt), Size(rw, rh)
 Rect::Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz)
 {
 }
-        
+
+Rect::Rect(const Rect & rt1, const Rect & rt2)
+{
+    x = rt1.x < rt2.x ? rt1.x : rt2.x;
+    y = rt1.y < rt2.y ? rt1.y : rt2.y;
+    w = rt1.x + rt1.w > rt2.x + rt2.w ? rt1.x + rt1.w - x : rt2.x + rt2.w - x;
+    h = rt1.y + rt1.h > rt2.y + rt2.h ? rt1.y + rt1.h - y : rt2.y + rt2.h - y;
+}
+
 Rect::Rect(const std::vector<Rect> & vect)
 {
     int x1 = 32766;

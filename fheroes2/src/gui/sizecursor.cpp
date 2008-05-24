@@ -48,7 +48,7 @@ void SizeCursor::ModifySize(const Size & sz)
 
 void SizeCursor::ModifySize(const u8 w, const u8 h)
 {
-    if(w > GameArea::GetRect().w || h > GameArea::GetRect().h)
+    if(w > GameArea::w() || h > GameArea::h())
     {
     	Error::Warning("SizeCursor::SizeCursor: size out of range.");
 	ModifyCursor(1, 1);

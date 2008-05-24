@@ -38,7 +38,7 @@ namespace Route
 	bool green_color;
     };
 
-    class Path : protected std::list<Step>
+    class Path : public std::list<Step>
     {
 	public:
 	    Path(const Heroes & h);
@@ -50,24 +50,27 @@ namespace Route
 
 	    u16		Calculate(u16 dst_index);
 
-	    void	Show(void) const;
-	    void	Hide(void) const;
+	    void	Show(void);
+	    void	Hide(void);
 	    void	Reset(void);
 	    void	Rescan(void);
-	    void	PopFront(void){ pop_front(); };
+	    void	PopFront(void){ if(size()) pop_front(); };
 
 	    u16		NextToLast(void) const;
 	    bool	isValid(void) const;
+	    bool	isShow(void) const;
 	    bool	EnableMove(void) const;
 	    u32		TotalPenalty(void) const;
 
-	private:
 	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to);
+
+	private:
 	    void	Dump(void) const;
 
 	private:
 	    const Heroes & hero;
 	    u16		dst;
+	    bool	hide;
     };
 };
 

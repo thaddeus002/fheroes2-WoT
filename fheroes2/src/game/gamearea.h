@@ -23,7 +23,7 @@
 #include "gamedefs.h"
 #include "rect.h"
 
-class GameArea
+class GameArea : protected Rect
 {
 public:
     static GameArea & Get(void);
@@ -31,24 +31,31 @@ public:
 
     typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
 
-    static const Rect & GetRect(void){ return area_pos; };
+    const Rect & GetRect(void) const { return *this; };
+
+    static s16 x(void) { return Get().GetRect().x; };
+    static s16 y(void) { return Get().GetRect().y; };
+    static u16 w(void) { return Get().GetRect().w; };
+    static u16 h(void) { return Get().GetRect().h; };
 
     static u16 GetLeftTopIndexMaps(void);
-    static void SrcRectFixed(Rect & src, Point & dst, const u16 w, const u16 h);
+    static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
 
     void Scroll(scroll_t scroll);
-
     void Center(const Point &pt);
     void CenterFromRadar(const Point &pt);
 
-    void Redraw(const Rect & area_rt = Rect(0, 0, area_pos.w, area_pos.h));
-    void RedrawAnimation(void);
+    void Redraw(const s16 rx = 0, const s16 ry = 0, const u16 rw = w(), const u16 rh = h()) const;
+    void Redraw(const Rect & rt) const;
+
 
 private:
     GameArea();
 
-    static Rect area_pos;
-    static u32 animation_ticket;
+    s16 & gx;
+    s16 & gy;
+    u16 & gw;
+    u16 & gh;
 };
 
 #endif

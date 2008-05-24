@@ -21,7 +21,23 @@
 #include "world.h"
 #include "gamearea.h"
 #include "error.h"
+#include "settings.h"
 #include "maps.h"
+
+namespace Maps
+{
+    static u32 animation_ticket = 0;
+};
+
+u32 Maps::AnimationTicket(void)
+{
+    return animation_ticket;
+}
+
+void Maps::IncreaseAnimationTicket(void)
+{
+    ++animation_ticket;
+}
 
 u16 Maps::GetDirectionIndex(u16 from, Direction::vector_t vector)
 {
@@ -122,18 +138,31 @@ u16 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
 }
 
 /* convert area point to index maps */
-u16 Maps::GetIndexFromAreaPoint(const Point & pt)
+int Maps::GetIndexFromAreaPoint(const Point & pt)
 {
     return GetIndexFromAreaPoint(pt.x, pt.y);
 }
 
-u16 Maps::GetIndexFromAreaPoint(s16 px, s16 py)
+int Maps::GetIndexFromAreaPoint(s16 px, s16 py)
 {
-    const Rect & area_pos = GameArea::GetRect();
+    const Rect & area_pos = GameArea::Get().GetRect();
 
     u16 result = (area_pos.y + (py - BORDERWIDTH) / TILEWIDTH) * world.w() + area_pos.x + (px - BORDERWIDTH) / TILEWIDTH;
 
-    if(result > world.w() * world.h() - 1) Error::Except("Game::GetIndexMaps: position, out of range.");
+    return result > world.w() * world.h() - 1 ? -1 : result;
+}
+
+u16 Maps::GetAroundFogDirection(u16 center, u8 color)
+{
+    if(!isValidAbsPoint(center % world.w(), center / world.h())) return 0;
+    if(0 == color) color = Settings::Get().MyColor();
+
+    u16 result = 0;
+
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+	if(isValidDirection(center, direct) && world.GetTiles(GetDirectionIndex(center, direct)).isFog(color)) result |= direct;
+
+    if(world.GetTiles(center).isFog(color)) result |= Direction::CENTER;
 
     return result;
 }

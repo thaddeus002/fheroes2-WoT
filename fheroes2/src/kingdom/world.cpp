@@ -44,12 +44,12 @@ World & World::GetWorld(void)
 }
 
 /* new maps */
-void World::NewMaps(Maps::mapsize_t w, Maps::mapsize_t h)
+void World::NewMaps(const u16 sw, const u16 sh)
 {
     FreeOldMaps();
 
-    width = w;
-    height = h;
+    width = sw;
+    height = sh;
 
     ultimate_artifact = 0xFFFF;
 
@@ -512,7 +512,6 @@ void World::LoadMaps(const std::string &filename)
 	}
 
 	(*tile).AddonsSort();
-	(*tile).FixAnimation();
 
 	vec_tiles[ii] = tile;
     }
@@ -773,8 +772,8 @@ void World::LoadMaps(const std::string &filename)
 	    {
 		if(pblock[8])
 		{
-		    vec_rumors.push_back(new GameEvent::Rumor(&pblock[8]));
-		    if(H2Config::Debug()) Error::Verbose("add Rumors: " + (*vec_rumors.back()).GetString());
+		    vec_rumors.push_back(&pblock[8]);
+		    if(H2Config::Debug()) Error::Verbose("add Rumors: " + vec_rumors.back());
 		}
 	    }
 	}
@@ -785,7 +784,7 @@ void World::LoadMaps(const std::string &filename)
     }
 
     // last rumors
-    vec_rumors.push_back(new GameEvent::Rumor("This game is now in pre alpha development version. ;)"));
+    vec_rumors.push_back("This game is now in pre alpha development version. ;)");
 
     // close mp2
     fd.close();
@@ -990,22 +989,19 @@ const Castle * World::GetCastle(u8 ax, u8 ay)
 }
 
 /* get heroes from index maps */
-const Heroes * World::GetHeroes(u16 maps_index)
+const Heroes * World::GetHeroes(u16 maps_index) const
 {
     return GetHeroes(maps_index % width, maps_index / height);
 }
 
 /* get heroes from coord maps */
-const Heroes * World::GetHeroes(u8 ax, u8 ay)
+const Heroes * World::GetHeroes(u8 ax, u8 ay) const
 {
     std::vector<Heroes *>::const_iterator it1 = vec_heroes.begin();
     std::vector<Heroes *>::const_iterator it2 = vec_heroes.end();
 
     for(; it1 != it2; ++it1)
         if(*it1 && (*it1)->GetCenter().x == ax && (*it1)->GetCenter().y == ay) return *it1;
-
-    //dinamic object
-    //Error::Warning("World::GetHeroes: return NULL pointer");
 
     return NULL;
 }
@@ -1106,12 +1102,6 @@ void World::FreeOldMaps(void)
     vec_riddles.clear();
 
     // rumors
-    if(vec_rumors.size())
-    {
-	std::vector<GameEvent::Rumor *>::const_iterator it = vec_rumors.begin();
-
-	for(; it != vec_rumors.end(); ++it) delete *it;
-    }
     vec_rumors.clear();
 
     // castles
@@ -1224,9 +1214,7 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
 
 const std::string & World::GetRumors(void)
 {
-    //vec_rumors.size();
-
-    return (*vec_rumors[Rand::Get(vec_rumors.size() - 1)]).GetString();
+    return vec_rumors[Rand::Get(vec_rumors.size() - 1)];
 }
 
 /* return spell from shrine circle */
@@ -1249,7 +1237,8 @@ u16 World::NextTeleport(const u16 index) const
 
     while((result = Rand::Get(vec_teleports.size() - 1)) == index) result = Rand::Get(vec_teleports.size() - 1);
 
-    return vec_teleports.at(result);
+    // check if busy
+    return GetHeroes(vec_teleports[result]) ? index : vec_teleports[result];
 }
 
 /* return skill from witchs hut */
@@ -1337,3 +1326,35 @@ Color::color_t World::ColorCapturedObject(const u16 index) const
     return Color::GRAY;
 }
 
+void World::ClearFog(const u8 color)
+{
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+
+    for(; it1 != it2; ++it1)
+	if(color & (*it1).second.second)
+    {
+	u8 scoute = 0;
+
+	switch((*it1).second.first)
+	{
+	    case MP2::OBJ_MINES:
+	    case MP2::OBJ_ALCHEMYTOWER:
+	    case MP2::OBJ_SAWMILL:	scoute = 2; break;
+
+	    case MP2::OBJ_LIGHTHOUSE:	scoute = 4; break; // FIXME: scoute and lighthouse
+
+	    default: break;
+	}
+
+        if(scoute)
+	{
+	    const Point center((*it1).first % w(), (*it1).first / h());
+
+	    for(s16 y = center.y - scoute; y <= center.y + scoute; ++y)
+        	for(s16 x = center.x - scoute; x <= center.x + scoute; ++x)
+                    if(Maps::isValidAbsPoint(x, y) &&  scoute + 2 >= std::abs(x - center.x) + std::abs(y - center.y))
+                        GetTiles(Maps::GetIndexFromAbsPoint(x, y)).ClearFog(color);
+	}
+    }
+}

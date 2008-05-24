@@ -31,15 +31,38 @@
 #include "rand.h"
 #include "m82.h"
 #include "game_focus.h"
+#include "engine.h"
+#include "cursor.h"
 #include "tools.h"
 
-// action to next cell
-void Heroes::Action(void)
+void AnimationRemoveObject(const Maps::Tiles & tile)
 {
-    if(! path.isValid()) return;
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    u32 ticket = 0;
+    u8 alpha = 250;
 
-    const u16 dst_index = path.GetFrontIndex();
-    const MP2::object_t object = world.GetTiles(dst_index).GetObject();
+    while(le.HandleEvents() && alpha > 0)
+    {
+        if(!(ticket % ANIMATION_HIGH))
+        {
+	    Cursor::Get().Hide();
+	    tile.RedrawTile();
+	    tile.RedrawBottomWithAlpha(alpha);
+	    tile.RedrawTop();
+	    Cursor::Get().Show();
+    	    Display::Get().Flip();
+    	    alpha -= 10;
+        }
+
+        ++ticket;
+    }
+}
+
+// action to next cell
+void Heroes::Action(const Maps::Tiles & dst)
+{
+    const u16 & dst_index = dst.GetIndex();
+    const MP2::object_t & object = dst.GetObject();
 
     switch(object)
     {
@@ -48,8 +71,8 @@ void Heroes::Action(void)
         case MP2::OBJ_CASTLE:	ActionToCastle(dst_index); break;
         case MP2::OBJ_HEROES:	ActionToHeroes(dst_index); break;
 
-        case MP2::OBJ_BOAT:	ActionToBoat(); break;
-	case MP2::OBJ_COAST:	ActionToCoast(); break;
+        case MP2::OBJ_BOAT:	ActionToBoat(dst_index); break;
+	case MP2::OBJ_COAST:	ActionToCoast(dst_index); break;
 
         // resource
         case MP2::OBJ_RESOURCE:	ActionToResource(dst_index, MP2::OBJ_RESOURCE); break;
@@ -151,11 +174,10 @@ void Heroes::Action(void)
         case MP2::OBJ_MAGICGARDEN:
 	case MP2::OBJ_OBSERVATIONTOWER:
         case MP2::OBJ_FREEMANFOUNDRY:
-    	    MoveNext();
 	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
 
-	default: MoveNext(); break;
+	default: break;
     }
 }
 
@@ -217,11 +239,9 @@ void Heroes::ActionToCastle(const u16 dst_index)
     const Castle *castle = world.GetCastle(dst_index);
 
     if(! castle) return;
-    
+
     if(color == castle->GetColor())
     {
-	MoveNext();
-
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: " + GetName() + " goto castle " + castle->GetName());
 
 	Audio::Mixer::Get().Reduce();
@@ -238,25 +258,52 @@ void Heroes::ActionToCastle(const u16 dst_index)
     }
 }
 
-void Heroes::ActionToBoat(void)
+void Heroes::ActionToBoat(const u16 dst_index)
 {
     if(isShipMaster()) return;
 
-    MoveNext();
-    SetShipMaster(true);
+    const u16 from_index = Maps::GetIndexFromAbsPoint(mp);
+
+    Maps::Tiles & tiles_from = world.GetTiles(from_index);
+    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+
+    path.Hide();
+    path.Reset();
     move_point = 0;
+
+    tiles_from.SetObject(MP2::OBJ_COAST);
+
+    SetCenter(dst_index);
+    SetShipMaster(true);
+
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+    save_maps_general = MP2::OBJ_ZERO;
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToBoat: " + GetName() + " to boat");
 }
 
-void Heroes::ActionToCoast(void)
+void Heroes::ActionToCoast(const u16 dst_index)
 {
-    MoveNext();
-
     if(! isShipMaster()) return;
 
-    SetShipMaster(false);
+    const u16 from_index = Maps::GetIndexFromAbsPoint(mp);
+
+    Maps::Tiles & tiles_from = world.GetTiles(from_index);
+    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+
+    path.Hide();
+    path.Reset();
     move_point = 0;
+
+    tiles_from.SetObject(MP2::OBJ_BOAT);
+
+    SetCenter(dst_index);
+    SetShipMaster(false);
+
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+    save_maps_general = MP2::OBJ_COAST;
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCoast: " + GetName() + " to coast");
 }
@@ -300,14 +347,7 @@ void Heroes::ActionToResource(const u16 dst_index)
 
 	// remove shadow from left cell
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	{
-	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
-
-	    left_tile.Remove(uniq);
-	    left_tile.RedrawAll();
-        }
-
-	tile.RedrawAll();
+	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
     }
@@ -356,14 +396,7 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 
 	// remove shadow from left cell
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	{
-	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
-
-	    left_tile.Remove(uniq);
-	    left_tile.RedrawAll();
-        }
-
-	tile.RedrawAll();
+	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: "  + GetName() + ": " + MP2::StringObject(obj));
     }
@@ -371,9 +404,6 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 
 void Heroes::ActionToShrine(const u16 dst_index)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     const Spell::spell_t spell = world.SpellFromShrine(dst_index);
 
     const std::string & spell_name = Spell::String(spell);
@@ -431,9 +461,6 @@ void Heroes::ActionToShrine(const u16 dst_index)
 
 void Heroes::ActionToWitchsHut(const u16 dst_index)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     const Skill::secondary_t skill = world.SkillFromWitchsHut(dst_index);
     const std::string & skill_name = Skill::String(skill);
     const std::string head("Witch's Hut");
@@ -468,9 +495,6 @@ void Heroes::ActionToWitchsHut(const u16 dst_index)
 
 void Heroes::ActionToLuckObject(const u16 dst_index, const MP2::object_t obj)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     const char *body_true = NULL;
     const char *body_false = NULL;
 
@@ -517,9 +541,6 @@ void Heroes::ActionToLuckObject(const u16 dst_index, const MP2::object_t obj)
 
 void Heroes::ActionToSign(const u16 dst_index)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     if(H2Config::MyColor() == GetColor())
 	Dialog::Message("Sign", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
 
@@ -538,24 +559,17 @@ void Heroes::ActionToBottle(const u16 dst_index)
     {
 	const u32 uniq = addon->uniq;
 
-	if(H2Config::MyColor() == GetColor())
-	    Dialog::Message("Bottle", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
-
 	PlayPickupSound();
 
 	tile.Remove(uniq);
 	tile.SetObject(MP2::OBJ_ZERO);
 
+	if(H2Config::MyColor() == GetColor())
+	    Dialog::Message("Bottle", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
+
 	// remove shadow from left cell
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	{
-	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
-
-	    left_tile.Remove(uniq);
-	    left_tile.RedrawAll();
-        }
-
-	tile.RedrawAll();
+	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToBottle: " + GetName() + " pickup bottle");
     }
@@ -563,9 +577,6 @@ void Heroes::ActionToBottle(const u16 dst_index)
 
 void Heroes::ActionToMagicWell(const u16 dst_index)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     const std::string header(MP2::StringObject(MP2::OBJ_MAGICWELL));
     const u16 max_point = GetMaxSpellPoints();
 
@@ -592,9 +603,6 @@ void Heroes::ActionToMagicWell(const u16 dst_index)
 
 void Heroes::ActionToTradingPost(const u16 dst_index)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     if(H2Config::MyColor() == GetColor()) Dialog::Marketplace();
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTradingPost: " + GetName());
@@ -602,9 +610,6 @@ void Heroes::ActionToTradingPost(const u16 dst_index)
 
 void Heroes::ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t obj)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     const char *body_true = NULL;
     const char *body_false = NULL;
     
@@ -666,9 +671,6 @@ void Heroes::ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t
 
 void Heroes::ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     const char *body_true = NULL;
     const char *body_false = NULL;
 
@@ -745,9 +747,6 @@ void Heroes::ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj)
 
 void Heroes::ActionToExperienceObject(const u16 dst_index, const MP2::object_t obj)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     const char *body_true = NULL;
     const char *body_false = NULL;
     
@@ -776,16 +775,12 @@ void Heroes::ActionToExperienceObject(const u16 dst_index, const MP2::object_t o
     // visit
     SetVisited(dst_index);
 
-    // increase experience
-    experience += exp;
-
     AGG::PlaySound(M82::EXPERNCE);
     if(H2Config::MyColor() == GetColor()) Dialog::ExperienceInfo(header, body_true, exp);
 
-    // FIXME: check level up
-    AGG::PlaySound(M82::NWHEROLV);
-
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToExperienceObject: " + GetName());
+
+    IncreaseExperience(exp);
 }
 
 void Heroes::ActionToArtifact(const u16 dst_index)
@@ -840,14 +835,7 @@ void Heroes::ActionToArtifact(const u16 dst_index)
 
 	// remove shadow from left cell
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	{
-	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
-
-	    left_tile.Remove(uniq);
-	    left_tile.RedrawAll();
-        }
-
-	tile.RedrawAll();
+	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToArtifact: " + GetName() + " pickup artifact");
     }
@@ -894,14 +882,7 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 
 	// remove shadow from left cell
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	{
-	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
-
-	    left_tile.Remove(uniq);
-	    left_tile.RedrawAll();
-        }
-
-	tile.RedrawAll();
+	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
     }
@@ -931,14 +912,7 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 
 	// remove shadow from left cell
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	{
-	    Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT));
-
-	    left_tile.Remove(uniq);
-	    left_tile.RedrawAll();
-        }
-
-	tile.RedrawAll();
+	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
     }
@@ -948,44 +922,29 @@ void Heroes::ActionToTeleports(const u16 index_from)
 {
     const u16 index_to = world.NextTeleport(index_from);
 
-    MoveNext();
-    Display::Get().Flip();
+    if(index_from == index_to)
+    {
+	Error::Warning("Heroes::ActionToTeleports: action unsuccessfully...");
+	return;
+    }
 
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-    RedrawAllDependentTiles();
-
     if(MP2::OBJ_HEROES != save_maps_general)
     {
 	tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
-        tiles_from.RedrawAll();
     }
 
     SetCenter(index_to);
 
     save_maps_general = MP2::OBJ_STONELIGHTS;
     tiles_to.SetObject(MP2::OBJ_HEROES);
-
-    tiles_to.RedrawAll();
-
-    Game::Focus & globalfocus = Game::Focus::Get();
-
-    globalfocus.Set(*this);
-    globalfocus.Redraw();
-
-    // FIXME: teleport: remove move points
-
-    Scoute();
-    Display::Get().Flip();
 }
 
 /* capture color object */
 void Heroes::ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj)
 {
-    MoveNext();
-    Display::Get().Flip();
-
     std::string header;
     std::string body;
 
@@ -1086,7 +1045,6 @@ void Heroes::ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj)
 	world.CaptureObject(dst_index, GetColor());
 	world.GetTiles(dst_index).CaptureFlags32(obj, GetColor());
 	if(H2Config::MyColor() == GetColor() && sprite) Dialog::SpriteInfo(header, body, *sprite);
-	Display::Get().Flip();
     }
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCaptureObject: " + GetName() + " captured: " + std::string(MP2::StringObject(obj)));

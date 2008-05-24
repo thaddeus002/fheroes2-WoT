@@ -28,7 +28,7 @@ namespace Direction
     typedef enum
     {
 	UNKNOWN		= 0x0000,
-	CENTER		= 0x0001,
+	TOP_LEFT	= 0x0001,
 	TOP		= 0x0002,
 	TOP_RIGHT	= 0x0004,
 	RIGHT		= 0x0008,
@@ -36,11 +36,11 @@ namespace Direction
 	BOTTOM		= 0x0020,
 	BOTTOM_LEFT	= 0x0040,
 	LEFT		= 0x0080,
-	TOP_LEFT	= 0x0100,
+	CENTER		= 0x0100,
     } vector_t;
 
-    inline vector_t& operator++ (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct << 1)); };
-    inline vector_t& operator-- (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct >> 1)); };
+    inline vector_t& operator++ (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct << 1)); };
+    inline vector_t& operator-- (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct >> 1)); };
 
     const std::string & String(vector_t direct);
 

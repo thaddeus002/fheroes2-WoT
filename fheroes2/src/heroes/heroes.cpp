@@ -36,7 +36,7 @@
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), spellCasted(false), name(str), experience(0), magic_point(0),
     move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
-    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT)
+    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     // hero is freeman
     color = Color::GRAY;
@@ -917,8 +917,26 @@ void Heroes::Recruit(const Castle & castle)
 
 void Heroes::ActionNewDay(void)
 {
+    // recovery move points
     move_point = GetMaxMovePoints();
     path.Rescan();
+
+    // recovery spell points
+    if(HasArtifact(Artifact::MAGIC_BOOK))
+    {
+	// everyday
+	if(magic_point != GetMaxSpellPoints()) ++magic_point;
+
+	// secondary skill
+	switch(GetLevelSkill(Skill::MYSTICISM))
+	{
+	    case Skill::Level::BASIC:	if(magic_point != GetMaxSpellPoints()) magic_point += 1; break;
+	    case Skill::Level::ADVANCED:if(magic_point != GetMaxSpellPoints()) magic_point += 2; break;
+	    case Skill::Level::EXPERT:	if(magic_point != GetMaxSpellPoints()) magic_point += 3; break;
+
+	    default: break;
+	}
+    }
 
     // remove day visit object
     std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isDayLife);
@@ -1021,6 +1039,16 @@ u8 Heroes::GetLevel(void) const
     return GetLevelFromExperience(experience);
 }
 
+void Heroes::IncreaseExperience(const u16 exp)
+{
+    const u8 level_old = GetLevelFromExperience(experience);
+    const u8 level_new = GetLevelFromExperience(experience + exp);
+
+    for(u8 ii = 0; ii < level_new - level_old; ++ii) LevelUp();
+
+    experience += exp;
+}
+
 /* calc level from exp */
 u8 Heroes::GetLevelFromExperience(u32 exp)
 {
@@ -1045,6 +1073,15 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 	case 8: 	return 11000;
 	case 9:		return 13200;
 	case 10:	return 15500;
+	case 11:	return 18500;
+	case 12:	return 22100;
+	case 13:	return 26400;
+	case 14:	return 31600;
+	case 15:	return 37800;
+	case 16:	return 45300;
+	case 17:	return 54200;
+	case 18:	return 65000;
+
 
 	// FIXME:	calculate alghoritm
 
@@ -1100,210 +1137,9 @@ void Heroes::SetMove(bool f)
     enable_move = f;
 }
 
-/* return true is need move */
-bool Heroes::isNeedMove(void) const
-{
-    return path.isValid() && path.GetDestinationIndex() != Maps::GetIndexFromAbsPoint(mp);
-}
-
-/* move heroes to next path cell */
-void Heroes::MoveNext(void)
-{
-    if(!path.isValid()) return;
-    
-    // move point deficiency
-    if(!path.EnableMove())
-    {
-	SetMove(false);
-
-	return;
-    }
-
-    MoveNextAnimation();
-
-    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    const u16 index_to = path.GetFrontIndex();
-
-    Maps::Tiles & tiles_from = world.GetTiles(index_from);
-    Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-    path.Hide();
-
-    RedrawAllDependentTiles();
-
-    if(MP2::OBJ_HEROES != save_maps_general)
-    {
-	tiles_from.SetObject(save_maps_general);
-	tiles_from.RedrawAll();
-    }
-
-    save_maps_general = tiles_to.GetObject();
-    tiles_to.SetObject(MP2::OBJ_HEROES);
-
-    mp.x = index_to % world.w();
-    mp.y = index_to / world.w();
-
-    move_point -= path.GetFrontPenalty();
-
-    path.PopFront();
-
-    path.isValid() ? path.Show() : path.Reset();
-
-    tiles_to.RedrawAll();
-
-    // fix boat
-    if(!shipmaster && MP2::OBJ_BOAT == save_maps_general) save_maps_general = MP2::OBJ_ZERO;
-    else
-    if(shipmaster && MP2::OBJ_COAST == save_maps_general)
-    {
-	tiles_from.SetObject(MP2::OBJ_BOAT);
-	tiles_from.RedrawAll();
-    }
-    Scoute();
-}
-
-/* draw move to next cell, return true if end way */
-bool Heroes::Move(void)
-{
-    if(!path.isValid()) return false;
-
-    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    const u16 & index_to = path.GetFrontIndex();
-    const Direction::vector_t direction2 = Direction::Get(index_from, index_to);
-
-    if(Direction::UNKNOWN == direction || Direction::CENTER == direction) return false;
-
-    // change through the circle
-    if(direction != direction2)
-    {
-	RedrawAllDependentTiles();
-
-	Direction::vector_t to1 = direction;
-	Direction::vector_t to2 = direction2;
-
-	while(to1 != to2)
-	{
-	    Direction::ShortDistanceClockWise(to1, to2) ? ++to1 : --to1;
-	    if(Direction::CENTER == to1) Direction::ShortDistanceClockWise(to1, to2) ? ++to1 : --to1;
-
-	    RedrawRotate(Direction::ShortDistanceClockWise(to1, to2));
-
-	    direction = to1;
-	}
-
-	world.GetTiles(index_from).RedrawAll();
-    }
-
-    // end: next last
-    if(path.GetDestinationIndex() == index_to)
-    {
-	SetMove(false);
-
-	return true;
-    }
-
-    MoveNext();
-
-    return false;
-}
-
-/* show path */
-void Heroes::ShowPathOrStartMove(const u16 dst_index)
-{
-    // show path
-    if(path.GetDestinationIndex() != dst_index)
-    {
-	Cursor & cursor = Cursor::Get();
-	Display & display = Display::Get();
-
-	SetMove(false);
-
-	cursor.Hide();
-
-	if(path.isValid()) path.Hide();
-
-	path.Calculate(dst_index);
-	path.Show();
-
-	world.GetTiles(mp).RedrawAll();
-
-	cursor.Show();
-	display.Flip();
-    }
-    // start move
-    else
-    if(path.EnableMove())
-    {
-	SetMove(true);
-    }
-}
-
 MP2::object_t Heroes::GetUnderObject(void) const
 {
     return save_maps_general;
-}
-
-void Heroes::RedrawRotate(bool clockwise)
-{
-    const Sprite *sprite1 = NULL;
-    const Sprite *sprite2 = NULL;
-    ICN::icn_t icn = ICN::UNKNOWN;
-
-    switch(race)
-    {
-	case Race::KNGT:	icn = ICN::KNGT32; break;
-	case Race::BARB:	icn = ICN::BARB32; break;
-	case Race::SORC:	icn = ICN::SORC32; break;
-	case Race::WRLK:	icn = ICN::WRLK32; break;
-	case Race::WZRD:	icn = ICN::WZRD32; break;
-	case Race::NECR:	icn = ICN::NECR32; break;
-	default: return;
-    }
-
-    switch(direction)
-    {
-	case Direction::TOP:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 45 : 55);
-	    sprite2 = &AGG::GetICN(icn, 46, !clockwise);
-	    break;
-
-	case Direction::TOP_RIGHT:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 47 : 46);
-	    sprite2 = &AGG::GetICN(icn, clockwise ? 48 : 45);
-	    break;
-
-	case Direction::RIGHT:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 49 : 48);
-	    sprite2 = &AGG::GetICN(icn, clockwise ? 50 : 47);
-	    break;
-
-	case Direction::BOTTOM_RIGHT:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 51 : 50);
-	    sprite2 = &AGG::GetICN(icn, clockwise ? 52 : 49);
-	    break;
-
-	case Direction::BOTTOM:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 53 : 52);
-	    sprite2 = &AGG::GetICN(icn, 51, !clockwise);
-	    break;
-
-	case Direction::BOTTOM_LEFT:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 50 : 51, true);
-	    sprite2 = &AGG::GetICN(icn, clockwise ? 49 : 52, clockwise);
-	    break;
-
-	case Direction::LEFT:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 48 : 49, true);
-	    sprite2 = &AGG::GetICN(icn, clockwise ? 47 : 50, true);
-	    break;
-
-	case Direction::TOP_LEFT:
-	    sprite1 = &AGG::GetICN(icn, clockwise ? 46 : 47, true);
-	    sprite2 = &AGG::GetICN(icn, clockwise ? 55 : 48, !clockwise);
-	    break;
-
-	default: return;
-    }
 }
 
 bool Heroes::isShipMaster(void) const
@@ -1398,12 +1234,13 @@ void Heroes::LearnBasicSkill(const Skill::secondary_t skill)
 void Heroes::Scoute(void)
 {
     int scouting = SCOUTINGBASE + GetLevelSkill(Skill::SCOUTING);
-    Point p = GetCenter();
-    for(int x = -scouting; x <= scouting; x ++)
-        for(int y = -scouting; y <= scouting; y ++)
-            if(abs(x)+abs(y) <= scouting+2)
-                if(p.x+x >= 0 && p.y+y >= 0 && p.x+x < world.w() && p.y+y < world.h())
-                    world.GetTiles(p.x+x, p.y+y).ClearFog(GetColor());
+
+    const Point & center = mp;
+
+    for(s16 y = center.y - scouting; y <= center.y + scouting; ++y)
+        for(s16 x = center.x - scouting; x <= center.x + scouting; ++x)
+            if(Maps::isValidAbsPoint(x, y) &&  scouting + 2 >= std::abs(x - center.x) + std::abs(y - center.y))
+                world.GetTiles(Maps::GetIndexFromAbsPoint(x, y)).ClearFog(color);
 }
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
@@ -1420,205 +1257,6 @@ void Heroes::SetCenter(const u16 index)
 {
     mp.x = index % world.w();
     mp.y = index / world.h();
-}
-
-/* anime movement */
-void Heroes::MoveNextAnimation(void)
-{
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-
-    const Rect area(0, 0, display.w(), display.h());
-    const Rect & gamearea = GameArea::GetRect();
-
-    if(!(gamearea & mp)) return;
-
-    bool reflect = ReflectSprite();
-    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
-    s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);
-
-    u8 frame = 1;
-    u32 ticket = 0;
-
-    while(le.HandleEvents())
-    {
-        // exit
-        if(9 == frame) break;
-
-        // FIXME: speed animation
-        if(!(ticket % ANIMATION_MEDIUM))
-        {
-	    cursor.Hide();
-
-	    const Sprite & sprite1 = SpriteHero(frame);
-    	    const Sprite & sprite2 = SpriteFlag(frame);
-	    const Maps::Tiles & tile = world.GetTiles(index_from);
-
-	    Point op(0, 0);
-
-	    // offset
-	    switch(direction)
-	    {
-    		case Direction::TOP:		op.y = -4 * frame; break;
-    		case Direction::TOP_RIGHT:	op.x = 4 * frame; op.y = -4 * frame; break;
-    		case Direction::TOP_LEFT:	op.x = -4 * frame; op.y = -4 * frame; break;
-    		case Direction::BOTTOM_RIGHT:	op.x = 4 * frame; op.y = 4 * frame; break;
-    		case Direction::BOTTOM:		op.y = 4 * frame; break;
-    		case Direction::BOTTOM_LEFT:	op.x = -4 * frame; op.y = 4 * frame; break;
-    		case Direction::RIGHT:		op.x = 4 * frame; break;
-    		case Direction::LEFT:		op.x = -4 * frame; break;
-		default: break;
-	    }
-
-	    RedrawAllDependentTiles();
-
-	    tile.RedrawTile();
-	    tile.RedrawBottom();
-
-    	    Point dst_pt1(reflect ? dx + TILEWIDTH - sprite1.x() - sprite1.w() : dx + sprite1.x(), dy + sprite1.y() + TILEWIDTH);
-    	    Point dst_pt2(reflect ? dx + TILEWIDTH - sprite2.x() - sprite2.w() : dx + sprite2.x(), dy + sprite2.y() + TILEWIDTH);
-
-    	    // little upper
-	    dst_pt1.y -= 5;
-    	    dst_pt2.y -= 5;
-
-    	    // apply anime offset
-	    dst_pt1 += op;
-	    dst_pt2 += op;
-
-	    Rect src_rt1;
-    	    Rect src_rt2;
-
-    	    GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
-    	    GameArea::SrcRectFixed(src_rt2, dst_pt2, sprite2.w(), sprite2.h());
-
-    	    display.Blit(sprite1, src_rt1, dst_pt1);
-    	    display.Blit(sprite2, src_rt2, dst_pt2);
-
-	    tile.RedrawTop();
-	    cursor.Show();
-    	    display.Flip();
-
-	    ++frame;
-        }
-
-        ++ticket;
-    }
-
-    cursor.Hide();
-}
-
-/* get anime sprite hero */
-const Sprite & Heroes::SpriteHero(const u8 index) const
-{
-    ICN::icn_t icn_hero = ICN::UNKNOWN;
-    u16 index_sprite = 0;
-
-    if(shipmaster) icn_hero = ICN::BOAT32;
-    else
-    switch(race)
-    {
-        case Race::KNGT: icn_hero = ICN::KNGT32; break;
-        case Race::BARB: icn_hero = ICN::BARB32; break;
-        case Race::SORC: icn_hero = ICN::SORC32; break;
-        case Race::WRLK: icn_hero = ICN::WRLK32; break;
-        case Race::WZRD: icn_hero = ICN::WZRD32; break;
-        case Race::NECR: icn_hero = ICN::NECR32; break;
-
-        default: Error::Warning("Heroes::SpriteHero: unknown race"); break;
-    }
-
-    switch(direction)
-    {
-        case Direction::TOP:            index_sprite =  0; break;
-        case Direction::TOP_RIGHT:      index_sprite =  9; break;
-        case Direction::RIGHT:          index_sprite = 18; break;
-        case Direction::BOTTOM_RIGHT:   index_sprite = 27; break;
-        case Direction::BOTTOM:         index_sprite = 36; break;
-        case Direction::BOTTOM_LEFT:    index_sprite = 27; break;
-        case Direction::LEFT:           index_sprite = 18; break;
-        case Direction::TOP_LEFT:       index_sprite =  9; break;
-
-        default: Error::Warning("Heroes::SpriteHero: unknown direction"); break;
-    }
-
-    return AGG::GetICN(icn_hero, index_sprite + (index % 9), ReflectSprite());
-}
-
-/* get anime sprite flag */
-const Sprite & Heroes::SpriteFlag(const u8 index) const
-{
-    ICN::icn_t icn_flag = ICN::UNKNOWN;
-    u16 index_sprite = 0;
-
-    switch(color)
-    {
-        case Color::BLUE:       icn_flag = shipmaster ? ICN::B_BFLG32 : ICN::B_FLAG32; break;
-        case Color::GREEN:      icn_flag = shipmaster ? ICN::G_BFLG32 : ICN::G_FLAG32; break;
-        case Color::RED:        icn_flag = shipmaster ? ICN::R_BFLG32 : ICN::R_FLAG32; break;
-        case Color::YELLOW:     icn_flag = shipmaster ? ICN::Y_BFLG32 : ICN::Y_FLAG32; break;
-        case Color::ORANGE:     icn_flag = shipmaster ? ICN::O_BFLG32 : ICN::O_FLAG32; break;
-        case Color::PURPLE:     icn_flag = shipmaster ? ICN::P_BFLG32 : ICN::P_FLAG32; break;
-
-        default: Error::Warning("Heroes::SpriteFlag: unknown color hero"); break;
-    }
-
-    switch(direction)
-    {
-        case Direction::TOP:            index_sprite =  0; break;
-        case Direction::TOP_RIGHT:      index_sprite =  9; break;
-        case Direction::RIGHT:          index_sprite = 18; break;
-        case Direction::BOTTOM_RIGHT:   index_sprite = 27; break;
-        case Direction::BOTTOM:         index_sprite = 36; break;
-        case Direction::BOTTOM_LEFT:    index_sprite = 27; break;
-        case Direction::LEFT:           index_sprite = 18; break;
-        case Direction::TOP_LEFT:       index_sprite =  9; break;
-
-        default: Error::Warning("Heroes::SpriteFlag: unknown direction"); break;
-    }
-
-    return AGG::GetICN(icn_flag, index_sprite + (index % 9), ReflectSprite());
-}
-
-bool Heroes::ReflectSprite(void) const
-{
-    switch(direction)
-    {
-        case Direction::BOTTOM_LEFT:
-        case Direction::LEFT:
-        case Direction::TOP_LEFT:
-	    return true;
-
-        default: break;
-    }
-
-    return false;
-}
-
-void Heroes::RedrawAllDependentTiles(void) const
-{
-    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    u16 redraw = 0;
-
-    switch(direction)
-    {
-        case Direction::TOP: 		redraw = Direction::TOP | Direction::BOTTOM | Direction::TOP_LEFT; break;
-        case Direction::TOP_RIGHT:	redraw = Direction::TOP | Direction::BOTTOM | Direction::TOP_LEFT | Direction::TOP_RIGHT | Direction::RIGHT; break;
-        case Direction::RIGHT:		redraw = Direction::TOP | Direction::BOTTOM | Direction::RIGHT | Direction::TOP_RIGHT; break;
-        case Direction::BOTTOM_RIGHT:	redraw = Direction::TOP | Direction::BOTTOM | Direction::RIGHT | Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT; break;
-        case Direction::BOTTOM:		redraw = Direction::TOP | Direction::BOTTOM | Direction::RIGHT | Direction::TOP_RIGHT; break;
-        case Direction::BOTTOM_LEFT:	redraw = Direction::TOP | Direction::BOTTOM | Direction::TOP_LEFT | Direction::LEFT | Direction::BOTTOM_LEFT; break;
-        case Direction::LEFT:		redraw = Direction::TOP | Direction::BOTTOM | Direction::TOP_LEFT | Direction::LEFT; break;
-        case Direction::TOP_LEFT: 	redraw = Direction::TOP | Direction::BOTTOM | Direction::TOP_LEFT | Direction::LEFT | Direction::TOP_RIGHT; break;
-
-        default: break;
-    }
-
-    for(Direction::vector_t ii = Direction::TOP; ii != Direction::CENTER; ++ii)
-	if((redraw & ii) && Maps::isValidDirection(index_from, ii))
-	    world.GetTiles(Maps::GetDirectionIndex(index_from, ii)).RedrawAll();
 }
 
 /* return route range in days */
@@ -1646,4 +1284,129 @@ u8 Heroes::GetRangeRouteDays(void) const
     }
 
     return 0;
+}
+
+/* up level */
+void Heroes::LevelUp(void)
+{
+    const u8 level = GetLevel();
+    std::vector<u8> primary(4);
+
+    // primary skill
+    switch(GetRace())
+    {
+	case Race::BARB:
+	    if(10 > level)
+	    {
+		primary[0] = 55; primary[1] = 35; primary[2] =  5; primary[3] =  5;
+	    }
+	    else
+	    {
+		primary[0] = 30; primary[1] = 30; primary[2] = 20; primary[3] = 20;
+	    }
+	    break;
+
+	case Race::KNGT:
+	    if(10 > level)
+	    {
+		primary[0] = 35; primary[1] = 45; primary[2] = 10; primary[3] = 10;
+	    }
+	    else
+	    {
+		primary[0] = 25; primary[1] = 25; primary[2] = 25; primary[3] = 25;
+	    }
+	    break;
+
+	case Race::NECR:
+	    if(10 > level)
+	    {
+		primary[0] = 15; primary[1] = 15; primary[2] = 35; primary[3] = 35;
+	    }
+	    else
+	    {
+		primary[0] = 25; primary[1] = 25; primary[2] = 25; primary[3] = 25;
+	    }
+	    break;
+
+	case Race::SORC:
+	    if(10 > level)
+	    {
+		primary[0] = 10; primary[1] = 10; primary[2] = 30; primary[3] = 50;
+	    }
+	    else
+	    {
+		primary[0] = 20; primary[1] = 20; primary[2] = 30; primary[3] = 30;
+	    }
+	    break;
+
+	case Race::WRLK:
+	    if(10 > level)
+	    {
+		primary[0] = 10; primary[1] = 10; primary[2] = 50; primary[3] = 30;
+	    }
+	    else
+	    {
+		primary[0] = 20; primary[1] = 20; primary[2] = 30; primary[3] = 30;
+	    }
+	    break;
+
+	case Race::WZRD:
+	    if(10 > level)
+	    {
+		primary[0] = 10; primary[1] = 10; primary[2] = 40; primary[3] = 40;
+	    }
+	    else
+	    {
+		primary[0] = 20; primary[1] = 20; primary[2] = 30; primary[3] = 30;
+	    }
+	    break;
+
+	default: return;
+    }
+
+    // calculate in percents
+    std::vector<u8>::const_iterator it1 = primary.begin();
+    std::vector<u8>::const_iterator it2 = primary.end();
+
+    const u8 value = Rand::Get(1, 100);
+    u8 amount = 0;
+    u8 res = 0;
+
+    for(; it1 != it2; ++it1)
+    {
+        amount += *it1;
+        ++res;
+
+        if(value <= amount) break;
+    }
+
+    // select skill
+    switch(res)
+    {
+	case 1:	++attack;
+	case 2: ++defence;
+	case 3: ++power;
+	case 4: ++knowledge;
+
+	default: break;
+    }
+    
+    if(GetColor() == H2Config::MyColor())
+    {
+	AGG::PlaySound(M82::NWHEROLV);
+
+	// show select dialog
+    }
+    else
+    {
+	// for AI
+    }
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::LevelUp: for " + GetName());
+}
+
+/* apply penalty */
+void Heroes::ApplyPenaltyMovement(void)
+{
+    if(path.isValid()) move_point -= path.GetFrontPenalty();
 }

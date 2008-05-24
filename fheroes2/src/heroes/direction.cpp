@@ -73,10 +73,6 @@ Direction::vector_t Direction::Get(u16 from, u16 to)
     if(to == Maps::GetTopLeftIndex(from))
     	return TOP_LEFT;
 
-    //Error::Warning("Direction::Get: from: ", from);
-    //Error::Warning("Direction::Get:   to: ", to);
-    //Error::Warning("Direction::Get: return UNKNOWN");
-
     return UNKNOWN;
 }
 
@@ -85,7 +81,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
    switch(from)
    {
 	case TOP:
-	    switch(from)
+	    switch(to)
 	    {
 		case TOP_RIGHT:
 		case RIGHT:
@@ -97,7 +93,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 	    break;
 
 	case TOP_RIGHT:
-	    switch(from)
+	    switch(to)
 	    {
 		case RIGHT:
 		case BOTTOM_RIGHT:
@@ -109,7 +105,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 	    break;
 
 	case RIGHT:
-	    switch(from)
+	    switch(to)
 	    {
 		case BOTTOM_RIGHT:
 		case BOTTOM:
@@ -121,7 +117,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 	    break;
 
 	case BOTTOM_RIGHT:
-	    switch(from)
+	    switch(to)
 	    {
 		case BOTTOM:
 		case BOTTOM_LEFT:
@@ -133,9 +129,8 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 	    break;
 
 	case BOTTOM:
-	    switch(from)
+	    switch(to)
 	    {
-		case TOP:
 		case BOTTOM_LEFT:
 		case LEFT:
 		case TOP_LEFT:		return true;
@@ -145,7 +140,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 	    break;
 
 	case BOTTOM_LEFT:
-	    switch(from)
+	    switch(to)
 	    {
 		case TOP:
 		case TOP_RIGHT:
@@ -157,7 +152,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 	    break;
 
 	case LEFT:
-	    switch(from)
+	    switch(to)
 	    {
 		case TOP:
 		case TOP_RIGHT:
@@ -169,7 +164,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 	    break;
 
 	case TOP_LEFT:
-	    switch(from)
+	    switch(to)
 	    {
 		case TOP:
 		case TOP_RIGHT:

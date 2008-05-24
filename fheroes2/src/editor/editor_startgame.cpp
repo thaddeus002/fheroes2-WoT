@@ -65,7 +65,7 @@ Game::menu_t Game::Editor::StartGame()
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
 
-    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
+    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
 
     const Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
@@ -484,12 +484,12 @@ Game::menu_t Game::Editor::StartGame()
 
     	    cursor.SetThemes(cursor.POINTER);
 
-	    const u16 div_x = mouse_coord.x < BORDERWIDTH + TILEWIDTH * (GameArea::GetRect().w - sizeCursor.w()) ?
+	    const u16 div_x = mouse_coord.x < BORDERWIDTH + TILEWIDTH * (GameArea::w() - sizeCursor.w()) ?
 			    (u16) ((mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH + BORDERWIDTH :
-			    BORDERWIDTH + (GameArea::GetRect().w - sizeCursor.w()) * TILEWIDTH;
-	    const u16 div_y = mouse_coord.y < BORDERWIDTH + TILEWIDTH * (GameArea::GetRect().h - sizeCursor.h()) ?
+			    BORDERWIDTH + (GameArea::w() - sizeCursor.w()) * TILEWIDTH;
+	    const u16 div_y = mouse_coord.y < BORDERWIDTH + TILEWIDTH * (GameArea::h() - sizeCursor.h()) ?
 			    (u16) ((mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH + BORDERWIDTH :
-			    BORDERWIDTH + (GameArea::GetRect().h - sizeCursor.h()) * TILEWIDTH;
+			    BORDERWIDTH + (GameArea::h() - sizeCursor.h()) * TILEWIDTH;
 
 	    if(! sizeCursor.isVisible() || sizeCursor.GetPos().x != div_x || sizeCursor.GetPos().y != div_y)
 	    {
@@ -509,8 +509,8 @@ Game::menu_t Game::Editor::StartGame()
 		sizeCursor.Hide();
 
 
-		const Point topleft(GameArea::GetRect().x + (div_x - BORDERWIDTH) / 32,
-				    GameArea::GetRect().y + (div_y - BORDERWIDTH) / 32);
+		const Point topleft(GameArea::x() + (div_x - BORDERWIDTH) / 32,
+				    GameArea::y() + (div_y - BORDERWIDTH) / 32);
 
 		
 		for(u8 iy = 0; iy < sizeCursor.h(); ++iy)
@@ -534,13 +534,15 @@ Game::menu_t Game::Editor::StartGame()
 			    default: break;
 			}
 
-			newtile.RedrawAll();
+			newtile.RedrawTile();
+			newtile.RedrawBottom();
+			newtile.RedrawTop();
 		    }
 		}
 		
 		//GetIndexFromAbsPoint(
-		//Error::Verbose("X: ", GameArea::GetRect().x + (div_x - BORDERWIDTH) / 32);
-		//Error::Verbose("Y: ", GameArea::GetRect().y + (div_y - BORDERWIDTH) / 32);
+		//Error::Verbose("X: ", GameArea::x() + (div_x - BORDERWIDTH) / 32);
+		//Error::Verbose("Y: ", GameArea::y() + (div_y - BORDERWIDTH) / 32);
 		//Maps::Tiles & tile = world.GetTiles(topleft);
 		//for(u8 ii = 0; ii < sizeCursor.w(); ++ii)
 		//{

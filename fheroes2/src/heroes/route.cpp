@@ -31,7 +31,7 @@
 
 /* construct */
 Route::Path::Path(const Heroes & h)
-    : hero(h), dst(Maps::GetIndexFromAbsPoint(h.GetCenter()))
+    : hero(h), dst(Maps::GetIndexFromAbsPoint(h.GetCenter())), hide(true)
 {
 }
 
@@ -49,34 +49,14 @@ u16 Route::Path::Calculate(u16 dst_index)
     return size();
 }
 
-void Route::Path::Show(void) const
+void Route::Path::Hide(void)
 {
-    if(empty()) return;
+    hide = true;
+}
 
-    // path only human players
-    if(hero.GetColor() != H2Config::MyColor()) return;
-
-    u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
-
-    std::list<Step>::const_iterator it1 = begin();
-    std::list<Step>::const_iterator it2 = end();
-    std::list<Step>::const_iterator it3 = it1;
-
-    for(; it1 != it2; ++it1)
-    {
-	Maps::Tiles & tile = world.GetTiles((*it1).to_index);
-
-	u16 index = 0;
-
-	if(++it3 != it2) index = GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index));
-
-	tile.AddPathSprite(& AGG::GetICN(!(*it1).green_color ? ICN::ROUTERED : ICN::ROUTE, index));
-	tile.RedrawAll();
-
-	from = (*it1).to_index;
-    }
-
-    if(H2Config::Debug()) Dump();
+void Route::Path::Show(void)
+{
+    hide = false;
 }
 
 void Route::Path::Dump(void) const
@@ -99,26 +79,6 @@ void Route::Path::Dump(void) const
 
     if(H2Config::Debug()) Error::Verbose("Route::Path: end index: ", dst);
     if(H2Config::Debug()) Error::Verbose("Route::Path: size: ", size());
-}
-
-void Route::Path::Hide(void) const
-{
-    if(empty()) return;
-
-    // path only human players
-    if(hero.GetColor() != H2Config::MyColor()) return;
-
-    // redraw tiles
-    std::list<Step>::const_iterator it1 = begin();
-    std::list<Step>::const_iterator it2 = end();
-
-    for(; it1 != it2; ++it1)
-    {
-	Maps::Tiles & tile = world.GetTiles((*it1).to_index);
-
-	tile.DelPathSprite();
-	tile.RedrawAll();
-    }
 }
 
 void Route::Path::Reset(void)
@@ -293,4 +253,9 @@ void Route::Path::Rescan(void)
 	}
 	else break;
     }
+}
+
+bool Route::Path::isShow(void) const
+{
+    return !hide;
 }

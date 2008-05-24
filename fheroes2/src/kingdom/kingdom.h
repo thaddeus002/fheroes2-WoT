@@ -91,7 +91,6 @@ public:
     Game::control_t Control() const{ return control; };
     void SetControl(const Game::control_t con) { control = con; };
     bool isPlay(void) const{ return play; };
-    bool isEmpty(void) const{ return !(castles.size() || heroes.size()); }
     bool AllowPayment(const Resource::funds_t & funds) const;
 
     Color::color_t GetColor(void) const{ return color; };
@@ -122,12 +121,12 @@ public:
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);
     
-    void SetDied(void){ play = false; };
-    
     void AITurns(const Game::StatusWindow & status);
     void ActionNewDay(void);
     void ActionNewWeek(void);
     void ActionNewMonth(void);
+
+    void ClearFog(void);
 
     void SetVisited(const u16 index, const MP2::object_t & object = MP2::OBJ_ZERO);
     bool isVisited(const MP2::object_t & object) const;

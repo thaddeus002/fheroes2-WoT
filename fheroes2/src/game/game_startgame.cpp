@@ -49,6 +49,7 @@ namespace Game
     void OpenHeroes(Heroes *heroes);
     void FocusToCastle(Castle *castle);
     void FocusToHeroes(Heroes *hero);
+    void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
     Game::menu_t HumanTurn(StatusWindow & statusWindow, bool message);
 };
 
@@ -225,11 +226,19 @@ Game::menu_t Game::StartGame(void)
 	if(world.GetKingdom(color).isPlay() && world.GetKingdom(color).Control() == Game::Human) 
 	    humans ++;
 
-    while(1) {
+    while(1)
+    {
 	// AI move
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) {
-	    if(world.GetKingdom(color).isPlay() && !world.GetKingdom(color).isEmpty()) 
-	    switch(world.GetKingdom(color).Control()) {
+	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	{
+	    Kingdom & kingdom = world.GetKingdom(color);
+	    if(kingdom.isPlay())
+	    {
+		kingdom.ClearFog();
+		world.ClearFog(color);
+
+		switch(kingdom.Control())
+		{
 	        case Game::Human:
 		    mixer.Enhance();
 		    //cursor.Show();
@@ -237,37 +246,38 @@ Game::menu_t Game::StartGame(void)
 		    statusWindow.SetState(Game::StatusWindow::DAY);
 		    statusWindow.Redraw();
 
-		    //Color::color_t human = H2Config::MyColor();
 		    conf.SetMyColor(color);
-    		    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().isValid())
-    		    {
-    		        global_focus.GetHeroes().GetPath().Hide();
-    		        global_focus.GetHeroes().GetPath().Show();
-		    }
 
 		    m = HumanTurn(statusWindow, humans > 1);
 
 		    cursor.Hide();
 		    mixer.Reduce();
-		    if(m != ENDTURN) break;
+
+		    if(m != ENDTURN) goto OUTDOOR;
 		    break;
 	        case Game::Network:
+		    cursor.SetThemes(Cursor::WAIT);
+		    cursor.Show();
 	            display.Flip();
+		    kingdom.AITurns(statusWindow);
 	            // TODO network game
 		    break;
 	        case Game::AI:
+		    cursor.SetThemes(Cursor::WAIT);
+		    cursor.Show();
 	            display.Flip();
-		    world.GetKingdom(color).AITurns(statusWindow);
+		    kingdom.AITurns(statusWindow);
 		    break;
 		default:
 		    Dialog::Message(Color::String(color), "default", Font::BIG, Dialog::OK);
 		    break;
+		}
 	    }
-	    if(m != ENDTURN) break;
 	}
-	if(m != ENDTURN) break;
 	world.NextDay();
     }
+
+OUTDOOR:
 
     delete _buttonScrollHeroesUp;
     delete _buttonScrollCastleUp;
@@ -299,7 +309,6 @@ void Game::OpenCastle(Castle *castle)
     const Kingdom & myKingdom = world.GetMyKingdom();
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-    GameArea & areaMaps = GameArea::Get();
 
     Dialog::answer_t result = Dialog::ZERO;
 
@@ -308,6 +317,8 @@ void Game::OpenCastle(Castle *castle)
     while(Dialog::CANCEL != result)
     {
 	FocusToCastle(castle);
+
+	Display::Get().Flip();
 
 	cursor.Hide();
 
@@ -328,10 +339,7 @@ void Game::OpenCastle(Castle *castle)
 	cursor.Show();
     }
 
-    if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes()))
-	    FocusToHeroes(hero);
-
-    areaMaps.Redraw();
+    if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes())) FocusToHeroes(hero);
 
     Audio::Mixer::Get().Enhance();
 }
@@ -343,7 +351,7 @@ void Game::FocusToCastle(Castle *castle)
 
     Game::Focus & globalfocus = Game::Focus::Get();
 
-    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().ShowPath(false);
 
     globalfocus.Set(*castle);
     globalfocus.Redraw();
@@ -368,6 +376,7 @@ void Game::OpenHeroes(Heroes *hero)
     while(Dialog::CANCEL != result)
     {
 	FocusToHeroes(hero);
+	Display::Get().Flip();
 
 	cursor.Hide();
 
@@ -419,9 +428,10 @@ void Game::FocusToHeroes(Heroes *hero)
 
     Game::Focus & globalfocus = Game::Focus::Get();
 
-    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().ShowPath(false);
 
     globalfocus.Set(*hero);
+    globalfocus.GetHeroes().ShowPath(true);
     globalfocus.Redraw();
 }
 
@@ -438,6 +448,9 @@ Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile, 
 	    {
 		switch(tile.GetObject())
 		{
+		    case MP2::OBJ_BOAT:
+    			    return Cursor::POINTER;
+
 		    case MP2::OBJN_CASTLE:
     		    {
     			const Castle *castle = world.GetCastle(tile.GetIndex());
@@ -657,21 +670,52 @@ Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile, 
     return Cursor::POINTER;
 }
 
+void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
+{
+    if(!hero) return;
+
+    Route::Path & path = hero->GetPath();
+
+    // show path
+    if(path.GetDestinationIndex() != dst_index)
+    {
+        Cursor & cursor = Cursor::Get();
+        Display & display = Display::Get();
+
+        hero->SetMove(false);
+
+        cursor.Hide();
+
+        if(path.isValid()) path.Hide();
+
+        path.Calculate(dst_index);
+        path.Show();
+        cursor.Show();
+        display.Flip();
+    }
+    // start move
+    else
+    if(path.EnableMove())
+    {
+        hero->SetMove(true);
+    }
+}
+
 Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 {
     Game::Focus & global_focus = Focus::Get();
     Radar & radar = Radar::Get();
-    GameArea & areaMaps = GameArea::Get();
+    GameArea & gamearea = GameArea::Get();
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     Audio::Mixer & mixer = Audio::Mixer::Get();
 
-    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
+    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, gamearea.GetRect().w * TILEWIDTH, gamearea.GetRect().h * TILEWIDTH);
     const Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
     const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
-    const Rect areaScrollTop(BORDERWIDTH / 2, 0, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    const Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    const Rect areaScrollTop(BORDERWIDTH / 2, 0, (gamearea.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    const Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (gamearea.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -744,7 +788,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
     }
 
     // center to focus
-    areaMaps.Center(global_focus.Center());
+    gamearea.Center(global_focus.Center());
     radar.RedrawCursor();
 
     selectCastles.Redraw();
@@ -765,19 +809,18 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	if(le.KeyPress(KEY_ESCAPE))
 	{
     	    // stop hero
-    	    if(Game::Focus::HEROES == global_focus.Type() &&
-    		global_focus.GetHeroes().isNeedMove() && 
-    		global_focus.GetHeroes().isEnableMove())
-    		    global_focus.GetHeroes().SetMove(false);
+    	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
+    	    	global_focus.GetHeroes().SetMove(false);
     	    else
     	    if(Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
+	    continue;
 	}
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft))
+	if(le.MouseCursor(areaScrollLeft) && GameArea::x())
 	{
 	    cursor.Hide();
 	    cursor.SetThemes(Cursor::SCROLL_LEFT);
-	    areaMaps.Scroll(GameArea::LEFT);
+	    gamearea.Scroll(GameArea::LEFT);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
@@ -785,11 +828,11 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	}
 	else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight))
+	if(le.MouseCursor(areaScrollRight) && (world.w() - GameArea::w() > GameArea::x()))
 	{
 	    cursor.Hide();
 	    cursor.SetThemes(Cursor::SCROLL_RIGHT);
-	    areaMaps.Scroll(GameArea::RIGHT);
+	    gamearea.Scroll(GameArea::RIGHT);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
@@ -797,11 +840,11 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	}
 	else
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop))
+	if(le.MouseCursor(areaScrollTop) && GameArea::y())
 	{
 	    cursor.Hide();
 	    cursor.SetThemes(Cursor::SCROLL_TOP);
-	    areaMaps.Scroll(GameArea::TOP);
+	    gamearea.Scroll(GameArea::TOP);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
@@ -809,10 +852,11 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	}
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom)){
+	if(le.MouseCursor(areaScrollBottom) && (world.h() - GameArea::h() > GameArea::y()))
+	{
 	    cursor.Hide();
 	    cursor.SetThemes(Cursor::SCROLL_BOTTOM);
-	    areaMaps.Scroll(GameArea::BOTTOM);
+	    gamearea.Scroll(GameArea::BOTTOM);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
@@ -823,7 +867,9 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	if(le.MouseCursor(area_pos))
 	{
 	    const Point & mouse_coord = le.MouseCursor();
-	    const u16 index_maps = Maps::GetIndexFromAreaPoint(mouse_coord);
+	    const int index_maps = Maps::GetIndexFromAreaPoint(mouse_coord);
+	    if(0 > index_maps) continue;
+
 	    const Maps::Tiles & tile = world.GetTiles(index_maps);
 	    const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
 
@@ -831,7 +877,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 
 	    if(le.MouseClickLeft(tile_pos))
 	    {
-		switch(global_focus.Type())
+		if(Cursor::POINTER != cursor.Themes()) switch(global_focus.Type())
 		{
 		    case Focus::HEROES:
 		    {
@@ -862,7 +908,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 				    else
 				    {
 					const u16 castle_center = Maps::GetIndexFromAbsPoint(to_castle->GetCenter());
-					from_hero.ShowPathOrStartMove(castle_center);
+					ShowPathOrStartMoveHero(&from_hero, castle_center);
 					route_days = from_hero.GetRangeRouteDays();
 				    }
     				}
@@ -886,7 +932,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 				    }
 				    else
 				    {
-					from_hero.ShowPathOrStartMove(index_maps);
+					ShowPathOrStartMoveHero(&from_hero, index_maps);
 					route_days = from_hero.GetRangeRouteDays();
 				    }
     				}
@@ -898,7 +944,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 			    default:
 				if(tile.isPassable() || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
 				{
-				    from_hero.ShowPathOrStartMove(index_maps);
+				    ShowPathOrStartMoveHero(&from_hero, index_maps);
 				    route_days = from_hero.GetRangeRouteDays();
 				}
 			    break;
@@ -1028,9 +1074,10 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 		(le.MouseClickLeft(radar.GetRect()) ||
 		    le.MousePressLeft(radar.GetRect())))
 	    {
-		Rect prev(areaMaps.GetRect());
-		areaMaps.CenterFromRadar(le.MouseCursor());
-		if(prev != areaMaps.GetRect()){
+		const Point prev(gamearea.GetRect());
+		gamearea.CenterFromRadar(le.MouseCursor());
+		if(prev != gamearea.GetRect())
+		{
 		    cursor.Hide();
 		    radar.RedrawCursor();
 		    cursor.Show();
@@ -1171,16 +1218,6 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 			    if(hero && H2Config::MyColor() == (*hero).GetColor())
 			    {
 				FocusToHeroes(hero);
-
-				const Route::Path & path = global_focus.GetHeroes().GetPath();
-				if(path.isValid())
-				{
-				    cursor.Hide();
-				    path.Show();
-				    world.GetTiles((*hero).GetCenter()).RedrawAll();
-				    cursor.Show();
-				}
-
 				display.Flip();
 			    }
 			}
@@ -1283,8 +1320,8 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	    if(le.MouseClickLeft(buttonMovement))
 	    {
     		if(Game::Focus::HEROES == global_focus.Type() &&
-    		    global_focus.GetHeroes().isNeedMove())
-    		    global_focus.GetHeroes().isEnableMove() ? global_focus.GetHeroes().SetMove(false) : global_focus.GetHeroes().SetMove(true);
+    		    global_focus.GetHeroes().GetPath().isValid())
+		    global_focus.GetHeroes().SetMove(!global_focus.GetHeroes().isEnableMove());
 	    }
 	    else
 	    // click Kingdom Summary
@@ -1393,38 +1430,51 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	// mix all sound from focus
 	Game::EnvironmentSoundMixer(change_settings);
 
-        // draw heroes movement (in focus)
-    	if(Game::Focus::HEROES == global_focus.Type() &&
-	   global_focus.GetHeroes().isNeedMove()) {
-    	    if(global_focus.GetHeroes().isEnableMove()) {
-		// FIXME: play sound only if move
-    		if(global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().PlayWalkSound();
-
-		cursor.Hide();
-
-    		if(global_focus.GetHeroes().Move())
-		{
-		    global_focus.Update();
-    		    // action, and modify sound evironment
-    		    global_focus.GetHeroes().Action();
-		}
-		else
-		    global_focus.Update();
-
-		selectHeroes.Redraw();
-		areaMaps.Center(global_focus.Center());
-		radar.RedrawCursor();
-
-		cursor.Show();
-		display.Flip();
-	    } else global_focus.GetHeroes().SetMove(false);
-	}
-
         // animation
-        if(!(ticket % ANIMATION_LOW))
+        if(!(ticket % ANIMATION_MEDIUM))
         {
             cursor.Hide();
-            areaMaps.RedrawAnimation();
+
+    	    if(Game::Focus::HEROES == global_focus.Type())
+	    {
+		Heroes & heroes = global_focus.GetHeroes();
+		const Route::Path & path = heroes.GetPath();
+
+		// if valid and enable move or anime sprite
+		if(path.isValid() && (heroes.isEnableMove() || (heroes.GetSpriteIndex() < 45 && heroes.GetSpriteIndex() % 9) || heroes.GetSpriteIndex() >= 45))
+		{
+		    const u16 center = Maps::GetIndexFromAbsPoint(heroes.GetCenter());
+		    const u16 front_index = path.GetFrontIndex();
+
+		    // if need change through the circle
+		    if(heroes.GetDirection() != Direction::Get(center, front_index))
+		    {
+			heroes.AngleStep(Direction::Get(center, front_index));
+		    }
+		    else
+		    // move
+		    {
+			heroes.MoveStep();
+		    }
+
+		    if(heroes.GetCenter() != global_focus.Center())
+		    {
+			global_focus.Update();
+
+			selectHeroes.Redraw();
+			gamearea.Center(global_focus.Center());
+			radar.RedrawCursor();
+		    }
+		}
+		else
+		{
+		    heroes.SetMove(false);
+		}
+	    }
+
+	    Maps::IncreaseAnimationTicket();
+
+	    gamearea.Redraw();
             cursor.Show();
             display.Flip();
         }
@@ -1433,6 +1483,12 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
     }
 
     Game::Focus & globalfocus = Game::Focus::Get();
-    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().GetPath().Hide();
+    if(Game::Focus::HEROES == globalfocus.Type())
+    {
+	globalfocus.GetHeroes().ShowPath(false);
+	globalfocus.Redraw();
+        display.Flip();
+    }
+
     return ENDTURN;
 }

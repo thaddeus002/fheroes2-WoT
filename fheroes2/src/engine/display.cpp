@@ -109,6 +109,7 @@ void Display::ShowCursor(void)
 void Display::Fade()
 {
     Display & display = Display::Get();
+    if(needrise || display.w() != 640 || display.h() != 480) return;
     Surface temp(display);
     temp.SetDisplayFormat();
     temp.Blit(display);
@@ -130,8 +131,9 @@ void Display::Fade()
 
 void Display::Rise()
 {
-    needrise = false;
     Display & display = Display::Get();
+    if(!needrise) return;
+    needrise = false;
     Surface temp(display);
     temp.SetDisplayFormat();
     temp.Blit(display);

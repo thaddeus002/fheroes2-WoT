@@ -65,7 +65,6 @@ namespace Maps
 	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().uniq : 0; };
 	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().uniq : 0; };
 
-	bool isAnimation(void) const;
 	bool isPassable(void) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 
@@ -97,13 +96,10 @@ namespace Maps
 
 	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
 
-	void AddPathSprite(const Sprite * sprite){ path_sprite = sprite; };
-	void DelPathSprite(void){ path_sprite = NULL; };
-
-	void RedrawAll(const u32 frame = 0) const;
 	void RedrawTile(void) const;
-	void RedrawBottom(const u32 frame = 0) const;
-	void RedrawTop(const u32 frame = 0) const;
+	void RedrawBottom(void) const;
+	void RedrawTop(void) const;
+	void RedrawBottomWithAlpha(const u8 alpha) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);
@@ -113,20 +109,13 @@ namespace Maps
 	void AddonsSort(void);
 	void Remove(u32 uniq);
 
-	void FixAnimation(void);
-
 	void DebugInfo(u16 index = 0xFFFF) const;
 	
-	bool GetFog(Color::color_t color){ return fogs & color; };
-	void SetFog(Color::color_t color){ fogs |= color; };
-	void ClearFog(Color::color_t color){ fogs &= ~color; };
+	bool isFog(u8 color) const{ return fogs & color; };
+	void SetFog(u8 color){ fogs |= color; };
+	void ClearFog(u8 color){ fogs &= ~color; };
 
     private:
-	void RedrawBoat(void) const;
-	void RedrawHeroes(void) const;
-	void RedrawMonster(const u32 anime_sprite) const;
-	void RedrawRoute(void) const;
-	void RedrawGrid(void) const;
 	void CorrectFlags32(const u8 index);
 
     private:
@@ -140,10 +129,6 @@ namespace Maps
         std::list<TilesAddon> addons_level1;
         std::list<TilesAddon> addons_level2;
 
-        const Sprite *path_sprite;
-        
-        bool	animation;
-        
         u8	fogs;
     };
 };

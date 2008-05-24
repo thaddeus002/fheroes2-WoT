@@ -663,13 +663,13 @@ u16 Monster::GetRNDSize(monster_t monster)
     switch(GetLevel(monster))
     {
 	case LEVEL1:
-		    return (Rand::Get(Army::HORDE, Army::SWARM) * (level / 100));
+		    return static_cast<u16>(Rand::Get(Army::HORDE, Army::SWARM) * (level / 100));
 	case LEVEL2:
-		    return (Rand::Get(Army::LOTS, Army::THRONG) * (level / 100));
+		    return static_cast<u16>(Rand::Get(Army::LOTS, Army::THRONG) * (level / 100));
 	case LEVEL3:
-		    return (Rand::Get(Army::PACK, Army::HORDE) * (level / 100));
+		    return static_cast<u16>(Rand::Get(Army::PACK, Army::HORDE) * (level / 100));
 	case LEVEL4:
-		    return (Rand::Get(Army::SEVERAL, Army::LOTS) * (level / 100));
+		    return static_cast<u16>(Rand::Get(Army::SEVERAL, Army::LOTS) * (level / 100));
     }
 
     return 1;

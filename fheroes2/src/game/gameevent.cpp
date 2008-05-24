@@ -287,7 +287,3 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
 
     if(H2Config::Debug()) Error::Verbose("GameEvent::Riddle: add: " + message);
 }
-
-GameEvent::Rumor::Rumor(const char * ptr) : message(ptr)
-{
-}

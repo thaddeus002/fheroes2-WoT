@@ -56,7 +56,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     // image box
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
 
-    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
+    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
     const Point & mp = LocalEvent::MouseCursor();
     
     Rect pos; 
@@ -172,7 +172,7 @@ void Dialog::QuickInfo(const Castle & castle)
     // image box
     const Sprite &box = AGG::GetICN(qwiktown, 0);
 
-    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
+    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
     const Point & mp = LocalEvent::MouseCursor();
     
     Rect cur_rt; 
@@ -323,7 +323,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     // image box
     const Sprite &box = AGG::GetICN(qwikhero, 0);
 
-    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::GetRect().w * TILEWIDTH, GameArea::GetRect().h * TILEWIDTH);
+    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
     const Point & mp = LocalEvent::MouseCursor();
     
     Rect cur_rt; 

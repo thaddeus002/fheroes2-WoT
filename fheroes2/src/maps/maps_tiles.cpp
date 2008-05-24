@@ -138,8 +138,8 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
-    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2), path_sprite(NULL),
-    animation(false), fogs(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE)
+    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
+    fogs(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE)
 {
     tile_sprite.LoadPalette(AGG::Cache::Get().GetPAL());
 
@@ -244,40 +244,9 @@ void Maps::Tiles::Remove(u32 uniq)
     }
 }
 
-void Maps::Tiles::RedrawAll(const u32 anime_frame) const
-{
-    RedrawTile();
-    RedrawBottom(anime_frame);
-
-    switch(general)
-    {
-	// boat
-	case MP2::OBJ_BOAT:
-	    RedrawBoat();
-	    break;
-
-	// heroes
-	case MP2::OBJ_HEROES:
-	    RedrawHeroes();
-	    break;
-
-	// monster
-	case MP2::OBJ_MONSTER:
-	    RedrawMonster(anime_frame);
-	    break;
-	
-	default:
-	    break;
-    }
-
-    RedrawTop(anime_frame);
-    RedrawRoute();
-    RedrawGrid();
-}
-
 void Maps::Tiles::RedrawTile(void) const
 {
-    const Rect & area = GameArea::GetRect();
+    const Rect & area = GameArea::Get().GetRect();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(area & mp)
@@ -289,10 +258,10 @@ void Maps::Tiles::RedrawTile(void) const
     }
 }
 
-void Maps::Tiles::RedrawBottom(const u32 anime_frame) const
+void Maps::Tiles::RedrawBottom(void) const
 {
     Display & display = Display::Get();
-    const Rect & area = GameArea::GetRect();
+    const Rect & area = GameArea::Get().GetRect();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(area & mp)
@@ -317,7 +286,7 @@ void Maps::Tiles::RedrawBottom(const u32 anime_frame) const
 		    display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		    // possible anime
-		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, anime_frame))
+		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
 		    {
 			const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 			display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
@@ -328,10 +297,10 @@ void Maps::Tiles::RedrawBottom(const u32 anime_frame) const
     }
 }
 
-void Maps::Tiles::RedrawTop(const u32 anime_frame) const
+void Maps::Tiles::RedrawTop(void) const
 {
     Display & display = Display::Get();
-    const Rect & area = GameArea::GetRect();
+    const Rect & area = GameArea::Get().GetRect();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(area & mp)
@@ -356,7 +325,7 @@ void Maps::Tiles::RedrawTop(const u32 anime_frame) const
 		    display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		    // possible anime
-		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, anime_frame))
+		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
 		    {
 			const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 			display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
@@ -367,28 +336,10 @@ void Maps::Tiles::RedrawTop(const u32 anime_frame) const
     }
 }
 
-void Maps::Tiles::RedrawRoute(void) const
+void Maps::Tiles::RedrawBottomWithAlpha(const u8 alpha) const
 {
-    if(!path_sprite) return;
-
-    const Rect & area = GameArea::GetRect();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
-
-    if(area & mp)
-    {
-	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
-
-	Display::Get().Blit(*path_sprite, dstx + 16 - path_sprite->w() / 2, dsty + path_sprite->y() - 3);
-    }
-}
-
-void Maps::Tiles::RedrawGrid(void) const
-{
-    if(! H2Config::Debug()) return;
-
     Display & display = Display::Get();
-    const Rect & area = GameArea::GetRect();
+    const Rect & area = GameArea::Get().GetRect();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(area & mp)
@@ -396,66 +347,25 @@ void Maps::Tiles::RedrawGrid(void) const
 	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
 	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
 
-	display.Lock();
-	display.SetPixel(dstx, dsty, AGG::GetColor(0x40));
-	display.Unlock();
-    }
-}
-
-bool Maps::Tiles::isAnimation(void) const
-{
-    // check object
-    switch(general)
-    {
-	case MP2::OBJ_HEROES:
-	case MP2::OBJ_MONSTER:	return true;
-
-	default: break;
-    }
-
-    return animation;
-}
-
-void Maps::Tiles::FixAnimation(void)
-{
-    // level 1
-    if(!animation && addons_level1.size())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
+	if(addons_level1.size())
 	{
-	    const u8 & object = (*it1).object;
-	    const u8 & index  = (*it1).index;
-	    const ICN::icn_t icn = MP2::GetICNObject(object);
+	    std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	    std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
-	    if(ICN::UNKNOWN != icn && ICN::AnimationFrame(icn, index))
+	    for(; it1 != it2; ++it1)
 	    {
-		animation = true;
-		
-		break;
-	    }
-	}
-    }
+		const u8 & object = (*it1).object;
+		const u8 & index  = (*it1).index;
+		const ICN::icn_t icn = MP2::GetICNObject(object);
 
-    // level 2
-    if(!animation && addons_level2.size())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    const u8 & object = (*it1).object;
-	    const u8 & index  = (*it1).index;
-	    const ICN::icn_t icn = MP2::GetICNObject(object);
-
-	    if(ICN::UNKNOWN != icn && ICN::AnimationFrame(icn, index))
-	    {
-		animation = true;
-
-		break;
+		if(ICN::UNKNOWN != icn)
+		{
+		    const Sprite & sprite = AGG::GetICN(icn, index);
+		    Surface sf(sprite);
+		    sf.SetDisplayFormat();
+		    sf.SetAlpha(alpha);
+		    display.Blit(sf, dstx + sprite.x(), dsty + sprite.y());
+		}
 	    }
 	}
     }
@@ -623,133 +533,6 @@ void Maps::Tiles::DebugInfo(u16 index) const
     }
 
     std::cout << "----------------:--------" << std::endl << std::endl;
-}
-
-void Maps::Tiles::RedrawMonster(const u32 anime_sprite) const
-{
-    Display & display = Display::Get();
-    const Rect & area = GameArea::GetRect();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
-
-    if(!(area & mp)) return;
-    const s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-    const s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
-
-    Monster::monster_t monster = Monster::Monster(*this);
-
-    if(Monster::UNKNOWN <= monster)
-    {
-	Error::Warning("Maps::Tiles::RedrawMonster: unknown monster, ", monster);
-
-	return;
-    }
-	
-    u8 align_x = 0;
-	
-    switch(monster)
-    {
-	    case Monster::CAVALRY:
-	    case Monster::CHAMPION:
-	    case Monster::UNICORN:
-	    case Monster::PHOENIX:
-	    case Monster::CENTAUR:
-	    case Monster::HYDRA:
-	    case Monster::GREEN_DRAGON:
-	    case Monster::RED_DRAGON:
-	    case Monster::BLACK_DRAGON:
-	    case Monster::BOAR:
-	    case Monster::ROC:
-	    case Monster::BONE_DRAGON:
-	    case Monster::NOMAD:
-		align_x = 22;
-		break;
-
-	    case Monster::WOLF:
-	    case Monster::GRIFFIN:
-		align_x = 18;
-		break;
-
-	    default:
-		align_x = 16;
-		break;
-    }
-
-    // redraw top tiles
-    if(BORDERWIDTH < dy) world.GetTiles(maps_index - world.w()).RedrawAll(anime_sprite);
-
-    // redraw left tiles
-    if(BORDERWIDTH < dx) world.GetTiles(maps_index - 1).RedrawAll(anime_sprite);
-
-    // draw first sprite
-    const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9);
-
-    Point dst_pt(dx + TILEWIDTH - std::abs(sprite_first.x()) - align_x,
-                 dy + TILEWIDTH - std::abs(sprite_first.y()) - 4);
-    Rect src_rt;
-
-    GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
-
-    display.Blit(sprite_first, src_rt, dst_pt);
-
-    // draw second sprite
-    const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster * 9 + 1 + (anime_sprite % 6));
-
-    dst_pt.x = dx + TILEWIDTH - std::abs(sprite_next.x()) - align_x;
-    dst_pt.y = dy + TILEWIDTH - std::abs(sprite_next.y()) - 4;
-
-    GameArea::SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
-
-    display.Blit(sprite_next, src_rt, dst_pt);
-}
-
-void Maps::Tiles::RedrawBoat(void) const
-{
-    const Rect & area = GameArea::GetRect();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
-
-    if(area & mp)
-    {
-	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
-
-	Display::Get().Blit(AGG::GetICN(ICN::OBJNWAT2, 23), dstx, dsty);
-    }
-}
-
-void Maps::Tiles::RedrawHeroes(void) const
-{
-    Display & display = Display::Get();
-    const Rect & area = GameArea::GetRect();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
-
-    if(!(area & mp)) return;
-    const s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-    const s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
-
-    if(const Heroes *heroes = world.GetHeroes(maps_index))
-    {
-	bool reflect = heroes->ReflectSprite();
-
-	const Sprite & sprite1 = heroes->SpriteHero(0);
-	const Sprite & sprite2 = heroes->SpriteFlag(0);
-
-	Point dst_pt1(reflect ? dx + TILEWIDTH - sprite1.x() - sprite1.w() : dx + sprite1.x(), dy + sprite1.y() + TILEWIDTH);
-	Point dst_pt2(reflect ? dx + TILEWIDTH - sprite2.x() - sprite2.w() : dx + sprite2.x(), dy + sprite2.y() + TILEWIDTH);
-
-	dst_pt1.y -= 5;
-	dst_pt2.y -= 5;
-
-	Rect src_rt1;
-	Rect src_rt2;
-
-	GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
-	GameArea::SrcRectFixed(src_rt2, dst_pt2, sprite2.w(), sprite2.h());
-
-	display.Blit(sprite1, src_rt1, dst_pt1);
-	display.Blit(sprite2, src_rt2, dst_pt2);
-    }
-    else
-	Error::Warning("Maps::Tiles::RedrawHeroes: unknown hero, maps index: ", maps_index);
 }
 
 MP2::object_t Maps::Tiles::GetObject(void) const
@@ -1046,15 +829,17 @@ bool Maps::Tiles::isPassable(void) const
 {
     if(Game::Focus::Get().Type() != Game::Focus::HEROES) return false;
 
-    std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-    std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+    //std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+    //std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
 
-    for(; it1 != it2; ++it1)
-    	if((*it1).level == 0 /*&& !TilesAddon::isRoad(*it1)*/ && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
+    //for(; it1 != it2; ++it1)
+    //	if(((*it1).level % 4) == 0 && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
+    	//if(/* (*it1).level == 0 && !TilesAddon::isRoad(*it1) &&*/ MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
 
     if(Game::Focus::Get().GetHeroes().isShipMaster())
     {
     	if(Ground::WATER != Maps::Tiles::GetGround()) return false;
+	if(addons_level1.empty()) return true;
 
         switch(general)
 	{
@@ -1078,21 +863,21 @@ bool Maps::Tiles::isPassable(void) const
     else
     {
 	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
-/*
+	if(addons_level1.empty()) return true;
+
         switch(general)
 	{
 	    case MP2::OBJ_COAST:
 	    case MP2::OBJ_DUNE:
-	    case MP2::OBJ_FLOWERS:		
+	    case MP2::OBJ_FLOWERS:
 	    case MP2::OBJ_SHRUB:
 	    case MP2::OBJ_SHRUB2:
 	    case MP2::OBJ_STUMP:
-	    case MP2::OBJ_ZERO:		
+	    case MP2::OBJ_ZERO:
 		return true;
 
 	    default: return false;
 	}
-*/
     }
 
     return true;
@@ -1499,9 +1284,9 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 
     switch(obj)
     {
-	case MP2::OBJ_MINES:		index += 14; CorrectFlags32(index); RedrawAll(); break;
-	//case MP2::OBJ_DRAGONCITY:	index += 35; CorrectFlags32(index); Redraw(); break; unused
-        case MP2::OBJ_LIGHTHOUSE:	index += 42; CorrectFlags32(index); RedrawAll(); break;
+	case MP2::OBJ_MINES:		index += 14; CorrectFlags32(index); break;
+	//case MP2::OBJ_DRAGONCITY:	index += 35; CorrectFlags32(index); break; unused
+        case MP2::OBJ_LIGHTHOUSE:	index += 42; CorrectFlags32(index); break;
 
 	case MP2::OBJ_ALCHEMYTOWER:
 	{
@@ -1510,7 +1295,6 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
 		tile.CorrectFlags32(index);
-		tile.RedrawAll();
 	    }
 	}
 	break;
@@ -1522,7 +1306,6 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
     	    {
     		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP_RIGHT));
     		tile.CorrectFlags32(index);
-		tile.RedrawAll();
 	    }
 	}
 	break;
@@ -1535,14 +1318,12 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
     		tile.CorrectFlags32(index);
-		tile.RedrawAll();
 	    }
 
 	    if(Maps::isValidDirection(maps_index, Direction::RIGHT))
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
     		tile.CorrectFlags32(index);
-		tile.RedrawAll();
 	    }
 	}
 	break;

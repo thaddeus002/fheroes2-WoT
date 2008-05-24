@@ -123,8 +123,6 @@ void Game::Focus::Redraw(void)
     {
 	selectCastles.Reset();
         selectHeroes.Select();
-
-        heroes->GetPath().Show();
     }
     else
     if(castle)
@@ -134,9 +132,10 @@ void Game::Focus::Redraw(void)
     }
 
     areaMaps.Center(center);
+    areaMaps.Redraw();
     radar.RedrawCursor();
     selectCastles.Redraw();
     selectHeroes.Redraw();
 
-    cursor.Show();                                                                
+    cursor.Show();
 }

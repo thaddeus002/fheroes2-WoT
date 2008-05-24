@@ -123,7 +123,6 @@ public:
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
     u8 GetKnowledge(void) const;
-    u32 GetExperience(void) const;
     u16 GetMaxSpellPoints(void) const;
     u16 GetMaxMovePoints(void) const;
     u16 GetSpellPoints(void) const;
@@ -159,9 +158,11 @@ public:
     void AppendSpellToBook(const Spell::spell_t spell);
 
     const Route::Path & GetPath(void) const{ return path; };
+    Route::Path & GetPath(void) { return path; };
     u16 FindPath(u16 dst_index);
     u8 GetRangeRouteDays(void) const;
-    
+    void ShowPath(bool f){ f ? path.Show() : path.Hide(); };
+
     Direction::vector_t GetDirection(void) const{ return direction; };
 
     void SetVisited(const u16 index, const Visit::type_t type = Visit::LOCAL);
@@ -173,12 +174,14 @@ public:
 
     bool isEnableMove(void) const;
     void SetMove(bool f);
-    bool isNeedMove(void) const;
-    bool Move(void);
-    void ShowPathOrStartMove(const u16 dst_index);
     bool isAllowMove(const u16 dst_index);
-    void MoveNext(void);
-    void Action(void);
+    void Action(const Maps::Tiles & dst);
+    void ApplyPenaltyMovement(void);
+
+    void AngleStep(const Direction::vector_t to_direct);
+    void MoveStep(void);
+    void Redraw(void) const;
+    u8   GetSpriteIndex(void) const{ return sprite_index; };
 
     void PlayWalkSound(void) const;
     void PlayPickupSound(void) const;
@@ -188,10 +191,11 @@ public:
 
     MP2::object_t GetUnderObject(void) const;
 
-    const Sprite & SpriteHero(const u8 index) const;
-    const Sprite & SpriteFlag(const u8 index) const;
-    bool ReflectSprite(void) const;
-    void RedrawAllDependentTiles(void) const;
+    u32 GetExperience(void) const;
+    void IncreaseExperience(const u16 exp);
+    void LevelUp(void);
+
+    void Scoute(void);
 
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
@@ -199,12 +203,11 @@ public:
     bool spellCasted;
 
 protected:
-    void MoveNextAnimation(void);
     void ActionToCastle(const u16 dst_index);
     void ActionToHeroes(const u16 dst_index);
     void ActionToMonster(const u16 dst_index);
-    void ActionToBoat(void);
-    void ActionToCoast(void);
+    void ActionToBoat(const u16 dst_index);
+    void ActionToCoast(const u16 dst_index);
     void ActionToResource(const u16 dst_index);
     void ActionToResource(const u16 dst_index, const MP2::object_t obj);
     void ActionToArtifact(const u16 dst_index);
@@ -222,8 +225,6 @@ protected:
     void ActionToAncientLamp(const u16 dst_index);
     void ActionToTeleports(const u16 dst_index);
     void ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj);
-    void RedrawRotate(bool clockwise);
-    void Scoute(void);
 
 private:
     std::string		name;
@@ -251,6 +252,7 @@ private:
     Route::Path		path;
 
     Direction::vector_t direction;
+    u8			sprite_index;
 
     std::list<Visit::IndexObject> visit_object;
 };

@@ -30,6 +30,8 @@
 #include "world.h"
 #include "kingdom.h"
 
+#define KINGDOMSCOUTE 6
+
 Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), play(cl & Settings::Get().FileInfo().KingdomColors() ? true : false)
 {
     // set starting resource
@@ -225,6 +227,8 @@ void Kingdom::RemoveHeroes(const Heroes *hero)
 {
     if(hero && heroes.size())
 	heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
+
+    if(heroes.empty() && castles.empty()) play = false;
 }
 
 void Kingdom::AddCastle(const Castle *castle)
@@ -237,6 +241,8 @@ void Kingdom::RemoveCastle(const Castle *castle)
 {
     if(castle && castles.size())
 	castles.erase(std::find(castles.begin(), castles.end(), castle));
+
+    if(heroes.empty() && castles.empty()) play = false;
 }
 
 u8 Kingdom::GetCountCastle(void) const
@@ -299,4 +305,33 @@ void Kingdom::SetVisited(const u16 index, const MP2::object_t & object)
     const MP2::object_t obj = object != MP2::OBJ_ZERO ? object : tile.GetObject();
 
     if(MP2::OBJ_ZERO != obj) visit_object.push_front(Visit::IndexObject(index, obj));
+}
+
+void Kingdom::ClearFog(void)
+{
+    // clear abroad castles
+    if(castles.size())
+    {
+	std::vector<Castle *>::const_iterator it1 = castles.begin();
+	std::vector<Castle *>::const_iterator it2 = castles.end();
+
+	for(; it1 != it2; ++it1) if(*it1)
+        {
+	    const Point & center = (**it1).GetCenter();
+	
+	    for(s16 y = center.y - KINGDOMSCOUTE; y <= center.y + KINGDOMSCOUTE; ++y)
+    		for(s16 x = center.x - KINGDOMSCOUTE; x <= center.x + KINGDOMSCOUTE; ++x)
+		    if(Maps::isValidAbsPoint(x, y) &&  KINGDOMSCOUTE + 2 >= std::abs(x - center.x) + std::abs(y - center.y))
+			world.GetTiles(Maps::GetIndexFromAbsPoint(x, y)).ClearFog(color);
+	}
+    }
+
+    // clear adboar heroes
+    if(heroes.size())
+    {
+	std::vector<Heroes *>::const_iterator it1 = heroes.begin();
+	std::vector<Heroes *>::const_iterator it2 = heroes.end();
+
+	for(; it1 != it2; ++it1) if(*it1) (**it1).Scoute();
+    }
 }

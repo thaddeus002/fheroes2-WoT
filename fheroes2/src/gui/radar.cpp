@@ -72,8 +72,8 @@ void Radar::Build(void)
     if(spriteCursor) delete spriteCursor;
 
     spriteArea = new Surface(RADARWIDTH, RADARWIDTH);
-    spriteCursor = new Surface(static_cast<u16>(GameArea::GetRect().w * (RADARWIDTH / static_cast<float>(world.w()))),
-                	static_cast<u16>(GameArea::GetRect().h * (RADARWIDTH / static_cast<float>(world.h()))));
+    spriteCursor = new Surface(static_cast<u16>(GameArea::w() * (RADARWIDTH / static_cast<float>(world.w()))),
+                	static_cast<u16>(GameArea::h() * (RADARWIDTH / static_cast<float>(world.h()))));
     cursor = new SpriteCursor(*spriteCursor, pos.x, pos.y);
 
     Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
@@ -113,7 +113,7 @@ void Radar::GenerateOrigin(void)
 	        default:
 	            pass = 0;
 	    }
-		if(!H2Config::Debug() && tile.GetFog(mycolor)) {
+		if(!H2Config::Debug() && tile.isFog(mycolor)) {
 			tile_surface.Fill(0);
 		} else 
 	    if(tile.FindCastle()) {
@@ -288,7 +288,7 @@ void Radar::RedrawCursor(void)
     cursor->Hide();
     Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
     Display::Get().Blit(*spriteArea, pos.x, pos.y); 
-    cursor->Move(pos.x + GameArea::GetRect().x * RADARWIDTH / world.w(),
-                pos.y + GameArea::GetRect().y * RADARWIDTH / world.h());
+    cursor->Move(pos.x + GameArea::x() * RADARWIDTH / world.w(),
+                pos.y + GameArea::y() * RADARWIDTH / world.h());
     cursor->Show();
 }

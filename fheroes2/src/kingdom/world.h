@@ -25,6 +25,7 @@
 #include <string>
 #include "maps.h"
 #include "race.h"
+#include "rect.h"
 #include "maps_tiles.h"
 #include "heroes.h"
 #include "color.h"
@@ -35,23 +36,21 @@ class Kingdom;
 
 namespace GameEvent
 {
-    class Sign;
     class Day;
     class Coord;
     class Riddle;
-    class Rumor;
 };
 
 #define DAYOFWEEK       7 
 #define WEEKOFMONTH     4 
 
-class World
+class World : protected Size
 {
 public:
     ~World(){ FreeOldMaps(); };
 
     void LoadMaps(const std::string &filename);
-    void NewMaps(Maps::mapsize_t w, Maps::mapsize_t h);
+    void NewMaps(const u16 sw, const u16 sh);
 
     static World & GetWorld(void);
 
@@ -74,9 +73,9 @@ public:
     const Castle * GetCastle(u8 ax, u8 ay);
     const Castle * GetCastle(const Point & pt){ return GetCastle(pt.x, pt.y); };
 
-    const Heroes * GetHeroes(u16 maps_index);
-    const Heroes * GetHeroes(u8 ax, u8 ay);
-    const Heroes * GetHeroes(const Point & pt){ return GetHeroes(pt.x, pt.y); };
+    const Heroes * GetHeroes(u16 maps_index) const;
+    const Heroes * GetHeroes(u8 ax, u8 ay) const;
+    const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); };
     const Heroes * GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
     const Heroes::heroes_t & GetFreeRecruit1(void);
@@ -108,11 +107,13 @@ public:
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;
     Color::color_t ColorCapturedObject(const u16 index) const;
 
+    void ClearFog(const u8 color);
+
     u32 GetUniq(void){ return ++uniq0; };
 
 private:
-    World(){};
-    
+    World() : Size(0, 0), width(Size::w), height(Size::h) {};
+
     void FreeOldMaps(void);
 
 private:
@@ -121,7 +122,7 @@ private:
     std::vector<GameEvent::Day *>       vec_eventsday;
     std::vector<GameEvent::Coord *>     vec_eventsmap;
     std::vector<GameEvent::Riddle *>    vec_riddles;
-    std::vector<GameEvent::Rumor *>     vec_rumors;
+    std::vector<std::string>     	vec_rumors;
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
     std::vector<u16>                    vec_teleports;
@@ -135,8 +136,8 @@ private:
 
     u16 ultimate_artifact;
 
-    Maps::mapsize_t width;
-    Maps::mapsize_t height;
+    u16 & width;
+    u16 & height;
 
     u16 day;
     u16 week;

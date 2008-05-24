@@ -63,6 +63,7 @@ public:
     Rect(const SDL_Rect & rt);
     Rect(const Point & pt, u16 rw, u16 rh);
     Rect(const Point & pt, const Size & sz);
+    Rect(const Rect & rt1, const Rect & rt2);
     Rect(const std::vector<Rect> & vect);
 
     SDL_Rect* SDLRect(void);

@@ -56,8 +56,13 @@ namespace Maps
     u16 GetIndexFromAbsPoint(const Point & mp);
     u16 GetIndexFromAbsPoint(s16 px, s16 py);
 
-    u16 GetIndexFromAreaPoint(const Point & pt);
-    u16 GetIndexFromAreaPoint(s16 px, s16 py);
+    int GetIndexFromAreaPoint(const Point & pt);
+    int GetIndexFromAreaPoint(s16 px, s16 py);
+
+    u32 AnimationTicket(void);
+    void IncreaseAnimationTicket(void);
+
+    u16 GetAroundFogDirection(u16 center, u8 color = 0);
 };
 
 #endif
