@@ -438,6 +438,8 @@ void Game::FocusToHeroes(Heroes *hero)
 /* return changee cursor */
 Cursor::themes_t Game::GetCursor(const Focus & focus, const Maps::Tiles & tile, const u8 days)
 {
+    if(0 == Settings::Get().Debug() && tile.isFog(Settings::Get().MyColor())) return Cursor::POINTER;
+
     switch(focus.Type())
     {
 	case Focus::HEROES:

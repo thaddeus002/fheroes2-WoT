@@ -828,6 +828,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 bool Maps::Tiles::isPassable(void) const
 {
     if(Game::Focus::Get().Type() != Game::Focus::HEROES) return false;
+    if(0 == Settings::Get().Debug() && isFog(Settings::Get().MyColor())) return false;
 
     //std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
     //std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
