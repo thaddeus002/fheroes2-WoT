@@ -1459,6 +1459,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 
 			selectHeroes.Redraw();
 			gamearea.Center(global_focus.Center());
+			radar.RedrawArea(Settings::Get().MyColor());
 			radar.RedrawCursor();
 		    }
 		}

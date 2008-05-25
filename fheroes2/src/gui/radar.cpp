@@ -140,6 +140,13 @@ void Radar::RedrawArea(const u8 color)
 	else
 	    switch(tile.GetObject())
 	    {
+		case MP2::OBJ_HEROES:
+		{
+		    const Heroes *hero = world.GetHeroes(index);
+		    if(hero) tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(hero->GetColor())));
+		}
+		break;
+
 		case MP2::OBJ_CASTLE:
 		case MP2::OBJN_CASTLE:
 		{
@@ -149,15 +156,16 @@ void Radar::RedrawArea(const u8 color)
 		break;
 
 		case MP2::OBJ_DRAGONCITY:
-		case MP2::OBJN_DRAGONCITY:
+		//case MP2::OBJN_DRAGONCITY:
 		case MP2::OBJ_LIGHTHOUSE:
-		case MP2::OBJN_LIGHTHOUSE:
+		//case MP2::OBJN_LIGHTHOUSE:
 		case MP2::OBJ_ALCHEMYTOWER:
-		case MP2::OBJN_ALCHEMYTOWER:
+		//case MP2::OBJN_ALCHEMYTOWER:
 		case MP2::OBJ_MINES:
-		case MP2::OBJN_MINES:
+		//case MP2::OBJN_MINES:
 		case MP2::OBJ_SAWMILL:
-		case MP2::OBJN_SAWMILL:	tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(world.ColorCapturedObject(index)))); break;
+		//case MP2::OBJN_SAWMILL:
+		    tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(world.ColorCapturedObject(index)))); break;
 
 		default: continue;
 	    }
