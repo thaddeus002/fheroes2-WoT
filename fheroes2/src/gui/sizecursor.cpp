@@ -22,8 +22,8 @@
 #include "spritecursor.h"
 #include "error.h"
 #include "maps.h"
-#include "radar.h"
 #include "gamearea.h"
+#include "cursor.h"
 #include "sizecursor.h"
 
 SizeCursor::SizeCursor(u8 sw, u8 sh) : SpriteCursor(), cursor()
@@ -65,7 +65,7 @@ void SizeCursor::ModifyCursor(const u8 w, const u8 h)
 
     cursor.SetColorKey();
 
-    Radar::DrawCursor(cursor);
+    Cursor::DrawCursor(cursor, 0x40);
 
     SetSprite(cursor);
 }

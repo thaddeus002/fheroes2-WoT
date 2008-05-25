@@ -27,18 +27,19 @@
 #include "world.h"
 #include "castle.h"
 #include "surface.h"
+#include "cursor.h"
 #include "spritecursor.h"
 #include "radar.h"
 
 #define RADARCOLOR	0x40	// index palette
-#define COLOR_DESERT	0x71
-#define COLOR_SNOW	0x0B
-#define COLOR_SWAMP	0xA6
-#define COLOR_WASTELAND	0xCE
-#define COLOR_BEACH	0xC7
+#define COLOR_DESERT	0x70
+#define COLOR_SNOW	0x0A
+#define COLOR_SWAMP	0xA0
+#define COLOR_WASTELAND	0xD6
+#define COLOR_BEACH	0xC6
 #define COLOR_LAVA	0x19
-#define COLOR_DIRT	0x31
-#define COLOR_GRASS	0x61
+#define COLOR_DIRT	0x30
+#define COLOR_GRASS	0x60
 #define COLOR_WATER	0xF0
 #define COLOR_ROAD	0x7A
 
@@ -48,7 +49,10 @@
 #define COLOR_YELLOW	0x70
 #define COLOR_ORANGE	0xcd
 #define COLOR_PURPLE	0x87
+#define COLOR_GRAY	0x10
 
+u32 GetPaletteIndexFromColor(const u8 color);
+u32 GetPaletteIndexFromGround(const u16 ground);
 
 /* constructor */
 Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL)
@@ -76,8 +80,8 @@ void Radar::Build(void)
                 	static_cast<u16>(GameArea::h() * (RADARWIDTH / static_cast<float>(world.h()))));
     cursor = new SpriteCursor(*spriteCursor, pos.x, pos.y);
 
-    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
-    DrawCursor(*spriteCursor);
+    Generate();
+    Cursor::DrawCursor(*spriteCursor, RADARCOLOR);
 }
 
 Radar & Radar::Get(void)
@@ -87,208 +91,125 @@ Radar & Radar::Get(void)
     return radar0;
 }
 
-/* generate mini maps (origin version) */
-void Radar::GenerateOrigin(void)
+/* generate mini maps */
+void Radar::Generate(void)
 {
-    Point dst_pt(0, 0);
-    u8  width_til = RADARWIDTH / world.w();
-    u16 index = 0;
+    const u16 world_w = world.w();
+    const u16 world_h = world.h();
 
-    Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2, true);
-	Color::color_t mycolor = world.GetMyKingdom().GetColor();
-    
-    for(u16 jj = 0; jj < world.h(); ++jj)
-    {
-	for(u16 ii = 0; ii < world.w(); ++ii)
-	{
-	    Maps::Tiles & tile = world.GetTiles(index);
-
-	    int pass;
-	    switch (tile.GetObject()) {
-	        case MP2::OBJ_TREES:
-	        case MP2::OBJ_MOUNTS:
-	        case MP2::OBJ_DUNE:
-	            pass = 2;
-	            break;
-	        default:
-	            pass = 0;
-	    }
-		if(!H2Config::Debug() && tile.isFog(mycolor)) {
-			tile_surface.Fill(0);
-		} else 
-	    if(tile.FindCastle()) {
-			const Castle *castle = world.GetCastle(index);
-			switch(castle->GetColor()) {
-			  case Color::BLUE:
-		        tile_surface.Fill(AGG::GetColor(COLOR_BLUE));
-			    break;
-			  case Color::GREEN:
-		        tile_surface.Fill(AGG::GetColor(COLOR_GREEN));
-			    break;
-			  case Color::RED:
-		        tile_surface.Fill(AGG::GetColor(COLOR_RED));
-			    break;
-			  case Color::YELLOW:
-		        tile_surface.Fill(AGG::GetColor(COLOR_YELLOW));
-			    break;
-			  case Color::ORANGE:
-		        tile_surface.Fill(AGG::GetColor(COLOR_ORANGE));
-			    break;
-			  case Color::PURPLE:
-		        tile_surface.Fill(AGG::GetColor(COLOR_PURPLE));
-			    break;
-			  case Color::GRAY:
-		        tile_surface.Fill(0xffffffff);
-			    break;
-			}
-	    } else
-		if(tile.FindMines()) {
-		// TODO correct color for mine
-	        tile_surface.Fill(0xffffffff);
-		} else
-	    if(tile.isRoad())
-		tile_surface.Fill(AGG::GetColor(COLOR_ROAD));
-	    else if(pass >= 0)
-	    switch(tile.GetGround())
-	    {
-		case Maps::Ground::DESERT:	tile_surface.Fill(AGG::GetColor(COLOR_DESERT+pass)); break;
-		case Maps::Ground::SNOW:	tile_surface.Fill(AGG::GetColor(COLOR_SNOW+pass)); break;
-		case Maps::Ground::SWAMP:	tile_surface.Fill(AGG::GetColor(COLOR_SWAMP+pass)); break;
-		case Maps::Ground::WASTELAND:	tile_surface.Fill(AGG::GetColor(COLOR_WASTELAND+pass)); break;
-		case Maps::Ground::BEACH:	tile_surface.Fill(AGG::GetColor(COLOR_BEACH+pass)); break;
-		case Maps::Ground::LAVA:	tile_surface.Fill(AGG::GetColor(COLOR_LAVA+pass)); break;
-		case Maps::Ground::DIRT:	tile_surface.Fill(AGG::GetColor(COLOR_DIRT+pass)); break;
-		case Maps::Ground::GRASS:	tile_surface.Fill(AGG::GetColor(COLOR_GRASS+pass)); break;
-		case Maps::Ground::WATER:	tile_surface.Fill(AGG::GetColor(COLOR_WATER+pass)); break;
-		default:			tile_surface.Fill(AGG::GetColor(COLOR_GRASS+pass)); break;
-	    }
-
-	    spriteArea->Blit(tile_surface, dst_pt);
-
-	    dst_pt.x += width_til;
-
-	    // X scale large maps
-	    if(Maps::LARGE == world.w() && !(ii % 3))
-	    {
-		spriteArea->Blit(tile_surface, dst_pt);
-
-		dst_pt.x += width_til;
-	    }
-
-	    ++index;
-	}
-
-	dst_pt.x = 0;
-	dst_pt.y += width_til;
-
-	// Y scale large maps
-	if(Maps::LARGE == world.h() && !(jj % 3))
-	{
-	    const Rect src_rt(0, dst_pt.y - 1, RADARWIDTH, width_til);
-	    spriteArea->Blit(*spriteArea, src_rt, dst_pt);
-
-	    dst_pt.y += width_til;
-	}
-    }
-}
-
-/* generate mini maps (realistic version) */
-void Radar::GenerateRealistic(void)
-{
-    Point dst_pt(0, 0);
-    u8  width_til = RADARWIDTH / world.w();
-    u16 index = 0;
-
-    Surface src_surface(TILEWIDTH, TILEWIDTH);
     Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2);
 
-    for(u16 jj = 0; jj < world.h(); ++jj)
+    for(u16 index = 0; index < world_w * world_h; ++index)
     {
-	for(u16 ii = 0; ii < world.w(); ++ii)
-	{
-	    src_surface.Blit(world.GetTiles(index).GetSurface());
+	const Maps::Tiles & tile = world.GetTiles(index);
+	u32 color = COLOR_ROAD;
 
-	    tile_surface.ScaleFrom(src_surface);
+	if(tile.isRoad())
+		tile_surface.Fill(AGG::GetColor(color));
+	else
+	if(0 != (color = GetPaletteIndexFromGround(tile.GetGround())))
+		tile_surface.Fill(AGG::GetColor(tile.GetObject() == MP2::OBJ_MOUNTS ? color + 2 : color));
+	else
+	    continue;
 
-	    spriteArea->Blit(tile_surface, dst_pt);
+	float dstx = (index % world_w) * RADARWIDTH / world_w;
+	float dsty = (index / world_h) * RADARWIDTH / world_w;
 
-	    dst_pt.x += width_til;
+	spriteArea->Blit(tile_surface, static_cast<u16>(dstx), static_cast<u16>(dsty));
+    }
+}
 
-	    // X scale large maps
-	    if(Maps::LARGE == world.w() && !(ii % 3))
+/* redraw radar area for color */
+void Radar::RedrawArea(const u8 color)
+{
+    Display & display = Display::Get();
+
+    const u16 world_w = world.w();
+    const u16 world_h = world.h();
+    Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2);
+
+    cursor->Hide();
+    display.Blit(*spriteArea, pos.x, pos.y);
+
+    for(u16 index = 0; index < world_w * world_h; ++index)
+    {
+	const Maps::Tiles & tile = world.GetTiles(index);
+
+	if(!Settings::Get().Debug() && tile.isFog(color))
+	    tile_surface.Fill(0);
+	else
+	    switch(tile.GetObject())
 	    {
-		spriteArea->Blit(tile_surface, dst_pt);
+		case MP2::OBJ_CASTLE:
+		case MP2::OBJN_CASTLE:
+		{
+		    const Castle *castle = world.GetCastle(index);
+		    if(castle) tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(castle->GetColor())));
+		}
+		break;
 
-		dst_pt.x += width_til;
+		case MP2::OBJ_DRAGONCITY:
+		case MP2::OBJN_DRAGONCITY:
+		case MP2::OBJ_LIGHTHOUSE:
+		case MP2::OBJN_LIGHTHOUSE:
+		case MP2::OBJ_ALCHEMYTOWER:
+		case MP2::OBJN_ALCHEMYTOWER:
+		case MP2::OBJ_MINES:
+		case MP2::OBJN_MINES:
+		case MP2::OBJ_SAWMILL:
+		case MP2::OBJN_SAWMILL:	tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(world.ColorCapturedObject(index)))); break;
+
+		default: continue;
 	    }
 
-	    ++index;
-	}
+	float dstx = (index % world_w) * RADARWIDTH / world_w;
+	float dsty = (index / world_h) * RADARWIDTH / world_w;
 
-	dst_pt.x = 0;
-	dst_pt.y += width_til;
-
-	// Y scale large maps
-	if(Maps::LARGE == world.h() && !(jj % 3))
-	{
-	    const Rect src_rt(0, dst_pt.y - 1, RADARWIDTH, width_til);
-	    spriteArea->Blit(*spriteArea, src_rt, dst_pt);
-
-	    dst_pt.y += width_til;
-	}
+	display.Blit(tile_surface, pos.x + static_cast<u16>(dstx), pos.y + static_cast<u16>(dsty));
     }
-}
-
-/* draw radar cursor */
-void Radar::DrawCursor(Surface &surface)
-{
-    if(! surface.valid()) return;
-
-    surface.SetColorKey();
-
-    u16 width  = surface.w();
-    u16 height = surface.h();
-
-    // draw cursor
-    u32 color = AGG::GetColor(RADARCOLOR);
-    surface.Lock();
-    for(u8 i = 0; i < width; ++i){
-	surface.SetPixel2(i, 0, color);
-	if(i + 1 < width) surface.SetPixel2(i + 1, 0, color);
-        i += 3;
-    }
-    for(u8 i = 0; i < width; ++i){
-	surface.SetPixel2(i, height - 1, color);
-	if(i + 1 < width) surface.SetPixel2(i + 1, height - 1, color);
-        i += 3;
-    }
-    for(u8 i = 0; i < height; ++i){
-	surface.SetPixel2(0, i, color);
-	if(i + 1 < height) surface.SetPixel2(0, i + 1, color);
-        i += 3;
-    }
-    for(u8 i = 0; i < height; ++i){
-	surface.SetPixel2(width - 1, i, color);
-	if(i + 1 < height) surface.SetPixel2(width - 1, i + 1, color);
-        i += 3;
-    }
-    surface.Unlock();
-}
-
-/* redraw radar area */
-void Radar::RedrawArea(void)
-{ 
-    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
-    Display::Get().Blit(*spriteArea, pos.x, pos.y); 
 }
 
 /* redraw radar cursor */
 void Radar::RedrawCursor(void)
 {
     cursor->Hide();
-    Settings::Get().Original() ? GenerateOrigin() : GenerateRealistic();
-    Display::Get().Blit(*spriteArea, pos.x, pos.y); 
     cursor->Move(pos.x + GameArea::x() * RADARWIDTH / world.w(),
                 pos.y + GameArea::y() * RADARWIDTH / world.h());
     cursor->Show();
+}
+
+u32 GetPaletteIndexFromColor(const u8 color)
+{
+    switch(color)
+    {
+	case Color::BLUE:	return (COLOR_BLUE);
+	case Color::GREEN:	return (COLOR_GREEN);
+	case Color::RED:	return (COLOR_RED);
+	case Color::YELLOW:	return (COLOR_YELLOW);
+	case Color::ORANGE:	return (COLOR_ORANGE);
+	case Color::PURPLE:	return (COLOR_PURPLE);
+	case Color::GRAY:	return (COLOR_GRAY);
+	default:		break;
+    }
+
+    return 0;
+}
+
+u32 GetPaletteIndexFromGround(const u16 ground)
+{
+    switch(ground)
+    {
+	case Maps::Ground::DESERT:	return (COLOR_DESERT);
+	case Maps::Ground::SNOW:	return (COLOR_SNOW);
+	case Maps::Ground::SWAMP:	return (COLOR_SWAMP);
+	case Maps::Ground::WASTELAND:	return (COLOR_WASTELAND);
+	case Maps::Ground::BEACH:	return (COLOR_BEACH);
+	case Maps::Ground::LAVA:	return (COLOR_LAVA);
+	case Maps::Ground::DIRT:	return (COLOR_DIRT);
+	case Maps::Ground::GRASS:	return (COLOR_GRASS);
+	case Maps::Ground::WATER:	return (COLOR_WATER);
+	default: break;
+    }
+
+    return 0;
 }

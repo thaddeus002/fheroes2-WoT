@@ -47,7 +47,7 @@ u16  SpriteCursor::h(void) const
 
 void SpriteCursor::SetSprite(const Surface & sf)
 {
-    Restore();
+    if(visible) Restore();
 
     Save(Background::x, Background::y, sf.w(), sf.h());
 

@@ -75,10 +75,11 @@ Game::menu_t Game::StartGame(void)
 {
     // cursor
     Cursor & cursor = Cursor::Get();
-    cursor.Hide();
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
     display.SetVideoMode(conf.VideoMode());
+
+    cursor.Hide();
     display.Fade();
 
     // Load maps
@@ -104,9 +105,6 @@ Game::menu_t Game::StartGame(void)
     // Create radar
     Radar & radar = Radar::Get();
     radar.Build();
-
-    areaMaps.Redraw();
-    radar.RedrawArea();
 
     //
     const ICN::icn_t icnscroll = H2Config::EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
@@ -218,8 +216,6 @@ Game::menu_t Game::StartGame(void)
     buttonScrollHeroesDown.Draw();
     buttonScrollCastleDown.Draw();
 
-    //display.Flip();
-
     Game::menu_t m = ENDTURN;
     int humans = 0;
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
@@ -234,19 +230,16 @@ Game::menu_t Game::StartGame(void)
 	    Kingdom & kingdom = world.GetKingdom(color);
 	    if(kingdom.isPlay())
 	    {
-		kingdom.ClearFog();
 		world.ClearFog(color);
 
 		switch(kingdom.Control())
 		{
 	        case Game::Human:
 		    mixer.Enhance();
-		    //cursor.Show();
-		    //display.Flip();
+		    conf.SetMyColor(color);
+		    radar.RedrawArea(color);
 		    statusWindow.SetState(Game::StatusWindow::DAY);
 		    statusWindow.Redraw();
-
-		    conf.SetMyColor(color);
 
 		    m = HumanTurn(statusWindow, humans > 1);
 
@@ -259,14 +252,18 @@ Game::menu_t Game::StartGame(void)
 		    cursor.SetThemes(Cursor::WAIT);
 		    cursor.Show();
 	            display.Flip();
+
 		    kingdom.AITurns(statusWindow);
+		    cursor.Hide();
 	            // TODO network game
 		    break;
 	        case Game::AI:
 		    cursor.SetThemes(Cursor::WAIT);
 		    cursor.Show();
 	            display.Flip();
+
 		    kingdom.AITurns(statusWindow);
+		    cursor.Hide();
 		    break;
 		default:
 		    Dialog::Message(Color::String(color), "default", Font::BIG, Dialog::OK);

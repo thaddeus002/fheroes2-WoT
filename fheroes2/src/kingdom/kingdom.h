@@ -126,8 +126,6 @@ public:
     void ActionNewWeek(void);
     void ActionNewMonth(void);
 
-    void ClearFog(void);
-
     void SetVisited(const u16 index, const MP2::object_t & object = MP2::OBJ_ZERO);
     bool isVisited(const MP2::object_t & object) const;
     bool isVisited(const Maps::Tiles & tile) const;

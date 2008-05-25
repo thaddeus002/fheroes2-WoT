@@ -30,8 +30,6 @@
 #include "world.h"
 #include "kingdom.h"
 
-#define KINGDOMSCOUTE 6
-
 Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), play(cl & Settings::Get().FileInfo().KingdomColors() ? true : false)
 {
     // set starting resource
@@ -305,25 +303,4 @@ void Kingdom::SetVisited(const u16 index, const MP2::object_t & object)
     const MP2::object_t obj = object != MP2::OBJ_ZERO ? object : tile.GetObject();
 
     if(MP2::OBJ_ZERO != obj) visit_object.push_front(Visit::IndexObject(index, obj));
-}
-
-void Kingdom::ClearFog(void)
-{
-    // clear abroad castles
-    if(castles.size())
-    {
-	std::vector<Castle *>::const_iterator it1 = castles.begin();
-	std::vector<Castle *>::const_iterator it2 = castles.end();
-
-	for(; it1 != it2; ++it1) if(*it1) Maps::ClearFog((**it1).GetCenter(), KINGDOMSCOUTE, color);
-    }
-
-    // clear adboar heroes
-    if(heroes.size())
-    {
-	std::vector<Heroes *>::const_iterator it1 = heroes.begin();
-	std::vector<Heroes *>::const_iterator it2 = heroes.end();
-
-	for(; it1 != it2; ++it1) if(*it1) (**it1).Scoute();
-    }
 }

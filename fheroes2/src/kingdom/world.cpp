@@ -1328,6 +1328,25 @@ Color::color_t World::ColorCapturedObject(const u16 index) const
 
 void World::ClearFog(const u8 color)
 {
+    // clear abroad castles
+    if(vec_castles.size())
+    {
+        std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
+        std::vector<Castle *>::const_iterator it2 = vec_castles.end();
+
+        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor()) Maps::ClearFog((**it1).GetCenter(), 6, color);
+    }
+
+    // clear adboar heroes
+    if(vec_heroes.size())
+    {
+        std::vector<Heroes *>::const_iterator it1 = vec_heroes.begin();
+        std::vector<Heroes *>::const_iterator it2 = vec_heroes.end();
+
+        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor()) (**it1).Scoute();
+    }
+
+    // clear abroad objects
     std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
     std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
 
@@ -1347,14 +1366,6 @@ void World::ClearFog(const u8 color)
 	    default: break;
 	}
 
-        if(scoute)
-	{
-	    const Point center((*it1).first % w(), (*it1).first / h());
-
-	    for(s16 y = center.y - scoute; y <= center.y + scoute; ++y)
-        	for(s16 x = center.x - scoute; x <= center.x + scoute; ++x)
-                    if(Maps::isValidAbsPoint(x, y) &&  scoute + 2 >= std::abs(x - center.x) + std::abs(y - center.y))
-                        GetTiles(Maps::GetIndexFromAbsPoint(x, y)).ClearFog(color);
-	}
+        if(scoute) Maps::ClearFog((*it1).first, scoute, color);
     }
 }

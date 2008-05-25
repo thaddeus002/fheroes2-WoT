@@ -285,7 +285,7 @@ Game::menu_t Game::Editor::StartGame()
     radar.Build();
 
     areaMaps.Redraw();
-    radar.RedrawArea();
+    radar.RedrawArea(0xFF);
 
     // Create radar cursor
     radar.RedrawCursor();
