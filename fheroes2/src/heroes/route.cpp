@@ -88,6 +88,8 @@ void Route::Path::Reset(void)
     dst = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
     clear();
+
+    hide = true;
 }
 
 u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to)

@@ -315,15 +315,7 @@ void Kingdom::ClearFog(void)
 	std::vector<Castle *>::const_iterator it1 = castles.begin();
 	std::vector<Castle *>::const_iterator it2 = castles.end();
 
-	for(; it1 != it2; ++it1) if(*it1)
-        {
-	    const Point & center = (**it1).GetCenter();
-	
-	    for(s16 y = center.y - KINGDOMSCOUTE; y <= center.y + KINGDOMSCOUTE; ++y)
-    		for(s16 x = center.x - KINGDOMSCOUTE; x <= center.x + KINGDOMSCOUTE; ++x)
-		    if(Maps::isValidAbsPoint(x, y) &&  KINGDOMSCOUTE + 2 >= std::abs(x - center.x) + std::abs(y - center.y))
-			world.GetTiles(Maps::GetIndexFromAbsPoint(x, y)).ClearFog(color);
-	}
+	for(; it1 != it2; ++it1) if(*it1) Maps::ClearFog((**it1).GetCenter(), KINGDOMSCOUTE, color);
     }
 
     // clear adboar heroes

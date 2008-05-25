@@ -1233,14 +1233,7 @@ void Heroes::LearnBasicSkill(const Skill::secondary_t skill)
 
 void Heroes::Scoute(void)
 {
-    int scouting = SCOUTINGBASE + GetLevelSkill(Skill::SCOUTING);
-
-    const Point & center = mp;
-
-    for(s16 y = center.y - scouting; y <= center.y + scouting; ++y)
-        for(s16 x = center.x - scouting; x <= center.x + scouting; ++x)
-            if(Maps::isValidAbsPoint(x, y) &&  scouting + 2 >= std::abs(x - center.x) + std::abs(y - center.y))
-                world.GetTiles(Maps::GetIndexFromAbsPoint(x, y)).ClearFog(color);
+    Maps::ClearFog(mp, SCOUTINGBASE + GetLevelSkill(Skill::SCOUTING), color);
 }
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t & art)

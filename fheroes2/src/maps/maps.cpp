@@ -166,3 +166,13 @@ u16 Maps::GetAroundFogDirection(u16 center, u8 color)
 
     return result;
 }
+
+void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
+{
+    if(0 == scoute) return;
+
+    for(s16 y = center.y - scoute; y <= center.y + scoute; ++y)
+        for(s16 x = center.x - scoute; x <= center.x + scoute; ++x)
+            if(isValidAbsPoint(x, y) &&  (scoute + scoute / 2) >= std::abs(x - center.x) + std::abs(y - center.y))
+                world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
+}

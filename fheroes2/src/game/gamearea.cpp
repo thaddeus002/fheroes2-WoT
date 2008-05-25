@@ -158,16 +158,14 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 	{
     	    // boat
     	    case MP2::OBJ_BOAT:		RedrawBoat(tile, dst); break;
-
     	    // heroes
     	    case MP2::OBJ_HEROES:	RedrawHeroes(tile, dst); break;
-
     	    // monster
     	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, dst); break;
+
     	    default: break;
 	}
     }
-
 
     // redraw grid
     if(H2Config::Debug())

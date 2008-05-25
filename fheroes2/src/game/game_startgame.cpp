@@ -312,15 +312,13 @@ void Game::OpenCastle(Castle *castle)
 
     Dialog::answer_t result = Dialog::ZERO;
 
-    Display::Get().Fade();
-
     while(Dialog::CANCEL != result)
     {
 	FocusToCastle(castle);
 
 	Display::Get().Flip();
-
 	cursor.Hide();
+	Display::Get().Fade();
 
 	result = castle->OpenDialog();
 
@@ -371,14 +369,13 @@ void Game::OpenHeroes(Heroes *hero)
 
     Dialog::answer_t result = Dialog::ZERO;
 
-    Display::Get().Fade();
-
     while(Dialog::CANCEL != result)
     {
 	FocusToHeroes(hero);
-	Display::Get().Flip();
 
+	Display::Get().Flip();
 	cursor.Hide();
+	Display::Get().Fade();
 
 	result = hero->OpenDialog();
 

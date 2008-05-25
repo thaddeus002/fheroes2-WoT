@@ -239,9 +239,9 @@ void Heroes::MoveStep(void)
     {
 	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
 	{
+	    path.Reset();
 	    Action(world.GetTiles(index_to));
 	    ApplyPenaltyMovement();
-	    path.PopFront();
 	    SetMove(false);
 	    return;
 	}
@@ -261,6 +261,7 @@ void Heroes::MoveStep(void)
 
 	if(index_to == index_dst)
 	{
+	    path.Reset();
 	    Action(world.GetTiles(index_to));
 	    SetMove(false);
 	}

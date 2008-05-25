@@ -63,6 +63,8 @@ namespace Maps
     void IncreaseAnimationTicket(void);
 
     u16 GetAroundFogDirection(u16 center, u8 color = 0);
+
+    void ClearFog(const Point & center, const u8 scoute, const u8 color);
 };
 
 #endif

@@ -99,7 +99,6 @@ namespace Maps
 	void RedrawTile(void) const;
 	void RedrawBottom(void) const;
 	void RedrawTop(void) const;
-	void RedrawBottomWithAlpha(const u8 alpha) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);

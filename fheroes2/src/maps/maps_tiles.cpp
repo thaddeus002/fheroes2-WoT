@@ -336,41 +336,6 @@ void Maps::Tiles::RedrawTop(void) const
     }
 }
 
-void Maps::Tiles::RedrawBottomWithAlpha(const u8 alpha) const
-{
-    Display & display = Display::Get();
-    const Rect & area = GameArea::Get().GetRect();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
-
-    if(area & mp)
-    {
-	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
-
-	if(addons_level1.size())
-	{
-	    std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	    std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	    for(; it1 != it2; ++it1)
-	    {
-		const u8 & object = (*it1).object;
-		const u8 & index  = (*it1).index;
-		const ICN::icn_t icn = MP2::GetICNObject(object);
-
-		if(ICN::UNKNOWN != icn)
-		{
-		    const Sprite & sprite = AGG::GetICN(icn, index);
-		    Surface sf(sprite);
-		    sf.SetDisplayFormat();
-		    sf.SetAlpha(alpha);
-		    display.Blit(sf, dstx + sprite.x(), dsty + sprite.y());
-		}
-	    }
-	}
-    }
-}
-
 Maps::TilesAddon * Maps::Tiles::FindAddonLevel1(u32 uniq1)
 {
     if(addons_level1.size())
@@ -830,13 +795,6 @@ bool Maps::Tiles::isPassable(void) const
     if(Game::Focus::Get().Type() != Game::Focus::HEROES) return false;
     if(0 == Settings::Get().Debug() && isFog(Settings::Get().MyColor())) return false;
 
-    //std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-    //std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-    //for(; it1 != it2; ++it1)
-    //	if(((*it1).level % 4) == 0 && MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
-    	//if(/* (*it1).level == 0 && !TilesAddon::isRoad(*it1) &&*/ MP2::OBJ_ZERO != general && MP2::OBJ_COAST != general) return false;
-
     if(Game::Focus::Get().GetHeroes().isShipMaster())
     {
     	if(Ground::WATER != Maps::Tiles::GetGround()) return false;
@@ -864,7 +822,10 @@ bool Maps::Tiles::isPassable(void) const
     else
     {
 	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
+	// if empty
 	if(addons_level1.empty()) return true;
+	// if road only
+	if(isRoad() && 1 == addons_level1.size()) return true;
 
         switch(general)
 	{

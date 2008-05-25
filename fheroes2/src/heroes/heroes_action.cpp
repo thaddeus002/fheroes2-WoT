@@ -31,12 +31,43 @@
 #include "rand.h"
 #include "m82.h"
 #include "game_focus.h"
+#include "gamearea.h"
+#include "sprite.h"
 #include "engine.h"
 #include "cursor.h"
 #include "tools.h"
 
+#define OBSERVATIONTOWERSCOUTE 10
+
 void AnimationRemoveObject(const Maps::Tiles & tile)
 {
+    const Maps::TilesAddon *addon = NULL;
+
+    switch(tile.GetObject())
+    {
+        case MP2::OBJ_TREASURECHEST:
+        case MP2::OBJ_ANCIENTLAMP:
+	case MP2::OBJ_RESOURCE:	addon = const_cast<Maps::Tiles &>(tile).FindResource(); break;
+	case MP2::OBJ_ARTIFACT:	addon = const_cast<Maps::Tiles &>(tile).FindArtifact(); break;
+	case MP2::OBJ_CAMPFIRE:	addon = const_cast<Maps::Tiles &>(tile).FindCampFire(); break;
+	case MP2::OBJ_BOTTLE:	addon = const_cast<Maps::Tiles &>(tile).FindBottle(); break;
+
+	default: break;
+    }
+
+    if(NULL == addon) return;
+
+    const Rect & area = GameArea::Get().GetRect();
+    const Point pos(tile.GetIndex() % world.w() - area.x, tile.GetIndex() / world.w() - area.y);
+
+    const s16 dstx = BORDERWIDTH + TILEWIDTH * pos.x;
+    const s16 dsty = BORDERWIDTH + TILEWIDTH * pos.y;
+
+    const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
+    Surface sf(sprite.w(), sprite.h());
+    sf.SetColorKey();
+    sf.Blit(sprite);
+
     LocalEvent & le = LocalEvent::GetLocalEvent();
     u32 ticket = 0;
     u8 alpha = 250;
@@ -45,11 +76,10 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     {
         if(!(ticket % ANIMATION_HIGH))
         {
-	    Cursor::Get().Hide();
 	    tile.RedrawTile();
-	    tile.RedrawBottomWithAlpha(alpha);
+            sf.SetAlpha(alpha);
+            Display::Get().Blit(sf, dstx + sprite.x(), dsty + sprite.y());
 	    tile.RedrawTop();
-	    Cursor::Get().Show();
     	    Display::Get().Flip();
     	    alpha -= 10;
         }
@@ -84,8 +114,6 @@ void Heroes::Action(const Maps::Tiles & dst)
 
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_FLOTSAM:
-    	    path.Hide();
-    	    path.Reset();
 	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: " + std::string(MP2::StringObject(object)));
 	    break;
 
@@ -126,6 +154,8 @@ void Heroes::Action(const Maps::Tiles & dst)
 
         // teleports
 	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(dst_index); break;
+
+	case MP2::OBJ_OBSERVATIONTOWER:	Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, GetColor()); break;
 
 	// capture color object
 	case MP2::OBJ_ALCHEMYTOWER:	ActionToCaptureObject(dst_index, MP2::OBJ_ALCHEMYTOWER); break;
@@ -172,7 +202,6 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_CAVE:
         case MP2::OBJ_LEANTO:
         case MP2::OBJ_MAGICGARDEN:
-	case MP2::OBJ_OBSERVATIONTOWER:
         case MP2::OBJ_FREEMANFOUNDRY:
 	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
@@ -267,8 +296,6 @@ void Heroes::ActionToBoat(const u16 dst_index)
     Maps::Tiles & tiles_from = world.GetTiles(from_index);
     Maps::Tiles & tiles_to = world.GetTiles(dst_index);
 
-    path.Hide();
-    path.Reset();
     move_point = 0;
 
     tiles_from.SetObject(MP2::OBJ_COAST);
@@ -292,8 +319,6 @@ void Heroes::ActionToCoast(const u16 dst_index)
     Maps::Tiles & tiles_from = world.GetTiles(from_index);
     Maps::Tiles & tiles_to = world.GetTiles(dst_index);
 
-    path.Hide();
-    path.Reset();
     move_point = 0;
 
     tiles_from.SetObject(MP2::OBJ_BOAT);
@@ -313,9 +338,6 @@ void Heroes::ActionToResource(const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     const Maps::TilesAddon *addon = tile.FindResource();
-
-    path.Hide();
-    path.Reset();
 
     if(addon)
     {
@@ -339,6 +361,7 @@ void Heroes::ActionToResource(const u16 dst_index)
         }
 
 	PlayPickupSound();
+	AnimationRemoveObject(tile);
 
 	world.GetKingdom(GetColor()).AddFundsResource(resource);
 
@@ -377,15 +400,13 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 	default: Error::Warning("Heroes::ActionToResource: unknown object: ", dst_index); return;
     }
 
-    path.Hide();
-    path.Reset();
-
     if(addon)
     {
 	Resource::funds_t resource(obj);
 	const u32 uniq = addon->uniq;
 
 	PlayPickupSound();
+	AnimationRemoveObject(tile);
 
 	world.GetKingdom(GetColor()).AddFundsResource(resource);
 
@@ -552,14 +573,12 @@ void Heroes::ActionToBottle(const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Maps::TilesAddon *addon = tile.FindBottle();
 
-    path.Hide();
-    path.Reset();
-
     if(addon)
     {
 	const u32 uniq = addon->uniq;
 
 	PlayPickupSound();
+	AnimationRemoveObject(tile);
 
 	tile.Remove(uniq);
 	tile.SetObject(MP2::OBJ_ZERO);
@@ -789,9 +808,6 @@ void Heroes::ActionToArtifact(const u16 dst_index)
 
     const Maps::TilesAddon *addon = tile.FindArtifact();
 
-    path.Hide();
-    path.Reset();
-
     if(addon)
     {
 	const u32 uniq = addon->uniq;
@@ -824,6 +840,7 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
 */
 	PlayPickupSound();
+	AnimationRemoveObject(tile);
 
 	PickupArtifact(art);
 
@@ -847,9 +864,6 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 
     const Maps::TilesAddon *addon = tile.FindResource();
 
-    path.Hide();
-    path.Reset();
-
     if(addon)
     {
 	const u32 uniq = addon->uniq;
@@ -868,6 +882,7 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
     After spending hours trying to fish the chest out of the sea, you open it, only to find it empty.
 */
 	PlayPickupSound();
+	AnimationRemoveObject(tile);
 
 	Resource::funds_t resource;
 	resource.gold = 1500;
@@ -894,14 +909,12 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 
     const Maps::TilesAddon *addon = tile.FindResource();
 
-    path.Hide();
-    path.Reset();
-
     if(addon)
     {
 	const u32 uniq = addon->uniq;
 
 	PlayPickupSound();
+	AnimationRemoveObject(tile);
 
 	// dialog
 	// message: You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?
