@@ -416,10 +416,10 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
 	{ index = 8; revert = false; }
 	else
 	// see ICN::CLOP32: sprite 9, 29
-	if(around == (Direction::LEFT | Direction::RIGHT))
+	if(around == (Direction::CENTER | Direction::TOP | Direction::BOTTOM))
 	{ index = 9; revert = false; }
 	else
-	if(around == (Direction::TOP | Direction::BOTTOM))
+	if(around == (Direction::CENTER | Direction::LEFT | Direction::RIGHT))
 	{ index = 29; revert = false; }
 	else
 	// see ICN::CLOP32: sprite 10
