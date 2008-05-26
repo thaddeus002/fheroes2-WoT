@@ -1334,7 +1334,7 @@ void World::ClearFog(const u8 color)
         std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
         std::vector<Castle *>::const_iterator it2 = vec_castles.end();
 
-        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor()) Maps::ClearFog((**it1).GetCenter(), 6, color);
+        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor()) Maps::ClearFog((**it1).GetCenter(), 5, color);
     }
 
     // clear adboar heroes

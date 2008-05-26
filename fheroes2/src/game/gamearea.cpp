@@ -34,6 +34,7 @@
 void	RedrawBoat(const Maps::Tiles & tile, const Point & dst);
 void	RedrawHeroes(const Maps::Tiles & tile, const Point & dst);
 void	RedrawMonster(const Maps::Tiles & tile, const Point & dst);
+void	RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy);
 
 GameArea & GameArea::Get(void)
 {
@@ -131,7 +132,7 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
     	    const u16 tile_x = (*it1).to_index % world.w();
     	    const u16 tile_y = (*it1).to_index / world.h();
 
-    	    if(tile_x < gx + rx || tile_y < gy + ry || tile_x > gx + rx + rw || tile_y > gy + ry + rh) continue;
+    	    if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
 
 	    u16 index = 0;
 
@@ -188,18 +189,9 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 	for(u8 oy = ry; oy < ry + rh; ++oy)
 	    for(u8 ox = rx; ox < rx + rw; ++ox)
 	{
-		const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
+	    const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
 
-		if(tile.isFog(Settings::Get().MyColor()))
-		{
-    		    const s16 dstx = BORDERWIDTH + TILEWIDTH * ox;
-    		    const s16 dsty = BORDERWIDTH + TILEWIDTH * oy;
-
-		    // TIL::CLOF32
-		    display.Blit(AGG::Cache::Get().GetTIL(TIL::CLOF32, tile.GetIndex() % 4), dstx, dsty);
-
-		    // or ICN::CLOP32
-		}
+	    if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), ox, oy);
 	}
     }
 }
@@ -393,4 +385,122 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
 
     if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
     	world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
+}
+
+void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
+{
+    const s16 dstx = BORDERWIDTH + TILEWIDTH * ox;
+    const s16 dsty = BORDERWIDTH + TILEWIDTH * oy;
+    Display & display = Display::Get();
+    const u16 around = Maps::GetAroundFogDirection(dst_index);
+
+    // TIL::CLOF32
+    if(DIRECTION_ALL == around)
+	display.Blit(AGG::Cache::Get().GetTIL(TIL::CLOF32, dst_index % 4), dstx, dsty);
+    else
+    {
+	u8 index = 0;
+	bool revert = false;
+
+	// see ICN::CLOP32: sprite 6, 7, 8
+	if(around == (Direction::CENTER | Direction::TOP))
+	{ index = 6; revert = false; }
+	else
+	if(around == (Direction::CENTER | Direction::RIGHT))
+	{ index = 7; revert = false; }
+	else
+	if(around == (Direction::CENTER | Direction::LEFT))
+	{ index = 7; revert = true; }
+	else
+	if(around == (Direction::CENTER | Direction::BOTTOM))
+	{ index = 8; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 9, 29
+	if(around == (Direction::LEFT | Direction::RIGHT))
+	{ index = 9; revert = false; }
+	else
+	if(around == (Direction::TOP | Direction::BOTTOM))
+	{ index = 29; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 10
+	if(around == Direction::CENTER)
+	{ index = 10; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 15, 22
+	if(around == (DIRECTION_ALL & (~Direction::TOP_RIGHT)))
+	{ index = 15; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~Direction::TOP_LEFT)))
+	{ index = 15; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~Direction::BOTTOM_RIGHT)))
+	{ index = 22; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~Direction::BOTTOM_LEFT)))
+	{ index = 22; revert = true; }
+	else
+	// see ICN::CLOP32: sprite 16, 17, 18, 23
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT))))
+	{ index = 16; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::BOTTOM_LEFT))))
+	{ index = 16; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | Direction::BOTTOM_LEFT))))
+	{ index = 17; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::BOTTOM_RIGHT))))
+	{ index = 17; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::TOP_RIGHT))))
+	{ index = 18; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT))))
+	{ index = 23; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 13, 14
+	if(around == (DIRECTION_ALL & (~DIRECTION_TOP_RIGHT_CORNER)))
+	{ index = 13; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~DIRECTION_TOP_LEFT_CORNER)))
+	{ index = 13; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~DIRECTION_BOTTOM_RIGHT_CORNER)))
+	{ index = 14; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~DIRECTION_BOTTOM_LEFT_CORNER)))
+	{ index = 14; revert = true; }
+	else
+	// see ICN::CLOP32: sprite 11, 12
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | DIRECTION_TOP_RIGHT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::BOTTOM_RIGHT | DIRECTION_TOP_RIGHT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::BOTTOM_RIGHT | DIRECTION_TOP_RIGHT_CORNER))))
+	{ index = 11; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | DIRECTION_TOP_LEFT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::BOTTOM_LEFT | DIRECTION_TOP_LEFT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | Direction::BOTTOM_LEFT | DIRECTION_TOP_LEFT_CORNER))))
+	{ index = 11; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | DIRECTION_BOTTOM_RIGHT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::BOTTOM_LEFT | DIRECTION_BOTTOM_RIGHT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | Direction::BOTTOM_LEFT | DIRECTION_BOTTOM_RIGHT_CORNER))))
+	{ index = 12; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | DIRECTION_BOTTOM_LEFT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::BOTTOM_RIGHT | DIRECTION_BOTTOM_LEFT_CORNER))) ||
+	    around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::BOTTOM_RIGHT | DIRECTION_BOTTOM_LEFT_CORNER))))
+	{ index = 12; revert = true; }
+	// unknown
+	else
+	{
+	    display.Blit(AGG::Cache::Get().GetTIL(TIL::CLOF32, dst_index % 4), dstx, dsty);
+	    return;
+	}
+
+	const Sprite & src = AGG::GetICN(ICN::CLOP32, index, revert);
+	Surface sf(src);
+	sf.SetDisplayFormat();
+	display.Blit(sf, revert ? dstx + src.x() + TILEWIDTH - src.w() : dstx + src.x(), dsty + src.y());
+    }
 }

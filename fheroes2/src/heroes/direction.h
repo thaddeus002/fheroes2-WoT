@@ -49,4 +49,15 @@ namespace Direction
     bool ShortDistanceClockWise(const vector_t from, const vector_t to);
 };
 
+#define DIRECTION_TOP_ROW	(Direction::TOP_LEFT | Direction::TOP | Direction::TOP_RIGHT)
+#define DIRECTION_BOTTOM_ROW	(Direction::BOTTOM_LEFT | Direction::BOTTOM | Direction::BOTTOM_RIGHT)
+#define DIRECTION_LEFT_ROW	(Direction::TOP_LEFT | Direction::LEFT | Direction::BOTTOM_LEFT)
+#define DIRECTION_RIGHT_ROW	(Direction::TOP_RIGHT | Direction::RIGHT | Direction::BOTTOM_RIGHT)
+#define DIRECTION_ALL		(Direction::CENTER | DIRECTION_TOP_ROW | DIRECTION_BOTTOM_ROW | DIRECTION_LEFT_ROW | DIRECTION_RIGHT_ROW)
+
+#define DIRECTION_TOP_RIGHT_CORNER	(Direction::TOP | Direction::TOP_RIGHT | Direction::RIGHT)
+#define DIRECTION_TOP_LEFT_CORNER	(Direction::TOP | Direction::TOP_LEFT | Direction::LEFT)
+#define DIRECTION_BOTTOM_RIGHT_CORNER	(Direction::BOTTOM | Direction::BOTTOM_RIGHT | Direction::RIGHT)
+#define DIRECTION_BOTTOM_LEFT_CORNER	(Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::LEFT)
+
 #endif
