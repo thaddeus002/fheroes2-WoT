@@ -71,7 +71,7 @@ namespace Monster {
 	{ true,  true,  PHOENIX,          12,  10,   0,  20,  40, 100, Speed::ULTRAFAST,   1, "Phoenix"        , ICN::PHOENIX , ICN::MONH0028, ICN::UNKNOWN, {1, 9, 30, 5, 35, 1, 35, 13, {10, 1, 14, 4, 11, 3, 18, 5 }, ANIMATTNONE } },
 
 	// fly   wide   monster         atck dfnc shts  min  max   hp             speed grwn  name            file
-	{ false, true,  CENTAUR,           3,   1,   8,   1,   2,   5,   Speed::AVERAGE,   8, "Centaur"        , ICN::CENTAUR , ICN::MONH0029, ICN::ORC__MSL, {1, 7, 64, 7, 58, 4, 46, 9, {1, 1, 38, 4, 34, 4, 42, 4 }, {18, 4, 27, 3, 22, 5, 30, 4} } },
+	{ false, true,  CENTAUR,           3,   1,   8,   1,   2,   5,   Speed::AVERAGE,   8, "Centaur"        , ICN::CENTAUR , ICN::MONH0029, ICN::ARCH_MSL, {1, 7, 64, 7, 58, 4, 46, 9, {1, 1, 38, 4, 34, 4, 42, 4 }, {18, 4, 27, 3, 22, 5, 30, 4} } },
 	{ true,  false, GARGOYLE,          4,   7,   0,   2,   3,  15,  Speed::VERYFAST,   6, "Gargoyle"       , ICN::GARGOYLE, ICN::MONH0030, ICN::UNKNOWN, {5, 7, 1, 4, 12, 3, 27, 5, {1, 1, 15, 4, 19, 4, 23, 4}, ANIMATTNONE } },
 	{ true,  true,  GRIFFIN,           6,   6,   0,   3,   5,  25,   Speed::AVERAGE,   4, "Griffin"        , ICN::GRIFFIN , ICN::MONH0031, ICN::UNKNOWN, {1, 6, 16, 9, 25, 3, 25, 9, {7, 1, 8, 3, 15, 1, 11, 4}, ANIMATTNONE } },
 	{ false, false, MINOTAUR,          9,   8,   0,   5,  10,  35,   Speed::AVERAGE,   3, "Minotaur"       , ICN::MINOTAUR, ICN::MONH0032, ICN::UNKNOWN, {6, 7, 1, 5, 27, 3, 30, 5, {13, 3, 23, 4, 16, 4, 20, 3}, ANIMATTNONE } },
