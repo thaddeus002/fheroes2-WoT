@@ -28,6 +28,7 @@
 #include "icn.h"
 #include "speed.h"
 #include "gamedefs.h"
+#include "m82.h"
 
 namespace Monster
 {
@@ -173,6 +174,7 @@ namespace Monster
 	const ICN::icn_t monh_icn;
 	const ICN::icn_t miss_icn;
 	anim_t animation;
+	M82::m82_t m82_attk, m82_expl, m82_kill, m82_move, m82_shot, m82_wnce;
     } stats_t;
 
     const std::string & String(monster_t monster);

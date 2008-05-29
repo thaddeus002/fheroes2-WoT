@@ -60,16 +60,25 @@ if(le.MousePressRight(b) && !b.isDisable()) rt;
 
 namespace Army {
     bool O_GRID = false, O_SHADM = false, O_SHADC = false, O_AUTO = false;
+    long EXP1, EXP2;
     Point dst_pt;
     std::vector<Point> movePoints;
     Dialog::StatusBar *statusBar1;
     Dialog::StatusBar *statusBar2;
+    typedef struct {
+	ICN::icn_t icn;
+	Point scrpoint, bfpoint;
+    } CObj;
+    std::vector<Point> blockedCells;
+    std::vector<CObj> cobjects;
 
     battle_t BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile);
     battle_t HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     battle_t CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     bool AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, const Point &move, const Point &attack);
+    void InitBackground(const Maps::Tiles & tile);
     void DrawBackground(const Maps::Tiles & tile);
+    void DrawObject(const Point &pt);
     void DrawCaptain(const Race::race_t race, u16 animframe, bool reflect=false);
     Rect DrawHero(const Heroes & hero, u16 animframe, bool reflect=false, int fframe=0);
     void DrawArmy(Army::army_t & army1, Army::army_t & army2, int animframe=-1);
@@ -121,6 +130,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
+    InitBackground(tile);
     DrawBackground(tile);
     if(hero1) DrawHero(*hero1, 1);
     if(hero2) DrawHero(*hero2, 1, true);
@@ -139,6 +149,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 
     display.Flip();
     Point move, attack;
+    EXP1 = EXP2 = 0;  // experience = damage
 
     while(1) {
 	if(hero1) hero1->spellCasted = false;
@@ -454,11 +465,17 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	while(le.HandleEvents()) {
 	    if(!(++animat%ANIMATION_LOW)) {
 		if(myMonster.fly) {
-		    if(frame >= prep && !part) part = 1;
+		    if(frame >= prep && !part) {
+			AGG::PlaySound(myMonster.m82_move);
+			part = 1;
+		    }
 		    if(part == 1) {
 			tp += step;
 			curstep ++;
-			if(myTroop.aframe >= st+len-post-1) myTroop.aframe = st+prep;
+			if(myTroop.aframe >= st+len-post-1) {
+			    AGG::PlaySound(myMonster.m82_move);
+			    myTroop.aframe = st+prep;
+			}
 			if(curstep == 8) {
 			    part = 3;
 			    tp = end;
@@ -469,6 +486,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 		} else {
 		    tp += step;
 		    if(myTroop.astate != Monster::AS_WALK && path.size()) {
+			AGG::PlaySound(myMonster.m82_move);
 			myTroop.SetPosition(path[path.size()-1]);
 			tp = Bf2Scr(myTroop.Position()) + dst_pt;
 			path.pop_back();
@@ -484,6 +502,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 		int t=-1;
 		for(p.y = 0; p.y < BFH; p.y++)
 		    for(p.x = 0; p.x < BFW; p.x++) {
+			DrawObject(p);
 			if(t = FindTroop(army1, p, false, false), t >= 0) {
 			    if(&army1[t] == &myTroop) {
 				    myTroop.Blit(tp, reflect);
@@ -537,9 +556,15 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	}
 	bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !counterstrike;
 	if(!ranged) {
+	    AGG::PlaySound(myMonster.m82_attk);
 	    target.Animate(hp > damage ? Monster::AS_PAIN : Monster::AS_DIE);
+	    if(hp <= damage)
+		AGG::PlaySound(Monster::GetStats(target.Monster()).m82_kill);
+	    else
+		AGG::PlaySound(Monster::GetStats(target.Monster()).m82_wnce);
 	    myTroop.aranged = false;
 	} else {
+	    AGG::PlaySound(myMonster.m82_shot);
 	    myTroop.aranged = true;
 	    int maxind = AGG::GetICNCount(myMonster.miss_icn);
 	    if(maxind > 1) {
@@ -568,8 +593,13 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 		} else {
 		    if(myTroop.astate == Monster::AS_NONE && !state) 
 			state ++;
-		    if(missframe >= MISSFRAMES && state == 1) 
+		    if(missframe >= MISSFRAMES && state == 1) {
 			target.Animate(hp > damage ? Monster::AS_PAIN : Monster::AS_DIE), state++;
+			if(hp <= damage)
+			    AGG::PlaySound(Monster::GetStats(target.Monster()).m82_kill);
+			else
+			    AGG::PlaySound(Monster::GetStats(target.Monster()).m82_wnce);
+		    }
 		    if(target.astate == Monster::AS_NONE && state == 2) break;
 		    if(hp <= damage && state == 2) {
 			u8 st, len;
@@ -584,6 +614,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 		int t=-1;
 		for(p.y = 0; p.y < BFH; p.y++)
 		    for(p.x = 0; p.x < BFW; p.x++) {
+			DrawObject(p);
 			if(t = FindTroop(army1, p, false, false), t >= 0) {
 			    DrawTroop(army1[t], false);
 			    army1[t].Animate();
@@ -608,6 +639,8 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	String::AddInt(status, damage);
 	status += " damage. ";
 	int oldcount = target.Count();
+	if(troopN >= 0) EXP1 += hp > damage ? damage : hp;
+	else EXP2 += hp > damage ? damage : hp;
 	if(hp > damage) {
 	    target.SetCount((hp - damage)/Monster::GetStats(target.Monster()).hp + 1);
 	    target.hp = (hp - damage) % Monster::GetStats(target.Monster()).hp;
@@ -633,9 +666,213 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
     return counterstrike;
 }
 
+void Army::InitBackground(const Maps::Tiles & tile)
+{
+    blockedCells.clear();
+    cobjects.clear();
+    int obj = Rand::Get(1,4);
+    for(int i=0; i < obj; i++) {
+	Point p;
+	p.x = Rand::Get(2, BFW-4);
+	p.y = Rand::Get(0, BFH-1);
+	blockedCells.push_back(p);
+	CObj cobj;
+	if(tile.GetObject() == MP2::OBJN_GRAVEYARD) {
+	    switch(Rand::Get(0,2)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0000;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0001;
+		break;
+	    case 2:
+		cobj.icn = ICN::COBJ0025;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    }
+	}
+	else switch(tile.GetGround()) {
+	case Maps::Ground::DESERT: 
+	    switch(Rand::Get(0,1)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0009;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0024;
+		break;
+	    }
+	    break;
+	case Maps::Ground::SNOW: 
+	    switch(Rand::Get(0,1)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0022;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0026;
+		break;
+	    }
+	    break;
+	case Maps::Ground::SWAMP: 
+	    switch(Rand::Get(0,3)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0004;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0006;
+		break;
+	    case 2:
+		cobj.icn = ICN::COBJ0015;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 3:
+		cobj.icn = ICN::COBJ0016;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    }
+	    break;
+	case Maps::Ground::WASTELAND: 
+	    switch(Rand::Get(0,3)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0013;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0018;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 2:
+		cobj.icn = ICN::COBJ0020;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 3:
+		cobj.icn = ICN::COBJ0021;
+		break;
+	    }
+	    break;
+	case Maps::Ground::BEACH: 
+	    switch(Rand::Get(0,0)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0017;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    }
+	    break;
+	case Maps::Ground::LAVA: 
+	    switch(Rand::Get(0,2)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0029;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0030;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 2:
+		cobj.icn = ICN::COBJ0031;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    }
+	    break;
+	case Maps::Ground::GRASS:
+	case Maps::Ground::DIRT: 
+	    switch(Rand::Get(0,9)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0002;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0005;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 2:
+		cobj.icn = ICN::COBJ0007;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 3:
+		cobj.icn = ICN::COBJ0011;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 4:
+		cobj.icn = ICN::COBJ0012;
+		break;
+	    case 5:
+		cobj.icn = ICN::COBJ0014;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 6:
+		cobj.icn = ICN::COBJ0019;
+		p.x ++;
+		blockedCells.push_back(p);
+		p.x --;
+		break;
+	    case 7:
+		cobj.icn = ICN::COBJ0027;
+		break;
+	    case 8:
+		cobj.icn = ICN::COBJ0028;
+		break;
+	    case 9:
+		cobj.icn = ICN::COBJ0008;
+		break;
+	    }
+	    break;
+	case Maps::Ground::WATER: 
+	    switch(Rand::Get(0,2)) {
+	    case 0:
+		cobj.icn = ICN::COBJ0003;
+		break;
+	    case 1:
+		cobj.icn = ICN::COBJ0010;
+		break;
+	    case 2:
+		cobj.icn = ICN::COBJ0023;
+		break;
+	    }
+	    break;
+	default:
+	    cobj.icn = ICN::COBJ0000;
+	    break;
+	}
+	//const Sprite & sp = AGG::GetICN(cobj.icn, 0, false);
+	cobj.bfpoint = p;
+	cobj.scrpoint = Bf2Scr(p)+dst_pt;
+	//cobj.point.y -= sp.h();
+	//cobj.point.x -= CELLH * 0.5f;
+	cobjects.push_back(cobj);
+    }
+}
+
 void Army::DrawBackground(const Maps::Tiles & tile)
 {
-    ICN::icn_t icn;
+    ICN::icn_t icn = ICN::UNKNOWN;
+    ICN::icn_t frng = ICN::UNKNOWN;
     bool trees = false;
     u16 index = tile.GetIndex();
     u16 x = index%world.w(), y = index/world.w();
@@ -644,31 +881,73 @@ void Army::DrawBackground(const Maps::Tiles & tile)
        (y < world.h()-1 && world.GetTiles(index+world.w()).GetObject() == MP2::OBJ_TREES) ||
        (y > 0 && world.GetTiles(index-world.w()).GetObject() == MP2::OBJ_TREES) )
 	trees = true;
-    if(tile.GetObject() == MP2::OBJN_GRAVEYARD)
+    if(tile.GetObject() == MP2::OBJN_GRAVEYARD) {
 	icn = ICN::CBKGGRAV;
+	frng = ICN::FRNG0001;
+    }
     else switch(tile.GetGround()) {
-	case Maps::Ground::DESERT: icn = ICN::CBKGDSRT; break;
-	case Maps::Ground::SNOW: 
-	    icn = trees ? ICN::CBKGSNTR : ICN::CBKGSNMT; break;
-	case Maps::Ground::SWAMP: icn = ICN::CBKGSWMP; break;
-	case Maps::Ground::WASTELAND: icn = ICN::CBKGCRCK; break;
-	case Maps::Ground::BEACH: icn = ICN::CBKGBEAC; break;
-	case Maps::Ground::LAVA: icn = ICN::CBKGLAVA; break;
-	case Maps::Ground::DIRT: 
-	    icn = trees ? ICN::CBKGDITR : ICN::CBKGDIMT; break;
-	case Maps::Ground::GRASS:
-	    icn = trees ? ICN::CBKGGRTR : ICN::CBKGGRMT; break;
-	case Maps::Ground::WATER: icn = ICN::CBKGWATR; break;
-	default:
-	    return;
-	}
+    case Maps::Ground::DESERT: 
+	icn = ICN::CBKGDSRT;
+	frng = ICN::FRNG0003; 
+	break;
+    case Maps::Ground::SNOW: 
+	icn = trees ? ICN::CBKGSNTR : ICN::CBKGSNMT; 
+	frng = trees ? ICN::FRNG0006 : ICN::FRNG0007;
+	break;
+    case Maps::Ground::SWAMP: 
+	icn = ICN::CBKGSWMP; 
+	frng = ICN::FRNG0008; 
+	break;
+    case Maps::Ground::WASTELAND: 
+	icn = ICN::CBKGCRCK; 
+	frng = ICN::FRNG0002; 
+	break;
+    case Maps::Ground::BEACH: 
+	icn = ICN::CBKGBEAC; 
+	frng = ICN::FRNG0004; 
+	break;
+    case Maps::Ground::LAVA: 
+	icn = ICN::CBKGLAVA; 
+	frng = ICN::FRNG0005; 
+	break;
+    case Maps::Ground::DIRT: 
+	icn = trees ? ICN::CBKGDITR : ICN::CBKGDIMT; 
+	frng = trees ? ICN::FRNG0010 : ICN::FRNG0009;
+	break;
+    case Maps::Ground::GRASS:
+	icn = trees ? ICN::CBKGGRTR : ICN::CBKGGRMT; 
+	frng = trees ? ICN::FRNG0011 : ICN::FRNG0012;
+	break;
+    case Maps::Ground::WATER: 
+	icn = ICN::CBKGWATR; 
+	frng = ICN::FRNG0013; 
+	break;
+    default:
+	return;
+    }
     display.Blit(AGG::GetICN(icn, 0), dst_pt);
+    Point pt = dst_pt;
+    pt.y += 200;
+    display.Blit(AGG::GetICN(frng, 0), pt);
     // draw grid
     if(O_GRID) {
 	Point p(0,0);
 	for(p.x=0; p.x<BFW; p.x++)
 	    for(p.y=0; p.y<BFH; p.y++)
 		DrawCell(p);
+    }
+//     for(u16 i=0; i<cobjects.size(); i++) {
+// 	const Sprite& spr = AGG::GetICN(cobjects[i].icn, 0);
+// 	display.Blit(spr, cobjects[i].point.x + spr.x(), cobjects[i].point.y +spr.y());
+//     }
+}
+
+void Army::DrawObject(const Point &pt)
+{
+    for(u16 i=0; i<cobjects.size(); i++) if(cobjects[i].bfpoint == pt) {
+	const Sprite& spr = AGG::GetICN(cobjects[i].icn, 0);
+	display.Blit(spr, cobjects[i].scrpoint.x + spr.x(), cobjects[i].scrpoint.y + spr.y());
+	break;
     }
 }
 
@@ -726,8 +1005,9 @@ void Army::DrawArmy(Army::army_t & army1, Army::army_t & army2, int animframe)
 {
     Point p;
     int t=-1;
-    for(p.y = 0; p.y < BFH; p.y++)
+    for(p.y = 0; p.y < BFH; p.y++) 
 	for(p.x = 0; p.x < BFW; p.x++) {
+	    DrawObject(p);
 	    if(t = FindTroop(army1, p, false, false), t >= 0) {
 		DrawTroop(army1[t], false, animframe);
 		army1[t].Animate();
@@ -829,6 +1109,7 @@ bool Army::CellFree(const Point &p, const Army::army_t &army1, const Army::army_
 	return false;
     if(t = FindTroop(army2, p, true), t >= 0 && army2[t].Count() > 0 && (skip >= 0 || -skip-1 != t)) 
 	return false;
+    for(u16 i=0; i<blockedCells.size(); i++) if(p == blockedCells[i]) return false;
     return true;
 }
 
