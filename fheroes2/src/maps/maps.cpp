@@ -160,7 +160,8 @@ u16 Maps::GetAroundFogDirection(u16 center, u8 color)
     u16 result = 0;
 
     for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	if(isValidDirection(center, direct) && world.GetTiles(GetDirectionIndex(center, direct)).isFog(color)) result |= direct;
+	if(!isValidDirection(center, direct) ||
+	   world.GetTiles(GetDirectionIndex(center, direct)).isFog(color)) result |= direct;
 
     if(world.GetTiles(center).isFog(color)) result |= Direction::CENTER;
 
