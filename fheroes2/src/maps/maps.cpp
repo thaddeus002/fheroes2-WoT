@@ -23,6 +23,7 @@
 #include "error.h"
 #include "settings.h"
 #include "maps.h"
+#include <cstdlib>
 
 namespace Maps
 {
