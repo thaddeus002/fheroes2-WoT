@@ -38,6 +38,10 @@ public:
 
     static void DrawICN(Surface & sf, const u32 size, const u8 *vdata, const u8 modify);
 
+    operator Point() const { return Point(offsetX, offsetY); }
+    operator Size() const { return Size(w(), h()); }
+    operator Rect() const { return Rect(offsetX, offsetY, w(), h()); }
+
 private:
     s16		offsetX;
     s16		offsetY;

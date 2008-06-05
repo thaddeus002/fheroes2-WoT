@@ -42,6 +42,7 @@
 #define BFY 108
 #define BFW 11
 #define BFH 9
+#define MORALEBOUND 10
 
 #define display Display::Get()
 #define le LocalEvent::GetLocalEvent()
@@ -100,6 +101,9 @@ namespace Army {
     std::vector<Point> *FindPath(const Point& start, const Point &end, int moves, const Army::army_t &army1, const Army::army_t &army2, int skip, bool wide, bool reflect);
     void AttackStatus(const std::string &str);
     int CanAttack(const Army::Troops &myTroop, const std::vector<Point> &moves, const Army::Troops &enemyTroop, const Point &d, bool reflect=false);
+    bool GoodMorale(Heroes *hero, const Army::Troops &troop);
+    bool BadMorale(Heroes *hero, const Army::Troops &troop);
+    int CheckLuck(Heroes *hero, const Army::Troops &troop);
 
     void Temp(int, int, Point);
 }
@@ -151,6 +155,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     display.Flip();
     Point move, attack;
     EXP1 = EXP2 = 0;  // experience = damage
+    bool goodmorale;
 
     while(1) {
 	if(hero1) hero1->spellCasted = false;
@@ -159,7 +164,8 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	while(1) {
 	    //Dialog::Message("speed", Speed::String(cursp), Font::BIG, Dialog::OK);
 	    for(unsigned int i=0; i < army1.size(); i++) {
-		if(Monster::GetStats(army1[i].Monster()).speed == cursp && army1[i].Count() > 0) {
+		goodmorale = false;
+		if(Monster::GetStats(army1[i].Monster()).speed == cursp && army1[i].Count() > 0 && !BadMorale(hero1, army1[i])) do {
 		    battle_t s;
 		    if(hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::Human && !O_AUTO) {
 			s = HumanTurn(hero1, hero2, army1, army2, tile, i, move, attack);
@@ -184,10 +190,11 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 			    bodies2.push_back(body);
 			}
 		    }
-		}
+		} while (!goodmorale && (goodmorale = GoodMorale(hero1, army1[i]), goodmorale));
 	    }
 	    for(unsigned int i=0; i < army2.size(); i++) {
-		if(Monster::GetStats(army2[i].Monster()).speed == cursp && army2[i].Count() > 0) {
+		goodmorale = false;
+		if(Monster::GetStats(army2[i].Monster()).speed == cursp && army2[i].Count() > 0 && !BadMorale(hero2, army2[i])) do {
 		    battle_t s;
 		    if(hero2 && world.GetKingdom(hero2->GetColor()).Control() == Game::Human && !O_AUTO) {
 			s = HumanTurn(hero1, hero2, army1, army2, tile, -i-1, move, attack);
@@ -212,7 +219,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 			    bodies1.push_back(body);
 			}
 		    }
-		}
+		} while (!goodmorale && (goodmorale = GoodMorale(hero2, army2[i]), goodmorale));
 	    }
 	    int c1 = 0, c2 = 0;
 	    for(unsigned int i=0; i < army1.size(); i++) c1 += army1[i].Count();
@@ -235,7 +242,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     PrepMovePoints(troopN, army1, army2, troopN < 0);
     move.x = move.y = attack.x = attack.y = -1;
     bool close = false;
-    for(int j=0; j<enemyArmy.size(); j++) {
+    for(u16 j=0; j<enemyArmy.size(); j++) {
 	Point tmpoint(0,0);
 	std::vector<Point> tmpoints;
 	tmpoints.push_back(enemyArmy[j].Position());
@@ -580,7 +587,18 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	Army::Troops &target = (t = FindTroop(army1, attack, false), t >= 0 ? army1[t] : army2[FindTroop(army2, attack, false)]);
 	int sk_a = myMonster.attack + (myTroop.MasterSkill() ? myTroop.MasterSkill()->GetAttack() : 0);
 	int sk_d = Monster::GetStats(target.Monster()).defence + (target.MasterSkill() ? target.MasterSkill()->GetDefense() : 0);
-	long damage = Rand::Get(myMonster.damageMin*myTroop.Count(), myMonster.damageMax*myTroop.Count());
+	long damage = 0;
+	switch(CheckLuck(troopN >= 0 ? hero1 : hero2, myTroop)) {
+	case -1:
+	    damage = myMonster.damageMin*myTroop.Count();
+	    break;
+	case 0:
+	    damage = Rand::Get(myMonster.damageMin*myTroop.Count(), myMonster.damageMax*myTroop.Count());
+	    break;
+	case 1:
+	    damage = myMonster.damageMax*myTroop.Count();
+	    break;
+	}
 	// TODO bless and curse
 	damage *= sk_a;
 	damage /= sk_d;
@@ -1566,6 +1584,103 @@ int Army::CanAttack(const Army::Troops &myTroop, const std::vector<Point> &moves
     return mp;
 }
 
+bool Army::GoodMorale(Heroes *hero, const Army::Troops &troop)
+{
+    int m = Rand::Get(1, MORALEBOUND);
+    if(hero && (Monster::GetRace(troop.Monster()) != Race::NECR) && (hero->GetMorale() >= m)) {
+	AGG::PlaySound(M82::GOODMRLE);
+	for(u16 i=0; i<AGG::GetICNCount(ICN::MORALEG); i++) {
+	    const Sprite &sp = AGG::GetICN(ICN::MORALEG, i);
+	    Rect pos_rt = sp;
+	    pos_rt += Bf2Scr(troop.Position()) + dst_pt;
+	    Background back(pos_rt);
+	    back.Save();
+	    display.Blit(sp, pos_rt);
+	    display.Flip();
+	    int animat = 0;
+	    while(le.HandleEvents()) {
+		if(!(++animat%ANIMATION_LOW)) break;
+	    }
+	    back.Restore();
+	}
+	AttackStatus("Hi morale enables the "+Monster::String(troop.Monster())+"s to attack again.");
+	return true;
+    }
+    return false;
+}
+
+bool Army::BadMorale(Heroes *hero, const Army::Troops &troop)
+{
+    int m = -Rand::Get(1, MORALEBOUND);
+    if(hero && (Monster::GetRace(troop.Monster()) != Race::NECR) && (hero->GetMorale() <= m)) {
+	AGG::PlaySound(M82::BADMRLE);
+	for(u16 i=0; i<AGG::GetICNCount(ICN::MORALEB); i++) {
+	    const Sprite &sp = AGG::GetICN(ICN::MORALEB, i);
+	    Rect pos_rt = sp;
+	    pos_rt += Bf2Scr(troop.Position()) + dst_pt;
+	    Background back(pos_rt);
+	    back.Save();
+	    display.Blit(sp, pos_rt);
+	    display.Flip();
+	    int animat = 0;
+	    while(le.HandleEvents()) {
+		if(!(++animat%ANIMATION_LOW)) break;
+	    }
+	    back.Restore();
+	}
+	AttackStatus("Low morale causes the "+Monster::String(troop.Monster())+"s to freeze in panic.");
+	return true;
+    }
+    return false;
+}
+
+// return 1 for good luck, -1 for bad luck, 0 for none luck
+int Army::CheckLuck(Heroes *hero, const Army::Troops &troop)
+{
+    int luck = Rand::Get(0, MORALEBOUND);
+    if(hero) {
+	if(hero->GetLuck() < 0 && hero->GetLuck() <= -luck) {
+	    AGG::PlaySound(M82::BADLUCK);
+	    for(u16 i=0; i<AGG::GetICNCount(ICN::CLOUDLUK); i++) {
+		const Sprite &sp = AGG::GetICN(ICN::CLOUDLUK, i);
+		Rect pos_rt = sp;
+		pos_rt += Bf2Scr(troop.Position()) + dst_pt;
+		Background back(pos_rt);
+		back.Save();
+		display.Blit(sp, pos_rt);
+		display.Flip();
+		int animat = 0;
+		while(le.HandleEvents()) {
+		    if(!(++animat%ANIMATION_LOW)) break;
+		}
+		back.Restore();
+	    }
+	    return -1;
+	}
+	if(hero->GetLuck() > 0 && hero->GetLuck() >= luck) {
+	    AGG::PlaySound(M82::GOODLUCK);
+	    for(u16 i=0; i<AGG::GetICNCount(ICN::CLOUDLUK); i++) {
+		const Sprite &sp = AGG::GetICN(ICN::EXPMRL, 0);
+		Rect pos_rt = sp;
+		pos_rt += Bf2Scr(troop.Position()) + dst_pt;
+		pos_rt.y -= CELLH*2;
+		pos_rt.x -= CELLW/2;
+		Background back(pos_rt);
+		back.Save();
+		display.Blit(sp, pos_rt);
+		display.Flip();
+		int animat = 0;
+		while(le.HandleEvents()) {
+		    if(!(++animat%ANIMATION_LOW)) break;
+		}
+		back.Restore();
+	    }
+	    return 1;
+	}
+    }
+    return 0;
+}
+
 void Army::Temp(int dicn, int dindex, Point pt)
 {
     static int icn=0, index=0;
@@ -1601,6 +1716,7 @@ void Army::Temp(int dicn, int dindex, Point pt)
 	display.Blit(sp, pt.x + x, pt.y + y);
 	x += sp.w();
 	index ++;
+	if(index >= AGG::GetICNCount((ICN::icn_t)icn)) break;
     }
     String::AddInt(str, index);
     Text(str, Font::SMALL, pt);
