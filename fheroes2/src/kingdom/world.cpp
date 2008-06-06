@@ -851,13 +851,73 @@ void World::LoadMaps(const std::string &filename)
 		}
 		break;
 
+	    case MP2::OBJ_TREASURECHEST:
+		if(Maps::Ground::WATER == tile.GetGround())
+		{
+		    switch(Rand::Get(1, 10))
+		    {
+			// 70% - 15 * 100 gold
+			default:
+			    tile.SetQuantity2(15);
+			    break;
+
+			// 20% - empty
+			case 7:
+			case 8:
+			    break;
+
+			// 10% - 10 * 100 gold + art
+			case 10:
+			    tile.SetQuantity1(Artifact::Rand1());
+			    tile.SetQuantity2(10);
+			    break;
+		    }
+		}
+		else
+		{
+		    switch(Rand::Get(1, 20))
+		    {
+			// 32% - 20 * 100 gold or 1500 exp
+			default:
+			    tile.SetQuantity2(20);
+			    break;
+
+			// 31% - 15 * 100 gold or 1000 exp
+			case 2:
+			case 5:
+			case 8:
+			case 11:
+			case 14:
+			case 17:
+			    tile.SetQuantity2(15);
+			    break;
+
+			// 31% - 10 * 100 gold or 500 exp
+			case 3:
+			case 6:
+			case 9:
+			case 12:
+			case 15:
+			case 18:
+			    tile.SetQuantity2(10);
+			    break;
+
+			// 10% - art
+			case 20:
+			    tile.SetQuantity1(Artifact::Rand1());
+			    break;
+		    }
+		}
+		break;
+
 	    case MP2::OBJ_RESOURCE:
-		    //tile.SetQuantity1();
+		tile.SetQuantity2(Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX));
 		break;
 
 	    case MP2::OBJ_RNDRESOURCE:
 		// modify rnd resource sprite
 		Resource::ChangeTileWithRNDResource(tile);
+		tile.SetQuantity2(Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX));
 		break;
 
 	    case MP2::OBJ_RNDMONSTER:

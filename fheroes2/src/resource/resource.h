@@ -84,9 +84,8 @@ namespace Resource
     const std::string & String(resource_t resource);
 
     resource_t Rand(void);
-    resource_t Rand2(void);
-    u16	RandCount(Resource::resource_t res);
-    
+    resource_t FromIndexSprite(u8 index);
+
     /* return index sprite objnrsrc.icn */
     u8 GetIndexSprite(resource_t resource);
 

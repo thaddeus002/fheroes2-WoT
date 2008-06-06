@@ -867,6 +867,30 @@ bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
     return false;
 }
 
+Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNWAT
+	    if(0xC7 < addon.object && 0xCC > addon.object && 
+		(0 == addon.index ||	// buttle
+		19 == addon.index ||	// chest
+		45 == addon.index ||	// flotsam
+		111 == addon.index))	// surviror
+				return &addon;
+	}
+    }
+
+    return NULL;
+}
+
 Maps::TilesAddon * Maps::Tiles::FindResource(void)
 {
     if(addons_level1.size())
@@ -1157,25 +1181,6 @@ Maps::TilesAddon * Maps::Tiles::FindMonster(void)
 
 	    // MONS32
 	    if(0x2F < addon.object && 0x34 > addon.object) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindBottle(void)
-{
-    if(addons_level1.size())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNWAT
-	    if(0xC7 < addon.object && 0xCC > addon.object && 0 == addon.index) return &addon;
 	}
     }
 

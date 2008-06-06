@@ -26,7 +26,7 @@
 #include "button.h"
 #include "dialog.h"
 
-void Dialog::SpriteInfo(const std::string &header, const std::string &message, const Sprite & sprite)
+void Dialog::SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;

@@ -43,6 +43,17 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 {
     const Maps::TilesAddon *addon = NULL;
 
+    if(Maps::Ground::WATER == tile.GetGround())
+    switch(tile.GetObject())
+    {
+        case MP2::OBJ_TREASURECHEST:
+	case MP2::OBJ_FLOTSAM:
+	case MP2::OBJ_SHIPWRECKSURVIROR:
+	case MP2::OBJ_BOTTLE:	addon = const_cast<Maps::Tiles &>(tile).FindWaterResource(); break;
+
+	default: break;
+    }
+    else
     switch(tile.GetObject())
     {
         case MP2::OBJ_TREASURECHEST:
@@ -50,7 +61,8 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 	case MP2::OBJ_RESOURCE:	addon = const_cast<Maps::Tiles &>(tile).FindResource(); break;
 	case MP2::OBJ_ARTIFACT:	addon = const_cast<Maps::Tiles &>(tile).FindArtifact(); break;
 	case MP2::OBJ_CAMPFIRE:	addon = const_cast<Maps::Tiles &>(tile).FindCampFire(); break;
-	case MP2::OBJ_BOTTLE:	addon = const_cast<Maps::Tiles &>(tile).FindBottle(); break;
+	case MP2::OBJ_FLOTSAM:
+	case MP2::OBJ_BOTTLE:	addon = const_cast<Maps::Tiles &>(tile).FindWaterResource(); break;
 
 	default: break;
     }
@@ -342,18 +354,18 @@ void Heroes::ActionToResource(const u16 dst_index)
     if(addon)
     {
 	Resource::funds_t resource;
-	u16 count = 0;
 	const u32 uniq = addon->uniq;
+	const u8 count = tile.GetQuantity2();
 
-	switch(addon->index)
+	switch(Resource::FromIndexSprite(addon->index))
         {
-    	    case 1:	count = Resource::RandCount(Resource::WOOD); resource.wood += count;  break;
-    	    case 3:	count = Resource::RandCount(Resource::MERCURY); resource.mercury += count; break;
-    	    case 5:	count = Resource::RandCount(Resource::ORE); resource.ore += count; break;
-    	    case 7:	count = Resource::RandCount(Resource::SULFUR); resource.sulfur += count; break;
-    	    case 9:	count = Resource::RandCount(Resource::CRYSTAL); resource.crystal += count; break;
-    	    case 11:	count = Resource::RandCount(Resource::GEMS); resource.gems += count; break;
-    	    case 13:	count = Resource::RandCount(Resource::GOLD); resource.gold += count; break;
+    	    case Resource::WOOD: resource.wood += count; break;
+    	    case Resource::MERCURY: resource.mercury += count; break;
+    	    case Resource::ORE: resource.ore += count; break;
+    	    case Resource::SULFUR: resource.sulfur += count; break;
+    	    case Resource::CRYSTAL: resource.crystal += count; break;
+    	    case Resource::GEMS: resource.gems += count; break;
+    	    case Resource::GOLD: resource.gold += 100 * count; break;
 
 	    default:
 		if(H2Config::Debug()) Error::Warning("Heroes::ActionToResource: unknown resource, from tile: ", dst_index);
@@ -571,7 +583,7 @@ void Heroes::ActionToSign(const u16 dst_index)
 void Heroes::ActionToBottle(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Maps::TilesAddon *addon = tile.FindBottle();
+    const Maps::TilesAddon *addon = tile.FindWaterResource();
 
     if(addon)
     {
@@ -862,35 +874,96 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    const Maps::TilesAddon *addon = tile.FindResource();
+    const Maps::TilesAddon *addon = Maps::Ground::WATER == tile.GetGround() ? tile.FindWaterResource() : tile.FindResource();
 
     if(addon)
     {
 	const u32 uniq = addon->uniq;
 
-/* FIXME: pickup chest variants
-    {Chest}
-    After scouring the area, you fall upon a hidden chest, containing the ancient artifact '%s'
-    {Chest}
-    After scouring the area, you fall upon a hidden treasure cache.  You may take the gold or distribute the gold to the peasants for experience.  Do you wish to keep the gold?
 
-    {Chest}
-    After spending hours trying to fish the chest out of the sea, you open it and find 1000 gold and the %s
-    {Chest}
-    After spending hours trying to fish the chest out of the sea, you open it and find 1500 gold pieces.
-    {Chest}
-    After spending hours trying to fish the chest out of the sea, you open it, only to find it empty.
-*/
 	PlayPickupSound();
 	AnimationRemoveObject(tile);
 
 	Resource::funds_t resource;
-	resource.gold = 1500;
-
-	world.GetKingdom(GetColor()).AddFundsResource(resource);
+	resource.gold = tile.GetQuantity2() * 100;
 
 	// dialog
-	//if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+	if(Maps::Ground::WATER == tile.GetGround())
+	{
+	    std::string message("After spending hours trying to fish the chest out of the sea,");
+
+	    if(0 == resource.gold)
+	    {
+		message += " you open it, only to find it empty.";
+		if(H2Config::MyColor() == GetColor())  Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
+	    }
+	    else
+	    if(tile.GetQuantity1())
+	    {
+		const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+		if(H2Config::MyColor() == GetColor())
+		{
+		    message += " you open it and find ";
+		    String::AddInt(message, resource.gold);
+		    message += " gold and the " + Artifact::String(art);
+		    const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
+		    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+		    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art + 1);
+		    Surface image(gold.w() + border.w() + 50, border.h());
+		    image.SetColorKey();
+		    image.Blit(border);
+		    image.Blit(artifact, 5, 5);
+		    image.Blit(gold, border.w() + 50, (border.h() - gold.h()) / 2);
+		    Dialog::SpriteInfo("Chest", message, image);
+		}
+		PickupArtifact(art);
+		world.GetKingdom(GetColor()).AddFundsResource(resource);
+	    }
+	    else
+	    {
+		if(H2Config::MyColor() == GetColor())
+		{
+		    message += " you open it and find 1500";
+		    String::AddInt(message, resource.gold);
+		    message += " gold pieces.";
+		    Dialog::SpriteInfo("Chest", message, AGG::GetICN(ICN::RESOURCE, 6));
+		}
+		world.GetKingdom(GetColor()).AddFundsResource(resource);
+	    }
+	}
+	else
+	{
+	    std::string message("After scouring the area,");
+
+	    if(tile.GetQuantity1())
+	    {
+		const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+		if(H2Config::MyColor() == GetColor())
+		{
+		    message += " you fall upon a hidden chest, containing the ancient artifact " + Artifact::String(art);
+		    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+		    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art + 1);
+		    Surface image(border.w(), border.h());
+		    image.SetColorKey();
+		    image.Blit(border);
+		    image.Blit(artifact, 5, 5);
+		    Dialog::SpriteInfo("Chest", message, image);
+		}
+		PickupArtifact(art);
+		world.GetKingdom(GetColor()).AddFundsResource(resource);
+	    }
+	    else
+	    {
+		// FIXME: select gold or exp
+		if(H2Config::MyColor() == GetColor())
+		{
+		    message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";
+		    Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
+		}
+		// FIXME: AI select gold or exp?
+		world.GetKingdom(GetColor()).AddFundsResource(resource);
+	    }
+	}
 
 	tile.Remove(uniq);
 	tile.SetObject(MP2::OBJ_ZERO);

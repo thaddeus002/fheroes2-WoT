@@ -100,6 +100,24 @@ Resource::resource_t Resource::Rand(void)
     return Resource::WOOD;
 }
 
+Resource::resource_t Resource::FromIndexSprite(u8 index)
+{
+    switch(index)
+    {
+        case 1:     return WOOD;
+        case 3:     return MERCURY;
+	case 5:     return ORE;
+        case 7:     return SULFUR;
+        case 9:     return CRYSTAL;
+        case 11:    return GEMS;
+        case 13:    return GOLD;
+
+	default: break;
+    }
+
+    return UNKNOWN;
+}
+
 // operator funds_t +
 const Resource::funds_t Resource::funds_t::operator+ (const Resource::funds_t & pm) const
 {
@@ -311,10 +329,6 @@ u8 Resource::funds_t::GetValidItems(void) const
 
 	return result;
 }
-
-/* return rnd count resource */
-u16 Resource::RandCount(Resource::resource_t res)
-{ return Resource::GOLD == res ? 100 * Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX) : Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX); }
 
 void Resource::ChangeTileWithRNDResource(Maps::Tiles & tile)
 {
