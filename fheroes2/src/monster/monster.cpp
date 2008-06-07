@@ -512,34 +512,19 @@ bool Monster::AllowUpgrade(monster_t monster)
 void Monster::ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 center)
 {
     Maps::Tiles & tile = *vector[center];
-    Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = tile.FindRNDMonster();
 
     u8 index = 0;
 
     switch(tile.GetObject())
     {
-	case MP2::OBJ_RNDMONSTER:
-	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER);
-	index = Monster::Rand();
-	break;
-	case MP2::OBJ_RNDMONSTER1:
-	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER1);
-	index = Monster::Rand1();
-	break;
-	case MP2::OBJ_RNDMONSTER2:
-	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER2);
-	index = Monster::Rand2();
-	break;
-	case MP2::OBJ_RNDMONSTER3:
-	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER3);
-	index = Monster::Rand3();
-	break;
-	case MP2::OBJ_RNDMONSTER4:
-	addon = tile.FindRNDMonster(MP2::OBJ_RNDMONSTER4);
-	index = Monster::Rand4();
-	break;
-	default:
-	return;
+	case MP2::OBJ_RNDMONSTER:	index = Monster::Rand(); break;
+	case MP2::OBJ_RNDMONSTER1:	index = Monster::Rand1();break;
+	case MP2::OBJ_RNDMONSTER2:	index = Monster::Rand2();break;
+	case MP2::OBJ_RNDMONSTER3:	index = Monster::Rand3();break;
+	case MP2::OBJ_RNDMONSTER4:	index = Monster::Rand4();break;
+
+	default: return;
     }
     
     if(addon)
@@ -547,6 +532,8 @@ void Monster::ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 
 	addon->index = index;
 	tile.SetObject(MP2::OBJ_MONSTER);
     }
+    else
+	Error::Warning("ChangeTileWithRNDMonster: FindRNDMonster return is NULL");
 }
 
 Monster::level_t Monster::GetLevel(monster_t monster)

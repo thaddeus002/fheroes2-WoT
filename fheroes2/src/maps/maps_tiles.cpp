@@ -1138,8 +1138,9 @@ Maps::TilesAddon * Maps::Tiles::FindFlags(void)
     return NULL;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindRNDMonster(const u8 level)
+Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 {
+/*
     u8 index = 0x42;
 
     switch(level)
@@ -1150,7 +1151,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDMonster(const u8 level)
 	case MP2::OBJ_RNDMONSTER4: index = 0x46; break;
 	default: break;
     }
-
+*/
     if(addons_level1.size())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
@@ -1161,7 +1162,11 @@ Maps::TilesAddon * Maps::Tiles::FindRNDMonster(const u8 level)
 	    TilesAddon & addon = *it1;
 
 	    // MONS32
-	    if(0x2F < addon.object && 0x34 > addon.object && index == addon.index) return &addon;
+	    if(0x2F < addon.object && 0x34 > addon.object &&
+	    (0x43 == addon.index ||
+	    0x44 == addon.index ||
+	    0x45 == addon.index ||
+	    0x46 == addon.index)) return &addon;
 	}
     }
 
