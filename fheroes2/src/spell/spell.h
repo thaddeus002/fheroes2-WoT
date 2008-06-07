@@ -23,6 +23,13 @@
 #include <string>
 #include <vector>
 #include "gamedefs.h"
+#include "icn.h"
+#include "m82.h"
+#include "monster.h"
+
+namespace Army {
+    class Troops;
+}
 
 namespace Spell
 {
@@ -93,25 +100,59 @@ namespace Spell
 	SETAGUARDIAN,
 	SETFGUARDIAN,
 	SETWGUARDIAN,
+	STONE,
     } spell_t;
 
+    typedef enum {
+	NOTARGET,
+	ONEFRIEND,
+	ONEENEMY,
+	ALLFRIEND,
+	ALLENEMY,
+	ALLLIVE,
+	ALLDEAD,
+	ALL,
+	//ANYCELL,
+	FREECELL
+    } target_t;
 
     typedef struct {
         const std::string name;
+	u8 mana;
+	u8 level;
+	bool combat;
+	u8 sprite;
+	target_t target;
+	u8 power;
+	ICN::icn_t icn;
+	M82::m82_t m82;
         const std::string description;
     } stats_t;
 
-    const std::string & String(spell_t spell);
-    const std::string & Description(spell_t spell);
+    typedef struct {
+	spell_t spell;
+	u8 duration;
+    } magic_t;
+
+    std::string String(spell_t spell);
+    u8 Mana(spell_t spell);
     u8 Level(spell_t spell);
     bool isCombat(spell_t spell);
+    /* return index sprite spells.icn */
+    u8 GetIndexSprite(spell_t spell);
+    /* return index in spellinl.icn */
+    u8 GetInlIndexSprite(spell_t spell);
+    target_t Target(spell_t spell);
+    u8 Power(spell_t spell);
+    ICN::icn_t Icn(spell_t spell);
+    M82::m82_t M82(spell_t spell);
+    const std::string & Description(spell_t spell);
 
     spell_t RandCombat(const u8 lvl);
     spell_t RandAdventure(const u8 lvl);
     
-    /* return index sprite spells.icn */
-    u8 GetIndexSprite(spell_t spell);
-
+    bool AllowSpell(spell_t spell, const Army::Troops &troop);
+    spell_t TroopAttack(Monster::monster_t monster);
 };
 
 #endif

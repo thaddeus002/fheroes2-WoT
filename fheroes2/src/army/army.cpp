@@ -64,7 +64,7 @@ Army::size_t Army::GetSize(u16 count)
     return FEW;
 }
 
-Army::Troops::Troops(const Army::Troops & troops) : astate(troops.astate), aframe(troops.aframe), aranged(troops.aranged), shots(troops.shots), hp(troops.hp), monster(troops.Monster()), count(troops.Count()), master_skill(NULL), pos(troops.Position()), saved(false)
+Army::Troops::Troops(const Army::Troops & troops) : astate(troops.astate), aframe(troops.aframe), aranged(troops.aranged), shots(troops.shots), hp(troops.hp), oldcount(troops.oldcount), monster(troops.Monster()), count(troops.Count()), master_skill(NULL), pos(troops.Position()), saved(false)
 {
 }
 
@@ -75,6 +75,7 @@ Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
     aranged = troops.aranged;
     shots = troops.shots;
     hp = troops.hp;
+    oldcount = troops.oldcount;
     monster = troops.Monster();
     count = troops.Count();
     pos = troops.Position();

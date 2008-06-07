@@ -35,6 +35,7 @@
 #include "tools.h"
 #include "rand.h"
 #include "portrait.h"
+#include "spell.h"
 
 #define CELLW 44
 #define CELLH 42
@@ -78,6 +79,7 @@ namespace Army {
     battle_t HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     battle_t CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     bool AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, const Point &move, const Point &attack);
+    bool MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell);
     void InitBackground(const Maps::Tiles & tile);
     void DrawBackground(const Maps::Tiles & tile);
     void DrawObject(const Point &pt);
@@ -92,7 +94,7 @@ namespace Army {
     int FindTroop(const Army::army_t &army, const Point &p, bool reflect=false, bool usewide=true);
     bool CellFree(const Point &p, const Army::army_t &army1, const Army::army_t &army2, int skip=99);
     void SettingsDialog();
-    battle_t HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool quickshow, bool cansurrender=false, bool locked=false);
+    battle_t HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender=false, bool locked=false);
     void DrawShadow(const Point &pt);
     void DrawCell(const Point &pt);
     void DrawMark(const Point &point, int animframe=0);
@@ -287,6 +289,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     int i = 0;
     u16 animat = 0;
     Point cur_pt(-1,-1);
+    Spell::spell_t spell = Spell::NONE;
     // dialog menu loop
     while(le.HandleEvents()) {
 	if(le.KeyPress(KEY_RETURN)) {
@@ -342,23 +345,27 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	do_button(buttonAuto, O_AUTO=true, Dialog::Message("Auto Combat", "Allows the computer to fight out the battle for you.", Font::BIG));
 	do_button(buttonSettings, SettingsDialog(), Dialog::Message("System Options", "Allows you to customize the combat screen.", Font::BIG));
 	if(le.MouseClickLeft(rectHero1)) {
-	    battle_t s = HeroStatus(*hero1, *statusBar2, false, hero2, troopN < 0);
+	    battle_t s = HeroStatus(*hero1, *statusBar2, spell, false, hero2, troopN < 0);
 	    if(s == RETREAT) {
 		if(Dialog::Message("", "Are you sure you want to retreat?", Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
 		    return s;
 	    }
 	    if(s == SURRENDER) return s;
+	    if(spell != Spell::NONE && MagicCycle(hero1, hero2, army1, army2, tile, false, spell))
+		hero1->spellCasted = true;
 	}
 	if(le.MouseClickLeft(rectHero2)) {
-	    battle_t s = HeroStatus(*hero2, *statusBar2, false, hero1, troopN >= 0);
+	    battle_t s = HeroStatus(*hero2, *statusBar2, spell, false, hero1, troopN >= 0);
 	    if(s == RETREAT) {
 		if(Dialog::Message("", "Are you sure you want to retreat?", Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
 		    return s;
 	    }
 	    if(s == SURRENDER) return s;
+	    if(spell != Spell::NONE && MagicCycle(hero1, hero2, army1, army2, tile, true, spell))
+		hero2->spellCasted = true;
 	}
-	if(le.MousePressRight(rectHero1)) HeroStatus(*hero1, *statusBar2, true, false, false);
-	if(le.MousePressRight(rectHero2)) HeroStatus(*hero2, *statusBar2, true, false, false);
+	if(le.MousePressRight(rectHero1)) HeroStatus(*hero1, *statusBar2, spell, true, false, false);
+	if(le.MousePressRight(rectHero2)) HeroStatus(*hero2, *statusBar2, spell, true, false, false);
         if(le.MouseCursor(buttonSkip)) {
 	    statusBar2->ShowMessage("Skip this unit");
 	    cursor.SetThemes(cursor.WAR_POINTER);
@@ -600,8 +607,11 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	    break;
 	}
 	// TODO bless and curse
-	damage *= sk_a;
-	damage /= sk_d;
+	//damage *= sk_a;
+	//damage /= sk_d;
+	float d = sk_a-sk_d;
+	d *= d>0 ? 0.1f : 0.05f;
+	damage *= 1+d; 
 	long hp = target.hp + (target.Count()-1)*Monster::GetStats(target.Monster()).hp;	
 	int state = 0, missframe = 0, missindex = 0;
 	Point miss_start(myTroop.Position().x + (myMonster.wide ? (troopN<0 ? -1 : 1): 0), myTroop.Position().y);
@@ -629,6 +639,9 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	else
 	    mytroopstate = Monster::AS_ATT2P;
 	if(!ranged) {
+	    if(myMonster.miss_icn != ICN::UNKNOWN && myTroop.Monster() != Monster::MAGE &&
+	       myTroop.Monster() != Monster::ARCHMAGE && myTroop.Monster() != Monster::TITAN)
+		damage /= 2;
 	    AGG::PlaySound(myMonster.m82_attk);
 	    u8 st, len, len2, len3;
 	    Monster::GetAnimFrames(target.Monster(), targetstate, st, len);
@@ -750,6 +763,11 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	if(ranged) myTroop.shots --;
     }
     return counterstrike;
+}
+
+bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell)
+{
+    return false;
 }
 
 void Army::InitBackground(const Maps::Tiles & tile)
@@ -1159,6 +1177,7 @@ void Army::InitArmyPosition(Army::army_t & army, bool compact, bool reflect)
 	    army[i].astate = Monster::AS_NONE;
 	    army[i].shots = stats.shots;
 	    army[i].hp = stats.hp;
+	    army[i].oldcount = army[i].Count();
 	}
 	y += compact ? 1 : 2;
     }
@@ -1258,8 +1277,9 @@ void Army::SettingsDialog()
     }
 }
 
-Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool quickshow, bool cansurrender, bool locked)
+Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender, bool locked)
 {
+    spell = Spell::NONE;
     const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
     const ICN::icn_t butt = ICN::VIEWGEN;
     const Surface & dialog = AGG::GetICN(sett, 0);
@@ -1325,7 +1345,7 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool
     Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);
     Button buttonSur(pos_rt.x + 148, pos_rt.y + 148, butt, 13, 14);
     Button buttonOK(pos_rt.x + 207, pos_rt.y + 148, butt, 15, 16);
-    buttonMag.SetDisable(hero.spellCasted || locked || quickshow);
+    buttonMag.SetDisable(!hero.SpellBook().Active() || hero.spellCasted || locked || quickshow);
     buttonRet.SetDisable(locked || quickshow);
     buttonSur.SetDisable(!cansurrender || locked || quickshow);
     buttonMag.Draw();
@@ -1345,7 +1365,7 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, bool
 	    if(le.KeyPress(KEY_ESCAPE)) {
 		return WIN;
 	    }
-	    do_button(buttonMag, {}, Dialog::Message("Cast Spell", "Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn.", Font::BIG));
+	    do_button(buttonMag, {if(spell=hero.SpellBook().Open(Spell::Book::CMBT, true),spell!=Spell::NONE) return WIN;}, Dialog::Message("Cast Spell", "Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn.", Font::BIG));
 	    do_button(buttonRet, return RETREAT, Dialog::Message("Retreat", "Retreat your hero, abandoning your creatures. Your hero will be available for you to recrut again, however, the hero will have only a novice hero's forces.", Font::BIG));
 	    do_button(buttonSur, return SURRENDER, Dialog::Message("Surrender", "Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again.", Font::BIG));
 	    do_button(buttonOK, return WIN, Dialog::Message("Cancel", "Return to the battle.", Font::BIG));
@@ -1586,8 +1606,10 @@ int Army::CanAttack(const Army::Troops &myTroop, const std::vector<Point> &moves
 
 bool Army::GoodMorale(Heroes *hero, const Army::Troops &troop)
 {
+    if(Monster::GetRace(troop.Monster()) == Race::NECR) return false;
+    if(Monster::GetRace(troop.Monster()) == Race::BOMG && troop.Monster() >= Monster::EARTH_ELEMENT) return false;
     int m = Rand::Get(1, MORALEBOUND);
-    if(hero && (Monster::GetRace(troop.Monster()) != Race::NECR) && (hero->GetMorale() >= m)) {
+    if(hero && (hero->GetMorale() >= m)) {
 	AGG::PlaySound(M82::GOODMRLE);
 	for(u16 i=0; i<AGG::GetICNCount(ICN::MORALEG); i++) {
 	    const Sprite &sp = AGG::GetICN(ICN::MORALEG, i);
@@ -1611,8 +1633,10 @@ bool Army::GoodMorale(Heroes *hero, const Army::Troops &troop)
 
 bool Army::BadMorale(Heroes *hero, const Army::Troops &troop)
 {
+    if(Monster::GetRace(troop.Monster()) == Race::NECR) return false;
+    if(Monster::GetRace(troop.Monster()) == Race::BOMG && troop.Monster() >= Monster::EARTH_ELEMENT) return false;
     int m = -Rand::Get(1, MORALEBOUND);
-    if(hero && (Monster::GetRace(troop.Monster()) != Race::NECR) && (hero->GetMorale() <= m)) {
+    if(hero && (hero->GetMorale() <= m)) {
 	AGG::PlaySound(M82::BADMRLE);
 	for(u16 i=0; i<AGG::GetICNCount(ICN::MORALEB); i++) {
 	    const Sprite &sp = AGG::GetICN(ICN::MORALEB, i);
@@ -1689,8 +1713,8 @@ void Army::Temp(int dicn, int dindex, Point pt)
 	index = 0;
     }
     index += dindex;
-    if(icn < 0) icn = 0;
-    if(icn >= ICN::UNKNOWN) icn = ICN::UNKNOWN-1;
+    if(icn < 0) icn = ICN::UNKNOWN-1;
+    if(icn >= ICN::UNKNOWN) icn = 0;
     if(index < 0) index = 0;
     std::string str = ICN::GetString((ICN::icn_t)icn);
     str += " ";

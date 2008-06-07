@@ -24,10 +24,13 @@
 #include "cursor.h"
 #include "sprite.h"
 #include "spell_book.h"
+#include "dialog.h"
+#include "tools.h"
+#include "heroes.h"
 
 #define SPELL_PER_PAGE	6
 
-Spell::Book::Book() : list_count(0)
+Spell::Book::Book(const Heroes &h) : hero(&h), active(false), list_count(0)
 {
 }
 
@@ -120,8 +123,10 @@ void Spell::Book::Append(const Spell::spell_t sp, const Skill::Level::type_t & w
     }
 }
 
-Spell::spell_t Spell::Book::Open(void)
+Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 {
+    if(!active) return Spell::NONE;
+
     Display & display = Display::Get();
 
     Cursor & cursor = Cursor::Get();
@@ -131,7 +136,10 @@ Spell::spell_t Spell::Book::Open(void)
 
     std::vector<Spell::spell_t> spells;
 
-    Filter(spells, true);
+    if(filt == CMBT)
+	Filter(spells, false);
+    else
+	Filter(spells, true);
 
     size_t current_index = 0;
 
@@ -153,6 +161,8 @@ Spell::spell_t Spell::Book::Open(void)
     const Rect advn_rt(pos.x + 270, pos.y + 270, bookmark_advn.w(), bookmark_advn.h());
     const Rect cmbt_rt(pos.x + 304, pos.y + 278, bookmark_cmbt.w(), bookmark_cmbt.h());
     const Rect clos_rt(pos.x + 420, pos.y + 284, bookmark_clos.w(), bookmark_clos.h());
+
+    Spell::spell_t curspell = Spell::NONE;
 
     RedrawLists(spells, current_index, pos);
 
@@ -184,11 +194,21 @@ Spell::spell_t Spell::Book::Open(void)
 	    display.Flip();
 	}
 
-	if(le.MouseClickLeft(info_rt))
-	{
+	if(le.MouseClickLeft(info_rt)) {
+	    std::string str = "Your hero has ";
+	    String::AddInt(str, hero->GetSpellPoints());
+	    str += " spell points remaining";
+	    Dialog::Message("", str, Font::BIG, Dialog::OK);
 	}
 
-	if(le.MouseClickLeft(advn_rt))
+	if(le.MousePressRight(info_rt)) {
+	    std::string str = "Your hero has ";
+	    String::AddInt(str, hero->GetSpellPoints());
+	    str += " spell points remaining";
+	    Dialog::Message("", str, Font::BIG);
+	}
+
+	if(le.MouseClickLeft(advn_rt) && filt != CMBT)
 	{
 	    Filter(spells, true);
 
@@ -198,7 +218,7 @@ Spell::spell_t Spell::Book::Open(void)
 	    display.Flip();
 	}
 
-	if(le.MouseClickLeft(cmbt_rt))
+	if(le.MouseClickLeft(cmbt_rt) && filt != ADVN)
 	{
 	    Filter(spells, false);
 
@@ -209,6 +229,30 @@ Spell::spell_t Spell::Book::Open(void)
 	}
 
 	if(le.MouseClickLeft(clos_rt) || le.KeyPress(KEY_ESCAPE)) break;
+
+	if(le.MouseClickLeft(pos))
+	{
+	    Spell::spell_t spell = GetSelected(spells, current_index, pos);
+	    if(canselect) {
+		curspell = spell;
+		if(curspell != Spell::NONE) break;
+	    } else if(spell != Spell::NONE) {
+		cursor.Hide();
+		Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, true);
+		cursor.Show();
+		display.Flip();
+	    }
+	}
+
+	if(le.MousePressRight(pos)) {
+	    Spell::spell_t spell = GetSelected(spells, current_index, pos);
+	    if(spell != Spell::NONE) {
+		cursor.Hide();
+		Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+		cursor.Show();
+		display.Flip();
+	    }
+	}
     }
 
     cursor.Hide();
@@ -217,10 +261,10 @@ Spell::spell_t Spell::Book::Open(void)
     cursor.Show();
     display.Flip();
 
-    return Spell::NONE;
+    return curspell;
 }
 
-void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt)
+void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt) const
 {
     Display & display = Display::Get();
 
@@ -242,6 +286,20 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
     display.Blit(bookmark_advn, advn_rt);
     display.Blit(bookmark_cmbt, cmbt_rt);
     display.Blit(bookmark_clos, clos_rt);
+
+    Point tp = info_rt;
+    tp += Point(9, 6);
+    int mp = hero->GetSpellPoints();
+    std::string mps;
+    for(int i=100; i>=1; i/=10) {
+	mps = " ";
+	if(mp >= i) {
+	    mps = "";
+	    String::AddInt(mps, (mp%(i*10))/i);
+	}
+	Text(mps, Font::SMALL, tp);
+	tp.y += Text::height(mps, Font::SMALL);
+    }
 
     u16 ox = 0;
     u16 oy = 0;
@@ -281,7 +339,37 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
     }
 }
 
-void Spell::Book::Filter(std::vector<Spell::spell_t> & spells, bool adv_mode)
+Spell::spell_t Spell::Book::GetSelected(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt)
+{
+    u16 ox = 0;
+    u16 oy = 0;
+
+    for(u8 ii = 0; ii < 2 * SPELL_PER_PAGE; ++ii)
+    {
+	if(spells.size() > cur + ii)
+	{
+	    if(!(ii % 3))
+	    {
+		oy = 50;
+		ox += 80;
+	    }
+
+	    if(SPELL_PER_PAGE == ii) ox += 70;
+
+	    const Spell::spell_t & spell = spells.at(ii + cur);
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+	    Rect rt(pt.x + ox - icon.w() / 2, pt.y + oy - icon.h() / 2, icon.w(), icon.h());
+
+	    LocalEvent & le = LocalEvent::GetLocalEvent();
+	    if(rt & le.MouseCursor()) return spell;
+
+    	    oy += 80;
+	}
+    }
+    return Spell::NONE;
+}
+
+void Spell::Book::Filter(std::vector<Spell::spell_t> & spells, bool adv_mode) const
 {
     if(spells.size()) spells.clear();
     

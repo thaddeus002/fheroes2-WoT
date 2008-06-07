@@ -118,6 +118,7 @@ public:
     const Point & GetCenter(void) const{ return mp; };
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
     u8 GetCountArmy(void) const;
+    const Spell::Book & SpellBook(void) const { return spell_book; };
 
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;

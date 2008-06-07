@@ -35,7 +35,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), spellCasted(false), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), heroes(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
+    move_point(0), army(HEROESMAXARMY), spell_book(*this), heroes(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     // hero is freeman
@@ -71,6 +71,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::NAVIGATION, Skill::Level::ADVANCED));
 	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
 
+	    spell_book.Activate();
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
 	    
@@ -83,6 +84,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::SCOUTING, Skill::Level::ADVANCED));
 	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
 
+	    spell_book.Activate();
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
 	    
@@ -94,6 +96,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 
 	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::ADVANCED));
 
+	    spell_book.Activate();
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
 	    
@@ -106,6 +109,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::NECROMANCY, Skill::Level::BASIC));
 	    secondary_skills.push_back(Skill::Secondary(Skill::WISDOM, Skill::Level::BASIC));
 
+	    spell_book.Activate();
 	    artifacts.push_back(Artifact::MAGIC_BOOK);
 	    break;
 	    
@@ -922,7 +926,7 @@ void Heroes::ActionNewDay(void)
     path.Rescan();
 
     // recovery spell points
-    if(HasArtifact(Artifact::MAGIC_BOOK))
+    if(spell_book.Active())
     {
 	// everyday
 	if(magic_point != GetMaxSpellPoints()) ++magic_point;
@@ -1094,7 +1098,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 /* buy book */
 bool Heroes::BuySpellBook(void)
 {
-    if(HasArtifact(Artifact::MAGIC_BOOK) || Color::GRAY == color) return false;
+    if(spell_book.Active() || Color::GRAY == color) return false;
 
     PaymentConditions::BuySpellBook payment;
     Kingdom & kingdom = world.GetKingdom(color);
@@ -1103,6 +1107,7 @@ bool Heroes::BuySpellBook(void)
 
     kingdom.OddFundsResource(payment);
 
+    spell_book.Activate();
     artifacts.push_back(Artifact::MAGIC_BOOK);
     
     return true;

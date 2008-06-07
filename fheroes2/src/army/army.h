@@ -84,6 +84,7 @@ namespace Army
 	bool                    aranged;
 	u8                      shots;
 	u16                     hp;
+	u16                     oldcount;
 
     private:
         Monster::monster_t	monster;
