@@ -79,7 +79,8 @@ namespace Army {
     battle_t HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     battle_t CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     bool AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, const Point &move, const Point &attack);
-    bool MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell);
+    bool MagicSelectTarget(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell);
+    void MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, Spell::spell_t spell, const Maps::Tiles &tile);
     void InitBackground(const Maps::Tiles & tile);
     void DrawBackground(const Maps::Tiles & tile);
     void DrawObject(const Point &pt);
@@ -351,7 +352,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 		    return s;
 	    }
 	    if(s == SURRENDER) return s;
-	    if(spell != Spell::NONE && MagicCycle(hero1, hero2, army1, army2, tile, false, spell))
+	    if(spell != Spell::NONE && MagicSelectTarget(hero1, hero2, army1, army2, tile, false, spell))
 		hero1->spellCasted = true;
 	}
 	if(le.MouseClickLeft(rectHero2)) {
@@ -361,7 +362,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 		    return s;
 	    }
 	    if(s == SURRENDER) return s;
-	    if(spell != Spell::NONE && MagicCycle(hero1, hero2, army1, army2, tile, true, spell))
+	    if(spell != Spell::NONE && MagicSelectTarget(hero1, hero2, army1, army2, tile, true, spell))
 		hero2->spellCasted = true;
 	}
 	if(le.MousePressRight(rectHero1)) HeroStatus(*hero1, *statusBar2, spell, true, false, false);
@@ -611,7 +612,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	//damage /= sk_d;
 	float d = sk_a-sk_d;
 	d *= d>0 ? 0.1f : 0.05f;
-	damage *= 1+d; 
+	damage = (long)(((float)damage) * 1+d); 
 	long hp = target.hp + (target.Count()-1)*Monster::GetStats(target.Monster()).hp;	
 	int state = 0, missframe = 0, missindex = 0;
 	Point miss_start(myTroop.Position().x + (myMonster.wide ? (troopN<0 ? -1 : 1): 0), myTroop.Position().y);
@@ -761,13 +762,72 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	}
 	AttackStatus(status);
 	if(ranged) myTroop.shots --;
+	if(!ranged) {
+	    Army::army_t ta1, ta2;
+	    (troopN >= 0 ? ta1 : ta2).push_back(target);
+	    MagicCycle(hero1, hero2, ta1, ta2, Spell::TroopAttack(myTroop.Monster()), tile);
+	}
     }
     return counterstrike;
 }
 
-bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell)
+bool Army::MagicSelectTarget(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell)
 {
+    Army::army_t ta1, ta2;
+    Army::army_t &myarmy = reflect ? army2 : army1;
+    Army::army_t &enarmy = reflect ? army1 : army2;
+    int mode = 0;
+    switch(Spell::Target(spell)) {
+    case Spell::ONEFRIEND:
+	mode = 1;
+	break;
+    case Spell::ONEENEMY:
+	mode = -1;
+	break;
+    case Spell::FREECELL:
+	mode = 0;
+	break;
+    case Spell::ALLFRIEND:
+	for(u16 i=0; i<myarmy.size(); i++) {
+	    if(Spell::AllowSpell(spell, myarmy[i]))
+		(reflect?ta2:ta1).push_back(myarmy[i]);
+	}
+	MagicCycle(hero1, hero2, ta1, ta2, spell, tile);
+	return true;
+    case Spell::ALLENEMY:
+	for(u16 i=0; i<enarmy.size(); i++) {
+	    if(Spell::AllowSpell(spell, enarmy[i]))
+		(reflect?ta1:ta2).push_back(enarmy[i]);
+	}
+	MagicCycle(hero1, hero2, ta1, ta2, spell, tile);
+    case Spell::ALLLIVE:
+    case Spell::ALLDEAD:
+    case Spell::ALL:
+	for(u16 i=0; i<army1.size(); i++) {
+	    if(Spell::AllowSpell(spell, army1[i]))
+		ta1.push_back(army1[i]);
+	}
+	for(u16 i=0; i<army2.size(); i++) {
+	    if(Spell::AllowSpell(spell, army2[i]))
+		ta1.push_back(army2[i]);
+	}
+	MagicCycle(hero1, hero2, ta1, ta2, spell, tile);
+	return true;
+    case Spell::NOTARGET:
+	return false;
+    }
+    // select target
+    // TODO
     return false;
+}
+
+void Army::MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, Spell::spell_t spell, const Maps::Tiles &tile)
+{
+    if(!army1.size() && army2.size()) {
+	Dialog::Message("", "That spell will affect no one!", Font::BIG, Dialog::OK);
+	return;
+    }
+    // TODO
 }
 
 void Army::InitBackground(const Maps::Tiles & tile)

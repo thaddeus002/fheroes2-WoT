@@ -33,11 +33,11 @@ namespace Spell
 	{ "Unknown",                 0, 0, false,  0,  NOTARGET,  0, ICN::UNKNOWN,  M82::UNKNOWN, "Unknown spell." },
 	{ "Fireball",                9, 3,  true,  8,  ONEENEMY, 10, ICN::FIREBALL, M82::FIREBALL, "Causes a giant fireball to strike the selected area, damaging all nearby creatures." },
 	{ "Fireblast",              15, 4,  true,  9,  ONEENEMY, 10, ICN::FIREBAL2, M82::FIREBALL, "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one." }, 
-	{ "Lightning Bolt",          7, 2,  true,  4,  ONEENEMY, 25, ICN::ELECTRIC, m82none, "Causes a bolt of electrical energy to strike the selected creature." }, 
-	{ "Chain Lightning",        15, 4,  true,  5,  ONEENEMY, 40, ICN::ELECTRIC, M82::CHAINLTE, "Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!" }, 
+	{ "Lightning Bolt",          7, 2,  true,  4,  ONEENEMY, 25, ICN::SPARKS,   m82none, "Causes a bolt of electrical energy to strike the selected creature." }, 
+	{ "Chain Lightning",        15, 4,  true,  5,  ONEENEMY, 40, ICN::SPARKS,   M82::CHAINLTE, "Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!" }, 
 	{ "Teleport",                9, 3,  true, 10, ONEFRIEND,  0, icnnone      , M82::TELEIN, "Teleports the creature you select to any open position on the battlefield." }, 
-	{ "Cure",                    6, 1,  true,  6, ONEFRIEND,  5, icnnone      , M82::CURE, "Removes all negative spells cast upon one of your units, and restores up to 5 HP per level of spell power." }, 
-	{ "Mass Cure",              15, 4,  true,  2, ALLFRIEND,  5, icnnone      , M82::MASSCURE, "Removes all negative spells cast upon your forces, and restores up to 5 HP per level of spell power, per creature." }, 
+	{ "Cure",                    6, 1,  true,  6, ONEFRIEND,  5, ICN::MAGIC01 , M82::CURE, "Removes all negative spells cast upon one of your units, and restores up to 5 HP per level of spell power." }, 
+	{ "Mass Cure",              15, 4,  true,  2, ALLFRIEND,  5, ICN::MAGIC01 , M82::MASSCURE, "Removes all negative spells cast upon your forces, and restores up to 5 HP per level of spell power, per creature." }, 
 	{ "Resurrect",              12, 4,  true, 12, ONEFRIEND, 50, icnnone      , M82::RESURECT, "Resurrects creatures from a damaged or dead unit until end of combat." }, 
 	{ "Resurrect True",         15, 5,  true, 13, ONEFRIEND, 50, icnnone      , M82::RESURTRU, "Resurrects creatures from a damaged or dead unit permanently." }, 
 	{ "Haste",                   3, 1,  true, 14, ONEFRIEND,  1, ICN::HASTE   , M82::HASTE, "Increases the speed of any creature by two." }, 
@@ -63,7 +63,7 @@ namespace Spell
 	{ "Meteor Shower",          15, 4,  true, 24,       ALL, 25, ICN::METEOR,   M82::METEOR, "A rain of rocks strikes an area of the battlefield, damaging all nearby creatures." },
 	{ "Paralyze",                9, 3,  true, 20,  ONEENEMY,  1, ICN::PARALYZE, M82::PARALIZE, "The targeted creatures are paralyzed, unable to move or retaliate." },
 	{ "Hypnotize",              15, 5,  true, 37,  ONEENEMY,  0, ICN::HYPNOTIZ, M82::HYPNOTIZ, "Brings a single enemy unit under your control for one combat round if its hits are less than 25 times the caster's spell power." },
-	{ "Cold Ray",                6, 2,  true, 35,  ONEENEMY, 20, ICN::COLDRAY,  M82::COLDRAY, "Drains body heat from a single enemy unit." },
+	{ "Cold Ray",                6, 2,  true, 35,  ONEENEMY, 20, ICN::ICECLOUD/*COLDRAY*/, M82::COLDRAY, "Drains body heat from a single enemy unit." },
 	{ "Cold Ring",               9, 3,  true, 36,  FREECELL, 10, ICN::COLDRING, M82::COLDRING, "Drains body heat from all units surrounding the center point, but not including the center point." },
 	{ "Disrupting Ray",          7, 2,  true, 34,  ONEENEMY,  0, ICN::DISRRAY,  M82::DISRUPTR, "Reduces the defense rating of an enemy unit by three." },
 	{ "Death Ripple",            6, 2,  true, 28,   ALLLIVE,  5, ICN::REDDEATH, M82::MNRDEATH, "Damages all living (non-undead) units in the battle." },
@@ -290,6 +290,10 @@ u8 Spell::GetIndexSprite(spell_t spell)
 
 bool Spell::AllowSpell(spell_t spell, const Army::Troops &troop)
 {
+    if(troop.Monster() == Monster::DWARF || troop.Monster() == Monster::BATTLE_DWARF) {
+	target_t target = Target(spell);
+	if(!Rand::Get(0,3) && target != ONEFRIEND && target != ALLFRIEND) return false;
+    }
     switch(troop.Monster()) {
     case Monster::GREEN_DRAGON:
     case Monster::RED_DRAGON:
