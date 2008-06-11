@@ -265,6 +265,9 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
 
 	    experience = 777;
+
+	    for(Spell::spell_t spell=(Spell::spell_t)(Spell::NONE+1); spell < Spell::STONE; spell = (Spell::spell_t)(spell+1)) 
+		spell_book.Append(spell, Skill::Level::EXPERT);
 	    break;
 
 	default: break;

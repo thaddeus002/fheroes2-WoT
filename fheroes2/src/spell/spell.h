@@ -52,7 +52,7 @@ namespace Spell
 	BLESS,
 	MASSBLESS,
 	STONESKIN,
-	STEELSKIN,
+	STELLSKIN,
 	CURSE,
 	MASSCURSE,
 	HOLYWORD,
@@ -134,7 +134,7 @@ namespace Spell
 	u8 duration;
     } magic_t;
 
-    std::string String(spell_t spell);
+    const std::string &String(spell_t spell);
     u8 Mana(spell_t spell);
     u8 Level(spell_t spell);
     bool isCombat(spell_t spell);
@@ -152,6 +152,7 @@ namespace Spell
     spell_t RandAdventure(const u8 lvl);
     
     bool AllowSpell(spell_t spell, const Army::Troops &troop);
+    void ApplySpell(int spower, spell_t spell, Army::Troops &troop);
     spell_t TroopAttack(Monster::monster_t monster);
 };
 

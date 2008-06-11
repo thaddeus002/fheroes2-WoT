@@ -234,8 +234,19 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 	{
 	    Spell::spell_t spell = GetSelected(spells, current_index, pos);
 	    if(canselect) {
-		curspell = spell;
-		if(curspell != Spell::NONE) break;
+		if(curspell != Spell::NONE) {
+		    if(hero->GetSpellPoints() >= Spell::Mana(spell)) {
+			curspell = spell;
+			break;
+		    } else {
+			std::string str = "That spell costs ";
+			String::AddInt(str, Spell::Mana(spell));
+			str += " mana. You only have ";
+			String::AddInt(str, hero->GetSpellPoints());
+			str += " mana, so you can't cast the spell.";
+			Dialog::Message("", str, Font::BIG, Dialog::OK);
+		    }
+		}
 	    } else if(spell != Spell::NONE) {
 		cursor.Hide();
 		Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, true);
@@ -321,7 +332,9 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
 
     	    display.Blit(icon, pt.x + ox - icon.w() / 2, pt.y + oy - icon.h() / 2);
 
-    	    const std::string & str = Spell::String(spell);
+    	    std::string str = Spell::String(spell) + " [";
+	    String::AddInt(str, Spell::Mana(spell));
+	    str += "]";
             size_t pos;
             if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
             {

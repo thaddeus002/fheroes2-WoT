@@ -64,7 +64,7 @@ Army::size_t Army::GetSize(u16 count)
     return FEW;
 }
 
-Army::Troops::Troops(const Army::Troops & troops) : astate(troops.astate), aframe(troops.aframe), aranged(troops.aranged), shots(troops.shots), hp(troops.hp), oldcount(troops.oldcount), monster(troops.Monster()), count(troops.Count()), master_skill(NULL), pos(troops.Position()), saved(false)
+Army::Troops::Troops(const Army::Troops & troops) : astate(troops.astate), aframe(troops.aframe), aranged(troops.aranged), shots(troops.shots), hp(troops.hp), oldcount(troops.oldcount), summoned(troops.summoned), monster(troops.Monster()), count(troops.Count()), master_skill(NULL), pos(troops.Position()), saved(false)
 {
 }
 
@@ -76,6 +76,7 @@ Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
     shots = troops.shots;
     hp = troops.hp;
     oldcount = troops.oldcount;
+    summoned = troops.summoned;
     monster = troops.Monster();
     count = troops.Count();
     pos = troops.Position();
@@ -142,6 +143,46 @@ void Army::Troops::Animate(Monster::animstate_t as)
 		Monster::GetAnimFrames(monster, astate, start, count, ranged);
 		aframe = start;
 	    }
+	}
+    }
+}
+
+void Army::Troops::SetMagic(Spell::magic_t &magic)
+{
+    //Dialog::Message("set magic", Spell::String(magic.spell), Font::BIG, Dialog::OK);
+    magics.push_back(magic);
+}
+
+bool Army::Troops::FindMagic(Spell::spell_t spell) const
+{
+    for(u16 i=0; i<magics.size(); i++) {
+	if(spell == magics[i].spell) return true;
+    }
+    return false;
+}
+
+void Army::Troops::RemoveMagic(Spell::spell_t spell)
+{
+    for(u16 i=0; i<magics.size(); i++) {
+	if(spell == magics[i].spell) {
+	    magics.erase(magics.begin()+i);
+	    i--;
+	}
+    }
+}
+
+void Army::Troops::ClearMagic()
+{
+    magics.clear();
+}
+
+void Army::Troops::ProceedMagic()
+{
+    for(u16 i=0; i<magics.size(); i++) {
+	magics[i].duration --;
+	if(magics[i].duration <= 0) {
+	    magics.erase(magics.begin()+i);
+	    i--;
 	}
     }
 }

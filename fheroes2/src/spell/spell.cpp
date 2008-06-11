@@ -44,9 +44,9 @@ namespace Spell
 	{ "Mass Haste",             10, 3,  true, 14, ALLFRIEND,  1, ICN::HASTE   , M82::MASSHAST, "Increases the speed of all of your creatures by two." }, 
 	{ "Slow",                    3, 1,  true,  1,  ONEENEMY,  1, icnnone      , M82::SLOW, "Slows target to half movement rate." }, 
 	{ "Mass Slow",              15, 4,  true,  1,  ALLENEMY,  1, icnnone      , M82::MASSSLOW, "Slows all enemies to half movement rate." }, 
-	{ "Blind ",                  6, 2,  true, 21,  ONEENEMY,  1, icnnone      , M82::BLIND, "Clouds the affected creatures' eyes, preventing them from moving." }, 
-	{ "Bless",                   3, 1,  true,  7, ONEFRIEND,  1, icnnone      , M82::BLESS, "Causes the selected creatures to inflict maximum damage." }, 
-	{ "Mass Bless",             12, 3,  true,  7, ALLFRIEND,  1, icnnone      , M82::MASSBLES, "Causes all of your units to inflict maximum damage." },
+	{ "Blind ",                  6, 2,  true, 21,  ONEENEMY,  1, ICN::BLIND   , M82::BLIND, "Clouds the affected creatures' eyes, preventing them from moving." }, 
+	{ "Bless",                   3, 1,  true,  7, ONEFRIEND,  1, ICN::BLESS   , M82::BLESS, "Causes the selected creatures to inflict maximum damage." }, 
+	{ "Mass Bless",             12, 3,  true,  7, ALLFRIEND,  1, ICN::BLESS   , M82::MASSBLES, "Causes all of your units to inflict maximum damage." },
 	{ "Stoneskin",               3, 1,  true, 31, ONEFRIEND,  1, ICN::STONSKIN, M82::STONSKIN, "Magically increases the defense skill of the selected creatures." },
 	{ "Steelskin",               6, 2,  true, 30, ONEFRIEND,  1, ICN::STELSKIN, M82::STELSKIN, "Increases the defense skill of the targeted creatures.  This is an improved version of Stoneskin." },
 	{ "Curse",                   3, 1,  true,  3,  ONEENEMY,  1, ICN::CURSE   , M82::CURSE, "Causes the selected creatures to inflict minimum damage." },
@@ -54,9 +54,9 @@ namespace Spell
 	{ "Holy Word",               9, 3,  true, 22,   ALLDEAD, 10, icnnone      , m82none, "Damages all undead in the battle." },
 	{ "Holy Shout",             12, 4,  true, 23,   ALLDEAD, 20, icnnone      , m82none, "Damages all undead in the battle.  This is an improved version of Holy Word." },
 	{ "Anti-Magic",              7, 3,  true, 17, ONEFRIEND,  1, icnnone      , M82::ANTIMAGK, "Prevents harmful magic against the selected creatures." },
-	{ "Dispel Magic",            5, 1,  true, 18, ONEFRIEND,  0, icnnone      , M82::DIPMAGK, "Removes all magic spells from a single target." },
-	{ "Mass Dispel",            12, 3,  true, 18,       ALL,  0, icnnone      , M82::DIPMAGK, "Removes all magic spells from all creatures." },
-	{ "Magic Arrow",             3, 1,  true, 28,  ONEENEMY, 10, icnnone      , M82::MAGCAROW, "Causes a magic arrow to strike the selected target." },
+	{ "Dispel Magic",            5, 1,  true, 18, ONEFRIEND,  0, ICN::MAGIC07 , M82::DIPMAGK, "Removes all magic spells from a single target." },
+	{ "Mass Dispel",            12, 3,  true, 18,       ALL,  0, ICN::MAGIC07 , M82::DIPMAGK, "Removes all magic spells from all creatures." },
+	{ "Magic Arrow",             3, 1,  true, 38,  ONEENEMY, 10, icnnone      , M82::MAGCAROW, "Causes a magic arrow to strike the selected target." },
 	{ "Berzerker",              12, 4,  true, 19,  ONEENEMY,  0, icnnone      , M82::BERZERK, "Causes a creature to attack its nearest neighbor." },
 	{ "Armageddon",             20, 5,  true, 16,       ALL, 50, icnnone      , M82::ARMGEDN, "Holy terror strikes the battlefield, causing severe damage to all creatures." },
 	{ "Elemental Storm",        15, 4,  true, 11,       ALL, 25, ICN::STORM,    M82::STORM, "Magical elements pour down on the battlefield, damaging all creatures." },
@@ -73,7 +73,7 @@ namespace Spell
 	{ "Animate Dead",           10, 3,  true, 25, ONEFRIEND, 50, icnnone      , m82none, "Resurrects creatures from a damaged or dead undead unit permanently." },
 	{ "Mirror Image",           25, 5,  true, 26, ONEFRIEND,  0, icnnone      , M82::MIRRORIM, "Creates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage." },
 	{ "Shield",                  3, 1,  true, 15, ONEFRIEND,  1, ICN::SHIELD,   M82::SHIELD, "Halves damage received from ranged attacks for a single unit." },
-	{ "Mass Shield",             7, 4,  true, 15, ALLFRIEND,  1, icnnone      , M82::MASSSHIE, "Halves damage received from ranged attacks for all of your units." },
+	{ "Mass Shield",             7, 4,  true, 15, ALLFRIEND,  1, ICN::SHIELD  , M82::MASSSHIE, "Halves damage received from ranged attacks for all of your units." },
 	{ "Summon Earth Elemental", 25, 5,  true, 56,  FREECELL,  3, icnnone      , M82::SUMNELM, "Summons Earth Elementals to fight for your army." },
 	{ "Summon Air Elemental",   25, 5,  true, 57,  FREECELL,  3, icnnone      , M82::SUMNELM, "Summons Air Elementals to fight for your army." },
 	{ "Summon Fire Elemental",  25, 5,  true, 58,  FREECELL,  3, icnnone      , M82::SUMNELM, "Summons Fire Elementals to fight for your army." },
@@ -101,12 +101,12 @@ namespace Spell
 
 }
 
-std::string Spell::String(spell_t spell)
+const std::string &Spell::String(spell_t spell)
 { 
-    std::string str = Spell::all_spells[spell].name + " ["; 
-    String::AddInt(str, Mana(spell));
-    str += "]";
-    return str;
+//     std::string str = Spell::all_spells[spell].name + " ["; 
+//     String::AddInt(str, Mana(spell));
+//     str += "]";
+    return Spell::all_spells[spell].name;
 }
 
 const std::string & Spell::Description(spell_t spell)
@@ -169,7 +169,7 @@ Spell::spell_t Spell::RandCombat(const u8 lvl)
 	case 4: return DISRUPTINGRAY;
 	case 5: return DRAGONSLAYER;
 	case 6: return LIGHTNINGBOLT;
-	case 7: return STEELSKIN;
+	case 7: return STELLSKIN;
 	default: break;
     }
     else
@@ -290,10 +290,13 @@ u8 Spell::GetIndexSprite(spell_t spell)
 
 bool Spell::AllowSpell(spell_t spell, const Army::Troops &troop)
 {
+    target_t target = Target(spell);
     if(troop.Monster() == Monster::DWARF || troop.Monster() == Monster::BATTLE_DWARF) {
-	target_t target = Target(spell);
 	if(!Rand::Get(0,3) && target != ONEFRIEND && target != ALLFRIEND) return false;
     }
+    if(troop.FindMagic(ANTIMAGIC) && target != ONEFRIEND && target != ALLFRIEND)
+	return false;
+    if(spell == ANTIMAGIC && troop.summoned) return false;
     switch(troop.Monster()) {
     case Monster::GREEN_DRAGON:
     case Monster::RED_DRAGON:
@@ -327,6 +330,9 @@ bool Spell::AllowSpell(spell_t spell, const Army::Troops &troop)
 	    return Monster::GetStats(troop.Monster()).hp > troop.hp ||
 		troop.oldcount > troop.Count();
 
+	case DISPEL:
+	case MASSDISPEL:
+	    return troop.Magics().size();
 /*	FIREBALL,
 	FIREBLAST,
 	LIGHTNINGBOLT,
@@ -337,10 +343,8 @@ bool Spell::AllowSpell(spell_t spell, const Army::Troops &troop)
 	SLOW,
 	MASSSLOW,
 	STONESKIN,
-	STEELSKIN,
+	STELLSKIN,
 	ANTIMAGIC,
-	DISPEL,
-	MASSDISPEL,
 	ARROW,
 	ARMAGEDDON,
 	ELEMENTALSTORM,
@@ -362,6 +366,134 @@ bool Spell::AllowSpell(spell_t spell, const Army::Troops &troop)
 	    return true;
 	}
 	return true;
+    }
+}
+
+void Spell::ApplySpell(int spower, spell_t spell, Army::Troops &troop)
+{
+    //Dialog::Message("apply spell", Spell::String(spell), Font::BIG, Dialog::OK);
+    magic_t magic;
+    magic.spell = spell;
+    magic.duration = spower;
+    if(!Power(spell)) {
+	switch(spell) {
+	case MASSDISPEL:
+	case DISPEL:
+	    troop.ClearMagic();
+	return;
+// 	TELEPORT,
+// 	MIRRORIMAGE,
+// 	BERZERKER,
+// 	HYPNOTIZE,
+// 	DISRUPTINGRAY,
+// 	EARTHQUAKE,
+	default:
+	    break;
+	// TODO
+	}
+    } else if(Power(spell) == 1) {
+	switch(spell) {
+	case MASSBLESS:
+	    magic.spell = BLESS;
+	case BLESS:
+	    troop.RemoveMagic(CURSE);
+	    troop.RemoveMagic(MASSCURSE);
+	    break;
+	case MASSCURSE:
+	    magic.spell = CURSE;
+	case CURSE:
+	    troop.RemoveMagic(BLESS);
+	    troop.RemoveMagic(MASSBLESS);
+	    break;
+	case STONESKIN:
+	    troop.RemoveMagic(STELLSKIN);
+	    break;
+	case STELLSKIN:
+	    troop.RemoveMagic(STONESKIN);
+	    break;
+	case MASSSLOW:
+	    magic.spell = SLOW;
+	    break;
+	case MASSSHIELD:
+	    magic.spell = SHIELD;
+	    break;
+	case MASSHASTE:
+	    magic.spell = HASTE;
+	    break;
+// 	BLIND,
+// 	SHIELD,
+// 	ANTIMAGIC,
+// 	PARALYZE,
+// 	STONE,
+// 	DRAGONSLAYER,
+// 	BLOODLUST,
+	default:
+	    break;
+	}
+	troop.SetMagic(magic);
+    } else {
+	int damage = spower * Power(spell);
+	switch(spell) {
+	case MASSCURE:
+	    spell = CURE;
+	case CURE:
+	case RESURRECT:
+	case RESURRECTTRUE:
+	case ANIMATEDEAD: {
+	    int hp = Monster::GetStats(troop.Monster()).hp;
+	    troop.hp += damage;
+	    if(troop.hp > hp) {
+		if(spell == CURE) troop.hp = hp;
+		else {
+		    troop.SetCount(troop.Count() + troop.hp/hp);
+		    troop.hp = troop.hp%hp;
+		    if(!troop.hp) {
+			troop.SetCount(troop.Count()-1);
+			troop.hp = hp;
+		    }
+		    if(troop.Count() > troop.oldcount) {
+			troop.SetCount(troop.oldcount);
+			troop.hp = hp;
+		    }
+		}
+	    }
+	    return;
+	}
+	case SUMMONEELEMENT:
+	case SUMMONAELEMENT:
+	case SUMMONFELEMENT:
+	case SUMMONWELEMENT:
+	    // TODO
+	    return;
+// 	ARROW,
+// 	FIREBALL,
+// 	FIREBLAST,
+// 	LIGHTNINGBOLT,
+// 	CHAINLIGHTNING,
+// 	HOLYWORD,
+// 	HOLYSHOUT,
+// 	COLDRAY,
+// 	COLDRING,
+// 	DEATHRIPPLE,
+// 	DEATHWAVE,
+// 	ARMAGEDDON,
+// 	ELEMENTALSTORM,
+// 	METEORSHOWER,
+	default: {
+	    int hp = Monster::GetStats(troop.Monster()).hp;
+	    while(troop.hp < damage) {
+		troop.SetCount(troop.Count() - 1);
+		if(troop.Count() <= 0) {
+		    troop.SetCount(0);
+		    troop.hp = 0;
+		    break;
+		}
+		damage -= troop.hp;
+		troop.hp = hp;
+	    }
+	    return;
+	}
+	}
     }
 }
 
@@ -428,7 +560,7 @@ u8 Spell::GetInlIndexSprite(spell_t spell)
 	return 12;
     case STONESKIN:
 	return 13;
-    case STEELSKIN:
+    case STELLSKIN:
 	return 14;
     default:
 	return 0;

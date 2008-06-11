@@ -80,7 +80,7 @@ namespace Army {
     battle_t CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     bool AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, const Point &move, const Point &attack);
     bool MagicSelectTarget(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell);
-    void MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, Spell::spell_t spell, const Maps::Tiles &tile);
+    bool MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &aff1, std::vector<Army::Troops*> &aff2, Army::army_t &army1, Army::army_t &army2, bool reflect, Spell::spell_t spell, const Maps::Tiles &tile);
     void InitBackground(const Maps::Tiles & tile);
     void DrawBackground(const Maps::Tiles & tile);
     void DrawObject(const Point &pt);
@@ -93,6 +93,7 @@ namespace Army {
     inline Point Bf2Scr(const Point & pt); // translate to screen (offset to frame border)
     inline bool BfValid(const Point & pt); // check battle field point
     int FindTroop(const Army::army_t &army, const Point &p, bool reflect=false, bool usewide=true);
+    int FindTroop(const std::vector<Army::Troops*> &army, const Point &p, bool reflect=false, bool usewide=true);
     bool CellFree(const Point &p, const Army::army_t &army1, const Army::army_t &army2, int skip=99);
     void SettingsDialog();
     battle_t HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender=false, bool locked=false);
@@ -163,6 +164,8 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     while(1) {
 	if(hero1) hero1->spellCasted = false;
 	if(hero2) hero2->spellCasted = false;
+	for(u16 i=0; i<army1.size(); i++) army1[i].ProceedMagic();
+	for(u16 i=0; i<army2.size(); i++) army2[i].ProceedMagic();
 	Speed::speed_t cursp = Speed::INSTANT;
 	while(1) {
 	    //Dialog::Message("speed", Speed::String(cursp), Font::BIG, Dialog::OK);
@@ -234,6 +237,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	}
     }
     return WIN;
+    // TODO remove summoned creatures
 }
 
 Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack)
@@ -763,9 +767,9 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	AttackStatus(status);
 	if(ranged) myTroop.shots --;
 	if(!ranged) {
-	    Army::army_t ta1, ta2;
-	    (troopN >= 0 ? ta1 : ta2).push_back(target);
-	    MagicCycle(hero1, hero2, ta1, ta2, Spell::TroopAttack(myTroop.Monster()), tile);
+	    std::vector<Army::Troops*> ta1, ta2;
+	    (troopN >= 0 ? ta1 : ta2).push_back(&target);
+	    MagicCycle(hero1, hero2, ta1, ta2, army1, army2, troopN<0, Spell::TroopAttack(myTroop.Monster()), tile);
 	}
     }
     return counterstrike;
@@ -773,61 +777,187 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 
 bool Army::MagicSelectTarget(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell)
 {
-    Army::army_t ta1, ta2;
+    std::vector<Army::Troops*> ta1, ta2;
     Army::army_t &myarmy = reflect ? army2 : army1;
     Army::army_t &enarmy = reflect ? army1 : army2;
-    int mode = 0;
     switch(Spell::Target(spell)) {
     case Spell::ONEFRIEND:
-	mode = 1;
-	break;
     case Spell::ONEENEMY:
-	mode = -1;
-	break;
     case Spell::FREECELL:
-	mode = 0;
 	break;
     case Spell::ALLFRIEND:
 	for(u16 i=0; i<myarmy.size(); i++) {
 	    if(Spell::AllowSpell(spell, myarmy[i]))
-		(reflect?ta2:ta1).push_back(myarmy[i]);
+		(reflect?ta2:ta1).push_back(&myarmy[i]);
 	}
-	MagicCycle(hero1, hero2, ta1, ta2, spell, tile);
-	return true;
+	return MagicCycle(hero1, hero2, ta1, ta2, army1, army2, reflect, spell, tile);
     case Spell::ALLENEMY:
 	for(u16 i=0; i<enarmy.size(); i++) {
 	    if(Spell::AllowSpell(spell, enarmy[i]))
-		(reflect?ta1:ta2).push_back(enarmy[i]);
+		(reflect?ta1:ta2).push_back(&enarmy[i]);
 	}
-	MagicCycle(hero1, hero2, ta1, ta2, spell, tile);
+	return MagicCycle(hero1, hero2, ta1, ta2, army1, army2, reflect, spell, tile);
     case Spell::ALLLIVE:
     case Spell::ALLDEAD:
     case Spell::ALL:
 	for(u16 i=0; i<army1.size(); i++) {
 	    if(Spell::AllowSpell(spell, army1[i]))
-		ta1.push_back(army1[i]);
+		ta1.push_back(&army1[i]);
 	}
 	for(u16 i=0; i<army2.size(); i++) {
 	    if(Spell::AllowSpell(spell, army2[i]))
-		ta1.push_back(army2[i]);
+		ta1.push_back(&army2[i]);
 	}
-	MagicCycle(hero1, hero2, ta1, ta2, spell, tile);
-	return true;
+	return MagicCycle(hero1, hero2, ta1, ta2, army1, army2, reflect, spell, tile);
     case Spell::NOTARGET:
 	return false;
     }
     // select target
-    // TODO
-    return false;
+    while(le.HandleEvents()) {
+	Point cur_pt = Scr2Bf(le.MouseCursor()-dst_pt);
+	int t;
+	if(Spell::Target(spell) == Spell::ONEFRIEND) {
+	    if(t = FindTroop(myarmy, cur_pt, reflect, true), t >= 0 && Spell::AllowSpell(spell, myarmy[t])) {
+		cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::GetIndexSprite(spell)));
+		if(le.MouseClickLeft(Rect(0, 0, display.w(), display.h()))) {
+		    (reflect?ta2:ta1).push_back(&myarmy[t]);
+		    break;
+		}
+	    } else 
+		cursor.SetThemes(cursor.SPELLNONE);
+	} else if(Spell::Target(spell) == Spell::ONEENEMY) {
+	    if(t = FindTroop(enarmy, cur_pt, reflect, true), t >= 0) {
+		cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::GetIndexSprite(spell)));
+		if(le.MouseClickLeft(Rect(0, 0, display.w(), display.h()))) {
+		    (reflect?ta1:ta2).push_back(&enarmy[t]);
+		    break;
+		}
+	    } else 
+		cursor.SetThemes(cursor.SPELLNONE);
+	} else if(Spell::Target(spell) == Spell::FREECELL) {
+	    if(CellFree(cur_pt, army1, army2)) {
+		cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::GetIndexSprite(spell)));
+		// TODO COLDRING & SUMMON
+	    } else 
+		cursor.SetThemes(cursor.SPELLNONE);
+	} else {
+	    cursor.SetThemes(cursor.SPELLNONE);
+	}
+	// exit
+	if(le.KeyPress(KEY_ESCAPE)) return false;
+	if(le.MousePressRight(Rect(0, 0, display.w(), display.h()))) return false;
+    }    
+    return MagicCycle(hero1, hero2, ta1, ta2, army1, army2, reflect, spell, tile);
 }
 
-void Army::MagicCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, Spell::spell_t spell, const Maps::Tiles &tile)
+bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &aff1, std::vector<Army::Troops*> &aff2, Army::army_t &army1, Army::army_t &army2, bool reflect, Spell::spell_t spell, const Maps::Tiles &tile)
 {
-    if(!army1.size() && army2.size()) {
+    if(spell == Spell::NONE) return false;
+    if(!aff1.size() && !aff2.size()) {
 	Dialog::Message("", "That spell will affect no one!", Font::BIG, Dialog::OK);
-	return;
+	return false;
     }
-    // TODO
+    AGG::PlaySound(Spell::M82(spell));
+    int frame = 0, mframe = AGG::GetICNCount(Spell::Icn(spell));
+    int damage = 0;
+    int spellpower = (reflect?hero2:hero1) ? (reflect?hero2:hero1)->GetPower() : 1 ;
+    if(Spell::Target(spell) != Spell::ONEFRIEND && Spell::Target(spell) != Spell::ALLFRIEND) {
+	if(Spell::Power(spell) > 1) {
+	    damage = Spell::Power(spell) * spellpower;
+	}
+    }
+    if(damage) {
+	for(u16 i=0; i<aff1.size(); i++) {
+	    if(damage < (aff1[i]->Count()-1) * Monster::GetStats(aff1[i]->Monster()).hp + aff1[i]->hp)
+		aff1[i]->Animate(Monster::AS_PAIN);
+	    else
+		aff1[i]->Animate(Monster::AS_DIE);
+	}
+	for(u16 i=0; i<aff2.size(); i++) {
+	    if(damage < (aff2[i]->Count()-1) * Monster::GetStats(aff2[i]->Monster()).hp + aff2[i]->hp)
+		aff2[i]->Animate(Monster::AS_PAIN);
+	    else
+		aff2[i]->Animate(Monster::AS_DIE);
+	}
+    }
+    int animat = 0;
+    while(le.HandleEvents()) {
+	if(!(animat++%ANIMATION_LOW)) {
+	    // paint
+	    DrawBackground(tile);
+	    if(hero1) DrawHero(*hero1, 1, false, 1);
+	    if(hero2) DrawHero(*hero2, 1, true);
+	    Point p;
+	    int t=-1;
+	    for(p.y = 0; p.y < BFH; p.y++)
+		for(p.x = 0; p.x < BFW; p.x++) {
+		    DrawObject(p);
+		    if(t = FindTroop(army1, p, false, false), t >= 0) {
+			DrawTroop(army1[t], false);
+			army1[t].Animate();
+		    }
+		    if(t = FindTroop(army2, p,  true, false), t >= 0) {
+			DrawTroop(army2[t],  true);
+			army2[t].Animate();
+		    }
+		}
+	    const Sprite& spr = AGG::GetICN(Spell::Icn(spell), frame);
+	    for(u16 i=0; i<aff1.size(); i++) display.Blit(spr, Bf2Scr(aff1[i]->Position())+dst_pt+spr);
+	    for(u16 i=0; i<aff2.size(); i++) display.Blit(spr, Bf2Scr(aff2[i]->Position())+dst_pt+spr);
+	    display.Flip();
+	    if(frame >= mframe) {
+		if(damage) {
+		    bool br = true;
+		    for(u16 i=0; i<aff1.size(); i++) if(aff1[i]->astate != Monster::AS_NONE) {
+			u8 strt=0, len=0;
+			Monster::GetAnimFrames(aff1[i]->Monster(), Monster::AS_DIE, strt, len, false);
+			if(aff1[i]->astate != Monster::AS_DIE || aff1[i]->aframe < strt+len-1)
+			    br = false;
+		    }
+		    for(u16 i=0; i<aff2.size(); i++) if(aff2[i]->astate != Monster::AS_NONE) {
+			u8 strt=0, len=0;
+			Monster::GetAnimFrames(aff2[i]->Monster(), Monster::AS_DIE, strt, len, false);
+			if(aff2[i]->astate != Monster::AS_DIE || aff2[i]->aframe < strt+len-1)
+			    br = false;
+		    }
+		    if(br) break;
+		} else break;
+	    }
+	    frame ++;
+	}
+    }
+    for(u16 i=0; i<aff1.size(); i++) {
+	if(!reflect || AllowSpell(spell, *aff1[i]))
+	    Spell::ApplySpell(spellpower, spell, *aff1[i]);
+	else {};// TODO resistance
+	if(aff1[i]->Count() <= 0) {
+	    Army::Troops body = *aff1[i];
+	    for(u16 j=0; j<army1.size(); j++) if(&army1[j] == aff1[i])
+		army1.erase(army1.begin()+j);
+	    bodies1.push_back(body);
+	}
+    }
+    for(u16 i=0; i<aff2.size(); i++) {
+	if(reflect || AllowSpell(spell, *aff2[i]))
+	    Spell::ApplySpell(spellpower, spell, *aff2[i]);
+	else {};// TODO resistance
+	if(aff2[i]->Count() <= 0) {
+	    Army::Troops body = *aff2[i];
+	    for(u16 j=0; j<army2.size(); j++) if(&army2[j] == aff2[i])
+		army2.erase(army2.begin()+j);
+	    bodies2.push_back(body);
+	}
+    }
+    if(damage) {
+	std::string str = "The " + Spell::String(spell) + " does ";
+	String::AddInt(str, damage);
+	str += " damage";
+	if(aff1.size() + aff2.size() == 1) str += " to the "+Monster::String((aff1.size()?aff1[0]:aff2[0])->Monster()) + "s.";
+	else str += ".";
+	AttackStatus(str);
+	AttackStatus("");
+    }
+    return true;
 }
 
 void Army::InitBackground(const Maps::Tiles & tile)
@@ -1272,6 +1402,18 @@ int Army::FindTroop(const Army::army_t &army, const Point &p, bool reflect, bool
     return -1;
 }
 
+// find troop at the position
+int Army::FindTroop(const std::vector<Army::Troops*> &army, const Point &p, bool reflect, bool usewide)
+{
+    for(unsigned int i=0; i<army.size(); i++) {
+	Point p2(army[i]->Position());
+	if(Monster::GetStats(army[i]->Monster()).wide && usewide) p2.x += (reflect ? -1 : 1);
+	if(army[i]->Monster() != Monster::UNKNOWN && (p == army[i]->Position() || p == p2)) 
+	    return i;
+	}
+    return -1;
+}
+
 bool Army::CellFree(const Point &p, const Army::army_t &army1, const Army::army_t &army2, int skip)
 {
     int t;
@@ -1425,7 +1567,7 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spel
 	    if(le.KeyPress(KEY_ESCAPE)) {
 		return WIN;
 	    }
-	    do_button(buttonMag, {if(spell=hero.SpellBook().Open(Spell::Book::CMBT, true),spell!=Spell::NONE) return WIN;}, Dialog::Message("Cast Spell", "Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn.", Font::BIG));
+	    do_button(buttonMag, {if(spell=hero.SpellBook().Open(Spell::Book::CMBT, true),spell!=Spell::NONE) {back.Restore();return WIN;}}, Dialog::Message("Cast Spell", "Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn.", Font::BIG));
 	    do_button(buttonRet, return RETREAT, Dialog::Message("Retreat", "Retreat your hero, abandoning your creatures. Your hero will be available for you to recrut again, however, the hero will have only a novice hero's forces.", Font::BIG));
 	    do_button(buttonSur, return SURRENDER, Dialog::Message("Surrender", "Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again.", Font::BIG));
 	    do_button(buttonOK, return WIN, Dialog::Message("Cancel", "Return to the battle.", Font::BIG));

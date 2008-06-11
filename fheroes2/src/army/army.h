@@ -55,7 +55,8 @@ namespace Army
     class Troops
     {
     public:
-	Troops(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0) : monster(m), count(c), master_skill(NULL){};
+	Troops(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0) : 
+	    summoned(false), monster(m), count(c), master_skill(NULL){};
 	Troops(const Troops & troops);
 
         void Set(Monster::monster_t m, u16 c){ monster = m; count = c; };
@@ -78,6 +79,12 @@ namespace Army
 	void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
 	void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
 	void Animate(Monster::animstate_t as = Monster::AS_NONE);
+	void SetMagic(Spell::magic_t &magic);
+	bool FindMagic(Spell::spell_t spell) const;
+	void RemoveMagic(Spell::spell_t spell);
+	void ClearMagic();
+	void ProceedMagic();
+	const std::vector<Spell::magic_t> &Magics() const { return magics; };
 
 	Monster::animstate_t    astate;
 	u16                     aframe;
@@ -85,6 +92,7 @@ namespace Army
 	u8                      shots;
 	u16                     hp;
 	u16                     oldcount;
+	bool                    summoned;
 
     private:
         Monster::monster_t	monster;
@@ -93,6 +101,7 @@ namespace Army
 	Point                   pos;
 	Background bg;
 	bool saved;
+	std::vector<Spell::magic_t> magics;
     };
 
     bool isValid(const Troops & army);
