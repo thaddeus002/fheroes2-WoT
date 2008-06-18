@@ -80,6 +80,7 @@ namespace Army {
     battle_t CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     bool AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, const Point &move, const Point &attack);
     bool MagicSelectTarget(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, bool reflect, Spell::spell_t spell);
+    void MagicPreCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &aff1, std::vector<Army::Troops*> &aff2, Army::army_t &army1, Army::army_t &army2, bool reflect, Spell::spell_t spell, const Maps::Tiles &tile);
     bool MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &aff1, std::vector<Army::Troops*> &aff2, Army::army_t &army1, Army::army_t &army2, bool reflect, Spell::spell_t spell, const Maps::Tiles &tile);
     void InitBackground(const Maps::Tiles & tile);
     void DrawBackground(const Maps::Tiles & tile);
@@ -357,7 +358,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	    }
 	    if(s == SURRENDER) return s;
 	    if(spell != Spell::NONE && MagicSelectTarget(hero1, hero2, army1, army2, tile, false, spell))
-		hero1->spellCasted = true;
+		hero1->spellCasted = 0;//true;
 	}
 	if(le.MouseClickLeft(rectHero2)) {
 	    battle_t s = HeroStatus(*hero2, *statusBar2, spell, false, hero1, troopN >= 0);
@@ -367,7 +368,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	    }
 	    if(s == SURRENDER) return s;
 	    if(spell != Spell::NONE && MagicSelectTarget(hero1, hero2, army1, army2, tile, true, spell))
-		hero2->spellCasted = true;
+		hero2->spellCasted = 0;//true;
 	}
 	if(le.MousePressRight(rectHero1)) HeroStatus(*hero1, *statusBar2, spell, true, false, false);
 	if(le.MousePressRight(rectHero2)) HeroStatus(*hero2, *statusBar2, spell, true, false, false);
@@ -494,6 +495,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
     Army::Troops &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
     const Monster::stats_t &myMonster = Monster::GetStats(myTroop.Monster());
     u16 animat = 0;
+    // MOVE
     if(BfValid(move) && move != myTroop.Position()) {
 	Point start = Bf2Scr(myTroop.Position()) + dst_pt;
 	Point end = Bf2Scr(move) + dst_pt;
@@ -594,6 +596,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	myTroop.SetPosition(move);
 	if(path) delete path;
     }
+    // ATTACK
     if(BfValid(attack)) {
 	int t;
 	Army::Troops &target = (t = FindTroop(army1, attack, false), t >= 0 ? army1[t] : army2[FindTroop(army2, attack, false)]);
@@ -850,6 +853,81 @@ bool Army::MagicSelectTarget(Heroes *hero1, Heroes *hero2, Army::army_t &army1, 
     return MagicCycle(hero1, hero2, ta1, ta2, army1, army2, reflect, spell, tile);
 }
 
+void Army::MagicPreCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &aff1, std::vector<Army::Troops*> &aff2, Army::army_t &army1, Army::army_t &army2, bool reflect, Spell::spell_t spell, const Maps::Tiles &tile)
+{
+    Background back(Rect(dst_pt.x, dst_pt.y, 640, 480));
+    back.Save();
+    ICN::icn_t icn;
+    int maxframe = 0, icnframe=-1;
+    switch(spell) {
+    case Spell::COLDRAY:
+    case Spell::DISRUPTINGRAY:
+    case Spell::ARROW:
+	if(aff1.size() + aff2.size() == 1) {
+	    Point start, end;
+	    if(aff1.size() && hero2) {
+		Rect hrect = DrawHero(*hero2, 1, true);
+		start = hrect + Point(hrect.w, hrect.h/2);
+		end = Bf2Scr(aff1[0]->Position())+dst_pt;
+	    } else if(aff2.size() && hero1) {
+		Rect hrect = DrawHero(*hero1, 1);
+		start = hrect + Point(0, hrect.h/2);
+		end = Bf2Scr(aff2[0]->Position())+dst_pt;
+	    } else break;
+	    int animat = 0;
+	    int frame = 0;
+	    Point delta = end - start;
+	    switch(spell) {
+	    case Spell::COLDRAY:
+		icn = ICN::COLDRAY;
+		maxframe = AGG::GetICNCount(icn);
+		break;
+	    case Spell::DISRUPTINGRAY:
+		icn = ICN::DISRRAY;
+		maxframe = AGG::GetICNCount(icn);
+		break;
+	    case Spell::ARROW: {
+		icn = ICN::KEEP;
+		maxframe = 16;
+		int maxind = AGG::GetICNCount(icn);
+		if(maxind > 1) {
+		    double angle = M_PI_2 - atan2(-delta.y, delta.x);
+		    icnframe = (int)(angle/M_PI * maxind);
+		} else icnframe = 0;
+		break;
+	    }
+	    default:
+		break;
+	    }
+	    delta.x /= maxframe;
+	    delta.y /= maxframe;
+	    while(le.HandleEvents()) {
+		if(!(animat++%ANIMATION_LOW)) {
+		    display.Blit(AGG::GetICN(icn, icnframe>=0? icnframe : frame, reflect), start);
+		    display.Flip();
+		    start += delta;
+		    frame ++;
+		    if(frame >= maxframe) break;
+		}
+	    }
+	}
+	break;
+    case Spell::LIGHTNINGBOLT:
+    case Spell::CHAINLIGHTNING:
+    case Spell::HOLYWORD:
+    case Spell::HOLYSHOUT:
+    case Spell::ARMAGEDDON:
+    case Spell::ELEMENTALSTORM:
+    case Spell::METEORSHOWER:
+    case Spell::DEATHRIPPLE:
+    case Spell::DEATHWAVE:
+    case Spell::EARTHQUAKE:
+	// TODO
+    default:
+	break;
+    }
+}
+
 bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &aff1, std::vector<Army::Troops*> &aff2, Army::army_t &army1, Army::army_t &army2, bool reflect, Spell::spell_t spell, const Maps::Tiles &tile)
 {
     if(spell == Spell::NONE) return false;
@@ -857,8 +935,10 @@ bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &
 	Dialog::Message("", "That spell will affect no one!", Font::BIG, Dialog::OK);
 	return false;
     }
+    MagicPreCycle(hero1, hero2, aff1, aff2, army1, army2, reflect, spell, tile);
     AGG::PlaySound(Spell::M82(spell));
-    int frame = 0, mframe = AGG::GetICNCount(Spell::Icn(spell));
+    int frame = 0, mframe = 0;
+    if(Spell::Icn(spell) != ICN::UNKNOWN) mframe = AGG::GetICNCount(Spell::Icn(spell));
     int damage = 0;
     int spellpower = (reflect?hero2:hero1) ? (reflect?hero2:hero1)->GetPower() : 1 ;
     if(Spell::Target(spell) != Spell::ONEFRIEND && Spell::Target(spell) != Spell::ALLFRIEND) {

@@ -234,7 +234,7 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 	{
 	    Spell::spell_t spell = GetSelected(spells, current_index, pos);
 	    if(canselect) {
-		if(curspell != Spell::NONE) {
+		if(spell != Spell::NONE) {
 		    if(hero->GetSpellPoints() >= Spell::Mana(spell)) {
 			curspell = spell;
 			break;
