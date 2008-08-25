@@ -109,6 +109,26 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 	for(u8 ox = rx; ox < rx + rw; ++ox)
 	    world.GetTiles(gx + ox, gy + oy).RedrawBottom();
 
+    // ext object
+    for(u8 oy = ry; oy < ry + rh; ++oy)
+	for(u8 ox = rx; ox < rx + rw; ++ox) if(GetRect() & Point(gx + ox, gy + oy))
+    {
+	const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
+    	const Point dst(BORDERWIDTH + TILEWIDTH * ox, BORDERWIDTH + TILEWIDTH * oy);
+
+	switch(tile.GetObject())
+	{
+    	    // boat
+    	    case MP2::OBJ_BOAT:		RedrawBoat(tile, dst); break;
+    	    // heroes
+    	    case MP2::OBJ_HEROES:	RedrawHeroes(tile, dst); break;
+    	    // monster
+    	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, dst); break;
+
+    	    default: break;
+	}
+    }
+
     // top
     for(u8 oy = ry; oy < ry + rh; ++oy)
 	for(u8 ox = rx; ox < rx + rw; ++ox)
@@ -148,25 +168,6 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 	}
     }
 
-    // ext object
-    for(u8 oy = ry; oy < ry + rh; ++oy)
-	for(u8 ox = rx; ox < rx + rw; ++ox) if(GetRect() & Point(gx + ox, gy + oy))
-    {
-	const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
-    	const Point dst(BORDERWIDTH + TILEWIDTH * ox, BORDERWIDTH + TILEWIDTH * oy);
-
-	switch(tile.GetObject())
-	{
-    	    // boat
-    	    case MP2::OBJ_BOAT:		RedrawBoat(tile, dst); break;
-    	    // heroes
-    	    case MP2::OBJ_HEROES:	RedrawHeroes(tile, dst); break;
-    	    // monster
-    	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, dst); break;
-
-    	    default: break;
-	}
-    }
 
     // redraw grid
     if(H2Config::Debug())

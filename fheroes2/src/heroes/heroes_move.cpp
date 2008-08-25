@@ -155,6 +155,7 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
             case MP2::OBJ_ARTIFACT:
             case MP2::OBJ_HEROES:
             case MP2::OBJ_BOAT:
+	    case MP2::OBJ_BARRIER:
             return true;
 
             case MP2::OBJ_CASTLE:

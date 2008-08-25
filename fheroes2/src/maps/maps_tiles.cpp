@@ -814,10 +814,14 @@ bool Maps::Tiles::isPassable(void) const
             case MP2::OBJ_BOTTLE:
     	    case MP2::OBJ_SHIPWRECKSURVIROR:
             case MP2::OBJ_FLOTSAM:
+
+            case MP2::OBJ_HEROES:
     		return false;
 	    
 	    default: break;
 	}
+
+    	return true;
     }
     else
     {
@@ -838,11 +842,13 @@ bool Maps::Tiles::isPassable(void) const
 	    case MP2::OBJ_ZERO:
 		return true;
 
-	    default: return false;
+	    default: break;
 	}
+
+	return false;
     }
 
-    return true;
+    return false;
 }
 
 /* check road */
@@ -1140,18 +1146,6 @@ Maps::TilesAddon * Maps::Tiles::FindFlags(void)
 
 Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 {
-/*
-    u8 index = 0x42;
-
-    switch(level)
-    {
-	case MP2::OBJ_RNDMONSTER1: index = 0x43; break;
-	case MP2::OBJ_RNDMONSTER2: index = 0x44; break;
-	case MP2::OBJ_RNDMONSTER3: index = 0x45; break;
-	case MP2::OBJ_RNDMONSTER4: index = 0x46; break;
-	default: break;
-    }
-*/
     if(addons_level1.size())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();

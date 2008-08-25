@@ -58,9 +58,10 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
     {
 	for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
 	{
-	    if(Maps::isValidDirection(index_i, direct))
+	    const u16 index_w = Maps::GetDirectionIndex(index_i, direct);
+
+	    if(Maps::AllowDirection(index_i, direct) || (index_w == index2))
 	    {
-		const u16 index_w = Maps::GetDirectionIndex(index_i, direct);
 		cellinfo_t & cell = work_map[index_w];
 
 		cell.direct = direct;

@@ -45,6 +45,7 @@ namespace Direction
     const std::string & String(vector_t direct);
 
     vector_t Get(u16 from, u16 to);
+    vector_t Reflect(vector_t from);
 
     bool ShortDistanceClockWise(const vector_t from, const vector_t to);
 };

@@ -77,6 +77,44 @@ bool Maps::isValidDirection(u16 from, Direction::vector_t vector)
     return false;
 }
 
+bool Maps::AllowDirection(u16 from, Direction::vector_t vector)
+{
+    if(!isValidDirection(from, vector)) return false;
+
+    switch(vector)
+    {
+	case Direction::TOP:
+	case Direction::RIGHT:
+	case Direction::BOTTOM:
+	case Direction::LEFT:
+	    return  world.GetTiles(GetDirectionIndex(from, vector)).isPassable();
+
+	case Direction::TOP_RIGHT:
+	    return  world.GetTiles(GetDirectionIndex(from, vector)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::RIGHT)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::TOP)).isPassable();
+
+	case Direction::BOTTOM_LEFT:
+	    return  world.GetTiles(GetDirectionIndex(from, vector)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::LEFT)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::BOTTOM)).isPassable();
+
+	case Direction::BOTTOM_RIGHT:
+	    return  world.GetTiles(GetDirectionIndex(from, vector)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::RIGHT)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::BOTTOM)).isPassable();
+
+	case Direction::TOP_LEFT:
+	    return  world.GetTiles(GetDirectionIndex(from, vector)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::LEFT)).isPassable() &&
+		    world.GetTiles(GetDirectionIndex(from, Direction::TOP)).isPassable();
+
+	default: break;
+    }
+
+    return false;
+}
+
 bool Maps::isValidAbsPoint(const Point & pt)
 {
     return isValidAbsPoint(pt.x, pt.y);

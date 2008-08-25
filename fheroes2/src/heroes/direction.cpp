@@ -180,3 +180,22 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
 
     return false;
 }
+
+Direction::vector_t Direction::Reflect(Direction::vector_t from)
+{
+    switch(from)
+    {
+	case TOP_LEFT:		return BOTTOM_RIGHT;
+	case TOP:		return BOTTOM;
+	case TOP_RIGHT:		return BOTTOM_LEFT;
+	case RIGHT:		return LEFT;
+	case BOTTOM_RIGHT:	return TOP_LEFT;
+	case BOTTOM:		return TOP;
+	case BOTTOM_LEFT:	return TOP_RIGHT;
+	case LEFT:		return RIGHT;
+	case CENTER:		return CENTER;
+	default: break;
+    }
+
+    return UNKNOWN;
+}
