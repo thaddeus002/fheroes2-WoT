@@ -99,7 +99,7 @@ public:
     
     Spell::spell_t SpellFromShrine(const u16 index);
     u16 NextTeleport(const u16 index) const;
-    Skill::secondary_t SkillFromWitchsHut(const u16 index);
+    Skill::Secondary::skill_t SkillFromWitchsHut(const u16 index);
     const std::string & MessageSign(const u16 index);
 
     void CaptureObject(const u16 index, const Color::color_t col);
@@ -129,7 +129,7 @@ private:
 
     std::map<u16, std::string>		map_sign;
     std::map<u16, Spell::spell_t>	map_shrine;
-    std::map<u16, Skill::secondary_t>	map_witchshut;
+    std::map<u16, Skill::Secondary::skill_t> map_witchshut;
 
     // index, object, color
     std::map<u16, std::pair<MP2::object_t, Color::color_t> > map_captureobj;

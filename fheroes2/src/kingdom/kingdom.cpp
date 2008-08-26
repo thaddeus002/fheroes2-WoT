@@ -166,7 +166,7 @@ void Kingdom::ActionNewDay(void)
 	    }
 	    
 	    // estates skill bonus
-	    switch(heroes.GetLevelSkill(Skill::ESTATES))
+	    switch(heroes.GetLevelSkill(Skill::Secondary::ESTATES))
 	    {
 		case Skill::Level::BASIC:	resource.gold += 100; break;
 		case Skill::Level::ADVANCED:	resource.gold += 250; break;

@@ -1302,7 +1302,7 @@ u16 World::NextTeleport(const u16 index) const
 }
 
 /* return skill from witchs hut */
-Skill::secondary_t World::SkillFromWitchsHut(const u16 index)
+Skill::Secondary::skill_t World::SkillFromWitchsHut(const u16 index)
 {
     return map_witchshut[index];
 }

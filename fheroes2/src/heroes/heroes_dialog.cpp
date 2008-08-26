@@ -403,17 +403,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
     {
-	const Skill::secondary_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::UNKNOWN;
+	const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
 	const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
 
 	const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(skill));
 
 	display.Blit(sprite_skill, dst_pt);
 
-	if(Skill::UNKNOWN != skill && Skill::Level::NONE != level)
+	if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
 	{
 	    // string skill
-	    message = Skill::String(skill);
+	    message = Skill::Secondary::String(skill);
 	    Text(message, Font::SMALL, dst_pt.x + (sprite_skill.w() - Text::width(message, Font::SMALL)) / 2, dst_pt.y + 3);
 
 	    // string level
@@ -722,13 +722,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	// left click skill
 	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MouseClickLeft(coordsSkill[ii]))
 	{
-	    const Skill::secondary_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::UNKNOWN;
+	    const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
 	    const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
 
-	    if(Skill::UNKNOWN != skill && Skill::Level::NONE != level)
+	    if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
 	    {
 		cursor.Hide();
-		Dialog::SkillInfo(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), skill, level, true);
+		Dialog::SkillInfo(skill, level, true);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -768,13 +768,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	// right info skill
 	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MousePressRight(coordsSkill[ii]))
 	{
-	    const Skill::secondary_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::UNKNOWN;
+	    const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
 	    const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
 
-	    if(Skill::UNKNOWN != skill && Skill::Level::NONE != level)
+	    if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
 	    {
 		cursor.Hide();
-		Dialog::SkillInfo(Skill::Level::String(level) + " " + Skill::String(skill), Skill::Description(skill, level), skill, level, false);
+		Dialog::SkillInfo(skill, level, false);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -833,11 +833,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	{
 	    for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MouseCursor(coordsSkill[ii]))
 	    {
-		const Skill::secondary_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::UNKNOWN;
+		const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
 		const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
 
-		if(Skill::UNKNOWN != skill && Skill::Level::NONE != level)
-		    statusBar.ShowMessage("View " + Skill::Level::String(level) + " " + Skill::String(skill) + " Info");
+		if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
+		    statusBar.ShowMessage("View " + Skill::Level::String(level) + " " + Skill::Secondary::String(skill) + " Info");
 		else
 		    statusBar.Clear("Hero Screen");
 	    }

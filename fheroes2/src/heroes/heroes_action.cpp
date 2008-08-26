@@ -473,7 +473,7 @@ void Heroes::ActionToShrine(const u16 dst_index)
     }
 
     // check valid level spell and wisdom skill
-    if(3 == spell_level && Skill::Level::NONE == GetLevelSkill(Skill::WISDOM))
+    if(3 == spell_level && Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM))
     {
 	body += " Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.";
 	if(H2Config::MyColor() == GetColor()) Dialog::Message(head, body, Font::BIG, Dialog::OK);
@@ -494,8 +494,8 @@ void Heroes::ActionToShrine(const u16 dst_index)
 
 void Heroes::ActionToWitchsHut(const u16 dst_index)
 {
-    const Skill::secondary_t skill = world.SkillFromWitchsHut(dst_index);
-    const std::string & skill_name = Skill::String(skill);
+    const Skill::Secondary::skill_t skill = world.SkillFromWitchsHut(dst_index);
+    const std::string & skill_name = Skill::Secondary::String(skill);
     const std::string head("Witch's Hut");
 
     // check full
@@ -644,30 +644,30 @@ void Heroes::ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t
     const char *body_true = NULL;
     const char *body_false = NULL;
     
-    Skill::primary_t skill = Skill::ATTACK;
+    Skill::Primary::skill_t skill = Skill::Primary::ATTACK;
 
     switch(obj)
     {
         case MP2::OBJ_FORT:
-    	    skill = Skill::DEFENCE;
+    	    skill = Skill::Primary::DEFENCE;
     	    body_false = "\"I'm sorry sir,\" The leader of the soldiers says, \"but you already know everything we have to teach.\"";
     	    body_true = "The soldiers living in the fort teach you a few new defensive tricks.";
     	    break;
 
         case MP2::OBJ_MERCENARYCAMP:
-    	    skill = Skill::ATTACK;
+    	    skill = Skill::Primary::ATTACK;
     	    body_false = "You've come upon a mercenary camp practicing their tactics. \"You're too advanced for us,\" the mercenary captain says. \"We can teach nothing more.\"";
     	    body_true = "You've come upon a mercenary camp practicing their tactics. The mercenaries welcome you and your troops and invite you to train with them.";
     	    break;
 
         case MP2::OBJ_DOCTORHUT:
-    	    skill = Skill::KNOWLEDGE;
+    	    skill = Skill::Primary::KNOWLEDGE;
     	    body_false = "\"Go 'way!\", the witch doctor barks, \"you know all I know.\"";
     	    body_true = "An Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.";
     	    break;
 
         case MP2::OBJ_STANDINGSTONES:
-    	    skill = Skill::POWER;
+    	    skill = Skill::Primary::POWER;
     	    body_false = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, the Druids turn you away, indicating they have nothing new to teach you.";
     	    body_true = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, they teach you new ways to cast spells.";
     	    break;
@@ -689,10 +689,11 @@ void Heroes::ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t
 
     switch(skill)
     {
-        case Skill::DEFENCE:		++defence; break;
-        case Skill::ATTACK:		++attack; break;
-        case Skill::KNOWLEDGE:		++knowledge; break;
-        case Skill::POWER:		++power; break;
+        case Skill::Primary::DEFENCE:		++defence; break;
+        case Skill::Primary::ATTACK:		++attack; break;
+        case Skill::Primary::KNOWLEDGE:		++knowledge; break;
+        case Skill::Primary::POWER:		++power; break;
+        default: break;
     }
 
     if(H2Config::MyColor() == GetColor()) Dialog::SkillInfo(header, body_true, skill);

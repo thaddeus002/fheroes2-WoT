@@ -211,10 +211,10 @@ void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> 
 
     for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
     {
-        const Skill::secondary_t skill = ii < skills.size() ? skills[ii].Skill() : Skill::UNKNOWN;
+        const Skill::Secondary::skill_t skill = ii < skills.size() ? skills[ii].Skill() : Skill::Secondary::UNKNOWN;
         const Skill::Level::type_t level = ii < skills.size() ? skills[ii].Level() : Skill::Level::NONE;
 
-        if(Skill::UNKNOWN != skill && Skill::Level::NONE != level)
+        if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
         {
     	    const Sprite & sprite_skill = AGG::GetICN(ICN::MINISS, Skill::Secondary::GetIndexSprite2(skill));
     	    display.Blit(sprite_skill, dst_pt);

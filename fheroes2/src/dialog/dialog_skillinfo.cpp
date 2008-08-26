@@ -26,7 +26,14 @@
 #include "button.h"
 #include "dialog.h"
 
-void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::secondary_t skill, const Skill::Level::type_t level, const bool ok_button)
+void Dialog::SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
+{
+    const std::string header(Skill::Level::String(level) + " " + Skill::Secondary::String(skill));
+    const std::string description(Skill::Secondary::Description(skill, level));
+    SkillInfo(header, description, skill, level, ok_button);
+}
+
+void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -66,7 +73,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     display.Blit(sprite, pos.x, pos.y + 3);
 
     // small text
-    const std::string & skill_name = Skill::String(skill);
+    const std::string & skill_name = Skill::Secondary::String(skill);
     const std::string & skill_level= Skill::Level::String(level);
     pos.x = box.GetArea().x + (pos.w - Text::width(skill_name, Font::SMALL)) / 2;
     Text(skill_name, Font::SMALL, pos.x, pos.y + 3);
@@ -106,7 +113,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     if(button) delete button;
 }
 
-void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::primary_t skill)
+void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -125,25 +132,27 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
 
     switch(skill)
     {
-	case Skill::ATTACK:
+	case Skill::Primary::ATTACK:
 	    index = 0;
-	    skill_name = Skill::String(skill) + " Skill";
+	    skill_name = Skill::Primary::String(skill) + " Skill";
 	    break;
 
-	case Skill::DEFENCE:
+	case Skill::Primary::DEFENCE:
 	    index = 1;
-	    skill_name = Skill::String(skill) + " Skill";
+	    skill_name = Skill::Primary::String(skill) + " Skill";
 	    break;
 
-	case Skill::POWER:
+	case Skill::Primary::POWER:
 	    index = 2;
-	    skill_name = "Spell " + Skill::String(skill);
+	    skill_name = "Spell " + Skill::Primary::String(skill);
 	    break;
 
-	case Skill::KNOWLEDGE:
+	case Skill::Primary::KNOWLEDGE:
 	    index = 3;
-	    skill_name = Skill::String(skill);
+	    skill_name = Skill::Primary::String(skill);
 	    break;
+
+	default: break;
     }
     const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, index);
 

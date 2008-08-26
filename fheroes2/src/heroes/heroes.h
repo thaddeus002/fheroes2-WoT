@@ -132,9 +132,10 @@ public:
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const;
 
-    bool HasSecondarySkill(const Skill::secondary_t skill) const;
-    Skill::Level::type_t GetLevelSkill(const Skill::secondary_t skill) const;
-    void LearnBasicSkill(const Skill::secondary_t skill);
+    bool HasSecondarySkill(const Skill::Secondary::skill_t skill) const;
+    Skill::Level::type_t GetLevelSkill(const Skill::Secondary::skill_t skill) const;
+    void LearnBasicSkill(const Skill::Secondary::skill_t skill);
+    void LevelUpSkill(const Skill::Secondary::skill_t skill);
 
     const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
     bool PickupArtifact(const Artifact::artifact_t & art);
@@ -226,6 +227,8 @@ protected:
     void ActionToAncientLamp(const u16 dst_index);
     void ActionToTeleports(const u16 dst_index);
     void ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj);
+
+    void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
 
 private:
     std::string		name;

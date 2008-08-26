@@ -40,7 +40,7 @@ u16 Route::Path::Calculate(u16 dst_index)
 {
     clear();
 
-    Algorithm::PathFinding(Maps::GetIndexFromAbsPoint(hero.GetCenter()), dst_index, hero.GetLevelSkill(Skill::PATHFINDING), *this);
+    Algorithm::PathFinding(Maps::GetIndexFromAbsPoint(hero.GetCenter()), dst_index, hero.GetLevelSkill(Skill::Secondary::PATHFINDING), *this);
 
     dst = dst_index;
 

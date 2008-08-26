@@ -79,9 +79,11 @@ namespace Dialog
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons = 0);
 
     // other info
+    Skill::Secondary::skill_t LevelUpSelectSkill(const std::string &header, const Skill::Secondary & sec1, const Skill::Secondary & sec2);
     void SpellInfo(const std::string &header, const std::string &message, const Spell::spell_t spell, const bool ok_button = true);
-    void SkillInfo(const std::string &header, const std::string &message, const Skill::secondary_t skill, const Skill::Level::type_t level, const bool ok_button = true);
-    void SkillInfo(const std::string &header, const std::string &message, const Skill::primary_t skill);
+    void SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
+    void SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
+    void SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill);
     void SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite);
     void ExperienceInfo(const std::string &header, const std::string &message, const u16 exp);
     void ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs);

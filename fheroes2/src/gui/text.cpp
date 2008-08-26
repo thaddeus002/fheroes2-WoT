@@ -58,12 +58,12 @@ Text::Text(const std::string &msg, Font::type_t ft, const Rect & rt) : font(ft),
     Blit(rt.x, rt.y);
 }
 
-void Text::Blit(const Point & dst_pt)
+void Text::Blit(const Point & dst_pt, Surface & dst)
 {
-    Blit(dst_pt.x, dst_pt.y);
+    Blit(dst_pt.x, dst_pt.y, dst);
 }
 
-void Text::Blit(u16 ax, u16 ay)
+void Text::Blit(u16 ax, u16 ay, Surface & dst)
 {
     std::string::const_iterator it = message.begin();
     std::string::const_iterator it_end = message.end();
@@ -112,7 +112,7 @@ void Text::Blit(u16 ax, u16 ay)
             break;
 	}
 
-	Display::Get().Blit(sprite, pt);
+	dst.Blit(sprite, pt);
 
 	pt.x += sprite.w();
     }

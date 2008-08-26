@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,37 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2RAND_H
-#define H2RAND_H
 
-#include <vector>
-#include <list>
-#include "gamedefs.h"
+#include "rand.h"
+#include "heroes.h"
+#include "ai.h"
 
-namespace Rand
+Skill::Secondary::skill_t AI::SelectSkill(const Heroes & hero, const Skill::Secondary & sec1, const Skill::Secondary & sec2)
 {
-    void Init(void);
-    u32 Get(u32 min, u32 max = 0);
-
-    template< typename T > const T * Get(const std::vector< T > & vec)
-    {
-        if(vec.empty()) return NULL;
-
-        return & vec[Rand::Get(vec.size() - 1)];
-    };
-    
-    template< typename T > const T * Get(const std::list< T > & list)
-    {
-        if(list.empty()) return NULL;
-
-	u32 index1  = Rand::Get(list.size() - 1);
-	u32 index2 = 0;
-        typename std::list<T>::const_iterator it = list.begin();
-
-        for(; it != list.end(); ++it) if(index1 == index2++) break;
-
-        return & (*it);
-    };
-};
-   
-#endif
+    return Rand::Get(0, 1) ? sec1.Skill() : sec2.Skill();
+}

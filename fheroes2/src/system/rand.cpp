@@ -22,6 +22,7 @@
 #include <ctime>
 #include "rand.h"
 
+
 void Rand::Init(void){ std::srand((u32) std::time(0)); }
 
 u32 Rand::Get(u32 min, u32 max){ return max ? min + (std::rand() % (max - min + 1)) : std::rand() % (min + 1); }

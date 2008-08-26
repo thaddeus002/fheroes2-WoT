@@ -32,32 +32,7 @@
 
 namespace Skill
 {
-    typedef enum
-    {
-	ATTACK		= 0,
-	DEFENCE		= 1,
-	POWER		= 2,
-	KNOWLEDGE	= 3
-    } primary_t;
 
-    typedef enum
-    {
-	UNKNOWN		= 0,
-	PATHFINDING	= 1,
-	ARCHERY		= 2,
-	LOGISTICS	= 3,
-	SCOUTING	= 4,
-	DIPLOMACY	= 5,
-	NAVIGATION	= 6,
-	LEADERSHIP	= 7,
-	WISDOM		= 8,
-	MYSTICISM	= 9,
-	LUCK		= 10,
-	BALLISTICS	= 11,
-	EAGLEEYE	= 12,
-	NECROMANCY	= 13,
-	ESTATES		= 14,
-    } secondary_t;
 
     namespace Level
     {
@@ -67,14 +42,20 @@ namespace Skill
 
 	const std::string & String(const type_t level);
     };
-
-    const std::string & String(const primary_t skill);
-    const std::string & String(const secondary_t skill);
-    const std::string & Description(const secondary_t skill, const Level::type_t level);
     
     class Primary
     {
 	public:
+
+	typedef enum
+	{
+	    UNKNOWN	= 0,
+	    ATTACK	= 1,
+	    DEFENCE	= 2,
+	    POWER	= 3,
+	    KNOWLEDGE	= 4,
+	} skill_t;
+
 	Primary();
 	virtual ~Primary(){};
 
@@ -85,6 +66,9 @@ namespace Skill
 	virtual Morale::morale_t GetMorale(void) const = 0;
 	virtual Luck::luck_t GetLuck(void) const = 0;
 
+        static const std::string & String(const skill_t skill);
+	static skill_t FromLevelUp(const u8 race, const u8 level);
+
 	protected:
 	u8			attack;
 	u8			defence;
@@ -94,25 +78,49 @@ namespace Skill
         Luck::luck_t		luck;
     };
 
-    class Secondary : private std::pair<secondary_t, Level::type_t>
+    class Secondary : private std::pair<u8, u8>
     {
 	public:
-	Secondary();
-	Secondary(const secondary_t & s, const Level::type_t & t);
 
+	typedef enum
+	{
+	    UNKNOWN	= 0,
+	    PATHFINDING	= 1,
+	    ARCHERY	= 2,
+	    LOGISTICS	= 3,
+	    SCOUTING	= 4,
+	    DIPLOMACY	= 5,
+	    NAVIGATION	= 6,
+	    LEADERSHIP	= 7,
+	    WISDOM	= 8,
+	    MYSTICISM	= 9,
+	    LUCK	= 10,
+	    BALLISTICS	= 11,
+	    EAGLEEYE	= 12,
+	    NECROMANCY	= 13,
+	    ESTATES	= 14,
+	} skill_t;
+
+	Secondary();
+	Secondary(const skill_t & s, const Level::type_t & t);
+
+	void		SetSkill(const skill_t s);
 	void		SetLevel(const Level::type_t level);
+	void		NextLevel(void);
 
 	Level::type_t	Level(void) const;
-	secondary_t	Skill(void) const;
+	skill_t		Skill(void) const;
 
-	static secondary_t 	FromMP2(const u8 byte);
-	static secondary_t 	RandForWitchsHut(void);
+	static skill_t 	FromMP2(const u8 byte);
+	static skill_t 	RandForWitchsHut(void);
+	static const std::string & String(const skill_t skill);
+	static const std::string & Description(const skill_t skill, const Level::type_t level);
 
 	/* index sprite from SECSKILL */
-	static u8 GetIndexSprite1(const secondary_t skill);
+	static u8 GetIndexSprite1(const skill_t skill);
 
 	/* index sprite from MINISS */
-	static u8 GetIndexSprite2(const secondary_t skill);
+	static u8 GetIndexSprite2(const skill_t skill);
     };
 };
 

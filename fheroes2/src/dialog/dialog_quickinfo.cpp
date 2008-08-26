@@ -127,7 +127,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_WITCHSHUT:
 	    // addons pack
 	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
-		visit_status = "(" + Skill::String(world.SkillFromWitchsHut(tile.GetIndex())) + ")";
+		visit_status = "(" + Skill::Secondary::String(world.SkillFromWitchsHut(tile.GetIndex())) + ")";
 	    break;
 
         default: break;

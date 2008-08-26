@@ -24,6 +24,7 @@
 #include <vector>
 #include "gamedefs.h"
 #include "rect.h"
+#include "display.h"
 #include "background.h"
 
 namespace Font
@@ -41,15 +42,16 @@ class Text
 public:
     typedef enum { LEFT, CENTER, RIGHT } align_t;
 
+    Text(){};
     Text(const std::string & msg, Font::type_t ft);
-
-    void SetText(const std::string & msg){ message = msg; };
-    void SetFont(const Font::type_t & ft){ font = ft; };
 
     // with blit
     Text(const std::string & msg, Font::type_t ft, const Point & dst_pt);
     Text(const std::string & msg, Font::type_t ft, const Rect & dst_rt);
     Text(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
+
+    void SetText(const std::string & msg){ message = msg; };
+    void SetFont(const Font::type_t & ft){ font = ft; };
 
     u16 width(u16 start = 0, u16 count = 0xffff){ return Text::width(message, font, start, count); };
     u16 height(u16 width = 0){ return Text::height(message, font, width); };
@@ -57,8 +59,8 @@ public:
     static u16 width(const std::string &str, Font::type_t ft, u16 start = 0, u16 count = 0xffff);
     static u16 height(const std::string &str, Font::type_t ft, u16 width = 0);
 
-    void Blit(u16 ax, u16 ay);
-    void Blit(const Point & dst_pt);
+    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
+    void Blit(const Point & dst_pt, Surface & sf = Display::Get());
 
 private:
     Font::type_t font;
