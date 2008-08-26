@@ -36,6 +36,7 @@
 #include "engine.h"
 #include "cursor.h"
 #include "tools.h"
+#include "ai.h"
 
 #define OBSERVATIONTOWERSCOUTE 10
 
@@ -955,14 +956,14 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 	    }
 	    else
 	    {
-		// FIXME: select gold or exp
-		if(H2Config::MyColor() == GetColor())
-		{
-		    message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";
-		    Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
-		}
-		// FIXME: AI select gold or exp?
-		world.GetKingdom(GetColor()).AddFundsResource(resource);
+		const u16 expr = resource.gold - 500;
+		message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";
+
+		if((H2Config::MyColor() == GetColor() && Dialog::SelectGoldOrExp("Chest", message, resource.gold, expr)) ||
+			(H2Config::MyColor() != GetColor() && AI::SelectGoldOrExp(*this, resource.gold, expr)))
+		    world.GetKingdom(GetColor()).AddFundsResource(resource);
+		else
+		    IncreaseExperience(expr);
 	    }
 	}
 

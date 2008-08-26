@@ -75,27 +75,25 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     pos.x = box.GetArea().x + box.GetArea().w / 2 - sprite_frame.w() - 20;
     display.Blit(sprite_frame, pos);
     pos.x += 3;
-    pos.y += 3;
     Rect rect_image1(pos, sprite_skill1.w(), sprite_skill1.h());
-    display.Blit(sprite_skill1, pos);
+    display.Blit(sprite_skill1, pos.x, pos.y + 3);
     // text
     const std::string &name_skill1 = Skill::Secondary::String(sec1.Skill());
-    Text(name_skill1, Font::SMALL, pos.x + (sprite_skill1.w() - Text::width(name_skill1, Font::SMALL)) / 2, pos.y + 2);
+    Text(name_skill1, Font::SMALL, pos.x + (sprite_skill1.w() - Text::width(name_skill1, Font::SMALL)) / 2, pos.y + 5);
     const std::string &name_level1 = Skill::Level::String(sec1.Level());
-    Text(name_level1, Font::SMALL, pos.x + (sprite_skill1.w() - Text::width(name_level1, Font::SMALL)) / 2, pos.y + sprite_skill1.h() - 15);
+    Text(name_level1, Font::SMALL, pos.x + (sprite_skill1.w() - Text::width(name_level1, Font::SMALL)) / 2, pos.y + sprite_skill1.h() - 12);
 
     // sprite2
     pos.x = box.GetArea().x + box.GetArea().w / 2 + 20;
     display.Blit(sprite_frame, pos);
     pos.x += 3;
-    pos.y += 3;
     Rect rect_image2(pos, sprite_skill2.w(), sprite_skill2.h());
-    display.Blit(sprite_skill2, pos);
+    display.Blit(sprite_skill2, pos.x, pos.y + 3);
     // text
     const std::string &name_skill2 = Skill::Secondary::String(sec2.Skill());
-    Text(name_skill2, Font::SMALL, pos.x + (sprite_skill2.w() - Text::width(name_skill2, Font::SMALL)) / 2, pos.y + 2);
+    Text(name_skill2, Font::SMALL, pos.x + (sprite_skill2.w() - Text::width(name_skill2, Font::SMALL)) / 2, pos.y + 5);
     const std::string &name_level2 = Skill::Level::String(sec2.Level());
-    Text(name_level2, Font::SMALL, pos.x + (sprite_skill2.w() - Text::width(name_level2, Font::SMALL)) / 2, pos.y + sprite_skill2.h() - 15);
+    Text(name_level2, Font::SMALL, pos.x + (sprite_skill2.w() - Text::width(name_level2, Font::SMALL)) / 2, pos.y + sprite_skill2.h() - 12);
 
     button_learn1.Draw();
     button_learn2.Draw();

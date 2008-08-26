@@ -80,6 +80,8 @@ namespace Dialog
 
     // other info
     Skill::Secondary::skill_t LevelUpSelectSkill(const std::string &header, const Skill::Secondary & sec1, const Skill::Secondary & sec2);
+    bool SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr);
+
     void SpellInfo(const std::string &header, const std::string &message, const Spell::spell_t spell, const bool ok_button = true);
     void SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
     void SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
