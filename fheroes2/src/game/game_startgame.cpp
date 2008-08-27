@@ -1337,6 +1337,7 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
     		if(Game::Focus::HEROES == global_focus.Type()) {
 		    Spell::spell_t spell = global_focus.GetHeroes().SpellBook().Open(Spell::Book::ADVN, true);
 		    // TODO cast selected spell
+		    Error::Verbose("spell selected: " + Spell::String(spell));
 		}
 	    }
 	    else

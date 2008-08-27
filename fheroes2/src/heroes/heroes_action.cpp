@@ -272,6 +272,14 @@ void Heroes::ActionToHeroes(const u16 dst_index)
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: " + GetName() + " attack enemy hero " + other_hero->GetName());
 
+	switch(b)
+	{
+	    case Army::WIN: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result WIN"); break;
+	    case Army::LOSE: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result LOSE"); break;
+	    case Army::RETREAT: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result RETREAT"); break;
+	    case Army::SURRENDER: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result SURRENDER"); break;
+	}
+
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: FIXME: attack enemy hero");
     }
 }
