@@ -1479,3 +1479,42 @@ void Heroes::ApplyPenaltyMovement(void)
 {
     if(path.isValid()) move_point -= path.GetFrontPenalty();
 }
+
+/*  true if present monster */
+bool Heroes::HasMonster(const Monster::monster_t mon) const
+{
+    std::vector<Army::Troops>::const_iterator it1 = army.begin();
+    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    
+    for(; it1 != it2; it1++) if(mon == (*it1).Monster()) return true;
+
+    return false;
+}
+
+bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
+{
+    std::vector<Army::Troops>::iterator it1 = army.begin();
+    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    
+    for(; it1 != it2; it1++) if(mon == (*it1).Monster())
+    {
+	(*it1).SetCount((*it1).Count() + count);
+	if(H2Config::Debug()) Error::Verbose("Heroes::JoinTroops: monster: " + Monster::String(mon) + ", count: ", count);
+	return true;
+    }
+
+    it1 = army.begin();
+    if(HEROESMAXARMY > GetCountArmy())
+    {
+	for(; it1 != it2; it1++) if(Monster::UNKNOWN == (*it1).Monster())
+	{
+	    (*it1).SetMonster(mon);
+	    (*it1).SetCount(count);
+	    
+	    if(H2Config::Debug()) Error::Verbose("Heroes::JoinTroops: monster: " + Monster::String(mon) + ", count: ", count);
+	    return true;
+	}
+    }
+
+    return false;
+}

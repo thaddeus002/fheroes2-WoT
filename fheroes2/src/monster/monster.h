@@ -190,6 +190,7 @@ namespace Monster
     monster_t Monster(u8 num);
     monster_t Monster(Race::race_t race, u32 dwelling);
     monster_t Monster(const Maps::Tiles & tile);
+    monster_t Monster(const MP2::object_t obj);
 
     monster_t Rand(void);
     monster_t Rand1(void);

@@ -929,6 +929,50 @@ void World::LoadMaps(const std::string &filename)
 		Monster::ChangeTileWithRNDMonster(vec_tiles, ii);
 		break;
 
+    	    case MP2::OBJ_WATCHTOWER:
+            case MP2::OBJ_EXCAVATION:
+            case MP2::OBJ_CAVE:
+            case MP2::OBJ_TREEHOUSE:
+            case MP2::OBJ_ARCHERHOUSE:
+            case MP2::OBJ_GOBLINHUT:
+            case MP2::OBJ_DWARFCOTT:
+            case MP2::OBJ_HALFLINGHOLE:
+            case MP2::OBJ_PEASANTHUT:
+            case MP2::OBJ_THATCHEDHUT:
+		// initial update dwelling population
+		{
+		    const Monster::monster_t monster = Monster::Monster(tile.GetObject());
+		    if(Monster::UNKNOWN == monster) continue;
+
+		    // save count
+		    u32 count = 0;
+
+		    // dependence from level monster
+		    switch(Monster::GetLevel(monster))
+		    {
+			case Monster::LEVEL1:	count = 4 * Monster::GetGrown(monster); break;
+			case Monster::LEVEL2:	count = 2 * Monster::GetGrown(monster); break;
+			case Monster::LEVEL3:	count = Monster::GetGrown(monster); break;
+			case Monster::LEVEL4:	count = 2;
+			default: break;
+		    }
+
+		    // dependence from game difficulty
+		    switch(Settings::Get().GameDifficulty())
+		    {
+			case Difficulty::EASY:	count = count * 2;
+			case Difficulty::NORMAL:break;
+			case Difficulty::HARD:	count = static_cast<u32>(count / 1.5);
+			case Difficulty::EXPERT:count = static_cast<u32>(count / 2);
+			case Difficulty::IMPOSSIBLE:count = 0;
+		    }
+
+		    tile.SetQuantity1(count % 0xFF);
+		    tile.SetQuantity2(count / 0xFF);
+		}
+		break;
+
+	//
 	    default:
 		break;
 	}
@@ -1108,6 +1152,8 @@ void World::NewWeek(void)
     const Race::race_t & rc = Settings::Get().FileInfo().KingdomRace(Settings::Get().MyColor());
     free_recruit_hero1 = GetFreemanHeroes(rc)->GetHeroes();
     free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
+    
+    UpdateDwellingPopulation();
 }
 
 void World::NewMonth(void)
@@ -1427,5 +1473,40 @@ void World::ClearFog(const u8 color)
 	}
 
         if(scoute) Maps::ClearFog((*it1).first, scoute, color);
+    }
+}
+
+/* update population monster in dwelling */
+void World::UpdateDwellingPopulation(void)
+{
+    std::vector<Maps::Tiles *>::iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+    for(; it1 != it2; ++it1)
+    {
+	Maps::Tiles & tile = **it1;
+	const MP2::object_t & obj = tile.GetObject();
+	switch(obj)
+	{
+    	    case MP2::OBJ_WATCHTOWER:
+            case MP2::OBJ_EXCAVATION:
+            case MP2::OBJ_CAVE:
+            case MP2::OBJ_TREEHOUSE:
+            case MP2::OBJ_ARCHERHOUSE:
+            case MP2::OBJ_GOBLINHUT:
+            case MP2::OBJ_DWARFCOTT:
+            case MP2::OBJ_HALFLINGHOLE:
+            case MP2::OBJ_PEASANTHUT:
+            case MP2::OBJ_THATCHEDHUT: break;
+
+	    default: continue;
+	}
+	const Monster::monster_t monster = Monster::Monster(obj);
+	if(Monster::UNKNOWN == monster) continue;
+
+	// save count
+	u32 count = tile.GetQuantity2() * 0xFF + tile.GetQuantity1();
+	count += Monster::GetGrown(monster);
+	tile.SetQuantity1(count % 0xFF);
+	tile.SetQuantity2(count / 0xFF);
     }
 }

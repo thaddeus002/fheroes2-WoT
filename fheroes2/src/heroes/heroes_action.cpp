@@ -178,16 +178,29 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_DRAGONCITY:	ActionToCaptureObject(dst_index, MP2::OBJ_DRAGONCITY); break;
         case MP2::OBJ_ABANDONEDMINE:	ActionToCaptureObject(dst_index, MP2::OBJ_ABANDONEDMINE); break;
 
+	// accept army
+        case MP2::OBJ_WATCHTOWER:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_TREEHOUSE:
+	case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUT:
+        case MP2::OBJ_DWARFCOTT:
+        case MP2::OBJ_HALFLINGHOLE:
+	case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT:	ActionToAcceptArmy(dst_index); break;
+
+	// recruit army
+        case MP2::OBJ_RUINS:
+        case MP2::OBJ_TREECITY:
+        case MP2::OBJ_WAGONCAMP:
+        case MP2::OBJ_TROLLBRIDGE:
+	case MP2::OBJ_DESERTTENT:	ActionToRecruitArmy(dst_index); break;
+
         // object
         case MP2::OBJ_WATERMILL:
         case MP2::OBJ_WINDMILL:
 
-	case MP2::OBJ_ARCHERHOUSE:
-        case MP2::OBJ_GOBLINHUNT:
-        case MP2::OBJ_DWARFCOTT:
-	case MP2::OBJ_PEASANTHUNT:
-        case MP2::OBJ_PEASANTHUNT2:
-	case MP2::OBJ_DESERTTENT:
 
         case MP2::OBJ_SKELETON:
         case MP2::OBJ_DAEMONCAVE:
@@ -195,24 +208,15 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_OBELISK:
 	case MP2::OBJ_ORACLE:
 	case MP2::OBJ_DERELICTSHIP:
-        case MP2::OBJ_WAGONCAMP:
-        case MP2::OBJ_WATCHTOWER:
-        case MP2::OBJ_TREEHOUSE:
-        case MP2::OBJ_TREECITY:
-        case MP2::OBJ_RUINS:
         case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_HILLFORT:
-        case MP2::OBJ_HALFLINGHOLE:
         case MP2::OBJ_CRAKEDLAKE:
 	case MP2::OBJ_PIRAMID:
         case MP2::OBJ_CITYDEAD:
-        case MP2::OBJ_EXCAVATION:
         case MP2::OBJ_SPHINX:
         case MP2::OBJ_WAGON:
         case MP2::OBJ_ARTESIANSPRING:
-        case MP2::OBJ_TROLLBRIDGE:
         case MP2::OBJ_XANADU:
-        case MP2::OBJ_CAVE:
         case MP2::OBJ_LEANTO:
         case MP2::OBJ_MAGICGARDEN:
         case MP2::OBJ_FREEMANFOUNDRY:
@@ -1146,3 +1150,67 @@ void Heroes::ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj)
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCaptureObject: " + GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
 
+void Heroes::ActionToAcceptArmy(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+
+    switch(obj)
+    {
+        case MP2::OBJ_WATCHTOWER:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_TREEHOUSE:
+	case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUT:
+        case MP2::OBJ_DWARFCOTT:
+        case MP2::OBJ_HALFLINGHOLE:
+	case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT: break;
+	default: return;
+    }
+    const Monster::monster_t monster = Monster::Monster(obj);
+    const u32 count = tile.GetQuantity2() * 0xFF + tile.GetQuantity1();
+    const u32 army_size = GetCountArmy();
+    if(count)
+    {
+	if(((HEROESMAXARMY == army_size && HasMonster(monster)) ||
+		HEROESMAXARMY > army_size))
+	{
+	    // join
+	    const std::string message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you. Do you accept?";
+
+	    if(Dialog::YES == Dialog::Message(Monster::String(monster), message, Font::BIG, Dialog::YES|Dialog::NO))
+	    {
+	    	JoinTroops(monster, count);
+		tile.SetQuantity1(0);
+		tile.SetQuantity2(0);
+	    }
+	}
+	// is full
+	else
+	    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+    }
+    // is void
+    else
+	    Dialog::Message(Monster::String(monster), "As you approach the dwelling, you notice that there is no one here.", Font::BIG, Dialog::OK);
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToAcceptArmy: " + GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+}
+
+void Heroes::ActionToRecruitArmy(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+
+    switch(obj)
+    {
+        case MP2::OBJ_RUINS:
+        case MP2::OBJ_TREECITY:
+        case MP2::OBJ_WAGONCAMP:
+        case MP2::OBJ_TROLLBRIDGE:
+	case MP2::OBJ_DESERTTENT: break;
+	default: return;
+    }
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToRecruitArmy: " + GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+}

@@ -437,8 +437,8 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_GAZEBO:			return "Gazebo";
         case MP2::OBJN_ARCHERHOUSE:
         case MP2::OBJ_ARCHERHOUSE:		return "Archer House";
-        case MP2::OBJN_PEASANTHUNT:
-        case MP2::OBJ_PEASANTHUNT:		return "Peasant Hunt";
+        case MP2::OBJN_PEASANTHUT:
+        case MP2::OBJ_PEASANTHUT:		return "Peasant Hut";
         case MP2::OBJN_DWARFCOTT:
         case MP2::OBJ_DWARFCOTT:		return "Dwarf Cottadge";
         case MP2::OBJN_STONELIGHTS:
@@ -472,8 +472,8 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_CAMPFIRE:			return "Camp Fire";
         case MP2::OBJ_FOUNTAIN:			return "Fountain";
         case MP2::OBJ_ANCIENTLAMP:		return "Ancient Lamp";
-        case MP2::OBJ_GOBLINHUNT:		return "Goblin Hunt";
-        case MP2::OBJ_PEASANTHUNT2:		return "Peasant Hunt";
+        case MP2::OBJ_GOBLINHUT:		return "Goblin Hut";
+        case MP2::OBJ_THATCHEDHUT:		return "Thatched Hut";
         case MP2::OBJ_MONSTER:			return "Monster";
         case MP2::OBJ_RESOURCE:			return "Resource";
         case MP2::OBJ_WHIRLPOOL:		return "Whirlpool";
@@ -644,10 +644,10 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     	    case OBJ_ANCIENTLAMP:
     	    case OBJ_GRAVEYARD:
     	    case OBJ_ARCHERHOUSE:
-    	    case OBJ_GOBLINHUNT:
+    	    case OBJ_GOBLINHUT:
     	    case OBJ_DWARFCOTT:
-    	    case OBJ_PEASANTHUNT:
-    	    case OBJ_PEASANTHUNT2:
+    	    case OBJ_PEASANTHUT:
+    	    case OBJ_THATCHEDHUT:
     	    case OBJ_DRAGONCITY:
     	    case OBJ_LIGHTHOUSE:
     	    case OBJ_WATERMILL:

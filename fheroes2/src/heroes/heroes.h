@@ -117,6 +117,8 @@ public:
     const std::string & GetName(void) const{ return name; };
     const Point & GetCenter(void) const{ return mp; };
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
+    bool HasMonster(const Monster::monster_t mon) const;
+
     u8 GetCountArmy(void) const;
     const Spell::Book & SpellBook(void) const { return spell_book; };
 
@@ -205,6 +207,8 @@ public:
     bool spellCasted;
 
 protected:
+    bool JoinTroops(const Monster::monster_t, const u16 count);
+
     void ActionToCastle(const u16 dst_index);
     void ActionToHeroes(const u16 dst_index);
     void ActionToMonster(const u16 dst_index);
@@ -227,6 +231,8 @@ protected:
     void ActionToAncientLamp(const u16 dst_index);
     void ActionToTeleports(const u16 dst_index);
     void ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToAcceptArmy(const u16 dst_index);
+    void ActionToRecruitArmy(const u16 dst_index);
 
     void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
 

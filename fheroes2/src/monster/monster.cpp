@@ -793,3 +793,23 @@ u32 Monster::Dwelling(const monster_t monster)
 
     return 0;
 }
+
+Monster::monster_t Monster::Monster(const MP2::object_t obj)
+{
+    switch(obj)
+    {
+        case MP2::OBJ_WATCHTOWER:	return ORC;
+        case MP2::OBJ_EXCAVATION:	return SKELETON;
+        case MP2::OBJ_CAVE:		return CENTAUR;
+        case MP2::OBJ_TREEHOUSE:	return SPRITE;
+        case MP2::OBJ_ARCHERHOUSE:	return ARCHER;
+        case MP2::OBJ_GOBLINHUT:	return GOBLIN;
+        case MP2::OBJ_DWARFCOTT:	return DWARF;
+        case MP2::OBJ_HALFLINGHOLE:	return HALFLING;
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT: 	return PEASANT;
+    	default: break;
+    }
+
+    return UNKNOWN;
+}

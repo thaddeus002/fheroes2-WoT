@@ -123,7 +123,7 @@ void Game::EnvironmentSoundMixer(bool forced)
 			case MP2::OBJ_TRADINGPOST:	m82 = M82::LOOP0022; break;
 			//case MP2:::	m82 = M82::LOOP0023; break;
 			case MP2::OBJ_RUINS:		m82 = M82::LOOP0024; break;
-			case MP2::OBJ_PEASANTHUNT:
+			case MP2::OBJ_PEASANTHUT:
 			case MP2::OBJ_DWARFCOTT:
 			case MP2::OBJ_ARCHERHOUSE:	m82 = M82::LOOP0025; break;
 			//case MP2:::	m82 = M82::LOOP0026; break;

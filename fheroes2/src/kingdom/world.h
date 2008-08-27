@@ -111,6 +111,9 @@ public:
 
     u32 GetUniq(void){ return ++uniq0; };
 
+protected:
+    void UpdateDwellingPopulation(void);
+
 private:
     World() : Size(0, 0), width(Size::w), height(Size::h) {};
 
