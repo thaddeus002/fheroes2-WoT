@@ -30,6 +30,8 @@ namespace AI
 {
     Skill::Secondary::skill_t SelectSkill(const Heroes & hero, const Skill::Secondary & sec1, const Skill::Secondary & sec2);
     bool SelectGoldOrExp(const Heroes & hero, const u16 gold, const u16 expr);
+    bool JoinTroops(const Heroes & hero, const u16 monster, const u16 count);
+    u16  RecruitTroops(const Heroes & hero, const u16 monster, const u16 count);
 };
 
 #endif

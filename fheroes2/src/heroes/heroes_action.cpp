@@ -189,7 +189,7 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_DWARFCOTT:
         case MP2::OBJ_HALFLINGHOLE:
 	case MP2::OBJ_PEASANTHUT:
-        case MP2::OBJ_THATCHEDHUT:	ActionToAcceptArmy(dst_index); break;
+        case MP2::OBJ_THATCHEDHUT:	ActionToJoinArmy(dst_index); break;
 
 	// recruit army
         case MP2::OBJ_RUINS:
@@ -398,6 +398,9 @@ void Heroes::ActionToResource(const u16 dst_index)
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
 	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
+	// redraw status info
+	Game::StatusWindow::Get().Redraw();
+
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
     }
 }
@@ -444,6 +447,9 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 	// remove shadow from left cell
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
 	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+
+	// redraw status info
+	Game::StatusWindow::Get().Redraw();
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: "  + GetName() + ": " + MP2::StringObject(obj));
     }
@@ -649,6 +655,9 @@ void Heroes::ActionToMagicWell(const u16 dst_index)
 void Heroes::ActionToTradingPost(const u16 dst_index)
 {
     if(H2Config::MyColor() == GetColor()) Dialog::Marketplace();
+
+    // redraw status info
+    Game::StatusWindow::Get().Redraw();
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTradingPost: " + GetName());
 }
@@ -987,6 +996,9 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 	if(Maps::isValidDirection(dst_index, Direction::LEFT))
 	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 
+	// redraw status info
+	Game::StatusWindow::Get().Redraw();
+
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
     }
 }
@@ -1001,19 +1013,49 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
     {
 	const u32 uniq = addon->uniq;
 
-	PlayPickupSound();
-	AnimationRemoveObject(tile);
+	const u32 count = Rand::Get(2, 4);
+	const u32 army_size = GetCountArmy();
 
-	// dialog
-	// message: You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?
-	//if(H2Config::MyColor() == GetColor()) Dialog::BuyMonster(Monster::GENIE);
+	if(((HEROESMAXARMY == army_size && HasMonster(Monster::GENIE)) || HEROESMAXARMY > army_size))
+	{
+	    const std::string message("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?");
+	    if(H2Config::MyColor() != GetColor())
+	    {
+		AI::RecruitTroops(*this, Monster::GENIE, count);
 
-	tile.Remove(uniq);
-	tile.SetObject(MP2::OBJ_ZERO);
+		// post tile action
+		tile.Remove(uniq);
+		tile.SetObject(MP2::OBJ_ZERO);
 
-	// remove shadow from left cell
-	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+		// remove shadow from left cell
+		if(Maps::isValidDirection(dst_index, Direction::LEFT))
+			world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+	    }
+	    else
+	    // recruit
+	    if(Dialog::YES == Dialog::Message(Monster::String(Monster::GENIE), message, Font::BIG, Dialog::YES|Dialog::NO))
+	    {
+		PlayPickupSound();
+		AnimationRemoveObject(tile);
+
+		const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
+		if(recruit) JoinTroops(Monster::GENIE, recruit);
+
+		// post tile action
+		tile.Remove(uniq);
+		tile.SetObject(MP2::OBJ_ZERO);
+
+		// remove shadow from left cell
+		if(Maps::isValidDirection(dst_index, Direction::LEFT))
+			world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+
+		// redraw status info
+		Game::StatusWindow::Get().Redraw();
+	    }
+	}
+	// is full
+	else
+		Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
     }
@@ -1151,7 +1193,7 @@ void Heroes::ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj)
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCaptureObject: " + GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
 
-void Heroes::ActionToAcceptArmy(const u16 dst_index)
+void Heroes::ActionToJoinArmy(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
@@ -1181,6 +1223,12 @@ void Heroes::ActionToAcceptArmy(const u16 dst_index)
 	    // join
 	    const std::string & message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you. Do you accept?";
 
+	    if(H2Config::MyColor() != GetColor() && AI::JoinTroops(*this, monster, count))
+	    {
+		tile.SetQuantity1(0);
+		tile.SetQuantity2(0);
+	    }
+	    else
 	    if(Dialog::YES == Dialog::Message(Monster::String(monster), message, Font::BIG, Dialog::YES|Dialog::NO))
 	    {
 	    	JoinTroops(monster, count);
@@ -1193,10 +1241,12 @@ void Heroes::ActionToAcceptArmy(const u16 dst_index)
 	}
 	// is full
 	else
+	if(H2Config::MyColor() == GetColor())
 	    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
     }
     // is void
     else
+    if(H2Config::MyColor() == GetColor())
 	    Dialog::Message(Monster::String(monster), "As you approach the dwelling, you notice that there is no one here.", Font::BIG, Dialog::OK);
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToAcceptArmy: " + GetName() + ", object: " + std::string(MP2::StringObject(obj)));
@@ -1246,28 +1296,38 @@ void Heroes::ActionToRecruitArmy(const u16 dst_index)
 
     if(count)
     {
-	if(((HEROESMAXARMY == army_size && HasMonster(monster)) ||
-		HEROESMAXARMY > army_size) &&
-		Dialog::YES == Dialog::Message(Monster::String(monster), msg_full, Font::BIG, Dialog::YES|Dialog::NO))
+	if(((HEROESMAXARMY == army_size && HasMonster(monster)) || HEROESMAXARMY > army_size))
 	{
-	    // recruit
-	    const u16 recruit = Dialog::RecruitMonster(monster, count);
-	    if(recruit)
+	    if(H2Config::MyColor() != GetColor())
 	    {
-	    	JoinTroops(monster, recruit);
+		const u16 recruit = AI::RecruitTroops(*this, monster, count);
 		tile.SetQuantity1((count - recruit) % 0xFF);
 		tile.SetQuantity2((count - recruit) / 0xFF);
+	    }
+	    else
+	    if(Dialog::YES == Dialog::Message(Monster::String(monster), msg_full, Font::BIG, Dialog::YES|Dialog::NO))
+	    {
+		// recruit
+		const u16 recruit = Dialog::RecruitMonster(monster, count);
+		if(recruit)
+		{
+	    	    JoinTroops(monster, recruit);
+		    tile.SetQuantity1((count - recruit) % 0xFF);
+		    tile.SetQuantity2((count - recruit) / 0xFF);
 
-		// redraw status info
-		Game::StatusWindow::Get().Redraw();
+		    // redraw status info
+		    Game::StatusWindow::Get().Redraw();
+		}
 	    }
 	}
 	// is full
 	else
+	if(H2Config::MyColor() == GetColor())
 	    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
     }
     // is void
     else
+	if(H2Config::MyColor() == GetColor())
 	    Dialog::Message(Monster::String(monster), msg_void, Font::BIG, Dialog::OK);
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToRecruitArmy: " + GetName() + ", object: " + std::string(MP2::StringObject(obj)));

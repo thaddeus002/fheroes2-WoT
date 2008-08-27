@@ -815,6 +815,8 @@ Monster::monster_t Monster::Monster(const MP2::object_t obj)
         case MP2::OBJ_TROLLBRIDGE:	return TROLL;
         case MP2::OBJ_DESERTTENT:	return NOMAD;
 
+        case MP2::OBJ_ANCIENTLAMP:	return GENIE;
+
         default: break;
     }
 

@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "rand.h"
+#include "monster.h"
 #include "heroes.h"
 #include "ai.h"
 
@@ -31,4 +32,26 @@ bool AI::SelectGoldOrExp(const Heroes & hero, const u16 gold, const u16 expr)
 {
     // FIXME: AI::SelectGoldOrExp: always select gold
     return true;
+}
+
+bool AI::JoinTroops(const Heroes & hero, const u16 monster, const u16 count)
+{
+    // FIXME: AI::JoinTroops
+    switch(monster)
+    {
+	default: break;
+    }
+
+    return false;
+}
+
+u16  AI::RecruitTroops(const Heroes & hero, const u16 monster, const u16 count)
+{
+    // FIXME: AI::RecruitTroops
+    switch(monster)
+    {
+	default: break;
+    }
+
+    return 0;
 }

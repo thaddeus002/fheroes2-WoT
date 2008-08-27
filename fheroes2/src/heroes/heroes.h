@@ -231,7 +231,7 @@ protected:
     void ActionToAncientLamp(const u16 dst_index);
     void ActionToTeleports(const u16 dst_index);
     void ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj);
-    void ActionToAcceptArmy(const u16 dst_index);
+    void ActionToJoinArmy(const u16 dst_index);
     void ActionToRecruitArmy(const u16 dst_index);
 
     void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
