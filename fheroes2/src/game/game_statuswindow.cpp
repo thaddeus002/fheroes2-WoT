@@ -32,10 +32,21 @@
 #include "game_focus.h"
 #include "game_statuswindow.h"
 
-Game::StatusWindow::StatusWindow(const Point &pt)
-    : ston(AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0)), 
-      pos(pt, ston.w(), ston.h()), state(Game::StatusWindow::DAY)
+Game::StatusWindow::StatusWindow() : state(Game::StatusWindow::DAY)
 {
+}
+
+Game::StatusWindow & Game::StatusWindow::Get(void)
+{
+    static Game::StatusWindow wstatus;
+
+    return wstatus;
+}
+
+void Game::StatusWindow::SetPos(const Point &pt)
+{
+    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    pos = Rect(pt, ston.w(), ston.h());
 }
 
 const Rect & Game::StatusWindow::GetRect(void) const
@@ -74,6 +85,7 @@ void Game::StatusWindow::DrawKingdomInfo(void)
     Kingdom & myKingdom = world.GetMyKingdom();
 
     Display & display = Display::Get();
+    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     // restore background
     display.Blit(ston, pos.x, pos.y);
@@ -123,6 +135,7 @@ void Game::StatusWindow::DrawDayInfo(void)
     std::string message;
 
     Display & display = Display::Get();
+    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     // restore background
     display.Blit(ston, pos.x, pos.y);
@@ -150,7 +163,8 @@ void Game::StatusWindow::DrawArmyInfo(void)
     const std::vector<Army::Troops> & armies = focus.GetHeroes().GetArmy();
 
     Display & display = Display::Get();
-    
+    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+
     // restore background
     display.Blit(ston, pos.x, pos.y);
     
@@ -236,6 +250,7 @@ void Game::StatusWindow::DrawArmyInfo(void)
 void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
 {
     Display & display = Display::Get();
+    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     // restore background
     display.Blit(ston, pos.x, pos.y);

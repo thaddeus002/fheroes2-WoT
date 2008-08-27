@@ -808,7 +808,14 @@ Monster::monster_t Monster::Monster(const MP2::object_t obj)
         case MP2::OBJ_HALFLINGHOLE:	return HALFLING;
         case MP2::OBJ_PEASANTHUT:
         case MP2::OBJ_THATCHEDHUT: 	return PEASANT;
-    	default: break;
+
+	case MP2::OBJ_RUINS:		return MEDUSA;
+        case MP2::OBJ_TREECITY:		return SPRITE;
+        case MP2::OBJ_WAGONCAMP:	return ROGUE;
+        case MP2::OBJ_TROLLBRIDGE:	return TROLL;
+        case MP2::OBJ_DESERTTENT:	return NOMAD;
+
+        default: break;
     }
 
     return UNKNOWN;

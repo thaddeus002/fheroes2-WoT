@@ -31,6 +31,7 @@
 #include "rand.h"
 #include "m82.h"
 #include "game_focus.h"
+#include "game_statuswindow.h"
 #include "gamearea.h"
 #include "sprite.h"
 #include "engine.h"
@@ -1178,13 +1179,16 @@ void Heroes::ActionToAcceptArmy(const u16 dst_index)
 		HEROESMAXARMY > army_size))
 	{
 	    // join
-	    const std::string message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you. Do you accept?";
+	    const std::string & message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you. Do you accept?";
 
 	    if(Dialog::YES == Dialog::Message(Monster::String(monster), message, Font::BIG, Dialog::YES|Dialog::NO))
 	    {
 	    	JoinTroops(monster, count);
 		tile.SetQuantity1(0);
 		tile.SetQuantity2(0);
+
+		// redraw status info
+		Game::StatusWindow::Get().Redraw();
 	    }
 	}
 	// is full
@@ -1202,15 +1206,69 @@ void Heroes::ActionToRecruitArmy(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
+    
+    std::string msg_full, msg_void, msg_attk;
 
     switch(obj)
     {
         case MP2::OBJ_RUINS:
+    	    msg_void = "You search the ruins, but the Medusas that used to live here are gone. Perhaps there will be more next week.";
+    	    msg_full = "You've found some Medusas living in the ruins. They are willing to join your army for a price. Do you want to recruit Medusas?";
+    	    break;
+
         case MP2::OBJ_TREECITY:
+    	    msg_void = "You've found a Sprite Tree City. Unfortunately, none of the Sprites living there wish to join an army. Maybe next week.";
+    	    msg_full = "Some of the Sprites living in the tree city are willing to join your army for a price. Do you want to recruit Sprites?";
+    	    break;
+  
         case MP2::OBJ_WAGONCAMP:
+    	    msg_void = "A colorful Rogues' wagon stands empty here. Perhaps more Rogues will be here later.";
+    	    msg_full = "Distant sounds of music and laughter draw you to a colorful wagon housing Rogues. Do you wish to have any Rogues join your army?";
+    	    break;
+
         case MP2::OBJ_TROLLBRIDGE:
-	case MP2::OBJ_DESERTTENT: break;
+    	    msg_void = "You've found one of those bridges that Trolls are so fond of living under, but there are none here. Perhaps there will be some next week.";
+    	    msg_full = "Some Trolls living under a bridge are willing to join your army, but for a price. Do you want to recruit Trolls?";
+	    // UNKNOWN MESS: "A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries. Do you want to buy any Trolls?";
+    	    msg_attk = "Trolls living under the bridge challenge you. Will you fight them?";
+    	    break;
+
+	case MP2::OBJ_DESERTTENT:
+    	    msg_void = "A group of tattered tents, billowing in the sandy wind, beckons you. The tents are unoccupied. Perhaps more Nomads will be here later.";
+    	    msg_full = "A group of tattered tents, billowing in the sandy wind, beckons you. Do you wish to have any Nomads join you during your travels?";
+    	    break;
+
 	default: return;
     }
+    const Monster::monster_t monster = Monster::Monster(obj);
+    const u32 count = tile.GetQuantity2() * 0xFF + tile.GetQuantity1();
+    const u32 army_size = GetCountArmy();
+
+    if(count)
+    {
+	if(((HEROESMAXARMY == army_size && HasMonster(monster)) ||
+		HEROESMAXARMY > army_size) &&
+		Dialog::YES == Dialog::Message(Monster::String(monster), msg_full, Font::BIG, Dialog::YES|Dialog::NO))
+	{
+	    // recruit
+	    const u16 recruit = Dialog::RecruitMonster(monster, count);
+	    if(recruit)
+	    {
+	    	JoinTroops(monster, recruit);
+		tile.SetQuantity1((count - recruit) % 0xFF);
+		tile.SetQuantity2((count - recruit) / 0xFF);
+
+		// redraw status info
+		Game::StatusWindow::Get().Redraw();
+	    }
+	}
+	// is full
+	else
+	    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+    }
+    // is void
+    else
+	    Dialog::Message(Monster::String(monster), msg_void, Font::BIG, Dialog::OK);
+
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToRecruitArmy: " + GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }

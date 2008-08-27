@@ -79,7 +79,6 @@
 #include "game.h"
 #include "visit.h"
 
-namespace Game { class StatusWindow; };
 class Castle;
 class Heroes;
 
@@ -121,7 +120,7 @@ public:
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);
     
-    void AITurns(const Game::StatusWindow & status);
+    void AITurns(void);
     void ActionNewDay(void);
     void ActionNewWeek(void);
     void ActionNewMonth(void);

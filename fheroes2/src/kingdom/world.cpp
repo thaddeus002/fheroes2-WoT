@@ -929,6 +929,7 @@ void World::LoadMaps(const std::string &filename)
 		Monster::ChangeTileWithRNDMonster(vec_tiles, ii);
 		break;
 
+	    // join dwelling
     	    case MP2::OBJ_WATCHTOWER:
             case MP2::OBJ_EXCAVATION:
             case MP2::OBJ_CAVE:
@@ -939,6 +940,12 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_HALFLINGHOLE:
             case MP2::OBJ_PEASANTHUT:
             case MP2::OBJ_THATCHEDHUT:
+	    // recruit dwelling
+	    case MP2::OBJ_RUINS:
+            case MP2::OBJ_TREECITY:
+            case MP2::OBJ_WAGONCAMP:
+            case MP2::OBJ_TROLLBRIDGE:
+            case MP2::OBJ_DESERTTENT:
 		// initial update dwelling population
 		{
 		    const Monster::monster_t monster = Monster::Monster(tile.GetObject());

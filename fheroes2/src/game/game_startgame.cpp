@@ -50,7 +50,7 @@ namespace Game
     void FocusToCastle(Castle *castle);
     void FocusToHeroes(Heroes *hero);
     void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
-    Game::menu_t HumanTurn(StatusWindow & statusWindow, bool message);
+    Game::menu_t HumanTurn(bool message);
 };
 
 Button *_buttonScrollHeroesUp;
@@ -200,7 +200,8 @@ Game::menu_t Game::StartGame(void)
     global_focus.Reset();
 
     // status window
-    Game::StatusWindow statusWindow(pt_stw);
+    Game::StatusWindow & statusWindow = Game::StatusWindow::Get();
+    statusWindow.SetPos(pt_stw);
     statusWindow.Redraw();
 
     buttonScrollHeroesUp.Draw();
@@ -241,7 +242,7 @@ Game::menu_t Game::StartGame(void)
 		    statusWindow.SetState(Game::StatusWindow::DAY);
 		    statusWindow.Redraw();
 
-		    m = HumanTurn(statusWindow, humans > 1);
+		    m = HumanTurn(humans > 1);
 
 		    cursor.Hide();
 		    mixer.Reduce();
@@ -253,7 +254,7 @@ Game::menu_t Game::StartGame(void)
 		    cursor.Show();
 	            display.Flip();
 
-		    kingdom.AITurns(statusWindow);
+		    kingdom.AITurns();
 		    cursor.Hide();
 	            // TODO network game
 		    break;
@@ -262,7 +263,7 @@ Game::menu_t Game::StartGame(void)
 		    cursor.Show();
 	            display.Flip();
 
-		    kingdom.AITurns(statusWindow);
+		    kingdom.AITurns();
 		    cursor.Hide();
 		    break;
 		default:
@@ -697,11 +698,12 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     }
 }
 
-Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
+Game::menu_t Game::HumanTurn(bool message)
 {
     Game::Focus & global_focus = Focus::Get();
     Radar & radar = Radar::Get();
     GameArea & gamearea = GameArea::Get();
+    Game::StatusWindow & statusWindow = Game::StatusWindow::Get();
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();

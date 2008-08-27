@@ -38,8 +38,9 @@ class StatusWindow
 public:
     typedef enum { DAY, FUNDS, ARMY } info_t;
 
-    StatusWindow(const Point &pt);
+    static StatusWindow & Get(void);
 
+    void SetPos(const Point &pt);
     const Rect & GetRect(void) const;
     
     void Redraw(void);
@@ -49,12 +50,12 @@ public:
     void RedrawAITurns(Color::color_t color, u8 progress) const;
 
 private:
+    StatusWindow();
     void DrawKingdomInfo(void);
     void DrawDayInfo(void);
     void DrawArmyInfo(void);
 
-    const Surface & ston;
-    const Rect pos;
+    Rect pos;
 
     info_t state;
 };

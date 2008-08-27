@@ -83,8 +83,10 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
     }
 }
 
-void Kingdom::AITurns(const Game::StatusWindow & status)
+void Kingdom::AITurns(void)
 {
+    Game::StatusWindow & status = Game::StatusWindow::Get();
+
     status.RedrawAITurns(color, 0);
     status.RedrawAITurns(color, 1);
     status.RedrawAITurns(color, 2);
