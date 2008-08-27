@@ -7,6 +7,11 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 - libSDL
 - Lua 5.1 or above (for building only)
 
+Build environment:
+DEBUG		- build in debug mode
+RELEASE		- build with addons extensions
+SCRIPTING	- build with lua support
+
 SDL libraries can be found at http://www.libsdl.org .
 Lua libraries can be found at http://www.lua.org .
 
@@ -29,7 +34,7 @@ Default config fheroes2.cfg options:
 # music: on off
 # music = off
 #
-# video mode (640x480, 800x600, 1024x768, 1280x1024)
+# video mode (640x480, 800x600, 1024x768, 1280x1024 or other)
 # videomode = 640x480
 #
 # fullscreen: on off (F4 switch)

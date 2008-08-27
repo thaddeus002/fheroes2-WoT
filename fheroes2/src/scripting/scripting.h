@@ -20,6 +20,8 @@
 #ifndef SCRIPTING_H
 #define SCRIPTING_H
 
+#ifdef WITH_LUA
+
 #include <lua.hpp>
 #include <map>
 
@@ -47,5 +49,7 @@ namespace Lua
     void RegisterCommonFunc();
 
 };
+
+#endif
 
 #endif

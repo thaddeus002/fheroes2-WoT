@@ -22,6 +22,8 @@
 #include "scripting.h"
 #include "dialog.h"
 
+#ifdef WITH_LUA
+
 #define MAXARG 4
 
 typedef struct {
@@ -284,4 +286,6 @@ int Callback(lua_State* st)
   }
   return 0;
 }
+
+#endif
 

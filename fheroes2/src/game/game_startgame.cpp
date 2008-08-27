@@ -1323,10 +1323,12 @@ Game::menu_t Game::HumanTurn(StatusWindow & statusWindow, bool message)
 	    // click Kingdom Summary
 	    if(le.MouseClickLeft(buttonKingdom))
 	    {
+#ifdef WITH_LUA
 	        Lua::DoString("alert()");
 	        Lua::DoString("alert1('test')");
 	        Lua::DoString("msg('header', 'text')");
 	        Lua::DoString("message('header', 'text', 0, 2)");
+#endif
 	    }
 	    else
 	    // click Cast Spell
