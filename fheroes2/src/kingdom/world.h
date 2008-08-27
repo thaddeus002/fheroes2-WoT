@@ -109,7 +109,7 @@ public:
 
     void ClearFog(const u8 color);
 
-    u32 GetUniq(void){ return ++uniq0; };
+    static u32 GetUniq(void){ return ++uniq0; };
 
 protected:
     void UpdateDwellingPopulation(void);

@@ -22,6 +22,7 @@
 #define H2OBJECT_H
 
 #include "mp2.h"
+#include "world.h"
 #include "gamedefs.h"
 
 class Object
@@ -34,8 +35,6 @@ class Object
 	const u32		id;
 
     private:
-
-	static u32	uniq;
 };
 
 #endif

@@ -1151,8 +1151,8 @@ void Castle::RedrawResourcePanel(void)
     const Resource::funds_t & resource = world.GetMyKingdom().GetFundsResource();
 
     Point dst_pt;
-    dst_pt.x = Display::SMALL == display.w() ? 0 : (display.w() - (640 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH + SHADOWWIDTH;
-    dst_pt.y = Display::SMALL == display.w() ? 0 : (display.h() - (480 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH;
+    dst_pt.x = 640 == display.w() ? 0 : (display.w() - (640 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH + SHADOWWIDTH;
+    dst_pt.y = 640 == display.w() ? 0 : (display.h() - (480 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH;
 
     Rect src_rt(dst_pt.x + 552, dst_pt.y + 262, 82, 192);
     display.FillRect(0, 0, 0, src_rt);

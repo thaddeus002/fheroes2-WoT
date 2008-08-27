@@ -79,6 +79,17 @@ Resource::funds_t::funds_t(const u8 obj) : wood(0), mercury(0), ore(0), sulfur(0
 	    }
 	    break;
 
+ 	case MP2::OBJ_FLOTSAM:
+	    // 25% 500g + 10 wood, 25% 200g + 5 wood, 25% 5 wood, 25% nothing
+	    switch(Rand::Get(1, 4))
+	    {
+    		case 1: wood = 10; gold = 500; break;
+    		case 2: wood =  5; gold = 200; break;
+    		case 3: wood =  5; break;
+    		default: break;
+	    }
+	    break;
+
 	default: break;
     }
 }

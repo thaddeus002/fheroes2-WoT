@@ -18,12 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "world.h"
 #include "object.h"
 
-u32 Object::uniq = 0;
-
 Object::Object(const MP2::object_t obj, const u32 uid)
-    : object(obj), id(uid ? uid : ++uniq)
+    : object(obj), id(uid ? uid : World::GetUniq())
 {
 }
 

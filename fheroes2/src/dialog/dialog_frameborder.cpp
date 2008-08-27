@@ -36,13 +36,13 @@ Dialog::FrameBorder::FrameBorder()
     
     Rect pos;
 
-    pos.x = Display::SMALL == display.w() ? 0 : (display.w() - FRAMEBORDER_WIDTH) / 2;
-    pos.y = Display::SMALL == display.w() ? 0 : (display.h() - FRAMEBORDER_HEIGHT) / 2;
-    pos.w = Display::SMALL == display.w() ? 640 : FRAMEBORDER_WIDTH;
-    pos.h = Display::SMALL == display.w() ? 480 : FRAMEBORDER_HEIGHT;
+    pos.x = 640 == display.w() ? 0 : (display.w() - FRAMEBORDER_WIDTH) / 2;
+    pos.y = 640 == display.w() ? 0 : (display.h() - FRAMEBORDER_HEIGHT) / 2;
+    pos.w = 640 == display.w() ? 640 : FRAMEBORDER_WIDTH;
+    pos.h = 640 == display.w() ? 480 : FRAMEBORDER_HEIGHT;
 
-    area.x = Display::SMALL == display.w() ? 0 : pos.x + BORDERWIDTH + SHADOWWIDTH;
-    area.y = Display::SMALL == display.w() ? 0 : pos.y + BORDERWIDTH;
+    area.x = 640 == display.w() ? 0 : pos.x + BORDERWIDTH + SHADOWWIDTH;
+    area.y = 640 == display.w() ? 0 : pos.y + BORDERWIDTH;
     area.w = 640;
     area.h = 480;
 
@@ -53,7 +53,7 @@ Dialog::FrameBorder::FrameBorder()
 
     back.Save(pos);
 
-    if(Display::SMALL != display.w())
+    if(640 != display.w())
     {
 	Rect  src_rt;
 	Point dst_pt;

@@ -219,18 +219,18 @@ protected:
     void ActionToArtifact(const u16 dst_index);
     void ActionToShrine(const u16 dst_index);
     void ActionToWitchsHut(const u16 dst_index);
-    void ActionToLuckObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToLuckObject(const u16 dst_index);
     void ActionToSign(const u16 dst_index);
     void ActionToBottle(const u16 dst_index);
     void ActionToMagicWell(const u16 dst_index);
     void ActionToTradingPost(const u16 dst_index);
-    void ActionToPrimarySkillObject(const u16 dst_index, const MP2::object_t obj);
-    void ActionToMoraleObject(const u16 dst_index, const MP2::object_t obj);
-    void ActionToExperienceObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToPrimarySkillObject(const u16 dst_index);
+    void ActionToMoraleObject(const u16 dst_index);
+    void ActionToExperienceObject(const u16 dst_index);
     void ActionToTreasureChest(const u16 dst_index);
     void ActionToAncientLamp(const u16 dst_index);
     void ActionToTeleports(const u16 dst_index);
-    void ActionToCaptureObject(const u16 dst_index, const MP2::object_t obj);
+    void ActionToCaptureObject(const u16 dst_index);
     void ActionToJoinArmy(const u16 dst_index);
     void ActionToRecruitArmy(const u16 dst_index);
 

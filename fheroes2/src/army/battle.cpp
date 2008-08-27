@@ -1825,7 +1825,7 @@ std::vector<Point> *Army::FindPath(const Point& start, const Point &end, int mov
 		if(p.y%2 && d.y && d.x>0) continue;
 		if(!(p.y%2) && d.y && d.x<0) continue;
 		if(tmpath = FindPath(p+d, end, moves-1, army1, army2, skip, wide, reflect),tmpath) {
-		    if(length < 0 || static_cast<unsigned int>(length) > tmpath->size()) {
+		    if(length < 0 || length > static_cast<int>(tmpath->size())) {
 			length = tmpath->size();
 			tmpath->push_back(p+d);
 			path = tmpath;
