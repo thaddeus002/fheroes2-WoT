@@ -849,7 +849,18 @@ void Heroes::ActionToExperienceObject(const u16 dst_index)
     SetVisited(dst_index);
 
     AGG::PlaySound(M82::EXPERNCE);
-    if(H2Config::MyColor() == GetColor()) Dialog::ExperienceInfo(header, body_true, exp);
+    if(H2Config::MyColor() == GetColor())
+    {
+	std::string count;
+	String::AddInt(count, exp);
+	const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
+	Surface image(sprite.w(), sprite.h() + 12);
+	image.SetColorKey();
+	image.Blit(sprite);
+	Text text(count, Font::SMALL);
+	text.Blit((sprite.w() - Text::width(count, Font::SMALL)) / 2, sprite.h() + 2, image);
+	Dialog::SpriteInfo(header, body_true, image);
+    }
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToExperienceObject: " + GetName());
 
