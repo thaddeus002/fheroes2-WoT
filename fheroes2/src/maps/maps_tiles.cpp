@@ -34,6 +34,7 @@
 #include "gamearea.h"
 #include "game_focus.h"
 #include "display.h"
+#include "object.h"
 #include "maps_tiles.h"
 
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
@@ -65,13 +66,10 @@ bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const M
 
 u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
 {
-    switch(ta.object)
+    switch(MP2::GetICNObject(ta.object))
     {
 	// castle and tower (gate)
-    	case 0x8C:
-	case 0x8D:
-	case 0x8E:
-	case 0x8F:
+	case ICN::OBJNTOWN:
 	    return (13 == ta.index ||
 		    29 == ta.index ||
 	    	    45 == ta.index ||
@@ -86,10 +84,7 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
 	    	    189 == ta.index ? Direction::TOP | Direction::BOTTOM : 0);
 
 	// castle lands (gate)
-        case 0x90:
-	case 0x91:
-	case 0x92:
-	case 0x93:
+        case ICN::OBJNTWBA:
 	    return ( 7 == ta.index ||
 		    17 == ta.index ||
 		    27 == ta.index ||
@@ -100,10 +95,7 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
 		    77 == ta.index ? Direction::TOP | Direction::BOTTOM : 0);
 
 	// from sprite road
-	case 0x78:
-	case 0x79:
-	case 0x7A:
-	case 0x7B:
+	case ICN::ROAD:
 	    if(0  == ta.index ||
 	       4  == ta.index ||
 	       5  == ta.index ||
@@ -845,6 +837,9 @@ bool Maps::Tiles::isPassable(void) const
 	    default: break;
 	}
 
+	// extra check object
+	if(Object::isPassable(general, addons_level1)) return true;
+
 	return false;
     }
 
@@ -884,8 +879,7 @@ Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
 	{
 	    TilesAddon & addon = *it1;
 
-	    // OBJNWAT
-	    if(0xC7 < addon.object && 0xCC > addon.object && 
+	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && 
 		(0 == addon.index ||	// buttle
 		19 == addon.index ||	// chest
 		45 == addon.index ||	// flotsam
@@ -909,7 +903,7 @@ Maps::TilesAddon * Maps::Tiles::FindResource(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNRSRC
-	    if(0xB7 < addon.object && 0xBC > addon.object && (addon.index % 2)) return &addon;
+	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && (addon.index % 2)) return &addon;
 	}
     }
 
@@ -928,7 +922,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDResource(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNRSRC
-	    if(0xB7 < addon.object && 0xBC > addon.object && 17 == addon.index) return &addon;
+	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && 17 == addon.index) return &addon;
 	}
     }
 
@@ -947,7 +941,7 @@ Maps::TilesAddon * Maps::Tiles::FindArtifact(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNARTI
-	    if(0x2B < addon.object && 0x30 > addon.object && (addon.index % 2)) return &addon;
+	    if(ICN::OBJNARTI == MP2::GetICNObject(addon.object) && (addon.index % 2)) return &addon;
 	}
     }
 
@@ -976,7 +970,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDArtifact(const u8 level)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNARTI
-	    if(0x2B < addon.object && 0x30 > addon.object && index == addon.index) return &addon;
+	    if(ICN::OBJNARTI == MP2::GetICNObject(addon.object) && index == addon.index) return &addon;
 	}
     }
 
@@ -995,7 +989,7 @@ Maps::TilesAddon * Maps::Tiles::FindUltimateArtifact(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNARTI
-	    if(0x2B < addon.object && 0x30 > addon.object && 0xA4 == addon.index) return &addon;
+	    if(ICN::OBJNARTI == MP2::GetICNObject(addon.object) && 0xA4 == addon.index) return &addon;
 	}
     }
 
@@ -1014,7 +1008,7 @@ Maps::TilesAddon * Maps::Tiles::FindMiniHero(void)
 	    TilesAddon & addon = *it1;
 
 	    // MINIHERO
-	    if(0x53 < addon.object && 0x58 > addon.object) return &addon;
+	    if(ICN::MINIHERO == MP2::GetICNObject(addon.object)) return &addon;
 	}
     }
 
@@ -1033,7 +1027,7 @@ Maps::TilesAddon * Maps::Tiles::FindEvent(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNMUL2
-            if(0xA3 < addon.object && 0xA8 > addon.object && 0xA3 == addon.index) return &addon;
+            if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object) && 0xA3 == addon.index) return &addon;
 	}
     }
 
@@ -1052,7 +1046,7 @@ Maps::TilesAddon * Maps::Tiles::FindBoat(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNWAT2
-            if(0x9F < addon.object && 0xA4 > addon.object && 0x17 == addon.index) return &addon;
+            if(ICN::OBJNWAT2 == MP2::GetICNObject(addon.object) && 0x17 == addon.index) return &addon;
 	}
     }
 
@@ -1071,7 +1065,7 @@ Maps::TilesAddon * Maps::Tiles::FindCastle(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNTOWN
-            if(0x8B < addon.object && 0x90 > addon.object) return &addon;
+            if(ICN::OBJNTOWN == MP2::GetICNObject(addon.object)) return &addon;
 	}
     }
 
@@ -1085,7 +1079,7 @@ Maps::TilesAddon * Maps::Tiles::FindCastle(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNTOWN
-            if(0x8B < addon.object && 0x90 > addon.object) return &addon;
+            if(ICN::OBJNTOWN == MP2::GetICNObject(addon.object)) return &addon;
 	}
     }
 
@@ -1104,7 +1098,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDCastle(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNTWRD
-            if(0x97 < addon.object && 0x9C > addon.object && 32 > addon.index) return &addon;
+            if(ICN::OBJNTWRD == MP2::GetICNObject(addon.object) && 32 > addon.index) return &addon;
 	}
     }
 
@@ -1118,7 +1112,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDCastle(void)
 	    TilesAddon & addon = *it1;
 
 	    // OBJNTWRD
-            if(0x97 < addon.object && 0x9C > addon.object && 32 > addon.index) return &addon;
+            if(ICN::OBJNTWRD == MP2::GetICNObject(addon.object)  && 32 > addon.index) return &addon;
 	}
     }
 
@@ -1137,7 +1131,7 @@ Maps::TilesAddon * Maps::Tiles::FindFlags(void)
 	    TilesAddon & addon = *it1;
 
 	    // FLAG32
-            if(0x37 < addon.object && 0x3C > addon.object) return &addon;
+            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
 	}
     }
 
@@ -1156,7 +1150,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 	    TilesAddon & addon = *it1;
 
 	    // MONS32
-	    if(0x2F < addon.object && 0x34 > addon.object &&
+	    if(ICN::MONS32 == MP2::GetICNObject(addon.object) &&
 	    (0x43 == addon.index ||
 	    0x44 == addon.index ||
 	    0x45 == addon.index ||
@@ -1179,7 +1173,7 @@ Maps::TilesAddon * Maps::Tiles::FindMonster(void)
 	    TilesAddon & addon = *it1;
 
 	    // MONS32
-	    if(0x2F < addon.object && 0x34 > addon.object) return &addon;
+	    if(ICN::MONS32 == MP2::GetICNObject(addon.object)) return &addon;
 	}
     }
 
@@ -1197,14 +1191,14 @@ Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
 	{
 	    TilesAddon & addon = *it1;
 
-	    // OBJNDSRT
-            if(0x63 < addon.object && 0x68 > addon.object && 61 == addon.index) return &addon;
+	    // MTNDSRT
+            if(ICN::MTNDSRT == MP2::GetICNObject(addon.object) && 61 == addon.index) return &addon;
 	    else
 	    // OBJNMULT
-            if(0xEB < addon.object && 0xF0 > addon.object && 131 == addon.index) return &addon;
+            if(ICN::OBJNMULT == MP2::GetICNObject(addon.object) && 131 == addon.index) return &addon;
 	    else
-	    // OBJNSNOW
-            if(0x57 < addon.object && 0x5C > addon.object && 4 == addon.index) return &addon;
+	    // MTNSNOW
+            if(ICN::MTNSNOW == MP2::GetICNObject(addon.object) && 4 == addon.index) return &addon;
 	}
     }
 
@@ -1223,7 +1217,7 @@ const Maps::TilesAddon * Maps::Tiles::FindMines(void) const
 	    const TilesAddon & addon = *it1;
 
 	    // EXTRAOVR
-	    if(0x74 == addon.object) return &addon;
+	    if(ICN::EXTRAOVR == MP2::GetICNObject(addon.object)) return &addon;
 	}
     }
 

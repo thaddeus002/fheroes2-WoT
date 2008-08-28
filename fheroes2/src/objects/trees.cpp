@@ -18,27 +18,48 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2OBJECT_H
-#define H2OBJECT_H
+#include "error.h"
+#include "trees.h"
 
-#include "mp2.h"
-#include "world.h"
-#include "maps_tiles.h"
-#include "gamedefs.h"
-
-class Object
+Trees::Trees(const ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
 {
-    public:
-	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
-	~Object();
+    switch(icn)
+    {
+        case ICN::TREJNGL:
+        case ICN::TREEVIL:
+        case ICN::TRESNOW:
+        case ICN::TREFIR:
+        case ICN::TREFALL:
+        case ICN::TREDECI: break;
 
-	static bool		isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms);
+        default: Error::Warning("Trees::Trees: unknown type: ", icn); break;
+    }
+}
 
-	const MP2::object_t	object;
-	const u16		icn;
-	const u32		id;
+bool Trees::isPassable(const u16 icn, const u8 index)
+{
+    switch(icn)
+    {
+        // 36 sprites
+        case ICN::TREDECI:
+        case ICN::TREEVIL:
+        case ICN::TREFALL:
+        case ICN::TREFIR:
+        case ICN::TREJNGL:
+        case ICN::TRESNOW:
+    	    if(3 < index < 6 || 7 < index < 10) return false;		// LARGE LEFT
+    	    else
+    	    if(14 < index < 17 || 17 < index < 20) return false;	// LARGE RIGHT
+    	    else
+    	    if(20 < index < 23 || 23 < index < 26) return false;	// MEDIUM LEFT
+    	    else
+    	    if(26 < index < 29 || 29 < index > 32) return false;	// MEDIUM RIGHT
+    	    else
+    	    if(33 == index || 35 == index) return false;		// SMALL
+    	    else return true;
 
-    private:
-};
+        default: break;;
+    }
 
-#endif
+    return false;
+}

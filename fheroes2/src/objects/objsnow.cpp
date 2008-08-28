@@ -18,27 +18,62 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2OBJECT_H
-#define H2OBJECT_H
+#include "icn.h"
+#include "objsnow.h"
 
-#include "mp2.h"
-#include "world.h"
-#include "maps_tiles.h"
-#include "gamedefs.h"
-
-class Object
+bool ObjSnow::isPassable(const u16 icn, const u8 index)
 {
-    public:
-	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
-	~Object();
+    switch(icn)
+    {
+	case ICN::OBJNSNOW:
+	    // cave for centaur
+	    if(1 < index < 4) return false;
+	    else
+	    // rock
+	    if(22 == index || 25 < index < 29 || 30 == index ||
+	    32 == index || 33 < index < 36 || 36 < index < 40) return false;
+	    else
+	    // stub
+	    if(40 < index < 43) return false;
+	    else
+	    // trees
+	    if(48 < index < 51 || 54 < index < 58 || 60 == index || 
+	    63 < index < 66 || 68 == index || 71 == index || 
+	    74 == index || 77 == index || 80 == index) return false;
+	    else
+	    // lake
+	    if(80 < index < 93 || 93 < index < 96) return false;
+	    else
+	    //wind mill
+	    if(128 == index || 132 == index) return false;
+	    else
+	    // watch tower
+	    if(138 == index) return false;
+	    else
+	    // obelisk
+	    if(141 == index) return false;
+	    else
+	    // sign
+	    if(143 == index) return false;
+	    else
+	    // alchemy tower
+	    if(148 < index < 152) return false;
+	    else
+	    // graveyard
+	    if(158 < index < 161 || 207 < index < 211) return false;
+	    else
+	    // water mill
+	    if(177 == index || 184 == index || 191 == index) return false;
+	    else
+	    // well
+	    if(194 == index) return false;
+	    else
+	    // saw mill
+	    if(196 < index < 203) return false;
+	    else return true;	    
 
-	static bool		isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms);
+	default: break;
+    }
 
-	const MP2::object_t	object;
-	const u16		icn;
-	const u32		id;
-
-    private:
-};
-
-#endif
+    return false;
+}

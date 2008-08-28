@@ -18,27 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2OBJECT_H
-#define H2OBJECT_H
+#ifndef H2OBJSWMP_H
+#define H2OBJSWMP_H
 
-#include "mp2.h"
-#include "world.h"
-#include "maps_tiles.h"
 #include "gamedefs.h"
 
-class Object
+namespace ObjSwamp
 {
-    public:
-	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
-	~Object();
-
-	static bool		isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms);
-
-	const MP2::object_t	object;
-	const u16		icn;
-	const u32		id;
-
-    private:
+    bool	isPassable(const u16 icn, const u8 index);
 };
 
 #endif

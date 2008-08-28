@@ -19,13 +19,97 @@
  ***************************************************************************/
 
 #include "world.h"
+#include "mounts.h"
+#include "trees.h"
+#include "objsnow.h"
+#include "objswmp.h"
+#include "objgras.h"
+#include "objcrck.h"
 #include "object.h"
 
-Object::Object(const MP2::object_t obj, const u32 uid)
-    : object(obj), id(uid ? uid : World::GetUniq())
+Object::Object(const MP2::object_t obj, const u16 sicn, const u32 uid)
+    : object(obj), icn(sicn), id(uid ? uid : World::GetUniq())
 {
 }
 
 Object::~Object()
 {
 }
+
+bool Object::isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms)
+{
+    if(bottoms.size())
+    {
+        std::list<Maps::TilesAddon>::const_iterator it1 = bottoms.begin();
+        std::list<Maps::TilesAddon>::const_iterator it2 = bottoms.end();
+
+        for(; it1 != it2; ++it1)
+        {
+            const Maps::TilesAddon & addon = *it1;
+	    const ICN::icn_t icn = MP2::GetICNObject(addon.object);
+
+            switch(icn)
+            {
+		case ICN::MTNCRCK:
+		case ICN::MTNSNOW:
+		case ICN::MTNSWMP:
+	    	case ICN::MTNLAVA:
+	    	case ICN::MTNDSRT:
+	    	case ICN::MTNDIRT:
+	    	case ICN::MTNMULT:
+	    	case ICN::MTNGRAS:	if(! Mounts::isPassable(icn, addon.index)) return false; break;
+
+		case ICN::TREJNGL:
+		case ICN::TREEVIL:
+		case ICN::TRESNOW:
+		case ICN::TREFIR:
+		case ICN::TREFALL:
+		case ICN::TREDECI:	if(! Trees::isPassable(icn, addon.index)) return false; break;
+
+		case ICN::OBJNSNOW:	if(! ObjSnow::isPassable(icn, addon.index)) return false; break;
+		case ICN::OBJNSWMP:	if(! ObjSwamp::isPassable(icn, addon.index)) return false; break;
+
+		case ICN::OBJNGRAS:
+		case ICN::OBJNGRA2:	if(! ObjGrass::isPassable(icn, addon.index)) return false; break;
+
+		case ICN::OBJNCRCK:	if(! ObjWasteLand::isPassable(icn, addon.index)) return false; break;
+		default: break;
+	    }
+        }
+    }
+
+    return true;
+}
+/*
+	    return ICN::MONS32;
+	    return ICN::OBJNRSRC;
+	    return ICN::EXTRAOVR;
+
+	    return ICN::OBJNTOWN;
+	    return ICN::OBJNTWBA;
+	    return ICN::OBJNTWSH;
+	    return ICN::OBJNTWRD;
+
+	    return ICN::OBJNWAT2;
+	    return ICN::OBJNWATR;
+
+	    return ICN::OBJNMUL2;
+	    return ICN::OBJNMULT;
+
+
+	    return ICN::OBJNLAVA;
+	    return ICN::OBJNLAV3;
+	    return ICN::OBJNLAV2;
+
+	    return ICN::OBJNDSRT;
+
+	    return ICN::OBJNDIRT;
+
+	    return ICN::OBJNCRCK;
+
+	    return ICN::X_LOC1;
+	    return ICN::X_LOC2;
+	    return ICN::X_LOC3;
+
+	    return ICN::UNKNOWN;
+*/

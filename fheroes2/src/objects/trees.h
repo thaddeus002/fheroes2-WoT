@@ -18,25 +18,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2OBJECT_H
-#define H2OBJECT_H
+#ifndef H2TREES_H
+#define H2TREES_H
 
-#include "mp2.h"
-#include "world.h"
-#include "maps_tiles.h"
+#include "icn.h"
+#include "object.h"
 #include "gamedefs.h"
 
-class Object
+class Trees : public Object
 {
     public:
-	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
-	~Object();
+	Trees(const ICN::icn_t icn);
 
-	static bool		isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms);
-
-	const MP2::object_t	object;
-	const u16		icn;
-	const u32		id;
+	static bool	isPassable(const u16 icn, const u8 index);
 
     private:
 };

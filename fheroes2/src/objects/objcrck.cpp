@@ -18,27 +18,33 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2OBJECT_H
-#define H2OBJECT_H
+#include "icn.h"
+#include "objcrck.h"
 
-#include "mp2.h"
-#include "world.h"
-#include "maps_tiles.h"
-#include "gamedefs.h"
-
-class Object
+bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
 {
-    public:
-	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
-	~Object();
+    switch(icn)
+    {
+	case ICN::OBJNCRCK:
+	    // artesian spring
+	    if(2 < index < 5) return false;
+	    else
+	    // rock
+	    if(9 < index < 12 || 18 == index || 20 < index < 23 ||
+		23 < index < 26 || 28 < index < 33 || 33 < index < 36) return false;
+	    else
+	    // cactus
+	    if(14 == index || 16 == index) return false;
+	    else
+	    // skull
+	    if(17 == index) return false;
+	    /*
+	     *
+	     */
+	    else return true;
 
-	static bool		isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms);
+	default: break;
+    }
 
-	const MP2::object_t	object;
-	const u16		icn;
-	const u32		id;
-
-    private:
-};
-
-#endif
+    return false;
+}
