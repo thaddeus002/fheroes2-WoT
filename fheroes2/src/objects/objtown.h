@@ -18,48 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
-#include "trees.h"
+#ifndef H2OBJTOWN_H
+#define H2OBJTOWN_H
 
-Trees::Trees(const ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
+#include "gamedefs.h"
+
+namespace ObjTown
 {
-    switch(icn)
-    {
-        case ICN::TREJNGL:
-        case ICN::TREEVIL:
-        case ICN::TRESNOW:
-        case ICN::TREFIR:
-        case ICN::TREFALL:
-        case ICN::TREDECI: break;
+    bool	isPassable(const u16 icn, const u8 index);
+};
 
-        default: Error::Warning("Trees::Trees: unknown type: ", icn); break;
-    }
-}
-
-bool Trees::isPassable(const u16 icn, const u8 index)
-{
-    switch(icn)
-    {
-        // 36 sprites
-        case ICN::TREDECI:
-        case ICN::TREEVIL:
-        case ICN::TREFALL:
-        case ICN::TREFIR:
-        case ICN::TREJNGL:
-        case ICN::TRESNOW:
-    	    if((3 < index && index < 6) || (7 < index && index < 10)) return false;	// LARGE LEFT
-    	    else
-    	    if((14 < index && index < 17) || (17 < index && index < 20)) return false;	// LARGE RIGHT
-    	    else
-    	    if((20 < index && index < 23) || (23 < index && index < 26)) return false;	// MEDIUM LEFT
-    	    else
-    	    if((26 < index && index < 29) || (29 < index && index < 32)) return false;	// MEDIUM RIGHT
-    	    else
-    	    if(33 == index || 35 == index) return false;				// SMALL
-    	    else return true;
-
-        default: break;;
-    }
-
-    return false;
-}
+#endif

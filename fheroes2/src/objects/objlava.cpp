@@ -27,36 +27,36 @@ bool ObjLava::isPassable(const u16 icn, const u8 index)
     {
 	case ICN::OBJNLAV2:
 	    // volcano
-	    if(129 < index < 133 || 78 < index < 82) return false;
+	    if((129 < index && index < 133) || (78 < index && index < 82)) return false;
 	    else return true;
 
 	case ICN::OBJNLAV3:
 	    // volcano
-	    if(243 < index < 247) return false;
+	    if(243 < index && index < 247) return false;
 	    else return true;
 
 	case ICN::OBJNLAVA:
 	    // crater
-	    if(1 < index < 10 || 11 < index < 18) return false;
+	    if((1 < index && index < 10) || (11 < index && index < 18)) return false;
 	    else
 	    // lava pool
-	    if(17 < index < 21 || 26 < index < 45 || 45 < index < 49 || 49 < index < 64 ||
-		64 < index < 74) return false;
+	    if((17 < index && index < 21) || (26 < index && index < 45) || (45 < index && index < 49) ||
+		( 49 < index && index < 64) || (64 < index && index < 74)) return false;
 	    else
 	    // volcano
-	    if(75 < index < 78 || 88 == index || 98 == index) return false;
+	    if((75 < index && index < 78) || 88 == index || 98 == index) return false;
 	    else
 	    // obelisk
 	    if(110 == index) return false;
 	    else
 	    // daemon cave
-	    if(113 < index < 116) return false;
+	    if(113 < index && index < 116) return false;
 	    else
 	    // sign
 	    if(117 == index) return false;
 	    else
 	    // saw mill
-	    if(119 < index < 126) return false;
+	    if(119 < index && index < 126) return false;
 
 	    else return true;
 

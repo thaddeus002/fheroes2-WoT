@@ -18,47 +18,49 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
-#include "trees.h"
+#include "icn.h"
+#include "objtown.h"
 
-Trees::Trees(const ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
+bool ObjTown::isPassable(const u16 icn, const u8 index)
 {
     switch(icn)
     {
-        case ICN::TREJNGL:
-        case ICN::TREEVIL:
-        case ICN::TRESNOW:
-        case ICN::TREFIR:
-        case ICN::TREFALL:
-        case ICN::TREDECI: break;
 
-        default: Error::Warning("Trees::Trees: unknown type: ", icn); break;
-    }
-}
+	case ICN::OBJNTWBA:
+	     if(index < 7 || ( 7 < index && index < 17) || (17 < index && index < 27) ||
+                (27 < index && index < 37) || (37 < index && index < 47) || (47 < index && index < 57) ||
+                (57 < index && index < 67) || (67 < index && index < 77) || 77 < index) return false;
 
-bool Trees::isPassable(const u16 icn, const u8 index)
-{
-    switch(icn)
-    {
-        // 36 sprites
-        case ICN::TREDECI:
-        case ICN::TREEVIL:
-        case ICN::TREFALL:
-        case ICN::TREFIR:
-        case ICN::TREJNGL:
-        case ICN::TRESNOW:
-    	    if((3 < index && index < 6) || (7 < index && index < 10)) return false;	// LARGE LEFT
-    	    else
-    	    if((14 < index && index < 17) || (17 < index && index < 20)) return false;	// LARGE RIGHT
-    	    else
-    	    if((20 < index && index < 23) || (23 < index && index < 26)) return false;	// MEDIUM LEFT
-    	    else
-    	    if((26 < index && index < 29) || (29 < index && index < 32)) return false;	// MEDIUM RIGHT
-    	    else
-    	    if(33 == index || 35 == index) return false;				// SMALL
-    	    else return true;
+	    else return true;
 
-        default: break;;
+	case ICN::OBJNTOWN:
+	    // kngt
+	    if((5 < index && index < 13) || (13 < index && index < 16) ||
+		(21 < index && index < 29) || (29 < index && index < 32)) return false;
+	    else
+	    // barb
+	    if((37 < index && index < 45) || (45 < index && index < 48) ||
+		(53 < index && index < 61) || (61 < index && index < 64)) return false;
+	    else
+	    // sorc
+	    if((69 < index && index < 77) || (77 < index && index < 80) ||
+		(85 < index && index < 93) || (93 < index && index < 96)) return false;
+	    else
+	    // wrlk
+	    if((101 < index && index < 109) || (109 < index && index < 112) ||
+		(117 < index && index < 125) || (125 < index && index < 128)) return false;
+	    else
+	    // wzrd
+	    if((133 < index && index < 141) || (141 < index && index < 144) ||
+		(149 < index && index < 157) || (157 < index && index < 160)) return false;
+	    else
+	    // necr
+	    if((165 < index && index < 173) || (173 < index && index < 176) ||
+		(181 < index && index < 189) || (189 < index && index < 192)) return false;
+
+	    else return true;
+
+	default: break;
     }
 
     return false;

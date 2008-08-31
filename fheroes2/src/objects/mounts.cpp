@@ -45,23 +45,23 @@ bool Mounts::isPassable(const u16 icn, const u8 index)
         // 133 sprites
         case ICN::MTNCRCK:
         case ICN::MTNDIRT:
-    	    if(5 < index < 10 || 11 < index < 17 || 17 < index < 21) return false;		// LARGE LEFT
+    	    if((5 < index && index < 10) || (11 < index && index < 17) || (17 < index && index < 21)) return false;	// LARGE LEFT
     	    else
-    	    if(27 < index < 32 || 32 < index < 38 || 38 < index < 42) return false;		// LARGE RIGHT
+    	    if((27 < index && index < 32) || (32 < index && index < 38) || (38 < index && index < 42)) return false;	// LARGE RIGHT
     	    else
-    	    if(47 < index < 51 || 53 < index < 57) return false;				// MEDIUM LEFT
+    	    if((47 < index && index < 51) || (53 < index && index < 57)) return false;				// MEDIUM LEFT
     	    else
-    	    if(64 < index < 68 || 68 < index < 72) return false;				// MEDIUM RIGHT
+    	    if((64 < index && index < 68) || (68 < index && index < 72)) return false;				// MEDIUM RIGHT
     	    else
-    	    if(75 < index < 79 || 79 < index < 82) return false;				// MEDIUM2 RIGHT
+    	    if((75 < index && index < 79) || (79 < index && index < 82)) return false;				// MEDIUM2 RIGHT
     	    else
-    	    if(86 < index < 89 || 89 < index < 92) return false;				// MEDIUM2 LEFT
+    	    if((86 < index && index < 89) || (89 < index && index < 92)) return false;				// MEDIUM2 LEFT
     	    else
-    	    if(92 < index < 95 || 95 < index < 98) return false;				// SMALL LEFT
+    	    if((92 < index && index < 95) || (95 < index && index < 98)) return false;				// SMALL LEFT
     	    else
-    	    if(98 < index < 101 || 101 < index < 104) return false;				// SMALL RIGHT
+    	    if((98 < index && index < 101) || (101 < index && index < 104)) return false;			// SMALL RIGHT
     	    else
-    	    if(110 < index < 114) return false; 						// MINES
+    	    if(110 < index && index < 114) return false; 							// MINES
     	    else return true;
 
         // 83 sprites
@@ -71,19 +71,19 @@ bool Mounts::isPassable(const u16 icn, const u8 index)
         case ICN::MTNMULT:
 	case ICN::MTNSNOW:
         case ICN::MTNSWMP:
-    	    if(5 < index < 10 || 11 < index < 17 || 17 < index < 21) return false;		// LARGE LEFT
+    	    if((5 < index && index < 10) || (11 < index && index < 17) || (17 < index && index < 21)) return false;	// LARGE LEFT
     	    else
-    	    if(27 < index < 32 || 32 < index < 38 || 38 < index < 42) return false;		// LARGE RIGHT
+    	    if((27 < index && index < 32) || (32 < index && index < 38) || (38 < index && index < 42)) return false;	// LARGE RIGHT
     	    else
-    	    if(45 < index < 49 || 49 < index < 52) return false;				// MEDIUM LEFT
+    	    if((45 < index && index < 49) || (49 < index && index < 52)) return false;				// MEDIUM LEFT
     	    else
-    	    if(55 < index < 59 || 59 < index < 62) return false;				// MEDIUM RIGHT
+    	    if((55 < index && index < 59) || (59 < index && index < 62)) return false;				// MEDIUM RIGHT
     	    else
-    	    if(62 < index < 65 || 65 < index < 68) return false;				// SMALL LEFT
+    	    if((62 < index && index < 65) || (65 < index && index < 68)) return false;				// SMALL LEFT
     	    else
-    	    if(68 < index < 71 || 71 < index < 74) return false;				// SMALL RIGHT
+    	    if((68 < index && index < 71) || (71 < index && index < 74)) return false;				// SMALL RIGHT
     	    else
-    	    if(80 < index < 84) return false; 							// MINES
+    	    if(80 < index && index < 84) return false; 								// MINES
     	    else return true;
 
         default: break;

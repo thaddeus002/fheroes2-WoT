@@ -34,22 +34,22 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(15 == index) return false;
 	    else
 	    // stub
-	    if(16 == index || 17 < index < 20) return false;
+	    if(16 == index || (17 < index && index < 20)) return false;
 	    else
 	    // alchemy tower
-	    if(24 < index < 28) return false;
+	    if(24 < index && index < 28) return false;
 	    else
 	    // dragon city
-	    if(50 < index < 56) return false;
+	    if(50 < index && index < 56) return false;
 	    else
 	    // grave yard
-	    if(56 < index < 59) return false;
+	    if(56 < index && index < 59) return false;
 	    else
 	    // light house
 	    if(73 == index) return false;
 	    else
 	    // saw mill
-	    if(75 < index < 82) return false;
+	    if(75 < index && index < 82) return false;
 	    else
 	    // water well
 	    if(98 == index || 105 == index || 112 == index) return false;
@@ -61,13 +61,13 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(116 == index || 119 == index || 122 == index) return false;
 	    else
 	    // wagon camp
-	    if(127 < index < 130 || 136 == index) return false;
+	    if((127 < index && index < 130) || 136 == index) return false;
 	    else
 	    // well
 	    if(162 == index || 165 == index) return false;
 	    else
 	    // freeman foundry
-	    if(186 < index < 189) return false;
+	    if(186 < index && index < 189) return false;
 	    else
 	    // magick garden
 	    if(190 == index) return false;
@@ -76,10 +76,10 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(201 == index) return false;
 	    else
 	    // grave yard
-	    if(206 < index < 210) return false;
+	    if(206 < index && index < 210) return false;
 	    else
 	    // saw mill
-	    if(211 < index < 218) return false;
+	    if(211 < index && index < 218) return false;
 
 	    else return true;
 
@@ -91,22 +91,22 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(35 == index) return false;
 	    else
 	    // fort
-	    if(57 < index < 60) return false;
+	    if(57 < index && index < 60) return false;
 	    else
 	    // gasebo
 	    if(62 == index) return false;
 	    else
 	    // shrub
-	    if(62 < index < 66) return false;
+	    if(62 < index && index < 66) return false;
 	    else
 	    // witch hut
 	    if(69 == index) return false;
 	    else
 	    // mercenary camp
-	    if(69 < index < 73) return false;
+	    if(69 < index && index < 73) return false;
 	    else
 	    // ruins
-	    if(72 < index < 75) return false;
+	    if(72 < index && index < 75) return false;
 	    else
 	    // shrine
 	    if(76 == index || 78 == index || 80 == index) return false;
@@ -115,10 +115,10 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(82 == index) return false;
 	    else
 	    // standing stones
-	    if(83 < index < 86) return false;
+	    if(83 < index && index < 86) return false;
 	    else
 	    // temple
-	    if(87 < index < 90) return false;
+	    if(87 < index && index < 90) return false;
 	    else
 	    // market
 	    if(104 == index || 111 == index) return false;
@@ -133,8 +133,9 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(123 == index) return false;
 	    else
 	    // camp fire
-	    if(132 == index) return false;
-	    else return true;
+	    if(131 == index) return false;
+
+	    else  return true;
 
 	default: break;
     }

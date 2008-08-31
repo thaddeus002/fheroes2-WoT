@@ -27,22 +27,22 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
     {
 	case ICN::OBJNSNOW:
 	    // cave for centaur
-	    if(1 < index < 4) return false;
+	    if((1 < index && index < 4)) return false;
 	    else
 	    // rock
-	    if(22 == index || 25 < index < 29 || 30 == index ||
-	    32 == index || 33 < index < 36 || 36 < index < 40) return false;
+	    if(22 == index || (25 < index && index < 29) || 30 == index ||
+	    32 == index || (33 < index && index < 36) || (36 < index && index < 40)) return false;
 	    else
 	    // stub
-	    if(40 < index < 43) return false;
+	    if(40 < index && index < 43) return false;
 	    else
 	    // trees
-	    if(48 < index < 51 || 54 < index < 58 || 60 == index || 
-	    63 < index < 66 || 68 == index || 71 == index || 
+	    if((48 < index && index < 51) || (54 < index && index < 58) || 60 == index || 
+	    63 < index && index < 66 || 68 == index || 71 == index || 
 	    74 == index || 77 == index || 80 == index) return false;
 	    else
 	    // lake
-	    if(80 < index < 93 || 93 < index < 96) return false;
+	    if((80 < index && index < 93) || (93 < index && index < 96)) return false;
 	    else
 	    //wind mill
 	    if(128 == index || 132 == index) return false;
@@ -57,10 +57,10 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
 	    if(143 == index) return false;
 	    else
 	    // alchemy tower
-	    if(148 < index < 152) return false;
+	    if(148 < index && index < 152) return false;
 	    else
 	    // graveyard
-	    if(158 < index < 161 || 207 < index < 211) return false;
+	    if((158 < index && index < 161) || (207 < index && index < 211)) return false;
 	    else
 	    // water mill
 	    if(177 == index || 184 == index || 191 == index) return false;
@@ -69,7 +69,8 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
 	    if(194 == index) return false;
 	    else
 	    // saw mill
-	    if(196 < index < 203) return false;
+	    if((196 < index && index < 203)) return false;
+
 	    else return true;	    
 
 	default: break;

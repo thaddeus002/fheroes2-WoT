@@ -430,7 +430,7 @@ void Maps::Tiles::DebugInfo(u16 index) const
     
 	    String::AddInt(value, addon.object);
     
-	    std::cout << "object          : " << value << std::endl;
+	    std::cout << "object          : " << value << " (" << ICN::GetString(MP2::GetICNObject(addon.object)) << ")" << std::endl;
 
 	    value.clear();
     
@@ -467,7 +467,7 @@ void Maps::Tiles::DebugInfo(u16 index) const
     
 	    String::AddInt(value, addon.object);
     
-	    std::cout << "object          : " << value << std::endl;
+	    std::cout << "object          : " << value << " (" << ICN::GetString(MP2::GetICNObject(addon.object)) << ")" << std::endl;
 
 	    value.clear();
     
@@ -787,28 +787,15 @@ bool Maps::Tiles::isPassable(void) const
     if(Game::Focus::Get().Type() != Game::Focus::HEROES) return false;
     if(0 == Settings::Get().Debug() && isFog(Settings::Get().MyColor())) return false;
 
+
     if(Game::Focus::Get().GetHeroes().isShipMaster())
     {
     	if(Ground::WATER != Maps::Tiles::GetGround()) return false;
-	if(addons_level1.empty()) return true;
 
         switch(general)
 	{
 	    case MP2::OBJ_BOAT:
             case MP2::OBJ_HEROES:	return false;
-/*
-	    case MP2::OBJ_STONES:
-	    case MP2::OBJN_MAGELLANMAPS:
-	    case MP2::OBJ_DERELICTSHIP:
-	    case MP2::OBJN_DERELICTSHIP:
-	    case MP2::OBJN_SHIPWRECK:
-
-            case MP2::OBJ_WHIRLPOOL:
-            case MP2::OBJ_BUOY:
-            case MP2::OBJ_BOTTLE:
-    	    case MP2::OBJ_SHIPWRECKSURVIROR:
-            case MP2::OBJ_FLOTSAM:
-*/
 
 	    default: break;
 	}
@@ -816,24 +803,11 @@ bool Maps::Tiles::isPassable(void) const
     else
     {
 	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
-	// if empty
-	if(addons_level1.empty()) return true;
-	// if road only
-	if(isRoad() && 1 == addons_level1.size()) return true;
 
         switch(general)
 	{
             case MP2::OBJ_HEROES:	return false;
 
-/*	    case MP2::OBJ_COAST:
-	    case MP2::OBJ_DUNE:
-	    case MP2::OBJ_FLOWERS:
-	    case MP2::OBJ_SHRUB:
-	    case MP2::OBJ_SHRUB2:
-	    case MP2::OBJ_STUMP:
-	    case MP2::OBJ_ZERO:
-		return true;
-*/
 	    default: break;
 	}
 

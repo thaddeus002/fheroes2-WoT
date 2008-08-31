@@ -79,6 +79,7 @@ bool Maps::isValidDirection(u16 from, Direction::vector_t vector)
 
 bool Maps::AllowDirection(u16 from, Direction::vector_t vector)
 {
+/*
     if(!isValidDirection(from, vector)) return false;
 
     switch(vector)
@@ -113,6 +114,8 @@ bool Maps::AllowDirection(u16 from, Direction::vector_t vector)
     }
 
     return false;
+*/
+    return isValidDirection(from, vector);
 }
 
 bool Maps::isValidAbsPoint(const Point & pt)

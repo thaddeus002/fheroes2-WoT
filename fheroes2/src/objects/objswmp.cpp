@@ -30,41 +30,41 @@ bool ObjSwamp::isPassable(const u16 icn, const u8 index)
 	    if(22 == index) return false;
 	    else
 	    // shrub
-	    if(31 < index < 34) return false;
+	    if((31 < index && index < 34)) return false;
 	    else
 	    // xanadu
-	    if(67 == index || 74 == index || 80 < index < 83) return false;
+	    if(67 == index || 74 == index || (80 < index && index < 83)) return false;
 	    else
 	    // faerie ring
-	    if(83 < index < 86) return false;
+	    if((83 < index && index < 86)) return false;
 	    else
 	    // lake
-	    if(87 < index < 92 || 93 < index < 99 || 100 < index < 106) return false;
+	    if((87 < index && index < 92) || (93 < index && index < 99) || (100 < index && index < 106)) return false;
 	    else
-	    if(107 < index < 111 || 111 < index < 114) return false;
+	    if((107 < index && index < 111) || (111 < index && index < 114)) return false;
 	    else
-	    if(114 < index < 117 || 117 < index < 120 || 121 < index < 124) return false;
+	    if((114 < index && index < 117) || (117 < index && index < 120) || (121 < index && index < 124)) return false;
 	    else
 	    // mandrake
-	    if(126 == index || 127 < index < 130 || 131 == index || 132 < index < 136 || 137 == index) return false;
+	    if(126 == index || (127 < index && index < 130) || 131 == index || (132 < index && index < 136) || 137 == index) return false;
 	    else
 	    // swamp
-	    if(137 < index < 140 || 142 < index < 161) return false;
+	    if((137 < index && index < 140) || (142 < index && index < 161)) return false;
 	    else
 	    // sign
 	    if(140 == index) return false;
 	    else
 	    // trees
-	    if(165 < index < 168 || 170 < index < 173 || 175 < index < 178) return false;
+	    if((165 < index && index < 168) || (170 < index && index < 173) || (175 < index && index < 178)) return false;
 	    else
 	    // swamp
-	    if(178 < index < 193 || 211 < index < 214) return false;
+	    if((178 < index && index < 193) || (211 < index && index < 214)) return false;
 	    else
 	    // shrub
-	    if(192 < index < 195 || 196 == index || 197 < index < 202) return false;
+	    if((192 < index && index < 195) || 196 == index || (197 < index && index < 202)) return false;
 	    else
 	    // rock
-	    if(203 == index || 205 == index || 207 < index < 211) return false;
+	    if(203 == index || 205 == index || (207 < index && index < 211)) return false;
 	    else
 	    // obelisk
 	    if(216 == index) return false;

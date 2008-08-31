@@ -21,6 +21,8 @@
 #include "world.h"
 #include "mounts.h"
 #include "trees.h"
+#include "objxloc.h"
+#include "objtown.h"
 #include "objwatr.h"
 #include "objlava.h"
 #include "objmult.h"
@@ -88,18 +90,16 @@ bool Object::isPassable(const u8 general, const std::list<Maps::TilesAddon> & bo
 
 		case ICN::MONS32:
 		case ICN::MINIMON:	return false;
+
 		case ICN::OBJNRSRC:	if(addon.index % 2) return false; break;
 
-/*
-		case ICN::OBJNTWBA:	if(7 != addon.index || 17 != addon.index || 27 != addon.index ||
-					    37 != addon.index || 47 != addon.index || 57 != addon.index ||
-					    67 != addon.index || 77 != addon.index ) return false; break;
-*/
-/*
+		case ICN::OBJNTWBA:
+		case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, addon.index)) return false; break;
+
 		case ICN::X_LOC1:
 		case ICN::X_LOC2:
 		case ICN::X_LOC3:	if(! ObjLoyalty::isPassable(icn, addon.index)) return false; break;
-*/
+
 		default: break;
 	    }
         }

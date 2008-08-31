@@ -27,46 +27,46 @@ bool ObjDirt::isPassable(const u16 icn, const u8 index)
     {
 	case ICN::OBJNDIRT:
 	    // abandone mines
-	    if(6 < index < 10) return false;
+	    if(6 < index && index < 10) return false;
 	    else
 	    // mound
-	    if(11 < index < 14 || 14 < index < 17) return false;
+	    if((11 < index && index < 14) || (14 < index && index < 17)) return false;
 	    else
 	    // crater
-	    if(16 < index < 23) return false;
+	    if(16 < index && index < 23) return false;
 	    // lake
 	    else
-	    if(22 < index < 39 || 39 < index < 46 ||
-		47 < index < 52 || 52 < index < 59) return false;
+	    if((22 < index && index < 39) || (39 < index && index < 46) ||
+		(47 < index && index < 52) || (52 < index && index < 59)) return false;
 	    else
 	    // shrub
-	    if(59 < index < 62 || 62 < index < 65 || 65 < index < 68 ||
-		69 == index || 71 == index || 72 < index < 75 || 75 < index < 78 ||
-		78 < index < 81 || 81 < index < 84 || 84 < index < 87 || 87 < index < 91) return false;
+	    if((59 < index && index < 62) || (62 < index && index < 65) || (65 < index && index < 68) ||
+		69 == index || 71 == index || (72 < index && index < 75) || (75 < index && index < 78) ||
+		(78 < index && index < 81) || (81 < index && index < 84) || (84 < index && index < 87) || (87 < index && index < 91)) return false;
 	    else
 	    // rock
-	    if(91 < index < 94 || 97 < index < 100 || 100 < index < 103 || 103 < index < 106) return false;
+	    if((91 < index && index < 94) || (97 < index && index < 100) || (100 < index && index < 103) || (103 < index && index < 106)) return false;
 	    else
 	    // trees
 	    if(118 == index || 123  == index || 127 == index)  return false;
 	    else
 	    // faerie ring
-	    if(128 < index < 131)  return false;
+	    if(128 < index && index < 131)  return false;
 	    else
 	    // hill fort
-	    if(132 < index < 136)  return false;
+	    if(132 < index && index < 136)  return false;
 	    else
 	    // halfling hole
-	    if(136 < index < 140)  return false;
+	    if(136 < index && index < 140)  return false;
 	    else
 	    // tree city
-	    if(150 < index < 153)  return false;
+	    if(150 < index && index < 153)  return false;
 	    else
 	    // wind mill
 	    if(185 == index || 189 == index) return false;
 	    else
 	    // oracul
-	    if(196 < index < 199)  return false;
+	    if(196 < index && index < 199)  return false;
 	    else
 	    // obelisk
 	    if(201 == index)  return false;

@@ -27,12 +27,12 @@ bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
     {
 	case ICN::OBJNCRCK:
 	    // artesian spring
-	    if(2 < index < 5) return false;
+	    if(2 < index && index < 5) return false;
 	    else
 	    // rock
-	    if(9 < index < 12 || 18 == index || 20 < index < 23 ||
-		23 < index < 26 || 28 < index < 33 || 33 < index < 36 ||
-		36 < index < 39 || 39 < index < 44 || 46 == index ||
+	    if((9 < index && index < 12) || 18 == index || (20 < index && index < 23) ||
+		(23 < index && index < 26) || (28 < index && index < 33) || (33 < index && index < 36) ||
+		(36 < index && index < 39) || (39 < index && index < 44) || 46 == index ||
 		49 == index || 52 == index || 55 == index) return false;
 	    else
 	    // cactus
@@ -42,35 +42,36 @@ bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
 	    if(17 == index) return false;
 	    else
 	    // crater
-	    if(57 < index < 60 || 61 < index < 66 || 67 < index < 70 ||
-		220 < index < 226 || 226 < index < 236) return false;
+	    if((57 < index && index < 60) || (61 < index && index < 66) || (67 < index && index < 70) ||
+		(220 < index && index < 226) || (226 < index && index < 236)) return false;
 	    else
 	    // shrub
-	    if(70 < index < 73) return false;
+	    if(70 < index && index < 73) return false;
 	    else
 	    // wagon
 	    if(74 == index) return false;
 	    else
 	    // tar pit
-	    if(75 < index < 79 || 80 == index || 91 == index ||
+	    if((75 < index && index < 79) || 80 == index || 91 == index ||
 		102 == index || 113 == index || 124 == index ||
-		134 < index < 138 || 148 == index || 159 == index ||
+		(134 < index && index < 138) || 148 == index || 159 == index ||
 		170 == index || 181 == index) return false;
 	    else
 	    // troll bridge
-	    if(181 < index < 190) return false;
+	    if(181 < index && index < 190) return false;
 	    else
 	    // market
 	    if(202 == index || 213 == index) return false;
 	    else
 	    // watering hole
-	    if(216 < index < 221) return false;
+	    if(216 < index && index < 221) return false;
 	    else
 	    // obelisk
 	    if(238 == index) return false;
 	    else
 	    // saw mill
-	    if(240 < index < 247) return false;
+	    if(240 < index && index < 247) return false;
+
 	    else return true;
 
 	default: break;

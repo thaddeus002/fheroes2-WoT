@@ -27,10 +27,10 @@ bool ObjWater::isPassable(const u16 icn, const u8 index)
     {
 	case ICN::OBJNWAT2:
 	    // rock
-	    if(6 < index) return false;
+	    if(2 == index) return false;
 	    else
 	    // ship
-	    if(12 == index || 18 < index < 23) return false;
+	    if(12 == index || (18 < index && index < 23)) return false;
 	    
 	    else return true;
 
@@ -51,7 +51,7 @@ bool ObjWater::isPassable(const u16 icn, const u8 index)
 	    if(111 == index) return false;
 	    else
 	    // rock
-	    if(181 < index < 184 || 184 < index < 188) return false;
+	    if((181 < index && index < 184) || (184 < index && index < 188)) return false;
 	    else
 	    // buoy
 	    if(195 == index) return false;
