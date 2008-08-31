@@ -119,7 +119,7 @@ void Game::EnvironmentSoundMixer(bool forced)
 			case MP2::OBJ_SHRINE3:		m82 = M82::LOOP0018; break;
 			//case MP2::OBJ_STONES:		if(Maps::Ground::WATER == tile.GetGround()) m82 = M82::LOOP0019; break;
 			//case MP2:::	m82 = M82::LOOP0020; break;
-			case MP2::OBJ_OILLAKE:		m82 = M82::LOOP0021; break;
+			case MP2::OBJ_TARPIT:		m82 = M82::LOOP0021; break;
 			case MP2::OBJ_TRADINGPOST:	m82 = M82::LOOP0022; break;
 			//case MP2:::	m82 = M82::LOOP0023; break;
 			case MP2::OBJ_RUINS:		m82 = M82::LOOP0024; break;

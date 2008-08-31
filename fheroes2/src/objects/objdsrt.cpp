@@ -19,58 +19,63 @@
  ***************************************************************************/
 
 #include "icn.h"
-#include "objcrck.h"
+#include "objdsrt.h"
 
-bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
+bool ObjDesert::isPassable(const u16 icn, const u8 index)
 {
     switch(icn)
     {
-	case ICN::OBJNCRCK:
-	    // artesian spring
-	    if(2 < index < 5) return false;
+	case ICN::OBJNDSRT:
+	    // trees
+	    if(3 == index || 6 == index || 9 == index || 12 == index ||
+		24 == index || 26 == index || 28 == index || 76 == index) return false;
 	    else
-	    // rock
-	    if(9 < index < 12 || 18 == index || 20 < index < 23 ||
-		23 < index < 26 || 28 < index < 33 || 33 < index < 36 ||
-		36 < index < 39 || 39 < index < 44 || 46 == index ||
-		49 == index || 52 == index || 55 == index) return false;
+	    // dune
+	    if(13 < index < 16 || 16 < index < 19 || 19 < index < 23) return false;
 	    else
 	    // cactus
-	    if(14 == index || 16 == index) return false;
+	    if(29 < index < 33 || 34 == index || 36 == index ||
+		38 < index < 41 || 42 == index || 45 == index ||
+		47 < index < 50 || 51 == index || 53 == index) return false;
 	    else
-	    // skull
-	    if(17 == index) return false;
+	    // camp fire
+	    if(61 == index) return false;
 	    else
-	    // crater
-	    if(57 < index < 60 || 61 < index < 66 || 67 < index < 70 ||
-		220 < index < 226 || 226 < index < 236) return false;
+	    // desert tent
+	    if(71 < index < 74) return false;
 	    else
-	    // shrub
-	    if(70 < index < 73) return false;
+	    // piramids
+	    if(80 < index < 83) return false;
 	    else
-	    // wagon
-	    if(74 == index) return false;
+	    // skeleton
+	    if(82 < index < 85) return false;
 	    else
-	    // tar pit
-	    if(75 < index < 79 || 80 == index || 91 == index ||
-		102 == index || 113 == index || 124 == index ||
-		134 < index < 138 || 148 == index || 159 == index ||
-		170 == index || 181 == index) return false;
+	    // sphinx
+	    if(86 < index <89) return false;
 	    else
-	    // troll bridge
-	    if(181 < index < 190) return false;
-	    else
-	    // market
-	    if(202 == index || 213 == index) return false;
-	    else
-	    // watering hole
-	    if(216 < index < 221) return false;
+	    // city of dead
+	    if(88 < index < 102) return false;
 	    else
 	    // obelisk
-	    if(238 == index) return false;
+	    if(104 == index) return false;
+	    else
+	    // oasis
+	    if(104 < index < 107 || 107 < index < 110) return false;
+	    else
+	    // desert
+	    if(109 < index < 113) return false;
+	    else
+	    // daemon cave
+	    if(115 < index < 118) return false;
+	    else
+	    // sign
+	    if(119 == index) return false;
+	    else
+	    // grave yard
+	    if(120 < index < 123) return false;
 	    else
 	    // saw mill
-	    if(240 < index < 247) return false;
+	    if(124 < index < 131) return false;
 	    else return true;
 
 	default: break;

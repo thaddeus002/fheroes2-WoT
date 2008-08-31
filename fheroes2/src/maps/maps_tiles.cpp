@@ -546,7 +546,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_EXCAVATION:	return MP2::OBJN_EXCAVATION;
 	case MP2::OBJN_SPHINX:		return MP2::OBJN_SPHINX;
 
-	case MP2::OBJ_OILLAKE:		return MP2::OBJ_OILLAKE;
+	case MP2::OBJ_TARPIT:		return MP2::OBJ_TARPIT;
 	case MP2::OBJN_TROLLBRIDGE:	return MP2::OBJN_TROLLBRIDGE;
 	case MP2::OBJN_WITCHSHUT:	return MP2::OBJN_WITCHSHUT;
 	case MP2::OBJN_XANADU:		return MP2::OBJN_XANADU;
@@ -563,7 +563,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_STONES:		return MP2::OBJ_STONES;
 	case MP2::OBJ_FLOWERS:		return MP2::OBJ_FLOWERS;
 	case MP2::OBJ_WATERLAKE:	return MP2::OBJ_WATERLAKE;
-	case MP2::OBJ_VEGETATION2:	return MP2::OBJ_VEGETATION2;
+	case MP2::OBJ_MANDRAKE:		return MP2::OBJ_MANDRAKE;
 	case MP2::OBJ_DEADTREE:		return MP2::OBJ_DEADTREE;
 	case MP2::OBJ_STUMP:		return MP2::OBJ_STUMP;
 	case MP2::OBJ_CRATER:		return MP2::OBJ_CRATER;
@@ -795,6 +795,8 @@ bool Maps::Tiles::isPassable(void) const
         switch(general)
 	{
 	    case MP2::OBJ_BOAT:
+            case MP2::OBJ_HEROES:	return false;
+/*
 	    case MP2::OBJ_STONES:
 	    case MP2::OBJN_MAGELLANMAPS:
 	    case MP2::OBJ_DERELICTSHIP:
@@ -806,14 +808,10 @@ bool Maps::Tiles::isPassable(void) const
             case MP2::OBJ_BOTTLE:
     	    case MP2::OBJ_SHIPWRECKSURVIROR:
             case MP2::OBJ_FLOTSAM:
+*/
 
-            case MP2::OBJ_HEROES:
-    		return false;
-	    
 	    default: break;
 	}
-
-    	return true;
     }
     else
     {
@@ -825,7 +823,9 @@ bool Maps::Tiles::isPassable(void) const
 
         switch(general)
 	{
-	    case MP2::OBJ_COAST:
+            case MP2::OBJ_HEROES:	return false;
+
+/*	    case MP2::OBJ_COAST:
 	    case MP2::OBJ_DUNE:
 	    case MP2::OBJ_FLOWERS:
 	    case MP2::OBJ_SHRUB:
@@ -833,17 +833,13 @@ bool Maps::Tiles::isPassable(void) const
 	    case MP2::OBJ_STUMP:
 	    case MP2::OBJ_ZERO:
 		return true;
-
+*/
 	    default: break;
 	}
 
-	// extra check object
-	if(Object::isPassable(general, addons_level1)) return true;
-
-	return false;
     }
 
-    return false;
+    return Object::isPassable(general, addons_level1);
 }
 
 /* check road */

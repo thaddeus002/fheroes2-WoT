@@ -449,7 +449,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_SIGN:			return "Sign";
         case MP2::OBJ_SHRUB2:			return "Shrub";
         case MP2::OBJ_NOTHINGSPECIAL:		return "Nothing Special";
-        case MP2::OBJ_OILLAKE:			return "Tar Pit";
+        case MP2::OBJ_TARPIT:			return "Tar Pit";
         case MP2::OBJ_COAST:			return "Coast";
         case MP2::OBJ_MOUND:			return "Mound";
         case MP2::OBJ_DUNE:			return "Dune";
@@ -462,7 +462,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_STONES:			return "Rock";
         case MP2::OBJ_FLOWERS:			return "Flowers";
         case MP2::OBJ_WATERLAKE:		return "Water Lake";
-        case MP2::OBJ_VEGETATION2:		return "Vegetation";
+        case MP2::OBJ_MANDRAKE:			return "Mandrake";
         case MP2::OBJ_CRATER:			return "Crater";
         case MP2::OBJ_LAVAPOOL:			return "Lava Pool";
         case MP2::OBJ_SHRUB:			return "Shrub";

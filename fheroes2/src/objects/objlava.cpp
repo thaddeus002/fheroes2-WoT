@@ -19,58 +19,45 @@
  ***************************************************************************/
 
 #include "icn.h"
-#include "objcrck.h"
+#include "objlava.h"
 
-bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
+bool ObjLava::isPassable(const u16 icn, const u8 index)
 {
     switch(icn)
     {
-	case ICN::OBJNCRCK:
-	    // artesian spring
-	    if(2 < index < 5) return false;
-	    else
-	    // rock
-	    if(9 < index < 12 || 18 == index || 20 < index < 23 ||
-		23 < index < 26 || 28 < index < 33 || 33 < index < 36 ||
-		36 < index < 39 || 39 < index < 44 || 46 == index ||
-		49 == index || 52 == index || 55 == index) return false;
-	    else
-	    // cactus
-	    if(14 == index || 16 == index) return false;
-	    else
-	    // skull
-	    if(17 == index) return false;
-	    else
+	case ICN::OBJNLAV2:
+	    // volcano
+	    if(129 < index < 133 || 78 < index < 82) return false;
+	    else return true;
+
+	case ICN::OBJNLAV3:
+	    // volcano
+	    if(243 < index < 247) return false;
+	    else return true;
+
+	case ICN::OBJNLAVA:
 	    // crater
-	    if(57 < index < 60 || 61 < index < 66 || 67 < index < 70 ||
-		220 < index < 226 || 226 < index < 236) return false;
+	    if(1 < index < 10 || 11 < index < 18) return false;
 	    else
-	    // shrub
-	    if(70 < index < 73) return false;
+	    // lava pool
+	    if(17 < index < 21 || 26 < index < 45 || 45 < index < 49 || 49 < index < 64 ||
+		64 < index < 74) return false;
 	    else
-	    // wagon
-	    if(74 == index) return false;
-	    else
-	    // tar pit
-	    if(75 < index < 79 || 80 == index || 91 == index ||
-		102 == index || 113 == index || 124 == index ||
-		134 < index < 138 || 148 == index || 159 == index ||
-		170 == index || 181 == index) return false;
-	    else
-	    // troll bridge
-	    if(181 < index < 190) return false;
-	    else
-	    // market
-	    if(202 == index || 213 == index) return false;
-	    else
-	    // watering hole
-	    if(216 < index < 221) return false;
+	    // volcano
+	    if(75 < index < 78 || 88 == index || 98 == index) return false;
 	    else
 	    // obelisk
-	    if(238 == index) return false;
+	    if(110 == index) return false;
+	    else
+	    // daemon cave
+	    if(113 < index < 116) return false;
+	    else
+	    // sign
+	    if(117 == index) return false;
 	    else
 	    // saw mill
-	    if(240 < index < 247) return false;
+	    if(119 < index < 126) return false;
+
 	    else return true;
 
 	default: break;

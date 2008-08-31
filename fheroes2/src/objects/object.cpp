@@ -21,6 +21,11 @@
 #include "world.h"
 #include "mounts.h"
 #include "trees.h"
+#include "objwatr.h"
+#include "objlava.h"
+#include "objmult.h"
+#include "objdsrt.h"
+#include "objdirt.h"
 #include "objsnow.h"
 #include "objswmp.h"
 #include "objgras.h"
@@ -68,11 +73,33 @@ bool Object::isPassable(const u8 general, const std::list<Maps::TilesAddon> & bo
 
 		case ICN::OBJNSNOW:	if(! ObjSnow::isPassable(icn, addon.index)) return false; break;
 		case ICN::OBJNSWMP:	if(! ObjSwamp::isPassable(icn, addon.index)) return false; break;
-
 		case ICN::OBJNGRAS:
 		case ICN::OBJNGRA2:	if(! ObjGrass::isPassable(icn, addon.index)) return false; break;
-
 		case ICN::OBJNCRCK:	if(! ObjWasteLand::isPassable(icn, addon.index)) return false; break;
+		case ICN::OBJNDIRT:	if(! ObjDirt::isPassable(icn, addon.index)) return false; break;
+		case ICN::OBJNDSRT:	if(! ObjDesert::isPassable(icn, addon.index)) return false; break;
+		case ICN::OBJNMUL2:
+		case ICN::OBJNMULT:	if(! ObjMulti::isPassable(icn, addon.index)) return false; break;
+		case ICN::OBJNLAVA:
+		case ICN::OBJNLAV3:
+		case ICN::OBJNLAV2:	if(! ObjLava::isPassable(icn, addon.index)) return false; break;
+		case ICN::OBJNWAT2:
+		case ICN::OBJNWATR:	if(! ObjWater::isPassable(icn, addon.index)) return false; break;
+
+		case ICN::MONS32:
+		case ICN::MINIMON:	return false;
+		case ICN::OBJNRSRC:	if(addon.index % 2) return false; break;
+
+/*
+		case ICN::OBJNTWBA:	if(7 != addon.index || 17 != addon.index || 27 != addon.index ||
+					    37 != addon.index || 47 != addon.index || 57 != addon.index ||
+					    67 != addon.index || 77 != addon.index ) return false; break;
+*/
+/*
+		case ICN::X_LOC1:
+		case ICN::X_LOC2:
+		case ICN::X_LOC3:	if(! ObjLoyalty::isPassable(icn, addon.index)) return false; break;
+*/
 		default: break;
 	    }
         }
@@ -80,36 +107,3 @@ bool Object::isPassable(const u8 general, const std::list<Maps::TilesAddon> & bo
 
     return true;
 }
-/*
-	    return ICN::MONS32;
-	    return ICN::OBJNRSRC;
-	    return ICN::EXTRAOVR;
-
-	    return ICN::OBJNTOWN;
-	    return ICN::OBJNTWBA;
-	    return ICN::OBJNTWSH;
-	    return ICN::OBJNTWRD;
-
-	    return ICN::OBJNWAT2;
-	    return ICN::OBJNWATR;
-
-	    return ICN::OBJNMUL2;
-	    return ICN::OBJNMULT;
-
-
-	    return ICN::OBJNLAVA;
-	    return ICN::OBJNLAV3;
-	    return ICN::OBJNLAV2;
-
-	    return ICN::OBJNDSRT;
-
-	    return ICN::OBJNDIRT;
-
-	    return ICN::OBJNCRCK;
-
-	    return ICN::X_LOC1;
-	    return ICN::X_LOC2;
-	    return ICN::X_LOC3;
-
-	    return ICN::UNKNOWN;
-*/
