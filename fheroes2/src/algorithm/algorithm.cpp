@@ -25,6 +25,9 @@
 #include "direction.h"
 #include "config.h"
 #include "tools.h"
+#include "object.h"
+#include "heroes.h"
+#include "route.h"
 #include "error.h"
 #include "algorithm.h"
 
@@ -42,10 +45,10 @@ struct cellinfo_t
 };
 
 // find path (A* implementation) - is valid return length path
-u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<Route::Step> & result)
+u16 Algorithm::PathFinding(u16 index1, u16 index2, const Heroes & hero, std::list<Route::Step> & result)
 {
     const u16 width = world.w();
-    
+    const Skill::Level::type_t & pathfinding = hero.GetLevelSkill(Skill::Secondary::PATHFINDING);
     std::map<u16, cellinfo_t>	work_map;
     
     bool notfound = false;
@@ -58,14 +61,22 @@ u16 Algorithm::PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & 
     {
 	for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
 	{
-	    const u16 index_w = Maps::GetDirectionIndex(index_i, direct);
-
-	    if(Maps::AllowDirection(index_i, direct) || (index_w == index2))
+	    if(Maps::isValidDirection(index_i, direct))
 	    {
+		const u16 index_w = Maps::GetDirectionIndex(index_i, direct);
+
+		// check direct from object
+		const Maps::Tiles & tile1 = world.GetTiles(index_i);
+		if(MP2::OBJ_HEROES == tile1.GetObject() && ! Object::AllowDirect(hero.GetUnderObject(), direct)) continue;
+
+		// check direct to object
+		const Maps::Tiles & tile2 = world.GetTiles(index_w);
+		if(! Object::AllowDirect(tile2.GetObject(), Direction::Reflect(direct))) continue;
+
 		cellinfo_t & cell = work_map[index_w];
 
 		cell.direct = direct;
-		cell.move = (world.GetTiles(index_w).isPassable() || index_w == index2);
+		cell.move = (tile2.isPassable() || index_w == index2);
 
 		if(cell.move && MAXU16 == cell.cost_g)
 		{

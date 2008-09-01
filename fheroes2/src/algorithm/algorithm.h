@@ -23,9 +23,11 @@
 #include <list>
 #include "gamedefs.h"
 
+class Heroes;
+
 namespace Algorithm
 {
-    u16 PathFinding(u16 index1, u16 index2, const Skill::Level::type_t & pathfinding, std::list<Route::Step> & result);
+    u16 PathFinding(u16 index1, u16 index2, const Heroes & hero, std::list<Route::Step> & result);
 
 };
 

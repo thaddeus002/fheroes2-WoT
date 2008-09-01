@@ -33,6 +33,7 @@ class Object
 	~Object();
 
 	static bool		isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms);
+	static bool		AllowDirect(const u8 general, const u16 direct);
 
 	const MP2::object_t	object;
 	const u16		icn;

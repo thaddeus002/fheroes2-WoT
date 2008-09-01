@@ -40,7 +40,6 @@ namespace Maps
 
     u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
     bool isValidDirection(u16 from, Direction::vector_t vector);
-    bool AllowDirection(u16 from, Direction::vector_t vector);
 
     bool isValidAbsPoint(const Point & pt);
     bool isValidAbsPoint(const s16 x, const s16 y);
