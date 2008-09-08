@@ -20,15 +20,15 @@
 #ifndef H2DIR_H
 #define H2DIR_H
 
-#include <vector>
+#include <list>
 #include <string>
 
-class Dir : public std::vector<std::string>
+class Dir : public std::list<std::string>
 {
 public:
     Dir();
 
-    void Read(const std::string &path = "", const std::string &filter = "");
+    void Read(const std::string &path, const std::string &filter = "", bool sensitive = true);
 };
 
 #endif

@@ -27,6 +27,7 @@
 #include "surface.h"
 #include "sprite.h"
 #include "audio.h"
+#include "tools.h"
 #include "agg.h"
 
 #define FATSIZENAME	15
@@ -152,15 +153,15 @@ void AGG::File::Dump(void) const
 }
 
 /* AGG::Cache constructor */
-AGG::Cache::Cache()
+AGG::Cache::Cache() : heroes2_agg(false)
 {
 }
 
 AGG::Cache::~Cache()
 {
     // free agg cache
-    std::vector<File *>::const_iterator agg_it1 = agg_cache.begin();
-    std::vector<File *>::const_iterator agg_it2 = agg_cache.end();
+    std::list<File *>::const_iterator agg_it1 = agg_cache.begin();
+    std::list<File *>::const_iterator agg_it2 = agg_cache.end();
 
     for(; agg_it1 != agg_it2; ++agg_it1) delete *agg_it1;
 
@@ -229,9 +230,10 @@ AGG::Cache & AGG::Cache::Get(void)
 /* attach AGG::File to AGG::Cache */
 bool AGG::Cache::AttachFile(const std::string & fname)
 {
-    std::vector<File *>::const_iterator it1 = agg_cache.begin();
-    std::vector<File *>::const_iterator it2 = agg_cache.end();
+    std::list<File *>::const_iterator it1 = agg_cache.begin();
+    std::list<File *>::const_iterator it2 = agg_cache.end();
 
+    //if(it2 != std::find_if(it1, it2, ))
     for(; it1 != it2; ++it1)
     {
 	const File & agg_file = **it1;
@@ -246,16 +248,36 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 
     AGG::File *file = new File(fname);
     
-    if(file->CountItems())
+    if(! file->CountItems())
     {
-	agg_cache.push_back(file);
-
-	return true;
+	delete file;
+	return false;
     }
 
-    delete file;
+    std::string lower(fname);
+    String::Lower(lower);
 
-    return false;
+    if(std::string::npos != lower.find("heroes2.agg"))
+    {
+	agg_cache.push_back(file);
+	heroes2_agg = true;
+    }
+    else
+    if(std::string::npos != lower.find("heroes2x.agg"))
+    {
+	if(heroes2_agg)
+	{
+	    agg_cache.insert(--(agg_cache.end()), file);
+	}
+	else
+	    agg_cache.push_back(file);
+
+	Settings::Get().SetModes(Settings::PRICELOYALTY);
+    }
+    else
+        agg_cache.push_front(file);
+
+    return true;
 }
 
 /* load ICN object to AGG::Cache */
@@ -271,8 +293,8 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     {
 	std::vector<char> body;
 
-	std::vector<File *>::const_iterator it1 = agg_cache.begin();
-	std::vector<File *>::const_iterator it2 = agg_cache.end();
+	std::list<File *>::const_iterator it1 = agg_cache.begin();
+	std::list<File *>::const_iterator it2 = agg_cache.end();
 
 	for(; it1 != it2; ++it1)
 
@@ -340,8 +362,8 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
     {
 	std::vector<char> body;
 
-	std::vector<File *>::const_iterator it1 = agg_cache.begin();
-	std::vector<File *>::const_iterator it2 = agg_cache.end();
+	std::list<File *>::const_iterator it1 = agg_cache.begin();
+	std::list<File *>::const_iterator it2 = agg_cache.end();
 
 	for(; it1 != it2; ++it1)
 
@@ -404,8 +426,8 @@ void AGG::Cache::LoadPAL(void)
     {
 	std::vector<char> body;
 
-	std::vector<File *>::const_iterator it1 = agg_cache.begin();
-	std::vector<File *>::const_iterator it2 = agg_cache.end();
+	std::list<File *>::const_iterator it1 = agg_cache.begin();
+	std::list<File *>::const_iterator it2 = agg_cache.end();
 
 	for(; it1 != it2; ++it1)
 
@@ -445,8 +467,8 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     {
 	std::vector<char> body;
 
-	std::vector<File *>::const_iterator it1 = agg_cache.begin();
-	std::vector<File *>::const_iterator it2 = agg_cache.end();
+	std::list<File *>::const_iterator it1 = agg_cache.begin();
+	std::list<File *>::const_iterator it2 = agg_cache.end();
 
 	for(; it1 != it2; ++it1)
 

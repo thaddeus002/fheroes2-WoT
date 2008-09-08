@@ -152,44 +152,14 @@ int main(int argc, char **argv)
 
 	    // read data directory
     	    Dir dir;
-    	    
-    	    dir.Read(conf.DataDirectory(), "agg");
-    	    dir.Read(conf.DataDirectory(), "Agg");
-            dir.Read(conf.DataDirectory(), "AGG");
-
-	    const u16 count_agg = dir.size();
+    	
+            dir.Read(conf.DataDirectory(), ".agg", false);
 
 	    // not found agg, exit
-	    if(0 == count_agg) Error::Except("AGG data files not found.");
-
-    	    std::string agg_heroes2;
-    	    std::string agg_heroes2x;
+	    if(0 == dir.size()) Error::Except("AGG data files not found.");
 
     	    // attach agg files
-    	    for(u16 ii = 0; ii < count_agg; ++ii)
-    	    {
-    		std::string filename(basename(const_cast<char *>(dir[ii].c_str())));
-
-    		// skip original version heroes2.agg
-    		if(0 == strncasecmp("heroes2.agg", filename.c_str(), 11))
-    		    agg_heroes2 = dir[ii];
-    		else
-    		// skip price loyality version heroes2x.agg
-    		if(0 == strncasecmp("heroes2x.agg", filename.c_str(), 12))
-    		{
-    		    agg_heroes2x = dir[ii];
-    		    
-    		    conf.SetModes(Settings::PRICELOYALTY);
-    		}
-    		else
-    		    cache.AttachFile(dir[ii]);
-	    }
-
-    	    // loyality version heroes2x.agg attach
-	    if(agg_heroes2x.size()) cache.AttachFile(agg_heroes2x);
-
-	    // original version heroes2.agg need to last attach
-	    if(agg_heroes2.size()) cache.AttachFile(agg_heroes2);
+    	    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) cache.AttachFile(*itd);
 
 	    // load palette
 	    cache.LoadPAL();

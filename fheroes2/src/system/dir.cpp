@@ -22,13 +22,14 @@
 #include "error.h"
 #include "gamedefs.h"
 #include "config.h"
+#include "tools.h"
 #include "dir.h"
 
 Dir::Dir()
 {
 }
 
-void Dir::Read(const std::string &path, const std::string &filter)
+void Dir::Read(const std::string &path, const std::string &filter, bool sensitive)
 {
     // read directory
     DIR *dp;
@@ -42,11 +43,28 @@ void Dir::Read(const std::string &path, const std::string &filter)
     {
 	while(NULL != (ep = readdir(dp)))
 	{
-    	    std::string filename(ep->d_name);
-    	    if( '.' == filename[0] ) continue;
-	    if( !filter.empty() && std::string::npos == filename.find(filter)) continue;
+    	    // if regular file
+    	    if(DT_REG != ep->d_type) continue;
 
-    	    push_back(std::string(path + SEPARATOR + filename));
+	    if(filter.size())
+	    {
+    		std::string filename(ep->d_name);
+
+		if(sensitive)
+		{
+		    if(std::string::npos == filename.find(filter)) continue;
+    		}
+    		else
+    		{
+    		    std::string filterlow(filter);
+    		    String::Lower(filterlow);
+    		    String::Lower(filename);
+
+		    if(std::string::npos == filename.find(filterlow)) continue;
+		}
+    	    }
+
+    	    push_back(std::string(path + SEPARATOR + ep->d_name));
 	}
     }
 

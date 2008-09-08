@@ -22,6 +22,7 @@
 #define H2AGG_H
 
 #include <string>
+#include <list>
 #include <vector>
 #include <map>
 
@@ -100,7 +101,7 @@ namespace AGG
     private:
 	Cache();
 
-	std::vector<File *> agg_cache;
+	std::list<File *> agg_cache;
 
 	std::map<ICN::icn_t, std::vector<Sprite *> > icn_cache;
 	std::map<ICN::icn_t, std::vector<Sprite *> > reflect_icn_cache;
@@ -108,7 +109,7 @@ namespace AGG
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
 
 	Palette palette;
-
+	bool heroes2_agg;
     };
 
     // wrapper AGG::PreloadObject

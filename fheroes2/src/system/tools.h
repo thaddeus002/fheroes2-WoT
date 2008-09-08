@@ -30,6 +30,7 @@ namespace String
     void Upper(std::string &str);
     void AddInt(std::string &str, int value);
     int  ToInt(const std::string &str);
+    bool Compare(const std::string &str1, const std::string &str2, bool sensitive = true);
 };
 
 #endif

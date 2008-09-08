@@ -89,3 +89,17 @@ int String::ToInt(const std::string &str)
 
     return res;
 }
+
+/* string compare */
+bool String::Compare(const std::string &str1, const std::string &str2, bool sensitive)
+{
+    if(str1.size() != str2.size()) return false;
+    if(sensitive) return str1 == str2;
+
+    std::string strl1(str1);
+    std::string strl2(str2);
+    Lower(strl1);
+    Lower(strl2);
+
+    return str1 == str2;
+}
