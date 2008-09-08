@@ -18,6 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__)
+#include <io.h>
+#define MKDIR(X)    mkdir(X)
+#else
+#define MKDIR(X)    mkdir(X, S_IRWXU)
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -52,6 +62,8 @@ int main(int argc, char **argv)
 
 	return EXIT_SUCCESS;
     }
+
+    MKDIR(argv[2]);
 
     u16 count;
     u16 total = 0;
