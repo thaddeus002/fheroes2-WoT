@@ -54,7 +54,7 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
     if(message.size())
     {
         TextBox(message, Font::BIG, pos);
-        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 10;
+        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 5;
     }
 
     // draw resource

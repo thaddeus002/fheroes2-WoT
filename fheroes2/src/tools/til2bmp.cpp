@@ -33,9 +33,6 @@
 #include <sstream>
 
 #include "kbpal.h"
-#include "types.h"
-#include "surface.h"
-#include "display.h"
 #include "engine.h"
 
 int main(int argc, char **argv)

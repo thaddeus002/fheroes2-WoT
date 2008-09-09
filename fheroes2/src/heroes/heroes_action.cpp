@@ -440,7 +440,7 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 	    if(resource.gold && resource.wood)
 		body = "You search through the flotsam, and find some wood and some gold.";
 	    else
-	    if(resource.gold)
+	    if(resource.wood)
 		body = "You search through the flotsam, and find some wood.";
 	    else
 		body = "You search through the flotsam, but find nothing.";
@@ -456,7 +456,6 @@ void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
 
 	PlayPickupSound();
 	AnimationRemoveObject(tile);
-
 	world.GetKingdom(GetColor()).AddFundsResource(resource);
 
 	if(H2Config::MyColor() == GetColor()) Dialog::ResourceInfo(header, body, resource);
@@ -982,7 +981,7 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 		    image.Blit(artifact, 5, 5);
 		    image.Blit(gold, border.w() + 50, (border.h() - gold.h()) / 2);
 		    Text text(count, Font::SMALL);
-		    text.Blit(border.w() + 50 + (image.w() - Text::width(count, Font::SMALL)) / 2, border.h(), image);
+		    text.Blit(border.w() + 50 + (gold.w() - Text::width(count, Font::SMALL)) / 2, border.h() - 25, image);
 		    Dialog::SpriteInfo("Chest", message, image);
 		}
 		PickupArtifact(art);
