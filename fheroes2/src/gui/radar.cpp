@@ -159,8 +159,8 @@ void Radar::RedrawArea(const u8 color)
 		//case MP2::OBJN_DRAGONCITY:
 		case MP2::OBJ_LIGHTHOUSE:
 		//case MP2::OBJN_LIGHTHOUSE:
-		case MP2::OBJ_ALCHEMYTOWER:
-		//case MP2::OBJN_ALCHEMYTOWER:
+		case MP2::OBJ_ALCHEMYLAB:
+		//case MP2::OBJN_ALCHEMYLAB:
 		case MP2::OBJ_MINES:
 		//case MP2::OBJN_MINES:
 		case MP2::OBJ_SAWMILL:

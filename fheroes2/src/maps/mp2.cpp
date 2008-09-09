@@ -341,8 +341,8 @@ const char * MP2::StringObject(u8 object)
 {
     switch(object){
         case MP2::OBJ_ZERO:			return "OBJ_ZERO";
-        case MP2::OBJN_ALCHEMYTOWER:
-        case MP2::OBJ_ALCHEMYTOWER:		return "Alchemy Tower";
+        case MP2::OBJN_ALCHEMYLAB:
+        case MP2::OBJ_ALCHEMYLAB:		return "Alchemist Lab";
         case MP2::OBJN_DAEMONCAVE:
         case MP2::OBJ_DAEMONCAVE:		return "Daemon Cave";
         case MP2::OBJN_FAERIERING:
@@ -509,6 +509,32 @@ const char * MP2::StringObject(u8 object)
 	case MP2::OBJ_TRAVELLERTENT:		return "Traveller's Tent";
 	case MP2::OBJ_BARRIER:			return "Barrier";
 
+	case MP2::OBJN_FIREALTAR:
+	case MP2::OBJ_FIREALTAR:		return "Fire Summoning Altar";
+	case MP2::OBJN_AIRALTAR:
+	case MP2::OBJ_AIRALTAR:			return "Air Summoning Altar";
+	case MP2::OBJN_EARTHALTAR:
+	case MP2::OBJ_EARTHALTAR:		return "Earth Summoning Altar";
+	case MP2::OBJN_WATERALTAR:
+	case MP2::OBJ_WATERALTAR:		return "Water Summoning Altar";
+	case MP2::OBJN_BARROWMOUNDS:
+	case MP2::OBJ_BARROWMOUNDS:		return "Barrow Mounds";
+	case MP2::OBJN_ARENA:
+	case MP2::OBJ_ARENA:			return "Arena";
+	case MP2::OBJN_STABLES:
+	case MP2::OBJ_STABLES:			return "Stables";
+	case MP2::OBJN_ALCHEMYTOWER:
+	case MP2::OBJ_ALCHEMYTOWER:		return "Alchemist's Tower";
+	case MP2::OBJN_HUTMAGI:
+	case MP2::OBJ_HUTMAGI:			return "Hut of the Magi";
+	case MP2::OBJN_EYEMAGI:
+	case MP2::OBJ_EYEMAGI:			return "Eye of the Magi";
+	case MP2::OBJN_MERMAID:
+	case MP2::OBJ_MERMAID:			return "Mermaid";
+	case MP2::OBJN_SIRENS:
+	case MP2::OBJ_SIRENS:			return "Sirens";
+	case MP2::OBJ_REEFS:			return "Reefs";
+
 	case MP2::OBJ_UNKNW_02:		return "OBJ_UNKNW_02";
 	case MP2::OBJ_UNKNW_03:		return "OBJ_UNKNW_03";
 	case MP2::OBJ_UNKNW_04:		return "OBJ_UNKNW_04";
@@ -551,18 +577,8 @@ const char * MP2::StringObject(u8 object)
 	case MP2::OBJ_UNKNW_5D:		return "OBJ_UNKNW_5D";
 	case MP2::OBJ_UNKNW_5F:		return "OBJ_UNKNW_5F";
 	case MP2::OBJ_UNKNW_62:		return "OBJ_UNKNW_62";
-	case MP2::OBJ_UNKNW_72:		return "OBJ_UNKNW_72";
-	case MP2::OBJ_UNKNW_73:		return "OBJ_UNKNW_73";
-	case MP2::OBJ_UNKNW_74:		return "OBJ_UNKNW_74";
-	case MP2::OBJ_UNKNW_75:		return "OBJ_UNKNW_75";
-	case MP2::OBJ_UNKNW_76:		return "OBJ_UNKNW_76";
-	case MP2::OBJ_UNKNW_77:		return "OBJ_UNKNW_77";
 	case MP2::OBJ_UNKNW_79:		return "OBJ_UNKNW_79";
 	case MP2::OBJ_UNKNW_7A:		return "OBJ_UNKNW_7A";
-	case MP2::OBJ_UNKNW_7C:		return "OBJ_UNKNW_7C";
-	case MP2::OBJ_UNKNW_7D:		return "OBJ_UNKNW_7D";
-	case MP2::OBJ_UNKNW_7E:		return "OBJ_UNKNW_7E";
-	case MP2::OBJ_UNKNW_7F:		return "OBJ_UNKNW_7F";
 	case MP2::OBJ_UNKNW_80:		return "OBJ_UNKNW_80";
 	case MP2::OBJ_UNKNW_91:		return "OBJ_UNKNW_91";
 	case MP2::OBJ_UNKNW_92:		return "OBJ_UNKNW_92";
@@ -580,24 +596,9 @@ const char * MP2::StringObject(u8 object)
 	case MP2::OBJ_UNKNW_E6:		return "OBJ_UNKNW_E6";
 	case MP2::OBJ_UNKNW_E7:		return "OBJ_UNKNW_E7";
 	case MP2::OBJ_UNKNW_E8:		return "OBJ_UNKNW_E8";
-	case MP2::OBJ_UNKNW_E9:		return "OBJ_UNKNW_E9";
-	case MP2::OBJ_UNKNW_EA:		return "OBJ_UNKNW_EA";
-	case MP2::OBJ_UNKNW_EB:		return "OBJ_UNKNW_EB";
-	case MP2::OBJ_UNKNW_EC:		return "OBJ_UNKNW_EC";
-	case MP2::OBJ_UNKNW_ED:		return "OBJ_UNKNW_ED";
-	case MP2::OBJ_UNKNW_EE:		return "OBJ_UNKNW_EE";
-	case MP2::OBJ_UNKNW_EF:		return "OBJ_UNKNW_EF";
-	case MP2::OBJ_UNKNW_F0:		return "OBJ_UNKNW_F0";
-	case MP2::OBJ_UNKNW_F1:		return "OBJ_UNKNW_F1";
-	case MP2::OBJ_UNKNW_F2:		return "OBJ_UNKNW_F2";
-	case MP2::OBJ_UNKNW_F3:		return "OBJ_UNKNW_F3";
 	case MP2::OBJ_UNKNW_F9:		return "OBJ_UNKNW_F9";
 	case MP2::OBJ_UNKNW_FA:		return "OBJ_UNKNW_FA";
-	case MP2::OBJ_UNKNW_FC:		return "OBJ_UNKNW_FC";
-	case MP2::OBJ_UNKNW_FD:		return "OBJ_UNKNW_FD";
-	case MP2::OBJ_UNKNW_FE:		return "OBJ_UNKNW_FE";
-	case MP2::OBJ_UNKNW_FF:		return "OBJ_UNKNW_FF";
-	
+
 	default:
 	    Error::Warning("MP2::Object: unknown, ", object);
 	    break;
@@ -623,6 +624,9 @@ bool MP2::isActionObject(const object_t obj, const bool water)
 	    case OBJ_COAST:
 
     	    case OBJ_HEROES:
+    	    
+    	    case MP2::OBJ_MERMAID:
+    	    case MP2::OBJ_SIRENS:
 		return true;
 
 	    default: break;
@@ -633,7 +637,7 @@ bool MP2::isActionObject(const object_t obj, const bool water)
 	switch(obj)
 	{
     	    case OBJ_TREASURECHEST:
-    	    case OBJ_ALCHEMYTOWER:
+    	    case OBJ_ALCHEMYLAB:
     	    case OBJ_SIGN:
     	    case OBJ_SKELETON:
     	    case OBJ_DAEMONCAVE:
@@ -703,6 +707,19 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     	    case OBJ_CASTLE:
     	    case OBJ_HEROES:
     	    case OBJ_BOAT:
+
+	    case MP2::OBJ_FIREALTAR:
+	    case MP2::OBJ_AIRALTAR:
+	    case MP2::OBJ_EARTHALTAR:
+	    case MP2::OBJ_WATERALTAR:
+	    case MP2::OBJ_BARROWMOUNDS:
+	    case MP2::OBJ_ARENA:
+	    case MP2::OBJ_JAIL:
+	    case MP2::OBJ_STABLES:
+	    case MP2::OBJ_ALCHEMYTOWER:
+	    case MP2::OBJ_HUTMAGI:
+	    case MP2::OBJ_EYEMAGI:
+
 		return true;
 
 	    default: break;
@@ -732,6 +749,9 @@ bool MP2::isWeekLife(const MP2::object_t obj)
     // FIXME: list week object life
     switch(obj)
     {
+	case OBJ_STABLES:
+	    return true;
+
 	default: break;
     }
 

@@ -797,6 +797,10 @@ void World::LoadMaps(const std::string &filename)
 	Maps::Tiles & tile = *vec_tiles[ii];
 	const Maps::TilesAddon *addon = NULL;
 
+	// fix loyalty version objects
+	if(Settings::Get().Modes(Settings::PRICELOYALTY)) tile.FixLoyaltyVersion();
+
+	//
 	switch(tile.GetObject())
 	{
 	    case MP2::OBJ_WITCHSHUT:
@@ -1471,7 +1475,7 @@ void World::ClearFog(const u8 color)
 	switch((*it1).second.first)
 	{
 	    case MP2::OBJ_MINES:
-	    case MP2::OBJ_ALCHEMYTOWER:
+	    case MP2::OBJ_ALCHEMYLAB:
 	    case MP2::OBJ_SAWMILL:	scoute = 2; break;
 
 	    case MP2::OBJ_LIGHTHOUSE:	scoute = 4; break; // FIXME: scoute and lighthouse

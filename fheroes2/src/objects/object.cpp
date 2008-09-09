@@ -118,6 +118,7 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_ARCHERHOUSE:
 	case MP2::OBJ_DOCTORHUT:
 	case MP2::OBJ_DWARFCOTT:
+	case MP2::OBJ_THATCHEDHUT:
 	case MP2::OBJ_FOUNTAIN:
 	case MP2::OBJ_IDOL:
 	case MP2::OBJ_LIGHTHOUSE:
@@ -145,6 +146,12 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_LEANTO:
 	case MP2::OBJ_MAGICGARDEN:
 	case MP2::OBJ_WAGON:
+	case MP2::OBJ_BARRIER:
+	case MP2::OBJ_TRAVELLERTENT:
+	case MP2::OBJ_JAIL:
+	case MP2::OBJ_ALCHEMYTOWER:
+        case MP2::OBJ_HUTMAGI:
+        case MP2::OBJ_EYEMAGI:
 	    return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_TRADINGPOST:
@@ -166,12 +173,14 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_TEMPLE:
 	case MP2::OBJ_WINDMILL:
 	case MP2::OBJ_FAERIERING:
+	case MP2::OBJ_BARROWMOUNDS:
+	case MP2::OBJ_STABLES:
 	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_MINES:
 	case MP2::OBJ_ABANDONEDMINE:
 	case MP2::OBJ_SAWMILL:
-	case MP2::OBJ_ALCHEMYTOWER:
+	case MP2::OBJ_ALCHEMYLAB:
 	case MP2::OBJ_CAVE:
 	case MP2::OBJ_CITYDEAD:
 	case MP2::OBJ_SHIPWRECK:
@@ -181,6 +190,13 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_MERCENARYCAMP:
 	case MP2::OBJ_HALFLINGHOLE:
 	case MP2::OBJ_WAGONCAMP:
+	case MP2::OBJ_WATERALTAR:
+	case MP2::OBJ_AIRALTAR:
+	case MP2::OBJ_FIREALTAR:
+	case MP2::OBJ_EARTHALTAR:
+	case MP2::OBJ_ARENA:
+	case MP2::OBJ_SIRENS:
+	case MP2::OBJ_MERMAID:
 	    return (direct & (DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_CASTLE:
@@ -189,13 +205,6 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_DERELICTSHIP:
 	    return (direct & Direction::LEFT);
 
-/* FIXME:: Object::AllowDirect
-OBJ_BARRIER
-OBJ_JAIL
-OBJ_NOTHINGSPECIAL
-OBJ_THATCHEDHUT
-OBJ_TRAVELLERTENT
-*/
 	default: break;
     }
 

@@ -21,11 +21,13 @@
 #ifndef H2OBJXLOC_H
 #define H2OBJXLOC_H
 
+#include "maps_tiles.h"
 #include "gamedefs.h"
 
 namespace ObjLoyalty
 {
     bool	isPassable(const u16 icn, const u8 index);
+    u8		LearnObject(const Maps::TilesAddon & addon);
 };
 
 #endif

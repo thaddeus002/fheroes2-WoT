@@ -114,6 +114,8 @@ namespace Maps
 	void SetFog(u8 color){ fogs |= color; };
 	void ClearFog(u8 color){ fogs &= ~color; };
 
+	void FixLoyaltyVersion(void);
+
     private:
 	void CorrectFlags32(const u8 index);
 

@@ -167,7 +167,7 @@ void Heroes::Action(const Maps::Tiles & dst)
 	case MP2::OBJ_OBSERVATIONTOWER:	Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, GetColor()); break;
 
 	// capture color object
-	case MP2::OBJ_ALCHEMYTOWER:
+	case MP2::OBJ_ALCHEMYLAB:
         case MP2::OBJ_MINES:
 	case MP2::OBJ_SAWMILL:
         case MP2::OBJ_LIGHTHOUSE:
@@ -214,6 +214,20 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_LEANTO:
         case MP2::OBJ_MAGICGARDEN:
         case MP2::OBJ_FREEMANFOUNDRY:
+
+        case MP2::OBJ_JAIL:
+        case MP2::OBJ_WATERALTAR:
+        case MP2::OBJ_AIRALTAR:
+        case MP2::OBJ_FIREALTAR:
+        case MP2::OBJ_EARTHALTAR:
+        case MP2::OBJ_BARROWMOUNDS:
+        case MP2::OBJ_ARENA:
+        case MP2::OBJ_STABLES:
+        case MP2::OBJ_ALCHEMYTOWER:
+        case MP2::OBJ_HUTMAGI:
+        case MP2::OBJ_EYEMAGI:
+        case MP2::OBJ_SIRENS:
+        case MP2::OBJ_MERMAID:
 	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
 
@@ -1136,7 +1150,7 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
 
     switch(obj)
     {
-	case MP2::OBJ_ALCHEMYTOWER:
+	case MP2::OBJ_ALCHEMYLAB:
 	    sprite = &AGG::GetICN(ICN::RESOURCE, 1);
 	    res = Resource::MERCURY;
 	    header = MP2::StringObject(obj);

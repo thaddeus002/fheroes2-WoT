@@ -35,6 +35,7 @@
 #include "game_focus.h"
 #include "display.h"
 #include "object.h"
+#include "objxloc.h"
 #include "maps_tiles.h"
 
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
@@ -497,7 +498,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
     switch(general)
     {
 	case MP2::OBJ_ZERO:		return MP2::OBJ_ZERO;
-	case MP2::OBJN_ALCHEMYTOWER:	return MP2::OBJN_ALCHEMYTOWER;
+	case MP2::OBJN_ALCHEMYLAB:	return MP2::OBJN_ALCHEMYLAB;
 	case MP2::OBJN_DAEMONCAVE:	return MP2::OBJN_DAEMONCAVE;
 	case MP2::OBJN_FAERIERING:	return MP2::OBJN_FAERIERING;
 	case MP2::OBJN_GAZEBO:		return MP2::OBJN_GAZEBO;
@@ -574,7 +575,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_LAVAPOOL:		return MP2::OBJ_LAVAPOOL;
 	case MP2::OBJ_SHRUB:		return MP2::OBJ_SHRUB;
 
-	case MP2::OBJ_ALCHEMYTOWER:	return MP2::OBJ_ALCHEMYTOWER;
+	case MP2::OBJ_ALCHEMYLAB:	return MP2::OBJ_ALCHEMYLAB;
 	case MP2::OBJ_SIGN:		return MP2::OBJ_SIGN;
 	case MP2::OBJ_BUOY:		return MP2::OBJ_BUOY;
 	case MP2::OBJ_SKELETON:		return MP2::OBJ_SKELETON;
@@ -682,8 +683,31 @@ MP2::object_t Maps::Tiles::GetObject(void) const
         case MP2::OBJ_TRAVELLERTENT:	return MP2::OBJ_TRAVELLERTENT;
         case MP2::OBJ_BARRIER:		return MP2::OBJ_BARRIER;
     
-
-
+	case MP2::OBJN_FIREALTAR:	return MP2::OBJN_FIREALTAR;
+	case MP2::OBJ_FIREALTAR:	return MP2::OBJ_FIREALTAR;
+	case MP2::OBJN_AIRALTAR:	return MP2::OBJN_AIRALTAR;
+	case MP2::OBJ_AIRALTAR:		return MP2::OBJ_AIRALTAR;
+	case MP2::OBJN_EARTHALTAR:	return MP2::OBJN_EARTHALTAR;
+	case MP2::OBJ_EARTHALTAR:	return MP2::OBJ_EARTHALTAR;
+	case MP2::OBJN_WATERALTAR:	return MP2::OBJN_WATERALTAR;
+	case MP2::OBJ_WATERALTAR:	return MP2::OBJ_WATERALTAR;
+	case MP2::OBJN_BARROWMOUNDS:	return MP2::OBJN_BARROWMOUNDS;
+	case MP2::OBJ_BARROWMOUNDS:	return MP2::OBJ_BARROWMOUNDS;
+	case MP2::OBJN_ARENA:		return MP2::OBJN_ARENA;
+	case MP2::OBJ_ARENA:		return MP2::OBJ_ARENA;
+	case MP2::OBJN_STABLES:		return MP2::OBJN_STABLES;
+	case MP2::OBJ_STABLES:		return MP2::OBJ_STABLES;
+	case MP2::OBJN_ALCHEMYTOWER:	return MP2::OBJN_ALCHEMYTOWER;
+	case MP2::OBJ_ALCHEMYTOWER:	return MP2::OBJ_ALCHEMYTOWER;
+	case MP2::OBJN_HUTMAGI:		return MP2::OBJN_HUTMAGI;
+	case MP2::OBJ_HUTMAGI:		return MP2::OBJ_HUTMAGI;
+	case MP2::OBJN_EYEMAGI:		return MP2::OBJN_EYEMAGI;
+	case MP2::OBJ_EYEMAGI:		return MP2::OBJ_EYEMAGI;
+	case MP2::OBJN_MERMAID:		return MP2::OBJN_MERMAID;
+	case MP2::OBJ_MERMAID:		return MP2::OBJ_MERMAID;
+	case MP2::OBJN_SIRENS:		return MP2::OBJN_SIRENS;
+	case MP2::OBJ_SIRENS:		return MP2::OBJ_SIRENS;
+	case MP2::OBJ_REEFS:		return MP2::OBJ_REEFS;
 
 	case MP2::OBJ_UNKNW_02:		return MP2::OBJ_UNKNW_02;
 	case MP2::OBJ_UNKNW_03:		return MP2::OBJ_UNKNW_03;
@@ -727,18 +751,8 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_UNKNW_5D:		return MP2::OBJ_UNKNW_5D;
 	case MP2::OBJ_UNKNW_5F:		return MP2::OBJ_UNKNW_5F;
 	case MP2::OBJ_UNKNW_62:		return MP2::OBJ_UNKNW_62;
-	case MP2::OBJ_UNKNW_72:		return MP2::OBJ_UNKNW_72;
-	case MP2::OBJ_UNKNW_73:		return MP2::OBJ_UNKNW_73;
-	case MP2::OBJ_UNKNW_74:		return MP2::OBJ_UNKNW_74;
-	case MP2::OBJ_UNKNW_75:		return MP2::OBJ_UNKNW_75;
-	case MP2::OBJ_UNKNW_76:		return MP2::OBJ_UNKNW_76;
-	case MP2::OBJ_UNKNW_77:		return MP2::OBJ_UNKNW_77;
 	case MP2::OBJ_UNKNW_79:		return MP2::OBJ_UNKNW_79;
 	case MP2::OBJ_UNKNW_7A:		return MP2::OBJ_UNKNW_7A;
-	case MP2::OBJ_UNKNW_7C:		return MP2::OBJ_UNKNW_7C;
-	case MP2::OBJ_UNKNW_7D:		return MP2::OBJ_UNKNW_7D;
-	case MP2::OBJ_UNKNW_7E:		return MP2::OBJ_UNKNW_7E;
-	case MP2::OBJ_UNKNW_7F:		return MP2::OBJ_UNKNW_7F;
 	case MP2::OBJ_UNKNW_80:		return MP2::OBJ_UNKNW_80;
 	case MP2::OBJ_UNKNW_91:		return MP2::OBJ_UNKNW_91;
 	case MP2::OBJ_UNKNW_92:		return MP2::OBJ_UNKNW_92;
@@ -756,23 +770,8 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_UNKNW_E6:		return MP2::OBJ_UNKNW_E6;
 	case MP2::OBJ_UNKNW_E7:		return MP2::OBJ_UNKNW_E7;
 	case MP2::OBJ_UNKNW_E8:		return MP2::OBJ_UNKNW_E8;
-	case MP2::OBJ_UNKNW_E9:		return MP2::OBJ_UNKNW_E9;
-	case MP2::OBJ_UNKNW_EA:		return MP2::OBJ_UNKNW_EA;
-	case MP2::OBJ_UNKNW_EB:		return MP2::OBJ_UNKNW_EB;
-	case MP2::OBJ_UNKNW_EC:		return MP2::OBJ_UNKNW_EC;
-	case MP2::OBJ_UNKNW_ED:		return MP2::OBJ_UNKNW_ED;
-	case MP2::OBJ_UNKNW_EE:		return MP2::OBJ_UNKNW_EE;
-	case MP2::OBJ_UNKNW_EF:		return MP2::OBJ_UNKNW_EF;
-	case MP2::OBJ_UNKNW_F0:		return MP2::OBJ_UNKNW_F0;
-	case MP2::OBJ_UNKNW_F1:		return MP2::OBJ_UNKNW_F1;
-	case MP2::OBJ_UNKNW_F2:		return MP2::OBJ_UNKNW_F2;
-	case MP2::OBJ_UNKNW_F3:		return MP2::OBJ_UNKNW_F3;
 	case MP2::OBJ_UNKNW_F9:		return MP2::OBJ_UNKNW_F9;
 	case MP2::OBJ_UNKNW_FA:		return MP2::OBJ_UNKNW_FA;
-	case MP2::OBJ_UNKNW_FC:		return MP2::OBJ_UNKNW_FC;
-	case MP2::OBJ_UNKNW_FD:		return MP2::OBJ_UNKNW_FD;
-	case MP2::OBJ_UNKNW_FE:		return MP2::OBJ_UNKNW_FE;
-	case MP2::OBJ_UNKNW_FF:		return MP2::OBJ_UNKNW_FF;
 
 
 	default: Error::Warning("Maps::Tiles::GetObject: unknown object: ", general); Error::Warning("maps index: ", maps_index); break;
@@ -1218,7 +1217,7 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	//case MP2::OBJ_DRAGONCITY:	index += 35; CorrectFlags32(index); break; unused
         case MP2::OBJ_LIGHTHOUSE:	index += 42; CorrectFlags32(index); break;
 
-	case MP2::OBJ_ALCHEMYTOWER:
+	case MP2::OBJ_ALCHEMYLAB:
 	{
 	    index += 21;
 	    if(Maps::isValidDirection(maps_index, Direction::TOP))
@@ -1273,4 +1272,57 @@ void Maps::Tiles::CorrectFlags32(const u8 index)
     else
     // or new flag
 	addons_level2.push_back(TilesAddon(TilesAddon::UPPER, world.GetUniq(), 0x38, index));
+}
+
+void Maps::Tiles::FixLoyaltyVersion(void)
+{
+    switch(general)
+    {
+	case MP2::OBJ_UNKNW_79:
+        case MP2::OBJ_UNKNW_7A:
+        case MP2::OBJ_UNKNW_F9:
+        case MP2::OBJ_UNKNW_FA:
+	{
+	    std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	    std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	    // check level1
+	    for(; it1 != it2; ++it1)
+	    {
+		TilesAddon & addon = *it1;
+
+		if(ICN::X_LOC1 == MP2::GetICNObject(addon.object) ||
+		    ICN::X_LOC2 == MP2::GetICNObject(addon.object) ||
+		    ICN::X_LOC3 == MP2::GetICNObject(addon.object))
+		{
+		    const u8 newobj = ObjLoyalty::LearnObject(addon);
+		    if(MP2::OBJ_ZERO != newobj) general = newobj;
+		    return;
+		}
+	    }
+
+	    it1 = addons_level2.begin();
+	    it2 = addons_level2.end();
+
+	    // check level2
+	    for(; it1 != it2; ++it1)
+	    {
+		TilesAddon & addon = *it1;
+
+		if(ICN::X_LOC1 == MP2::GetICNObject(addon.object) ||
+		    ICN::X_LOC2 == MP2::GetICNObject(addon.object) ||
+		    ICN::X_LOC3 == MP2::GetICNObject(addon.object))
+		{
+		    const u8 newobj = ObjLoyalty::LearnObject(addon);
+		    if(MP2::OBJ_ZERO != newobj) general = newobj;
+		    return;
+		}
+	    }
+
+	    if(H2Config::Debug()) Error::Warning("Maps::Tiles::FixLoyaltyVersion: index: ", maps_index);
+
+	} break;
+
+	default: break;
+    }
 }
