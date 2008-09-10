@@ -62,7 +62,8 @@ namespace Maps
     u32 AnimationTicket(void);
     void IncreaseAnimationTicket(void);
 
-    u16 GetAroundFogDirection(u16 center, u8 color = 0);
+    u16 GetAroundFogDirection(const u16 center, u8 color = 0);
+    u16 GetAroundGroundDirection(const u16 center, const u16 ground);
 
     void ClearFog(const Point & center, const u8 scoute, const u8 color);
 };

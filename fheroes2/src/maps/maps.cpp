@@ -193,7 +193,7 @@ int Maps::GetIndexFromAreaPoint(s16 px, s16 py)
     return result > world.w() * world.h() - 1 ? -1 : result;
 }
 
-u16 Maps::GetAroundFogDirection(u16 center, u8 color)
+u16 Maps::GetAroundFogDirection(const u16 center, u8 color)
 {
     if(!isValidAbsPoint(center % world.w(), center / world.h())) return 0;
     if(0 == color) color = Settings::Get().MyColor();
@@ -209,6 +209,21 @@ u16 Maps::GetAroundFogDirection(u16 center, u8 color)
     return result;
 }
 
+u16 Maps::GetAroundGroundDirection(const u16 center, const u16 ground)
+{
+    if(0 == ground || !isValidAbsPoint(center % world.w(), center / world.h())) return 0;
+
+    u16 result = 0;
+
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+	if(isValidDirection(center, direct) &&
+	   ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) result |= direct;
+
+    if(ground & world.GetTiles(center).GetGround()) result |= Direction::CENTER;
+
+    return result;
+}
+    
 void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
 {
     if(0 == scoute) return;
