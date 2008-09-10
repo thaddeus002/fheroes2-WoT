@@ -1194,44 +1194,47 @@ void Game::Editor::RedrawLeftNumberCell(const Rect & area)
 void Game::Editor::ModifySingleTile(Maps::Tiles & tile)
 {
     //u8 count = Maps::GetCountAroundGround(tile.GetIndex(), tile.GetGround());
-    //u16 ground = Maps::GetMaxGroundAround(tile.GetIndex());
-    std::vector<u8> grounds(9, 0);
-    u16 result = 0;
+    const u16 center = tile.GetIndex();
+    const Maps::Ground::ground_t ground = tile.GetGround();
+    const u16 max = Maps::GetMaxGroundAround(center);
 
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+    if(max & ground) return;
+
+    if((ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::TOP)).GetGround() &&
+	ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::LEFT)).GetGround()) ||
+       (ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::TOP)).GetGround() &&
+	ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::RIGHT)).GetGround()) ||
+       (ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).GetGround() &&
+	ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::LEFT)).GetGround()) ||
+       (ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).GetGround() &&
+	ground == world.GetTiles(Maps::GetDirectionIndex(center, Direction::RIGHT)).GetGround())) return;
+
+    u16 index = 0;
+
+    if(max & Maps::Ground::DESERT)	index = 300;
+    else
+    if(max & Maps::Ground::SNOW)	index = 130;
+    else
+    if(max & Maps::Ground::SWAMP)	index = 184;
+    else
+    if(max & Maps::Ground::WASTELAND)	index = 399;
+    else
+    if(max & Maps::Ground::BEACH)	index = 415;
+    else
+    if(max & Maps::Ground::LAVA)	index = 246;
+    else
+    if(max & Maps::Ground::DIRT)	index = 337;
+    else
+    if(max & Maps::Ground::GRASS)	index =  68;
+    else
+    if(max & Maps::Ground::WATER)	index =  16;
+
+    if(index)
     {
-	const Maps::Tiles & tile = (Maps::isValidDirection(center, direct) ? world.GetTiles(GetDirectionIndex(center, direct)) : world.GetTiles(center));
-
-    switch(tile.GetGround())
-    {
-	case Maps::Ground::DESERT:  ++grounds[0]; break;
-        case Maps::Ground::SNOW:    ++grounds[1]; break;
-        case Maps::Ground::SWAMP:   ++grounds[2]; break;
-        case Maps::Ground::WASTELAND:++grounds[3]; break;
-        case Maps::Ground::BEACH:   ++grounds[4]; break;
-        case Maps::Ground::LAVA:    ++grounds[5]; break;
-        case Maps::Ground::DIRT:    ++grounds[6]; break;
-        case Maps::Ground::GRASS:   ++grounds[7]; break;
-        case Maps::Ground::WATER:   ++grounds[8]; break;
-        default: break;
-    }
-
-    switch(tile.GetGround())
-    {
-	case Maps::Ground::WATER:
-		break;
-
-	case Maps::Ground::DESERT:
-	case Maps::Ground::SNOW:
-	case Maps::Ground::SWAMP:
-	case Maps::Ground::WASTELAND:
-	case Maps::Ground::BEACH:
-	case Maps::Ground::LAVA:
-	case Maps::Ground::DIRT:
-	case Maps::Ground::GRASS:
-		break;
-
-	default: break;
+	tile.SetTile(Rand::Get(index, index + 7), 0);
+        tile.RedrawTile();
+        tile.RedrawBottom();
+    	tile.RedrawTop();
     }
 }
 
