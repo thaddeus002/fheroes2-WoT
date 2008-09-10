@@ -1021,7 +1021,7 @@ Game::menu_t Game::HumanTurn(bool message)
 	    else
 	    if(le.MousePressRight(tile_pos))
 	    {
-		if(H2Config::Debug()) tile.DebugInfo(index_maps);
+		if(H2Config::Debug()) tile.DebugInfo();
 
 		switch(tile.GetObject())
 		{

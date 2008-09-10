@@ -108,7 +108,7 @@ namespace Maps
 	void AddonsSort(void);
 	void Remove(u32 uniq);
 
-	void DebugInfo(u16 index = 0xFFFF) const;
+	void DebugInfo(void) const;
 	
 	bool isFog(u8 color) const{ return fogs & color; };
 	void SetFog(u8 color){ fogs |= color; };

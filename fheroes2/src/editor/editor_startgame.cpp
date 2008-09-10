@@ -46,7 +46,8 @@ namespace Game
     {
 	void RedrawTopNumberCell(const Rect & area);
 	void RedrawLeftNumberCell(const Rect & area);
-	void ModifyAllTilesAbroad(void);
+	void ModifySingleTile(Maps::Tiles & center);
+	void ModifyTileAbroad(Maps::Tiles & center);
 	void SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::ground_t ground);
     };
 };
@@ -367,9 +368,6 @@ Game::menu_t Game::Editor::StartGame()
     u8 selectTerrain = 0;
     u8 selectObject = 0;
 
-    bool selectTerrainEnable = true;
-    bool selectObjectEnable = false;
-
     cursor.Show();
     display.Flip();
 
@@ -539,24 +537,13 @@ Game::menu_t Game::Editor::StartGame()
 			newtile.RedrawTop();
 		    }
 		}
-		
-		//GetIndexFromAbsPoint(
-		//Error::Verbose("X: ", GameArea::x() + (div_x - BORDERWIDTH) / 32);
-		//Error::Verbose("Y: ", GameArea::y() + (div_y - BORDERWIDTH) / 32);
-		//Maps::Tiles & tile = world.GetTiles(topleft);
-		//for(u8 ii = 0; ii < sizeCursor.w(); ++ii)
-		//{
-		    //from + ii;
 
-		    //if(! isValidDirection(from + ii, Direction::LEFT)) break;
-		//}
+		// modify single tiles
+		for(u16 ii = 0; ii < world.w() * world.h(); ++ii) ModifySingleTile(world.GetTiles(ii));
 
-		//u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
-		//bool isValidDirection(u16 from, Direction::vector_t vector);    
-		//sizeCursor.GetPos();
-
-		ModifyAllTilesAbroad();
-
+		// modify all tiles abroad
+		for(u16 ii = 0; ii < world.w() * world.h(); ++ii) ModifyTileAbroad(world.GetTiles(ii));
+        
 		sizeCursor.Show();
 		cursor.Show();
 
@@ -569,15 +556,33 @@ Game::menu_t Game::Editor::StartGame()
 	    else
 	    if(le.MouseRight())
 	    {
-		if(H2Config::Debug()) tile.DebugInfo(index_maps);
+		if(btnSelectInfo.isPressed())
+		{
+		    if(H2Config::Debug())
+		    {
+			tile.DebugInfo();
 
-		// wait
-		while(le.HandleEvents() && le.MouseRight());
+			const u16 around = Maps::GetDirectionAroundGround(tile.GetIndex(), tile.GetGround());
+			if(Direction::TOP_LEFT & around) Error::Verbose("TOP_LEFT");
+			if(Direction::TOP & around) Error::Verbose("TOP");
+			if(Direction::TOP_RIGHT & around) Error::Verbose("TOP_RIGHT");
+			if(Direction::RIGHT & around) Error::Verbose("RIGHT");
+			if(Direction::BOTTOM_RIGHT & around) Error::Verbose("BOTTOM_RIGHT");
+			if(Direction::BOTTOM & around) Error::Verbose("BOTTOM");
+			if(Direction::BOTTOM_LEFT & around) Error::Verbose("BOTTOM_LEFT");
+			if(Direction::LEFT & around) Error::Verbose("LEFT");
 
-		//const std::string & info = (MP2::OBJ_ZERO == object || MP2::OBJ_EVENT == object ?
-		//    Maps::Ground::String(tile.GetGround()) : MP2::StringObject(object));
+			// wait
+			while(le.HandleEvents() && le.MouseRight());
+		    }
+		    else
+		    {
+			//const std::string & info = (MP2::OBJ_ZERO == object || MP2::OBJ_EVENT == object ?
+			//Maps::Ground::String(tile.GetGround()) : MP2::StringObject(object));
 
-		//Dialog::QuickInfo(info);
+			//Dialog::QuickInfo(info);
+		    }
+		}
 	    }
 	// end cursor over game area
 	}
@@ -625,9 +630,6 @@ Game::menu_t Game::Editor::StartGame()
 
 	    if(le.MouseCursor(btnSelectGround))
 	    {
-		selectTerrainEnable = true;
-		selectObjectEnable = false;
-
 		selectTerrain = 0;
 
 		btnSizeSmall.SetDisable(false);
@@ -645,9 +647,6 @@ Game::menu_t Game::Editor::StartGame()
 	    else
 	    if(le.MouseCursor(btnSelectObject))
 	    {
-		selectTerrainEnable = false;
-		selectObjectEnable = true;
-
 		selectObject = 0;
 
 		btnSizeSmall.SetDisable(true);
@@ -665,8 +664,13 @@ Game::menu_t Game::Editor::StartGame()
 	    else
 	    if(le.MouseCursor(btnSelectInfo))
 	    {
-		selectTerrainEnable = false;
-		selectObjectEnable = false;
+		btnSizeSmall.Release();
+		btnSizeMedium.Release();
+		btnSizeLarge.Release();
+		btnSizeManual.Release();
+
+		btnSizeSmall.Press();
+		sizeCursor.ModifySize(1, 1);
 
 		btnSizeSmall.SetDisable(true);
 		btnSizeMedium.SetDisable(true);
@@ -682,9 +686,6 @@ Game::menu_t Game::Editor::StartGame()
 	    else
 	    if(le.MouseCursor(btnSelectRiver))
 	    {
-		selectTerrainEnable = false;
-		selectObjectEnable = false;
-
 		btnSizeSmall.SetDisable(true);
 		btnSizeMedium.SetDisable(true);
 		btnSizeLarge.SetDisable(true);
@@ -699,9 +700,6 @@ Game::menu_t Game::Editor::StartGame()
 	    else
 	    if(le.MouseCursor(btnSelectRoad))
 	    {
-		selectTerrainEnable = false;
-		selectObjectEnable = false;
-
 		btnSizeSmall.SetDisable(true);
 		btnSizeMedium.SetDisable(true);
 		btnSizeLarge.SetDisable(true);
@@ -716,9 +714,6 @@ Game::menu_t Game::Editor::StartGame()
 	    else
 	    if(le.MouseCursor(btnSelectClear))
 	    {
-		selectTerrainEnable = false;
-		selectObjectEnable = false;
-
 		btnSizeSmall.SetDisable(false);
 		btnSizeMedium.SetDisable(false);
 		btnSizeLarge.SetDisable(false);
@@ -777,7 +772,7 @@ Game::menu_t Game::Editor::StartGame()
 	}
 
 	// click select terrain
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainWater))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainWater))
 	{
 	    selectTerrain = 0;
 	    cursor.Hide();
@@ -787,7 +782,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: water");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainGrass))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainGrass))
 	{
 	    selectTerrain = 1;
 	    cursor.Hide();
@@ -797,7 +792,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: grass");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainSnow))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainSnow))
 	{
 	    selectTerrain = 2;
 	    cursor.Hide();
@@ -807,7 +802,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: snow");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainSwamp))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainSwamp))
 	{
 	    selectTerrain = 3;
 	    cursor.Hide();
@@ -817,7 +812,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: swamp");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainLava))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainLava))
 	{
 	    selectTerrain = 4;
 	    cursor.Hide();
@@ -827,7 +822,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: lava");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainBeach))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainBeach))
 	{
 	    selectTerrain = 5;
 	    cursor.Hide();
@@ -837,7 +832,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: beach");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainDirt))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainDirt))
 	{
 	    selectTerrain = 6;
 	    cursor.Hide();
@@ -847,7 +842,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: dirt");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainWasteland))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainWasteland))
 	{
 	    selectTerrain = 7;
 	    cursor.Hide();
@@ -857,7 +852,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select terrain: wasteland");
 	}
 	else
-	if(selectTerrainEnable && le.MouseClickLeft(rectTerrainDesert))
+	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainDesert))
 	{
 	    selectTerrain = 8;
 	    cursor.Hide();
@@ -868,7 +863,7 @@ Game::menu_t Game::Editor::StartGame()
 	}
 
 	// click select object
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectWater))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectWater))
 	{
 	    selectObject = 0;
 	    cursor.Hide();
@@ -878,7 +873,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: water");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectGrass))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectGrass))
 	{
 	    selectObject = 1;
 	    cursor.Hide();
@@ -888,7 +883,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: grass");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectSnow))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectSnow))
 	{
 	    selectObject = 2;
 	    cursor.Hide();
@@ -898,7 +893,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: snow");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectSwamp))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectSwamp))
 	{
 	    selectObject = 3;
 	    cursor.Hide();
@@ -908,7 +903,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: swamp");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectLava))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectLava))
 	{
 	    selectObject = 4;
 	    cursor.Hide();
@@ -918,7 +913,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: lava");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectDesert))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectDesert))
 	{
 	    selectObject = 5;
 	    cursor.Hide();
@@ -928,7 +923,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: desert");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectDirt))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectDirt))
 	{
 	    selectObject = 6;
 	    cursor.Hide();
@@ -938,7 +933,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: dirt");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectWasteland))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectWasteland))
 	{
 	    selectObject = 7;
 	    cursor.Hide();
@@ -948,7 +943,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: wasteland");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectBeach))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectBeach))
 	{
 	    selectObject = 8;
 	    cursor.Hide();
@@ -958,7 +953,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: beach");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectTown))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectTown))
 	{
 	    selectObject = 9;
 	    cursor.Hide();
@@ -968,7 +963,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: town");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectMonster))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectMonster))
 	{
 	    selectObject = 10;
 	    cursor.Hide();
@@ -978,7 +973,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: monster");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectHero))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectHero))
 	{
 	    selectObject = 11;
 	    cursor.Hide();
@@ -988,7 +983,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: hero");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectArtifact))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectArtifact))
 	{
 	    selectObject = 12;
 	    cursor.Hide();
@@ -998,7 +993,7 @@ Game::menu_t Game::Editor::StartGame()
 	    Error::Verbose("Game::Editor::StartGame: select object: artifact");
 	}
 	else
-	if(selectObjectEnable && le.MouseClickLeft(rectObjectResource))
+	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectResource))
 	{
 	    selectObject = 13;
 	    cursor.Hide();
@@ -1079,73 +1074,73 @@ Game::menu_t Game::Editor::StartGame()
 	if(le.MousePressRight(btnSelectClear))
 	    Dialog::Message("Erase Mode", "Used to erase objects of the map.", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainWater))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainWater))
 	    Dialog::Message("Water", "Traversable only by boat.", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainGrass))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainGrass))
 	    Dialog::Message("Grass", "No special modifiers.", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainSnow))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainSnow))
 	    Dialog::Message("Snow", "Cost 1.5 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainSwamp))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainSwamp))
 	    Dialog::Message("Swamp", "Cost 1.75 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainLava))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainLava))
 	    Dialog::Message("Lava", "No special modifiers.", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainBeach))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainBeach))
 	    Dialog::Message("Beach", "Cost 1.25 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainDirt))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainDirt))
 	    Dialog::Message("Dirt", "No special modifiers.", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainWasteland))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainWasteland))
 	    Dialog::Message("Wasteland", "Cost 1.25 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
 	else
-	if(selectTerrainEnable && le.MousePressRight(rectTerrainDesert))
+	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainDesert))
 	    Dialog::Message("Desert", "Cost 2 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectWater))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectWater))
 	    Dialog::Message("Water Objects", "Used to select objects most appropriate for use on water.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectGrass))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectGrass))
 	    Dialog::Message("Grass Objects", "Used to select objects most appropriate for use on grass.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectSnow))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectSnow))
 	    Dialog::Message("Snow Objects", "Used to select objects most appropriate for use on snow.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectSwamp))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectSwamp))
 	    Dialog::Message("Swamp Objects", "Used to select objects most appropriate for use on swamp.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectLava))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectLava))
 	    Dialog::Message("Lava Objects", "Used to select objects most appropriate for use on lava.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectDesert))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectDesert))
 	    Dialog::Message("Desert Objects", "Used to select objects most appropriate for use on desert.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectDirt))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectDirt))
 	    Dialog::Message("Dirt Objects", "Used to select objects most appropriate for use on dirt.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectWasteland))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectWasteland))
 	    Dialog::Message("Wasteland Objects", "Used to select objects most appropriate for use on wasteland.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectBeach))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectBeach))
 	    Dialog::Message("Beach Objects", "Used to select objects most appropriate for use on beach.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectTown))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectTown))
 	    Dialog::Message("Towns", "Used to place a town or castle.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectMonster))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectMonster))
 	    Dialog::Message("Monsters", "Used to place a monster group.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectHero))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectHero))
 	    Dialog::Message("Heroes", "Used to place a hero.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectArtifact))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectArtifact))
 	    Dialog::Message("Artifact", "Used to place an artifact.", Font::BIG);
 	else
-	if(selectObjectEnable && le.MousePressRight(rectObjectResource))
+	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectResource))
 	    Dialog::Message("Treasures", "Used to place a resource or treasure.", Font::BIG);
 
     }
@@ -1196,124 +1191,143 @@ void Game::Editor::RedrawLeftNumberCell(const Rect & area)
     }
 }
 
-/* modify all tiles maps for correct abroad direction */
-void Game::Editor::ModifyAllTilesAbroad(void)
+void Game::Editor::ModifySingleTile(Maps::Tiles & tile)
 {
-    std::vector<Direction::vector_t> directs_frnt(4);
-    std::vector<Direction::vector_t> directs_diag(4);
+    //u8 count = Maps::GetCountAroundGround(tile.GetIndex(), tile.GetGround());
+    //u16 ground = Maps::GetMaxGroundAround(tile.GetIndex());
+    std::vector<u8> grounds(9, 0);
+    u16 result = 0;
 
-    std::vector<Direction::vector_t>::const_iterator it1;
-    std::vector<Direction::vector_t>::const_iterator it2;
-    
-    directs_frnt[0] = Direction::TOP;
-    directs_frnt[1] = Direction::RIGHT;
-    directs_frnt[2] = Direction::BOTTOM;
-    directs_frnt[3] = Direction::LEFT;
-
-    directs_diag[0] = Direction::TOP_LEFT;
-    directs_diag[1] = Direction::TOP_RIGHT;
-    directs_diag[2] = Direction::BOTTOM_RIGHT;
-    directs_diag[3] = Direction::BOTTOM_LEFT;
-
-    for(u16 ii = 0; ii < world.w() * world.h(); ++ii)
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
     {
-	Maps::Tiles & center = world.GetTiles(ii);
+	const Maps::Tiles & tile = (Maps::isValidDirection(center, direct) ? world.GetTiles(GetDirectionIndex(center, direct)) : world.GetTiles(center));
 
-	u16 around_frnt = 0;
-	u16 around_diag = 0;
-
-	//u8 around_ground = 0;
-
-	//u8 count_desert = 0;
-	//u8 count_snow = 0;
-	//u8 count_swamp = 0;
-	//u8 count_wasteland = 0;
-	//u8 count_beach = 0;
-	//u8 count_lava = 0;
-	//u8 count_dirt = 0;
-	//u8 count_grass = 0;
-	//u8 count_water = 0;
-
-	//Maps::Ground::ground_t max = Maps::Ground::UNKNOWN;
-
-	bool skip = true;
-
-	// frontal
-	it1 = directs_frnt.begin();
-	it2 = directs_frnt.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    const Direction::vector_t & direct = *it1;
-
-	    if(Maps::isValidDirection(ii, direct))
-	    {
-		const Maps::Tiles & opposition = world.GetTiles(Maps::GetDirectionIndex(ii, direct));
-
-		if(center.GetGround() != opposition.GetGround())
-		{
-		    skip = false;
-
-		    around_frnt |= direct;
-		}
-	    }
-	}
-
-	// diagonal
-	it1 = directs_diag.begin();
-	it2 = directs_diag.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    const Direction::vector_t & direct = *it1;
-
-	    if(Maps::isValidDirection(ii, direct))
-	    {
-		const Maps::Tiles & opposition = world.GetTiles(Maps::GetDirectionIndex(ii, direct));
-
-		if(center.GetGround() != opposition.GetGround())
-		{
-		    skip = false;
-
-		    around_diag |= direct;
-		}
-	    }
-	}
-
-	// skip if all around ground equalent
-	if(skip) continue;
-	
-	// if
-	std::bitset<16> around_bits(around_frnt);
-
-	if(2 > around_bits.count())
-	{
-	}
-
-	// modify opposite tile
-	// center.ModifyTileSprite(around, );
+    switch(tile.GetGround())
+    {
+	case Maps::Ground::DESERT:  ++grounds[0]; break;
+        case Maps::Ground::SNOW:    ++grounds[1]; break;
+        case Maps::Ground::SWAMP:   ++grounds[2]; break;
+        case Maps::Ground::WASTELAND:++grounds[3]; break;
+        case Maps::Ground::BEACH:   ++grounds[4]; break;
+        case Maps::Ground::LAVA:    ++grounds[5]; break;
+        case Maps::Ground::DIRT:    ++grounds[6]; break;
+        case Maps::Ground::GRASS:   ++grounds[7]; break;
+        case Maps::Ground::WATER:   ++grounds[8]; break;
+        default: break;
     }
 
-/*
-Maps::Ground::WATER:
-Maps::Ground::GRASS:
-Maps::Ground::SNOW:
-Maps::Ground::SWAMP:
-Maps::Ground::LAVA:
-Maps::Ground::DESERT:
-Maps::Ground::DIRT:
-Maps::Ground::WASTELAND:
-Maps::Ground::BEACH:
+    switch(tile.GetGround())
+    {
+	case Maps::Ground::WATER:
+		break;
 
-Direction::TOP
-Direction::TOP_RIGHT
-Direction::RIGHT
-Direction::BOTTOM_RIGHT
-Direction::BOTTOM
-Direction::BOTTOM_LEFT
-Direction::LEFT
-Direction::TOP_LEFT
-*/
+	case Maps::Ground::DESERT:
+	case Maps::Ground::SNOW:
+	case Maps::Ground::SWAMP:
+	case Maps::Ground::WASTELAND:
+	case Maps::Ground::BEACH:
+	case Maps::Ground::LAVA:
+	case Maps::Ground::DIRT:
+	case Maps::Ground::GRASS:
+		break;
+
+	default: break;
+    }
+}
+
+void Game::Editor::ModifyTileAbroad(Maps::Tiles & tile)
+{
+    const u16 center = tile.GetIndex();
+
+    // fix
+    if(Maps::Ground::WATER != tile.GetGround()) return;
+
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+    {
+	if(Maps::isValidDirection(center, direct))
+	{
+	    const Maps::Tiles & opposition = world.GetTiles(Maps::GetDirectionIndex(center, direct));
+	    u16 index = 0;
+
+	    // start index sprite
+	    switch(opposition.GetGround())
+	    {
+		case Maps::Ground::DESERT:
+		case Maps::Ground::SNOW:
+		case Maps::Ground::SWAMP:
+		case Maps::Ground::WASTELAND:
+		case Maps::Ground::BEACH:
+		case Maps::Ground::LAVA:
+		case Maps::Ground::DIRT:
+		case Maps::Ground::GRASS:	index = 0; break;
+
+		case Maps::Ground::WATER:
+		default: continue;
+	    }
+
+	    const u16 around = Maps::GetDirectionAroundGround(center, tile.GetGround());
+
+	    // normal: 0, vertical: 1, horizontal: 2, any: 3
+	    bool fix = false;
+	    u8 revert = 0;
+
+	    // sprite small corner
+	    if(around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | Direction::CENTER))))
+	    { fix = true; index += 12; revert = 0; }
+	    else
+	    if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::CENTER))))
+	    { fix = true; index += 12; revert = 2; }
+	    else
+	    if(around == (DIRECTION_ALL & (~(Direction::BOTTOM_RIGHT | Direction::CENTER))))
+	    { fix = true; index += 12; revert = 1; }
+	    else
+	    if(around == (DIRECTION_ALL & (~(Direction::BOTTOM_LEFT | Direction::CENTER))))
+	    { fix = true; index += 12; revert = 3; }
+	    else
+	    // sprite row
+	    if(around & (DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW) &&
+        	!(around & (Direction::TOP)))
+            { fix = true; index += 0; revert = 0; }
+            else
+            if(around & (DIRECTION_CENTER_ROW | DIRECTION_TOP_ROW) &&
+        	!(around & (Direction::BOTTOM)))
+    	    { fix = true; index += 0; revert = 1; }
+            else
+	    // sprite col
+            if(around & (DIRECTION_CENTER_COL | DIRECTION_LEFT_COL) &&
+        	!(around & (Direction::RIGHT)))
+            { fix = true; index += 8; revert = 0; }
+    	    else
+            if(around & (DIRECTION_CENTER_COL | DIRECTION_RIGHT_COL) &&
+        	!(around & (Direction::LEFT)))
+    	    { fix = true; index += 8; revert = 2; }
+	    // sprite small corner
+	    if(around & (Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM) &&
+		!(around & (Direction::TOP | Direction::TOP_RIGHT | Direction::RIGHT)))
+    	    { fix = true; index += 4; revert = 0; }
+	    else
+	    if(around & (Direction::CENTER | Direction::RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM) &&
+		!(around & (Direction::TOP | Direction::TOP_LEFT | Direction::LEFT)))
+    	    { fix = true; index += 4; revert = 2; }
+	    else
+	    if(around & (Direction::CENTER | Direction::LEFT | Direction::TOP_LEFT | Direction::TOP) &&
+		!(around & (Direction::BOTTOM | Direction::BOTTOM_RIGHT | Direction::RIGHT)))
+    	    { fix = true; index += 4; revert = 1; }
+	    else
+            if(around & (Direction::CENTER | Direction::RIGHT | Direction::TOP_RIGHT | Direction::TOP) &&
+        	!(around & (Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::LEFT)))
+    	    { fix = true; index += 4; revert = 3; }
+
+	    // fix random
+	    if(fix)
+	    {
+		tile.SetTile(Rand::Get(index, index + 3), revert);
+                tile.RedrawTile();
+                tile.RedrawBottom();
+    		tile.RedrawTop();
+    	    }
+    	}
+    }
 }
 
 /* set ground to tile */
@@ -1323,7 +1337,7 @@ void Game::Editor::SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::groun
 
     switch(ground)
     {
-	case Maps::Ground::WATER:	return; //index_ground =  16; break;
+	case Maps::Ground::WATER:	tile.SetTile(Rand::Get(16, 19), 0); return;
 	case Maps::Ground::GRASS:	index_ground =  68; break;
 	case Maps::Ground::SNOW:	index_ground = 130; break;
 	case Maps::Ground::SWAMP:	index_ground = 184; break;

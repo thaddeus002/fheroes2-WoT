@@ -23,6 +23,7 @@
 #include "error.h"
 #include "settings.h"
 #include "maps.h"
+#include "maps_tiles.h"
 #include <cstdlib>
 
 namespace Maps
@@ -193,7 +194,7 @@ int Maps::GetIndexFromAreaPoint(s16 px, s16 py)
     return result > world.w() * world.h() - 1 ? -1 : result;
 }
 
-u16 Maps::GetAroundFogDirection(const u16 center, u8 color)
+u16 Maps::GetDirectionAroundFog(const u16 center, u8 color)
 {
     if(!isValidAbsPoint(center % world.w(), center / world.h())) return 0;
     if(0 == color) color = Settings::Get().MyColor();
@@ -209,21 +210,75 @@ u16 Maps::GetAroundFogDirection(const u16 center, u8 color)
     return result;
 }
 
-u16 Maps::GetAroundGroundDirection(const u16 center, const u16 ground)
+u16 Maps::GetDirectionAroundGround(const u16 center, const u16 ground)
 {
     if(0 == ground || !isValidAbsPoint(center % world.w(), center / world.h())) return 0;
 
     u16 result = 0;
 
     for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	if(isValidDirection(center, direct) &&
-	   ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) result |= direct;
-
-    if(ground & world.GetTiles(center).GetGround()) result |= Direction::CENTER;
+	if(!isValidDirection(center, direct))
+	    result |= direct;
+	else
+	if(ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) result |= direct;
 
     return result;
 }
+
+u8 Maps::GetCountAroundGround(const u16 center, const u16 ground)
+{
+    if(0 == ground || !isValidAbsPoint(center % world.w(), center / world.h())) return 0;
+
+    u8 result = 0;
+
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+	if(!isValidDirection(center, direct))
+	    ++result;
+	else
+	if(ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) ++result;
+
+    return result;
+}
+
+u16 Maps::GetMaxGroundAround(const u16 center)
+{
+    std::vector<u8> grounds(9, 0);
+    u16 result = 0;
+
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+    {
+    	const Maps::Tiles & tile = (Maps::isValidDirection(center, direct) ? world.GetTiles(GetDirectionIndex(center, direct)) : world.GetTiles(center));
+
+	switch(tile.GetGround())
+	{
+	    case Maps::Ground::DESERT:	++grounds[0]; break;
+	    case Maps::Ground::SNOW:	++grounds[1]; break;
+	    case Maps::Ground::SWAMP:	++grounds[2]; break;
+	    case Maps::Ground::WASTELAND:++grounds[3]; break;
+	    case Maps::Ground::BEACH:	++grounds[4]; break;
+	    case Maps::Ground::LAVA:	++grounds[5]; break;
+	    case Maps::Ground::DIRT:	++grounds[6]; break;
+	    case Maps::Ground::GRASS:	++grounds[7]; break;
+	    case Maps::Ground::WATER:	++grounds[8]; break;
+	    default: break;
+	}
+    }
     
+    const u8 max = *std::max_element(grounds.begin(), grounds.end());
+
+    if(max == grounds[0]) result |= Maps::Ground::DESERT;
+    if(max == grounds[1]) result |= Maps::Ground::SNOW;
+    if(max == grounds[2]) result |= Maps::Ground::SWAMP;
+    if(max == grounds[3]) result |= Maps::Ground::WASTELAND;
+    if(max == grounds[4]) result |= Maps::Ground::BEACH;
+    if(max == grounds[5]) result |= Maps::Ground::LAVA;
+    if(max == grounds[6]) result |= Maps::Ground::DIRT;
+    if(max == grounds[7]) result |= Maps::Ground::GRASS;
+    if(max == grounds[8]) result |= Maps::Ground::WATER;
+
+    return result;
+}
+
 void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
 {
     if(0 == scoute) return;

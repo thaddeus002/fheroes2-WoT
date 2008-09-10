@@ -145,6 +145,7 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
 void Maps::Tiles::SetTile(const u16 index, const u8 shape)
 {
     AGG::GetTIL(TIL::GROUND32, index, shape, tile_sprite);
+    tile_index = index;
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
@@ -365,7 +366,7 @@ Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2)
     return NULL;
 }
 
-void Maps::Tiles::DebugInfo(u16 index) const
+void Maps::Tiles::DebugInfo(void) const
 {
     std::list<TilesAddon>::const_iterator it1;
     std::list<TilesAddon>::const_iterator it2;
@@ -374,14 +375,11 @@ void Maps::Tiles::DebugInfo(u16 index) const
 
     std::string value;
 
-    if(0xFFFF > index)
-    {
-	String::AddInt(value, index);
+    String::AddInt(value, maps_index);
 
-	std::cout << "index           : " << value << std::endl;
+    std::cout << "maps index      : " << value << std::endl;
     
-	value.clear();
-    }
+    value.clear();
     
     String::AddInt(value, tile_index);
 
