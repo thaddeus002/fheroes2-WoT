@@ -21,7 +21,6 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
-#include <libgen.h>
 
 #include "gamedefs.h"
 #include "cmdline.h"
@@ -39,26 +38,24 @@
 #include "image_logo.h"
 #include "image_icons.h"
 
-#ifdef WIN32
-#warning Fixme libgen.h
-char *dirname(char *path) {
-	static char buff[PATH_MAX];
-	strcpy(buff, path);
-	char *c = strrchr(buff, '\\');
-	if(!c) strcpy(path, ".");
-	else *c = 0;
-	return buff;
+char *dirname(const char *path)
+{
+    static char buff[PATH_MAX];
+    strncpy(buff, path, PATH_MAX);
+    char *c = strrchr(buff, SEPARATOR);
+    if(!c) strcpy(buff, ".");
+    else *c = 0;
+    return buff;
 }
 
-char *basename(char *path) {
-	static char buff[PATH_MAX];
-	char *c = strrchr(path, '\\');
-	if(!c) strcpy(buff, path);
-	else strcpy(buff, c);
-	return buff;
+char *basename(const char *path)
+{
+    static char buff[PATH_MAX];
+    char *c = strrchr(path, SEPARATOR);
+    if(!c) strncpy(buff, path, PATH_MAX);
+    else strcpy(buff, c);
+    return buff;
 }
-
-#endif
 
 int main(int argc, char **argv)
 {
