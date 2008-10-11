@@ -43,8 +43,7 @@ char *dirname(const char *path)
 {
     static char buff[PATH_MAX];
     strncpy(buff, path, PATH_MAX);
-    // FIXME it won't (probably) work on Win32
-    char *c = strrchr(buff, (int)SEPARATOR);
+    char *c = strrchr(buff, SEPARATOR);
     if(!c) strcpy(buff, ".");
     else *c = 0;
     return buff;
@@ -53,8 +52,7 @@ char *dirname(const char *path)
 char *basename(const char *path)
 {
     static char buff[PATH_MAX];
-    // FIXME it won't (probably) work on Win32
-    char *c = strrchr(path, (int)SEPARATOR);
+    char *c = strrchr(buff, SEPARATOR);
     if(!c) strncpy(buff, path, PATH_MAX);
     else strcpy(buff, c);
     return buff;
