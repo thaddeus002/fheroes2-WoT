@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <limits.h>
 
 #include "gamedefs.h"
 #include "cmdline.h"
@@ -42,7 +43,8 @@ char *dirname(const char *path)
 {
     static char buff[PATH_MAX];
     strncpy(buff, path, PATH_MAX);
-    char *c = strrchr(buff, SEPARATOR);
+    // FIXME it won't (probably) work on Win32
+    char *c = strrchr(buff, (int)SEPARATOR);
     if(!c) strcpy(buff, ".");
     else *c = 0;
     return buff;
@@ -51,7 +53,8 @@ char *dirname(const char *path)
 char *basename(const char *path)
 {
     static char buff[PATH_MAX];
-    char *c = strrchr(path, SEPARATOR);
+    // FIXME it won't (probably) work on Win32
+    char *c = strrchr(path, (int)SEPARATOR);
     if(!c) strncpy(buff, path, PATH_MAX);
     else strcpy(buff, c);
     return buff;
