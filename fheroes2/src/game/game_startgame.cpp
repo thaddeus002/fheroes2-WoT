@@ -698,6 +698,18 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     }
 }
 
+bool Game::ShouldAnimate(u32 ticket)
+{
+    return Game::ShouldAnimateInfrequent(ticket, 1);
+}
+
+bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
+{
+    //TODO: Use user-selected speed instead of medium by default
+    const u32 speed = ANIMATION_MEDIUM * modifier;
+    return !(ticket % speed);
+}
+
 Game::menu_t Game::HumanTurn(bool message)
 {
     Game::Focus & global_focus = Focus::Get();
@@ -710,11 +722,13 @@ Game::menu_t Game::HumanTurn(bool message)
     Audio::Mixer & mixer = Audio::Mixer::Get();
 
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, gamearea.GetRect().w * TILEWIDTH, gamearea.GetRect().h * TILEWIDTH);
-    const Rect areaScrollLeft(0, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
-    const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH / 2, BORDERWIDTH / 2, display.h() - BORDERWIDTH);
-    const Rect areaScrollTop(BORDERWIDTH / 2, 0, (gamearea.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    const Rect areaScrollBottom(BORDERWIDTH / 2, display.h() - BORDERWIDTH / 2, (gamearea.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    const Rect areaScrollLeft(0, 0, BORDERWIDTH, display.h());
+    const Rect areaScrollRight(display.w() - BORDERWIDTH, 0, BORDERWIDTH, display.h());
+    const Rect areaScrollTop(0, 0, display.w(), BORDERWIDTH);
+    const Rect areaScrollBottom(0, display.h() - BORDERWIDTH, display.w(), BORDERWIDTH);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
+    
+    GameArea::scroll_t scrollDir = GameArea::NONE;
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
@@ -816,51 +830,66 @@ Game::menu_t Game::HumanTurn(bool message)
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft) && GameArea::x())
 	{
-	    cursor.Hide();
-	    cursor.SetThemes(Cursor::SCROLL_LEFT);
-	    gamearea.Scroll(GameArea::LEFT);
-	    radar.RedrawCursor();
-	    cursor.Show();
-	    display.Flip();
-	    continue;
+            scrollDir |= GameArea::LEFT;
 	}
-	else
+        else
 	// scroll area maps right
 	if(le.MouseCursor(areaScrollRight) && (world.w() - GameArea::w() > GameArea::x()))
 	{
-	    cursor.Hide();
-	    cursor.SetThemes(Cursor::SCROLL_RIGHT);
-	    gamearea.Scroll(GameArea::RIGHT);
-	    radar.RedrawCursor();
-	    cursor.Show();
-	    display.Flip();
-	    continue;
+	    scrollDir |= GameArea::RIGHT;
 	}
-	else
+	
 	// scroll area maps top
 	if(le.MouseCursor(areaScrollTop) && GameArea::y())
 	{
-	    cursor.Hide();
-	    cursor.SetThemes(Cursor::SCROLL_TOP);
-	    gamearea.Scroll(GameArea::TOP);
-	    radar.RedrawCursor();
-	    cursor.Show();
-	    display.Flip();
-	    continue;
+            scrollDir |= GameArea::TOP;
 	}
 	else
 	// scroll area maps bottom
 	if(le.MouseCursor(areaScrollBottom) && (world.h() - GameArea::h() > GameArea::y()))
 	{
-	    cursor.Hide();
-	    cursor.SetThemes(Cursor::SCROLL_BOTTOM);
-	    gamearea.Scroll(GameArea::BOTTOM);
-	    radar.RedrawCursor();
-	    cursor.Show();
-	    display.Flip();
-	    continue;
+	    scrollDir |= GameArea::BOTTOM;
 	}
-	else
+        
+        if(scrollDir)
+        {
+            Cursor::themes_t cursorDir = Cursor::NONE;
+            if(scrollDir & GameArea::LEFT)
+            {
+                if(scrollDir & GameArea::TOP)
+                    cursorDir = Cursor::SCROLL_TOPLEFT;
+                else if(scrollDir & GameArea::BOTTOM)
+                    cursorDir = Cursor::SCROLL_BOTTOMLEFT;
+                else
+                    cursorDir = Cursor::SCROLL_LEFT;
+            }
+            else if(scrollDir & GameArea::RIGHT)
+            {
+                if(scrollDir & GameArea::BOTTOM)
+                    cursorDir = Cursor::SCROLL_BOTTOMRIGHT;
+                else if(scrollDir & GameArea::TOP)
+                    cursorDir = Cursor::SCROLL_TOPRIGHT;
+                else
+                    cursorDir = Cursor::SCROLL_RIGHT;
+            }
+            else if(scrollDir & GameArea::TOP)
+                cursorDir = Cursor::SCROLL_TOP;
+            else
+                cursorDir = Cursor::SCROLL_BOTTOM;
+            
+            if(Game::ShouldAnimate(ticket))
+            {
+              cursor.Hide();
+              cursor.SetThemes(cursorDir);
+              gamearea.Scroll(scrollDir);
+              radar.RedrawCursor();
+              cursor.Show();
+              display.Flip();
+            }
+            
+            scrollDir = GameArea::NONE;
+        }
+
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
 	{
@@ -1436,7 +1465,7 @@ Game::menu_t Game::HumanTurn(bool message)
 	Game::EnvironmentSoundMixer(change_settings);
 
         // animation
-        if(!(ticket % ANIMATION_MEDIUM))
+        if(Game::ShouldAnimate(ticket))
         {
             cursor.Hide();
 
@@ -1478,7 +1507,8 @@ Game::menu_t Game::HumanTurn(bool message)
 		}
 	    }
 
-	    Maps::IncreaseAnimationTicket();
+	    if(Game::ShouldAnimateInfrequent(ticket, 10))
+              Maps::IncreaseAnimationTicket();
 
 	    gamearea.Redraw();
             cursor.Show();

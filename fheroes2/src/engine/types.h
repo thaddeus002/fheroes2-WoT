@@ -33,9 +33,9 @@ typedef uint32_t	u32;
 #define MAXU32   4294967295
 
 #if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__)
-#define SEPARATOR       "\\"
+#define SEPARATOR       '\\'
 #else
-#define SEPARATOR       "/"
+#define SEPARATOR       '/'
 #endif
 
 

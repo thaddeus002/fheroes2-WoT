@@ -29,7 +29,12 @@ public:
     static GameArea & Get(void);
     void Build(void);
 
-    typedef enum { LEFT, RIGHT, TOP, BOTTOM } scroll_t;
+    static const u8 NONE = 0x0;
+    static const u8 LEFT = 0x01;
+    static const u8 RIGHT = 0x02;
+    static const u8 TOP = 0x04;
+    static const u8 BOTTOM = 0x08;
+    typedef u8 scroll_t;
 
     const Rect & GetRect(void) const { return *this; };
 

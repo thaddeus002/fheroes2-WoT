@@ -147,24 +147,23 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 	std::list<Route::Step>::const_iterator it2 = focus.GetHeroes().GetPath().end();
 	std::list<Route::Step>::const_iterator it3 = it1;
 
-	for(; it1 != it2; ++it1)
+	for(; it1 != it2; from = (*(it1++)).to_index)
 	{
     	    const u16 tile_x = (*it1).to_index % world.w();
     	    const u16 tile_y = (*it1).to_index / world.h();
+            it3++;
 
-    	    if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
+            if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
 
 	    u16 index = 0;
 
-	    if(++it3 != it2) index = Route::Path::GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index));
+	    if(it3 != it2) index = Route::Path::GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index));
 
 	    const Sprite & sprite = AGG::GetICN(!(*it1).green_color ? ICN::ROUTERED : ICN::ROUTE, index);
     	    Point dst_pt(BORDERWIDTH + TILEWIDTH * (tile_x - gx) + sprite.x() - 16, BORDERWIDTH + TILEWIDTH * (tile_y - gy) + sprite.y());
     	    Rect src_rt;
     	    GameArea::SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
 	    display.Blit(sprite, src_rt, dst_pt);
-
-    	    from = (*it1).to_index;
 	}
     }
 
@@ -200,45 +199,34 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 /* scroll area */
 void GameArea::Scroll(GameArea::scroll_t scroll)
 {
-    switch(scroll)
+    bool redraw = false;
+
+    if(scroll & GameArea::LEFT)
     {
-	case GameArea::LEFT:
-	{
-	    if(0 == gx) return;
-
-	    --gx;
-
-	    Redraw();
-	}
-	    break;
-	case GameArea::RIGHT:
-	{
-	    if(world.w() - gw == gx) return;
-
-	    ++gx;
-
-	    Redraw();
-	}
-	    break;
-	case GameArea::TOP:
-	{
-	    if(0 == gy) return;
-
-	    --gy;
-
-	    Redraw();
-	}
-	    break;
-	case GameArea::BOTTOM:
-	{
-	    if(world.h() - gh == gy) return;
-
-	    ++gy;
-
-	    Redraw();
-	}
-	    break;
+        if(0 == gx) return;
+        --gx;
+        redraw = true;
     }
+    if(scroll & GameArea::RIGHT)
+    {
+	if(world.w() - gw == gx) return;
+        ++gx;
+        redraw = true;
+    }
+    if(scroll & GameArea::TOP)
+    {
+        if(0 == gy) return;
+        --gy;
+        redraw = true;
+    }
+    if(scroll & GameArea::BOTTOM)
+    {
+        if(world.h() - gh == gy) return;
+        ++gy;
+        redraw = true;
+    }
+    if(redraw)
+      Redraw();
 }
 
 /* scroll area from radar area_pos */
