@@ -41,9 +41,9 @@
 
 #define OBSERVATIONTOWERSCOUTE 10
 
-void AnimationRemoveObject(const Maps::Tiles & tile)
+Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
 {
-    const Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = NULL;
 
     if(Maps::Ground::WATER == tile.GetGround())
     switch(tile.GetObject())
@@ -67,7 +67,12 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 	default: break;
     }
 
-    if(NULL == addon) return;
+    if(NULL == addon)
+      addon = const_cast<Maps::Tiles &>(tile).FindMonster();
+    if(NULL == addon)
+      addon = const_cast<Maps::Tiles &>(tile).FindMiniHero(); //FIXME: Why doesn't this work?
+    if(NULL == addon)
+      return NULL;
 
     const Rect & area = GameArea::Get().GetRect();
     const Point pos(tile.GetIndex() % world.w() - area.x, tile.GetIndex() / world.w() - area.y);
@@ -86,7 +91,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
     while(le.HandleEvents() && alpha > 0)
     {
-        if(!(ticket % ANIMATION_HIGH))
+        if(Game::ShouldAnimate(ticket))
         {
 	    tile.RedrawTile();
             sf.SetAlpha(alpha);
@@ -98,6 +103,8 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
         ++ticket;
     }
+    
+    return addon;
 }
 
 // action to next cell
@@ -237,8 +244,10 @@ void Heroes::Action(const Maps::Tiles & dst)
 
 void Heroes::ActionToMonster(const u16 dst_index)
 {
+    const Game::Focus & focus = Game::Focus::Get();
     const Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
+    Maps::Tiles *to_remove;
     const u16 count = Monster::GetSize(tile);
     std::vector<Army::Troops> army;
     int tr_c = count > 5 ? 5 : count;
@@ -254,16 +263,32 @@ void Heroes::ActionToMonster(const u16 dst_index)
     Display::Fade();
     Army::battle_t b = Army::Battle(*this, army, tile);
     if(b == Army::WIN) {
-       // TODO victory and expirience
-       if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: victory");
+        int exp = 1000; //TODO: Figure out appropriate calculation
+       IncreaseExperience(exp);
+       to_remove = const_cast<Maps::Tiles *>(&tile);
     } else if(b == Army::LOSE) {
-       // TODO fail
-       if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: fail");
+        u16 index = Maps::GetIndexFromAbsPoint(focus.GetHeroes().GetCenter());
+        to_remove = &world.GetTiles(index);
+        //TODO: Kill off hero, perform cleanup
     } else {
-	// TODO retreat
-       if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMonster: FIXME: retreat");
+        u16 index = Maps::GetIndexFromAbsPoint(focus.GetHeroes().GetCenter());
+        to_remove = &world.GetTiles(index);
+        //TODO: Put hero back in available buying list, perform cleanup
     }
+    
+    AGG::PlaySound(M82::KILLFADE);
+    Maps::TilesAddon *addon = AnimationRemoveObject(*to_remove);
+    
+    if(addon)
+    {
+      const u16 uniq = addon->uniq;
+      to_remove->Remove(uniq);
+      to_remove->SetObject(MP2::OBJ_ZERO);
 
+      // remove shadow from left cell
+      if(Maps::isValidDirection(to_remove->GetIndex(), Direction::LEFT))
+          world.GetTiles(Maps::GetDirectionIndex(to_remove->GetIndex(), Direction::LEFT)).Remove(uniq);
+    }
 }
 
 void Heroes::ActionToHeroes(const u16 dst_index)

@@ -647,19 +647,27 @@ u16 Monster::GetRNDSize(monster_t monster)
 	case Difficulty::IMPOSSIBLE:	level = 250; break;
     }
 
+    u16 randSize = 1;
+    
     switch(GetLevel(monster))
     {
 	case LEVEL1:
-		    return static_cast<u16>(Rand::Get(Army::HORDE, Army::SWARM) * (level / 100));
+		    randSize = Rand::Get(Army::HORDE, Army::SWARM);
+                    break;
 	case LEVEL2:
-		    return static_cast<u16>(Rand::Get(Army::LOTS, Army::THRONG) * (level / 100));
+		    randSize = Rand::Get(Army::LOTS, Army::THRONG);
+                    break;
 	case LEVEL3:
-		    return static_cast<u16>(Rand::Get(Army::PACK, Army::HORDE) * (level / 100));
+		    randSize = Rand::Get(Army::PACK, Army::HORDE);
+                    break;
 	case LEVEL4:
-		    return static_cast<u16>(Rand::Get(Army::SEVERAL, Army::LOTS) * (level / 100));
+		    randSize = Rand::Get(Army::SEVERAL, Army::LOTS);
+                    break;
     }
+    
+    if(H2Config::Debug()) Error::Verbose("randSize: ", randSize);
 
-    return 1;
+    return randSize ? static_cast<u16>(randSize * (level / 100)) : 1;
 }
 
 Monster::monster_t Monster::Monster(const Maps::Tiles & tile)
@@ -688,9 +696,11 @@ void Monster::ChangeTileWithRNDSize(Maps::Tiles & tile)
 u16 Monster::GetSize(const Maps::Tiles & tile)
 {
     u16 size = tile.GetQuantity2();
-    size <<= 8;
+    size <<= 3;
     size |= tile.GetQuantity1();
-    size >>= 3;
+    size >>= 8;
+
+    if(H2Config::Debug()) Error::Verbose("Army size is ", size);
 
     // random
     if(0 == size)
@@ -698,6 +708,7 @@ u16 Monster::GetSize(const Maps::Tiles & tile)
 	size = GetRNDSize(Monster(tile));
 	
 	ChangeTileWithRNDSize(const_cast<Maps::Tiles &>(tile));
+        return GetSize(tile);
     }
 
     return size;
