@@ -35,6 +35,7 @@
 #include "army.h"
 #include "skill.h"
 #include "dialog.h"
+#include "game.h"
 
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
 {
@@ -278,7 +279,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
     	    if(le.MouseClickLeft(buttonExit) ||
     		le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
 	}
-	if(!(animat++%ANIMATION_LOW)) {
+	if(Game::ShouldAnimateInfrequent(animat++, 3)) {
 	    troop.Animate();
 	    if(troop.astate == Monster::AS_NONE) {
 		switch(animcount) {

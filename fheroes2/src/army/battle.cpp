@@ -326,7 +326,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	    i = 1;
 	    display.Flip();
 	}
-	if(!(++animat%ANIMATION_LOW) && !i) {
+	if(Game::ShouldAnimateInfrequent(++animat, 3) && !i) {
 	    cursor.Hide();
 	    DrawBackground(tile);
 	    if(O_SHADM) //DrawMoveShadow(myTroop, army1, army2, troopN < 0);
@@ -526,7 +526,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	}
 	myTroop.Animate(Monster::AS_WALK);
 	while(le.HandleEvents()) {
-	    if(!(++animat%ANIMATION_LOW)) {
+	    if(Game::ShouldAnimateInfrequent(++animat, 4)) {
 		if(myMonster.fly) {
 		    if(frame >= prep && !part) {
 			AGG::PlaySound(myMonster.m82_move);
@@ -676,7 +676,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	}
 	myTroop.Animate(mytroopstate);
 	while(le.HandleEvents()) {
-	    if(!(++animat%ANIMATION_LOW)) {
+	    if(Game::ShouldAnimateInfrequent(++animat, 4)) {
 		if(!ranged) {
 		    if(missframe) {
 			missframe --;
@@ -902,7 +902,7 @@ void Army::MagicPreCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*
 	    delta.x /= maxframe;
 	    delta.y /= maxframe;
 	    while(le.HandleEvents()) {
-		if(!(animat++%ANIMATION_LOW)) {
+		if(Game::ShouldAnimateInfrequent(animat++, 3)) {
 		    display.Blit(AGG::GetICN(icn, icnframe>=0? icnframe : frame, reflect), start);
 		    display.Flip();
 		    start += delta;
@@ -962,7 +962,7 @@ bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &
     }
     int animat = 0;
     while(le.HandleEvents()) {
-	if(!(animat++%ANIMATION_LOW)) {
+	if(Game::ShouldAnimateInfrequent(animat++, 3)) {
 	    // paint
 	    DrawBackground(tile);
 	    if(hero1) DrawHero(*hero1, 1, false, 1);
@@ -1903,11 +1903,11 @@ bool Army::GoodMorale(Heroes *hero, const Army::Troops &troop)
 	    display.Flip();
 	    int animat = 0;
 	    while(le.HandleEvents()) {
-		if(!(++animat%ANIMATION_LOW)) break;
+		if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
 	    }
 	    back.Restore();
 	}
-	AttackStatus("Hi morale enables the "+Monster::String(troop.Monster())+"s to attack again.");
+	AttackStatus("High morale enables the "+Monster::String(troop.Monster())+"s to attack again.");
 	return true;
     }
     return false;
@@ -1930,7 +1930,7 @@ bool Army::BadMorale(Heroes *hero, const Army::Troops &troop)
 	    display.Flip();
 	    int animat = 0;
 	    while(le.HandleEvents()) {
-		if(!(++animat%ANIMATION_LOW)) break;
+		if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
 	    }
 	    back.Restore();
 	}
@@ -1957,7 +1957,7 @@ int Army::CheckLuck(Heroes *hero, const Army::Troops &troop)
 		display.Flip();
 		int animat = 0;
 		while(le.HandleEvents()) {
-		    if(!(++animat%ANIMATION_LOW)) break;
+		    if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
 		}
 		back.Restore();
 	    }
@@ -1977,7 +1977,7 @@ int Army::CheckLuck(Heroes *hero, const Army::Troops &troop)
 		display.Flip();
 		int animat = 0;
 		while(le.HandleEvents()) {
-		    if(!(++animat%ANIMATION_LOW)) break;
+		    if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
 		}
 		back.Restore();
 	    }
