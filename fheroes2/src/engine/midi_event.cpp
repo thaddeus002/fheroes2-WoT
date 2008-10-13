@@ -17,33 +17,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#include <cstring>
+#include "midi_event.h"
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+using namespace MIDI;
 
-namespace SDL
+Event::Event::Event() : delta(0), status(0) 
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
-};
+}
 
-#endif
+Event::Event::Event(const u32 dl, const u8 st,  const u32 sz, const char *p) : delta(dl), status(st)
+{
+    if(sz) data.assign(p , p + sz);
+
+    SetDelta(dl);
+}
+
+void Event::SetDelta(const u32 dl)
+{
+    sp = MIDI::PackDelta(pack, dl);
+}
+
+u32 Event::Size(void) const
+{
+    return 1 + sp + data.size();
+}
+
+bool Event::Write(std::ostream & o) const
+{
+    if(o.fail()) return false;
+
+    o.write(pack, sp);
+    o.write(&status, 1);
+    if(data.size()) o.write(&data[0], data.size());
+
+    return true;
+}
+
+void Event::Dump(void) const
+{
+    printf("          [dl:%d:st:%hhX:dt", delta, status);
+
+    for(u32 ii = 0; ii < data.size(); ++ii) printf(":%hhX", data[ii]);
+
+    printf("]\n");
+}

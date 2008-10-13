@@ -2,7 +2,7 @@
 # project: Free Heroes2 Tools
 #
 
-TARGETS := extractor 82m2wav til2bmp icn2bmp
+TARGETS := extractor 82m2wav til2bmp icn2bmp xmi2mid
 SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
 LIBENGINE := ../engine/libengine.a

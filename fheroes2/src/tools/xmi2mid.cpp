@@ -17,33 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#include <iostream>
+#include <fstream>
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+#include "engine.h"
 
-namespace SDL
+int main(int argc, char **argv)
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
-};
+    if(argc != 3)
+    {
+	std::cout << argv[0] << " infile.xmi outfile.mid" << std::endl;
 
-#endif
+	return EXIT_SUCCESS;
+    }
+
+    MIDI::Xmi x;
+    MIDI::Mid m;
+    MIDI::MTrk track;
+
+    x.Read(argv[1]);
+
+    track.ImportXmiEVNT(x.EVNT());
+
+    m.AddTrack(track);
+    m.SetPPQN(64);
+
+    // m.Dump();
+
+    m.Write(argv[2]);
+
+    return EXIT_SUCCESS;
+}

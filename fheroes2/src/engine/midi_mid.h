@@ -17,33 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#ifndef MIDI_MID_H
+#define MIDI_MID_H
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+#include <list>
+#include "midi.h"
+#include "midi_mthd.h"
+#include "midi_mtrk.h"
 
-namespace SDL
+namespace MIDI
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
+    class Mid
+    {
+    public:
+	Mid();
+	Mid(const Mid & m);
+	~Mid();
+
+	Mid & operator= (const Mid & m);
+
+	bool Read(const std::string & filename);
+	bool Write(const std::string & filename);
+
+        void SetFormat(const u16 f){ mthd.SetFormat(f); };
+        void SetTracks(const u16 t){ mthd.SetTracks(t); };
+        void SetPPQN(const u16 p){ mthd.SetPPQN(p); };
+	void AddTrack(MTrk & track);
+
+	void Dump(void) const;
+
+    private:
+	MThd			mthd;
+	std::list<MTrk *>	tracks;
+    };
 };
 
 #endif

@@ -17,33 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#ifndef MIDI_TRACK_H
+#define MIDI_TRACK_H
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+#include <list>
+#include <ostream>
+#include "midi.h"
+#include "midi_chunk.h"
+#include "midi_event.h"
 
-namespace SDL
+#define ID_MTRK "MTrk"
+
+namespace MIDI
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
+    u8 UnpackDelta(const char *p, u32 & d);
+    u8 PackDelta(char *p, const u32 & d);
+
+    class MTrk
+    {
+    public:
+	MTrk() {};
+        MTrk(const char *p, const u32 s);
+        MTrk(const MTrk & t);
+	~MTrk();
+
+	bool Write(std::ostream & o) const;
+
+	void AddEvent(const Event & e);
+	void ImportXmiEVNT(const Chunk & c);
+	void CloseEvents(void);
+
+	void Dump(void) const;
+
+    private:
+	std::list<Event *> events;
+    };
 };
 
 #endif

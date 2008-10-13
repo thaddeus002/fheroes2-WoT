@@ -17,33 +17,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#include <iostream>
+#include "midi_mthd.h"
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+using namespace MIDI;
 
-namespace SDL
+void MThd::Dump(void) const
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
-};
+    std::cout << "[MThd]    format: " << Format() << ", tracks: " << Tracks() << ", ppqn: " << PPQN() << std::endl;
+}
 
-#endif
+void MThd::SetFormat(const u16 f)
+{
+    WriteBE16(&data[0], f);
+}
+
+void MThd::SetTracks(const u16 t)
+{
+    WriteBE16(&data[2], t);
+}
+
+void MThd::SetPPQN(const u16 p)
+{
+    WriteBE16(&data[4], p);
+}

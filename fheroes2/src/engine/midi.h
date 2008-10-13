@@ -17,33 +17,25 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
+#ifndef MIDI_H
+#define MIDI_H
+
 #include "types.h"
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
-
-namespace SDL
+namespace MIDI
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
+    static __inline__ u32 Swap32(u32 x){ return((x<<24)|((x<<8)&0x00FF0000)|((x>>8)&0x0000FF00)|(x>>24)); };
+    static __inline__ u16 Swap16(u16 x){ return((x<<8)|(x>>8)); };
+
+    u32 ReadBE32(const char * p);
+    u16 ReadBE16(const char * p);
+
+    void WriteBE32(char * p, u32 x);
+    void WriteBE16(char * p, u16 x);
+
+    u8 UnpackDelta(const char *p, u32 & d);
+    u8 PackDelta(char *p, const u32 & d);
 };
 
 #endif

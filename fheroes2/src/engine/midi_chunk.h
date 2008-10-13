@@ -17,33 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#ifndef MIDI_CHUNK_H
+#define MIDI_CHUNK_H
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+#include <ostream>
+#include <istream>
+#include "midi.h"
 
-namespace SDL
+namespace MIDI
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
+    class Chunk
+    {
+	public:
+	char		id[4];
+	u32		size;
+	char *		data;
+
+	Chunk();
+	Chunk(const char *i, const u32 s, const char *p = NULL);
+	Chunk(std::istream & i);
+	Chunk(const char *p);
+	Chunk(const Chunk & c);
+	~Chunk();
+
+	Chunk &	operator= (const Chunk & c);
+
+	bool Write(std::ostream & o) const;
+	bool Write(char *p) const;
+
+	bool Read(std::istream & i);
+	bool Read(const char *p);
+
+	void Dump(void) const;
+    };
 };
 
 #endif

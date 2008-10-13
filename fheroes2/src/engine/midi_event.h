@@ -17,33 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#ifndef MIDI_EVENT_H
+#define MIDI_EVENT_H
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+#include <vector>
+#include <ostream>
+#include "midi.h"
 
-namespace SDL
+namespace MIDI
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
+    class Event
+    {
+    public:
+	Event();
+	Event(const u32 dl, const u8 st, const u32 sz, const char *p);
+
+	u32	Size(void) const;
+	const std::vector<char> & Data(void) const{ return data; };
+	u32	Delta(void) const { return delta; };
+	u8	Status(void) const { return status; };
+
+	void	SetDelta(const u32 dl);
+
+	void	Dump(void) const;
+	bool	Write(std::ostream & o) const;
+
+    protected:
+	u32	delta;
+	char	status;
+	std::vector<char> data;
+
+	char	pack[4];
+	u8	sp;
+    };
 };
 
 #endif

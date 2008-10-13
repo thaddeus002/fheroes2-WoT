@@ -17,33 +17,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "audio.h"
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
-#include "types.h"
+#ifndef MIDI_MTHD_H
+#define MIDI_MTHD_H
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
+#include <istream>
+#include <cstring>
+#include "midi.h"
+#include "midi_chunk.h"
 
-namespace SDL
+#define ID_MTHD	"MThd"
+
+namespace MIDI
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-    
-    bool SubSystem(const u32 system);
+    class MThd : protected Chunk
+    {
+    public:
+	MThd() : Chunk(ID_MTHD, 6) {};
+	MThd(const char *p, const u32 s) : Chunk(ID_MTHD, s, p) {};
+	MThd(std::istream & i) : Chunk(i) {};
+
+	bool isValid(void) const{ return 0 == memcmp(Chunk::id, ID_MTHD, 4); };
+	bool Read(std::istream & is){ return Chunk::Read(is); };
+	bool Write(std::ostream & os) const{ return Chunk::Write(os); };
+
+	void SetFormat(const u16 f);
+	void SetTracks(const u16 t);
+	void SetPPQN(const u16 p);
+
+	const char* Data(void) const{ return Chunk::data; };
+	u16 Format(void) const{ return MIDI::ReadBE16(&data[0]); };
+	u16 Tracks(void) const{ return MIDI::ReadBE16(&data[2]); };
+	u16 PPQN(void) const{ return MIDI::ReadBE16(&data[4]); };
+
+	void Dump(void) const;
+    };
 };
 
 #endif
