@@ -7,7 +7,7 @@ SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
 LIBENGINE := ../engine/libengine.a
 
-LIBS := $(SDL_LIBS) $(LIBENGINE)
+LIBS := $(LIBENGINE) $(SDL_LIBS)
 CFLAGS := -O2 -Wall -I ../engine $(SDL_FLAGS)
 
 CC := g++

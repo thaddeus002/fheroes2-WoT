@@ -9,7 +9,7 @@
 
 TARGET := fheroes2
 LIBENGINE := ../engine/libengine.a
-LIBS := $(SDL_LIBS) $(LIBENGINE)
+LIBS := $(LIBENGINE) $(SDL_LIBS)
 CFLAGS = -I../engine
 
 ifdef DEBUG

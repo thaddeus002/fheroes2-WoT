@@ -44,7 +44,7 @@ void Dir::Read(const std::string &path, const std::string &filter, bool sensitiv
 	while(NULL != (ep = readdir(dp)))
 	{
     	    // if regular file
-    	    if(DT_REG != ep->d_type) continue;
+    	    //if(DT_REG != ep->d_type) continue;
 
 	    if(filter.size())
 	    {
