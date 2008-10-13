@@ -391,20 +391,25 @@ void Game::OpenHeroes(Heroes *hero)
 	
 	    case Dialog::DISMISS:
 	    {
-		Error::Verbose("Game::OpenHeroes: FIXME dismiss hero.");
-		//Kingdom & kingdom = world.GetMyKingdom();
-		//const Maps::Tiles & tile = world.GetTiles((*hero).GetCenter());
+		//Error::Verbose("Game::OpenHeroes: FIXME dismiss hero.");
+		Kingdom & kingdom = world.GetMyKingdom();
+		Maps::Tiles & to_remove = world.GetTiles((*hero).GetCenter());
 
-                //kingdom.RemoveHeroes(hero);
-	    /*
-		// FIX redraw:
-		// 	tile
-		// 	top tile
-		// 	selectHeroes
-		//	selectCastle if selectHeroes = 0
-    	    */
-	    }
+	        to_remove.SetObject((*hero).GetUnderObject());
+		kingdom.RemoveHeroes(hero);
+		(*hero).SetFreeman();
+
+		AGG::PlaySound(M82::KILLFADE);
+
+                // redraw focus list
+                Game::Focus::Get().Redraw();
+
+                // redraw status
+                Game::StatusWindow::Get().SetState(Game::StatusWindow::DAY);
+        	Game::StatusWindow::Get().Redraw();
+
 		result = Dialog::CANCEL;
+	    }
 	    	break;
 	
 	    default: break;

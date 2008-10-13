@@ -77,6 +77,7 @@ public:
     void SetCastles(const std::vector<Castle *> & vec);
 
     u8 GetSizeObject(void) const{ return castles ? castles->size() : 0; };
+    const Castle * First(void) const { return castles && castles->size() ? castles->front() : NULL; };
 
     void Redraw(void);
 
@@ -100,6 +101,7 @@ public:
     void SetHeroes(const std::vector<Heroes *> & vec);
 
     u8 GetSizeObject(void) const{ return heroes ? heroes->size() : 0; };
+    const Heroes * First(void) const { return heroes && heroes->size() ? heroes->front() : NULL; };
 
     void Redraw(void);
 

@@ -73,7 +73,7 @@ void Game::StatusWindow::NextState(void)
 {
     if(DAY == state) state = FUNDS;
     else
-    if(FUNDS == state) state = (Game::Focus::CASTLE == Game::Focus::Get().Type() ? DAY : ARMY);
+    if(FUNDS == state) state = (Game::Focus::UNSEL == Game::Focus::Get().Type() ? DAY : ARMY);
     else
     if(ARMY == state) state = DAY;
 }
@@ -158,9 +158,9 @@ void Game::StatusWindow::DrawArmyInfo(void)
 {
     const Game::Focus & focus = Game::Focus::Get();
 
-    if(Game::Focus::HEROES != focus.Type()) return;
+    if(Game::Focus::UNSEL == focus.Type()) return;
 
-    const std::vector<Army::Troops> & armies = focus.GetHeroes().GetArmy();
+    const std::vector<Army::Troops> & armies = (Game::Focus::HEROES == focus.Type() ? focus.GetHeroes().GetArmy() : focus.GetCastle().GetArmy());
 
     Display & display = Display::Get();
     const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);

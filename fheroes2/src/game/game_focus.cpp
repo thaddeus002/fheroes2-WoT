@@ -23,6 +23,7 @@
 #include "heroes.h"
 #include "cursor.h"
 #include "radar.h"
+#include "settings.h"
 #include "gamearea.h"
 #include "game_selectfocus.h"
 #include "game_focus.h"
@@ -118,17 +119,58 @@ void Game::Focus::Redraw(void)
     GameArea & areaMaps = GameArea::Get();
     SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
     SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
+    Color::color_t mycolor = Settings::Get().MyColor();
 
     if(heroes)
     {
-	selectCastles.Reset();
-        selectHeroes.Select();
+	if(selectHeroes.GetSizeObject())
+	{
+	    selectCastles.Reset();
+
+	    if(heroes->GetColor() != mycolor)
+	    { selectHeroes.Reset(); selectHeroes.Select(0); Set(*selectHeroes.First()); }
+	    else
+		selectHeroes.Select();
+	}
+	else
+	if(selectCastles.GetSizeObject())
+	{
+	    selectHeroes.Reset();
+	    selectCastles.Select(0);
+	    Set(*selectCastles.First());
+	}
+	else
+	{
+	    selectCastles.Reset();
+	    selectHeroes.Reset();
+	    Reset();
+	}
     }
     else
     if(castle)
     {
-	selectHeroes.Reset();
-        selectCastles.Select();
+	if(selectCastles.GetSizeObject())
+	{
+	    selectHeroes.Reset();
+
+	    if(castle->GetColor() != mycolor)
+	    { selectCastles.Reset(); selectCastles.Select(0); Set(*selectCastles.First()); }
+    	    else
+    		selectCastles.Select();
+    	}
+	else
+	if(selectHeroes.GetSizeObject())
+	{
+	    selectCastles.Reset();
+	    selectHeroes.Select(0);
+	    Set(*selectHeroes.First());
+	}
+	else
+	{
+	    selectCastles.Reset();
+	    selectHeroes.Reset();
+	    Reset();
+	}
     }
 
     areaMaps.Center(center);

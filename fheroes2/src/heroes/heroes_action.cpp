@@ -63,16 +63,12 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
 	case MP2::OBJ_RESOURCE:	addon = const_cast<Maps::Tiles &>(tile).FindResource(); break;
 	case MP2::OBJ_ARTIFACT:	addon = const_cast<Maps::Tiles &>(tile).FindArtifact(); break;
 	case MP2::OBJ_CAMPFIRE:	addon = const_cast<Maps::Tiles &>(tile).FindCampFire(); break;
+	case MP2::OBJ_MONSTER:  addon = const_cast<Maps::Tiles &>(tile).FindMonster(); break;
 
 	default: break;
     }
 
-    if(NULL == addon)
-      addon = const_cast<Maps::Tiles &>(tile).FindMonster();
-    if(NULL == addon)
-      addon = const_cast<Maps::Tiles &>(tile).FindMiniHero(); //FIXME: Why doesn't this work?
-    if(NULL == addon)
-      return NULL;
+    if(NULL == addon) return NULL;
 
     const Rect & area = GameArea::Get().GetRect();
     const Point pos(tile.GetIndex() % world.w() - area.x, tile.GetIndex() / world.w() - area.y);
@@ -262,6 +258,7 @@ void Heroes::ActionToMonster(const u16 dst_index)
 
     Display::Fade();
     Army::battle_t b = Army::Battle(*this, army, tile);
+
     if(b == Army::WIN) {
         int exp = 1000; //TODO: Figure out appropriate calculation
        IncreaseExperience(exp);
@@ -270,25 +267,26 @@ void Heroes::ActionToMonster(const u16 dst_index)
         u16 index = Maps::GetIndexFromAbsPoint(focus.GetHeroes().GetCenter());
         to_remove = &world.GetTiles(index);
         //TODO: Kill off hero, perform cleanup
-    } else {
+    }
+    else
+    // dismiss hero
+    {
         u16 index = Maps::GetIndexFromAbsPoint(focus.GetHeroes().GetCenter());
         to_remove = &world.GetTiles(index);
-        //TODO: Put hero back in available buying list, perform cleanup
-    }
-    
-    AGG::PlaySound(M82::KILLFADE);
-    Maps::TilesAddon *addon = AnimationRemoveObject(*to_remove);
-    
-    if(addon)
-    {
-      const u16 uniq = addon->uniq;
-      to_remove->Remove(uniq);
-      to_remove->SetObject(MP2::OBJ_ZERO);
 
-      // remove shadow from left cell
-      if(Maps::isValidDirection(to_remove->GetIndex(), Direction::LEFT))
-          world.GetTiles(Maps::GetDirectionIndex(to_remove->GetIndex(), Direction::LEFT)).Remove(uniq);
+        to_remove->SetObject(GetUnderObject());
+        world.GetKingdom(color).RemoveHeroes(this);
+        SetFreeman();
     }
+
+    AGG::PlaySound(M82::KILLFADE);
+
+    // redraw focus list
+    Game::Focus::Get().Redraw();
+
+    // redraw status
+    Game::StatusWindow::Get().SetState(Game::StatusWindow::DAY);
+    Game::StatusWindow::Get().Redraw();
 }
 
 void Heroes::ActionToHeroes(const u16 dst_index)
