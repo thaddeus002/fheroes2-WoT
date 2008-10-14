@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <dirent.h> 
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "error.h"
 #include "gamedefs.h"
 #include "config.h"
@@ -34,6 +36,7 @@ void Dir::Read(const std::string &path, const std::string &filter, bool sensitiv
     // read directory
     DIR *dp;
     struct dirent *ep;
+    struct stat fs;
 
     dp = opendir(path.c_str());
 
@@ -43,8 +46,10 @@ void Dir::Read(const std::string &path, const std::string &filter, bool sensitiv
     {
 	while(NULL != (ep = readdir(dp)))
 	{
-    	    // if regular file
-    	    //if(DT_REG != ep->d_type) continue;
+	    const std::string fullname(path + SEPARATOR + ep->d_name);
+
+    	    // if not regular file
+    	    if(stat(fullname.c_str(), &fs) || !S_ISREG(fs.st_mode)) continue;
 
 	    if(filter.size())
 	    {
@@ -64,9 +69,8 @@ void Dir::Read(const std::string &path, const std::string &filter, bool sensitiv
 		}
     	    }
 
-    	    push_back(std::string(path + SEPARATOR + ep->d_name));
+    	    push_back(fullname);
 	}
+	closedir(dp);
     }
-
-    closedir(dp);
 }
