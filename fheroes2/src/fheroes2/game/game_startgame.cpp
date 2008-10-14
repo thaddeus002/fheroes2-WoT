@@ -77,7 +77,8 @@ Game::menu_t Game::StartGame(void)
     Cursor & cursor = Cursor::Get();
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
-    display.SetVideoMode(conf.VideoMode());
+
+    SetFixVideoMode();
 
     cursor.Hide();
     display.Fade();

@@ -78,6 +78,7 @@ namespace Game
     
     bool ShouldAnimate(u32 ticket);
     bool ShouldAnimateInfrequent(u32 ticket, u32 modifier);
+    void SetFixVideoMode(void);
     
     void EnvironmentSoundMixer(bool forced = false);
 

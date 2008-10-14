@@ -46,6 +46,39 @@ Game::menu_t Game::NewNetwork(void){ Error::Verbose("New Network Game: under con
 Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
 Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }
 
+void Game::SetFixVideoMode(void)
+{
+    const Settings & conf = Settings::Get();
+
+    Size fixsize(conf.VideoMode());
+    u32 max = 0;
+
+    switch(conf.FileInfo().SizeMaps())
+    {
+	default:
+	case Maps::SMALL:
+	    max = (6 + 36) * TILEWIDTH;
+	    break;
+
+	case Maps::MEDIUM:
+	    max = (6 + 72) * TILEWIDTH;
+	    break;
+
+	case Maps::LARGE:
+	    max = (6 + 108) * TILEWIDTH;
+	    break;
+
+	case Maps::XLARGE:
+	    max = (6 + 144) * TILEWIDTH;
+	    break;
+    }
+
+    if(conf.VideoMode().w > max) fixsize.w = max;
+    if(conf.VideoMode().h > max) fixsize.h = max;
+
+    Display::Get().SetVideoMode(fixsize);
+}
+
 /* play all sound from focus area game */
 void Game::EnvironmentSoundMixer(bool forced)
 {
