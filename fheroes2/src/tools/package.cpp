@@ -22,19 +22,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-/*
-#if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__)
-#include <io.h>
-#define MKDIR(X)    mkdir(X)
-#else
-#define MKDIR(X)    mkdir(X, S_IRWXU)
-#endif
-*/
-
 #include <iostream>
 #include <fstream>
 #include <list>
 #include <cstring>
+#include <algorithm>
 #include <cctype>
 
 #include "types.h"
@@ -43,10 +35,8 @@
 
 struct aggfat_t
 {
-    aggfat_t() : size(0), ptr(NULL){};
-
     u32 size;
-    char *ptr;
+    std::string name;
 };
             
 int main(int argc, char **argv)
@@ -65,8 +55,6 @@ int main(int argc, char **argv)
     const std::string sourcedir(argv[1]);
     dp = opendir(argv[1]);
 
-    u32 size = 0;
-    //std::list<char *> names;
     std::list<aggfat_t> fats;
 
     if(dp)
@@ -82,12 +70,7 @@ int main(int argc, char **argv)
 
             aggfat_t & fat = fats.back();
 	    fat.size = fs.st_size;
-	    fat.ptr = new char[AGGSIZENAME];
-
-            size += fs.st_size;
-
-            std::memset(fat.ptr, '\0', AGGSIZENAME);
-            std::strlen(ep->d_name) < AGGSIZENAME ? std::strcpy(fat.ptr, ep->d_name) : std::memcpy(fat.ptr, ep->d_name, AGGSIZENAME - 1);
+	    fat.name = std::string(ep->d_name);
 	}
 	closedir(dp);
     }
@@ -102,7 +85,8 @@ int main(int argc, char **argv)
     }
 
     // write count
-    const u16 count = fats.size();
+    u16 count = fats.size();
+    SWAP16(count);
     fd.write(reinterpret_cast<const char *>(&count), 2);
 
     // write fat1
@@ -112,10 +96,16 @@ int main(int argc, char **argv)
     for(; it1 != it2; ++it1)
     {
         const aggfat_t & fat = *it1;
+
+        u32 le_size = fat.size;
+        SWAP32(le_size);
+        u32 le_offset = offset;
+        SWAP32(le_offset);
+
         u32 crc = 0; // TODO: fix crc or ?
 	fd.write(reinterpret_cast<const char *>(&crc), 4);
-	fd.write(reinterpret_cast<const char *>(&offset), 4);
-	fd.write(reinterpret_cast<const char *>(&fat.size), 4);
+	fd.write(reinterpret_cast<const char *>(&le_offset), 4);
+	fd.write(reinterpret_cast<const char *>(&le_size), 4);
 	offset += fat.size;
     }
 
@@ -124,7 +114,7 @@ int main(int argc, char **argv)
     it2 = fats.end();
     for(; it1 != it2; ++it1)
     {
-	const std::string fullname(sourcedir + SEPARATOR + (*it1).ptr);
+	const std::string fullname(sourcedir + SEPARATOR + (*it1).name);
         const aggfat_t & fat = *it1;
 
 	std::fstream fdin(fullname.c_str(), std::ios::in | std::ios::binary);
@@ -146,14 +136,23 @@ int main(int argc, char **argv)
     // write fat2
     it1 = fats.begin();
     it2 = fats.end();
-    for(; it1 != it2; ++it1) fd.write((*it1).ptr, AGGSIZENAME);
+    for(; it1 != it2; ++it1)
+    {
+        const aggfat_t & fat = *it1;
+	char *ptr = new char[AGGSIZENAME];
+
+	// upper string
+	std::string name(fat.name);
+	std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+
+        std::memset(ptr, '\0', AGGSIZENAME);
+        name.size() < AGGSIZENAME ? std::strcpy(ptr, name.c_str()) : std::memcpy(ptr, name.c_str(), AGGSIZENAME - 1);
+
+	fd.write(ptr, AGGSIZENAME);
+	delete [] ptr;
+    }
 
     fd.close();
-
-    it1 = fats.begin();
-    it2 = fats.end();
-
-    for(; it1 != it2; ++it1) delete [] (*it1).ptr;
 
     return EXIT_SUCCESS;
 }
