@@ -117,6 +117,17 @@ MTrk::~MTrk()
     }
 }
 
+u32 MTrk::Size(void) const
+{
+    u32 result = 8;	// id + size
+
+    std::list<Event *>::const_iterator it1 = events.begin();
+    std::list<Event *>::const_iterator it2 = events.end();
+    for(; it1 != it2; ++it1) if(*it1) result += (*it1)->Size();
+
+    return result;
+}
+
 bool MTrk::Write(std::ostream & o) const
 {
     if(o.fail()) return false;
@@ -124,7 +135,6 @@ bool MTrk::Write(std::ostream & o) const
     o.write(ID_MTRK, 4);
 
     u32 size = 0;
-
     std::list<Event *>::const_iterator it1 = events.begin();
     std::list<Event *>::const_iterator it2 = events.end();
     for(; it1 != it2; ++it1) if(*it1) size += (*it1)->Size();
@@ -139,6 +149,34 @@ bool MTrk::Write(std::ostream & o) const
 	it1 = events.begin();
 	it2 = events.end();
 	for(; it1 != it2; ++it1) if(*it1) (*it1)->Write(o);
+    }
+
+    return true;
+}
+
+bool MTrk::Write(char *p) const
+{
+    if(NULL == p) return false;
+
+    memcpy(p, ID_MTRK, 4);
+    p+= 4;
+
+    u32 size = 0;
+    std::list<Event *>::const_iterator it1 = events.begin();
+    std::list<Event *>::const_iterator it2 = events.end();
+    for(; it1 != it2; ++it1) if(*it1) size += (*it1)->Size();
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    size = MIDI::Swap32(size);
+#endif
+    memcpy(p, reinterpret_cast<char *>(&size), 4);
+    p+= 4;
+
+    if(events.size())
+    {
+	it1 = events.begin();
+        it2 = events.end();
+	for(; it1 != it2; ++it1) if(*it1){ (*it1)->Write(p); p += (*it1)->Size(); }
     }
 
     return true;

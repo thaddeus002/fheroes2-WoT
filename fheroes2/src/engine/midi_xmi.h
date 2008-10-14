@@ -33,6 +33,7 @@ namespace MIDI
 	Xmi();
 
 	bool Read(const std::string & filename);
+	bool Read(const std::vector<char> & body);
 
 	const Chunk & TIMB(void) const { return timb; };
 	const Chunk & EVNT(void) const { return evnt; };

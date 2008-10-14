@@ -21,6 +21,7 @@
 #ifndef MIDI_MTHD_H
 #define MIDI_MTHD_H
 
+#include <vector>
 #include <istream>
 #include <cstring>
 #include "midi.h"
@@ -39,13 +40,16 @@ namespace MIDI
 
 	bool isValid(void) const{ return 0 == memcmp(Chunk::id, ID_MTHD, 4); };
 	bool Read(std::istream & is){ return Chunk::Read(is); };
+	bool Read(const std::vector<char> & b){ return Chunk::Read(b); };
 	bool Write(std::ostream & os) const{ return Chunk::Write(os); };
+	bool Write(char* b) const{ return Chunk::Write(b); };
 
 	void SetFormat(const u16 f);
 	void SetTracks(const u16 t);
 	void SetPPQN(const u16 p);
 
 	const char* Data(void) const{ return Chunk::data; };
+	u32 Size(void) const{ return 8 + size; };
 	u16 Format(void) const{ return MIDI::ReadBE16(&data[0]); };
 	u16 Tracks(void) const{ return MIDI::ReadBE16(&data[2]); };
 	u16 PPQN(void) const{ return MIDI::ReadBE16(&data[4]); };

@@ -36,25 +36,9 @@ Xmi::Xmi()
 {
 }
 
-bool Xmi::Read(const std::string & filename)
+bool Xmi::Read(const std::vector<char> & body)
 {
-    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
-
-    if(fd.fail())
-    {
-        std::cerr << "Xmi: error read: " << filename << std::endl;
-        return false;
-    }
-
-    fd.seekg(0, std::ios_base::end);
-    const u32 size = fd.tellg();
-    fd.seekg(0, std::ios_base::beg);
-
-    std::vector<char> body(size);
-    fd.read(&body[0], size);
-    fd.close();
-
-    if(0 == size)
+    if(0 == body.size())
     {
         std::cout << "Xmi: incorrect size" << std::endl;
         return false;
@@ -120,8 +104,26 @@ bool Xmi::Read(const std::string & filename)
 
     evnt.Read(ptr);
 
-    body.clear();
-    ptr = NULL;
-
     return true;
+}
+
+bool Xmi::Read(const std::string & filename)
+{
+    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
+
+    if(fd.fail())
+    {
+        std::cerr << "Xmi: error read: " << filename << std::endl;
+        return false;
+    }
+
+    fd.seekg(0, std::ios_base::end);
+    const u32 size = fd.tellg();
+    fd.seekg(0, std::ios_base::beg);
+
+    std::vector<char> body(size);
+    fd.read(&body[0], size);
+    fd.close();
+
+    return Read(body);
 }

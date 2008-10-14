@@ -487,6 +487,47 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 		    v.assign(cvt.buf, cvt.buf + size - 1);
 
 		    delete [] cvt.buf;
+		    cvt.buf = NULL;
+	    }
+    }
+}
+
+/* load XMI object to AGG::Cache */
+void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
+{
+    std::vector<char> & v = mid_cache[xmi];
+
+    if(v.size()) return;
+
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadMID: " + XMI::GetString(xmi));
+
+    const Audio::Mixer & mixer = Audio::Mixer::Get();
+
+    if(! mixer.isValid()) return;
+
+    if(agg_cache.size())
+    {
+	std::vector<char> body;
+
+	std::list<File *>::const_iterator it1 = agg_cache.begin();
+	std::list<File *>::const_iterator it2 = agg_cache.end();
+
+	for(; it1 != it2; ++it1)
+
+	    // read only first found
+	    if((**it1).Read(XMI::GetString(xmi), body))
+	    {
+		MIDI::Xmi x;
+		MIDI::Mid m;
+		MIDI::MTrk track;
+
+		x.Read(body);
+		track.ImportXmiEVNT(x.EVNT());
+
+		m.AddTrack(track);
+		m.SetPPQN(64);
+
+		m.Write(v);
 	    }
     }
 }
@@ -531,6 +572,14 @@ void AGG::Cache::FreeTIL(const TIL::til_t til)
 void AGG::Cache::FreeWAV(const M82::m82_t m82)
 {
     std::vector<u8> & v = wav_cache[m82];
+
+    if(v.size()) v.clear();
+}
+
+/* free XMI object in AGG::Cache */
+void AGG::Cache::FreeMID(const XMI::xmi_t xmi)
+{
+    std::vector<char> & v = mid_cache[xmi];
 
     if(v.size()) v.clear();
 }
@@ -610,9 +659,17 @@ const std::vector<u8> & AGG::Cache::GetWAV(const M82::m82_t m82)
 {
     const std::vector<u8> & v = wav_cache[m82];
 
-    const Audio::Mixer & mixer = Audio::Mixer::Get();
+    if(v.empty()) LoadWAV(m82);
 
-    if(v.empty() && mixer.isValid()) LoadWAV(m82);
+    return v;
+}
+
+/* return MID from AGG::Cache */
+const std::vector<char> & AGG::Cache::GetMID(const XMI::xmi_t xmi)
+{
+    const std::vector<char> & v = mid_cache[xmi];
+
+    if(v.empty()) LoadMID(xmi);
 
     return v;
 }
@@ -662,6 +719,11 @@ const std::vector<u8> & AGG::GetWAV(const M82::m82_t m82)
     return AGG::Cache::Get().GetWAV(m82);
 }
 
+const std::vector<char> & AGG::GetMID(const XMI::xmi_t xmi)
+{
+    return AGG::Cache::Get().GetMID(xmi);
+}
+
 // wrapper AGG::GetColor
 u32 AGG::GetColor(const u16 index, const u8 flag)
 {
@@ -694,5 +756,20 @@ void AGG::PlaySound(const M82::m82_t m82, const u8 volume, bool loop)
 	const u8 state = loop ? Audio::Mixer::PLAY | Audio::Mixer::REPEATE : Audio::Mixer::PLAY;
 
 	Audio::Mixer::Get().Play(AGG::Cache::Get().GetWAV(m82), vol, state);
+    }
+}
+
+// wrapper Music::Play
+void AGG::PlayMusic(const XMI::xmi_t xmi, const u8 volume, bool loop)
+{
+    const Settings & conf = Settings::Get();
+
+    if(conf.Music())
+    {
+	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + XMI::GetString(xmi));
+
+	const std::vector<char> & v = AGG::Cache::Get().GetMID(xmi);
+
+	// TODO: vector contains MIDI
     }
 }

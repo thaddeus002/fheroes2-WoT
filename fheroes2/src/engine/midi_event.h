@@ -41,6 +41,7 @@ namespace MIDI
 	void	SetDelta(const u32 dl);
 
 	void	Dump(void) const;
+	bool	Write(char *p) const;
 	bool	Write(std::ostream & o) const;
 
     protected:

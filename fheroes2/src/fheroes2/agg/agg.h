@@ -88,15 +88,18 @@ namespace AGG
 	const Surface & GetTIL(const TIL::til_t til, u16 index);
 	const Palette & GetPAL(void);
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
+	const std::vector<char> & GetMID(const XMI::xmi_t xmi);
 
 	void LoadICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
 	void LoadWAV(const M82::m82_t m82);
+	void LoadMID(const XMI::xmi_t xmi);
 	void LoadPAL(void);
 
 	void FreeICN(const ICN::icn_t icn, bool reflect = false);
 	void FreeTIL(const TIL::til_t til);
 	void FreeWAV(const M82::m82_t m82);
+	void FreeMID(const XMI::xmi_t xmi);
 
     private:
 	Cache();
@@ -107,6 +110,7 @@ namespace AGG
 	std::map<ICN::icn_t, std::vector<Sprite *> > reflect_icn_cache;
 	std::map<TIL::til_t, std::vector<Surface *> > til_cache;
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
+	std::map<XMI::xmi_t, std::vector<char> > mid_cache;
 
 	Palette palette;
 	bool heroes2_agg;
@@ -125,6 +129,7 @@ namespace AGG
     const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
     void GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst);
     const std::vector<u8> & GetWAV(const M82::m82_t m82);
+    const std::vector<char> & GetMID(const XMI::xmi_t xmi);
 
     // wrapper AGG::GetColor
     u32 GetColor(const u16 index, const u8 flag = 0);
@@ -133,6 +138,9 @@ namespace AGG
     
     // wrapper Audio::Play
     void PlaySound(const M82::m82_t m82, const u8 volume = 10, bool loop = false);
+
+    // wrapper Music::Play
+    void PlayMusic(const XMI::xmi_t xmi, const u8 volume = 10, bool loop = false);
 };
 
 #endif

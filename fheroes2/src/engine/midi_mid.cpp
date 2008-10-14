@@ -69,6 +69,40 @@ Mid & Mid::operator= (const Mid & m)
     return *this;
 }
 
+bool Mid::Read(const std::vector<char> & body)
+{
+    mthd.Read(body);
+
+    if(! mthd.isValid())
+    {
+        std::cerr << "Mid: error format" << std::endl;
+
+        return false;
+    }
+
+    const u32 count = mthd.Tracks();
+    const char *ptr = &body[mthd.Size()];
+
+    for(u16 ii = 0; ii < count; ++ii)
+    {
+	if(ptr >= &body[0] + body.size())
+	{
+    	    std::cerr << "Mid: error read chunk, total: " << count << ", current: " << ii << std::endl;
+
+    	    return false;
+	}
+
+	const Chunk chunk(ptr);
+
+	if(0 == memcmp(ID_MTRK, chunk.id, 4)) tracks.push_back(new MTrk(chunk.data, chunk.size));
+	else --ii;
+
+	ptr += 8 + chunk.size;
+    }
+
+    return true;
+}
+
 bool Mid::Read(const std::string & filename)
 {
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
@@ -107,6 +141,40 @@ bool Mid::Read(const std::string & filename)
     }
 
     fd.close();
+
+    return true;
+}
+
+u32 Mid::Size(void) const
+{
+    u32 total = mthd.Size();
+
+    if(tracks.size())
+    {
+	std::list<MTrk *>::const_iterator it1 = tracks.begin();
+	std::list<MTrk *>::const_iterator it2 = tracks.end();
+
+	for(; it1 != it2; ++it1) if(*it1) total += (*it1)->Size();
+    }
+    
+    return total;
+}
+
+bool Mid::Write(std::vector<char> & body)
+{
+    body.resize(Size());
+    char *ptr = &body[0];
+
+    mthd.Write(ptr);
+    ptr += mthd.Size();
+
+    if(tracks.size())
+    {
+	std::list<MTrk *>::const_iterator it1 = tracks.begin();
+	std::list<MTrk *>::const_iterator it2 = tracks.end();
+
+	for(; it1 != it2; ++it1) if(*it1){ (*it1)->Write(ptr); ptr += (*it1)->Size(); }
+    }
 
     return true;
 }

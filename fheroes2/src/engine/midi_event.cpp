@@ -23,7 +23,7 @@
 
 using namespace MIDI;
 
-Event::Event::Event() : delta(0), status(0) 
+Event::Event::Event() : delta(0), status(0), sp(0)
 {
 }
 
@@ -42,6 +42,20 @@ void Event::SetDelta(const u32 dl)
 u32 Event::Size(void) const
 {
     return 1 + sp + data.size();
+}
+
+bool Event::Write(char *p) const
+{
+    if(NULL == p) return false;
+
+    memcpy(p, pack, sp);
+    p+= sp;
+
+    *p = status;
+
+    if(data.size()) memcpy(p + 1, &data[0], data.size());
+
+    return true;
 }
 
 bool Event::Write(std::ostream & o) const

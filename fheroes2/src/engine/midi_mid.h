@@ -21,6 +21,7 @@
 #ifndef MIDI_MID_H
 #define MIDI_MID_H
 
+#include <vector>
 #include <list>
 #include "midi.h"
 #include "midi_mthd.h"
@@ -38,7 +39,12 @@ namespace MIDI
 	Mid & operator= (const Mid & m);
 
 	bool Read(const std::string & filename);
+	bool Read(const std::vector<char> & body);
+
 	bool Write(const std::string & filename);
+	bool Write(std::vector<char> & body);
+
+	u32 Size(void) const;
 
         void SetFormat(const u16 f){ mthd.SetFormat(f); };
         void SetTracks(const u16 t){ mthd.SetTracks(t); };

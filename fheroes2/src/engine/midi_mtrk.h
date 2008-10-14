@@ -43,6 +43,8 @@ namespace MIDI
 	~MTrk();
 
 	bool Write(std::ostream & o) const;
+	bool Write(char *p) const;
+	u32 Size(void) const;
 
 	void AddEvent(const Event & e);
 	void ImportXmiEVNT(const Chunk & c);

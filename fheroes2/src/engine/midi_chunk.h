@@ -23,6 +23,7 @@
 
 #include <ostream>
 #include <istream>
+#include <vector>
 #include "midi.h"
 
 namespace MIDI
@@ -48,6 +49,7 @@ namespace MIDI
 
 	bool Read(std::istream & i);
 	bool Read(const char *p);
+	bool Read(const std::vector<char> & b);
 
 	void Dump(void) const;
     };

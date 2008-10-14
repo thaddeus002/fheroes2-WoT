@@ -112,6 +112,28 @@ bool Chunk::Read(std::istream & i)
     return true;
 }
 
+bool Chunk::Read(const std::vector<char> & b)
+{
+    if(8 > b.size()) return false;
+
+    memcpy(id, &b[0], 4);
+
+    size = MIDI::ReadBE32(&b[4]);
+
+    if(data) delete [] data;
+    data = NULL;
+
+    if(size + 8 > b.size()) size = b.size() - 8;
+
+    if(size)
+    {
+	data = new char [size];
+	memcpy(data, &b[8], size);
+    }
+
+    return true;
+}
+
 bool Chunk::Read(const char *p)
 {
     if(NULL == p) return false;
