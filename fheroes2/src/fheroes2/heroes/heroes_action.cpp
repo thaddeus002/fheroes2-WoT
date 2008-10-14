@@ -240,43 +240,55 @@ void Heroes::Action(const Maps::Tiles & dst)
 
 void Heroes::ActionToMonster(const u16 dst_index)
 {
-    const Game::Focus & focus = Game::Focus::Get();
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    //const Game::Focus & focus = Game::Focus::Get();
+    Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
-    Maps::Tiles *to_remove;
     const u16 count = Monster::GetSize(tile);
     std::vector<Army::Troops> army;
     int tr_c = count > 5 ? 5 : count;
-    for(int i=0; i< tr_c; i++) {
+
+    for(int i=0; i< tr_c; i++)
+    {
 	Army::Troops troop(monster, (int)(count/tr_c));
 	army.push_back(troop);
     }
+
     std::string str = "Heroes::ActionToMonster: " + GetName() + " attack monster " + Monster::String(monster)+" (";
     String::AddInt(str, count);
     str += ")";
     if(H2Config::Debug()) Error::Verbose(str);
 
     Display::Fade();
-    Army::battle_t b = Army::Battle(*this, army, tile);
 
-    if(b == Army::WIN) {
-        int exp = 1000; //TODO: Figure out appropriate calculation
-       IncreaseExperience(exp);
-       to_remove = const_cast<Maps::Tiles *>(&tile);
-    } else if(b == Army::LOSE) {
-        u16 index = Maps::GetIndexFromAbsPoint(focus.GetHeroes().GetCenter());
-        to_remove = &world.GetTiles(index);
-        //TODO: Kill off hero, perform cleanup
-    }
-    else
-    // dismiss hero
+    switch(Army::Battle(*this, army, tile))
     {
-        u16 index = Maps::GetIndexFromAbsPoint(focus.GetHeroes().GetCenter());
-        to_remove = &world.GetTiles(index);
+	case Army::WIN:
+	{
+	    Maps::TilesAddon *addon = tile.FindMonster();
+	    if(addon)
+	    {
+		const u32 uniq = addon->uniq;
+		AnimationRemoveObject(tile);
+		tile.Remove(uniq);
+		tile.SetObject(MP2::OBJ_ZERO);
 
-        to_remove->SetObject(GetUnderObject());
-        world.GetKingdom(color).RemoveHeroes(this);
-        SetFreeman();
+		// remove shadow from left cell
+		if(Maps::isValidDirection(dst_index, Direction::LEFT))
+		    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+	    }
+	    IncreaseExperience(1000);	//TODO: Figure out appropriate calculation
+	}
+	break;
+
+	case Army::RETREAT:
+	case Army::SURRENDER:
+	case Army::LOSE:
+    	    Maps::Tiles & tile_hero = world.GetTiles(GetCenter());
+    	    tile_hero.SetObject(GetUnderObject());
+
+    	    world.GetKingdom(color).RemoveHeroes(this);
+    	    SetFreeman();
+	break;
     }
 
     AGG::PlaySound(M82::KILLFADE);

@@ -104,7 +104,7 @@ public:
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
 
     bool isFreeman(void) const{ return Color::GRAY == color; };
-    void SetFreeman(void) { color = Color::GRAY; };
+    void SetFreeman(void) { color = Color::GRAY; mp.x = -1; mp.y = -1; };
 
     bool operator== (const Heroes & h) const;
 
