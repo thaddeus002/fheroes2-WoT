@@ -197,7 +197,7 @@ void Heroes::Action(const Maps::Tiles & dst)
 	case MP2::OBJ_DESERTTENT:	ActionToRecruitArmy(dst_index); break;
 
         // object
-        case MP2::OBJ_WATERMILL:
+        case MP2::OBJ_WATERWHEEL:
         case MP2::OBJ_WINDMILL:
         case MP2::OBJ_SKELETON:
         case MP2::OBJ_DAEMONCAVE:
