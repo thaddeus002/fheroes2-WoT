@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <list>
-#include "gamedefs.h"
+#include "types.h"
 
 namespace Rand
 {
