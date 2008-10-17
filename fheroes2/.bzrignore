@@ -1,0 +1,9 @@
+*.d
+./fheroes2
+src/tools/xmi2mid
+src/tools/til2bmp
+src/tools/82m2wav
+src/tools/extractor
+src/tools/icn2bmp
+src/tools/package
+src/dist/fheroes2

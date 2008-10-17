@@ -52,9 +52,9 @@ char *dirname(const char *path)
 char *basename(const char *path)
 {
     static char buff[PATH_MAX];
-    char *c = strrchr(buff, SEPARATOR);
+    char *c = strrchr(path, SEPARATOR);
     if(!c) strncpy(buff, path, PATH_MAX);
-    else strcpy(buff, c);
+    else strcpy(buff, c + 1);
     return buff;
 }
 
