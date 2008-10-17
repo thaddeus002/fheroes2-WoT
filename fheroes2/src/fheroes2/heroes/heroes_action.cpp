@@ -45,22 +45,15 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
 {
     Maps::TilesAddon *addon = NULL;
 
-    if(Maps::Ground::WATER == tile.GetGround())
     switch(tile.GetObject())
     {
-        case MP2::OBJ_TREASURECHEST:
 	case MP2::OBJ_FLOTSAM:
 	case MP2::OBJ_SHIPWRECKSURVIROR:
-	case MP2::OBJ_BOTTLE:	addon = const_cast<Maps::Tiles &>(tile).FindWaterResource(); break;
-
-	default: break;
-    }
-    else
-    switch(tile.GetObject())
-    {
+	case MP2::OBJ_BOTTLE:
         case MP2::OBJ_TREASURECHEST:
         case MP2::OBJ_ANCIENTLAMP:
 	case MP2::OBJ_RESOURCE:	addon = const_cast<Maps::Tiles &>(tile).FindResource(); break;
+
 	case MP2::OBJ_ARTIFACT:	addon = const_cast<Maps::Tiles &>(tile).FindArtifact(); break;
 	case MP2::OBJ_CAMPFIRE:	addon = const_cast<Maps::Tiles &>(tile).FindCampFire(); break;
 	case MP2::OBJ_MONSTER:  addon = const_cast<Maps::Tiles &>(tile).FindMonster(); break;
@@ -93,6 +86,7 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
             sf.SetAlpha(alpha);
             Display::Get().Blit(sf, dstx + sprite.x(), dsty + sprite.y());
 	    tile.RedrawTop();
+	    if(Game::Focus::HEROES == Game::Focus::Get().Type()) Game::Focus::Get().GetHeroes().Redraw();
     	    Display::Get().Flip();
     	    alpha -= 10;
         }
@@ -119,16 +113,21 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_BOAT:	ActionToBoat(dst_index); break;
 	case MP2::OBJ_COAST:	ActionToCoast(dst_index); break;
 
-        // resource
-        case MP2::OBJ_RESOURCE:	ActionToResource(dst_index, MP2::OBJ_RESOURCE); break;
-        case MP2::OBJ_CAMPFIRE: ActionToResource(dst_index, MP2::OBJ_CAMPFIRE); break;
+        // resource object
+        case MP2::OBJ_MAGICGARDEN:
+        case MP2::OBJ_LEANTO:
+        case MP2::OBJ_WINDMILL:
+        case MP2::OBJ_WATERWHEEL:	ActionToResource(dst_index); break;
 
+        // pickup object
+        //case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_RESOURCE:
+        case MP2::OBJ_BOTTLE:
+        case MP2::OBJ_CAMPFIRE:		ActionToPickupResource(dst_index); break;
         case MP2::OBJ_TREASURECHEST:	ActionToTreasureChest(dst_index); break;
         case MP2::OBJ_ANCIENTLAMP:	ActionToAncientLamp(dst_index); break;
         case MP2::OBJ_ARTIFACT: 	ActionToArtifact(dst_index); break;
-
-        case MP2::OBJ_SHIPWRECKSURVIROR:
-        case MP2::OBJ_FLOTSAM:		ActionToResource(dst_index, object); break;
+        case MP2::OBJ_FLOTSAM:		ActionToFlotSam(dst_index); break;
 
         // shrine circle
 	case MP2::OBJ_SHRINE1:
@@ -140,7 +139,6 @@ void Heroes::Action(const Maps::Tiles & dst)
 
         // info message
         case MP2::OBJ_SIGN:		ActionToSign(dst_index); break;
-        case MP2::OBJ_BOTTLE:		ActionToBottle(dst_index); break;
 
         // luck modification
         case MP2::OBJ_FOUNTAIN:
@@ -197,8 +195,6 @@ void Heroes::Action(const Maps::Tiles & dst)
 	case MP2::OBJ_DESERTTENT:	ActionToRecruitArmy(dst_index); break;
 
         // object
-        case MP2::OBJ_WATERWHEEL:
-        case MP2::OBJ_WINDMILL:
         case MP2::OBJ_SKELETON:
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_GRAVEYARD:
@@ -214,8 +210,6 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_WAGON:
         case MP2::OBJ_ARTESIANSPRING:
         case MP2::OBJ_XANADU:
-        case MP2::OBJ_LEANTO:
-        case MP2::OBJ_MAGICGARDEN:
         case MP2::OBJ_FREEMANFOUNDRY:
 
         case MP2::OBJ_JAIL:
@@ -240,7 +234,6 @@ void Heroes::Action(const Maps::Tiles & dst)
 
 void Heroes::ActionToMonster(const u16 dst_index)
 {
-    //const Game::Focus & focus = Game::Focus::Get();
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = Monster::GetSize(tile);
@@ -267,6 +260,7 @@ void Heroes::ActionToMonster(const u16 dst_index)
 	    Maps::TilesAddon *addon = tile.FindMonster();
 	    if(addon)
 	    {
+		AGG::PlaySound(M82::KILLFADE);
 		const u32 uniq = addon->uniq;
 		AnimationRemoveObject(tile);
 		tile.Remove(uniq);
@@ -283,6 +277,7 @@ void Heroes::ActionToMonster(const u16 dst_index)
 	case Army::RETREAT:
 	case Army::SURRENDER:
 	case Army::LOSE:
+	    AGG::PlaySound(M82::KILLFADE);
     	    Maps::Tiles & tile_hero = world.GetTiles(GetCenter());
     	    tile_hero.SetObject(GetUnderObject());
 
@@ -290,8 +285,6 @@ void Heroes::ActionToMonster(const u16 dst_index)
     	    SetFreeman();
 	break;
     }
-
-    AGG::PlaySound(M82::KILLFADE);
 
     // redraw focus list
     Game::Focus::Get().Redraw();
@@ -403,110 +396,159 @@ void Heroes::ActionToCoast(const u16 dst_index)
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCoast: " + GetName() + " to coast");
 }
 
+void Heroes::ActionToPickupResource(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    Resource::funds_t resource;
+
+    const u8 count = tile.GetQuantity2();
+    switch(tile.GetQuantity1())
+    {
+	case Resource::WOOD: resource.wood += count; break;
+    	case Resource::MERCURY: resource.mercury += count; break;
+    	case Resource::ORE: resource.ore += count; break;
+    	case Resource::SULFUR: resource.sulfur += count; break;
+    	case Resource::CRYSTAL: resource.crystal += count; break;
+    	case Resource::GEMS: resource.gems += count; break;
+    	case Resource::GOLD: resource.gold += 100 * count; break;
+
+	default: break;
+    }
+
+    PlayPickupSound();
+    AnimationRemoveObject(tile);
+
+    world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+    // dialog
+    if(H2Config::MyColor() == GetColor())
+	switch(tile.GetObject())
+	{
+	    case MP2::OBJ_CAMPFIRE:
+		Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "Ransacking an enemy camp, you discover a hidden cache of treasures.", resource);
+	    break;
+
+	    case MP2::OBJ_BOTTLE:
+		Dialog::Message(MP2::StringObject(tile.GetObject()), world.MessageSign(dst_index), Font::BIG, Dialog::OK);
+	    break;
+
+	    default: break;
+	}
+
+    tile.RemoveObjectSprite();
+    tile.SetObject(MP2::OBJ_ZERO);
+
+    // redraw status info
+    Game::StatusWindow::Get().Redraw();
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToPickupResource: " + GetName() + " pickup small resource");
+}
+
 void Heroes::ActionToResource(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+    Resource::funds_t resource;
 
-    const Maps::TilesAddon *addon = tile.FindResource();
-
-    if(addon)
+    const u8 count = tile.GetQuantity2();
+    switch(tile.GetQuantity1())
     {
-	Resource::funds_t resource;
-	const u32 uniq = addon->uniq;
-	const u8 count = tile.GetQuantity2();
+	case Resource::WOOD: resource.wood += count; break;
+    	case Resource::MERCURY: resource.mercury += count; break;
+    	case Resource::ORE: resource.ore += count; break;
+    	case Resource::SULFUR: resource.sulfur += count; break;
+    	case Resource::CRYSTAL: resource.crystal += count; break;
+    	case Resource::GEMS: resource.gems += count; break;
+    	case Resource::GOLD: resource.gold += 100 * count; break;
 
-	switch(Resource::FromIndexSprite(addon->index))
-        {
-    	    case Resource::WOOD: resource.wood += count; break;
-    	    case Resource::MERCURY: resource.mercury += count; break;
-    	    case Resource::ORE: resource.ore += count; break;
-    	    case Resource::SULFUR: resource.sulfur += count; break;
-    	    case Resource::CRYSTAL: resource.crystal += count; break;
-    	    case Resource::GEMS: resource.gems += count; break;
-    	    case Resource::GOLD: resource.gold += 100 * count; break;
-
-	    default:
-		if(H2Config::Debug()) Error::Warning("Heroes::ActionToResource: unknown resource, from tile: ", dst_index);
-		return;
-        }
-
-	PlayPickupSound();
-	AnimationRemoveObject(tile);
-
-	world.GetKingdom(GetColor()).AddFundsResource(resource);
-
-	tile.Remove(uniq);
-	tile.SetObject(MP2::OBJ_ZERO);
-
-	// remove shadow from left cell
-	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-
-	// redraw status info
-	Game::StatusWindow::Get().Redraw();
-
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
+	default: break;
     }
+
+    PlayPickupSound();
+    AnimationRemoveObject(tile);
+
+    world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+    // dialog
+    if(H2Config::MyColor() == GetColor())
+	switch(tile.GetObject())
+	{
+	    case MP2::OBJ_WINDMILL:
+	    	if(resource.GetValidItems())
+		    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "The keeper of the mill announces: \"Milord, I have been working very hard to provide you with these resources, come back next week formore.\"", resource);
+		else
+		    Dialog::Message(MP2::StringObject(tile.GetObject()), "The keeper of the mill announces: \"Milord, I am sorry, there are no resources currently available. Please try again next week.\"", Font::BIG, Dialog::OK);
+	    break;
+
+	    case MP2::OBJ_WATERWHEEL:
+	    	if(resource.GetValidItems())
+		    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "The keeper of the mill announces: \"Milord, I have been working very hard to provide you with this gold, come back next week for more.\"", resource);
+		else
+		    Dialog::Message(MP2::StringObject(tile.GetObject()), "The keeper of the mill announces: \"Milord, I am sorry, there is no gold currently available.  Please try again next week.\"", Font::BIG, Dialog::OK);
+	    break;
+	    
+	    case MP2::OBJ_LEANTO:
+	    	if(resource.GetValidItems())
+		    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "You've found an abandoned lean-to. Poking about, you discover some resources hidden nearby.", resource);
+		else
+		    Dialog::Message(MP2::StringObject(tile.GetObject()), "The lean-to is long abandoned. There is nothing of value here.", Font::BIG, Dialog::OK);
+	    break;
+
+    	    case MP2::OBJ_MAGICGARDEN:
+	    	if(resource.GetValidItems())
+		    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms. In exchange for his freedom, he guides you to a smallpot filled with precious things.", resource);
+		else
+		    Dialog::Message(MP2::StringObject(tile.GetObject()), "You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today. Perhaps you should try again next week.", Font::BIG, Dialog::OK);
+    	    break;
+
+	    default: break;
+	}
+
+    tile.SetQuantity1(0);
+    tile.SetQuantity2(0);
+
+    // redraw status info
+    Game::StatusWindow::Get().Redraw();
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
 }
 
-void Heroes::ActionToResource(const u16 dst_index, const MP2::object_t obj)
+void Heroes::ActionToFlotSam(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    const Maps::TilesAddon *addon = NULL;
-    const std::string header(MP2::StringObject(obj));
     std::string body;
-    Resource::funds_t resource(obj);
+    Resource::funds_t resource;
 
-    switch(obj)
+    resource.gold += 100 * tile.GetQuantity1();
+    resource.wood += tile.GetQuantity2();
+
+    if(resource.gold && resource.wood)
+	body = "You search through the flotsam, and find some wood and some gold.";
+    else
+    if(resource.wood)
+	body = "You search through the flotsam, and find some wood.";
+    else
+	body = "You search through the flotsam, but find nothing.";
+
+    PlayPickupSound();
+    AnimationRemoveObject(tile);
+
+    world.GetKingdom(GetColor()).AddFundsResource(resource);
+    if(H2Config::MyColor() == GetColor())
     {
-	case MP2::OBJ_RESOURCE:
-	    ActionToResource(dst_index);
-	    return;
-
-	case MP2::OBJ_CAMPFIRE:
-	    addon = tile.FindCampFire();
-	    body = "Ransacking an enemy camp, you discover a hidden cache of treasures.";
-	    break;
-
-	case MP2::OBJ_FLOTSAM:
-	{
-	    addon = const_cast<Maps::Tiles &>(tile).FindWaterResource();
-	    if(resource.gold && resource.wood)
-		body = "You search through the flotsam, and find some wood and some gold.";
-	    else
-	    if(resource.wood)
-		body = "You search through the flotsam, and find some wood.";
-	    else
-		body = "You search through the flotsam, but find nothing.";
-	}
-	    break;
-
-	default: Error::Warning("Heroes::ActionToResource: unknown object: ", dst_index); return;
+	if(resource.GetValidItems())
+	    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), body, resource);
+	else
+	    Dialog::Message(MP2::StringObject(tile.GetObject()), body, Font::BIG, Dialog::OK);
     }
 
-    if(addon)
-    {
-	const u32 uniq = addon->uniq;
+    tile.RemoveObjectSprite();
+    tile.SetObject(MP2::OBJ_ZERO);
 
-	PlayPickupSound();
-	AnimationRemoveObject(tile);
-	world.GetKingdom(GetColor()).AddFundsResource(resource);
+    // redraw status info
+    Game::StatusWindow::Get().Redraw();
 
-	if(H2Config::MyColor() == GetColor()) Dialog::ResourceInfo(header, body, resource);
-
-	tile.Remove(uniq);
-	tile.SetObject(MP2::OBJ_ZERO);
-
-	// remove shadow from left cell
-	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-
-	// redraw status info
-	Game::StatusWindow::Get().Redraw();
-
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: "  + GetName() + ": " + MP2::StringObject(obj));
-    }
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToFlotSam: " + GetName() + " pickup small resource");
 }
 
 void Heroes::ActionToShrine(const u16 dst_index)
@@ -655,32 +697,6 @@ void Heroes::ActionToSign(const u16 dst_index)
 	Dialog::Message("Sign", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToSign: " + GetName());
-}
-
-void Heroes::ActionToBottle(const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Maps::TilesAddon *addon = tile.FindWaterResource();
-
-    if(addon)
-    {
-	const u32 uniq = addon->uniq;
-
-	PlayPickupSound();
-	AnimationRemoveObject(tile);
-
-	tile.Remove(uniq);
-	tile.SetObject(MP2::OBJ_ZERO);
-
-	if(H2Config::MyColor() == GetColor())
-	    Dialog::Message("Bottle", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
-
-	// remove shadow from left cell
-	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToBottle: " + GetName() + " pickup bottle");
-    }
 }
 
 void Heroes::ActionToMagicWell(const u16 dst_index)
@@ -919,14 +935,7 @@ void Heroes::ActionToArtifact(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    const Maps::TilesAddon *addon = tile.FindArtifact();
-
-    if(addon)
-    {
-	const u32 uniq = addon->uniq;
-	const Artifact::artifact_t art = Artifact::FromMP2(addon->index);
-
-	if(Artifact::UNKNOWN == art) return;
+    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
 
 /* FIXME: pickup artifact variants
     {Artifact}
@@ -952,58 +961,46 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
     Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
 */
-	PlayPickupSound();
-	AnimationRemoveObject(tile);
+    PlayPickupSound();
+    AnimationRemoveObject(tile);
 
-	PickupArtifact(art);
+    PickupArtifact(art);
 
-	// dialog
-	//if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
+    // dialog
+    //if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
 
-	tile.Remove(uniq);
-	tile.SetObject(MP2::OBJ_ZERO);
+    tile.RemoveObjectSprite();
+    tile.SetObject(MP2::OBJ_ZERO);
 
-	// remove shadow from left cell
-	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToArtifact: " + GetName() + " pickup artifact");
-    }
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToArtifact: " + GetName() + " pickup artifact");
 }
 
 void Heroes::ActionToTreasureChest(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    const Maps::TilesAddon *addon = Maps::Ground::WATER == tile.GetGround() ? tile.FindWaterResource() : tile.FindResource();
+    PlayPickupSound();
+    AnimationRemoveObject(tile);
 
-    if(addon)
+    Resource::funds_t resource;
+    resource.gold = tile.GetQuantity2() * 100;
+
+    // dialog
+    if(Maps::Ground::WATER == tile.GetGround())
     {
-	const u32 uniq = addon->uniq;
+	std::string message("After spending hours trying to fish the chest out of the sea,");
 
-
-	PlayPickupSound();
-	AnimationRemoveObject(tile);
-
-	Resource::funds_t resource;
-	resource.gold = tile.GetQuantity2() * 100;
-
-	// dialog
-	if(Maps::Ground::WATER == tile.GetGround())
+	if(0 == resource.gold)
 	{
-	    std::string message("After spending hours trying to fish the chest out of the sea,");
-
-	    if(0 == resource.gold)
+	    message += " you open it, only to find it empty.";
+	    if(H2Config::MyColor() == GetColor())  Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
+	}
+	else
+	if(tile.GetQuantity1())
+	{
+	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    if(H2Config::MyColor() == GetColor())
 	    {
-		message += " you open it, only to find it empty.";
-		if(H2Config::MyColor() == GetColor())  Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
-	    }
-	    else
-	    if(tile.GetQuantity1())
-	    {
-		const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-		if(H2Config::MyColor() == GetColor())
-		{
 		    std::string count;
 		    String::AddInt(count, resource.gold);
 		    message += " you open it and find " + count + " gold and the " + Artifact::String(art);
@@ -1018,14 +1015,14 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 		    Text text(count, Font::SMALL);
 		    text.Blit(border.w() + 50 + (gold.w() - Text::width(count, Font::SMALL)) / 2, border.h() - 25, image);
 		    Dialog::SpriteInfo("Chest", message, image);
-		}
-		PickupArtifact(art);
-		world.GetKingdom(GetColor()).AddFundsResource(resource);
 	    }
-	    else
+	    PickupArtifact(art);
+	    world.GetKingdom(GetColor()).AddFundsResource(resource);
+	}
+	else
+	{
+	    if(H2Config::MyColor() == GetColor())
 	    {
-		if(H2Config::MyColor() == GetColor())
-		{
 		    std::string count;
 		    String::AddInt(count, resource.gold);
 		    message += " you open it and find " + count + " gold pieces.";
@@ -1036,19 +1033,19 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 		    Text text(count, Font::SMALL);
 		    text.Blit((gold.w() - Text::width(count, Font::SMALL)) / 2, gold.h(), image);
 		    Dialog::SpriteInfo("Chest", message, image);
-		}
-		world.GetKingdom(GetColor()).AddFundsResource(resource);
 	    }
+	    world.GetKingdom(GetColor()).AddFundsResource(resource);
 	}
-	else
-	{
-	    std::string message("After scouring the area,");
+    }
+    else
+    {
+	std::string message("After scouring the area,");
 
-	    if(tile.GetQuantity1())
+	if(tile.GetQuantity1())
+	{
+	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    if(H2Config::MyColor() == GetColor())
 	    {
-		const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-		if(H2Config::MyColor() == GetColor())
-		{
 		    message += " you fall upon a hidden chest, containing the ancient artifact " + Artifact::String(art);
 		    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
 		    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art + 1);
@@ -1057,93 +1054,72 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 		    image.Blit(border);
 		    image.Blit(artifact, 5, 5);
 		    Dialog::SpriteInfo("Chest", message, image);
-		}
-		PickupArtifact(art);
-		world.GetKingdom(GetColor()).AddFundsResource(resource);
 	    }
-	    else
-	    {
-		const u16 expr = resource.gold - 500;
-		message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";
-
-		if((H2Config::MyColor() == GetColor() && Dialog::SelectGoldOrExp("Chest", message, resource.gold, expr)) ||
-			(H2Config::MyColor() != GetColor() && AI::SelectGoldOrExp(*this, resource.gold, expr)))
-		    world.GetKingdom(GetColor()).AddFundsResource(resource);
-		else
-		    IncreaseExperience(expr);
-	    }
+	    PickupArtifact(art);
+	    world.GetKingdom(GetColor()).AddFundsResource(resource);
 	}
+	else
+	{
+	    const u16 expr = resource.gold - 500;
+	    message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";
 
-	tile.Remove(uniq);
-	tile.SetObject(MP2::OBJ_ZERO);
-
-	// remove shadow from left cell
-	if(Maps::isValidDirection(dst_index, Direction::LEFT))
-	    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-
-	// redraw status info
-	Game::StatusWindow::Get().Redraw();
-
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
+	    if((H2Config::MyColor() == GetColor() && Dialog::SelectGoldOrExp("Chest", message, resource.gold, expr)) ||
+		(H2Config::MyColor() != GetColor() && AI::SelectGoldOrExp(*this, resource.gold, expr)))
+		    world.GetKingdom(GetColor()).AddFundsResource(resource);
+	    else
+		    IncreaseExperience(expr);
+	}
     }
+
+    tile.RemoveObjectSprite();
+    tile.SetObject(MP2::OBJ_ZERO);
+
+    // redraw status info
+    Game::StatusWindow::Get().Redraw();
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
 }
 
 void Heroes::ActionToAncientLamp(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    const Maps::TilesAddon *addon = tile.FindResource();
+    const u32 count = Rand::Get(2, 4);
+    const u32 army_size = GetCountArmy();
 
-    if(addon)
+    if(((HEROESMAXARMY == army_size && HasMonster(Monster::GENIE)) || HEROESMAXARMY > army_size))
     {
-	const u32 uniq = addon->uniq;
-
-	const u32 count = Rand::Get(2, 4);
-	const u32 army_size = GetCountArmy();
-
-	if(((HEROESMAXARMY == army_size && HasMonster(Monster::GENIE)) || HEROESMAXARMY > army_size))
+	const std::string message("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?");
+	if(H2Config::MyColor() != GetColor())
 	{
-	    const std::string message("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?");
-	    if(H2Config::MyColor() != GetColor())
-	    {
-		AI::RecruitTroops(*this, Monster::GENIE, count);
+	    AI::RecruitTroops(*this, Monster::GENIE, count);
 
-		// post tile action
-		tile.Remove(uniq);
-		tile.SetObject(MP2::OBJ_ZERO);
-
-		// remove shadow from left cell
-		if(Maps::isValidDirection(dst_index, Direction::LEFT))
-			world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-	    }
-	    else
-	    // recruit
-	    if(Dialog::YES == Dialog::Message(Monster::String(Monster::GENIE), message, Font::BIG, Dialog::YES|Dialog::NO))
-	    {
-		PlayPickupSound();
-		AnimationRemoveObject(tile);
-
-		const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
-		if(recruit) JoinTroops(Monster::GENIE, recruit);
-
-		// post tile action
-		tile.Remove(uniq);
-		tile.SetObject(MP2::OBJ_ZERO);
-
-		// remove shadow from left cell
-		if(Maps::isValidDirection(dst_index, Direction::LEFT))
-			world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-
-		// redraw status info
-		Game::StatusWindow::Get().Redraw();
-	    }
+	    tile.RemoveObjectSprite();
+	    tile.SetObject(MP2::OBJ_ZERO);
 	}
-	// is full
 	else
-		Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+	// recruit
+	if(Dialog::YES == Dialog::Message(Monster::String(Monster::GENIE), message, Font::BIG, Dialog::YES|Dialog::NO))
+	{
+	    PlayPickupSound();
+	    AnimationRemoveObject(tile);
 
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
+	    const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
+	    if(recruit) JoinTroops(Monster::GENIE, recruit);
+
+	    // post tile action
+	    tile.RemoveObjectSprite();
+	    tile.SetObject(MP2::OBJ_ZERO);
+
+	    // redraw status info
+	    Game::StatusWindow::Get().Redraw();
+	}
     }
+    // is full
+    else
+	Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
 }
 
 void Heroes::ActionToTeleports(const u16 index_from)

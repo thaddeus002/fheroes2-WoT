@@ -712,8 +712,7 @@ bool Game::ShouldAnimate(u32 ticket)
 bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
 {
     //TODO: Use user-selected speed instead of medium by default
-    const u32 speed = ANIMATION_MEDIUM * modifier;
-    return !(ticket % speed);
+    return !(ticket % (1 < modifier ? ANIMATION_MEDIUM * modifier : ANIMATION_MEDIUM));
 }
 
 Game::menu_t Game::HumanTurn(bool message)

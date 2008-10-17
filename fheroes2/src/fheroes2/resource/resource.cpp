@@ -96,7 +96,7 @@ Resource::funds_t::funds_t(const u8 obj) : wood(0), mercury(0), ore(0), sulfur(0
 
 Resource::resource_t Resource::Rand(void)
 {
-    switch(Rand::Get(1, 7))
+    switch(Rand::Get(1, 6))
     {
         case 1: return Resource::WOOD;
         case 2: return Resource::MERCURY;
@@ -104,7 +104,7 @@ Resource::resource_t Resource::Rand(void)
         case 4: return Resource::SULFUR;
         case 5: return Resource::CRYSTAL;
         case 6: return Resource::GEMS;
-	case 7: return Resource::GOLD;
+	//case 7: return Resource::GOLD; exclude
         default: break;
     }
 
@@ -368,6 +368,8 @@ void Resource::ChangeTileWithRNDResource(Maps::Tiles & tile)
 void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 {
     const u8 valid_resource = rs.GetValidItems();
+
+    if(0 == valid_resource) return;
 
     u16 index = 2 < valid_resource ? dst_rt.w / 3 : dst_rt.w / valid_resource;
 

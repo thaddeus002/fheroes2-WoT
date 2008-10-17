@@ -216,7 +216,8 @@ protected:
     void ActionToBoat(const u16 dst_index);
     void ActionToCoast(const u16 dst_index);
     void ActionToResource(const u16 dst_index);
-    void ActionToResource(const u16 dst_index, const MP2::object_t obj);
+    void ActionToPickupResource(const u16 dst_index);
+    void ActionToFlotSam(const u16 dst_index);
     void ActionToArtifact(const u16 dst_index);
     void ActionToShrine(const u16 dst_index);
     void ActionToWitchsHut(const u16 dst_index);

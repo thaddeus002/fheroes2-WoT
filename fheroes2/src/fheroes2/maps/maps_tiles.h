@@ -72,7 +72,6 @@ namespace Maps
 	TilesAddon * FindAddonLevel2(u32 uniq2);
 
 	TilesAddon * FindCampFire(void);
-	TilesAddon * FindWaterResource(void);
 	TilesAddon * FindResource(void);
 	TilesAddon * FindRNDResource(void);
 	TilesAddon * FindArtifact(void);
@@ -94,6 +93,7 @@ namespace Maps
 	void SetQuantity2(u8 val){ quantity2 = val; };
 	void SetObject(MP2::object_t object){ general = object; };
 
+	void UpdateQuantity(void);
 	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
 
 	void RedrawTile(void) const;
@@ -107,6 +107,7 @@ namespace Maps
 
 	void AddonsSort(void);
 	void Remove(u32 uniq);
+	void RemoveObjectSprite(void);
 
 	void DebugInfo(void) const;
 	

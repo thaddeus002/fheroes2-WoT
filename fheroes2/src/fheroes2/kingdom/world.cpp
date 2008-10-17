@@ -829,24 +829,6 @@ void World::LoadMaps(const std::string &filename)
 		}
 		break;
 	
-    	    case MP2::OBJ_RNDARTIFACT:
-    	    case MP2::OBJ_RNDARTIFACT1:
-    	    case MP2::OBJ_RNDARTIFACT2:
-    	    case MP2::OBJ_RNDARTIFACT3:
-		// modify rnd artifact sprite
-		Artifact::ChangeTileWithRNDArtifact(tile);
-		break;
-
-    	    case MP2::OBJ_RNDULTIMATEARTIFACT:
-		// remove ultimate artifact sprite
-		if(NULL != (addon = tile.FindUltimateArtifact()))
-		{
-		    tile.Remove(addon->uniq);
-		    tile.SetObject(MP2::OBJ_ZERO);
-		    ultimate_artifact = ii;
-		}
-		break;
-
     	    case MP2::OBJ_BOAT:
 		// remove small sprite boat
 		if(NULL != (addon = tile.FindBoat()))
@@ -855,73 +837,48 @@ void World::LoadMaps(const std::string &filename)
 		}
 		break;
 
-	    case MP2::OBJ_TREASURECHEST:
-		if(Maps::Ground::WATER == tile.GetGround())
+    	    case MP2::OBJ_RNDULTIMATEARTIFACT:
+		// remove ultimate artifact sprite
+		if(NULL != (addon = tile.FindUltimateArtifact()))
 		{
-		    switch(Rand::Get(1, 10))
-		    {
-			// 70% - 15 * 100 gold
-			default:
-			    tile.SetQuantity2(15);
-			    break;
-
-			// 20% - empty
-			case 7:
-			case 8:
-			    break;
-
-			// 10% - 10 * 100 gold + art
-			case 10:
-			    tile.SetQuantity1(Artifact::Rand1());
-			    tile.SetQuantity2(10);
-			    break;
-		    }
-		}
-		else
-		{
-		    switch(Rand::Get(1, 20))
-		    {
-			// 32% - 20 * 100 gold or 1500 exp
-			default:
-			    tile.SetQuantity2(20);
-			    break;
-
-			// 31% - 15 * 100 gold or 1000 exp
-			case 2:
-			case 5:
-			case 8:
-			case 11:
-			case 14:
-			case 17:
-			    tile.SetQuantity2(15);
-			    break;
-
-			// 31% - 10 * 100 gold or 500 exp
-			case 3:
-			case 6:
-			case 9:
-			case 12:
-			case 15:
-			case 18:
-			    tile.SetQuantity2(10);
-			    break;
-
-			// 10% - art
-			case 20:
-			    tile.SetQuantity1(Artifact::Rand1());
-			    break;
-		    }
+		    tile.Remove(addon->uniq);
+		    tile.SetQuantity1(Artifact::FromIndexSprite(addon->index));
+		    tile.SetObject(MP2::OBJ_ZERO);
+		    ultimate_artifact = ii;
 		}
 		break;
 
-	    case MP2::OBJ_RESOURCE:
-		tile.SetQuantity2(Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX));
+    	    case MP2::OBJ_RNDARTIFACT:
+    	    case MP2::OBJ_RNDARTIFACT1:
+    	    case MP2::OBJ_RNDARTIFACT2:
+    	    case MP2::OBJ_RNDARTIFACT3:
+		// modify rnd artifact sprite
+		Artifact::ChangeTileWithRNDArtifact(tile);
+    		tile.UpdateQuantity();
 		break;
 
 	    case MP2::OBJ_RNDRESOURCE:
 		// modify rnd resource sprite
 		Resource::ChangeTileWithRNDResource(tile);
-		tile.SetQuantity2(Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX));
+		tile.UpdateQuantity();
+		break;
+
+	    case MP2::OBJ_ARTIFACT:
+	    case MP2::OBJ_RESOURCE:
+            case MP2::OBJ_MAGICGARDEN:
+            case MP2::OBJ_WATERWHEEL:
+            case MP2::OBJ_WINDMILL:
+            case MP2::OBJ_LEANTO:
+            case MP2::OBJ_CAMPFIRE:
+            case MP2::OBJ_FLOTSAM:
+            case MP2::OBJ_SHIPWRECKSURVIROR:
+            case MP2::OBJ_TREASURECHEST:
+            case MP2::OBJ_SHIPWRECK:
+            case MP2::OBJ_DERELICTSHIP:
+            case MP2::OBJ_GRAVEYARD:
+            case MP2::OBJ_PIRAMID:
+            case MP2::OBJ_DAEMONCAVE:
+    		tile.UpdateQuantity();
 		break;
 
 	    case MP2::OBJ_RNDMONSTER:
@@ -1165,6 +1122,13 @@ void World::NewWeek(void)
     free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
     
     UpdateDwellingPopulation();
+    
+    // update week life object
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+
+    for(; it1 != it2; ++it1)
+	if(*it1 && MP2::isWeekLife((*it1)->GetObject())) (*it1)->UpdateQuantity();
 }
 
 void World::NewMonth(void)

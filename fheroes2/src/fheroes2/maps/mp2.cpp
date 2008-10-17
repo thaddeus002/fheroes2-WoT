@@ -494,7 +494,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_SHRINE2:               	return "Shrine of Level 2";
         case MP2::OBJ_SHRINE3:               	return "Shrine of Level 3";
         case MP2::OBJ_WAGON:                 	return "Wagon";
-        case MP2::OBJ_LEANTO:                	return "Leanto";
+        case MP2::OBJ_LEANTO:                	return "Lean To";
         case MP2::OBJ_FLOTSAM:               	return "Flotsam";
         case MP2::OBJ_SHIPWRECKSURVIROR:     	return "Shipwreck Surviror";
         case MP2::OBJ_BOTTLE:                	return "Bottle";
@@ -750,6 +750,9 @@ bool MP2::isWeekLife(const MP2::object_t obj)
     switch(obj)
     {
 	case OBJ_STABLES:
+        case MP2::OBJ_MAGICGARDEN:
+        case MP2::OBJ_WATERWHEEL:
+        case MP2::OBJ_WINDMILL:
 	    return true;
 
 	default: break;

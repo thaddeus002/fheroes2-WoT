@@ -156,7 +156,7 @@ namespace Artifact
     const std::string & Description(artifact_t artifact);
     
     artifact_t Artifact(u8 index);
-    artifact_t FromMP2(u8 index);
+    artifact_t FromIndexSprite(u8 index);
     
     u8 GetIndexSprite(Artifact::artifact_t artifact);
     

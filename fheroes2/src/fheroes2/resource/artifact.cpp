@@ -258,7 +258,7 @@ Artifact::artifact_t Artifact::Artifact(u8 index)
     return Artifact::UNKNOWN;
 }
 
-Artifact::artifact_t Artifact::FromMP2(u8 index)
+Artifact::artifact_t Artifact::FromIndexSprite(u8 index)
 {
     if(0x10 < index && 0xA2 > index) return Artifact((index - 1)/2);
     else

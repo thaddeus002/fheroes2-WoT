@@ -22,20 +22,19 @@
 #include <iostream>
 #include <algorithm>
 #include "agg.h"
-#include "icn.h"
 #include "tools.h"
 #include "world.h"
 #include "race.h"
 #include "config.h"
-#include "error.h"
 #include "heroes.h"
 #include "sprite.h"
 #include "maps.h"
 #include "gamearea.h"
 #include "game_focus.h"
-#include "display.h"
+#include "engine.h"
 #include "object.h"
 #include "objxloc.h"
+#include "resource.h"
 #include "maps_tiles.h"
 
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
@@ -835,29 +834,6 @@ bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
     return false;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
-{
-    if(addons_level1.size())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && 
-		(0 == addon.index ||	// buttle
-		19 == addon.index ||	// chest
-		45 == addon.index ||	// flotsam
-		111 == addon.index))	// surviror
-				return &addon;
-	}
-    }
-
-    return NULL;
-}
-
 Maps::TilesAddon * Maps::Tiles::FindResource(void)
 {
     if(addons_level1.size())
@@ -871,6 +847,14 @@ Maps::TilesAddon * Maps::Tiles::FindResource(void)
 
 	    // OBJNRSRC
 	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && (addon.index % 2)) return &addon;
+	    else
+	    // OBJNWATR
+	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && 
+		(0 == addon.index ||	// buttle
+		19 == addon.index ||	// chest
+		45 == addon.index ||	// flotsam
+		111 == addon.index))	// surviror
+				return &addon;
 	}
     }
 
@@ -1322,5 +1306,224 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 	} break;
 
 	default: break;
+    }
+}
+
+/* for few object need many resource */
+void Maps::Tiles::UpdateQuantity(void)
+{
+    const TilesAddon * addon = NULL;
+
+    switch(general)
+    {
+	case MP2::OBJ_ARTIFACT:
+	    addon = FindArtifact();
+	    if(addon)
+	    {
+		quantity1 = Artifact::FromIndexSprite(addon->index);
+	    }
+	break;
+
+	case MP2::OBJ_RESOURCE:
+	    addon = FindResource();
+	    if(addon)
+	    {
+		quantity1 = Resource::FromIndexSprite(addon->index);
+		quantity2 = Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX);
+	    }
+	break;
+
+	case MP2::OBJ_MAGICGARDEN:
+	    // 5 gems or 500 gold
+	    quantity1 = (Rand::Get(1) ? Resource::GEMS : Resource::GOLD);
+	    quantity2 = 5;
+	break;
+
+	case MP2::OBJ_WATERWHEEL:
+	    // first week 500 gold, next week 100 gold
+	    quantity1 = Resource::GOLD;
+	    quantity2 = (world.CountDay() == 1 ? 5 : 10);
+	break;
+
+	case MP2::OBJ_WINDMILL:
+	    // 2 rnd resource
+	    quantity1 = Resource::Rand();
+	    quantity2 = 2;
+	break;
+
+	case MP2::OBJ_LEANTO:
+	    // 1-4 rnd resource
+	    quantity1 = Resource::Rand();
+	    quantity2 = Rand::Get(1, 4);
+	break;
+
+	case MP2::OBJ_CAMPFIRE:
+	    // 4-6 rnd resource and + 400-600 gold
+	    quantity1 = Resource::Rand();
+	    quantity2 = Rand::Get(4, 6);
+	break;
+
+	case MP2::OBJ_FLOTSAM:
+	    switch(Rand::Get(1, 4))
+	    {
+		// 25%: 500 gold + 10 wood
+		case 1:
+		    quantity1 = 5;
+		    quantity2 = 10;
+		break;
+		// 25%: 200 gold + 5 wood
+		case 2:
+		    quantity1 = 2;
+		    quantity2 = 5;
+		break;
+		// 25%: 5 wood
+		case 3:
+		    quantity2 = 5;
+		break;
+		default: break;
+	    }
+	break;
+
+	case MP2::OBJ_SHIPWRECKSURVIROR:
+	    // artifact
+	    quantity1 = Artifact::Rand();
+	break;
+
+	case MP2::OBJ_TREASURECHEST:
+	    if(Maps::Ground::WATER == GetGround())
+	    {
+		switch(Rand::Get(1, 10))
+		{
+            	    // 70% - 1500 gold
+                    default:
+                	quantity2 = 15;
+            	    break;
+                    // 20% - empty
+                    case 7:
+		    case 8:
+            	    break;
+                    // 10% - 1000 gold + art
+		    case 10:
+                	quantity1 = Artifact::Rand1();
+			quantity2 = 10;
+		    break;
+		}
+	    }
+	    else
+	    {
+		switch(Rand::Get(1, 20))
+		{
+		    // 32% - 2000 gold or 1500 exp
+		    default:
+			quantity2 = 20;
+		    break;
+		    // 31% - 1500 gold or 1000 exp
+		    case 2:
+		    case 5:
+		    case 8:
+		    case 11:
+		    case 14:
+		    case 17:
+			quantity2 = 15;
+		    break;
+		    // 31% - 1000 gold or 500 exp
+		    case 3:
+		    case 6:
+		    case 9:
+		    case 12:
+		    case 15:
+		    case 18:
+			quantity2 = 10;
+		    break;
+		    // 10% - art
+		    case 20:
+			quantity1 = Artifact::Rand1();
+		    break;
+		}
+	    }
+	break;
+
+	case MP2::OBJ_SHIPWRECK:
+	    switch(Rand::Get(1, 4))
+	    {
+		// 1000 gold
+		case 1:
+		    quantity2 = 10;
+		break;
+		// 2000 gold
+		case 2:
+		    quantity2 = 20;
+		break;
+		// 5000 gold
+		case 3:
+		    quantity2 = 50;
+		break;
+		// 2000 gold + art
+		default:
+		    quantity1 = Artifact::Rand();
+		    quantity2 = 20;
+		break;
+	    }
+	break;
+
+	case MP2::OBJ_DERELICTSHIP:
+	    // 5000 gold
+	    quantity2 = 50;
+	break;
+
+	case MP2::OBJ_GRAVEYARD:
+	    // 1000 gold + art
+		quantity1 = Artifact::Rand();
+		quantity2 = 10;
+	break;
+
+	case MP2::OBJ_PIRAMID:
+	    quantity1 = 0; // FIXME: PackQuantity: Piramid: add Spell Level 5
+	break;
+
+	case MP2::OBJ_DAEMONCAVE:
+	    // 1000 exp or 1000 exp + 2500 gold or 1000 exp + art
+	    switch(Rand::Get(1, 3))
+	    {
+		case 1:
+		    quantity2 = 25;
+		break;
+		case 2:
+		    quantity1 = Artifact::Rand();
+		break;
+		default: break;
+	    }
+	break;
+
+	default: return;
+    }
+}
+
+void Maps::Tiles::RemoveObjectSprite(void)
+{
+    const Maps::TilesAddon *addon = NULL;
+
+    switch(general)
+    {
+	case MP2::OBJ_ARTIFACT:		addon = FindArtifact(); break;
+	case MP2::OBJ_CAMPFIRE:		addon = FindCampFire(); break;
+
+	case MP2::OBJ_BOTTLE:
+	case MP2::OBJ_FLOTSAM:
+
+	case MP2::OBJ_TREASURECHEST:
+	case MP2::OBJ_ANCIENTLAMP:
+	case MP2::OBJ_RESOURCE:		addon = FindResource(); break;
+
+	default: return;
+    }
+    
+    if(addon)
+    {
+        // remove shadow sprite from left cell
+        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+    	    world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT)).Remove(addon->uniq);
+
+	Remove(addon->uniq);
     }
 }
