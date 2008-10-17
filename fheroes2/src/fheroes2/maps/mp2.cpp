@@ -352,9 +352,9 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJN_DRAGONCITY:
         case MP2::OBJ_DRAGONCITY:		return "Dragon City";
         case MP2::OBJN_LIGHTHOUSE:
-        case MP2::OBJ_LIGHTHOUSE:		return "Lighthouse";
-        case MP2::OBJN_WATERMILL:
-        case MP2::OBJ_WATERMILL:		return "Watermill";
+        case MP2::OBJ_LIGHTHOUSE:		return "Light House";
+        case MP2::OBJN_WATERWHEEL:
+        case MP2::OBJ_WATERWHEEL:		return "Water Wheel";
         case MP2::OBJN_MINES:
         case MP2::OBJ_MINES:			return "Mines";
         case MP2::OBJN_OBELISK:
@@ -654,7 +654,7 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     	    case OBJ_THATCHEDHUT:
     	    case OBJ_DRAGONCITY:
     	    case OBJ_LIGHTHOUSE:
-    	    case OBJ_WATERMILL:
+    	    case OBJ_WATERWHEEL:
     	    case OBJ_MINES:
 	    case OBJ_OBELISK:
 	    case OBJ_OASIS:

@@ -136,7 +136,7 @@ void Game::EnvironmentSoundMixer(bool forced)
 			case MP2::OBJ_LAVAPOOL:		m82 = M82::LOOP0006; break;
 			case MP2::OBJ_ALCHEMYLAB:	m82 = M82::LOOP0007; break;
 			//case MP2:::	m82 = M82::LOOP0008; break;
-			case MP2::OBJ_WATERMILL:	m82 = M82::LOOP0009; break;
+			case MP2::OBJ_WATERWHEEL:	m82 = M82::LOOP0009; break;
 			case MP2::OBJ_CAMPFIRE:		m82 = M82::LOOP0010; break;
 			case MP2::OBJ_WINDMILL:		m82 = M82::LOOP0011; break;
 			case MP2::OBJ_ARTESIANSPRING:

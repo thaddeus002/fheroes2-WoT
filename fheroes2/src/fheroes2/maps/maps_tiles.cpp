@@ -507,7 +507,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
         case MP2::OBJN_PEASANTHUT:	return MP2::OBJN_PEASANTHUT;
 	case MP2::OBJN_DRAGONCITY:	return MP2::OBJN_DRAGONCITY;
 	case MP2::OBJN_LIGHTHOUSE:	return MP2::OBJN_LIGHTHOUSE;
-	case MP2::OBJN_WATERMILL:	return MP2::OBJN_WATERMILL;
+	case MP2::OBJN_WATERWHEEL:	return MP2::OBJN_WATERWHEEL;
 	case MP2::OBJN_MINES:		return MP2::OBJN_MINES;
 	case MP2::OBJN_OBELISK:		return MP2::OBJN_OBELISK;
 	case MP2::OBJN_OASIS:		return MP2::OBJN_OASIS;
@@ -593,7 +593,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_EVENT:		return MP2::OBJ_EVENT;
 	case MP2::OBJ_DRAGONCITY:	return MP2::OBJ_DRAGONCITY;
 	case MP2::OBJ_LIGHTHOUSE:	return MP2::OBJ_LIGHTHOUSE;
-	case MP2::OBJ_WATERMILL:	return MP2::OBJ_WATERMILL;
+	case MP2::OBJ_WATERWHEEL:	return MP2::OBJ_WATERWHEEL;
 	case MP2::OBJ_MINES:		return MP2::OBJ_MINES;
 	case MP2::OBJ_MONSTER:		return MP2::OBJ_MONSTER;
 	case MP2::OBJ_OBELISK:		return MP2::OBJ_OBELISK;

@@ -162,7 +162,7 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_FORT:
 	case MP2::OBJ_RUINS:
 	case MP2::OBJ_TROLLBRIDGE:
-	case MP2::OBJ_WATERMILL:
+	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_HILLFORT:
 	case MP2::OBJ_FREEMANFOUNDRY:
 	    return (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
