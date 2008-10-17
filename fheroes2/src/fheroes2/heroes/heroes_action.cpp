@@ -120,14 +120,16 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_WATERWHEEL:	ActionToResource(dst_index); break;
 
         // pickup object
-        //case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_RESOURCE:
         case MP2::OBJ_BOTTLE:
         case MP2::OBJ_CAMPFIRE:		ActionToPickupResource(dst_index); break;
+
         case MP2::OBJ_TREASURECHEST:	ActionToTreasureChest(dst_index); break;
         case MP2::OBJ_ANCIENTLAMP:	ActionToAncientLamp(dst_index); break;
-        case MP2::OBJ_ARTIFACT: 	ActionToArtifact(dst_index); break;
         case MP2::OBJ_FLOTSAM:		ActionToFlotSam(dst_index); break;
+
+        case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_ARTIFACT: 	ActionToArtifact(dst_index); break;
 
         // shrine circle
 	case MP2::OBJ_SHRINE1:
@@ -936,7 +938,15 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+    const Sprite & sprite = AGG::GetICN(ICN::ARTIFACT, art);
 
+    switch(tile.GetObject())
+    {
+        case MP2::OBJ_SHIPWRECKSURVIROR:
+	    if(H2Config::MyColor() == GetColor()) Dialog::SpriteInfo(MP2::StringObject(tile.GetObject()), "You've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he rewards you for your act of kindness by giving you the " + Artifact::String(art), sprite);
+        break;
+
+	case MP2::OBJ_ARTIFACT:
 /* FIXME: pickup artifact variants
     {Artifact}
     You come upon an ancient artifact.  As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.
@@ -961,13 +971,15 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
     Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
 */
+	    if(H2Config::MyColor() == GetColor()) Dialog::SpriteInfo(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), sprite);
+	break;
+
+	default: break;
+    }
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
     PickupArtifact(art);
-
-    // dialog
-    //if(H2Config::MyColor() == GetColor()) Dialog::Message(header, body_false, Font::BIG, Dialog::OK);
 
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);

@@ -223,7 +223,6 @@ protected:
     void ActionToWitchsHut(const u16 dst_index);
     void ActionToLuckObject(const u16 dst_index);
     void ActionToSign(const u16 dst_index);
-    void ActionToBottle(const u16 dst_index);
     void ActionToMagicWell(const u16 dst_index);
     void ActionToTradingPost(const u16 dst_index);
     void ActionToPrimarySkillObject(const u16 dst_index);

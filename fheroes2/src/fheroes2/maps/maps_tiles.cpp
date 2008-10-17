@@ -1511,6 +1511,7 @@ void Maps::Tiles::RemoveObjectSprite(void)
 	case MP2::OBJ_BOTTLE:
 	case MP2::OBJ_FLOTSAM:
 
+	case MP2::OBJ_SHIPWRECKSURVIROR:
 	case MP2::OBJ_TREASURECHEST:
 	case MP2::OBJ_ANCIENTLAMP:
 	case MP2::OBJ_RESOURCE:		addon = FindResource(); break;
