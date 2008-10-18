@@ -476,7 +476,7 @@ void Heroes::ActionToResource(const u16 dst_index)
 	{
 	    case MP2::OBJ_WINDMILL:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "The keeper of the mill announces: \"Milord, I have been working very hard to provide you with these resources, come back next week formore.\"", resource);
+		    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "The keeper of the mill announces: \"Milord, I have been working very hard to provide you with these resources, come back next week for more.\"", resource);
 		else
 		    Dialog::Message(MP2::StringObject(tile.GetObject()), "The keeper of the mill announces: \"Milord, I am sorry, there are no resources currently available. Please try again next week.\"", Font::BIG, Dialog::OK);
 	    break;
