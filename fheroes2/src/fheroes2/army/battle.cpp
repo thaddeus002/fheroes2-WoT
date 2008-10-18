@@ -197,7 +197,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 			    bodies2.push_back(body);
 			}
 		    }
-		} while (!goodmorale && (goodmorale = GoodMorale(hero1, army1[i]), goodmorale));
+		} while (!goodmorale && army2.size() && (goodmorale = GoodMorale(hero1, army1[i]), goodmorale));
 	    }
 	    for(unsigned int i=0; i < army2.size(); i++) {
 		goodmorale = false;
@@ -226,7 +226,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 			    bodies1.push_back(body);
 			}
 		    }
-		} while (!goodmorale && (goodmorale = GoodMorale(hero2, army2[i]), goodmorale));
+		} while (!goodmorale && army1.size() && (goodmorale = GoodMorale(hero2, army2[i]), goodmorale));
 	    }
 	    int c1 = 0, c2 = 0;
 	    for(unsigned int i=0; i < army1.size(); i++) c1 += army1[i].Count();
@@ -599,7 +599,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
     // ATTACK
     if(BfValid(attack)) {
 	int t;
-	Army::Troops &target = (t = FindTroop(army1, attack, false), t >= 0 ? army1[t] : army2[FindTroop(army2, attack, false)]);
+	Army::Troops &target = (t = FindTroop(army1, attack, false), t >= 0 ? army1[t] : army2[FindTroop(army2, attack, troopN >= 0)]);
 	int sk_a = myMonster.attack + (myTroop.MasterSkill() ? myTroop.MasterSkill()->GetAttack() : 0);
 	int sk_d = Monster::GetStats(target.Monster()).defence + (target.MasterSkill() ? target.MasterSkill()->GetDefense() : 0);
 	long damage = 0;
@@ -1871,16 +1871,18 @@ int Army::CanAttack(const Army::Troops &myTroop, const std::vector<Point> &moves
 			    }
 			}
 		    }
+            bool mod = false;
 	    if(myMonster.wide && p1.x == moves[i].x) {
 		p1.x += reflect ? -1 : 1;
-		continue;
+		mod = true;
 	    }
 	    if(enemyMonster.wide && p2.x == enemyTroop.Position().x) {
-		p1 = myTroop.Position();
+		if(!mod) p1 = myTroop.Position();
 		p2.x -= reflect ? -1 : 1;
-		continue;
+		mod = true;
 	    }
-	    break;
+            if(mod) continue;
+	    else break;
 	} while(1);
     }
     return mp;
