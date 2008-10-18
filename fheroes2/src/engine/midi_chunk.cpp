@@ -179,7 +179,7 @@ bool Chunk::Write(char *p) const
 
     memcpy(p, id, 4);
 
-    MIDI::WriteBE32(&p[5], size);
+    MIDI::WriteBE32(&p[4], size);
 
     if(size && data) memcpy(&p[8], data, size);
 
