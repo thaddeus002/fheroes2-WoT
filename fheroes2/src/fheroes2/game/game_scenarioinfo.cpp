@@ -50,6 +50,8 @@ namespace Scenario
 
 Game::menu_t Game::ScenarioInfo(void)
 {
+    AGG::PlayMusic(MUS::MAINMENU);
+
     std::list<Maps::FileInfo> info_maps;
 
     Settings & conf = Settings::Get();

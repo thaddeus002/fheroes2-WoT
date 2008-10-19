@@ -5,7 +5,7 @@
 TARGET := fheroes2
 LUA_LIBS := -Wl,-Bstatic -llua -Wl,-Bdynamic
 LUA_FLAGS :=
-SDL_LIBS := $(shell sdl-config --libs)
+SDL_LIBS := $(shell sdl-config --libs) -lSDL_mixer
 SDL_FLAGS := $(shell sdl-config --cflags)
 BUILD_DATE := $(shell date +%Y%m%d)
 

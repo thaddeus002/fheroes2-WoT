@@ -33,7 +33,7 @@
 #define FATSIZENAME	15
 
 /*AGG::File constructor */
-AGG::File::File(const std::string & fname) : filename(fname), count_items(0), stream(NULL)
+AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), count_items(0), stream(NULL)
 {
     stream = new std::fstream(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -46,35 +46,48 @@ AGG::File::File(const std::string & fname) : filename(fname), count_items(0), st
 
     if(H2Config::Debug()) Error::Verbose("AGG::File: load: " + filename);
 
-    stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
-    SWAP16(count_items);
-
-    if(H2Config::Debug()) Error::Verbose("AGG::File: count items: ", count_items);
-
-    char buf[FATSIZENAME + 1];
-    buf[FATSIZENAME] = 0;
-
-    for(u16 ii = 0; ii < count_items; ++ii)
+    if(isGameFile)
     {
-	const u32 pos = stream->tellg();
+        stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
+        SWAP16(count_items);
 
-	stream->seekg(-FATSIZENAME * (count_items - ii), std::ios_base::end);
-	stream->read(buf, FATSIZENAME);
+        if(H2Config::Debug()) Error::Verbose("AGG::File: count items: ", count_items);
 
-	const std::string key(buf);
+        char buf[FATSIZENAME + 1];
+        buf[FATSIZENAME] = 0;
 
-	FAT & f = fat[key];
+        for(u16 ii = 0; ii < count_items; ++ii)
+        {
+            const u32 pos = stream->tellg();
+
+            stream->seekg(-FATSIZENAME * (count_items - ii), std::ios_base::end);
+            stream->read(buf, FATSIZENAME);
+
+            const std::string key(buf);
+
+            FAT & f = fat[key];
 		
-	stream->seekg(pos, std::ios_base::beg);
+            stream->seekg(pos, std::ios_base::beg);
 
-	stream->read(reinterpret_cast<char *>(&f.crc), sizeof(u32));
-	SWAP32(f.crc);
+            stream->read(reinterpret_cast<char *>(&f.crc), sizeof(u32));
+            SWAP32(f.crc);
 
-	stream->read(reinterpret_cast<char *>(&f.offset), sizeof(u32));
-	SWAP32(f.offset);
+            stream->read(reinterpret_cast<char *>(&f.offset), sizeof(u32));
+            SWAP32(f.offset);
 
-	stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
-	SWAP32(f.size);
+            stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
+            SWAP32(f.size);
+        }
+    }
+    else
+    {
+        FAT &f = fat[basename(fname.c_str())];
+        count_items = 1;
+        stream->seekg(0, std::ios_base::end);
+        f.size = stream->tellg();
+        f.offset = 0;
+        f.crc = 0;
+        stream->seekg(0, std::ios_base::beg);
     }
 }
 
@@ -120,7 +133,7 @@ bool AGG::File::Read(const std::string & key, std::vector<char> & body)
     body.clear();
 
     if(H2Config::Debug() > 3) f.Dump(key);
-
+    
     if(f.size)
     {
 	if(2 < H2Config::Debug()) Error::Verbose("AGG::File::Read: " + key);
@@ -246,36 +259,44 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 	}
     }
 
-    AGG::File *file = new File(fname);
-    
-    if(! file->CountItems())
-    {
-	delete file;
-	return false;
-    }
-
     std::string lower(fname);
     String::Lower(lower);
 
-    if(std::string::npos != lower.find("heroes2.agg"))
+    if(std::string::npos != lower.find(".agg"))
     {
-	agg_cache.push_back(file);
-	heroes2_agg = true;
-    }
-    else
-    if(std::string::npos != lower.find("heroes2x.agg"))
-    {
-	if(heroes2_agg)
+	AGG::File *file = new File(fname);
+    
+	if(! file->CountItems())
 	{
-	    agg_cache.insert(--(agg_cache.end()), file);
+	    delete file;
+	    return false;
+	}
+
+	if(std::string::npos != lower.find("heroes2.agg"))
+	{
+	    agg_cache.push_back(file);
+	    heroes2_agg = true;
 	}
 	else
-	    agg_cache.push_back(file);
+	if(std::string::npos != lower.find("heroes2x.agg"))
+	{
+	    if(heroes2_agg)
+	    {
+		agg_cache.insert(--(agg_cache.end()), file);
+	    }
+	    else
+		agg_cache.push_back(file);
 
-	Settings::Get().SetModes(Settings::PRICELOYALTY);
+	    Settings::Get().SetModes(Settings::PRICELOYALTY);
+	}
+	else
+    	    agg_cache.push_front(file);
     }
     else
-        agg_cache.push_front(file);
+    {
+	AGG::File *file = new File(fname, false);
+	agg_cache.push_front(file);
+    }
 
     return true;
 }
@@ -471,8 +492,6 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 	std::list<File *>::const_iterator it2 = agg_cache.end();
 
 	for(; it1 != it2; ++it1)
-
-	    // read only first found
 	    if((**it1).Read(M82::GetString(m82), body))
 	    {
 		    const u32 size = cvt.len_mult * body.size();
@@ -495,7 +514,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 /* load XMI object to AGG::Cache */
 void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 {
-    std::vector<char> & v = mid_cache[xmi];
+    std::vector<u8> & v = mid_cache[xmi];
 
     if(v.size()) return;
 
@@ -527,8 +546,33 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 		m.AddTrack(track);
 		m.SetPPQN(64);
 
-		m.Write(v);
+		m.Write(reinterpret_cast<std::vector<char> &>(v));
 	    }
+    }
+}
+
+void AGG::Cache::LoadMUS(const MUS::mus_t mus)
+{
+    std::vector<u8> & v = mus_cache[mus];
+    
+    if(v.size()) return;
+
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + MUS::GetString(mus));
+
+    const Audio::Mixer & mixer = Audio::Mixer::Get();
+
+    if(! mixer.isValid()) return;
+
+    if(agg_cache.size())
+    {
+	std::vector<char> body;
+
+	std::list<File *>::const_iterator it1 = agg_cache.begin();
+	std::list<File *>::const_iterator it2 = agg_cache.end();
+
+	for(; it1 != it2; ++it1)
+	    // read only first found
+	    if((**it1).Read(MUS::GetString(mus), reinterpret_cast<std::vector<char> &>(v))) break;
     }
 }
 
@@ -576,10 +620,18 @@ void AGG::Cache::FreeWAV(const M82::m82_t m82)
     if(v.size()) v.clear();
 }
 
+/* free music object in AGG::Cache */
+void AGG::Cache::FreeMUS(const MUS::mus_t mus)
+{
+    std::vector<u8> & v = mus_cache[mus];
+
+    if(v.size()) v.clear();
+}
+
 /* free XMI object in AGG::Cache */
 void AGG::Cache::FreeMID(const XMI::xmi_t xmi)
 {
-    std::vector<char> & v = mid_cache[xmi];
+    std::vector<u8> & v = mid_cache[xmi];
 
     if(v.size()) v.clear();
 }
@@ -665,11 +717,21 @@ const std::vector<u8> & AGG::Cache::GetWAV(const M82::m82_t m82)
 }
 
 /* return MID from AGG::Cache */
-const std::vector<char> & AGG::Cache::GetMID(const XMI::xmi_t xmi)
+const std::vector<u8> & AGG::Cache::GetMID(const XMI::xmi_t xmi)
 {
-    const std::vector<char> & v = mid_cache[xmi];
+    const std::vector<u8> & v = mid_cache[xmi];
 
     if(v.empty()) LoadMID(xmi);
+
+    return v;
+}
+
+/* return CVT from AGG::Cache */
+const std::vector<u8> & AGG::Cache::GetMUS(const MUS::mus_t mus)
+{
+    const std::vector<u8> & v = mus_cache[mus];
+
+    if(v.empty()) LoadMUS(mus);
 
     return v;
 }
@@ -719,7 +781,12 @@ const std::vector<u8> & AGG::GetWAV(const M82::m82_t m82)
     return AGG::Cache::Get().GetWAV(m82);
 }
 
-const std::vector<char> & AGG::GetMID(const XMI::xmi_t xmi)
+const std::vector<u8> & AGG::GetMUS(const MUS::mus_t mus)
+{
+    return AGG::Cache::Get().GetMUS(mus);
+}
+
+const std::vector<u8> & AGG::GetMID(const XMI::xmi_t xmi)
 {
     return AGG::Cache::Get().GetMID(xmi);
 }
@@ -742,8 +809,8 @@ const Sprite & AGG::GetLetter(char ch, Font::type_t ft)
     return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
 }
 
-/* wrapper Audio::Play, volume: 0 - 10 */
-void AGG::PlaySound(const M82::m82_t m82, const u8 volume, bool loop)
+/* wrapper Audio::Play */
+void AGG::PlaySound(const M82::m82_t m82)
 {
     const Settings & conf = Settings::Get();
 
@@ -751,25 +818,31 @@ void AGG::PlaySound(const M82::m82_t m82, const u8 volume, bool loop)
     {
 	if(conf.Debug()) Error::Verbose("AGG::PlaySound: " + M82::GetString(m82));
 
-	const u8 vol = (10 <= volume ? MIX_MAXVOLUME : volume * MIX_MAXVOLUME / 10) * conf.SoundVolume() / 10;
-
-	const u8 state = loop ? Audio::Mixer::PLAY | Audio::Mixer::REPEATE : Audio::Mixer::PLAY;
-
-	Audio::Mixer::Get().Play(AGG::Cache::Get().GetWAV(m82), vol, state);
+	Audio::Mixer::PlayRAW(AGG::Cache::Get().GetWAV(m82));
     }
 }
 
-// wrapper Music::Play
-void AGG::PlayMusic(const XMI::xmi_t xmi, const u8 volume, bool loop)
+/* wrapper Audio::Play */
+void AGG::PlayMusic(const MUS::mus_t mus)
 {
     const Settings & conf = Settings::Get();
 
-    if(conf.Music())
+    if(!conf.Music()) return;
+
+    //if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
+
+    if(conf.Modes(Settings::MUSIC_EXT))
     {
-	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + XMI::GetString(xmi));
-
-	const std::vector<char> & v = AGG::Cache::Get().GetMID(xmi);
-
-	// TODO: vector contains MIDI
+	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Music::Play(AGG::Cache::Get().GetMUS(mus));
+    }
+    else
+    if(conf.Modes(Settings::MUSIC_CD) && Audio::Cdrom::Get().isValid())
+    {
+	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Audio::Cdrom::Get().Play(mus);
+    }
+    else
+    {
+	XMI::xmi_t xmi = XMI::FromMUS(mus);
+	if(XMI::UNKNOWN != xmi) Music::Play(AGG::Cache::Get().GetMID(xmi));
     }
 }

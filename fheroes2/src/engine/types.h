@@ -21,6 +21,7 @@
 #define H2TYPES_H
 
 #include "SDL.h"
+#include "SDL_mixer.h"
 
 typedef int8_t		s8;
 typedef uint8_t		u8;

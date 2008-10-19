@@ -21,7 +21,6 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
-#include <limits.h>
 
 #include "gamedefs.h"
 #include "cmdline.h"
@@ -128,7 +127,11 @@ int main(int argc, char **argv)
 	// random init
 	Rand::Init();
 	
-	const u32 subsystem = conf.Sound() || conf.Music() ? INIT_VIDEO | INIT_AUDIO : INIT_VIDEO;
+	u32 subsystem = INIT_VIDEO;
+        if(conf.Sound() || conf.Music())
+            subsystem |= INIT_AUDIO;
+        if(conf.Modes(Settings::MUSIC_CD))
+            subsystem |= INIT_CDROM | INIT_AUDIO;
 
 	if(SDL::Init(subsystem))
 	try
@@ -159,7 +162,18 @@ int main(int argc, char **argv)
     	    // attach agg files
     	    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) cache.AttachFile(*itd);
 
-	    // load palette
+	    if(conf.Modes(Settings::MUSIC_EXT))
+            {
+                Dir dir;
+                dir.Read(conf.DataDirectory(), ".ogg", false);
+                if(dir.size())
+                  for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) cache.AttachFile(*itd);
+                else Error::Warning("No music files found.");
+            }
+            
+            if(conf.Debug()) conf.Dump();
+            
+            // load palette
 	    cache.LoadPAL();
 
 #ifdef BUILD_RELEASE

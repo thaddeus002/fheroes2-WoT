@@ -26,8 +26,13 @@
 #include "button.h"
 #include "display.h"
 #include "game.h"
+#include "audio.h"
 
-Game::menu_t Game::NewGame(void){
+Game::menu_t Game::NewGame(void)
+{
+    //If we're arriving from the main game menu,
+    //stop all environment sounds.
+    Audio::Mixer::PauseLoops();
 
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -67,6 +72,8 @@ Game::menu_t Game::NewGame(void){
     // newgame loop
     while(le.HandleEvents())
     {
+        AGG::PlayMusic(MUS::MAINMENU);
+        
 	le.MousePressLeft(buttonStandartGame) ? buttonStandartGame.PressDraw() : buttonStandartGame.ReleaseDraw();
 	le.MousePressLeft(buttonCampainGame) ? buttonCampainGame.PressDraw() : buttonCampainGame.ReleaseDraw();
 	le.MousePressLeft(buttonMultiGame) ? buttonMultiGame.PressDraw() : buttonMultiGame.ReleaseDraw();

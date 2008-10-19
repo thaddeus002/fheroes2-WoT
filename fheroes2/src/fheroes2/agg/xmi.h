@@ -22,11 +22,13 @@
 #define H2XMI_H
 
 #include <string>
+#include "mus.h"
 
 namespace XMI
 {
     typedef enum
     {
+	UNKNOWN,
 	MIDI0002,
 	MIDI0003,
 	MIDI0004,
@@ -56,6 +58,7 @@ namespace XMI
 
     const std::string  & GetString(const xmi_t xmi);
 
+    xmi_t FromMUS(const MUS::mus_t mus);
 };
 
 #endif

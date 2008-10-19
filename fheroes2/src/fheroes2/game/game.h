@@ -80,7 +80,8 @@ namespace Game
     bool ShouldAnimateInfrequent(u32 ticket, u32 modifier);
     void SetFixVideoMode(void);
     
-    void EnvironmentSoundMixer(bool forced = false);
+    void PreloadLOOPSounds(void);
+    void EnvironmentSoundMixer(bool forced);
 
     namespace Editor
     {

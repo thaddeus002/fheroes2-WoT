@@ -26,6 +26,8 @@
 #include "settings.h"
 #include "gamearea.h"
 #include "game_selectfocus.h"
+#include "agg.h"
+#include "world.h"
 #include "game_focus.h"
 
 Game::Focus::Focus() : castle(NULL), heroes(NULL)
@@ -45,6 +47,12 @@ void Game::Focus::Set(const Heroes & hr)
     castle = NULL;
 
     center = hr.GetCenter();
+
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(center).GetGround()));
+    
+    //Force the environment sounds to recalculate, for times like
+    //exiting a castle/battle screen
+    Game::EnvironmentSoundMixer(true);
 }
 
 void Game::Focus::Set(const Castle & cs)
@@ -53,6 +61,12 @@ void Game::Focus::Set(const Castle & cs)
     heroes = NULL;
 
     center = cs.GetCenter();
+
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(center).GetGround()));
+    
+    //Force the environment sounds to recalculate, for times like
+    //exiting a castle/battle screen
+    Game::EnvironmentSoundMixer(true);
 }
 
 void Game::Focus::Reset(void)

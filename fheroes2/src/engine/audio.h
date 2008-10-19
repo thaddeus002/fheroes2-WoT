@@ -24,7 +24,20 @@
 #include <vector>
 #include "types.h"
 
-#define MIX_MAXVOLUME	SDL_MIX_MAXVOLUME
+#define MAXVOLUME		MIX_MAX_VOLUME
+#define CHANNEL_RESERVED	22
+#define CHANNEL_FREE		8
+
+namespace Music
+{
+    void	Play(const std::vector<u8> & body);
+    void	Volume(const u8 vol);
+    void	Pause(void);
+    void	Resume(void);
+    void	Reset(void);
+    bool	isPlaying(void);
+    bool	isPaused(void);
+};
 
 namespace Audio
 {
@@ -41,49 +54,52 @@ namespace Audio
 	bool Convert(void);
     };
 
+    class Cdrom
+    {
+    public:
+	static Cdrom & Get(void);
+	~Cdrom();
+
+	bool isValid(void) const{ return cd; };
+	void Play(const u8 track);
+	void Pause(void);
+
+    private:
+	Cdrom();
+	SDL_CD *cd;
+    };
+
     class Mixer
     {
     public:
 	~Mixer();
 
-	enum { PLAY = 0x01, REPEATE = 0x02, REDUCE = 0x04, ENHANCE = 0x08 } flag_t;
+	//enum { PLAY = 0x01, REPEATE = 0x02, REDUCE = 0x04, ENHANCE = 0x08 } flag_t;
 
 	static Mixer & Get(void);
 
 	bool isValid(void) const;
 	const Spec & HardwareSpec(void) const;
 
-	void Play(const std::vector<u8> & body, const u8 volume = MIX_MAXVOLUME, const u8 state = 0);
-	void StopRepeate(void);
-	void StopAll(void);
+	static u8   Volume(const int ch, const int vol = -1);
+	static void Pause(const int ch = -1);
+        static void PauseLoops(void);
+	static void Resume(const int ch = -1);
+        static void ResumeLoops(void);
+	static void Reset(const int ch = -1);
+	static u8   isPlaying(const int ch);
+	static u8   isPaused(const int ch);
+	static void PlayRAW(const std::vector<u8> & body, const int ch = -1);
+	static void LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch);
 
-	void Reduce(void);
-	void Enhance(void);
+	static void Reduce(void);
+	static void Enhance(void);
 
     private:
-	struct mixer_t
-        {
-            mixer_t() : data(NULL), length(0), position(0), volume1(0), volume2(0), state(0) {};
-
-	    const u8 *	data;
-	    u32		length;
-    	    u32		position;
-    	    u8		volume1;
-    	    u8		volume2;
-    	    u8		state;
-        };
-
 	Mixer();
-
-	static void CallBack(void *unused, u8 *stream, int size);
-	static bool PredicateIsFreeSound(const mixer_t & header);
-	static void PredicateStopAllSound(mixer_t & header);
-	static void PredicateStopRepeateSound(mixer_t & header);
-	static void PredicateReduceSound(mixer_t & header);
-	static void PredicateEnhanceSound(mixer_t & header);
+	static void FreeChunk(const int ch);
 
 	Spec hardware;
-	std::vector<mixer_t> sounds;
 	bool valid;
     };
 };

@@ -24,6 +24,7 @@ namespace XMI
 {
     static const xmimap_t xmimap[] = 
     {
+        { UNKNOWN,      "???"          },
 	{ MIDI0002,	"MIDI0002.XMI" },
 	{ MIDI0003,	"MIDI0003.XMI" },
 	{ MIDI0004,	"MIDI0004.XMI" },
@@ -41,11 +42,37 @@ namespace XMI
 	{ MIDI0018,	"MIDI0018.XMI" },
 	{ MIDI0042,	"MIDI0042.XMI" },
 	{ MIDI0043,	"MIDI0043.XMI" },
-
     };
 };
 
 const std::string  & XMI::GetString(const xmi_t xmi)
 {
     return xmimap[xmi].string;
+}
+
+XMI::xmi_t XMI::FromMUS(const MUS::mus_t mus)
+{
+    switch(mus)
+    {
+        case MUS::BATTLE1:	return MIDI0002;
+        case MUS::BATTLE2:	return MIDI0003;
+        case MUS::BATTLE3:	return MIDI0004;
+        case MUS::BARBARIAN:	return MIDI0005;
+        case MUS::SORCERESS:	return MIDI0006;
+        case MUS::WARLOCK:	return MIDI0007;
+        case MUS::KNIGHT:	return MIDI0008;
+        case MUS::NECROMANCER:	return MIDI0009;
+        case MUS::WIZARD:	return MIDI0010;
+        case MUS::LAVA:		return MIDI0011;
+        case MUS::DESERT:	return MIDI0013;
+        case MUS::SNOW:		return MIDI0014;
+        case MUS::SWAMP:	return MIDI0015;
+	case MUS::DIRT:		return MIDI0017;
+	case MUS::GRASS:	return MIDI0018;
+	case MUS::MAINMENU:	return MIDI0042;
+	case MUS::VICTORY:	return MIDI0003;
+	default: break;
+    }
+
+    return UNKNOWN;
 }

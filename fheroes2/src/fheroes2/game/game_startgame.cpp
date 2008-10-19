@@ -86,6 +86,9 @@ Game::menu_t Game::StartGame(void)
     // Load maps
     world.LoadMaps(conf.FileInfo().FileMaps());
 
+    // preload sounds
+    Game::PreloadLOOPSounds();
+
     if(conf.HotSeat()) {
         for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) 
             if(color & conf.Players())
@@ -100,6 +103,7 @@ Game::menu_t Game::StartGame(void)
     areaMaps.Build();
 
     Audio::Mixer & mixer = Audio::Mixer::Get();
+    mixer.Reset();
 
     Game::DrawInterface();
 
@@ -337,7 +341,8 @@ void Game::OpenCastle(Castle *castle)
     }
 
     if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes())) FocusToHeroes(hero);
-
+    else FocusToCastle(castle);
+    
     Audio::Mixer::Get().Enhance();
 }
 
@@ -724,7 +729,7 @@ Game::menu_t Game::HumanTurn(bool message)
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    Audio::Mixer & mixer = Audio::Mixer::Get();
+    const Settings & conf = Settings::Get();
 
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, gamearea.GetRect().w * TILEWIDTH, gamearea.GetRect().h * TILEWIDTH);
     const Rect areaScrollLeft(0, 0, BORDERWIDTH, display.h());
@@ -776,10 +781,15 @@ Game::menu_t Game::HumanTurn(bool message)
     selectHeroes.SetHeroes(myHeroes);
     selectHeroes.Reset();
 
+    Audio::Mixer & mixer = Audio::Mixer::Get();
+    mixer.Reset();
+    Game::EnvironmentSoundMixer(true);
+
     switch(global_focus.Type())
     {
 	// start game
 	case Focus::UNSEL:
+        {
 	    if(myCastles.size())
 	    {
 		global_focus.Set(*myCastles.front());
@@ -792,7 +802,7 @@ Game::menu_t Game::HumanTurn(bool message)
 		selectHeroes.Select(0);
 	    }
 	    break;
-
+        }
 	case Focus::HEROES:
 	    selectHeroes.Select(0);
 	    FocusToHeroes(myHeroes.front());
@@ -1429,6 +1439,13 @@ Game::menu_t Game::HumanTurn(bool message)
 		// Change and save system settings
 		change_settings = Dialog::SystemOptions();
 
+		const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
+		const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
+
+		Audio::Mixer::Volume(-1, vol1);
+		Music::Volume(vol2);
+
+
 		mixer.Enhance();
 	    }
 	    else
@@ -1468,6 +1485,7 @@ Game::menu_t Game::HumanTurn(bool message)
 
 	// mix all sound from focus
 	Game::EnvironmentSoundMixer(change_settings);
+	change_settings = false;
 
         // animation
         if(Game::ShouldAnimate(ticket))

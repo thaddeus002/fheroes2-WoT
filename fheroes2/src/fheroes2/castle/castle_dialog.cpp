@@ -331,6 +331,9 @@ Dialog::answer_t Castle::OpenDialog(void)
     buttonNextCastle.Draw();
     buttonExit.Draw();
 
+    Audio::Mixer & mixer = Audio::Mixer::Get();
+    mixer.Reset();
+    
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     cursor.Show();
@@ -344,6 +347,8 @@ Dialog::answer_t Castle::OpenDialog(void)
     // dialog menu loop
     while(le.HandleEvents())
     {
+        AGG::PlayMusic(MUS::FromRace(race));
+        
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
 
@@ -805,6 +810,10 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 		BuyBuilding(BUILD_CASTLE);
+
+		// play sound
+		AGG::PlaySound(M82::BUILDTWN);
+
 		RedrawResourcePanel();
 	        RedrawAllBuilding(cur_pt, orders_building);
 	        RedrawNameTown(cur_pt);

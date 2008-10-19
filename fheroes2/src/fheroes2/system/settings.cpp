@@ -26,7 +26,7 @@
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(ANIMATION | SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), sound_volume(10), music_volume(10),
+    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), sound_volume(6), music_volume(6),
     animation_speed(10), hotseat(false), players(Color::BLUE)
 {
 }
@@ -119,7 +119,7 @@ void Settings::Dump(std::ostream & stream) const
 
     stream << "videomode = " << str << std::endl;
     stream << "sound = " << (modes & SOUND ? "on"  : "off") << std::endl;
-    stream << "music = " << (modes & MUSIC ? "on"  : "off") << std::endl;
+    stream << "music = " << (modes & MUSIC_CD ? "cd" : ( modes & MUSIC_MIDI ? "midi" : ( modes & MUSIC_EXT ? "ext" : "off"))) << std::endl;
     stream << "fullscreen = " << (modes & FULLSCREEN ? "on"  : "off") << std::endl;
     stream << "evilinterface = " << (modes & EVILINTERFACE ? "on"  : "off") << std::endl;
     stream << "shadow = " << (modes & SHADOW ? "on"  : "off") << std::endl;
@@ -230,6 +230,28 @@ void Settings::Parse(const std::string & left, const std::string & right)
     // maps directory
     if(left == "maps") path_maps_directory = right;
     else
+    if(left == "music")
+    {
+	std::string lower(right);
+	String::Lower(lower);
+
+        if(lower == "midi")
+        {
+            ResetModes(MUSIC);
+            SetModes(MUSIC_MIDI);
+        }
+        else if(lower == "cd")
+        {
+            ResetModes(MUSIC);
+            SetModes(MUSIC_CD);
+        }
+        else if(lower == "ext")
+        {
+            ResetModes(MUSIC);
+            SetModes(MUSIC_EXT);
+        }
+    }
+    else
     // value
     if(left == "videomode")
     {
@@ -289,7 +311,7 @@ void Settings::SetModes(const std::string & key)
     if(key == "sound")		SetModes(SOUND);
     else
     // music
-    if(key == "music")		SetModes(MUSIC);
+    if(key == "music")		SetModes(MUSIC_MIDI);
     else
     // animation
     if(key == "animation")	SetModes(ANIMATION);
@@ -319,7 +341,7 @@ void Settings::ResetModes(const std::string & key)
     if(key == "sound")		ResetModes(SOUND);
     else
     // music
-    if(key == "music")		ResetModes(MUSIC);
+    if(key == "music")          ResetModes(MUSIC);
     else
     // animation
     if(key == "animation")	ResetModes(ANIMATION);

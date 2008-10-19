@@ -25,7 +25,11 @@
 #include "error.h"
 #include "audio.h"
 
-#define		NUM_SOUNDS	16
+namespace Music
+{
+    static Mix_Music * music	= NULL;
+    static const void * id	= NULL;
+}
 
 Audio::Spec::Spec()
 {
@@ -81,20 +85,123 @@ bool Audio::CVT::Convert(void)
     return false;
 }
 
+Audio::Cdrom & Audio::Cdrom::Get(void)
+{
+    static Audio::Cdrom cdrom;
+
+    return cdrom;
+}
+
+Audio::Cdrom::Cdrom() : cd(NULL)
+{
+    for(int i = 0; i < SDL_CDNumDrives(); i++)
+    {
+        SDL_CD *drive = SDL_CDOpen(i);
+
+        if(drive)
+        {
+            if(!CD_INDRIVE(SDL_CDStatus(drive)))
+            {
+                SDL_CDClose(drive);
+                continue;
+            }
+            else
+	    if(drive->numtracks > 1 && drive->track[0].type == SDL_DATA_TRACK)
+            {
+                cd = drive;
+                break;
+            }
+        }
+    }
+
+    Error::Verbose("Audio::CD: " + std::string(cd ? "found CD audio device." : "no CDROM devices available."));
+}
+
+Audio::Cdrom::~Cdrom()
+{
+    if(cd) SDL_CDClose(cd);
+}
+
+void Audio::Cdrom::Play(const u8 track)
+{
+    if(SDL_CDPlayTracks(cd, track - 1, 0, 1, 0) < 0)
+        Error::Verbose("Couldn't play track ", track);
+
+    if(SDL_CDStatus(cd) != CD_PLAYING)
+    {
+        Error::Warning("CD is not playing");
+        Error::Warning(SDL_GetError());
+    }
+}
+
+void Audio::Cdrom::Pause(void)
+{
+    if(cd) SDL_CDPause(cd);
+}
+
+void Music::Play(const std::vector<u8> & body)
+{
+    bool skip = false;
+
+    if(id != &body[0]) Reset();
+    else skip = true;
+
+    if(!music && body.size())
+    {
+	id = &body[0];
+	music = Mix_LoadMUS_RW(SDL_RWFromConstMem(&body[0], body.size()));
+	Mix_HookMusicFinished(Reset);
+    }
+
+    if(music && !skip) Mix_PlayMusic(music, 0);
+}
+
+void Music::Volume(const u8 vol)
+{
+    Mix_VolumeMusic(MIX_MAX_VOLUME > vol ? vol : MIX_MAX_VOLUME);
+}
+
+void Music::Pause(void)
+{
+    if(music) Mix_PauseMusic();
+}
+
+void Music::Resume(void)
+{
+    if(music) Mix_ResumeMusic();
+}
+
+bool Music::isPlaying(void)
+{
+    return Mix_PlayingMusic();
+}
+
+bool Music::isPaused(void)
+{
+    return Mix_PausedMusic();
+}
+
+void Music::Reset(void)
+{
+    if(music)
+    {
+	Mix_HaltMusic();
+        Mix_FreeMusic(music);
+	music = NULL;
+        id = NULL;
+    }
+}
+
 Audio::Mixer::Mixer() : valid(true)
 {
     if(SDL::SubSystem(INIT_AUDIO))
     {
-	SDL_AudioSpec fmt;
+	hardware.freq = 22050;
+	hardware.format = AUDIO_S16;
+        hardware.channels = 2;
+	hardware.samples = 4096;
 
-	fmt.freq = 22050;
-	fmt.format = AUDIO_S16;
-        fmt.channels = 1;
-	fmt.samples = 4096;
-        fmt.callback = CallBack;
-	fmt.userdata = NULL;
-
-	if(0 > SDL_OpenAudio(&fmt, &hardware))
+	if(0 != Mix_OpenAudio(hardware.freq, hardware.format, hardware.channels, hardware.samples))
 	{
 	    Error::Warning("Audio::Mixer: " + std::string(SDL_GetError()));
 	    
@@ -102,9 +209,13 @@ Audio::Mixer::Mixer() : valid(true)
 	}
 	else
 	{
-	    SDL_PauseAudio(0);
+	    int channels = 0;
+            Mix_QuerySpec(&hardware.freq, &hardware.format, &channels);
+	    hardware.channels = channels;
 
-	    sounds.resize(NUM_SOUNDS);
+	    Mix_AllocateChannels(CHANNEL_RESERVED + CHANNEL_FREE);
+            Mix_ReserveChannels(CHANNEL_RESERVED);
+	    Mix_ChannelFinished(FreeChunk);
 	}
     }
     else
@@ -117,9 +228,18 @@ Audio::Mixer::Mixer() : valid(true)
 
 Audio::Mixer::~Mixer()
 {
-    SDL_CloseAudio();
+    Music::Reset();
+    Mixer::Reset();
 
-    sounds.clear();
+    // free reserved
+    for(u8 ch = 0; ch < CHANNEL_RESERVED; ++ch)
+    {
+	Mix_Chunk *chunk = Mix_GetChunk(ch);
+
+	if(chunk) Mix_FreeChunk(chunk);
+    }
+
+    Mix_CloseAudio();
 }
 
 Audio::Mixer & Audio::Mixer::Get(void)
@@ -139,157 +259,123 @@ const Audio::Spec & Audio::Mixer::HardwareSpec(void) const
     return hardware;
 }
 
-bool Audio::Mixer::PredicateIsFreeSound(const mixer_t & header)
+void Audio::Mixer::Pause(const int ch)
 {
-    return !(header.state & PLAY) || (!(header.state & REPEATE) && header.length == header.position);
+    if(0 > ch)
+    	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii) Mix_Pause(ii);
+    else
+	Mix_Pause(ch);
 }
 
-void Audio::Mixer::PredicateStopRepeateSound(mixer_t & header)
+void Audio::Mixer::PauseLoops(void)
 {
-    if(header.state & REPEATE) header.state &= ~PLAY;
+    for(u8 ii = 0; ii < CHANNEL_RESERVED; ++ii)
+        Mix_Pause(ii);
 }
 
-void Audio::Mixer::PredicateStopAllSound(mixer_t & header)
+void Audio::Mixer::Resume(const int ch)
 {
-    header.state &= ~PLAY;
+    if(0 > ch)
+    	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii) Mix_Resume(ii);
+    else
+	Mix_Resume(ch);
 }
 
-void Audio::Mixer::PredicateReduceSound(mixer_t & header)
+void Audio::Mixer::ResumeLoops(void)
 {
-    header.state &= ~ENHANCE;
-    header.state |= REDUCE;
+    for(u8 ii = 0; ii < CHANNEL_RESERVED; ++ii)
+        Mix_Resume(ii);
 }
 
-void Audio::Mixer::PredicateEnhanceSound(mixer_t & header)
+u8 Audio::Mixer::Volume(const int ch, const int vol)
 {
-    header.state &= ~REDUCE;
-    header.state |= ENHANCE;
+    return Mix_Volume(ch, MIX_MAX_VOLUME > vol ? vol : MIX_MAX_VOLUME);
 }
 
-void Audio::Mixer::CallBack(void *unused, u8 *stream, int size)
+void Audio::Mixer::Reset(const int ch)
 {
-    std::vector<mixer_t> & sounds = Audio::Mixer::Get().sounds;
-
-    int amount = 0;
-
-    for(u8 ii = 0; ii < sounds.size(); ++ii)
+    if(0 > ch)
     {
-	mixer_t & header = sounds[ii];
+	Music::Reset();
 
-        if(header.volume1 && header.state & PLAY)
-        {
-    	    amount = header.length - header.position;
+	if(Audio::Cdrom::Get().isValid()) Audio::Cdrom::Get().Pause();
 
-	    if(amount > size) amount = size;
+	for(u8 ii = 0; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii)
+	    if(ii < CHANNEL_RESERVED) Mix_Pause(ii);
+	    else Mix_HaltChannel(ii);
+    }
+    else Mix_HaltChannel(ch);
 
-    	    if(header.state & REDUCE)
-    	    {
-    		if(10 < header.volume2)
-    		    header.volume2 -= 10;
-    		else
-    		{
-    		    header.volume2 = 0;
-    		    header.state &= ~REDUCE;
-		}
-	    }
-	    else
-    	    if(header.state & ENHANCE)
-    	    {
-    		if(header.volume1 > header.volume2 + 10)
-    		    header.volume2 += 10;
-    		else
-    		{
-    		    header.volume2 = header.volume1;
-    		    header.state &= ~ENHANCE;
-    		}
-    	    }
+    Error::Verbose("Audio::Mixer::Reset");
+}
 
-    	    SDL_MixAudio(stream, &header.data[header.position], amount, header.volume2);
+u8 Audio::Mixer::isPlaying(const int ch)
+{
+    return Mix_Playing(ch);
+}
 
-    	    header.position += amount;
-    	    
-    	    if((header.state & REPEATE) && header.length - amount <= header.position) header.position = 0;
-	}
+u8 Audio::Mixer::isPaused(const int ch)
+{
+    return Mix_Paused(ch);
+}
+
+void Audio::Mixer::PlayRAW(const std::vector<u8> & body, const int ch)
+{
+    if(0 <= ch && Mix_GetChunk(ch)) Mix_HaltChannel(ch);
+
+    if(body.size())
+    {
+	Mix_Chunk* chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+
+	if(chunk)
+	    Mix_PlayChannel(ch, chunk, 0);
+	else
+	    Error::Warning(Mix_GetError());
     }
 }
 
-void Audio::Mixer::StopAll(void)
+void Audio::Mixer::LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch)
 {
-    if(! valid) return;
-
-    std::for_each(sounds.begin(), sounds.end(), PredicateStopAllSound);
-}
-
-void Audio::Mixer::StopRepeate(void)
-{
-    if(! valid) return;
-
-    std::for_each(sounds.begin(), sounds.end(), PredicateStopRepeateSound);
-}
-
-/* play sound, volume MIX_MAXVOLUME */
-void Audio::Mixer::Play(const std::vector<u8> & body, const u8 volume, const u8 state)
-{
-    if(! valid || body.empty()) return;
-
-    // find same sound
-    std::vector<mixer_t>::iterator it1 = sounds.begin();
-    std::vector<mixer_t>::const_iterator it2 = sounds.end();
-    
-    const u8 * data = &body[0];
-
-    for(; it1 != it2; ++it1)
+    if(CHANNEL_RESERVED <= ch)
     {
-	const mixer_t & header = *it1;
-
-	if(header.data == data) break;
+	Error::Verbose("Audio::Mixer::LoadRAW: need reserved channel: ", ch);
+	return;
     }
-    
-    // find free
-    if(it2 == it1)
-    {
-	it1 = std::find_if(sounds.begin(), sounds.end(), PredicateIsFreeSound);
 
-	if(it2 == it1)
+    Mix_HaltChannel(ch);
+    Mix_Chunk* chunk = Mix_GetChunk(ch);
+    if(ch) Mix_FreeChunk(chunk);
+
+    if(body.size())
+    {
+	chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+
+	if(chunk)
 	{
-	    Error::Warning("Audio::Play: mixer is full, increase NUM_SOUNDS");
-
-	    return;
+	    Mix_PlayChannel(ch, chunk, loop ? -1 : 0);
+	    Mix_Pause(ch);
 	}
+	else
+	    Error::Warning(Mix_GetError());
     }
+}
 
-    mixer_t & mixer = *it1;
-
-    SDL_LockAudio();
-
-    mixer.state = state;
-    mixer.state |= PLAY;
-
-    mixer.volume1 = MIX_MAXVOLUME < volume ? MIX_MAXVOLUME : volume;
-    mixer.volume2 = mixer.volume1;
-
-    if(mixer.data != data || !(state & REPEATE))
+void Audio::Mixer::FreeChunk(const int ch)
+{
+    if(CHANNEL_RESERVED <= ch)
     {
-	mixer.data = data;
-	mixer.length = body.size();
-	mixer.position = 0;
+	Mix_Chunk *chunk = Mix_GetChunk(ch);
 
-	mixer.volume2 = state & ENHANCE ? 10 : mixer.volume1;
+	if(chunk) Mix_FreeChunk(chunk);
     }
-
-    SDL_UnlockAudio();
 }
 
 void Audio::Mixer::Reduce(void)
 {
-    if(! valid) return;
-
-    std::for_each(sounds.begin(), sounds.end(), PredicateReduceSound);
+    // deprecater, remove later
 }
 
 void Audio::Mixer::Enhance(void)
 {
-    if(! valid) return;
-
-    std::for_each(sounds.begin(), sounds.end(), PredicateEnhanceSound);
+    // deprecater, remove later
 }

@@ -35,17 +35,19 @@ public:
     typedef enum
     {
         SOUND           = 0x00000001,
-        MUSIC           = 0x00000002,
-        ANIMATION       = 0x00000004,
-        FULLSCREEN      = 0x00000008,
-        LOGO            = 0x00000010,
-        EDITOR          = 0x00000020,
-
-
+        ANIMATION       = 0x00000002,
+        FULLSCREEN      = 0x00000004,
+        LOGO            = 0x00000008,
+        EDITOR          = 0x00000010,
+        MUSIC_EXT       = 0x00000020,
+        MUSIC_CD        = 0x00000040,
+        MUSIC_MIDI      = 0x00000080,
         ORIGINAL        = 0x00010000,
         PRICELOYALTY    = 0x00020000,
         EVILINTERFACE   = 0x00040000,
         SHADOW          = 0x00080000,
+
+	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
 
     } settings_t;
 
@@ -132,7 +134,7 @@ private:
     u8 sound_volume;
     u8 music_volume;
     u8 animation_speed;
-    
+
     bool hotseat;
     u8   players;
 };

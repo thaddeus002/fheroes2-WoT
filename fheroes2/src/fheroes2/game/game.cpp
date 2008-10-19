@@ -95,11 +95,9 @@ void Game::EnvironmentSoundMixer(bool forced)
 	previous_index = new_index;
 
 	Audio::Mixer & mixer = Audio::Mixer::Get();
+	std::vector<u8> vols(CHANNEL_RESERVED, 0);
 
-	std::map<M82::m82_t, u8> maps_sound;
-
-        // reset all loop sound
-	mixer.StopRepeate();
+        Audio::Mixer::PauseLoops();
 
         // scan 4x4 square from focus
         for(s16 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)
@@ -112,9 +110,8 @@ void Game::EnvironmentSoundMixer(bool forced)
 		    
     		    // calculation volume
     		    const u8 length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
-		    const u8 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * MIX_MAXVOLUME / 10 * conf.SoundVolume() / 10;
-
-		    M82::m82_t m82 = M82::UNKNOWN;
+		    const u16 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * MAXVOLUME * conf.SoundVolume() / 100;
+		    u8 channel = 0xFF;
 		    MP2::object_t object = tile.GetObject();
 		    
 		    if(MP2::OBJ_HEROES == object)
@@ -126,56 +123,75 @@ void Game::EnvironmentSoundMixer(bool forced)
 
 		    switch(object)
 		    {
-			case MP2::OBJ_BUOY:		m82 = M82::LOOP0000; break;
+			case MP2::OBJ_BUOY:		channel = 0; break;
 			case MP2::OBJ_DERELICTSHIP:
-			case MP2::OBJ_SHIPWRECK:	m82 = M82::LOOP0001; break;
-			case MP2::OBJ_COAST:		m82 = M82::LOOP0002; break;
-			case MP2::OBJ_ORACLE:		m82 = M82::LOOP0003; break;
-			case MP2::OBJ_STONELIGHTS:	m82 = M82::LOOP0004; break;
-			//case MP2:::	m82 = M82::LOOP0005; break;
-			case MP2::OBJ_LAVAPOOL:		m82 = M82::LOOP0006; break;
-			case MP2::OBJ_ALCHEMYLAB:	m82 = M82::LOOP0007; break;
-			//case MP2:::	m82 = M82::LOOP0008; break;
-			case MP2::OBJ_WATERWHEEL:	m82 = M82::LOOP0009; break;
-			case MP2::OBJ_CAMPFIRE:		m82 = M82::LOOP0010; break;
-			case MP2::OBJ_WINDMILL:		m82 = M82::LOOP0011; break;
+			case MP2::OBJ_SHIPWRECK:	channel = 1; break;
+			case MP2::OBJ_COAST:		channel = 2; break;
+			case MP2::OBJ_ORACLE:		channel = 3; break;
+			case MP2::OBJ_STONELIGHTS:	channel = 4; break;
+			case MP2::OBJ_LAVAPOOL:		channel = 5; break;
+			case MP2::OBJ_ALCHEMYLAB:	channel = 6; break;
+			case MP2::OBJ_WATERWHEEL:	channel = 7; break;
+			case MP2::OBJ_CAMPFIRE:		channel = 8; break;
+			case MP2::OBJ_WINDMILL:		channel = 9; break;
 			case MP2::OBJ_ARTESIANSPRING:
-			case MP2::OBJ_FOUNTAIN:		m82 = M82::LOOP0012; break;
+			case MP2::OBJ_FOUNTAIN:		channel = 10; break;
 			case MP2::OBJ_WATERLAKE:
-			case MP2::OBJ_CRAKEDLAKE:	m82 = M82::LOOP0013; break;
-			//case MP2:::	m82 = M82::LOOP0014; break;
-			case MP2::OBJ_MINES:		m82 = M82::LOOP0015; break;
-			case MP2::OBJ_SAWMILL:		m82 = M82::LOOP0016; break;
-			case MP2::OBJ_DAEMONCAVE:	m82 = M82::LOOP0017; break;
+			case MP2::OBJ_CRAKEDLAKE:	channel = 11; break;
+			case MP2::OBJ_MINES:		channel = 12; break;
+			case MP2::OBJ_SAWMILL:		channel = 13; break;
+			case MP2::OBJ_DAEMONCAVE:	channel = 14; break;
 			case MP2::OBJ_SHRINE1:
 			case MP2::OBJ_SHRINE2:
-			case MP2::OBJ_SHRINE3:		m82 = M82::LOOP0018; break;
-			//case MP2::OBJ_STONES:		if(Maps::Ground::WATER == tile.GetGround()) m82 = M82::LOOP0019; break;
-			//case MP2:::	m82 = M82::LOOP0020; break;
-			case MP2::OBJ_TARPIT:		m82 = M82::LOOP0021; break;
-			case MP2::OBJ_TRADINGPOST:	m82 = M82::LOOP0022; break;
-			//case MP2:::	m82 = M82::LOOP0023; break;
-			case MP2::OBJ_RUINS:		m82 = M82::LOOP0024; break;
+			case MP2::OBJ_SHRINE3:		channel = 15; break;
+			case MP2::OBJ_TARPIT:		channel = 16; break;
+			case MP2::OBJ_TRADINGPOST:	channel = 17; break;
+			case MP2::OBJ_RUINS:		channel = 18; break;
 			case MP2::OBJ_PEASANTHUT:
 			case MP2::OBJ_DWARFCOTT:
-			case MP2::OBJ_ARCHERHOUSE:	m82 = M82::LOOP0025; break;
-			//case MP2:::	m82 = M82::LOOP0026; break;
-			case MP2::OBJ_VOLCANO:		m82 = M82::LOOP0027; break;
+			case MP2::OBJ_ARCHERHOUSE:	channel = 19; break;
+			case MP2::OBJ_VOLCANO:		channel = 20; break;
 
-			default: break;
+			default: continue;
 		    }
 
-		    if(M82::UNKNOWN != m82 && volume > maps_sound[m82]) maps_sound[m82] = volume;
+		    if(volume > vols[channel]) vols[channel] = volume;
 		}
 	    }
 	}
 
-
-        // load sound
-	std::map<M82::m82_t, u8>::const_iterator it1 = maps_sound.begin();
-	std::map<M82::m82_t, u8>::const_iterator it2 = maps_sound.end();
-	
-	for(; it1 != it2; ++it1)
-	    mixer.Play(AGG::Cache::Get().GetWAV((*it1).first), (*it1).second, Audio::Mixer::PLAY | Audio::Mixer::REPEATE | Audio::Mixer::ENHANCE);
+	for(u8 ch = 0; ch < vols.size(); ++ch) if(vols[ch])
+	    mixer.Volume(ch, vols[ch]);
+        
+        mixer.ResumeLoops();
     }
+}
+
+void Game::PreloadLOOPSounds(void)
+{
+    if(! Settings::Get().Sound()) return;
+
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0000), true, 0);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0001), true, 1);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0002), true, 2);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0003), true, 3);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0004), true, 4);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0006), true, 5);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0007), true, 6);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0009), true, 7);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0010), true, 8);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0011), true, 9);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0012), true, 10);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0013), true, 11);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0015), true, 12);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0016), true, 13);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0017), true, 14);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0018), true, 15);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0021), true, 16);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0022), true, 17);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0024), true, 18);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0025), true, 19);
+    Audio::Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0027), true, 20);
+
+    Error::Verbose("Game::PreloadLOOPSoundToMixer: done.");
 }

@@ -58,6 +58,8 @@ Game::menu_t Game::HighScores(void)
     // highscores loop
     while(le.HandleEvents())
     {
+        AGG::PlayMusic(MUS::MAINMENU);
+    
 	le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 

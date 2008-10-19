@@ -83,6 +83,8 @@ Game::menu_t Game::MainMenu(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
+        AGG::PlayMusic(MUS::MAINMENU);
+    
 	le.MousePressLeft(buttonNewGame) ? buttonNewGame.PressDraw() : buttonNewGame.ReleaseDraw();
 	le.MousePressLeft(buttonLoadGame) ? buttonLoadGame.PressDraw() : buttonLoadGame.ReleaseDraw();
 	le.MousePressLeft(buttonHighScores) ? buttonHighScores.PressDraw() : buttonHighScores.ReleaseDraw();
