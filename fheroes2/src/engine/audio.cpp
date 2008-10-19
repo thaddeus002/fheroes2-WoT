@@ -372,10 +372,8 @@ void Audio::Mixer::FreeChunk(const int ch)
 
 void Audio::Mixer::Reduce(void)
 {
-    // deprecater, remove later
 }
 
 void Audio::Mixer::Enhance(void)
 {
-    // deprecater, remove later
 }

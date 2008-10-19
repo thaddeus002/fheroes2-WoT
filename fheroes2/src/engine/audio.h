@@ -26,7 +26,7 @@
 
 #define MAXVOLUME		MIX_MAX_VOLUME
 #define CHANNEL_RESERVED	22
-#define CHANNEL_FREE		8
+#define CHANNEL_FREE		6
 
 namespace Music
 {
@@ -73,8 +73,6 @@ namespace Audio
     {
     public:
 	~Mixer();
-
-	//enum { PLAY = 0x01, REPEATE = 0x02, REDUCE = 0x04, ENHANCE = 0x08 } flag_t;
 
 	static Mixer & Get(void);
 

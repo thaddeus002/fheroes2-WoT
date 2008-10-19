@@ -220,6 +220,7 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 	const u8 status = *ptr;
 
 	// insert event: note off
+	if(delta)
 	{
 	    std::list<meta_t>::iterator it1 = notesoff.begin();
 	    std::list<meta_t>::const_iterator it2 = notesoff.end();
