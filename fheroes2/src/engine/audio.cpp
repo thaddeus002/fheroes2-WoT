@@ -124,6 +124,8 @@ Audio::Cdrom::~Cdrom()
 
 void Audio::Cdrom::Play(const u8 track)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+    
     if(SDL_CDPlayTracks(cd, track - 1, 0, 1, 0) < 0)
         Error::Verbose("Couldn't play track ", track);
 
@@ -136,11 +138,15 @@ void Audio::Cdrom::Play(const u8 track)
 
 void Audio::Cdrom::Pause(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(cd) SDL_CDPause(cd);
 }
 
 void Music::Play(const std::vector<u8> & body)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     bool skip = false;
 
     if(id != &body[0]) Reset();
@@ -158,16 +164,22 @@ void Music::Play(const std::vector<u8> & body)
 
 void Music::Volume(const u8 vol)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     Mix_VolumeMusic(MIX_MAX_VOLUME > vol ? vol : MIX_MAX_VOLUME);
 }
 
 void Music::Pause(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(music) Mix_PauseMusic();
 }
 
 void Music::Resume(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(music) Mix_ResumeMusic();
 }
 
@@ -183,6 +195,8 @@ bool Music::isPaused(void)
 
 void Music::Reset(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(music)
     {
 	Mix_HaltMusic();
@@ -261,6 +275,8 @@ const Audio::Spec & Audio::Mixer::HardwareSpec(void) const
 
 void Audio::Mixer::Pause(const int ch)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(0 > ch)
     	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii) Mix_Pause(ii);
     else
@@ -269,12 +285,16 @@ void Audio::Mixer::Pause(const int ch)
 
 void Audio::Mixer::PauseLoops(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     for(u8 ii = 0; ii < CHANNEL_RESERVED; ++ii)
         Mix_Pause(ii);
 }
 
 void Audio::Mixer::Resume(const int ch)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(0 > ch)
     	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii) Mix_Resume(ii);
     else
@@ -283,17 +303,23 @@ void Audio::Mixer::Resume(const int ch)
 
 void Audio::Mixer::ResumeLoops(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     for(u8 ii = 0; ii < CHANNEL_RESERVED; ++ii)
         Mix_Resume(ii);
 }
 
 u8 Audio::Mixer::Volume(const int ch, const int vol)
 {
+    if(!Audio::Mixer::Get().isValid()) return 0;
+
     return Mix_Volume(ch, MIX_MAX_VOLUME > vol ? vol : MIX_MAX_VOLUME);
 }
 
 void Audio::Mixer::Reset(const int ch)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(0 > ch)
     {
 	Music::Reset();
@@ -311,16 +337,22 @@ void Audio::Mixer::Reset(const int ch)
 
 u8 Audio::Mixer::isPlaying(const int ch)
 {
+    if(!Audio::Mixer::Get().isValid()) return 0;
+
     return Mix_Playing(ch);
 }
 
 u8 Audio::Mixer::isPaused(const int ch)
 {
+    if(!Audio::Mixer::Get().isValid()) return 0;
+
     return Mix_Paused(ch);
 }
 
 void Audio::Mixer::PlayRAW(const std::vector<u8> & body, const int ch)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(0 <= ch && Mix_GetChunk(ch)) Mix_HaltChannel(ch);
 
     if(body.size())
@@ -336,6 +368,8 @@ void Audio::Mixer::PlayRAW(const std::vector<u8> & body, const int ch)
 
 void Audio::Mixer::LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
+
     if(CHANNEL_RESERVED <= ch)
     {
 	Error::Verbose("Audio::Mixer::LoadRAW: need reserved channel: ", ch);
@@ -372,8 +406,10 @@ void Audio::Mixer::FreeChunk(const int ch)
 
 void Audio::Mixer::Reduce(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
 }
 
 void Audio::Mixer::Enhance(void)
 {
+    if(!Audio::Mixer::Get().isValid()) return;
 }
