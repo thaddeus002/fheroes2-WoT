@@ -22,13 +22,15 @@
 #include "cursor.h"
 #include "dialog.h"
 #include "sprite.h"
-#include "localevent.h"
-#include "display.h"
+#include "engine.h"
 #include "button.h"
 #include "game.h"
 
 Game::menu_t Game::MainMenu(void)
 {
+    Audio::Mixer::Pause();
+    AGG::PlayMusic(MUS::MAINMENU);
+
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNSHNGL);
@@ -83,8 +85,6 @@ Game::menu_t Game::MainMenu(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-        AGG::PlayMusic(MUS::MAINMENU);
-    
 	le.MousePressLeft(buttonNewGame) ? buttonNewGame.PressDraw() : buttonNewGame.ReleaseDraw();
 	le.MousePressLeft(buttonLoadGame) ? buttonLoadGame.PressDraw() : buttonLoadGame.ReleaseDraw();
 	le.MousePressLeft(buttonHighScores) ? buttonHighScores.PressDraw() : buttonHighScores.ReleaseDraw();

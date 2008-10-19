@@ -21,13 +21,15 @@
 #include "agg.h"
 #include "cursor.h"
 #include "sprite.h"
-#include "localevent.h"
-#include "display.h"
+#include "engine.h"
 #include "button.h"
 #include "game.h"
 
 Game::menu_t Game::HighScores(void)
 {
+    Audio::Mixer::Pause();
+    AGG::PlayMusic(MUS::MAINMENU);
+
     // preload
     AGG::PreloadObject(ICN::HSBKG);
     AGG::PreloadObject(ICN::HISCORE);
@@ -58,8 +60,6 @@ Game::menu_t Game::HighScores(void)
     // highscores loop
     while(le.HandleEvents())
     {
-        AGG::PlayMusic(MUS::MAINMENU);
-    
 	le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 

@@ -21,14 +21,16 @@
 #include "agg.h"
 #include "cursor.h"
 #include "sprite.h"
-#include "localevent.h"
-#include "display.h"
+#include "engine.h"
 #include "button.h"
 #include "game.h"
 #include "error.h"
 
 Game::menu_t Game::LoadGame(void)
 {
+    Audio::Mixer::Pause();
+    AGG::PlayMusic(MUS::MAINMENU);
+
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNNEWGM);
