@@ -31,10 +31,10 @@ Default config fheroes2.cfg options:
 # sound: on off
 # sound = off
 #
-# music: on off
+# music: on,midi,cd,ext,off
 # music = off
 #
-# video mode (640x480, 800x600, 1024x768, 1280x1024 or other)
+# video mode (640x480, 800x576, 1024x768, 1280x1024 or other divisible 32)
 # videomode = 640x480
 #
 # fullscreen: on off (F4 switch)
