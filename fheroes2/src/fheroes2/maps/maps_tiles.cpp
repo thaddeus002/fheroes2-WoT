@@ -251,7 +251,7 @@ void Maps::Tiles::RedrawTile(void) const
     }
 }
 
-void Maps::Tiles::RedrawBottom(void) const
+void Maps::Tiles::RedrawBottom(const TilesAddon * skip) const
 {
     Display & display = Display::Get();
     const Rect & area = GameArea::Get().GetRect();
@@ -269,6 +269,8 @@ void Maps::Tiles::RedrawBottom(void) const
 
 	    for(; it1 != it2; ++it1)
 	    {
+		if(skip && skip == &(*it1)) continue;
+
 		const u8 & object = (*it1).object;
 	        const u8 & index  = (*it1).index;
 		const ICN::icn_t icn = MP2::GetICNObject(object);
@@ -290,7 +292,7 @@ void Maps::Tiles::RedrawBottom(void) const
     }
 }
 
-void Maps::Tiles::RedrawTop(void) const
+void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 {
     Display & display = Display::Get();
     const Rect & area = GameArea::Get().GetRect();
@@ -308,6 +310,8 @@ void Maps::Tiles::RedrawTop(void) const
 
 	    for(; it1 != it2; ++it1)
 	    {
+		if(skip && skip == &(*it1)) continue;
+
 		const u8 & object = (*it1).object;
 		const u8 & index  = (*it1).index;
 	        const ICN::icn_t icn = MP2::GetICNObject(object);

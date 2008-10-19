@@ -333,6 +333,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     Audio::Mixer & mixer = Audio::Mixer::Get();
     mixer.Reset();
+    AGG::PlayMusic(MUS::FromRace(race));
     
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
@@ -347,8 +348,6 @@ Dialog::answer_t Castle::OpenDialog(void)
     // dialog menu loop
     while(le.HandleEvents())
     {
-        AGG::PlayMusic(MUS::FromRace(race));
-        
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
 

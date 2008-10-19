@@ -97,8 +97,8 @@ namespace Maps
 	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
 
 	void RedrawTile(void) const;
-	void RedrawBottom(void) const;
-	void RedrawTop(void) const;
+	void RedrawBottom(const TilesAddon * skip = NULL) const;
+	void RedrawTop(const TilesAddon * skip = NULL) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);

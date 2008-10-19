@@ -69,10 +69,13 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
     const s16 dstx = BORDERWIDTH + TILEWIDTH * pos.x;
     const s16 dsty = BORDERWIDTH + TILEWIDTH * pos.y;
 
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+
     const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
-    Surface sf(sprite.w(), sprite.h());
-    sf.SetColorKey();
-    sf.Blit(sprite);
+
+    Surface sf(tile.GetSurface());
+    sf.Blit(sprite, sprite.x(), sprite.y());
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     u32 ticket = 0;
@@ -80,15 +83,18 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
 
     while(le.HandleEvents() && alpha > 0)
     {
-        if(Game::ShouldAnimate(ticket))
+	if(!(ticket % ANIMATION_HIGH))
         {
+	    cursor.Hide();
 	    tile.RedrawTile();
+	    tile.RedrawBottom(addon);
             sf.SetAlpha(alpha);
-            Display::Get().Blit(sf, dstx + sprite.x(), dsty + sprite.y());
+	    display.Blit(sf, dstx, dsty);
 	    tile.RedrawTop();
 	    if(Game::Focus::HEROES == Game::Focus::Get().Type()) Game::Focus::Get().GetHeroes().Redraw();
-    	    Display::Get().Flip();
-    	    alpha -= 10;
+            cursor.Show();
+            display.Flip();
+            alpha -= 10;
         }
 
         ++ticket;

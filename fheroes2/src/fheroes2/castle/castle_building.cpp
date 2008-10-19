@@ -387,9 +387,9 @@ void Castle::RedrawAnimationBuilding(const Point & dst_pt, const building_t buil
     {
         if(!(ticket % ANIMATION_MEDIUM))
         {
+    	    cursor.Hide();
     	    display.Blit(bg, src_rt);
     	    sf.SetAlpha(ii);
-    	    cursor.Hide();
     	    display.Blit(sf, src_rt);
 	    cursor.Show();
     	    display.Flip();
