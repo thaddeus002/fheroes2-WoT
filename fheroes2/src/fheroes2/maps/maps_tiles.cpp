@@ -1152,8 +1152,8 @@ Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
 	    // OBJNMULT
             if(ICN::OBJNMULT == MP2::GetICNObject(addon.object) && 131 == addon.index) return &addon;
 	    else
-	    // MTNSNOW
-            if(ICN::MTNSNOW == MP2::GetICNObject(addon.object) && 4 == addon.index) return &addon;
+	    // OBJNSNOW
+            if(ICN::OBJNSNOW == MP2::GetICNObject(addon.object) && 4 == addon.index) return &addon;
 	}
     }
 
