@@ -829,20 +829,22 @@ void AGG::PlayMusic(const MUS::mus_t mus)
 
     if(!conf.Music()) return;
 
-    //if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
 
     if(conf.Modes(Settings::MUSIC_EXT))
     {
 	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Music::Play(AGG::Cache::Get().GetMUS(mus));
+	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
     }
     else
     if(conf.Modes(Settings::MUSIC_CD) && Audio::Cdrom::Get().isValid())
     {
 	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Audio::Cdrom::Get().Play(mus);
+	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: cd track ", mus);
     }
     else
     {
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
 	if(XMI::UNKNOWN != xmi) Music::Play(AGG::Cache::Get().GetMID(xmi));
+	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + XMI::GetString(xmi));
     }
 }

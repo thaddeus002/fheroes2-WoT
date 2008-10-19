@@ -1,0 +1,91 @@
+/***************************************************************************
+ *   Copyright (C) 2008 by Josh Matthews                                   *
+ *   josh@joshmatthews.net                                                 *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#ifndef H2MUS_H
+#define H2MUS_H
+
+#include <string>
+#include "gamedefs.h"
+
+namespace MUS
+{
+    typedef enum
+    {
+        UNUSED,
+        DATATRACK,
+	BATTLE1,
+        BATTLE2,
+        BATTLE3,
+        BARBARIAN,
+        SORCERESS,
+        WARLOCK,
+        KNIGHT,
+        NECROMANCER,
+        WIZARD,
+        LAVA,
+        WASTELAND,
+        DESERT,
+        SNOW,
+        SWAMP,
+        BEACH,
+        DIRT,
+        GRASS,
+        LOSTGAME,
+        WEEK1,
+        WEEK2_MONTH1,
+        MONTH2,
+        PUZZLE,
+        ROLAND,
+        EVENT1, // }
+        EVENT2, // |--> all the same?
+        EVENT3, // }
+        COMPUTER,
+        BATTLEWIN,
+        BATTLELOSE, // defeat, castle?
+        EVENT6, // defeat, catastrophe?
+        EVENT7,
+        EVENT8, // desert?
+        EVENT9,
+        EVENT10, // grasslands?
+        EVENT11, // snow?
+        EVENT12,
+        EVENT13,
+        EVENT14,
+        EVENT15,
+        EVENT16,
+        MAINMENU,
+        VICTORY,
+	UNKNOWN
+    } mus_t;
+
+    typedef struct
+    {
+        mus_t		type;
+        std::string     string;
+
+    } musmap_t;
+
+    const std::string  GetString(const mus_t mus);
+
+    mus_t FromGround(const u16 ground);
+    mus_t FromRace(const u8 race);
+};
+
+#endif
