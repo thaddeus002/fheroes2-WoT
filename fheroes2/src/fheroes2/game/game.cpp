@@ -98,6 +98,8 @@ void Game::EnvironmentSoundMixer(bool forced)
 
         Mixer::PauseLoops();
 
+        AGG::PlayMusic(MUS::FromGround(world.GetTiles(new_index).GetGround()));
+        
         // scan 4x4 square from focus
         for(s16 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)
     	{
