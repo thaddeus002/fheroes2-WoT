@@ -823,7 +823,25 @@ Game::menu_t Game::HumanTurn(bool message)
     cursor.Show();
 
     if(message)
-        Dialog::Message("", Color::String(myKingdom.GetColor()) + " player's turn", Font::BIG, Dialog::OK);
+    {
+	const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
+
+	Surface sign(border.w(), border.h());
+	sign.Blit(border);
+
+	switch(Settings::Get().MyColor())
+	{
+	    case Color::BLUE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 0), 4, 4); break;
+	    case Color::GREEN:	sign.Blit(AGG::GetICN(ICN::BRCREST, 1), 4, 4); break;
+	    case Color::RED:	sign.Blit(AGG::GetICN(ICN::BRCREST, 2), 4, 4); break;
+	    case Color::YELLOW:	sign.Blit(AGG::GetICN(ICN::BRCREST, 3), 4, 4); break;
+	    case Color::ORANGE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 4), 4, 4); break;
+	    case Color::PURPLE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 5), 4, 4); break;
+   	    default: break;
+	}
+
+	Dialog::SpriteInfo("", Color::String(myKingdom.GetColor()) + " player's turn", sign);
+    }
 
     u8 route_days = 0;
 
