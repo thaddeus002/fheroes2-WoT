@@ -159,7 +159,7 @@ void Game::EnvironmentSoundMixer(bool forced)
 	    }
 	}
 
-	for(u8 ch = 0; ch < vols.size(); ++ch) if(vols[ch])
+	for(u8 ch = 0; ch < vols.size(); ++ch)
 	    Mixer::Volume(ch, vols[ch]);
         
         Mixer::ResumeLoops();
