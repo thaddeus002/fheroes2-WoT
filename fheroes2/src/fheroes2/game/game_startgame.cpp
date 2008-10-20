@@ -102,8 +102,7 @@ Game::menu_t Game::StartGame(void)
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
 
-    Audio::Mixer & mixer = Audio::Mixer::Get();
-    mixer.Reset();
+    Mixer::Reset();
 
     Game::DrawInterface();
 
@@ -241,7 +240,7 @@ Game::menu_t Game::StartGame(void)
 		switch(kingdom.Control())
 		{
 	        case Game::Human:
-		    mixer.Enhance();
+		    Mixer::Enhance();
 		    conf.SetMyColor(color);
 		    radar.RedrawArea(color);
 		    statusWindow.SetState(Game::StatusWindow::DAY);
@@ -250,7 +249,7 @@ Game::menu_t Game::StartGame(void)
 		    m = HumanTurn(humans > 1);
 
 		    cursor.Hide();
-		    mixer.Reduce();
+		    Mixer::Reduce();
 
 		    if(m != ENDTURN) goto OUTDOOR;
 		    break;
@@ -306,7 +305,7 @@ void Game::OpenCastle(Castle *castle)
 {
     if(! castle) return;
 
-    Audio::Mixer::Get().Reduce();
+    Mixer::Reduce();
 
     Cursor & cursor = Cursor::Get();
     const Kingdom & myKingdom = world.GetMyKingdom();
@@ -343,7 +342,7 @@ void Game::OpenCastle(Castle *castle)
     if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes())) FocusToHeroes(hero);
     else FocusToCastle(castle);
     
-    Audio::Mixer::Get().Enhance();
+    Mixer::Enhance();
 }
 
 /* focus to castle */
@@ -364,7 +363,7 @@ void Game::OpenHeroes(Heroes *hero)
 {
     if(! hero) return;
 
-    Audio::Mixer::Get().Reduce();
+    Mixer::Reduce();
 
     Cursor & cursor = Cursor::Get();
     const Kingdom & myKingdom = world.GetMyKingdom();
@@ -424,7 +423,7 @@ void Game::OpenHeroes(Heroes *hero)
 	cursor.Show();
     }
 
-    Audio::Mixer::Get().Enhance();
+    Mixer::Enhance();
 }
 
 /* focus to heroes */
@@ -781,8 +780,7 @@ Game::menu_t Game::HumanTurn(bool message)
     selectHeroes.SetHeroes(myHeroes);
     selectHeroes.Reset();
 
-    Audio::Mixer & mixer = Audio::Mixer::Get();
-    mixer.Reset();
+    Mixer::Reset();
     Game::EnvironmentSoundMixer(true);
 
     switch(global_focus.Type())
@@ -966,11 +964,11 @@ Game::menu_t Game::HumanTurn(bool message)
 			        {
 			    	    if(from_hero.GetCenter() == to_hero->GetCenter())
 				    {
-					mixer.Reduce();
+					Mixer::Reduce();
 					OpenHeroes(&from_hero);
 					statusWindow.Redraw();
 					display.Flip();
-					mixer.Enhance();
+					Mixer::Enhance();
 				    }
 				    else
 				    {
@@ -1012,10 +1010,10 @@ Game::menu_t Game::HumanTurn(bool message)
 				    // is selected open dialog
 				    if(from_castle.GetCenter() == to_castle->GetCenter())
 				    {
-					mixer.Reduce();
+					Mixer::Reduce();
 					OpenCastle(&from_castle);
 					statusWindow.Redraw();
-					mixer.Enhance();
+					Mixer::Enhance();
 				    }
 				    // select other castle
 				    else
@@ -1396,7 +1394,7 @@ Game::menu_t Game::HumanTurn(bool message)
     	    // click AdventureOptions
 	    if(le.MouseClickLeft(buttonAdventure))
 	    {
-		mixer.Reduce();
+		Mixer::Reduce();
 
 		switch(Dialog::AdventureOptions())
 		{
@@ -1404,13 +1402,13 @@ Game::menu_t Game::HumanTurn(bool message)
 			break;
 		}
 
-		mixer.Enhance();
+		Mixer::Enhance();
     	    }
 	    else
 	    // click FileOptions
 	    if(le.MouseClickLeft(buttonFile))
 	    {
-		mixer.Reduce();
+		Mixer::Reduce();
 
 		Game::menu_t result = Dialog::FileOptions();
 	    
@@ -1428,13 +1426,13 @@ Game::menu_t Game::HumanTurn(bool message)
 			break;
 		}
 
-		mixer.Enhance();
+		Mixer::Enhance();
 	    }
 	    else
 	    // click SystemOptions
 	    if(le.MouseClickLeft(buttonSystem))
 	    {
-		mixer.Reduce();
+		Mixer::Reduce();
 
 		// Change and save system settings
 		change_settings = Dialog::SystemOptions();
@@ -1442,11 +1440,11 @@ Game::menu_t Game::HumanTurn(bool message)
 		const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
 		const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
 
-		Audio::Mixer::Volume(-1, vol1);
+		Mixer::Volume(-1, vol1);
 		Music::Volume(vol2);
 
 
-		mixer.Enhance();
+		Mixer::Enhance();
 	    }
 	    else
 	    // click StatusWindow

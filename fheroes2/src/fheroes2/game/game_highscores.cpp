@@ -27,7 +27,7 @@
 
 Game::menu_t Game::HighScores(void)
 {
-    Audio::Mixer::Pause();
+    Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
     // preload

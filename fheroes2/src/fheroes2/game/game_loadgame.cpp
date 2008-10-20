@@ -28,7 +28,7 @@
 
 Game::menu_t Game::LoadGame(void)
 {
-    Audio::Mixer::Pause();
+    Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
     // preload

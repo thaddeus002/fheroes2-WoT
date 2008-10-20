@@ -136,7 +136,7 @@ int main(int argc, char **argv)
 	if(SDL::Init(subsystem))
 	try
 	{
-	    if((conf.Sound() || conf.Music()) && ! Audio::Mixer::Get().isValid())
+	    if((conf.Sound() || conf.Music()) && ! Mixer::isValid())
 	    {
 		conf.ResetModes(Settings::SOUND);
 		conf.ResetModes(Settings::MUSIC);

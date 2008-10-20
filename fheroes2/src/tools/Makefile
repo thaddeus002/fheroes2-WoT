@@ -3,12 +3,15 @@
 #
 
 TARGETS := extractor 82m2wav til2bmp icn2bmp xmi2mid package
-SDL_LIBS := $(shell sdl-config --libs)
-SDL_FLAGS := $(shell sdl-config --cflags)
 LIBENGINE := ../engine/libengine.a
-
 LIBS := $(LIBENGINE) $(SDL_LIBS)
-CFLAGS := -O2 -Wall -I ../engine $(SDL_FLAGS)
+CFLAGS = -I../engine
+
+ifdef DEBUG
+CFLAGS := $(CFLAGS) -O0 -g -Wall $(SDL_FLAGS)
+else
+CFLAGS := $(CFLAGS) -O2 -Wall $(SDL_FLAGS)
+endif
 
 CC := g++
 

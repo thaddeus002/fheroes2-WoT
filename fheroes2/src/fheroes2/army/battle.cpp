@@ -131,8 +131,7 @@ Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &til
 
 Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile)
 {
-    Audio::Mixer & mixer = Audio::Mixer::Get();
-    mixer.Reset();
+    Mixer::Reset();
     
     AGG::PlaySound(M82::PREBATTL);
     cursor.SetThemes(cursor.WAR_POINTER);

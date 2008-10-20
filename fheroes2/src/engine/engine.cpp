@@ -22,6 +22,18 @@
 #include "audio.h"
 #include "engine.h"
 
+namespace Mixer
+{
+    void Init(void);
+    void Quit(void);
+}
+
+namespace Cdrom
+{
+    void Open(void);
+    void Close(void);
+}
+
 bool SDL::Init(const u32 system)
 {
     if(0 > SDL_Init(system))
@@ -31,11 +43,17 @@ bool SDL::Init(const u32 system)
 	return false;
     }
 
+    if(INIT_AUDIO & system) Mixer::Init();
+    if(INIT_CDROM & system) Cdrom::Open();
+
     return true;
 }
 
 void SDL::Quit(void)
 {
+    if(SubSystem(INIT_CDROM)) Cdrom::Close();
+    if(SubSystem(INIT_AUDIO)) Mixer::Quit();
+
     SDL_Quit();
 }
 

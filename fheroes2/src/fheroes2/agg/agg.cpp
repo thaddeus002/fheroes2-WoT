@@ -471,16 +471,14 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
     if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadWAV: " + M82::GetString(m82));
 
-    const Audio::Mixer & mixer = Audio::Mixer::Get();
-
-    if(! mixer.isValid()) return;
+    if(! Mixer::isValid()) return;
 
     Audio::Spec wav_spec;
     wav_spec.format = 8;
     wav_spec.channels = 1;
     wav_spec.freq = 22050;
 
-    const Audio::Spec & hardware = mixer.HardwareSpec();
+    const Audio::Spec & hardware = Mixer::HardwareSpec();
 
     Audio::CVT cvt;
 
@@ -520,9 +518,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
     if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadMID: " + XMI::GetString(xmi));
 
-    const Audio::Mixer & mixer = Audio::Mixer::Get();
-
-    if(! mixer.isValid()) return;
+    if(! Mixer::isValid()) return;
 
     if(agg_cache.size())
     {
@@ -559,9 +555,7 @@ void AGG::Cache::LoadMUS(const MUS::mus_t mus)
 
     if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + MUS::GetString(mus));
 
-    const Audio::Mixer & mixer = Audio::Mixer::Get();
-
-    if(! mixer.isValid()) return;
+    if(! Mixer::isValid()) return;
 
     if(agg_cache.size())
     {
@@ -818,7 +812,7 @@ void AGG::PlaySound(const M82::m82_t m82)
     {
 	if(conf.Debug()) Error::Verbose("AGG::PlaySound: " + M82::GetString(m82));
 
-	Audio::Mixer::PlayRAW(AGG::Cache::Get().GetWAV(m82));
+	Mixer::PlayRAW(AGG::Cache::Get().GetWAV(m82));
     }
 }
 
@@ -836,9 +830,9 @@ void AGG::PlayMusic(const MUS::mus_t mus)
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
     }
     else
-    if(conf.Modes(Settings::MUSIC_CD) && Audio::Cdrom::Get().isValid())
+    if(conf.Modes(Settings::MUSIC_CD) && Cdrom::isValid())
     {
-	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Audio::Cdrom::Get().Play(mus);
+	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Cdrom::Play(mus);
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: cd track ", mus);
     }
     else

@@ -342,11 +342,11 @@ void Heroes::ActionToCastle(const u16 dst_index)
     {
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: " + GetName() + " goto castle " + castle->GetName());
 
-	Audio::Mixer::Get().Reduce();
+	Mixer::Reduce();
 
 	const_cast<Castle *>(castle)->OpenDialog();
 
-	Audio::Mixer::Get().Enhance();
+	Mixer::Enhance();
     }
     else
     {

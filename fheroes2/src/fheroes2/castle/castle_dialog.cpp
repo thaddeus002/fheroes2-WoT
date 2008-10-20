@@ -331,8 +331,7 @@ Dialog::answer_t Castle::OpenDialog(void)
     buttonNextCastle.Draw();
     buttonExit.Draw();
 
-    Audio::Mixer & mixer = Audio::Mixer::Get();
-    mixer.Reset();
+    Mixer::Reset();
     AGG::PlayMusic(MUS::FromRace(race));
     
     LocalEvent & le = LocalEvent::GetLocalEvent();
