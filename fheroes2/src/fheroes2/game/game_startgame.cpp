@@ -1442,7 +1442,8 @@ Game::menu_t Game::HumanTurn(bool message)
 
 		Mixer::Volume(-1, vol1);
 		Music::Volume(vol2);
-
+                //Force a recalculation of all current loops
+                Game::EnvironmentSoundMixer(true);
 
 		Mixer::Enhance();
 	    }
