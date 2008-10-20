@@ -819,7 +819,7 @@ void AGG::PlaySound(const M82::m82_t m82)
 }
 
 /* wrapper Audio::Play */
-void AGG::PlayMusic(const MUS::mus_t mus)
+void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 {
     const Settings & conf = Settings::Get();
 
@@ -828,19 +828,19 @@ void AGG::PlayMusic(const MUS::mus_t mus)
 
     if(conf.Modes(Settings::MUSIC_EXT))
     {
-	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Music::Play(AGG::Cache::Get().GetMUS(mus));
+	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Music::Play(AGG::Cache::Get().GetMUS(mus), loop);
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
     }
     else
     if(conf.Modes(Settings::MUSIC_CD) && Cdrom::isValid())
     {
-	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Cdrom::Play(mus);
+	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Cdrom::Play(mus, loop);
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: cd track ", mus);
     }
     else
     {
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
-	if(XMI::UNKNOWN != xmi) Music::Play(AGG::Cache::Get().GetMID(xmi));
+	if(XMI::UNKNOWN != xmi) Music::Play(AGG::Cache::Get().GetMID(xmi), loop);
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + XMI::GetString(xmi));
     }
 }

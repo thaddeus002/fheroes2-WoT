@@ -132,6 +132,9 @@ Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &til
 Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile)
 {
     Mixer::Reset();
+    //FIXME: The music currently plays underneath the sound effect
+    int track = ((int)MUS::BATTLE1 + Rand::Get(0, 3));
+    AGG::PlayMusic((MUS::mus_t)track);
     
     AGG::PlaySound(M82::PREBATTL);
     cursor.SetThemes(cursor.WAR_POINTER);
@@ -165,12 +168,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     EXP1 = EXP2 = 0;  // experience = damage
     bool goodmorale;
 
-    int track = ((int)MUS::BATTLE1 + Rand::Get(0, 3));
-
     while(1) {
-        //FIXME: The music currently plays underneath the sound effect
-        AGG::PlayMusic((MUS::mus_t)track);
-    
 	if(hero1) hero1->spellCasted = false;
 	if(hero2) hero2->spellCasted = false;
 	for(u16 i=0; i<army1.size(); i++) army1[i].ProceedMagic();
@@ -223,14 +221,14 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 			s = HumanTurn(hero1, hero2, army1, army2, tile, -i-1, move, attack);
 			if(s == RETREAT || s == SURRENDER)
                         {
-                            AGG::PlayMusic(MUS::BATTLEWIN);
+                            AGG::PlayMusic(MUS::BATTLEWIN, false);
                             return WIN;
                         }
 		    } else {
 			s = CompTurn(hero1, hero2, army1, army2, tile, -i-1, move, attack);
 			if(s == RETREAT || s == SURRENDER)
                         {
-                            AGG::PlayMusic(MUS::BATTLEWIN);
+                            AGG::PlayMusic(MUS::BATTLEWIN, false);
                             return WIN;
                         }
 		    }
@@ -257,12 +255,12 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	    for(unsigned int i=0; i < army2.size(); i++) c2 += army2[i].Count();
 	    if(c1 <= 0)
             {
-                AGG::PlayMusic(MUS::BATTLELOSE);
+                AGG::PlayMusic(MUS::BATTLELOSE, false);
                 return LOSE;
             }
 	    if(c2 <= 0)
             {
-                AGG::PlayMusic(MUS::BATTLEWIN);
+                AGG::PlayMusic(MUS::BATTLEWIN, false);
                 return WIN;
             }
 	    if(cursp == Speed::CRAWLING) break;
@@ -270,7 +268,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	}
     }
     
-    AGG::PlayMusic(MUS::BATTLEWIN);
+    AGG::PlayMusic(MUS::BATTLEWIN, false);
     
     return WIN;
     // TODO remove summoned creatures

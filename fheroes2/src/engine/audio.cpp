@@ -50,6 +50,10 @@ namespace Cdrom
     static int currentTrack     = -1;
     static int startTime        = 0;
     static int tickLength;
+    static SDL_Thread *loopThread;
+    static SDL_mutex *cdLock;
+    
+    int LoopCheck(void *data);
 }
 
 Audio::Spec::Spec()
@@ -127,6 +131,12 @@ void Cdrom::Open(void)
             }
         }
     }
+    
+    if(cd)
+    {
+        loopThread = SDL_CreateThread(&LoopCheck, NULL);
+        cdLock = SDL_CreateMutex();
+    }
 
     Error::Verbose("Cdrom: " + std::string(cd ? "found CD audio device." : "no CDROM devices available."));
 }
@@ -135,6 +145,8 @@ void Cdrom::Close(void)
 {
     if(cd)
     {
+        SDL_KillThread(loopThread);
+        SDL_DestroyMutex(cdLock);
 	SDL_CDClose(cd);
 	cd = NULL;
     }
@@ -145,19 +157,37 @@ bool Cdrom::isValid(void)
     return cd;
 }
 
-void Cdrom::Play(const u8 track)
+int Cdrom::LoopCheck(void *data)
+{
+    while(1)
+    {
+        SDL_Delay(5000);
+        SDL_LockMutex(cdLock);
+        if(startTime && SDL_GetTicks() - startTime > tickLength)
+            Play(currentTrack, true, true);
+        SDL_UnlockMutex(cdLock);
+    }
+    return 0;
+}
+
+void Cdrom::Play(const u8 track, bool loop, bool force)
 {
     if(Mixer::valid && cd)
     {
-        if(currentTrack != track
-        ||(startTime && SDL_GetTicks() - startTime > tickLength))
+        SDL_LockMutex(cdLock);
+        
+        if(currentTrack != track || force)
         {
             if(SDL_CDPlayTracks(cd, track - 1, 0, 1, 0) < 0)
                 Error::Verbose("Couldn't play track ", track);
             
             currentTrack = track;
-            tickLength = (cd->track[track].length / CD_FPS) * 0.01f;
-            startTime = SDL_GetTicks();
+            if(loop)
+            {
+              tickLength = (cd->track[track].length / CD_FPS) * 0.01f;
+              startTime = SDL_GetTicks();
+            }
+            else startTime = 0;
 
             if(SDL_CDStatus(cd) != CD_PLAYING)
             {
@@ -165,6 +195,8 @@ void Cdrom::Play(const u8 track)
                 Error::Warning(SDL_GetError());
             }
         }
+        
+        SDL_UnlockMutex(cdLock);
     }
 }
 
@@ -173,7 +205,7 @@ void Cdrom::Pause(void)
     if(cd) SDL_CDPause(cd);
 }
 
-void Music::Play(const std::vector<u8> & body)
+void Music::Play(const std::vector<u8> & body, bool loop)
 {
     if(! Mixer::valid) return;
 
@@ -189,7 +221,7 @@ void Music::Play(const std::vector<u8> & body)
 	Mix_HookMusicFinished(Reset);
     }
 
-    if(music && !skip) Mix_PlayMusic(music, 0);
+    if(music && !skip) Mix_PlayMusic(music, loop ? -1 : 0);
 }
 
 void Music::Volume(const u8 vol)

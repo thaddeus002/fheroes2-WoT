@@ -144,7 +144,7 @@ namespace AGG
     
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);
-    void PlayMusic(const MUS::mus_t mus);
+    void PlayMusic(const MUS::mus_t mus, bool loop = false);
 };
 
 #endif

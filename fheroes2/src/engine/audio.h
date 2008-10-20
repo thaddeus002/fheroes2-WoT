@@ -47,13 +47,13 @@ namespace Audio
 namespace Cdrom
 {
     bool	isValid(void);
-    void	Play(const u8 track);
+    void	Play(const u8 track, bool loop, bool force = false);
     void	Pause(void);
 };
 
 namespace Music
 {
-    void	Play(const std::vector<u8> & body);
+    void	Play(const std::vector<u8> & body, bool loop);
     void	Volume(const u8 vol);
     void	Pause(void);
     void	Resume(void);
