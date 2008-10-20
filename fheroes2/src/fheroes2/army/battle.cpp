@@ -1938,7 +1938,7 @@ bool Army::GoodMorale(Heroes *hero, const Army::Troops &troop)
 	    display.Flip();
 	    int animat = 0;
 	    while(le.HandleEvents()) {
-		if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
+		if(Game::ShouldAnimateInfrequent(++animat, 4)) break;
 	    }
 	    back.Restore();
 	}
@@ -1965,7 +1965,7 @@ bool Army::BadMorale(Heroes *hero, const Army::Troops &troop)
 	    display.Flip();
 	    int animat = 0;
 	    while(le.HandleEvents()) {
-		if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
+		if(Game::ShouldAnimateInfrequent(++animat, 4)) break;
 	    }
 	    back.Restore();
 	}
@@ -1992,7 +1992,7 @@ int Army::CheckLuck(Heroes *hero, const Army::Troops &troop)
 		display.Flip();
 		int animat = 0;
 		while(le.HandleEvents()) {
-		    if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
+		    if(Game::ShouldAnimateInfrequent(++animat, 4)) break;
 		}
 		back.Restore();
 	    }
@@ -2000,7 +2000,7 @@ int Army::CheckLuck(Heroes *hero, const Army::Troops &troop)
 	}
 	if(hero->GetLuck() > 0 && hero->GetLuck() >= luck) {
 	    AGG::PlaySound(M82::GOODLUCK);
-	    for(u16 i=0; i<AGG::GetICNCount(ICN::CLOUDLUK); i++) {
+	    for(u16 i=0; i<AGG::GetICNCount(ICN::EXPMRL); i++) {
 		const Sprite &sp = AGG::GetICN(ICN::EXPMRL, 0);
 		Rect pos_rt = sp;
 		pos_rt += Bf2Scr(troop.Position()) + dst_pt;
@@ -2012,7 +2012,7 @@ int Army::CheckLuck(Heroes *hero, const Army::Troops &troop)
 		display.Flip();
 		int animat = 0;
 		while(le.HandleEvents()) {
-		    if(Game::ShouldAnimateInfrequent(++animat, 3)) break;
+		    if(Game::ShouldAnimateInfrequent(++animat, 4)) break;
 		}
 		back.Restore();
 	    }
