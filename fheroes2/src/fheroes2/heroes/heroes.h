@@ -184,7 +184,7 @@ public:
     void ApplyPenaltyMovement(void);
 
     void AngleStep(const Direction::vector_t to_direct);
-    void MoveStep(void);
+    bool MoveStep(void);
     void Redraw(void) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; };
 

@@ -230,11 +230,12 @@ void Heroes::Redraw(void) const
     display.Blit(sprite2, src_rt2, dst_pt2);
 }
 
-void Heroes::MoveStep(void)
+bool Heroes::MoveStep(void)
 {
     const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
     const u16 index_to = path.GetFrontIndex();
     const u16 index_dst = path.GetDestinationIndex();
+    bool didMove = false;
 
     if(0 == sprite_index % 9)
     {
@@ -244,7 +245,7 @@ void Heroes::MoveStep(void)
 	    Action(world.GetTiles(index_to));
 	    ApplyPenaltyMovement();
 	    SetMove(false);
-	    return;
+	    return true;
 	}
 	else
 	    PlayWalkSound();
@@ -265,6 +266,7 @@ void Heroes::MoveStep(void)
 	    path.Reset();
 	    Action(world.GetTiles(index_to));
 	    SetMove(false);
+            didMove = true;
 	}
 
 	save_maps_general = tiles_to.GetObject();
@@ -274,11 +276,12 @@ void Heroes::MoveStep(void)
 	path.PopFront();
 
 	sprite_index -= 8;
-	return;
+        return didMove;
     }
 
 
     ++sprite_index;
+    return didMove;
 }
 
 void Heroes::AngleStep(const Direction::vector_t to_direct)

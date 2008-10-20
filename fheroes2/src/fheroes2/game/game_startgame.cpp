@@ -743,7 +743,7 @@ Game::menu_t Game::HumanTurn(bool message)
 
     u32 ticket = 0;
 
-    bool change_settings = false;
+    bool update_audio = false;
 
     Button &buttonScrollHeroesUp = *_buttonScrollHeroesUp;
     Button &buttonScrollCastleUp = *_buttonScrollCastleUp;
@@ -1435,15 +1435,14 @@ Game::menu_t Game::HumanTurn(bool message)
 		Mixer::Reduce();
 
 		// Change and save system settings
-		change_settings = Dialog::SystemOptions();
+		Dialog::SystemOptions();
 
 		const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
 		const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
 
 		Mixer::Volume(-1, vol1);
 		Music::Volume(vol2);
-                //Force a recalculation of all current loops
-                Game::EnvironmentSoundMixer(true);
+                update_audio = true;
 
 		Mixer::Enhance();
 	    }
@@ -1483,8 +1482,8 @@ Game::menu_t Game::HumanTurn(bool message)
 	}
 
 	// mix all sound from focus
-	Game::EnvironmentSoundMixer(change_settings);
-	change_settings = false;
+	Game::EnvironmentSoundMixer(update_audio);
+	update_audio = false;
 
         // animation
         if(Game::ShouldAnimate(ticket))
@@ -1510,7 +1509,9 @@ Game::menu_t Game::HumanTurn(bool message)
 		    else
 		    // move
 		    {
-			heroes.MoveStep();
+                        //In case of exiting a battle, we want the music to return to normal
+			if(heroes.MoveStep())
+                            update_audio = true;
 		    }
 
 		    if(heroes.GetCenter() != global_focus.Center())
