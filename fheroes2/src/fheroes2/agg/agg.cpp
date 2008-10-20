@@ -32,6 +32,8 @@
 
 #define FATSIZENAME	15
 
+char *basename(const char *path);
+
 /*AGG::File constructor */
 AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), count_items(0), stream(NULL)
 {
