@@ -279,7 +279,7 @@ Skill::Secondary::skill_t Skill::Secondary::FromMP2(const u8 byte)
 
 Skill::Secondary::skill_t Skill::Secondary::RandForWitchsHut(void)
 {
-    switch(Rand::Get(13))
+    switch(Rand::Get(11))
     {
 	case 0:		return PATHFINDING;
         case 1:		return ARCHERY;
