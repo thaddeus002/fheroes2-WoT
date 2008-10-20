@@ -241,6 +241,8 @@ void Mixer::Init(void)
 	    Mix_AllocateChannels(CHANNEL_RESERVED + CHANNEL_FREE);
     	    Mix_ReserveChannels(CHANNEL_RESERVED);
 	    Mix_ChannelFinished(FreeChunk);
+            
+            valid = true;
 	}
     }
     else
