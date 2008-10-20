@@ -287,14 +287,12 @@ Skill::Secondary::skill_t Skill::Secondary::RandForWitchsHut(void)
         case 3:		return SCOUTING;
         case 4:		return DIPLOMACY;
         case 5:		return NAVIGATION;
-        case 6:		return LEADERSHIP;
-        case 7:		return WISDOM;
-        case 8:		return MYSTICISM;
-        case 9:		return LUCK;
-        case 10:	return BALLISTICS;
-        case 11:	return EAGLEEYE;
-        case 12:	return NECROMANCY;	// FIXME: check Witch's Hut and necromancy skill ???
-        case 13:	return ESTATES;
+        case 6:		return WISDOM;
+        case 7:		return MYSTICISM;
+        case 8:		return LUCK;
+        case 9:		return BALLISTICS;
+        case 10:	return EAGLEEYE;
+        case 11:	return ESTATES;
 
         default: break;
     }
