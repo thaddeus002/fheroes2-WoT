@@ -47,6 +47,9 @@ namespace Cdrom
     void Close(void);
     
     static SDL_CD *cd		= NULL;
+    static int currentTrack     = -1;
+    static int startTime        = 0;
+    static int tickLength;
 }
 
 Audio::Spec::Spec()
@@ -146,14 +149,22 @@ void Cdrom::Play(const u8 track)
 {
     if(Mixer::valid && cd)
     {
-	if(SDL_CDPlayTracks(cd, track - 1, 0, 1, 0) < 0)
-    	    Error::Verbose("Couldn't play track ", track);
+        if(currentTrack != track
+        ||(startTime && SDL_GetTicks() - startTime > tickLength))
+        {
+            if(SDL_CDPlayTracks(cd, track - 1, 0, 1, 0) < 0)
+                Error::Verbose("Couldn't play track ", track);
+            
+            currentTrack = track;
+            tickLength = (cd->track[track].length / CD_FPS) * 0.01f;
+            startTime = SDL_GetTicks();
 
-	if(SDL_CDStatus(cd) != CD_PLAYING)
-	{
-    	    Error::Warning("CD is not playing");
-    	    Error::Warning(SDL_GetError());
-	}
+            if(SDL_CDStatus(cd) != CD_PLAYING)
+            {
+                Error::Warning("CD is not playing");
+                Error::Warning(SDL_GetError());
+            }
+        }
     }
 }
 
