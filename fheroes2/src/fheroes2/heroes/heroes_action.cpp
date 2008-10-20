@@ -944,7 +944,11 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-    const Sprite & sprite = AGG::GetICN(ICN::ARTIFACT, art);
+    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+    Surface sprite(border.w(), border.h());
+
+    sprite.Blit(border);
+    sprite.Blit(AGG::GetICN(ICN::ARTIFACT, art), 5, 5);
 
     switch(tile.GetObject())
     {
