@@ -248,6 +248,8 @@ void Heroes::ActionToMonster(const u16 dst_index)
     std::vector<Army::Troops> army;
     int tr_c = count > 5 ? 5 : count;
 
+    ApplyPenaltyMovement();
+
     for(int i=0; i< tr_c; i++)
     {
 	Army::Troops troop(monster, (int)(count/tr_c));
@@ -308,6 +310,8 @@ void Heroes::ActionToHeroes(const u16 dst_index)
 
     if(! other_hero) return;
 
+    ApplyPenaltyMovement();
+
     if(color == other_hero->GetColor())
     {
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: " + GetName() + " meeting " + other_hero->GetName());
@@ -337,6 +341,8 @@ void Heroes::ActionToCastle(const u16 dst_index)
     const Castle *castle = world.GetCastle(dst_index);
 
     if(! castle) return;
+
+    ApplyPenaltyMovement();
 
     if(color == castle->GetColor())
     {
@@ -423,6 +429,7 @@ void Heroes::ActionToPickupResource(const u16 dst_index)
 	default: break;
     }
 
+    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -471,6 +478,7 @@ void Heroes::ActionToResource(const u16 dst_index)
 	default: break;
     }
 
+    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -538,6 +546,7 @@ void Heroes::ActionToFlotSam(const u16 dst_index)
     else
 	body = "You search through the flotsam, but find nothing.";
 
+    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -986,6 +995,8 @@ void Heroes::ActionToArtifact(const u16 dst_index)
 
 	default: break;
     }
+
+    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -1001,6 +1012,7 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
+    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -1109,6 +1121,8 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
     const u32 count = Rand::Get(2, 4);
     const u32 army_size = GetCountArmy();
 
+    ApplyPenaltyMovement();
+
     if(((HEROESMAXARMY == army_size && HasMonster(Monster::GENIE)) || HEROESMAXARMY > army_size))
     {
 	const std::string message("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?");
@@ -1166,6 +1180,7 @@ void Heroes::ActionToTeleports(const u16 index_from)
 
     save_maps_general = MP2::OBJ_STONELIGHTS;
     tiles_to.SetObject(MP2::OBJ_HEROES);
+    ApplyPenaltyMovement();
 }
 
 /* capture color object */

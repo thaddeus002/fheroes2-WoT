@@ -659,49 +659,65 @@ u16 Heroes::GetMaxSpellPoints(void) const
 
 u16 Heroes::GetMaxMovePoints(void) const
 {
-    u16 point = DEFAULT_MOVE_POINTS * 100;
+    u16 point = 0;
 
-    // skill logistics
-    switch(GetLevelSkill(Skill::Secondary::LOGISTICS))
-    {
-	// bonus: 10%
-	case Skill::Level::BASIC:       point += (point * 10) / 100; break;
-        // bonus: 20%
-        case Skill::Level::ADVANCED:    point += (point * 20) / 100; break;
-        // bonus: 30%
-        case Skill::Level::EXPERT:      point += (point * 30) / 100; break;
-
-        default: break;
-    }
-
+    // start point
     if(isShipMaster())
     {
+	point = 1500;
+
 	switch(GetLevelSkill(Skill::Secondary::NAVIGATION))
 	{
-	    // bonus: 1/3
-	    case Skill::Level::BASIC:       point += point / 3; break;
-    	    // bonus: 2/3
-    	    case Skill::Level::ADVANCED:    point += (point * 2) / 3; break;
-    	    // bonus: double
-    	    case Skill::Level::EXPERT:      point *= 2; break;
+	    case Skill::Level::BASIC:       point += 450; break;
+    	    case Skill::Level::ADVANCED:    point += 950; break;
+    	    case Skill::Level::EXPERT:      point += 1500; break;
 
     	    default: break;
 	}
 
-        // artifact bonus: FIXME: SAILORS_ASTROLABE_MOBILITY 20% ?
-        if(HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY)) point += (point * 20) / 100;
+	// artifact bonus
+        if(HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY)) point += 1000;
+
+        // visited object
+        if(isVisited(MP2::OBJ_LIGHTHOUSE)) point += 500;
     }
     else
     {
-        // artifact bonus: FIXME: NOMAD_BOOTS_MOBILITY 20% ?
-	if(HasArtifact(Artifact::NOMAD_BOOTS_MOBILITY)) point += (point * 20) / 100;
+    	switch(GetSlowestArmySpeed())
+	{
+	    case Speed::CRAWLING:
+	    case Speed::VERYSLOW:	point = 1000; break;
+	    case Speed::SLOW:		point = 1100; break;
+	    case Speed::AVERAGE:	point = 1200; break;
+	    case Speed::FAST:		point = 1300; break;
+	    case Speed::VERYFAST:	point = 1400; break;
+	    case Speed::ULTRAFAST:
+	    case Speed::BLAZING:
+	    case Speed::INSTANT:	point = 1500; break;
+	}
 
-        // artifact bonus: FIXME: TRAVELER_BOOTS_MOBILITY 20% ?
-	if(HasArtifact(Artifact::TRAVELER_BOOTS_MOBILITY)) point += (point * 20) / 100;
+	// skill logistics
+	switch(GetLevelSkill(Skill::Secondary::LOGISTICS))
+	{
+	    // bonus: 10%
+	    case Skill::Level::BASIC:       point += point * 10 / 100; break;
+    	    // bonus: 20%
+    	    case Skill::Level::ADVANCED:    point += point * 20 / 100; break;
+    	    // bonus: 29%
+    	    case Skill::Level::EXPERT:      point += point * 29 / 100; break;
+
+	    default: break;
+	}
+
+	// artifact bonus
+	if(HasArtifact(Artifact::NOMAD_BOOTS_MOBILITY)) point += 600;
+	if(HasArtifact(Artifact::TRAVELER_BOOTS_MOBILITY)) point += 300;
+
+        // visited object
+        if(isVisited(MP2::OBJ_STABLES)) point += 500;
     }
 
-    // artifact bonus: FIXME: TRUE_COMPASS_MOBILITY 20% ?
-    if(HasArtifact(Artifact::TRUE_COMPASS_MOBILITY)) point += (point * 20) / 100;
+    if(HasArtifact(Artifact::TRUE_COMPASS_MOBILITY)) point += 500;
 
     return point;
 }
