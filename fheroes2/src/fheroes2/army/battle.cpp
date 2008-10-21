@@ -180,7 +180,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 		goodmorale = false;
 		if(Monster::GetStats(army1[i].Monster()).speed == cursp && army1[i].Count() > 0 && !BadMorale(hero1, army1[i])) do {
 		    battle_t s;
-		    if(hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::Human && !O_AUTO) {
+		    if(hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::LOCAL && !O_AUTO) {
 			s = HumanTurn(hero1, hero2, army1, army2, tile, i, move, attack);
 			if( s == RETREAT || s == SURRENDER)
                         {
@@ -217,7 +217,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 		goodmorale = false;
 		if(Monster::GetStats(army2[i].Monster()).speed == cursp && army2[i].Count() > 0 && !BadMorale(hero2, army2[i])) do {
 		    battle_t s;
-		    if(hero2 && world.GetKingdom(hero2->GetColor()).Control() == Game::Human && !O_AUTO) {
+		    if(hero2 && world.GetKingdom(hero2->GetColor()).Control() == Game::LOCAL && !O_AUTO) {
 			s = HumanTurn(hero1, hero2, army1, army2, tile, -i-1, move, attack);
 			if(s == RETREAT || s == SURRENDER)
                         {

@@ -93,12 +93,12 @@ Game::menu_t Game::StartGame(void)
     {
         for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) 
             if(color & conf.Players())
-                world.GetKingdom(color).SetControl(Game::Human);
+                world.GetKingdom(color).SetControl(LOCAL);
     }
     else
     {
         // single player
-        world.GetKingdom(conf.MyColor()).SetControl(Game::Human);
+        world.GetKingdom(conf.MyColor()).SetControl(LOCAL);
     }
     conf.SetGameType(Game::UNKNOWN);
 
@@ -227,7 +227,7 @@ Game::menu_t Game::StartGame(void)
     Game::menu_t m = ENDTURN;
     int humans = 0;
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(world.GetKingdom(color).isPlay() && world.GetKingdom(color).Control() == Game::Human) 
+	if(world.GetKingdom(color).isPlay() && world.GetKingdom(color).Control() == LOCAL) 
 	    humans ++;
 
     while(1)
@@ -242,7 +242,7 @@ Game::menu_t Game::StartGame(void)
 
 		switch(kingdom.Control())
 		{
-	        case Game::Human:
+	        case LOCAL:
 		    Mixer::Enhance();
 		    conf.SetMyColor(color);
 		    radar.RedrawArea(color);
@@ -256,7 +256,7 @@ Game::menu_t Game::StartGame(void)
 
 		    if(m != ENDTURN) goto OUTDOOR;
 		    break;
-	        case Game::Network:
+	        case REMOTE:
 		    cursor.SetThemes(Cursor::WAIT);
 		    cursor.Show();
 	            display.Flip();
@@ -265,7 +265,7 @@ Game::menu_t Game::StartGame(void)
 		    cursor.Hide();
 	            // TODO network game
 		    break;
-	        case Game::AI:
+	        case AI:
 		    cursor.SetThemes(Cursor::WAIT);
 		    cursor.Show();
 	            display.Flip();
