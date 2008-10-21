@@ -27,7 +27,7 @@
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(ANIMATION | SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), sound_volume(6), music_volume(6),
-    animation_speed(10), hotseat(false), players(Color::BLUE)
+    animation_speed(10), game(0), players(Color::BLUE)
 {
 }
 
@@ -393,4 +393,16 @@ void Settings::SetMusicVolume(const u8 v)
 void Settings::SetAnimationSpeed(const u8 s)
 {
     animation_speed = 10 <= s ? 10 : (s ? s : 1);
+}
+
+/* check game type */
+u8 Settings::GameType(void) const
+{
+    return game;
+}
+
+/* set game type */
+void Settings::SetGameType(const Game::type_t type)
+{
+    game = type;
 }

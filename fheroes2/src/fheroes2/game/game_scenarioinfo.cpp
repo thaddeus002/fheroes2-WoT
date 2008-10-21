@@ -185,7 +185,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		le.MouseClickLeft(coordColors[Color::GetIndex(color)]))
 	{
 	    cursor.Hide();
-	    if(conf.HotSeat()) 
+	    if(Game::HOTSEAT == conf.GameType()) 
 	        if(conf.Players() & color)
 	            conf.SetPlayers(conf.Players() & ~color);
 	        else
@@ -254,8 +254,9 @@ Game::menu_t Game::ScenarioInfo(void)
 	}
 
 	// click cancel
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) {
-	    Settings::Get().SetHotSeat(false);
+	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
+	{
+	    Settings::Get().SetGameType(Game::UNKNOWN);
 	    return MAINMENU;
 	}
 

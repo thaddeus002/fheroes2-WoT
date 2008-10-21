@@ -21,13 +21,16 @@
 #include "agg.h"
 #include "cursor.h"
 #include "sprite.h"
-#include "localevent.h"
+#include "engine.h"
 #include "button.h"
 #include "display.h"
+#include "settings.h"
 #include "game.h"
 
 Game::menu_t Game::LoadStandard(void)
 {
+    Settings::Get().SetGameType(Game::STANDARD);
+
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::REQBKG);

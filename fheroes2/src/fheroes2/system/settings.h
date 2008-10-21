@@ -101,8 +101,8 @@ public:
     void SetMusicVolume(const u8 v);
     void SetAnimationSpeed(const u8 s);
     
-    bool HotSeat(void) const { return hotseat; };
-    void SetHotSeat(const bool h) { hotseat = h; };
+    u8   GameType(void) const;
+    void SetGameType(const Game::type_t type);
     u8   Players(void) const { return players; };
     void SetPlayers(u8 pl) { players = pl; };
 
@@ -135,7 +135,7 @@ private:
     u8 music_volume;
     u8 animation_speed;
 
-    bool hotseat;
+    u8   game;
     u8   players;
 };
 

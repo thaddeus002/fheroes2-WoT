@@ -56,6 +56,7 @@ namespace Game
 	ENDTURN
     } menu_t;
 
+    typedef enum { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK } type_t;
     typedef enum { Human=0, Network, AI } control_t;
 
     menu_t MainMenu(void);

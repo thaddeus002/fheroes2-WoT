@@ -89,15 +89,18 @@ Game::menu_t Game::StartGame(void)
     // preload sounds
     Game::PreloadLOOPSounds();
 
-    if(conf.HotSeat()) {
+    if(Game::HOTSEAT == conf.GameType())
+    {
         for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) 
             if(color & conf.Players())
                 world.GetKingdom(color).SetControl(Game::Human);
-    } else {
+    }
+    else
+    {
         // single player
         world.GetKingdom(conf.MyColor()).SetControl(Game::Human);
     }
-    conf.SetHotSeat(false);
+    conf.SetGameType(Game::UNKNOWN);
 
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();

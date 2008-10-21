@@ -33,17 +33,12 @@
 #include "agg.h"
 #include "game.h"
 
-Game::menu_t Game::NewStandard(void){ return Game::SCENARIOINFO; }
-Game::menu_t Game::NewHotSeat(void)
-{ 
-	Settings::Get().SetHotSeat(true);
-	return Game::SCENARIOINFO; 
-}
-
+Game::menu_t Game::NewStandard(void){ Settings::Get().SetGameType(Game::STANDARD); return Game::SCENARIOINFO; }
+Game::menu_t Game::NewHotSeat(void){ Settings::Get().SetGameType(Game::HOTSEAT); return Game::SCENARIOINFO; }
 Game::menu_t Game::Credits(void){ Error::Verbose("Credits: under construction."); return Game::MAINMENU; }
-Game::menu_t Game::NewCampain(void){ Error::Verbose("New Campain Game: under construction."); return Game::NEWGAME; }
-Game::menu_t Game::NewNetwork(void){ Error::Verbose("New Network Game: under construction."); return Game::NEWMULTI; }
-Game::menu_t Game::LoadCampain(void){ Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
+Game::menu_t Game::NewCampain(void){ Settings::Get().SetGameType(Game::CAMPAIGN); Error::Verbose("New Campain Game: under construction."); return Game::NEWGAME; }
+Game::menu_t Game::NewNetwork(void){ Settings::Get().SetGameType(Game::NETWORK); Error::Verbose("New Network Game: under construction."); return Game::NEWMULTI; }
+Game::menu_t Game::LoadCampain(void){ Settings::Get().SetGameType(Game::CAMPAIGN); Error::Verbose("Load Campain Game: under construction."); return Game::LOADGAME; }
 Game::menu_t Game::LoadMulti(void){ Error::Verbose("Load Multi Game: under construction."); return Game::LOADGAME; }
 
 void Game::SetFixVideoMode(void)
