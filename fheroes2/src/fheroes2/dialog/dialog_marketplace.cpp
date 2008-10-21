@@ -402,7 +402,7 @@ void Dialog::Marketplace(void)
 	}
 
 	// move splitter
-        if(splitter && max_buy && le.MousePressLeft(splitter->GetRect()) && le.MouseCursor(splitter->GetRect()))
+        if(splitter && max_buy && le.MousePressLeft(splitter->GetRect()))
         {
             u32 seek = (le.MouseCursor().x - splitter->GetRect().x) * 100 / splitter->GetStep();
 
