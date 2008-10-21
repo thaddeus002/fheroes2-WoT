@@ -44,6 +44,8 @@ public:
     const Rect & GetCursor(void) const{ return SpriteCursor::GetRect(); };
 
 private:
+    void Dump(void);
+
     const Rect area;
     u16 step;
     u16 min;

@@ -96,6 +96,11 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 
     // area list
     Rect rectAreaList(Rect(170, 60, 270, 175));
+
+    const Rect countPlayers(175, 65, 17, 170);
+    const Rect sizeMaps(195, 65, 17, 170);
+    const Rect victoryCond(400, 65, 17, 170);
+    const Rect lossCond(420, 65, 17, 170);
     
     // Splitter
     Splitter split(AGG::GetICN(ICN::ESCROLL, 3), Rect(460, 78, 8, 141), Splitter::VERTICAL);
@@ -242,7 +247,6 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	    it_current = it_list_head;
 	    while(num--) ++it_current;
 	    DrawSelectInfo(*it_current);
-	    split.Move(num_head + num_select);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -253,8 +257,9 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	{
 	    cursor.Hide();
 	    backgroundList.Restore();
-	    DrawList(--it_list_head);
+	    --it_list_head;
 	    --num_head;
+	    DrawList(it_list_head);
 	    split.Backward();
 	    cursor.Show();
 	    display.Flip();
@@ -266,8 +271,9 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	{
 	    cursor.Hide();
 	    backgroundList.Restore();
-	    DrawList(++it_list_head);
+	    ++it_list_head;
 	    ++num_head;
+	    DrawList(it_list_head);
 	    split.Forward();
 	    cursor.Show();
 	    display.Flip();
@@ -278,15 +284,12 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	{
 	    u16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
 	    if(seek > curmaps->size() - LISTMAXITEM) seek = curmaps->size() - LISTMAXITEM;
-
 	    it_list_head = curmaps->begin();
-	    while(seek--) ++it_list_head;
 	    cursor.Hide();
 	    backgroundList.Restore();
-	    DrawList(it_list_head, LISTMAXITEM);
-	    backgroundInfo.Restore();
-	    DrawSelectInfo(*it_current);
 	    split.Move(seek);
+	    while(seek--){ ++it_list_head; ++num_head; }
+	    DrawList(it_list_head);
 	    cursor.Show();
 	    display.Flip();
  	}
@@ -297,11 +300,11 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	if(le.MousePressRight(buttonSelectLarge)) Dialog::Message("Large Maps", "View only maps of size large (108x108).", Font::BIG);
 	if(le.MousePressRight(buttonSelectXLarge)) Dialog::Message("Extra Large Maps", "View only maps of size extra large (144x144).", Font::BIG);
 	if(le.MousePressRight(buttonSelectAll)) Dialog::Message("All Maps", "View all maps, regardless of size.", Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message("Players Icon", "Indicates how many players total are in the EditScenario. Any positions not occupied by humans will be occupied by computer players.", Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message("Size Icon", "Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144).", Font::BIG);
+	if(le.MousePressRight(countPlayers)) Dialog::Message("Players Icon", "Indicates how many players total are in the EditScenario. Any positions not occupied by humans will be occupied by computer players.", Font::BIG);
+	if(le.MousePressRight(sizeMaps)) Dialog::Message("Size Icon", "Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144).", Font::BIG);
 	//if(le.MousePressRight(?)) Dialog::Message("Selected Name", "The name of the currently selected map.", Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message("Victory Condition Icon", "There are 6 possiblities:.", Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message("Loss Condition Icon", "There are 4 possible loss conditions, as indicated by the following icons:.", Font::BIG);
+	if(le.MousePressRight(victoryCond)) Dialog::Message("Victory Condition Icon", "There are 6 possiblities: FIXME.", Font::BIG);
+	if(le.MousePressRight(lossCond)) Dialog::Message("Loss Condition Icon", "There are 4 possible loss conditions, as indicated by the following icons: FIXME.", Font::BIG);
 	//if(le.MousePressRight(?)) Dialog::Message("Selected Map Difficulty", "The map difficulty of the currently selected map.  The map difficulty is determined by the EditScenario designer. More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player.", Font::BIG);
 	//if(le.MousePressRight(?)) Dialog::Message("Selected Description", "The description of the currently selected map.", Font::BIG);
 	if(le.MousePressRight(buttonOk)) Dialog::Message("OK", "Accept the choice made.", Font::BIG);

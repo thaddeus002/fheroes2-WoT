@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include "error.h"
 #include "splitter.h"
 
@@ -47,7 +48,7 @@ void Splitter::Move(u16 pos)
 {
     if(pos && cur == pos) return;
 
-    if(pos > max || pos < min){ Error::Warning("Splitter::Move: out of range."); return; }
+    if(pos > max || pos < min){ Error::Warning("Splitter::Move: out of range."); Dump(); return; }
 
     Point pt(GetRect().x, GetRect().y);
 
@@ -102,4 +103,9 @@ void Splitter::Backward(void)
     SpriteCursor::Hide();
     SpriteCursor::Move(pt);
     SpriteCursor::Show();
+}
+
+void Splitter::Dump(void)
+{
+    std::cout << "Splitter::Dump min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step << std::endl;
 }
