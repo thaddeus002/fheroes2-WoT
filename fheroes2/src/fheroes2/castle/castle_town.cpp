@@ -333,29 +333,41 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
     bool allowBuyBuilding = castle.AllowBuyBuilding(build);
 
     PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), build);
-                
-    // indicator
-    dst_pt.x = pt.x + 115;
-    dst_pt.y = pt.y + 40;
-    if(castle.isBuild(build)) display.Blit(sprite_allow, dst_pt);
-    else
-    if(! allowBuyBuilding)
-	(1 == paymentBuild.GetValidItems() && paymentBuild.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
 
-    // status bar
-    if(!castle.isBuild(build))
+    if(Castle::BUILD_CAPTAIN & build)
     {
-	dst_pt.x = pt.x - 1;
-	dst_pt.y = pt.y + 57;
-	display.Blit(AGG::GetICN(ICN::CASLXTRA, allowBuyBuilding ? 1 : 2), dst_pt);
+	// indicator
+	dst_pt.x = pt.x + 65;
+	dst_pt.y = pt.y + 60;
+	if(castle.isBuild(build)) display.Blit(sprite_allow, dst_pt);
+	else
+	if(! allowBuyBuilding)
+	    (1 == paymentBuild.GetValidItems() && paymentBuild.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
     }
+    else
+    {
+	// indicator
+	dst_pt.x = pt.x + 115;
+	dst_pt.y = pt.y + 40;
+	if(castle.isBuild(build)) display.Blit(sprite_allow, dst_pt);
+	else
+	if(! allowBuyBuilding)
+	    (1 == paymentBuild.GetValidItems() && paymentBuild.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
 
-    // name
-    const std::string & stringBuilding = Castle::GetStringBuilding(build, castle.GetRace());
-    dst_pt.x = pt.x + 68 - Text::width(stringBuilding, Font::SMALL) / 2;
-    dst_pt.y = pt.y + 58;
-    Text(stringBuilding, Font::SMALL, dst_pt);
+	// status bar
+	if(!castle.isBuild(build))
+	{
+	    dst_pt.x = pt.x - 1;
+	    dst_pt.y = pt.y + 57;
+	    display.Blit(AGG::GetICN(ICN::CASLXTRA, allowBuyBuilding ? 1 : 2), dst_pt);
+	}
 
+	// name
+	const std::string & stringBuilding = Castle::GetStringBuilding(build, castle.GetRace());
+        dst_pt.x = pt.x + 68 - Text::width(stringBuilding, Font::SMALL) / 2;
+	dst_pt.y = pt.y + 58;
+	Text(stringBuilding, Font::SMALL, dst_pt);
+    }
 }
 
 Castle::building_t Castle::OpenTown(void)
@@ -652,6 +664,8 @@ Castle::building_t Castle::OpenTown(void)
     const Rect rectCaptain(dst_pt, AGG::GetICN(icn, index).w(), AGG::GetICN(icn, index).h());
     bool allowBuyBuildCaptain = AllowBuyBuilding(BUILD_CAPTAIN);
     const std::string & stringCaptain = GetStringBuilding(BUILD_CAPTAIN, race);
+    RedrawInfoDwelling(dst_pt, *this, BUILD_CAPTAIN);
+
     const Sprite & spriteSpreadArmyFormat = AGG::GetICN(ICN::HSICONS, 9);
     const Sprite & spriteGroupedArmyFormat = AGG::GetICN(ICN::HSICONS, 10);
     const Rect rectSpreadArmyFormat(cur_pt.x + 550, cur_pt.y + 220, spriteSpreadArmyFormat.w(), spriteSpreadArmyFormat.h());
