@@ -1518,3 +1518,25 @@ bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
 
     return false;
 }
+
+Speed::speed_t Heroes::GetSlowestArmySpeed(void) const
+{
+    std::vector<Army::Troops>::const_iterator it1 = army.begin();
+    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    Speed::speed_t result = Speed::INSTANT;
+    
+    for(; it1 != it2; ++it1) if(result > Monster::GetStats((*it1).Monster()).speed) result = Monster::GetStats((*it1).Monster()).speed;
+    
+    return result;
+}
+
+Speed::speed_t Heroes::GetHighestArmySpeed(void) const
+{
+    std::vector<Army::Troops>::const_iterator it1 = army.begin();
+    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    Speed::speed_t result = Speed::CRAWLING;
+    
+    for(; it1 != it2; ++it1) if(result < Monster::GetStats((*it1).Monster()).speed) result = Monster::GetStats((*it1).Monster()).speed;
+    
+    return result;
+}

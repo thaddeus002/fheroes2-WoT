@@ -117,10 +117,13 @@ public:
     Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
     const Point & GetCenter(void) const{ return mp; };
+
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
     bool HasMonster(const Monster::monster_t mon) const;
-
+    Speed::speed_t GetSlowestArmySpeed(void) const;
+    Speed::speed_t GetHighestArmySpeed(void) const;
     u8 GetCountArmy(void) const;
+
     const Spell::Book & SpellBook(void) const { return spell_book; };
 
     u8 GetAttack(void) const;
