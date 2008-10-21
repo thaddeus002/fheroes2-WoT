@@ -369,43 +369,41 @@ void Game::OpenHeroes(Heroes *hero)
     Mixer::Reduce();
 
     Cursor & cursor = Cursor::Get();
-    const Kingdom & myKingdom = world.GetMyKingdom();
-    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
-    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
+    const std::vector<Heroes *> & myHeroes = world.GetMyKingdom().GetHeroes();
 
     Dialog::answer_t result = Dialog::ZERO;
+    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
 
     while(Dialog::CANCEL != result)
     {
-	FocusToHeroes(hero);
+	FocusToHeroes(*it);
 
 	Display::Get().Flip();
 	cursor.Hide();
 	Display::Get().Fade();
 
-	result = hero->OpenDialog();
-
-	const u32 cursor_index = selectHeroes.GetCursorIndex();
+	result = (*it)->OpenDialog();
 
 	switch(result)
 	{
 	    case Dialog::PREV:
-		hero = cursor_index ? myHeroes.at(cursor_index - 1) : myHeroes.back();
+                if(it == myHeroes.begin()) it = myHeroes.end();
+                --it;
 		break;
 	
 	    case Dialog::NEXT:
-		hero = myHeroes.size() == cursor_index + 1 ? myHeroes.front() : myHeroes.at(cursor_index + 1);
+                ++it;
+                if(it == myHeroes.end()) it = myHeroes.begin();
 		break;
-	
+
 	    case Dialog::DISMISS:
 	    {
-		//Error::Verbose("Game::OpenHeroes: FIXME dismiss hero.");
 		Kingdom & kingdom = world.GetMyKingdom();
-		Maps::Tiles & to_remove = world.GetTiles((*hero).GetCenter());
+		Maps::Tiles & to_remove = world.GetTiles((**it).GetCenter());
 
-	        to_remove.SetObject((*hero).GetUnderObject());
-		kingdom.RemoveHeroes(hero);
-		(*hero).SetFreeman();
+	        to_remove.SetObject((**it).GetUnderObject());
+		kingdom.RemoveHeroes(*it);
+		(**it).SetFreeman();
 
 		AGG::PlaySound(M82::KILLFADE);
 

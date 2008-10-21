@@ -39,6 +39,7 @@
 #include "error.h"
 #include "portrait.h"
 #include "dialog.h"
+#include "game_selectfocus.h"
 
 void Castle::RedrawNameTown(const Point & src_pt)
 {
@@ -659,9 +660,35 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// view hero
 	if(castle_heroes && selectHeroesTroops && le.MouseClickLeft(rectHeroPortrait))
 	{
-	    (*const_cast<Heroes *>(castle_heroes)).OpenDialog();
+	    const std::vector<Heroes *> & myHeroes = world.GetMyKingdom().GetHeroes();
+	    Dialog::answer_t result = Dialog::ZERO;
+	    
+	    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), castle_heroes);
 
-	    // FIXME check return value: next hero, prev hero
+	    while(Dialog::CANCEL != result)
+	    {
+	        Display::Get().Flip();
+	        cursor.Hide();
+	        Display::Get().Fade();
+
+                result = (*it)->OpenDialog();
+
+		switch(result)
+        	{
+            	    case Dialog::PREV:
+            		if(it == myHeroes.begin()) it = myHeroes.end();
+            		--it;
+            		break;
+
+            	    case Dialog::NEXT:
+            		++it;
+            		if(it == myHeroes.end()) it = myHeroes.begin();
+            		break;
+
+            	    default: break;
+		}
+		cursor.Show();
+	    }
 
 	    cursor.Hide();
 	    selectHeroesTroops->Reset();
