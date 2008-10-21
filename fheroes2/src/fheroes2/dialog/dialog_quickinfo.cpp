@@ -133,12 +133,18 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
         default: break;
     }
 
-    u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(name_object, Font::SMALL)) / 2;
-    u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(name_object, Font::SMALL)) / 2;
-    Text(name_object, Font::SMALL, tx, ty);
-
-    if(visit_status.size())
+    if(visit_status.empty())
     {
+	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(name_object, Font::SMALL)) / 2;
+	u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(name_object, Font::SMALL)) / 2;
+	Text(name_object, Font::SMALL, tx, ty);
+    }
+    else
+    {
+    	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(name_object, Font::SMALL)) / 2;
+	u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(name_object, Font::SMALL)) / 2 - 7;
+	Text(name_object, Font::SMALL, tx, ty);
+
 	tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(visit_status, Font::SMALL)) / 2;
 	ty += 15;
 	Text(visit_status, Font::SMALL, tx, ty);
