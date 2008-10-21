@@ -91,7 +91,7 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
             sf.SetAlpha(alpha);
 	    display.Blit(sf, dstx, dsty);
 	    tile.RedrawTop();
-	    if(Game::Focus::HEROES == Game::Focus::Get().Type()) Game::Focus::Get().GetHeroes().Redraw();
+	    if(Game::Focus::HEROES == Game::Focus::Get().Type()) Game::Focus::Get().GetHeroes().Redraw(false);
             cursor.Show();
             display.Flip();
             alpha -= 10;

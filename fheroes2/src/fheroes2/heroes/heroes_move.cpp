@@ -197,7 +197,7 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
     return false;
 }
 
-void Heroes::Redraw(void) const
+void Heroes::Redraw(bool with_shadow) const
 {
     Display & display = Display::Get();
 
@@ -261,7 +261,7 @@ void Heroes::Redraw(void) const
     display.Blit(sprite2, src_rt2, dst_pt2);
     
     // redraw sprites for shadow
-    display.Blit(sprite3, src_rt3, dst_pt3);
+    if(with_shadow) display.Blit(sprite3, src_rt3, dst_pt3);
 }
 
 bool Heroes::MoveStep(void)

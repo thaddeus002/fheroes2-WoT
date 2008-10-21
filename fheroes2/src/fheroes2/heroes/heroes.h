@@ -185,7 +185,7 @@ public:
 
     void AngleStep(const Direction::vector_t to_direct);
     bool MoveStep(void);
-    void Redraw(void) const;
+    void Redraw(bool with_shadow = true) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; };
 
     void PlayWalkSound(void) const;
