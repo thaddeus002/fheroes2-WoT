@@ -957,7 +957,7 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     Surface sprite(border.w(), border.h());
 
     sprite.Blit(border);
-    sprite.Blit(AGG::GetICN(ICN::ARTIFACT, art), 5, 5);
+    sprite.Blit(AGG::GetICN(ICN::ARTIFACT, art + 1), 5, 5);
 
     switch(tile.GetObject())
     {
