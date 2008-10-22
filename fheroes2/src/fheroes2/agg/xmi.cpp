@@ -57,12 +57,13 @@ XMI::xmi_t XMI::FromMUS(const MUS::mus_t mus)
         case MUS::BATTLE1:	return MIDI0002;
         case MUS::BATTLE2:	return MIDI0003;
         case MUS::BATTLE3:	return MIDI0004;
-        case MUS::BARBARIAN:	return MIDI0005;
-        case MUS::SORCERESS:	return MIDI0006;
-        case MUS::WARLOCK:	return MIDI0007;
+        case MUS::SORCERESS:	return MIDI0005;
+        case MUS::WARLOCK:	return MIDI0006;
+        case MUS::NECROMANCER:	return MIDI0007;
         case MUS::KNIGHT:	return MIDI0008;
-        case MUS::NECROMANCER:	return MIDI0009;
-        case MUS::WIZARD:	return MIDI0010;
+        case MUS::WIZARD:	return MIDI0009;
+        //9 and 10 are both the Wizard theme?
+        //case MUS::BARBARIAN:	return MIDI0010;
         case MUS::LAVA:		return MIDI0011;
         case MUS::DESERT:	return MIDI0013;
         case MUS::SNOW:		return MIDI0014;
@@ -70,7 +71,7 @@ XMI::xmi_t XMI::FromMUS(const MUS::mus_t mus)
 	case MUS::DIRT:		return MIDI0017;
 	case MUS::GRASS:	return MIDI0018;
 	case MUS::MAINMENU:	return MIDI0042;
-	case MUS::VICTORY:	return MIDI0003;
+	case MUS::VICTORY:	return MIDI0043;
 	default: break;
     }
 
