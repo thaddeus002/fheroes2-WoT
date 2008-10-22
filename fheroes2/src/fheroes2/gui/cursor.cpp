@@ -121,9 +121,31 @@ void Cursor::SetOffset(const themes_t name)
 		offset_y = -10;
 		break;
 
+	    case Cursor::BOAT:
+	    case Cursor::BOAT2:
+	    case Cursor::BOAT3:
+	    case Cursor::BOAT4:
+	    case Cursor::REDBOAT:
+	    case Cursor::REDBOAT2:
+	    case Cursor::REDBOAT3:
+	    case Cursor::REDBOAT4:
+		offset_x = -12;
+		offset_y = -12;
+		break;
+
 	    case Cursor::CASTLE:
 		offset_x = -6;
 		offset_y = -4;
+		break;
+
+	    case Cursor::SCROLL_RIGHT:
+		offset_x = -15;
+		offset_y = 0;
+		break;
+
+	    case Cursor::SCROLL_BOTTOM:
+		offset_x = 0;
+		offset_y = -15;
 		break;
 
 	    default:
