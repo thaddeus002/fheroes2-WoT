@@ -282,12 +282,21 @@ void Settings::Parse(const std::string & left, const std::string & right)
 	    video_mode.w = String::ToInt(left2);
 	    video_mode.h = String::ToInt(right2);
 
-	    if((video_mode.w % 32) || (video_mode.h % 32) || video_mode.w < 640 || video_mode.h < 480)
+	    if((video_mode.w % TILEWIDTH) || (video_mode.h % TILEWIDTH))
 	    {
-		video_mode.w = 640;
-		video_mode.h = 480;
+		u16 possible_w = video_mode.w / TILEWIDTH;
+		u16 possible_h = video_mode.h / TILEWIDTH;
 
-	        Error::Warning("Settings: unknown video mode, use default: 640x480");
+		possible_w *= TILEWIDTH;
+		possible_h *= TILEWIDTH;
+
+		if(possible_w < 640) possible_w = 640;
+		if(possible_h < 480) possible_h = 480;
+
+		std::cout << "Settings: unknown videomode: " << video_mode.w << "x" << video_mode.h << ", approximate load: " << possible_w << "x" << possible_h << std::endl;
+
+		video_mode.w = possible_w;
+		video_mode.h = possible_h;
 	    }
 	}
 	else Error::Warning("Settings: unknown video mode: " + right);
