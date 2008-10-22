@@ -719,29 +719,50 @@ Castle::building_t Castle::OpenTown(void)
 	cursorFormat.Show(army_spread ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
+    const bool many_hero = world.GetMyKingdom().GetHeroes().size() == KINGDOMMAXHEROES;
+    const bool allow_buy_hero = AllowBuyHero();
+
     // first hero
-    const Heroes::heroes_t & hero1 = world.GetFreeRecruit1();
+    const Heroes::heroes_t & name1 = world.GetFreeRecruit1();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 260;
     const Rect rectHero1(dst_pt, 102, 93);
-    if(Heroes::UNKNOWN != hero1)
-	display.Blit(Portrait::Hero(hero1, Portrait::BIG), dst_pt);
+    Heroes *hero1 = NULL;
+    if(Heroes::UNKNOWN != name1)
+    {
+	hero1 = &world.GetHeroes(name1);
+	display.Blit(Portrait::Hero(name1, Portrait::BIG), dst_pt);
+    }
     else
 	display.FillRect(0, 0, 0, rectHero1);
-
-    Heroes heroes1 = world.GetHeroes(hero1);
+    // indicator
+    if(many_hero || !allow_buy_hero)
+    {
+	dst_pt.x += 83;
+	dst_pt.y += 75;
+	display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), dst_pt);
+    }
 
     // second hero
-    const Heroes::heroes_t & hero2 = world.GetFreeRecruit2();
+    const Heroes::heroes_t & name2 = world.GetFreeRecruit2();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 362;
     const Rect rectHero2(dst_pt, 102, 94);
-    if(Heroes::UNKNOWN != hero2)
-	display.Blit(Portrait::Hero(hero2, Portrait::BIG), dst_pt);
+    Heroes *hero2 = NULL;
+    if(Heroes::UNKNOWN != name2)
+    {
+    	hero2 = &world.GetHeroes(name2);
+	display.Blit(Portrait::Hero(name2, Portrait::BIG), dst_pt);
+    }
     else
 	display.FillRect(0, 0, 0, rectHero2);
-
-    Heroes heroes2 = world.GetHeroes(hero2);
+    // indicator
+    if(many_hero || !allow_buy_hero)
+    {
+	dst_pt.x += 83;
+	dst_pt.y += 75;
+	display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), dst_pt);
+    }
 
     // bottom bar
     dst_pt.x = cur_pt.x;
@@ -892,18 +913,18 @@ Castle::building_t Castle::OpenTown(void)
             army_spread = false;
         }
 	else
-	if(Heroes::UNKNOWN != hero1 && le.MouseClickLeft(rectHero1) &&
-	    Dialog::OK == DialogBuyHero(hero1))
+	if(Heroes::UNKNOWN != name1 && le.MouseClickLeft(rectHero1) &&
+	    Dialog::OK == DialogBuyHero(name1))
         {
-    	    RecruitHero(hero1);
+    	    RecruitHero(name1);
 
     	    return BUILD_NOTHING;
         }
 	else
-	if(Heroes::UNKNOWN != hero2 && le.MouseClickLeft(rectHero2) &&
-	    Dialog::OK == DialogBuyHero(hero2))
+	if(Heroes::UNKNOWN != name2 && le.MouseClickLeft(rectHero2) &&
+	    Dialog::OK == DialogBuyHero(name2))
         {
-    	    RecruitHero(hero2);
+    	    RecruitHero(name2);
 
 	    return BUILD_NOTHING;
         }
@@ -952,9 +973,9 @@ Castle::building_t Castle::OpenTown(void)
         else
 	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message("Grouped Formation", descriptionGroupedArmyFormat, Font::BIG);
 	else
-	if(Heroes::UNKNOWN != hero1 && le.MousePressRight(rectHero1)) heroes1.OpenDialog(true);
+	if(hero1 && le.MousePressRight(rectHero1)) hero1->OpenDialog(true);
 	else
-	if(Heroes::UNKNOWN != hero2 && le.MousePressRight(rectHero2)) heroes2.OpenDialog(true);
+	if(hero2 && le.MousePressRight(rectHero2)) hero2->OpenDialog(true);
 
         // status info
 	if(le.MouseCursor(rectDwelling1))
@@ -1056,23 +1077,23 @@ Castle::building_t Castle::OpenTown(void)
 	if(le.MouseCursor(rectCaptain))
 	    statusBar.ShowBuildMessage(BUILD_CAPTAIN & building, allowBuyBuildCaptain, stringCaptain, *this, BUILD_CAPTAIN);
 	else
-	if((Heroes::UNKNOWN != hero1 && le.MouseCursor(rectHero1)) ||
-	   (Heroes::UNKNOWN != hero2 && le.MouseCursor(rectHero2)))
+	if((hero1 && le.MouseCursor(rectHero1)) ||
+	   (hero2 && le.MouseCursor(rectHero2)))
 	{
-	    if(world.GetMyKingdom().GetHeroes().size() == KINGDOMMAXHEROES)
+	    if(many_hero)
 		statusBar.ShowMessage("Cannot recruit - you have to many Heroes.");
 	    else
 	    if(castle_heroes)
 		statusBar.ShowMessage("Cannot recruit - you already have a Hero in this town.");
 	    else
-	    if(! AllowBuyHero())
+	    if(! allow_buy_hero)
 		statusBar.ShowMessage("Cannot afford a Hero");
 	    else
 	    if(le.MouseCursor(rectHero1))
-		statusBar.ShowMessage("Recruit " + heroes1.GetName() + " the " + Race::String(heroes1.GetRace()));
+		statusBar.ShowMessage("Recruit " + hero1->GetName() + " the " + Race::String(hero1->GetRace()));
 	    else
 	    if(le.MouseCursor(rectHero2))
-		statusBar.ShowMessage("Recruit " + heroes2.GetName() + " the " + Race::String(heroes2.GetRace()));
+		statusBar.ShowMessage("Recruit " + hero2->GetName() + " the " + Race::String(hero2->GetRace()));
 	}
 	else
 	if(le.MouseCursor(rectSpreadArmyFormat))
