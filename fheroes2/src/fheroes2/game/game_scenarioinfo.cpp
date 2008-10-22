@@ -61,6 +61,7 @@ Game::menu_t Game::ScenarioInfo(void)
     Dir dir;
 
     dir.Read(conf.MapsDirectory(), ".mp2", false);
+    dir.sort();
 
     // loyality version
     if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
@@ -72,9 +73,17 @@ Game::menu_t Game::ScenarioInfo(void)
 	return MAINMENU;
     }
 
-    info_maps.resize(dir.size());
-    std::list<Maps::FileInfo>::iterator itl = info_maps.begin();
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) (*itl++).Read(*itd);
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
+    {
+	Maps::FileInfo mi;
+	mi.Read(*itd);
+	const std::bitset<8> colors(mi.AllowColors());
+	
+	// multi map filter
+	if(Game::MULTI & conf.GameType() && 2 > colors.count()) continue;
+
+	info_maps.push_back(mi);
+    }
 
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -91,17 +100,9 @@ Game::menu_t Game::ScenarioInfo(void)
     Display & display = Display::Get();
     display.SetVideoMode(640, 480);
 
-    // vector coord colors opponent
-    std::vector<Rect> coordColors(KINGDOMMAX);
-
-    // vector coord class
-    std::vector<Rect> coordClass(KINGDOMMAX);
-
     // set first maps settings
     conf.LoadFileMaps(info_maps.front().FileMaps());
 
-    Scenario::DrawInfo(coordColors, coordClass);
-    Scenario::RedrawOpponentColors(coordColors);
 
     Button buttonSelectMaps(513, 77, ICN::NGEXTRA, 64, 65);
     Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
@@ -113,13 +114,26 @@ Game::menu_t Game::ScenarioInfo(void)
     levelCursor.Show(pointDifficultyNormal);
     conf.SetGameDifficulty(Difficulty::NORMAL);
 
-    u8 rnd_color = Scenario::GetAllowChangeRaces(conf.FileInfo());
-
     const Rect rectDifficultyEs(225, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyNr(pointDifficultyNormal.x, pointDifficultyNormal.y, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyHd(378, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
+
+    // vector coord colors opponent
+    std::vector<Rect> coordColors(KINGDOMMAX);
+    // vector coord class
+    std::vector<Rect> coordClass(KINGDOMMAX);
+
+    // first allow color
+    conf.SetPlayers(0);
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	if(color & conf.FileInfo().AllowColors()){ conf.SetPlayers(color); conf.SetMyColor(color); break; }
+
+    Scenario::DrawInfo(coordColors, coordClass);
+    Scenario::RedrawOpponentColors(coordColors);
+
+    u8 rnd_color = Scenario::GetAllowChangeRaces(conf.FileInfo());
 
     buttonSelectMaps.Draw();
     buttonOk.Draw();
@@ -185,14 +199,18 @@ Game::menu_t Game::ScenarioInfo(void)
 		le.MouseClickLeft(coordColors[Color::GetIndex(color)]))
 	{
 	    cursor.Hide();
-	    if(Game::HOTSEAT == conf.GameType()) 
-	        if(conf.Players() & color)
-	            conf.SetPlayers(conf.Players() & ~color);
-	        else
-	            conf.SetPlayers(conf.Players() | color);
-	    else {
-	        conf.SetPlayers(color);
-	        conf.SetMyColor(color);
+	    const u8 players = conf.Players();
+	    switch(conf.GameType())
+	    {
+		//case Game::NETWORK:
+		case Game::HOTSEAT:
+	    	    conf.SetPlayers(players & color ? players & ~color : players | color);
+		    break;
+		default:
+		    conf.SetPlayers(0);
+	    	    conf.SetPlayers(color);
+		    conf.SetMyColor(color);
+	    	    break;
 	    }
 	    Scenario::RedrawOpponentColors(coordColors);
 	    cursor.Show();
@@ -234,16 +252,11 @@ Game::menu_t Game::ScenarioInfo(void)
 	    Dialog::SelectFileInfo(info_maps);
 	    cursor.Hide();
 	    levelCursor.Hide();
-	    conf.SetPlayers(0);  
+	    // set first allow color
+	    conf.SetPlayers(0);
 	    for(Color::color_t col = Color::BLUE; col < Color::GRAY; ++col)
-	    {
-		if(conf.FileInfo().AllowColors() & col)
-		{
-		    conf.SetPlayers(col);
-		    conf.SetMyColor(col);
-		    break;
-		}
-	    }
+		if(conf.FileInfo().AllowColors() & col){ conf.SetPlayers(col); conf.SetMyColor(col); break; }
+
 	    Scenario::DrawInfo(coordColors, coordClass);
 	    Scenario::RedrawOpponentColors(coordColors);
 	    levelCursor.Move(pointDifficultyNormal);

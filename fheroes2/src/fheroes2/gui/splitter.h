@@ -40,6 +40,8 @@ public:
 
     u16 GetCurrent(void) const{ return cur; };
     u16 GetStep(void) const{ return step; };
+    u16 Max(void) const{ return max; };
+    u16 Min(void) const{ return min; };
     const Rect & GetRect(void) const{ return area; };
     const Rect & GetCursor(void) const{ return SpriteCursor::GetRect(); };
 

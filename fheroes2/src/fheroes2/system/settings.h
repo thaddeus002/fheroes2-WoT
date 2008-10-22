@@ -71,7 +71,6 @@ public:
     const std::string & MapsDirectory(void) const;
 
     Difficulty::difficulty_t GameDifficulty(void) const;
-    Color::color_t MyColor(void) const;
 
     bool Editor(void) const;
     bool Original(void) const;
@@ -93,7 +92,6 @@ public:
 
     void SetDebug(const u8 d);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
-    void SetMyColor(const Color::color_t c);
     void SetModes(const settings_t s);
     void ResetModes(const settings_t s);
 
@@ -103,8 +101,11 @@ public:
     
     u8   GameType(void) const;
     void SetGameType(const Game::type_t type);
-    u8   Players(void) const { return players; };
-    void SetPlayers(u8 pl) { players = pl; };
+
+    Color::color_t MyColor(void) const;
+    void SetMyColor(const Color::color_t c);
+    u8   Players(void) const;
+    void SetPlayers(u8 c);
 
 protected:
     void Parse(const std::string & left, const std::string & right);

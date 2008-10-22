@@ -27,7 +27,7 @@
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(ANIMATION | SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), sound_volume(6), music_volume(6),
-    animation_speed(10), game(0), players(Color::BLUE)
+    animation_speed(10), game(0), players(0)
 {
 }
 
@@ -301,6 +301,7 @@ void Settings::SetDebug(const u8 d) { debug = d; }
 void Settings::SetGameDifficulty(const Difficulty::difficulty_t d) { game_difficulty = d; }
 
 void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
+
 /**/
 void Settings::SetModes(const std::string & key)
 {
@@ -405,4 +406,16 @@ u8 Settings::GameType(void) const
 void Settings::SetGameType(const Game::type_t type)
 {
     game = type;
+}
+
+/* get color players */
+u8 Settings::Players(void) const
+{
+    return players;
+}
+
+/* set game color players */
+void Settings::SetPlayers(u8 c)
+{
+    players = c;
 }

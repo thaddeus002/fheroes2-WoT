@@ -280,15 +280,20 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	}
 
 	// move cursor splitter
-	if(le.MousePressLeft(split.GetRect()) && curmaps->size() > LISTMAXITEM && le.MouseCursor(split.GetRect()))
+	if(le.MousePressLeft(split.GetRect()) && curmaps->size() > LISTMAXITEM)
 	{
-	    u16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
-	    if(seek > curmaps->size() - LISTMAXITEM) seek = curmaps->size() - LISTMAXITEM;
+	    s16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
+
+	    if(seek < split.Min()) seek = split.Min();
+	    else
+	    if(seek > split.Max()) seek = split.Max();
+
 	    it_list_head = curmaps->begin();
 	    cursor.Hide();
 	    backgroundList.Restore();
 	    split.Move(seek);
 	    while(seek--){ ++it_list_head; ++num_head; }
+
 	    DrawList(it_list_head);
 	    cursor.Show();
 	    display.Flip();

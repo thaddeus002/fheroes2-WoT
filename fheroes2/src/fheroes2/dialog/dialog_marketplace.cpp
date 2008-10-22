@@ -406,10 +406,11 @@ void Dialog::Marketplace(void)
         {
             u32 seek = (le.MouseCursor().x - splitter->GetRect().x) * 100 / splitter->GetStep();
 
-            if(seek > max_sell) seek = max_sell;
+            if(seek < splitter->Min()) seek = splitter->Min();
+            else
+            if(seek > splitter->Max()) seek = splitter->Max();
 
 	    count_buy = seek * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo) : 1);
-
 	    count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo));
 
             cursor.Hide();
