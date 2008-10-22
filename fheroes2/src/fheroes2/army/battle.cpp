@@ -133,7 +133,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 {
     Mixer::Reset();
     //FIXME: The music currently plays underneath the sound effect
-    int track = ((int)MUS::BATTLE1 + Rand::Get(0, 3));
+    int track = ((int)MUS::BATTLE1 + Rand::Get(0, 2));
     AGG::PlayMusic((MUS::mus_t)track);
     
     AGG::PlaySound(M82::PREBATTL);

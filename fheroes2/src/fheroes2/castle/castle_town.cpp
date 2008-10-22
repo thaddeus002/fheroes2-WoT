@@ -1081,7 +1081,7 @@ Castle::building_t Castle::OpenTown(void)
 	   (hero2 && le.MouseCursor(rectHero2)))
 	{
 	    if(many_hero)
-		statusBar.ShowMessage("Cannot recruit - you have to many Heroes.");
+		statusBar.ShowMessage("Cannot recruit - you have too many Heroes.");
 	    else
 	    if(castle_heroes)
 		statusBar.ShowMessage("Cannot recruit - you already have a Hero in this town.");

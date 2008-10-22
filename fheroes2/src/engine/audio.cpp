@@ -46,10 +46,10 @@ namespace Cdrom
     void Open(void);
     void Close(void);
     
-    static SDL_CD *cd		= NULL;
-    static int currentTrack     = -1;
-    static int startTime        = 0;
-    static int tickLength;
+    static SDL_CD *cd		  = NULL;
+    static int currentTrack       = -1;
+    static unsigned int startTime = 0;
+    static unsigned int tickLength;
     static SDL_Thread *loopThread;
     static SDL_mutex *cdLock;
     
@@ -184,7 +184,7 @@ void Cdrom::Play(const u8 track, bool loop, bool force)
             currentTrack = track;
             if(loop)
             {
-              tickLength = (cd->track[track].length / CD_FPS) * 0.01f;
+              tickLength = (unsigned int)((cd->track[track].length / CD_FPS) * 0.01f);
               startTime = SDL_GetTicks();
             }
             else startTime = 0;
