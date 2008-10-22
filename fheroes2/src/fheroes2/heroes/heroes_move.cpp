@@ -25,6 +25,7 @@
 #include "sprite.h"
 #include "gamearea.h"
 #include "maps_tiles.h"
+#include "game_selectfocus.h"
 #include "castle.h"
 #include "heroes.h"
 
@@ -275,9 +276,10 @@ bool Heroes::MoveStep(void)
     {
 	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
 	{
+	    ApplyPenaltyMovement();
+	    Game::SelectFocusHeroes::Get().Redraw();
 	    path.Reset();
 	    Action(world.GetTiles(index_to));
-	    ApplyPenaltyMovement();
 	    SetMove(false);
 	    return true;
 	}
@@ -294,6 +296,7 @@ bool Heroes::MoveStep(void)
 
 	SetCenter(index_to);
 	Scoute();
+	ApplyPenaltyMovement();
 
 	if(index_to == index_dst)
 	{
@@ -306,7 +309,6 @@ bool Heroes::MoveStep(void)
 	save_maps_general = tiles_to.GetObject();
 	tiles_to.SetObject(MP2::OBJ_HEROES);
 
-	ApplyPenaltyMovement();
 	path.PopFront();
 
 	sprite_index -= 8;

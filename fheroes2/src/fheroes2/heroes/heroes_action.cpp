@@ -248,8 +248,6 @@ void Heroes::ActionToMonster(const u16 dst_index)
     std::vector<Army::Troops> army;
     int tr_c = count > 5 ? 5 : count;
 
-    ApplyPenaltyMovement();
-
     for(int i=0; i< tr_c; i++)
     {
 	Army::Troops troop(monster, (int)(count/tr_c));
@@ -310,8 +308,6 @@ void Heroes::ActionToHeroes(const u16 dst_index)
 
     if(! other_hero) return;
 
-    ApplyPenaltyMovement();
-
     if(color == other_hero->GetColor())
     {
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: " + GetName() + " meeting " + other_hero->GetName());
@@ -341,8 +337,6 @@ void Heroes::ActionToCastle(const u16 dst_index)
     const Castle *castle = world.GetCastle(dst_index);
 
     if(! castle) return;
-
-    ApplyPenaltyMovement();
 
     if(color == castle->GetColor())
     {
@@ -429,7 +423,6 @@ void Heroes::ActionToPickupResource(const u16 dst_index)
 	default: break;
     }
 
-    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -478,7 +471,6 @@ void Heroes::ActionToResource(const u16 dst_index)
 	default: break;
     }
 
-    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -546,7 +538,6 @@ void Heroes::ActionToFlotSam(const u16 dst_index)
     else
 	body = "You search through the flotsam, but find nothing.";
 
-    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -996,7 +987,6 @@ void Heroes::ActionToArtifact(const u16 dst_index)
 	default: break;
     }
 
-    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -1012,7 +1002,6 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    ApplyPenaltyMovement();
     PlayPickupSound();
     AnimationRemoveObject(tile);
 
@@ -1121,8 +1110,6 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
     const u32 count = Rand::Get(2, 4);
     const u32 army_size = GetCountArmy();
 
-    ApplyPenaltyMovement();
-
     if(((HEROESMAXARMY == army_size && HasMonster(Monster::GENIE)) || HEROESMAXARMY > army_size))
     {
 	const std::string message("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?");
@@ -1180,7 +1167,6 @@ void Heroes::ActionToTeleports(const u16 index_from)
 
     save_maps_general = MP2::OBJ_STONELIGHTS;
     tiles_to.SetObject(MP2::OBJ_HEROES);
-    ApplyPenaltyMovement();
 }
 
 /* capture color object */
@@ -1193,15 +1179,25 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
     std::string body;
 
     Resource::resource_t res = Resource::UNKNOWN;
-    const Sprite *sprite = NULL;
+    Surface *sf = NULL;
 
     switch(obj)
     {
 	case MP2::OBJ_ALCHEMYLAB:
-	    sprite = &AGG::GetICN(ICN::RESOURCE, 1);
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
+
+	    sf = new Surface(sprite.w(), sprite.h() + 12);
+	    sf->SetColorKey();
+	    sf->Blit(sprite);
+	    body = "1 / day";
+    	    Text text(body, Font::SMALL);
+    	    text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+
 	    res = Resource::MERCURY;
 	    header = MP2::StringObject(obj);
 	    body = "You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.";
+	}
 	    break;
         case MP2::OBJ_MINES:
     	{
@@ -1210,7 +1206,15 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
             // ore
             if(0 == taddon->index)
             {
-		sprite = &AGG::GetICN(ICN::RESOURCE, 2);
+		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
+
+		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf->SetColorKey();
+		sf->Blit(sprite);
+		body = "2 / day";
+    		Text text(body, Font::SMALL);
+    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+
         	res = Resource::ORE;
         	header = "Ore Mine";
         	body = "You gain control of an ore mine. It will provide you with two units of ore per day.";
@@ -1219,7 +1223,15 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
             // sulfur
             if(1 == taddon->index)
             {
-		sprite = &AGG::GetICN(ICN::RESOURCE, 3);
+		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
+
+		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf->SetColorKey();
+		sf->Blit(sprite);
+		body = "1 / day";
+    		Text text(body, Font::SMALL);
+    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+
         	res = Resource::SULFUR;
         	header = "Sulfur Mine";
 		body = "You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.";
@@ -1228,7 +1240,15 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
             // crystal
             if(2 == taddon->index)
             {
-		sprite = &AGG::GetICN(ICN::RESOURCE, 4);
+		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
+
+		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf->SetColorKey();
+		sf->Blit(sprite);
+		body = "1 / day";
+    		Text text(body, Font::SMALL);
+    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+
         	res = Resource::CRYSTAL;
         	header = "Crystal Mine";
 		body = "You gain control of a crystal mine. It will provide you with one unit of crystal per day.";
@@ -1237,7 +1257,15 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
             // gems
             if(3 == taddon->index)
             {
-		sprite = &AGG::GetICN(ICN::RESOURCE, 5);
+		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
+
+		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf->SetColorKey();
+		sf->Blit(sprite);
+		body = "1 / day";
+    		Text text(body, Font::SMALL);
+    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+
         	res = Resource::GEMS;
         	header = "Gems Mine";
 		body = "You gain control of a gem mine. It will provide you with one unit of gems per day.";
@@ -1246,7 +1274,15 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
             // gold
             if(4 == taddon->index)
             {
-		sprite = &AGG::GetICN(ICN::RESOURCE, 6);
+		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
+
+		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf->SetColorKey();
+		sf->Blit(sprite);
+		body = "1000 / day";
+    		Text text(body, Font::SMALL);
+    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+
         	res = Resource::GOLD;
         	header = "Gold Mine";
 		body = "You gain control of a gold mine. It will provide you with 1000 gold per day.";
@@ -1254,10 +1290,20 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
     	}
     	    break;
 	case MP2::OBJ_SAWMILL:
-	    sprite = &AGG::GetICN(ICN::RESOURCE, 0);
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
+
+	    sf = new Surface(sprite.w(), sprite.h() + 12);
+	    sf->SetColorKey();
+	    sf->Blit(sprite);
+	    body = "2 / day";
+    	    Text text(body, Font::SMALL);
+    	    text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+
     	    res = Resource::WOOD;
 	    header = MP2::StringObject(obj);
 	    body = "You gain control of a sawmill. It will provide you with two units of wood per day.";
+	}
 	    break;
 
         case MP2::OBJ_LIGHTHOUSE:
@@ -1288,8 +1334,15 @@ void Heroes::ActionToCaptureObject(const u16 dst_index)
     {
 	world.CaptureObject(dst_index, GetColor());
 	world.GetTiles(dst_index).CaptureFlags32(obj, GetColor());
-	if(H2Config::MyColor() == GetColor() && sprite) Dialog::SpriteInfo(header, body, *sprite);
+
+	if(H2Config::MyColor() == GetColor())
+	{
+	    if(sf) Dialog::SpriteInfo(header, body, *sf);
+	    else Dialog::Message(header, body, Font::BIG, Dialog::OK);
+	}
     }
+    
+    if(sf) delete sf;
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCaptureObject: " + GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
