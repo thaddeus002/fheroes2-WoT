@@ -20,7 +20,12 @@ Sourcecode: you can get it here: http://sourceforge.net/projects/fheroes2/
 Copy origin data/*.agg in to data directory.
 Copy maps files (*.mp2) in to maps directory.
 
+Hot keys:
+F4		- switch to fullscreen
+PrintScreen	- create screenshot
+
 Default config fheroes2.cfg options:
+
 #
 # path to directory data
 # data = data
