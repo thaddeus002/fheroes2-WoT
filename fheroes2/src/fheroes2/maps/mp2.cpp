@@ -408,7 +408,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJN_PIRAMID:
         case MP2::OBJ_PIRAMID:			return "Piramid";
         case MP2::OBJN_CITYDEAD:
-        case MP2::OBJ_CITYDEAD:			return "City Dead";
+        case MP2::OBJ_CITYDEAD:			return "City of the Dead";
         case MP2::OBJN_EXCAVATION:
         case MP2::OBJ_EXCAVATION:		return "Excavation";
         case MP2::OBJN_SPHINX:

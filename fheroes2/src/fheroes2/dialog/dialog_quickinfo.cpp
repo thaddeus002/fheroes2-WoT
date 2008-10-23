@@ -92,7 +92,22 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     switch(tile.GetObject())
     {
         case MP2::OBJ_MONSTER:
-            name_object = Army::String(Army::GetSize(Monster::GetSize(tile))) + " of " + Monster::String(Monster::Monster(tile));
+    	{
+    	    switch(Army::GetSize(Monster::GetSize(tile)))
+    	    {
+		case Army::FEW:		name_object = "A few "; break;
+		case Army::SEVERAL:	name_object = "Several "; break;
+		case Army::PACK:	name_object = "A pack of "; break;
+		case Army::LOTS:	name_object = "Lots of "; break;
+		case Army::HORDE:	name_object = "A horde of "; break;
+		case Army::THRONG:	name_object = "A throng of "; break;
+		case Army::SWARM:	name_object = "A swarm of "; break;
+		case Army::ZOUNDS:	name_object = "Zounds of "; break;
+		case Army::LEGION:	name_object = "A legion of "; break;
+            }
+
+            name_object += Monster::String(Monster::Monster(tile)) + "s";
+    	}
     	    break;
 
         case MP2::OBJ_EVENT:
