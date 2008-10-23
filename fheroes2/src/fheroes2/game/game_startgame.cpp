@@ -246,8 +246,6 @@ Game::menu_t Game::StartGame(void)
 		    Mixer::Enhance();
 		    conf.SetMyColor(color);
 		    radar.RedrawArea(color);
-		    statusWindow.SetState(Game::StatusWindow::DAY);
-		    statusWindow.Redraw();
 
 		    m = HumanTurn(humans > 1);
 
@@ -790,16 +788,16 @@ Game::menu_t Game::HumanTurn(bool message)
 	// start game
 	case Focus::UNSEL:
         {
+            if(myHeroes.size())
+	    {
+		global_focus.Set(*myHeroes.front());
+		selectHeroes.Select(0);
+	    }
+            else
 	    if(myCastles.size())
 	    {
 		global_focus.Set(*myCastles.front());
 		selectCastles.Select(0);
-	    }
-	    else
-	    if(myHeroes.size())
-	    {
-		global_focus.Set(*myHeroes.front());
-		selectHeroes.Select(0);
 	    }
 	    break;
         }
@@ -813,6 +811,9 @@ Game::menu_t Game::HumanTurn(bool message)
 	    FocusToCastle(myCastles.front());
 	    break;
     }
+    
+    statusWindow.SetState(Game::StatusWindow::DAY);
+    statusWindow.Redraw();
 
     // center to focus
     gamearea.Center(global_focus.Center());
