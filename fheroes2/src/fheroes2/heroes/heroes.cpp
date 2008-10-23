@@ -1272,7 +1272,7 @@ void Heroes::LevelUpSkill(const Skill::Secondary::skill_t skill)
 
 void Heroes::Scoute(void)
 {
-    Maps::ClearFog(mp, SCOUTINGBASE + GetLevelSkill(Skill::Secondary::SCOUTING), color);
+    Maps::ClearFog(mp, (HasArtifact(Artifact::TELESCOPE) ? 1 : 0) + SCOUTINGBASE + GetLevelSkill(Skill::Secondary::SCOUTING), color);
 }
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
