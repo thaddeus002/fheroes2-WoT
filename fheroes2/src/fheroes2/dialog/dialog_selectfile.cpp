@@ -284,6 +284,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	    if(seek > split.Max()) seek = split.Max();
 
 	    it_list_head = curmaps->begin();
+	    num_head = 0;
 	    cursor.Hide();
 	    backgroundList.Restore();
 	    split.Move(seek);
