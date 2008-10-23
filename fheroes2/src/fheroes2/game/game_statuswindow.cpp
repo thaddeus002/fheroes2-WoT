@@ -47,6 +47,7 @@ void Game::StatusWindow::SetPos(const Point &pt)
 {
     const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
     pos = Rect(pt, ston.w(), ston.h());
+    count = (Display::Get().h() - BORDERWIDTH - pos.y) / TILEWIDTH;
 }
 
 const Rect & Game::StatusWindow::GetRect(void) const
@@ -61,6 +62,18 @@ void Game::StatusWindow::SetState(const info_t info)
 
 void Game::StatusWindow::Redraw(void)
 {
+    // restore background
+    DrawBackground();
+    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+
+    // draw info: Day and Funds and Army
+    if(count >= (ston.h() / TILEWIDTH) * 3)
+    {
+	DrawDayInfo(pos.y);
+	DrawKingdomInfo(ston.h() + 5);
+	DrawArmyInfo(2 * ston.h() + 10);
+    }
+    else
     switch(state)
     {
 	case DAY:	DrawDayInfo();		break;
@@ -78,96 +91,81 @@ void Game::StatusWindow::NextState(void)
     if(ARMY == state) state = DAY;
 }
 
-void Game::StatusWindow::DrawKingdomInfo(void)
+void Game::StatusWindow::DrawKingdomInfo(const u8 oh) const
 {
     std::string count;
 
     Kingdom & myKingdom = world.GetMyKingdom();
-
     Display & display = Display::Get();
-    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
-
-    // restore background
-    display.Blit(ston, pos.x, pos.y);
 
     // sprite all resource
-    display.Blit(AGG::GetICN(ICN::RESSMALL, 0), pos.x + 6, pos.y + 3);
+    display.Blit(AGG::GetICN(ICN::RESSMALL, 0), pos.x + 6, pos.y + 3 + oh);
 
     // count castle
     String::AddInt(count, myKingdom.GetCountCastle());
-    Text(count, Font::SMALL, pos.x + 26 - Text::width(count, Font::SMALL) / 2, pos.y + 28);
+    Text(count, Font::SMALL, pos.x + 26 - Text::width(count, Font::SMALL) / 2, pos.y + 28 + oh);
     // count town
     count.clear();
     String::AddInt(count, myKingdom.GetCountTown());
-    Text(count, Font::SMALL, pos.x + 78 - Text::width(count, Font::SMALL) / 2, pos.y + 28);
+    Text(count, Font::SMALL, pos.x + 78 - Text::width(count, Font::SMALL) / 2, pos.y + 28 + oh);
     // count gold
     count.clear();
     String::AddInt(count, myKingdom.GetFundsGold());
-    Text(count, Font::SMALL, pos.x + 122 - Text::width(count, Font::SMALL) / 2, pos.y + 28);
+    Text(count, Font::SMALL, pos.x + 122 - Text::width(count, Font::SMALL) / 2, pos.y + 28 + oh);
     // count wood
     count.clear();
     String::AddInt(count, myKingdom.GetFundsWood());
-    Text(count, Font::SMALL, pos.x + 15 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
+    Text(count, Font::SMALL, pos.x + 15 - Text::width(count, Font::SMALL) / 2, pos.y + 58 + oh);
     // count mercury
     count.clear();
     String::AddInt(count, myKingdom.GetFundsMercury());
-    Text(count, Font::SMALL, pos.x + 37 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
+    Text(count, Font::SMALL, pos.x + 37 - Text::width(count, Font::SMALL) / 2, pos.y + 58 + oh);
     // count ore
     count.clear();
     String::AddInt(count, myKingdom.GetFundsOre());
-    Text(count, Font::SMALL, pos.x + 60 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
+    Text(count, Font::SMALL, pos.x + 60 - Text::width(count, Font::SMALL) / 2, pos.y + 58 + oh);
     // count sulfur
     count.clear();
     String::AddInt(count, myKingdom.GetFundsSulfur());
-    Text(count, Font::SMALL, pos.x + 84 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
+    Text(count, Font::SMALL, pos.x + 84 - Text::width(count, Font::SMALL) / 2, pos.y + 58 + oh);
     // count crystal
     count.clear();
     String::AddInt(count, myKingdom.GetFundsCrystal());
-    Text(count, Font::SMALL, pos.x + 108 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
+    Text(count, Font::SMALL, pos.x + 108 - Text::width(count, Font::SMALL) / 2, pos.y + 58 + oh);
     // count gems
     count.clear();
     String::AddInt(count, myKingdom.GetFundsGems());
-    Text(count, Font::SMALL, pos.x + 130 - Text::width(count, Font::SMALL) / 2, pos.y + 58);
+    Text(count, Font::SMALL, pos.x + 130 - Text::width(count, Font::SMALL) / 2, pos.y + 58 + oh);
 }
 
-void Game::StatusWindow::DrawDayInfo(void)
+void Game::StatusWindow::DrawDayInfo(const u8 oh) const
 {
     std::string message;
-
     Display & display = Display::Get();
-    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
-    // restore background
-    display.Blit(ston, pos.x, pos.y);
-
-    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), pos.x, pos.y + 1);
+    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), pos.x, pos.y + 1 + oh);
 
     message = "Month: ";
     String::AddInt(message, world.GetMonth());
 
     message += " Week: ";
     String::AddInt(message, world.GetWeek());
-    Text(message, Font::SMALL, pos.x + (pos.w - Text::width(message, Font::SMALL)) / 2, pos.y + 30);
+    Text(message, Font::SMALL, pos.x + (pos.w - Text::width(message, Font::SMALL)) / 2, pos.y + 30 + oh);
 
     message = "Day: ";
     String::AddInt(message, world.GetDay());
-    Text(message, Font::BIG, pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 46);
+    Text(message, Font::BIG, pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 46 + oh);
 }
 
-void Game::StatusWindow::DrawArmyInfo(void)
+void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
 {
     const Game::Focus & focus = Game::Focus::Get();
 
     if(Game::Focus::UNSEL == focus.Type()) return;
 
     const std::vector<Army::Troops> & armies = (Game::Focus::HEROES == focus.Type() ? focus.GetHeroes().GetArmy() : focus.GetCastle().GetArmy());
-
     Display & display = Display::Get();
-    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
-    // restore background
-    display.Blit(ston, pos.x, pos.y);
-    
     // valid count army
     u16 count = std::count_if(armies.begin(), armies.end(), Army::Troops::PredicateIsValid);
 
@@ -186,7 +184,7 @@ void Game::StatusWindow::DrawArmyInfo(void)
 		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
 
 		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
-		dst_pt.y = pos.y + 55 - sprite.h();
+		dst_pt.y = pos.y + 55 - sprite.h() + oh;
 
 		display.Blit(sprite, dst_pt);
 
@@ -210,7 +208,7 @@ void Game::StatusWindow::DrawArmyInfo(void)
 		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
 
 		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
-		dst_pt.y = pos.y + 42 - sprite.h();
+		dst_pt.y = pos.y + 42 - sprite.h() + oh;
 
 		display.Blit(sprite, dst_pt);
 
@@ -234,7 +232,7 @@ void Game::StatusWindow::DrawArmyInfo(void)
 		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
 
 		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
-		dst_pt.y = pos.y + 65 - sprite.h();
+		dst_pt.y = pos.y + 65 - sprite.h() + oh;
 
 		display.Blit(sprite, dst_pt);
 
@@ -249,12 +247,10 @@ void Game::StatusWindow::DrawArmyInfo(void)
 
 void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
 {
-    Display & display = Display::Get();
-    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
-
     // restore background
-    display.Blit(ston, pos.x, pos.y);
+    DrawBackground();
 
+    Display & display = Display::Get();
     const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
 
     u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
@@ -295,4 +291,38 @@ void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
     //
 
     display.Flip();
+}
+
+void Game::StatusWindow::DrawBackground(void) const
+{
+    Display & display = Display::Get();
+    const Sprite & icnston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    Point dstpt(pos);
+
+    if(display.h() - BORDERWIDTH - icnston.h() > dstpt.y)
+    {
+        Rect srcrt;
+
+        srcrt.x = 0;
+        srcrt.y = 0;
+        srcrt.w = icnston.w();
+        srcrt.h = 12;
+        display.Blit(icnston, srcrt, dstpt);
+
+        srcrt.y = 12;
+        srcrt.h = 32;
+        dstpt.y = dstpt.y + 12;
+
+        for(u8 ii = 0; ii < count; ++ii)
+        {
+            display.Blit(icnston, srcrt, dstpt);
+    	    dstpt.y = dstpt.y + TILEWIDTH;
+        }
+
+        dstpt.y = display.h() - BORDERWIDTH - 12;
+        srcrt.y = icnston.h() - 12;
+        display.Blit(icnston, srcrt, dstpt);
+    }
+    else
+	display.Blit(icnston, dstpt);
 }

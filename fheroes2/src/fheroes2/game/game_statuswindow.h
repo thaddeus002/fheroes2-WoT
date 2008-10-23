@@ -51,11 +51,13 @@ public:
 
 private:
     StatusWindow();
-    void DrawKingdomInfo(void);
-    void DrawDayInfo(void);
-    void DrawArmyInfo(void);
+    void DrawKingdomInfo(const u8 oh = 0) const;
+    void DrawDayInfo(const u8 oh = 0) const;
+    void DrawArmyInfo(const u8 oh = 0) const;
+    void DrawBackground(void) const;
 
     Rect pos;
+    u8 count;
 
     info_t state;
 };

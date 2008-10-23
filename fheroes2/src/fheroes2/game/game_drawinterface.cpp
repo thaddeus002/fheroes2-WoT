@@ -189,25 +189,24 @@ void Game::DrawInterface(void)
     dstpt.y = button_coord + 2 * 36;
     if(display.h() - BORDERWIDTH - icnston.h() > dstpt.y)
     {
-	const u8 count_item = (display.h() - BORDERWIDTH - dstpt.y) / TILEWIDTH;
-	if(2 < count_item)
-	{
-	    srcrt.x = 0;
-	    srcrt.y = 0;
-	    srcrt.w = icnston.w();
-	    srcrt.h = 12;
-	    display.Blit(icnston, srcrt, dstpt);
-	    srcrt.y = 12;
-	    srcrt.h = 32;
-	    dstpt.y = dstpt.y + srcrt.h;
-	    for(u8 ii = 0; ii < count_item - 1; ++ii)
-	    {
-		display.Blit(icnston, srcrt, dstpt);
-		dstpt.y = dstpt.y + TILEWIDTH;
-	    }
-	    srcrt.y = icnston.h() - 12;
-	    display.Blit(icnston, srcrt, dstpt);
-	}
+        const u8 count_item = (display.h() - BORDERWIDTH - dstpt.y) / TILEWIDTH;
+        Rect srcrt;
+        srcrt.x = 0;
+	srcrt.y = 0;
+        srcrt.w = icnston.w();
+        srcrt.h = 12;
+        display.Blit(icnston, srcrt, dstpt);
+        srcrt.y = 12;
+        srcrt.h = 32;
+        dstpt.y = dstpt.y + 12;
+        for(u8 ii = 0; ii < count_item; ++ii)
+        {
+            display.Blit(icnston, srcrt, dstpt);
+            dstpt.y = dstpt.y + TILEWIDTH;
+        }
+        dstpt.y = display.h() - BORDERWIDTH - 12;
+        srcrt.y = icnston.h() - 12;
+        display.Blit(icnston, srcrt, dstpt);
     }
     else
 	display.Blit(icnston, dstpt);
