@@ -138,15 +138,22 @@ void Cursor::SetOffset(const themes_t name)
 		offset_y = -4;
 		break;
 
-	    case Cursor::SCROLL_RIGHT:
+	    case Cursor::SCROLL_TOPRIGHT:
+            case Cursor::SCROLL_RIGHT:
 		offset_x = -15;
 		offset_y = 0;
 		break;
 
 	    case Cursor::SCROLL_BOTTOM:
+            case Cursor::SCROLL_BOTTOMLEFT:
 		offset_x = 0;
 		offset_y = -15;
 		break;
+            
+            case Cursor::SCROLL_BOTTOMRIGHT:
+                offset_x = -15;
+                offset_y = -15;
+                break;
 
 	    default:
 		offset_x = 0;
