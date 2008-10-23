@@ -705,6 +705,7 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     else
     if(path.EnableMove())
     {
+        FocusToHeroes(hero);
         hero->SetMove(true);
     }
 }
