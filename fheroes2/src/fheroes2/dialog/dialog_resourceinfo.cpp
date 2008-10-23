@@ -41,14 +41,14 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 40 + Text::height(message, Font::BIG, BOXAREA_WIDTH), Dialog::OK);
+    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 50 + Text::height(message, Font::BIG, BOXAREA_WIDTH), Dialog::OK);
 
     Rect pos = box.GetArea();
 
     if(header.size())
     {
 	TextBox(header, Font::BIG, pos);
-        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 15;
+        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 10;
     }
 
     if(message.size())

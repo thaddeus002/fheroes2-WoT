@@ -47,7 +47,7 @@ void Dialog::SpriteInfo(const std::string &header, const std::string &message, c
     if(header.size())
     {
 	TextBox(header, Font::BIG, pos);
-        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 15;
     }
 
     if(message.size())

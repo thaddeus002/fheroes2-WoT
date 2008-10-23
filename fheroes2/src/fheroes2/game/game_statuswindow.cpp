@@ -67,9 +67,9 @@ void Game::StatusWindow::Redraw(void)
     const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     // draw info: Day and Funds and Army
-    if(count >= (ston.h() / TILEWIDTH) * 3)
+    if(count >= ((ston.h() * 3 + 15)/ TILEWIDTH))
     {
-	DrawDayInfo(pos.y);
+	DrawDayInfo();
 	DrawKingdomInfo(ston.h() + 5);
 	DrawArmyInfo(2 * ston.h() + 10);
     }
