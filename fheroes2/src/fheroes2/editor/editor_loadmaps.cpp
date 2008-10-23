@@ -24,11 +24,10 @@
 #include "config.h"
 #include "maps_fileinfo.h"
 #include "dialog.h"
-#include "world.h"
 
 Game::menu_t Game::Editor::LoadMaps(void)
 {
-    std::list<Maps::FileInfo> info_maps;
+    std::list<Maps::FileInfo *> info_maps;
 
     // read maps directory
     Dir dir;
@@ -46,15 +45,16 @@ Game::menu_t Game::Editor::LoadMaps(void)
         return MAINMENU;
     }
 
-    info_maps.resize(dir.size());
-    std::list<Maps::FileInfo>::iterator itl = info_maps.begin();
-
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) (*itl++).Read(*itd);
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
+	info_maps.push_back(new Maps::FileInfo(*itd));
 
     // show dialog
-    Dialog::SelectFileInfo(info_maps);
+    const Maps::FileInfo * finfo = Dialog::SelectFileInfo(info_maps);
+    if(NULL != finfo) conf.LoadFileMaps(finfo->FileMaps());
 
-    world.LoadMaps(conf.FileInfo().FileMaps());
+    std::list<Maps::FileInfo *>::const_iterator it1 = info_maps.begin();
+    std::list<Maps::FileInfo *>::const_iterator it2 = info_maps.end();
+    for(; it1 != it2; ++it1) if(*it1) delete *it1;
 
     return EDITSTART;
 }

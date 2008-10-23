@@ -37,6 +37,7 @@ class FileInfo
 
 public:
     FileInfo();
+    FileInfo(const std::string &filename);
 
     bool Read(const std::string &filename);
 

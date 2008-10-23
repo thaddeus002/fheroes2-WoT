@@ -70,7 +70,7 @@ namespace Dialog
     answer_t AdventureOptions(void);
     Game::menu_t FileOptions(void);
     bool SystemOptions(void);
-    void SelectFileInfo(const std::list<Maps::FileInfo> & list);
+    const Maps::FileInfo * SelectFileInfo(const std::list<Maps::FileInfo *> & list);
 
     // show info cell maps
     void QuickInfo(const Maps::Tiles & tile);

@@ -26,11 +26,9 @@
 #include "agg.h"
 #include "sprite.h"
 #include "spritecursor.h"
-#include "error.h"
-#include "localevent.h"
+#include "engine.h"
 #include "button.h"
 #include "cursor.h"
-#include "config.h"
 #include "maps_fileinfo.h"
 #include "difficulty.h"
 #include "dialog.h"
@@ -42,28 +40,25 @@
 #define LISTMAXITEM	9
 #define LISTHEIGHTROW	19
 
-void DrawList(std::list<Maps::FileInfo>::const_iterator &it_top, u8 count = LISTMAXITEM);
+void DrawList(std::list<Maps::FileInfo *>::const_iterator &it_top, u8 count = LISTMAXITEM);
 void DrawSelectInfo(const Maps::FileInfo & finfo);
 
-void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
+const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> & info_maps)
 {
     // preload
     AGG::PreloadObject(ICN::REQSBKG);
 
-    Settings & conf = Settings::Get();
-    conf.LoadFileMaps(info_maps.front().FileMaps());
+    std::list<Maps::FileInfo *> smallmaps, mediummaps, largemaps, xlargemaps;
 
-    std::list<Maps::FileInfo> smallmaps, mediummaps, largemaps, xlargemaps;
+    const std::list<Maps::FileInfo *> & allmaps = info_maps;
+    const std::list<Maps::FileInfo *> *curmaps = &allmaps;
 
-    const std::list<Maps::FileInfo> & allmaps = info_maps;
-    const std::list<Maps::FileInfo> *curmaps = &allmaps;
-
-    std::list<Maps::FileInfo>::const_iterator it_list_head = allmaps.begin();
-    std::list<Maps::FileInfo>::const_iterator it_current = it_list_head;
-    std::list<Maps::FileInfo>::const_iterator it_end = allmaps.end();
+    std::list<Maps::FileInfo *>::const_iterator it_list_head = allmaps.begin();
+    std::list<Maps::FileInfo *>::const_iterator it_current = it_list_head;
+    std::list<Maps::FileInfo *>::const_iterator it_end = allmaps.end();
 
     for(; it_current != it_end; ++it_current)
-	switch((*it_current).SizeMaps())
+	switch((**it_current).SizeMaps())
 	{
     	    case Maps::SMALL:	smallmaps.push_back(*it_current);break;
     	    case Maps::MEDIUM:	mediummaps.push_back(*it_current); break;
@@ -118,7 +113,7 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
     Button buttonSelectAll(415, 28, ICN::REQUESTS, 17, 18);
 
     DrawList(it_list_head, (LISTMAXITEM > allmaps.size() ? allmaps.size() : LISTMAXITEM));
-    DrawSelectInfo(*it_current);
+    DrawSelectInfo(**it_current);
 
     buttonOk.Draw();
     buttonPgUp.Draw();
@@ -161,7 +156,7 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	    backgroundList.Restore();
 	    DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
-	    DrawSelectInfo(*it_current);
+	    DrawSelectInfo(**it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    cursor.Show();
 	    display.Flip();
@@ -178,7 +173,7 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	    backgroundList.Restore();
 	    DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
-	    DrawSelectInfo(*it_current);
+	    DrawSelectInfo(**it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    cursor.Show();
 	    display.Flip();
@@ -195,7 +190,7 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	    backgroundList.Restore();
 	    DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
-	    DrawSelectInfo(*it_current);
+	    DrawSelectInfo(**it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    cursor.Show();
 	    display.Flip();
@@ -212,14 +207,14 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	    backgroundList.Restore();
 	    DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
-	    DrawSelectInfo(*it_current);
+	    DrawSelectInfo(**it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    cursor.Show();
 	    display.Flip();
 	}
 
 	// click all
-	if(le.MouseClickLeft(buttonSelectAll))
+	if(le.MouseClickLeft(buttonSelectAll) && allmaps.size())
 	{
 	    curmaps = &allmaps;
 	    it_list_head = curmaps->begin();
@@ -229,14 +224,14 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	    backgroundList.Restore();
 	    DrawList(it_list_head, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    backgroundInfo.Restore();
-	    DrawSelectInfo(*it_current);
+	    DrawSelectInfo(**it_current);
 	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
 	    cursor.Show();
 	    display.Flip();
 	}
 
 	// click list
-	if(le.MouseClickLeft(rectAreaList))
+	if(le.MouseClickLeft(rectAreaList) && curmaps->size())
 	{
 	    u16 num = (le.MouseReleaseLeft().y - rectAreaList.y) / LISTHEIGHTROW;
 	    if(num >= curmaps->size()) num = curmaps->size() - 1;
@@ -246,7 +241,7 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	    backgroundInfo.Restore();
 	    it_current = it_list_head;
 	    while(num--) ++it_current;
-	    DrawSelectInfo(*it_current);
+	    DrawSelectInfo(**it_current);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -319,34 +314,33 @@ void Dialog::SelectFileInfo(const std::list<Maps::FileInfo> & info_maps)
 	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN)) break;
     }
 
-    // set current settings
-    conf.LoadFileMaps((*it_current).FileMaps());
-
     cursor.Hide();
     background.Restore();
     
     cursor.Show();
+
+    return info_maps.size() ? *it_current : NULL;
 }
 
-void DrawList(std::list<Maps::FileInfo>::const_iterator &it_top, u8 count)
+void DrawList(std::list<Maps::FileInfo *>::const_iterator &it_top, u8 count)
 {
     Display & display = Display::Get();
 
     u16 y = 64;
     u16 x = 176;
     u8 index = 0;
-    std::list<Maps::FileInfo>::const_iterator it_head(it_top);
+    std::list<Maps::FileInfo *>::const_iterator it_head(it_top);
 
     for(int ii = 0; ii < count; ++ii)
     {
 	// sprite count
-	const std::bitset<8> colors((*it_head).KingdomColors());
+	const std::bitset<8> colors((**it_head).KingdomColors());
 	index = 19 + colors.count();
 	const Sprite &spriteCount = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteCount, x, y);
 
         // sprite size
-	switch((*it_head).SizeMaps())
+	switch((**it_head).SizeMaps())
 	{
             case Maps::SMALL:
     		index = 26;
@@ -368,15 +362,15 @@ void DrawList(std::list<Maps::FileInfo>::const_iterator &it_top, u8 count)
 	display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
 	// text longname
-	Text((*it_head).Name(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 18, y);
+	Text((**it_head).Name(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 18, y);
 
 	// sprite wins
-	index = 30 + (*it_head).ConditionsWins();
+	index = 30 + (**it_head).ConditionsWins();
 	const Sprite &spriteWins = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteWins, x + 224, y);
 
 	// sprite loss
-	index = 36 + (*it_head).ConditionsLoss();
+	index = 36 + (**it_head).ConditionsLoss();
 	const Sprite &spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteLoss, x + 226 + spriteWins.w(), y);
 

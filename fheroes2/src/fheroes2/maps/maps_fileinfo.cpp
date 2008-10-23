@@ -31,6 +31,12 @@ Maps::FileInfo::FileInfo() : size(Maps::ZERO), difficulty(Difficulty::EASY),
 {
 }
 
+Maps::FileInfo::FileInfo(const std::string &filename) : size(Maps::ZERO), difficulty(Difficulty::EASY),
+    kingdom_colors(0), allow_colors(0), rnd_colors(0), with_heroes(false), races(KINGDOMMAX)
+{
+    Read(filename);
+}
+
 const std::string & Maps::FileInfo::FileMaps(void) const
 {
     return file;

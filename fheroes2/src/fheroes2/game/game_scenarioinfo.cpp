@@ -52,7 +52,7 @@ Game::menu_t Game::ScenarioInfo(void)
 {
     AGG::PlayMusic(MUS::MAINMENU);
 
-    std::list<Maps::FileInfo> info_maps;
+    std::list<Maps::FileInfo *> info_maps;
 
     Settings & conf = Settings::Get();
 
@@ -66,23 +66,26 @@ Game::menu_t Game::ScenarioInfo(void)
     // loyality version
     if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
 
-    // empty maps dir
-    if(dir.empty())
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
+    {
+	Maps::FileInfo *mi = new Maps::FileInfo(*itd);
+	const std::bitset<8> colors(mi->AllowColors());
+	
+	// multi map filter
+	if(Game::MULTI & conf.GameType() && 2 > colors.count())
+	{
+	    delete mi;
+	    continue;
+	}
+
+	info_maps.push_back(mi);
+    }
+
+    // empty maps
+    if(info_maps.empty())
     {
 	Dialog::Message("Warning", "No maps available!", Font::BIG, Dialog::OK);
 	return MAINMENU;
-    }
-
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
-    {
-	Maps::FileInfo mi;
-	mi.Read(*itd);
-	const std::bitset<8> colors(mi.AllowColors());
-	
-	// multi map filter
-	if(Game::MULTI & conf.GameType() && 2 > colors.count()) continue;
-
-	info_maps.push_back(mi);
     }
 
     // preload
@@ -90,6 +93,7 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PreloadObject(ICN::NGEXTRA);
     AGG::PreloadObject(ICN::NGHSBKG);
 
+    menu_t result = QUITGAME;
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     // cursor
@@ -101,8 +105,7 @@ Game::menu_t Game::ScenarioInfo(void)
     display.SetVideoMode(640, 480);
 
     // set first maps settings
-    conf.LoadFileMaps(info_maps.front().FileMaps());
-
+    conf.LoadFileMaps(info_maps.front()->FileMaps());
 
     Button buttonSelectMaps(513, 77, ICN::NGEXTRA, 64, 65);
     Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
@@ -249,7 +252,9 @@ Game::menu_t Game::ScenarioInfo(void)
 	// click select
 	if(le.MouseClickLeft(buttonSelectMaps))
 	{
-	    Dialog::SelectFileInfo(info_maps);
+	    const Maps::FileInfo * finfo = Dialog::SelectFileInfo(info_maps);
+	    if(NULL != finfo) conf.LoadFileMaps(finfo->FileMaps());
+
 	    cursor.Hide();
 	    levelCursor.Hide();
 	    // set first allow color
@@ -270,7 +275,8 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
 	{
 	    Settings::Get().SetGameType(Game::UNKNOWN);
-	    return MAINMENU;
+	    result = MAINMENU;
+	    break;
 	}
 
 	// click ok
@@ -286,7 +292,8 @@ Game::menu_t Game::ScenarioInfo(void)
 		}
 	    if(H2Config::Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
 
-	    return STARTGAME;
+	    result = STARTGAME;
+	    break;
 	}
 	
 	// right info
@@ -317,7 +324,11 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(le.MousePressRight(buttonCancel)) Dialog::Message("Cancel", "Click to return to the main menu.", Font::BIG);
     }
 
-    return QUITGAME;
+    std::list<Maps::FileInfo *>::const_iterator it1 = info_maps.begin();
+    std::list<Maps::FileInfo *>::const_iterator it2 = info_maps.end();
+    for(; it1 != it2; ++it1) if(*it1) delete *it1;
+
+    return result;
 }
 
 void Scenario::RedrawOpponentColors(const std::vector<Rect> & coordColors)

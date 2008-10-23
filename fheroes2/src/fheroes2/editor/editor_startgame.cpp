@@ -55,10 +55,15 @@ namespace Game
 Game::menu_t Game::Editor::StartGame()
 {
     Display & display = Display::Get();
+    Settings & conf = Settings::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
+    
+    // Load maps
+    world.LoadMaps(conf.FileInfo().FileMaps());
+
     cursor.SetThemes(cursor.POINTER);
     Display::SetVideoMode(Settings::Get().VideoMode());
     display.Fill(0x00, 0x00, 0x00);
