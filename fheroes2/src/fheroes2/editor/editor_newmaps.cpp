@@ -96,7 +96,7 @@ Game::menu_t Game::Editor::NewMaps(void)
 		world.NewMaps(Maps::XLARGE, Maps::XLARGE);
 		return EDITSTART;
 	}
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
+	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return EDITMAINMENU;
 
         // right info
 	if(le.MousePressRight(buttonSmall)) Dialog::Message("", "Create a map that is 36 squares wide by 36 squares high. (For reference, all the maps in Heroes where 72 x 72)", Font::BIG);
@@ -110,5 +110,5 @@ Game::menu_t Game::Editor::NewMaps(void)
 	if(le.MousePressRight(buttonCancel)) Dialog::Message("", "Cancel back to the main menu.", Font::BIG);
     }
 
-    return MAINMENU;
+    return EDITMAINMENU;
 }

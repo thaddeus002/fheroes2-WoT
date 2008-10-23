@@ -109,8 +109,9 @@ int main(int argc, char **argv)
 	    if(cmd.Exists('e'))
 	    {
 		conf.SetModes(Settings::EDITOR);
+		conf.SetDebug(3);
 
-		if(conf.Debug()) std::cout << "start: editor mode." << std::endl;
+		std::cout << "start: editor mode." << std::endl;
 
 		caption = "Free Heroes II (Editor), version: ";
 		String::AddInt(caption, conf.MajorVersion());
@@ -223,26 +224,16 @@ int main(int argc, char **argv)
 	    LocalEvent::SetGlobalFilterEvents(Cursor::Redraw);
 
 	    // goto main menu
-	    Game::menu_t rs = Game::MAINMENU;
+	    Game::menu_t rs = conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU;
 
 	    while(rs != Game::QUITGAME)
 	    {
-		if(conf.Editor())
+		switch(rs)
 		{
-		    switch(rs)
-		    {
-	    		case Game::MAINMENU:       rs = Game::Editor::MainMenu();	break;
+	    		case Game::EDITMAINMENU:   rs = Game::Editor::MainMenu();	break;
 	    		case Game::EDITNEWMAP:     rs = Game::Editor::NewMaps();	break;
 	    		case Game::EDITLOADMAP:    rs = Game::Editor::LoadMaps();       break;
 	    		case Game::EDITSTART:      rs = Game::Editor::StartGame();      break;
-
-			default: break;
-		    }
-		}
-		else
-		{
-		    switch(rs)
-		    {
 	    		case Game::MAINMENU:       rs = Game::MainMenu();		break;
 	    		case Game::NEWGAME:        rs = Game::NewGame();		break;
 	    		case Game::LOADGAME:       rs = Game::LoadGame();		break;
@@ -261,7 +252,6 @@ int main(int argc, char **argv)
 
 
 	    		default: break;
-		    }
 		}
 	    }
 
