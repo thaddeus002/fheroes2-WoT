@@ -145,6 +145,7 @@ void Cdrom::Close(void)
 {
     if(cd)
     {
+        SDL_CDStop(cd);
         SDL_KillThread(loopThread);
         SDL_DestroyMutex(cdLock);
 	SDL_CDClose(cd);
