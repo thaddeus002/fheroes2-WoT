@@ -50,7 +50,7 @@ namespace Game
     void FocusToCastle(Castle *castle);
     void FocusToHeroes(Heroes *hero);
     void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
-    Game::menu_t HumanTurn(bool message);
+    Game::menu_t HumanTurn(void);
 };
 
 Button *_buttonScrollHeroesUp;
@@ -93,14 +93,14 @@ Game::menu_t Game::StartGame(void)
     {
         for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) 
             if(color & conf.Players())
-                world.GetKingdom(color).SetControl(LOCAL);
+        	world.GetKingdom(color).SetControl(LOCAL);
     }
     else
     {
+	//conf.SetGameType(Game::STANDARD);
         // single player
         world.GetKingdom(conf.MyColor()).SetControl(LOCAL);
     }
-    conf.SetGameType(Game::UNKNOWN);
 
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
@@ -225,10 +225,6 @@ Game::menu_t Game::StartGame(void)
     buttonScrollCastleDown.Draw();
 
     Game::menu_t m = ENDTURN;
-    int humans = 0;
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(world.GetKingdom(color).isPlay() && world.GetKingdom(color).Control() == LOCAL) 
-	    humans ++;
 
     while(1)
     {
@@ -247,7 +243,7 @@ Game::menu_t Game::StartGame(void)
 		    conf.SetMyColor(color);
 		    radar.RedrawArea(color);
 
-		    m = HumanTurn(humans > 1);
+		    m = HumanTurn();
 
 		    cursor.Hide();
 		    Mixer::Reduce();
@@ -719,7 +715,7 @@ bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
     return !(ticket % (1 < modifier ? ANIMATION_MEDIUM * modifier : ANIMATION_MEDIUM));
 }
 
-Game::menu_t Game::HumanTurn(bool message)
+Game::menu_t Game::HumanTurn(void)
 {
     Game::Focus & global_focus = Focus::Get();
     Radar & radar = Radar::Get();
@@ -783,6 +779,8 @@ Game::menu_t Game::HumanTurn(bool message)
     Mixer::Reset();
     Game::EnvironmentSoundMixer(true);
 
+    global_focus.Reset();
+
     switch(global_focus.Type())
     {
 	// start game
@@ -825,7 +823,8 @@ Game::menu_t Game::HumanTurn(bool message)
     display.Flip();
     cursor.Show();
 
-    if(message)
+    // show turns dialog
+    if(Game::HOTSEAT == conf.GameType())
     {
 	const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
 
