@@ -89,17 +89,22 @@ Game::menu_t Game::StartGame(void)
     // preload sounds
     Game::PreloadLOOPSounds();
 
-    if(Game::HOTSEAT == conf.GameType())
+    // set controls type for players
+    switch(conf.GameType())
     {
-        for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) 
-            if(color & conf.Players())
+    	case Game::HOTSEAT:
+	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.Players())
         	world.GetKingdom(color).SetControl(LOCAL);
-    }
-    else
-    {
-	//conf.SetGameType(Game::STANDARD);
-        // single player
-        world.GetKingdom(conf.MyColor()).SetControl(LOCAL);
+    	    break;
+
+    	case Game::NETWORK:
+	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.Players())
+        	world.GetKingdom(color).SetControl(color == conf.MyColor() ? LOCAL : REMOTE);
+    	    break;
+
+    	default:
+    	    world.GetKingdom(conf.MyColor()).SetControl(LOCAL);
+    	    break;
     }
 
     GameArea & areaMaps = GameArea::Get();
@@ -242,28 +247,23 @@ Game::menu_t Game::StartGame(void)
 		    Mixer::Enhance();
 		    conf.SetMyColor(color);
 		    radar.RedrawArea(color);
-
 		    m = HumanTurn();
-
 		    cursor.Hide();
 		    Mixer::Reduce();
-
 		    if(m != ENDTURN) goto OUTDOOR;
 		    break;
 	        case REMOTE:
 		    cursor.SetThemes(Cursor::WAIT);
 		    cursor.Show();
 	            display.Flip();
-
-		    kingdom.AITurns();
+		    //TODO: network players: sync world, kingdoms and heroes.
+		    //kingdom.AITurns();
 		    cursor.Hide();
-	            // TODO network game
 		    break;
 	        case AI:
 		    cursor.SetThemes(Cursor::WAIT);
 		    cursor.Show();
 	            display.Flip();
-
 		    kingdom.AITurns();
 		    cursor.Hide();
 		    break;
