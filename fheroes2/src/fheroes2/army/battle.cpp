@@ -801,8 +801,12 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	if(oldcount > 0) {
 	    String::AddInt(status, oldcount);
 	    status += " "+Monster::String(target.Monster());
-	    if(oldcount > 1) status += "s";
-	    status += " perish.";
+	    if(oldcount > 1)
+            {
+                status += "s";
+                status += " perish.";
+            }
+            else status += " perishes.";
 	}
 	AttackStatus(status);
 	if(ranged) myTroop.shots --;
