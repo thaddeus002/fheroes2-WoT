@@ -774,8 +774,12 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	}
 	std::string status = "";
 	status += Monster::String(myTroop.Monster());
-	if(myTroop.Count() > 1) status += "s";
-	status += " do ";
+	if(myTroop.Count() > 1)
+        {
+            status += "s";
+            status += " do ";
+        }
+        else status += " does ";
 	String::AddInt(status, damage);
 	status += " damage. ";
 	int oldcount = target.Count();
@@ -1681,7 +1685,7 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spel
 		return WIN;
 	    }
 	    do_button(buttonMag, {if(spell=hero.SpellBook().Open(Spell::Book::CMBT, true),spell!=Spell::NONE) {back.Restore();return WIN;}}, Dialog::Message("Cast Spell", "Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn.", Font::BIG));
-	    do_button(buttonRet, return RETREAT, Dialog::Message("Retreat", "Retreat your hero, abandoning your creatures. Your hero will be available for you to recrut again, however, the hero will have only a novice hero's forces.", Font::BIG));
+	    do_button(buttonRet, return RETREAT, Dialog::Message("Retreat", "Retreat your hero, abandoning your creatures. Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces.", Font::BIG));
 	    do_button(buttonSur, return SURRENDER, Dialog::Message("Surrender", "Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again.", Font::BIG));
 	    do_button(buttonOK, return WIN, Dialog::Message("Cancel", "Return to the battle.", Font::BIG));
 	    if(le.MouseCursor(buttonMag)) {
