@@ -418,7 +418,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 	    statusBar2->ShowMessage("Hero's Options");
 	    cursor.SetThemes(cursor.WAR_HELMET);
 	} else if(le.MouseCursor(troopN >= 0 ? rectHero2 : rectHero1)) {
-	    statusBar2->ShowMessage("View Oppositing Hero");
+	    statusBar2->ShowMessage("View Opposing Hero");
 	    cursor.SetThemes(cursor.WAR_INFO);
 	} else {
 	    int t = -1;
