@@ -36,11 +36,11 @@ Route::Path::Path(const Heroes & h)
 }
 
 /* return length path */
-u16 Route::Path::Calculate(u16 dst_index)
+u16 Route::Path::Calculate(const u16 dst_index, const u16 limit)
 {
     clear();
 
-    Algorithm::PathFinding(Maps::GetIndexFromAbsPoint(hero.GetCenter()), dst_index, hero, *this);
+    Find_v1(Maps::GetIndexFromAbsPoint(hero.GetCenter()), dst_index, limit);
 
     dst = dst_index;
 

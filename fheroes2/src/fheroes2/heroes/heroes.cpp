@@ -1292,28 +1292,32 @@ void Heroes::SetCenter(const u16 index)
 }
 
 /* return route range in days */
-u8 Heroes::GetRangeRouteDays(void) const
+u8 Heroes::GetRangeRouteDays(const u16 dst) const
 {
-    if(path.isValid())
-    {
-	u8 result = 0;
-	s32 total = path.TotalPenalty();
-	const u16 max = GetMaxMovePoints();
+    const u32 max = GetMaxMovePoints();
 
-	// current day
-	if(move_point > total) return 1;
-	++result;
-	total -= move_point;
+    // 60 - approximate distance, this restriction calculation
+    if(60 < std::abs(mp.x - dst % world.w()) + std::abs(mp.y - dst / world.w())) return 4;
 
-	// next days cast
-	while(1)
-	{
-	    ++result;
+    Route::Path test(*this);
+    // 80 - approximate limit, this restriction path finding algorithm
+    test.Calculate(dst, 80);
 
-	    if(max < total) total -= max;
-	    else return result;
-	}
-    }
+    u32 total = test.TotalPenalty();
+
+    if(move_point >= total) return 1;
+
+    total -= move_point;
+
+    if(max >= total) return 2;
+
+    total -= move_point;
+
+    if(max >= total) return 3;
+
+    total -= move_point;
+
+    if(max >= total) return 4;
 
     return 0;
 }

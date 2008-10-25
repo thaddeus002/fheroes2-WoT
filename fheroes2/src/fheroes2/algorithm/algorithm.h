@@ -20,15 +20,6 @@
 #ifndef H2ALGORITHM_H
 #define H2ALGORITHM_H
 
-#include <list>
 #include "gamedefs.h"
-
-class Heroes;
-
-namespace Algorithm
-{
-    u16 PathFinding(u16 index1, u16 index2, const Heroes & hero, std::list<Route::Step> & result);
-
-};
 
 #endif

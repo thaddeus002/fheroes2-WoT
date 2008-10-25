@@ -48,7 +48,7 @@ namespace Route
 	    u16		GetFrontIndex(void) const{ return size() ? front().to_index : 0; };
 	    u16		GetFrontPenalty(void) const{ return size() ? front().penalty : 0; };
 
-	    u16		Calculate(u16 dst_index);
+	    u16		Calculate(const u16 dst_index, const u16 limit = MAXU16);
 
 	    void	Show(void);
 	    void	Hide(void);
@@ -66,6 +66,7 @@ namespace Route
 
 	private:
 	    void	Dump(void) const;
+	    void	Find_v1(const u16 index1, const u16 index2, const u16 limit = MAXU16);
 
 	private:
 	    const Heroes & hero;
