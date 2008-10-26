@@ -1122,6 +1122,7 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 	const std::string message("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?");
 	if(H2Config::MyColor() != GetColor())
 	{
+            //FIXME: This may be a network player instead of AI
 	    AI::RecruitTroops(*this, Monster::GENIE, count);
 
 	    tile.RemoveObjectSprite();
