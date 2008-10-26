@@ -1294,6 +1294,8 @@ void Heroes::SetCenter(const u16 index)
 /* return route range in days */
 u8 Heroes::GetRangeRouteDays(const u16 dst) const
 {
+    if(Settings::Get().Debug()) return 1;
+
     const u32 max = GetMaxMovePoints();
 
     // 60 - approximate distance, this restriction calculation
@@ -1301,7 +1303,7 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
 
     Route::Path test(*this);
     // 80 - approximate limit, this restriction path finding algorithm
-    test.Calculate(dst, 80);
+    if(! test.Calculate(dst, 80)) return 4;
 
     u32 total = test.TotalPenalty();
 

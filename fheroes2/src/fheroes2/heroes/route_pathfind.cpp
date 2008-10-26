@@ -42,7 +42,7 @@ struct cellinfo_t
 };
 
 // find path (A* implementation) - is valid return length path
-void Route::Path::Find_v1(const u16 index1, const u16 index2, const u16 limit)
+bool Route::Path::Find_v1(const u16 index1, const u16 index2, const u16 limit)
 {
     const u8 debug = Settings::Get().Debug();
     const u16 width = world.w();
@@ -190,16 +190,19 @@ void Route::Path::Find_v1(const u16 index1, const u16 index2, const u16 limit)
 	}
     }
 
-    if(!notfound)
+    if(notfound)
     {
-	while(index_i != index1)
-	{
-	    // push_front
-	    push_front(Route::Step(index_i, work_map[index_i].cost_g));
-
-	    index_i = work_map[index_i].parent;
-	}
+	if(debug) Error::Warning("Route::Path::Find: not found...");
+	return false;
     }
-    else
-    if(debug) Error::Warning("Route::Path::Find: not found...");
+
+    while(index_i != index1)
+    {
+	// push_front
+	push_front(Route::Step(index_i, work_map[index_i].cost_g));
+
+	index_i = work_map[index_i].parent;
+    }
+
+    return true;
 }

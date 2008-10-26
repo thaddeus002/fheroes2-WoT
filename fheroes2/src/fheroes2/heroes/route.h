@@ -66,7 +66,7 @@ namespace Route
 
 	private:
 	    void	Dump(void) const;
-	    void	Find_v1(const u16 index1, const u16 index2, const u16 limit = MAXU16);
+	    bool	Find_v1(const u16 index1, const u16 index2, const u16 limit = MAXU16);
 
 	private:
 	    const Heroes & hero;

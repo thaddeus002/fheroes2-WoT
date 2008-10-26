@@ -499,7 +499,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			    else
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
-				    case 0:
+				    case 0:	return Cursor::POINTER;
 				    case 1:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
 				    case 2:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE2 : Cursor::FIGHT2;
 				    case 3:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE3 : Cursor::FIGHT3;
@@ -512,7 +512,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     		    case MP2::OBJ_TREASURECHEST:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
-			    case 0:
+			    case 0:	return Cursor::POINTER;
 			    case 1:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT : Cursor::POINTER;
 			    case 2:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT2 : Cursor::POINTER;
 			    case 3:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT3 : Cursor::POINTER;
@@ -523,7 +523,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 		    case MP2::OBJ_COAST:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
-			    case 0:
+			    case 0:	return Cursor::POINTER;
 			    case 1:	return Cursor::ANCHOR;
 			    case 2:	return Cursor::ANCHOR2;
 			    case 3:	return Cursor::ANCHOR3;
@@ -534,7 +534,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 		    default:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
-			    case 0:
+			    case 0:	return Cursor::POINTER;
 			    case 1:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT : (tile.isPassable() ? Cursor::BOAT : Cursor::POINTER);
 			    case 2:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT2 : (tile.isPassable() ? Cursor::BOAT2 : Cursor::POINTER);
 			    case 3:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT3 : (tile.isPassable() ? Cursor::BOAT3 : Cursor::POINTER);
@@ -550,7 +550,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     		    case MP2::OBJ_MONSTER:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
-			    case 0:
+			    case 0:	return Cursor::POINTER;
 			    case 1:	return Cursor::FIGHT;
 			    case 2:	return Cursor::FIGHT2;
 			    case 3:	return Cursor::FIGHT3;
@@ -565,7 +565,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     			if(NULL != castle)
 			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			    {
-				case 0:
+				case 0:	return Cursor::POINTER;
 				case 1:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT;
 				case 2:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT2;
 				case 3:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT3;
@@ -582,7 +582,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     			if(NULL != castle)
 			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			    {
-				case 0:
+				case 0:	return Cursor::POINTER;
 				case 1:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION : Cursor::FIGHT;
 				case 2:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION2 : Cursor::FIGHT2;
 				case 3:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION3 : Cursor::FIGHT3;
@@ -603,7 +603,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			    else
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
-				    case 0:
+				    case 0:	return Cursor::POINTER;
 				    case 1:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
 				    case 2:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE2 : Cursor::FIGHT2;
 				    case 3:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE3 : Cursor::FIGHT3;
@@ -617,7 +617,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     		    case MP2::OBJ_BOAT:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
-			    case 0:
+			    case 0:	return Cursor::POINTER;
 			    case 1:	return Cursor::BOAT;
 			    case 2:	return Cursor::BOAT2;
 			    case 3:	return Cursor::BOAT3;
@@ -628,7 +628,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     		    case MP2::OBJ_TREASURECHEST:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
-			    case 0:
+			    case 0:	return Cursor::POINTER;
 			    case 1:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION;
 			    case 2:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION2;
 			    case 3:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION3;
@@ -639,7 +639,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 		    default:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
-			    case 0:
+			    case 0:	return Cursor::POINTER;
 			    case 1:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION : (tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
 			    case 2:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION2 : (tile.isPassable() ? Cursor::MOVE2 : Cursor::POINTER);
 			    case 3:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION3 : (tile.isPassable() ? Cursor::MOVE3 : Cursor::POINTER);
