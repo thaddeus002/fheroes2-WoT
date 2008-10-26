@@ -1294,8 +1294,6 @@ void Heroes::SetCenter(const u16 index)
 /* return route range in days */
 u8 Heroes::GetRangeRouteDays(const u16 dst) const
 {
-    if(Settings::Get().Debug()) return 1;
-
     const u32 max = GetMaxMovePoints();
 
     // 60 - approximate distance, this restriction calculation
