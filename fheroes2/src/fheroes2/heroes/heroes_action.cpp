@@ -540,6 +540,9 @@ void Heroes::ActionToFlotSam(const u16 dst_index)
     if(resource.wood)
 	body = "You search through the flotsam, and find some wood.";
     else
+    if(resource.gold)
+        body = "You search through the flotsam, and find some gold.";
+    else
 	body = "You search through the flotsam, but find nothing.";
 
     PlayPickupSound();
