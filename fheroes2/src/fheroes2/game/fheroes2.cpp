@@ -137,7 +137,16 @@ int main(int argc, char **argv)
 	if(SDL::Init(subsystem))
 	try
 	{
-	    if((conf.Sound() || conf.Music()) && ! Mixer::isValid())
+	    if(Mixer::isValid())
+	    {
+                const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
+                const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
+
+                Mixer::Volume(-1, vol1);
+                Music::Volume(vol2);
+	    }
+	    else
+	    if(conf.Sound() || conf.Music())
 	    {
 		conf.ResetModes(Settings::SOUND);
 		conf.ResetModes(Settings::MUSIC);

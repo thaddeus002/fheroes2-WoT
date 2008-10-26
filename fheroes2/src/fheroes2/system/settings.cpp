@@ -120,6 +120,8 @@ void Settings::Dump(std::ostream & stream) const
     stream << "videomode = " << str << std::endl;
     stream << "sound = " << (modes & SOUND ? "on"  : "off") << std::endl;
     stream << "music = " << (modes & MUSIC_CD ? "cd" : ( modes & MUSIC_MIDI ? "midi" : ( modes & MUSIC_EXT ? "ext" : "off"))) << std::endl;
+    stream << "sound volume = " << static_cast<int>(sound_volume) << std::endl;
+    stream << "music volume = " << static_cast<int>(music_volume) << std::endl;
     stream << "fullscreen = " << (modes & FULLSCREEN ? "on"  : "off") << std::endl;
     stream << "evilinterface = " << (modes & EVILINTERFACE ? "on"  : "off") << std::endl;
     stream << "shadow = " << (modes & SHADOW ? "on"  : "off") << std::endl;
@@ -221,6 +223,7 @@ const Size & Settings::VideoMode(void) const { return video_mode; }
 
 void Settings::Parse(const std::string & left, const std::string & right)
 {
+Error::Verbose(left);
     // debug
     if(left == "debug") debug = String::ToInt(right);
     else
@@ -250,6 +253,20 @@ void Settings::Parse(const std::string & left, const std::string & right)
             ResetModes(MUSIC);
             SetModes(MUSIC_EXT);
         }
+    }
+    else
+    // volume
+    if(left == "sound volume")
+    {
+	sound_volume = String::ToInt(right);
+	if(sound_volume > 10) sound_volume = 10;
+    }
+    else
+    // volume
+    if(left == "music volume")
+    {
+	music_volume = String::ToInt(right);
+	if(music_volume > 10) music_volume = 10;
     }
     else
     // value
