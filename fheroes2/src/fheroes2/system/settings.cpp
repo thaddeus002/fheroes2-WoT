@@ -223,7 +223,6 @@ const Size & Settings::VideoMode(void) const { return video_mode; }
 
 void Settings::Parse(const std::string & left, const std::string & right)
 {
-Error::Verbose(left);
     // debug
     if(left == "debug") debug = String::ToInt(right);
     else
