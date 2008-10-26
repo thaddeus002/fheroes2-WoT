@@ -174,6 +174,7 @@ void Heroes::Action(const Maps::Tiles & dst)
 	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(dst_index); break;
 
 	case MP2::OBJ_OBSERVATIONTOWER:
+	    if(H2Config::MyColor() == GetColor())
 	    Dialog::Message(MP2::StringObject(object), "From the observation tower, you are able to see distant lands.", Font::BIG, Dialog::OK);
 	    Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, GetColor());
 	    break;
