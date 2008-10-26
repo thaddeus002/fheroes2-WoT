@@ -39,11 +39,11 @@
 #include "error.h"
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs);
-void RedrawToResource(const Point & pt, bool showcost, u8 from_resource = 0);
-void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to);
-u16 GetTradeCosts(u8 rs_from, u8 rs_to);
+void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);
+void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPost);
+u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost);
 
-void Dialog::Marketplace(void)
+void Dialog::Marketplace(bool fromTradingPost)
 {
     Display & display = Display::Get();
     const ICN::icn_t tradpost = H2Config::EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
@@ -120,7 +120,7 @@ void Dialog::Marketplace(void)
     dst_pt.x = pt2.x + (108 - Text::width(header_to, Font::SMALL)) / 2;
     dst_pt.y = pt2.y - 15;
     Text(header_to, Font::SMALL, dst_pt);
-    RedrawToResource(pt2, false);
+    RedrawToResource(pt2, false, fromTradingPost);
 
     u32 count_sell = 0;
     u32 count_buy = 0;
@@ -192,7 +192,7 @@ void Dialog::Marketplace(void)
 	buttonRight = new Button(dst_pt, tradpost, 5, 6); \
 	Resource::resource_t rs_from = static_cast<Resource::resource_t>(resourceFrom); \
 	Resource::resource_t rs_to   = static_cast<Resource::resource_t>(resourceTo); \
-	u16 exchange_rate = GetTradeCosts(resourceFrom, resourceTo); \
+	u16 exchange_rate = GetTradeCosts(resourceFrom, resourceTo, fromTradingPost); \
 	if(Resource::GOLD == resourceTo) \
 	{ \
 	    message = "I can offer you "; \
@@ -336,10 +336,11 @@ void Dialog::Marketplace(void)
 		    default: break;
 		}
 
-		if(GetTradeCosts(resourceFrom, resourceTo))
+		if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
 		{
 		    max_buy = Resource::GOLD == resourceTo ? 
-			max_sell * GetTradeCosts(resourceFrom, resourceTo) : max_sell / GetTradeCosts(resourceFrom, resourceTo);
+			max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
+                        max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
 		}
 
 		count_sell = 0;
@@ -349,7 +350,7 @@ void Dialog::Marketplace(void)
 		cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
 
 		if(resourceTo) cursorTo.Hide();
-		RedrawToResource(pt2, true, resourceFrom);
+		RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
 		if(resourceTo) cursorTo.Show();
 		if(resourceTo) ShowTradeArea;
 
@@ -377,10 +378,11 @@ void Dialog::Marketplace(void)
 		    default: break;
 		}
 
-		if(GetTradeCosts(resourceFrom, resourceTo))
+		if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
 		{
 		    max_buy = Resource::GOLD == resourceTo ? 
-			max_sell * GetTradeCosts(resourceFrom, resourceTo) : max_sell / GetTradeCosts(resourceFrom, resourceTo);
+			max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
+                        max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
 		}
 
 		count_sell = 0;
@@ -392,7 +394,7 @@ void Dialog::Marketplace(void)
 		if(resourceFrom)
 		{
 		    cursorTo.Hide();
-		    RedrawToResource(pt2, true, resourceFrom);
+		    RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
 		    cursorTo.Show();
 		    ShowTradeArea;
 		}
@@ -410,8 +412,8 @@ void Dialog::Marketplace(void)
             else
             if(seek > splitter->Max()) seek = splitter->Max();
 
-	    count_buy = seek * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo) : 1);
-	    count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo));
+	    count_buy = seek * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
+	    count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
 
             cursor.Hide();
             splitter->Move(seek);
@@ -435,9 +437,9 @@ void Dialog::Marketplace(void)
 	    ((buttonLeft && le.MouseClickLeft(*buttonLeft)) ||
 	    le.MouseWheelDn(splitter->GetRect())))
 	{
-	    count_buy -= Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo) : 1;
+	    count_buy -= Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
 
-	    count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
+	    count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
 
             cursor.Hide();
 	    splitter->Backward();
@@ -452,9 +454,9 @@ void Dialog::Marketplace(void)
 	    ((buttonRight && le.MouseClickLeft(*buttonRight)) ||
 	    le.MouseWheelUp(splitter->GetRect())))
 	{
-	    count_buy += Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo) : 1;
+	    count_buy += Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
 
-	    count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo);
+	    count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
 
             cursor.Hide();
 	    splitter->Forward();
@@ -553,7 +555,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     Text(str, Font::SMALL, dst_pt);
 }
 
-void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
+void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource)
 {
     Display & display = Display::Get();
     const ICN::icn_t tradpost = H2Config::EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
@@ -566,7 +568,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
     display.Blit(AGG::GetICN(tradpost, 7), dst_pt);
     if(showcost)
     {
-	GetStringTradeCosts(str, from_resource, Resource::WOOD);
+	GetStringTradeCosts(str, from_resource, Resource::WOOD, tradingPost);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
 	Text(str, Font::SMALL, dst_pt);
@@ -578,7 +580,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
     display.Blit(AGG::GetICN(tradpost, 8), dst_pt);
     if(showcost)
     {
-	GetStringTradeCosts(str, from_resource, Resource::MERCURY);
+	GetStringTradeCosts(str, from_resource, Resource::MERCURY, tradingPost);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
         Text(str, Font::SMALL, dst_pt);
@@ -590,7 +592,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
     display.Blit(AGG::GetICN(tradpost, 9), dst_pt);
     if(showcost)
     {
-	GetStringTradeCosts(str, from_resource, Resource::ORE);
+	GetStringTradeCosts(str, from_resource, Resource::ORE, tradingPost);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
 	Text(str, Font::SMALL, dst_pt);
@@ -602,7 +604,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
     display.Blit(AGG::GetICN(tradpost, 10), dst_pt);
     if(showcost)
     {
-	GetStringTradeCosts(str, from_resource, Resource::SULFUR);
+	GetStringTradeCosts(str, from_resource, Resource::SULFUR, tradingPost);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
 	Text(str, Font::SMALL, dst_pt);
@@ -614,7 +616,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
     display.Blit(AGG::GetICN(tradpost, 11), dst_pt);
     if(showcost)
     {
-	GetStringTradeCosts(str, from_resource, Resource::CRYSTAL);
+	GetStringTradeCosts(str, from_resource, Resource::CRYSTAL, tradingPost);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
 	Text(str, Font::SMALL, dst_pt);
@@ -626,7 +628,7 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
     display.Blit(AGG::GetICN(tradpost, 12), dst_pt);
     if(showcost)
     {
-	GetStringTradeCosts(str, from_resource, Resource::GEMS);
+	GetStringTradeCosts(str, from_resource, Resource::GEMS, tradingPost);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
 	Text(str, Font::SMALL, dst_pt);
@@ -638,14 +640,14 @@ void RedrawToResource(const Point & pt, bool showcost, u8 from_resource)
     display.Blit(AGG::GetICN(tradpost, 13), dst_pt);
     if(showcost)
     {
-	GetStringTradeCosts(str, from_resource, Resource::GOLD);
+	GetStringTradeCosts(str, from_resource, Resource::GOLD, tradingPost);
 	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
 	dst_pt.y += 21;
 	Text(str, Font::SMALL, dst_pt);
     }
 }
 
-void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to)
+void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPost)
 {
     if(str.size()) str.clear();
 
@@ -658,12 +660,15 @@ void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to)
 
     if(Resource::GOLD != rs_from && Resource::GOLD != rs_to) str = "1/";
 
-    String::AddInt(str, GetTradeCosts(rs_from, rs_to));
+    String::AddInt(str, GetTradeCosts(rs_from, rs_to, tradingPost));
 }
 
-u16 GetTradeCosts(u8 rs_from, u8 rs_to)
+u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 {
     u8 markets = world.GetMyKingdom().GetCountMarketplace();
+    
+    if(tradingPost)
+        markets++;
 
     if(rs_from == rs_to) return 0;
 

@@ -742,7 +742,7 @@ void Heroes::ActionToMagicWell(const u16 dst_index)
 
 void Heroes::ActionToTradingPost(const u16 dst_index)
 {
-    if(H2Config::MyColor() == GetColor()) Dialog::Marketplace();
+    if(H2Config::MyColor() == GetColor()) Dialog::Marketplace(true);
 
     // redraw status info
     Game::StatusWindow::Get().Redraw();

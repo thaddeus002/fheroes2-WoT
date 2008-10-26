@@ -102,7 +102,7 @@ namespace Dialog
     answer_t ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle=false);
 
     // dialog marketplace
-    void Marketplace(void);
+    void Marketplace(bool fromTradingPost = false);
 
     // dialog buy boat
     answer_t BuyBoat(bool enable);
