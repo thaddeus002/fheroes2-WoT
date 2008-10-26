@@ -1459,6 +1459,7 @@ Game::menu_t Game::HumanTurn(void)
 		    case Game::NEWGAME:
 		    case Game::LOADGAME:
 		    case Game::QUITGAME:
+			Mixer::Reset();
 			return result;
 
 		    case Game::SAVEGAME:
