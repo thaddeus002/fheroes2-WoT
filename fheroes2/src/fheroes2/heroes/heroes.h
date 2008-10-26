@@ -214,6 +214,8 @@ protected:
     void ActionToMonster(const u16 dst_index);
     void ActionToBoat(const u16 dst_index);
     void ActionToCoast(const u16 dst_index);
+    void ActionToWagon(const u16 dst_index);
+    void ActionToSkeleton(const u16 dst_index);
     void ActionToResource(const u16 dst_index);
     void ActionToPickupResource(const u16 dst_index);
     void ActionToFlotSam(const u16 dst_index);

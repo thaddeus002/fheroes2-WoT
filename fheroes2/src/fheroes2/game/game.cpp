@@ -189,5 +189,5 @@ void Game::PreloadLOOPSounds(void)
     Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0025), true, 19);
     Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0027), true, 20);
 
-    Error::Verbose("Game::PreloadLOOPSoundToMixer: done.");
+    if(Settings::Get().Debug()) Error::Verbose("Game::PreloadLOOPSoundToMixer: done.");
 }

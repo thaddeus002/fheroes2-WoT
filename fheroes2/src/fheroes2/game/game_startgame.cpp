@@ -444,9 +444,9 @@ void Game::FocusToHeroes(Heroes *hero)
     Game::Focus & globalfocus = Game::Focus::Get();
 
     if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().ShowPath(false);
+    (*hero).ShowPath(true);
 
     globalfocus.Set(*hero);
-    globalfocus.GetHeroes().ShowPath(true);
     globalfocus.Redraw();
 }
 
@@ -805,25 +805,25 @@ Game::menu_t Game::HumanTurn(void)
         {
             if(myHeroes.size())
 	    {
-		global_focus.Set(*myHeroes.front());
+		FocusToHeroes(myHeroes.front());
 		selectHeroes.Select(0);
 	    }
             else
 	    if(myCastles.size())
 	    {
-		global_focus.Set(*myCastles.front());
+		FocusToCastle(myCastles.front());
 		selectCastles.Select(0);
 	    }
 	    break;
         }
 	case Focus::HEROES:
-	    selectHeroes.Select(0);
 	    FocusToHeroes(myHeroes.front());
+	    selectHeroes.Select(0);
 	    break;
 
 	case Focus::CASTLE:
-	    selectCastles.Select(0);
 	    FocusToCastle(myCastles.front());
+	    selectCastles.Select(0);
 	    break;
     }
     
@@ -1421,7 +1421,9 @@ Game::menu_t Game::HumanTurn(void)
 	    // click End Turn
 	    if(le.MouseClickLeft(buttonEndTur))
 	    {
-	        break;
+		if(!myKingdom.HeroesMayStillMove() ||
+		    Dialog::YES == Dialog::Message("", "One or more heroes may still move, are you sure you want to end your turn?", Font::BIG, Dialog::YES | Dialog::NO))
+	    	    break;
 	    }
 	    else
     	    // click AdventureOptions

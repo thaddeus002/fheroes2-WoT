@@ -298,6 +298,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    orders_building.push_back(BUILD_RIGHTTURRET);
 	    orders_building.push_back(DWELLING_MONSTER6);
 	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(DWELLING_MONSTER1);
 	    orders_building.push_back(BUILD_SHIPYARD);
 	    orders_building.push_back(BUILD_THIEVESGUILD);
 	    orders_building.push_back(BUILD_TAVERN);
@@ -305,7 +306,6 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    orders_building.push_back(DWELLING_MONSTER5);
 	    orders_building.push_back(DWELLING_MONSTER2);
 	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(DWELLING_MONSTER1);
 	    orders_building.push_back(BUILD_MAGEGUILD1);
 	    orders_building.push_back(BUILD_WEL2);
 	    orders_building.push_back(BUILD_MARKETPLACE);

@@ -1323,6 +1323,32 @@ void Maps::Tiles::UpdateQuantity(void)
 
     switch(general)
     {
+	case MP2::OBJ_SKELETON:
+	    switch(Rand::Get(1, 2))
+	    {
+		case 1:
+            	    quantity1 = Artifact::Rand();
+		    quantity2 = 0;
+		break;
+		default: break;
+	    }
+	break;
+
+	case MP2::OBJ_WAGON:
+	    switch(Rand::Get(1, 3))
+	    {
+		case 1:
+            	    quantity1 = Artifact::Rand1();
+		    quantity2 = 0;
+		break;
+		case 2:
+		    quantity1 = Resource::Rand();
+		    quantity2 = Rand::Get(2, 5);
+		break;
+		default: break;
+	    }
+	break;
+
 	case MP2::OBJ_ARTIFACT:
 	    addon = FindArtifact();
 	    if(addon)

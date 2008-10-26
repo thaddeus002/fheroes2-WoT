@@ -129,6 +129,8 @@ public:
     bool isVisited(const MP2::object_t & object) const;
     bool isVisited(const Maps::Tiles & tile) const;
 
+    bool HeroesMayStillMove(void) const;
+
 private:
     const Color::color_t color;
     Game::control_t control;

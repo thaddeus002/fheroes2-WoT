@@ -868,6 +868,8 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_MAGICGARDEN:
             case MP2::OBJ_WATERWHEEL:
             case MP2::OBJ_WINDMILL:
+            case MP2::OBJ_WAGON:
+            case MP2::OBJ_SKELETON:
             case MP2::OBJ_LEANTO:
             case MP2::OBJ_CAMPFIRE:
             case MP2::OBJ_FLOTSAM:

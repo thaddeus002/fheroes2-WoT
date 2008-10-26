@@ -1301,23 +1301,24 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
 
     Route::Path test(*this);
     // 80 - approximate limit, this restriction path finding algorithm
-    if(! test.Calculate(dst, 80)) return 4;
+    if(test.Calculate(dst, 80))
+    {
+	u32 total = test.TotalPenalty();
 
-    u32 total = test.TotalPenalty();
+	if(move_point >= total) return 1;
 
-    if(move_point >= total) return 1;
+	total -= move_point;
 
-    total -= move_point;
+	if(max >= total) return 2;
 
-    if(max >= total) return 2;
+	total -= move_point;
 
-    total -= move_point;
+	if(max >= total) return 3;
 
-    if(max >= total) return 3;
+	total -= move_point;
 
-    total -= move_point;
-
-    if(max >= total) return 4;
+	if(max >= total) return 4;
+    }
 
     return 0;
 }

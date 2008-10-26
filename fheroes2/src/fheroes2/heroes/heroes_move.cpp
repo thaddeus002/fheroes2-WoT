@@ -257,12 +257,12 @@ void Heroes::Redraw(bool with_shadow) const
     GameArea::SrcRectFixed(src_rt2, dst_pt2, sprite2.w(), sprite2.h());
     GameArea::SrcRectFixed(src_rt3, dst_pt3, sprite3.w(), sprite3.h());
 
+    // redraw sprites for shadow
+    if(with_shadow) display.Blit(sprite3, src_rt3, dst_pt3);
+
     // redraw sprites hero and flag
     display.Blit(sprite1, src_rt1, dst_pt1);
     display.Blit(sprite2, src_rt2, dst_pt2);
-    
-    // redraw sprites for shadow
-    if(with_shadow) display.Blit(sprite3, src_rt3, dst_pt3);
 }
 
 bool Heroes::MoveStep(void)

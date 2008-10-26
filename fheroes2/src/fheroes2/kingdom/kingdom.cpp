@@ -310,3 +310,11 @@ void Kingdom::SetVisited(const u16 index, const MP2::object_t & object)
 
     if(MP2::OBJ_ZERO != obj) visit_object.push_front(Visit::IndexObject(index, obj));
 }
+
+bool Kingdom::HeroesMayStillMove(void) const
+{
+    std::vector<Heroes *>::const_iterator ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith) if(*ith && (**ith).GetMovePoints()) return true;
+
+    return false;
+}

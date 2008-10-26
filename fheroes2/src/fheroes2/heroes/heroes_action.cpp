@@ -125,6 +125,9 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_WINDMILL:
         case MP2::OBJ_WATERWHEEL:	ActionToResource(dst_index); break;
 
+        case MP2::OBJ_WAGON:		ActionToWagon(dst_index); break;
+        case MP2::OBJ_SKELETON:		ActionToSkeleton(dst_index); break;
+
         // pickup object
         case MP2::OBJ_RESOURCE:
         case MP2::OBJ_BOTTLE:
@@ -207,7 +210,6 @@ void Heroes::Action(const Maps::Tiles & dst)
 	case MP2::OBJ_DESERTTENT:	ActionToRecruitArmy(dst_index); break;
 
         // object
-        case MP2::OBJ_SKELETON:
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_GRAVEYARD:
         case MP2::OBJ_OBELISK:
@@ -219,7 +221,6 @@ void Heroes::Action(const Maps::Tiles & dst)
 	case MP2::OBJ_PIRAMID:
         case MP2::OBJ_CITYDEAD:
         case MP2::OBJ_SPHINX:
-        case MP2::OBJ_WAGON:
         case MP2::OBJ_ARTESIANSPRING:
         case MP2::OBJ_XANADU:
         case MP2::OBJ_FREEMANFOUNDRY:
@@ -298,12 +299,15 @@ void Heroes::ActionToMonster(const u16 dst_index)
 	break;
     }
 
-    // redraw focus list
-    Game::Focus::Get().Redraw();
+    if(H2Config::MyColor() == GetColor())
+    {
+	// redraw focus list
+	Game::Focus::Get().Redraw();
 
-    // redraw status
-    Game::StatusWindow::Get().SetState(Game::StatusWindow::DAY);
-    Game::StatusWindow::Get().Redraw();
+	// redraw status
+	Game::StatusWindow::Get().SetState(Game::StatusWindow::DAY);
+	Game::StatusWindow::Get().Redraw();
+    }
 }
 
 void Heroes::ActionToHeroes(const u16 dst_index)
@@ -434,6 +438,7 @@ void Heroes::ActionToPickupResource(const u16 dst_index)
 
     // dialog
     if(H2Config::MyColor() == GetColor())
+    {
 	switch(tile.GetObject())
 	{
 	    case MP2::OBJ_CAMPFIRE:
@@ -447,11 +452,12 @@ void Heroes::ActionToPickupResource(const u16 dst_index)
 	    default: break;
 	}
 
+	// redraw status info
+	Game::StatusWindow::Get().Redraw();
+    }
+
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
-
-    // redraw status info
-    Game::StatusWindow::Get().Redraw();
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToPickupResource: " + GetName() + " pickup small resource");
 }
@@ -459,9 +465,10 @@ void Heroes::ActionToPickupResource(const u16 dst_index)
 void Heroes::ActionToResource(const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
 
     const u8 count = tile.GetQuantity2();
+
+    Resource::funds_t resource;
     switch(tile.GetQuantity1())
     {
 	case Resource::WOOD: resource.wood += count; break;
@@ -482,6 +489,7 @@ void Heroes::ActionToResource(const u16 dst_index)
 
     // dialog
     if(H2Config::MyColor() == GetColor())
+    {
 	switch(tile.GetObject())
 	{
 	    case MP2::OBJ_WINDMILL:
@@ -515,13 +523,119 @@ void Heroes::ActionToResource(const u16 dst_index)
 	    default: break;
 	}
 
+        // redraw status info
+	Game::StatusWindow::Get().Redraw();
+    }
+
     tile.SetQuantity1(0);
     tile.SetQuantity2(0);
 
-    // redraw status info
-    Game::StatusWindow::Get().Redraw();
-
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToResource: " + GetName() + " pickup small resource");
+}
+
+void Heroes::ActionToSkeleton(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    // artifact
+    if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
+    {
+	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+	Surface sprite(border.w(), border.h());
+
+	sprite.Blit(border);
+	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, art + 1), 5, 5);
+
+	PickupArtifact(art);
+
+	if(H2Config::MyColor() == GetColor()) 
+	{
+	    PlayPickupSound();
+	    Dialog::SpriteInfo(MP2::StringObject(tile.GetObject()), "You come upon the remains of an unfortunate adventurer. Searching through the tattered clothing, you find " + Artifact::String(art), sprite);
+	}
+    }
+    else
+    {
+	if(H2Config::MyColor() == GetColor()) 
+	{
+	    PlayPickupSound();
+	    Dialog::Message(MP2::StringObject(tile.GetObject()), "You come upon the remains of an unfortunate adventurer. Searching through the tattered clothing, you find nothing.", Font::BIG, Dialog::OK);
+	}
+    }
+
+    tile.SetQuantity1(0);
+    tile.SetQuantity2(0);
+
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToSkeleton: " + GetName());
+}
+
+void Heroes::ActionToWagon(const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    // artifact
+    if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
+    {
+	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+	Surface sprite(border.w(), border.h());
+
+	sprite.Blit(border);
+	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, art + 1), 5, 5);
+
+	PickupArtifact(art);
+
+	if(H2Config::MyColor() == GetColor()) 
+	{
+	    PlayPickupSound();
+	    Dialog::SpriteInfo(MP2::StringObject(tile.GetObject()), "You come across an old wagon left by a trader who didn't quite make it to safe terrain. Searching inside, you find the " + Artifact::String(art), sprite);
+	}
+    }
+    else
+    if(tile.GetQuantity1() && tile.GetQuantity2())
+    {
+	const u8 count = tile.GetQuantity2();
+	Resource::funds_t resource;
+
+	switch(tile.GetQuantity1())
+	{
+	    case Resource::WOOD:	resource.wood += count; break;
+    	    case Resource::MERCURY:	resource.mercury += count; break;
+    	    case Resource::ORE:		resource.ore += count; break;
+    	    case Resource::SULFUR:	resource.sulfur += count; break;
+    	    case Resource::CRYSTAL:	resource.crystal += count; break;
+    	    case Resource::GEMS:	resource.gems += count; break;
+    	    case Resource::GOLD:	resource.gold += 100 * count; break;
+
+	    default: break;
+	}
+
+	world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+	if(H2Config::MyColor() == GetColor()) 
+	{
+	    PlayPickupSound();
+	    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "You come across an old wagon left by a trader who didn't quite make it to safe terrain. Inside, you find some of the wagon's cargo still intact.", resource);
+
+	    Game::StatusWindow::Get().Redraw();
+	}
+    }
+    else
+    {
+	if(H2Config::MyColor() == GetColor()) 
+	{
+	    PlayPickupSound();
+	    Dialog::Message(MP2::StringObject(tile.GetObject()), "You come across an old wagon left by a trader who didn't quite make it to safe terrain. Unfortunately, others have found it first, and the wagon is empty.", Font::BIG, Dialog::OK);
+	}
+    }
+
+    tile.SetQuantity1(0);
+    tile.SetQuantity2(0);
+
+
+    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToWagon: " + GetName());
 }
 
 void Heroes::ActionToFlotSam(const u16 dst_index)
@@ -555,13 +669,13 @@ void Heroes::ActionToFlotSam(const u16 dst_index)
 	    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), body, resource);
 	else
 	    Dialog::Message(MP2::StringObject(tile.GetObject()), body, Font::BIG, Dialog::OK);
+
+	// redraw status info
+	Game::StatusWindow::Get().Redraw();
     }
 
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
-
-    // redraw status info
-    Game::StatusWindow::Get().Redraw();
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToFlotSam: " + GetName() + " pickup small resource");
 }
@@ -742,10 +856,13 @@ void Heroes::ActionToMagicWell(const u16 dst_index)
 
 void Heroes::ActionToTradingPost(const u16 dst_index)
 {
-    if(H2Config::MyColor() == GetColor()) Dialog::Marketplace(true);
+    if(H2Config::MyColor() == GetColor())
+    {
+	Dialog::Marketplace();
 
-    // redraw status info
-    Game::StatusWindow::Get().Redraw();
+	// redraw status info
+        Game::StatusWindow::Get().Redraw();
+    }
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTradingPost: " + GetName());
 }
@@ -1104,8 +1221,11 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    // redraw status info
-    Game::StatusWindow::Get().Redraw();
+    if(H2Config::MyColor() == GetColor())
+    {
+	// redraw status info
+	Game::StatusWindow::Get().Redraw();
+    }
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
 }
@@ -1122,7 +1242,7 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 	const std::string message("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?");
 	if(H2Config::MyColor() != GetColor())
 	{
-            //FIXME: This may be a network player instead of AI
+	    //FIXME: This may be a network player instead of AI
 	    AI::RecruitTroops(*this, Monster::GENIE, count);
 
 	    tile.RemoveObjectSprite();
@@ -1385,20 +1505,25 @@ void Heroes::ActionToJoinArmy(const u16 dst_index)
 	    // join
 	    const std::string & message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you. Do you accept?";
 
-	    if(H2Config::MyColor() != GetColor() && AI::JoinTroops(*this, monster, count))
+	    if(H2Config::MyColor() == GetColor())
 	    {
-		tile.SetQuantity1(0);
-		tile.SetQuantity2(0);
+		AGG::PlaySound(M82::EXPERNCE);
+
+		if(Dialog::YES == Dialog::Message(Monster::String(monster), message, Font::BIG, Dialog::YES|Dialog::NO))
+		{
+	    	    JoinTroops(monster, count);
+		    tile.SetQuantity1(0);
+		    tile.SetQuantity2(0);
+
+		    // redraw status info
+		    Game::StatusWindow::Get().Redraw();
+		}
 	    }
 	    else
-	    if(Dialog::YES == Dialog::Message(Monster::String(monster), message, Font::BIG, Dialog::YES|Dialog::NO))
+	    if(AI::JoinTroops(*this, monster, count))
 	    {
-	    	JoinTroops(monster, count);
 		tile.SetQuantity1(0);
 		tile.SetQuantity2(0);
-
-		// redraw status info
-		Game::StatusWindow::Get().Redraw();
 	    }
 	}
 	// is full
@@ -1460,26 +1585,30 @@ void Heroes::ActionToRecruitArmy(const u16 dst_index)
     {
 	if(((HEROESMAXARMY == army_size && HasMonster(monster)) || HEROESMAXARMY > army_size))
 	{
-	    if(H2Config::MyColor() != GetColor())
+	    if(H2Config::MyColor() == GetColor())
+	    {
+		AGG::PlaySound(M82::EXPERNCE);
+
+		if(Dialog::YES == Dialog::Message(Monster::String(monster), msg_full, Font::BIG, Dialog::YES|Dialog::NO))
+		{
+		    // recruit
+		    const u16 recruit = Dialog::RecruitMonster(monster, count);
+		    if(recruit)
+		    {
+	    		JoinTroops(monster, recruit);
+			tile.SetQuantity1((count - recruit) % 0xFF);
+			tile.SetQuantity2((count - recruit) / 0xFF);
+
+			// redraw status info
+			Game::StatusWindow::Get().Redraw();
+		    }
+		}
+	    }
+	    else
 	    {
 		const u16 recruit = AI::RecruitTroops(*this, monster, count);
 		tile.SetQuantity1((count - recruit) % 0xFF);
 		tile.SetQuantity2((count - recruit) / 0xFF);
-	    }
-	    else
-	    if(Dialog::YES == Dialog::Message(Monster::String(monster), msg_full, Font::BIG, Dialog::YES|Dialog::NO))
-	    {
-		// recruit
-		const u16 recruit = Dialog::RecruitMonster(monster, count);
-		if(recruit)
-		{
-	    	    JoinTroops(monster, recruit);
-		    tile.SetQuantity1((count - recruit) % 0xFF);
-		    tile.SetQuantity2((count - recruit) / 0xFF);
-
-		    // redraw status info
-		    Game::StatusWindow::Get().Redraw();
-		}
 	    }
 	}
 	// is full
