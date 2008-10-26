@@ -839,6 +839,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		// play sound
 		AGG::PlaySound(M82::BUILDTWN);
 
+		RedrawAnimationBuilding(cur_pt, BUILD_CASTLE);
+
 		RedrawResourcePanel();
 	        RedrawAllBuilding(cur_pt, orders_building);
 	        RedrawNameTown(cur_pt);
