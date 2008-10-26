@@ -127,12 +127,14 @@ public:
     u8 GetPower(void) const;
     u8 GetKnowledge(void) const;
     u16 GetMaxSpellPoints(void) const;
-    u16 GetMaxMovePoints(void) const;
     u16 GetSpellPoints(void) const;
-    u16 GetMovePoints(void) const;
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const;
+
+    u16 GetMaxMovePoints(void) const;
+    u16 GetMovePoints(void) const;
+    bool MayStillMove(void) const;
 
     bool HasSecondarySkill(const Skill::Secondary::skill_t skill) const;
     Skill::Level::type_t GetLevelSkill(const Skill::Secondary::skill_t skill) const;

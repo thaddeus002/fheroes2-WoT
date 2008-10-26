@@ -1561,3 +1561,10 @@ Speed::speed_t Heroes::GetHighestArmySpeed(void) const
     
     return result;
 }
+
+bool Heroes::MayStillMove(void) const
+{
+    const u16 center = Maps::GetIndexFromAbsPoint(mp);
+
+    return move_point >= Maps::Ground::GetPenalty(center, center, GetLevelSkill(Skill::Secondary::PATHFINDING));
+}
