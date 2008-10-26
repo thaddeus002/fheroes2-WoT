@@ -295,6 +295,8 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
     if(buttons)
     {
+	if(!AllowBuyBuilding(build)) button1.SetDisable(true);
+
 	button1.Draw();
 	button2.Draw();
     }
@@ -310,8 +312,8 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
         le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
-        if(le.KeyPress(KEY_RETURN) ||
-    	    le.MouseClickLeft(button1)) return Dialog::OK;
+        if(button1.isEnable() && (le.KeyPress(KEY_RETURN) ||
+    	    le.MouseClickLeft(button1))) return Dialog::OK;
 
         if(le.KeyPress(KEY_ESCAPE) ||
     	    le.MouseClickLeft(button2)) return Dialog::CANCEL;
