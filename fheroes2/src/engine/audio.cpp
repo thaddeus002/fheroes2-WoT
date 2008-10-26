@@ -380,8 +380,6 @@ void Mixer::Reset(const int ch)
 	    else Mix_HaltChannel(ii);
     }
     else Mix_HaltChannel(ch);
-
-    Error::Verbose("Mixer::Reset");
 }
 
 u8 Mixer::isPlaying(const int ch)
