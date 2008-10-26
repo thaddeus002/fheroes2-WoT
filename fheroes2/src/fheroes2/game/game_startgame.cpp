@@ -510,13 +510,15 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     		    break;
 
     		    case MP2::OBJ_TREASURECHEST:
+			if(Maps::Ground::WATER != tile.GetGround()) return Cursor::POINTER;
+			else
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
 			    case 0:	return Cursor::POINTER;
-			    case 1:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT : Cursor::POINTER;
-			    case 2:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT2 : Cursor::POINTER;
-			    case 3:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT3 : Cursor::POINTER;
-			    default:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::REDBOAT4 : Cursor::POINTER;
+			    case 1:	return Cursor::REDBOAT;
+			    case 2:	return Cursor::REDBOAT2;
+			    case 3:	return Cursor::REDBOAT3;
+			    default:	return Cursor::REDBOAT4;
 			}
 			break;
 
@@ -540,7 +542,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			    case 3:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT3 : (tile.isPassable() ? Cursor::BOAT3 : Cursor::POINTER);
 			    default:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT4 : (tile.isPassable() ? Cursor::BOAT4 : Cursor::POINTER);
 			}
-			break;                        
+			break;
 		}
 	    }
 	    else
@@ -563,15 +565,18 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     			const Castle *castle = world.GetCastle(tile.GetIndex());
 
     			if(NULL != castle)
+			{
+			    if(from_hero.GetColor() == castle->GetColor()) return Cursor::CASTLE;
+			    else
 			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			    {
 				case 0:	return Cursor::POINTER;
-				case 1:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT;
-				case 2:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT2;
-				case 3:	return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT3;
-				default:return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::FIGHT4;
+				case 1:	return Cursor::FIGHT;
+				case 2:	return Cursor::FIGHT2;
+				case 3:	return Cursor::FIGHT3;
+				default:return Cursor::FIGHT4;
 			    }
-			    break;
+			}
     		    }
     		    break;
 
@@ -626,13 +631,15 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			break;
 
     		    case MP2::OBJ_TREASURECHEST:
+			if(Maps::Ground::WATER == tile.GetGround()) return Cursor::POINTER;
+			else
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
 			    case 0:	return Cursor::POINTER;
-			    case 1:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION;
-			    case 2:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION2;
-			    case 3:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION3;
-			    default:	return Maps::Ground::WATER == tile.GetGround() ? Cursor::POINTER : Cursor::ACTION4;
+			    case 1:	return Cursor::ACTION;
+			    case 2:	return Cursor::ACTION2;
+			    case 3:	return Cursor::ACTION3;
+			    default:	return Cursor::ACTION4;
 			}
 			break;
 
