@@ -23,36 +23,3 @@ Copy maps files (*.mp2) in to maps directory.
 Hot keys:
 F4		- switch to fullscreen
 PrintScreen	- create screenshot
-
-Default config fheroes2.cfg options:
-
-#
-# path to directory data
-# data = data
-#
-# path to directory maps
-# maps = maps
-#
-# sound: on off
-# sound = off
-#
-# music: on,midi,cd,ext,off
-# music = off
-#
-# video mode (640x480, 800x576, 1024x768, 1280x1024 or other divisible 32)
-# videomode = 640x480
-#
-# fullscreen: on off (F4 switch)
-# fullscreen = off
-#
-# interface (good/evil)
-# evilinterface = off
-#
-# shadow
-# shadow = on
-#
-# debug
-# debug = off
-#
-# original version
-# original = on
