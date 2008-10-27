@@ -26,7 +26,6 @@
 
 class Sprite : public Surface
 {
-
 public:
     enum { REFLECT = 0x01, GREEN2RED = 0x02, WHITE2YELLOW = 0x04 } flag_t;
 
@@ -36,11 +35,11 @@ public:
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };
 
-    static void DrawICN(Surface & sf, const u32 size, const u8 *vdata, const u8 modify);
-
     operator Point() const { return Point(offsetX, offsetY); }
     operator Size() const { return Size(w(), h()); }
     operator Rect() const { return Rect(offsetX, offsetY, w(), h()); }
+
+    static void DrawICN(Surface & sf, const char *buf, const u32 size, const u8 flags = 0);
 
 private:
     s16		offsetX;

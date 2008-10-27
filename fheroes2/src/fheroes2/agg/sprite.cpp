@@ -18,135 +18,102 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <vector>
 #include "agg.h"
-#include "config.h"
 #include "error.h"
+#include "settings.h"
 #include "sprite.h"
-
-#define DEFAULT_SHADOW_ALPHA    0x40
 
 /* ICN Sprite constructor */
 Sprite::Sprite(const ICN::Header & header, const char *data, const u32 size, const u8 modify)
-    : Surface(header.Width(), header.Height(), H2Config::Shadow()), offsetX(header.OffsetX()), offsetY(header.OffsetY())
+    : Surface(header.Width(), header.Height(), Settings::Get().Shadow()), offsetX(header.OffsetX()), offsetY(header.OffsetY())
 {
     SetColorKey();
-    DrawICN(*this, size, reinterpret_cast<const u8 *>(data), modify);
-    if(H2Config::Shadow()) SetDisplayFormat();
+    DrawICN(*this, data, size, modify);
+    if(Settings::Get().Shadow()) SetDisplayFormat();
 }
 
-/* draw RLE ICN to surface */
-void Sprite::DrawICN(Surface & sf, const u32 size, const u8 *vdata, const u8 modify)
+void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, const u8 flags)
 {
-    bool reflect = modify & REFLECT;
+    if(NULL == buf || 0 == size) return;
 
-    u8 i, count;
+    const u8 *cur = (const u8 *) buf;
+    const u8 *max = cur + size;
+    const bool reflect = flags & REFLECT;
+
+    u8  c = 0;
     u16 x = reflect ? sf.w() - 1 : 0;
     u16 y = 0;
-    u32 index = 0;
-
-    u32 shadow =  sf.alpha() ? sf.MapRGB(0, 0, 0, DEFAULT_SHADOW_ALPHA) : DEFAULT_COLOR_KEY16;
-
+    const u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : DEFAULT_COLOR_KEY16;
 
     // lock surface
     sf.Lock();
 
-    while(index < size)
+    while(1)
     {
 	// 0x00 - end line
-	if(0 == vdata[index])
+	if(0 == *cur)
 	{
 	    ++y;
 	    x = reflect ? sf.w() - 1 : 0;
-	    ++index;
-	    continue;
+	    ++cur;
 	}
 	else
-	// range 0x01..0x7F XX
-	if(0x80 > vdata[index])
+	// 0x7F - count data
+	if(0x80 > *cur)
 	{
-	    count = vdata[index];
-	    ++index;
-	    i = 0;
-	    while(i++ < count && index < size)
+	    c = *cur;
+	    ++cur;
+	    while(c-- && cur < max)
 	    {
-		sf.SetPixel2(x, y, AGG::GetColor(vdata[index++], modify));
+		sf.SetPixel2(x, y, AGG::GetColor(*cur, flags));
 		reflect ? x-- : x++;
+		++cur;
 	    }
-	    continue;
 	}
 	else
-	// end data
-	if(0x80 == vdata[index])
+	// 0x80 - end data
+	if(0x80 == *cur)
 	{
 	    break;
 	}
 	else
-	// range 0x81..0xBF 00 
-	if(0x80 < vdata[index] && 0xC0 > vdata[index])
+	// 0xBF - skip data
+	if(0xC0 > *cur)
 	{
-	    reflect ? x -= (vdata[index] - 0x80) : x += (vdata[index] - 0x80);
-	    ++index;
-	    continue;
+	    reflect ? x -= *cur - 0x80 : x += *cur - 0x80;
+	    ++cur;
 	}
 	else
-	// 0xC0 - seek
-	if(0xC0 == vdata[index])
+	// 0xC0 - shadow
+	if(0xC0 == *cur)
 	{
-	    ++index;
+	    ++cur;
+	    c = *cur % 4 ? *cur % 4 : *(++cur);
+	    while(c--){ sf.SetPixel2(x, y, shadow); reflect ? x-- : x++; }
+	    ++cur;
+	}
+	else
+	// 0xC1
+	if(0xC1 == *cur)
+	{
+	    ++cur;
+	    c = *cur;
+	    ++cur;
+	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur, flags)); reflect ? x-- : x++; }
+	    ++cur;
+	}
+	else
+	{
+	    c = *cur - 0xC0;
+	    ++cur;
+	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur, flags)); reflect ? x-- : x++; }
+	    ++cur;
+	}
 
-	    if( 0 == vdata[index] % 4)
-	    {
-		count = vdata[index];
-		++index;
-		for(i = 0; i < vdata[index]; ++i)
-		{
-		    sf.SetPixel2(x, y, shadow);
-		    reflect ? x-- : x++;
-		}
-		++index;
-		continue;
-	    }
-	    else
-	    {
-		count = vdata[index];
-		for(i = 0; i < vdata[index] % 4; ++i)
-		{
-		    sf.SetPixel2(x, y, shadow);
-		    reflect ? x-- : x++;
-		}
-		++index;
-		continue;
-	    }
-	}
-	else
-	// 0xC1 N D count - data
-	if(0xC1 == vdata[index])
+	if(cur >= max)
 	{
-	    ++index;
-	    count = vdata[index];
-	    ++index;
-	    for(i = 0; i < count; ++i)
-	    {
-	    	sf.SetPixel2(x, y, AGG::GetColor(vdata[index], modify));
-		reflect ? x-- : x++;
-	    }
-	    ++index;
-	    continue;
-	}
-	else
-	// 0xC2 more
-	if(0xC1 < vdata[index])
-	{
-	    count = vdata[index] - 0xC0;
-	    ++index;
-	    for(i = 0; i < count; ++i)
-	    {
-		sf.SetPixel2(x, y, AGG::GetColor(vdata[index], modify));
-		reflect ? x-- : x++;
-	    }
-	    ++index;
-	    continue;
+	    if(Settings::Get().Debug()) Error::Warning("Sprite: index out of range");
+	    break;
 	}
     }
 
