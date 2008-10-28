@@ -63,6 +63,14 @@ void World::NewMaps(const u16 sw, const u16 sh)
     free_recruit_hero1 = Heroes::UNKNOWN;
     free_recruit_hero2 = Heroes::UNKNOWN;
 
+    // reserve memory
+    vec_eventsday.reserve(6);
+    vec_eventsmap.reserve(6);
+    vec_riddles.reserve(10);
+    vec_rumors.reserve(10);
+    vec_castles.reserve(30);
+    vec_teleports.reserve(10);
+
     // playing kingdom
     Settings::Get().FileInfo().SetKingdomColors(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE);
     vec_kingdoms.resize(KINGDOMMAX);
@@ -229,6 +237,14 @@ void World::LoadMaps(const std::string &filename)
 
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
 
+    // reserve memory
+    vec_eventsday.reserve(6);
+    vec_eventsmap.reserve(6);
+    vec_riddles.reserve(10);
+    vec_rumors.reserve(10);
+    vec_castles.reserve(30);
+    vec_teleports.reserve(10);
+                                    
     // playing kingdom
     vec_kingdoms.resize(KINGDOMMAX);
     vec_kingdoms[0] = new Kingdom(Color::BLUE);
