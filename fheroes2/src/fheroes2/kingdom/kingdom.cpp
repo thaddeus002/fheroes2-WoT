@@ -81,6 +81,9 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
 	    resource.gold	= START_IMPOSSIBLE_GOLD;
 	    break;
     }
+
+    heroes.reserve(KINGDOMMAXHEROES);
+    castles.reserve(15);
 }
 
 void Kingdom::AITurns(void)

@@ -114,6 +114,9 @@ public:
     const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; };
     const std::vector<Castle *> & GetCastles(void) const{ return castles; };
 
+    std::vector<Heroes *> & GetHeroes(void) { return heroes; };
+    std::vector<Castle *> & GetCastles(void) { return castles; };
+
     void AddHeroes(const Heroes *hero);
     void RemoveHeroes(const Heroes *hero);
 
