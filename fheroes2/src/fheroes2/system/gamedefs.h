@@ -20,7 +20,7 @@
 #ifndef H2GAMEDEFS_H
 #define H2GAMEDEFS_H
 
-#include "types.h"
+#include "engine.h"
 
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 1
