@@ -51,7 +51,7 @@ public:
 
     void Redraw(void);
     
-    bool isVisible(void);
+    bool isVisible(void) const;
 
 private:
     const Surface* sprite;

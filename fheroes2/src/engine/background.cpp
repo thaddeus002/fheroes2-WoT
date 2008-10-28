@@ -45,6 +45,8 @@ void Background::Save(void)
     // resize background
     if(Surface::valid() && (Size::w != Surface::w() || Size::h != Surface::h())) FreeSurface();
 
+    if(0 == Rect::w || 0 == Rect::h) return;
+
     if(! Surface::valid()) CreateSurface(*this, DEFAULT_DEPTH, SDL_SWSURFACE);
 
     Blit(Display::Get(), *this, 0, 0);

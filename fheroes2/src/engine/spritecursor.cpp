@@ -111,7 +111,7 @@ void SpriteCursor::Show(s16 ax, s16 ay)
     visible = true;
 }
 
-bool SpriteCursor::isVisible(void)
+bool SpriteCursor::isVisible(void) const
 {
     return visible;
 }
