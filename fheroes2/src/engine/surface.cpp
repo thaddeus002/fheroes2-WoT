@@ -84,6 +84,13 @@ Surface & Surface::operator= (const Surface & bs)
     return *this;
 }
 
+void Surface::Set(u16 sw, u16 sh, bool alpha)
+{
+    if(surface) SDL_FreeSurface(surface);
+
+    CreateSurface(sw, sh, DEFAULT_DEPTH, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
+}
+
 /* create new surface */
 void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 {

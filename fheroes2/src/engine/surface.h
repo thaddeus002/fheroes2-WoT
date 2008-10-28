@@ -40,6 +40,7 @@ public:
     ~Surface();
 
     Surface & operator= (const Surface & bs);
+    void Set(u16 sw, u16 sh, bool alpha = false);
 
     u16 w(void) const{ return surface ? surface->w : 0; };
     u16 h(void) const{ return surface ? surface->h : 0; };
