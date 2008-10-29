@@ -55,3 +55,7 @@ u16  AI::RecruitTroops(const Heroes & hero, const u16 monster, const u16 count)
 
     return 0;
 }
+
+void AI::Marketplace(const Heroes & hero)
+{
+}

@@ -32,6 +32,7 @@ namespace AI
     bool SelectGoldOrExp(const Heroes & hero, const u16 gold, const u16 expr);
     bool JoinTroops(const Heroes & hero, const u16 monster, const u16 count);
     u16  RecruitTroops(const Heroes & hero, const u16 monster, const u16 count);
+    void Marketplace(const Heroes & hero);
 };
 
 #endif
