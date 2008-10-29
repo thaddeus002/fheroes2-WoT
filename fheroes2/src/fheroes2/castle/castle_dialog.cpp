@@ -515,7 +515,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	{
 	    std::vector<Army::Troops> & army2 = const_cast<std::vector<Army::Troops> &>((*castle_heroes).GetArmy());
 
-	    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+	    for(u8 ii = 0; ii < coordsHeroesTroops->size(); ++ii)
 		if(coordsHeroesTroops && le.MouseClickLeft(coordsHeroesTroops->at(ii)))
 	    {
 		cursor.Hide();
