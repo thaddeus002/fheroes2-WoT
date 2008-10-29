@@ -407,15 +407,27 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			break;
 
 		    default:
-			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
-			{
-			    case 0:	return Cursor::POINTER;
-			    case 1:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT : (tile.isPassable() ? Cursor::BOAT : Cursor::POINTER);
-			    case 2:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT2 : (tile.isPassable() ? Cursor::BOAT2 : Cursor::POINTER);
-			    case 3:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT3 : (tile.isPassable() ? Cursor::BOAT3 : Cursor::POINTER);
-			    default:	return MP2::isActionObject(tile.GetObject(), true) ? Cursor::REDBOAT4 : (tile.isPassable() ? Cursor::BOAT4 : Cursor::POINTER);
-			}
-			break;
+			    if(MP2::isActionObject(tile.GetObject(), true))
+				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
+				{
+				    case 0:	return Cursor::POINTER;
+				    case 1:	return Cursor::REDBOAT;
+				    case 2:	return Cursor::REDBOAT2;
+				    case 3:	return Cursor::REDBOAT3;
+				    default:	return Cursor::REDBOAT4;
+				}
+			    else
+			    if(tile.isPassable())
+				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
+				{
+				    case 0:	return Cursor::POINTER;
+				    case 1:	return Cursor::BOAT;
+				    case 2:	return Cursor::BOAT2;
+				    case 3:	return Cursor::BOAT3;
+				    default:	return Cursor::BOAT4;
+				}
+			    else
+				return Cursor::POINTER;
 		}
 	    }
 	    else
@@ -517,15 +529,27 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			break;
 
 		    default:
-			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
-			{
-			    case 0:	return Cursor::POINTER;
-			    case 1:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION : (tile.isPassable() ? Cursor::MOVE : Cursor::POINTER);
-			    case 2:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION2 : (tile.isPassable() ? Cursor::MOVE2 : Cursor::POINTER);
-			    case 3:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION3 : (tile.isPassable() ? Cursor::MOVE3 : Cursor::POINTER);
-			    default:	return MP2::isActionObject(tile.GetObject(), false) ? Cursor::ACTION4 : (tile.isPassable() ? Cursor::MOVE4 : Cursor::POINTER);
-			}
-			break;
+			    if(MP2::isActionObject(tile.GetObject(), false))
+				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
+				{
+				    case 0:	return Cursor::POINTER;
+				    case 1:	return Cursor::ACTION;
+				    case 2:	return Cursor::ACTION2;
+				    case 3:	return Cursor::ACTION3;
+				    default:	return Cursor::ACTION4;
+				}
+			    else
+			    if(tile.isPassable())
+				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
+				{
+				    case 0:	return Cursor::POINTER;
+				    case 1:	return Cursor::MOVE;
+				    case 2:	return Cursor::MOVE2;
+				    case 3:	return Cursor::MOVE3;
+				    default:	return Cursor::MOVE4;
+				}
+			    else
+				return Cursor::POINTER;
 		}
 	    }
 	}
