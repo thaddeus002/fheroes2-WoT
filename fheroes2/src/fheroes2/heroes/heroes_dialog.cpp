@@ -681,7 +681,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     	    if(buttonNextHero.isEnable() && le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
     	    
     	    // dismiss
-    	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)){ return Dialog::DISMISS; }
+    	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
+    	      Dialog::YES == Dialog::Message(GetName(), "Are you sure you want to dismiss this Hero?", Font::BIG, Dialog::YES | Dialog::NO))
+    	    { return Dialog::DISMISS; }
 	}
 
 	// left click info
