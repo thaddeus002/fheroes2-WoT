@@ -28,10 +28,10 @@
 class Button : public Rect
 {
 public:
-    Button(const Sprite &s1, const Sprite &s2);
-    Button(const ICN::icn_t icn, u16 index1, u16 index2);
+    Button();
     Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2);
     Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2);
+
     bool isEnable(void) const{ return !disable; };
     bool isDisable(void) const{ return disable; };
     bool isPressed(void) const{ return pressed; };
@@ -40,6 +40,9 @@ public:
     void Press(void);
     void Release(void);
 
+    void SetPos(const Point & pt);
+    void SetPos(const u16 ox, const u16 oy);
+    void SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2);
     void SetDisable(bool fl){ disable = fl; pressed = fl; };
 
     void Draw(void);
@@ -47,9 +50,9 @@ public:
     void ReleaseDraw(void);
 
 private:
-
-    const Sprite &sprite1;
-    const Sprite &sprite2;
+    ICN::icn_t	_icn;
+    u16		_index1;
+    u16		_index2;
 
     bool pressed;
     bool disable;

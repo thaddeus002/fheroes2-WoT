@@ -50,11 +50,17 @@ Game::menu_t Game::MainMenu(void)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Button buttonNewGame(ICN::BTNSHNGL, 0, 3);
-    Button buttonLoadGame(ICN::BTNSHNGL, 4, 7);
-    Button buttonHighScores(ICN::BTNSHNGL, 8, 11);
-    Button buttonCredits(ICN::BTNSHNGL, 12, 15);
-    Button buttonQuit(ICN::BTNSHNGL, 16, 19);
+    const Sprite & s1 = AGG::GetICN(ICN::BTNSHNGL, 0);
+    const Sprite & s2 = AGG::GetICN(ICN::BTNSHNGL, 4);
+    const Sprite & s3 = AGG::GetICN(ICN::BTNSHNGL, 8);
+    const Sprite & s4 = AGG::GetICN(ICN::BTNSHNGL, 12);
+    const Sprite & s5 = AGG::GetICN(ICN::BTNSHNGL, 16);
+
+    Button buttonNewGame(s1.x(), s1.y(), ICN::BTNSHNGL, 0, 3);
+    Button buttonLoadGame(s2.x(), s2.y(), ICN::BTNSHNGL, 4, 7);
+    Button buttonHighScores(s3.x(), s3.y(), ICN::BTNSHNGL, 8, 11);
+    Button buttonCredits(s4.x(), s4.y(), ICN::BTNSHNGL, 12, 15);
+    Button buttonQuit(s5.x(), s5.y(), ICN::BTNSHNGL, 16, 19);
 
     const Point lt_pt(0, 0);
 
