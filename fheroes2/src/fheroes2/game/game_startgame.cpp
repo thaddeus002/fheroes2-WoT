@@ -214,6 +214,7 @@ void Game::OpenCastle(Castle *castle)
     }
 
     cursor.Hide();
+    Game::SelectBarCastle::Get().Redraw(*it);
     if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) FocusToHeroes(hero);
     Game::StatusWindow::Get().Redraw();
     cursor.Show();
@@ -657,6 +658,9 @@ Game::menu_t Game::HumanTurn(void)
 
     Splitter & splitCastle = selectCastle.GetSplitter();
     Splitter & splitHeroes = selectHeroes.GetSplitter();
+
+    selectHeroes.Redraw();
+    selectCastle.Redraw();
 
     Mixer::Reset();
     Game::EnvironmentSoundMixer(true);
@@ -1252,11 +1256,10 @@ Game::menu_t Game::HumanTurn(void)
         ++ticket;
     }
 
-    Game::Focus & globalfocus = Game::Focus::Get();
-    if(Game::Focus::HEROES == globalfocus.Type())
+    if(Game::Focus::HEROES == global_focus.Type())
     {
-	globalfocus.GetHeroes().ShowPath(false);
-	globalfocus.Redraw();
+	global_focus.GetHeroes().ShowPath(false);
+	global_focus.Redraw();
         display.Flip();
     }
 
