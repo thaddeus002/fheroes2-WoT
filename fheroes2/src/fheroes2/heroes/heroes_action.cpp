@@ -30,9 +30,8 @@
 #include "battle.h"
 #include "rand.h"
 #include "m82.h"
-#include "game_focus.h"
-#include "game_statuswindow.h"
 #include "gamearea.h"
+#include "game_focus.h"
 #include "sprite.h"
 #include "engine.h"
 #include "cursor.h"
@@ -298,16 +297,6 @@ void Heroes::ActionToMonster(const u16 dst_index)
     	    SetFreeman();
 	break;
     }
-
-    if(H2Config::MyColor() == GetColor())
-    {
-	// redraw focus list
-	Game::Focus::Get().Redraw();
-
-	// redraw status
-	Game::StatusWindow::Get().SetState(Game::StatusWindow::DAY);
-	Game::StatusWindow::Get().Redraw();
-    }
 }
 
 void Heroes::ActionToHeroes(const u16 dst_index)
@@ -451,9 +440,6 @@ void Heroes::ActionToPickupResource(const u16 dst_index)
 
 	    default: break;
 	}
-
-	// redraw status info
-	Game::StatusWindow::Get().Redraw();
     }
 
     tile.RemoveObjectSprite();
@@ -522,9 +508,6 @@ void Heroes::ActionToResource(const u16 dst_index)
 
 	    default: break;
 	}
-
-        // redraw status info
-	Game::StatusWindow::Get().Redraw();
     }
 
     tile.SetQuantity1(0);
@@ -618,8 +601,6 @@ void Heroes::ActionToWagon(const u16 dst_index)
 	{
 	    PlayPickupSound();
 	    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "You come across an old wagon left by a trader who didn't quite make it to safe terrain. Inside, you find some of the wagon's cargo still intact.", resource);
-
-	    Game::StatusWindow::Get().Redraw();
 	}
     }
     else
@@ -669,9 +650,6 @@ void Heroes::ActionToFlotSam(const u16 dst_index)
 	    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), body, resource);
 	else
 	    Dialog::Message(MP2::StringObject(tile.GetObject()), body, Font::BIG, Dialog::OK);
-
-	// redraw status info
-	Game::StatusWindow::Get().Redraw();
     }
 
     tile.RemoveObjectSprite();
@@ -859,9 +837,10 @@ void Heroes::ActionToTradingPost(const u16 dst_index)
     if(H2Config::MyColor() == GetColor())
     {
 	Dialog::Marketplace();
-
-	// redraw status info
-        Game::StatusWindow::Get().Redraw();
+    }
+    else
+    {
+	AI::Marketplace(*this);
     }
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTradingPost: " + GetName());
@@ -1221,12 +1200,6 @@ void Heroes::ActionToTreasureChest(const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(H2Config::MyColor() == GetColor())
-    {
-	// redraw status info
-	Game::StatusWindow::Get().Redraw();
-    }
-
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToTreasureChest: " + GetName() + " pickup chest");
 }
 
@@ -1261,9 +1234,6 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 	    // post tile action
 	    tile.RemoveObjectSprite();
 	    tile.SetObject(MP2::OBJ_ZERO);
-
-	    // redraw status info
-	    Game::StatusWindow::Get().Redraw();
 	}
     }
     // is full
@@ -1514,9 +1484,6 @@ void Heroes::ActionToJoinArmy(const u16 dst_index)
 	    	    JoinTroops(monster, count);
 		    tile.SetQuantity1(0);
 		    tile.SetQuantity2(0);
-
-		    // redraw status info
-		    Game::StatusWindow::Get().Redraw();
 		}
 	    }
 	    else
@@ -1598,9 +1565,6 @@ void Heroes::ActionToRecruitArmy(const u16 dst_index)
 	    		JoinTroops(monster, recruit);
 			tile.SetQuantity1((count - recruit) % 0xFF);
 			tile.SetQuantity2((count - recruit) / 0xFF);
-
-			// redraw status info
-			Game::StatusWindow::Get().Redraw();
 		    }
 		}
 	    }

@@ -39,7 +39,6 @@
 #include "error.h"
 #include "portrait.h"
 #include "dialog.h"
-#include "game_selectfocus.h"
 
 void Castle::RedrawNameTown(const Point & src_pt)
 {

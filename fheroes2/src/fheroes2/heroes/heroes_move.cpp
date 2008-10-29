@@ -25,7 +25,6 @@
 #include "sprite.h"
 #include "gamearea.h"
 #include "maps_tiles.h"
-#include "game_selectfocus.h"
 #include "castle.h"
 #include "heroes.h"
 
@@ -277,7 +276,6 @@ bool Heroes::MoveStep(void)
 	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
 	{
 	    ApplyPenaltyMovement();
-	    Game::SelectFocusHeroes::Get().Redraw();
 	    path.Reset();
 	    Action(world.GetTiles(index_to));
 	    SetMove(false);

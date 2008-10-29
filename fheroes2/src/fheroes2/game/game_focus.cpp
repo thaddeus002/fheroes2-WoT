@@ -25,7 +25,7 @@
 #include "radar.h"
 #include "settings.h"
 #include "gamearea.h"
-#include "game_selectfocus.h"
+#include "game_selectobjbar.h"
 #include "game_statuswindow.h"
 #include "agg.h"
 #include "world.h"
@@ -42,44 +42,61 @@ Game::Focus & Game::Focus::Get(void)
     return gfocus;
 }
 
-void Game::Focus::Set(const Heroes & hr)
+void Game::Focus::Set(const Heroes *hr)
 {
-    heroes = &hr;
+    if(NULL == hr) return;
+
+    heroes = hr;
     castle = NULL;
 
-    center = hr.GetCenter();
+    SelectBarHeroes & heroesBar = SelectBarHeroes::Get();
+    SelectBarCastle & castleBar = SelectBarCastle::Get();
 
-    AGG::PlayMusic(MUS::FromGround(world.GetTiles(center).GetGround()));
+    castleBar.Unselect();
+    heroesBar.Select(hr);
+
+    GameArea::Get().Center(heroes->GetCenter());
+
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(hr->GetCenter()).GetGround()));
     
     //Force the environment sounds to recalculate, for times like
     //exiting a castle/battle screen
     Game::EnvironmentSoundMixer(true);
     
     StatusWindow::Get().SetState(StatusWindow::ARMY);
-    StatusWindow::Get().Redraw();
 }
 
-void Game::Focus::Set(const Castle & cs)
+void Game::Focus::Set(const Castle *cs)
 {
-    castle = & cs;
+    if(NULL == cs) return;
+
+    castle = cs;
     heroes = NULL;
 
-    center = cs.GetCenter();
+    SelectBarHeroes & heroesBar = SelectBarHeroes::Get();
+    SelectBarCastle & castleBar = SelectBarCastle::Get();
 
-    AGG::PlayMusic(MUS::FromGround(world.GetTiles(center).GetGround()));
+    heroesBar.Unselect();
+    castleBar.Select(cs);
+
+    GameArea::Get().Center(castle->GetCenter());
+
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(cs->GetCenter()).GetGround()));
     
     //Force the environment sounds to recalculate, for times like
     //exiting a castle/battle screen
     Game::EnvironmentSoundMixer(true);
 
     StatusWindow::Get().SetState(StatusWindow::FUNDS);
-    StatusWindow::Get().Redraw();
 }
 
 void Game::Focus::Reset(void)
 {
     castle = NULL;
     heroes = NULL;
+
+    SelectBarHeroes::Get().Reset();
+    SelectBarCastle::Get().Reset();
 }
 
 Game::Focus::focus_t Game::Focus::Type(void) const
@@ -121,84 +138,34 @@ Heroes & Game::Focus::GetHeroes(void)
 
 const Point & Game::Focus::Center(void) const
 {
-    return center;
-}
-
-void Game::Focus::Update(void)
-{
-    if(heroes) center = heroes->GetCenter();
+    if(heroes) return heroes->GetCenter();
     else
-    if(castle) center = castle->GetCenter();
+    if(castle) return castle->GetCenter();
+
+    return center;
 }
 
 void Game::Focus::Redraw(void)
 {
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-
     Radar & radar = Radar::Get();
     GameArea & areaMaps = GameArea::Get();
-    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-    SelectFocusHeroes & selectHeroes = SelectFocusHeroes::Get();
     Color::color_t mycolor = Settings::Get().MyColor();
+    SelectBarHeroes & heroesBar = SelectBarHeroes::Get();
+    SelectBarCastle & castleBar = SelectBarCastle::Get();
 
-    if(heroes)
+    if(! heroes && !castle)
     {
-	if(selectHeroes.GetSizeObject())
-	{
-	    selectCastles.Reset();
-
-	    if(heroes->GetColor() != mycolor)
-	    { selectHeroes.Reset(); selectHeroes.Select(0); Set(*selectHeroes.First()); }
-	    else
-		selectHeroes.Select();
-	}
-	else
-	if(selectCastles.GetSizeObject())
-	{
-	    selectHeroes.Reset();
-	    selectCastles.Select(0);
-	    Set(*selectCastles.First());
-	}
-	else
-	{
-	    selectCastles.Reset();
-	    selectHeroes.Reset();
-	    Reset();
-	}
-    }
-    else
-    if(castle)
-    {
-	if(selectCastles.GetSizeObject())
-	{
-	    selectHeroes.Reset();
-
-	    if(castle->GetColor() != mycolor)
-	    { selectCastles.Reset(); selectCastles.Select(0); Set(*selectCastles.First()); }
-    	    else
-    		selectCastles.Select();
-    	}
-	else
-	if(selectHeroes.GetSizeObject())
-	{
-	    selectCastles.Reset();
-	    selectHeroes.Select(0);
-	    Set(*selectHeroes.First());
-	}
-	else
-	{
-	    selectCastles.Reset();
-	    selectHeroes.Reset();
-	    Reset();
-	}
+	castleBar.Reset();
+	heroesBar.Reset();
     }
 
-    areaMaps.Center(center);
     areaMaps.Redraw();
+    radar.RedrawArea(mycolor);
     radar.RedrawCursor();
-    selectCastles.Redraw();
-    selectHeroes.Redraw();
 
-    cursor.Show();
+    if(heroes) heroesBar.Redraw();
+    else
+    if(castle) castleBar.Redraw();
+
+    StatusWindow::Get().Redraw();
 }

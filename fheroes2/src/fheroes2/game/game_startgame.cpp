@@ -21,7 +21,6 @@
 #include <vector>
 #include "agg.h"
 #include "audio.h"
-#include "config.h"
 #include "sprite.h"
 #include "localevent.h"
 #include "button.h"
@@ -33,11 +32,13 @@
 #include "castle.h"
 #include "heroes.h"
 #include "splitter.h"
-#include "game_statuswindow.h"
 #include "maps_tiles.h"
 #include "ground.h"
 #include "error.h"
-#include "game_selectfocus.h"
+#include "game_interface.h"
+#include "game_statuswindow.h"
+#include "game_selectobjbar.h"
+#include "settings.h"
 #include "route.h"
 #include "game_focus.h"
 #include "scripting.h"
@@ -53,24 +54,6 @@ namespace Game
     Game::menu_t HumanTurn(void);
     bool CursorChangePosition(const u16 index);
 };
-
-Button *_buttonScrollHeroesUp;
-Button *_buttonScrollCastleUp;
-Button *_buttonNextHero;
-Button *_buttonMovement;
-Button *_buttonKingdom;
-Button *_buttonSpell;
-Button *_buttonEndTur;
-Button *_buttonAdventure;
-Button *_buttonFile;
-Button *_buttonSystem;
-Button *_buttonScrollHeroesDown;
-Button *_buttonScrollCastleDown;
-
-Splitter *_splitHeroes;
-Splitter *_splitCastles;
-
-u8 icon_count = 0;
 
 bool Game::CursorChangePosition(const u16 index)
 {
@@ -127,122 +110,15 @@ Game::menu_t Game::StartGame(void)
 
     Mixer::Reset();
 
-    Game::DrawInterface();
-
     // Create radar
     Radar & radar = Radar::Get();
     radar.Build();
 
-    //
-    const ICN::icn_t icnscroll = H2Config::EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
-    const ICN::icn_t icnbtn = H2Config::EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
-
-    Point pt_stw, pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt ,pt_set, pt_shd, pt_scd;
-
-    // coord button heroes scroll up
-    pt_shu.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-    pt_shu.y = RADARWIDTH + 2 * BORDERWIDTH;
-
-    // coord button castle scroll up
-    pt_scu.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
-    pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
-
-    // recalculate buttons coordinate
-    const u8 count_h = (display.h() - 480) / TILEWIDTH;
-    icon_count = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
-    const u16 last_coord = RADARWIDTH + BORDERWIDTH * 2 + icon_count * 32 + BORDERWIDTH;
-    const u8 button_w = AGG::GetICN(icnbtn, 0).w();
-    const u8 button_h = AGG::GetICN(icnbtn, 0).h();
-
-    // coord status windows
-    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
-    pt_stw.y = last_coord + 2 * button_h;
-    // coord button next hero
-    pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
-    pt_her.y = last_coord;
-    // coord button action
-    pt_act.x = pt_her.x + button_w;
-    pt_act.y = last_coord;
-    // coord button castle
-    pt_cas.x = pt_act.x + button_w;
-    pt_cas.y = last_coord;
-    // coord button magic
-    pt_mag.x = pt_cas.x + button_w;
-    pt_mag.y = last_coord;
-    // coord button end tur
-    pt_end.x = display.w() - RADARWIDTH - BORDERWIDTH;
-    pt_end.y = last_coord + button_h;
-    // coord button info
-    pt_inf.x = pt_end.x + button_w;
-    pt_inf.y = last_coord + button_h;
-    // coord button option
-    pt_opt.x = pt_inf.x + button_w;
-    pt_opt.y = last_coord + button_h;
-    // coord button settings
-    pt_set.x = pt_opt.x + button_w;
-    pt_set.y = last_coord + button_h;
-    // coord button heroes scroll down
-    pt_shd.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-    pt_shd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-    // coord button castle scroll down
-    pt_scd.x = display.w() - BORDERWIDTH - 15;
-    pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * icon_count - 15;
-
-    _buttonScrollHeroesUp = new Button(pt_shu, icnscroll, 0, 1);
-    _buttonScrollCastleUp = new Button(pt_scu, icnscroll, 0, 1);
-    _buttonNextHero = new Button(pt_her, icnbtn, 0, 1);
-    _buttonMovement = new Button(pt_act, icnbtn, 2, 3);
-    _buttonKingdom = new Button(pt_cas, icnbtn, 4, 5);
-    _buttonSpell = new Button(pt_mag, icnbtn, 6, 7);
-    _buttonEndTur = new Button(pt_end, icnbtn, 8, 9);
-    _buttonAdventure = new Button(pt_inf, icnbtn, 10, 11);
-    _buttonFile = new Button(pt_opt, icnbtn, 12, 13);
-    _buttonSystem = new Button(pt_set, icnbtn, 14, 15);
-    _buttonScrollHeroesDown = new Button(pt_shd, icnscroll, 2, 3);
-    _buttonScrollCastleDown = new Button(pt_scd, icnscroll, 2, 3);
-
-    Button &buttonScrollHeroesUp = *_buttonScrollHeroesUp;
-    Button &buttonScrollCastleUp = *_buttonScrollCastleUp;
-    Button &buttonNextHero = *_buttonNextHero;
-    Button &buttonMovement = *_buttonMovement;
-    Button &buttonKingdom = *_buttonKingdom;
-    Button &buttonSpell = *_buttonSpell;
-    Button &buttonEndTur = *_buttonEndTur;
-    Button &buttonAdventure = *_buttonAdventure;
-    Button &buttonFile = *_buttonFile;
-    Button &buttonSystem = *_buttonSystem;
-    Button &buttonScrollHeroesDown = *_buttonScrollHeroesDown;
-    Button &buttonScrollCastleDown = *_buttonScrollCastleDown;
-
-    // splitter
-    _splitHeroes = new Splitter(AGG::GetICN(icnscroll, 4), Rect(pt_shu.x + 3, pt_shu.y + 18, 10, pt_shd.y - pt_shu.y - 20), Splitter::VERTICAL);
-    _splitCastles = new Splitter(AGG::GetICN(icnscroll, 4), Rect(pt_scu.x + 3, pt_scu.y + 18, 10, pt_scd.y - pt_scu.y - 20), Splitter::VERTICAL);
-    Splitter &splitHeroes = *_splitHeroes;
-    Splitter &splitCastles = *_splitCastles;
-
-    splitHeroes.SetRange(0, 0);
-    splitCastles.SetRange(0, 0);
-
     Game::Focus & global_focus = Focus::Get();
     global_focus.Reset();
 
-    // status window
-    Game::StatusWindow & statusWindow = Game::StatusWindow::Get();
-    statusWindow.SetPos(pt_stw);
-    statusWindow.Redraw();
-
-    buttonScrollHeroesUp.Draw();
-    buttonScrollCastleUp.Draw();
-    buttonNextHero.Draw();
-    buttonMovement.Draw();
-    buttonKingdom.Draw();
-    buttonSpell.Draw();
-    buttonEndTur.Draw();
-    buttonAdventure.Draw();
-    buttonFile.Draw();
-    buttonSystem.Draw();
-    buttonScrollHeroesDown.Draw();
-    buttonScrollCastleDown.Draw();
+    // draw interface
+    Game::Interface::Get().Draw();
 
     Game::menu_t m = ENDTURN;
 
@@ -293,22 +169,6 @@ Game::menu_t Game::StartGame(void)
 
 OUTDOOR:
 
-    delete _buttonScrollHeroesUp;
-    delete _buttonScrollCastleUp;
-    delete _buttonNextHero;
-    delete _buttonMovement;
-    delete _buttonKingdom;
-    delete _buttonSpell;
-    delete _buttonEndTur;
-    delete _buttonAdventure;
-    delete _buttonFile;
-    delete _buttonSystem;
-    delete _buttonScrollHeroesDown;
-    delete _buttonScrollCastleDown;
-
-    delete _splitHeroes;
-    delete _splitCastles;
-
     return m == ENDTURN ? QUITGAME : m;
 }
 
@@ -320,40 +180,44 @@ void Game::OpenCastle(Castle *castle)
     Mixer::Reduce();
 
     Cursor & cursor = Cursor::Get();
-    const Kingdom & myKingdom = world.GetMyKingdom();
-    const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
-    SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
+    Kingdom & myKingdom = world.GetMyKingdom();
+    std::vector<Castle *> & myCastles = myKingdom.GetCastles();
+    Display & display = Display::Get();
+    std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
 
-    Dialog::answer_t result = Dialog::ZERO;
-
-    while(Dialog::CANCEL != result)
+    if(it != myCastles.end())
     {
-	FocusToCastle(castle);
+	Dialog::answer_t result = Dialog::ZERO;
 
-	Display::Get().Flip();
-	cursor.Hide();
-	Display::Get().Fade();
-
-	result = castle->OpenDialog();
-
-	const u32 cursor_index = selectCastles.GetCursorIndex();
-
-	if(Dialog::PREV == result)
+	while(Dialog::CANCEL != result)
 	{
-	     castle = cursor_index ? myCastles.at(cursor_index - 1) : myCastles.back();
-	}
-	else
-	if(Dialog::NEXT == result)
-	{
-	     castle = myCastles.size() == cursor_index + 1 ? myCastles.front() : myCastles.at(cursor_index + 1);
-	}
+	    cursor.Hide();
+	    FocusToCastle(*it);
+	    cursor.Show();
+	    display.Flip();
 
-	cursor.Show();
+	    display.Fade();
+	    result = (*it)->OpenDialog();
+
+	    if(Dialog::PREV == result)
+	    {
+		if(it == myCastles.begin()) it = myCastles.end();
+		--it;
+	    }
+	    else
+	    if(Dialog::NEXT == result)
+	    {
+		++it;
+		if(it == myCastles.end()) it = myCastles.begin();
+	    }
+	}
     }
 
-    if(Heroes *hero = const_cast<Heroes *>(castle->GetHeroes())) FocusToHeroes(hero);
-    else FocusToCastle(castle);
-    
+    cursor.Hide();
+    if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) FocusToHeroes(hero);
+    Game::StatusWindow::Get().Redraw();
+    cursor.Show();
+    Display::Get().Flip();
     Mixer::Enhance();
 }
 
@@ -366,7 +230,7 @@ void Game::FocusToCastle(Castle *castle)
 
     if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().ShowPath(false);
 
-    globalfocus.Set(*castle);
+    globalfocus.Set(castle);
     globalfocus.Redraw();
 }
 
@@ -378,61 +242,69 @@ void Game::OpenHeroes(Heroes *hero)
     Mixer::Reduce();
 
     Cursor & cursor = Cursor::Get();
-    const std::vector<Heroes *> & myHeroes = world.GetMyKingdom().GetHeroes();
-
-    Dialog::answer_t result = Dialog::ZERO;
+    Kingdom & myKingdom = world.GetMyKingdom();
+    std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+    Display & display = Display::Get();
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
+    Game::Focus & gamefocus = Game::Focus::Get();
 
-    while(Dialog::CANCEL != result)
+    if(it != myHeroes.end())
     {
-	FocusToHeroes(*it);
+	Dialog::answer_t result = Dialog::ZERO;
 
-	Display::Get().Flip();
-	cursor.Hide();
-	Display::Get().Fade();
-
-	result = (*it)->OpenDialog();
-
-	switch(result)
+	while(Dialog::CANCEL != result)
 	{
-	    case Dialog::PREV:
-                if(it == myHeroes.begin()) it = myHeroes.end();
-                --it;
-		break;
-	
-	    case Dialog::NEXT:
-                ++it;
-                if(it == myHeroes.end()) it = myHeroes.begin();
-		break;
+	    cursor.Hide();
+	    FocusToHeroes(*it);
+	    cursor.Show();
+	    display.Flip();
 
-	    case Dialog::DISMISS:
+	    display.Fade();
+	    result = (*it)->OpenDialog();
+
+	    switch(result)
 	    {
-		Kingdom & kingdom = world.GetMyKingdom();
-		Maps::Tiles & to_remove = world.GetTiles((**it).GetCenter());
+		case Dialog::PREV:
+	    	    if(it == myHeroes.begin()) it = myHeroes.end();
+		    --it;
+		    break;
 
-	        to_remove.SetObject((**it).GetUnderObject());
-		kingdom.RemoveHeroes(*it);
-		(**it).SetFreeman();
+		case Dialog::NEXT:
+		    ++it;
+		    if(it == myHeroes.end()) it = myHeroes.begin();
+		    break;
 
-		AGG::PlaySound(M82::KILLFADE);
+		case Dialog::DISMISS:
+		{
+		    (**it).SetFreeman();
+		    myKingdom.RemoveHeroes(*it);
 
-                // redraw focus list
-                Game::Focus::Get().Redraw();
+		    AGG::PlaySound(M82::KILLFADE);
 
-                // redraw status
-                Game::StatusWindow::Get().SetState(Game::StatusWindow::DAY);
-        	Game::StatusWindow::Get().Redraw();
+            	    // redraw focus list
+		    if(myKingdom.GetHeroes().size())
+			FocusToHeroes(myKingdom.GetHeroes().front());
+		    else
+		    if(myKingdom.GetCastles().size())
+			FocusToCastle(myKingdom.GetCastles().front());
+		    else
+		    {
+			gamefocus.Reset();
+            		gamefocus.Redraw();
+		    }
 
-		result = Dialog::CANCEL;
-	    }
-	    	break;
+		    result = Dialog::CANCEL;
+		    break;
+		}
 	
-	    default: break;
+		default: break;
+	    }
 	}
-
-	cursor.Show();
     }
 
+    Game::StatusWindow::Get().Redraw();
+    cursor.Show();
+    Display::Get().Flip();
     Mixer::Enhance();
 }
 
@@ -446,7 +318,7 @@ void Game::FocusToHeroes(Heroes *hero)
     if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().ShowPath(false);
     (*hero).ShowPath(true);
 
-    globalfocus.Set(*hero);
+    globalfocus.Set(hero);
     globalfocus.Redraw();
 }
 
@@ -701,23 +573,17 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     if(!hero) return;
 
     Route::Path & path = hero->GetPath();
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
 
+    cursor.Hide();
     // show path
     if(path.GetDestinationIndex() != dst_index)
     {
-        Cursor & cursor = Cursor::Get();
-        Display & display = Display::Get();
-
         hero->SetMove(false);
-
-        cursor.Hide();
-
         if(path.isValid()) path.Hide();
-
         path.Calculate(dst_index);
         path.Show();
-        cursor.Show();
-        display.Flip();
     }
     // start move
     else
@@ -726,6 +592,8 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
         FocusToHeroes(hero);
         hero->SetMove(true);
     }
+    cursor.Show();
+    display.Flip();
 }
 
 bool Game::ShouldAnimate(u32 ticket)
@@ -757,7 +625,7 @@ Game::menu_t Game::HumanTurn(void)
     const Rect areaScrollBottom(0, display.h() - BORDERWIDTH, display.w(), BORDERWIDTH);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
     
-    GameArea::scroll_t scrollDir = GameArea::NONE;
+    u8 scrollDir = GameArea::NONE;
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
@@ -765,40 +633,30 @@ Game::menu_t Game::HumanTurn(void)
 
     bool update_audio = false;
 
-    Button &buttonScrollHeroesUp = *_buttonScrollHeroesUp;
-    Button &buttonScrollCastleUp = *_buttonScrollCastleUp;
-    Button &buttonNextHero = *_buttonNextHero;
-    Button &buttonMovement = *_buttonMovement;
-    Button &buttonKingdom = *_buttonKingdom;
-    Button &buttonSpell = *_buttonSpell;
-    Button &buttonEndTur = *_buttonEndTur;
-    Button &buttonAdventure = *_buttonAdventure;
-    Button &buttonFile = *_buttonFile;
-    Button &buttonSystem = *_buttonSystem;
-    Button &buttonScrollHeroesDown = *_buttonScrollHeroesDown;
-    Button &buttonScrollCastleDown = *_buttonScrollCastleDown;
+    Game::Interface & I = Game::Interface::Get();
 
-    Splitter &splitHeroes = *_splitHeroes;
-    Splitter &splitCastles = *_splitCastles;
+    Button &buttonScrollHeroesUp = I.buttonScrollHeroesUp;
+    Button &buttonScrollCastleUp = I.buttonScrollCastleUp;
+    Button &buttonNextHero = I.buttonNextHero;
+    Button &buttonMovement = I.buttonMovement;
+    Button &buttonKingdom = I.buttonKingdom;
+    Button &buttonSpell = I.buttonSpell;
+    Button &buttonEndTur = I.buttonEndTur;
+    Button &buttonAdventure = I.buttonAdventure;
+    Button &buttonFile = I.buttonFile;
+    Button &buttonSystem = I.buttonSystem;
+    Button &buttonScrollHeroesDown = I.buttonScrollHeroesDown;
+    Button &buttonScrollCastleDown = I.buttonScrollCastleDown;
 
     const Kingdom & myKingdom = world.GetMyKingdom();
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
-    Game::SelectFocusCastles & selectCastles = SelectFocusCastles::Get();
-    Game::SelectFocusHeroes  & selectHeroes = SelectFocusHeroes::Get();
+    Game::SelectBarCastle & selectCastle = Game::SelectBarCastle::Get();
+    Game::SelectBarHeroes & selectHeroes = Game::SelectBarHeroes::Get();
 
-    const std::vector<Rect> & coordsCastlesIcon = selectCastles.GetCoords();
-    const std::vector<Rect> & coordsHeroesIcon = selectHeroes.GetCoords();
-
-    splitHeroes.SetRange(0, myHeroes.size() > icon_count ? myHeroes.size() - icon_count : 0);
-    splitCastles.SetRange(0, myCastles.size() > icon_count ? myCastles.size() - icon_count : 0);
-
-    selectCastles.SetCastles(myCastles);
-    selectCastles.Reset();
-
-    selectHeroes.SetHeroes(myHeroes);
-    selectHeroes.Reset();
+    Splitter & splitCastle = selectCastle.GetSplitter();
+    Splitter & splitHeroes = selectHeroes.GetSplitter();
 
     Mixer::Reset();
     Game::EnvironmentSoundMixer(true);
@@ -807,45 +665,26 @@ Game::menu_t Game::HumanTurn(void)
 
     switch(global_focus.Type())
     {
-	// start game
 	case Focus::UNSEL:
         {
             if(myHeroes.size())
-	    {
 		FocusToHeroes(myHeroes.front());
-		selectHeroes.Select(0);
-	    }
             else
 	    if(myCastles.size())
-	    {
 		FocusToCastle(myCastles.front());
-		selectCastles.Select(0);
-	    }
 	    break;
         }
 	case Focus::HEROES:
 	    FocusToHeroes(myHeroes.front());
-	    selectHeroes.Select(0);
 	    break;
 
 	case Focus::CASTLE:
 	    FocusToCastle(myCastles.front());
-	    selectCastles.Select(0);
 	    break;
     }
-    
-    statusWindow.SetState(Game::StatusWindow::DAY);
-    statusWindow.Redraw();
 
-    // center to focus
-    gamearea.Center(global_focus.Center());
-    radar.RedrawCursor();
-
-    selectCastles.Redraw();
-    selectHeroes.Redraw();
-
-    display.Flip();
     cursor.Show();
+    display.Flip();
 
     // show turns dialog
     if(Game::HOTSEAT == conf.GameType())
@@ -880,70 +719,20 @@ Game::menu_t Game::HumanTurn(void)
     	    	global_focus.GetHeroes().SetMove(false);
     	    else
     	    if(Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
-	    continue;
+    	    continue;
 	}
+
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft) && GameArea::x())
-	{
-            scrollDir |= GameArea::LEFT;
-	}
+	if(le.MouseCursor(areaScrollLeft)) scrollDir |= GameArea::LEFT;
         else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight) && (world.w() - GameArea::w() > GameArea::x()))
-	{
-	    scrollDir |= GameArea::RIGHT;
-	}
+	if(le.MouseCursor(areaScrollRight)) scrollDir |= GameArea::RIGHT;
 	
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop) && GameArea::y())
-	{
-            scrollDir |= GameArea::TOP;
-	}
+	if(le.MouseCursor(areaScrollTop)) scrollDir |= GameArea::TOP;
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom) && (world.h() - GameArea::h() > GameArea::y()))
-	{
-	    scrollDir |= GameArea::BOTTOM;
-	}
-        
-        if(scrollDir)
-        {
-            Cursor::themes_t cursorDir = Cursor::NONE;
-            if(scrollDir & GameArea::LEFT)
-            {
-                if(scrollDir & GameArea::TOP)
-                    cursorDir = Cursor::SCROLL_TOPLEFT;
-                else if(scrollDir & GameArea::BOTTOM)
-                    cursorDir = Cursor::SCROLL_BOTTOMLEFT;
-                else
-                    cursorDir = Cursor::SCROLL_LEFT;
-            }
-            else if(scrollDir & GameArea::RIGHT)
-            {
-                if(scrollDir & GameArea::BOTTOM)
-                    cursorDir = Cursor::SCROLL_BOTTOMRIGHT;
-                else if(scrollDir & GameArea::TOP)
-                    cursorDir = Cursor::SCROLL_TOPRIGHT;
-                else
-                    cursorDir = Cursor::SCROLL_RIGHT;
-            }
-            else if(scrollDir & GameArea::TOP)
-                cursorDir = Cursor::SCROLL_TOP;
-            else
-                cursorDir = Cursor::SCROLL_BOTTOM;
-            
-            if(Game::ShouldAnimate(ticket))
-            {
-              cursor.Hide();
-              cursor.SetThemes(cursorDir);
-              gamearea.Scroll(scrollDir);
-              radar.RedrawCursor();
-              cursor.Show();
-              display.Flip();
-            }
-            
-            scrollDir = GameArea::NONE;
-        }
+	if(le.MouseCursor(areaScrollBottom)) scrollDir |= GameArea::BOTTOM;
 
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
@@ -977,15 +766,9 @@ Game::menu_t Game::HumanTurn(void)
     				{
 				    if(from_hero.GetColor() == to_castle->GetColor())
 				    {
-					if(selectHeroes.isSelected())
-					{
-					    selectHeroes.Reset();
-					    selectHeroes.Redraw();
-					    splitHeroes.Move(selectHeroes.GetTopIndex());
-					}
-
+					cursor.Hide();
 					FocusToCastle(const_cast<Castle *>(to_castle));
-					splitCastles.Move(selectCastles.GetTopIndex());
+					cursor.Show();
 					display.Flip();
 				    }
 				    else
@@ -1005,17 +788,9 @@ Game::menu_t Game::HumanTurn(void)
 			        if(NULL != to_hero)
 			        {
 			    	    if(from_hero.GetCenter() == to_hero->GetCenter())
-				    {
-					Mixer::Reduce();
 					OpenHeroes(&from_hero);
-					statusWindow.Redraw();
-					display.Flip();
-					Mixer::Enhance();
-				    }
 				    else
-				    {
 					ShowPathOrStartMoveHero(&from_hero, index_maps);
-				    }
     				}
     			    }
     			    break;
@@ -1049,21 +824,15 @@ Game::menu_t Game::HumanTurn(void)
     				{
 				    // is selected open dialog
 				    if(from_castle.GetCenter() == to_castle->GetCenter())
-				    {
-					Mixer::Reduce();
 					OpenCastle(&from_castle);
-					statusWindow.Redraw();
-					Mixer::Enhance();
-				    }
 				    // select other castle
 				    else
 				    {
+					cursor.Hide();
 					FocusToCastle(const_cast<Castle *>(to_castle));
-					splitCastles.Move(selectCastles.GetTopIndex());
+					cursor.Show();
+					display.Flip();
 				    }
-
-				    selectCastles.Redraw();
-				    display.Flip();
 				}
 			    }
 			    break;
@@ -1076,15 +845,9 @@ Game::menu_t Game::HumanTurn(void)
 				if(NULL != to_hero &&
     				    from_castle.GetColor() == to_hero->GetColor())
     				{
-				    if(selectCastles.isSelected())
-				    {
-					selectCastles.Reset();
-					selectCastles.Redraw();
-					splitCastles.Move(selectCastles.GetTopIndex());
-				    }
-
+    				    cursor.Hide();
     				    FocusToHeroes(const_cast<Heroes *>(to_hero));
-				    splitHeroes.Move(selectHeroes.GetTopIndex());
+    				    cursor.Show();
 				    display.Flip();
         			}
 			    }
@@ -1103,7 +866,7 @@ Game::menu_t Game::HumanTurn(void)
 	    else
 	    if(le.MousePressRight(tile_pos))
 	    {
-		if(H2Config::Debug()) tile.DebugInfo();
+		if(conf.Debug()) tile.DebugInfo();
 
 		switch(tile.GetObject())
 		{
@@ -1164,231 +927,127 @@ Game::menu_t Game::HumanTurn(void)
 		    display.Flip();
 		}
 	    }
-	
+
 	    // click Scroll Heroes Up
-	    if((le.MouseWheelUp(selectHeroes.GetMaxRect()) ||
+	    if((le.MouseWheelUp(selectHeroes.GetArea()) ||
 		le.MouseWheelUp(splitHeroes.GetRect()) ||
-		le.MouseClickLeft(buttonScrollHeroesUp))  && selectHeroes.Prev())
+		le.MouseClickLeft(buttonScrollHeroesUp)) && selectHeroes.Prev())
 	    {
 		cursor.Hide();
 		selectHeroes.Redraw();
-		splitHeroes.Backward();
 		cursor.Show();
 		display.Flip();
 	    }
 	    else
 	    // click Scroll Castle Up
-	    if((le.MouseWheelUp(selectCastles.GetMaxRect()) ||
-		le.MouseWheelUp(splitCastles.GetRect()) ||
-		le.MouseClickLeft(buttonScrollCastleUp)) && selectCastles.Prev())
+	    if((le.MouseWheelUp(selectCastle.GetArea()) ||
+		le.MouseWheelUp(splitCastle.GetRect()) ||
+		le.MouseClickLeft(buttonScrollCastleUp)) && selectCastle.Prev())
 	    {
 		cursor.Hide();
-		selectCastles.Redraw();
-		splitCastles.Backward();
+		selectCastle.Redraw();
 		cursor.Show();
 		display.Flip();
 	    }
 	    else
 	    // click Scroll Heroes Down
-	    if((le.MouseWheelDn(selectHeroes.GetMaxRect()) ||
+	    if((le.MouseWheelDn(selectHeroes.GetArea()) ||
 		le.MouseWheelDn(splitHeroes.GetRect()) ||
 		le.MouseClickLeft(buttonScrollHeroesDown)) && 
-		myHeroes.size() > selectHeroes.GetCoords().size() &&
 		selectHeroes.Next())
 	    {
 		cursor.Hide();
 		selectHeroes.Redraw();
-		splitHeroes.Forward();
 		cursor.Show();
 		display.Flip();
 	    }
 	    else
 	    // click Scroll Castle Down
-	    if((le.MouseWheelDn(selectCastles.GetMaxRect()) ||
-		le.MouseWheelDn(splitCastles.GetRect())  ||
+	    if((le.MouseWheelDn(selectCastle.GetArea()) ||
+		le.MouseWheelDn(splitCastle.GetRect())  ||
 		le.MouseClickLeft(buttonScrollCastleDown)) &&
-		myCastles.size() > selectCastles.GetCoords().size() &&
-		selectCastles.Next())
+		selectCastle.Next())
 	    {
 		cursor.Hide();
-		selectCastles.Redraw();
-		splitCastles.Forward();
+		selectCastle.Redraw();
 		cursor.Show();
 		display.Flip();
 	    }
 
     	    // move splitter cursor castle
-    	    if(le.MousePressLeft(splitCastles.GetRect()) && myCastles.size() > icon_count && le.MouseCursor(splitCastles.GetRect()))
+    	    if(le.MousePressLeft(selectCastle.GetSplitter().GetRect()) &&
+    		myCastles.size() > I.CountIcons())
     	    {
-    		u32 seek = (le.MouseCursor().y - splitCastles.GetRect().y) * 100 / splitCastles.GetStep();
-
-        	if(seek > myCastles.size() - 1) seek = myCastles.size() - 1;
+    		Splitter & splitter = selectCastle.GetSplitter();
+    		u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
+        	if(seek > myCastles.size() - I.CountIcons()) seek = myCastles.size() - I.CountIcons();
 
         	cursor.Hide();
-
-        	splitCastles.Move(seek);
-		selectCastles.SetTop(seek);
-		selectCastles.Redraw();
-
+        	splitter.Move(seek);
+		selectCastle.SetTop(seek);
+		selectCastle.Redraw();
         	cursor.Show();
         	display.Flip();
 	    }
 	    else
     	    // move splitter cursor heroes
-    	    if(le.MousePressLeft(splitHeroes.GetRect()) && myHeroes.size() > icon_count && le.MouseCursor(splitHeroes.GetRect()))
+    	    if(le.MousePressLeft(selectHeroes.GetSplitter().GetRect()) &&
+    		myHeroes.size() > I.CountIcons())
     	    {
-    		u32 seek = (le.MouseCursor().y - splitHeroes.GetRect().y) * 100 / splitHeroes.GetStep();
-
-        	if(seek > myHeroes.size() - 1) seek = myHeroes.size() - 1;
+    		Splitter & splitter = selectHeroes.GetSplitter();
+    		u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
+        	if(seek > myHeroes.size() - I.CountIcons()) seek = myHeroes.size() - I.CountIcons();
 
         	cursor.Hide();
-
-        	splitHeroes.Move(seek);
+        	splitter.Move(seek);
 		selectHeroes.SetTop(seek);
 		selectHeroes.Redraw();
-
         	cursor.Show();
         	display.Flip();
 	    }
 
 	    // click Heroes Icons
-	    if(u8 count_icons = coordsHeroesIcon.size())
+	    if(const Heroes * hero = selectHeroes.MouseClickLeft())
 	    {
-		for(u8 ii = 0; ii < count_icons; ++ii)
+		if(hero == selectHeroes.Selected())
+		    OpenHeroes(const_cast<Heroes *>(hero));
+		else
 		{
-		    const Rect & coord = coordsHeroesIcon[ii];
-		    const u8 icons_index = selectHeroes.GetTopIndex() + ii;
-
-		    // left click (center to hero)
-		    if(le.MouseClickLeft(coord) && icons_index < myHeroes.size())
-		    {
-			//double click
-		        if(icons_index == selectHeroes.GetCursorIndex())
-			{
-			    const Point & center = selectHeroes.GetCenter(ii);
-			    Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
-
-			    // open hero
-			    if(hero && H2Config::MyColor() == (*hero).GetColor())
-			    {
-				if(selectCastles.isSelected())
-				{
-				    selectCastles.Reset();
-				    selectCastles.Redraw();
-				}
-
-				OpenHeroes(hero);
-
-				statusWindow.Redraw();
-				display.Flip();
-			    }
-			}
-			else
-			{
-			    if(selectCastles.isSelected())
-			    {
-				selectCastles.Reset();
-				selectCastles.Redraw();
-			    }
-
-			    const Point & center = selectHeroes.GetCenter(ii);
-			    Heroes *hero = const_cast<Heroes *>(world.GetHeroes(center.x, center.y));
-
-			    // open hero
-			    if(hero && H2Config::MyColor() == (*hero).GetColor())
-			    {
-				FocusToHeroes(hero);
-				display.Flip();
-			    }
-			}
-		    }
-		    else
-		    // right click (show info heroes)
-		    if(le.MousePressRight(coord) && icons_index < myHeroes.size())
-		    {
-			const Point & center = selectHeroes.GetCenter(ii);
-			const Heroes *hero = world.GetHeroes(center.x, center.y);
-			if(hero)
-			{
-			    cursor.Hide();
-			    Dialog::QuickInfo(*hero);
-			    cursor.Show();
-			    display.Flip();
-			}
-		    }
+		    cursor.Hide();
+		    FocusToHeroes(const_cast<Heroes *>(hero));
+		    cursor.Show();
+		    display.Flip();
 		}
-	    // end click Heroes Icons
 	    }
-
-	    // click Castle Icons
-	    if(u8 count_icons = coordsCastlesIcon.size())
+	    else
+	    if(const Heroes * hero = selectHeroes.MousePressRight())
 	    {
-		for(u8 ii = 0; ii < count_icons; ++ii)
+		cursor.Hide();
+		Dialog::QuickInfo(*hero);
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+	    // click Castle Icons
+	    if(const Castle * cstl = selectCastle.MouseClickLeft())
+	    {
+		if(cstl == selectCastle.Selected())
+		    OpenCastle(const_cast<Castle *>(cstl));
+		else
 		{
-		    const Rect & coord = coordsCastlesIcon[ii];
-		    const u8 icons_index = selectCastles.GetTopIndex() + ii;
-
-		    // left click (center to castle)
-		    if(le.MouseClickLeft(coord) && icons_index < myCastles.size())
-		    {
-			// double click
-			if(icons_index == selectCastles.GetCursorIndex())
-			{
-			    const Point & center = selectCastles.GetCenter(ii);
-			    Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
-
-			    // open castle
-			    if(castle && H2Config::MyColor() == (*castle).GetColor())
-			    {
-				if(selectHeroes.isSelected())
-				{
-				    selectHeroes.Reset();
-				    selectHeroes.Redraw();
-				}
-
-				OpenCastle(castle);
-
-				statusWindow.Redraw();
-				selectCastles.Redraw();
-
-				display.Flip();
-			    }
-			}
-			else
-			{
-			    if(selectHeroes.isSelected())
-			    {
-				selectHeroes.Reset();
-				selectHeroes.Redraw();
-			    }
-
-			    const Point & center = selectCastles.GetCenter(ii);
-			    Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
-
-			    if(castle && H2Config::MyColor() == (*castle).GetColor())
-			    {
-				FocusToCastle(castle);
-				display.Flip();
-			    }
-			}
-		    }
-		    else
-		    // right click (show info castle)
-		    if(le.MousePressRight(coord) && icons_index < myCastles.size())
-		    {
-			const Point & center = selectCastles.GetCenter(ii);
-			Castle *castle = const_cast<Castle *>(world.GetCastle(center.x, center.y));
-		    
-			if(castle)
-			{
-			    cursor.Hide();
-			    Dialog::QuickInfo(*castle);
-			    cursor.Show();
-			    display.Flip();
-			}
-	    	    }
+		    cursor.Hide();
+		    FocusToCastle(const_cast<Castle *>(cstl));
+		    cursor.Show();
+		    display.Flip();
 		}
-	    // end click Castle Icons
+	    }
+	    else
+	    if(const Castle * cstl = selectCastle.MousePressRight())
+	    {
+		cursor.Hide();
+		Dialog::QuickInfo(*cstl);
+		cursor.Show();
+		display.Flip();
 	    }
 
 	    // click Next Hero
@@ -1533,13 +1192,26 @@ Game::menu_t Game::HumanTurn(void)
         {
             cursor.Hide();
 
+            if(scrollDir)
+            {
+    		cursor.SetThemes(GameArea::ScrollToCursor(scrollDir));
+    		gamearea.Scroll(scrollDir);
+
+    		// need stop hero
+    		if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
+    		    global_focus.GetHeroes().SetMove(false);
+
+        	scrollDir = GameArea::NONE;
+            }
+    	    else
     	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
 		Heroes & heroes = global_focus.GetHeroes();
 		const Route::Path & path = heroes.GetPath();
 
 		// if valid and enable move or anime sprite
-		if(path.isValid() && (heroes.isEnableMove() || (heroes.GetSpriteIndex() < 45 && heroes.GetSpriteIndex() % 9) || heroes.GetSpriteIndex() >= 45))
+		if(path.isValid() &&
+		    (heroes.isEnableMove() || (heroes.GetSpriteIndex() < 45 && heroes.GetSpriteIndex() % 9) || heroes.GetSpriteIndex() >= 45))
 		{
 		    const u16 center = Maps::GetIndexFromAbsPoint(heroes.GetCenter());
 		    const u16 front_index = path.GetFrontIndex();
@@ -1554,17 +1226,13 @@ Game::menu_t Game::HumanTurn(void)
 		    {
                         //In case of exiting a battle, we want the music to return to normal
 			if(heroes.MoveStep())
-                            update_audio = true;
-		    }
+			{
+			    update_audio = true;
+			    statusWindow.Redraw();
+			}
 
-		    if(heroes.GetCenter() != global_focus.Center())
-		    {
-			global_focus.Update();
-
-			selectHeroes.Redraw();
 			gamearea.Center(global_focus.Center());
-			radar.RedrawArea(Settings::Get().MyColor());
-			radar.RedrawCursor();
+			selectHeroes.Redraw(&heroes);
 		    }
 		}
 		else
@@ -1573,10 +1241,10 @@ Game::menu_t Game::HumanTurn(void)
 		}
 	    }
 
-	    if(Game::ShouldAnimateInfrequent(ticket, 10))
-              Maps::IncreaseAnimationTicket();
+	    if(Game::ShouldAnimateInfrequent(ticket, 10)) Maps::IncreaseAnimationTicket();
 
 	    gamearea.Redraw();
+            radar.RedrawCursor();
             cursor.Show();
             display.Flip();
         }

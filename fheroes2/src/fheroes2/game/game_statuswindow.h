@@ -36,7 +36,7 @@ namespace Game
 class StatusWindow
 {
 public:
-    typedef enum { DAY, FUNDS, ARMY } info_t;
+    typedef enum { UNKNOWN, DAY, FUNDS, ARMY } info_t;
 
     static StatusWindow & Get(void);
 

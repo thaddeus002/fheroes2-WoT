@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "cursor.h"
 #include "error.h"
 #include "engine.h"
 #include "sprite.h"
@@ -197,36 +196,15 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 }
 
 /* scroll area */
-void GameArea::Scroll(GameArea::scroll_t scroll)
+void GameArea::Scroll(const u8 scroll)
 {
-    bool redraw = false;
+    if(scroll & GameArea::LEFT && 0 < gx) --gx;
+    else
+    if(scroll & GameArea::RIGHT && world.w() - gw > gx) ++gx;
 
-    if(scroll & GameArea::LEFT)
-    {
-        if(0 == gx) return;
-        --gx;
-        redraw = true;
-    }
-    if(scroll & GameArea::RIGHT)
-    {
-	if(world.w() - gw == gx) return;
-        ++gx;
-        redraw = true;
-    }
-    if(scroll & GameArea::TOP)
-    {
-        if(0 == gy) return;
-        --gy;
-        redraw = true;
-    }
-    if(scroll & GameArea::BOTTOM)
-    {
-        if(world.h() - gh == gy) return;
-        ++gy;
-        redraw = true;
-    }
-    if(redraw)
-      Redraw();
+    if(scroll & GameArea::TOP && 0 < gy) --gy;
+    else
+    if(scroll & GameArea::BOTTOM && world.h() - gh > gy) ++gy;
 }
 
 /* scroll area from radar area_pos */
@@ -593,4 +571,23 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
 	sf.SetDisplayFormat();
 	display.Blit(sf, revert ? dstx + src.x() + TILEWIDTH - src.w() : dstx + src.x(), dsty + src.y());
     }
+}
+
+Cursor::themes_t GameArea::ScrollToCursor(const u8 scroll)
+{
+    switch(scroll)
+    {
+	case TOP:		return Cursor::SCROLL_TOP;
+	case BOTTOM:		return Cursor::SCROLL_BOTTOM;
+	case RIGHT:		return Cursor::SCROLL_RIGHT;
+	case LEFT:		return Cursor::SCROLL_LEFT;
+	case LEFT | TOP:	return Cursor::SCROLL_TOPLEFT;
+	case LEFT | BOTTOM:	return Cursor::SCROLL_BOTTOMLEFT;
+	case RIGHT | TOP:	return Cursor::SCROLL_TOPRIGHT;
+	case RIGHT | BOTTOM:	return Cursor::SCROLL_BOTTOMRIGHT;
+
+	default: break;
+    }
+
+    return Cursor::NONE;
 }

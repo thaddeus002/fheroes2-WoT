@@ -32,7 +32,7 @@
 #include "game_focus.h"
 #include "game_statuswindow.h"
 
-Game::StatusWindow::StatusWindow() : state(Game::StatusWindow::DAY)
+Game::StatusWindow::StatusWindow() : state(UNKNOWN)
 {
 }
 
@@ -67,7 +67,7 @@ void Game::StatusWindow::Redraw(void)
     const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     // draw info: Day and Funds and Army
-    if(count >= ((ston.h() * 3 + 15)/ TILEWIDTH))
+    if(UNKNOWN != state && count >= ((ston.h() * 3 + 15)/ TILEWIDTH))
     {
 	DrawDayInfo();
 	DrawKingdomInfo(ston.h() + 5);
@@ -79,6 +79,7 @@ void Game::StatusWindow::Redraw(void)
 	case DAY:	DrawDayInfo();		break;
 	case FUNDS:	DrawKingdomInfo();	break;
 	case ARMY:	DrawArmyInfo();		break;
+	default: break;
     }
 }
 

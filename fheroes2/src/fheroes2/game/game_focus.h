@@ -36,9 +36,8 @@ namespace Game
 
    	static Focus &	Get(void);
 
-	void		Set(const Heroes & hr);
-	void		Set(const Castle & cs);
-	void		Update(void);
+	void		Set(const Heroes *hr);
+	void		Set(const Castle *cs);
 	void		Redraw(void);
 	void		Reset(void);
 

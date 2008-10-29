@@ -21,6 +21,7 @@
 #define H2GAMEAREA_H
 
 #include "gamedefs.h"
+#include "cursor.h"
 #include "rect.h"
 
 class GameArea : protected Rect
@@ -29,12 +30,14 @@ public:
     static GameArea & Get(void);
     void Build(void);
 
-    static const u8 NONE = 0x0;
-    static const u8 LEFT = 0x01;
-    static const u8 RIGHT = 0x02;
-    static const u8 TOP = 0x04;
-    static const u8 BOTTOM = 0x08;
-    typedef u8 scroll_t;
+    enum scroll_t
+    {
+	NONE	= 0x00,
+	LEFT	= 0x01,
+	RIGHT	= 0x02,
+	TOP	= 0x04,
+	BOTTOM	= 0x08,
+    };
 
     const Rect & GetRect(void) const { return *this; };
 
@@ -45,8 +48,9 @@ public:
 
     static u16 GetLeftTopIndexMaps(void);
     static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
+    static Cursor::themes_t ScrollToCursor(const u8 scroll);
 
-    void Scroll(scroll_t scroll);
+    void Scroll(const u8 scroll);
     void Center(const Point &pt);
     void CenterFromRadar(const Point &pt);
 
