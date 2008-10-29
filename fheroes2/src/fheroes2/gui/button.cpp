@@ -23,39 +23,53 @@
 #include "display.h"
 #include "button.h"
 
-Button::Button(const Sprite &s1, const Sprite &s2) : sprite1(s1), sprite2(s2), pressed(false), disable(false)
+Button::Button() : _icn(ICN::UNKNOWN)
 {
-    x = sprite1.x();
-    y = sprite1.y();
-    w = sprite1.w();
-    h = sprite1.h();
-}
-
-Button::Button(const ICN::icn_t icn, u16 index1, u16 index2)
-    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
-{
-    x = sprite1.x();
-    y = sprite1.y();
-    w = sprite1.w();
-    h = sprite1.h();
 }
 
 Button::Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2)
-    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
+    : _icn(icn), _index1(index1), _index2(index2), pressed(false), disable(false)
 {
-    x = pt.x;
-    y = pt.y;
-    w = sprite1.w();
-    h = sprite1.h();
+    SetPos(pt);
+
+    const Sprite & sprite = AGG::GetICN(icn, index1);
+
+    w = sprite.w();
+    h = sprite.h();
 }
 
 Button::Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2)
-    : sprite1(AGG::GetICN(icn, index1)), sprite2(AGG::GetICN(icn, index2)), pressed(false), disable(false)
+    : _icn(icn), _index1(index1), _index2(index2), pressed(false), disable(false)
+{
+    SetPos(ox, oy);
+
+    const Sprite & sprite = AGG::GetICN(icn, index1);
+
+    w = sprite.w();
+    h = sprite.h();
+}
+
+void Button::SetPos(const Point & pt)
+{
+    SetPos(pt.x, pt.y);
+}
+
+void Button::SetPos(const u16 ox, const u16 oy)
 {
     x = ox;
     y = oy;
-    w = sprite1.w();
-    h = sprite1.h();
+}
+
+void Button::SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2)
+{
+    _icn = icn;
+    _index1 = index1;
+    _index2 = index2;
+
+    const Sprite & sprite = AGG::GetICN(icn, index1);
+
+    w = sprite.w();
+    h = sprite.h();
 }
 
 void Button::Press(void)
@@ -99,6 +113,9 @@ void Button::Draw(void)
     bool localcursor = false;
     Cursor & cursor = Cursor::Get();
     if(*this & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
+
+    const Sprite & sprite1 = AGG::GetICN(_icn, _index1);
+    const Sprite & sprite2 = AGG::GetICN(_icn, _index2);
 
     Display::Get().Blit(pressed ? sprite2 : sprite1, x, y);
 
