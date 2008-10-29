@@ -137,13 +137,14 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
     const Game::Focus & focus = Game::Focus::Get();
 
     if(Game::Focus::HEROES == focus.Type() &&
-	focus.GetHeroes().GetColor() == H2Config::MyColor() &&
 	focus.GetHeroes().GetPath().isShow())
     {
-	u16 from = Maps::GetIndexFromAbsPoint(focus.GetHeroes().GetCenter());
+	const Heroes & hero = focus.GetHeroes();
+	u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+	const bool skipfirst = hero.isEnableMove() && 45 > hero.GetSpriteIndex() && 2 < (hero.GetSpriteIndex() % 9);
 
-	std::list<Route::Step>::const_iterator it1 = focus.GetHeroes().GetPath().begin();
-	std::list<Route::Step>::const_iterator it2 = focus.GetHeroes().GetPath().end();
+	std::list<Route::Step>::const_iterator it1 = hero.GetPath().begin();
+	std::list<Route::Step>::const_iterator it2 = hero.GetPath().end();
 	std::list<Route::Step>::const_iterator it3 = it1;
 
 	for(; it1 != it2; from = (*(it1++)).to_index)
@@ -153,6 +154,7 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
             it3++;
 
             if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
+	    if(it1 == hero.GetPath().begin() && skipfirst) continue;
 
 	    u16 index = 0;
 
