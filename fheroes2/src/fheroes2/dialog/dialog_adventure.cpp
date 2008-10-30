@@ -26,7 +26,7 @@
 #include "background.h"
 #include "dialog.h"
 
-Dialog::answer_t Dialog::AdventureOptions(void)
+Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
 {
     Display & display = Display::Get();
 
@@ -61,6 +61,8 @@ Dialog::answer_t Dialog::AdventureOptions(void)
     Button buttonDig(rb.x + 195, rb.y + 107, apanel, 6, 7);
     Button buttonCancel(rb.x + 128, rb.y + 184, apanel, 8, 9);
 
+    if(! enabledig) buttonDig.SetDisable(true);
+
     buttonWorld.Draw();
     buttonPuzzle.Draw();
     buttonInfo.Draw();
@@ -81,11 +83,18 @@ Dialog::answer_t Dialog::AdventureOptions(void)
         le.MousePressLeft(buttonDig) ? buttonDig.PressDraw() : buttonDig.ReleaseDraw();
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonWorld)){ result = Dialog::CANCEL; break; }
-        if(le.MouseClickLeft(buttonPuzzle)){ result = Dialog::CANCEL; break; }
-        if(le.MouseClickLeft(buttonInfo)){ result = Dialog::CANCEL; break; }
-        if(le.MouseClickLeft(buttonDig)){ result = Dialog::CANCEL; break; }
+        if(le.MouseClickLeft(buttonWorld)){ result = Dialog::WORLD; break; }
+        if(le.MouseClickLeft(buttonPuzzle)){ result = Dialog::PUZZLE; break; }
+        if(le.MouseClickLeft(buttonInfo)){ result = Dialog::INFO; break; }
+        if(le.MouseClickLeft(buttonDig) && buttonDig.isEnable()){ result = Dialog::DIG; break; }
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
+
+	// right info
+        if(le.MousePressRight(buttonWorld)) Dialog::Message("", "View the entire world.", Font::BIG);
+        if(le.MousePressRight(buttonPuzzle)) Dialog::Message("", "View the obelisk puzzle.", Font::BIG);
+        if(le.MousePressRight(buttonInfo)) Dialog::Message("", "View information on the scenario you are currently playing.", Font::BIG);
+        if(le.MousePressRight(buttonDig)) Dialog::Message("", "Dig for the Ultimate Artifact.", Font::BIG);
+        if(le.MousePressRight(buttonCancel)) Dialog::Message("", "Exit this menu without doing anything.", Font::BIG);
     }
 
     // restore background

@@ -64,10 +64,15 @@ namespace Dialog
         UPGRADE = 0x0020,
         MAX     = 0x0040,
 	PREV	= 0x0080,
-	NEXT	= 0x0100
+	NEXT	= 0x0100,
+
+	WORLD	= 0x0200,
+	PUZZLE	= 0x0400,
+	INFO	= 0x0800,
+	DIG	= 0x1000,
     } answer_t;
 
-    answer_t AdventureOptions(void);
+    answer_t AdventureOptions(const bool enabledig);
     Game::menu_t FileOptions(void);
     bool SystemOptions(void);
     const Maps::FileInfo * SelectFileInfo(const std::list<Maps::FileInfo *> & list);

@@ -1120,10 +1120,14 @@ Game::menu_t Game::HumanTurn(void)
 	    {
 		Mixer::Reduce();
 
-		switch(Dialog::AdventureOptions())
+		switch(Dialog::AdventureOptions(Game::Focus::HEROES == global_focus.Type()))
 		{
-		    default:
-			break;
+		    case Dialog::WORLD:
+		    case Dialog::PUZZLE:
+		    case Dialog::INFO:
+		    case Dialog::DIG:
+
+		    default: break;
 		}
 
 		Mixer::Enhance();
