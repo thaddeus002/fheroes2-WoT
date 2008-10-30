@@ -1053,6 +1053,8 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     sprite.Blit(border);
     sprite.Blit(AGG::GetICN(ICN::ARTIFACT, art + 1), 5, 5);
 
+    if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::TREASURE);
+
     switch(tile.GetObject())
     {
         case MP2::OBJ_SHIPWRECKSURVIROR:
