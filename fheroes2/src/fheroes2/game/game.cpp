@@ -117,6 +117,9 @@ void Game::EnvironmentSoundMixer(bool forced)
 			if(hero) object = hero->GetUnderObject();
 		    }
 
+		    // ext: stream
+		    if(tile.isStream() && volume > vols[11]) vols[11] = volume;
+
 		    switch(object)
 		    {
 			case MP2::OBJ_BUOY:		channel = 0; break;
@@ -150,9 +153,6 @@ void Game::EnvironmentSoundMixer(bool forced)
 
 			default: continue;
 		    }
-
-		    // ext: stream
-		    if(tile.isStream() && volume > vols[11]) vols[11] = volume;
 
 		    if(volume > vols[channel]) vols[channel] = volume;
 		}
