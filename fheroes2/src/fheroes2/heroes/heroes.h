@@ -135,6 +135,7 @@ public:
     u16 GetMaxMovePoints(void) const;
     u16 GetMovePoints(void) const;
     bool MayStillMove(void) const;
+    void ResetMovePoints(void) { move_point = 0; };
 
     bool HasSecondarySkill(const Skill::Secondary::skill_t skill) const;
     Skill::Level::type_t GetLevelSkill(const Skill::Secondary::skill_t skill) const;

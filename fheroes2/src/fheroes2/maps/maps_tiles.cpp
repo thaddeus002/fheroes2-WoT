@@ -1571,3 +1571,21 @@ void Maps::Tiles::RemoveObjectSprite(void)
 	Remove(addon->uniq);
     }
 }
+
+void Maps::Tiles::AddHoleSprite(void)
+{
+    u8 obj = 0;
+    u8 idx = 0;
+
+    switch(GetGround())
+    {
+        case Ground::WASTELAND:	obj = 0xE4; idx = 70; break;
+        case Ground::DIRT:	obj = 0xE0; idx = 140; break;
+        case Ground::DESERT:	obj = 0xDC; idx = 68; break;
+        case Ground::LAVA:	obj = 0xD8; idx = 26; break;
+        case Ground::GRASS:
+        default:		obj = 0xC0; idx = 9; break;
+    }
+
+    addons_level1.push_back(TilesAddon(0, World::GetUniq(), obj, idx));
+}

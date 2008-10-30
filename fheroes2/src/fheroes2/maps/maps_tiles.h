@@ -65,6 +65,8 @@ namespace Maps
 	const Surface & GetSurface(void) const{ return tile_sprite; };
 	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().uniq : 0; };
 	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().uniq : 0; };
+	u32 GetSize1(void) const{ return addons_level1.size(); };
+	u32 GetSize2(void) const{ return addons_level2.size(); };
 
 	bool isPassable(void) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
@@ -118,6 +120,7 @@ namespace Maps
 	void ClearFog(u8 color){ fogs &= ~color; };
 
 	void FixLoyaltyVersion(void);
+	void AddHoleSprite(void);
 
     private:
 	void CorrectFlags32(const u8 index);

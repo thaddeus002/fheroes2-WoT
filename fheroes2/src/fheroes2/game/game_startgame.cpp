@@ -53,6 +53,7 @@ namespace Game
     void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
     Game::menu_t HumanTurn(void);
     bool CursorChangePosition(const u16 index);
+    bool DiggingForArtifacts(const Heroes & hero);
 };
 
 bool Game::CursorChangePosition(const u16 index)
@@ -1122,10 +1123,10 @@ Game::menu_t Game::HumanTurn(void)
 
 		switch(Dialog::AdventureOptions(Game::Focus::HEROES == global_focus.Type()))
 		{
-		    case Dialog::WORLD:
-		    case Dialog::PUZZLE:
-		    case Dialog::INFO:
-		    case Dialog::DIG:
+		    case Dialog::WORLD:	break;
+		    case Dialog::PUZZLE:break;
+		    case Dialog::INFO:	break;
+		    case Dialog::DIG:	DiggingForArtifacts(global_focus.GetHeroes());
 
 		    default: break;
 		}
@@ -1287,4 +1288,32 @@ Game::menu_t Game::HumanTurn(void)
     }
 
     return ENDTURN;
+}
+
+bool Game::DiggingForArtifacts(const Heroes & hero)
+{
+    if(hero.GetMaxMovePoints() == hero.GetMovePoints())
+    {
+	if(0 != world.GetTiles(hero.GetCenter()).GetSize1())
+	{
+	    Dialog::Message("", "Try searching on clear ground.", Font::BIG, Dialog::OK);
+	    return false;
+	}
+
+	AGG::PlaySound(M82::DIGSOUND);
+
+	const_cast<Heroes &>(hero).ResetMovePoints();
+	world.GetTiles(hero.GetCenter()).AddHoleSprite();
+
+	Dialog::Message("", "Nothing here. Where could it be?", Font::BIG, Dialog::OK);
+
+	Cursor::Get().Hide();
+	Game::SelectBarHeroes::Get().Redraw(&hero);
+	Cursor::Get().Show();
+	Display::Get().Flip();
+    }
+    else
+	Dialog::Message("", "Digging for artifacts requires a whole day, try again tomorrow.", Font::BIG, Dialog::OK);
+
+    return false;
 }
