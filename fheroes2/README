@@ -4,7 +4,8 @@ Prerequisites:
 
 You need to have these libraries (with equivalent devel versions) to build fHeroes2:
 
-- libSDL
+- SDL
+- SDL_mixer
 - Lua 5.1 or above (for building only)
 
 Build environment:
