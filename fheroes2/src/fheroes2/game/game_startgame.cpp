@@ -689,25 +689,20 @@ Game::menu_t Game::HumanTurn(void)
     Mixer::Reset();
     Game::EnvironmentSoundMixer(true);
 
-    global_focus.Reset();
+    if(conf.Original()) global_focus.Reset();
 
     switch(global_focus.Type())
     {
 	case Focus::UNSEL:
-        {
-            if(myHeroes.size())
-		FocusToHeroes(myHeroes.front());
-            else
-	    if(myCastles.size())
-		FocusToCastle(myCastles.front());
+    	    if(myHeroes.size())  FocusToHeroes(myHeroes.front());
+    	    else
+	    if(myCastles.size()) FocusToCastle(myCastles.front());
 	    break;
-        }
 	case Focus::HEROES:
-	    FocusToHeroes(myHeroes.front());
+	    if(conf.Original()) FocusToHeroes(myHeroes.front());
 	    break;
-
 	case Focus::CASTLE:
-	    FocusToCastle(myCastles.front());
+	    if(conf.Original()) FocusToCastle(myCastles.front());
 	    break;
     }
 
