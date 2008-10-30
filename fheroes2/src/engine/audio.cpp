@@ -179,7 +179,7 @@ void Cdrom::Play(const u8 track, bool loop, bool force)
         
         if(currentTrack != track || force)
         {
-            if(SDL_CDPlayTracks(cd, track - 1, 0, 1, 0) < 0)
+            if(SDL_CDPlayTracks(cd, track, 0, 1, 0) < 0)
                 Error::Verbose("Couldn't play track ", track);
             
             currentTrack = track;
