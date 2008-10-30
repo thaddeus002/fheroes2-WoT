@@ -1297,7 +1297,12 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
     const u32 max = GetMaxMovePoints();
 
     // 60 - approximate distance, this restriction calculation
-    if(60 < std::abs(mp.x - dst % world.w()) + std::abs(mp.y - dst / world.w())) return 4;
+    if(60 < std::abs(mp.x - dst % world.w()) + std::abs(mp.y - dst / world.w()))
+    {
+	if(Settings::Get().Debug()) Error::Warning("Heroes::GetRangeRouteDays: distance limit");
+
+	return 4;
+    }
 
     Route::Path test(*this);
     // 80 - approximate limit, this restriction path finding algorithm
@@ -1320,7 +1325,7 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
 	if(max >= total) return 4;
     }
 
-    return 0;
+    return 4;
 }
 
 /* FIXME: algorithm for levelup select secondary skills */

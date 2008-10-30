@@ -184,7 +184,7 @@ bool Route::Path::Find_v1(const u16 index1, const u16 index2, const u16 limit)
 	// exception (invalid algorithm)
 	if(count_itr > limit)
 	{
-	    if(limit < MAXU16 && debug) Error::Warning("Route::Path::Find: not found, fix limit: ", limit);
+	    if(limit < MAXU16 && debug) Error::Warning("Route::Path::Find: fix limit: ", limit);
 
 	    notfound = true;
 	}
