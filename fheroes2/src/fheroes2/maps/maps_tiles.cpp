@@ -129,6 +129,11 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
     return 0;
 }
 
+bool Maps::TilesAddon::isStream(const TilesAddon & ta)
+{
+    return ICN::STREAM == MP2::GetICNObject(ta.object);
+}
+
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SDL_SWSURFACE), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
     fogs(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE)
@@ -839,6 +844,11 @@ bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
     }
 
     return false;
+}
+
+bool Maps::Tiles::isStream(void) const
+{
+    return addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isStream);
 }
 
 Maps::TilesAddon * Maps::Tiles::FindResource(void)

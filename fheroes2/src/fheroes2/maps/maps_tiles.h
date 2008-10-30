@@ -42,6 +42,7 @@ namespace Maps
 	TilesAddon & operator= (const TilesAddon & ta);
 
 	static u16 isRoad(const TilesAddon & ta);
+	static bool isStream(const TilesAddon & ta);
 	static bool PredicateSortRules1(const TilesAddon & ta1, const TilesAddon & ta2);
 	static bool PredicateSortRules2(const TilesAddon & ta1, const TilesAddon & ta2);
 
@@ -67,6 +68,7 @@ namespace Maps
 
 	bool isPassable(void) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
+	bool isStream(void) const;
 
 	TilesAddon * FindAddonLevel1(u32 uniq1);
 	TilesAddon * FindAddonLevel2(u32 uniq2);

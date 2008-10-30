@@ -151,6 +151,9 @@ void Game::EnvironmentSoundMixer(bool forced)
 			default: continue;
 		    }
 
+		    // ext: stream
+		    if(tile.isStream() && volume > vols[11]) vols[11] = volume;
+
 		    if(volume > vols[channel]) vols[channel] = volume;
 		}
 	    }
