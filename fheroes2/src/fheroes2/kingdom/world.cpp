@@ -1514,12 +1514,12 @@ Artifact::artifact_t World::DiggingForUltimateArtifacts(const Point & center)
         
     switch(tile.GetGround())
     {
-        case Maps::Ground::WASTELAND: obj = ICN::OBJNCRCK; idx = 70; break;
-        case Maps::Ground::DIRT:      obj = ICN::OBJNDIRT; idx = 140; break;
-        case Maps::Ground::DESERT:    obj = ICN::OBJNDSRT; idx = 68; break;
-        case Maps::Ground::LAVA:      obj = ICN::OBJNLAVA; idx = 26; break;
+        case Maps::Ground::WASTELAND: obj = 0xE4; idx = 70; break;	// ICN::OBJNCRCK
+        case Maps::Ground::DIRT:      obj = 0xE0; idx = 140; break;	// ICN::OBJNDIRT
+        case Maps::Ground::DESERT:    obj = 0xDC; idx = 68; break;	// ICN::OBJNDSRT
+        case Maps::Ground::LAVA:      obj = 0xD8; idx = 26; break;	// ICN::OBJNLAVA
         case Maps::Ground::GRASS:
-        default:                      obj = ICN::OBJNGRA2; idx = 9; break;
+        default:                      obj = 0xC0; idx = 9; break;	// ICN::OBJNGRA2
     }
     tile.AddonsPushLevel1(Maps::TilesAddon(0, GetUniq(), obj, idx));
 
