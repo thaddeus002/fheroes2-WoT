@@ -1503,3 +1503,33 @@ void World::UpdateDwellingPopulation(void)
 	tile.SetQuantity2(count / 0xFF);
     }
 }
+
+Artifact::artifact_t World::DiggingForUltimateArtifacts(const Point & center)
+{
+    Maps::Tiles & tile = GetTiles(center);
+
+    // puts hole sprite
+    u8 obj = 0;
+    u8 idx = 0;
+        
+    switch(tile.GetGround())
+    {
+        case Maps::Ground::WASTELAND: obj = ICN::OBJNCRCK; idx = 70; break;
+        case Maps::Ground::DIRT:      obj = ICN::OBJNDIRT; idx = 140; break;
+        case Maps::Ground::DESERT:    obj = ICN::OBJNDSRT; idx = 68; break;
+        case Maps::Ground::LAVA:      obj = ICN::OBJNLAVA; idx = 26; break;
+        case Maps::Ground::GRASS:
+        default:                      obj = ICN::OBJNGRA2; idx = 9; break;
+    }
+    tile.AddonsPushLevel1(Maps::TilesAddon(0, GetUniq(), obj, idx));
+
+    if(ultimate_artifact == tile.GetIndex() && tile.GetQuantity1())
+    {
+	tile.SetQuantity1(0);
+	ultimate_artifact = 0xFFFF;
+
+	return Artifact::Artifact(tile.GetQuantity1());
+    }
+
+    return  Artifact::UNKNOWN;
+}

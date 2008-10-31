@@ -83,6 +83,8 @@ public:
 
     Heroes & GetHeroes(const Heroes::heroes_t & hero){ return *vec_heroes[hero]; };
 
+    Artifact::artifact_t DiggingForUltimateArtifacts(const Point & center);
+
     u8 GetDay(void){ return day % DAYOFWEEK + 1; };
     u8 GetWeek(void){ return week % WEEKOFMONTH + 1; };
     u8 GetMonth(void){ return month + 1; };

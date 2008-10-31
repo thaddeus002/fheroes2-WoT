@@ -1303,9 +1303,17 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	AGG::PlaySound(M82::DIGSOUND);
 
 	const_cast<Heroes &>(hero).ResetMovePoints();
-	world.GetTiles(hero.GetCenter()).AddHoleSprite();
+	const Artifact::artifact_t ultimate = world.DiggingForUltimateArtifacts(hero.GetCenter());
 
-	Dialog::Message("", "Nothing here. Where could it be?", Font::BIG, Dialog::OK);
+	if(Artifact::UNKNOWN == ultimate)
+	    Dialog::Message("", "Nothing here. Where could it be?", Font::BIG, Dialog::OK);
+	else
+	{
+	    // TODO: congratulations!
+	    // check returns
+	    const_cast<Heroes &>(hero).PickupArtifact(ultimate);
+	    Dialog::Message("Congratulations!!!", "You found " + Artifact::String(ultimate), Font::BIG, Dialog::OK);
+	}
 
 	Cursor::Get().Hide();
 	Game::SelectBarHeroes::Get().Redraw(&hero);

@@ -164,6 +164,11 @@ void Maps::Tiles::AddonsPushLevel1(const MP2::mp2addon_t & ma)
 	addons_level1.push_back(TilesAddon(ma.quantityN, ma.uniqNumberN1, ma.objectNameN1, ma.indexNameN1));
 }
 
+void Maps::Tiles::AddonsPushLevel1(const TilesAddon & ta)
+{
+    addons_level1.push_back(ta);
+}
+
 void Maps::Tiles::AddonsPushLevel2(const MP2::mp2tile_t & mt)
 {
     if(mt.objectName2 && mt.indexName2 < 0xFF)
@@ -174,6 +179,11 @@ void Maps::Tiles::AddonsPushLevel2(const MP2::mp2addon_t & ma)
 {
     if(ma.objectNameN2 && ma.indexNameN2 < 0xFF)
 	addons_level2.push_back(TilesAddon(ma.quantityN, ma.uniqNumberN2, ma.objectNameN2, ma.indexNameN2));
+}
+
+void Maps::Tiles::AddonsPushLevel2(const TilesAddon & ta)
+{
+    addons_level2.push_back(ta);
 }
 
 void Maps::Tiles::AddonsSort(void)
@@ -1572,20 +1582,3 @@ void Maps::Tiles::RemoveObjectSprite(void)
     }
 }
 
-void Maps::Tiles::AddHoleSprite(void)
-{
-    u8 obj = 0;
-    u8 idx = 0;
-
-    switch(GetGround())
-    {
-        case Ground::WASTELAND:	obj = 0xE4; idx = 70; break;
-        case Ground::DIRT:	obj = 0xE0; idx = 140; break;
-        case Ground::DESERT:	obj = 0xDC; idx = 68; break;
-        case Ground::LAVA:	obj = 0xD8; idx = 26; break;
-        case Ground::GRASS:
-        default:		obj = 0xC0; idx = 9; break;
-    }
-
-    addons_level1.push_back(TilesAddon(0, World::GetUniq(), obj, idx));
-}

@@ -106,8 +106,10 @@ namespace Maps
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);
+	void AddonsPushLevel1(const TilesAddon & ta);
 	void AddonsPushLevel2(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel2(const MP2::mp2addon_t & ma);
+	void AddonsPushLevel2(const TilesAddon & ta);
 
 	void AddonsSort(void);
 	void Remove(u32 uniq);
@@ -120,7 +122,6 @@ namespace Maps
 	void ClearFog(u8 color){ fogs &= ~color; };
 
 	void FixLoyaltyVersion(void);
-	void AddHoleSprite(void);
 
     private:
 	void CorrectFlags32(const u8 index);
