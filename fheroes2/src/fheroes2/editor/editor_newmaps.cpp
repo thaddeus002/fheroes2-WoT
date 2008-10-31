@@ -80,19 +80,23 @@ Game::menu_t Game::Editor::NewMaps(void)
 	le.MousePressLeft(buttonXLarge) ? buttonXLarge.PressDraw() : buttonXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonSmall)) {
+	if(le.MouseClickLeft(buttonSmall))
+	{
 		world.NewMaps(Maps::SMALL, Maps::SMALL);
 		return EDITSTART;
 	}
-	if(le.MouseClickLeft(buttonMedium)) {
+	if(le.MouseClickLeft(buttonMedium))
+	{
 		world.NewMaps(Maps::MEDIUM, Maps::MEDIUM);
 		return EDITSTART;
 	}
-	if(le.MouseClickLeft(buttonLarge)) {
+	if(le.MouseClickLeft(buttonLarge))
+	{
 		world.NewMaps(Maps::LARGE, Maps::LARGE);
 		return EDITSTART;
 	}
-	if(le.MouseClickLeft(buttonXLarge)) {
+	if(le.MouseClickLeft(buttonXLarge))
+	{
 		world.NewMaps(Maps::XLARGE, Maps::XLARGE);
 		return EDITSTART;
 	}

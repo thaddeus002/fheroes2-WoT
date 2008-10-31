@@ -23,6 +23,7 @@
 #include "error.h"
 #include "config.h"
 #include "maps_fileinfo.h"
+#include "world.h"
 #include "dialog.h"
 
 Game::menu_t Game::Editor::LoadMaps(void)
@@ -56,5 +57,6 @@ Game::menu_t Game::Editor::LoadMaps(void)
     std::list<Maps::FileInfo *>::const_iterator it2 = info_maps.end();
     for(; it1 != it2; ++it1) if(*it1) delete *it1;
 
+    world.LoadMaps(conf.FileInfo().FileMaps());
     return EDITSTART;
 }

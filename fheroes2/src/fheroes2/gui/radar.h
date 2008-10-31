@@ -31,13 +31,13 @@ public:
     const Rect & GetRect(void) const{ return pos; }
 
     void Build(void);
-    void RedrawArea(const u8 color);
+    void Generate(void);
+    void RedrawArea(const u8 color = 0xFF);
     void RedrawCursor(void);
 
 private:
     Radar();
 
-    void Generate(void);
     Rect pos;
     Surface *spriteArea;
     Surface *spriteCursor;

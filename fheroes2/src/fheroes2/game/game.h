@@ -91,6 +91,7 @@ namespace Game
 	Game::menu_t NewMaps(void);
 	Game::menu_t LoadMaps(void);
 	Game::menu_t StartGame(void);
+	Game::menu_t StartGame(void);
     };
 };
 
