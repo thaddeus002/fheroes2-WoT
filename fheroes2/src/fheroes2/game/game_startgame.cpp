@@ -1312,7 +1312,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	    // TODO: congratulations!
 	    // check returns
 	    const_cast<Heroes &>(hero).PickupArtifact(ultimate);
-	    Dialog::Message("Congratulations!!!", "You found " + Artifact::String(ultimate), Font::BIG, Dialog::OK);
+	    Dialog::Message("Congratulations!!!", "After spending many hours digging here, you have uncovered the " + Artifact::String(ultimate), Font::BIG, Dialog::OK);
 	}
 
 	Cursor::Get().Hide();
