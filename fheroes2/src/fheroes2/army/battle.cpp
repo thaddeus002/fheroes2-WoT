@@ -139,7 +139,7 @@ namespace Army {
     int CheckLuck(Heroes *hero, const Army::Troops &troop);
     bool CanRetaliate(const Army::Troops &attacker, const Army::Troops &defender);
     bool CanAttackTwice(Monster::monster_t attacker);
-    int AdjustDamage(Monster::monster_t attacker, Monster::monster_t defender, int damage);
+    int AdjustDamage(Monster::monster_t attacker, Monster::monster_t defender, int damage, bool ranged);
 
     void Temp(int, int, Point);
 }
@@ -950,8 +950,10 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	    break;
 	}
         
+        bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !retaliate;
+        
         //Racial/unit modifiers apply here
-        damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage);
+        damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage, ranged);
         
 	// TODO bless and curse
 	//damage *= sk_a;
@@ -980,7 +982,6 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
                 target.SetRetaliated(true);
             }
 	}
-	bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !retaliate;
 	Monster::animstate_t targetstate = !IsDamageFatal(damage, target) ? Monster::AS_PAIN : Monster::AS_DIE;
 	Monster::animstate_t mytroopstate;
 	if(target.Position().y > myTroop.Position().y)
@@ -993,9 +994,6 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
         myTroop.SetReflect(myTroop.Position().x > target.Position().x);
         
 	if(!ranged) {
-	    if(myMonster.miss_icn != ICN::UNKNOWN && myTroop.Monster() != Monster::MAGE &&
-	       myTroop.Monster() != Monster::ARCHMAGE && myTroop.Monster() != Monster::TITAN)
-		damage /= 2;
 	    AGG::PlaySound(myMonster.m82_attk);
 	    u8 st, len, len2, len3;
 	    Monster::GetAnimFrames(target.Monster(), targetstate, st, len);
@@ -1447,12 +1445,28 @@ bool Army::CanAttackTwice(Monster::monster_t attacker)
     }
 }
 
-int Army::AdjustDamage(Monster::monster_t attacker, Monster::monster_t defender, int damage)
+int Army::AdjustDamage(Monster::monster_t attacker, Monster::monster_t defender, int damage, bool ranged)
 {
     if(attacker == Monster::CRUSADER
     && Monster::GetRace(defender) == Race::NECR)
         return damage * 2;
-    else return damage;
+    
+    else if(!ranged)
+    {
+        if(Monster::GetStats(attacker).miss_icn != ICN::UNKNOWN)
+            switch(attacker)
+            {
+                case Monster::MAGE:
+                case Monster::ARCHMAGE:
+                case Monster::TITAN:
+                    return damage;
+                
+                default:
+                    return damage / 2;
+            }
+    }
+    
+    return damage;
 }
 
 void Army::InitBackground(const Maps::Tiles & tile)
