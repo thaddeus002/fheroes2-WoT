@@ -23,12 +23,26 @@
 #include "splitter.h"
 
 /* splitter constructor */
+Splitter::Splitter()
+{
+}
+
 Splitter::Splitter(const Surface &sf, const Rect &rt, positions_t pos)
     : SpriteCursor(sf, rt.x, rt.y), area(rt), step(0), min(0), max(0), cur(0), position(pos)
 {
     SpriteCursor::Hide();
     SpriteCursor::Move(rt.x, rt.y);
     SpriteCursor::Show();
+}
+
+void Splitter::SetArea(const Rect & rt)
+{
+    area = rt;
+}
+
+void Splitter::SetPos(positions_t ps)
+{
+    position = ps;
 }
 
 /* set range */

@@ -25,17 +25,20 @@
 #include "surface.h"
 #include "gamedefs.h"
 
-class Splitter : private SpriteCursor
+class Splitter : public SpriteCursor
 {
 public:
     typedef enum { HORIZONTAL, VERTICAL } positions_t;
 
+    Splitter();
     Splitter(const Surface &sf, const Rect &rt, positions_t pos);
 
     void Forward(void);
     void Backward(void);
     void Move(u16 pos);
 
+    void SetArea(const Rect & rt);
+    void SetPos(positions_t ps);
     void SetRange(u16 smin, u16 smax);
 
     u16 GetCurrent(void) const{ return cur; };
@@ -48,7 +51,7 @@ public:
 private:
     void Dump(void);
 
-    const Rect area;
+    Rect area;
     u16 step;
     u16 min;
     u16 max;
