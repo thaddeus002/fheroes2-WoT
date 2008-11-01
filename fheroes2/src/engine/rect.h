@@ -36,6 +36,8 @@ public:
 
     Point & operator+=(const Point & pt);
     Point & operator-=(const Point & pt);
+    
+    double distance(const Point & pt) const;
 };
 
 Point operator+(const Point& pt1, const Point& pt2);

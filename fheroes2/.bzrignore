@@ -7,3 +7,7 @@ src/tools/extractor
 src/tools/icn2bmp
 src/tools/package
 src/dist/fheroes2
+*.mp2
+*.ogg
+data/extracted
+*.agg

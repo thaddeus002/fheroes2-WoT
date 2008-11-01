@@ -85,6 +85,16 @@ namespace Army
 	void ClearMagic();
 	void ProceedMagic();
 	const std::vector<Spell::magic_t> &Magics() const { return magics; };
+        
+        bool IsReflected() const { return reflect; }
+        void SetReflect(bool r) { reflect = r; }
+        void SetOriginalReflection(bool r) { origReflect = r; }
+        void ResetReflection() { reflect = origReflect; }
+        
+        bool HasRetaliated() const { return retaliated; }
+        void SetRetaliated(bool r) { retaliated = r; }
+        
+        int TotalHP() const { return hp + (count - 1) * Monster::GetStats(monster).hp; }
 
 	Monster::animstate_t    astate;
 	u16                     aframe;
@@ -101,6 +111,8 @@ namespace Army
 	Point                   pos;
 	Background bg;
 	bool saved;
+        bool reflect, origReflect;
+        bool retaliated;
 	std::vector<Spell::magic_t> magics;
     };
 

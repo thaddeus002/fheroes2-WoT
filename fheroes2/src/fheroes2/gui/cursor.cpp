@@ -154,6 +154,21 @@ void Cursor::SetOffset(const themes_t name)
                 offset_x = -15;
                 offset_y = -15;
                 break;
+            
+            case Cursor::WAR_NONE:
+            case Cursor::WAR_MOVE:
+            case Cursor::WAR_HELMET:
+            case Cursor::WAR_FLIGHT:
+            case Cursor::WAR_ARROW:
+            case Cursor::WAR_INFO:
+            case Cursor::SWORD_TOPLEFT:
+            case Cursor::SWORD_LEFT:
+            case Cursor::SWORD_BOTTOMLEFT:
+            case Cursor::WAR_BROKENARROW:
+            case Cursor::SWORD_TOPRIGHT:
+                offset_x = -7;
+                offset_y = -7;
+                break;
 
 	    default:
 		offset_x = 0;

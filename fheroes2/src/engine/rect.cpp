@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cmath>
 #include "rect.h"
 
 Point::Point(s16 px, s16 py) : x(px), y(py)
@@ -48,6 +49,13 @@ Point & Point::operator-=(const Point & pt)
     y -= pt.y;
 
     return *this;
+}
+
+double Point::distance(const Point & pt) const
+{
+    int dX = x - pt.x;
+    int dY = y - pt.y;
+    return sqrt(dX * dX + dY * dY);
 }
 
 Point operator+(const Point& pt1, const Point& pt2)
