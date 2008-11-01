@@ -31,7 +31,7 @@
 bool ReflectSprite(const u16 from, const u16 to = Direction::UNKNOWN);
 const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
 const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
-const Sprite & SpriteShad(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
+const Sprite & SpriteShad(const Heroes & hero, const u8 index);
 bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next);
 
 bool ReflectSprite(const u16 from, const u16 to)
@@ -130,7 +130,7 @@ const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflec
     return AGG::GetICN(icn_flag, index_sprite + (index % 9), reflect);
 }
 
-const Sprite & SpriteShad(const Heroes & hero, const u8 index, const bool reflect, const bool rotate)
+const Sprite & SpriteShad(const Heroes & hero, const u8 index)
 {
     const ICN::icn_t icn_shad = hero.isShipMaster() ? ICN::BOATSHAD : ICN::SHADOW32;
     u16 index_sprite = 0;
@@ -214,7 +214,7 @@ void Heroes::Redraw(bool with_shadow) const
 
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
     const Sprite & sprite2 = SpriteFlag(*this, sprite_index, reflect);
-    const Sprite & sprite3 = SpriteShad(*this, sprite_index, reflect);
+    const Sprite & sprite3 = SpriteShad(*this, sprite_index);
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     Point dst_pt2(dx + (reflect ? TILEWIDTH - sprite2.x() - sprite2.w() : sprite2.x()), dy + sprite2.y() + TILEWIDTH);

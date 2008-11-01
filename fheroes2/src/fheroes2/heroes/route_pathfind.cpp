@@ -33,7 +33,7 @@
 struct cellinfo_t
 {
     cellinfo_t() : cost_g(MAXU16),cost_s(MAXU16), parent(MAXU16), open_list(true){};
-    cellinfo_t(const u16 g, const u16 h, const u16 p, bool f, bool m) : cost_g(g), cost_s(h), parent(p), open_list(f){};
+    cellinfo_t(const u16 g, const u16 h, const u16 p, bool f) : cost_g(g), cost_s(h), parent(p), open_list(f){};
 
     u16		cost_g;
     u16		cost_s;
@@ -53,7 +53,7 @@ bool Route::Path::Find_v1(const u16 index1, const u16 index2, const u16 limit)
     u32 count_itr = 0;
 
     u16 index_i = index1;
-    work_map[index_i] = cellinfo_t(MAXU16, MAXU16, MAXU16, false, true);
+    work_map[index_i] = cellinfo_t(MAXU16, MAXU16, MAXU16, false);
 
     while(index_i != index2 && !notfound)
     {

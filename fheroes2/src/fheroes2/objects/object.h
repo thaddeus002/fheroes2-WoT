@@ -32,7 +32,7 @@ class Object
 	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
 	~Object();
 
-	static bool		isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms);
+	static bool		isPassable(const std::list<Maps::TilesAddon> & bottoms);
 	static bool		AllowDirect(const u8 general, const u16 direct);
 
 	const MP2::object_t	object;

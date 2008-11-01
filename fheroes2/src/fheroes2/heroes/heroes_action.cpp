@@ -156,7 +156,7 @@ void Heroes::Action(const Maps::Tiles & dst)
         case MP2::OBJ_IDOL:		ActionToLuckObject(dst_index); break;
 
         case MP2::OBJ_MAGICWELL: 	ActionToMagicWell(dst_index); break;
-        case MP2::OBJ_TRADINGPOST:	ActionToTradingPost(dst_index); break;
+        case MP2::OBJ_TRADINGPOST:	ActionToTradingPost(); break;
 
         // primary skill modification
         case MP2::OBJ_FORT:
@@ -832,7 +832,7 @@ void Heroes::ActionToMagicWell(const u16 dst_index)
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToMagicWell: " + GetName());
 }
 
-void Heroes::ActionToTradingPost(const u16 dst_index)
+void Heroes::ActionToTradingPost(void)
 {
     if(H2Config::MyColor() == GetColor())
     {

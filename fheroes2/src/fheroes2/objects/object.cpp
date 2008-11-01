@@ -45,7 +45,7 @@ Object::~Object()
 {
 }
 
-bool Object::isPassable(const u8 general, const std::list<Maps::TilesAddon> & bottoms)
+bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms)
 {
     if(bottoms.size())
     {

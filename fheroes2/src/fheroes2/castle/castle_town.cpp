@@ -981,38 +981,38 @@ Castle::building_t Castle::OpenTown(void)
 
         // status info
 	if(le.MouseCursor(rectDwelling1))
-	    statusBar.ShowBuildMessage(DWELLING_MONSTER1 & building, allowBuyBuildDwelling1, stringDwelling1, *this, DWELLING_MONSTER1);
+	    statusBar.ShowBuildMessage(DWELLING_MONSTER1 & building, stringDwelling1, *this, DWELLING_MONSTER1);
 	else
 	if(le.MouseCursor(rectDwelling2))
 	{
 	    if(isBuild(DWELLING_MONSTER2) && allowUpgrade2)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE2), allowBuyBuildDwelling2, stringDwelling2, *this, DWELLING_UPGRADE2);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE2), stringDwelling2, *this, DWELLING_UPGRADE2);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER2), allowBuyBuildDwelling2, stringDwelling2, *this, DWELLING_MONSTER2);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER2), stringDwelling2, *this, DWELLING_MONSTER2);
 	}
 	else
 	if(le.MouseCursor(rectDwelling3))
 	{
 	    if(isBuild(DWELLING_MONSTER3) && allowUpgrade3)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE3), allowBuyBuildDwelling3, stringDwelling3, *this, DWELLING_UPGRADE3);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE3), stringDwelling3, *this, DWELLING_UPGRADE3);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER3), allowBuyBuildDwelling3, stringDwelling3, *this, DWELLING_MONSTER3);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER3), stringDwelling3, *this, DWELLING_MONSTER3);
 	}
 	else
 	if(le.MouseCursor(rectDwelling4))
 	{
 	    if(isBuild(DWELLING_MONSTER4) && allowUpgrade4)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE4), allowBuyBuildDwelling4, stringDwelling4, *this, DWELLING_UPGRADE4);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE4), stringDwelling4, *this, DWELLING_UPGRADE4);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER4), allowBuyBuildDwelling4, stringDwelling4, *this, DWELLING_MONSTER4);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER4), stringDwelling4, *this, DWELLING_MONSTER4);
 	}
 	else
 	if(le.MouseCursor(rectDwelling5))
 	{
 	    if(isBuild(DWELLING_MONSTER5) && allowUpgrade5)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE5), allowBuyBuildDwelling5, stringDwelling5, *this, DWELLING_UPGRADE5);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE5), stringDwelling5, *this, DWELLING_UPGRADE5);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER5), allowBuyBuildDwelling5, stringDwelling5, *this, DWELLING_MONSTER5);
+		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER5), stringDwelling5, *this, DWELLING_MONSTER5);
 	}
 	else
 	if(le.MouseCursor(rectDwelling6))
@@ -1020,64 +1020,64 @@ Castle::building_t Castle::OpenTown(void)
 	    if(isBuild(DWELLING_MONSTER6) && allowUpgrade6)
 	    {
 		if(isBuild(DWELLING_UPGRADE6) && allowUpgrade7)
-		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE7), allowBuyBuildDwelling6, stringDwelling6, *this, DWELLING_UPGRADE7);
+		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE7), stringDwelling6, *this, DWELLING_UPGRADE7);
 		else
-		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE6), allowBuyBuildDwelling6, stringDwelling6, *this, DWELLING_UPGRADE6);
+		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE6), stringDwelling6, *this, DWELLING_UPGRADE6);
 	    }
 	    else
-		    statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER6), allowBuyBuildDwelling6, stringDwelling6, *this, DWELLING_MONSTER6);
+		    statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER6), stringDwelling6, *this, DWELLING_MONSTER6);
 	}
 	else
 	if(le.MouseCursor(rectMageGuild))
 	{
 	    switch(GetLevelMageGuild())
 	    {
-		case 0: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD1); break;
-		case 1: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD2); break;
-                case 2: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD3); break;
-                case 3: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD4); break;
-                case 4: statusBar.ShowBuildMessage(false, allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
-                case 5: statusBar.ShowBuildMessage(true,  allowBuyBuildMageGuild, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
+		case 0: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD1); break;
+		case 1: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD2); break;
+                case 2: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD3); break;
+                case 3: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD4); break;
+                case 4: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
+                case 5: statusBar.ShowBuildMessage(true,  stringMageGuild, *this, BUILD_MAGEGUILD5); break;
 
 		default: break;
 	    }
 	}
 	else
 	if((Race::NECR != race || Settings::Get().Modes(Settings::PRICELOYALTY)) && le.MouseCursor(rectTavern))
-	    statusBar.ShowBuildMessage(BUILD_TAVERN & building, allowBuyBuildTavern, stringTavern, *this, BUILD_TAVERN);
+	    statusBar.ShowBuildMessage(BUILD_TAVERN & building, stringTavern, *this, BUILD_TAVERN);
 	else
 	if(le.MouseCursor(rectThievesGuild))
-	    statusBar.ShowBuildMessage(BUILD_THIEVESGUILD & building, allowBuyBuildThievesGuild, stringThievesGuild, *this, BUILD_THIEVESGUILD);
+	    statusBar.ShowBuildMessage(BUILD_THIEVESGUILD & building, stringThievesGuild, *this, BUILD_THIEVESGUILD);
 	else
 	if(le.MouseCursor(rectShipyard))
-	    statusBar.ShowBuildMessage(BUILD_SHIPYARD & building, allowBuyBuildShipyard, stringShipyard, *this, BUILD_SHIPYARD);
+	    statusBar.ShowBuildMessage(BUILD_SHIPYARD & building, stringShipyard, *this, BUILD_SHIPYARD);
 	else
 	if(le.MouseCursor(rectStatue))
-	    statusBar.ShowBuildMessage(BUILD_STATUE & building, allowBuyBuildStatue, stringStatue, *this, BUILD_STATUE);
+	    statusBar.ShowBuildMessage(BUILD_STATUE & building, stringStatue, *this, BUILD_STATUE);
 	else
 	if(le.MouseCursor(rectMarketplace))
-	    statusBar.ShowBuildMessage(BUILD_MARKETPLACE & building, allowBuyBuildMarketplace, stringMarketplace, *this, BUILD_MARKETPLACE);
+	    statusBar.ShowBuildMessage(BUILD_MARKETPLACE & building, stringMarketplace, *this, BUILD_MARKETPLACE);
 	else
 	if(le.MouseCursor(rectWell))
-	    statusBar.ShowBuildMessage(BUILD_WELL & building, allowBuyBuildWell, stringWell, *this, BUILD_WELL);
+	    statusBar.ShowBuildMessage(BUILD_WELL & building, stringWell, *this, BUILD_WELL);
 	else
 	if(le.MouseCursor(rectWel2))
-	    statusBar.ShowBuildMessage(BUILD_WEL2 & building, allowBuyBuildWel2, stringWel2, *this, BUILD_WEL2);
+	    statusBar.ShowBuildMessage(BUILD_WEL2 & building, stringWel2, *this, BUILD_WEL2);
 	else
 	if(le.MouseCursor(rectSpec))
-	    statusBar.ShowBuildMessage(BUILD_SPEC & building, allowBuyBuildSpec, stringSpec, *this, BUILD_SPEC);
+	    statusBar.ShowBuildMessage(BUILD_SPEC & building, stringSpec, *this, BUILD_SPEC);
 	else
 	if(le.MouseCursor(rectLTurret))
-	    statusBar.ShowBuildMessage(BUILD_LEFTTURRET & building, allowBuyBuildLTurret, stringLTurret, *this, BUILD_LEFTTURRET);
+	    statusBar.ShowBuildMessage(BUILD_LEFTTURRET & building, stringLTurret, *this, BUILD_LEFTTURRET);
 	else
 	if(le.MouseCursor(rectRTurret))
-	    statusBar.ShowBuildMessage(BUILD_RIGHTTURRET & building, allowBuyBuildRTurret, stringRTurret, *this, BUILD_RIGHTTURRET);
+	    statusBar.ShowBuildMessage(BUILD_RIGHTTURRET & building, stringRTurret, *this, BUILD_RIGHTTURRET);
 	else
 	if(le.MouseCursor(rectMoat))
-	    statusBar.ShowBuildMessage(BUILD_MOAT & building, allowBuyBuildMoat, stringMoat, *this, BUILD_MOAT);
+	    statusBar.ShowBuildMessage(BUILD_MOAT & building, stringMoat, *this, BUILD_MOAT);
 	else
 	if(le.MouseCursor(rectCaptain))
-	    statusBar.ShowBuildMessage(BUILD_CAPTAIN & building, allowBuyBuildCaptain, stringCaptain, *this, BUILD_CAPTAIN);
+	    statusBar.ShowBuildMessage(BUILD_CAPTAIN & building, stringCaptain, *this, BUILD_CAPTAIN);
 	else
 	if((hero1 && le.MouseCursor(rectHero1)) ||
 	   (hero2 && le.MouseCursor(rectHero2)))

@@ -31,7 +31,7 @@
 #include "gamearea.h"
 
 void	RedrawBoat(const Maps::Tiles & tile, const Point & dst);
-void	RedrawHeroes(const Maps::Tiles & tile, const Point & dst);
+void	RedrawHeroes(const Maps::Tiles & tile);
 void	RedrawMonster(const Maps::Tiles & tile, const Point & dst);
 void	RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy);
 
@@ -120,7 +120,7 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
     	    // boat
     	    case MP2::OBJ_BOAT:		RedrawBoat(tile, dst); break;
     	    // heroes
-    	    case MP2::OBJ_HEROES:	RedrawHeroes(tile, dst); break;
+    	    case MP2::OBJ_HEROES:	RedrawHeroes(tile); break;
     	    // monster
     	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, dst); break;
 
@@ -305,7 +305,7 @@ void RedrawBoat(const Maps::Tiles & tile, const Point & dst)
     }
 }
 
-void RedrawHeroes(const Maps::Tiles & tile, const Point & dst)
+void RedrawHeroes(const Maps::Tiles & tile)
 {
     const Heroes *hero = world.GetHeroes(tile.GetIndex());
 

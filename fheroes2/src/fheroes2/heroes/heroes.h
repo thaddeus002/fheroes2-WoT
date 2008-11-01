@@ -228,7 +228,7 @@ protected:
     void ActionToLuckObject(const u16 dst_index);
     void ActionToSign(const u16 dst_index);
     void ActionToMagicWell(const u16 dst_index);
-    void ActionToTradingPost(const u16 dst_index);
+    void ActionToTradingPost(void);
     void ActionToPrimarySkillObject(const u16 dst_index);
     void ActionToMoraleObject(const u16 dst_index);
     void ActionToExperienceObject(const u16 dst_index);

@@ -831,7 +831,7 @@ bool Maps::Tiles::isPassable(void) const
 
     }
 
-    return Object::isPassable(general, addons_level1);
+    return Object::isPassable(addons_level1);
 }
 
 /* check road */

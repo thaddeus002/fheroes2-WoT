@@ -28,7 +28,7 @@
 #include "world.h"
 #include "dialog.h"
 
-void Dialog::StatusBar::ShowBuildMessage(bool isBuilt, bool allowBuild, const std::string & message, const Castle & castle, const u32 building)
+void Dialog::StatusBar::ShowBuildMessage(bool isBuilt, const std::string & message, const Castle & castle, const u32 building)
 {
     if(isBuilt)
 	ShowMessage(message + " is already built");
