@@ -288,7 +288,10 @@ void Game::OpenHeroes(Heroes *hero)
 			FocusToHeroes(myKingdom.GetHeroes().front());
 		    else
 		    if(myKingdom.GetCastles().size())
+		    {
+			SelectBarHeroes::Get().Redraw();
 			FocusToCastle(myKingdom.GetCastles().front());
+		    }
 		    else
 		    {
 			gamefocus.Reset();
