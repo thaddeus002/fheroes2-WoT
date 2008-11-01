@@ -113,6 +113,7 @@ namespace Army {
     
     int FindTroop(const Army::army_t &army, const Point &p);
     int FindTroop(const std::vector<Army::Troops*> &army, const Point &p);
+    int FindTroopExact(const Army::army_t &army, const Point &p);
     bool FindTroopAt(const Army::Troops &troop, const Point &p);
     bool CellFree(const Point &p, const Army::army_t &army1, const Army::army_t &army2, int skip=99);
     bool CellFreeFor(const Point &p, const Army::Troops &troop, const Army::army_t &army1, const Army::army_t &army2, int skip=99);
@@ -904,16 +905,16 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 		for(p.y = 0; p.y < BFH; p.y++)
 		    for(p.x = 0; p.x < BFW; p.x++) {
 			DrawObject(p);
-			if(t = FindTroop(army1, p), t >= 0) {
+			if(t = FindTroopExact(army1, p), t >= 0) {
 			    if(&army1[t] == &myTroop) {
-				    myTroop.Blit(tp, myTroop.IsReflected());
-				    myTroop.Animate();
+                                myTroop.Blit(tp, myTroop.IsReflected());
+                                myTroop.Animate();
 			    } else {
 				DrawTroop(army1[t]);
 				army1[t].Animate();
 			    }
 			}
-			if(t = FindTroop(army2, p), t >= 0) {
+			if(t = FindTroopExact(army2, p), t >= 0) {
 			    if(&army2[t] == &myTroop) {
 				myTroop.Blit(tp, myTroop.IsReflected());
 				myTroop.Animate();
@@ -1067,11 +1068,11 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 		for(p.y = 0; p.y < BFH; p.y++)
 		    for(p.x = 0; p.x < BFW; p.x++) {
 			DrawObject(p);
-			if(t = FindTroop(army1, p), t >= 0) {
-			    DrawTroop(army1[t]);
+			if(t = FindTroopExact(army1, p), t >= 0) {
+                            DrawTroop(army1[t]);
 			    army1[t].Animate();
 			}
-			if(t = FindTroop(army2, p), t >= 0) {
+			if(t = FindTroopExact(army2, p), t >= 0) {
 			    DrawTroop(army2[t]);
 			    army2[t].Animate();
 			}
@@ -1334,11 +1335,11 @@ bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::Troops*> &
 	    for(p.y = 0; p.y < BFH; p.y++)
 		for(p.x = 0; p.x < BFW; p.x++) {
 		    DrawObject(p);
-		    if(t = FindTroop(army1, p), t >= 0) {
+		    if(t = FindTroopExact(army1, p), t >= 0) {
 			DrawTroop(army1[t]);
 			army1[t].Animate();
 		    }
-		    if(t = FindTroop(army2, p), t >= 0) {
+		    if(t = FindTroopExact(army2, p), t >= 0) {
 			DrawTroop(army2[t]);
 			army2[t].Animate();
 		    }
@@ -1797,13 +1798,13 @@ void Army::DrawArmy(Army::army_t & army1, Army::army_t & army2, int animframe)
     for(p.y = 0; p.y < BFH; p.y++) 
 	for(p.x = 0; p.x < BFW; p.x++) {
 	    DrawObject(p);
-	    if(t = FindTroop(army1, p), t >= 0) {
+	    if(t = FindTroopExact(army1, p), t >= 0) {
 		DrawTroop(army1[t], animframe);
 		army1[t].Animate();
 		if(army1[t].astate == Monster::AS_NONE && !Rand::Get(0, 30))
 		    army1[t].Animate(Monster::AS_IDLE);
 	    }
-	    if(t = FindTroop(army2, p), t >= 0) {
+	    if(t = FindTroopExact(army2, p), t >= 0) {
 		DrawTroop(army2[t], animframe);
 		army2[t].Animate();
 		if(army2[t].astate == Monster::AS_NONE && !Rand::Get(0, 30))
@@ -1914,6 +1915,21 @@ bool Army::FindTroopAt(const Army::Troops &troop, const Point &p)
     if(troop.Monster() != Monster::UNKNOWN && (p == troop.Position() || p == p2)) 
         return true;
     else return false;
+}
+
+/** Determine which troop, if one exists, is exactly at the given point
+ *  \note No wide or reflection calculations are performed
+ *  \param army Army through which to search
+ *  \param p    Point at which to look
+ *  \return The troop's index into #army, or -1 if none found
+ */
+int Army::FindTroopExact(const Army::army_t &army, const Point &p)
+{
+    for(unsigned int i=0; i<army.size(); i++) {
+	if(army[i].Position() == p)
+            return i;
+    }
+    return -1;
 }
 
 /** Determine which troop, if one exists, is at the given point
