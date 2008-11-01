@@ -1022,7 +1022,12 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	}
 	myTroop.Animate(mytroopstate);
 	while(le.HandleEvents()) {
-	    if(Game::ShouldAnimateInfrequent(++animat, 4)) {
+            bool shouldAnimate = false;
+            if(ranged && state == 1)
+                shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 2);
+            else
+                shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 4);
+	    if(shouldAnimate) {
 		if(!ranged) {
 		    if(missframe) {
 			missframe --;
