@@ -34,6 +34,8 @@
 #include "rand.h" 
 #include "world.h"
 
+World & world = World::GetWorld();
+
 u32 World::uniq0 = 0;
 
 World & World::GetWorld(void)

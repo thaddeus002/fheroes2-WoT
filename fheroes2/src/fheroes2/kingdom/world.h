@@ -156,6 +156,6 @@ private:
     static u32 uniq0;
 };
 
-static World & world = World::GetWorld();
+extern World & world;
 
 #endif
