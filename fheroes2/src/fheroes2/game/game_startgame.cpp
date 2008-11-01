@@ -709,6 +709,10 @@ Game::menu_t Game::HumanTurn(void)
 	    if(conf.Original()) FocusToCastle(myCastles.front());
 	    break;
     }
+    
+    //Override whatever the focus set the window to show
+    statusWindow.SetState(StatusWindow::DAY);
+    statusWindow.Redraw();
 
     cursor.Show();
     display.Flip();
