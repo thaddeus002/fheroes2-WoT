@@ -329,6 +329,7 @@ void Heroes::ActionToHeroes(const u16 dst_index)
 	    case Army::LOSE: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result LOSE"); break;
 	    case Army::RETREAT: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result RETREAT"); break;
 	    case Army::SURRENDER: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result SURRENDER"); break;
+            default: break; // Silly compiler warnings
 	}
 
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: FIXME: attack enemy hero");
