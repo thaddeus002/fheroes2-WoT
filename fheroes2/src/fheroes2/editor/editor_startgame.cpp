@@ -22,7 +22,7 @@
 #include "agg.h"
 #include "config.h"
 #include "sprite.h"
-#include "localevent.h"
+#include "engine.h"
 #include "button.h"
 #include "dialog.h"
 #include "world.h"
@@ -30,22 +30,18 @@
 #include "cursor.h"
 #include "radar.h"
 #include "splitter.h"
-#include "spritecursor.h"
 #include "sizecursor.h"
 #include "direction.h"
 #include "maps_tiles.h"
 #include "ground.h"
-#include "error.h"
 #include "tools.h"
-#include "rand.h"
+#include "editor_interface.h"
 #include "game.h"
 
 namespace Game
 {
     namespace Editor
     {
-	void RedrawTopNumberCell(const Rect & area);
-	void RedrawLeftNumberCell(const Rect & area);
 	void ModifySingleTile(Maps::Tiles & center);
 	void ModifyTileAbroad(Maps::Tiles & center);
 	void SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::ground_t ground);
@@ -54,233 +50,33 @@ namespace Game
 
 Game::menu_t Game::Editor::StartGame()
 {
+    Game::SetFixVideoMode();
+
     Display & display = Display::Get();
-
-    // cursor
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-    
-    cursor.SetThemes(cursor.POINTER);
-    Display::SetVideoMode(Settings::Get().VideoMode());
-    display.Fill(0x00, 0x00, 0x00);
-
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
 
-    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
+    Cursor & cursor = Cursor::Get();
+    Interface & I = Interface::Get();
 
+    // cursor
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+    I.Draw();
+
+    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
     const Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     const Rect areaScrollTop(BORDERWIDTH, 0, areaMaps.GetRect().w * TILEWIDTH, BORDERWIDTH / 2);
     const Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, (areaMaps.GetRect().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
-    Rect src_rt;
-    Point dst_pt;
-
-    // draw interface
-    const Sprite & spriteAdv = AGG::GetICN(ICN::ADVBORD, 0);
-    const Sprite & spriteBac = AGG::GetICN(ICN::STONBACK, 0);
-    // bottom scroll bar indicator
-    const Sprite & spriteBottomBar(AGG::GetICN(ICN::ESCROLL, 0));
-    dst_pt.x = BORDERWIDTH * 2;
-    dst_pt.y = BORDERWIDTH + areaMaps.GetRect().h * TILEWIDTH;
-    src_rt.x = 0;
-    src_rt.y = 0;
-    src_rt.w = TILEWIDTH;
-    src_rt.h = BORDERWIDTH;
-    display.Blit(spriteBottomBar, src_rt, dst_pt);
-    src_rt.x = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.GetRect().w - 3); ++ii)
-    {
-	dst_pt.x += TILEWIDTH;
-	display.Blit(spriteBottomBar, src_rt, dst_pt);
-    }
-    dst_pt.x += TILEWIDTH;
-    src_rt.x = spriteBottomBar.w() - TILEWIDTH;
-    display.Blit(spriteBottomBar, src_rt, dst_pt);
-    // left scroll bar indicator
-    const Sprite & spriteLeftBar(AGG::GetICN(ICN::ESCROLL, 1));
-    dst_pt.x = BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
-    dst_pt.y = BORDERWIDTH * 2;
-    src_rt.x = 0;
-    src_rt.y = 0;
-    src_rt.w = BORDERWIDTH;
-    src_rt.h = TILEWIDTH;
-    display.Blit(spriteLeftBar, src_rt, dst_pt);
-    src_rt.y = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.GetRect().h - 3); ++ii)
-    {
-	dst_pt.y += TILEWIDTH;
-	display.Blit(spriteLeftBar, src_rt, dst_pt);
-    }
-    dst_pt.y += TILEWIDTH;
-    src_rt.y = spriteLeftBar.h() - TILEWIDTH;
-    display.Blit(spriteLeftBar,src_rt, dst_pt);
-    // left top static border
-    src_rt.x = spriteAdv.w() - BORDERWIDTH - RADARWIDTH;
-    src_rt.y = 0;
-    src_rt.w = BORDERWIDTH + RADARWIDTH;
-    src_rt.h = BORDERWIDTH;
-    dst_pt.x = 2 * BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
-    dst_pt.y = 0;
-    display.Blit(spriteAdv, src_rt, dst_pt);
-    // left bottom static border
-    src_rt.x = spriteAdv.w() - BORDERWIDTH - RADARWIDTH;
-    src_rt.y = spriteAdv.h() - BORDERWIDTH;
-    src_rt.w = BORDERWIDTH + RADARWIDTH;
-    src_rt.h = BORDERWIDTH;
-    dst_pt.x = 2 * BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
-    dst_pt.y = BORDERWIDTH + areaMaps.GetRect().h * TILEWIDTH;
-    display.Blit(spriteAdv, src_rt, dst_pt);
-    // left static border
-    src_rt.x = spriteAdv.w() - BORDERWIDTH;
-    src_rt.y = 0;
-    src_rt.w = BORDERWIDTH;
-    src_rt.h = 250;
-    dst_pt.x = display.w() - BORDERWIDTH;
-    dst_pt.y = 0;
-    display.Blit(spriteAdv, src_rt, dst_pt);
-    //
-    src_rt.y = 250;
-    src_rt.h = TILEWIDTH;
-    dst_pt.y = 250;
-    //
-    u8 var1 = 4 + (display.h() - 480) / TILEWIDTH;
-
-    for(u8 ii = 0; ii < var1; ++ii)
-    {
-	display.Blit(spriteAdv, src_rt, dst_pt);
-	dst_pt.y += TILEWIDTH;
-    }
-    //
-    src_rt.y = spriteAdv.h() - 102;
-    src_rt.h = 102;
-    dst_pt.y = display.h() - 102;
-    display.Blit(spriteAdv, src_rt, dst_pt);
-
-    // buttons
-    dst_pt.x = 0;
-    dst_pt.y = 0;
-    Button btnLeftTopScroll(dst_pt, ICN::ESCROLL, 12, 13);
-
-    dst_pt.x = BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
-    Button btnRightTopScroll(dst_pt, ICN::ESCROLL, 14, 15);
-	
-    dst_pt.y = BORDERWIDTH;
-    Button btnTopScroll(dst_pt, ICN::ESCROLL, 4, 5);
-
-    dst_pt.x = 0;
-    dst_pt.y = BORDERWIDTH + areaMaps.GetRect().h * TILEWIDTH;
-    Button btnLeftBottomScroll(dst_pt, ICN::ESCROLL, 18, 19);
-
-    dst_pt.x = BORDERWIDTH;
-    Button btnLeftScroll(dst_pt, ICN::ESCROLL, 8, 9);
-
-    dst_pt.x = 2 * BORDERWIDTH + (areaMaps.GetRect().w - 1) * TILEWIDTH;
-    Button btnRightScroll(dst_pt, ICN::ESCROLL, 10, 11);
-
-    dst_pt.x = BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH;
-    Button btnRightBottomScroll(dst_pt, ICN::ESCROLL, 16, 17);
-
-    dst_pt.y = areaMaps.GetRect().h * TILEWIDTH;
-    Button btnBottomScroll(dst_pt, ICN::ESCROLL, 6, 7);
-    
-    dst_pt.x = display.w() - BORDERWIDTH - RADARWIDTH;
-    dst_pt.y = BORDERWIDTH + RADARWIDTH;
-    Button btnSelectGround(dst_pt, ICN::EDITBTNS, 0, 1);
-
-    dst_pt.x = btnSelectGround.x + btnSelectGround.w;
-    dst_pt.y = btnSelectGround.y;
-    Button btnSelectObject(dst_pt, ICN::EDITBTNS, 2, 3);
-
-    dst_pt.x = btnSelectObject.x + btnSelectObject.w;
-    dst_pt.y = btnSelectObject.y;
-    Button btnSelectInfo(dst_pt, ICN::EDITBTNS, 4, 5);
-
-    dst_pt.x = btnSelectGround.x;
-    dst_pt.y = btnSelectGround.y + btnSelectGround.h;
-    Button btnSelectRiver(dst_pt, ICN::EDITBTNS, 6, 7);
-
-    dst_pt.x = btnSelectRiver.x + btnSelectRiver.w;
-    dst_pt.y = btnSelectRiver.y;
-    Button btnSelectRoad(dst_pt, ICN::EDITBTNS, 8, 9);
-
-    dst_pt.x = btnSelectRoad.x + btnSelectRoad.w;
-    dst_pt.y = btnSelectRoad.y;
-    Button btnSelectClear(dst_pt, ICN::EDITBTNS, 10, 11);
-
-    const Point dstPanel(btnSelectRiver.x, btnSelectRiver.y + btnSelectRiver.h);
     const Sprite & spritePanelGround = AGG::GetICN(ICN::EDITPANL, 0);
     const Sprite & spritePanelObject = AGG::GetICN(ICN::EDITPANL, 1);
     const Sprite & spritePanelInfo = AGG::GetICN(ICN::EDITPANL, 2);
     const Sprite & spritePanelRiver = AGG::GetICN(ICN::EDITPANL, 3);
     const Sprite & spritePanelRoad = AGG::GetICN(ICN::EDITPANL, 4);
     const Sprite & spritePanelClear = AGG::GetICN(ICN::EDITPANL, 5);
-
-    dst_pt.x = dstPanel.x + 14;
-    dst_pt.y = dstPanel.y + 127;
-    Button btnSizeSmall(dst_pt, ICN::EDITBTNS, 24, 25);
-    dst_pt.x = dstPanel.x + 44;
-    Button btnSizeMedium(dst_pt, ICN::EDITBTNS, 26, 27);
-    dst_pt.x = dstPanel.x + 74;
-    Button btnSizeLarge(dst_pt, ICN::EDITBTNS, 28, 29);
-    dst_pt.x = dstPanel.x + 104;
-    Button btnSizeManual(dst_pt, ICN::EDITBTNS, 30, 31);
-
-    dst_pt.x = dstPanel.x;
-    dst_pt.y = dstPanel.y + spritePanelGround.h();
-    Button btnZoom(dst_pt, ICN::EDITBTNS, 12, 13);
-
-    dst_pt.x = btnZoom.x + btnZoom.w;
-    dst_pt.y = btnZoom.y;
-    Button btnUndo(dst_pt, ICN::EDITBTNS, 14, 15);
-
-    dst_pt.x = btnUndo.x + btnUndo.w;
-    dst_pt.y = btnUndo.y;
-    Button btnNew(dst_pt, ICN::EDITBTNS, 16, 17);
-
-    dst_pt.x = btnZoom.x;
-    dst_pt.y = btnZoom.y + btnZoom.h;
-    Button btnSpec(dst_pt, ICN::EDITBTNS, 18, 19);
-
-    dst_pt.x = btnSpec.x + btnSpec.w;
-    dst_pt.y = btnSpec.y;
-    Button btnFile(dst_pt, ICN::EDITBTNS, 20, 21);
-
-    dst_pt.x = btnFile.x + btnFile.w;
-    dst_pt.y = btnFile.y;
-    Button btnSystem(dst_pt, ICN::EDITBTNS, 22, 23);
-
-    // bottom static
-    var1 = (display.h() - 480) / TILEWIDTH - 2;
-
-    src_rt.x = 0;
-    src_rt.y = 0;
-    src_rt.w = spriteBac.w();
-    src_rt.h = TILEWIDTH;
-    dst_pt.x = btnSpec.x;
-    dst_pt.y = btnSpec.y + btnSpec.h;
-    if(var1) display.Blit(spriteBac, src_rt, dst_pt);
-    src_rt.y = TILEWIDTH;
-    dst_pt.y += TILEWIDTH;
-    for(u8 ii = 0; ii < var1; ++ii)
-    {
-	display.Blit(spriteBac, src_rt, dst_pt);
-	dst_pt.y += TILEWIDTH;
-    }
-    src_rt.y = spriteBac.h() - TILEWIDTH;
-    if(var1) display.Blit(spriteBac, src_rt, dst_pt);
-
-    // splitter
-    Splitter split_h(AGG::GetICN(ICN::ESCROLL, 2), Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRect().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8), Splitter::HORIZONTAL);
-    Splitter split_v(AGG::GetICN(ICN::ESCROLL, 3), Rect(BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRect().h - 1) * TILEWIDTH - 6), Splitter::VERTICAL);
-
-    split_h.SetRange(0, world.w() - areaMaps.GetRect().w);
-    split_v.SetRange(0, world.h() - areaMaps.GetRect().h);
-
-    split_h.Move(areaMaps.GetRect().x);
-    split_v.Move(areaMaps.GetRect().y);
 
     // Create radar
     Radar & radar = Radar::Get();
@@ -292,44 +88,41 @@ Game::menu_t Game::Editor::StartGame()
     // Create radar cursor
     radar.RedrawCursor();
 
-    RedrawTopNumberCell(areaMaps.GetRect());
-    RedrawLeftNumberCell(areaMaps.GetRect());
-
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    btnLeftTopScroll.Draw();
-    btnRightTopScroll.Draw();
-    btnTopScroll.Draw();
-    btnLeftBottomScroll.Draw();
-    btnLeftScroll.Draw();
-    btnRightScroll.Draw();
-    btnRightBottomScroll.Draw();
-    btnBottomScroll.Draw();
-
-    btnZoom.Draw();
-    btnUndo.Draw();
-    btnNew.Draw();
-    btnSpec.Draw();
-    btnFile.Draw();
-    btnSystem.Draw();
-
-	
-    btnSelectObject.Draw();
-    btnSelectInfo.Draw();
-    btnSelectRiver.Draw();
-    btnSelectRoad.Draw();
-    btnSelectClear.Draw();
+    Button &btnLeftTopScroll = I.btnLeftTopScroll;
+    Button &btnRightTopScroll = I.btnRightTopScroll;
+    Button &btnTopScroll = I.btnTopScroll;
+    Button &btnLeftBottomScroll = I.btnLeftBottomScroll;
+    Button &btnLeftScroll = I.btnLeftScroll;
+    Button &btnRightScroll = I.btnRightScroll;
+    Button &btnRightBottomScroll = I.btnRightBottomScroll;
+    Button &btnBottomScroll = I.btnBottomScroll;
+    Button &btnSelectGround = I.btnSelectGround;
+    Button &btnSelectObject = I.btnSelectObject;
+    Button &btnSelectInfo = I.btnSelectInfo;
+    Button &btnSelectRiver = I.btnSelectRiver;
+    Button &btnSelectRoad = I.btnSelectRoad;
+    Button &btnSelectClear = I.btnSelectClear;
+    Button &btnSizeSmall = I.btnSizeSmall;
+    Button &btnSizeMedium = I.btnSizeMedium;
+    Button &btnSizeLarge = I.btnSizeLarge;
+    Button &btnSizeManual = I.btnSizeManual;
+    Button &btnZoom = I.btnZoom;
+    Button &btnUndo = I.btnUndo;
+    Button &btnNew = I.btnNew;
+    Button &btnSpec = I.btnSpec;
+    Button &btnFile = I.btnFile;
+    Button &btnSystem = I.btnSystem;
 
     btnSelectGround.Press();
-    btnSelectGround.Draw();
-    display.Blit(spritePanelGround, dstPanel);
-
-    btnSizeSmall.Draw();
-    btnSizeLarge.Draw();
-    btnSizeManual.Draw();
-
     btnSizeMedium.Press();
+
+    btnSelectGround.Draw();
     btnSizeMedium.Draw();
+
+    const Point dstPanel(btnSelectRiver.x, btnSelectRiver.y + btnSelectRiver.h);
+    display.Blit(spritePanelGround, dstPanel);
     
     SizeCursor sizeCursor;
     
@@ -373,7 +166,7 @@ Game::menu_t Game::Editor::StartGame()
     display.Flip();
 
     //u32 ticket = 0;
-
+    u8 scrollDir = 0;
     // startgame loop
     while(le.HandleEvents())
     {
@@ -381,65 +174,17 @@ Game::menu_t Game::Editor::StartGame()
 	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft))
-	{
-	    cursor.Hide();
-	    sizeCursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_LEFT);
-	    areaMaps.Scroll(GameArea::LEFT);
-	    split_h.Backward();
-	    radar.RedrawCursor();
-	    RedrawTopNumberCell(areaMaps.GetRect());
-	    cursor.Show();
-	    display.Flip();
-	    continue;
-	}
+	if(le.MouseCursor(areaScrollLeft))	scrollDir |= GameArea::LEFT;
 	else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight))
-	{
-	    cursor.Hide();
-	    sizeCursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_RIGHT);
-	    areaMaps.Scroll(GameArea::RIGHT);
-	    split_h.Forward();
-	    radar.RedrawCursor();
-	    RedrawTopNumberCell(areaMaps.GetRect());
-	    cursor.Show();
-	    display.Flip();
-	    continue;
-	}
-	else
+	if(le.MouseCursor(areaScrollRight))	scrollDir |= GameArea::RIGHT;
+
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop))
-	{
-	    cursor.Hide();
-	    sizeCursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_TOP);
-	    areaMaps.Scroll(GameArea::TOP);
-	    split_v.Backward();
-	    radar.RedrawCursor();
-	    RedrawLeftNumberCell(areaMaps.GetRect());
-	    cursor.Show();
-	    display.Flip();
-	    continue;
-	}
+	if(le.MouseCursor(areaScrollTop))	scrollDir |= GameArea::TOP;
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom))
-	{
-	    cursor.Hide();
-	    sizeCursor.Hide();
-	    cursor.SetThemes(cursor.SCROLL_BOTTOM);
-	    areaMaps.Scroll(GameArea::BOTTOM);
-	    split_v.Forward();
-	    radar.RedrawCursor();
-	    RedrawLeftNumberCell(areaMaps.GetRect());
-	    cursor.Show();
-	    display.Flip();
-	    continue;
-	}
-	else
+	if(le.MouseCursor(areaScrollBottom))	scrollDir |= GameArea::BOTTOM;
+
 	// point radar
 	if(le.MouseCursor(radar.GetRect()) &&
 	    (le.MouseClickLeft(radar.GetRect()) ||
@@ -452,11 +197,11 @@ Game::menu_t Game::Editor::StartGame()
 		cursor.Hide();
 		cursor.SetThemes(cursor.POINTER);
 		sizeCursor.Hide();
-		split_h.Move(areaMaps.GetRect().x);
-		split_v.Move(areaMaps.GetRect().y);
+		I.split_h.Move(areaMaps.GetRect().x);
+		I.split_v.Move(areaMaps.GetRect().y);
 		radar.RedrawCursor();
-		RedrawTopNumberCell(areaMaps.GetRect());
-		RedrawLeftNumberCell(areaMaps.GetRect());
+		Interface::DrawTopNumberCell();
+		Interface::DrawLeftNumberCell();
 		cursor.Show();
 		display.Flip();
 	    }
@@ -493,11 +238,8 @@ Game::menu_t Game::Editor::StartGame()
 	    if(! sizeCursor.isVisible() || sizeCursor.GetPos().x != div_x || sizeCursor.GetPos().y != div_y)
 	    {
 		cursor.Hide();
-
 		sizeCursor.Hide();
-
 		sizeCursor.Show(div_x, div_y);
-
 		cursor.Show();
 		display.Flip();
 	    }
@@ -1148,52 +890,22 @@ Game::menu_t Game::Editor::StartGame()
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectResource))
 	    Dialog::Message("Treasures", "Used to place a resource or treasure.", Font::BIG);
 
+	if(scrollDir)
+	{
+	    cursor.Hide();
+	    sizeCursor.Hide();
+	    cursor.SetThemes(GameArea::ScrollToCursor(scrollDir));
+	    areaMaps.Scroll(scrollDir);
+	    I.Scroll(scrollDir);
+	    areaMaps.Redraw();
+	    radar.RedrawCursor();
+	    cursor.Show();
+	    display.Flip();
+	    scrollDir = 0;
+	}
     }
 
     return QUITGAME;
-}
-
-void Game::Editor::RedrawTopNumberCell(const Rect & area)
-{
-    Point dst_pt;
-
-    // top number cell
-    for(u16 ii = 0; ii < area.w; ++ii)
-    {
-	dst_pt.x = BORDERWIDTH + ii * TILEWIDTH;
-	dst_pt.y = 0;
-
-	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 34), dst_pt);
-
-	std::string number;
-	String::AddInt(number, area.x + ii);
-
-	dst_pt.x = 2 * BORDERWIDTH + ii * TILEWIDTH - Text::width(number, Font::SMALL) / 2;
-	dst_pt.y = 2;
-	Text(number, Font::SMALL, dst_pt);
-
-    }
-}
-
-void Game::Editor::RedrawLeftNumberCell(const Rect & area)
-{
-    Point dst_pt;
-
-    // left number cell
-    for(u16 ii = 0; ii < area.h; ++ii)
-    {
-	dst_pt.x = 0;
-	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH;
-
-	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 33), dst_pt);
-
-	std::string number;
-	String::AddInt(number, area.y + ii);
-
- 	dst_pt.x = BORDERWIDTH / 2 - Text::width(number, Font::SMALL) / 2 - 1;
-	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH + BORDERWIDTH - 5;
-	Text(number, Font::SMALL, dst_pt);
-    }
 }
 
 void Game::Editor::ModifySingleTile(Maps::Tiles & tile)

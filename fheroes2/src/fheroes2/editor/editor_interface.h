@@ -23,6 +23,7 @@
 
 #include "gamedefs.h"
 #include "button.h"
+#include "splitter.h"
 #include "game.h"
 
 namespace Game
@@ -38,6 +39,7 @@ namespace Editor
 	static void	DrawLeftNumberCell(void);
 
 	void	Draw(void);
+	void	Scroll(const u8 scroll);
 
 	Button btnLeftTopScroll;
         Button btnRightTopScroll;
@@ -63,6 +65,9 @@ namespace Editor
         Button btnSpec;
         Button btnFile;
         Button btnSystem;
+
+	Splitter split_h;
+	Splitter split_v;
 
     private:
 	Interface();

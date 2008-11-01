@@ -22,6 +22,7 @@
 #include "agg.h"
 #include "settings.h"
 #include "gamearea.h"
+#include "world.h"
 #include "tools.h"
 #include "editor_interface.h"
 
@@ -51,6 +52,9 @@ Game::Editor::Interface::Interface()
     btnSpec.SetSprite(ICN::EDITBTNS, 18, 19);
     btnFile.SetSprite(ICN::EDITBTNS, 20, 21);
     btnSystem.SetSprite(ICN::EDITBTNS, 22, 23);
+
+    split_h.SetSprite(AGG::GetICN(ICN::ESCROLL, 2));
+    split_v.SetSprite(AGG::GetICN(ICN::ESCROLL, 3));
 }
 
 Game::Editor::Interface & Game::Editor::Interface::Get(void)
@@ -63,10 +67,9 @@ Game::Editor::Interface & Game::Editor::Interface::Get(void)
 void Game::Editor::Interface::Draw(void)
 {
     Display & display = Display::Get();
-    Game::SetFixVideoMode();
+    GameArea & areaMaps = GameArea::Get();
 
     display.Fill(0x00, 0x00, 0x00);
-    GameArea & areaMaps = GameArea::Get();
 
     Rect src_rt;
     Point dst_pt;
@@ -283,19 +286,6 @@ void Game::Editor::Interface::Draw(void)
     const Sprite & spritePanelRiver = AGG::GetICN(ICN::EDITPANL, 3);
     const Sprite & spritePanelRoad = AGG::GetICN(ICN::EDITPANL, 4);
     const Sprite & spritePanelClear = AGG::GetICN(ICN::EDITPANL, 5);
-
-    // splitter
-    Splitter split_h(AGG::GetICN(ICN::ESCROLL, 2), Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRect().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8), Splitter::HORIZONTAL);
-    Splitter split_v(AGG::GetICN(ICN::ESCROLL, 3), Rect(BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRect().h - 1) * TILEWIDTH - 6), Splitter::VERTICAL);
-
-    split_h.SetRange(0, world.w() - areaMaps.GetRect().w);
-    split_v.SetRange(0, world.h() - areaMaps.GetRect().h);
-
-    split_h.Move(areaMaps.GetRect().x);
-    split_v.Move(areaMaps.GetRect().y);
-
-    RedrawTopNumberCell(areaMaps.GetRect());
-    RedrawLeftNumberCell(areaMaps.GetRect());
 */
 
     btnLeftTopScroll.Draw();
@@ -326,6 +316,45 @@ void Game::Editor::Interface::Draw(void)
 
     DrawTopNumberCell();
     DrawLeftNumberCell();
+
+    split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRect().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8));
+    split_h.SetPos(Splitter::HORIZONTAL);
+
+    split_v.SetArea(Rect(BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRect().h - 1) * TILEWIDTH - 6));
+    split_v.SetPos(Splitter::VERTICAL);
+
+    split_h.SetRange(0, world.w() - areaMaps.GetRect().w);
+    split_v.SetRange(0, world.h() - areaMaps.GetRect().h);
+
+    split_h.Move(areaMaps.GetRect().x);
+    split_v.Move(areaMaps.GetRect().y);
+}
+
+void Game::Editor::Interface::Scroll(const u8 scroll)
+{
+    if(scroll & GameArea::LEFT)
+    {
+	split_h.Backward();
+	DrawTopNumberCell();
+    }
+    else
+    if(scroll & GameArea::RIGHT)
+    {
+	split_h.Forward();
+	DrawTopNumberCell();
+    }
+    
+    if(scroll & GameArea::TOP)
+    {
+	split_v.Backward();
+	DrawLeftNumberCell();
+    }
+    else
+    if(scroll & GameArea::BOTTOM)
+    {
+	split_v.Forward();
+	DrawLeftNumberCell();
+    }
 }
 
 void Game::Editor::Interface::DrawTopNumberCell(void)
