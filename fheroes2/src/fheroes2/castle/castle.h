@@ -152,6 +152,8 @@ private:
     Dialog::answer_t DialogBuyHero(const Heroes::heroes_t hero);
     Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
 
+    void PressRightAction(building_t b);
+
 private:
     Color::color_t	color;
     Race::race_t	race;
