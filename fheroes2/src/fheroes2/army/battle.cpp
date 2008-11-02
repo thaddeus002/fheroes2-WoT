@@ -323,8 +323,8 @@ bool Army::CleanupBody(Army::army_t &army, u16 idx, Army::army_t &bodies)
     if(army[idx].Count() == 0)
     {
         Army::Troops body = army[idx];
-        army.erase(army.begin()+idx);
         bodies.push_back(body);
+        army[idx].SetMonster(Monster::UNKNOWN);
         return true;
     }
     else return false;
