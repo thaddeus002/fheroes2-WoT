@@ -826,19 +826,21 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	Point end = Bf2Scr(move) + dst_pt;
 	Point tp = start;
 	Point step;
-	//bool reflect = end.x > start.x ? false : true;
         myTroop.SetReflect(end.x < start.x);
 	u8 st, len, prep=0, post=0;
 	Monster::GetAnimFrames(myTroop.Monster(), Monster::AS_WALK, st, len);
-	int frame = 0, curstep = 0, part = 0;
+	int frame = 0, curstep = 0, part = 0, numsteps;
 	std::vector<Point> *path=0;
 	if(myMonster.fly) {
 	    if(len >= 12) prep = post = 4;
 	    else if(len >= 8) prep = post = 2;
 	    else prep = post = 1;
 	    step = end-start;
-	    step.x /= 8;
-	    step.y /= 8;
+            const int deltaX = abs(myTroop.Position().x - move.x);
+            const int deltaY = abs(myTroop.Position().y - move.y);
+            numsteps = std::max(std::max(deltaX, deltaY), 1); //avoid divide by zero
+	    step.x /= numsteps;
+	    step.y /= numsteps;
 	} else {
 	    if(path = FindPath(myTroop.Position(), move, Speed::Move(myMonster.speed), myTroop, army1, army2, troopN),!path) {
 		Dialog::Message("Error", "Path not found!", Font::BIG, Dialog::OK);
@@ -846,7 +848,6 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	    }
 	    step.x = ((Bf2Scr(path->back())+dst_pt).x - tp.x) / len;
 	    step.y = ((Bf2Scr(path->back())+dst_pt).y - tp.y) / len;
-	    //reflect = step.x < 0;
             myTroop.SetReflect(step.x < 0);
 	    if(step.y) step.x = -step.x;
 	    else step.x = 0;
@@ -873,7 +874,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 			    AGG::PlaySound(myMonster.m82_move);
 			    myTroop.aframe = st+prep;
 			}
-			if(curstep == 8) {
+			if(curstep == numsteps) {
 			    part = 3;
 			    tp = end;
 			    myTroop.aframe = st+len-post;
