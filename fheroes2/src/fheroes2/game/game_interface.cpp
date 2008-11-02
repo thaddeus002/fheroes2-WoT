@@ -56,74 +56,24 @@ u8 Game::Interface::CountIcons(void)
     return count_icons;
 }
 
-void Game::Interface::Draw(void)
+void Game::Interface::DrawBorder(bool drawMiddle, bool useAlt)
 {
     Display & display = Display::Get();
 
     const bool evil = Settings::Get().EvilInterface();
 
-    const ICN::icn_t icnscroll = evil ? ICN::SCROLLE : ICN::SCROLL;
-    const ICN::icn_t icnbtn = evil ? ICN::ADVEBTNS : ICN::ADVBTNS;
-
-    Point pt_stw, pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt, pt_set, pt_shd, pt_scd;
-
-    // coord button heroes scroll up
-    pt_shu.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-    pt_shu.y = RADARWIDTH + 2 * BORDERWIDTH;
-
-    // coord button castle scroll up
-    pt_scu.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
-    pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
-
-    // recalculate buttons coordinate
     const u8 count_w = (display.w() - 640) / TILEWIDTH;
     const u8 count_h = (display.h() - 480) / TILEWIDTH;
-    count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
-    const u16 last_coord = RADARWIDTH + BORDERWIDTH * 2 + count_icons * 32 + BORDERWIDTH;
-    const u8 button_w = AGG::GetICN(icnbtn, 0).w();
-    const u8 button_h = AGG::GetICN(icnbtn, 0).h();
-
-    // coord status window
-    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
-    pt_stw.y = RADARWIDTH + BORDERWIDTH * 2 + count_icons * 32 + BORDERWIDTH + 2 * button_h;
-    // coord button next hero
-    pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
-    pt_her.y = last_coord;
-    // coord button action
-    pt_act.x = pt_her.x + button_w;
-    pt_act.y = last_coord;
-    // coord button castle
-    pt_cas.x = pt_act.x + button_w;
-    pt_cas.y = last_coord;
-    // coord button magic
-    pt_mag.x = pt_cas.x + button_w;
-    pt_mag.y = last_coord;
-    // coord button end tur
-    pt_end.x = display.w() - RADARWIDTH - BORDERWIDTH;
-    pt_end.y = last_coord + button_h;
-    // coord button info
-    pt_inf.x = pt_end.x + button_w;
-    pt_inf.y = last_coord + button_h;
-    // coord button option
-    pt_opt.x = pt_inf.x + button_w;
-    pt_opt.y = last_coord + button_h;
-    // coord button settings
-    pt_set.x = pt_opt.x + button_w;
-    pt_set.y = last_coord + button_h;
-    // coord button heroes scroll down
-    pt_shd.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
-    pt_shd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * count_icons - 15;
-    // coord button castle scroll down
-    pt_scd.x = display.w() - BORDERWIDTH - 15;
-    pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * count_icons - 15;
-
-    /**/
-    display.Fill(0x00, 0x00, 0x00);
 
     Rect srcrt;
     Point dstpt;
-    //const Sprite & icnston = AGG::GetICN(evil ? ICN::STONBAKE : ICN::STONBACK, 0);
-    const Sprite & icnadv = AGG::GetICN(evil ? ICN::ADVBORDE : ICN::ADVBORD, 0);
+    const Sprite *border;
+    if(useAlt)
+      border = &AGG::GetICN(evil ? ICN::STONBAKE : ICN::STONBACK, 0);
+    else
+      border = &AGG::GetICN(evil ? ICN::ADVBORDE : ICN::ADVBORD, 0);
+    
+    const Sprite &icnadv = *border;
 
     // TOP BORDER
     srcrt.x = 0;
@@ -188,26 +138,29 @@ void Game::Interface::Draw(void)
     srcrt.h = icnadv.h() - srcrt.y;
     display.Blit(icnadv, srcrt, dstpt);
 
-    // MIDDLE BORDER
-    srcrt.x = icnadv.w() - RADARWIDTH - 2 * BORDERWIDTH;
-    srcrt.y = 0;
-    srcrt.w = BORDERWIDTH;
-    srcrt.h = 255;
-    dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-    dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
-    srcrt.y = 255;
-    srcrt.h = TILEWIDTH;
-    dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
-    dstpt.y = srcrt.y;
-    for(u8 ii = 0; ii < count_h + 1; ++ii)
+    if(drawMiddle)
     {
+        // MIDDLE BORDER
+        srcrt.x = icnadv.w() - RADARWIDTH - 2 * BORDERWIDTH;
+        srcrt.y = 0;
+        srcrt.w = BORDERWIDTH;
+        srcrt.h = 255;
+        dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
+        dstpt.y = srcrt.y;
         display.Blit(icnadv, srcrt, dstpt);
-	dstpt.y += TILEWIDTH;
+        srcrt.y = 255;
+        srcrt.h = TILEWIDTH;
+        dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
+        dstpt.y = srcrt.y;
+        for(u8 ii = 0; ii < count_h + 1; ++ii)
+        {
+            display.Blit(icnadv, srcrt, dstpt);
+            dstpt.y += TILEWIDTH;
+        }
+        srcrt.y += TILEWIDTH;
+        srcrt.h = icnadv.h() - srcrt.y;
+        display.Blit(icnadv, srcrt, dstpt);
     }
-    srcrt.y += TILEWIDTH;
-    srcrt.h = icnadv.h() - srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
 
     // RIGHT BORDER
     srcrt.x = icnadv.w() - BORDERWIDTH;
@@ -229,6 +182,78 @@ void Game::Interface::Draw(void)
     srcrt.y += TILEWIDTH;
     srcrt.h = icnadv.h() - srcrt.y;
     display.Blit(icnadv, srcrt, dstpt);
+}
+
+void Game::Interface::Draw(void)
+{
+    Display & display = Display::Get();
+
+    const bool evil = Settings::Get().EvilInterface();
+
+    const ICN::icn_t icnscroll = evil ? ICN::SCROLLE : ICN::SCROLL;
+    const ICN::icn_t icnbtn = evil ? ICN::ADVEBTNS : ICN::ADVBTNS;
+
+    Point pt_stw, pt_shu, pt_scu, pt_her, pt_act, pt_cas, pt_mag, pt_end, pt_inf, pt_opt, pt_set, pt_shd, pt_scd;
+
+    // coord button heroes scroll up
+    pt_shu.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
+    pt_shu.y = RADARWIDTH + 2 * BORDERWIDTH;
+
+    // coord button castle scroll up
+    pt_scu.x = display.w() - RADARWIDTH - BORDERWIDTH + 115 + AGG::GetICN(icnscroll, 0).w();
+    pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
+
+    // recalculate buttons coordinate
+    //const u8 count_w = (display.w() - 640) / TILEWIDTH;
+    const u8 count_h = (display.h() - 480) / TILEWIDTH;
+    count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
+    const u16 last_coord = RADARWIDTH + BORDERWIDTH * 2 + count_icons * 32 + BORDERWIDTH;
+    const u8 button_w = AGG::GetICN(icnbtn, 0).w();
+    const u8 button_h = AGG::GetICN(icnbtn, 0).h();
+
+    // coord status window
+    pt_stw.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    pt_stw.y = RADARWIDTH + BORDERWIDTH * 2 + count_icons * 32 + BORDERWIDTH + 2 * button_h;
+    // coord button next hero
+    pt_her.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    pt_her.y = last_coord;
+    // coord button action
+    pt_act.x = pt_her.x + button_w;
+    pt_act.y = last_coord;
+    // coord button castle
+    pt_cas.x = pt_act.x + button_w;
+    pt_cas.y = last_coord;
+    // coord button magic
+    pt_mag.x = pt_cas.x + button_w;
+    pt_mag.y = last_coord;
+    // coord button end tur
+    pt_end.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    pt_end.y = last_coord + button_h;
+    // coord button info
+    pt_inf.x = pt_end.x + button_w;
+    pt_inf.y = last_coord + button_h;
+    // coord button option
+    pt_opt.x = pt_inf.x + button_w;
+    pt_opt.y = last_coord + button_h;
+    // coord button settings
+    pt_set.x = pt_opt.x + button_w;
+    pt_set.y = last_coord + button_h;
+    // coord button heroes scroll down
+    pt_shd.x = display.w() - RADARWIDTH - BORDERWIDTH + 57;
+    pt_shd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * count_icons - 15;
+    // coord button castle scroll down
+    pt_scd.x = display.w() - BORDERWIDTH - 15;
+    pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * count_icons - 15;
+
+    /**/
+    display.Fill(0x00, 0x00, 0x00);
+
+    Rect srcrt;
+    Point dstpt;
+    //const Sprite & icnston = AGG::GetICN(evil ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & icnadv = AGG::GetICN(evil ? ICN::ADVBORDE : ICN::ADVBORD, 0);
+
+    DrawBorder(true, false);
 
     // ICON PANEL
     srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;

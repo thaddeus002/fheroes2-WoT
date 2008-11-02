@@ -33,6 +33,7 @@ namespace Game
     	static Interface & Get(void);
 
 	void	Draw(void);
+        void    DrawBorder(bool drawMiddle, bool useAlt);
 	u8	CountIcons(void);
 
 	Button	buttonScrollHeroesUp;
