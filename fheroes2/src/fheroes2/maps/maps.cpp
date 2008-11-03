@@ -252,14 +252,15 @@ void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
 
 u16 Maps::ScanAroundObject(const u16 center, const u8 obj)
 {
-    const u16 cx = center % world.w();
-    const u16 cy = center / world.w();
+    const s16 cx = center % world.w();
+    const s16 cy = center / world.w();
 
     for(s16 y = cy - 1; y <= cy + 1; ++y)
         for(s16 x = cx - 1; x <= cx + 1; ++x)
-            if(y != cy && x != cx &&
-	    isValidAbsPoint(x, y) &&
-	    obj == world.GetTiles(GetIndexFromAbsPoint(x, y)).GetObject()) return y * world.w() + x;
-
+    {
+            if(y == cy && x == cx) continue;
+	    if(isValidAbsPoint(x, y) &&
+		obj == world.GetTiles(GetIndexFromAbsPoint(x, y)).GetObject()) return y * world.w() + x;
+    }
     return MAXU16;
 }
