@@ -426,3 +426,68 @@ void Heroes::AngleStep(const Direction::vector_t to_direct)
 	}
     }
 }
+
+void Heroes::FadeOut(void) const
+{
+    const Rect & gamearea = GameArea::Get().GetRect();
+
+    if(!(gamearea & mp)) return;
+
+    const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
+
+    bool reflect = ReflectSprite(direction, path.isValid() ? Direction::Get(center, path.GetFrontIndex()) : Direction::UNKNOWN);
+
+    s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
+    s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);
+
+    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
+
+    Surface sf(sprite1.w(), sprite1.h());
+    sf.SetColorKey();
+    sf.Blit(sprite1);
+
+    Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
+    Rect src_rt1;
+
+    GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    u32 ticket = 0;
+    u8 alpha = 250;
+
+    while(le.HandleEvents() && alpha > 0)
+    {
+        if(!(ticket % ANIMATION_HIGH))
+        {
+            Cursor::Get().Hide();
+
+	    for(s16 y = mp.y - 1; y <= mp.y + 1; ++y)
+		for(s16 x = mp.x - 1; x <= mp.x + 1; ++x)
+    		    if(Maps::isValidAbsPoint(x, y))
+	    {
+        	const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
+
+        	tile.RedrawTile();
+        	tile.RedrawBottom();
+    	    }
+
+    	    sf.SetAlpha(alpha);
+    	    Display::Get().Blit(sf, src_rt1, dst_pt1);
+
+	    for(s16 y = mp.y - 1; y <= mp.y + 1; ++y)
+		for(s16 x = mp.x - 1; x <= mp.x + 1; ++x)
+    		    if(Maps::isValidAbsPoint(x, y))
+	    {
+        	const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
+
+        	tile.RedrawTop();
+    	    }
+
+	    Cursor::Get().Show();
+	    Display::Get().Flip();
+            alpha -= 10;
+        }
+
+        ++ticket;
+    }
+}

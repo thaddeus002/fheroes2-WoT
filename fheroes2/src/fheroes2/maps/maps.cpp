@@ -257,7 +257,9 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj)
 
     for(s16 y = cy - 1; y <= cy + 1; ++y)
         for(s16 x = cx - 1; x <= cx + 1; ++x)
-            if(isValidAbsPoint(x, y) && obj == world.GetTiles(GetIndexFromAbsPoint(x, y)).GetObject()) return y * world.w() + x;
+            if(y != cy && x != cx &&
+	    isValidAbsPoint(x, y) &&
+	    obj == world.GetTiles(GetIndexFromAbsPoint(x, y)).GetObject()) return y * world.w() + x;
 
     return MAXU16;
 }

@@ -189,6 +189,7 @@ public:
     bool MoveStep(void);
     void Redraw(bool with_shadow = true) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; };
+    void FadeOut(void) const;
 
     void PlayWalkSound(void) const;
     void PlayPickupSound(void) const;

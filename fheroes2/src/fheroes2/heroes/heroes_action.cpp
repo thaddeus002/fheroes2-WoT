@@ -40,7 +40,7 @@
 
 #define OBSERVATIONTOWERSCOUTE 10
 
-Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
+void AnimationRemoveObject(const Maps::Tiles & tile)
 {
     Maps::TilesAddon *addon = NULL;
 
@@ -60,7 +60,7 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
 	default: break;
     }
 
-    if(NULL == addon) return NULL;
+    if(NULL == addon) return;
 
     const Rect & area = GameArea::Get().GetRect();
     const Point pos(tile.GetIndex() % world.w() - area.x, tile.GetIndex() / world.w() - area.y);
@@ -71,10 +71,20 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
-    const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
+    u16 index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
+    const Heroes *hero = MAXU16 == index ? NULL : world.GetHeroes(index);
 
     Surface sf(tile.GetSurface());
+
+    const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
     sf.Blit(sprite, sprite.x(), sprite.y());
+
+    // if animation sprite
+    if(0 != (index = ICN::AnimationFrame(MP2::GetICNObject(addon->object), addon->index)))
+    {
+	const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), index);
+	sf.Blit(sprite, sprite.x(), sprite.y());
+    }
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     u32 ticket = 0;
@@ -90,7 +100,7 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
             sf.SetAlpha(alpha);
 	    display.Blit(sf, dstx, dsty);
 	    tile.RedrawTop();
-	    if(Game::Focus::HEROES == Game::Focus::Get().Type()) Game::Focus::Get().GetHeroes().Redraw(false);
+	    if(hero) hero->Redraw(false);
             cursor.Show();
             display.Flip();
             alpha -= 10;
@@ -98,8 +108,6 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
 
         ++ticket;
     }
-    
-    return addon;
 }
 
 // action to next cell
@@ -293,8 +301,9 @@ void Heroes::ActionToMonster(const u16 dst_index)
 		Game::RemoveMyHeroes(this);
     	    else
     	    {
-    		SetFreeman();
 		AGG::PlaySound(M82::KILLFADE);
+		FadeOut();
+    		SetFreeman();
     		world.GetKingdom(color).RemoveHeroes(this);
     	    }
         }

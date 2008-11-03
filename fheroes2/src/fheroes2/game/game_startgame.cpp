@@ -77,10 +77,11 @@ void Game::RemoveMyHeroes(Heroes *heroes)
     Kingdom & myKingdom = world.GetMyKingdom();
     Game::Focus & gamefocus = Game::Focus::Get();
 
+    AGG::PlaySound(M82::KILLFADE);
+
+    heroes->FadeOut();
     heroes->SetFreeman();
     myKingdom.RemoveHeroes(heroes);
-
-    AGG::PlaySound(M82::KILLFADE);
 
     // redraw focus list
     if(myKingdom.GetHeroes().size())
