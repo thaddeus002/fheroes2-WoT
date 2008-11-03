@@ -1254,7 +1254,7 @@ Game::menu_t Game::HumanTurn(void)
 	Game::EnvironmentSoundMixer(update_audio);
 	update_audio = false;
 
-        // animation
+	// animation
         if(Game::ShouldAnimate(ticket))
         {
             cursor.Hide();

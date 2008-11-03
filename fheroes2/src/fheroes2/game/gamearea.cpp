@@ -329,31 +329,55 @@ void RedrawHeroes(const Maps::Tiles & tile)
 void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
 {
     Display & display = Display::Get();
-
     Monster::monster_t monster = Monster::Monster(tile);
-
-    // draw first sprite
-    const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9);
-
-    Point dst_pt(dst.x + sprite_first.x() + 16, dst.y + TILEWIDTH + sprite_first.y());
+    Point dst_pt;
     Rect src_rt;
+    const u16 dst_index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
 
-    GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+    // draw attack sprite
+    if(MAXU16 != dst_index)
+    {
+	bool revert = false;
 
-    display.Blit(sprite_first, src_rt, dst_pt);
+	switch(Direction::Get(tile.GetIndex(), dst_index))
+	{
+	    case Direction::TOP_LEFT:
+	    case Direction::LEFT:
+	    case Direction::BOTTOM_LEFT:	revert = true;
+	    default: break;
+	}
 
-    // draw second sprite
-    const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster * 9 + 1 + (Maps::AnimationTicket() % 6));
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9 + (revert ? 8 : 7));
 
-    dst_pt.x = dst.x + sprite_next.x() + 16;
-    dst_pt.y = dst.y + TILEWIDTH + sprite_next.y();
+	dst_pt.x = dst.x + sprite_first.x() + 16;
+	dst_pt.y = dst.y + TILEWIDTH + sprite_first.y();
 
-    GameArea::SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
+	GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	display.Blit(sprite_first, src_rt, dst_pt);
+    }
+    else
+    {
+	// draw first sprite
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9);
 
-    display.Blit(sprite_next, src_rt, dst_pt);
+	dst_pt.x = dst.x + sprite_first.x() + 16;
+	dst_pt.y = dst.y + TILEWIDTH + sprite_first.y();
 
-    if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
-    	world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
+	GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	display.Blit(sprite_first, src_rt, dst_pt);
+
+	// draw second sprite
+	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster * 9 + 1 + (Maps::AnimationTicket() % 6));
+
+	dst_pt.x = dst.x + sprite_next.x() + 16;
+	dst_pt.y = dst.y + TILEWIDTH + sprite_next.y();
+
+	GameArea::SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
+	display.Blit(sprite_next, src_rt, dst_pt);
+
+	if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
+    	    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
+    }
 }
 
 void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)

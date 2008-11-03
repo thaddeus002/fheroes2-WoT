@@ -307,20 +307,22 @@ bool Heroes::MoveStep(void)
 	save_maps_general = tiles_to.GetObject();
 	tiles_to.SetObject(MP2::OBJ_HEROES);
 
-        const u16 dst_index2 = Maps::ScanAroundObject(GetCenter(), MP2::OBJ_MONSTER);
-        if(MAXU16 != dst_index2)
-        {
-            Error::Verbose("Monster attack to You!");
-            Action(dst_index2);
-        }
-
 	path.PopFront();
 
 	sprite_index -= 8;
-        return didMove;
+
+	const u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER);
+	if(MAXU16 != dst_index2)
+        {
+	    GameArea::Get().Redraw();
+	    Action(dst_index2);
+	}
+
+	return didMove;
     }
 
     ++sprite_index;
+
     return didMove;
 }
 
