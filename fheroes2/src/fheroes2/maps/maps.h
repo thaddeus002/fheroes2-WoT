@@ -66,7 +66,7 @@ namespace Maps
     u16 GetDirectionAroundGround(const u16 center, const u16 ground);
     u8  GetCountAroundGround(const u16 center, const u16 ground);
     u16 GetMaxGroundAround(const u16 center);
-
+    u16 ScanAroundMonster(const Point & pt);
     void ClearFog(const Point & center, const u8 scoute, const u8 color);
 };
 

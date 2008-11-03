@@ -249,3 +249,12 @@ void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
             if(isValidAbsPoint(x, y) &&  (scoute + scoute / 2) >= std::abs(x - center.x) + std::abs(y - center.y))
                 world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
 }
+
+u16 Maps::ScanAroundMonster(const Point & center)
+{
+    for(s16 y = center.y - 1; y <= center.y + 1; ++y)
+        for(s16 x = center.x - 1; x <= center.x + 1; ++x)
+            if(isValidAbsPoint(x, y) && MP2::OBJ_MONSTER == world.GetTiles(GetIndexFromAbsPoint(x, y)).GetObject()) return y * world.w() + x;
+
+    return MAXU16;
+}

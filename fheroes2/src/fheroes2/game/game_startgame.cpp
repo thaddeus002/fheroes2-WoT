@@ -1306,6 +1306,15 @@ Game::menu_t Game::HumanTurn(void)
 		{
 		    heroes.SetMove(false);
 		}
+		
+		// scan around monster and battle
+		const u16 index = Maps::ScanAroundMonster(heroes.GetCenter());
+		if(MAXU16 != index)
+		{
+		    // TODO: need add animation for monster attack
+		    if(conf.Debug()) Error::Verbose("Monster attack to You!");
+		    heroes.Action(index);
+		}
 	    }
 
 	    if(Game::ShouldAnimateInfrequent(ticket, 10)) Maps::IncreaseAnimationTicket();

@@ -277,7 +277,7 @@ bool Heroes::MoveStep(void)
 	{
 	    ApplyPenaltyMovement();
 	    path.Reset();
-	    Action(world.GetTiles(index_to));
+	    Action(index_to);
 	    SetMove(false);
 	    return true;
 	}
@@ -299,7 +299,7 @@ bool Heroes::MoveStep(void)
 	if(index_to == index_dst)
 	{
 	    path.Reset();
-	    Action(world.GetTiles(index_to));
+	    Action(index_to);
 	    SetMove(false);
             didMove = true;
 	}

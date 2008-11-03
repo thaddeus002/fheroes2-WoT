@@ -182,7 +182,7 @@ public:
     bool isEnableMove(void) const;
     void SetMove(bool f);
     bool isAllowMove(const u16 dst_index);
-    void Action(const Maps::Tiles & dst);
+    void Action(const u16 dst_index);
     void ApplyPenaltyMovement(void);
 
     void AngleStep(const Direction::vector_t to_direct);

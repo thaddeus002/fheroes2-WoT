@@ -103,10 +103,9 @@ Maps::TilesAddon *AnimationRemoveObject(const Maps::Tiles & tile)
 }
 
 // action to next cell
-void Heroes::Action(const Maps::Tiles & dst)
+void Heroes::Action(const u16 dst_index)
 {
-    const u16 & dst_index = dst.GetIndex();
-    const MP2::object_t & object = dst.GetObject();
+    const MP2::object_t & object = world.GetTiles(dst_index).GetObject();
 
     switch(object)
     {
