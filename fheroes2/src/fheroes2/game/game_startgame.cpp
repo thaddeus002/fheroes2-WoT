@@ -102,7 +102,27 @@ void Game::RemoveMyCastle(Castle *castle)
 {
     if(!castle) return;
     
-    // same as remove my heroes
+    Kingdom & myKingdom = world.GetMyKingdom();
+    Game::Focus & gamefocus = Game::Focus::Get();
+
+    myKingdom.RemoveCastle(castle);
+
+    //AGG::PlaySound(M82::KILLFADE);
+
+    // redraw focus list
+    if(myKingdom.GetCastles().size())
+        FocusToCastle(myKingdom.GetCastles().front());
+    else
+    if(myKingdom.GetHeroes().size())
+    {
+        SelectBarCastle::Get().Redraw();
+        FocusToHeroes(myKingdom.GetHeroes().front());
+    }
+    else
+    {
+        gamefocus.Reset();
+        gamefocus.Redraw();
+    }
 }
 
 Game::menu_t Game::StartGame(void)
