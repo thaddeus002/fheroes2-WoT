@@ -421,7 +421,12 @@ void Maps::Tiles::DebugInfo(void) const
     
     String::AddInt(value, general);
     value += ", (" + std::string(MP2::StringObject(general)) + ")";
-    std::cout << "general object  : " << value << std::endl;
+    std::cout << "general object  : " << value;
+
+    if(MP2::OBJ_MONSTER == general)
+	std::cout << " (count: " << GetCountMonster() << ")" << std::endl;
+    else
+	std::cout << std::endl;
 
     value.clear();
     
@@ -1343,6 +1348,15 @@ void Maps::Tiles::UpdateQuantity(void)
 
     switch(general)
     {
+	case MP2::OBJ_MONSTER:
+	    if(0 == quantity1 && 0 == quantity2)
+	    {
+    		u16 size = Monster::GetRNDSize(Monster::Monster(*this));
+    		quantity2 = 0x00FF & (size >> 5);
+    		quantity1 = 0x00FF & (size << 3);
+	    }
+	break;
+
 	case MP2::OBJ_SKELETON:
 	    switch(Rand::Get(1, 2))
 	    {
@@ -1582,3 +1596,7 @@ void Maps::Tiles::RemoveObjectSprite(void)
     }
 }
 
+u16 Maps::Tiles::GetCountMonster(void) const
+{
+    return (((u16) quantity2 << 8) | quantity1) >> 3;
+}

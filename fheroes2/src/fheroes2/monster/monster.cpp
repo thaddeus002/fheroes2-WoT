@@ -509,9 +509,8 @@ bool Monster::AllowUpgrade(monster_t monster)
     return monster != Upgrade(monster);
 }
 
-void Monster::ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 center)
+void Monster::ChangeTileWithRNDMonster(Maps::Tiles & tile)
 {
-    Maps::Tiles & tile = *vector[center];
     Maps::TilesAddon *addon = tile.FindRNDMonster();
 
     u8 index = 0;
@@ -636,11 +635,11 @@ Monster::level_t Monster::GetLevel(monster_t monster)
 /* get rnd count monster */
 u16 Monster::GetRNDSize(monster_t monster)
 {
-    float level = 0;
+    float level = 100;
 
     switch(Settings::Get().GameDifficulty())
     {
-	case Difficulty::EASY:		level = 50; break;
+	case Difficulty::EASY:		level = 75; break;
 	case Difficulty::NORMAL:	level = 100; break;
 	case Difficulty::HARD:		level = 150; break;
 	case Difficulty::EXPERT:	level = 200; break;
@@ -664,10 +663,8 @@ u16 Monster::GetRNDSize(monster_t monster)
 		    randSize = Rand::Get(Army::SEVERAL, Army::LOTS);
                     break;
     }
-    
-    if(H2Config::Debug()) Error::Verbose("randSize: ", randSize);
 
-    return randSize ? static_cast<u16>(randSize * (level / 100)) : 1;
+    return static_cast<u16>(randSize * level / 100);
 }
 
 Monster::monster_t Monster::Monster(const Maps::Tiles & tile)
@@ -677,41 +674,9 @@ Monster::monster_t Monster::Monster(const Maps::Tiles & tile)
     return (addons ? Monster::Monster(addons->index) : Monster::UNKNOWN);
 }
 
-void Monster::ChangeTileWithRNDSize(Maps::Tiles & tile)
-{
-    monster_t monster = Monster(tile);
-
-    if(Monster::UNKNOWN > monster)
-    {
-	u16 size = GetRNDSize(monster);
-
-	size <<= 3;
-	tile.SetQuantity2(static_cast<u8>(0x00FF & size));
-
-	size >>= 8;
-	tile.SetQuantity1(static_cast<u8>(0x00FF & size));
-    }
-}
-
 u16 Monster::GetSize(const Maps::Tiles & tile)
 {
-    u16 size = tile.GetQuantity2();
-    size <<= 3;
-    size |= tile.GetQuantity1();
-    size >>= 8;
-
-    if(H2Config::Debug()) Error::Verbose("Army size is ", size);
-
-    // random
-    if(0 == size)
-    {
-	size = GetRNDSize(Monster(tile));
-	
-	ChangeTileWithRNDSize(const_cast<Maps::Tiles &>(tile));
-        return GetSize(tile);
-    }
-
-    return size;
+    return tile.GetCountMonster();
 }
 
 u32 Monster::Dwelling(const monster_t monster)

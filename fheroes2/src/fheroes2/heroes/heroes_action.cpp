@@ -329,20 +329,31 @@ void Heroes::ActionToHeroes(const u16 dst_index)
     }
     else
     {
-	Army::battle_t b = Army::Battle(*this, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
-
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: " + GetName() + " attack enemy hero " + other_hero->GetName());
+	Army::battle_t b = Army::Battle(*this, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
 
 	switch(b)
 	{
 	    case Army::WIN: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result WIN"); break;
-	    case Army::LOSE: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result LOSE"); break;
-	    case Army::RETREAT: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result RETREAT"); break;
-	    case Army::SURRENDER: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: result SURRENDER"); break;
+
+	    case Army::LOSE:
+	    case Army::RETREAT:
+	    case Army::SURRENDER:
+    	    {
+		if(H2Config::MyColor() == GetColor())
+		    Game::RemoveMyHeroes(this);
+    		else
+    		{
+		    AGG::PlaySound(M82::KILLFADE);
+		    FadeOut();
+    		    SetFreeman();
+    		    world.GetKingdom(color).RemoveHeroes(this);
+    		}
+    	    }
+	    break;
+
             default: break; // Silly compiler warnings
 	}
-
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToHeroes: FIXME: attack enemy hero");
     }
 }
 
@@ -365,8 +376,30 @@ void Heroes::ActionToCastle(const u16 dst_index)
     else
     {
 	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: " + GetName() + " attack enemy castle " + castle->GetName());
+	Army::battle_t b = Army::Battle(*this, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
 
-	if(H2Config::Debug()) Error::Verbose("Heroes::ActiontoCastle: FIXME: attack enemy castle");
+	switch(b)
+	{
+	    case Army::WIN: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: result WIN"); break;
+
+	    case Army::LOSE:
+	    case Army::RETREAT:
+	    case Army::SURRENDER:
+    	    {
+		if(H2Config::MyColor() == GetColor())
+		    Game::RemoveMyHeroes(this);
+    		else
+    		{
+		    AGG::PlaySound(M82::KILLFADE);
+		    FadeOut();
+    		    SetFreeman();
+    		    world.GetKingdom(color).RemoveHeroes(this);
+    		}
+    	    }
+	    break;
+
+            default: break;
+	}
     }
 }
 

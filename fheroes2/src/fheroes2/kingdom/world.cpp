@@ -881,6 +881,7 @@ void World::LoadMaps(const std::string &filename)
 		tile.UpdateQuantity();
 		break;
 
+	    case MP2::OBJ_MONSTER:
 	    case MP2::OBJ_ARTIFACT:
 	    case MP2::OBJ_RESOURCE:
             case MP2::OBJ_MAGICGARDEN:
@@ -907,7 +908,8 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_RNDMONSTER3:
 	    case MP2::OBJ_RNDMONSTER4:
 		// modify rnd monster sprite
-		Monster::ChangeTileWithRNDMonster(vec_tiles, ii);
+		Monster::ChangeTileWithRNDMonster(tile);
+		tile.UpdateQuantity();
 		break;
 
 	    // join dwelling

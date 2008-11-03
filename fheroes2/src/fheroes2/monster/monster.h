@@ -204,8 +204,7 @@ namespace Monster
 
     u32 Dwelling(const monster_t monster);
 
-    void ChangeTileWithRNDMonster(std::vector<Maps::Tiles *> & vector, u16 center);
-    void ChangeTileWithRNDSize(Maps::Tiles & tile);
+    void ChangeTileWithRNDMonster(Maps::Tiles & tile);
 };
 
 #endif

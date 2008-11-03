@@ -111,18 +111,6 @@ Game::menu_t Game::ScenarioInfo(void)
     Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
     Button buttonCancel(491, 413, ICN::NGEXTRA, 68, 69);
 
-    // set levelCursor (default normal)
-    const Point pointDifficultyNormal(302, 124);
-    SpriteCursor levelCursor(AGG::GetICN(ICN::NGEXTRA, 62), pointDifficultyNormal);
-    levelCursor.Show(pointDifficultyNormal);
-    conf.SetGameDifficulty(Difficulty::NORMAL);
-
-    const Rect rectDifficultyEs(225, 124, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyNr(pointDifficultyNormal.x, pointDifficultyNormal.y, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyHd(378, 124, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
-
     // vector coord colors opponent
     std::vector<Rect> coordColors(KINGDOMMAX);
     // vector coord class
@@ -133,8 +121,20 @@ Game::menu_t Game::ScenarioInfo(void)
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	if(color & conf.FileInfo().AllowColors()){ conf.SetPlayers(color); conf.SetMyColor(color); break; }
 
+    // set levelCursor (default normal)
+    const Point pointDifficultyNormal(302, 124);
     Scenario::DrawInfo(coordColors, coordClass);
     Scenario::RedrawOpponentColors(coordColors);
+
+    SpriteCursor levelCursor(AGG::GetICN(ICN::NGEXTRA, 62), pointDifficultyNormal);
+    levelCursor.Show(pointDifficultyNormal);
+    conf.SetGameDifficulty(Difficulty::NORMAL);
+
+    const Rect rectDifficultyEs(225, 124, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyNr(pointDifficultyNormal.x, pointDifficultyNormal.y, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyHd(378, 124, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
 
     u8 rnd_color = Scenario::GetAllowChangeRaces(conf.FileInfo());
 
