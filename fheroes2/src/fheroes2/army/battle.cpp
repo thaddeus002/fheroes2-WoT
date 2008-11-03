@@ -1946,7 +1946,7 @@ bool Army::FindTroopAt(const Army::Troops &troop, const Point &p)
 int Army::FindTroopExact(const Army::army_t &army, const Point &p)
 {
     for(unsigned int i=0; i<army.size(); i++) {
-	if(army[i].Position() == p)
+	if(army[i].Monster() != Monster::UNKNOWN && army[i].Position() == p)
             return i;
     }
     return -1;
