@@ -1573,3 +1573,11 @@ bool Heroes::MayStillMove(void) const
 
     return move_point >= Maps::Ground::GetPenalty(center, center, GetLevelSkill(Skill::Secondary::PATHFINDING));
 }
+
+void Heroes::SetFreeman(void)
+{
+    color = Color::GRAY;
+    world.GetTiles(mp).SetObject(save_maps_general);
+    mp.x = -1;
+    mp.y = -1;
+}

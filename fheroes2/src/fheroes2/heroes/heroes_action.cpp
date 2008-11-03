@@ -290,12 +290,14 @@ void Heroes::ActionToMonster(const u16 dst_index)
 	case Army::SURRENDER:
 	case Army::LOSE:
         {
-	    AGG::PlaySound(M82::KILLFADE);
-    	    Maps::Tiles & tile_hero = world.GetTiles(GetCenter());
-    	    tile_hero.SetObject(GetUnderObject());
-
-    	    world.GetKingdom(color).RemoveHeroes(this);
-    	    SetFreeman();
+	    if(H2Config::MyColor() == GetColor())
+		Game::RemoveMyHeroes(this);
+    	    else
+    	    {
+    		SetFreeman();
+		AGG::PlaySound(M82::KILLFADE);
+    		world.GetKingdom(color).RemoveHeroes(this);
+    	    }
         }
 	break;
         

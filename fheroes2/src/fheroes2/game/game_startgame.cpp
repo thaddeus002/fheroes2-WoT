@@ -70,6 +70,41 @@ bool Game::CursorChangePosition(const u16 index)
     return false;
 }
 
+void Game::RemoveMyHeroes(Heroes *heroes)
+{
+    if(!heroes) return;
+
+    Kingdom & myKingdom = world.GetMyKingdom();
+    Game::Focus & gamefocus = Game::Focus::Get();
+
+    heroes->SetFreeman();
+    myKingdom.RemoveHeroes(heroes);
+
+    AGG::PlaySound(M82::KILLFADE);
+
+    // redraw focus list
+    if(myKingdom.GetHeroes().size())
+        FocusToHeroes(myKingdom.GetHeroes().front());
+    else
+    if(myKingdom.GetCastles().size())
+    {
+        SelectBarHeroes::Get().Redraw();
+        FocusToCastle(myKingdom.GetCastles().front());
+    }
+    else
+    {
+        gamefocus.Reset();
+        gamefocus.Redraw();
+    }
+}
+
+void Game::RemoveMyCastle(Castle *castle)
+{
+    if(!castle) return;
+    
+    // same as remove my heroes
+}
+
 Game::menu_t Game::StartGame(void)
 {
     // cursor
@@ -248,7 +283,6 @@ void Game::OpenHeroes(Heroes *hero)
     std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
     Display & display = Display::Get();
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
-    Game::Focus & gamefocus = Game::Focus::Get();
 
     if(it != myHeroes.end())
     {
@@ -277,37 +311,15 @@ void Game::OpenHeroes(Heroes *hero)
 		    break;
 
 		case Dialog::DISMISS:
-		{
-		    (**it).SetFreeman();
-		    myKingdom.RemoveHeroes(*it);
-
-		    AGG::PlaySound(M82::KILLFADE);
-
-            	    // redraw focus list
-		    if(myKingdom.GetHeroes().size())
-			FocusToHeroes(myKingdom.GetHeroes().front());
-		    else
-		    if(myKingdom.GetCastles().size())
-		    {
-			SelectBarHeroes::Get().Redraw();
-			FocusToCastle(myKingdom.GetCastles().front());
-		    }
-		    else
-		    {
-			gamefocus.Reset();
-            		gamefocus.Redraw();
-		    }
-
+		    RemoveMyHeroes(*it);
 		    result = Dialog::CANCEL;
 		    break;
-		}
 	
 		default: break;
 	    }
 	}
     }
 
-    Game::StatusWindow::Get().Redraw();
     cursor.Show();
     Display::Get().Flip();
     Mixer::Enhance();

@@ -26,6 +26,9 @@
 #define RADARWIDTH	144
 #define BORDERWIDTH	16
 
+class Heroes;
+class Castle;
+
 namespace Game
 {
     typedef enum
@@ -84,6 +87,9 @@ namespace Game
     
     void PreloadLOOPSounds(void);
     void EnvironmentSoundMixer(bool forced);
+
+    void RemoveMyHeroes(Heroes *heroes);
+    void RemoveMyCastle(Castle *castle);
 
     namespace Editor
     {
