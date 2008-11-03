@@ -833,3 +833,28 @@ Monster::monster_t Monster::Monster(const MP2::object_t obj)
 
     return UNKNOWN;
 }
+
+const std::string Monster::MultipleNames(monster_t monster)
+{
+    switch(monster)
+    {
+	case WOLF:		return "Wolves";
+	case PIKEMAN:
+	case VETERAN_PIKEMAN:
+	case SWORDSMAN:
+	case MASTER_SWORDSMAN:
+	case WAR_TROLL:
+	case PHOENIX:
+	case MAGE:
+	case ARCHMAGE:		return String(monster);
+	case CAVALRY:		return "Cavalries";
+	case CYCLOPS:		return "Cyclopes";
+	case DWARF:		return "Dwarves";
+	case BATTLE_DWARF:	return "Battle Dwarves";
+	case ELF:		return "Elves";
+	case GRAND_ELF:		return "Grand Elves";
+	default: break;
+    }
+
+    return String(monster) + "s";
+}

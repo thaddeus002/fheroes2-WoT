@@ -141,7 +141,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 			 DWELLING_UPGRADE5 |
 			 DWELLING_UPGRADE6 |
 			 DWELLING_UPGRADE7) & build ?
-			 std::string("The " + GetStringBuilding(build, race) + " produces " + Monster::String(Monster::Monster(race, build)) + ".") :
+			 std::string("The " + GetStringBuilding(build, race) + " produces " + Monster::MultipleNames(Monster::Monster(race, build)) + ".") :
 			 GetDescriptionBuilding(build, race);
 	
     u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
@@ -1142,7 +1142,7 @@ void Castle::PressRightAction(building_t b)
 			 DWELLING_UPGRADE5 |
 			 DWELLING_UPGRADE6 |
 			 DWELLING_UPGRADE7) & b ?
-			 std::string("The " + GetStringBuilding(b, race) + " produces " + Monster::String(Monster::Monster(race, b)) + ".") :
+			 std::string("The " + GetStringBuilding(b, race) + " produces " + Monster::MultipleNames(Monster::Monster(race, b)) + ".") :
 			 GetDescriptionBuilding(b, race);
 
     if(b & building && complete)

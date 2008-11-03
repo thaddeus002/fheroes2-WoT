@@ -178,6 +178,7 @@ namespace Monster
     } stats_t;
 
     const std::string & String(monster_t monster);
+    const std::string MultipleNames(monster_t monster);
     const stats_t & GetStats(monster_t monster);
     u8 GetGrown(monster_t monster);
     Race::race_t GetRace(monster_t monster);
