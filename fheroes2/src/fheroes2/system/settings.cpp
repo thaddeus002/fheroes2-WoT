@@ -25,9 +25,9 @@
 
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
-    modes(ANIMATION | SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
+    modes(SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), sound_volume(6), music_volume(6),
-    animation_speed(10), game(0), players(0)
+    animation(6), game(0), players(0)
 {
 }
 
@@ -198,7 +198,7 @@ bool Settings::Sound(void) const { return modes & SOUND; }
 bool Settings::Music(void) const { return modes & MUSIC; }
 
 /* return animation */
-bool Settings::Animation(void) const { return modes & ANIMATION; }
+u8   Settings::Animation(void) const { return animation; }
 
 /* return full screen */
 bool Settings::FullScreen(void) const { return modes & FULLSCREEN; }
@@ -225,6 +225,9 @@ void Settings::Parse(const std::string & left, const std::string & right)
 {
     // debug
     if(left == "debug") debug = String::ToInt(right);
+    else
+    // animation
+    if(left == "debug") animation = String::ToInt(right);
     else
     // data directory
     if(left == "data") path_data_directory = right;
@@ -339,9 +342,6 @@ void Settings::SetModes(const std::string & key)
     // music
     if(key == "music")		SetModes(MUSIC_MIDI);
     else
-    // animation
-    if(key == "animation")	SetModes(ANIMATION);
-    else
     // fullscreen
     if(key == "fullscreen")	SetModes(FULLSCREEN);
     else
@@ -369,9 +369,6 @@ void Settings::ResetModes(const std::string & key)
     // music
     if(key == "music")          ResetModes(MUSIC);
     else
-    // animation
-    if(key == "animation")	ResetModes(ANIMATION);
-    else
     // fullscreen
     if(key == "fullscreen")	ResetModes(FULLSCREEN);
     else
@@ -398,11 +395,6 @@ u8   Settings::MusicVolume(void) const
     return music_volume;
 }
 
-u8   Settings::AnimationSpeed(void) const
-{
-    return animation_speed;
-}
-
 /* sound volume: 0 - 10 */
 void Settings::SetSoundVolume(const u8 v)
 {
@@ -416,9 +408,9 @@ void Settings::SetMusicVolume(const u8 v)
 }
 
 /* animation speed: 1 - 10 */
-void Settings::SetAnimationSpeed(const u8 s)
+void Settings::SetAnimation(const u8 s)
 {
-    animation_speed = 10 <= s ? 10 : (s ? s : 1);
+    animation = 10 <= s ? 10 : s;
 }
 
 /* check game type */

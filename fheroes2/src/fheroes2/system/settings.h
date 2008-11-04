@@ -35,7 +35,6 @@ public:
     typedef enum
     {
         SOUND           = 0x00000001,
-        ANIMATION       = 0x00000002,
         FULLSCREEN      = 0x00000004,
         LOGO            = 0x00000008,
         EDITOR          = 0x00000010,
@@ -63,6 +62,7 @@ public:
     u8 MinorVersion(void) const;
     u32 DateBuild(void) const;
     u8 Debug(void) const;
+    u8 Animation(void) const;
 
     const Maps::FileInfo & FileInfo(void) const;
     Maps::FileInfo & FileInfo(void);
@@ -76,7 +76,6 @@ public:
     bool Original(void) const;
     bool Sound(void) const;
     bool Music(void) const;
-    bool Animation(void) const;
     bool FullScreen(void) const;
     bool EvilInterface(void) const;
     bool Shadow(void) const;
@@ -88,7 +87,6 @@ public:
 
     u8   SoundVolume(void) const;
     u8   MusicVolume(void) const;
-    u8   AnimationSpeed(void) const;
 
     void SetDebug(const u8 d);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
@@ -97,7 +95,7 @@ public:
 
     void SetSoundVolume(const u8 v);
     void SetMusicVolume(const u8 v);
-    void SetAnimationSpeed(const u8 s);
+    void SetAnimation(const u8 s);
     
     u8   GameType(void) const;
     void SetGameType(const Game::type_t type);
@@ -134,7 +132,7 @@ private:
     
     u8 sound_volume;
     u8 music_volume;
-    u8 animation_speed;
+    u8 animation;
 
     u8   game;
     u8   players;
