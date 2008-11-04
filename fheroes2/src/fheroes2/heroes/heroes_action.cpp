@@ -384,7 +384,11 @@ void Heroes::ActionToCastle(const u16 dst_index)
 		world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
 		world.GetKingdom(color).AddCastle(castle);
 		const_cast<Castle *>(castle)->ChangeColor(color);
-		if(H2Config::MyColor() == GetColor()) Game::Focus::Get().Redraw();
+		if(H2Config::MyColor() == GetColor())
+		{
+		    Game::Focus::Get().Reset(Game::Focus::CASTLE);
+		    Game::Focus::Get().Redraw();
+    		}
 		break;
 
 	    case Army::LOSE:
