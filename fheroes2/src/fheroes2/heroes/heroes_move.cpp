@@ -266,18 +266,26 @@ void Heroes::RedrawDependencesTiles(void) const
 
     if(Maps::isValidDirection(center, Direction::BOTTOM))
     {
-	const Maps::TilesAddon * skip1 = NULL;
-	const Maps::TilesAddon * skip2 = NULL;
+	Maps::Tiles & tile_bottom = world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM));
+	const Maps::TilesAddon * skip = NULL;
+	std::vector<const Maps::TilesAddon *> v;
+	v.reserve(3);
+
 	// skip always: ICN::OBJNTWBA
-	skip1 = world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA);
+	skip = tile_bottom.FindAddonICN1(ICN::OBJNTWBA);
+	if(skip) v.push_back(skip);
 	// skip only sprite: ICN::ROAD
-	skip2 = world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).FindAddonICN1(ICN::ROAD);
+	skip = tile_bottom.FindAddonICN1(ICN::ROAD);
+	if(skip) v.push_back(skip);
+	// skip only sprite: ICN::STREAM
+	skip = tile_bottom.FindAddonICN1(ICN::STREAM);
+	if(skip) v.push_back(skip);
 	// add other sprite if incorrect draw hero
 
-	if(!skip1)
+	if(2 > v.size())
 	{
-	    world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).RedrawBottom(skip2);
-	    world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).RedrawTop();
+	    tile_bottom.RedrawBottom(v.size() ? v.front() : NULL);
+	    tile_bottom.RedrawTop();
 	}
     }
 
@@ -289,18 +297,26 @@ void Heroes::RedrawDependencesTiles(void) const
 	    Maps::isValidDirection(center, direction) &&
 	    Maps::isValidDirection(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM))
 	{
-	    const Maps::TilesAddon * skip1 = NULL;
-	    const Maps::TilesAddon * skip2 = NULL;
+	    Maps::Tiles & tile_dir_bottom = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM));
+	    const Maps::TilesAddon * skip = NULL;
+	    std::vector<const Maps::TilesAddon *> v;
+	    v.reserve(3);
+
 	    // skip always: ICN::OBJNTWBA
-    	    skip1 = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA);
+    	    skip = tile_dir_bottom.FindAddonICN1(ICN::OBJNTWBA);
+	    if(skip) v.push_back(skip);
 	    // skip only sprite: ICN::ROAD
-    	    skip2 = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).FindAddonICN1(ICN::ROAD);
+    	    skip = tile_dir_bottom.FindAddonICN1(ICN::ROAD);
+	    if(skip) v.push_back(skip);
+	    // skip only sprite: ICN::STREAM
+    	    skip = tile_dir_bottom.FindAddonICN1(ICN::STREAM);
+	    if(skip) v.push_back(skip);
 	    // add other sprite if incorrect draw hero
 
-	    if(!skip1)
+	    if(2 > v.size())
     	    {
-    		world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).RedrawBottom(skip2);
-    		world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).RedrawTop();
+    		tile_dir_bottom.RedrawBottom(v.size() ? v.front() : NULL);
+    		tile_dir_bottom.RedrawTop();
 	    }
 	}
     }
