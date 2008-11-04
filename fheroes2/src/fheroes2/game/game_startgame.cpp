@@ -68,41 +68,6 @@ bool Game::CursorChangePosition(const u16 index)
     return false;
 }
 
-/*
-void Game::RemoveMyHeroes(Heroes *heroes)
-{
-    if(!heroes) return;
-
-    Kingdom & myKingdom = world.GetMyKingdom();
-    Game::Focus & gamefocus = Game::Focus::Get();
-
-    AGG::PlaySound(M82::KILLFADE);
-
-    heroes->GetPath().Hide();
-    GameArea::Get().Redraw();
-    Display::Get().Flip();
-
-    heroes->FadeOut();
-    heroes->SetFreeman();
-    myKingdom.RemoveHeroes(heroes);
-
-    // redraw focus list
-    if(myKingdom.GetHeroes().size())
-        FocusToHeroes(myKingdom.GetHeroes().front());
-    else
-    if(myKingdom.GetCastles().size())
-    {
-        SelectBarHeroes::Get().Redraw();
-        FocusToCastle(myKingdom.GetCastles().front());
-    }
-    else
-    {
-        gamefocus.Reset();
-        gamefocus.Redraw();
-    }
-}
-*/
-
 Game::menu_t Game::StartGame(void)
 {
     // cursor
