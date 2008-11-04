@@ -55,7 +55,6 @@ namespace Resource
     public:
 	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};
 	funds_t(const resource_t rs, u32 count);
-	funds_t(const u8 obj);
 
 	const funds_t operator+ (const funds_t &pm) const;
 	const funds_t operator* (u32 mul) const;
