@@ -188,6 +188,7 @@ public:
     void AngleStep(const Direction::vector_t to_direct);
     bool MoveStep(void);
     void Redraw(bool with_shadow = true) const;
+    void RedrawDependencesTiles(void) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; };
     void FadeOut(void) const;
     void FadeIn(void) const;

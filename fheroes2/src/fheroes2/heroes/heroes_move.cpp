@@ -28,27 +28,19 @@
 #include "castle.h"
 #include "heroes.h"
 
-bool ReflectSprite(const u16 from, const u16 to = Direction::UNKNOWN);
+bool ReflectSprite(const u16 from);
 const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
 const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
 const Sprite & SpriteShad(const Heroes & hero, const u8 index);
 bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next);
 
-bool ReflectSprite(const u16 from, const u16 to)
+bool ReflectSprite(const u16 from)
 {
     switch(from)
     {
         case Direction::BOTTOM_LEFT:
         case Direction::LEFT:
         case Direction::TOP_LEFT:		return true;
-
-        case Direction::TOP:
-	    if(Direction::TOP_LEFT == to)	return true;
-	    break;
-
-        case Direction::BOTTOM:
-	    if(Direction::BOTTOM_LEFT == to)	return true;
-	    break;
 
         default: break;
     }
@@ -205,9 +197,9 @@ void Heroes::Redraw(bool with_shadow) const
 
     if(!(gamearea & mp)) return;
 
-    const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
+    //const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
 
-    bool reflect = ReflectSprite(direction, path.isValid() ? Direction::Get(center, path.GetFrontIndex()) : Direction::UNKNOWN);
+    bool reflect = ReflectSprite(direction);
 
     s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
     s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);
@@ -262,6 +254,58 @@ void Heroes::Redraw(bool with_shadow) const
     // redraw sprites hero and flag
     display.Blit(sprite1, src_rt1, dst_pt1);
     display.Blit(sprite2, src_rt2, dst_pt2);
+    
+    RedrawDependencesTiles();
+}
+
+void Heroes::RedrawDependencesTiles(void) const
+{
+    const u16 center = Maps::GetIndexFromAbsPoint(mp);
+
+    world.GetTiles(center).RedrawTop();
+
+    if(Maps::isValidDirection(center, Direction::BOTTOM))
+    {
+	const Maps::TilesAddon * skip1 = NULL;
+	const Maps::TilesAddon * skip2 = NULL;
+	// skip always: ICN::OBJNTWBA
+	skip1 = world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA);
+	// skip only sprite: ICN::ROAD
+	skip2 = world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).FindAddonICN1(ICN::ROAD);
+	// add other sprite if incorrect draw hero
+
+	if(!skip1)
+	{
+	    world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).RedrawBottom(skip2);
+	    world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM)).RedrawTop();
+	}
+    }
+
+    // skip if rotate
+    if(45 > GetSpriteIndex())
+    {
+	if(Direction::BOTTOM != direction &&
+	    Direction::TOP != direction &&
+	    Maps::isValidDirection(center, direction) &&
+	    Maps::isValidDirection(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM))
+	{
+	    const Maps::TilesAddon * skip1 = NULL;
+	    const Maps::TilesAddon * skip2 = NULL;
+	    // skip always: ICN::OBJNTWBA
+    	    skip1 = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA);
+	    // skip only sprite: ICN::ROAD
+    	    skip2 = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).FindAddonICN1(ICN::ROAD);
+	    // add other sprite if incorrect draw hero
+
+	    if(!skip1)
+    	    {
+    		world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).RedrawBottom(skip2);
+    		world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM)).RedrawTop();
+	    }
+	}
+    }
+    
+    if(Maps::isValidDirection(center, direction)) world.GetTiles(Maps::GetDirectionIndex(center, direction)).RedrawTop();
 }
 
 bool Heroes::MoveStep(void)
@@ -315,6 +359,7 @@ bool Heroes::MoveStep(void)
 	if(MAXU16 != dst_index2)
         {
 	    GameArea::Get().Redraw();
+	    Display::Get().Flip();
 	    Action(dst_index2);
 	    SetMove(false);
             didMove = true;
@@ -435,9 +480,9 @@ void Heroes::FadeOut(void) const
 
     if(!(gamearea & mp)) return;
 
-    const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
+    //const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
 
-    bool reflect = ReflectSprite(direction, path.isValid() ? Direction::Get(center, path.GetFrontIndex()) : Direction::UNKNOWN);
+    bool reflect = ReflectSprite(direction);
 
     s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
     s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);
@@ -500,9 +545,9 @@ void Heroes::FadeIn(void) const
 
     if(!(gamearea & mp)) return;
 
-    const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
+    //const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
 
-    bool reflect = ReflectSprite(direction, path.isValid() ? Direction::Get(center, path.GetFrontIndex()) : Direction::UNKNOWN);
+    bool reflect = ReflectSprite(direction);
 
     s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
     s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);

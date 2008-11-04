@@ -119,11 +119,8 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
 	{
     	    // boat
     	    case MP2::OBJ_BOAT:		RedrawBoat(tile, dst); break;
-    	    // heroes
-    	    case MP2::OBJ_HEROES:	RedrawHeroes(tile); break;
     	    // monster
     	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, dst); break;
-
     	    default: break;
 	}
     }
@@ -132,6 +129,21 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
     for(u8 oy = ry; oy < ry + rh; ++oy)
 	for(u8 ox = rx; ox < rx + rw; ++ox)
 	    world.GetTiles(gx + ox, gy + oy).RedrawTop();
+
+    // ext object
+    for(u8 oy = ry; oy < ry + rh; ++oy)
+	for(u8 ox = rx; ox < rx + rw; ++ox) if(GetRect() & Point(gx + ox, gy + oy))
+    {
+	const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
+    	const Point dst(BORDERWIDTH + TILEWIDTH * ox, BORDERWIDTH + TILEWIDTH * oy);
+
+	switch(tile.GetObject())
+	{
+    	    // heroes
+    	    case MP2::OBJ_HEROES:	RedrawHeroes(tile); break;
+    	    default: break;
+	}
+    }
 
     // route
     const Game::Focus & focus = Game::Focus::Get();
@@ -293,41 +305,6 @@ void RedrawHeroes(const Maps::Tiles & tile)
     if(hero)
     {
 	hero->Redraw();
-
-	    if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
-	    {
-		const Maps::TilesAddon * skip1 = NULL;
-		const Maps::TilesAddon * skip2 = NULL;
-		// skip always: ICN::OBJNTWBA
-		skip1 = world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA);
-		// skip only sprite: ICN::ROAD
-		skip2 = world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).FindAddonICN1(ICN::ROAD);
-		// add other sprite if incorrect draw hero
-
-		if(!skip1)
-		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawBottom(skip2);
-	    }
-
-	// skip if rotate
-	if(45 > hero->GetSpriteIndex())
-	{
-	    if(Direction::BOTTOM != hero->GetDirection() &&
-		Direction::TOP != hero->GetDirection() &&
-		Maps::isValidDirection(tile.GetIndex(), hero->GetDirection()) &&
-		Maps::isValidDirection(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM))
-	    {
-		const Maps::TilesAddon * skip1 = NULL;
-		const Maps::TilesAddon * skip2 = NULL;
-		// skip always: ICN::OBJNTWBA
-    		skip1 = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA);
-	    	// skip only sprite: ICN::ROAD
-    		skip2 = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM)).FindAddonICN1(ICN::ROAD);
-		// add other sprite if incorrect draw hero
-
-		if(!skip1)
-    		world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM)).RedrawBottom(skip2);
-	    }
-	}
     }
 }
 
