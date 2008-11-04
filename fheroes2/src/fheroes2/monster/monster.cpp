@@ -651,16 +651,16 @@ u16 Monster::GetRNDSize(monster_t monster)
     switch(GetLevel(monster))
     {
 	case LEVEL1:
-		    randSize = Rand::Get(Army::HORDE, Army::SWARM);
+		    randSize = Rand::Get(Army::HORDE, Army::THRONG);
                     break;
 	case LEVEL2:
-		    randSize = Rand::Get(Army::LOTS, Army::THRONG);
+		    randSize = Rand::Get(Army::LOTS, Army::HORDE);
                     break;
 	case LEVEL3:
-		    randSize = Rand::Get(Army::PACK, Army::HORDE);
+		    randSize = Rand::Get(Army::PACK, Army::LOTS);
                     break;
 	case LEVEL4:
-		    randSize = Rand::Get(Army::SEVERAL, Army::LOTS);
+		    randSize = Rand::Get(Army::SEVERAL, Army::PACK);
                     break;
     }
 
