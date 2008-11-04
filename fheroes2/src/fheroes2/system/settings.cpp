@@ -122,6 +122,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "music = " << (modes & MUSIC_CD ? "cd" : ( modes & MUSIC_MIDI ? "midi" : ( modes & MUSIC_EXT ? "ext" : "off"))) << std::endl;
     stream << "sound volume = " << static_cast<int>(sound_volume) << std::endl;
     stream << "music volume = " << static_cast<int>(music_volume) << std::endl;
+    stream << "animation = " << static_cast<int>(animation) << std::endl;
     stream << "fullscreen = " << (modes & FULLSCREEN ? "on"  : "off") << std::endl;
     stream << "evilinterface = " << (modes & EVILINTERFACE ? "on"  : "off") << std::endl;
     stream << "shadow = " << (modes & SHADOW ? "on"  : "off") << std::endl;
@@ -227,7 +228,7 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "debug") debug = String::ToInt(right);
     else
     // animation
-    if(left == "debug") animation = String::ToInt(right);
+    if(left == "animation") animation = String::ToInt(right);
     else
     // data directory
     if(left == "data") path_data_directory = right;
