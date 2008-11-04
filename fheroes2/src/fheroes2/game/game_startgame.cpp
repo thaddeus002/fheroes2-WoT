@@ -79,6 +79,10 @@ void Game::RemoveMyHeroes(Heroes *heroes)
 
     AGG::PlaySound(M82::KILLFADE);
 
+    heroes->GetPath().Hide();
+    GameArea::Get().Redraw();
+    Display::Get().Flip();
+
     heroes->FadeOut();
     heroes->SetFreeman();
     myKingdom.RemoveHeroes(heroes);
@@ -286,7 +290,11 @@ void Game::FocusToCastle(Castle *castle)
 
     Game::Focus & globalfocus = Game::Focus::Get();
 
-    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().ShowPath(false);
+    if(Game::Focus::HEROES == globalfocus.Type())
+    {
+	globalfocus.GetHeroes().SetMove(false);
+	globalfocus.GetHeroes().ShowPath(false);
+    }
 
     globalfocus.Set(castle);
     globalfocus.Redraw();
@@ -353,7 +361,12 @@ void Game::FocusToHeroes(Heroes *hero)
 
     Game::Focus & globalfocus = Game::Focus::Get();
 
-    if(Game::Focus::HEROES == globalfocus.Type()) globalfocus.GetHeroes().ShowPath(false);
+    if(Game::Focus::HEROES == globalfocus.Type())
+    {
+	globalfocus.GetHeroes().SetMove(false);
+	globalfocus.GetHeroes().ShowPath(false);
+    }
+
     (*hero).ShowPath(true);
 
     globalfocus.Set(hero);
@@ -683,7 +696,7 @@ Game::menu_t Game::HumanTurn(void)
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, gamearea.GetRect().w * TILEWIDTH, gamearea.GetRect().h * TILEWIDTH);
     const Rect areaScrollLeft(0, 0, BORDERWIDTH, display.h());
     const Rect areaScrollRight(display.w() - BORDERWIDTH, 0, BORDERWIDTH, display.h());
-    const Rect areaScrollTop(0, 0, display.w(), BORDERWIDTH);
+    const Rect areaScrollTop(0, 0, display.w() - RADARWIDTH, BORDERWIDTH);
     const Rect areaScrollBottom(0, display.h() - BORDERWIDTH, display.w(), BORDERWIDTH);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
     

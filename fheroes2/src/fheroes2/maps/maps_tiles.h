@@ -72,6 +72,9 @@ namespace Maps
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
 
+	TilesAddon * FindAddonICN1(u16 icn1);
+	TilesAddon * FindAddonICN2(u16 icn2);
+
 	TilesAddon * FindAddonLevel1(u32 uniq1);
 	TilesAddon * FindAddonLevel2(u32 uniq2);
 

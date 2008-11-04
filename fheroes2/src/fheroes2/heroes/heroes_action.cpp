@@ -301,7 +301,6 @@ void Heroes::ActionToMonster(const u16 dst_index)
 		Game::RemoveMyHeroes(this);
     	    else
     	    {
-		AGG::PlaySound(M82::KILLFADE);
 		FadeOut();
     		SetFreeman();
     		world.GetKingdom(color).RemoveHeroes(this);
@@ -344,7 +343,6 @@ void Heroes::ActionToHeroes(const u16 dst_index)
 		    Game::RemoveMyHeroes(this);
     		else
     		{
-		    AGG::PlaySound(M82::KILLFADE);
 		    FadeOut();
     		    SetFreeman();
     		    world.GetKingdom(color).RemoveHeroes(this);
@@ -390,7 +388,6 @@ void Heroes::ActionToCastle(const u16 dst_index)
 		    Game::RemoveMyHeroes(this);
     		else
     		{
-		    AGG::PlaySound(M82::KILLFADE);
 		    FadeOut();
     		    SetFreeman();
     		    world.GetKingdom(color).RemoveHeroes(this);
@@ -412,17 +409,19 @@ void Heroes::ActionToBoat(const u16 dst_index)
     Maps::Tiles & tiles_from = world.GetTiles(from_index);
     Maps::Tiles & tiles_to = world.GetTiles(dst_index);
 
+    if(H2Config::MyColor() == GetColor())
+    {
+	AGG::PlaySound(M82::KILLFADE);
+	GetPath().Hide();
+    }
+    FadeOut();
+
     move_point = 0;
-
     tiles_from.SetObject(MP2::OBJ_COAST);
-
     SetCenter(dst_index);
     SetShipMaster(true);
-
     tiles_to.SetObject(MP2::OBJ_HEROES);
-
     save_maps_general = MP2::OBJ_ZERO;
-    if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToBoat: " + GetName() + " to boat");
 }
@@ -437,16 +436,18 @@ void Heroes::ActionToCoast(const u16 dst_index)
     Maps::Tiles & tiles_to = world.GetTiles(dst_index);
 
     move_point = 0;
-
     tiles_from.SetObject(MP2::OBJ_BOAT);
-
     SetCenter(dst_index);
     SetShipMaster(false);
-
     tiles_to.SetObject(MP2::OBJ_HEROES);
-
     save_maps_general = MP2::OBJ_COAST;
-    if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
+
+    if(H2Config::MyColor() == GetColor())
+    {
+	AGG::PlaySound(M82::KILLFADE);
+	GetPath().Hide();
+    }
+    FadeIn();
 
     if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCoast: " + GetName() + " to coast");
 }
@@ -1298,12 +1299,21 @@ void Heroes::ActionToAncientLamp(const u16 dst_index)
 void Heroes::ActionToTeleports(const u16 index_from)
 {
     const u16 index_to = world.NextTeleport(index_from);
+    ApplyPenaltyMovement();
 
     if(index_from == index_to)
     {
+	if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::RSBRYFZL);
 	Error::Warning("Heroes::ActionToTeleports: action unsuccessfully...");
 	return;
     }
+
+    if(H2Config::MyColor() == GetColor())
+    {
+	AGG::PlaySound(M82::KILLFADE);
+	GetPath().Hide();
+    }
+    FadeOut();
 
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
@@ -1312,11 +1322,24 @@ void Heroes::ActionToTeleports(const u16 index_from)
     {
 	tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
     }
-
-    SetCenter(index_to);
-
     save_maps_general = MP2::OBJ_STONELIGHTS;
     tiles_to.SetObject(MP2::OBJ_HEROES);
+    SetCenter(index_to);
+    Scoute();
+
+    if(H2Config::MyColor() == GetColor())
+    {
+	AGG::PlaySound(M82::KILLFADE);
+	GetPath().Hide();
+    }
+    FadeIn();
+
+    // check monster
+    u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER);
+    if(MAXU16 != dst_index2)
+    {
+        Action(dst_index2);
+    }
 }
 
 /* capture color object */

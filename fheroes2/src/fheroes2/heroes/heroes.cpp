@@ -1580,4 +1580,17 @@ void Heroes::SetFreeman(void)
     world.GetTiles(mp).SetObject(save_maps_general);
     mp.x = -1;
     mp.y = -1;
+    SetMove(false);
+}
+
+void Heroes::Dump(void) const
+{
+    std::cout << "----------------I--------" << std::endl;
+    std::cout << "name            : " << name << std::endl;
+    std::cout << "race            : " << Race::String(race) << std::endl;
+    std::cout << "color           : " << Color::String(color) << std::endl;
+    std::cout << "experience      : " << experience << std::endl;
+    std::cout << "magic point     : " << magic_point << std::endl;
+    std::cout << "move point      : " << move_point << std::endl;
+    std::cout << "direction       : " << Direction::String(direction) << std::endl;
 }

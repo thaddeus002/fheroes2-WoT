@@ -351,6 +351,42 @@ void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
     }
 }
 
+Maps::TilesAddon * Maps::Tiles::FindAddonICN1(u16 icn1)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(icn1 == MP2::GetICNObject(addon.object)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+Maps::TilesAddon * Maps::Tiles::FindAddonICN2(u16 icn2)
+{
+    if(addons_level2.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(icn2 == MP2::GetICNObject(addon.object)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
 Maps::TilesAddon * Maps::Tiles::FindAddonLevel1(u32 uniq1)
 {
     if(addons_level1.size())
@@ -421,12 +457,7 @@ void Maps::Tiles::DebugInfo(void) const
     
     String::AddInt(value, general);
     value += ", (" + std::string(MP2::StringObject(general)) + ")";
-    std::cout << "general object  : " << value;
-
-    if(MP2::OBJ_MONSTER == general)
-	std::cout << " (count: " << GetCountMonster() << ")" << std::endl;
-    else
-	std::cout << std::endl;
+    std::cout << "general object  : " << value << std::endl;
 
     value.clear();
     
@@ -512,6 +543,24 @@ void Maps::Tiles::DebugInfo(void) const
     
 	    std::cout << "level           : " << value << std::endl;
 	}
+    }
+
+    // extra obj info
+    switch(general)
+    {
+	case MP2::OBJ_MONSTER:
+	    std::cout << "----------------I--------" << std::endl;
+	    std::cout << "count           : " << GetCountMonster() << std::endl;
+	    break;
+
+	case MP2::OBJ_HEROES:
+	    {
+		const Heroes *hero = world.GetHeroes(maps_index);
+		if(hero) hero->Dump();
+	    }
+	    break;
+
+	default: break;
     }
 
     std::cout << "----------------:--------" << std::endl << std::endl;

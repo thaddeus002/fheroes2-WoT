@@ -156,15 +156,10 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
             if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
 	    if(it1 == hero.GetPath().begin() && skipfirst) continue;
 
-	    u16 index = 0;
-
-	    if(it3 != it2) index = Route::Path::GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index));
-
+	    const u16 index = (it3 == it2 ? 0 : Route::Path::GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index)));
 	    const Sprite & sprite = AGG::GetICN(!(*it1).green_color ? ICN::ROUTERED : ICN::ROUTE, index);
-    	    Point dst_pt(BORDERWIDTH + TILEWIDTH * (tile_x - gx) + sprite.x() - 16, BORDERWIDTH + TILEWIDTH * (tile_y - gy) + sprite.y());
-    	    Rect src_rt;
-    	    GameArea::SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
-	    display.Blit(sprite, src_rt, dst_pt);
+    	    Point dst_pt(BORDERWIDTH + TILEWIDTH * (tile_x - gx) + sprite.x() - 14, BORDERWIDTH + TILEWIDTH * (tile_y - gy) + sprite.y());
+	    display.Blit(sprite, dst_pt);
 	}
     }
 
@@ -289,20 +284,6 @@ void RedrawBoat(const Maps::Tiles & tile, const Point & dst)
         GameArea::SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
         Display::Get().Blit(sprite, src_rt, dst_pt);
     }
-
-    tile.RedrawTop();
-
-    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT))
-        world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).RedrawTop();
-
-    if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT))
-        world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).RedrawTop();
-
-    if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
-    {
-        world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawBottom();
-        world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
-    }
 }
 
 void RedrawHeroes(const Maps::Tiles & tile)
@@ -313,16 +294,24 @@ void RedrawHeroes(const Maps::Tiles & tile)
     {
 	hero->Redraw();
 
-	tile.RedrawTop();
+	if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM) &&
+	    // ICN::ROAD
+	    !world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).FindAddonICN1(ICN::ROAD) &&
+	    // ICN::OBJNTWBA
+	    !world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA)
+	    // add other sprite if incorrect draw hero
+	)
+	    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawBottom();
 
-	//if(Maps::isValidDirection(tile.GetIndex(), hero->GetDirection()))
-    	//    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection())).RedrawTop();
-
-	//if(Maps::isValidDirection(tile.GetIndex(), hero->GetDirection()))
-    	//    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection())).RedrawBottom();
-
-	if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
-    	    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
+	if(Maps::isValidDirection(tile.GetIndex(), hero->GetDirection()) &&
+	    Maps::isValidDirection(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM) &&
+		// ICN::ROAD
+    		!world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM)).FindAddonICN1(ICN::ROAD) &&
+		// ICN::OBJNTWBA
+    		!world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM)).FindAddonICN1(ICN::OBJNTWBA)
+		// add other sprite if incorrect draw hero
+	    )
+    		world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(tile.GetIndex(), hero->GetDirection()), Direction::BOTTOM)).RedrawBottom();
     }
 }
 

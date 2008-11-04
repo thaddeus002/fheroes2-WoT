@@ -73,6 +73,8 @@ bool Mounts::isPassable(const u16 icn, const u8 index)
         case ICN::MTNSWMP:
     	    if((5 < index && index < 10) || (11 < index && index < 17) || (17 < index && index < 21)) return false;	// LARGE LEFT
     	    else
+	    if(25 == index) return false;	// bug: level 1 sprite for mtngrass
+    	    else
     	    if((27 < index && index < 32) || (32 < index && index < 38) || (38 < index && index < 42)) return false;	// LARGE RIGHT
     	    else
     	    if((45 < index && index < 49) || (49 < index && index < 52)) return false;				// MEDIUM LEFT

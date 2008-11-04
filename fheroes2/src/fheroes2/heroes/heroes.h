@@ -190,6 +190,7 @@ public:
     void Redraw(bool with_shadow = true) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; };
     void FadeOut(void) const;
+    void FadeIn(void) const;
 
     void PlayWalkSound(void) const;
     void PlayPickupSound(void) const;
@@ -204,6 +205,8 @@ public:
     void LevelUp(void);
 
     void Scoute(void);
+
+    void Dump(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
