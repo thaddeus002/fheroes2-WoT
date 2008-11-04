@@ -88,9 +88,6 @@ namespace Game
     void PreloadLOOPSounds(void);
     void EnvironmentSoundMixer(bool forced);
 
-    void RemoveMyHeroes(Heroes *heroes);
-    void RemoveMyCastle(Castle *castle);
-
     namespace Editor
     {
 	Game::menu_t MainMenu(void);

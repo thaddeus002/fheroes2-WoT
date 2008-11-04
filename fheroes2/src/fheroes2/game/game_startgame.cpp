@@ -48,8 +48,6 @@ namespace Game
     Cursor::themes_t GetCursor(const Maps::Tiles & tile);
     void OpenCastle(Castle *castle);
     void OpenHeroes(Heroes *heroes);
-    void FocusToCastle(Castle *castle);
-    void FocusToHeroes(Heroes *hero);
     void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
     Game::menu_t HumanTurn(void);
     bool CursorChangePosition(const u16 index);
@@ -70,6 +68,7 @@ bool Game::CursorChangePosition(const u16 index)
     return false;
 }
 
+/*
 void Game::RemoveMyHeroes(Heroes *heroes)
 {
     if(!heroes) return;
@@ -102,33 +101,7 @@ void Game::RemoveMyHeroes(Heroes *heroes)
         gamefocus.Redraw();
     }
 }
-
-void Game::RemoveMyCastle(Castle *castle)
-{
-    if(!castle) return;
-    
-    Kingdom & myKingdom = world.GetMyKingdom();
-    Game::Focus & gamefocus = Game::Focus::Get();
-
-    myKingdom.RemoveCastle(castle);
-
-    //AGG::PlaySound(M82::KILLFADE);
-
-    // redraw focus list
-    if(myKingdom.GetCastles().size())
-        FocusToCastle(myKingdom.GetCastles().front());
-    else
-    if(myKingdom.GetHeroes().size())
-    {
-        SelectBarCastle::Get().Redraw();
-        FocusToHeroes(myKingdom.GetHeroes().front());
-    }
-    else
-    {
-        gamefocus.Reset();
-        gamefocus.Redraw();
-    }
-}
+*/
 
 Game::menu_t Game::StartGame(void)
 {
@@ -245,6 +218,7 @@ void Game::OpenCastle(Castle *castle)
     std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     Display & display = Display::Get();
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
+    Game::Focus & globalfocus = Game::Focus::Get();
 
     if(it != myCastles.end())
     {
@@ -253,7 +227,8 @@ void Game::OpenCastle(Castle *castle)
 	while(Dialog::CANCEL != result)
 	{
 	    cursor.Hide();
-	    FocusToCastle(*it);
+	    globalfocus.Set(*it);
+	    globalfocus.Redraw();
 	    cursor.Show();
 	    display.Flip();
 
@@ -276,28 +251,11 @@ void Game::OpenCastle(Castle *castle)
 
     cursor.Hide();
     Game::SelectBarCastle::Get().Redraw(*it);
-    if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) FocusToHeroes(hero);
-    Game::StatusWindow::Get().Redraw();
+    if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) globalfocus.Set(hero);
+    globalfocus.Redraw();
     cursor.Show();
     Display::Get().Flip();
     Mixer::Enhance();
-}
-
-/* focus to castle */
-void Game::FocusToCastle(Castle *castle)
-{
-    if(! castle) return;
-
-    Game::Focus & globalfocus = Game::Focus::Get();
-
-    if(Game::Focus::HEROES == globalfocus.Type())
-    {
-	globalfocus.GetHeroes().SetMove(false);
-	globalfocus.GetHeroes().ShowPath(false);
-    }
-
-    globalfocus.Set(castle);
-    globalfocus.Redraw();
 }
 
 /* open heroes wrapper */
@@ -312,6 +270,7 @@ void Game::OpenHeroes(Heroes *hero)
     std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
     Display & display = Display::Get();
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
+    Game::Focus & globalfocus = Game::Focus::Get();
 
     if(it != myHeroes.end())
     {
@@ -320,7 +279,8 @@ void Game::OpenHeroes(Heroes *hero)
 	while(Dialog::CANCEL != result)
 	{
 	    cursor.Hide();
-	    FocusToHeroes(*it);
+	    globalfocus.Set(*it);
+	    globalfocus.Redraw();
 	    cursor.Show();
 	    display.Flip();
 
@@ -340,7 +300,19 @@ void Game::OpenHeroes(Heroes *hero)
 		    break;
 
 		case Dialog::DISMISS:
-		    RemoveMyHeroes(*it);
+		    AGG::PlaySound(M82::KILLFADE);
+
+		    (*it)->GetPath().Hide();
+		    GameArea::Get().Redraw();
+		    Display::Get().Flip();
+
+		    (*it)->FadeOut();
+		    (*it)->SetFreeman();
+		    myKingdom.RemoveHeroes(*it);
+
+    		    globalfocus.Reset(Game::Focus::HEROES);
+    		    globalfocus.Redraw();
+
 		    result = Dialog::CANCEL;
 		    break;
 	
@@ -352,25 +324,6 @@ void Game::OpenHeroes(Heroes *hero)
     cursor.Show();
     Display::Get().Flip();
     Mixer::Enhance();
-}
-
-/* focus to heroes */
-void Game::FocusToHeroes(Heroes *hero)
-{
-    if(! hero) return;
-
-    Game::Focus & globalfocus = Game::Focus::Get();
-
-    if(Game::Focus::HEROES == globalfocus.Type())
-    {
-	globalfocus.GetHeroes().SetMove(false);
-	globalfocus.GetHeroes().ShowPath(false);
-    }
-
-    (*hero).ShowPath(true);
-
-    globalfocus.Set(hero);
-    globalfocus.Redraw();
 }
 
 /* return changee cursor */
@@ -664,7 +617,8 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     else
     if(path.EnableMove())
     {
-        FocusToHeroes(hero);
+        Game::Focus::Get().Set(hero);
+        Game::Focus::Get().Redraw();
         hero->SetMove(true);
     }
     cursor.Show();
@@ -744,21 +698,22 @@ Game::menu_t Game::HumanTurn(void)
     switch(global_focus.Type())
     {
 	case Focus::UNSEL:
-    	    if(myHeroes.size())  FocusToHeroes(myHeroes.front());
+    	    if(myHeroes.size())  global_focus.Set(myHeroes.front());
     	    else
-	    if(myCastles.size()) FocusToCastle(myCastles.front());
+	    if(myCastles.size()) global_focus.Set(myCastles.front());
 	    break;
 	case Focus::HEROES:
-	    if(conf.Original()) FocusToHeroes(myHeroes.front());
+	    if(conf.Original()) global_focus.Set(myHeroes.front());
 	    break;
 	case Focus::CASTLE:
-	    if(conf.Original()) FocusToCastle(myCastles.front());
+	    if(conf.Original()) global_focus.Set(myCastles.front());
 	    break;
     }
-    
+
     //Override whatever the focus set the window to show
     statusWindow.SetState(StatusWindow::DAY);
-    statusWindow.Redraw();
+
+    global_focus.Redraw();
 
     cursor.Show();
     display.Flip();
@@ -844,7 +799,8 @@ Game::menu_t Game::HumanTurn(void)
 				    if(from_hero.GetColor() == to_castle->GetColor())
 				    {
 					cursor.Hide();
-					FocusToCastle(const_cast<Castle *>(to_castle));
+					global_focus.Set(const_cast<Castle *>(to_castle));
+					global_focus.Redraw();
 					cursor.Show();
 					display.Flip();
 				    }
@@ -906,7 +862,8 @@ Game::menu_t Game::HumanTurn(void)
 				    else
 				    {
 					cursor.Hide();
-					FocusToCastle(const_cast<Castle *>(to_castle));
+					global_focus.Set(const_cast<Castle *>(to_castle));
+					global_focus.Redraw();
 					cursor.Show();
 					display.Flip();
 				    }
@@ -923,7 +880,8 @@ Game::menu_t Game::HumanTurn(void)
     				    from_castle.GetColor() == to_hero->GetColor())
     				{
     				    cursor.Hide();
-    				    FocusToHeroes(const_cast<Heroes *>(to_hero));
+    				    global_focus.Set(const_cast<Heroes *>(to_hero));
+    				    global_focus.Redraw();
     				    cursor.Show();
 				    display.Flip();
         			}
@@ -1091,7 +1049,8 @@ Game::menu_t Game::HumanTurn(void)
 		else
 		{
 		    cursor.Hide();
-		    FocusToHeroes(const_cast<Heroes *>(hero));
+		    global_focus.Set(const_cast<Heroes *>(hero));
+		    global_focus.Redraw();
 		    cursor.Show();
 		    display.Flip();
 		}
@@ -1113,7 +1072,8 @@ Game::menu_t Game::HumanTurn(void)
 		else
 		{
 		    cursor.Hide();
-		    FocusToCastle(const_cast<Castle *>(cstl));
+		    global_focus.Set(const_cast<Castle *>(cstl));
+		    global_focus.Redraw();
 		    cursor.Show();
 		    display.Flip();
 		}

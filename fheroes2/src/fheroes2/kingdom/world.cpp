@@ -75,13 +75,14 @@ void World::NewMaps(const u16 sw, const u16 sh)
 
     // playing kingdom
     Settings::Get().FileInfo().SetKingdomColors(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE);
-    vec_kingdoms.resize(KINGDOMMAX);
+    vec_kingdoms.resize(KINGDOMMAX + 1);
     vec_kingdoms[0] = new Kingdom(Color::BLUE);
     vec_kingdoms[1] = new Kingdom(Color::GREEN);
     vec_kingdoms[2] = new Kingdom(Color::RED);
     vec_kingdoms[3] = new Kingdom(Color::YELLOW);
     vec_kingdoms[4] = new Kingdom(Color::ORANGE);
     vec_kingdoms[5] = new Kingdom(Color::PURPLE);
+    vec_kingdoms[6] = new Kingdom(Color::GRAY);
 
     // initialize all heroes
     vec_heroes.resize(HEROESMAXCOUNT + 2);
@@ -248,13 +249,14 @@ void World::LoadMaps(const std::string &filename)
     vec_teleports.reserve(10);
                                     
     // playing kingdom
-    vec_kingdoms.resize(KINGDOMMAX);
+    vec_kingdoms.resize(KINGDOMMAX + 1);
     vec_kingdoms[0] = new Kingdom(Color::BLUE);
     vec_kingdoms[1] = new Kingdom(Color::GREEN);
     vec_kingdoms[2] = new Kingdom(Color::RED);
     vec_kingdoms[3] = new Kingdom(Color::YELLOW);
     vec_kingdoms[4] = new Kingdom(Color::ORANGE);
     vec_kingdoms[5] = new Kingdom(Color::PURPLE);
+    vec_kingdoms[6] = new Kingdom(Color::GRAY);
 
     // initialize all heroes
     vec_heroes.resize(HEROESMAXCOUNT + 2);
@@ -971,10 +973,10 @@ void World::LoadMaps(const std::string &filename)
     AGG::FreeObject(TIL::GROUND32);
 
     // sort castles to kingdoms
-    for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
-	if((*vec_kingdoms[ii]).isPlay()) for(u16 cc = 0; cc < vec_castles.size(); ++cc)
-	    if((*vec_kingdoms[ii]).GetColor() == (*vec_castles[cc]).GetColor())
-		(*vec_kingdoms[ii]).AddCastle(vec_castles[cc]);
+    std::vector<Castle *>::const_iterator itc1 = vec_castles.begin();
+    std::vector<Castle *>::const_iterator itc2 = vec_castles.end();
+    for(; itc1 != itc2; ++itc1)
+	if(*itc1) GetKingdom((*itc1)->GetColor()).AddCastle(*itc1);
 
     // play with debug hero
     if(H2Config::Debug())
@@ -1030,36 +1032,36 @@ Kingdom & World::GetKingdom(Color::color_t color)
 {
     switch(color)
     {
-        case Color::BLUE:       return *vec_kingdoms[0]; break;
-        case Color::GREEN:      return *vec_kingdoms[1]; break;
-        case Color::RED:        return *vec_kingdoms[2]; break;
-        case Color::YELLOW:     return *vec_kingdoms[3]; break;
-        case Color::ORANGE:     return *vec_kingdoms[4]; break;
-        case Color::PURPLE:     return *vec_kingdoms[5]; break;
-        case Color::GRAY:       break;
+        case Color::BLUE:       return *vec_kingdoms[0];
+        case Color::GREEN:      return *vec_kingdoms[1];
+        case Color::RED:        return *vec_kingdoms[2];
+        case Color::YELLOW:     return *vec_kingdoms[3];
+        case Color::ORANGE:     return *vec_kingdoms[4];
+        case Color::PURPLE:     return *vec_kingdoms[5];
+        case Color::GRAY:       return *vec_kingdoms[6];
     }
 
-    Error::Warning("World::GetKingdom: return Color::GRAY.");
+    if(Settings::Get().Debug()) Error::Warning("World::GetKingdom: return Color::GRAY.");
 
-    return *vec_kingdoms[0];
+    return *vec_kingdoms[6];
 }
 
 const Kingdom & World::GetKingdom(Color::color_t color) const
 {
     switch(color)
     {
-        case Color::BLUE:       return *vec_kingdoms[0]; break;
-        case Color::GREEN:      return *vec_kingdoms[1]; break;
-        case Color::RED:        return *vec_kingdoms[2]; break;
-        case Color::YELLOW:     return *vec_kingdoms[3]; break;
-        case Color::ORANGE:     return *vec_kingdoms[4]; break;
-        case Color::PURPLE:     return *vec_kingdoms[5]; break;
-        case Color::GRAY:       break;
+        case Color::BLUE:       return *vec_kingdoms[0];
+        case Color::GREEN:      return *vec_kingdoms[1];
+        case Color::RED:        return *vec_kingdoms[2];
+        case Color::YELLOW:     return *vec_kingdoms[3];
+        case Color::ORANGE:     return *vec_kingdoms[4];
+        case Color::PURPLE:     return *vec_kingdoms[5];
+        case Color::GRAY:       return *vec_kingdoms[6];
     }
 
     Error::Warning("World::GetKingdom: return Color::GRAY.");
 
-    return *vec_kingdoms[0];
+    return *vec_kingdoms[6];
 }
 
 /* get castle from index maps */

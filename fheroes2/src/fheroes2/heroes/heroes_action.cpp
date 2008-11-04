@@ -297,15 +297,16 @@ void Heroes::ActionToMonster(const u16 dst_index)
 	case Army::SURRENDER:
 	case Army::LOSE:
         {
+	    if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
+	    FadeOut();
+    	    SetFreeman();
+    	    world.GetKingdom(color).RemoveHeroes(this);
 	    if(H2Config::MyColor() == GetColor())
-		Game::RemoveMyHeroes(this);
-    	    else
-    	    {
-		FadeOut();
-    		SetFreeman();
-    		world.GetKingdom(color).RemoveHeroes(this);
+	    {
+		Game::Focus::Get().Reset(Game::Focus::HEROES);
+		Game::Focus::Get().Redraw();
     	    }
-        }
+	}
 	break;
         
         default:
@@ -339,15 +340,16 @@ void Heroes::ActionToHeroes(const u16 dst_index)
 	    case Army::RETREAT:
 	    case Army::SURRENDER:
     	    {
+		if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
+		FadeOut();
+    		SetFreeman();
+    		world.GetKingdom(color).RemoveHeroes(this);
 		if(H2Config::MyColor() == GetColor())
-		    Game::RemoveMyHeroes(this);
-    		else
-    		{
-		    FadeOut();
-    		    SetFreeman();
-    		    world.GetKingdom(color).RemoveHeroes(this);
+		{
+		    Game::Focus::Get().Reset(Game::Focus::HEROES);
+		    Game::Focus::Get().Redraw();
     		}
-    	    }
+	    }
 	    break;
 
             default: break; // Silly compiler warnings
@@ -378,21 +380,27 @@ void Heroes::ActionToCastle(const u16 dst_index)
 
 	switch(b)
 	{
-	    case Army::WIN: if(H2Config::Debug()) Error::Verbose("Heroes::ActionToCastle: result WIN"); break;
+	    case Army::WIN:
+		world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
+		world.GetKingdom(color).AddCastle(castle);
+		const_cast<Castle *>(castle)->ChangeColor(color);
+		if(H2Config::MyColor() == GetColor()) Game::Focus::Get().Redraw();
+		break;
 
 	    case Army::LOSE:
 	    case Army::RETREAT:
 	    case Army::SURRENDER:
     	    {
+		if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
+		FadeOut();
+    		SetFreeman();
+    		world.GetKingdom(color).RemoveHeroes(this);
 		if(H2Config::MyColor() == GetColor())
-		    Game::RemoveMyHeroes(this);
-    		else
-    		{
-		    FadeOut();
-    		    SetFreeman();
-    		    world.GetKingdom(color).RemoveHeroes(this);
+		{
+		    Game::Focus::Get().Reset(Game::Focus::HEROES);
+		    Game::Focus::Get().Redraw();
     		}
-    	    }
+	    }
 	    break;
 
             default: break;
