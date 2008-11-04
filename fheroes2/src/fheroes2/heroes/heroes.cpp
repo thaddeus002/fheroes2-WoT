@@ -1593,4 +1593,5 @@ void Heroes::Dump(void) const
     std::cout << "magic point     : " << magic_point << std::endl;
     std::cout << "move point      : " << move_point << std::endl;
     std::cout << "direction       : " << Direction::String(direction) << std::endl;
+    std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
 }
