@@ -1401,7 +1401,8 @@ void Maps::Tiles::UpdateQuantity(void)
 	    switch(Rand::Get(1, 2))
 	    {
 		case 1:
-            	    quantity1 = Artifact::Rand();
+		    quantity2 = Rand::Get(1, 3);
+            	    quantity1 = (1 == quantity2 ? Artifact::Rand1() : (2 == quantity2 ? Artifact::Rand2() : Artifact::Rand3()));
 		    quantity2 = 0;
 		break;
 		default: break;
@@ -1412,7 +1413,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    switch(Rand::Get(1, 3))
 	    {
 		case 1:
-            	    quantity1 = Artifact::Rand1();
+            	    quantity1 = (1 == Rand::Get(1, 2) ? Artifact::Rand1() : Artifact::Rand2());
 		    quantity2 = 0;
 		break;
 		case 2:
@@ -1493,7 +1494,9 @@ void Maps::Tiles::UpdateQuantity(void)
 
 	case MP2::OBJ_SHIPWRECKSURVIROR:
 	    // artifact
-	    quantity1 = Artifact::Rand();
+	    quantity2 = Rand::Get(1, 3);
+            quantity1 = (1 == quantity2 ? Artifact::Rand1() : (2 == quantity2 ? Artifact::Rand2() : Artifact::Rand3()));
+	    quantity2 = 0;
 	break;
 
 	case MP2::OBJ_TREASURECHEST:
