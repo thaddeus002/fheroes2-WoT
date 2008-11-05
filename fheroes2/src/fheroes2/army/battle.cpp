@@ -711,7 +711,10 @@ bool Army::AttackRangedTroop(const Monster::stats_t &myMonster, Army::army_t &ar
     {
         sort(ranged.begin(), ranged.end(), DangerousUnitPredicate);
         if(myTroop.shots)
+        {
             attack = ranged.front().Position();
+            return true;
+        }
         else if(myMonster.fly)
             return AttackTroopInList(ranged, army1, army2, troopN, move, attack);
         else if(!AttackTroopInList(ranged, army1, army2, troopN, move, attack))
@@ -753,7 +756,10 @@ bool Army::AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::army_t 
     {
         sort(nonranged.begin(), nonranged.end(), DangerousUnitPredicate);
         if(myTroop.shots)
+        {
             attack = nonranged.front().Position();
+            return true;
+        }
         else if(myMonster.fly)
             return !AttackTroopInList(nonranged, army1, army2, troopN, move, attack);
         else if(!AttackTroopInList(nonranged, army1, army2, troopN, move, attack))
