@@ -951,7 +951,23 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	    break;
 	}
         
-        bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !retaliate;
+        bool closeAttack = false;
+        {
+	    Point tmp(0,0);
+	    std::vector<Point> tmpmoves;
+	    tmpmoves.push_back(target.Position());
+	    if(CanAttack(target, tmpmoves, myTroop, tmp) >= 0)
+            {
+                closeAttack = true;
+                if(CanRetaliate(myTroop, target))
+                {
+                    retaliate = true;
+                    target.SetRetaliated(true);
+                }
+            }
+	}
+        
+        bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !closeAttack;
         
         //Racial/unit modifiers apply here
         damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage, ranged);
@@ -973,16 +989,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
 	miss_step.x /= MISSFRAMES;
 	miss_step.y /= MISSFRAMES;
 	miss_start.y -= CELLH;
-	{
-	    Point tmp(0,0);
-	    std::vector<Point> tmpmoves;
-	    tmpmoves.push_back(target.Position());
-	    if(CanAttack(target, tmpmoves, myTroop, tmp) >= 0 && CanRetaliate(myTroop, target))
-            {
-		retaliate = true;
-                target.SetRetaliated(true);
-            }
-	}
+	
 	Monster::animstate_t targetstate = !IsDamageFatal(damage, target) ? Monster::AS_PAIN : Monster::AS_DIE;
 	Monster::animstate_t mytroopstate;
 	if(target.Position().y > myTroop.Position().y)
