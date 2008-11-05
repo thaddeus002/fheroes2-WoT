@@ -1011,8 +1011,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
         bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !closeAttack;
         
         //Racial/unit modifiers apply here
-        //damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage, ranged);
-        damage = 0;
+        damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage, ranged);
         
 	// TODO bless and curse
 	//damage *= sk_a;
