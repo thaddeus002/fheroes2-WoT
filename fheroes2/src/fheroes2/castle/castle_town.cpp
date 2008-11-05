@@ -77,7 +77,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     Rect src_rt(box_rt.x, box_rt.y + portrait_frame.w() + tit_rt.h - 3, BOXAREA_WIDTH, 200);
     TextBox(str, Font::BIG, src_rt);
 
-    Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
+    Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
 
     src_rt.y += 50;
     Resource::AlignDraw(paymentCosts, src_rt);

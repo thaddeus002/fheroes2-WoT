@@ -689,7 +689,7 @@ bool Castle::AllowBuyHero(void)
 
     if(kingdom.GetHeroes().size() >= KINGDOMMAXHEROES) return false;
 
-    const Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
+    const Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
 
     if(! kingdom.AllowPayment(paymentCosts)) return false;
 
@@ -702,7 +702,7 @@ void Castle::RecruitHero(const Heroes::heroes_t hero)
 
     Kingdom & kingdom = world.GetKingdom(color);
 
-    const Resource::funds_t paymentCosts(PaymentConditions::BuyHero() * 1);
+    const Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
 
     kingdom.OddFundsResource(paymentCosts);
 
