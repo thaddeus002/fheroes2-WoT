@@ -1580,6 +1580,7 @@ void Heroes::SetFreeman(void)
     world.GetTiles(mp).SetObject(save_maps_general);
     mp.x = -1;
     mp.y = -1;
+    path.Reset();
     SetMove(false);
 }
 

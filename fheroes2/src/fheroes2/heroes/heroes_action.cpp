@@ -299,13 +299,13 @@ void Heroes::ActionToMonster(const u16 dst_index)
         {
 	    if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
 	    FadeOut();
-    	    SetFreeman();
     	    world.GetKingdom(color).RemoveHeroes(this);
 	    if(H2Config::MyColor() == GetColor())
 	    {
 		Game::Focus::Get().Reset(Game::Focus::HEROES);
 		Game::Focus::Get().Redraw();
     	    }
+    	    SetFreeman();
 	}
 	break;
         
@@ -342,13 +342,13 @@ void Heroes::ActionToHeroes(const u16 dst_index)
     	    {
 		if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
 		FadeOut();
-    		SetFreeman();
     		world.GetKingdom(color).RemoveHeroes(this);
 		if(H2Config::MyColor() == GetColor())
 		{
 		    Game::Focus::Get().Reset(Game::Focus::HEROES);
 		    Game::Focus::Get().Redraw();
     		}
+    		SetFreeman();
 	    }
 	    break;
 
@@ -397,13 +397,13 @@ void Heroes::ActionToCastle(const u16 dst_index)
     	    {
 		if(H2Config::MyColor() == GetColor()) AGG::PlaySound(M82::KILLFADE);
 		FadeOut();
-    		SetFreeman();
     		world.GetKingdom(color).RemoveHeroes(this);
 		if(H2Config::MyColor() == GetColor())
 		{
 		    Game::Focus::Get().Reset(Game::Focus::HEROES);
 		    Game::Focus::Get().Redraw();
     		}
+    		SetFreeman();
 	    }
 	    break;
 
