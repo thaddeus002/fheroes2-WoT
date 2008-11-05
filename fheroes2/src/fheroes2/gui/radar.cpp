@@ -20,15 +20,14 @@
 
 #include "gamedefs.h" 
 #include "agg.h"
-#include "config.h"
+#include "settings.h"
 #include "game.h"
 #include "gamearea.h"
 #include "ground.h"
 #include "world.h"
 #include "castle.h"
-#include "surface.h"
+#include "sprite.h"
 #include "cursor.h"
-#include "spritecursor.h"
 #include "radar.h"
 
 #define RADARCOLOR	0x40	// index palette
@@ -117,6 +116,11 @@ void Radar::Generate(void)
 
 	spriteArea->Blit(tile_surface, static_cast<u16>(dstx), static_cast<u16>(dsty));
     }
+}
+
+void Radar::HideArea(void)
+{
+    Display::Get().Blit(AGG::GetICN((Settings::Get().EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0), pos.x, pos.y);
 }
 
 /* redraw radar area for color */

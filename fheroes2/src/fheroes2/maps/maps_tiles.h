@@ -127,6 +127,7 @@ namespace Maps
 	void FixLoyaltyVersion(void);
 
 	u16 GetCountMonster(void) const;
+	void SetCountMonster(const u16 count);
 
     private:
 	void CorrectFlags32(const u8 index);

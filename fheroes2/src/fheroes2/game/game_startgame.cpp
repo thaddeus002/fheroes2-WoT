@@ -52,7 +52,30 @@ namespace Game
     Game::menu_t HumanTurn(void);
     bool CursorChangePosition(const u16 index);
     bool DiggingForArtifacts(const Heroes & hero);
+    void DialogPlayersTurn(void);
 };
+
+void Game::DialogPlayersTurn(void)
+{
+    const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
+    const Color::color_t color = Settings::Get().MyColor();
+
+    Surface sign(border.w(), border.h());
+    sign.Blit(border);
+
+    switch(color)
+    {
+	    case Color::BLUE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 0), 4, 4); break;
+	    case Color::GREEN:	sign.Blit(AGG::GetICN(ICN::BRCREST, 1), 4, 4); break;
+	    case Color::RED:	sign.Blit(AGG::GetICN(ICN::BRCREST, 2), 4, 4); break;
+	    case Color::YELLOW:	sign.Blit(AGG::GetICN(ICN::BRCREST, 3), 4, 4); break;
+	    case Color::ORANGE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 4), 4, 4); break;
+	    case Color::PURPLE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 5), 4, 4); break;
+   	    default: break;
+    }
+
+    Dialog::SpriteInfo("", Color::String(color) + " player's turn", sign);
+}
 
 bool Game::CursorChangePosition(const u16 index)
 {
@@ -129,6 +152,7 @@ Game::menu_t Game::StartGame(void)
 	    Kingdom & kingdom = world.GetKingdom(color);
 	    if(kingdom.isPlay())
 	    {
+		radar.HideArea();
 		world.ClearFog(color);
 
 		switch(kingdom.Control())
@@ -136,7 +160,17 @@ Game::menu_t Game::StartGame(void)
 	        case LOCAL:
 		    Mixer::Enhance();
 		    conf.SetMyColor(color);
-		    radar.RedrawArea(color);
+		    if(Game::HOTSEAT == conf.GameType())
+		    {
+			global_focus.Reset();
+			areaMaps.Redraw();
+			SelectBarCastle::Get().Hide();
+			SelectBarHeroes::Get().Hide();
+			StatusWindow::Get().SetState(StatusWindow::UNKNOWN);
+			StatusWindow::Get().Redraw();
+			display.Flip();
+			DialogPlayersTurn();
+		    }
 		    m = HumanTurn();
 		    cursor.Hide();
 		    Mixer::Reduce();
@@ -658,7 +692,7 @@ Game::menu_t Game::HumanTurn(void)
     Mixer::Reset();
     Game::EnvironmentSoundMixer(true);
 
-    if(conf.Original()) global_focus.Reset();
+    if(Game::HOTSEAT == conf.GameType() || conf.Original()) global_focus.Reset();
 
     switch(global_focus.Type())
     {
@@ -683,27 +717,8 @@ Game::menu_t Game::HumanTurn(void)
     cursor.Show();
     display.Flip();
 
-    // show turns dialog
-    if(Game::HOTSEAT == conf.GameType())
-    {
-	const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
-
-	Surface sign(border.w(), border.h());
-	sign.Blit(border);
-
-	switch(Settings::Get().MyColor())
-	{
-	    case Color::BLUE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 0), 4, 4); break;
-	    case Color::GREEN:	sign.Blit(AGG::GetICN(ICN::BRCREST, 1), 4, 4); break;
-	    case Color::RED:	sign.Blit(AGG::GetICN(ICN::BRCREST, 2), 4, 4); break;
-	    case Color::YELLOW:	sign.Blit(AGG::GetICN(ICN::BRCREST, 3), 4, 4); break;
-	    case Color::ORANGE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 4), 4, 4); break;
-	    case Color::PURPLE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 5), 4, 4); break;
-   	    default: break;
-	}
-
-	Dialog::SpriteInfo("", Color::String(myKingdom.GetColor()) + " player's turn", sign);
-    }
+    // new week dialog
+    if(1 < world.CountWeek() && world.BeginWeek()) Dialog::Message("Astrologers proclaim week of the Tortoise.", "All dwellings increase population.", Font::BIG, Dialog::OK);
 
     // startgame loop
     while(le.HandleEvents())

@@ -33,6 +33,7 @@ public:
     void Build(void);
     void Generate(void);
     void RedrawArea(const u8 color = 0xFF);
+    void HideArea(void);
     void RedrawCursor(void);
 
 private:

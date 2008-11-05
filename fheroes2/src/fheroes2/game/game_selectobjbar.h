@@ -63,6 +63,8 @@ public:
 	void		Redraw(void);
 	void		Redraw(const Castle *castle);
 
+	void		Hide(void);
+
 	void		Unselect(void);
 	void		Select(const Castle *castle);
 	bool		isSelected(void) const;
@@ -101,6 +103,8 @@ public:
 
 	void		Redraw(void);
 	void		Redraw(const Heroes *hero);
+
+	void		Hide(void);
 
 	void		Unselect(void);
 	void		Select(const Heroes *hero);

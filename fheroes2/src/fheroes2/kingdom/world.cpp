@@ -883,7 +883,6 @@ void World::LoadMaps(const std::string &filename)
 		tile.UpdateQuantity();
 		break;
 
-	    case MP2::OBJ_MONSTER:
 	    case MP2::OBJ_ARTIFACT:
 	    case MP2::OBJ_RESOURCE:
             case MP2::OBJ_MAGICGARDEN:
@@ -904,6 +903,11 @@ void World::LoadMaps(const std::string &filename)
     		tile.UpdateQuantity();
 		break;
 
+	    case MP2::OBJ_MONSTER:
+		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
+		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
+		break;
+
 	    case MP2::OBJ_RNDMONSTER:
 	    case MP2::OBJ_RNDMONSTER1:
 	    case MP2::OBJ_RNDMONSTER2:
@@ -911,7 +915,8 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_RNDMONSTER4:
 		// modify rnd monster sprite
 		Monster::ChangeTileWithRNDMonster(tile);
-		tile.UpdateQuantity();
+		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
+		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
 		break;
 
 	    // join dwelling
@@ -1146,8 +1151,10 @@ void World::NewWeek(void)
     free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
     
     UpdateDwellingPopulation();
-    
-    // update week life object
+
+    UpdateMonsterPopulation();
+
+    // update week object
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
     std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
 
@@ -1507,6 +1514,23 @@ void World::UpdateDwellingPopulation(void)
 	count += Monster::GetGrown(monster);
 	tile.SetQuantity1(count % 0xFF);
 	tile.SetQuantity2(count / 0xFF);
+    }
+}
+
+void World::UpdateMonsterPopulation(void)
+{
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+        
+    for(; it1 != it2; ++it1) if(*it1 && MP2::OBJ_MONSTER == (*it1)->GetObject())
+    {
+	Maps::Tiles & tile = **it1;
+	const u16 count = tile.GetCountMonster();
+
+	if(0 == count)
+	    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
+	else
+	    tile.SetCountMonster(count * 8 / 7);
     }
 }
 

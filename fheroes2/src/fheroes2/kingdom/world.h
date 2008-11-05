@@ -92,8 +92,8 @@ public:
     u16 CountWeek(void){ return week + 1; };
     bool BeginWeek(void){ return begin_week; };
     bool BeginMonth(void){ return begin_month; };
-    void NextDay(void);
 
+    void NextDay(void);
     void NewWeek(void);
     void NewMonth(void);
 
@@ -115,6 +115,7 @@ public:
 
 protected:
     void UpdateDwellingPopulation(void);
+    void UpdateMonsterPopulation(void);
 
 private:
     World() : Size(0, 0), width(Size::w), height(Size::h) {};

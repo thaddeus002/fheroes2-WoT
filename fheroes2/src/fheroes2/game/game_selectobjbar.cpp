@@ -202,6 +202,12 @@ void Game::SelectBarHeroes::Redraw(const Heroes *hero)
     }
 }
 
+void Game::SelectBarHeroes::Hide(void)
+{
+    if(isSelected()) Unselect();
+    SelectObjectBar::Redraw();
+}
+
 void Game::SelectBarHeroes::Unselect(void)
 {
     if(visible)
@@ -471,6 +477,12 @@ void Game::SelectBarCastle::Redraw(const Castle *castle)
 	if(*it) ++ii;
 	++it;
     }
+}
+
+void Game::SelectBarCastle::Hide(void)
+{
+    if(isSelected()) Unselect();
+    SelectObjectBar::Redraw();
 }
 
 void Game::SelectBarCastle::Unselect(void)
