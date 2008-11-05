@@ -639,11 +639,11 @@ u16 Monster::GetRNDSize(monster_t monster)
 
     switch(Settings::Get().GameDifficulty())
     {
-	case Difficulty::EASY:		level = 75; break;
-	case Difficulty::NORMAL:	level = 100; break;
-	case Difficulty::HARD:		level = 150; break;
-	case Difficulty::EXPERT:	level = 200; break;
-	case Difficulty::IMPOSSIBLE:	level = 250; break;
+	case Difficulty::EASY:		level = 50; break;
+	case Difficulty::NORMAL:	level = 80; break;
+	case Difficulty::HARD:		level = 120; break;
+	case Difficulty::EXPERT:	level = 150; break;
+	case Difficulty::IMPOSSIBLE:	level = 175; break;
     }
 
     u16 randSize = 1;
@@ -651,16 +651,16 @@ u16 Monster::GetRNDSize(monster_t monster)
     switch(GetLevel(monster))
     {
 	case LEVEL1:
-		    randSize = Rand::Get(Army::HORDE, Army::THRONG);
+		    randSize = Rand::Get(Army::HORDE, Army::THRONG * level / 100);
                     break;
 	case LEVEL2:
-		    randSize = Rand::Get(Army::LOTS, Army::HORDE);
+		    randSize = Rand::Get(Army::LOTS, Army::HORDE * level / 100);
                     break;
 	case LEVEL3:
-		    randSize = Rand::Get(Army::PACK, Army::LOTS);
+		    randSize = Rand::Get(Army::PACK, Army::LOTS * level / 100);
                     break;
 	case LEVEL4:
-		    randSize = Rand::Get(Army::SEVERAL, Army::PACK);
+		    randSize = Rand::Get(Army::SEVERAL, Army::PACK * level / 100);
                     break;
     }
 
