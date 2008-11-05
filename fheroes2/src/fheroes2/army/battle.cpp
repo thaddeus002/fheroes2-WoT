@@ -772,7 +772,7 @@ bool Army::AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::army_t 
             return true;
         }
     }
-    else return false;
+    return false;
 }
 
 Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack)
