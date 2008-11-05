@@ -85,10 +85,11 @@ namespace Army {
     bool CleanupBody(Army::army_t &army, u16 idx, Army::army_t &bodies);
     
     bool DangerousUnitPredicate(Army::Troops first, Army::Troops second);
-    void AttackNonRangedTroop(const Monster::stats_t &myMonster, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, int troopN, Point &move, Point &attack);
-    void AttackRangedTroop(const Monster::stats_t &myMonster, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, int troopN, Point &move, Point &attack);
+    bool AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack);
+    bool AttackRangedTroop(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack);
     bool AttackTroopInList(const Army::army_t &troops, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack);
     void MoveToClosestTroopInList(const Army::army_t &troops, const Army::Troops &myTroop, Point &move);
+    void MoveOrAttack(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack, bool rangedFirst);
     
     bool IsDamageFatal(int damage, Army::Troops &troop);
     bool AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, const Point &move, const Point &attack);
@@ -595,6 +596,13 @@ bool Army::DangerousUnitPredicate(Army::Troops first, Army::Troops second)
             (second.Count() * Monster::GetStats(second.Monster()).damageMax);
 }
 
+/** Attempt to attack a unit in the given list
+ *  \param troops[in]  List of units to consider
+ *  \param army1[in]   Left army
+ *  \param army2[in]   Right army
+ *  \param move[out]   Movement destination
+ *  \param attack[out] Point at which to attack
+ */
 bool Army::AttackTroopInList(const Army::army_t &troops, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack)
 {
     u16 idx;
@@ -622,6 +630,11 @@ struct DistancePredicate : public std::binary_function<Army::Troops, Army::Troop
     }
 };
 
+/** Move to the closest point to the closest unit in the list
+ *  \param troops[in]   List of units to consider
+ *  \param myTroop[in]  Unit to move
+ *  \param move[out]    Destination point
+ */
 void Army::MoveToClosestTroopInList(const Army::army_t &troops, const Army::Troops &myTroop, Point &move)
 {
     Army::army_t tempTroops = troops;
@@ -638,11 +651,42 @@ void Army::MoveToClosestTroopInList(const Army::army_t &troops, const Army::Troo
     move = closest;
 }
 
+/** Find a valid move and/or attack to make
+ *  \param myMonster[in]  Attacker monster
+ *  \param army1[in]       Left army
+ *  \param army2[in]       Right army
+ *  \param troopN[in]      Index into #army1 or #army2
+ *  \param move[out]       #Point to which to move
+ *  \param attack[out]     #Point which to attack
+ *  \param rangedFirst[in] Try to attack ranged units first
+ */
+void Army::MoveOrAttack(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack, bool rangedFirst)
+{
+    bool result;
+    if(rangedFirst)
+        result = AttackRangedTroop(myMonster, army1, army2, troopN, move, attack);
+    else
+        result = AttackNonRangedTroop(myMonster, army1, army2, troopN, move, attack);
+    if(!result)
+    {
+        if(rangedFirst)
+            result = AttackNonRangedTroop(myMonster, army1, army2, troopN, move, attack);
+        else
+            result = AttackRangedTroop(myMonster, army1, army2, troopN, move, attack);
+    }
+    if(!result)
+    {
+        const Army::Troops &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
+        const Army::army_t &enemyArmy = troopN >= 0 ? army2 : army1;
+        army_t realArmy;
+        for(u16 i = 0; i < enemyArmy.size(); i++)
+            if(enemyArmy[i].isValid())
+                realArmy.push_back(enemyArmy[i]);
+        MoveToClosestTroopInList(realArmy, myTroop, move);
+    }
+}
+
 /** Find a ranged enemy to attack, and set up the destination action and movement points
- *
- *  \note
- *  This is mutually recursive with #Army:AttackNonRangedTroop, but this is not a problem
- *  as the other is only called when all ranged/non-ranged units are unavailable for attack.
  *
  *  \param myMonster[in]  Attacker monster
  *  \param army1[in]      Left army
@@ -650,8 +694,9 @@ void Army::MoveToClosestTroopInList(const Army::army_t &troops, const Army::Troo
  *  \param troopN[in]     Index into #army1 or #army2
  *  \param move[out]      #Point to which to move
  *  \param attack[out]    #Point which to attack
+ *  \return Whether a possible move or attack was found
  */
-void Army::AttackRangedTroop(const Monster::stats_t &myMonster, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, int troopN, Point &move, Point &attack)
+bool Army::AttackRangedTroop(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack)
 {
     const Army::Troops &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
     const Army::army_t &enemyArmy = troopN >= 0 ? army2 : army1;
@@ -668,27 +713,22 @@ void Army::AttackRangedTroop(const Monster::stats_t &myMonster, std::vector<Army
         if(myTroop.shots)
             attack = ranged.front().Position();
         else if(myMonster.fly)
-        {
-            if(!AttackTroopInList(ranged, army1, army2, troopN, move, attack))
-                AttackNonRangedTroop(myMonster, army1, army2, troopN, move, attack);
-        }
+            return AttackTroopInList(ranged, army1, army2, troopN, move, attack);
         else if(!AttackTroopInList(ranged, army1, army2, troopN, move, attack))
         {
             army_t realArmy;
             for(u16 i = 0; i < enemyArmy.size(); i++)
-                if(enemyArmy[i].Count())
+                if(enemyArmy[i].isValid())
                     realArmy.push_back(enemyArmy[i]);
             MoveToClosestTroopInList(realArmy, myTroop, move);
+            return true;
         }
     }
-    else AttackNonRangedTroop(myMonster, army1, army2, troopN, move, attack);
+    return false;
 }
 
 /** Find a non-ranged enemy to attack, and set up the destination action and movement points
  *
- *  \note
- *  This is mutually recursive with #Army:AttackRangedTroop, but this is not a problem
- *  as the other is only called when all ranged/non-ranged units are unavailable for attack.
  *
  *  \param myMonster[in]  Attacker monster
  *  \param army1[in]      Left army
@@ -696,8 +736,9 @@ void Army::AttackRangedTroop(const Monster::stats_t &myMonster, std::vector<Army
  *  \param troopN[in]     Index into #army1 or #army2
  *  \param move[out]      #Point to which to move
  *  \param attack[out]    #Point which to attack
+ *  \return Whether a possible move or attack was found
  */
-void Army::AttackNonRangedTroop(const Monster::stats_t &myMonster, std::vector<Army::Troops> &army1, std::vector<Army::Troops> &army2, int troopN, Point &move, Point &attack)
+bool Army::AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack)
 {
     const Army::Troops &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
     std::vector<Army::Troops> &enemyArmy = troopN >= 0 ? army2 : army1;
@@ -714,20 +755,18 @@ void Army::AttackNonRangedTroop(const Monster::stats_t &myMonster, std::vector<A
         if(myTroop.shots)
             attack = nonranged.front().Position();
         else if(myMonster.fly)
-        {
-            if(!AttackTroopInList(nonranged, army1, army2, troopN, move, attack))
-                AttackRangedTroop(myMonster, army1, army2, troopN, move, attack);
-        }
+            return !AttackTroopInList(nonranged, army1, army2, troopN, move, attack);
         else if(!AttackTroopInList(nonranged, army1, army2, troopN, move, attack))
         {
             army_t realArmy;
             for(u16 i = 0; i < enemyArmy.size(); i++)
-                if(enemyArmy[i].Count())
+                if(enemyArmy[i].isValid())
                     realArmy.push_back(enemyArmy[i]);
             MoveToClosestTroopInList(realArmy, myTroop, move);
+            return true;
         }
     }
-    else AttackRangedTroop(myMonster, army1, army2, troopN, move, attack);
+    else return false;
 }
 
 Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack)
@@ -783,9 +822,7 @@ Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1,
     //TODO: Retreat/surrender
     
     if(myMonster.fly || (myMonster.shots && !close))
-    {
-        AttackRangedTroop(myMonster, army1, army2, troopN, move, attack);
-    }
+        MoveOrAttack(myMonster, army1, army2, troopN, move, attack, true);
     else if(myMonster.shots && close)
     {
         std::vector<Army::Troops> closeEnemies;
@@ -801,9 +838,7 @@ Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1,
         attack = closeEnemies.front().Position();
     }
     else
-    {
-        AttackNonRangedTroop(myMonster, army1, army2, troopN, move, attack);
-    }
+        MoveOrAttack(myMonster, army1, army2, troopN, move, attack, false);
     
     return WIN;
 }
@@ -970,7 +1005,8 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army:
         bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !closeAttack;
         
         //Racial/unit modifiers apply here
-        damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage, ranged);
+        //damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage, ranged);
+        damage = 0;
         
 	// TODO bless and curse
 	//damage *= sk_a;
