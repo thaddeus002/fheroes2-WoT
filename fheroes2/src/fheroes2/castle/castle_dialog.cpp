@@ -887,7 +887,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    if(!castle_heroes || (*castle_heroes).HasArtifact(Artifact::MAGIC_BOOK))
 		OpenMageGuild();
 	    else
-	    if(Dialog::YES == Dialog::BuySpellBook(world.GetMyKingdom().AllowPayment(PaymentConditions::BuySpellBook())) && (*castle_heroes).BuySpellBook())
+	    if((*castle_heroes).BuySpellBook())
 	    {
 		cursor.Hide();
 		selectCastleTroops.Redraw();

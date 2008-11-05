@@ -93,7 +93,7 @@ namespace Dialog
     void SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
     void SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
     void SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill);
-    void SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite);
+    u16  SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons = Dialog::OK);
     void ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs);
 
     // redistribute count
@@ -111,9 +111,6 @@ namespace Dialog
 
     // dialog buy boat
     answer_t BuyBoat(bool enable);
-
-    // dialog buy spell book
-    answer_t BuySpellBook(bool enable);
 
 class Box
 {

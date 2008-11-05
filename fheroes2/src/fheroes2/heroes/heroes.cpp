@@ -32,6 +32,7 @@
 #include "sprite.h"
 #include "rand.h"
 #include "gamearea.h"
+#include "tools.h"
 #include "ai.h"
 #include "heroes.h"
 
@@ -1120,10 +1121,37 @@ bool Heroes::BuySpellBook(void)
 {
     if(spell_book.Active() || Color::GRAY == color) return false;
 
-    PaymentConditions::BuySpellBook payment;
+    Resource::funds_t payment(Resource::GOLD, BUY_SPELL_BOOK_GOLD);
     Kingdom & kingdom = world.GetKingdom(color);
 
-    if( ! kingdom.AllowPayment(payment)) return false;
+    std::string header = "To cast spells, you must first buy a spell book for ";
+    String::AddInt(header, BUY_SPELL_BOOK_GOLD);
+    header += " gold.";
+
+    if( ! kingdom.AllowPayment(payment))
+    {
+	if(Settings::Get().MyColor() == color)
+	Dialog::Message(header, "Unfortunately, you seem to be a little short of cash at the moment.", Font::BIG, Dialog::OK);
+	return false;
+    }
+
+    if(artifacts.size() >= HEROESMAXARTIFACT)
+    {
+	if(Settings::Get().MyColor() == color)
+	Dialog::Message("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book.", "Try giving one of your artifacts to another hero.", Font::BIG, Dialog::OK);
+	return false;
+    }
+
+    if(Settings::Get().MyColor() == color)
+    {
+	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+	Surface sprite(border.w(), border.h());
+
+	sprite.Blit(border);
+	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::MAGIC_BOOK + 1), 5, 5);
+
+	if(Dialog::NO == Dialog::SpriteInfo(header, "Do you wish to buy one?", sprite, Dialog::YES | Dialog::NO)) return false;
+    }
 
     kingdom.OddFundsResource(payment);
 
