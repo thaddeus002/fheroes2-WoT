@@ -1425,10 +1425,15 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_ARTIFACT:
+	    // quantity1 - art, quantity2 - conditions for pickup: 
+	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res,
+	    // 4,5 - need have skill wisard or leadership,
+	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4, other - none
 	    addon = FindArtifact();
 	    if(addon)
 	    {
 		quantity1 = Artifact::FromIndexSprite(addon->index);
+		quantity2 = Rand::Get(1, 18);
 	    }
 	break;
 

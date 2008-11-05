@@ -59,3 +59,11 @@ u16  AI::RecruitTroops(const Heroes & hero, const u16 monster, const u16 count)
 void AI::Marketplace(const Heroes & hero)
 {
 }
+
+// pickup artifact with conditions:
+// 1 - 2500g, 2,3 - 2500g+3res 3000g+5res, 4,5 - need have skill wisard or leadership,
+// 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+ bool AI::PickupArtifact(const Heroes & hero, const Artifact::artifact_t art, const u8 cond)
+{
+    return false;
+}

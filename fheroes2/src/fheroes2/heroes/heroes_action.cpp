@@ -1113,6 +1113,9 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     Surface sprite(border.w(), border.h());
 
+    bool conditions = false;
+    const u8 c = tile.GetQuantity2();
+
     sprite.Blit(border);
     sprite.Blit(AGG::GetICN(ICN::ARTIFACT, art + 1), 5, 5);
 
@@ -1121,49 +1124,166 @@ void Heroes::ActionToArtifact(const u16 dst_index)
     switch(tile.GetObject())
     {
         case MP2::OBJ_SHIPWRECKSURVIROR:
+	    conditions = true;
 	    if(H2Config::MyColor() == GetColor()) Dialog::SpriteInfo(MP2::StringObject(tile.GetObject()), "You've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he rewards you for your act of kindness by giving you the " + Artifact::String(art), sprite);
         break;
 
 	case MP2::OBJ_ARTIFACT:
-/* FIXME: pickup artifact variants
-    {Artifact}
-    You come upon an ancient artifact.  As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.
-    {Artifact}
-    Through a clearing you observe an ancient artifact.  Unfortunately, it's guarded by a nearby %s.  Do you want to fight the %s for the artifact?
-    Victorious, you take your prize, the %s
-    Discretion is the better part of valor, and you decide to avoid this fight for today.
-    {Artifact}
-    You've found the humble dwelling of a withered hermit.  The hermit tells you that he is willing to give the %s to the first wise person he meets.
-    {Artifact}
-    You've come across the spartan quarters of a retired soldier.  The soldier tells you that he is willing to pass on the %s to the first true leader he meets.
-    {Artifact}
-    A leprechaun offers you the %s for the small price of 2000 gold.  Do you wish to buy this artifact?
-    You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
-    Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
-    {Artifact}
-    A leprechaun offers you the %s for the small price of 2500 gold and 3 %s.  Do you wish to buy this artifact?
-    You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
-    Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
-    {Artifact}
-    A leprechaun offers you the %s for the small price of 3000 gold and 5 %s.  Do you wish to buy this artifact?
-    You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.
-    Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.
-*/
-	    if(H2Config::MyColor() == GetColor()) Dialog::SpriteInfo(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), sprite);
+	    if(H2Config::MyColor() != GetColor())
+		conditions = AI::PickupArtifact(*this, art, tile.GetQuantity1());
+	    else
+	    switch(c)
+	    {
+		// 1,2,3 - 2000g, 2500g+3res,3000g+5res
+		case 1:
+		case 2:
+		case 3:
+		{
+		    const Resource::resource_t r = Resource::Rand();
+		    std::string header = "A leprechaun offers you the " + Artifact::String(art) + " for the small price of ";
+		    std::string body;
+		    u32 buttons = 0;
+		    Resource::funds_t payment;
+		    if(1 == c)
+		    {
+			header += "2000 Gold.";
+			payment += Resource::funds_t(Resource::GOLD, 2000);
+		    }
+		    else
+		    if(2 == c)
+		    {
+			header += "2500 Gold and 3 " + Resource::String(r) + ".";
+			payment += Resource::funds_t(Resource::GOLD, 2500);
+			payment += Resource::funds_t(r, 3);
+		    }
+		    else
+		    {
+			header += "3000 Gold and 3 " + Resource::String(r) + ".";
+			payment += Resource::funds_t(Resource::GOLD, 3000);
+			payment += Resource::funds_t(r, 5);
+		    }
+
+		    if(world.GetMyKingdom().AllowPayment(payment))
+		    {
+			buttons = Dialog::YES | Dialog::NO;
+			body = "Do you wish to buy this artifact?";
+		    }
+		    else
+		    {
+			buttons = Dialog::OK;
+			body = "You try to pay the leprechaun, but realize that you can't afford it. The leprechaun stamps his foot and ignores you.";
+		    }
+
+		    if(Dialog::YES == Dialog::SpriteInfo(header, body, sprite, buttons))
+			conditions = true;
+		    else
+			Dialog::Message("Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", "", Font::BIG, Dialog::OK);
+		    break;
+		}
+
+		// 4,5 - need have skill wisard or leadership,
+		case 4:
+		case 5:
+		{
+		    u32 buttons = 0;
+		    std::string header;
+		    std::string body;
+		    if(4 == c)
+		    {
+			buttons = HasSecondarySkill(Skill::Secondary::WISDOM) ? Dialog::YES | Dialog::NO : Dialog::OK;
+			header = "You've found the humble dwelling of a withered hermit.";
+			body = "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.";
+		    }
+		    else
+		    {
+			buttons = HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? Dialog::YES | Dialog::NO : Dialog::OK;
+			header = "You've come across the spartan quarters of a retired soldier.";
+			body = "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.";
+		    }
+		    conditions = Dialog::YES == Dialog::SpriteInfo(header, body, sprite, buttons);
+		    break;
+		}
+
+		// 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		{
+		    bool battle = true;
+		    const u8 count = (c == 6 ? 50 : 1);
+		    const Monster::monster_t mons = (6 == c ? Monster::ROGUE :
+						    (7 == c ? Monster::GENIE :
+						    (8 == c ? Monster::PALADIN :
+						    (9 == c ? Monster::CYCLOPS :
+						    (10== c ? Monster::PHOENIX :
+						    (11== c ? Monster::GREEN_DRAGON :
+						    (12== c ? Monster::TITAN : Monster::BONE_DRAGON )))))));
+		    std::vector<Army::Troops> army(1);
+		    army.at(0).Set(mons, count);
+
+		    if(6 == c)
+			Dialog::Message("You come upon an ancient artifact.", "As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.", Font::BIG, Dialog::OK);
+		    else
+			battle = (Dialog::YES == Dialog::Message("Through a clearing you observe an ancient artifact.",
+						"Unfortunately, it's guarded by a nearby " + Artifact::String(art) + ". Do you want to fight the " + Monster::String(mons) + " for the artifact?",
+						Font::BIG, Dialog::YES | Dialog::NO));
+
+		    Display::Fade();
+
+		    if(battle) switch(Army::Battle(*this, army, tile))
+		    {
+			case Army::WIN:
+			    conditions = true;
+			    Dialog::SpriteInfo("Victorious, you take your prize, the ", Artifact::String(art), sprite);
+			    break;
+
+			case Army::RETREAT:
+			case Army::SURRENDER:
+			case Army::LOSE:
+    			{
+			    AGG::PlaySound(M82::KILLFADE);
+			    FadeOut();
+    			    world.GetKingdom(color).RemoveHeroes(this);
+			    Game::Focus::Get().Reset(Game::Focus::HEROES);
+			    Game::Focus::Get().Redraw();
+    			    SetFreeman();
+			}
+			break;
+        
+    			default: break;
+		    }
+		    else
+			Dialog::Message("Discretion is the better part of valor, and you decide to avoid this fight for today.", "", Font::BIG, Dialog::OK);
+		    break;
+		}
+
+		default:
+		    Dialog::SpriteInfo(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), sprite);
+		    conditions = true;
+		    break;
+	    }
 	break;
 
 	default: break;
     }
 
-    PlayPickupSound();
-    AnimationRemoveObject(tile);
+    if(conditions)
+    {
+	PlayPickupSound();
+	AnimationRemoveObject(tile);
 
-    PickupArtifact(art);
+	PickupArtifact(art);
 
-    tile.RemoveObjectSprite();
-    tile.SetObject(MP2::OBJ_ZERO);
+	tile.RemoveObjectSprite();
+	tile.SetObject(MP2::OBJ_ZERO);
 
-    if(H2Config::Debug()) Error::Verbose("Heroes::ActionToArtifact: " + GetName() + " pickup artifact");
+	if(H2Config::Debug()) Error::Verbose("Heroes::ActionToArtifact: " + GetName() + " pickup artifact");
+    }
 }
 
 void Heroes::ActionToTreasureChest(const u16 dst_index)

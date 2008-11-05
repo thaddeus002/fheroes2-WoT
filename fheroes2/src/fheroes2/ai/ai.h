@@ -22,6 +22,7 @@
 #define H2AI_H
 
 #include "gamedefs.h"
+#include "artifact.h"
 #include "skill.h"
 
 class Heroes;
@@ -33,6 +34,7 @@ namespace AI
     bool JoinTroops(const Heroes & hero, const u16 monster, const u16 count);
     u16  RecruitTroops(const Heroes & hero, const u16 monster, const u16 count);
     void Marketplace(const Heroes & hero);
+    bool PickupArtifact(const Heroes & hero, const Artifact::artifact_t art, const u8 cond);
 };
 
 #endif
