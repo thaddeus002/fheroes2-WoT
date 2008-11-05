@@ -65,6 +65,8 @@ void World::NewMaps(const u16 sw, const u16 sh)
     free_recruit_hero1 = Heroes::UNKNOWN;
     free_recruit_hero2 = Heroes::UNKNOWN;
 
+    week_name = Week::TORTOISE;
+
     // reserve memory
     vec_eventsday.reserve(6);
     vec_eventsmap.reserve(6);
@@ -235,6 +237,8 @@ void World::LoadMaps(const std::string &filename)
 
     free_recruit_hero1 = Heroes::UNKNOWN;
     free_recruit_hero2 = Heroes::UNKNOWN;
+
+    week_name = Week::TORTOISE;
 
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -1160,6 +1164,11 @@ void World::NewWeek(void)
 
     for(; it1 != it2; ++it1)
 	if(*it1 && MP2::isWeekLife((*it1)->GetObject())) (*it1)->UpdateQuantity();
+
+    // update week type
+    week_name = Week::Rand();
+
+    // TODO:: action for week type: PLAGUE and MONSTERS
 }
 
 void World::NewMonth(void)

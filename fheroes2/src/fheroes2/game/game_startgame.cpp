@@ -718,7 +718,15 @@ Game::menu_t Game::HumanTurn(void)
     display.Flip();
 
     // new week dialog
-    if(1 < world.CountWeek() && world.BeginWeek()) Dialog::Message("Astrologers proclaim week of the Tortoise.", "All dwellings increase population.", Font::BIG, Dialog::OK);
+    if(1 < world.CountWeek() && world.BeginWeek())
+    {
+	const Week::type_t name = world.GetWeekType();
+	const std::string message(name == Week::PLAGUE ? "All populations are halved." : "All dwellings increase population.");
+	if(world.BeginMonth())
+	    Dialog::Message("Astrologers proclaim month of the " + Week::GetString(name) + ".", message, Font::BIG, Dialog::OK);
+	else
+	    Dialog::Message("Astrologers proclaim week of the " + Week::GetString(name) + ".", message, Font::BIG, Dialog::OK);
+    }
 
     // startgame loop
     while(le.HandleEvents())

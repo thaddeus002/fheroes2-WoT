@@ -28,6 +28,7 @@
 #include "rect.h"
 #include "maps_tiles.h"
 #include "heroes.h"
+#include "week.h"
 #include "color.h"
 
 class Heroes;
@@ -92,6 +93,7 @@ public:
     u16 CountWeek(void){ return week + 1; };
     bool BeginWeek(void){ return begin_week; };
     bool BeginMonth(void){ return begin_month; };
+    Week::type_t GetWeekType(void) const{ return week_name; };
 
     void NextDay(void);
     void NewWeek(void);
@@ -153,6 +155,8 @@ private:
 
     Heroes::heroes_t free_recruit_hero1;
     Heroes::heroes_t free_recruit_hero2;
+
+    Week::type_t week_name;
     
     static u32 uniq0;
 };
