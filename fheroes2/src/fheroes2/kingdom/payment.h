@@ -360,18 +360,6 @@ namespace PaymentConditions
 	BuyBuilding(const Race::race_t & race, const u32 build);
     };
 
-    class BuySpellBook : public payment_t
-    {
-    public:
-	BuySpellBook();
-    };
-
-    class BuyHero : public payment_t
-    {
-    public:
-	BuyHero();
-    };
-
     class BuyMonster : public payment_t
     {
     public:

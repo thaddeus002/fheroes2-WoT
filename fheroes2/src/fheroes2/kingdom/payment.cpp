@@ -25,16 +25,6 @@
 #include "sprite.h"
 #include "payment.h"
 
-PaymentConditions::BuySpellBook::BuySpellBook()
-{
-    gold = BUY_SPELL_BOOK_GOLD;
-}
-
-PaymentConditions::BuyHero::BuyHero()
-{
-    gold = RECRUIT_HEROES_GOLD;
-}
-
 PaymentConditions::BuyMonster::BuyMonster(const Monster::monster_t & monster)
 {
     gold	= 0;
