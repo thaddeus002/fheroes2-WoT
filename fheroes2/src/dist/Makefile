@@ -13,7 +13,7 @@ LIBS := $(LIBENGINE) $(SDL_LIBS)
 CFLAGS = -I../engine
 
 ifdef DEBUG
-CFLAGS := $(CFLAGS) -O0 -g -Wall -Wextra $(SDL_FLAGS)
+CFLAGS := $(CFLAGS) -O0 -g -Wall $(SDL_FLAGS)
 else
 CFLAGS := $(CFLAGS) -O2 -Wall $(SDL_FLAGS)
 endif
