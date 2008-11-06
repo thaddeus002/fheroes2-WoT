@@ -750,9 +750,9 @@ bool MP2::isWeekLife(const MP2::object_t obj)
     switch(obj)
     {
 	case OBJ_STABLES:
-        case MP2::OBJ_MAGICGARDEN:
-        case MP2::OBJ_WATERWHEEL:
-        case MP2::OBJ_WINDMILL:
+        case OBJ_MAGICGARDEN:
+        case OBJ_WATERWHEEL:
+        case OBJ_WINDMILL:
 	    return true;
 
 	default: break;

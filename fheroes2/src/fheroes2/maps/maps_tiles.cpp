@@ -548,6 +548,26 @@ void Maps::Tiles::DebugInfo(void) const
     // extra obj info
     switch(general)
     {
+	// dwelling
+        case MP2::OBJ_RUINS:
+        case MP2::OBJ_TREECITY:
+        case MP2::OBJ_WAGONCAMP:
+        case MP2::OBJ_DESERTTENT:
+	case MP2::OBJ_TROLLBRIDGE:
+        case MP2::OBJ_DRAGONCITY:
+        case MP2::OBJ_CITYDEAD:
+	//
+        case MP2::OBJ_WATCHTOWER:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_TREEHOUSE:
+        case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUT:
+        case MP2::OBJ_DWARFCOTT:
+        case MP2::OBJ_HALFLINGHOLE:
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT:
+	//
 	case MP2::OBJ_MONSTER:
 	    std::cout << "----------------I--------" << std::endl;
 	    std::cout << "count           : " << GetCountMonster() << std::endl;
@@ -1646,11 +1666,11 @@ void Maps::Tiles::RemoveObjectSprite(void)
 
 u16 Maps::Tiles::GetCountMonster(void) const
 {
-    return (((u16) quantity2 << 8) | quantity1) >> 3;
+    return quantity2 * 0xFF + quantity1;
 }
 
 void Maps::Tiles::SetCountMonster(const u16 count)
 {
-    quantity2 = 0x00FF & (count >> 5);
-    quantity1 = 0x00FF & (count << 3);
+    quantity1 = count % 0xFF;
+    quantity2 = count / 0xFF;
 }

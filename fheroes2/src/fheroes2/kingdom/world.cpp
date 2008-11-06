@@ -910,6 +910,9 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_MONSTER:
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
 		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
+		else
+		    // old format
+		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
 		break;
 
 	    case MP2::OBJ_RNDMONSTER:
@@ -921,6 +924,9 @@ void World::LoadMaps(const std::string &filename)
 		Monster::ChangeTileWithRNDMonster(tile);
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
 		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
+		else
+		    // old format
+		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
 		break;
 
 	    // join dwelling
@@ -938,8 +944,10 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_RUINS:
             case MP2::OBJ_TREECITY:
             case MP2::OBJ_WAGONCAMP:
-            case MP2::OBJ_TROLLBRIDGE:
             case MP2::OBJ_DESERTTENT:
+            case MP2::OBJ_TROLLBRIDGE:
+            case MP2::OBJ_DRAGONCITY:
+            case MP2::OBJ_CITYDEAD:
 		// initial update dwelling population
 		{
 		    const Monster::monster_t monster = Monster::Monster(tile.GetObject());
@@ -968,8 +976,7 @@ void World::LoadMaps(const std::string &filename)
 			case Difficulty::IMPOSSIBLE:count = 0;
 		    }
 
-		    tile.SetQuantity1(count % 0xFF);
-		    tile.SetQuantity2(count / 0xFF);
+		    tile.SetCountMonster(count);
 		}
 		break;
 
@@ -1509,18 +1516,32 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_DWARFCOTT:
             case MP2::OBJ_HALFLINGHOLE:
             case MP2::OBJ_PEASANTHUT:
-            case MP2::OBJ_THATCHEDHUT: break;
+            case MP2::OBJ_THATCHEDHUT:
+	    {
+		const Monster::monster_t monster = Monster::Monster(obj);
+		if(Monster::UNKNOWN == monster) continue;
 
-	    default: continue;
+		tile.SetCountMonster(tile.GetCountMonster() + (Monster::GetGrown(monster)));
+		break;
+	    }
+
+	    case MP2::OBJ_RUINS:
+            case MP2::OBJ_TREECITY:
+            case MP2::OBJ_WAGONCAMP:
+            case MP2::OBJ_DESERTTENT:
+            case MP2::OBJ_TROLLBRIDGE:
+            case MP2::OBJ_DRAGONCITY:
+            case MP2::OBJ_CITYDEAD:
+            {
+		const Monster::monster_t monster = Monster::Monster(obj);
+		if(Monster::UNKNOWN == monster) continue;
+
+		if(0 == tile.GetCountMonster()) tile.SetCountMonster(Monster::GetGrown(monster));
+        	break;
+	    }
+
+	    default: break;;
 	}
-	const Monster::monster_t monster = Monster::Monster(obj);
-	if(Monster::UNKNOWN == monster) continue;
-
-	// save count
-	u32 count = tile.GetQuantity2() * 0xFF + tile.GetQuantity1();
-	count += Monster::GetGrown(monster);
-	tile.SetQuantity1(count % 0xFF);
-	tile.SetQuantity2(count / 0xFF);
     }
 }
 

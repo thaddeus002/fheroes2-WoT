@@ -788,8 +788,11 @@ Monster::monster_t Monster::Monster(const MP2::object_t obj)
 	case MP2::OBJ_RUINS:		return MEDUSA;
         case MP2::OBJ_TREECITY:		return SPRITE;
         case MP2::OBJ_WAGONCAMP:	return ROGUE;
-        case MP2::OBJ_TROLLBRIDGE:	return TROLL;
         case MP2::OBJ_DESERTTENT:	return NOMAD;
+
+        case MP2::OBJ_TROLLBRIDGE:	return TROLL;
+        case MP2::OBJ_DRAGONCITY:	return RED_DRAGON;
+        case MP2::OBJ_CITYDEAD:		return POWER_LICH;
 
         case MP2::OBJ_ANCIENTLAMP:	return GENIE;
 
