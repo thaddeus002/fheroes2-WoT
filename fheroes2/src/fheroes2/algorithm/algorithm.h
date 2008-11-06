@@ -20,6 +20,17 @@
 #ifndef H2ALGORITHM_H
 #define H2ALGORITHM_H
 
+#include "army.h"
 #include "gamedefs.h"
+
+class Heroes;
+class Castle;
+
+namespace Algorithm
+{
+    u16 CalculateExperience(const Army::army_t & army);
+    u16 CalculateExperience(const Heroes & hero);
+    u16 CalculateExperience(const Castle &castle);
+};
 
 #endif

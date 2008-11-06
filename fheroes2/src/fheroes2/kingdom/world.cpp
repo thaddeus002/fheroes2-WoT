@@ -907,6 +907,10 @@ void World::LoadMaps(const std::string &filename)
     		tile.UpdateQuantity();
 		break;
 
+	    case MP2::OBJ_ANCIENTLAMP:
+		    tile.SetCountMonster(Rand::Get(2, 4));
+		break;
+
 	    case MP2::OBJ_MONSTER:
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
 		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));

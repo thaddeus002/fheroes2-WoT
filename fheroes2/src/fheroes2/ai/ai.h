@@ -22,7 +22,6 @@
 #define H2AI_H
 
 #include "gamedefs.h"
-#include "artifact.h"
 #include "skill.h"
 
 class Heroes;
@@ -31,10 +30,8 @@ namespace AI
 {
     Skill::Secondary::skill_t SelectSkill(const Heroes & hero, const Skill::Secondary & sec1, const Skill::Secondary & sec2);
     bool SelectGoldOrExp(const Heroes & hero, const u16 gold, const u16 expr);
-    bool JoinTroops(const Heroes & hero, const u16 monster, const u16 count);
-    u16  RecruitTroops(const Heroes & hero, const u16 monster, const u16 count);
-    void Marketplace(const Heroes & hero);
-    bool PickupArtifact(const Heroes & hero, const Artifact::artifact_t art, const u8 cond);
+
+    void HeroesAction(Heroes & hero, const u16 dst_index);
 };
 
 #endif

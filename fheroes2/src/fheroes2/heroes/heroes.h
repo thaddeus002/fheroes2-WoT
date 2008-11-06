@@ -126,11 +126,15 @@ public:
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
     u8 GetKnowledge(void) const;
-    u16 GetMaxSpellPoints(void) const;
-    u16 GetSpellPoints(void) const;
+    void IncreasePrimarySkill(const Skill::Primary::skill_t skill);
+
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
     u8 GetLevel(void) const;
+
+    u16 GetMaxSpellPoints(void) const;
+    u16 GetSpellPoints(void) const;
+    void SetSpellPoints(const u16 point);
 
     u16 GetMaxMovePoints(void) const;
     u16 GetMovePoints(void) const;
@@ -138,13 +142,16 @@ public:
     void ResetMovePoints(void) { move_point = 0; };
 
     bool HasSecondarySkill(const Skill::Secondary::skill_t skill) const;
+    u8   CountSecondarySkill(void) const;
     Skill::Level::type_t GetLevelSkill(const Skill::Secondary::skill_t skill) const;
     void LearnBasicSkill(const Skill::Secondary::skill_t skill);
     void LevelUpSkill(const Skill::Secondary::skill_t skill);
+    void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
 
     const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
     bool PickupArtifact(const Artifact::artifact_t & art);
     bool HasArtifact(const Artifact::artifact_t & art) const;
+    bool MaxCountArtifact(void) const;
 
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;
@@ -193,12 +200,10 @@ public:
     void FadeOut(void) const;
     void FadeIn(void) const;
 
-    void PlayWalkSound(void) const;
-    void PlayPickupSound(void) const;
-
     bool isShipMaster(void) const;
     void SetShipMaster(bool f);
 
+    void SaveUnderObject(MP2::object_t obj);
     MP2::object_t GetUnderObject(void) const;
 
     u32 GetExperience(void) const;
@@ -212,40 +217,9 @@ public:
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
 
-    bool spellCasted;
-
-protected:
     bool JoinTroops(const Monster::monster_t, const u16 count);
 
-    void ActionToCastle(const u16 dst_index);
-    void ActionToHeroes(const u16 dst_index);
-    void ActionToMonster(const u16 dst_index);
-    void ActionToBoat(const u16 dst_index);
-    void ActionToCoast(const u16 dst_index);
-    void ActionToWagon(const u16 dst_index);
-    void ActionToSkeleton(const u16 dst_index);
-    void ActionToResource(const u16 dst_index);
-    void ActionToPickupResource(const u16 dst_index);
-    void ActionToFlotSam(const u16 dst_index);
-    void ActionToArtifact(const u16 dst_index);
-    void ActionToShrine(const u16 dst_index);
-    void ActionToWitchsHut(const u16 dst_index);
-    void ActionToLuckObject(const u16 dst_index);
-    void ActionToSign(const u16 dst_index);
-    void ActionToMagicWell(const u16 dst_index);
-    void ActionToTradingPost(void);
-    void ActionToPrimarySkillObject(const u16 dst_index);
-    void ActionToMoraleObject(const u16 dst_index);
-    void ActionToExperienceObject(const u16 dst_index);
-    void ActionToTreasureChest(const u16 dst_index);
-    void ActionToAncientLamp(const u16 dst_index);
-    void ActionToTeleports(const u16 dst_index);
-    void ActionToCaptureObject(const u16 dst_index);
-    void ActionToJoinArmy(const u16 dst_index);
-    void ActionToRecruitArmy(const u16 dst_index);
-
-    void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
-
+    bool spellCasted;
 private:
     std::string		name;
     Color::color_t	color;

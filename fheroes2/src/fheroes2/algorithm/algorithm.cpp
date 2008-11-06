@@ -18,4 +18,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "heroes.h"
+#include "castle.h"
 #include "algorithm.h"
+
+u16 Algorithm::CalculateExperience(const Army::army_t & army)
+{
+    return 1000;
+}
+
+u16 Algorithm::CalculateExperience(const Heroes & hero)
+{
+    return 1000;
+}
+
+u16 Algorithm::CalculateExperience(const Castle & castle)
+{
+    return 1000;
+}

@@ -638,6 +638,18 @@ u8 Heroes::GetKnowledge(void) const
     return result;
 }
 
+void Heroes::IncreasePrimarySkill(const Skill::Primary::skill_t skill)
+{
+    switch(skill)
+    {
+	case Skill::Primary::ATTACK:	++attack; break;
+	case Skill::Primary::DEFENCE:	++defence; break;
+	case Skill::Primary::POWER:	++power; break;
+	case Skill::Primary::KNOWLEDGE:	++knowledge; break;
+	default: break;
+    }
+}
+
 u32 Heroes::GetExperience(void) const
 {
     return experience;
@@ -651,6 +663,11 @@ u16 Heroes::GetSpellPoints(void) const
 u16 Heroes::GetMovePoints(void) const
 {
     return move_point;
+}
+
+void Heroes::SetSpellPoints(const u16 point)
+{
+    magic_point = point;
 }
 
 u16 Heroes::GetMaxSpellPoints(void) const
@@ -1190,6 +1207,11 @@ void Heroes::SetMove(bool f)
     enable_move = f;
 }
 
+void Heroes::SaveUnderObject(MP2::object_t obj)
+{
+    save_maps_general = obj;
+}
+
 MP2::object_t Heroes::GetUnderObject(void) const
 {
     return save_maps_general;
@@ -1205,58 +1227,14 @@ void Heroes::SetShipMaster(bool f)
     shipmaster = f;
 }
 
-void Heroes::PlayWalkSound(void) const
-{
-    if(GetColor() != H2Config::MyColor()) return;
-
-    M82::m82_t wav = M82::UNKNOWN;
-    
-    const u8 speed = 3;
-
-    // play sound
-    switch(world.GetTiles(mp).GetGround())
-    {
-        case Maps::Ground::WATER:	wav = (1 == speed ? M82::WSND00 : (2 == speed ? M82::WSND10 : M82::WSND20)); break;
-        case Maps::Ground::GRASS:	wav = (1 == speed ? M82::WSND01 : (2 == speed ? M82::WSND11 : M82::WSND21)); break;
-        case Maps::Ground::WASTELAND:	wav = (1 == speed ? M82::WSND02 : (2 == speed ? M82::WSND12 : M82::WSND22)); break;
-        case Maps::Ground::SWAMP:
-        case Maps::Ground::BEACH:	wav = (1 == speed ? M82::WSND03 : (2 == speed ? M82::WSND13 : M82::WSND23)); break;
-        case Maps::Ground::LAVA:	wav = (1 == speed ? M82::WSND04 : (2 == speed ? M82::WSND14 : M82::WSND24)); break;
-        case Maps::Ground::DESERT:
-        case Maps::Ground::SNOW:	wav = (1 == speed ? M82::WSND05 : (2 == speed ? M82::WSND15 : M82::WSND25)); break;
-        case Maps::Ground::DIRT:	wav = (1 == speed ? M82::WSND06 : (2 == speed ? M82::WSND16 : M82::WSND26)); break;
-
-        default: return;
-    }
-
-    AGG::PlaySound(wav);
-}
-
-void Heroes::PlayPickupSound(void) const
-{
-    if(GetColor() != H2Config::MyColor()) return;
-
-    M82::m82_t wav = M82::UNKNOWN;
-
-    switch(Rand::Get(1, 7))
-    {
-	case 1:	wav = M82::PICKUP01; break;
-	case 2:	wav = M82::PICKUP02; break;
-	case 3:	wav = M82::PICKUP03; break;
-	case 4:	wav = M82::PICKUP04; break;
-	case 5:	wav = M82::PICKUP05; break;
-	case 6:	wav = M82::PICKUP06; break;
-	case 7:	wav = M82::PICKUP07; break;
-
-	default: return;
-    }
-
-    AGG::PlaySound(wav);
-}
-
 bool Heroes::HasSecondarySkill(const Skill::Secondary::skill_t skill) const
 {
     return Skill::Level::NONE != GetLevelSkill(skill);
+}
+
+u8 Heroes::CountSecondarySkill(void) const
+{
+    return secondary_skills.size();
 }
 
 Skill::Level::type_t Heroes::GetLevelSkill(const Skill::Secondary::skill_t skill) const
@@ -1305,11 +1283,21 @@ void Heroes::Scoute(void)
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
 {
-    if(HasArtifact(art) || HEROESMAXARTIFACT <= artifacts.size()) return false;
-    
+    if(HasArtifact(art)) return false;
+    if(MaxCountArtifact())
+    {
+	if(H2Config::MyColor() == color) Dialog::Message("Warning", "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
+	return false;
+    }
+
     artifacts.push_back(art);
     
     return true;
+}
+
+bool Heroes::MaxCountArtifact(void) const
+{
+    return HEROESMAXARTIFACT <= artifacts.size();
 }
 
 /* set cente from index maps */
@@ -1569,6 +1557,9 @@ bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
 	    return true;
 	}
     }
+
+    if(H2Config::MyColor() == GetColor())
+	Dialog::Message(Monster::String(mon), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 
     return false;
 }
