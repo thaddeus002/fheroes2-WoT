@@ -1525,7 +1525,7 @@ void World::UpdateDwellingPopulation(void)
 		const Monster::monster_t monster = Monster::Monster(obj);
 		if(Monster::UNKNOWN == monster) continue;
 
-		tile.SetCountMonster(tile.GetCountMonster() + (Monster::GetGrown(monster)));
+		tile.SetCountMonster(tile.GetCountMonster() + Monster::GetGrown(monster));
 		break;
 	    }
 
@@ -1540,7 +1540,7 @@ void World::UpdateDwellingPopulation(void)
 		const Monster::monster_t monster = Monster::Monster(obj);
 		if(Monster::UNKNOWN == monster) continue;
 
-		if(0 == tile.GetCountMonster()) tile.SetCountMonster(Monster::GetGrown(monster));
+		if(0 == tile.GetCountMonster()) tile.SetCountMonster(tile.GetCountMonster() + Monster::GetGrown(monster));
         	break;
 	    }
 
