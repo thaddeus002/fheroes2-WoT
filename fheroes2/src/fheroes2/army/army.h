@@ -129,7 +129,7 @@ namespace Army
 	
 	u8 GetCursorIndex(void) const{ return cursor_index; };
 
-	void Redraw(void);
+	void Redraw(const u8 alpha = 0xFF);
 	void Reset(void);
 	void Select(u8 index);
 

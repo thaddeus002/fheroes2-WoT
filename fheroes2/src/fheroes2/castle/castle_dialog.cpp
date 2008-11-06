@@ -769,8 +769,10 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle))
 	{
+	    const Heroes * prev = castle_heroes;
 	    const building_t build = OpenTown();
-	    
+	    const bool buyhero = ((castle_heroes != prev) && (castle_heroes != NULL));
+
 	    if(Castle::BUILD_NOTHING != build)
 	    {
 		cursor.Hide();
@@ -799,47 +801,54 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
+		if(selectHeroesTroops) delete selectHeroesTroops;
+		dst_pt.x = cur_pt.x + 112;
+		dst_pt.y = cur_pt.y + 361;
+		selectHeroesTroops = new Army::SelectBar(dst_pt, (*castle_heroes).GetArmy());
+
 		// play sound
-		AGG::PlaySound(M82::BUILDTWN);
 		const Surface & port = Portrait::Hero((*castle_heroes).GetHeroes(), Portrait::BIG);
 		Surface sf(port.w(), port.h());
 		sf.SetColorKey();
 		sf.Blit(port);
-//		display.Blit(Portrait::Hero((*castle_heroes).GetHeroes(), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
 
-		LocalEvent & le = LocalEvent::GetLocalEvent();
-		u32 ticket = 0;
-		u8 alpha = 0;
-
-		while(le.HandleEvents() && alpha < 250)
+		if(buyhero)
 		{
-    		    if(!(ticket % ANIMATION_HIGH))
-    		    {
-        		sf.SetAlpha(alpha);
-        		display.Blit(sf, cur_pt.x + 5, cur_pt.y + 361);
-        		display.Flip();
-        		alpha += 10;
-    		    }
+		    AGG::PlaySound(M82::BUILDTWN);
+		    LocalEvent & le = LocalEvent::GetLocalEvent();
+		    u32 ticket = 0;
+		    u8 alpha = 0;
 
-    		    ++ticket;
+		    while(le.HandleEvents() && alpha < 250)
+		    {
+    			if(!(ticket % ANIMATION_HIGH))
+    			{
+        		    sf.SetAlpha(alpha);
+        		    display.Blit(sf, cur_pt.x + 5, cur_pt.y + 361);
+			    selectHeroesTroops->Redraw(alpha);
+        		    display.Flip();
+        		    alpha += 10;
+    			}
+
+    			++ticket;
+		    }
+
+		    RedrawResourcePanel();
 		}
 
-		RedrawResourcePanel();
-
-		if(selectHeroesTroops) delete selectHeroesTroops;
+		display.Blit(Portrait::Hero((*castle_heroes).GetHeroes(), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
 
     		dst_pt.x = cur_pt.x;
         	dst_pt.y = cur_pt.y + 256;
                 display.Blit(AGG::GetICN(ICN::STRIP, 0), dst_pt);
 
-		dst_pt.x = cur_pt.x + 112;
-		dst_pt.y = cur_pt.y + 361;
-		selectHeroesTroops = new Army::SelectBar(dst_pt, (*castle_heroes).GetArmy());
-
 		coordsHeroesTroops = &selectHeroesTroops->GetCoords();
 
-		selectHeroesTroops->Reset();
-		selectHeroesTroops->Redraw();
+		if(selectHeroesTroops)
+		{
+		    selectHeroesTroops->Reset();
+		    selectHeroesTroops->Redraw();
+		}
 
 		cursor.Show();
 		display.Flip();
