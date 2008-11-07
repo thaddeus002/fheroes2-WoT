@@ -753,6 +753,7 @@ bool MP2::isWeekLife(const MP2::object_t obj)
         case OBJ_MAGICGARDEN:
         case OBJ_WATERWHEEL:
         case OBJ_WINDMILL:
+        case OBJ_ARTESIANSPRING:
 	    return true;
 
 	default: break;

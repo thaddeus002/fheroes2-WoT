@@ -67,6 +67,7 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index);
 void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index);
 void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index);
 void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index);
+void ActionToArtesianSpring(Heroes &hero, const u16 dst_index);
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
@@ -345,6 +346,8 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_CITYDEAD:
         case MP2::OBJ_TROLLBRIDGE:	ActionToDwellingBattleMonster(*this, dst_index); break;
 
+        case MP2::OBJ_ARTESIANSPRING:	ActionToArtesianSpring(*this, dst_index); break;
+
         // object
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_OBELISK:
@@ -352,7 +355,6 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_SPHINX:
-        case MP2::OBJ_ARTESIANSPRING:
         case MP2::OBJ_XANADU:
         case MP2::OBJ_FREEMANFOUNDRY:
 
@@ -2089,4 +2091,24 @@ void ActionToObservationTower(Heroes &hero, const u16 dst_index)
 
     Dialog::Message(MP2::StringObject(tile.GetObject()), "From the observation tower, you are able to see distant lands.", Font::BIG, Dialog::OK);
     Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, hero.GetColor());
+}
+
+void ActionToArtesianSpring(Heroes &hero, const u16 dst_index)
+{
+    const u16 max = hero.GetMaxSpellPoints();
+    const std::string & name = MP2::StringObject(MP2::OBJ_ARTESIANSPRING);
+
+    if(hero.isVisited(MP2::OBJ_ARTESIANSPRING))
+	Dialog::Message(name, "The spring only refills once a week, and someone's already been here this week.", Font::BIG, Dialog::OK);
+    else
+    if(hero.GetSpellPoints() == max * 2)
+	Dialog::Message(name, "A drink at the spring is supposed to give you twice your normal spell points, but you are already at that level.", Font::BIG, Dialog::OK);
+    else
+    {
+	hero.SetVisited(dst_index);
+	hero.SetSpellPoints(max * 2);
+	Dialog::Message(name, "A drink from the spring fills your blood with magic!  You have twice your normal spell points in reserve.", Font::BIG, Dialog::OK);
+    }
+
+    if(H2Config::Debug()) Error::Verbose("ActionToArtesianSpring: " + hero.GetName());
 }
