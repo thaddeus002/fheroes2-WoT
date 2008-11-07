@@ -1672,8 +1672,12 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 
     if(Dialog::YES == Dialog::Message("You come upon an abandoned gold mine.", "The mine appears to be haunted. Do you wish to enter?", Font::BIG, Dialog::YES | Dialog::NO))
     {
-	std::vector<Army::Troops> army(1);
+	std::vector<Army::Troops> army(5);
 	army.at(0).Set(Monster::GHOST, tile.GetQuantity1());
+	army.at(1).Set(Monster::GHOST, tile.GetQuantity1());
+	army.at(2).Set(Monster::GHOST, tile.GetQuantity1());
+	army.at(3).Set(Monster::GHOST, tile.GetQuantity1());
+	army.at(4).Set(Monster::GHOST, tile.GetQuantity1());
 	const u16 exp = Algorithm::CalculateExperience(army);
 	const Army::battle_t b = Army::Battle(hero, army, tile);
 
