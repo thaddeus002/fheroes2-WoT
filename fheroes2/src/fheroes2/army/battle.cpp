@@ -174,7 +174,7 @@ Army::battle_t Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const
 
 Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile)
 {
-    return LOSE; // TODO
+    return WIN; // TODO
 }
 
 void Army::BattleSummaryVsArmy(Heroes &hero, const Army::army_t &heroOrig, const Army::army_t &army, const Army::army_t &armyOrig, Army::battle_t status)
