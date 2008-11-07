@@ -1689,7 +1689,7 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 		tile.SetQuantity1(0);
 		tile.UpdateAbandoneMine();
 		world.CaptureObject(dst_index, hero.GetColor());
-		world.GetTiles(dst_index).CaptureFlags32(obj, hero.GetColor());
+		world.GetTiles(dst_index).CaptureFlags32(MP2::OBJ_MINES, hero.GetColor());
 		hero.ActionAfterBattle();
 		break;
 
