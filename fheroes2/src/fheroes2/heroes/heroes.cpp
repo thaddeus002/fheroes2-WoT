@@ -660,6 +660,11 @@ u16 Heroes::GetSpellPoints(void) const
     return magic_point;
 }
 
+void Heroes::IncreaseMovePoints(const u16 point)
+{
+    move_point += point;
+}
+
 u16 Heroes::GetMovePoints(void) const
 {
     return move_point;
@@ -799,6 +804,7 @@ Morale::morale_t Heroes::GetMorale(void) const
     // object visited
     if(isVisited(MP2::OBJ_BUOY)) ++result;
     if(isVisited(MP2::OBJ_OASIS)) ++result;
+    if(isVisited(MP2::OBJ_WATERINGHOLE)) ++result;
     if(isVisited(MP2::OBJ_TEMPLE)) result += 2;
     if(isVisited(MP2::OBJ_GRAVEYARD)) --result;
     if(isVisited(MP2::OBJ_SHIPWRECK)) --result;
@@ -908,6 +914,7 @@ Luck::luck_t Heroes::GetLuck(void) const
     if(isVisited(MP2::OBJ_FAERIERING)) ++result;
     if(isVisited(MP2::OBJ_FOUNTAIN)) ++result;
     if(isVisited(MP2::OBJ_IDOL)) ++result;
+    if(isVisited(MP2::OBJ_PYRAMID)) result -= 2;
 
     // bonus in castle and sorceress rainbow
     const Castle* castle = inCastle();

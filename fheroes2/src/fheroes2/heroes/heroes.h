@@ -139,6 +139,7 @@ public:
 
     u16 GetMaxMovePoints(void) const;
     u16 GetMovePoints(void) const;
+    void IncreaseMovePoints(const u16 point);
     bool MayStillMove(void) const;
     void ResetMovePoints(void) { move_point = 0; };
 

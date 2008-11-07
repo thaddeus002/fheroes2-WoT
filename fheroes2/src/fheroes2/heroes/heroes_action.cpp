@@ -108,6 +108,30 @@ u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const A
     return Dialog::SpriteInfo(hdr, msg, image);
 }
 
+u16 DialogMorale(const std::string & hdr, const std::string & msg, const bool good, u8 count)
+{
+    if(1 > count) count = 1;
+    if(3 < count) count = 3;
+    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 2 : 3));
+    u8 offset = sprite.w() / count;
+    Surface image(sprite.w() + offset * (count - 1), sprite.h());
+    image.SetColorKey();
+    for(u8 ii = 0; ii < count; ++ii) image.Blit(sprite, offset * ii, 0);
+    return Dialog::SpriteInfo(hdr, msg, image);
+}
+
+u16 DialogLuck(const std::string & hdr, const std::string & msg, const bool good, u8 count)
+{
+    if(1 > count) count = 1;
+    if(3 < count) count = 3;
+    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 0 : 1));
+    u8 offset = sprite.w() / count;
+    Surface image(sprite.w() + offset * (count - 1), sprite.h());
+    image.SetColorKey();
+    for(u8 ii = 0; ii < count; ++ii) image.Blit(sprite, offset * ii, 0);
+    return Dialog::SpriteInfo(hdr, msg, image);
+}
+
 void BattleLose(Heroes &hero, const u8 reason)
 {
     AGG::PlaySound(M82::KILLFADE);
@@ -276,6 +300,7 @@ void Heroes::Action(const u16 dst_index)
         // morale modification
         case MP2::OBJ_OASIS:
         case MP2::OBJ_TEMPLE:
+        case MP2::OBJ_WATERINGHOLE:
         case MP2::OBJ_BUOY:		ActionToGoodMoraleObject(*this, dst_index); break;
 
 	case MP2::OBJ_DERELICTSHIP:
@@ -326,7 +351,6 @@ void Heroes::Action(const u16 dst_index)
 	case MP2::OBJ_ORACLE:
         case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_HILLFORT:
-        case MP2::OBJ_WATERINGHOLE:
         case MP2::OBJ_SPHINX:
         case MP2::OBJ_ARTESIANSPRING:
         case MP2::OBJ_XANADU:
@@ -380,6 +404,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     {
 	case Army::WIN:
 	{
+	    hero.IncreaseExperience(exp);
 	    Maps::TilesAddon *addon = tile.FindMonster();
 	    if(addon)
 	    {
@@ -394,7 +419,6 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 		    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 	    }
 	    hero.ActionAfterBattle();
-	    hero.IncreaseExperience(exp);
 	    break;
 	}
 
@@ -429,11 +453,11 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
 	switch(b)
 	{
 	    case Army::WIN:
+		hero.IncreaseExperience(exp);
 		AGG::PlaySound(M82::KILLFADE);
 		(*other_hero).FadeOut();
     		world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
     		const_cast<Heroes &>(*other_hero).SetFreeman(b);
-		hero.IncreaseExperience(exp);
 		hero.ActionAfterBattle();
 		break;
 
@@ -473,12 +497,12 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
 	switch(b)
 	{
 	    case Army::WIN:
+		hero.IncreaseExperience(exp);
 		world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
 		world.GetKingdom(hero.GetColor()).AddCastle(castle);
 		const_cast<Castle *>(castle)->ChangeColor(hero.GetColor());
 		Game::Focus::Get().Reset(Game::Focus::CASTLE);
 		Game::Focus::Get().Redraw();
-		hero.IncreaseExperience(exp);
 		hero.ActionAfterBattle();
 		break;
 
@@ -874,7 +898,7 @@ void ActionToGoodLuckObject(Heroes &hero, const u16 dst_index)
 	// modify luck
         hero.SetVisited(dst_index);
 	AGG::PlaySound(M82::GOODLUCK);
-        Dialog::SpriteInfo(MP2::StringObject(obj), body_true, AGG::GetICN(ICN::EXPMRL, 0));
+	DialogLuck(MP2::StringObject(obj), body_true, true, 1);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToGoodLuckObject: " + hero.GetName());
@@ -882,38 +906,81 @@ void ActionToGoodLuckObject(Heroes &hero, const u16 dst_index)
 
 void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 {
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
-
-    std::string body_true;
-    std::string body_false;
+    const bool battle = tile.GetQuantity1();
+    bool complete = false;
+    std::string body;
 
     switch(obj)
     {
         case MP2::OBJ_PYRAMID:
-/*
-You come upon the pyramid of a great and ancient king.  You are tempted to search it for treasure, but all the old stories
- warn of fearful curses and undead guardians.  Will you search?
- You come upon the pyramid of a great and ancient king.  Routine exploration reveals that the pyramid is completely empty.
- Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell -
- %s'%s'.
- Unfortunately, you have no Magic Book to record the spell with.
-Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.
-*/
+    	    if(battle)
+    	    {
+		if(Dialog::YES == Dialog::Message("You come upon the pyramid of a great and ancient king.", "You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians. Will you search?", Font::BIG, Dialog::OK))
+		{
+		    // battle
+		    std::vector<Army::Troops> army(5);
+		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
+		    army.at(0).Set(Monster::LORD_VAMPIRE, 10);
+		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
+		    army.at(0).Set(Monster::LORD_VAMPIRE, 10);
+		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
+
+		    // battle
+		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    switch(b)
+		    {
+			case Army::WIN:
+			{
+			    hero.IncreaseExperience(exp);
+			    complete = true;
+			    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
+			    // check magick book
+			    if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
+				Dialog::Message(MP2::StringObject(obj), "Unfortunately, you have no Magic Book to record the spell with.", Font::BIG, Dialog::OK);
+			    else
+			    // check skill level for wisdom
+			    if(Skill::Level::EXPERT > hero.GetLevelSkill(Skill::Secondary::WISDOM))
+			    	Dialog::Message(MP2::StringObject(obj), "Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.", Font::BIG, Dialog::OK);
+			    else
+			    {
+				Dialog::SpellInfo(Spell::String(spell), "Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell.", spell, true);
+				hero.AppendSpellToBook(spell);
+			    }
+			    hero.ActionAfterBattle();
+			    break;
+			}
+			case Army::RETREAT:
+			case Army::SURRENDER:
+			case Army::LOSE:
+			    BattleLose(hero, b);
+			    break;
+        
+    			default: break;
+		    }
+		}
+    	    }
+    	    else
+    		body = "You come upon the pyramid of a great and ancient king. Routine exploration reveals that the pyramid is completely empty.";
     	    break;
 
     	default: return;
     }
 
-    // check already visited
-    //if(hero.isVisited(obj))
-//	Dialog::Message(MP2::StringObject(obj), body_false, Font::BIG, Dialog::OK);
-//    else
+    if(complete)
+    {
+	tile.SetQuantity1(0);
+	tile.SetQuantity2(0);
+    }
+    else
+    if(!battle && !hero.isVisited(obj))
     {
 	// modify luck
         hero.SetVisited(dst_index);
 	AGG::PlaySound(M82::BADLUCK);
-        Dialog::SpriteInfo(MP2::StringObject(obj), body_true, AGG::GetICN(ICN::EXPMRL, 0));
+	DialogLuck(MP2::StringObject(obj), body, false, 2);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToPoorLuckObject: " + hero.GetName());
@@ -1010,7 +1077,8 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 
     const bool battle = (tile.GetQuantity1() || tile.GetQuantity2());
     bool complete = false;
-
+    std::string body;
+    
     switch(obj)
     {
         case MP2::OBJ_GRAVEYARD:
@@ -1032,6 +1100,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    {
 			case Army::WIN:
 			{
+			    hero.IncreaseExperience(exp);
 			    complete = true;
 			    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
 			    Resource::funds_t resource;
@@ -1039,7 +1108,6 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 			    DialogWithArtifactAndGold(MP2::StringObject(obj), "Upon defeating the zomies you search the graves and find something!", art, resource.gold);
 			    hero.PickupArtifact(art);
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.IncreaseExperience(exp);
 			    hero.ActionAfterBattle();
 			    break;
 			}
@@ -1054,8 +1122,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		}
     	    }
     	    else
-    		Dialog::Message("Upon defeating the Zombies you spend several hours searching the graves and find nothing.", "Such a despicable act reduces your army's morale.", Font::BIG, Dialog::OK);
-
+    		body = "Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.";
     	    break;
 
         case MP2::OBJ_SHIPWRECK:
@@ -1101,6 +1168,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    {
 			case Army::WIN:
 			{
+			    hero.IncreaseExperience(exp);
 			    complete = true;
 			    if(art == Artifact::UNKNOWN)
 				DialogWithGold(MP2::StringObject(obj), "Upon defeating the Ghosts you sift through the debris and find something!", resource.gold);
@@ -1110,7 +1178,6 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 				hero.PickupArtifact(art);
 			    }
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.IncreaseExperience(exp);
 			    hero.ActionAfterBattle();
 			    break;
 			}
@@ -1125,7 +1192,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		}
     	    }
     	    else
-    		Dialog::Message("Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing.", "Such a despicable act reduces your army's morale.", Font::BIG, Dialog::OK);
+    		body = "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
     	    break;
 
         case MP2::OBJ_DERELICTSHIP:
@@ -1147,12 +1214,12 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    {
 			case Army::WIN:
 			{
+			    hero.IncreaseExperience(exp);
 			    complete = true;
 			    Resource::funds_t resource;
 			    resource.gold = tile.GetQuantity2() * 100;
 			    DialogWithGold(MP2::StringObject(obj), "Upon defeating the Skeletons you sift through the debris and find something!", resource.gold);
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.IncreaseExperience(exp);
 			    hero.ActionAfterBattle();
 			    break;
 			}
@@ -1167,7 +1234,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		}
     	    }
     	    else
-    		Dialog::Message("Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing.", "Such a despicable act reduces your army's morale.", Font::BIG, Dialog::OK);
+    		body = "Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
     	    break;
 
     	default: return;
@@ -1184,7 +1251,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 	// modify morale
 	hero.SetVisited(dst_index);
 	AGG::PlaySound(M82::BADMRLE);
-	//Dialog::SpriteInfo(MP2::StringObject(obj), body_true, AGG::GetICN(ICN::EXPMRL, 2));
+	DialogMorale(MP2::StringObject(obj), body, false, 1);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToPoorMoraleObject: " + hero.GetName());
@@ -1208,6 +1275,13 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
         case MP2::OBJ_OASIS:
     	    body_false = "The drink at the oasis is refreshing, but offers no further benefit. The oasis might help again if you fought a battle first.";
     	    body_true = "A drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.";
+    	    hero.IncreaseMovePoints(800);	// + 8TP, from FAQ
+    	    break;
+
+        case MP2::OBJ_WATERINGHOLE:
+    	    body_false = "The drink at the watering hole is refreshing, but offers no further benefit. The watering hole might help again if you fought a battle first.";
+	    body_true = "A drink at the watering hole fills your troops with strength and lifts their spirits. You can travel a bit further today.";
+    	    hero.IncreaseMovePoints(400);	// + 4TP, from FAQ
     	    break;
 
         case MP2::OBJ_TEMPLE:
@@ -1226,7 +1300,7 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
 	// modify morale
 	hero.SetVisited(dst_index);
 	AGG::PlaySound(M82::GOODMRLE);
-	Dialog::SpriteInfo(MP2::StringObject(obj), body_true, AGG::GetICN(ICN::EXPMRL, 2));
+	DialogMorale(MP2::StringObject(obj), body_true, true, (obj == MP2::OBJ_TEMPLE ? 2 : 1));
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToGoodMoraleObject: " + hero.GetName());
@@ -1408,9 +1482,9 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 			switch(b)
 			{
 			    case Army::WIN:
+			    hero.IncreaseExperience(exp);
 			    conditions = true;
 			    DialogWithArtifact("Victorious, you take your prize, the ", Artifact::String(art), art);
-			    hero.IncreaseExperience(exp);
 			    hero.ActionAfterBattle();
 			    break;
 
@@ -1887,9 +1961,9 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		    switch(b)
 		    {
 			case Army::WIN:
+			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    complete = (Dialog::YES == Dialog::Message("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price.", "Do you want to recruit Liches?", Font::BIG, Dialog::YES | Dialog::NO));
-			    hero.IncreaseExperience(exp);
 			    hero.ActionAfterBattle();
 			break;
 
@@ -1933,9 +2007,9 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		    switch(b)
 		    {
 			case Army::WIN:
+			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    complete = (Dialog::YES == Dialog::Message("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries.", "Do you want to buy any Trolls?", Font::BIG, Dialog::YES | Dialog::NO));
-			    hero.IncreaseExperience(exp);
 			    hero.ActionAfterBattle();
 			break;
 
@@ -1977,9 +2051,9 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		    switch(b)
 		    {
 			case Army::WIN:
+			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    complete = (Dialog::YES == Dialog::Message("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.", "Do you wish to recruit Dragons?", Font::BIG, Dialog::YES | Dialog::NO));
-			    hero.IncreaseExperience(exp);
 			    hero.ActionAfterBattle();
 			break;
 

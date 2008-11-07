@@ -782,17 +782,17 @@ bool MP2::isBattleLife(const MP2::object_t obj)
 	case OBJ_FOUNTAIN:
 	case OBJ_FAERIERING:
 	case OBJ_PYRAMID:
-	case OBJ_MERMAID:
 
 	// morale modificators
 	case OBJ_BUOY:
 	case OBJ_OASIS:
 	case OBJ_TEMPLE:
+	case OBJ_WATERINGHOLE:
 	case OBJ_GRAVEYARD:
         case OBJ_SHIPWRECK:
         case OBJ_DERELICTSHIP:
 
-        case OBJ_WATERINGHOLE:
+	case OBJ_MERMAID:
 
 	    return true;
 

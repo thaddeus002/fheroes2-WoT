@@ -1596,7 +1596,9 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_PYRAMID:
-	    quantity1 = 0; // FIXME: PackQuantity: Pyramid: add Spell Level 5
+	    // random spell level 5
+	    quantity1 = (Rand::Get(1) ? Spell::RandCombat(5) : Spell::RandAdventure(5));
+	    quantity2 = 0;
 	break;
 
 	case MP2::OBJ_DAEMONCAVE:
