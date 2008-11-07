@@ -78,7 +78,7 @@ namespace Army {
     std::vector<Point> blockedCells;
     std::vector<CObj> cobjects;
     Army::army_t bodies1, bodies2;
-    
+        
     typedef std::vector<std::pair<const Army::army_t *, const Army::army_t *> > ArmyPairs;
 
     bool ArmyExists(army_t &army);
@@ -296,7 +296,7 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
     
     const Sprite &animBase = AGG::GetICN(animation[0].first, 0, false);
     const int baseAnimX = backgroundX + (background.w() - animBase.w()) / 2 - 1;
-    const int baseAnimY = 48;
+    const int baseAnimY = backgroundY + 36;
    
     cursor.SetThemes(cursor.WAR_POINTER); 
     display.Fade(100, false);
