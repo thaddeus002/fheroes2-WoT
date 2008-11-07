@@ -1266,6 +1266,7 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
 
     std::string body_true;
     std::string body_false;
+    u16 move = 0;
 
     switch(obj)
     {
@@ -1277,13 +1278,13 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
         case MP2::OBJ_OASIS:
     	    body_false = "The drink at the oasis is refreshing, but offers no further benefit. The oasis might help again if you fought a battle first.";
     	    body_true = "A drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.";
-    	    hero.IncreaseMovePoints(800);	// + 8TP, from FAQ
+    	    move = 800;	// + 8TP, from FAQ
     	    break;
 
         case MP2::OBJ_WATERINGHOLE:
     	    body_false = "The drink at the watering hole is refreshing, but offers no further benefit. The watering hole might help again if you fought a battle first.";
 	    body_true = "A drink at the watering hole fills your troops with strength and lifts their spirits. You can travel a bit further today.";
-    	    hero.IncreaseMovePoints(400);	// + 4TP, from FAQ
+    	    move = 400;	// + 4TP, from FAQ
     	    break;
 
         case MP2::OBJ_TEMPLE:
@@ -1303,6 +1304,7 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
 	hero.SetVisited(dst_index);
 	AGG::PlaySound(M82::GOODMRLE);
 	DialogMorale(MP2::StringObject(obj), body_true, true, (obj == MP2::OBJ_TEMPLE ? 2 : 1));
+        hero.IncreaseMovePoints(move);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToGoodMoraleObject: " + hero.GetName());
