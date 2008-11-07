@@ -291,6 +291,17 @@ u8 Resource::funds_t::GetValidItems(void) const
 	return result;
 }
 
+void Resource::funds_t::Reset(void)
+{
+    wood = 0;
+    ore = 0;
+    mercury = 0;
+    sulfur = 0;
+    crystal = 0;
+    gems = 0;
+    gold = 0;
+}
+
 void Resource::ChangeTileWithRNDResource(Maps::Tiles & tile)
 {
     Maps::TilesAddon *addon = tile.FindRNDResource();

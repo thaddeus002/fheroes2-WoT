@@ -966,6 +966,38 @@ void Heroes::Recruit(const Castle & castle)
 
 void Heroes::ActionNewDay(void)
 {
+    // increase resource
+    Resource::funds_t resource;
+
+    if(HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource.gold += INCOME_ENDLESS_SACK_GOLD;
+    if(HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource.gold += INCOME_ENDLESS_BAG_GOLD;
+    if(HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource.gold += INCOME_ENDLESS_PURSE_GOLD;
+    if(HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR;
+    if(HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource.mercury += INCOME_ENDLESS_VIAL_MERCURY;
+    if(HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource.gems += INCOME_ENDLESS_POUCH_GEMS;
+    if(HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource.wood += INCOME_ENDLESS_CORD_WOOD;
+    if(HasArtifact(Artifact::ENDLESS_CART_ORE))       resource.ore += INCOME_ENDLESS_CART_ORE;
+    if(HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL;
+
+    // estates skill bonus
+    switch(GetLevelSkill(Skill::Secondary::ESTATES))
+    {
+        case Skill::Level::BASIC:       resource.gold += 100; break;
+        case Skill::Level::ADVANCED:    resource.gold += 250; break;
+        case Skill::Level::EXPERT:      resource.gold += 500; break;
+
+        default: break;
+    }
+
+    if(resource.GetValidItems()) world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+    if(HasArtifact(Artifact::TAX_LIEN))
+    {
+	resource.Reset();
+	resource.gold = 250;
+	world.GetKingdom(GetColor()).OddFundsResource(resource);
+    }
+
     // recovery move points
     move_point = GetMaxMovePoints();
     path.Rescan();
@@ -973,18 +1005,25 @@ void Heroes::ActionNewDay(void)
     // recovery spell points
     if(spell_book.Active())
     {
+	// possible visit arteian spring 2 * max
+	u16 prev = magic_point;
+
 	// everyday
-	if(magic_point != GetMaxSpellPoints()) ++magic_point;
+	++magic_point;
+
+	if(HasArtifact(Artifact::POWER_RING)) magic_point += 2;
 
 	// secondary skill
 	switch(GetLevelSkill(Skill::Secondary::MYSTICISM))
 	{
-	    case Skill::Level::BASIC:	if(magic_point != GetMaxSpellPoints()) magic_point += 1; break;
-	    case Skill::Level::ADVANCED:if(magic_point != GetMaxSpellPoints()) magic_point += 2; break;
-	    case Skill::Level::EXPERT:	if(magic_point != GetMaxSpellPoints()) magic_point += 3; break;
+	    case Skill::Level::BASIC:	magic_point += 1; break;
+	    case Skill::Level::ADVANCED:magic_point += 2; break;
+	    case Skill::Level::EXPERT:	magic_point += 3; break;
 
 	    default: break;
 	}
+
+	if((magic_point > GetMaxSpellPoints()) && (magic_point > prev)) magic_point = prev;
     }
 
     // remove day visit object
@@ -1088,7 +1127,7 @@ u8 Heroes::GetLevel(void) const
     return GetLevelFromExperience(experience);
 }
 
-void Heroes::IncreaseExperience(const u16 exp)
+void Heroes::IncreaseExperience(const u32 exp)
 {
     const u8 level_old = GetLevelFromExperience(experience);
     const u8 level_new = GetLevelFromExperience(experience + exp);

@@ -28,9 +28,9 @@ class Castle;
 
 namespace Algorithm
 {
-    u16 CalculateExperience(const Army::army_t & army);
-    u16 CalculateExperience(const Heroes & hero);
-    u16 CalculateExperience(const Castle &castle);
+    u32 CalculateExperience(const Army::army_t & army);
+    u32 CalculateExperience(const Heroes & hero);
+    u32 CalculateExperience(const Castle &castle);
 };
 
 #endif

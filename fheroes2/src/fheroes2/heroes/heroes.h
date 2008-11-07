@@ -211,7 +211,7 @@ public:
     MP2::object_t GetUnderObject(void) const;
 
     u32 GetExperience(void) const;
-    void IncreaseExperience(const u16 exp);
+    void IncreaseExperience(const u32 exp);
     void LevelUp(void);
 
     void PostBattle(void);

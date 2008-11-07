@@ -22,17 +22,24 @@
 #include "castle.h"
 #include "algorithm.h"
 
-u16 Algorithm::CalculateExperience(const Army::army_t & army)
+u32 Algorithm::CalculateExperience(const Army::army_t & army)
 {
-    return 1000;
+    Army::army_t::const_iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
+
+    u32 res = 0;
+
+    for(; it1 != it2; ++it1) res += (*it1).Count() * Monster::GetStats((*it1).Monster()).hp;
+
+    return res;
 }
 
-u16 Algorithm::CalculateExperience(const Heroes & hero)
+u32 Algorithm::CalculateExperience(const Heroes & hero)
 {
-    return 1000;
+    return 500 + CalculateExperience(hero.GetArmy());
 }
 
-u16 Algorithm::CalculateExperience(const Castle & castle)
+u32 Algorithm::CalculateExperience(const Castle & castle)
 {
-    return 1000;
+    return 500 + CalculateExperience(castle.GetArmy());
 }

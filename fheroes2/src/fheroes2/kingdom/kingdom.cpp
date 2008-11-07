@@ -141,46 +141,6 @@ void Kingdom::ActionNewDay(void)
 	    resource.gold += (castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == castle.GetRace() ? INCOME_DUNGEON_GOLD : 0);
 	}
     }
-
-    ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith)
-    {
-	if(*ith)
-	{
-	    const Heroes & heroes = **ith;
-
-	    if(heroes.GetArtifacts().size())
-	    {
-		std::vector<Artifact::artifact_t>::const_iterator it1 = heroes.GetArtifacts().begin();
-		std::vector<Artifact::artifact_t>::const_iterator it2 = heroes.GetArtifacts().end();
-
-		for(; it1 != it2; ++it1) switch(*it1)
-		{
-		    case Artifact::ENDLESS_SACK_GOLD:		resource.gold += INCOME_ENDLESS_SACK_GOLD; break;
-		    case Artifact::ENDLESS_BAG_GOLD:		resource.gold += INCOME_ENDLESS_BAG_GOLD; break;
-		    case Artifact::ENDLESS_PURSE_GOLD:		resource.gold += INCOME_ENDLESS_PURSE_GOLD; break;
-		    case Artifact::ENDLESS_POUCH_SULFUR:	resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR; break;
-		    case Artifact::ENDLESS_VIAL_MERCURY:	resource.mercury += INCOME_ENDLESS_VIAL_MERCURY; break;
-		    case Artifact::ENDLESS_POUCH_GEMS:		resource.gems += INCOME_ENDLESS_POUCH_GEMS; break;
-		    case Artifact::ENDLESS_CORD_WOOD:		resource.wood += INCOME_ENDLESS_CORD_WOOD; break;
-		    case Artifact::ENDLESS_CART_ORE:		resource.ore += INCOME_ENDLESS_CART_ORE; break;
-		    case Artifact::ENDLESS_POUCH_CRYSTAL:	resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL; break;
-
-		    default: break;
-		}
-	    }
-	    
-	    // estates skill bonus
-	    switch(heroes.GetLevelSkill(Skill::Secondary::ESTATES))
-	    {
-		case Skill::Level::BASIC:	resource.gold += 100; break;
-		case Skill::Level::ADVANCED:	resource.gold += 250; break;
-		case Skill::Level::EXPERT:	resource.gold += 500; break;
-
-		default: break;
-	    }
-	}
-    }
 }
 
 void Kingdom::ActionNewWeek(void)

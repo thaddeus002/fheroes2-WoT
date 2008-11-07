@@ -367,6 +367,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_SPHINX:
         case MP2::OBJ_FREEMANFOUNDRY:
         case MP2::OBJ_MAGELLANMAPS:
+	case MP2::OBJ_WHIRLPOOL:
 
         case MP2::OBJ_JAIL:
         case MP2::OBJ_WATERALTAR:
@@ -409,7 +410,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 
     Display::Fade();
 
-    const u16 exp = Algorithm::CalculateExperience(army);
+    const u32 exp = Algorithm::CalculateExperience(army);
     const Army::battle_t b = Army::Battle(hero, army, tile);
 
     switch(b)
@@ -460,7 +461,7 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
     {
 	if(H2Config::Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
-	const u16 exp = Algorithm::CalculateExperience(*other_hero);
+	const u32 exp = Algorithm::CalculateExperience(*other_hero);
 
 	switch(b)
 	{
@@ -504,7 +505,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
     {
 	if(H2Config::Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
-	const u16 exp = Algorithm::CalculateExperience(*castle);
+	const u32 exp = Algorithm::CalculateExperience(*castle);
 
 	switch(b)
 	{
@@ -957,7 +958,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
 
 		    // battle
-		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = Algorithm::CalculateExperience(army);
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1138,7 +1139,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    army.at(4).Set(Monster::MUTANT_ZOMBIE, 20);
 
 		    // battle
-		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = Algorithm::CalculateExperience(army);
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1208,7 +1209,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    army.at(4).Set(Monster::GHOST, c);
 
 		    // battle
-		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = Algorithm::CalculateExperience(army);
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1256,7 +1257,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    army.at(4).Set(Monster::SKELETON, 20);
 
 		    // battle
-		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = Algorithm::CalculateExperience(army);
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1369,7 +1370,7 @@ void ActionToExperienceObject(Heroes &hero, const u16 dst_index)
     std::string body_true;
     std::string body_false;
     
-    u16 exp = 0;
+    u32 exp = 0;
 
     switch(obj)
     {
@@ -1390,12 +1391,6 @@ void ActionToExperienceObject(Heroes &hero, const u16 dst_index)
     }
     else
     {
-	PlaySoundWarning;
-
-	// visit
-	hero.SetVisited(dst_index);
-	hero.IncreaseExperience(exp);
-
 	std::string count;
 	String::AddInt(count, exp);
 	const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
@@ -1405,7 +1400,12 @@ void ActionToExperienceObject(Heroes &hero, const u16 dst_index)
 	Text text(count, Font::SMALL);
 	text.Blit((sprite.w() - Text::width(count, Font::SMALL)) / 2, sprite.h() + 2, image);
 
+	PlaySoundWarning;
 	Dialog::SpriteInfo(MP2::StringObject(obj), body_true, image);
+
+	// visit
+	hero.SetVisited(dst_index);
+	hero.IncreaseExperience(exp);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToExperienceObject: " + hero.GetName());
@@ -1420,13 +1420,12 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
     bool conditions = false;
     const u8 c = tile.GetQuantity2();
 
-    PlaySoundSuccess;
     switch(tile.GetObject())
     {
         case MP2::OBJ_SHIPWRECKSURVIROR:
 	    conditions = true;
-	    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he rewards you for your act of kindness by giving you the " + Artifact::String(art), art);
-        break;
+	    PlaySoundSuccess;
+	    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he rewards you for your act of kindness by giving you the " + Artifact::String(art), art);        break;
 
 	case MP2::OBJ_ARTIFACT:
 	    switch(c)
@@ -1470,7 +1469,8 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 			buttons = Dialog::OK;
 			body = "You try to pay the leprechaun, but realize that you can't afford it. The leprechaun stamps his foot and ignores you.";
 		    }
-
+		    
+		    PlaySoundWarning;
 		    if(Dialog::YES == DialogWithArtifact(header, body, art, buttons))
 			conditions = true;
 		    else
@@ -1487,16 +1487,20 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    std::string body;
 		    if(4 == c)
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::WISDOM) ? Dialog::YES | Dialog::NO : Dialog::OK;
+			buttons = hero.HasSecondarySkill(Skill::Secondary::WISDOM) ? Dialog::YES : Dialog::OK;
 			header = "You've found the humble dwelling of a withered hermit.";
 			body = "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.";
 		    }
 		    else
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? Dialog::YES | Dialog::NO : Dialog::OK;
+			buttons = hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? Dialog::YES : Dialog::OK;
 			header = "You've come across the spartan quarters of a retired soldier.";
 			body = "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.";
 		    }
+		    if(buttons == Dialog::OK)
+			PlaySoundFailure;
+		    else
+			PlaySoundSuccess;
 		    conditions = Dialog::YES == DialogWithArtifact(header, body,art, buttons);
 		    break;
 		}
@@ -1523,6 +1527,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    std::vector<Army::Troops> army(1);
 		    army.at(0).Set(mons, count);
 
+		    PlaySoundWarning;
 		    if(6 == c)
 			Dialog::Message("You come upon an ancient artifact.", "As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.", Font::BIG, Dialog::OK);
 		    else
@@ -1534,13 +1539,14 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 
 		    if(battle)
 		    {
-			const u16 exp = Algorithm::CalculateExperience(army);
+			const u32 exp = Algorithm::CalculateExperience(army);
 			const Army::battle_t b = Army::Battle(hero, army, tile);
 			switch(b)
 			{
 			    case Army::WIN:
 			    hero.IncreaseExperience(exp);
 			    conditions = true;
+			    PlaySoundSuccess;
 			    DialogWithArtifact("Victorious, you take your prize, the ", Artifact::String(art), art);
 			    hero.ActionAfterBattle();
 			    break;
@@ -1555,11 +1561,15 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 			}
 		    }
 		    else
+		    {
+			PlaySoundFailure;
 			Dialog::Message("Discretion is the better part of valor, and you decide to avoid this fight for today.", "", Font::BIG, Dialog::OK);
+		    }
 		    break;
 		}
 
 		default:
+		    PlaySoundSuccess;
 		    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), art);
 		    conditions = true;
 		    break;
@@ -1731,7 +1741,7 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 	army.at(2).Set(Monster::GHOST, tile.GetQuantity1());
 	army.at(3).Set(Monster::GHOST, tile.GetQuantity1());
 	army.at(4).Set(Monster::GHOST, tile.GetQuantity1());
-	const u16 exp = Algorithm::CalculateExperience(army);
+	const u32 exp = Algorithm::CalculateExperience(army);
 	const Army::battle_t b = Army::Battle(hero, army, tile);
 
 	switch(b)
@@ -2063,7 +2073,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You've found the ruins of an ancient city, now inhabited solely by the undead.", "Will you search?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = Algorithm::CalculateExperience(army);
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -2115,7 +2125,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("Trolls living under the bridge challenge you.", "Will you fight them?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = Algorithm::CalculateExperience(army);
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -2165,7 +2175,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You stand before the Dragon City, a place off-limits to mere humans.", "Do you wish to violate this rule and challenge the Dragons to a fight?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = Algorithm::CalculateExperience(army);
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
