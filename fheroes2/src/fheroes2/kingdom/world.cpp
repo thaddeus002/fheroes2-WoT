@@ -904,6 +904,7 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_GRAVEYARD:
             case MP2::OBJ_PYRAMID:
             case MP2::OBJ_DAEMONCAVE:
+            case MP2::OBJ_ABANDONEDMINE:
     		tile.UpdateQuantity();
 		break;
 

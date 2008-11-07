@@ -68,6 +68,7 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index);
 void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index);
 void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index);
 void ActionToArtesianSpring(Heroes &hero, const u16 dst_index);
+void ActionToAbandoneMine(Heroes &hero, const u16 dst_index);
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
@@ -320,8 +321,9 @@ void Heroes::Action(const u16 dst_index)
 	case MP2::OBJ_ALCHEMYLAB:
         case MP2::OBJ_MINES:
 	case MP2::OBJ_SAWMILL:
-        case MP2::OBJ_LIGHTHOUSE:
-        case MP2::OBJ_ABANDONEDMINE:	ActionToCaptureObject(*this, dst_index); break;
+        case MP2::OBJ_LIGHTHOUSE:	ActionToCaptureObject(*this, dst_index); break;
+
+        case MP2::OBJ_ABANDONEDMINE:	ActionToAbandoneMine(*this, dst_index); break;
 
 	// accept army
         case MP2::OBJ_WATCHTOWER:
@@ -1663,6 +1665,43 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     if(MAXU16 != dst_index2) hero.Action(dst_index2);
 }
 
+void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+
+    if(Dialog::YES == Dialog::Message("You come upon an abandoned gold mine.", "The mine appears to be haunted. Do you wish to enter?", Font::BIG, Dialog::YES | Dialog::NO))
+    {
+	std::vector<Army::Troops> army(1);
+	army.at(0).Set(Monster::GHOST, tile.GetQuantity1());
+	const u16 exp = Algorithm::CalculateExperience(army);
+	const Army::battle_t b = Army::Battle(hero, army, tile);
+
+	switch(b)
+	{
+	    case Army::WIN:
+		hero.IncreaseExperience(exp);
+		DialogWithGold(MP2::StringObject(obj), "You beat the Ghosts and are able to restore the mine to production.", 1000);
+		tile.SetQuantity1(0);
+		tile.UpdateAbandoneMine();
+		world.CaptureObject(dst_index, hero.GetColor());
+		world.GetTiles(dst_index).CaptureFlags32(obj, hero.GetColor());
+		hero.ActionAfterBattle();
+		break;
+
+	    case Army::RETREAT:
+	    case Army::SURRENDER:
+	    case Army::LOSE:
+		BattleLose(hero, b);
+		break;
+        
+    	    default: break;
+	}
+    }
+
+    if(H2Config::Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+}
+
 /* capture color object */
 void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
 {
@@ -1805,10 +1844,6 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
     	    body = "The lighthouse is now under your control, and all of your ships will now move further each turn.";
 	    break;
 
-	case MP2::OBJ_ABANDONEDMINE:
-    	    Error::Warning("ActionToCaptureObject: FIXME: Abandone Mine");
-	    break;
-
         default:
     	    Error::Warning("ActionToCaptureObject: unknown captured: " + std::string(MP2::StringObject(obj)));
     	    return;
@@ -1823,7 +1858,7 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
 	if(sf) Dialog::SpriteInfo(header, body, *sf);
 	else Dialog::Message(header, body, Font::BIG, Dialog::OK);
     }
-    
+
     if(sf) delete sf;
     if(H2Config::Debug()) Error::Verbose("ActionToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }

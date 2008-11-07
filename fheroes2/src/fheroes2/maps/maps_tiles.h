@@ -128,6 +128,8 @@ namespace Maps
 
 	u16 GetCountMonster(void) const;
 	void SetCountMonster(const u16 count);
+	
+	void UpdateAbandoneMine(void);
 
     private:
 	void CorrectFlags32(const u8 index);

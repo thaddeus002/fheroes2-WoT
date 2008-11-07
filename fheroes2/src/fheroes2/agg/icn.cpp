@@ -1001,6 +1001,8 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket)
 	
 	case BTNSHNGL:	return start + ticket % 4;
 
+	case OBJNHAUN:	return ticket % 15;
+
 	case OBJNWATR:
 
 	    switch(start)

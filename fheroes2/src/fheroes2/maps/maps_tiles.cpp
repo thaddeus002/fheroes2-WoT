@@ -348,6 +348,16 @@ void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 		}
 	    }
 	}
+	else
+	// fix for abandone mine
+	if(MP2::OBJ_ABANDONEDMINE == general)
+	{
+	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
+	    Rect rt;
+	    Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
+	    GameArea::SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
+	    display.Blit(anime_sprite, rt, pt);
+	}
     }
 }
 
@@ -1615,6 +1625,12 @@ void Maps::Tiles::UpdateQuantity(void)
 	    }
 	break;
 
+	// rand monster
+	case MP2::OBJ_ABANDONEDMINE:
+	    quantity1 = Monster::GetRNDSize(Monster::GHOST);
+	    quantity2 = 0;
+	break;
+
 	default: return;
     }
 }
@@ -1658,4 +1674,25 @@ void Maps::Tiles::SetCountMonster(const u16 count)
 {
     quantity1 = count % 0xFF;
     quantity2 = count / 0xFF;
+}
+
+void Maps::Tiles::UpdateAbandoneMine(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(ICN::EXTRAOVR == MP2::GetICNObject(addon.object) && 5 == addon.index)
+	    {
+		addon.index = 4;
+		general = MP2::OBJ_MINES;
+		break;
+	    }
+	}
+    }
 }
