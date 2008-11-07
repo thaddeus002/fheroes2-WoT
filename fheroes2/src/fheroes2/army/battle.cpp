@@ -19,9 +19,8 @@
  ***************************************************************************/
 
 
-#include <algorithm>
 #include <cmath>
-#include <functional>
+#include <utility>
 #include "battle.h"
 #include "localevent.h"
 #include "display.h"
@@ -63,6 +62,8 @@ if(le.MousePressRight(b)&& !b.isDisable()) rt;
 if(le.MouseClickLeft(b) && !b.isDisable()) { b.isPressed() ? b.ReleaseDraw() : b.PressDraw(); lf; } \
 if(le.MousePressRight(b) && !b.isDisable()) rt;
 
+static Dialog::FrameBorder *frameborder;
+
 namespace Army {
     bool O_GRID = false, O_SHADM = false, O_SHADC = false, O_AUTO = false;
     long EXP1, EXP2;
@@ -77,12 +78,19 @@ namespace Army {
     std::vector<Point> blockedCells;
     std::vector<CObj> cobjects;
     Army::army_t bodies1, bodies2;
+    
+    typedef std::vector<std::pair<const Army::army_t *, const Army::army_t *> > ArmyPairs;
 
     bool ArmyExists(army_t &army);
     battle_t BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile);
     battle_t HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     battle_t CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile, int troopN, Point &move, Point &attack);
     bool CleanupBody(Army::army_t &army, u16 idx, Army::army_t &bodies);
+    
+    void DrawArmySummary(const Army::army_t &orig, const Army::army_t &current, const Rect &draw);
+    void BattleSummary(const std::string &name, const ArmyPairs &armies, const std::vector<Artifact::artifact_t> *artifacts, Spell::spell_t, int deadRaised, Army::battle_t status);
+    void BattleSummaryVsArmy(Heroes &hero, const Army::army_t &heroOrig, const Army::army_t &army, const Army::army_t &armyOrig, Army::battle_t status);
+    void BattleSummaryVsHero(Heroes &hero, const Army::army_t &heroOrig, Heroes &hero2, const Army::army_t &hero2Orig, Army::battle_t status);
     
     bool DangerousUnitPredicate(Army::Troops first, Army::Troops second);
     bool AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack);
@@ -147,17 +155,247 @@ namespace Army {
 
 Army::battle_t Army::Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile)
 {
-    return BattleInt(&hero1, &hero2, const_cast<std::vector<Army::Troops>&>(hero1.GetArmy()), const_cast<std::vector<Army::Troops>&>(hero2.GetArmy()), tile);
+    Army::army_t heroArmy = hero1.GetArmy();
+    Army::army_t oppArmy = hero2.GetArmy();
+    Army::battle_t status = BattleInt(&hero1, &hero2, const_cast<std::vector<Army::Troops>&>(hero1.GetArmy()),
+                                                      const_cast<std::vector<Army::Troops>&>(hero2.GetArmy()), tile);
+    BattleSummaryVsHero(hero1, heroArmy, hero2, oppArmy, status);
+    return status;
 }
 
 Army::battle_t Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const Maps::Tiles & tile)
 {
-    return BattleInt(&hero, 0, const_cast<std::vector<Army::Troops>&>(hero.GetArmy()), army, tile);
+    Army::army_t heroArmy = hero.GetArmy();
+    Army::army_t oppArmy = army;
+    Army::battle_t status = BattleInt(&hero, 0, const_cast<std::vector<Army::Troops>&>(hero.GetArmy()), army, tile);
+    BattleSummaryVsArmy(hero, heroArmy, army, oppArmy, status);
+    return status;
 }
 
 Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile)
 {
     return LOSE; // TODO
+}
+
+void Army::BattleSummaryVsArmy(Heroes &hero, const Army::army_t &heroOrig, const Army::army_t &army, const Army::army_t &armyOrig, Army::battle_t status)
+{
+    ArmyPairs armies;
+    armies.push_back(std::make_pair(&hero.GetArmy(), &heroOrig));
+    armies.push_back(std::make_pair(&army, &armyOrig));
+    //TODO: Necromancy
+    BattleSummary(hero.GetName(), armies, NULL, Spell::NONE, 0, status);
+}
+
+void Army::BattleSummaryVsHero(Heroes &hero, const Army::army_t &heroOrig, Heroes &hero2, const Army::army_t &hero2Orig, Army::battle_t status)
+{
+    ArmyPairs armies;
+    armies.push_back(std::make_pair(&hero.GetArmy(), &heroOrig));
+    armies.push_back(std::make_pair(&hero2.GetArmy(), &hero2Orig));
+    //TODO: Necromancy
+    //TODO: Eagle eye
+    const std::vector<Artifact::artifact_t> *artifacts = status == WIN ? &hero2.GetArtifacts() : NULL;
+    BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, status);
+    Heroes *from, *to;
+    if(status == WIN)
+    {
+        from = &hero2;
+        to = &hero;
+    }
+    else
+    {
+        from = &hero;
+        to = &hero2;
+    }
+    to->GetArtifacts().insert(to->GetArtifacts().end(), from->GetArtifacts().begin(), from->GetArtifacts().end());
+    from->GetArtifacts().clear();
+}
+
+void Army::DrawArmySummary(const Army::army_t &orig, const Army::army_t &current, const Rect &draw)
+{
+    std::vector<std::pair<const Sprite *, int> > killed;
+    u16 width = 0, height = 0;
+    for(u16 i = 0; i < orig.size(); i++)
+    {
+        int delta = orig[i].Count() - current[i].Count();
+        if(!orig[i].isValid() || delta <= 0)
+            continue;
+        const Sprite &monster = AGG::GetICN(ICN::MONS32, orig[i].Monster());
+        killed.push_back(std::make_pair(&monster, delta));
+        width += monster.w() + 10;
+        height = std::max(height, monster.h());
+    }
+    if(killed.size())
+    {
+        width -= 10;
+        Surface surf(width, height + 15);
+        surf.SetDisplayFormat();
+        surf.SetColorKey();
+        int x = 0;
+        for(u16 i = 0; i < killed.size(); i++)
+        {
+            const Sprite &sprite = *killed[i].first;
+            surf.Blit(sprite, x, surf.h() - sprite.h() - 15);
+            std::string amount;
+            String::AddInt(amount, killed[i].second);
+            Text number(amount, Font::SMALL);
+            number.Blit(Point(x + (sprite.w() - number.width()) / 2, surf.h() - 15), surf);
+            x += sprite.w() + 10;
+        }
+        display.Blit(surf, draw.x + (draw.w - surf.w()) / 2, draw.y);
+    }
+    else
+    {
+        Text none("None", Font::SMALL);
+        none.Blit(draw.x + (draw.w - none.width()) / 2, draw.y);
+    }
+}
+
+void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
+                         const std::vector<Artifact::artifact_t> *artifacts,
+                         Spell::spell_t spell, int deadRaised, Army::battle_t status)
+{
+    ICN::icn_t interface = Settings::Get().EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE;
+    ICN::icn_t buttonIcon = Settings::Get().EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB;
+    const Sprite &background = AGG::GetICN(interface, 0);
+    const Sprite &shadow = AGG::GetICN(interface, 1);
+    const Sprite &button = AGG::GetICN(buttonIcon, 0);
+    const int backgroundX = (display.w() - background.w()) / 2;
+    const int backgroundY = (display.h() - background.h()) / 2;
+    Button buttonDone(backgroundX + (background.w() - button.w()) / 2 + 1, backgroundY + background.h() - button.h() * 2 + 3, buttonIcon, 0, 1);
+    
+    std::string message[2];
+    std::vector<std::pair<ICN::icn_t, Point> > animation;
+    switch(status)
+    {
+        case WIN:
+            animation.push_back(std::make_pair(ICN::WINCMBT, Point(32, 0)));
+            message[0] = "A glorious victory!";
+            message[1] = "For valor in combat, " + name + " receives ";
+            String::AddInt(message[1], 1000); //FIXME
+            message[1] += " experience.";
+            break;
+        case LOSE:
+            animation.push_back(std::make_pair(ICN::CMBTLOS1, Point(0, 0)));
+            animation.push_back(std::make_pair(ICN::CMBTLOS2, Point(0, 0)));
+            animation.push_back(std::make_pair(ICN::CMBTLOS3, Point(0, 29)));
+            message[0] = "Your forces suffer a bitter defeat, and " + name + " abandons your cause.";
+            break;
+        case SURRENDER:
+            animation.push_back(std::make_pair(ICN::CMBTSURR, Point(32, 3)));
+            message[0] = "TODO";
+            break;
+        case RETREAT:
+            animation.push_back(std::make_pair(ICN::CMBTFLE1, Point(34, 42)));
+            animation.push_back(std::make_pair(ICN::CMBTFLE2, Point(0, 12)));
+            animation.push_back(std::make_pair(ICN::CMBTFLE3, Point(0, 0)));
+            message[0] = "Your forces in disarray, the cowardly " + name + " flees in terror.";
+            break;
+        default:
+            break;
+    }
+    
+    const Sprite &animBase = AGG::GetICN(animation[0].first, 0, false);
+    const int baseAnimX = backgroundX + (background.w() - animBase.w()) / 2 - 1;
+    const int baseAnimY = 48;
+   
+    cursor.SetThemes(cursor.WAR_POINTER); 
+    display.Fade(100, false);
+    display.Flip();
+    cursor.Hide();
+    display.Blit(shadow, backgroundX - 17, backgroundY + 10);
+    display.Blit(background, backgroundX, backgroundY);
+    display.Blit(animBase, baseAnimX, baseAnimY);
+    buttonDone.Draw();
+    
+    TextBox first(message[0], Font::BIG, Rect(baseAnimX - 20, backgroundY + 180, animBase.w() + 40, background.h() - 160));
+    if(message[1] != "")
+        TextBox::TextBox(message[1], Font::BIG, Rect(baseAnimX - 20, first.extents.y + first.extents.h,
+                         animBase.w() + 40, background.h() - 160 - first.extents.h));
+    
+    const int textY = backgroundY + background.h() / 2 + 30;
+    TextBox title("Battlefield Casualties", Font::SMALL, Rect(backgroundX, textY, background.w(), 40));
+    TextBox attacker("Attacker", Font::SMALL, Rect(backgroundX, title.extents.y + int(title.extents.h * 1.5f), background.w(), 40));
+    TextBox defender("Defender", Font::SMALL, Rect(backgroundX, attacker.extents.y + attacker.extents.h * 4, background.w(), 40));
+    
+    Army::DrawArmySummary(*armies[0].second, *armies[0].first, Rect(backgroundX, attacker.extents.y + attacker.extents.h + 5, background.w(), 0));
+    Army::DrawArmySummary(*armies[1].second, *armies[1].first, Rect(backgroundX, defender.extents.y + defender.extents.h + 5, background.w(), 0));
+    
+    cursor.Show();
+    display.Flip();
+    
+    u32 ticket = 0;
+    u32 frame = 1, subanim = 0, count = AGG::GetICNCount(animation[subanim].first);
+    u16 artIndex = 1; //skip the magic book
+    int state = 0;
+    while(le.HandleEvents()) {
+        if(le.MousePressLeft(buttonDone)) buttonDone.PressDraw();
+        else buttonDone.ReleaseDraw();
+        
+        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonDone))
+        {
+            bool done = false;
+            switch(state)
+            {
+                case 0:
+                    state++; //fall-through
+                case 1:
+                    if(!artifacts)
+                        state++; //fall-through
+                    else if(artIndex < artifacts->size())
+                    {
+                        display.Blit(background, backgroundX, backgroundY);
+                        AGG::PlaySound(M82::PICKUP01);
+                        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, artifacts->at(artIndex) + 1);
+                        std::string artName = Artifact::String(artifacts->at(artIndex));
+                        Text artText(artName, Font::SMALL);
+                        artText.Blit(backgroundX + (background.w() - artText.width()) / 2, buttonDone.y - 20 - art.h() - artText.height() - 10);
+                        display.Blit(art, backgroundX + (background.w() - art.w()) / 2, buttonDone.y - 20 - art.h());
+                        artIndex++;
+                        break;
+                    }
+                    else state++; //fall-through
+                case 2:
+                    state++; //fall-through
+                    if(spell != Spell::NONE)
+                    {
+                        //TODO: Eagle eye
+                        display.Blit(background, backgroundX, backgroundY);
+                        AGG::PlaySound(M82::PICKUP01);
+                        break;
+                    }
+                case 3:
+                    state++; //fall-through
+                    if(deadRaised != 0)
+                    {
+                        //TODO: Necromancy
+                        display.Blit(background, backgroundX, backgroundY);
+                        AGG::PlaySound(M82::PICKUP01);
+                        break;
+                    }
+                case 4:
+                    done = true;
+                    break;
+            }
+            if(done)
+              break;
+        }
+        
+        if(frame < count && Game::ShouldAnimateInfrequent(ticket++, 3))
+        {
+            const Sprite &animFrame = AGG::GetICN(animation[subanim].first, frame++, false);
+            display.Blit(AGG::GetICN(animation[subanim].first, 0), baseAnimX, baseAnimY);
+            display.Blit(animFrame, animation[subanim].second.x + baseAnimX, animation[subanim].second.y + baseAnimY);
+            display.Flip();
+            if(frame == count && animation[subanim].first != ICN::CMBTFLE3)
+            {
+                if(subanim < animation.size() - 1)
+                    count = AGG::GetICNCount(animation[++subanim].first);
+                frame = 1;
+            }
+        }
+    }
+    
+    delete frameborder;
 }
 
 Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile)
@@ -170,10 +408,10 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     AGG::PlaySound(M82::PREBATTL);
     cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
+    
+    frameborder = new Dialog::FrameBorder;
 
-    Dialog::FrameBorder frameborder;
-
-    dst_pt = Point(frameborder.GetArea().x, frameborder.GetArea().y);
+    dst_pt = Point(frameborder->GetArea().x, frameborder->GetArea().y);
 
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
@@ -220,7 +458,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 			s = HumanTurn(hero1, hero2, army1, army2, tile, i, move, attack);
 			if( s == RETREAT || s == SURRENDER)
                         {
-                            AGG::PlayMusic(MUS::BATTLELOSE);
+                            AGG::PlayMusic(MUS::BATTLELOSE, false);
                             return s;
                         }
                         else if(s == AUTO)
@@ -229,7 +467,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
 			s = CompTurn(hero1, hero2, army1, army2, tile, i, move, attack);
 			if( s == RETREAT || s == SURRENDER)
                         {
-                            AGG::PlayMusic(MUS::BATTLELOSE);
+                            AGG::PlayMusic(MUS::BATTLELOSE, false);
                             return s;
                         }
 		    }
@@ -402,13 +640,17 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     // dialog menu loop
     while(le.HandleEvents()) {
 	if(le.KeyPress(KEY_RETURN)) {
-	    DrawBackground(tile);
+	    /*DrawBackground(tile);
 	    army1[0].SetCount(i);
 	    if(hero1) DrawHero(*hero1, i);
 	    if(hero2) DrawHero(*hero2, i, true);
 	    DrawArmy(army1, army2, i++);
 	    cursor.Show();
-	    display.Flip();
+	    display.Flip();*/
+            
+            for(u16 i = 0; i < army2.size(); i++)
+                army2[i].SetCount(0);
+            return WIN;
 	}
 // 	if(le.KeyPress(SDLK_SPACE)) return WIN;
 	if(le.KeyPress(SDLK_SPACE)) {

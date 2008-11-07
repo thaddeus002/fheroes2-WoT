@@ -114,7 +114,8 @@ public:
     const std::string & GetName(void) const{ return name; };
     const Point & GetCenter(void) const{ return mp; };
 
-    const std::vector<Army::Troops> & GetArmy(void) const{ return army; };
+    const std::vector<Army::Troops> & GetArmy(void) const{ return army; }
+    std::vector<Army::Troops> & GetArmy(void) { return army; };
     bool HasMonster(const Monster::monster_t mon) const;
     Speed::speed_t GetSlowestArmySpeed(void) const;
     Speed::speed_t GetHighestArmySpeed(void) const;
@@ -148,7 +149,8 @@ public:
     void LevelUpSkill(const Skill::Secondary::skill_t skill);
     void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
 
-    const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; };
+    const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; }
+    std::vector<Artifact::artifact_t> & GetArtifacts(void) { return artifacts; };
     bool PickupArtifact(const Artifact::artifact_t & art);
     bool HasArtifact(const Artifact::artifact_t & art) const;
     bool MaxCountArtifact(void) const;

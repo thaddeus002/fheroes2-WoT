@@ -168,6 +168,9 @@ TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
     u16 s_start = 0;
     u16 s_end = pos_last;
     Point pt(rt.x, rt.y + 2);
+    extents.x = rt.x;
+    extents.y = rt.y;
+    extents.w = 0;
 
     while(s_start < s_end)
     {
@@ -179,15 +182,21 @@ TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
 	}
     	++s_end;
 
-	pt.x = rt.x + (rt.w - Text::width(msg, ft, s_start, s_end - s_start)) / 2;
+	int width = Text::width(msg, ft, s_start, s_end - s_start);
+        pt.x = rt.x + (rt.w - width) / 2;
 	
 	Text(msg.substr(s_start, s_end - s_start), ft, pt);
+        
+        if(width > extents.w)
+             extents.w = width;
 	
 	pt.y += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
 
 	s_start = s_end + 1;
 	s_end = pos_last;
     }
+    
+    extents.h = pt.y - extents.y;
 }
 
 Text2::Text2(const std::string & msg, Font::type_t ft, const Point & pt) : Text(msg, ft)

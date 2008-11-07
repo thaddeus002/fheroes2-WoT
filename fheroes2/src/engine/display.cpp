@@ -25,6 +25,7 @@
 #include "display.h"
 
 bool needrise = false;
+int Display::faded = 255;
 
 Display::Display()
 {
@@ -66,11 +67,11 @@ void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
 }
 
 /* flip */
-void Display::Flip(void)
+void Display::Flip()
 {
     Display & display = Display::Get();
 
-    if(needrise) display.Rise();
+    if(needrise && faded == 0) display.Rise();
     else SDL_Flip(display.surface);
 }
 
@@ -106,49 +107,54 @@ void Display::ShowCursor(void)
     SDL_ShowCursor(SDL_ENABLE);
 }
 
-void Display::Fade()
+void Display::Fade(int fadeTo, bool restore)
 {
     Display & display = Display::Get();
-    if(needrise || display.w() != 640 || display.h() != 480) return;
+    if(faded < fadeTo || display.w() != 640 || display.h() != 480) return;
     Surface temp(display);
     temp.SetDisplayFormat();
     temp.Blit(display);
     const u32 black = temp.MapRGB(0, 0, 0);
-    u8 ii = 250;
-    while(ii > 0)
+    u8 ii = std::max(faded, 255);
+    while(ii > fadeTo)
     {
 	display.Fill(black);
 	temp.SetAlpha(ii);
 	display.Blit(temp);
         display.Flip();
-	ii -= 10;
+	ii -= ii - 10 > fadeTo ? 10 : ii - fadeTo;
 	DELAY(10);
     }
-    temp.SetAlpha(255);
-    display.Blit(temp);
+    faded = ii;
+    if(restore)
+    {
+        temp.SetAlpha(255 - fadeTo);
+        display.Blit(temp);
+    }
     needrise = true;
 }
 
-void Display::Rise()
+void Display::Rise(int riseTo)
 {
     Display & display = Display::Get();
-    if(!needrise) return;
+    if(riseTo < faded) return;
     needrise = false;
     Surface temp(display);
     temp.SetDisplayFormat();
     temp.Blit(display);
     const u32 black = temp.MapRGB(0, 0, 0);
-    u8 ii = 0;
-    while(ii < 250)
+    u8 ii = std::max(faded, 0);
+    while(ii < riseTo)
     {
 	display.Fill(black);
 	temp.SetAlpha(ii);
 	display.Blit(temp);
         display.Flip();
-	ii += 10;
+	ii += ii + 10 < riseTo ? 10 : riseTo - ii;
 	DELAY(10);
     }
-    temp.SetAlpha(255);
+    faded = ii;
+    temp.SetAlpha(255 - riseTo);
     display.Blit(temp);
     display.Flip();
 }

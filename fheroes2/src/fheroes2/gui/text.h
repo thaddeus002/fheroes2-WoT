@@ -87,7 +87,7 @@ class TextBox
 {
 public:
     TextBox(const std::string & msg, Font::type_t ft, const Rect & rt);
-
+    Rect extents;
 };
 
 #endif
