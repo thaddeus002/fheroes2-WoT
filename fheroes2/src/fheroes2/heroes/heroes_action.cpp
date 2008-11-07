@@ -69,6 +69,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index);
 void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index);
 void ActionToArtesianSpring(Heroes &hero, const u16 dst_index);
 void ActionToAbandoneMine(Heroes &hero, const u16 dst_index);
+void ActionToXanadu(Heroes &hero, const u16 dst_index);
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
@@ -97,7 +98,7 @@ u16 DialogWithGold(const std::string & hdr, const std::string & msg, const u16 c
     image.Blit(gold);
     Text text(str, Font::SMALL);
     text.Blit((gold.w() - Text::width(str, Font::SMALL)) / 2, gold.h(), image);
-    return Dialog::SpriteInfo(hdr, msg, image);
+    return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
 u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK)
@@ -107,7 +108,7 @@ u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const A
     Surface image(border.w(), border.h());
     image.Blit(border);
     image.Blit(artifact, 5, 5);
-    return Dialog::SpriteInfo(hdr, msg, image);
+    return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
 u16 DialogMorale(const std::string & hdr, const std::string & msg, const bool good, u8 count)
@@ -350,6 +351,8 @@ void Heroes::Action(const u16 dst_index)
 
         case MP2::OBJ_ARTESIANSPRING:	ActionToArtesianSpring(*this, dst_index); break;
 
+        case MP2::OBJ_XANADU:		ActionToXanadu(*this, dst_index); break;
+
         // object
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_OBELISK:
@@ -357,8 +360,8 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_SPHINX:
-        case MP2::OBJ_XANADU:
         case MP2::OBJ_FREEMANFOUNDRY:
+        case MP2::OBJ_MAGELLANMAPS:
 
         case MP2::OBJ_JAIL:
         case MP2::OBJ_WATERALTAR:
@@ -1388,7 +1391,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    const Resource::resource_t r = Resource::Rand();
 		    std::string header = "A leprechaun offers you the " + Artifact::String(art) + " for the small price of ";
 		    std::string body;
-		    u32 buttons = 0;
+		    u16 buttons = 0;
 		    Resource::funds_t payment;
 		    if(1 == c)
 		    {
@@ -2152,4 +2155,9 @@ void ActionToArtesianSpring(Heroes &hero, const u16 dst_index)
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToArtesianSpring: " + hero.GetName());
+}
+
+void ActionToXanadu(Heroes &hero, const u16 dst_index)
+{
+    if(H2Config::Debug()) Error::Verbose("ActionToXanadu: " + hero.GetName());
 }
