@@ -199,6 +199,7 @@ public:
     u8   GetSpriteIndex(void) const{ return sprite_index; };
     void FadeOut(void) const;
     void FadeIn(void) const;
+    void Scoute(void);
 
     bool isShipMaster(void) const;
     void SetShipMaster(bool f);
@@ -210,8 +211,7 @@ public:
     void IncreaseExperience(const u16 exp);
     void LevelUp(void);
 
-    void Scoute(void);
-
+    void PostBattle(void);
     void Dump(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);

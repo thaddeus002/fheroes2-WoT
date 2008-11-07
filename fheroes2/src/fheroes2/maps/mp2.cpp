@@ -405,8 +405,8 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_HALFLINGHOLE:		return "Halfling Hole";
         case MP2::OBJN_MERCENARYCAMP:
         case MP2::OBJ_MERCENARYCAMP:		return "Mercenary Camp";
-        case MP2::OBJN_PIRAMID:
-        case MP2::OBJ_PIRAMID:			return "Piramid";
+        case MP2::OBJN_PYRAMID:
+        case MP2::OBJ_PYRAMID:			return "Pyramid";
         case MP2::OBJN_CITYDEAD:
         case MP2::OBJ_CITYDEAD:			return "City of the Dead";
         case MP2::OBJN_EXCAVATION:
@@ -429,8 +429,8 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_OBSERVATIONTOWER:		return "Observation Tower";
         case MP2::OBJN_FREEMANFOUNDRY:
         case MP2::OBJ_FREEMANFOUNDRY:		return "Freeman Foundry";
-        case MP2::OBJN_CRAKEDLAKE:
-        case MP2::OBJ_CRAKEDLAKE:            	return "Watering Hole";
+        case MP2::OBJN_WATERINGHOLE:
+        case MP2::OBJ_WATERINGHOLE:            	return "Watering Hole";
         case MP2::OBJN_ARTESIANSPRING:
         case MP2::OBJ_ARTESIANSPRING:        	return "Artesian Spring";
         case MP2::OBJN_GAZEBO:
@@ -682,11 +682,11 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     	    case OBJ_HILLFORT:
     	    case OBJ_HALFLINGHOLE:
     	    case OBJ_MERCENARYCAMP:
-    	    case OBJ_CRAKEDLAKE:
+    	    case OBJ_WATERINGHOLE:
 	    case OBJ_SHRINE1:
     	    case OBJ_SHRINE2:
     	    case OBJ_SHRINE3:
-    	    case OBJ_PIRAMID:
+    	    case OBJ_PYRAMID:
     	    case OBJ_CITYDEAD:
     	    case OBJ_EXCAVATION:
     	    case OBJ_SPHINX:
@@ -781,6 +781,8 @@ bool MP2::isBattleLife(const MP2::object_t obj)
 	case OBJ_IDOL:
 	case OBJ_FOUNTAIN:
 	case OBJ_FAERIERING:
+	case OBJ_PYRAMID:
+	case OBJ_MERMAID:
 
 	// morale modificators
 	case OBJ_BUOY:
@@ -789,7 +791,9 @@ bool MP2::isBattleLife(const MP2::object_t obj)
 	case OBJ_GRAVEYARD:
         case OBJ_SHIPWRECK:
         case OBJ_DERELICTSHIP:
-            
+
+        case OBJ_WATERINGHOLE:
+
 	    return true;
 
 	default: break;

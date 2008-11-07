@@ -158,7 +158,7 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_EXCAVATION:
 	case MP2::OBJ_DESERTTENT:
 	case MP2::OBJ_DAEMONCAVE:
-	case MP2::OBJ_PIRAMID:
+	case MP2::OBJ_PYRAMID:
 	case MP2::OBJ_FORT:
 	case MP2::OBJ_RUINS:
 	case MP2::OBJ_TROLLBRIDGE:

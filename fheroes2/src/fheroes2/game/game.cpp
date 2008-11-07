@@ -136,7 +136,7 @@ void Game::EnvironmentSoundMixer(bool forced)
 			case MP2::OBJ_ARTESIANSPRING:
 			case MP2::OBJ_FOUNTAIN:		channel = 10; break;
 			case MP2::OBJ_WATERLAKE:
-			case MP2::OBJ_CRAKEDLAKE:	channel = 11; break;
+			case MP2::OBJ_WATERINGHOLE:	channel = 11; break;
 			case MP2::OBJ_MINES:		channel = 12; break;
 			case MP2::OBJ_SAWMILL:		channel = 13; break;
 			case MP2::OBJ_DAEMONCAVE:	channel = 14; break;

@@ -635,7 +635,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_HILLFORT:	return MP2::OBJN_HILLFORT;
 	case MP2::OBJN_HALFLINGHOLE:	return MP2::OBJN_HALFLINGHOLE;
 	case MP2::OBJN_MERCENARYCAMP:	return MP2::OBJN_MERCENARYCAMP;
-	case MP2::OBJN_PIRAMID:		return MP2::OBJN_PIRAMID;
+	case MP2::OBJN_PYRAMID:		return MP2::OBJN_PYRAMID;
 	case MP2::OBJN_CITYDEAD:	return MP2::OBJN_CITYDEAD;
 	case MP2::OBJN_EXCAVATION:	return MP2::OBJN_EXCAVATION;
 	case MP2::OBJN_SPHINX:		return MP2::OBJN_SPHINX;
@@ -738,7 +738,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_MERCENARYCAMP:	return MP2::OBJ_MERCENARYCAMP;
 	case MP2::OBJ_SHRINE2:		return MP2::OBJ_SHRINE2;
 	case MP2::OBJ_SHRINE3:		return MP2::OBJ_SHRINE3;
-	case MP2::OBJ_PIRAMID:		return MP2::OBJ_PIRAMID;
+	case MP2::OBJ_PYRAMID:		return MP2::OBJ_PYRAMID;
 	case MP2::OBJ_CITYDEAD:		return MP2::OBJ_CITYDEAD;
 	case MP2::OBJ_EXCAVATION:	return MP2::OBJ_EXCAVATION;
 	case MP2::OBJ_SPHINX:		return MP2::OBJ_SPHINX;
@@ -747,8 +747,8 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_ARTESIANSPRING:	return MP2::OBJN_ARTESIANSPRING;
 	case MP2::OBJ_ARTESIANSPRING:	return MP2::OBJ_ARTESIANSPRING;
 	case MP2::OBJ_TROLLBRIDGE:	return MP2::OBJ_TROLLBRIDGE;
-	case MP2::OBJN_CRAKEDLAKE:	return MP2::OBJN_CRAKEDLAKE;
-	case MP2::OBJ_CRAKEDLAKE:	return MP2::OBJ_CRAKEDLAKE;
+	case MP2::OBJN_WATERINGHOLE:	return MP2::OBJN_WATERINGHOLE;
+	case MP2::OBJ_WATERINGHOLE:	return MP2::OBJ_WATERINGHOLE;
 	case MP2::OBJ_WITCHSHUT:	return MP2::OBJ_WITCHSHUT;
 	case MP2::OBJ_XANADU:		return MP2::OBJ_XANADU;
 	case MP2::OBJ_CAVE:		return MP2::OBJ_CAVE;
@@ -1579,26 +1579,9 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_SHIPWRECK:
-	    switch(Rand::Get(1, 4))
-	    {
-		// 1000 gold
-		case 1:
-		    quantity2 = 10;
-		break;
-		// 2000 gold
-		case 2:
-		    quantity2 = 20;
-		break;
-		// 5000 gold
-		case 3:
-		    quantity2 = 50;
-		break;
-		// 2000 gold + art
-		default:
-		    quantity1 = Artifact::Rand();
-		    quantity2 = 20;
-		break;
-	    }
+	    // variant: 10ghost(1000g), 15 ghost(2000g), 25ghost(5000g) or 50ghost(2000g+art)
+	    quantity2 = Rand::Get(1, 4);
+	    quantity1 = 4 == quantity2 ? Artifact::Rand() : 0;
 	break;
 
 	case MP2::OBJ_DERELICTSHIP:
@@ -1612,8 +1595,8 @@ void Maps::Tiles::UpdateQuantity(void)
 		quantity2 = 10;
 	break;
 
-	case MP2::OBJ_PIRAMID:
-	    quantity1 = 0; // FIXME: PackQuantity: Piramid: add Spell Level 5
+	case MP2::OBJ_PYRAMID:
+	    quantity1 = 0; // FIXME: PackQuantity: Pyramid: add Spell Level 5
 	break;
 
 	case MP2::OBJ_DAEMONCAVE:
