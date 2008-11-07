@@ -316,10 +316,12 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     str += ")";
     if(H2Config::Debug()) Error::Verbose(str);
 
-    const u16 exp = Algorithm::CalculateExperience(army);
     Display::Fade();
 
-    switch(Army::Battle(hero, army, tile))
+    const u16 exp = Algorithm::CalculateExperience(army);
+    const Army::battle_t b = Army::Battle(hero, army, tile);
+
+    switch(b)
     {
 	case Army::WIN:
 	{
@@ -348,7 +350,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     	    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
 	    Game::Focus::Get().Reset(Game::Focus::HEROES);
 	    Game::Focus::Get().Redraw();
-    	    hero.SetFreeman();
+    	    hero.SetFreeman(b);
 	break;
         
         default: break;
@@ -370,7 +372,7 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
     else
     {
 	if(H2Config::Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
-	Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
+	const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
 	const u16 exp = Algorithm::CalculateExperience(*other_hero);
 
 	switch(b)
@@ -379,7 +381,7 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
 		AGG::PlaySound(M82::KILLFADE);
 		(*other_hero).FadeOut();
     		world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
-    		const_cast<Heroes &>(*other_hero).SetFreeman();
+    		const_cast<Heroes &>(*other_hero).SetFreeman(b);
 		hero.IncreaseExperience(exp);
 		break;
 
@@ -391,7 +393,7 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
     		world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
 		Game::Focus::Get().Reset(Game::Focus::HEROES);
 		Game::Focus::Get().Redraw();
-    		hero.SetFreeman();
+    		hero.SetFreeman(b);
 	    break;
 
             default: break;
@@ -418,7 +420,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
     else
     {
 	if(H2Config::Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
-	Army::battle_t b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
+	const Army::battle_t b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
 	const u16 exp = Algorithm::CalculateExperience(*castle);
 
 	switch(b)
@@ -440,7 +442,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
     		world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
 		Game::Focus::Get().Reset(Game::Focus::HEROES);
 		Game::Focus::Get().Redraw();
-    		hero.SetFreeman();
+    		hero.SetFreeman(b);
 	    break;
 
             default: break;
@@ -1177,27 +1179,29 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 
 		    Display::Fade();
 
-		    if(battle) switch(Army::Battle(hero, army, tile))
+		    if(battle)
 		    {
-			case Army::WIN:
+			const Army::battle_t b = Army::Battle(hero, army, tile);
+			switch(b)
+			{
+			    case Army::WIN:
 			    conditions = true;
 			    Dialog::SpriteInfo("Victorious, you take your prize, the ", Artifact::String(art), sprite);
 			    break;
 
-			case Army::RETREAT:
-			case Army::SURRENDER:
-			case Army::LOSE:
-    			{
+			    case Army::RETREAT:
+			    case Army::SURRENDER:
+			    case Army::LOSE:
 			    AGG::PlaySound(M82::KILLFADE);
 			    hero.FadeOut();
     			    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
 			    Game::Focus::Get().Reset(Game::Focus::HEROES);
 			    Game::Focus::Get().Redraw();
-    			    hero.SetFreeman();
-			}
-			break;
+    			    hero.SetFreeman(b);
+			    break;
         
     			default: break;
+			}
 		    }
 		    else
 			Dialog::Message("Discretion is the better part of valor, and you decide to avoid this fight for today.", "", Font::BIG, Dialog::OK);
@@ -1680,10 +1684,29 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You've found the ruins of an ancient city, now inhabited solely by the undead.", "Will you search?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
+		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    switch(b)
+		    {
+			case Army::WIN:
+			    hero.IncreaseExperience(exp);
+			    world.CaptureObject(dst_index, hero.GetColor());
+			    complete = (Dialog::YES == Dialog::Message("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price.", "Do you want to recruit Liches?", Font::BIG, Dialog::YES | Dialog::NO));
+			break;
 
-
-		    world.CaptureObject(dst_index, hero.GetColor());
-		    complete = (Dialog::YES == Dialog::Message("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price.", "Do you want to recruit Liches?", Font::BIG, Dialog::YES | Dialog::NO));
+			case Army::RETREAT:
+			case Army::SURRENDER:
+			case Army::LOSE:
+			    AGG::PlaySound(M82::KILLFADE);
+			    hero.FadeOut();
+    			    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
+			    Game::Focus::Get().Reset(Game::Focus::HEROES);
+			    Game::Focus::Get().Redraw();
+    			    hero.SetFreeman(b);
+			break;
+        
+    			default: break;
+		    }
 		}
 	    }
 	    break;
@@ -1711,10 +1734,29 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("Trolls living under the bridge challenge you.", "Will you fight them?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
+		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    switch(b)
+		    {
+			case Army::WIN:
+			    hero.IncreaseExperience(exp);
+			    world.CaptureObject(dst_index, hero.GetColor());
+			    complete = (Dialog::YES == Dialog::Message("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries.", "Do you want to buy any Trolls?", Font::BIG, Dialog::YES | Dialog::NO));
+			break;
 
-
-		    world.CaptureObject(dst_index, hero.GetColor());
-		    complete = (Dialog::YES == Dialog::Message("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries.", "Do you want to buy any Trolls?", Font::BIG, Dialog::YES | Dialog::NO));
+			case Army::RETREAT:
+			case Army::SURRENDER:
+			case Army::LOSE:
+			    AGG::PlaySound(M82::KILLFADE);
+			    hero.FadeOut();
+    			    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
+			    Game::Focus::Get().Reset(Game::Focus::HEROES);
+			    Game::Focus::Get().Redraw();
+    			    hero.SetFreeman(b);
+			break;
+        
+    			default: break;
+		    }
 		}
 	    }
     	    break;
@@ -1740,10 +1782,29 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You stand before the Dragon City, a place off-limits to mere humans.", "Do you wish to violate this rule and challenge the Dragons to a fight?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
+		    const u16 exp = Algorithm::CalculateExperience(army);
+		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    switch(b)
+		    {
+			case Army::WIN:
+			    hero.IncreaseExperience(exp);
+			    world.CaptureObject(dst_index, hero.GetColor());
+			    complete = (Dialog::YES == Dialog::Message("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.", "Do you wish to recruit Dragons?", Font::BIG, Dialog::YES | Dialog::NO));
+			break;
 
-
-		    world.CaptureObject(dst_index, hero.GetColor());
-		    complete = (Dialog::YES == Dialog::Message("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.", "Do you wish to recruit Dragons?", Font::BIG, Dialog::YES | Dialog::NO));
+			case Army::RETREAT:
+			case Army::SURRENDER:
+			case Army::LOSE:
+			    AGG::PlaySound(M82::KILLFADE);
+			    hero.FadeOut();
+    			    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
+			    Game::Focus::Get().Reset(Game::Focus::HEROES);
+			    Game::Focus::Get().Redraw();
+    			    hero.SetFreeman(b);
+			break;
+        
+    			default: break;
+		    }
 		}
 	    }
 	    break;

@@ -29,7 +29,6 @@ class Heroes;
 namespace AI
 {
     Skill::Secondary::skill_t SelectSkill(const Heroes & hero, const Skill::Secondary & sec1, const Skill::Secondary & sec2);
-    bool SelectGoldOrExp(const Heroes & hero, const u16 gold, const u16 expr);
 
     void HeroesAction(Heroes & hero, const u16 dst_index);
 };

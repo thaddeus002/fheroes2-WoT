@@ -28,12 +28,6 @@ Skill::Secondary::skill_t AI::SelectSkill(const Heroes & hero, const Skill::Seco
     return Rand::Get(0, 1) ? sec1.Skill() : sec2.Skill();
 }
 
-bool AI::SelectGoldOrExp(const Heroes & hero, const u16 gold, const u16 expr)
-{
-    // FIXME: AI::SelectGoldOrExp: always select gold
-    return true;
-}
-
 // see Heroes::Action
 void AI::HeroesAction(Heroes & hero, const u16 dst_index)
 {

@@ -306,7 +306,7 @@ void Game::OpenHeroes(Heroes *hero)
 		    Display::Get().Flip();
 
 		    (*it)->FadeOut();
-		    (*it)->SetFreeman();
+		    (*it)->SetFreeman(0);
 		    myKingdom.RemoveHeroes(*it);
 
     		    globalfocus.Reset(Game::Focus::HEROES);

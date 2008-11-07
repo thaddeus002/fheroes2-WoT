@@ -100,7 +100,7 @@ public:
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
 
     bool isFreeman(void) const{ return Color::GRAY == color; };
-    void SetFreeman(void);
+    void SetFreeman(const u8 reason);
 
     bool operator== (const Heroes & h) const;
 
