@@ -1585,6 +1585,8 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 	AnimationRemoveObject(tile);
 
 	tile.RemoveObjectSprite();
+	tile.SetQuantity1(0);
+	tile.SetQuantity2(0);
 	tile.SetObject(MP2::OBJ_ZERO);
     }
 

@@ -1329,7 +1329,8 @@ void Heroes::Scoute(void)
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
 {
-    if(HasArtifact(art)) return false;
+    //if(HasArtifact(art)) return false; TODO for Message
+
     if(MaxCountArtifact())
     {
 	if(H2Config::MyColor() == color) Dialog::Message("Warning", "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
