@@ -299,43 +299,40 @@ void Castle::ActionNewWeek(void)
     u8 well = building & BUILD_WELL ? GROWN_WELL : 0;
     u8 wel2 = building & BUILD_WEL2 ? GROWN_WEL2 : 0;
 
+    // dw 1
+    if(building & DWELLING_MONSTER1) dwelling[0]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)) + well + wel2;
+    // dw 2
+    if(building & DWELLING_UPGRADE2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE2)) + well;
+    else
+    if(building & DWELLING_MONSTER2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)) + well;
+    // dw 3
+    if(building & DWELLING_UPGRADE3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE3)) + well;
+    else
+    if(building & DWELLING_MONSTER3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)) + well;
+    // dw 4
+    if(building & DWELLING_UPGRADE4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE4)) + well;
+    else
+    if(building & DWELLING_MONSTER4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4)) + well;
+    // dw 5
+    if(building & DWELLING_UPGRADE5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE5)) + well;
+    else
+    if(building & DWELLING_MONSTER5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5)) + well;
+    // dw 6
+    if(building & DWELLING_UPGRADE7) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7)) + well;
+    else
+    if(building & DWELLING_UPGRADE6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE6)) + well;
+    else
+    if(building & DWELLING_MONSTER6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6)) + well;
+}
+
+void Castle::ActionNewMonth(void)
+{
     if(world.GetWeekType() == Week::PLAGUE)
     {
 	std::vector<u16>::iterator it1 = dwelling.begin();
 	std::vector<u16>::iterator it2 = dwelling.end();
 	for(; it1 != it2; ++it1) if(*it1) (*it1) = (*it1) / 2;
     }
-    else
-    {
-    	// dw 1
-	if(building & DWELLING_MONSTER1) dwelling[0]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)) + well + wel2;
-	// dw 2
-	if(building & DWELLING_UPGRADE2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE2)) + well;
-	else
-	if(building & DWELLING_MONSTER2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)) + well;
-	// dw 3
-	if(building & DWELLING_UPGRADE3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE3)) + well;
-	else
-	if(building & DWELLING_MONSTER3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)) + well;
-	// dw 4
-        if(building & DWELLING_UPGRADE4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE4)) + well;
-	else
-        if(building & DWELLING_MONSTER4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4)) + well;
-	// dw 5
-	if(building & DWELLING_UPGRADE5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE5)) + well;
-	else
-	if(building & DWELLING_MONSTER5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5)) + well;
-	// dw 6
-	if(building & DWELLING_UPGRADE7) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7)) + well;
-	else
-	if(building & DWELLING_UPGRADE6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE6)) + well;
-	else
-	if(building & DWELLING_MONSTER6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6)) + well;
-    }
-}
-
-void Castle::ActionNewMonth(void)
-{
 }
 
 // change castle color

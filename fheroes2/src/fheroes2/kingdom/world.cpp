@@ -1176,7 +1176,7 @@ void World::NewWeek(void)
 	if(*it1 && MP2::isWeekLife((*it1)->GetObject())) (*it1)->UpdateQuantity();
 
     // update week type
-    week_name = Week::Rand();
+    week_name = BeginMonth() ? Week::MonthRand() : Week::WeekRand();
 
     // TODO:: action for week type: PLAGUE and MONSTERS
 }

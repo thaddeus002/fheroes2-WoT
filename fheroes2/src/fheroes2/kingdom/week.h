@@ -57,7 +57,8 @@ namespace Week
     };
 
     const std::string & GetString(type_t type);
-    type_t Rand(void);
+    type_t WeekRand(void);
+    type_t MonthRand(void);
 };
 
 #endif

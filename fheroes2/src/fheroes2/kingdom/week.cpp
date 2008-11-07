@@ -62,7 +62,40 @@ const std::string & Week::GetString(type_t type)
     return str_name[0];
 }
 
-Week::type_t Week::Rand(void)
+Week::type_t Week::WeekRand(void)
+{
+    switch(Rand::Get(2, 24))
+    {
+	case 2:		return ANT;
+	case 3:		return GRASSHOPPER;
+	case 4:		return DRAGONFLY;
+	case 5:		return SPIDER;
+	case 6:		return BUTTERFLY;
+	case 7:		return BUMBLEBEE;
+	case 8:		return LOCUST;
+	case 9:		return EARTHWORM;
+	case 10:	return HORNET;
+	case 11:	return BEETLE;
+	case 12:	return SQUIRREL;
+	case 13:	return RABBIT;
+	case 14:	return GOPHER;
+	case 15:	return BADGER;
+	case 16:	return EAGLE;
+	case 17:	return WEASEL;
+	case 18:	return RAVEN;
+	case 19:	return MONGOOSE;
+	case 20:	return AARDVARK;
+	case 21:	return LIZARD;
+	case 22:	return TORTOISE;
+	case 23:	return HEDGEHOG;
+	case 24:	return CONDOR;
+	default: break;
+    }
+
+    return UNNAMED;
+}
+
+Week::type_t Week::MonthRand(void)
 {
     switch(Rand::Get(1, 24))
     {
