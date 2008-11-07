@@ -321,6 +321,16 @@ void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
 	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
 
+	// fix for abandone mine
+	if(MP2::OBJ_ABANDONEDMINE == general)
+	{
+	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
+	    Rect rt;
+	    Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
+	    GameArea::SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
+	    display.Blit(anime_sprite, rt, pt);
+	}
+
 	if(addons_level2.size())
 	{
 	    std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
@@ -347,16 +357,6 @@ void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 		    }
 		}
 	    }
-	}
-	else
-	// fix for abandone mine
-	if(MP2::OBJ_ABANDONEDMINE == general)
-	{
-	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
-	    Rect rt;
-	    Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
-	    GameArea::SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
-	    display.Blit(anime_sprite, rt, pt);
 	}
     }
 }
