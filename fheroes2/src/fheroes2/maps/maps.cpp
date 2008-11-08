@@ -255,29 +255,12 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj, bool full)
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
 
-    if(isValidAbsPoint(cx - 1, cy - 1) && full &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx - 1, cy - 1)).GetObject()) return (cy - 1) * world.w() + cx - 1;
-
-    if(isValidAbsPoint(cx, cy - 1) &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx, cy - 1)).GetObject()) return (cy - 1) * world.w() + cx;
-
-    if(isValidAbsPoint(cx + 1, cy - 1) && full &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx + 1, cy - 1)).GetObject()) return (cy - 1) * world.w() + cx + 1;
-
-    if(isValidAbsPoint(cx - 1, cy) &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx - 1, cy)).GetObject()) return cy * world.w() + cx - 1;
-
-    if(isValidAbsPoint(cx + 1, cy) &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx + 1, cy)).GetObject()) return cy * world.w() + cx + 1;
-
-    if(isValidAbsPoint(cx - 1, cy + 1) && full &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx - 1, cy + 1)).GetObject()) return (cy + 1) * world.w() + cx - 1;
-
-    if(isValidAbsPoint(cx, cy + 1) &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx, cy + 1)).GetObject()) return (cy + 1) * world.w() + cx;
-
-    if(isValidAbsPoint(cx + 1, cy + 1) && full &&
-	obj == world.GetTiles(GetIndexFromAbsPoint(cx + 1, cy + 1)).GetObject()) return (cy + 1) * world.w() + cx + 1;
-
+    for(s16 y = cy - 1; y <= cy + 1; ++y)
+        for(s16 x = cx - 1; x <= cx + 1; ++x)
+    {
+            if((y == cy && x == cx) || (cy && cx && !full)) continue;
+	    if(isValidAbsPoint(x, y) &&
+		obj == world.GetTiles(GetIndexFromAbsPoint(x, y)).GetObject()) return y * world.w() + x;
+    }
     return MAXU16;
 }
