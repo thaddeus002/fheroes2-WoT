@@ -206,8 +206,12 @@ void Army::BattleSummaryVsHero(Heroes &hero, const Army::army_t &heroOrig, Heroe
         from = &hero;
         to = &hero2;
     }
-    to->GetArtifacts().insert(to->GetArtifacts().end(), from->GetArtifacts().begin(), from->GetArtifacts().end());
-    from->GetArtifacts().clear();
+    if(from->GetArtifacts().size() > 1)
+    {
+        //Transfer all artifacts except the spell book
+        to->GetArtifacts().insert(to->GetArtifacts().end(), from->GetArtifacts().begin() + 1, from->GetArtifacts().end());
+        from->GetArtifacts().clear();
+    }
 }
 
 void Army::DrawArmySummary(const Army::army_t &orig, const Army::army_t &current, const Rect &draw)
