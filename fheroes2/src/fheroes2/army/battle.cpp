@@ -183,7 +183,13 @@ Army::battle_t Army::Battle(Heroes& hero, std::vector<Army::Troops>& army, const
 
 Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile)
 {
-    return WIN; // TODO
+    Army::army_t heroArmy = hero.GetArmy();
+    Army::army_t oppArmy = castle.GetArmy();
+    // TODO
+    //Army::battle_t status = BattleInt(&hero, 0, const_cast<std::vector<Army::Troops>&>(hero.GetArmy()), army, tile);
+    Army::battle_t status = WIN;
+    BattleSummaryVsArmy(hero, heroArmy, castle.GetArmy(), oppArmy, status);
+    return status;
 }
 
 void Army::BattleSummaryVsArmy(Heroes &hero, const Army::army_t &heroOrig, const Army::army_t &army, const Army::army_t &armyOrig, Army::battle_t status)
