@@ -393,7 +393,7 @@ bool Heroes::MoveStep(void)
 
 	sprite_index -= 8;
 
-	const u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER);
+	const u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, false);
 	if(MAXU16 != dst_index2)
         {
 	    GameArea::Get().Redraw();

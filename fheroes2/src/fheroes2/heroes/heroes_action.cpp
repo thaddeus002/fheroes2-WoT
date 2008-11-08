@@ -201,7 +201,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
-    u16 index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
+    u16 index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES, true);
     const Heroes *hero = MAXU16 == index ? NULL : world.GetHeroes(index);
 
     Surface sf(tile.GetSurface());
@@ -1725,7 +1725,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.FadeIn();
 
     // check monster
-    u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER);
+    u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, false);
     if(MAXU16 != dst_index2) hero.Action(dst_index2);
 }
 

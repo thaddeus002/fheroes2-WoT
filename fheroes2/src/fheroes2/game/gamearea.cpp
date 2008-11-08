@@ -314,7 +314,7 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
     Monster::monster_t monster = Monster::Monster(tile);
     Point dst_pt;
     Rect src_rt;
-    const u16 dst_index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
+    const u16 dst_index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES, false);
 
     // draw attack sprite
     if(MAXU16 != dst_index)
