@@ -75,6 +75,15 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index);
 void ActionToArtesianSpring(Heroes &hero, const u16 dst_index);
 void ActionToAbandoneMine(Heroes &hero, const u16 dst_index);
 void ActionToXanadu(Heroes &hero, const u16 dst_index);
+void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
+
+void UpgradeMonsters(Heroes & hero, const Monster::monster_t monster)
+{
+    Army::army_t::iterator it1 = hero.GetArmy().begin();
+    Army::army_t::const_iterator it2 = hero.GetArmy().end();
+
+    for(; it1 != it2; it1++) if(monster == (*it1).Monster() && Monster::AllowUpgrade(monster)) (*it1).SetMonster(Monster::Upgrade(monster));
+}
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
@@ -358,14 +367,15 @@ void Heroes::Action(const u16 dst_index)
 
         case MP2::OBJ_XANADU:		ActionToXanadu(*this, dst_index); break;
 
+        case MP2::OBJ_HILLFORT:
+        case MP2::OBJ_FREEMANFOUNDRY:	ActionToUpgradeArmyObject(*this, dst_index); break;
+
         // object
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_OBELISK:
 	case MP2::OBJ_ORACLE:
         case MP2::OBJ_TREEKNOWLEDGE:
-        case MP2::OBJ_HILLFORT:
         case MP2::OBJ_SPHINX:
-        case MP2::OBJ_FREEMANFOUNDRY:
         case MP2::OBJ_MAGELLANMAPS:
 	case MP2::OBJ_WHIRLPOOL:
 
@@ -2293,4 +2303,108 @@ void ActionToXanadu(Heroes &hero, const u16 dst_index)
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToXanadu: " + hero.GetName());
+}
+
+void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t & obj = tile.GetObject();
+
+    std::string msg1;
+    std::string msg2;
+    std::string msg3;
+    
+    std::vector<Monster::monster_t> mons;
+    mons.reserve(3);
+
+    switch(obj)
+    {
+	case MP2::OBJ_HILLFORT:
+	    if(hero.HasMonster(Monster::DWARF))
+	    {
+		UpgradeMonsters(hero, Monster::DWARF);
+		mons.push_back(Monster::DWARF);
+		msg1 = Monster::MultipleNames(Monster::DWARF);
+	    }
+	    if(hero.HasMonster(Monster::ORC))
+	    {
+		UpgradeMonsters(hero, Monster::ORC);
+		mons.push_back(Monster::ORC);
+		if(msg1.size()) msg1 += ", ";
+		msg1 += Monster::MultipleNames(Monster::ORC);
+	    }
+	    if(hero.HasMonster(Monster::OGRE))
+	    {
+		UpgradeMonsters(hero, Monster::OGRE);
+		mons.push_back(Monster::OGRE);
+		if(msg1.size()) msg1 += ", ";
+		msg1 += Monster::MultipleNames(Monster::OGRE);
+	    }
+	    msg1 = "All of the " + msg1 + " you have in your army have been trained by the battle masters of the fort.  Your army now contains " + msg1 + ".";
+	    msg2 = "An unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any such troops brought to them.  Unfortunately, you have none with you.";
+	    break;
+
+	case MP2::OBJ_FREEMANFOUNDRY:
+	    if(hero.HasMonster(Monster::PIKEMAN))
+	    {
+		UpgradeMonsters(hero, Monster::PIKEMAN);
+		mons.push_back(Monster::PIKEMAN);
+		msg1 = Monster::MultipleNames(Monster::PIKEMAN);
+	    }
+	    if(hero.HasMonster(Monster::SWORDSMAN))
+	    {
+		UpgradeMonsters(hero, Monster::SWORDSMAN);
+		mons.push_back(Monster::SWORDSMAN);
+		if(msg1.size()) msg1 += ", ";
+		msg1 += Monster::MultipleNames(Monster::SWORDSMAN);
+	    }
+	    if(hero.HasMonster(Monster::IRON_GOLEM))
+	    {
+		UpgradeMonsters(hero, Monster::IRON_GOLEM);
+		mons.push_back(Monster::IRON_GOLEM);
+		if(msg1.size()) msg1 += ", ";
+		msg1 += Monster::MultipleNames(Monster::IRON_GOLEM);
+	    }
+	    msg1 = "All of your " + msg1 + " have been upgraded into " + msg1 + ".";
+	    msg2 = "A blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.";
+	    break;
+
+	default: break;
+    }
+
+    if(mons.size())
+    {
+	// composite sprite
+	u8 ox = 0;
+	const Sprite & br = AGG::GetICN(ICN::STRIP, 12);
+	Surface sf(br.w() * mons.size() + (mons.size() - 1) * 4, br.h());
+	sf.SetColorKey();
+	std::vector<Monster::monster_t>::const_iterator it1 = mons.begin();
+	std::vector<Monster::monster_t>::const_iterator it2 = mons.end();
+	for(; it1 != it2; ++it1)
+	{
+	    sf.Blit(br, ox, 0);
+	    switch(Monster::GetRace(*it1))
+	    {
+		case Race::KNGT:	sf.Blit(AGG::GetICN(ICN::STRIP, 4), ox + 6, 6); break;
+		case Race::BARB:	sf.Blit(AGG::GetICN(ICN::STRIP, 5), ox + 6, 6); break;
+		case Race::SORC:	sf.Blit(AGG::GetICN(ICN::STRIP, 6), ox + 6, 6); break;
+		case Race::WRLK:	sf.Blit(AGG::GetICN(ICN::STRIP, 7), ox + 6, 6); break;
+		case Race::WZRD:	sf.Blit(AGG::GetICN(ICN::STRIP, 8), ox + 6, 6); break;
+		case Race::NECR:	sf.Blit(AGG::GetICN(ICN::STRIP, 9), ox + 6, 6); break;
+		default:		sf.Blit(AGG::GetICN(ICN::STRIP, 10), ox + 6, 6); break;
+	    }
+	    const Sprite & mon = AGG::GetICN(Monster::GetStats(Monster::Upgrade(*it1)).monh_icn, 0);
+	    sf.Blit(mon, ox + 6 + mon.x(), 6 + mon.y());
+	    ox += br.w() + 4;
+	}
+	Dialog::SpriteInfo(MP2::StringObject(obj), msg1, sf);
+    }
+    else
+    {
+	PlaySoundFailure;
+	Dialog::Message(MP2::StringObject(obj), msg2, Font::BIG, Dialog::OK);
+    }
+
+    if(H2Config::Debug()) Error::Verbose("ActionToUpgradeArmyObject: " + hero.GetName());
 }
