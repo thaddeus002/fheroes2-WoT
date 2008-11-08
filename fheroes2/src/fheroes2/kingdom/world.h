@@ -85,6 +85,7 @@ public:
     Heroes & GetHeroes(const Heroes::heroes_t & hero){ return *vec_heroes[hero]; };
 
     Artifact::artifact_t DiggingForUltimateArtifacts(const Point & center);
+    void ActionForMagellanMaps(u8 color);
 
     u8 GetDay(void){ return day % DAYOFWEEK + 1; };
     u8 GetWeek(void){ return week % WEEKOFMONTH + 1; };
@@ -101,8 +102,10 @@ public:
 
     const std::string & GetRumors(void);
     
-    Spell::spell_t SpellFromShrine(const u16 index);
     u16 NextTeleport(const u16 index) const;
+    u16 NextWhirlpool(const u16 index);
+
+    Spell::spell_t SpellFromShrine(const u16 index);
     Skill::Secondary::skill_t SkillFromWitchsHut(const u16 index);
     const std::string & MessageSign(const u16 index);
 
@@ -135,6 +138,7 @@ private:
     std::vector<Heroes *>               vec_heroes;
     std::vector<u16>                    vec_teleports;
 
+    std::map<u32, std::vector<u16> >	map_whirlpools;
     std::map<u16, std::string>		map_sign;
     std::map<u16, Spell::spell_t>	map_shrine;
     std::map<u16, Skill::Secondary::skill_t> map_witchshut;

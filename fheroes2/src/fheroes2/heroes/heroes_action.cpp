@@ -67,6 +67,7 @@ void ActionToExperienceObject(Heroes &hero, const u16 dst_index);
 void ActionToTreasureChest(Heroes &hero, const u16 dst_index);
 void ActionToAncientLamp(Heroes &hero, const u16 dst_index);
 void ActionToTeleports(Heroes &hero, const u16 dst_index);
+void ActionToWhirlpools(Heroes &hero, const u16 dst_index);
 void ActionToObservationTower(Heroes &hero, const u16 dst_index);
 void ActionToCaptureObject(Heroes &hero, const u16 dst_index);
 void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index);
@@ -76,6 +77,7 @@ void ActionToArtesianSpring(Heroes &hero, const u16 dst_index);
 void ActionToAbandoneMine(Heroes &hero, const u16 dst_index);
 void ActionToXanadu(Heroes &hero, const u16 dst_index);
 void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
+void ActionToMagellanMaps(Heroes &hero, const u16 dst_index);
 
 void UpgradeMonsters(Heroes & hero, const Monster::monster_t monster)
 {
@@ -329,8 +331,11 @@ void Heroes::Action(const u16 dst_index)
 
         // teleports
 	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(*this, dst_index); break;
+	case MP2::OBJ_WHIRLPOOL:	ActionToWhirlpools(*this, dst_index); break;
+
 	// obsv tower
 	case MP2::OBJ_OBSERVATIONTOWER:	ActionToObservationTower(*this, dst_index); break;
+        case MP2::OBJ_MAGELLANMAPS:	ActionToMagellanMaps(*this, dst_index); break;
 
 	// capture color object
 	case MP2::OBJ_ALCHEMYLAB:
@@ -376,8 +381,6 @@ void Heroes::Action(const u16 dst_index)
 	case MP2::OBJ_ORACLE:
         case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_SPHINX:
-        case MP2::OBJ_MAGELLANMAPS:
-	case MP2::OBJ_WHIRLPOOL:
 
         case MP2::OBJ_JAIL:
         case MP2::OBJ_WATERALTAR:
@@ -1739,6 +1742,42 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     if(MAXU16 != dst_index2) hero.Action(dst_index2);
 }
 
+void ActionToWhirlpools(Heroes &hero, const u16 index_from)
+{
+    const u16 index_to = world.NextWhirlpool(index_from);
+    hero.ApplyPenaltyMovement();
+
+    if(index_from == index_to)
+    {
+	AGG::PlaySound(M82::RSBRYFZL);
+	Error::Warning("ActionToWhirlpools: action unsuccessfully...");
+	return;
+    }
+
+    AGG::PlaySound(M82::KILLFADE);
+    hero.GetPath().Hide();
+    hero.FadeOut();
+
+    Maps::Tiles & tiles_from = world.GetTiles(index_from);
+    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
+
+    hero.SaveUnderObject(MP2::OBJ_WHIRLPOOL);
+    hero.SetCenter(index_to);
+    hero.Scoute();
+
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+    AGG::PlaySound(M82::KILLFADE);
+    hero.GetPath().Hide();
+    hero.FadeIn();
+
+    // check monster
+    //u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, false);
+    //if(MAXU16 != dst_index2) hero.Action(dst_index2);
+}
+
 void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
@@ -2408,3 +2447,23 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
 
     if(H2Config::Debug()) Error::Verbose("ActionToUpgradeArmyObject: " + hero.GetName());
 }
+
+void ActionToMagellanMaps(Heroes &hero, const u16 dst_index)
+{
+    if(1000 > world.GetKingdom(hero.GetColor()).GetFundsGold())
+    {
+	PlaySoundFailure;
+	Dialog::Message("The captain sighs.", "\"You don't have enough money, eh?  You can't expect me to give my maps away for free!\"", Font::BIG, Dialog::OK);
+    }
+    else
+    {
+	PlaySoundWarning;
+	if(Dialog::YES == Dialog::Message("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold.", "Do you wish to buy the maps?", Font::BIG, Dialog::YES | Dialog::NO))
+	    world.ActionForMagellanMaps(hero.GetColor());
+
+	Game::Focus::Get().Redraw();
+    }
+
+    if(H2Config::Debug()) Error::Verbose("ActionToMagellanMaps: " + hero.GetName());
+}
+

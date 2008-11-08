@@ -251,7 +251,7 @@ void World::LoadMaps(const std::string &filename)
     vec_rumors.reserve(10);
     vec_castles.reserve(30);
     vec_teleports.reserve(10);
-                                    
+
     // playing kingdom
     vec_kingdoms.resize(KINGDOMMAX + 1);
     vec_kingdoms[0] = new Kingdom(Color::BLUE);
@@ -845,6 +845,10 @@ void World::LoadMaps(const std::string &filename)
 		vec_teleports.push_back(ii);
 		break;
 
+	    case MP2::OBJ_WHIRLPOOL:
+		map_whirlpools[tile.GetUniq1()].push_back(ii);
+		break;
+
 	    case MP2::OBJ_EVENT:
 		// remove event sprite
 		if(NULL != (addon = tile.FindEvent()))
@@ -1357,19 +1361,73 @@ Spell::spell_t World::SpellFromShrine(const u16 index)
 /* return random teleport destination */
 u16 World::NextTeleport(const u16 index) const
 {
-    if(vec_teleports.empty() || 1 == vec_teleports.size())
+    if(2 > vec_teleports.size())
     {
 	Error::Warning("World::NextTeleport: is empty.");
 
 	return index;
     }
 
-    u16 result;
+    std::vector<u16> v;
+    v.reserve(vec_teleports.size());
 
-    while((result = Rand::Get(vec_teleports.size() - 1)) == index) result = Rand::Get(vec_teleports.size() - 1);
+    std::vector<u16>::const_iterator it1 = vec_teleports.begin();
+    std::vector<u16>::const_iterator it2 = vec_teleports.end();
+    for(; it1 != it2; ++it1)
+    {
+	const u16 & i = *it1;
+	if(i == index) continue;
+	if(NULL != world.GetHeroes(i)) continue;
+	v.push_back(i);
+    }
 
-    // check if busy
-    return GetHeroes(vec_teleports[result]) ? index : vec_teleports[result];
+    if(v.empty()) Error::Warning("World::NextTeleport: is full.");
+
+    return v.size() ? *Rand::Get(v) : index;
+}
+
+/* return random whirlpools destination */
+u16 World::NextWhirlpool(const u16 index)
+{
+    if(2 > map_whirlpools.size())
+    {
+	Error::Warning("World::NextWhirlpool: is empty.");
+
+	return index;
+    }
+
+    const Maps::Tiles & tile = GetTiles(index);
+    std::vector<u32> v1;
+    v1.reserve(map_whirlpools.size());
+
+    std::map<u32, std::vector<u16> >::const_iterator it1 = map_whirlpools.begin();
+    std::map<u32, std::vector<u16> >::const_iterator it2 = map_whirlpools.end();
+    for(; it1 != it2; ++it1)
+    {
+	const u32 & uniq = (*it1).first;
+
+	if(uniq == tile.GetUniq1()) continue;
+	v1.push_back(uniq);
+    }
+
+    std::vector<u16> & v2 = map_whirlpools[*Rand::Get(v1)];
+
+    std::vector<u16> v3;
+    v3.reserve(v2.size());
+
+    std::vector<u16>::const_iterator it3 = v2.begin();
+    std::vector<u16>::const_iterator it4 = v2.end();
+    for(; it3 != it4; ++it3)
+    {
+	const u16 & i = *it3;
+	if(i == index) continue;
+	if(NULL != world.GetHeroes(i)) continue;
+	v3.push_back(i);
+    }
+
+    if(v3.empty()) Error::Warning("World::NextWhirlpool: is full.");
+
+    return v3.size() ? *Rand::Get(v3) : index;
 }
 
 /* return skill from witchs hut */
@@ -1595,4 +1653,12 @@ Artifact::artifact_t World::DiggingForUltimateArtifacts(const Point & center)
     }
 
     return  Artifact::UNKNOWN;
+}
+
+void World::ActionForMagellanMaps(u8 color)
+{
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+        
+    for(; it1 != it2; ++it1) if(*it1 && Maps::Ground::WATER == (*it1)->GetGround()) (*it1)->ClearFog(color);
 }
