@@ -87,6 +87,7 @@ class TextBox
 {
 public:
     TextBox(const std::string & msg, Font::type_t ft, const Rect & rt);
+    TextBox(const std::list<std::string> & list, Font::type_t ft, const Rect & rt);
     Rect extents;
 };
 

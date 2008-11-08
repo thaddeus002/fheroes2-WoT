@@ -199,6 +199,51 @@ TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
     extents.h = pt.y - extents.y;
 }
 
+TextBox::TextBox(const std::list<std::string> & list, Font::type_t ft, const Rect & rt)
+{
+    extents.x = rt.x;
+    extents.y = rt.y;
+    extents.w = 0;
+    Point pt(rt.x, rt.y + 2);
+
+    std::list<std::string>::const_iterator it1 = list.begin();
+    std::list<std::string>::const_iterator it2 = list.end();
+    for(; it1 != it2; ++it1)
+    {
+	const std::string & msg = *it1;
+
+	u16 pos_last = msg.size() - 1;
+	u16 s_start = 0;
+	u16 s_end = pos_last;
+
+	while(s_start < s_end)
+	{
+	    while(s_start < s_end && rt.w < Text::width(msg, ft, s_start, s_end - s_start))
+	    {
+		while(s_start < s_end && !isspace(msg[s_end])) --s_end;
+
+    		--s_end;
+	    }
+    	    ++s_end;
+
+	    int width = Text::width(msg, ft, s_start, s_end - s_start);
+    	    pt.x = rt.x + (rt.w - width) / 2;
+	
+	    Text(msg.substr(s_start, s_end - s_start), ft, pt);
+        
+    	    if(width > extents.w)
+        	extents.w = width;
+	
+	    pt.y += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+
+	    s_start = s_end + 1;
+	    s_end = pos_last;
+	}
+    }
+
+    extents.h = pt.y - extents.y;
+}
+
 Text2::Text2(const std::string & msg, Font::type_t ft, const Point & pt) : Text(msg, ft)
 {
     back.Save(Rect(pt, Text::width(msg, ft), Text::height(msg, ft, Text::width(msg, ft))));

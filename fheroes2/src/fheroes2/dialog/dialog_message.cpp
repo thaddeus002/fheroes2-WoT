@@ -28,6 +28,14 @@
 
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
+    std::list<std::string> list;
+    list.push_back(message);
+
+    return Dialog::Message(header, list, ft, buttons);
+}
+
+u16 Dialog::Message(const std::string &header, const std::list<std::string> &messages, Font::type_t ft, u16 buttons)
+{
     Display & display = Display::Get();
     const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
@@ -41,7 +49,12 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Box box(Text::height(header, ft, BOXAREA_WIDTH) + 20 + Text::height(message, ft, BOXAREA_WIDTH), buttons);
+    u16 hm = 0;
+    std::list<std::string>::const_iterator it1 = messages.begin();
+    std::list<std::string>::const_iterator it2 = messages.end();
+    for(; it1 != it2; ++it1) hm += Text::height(*it1, ft, BOXAREA_WIDTH);
+
+    Box box(Text::height(header, ft, BOXAREA_WIDTH) + 10 + hm, buttons);
 
     Rect pos = box.GetArea();
 
@@ -51,8 +64,7 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
         pos.y += Text::height(header, ft, BOXAREA_WIDTH) + 20;
     }
 
-    if(message.size())
-        TextBox(message, ft, pos);
+    if(messages.size()) TextBox(messages, ft, pos);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
