@@ -428,6 +428,11 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
     cursor.SetThemes(cursor.WAR_POINTER);
     cursor.Hide();
     
+    const Settings &settings = Settings::Get();
+    O_GRID = settings.BattleGrid();
+    O_SHADM = settings.BattleMovementShaded();
+    O_SHADC = settings.BattleMouseShaded();
+    
     frameborder = new Dialog::FrameBorder;
 
     dst_pt = Point(frameborder->GetArea().x, frameborder->GetArea().y);
@@ -466,7 +471,6 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
             StartTurn(army1);
             StartTurn(army2);
         
-	    //Dialog::Message("speed", Speed::String(cursp), Font::BIG, Dialog::OK);
 	    for(unsigned int i=0; i < army1.size(); i++) {
                 bool attackerAlive = true;
 		goodmorale = false;
@@ -2207,7 +2211,6 @@ void Army::InitArmyPosition(Army::army_t & army, bool compact, bool reflect)
 {
     int x = reflect ? 10 : 0;
     int y = compact ? 2 : 0;
-    //for(std::vector<Army::Troops>::iterator it = army.begin(); it != army.end(); it++) {
     for(unsigned int i=0; i < army.size(); i++) {
 	if(army[i].Monster() != Monster::UNKNOWN) {
 	    const Monster::stats_t &stats = Monster::GetStats(army[i].Monster());

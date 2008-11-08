@@ -23,6 +23,28 @@
 #include "error.h"
 #include "config.h"
 
+namespace
+{
+    struct ModeSetting
+    {
+        const char *name;           //Name of config setting
+        Settings::settings_t set;   //Mode value to set for "on"
+        Settings::settings_t reset; //Mode value to reset for "off" if different than setting value (ie. music)
+    } modeSettings[] =
+    {
+        { "sound",             Settings::SOUND                       },
+        { "music",             Settings::MUSIC_MIDI, Settings::MUSIC },
+        { "fullscreen",        Settings::FULLSCREEN                  },
+        { "evilinterface",     Settings::EVILINTERFACE               },
+        { "shadow",            Settings::SHADOW                      },
+        { "original",          Settings::ORIGINAL                    },
+        { "logo",              Settings::LOGO                        },
+        { "battlegrid",        Settings::BATTLEGRID                  },
+        { "battlemoveshadow",  Settings::BATTLEMOVESHADOW            },
+        { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           }
+    };
+}
+
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
@@ -128,6 +150,9 @@ void Settings::Dump(std::ostream & stream) const
     stream << "shadow = " << (modes & SHADOW ? "on"  : "off") << std::endl;
     stream << "original = " << (modes & ORIGINAL ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
+    stream << "battle grid = " << (modes & BATTLEGRID ? "on" : "off") << std::endl;
+    stream << "battle movement shadow = " << (modes & BATTLEMOVESHADOW ? "on" : "off") << std::endl;
+    stream << "battle mouse shadow = " << (modes & BATTLEMOUSESHADOW ? "on" : "off") << std::endl;
 
     stream << std::endl;
 }
@@ -212,6 +237,15 @@ bool Settings::Shadow(void) const { return modes & SHADOW; }
 
 /* get show logo */
 bool Settings::Logo(void) const { return modes & LOGO; }
+
+/* battle grid */
+bool Settings::BattleGrid(void) const { return modes & BATTLEGRID; }
+
+/* battle shaded grid */
+bool Settings::BattleMovementShaded(void) const { return modes & BATTLEMOVESHADOW; }
+
+/* battle shaded mouse */
+bool Settings::BattleMouseShaded(void) const { return modes & BATTLEMOUSESHADOW; }
 
 /* set modes */
 void Settings::SetModes(const settings_t s) { modes |= s; }
@@ -337,26 +371,16 @@ void Settings::SetModes(const std::string & key)
     // debug
     if(key == "debug")		debug = 1;
     else
-    // sound
-    if(key == "sound")		SetModes(SOUND);
-    else
-    // music
-    if(key == "music")		SetModes(MUSIC_MIDI);
-    else
-    // fullscreen
-    if(key == "fullscreen")	SetModes(FULLSCREEN);
-    else
-    // interface
-    if(key == "evilinterface")	SetModes(EVILINTERFACE);
-    else
-    // shadow
-    if(key == "shadow")		SetModes(SHADOW);
-    else
-    // origin version
-    if(key == "original")	SetModes(ORIGINAL);
-    else
-    // show logo
-    if(key == "logo")		SetModes(LOGO);
+    {
+        for(u16 i = 0; i < sizeof(modeSettings) / sizeof(modeSettings[0]); i++)
+        {
+            if(key == modeSettings[i].name)
+            {
+                SetModes(modeSettings[i].set);
+                break;
+            }
+        }
+    }
 }
 
 void Settings::ResetModes(const std::string & key)
@@ -364,26 +388,18 @@ void Settings::ResetModes(const std::string & key)
     // debug
     if(key == "debug")		debug = 0;
     else
-    // sound
-    if(key == "sound")		ResetModes(SOUND);
-    else
-    // music
-    if(key == "music")          ResetModes(MUSIC);
-    else
-    // fullscreen
-    if(key == "fullscreen")	ResetModes(FULLSCREEN);
-    else
-    // interface
-    if(key == "evilinterface") ResetModes(EVILINTERFACE);
-    else
-    // shadow
-    if(key == "shadow")		ResetModes(SHADOW);
-    else
-    // origin version
-    if(key == "original")	ResetModes(ORIGINAL);
-    else
-    // show logo
-    if(key == "logo")		ResetModes(LOGO);
+    {
+        for(u16 i = 0; i < sizeof(modeSettings) / sizeof(modeSettings[0]); i++)
+        {
+            if(key == modeSettings[i].name)
+            {
+                if(modeSettings[i].reset != Settings::NONE)
+                    ResetModes(modeSettings[i].reset);
+                else ResetModes(modeSettings[i].set);
+                break;
+            }
+        }
+    }
 }
 
 u8   Settings::SoundVolume(void) const
