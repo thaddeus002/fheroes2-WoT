@@ -20,6 +20,7 @@
 
 
 #include <cmath>
+#include <algorithm>
 #include <utility>
 #include "battle.h"
 #include "localevent.h"

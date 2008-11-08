@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <vector>
+#include <algorithm>
+
 #include "agg.h"
 #include "audio.h"
 #include "sprite.h"

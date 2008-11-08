@@ -20,6 +20,7 @@
 
 #include <string>
 #include <utility>
+#include <algorithm>
 #include "agg.h"
 #include "audio.h"
 #include "localevent.h"

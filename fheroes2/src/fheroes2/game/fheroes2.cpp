@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <limits.h>
 
 #include "gamedefs.h"
 #include "cmdline.h"
