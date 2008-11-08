@@ -98,7 +98,7 @@ namespace Army
 
 	Monster::animstate_t    astate;
 	u16                     aframe;
-	bool                    aranged;
+	bool                    attackRanged;
 	u8                      shots;
 	u16                     hp;
 	u16                     oldcount;

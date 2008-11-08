@@ -67,7 +67,7 @@ Army::size_t Army::GetSize(u16 count)
 Army::Troops::Troops(const Army::Troops & troops)
 : astate(troops.astate)
 , aframe(troops.aframe)
-, aranged(troops.aranged)
+, attackRanged(troops.attackRanged)
 , shots(troops.shots)
 , hp(troops.hp)
 , oldcount(troops.oldcount)
@@ -85,7 +85,7 @@ Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
 {
     astate = troops.astate;
     aframe = troops.aframe;
-    aranged = troops.aranged;
+    attackRanged = troops.attackRanged;
     shots = troops.shots;
     hp = troops.hp;
     oldcount = troops.oldcount;
@@ -136,7 +136,7 @@ void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
 
 void Army::Troops::Animate(Monster::animstate_t as)
 {
-    bool ranged = aranged && Monster::GetStats(monster).miss_icn != ICN::UNKNOWN;
+    bool ranged = attackRanged && Monster::GetStats(monster).miss_icn != ICN::UNKNOWN;
     u8 start, count;
     if(as != Monster::AS_NONE) {
 	astate = as;
