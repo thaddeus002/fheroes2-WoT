@@ -1120,26 +1120,25 @@ void Heroes::ActionNewDay(void)
     }
 
     // remove day visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isDayLife);
+    visit_object.remove_if(Visit::IndexObject::isDayLife);
 }
 
 void Heroes::ActionNewWeek(void)
 {
     // remove week visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isWeekLife);
+    visit_object.remove_if(Visit::IndexObject::isWeekLife);
 }
 
 void Heroes::ActionNewMonth(void)
 {
     // remove month visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isMonthLife);
+    visit_object.remove_if(Visit::IndexObject::isMonthLife);
 }
-
 
 void Heroes::ActionAfterBattle(void)
 {
     // remove month visit object
-    std::remove_if(visit_object.begin(), visit_object.end(), Visit::IndexObject::isBattleLife);
+    visit_object.remove_if(Visit::IndexObject::isBattleLife);
 }
 
 u16 Heroes::FindPath(u16 dst_index)
