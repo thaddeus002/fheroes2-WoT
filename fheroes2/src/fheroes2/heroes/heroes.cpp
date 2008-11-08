@@ -902,17 +902,26 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 		if(list) list->push_back("All " + Race::String(GetRace()) + " in groups +1");
 	    }
 	    break;
-	case 3: result -= 1; break; // TODO: get name modificators
-	case 4: result -= 2; break; // TODO: get name modificators
-	// over 4 different race
-	default: result -=3; break; // TODO: get name modificators
+	case 3:
+	    --result;
+	    if(list) list->push_back("Troops of 3 alignments -1");
+	    break;
+	case 4:
+	    result -= 2;
+	    --result;
+	    if(list) list->push_back("Troops of 4 alignments -2");
+	    break;
+	default:
+	    result -=3;
+	    if(list) list->push_back("Troops of 5 alignments -3");
+	    break;
     }
 
     // undead in life group
     if(count_necr && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
     {
 	--result;
-	if(list) list->push_back("Some undead in group -1");
+	if(list) list->push_back("Some undead in groups -1");
     }
 
     if(result < Morale::AWFUL)	return Morale::TREASON;
