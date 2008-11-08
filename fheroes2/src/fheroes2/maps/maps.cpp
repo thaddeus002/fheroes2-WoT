@@ -255,12 +255,12 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj, bool full)
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
 
-    for(s16 y = cy - 1; y <= cy + 1; ++y)
-        for(s16 x = cx - 1; x <= cx + 1; ++x)
+    for(s16 y = -1; y <= 1; ++y)
+        for(s16 x = -1; x <= 1; ++x)
     {
-            if((y == cy && x == cx) || (cy && cx && !full)) continue;
-	    if(isValidAbsPoint(x, y) &&
-		obj == world.GetTiles(GetIndexFromAbsPoint(x, y)).GetObject()) return y * world.w() + x;
+            if((!y && !x) || (y && x && !full)) continue;
+	    if(isValidAbsPoint(cx + x, cy + y) &&
+		obj == world.GetTiles(GetIndexFromAbsPoint(cx + x, cy + y)).GetObject()) return (cy + y) * world.w() + (cx + x);
     }
     return MAXU16;
 }
