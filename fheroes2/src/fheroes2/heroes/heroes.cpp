@@ -747,7 +747,17 @@ u16 Heroes::GetMaxMovePoints(void) const
 
 Morale::morale_t Heroes::GetMorale(void) const
 {
+    return GetMoraleWithModificators(NULL);
+}
+
+Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
+{
     s8 result = morale;
+
+    const std::string p1(" +1");
+    const std::string p2(" +2");
+    const std::string m1(" -1");
+    const std::string m2(" -2");
 
     // bonus artifact
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
@@ -760,10 +770,12 @@ Morale::morale_t Heroes::GetMorale(void) const
             case Artifact::MEDAL_HONOR:
             case Artifact::MEDAL_DISTINCTION:
                 result += 1;
+		if(list) list->push_back(Artifact::String(*it) + p1);
                 break;
 
             case Artifact::FIZBIN_MISFORTUNE:
                 result -= 2;
+		if(list) list->push_back(Artifact::String(*it) + m2);
                 break;
 
             default:
@@ -775,14 +787,17 @@ Morale::morale_t Heroes::GetMorale(void) const
     {
         case Skill::Level::EXPERT:
             result += 3;
+	    if(list) list->push_back("Expert Leadership +3");
             break;
 
         case Skill::Level::ADVANCED:
             result += 2;
+	    if(list) list->push_back("Advanced Leadership +2");
             break;
 
         case Skill::Level::BASIC:
             result += 1;
+	    if(list) list->push_back("Basic Leadership +1");
             break;
 
         default:
@@ -795,20 +810,56 @@ Morale::morale_t Heroes::GetMorale(void) const
     if(castle)
     {
 	// and tavern
-	if(castle->isBuild(Castle::BUILD_TAVERN)) result += 1;
+	if(Race::NECR != castle->GetRace() && castle->isBuild(Castle::BUILD_TAVERN))
+	{
+	    result += 1;
+	    if(list) list->push_back(Castle::GetStringBuilding(Castle::BUILD_TAVERN, castle->GetRace()) + p1);
+	}
 
 	// and barbarian coliseum
-        if(Race::BARB == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC)) result += 2;
+        if(Race::BARB == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC))
+	{
+	    result += 2;
+	    if(list) list->push_back(Castle::GetStringBuilding(Castle::BUILD_SPEC, castle->GetRace()) + p2);
+	}
     }
 
     // object visited
-    if(isVisited(MP2::OBJ_BUOY)) ++result;
-    if(isVisited(MP2::OBJ_OASIS)) ++result;
-    if(isVisited(MP2::OBJ_WATERINGHOLE)) ++result;
-    if(isVisited(MP2::OBJ_TEMPLE)) result += 2;
-    if(isVisited(MP2::OBJ_GRAVEYARD)) --result;
-    if(isVisited(MP2::OBJ_SHIPWRECK)) --result;
-    if(isVisited(MP2::OBJ_DERELICTSHIP)) --result;
+    if(isVisited(MP2::OBJ_BUOY))
+    {
+	++result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_BUOY) + p1);
+    }
+    if(isVisited(MP2::OBJ_OASIS))
+    {
+	++result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_OASIS) + p1);
+    }
+    if(isVisited(MP2::OBJ_WATERINGHOLE))
+    {
+	++result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_WATERINGHOLE) + p1);
+    }
+    if(isVisited(MP2::OBJ_TEMPLE))
+    {
+	result += 2;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_TEMPLE) + p2);
+    }
+    if(isVisited(MP2::OBJ_GRAVEYARD))
+    {
+	--result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_GRAVEYARD) + m1);
+    }
+    if(isVisited(MP2::OBJ_SHIPWRECK))
+    {
+	--result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_SHIPWRECK) + m1);
+    }
+    if(isVisited(MP2::OBJ_DERELICTSHIP))
+    {
+	--result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_DERELICTSHIP) + m1);
+    }
 
     // different race penalty
     std::vector<Army::Troops>::const_iterator it1_army = army.begin();
@@ -844,15 +895,25 @@ Morale::morale_t Heroes::GetMorale(void) const
     switch(count)
     {
 	case 0: break;
-	case 1: result += (count_necr ? 0 : 1); break;
-	case 3: result -= 1; break;
-	case 4: result -= 2; break;
+	case 1:
+	    if(0 == count_necr)
+	    {
+		++result;
+		if(list) list->push_back("All " + Race::String(GetRace()) + " in groups +1");
+	    }
+	    break;
+	case 3: result -= 1; break; // TODO: get name modificators
+	case 4: result -= 2; break; // TODO: get name modificators
 	// over 4 different race
-	default: result -=3; break;
+	default: result -=3; break; // TODO: get name modificators
     }
 
     // undead in life group
-    if(count_necr && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg)) --result;
+    if(count_necr && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
+    {
+	--result;
+	if(list) list->push_back("Some undead in group -1");
+    }
 
     if(result < Morale::AWFUL)	return Morale::TREASON;
     else
@@ -871,9 +932,18 @@ Morale::morale_t Heroes::GetMorale(void) const
 
 Luck::luck_t Heroes::GetLuck(void) const
 {
+    return GetLuckWithModificators(NULL);
+}
+
+Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
+{
     s8 result = luck;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+
+    const std::string p1(" +1");
+    const std::string p2(" +2");
+    const std::string m2(" -2");
 
     // bonus artifact
     for(; it != artifacts.end(); ++it)
@@ -885,6 +955,7 @@ Luck::luck_t Heroes::GetLuck(void) const
             case Artifact::GAMBLER_LUCKY_COIN:
             case Artifact::FOUR_LEAF_CLOVER:
 	    	++result;
+		if(list) list->push_back(Artifact::String(*it) + p1);
 		break;
 
             default:
@@ -896,14 +967,17 @@ Luck::luck_t Heroes::GetLuck(void) const
     {
         case Skill::Level::EXPERT:
             result += 3;
+	    if(list) list->push_back("Expert Luck +3");
             break;
 
         case Skill::Level::ADVANCED:
             result += 2;
+	    if(list) list->push_back("Advanced Luck +2");
             break;
 
         case Skill::Level::BASIC:
             result += 1;
+	    if(list) list->push_back("Basic Luck +1");
             break;
 
         default:
@@ -911,15 +985,34 @@ Luck::luck_t Heroes::GetLuck(void) const
     }
 
     // object visited
-    if(isVisited(MP2::OBJ_FAERIERING)) ++result;
-    if(isVisited(MP2::OBJ_FOUNTAIN)) ++result;
-    if(isVisited(MP2::OBJ_IDOL)) ++result;
-    if(isVisited(MP2::OBJ_PYRAMID)) result -= 2;
+    if(isVisited(MP2::OBJ_FAERIERING))
+    {
+	++result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_FAERIERING) + p1);
+    }
+    if(isVisited(MP2::OBJ_FOUNTAIN))
+    {
+	++result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_FOUNTAIN) + p1);
+    }
+    if(isVisited(MP2::OBJ_IDOL))
+    {
+	++result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_IDOL) + p1);
+    }
+    if(isVisited(MP2::OBJ_PYRAMID))
+    {
+	 result -= 2;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_PYRAMID) + m2);
+    }
 
     // bonus in castle and sorceress rainbow
     const Castle* castle = inCastle();
-    if(castle && Race::SORC == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC)) result += 2;
-
+    if(castle && Race::SORC == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC))
+    {
+	result += 2;
+	if(list) list->push_back(Castle::GetStringBuilding(Castle::BUILD_SPEC, castle->GetRace()) + p2);
+    }
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else

@@ -131,6 +131,8 @@ public:
 
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
+    Morale::morale_t GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
+    Luck::luck_t GetLuckWithModificators(std::list<std::string> *list = NULL) const;
     u8 GetLevel(void) const;
 
     u16 GetMaxSpellPoints(void) const;
@@ -223,6 +225,7 @@ public:
     bool JoinTroops(const Monster::monster_t, const u16 count);
 
     bool spellCasted;
+
 private:
     std::string		name;
     Color::color_t	color;

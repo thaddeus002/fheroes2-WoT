@@ -133,7 +133,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     
     const Rect rectMoraleInfo(dst_pt, 34, 26);
 
-    switch(GetMorale())
+    std::list<std::string> moraleModificators;
+    const Morale::morale_t current_morale = GetMoraleWithModificators(&moraleModificators);
+
+    switch(current_morale)
     {
 	case Morale::TREASON:
 	{
@@ -208,6 +211,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     }
 
+    if(moraleModificators.size()) moraleModificators.push_front("Current Morale Modifiers:");
+    moraleModificators.push_front("    ");
+    moraleModificators.push_front(Morale::Description(current_morale));
+
     // luck
     dst_pt.x = cur_pt.x + 552;
     dst_pt.y = cur_pt.y + 35;
@@ -215,7 +222,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     const Rect rectLuckInfo(dst_pt, 34, 26);
 
-    switch(GetLuck())
+    std::list<std::string> luckModificators;
+    const Luck::luck_t current_luck = GetLuckWithModificators(&luckModificators);
+
+    switch(current_luck)
     {
 	case Luck::CURSED:
 	{
@@ -289,7 +299,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	} break;
 
     }
-    
+
+    if(luckModificators.size()) luckModificators.push_front("Current Morale Modifiers:");
+    luckModificators.push_front("    ");
+    luckModificators.push_front(Luck::Description(current_luck));
+
     // army format spread
     dst_pt.x = cur_pt.x + 515;
     dst_pt.y = cur_pt.y + 63;
@@ -695,9 +709,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         else
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG, Dialog::OK);
 	else
-	if(le.MouseClickLeft(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG, Dialog::OK);
+	if(le.MouseClickLeft(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, moraleModificators, Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectLuckInfo)) Dialog::Message(headerLuckInfo, Luck::Description(GetLuck()), Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectLuckInfo)) Dialog::Message(headerLuckInfo, luckModificators, Font::BIG, Dialog::OK);
         else
         if(le.MouseClickLeft(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
         else
@@ -755,9 +769,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         else
         if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG);
 	else
-        if(le.MousePressRight(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, Morale::Description(GetMorale()), Font::BIG);
+        if(le.MousePressRight(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, moraleModificators, Font::BIG);
         else
-        if(le.MousePressRight(rectLuckInfo)) Dialog::Message(headerLuckInfo, Luck::Description(GetLuck()), Font::BIG);
+        if(le.MousePressRight(rectLuckInfo)) Dialog::Message(headerLuckInfo, luckModificators, Font::BIG);
         else
         if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG);
         else
