@@ -34,21 +34,17 @@ public:
 
     typedef enum
     {
-        NONE              = 0x00000000,
-        SOUND             = 0x00000001,
-        FULLSCREEN        = 0x00000004,
-        LOGO              = 0x00000008,
-        EDITOR            = 0x00000010,
-        MUSIC_EXT         = 0x00000020,
-        MUSIC_CD          = 0x00000040,
-        MUSIC_MIDI        = 0x00000080,
-        ORIGINAL          = 0x00010000,
-        PRICELOYALTY      = 0x00020000,
-        EVILINTERFACE     = 0x00040000,
-        SHADOW            = 0x00080000,
-        BATTLEGRID        = 0x00100000,
-        BATTLEMOUSESHADOW = 0x00200000,
-        BATTLEMOVESHADOW  = 0x00400000,
+        SOUND           = 0x00000001,
+        FULLSCREEN      = 0x00000004,
+        LOGO            = 0x00000008,
+        EDITOR          = 0x00000010,
+        MUSIC_EXT       = 0x00000020,
+        MUSIC_CD        = 0x00000040,
+        MUSIC_MIDI      = 0x00000080,
+        ORIGINAL        = 0x00010000,
+        PRICELOYALTY    = 0x00020000,
+        EVILINTERFACE   = 0x00040000,
+        SHADOW          = 0x00080000,
 
 	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
 
@@ -84,9 +80,6 @@ public:
     bool EvilInterface(void) const;
     bool Shadow(void) const;
     bool Logo(void) const;
-    bool BattleGrid(void) const;
-    bool BattleMovementShaded(void) const;
-    bool BattleMouseShaded(void) const;
 
     bool Modes(const settings_t s) const;
 
