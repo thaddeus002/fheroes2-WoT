@@ -841,6 +841,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
     {
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
 	if(XMI::UNKNOWN != xmi) Music::Play(AGG::Cache::Get().GetMID(xmi), loop);
+        else Music::Reset();
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + XMI::GetString(xmi));
     }
 }

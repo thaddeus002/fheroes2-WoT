@@ -78,6 +78,7 @@ Army::Troops::Troops(const Army::Troops & troops)
 , pos(troops.Position())
 , saved(false)
 , reflect(troops.reflect)
+, origReflect(troops.origReflect)
 {
 }
 
@@ -94,6 +95,7 @@ Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
     count = troops.Count();
     pos = troops.Position();
     reflect = troops.reflect;
+    origReflect = troops.origReflect;
 
     return *this;
 }
@@ -159,6 +161,22 @@ void Army::Troops::Animate(Monster::animstate_t as)
 	    }
 	}
     }
+}
+
+int Army::Troops::ApplyDamage(int damage)
+{
+    int perished = 0;
+    while(damage >= hp)
+    {
+        damage -= hp;
+        hp = Monster::GetStats(monster).hp;
+        count--;
+        perished++;
+        if(!count)
+            break;
+    }
+    hp -= damage;
+    return perished;
 }
 
 void Army::Troops::SetMagic(Spell::magic_t &magic)
