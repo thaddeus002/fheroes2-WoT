@@ -1500,21 +1500,22 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    std::string body;
 		    if(4 == c)
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::WISDOM) ? Dialog::YES : Dialog::OK;
+			buttons = hero.HasSecondarySkill(Skill::Secondary::WISDOM) ? 0 : Dialog::OK;
 			header = "You've found the humble dwelling of a withered hermit.";
 			body = "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.";
 		    }
 		    else
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? Dialog::YES : Dialog::OK;
+			buttons = hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? 0 : Dialog::OK;
 			header = "You've come across the spartan quarters of a retired soldier.";
 			body = "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.";
 		    }
-		    if(buttons == Dialog::OK)
-			PlaySoundFailure;
-		    else
-			PlaySoundSuccess;
-		    conditions = Dialog::YES == DialogWithArtifact(header, body,art, buttons);
+		    PlaySoundSuccess;
+		    if(buttons)
+		    {
+			conditions = true;
+			DialogWithArtifact(header, body,art, buttons);
+		    }
 		    break;
 		}
 
@@ -1545,7 +1546,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 			Dialog::Message("You come upon an ancient artifact.", "As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.", Font::BIG, Dialog::OK);
 		    else
 			battle = (Dialog::YES == Dialog::Message("Through a clearing you observe an ancient artifact.",
-						"Unfortunately, it's guarded by a nearby " + Artifact::String(art) + ". Do you want to fight the " + Monster::String(mons) + " for the artifact?",
+						"Unfortunately, it's guarded by a nearby " + Monster::String(mons) + ". Do you want to fight the " + Monster::String(mons) + " for the artifact?",
 						Font::BIG, Dialog::YES | Dialog::NO));
 
 		    Display::Fade();
