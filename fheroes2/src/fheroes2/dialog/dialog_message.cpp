@@ -29,8 +29,7 @@
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
     std::list<std::string> list;
-    list.push_back(message);
-
+    if(message.size()) list.push_back(message);
     return Dialog::Message(header, list, ft, buttons);
 }
 
@@ -54,7 +53,7 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
     std::list<std::string>::const_iterator it2 = messages.end();
     for(; it1 != it2; ++it1) hm += Text::height(*it1, ft, BOXAREA_WIDTH);
 
-    Box box(Text::height(header, ft, BOXAREA_WIDTH) + 10 + hm, buttons);
+    Box box((header.size() ? Text::height(header, ft, BOXAREA_WIDTH) + 10 : 0) + hm, buttons);
 
     Rect pos = box.GetArea();
 

@@ -428,11 +428,12 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors, std::vector<Rect> & coo
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	if(conf.FileInfo().KingdomColors() & color)
-	{
+    {
 	    u8 index = 0;
 	    Point pt;
+	    const Race::race_t race = conf.FileInfo().KingdomRace(color);
 
-	    switch(conf.FileInfo().KingdomRace(color))
+	    switch(race)
 	    {
 		case Race::KNGT: index = 70; break;
 	        case Race::BARB: index = 71; break;
@@ -453,6 +454,9 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors, std::vector<Rect> & coo
 	    coordClass[Color::GetIndex(color)] = Rect(pt.x, pt.y, sprite.w(), sprite.h());
 
 	    display.Blit(sprite, pt);
+
+	    const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
+	    Text(name, Font::SMALL, pt.x + (sprite.w() - Text::width(name, Font::SMALL)) / 2, pt.y + sprite.h() + 2);
 
     	    ++current;
     }
