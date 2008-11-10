@@ -421,7 +421,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     str += ")";
     if(H2Config::Debug()) Error::Verbose(str);
 
-    Display::Fade();
+    //Display::Fade(); need move to start battle code
 
     const u32 exp = Algorithm::CalculateExperience(army);
     const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -1488,7 +1488,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    if(Dialog::YES == DialogWithArtifact(header, body, art, buttons))
 			conditions = true;
 		    else
-			Dialog::Message("Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", "", Font::BIG, Dialog::OK);
+			Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    break;
 		}
 
@@ -1550,10 +1550,9 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 						"Unfortunately, it's guarded by a nearby " + Monster::String(mons) + ". Do you want to fight the " + Monster::String(mons) + " for the artifact?",
 						Font::BIG, Dialog::YES | Dialog::NO));
 
-		    Display::Fade();
-
 		    if(battle)
 		    {
+			//Display::Fade(); need move to start battle code
 			const u32 exp = Algorithm::CalculateExperience(army);
 			const Army::battle_t b = Army::Battle(hero, army, tile);
 			switch(b)
@@ -1578,7 +1577,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    else
 		    {
 			PlaySoundFailure;
-			Dialog::Message("Discretion is the better part of valor, and you decide to avoid this fight for today.", "", Font::BIG, Dialog::OK);
+			Dialog::Message("", "Discretion is the better part of valor, and you decide to avoid this fight for today.", Font::BIG, Dialog::OK);
 		    }
 		    break;
 		}
@@ -2019,7 +2018,7 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
     else
     {
 	PlaySoundVisited;
-	Dialog::Message("As you approach the dwelling, you notice that there is no one here.", "", Font::BIG, Dialog::OK);
+	Dialog::Message("", "As you approach the dwelling, you notice that there is no one here.", Font::BIG, Dialog::OK);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToDwellingJoinMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));

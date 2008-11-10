@@ -29,8 +29,7 @@
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
     std::list<std::string> list;
-    list.push_back(message);
-
+    if(message.size()) list.push_back(message);
     return Dialog::Message(header, list, ft, buttons);
 }
 
