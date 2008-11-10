@@ -117,10 +117,14 @@ public:
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; }
     std::vector<Army::Troops> & GetArmy(void) { return army; };
     bool HasMonster(const Monster::monster_t mon) const;
-    Monster::monster_t GetSlowestArmyMonster(void) const;
-    Monster::monster_t GetHighestArmyMonster(void) const;
-    Monster::monster_t GetStrongestArmyMonster(void) const;
-    Monster::monster_t GetWeakestArmyMonster(void) const;
+    Army::Troops & GetSlowestArmy(void);
+    Army::Troops & GetHighestArmy(void);
+    Army::Troops & GetStrongestArmy(void);
+    Army::Troops & GetWeakestArmy(void);
+    const Army::Troops & GetSlowestArmy(void) const;
+    const Army::Troops & GetHighestArmy(void) const;
+    const Army::Troops & GetStrongestArmy(void) const;
+    const Army::Troops & GetWeakestArmy(void) const;
     u8 GetCountArmy(void) const;
 
     const Spell::Book & SpellBook(void) const { return spell_book; };

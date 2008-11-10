@@ -706,7 +706,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     }
     else
     {
-    	switch(Monster::GetStats(GetSlowestArmyMonster()).speed)
+    	switch(Monster::GetStats(GetSlowestArmy().Monster()).speed)
 	{
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;
@@ -1712,28 +1712,44 @@ bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
     return false;
 }
 
-Monster::monster_t Heroes::GetSlowestArmyMonster(void) const
+Army::Troops & Heroes::GetSlowestArmy(void)
 {
-    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateSlowestTroops);
-    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
+    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroops);
 }
 
-Monster::monster_t Heroes::GetHighestArmyMonster(void) const
+Army::Troops & Heroes::GetHighestArmy(void)
 {
-    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateHighestTroops);
-    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
+    return *min_element(army.begin(), army.end(), Army::PredicateHighestTroops);
 }
 
-Monster::monster_t Heroes::GetStrongestArmyMonster(void) const
+Army::Troops & Heroes::GetStrongestArmy(void)
 {
-    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateStrongestTroops);
-    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
+    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroops);
 }
 
-Monster::monster_t Heroes::GetWeakestArmyMonster(void) const
+Army::Troops & Heroes::GetWeakestArmy(void)
 {
-    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateWeakestTroops);
-    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
+    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroops);
+}
+
+const Army::Troops & Heroes::GetSlowestArmy(void) const
+{
+    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroops);
+}
+
+const Army::Troops & Heroes::GetHighestArmy(void) const
+{
+    return *min_element(army.begin(), army.end(), Army::PredicateHighestTroops);
+}
+
+const Army::Troops & Heroes::GetStrongestArmy(void) const
+{
+    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroops);
+}
+
+const Army::Troops & Heroes::GetWeakestArmy(void) const
+{
+    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroops);
 }
 
 bool Heroes::MayStillMove(void) const
