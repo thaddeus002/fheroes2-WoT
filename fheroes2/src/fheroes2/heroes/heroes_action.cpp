@@ -1774,9 +1774,13 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    // check monster
-    //u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, false);
-    //if(MAXU16 != dst_index2) hero.Action(dst_index2);
+    if(Rand::Get(1))
+    {
+	PlaySoundWarning;
+	Dialog::Message(MP2::StringObject(MP2::OBJ_WHIRLPOOL), "A whirlpool engulfs your ship.  Some of your army has fallen overboard.", Font::BIG, Dialog::OK);
+	Army::Troops & troops = hero.GetWeakestArmy();
+	troops.SetCount(troops.Count() / 2 + 1);
+    }
 }
 
 void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
