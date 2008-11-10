@@ -362,8 +362,8 @@ static void RedrawItem(const Sprite *sprite, const Rect &displayable, const Rect
     display.Blit(surf, selectable.x, selectable.y);
 }
 
-/** Draw a list of #SelectableRect items in their proper places
- *  \param army List of troops encapsulated in #SelectableRect objects
+/** Draw a list of SelectableRect items in their proper places
+ *  \param army List of troops encapsulated in SelectableRect objects
  */
 static void RedrawArmy(const ArmyList &army)
 {
@@ -393,8 +393,8 @@ static void RedrawArmy(const ArmyList &army)
     }
 }
 
-/** Draw a list of #SelectableRect items in their proper places
- *  \param artifacts List of artifacts encapsulated in #SelectableRect objects
+/** Draw a list of SelectableRect items in their proper places
+ *  \param artifacts List of artifacts encapsulated in SelectableRect objects
  */
 static void RedrawArtifacts(const ArtifactList &artifacts)
 {
@@ -409,10 +409,10 @@ static void RedrawArtifacts(const ArtifactList &artifacts)
     }
 }
 
-/** Convert an army into a list of #SelectableRect objects which encapsulate it
- *  \param army[in]     Hero's army
- *  \param pt[in]       Starting point at which to display the troop pictures
- *  \param coords[out]  List of #SelectableRect objects encapsulating each troop object
+/** Convert an army into a list of SelectableRect objects which encapsulate it
+ *  \param[in]  army     Hero's army
+ *  \param[in]  pt       Starting point at which to display the troop pictures
+ *  \param[out] coords  List of SelectableRect objects encapsulating each troop object
  */
 static void PrepareArmy(std::vector<Army::Troops> &army, const Point &pt, ArmyList &coords)
 {
@@ -436,10 +436,10 @@ static void PrepareArmy(std::vector<Army::Troops> &army, const Point &pt, ArmyLi
     }
 }
 
-/** Convert a list of artifacts into a list of #SelectableRect objects
- *  \param artifacts[in]  List of artifacts
- *  \param pt[in]         Starting point at which to display the artifact pictures
- *  \param coords[out]    List of #SelectableRect objects encapsulating each artifact
+/** Convert a list of artifacts into a list of SelectableRect objects
+ *  \param[in]  artifacts  List of artifacts
+ *  \param[in]  pt         Starting point at which to display the artifact pictures
+ *  \param[out] coords    List of SelectableRect objects encapsulating each artifact
  */
 static void PrepareArtifacts(std::vector<Artifact::artifact_t> &artifacts, const Point &pt, ArtifactList &coords)
 {
@@ -463,8 +463,8 @@ static void PrepareArtifacts(std::vector<Artifact::artifact_t> &artifacts, const
     }
 }
 
-/** Deselect every item in an array of #SelectableRect lists
- *  \param list Two element array of lists of #SelectableRect objects
+/** Deselect every item in an array of SelectableRect lists
+ *  \param list Two element array of lists of SelectableRect objects
  */
 template<class T>
 static void DeselectList(std::vector<SelectableRect<T> > *list)
@@ -474,8 +474,8 @@ static void DeselectList(std::vector<SelectableRect<T> > *list)
             list[j][i].selected = false;
 }
 
-/** Retrieve any existing, selected element in a list of #SelectableRect objects
- *  \param list List of #SelectableRect objects
+/** Retrieve any existing, selected element in a list of SelectableRect objects
+ *  \param list List of SelectableRect objects
  */
 template<class T>
 static SelectableRect<T> *GetSelectedListElement(std::vector<SelectableRect<T> > &list)
@@ -486,7 +486,7 @@ static SelectableRect<T> *GetSelectedListElement(std::vector<SelectableRect<T> >
     return NULL;
 }
 
-/** Check whether an action about to be performed on the given #SelectableRect should continue
+/** Check whether an action about to be performed on the given SelectableRect should continue
  *  \param picked Chosen object
  */
 template <>
@@ -496,7 +496,7 @@ static bool IsActionValid<Army::Troops>(SelectableRect<Army::Troops> &picked)
     return true;
 }
 
-/** Check whether an action about to be performed on the given #SelectableRect should continue
+/** Check whether an action about to be performed on the given SelectableRect should continue
  *  \param picked Chosen object
  */
 template <>
@@ -518,9 +518,9 @@ static bool IsActionValid<Artifact::artifact_t>(SelectableRect<Artifact::artifac
     return true;
 }
 
-/** Act on the chosen #SelectableRect, based on any previous selection
+/** Act on the chosen SelectableRect, based on any previous selection
  *  \param picked User-picked item
- *  \param list   Two-element array of lists of #SelectableRect objects, which are all the same type
+ *  \param list   Two-element array of lists of SelectableRect objects, which are all the same type
  */
 template<class T>
 static void PerformAction(SelectableRect<T> &picked, std::vector<SelectableRect<T> > *list)
@@ -573,9 +573,9 @@ static void RecalcDisplayable<Army::Troops>(SelectableRect<Army::Troops> &item)
     }
 }
 
-/** Convert a list of #SelectableRect objects back into the original item list, retaining modifications
- *  \param list[in] List of #SelectableRect objects
- *  \param out[out] List to be filled up with the contents of #list
+/** Convert a list of SelectableRect objects back into the original item list, retaining modifications
+ *  \param[in]  list List of SelectableRect objects
+ *  \param[out] out  List to be filled up with the contents of \i list
  */
 template<class T>
 static std::vector<T> RecreateListsFromSelectable(const std::vector<SelectableRect<T> > &list, std::vector<T> &out)

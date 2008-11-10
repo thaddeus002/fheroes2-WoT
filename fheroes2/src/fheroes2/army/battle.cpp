@@ -878,11 +878,12 @@ bool Army::DangerousUnitPredicate(Army::Troops first, Army::Troops second)
 }
 
 /** Attempt to attack a unit in the given list
- *  \param troops[in]  List of units to consider
- *  \param army1[in]   Left army
- *  \param army2[in]   Right army
- *  \param move[out]   Movement destination
- *  \param attack[out] Point at which to attack
+ *  \param[in]  troops  List of units to consider
+ *  \param[in]  army1   Left army
+ *  \param[in]  army2   Right army
+ *  \param[in]  troopN  Index into either \i army1 or \i army2.
+ *  \param[out] move    Movement destination
+ *  \param[out] attack  Point at which to attack
  *  \return True if an attack succeeded, false otherwise
  */
 bool Army::AttackTroopInList(const Army::army_t &troops, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack)
@@ -913,9 +914,9 @@ struct DistancePredicate : public std::binary_function<Army::Troops, Army::Troop
 };
 
 /** Move to the closest point to the closest unit in the list
- *  \param troops[in]   List of units to consider
- *  \param myTroop[in]  Unit to move
- *  \param move[out]    Destination point
+ *  \param[in] troops   List of units to consider
+ *  \param[in] myTroop  Unit to move
+ *  \param[out] move    Destination point
  */
 void Army::MoveToClosestTroopInList(const Army::army_t &troops, const Army::Troops &myTroop, Point &move)
 {
@@ -934,13 +935,13 @@ void Army::MoveToClosestTroopInList(const Army::army_t &troops, const Army::Troo
 }
 
 /** Find a valid move and/or attack to make
- *  \param myMonster[in]  Attacker monster
- *  \param army1[in]       Left army
- *  \param army2[in]       Right army
- *  \param troopN[in]      Index into #army1 or #army2
- *  \param move[out]       #Point to which to move
- *  \param attack[out]     #Point which to attack
- *  \param rangedFirst[in] Try to attack ranged units first
+ *  \param[in] myMonster   Attacker monster
+ *  \param[in] army1       Left army
+ *  \param[in] army2       Right army
+ *  \param[in] troopN      Index into \i army1 or \i army2
+ *  \param[out] move       #Point to which to move
+ *  \param[out] attack     #Point which to attack
+ *  \param[in] rangedFirst Try to attack ranged units first
  */
 void Army::MoveOrAttack(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack, bool rangedFirst)
 {
@@ -969,12 +970,12 @@ void Army::MoveOrAttack(const Monster::stats_t &myMonster, Army::army_t &army1, 
 }
 
 /** Find a ranged enemy to attack, and set up the destination action and movement points
- *  \param myMonster[in]  Attacker monster
- *  \param army1[in]      Left army
- *  \param army2[in]      Right army
- *  \param troopN[in]     Index into #army1 or #army2
- *  \param move[out]      #Point to which to move
- *  \param attack[out]    #Point which to attack
+ *  \param[in] myMonster  Attacker monster
+ *  \param[in] army1      Left army
+ *  \param[in] army2      Right army
+ *  \param[in] troopN     Index into \i army1 or \i army2
+ *  \param[out] move      #Point to which to move
+ *  \param[out] attack    #Point which to attack
  *  \return Whether a possible move or attack was found
  */
 bool Army::AttackRangedTroop(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack)
@@ -1002,12 +1003,12 @@ bool Army::AttackRangedTroop(const Monster::stats_t &myMonster, Army::army_t &ar
 }
 
 /** Find a non-ranged enemy to attack, and set up the destination action and movement points
- *  \param myMonster[in]  Attacker monster
- *  \param army1[in]      Left army
- *  \param army2[in]      Right army
- *  \param troopN[in]     Index into #army1 or #army2
- *  \param move[out]      #Point to which to move
- *  \param attack[out]    #Point which to attack
+ *  \param[in] myMonster  Attacker monster
+ *  \param[in] army1      Left army
+ *  \param[in] army2      Right army
+ *  \param[in] troopN     Index into \i army1 or \i army2
+ *  \param[out] move      #Point to which to move
+ *  \param[out] attack    #Point which to attack
  *  \return Whether a possible move or attack was found
  */
 bool Army::AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::army_t &army1, Army::army_t &army2, int troopN, Point &move, Point &attack)
@@ -1262,11 +1263,11 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::
 }
 
 /** Popular a list with the targets for the given unit's attack at a given point
- *  \param targets[out] List of troops which will be affected
- *  \param attacker[in] Troop that is attacking
- *  \param attack[in]   Point which is being attacked
- *  \param army1[in]    Left army
- *  \param army2[in]    Right army
+ *  \param[out] targets List of troops which will be affected
+ *  \param[in] attacker Troop that is attacking
+ *  \param[in] attack   Point which is being attacked
+ *  \param[in] army1    Left army
+ *  \param[in] army2    Right army
  */
 void Army::GetTargets(std::vector<Army::Troops *> &targets, const Army::Troops &attacker, const Point &attack, Army::army_t &army1, Army::army_t &army2)
 {
@@ -2407,7 +2408,7 @@ bool Army::FindTroopAt(const Army::Troops &troop, const Point &p)
  *  \note No wide or reflection calculations are performed
  *  \param army Army through which to search
  *  \param p    Point at which to look
- *  \return The troop's index into #army, or -1 if none found
+ *  \return The troop's index into \i army, or -1 if none found
  */
 int Army::FindTroopExact(const Army::army_t &army, const Point &p)
 {
@@ -2421,7 +2422,7 @@ int Army::FindTroopExact(const Army::army_t &army, const Point &p)
 /** Determine which troop, if one exists, is at the given point
  *  \param army Army through which to search
  *  \param p    Point at which to look
- *  \return The troop's index into #army, or -1 if none found
+ *  \return The troop's index into \i army, or -1 if none found
  */
 int Army::FindTroop(const Army::army_t &army, const Point &p)
 {
@@ -2435,7 +2436,7 @@ int Army::FindTroop(const Army::army_t &army, const Point &p)
 /** Determine which troop, if one exists, is at the given point
  *  \param army Army through which to search
  *  \param p    Point at which to look
- *  \return The troop's index into #army, or -1 if none found
+ *  \return The troop's index into \i army, or -1 if none found
  */
 int Army::FindTroop(const std::vector<Army::Troops*> &army, const Point &p)
 {
@@ -2901,7 +2902,7 @@ int Army::CanAttack(const Army::Troops &myTroop, const std::vector<Point> &moves
  *  \param target Target to be attacked
  *  \param army1  Left army
  *  \param army2  Right army
- *  \param troopN Index in either #army1 or #army2
+ *  \param troopN Index in either \i army1 or \i army2
  *  \return Free cell if one is available, invalid if none
  */
 Point Army::GetReachableAttackCell(const Army::Troops &target, const Army::army_t &army1, const Army::army_t &army2, int troopN)

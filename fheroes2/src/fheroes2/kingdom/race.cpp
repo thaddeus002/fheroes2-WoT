@@ -24,7 +24,7 @@
 const std::string & Race::String(Race::race_t race)
 {
     static const std::string str_race[] = { "Knight", "Barbarian", "Sorceress", 
-	"Warlock", "Wizard", "Necromancer", "Multi", "Random", "Bomg" };
+	"Warlock", "Wizard", "Necromancer", "Multi", "Randomize", "Bomg" };
 
     switch(race){
         case Race::KNGT: return str_race[0];
