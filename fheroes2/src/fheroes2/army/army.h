@@ -49,6 +49,11 @@ namespace Army
 	LEGION	= 1000
     } size_t;
 
+    bool PredicateStrongestTroops(const Troops & t1, const Troops & t2);
+    bool PredicateWeakestTroops(const Troops & t1, const Troops & t2);
+    bool PredicateSlowestTroops(const Troops & t1, const Troops & t2);
+    bool PredicateHighestTroops(const Troops & t1, const Troops & t2);
+
     const std::string & String(size_t size);
     size_t GetSize(u16 count);
 

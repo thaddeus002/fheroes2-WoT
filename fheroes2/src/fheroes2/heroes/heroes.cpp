@@ -706,7 +706,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     }
     else
     {
-    	switch(GetSlowestArmySpeed())
+    	switch(Monster::GetStats(GetSlowestArmyMonster()).speed)
 	{
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;
@@ -1712,26 +1712,28 @@ bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
     return false;
 }
 
-Speed::speed_t Heroes::GetSlowestArmySpeed(void) const
+Monster::monster_t Heroes::GetSlowestArmyMonster(void) const
 {
-    std::vector<Army::Troops>::const_iterator it1 = army.begin();
-    std::vector<Army::Troops>::const_iterator it2 = army.end();
-    Speed::speed_t result = Speed::INSTANT;
-    
-    for(; it1 != it2; ++it1) if(result > Monster::GetStats((*it1).Monster()).speed) result = Monster::GetStats((*it1).Monster()).speed;
-    
-    return result;
+    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateSlowestTroops);
+    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
 }
 
-Speed::speed_t Heroes::GetHighestArmySpeed(void) const
+Monster::monster_t Heroes::GetHighestArmyMonster(void) const
 {
-    std::vector<Army::Troops>::const_iterator it1 = army.begin();
-    std::vector<Army::Troops>::const_iterator it2 = army.end();
-    Speed::speed_t result = Speed::CRAWLING;
-    
-    for(; it1 != it2; ++it1) if(result < Monster::GetStats((*it1).Monster()).speed) result = Monster::GetStats((*it1).Monster()).speed;
-    
-    return result;
+    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateHighestTroops);
+    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
+}
+
+Monster::monster_t Heroes::GetStrongestArmyMonster(void) const
+{
+    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateStrongestTroops);
+    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
+}
+
+Monster::monster_t Heroes::GetWeakestArmyMonster(void) const
+{
+    std::vector<Army::Troops>::const_iterator it = min_element(army.begin(), army.end(), Army::PredicateWeakestTroops);
+    return it != army.end() ? (*it).Monster() : Monster::UNKNOWN;
 }
 
 bool Heroes::MayStillMove(void) const

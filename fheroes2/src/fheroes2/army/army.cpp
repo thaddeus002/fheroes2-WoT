@@ -218,3 +218,23 @@ void Army::Troops::ProceedMagic()
 	}
     }
 }
+
+bool Army::PredicateStrongestTroops(const Troops & t1, const Troops & t2)
+{
+    return Monster::GetStats(t1.Monster()).damageMin > Monster::GetStats(t2.Monster()).damageMin;
+}
+
+bool Army::PredicateWeakestTroops(const Troops & t1, const Troops & t2)
+{
+    return Monster::GetStats(t1.Monster()).damageMin < Monster::GetStats(t2.Monster()).damageMin;
+}
+
+bool Army::PredicateSlowestTroops(const Troops & t1, const Troops & t2)
+{
+    return Monster::GetStats(t1.Monster()).speed < Monster::GetStats(t2.Monster()).speed;
+}
+
+bool Army::PredicateHighestTroops(const Troops & t1, const Troops & t2)
+{
+    return Monster::GetStats(t1.Monster()).speed > Monster::GetStats(t2.Monster()).speed;
+}
