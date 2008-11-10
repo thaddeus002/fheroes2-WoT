@@ -615,6 +615,7 @@ void ActionToPickupResource(Heroes &hero, const u16 dst_index)
     switch(tile.GetObject())
     {
 	case MP2::OBJ_CAMPFIRE:
+	    resource.gold += 100 * count;
 	    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "Ransacking an enemy camp, you discover a hidden cache of treasures.", resource);
 	break;
 
