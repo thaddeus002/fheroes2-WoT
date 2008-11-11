@@ -162,6 +162,7 @@ u16 Text::height(const std::string &str, Font::type_t ft, u16 width)
 
 TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
 {
+    if(msg.empty()) return;
 
     u16 pos_last = msg.size() - 1;
 
@@ -172,7 +173,7 @@ TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
     extents.y = rt.y;
     extents.w = 0;
 
-    while(s_start < s_end)
+    while(s_start <= s_end)
     {
 	while(s_start < s_end && rt.w < Text::width(msg, ft, s_start, s_end - s_start))
 	{
@@ -208,7 +209,7 @@ TextBox::TextBox(const std::list<std::string> & list, Font::type_t ft, const Rec
 
     std::list<std::string>::const_iterator it1 = list.begin();
     std::list<std::string>::const_iterator it2 = list.end();
-    for(; it1 != it2; ++it1)
+    for(; it1 != it2; ++it1) if((*it1).size())
     {
 	const std::string & msg = *it1;
 
@@ -216,7 +217,7 @@ TextBox::TextBox(const std::list<std::string> & list, Font::type_t ft, const Rec
 	u16 s_start = 0;
 	u16 s_end = pos_last;
 
-	while(s_start < s_end)
+	while(s_start <= s_end)
 	{
 	    while(s_start < s_end && rt.w < Text::width(msg, ft, s_start, s_end - s_start))
 	    {
