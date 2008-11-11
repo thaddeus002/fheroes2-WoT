@@ -22,6 +22,7 @@
 
 #include "SDL.h"
 #include "SDL_mixer.h"
+#include "l10n.h"
 
 typedef int8_t		s8;
 typedef uint8_t		u8;
