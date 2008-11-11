@@ -71,6 +71,7 @@ public:
     const Maps::FileInfo & FileInfo(void) const;
     Maps::FileInfo & FileInfo(void);
 
+    const std::string & TranslationFile(void) const;
     const std::string & DataDirectory(void) const;
     const std::string & MapsDirectory(void) const;
 
@@ -134,6 +135,8 @@ private:
 
     std::string path_data_directory;
     std::string path_maps_directory;
+    
+    std::string translationFile;
     
     Maps::FileInfo current_maps_file;
     

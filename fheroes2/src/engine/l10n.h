@@ -17,6 +17,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifndef H2L10N_H
+#define H2L10N_H
+
 #include <string>
 #include <map>
 #include <vector>
@@ -56,3 +59,5 @@ namespace l10n
 
     Strings &Get();
 }
+
+#endif

@@ -24,7 +24,7 @@ Acceptable hardcoded strings include:
 #include "string"
 Error::Warning("string")
 Error::Verbose("string")
-Error::Exception("string")
+Error::Except("string")
 _NOL10N("string")
 
 The _NOL10N() construct is used when the string will NEVER, EVER
@@ -41,7 +41,7 @@ def checkLine(line):
         return []
 
     untagged = []
-    errorRE = re.compile("Error::(?:Verbose|Warning|Exception)\((.*)\);")
+    errorRE = re.compile("Error::(?:Verbose|Warning|Except)\((.*)\);")
     taggedRE = re.compile('_NOL10N\("(.*)"\)')
     untaggedRE = re.compile('"(.*)"')
     

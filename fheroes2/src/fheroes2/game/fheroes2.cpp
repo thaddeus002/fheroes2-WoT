@@ -162,6 +162,12 @@ int main(int argc, char **argv)
 
 	    AGG::Cache & cache = AGG::Cache::Get();
 
+            std::string translatePath = conf.DataDirectory();
+            translatePath += SEPARATOR;
+            translatePath += conf.TranslationFile();
+            if(! l10n::Get().InitWithStringsFile(translatePath))
+                Error::Except("Translation file not found.");
+
 	    // read data directory
     	    Dir dir;
     	
