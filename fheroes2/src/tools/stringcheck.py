@@ -22,12 +22,14 @@ stringcheck.py - a tool to report all incorrectly hardcoded strings
 Acceptable hardcoded strings include:
 
 #include "string"
+printf("string")
 Error::Warning("string")
 Error::Verbose("string")
 Error::Except("string")
-_NOL10N("string")
+NOL10N("string")
+tr("string")
 
-The _NOL10N() construct is used when the string will NEVER, EVER
+The NOL10N() construct is used when the string will NEVER, EVER
 need localization, such as blank strings (" ").
 """
 
@@ -42,17 +44,18 @@ def checkLine(line):
 
     untagged = []
     errorRE = re.compile("Error::(?:Verbose|Warning|Except)\((.*)\);")
-    taggedRE = re.compile('_NOL10N\("(.*)"\)')
+    printfRE = re.compile("printf\((.*)\)")
+    taggedRE = re.compile('(?:NOL10N|tr)\("(.*)"\)')
     untaggedRE = re.compile('"(.*)"')
     
     tagged = taggedRE.findall(line)
     errors = errorRE.findall(line)
+    printf = printfRE.findall(line)
     
     allowed = []
-    if errors:
-        allowed.append(errors)
-    if tagged:
-        allowed.append(tagged)
+    for toAppend in [errors, tagged, printf]:
+        if toAppend:
+            allowed.append(toAppend)
     
     possiblyUntagged = untaggedRE.findall(line)
     
@@ -81,7 +84,8 @@ def main(argc, argv):
         print "written by Josh Matthews, 2008\n"
         print "Report all uses of hardcoded strings that are not:"
         print "- part of an error message"
-        print "- tagged with _NOL10N()"
+        print "- tagged with NOL10N()"
+        print "- or otherwise acceptable (see source)"
         return 1
     
     if not stat.S_ISDIR(os.stat(argv[1])[0]):

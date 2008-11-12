@@ -25,8 +25,8 @@
 #include <vector>
 #include "error.h"
 
-#define _(s) l10n::Get().FromKey(s)
-#define _NOL10N(s) s
+#define tr(s) l10n::Get().FromKey(s)
+#define NOL10N(s) s
 
 namespace l10n
 {
@@ -36,8 +36,10 @@ namespace l10n
             LocalizedString();
             LocalizedString(const std::string &);
             LocalizedString(const LocalizedString &);
-            LocalizedString &sub(std::string &replace, int idx=1);
+            LocalizedString &sub(const std::string &replace, int idx=-1);
+            LocalizedString &sub(int, int idx=-1);
             operator std::string();
+            size_t size();
             
         private:
             LocalizedString &operator=(const LocalizedString &);

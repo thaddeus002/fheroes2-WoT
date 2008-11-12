@@ -1,1 +1,66 @@
 # English strings translation file
+
+[battle]
+none = None
+victory1 = A glorious victory!
+victory2 = For valor in combat, %1 receives %2 experience.
+lose = Your forces suffer a bitter defeat, and %1 abandons your cause.
+surrender = TODO
+retreat = Your forces in disarray, the cowardly %1 flees in terror.
+casualties = Battlefield Casualties
+attacker = Attacker
+defender = Defender
+skip = Skip
+skip_info = Skip the current creature. The current creature loses its turn and does not get to go again until the next round.
+auto = Auto Combat
+auto_info = Allows the computer to fight out the battle for you.
+options = System Options
+options_info = Allows you to customize the combat screen.
+retreat? = Are you sure you want to retreat?
+skip_unit = Skip this unit
+system_options = Customize system options
+hero_options = Hero's Options
+opp_hero = View Opposing Hero
+monster_info = View %1 info.
+shoot_monster = Shoot %1 (%2 shot(s) left)
+attack_monster = Attack %1
+view_monster = View %1 info.
+fly = Fly
+move = Move
+move/fly_here = %1 %2 here.
+error = Error
+no_path = Path not found!
+multiple_attack = %1 do %2 damage.
+single_attack = %1 does %2 damage.
+single_perish = %1 %2 perishes.
+multiple_perish = %1 %2 perish.
+affect_noone = That spell will affect no one!
+spell_damage_single = The %1 does %2 damage.
+spell_damage_multiple = The %1 does %2 damage to the %3.
+cast_spell = Cast Spell
+cast_spell_info = Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn.
+retreat = Retreat
+retreat_info = Retreat your hero, abandoning your creatures. Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces.
+surrender = Surrender
+surrender_info = Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again.
+cancel_info = Return to the battle.
+high_morale = High morale enables the %1 to attack again.
+low_morale = Low morale causes the %1 to freeze in panic.
+
+[hero]
+long_name = %1 the %2
+skill_display = %1: %2
+skill_display_ratio = %1: %2/%3
+
+[skills]
+attack = Attack
+defense = Defense
+spell_power = Spell Power
+knowledge = Knowledge
+morale = Morale
+luck = Luck
+spell_points = Spell Points
+
+[dialog]
+cancel = Cancel
+ok = Ok

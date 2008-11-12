@@ -164,9 +164,10 @@ int main(int argc, char **argv)
 
             std::string translatePath = conf.DataDirectory();
             translatePath += SEPARATOR;
-            translatePath += conf.TranslationFile();
-            if(! l10n::Get().InitWithStringsFile(translatePath))
-                Error::Except("Translation file not found.");
+            if(! l10n::Get().InitWithStringsFile(translatePath + "english.str"))
+                Error::Except("Base translation file not found.");
+            if(! l10n::Get().InitWithStringsFile(translatePath + conf.TranslationFile()))
+                Error::Except("Requested translation file not found.");
 
 	    // read data directory
     	    Dir dir;

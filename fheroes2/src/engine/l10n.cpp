@@ -36,15 +36,24 @@ namespace l10n
     LocalizedString::LocalizedString(const LocalizedString &other)
     : string(other.string), subs(other.subs) {}
     
-    LocalizedString &LocalizedString::sub(std::string &replace, int idx /* = 1 */)
+    LocalizedString &LocalizedString::sub(const std::string &replace, int idx /* = -1 */)
     {
-        subs[idx - 1] = replace;
+        if(idx > 0)
+            subs[idx - 1] = replace;
+        else subs.push_back(replace);
         return *this;
+    }
+    
+    LocalizedString &LocalizedString::sub(int replace, int idx /* = -1 */)
+    {
+        std::string strReplace;
+        String::AddInt(strReplace, replace);
+        return sub(strReplace, idx);
     }
     
     LocalizedString::operator std::string()
     {
-        std::string subbed;
+        std::string subbed(string);
         for(u16 i = 0; i < sizeof(subs); i++)
         {
             std::string find = "%";
@@ -56,18 +65,30 @@ namespace l10n
         return subbed;
     }
     
+    size_t LocalizedString::size()
+    {
+        return std::string(*this).size();
+    }
+    
     bool Strings::InitWithStringsFile(const std::string &filename)
     {
-        localizedStrings.clear();
-        
         if(filename.empty()) return false;
         std::fstream file(filename.c_str(), std::ios::in);
         if(! file || file.fail()) return false;
 
         std::string str;
+        std::string prefix;
         while(std::getline(file, str))
         {
+            String::Trim(str);
+            
             if(String::Comment(str) || 0 == str.size()) continue;
+            else if(str[0] == '[' && str[str.size() - 1] == ']')
+            {
+                prefix = str.substr(1, str.size() - 2);
+                String::Trim(prefix);
+                continue;
+            }
 
             const size_t pos = str.find('=');
             if(std::string::npos != pos)
@@ -78,7 +99,15 @@ namespace l10n
                 String::Trim(left);
                 String::Trim(right);
 
-                localizedStrings[left] = right;
+                std::string key;
+                if(prefix != "")
+                {
+                    key += prefix;
+                    key += ".";
+                }
+                key += left;
+                
+                localizedStrings[key] = right;
             }
         }
 
@@ -92,10 +121,10 @@ namespace l10n
             return localizedStrings[key];
         else
         {
-            std::string error("Unknown string requested (");
+            std::string error("Unlocalized string requested (");
             error += key;
             error += ")";
-            Error::Except(error);
+            Error::Warning(error);
             return std::string("");
         }
     }
