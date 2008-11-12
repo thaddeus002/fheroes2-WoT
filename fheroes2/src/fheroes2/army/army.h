@@ -61,8 +61,8 @@ namespace Army
     {
     public:
 	Troops(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0) : 
-	    summoned(false), monster(m), count(c), master_skill(NULL),
-            attackRanged(false) {};
+	    attackRanged(false), summoned(false), monster(m), count(c), 
+            master_skill(NULL) {};
 	Troops(const Troops & troops);
 
         void Set(Monster::monster_t m, u16 c){ monster = m; count = c; };
