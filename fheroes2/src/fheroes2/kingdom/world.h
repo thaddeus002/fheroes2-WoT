@@ -109,6 +109,7 @@ public:
     Skill::Secondary::skill_t SkillFromWitchsHut(const u16 index);
     const std::string & MessageSign(const u16 index);
 
+    u16 GetNearestObject(const u16 center, const MP2::object_t obj);
     void CaptureObject(const u16 index, const Color::color_t col);
     u16 CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const;
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;

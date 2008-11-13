@@ -1662,3 +1662,24 @@ void World::ActionForMagellanMaps(u8 color)
         
     for(; it1 != it2; ++it1) if(*it1 && Maps::Ground::WATER == (*it1)->GetGround()) (*it1)->ClearFog(color);
 }
+
+u16 World::GetNearestObject(const u16 center, const MP2::object_t obj)
+{
+    u16 res = MAXU16;
+    u16 min = MAXU16;
+
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+
+    for(; it1 != it2; ++it1) if(*it1 && obj == (*it1)->GetObject())
+    {
+	const u16 min2 = Maps::GetApproximateDistance(center, (*it1)->GetIndex());
+	if(min2 < min)
+	{
+	    min = min2;
+	    res = (*it1)->GetIndex();
+	}
+    }
+
+    return res;
+}
