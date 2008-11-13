@@ -43,8 +43,6 @@
 
 void Castle::RedrawNameTown(const Point & src_pt)
 {
-    castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
-
     const Sprite & ramka = AGG::GetICN(ICN::TOWNNAME, 0);
     Point dst_pt(src_pt.x + 320 - ramka.w() / 2, src_pt.y + 248);
     Display::Get().Blit(ramka, dst_pt);

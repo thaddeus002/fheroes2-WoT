@@ -88,14 +88,13 @@ public:
     bool isBuild(u32 bd) const{ return building & bd; };
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
-    bool isHeroesPresent(void);
     bool RecruitMonster(building_t dw, u16 count);
     bool AllowBuyBuilding(building_t build) const;
     bool AllowBuyHero(void);
     bool ContainCoord(const u16 ax, const u16 ay) const;
 
     void RecruitHero(const Heroes::heroes_t hero);
-    const Heroes* GetHeroes(void){ return castle_heroes; };
+    const Heroes* GetHeroes(void) const;
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };

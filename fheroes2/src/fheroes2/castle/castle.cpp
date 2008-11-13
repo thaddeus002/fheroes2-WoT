@@ -30,11 +30,9 @@
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     : building(0), army_spread(true), allow_build(true), present_boat(false), dwelling(CASTLEMAXMONSTER, 0),
-      army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h()),
+      army(CASTLEMAXARMY), castle_heroes(false), uniq(gid), mp(mapindex % world.w(), mapindex / world.h()),
       nearly_sea(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST)))
 {
-    castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
-
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
 
@@ -284,17 +282,10 @@ bool Castle::ContainCoord(const u16 ax, const u16 ay) const
     return ((mp.x == ax && mp.y - 3 == ay) || (ax >= mp.x - 2 && ax <= mp.x + 2 && ay >= mp.y - 2 && ay <= mp.y + 1));
 }
 
-bool Castle::isHeroesPresent(void)
-{
-    castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp));
-
-    return castle_heroes;
-}
-
 void Castle::ActionNewDay(void)
 {
     // for learns new spells need today
-    if(isHeroesPresent() && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);
+    if(castle_heroes && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);
 
     allow_build = true;
 }
@@ -685,7 +676,7 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
 
 bool Castle::AllowBuyHero(void)
 {
-    if(isHeroesPresent()) return false;
+    if(castle_heroes) return false;
 
     const Kingdom & kingdom = world.GetKingdom(color);
 
@@ -1485,6 +1476,11 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
     Error::Warning("Castle::GetICNBuilding: return unknown, " + Castle::GetStringBuilding(build, race));
 
     return ICN::UNKNOWN;
+}
+
+const Heroes* Castle::GetHeroes(void) const
+{
+    return world.GetHeroes(mp.x, mp.y);
 }
 
 bool Castle::HaveNearlySea(void) const
