@@ -37,7 +37,7 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), spellCasted(false), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), spell_book(*this), heroes(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
+    move_point(0), army(HEROESMAXARMY), spell_book(*this), hid(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     // hero is freeman
@@ -129,7 +129,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     for(; it1 != it2; ++it1) (*it1).SetMasterSkill(this);
 
     // extra hero
-    switch(heroes)
+    switch(hid)
     {
         case ROLAND:
             attack    = 0;
@@ -439,7 +439,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
 bool Heroes::operator== (const Heroes & h) const
 {
-    return heroes == h.heroes;
+    return hid == h.hid;
 }
 
 u8 Heroes::GetMobilityIndexSprite(void) const

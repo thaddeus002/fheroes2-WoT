@@ -20,11 +20,14 @@
 #ifndef H2PORTRAIT_H
 #define H2PORTRAIT_H
 
+class Heroes;
+
 namespace Portrait
 {
     typedef enum { BIG, MEDIUM, SMALL } size_t;
 
-    const Surface & Hero(const Heroes::heroes_t hero, const Portrait::size_t sz);
+    const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
+    const Surface & Hero(const Heroes::heroes_t hid, const Portrait::size_t sz);
     const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
 };
 

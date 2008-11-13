@@ -384,7 +384,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     Text(message, Font::SMALL, dst_pt);
 
     // mini port heroes
-    const Surface & port = Portrait::Hero(hero.GetHeroes(), Portrait::SMALL);
+    const Surface & port = Portrait::Hero(hero, Portrait::SMALL);
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
     dst_pt.y += 15;
     display.Blit(port, dst_pt);

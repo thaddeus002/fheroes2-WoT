@@ -118,11 +118,11 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // portrait
     dst_pt.x = cur_pt.x + 93;
     dst_pt.y = cur_pt.y + 72;
-    display.Blit(Portrait::Hero(GetHeroes(), Portrait::BIG), dst_pt);
+    display.Blit(Portrait::Hero(GetID(), Portrait::BIG), dst_pt);
 
     dst_pt.x = cur_pt.x + 447;
     dst_pt.y = cur_pt.y + 72;
-    display.Blit(Portrait::Hero(heroes2.GetHeroes(), Portrait::BIG), dst_pt);
+    display.Blit(Portrait::Hero(heroes2.GetID(), Portrait::BIG), dst_pt);
 
     // attack skill
     message.clear();

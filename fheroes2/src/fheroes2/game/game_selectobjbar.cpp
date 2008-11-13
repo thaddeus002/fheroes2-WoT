@@ -132,7 +132,7 @@ void Game::SelectBarHeroes::RedrawIcon(const Heroes & hero, const Rect & dst)
 
     const Sprite & mobility = AGG::GetICN(ICN::MOBILITY, hero.GetMobilityIndexSprite());
     const Sprite & mana = AGG::GetICN(ICN::MANA, hero.GetManaIndexSprite());
-    const Surface & port = Portrait::Hero(hero.GetHeroes(), Portrait::SMALL);
+    const Surface & port = Portrait::Hero(hero, Portrait::SMALL);
 
     display.FillRect(0, 0, 0, dst);
 

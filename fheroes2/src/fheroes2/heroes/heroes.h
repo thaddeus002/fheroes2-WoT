@@ -108,7 +108,7 @@ public:
 
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
 
-    Heroes::heroes_t GetHeroes(void) const{ return heroes; };
+    Heroes::heroes_t GetID(void) const{ return hid; };
     Color::color_t GetColor(void) const{ return color; };
     Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
@@ -245,7 +245,7 @@ private:
     std::vector<Army::Troops> army;
     Spell::Book		spell_book;
 
-    const heroes_t	heroes;
+    const heroes_t	hid;
     const Race::race_t	race;
 
     bool		army_spread;

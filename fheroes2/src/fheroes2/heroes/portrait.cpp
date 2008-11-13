@@ -63,7 +63,12 @@ const Surface & Portrait::Captain(const Race::race_t rc, const Portrait::size_t 
     return AGG::GetICN(ICN::PORT0090, 0);
 }
 
-const Surface & Portrait::Hero(const Heroes::heroes_t hero, const Portrait::size_t sz)
+const Surface & Portrait::Hero(const Heroes & hero, const Portrait::size_t sz)
+{
+    return Hero(hero.GetID(), sz);
+}
+
+const Surface & Portrait::Hero(const Heroes::heroes_t hid, const Portrait::size_t sz)
 {
     switch(sz)
     {
@@ -71,7 +76,7 @@ const Surface & Portrait::Hero(const Heroes::heroes_t hero, const Portrait::size
 	{
 	    ICN::icn_t icn = ICN::UNKNOWN;
 
-	    switch(hero)
+	    switch(hid)
 	    {
     		case Heroes::LORDKILBURN:	icn = ICN::PORT0000; break;
     		case Heroes::SIRGALLANTH:	icn = ICN::PORT0001; break;
@@ -150,18 +155,18 @@ const Surface & Portrait::Hero(const Heroes::heroes_t hero, const Portrait::size
 	    }
 
 	    // FIXME: VERSION: 2.1 add new portrait
-	    return AGG::GetICN(Heroes::SANDYSANDY > hero ? icn : ICN::PORT0059, 0);
+	    return AGG::GetICN(Heroes::SANDYSANDY > hid ? icn : ICN::PORT0059, 0);
 	}
 
 	case MEDIUM:
-	    if(Heroes::UNKNOWN <= hero) return AGG::GetICN(ICN::PORTMEDI, 0);
+	    if(Heroes::UNKNOWN <= hid) return AGG::GetICN(ICN::PORTMEDI, 0);
 	    else
-	    if(Heroes::SANDYSANDY > hero) return AGG::GetICN(ICN::PORTMEDI, hero + 1);
+	    if(Heroes::SANDYSANDY > hid) return AGG::GetICN(ICN::PORTMEDI, hid + 1);
 	    else
 	    return AGG::GetICN(ICN::PORTMEDI, 60);
 
 	case SMALL:
-	    return AGG::GetICN(ICN::MINIPORT, Heroes::SANDYSANDY > hero ? hero : 59);
+	    return AGG::GetICN(ICN::MINIPORT, Heroes::SANDYSANDY > hid ? hid : 59);
     }
 
     return AGG::GetICN(ICN::PORTMEDI, 0);

@@ -124,7 +124,7 @@ Dialog::answer_t Castle::OpenDialog(void)
     Rect rectHeroPortrait(dst_pt.x, dst_pt.y, 100, 92);
 
     if(castle_heroes)
-	display.Blit(Portrait::Hero((*castle_heroes).GetHeroes(), Portrait::BIG), dst_pt);
+	display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), dst_pt);
     else
     if(isBuild(Castle::BUILD_CAPTAIN))
 	display.Blit(Portrait::Captain(race, Portrait::BIG), dst_pt);
@@ -811,7 +811,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		selectHeroesTroops = new Army::SelectBar(dst_pt, (*castle_heroes).GetArmy());
 
 		// play sound
-		const Surface & port = Portrait::Hero((*castle_heroes).GetHeroes(), Portrait::BIG);
+		const Surface & port = Portrait::Hero((*castle_heroes), Portrait::BIG);
 		Surface sf(port.w(), port.h());
 		sf.SetColorKey();
 		sf.Blit(port);
@@ -840,7 +840,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    RedrawResourcePanel();
 		}
 
-		display.Blit(Portrait::Hero((*castle_heroes).GetHeroes(), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
+		display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
 
     		dst_pt.x = cur_pt.x;
         	dst_pt.y = cur_pt.y + 256;

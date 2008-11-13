@@ -1165,8 +1165,8 @@ void World::NewWeek(void)
 {
     // change free recruit hero
     const Race::race_t & rc = Settings::Get().FileInfo().KingdomRace(Settings::Get().MyColor());
-    free_recruit_hero1 = GetFreemanHeroes(rc)->GetHeroes();
-    free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
+    free_recruit_hero1 = GetFreemanHeroes(rc)->GetID();
+    free_recruit_hero2 = GetFreemanHeroes()->GetID();
     
     UpdateDwellingPopulation();
 
@@ -1262,20 +1262,20 @@ const Heroes::heroes_t & World::GetFreeRecruit1(void)
 {
     const Race::race_t & rc = Settings::Get().FileInfo().KingdomRace(Settings::Get().MyColor());
 
-    if(Heroes::UNKNOWN == free_recruit_hero1 || !(*vec_heroes[free_recruit_hero1]).isFreeman()) free_recruit_hero1 = GetFreemanHeroes(rc)->GetHeroes();
+    if(Heroes::UNKNOWN == free_recruit_hero1 || !(*vec_heroes[free_recruit_hero1]).isFreeman()) free_recruit_hero1 = GetFreemanHeroes(rc)->GetID();
 
     return free_recruit_hero1;
 }
 
 const Heroes::heroes_t & World::GetFreeRecruit2(void)
 {
-    if(Heroes::UNKNOWN == free_recruit_hero2 || !(*vec_heroes[free_recruit_hero2]).isFreeman()) free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
+    if(Heroes::UNKNOWN == free_recruit_hero2 || !(*vec_heroes[free_recruit_hero2]).isFreeman()) free_recruit_hero2 = GetFreemanHeroes()->GetID();
 
     while(free_recruit_hero1 == free_recruit_hero2)
     {
 	Error::Verbose("World::GetFreeRecruit2: hero1 equal hero2");
 
-	free_recruit_hero2 = GetFreemanHeroes()->GetHeroes();
+	free_recruit_hero2 = GetFreemanHeroes()->GetID();
     }
 
     return free_recruit_hero2;
@@ -1329,12 +1329,12 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
     // find freeman in race
     if(Race::BOMG != rc)
 	for(u8 ii = min; ii <= max; ++ii)
-	    if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetHeroes());
+	    if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetID());
 
     // not found, find other race
     if(Race::BOMG == rc || freeman_heroes.empty())
 	for(u8 ii = 0; ii <= 53; ++ii)
-	    if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetHeroes());
+	    if((*vec_heroes[ii]).isFreeman()) freeman_heroes.push_back((*vec_heroes[ii]).GetID());
 
     // not found, all heroes busy
     if(freeman_heroes.empty())
