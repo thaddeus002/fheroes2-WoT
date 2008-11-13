@@ -1513,10 +1513,9 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    }
 		    PlaySoundSuccess;
 		    if(buttons)
-		    {
+			DialogWithArtifact(header, body, art, buttons);
+		    else
 			conditions = true;
-			DialogWithArtifact(header, body,art, buttons);
-		    }
 		    break;
 		}
 
