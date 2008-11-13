@@ -68,6 +68,7 @@ namespace Maps
     u16 GetMaxGroundAround(const u16 center);
     u16 ScanAroundObject(const u16 center, const u8 obj, bool full);
     void ClearFog(const Point & center, const u8 scoute, const u8 color);
+    u16 GetApproximateDistance(const u16 index1, const u16 index2);
 };
 
 #endif

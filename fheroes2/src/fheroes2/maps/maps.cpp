@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cstdlib>
 #include "world.h"
 #include "gamearea.h"
 #include "error.h"
@@ -263,4 +264,10 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj, bool full)
 		obj == world.GetTiles(GetIndexFromAbsPoint(cx + x, cy + y)).GetObject()) return (cy + y) * world.w() + (cx + x);
     }
     return MAXU16;
+}
+
+u16 Maps::GetApproximateDistance(const u16 index1, const u16 index2)
+{
+    return (std::abs(static_cast<s32>(index1 % world.w()) - static_cast<s32>(index1 % world.w())) +
+        std::abs(static_cast<s32>(index2 / world.w()) - static_cast<s32>(index2 / world.w())));
 }
