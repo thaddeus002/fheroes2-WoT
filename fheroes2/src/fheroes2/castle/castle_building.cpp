@@ -563,9 +563,9 @@ void Castle::RedrawBuilding(const building_t build, const Point & dst_pt, const 
 	if(BUILD_SHIPYARD == build2)
     	{
 	    // boat
-	    if(BUILD_BOAT & building)
+	    if(present_boat)
 	    {
-		const ICN::icn_t icn2 = GetICNBuilding(BUILD_BOAT, race);
+		const ICN::icn_t icn2 = GetICNBoat(race);
 
     		const Sprite & sprite40 = AGG::GetICN(icn2, 0);
 		display.Blit(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y());

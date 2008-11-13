@@ -98,8 +98,6 @@ class Rect;
 #define BUILD_RIGHTTURRET_GOLD		1500
 #define BUILD_RIGHTTURRET_ORE		5
 #define BUILD_CAPTAIN_GOLD		500
-#define BUILD_BOAT_GOLD			1000
-#define BUILD_BOAT_WOOD			10
 #define BUILD_WEL2_GOLD			1000
 // spec
 #define BUILD_FORTIFICATION_GOLD	1500
@@ -349,6 +347,9 @@ class Rect;
 #define BUY_WATER_ELEMENT_GOLD 		500
 
 #define BUY_SPELL_BOOK_GOLD		500
+
+#define BUY_BOAT_GOLD			1000
+#define BUY_BOAT_WOOD			10
 
 namespace PaymentConditions
 {

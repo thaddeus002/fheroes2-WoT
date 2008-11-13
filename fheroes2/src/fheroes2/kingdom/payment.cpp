@@ -232,11 +232,6 @@ PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const u32
             gold = BUILD_MOAT_GOLD;
             break;
 
-        case Castle::BUILD_BOAT:
-            gold = BUILD_BOAT_GOLD;
-            wood = BUILD_BOAT_WOOD;
-            break;
-
         case Castle::BUILD_MAGEGUILD1:
             gold = BUILD_MAGEGUILD1_GOLD;
             ore = BUILD_MAGEGUILD1_ORE;

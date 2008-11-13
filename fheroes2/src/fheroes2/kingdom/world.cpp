@@ -1683,3 +1683,44 @@ u16 World::GetNearestObject(const u16 center, const MP2::object_t obj)
 
     return res;
 }
+
+// create boat: with option build or summon
+bool World::CreateBoat(const u16 center, bool build)
+{
+    
+    // scan 3x3
+    const s16 cx = center % world.w();
+    const s16 cy = center / world.w();
+
+    for(s16 y = -3; y <= 3; ++y)
+        for(s16 x = -3; x <= 3; ++x)
+	    if(Maps::isValidAbsPoint(cx + x, cy + y))
+    {
+        Maps::Tiles & tile = GetTiles(Maps::GetIndexFromAbsPoint(cx + x, cy + y));
+
+        if(Maps::Ground::WATER == tile.GetGround() &&
+    	    MP2::OBJ_ZERO == tile.GetObject() &&
+    	    Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_COAST, false))
+    	    // TODO: need add check path find form center to tile
+        {
+    	    if(build)
+    	    {
+    		tile.SetObject(MP2::OBJ_BOAT);
+    		return true;
+    	    }
+    	    else
+    	    {
+    		const u16 boat = GetNearestObject(center, MP2::OBJ_BOAT);
+    		if(MAXU16 != boat)
+    		{
+    		    world.GetTiles(boat).SetObject(MP2::OBJ_ZERO);
+    		    tile.SetObject(MP2::OBJ_BOAT);
+    		    return true;
+    		}
+    	    }
+    	    break;
+        }
+    }
+
+    return false;
+}

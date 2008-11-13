@@ -115,6 +115,7 @@ public:
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;
     Color::color_t ColorCapturedObject(const u16 index) const;
 
+    bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);
 
     static u32 GetUniq(void){ return ++uniq0; };

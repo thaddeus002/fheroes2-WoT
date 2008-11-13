@@ -29,8 +29,9 @@
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
-    : building(0), army_spread(true), allow_build(true), dwelling(CASTLEMAXMONSTER, 0),
-      army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h())
+    : building(0), army_spread(true), allow_build(true), present_boat(false), dwelling(CASTLEMAXMONSTER, 0),
+      army(CASTLEMAXARMY), uniq(gid), mp(mapindex % world.w(), mapindex / world.h()),
+      nearly_sea(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST)))
 {
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
 
@@ -256,8 +257,6 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     // minimize area maps id
     MinimizeAreaMapsID();
     
-    present_boat = false;
-
     // set master primary skill to army
     std::vector<Army::Troops>::iterator it1 = army.begin();
     std::vector<Army::Troops>::const_iterator it2 = army.end();
@@ -273,6 +272,12 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     // end
     if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
+
+const Point & Castle::GetCenter(void) const
+{ return mp; }
+
+u16 Castle::GetIndex(void) const
+{ return Maps::GetIndexFromAbsPoint(mp); }
 
 bool Castle::ContainCoord(const u16 ax, const u16 ay) const
 {
@@ -1236,6 +1241,23 @@ void Castle::DrawImageCastle(const Point & pt)
     }
 }
 
+ICN::icn_t Castle::GetICNBoat(const Race::race_t & race)
+{
+    switch(race)
+    {
+	case Race::BARB:	return ICN::TWNBBOAT;
+	case Race::KNGT:	return ICN::TWNKBOAT;
+	case Race::NECR:	return ICN::TWNNBOAT;
+	case Race::SORC:	return ICN::TWNSBOAT;
+	case Race::WRLK:	return ICN::TWNWBOAT;
+	case Race::WZRD:	return ICN::TWNZBOAT;
+	default: break;
+    }
+
+    Error::Warning("Castle::GetICNBoat: return unknown");
+    return ICN::UNKNOWN;
+}
+
 /* get building name ICN */
 ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::race_t & race)
 {
@@ -1256,7 +1278,6 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 	case BUILD_TAVERN:	return ICN::TWNBTVRN;
 	case BUILD_WELL:	return ICN::TWNBWELL;
 	case BUILD_STATUE:	return ICN::TWNBSTAT;
-	case BUILD_BOAT:	return ICN::TWNBBOAT;
 	case BUILD_SHIPYARD:	return ICN::TWNBDOCK;
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
@@ -1293,7 +1314,6 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 	case BUILD_TAVERN:	return ICN::TWNKTVRN;
 	case BUILD_WELL:	return ICN::TWNKWELL;
 	case BUILD_STATUE:	return ICN::TWNKSTAT;
-	case BUILD_BOAT:	return ICN::TWNKBOAT;
 	case BUILD_SHIPYARD:	return ICN::TWNKDOCK;
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
@@ -1334,7 +1354,6 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 				break;
 	case BUILD_WELL:	return ICN::TWNNWELL;
 	case BUILD_STATUE:	return ICN::TWNNSTAT;
-	case BUILD_BOAT:	return ICN::TWNNBOAT;
 	case BUILD_SHIPYARD:	return ICN::TWNNDOCK;
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
@@ -1372,7 +1391,6 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 	case BUILD_TAVERN:	return ICN::TWNSTVRN;
 	case BUILD_WELL:	return ICN::TWNSWELL;
 	case BUILD_STATUE:	return ICN::TWNSSTAT;
-	case BUILD_BOAT:	return ICN::TWNSBOAT;
 	case BUILD_SHIPYARD:	return ICN::TWNSDOCK;
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
@@ -1409,7 +1427,6 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 	case BUILD_TAVERN:	return ICN::TWNWTVRN;
 	case BUILD_WELL:	return ICN::TWNWWELL;
 	case BUILD_STATUE:	return ICN::TWNWSTAT;
-	case BUILD_BOAT:	return ICN::TWNWBOAT;
 	case BUILD_SHIPYARD:	return ICN::TWNWDOCK;
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
@@ -1446,7 +1463,6 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 	case BUILD_TAVERN:	return ICN::TWNZTVRN;
 	case BUILD_WELL:	return ICN::TWNZWELL;
 	case BUILD_STATUE:	return ICN::TWNZSTAT;
-	case BUILD_BOAT:	return ICN::TWNZBOAT;
 	case BUILD_SHIPYARD:	return ICN::TWNZDOCK;
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
@@ -1473,15 +1489,12 @@ ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::
 
 bool Castle::HaveNearlySea(void) const
 {
-    if(world.h() <= mp.y + 2) return false;
+    return nearly_sea;
+}
 
-    const u16 index_c = (mp.y + 2 ) * world.h() + mp.x;
-
-    const Maps::Tiles & tile_c = world.GetTiles(index_c);
-    const Maps::Tiles & tile_l = world.GetTiles(index_c - 1);
-    const Maps::Tiles & tile_r = world.GetTiles(index_c + 2);
-
-    return Maps::Ground::WATER == tile_c.GetGround() || Maps::Ground::WATER == tile_l.GetGround() || Maps::Ground::WATER == tile_r.GetGround();
+bool Castle::PresentBoat(void) const
+{
+    return 3 >= Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_BOAT));
 }
 
 u32 Castle::GetUpgradeBuilding(const u32 build, const Race::race_t & race)

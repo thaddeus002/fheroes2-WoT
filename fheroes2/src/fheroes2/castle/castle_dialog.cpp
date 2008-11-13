@@ -58,6 +58,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 {
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
+    present_boat = PresentBoat();
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -718,12 +719,16 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    cursor.Hide();
 
 	    // check payment and present other boat
-	    //bool enable = ! world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBuilding(race, BUILD_BOAT)) ||
-	    //		   (building & BUILD_BOAT)) ? false : true;
+	    Resource::funds_t res;
+	    res.gold = BUY_BOAT_GOLD;
+	    res.wood = BUY_BOAT_WOOD;
+	    bool enable = world.GetMyKingdom().AllowPayment(res) && (false == present_boat);
 
-	    if(Dialog::OK == Dialog::BuyBoat(false))
+	    if(Dialog::OK == Dialog::BuyBoat(enable))
 	    {
-		BuyBuilding(BUILD_BOAT);
+		world.GetMyKingdom().OddFundsResource(res);
+		present_boat = true;
+		world.CreateBoat(GetIndex(), true);
 
 		RedrawResourcePanel();
 

@@ -60,7 +60,7 @@ public:
         BUILD_SPEC              = 0x00000400,   // Fortification, Coliseum, Rainbow, Dungeon, Library, Storm
         BUILD_CASTLE            = 0x00000800,
         BUILD_CAPTAIN           = 0x00001000,
-        BUILD_BOAT              = 0x00002000,
+        //BUILD_BOAT              = 0x00002000, unused
         BUILD_MAGEGUILD1        = 0x00004000,
 	BUILD_MAGEGUILD2        = 0x00008000,
 	BUILD_MAGEGUILD3        = 0x00010000,
@@ -87,6 +87,7 @@ public:
     bool AllowBuild(void) const{ return allow_build; };
     bool isBuild(u32 bd) const{ return building & bd; };
     bool HaveNearlySea(void) const;
+    bool PresentBoat(void) const;
     bool isHeroesPresent(void);
     bool RecruitMonster(building_t dw, u16 count);
     bool AllowBuyBuilding(building_t build) const;
@@ -106,7 +107,8 @@ public:
     u8 GetCountArmy(void) const;
     u16 GetDwellingLivedCount(building_t dw);
 
-    const Point & GetCenter(void) const{ return mp; };
+    const Point & GetCenter(void) const;
+    u16 GetIndex(void) const;
 
     void ChangeColor(Color::color_t cl);
 
@@ -122,6 +124,7 @@ public:
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static ICN::icn_t GetICNBuilding(const building_t & build, const Race::race_t & race);
+    static ICN::icn_t GetICNBoat(const Race::race_t & race);
     static u32 GetUpgradeBuilding(const u32 build, const Race::race_t & race);
     
     static bool PredicateIsCastle(const Castle *castle);
@@ -174,6 +177,7 @@ private:
 
     // center point maps
     const Point		mp;
+    const bool		nearly_sea;
 };
 
 #endif

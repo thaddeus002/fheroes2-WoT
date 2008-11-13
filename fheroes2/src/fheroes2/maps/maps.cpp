@@ -268,6 +268,6 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj, bool full)
 
 u16 Maps::GetApproximateDistance(const u16 index1, const u16 index2)
 {
-    return (std::abs(static_cast<s32>(index1 % world.w()) - static_cast<s32>(index1 % world.w())) +
-        std::abs(static_cast<s32>(index2 / world.w()) - static_cast<s32>(index2 / world.w())));
+    return (std::abs(static_cast<s32>(index1 % world.w()) - static_cast<s32>(index2 % world.w())) +
+        std::abs(static_cast<s32>(index1 / world.w()) - static_cast<s32>(index2 / world.w())));
 }

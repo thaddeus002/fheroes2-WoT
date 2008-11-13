@@ -67,9 +67,11 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 
     const Rect src_rt(box_rt.x, box_rt.y + 40 + sprite.h(), box_rt.w, box_rt.h);
 
-    const PaymentConditions::BuyBuilding payment(world.GetMyKingdom().GetRace(), Castle::BUILD_BOAT);
-    
-    Resource::AlignDraw(payment, src_rt);
+    Resource::funds_t res;
+    res.gold = BUY_BOAT_GOLD;
+    res.wood = BUY_BOAT_WOOD;
+
+    Resource::AlignDraw(res, src_rt);
 
     // buttons
     dst_pt.x = box_rt.x;
