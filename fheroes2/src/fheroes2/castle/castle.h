@@ -100,7 +100,6 @@ public:
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
     u8 GetLevelMageGuild(void);
-    u32 GetUniq(void) const{ return uniq; };
 
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; }; 
     u8 GetCountArmy(void) const;
@@ -129,6 +128,8 @@ public:
     static bool PredicateIsCastle(const Castle *castle);
     static bool PredicateIsTown(const Castle *castle);
     static bool PredicateIsBuildMarketplace(const Castle *castle);
+
+    void Dump(void) const;
 
 private:
     void RedrawResourcePanel(void);
@@ -171,8 +172,6 @@ private:
     Heroes * 		castle_heroes;
 
     Captain		captain;
-
-    const u32		uniq;
 
     // center point maps
     const Point		mp;

@@ -30,7 +30,7 @@
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     : building(0), army_spread(true), allow_build(true), present_boat(false), dwelling(CASTLEMAXMONSTER, 0),
-      army(CASTLEMAXARMY), castle_heroes(false), uniq(gid), mp(mapindex % world.w(), mapindex / world.h()),
+      army(CASTLEMAXARMY), castle_heroes(false), mp(mapindex % world.w(), mapindex / world.h()),
       nearly_sea(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST)))
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
@@ -1590,4 +1590,16 @@ bool Castle::PredicateIsTown(const Castle* castle)
 bool Castle::PredicateIsBuildMarketplace(const Castle* castle)
 {
     return castle && castle->isBuild(Castle::BUILD_MARKETPLACE);
+}
+
+void Castle::Dump(void) const
+{
+    std::cout << "----------------I--------" << std::endl;
+    std::cout << "name            : " << name << std::endl;
+    std::cout << "race            : " << Race::String(race) << std::endl;
+    std::cout << "color           : " << Color::String(color) << std::endl;
+    std::cout << "build           : " << building << std::endl;
+    std::cout << "present heroes  : " << (GetHeroes() ? "yes" : "no") << std::endl;
+    std::cout << "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl;
+    std::cout << "nearly sea      : " << (nearly_sea ? "yes" : "no") << std::endl;
 }

@@ -27,6 +27,7 @@
 #include "race.h"
 #include "config.h"
 #include "heroes.h"
+#include "castle.h"
 #include "sprite.h"
 #include "maps.h"
 #include "gamearea.h"
@@ -587,6 +588,14 @@ void Maps::Tiles::DebugInfo(void) const
 	    {
 		const Heroes *hero = world.GetHeroes(maps_index);
 		if(hero) hero->Dump();
+	    }
+	    break;
+
+	case MP2::OBJN_CASTLE:
+	case MP2::OBJ_CASTLE:
+	    {
+		const Castle *castle = world.GetCastle(maps_index);
+		if(castle) castle->Dump();
 	    }
 	    break;
 
