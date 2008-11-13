@@ -1136,6 +1136,9 @@ void Heroes::ActionNewWeek(void)
 {
     // remove week visit object
     visit_object.remove_if(Visit::IndexObject::isWeekLife);
+    
+    // fix artesian spring effect
+    if(magic_point > GetMaxSpellPoints()) magic_point = GetMaxSpellPoints();
 }
 
 void Heroes::ActionNewMonth(void)
