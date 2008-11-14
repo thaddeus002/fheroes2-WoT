@@ -20,7 +20,7 @@
 
 #include <cstdlib> 
 #include <fstream> 
-#include "error.h" 
+#include "engine.h" 
 #include "agg.h" 
 #include "artifact.h"
 #include "resource.h"
@@ -31,7 +31,7 @@
 #include "gameevent.h" 
 #include "mp2.h" 
 #include "text.h" 
-#include "rand.h" 
+#include "algorithm.h" 
 #include "world.h"
 
 World & world = World::GetWorld();
@@ -1687,7 +1687,6 @@ u16 World::GetNearestObject(const u16 center, const MP2::object_t obj)
 // create boat: with option build or summon
 bool World::CreateBoat(const u16 center, bool build)
 {
-    
     // scan 3x3
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
@@ -1699,28 +1698,32 @@ bool World::CreateBoat(const u16 center, bool build)
         Maps::Tiles & tile = GetTiles(Maps::GetIndexFromAbsPoint(cx + x, cy + y));
 
         if(Maps::Ground::WATER == tile.GetGround() &&
-    	    MP2::OBJ_ZERO == tile.GetObject() &&
-    	    Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_COAST, false))
-    	    // TODO: need add check path find form center to tile
-        {
-    	    if(build)
+    	    MP2::OBJ_ZERO == tile.GetObject())
+	{
+    	    const u16 coast = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_COAST, false);
+
+	    if(MAXU16 != coast && Algorithm::PathFind(NULL, center, coast, 256))
     	    {
-    		tile.SetObject(MP2::OBJ_BOAT);
-    		return true;
-    	    }
-    	    else
-    	    {
-    		const u16 boat = GetNearestObject(center, MP2::OBJ_BOAT);
-    		if(MAXU16 != boat)
+    		if(build)
     		{
-    		    world.GetTiles(boat).SetObject(MP2::OBJ_ZERO);
     		    tile.SetObject(MP2::OBJ_BOAT);
     		    return true;
     		}
+    		else
+    		{
+    		    const u16 boat = GetNearestObject(center, MP2::OBJ_BOAT);
+    		    if(MAXU16 != boat)
+    		    {
+    			world.GetTiles(boat).SetObject(MP2::OBJ_ZERO);
+    			tile.SetObject(MP2::OBJ_BOAT);
+    			return true;
+    		    }
+    		}
+    		break;
     	    }
-    	    break;
-        }
+	}
     }
 
+    Error::Warning("World::CreateBoat: failed");
     return false;
 }
