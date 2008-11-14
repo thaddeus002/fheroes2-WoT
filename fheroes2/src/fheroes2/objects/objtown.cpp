@@ -25,12 +25,10 @@ bool ObjTown::isPassable(const u16 icn, const u8 index)
 {
     switch(icn)
     {
-
 	case ICN::OBJNTWBA:
-	     if(index < 7 || ( 7 < index && index < 17) || (17 < index && index < 27) ||
-                (27 < index && index < 37) || (37 < index && index < 47) || (47 < index && index < 57) ||
-                (57 < index && index < 67) || (67 < index && index < 77) || 77 < index) return false;
-
+             if(index < 5 || ( 9 < index && index < 15) || (19 < index && index < 25) ||
+                 (29 < index && index < 35) || (39 < index && index < 45) || (49 < index && index < 55) ||
+                 (59 < index && index < 65) || (69 < index && index < 75) || 79 < index) return false;
 	    else return true;
 
 	case ICN::OBJNTOWN:
