@@ -602,28 +602,27 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     if(!hero) return;
 
     Route::Path & path = hero->GetPath();
-    Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
-    cursor.Hide();
     // show path
     if(path.GetDestinationIndex() != dst_index)
     {
         hero->SetMove(false);
-        if(path.isValid()) path.Hide();
-        path.Calculate(dst_index);
+	path.Calculate(dst_index);
+        if(1 < Settings::Get().Debug()) path.Dump();
         path.Show();
     }
     // start move
     else
-    if(path.EnableMove())
+    if(path.isValid())
     {
+	Cursor::Get().Hide();
         Game::Focus::Get().Set(hero);
         Game::Focus::Get().Redraw();
+	Cursor::Get().Show();
+	display.Flip();
         hero->SetMove(true);
     }
-    cursor.Show();
-    display.Flip();
 }
 
 bool Game::ShouldAnimate(u32 ticket)
@@ -795,10 +794,7 @@ Game::menu_t Game::HumanTurn(void)
 					display.Flip();
 				    }
 				    else
-				    {
-					const u16 castle_center = Maps::GetIndexFromAbsPoint(to_castle->GetCenter());
-					ShowPathOrStartMoveHero(&from_hero, castle_center);
-				    }
+					ShowPathOrStartMoveHero(&from_hero, Maps::GetIndexFromAbsPoint(to_castle->GetCenter()));
     				}
 			    }
 			    break;
@@ -822,9 +818,7 @@ Game::menu_t Game::HumanTurn(void)
 
 			    default:
 				if(tile.isPassable() || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
-				{
 				    ShowPathOrStartMoveHero(&from_hero, index_maps);
-				}
 			    break;
 			}
 		    }
@@ -1244,13 +1238,10 @@ Game::menu_t Game::HumanTurn(void)
 		if(path.isValid() &&
 		    (heroes.isEnableMove() || (heroes.GetSpriteIndex() < 45 && heroes.GetSpriteIndex() % 9) || heroes.GetSpriteIndex() >= 45))
 		{
-		    const u16 center = Maps::GetIndexFromAbsPoint(heroes.GetCenter());
-		    const u16 front_index = path.GetFrontIndex();
-
 		    // if need change through the circle
-		    if(heroes.GetDirection() != Direction::Get(center, front_index))
+		    if(heroes.GetDirection() != path.GetFrontDirection())
 		    {
-			heroes.AngleStep(Direction::Get(center, front_index));
+			heroes.AngleStep(path.GetFrontDirection());
 		    }
 		    else
 		    // move

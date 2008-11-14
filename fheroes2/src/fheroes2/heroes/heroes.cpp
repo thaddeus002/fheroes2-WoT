@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
-#include <cmath>
 #include <algorithm>
 #include "artifact.h"
 #include "world.h"
@@ -442,20 +441,23 @@ bool Heroes::operator== (const Heroes & h) const
     return hid == h.hid;
 }
 
+const Point & Heroes::GetCenter(void) const
+{ return mp; }
+
+u16 Heroes::GetIndex(void) const
+{ return Maps::GetIndexFromAbsPoint(mp); }
+
 u8 Heroes::GetMobilityIndexSprite(void) const
 {
     // valid range (0 - 25)
-    const double floor = std::floor(move_point / 100);
-
-    return 25 >= floor ? static_cast<u8>(floor) : 25;
+    const u8 index = move_point  < Maps::Ground::GetPenalty(GetIndex(), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING)) ? 0 : move_point / 100;
+    return 25 >= index ? index : 25;
 }
 
 u8 Heroes::GetManaIndexSprite(void) const
 {
     // valid range (0 - 25)
-
     u8 r = magic_point / 5;
-
     return 25 >= r ? r : 25;
 }
 
@@ -1102,7 +1104,6 @@ void Heroes::ActionNewDay(void)
 
     // recovery move points
     move_point = GetMaxMovePoints();
-    path.Rescan();
 
     // recovery spell points
     if(spell_book.Active())
@@ -1342,13 +1343,7 @@ void Heroes::AppendSpellToBook(const Spell::spell_t spell)
 /* return true is move enable */
 bool Heroes::isEnableMove(void) const
 {
-    return enable_move && path.EnableMove();
-}
-
-/* return true isn allow move to dst tile */
-bool Heroes::isAllowMove(const u16 dst_index)
-{
-    return path.Calculate(dst_index);
+    return enable_move && path.isValid() && path.GetFrontPenalty() <= move_point;
 }
 
 /* set enable move */
@@ -1433,8 +1428,6 @@ void Heroes::Scoute(void)
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
 {
-    //if(HasArtifact(art)) return false; TODO for Message
-
     if(MaxCountArtifact())
     {
 	if(H2Config::MyColor() == color) Dialog::Message("Warning", "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
@@ -1462,37 +1455,34 @@ void Heroes::SetCenter(const u16 index)
 u8 Heroes::GetRangeRouteDays(const u16 dst) const
 {
     const u32 max = GetMaxMovePoints();
+    const u16 limit = 1024;
 
-    // 60 - approximate distance, this restriction calculation
-    if(60 < std::abs(mp.x - dst % world.w()) + std::abs(mp.y - dst / world.w()))
+    // approximate distance, this restriction calculation
+    if((4 * max / 100) < Maps::GetApproximateDistance(GetIndex(), dst))
     {
 	if(Settings::Get().Debug()) Error::Warning("Heroes::GetRangeRouteDays: distance limit");
-
-	return 4;
+	return 0;
     }
 
     Route::Path test(*this);
-    // 150 - approximate limit, this restriction path finding algorithm
-    if(test.Calculate(dst, 150))
+    // approximate limit, this restriction path finding algorithm
+    if(test.Calculate(dst, limit))
     {
 	u32 total = test.TotalPenalty();
-
 	if(move_point >= total) return 1;
 
 	total -= move_point;
-
 	if(max >= total) return 2;
 
 	total -= move_point;
-
 	if(max >= total) return 3;
 
-	total -= move_point;
-
-	if(max >= total) return 4;
+	return 4;
     }
+    else
+    if(Settings::Get().Debug()) Error::Warning("Heroes::GetRangeRouteDays: iteration limit: ", limit);
 
-    return 4;
+    return 0;
 }
 
 /* FIXME: algorithm for levelup select secondary skills */
@@ -1668,9 +1658,18 @@ void Heroes::LevelUp(void)
 }
 
 /* apply penalty */
-void Heroes::ApplyPenaltyMovement(void)
+bool Heroes::ApplyPenaltyMovement(void)
 {
-    if(path.isValid()) move_point -= path.GetFrontPenalty();
+    const u16 center = Maps::GetIndexFromAbsPoint(mp);
+
+    const u16 penalty = path.isValid() ?
+	    path.GetFrontPenalty() :
+	    Maps::Ground::GetPenalty(center, Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
+
+    if(move_point >= penalty) move_point -= penalty;
+    else return false;
+
+    return true;
 }
 
 /*  true if present monster */
@@ -1757,9 +1756,7 @@ const Army::Troops & Heroes::GetWeakestArmy(void) const
 
 bool Heroes::MayStillMove(void) const
 {
-    const u16 center = Maps::GetIndexFromAbsPoint(mp);
-
-    return move_point >= Maps::Ground::GetPenalty(center, center, GetLevelSkill(Skill::Secondary::PATHFINDING));
+    return move_point >= Maps::Ground::GetPenalty(Maps::GetIndexFromAbsPoint(mp), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
 }
 
 void Heroes::SetFreeman(const u8 reason)

@@ -112,7 +112,9 @@ public:
     Color::color_t GetColor(void) const{ return color; };
     Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
-    const Point & GetCenter(void) const{ return mp; };
+
+    const Point & GetCenter(void) const;
+    u16 GetIndex(void) const;
 
     const std::vector<Army::Troops> & GetArmy(void) const{ return army; }
     std::vector<Army::Troops> & GetArmy(void) { return army; };
@@ -199,9 +201,8 @@ public:
 
     bool isEnableMove(void) const;
     void SetMove(bool f);
-    bool isAllowMove(const u16 dst_index);
     void Action(const u16 dst_index);
-    void ApplyPenaltyMovement(void);
+    bool ApplyPenaltyMovement(void);
 
     void AngleStep(const Direction::vector_t to_direct);
     bool MoveStep(void);

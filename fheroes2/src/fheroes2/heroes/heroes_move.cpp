@@ -197,8 +197,6 @@ void Heroes::Redraw(bool with_shadow) const
 
     if(!(gamearea & mp)) return;
 
-    //const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
-
     bool reflect = ReflectSprite(direction);
 
     s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
@@ -260,7 +258,7 @@ void Heroes::Redraw(bool with_shadow) const
 
 void Heroes::RedrawDependencesTiles(void) const
 {
-    const u16 center = Maps::GetIndexFromAbsPoint(mp);
+    const u16 center = GetIndex();
 
     world.GetTiles(center).RedrawTop();
 
@@ -326,8 +324,8 @@ void Heroes::RedrawDependencesTiles(void) const
 
 bool Heroes::MoveStep(void)
 {
-    const u16 index_from = Maps::GetIndexFromAbsPoint(mp);
-    const u16 index_to = path.GetFrontIndex();
+    const u16 index_from = GetIndex();
+    const u16 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
     const u16 index_dst = path.GetDestinationIndex();
     bool didMove = false;
 
@@ -518,8 +516,6 @@ void Heroes::FadeOut(void) const
 
     if(!(gamearea & mp)) return;
 
-    //const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
-
     bool reflect = ReflectSprite(direction);
 
     s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
@@ -582,8 +578,6 @@ void Heroes::FadeIn(void) const
     const Rect & gamearea = GameArea::Get().GetRect();
 
     if(!(gamearea & mp)) return;
-
-    //const u16 center = Maps::GetIndexFromAbsPoint(GetCenter());
 
     bool reflect = ReflectSprite(direction);
 

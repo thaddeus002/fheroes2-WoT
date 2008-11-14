@@ -35,50 +35,31 @@ Route::Path::Path(const Heroes & h)
 {
 }
 
+Direction::vector_t Route::Path::GetFrontDirection(void) const
+{
+    return size() ? front().Direction() : Direction::CENTER;
+}
+
+u16 Route::Path::GetFrontPenalty(void) const
+{
+    return size() ? front().Penalty() : 0;
+}
+
+void Route::Path::PopFront(void)
+{
+    if(size()) pop_front();
+}
+
 /* return length path */
 u16 Route::Path::Calculate(const u16 dst_index, const u16 limit)
 {
     clear();
 
-    Find_v1(Maps::GetIndexFromAbsPoint(hero.GetCenter()), dst_index, limit);
+    Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, hero.GetLevelSkill(Skill::Secondary::PATHFINDING), hero.GetUnderObject());
 
     dst = dst_index;
 
-    Rescan();
-
     return size();
-}
-
-void Route::Path::Hide(void)
-{
-    hide = true;
-}
-
-void Route::Path::Show(void)
-{
-    hide = false;
-}
-
-void Route::Path::Dump(void) const
-{
-    if(H2Config::Debug()) Error::Verbose("Route::Path: move point: ", hero.GetMovePoints());
-    if(H2Config::Debug()) Error::Verbose("Route::Path: start index: ", Maps::GetIndexFromAbsPoint(hero.GetCenter()));
-
-    std::list<Step>::const_iterator it1 = begin();
-    std::list<Step>::const_iterator it2 = end();
-
-    u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
-
-    // dump route
-    for(; it1 != it2; ++it1)
-    {
-	if(H2Config::Debug()) Error::Verbose("Route::Path: " + Direction::String(Direction::Get(from, (*it1).to_index)) + ", penalty: ", (*it1).penalty);
-
-	from = (*it1).to_index;
-    }
-
-    if(H2Config::Debug()) Error::Verbose("Route::Path: end index: ", dst);
-    if(H2Config::Debug()) Error::Verbose("Route::Path: size: ", size());
 }
 
 void Route::Path::Reset(void)
@@ -94,6 +75,7 @@ void Route::Path::Reset(void)
 
 u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to)
 {
+    // ICN::ROUTE
     // start index 1, 25, 49, 73, 97, 121 (size arrow path)
     u16 index = 1;
 
@@ -107,6 +89,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::RIGHT:		index += 18; break;
 		case Direction::LEFT:		index +=  6; break;
 		case Direction::TOP_LEFT:	index +=  7; break;
+		case Direction::BOTTOM_LEFT:	index +=  5; break;
+		case Direction::BOTTOM_RIGHT:	index += 19; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -119,6 +103,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::RIGHT:		index += 18; break;
 		case Direction::BOTTOM_RIGHT:	index += 19; break;
 		case Direction::TOP_LEFT:	index +=  7; break;
+		case Direction::BOTTOM:		index += 20; break;
+		case Direction::LEFT:		index +=  6; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -131,6 +117,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::BOTTOM_RIGHT:	index += 19; break;
 		case Direction::RIGHT:		index += 10; break;
 		case Direction::TOP_RIGHT:	index +=  1; break;
+		case Direction::TOP_LEFT:	index +=  7; break;
+		case Direction::BOTTOM_LEFT:	index += 21; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -143,6 +131,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::BOTTOM_RIGHT:	index += 11; break;
 		case Direction::BOTTOM:		index += 20; break;
 		case Direction::BOTTOM_LEFT:	index += 21; break;
+		case Direction::TOP:		index +=  0; break;
+		case Direction::LEFT:		index +=  6; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -155,6 +145,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::BOTTOM:		index += 12; break;
 		case Direction::BOTTOM_LEFT:	index += 21; break;
 		case Direction::LEFT:		index += 22; break;
+		case Direction::TOP_LEFT:	index += 16; break;
+		case Direction::TOP_RIGHT:	index +=  1; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -167,6 +159,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::BOTTOM_LEFT:	index += 13; break;
 		case Direction::LEFT:		index += 22; break;
 		case Direction::TOP_LEFT:	index += 23; break;
+		case Direction::TOP:		index += 16; break;
+		case Direction::RIGHT:		index +=  2; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -179,6 +173,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::BOTTOM_LEFT:	index +=  5; break;
 		case Direction::LEFT:		index += 14; break;
 		case Direction::TOP_LEFT:	index += 23; break;
+		case Direction::TOP_RIGHT:	index += 17; break;
+		case Direction::BOTTOM_RIGHT:	index +=  3; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -191,6 +187,8 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
 		case Direction::BOTTOM_LEFT:	index +=  5; break;
 		case Direction::LEFT:		index +=  6; break;
 		case Direction::TOP_LEFT:	index += 15; break;
+		case Direction::BOTTOM:		index +=  4; break;
+		case Direction::RIGHT:		index += 18; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
@@ -201,63 +199,45 @@ u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Directio
     return index;
 }
 
-/* get next to last path element */
-u16 Route::Path::NextToLast(void) const
-{
-    if(2 > size())
-    {
-	Error::Warning("Route::NextToLast: path size is short, return 0");
-
-	return 0;
-    }
-
-    std::list<Step>::const_reverse_iterator it = rbegin();
-
-    return (*(++it)).to_index;
-}
-
-bool Route::Path::isValid(void) const
-{
-    return size();
-}
-
-bool Route::Path::EnableMove(void) const
-{
-    return size() && front().green_color;
-}
-
 /* total penalty cast */
 u32 Route::Path::TotalPenalty(void) const
 {
     u32 result = 0;
 
-    std::list<Step>::const_iterator it1 = begin();
-    std::list<Step>::const_iterator it2 = end();
+    const_iterator it1 = begin();
+    const_iterator it2 = end();
 
-    for(; it1 != it2; ++it1) result += (*it1).penalty;
+    for(; it1 != it2; ++it1) result += (*it1).Penalty();
 
     return result;
 }
 
-void Route::Path::Rescan(void)
+u16 Route::Path::GetAllowStep(void) const
 {
-    // fill green color
-    std::list<Step>::iterator it1 = begin();
-    std::list<Step>::const_iterator it2 = end();
+    u16 green = 0;
+
+    const_iterator it1 = begin();
+    const_iterator it2 = end();
+
     u16 move_point = hero.GetMovePoints();
 
     for(; it1 != it2; ++it1)
     {
-	if(move_point >= (*it1).penalty)
+	if(move_point >= (*it1).Penalty())
 	{
-	    move_point -= (*it1).penalty;
-	    (*it1).green_color = true;
+	    move_point -= (*it1).Penalty();
+	    ++green;
 	}
 	else break;
     }
+
+    return green;
 }
 
-bool Route::Path::isShow(void) const
+void Route::Path::Dump(void) const
 {
-    return !hide;
+    const_iterator it1 = begin();
+    const_iterator it2 = end();
+
+    for(; it1 != it2; ++it1) std::cout << Direction::String((*it1).Direction()) << ", " << (*it1).Penalty() << std::endl;
 }

@@ -28,14 +28,14 @@ class Heroes;
 
 namespace Route
 {
-    struct Step
+    class Step : private std::pair<Direction::vector_t, u16>
     {
-	Step() : to_index(MAXU16), penalty(MAXU16), green_color(false) {};
-	Step(const u16 t, const u16 p) : to_index(t), penalty(p), green_color(false) {};
+	public:
+	Step() : std::pair<Direction::vector_t, u16>(Direction::CENTER, 0) {};
+	Step(const Direction::vector_t v, const u16 c) : std::pair<Direction::vector_t, u16>(v, c) {};
 
-	const u16 to_index;
-	const u16 penalty;
-	bool green_color;
+	Direction::vector_t Direction() const { return first; };
+	u16 Penalty() const { return second; };
     };
 
     class Path : public std::list<Step>
@@ -43,30 +43,28 @@ namespace Route
 	public:
 	    Path(const Heroes & h);
 
-	    void	DestinationIndex(u16 index){ dst = index; };
 	    u16		GetDestinationIndex(void) const{ return dst; };
-	    u16		GetFrontIndex(void) const{ return size() ? front().to_index : 0; };
-	    u16		GetFrontPenalty(void) const{ return size() ? front().penalty : 0; };
-
+	    Direction::vector_t GetFrontDirection(void) const;
+	    u16		GetFrontPenalty(void) const;
 	    u16		Calculate(const u16 dst_index, const u16 limit = MAXU16);
 
-	    void	Show(void);
-	    void	Hide(void);
+	    void	Show(void){ hide = false; };
+	    void	Hide(void){ hide = true; };
 	    void	Reset(void);
-	    void	Rescan(void);
-	    void	PopFront(void){ if(size()) pop_front(); };
+	    void	PopFront(void);
 
-	    u16		NextToLast(void) const;
-	    bool	isValid(void) const;
-	    bool	isShow(void) const;
-	    bool	EnableMove(void) const;
+	    bool	isValid(void) const { return size(); };
+	    bool	isShow(void) const { return !hide; };
+
+	    void	Dump(void) const;
+
+	    u16		GetAllowStep(void) const;
 	    u32		TotalPenalty(void) const;
 
-	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to);
+	    const_iterator Begin(void) const{ return begin(); };
+	    const_iterator End(void) const{ return end(); };
 
-	private:
-	    void	Dump(void) const;
-	    bool	Find_v1(const u16 index1, const u16 index2, const u16 limit = MAXU16);
+	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to);
 
 	private:
 	    const Heroes & hero;

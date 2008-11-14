@@ -22,6 +22,7 @@
 
 #include <string>
 #include "gamedefs.h"
+#include "direction.h"
 #include "skill.h"
 
 namespace Maps
@@ -45,7 +46,7 @@ namespace Maps
 	} ground_t;
 
 	const std::string & String(ground_t ground);
-	u16 GetPenalty(u16 from, u16 to, const Skill::Level::type_t & pathfinding);
+	u16 GetPenalty(const u16 index, const Direction::vector_t direct, const Skill::Level::type_t pathfinding);
     };
 };
 

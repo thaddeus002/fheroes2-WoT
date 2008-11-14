@@ -153,23 +153,27 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
     {
 	const Heroes & hero = focus.GetHeroes();
 	u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+	s16 green = hero.GetPath().GetAllowStep();
+
 	const bool skipfirst = hero.isEnableMove() && 45 > hero.GetSpriteIndex() && 2 < (hero.GetSpriteIndex() % 9);
 
-	std::list<Route::Step>::const_iterator it1 = hero.GetPath().begin();
-	std::list<Route::Step>::const_iterator it2 = hero.GetPath().end();
-	std::list<Route::Step>::const_iterator it3 = it1;
+	Route::Path::const_iterator it1 = hero.GetPath().begin();
+	Route::Path::const_iterator it2 = hero.GetPath().end();
+	Route::Path::const_iterator it3 = it1;
 
-	for(; it1 != it2; from = (*(it1++)).to_index)
+	for(; it1 != it2; ++it1)
 	{
-    	    const u16 tile_x = (*it1).to_index % world.w();
-    	    const u16 tile_y = (*it1).to_index / world.h();
-            it3++;
+	    from = Maps::GetDirectionIndex(from, (*it1).Direction());
+    	    const u16 tile_x = from % world.w();
+    	    const u16 tile_y = from / world.h();
+	    ++it3;
+	    --green;
 
             if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
 	    if(it1 == hero.GetPath().begin() && skipfirst) continue;
 
-	    const u16 index = (it3 == it2 ? 0 : Route::Path::GetIndexSprite(Direction::Get(from, (*it1).to_index), Direction::Get((*it1).to_index, (*it3).to_index)));
-	    const Sprite & sprite = AGG::GetICN(!(*it1).green_color ? ICN::ROUTERED : ICN::ROUTE, index);
+	    const u16 index = (it3 == it2 ? 0 : Route::Path::GetIndexSprite((*it1).Direction(), (*it3).Direction()));
+	    const Sprite & sprite = AGG::GetICN(0 > green ? ICN::ROUTERED : ICN::ROUTE, index);
     	    Point dst_pt(BORDERWIDTH + TILEWIDTH * (tile_x - gx) + sprite.x() - 14, BORDERWIDTH + TILEWIDTH * (tile_y - gy) + sprite.y());
 	    display.Blit(sprite, dst_pt);
 	}
