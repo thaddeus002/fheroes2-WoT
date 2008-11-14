@@ -1490,7 +1490,7 @@ bool Castle::HaveNearlySea(void) const
 
 bool Castle::PresentBoat(void) const
 {
-    return 3 >= Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_BOAT));
+    return 3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_BOAT));
 }
 
 u32 Castle::GetUpgradeBuilding(const u32 build, const Race::race_t & race)
