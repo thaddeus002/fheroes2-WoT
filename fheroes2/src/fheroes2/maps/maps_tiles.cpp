@@ -895,33 +895,34 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 /* accept move */
 bool Maps::Tiles::isPassable(void) const
 {
-    if(Game::Focus::Get().Type() != Game::Focus::HEROES) return false;
     if(0 == Settings::Get().Debug() && isFog(Settings::Get().MyColor())) return false;
 
-
-    if(Game::Focus::Get().GetHeroes().isShipMaster())
+    if(Game::Focus::HEROES == Game::Focus::Get().Type())
     {
-    	if(Ground::WATER != Maps::Tiles::GetGround()) return false;
-
-        switch(general)
+	if(Game::Focus::Get().GetHeroes().isShipMaster())
 	{
-	    case MP2::OBJ_BOAT:
-            case MP2::OBJ_HEROES:	return false;
+    	    if(Ground::WATER != Maps::Tiles::GetGround()) return false;
 
-	    default: break;
+    	    switch(general)
+	    {
+		case MP2::OBJ_BOAT:
+        	case MP2::OBJ_HEROES:	return false;
+
+		default: break;
+	    }
 	}
-    }
-    else
-    {
-	if(Ground::WATER == Maps::Tiles::GetGround()) return false;
-
-        switch(general)
+	else
 	{
-            case MP2::OBJ_HEROES:	return false;
+	    if(Ground::WATER == Maps::Tiles::GetGround()) return false;
 
-	    default: break;
+    	    switch(general)
+	    {
+        	case MP2::OBJ_HEROES:	return false;
+
+		default: break;
+	    }
+
 	}
-
     }
 
     return Object::isPassable(addons_level1);
