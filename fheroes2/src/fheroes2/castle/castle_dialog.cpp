@@ -724,6 +724,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 
 	    if(Dialog::OK == Dialog::BuyBoat(enable))
 	    {
+		AGG::PlaySound(M82::BUILDTWN);
 		world.GetMyKingdom().OddFundsResource(res);
 		present_boat = true;
 		world.CreateBoat(GetIndex(), true);
