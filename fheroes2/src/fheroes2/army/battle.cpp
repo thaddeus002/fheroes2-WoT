@@ -588,7 +588,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1
  */
 bool Army::CleanupBodies(Army::army_t &army, u16 idx, Army::army_t &bodies)
 {
-    bool troopAlive = true;
+    bool troopCleaned = false;
     for(u16 i = 0; i < army.size(); i++)
     {
         if(army[i].Count() == 0)
@@ -597,10 +597,10 @@ bool Army::CleanupBodies(Army::army_t &army, u16 idx, Army::army_t &bodies)
             bodies.push_back(body);
             army[i].SetMonster(Monster::UNKNOWN);
             if(i == idx)
-                troopAlive = false;
+                troopCleaned = true;
         }
     }
-    return troopAlive;
+    return troopCleaned;
 }
 
 bool Army::ArmyExists(Army::army_t &army)
@@ -1097,6 +1097,7 @@ Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::army_t &army1,
         }
         sort(closeEnemies.begin(), closeEnemies.end(), DangerousUnitPredicate);
         attack = closeEnemies.front().Position();
+        move = myTroop.Position();
     }
     else
         MoveOrAttack(myMonster, army1, army2, troopN, move, attack, false);
@@ -1291,9 +1292,13 @@ void Army::GetTargets(std::vector<Army::Troops *> &targets, const Army::Troops &
                 nextcell = attack + Point( 0, incr.y);
             //printf("incr: %d, %d\n", incr.x, incr.y);
             int t;
-            if((t = FindTroop(army1, nextcell)) >= 0)
+            if((t = FindTroop(army1, nextcell)) >= 0
+            && &army1[t] != &attacker
+            && &army1[t] != &mainTarget)
                 targets.push_back(&army1[t]);
-            else if((t = FindTroop(army2, nextcell)) >= 0)
+            else if((t = FindTroop(army2, nextcell)) >= 0
+            && &army2[t] != &attacker
+            && &army2[t] != &mainTarget)
                 targets.push_back(&army2[t]);
             break;
         }
@@ -1429,7 +1434,7 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army
             if(!tid) //Only the original target matters
             {
                 perished = tempPerished;
-                if(!target.isValid())
+                if(!target.Count())
                     retaliate = false;
             }
         }
@@ -2863,10 +2868,7 @@ int Army::CanAttack(const Army::Troops &myTroop, const std::vector<Point> &moves
 	    }
 	    if(enemyMonster.wide && p2.x == enemyTroop.Position().x) {
                 //WIDE-REVIEW
-                //FIXME: This next line screws up lots of things, but may
-                //       be necessary with wide creatures attacking wide creatures.
-                //       It needs looking into.
-		//if(!mod) p1 = myTroop.Position();
+		if(!mod) p1 = myTroop.Position();
 		p2.x -= myTroop.IsReflected() ? -1 : 1;
                 //p2.x --;
 		mod = true;
@@ -2917,12 +2919,10 @@ Point Army::GetReachableAttackCell(const Army::Troops &target, const Army::army_
     }
     for(delta.x = xstart; delta.x != xend; delta.x += xincr)
         for(delta.y = ystart; delta.y != yend; delta.y += yincr)
-            if(/*delta.x || delta.y &&*/ BfValid(p + delta))
+            if(delta.x || delta.y && BfValid(p + delta))
             {
-                if(p.y%2 && delta.y && delta.x>0) continue;
-                else if(!(p.y%2) && delta.y && delta.x<0) continue;
-                else if(CellFreeFor(p + delta, attacker, army1, army2, troopN)
-                && CanAttack(attacker, movePoints, target, Bf2Scr(p + delta) + dst_pt) >= 0
+                if(delta.x < 0 && delta.y) continue;
+                if(CellFreeFor(p + delta, attacker, army1, army2, troopN)
                 && find(movePoints.begin(), movePoints.end(), p + delta) != movePoints.end())
                     return p + delta;
             }

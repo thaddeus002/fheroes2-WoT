@@ -148,12 +148,12 @@ void Army::Troops::Animate(Monster::animstate_t as)
 	Monster::GetAnimFrames(monster, astate & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : astate, start, count, ranged);
 	aframe++;
 	if(aframe >= start+count) {
-	    if(astate & Monster::AS_ATTPREP) {
+            if(astate == Monster::AS_DIE) {
+		aframe --;
+            } else if(astate & Monster::AS_ATTPREP) {
 		astate = (Monster::animstate_t)(astate & ~Monster::AS_ATTPREP);
 		Monster::GetAnimFrames(monster, astate, start, count, ranged);
 		aframe = start;
-	    } else if(astate == Monster::AS_DIE) {
-		aframe --;
 	    } else {
 		astate = Monster::AS_NONE;
 		Monster::GetAnimFrames(monster, astate, start, count, ranged);
