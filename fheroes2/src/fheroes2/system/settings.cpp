@@ -48,8 +48,8 @@ namespace
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), sound_volume(6), music_volume(6),
-    animation(6), game(0), players(0), translationFile("english.str")
+    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"),
+    sound_volume(6), music_volume(6), animation(6), game(0), players(0)
 {
 }
 
