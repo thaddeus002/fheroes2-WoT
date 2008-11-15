@@ -73,7 +73,7 @@ namespace Artifact {
 	{ "Enchanted Hourglass", "The Enchanted Hourglass extends the duration of all your spells by 2 turns." },
 	{ "Gold Wath", "The Gold Watch doubles the effectiveness of your hypnotize spells." },
 	{ "Skullcap", "The Skullcap halves the casting cost of all mind influencing spells." },
-	{ "Ice Clock", "The Ice Cloak halves all damage your troops take from cold spells." },
+	{ "Ice Cloak", "The Ice Cloak halves all damage your troops take from cold spells." },
 	{ "Fire Cloak", "The Fire Cloak halves all damage your troops take from fire spells." },
 	{ "Lightning Helm", "The Lightning Helm halves all damage your troops take from lightning spells." },
 	{ "Evercold Icicle", "The Evercold Icicle causes your cold spells to do 50% more damage to enemy troops." },
