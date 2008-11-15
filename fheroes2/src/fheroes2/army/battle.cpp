@@ -2919,7 +2919,7 @@ Point Army::GetReachableAttackCell(const Army::Troops &target, const Army::army_
     }
     for(delta.x = xstart; delta.x != xend; delta.x += xincr)
         for(delta.y = ystart; delta.y != yend; delta.y += yincr)
-            if(delta.x || delta.y && BfValid(p + delta))
+            if((delta.x || delta.y) && BfValid(p + delta))
             {
                 if(delta.x < 0 && delta.y) continue;
                 if(CellFreeFor(p + delta, attacker, army1, army2, troopN)
