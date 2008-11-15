@@ -30,8 +30,6 @@ Surface::Surface(const unsigned char * pixels, unsigned int width, unsigned int 
 {
     surface = SDL_CreateRGBSurfaceFrom((void *) pixels, width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
 		RMASK32, GMASK32, BMASK32, alpha ? AMASK32 : 0);
-
-    if(!surface) Error::Warning("Surface: empty surface, error: " + std::string(SDL_GetError()));
 }
 
 Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl) : videosurface(false)
@@ -48,15 +46,11 @@ Surface::Surface(const Surface & bs) : videosurface(false)
 {
     surface = bs.valid() ?
 	SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags()) : NULL;
-
-    if(!surface) Error::Warning("Surface: empty surface, error: " + std::string(SDL_GetError()));
 }
 
 Surface::Surface(SDL_Surface * sf) : videosurface(false)
 {
     surface = sf ? sf : NULL;
-
-    if(!surface) Error::Warning("Surface: empty surface, error: " + std::string(SDL_GetError()));
 }
 
 Surface::~Surface()
