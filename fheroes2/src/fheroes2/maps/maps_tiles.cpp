@@ -1482,7 +1482,17 @@ void Maps::Tiles::UpdateQuantity(void)
 	    if(addon)
 	    {
 		quantity1 = Resource::FromIndexSprite(addon->index);
-		quantity2 = Rand::Get(RNDRESOURCEMIN, RNDRESOURCEMAX);
+		switch(quantity1)
+		{
+		    case Resource::WOOD:
+		    case Resource::ORE:
+		    case Resource::GOLD:
+			quantity2 = Rand::Get(5, 10);
+			break;
+		    default:
+			quantity2 = Rand::Get(3, 6);
+			break;
+		}
 	    }
 	break;
 

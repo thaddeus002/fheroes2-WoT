@@ -25,9 +25,6 @@
 #include "maps_tiles.h"
 #include "gamedefs.h"
 
-#define RNDRESOURCEMAX  15 
-#define RNDRESOURCEMIN  5 
-
 namespace Resource
 {
     typedef enum {
