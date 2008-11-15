@@ -896,6 +896,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 
     switch(count)
     {
+	case 2:
 	case 0: break;
 	case 1:
 	    if(0 == count_necr)
