@@ -1345,13 +1345,13 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	case MP2::OBJ_CASTLE:
 	{
 	    index *= 2;
-
 	    if(Maps::isValidDirection(maps_index, Direction::LEFT))
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
     		tile.CorrectFlags32(index);
 	    }
 
+	    index += 1;
 	    if(Maps::isValidDirection(maps_index, Direction::RIGHT))
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
