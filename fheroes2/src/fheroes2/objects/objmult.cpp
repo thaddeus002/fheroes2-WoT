@@ -26,10 +26,6 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
     switch(icn)
     {
 	case ICN::OBJNMUL2:
-	    // trees
-	    if(3 == index || 6 == index || 9 == index || 12 == index ||
-		24 == index || 26 == index || 28 == index || 76 == index) return false;
-	    else
 	    // fountain
 	    if(15 == index) return false;
 	    else
