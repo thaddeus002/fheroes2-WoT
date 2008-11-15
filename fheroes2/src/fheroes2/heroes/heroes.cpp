@@ -901,7 +901,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	    if(0 == count_necr)
 	    {
 		++result;
-		if(list) list->push_back("All " + Race::String(GetRace()) + " in groups +1");
+		if(list && 1 < GetCountArmy()) list->push_back("All " + Race::String(GetRace()) + " groups +1");
 	    }
 	    break;
 	case 3:
