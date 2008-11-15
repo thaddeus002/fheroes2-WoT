@@ -43,7 +43,7 @@
 
 namespace Scenario
 {
-    void DrawInfo(std::vector<Rect> & coordColors,  std::vector<Rect> & coordClass);
+    void DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair<Rect, TextSprite> > & coordClass);
     void RedrawOpponentColors(const std::vector<Rect> & coordColors);
     u8   GetAllowChangeRaces(const Maps::FileInfo &maps);
 }
@@ -114,7 +114,7 @@ Game::menu_t Game::ScenarioInfo(void)
     // vector coord colors opponent
     std::vector<Rect> coordColors(KINGDOMMAX);
     // vector coord class
-    std::vector<Rect> coordClass(KINGDOMMAX);
+    std::vector< std::pair<Rect, TextSprite> > coordClass(KINGDOMMAX);
 
     // first allow color
     conf.SetPlayers(0);
@@ -223,23 +223,33 @@ Game::menu_t Game::ScenarioInfo(void)
 	// select class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	    if((conf.FileInfo().KingdomColors() & rnd_color & color) &&
-		le.MouseClickLeft(coordClass[Color::GetIndex(color)]))
+		le.MouseClickLeft(coordClass[Color::GetIndex(color)].first))
 	    {
 		cursor.Hide();
 		u8 index = 0;
-		switch(conf.FileInfo().KingdomRace(color))
+		const Rect & rt = coordClass[Color::GetIndex(color)].first;
+		TextSprite & text = coordClass[Color::GetIndex(color)].second;
+		Race::race_t race = conf.FileInfo().KingdomRace(color);
+		switch(race)
 		{
-		    case Race::KNGT: index = 52; conf.FileInfo().SetKingdomRace(color, Race::BARB); break;
-		    case Race::BARB: index = 53; conf.FileInfo().SetKingdomRace(color, Race::SORC); break;
-		    case Race::SORC: index = 54; conf.FileInfo().SetKingdomRace(color, Race::WRLK); break;
-		    case Race::WRLK: index = 55; conf.FileInfo().SetKingdomRace(color, Race::WZRD); break;
-		    case Race::WZRD: index = 56; conf.FileInfo().SetKingdomRace(color, Race::NECR); break;
-		    case Race::NECR: index = 58; conf.FileInfo().SetKingdomRace(color, Race::RAND); break;
-		    case Race::RAND: index = 51; conf.FileInfo().SetKingdomRace(color, Race::KNGT); break;
+		    case Race::KNGT: index = 52; race = Race::BARB; break;
+		    case Race::BARB: index = 53; race = Race::SORC; break;
+		    case Race::SORC: index = 54; race = Race::WRLK; break;
+		    case Race::WRLK: index = 55; race = Race::WZRD; break;
+		    case Race::WZRD: index = 56; race = Race::NECR; break;
+		    case Race::NECR: index = 58; race = Race::RAND; break;
+		    case Race::RAND: index = 51; race = Race::KNGT; break;
 		    default: break;
 		}
-    		const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, index);
-		display.Blit(sprite, coordClass[Color::GetIndex(color)].x, coordClass[Color::GetIndex(color)].y);
+		conf.FileInfo().SetKingdomRace(color, race);
+		display.Blit(AGG::GetICN(ICN::NGEXTRA, index), rt.x, rt.y);
+
+		const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
+		text.Hide();
+		text.SetText(name);
+		text.SetPos(rt.x + (rt.w - text.width()) / 2, rt.y + rt.h + 2);
+		text.Show();
+
 		cursor.Show();
 		display.Flip();
 	    }
@@ -316,7 +326,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	// class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	    if(conf.FileInfo().KingdomColors() & color &&
-		le.MousePressRight(coordClass[Color::GetIndex(color)]))
+		le.MousePressRight(coordClass[Color::GetIndex(color)].first))
 		    Dialog::Message("Class", "This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alingment.", Font::BIG);
 
 	//if(le.MousePressRight(?)) Dialog::Message("Difficulty Rating", "The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score.", Font::BIG);
@@ -370,7 +380,7 @@ void Scenario::RedrawOpponentColors(const std::vector<Rect> & coordColors)
     }
 }
 
-void Scenario::DrawInfo(std::vector<Rect> & coordColors, std::vector<Rect> & coordClass)
+void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair<Rect, TextSprite> > & coordClass)
 {
     Display & display = Display::Get();
 
@@ -451,12 +461,18 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors, std::vector<Rect> & coo
     	    pt.x = 228 + current * sprite.w() * 6 / count + (sprite.w() * (6 - count) / (2 * count));
     	    pt.y = 314;
 
-	    coordClass[Color::GetIndex(color)] = Rect(pt.x, pt.y, sprite.w(), sprite.h());
+	    coordClass[Color::GetIndex(color)].first = Rect(pt.x, pt.y, sprite.w(), sprite.h());
 
 	    display.Blit(sprite, pt);
 
+	    const Rect & rt = coordClass[Color::GetIndex(color)].first;
+	    TextSprite & text = coordClass[Color::GetIndex(color)].second;
+
 	    const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
-	    Text(name, Font::SMALL, pt.x + (sprite.w() - Text::width(name, Font::SMALL)) / 2, pt.y + sprite.h() + 2);
+	    text.SetFont(Font::SMALL);
+	    text.SetText(name);
+	    text.SetPos(rt.x + (rt.w - text.width()) / 2, rt.y + rt.h + 2);
+	    text.Show();
 
     	    ++current;
     }

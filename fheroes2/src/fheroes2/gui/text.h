@@ -67,11 +67,12 @@ private:
     std::string message;
 };
 
-class Text2 : public Text
+class TextSprite : public Text
 {
 public:
-    Text2(const std::string & msg, Font::type_t ft, const Point & pt);
-    Text2(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
+    TextSprite(){};
+    TextSprite(const std::string & msg, Font::type_t ft, const Point & pt);
+    TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
 
     void SetPos(const Point & pt){ SetPos(pt.x, pt.y); };
     void SetPos(u16 ax, u16 ay);

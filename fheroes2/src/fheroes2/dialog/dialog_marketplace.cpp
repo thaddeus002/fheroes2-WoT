@@ -134,8 +134,8 @@ void Dialog::Marketplace(bool fromTradingPost)
 
     Splitter *splitter = NULL;
     
-    Text2 *textSell = NULL;
-    Text2 *textBuy = NULL;
+    TextSprite *textSell = NULL;
+    TextSprite *textBuy = NULL;
 
     std::string message;
 
@@ -218,7 +218,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 	String::AddInt(message, count_sell); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2; \
 	dst_pt.y = pos_rt.y + 116; \
-	textSell = new Text2(message, Font::SMALL, dst_pt); \
+	textSell = new TextSprite(message, Font::SMALL, dst_pt); \
 	const Sprite & sprite_to = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_to)); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2; \
 	dst_pt.y = pos_rt.y + 115 - sprite_to.h(); \
@@ -227,7 +227,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 	String::AddInt(message, count_buy); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2; \
 	dst_pt.y = pos_rt.y + 116; \
-	textBuy = new Text2(message, Font::SMALL, dst_pt); \
+	textBuy = new TextSprite(message, Font::SMALL, dst_pt); \
 	const Sprite & sprite_fromto = AGG::GetICN(tradpost, 0); \
 	dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2; \
 	dst_pt.y = pos_rt.y + 90; \
