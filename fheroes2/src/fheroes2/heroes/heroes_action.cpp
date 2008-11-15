@@ -1068,7 +1068,7 @@ void ActionToMagicWell(Heroes &hero, const u16 dst_index)
 void ActionToTradingPost(Heroes &hero)
 {
     PlaySoundSuccess;
-    Dialog::Marketplace();
+    Dialog::Marketplace(true);
     if(H2Config::Debug()) Error::Verbose("ActionToTradingPost: " + hero.GetName());
 }
 

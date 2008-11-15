@@ -665,11 +665,8 @@ void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPo
 
 u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 {
-    u8 markets = world.GetMyKingdom().GetCountMarketplace();
+    const u8 markets = tradingPost ? 3 : world.GetMyKingdom().GetCountMarketplace();
     
-    if(tradingPost)
-        markets++;
-
     if(rs_from == rs_to) return 0;
 
     switch(rs_from)
