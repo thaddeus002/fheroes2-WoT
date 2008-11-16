@@ -72,7 +72,7 @@ static void PrepareArmy(std::vector<Army::Troops> &army, const Point &p, ArmyLis
 static void PrepareArtifacts(std::vector<Artifact::artifact_t> &artifacts, const Point &p, ArtifactList &coords);
 static void RedrawArmy(const ArmyList &coords);
 static void RedrawArtifacts(const ArtifactList &coords);
-static void RedrawItem(const Sprite *sprite, const Rect &display, const Rect &select, bool selected);
+static void RedrawItem(const Sprite *sprite, const Rect &display, const Rect &select, int adjustHeight, bool selected);
 static void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> & skills);
 template<class T> static void DeselectList(std::vector<SelectableRect<T> > *list);
 template<class T> static SelectableRect<T> *GetSelectedListElement(std::vector<SelectableRect<T> > &list);
@@ -89,23 +89,20 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-
-    Dialog::FrameBorder background;
-
-    const Point cur_pt(background.GetArea().x, background.GetArea().y);
+    
+    const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
+    const Point cur_pt((display.w() - backSprite.w()) / 2, (display.h() - backSprite.h()) / 2);
+    Background background(cur_pt, backSprite.w(), backSprite.h());
+    background.Save();
     Point dst_pt(cur_pt);
     std::string message;
 
-    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
-
-    u8 w = 22;
-
-    Rect src_rt(w, w, 640 - 2 * w, 480 - 2 * w);
+    Rect src_rt(0, 0, 640, 480);
 
     // background
-    dst_pt.x = cur_pt.x + w;
-    dst_pt.y = cur_pt.y + w;
-    display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), src_rt, dst_pt);
+    dst_pt.x = cur_pt.x;
+    dst_pt.y = cur_pt.y;
+    display.Blit(backSprite, src_rt, dst_pt);
     
     Game::Interface::Get().DrawBorder(false, false);
 
@@ -300,6 +297,8 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     artifacts.swap(newArtifacts[0]);
     heroes2.army.swap(newArmy[1]);
     heroes2.artifacts.swap(newArtifacts[1]);
+    
+    background.Restore();
 }
 
 static void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> & skills)
@@ -333,15 +332,17 @@ static void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Seco
  *  \param selectable   Absolute rectangle for which to draw a selection box
  *  \param selected     Draw the selection box or not
  */
-static void RedrawItem(const Sprite *sprite, const Rect &displayable, const Rect &selectable, bool selected)
+static void RedrawItem(const Sprite *sprite, const Rect &displayable, const Rect &selectable, int adjustHeight, bool selected)
 {
     Display & display = Display::Get();
 
     const int ox = displayable.x;
     const int oy = displayable.y;
     Surface surf(selectable.w, selectable.h);
-    Rect back(selectable.x, selectable.y, selectable.w, selectable.h);
-    surf.Blit(AGG::GetICN(ICN::SWAPWIN, 0), back, 0, 0);
+    const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
+    Point offset((display.w() - backSprite.w()) / 2, (display.h() - backSprite.h()) / 2);
+    Rect back(selectable.x - offset.x, selectable.y - offset.y, selectable.w, selectable.h + adjustHeight);
+    surf.Blit(backSprite, back, 0, 0);
     if(sprite)
         surf.Blit(*sprite, ox - selectable.x, oy - selectable.y);
     
@@ -373,22 +374,16 @@ static void RedrawArmy(const ArmyList &army)
         {
             const Army::Troops &troop = *army[ii].object;
             const Sprite & sprite = AGG::GetICN(ICN::MONS32, troop.Monster());
-            //Remove any remaining text underneath
-            Rect adjustedSelect(army[ii].selectable);
-            adjustedSelect.h += 20;
-            RedrawItem(&sprite, army[ii].displayable, adjustedSelect, army[ii].selected);
-            
             const Rect &select = army[ii].selectable;
+            RedrawItem(&sprite, army[ii].displayable, select, 20, army[ii].selected);
+            
             std::string message;
             String::AddInt(message, troop.Count());
             Text(message, Font::SMALL, select.x + (select.w - Text::width(message, Font::SMALL)) / 2, select.y + select.h + 3);
         }
         else
         {
-            //Remove any remaining text underneath
-            Rect adjustedSelect(army[ii].selectable);
-            adjustedSelect.h += 20;
-            RedrawItem(NULL, army[ii].displayable, adjustedSelect, army[ii].selected);
+            RedrawItem(NULL, army[ii].displayable, army[ii].selectable, 20, army[ii].selected);
         }
     }
 }
@@ -403,9 +398,9 @@ static void RedrawArtifacts(const ArtifactList &artifacts)
 	if(artifacts[ii].object)
 	{
             const Sprite & sprite = AGG::GetICN(ICN::ARTFX, *artifacts[ii].object);
-            RedrawItem(&sprite, artifacts[ii].displayable, artifacts[ii].selectable, artifacts[ii].selected);
+            RedrawItem(&sprite, artifacts[ii].displayable, artifacts[ii].selectable, 0, artifacts[ii].selected);
 	}
-        else RedrawItem(NULL, artifacts[ii].displayable, artifacts[ii].selectable, artifacts[ii].selected);
+        else RedrawItem(NULL, artifacts[ii].displayable, artifacts[ii].selectable, 0, artifacts[ii].selected);
     }
 }
 
@@ -492,6 +487,9 @@ static SelectableRect<T> *GetSelectedListElement(std::vector<SelectableRect<T> >
 template <>
 static bool IsActionValid<Army::Troops>(SelectableRect<Army::Troops> &picked)
 {
+    if(!picked.object->isValid())
+        return false;
+    
     //TODO: Ensure there is still one stack left if troops are being transferred
     return true;
 }
