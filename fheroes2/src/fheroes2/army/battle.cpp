@@ -63,7 +63,7 @@ if(le.MousePressRight(b)&& !b.isDisable()) rt;
 if(le.MouseClickLeft(b) && !b.isDisable()) { b.isPressed() ? b.ReleaseDraw() : b.PressDraw(); lf; } \
 if(le.MousePressRight(b) && !b.isDisable()) rt;
 
-static Dialog::FrameBorder *frameborder;
+static Dialog::FrameBorder *frameborder = NULL;
 
 namespace Army {
     bool O_GRID = false, O_SHADM = false, O_SHADC = false, O_AUTO = false;
@@ -414,7 +414,8 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
         }
     }
     
-    delete frameborder;
+    if(frameborder) delete frameborder;
+    frameborder = NULL;
 }
 
 Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, const Maps::Tiles &tile)
