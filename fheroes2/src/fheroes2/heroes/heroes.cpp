@@ -382,7 +382,6 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     experience = byte32;
     ptr8 += 4;
 
-
     // custom skill
     if(*ptr8)
     {
@@ -428,6 +427,10 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
     // save general object
     save_maps_general = MP2::OBJ_ZERO;
+
+    // level up
+    u8 level = GetLevel();
+    while(1 < level--) LevelUp();
 
     // other param
     magic_point = GetMaxSpellPoints();
