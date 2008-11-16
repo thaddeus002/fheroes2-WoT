@@ -54,13 +54,12 @@ namespace Game
     Game::menu_t HumanTurn(void);
     bool CursorChangePosition(const u16 index);
     bool DiggingForArtifacts(const Heroes & hero);
-    void DialogPlayersTurn(void);
+    void DialogPlayersTurn(const Color::color_t);
 };
 
-void Game::DialogPlayersTurn(void)
+void Game::DialogPlayersTurn(const Color::color_t color)
 {
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
-    const Color::color_t color = Settings::Get().MyColor();
 
     Surface sign(border.w(), border.h());
     sign.Blit(border);
@@ -161,18 +160,19 @@ Game::menu_t Game::StartGame(void)
 		{
 	        case LOCAL:
 		    Mixer::Enhance();
-		    conf.SetMyColor(color);
+		    Mixer::Reset();
 		    if(Game::HOTSEAT == conf.GameType())
 		    {
-			global_focus.Reset();
-			areaMaps.Redraw();
+			conf.SetMyColor(Color::GRAY);
 			SelectBarCastle::Get().Hide();
 			SelectBarHeroes::Get().Hide();
 			StatusWindow::Get().SetState(StatusWindow::UNKNOWN);
 			StatusWindow::Get().Redraw();
+			areaMaps.Redraw();
 			display.Flip();
-			DialogPlayersTurn();
+			DialogPlayersTurn(color);
 		    }
+		    conf.SetMyColor(color);
 		    m = HumanTurn();
 		    cursor.Hide();
 		    Mixer::Reduce();
@@ -681,6 +681,8 @@ Game::menu_t Game::HumanTurn(void)
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
+    if(Game::HOTSEAT == conf.GameType() || conf.Original()) global_focus.Reset();
+
     Game::SelectBarCastle & selectCastle = Game::SelectBarCastle::Get();
     Game::SelectBarHeroes & selectHeroes = Game::SelectBarHeroes::Get();
 
@@ -690,10 +692,7 @@ Game::menu_t Game::HumanTurn(void)
     selectHeroes.Redraw();
     selectCastle.Redraw();
 
-    Mixer::Reset();
     Game::EnvironmentSoundMixer(true);
-
-    if(Game::HOTSEAT == conf.GameType() || conf.Original()) global_focus.Reset();
 
     switch(global_focus.Type())
     {
