@@ -41,7 +41,8 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 50 + Text::height(message, Font::BIG, BOXAREA_WIDTH), Dialog::OK);
+    const u8 extra = (4 > rs.GetValidItems() ? 40 : (4 > rs.GetValidItems() ? 80 : 120));
+    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 10 + extra + Text::height(message, Font::BIG, BOXAREA_WIDTH), Dialog::OK);
 
     Rect pos = box.GetArea();
 

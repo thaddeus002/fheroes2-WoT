@@ -1159,6 +1159,34 @@ void World::NextDay(void)
         NewMonth();
         for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewMonth();
     }
+
+    // check events day
+    if(vec_eventsday.size())
+    {
+	std::vector<GameEvent::Day *>::const_iterator it1 = vec_eventsday.begin();
+	std::vector<GameEvent::Day *>::const_iterator it2 = vec_eventsday.end();
+
+	for(; it1 != it2; ++it1) if(*it1)
+	{
+	    const GameEvent::Day & event = **it1;
+	    const u16 today = GetDay();
+	    const u16 first = event.GetFirst();
+	    const u16 sequent = event.GetSubsequent();
+
+	    if(first == today ||
+	       (sequent && (first < today && 0 == ((today - first) % sequent))))
+	    {
+		std::vector<Kingdom *>::iterator itk1 = vec_kingdoms.begin();
+		std::vector<Kingdom *>::iterator itk2 = vec_kingdoms.end();
+
+		for(; itk1 != itk2; ++itk1) if(*itk1 && (*itk1)->isPlay() && ((*itk1)->GetColor() & event.GetColors()))
+		{
+		    (*itk1)->AddFundsResource(event.GetResource());
+		    if(Game::LOCAL == (*itk1)->Control()) Dialog::ResourceInfo(event.GetMessage(), "", event.GetResource());
+		}
+	    }
+	}
+    }
 }
 
 void World::NewWeek(void)

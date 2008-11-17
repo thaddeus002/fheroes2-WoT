@@ -36,7 +36,7 @@ public:
     Day(const void *ptr);
     
     bool AllowComputer(void) const{ return computer; };
-    const Resource::funds_t & GetResource(void){ return resource; };
+    const Resource::funds_t & GetResource(void) const{ return resource; };
     u16 GetFirst(void) const{ return first; };
     u16 GetSubsequent(void) const{ return subsequent; };
     u8  GetColors(void) const{ return colors; };
