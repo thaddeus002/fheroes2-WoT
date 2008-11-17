@@ -877,7 +877,9 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     u8 count_wzrd = 0;
     u8 count_necr = 0;
     u8 count_bomg = 0;
+    bool ghost_present = false;
     for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).Monster())
+    {
 	switch(Monster::GetRace((*it1_army).Monster()))
 	{
 	    case Race::KNGT: ++count_kngt; break;
@@ -889,6 +891,8 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	    case Race::BOMG: ++count_bomg; break;
 	    default: break;
 	}
+	if(Monster::GHOST == (*it1_army).Monster()) ghost_present = true;
+    }
     if(count_kngt) ++count;
     if(count_barb) ++count;
     if(count_sorc) ++count;
@@ -902,7 +906,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	case 2:
 	case 0: break;
 	case 1:
-	    if(0 == count_necr && 1 < GetCountUniqTroops())
+	    if(0 == count_necr && !ghost_present && 1 < GetCountUniqTroops())
 	    {
 		++result;
 		if(list) list->push_back("All " + Race::String(GetRace()) + " troops +1");
@@ -924,7 +928,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     }
 
     // undead in life group
-    if(count_necr && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
+    if(1 < GetCountUniqTroops() && (count_necr || ghost_present) && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
     {
 	--result;
 	if(list) list->push_back("Some undead in groups -1");
