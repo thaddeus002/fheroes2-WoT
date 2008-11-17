@@ -127,8 +127,6 @@ const Sprite & SpriteShad(const Heroes & hero, const u8 index)
     const ICN::icn_t icn_shad = hero.isShipMaster() ? ICN::BOATSHAD : ICN::SHADOW32;
     u16 index_sprite = 0;
 
-    //if(rotate)				index_sprite = 45;
-    //else
     switch(hero.GetDirection())
     {
         case Direction::TOP:            index_sprite =  0; break;
@@ -144,6 +142,27 @@ const Sprite & SpriteShad(const Heroes & hero, const u8 index)
     }
 
     return AGG::GetICN(icn_shad, index_sprite + (index % 9));
+}
+
+const Sprite & SpriteFroth(const Heroes & hero, const u8 index, const bool reflect)
+{
+    u16 index_sprite = 0;
+
+    switch(hero.GetDirection())
+    {
+        case Direction::TOP:            index_sprite =  0; break;
+        case Direction::TOP_RIGHT:      index_sprite =  9; break;
+        case Direction::RIGHT:          index_sprite = 18; break;
+        case Direction::BOTTOM_RIGHT:   index_sprite = 27; break;
+        case Direction::BOTTOM:         index_sprite = 36; break;
+        case Direction::BOTTOM_LEFT:    index_sprite = 27; break;
+        case Direction::LEFT:           index_sprite = 18; break;
+        case Direction::TOP_LEFT:       index_sprite =  9; break;
+
+        default: Error::Warning("Heroes::SpriteFroth: unknown direction"); break;
+    }
+
+    return AGG::GetICN(ICN::FROTH, index_sprite + (index % 9), reflect);
 }
 
 bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
@@ -205,10 +224,12 @@ void Heroes::Redraw(bool with_shadow) const
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
     const Sprite & sprite2 = SpriteFlag(*this, sprite_index, reflect);
     const Sprite & sprite3 = SpriteShad(*this, sprite_index);
+    const Sprite & sprite4 = SpriteFroth(*this, sprite_index, reflect);
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     Point dst_pt2(dx + (reflect ? TILEWIDTH - sprite2.x() - sprite2.w() : sprite2.x()), dy + sprite2.y() + TILEWIDTH);
     Point dst_pt3(dx + sprite3.x(), dy + sprite3.y() + TILEWIDTH);
+    Point dst_pt4(dx + (reflect ? TILEWIDTH - sprite4.x() - sprite4.w() : sprite4.x()), dy + sprite4.y() + TILEWIDTH);
 
     // apply offset
     if(sprite_index < 45)
@@ -236,15 +257,21 @@ void Heroes::Redraw(bool with_shadow) const
 	dst_pt2.y += oy;
 	dst_pt3.x += ox;
 	dst_pt3.y += oy;
+	dst_pt4.x += ox;
+	dst_pt4.y += oy;
     }
 
     Rect src_rt1;
     Rect src_rt2;
     Rect src_rt3;
+    Rect src_rt4;
 
     GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
     GameArea::SrcRectFixed(src_rt2, dst_pt2, sprite2.w(), sprite2.h());
     GameArea::SrcRectFixed(src_rt3, dst_pt3, sprite3.w(), sprite3.h());
+    GameArea::SrcRectFixed(src_rt4, dst_pt4, sprite4.w(), sprite4.h());
+
+    if(isShipMaster()) display.Blit(sprite4, src_rt4, dst_pt4);
 
     // redraw sprites for shadow
     if(with_shadow) display.Blit(sprite3, src_rt3, dst_pt3);
