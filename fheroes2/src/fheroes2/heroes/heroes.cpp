@@ -757,7 +757,7 @@ Morale::morale_t Heroes::GetMorale(void) const
 
 Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
 {
-    s8 result = morale;
+    s8 result = Morale::NORMAL;
 
     const std::string p1(" +1");
     const std::string p2(" +2");
@@ -902,10 +902,10 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	case 2:
 	case 0: break;
 	case 1:
-	    if(0 == count_necr)
+	    if(0 == count_necr && 1 < GetCountUniqTroops())
 	    {
 		++result;
-		if(list && 1 < GetCountArmy()) list->push_back("All " + Race::String(GetRace()) + " groups +1");
+		if(list) list->push_back("All " + Race::String(GetRace()) + " troops +1");
 	    }
 	    break;
 	case 3:
@@ -952,7 +952,7 @@ Luck::luck_t Heroes::GetLuck(void) const
 
 Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 {
-    s8 result = luck;
+    s8 result = Luck::NORMAL;
 
     std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
 
@@ -1052,6 +1052,17 @@ u8 Heroes::GetCountArmy(void) const
     for(u8 ii = 0; ii < HEROESMAXARMY; ++ii) if(Army::isValid(army[ii])) ++result;
 
     return result;
+}
+
+u8 Heroes::GetCountUniqTroops(void) const
+{
+    std::vector<Monster::monster_t> troops;
+    troops.reserve(HEROESMAXARMY);
+
+    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii) if(army[ii].isValid()) troops.push_back(army[ii].Monster());
+    troops.resize(std::unique(troops.begin(), troops.end()) - troops.begin());
+
+    return troops.size();
 }
 
 /* recrut hero */

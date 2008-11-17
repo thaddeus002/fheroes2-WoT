@@ -37,6 +37,186 @@
 #include "portrait.h"
 #include "dialog.h"
 
+void DrawLuckSprite(const Luck::luck_t luck, const Point & pt)
+{
+    Display & display = Display::Get();
+    Point dst_pt(pt);
+
+    switch(luck)
+    {
+	case Luck::CURSED:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Luck::AWFUL:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Luck::BAD:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Luck::NORMAL:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 6);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Luck::GOOD:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Luck::GREAT:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Luck::IRISH:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	default: break;
+    }
+}
+
+void DrawMoraleSprite(const Morale::morale_t morale, const Point & pt)
+{
+    Display & display = Display::Get();
+    Point dst_pt(pt);
+
+    switch(morale)
+    {
+	case Morale::TREASON:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Morale::AWFUL:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Morale::POOR:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Morale::NORMAL:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 7);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Morale::GOOD:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
+	    dst_pt.x += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Morale::GREAT:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 7;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	case Morale::BLOOD:
+	{
+	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	    dst_pt.x += 5;
+	    display.Blit(sprite, dst_pt);
+	} break;
+
+	default: break;
+    }
+}
+
+const char* MoraleString(const Morale::morale_t morale)
+{
+    switch(morale)
+    {
+	case Morale::TREASON:
+	case Morale::AWFUL:
+	case Morale::POOR:
+	    return "Bad Morale";
+
+	case Morale::NORMAL:
+	    return "Neutral Morale";
+
+	case Morale::GOOD:
+	case Morale::GREAT:
+	case Morale::BLOOD:
+	    return "Good Morale";
+
+	default: break;
+    }
+    return NULL;
+}
+
+const char* LuckString(const Luck::luck_t luck)
+{
+    switch(luck)
+    {
+	case Luck::CURSED:
+	case Luck::AWFUL:
+	case Luck::BAD:
+	    return "Bad Luck";
+
+	case Luck::NORMAL:
+	    return "Neutral Luck";
+
+	case Luck::GOOD:
+	case Luck::GREAT:
+	case Luck::IRISH:
+	    return "Good Luck";
+
+	default: break;
+    }
+    return NULL;
+}
+
 Dialog::answer_t Heroes::OpenDialog(bool readonly)
 {
     Display & display = Display::Get();
@@ -129,180 +309,34 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // morale
     dst_pt.x = cur_pt.x + 515;
     dst_pt.y = cur_pt.y + 35;
-    std::string headerMoraleInfo;
-    
+
     const Rect rectMoraleInfo(dst_pt, 34, 26);
-
+    Background backgroundMorale(rectMoraleInfo);
     std::list<std::string> moraleModificators;
-    const Morale::morale_t current_morale = GetMoraleWithModificators(&moraleModificators);
-
-    switch(current_morale)
-    {
-	case Morale::TREASON:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-
-	    headerMoraleInfo = "Bad Morale";
-	} break;
-
-	case Morale::AWFUL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
-
-	    headerMoraleInfo = "Bad Morale";
-	} break;
-
-	case Morale::POOR:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
-
-	    headerMoraleInfo = "Bad Morale";
-	} break;
-
-	case Morale::NORMAL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 7);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
-
-	    headerMoraleInfo = "Neutral Morale";
-	} break;
-
-	case Morale::GOOD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
-
-	    headerMoraleInfo = "Good Morale";
-	} break;
-
-	case Morale::GREAT:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
-
-	    headerMoraleInfo = "Good Morale";
-	} break;
-
-	case Morale::BLOOD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-
-	    headerMoraleInfo = "Good Morale";
-	} break;
-
-    }
-
+    Morale::morale_t current_morale = GetMoraleWithModificators(&moraleModificators);
     if(moraleModificators.size()) moraleModificators.push_front("Current Morale Modifiers:");
-    moraleModificators.push_front("    ");
+    moraleModificators.push_front(" ");
     moraleModificators.push_front(Morale::Description(current_morale));
+    std::string headerMoraleInfo(MoraleString(current_morale));
+
+    backgroundMorale.Save();
+    DrawMoraleSprite(current_morale, rectMoraleInfo);
 
     // luck
     dst_pt.x = cur_pt.x + 552;
     dst_pt.y = cur_pt.y + 35;
-    std::string headerLuckInfo;
 
     const Rect rectLuckInfo(dst_pt, 34, 26);
-
+    Background backgroundLuck(rectLuckInfo);
     std::list<std::string> luckModificators;
-    const Luck::luck_t current_luck = GetLuckWithModificators(&luckModificators);
-
-    switch(current_luck)
-    {
-	case Luck::CURSED:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    
-	    headerLuckInfo = "Bad Luck";
-	} break;
-
-	case Luck::AWFUL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
-
-	    headerLuckInfo = "Bad Luck";
-	} break;
-
-	case Luck::BAD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
-
-	    headerLuckInfo = "Bad Luck";
-	} break;
-
-	case Luck::NORMAL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 6);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
-
-	    headerLuckInfo = "Neutral Luck";
-	} break;
-
-	case Luck::GOOD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
-
-	    headerLuckInfo = "Good Luck";
-	} break;
-
-	case Luck::GREAT:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
-
-	    headerLuckInfo = "Good Luck";
-	} break;
-
-	case Luck::IRISH:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-
-	    headerLuckInfo = "Good Luck";
-	} break;
-
-    }
-
+    Luck::luck_t current_luck = GetLuckWithModificators(&luckModificators);
     if(luckModificators.size()) luckModificators.push_front("Current Morale Modifiers:");
-    luckModificators.push_front("    ");
+    luckModificators.push_front(" ");
     luckModificators.push_front(Luck::Description(current_luck));
+    std::string headerLuckInfo(LuckString(current_luck));
+
+    backgroundLuck.Save();
+    DrawLuckSprite(current_luck, dst_pt);
 
     // army format spread
     dst_pt.x = cur_pt.x + 515;
@@ -528,9 +562,44 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     cursor.Show();
     display.Flip();
 
+    bool redrawMorale = false;
+    bool redrawLuck = false;
+
     // dialog menu loop
     while(le.HandleEvents())
     {
+	if(redrawMorale)
+	{
+	    cursor.Hide();
+	    backgroundMorale.Restore();
+	    moraleModificators.clear();
+	    current_morale = GetMoraleWithModificators(&moraleModificators);
+	    if(moraleModificators.size()) moraleModificators.push_front("Current Morale Modifiers:");
+	    moraleModificators.push_front(" ");
+	    moraleModificators.push_front(Morale::Description(current_morale));
+	    DrawMoraleSprite(current_morale, rectMoraleInfo);
+	    headerMoraleInfo = MoraleString(current_morale);
+	    cursor.Show();
+	    display.Flip();
+	    redrawMorale = false;
+	}
+
+	if(redrawLuck)
+	{
+	    cursor.Hide();
+	    backgroundLuck.Restore();
+	    luckModificators.clear();
+	    current_luck = GetLuckWithModificators(&luckModificators);
+	    if(luckModificators.size()) luckModificators.push_front("Current Morale Modifiers:");
+	    luckModificators.push_front(" ");
+	    luckModificators.push_front(Luck::Description(current_luck));
+	    DrawLuckSprite(current_luck, dst_pt);
+	    headerLuckInfo = LuckString(current_luck);
+	    cursor.Show();
+	    display.Flip();
+	    redrawLuck = false;
+	}
+
         // exit
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) {
 	    Display::Get().Fade();
@@ -562,10 +631,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
 		            kingdom.OddFundsResource(PaymentConditions::UpgradeMonster(select_monster) * select_count);
+			    redrawMorale = true;
 			    break;
 
 			case Dialog::DISMISS:
 			    select_troops.Set(Monster::UNKNOWN, 0);
+			    redrawMorale = true;
 			    break;
 
 			default: break;
