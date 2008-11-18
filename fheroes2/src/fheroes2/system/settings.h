@@ -112,6 +112,8 @@ public:
     void SetMyColor(const Color::color_t c);
     u8   Players(void) const;
     void SetPlayers(u8 c);
+    u8   PreferablyCountPlayers(void) const;
+    void SetPreferablyCountPlayers(u8 c);
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -144,8 +146,9 @@ private:
     u8 music_volume;
     u8 animation;
 
-    u8   game;
-    u8   players;
+    u8 game;
+    u8 players;
+    u8 preferably_count_players;
 };
 
 #endif
