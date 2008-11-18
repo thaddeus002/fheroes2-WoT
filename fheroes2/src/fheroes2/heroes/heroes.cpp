@@ -893,13 +893,15 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	}
 	if(Monster::GHOST == (*it1_army).Monster()) ghost_present = true;
     }
-    if(count_kngt) ++count;
-    if(count_barb) ++count;
-    if(count_sorc) ++count;
-    if(count_wrlk) ++count;
-    if(count_wzrd) ++count;
-    if(count_necr) ++count;
-    if(count_bomg) ++count;
+
+    Race::race_t r = Race::MULT;
+    if(count_kngt){ ++count; r = Race::KNGT; }
+    if(count_barb){ ++count; r = Race::BARB; }
+    if(count_sorc){ ++count; r = Race::SORC; }
+    if(count_wrlk){ ++count; r = Race::WRLK; }
+    if(count_wzrd){ ++count; r = Race::WZRD; }
+    if(count_necr){ ++count; r = Race::NECR; }
+    if(count_bomg){ ++count; r = Race::BOMG; }
 
     switch(count)
     {
@@ -909,7 +911,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	    if(0 == count_necr && !ghost_present && 1 < GetCountUniqTroops())
 	    {
 		++result;
-		if(list) list->push_back("All " + Race::String(GetRace()) + " troops +1");
+		if(list) list->push_back("All " + Race::String(r) + " troops +1");
 	    }
 	    break;
 	case 3:
@@ -1771,6 +1773,25 @@ const Army::Troops & Heroes::GetStrongestArmy(void) const
 const Army::Troops & Heroes::GetWeakestArmy(void) const
 {
     return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroops);
+}
+
+Race::race_t Heroes::GetRaceArmy(void) const
+{
+    std::vector<Army::Troops>::const_iterator it1 = army.begin();
+    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    std::vector<Race::race_t> races;
+    races.reserve(HEROESMAXARMY);
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()) races.push_back(Monster::GetRace((*it1).Monster()));
+    races.resize(std::unique(races.begin(), races.end()) - races.begin());
+
+    if(races.empty())
+    {
+	Error::Warning("Heroes::GetRaceArmy: empty");
+	return Race::MULT;
+    }
+
+    return 1 < races.size() ? Race::MULT : races.at(0);
 }
 
 bool Heroes::MayStillMove(void) const

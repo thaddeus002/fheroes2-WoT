@@ -129,6 +129,7 @@ public:
     const Army::Troops & GetWeakestArmy(void) const;
     u8 GetCountArmy(void) const;
     u8 GetCountUniqTroops(void) const;
+    Race::race_t GetRaceArmy(void) const;
 
     const Spell::Book & SpellBook(void) const { return spell_book; };
 
