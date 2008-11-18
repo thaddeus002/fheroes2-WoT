@@ -1738,7 +1738,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.FadeIn();
 
     // check monster
-    u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, false);
+    u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, !Settings::Get().Original());
     if(MAXU16 != dst_index2) hero.Action(dst_index2);
 }
 
