@@ -118,6 +118,9 @@ public:
     bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);
 
+    const GameEvent::Day*   GetEventDay(const Color::color_t c) const;
+    const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;
+
     static u32 GetUniq(void){ return ++uniq0; };
 
 protected:

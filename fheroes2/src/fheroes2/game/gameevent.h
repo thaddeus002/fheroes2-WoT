@@ -56,6 +56,12 @@ class Coord
 public:
     Coord(u16 index, const void *ptr);
 
+    bool AllowComputer(void) const{ return computer; };
+    const Resource::funds_t & GetResource(void) const{ return resource; };
+    u16 GetIndex(void) const{ return index_map; };
+    u8  GetColors(void) const{ return colors; };
+    const std::string & GetMessage(void) const{ return message; };
+
 private:
     u16 index_map;
     Resource::funds_t resource;

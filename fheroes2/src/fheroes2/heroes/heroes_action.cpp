@@ -34,6 +34,7 @@
 #include "tools.h"
 #include "algorithm.h"
 #include "ai.h"
+#include "gameevent.h"
 
 #define OBSERVATIONTOWERSCOUTE 10
 
@@ -78,6 +79,7 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index);
 void ActionToXanadu(Heroes &hero, const u16 dst_index);
 void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
 void ActionToMagellanMaps(Heroes &hero, const u16 dst_index);
+void ActionToEvent(Heroes &hero, const u16 dst_index);
 
 void UpgradeMonsters(Heroes & hero, const Monster::monster_t monster)
 {
@@ -375,8 +377,9 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_FREEMANFOUNDRY:	ActionToUpgradeArmyObject(*this, dst_index); break;
 
+	case MP2::OBJ_EVENT:		ActionToEvent(*this, dst_index); break;
+
         // object
-        case MP2::OBJ_EVENT:
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_OBELISK:
 	case MP2::OBJ_ORACLE:
@@ -2484,3 +2487,18 @@ void ActionToMagellanMaps(Heroes &hero, const u16 dst_index)
     if(H2Config::Debug()) Error::Verbose("ActionToMagellanMaps: " + hero.GetName());
 }
 
+void ActionToEvent(Heroes &hero, const u16 dst_index)
+{
+    // check event maps
+    const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
+
+    if(event_maps)
+    {
+        world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
+        Dialog::ResourceInfo(event_maps->GetMessage(), "", event_maps->GetResource());
+    }
+
+    world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
+
+    if(H2Config::Debug()) Error::Verbose("ActionToEvent: " + hero.GetName());
+}

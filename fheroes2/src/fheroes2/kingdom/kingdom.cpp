@@ -26,6 +26,7 @@
 #include "error.h"
 #include "difficulty.h"
 #include "game_statuswindow.h"
+#include "gameevent.h"
 #include "payment.h"
 #include "world.h"
 #include "kingdom.h"
@@ -141,6 +142,15 @@ void Kingdom::ActionNewDay(void)
 	    resource.gold += (castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == castle.GetRace() ? INCOME_DUNGEON_GOLD : 0);
 	}
     }
+    
+    // check event day
+    const GameEvent::Day* event_day = world.GetEventDay(color);
+    
+    if(event_day)
+    {
+	AddFundsResource(event_day->GetResource());
+        if(Game::LOCAL == control) Dialog::ResourceInfo(event_day->GetMessage(), "", event_day->GetResource());
+    }                                            
 }
 
 void Kingdom::ActionNewWeek(void)
