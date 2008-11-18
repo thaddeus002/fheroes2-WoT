@@ -408,12 +408,20 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = Monster::GetSize(tile);
-    std::vector<Army::Troops> army;
-    army.reserve(HEROESMAXARMY);
-    const int tr_c = count > HEROESMAXARMY ? HEROESMAXARMY : count;
-
-    for(int i = 0; i < tr_c; i++)
-	army.push_back(Army::Troops(monster, count / tr_c));
+    std::vector<Army::Troops> army(5);
+    if(count > 5)
+    {
+	const s16 c = count / 5;
+	army[0] = Army::Troops(monster, c);
+	army[1] = Army::Troops(monster, c);
+	army[2] = Army::Troops(monster, c + count - (c * 5));
+	army[3] = Army::Troops(monster, c);
+	army[4] = Army::Troops(monster, c);
+    }
+    else
+    {
+	army[0] = Army::Troops(monster, count);
+    }
 
     if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
 
@@ -449,7 +457,13 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 	case Army::LOSE:
 	    BattleLose(hero, b);
 	    if(!Settings::Get().Original())
-	        tile.SetCountMonster(tr_c * std::count_if(army.begin(), army.end(), Army::isValid));
+	    {
+		u16 c = 0;
+		std::vector<Army::Troops>::const_iterator it1 = army.begin();
+		std::vector<Army::Troops>::const_iterator it2 = army.end();
+		for(; it1 != it2; ++it1) if((*it1).isValid()) c+= (*it1).Count();
+	        tile.SetCountMonster(c);
+	    }
 	    break;
         
         default: break;
