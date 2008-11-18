@@ -376,6 +376,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_FREEMANFOUNDRY:	ActionToUpgradeArmyObject(*this, dst_index); break;
 
         // object
+        case MP2::OBJ_EVENT:
         case MP2::OBJ_DAEMONCAVE:
         case MP2::OBJ_OBELISK:
 	case MP2::OBJ_ORACLE:
@@ -408,18 +409,13 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = Monster::GetSize(tile);
     std::vector<Army::Troops> army;
-    int tr_c = count > 5 ? 5 : count;
+    army.reserve(HEROESMAXARMY);
+    const int tr_c = count > HEROESMAXARMY ? HEROESMAXARMY : count;
 
-    for(int i=0; i< tr_c; i++)
-    {
-	Army::Troops troop(monster, (int)(count/tr_c));
-	army.push_back(troop);
-    }
+    for(int i = 0; i < tr_c; i++)
+	army.push_back(Army::Troops(monster, count / tr_c));
 
-    std::string str = "ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster)+" (";
-    String::AddInt(str, count);
-    str += ")";
-    if(H2Config::Debug()) Error::Verbose(str);
+    if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
 
     //Display::Fade(); need move to start battle code
 
@@ -452,6 +448,8 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 	case Army::SURRENDER:
 	case Army::LOSE:
 	    BattleLose(hero, b);
+	    if(!Settings::Get().Original())
+	        tile.SetCountMonster(tr_c * std::count_if(army.begin(), army.end(), Army::isValid));
 	    break;
         
         default: break;
