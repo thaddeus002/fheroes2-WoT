@@ -67,7 +67,7 @@ u16 Maps::Ground::GetPenalty(const u16 index, const Direction::vector_t direct, 
     // if(tile.isRoad(direct)) need fix isRoad(Direction::vector_t)
     if(tile.isRoad())
     {
-	return 75;
+	result = 75;
     }
     else
     switch(tile.GetGround())
