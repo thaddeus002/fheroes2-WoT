@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
-#include <vector>
 #include "gamedefs.h"
 #include "rand.h"
 #include "race.h"
@@ -32,7 +31,7 @@ Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0), moral
 // primary skill from level up (dependence from race and hero level)
 Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 level)
 {
-    std::vector<u8> percents(4);
+    Rand::Queue percents(4);
 
     // primary skill
     switch(race)
@@ -40,66 +39,66 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	case Race::BARB:
 	    if(10 > level)
 	    {
-		percents[0] = 55; percents[1] = 35; percents[2] =  5; percents[3] =  5;
+		percents.Push(55); percents.Push(35); percents.Push(5); percents.Push(5);
 	    }
 	    else
 	    {
-		percents[0] = 30; percents[1] = 30; percents[2] = 20; percents[3] = 20;
+		percents.Push(30); percents.Push(30); percents.Push(20); percents.Push(20);
 	    }
 	    break;
 
 	case Race::KNGT:
 	    if(10 > level)
 	    {
-		percents[0] = 35; percents[1] = 45; percents[2] = 10; percents[3] = 10;
+		percents.Push(35); percents.Push(45); percents.Push(10); percents.Push(10);
 	    }
 	    else
 	    {
-		percents[0] = 25; percents[1] = 25; percents[2] = 25; percents[3] = 25;
+		percents.Push(25); percents.Push(25); percents.Push(25); percents.Push(25);
 	    }
 	    break;
 
 	case Race::NECR:
 	    if(10 > level)
 	    {
-		percents[0] = 15; percents[1] = 15; percents[2] = 35; percents[3] = 35;
+		percents.Push(15); percents.Push(15); percents.Push(35); percents.Push(35);
 	    }
 	    else
 	    {
-		percents[0] = 25; percents[1] = 25; percents[2] = 25; percents[3] = 25;
+		percents.Push(25); percents.Push(25); percents.Push(25); percents.Push(25);
 	    }
 	    break;
 
 	case Race::SORC:
 	    if(10 > level)
 	    {
-		percents[0] = 10; percents[1] = 10; percents[2] = 30; percents[3] = 50;
+		percents.Push(10); percents.Push(10); percents.Push(30); percents.Push(50);
 	    }
 	    else
 	    {
-		percents[0] = 20; percents[1] = 20; percents[2] = 30; percents[3] = 30;
+		percents.Push(20); percents.Push(20); percents.Push(30); percents.Push(30);
 	    }
 	    break;
 
 	case Race::WRLK:
 	    if(10 > level)
 	    {
-		percents[0] = 10; percents[1] = 10; percents[2] = 50; percents[3] = 30;
+		percents.Push(10); percents.Push(10); percents.Push(50); percents.Push(30);
 	    }
 	    else
 	    {
-		percents[0] = 20; percents[1] = 20; percents[2] = 30; percents[3] = 30;
+		percents.Push(20); percents.Push(20); percents.Push(30); percents.Push(30);
 	    }
 	    break;
 
 	case Race::WZRD:
 	    if(10 > level)
 	    {
-		percents[0] = 10; percents[1] = 10; percents[2] = 40; percents[3] = 40;
+		percents.Push(10); percents.Push(10); percents.Push(40); percents.Push(40);
 	    }
 	    else
 	    {
-		percents[0] = 20; percents[1] = 20; percents[2] = 30; percents[3] = 30;
+		percents.Push(20); percents.Push(20); percents.Push(30); percents.Push(30);
 	    }
 	    break;
 
@@ -107,28 +106,12 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	    Error::Warning("Skill::Primary::LevelUp: unknown race."); return UNKNOWN;
     }
 
-    // calculate in percents
-    std::vector<u8>::const_iterator it1 = percents.begin();
-    std::vector<u8>::const_iterator it2 = percents.end();
-
-    const u8 value = Rand::Get(1, 100);
-    u8 amount = 0;
-    u8 res = 0;
-
-    for(; it1 != it2; ++it1)
+    switch(percents.Get())
     {
-        amount += *it1;
-        ++res;
-
-        if(value <= amount) break;
-    }
-
-    switch(res)
-    {
-	case 1:	return ATTACK;
-	case 2: return DEFENCE;
-	case 3: return POWER;
-	case 4: return KNOWLEDGE;
+	case 0:	return ATTACK;
+	case 1: return DEFENCE;
+	case 2: return POWER;
+	case 3: return KNOWLEDGE;
 
 	default: break;
     }
