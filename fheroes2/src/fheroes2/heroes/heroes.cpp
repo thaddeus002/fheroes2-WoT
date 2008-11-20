@@ -1487,7 +1487,7 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
 
     Route::Path test(*this);
     // approximate limit, this restriction path finding algorithm
-    if(test.Calculate(dst, limit))
+    if(test.Calculate(dst, limit, true))
     {
 	u32 total = test.TotalPenalty();
 	if(move_point >= total) return 1;

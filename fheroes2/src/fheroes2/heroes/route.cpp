@@ -51,11 +51,11 @@ void Route::Path::PopFront(void)
 }
 
 /* return length path */
-u16 Route::Path::Calculate(const u16 dst_index, const u16 limit)
+u16 Route::Path::Calculate(const u16 dst_index, const u16 limit, bool revert)
 {
     clear();
 
-    Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, hero.GetLevelSkill(Skill::Secondary::PATHFINDING), hero.GetUnderObject());
+    Algorithm::PathFind(this, (revert ? dst_index : hero.GetIndex()), (revert ? hero.GetIndex() : dst_index), limit, hero.GetLevelSkill(Skill::Secondary::PATHFINDING), hero.GetUnderObject());
 
     dst = dst_index;
 
