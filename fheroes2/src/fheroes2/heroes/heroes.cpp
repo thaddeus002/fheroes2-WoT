@@ -1509,67 +1509,25 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
     return 0;
 }
 
-/* FIXME: algorithm for levelup select secondary skills */
+/* select secondary skills for level up */
 void Heroes::FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const
 {
-    // get skill basic or advanced
-    std::list<Skill::Secondary::skill_t> noexpert_skills;
+    std::vector<Skill::Secondary::skill_t> exclude_skills;
+    exclude_skills.reserve(HEROESMAXSKILL);
+
     std::vector<Skill::Secondary>::const_iterator it1 = secondary_skills.begin();
     std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
-    for(; it1 != it2; ++it1) if((*it1).Level() != Skill::Level::EXPERT) noexpert_skills.push_back((*it1).Skill());
+    for(; it1 != it2; ++it1) if((*it1).Level() == Skill::Level::EXPERT) exclude_skills.push_back((*it1).Skill());
 
-    // get free skills
-    std::list<Skill::Secondary::skill_t> free_skills;
-    free_skills.push_back(Skill::Secondary::PATHFINDING);
-    free_skills.push_back(Skill::Secondary::ARCHERY);
-    free_skills.push_back(Skill::Secondary::LOGISTICS);
-    free_skills.push_back(Skill::Secondary::SCOUTING);
-    free_skills.push_back(Skill::Secondary::DIPLOMACY);
-    free_skills.push_back(Skill::Secondary::NAVIGATION);
-    free_skills.push_back(Skill::Secondary::LEADERSHIP);
-    free_skills.push_back(Skill::Secondary::WISDOM);
-    free_skills.push_back(Skill::Secondary::MYSTICISM);
-    free_skills.push_back(Skill::Secondary::LUCK);
-    free_skills.push_back(Skill::Secondary::BALLISTICS);
-    free_skills.push_back(Skill::Secondary::EAGLEEYE);
-    free_skills.push_back(Skill::Secondary::NECROMANCY);
-    free_skills.push_back(Skill::Secondary::ESTATES);
-    it1 = secondary_skills.begin();
-    it2 = secondary_skills.end();
-    for(; it1 != it2; ++it1) free_skills.remove((*it1).Skill());
+    sec1.SetSkill(Skill::Secondary::PriorityFromRace(GetRace(), exclude_skills));
+    exclude_skills.push_back(sec1.Skill());
+    sec2.SetSkill(Skill::Secondary::PriorityFromRace(GetRace(), exclude_skills));
 
-    // get skills
-    if((noexpert_skills.empty() && 2 <= free_skills.size()) ||
-	secondary_skills.empty())
-    {
-	sec1.SetSkill(*Rand::Get(free_skills));
-	sec1.SetLevel(Skill::Level::BASIC);
-	free_skills.remove(sec1.Skill());
-	sec2.SetSkill(*Rand::Get(free_skills));
-	sec2.SetLevel(Skill::Level::BASIC);
-    }
-    else
-    if(HEROESMAXSKILL == secondary_skills.size() && noexpert_skills.size())
-    {
-	sec1.SetSkill(*Rand::Get(noexpert_skills));
-	sec1.SetLevel(GetLevelSkill(sec1.Skill()));
-	sec1.NextLevel();
-	if(2 <= noexpert_skills.size())
-	{
-	    sec2.SetSkill(*Rand::Get(noexpert_skills));
-	    sec2.SetLevel(GetLevelSkill(sec2.Skill()));
-	    sec2.NextLevel();
-	}
-    }
-    else
-    if(noexpert_skills.size() && free_skills.size())
-    {
-	sec1.SetSkill(*Rand::Get(noexpert_skills));
-	sec1.SetLevel(GetLevelSkill(sec1.Skill()));
-	sec1.NextLevel();
-	sec2.SetSkill(*Rand::Get(free_skills));
-	sec2.SetLevel(Skill::Level::BASIC);
-    }
+    sec1.SetLevel(GetLevelSkill(sec1.Skill()));
+    sec2.SetLevel(GetLevelSkill(sec2.Skill()));
+
+    sec1.NextLevel();
+    sec2.NextLevel();
 }
 
 /* up level */

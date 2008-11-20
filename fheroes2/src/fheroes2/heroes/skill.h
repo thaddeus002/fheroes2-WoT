@@ -22,6 +22,7 @@
 #define H2SKILL_H
 
 #include <string>
+#include <vector>
 #include <utility>
 #include "morale.h"
 #include "luck.h"
@@ -115,6 +116,8 @@ namespace Skill
 	static skill_t 	RandForWitchsHut(void);
 	static const std::string & String(const skill_t skill);
 	static const std::string & Description(const skill_t skill, const Level::type_t level);
+	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t> & exclude);
+	static skill_t PriorityFromRace(const u8 race);
 
 	/* index sprite from SECSKILL */
 	static u8 GetIndexSprite1(const skill_t skill);

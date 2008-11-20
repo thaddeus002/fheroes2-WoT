@@ -453,6 +453,368 @@ const std::string & Skill::Secondary::Description(const skill_t skill, const Lev
 	
 	default: break;
     }
-    
+
     return description_skill[index];
+}
+
+Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race, const std::vector<skill_t> &exclude)
+{
+    if(exclude.empty()) return PriorityFromRace(race);
+    
+    std::vector<skill_t>::const_iterator it1 = exclude.begin();
+    std::vector<skill_t>::const_iterator it2 = exclude.end();
+    Rand::Queue parts(MAXSECONDARYSKILL);
+
+    // primary skill
+    switch(race)
+    {
+	case Race::BARB:
+	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+    	break;
+
+	case Race::KNGT:
+	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(5);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(3);	else	parts.Push(0);
+	    break;
+
+	case Race::NECR:
+	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(0);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(5);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    break;
+
+	case Race::SORC:
+	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    break;
+
+	case Race::WRLK:
+	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(5);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    break;
+
+	case Race::WZRD:
+	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(1);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(5);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(4);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(2);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(3);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
+	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    break;
+
+	default:
+	    Error::Warning("Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
+    }
+
+    switch(parts.Get())
+    {
+	case 0: return PATHFINDING;
+	case 1: return ARCHERY;
+	case 2: return LOGISTICS;
+	case 3: return SCOUTING;
+	case 4: return DIPLOMACY;
+	case 5: return NAVIGATION;
+	case 6: return LEADERSHIP;
+	case 7: return WISDOM;
+	case 8: return MYSTICISM;
+	case 9: return LUCK;
+	case 10: return BALLISTICS;
+	case 11: return EAGLEEYE;
+	case 12: return NECROMANCY;
+	case 13: return ESTATES;
+
+	default: break;
+    }
+
+    Error::Warning("Skill::Secondary::PriorityForRace: unknown result.");
+    return UNKNOWN;
+}
+
+Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race)
+{
+    Rand::Queue parts(MAXSECONDARYSKILL);
+
+    // primary skill
+    switch(race)
+    {
+	case Race::BARB:
+	    // pathfinding
+	    parts.Push(4);
+	    // archery
+	    parts.Push(3);
+	    // logistics
+	    parts.Push(3);
+	    // scouting
+	    parts.Push(4);
+	    // diplomacy
+	    parts.Push(2);
+	    // navigation
+	    parts.Push(3);
+	    // leadership
+	    parts.Push(3);
+	    // wisdom
+	    parts.Push(1);
+	    // mysticism
+	    parts.Push(1);
+	    // luck
+	    parts.Push(2);
+	    // ballistics
+	    parts.Push(3);
+	    // eagleeye
+	    parts.Push(1);
+	    // necromancy
+	    parts.Push(0);
+	    // estates
+	    parts.Push(2);
+    	break;
+
+	case Race::KNGT:
+	    // pathfinding
+	    parts.Push(3);
+	    // archery
+	    parts.Push(2);
+	    // logistics
+	    parts.Push(3);
+	    // scouting
+	    parts.Push(2);
+	    // diplomacy
+	    parts.Push(3);
+	    // navigation
+	    parts.Push(2);
+	    // leadership
+	    parts.Push(5);
+	    // wisdom
+	    parts.Push(2);
+	    // mysticism
+	    parts.Push(1);
+	    // luck
+	    parts.Push(1);
+	    // ballistics
+	    parts.Push(4);
+	    // eagleeye
+	    parts.Push(1);
+	    // necromancy
+	    parts.Push(0);
+	    // estates
+	    parts.Push(3);
+	    break;
+
+	case Race::NECR:
+	    // pathfinding
+	    parts.Push(3);
+	    // archery
+	    parts.Push(1);
+	    // logistics
+	    parts.Push(2);
+	    // scouting
+	    parts.Push(1);
+	    // diplomacy
+	    parts.Push(2);
+	    // navigation
+	    parts.Push(2);
+	    // leadership
+	    parts.Push(0);
+	    // wisdom
+	    parts.Push(4);
+	    // mysticism
+	    parts.Push(3);
+	    // luck
+	    parts.Push(1);
+	    // ballistics
+	    parts.Push(3);
+	    // eagleeye
+	    parts.Push(3);
+	    // necromancy
+	    parts.Push(5);
+	    // estates
+	    parts.Push(2);
+	    break;
+
+	case Race::SORC:
+	    // pathfinding
+	    parts.Push(2);
+	    // archery
+	    parts.Push(3);
+	    // logistics
+	    parts.Push(2);
+	    // scouting
+	    parts.Push(1);
+	    // diplomacy
+	    parts.Push(2);
+	    // navigation
+	    parts.Push(4);
+	    // leadership
+	    parts.Push(1);
+	    // wisdom
+	    parts.Push(4);
+	    // mysticism
+	    parts.Push(3);
+	    // luck
+	    parts.Push(3);
+	    // ballistics
+	    parts.Push(3);
+	    // eagleeye
+	    parts.Push(2);
+	    // necromancy
+	    parts.Push(0);
+	    // estates
+	    parts.Push(2);
+	    break;
+
+	case Race::WRLK:
+	    // pathfinding
+	    parts.Push(2);
+	    // archery
+	    parts.Push(1);
+	    // logistics
+	    parts.Push(2);
+	    // scouting
+	    parts.Push(4);
+	    // diplomacy
+	    parts.Push(2);
+	    // navigation
+	    parts.Push(2);
+	    // leadership
+	    parts.Push(1);
+	    // wisdom
+	    parts.Push(5);
+	    // mysticism
+	    parts.Push(3);
+	    // luck
+	    parts.Push(1);
+	    // ballistics
+	    parts.Push(3);
+	    // eagleeye
+	    parts.Push(3);
+	    // necromancy
+	    parts.Push(1);
+	    // estates
+	    parts.Push(2);
+	    break;
+
+	case Race::WZRD:
+	    // pathfinding
+	    parts.Push(2);
+	    // archery
+	    parts.Push(1);
+	    // logistics
+	    parts.Push(2);
+	    // scouting
+	    parts.Push(2);
+	    // diplomacy
+	    parts.Push(2);
+	    // navigation
+	    parts.Push(2);
+	    // leadership
+	    parts.Push(2);
+	    // wisdom
+	    parts.Push(5);
+	    // mysticism
+	    parts.Push(4);
+	    // luck
+	    parts.Push(2);
+	    // ballistics
+	    parts.Push(3);
+	    // eagleeye
+	    parts.Push(3);
+	    // necromancy
+	    parts.Push(0);
+	    // estates
+	    parts.Push(2);
+	    break;
+
+	default:
+	    Error::Warning("Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
+    }
+
+    switch(parts.Get())
+    {
+	case 0: return PATHFINDING;
+	case 1: return ARCHERY;
+	case 2: return LOGISTICS;
+	case 3: return SCOUTING;
+	case 4: return DIPLOMACY;
+	case 5: return NAVIGATION;
+	case 6: return LEADERSHIP;
+	case 7: return WISDOM;
+	case 8: return MYSTICISM;
+	case 9: return LUCK;
+	case 10: return BALLISTICS;
+	case 11: return EAGLEEYE;
+	case 12: return NECROMANCY;
+	case 13: return ESTATES;
+
+	default: break;
+    }
+
+    Error::Warning("Skill::Secondary::PriorityForRace: unknown result.");
+    return UNKNOWN;
 }
