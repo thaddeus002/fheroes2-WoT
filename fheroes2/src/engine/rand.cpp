@@ -20,9 +20,44 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <iterator>
 #include "rand.h"
 
 
 void Rand::Init(void){ std::srand((u32) std::time(0)); }
 
 u32 Rand::Get(u32 min, u32 max){ return max ? min + (std::rand() % (max - min + 1)) : std::rand() % (min + 1); }
+
+Rand::Queue::Queue(const u8 size) : max(0)
+{
+    reserve(size);
+}
+
+void Rand::Queue::Reset(void)
+{
+    max = 0;
+    clear();
+}
+
+void Rand::Queue::Push(const u8 quote)
+{
+    push_back(quote);
+    max += quote;
+}
+
+size_t Rand::Queue::Get(void) const
+{
+    const u8 value = Rand::Get(1, max);
+    u8 amount = 0;
+
+    const_iterator it1 = begin();
+    const_iterator it2 = end();
+
+    for(; it1 != it2; ++it1)
+    {
+        amount += *it1;
+        if(value <= amount) break;
+    }
+
+    return std::distance(begin(), it1);
+}

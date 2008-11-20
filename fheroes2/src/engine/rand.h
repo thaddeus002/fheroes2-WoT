@@ -48,6 +48,19 @@ namespace Rand
 
         return & (*it);
     };
+
+    class Queue : private std::vector<u8>
+    {
+    public:
+	Queue(const u8 size = 0);
+
+	void Reset(void);
+	void Push(const u8 quote);
+	size_t Get(void) const;
+
+    private:
+	u16 max;
+    };
 };
    
 #endif
