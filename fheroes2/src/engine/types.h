@@ -31,8 +31,8 @@ typedef uint16_t	u16;
 typedef int32_t		s32;
 typedef uint32_t	u32;
 
-#define MAXU16   65535
-#define MAXU32   4294967295
+#define MAXU16   0xFFFF
+#define MAXU32   0xFFFFFFFF
 
 #if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__)
 #define SEPARATOR       '\\'
