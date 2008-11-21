@@ -37,8 +37,10 @@
 #include "dialog.h"
 #include "game.h"
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
 {
+    const Army::BattleTroop & army(basicArmy);
+
     Display & display = Display::Get();
 
     const ICN::icn_t viewarmy = H2Config::EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
@@ -251,7 +253,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troops & army, bool dismiss, bool 
         
     u16 animat = 0;
     Point anim_rt(pos_rt.x + 100, pos_rt.y + 180);
-    Army::Troops troop(army.Monster(), 0);
+    Army::BattleTroop troop(army.Monster(), 0);
     troop.astate = Monster::AS_NONE;
     troop.aframe = 0;
     troop.Blit(anim_rt);

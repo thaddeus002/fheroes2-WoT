@@ -256,8 +256,8 @@ Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     MinimizeAreaMapsID();
     
     // set master primary skill to army
-    std::vector<Army::Troops>::iterator it1 = army.begin();
-    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    Army::army_t::iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
     for(; it1 != it2; ++it1) (*it1).SetMasterSkill(&captain);
 
     // init captain

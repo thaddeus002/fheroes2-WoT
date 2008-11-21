@@ -411,19 +411,19 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = Monster::GetSize(tile);
-    std::vector<Army::Troops> army(5);
+    Army::army_t army(5);
     if(count > 5)
     {
 	const s16 c = count / 5;
-	army[0] = Army::Troops(monster, c);
-	army[1] = Army::Troops(monster, c);
-	army[2] = Army::Troops(monster, c + count - (c * 5));
-	army[3] = Army::Troops(monster, c);
-	army[4] = Army::Troops(monster, c);
+	army[0] = Army::Troop(monster, c);
+	army[1] = Army::Troop(monster, c);
+	army[2] = Army::Troop(monster, c + count - (c * 5));
+	army[3] = Army::Troop(monster, c);
+	army[4] = Army::Troop(monster, c);
     }
     else
     {
-	army[0] = Army::Troops(monster, count);
+	army[0] = Army::Troop(monster, count);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
@@ -462,8 +462,8 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 	    if(!Settings::Get().Original())
 	    {
 		u16 c = 0;
-		std::vector<Army::Troops>::const_iterator it1 = army.begin();
-		std::vector<Army::Troops>::const_iterator it2 = army.end();
+		Army::army_t::const_iterator it1 = army.begin();
+		Army::army_t::const_iterator it2 = army.end();
 		for(; it1 != it2; ++it1) if((*it1).isValid()) c+= (*it1).Count();
 	        tile.SetCountMonster(c);
 	    }
@@ -979,7 +979,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You come upon the pyramid of a great and ancient king.", "You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians. Will you search?", Font::BIG, Dialog::OK))
 		{
 		    // battle
-		    std::vector<Army::Troops> army(5);
+		    Army::army_t army(5);
 		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
 		    army.at(0).Set(Monster::LORD_VAMPIRE, 10);
 		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
@@ -1160,7 +1160,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("You tentatively approach the burial ground of ancient warriors.", "Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
-		    std::vector<Army::Troops> army(5);
+		    Army::army_t army(5);
 		    army.at(0).Set(Monster::MUTANT_ZOMBIE, 20);
 		    army.at(1).Set(Monster::MUTANT_ZOMBIE, 20);
 		    army.at(2).Set(Monster::MUTANT_ZOMBIE, 20);
@@ -1206,7 +1206,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		PlaySoundWarning;
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the shipwreck?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
-		    std::vector<Army::Troops> army(5);
+		    Army::army_t army(5);
 		    Resource::funds_t resource;
 		    Artifact::artifact_t art = Artifact::UNKNOWN;
 		    u8 c = 1;
@@ -1278,7 +1278,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		PlaySoundWarning;
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
-		    std::vector<Army::Troops> army(5);
+		    Army::army_t army(5);
 		    army.at(0).Set(Monster::SKELETON, 20);
 		    army.at(1).Set(Monster::SKELETON, 20);
 		    army.at(2).Set(Monster::SKELETON, 20);
@@ -1553,7 +1553,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 						    (10== c ? Monster::PHOENIX :
 						    (11== c ? Monster::GREEN_DRAGON :
 						    (12== c ? Monster::TITAN : Monster::BONE_DRAGON )))))));
-		    std::vector<Army::Troops> army(1);
+		    Army::army_t army(1);
 		    army.at(0).Set(mons, count);
 
 		    PlaySoundWarning;
@@ -1792,7 +1792,7 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     {
 	PlaySoundWarning;
 	Dialog::Message("A whirlpool engulfs your ship.", "Some of your army has fallen overboard.", Font::BIG, Dialog::OK);
-	Army::Troops & troops = hero.GetWeakestArmy();
+	Army::Troop & troops = hero.GetWeakestArmy();
 	const u16 c = troops.Count() / 2;
 	troops.SetCount(c ? c : 1);
     }
@@ -1806,7 +1806,7 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
     PlaySoundWarning;
     if(Dialog::YES == Dialog::Message("You come upon an abandoned gold mine.", "The mine appears to be haunted. Do you wish to enter?", Font::BIG, Dialog::YES | Dialog::NO))
     {
-	std::vector<Army::Troops> army(5);
+	Army::army_t army(5);
 	army.at(0).Set(Monster::GHOST, tile.GetQuantity1());
 	army.at(1).Set(Monster::GHOST, tile.GetQuantity1());
 	army.at(2).Set(Monster::GHOST, tile.GetQuantity1());
@@ -2133,7 +2133,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    }
 	    else
 	    {
-		std::vector<Army::Troops> army(5);
+		Army::army_t army(5);
 		army.at(0).Set(Monster::ZOMBIE, 20);
 		army.at(1).Set(Monster::LORD_VAMPIRE, 5);
 		army.at(2).Set(Monster::POWER_LICH, 5);
@@ -2185,7 +2185,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    }
 	    else
 	    {
-		std::vector<Army::Troops> army(5);
+		Army::army_t army(5);
 		army.at(0).Set(Monster::WAR_TROLL, 4);
 		army.at(1).Set(Monster::TROLL, 4);
 		army.at(2).Set(Monster::TROLL, 4);
@@ -2237,7 +2237,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    }
 	    else
 	    {
-		std::vector<Army::Troops> army(3);
+		Army::army_t army(3);
 		army.at(0).Set(Monster::GREEN_DRAGON, 3);
 		army.at(1).Set(Monster::RED_DRAGON, 2);
 		army.at(2).Set(Monster::BLACK_DRAGON, 1);

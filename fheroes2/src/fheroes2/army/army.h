@@ -49,35 +49,43 @@ namespace Army
 	LEGION	= 1000
     } size_t;
 
-    bool PredicateStrongestTroops(const Troops & t1, const Troops & t2);
-    bool PredicateWeakestTroops(const Troops & t1, const Troops & t2);
-    bool PredicateSlowestTroops(const Troops & t1, const Troops & t2);
-    bool PredicateHighestTroops(const Troops & t1, const Troops & t2);
-
     const std::string & String(size_t size);
     size_t GetSize(u16 count);
 
-    class Troops
+    class Troop
+    {
+        public:
+            Troop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
+            
+            void Set(Monster::monster_t m, u16 c){ monster = m; count = c; };
+            void SetMonster(Monster::monster_t m){ monster = m; };
+            void SetCount(u16 c){ count = c; };
+            
+            const Skill::Primary* MasterSkill(void) const{ return master_skill; };
+            void SetMasterSkill(const Skill::Primary* p){ master_skill = p; };
+            
+            Monster::monster_t Monster(void) const{ return monster; };
+            u16 Count(void) const{ return count; };
+            
+            bool isValid(void) const;
+            
+            static bool PredicateIsValid(const Troop & t);
+            
+        protected:
+            Monster::monster_t monster;
+            u16 count;
+            const Skill::Primary* master_skill;
+    };
+
+    class BattleTroop : public Troop
     {
     public:
-	Troops(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0) : 
-	    attackRanged(false), summoned(false), monster(m), count(c), 
-            master_skill(NULL) {};
-	Troops(const Troops & troops);
+	BattleTroop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
+	BattleTroop(const BattleTroop & troop);
+        BattleTroop(const Troop & troop);
 
-        void Set(Monster::monster_t m, u16 c){ monster = m; count = c; };
-        void SetMonster(Monster::monster_t m){ monster = m; };
-        void SetCount(u16 c){ count = c; };
-        void SetMasterSkill(const Skill::Primary* p){ master_skill = p; };
-	Troops & operator= (const Troops & troops);
-
-        static bool PredicateIsValid(const Troops & t);
-
-        bool isValid(void) const;
-
-        Monster::monster_t Monster(void) const{ return monster; };
-        u16 Count(void) const{ return count; };
-        const Skill::Primary* MasterSkill(void) const{ return master_skill; };
+	BattleTroop & operator= (const BattleTroop & troops);
+        BattleTroop & operator= (const Troop & troops);
 	
 	void SetPosition(const Point & pt) { pos = pt; };
 	const Point& Position() const { return pos; };
@@ -114,9 +122,6 @@ namespace Army
 	bool                    summoned;
 
     private:
-        Monster::monster_t	monster;
-        u16			count;
-        const Skill::Primary*	master_skill;
 	Point                   pos;
 	Background bg;
 	bool saved;
@@ -125,12 +130,20 @@ namespace Army
 	std::vector<Spell::magic_t> magics;
     };
 
-    bool isValid(const Troops & army);
+    bool isValid(const Troop & troop);
+
+    bool PredicateStrongestTroop(const Troop & t1, const Troop & t2);
+    bool PredicateWeakestTroop(const Troop & t1, const Troop & t2);
+    bool PredicateSlowestTroop(const Troop & t1, const Troop & t2);
+    bool PredicateFastestTroop(const Troop & t1, const Troop & t2);
+
+    typedef std::vector<BattleTroop> BattleArmy_t;
+    typedef std::vector<Troop> army_t;
 
     class SelectBar
     {
     public:
-	SelectBar(const Point & pos, const std::vector<Troops> & troops);
+	SelectBar(const Point & pos, const army_t & troops);
 
 	bool isSelected(void) const{ return selected; };
 
@@ -147,14 +160,12 @@ namespace Army
 	const Surface & empty_back;
 	const u8 step;
 	SpriteCursor cursor;
-	const std::vector<Troops> & army;
+	const army_t & army;
 	bool selected;
 	u8 cursor_index;
 	
 	std::vector<Rect> coords;
     };
-
-    typedef std::vector<Troops> army_t;
 };
 
 #endif

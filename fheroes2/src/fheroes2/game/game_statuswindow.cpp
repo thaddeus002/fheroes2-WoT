@@ -164,11 +164,11 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
 
     if(Game::Focus::UNSEL == focus.Type()) return;
 
-    const std::vector<Army::Troops> & armies = (Game::Focus::HEROES == focus.Type() ? focus.GetHeroes().GetArmy() : focus.GetCastle().GetArmy());
+    const Army::army_t & armies = (Game::Focus::HEROES == focus.Type() ? focus.GetHeroes().GetArmy() : focus.GetCastle().GetArmy());
     Display & display = Display::Get();
 
     // valid count army
-    u16 count = std::count_if(armies.begin(), armies.end(), Army::Troops::PredicateIsValid);
+    u16 count = std::count_if(armies.begin(), armies.end(), Army::isValid);
 
     Point dst_pt;
     u8 current = 0;

@@ -288,7 +288,7 @@ u8 Spell::GetIndexSprite(spell_t spell)
     return Spell::all_spells[spell].sprite;
 }
 
-bool Spell::AllowSpell(spell_t spell, const Army::Troops &troop)
+bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
 {
     target_t target = Target(spell);
     if(troop.Monster() == Monster::DWARF || troop.Monster() == Monster::BATTLE_DWARF) {
@@ -369,7 +369,7 @@ bool Spell::AllowSpell(spell_t spell, const Army::Troops &troop)
     }
 }
 
-void Spell::ApplySpell(int spower, spell_t spell, Army::Troops &troop)
+void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
 {
     //Dialog::Message("apply spell", Spell::String(spell), Font::BIG, Dialog::OK);
     magic_t magic;

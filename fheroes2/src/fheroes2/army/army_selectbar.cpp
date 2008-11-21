@@ -27,7 +27,7 @@
 #include "display.h"
 #include "army.h"
 
-Army::SelectBar::SelectBar(const Point & pos, const std::vector<Troops> & troops)
+Army::SelectBar::SelectBar(const Point & pos, const Army::army_t & troops)
     : pos_pt(pos), empty_back(AGG::GetICN(ICN::STRIP, 2)), step(6), cursor(AGG::GetICN(ICN::STRIP, 1), pos),
     army(troops), selected(false), cursor_index(0xFF), coords(army.size())
 {

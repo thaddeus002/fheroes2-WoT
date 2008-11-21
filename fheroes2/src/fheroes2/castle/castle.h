@@ -101,7 +101,7 @@ public:
     const std::string & GetName(void) const{ return name; };
     u8 GetLevelMageGuild(void);
 
-    const std::vector<Army::Troops> & GetArmy(void) const{ return army; }; 
+    const Army::army_t & GetArmy(void) const{ return army; }; 
     u8 GetCountArmy(void) const;
     u16 GetDwellingLivedCount(building_t dw);
 
@@ -168,7 +168,7 @@ private:
     bool		present_boat;
     MageGuild		mageguild;
     std::vector<u16>    dwelling;
-    std::vector<Army::Troops> army;
+    Army::army_t        army;
     Heroes * 		castle_heroes;
 
     Captain		captain;

@@ -616,7 +616,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		// show dialog army info
 		if(selectHeroesTroops.isSelected() && Army::isValid(army[ii]) && selectHeroesTroops.GetCursorIndex() == ii)
 		{
-		    Army::Troops & select_troops = army[ii];
+		    Army::Troop & select_troops = army[ii];
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = world.GetMyKingdom();
@@ -651,7 +651,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		    if(! readonly)
 		    {
 			// from castle or heroes
-			Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
+			Army::Troop & select_troops = army[selectHeroesTroops.GetCursorIndex()];
 			const Monster::monster_t select_monster = select_troops.Monster();
 			const u16 select_count = select_troops.Count();
 
@@ -721,7 +721,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    {
 		cursor.Hide();
 
-		Army::Troops & select_troops = army[selectHeroesTroops.GetCursorIndex()];
+		Army::Troop & select_troops = army[selectHeroesTroops.GetCursorIndex()];
 
 		if(const u16 redistr_count = Dialog::SelectCount(select_troops.Count()))
 		{

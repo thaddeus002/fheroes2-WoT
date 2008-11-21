@@ -290,7 +290,7 @@ void Dialog::QuickInfo(const Castle & castle)
     {
         // draw in one string
         u8 current = 0;
-	const std::vector<Army::Troops> & army = castle.GetArmy();
+	const Army::army_t & army = castle.GetArmy();
 
 	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
         {
@@ -473,7 +473,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     // draw monster sprite in one string
     u8 current = 0;
-    const std::vector<Army::Troops> & army = hero.GetArmy();
+    const Army::army_t & army = hero.GetArmy();
 
     for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
     {

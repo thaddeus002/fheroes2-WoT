@@ -365,7 +365,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		// show dialog army info
 		if(selectCastleTroops.isSelected() && Army::isValid(army[ii]) && selectCastleTroops.GetCursorIndex() == ii)
 		{
-		    Army::Troops & select_troops = army[ii];
+		    Army::Troop & select_troops = army[ii];
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = world.GetMyKingdom();
@@ -399,8 +399,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		if(selectCastleTroops.isSelected() || (castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected()))
 		{
 		    // from castle or castle_heroes
-		    Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
-			const_cast<std::vector<Army::Troops> &>((*castle_heroes).GetArmy())[selectHeroesTroops->GetCursorIndex()] );
+		    Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
+			const_cast<Army::army_t &>((*castle_heroes).GetArmy())[selectHeroesTroops->GetCursorIndex()] );
 
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
@@ -470,8 +470,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-		Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
-		    const_cast<std::vector<Army::Troops> &>((*castle_heroes).GetArmy())[selectHeroesTroops->GetCursorIndex()] );
+		Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
+		    const_cast<Army::army_t &>((*castle_heroes).GetArmy())[selectHeroesTroops->GetCursorIndex()] );
 
 		if(const u16 redistr_count = Dialog::SelectCount(select_troops.Count()))
 		{
@@ -512,7 +512,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// castle_heroes troops
 	if(castle_heroes)
 	{
-	    std::vector<Army::Troops> & army2 = const_cast<std::vector<Army::Troops> &>((*castle_heroes).GetArmy());
+	    Army::army_t & army2 = const_cast<Army::army_t &>((*castle_heroes).GetArmy());
 
 	    for(u8 ii = 0; ii < coordsHeroesTroops->size(); ++ii)
 		if(coordsHeroesTroops && le.MouseClickLeft(coordsHeroesTroops->at(ii)))
@@ -522,7 +522,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		// show dialog army info
 		if(selectHeroesTroops && selectHeroesTroops->isSelected() && Army::isValid(army2[ii]) && selectHeroesTroops->GetCursorIndex() == ii)
 		{
-		    Army::Troops & select_troops = army2[ii];
+		    Army::Troop & select_troops = army2[ii];
 		    const Monster::monster_t select_monster = select_troops.Monster();
 		    const u16 select_count = select_troops.Count();
 		    Kingdom & kingdom = world.GetMyKingdom();
@@ -556,7 +556,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		if(selectHeroesTroops && (selectHeroesTroops->isSelected() || selectCastleTroops.isSelected()))
 		{
 		    // from castle or castle_heroes
-		    Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
+		    Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
 			army2[selectHeroesTroops->GetCursorIndex()] );
 
 		    const Monster::monster_t select_monster = select_troops.Monster();
@@ -621,7 +621,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-		Army::Troops & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
+		Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
 		    army2[selectHeroesTroops->GetCursorIndex()] );
 
 		if(const u16 redistr_count = Dialog::SelectCount(select_troops.Count()))
@@ -1165,7 +1165,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    le.MouseCursor(coordsHeroesTroops->at(4))))
 	{
 	    const u8 heroes_select = selectHeroesTroops->GetCursorIndex();
-	    const std::vector<Army::Troops> & army2 = (*castle_heroes).GetArmy();
+	    const Army::army_t & army2 = (*castle_heroes).GetArmy();
 
 	    for(u8 ii = 0; ii < coordsHeroesTroops->size(); ++ii) if(le.MouseCursor(coordsHeroesTroops->at(ii)))
 	    {

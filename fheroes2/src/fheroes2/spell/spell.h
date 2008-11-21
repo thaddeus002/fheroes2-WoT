@@ -28,7 +28,7 @@
 #include "monster.h"
 
 namespace Army {
-    class Troops;
+    class BattleTroop;
 }
 
 namespace Spell
@@ -151,8 +151,8 @@ namespace Spell
     spell_t RandCombat(const u8 lvl);
     spell_t RandAdventure(const u8 lvl);
     
-    bool AllowSpell(spell_t spell, const Army::Troops &troop);
-    void ApplySpell(int spower, spell_t spell, Army::Troops &troop);
+    bool AllowSpell(spell_t spell, const Army::BattleTroop &troop);
+    void ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop);
     spell_t TroopAttack(Monster::monster_t monster);
 };
 

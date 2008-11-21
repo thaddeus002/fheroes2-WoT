@@ -64,58 +64,83 @@ Army::size_t Army::GetSize(u16 count)
     return FEW;
 }
 
-Army::Troops::Troops(const Army::Troops & troops)
-: astate(troops.astate)
-, aframe(troops.aframe)
-, attackRanged(troops.attackRanged)
-, shots(troops.shots)
-, hp(troops.hp)
-, oldcount(troops.oldcount)
-, summoned(troops.summoned)
-, monster(troops.Monster())
-, count(troops.Count())
+Army::Troop::Troop(Monster::monster_t m, u16 c)
+: monster(m)
+, count(c)
 , master_skill(NULL)
-, pos(troops.Position())
-, saved(false)
-, reflect(troops.reflect)
-, origReflect(troops.origReflect)
 {
 }
 
-Army::Troops & Army::Troops::operator= (const Army::Troops & troops)
+/*Army::Troop &Army::Troop::operator=(const Troop &t)
 {
-    astate = troops.astate;
-    aframe = troops.aframe;
-    attackRanged = troops.attackRanged;
-    shots = troops.shots;
-    hp = troops.hp;
-    oldcount = troops.oldcount;
-    summoned = troops.summoned;
-    monster = troops.Monster();
-    count = troops.Count();
-    pos = troops.Position();
-    reflect = troops.reflect;
-    origReflect = troops.origReflect;
+  monster = t.monster;
+  count = t.count;
+  return *this;
+}*/
+
+Army::BattleTroop::BattleTroop(const Troop &t)
+: Troop(t)
+{
+}
+
+Army::BattleTroop::BattleTroop(Monster::monster_t m, u16 c)
+: Troop(m, c)
+, attackRanged(false)
+, summoned(false)
+{
+}
+
+Army::BattleTroop::BattleTroop(const Army::BattleTroop & troop)
+: Troop(troop)
+, astate(troop.astate)
+, aframe(troop.aframe)
+, attackRanged(troop.attackRanged)
+, shots(troop.shots)
+, hp(troop.hp)
+, oldcount(troop.oldcount)
+, summoned(troop.summoned)
+, pos(troop.Position())
+, saved(false)
+, reflect(troop.reflect)
+, origReflect(troop.origReflect)
+{
+}
+
+Army::BattleTroop & Army::BattleTroop::operator= (const Army::BattleTroop & troop)
+{
+    astate = troop.astate;
+    aframe = troop.aframe;
+    attackRanged = troop.attackRanged;
+    shots = troop.shots;
+    hp = troop.hp;
+    oldcount = troop.oldcount;
+    summoned = troop.summoned;
+    monster = troop.Monster();
+    count = troop.Count();
+    pos = troop.Position();
+    reflect = troop.reflect;
+    origReflect = troop.origReflect;
 
     return *this;
 }
 
-bool Army::Troops::PredicateIsValid(const Army::Troops & t)
+Army::BattleTroop & Army::BattleTroop::operator= (const Army::Troop & troop)
 {
-    return Monster::UNKNOWN > t.Monster() && t.Count();
+    Troop::operator=(troop);
+    return *this;
 }
 
-bool Army::Troops::isValid(void) const
+bool Army::Troop::isValid(void) const
 {
     return Monster::UNKNOWN > monster && count;
 }
 
-bool Army::isValid(const Troops & army)
+bool Army::isValid(const Troop & army)
 {
     return army.isValid();
 }
 
-void Army::Troops::BlitR(const Point& dst_pt, bool reflect, int frame)
+void Army::BattleTroop::BlitR(const Point& dst_pt, bool reflect, int frame)
 {
     Display & display = Display::Get();
     if(saved) bg.Restore();
@@ -126,7 +151,7 @@ void Army::Troops::BlitR(const Point& dst_pt, bool reflect, int frame)
     display.Blit(sp, p);
 }
 
-void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
+void Army::BattleTroop::Blit(const Point& dst_pt, bool reflect, int frame)
 {
     Display & display = Display::Get();
     const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
@@ -136,7 +161,7 @@ void Army::Troops::Blit(const Point& dst_pt, bool reflect, int frame)
     display.Blit(sp, p);
 }
 
-void Army::Troops::Animate(Monster::animstate_t as)
+void Army::BattleTroop::Animate(Monster::animstate_t as)
 {
     bool ranged = attackRanged && Monster::GetStats(monster).miss_icn != ICN::UNKNOWN;
     u8 start, count;
@@ -163,7 +188,7 @@ void Army::Troops::Animate(Monster::animstate_t as)
     }
 }
 
-int Army::Troops::ApplyDamage(int damage)
+int Army::BattleTroop::ApplyDamage(int damage)
 {
     int perished = 0;
     while(damage >= hp)
@@ -179,13 +204,13 @@ int Army::Troops::ApplyDamage(int damage)
     return perished;
 }
 
-void Army::Troops::SetMagic(Spell::magic_t &magic)
+void Army::BattleTroop::SetMagic(Spell::magic_t &magic)
 {
     //Dialog::Message("set magic", Spell::String(magic.spell), Font::BIG, Dialog::OK);
     magics.push_back(magic);
 }
 
-bool Army::Troops::FindMagic(Spell::spell_t spell) const
+bool Army::BattleTroop::FindMagic(Spell::spell_t spell) const
 {
     for(u16 i=0; i<magics.size(); i++) {
 	if(spell == magics[i].spell) return true;
@@ -193,7 +218,7 @@ bool Army::Troops::FindMagic(Spell::spell_t spell) const
     return false;
 }
 
-void Army::Troops::RemoveMagic(Spell::spell_t spell)
+void Army::BattleTroop::RemoveMagic(Spell::spell_t spell)
 {
     for(u16 i=0; i<magics.size(); i++) {
 	if(spell == magics[i].spell) {
@@ -203,12 +228,12 @@ void Army::Troops::RemoveMagic(Spell::spell_t spell)
     }
 }
 
-void Army::Troops::ClearMagic()
+void Army::BattleTroop::ClearMagic()
 {
     magics.clear();
 }
 
-void Army::Troops::ProceedMagic()
+void Army::BattleTroop::ProceedMagic()
 {
     for(u16 i=0; i<magics.size(); i++) {
 	magics[i].duration --;
@@ -219,22 +244,22 @@ void Army::Troops::ProceedMagic()
     }
 }
 
-bool Army::PredicateStrongestTroops(const Troops & t1, const Troops & t2)
+bool Army::PredicateStrongestTroop(const Troop & t1, const Troop & t2)
 {
     return t1.isValid() && t2.isValid() && (Monster::GetStats(t1.Monster()).damageMin > Monster::GetStats(t2.Monster()).damageMin);
 }
 
-bool Army::PredicateWeakestTroops(const Troops & t1, const Troops & t2)
+bool Army::PredicateWeakestTroop(const Troop & t1, const Troop & t2)
 {
     return t1.isValid() && t2.isValid() && (Monster::GetStats(t1.Monster()).damageMin < Monster::GetStats(t2.Monster()).damageMin);
 }
 
-bool Army::PredicateSlowestTroops(const Troops & t1, const Troops & t2)
-{
+bool Army::PredicateSlowestTroop(const Troop & t1, const Troop & t2)
+  {
     return t1.isValid() && t2.isValid() && (Monster::GetStats(t1.Monster()).speed < Monster::GetStats(t2.Monster()).speed);
 }
 
-bool Army::PredicateHighestTroops(const Troops & t1, const Troops & t2)
+bool Army::PredicateFastestTroop(const Troop & t1, const Troop & t2)
 {
     return t1.isValid() && t2.isValid() && (Monster::GetStats(t1.Monster()).speed > Monster::GetStats(t2.Monster()).speed);
 }

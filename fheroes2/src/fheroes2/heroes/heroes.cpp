@@ -126,8 +126,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     army[0].Set(monster.monster, monster.grown);
 
     // set master primary skill to army
-    std::vector<Army::Troops>::iterator it1 = army.begin();
-    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    Army::army_t::iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
     for(; it1 != it2; ++it1) (*it1).SetMasterSkill(this);
 
     // extra hero
@@ -870,8 +870,8 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     }
 
     // different race penalty
-    std::vector<Army::Troops>::const_iterator it1_army = army.begin();
-    std::vector<Army::Troops>::const_iterator it2_army = army.end();
+    Army::army_t::const_iterator it1_army = army.begin();
+    Army::army_t::const_iterator it2_army = army.end();
     u8 count = 0;
     u8 count_kngt = 0;
     u8 count_barb = 0;
@@ -1657,8 +1657,8 @@ bool Heroes::ApplyPenaltyMovement(void)
 /*  true if present monster */
 bool Heroes::HasMonster(const Monster::monster_t mon) const
 {
-    std::vector<Army::Troops>::const_iterator it1 = army.begin();
-    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    Army::army_t::const_iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
     
     for(; it1 != it2; it1++) if(mon == (*it1).Monster()) return true;
 
@@ -1667,8 +1667,8 @@ bool Heroes::HasMonster(const Monster::monster_t mon) const
 
 bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
 {
-    std::vector<Army::Troops>::iterator it1 = army.begin();
-    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    Army::army_t::iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
     
     for(; it1 != it2; it1++) if(mon == (*it1).Monster())
     {
@@ -1696,50 +1696,50 @@ bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
     return false;
 }
 
-Army::Troops & Heroes::GetSlowestArmy(void)
+Army::Troop & Heroes::GetSlowestArmy(void)
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroop);
 }
 
-Army::Troops & Heroes::GetHighestArmy(void)
+Army::Troop & Heroes::GetFastestArmy(void)
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateHighestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateFastestTroop);
 }
 
-Army::Troops & Heroes::GetStrongestArmy(void)
+Army::Troop & Heroes::GetStrongestArmy(void)
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroop);
 }
 
-Army::Troops & Heroes::GetWeakestArmy(void)
+Army::Troop & Heroes::GetWeakestArmy(void)
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroop);
 }
 
-const Army::Troops & Heroes::GetSlowestArmy(void) const
+const Army::Troop & Heroes::GetSlowestArmy(void) const
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroop);
 }
 
-const Army::Troops & Heroes::GetHighestArmy(void) const
+const Army::Troop & Heroes::GetFastestArmy(void) const
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateHighestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateFastestTroop);
 }
 
-const Army::Troops & Heroes::GetStrongestArmy(void) const
+const Army::Troop & Heroes::GetStrongestArmy(void) const
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroop);
 }
 
-const Army::Troops & Heroes::GetWeakestArmy(void) const
+const Army::Troop & Heroes::GetWeakestArmy(void) const
 {
-    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroops);
+    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroop);
 }
 
 Race::race_t Heroes::GetRaceArmy(void) const
 {
-    std::vector<Army::Troops>::const_iterator it1 = army.begin();
-    std::vector<Army::Troops>::const_iterator it2 = army.end();
+    Army::army_t::const_iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
     std::vector<Race::race_t> races;
     races.reserve(HEROESMAXARMY);
 

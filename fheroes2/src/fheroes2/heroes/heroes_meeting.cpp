@@ -64,11 +64,11 @@ namespace
       typedef std::vector<SelectableRect<T> > Type;
     };
     
-    typedef SelectableRectList<Army::Troops>::Type ArmyList;
+    typedef SelectableRectList<Army::Troop>::Type ArmyList;
     typedef SelectableRectList<Artifact::artifact_t>::Type ArtifactList;
 }
 
-static void PrepareArmy(std::vector<Army::Troops> &army, const Point &p, ArmyList &coords);
+static void PrepareArmy(Army::army_t &army, const Point &p, ArmyList &coords);
 static void PrepareArtifacts(std::vector<Artifact::artifact_t> &artifacts, const Point &p, ArtifactList &coords);
 static void RedrawArmy(const ArmyList &coords);
 static void RedrawArtifacts(const ArtifactList &coords);
@@ -259,7 +259,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
                 {
                     //TODO: Splitting troops
                     DeselectList<Artifact::artifact_t>(artifactCoords);
-                    PerformAction<Army::Troops>(armyCoords[i][j], armyCoords);
+                    PerformAction<Army::Troop>(armyCoords[i][j], armyCoords);
                     updateScreen = true;
                     break;
                 }
@@ -268,7 +268,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
             for(u16 j = 0; j < artifactCoords[i].size(); j++)
                 if(le.MouseClickLeft(artifactCoords[i][j].selectable))
                 {
-                    DeselectList<Army::Troops>(armyCoords);
+                    DeselectList<Army::Troop>(armyCoords);
                     PerformAction<Artifact::artifact_t>(artifactCoords[i][j], artifactCoords);
                     updateScreen = true;
                     break;
@@ -286,11 +286,11 @@ void Heroes::MeetingDialog(Heroes & heroes2)
         }
     }
     
-    std::vector<Army::Troops> newArmy[2];
+    Army::army_t newArmy[2];
     std::vector<Artifact::artifact_t> newArtifacts[2];
     for(int i = 0; i < 2; i++)
     {
-        RecreateListsFromSelectable<Army::Troops>(armyCoords[i], newArmy[i]);
+        RecreateListsFromSelectable<Army::Troop>(armyCoords[i], newArmy[i]);
         RecreateListsFromSelectable<Artifact::artifact_t>(artifactCoords[i], newArtifacts[i]);
     }
     army.swap(newArmy[0]);
@@ -372,7 +372,7 @@ static void RedrawArmy(const ArmyList &army)
     {
         if(army[ii].object->isValid())
         {
-            const Army::Troops &troop = *army[ii].object;
+            const Army::Troop &troop = *army[ii].object;
             const Sprite & sprite = AGG::GetICN(ICN::MONS32, troop.Monster());
             const Rect &select = army[ii].selectable;
             RedrawItem(&sprite, army[ii].displayable, select, 20, army[ii].selected);
@@ -409,7 +409,7 @@ static void RedrawArtifacts(const ArtifactList &artifacts)
  *  \param[in]  pt       Starting point at which to display the troop pictures
  *  \param[out] coords  List of SelectableRect objects encapsulating each troop object
  */
-static void PrepareArmy(std::vector<Army::Troops> &army, const Point &pt, ArmyList &coords)
+static void PrepareArmy(Army::army_t &army, const Point &pt, ArmyList &coords)
 {
     for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
     {
@@ -420,13 +420,13 @@ static void PrepareArmy(std::vector<Army::Troops> &army, const Point &pt, ArmyLi
 	    const u16 oy = pt.y + 40 - sprite.h();
             Rect select(ox - (44 - sprite.w()) / 2, pt.y, 43, 43);
             Rect display(Point(ox, oy), sprite.w(), sprite.h());
-            coords.push_back(SelectableRect<Army::Troops>(select, display, &army[ii], army));
+            coords.push_back(SelectableRect<Army::Troop>(select, display, &army[ii], army));
 	}
         else
         {
             Rect select(pt.x + ii * 45, pt.y, 43, 43);
             Rect display(select);
-            coords.push_back(SelectableRect<Army::Troops>(select, display, &army[ii], army));
+            coords.push_back(SelectableRect<Army::Troop>(select, display, &army[ii], army));
         }
     }
 }
@@ -485,7 +485,7 @@ static SelectableRect<T> *GetSelectedListElement(std::vector<SelectableRect<T> >
  *  \param picked Chosen object
  */
 template <>
-static bool IsActionValid<Army::Troops>(SelectableRect<Army::Troops> &picked)
+static bool IsActionValid<Army::Troop>(SelectableRect<Army::Troop> &picked)
 {
     if(!picked.object->isValid())
         return false;
@@ -559,11 +559,11 @@ static void RecalcDisplayable<Artifact::artifact_t>(SelectableRect<Artifact::art
  *  \param item Item containing newly-swapped object
  */
 template<>
-static void RecalcDisplayable<Army::Troops>(SelectableRect<Army::Troops> &item)
+static void RecalcDisplayable<Army::Troop>(SelectableRect<Army::Troop> &item)
 {
     if(item.object)
     {
-        Army::Troops &troop = *item.object;
+        Army::Troop &troop = *item.object;
         const Sprite & sprite = AGG::GetICN(ICN::MONS32, troop.Monster());
         item.displayable = Rect(item.selectable.x + (44 - sprite.w()) / 2,
                                 item.selectable.y + 40 - sprite.h(),
