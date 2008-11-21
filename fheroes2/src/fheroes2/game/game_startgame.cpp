@@ -1168,10 +1168,11 @@ Game::menu_t Game::HumanTurn(void)
                 update_audio = true;
 
 		cursor.Hide();
+		if(selectHeroes.isSelected()) selectHeroes.Unselect();
+		if(selectCastle.isSelected()) selectCastle.Unselect();
 		I.Draw();
-		selectHeroes.Redraw();
-		selectCastle.Redraw();
-		statusWindow.Redraw();
+		global_focus.Reset(Focus::HEROES);
+		global_focus.Redraw();
 		cursor.Show();
 		display.Flip();
 

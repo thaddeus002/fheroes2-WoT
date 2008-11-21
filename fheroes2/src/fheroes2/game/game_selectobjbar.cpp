@@ -158,6 +158,7 @@ void Game::SelectBarHeroes::Redraw(void)
 
     if(visible) sp_cursor.Hide();
     splitter.Hide();
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
 
     SelectObjectBar::Redraw();
 
@@ -437,6 +438,7 @@ void Game::SelectBarCastle::Redraw(void)
 
     if(visible) sp_cursor.Hide();
     splitter.Hide();
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
 
     SelectObjectBar::Redraw();
 
