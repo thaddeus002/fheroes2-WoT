@@ -1469,8 +1469,6 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		{
 		    const Resource::resource_t r = Resource::Rand();
 		    std::string header = "A leprechaun offers you the " + Artifact::String(art) + " for the small price of ";
-		    std::string body;
-		    u16 buttons = 0;
 		    Resource::funds_t payment;
 		    if(1 == c)
 		    {
@@ -1493,23 +1491,20 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 
 		    if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
 		    {
-			buttons = Dialog::YES | Dialog::NO;
-			body = "Do you wish to buy this artifact?";
+			PlaySoundWarning;
+			if(Dialog::YES == DialogWithArtifact(header, "Do you wish to buy this artifact?", art, Dialog::YES | Dialog::NO))
+			{
+		    	    conditions = true;
+		    	    world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+			}
+			else
+			    Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    }
 		    else
 		    {
-			buttons = Dialog::OK;
-			body = "You try to pay the leprechaun, but realize that you can't afford it. The leprechaun stamps his foot and ignores you.";
+			PlaySoundFailure;
+			Dialog::Message("You try to pay the leprechaun, but realize that you can't afford it.", "The leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    }
-		    
-		    PlaySoundWarning;
-		    if(Dialog::YES == DialogWithArtifact(header, body, art, buttons))
-		    {
-		    	conditions = true;
-		    	world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
-		    }
-		    else
-			Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    break;
 		}
 
