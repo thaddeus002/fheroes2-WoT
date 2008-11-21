@@ -65,7 +65,7 @@ bool Dialog::SystemOptions(void)
     const Rect rect4(rb.x + 36,  rb.y + 157, 64, 64);
     //const Rect rect5(rb.x + 128, rb.y + 157, 64, 64);
     //const Rect rect6(rb.x + 220, rb.y + 157, 64, 64);
-    //const Rect rect7(rb.x + 36,  rb.y + 267, 64, 64);
+    const Rect rect7(rb.x + 36,  rb.y + 267, 64, 64);
     //const Rect rect8(rb.x + 128, rb.y + 267, 64, 64);
     //const Rect rect9(rb.x + 220, rb.y + 267, 64, 64);
 
@@ -129,7 +129,17 @@ bool Dialog::SystemOptions(void)
     	    display.Flip();
     	}
 
-        //
+        // set interface
+        if(le.MouseClickLeft(rect7))
+        {
+    	    conf.EvilInterface() ? conf.ResetModes(Settings::EVILINTERFACE) : conf.SetModes(Settings::EVILINTERFACE);
+    	    result = true;
+    	    cursor.Hide();
+    	    display.Blit(back2, rb);
+	    DrawSystemInfo(rb);
+    	    cursor.Show();
+    	    display.Flip();
+    	}
     }
 
     // restore background
@@ -148,6 +158,9 @@ void Dialog::DrawSystemInfo(const Point & dst)
     Settings & conf = Settings::Get();
 
     std::string text;
+
+    Surface black(65, 65);
+    black.Fill(0, 0, 0);
 
     // sound
     const Sprite & sprite1 = AGG::GetICN(ICN::SPANEL, conf.Sound() ? 1 : 0);
@@ -176,7 +189,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // unused
     const Sprite & sprite3 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect3(dst.x + 220, dst.y + 47, sprite3.w(), sprite3.h());
-    display.Blit(sprite3, rect3);
+    display.Blit(black, rect3);
     text.clear();
     text = "unused";
     Text(text, Font::SMALL, rect3.x + (rect3.w - Text::width(text, Font::SMALL)) / 2, rect3.y + rect3.h + 5);
@@ -197,7 +210,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // unused
     const Sprite & sprite5 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect5(dst.x + 128, dst.y + 157, sprite5.w(), sprite5.h());
-    display.Blit(sprite5, rect5);
+    display.Blit(black, rect5);
     text.clear();
     text = "unused";
     Text(text, Font::SMALL, rect5.x + (rect5.w - Text::width(text, Font::SMALL)) / 2, rect5.y + rect5.h + 5);
@@ -205,23 +218,26 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // unused
     const Sprite & sprite6 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect6(dst.x + 220, dst.y + 157, sprite6.w(), sprite6.h());
-    display.Blit(sprite6, rect6);
+    display.Blit(black, rect6);
     text.clear();
     text = "unused";
     Text(text, Font::SMALL, rect6.x + (rect6.w - Text::width(text, Font::SMALL)) / 2, rect6.y + rect6.h + 5);
 
-    // unused
-    const Sprite & sprite7 = AGG::GetICN(ICN::SPANEL, 17);
+    // interface
+    const Sprite & sprite7 = AGG::GetICN(ICN::SPANEL, (conf.EvilInterface() ? 17 : 16));
     const Rect rect7(dst.x + 36, dst.y + 267, sprite7.w(), sprite7.h());
     display.Blit(sprite7, rect7);
     text.clear();
-    text = "unused";
+    if(conf.EvilInterface())
+	text = "Evil";
+    else
+	text = "Good";
     Text(text, Font::SMALL, rect7.x + (rect7.w - Text::width(text, Font::SMALL)) / 2, rect7.y + rect7.h + 5);
 
     // unused
     const Sprite & sprite8 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect8(dst.x + 128, dst.y + 267, sprite8.w(), sprite8.h());
-    display.Blit(sprite8, rect8);
+    display.Blit(black, rect8);
     text.clear();
     text = "unused";
     Text(text, Font::SMALL, rect8.x + (rect8.w - Text::width(text, Font::SMALL)) / 2, rect8.y + rect8.h + 5);
@@ -229,7 +245,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // unused
     const Sprite & sprite9 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect9(dst.x + 220, dst.y + 267, sprite9.w(), sprite9.h());
-    display.Blit(sprite9, rect9);
+    display.Blit(black, rect9);
     text.clear();
     text = "unused";
     Text(text, Font::SMALL, rect9.x + (rect9.w - Text::width(text, Font::SMALL)) / 2, rect9.y + rect9.h + 5);

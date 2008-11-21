@@ -27,21 +27,6 @@
 
 Game::Interface::Interface()
 {
-    const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
-    const ICN::icn_t icnbtn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
-
-    buttonScrollHeroesUp.SetSprite(icnscroll, 0, 1);
-    buttonScrollCastleUp.SetSprite(icnscroll, 0, 1);
-    buttonNextHero.SetSprite(icnbtn, 0, 1);
-    buttonMovement.SetSprite(icnbtn, 2, 3);
-    buttonKingdom.SetSprite(icnbtn, 4, 5);
-    buttonSpell.SetSprite(icnbtn, 6, 7);
-    buttonEndTur.SetSprite(icnbtn, 8, 9);
-    buttonAdventure.SetSprite(icnbtn, 10, 11);
-    buttonFile.SetSprite(icnbtn, 12, 13);
-    buttonSystem.SetSprite(icnbtn, 14, 15);
-    buttonScrollHeroesDown.SetSprite(icnscroll, 2, 3);
-    buttonScrollCastleDown.SetSprite(icnscroll, 2, 3);
 }
 
 Game::Interface & Game::Interface::Get(void)
@@ -199,9 +184,7 @@ void Game::Interface::DrawBorder(bool drawMiddle, bool useAlt)
 void Game::Interface::Draw(void)
 {
     Display & display = Display::Get();
-
     const bool evil = Settings::Get().EvilInterface();
-
     const ICN::icn_t icnscroll = evil ? ICN::SCROLLE : ICN::SCROLL;
     const ICN::icn_t icnbtn = evil ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
@@ -257,7 +240,7 @@ void Game::Interface::Draw(void)
     pt_scd.y = RADARWIDTH + 2 * BORDERWIDTH + 32 * count_icons - 15;
 
     /**/
-    display.Fill(0x00, 0x00, 0x00);
+    //display.Fill(0x00, 0x00, 0x00);
 
     Rect srcrt;
     Point dstpt;
@@ -288,6 +271,19 @@ void Game::Interface::Draw(void)
 
     Game::StatusWindow::Get().SetPos(pt_stw);
     Game::StatusWindow::Get().Redraw();
+
+    buttonScrollHeroesUp.SetSprite(icnscroll, 0, 1);
+    buttonScrollCastleUp.SetSprite(icnscroll, 0, 1);
+    buttonNextHero.SetSprite(icnbtn, 0, 1);
+    buttonMovement.SetSprite(icnbtn, 2, 3);
+    buttonKingdom.SetSprite(icnbtn, 4, 5);
+    buttonSpell.SetSprite(icnbtn, 6, 7);
+    buttonEndTur.SetSprite(icnbtn, 8, 9);
+    buttonAdventure.SetSprite(icnbtn, 10, 11);
+    buttonFile.SetSprite(icnbtn, 12, 13);
+    buttonSystem.SetSprite(icnbtn, 14, 15);
+    buttonScrollHeroesDown.SetSprite(icnscroll, 2, 3);
+    buttonScrollCastleDown.SetSprite(icnscroll, 2, 3);
 
     buttonScrollHeroesUp.SetPos(pt_shu);
     buttonScrollCastleUp.SetPos(pt_scu);

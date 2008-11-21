@@ -1159,13 +1159,21 @@ Game::menu_t Game::HumanTurn(void)
 
 		// Change and save system settings
 		Dialog::SystemOptions();
-
+		
 		const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
 		const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
 
 		Mixer::Volume(-1, vol1);
 		Music::Volume(vol2);
                 update_audio = true;
+
+		cursor.Hide();
+		I.Draw();
+		selectHeroes.Redraw();
+		selectCastle.Redraw();
+		statusWindow.Redraw();
+		cursor.Show();
+		display.Flip();
 
 		Mixer::Enhance();
 	    }
