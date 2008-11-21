@@ -36,6 +36,8 @@
 class Surface;
 class Heroes;
 
+#define	ARMYMAXTROOPS		5
+
 namespace Army
 {
     typedef enum
@@ -156,7 +158,8 @@ namespace Army
     u8 GetCountUniqTroops(const army_t & army);
     Race::race_t GetRace(const army_t & army);
     bool HasMonster(const army_t & army, const Monster::monster_t mon);
-
+    bool JoinTroop(army_t & army, const Troop & troop);
+    bool JoinTroop(army_t & army, const Monster::monster_t mon, const u16 count);
 
     // deprecated
     class SelectBar

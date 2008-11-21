@@ -433,3 +433,36 @@ bool Army::HasMonster(const army_t & army, const Monster::monster_t mon)
 
     return false;
 }
+
+bool Army::JoinTroop(army_t & army, const Monster::monster_t mon, const u16 count)
+{
+    return JoinTroop(army, Troop(mon, count));
+}
+
+bool Army::JoinTroop(army_t & army, const Troop & troop)
+{
+    if(!troop.isValid()) return false;
+
+    army_t::iterator it1 = army.begin();
+    army_t::const_iterator it2 = army.end();
+
+    for(; it1 != it2; it1++) if(troop.Monster() == (*it1).Monster())
+    {
+        (*it1).SetCount((*it1).Count() + troop.Count());
+        if(Settings::Get().Debug()) Error::Verbose("Army::JoinTroop: monster: " + Monster::String(troop.Monster()) + ", count: ", troop.Count());
+        return true;
+    }
+
+    it1 = army.begin();
+    if(ARMYMAXTROOPS > Army::GetCountTroops(army))
+    {
+        for(; it1 != it2; it1++) if(Monster::UNKNOWN == (*it1).Monster())
+        {
+            *it1 = troop;
+            if(Settings::Get().Debug()) Error::Verbose("Heroes::JoinTroops: monster: " + Monster::String(troop.Monster()) + ", count: ", troop.Count());
+            return true;
+        }
+    }
+
+    return false;
+}

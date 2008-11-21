@@ -1552,37 +1552,6 @@ bool Heroes::ApplyPenaltyMovement(void)
     return true;
 }
 
-bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
-{
-    Army::army_t::iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    
-    for(; it1 != it2; it1++) if(mon == (*it1).Monster())
-    {
-	(*it1).SetCount((*it1).Count() + count);
-	if(H2Config::Debug()) Error::Verbose("Heroes::JoinTroops: monster: " + Monster::String(mon) + ", count: ", count);
-	return true;
-    }
-
-    it1 = army.begin();
-    if(HEROESMAXARMY > Army::GetCountTroops(army))
-    {
-	for(; it1 != it2; it1++) if(Monster::UNKNOWN == (*it1).Monster())
-	{
-	    (*it1).SetMonster(mon);
-	    (*it1).SetCount(count);
-	    
-	    if(H2Config::Debug()) Error::Verbose("Heroes::JoinTroops: monster: " + Monster::String(mon) + ", count: ", count);
-	    return true;
-	}
-    }
-
-    if(H2Config::MyColor() == GetColor())
-	Dialog::Message(Monster::String(mon), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
-
-    return false;
-}
-
 bool Heroes::MayStillMove(void) const
 {
     return move_point >= Maps::Ground::GetPenalty(Maps::GetIndexFromAbsPoint(mp), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));

@@ -1712,7 +1712,10 @@ void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
 	PlayPickupSound();
 
 	const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
-	if(recruit && hero.JoinTroops(Monster::GENIE, recruit))
+	if(!Army::JoinTroop(hero.GetArmy(), Monster::GENIE, recruit))
+	    Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+	else
+	if(recruit)
 	{
 	    AnimationRemoveObject(tile);
 	    tile.SetCountMonster(0);
@@ -2034,8 +2037,13 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
         const std::string & message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you.";
 
 	PlaySoundSuccess;
-	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO) &&
-	    hero.JoinTroops(monster, count)) tile.SetCountMonster(0);
+	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO))
+	{
+	    if(!Army::JoinTroop(hero.GetArmy(), monster, count))
+		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+	    else
+		tile.SetCountMonster(0);
+	}
     }
     else
     {
@@ -2095,7 +2103,13 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
 	if(Dialog::YES == Dialog::Message(msg_full1, msg_full2, Font::BIG, Dialog::YES | Dialog::NO))
 	{
 	    const u16 recruit = Dialog::RecruitMonster(monster, count);
-	    if(recruit && hero.JoinTroops(monster, recruit)) tile.SetCountMonster(count - recruit);
+	    if(recruit)
+	    {
+		if(!Army::JoinTroop(hero.GetArmy(), monster, recruit))
+		    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		else
+		    tile.SetCountMonster(count - recruit);
+	    }
 	}
     }
     else
@@ -2281,7 +2295,13 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
     {
 	const Monster::monster_t monster = Monster::Monster(obj);
         const u16 recruit = Dialog::RecruitMonster(monster, count);
-        if(recruit && hero.JoinTroops(monster, recruit)) tile.SetCountMonster(count - recruit);
+        if(recruit)
+        {
+    	    if(!Army::JoinTroop(hero.GetArmy(), monster, recruit))
+		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+    	    else
+    		tile.SetCountMonster(count - recruit);
+    	}
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));

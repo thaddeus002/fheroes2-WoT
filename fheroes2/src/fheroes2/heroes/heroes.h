@@ -219,8 +219,6 @@ public:
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
 
-    bool JoinTroops(const Monster::monster_t, const u16 count);
-
     bool spellCasted;
 
 private:
