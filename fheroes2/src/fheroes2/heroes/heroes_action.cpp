@@ -2491,11 +2491,22 @@ void ActionToEvent(Heroes &hero, const u16 dst_index)
 {
     // check event maps
     const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
-
     if(event_maps)
     {
-        world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
-        Dialog::ResourceInfo(event_maps->GetMessage(), "", event_maps->GetResource());
+        if(event_maps->GetResource().GetValidItems())
+        {
+    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
+	    PlaySoundSuccess;
+    	    Dialog::ResourceInfo(event_maps->GetMessage(), "", event_maps->GetResource());
+	}
+	if(Artifact::UNKNOWN != event_maps->GetArtifact())
+	{
+	    if(hero.PickupArtifact(event_maps->GetArtifact()))
+	    {
+		PlayPickupSound();
+		DialogWithArtifact("You find " + Artifact::String(event_maps->GetArtifact()), "", event_maps->GetArtifact());
+	    }
+	}
     }
 
     world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
