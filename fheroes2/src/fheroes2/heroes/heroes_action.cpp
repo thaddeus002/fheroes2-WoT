@@ -2382,20 +2382,20 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
     switch(obj)
     {
 	case MP2::OBJ_HILLFORT:
-	    if(hero.HasMonster(Monster::DWARF))
+	    if(Army::HasMonster(hero.GetArmy(), Monster::DWARF))
 	    {
 		UpgradeMonsters(hero, Monster::DWARF);
 		mons.push_back(Monster::DWARF);
 		msg1 = Monster::MultipleNames(Monster::DWARF);
 	    }
-	    if(hero.HasMonster(Monster::ORC))
+	    if(Army::HasMonster(hero.GetArmy(), Monster::ORC))
 	    {
 		UpgradeMonsters(hero, Monster::ORC);
 		mons.push_back(Monster::ORC);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::ORC);
 	    }
-	    if(hero.HasMonster(Monster::OGRE))
+	    if(Army::HasMonster(hero.GetArmy(), Monster::OGRE))
 	    {
 		UpgradeMonsters(hero, Monster::OGRE);
 		mons.push_back(Monster::OGRE);
@@ -2407,20 +2407,20 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
 	    break;
 
 	case MP2::OBJ_FREEMANFOUNDRY:
-	    if(hero.HasMonster(Monster::PIKEMAN))
+	    if(Army::HasMonster(hero.GetArmy(), Monster::PIKEMAN))
 	    {
 		UpgradeMonsters(hero, Monster::PIKEMAN);
 		mons.push_back(Monster::PIKEMAN);
 		msg1 = Monster::MultipleNames(Monster::PIKEMAN);
 	    }
-	    if(hero.HasMonster(Monster::SWORDSMAN))
+	    if(Army::HasMonster(hero.GetArmy(), Monster::SWORDSMAN))
 	    {
 		UpgradeMonsters(hero, Monster::SWORDSMAN);
 		mons.push_back(Monster::SWORDSMAN);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::SWORDSMAN);
 	    }
-	    if(hero.HasMonster(Monster::IRON_GOLEM))
+	    if(Army::HasMonster(hero.GetArmy(), Monster::IRON_GOLEM))
 	    {
 		UpgradeMonsters(hero, Monster::IRON_GOLEM);
 		mons.push_back(Monster::IRON_GOLEM);

@@ -155,7 +155,7 @@ namespace Army
     u8 GetCountTroops(const army_t & army);
     u8 GetCountUniqTroops(const army_t & army);
     Race::race_t GetRace(const army_t & army);
-
+    bool HasMonster(const army_t & army, const Monster::monster_t mon);
 
 
     // deprecated

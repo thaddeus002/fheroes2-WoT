@@ -424,3 +424,12 @@ Race::race_t Army::GetRace(const army_t & army)
 
     return 1 < races.size() ? Race::MULT : races.at(0);
 }
+
+bool Army::HasMonster(const army_t & army, const Monster::monster_t mon)
+{
+    army_t::const_iterator it1 = army.begin();
+    army_t::const_iterator it2 = army.end();
+    for(; it1 != it2; it1++) if(mon == (*it1).Monster()) return true;
+
+    return false;
+}

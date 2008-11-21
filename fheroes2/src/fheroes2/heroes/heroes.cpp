@@ -1552,17 +1552,6 @@ bool Heroes::ApplyPenaltyMovement(void)
     return true;
 }
 
-/*  true if present monster */
-bool Heroes::HasMonster(const Monster::monster_t mon) const
-{
-    Army::army_t::const_iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    
-    for(; it1 != it2; it1++) if(mon == (*it1).Monster()) return true;
-
-    return false;
-}
-
 bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
 {
     Army::army_t::iterator it1 = army.begin();

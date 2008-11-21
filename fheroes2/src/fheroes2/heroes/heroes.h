@@ -118,7 +118,6 @@ public:
 
     const Army::army_t & GetArmy(void) const{ return army; }
     Army::army_t & GetArmy(void) { return army; };
-    bool HasMonster(const Monster::monster_t mon) const;
 
     const Spell::Book & SpellBook(void) const { return spell_book; };
 
