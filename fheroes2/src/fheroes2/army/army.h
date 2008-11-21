@@ -147,6 +147,7 @@ namespace Army
 
 
     s8 GetMoraleWithModificators(const army_t &, std::list<std::string> *list = NULL);
+    s8 GetLuckWithModificators(const army_t &, std::list<std::string> *list = NULL);
     Troop & GetSlowestTroop(army_t & army);
     Troop & GetFastestTroop(army_t & army);
     Troop & GetStrongestTroop(army_t & army);
@@ -161,6 +162,7 @@ namespace Army
     bool HasMonster(const army_t & army, const Monster::monster_t mon);
     bool JoinTroop(army_t & army, const Troop & troop);
     bool JoinTroop(army_t & army, const Monster::monster_t mon, const u16 count);
+    void SetMasterSkill(army_t & army, const Skill::Primary & primary);
 
     // deprecated
     class SelectBar

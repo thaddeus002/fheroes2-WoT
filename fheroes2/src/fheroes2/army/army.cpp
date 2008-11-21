@@ -266,6 +266,11 @@ bool Army::PredicateFastestTroop(const Troop & t1, const Troop & t2)
     return t1.isValid() && t2.isValid() && (Monster::GetStats(t1.Monster()).speed > Monster::GetStats(t2.Monster()).speed);
 }
 
+s8 Army::GetLuckWithModificators(const army_t & army, std::list<std::string> *list)
+{
+    return 0;
+}
+
 s8 Army::GetMoraleWithModificators(const army_t & army, std::list<std::string> *list)
 {
     s8 result(Morale::NORMAL);
@@ -465,4 +470,11 @@ bool Army::JoinTroop(army_t & army, const Troop & troop)
     }
 
     return false;
+}
+
+void Army::SetMasterSkill(army_t & army, const Skill::Primary & primary)
+{
+    army_t::iterator it1 = army.begin();
+    army_t::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) (*it1).SetMasterSkill(&primary);
 }
