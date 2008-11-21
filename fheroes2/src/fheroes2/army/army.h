@@ -30,6 +30,7 @@
 #include "skill.h"
 #include "spritecursor.h"
 #include "gamedefs.h"
+#include "spell_types.h"
 
 class Surface;
 class Heroes;

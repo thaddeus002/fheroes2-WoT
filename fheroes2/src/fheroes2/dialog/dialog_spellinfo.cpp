@@ -25,6 +25,8 @@
 #include "localevent.h"
 #include "button.h"
 #include "dialog.h"
+#include "spell.h"
+#include "SDL.h"
 
 void Dialog::SpellInfo(const std::string &header, const std::string &message, const Spell::spell_t spell, const bool ok_button)
 {

@@ -25,6 +25,7 @@
 #include "config.h"
 #include "background.h"
 #include "dialog.h"
+#include "SDL.h"
 
 Game::menu_t Dialog::FileOptions(void)
 {

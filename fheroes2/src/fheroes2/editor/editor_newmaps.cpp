@@ -29,6 +29,7 @@
 #include "maps.h"
 #include "game.h"
 #include "world.h"
+#include "SDL.h"
 
 #include "error.h"
 

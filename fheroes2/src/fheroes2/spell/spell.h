@@ -22,88 +22,15 @@
 
 #include <string>
 #include <vector>
-#include "gamedefs.h"
 #include "icn.h"
 #include "m82.h"
 #include "monster.h"
-
-namespace Army {
-    class BattleTroop;
-}
+#include "army_types.h"
+#include "spell_types.h"
 
 namespace Spell
 {
-    typedef enum {
-	NONE,
-	FIREBALL,
-	FIREBLAST,
-	LIGHTNINGBOLT,
-	CHAINLIGHTNING,
-	TELEPORT,
-	CURE,
-	MASSCURE,
-	RESURRECT,
-	RESURRECTTRUE,
-	HASTE,
-	MASSHASTE,
-	SLOW,
-	MASSSLOW,
-	BLIND,
-	BLESS,
-	MASSBLESS,
-	STONESKIN,
-	STELLSKIN,
-	CURSE,
-	MASSCURSE,
-	HOLYWORD,
-	HOLYSHOUT,
-	ANTIMAGIC,
-	DISPEL,
-	MASSDISPEL,
-	ARROW,
-	BERZERKER,
-	ARMAGEDDON,
-	ELEMENTALSTORM,
-	METEORSHOWER,
-	PARALYZE,
-	HYPNOTIZE,
-	COLDRAY,
-	COLDRING,
-	DISRUPTINGRAY,
-	DEATHRIPPLE,
-	DEATHWAVE,
-	DRAGONSLAYER,
-	BLOODLUST,
-	ANIMATEDEAD,
-	MIRRORIMAGE,
-	SHIELD,
-	MASSSHIELD,
-	SUMMONEELEMENT,
-	SUMMONAELEMENT,
-	SUMMONFELEMENT,
-	SUMMONWELEMENT,
-	EARTHQUAKE,
-	VIEWMINES,
-	VIEWRESOURCES,
-	VIEWARTIFACTS,
-	VIEWTOWNS,
-	VIEWHEROES,
-	VIEWALL,
-	IDENTIFYHERO,
-	SUMMONBOAT,
-	DIMENSIONDOOR,
-	TOWNGATE,
-	TOWNPORTAL,
-	VISIONS,
-	HAUNT,
-	SETEGUARDIAN,
-	SETAGUARDIAN,
-	SETFGUARDIAN,
-	SETWGUARDIAN,
-	STONE,
-    } spell_t;
-
-    typedef enum {
+    enum target_t {
 	NOTARGET,
 	ONEFRIEND,
 	ONEENEMY,
@@ -114,9 +41,9 @@ namespace Spell
 	ALL,
 	//ANYCELL,
 	FREECELL
-    } target_t;
+    };
 
-    typedef struct {
+    struct stats_t {
         const std::string name;
 	u8 mana;
 	u8 level;
@@ -127,12 +54,12 @@ namespace Spell
 	ICN::icn_t icn;
 	M82::m82_t m82;
         const std::string description;
-    } stats_t;
+    };
 
-    typedef struct {
+    struct magic_t {
 	spell_t spell;
 	u8 duration;
-    } magic_t;
+    };
 
     const std::string &String(spell_t spell);
     u8 Mana(spell_t spell);

@@ -28,6 +28,7 @@
 #include "localevent.h"
 #include "button.h"
 #include "dialog.h"
+#include "SDL.h"
 
 u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 {

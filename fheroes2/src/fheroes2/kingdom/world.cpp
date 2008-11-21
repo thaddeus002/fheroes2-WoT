@@ -20,6 +20,7 @@
 
 #include <cstdlib> 
 #include <fstream> 
+#include "SDL.h"
 #include "engine.h" 
 #include "agg.h" 
 #include "artifact.h"
@@ -33,6 +34,8 @@
 #include "text.h" 
 #include "algorithm.h" 
 #include "world.h"
+#include "army.h"
+#include "spell.h"
 
 World & world = World::GetWorld();
 

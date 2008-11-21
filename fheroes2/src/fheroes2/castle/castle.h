@@ -31,7 +31,7 @@
 #include "dialog.h"
 #include "race.h"
 #include "rect.h"
-#include "army.h"
+#include "army_types.h"
 #include "heroes.h"
 
 #define CASTLEMAXARMY           5 

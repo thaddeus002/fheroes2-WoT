@@ -27,6 +27,7 @@
 #include "display.h"
 #include "sprite.h"
 #include "castle.h"
+#include "army.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     : building(0), army_spread(true), allow_build(true), present_boat(false), dwelling(CASTLEMAXMONSTER, 0),

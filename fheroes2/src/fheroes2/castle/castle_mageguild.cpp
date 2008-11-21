@@ -27,6 +27,8 @@
 #include "castle.h"
 #include "background.h"
 #include "text.h"
+#include "spell.h"
+#include "SDL.h"
 
 void Castle::OpenMageGuild(void)
 {

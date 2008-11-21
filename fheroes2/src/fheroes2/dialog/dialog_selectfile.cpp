@@ -36,6 +36,7 @@
 #include "tools.h"
 #include "splitter.h"
 #include "world.h"
+#include "SDL.h"
 
 #define LISTMAXITEM	9
 #define LISTHEIGHTROW	19

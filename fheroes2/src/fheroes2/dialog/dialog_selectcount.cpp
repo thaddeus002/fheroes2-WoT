@@ -26,6 +26,7 @@
 #include "localevent.h"
 #include "button.h"
 #include "dialog.h"
+#include "SDL.h"
 
 u16 Dialog::SelectCount(u16 max_count)
 {

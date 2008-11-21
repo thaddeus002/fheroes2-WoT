@@ -22,6 +22,7 @@
 #include "display.h"
 #include "agg.h"
 #include "sprite.h"
+#include "spell.h"
 
 const std::string & Army::String(Army::size_t size)
 {

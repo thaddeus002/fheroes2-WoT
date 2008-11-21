@@ -25,6 +25,7 @@
 #include "localevent.h"
 #include "button.h"
 #include "dialog.h"
+#include "SDL.h"
 
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {

@@ -22,6 +22,7 @@
 #include "error.h"
 #include "rand.h"
 #include "mageguild.h"
+#include "spell.h"
 
 MageGuild::MageGuild() : level(0), upgrade(false)
 {

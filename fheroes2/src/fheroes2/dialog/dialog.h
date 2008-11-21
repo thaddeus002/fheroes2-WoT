@@ -26,11 +26,12 @@
 #include "maps_fileinfo.h"
 #include "monster.h"
 #include "rect.h"
-#include "spell.h"
+#include "spell_types.h"
 #include "skill.h"
 #include "text.h"
 #include "resource.h"
 #include "game.h"
+#include "army_types.h"
 
 #define	SHADOWWIDTH	16
 
@@ -41,11 +42,6 @@
 class Castle;
 class Heroes;
 class Surface;
-
-namespace Army
-{
-    class Troop;
-};
 
 namespace Skill
 {

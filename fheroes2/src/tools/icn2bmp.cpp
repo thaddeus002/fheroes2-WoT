@@ -31,7 +31,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include "SDL.h"
 #include "kbpal.h"
 #include "engine.h"
 

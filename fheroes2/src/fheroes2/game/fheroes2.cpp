@@ -35,7 +35,7 @@
 #include "cursor.h"
 #include "game.h"
 #include "engine.h"
-#include "audio.h"
+#include "audio_interface.h"
 #include "image_logo.h"
 #include "image_icons.h"
 

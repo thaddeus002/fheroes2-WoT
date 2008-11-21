@@ -22,6 +22,14 @@
 
 #include "types.h"
 
+class Point;
+class Rect;
+
+struct SDL_MouseMotionEvent;
+struct SDL_MouseButtonEvent;
+union SDL_Event;
+struct SDL_keysym;
+
 class LocalEvent
 {
 public:
@@ -38,11 +46,11 @@ public:
 
     bool HandleEvents(void);
 
-    bool MouseMotion(void) const{ return mouse_motion; };
-    bool MouseMotion(const Rect &rt) const{ return mouse_motion ? rt & mouse_cu : false; };
-    bool MouseLeft(void) const{ return mouse_pressed && SDL_BUTTON_LEFT == mouse_button; };
-    bool MouseMiddle(void) const{ return mouse_pressed && SDL_BUTTON_MIDDLE  == mouse_button; };
-    bool MouseRight(void) const{ return mouse_pressed && SDL_BUTTON_RIGHT == mouse_button; };
+    bool MouseMotion(void) const;
+    bool MouseMotion(const Rect &rt) const;
+    bool MouseLeft(void) const;
+    bool MouseMiddle(void) const;
+    bool MouseRight(void) const;
 
     const Point & MousePressLeft(void) const{ return mouse_pl; };
     const Point & MousePressMiddle(void) const{ return mouse_pm; };
@@ -56,24 +64,24 @@ public:
     bool MouseClickMiddle(const Rect &rt);
     bool MouseClickRight(const Rect &rt);
 
-    bool MouseWheelUp(void) const{ return mouse_pressed && SDL_BUTTON_WHEELUP == mouse_button; };
-    bool MouseWheelDn(void) const{ return mouse_pressed && SDL_BUTTON_WHEELDOWN == mouse_button; };
+    bool MouseWheelUp(void) const;
+    bool MouseWheelDn(void) const;
 
-    bool MousePressLeft(const Rect &rt) const{ return MouseLeft() ? rt & mouse_pl : false; };
-    bool MousePressLeft(const Point &pt, u16 w, u16 h) const{ return MouseLeft() ? Rect(pt.x, pt.y, w, h) & mouse_pl : false; };
-    bool MousePressMiddle(const Rect &rt) const{ return MouseMiddle() ? rt & mouse_pm : false; };
-    bool MousePressRight(const Rect &rt) const{ return MouseRight() ? rt & mouse_pr : false; };
+    bool MousePressLeft(const Rect &rt) const;
+    bool MousePressLeft(const Point &pt, u16 w, u16 h) const;
+    bool MousePressMiddle(const Rect &rt) const;
+    bool MousePressRight(const Rect &rt) const;
 
-    bool MouseReleaseLeft(const Rect &rt) const{ return MouseLeft() ? false : rt & mouse_rl; };
-    bool MouseReleaseMiddle(const Rect &rt) const{ return MouseMiddle() ? false : rt & mouse_rm; };
-    bool MouseReleaseRight(const Rect &rt) const{ return MouseRight() ? false : rt & mouse_rr; };
+    bool MouseReleaseLeft(const Rect &rt) const;
+    bool MouseReleaseMiddle(const Rect &rt) const;
+    bool MouseReleaseRight(const Rect &rt) const;
 
-    bool MouseWheelUp(const Rect &rt) const{ return MouseWheelUp() ? rt & mouse_cu : false; };
-    bool MouseWheelDn(const Rect &rt) const{ return MouseWheelDn() ? rt & mouse_cu : false; };
+    bool MouseWheelUp(const Rect &rt) const;
+    bool MouseWheelDn(const Rect &rt) const;
 
-    bool MouseCursor(const Rect &rt) const{ return rt & mouse_cu; };
+    bool MouseCursor(const Rect &rt) const;
 
-    bool KeyPress(SDLKey key) const{ return key == key_value && key_pressed; };
+    bool KeyPress(int key) const;
     
 private:
     LocalEvent();
@@ -87,7 +95,7 @@ private:
     static int GlobalFilterEvents(const SDL_Event *event);
 
     static bool keep_going;
-    static SDLKey key_value;
+    static int  key_value;
     static bool key_pressed;
     static bool mouse_motion;
     static bool mouse_pressed;

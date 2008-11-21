@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include <cstdlib>
-
+#include "SDL.h"
 #include "surface.h"
 #include "agg.h"
 #include "error.h"

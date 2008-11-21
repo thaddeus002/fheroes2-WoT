@@ -26,6 +26,7 @@
 #include "button.h"
 #include "tools.h"
 #include "dialog.h"
+#include "SDL.h"
 
 void Dialog::ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs)
 {

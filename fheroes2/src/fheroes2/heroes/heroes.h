@@ -25,13 +25,12 @@
 #include <vector>
 #include <list>
 #include "race.h"
-#include "spell.h"
+#include "spell_types.h"
 #include "color.h"
 #include "morale.h"
 #include "mp2.h"
 #include "luck.h"
 #include "dialog.h"
-#include "army.h"
 #include "skill.h"
 #include "artifact.h"
 #include "route.h"
@@ -39,6 +38,7 @@
 #include "direction.h"
 #include "spell_book.h"
 #include "gamedefs.h"
+#include "army_types.h"
 
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXSKILL		8

@@ -27,6 +27,8 @@
 #include "dialog.h"
 #include "tools.h"
 #include "heroes.h"
+#include "spell.h"
+#include "SDL.h"
 
 #define SPELL_PER_PAGE	6
 

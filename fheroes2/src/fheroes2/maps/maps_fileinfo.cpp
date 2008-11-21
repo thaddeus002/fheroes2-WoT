@@ -20,6 +20,7 @@
 
 
 #include <fstream>
+#include "SDL.h"
 #include "error.h"
 #include "maps_fileinfo.h"
 

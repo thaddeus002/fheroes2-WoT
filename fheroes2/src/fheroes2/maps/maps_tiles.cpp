@@ -21,6 +21,7 @@
 #include <list>
 #include <iostream>
 #include <algorithm>
+#include "SDL.h"
 #include "agg.h"
 #include "tools.h"
 #include "world.h"
@@ -37,6 +38,7 @@
 #include "objxloc.h"
 #include "resource.h"
 #include "maps_tiles.h"
+#include "spell.h"
 
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
 {

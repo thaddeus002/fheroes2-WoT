@@ -35,6 +35,9 @@
 #include "algorithm.h"
 #include "ai.h"
 #include "gameevent.h"
+#include "army.h"
+#include "spell.h"
+#include "audio_interface.h"
 
 #define OBSERVATIONTOWERSCOUTE 10
 

@@ -21,6 +21,7 @@
 #include "surface.h"
 #include "palette.h"
 #include "error.h"
+#include "SDL.h"
 
 Surface::Surface() : surface(NULL), videosurface(false)
 {
@@ -83,6 +84,36 @@ void Surface::Set(u16 sw, u16 sh, bool alpha)
     if(surface) SDL_FreeSurface(surface);
 
     CreateSurface(sw, sh, DEFAULT_DEPTH, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
+}
+
+u16 Surface::w(void) const
+{
+    return surface ? surface->w : 0;
+}
+
+u16 Surface::h(void) const
+{
+    return surface ? surface->h : 0;
+}
+
+u8 Surface::depth(void) const
+{
+    return surface ? surface->format->BitsPerPixel : 0;
+}
+
+bool Surface::alpha(void) const
+{
+    return SDL_SRCALPHA & surface->flags;
+}
+
+u32 Surface::flags(void) const
+{
+    return surface->flags;
+}
+
+u32 Surface::MapRGB(u8 r, u8 g, u8 b, u8 a) const
+{
+    return a ? SDL_MapRGBA(surface->format, r, g, b, a) : SDL_MapRGB(surface->format, r, g, b);
 }
 
 /* create new surface */
@@ -401,4 +432,53 @@ void Surface::ScaleFrom(const Surface & bs)
     Unlock();
 
     delete [] p_src;
+}
+
+bool Surface::SaveBMP(const char *fn) const
+{
+    return SDL_SaveBMP(surface, fn) ? false : true;
+}
+
+const void *Surface::pixels(void) const
+{
+    return surface->pixels;
+}
+
+void Surface::SetColorKey(u8 r, u8 g, u8 b)
+{
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, MapRGB(r, g, b));
+}
+
+void Surface::SetColorKey(u32 color)
+{
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, color);
+}
+
+void Surface::SetAlpha(u8 level)
+{
+    SDL_SetAlpha(surface, SDL_SRCALPHA|SDL_RLEACCEL, level);
+}
+
+void Surface::Lock(void)
+{
+    if(SDL_MUSTLOCK(surface))
+        SDL_LockSurface(surface);
+}
+
+void Surface::Unlock(void)
+{
+    if(SDL_MUSTLOCK(surface))
+        SDL_UnlockSurface(surface);
+}
+
+void Surface::FreeSurface(void)
+{
+    if(surface)
+        SDL_FreeSurface(surface);
+    surface = NULL;
+}
+
+const SDL_PixelFormat *Surface::GetPixelFormat(void) const
+{
+    return surface->format;
 }

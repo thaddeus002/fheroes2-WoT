@@ -11,3 +11,6 @@ Developers
   number, and primary skill) and Army::BattleTroop, which holds information
   about animation, hit points, and position. (revvy)
 + Renamed uses of HighestTroop to FastestTroop (revvy)
++ Introduced army_types.h, spell_types.h, and audio_interface.h for inclusion
+  by headers to reduce uneeded dependencies. (revvy)
++ Moved all SDL dependencies out of header files to reduce build times. (revvy)

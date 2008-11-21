@@ -22,7 +22,7 @@
 #include <utility>
 #include <algorithm>
 #include "agg.h"
-#include "audio.h"
+#include "audio_interface.h"
 #include "localevent.h"
 #include "button.h"
 #include "world.h"
@@ -40,6 +40,8 @@
 #include "error.h"
 #include "portrait.h"
 #include "dialog.h"
+#include "army.h"
+#include "SDL.h"
 
 void Castle::RedrawNameTown(const Point & src_pt)
 {

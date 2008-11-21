@@ -22,7 +22,7 @@
 #define H2SPELLSTORAGE_H
 
 #include <list>
-#include "spell.h"
+#include "spell_types.h"
 #include "gamedefs.h"
 
 namespace Spell

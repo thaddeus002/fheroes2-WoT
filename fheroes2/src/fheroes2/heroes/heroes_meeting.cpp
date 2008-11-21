@@ -31,6 +31,7 @@
 #include "heroes.h"
 #include "portrait.h"
 #include "game_interface.h"
+#include "SDL.h"
 
 namespace
 {

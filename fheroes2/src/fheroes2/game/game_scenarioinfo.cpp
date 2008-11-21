@@ -40,6 +40,7 @@
 #include "tools.h"
 #include "splitter.h"
 #include "game.h"
+#include "SDL.h"
 
 namespace Scenario
 {

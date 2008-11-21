@@ -21,9 +21,14 @@
 #include <string>
 #include <algorithm>
 
+#include "SDL.h"
+#include "SDL_mixer.h"
 #include "engine.h"
 #include "error.h"
 #include "audio.h"
+#include "audio_interface.h"
+
+const u32 MAXVOLUME = MIX_MAX_VOLUME;
 
 namespace Music
 {

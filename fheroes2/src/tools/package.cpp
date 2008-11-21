@@ -28,7 +28,7 @@
 #include <cstring>
 #include <algorithm>
 #include <cctype>
-
+#include "SDL.h"
 #include "types.h"
 
 #define AGGSIZENAME	15

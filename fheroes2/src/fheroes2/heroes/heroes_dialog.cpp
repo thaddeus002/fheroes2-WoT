@@ -36,6 +36,8 @@
 #include "castle.h"
 #include "portrait.h"
 #include "dialog.h"
+#include "army.h"
+#include "SDL.h"
 
 void DrawLuckSprite(const Luck::luck_t luck, const Point & pt)
 {

@@ -18,113 +18,116 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "SDL.h"
 #include "surface.h"
 #include "error.h"
 #include "palette.h"
 
 Palette::Palette()
 {
-    ncolors = 0;
-    colors  = NULL;
+    sdlpal = new SDL_Palette;
+    sdlpal->ncolors = 0;
+    sdlpal->colors  = NULL;
 }
 
 Palette::Palette(const std::vector<char> & v)
 {
-    ncolors = v.size() / 3;
+    sdlpal->ncolors = v.size() / 3;
     
-    if(ncolors)
+    if(sdlpal->ncolors)
     {
-	pal.resize(ncolors);
+	pal.resize(sdlpal->ncolors);
 
 	Surface surface(1, 1, true);
         surface.SetAlpha(255);
 
-    	colors = new SDL_Color[ncolors];
+    	sdlpal->colors = new SDL_Color[sdlpal->ncolors];
 	const char * p = & v[0];
 
-	for(u16 ii = 0; ii < ncolors; ++ii)
+	for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
 	{
-	    colors[ii].r = *p++;
-    	    colors[ii].g = *p++;
-    	    colors[ii].b = *p++;
+	    sdlpal->colors[ii].r = *p++;
+    	    sdlpal->colors[ii].g = *p++;
+    	    sdlpal->colors[ii].b = *p++;
 
-	    colors[ii].r <<= 2;
-    	    colors[ii].g <<= 2;
-    	    colors[ii].b <<= 2;
+	    sdlpal->colors[ii].r <<= 2;
+    	    sdlpal->colors[ii].g <<= 2;
+    	    sdlpal->colors[ii].b <<= 2;
 
-    	    pal[ii] = surface.MapRGB(colors[ii].r, colors[ii].g, colors[ii].b);
+    	    pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
 	}
     }
 }
 
 Palette::Palette(const Palette & p)
 {
-    ncolors = p.ncolors;
-    colors = new SDL_Color[ncolors];
+    sdlpal->ncolors = p.sdlpal->ncolors;
+    sdlpal->colors = new SDL_Color[sdlpal->ncolors];
 
-    memcpy(colors, p.colors, ncolors * sizeof(SDL_Color));
+    memcpy(sdlpal->colors, p.sdlpal->colors, sdlpal->ncolors * sizeof(SDL_Color));
 
-    pal.resize(ncolors);
+    pal.resize(sdlpal->ncolors);
 
     Surface surface(1, 1, true);
     surface.SetAlpha(255);
 
-    for(u16 ii = 0; ii < ncolors; ++ii)
-	pal[ii] = surface.MapRGB(colors[ii].r, colors[ii].g, colors[ii].b);
+    for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
+	pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
 }
 
 Palette::~Palette()
 {
-    if(colors) delete [] colors;
+    if(sdlpal->colors) delete [] sdlpal->colors;
+    delete sdlpal;
 }
 
 Palette & Palette::operator= (const Palette & p)
 {
-    if(colors) delete [] colors;
+    if(sdlpal->colors) delete [] sdlpal->colors;
 
-    ncolors = p.ncolors;
-    colors = new SDL_Color[ncolors];
+    sdlpal->ncolors = p.sdlpal->ncolors;
+    sdlpal->colors = new SDL_Color[sdlpal->ncolors];
 
-    memcpy(colors, p.colors, ncolors * sizeof(SDL_Color));
+    memcpy(sdlpal->colors, p.sdlpal->colors, sdlpal->ncolors * sizeof(SDL_Color));
 
-    pal.resize(ncolors);
+    pal.resize(sdlpal->ncolors);
 
     Surface surface(1, 1, true);
     surface.SetAlpha(255);
 
-    for(u16 ii = 0; ii < ncolors; ++ii)
-	pal[ii] = surface.MapRGB(colors[ii].r, colors[ii].g, colors[ii].b);
+    for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
+	pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
 
     return *this;
 }
 
 void Palette::Load(const std::vector<char> & v)
 {
-    if(colors) delete [] colors;
+    if(sdlpal->colors) delete [] sdlpal->colors;
 
-    ncolors = v.size() / 3;
+    sdlpal->ncolors = v.size() / 3;
 
-    if(ncolors)
+    if(sdlpal->ncolors)
     {
-	pal.resize(ncolors);
+	pal.resize(sdlpal->ncolors);
 
 	Surface surface(1, 1, true);
 	surface.SetAlpha(255);
 
-	colors = new SDL_Color[ncolors];
+	sdlpal->colors = new SDL_Color[sdlpal->ncolors];
 	const char * p = & v[0];
 
-	for(u16 ii = 0; ii < ncolors; ++ii)
+	for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
 	{
-	    colors[ii].r = *p++;
-    	    colors[ii].g = *p++;
-    	    colors[ii].b = *p++;
+	    sdlpal->colors[ii].r = *p++;
+    	    sdlpal->colors[ii].g = *p++;
+    	    sdlpal->colors[ii].b = *p++;
 
-	    colors[ii].r <<= 2;
-    	    colors[ii].g <<= 2;
-    	    colors[ii].b <<= 2;
+	    sdlpal->colors[ii].r <<= 2;
+    	    sdlpal->colors[ii].g <<= 2;
+    	    sdlpal->colors[ii].b <<= 2;
 
-	    pal[ii] = surface.MapRGB(colors[ii].r, colors[ii].g, colors[ii].b);
+	    pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
 	}
 
 	return;
@@ -135,15 +138,15 @@ void Palette::Load(const std::vector<char> & v)
 
 u32 Palette::Size(void) const
 {
-    return ncolors;
+    return sdlpal->ncolors;
 }
 
 const SDL_Color * Palette::SDLColors(void) const
 {
-    return colors;
+    return sdlpal->colors;
 }
 
 u32 Palette::Color(const u16 index) const
 {
-    return index < ncolors ? pal[index] : 0;
+    return index < sdlpal->ncolors ? pal[index] : 0;
 }

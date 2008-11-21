@@ -26,6 +26,7 @@
 #include "button.h"
 #include "display.h"
 #include "game.h"
+#include "SDL.h"
 
 Game::menu_t Game::Editor::MainMenu(void)
 {

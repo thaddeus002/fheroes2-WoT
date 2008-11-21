@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
- *   afletdinov@mail.dc.baikal.ru                                          *
+ *   Copyright (C) 2008 by Josh Matthews <josh@joshmatthews.net>           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,25 +16,83 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ALGORITHM_H
-#define H2ALGORITHM_H
+#ifndef H2SPELL_TYPES_H
+#define H2SPELL_TYPES_H
 
-#include <list>
-#include "skill.h"
-#include "gamedefs.h"
-#include "army_types.h"
-
-class Heroes;
-class Castle;
-namespace Route { class Step; };
-
-namespace Algorithm
+namespace Spell
 {
-    u32 CalculateExperience(const Army::army_t & army);
-    u32 CalculateExperience(const Heroes & hero);
-    u32 CalculateExperience(const Castle &castle);
-
-    bool PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit = MAXU16, const Skill::Level::type_t pathfinding = Skill::Level::NONE, const u8 under = MP2::OBJ_ZERO);
-};
+    typedef enum {
+	NONE,
+	FIREBALL,
+	FIREBLAST,
+	LIGHTNINGBOLT,
+	CHAINLIGHTNING,
+	TELEPORT,
+	CURE,
+	MASSCURE,
+	RESURRECT,
+	RESURRECTTRUE,
+	HASTE,
+	MASSHASTE,
+	SLOW,
+	MASSSLOW,
+	BLIND,
+	BLESS,
+	MASSBLESS,
+	STONESKIN,
+	STELLSKIN,
+	CURSE,
+	MASSCURSE,
+	HOLYWORD,
+	HOLYSHOUT,
+	ANTIMAGIC,
+	DISPEL,
+	MASSDISPEL,
+	ARROW,
+	BERZERKER,
+	ARMAGEDDON,
+	ELEMENTALSTORM,
+	METEORSHOWER,
+	PARALYZE,
+	HYPNOTIZE,
+	COLDRAY,
+	COLDRING,
+	DISRUPTINGRAY,
+	DEATHRIPPLE,
+	DEATHWAVE,
+	DRAGONSLAYER,
+	BLOODLUST,
+	ANIMATEDEAD,
+	MIRRORIMAGE,
+	SHIELD,
+	MASSSHIELD,
+	SUMMONEELEMENT,
+	SUMMONAELEMENT,
+	SUMMONFELEMENT,
+	SUMMONWELEMENT,
+	EARTHQUAKE,
+	VIEWMINES,
+	VIEWRESOURCES,
+	VIEWARTIFACTS,
+	VIEWTOWNS,
+	VIEWHEROES,
+	VIEWALL,
+	IDENTIFYHERO,
+	SUMMONBOAT,
+	DIMENSIONDOOR,
+	TOWNGATE,
+	TOWNPORTAL,
+	VISIONS,
+	HAUNT,
+	SETEGUARDIAN,
+	SETAGUARDIAN,
+	SETFGUARDIAN,
+	SETWGUARDIAN,
+	STONE,
+    } spell_t;
+    
+    struct stats_t;
+    struct magic_t;
+}
 
 #endif

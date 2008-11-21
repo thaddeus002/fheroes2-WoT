@@ -36,6 +36,7 @@
 #include "text.h"
 #include "portrait.h"
 #include "payment.h"
+#include "SDL.h"
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 {

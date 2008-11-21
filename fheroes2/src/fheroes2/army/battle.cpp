@@ -38,7 +38,11 @@
 #include "rand.h"
 #include "portrait.h"
 #include "spell.h"
-#include "audio.h"
+#include "audio_interface.h"
+#include "army.h"
+#include "castle.h"
+#include "heroes.h"
+#include "SDL.h"
 
 #define CELLW 44
 #define CELLH 42

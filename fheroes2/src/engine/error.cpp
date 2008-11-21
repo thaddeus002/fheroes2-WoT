@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include "SDL.h"
 #include "types.h"
 #include "error.h"
 
