@@ -315,5 +315,5 @@ void Game::Interface::Draw(void)
     buttonScrollHeroesDown.Draw();
     buttonScrollCastleDown.Draw();
 
-    DrawBorder(true, true);
+    DrawBorder(true, false);
 }
