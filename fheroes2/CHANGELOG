@@ -1,0 +1,12 @@
+SVN
+
+Users
+
++ Heroes now level up and learn new skills based on race tables from HoMM II
+  (afletdinov)
+
+Developers
+
++ Army::Troops has been split into Army::Troop (for storing monster type, total
+  number, and primary skill) and Army::BattleTroop, which holds information
+  about animation, hit points, and position. (revvy)
