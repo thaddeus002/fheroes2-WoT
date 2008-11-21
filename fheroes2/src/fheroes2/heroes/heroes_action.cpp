@@ -1795,7 +1795,7 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     {
 	PlaySoundWarning;
 	Dialog::Message("A whirlpool engulfs your ship.", "Some of your army has fallen overboard.", Font::BIG, Dialog::OK);
-	Army::Troop & troops = hero.GetWeakestArmy();
+	Army::Troop & troops = Army::GetWeakestTroop(hero.GetArmy());
 	const u16 c = troops.Count() / 2;
 	troops.SetCount(c ? c : 1);
     }

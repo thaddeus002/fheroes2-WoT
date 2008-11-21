@@ -277,7 +277,7 @@ void Dialog::QuickInfo(const Castle & castle)
     dst_pt.y += sprite.h() + 5;
     Text(message, Font::SMALL, dst_pt);
 
-    u8 count = castle.GetCountArmy();
+    u8 count = Army::GetCountTroops(castle.GetArmy());
 
     if(! count)
     {
@@ -469,7 +469,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     Text(message, Font::SMALL, dst_pt);
 
     // get valid count army
-    u8 count = hero.GetCountArmy();
+    u8 count = Army::GetCountTroops(hero.GetArmy());
 
     // draw monster sprite in one string
     u8 current = 0;

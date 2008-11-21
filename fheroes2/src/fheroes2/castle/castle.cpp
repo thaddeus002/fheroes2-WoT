@@ -494,16 +494,6 @@ void Castle::TownUpgradeToCastle(void)
     building &= ~BUILD_TENT;
 }
 
-// return valid count army in castle
-u8 Castle::GetCountArmy(void) const
-{
-    u8 result = 0;
-
-    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii) if(Army::isValid(army[ii])) ++result;
-
-    return result;
-}
-
 // return mage guild level
 u8 Castle::GetLevelMageGuild(void)
 {
@@ -1603,4 +1593,25 @@ void Castle::Dump(void) const
     std::cout << "present heroes  : " << (GetHeroes() ? "yes" : "no") << std::endl;
     std::cout << "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl;
     std::cout << "nearly sea      : " << (nearly_sea ? "yes" : "no") << std::endl;
+}
+
+s8 Castle::GetMoraleWithModificators(std::list<std::string> *list) const
+{
+    s8 result(Morale::NORMAL);
+
+    // and tavern
+    if(Race::NECR != race && isBuild(BUILD_TAVERN))
+    {
+        result += 1;
+        if(list) list->push_back(GetStringBuilding(BUILD_TAVERN, race) + "+1");
+    }
+
+    // and barbarian coliseum
+    if(Race::BARB == race && isBuild(BUILD_SPEC))
+    {
+        result += 2;
+        if(list) list->push_back(GetStringBuilding(BUILD_SPEC, race) + "+2");
+    }
+
+    return result;
 }

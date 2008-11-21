@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
 #include "army.h"
 #include "display.h"
 #include "agg.h"
@@ -263,4 +264,163 @@ bool Army::PredicateSlowestTroop(const Troop & t1, const Troop & t2)
 bool Army::PredicateFastestTroop(const Troop & t1, const Troop & t2)
 {
     return t1.isValid() && t2.isValid() && (Monster::GetStats(t1.Monster()).speed > Monster::GetStats(t2.Monster()).speed);
+}
+
+s8 Army::GetMoraleWithModificators(const army_t & army, std::list<std::string> *list)
+{
+    s8 result(Morale::NORMAL);
+
+    // different race penalty
+    army_t::const_iterator it1_army = army.begin();
+    army_t::const_iterator it2_army = army.end();
+    u8 count = 0;
+    u8 count_kngt = 0;
+    u8 count_barb = 0;
+    u8 count_sorc = 0;
+    u8 count_wrlk = 0;
+    u8 count_wzrd = 0;
+    u8 count_necr = 0;
+    u8 count_bomg = 0;
+    bool ghost_present = false;
+    for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).Monster())
+    {
+        switch(Monster::GetRace((*it1_army).Monster()))
+	{
+            case Race::KNGT: ++count_kngt; break;
+            case Race::BARB: ++count_barb; break;
+            case Race::SORC: ++count_sorc; break;
+            case Race::WRLK: ++count_wrlk; break;
+            case Race::WZRD: ++count_wzrd; break;
+            case Race::NECR: ++count_necr; break;
+            case Race::BOMG: ++count_bomg; break;
+            default: break;
+	}
+        if(Monster::GHOST == (*it1_army).Monster()) ghost_present = true;
+    }
+
+    Race::race_t r = Race::MULT;
+    if(count_kngt){ ++count; r = Race::KNGT; }
+    if(count_barb){ ++count; r = Race::BARB; }
+    if(count_sorc){ ++count; r = Race::SORC; }
+    if(count_wrlk){ ++count; r = Race::WRLK; }
+    if(count_wzrd){ ++count; r = Race::WZRD; }
+    if(count_necr){ ++count; r = Race::NECR; }
+    if(count_bomg){ ++count; r = Race::BOMG; }
+    const u8 uniq_count = GetCountUniqTroops(army);
+
+    switch(count)
+    {
+        case 2:
+        case 0: break;
+        case 1:
+    	    if(0 == count_necr && !ghost_present && 1 < uniq_count)
+            {
+                ++result;
+                if(list) list->push_back("All " + Race::String(r) + " troops +1");
+            }
+            break;
+        case 3:
+            result -= 1;
+            if(list) list->push_back("Troops of 3 alignments -1");
+            break;
+        case 4:
+    	    result -= 2;
+            if(list) list->push_back("Troops of 4 alignments -2");
+            break;
+        default:
+            result -= 3;
+            if(list) list->push_back("Troops of 5 alignments -3");
+            break;
+    }
+
+    // undead in life group
+    if(1 < uniq_count && (count_necr || ghost_present) && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
+    {
+        result -= 1;
+        if(list) list->push_back("Some undead in groups -1");
+    }
+
+    return result;
+}
+
+Army::Troop & Army::GetSlowestTroop(army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateSlowestTroop);
+}
+
+Army::Troop & Army::GetFastestTroop(army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateFastestTroop);
+}
+
+Army::Troop & Army::GetStrongestTroop(army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateStrongestTroop);
+}
+
+Army::Troop & Army::GetWeakestTroop(army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateWeakestTroop);
+}
+
+const Army::Troop & Army::GetSlowestTroop(const army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateSlowestTroop);
+}
+
+const Army::Troop & Army::GetFastestTroop(const army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateFastestTroop);
+}
+
+const Army::Troop & Army::GetStrongestTroop(const army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateStrongestTroop);
+}
+
+const Army::Troop & Army::GetWeakestTroop(const army_t & army)
+{
+    return *min_element(army.begin(), army.end(), PredicateWeakestTroop);
+}
+
+u8 Army::GetCountTroops(const army_t & army)
+{
+    u8 result = 0;
+    army_t::const_iterator it1 = army.begin();
+    army_t::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) if((*it1).isValid()) ++result;
+
+    return result;
+}
+
+u8 Army::GetCountUniqTroops(const army_t & army)
+{
+    std::vector<Monster::monster_t> troops;
+    troops.reserve(army.size());
+
+    army_t::const_iterator it1 = army.begin();
+    army_t::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) if((*it1).isValid()) troops.push_back((*it1).Monster());
+    troops.resize(std::unique(troops.begin(), troops.end()) - troops.begin());
+
+    return troops.size();
+}
+
+Race::race_t Army::GetRace(const army_t & army)
+{
+    army_t::const_iterator it1 = army.begin();
+    army_t::const_iterator it2 = army.end();
+    std::vector<Race::race_t> races;
+    races.reserve(army.size());
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()) races.push_back(Monster::GetRace((*it1).Monster()));
+    races.resize(std::unique(races.begin(), races.end()) - races.begin());
+
+    if(races.empty())
+    {
+        Error::Warning("Army::GetRaceArmy: empty");
+        return Race::MULT;
+    }
+
+    return 1 < races.size() ? Race::MULT : races.at(0);
 }

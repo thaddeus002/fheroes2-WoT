@@ -628,7 +628,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
                     	    Monster::GetRace(select_monster) == castle->GetRace() &&
                             castle->isBuild(Castle::GetUpgradeBuilding(Monster::Dwelling(select_monster), castle->GetRace()));
 
-                    switch(Dialog::ArmyInfo(army[ii], readonly? false : (1 == GetCountArmy() ? false : true), false, show_upgrade))
+                    switch(Dialog::ArmyInfo(army[ii], readonly? false : (1 == Army::GetCountTroops(army) ? false : true), false, show_upgrade))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
@@ -746,7 +746,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    {
 		cursor.Hide();
 
-		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == GetCountArmy() ? false : true), true, false);
+		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == Army::GetCountTroops(army) ? false : true), true, false);
 
 		cursor.Show();
 		display.Flip();

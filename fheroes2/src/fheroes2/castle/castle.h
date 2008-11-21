@@ -102,7 +102,7 @@ public:
     u8 GetLevelMageGuild(void);
 
     const Army::army_t & GetArmy(void) const{ return army; }; 
-    u8 GetCountArmy(void) const;
+    Army::army_t & GetArmy(void) { return army; }; 
     u16 GetDwellingLivedCount(building_t dw);
 
     const Point & GetCenter(void) const;
@@ -118,6 +118,8 @@ public:
     void DrawImageCastle(const Point & pt);
 
     Dialog::answer_t OpenDialog(void);
+
+    s8 GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
 
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);

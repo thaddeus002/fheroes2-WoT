@@ -21,6 +21,7 @@
 #define H2ARMY_H
 
 #include <string>
+#include <list>
 #include <vector>
 #include <utility>
 #include "race.h"
@@ -141,6 +142,23 @@ namespace Army
     typedef std::vector<BattleTroop> BattleArmy_t;
     typedef std::vector<Troop> army_t;
 
+
+    s8 GetMoraleWithModificators(const army_t &, std::list<std::string> *list = NULL);
+    Troop & GetSlowestTroop(army_t & army);
+    Troop & GetFastestTroop(army_t & army);
+    Troop & GetStrongestTroop(army_t & army);
+    Troop & GetWeakestTroop(army_t & army);
+    const Troop & GetSlowestTroop(const army_t & army);
+    const Troop & GetFastestTroop(const army_t & army);
+    const Troop & GetStrongestTroop(const army_t & army);
+    const Troop & GetWeakestTroop(const army_t & army);
+    u8 GetCountTroops(const army_t & army);
+    u8 GetCountUniqTroops(const army_t & army);
+    Race::race_t GetRace(const army_t & army);
+
+
+
+    // deprecated
     class SelectBar
     {
     public:
