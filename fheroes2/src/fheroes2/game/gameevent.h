@@ -61,6 +61,7 @@ public:
     u16 GetIndex(void) const{ return index_map; };
     u8  GetColors(void) const{ return colors; };
     const std::string & GetMessage(void) const{ return message; };
+    Artifact::artifact_t GetArtifact(void) const {return artifact; };
 
 private:
     u16 index_map;
