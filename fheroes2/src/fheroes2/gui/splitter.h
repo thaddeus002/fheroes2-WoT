@@ -38,7 +38,7 @@ public:
     void Move(u16 pos);
 
     void SetArea(const Rect & rt);
-    void SetPos(positions_t ps);
+    void SetOrientation(positions_t ps);
     void SetRange(u16 smin, u16 smax);
 
     u16 GetCurrent(void) const{ return cur; };

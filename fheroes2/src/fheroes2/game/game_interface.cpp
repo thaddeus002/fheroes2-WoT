@@ -69,10 +69,10 @@ void Game::Interface::DrawBorder(bool drawMiddle, bool useAlt)
     Point dstpt;
     const Sprite *border;
     if(useAlt)
-      border = &AGG::GetICN(evil ? ICN::STONBAKE : ICN::STONBACK, 0);
+      border = &AGG::GetICN(ICN::STONEBAK, 0);
     else
       border = &AGG::GetICN(evil ? ICN::ADVBORDE : ICN::ADVBORD, 0);
-    
+
     const Sprite &icnadv = *border;
 
     // TOP BORDER
@@ -182,6 +182,18 @@ void Game::Interface::DrawBorder(bool drawMiddle, bool useAlt)
     srcrt.y += TILEWIDTH;
     srcrt.h = icnadv.h() - srcrt.y;
     display.Blit(icnadv, srcrt, dstpt);
+
+    // ICON BORDER
+    srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;
+    srcrt.y = RADARWIDTH + BORDERWIDTH;
+    srcrt.w = RADARWIDTH;
+    srcrt.h = BORDERWIDTH;
+    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
+    dstpt.y = srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
+    dstpt.y = srcrt.y + BORDERWIDTH + count_icons * 32;
+    srcrt.y = srcrt.y + BORDERWIDTH + 4 * 32;
+    display.Blit(icnadv, srcrt, dstpt);
 }
 
 void Game::Interface::Draw(void)
@@ -204,7 +216,6 @@ void Game::Interface::Draw(void)
     pt_scu.y = RADARWIDTH + 2 * BORDERWIDTH;
 
     // recalculate buttons coordinate
-    //const u8 count_w = (display.w() - 640) / TILEWIDTH;
     const u8 count_h = (display.h() - 480) / TILEWIDTH;
     count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
     const u16 last_coord = RADARWIDTH + BORDERWIDTH * 2 + count_icons * 32 + BORDERWIDTH;
@@ -250,30 +261,26 @@ void Game::Interface::Draw(void)
 
     Rect srcrt;
     Point dstpt;
-    //const Sprite & icnston = AGG::GetICN(evil ? ICN::STONBAKE : ICN::STONBACK, 0);
-    const Sprite & icnadv = AGG::GetICN(evil ? ICN::ADVBORDE : ICN::ADVBORD, 0);
-
-    DrawBorder(true, false);
 
     // ICON PANEL
+    const Sprite & icnadv = AGG::GetICN(evil ? ICN::ADVBORDE : ICN::ADVBORD, 0);
     srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;
-    srcrt.y = RADARWIDTH + BORDERWIDTH;
+    srcrt.y = RADARWIDTH + 2 * BORDERWIDTH;
     srcrt.w = RADARWIDTH;
-    srcrt.h = 48;
+    srcrt.h = 32;
     dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
     dstpt.y = srcrt.y;
     display.Blit(icnadv, srcrt, dstpt);
     srcrt.y = srcrt.y + srcrt.h;
     dstpt.y = dstpt.y + srcrt.h;
     srcrt.h = 32;
-    const u8 ext_icon = count_h > 3 ? 6 : ( count_h < 3 ? 2 : 5);
-    for(u8 ii = 0; ii < ext_icon; ++ii)
+    for(u8 ii = 0; ii < count_icons - 2; ++ii)
     {
 	display.Blit(icnadv, srcrt, dstpt);
 	dstpt.y += srcrt.h;
     }
     srcrt.y = srcrt.y + 64;
-    srcrt.h = 48;
+    srcrt.h = 32;
     display.Blit(icnadv, srcrt, dstpt);
 
     Game::SelectBarCastle::Get().Redraw();
@@ -307,4 +314,6 @@ void Game::Interface::Draw(void)
     buttonSystem.Draw();
     buttonScrollHeroesDown.Draw();
     buttonScrollCastleDown.Draw();
+
+    DrawBorder(true, true);
 }

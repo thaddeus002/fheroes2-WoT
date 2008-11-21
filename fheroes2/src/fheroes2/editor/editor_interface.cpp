@@ -318,10 +318,10 @@ void Game::Editor::Interface::Draw(void)
     DrawLeftNumberCell();
 
     split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRect().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8));
-    split_h.SetPos(Splitter::HORIZONTAL);
+    split_h.SetOrientation(Splitter::HORIZONTAL);
 
     split_v.SetArea(Rect(BORDERWIDTH + areaMaps.GetRect().w * TILEWIDTH + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRect().h - 1) * TILEWIDTH - 6));
-    split_v.SetPos(Splitter::VERTICAL);
+    split_v.SetOrientation(Splitter::VERTICAL);
 
     split_h.SetRange(0, world.w() - areaMaps.GetRect().w);
     split_v.SetRange(0, world.h() - areaMaps.GetRect().h);

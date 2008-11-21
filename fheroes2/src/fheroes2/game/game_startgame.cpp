@@ -653,13 +653,10 @@ Game::menu_t Game::HumanTurn(void)
     const Rect areaScrollTop(0, 0, display.w() - RADARWIDTH, BORDERWIDTH);
     const Rect areaScrollBottom(0, display.h() - BORDERWIDTH, display.w(), BORDERWIDTH);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
-    
+
     u8 scrollDir = GameArea::NONE;
-
     LocalEvent & le = LocalEvent::GetLocalEvent();
-
     u32 ticket = 0;
-
     bool update_audio = false;
 
     Game::Interface & I = Game::Interface::Get();

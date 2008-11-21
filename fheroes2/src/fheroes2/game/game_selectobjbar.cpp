@@ -93,11 +93,8 @@ const Rect & Game::SelectObjectBar::GetArea(void) const
     return max_area;
 }
 
-Game::SelectBarHeroes::SelectBarHeroes()
-    : SelectObjectBar(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21),
-	splitter(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4),
-	Rect(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 60, RADARWIDTH + 2 * BORDERWIDTH + 18, 10, 32 * coords.size() - 35),
-	Splitter::VERTICAL), visible(false)
+Game::SelectBarHeroes::SelectBarHeroes() 
+    : SelectObjectBar(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21), visible(false)
 {
     sf_cursor.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT);
     sf_cursor.SetColorKey();
@@ -106,7 +103,11 @@ Game::SelectBarHeroes::SelectBarHeroes()
     sp_cursor.Save(pos_pt);
     sp_cursor.SetSprite(sf_cursor);
 
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
+    splitter.SetArea(Rect(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 60, RADARWIDTH + 2 * BORDERWIDTH + 18, 10, 32 * coords.size() - 35));
+    splitter.SetOrientation(Splitter::VERTICAL);
     splitter.SetRange(0, 0);
+    splitter.Move(0);
 }
 
 Game::SelectBarHeroes & Game::SelectBarHeroes::Get(void)
@@ -156,6 +157,7 @@ void Game::SelectBarHeroes::Redraw(void)
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
 
     if(visible) sp_cursor.Hide();
+    splitter.Hide();
 
     SelectObjectBar::Redraw();
 
@@ -175,6 +177,7 @@ void Game::SelectBarHeroes::Redraw(void)
 	}
 	++it;
     }
+    splitter.Show();
 }
 
 void Game::SelectBarHeroes::Redraw(const Heroes *hero)
@@ -371,10 +374,7 @@ Splitter & Game::SelectBarHeroes::GetSplitter(void)
 }
 
 Game::SelectBarCastle::SelectBarCastle()
-    : SelectObjectBar(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21),
-	splitter(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4),
-	Rect(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 132, RADARWIDTH + 2 * BORDERWIDTH + 18, 10, 32 * coords.size() - 35),
-	Splitter::VERTICAL), visible(false)
+    : SelectObjectBar(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21), visible(false)
 {
     sf_cursor.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT);
     sf_cursor.SetColorKey();
@@ -383,6 +383,9 @@ Game::SelectBarCastle::SelectBarCastle()
     sp_cursor.Save(pos_pt);
     sp_cursor.SetSprite(sf_cursor);
 
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
+    splitter.SetArea(Rect(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 132, RADARWIDTH + 2 * BORDERWIDTH + 18, 10, 32 * coords.size() - 35));
+    splitter.SetOrientation(Splitter::VERTICAL);
     splitter.SetRange(0, 0);
 }
 
@@ -433,6 +436,7 @@ void Game::SelectBarCastle::Redraw(void)
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
 
     if(visible) sp_cursor.Hide();
+    splitter.Hide();
 
     SelectObjectBar::Redraw();
 
@@ -452,6 +456,7 @@ void Game::SelectBarCastle::Redraw(void)
 	}
 	++it;
     }
+    splitter.Show();
 }
 
 void Game::SelectBarCastle::Redraw(const Castle *castle)

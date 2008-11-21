@@ -40,7 +40,7 @@ void Splitter::SetArea(const Rect & rt)
     area = rt;
 }
 
-void Splitter::SetPos(positions_t ps)
+void Splitter::SetOrientation(positions_t ps)
 {
     position = ps;
 }
