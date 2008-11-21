@@ -10,3 +10,4 @@ Developers
 + Army::Troops has been split into Army::Troop (for storing monster type, total
   number, and primary skill) and Army::BattleTroop, which holds information
   about animation, hit points, and position. (revvy)
++ Renamed uses of HighestTroop to FastestTroop (revvy)
