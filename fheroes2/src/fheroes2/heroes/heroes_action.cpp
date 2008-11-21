@@ -1504,7 +1504,10 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    
 		    PlaySoundWarning;
 		    if(Dialog::YES == DialogWithArtifact(header, body, art, buttons))
-			conditions = true;
+		    {
+		    	conditions = true;
+		    	world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+		    }
 		    else
 			Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    break;
