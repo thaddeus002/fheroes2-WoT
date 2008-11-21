@@ -271,3 +271,148 @@ u16 Maps::GetApproximateDistance(const u16 index1, const u16 index2)
     return std::max(std::abs(static_cast<s32>(index1 % world.w()) - static_cast<s32>(index2 % world.w())), 
 	            std::abs(static_cast<s32>(index1 / world.w()) - static_cast<s32>(index2 / world.w())));
 }
+
+
+void Maps::MinimizeAreaForCastle(const Point & center)
+{
+    // reset castle ID
+    for(s8 yy = -3; yy < 2; ++yy)
+        for(s8 xx = -2; xx < 3; ++xx)
+    {
+        Maps::Tiles & tile = world.GetTiles((center.y + yy) * world.h() + center.x + xx);
+
+        if(MP2::OBJN_RNDCASTLE == tile.GetObject() ||
+             MP2::OBJN_RNDTOWN == tile.GetObject() ||
+             MP2::OBJN_CASTLE  == tile.GetObject()) tile.SetObject(MP2::OBJ_ZERO);
+    }
+
+    // set minimum area castle ID
+    for(s8 yy = -1; yy < 1; ++yy)
+        for(s8 xx = -2; xx < 3; ++xx)
+    {
+        Maps::Tiles & tile = world.GetTiles((center.y + yy) * world.h() + center.x + xx);
+
+        tile.SetObject(MP2::OBJN_CASTLE);
+    }
+
+    // restore center ID
+    world.GetTiles(center).SetObject(MP2::OBJ_CASTLE);
+}
+
+/* correct sprites for RND castles */
+void Maps::UpdateRNDSpriteForCastle(const Point & center, u8 race, bool is_castle)
+{
+/* 
+castle size: T and B - sprite, S - shadow, XX - center
+
+              T0
+      S1S1T1T1T1T1T1
+    S2S2S2T2T2T2T2T2
+      S3S3B1B1XXB1B1
+        S4B2B2  B2B2
+*/
+    std::vector<u16> coords;
+    coords.reserve(21);
+
+    // T0
+    if(is_castle) coords.push_back((center.y - 3) * world.h() + center.x);
+    // T1
+    coords.push_back((center.y - 2) * world.h() + center.x - 2);
+    coords.push_back((center.y - 2) * world.h() + center.x - 1);
+    coords.push_back((center.y - 2) * world.h() + center.x);
+    coords.push_back((center.y - 2) * world.h() + center.x + 1);
+    coords.push_back((center.y - 2) * world.h() + center.x + 2);
+    // T2
+    coords.push_back((center.y - 1) * world.h() + center.x - 2);
+    coords.push_back((center.y - 1) * world.h() + center.x - 1);
+    coords.push_back((center.y - 1) * world.h() + center.x);
+    coords.push_back((center.y - 1) * world.h() + center.x + 1);
+    coords.push_back((center.y - 1) * world.h() + center.x + 2);
+    // B1
+    coords.push_back(center.y * world.h() + center.x - 2);
+    coords.push_back(center.y * world.h() + center.x - 1);
+    coords.push_back(center.y * world.h() + center.x);
+    coords.push_back(center.y * world.h() + center.x + 1);
+    coords.push_back(center.y * world.h() + center.x + 2);
+    // B2
+    coords.push_back((center.y + 1) * world.h() + center.x - 2);
+    coords.push_back((center.y + 1) * world.h() + center.x - 1);
+    coords.push_back((center.y + 1) * world.h() + center.x);
+    coords.push_back((center.y + 1) * world.h() + center.x + 1);
+    coords.push_back((center.y + 1) * world.h() + center.x + 2);
+
+    Maps::Tiles & tile_center = world.GetTiles(center);
+
+    // correct only RND town and castle
+    switch(tile_center.GetObject())
+    {
+	case MP2::OBJ_RNDTOWN:
+	case MP2::OBJ_RNDCASTLE:
+	    break;
+	
+	default:
+	    Error::Warning("Maps::UpdateRNDSpriteForCastle: correct only RND town and castle. index: ", center.y * world.w() + center.x);
+	    return;
+    }
+
+    // modify all rnd sprites
+    std::vector<u16>::const_iterator it1 = coords.begin();
+    std::vector<u16>::const_iterator it2 = coords.end();
+
+    for(; it1 != it2; ++it1)
+    {
+	Maps::TilesAddon *addon = world.GetTiles(*it1).FindRNDCastle();
+	if(addon)
+	{
+    	    addon->object -= 12;
+
+    	    switch(race)
+    	    {
+    		case Race::KNGT: break;
+        	case Race::BARB: addon->index += 32; break;
+        	case Race::SORC: addon->index += 64; break;
+        	case Race::WRLK: addon->index += 96; break;
+        	case Race::WZRD: addon->index += 128; break;
+        	case Race::NECR: addon->index += 160; break;
+        	default: break;
+	    }
+	}
+    }
+}
+
+void Maps::UpdateSpritesFromTownToCastle(const Point & center)
+{
+    // correct area maps sprites
+    std::vector<u16> coords;
+    coords.reserve(16);
+
+    // T0
+    coords.push_back((center.y - 3) * world.h() + center.x);
+    // T1
+    coords.push_back((center.y - 2) * world.h() + center.x - 2);
+    coords.push_back((center.y - 2) * world.h() + center.x - 1);
+    coords.push_back((center.y - 2) * world.h() + center.x);
+    coords.push_back((center.y - 2) * world.h() + center.x + 1);
+    coords.push_back((center.y - 2) * world.h() + center.x + 2);
+    // T2
+    coords.push_back((center.y - 1) * world.h() + center.x - 2);
+    coords.push_back((center.y - 1) * world.h() + center.x - 1);
+    coords.push_back((center.y - 1) * world.h() + center.x);
+    coords.push_back((center.y - 1) * world.h() + center.x + 1);
+    coords.push_back((center.y - 1) * world.h() + center.x + 2);
+    // B1
+    coords.push_back(center.y * world.h() + center.x - 2);
+    coords.push_back(center.y * world.h() + center.x - 1);
+    coords.push_back(center.y * world.h() + center.x);
+    coords.push_back(center.y * world.h() + center.x + 1);
+    coords.push_back(center.y * world.h() + center.x + 2);
+
+    // modify all rnd sprites
+    std::vector<u16>::const_iterator it1 = coords.begin();
+    std::vector<u16>::const_iterator it2 = coords.end();
+    for(; it1 != it2; ++it1)
+    {
+	Maps::TilesAddon *addon = world.GetTiles(*it1).FindCastle();
+	if(addon) addon->index -= 16;
+    }
+}

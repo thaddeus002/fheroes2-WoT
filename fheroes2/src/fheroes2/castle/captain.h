@@ -24,11 +24,14 @@
 #include "skill.h"
 #include "gamedefs.h"
 
+class Castle;
+
 class Captain : public Skill::Primary
 {
     public:
-	Captain();
+	Captain(const Castle &);
 
+	bool isValid(void) const;
         u8 GetAttack(void) const;
         u8 GetDefense(void) const;
         u8 GetPower(void) const;
@@ -36,7 +39,7 @@ class Captain : public Skill::Primary
         Morale::morale_t GetMorale(void) const;
         Luck::luck_t GetLuck(void) const;
 
-	void SetRace(Race::race_t race);
+	const Castle & home;
 };
 
 #endif

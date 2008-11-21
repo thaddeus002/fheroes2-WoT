@@ -123,13 +123,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     
     // set default army
     const Monster::stats_t monster = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
-
     army[0].Set(monster.monster, monster.grown);
 
     // set master primary skill to army
-    Army::army_t::iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    for(; it1 != it2; ++it1) (*it1).SetMasterSkill(this);
+    Army::SetMasterSkill(army, *this);
 
     // extra hero
     switch(hid)
@@ -949,13 +946,12 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 	if(list) list->push_back(MP2::StringObject(MP2::OBJ_PYRAMID) + m2);
     }
 
-    // bonus in castle and sorceress rainbow
     const Castle* castle = inCastle();
-    if(castle && Race::SORC == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC))
-    {
-	result += 2;
-	if(list) list->push_back(Castle::GetStringBuilding(Castle::BUILD_SPEC, castle->GetRace()) + p2);
-    }
+    // check castle morale modificators
+    if(castle) result += castle->GetLuckWithModificators(list);
+
+    // check from army morale
+    result += Army::GetLuckWithModificators(army, list);
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else
