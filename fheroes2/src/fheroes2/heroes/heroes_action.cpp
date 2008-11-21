@@ -1512,26 +1512,34 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		case 4:
 		case 5:
 		{
-		    u32 buttons = 0;
-		    std::string header;
-		    std::string body;
 		    if(4 == c)
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::WISDOM) ? 0 : Dialog::OK;
-			header = "You've found the humble dwelling of a withered hermit.";
-			body = "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.";
+			if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
+			{
+			    PlaySoundSuccess;
+			    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
+			    conditions = true;
+			}
+			else
+			{
+			    PlaySoundFailure;
+			    Dialog::Message("You've found the humble dwelling of a withered hermit.", "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.", Font::BIG, Dialog::OK);
+			}
 		    }
 		    else
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? 0 : Dialog::OK;
-			header = "You've come across the spartan quarters of a retired soldier.";
-			body = "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.";
+			if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
+			{
+			    PlaySoundSuccess;
+			    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
+			    conditions = true;
+			}
+			else
+			{
+			    PlaySoundFailure;
+			    Dialog::Message("You've come across the spartan quarters of a retired soldier.", "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.", Font::BIG, Dialog::OK);
+			}
 		    }
-		    PlaySoundSuccess;
-		    if(buttons)
-			DialogWithArtifact(header, body, art, buttons);
-		    else
-			conditions = true;
 		    break;
 		}
 
