@@ -34,7 +34,6 @@
 #include "army_types.h"
 #include "heroes.h"
 
-#define CASTLEMAXARMY           5 
 #define CASTLEMAXMONSTER        6 
 
 #define GROWN_WELL		2

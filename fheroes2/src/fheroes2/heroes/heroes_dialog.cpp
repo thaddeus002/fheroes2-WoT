@@ -609,7 +609,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	}
 
 	// heroes troops
-	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+	for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
 	{
 	    if(le.MouseClickLeft(coordsHeroesTroops[ii]))
 	    {

@@ -358,7 +358,7 @@ Dialog::answer_t Castle::OpenDialog(void)
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
 	// castle troops
-	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
+	for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
 	{
 	    if(le.MouseClickLeft(coordsCastleTroops[ii]))
 	    {

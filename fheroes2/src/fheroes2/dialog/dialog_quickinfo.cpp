@@ -292,14 +292,14 @@ void Dialog::QuickInfo(const Castle & castle)
         u8 current = 0;
 	const Army::army_t & army = castle.GetArmy();
 
-	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
+	for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
         {
 	    if(Army::isValid(army.at(ii)))
 	    {
 		const Sprite & monster = AGG::GetICN(ICN::MONS32, army.at(ii).Monster());
 
                 // align from count
-		dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
+		dst_pt.x = (cur_rt.w / ARMYMAXTROOPS - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / ARMYMAXTROOPS) * (ARMYMAXTROOPS - count) / (2 * count));
 		dst_pt.y = cur_rt.y + 85;
 		// alignt from height sprite
 		dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
@@ -475,14 +475,16 @@ void Dialog::QuickInfo(const Heroes & hero)
     u8 current = 0;
     const Army::army_t & army = hero.GetArmy();
 
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+    Army::army_t::const_iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1)
     {
-	if(Army::isValid(army.at(ii)))
+    	if((*it1).isValid())
 	{
-	    const Sprite & monster = AGG::GetICN(ICN::MONS32, army.at(ii).Monster());
+	    const Sprite & monster = AGG::GetICN(ICN::MONS32, (*it1).Monster());
 
             // align from count
-	    dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
+	    dst_pt.x = (cur_rt.w / ARMYMAXTROOPS - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / ARMYMAXTROOPS) * (ARMYMAXTROOPS - count) / (2 * count));
 	    dst_pt.y = cur_rt.y + 112;
 	    // alignt from height sprite
 	    dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
@@ -490,7 +492,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
 	    // count message
             message.clear();
-	    String::AddInt(message, army.at(ii).Count());
+	    String::AddInt(message, (*it1).Count());
 	    dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
 	    dst_pt.y = cur_rt.y + 142;
 	    Text(message, Font::SMALL, dst_pt);

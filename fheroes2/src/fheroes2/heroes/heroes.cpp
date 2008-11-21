@@ -37,7 +37,7 @@
 #include "army.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), spellCasted(false), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), spell_book(*this), hid(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
+    move_point(0), army(ARMYMAXTROOPS), spell_book(*this), hid(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     artifacts.reserve(HEROESMAXARTIFACT);

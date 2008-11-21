@@ -412,7 +412,7 @@ static void RedrawArtifacts(const ArtifactList &artifacts)
  */
 static void PrepareArmy(Army::army_t &army, const Point &pt, ArmyList &coords)
 {
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
     {
 	if(army[ii].isValid())
 	{

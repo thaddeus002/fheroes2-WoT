@@ -31,7 +31,7 @@
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
     : building(0), army_spread(true), allow_build(true), present_boat(false), dwelling(CASTLEMAXMONSTER, 0),
-      army(CASTLEMAXARMY), castle_heroes(false), mp(mapindex % world.w(), mapindex / world.h()),
+      army(ARMYMAXTROOPS), castle_heroes(false), mp(mapindex % world.w(), mapindex / world.h()),
       nearly_sea(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST)))
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
@@ -740,12 +740,12 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
     if(dwelling[dw_index] < count) return false;
 
     // find free cell
-    u8 num_cell = CASTLEMAXARMY;
-    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
+    u8 num_cell = ARMYMAXTROOPS;
+    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
 	if(ms == army[ii].Monster() || 0 == army[ii].Count()){ num_cell = ii; break; }
 
     // not found
-    if(CASTLEMAXARMY <= num_cell) return false;
+    if(ARMYMAXTROOPS <= num_cell) return false;
 
     // buy
     const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms) * count);

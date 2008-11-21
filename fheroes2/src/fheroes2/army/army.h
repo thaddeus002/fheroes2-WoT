@@ -40,6 +40,7 @@ class Heroes;
 
 namespace Army
 {
+
     typedef enum
     {
 	FEW	= 1,
