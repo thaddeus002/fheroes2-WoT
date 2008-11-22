@@ -35,11 +35,11 @@
 #include "sprite.h"
 #include "portrait.h"
 #include "game_focus.h"
-#include "spell.h"
 #include "skill.h"
 #include "world.h"
 #include "settings.h"
 #include "dialog.h"
+#include "spell.h"
 
 void Dialog::QuickInfo(const Maps::Tiles & tile)
 {

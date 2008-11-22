@@ -36,7 +36,6 @@
 #include "skill.h"
 #include "dialog.h"
 #include "game.h"
-#include "spell.h"
 #include "SDL.h"
 
 Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle)

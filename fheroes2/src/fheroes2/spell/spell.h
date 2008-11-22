@@ -28,6 +28,9 @@
 #include "army_types.h"
 #include "spell_types.h"
 
+// FIXME: For definitions of spell_t and magic_t, look in spell_types.h
+//        This is hopefully only a temporary hack.
+
 namespace Spell
 {
     enum target_t {
@@ -54,11 +57,6 @@ namespace Spell
 	ICN::icn_t icn;
 	M82::m82_t m82;
         const std::string description;
-    };
-
-    struct magic_t {
-	spell_t spell;
-	u8 duration;
     };
 
     const std::string &String(spell_t spell);

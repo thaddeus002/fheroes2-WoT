@@ -103,7 +103,7 @@ namespace Army
 	void RemoveMagic(Spell::spell_t spell);
 	void ClearMagic();
 	void ProceedMagic();
-	const std::vector<Spell::magic_t> &Magics() const { return magics; };
+	const std::vector<Spell::magic_t> &Magics() const;
         
         bool IsReflected() const { return reflect; }
         void SetReflect(bool r) { lastReflect = reflect; reflect = r; }

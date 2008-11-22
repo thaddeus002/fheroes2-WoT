@@ -241,6 +241,11 @@ void Army::BattleTroop::ProceedMagic()
     }
 }
 
+const std::vector<Spell::magic_t> &Army::BattleTroop::Magics() const
+{
+    return magics;
+}
+
 bool Army::PredicateStrongestTroop(const Troop & t1, const Troop & t2)
 {
     return t1.isValid() && t2.isValid() && (Monster::GetStats(t1.Monster()).damageMin > Monster::GetStats(t2.Monster()).damageMin);

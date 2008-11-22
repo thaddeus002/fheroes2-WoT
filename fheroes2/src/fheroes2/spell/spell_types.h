@@ -19,6 +19,8 @@
 #ifndef H2SPELL_TYPES_H
 #define H2SPELL_TYPES_H
 
+#include "types.h"
+
 namespace Spell
 {
     typedef enum {
@@ -92,7 +94,11 @@ namespace Spell
     } spell_t;
     
     struct stats_t;
-    struct magic_t;
+
+    struct magic_t {
+	spell_t spell;
+	u8 duration;
+    };
 }
 
 #endif
