@@ -438,6 +438,12 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
     current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+    {
+	TextSprite & text = coordClass[Color::GetIndex(color)].second;
+	text.Hide();
+    }
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	if(conf.FileInfo().KingdomColors() & color)
     {
 	    u8 index = 0;

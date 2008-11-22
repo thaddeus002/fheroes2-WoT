@@ -70,7 +70,7 @@ private:
 class TextSprite : public Text
 {
 public:
-    TextSprite(){};
+    TextSprite();
     TextSprite(const std::string & msg, Font::type_t ft, const Point & pt);
     TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
 
@@ -82,6 +82,7 @@ public:
 
 private:
     Background back;
+    bool hide;
 };
 
 class TextBox

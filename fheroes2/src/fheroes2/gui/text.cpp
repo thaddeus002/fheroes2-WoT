@@ -245,12 +245,16 @@ TextBox::TextBox(const std::list<std::string> & list, Font::type_t ft, const Rec
     extents.h = pt.y - extents.y;
 }
 
-TextSprite::TextSprite(const std::string & msg, Font::type_t ft, const Point & pt) : Text(msg, ft)
+TextSprite::TextSprite() : hide(true)
+{
+}
+
+TextSprite::TextSprite(const std::string & msg, Font::type_t ft, const Point & pt) : Text(msg, ft), hide(false)
 {
     back.Save(Rect(pt, Text::width(msg, ft), Text::height(msg, ft, Text::width(msg, ft))));
 }
 
-TextSprite::TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay) : Text(msg, ft)
+TextSprite::TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay) : Text(msg, ft), hide(false)
 {
     back.Save(Rect(ax, ay, Text::width(msg, ft), Text::height(msg, ft, Text::width(msg, ft))));
 }
@@ -262,12 +266,12 @@ void TextSprite::Show(void)
 
 void TextSprite::Hide(void)
 {
-    back.Restore();
+    if(!hide) back.Restore();
+    hide = true;
 }
 
 void TextSprite::SetPos(u16 ax, u16 ay)
 {
-    back.Restore();
-    
     back.Save(Rect(ax, ay, width(), height()));
+    hide = false;
 }
