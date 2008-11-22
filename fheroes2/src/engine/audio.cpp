@@ -268,7 +268,7 @@ void Music::Reset(void)
 
 void Mixer::Init(void)
 {
-    if(SDL::SubSystem(INIT_AUDIO))
+    if(SDL::SubSystem(SDL_INIT_AUDIO))
     {
 	hardware.freq = 22050;
 	hardware.format = AUDIO_S16;
