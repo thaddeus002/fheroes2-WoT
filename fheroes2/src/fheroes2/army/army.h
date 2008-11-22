@@ -127,6 +127,8 @@ namespace Army
 	bool                    summoned;
 
     private:
+        void initDefaults();
+    
 	Point                   pos;
 	Background bg;
 	bool saved;

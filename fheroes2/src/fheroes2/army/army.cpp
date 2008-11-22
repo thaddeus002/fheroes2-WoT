@@ -73,15 +73,10 @@ Army::Troop::Troop(Monster::monster_t m, u16 c)
 {
 }
 
-/*Army::Troop &Army::Troop::operator=(const Troop &t)
-{
-  monster = t.monster;
-  count = t.count;
-  return *this;
-}*/
-
 Army::BattleTroop::BattleTroop(const Troop &t)
-: Troop(t)
+: Troop(t.Monster(), t.Count())
+, attackRanged(false)
+, summoned(false)
 {
 }
 

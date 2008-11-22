@@ -2375,7 +2375,7 @@ void Army::InitArmyPosition(Army::BattleArmy_t & army, bool compact, bool reflec
 	    army[i].aframe = 1;
 	    army[i].astate = Monster::AS_NONE;
 	    army[i].shots = stats.shots;
-	    army[i].hp = stats.hp;
+            army[i].hp = stats.hp;
 	    army[i].oldcount = army[i].Count();
             army[i].SetReflect(reflect);
             army[i].SetOriginalReflection(reflect);

@@ -41,6 +41,7 @@
 #include "portrait.h"
 #include "dialog.h"
 #include "army.h"
+#include "spell.h"
 #include "SDL.h"
 
 void Castle::RedrawNameTown(const Point & src_pt)
