@@ -26,11 +26,22 @@
 
 namespace Spell
 {
-    static const stats_t all_spells[] = {
+    static const struct
+    {
+        const std::string name;
+        u8 mana;
+        u8 level;
+        bool combat;
+        u8 sprite;
+        target_t target;
+        u8 power;
+        ICN::icn_t icn;
+        M82::m82_t m82;
+        const std::string description;
+    } all_spells[] = {
 	//  name                   mana lvl cmbt  spr    target  pwr icn            m82           description
 	{ "Unknown",                 0, 0, false,  0,  NOTARGET,  0, ICN::UNKNOWN,  M82::UNKNOWN, "Unknown spell." },
-	{ "Fireball",                9, 3,  true,  8,  ONEENEMY, 10, ICN::FIREBALL, M82::FIREBALL, "Causes a giant fireball to strike the selected area, damaging all nearby creatures." },
-	{ "Fireblast",              15, 4,  true,  9,  ONEENEMY, 10, ICN::FIREBAL2, M82::FIREBALL, "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one." }, 
+	{ "Fireball",                9, 3,  true,  8,  ONEENEMY, 10, ICN::FIREBALL, M82::FIREBALL, "Causes a giant fireball to strike the selected area, damaging all nearby creatures." },	{ "Fireblast",              15, 4,  true,  9,  ONEENEMY, 10, ICN::FIREBAL2, M82::FIREBALL, "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one." }, 
 	{ "Lightning Bolt",          7, 2,  true,  4,  ONEENEMY, 25, ICN::SPARKS,   M82::LIGHTBLT, "Causes a bolt of electrical energy to strike the selected creature." }, 
 	{ "Chain Lightning",        15, 4,  true,  5,  ONEENEMY, 40, ICN::SPARKS,   M82::CHAINLTE, "Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!" }, 
 	{ "Teleport",                9, 3,  true, 10, ONEFRIEND,  0, icnnone      , M82::TELEIN, "Teleports the creature you select to any open position on the battlefield." }, 
@@ -286,282 +297,32 @@ u8 Spell::GetIndexSprite(spell_t spell)
     return Spell::all_spells[spell].sprite;
 }
 
-bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
-{
-    target_t target = Target(spell);
-    if(troop.Monster() == Monster::DWARF || troop.Monster() == Monster::BATTLE_DWARF) {
-	if(!Rand::Get(0,3) && target != ONEFRIEND && target != ALLFRIEND) return false;
-    }
-    if(troop.FindMagic(ANTIMAGIC) && target != ONEFRIEND && target != ALLFRIEND)
-	return false;
-    if(spell == ANTIMAGIC && troop.summoned) return false;
-    switch(troop.Monster()) {
-    case Monster::GREEN_DRAGON:
-    case Monster::RED_DRAGON:
-    case Monster::BLACK_DRAGON:
-	return false;
-    default:
-	switch(spell) {
-	case BLESS:
-	case MASSBLESS:
-	case CURSE:
-	case MASSCURSE:
-	case BERZERKER:
-	case BLIND:
-	case PARALYZE:
-	case HYPNOTIZE:
-	case DEATHRIPPLE:
-	case DEATHWAVE:
-	    return Monster::GetRace(troop.Monster()) != Race::NECR;
-	case HOLYWORD:
-	case HOLYSHOUT:
-	    return Monster::GetRace(troop.Monster()) == Race::NECR;
-	case ANIMATEDEAD:
-	    return Monster::GetRace(troop.Monster()) == Race::NECR &&
-		( Monster::GetStats(troop.Monster()).hp > troop.hp ||
-		  troop.oldcount > troop.Count());
-	case CURE:
-	case MASSCURE:
-	    return Monster::GetStats(troop.Monster()).hp > troop.hp;
-	case RESURRECT:
-	case RESURRECTTRUE:
-	    return Monster::GetStats(troop.Monster()).hp > troop.hp ||
-		troop.oldcount > troop.Count();
-
-	case DISPEL:
-	case MASSDISPEL:
-	    return troop.Magics().size();
-/*	FIREBALL,
-	FIREBLAST,
-	LIGHTNINGBOLT,
-	CHAINLIGHTNING,
-	TELEPORT,
-	HASTE,
-	MASSHASTE,
-	SLOW,
-	MASSSLOW,
-	STONESKIN,
-	STELLSKIN,
-	ANTIMAGIC,
-	ARROW,
-	ARMAGEDDON,
-	ELEMENTALSTORM,
-	METEORSHOWER,
-	COLDRAY,
-	COLDRING,
-	DISRUPTINGRAY,
-	DRAGONSLAYER,
-	BLOODLUST,
-	MIRRORIMAGE,
-	SHIELD,
-	MASSSHIELD,
-	SUMMONEELEMENT,
-	SUMMONAELEMENT,
-	SUMMONFELEMENT,
-	SUMMONWELEMENT,
-	EARTHQUAKE*/
-	default: 
-	    return true;
-	}
-	return true;
-    }
-}
-
-void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
-{
-    //Dialog::Message("apply spell", Spell::String(spell), Font::BIG, Dialog::OK);
-    magic_t magic;
-    magic.spell = spell;
-    magic.duration = spower;
-    if(!Power(spell)) {
-	switch(spell) {
-	case MASSDISPEL:
-	case DISPEL:
-	    troop.ClearMagic();
-	return;
-// 	TELEPORT,
-// 	MIRRORIMAGE,
-// 	BERZERKER,
-// 	HYPNOTIZE,
-// 	DISRUPTINGRAY,
-// 	EARTHQUAKE,
-	default:
-	    break;
-	// TODO
-	}
-    } else if(Power(spell) == 1) {
-	switch(spell) {
-	case MASSBLESS:
-	    magic.spell = BLESS;
-	case BLESS:
-	    troop.RemoveMagic(CURSE);
-	    troop.RemoveMagic(MASSCURSE);
-	    break;
-	case MASSCURSE:
-	    magic.spell = CURSE;
-	case CURSE:
-	    troop.RemoveMagic(BLESS);
-	    troop.RemoveMagic(MASSBLESS);
-	    break;
-	case STONESKIN:
-	    troop.RemoveMagic(STELLSKIN);
-	    break;
-	case STELLSKIN:
-	    troop.RemoveMagic(STONESKIN);
-	    break;
-	case MASSSLOW:
-	    magic.spell = SLOW;
-	    break;
-	case MASSSHIELD:
-	    magic.spell = SHIELD;
-	    break;
-	case MASSHASTE:
-	    magic.spell = HASTE;
-	    break;
-// 	BLIND,
-// 	SHIELD,
-// 	ANTIMAGIC,
-// 	PARALYZE,
-// 	STONE,
-// 	DRAGONSLAYER,
-// 	BLOODLUST,
-	default:
-	    break;
-	}
-	troop.SetMagic(magic);
-    } else {
-	int damage = spower * Power(spell);
-	switch(spell) {
-	case MASSCURE:
-	    spell = CURE;
-	case CURE:
-	case RESURRECT:
-	case RESURRECTTRUE:
-	case ANIMATEDEAD: {
-	    int hp = Monster::GetStats(troop.Monster()).hp;
-	    troop.hp += damage;
-	    if(troop.hp > hp) {
-		if(spell == CURE) troop.hp = hp;
-		else {
-		    troop.SetCount(troop.Count() + troop.hp/hp);
-		    troop.hp = troop.hp%hp;
-		    if(!troop.hp) {
-			troop.SetCount(troop.Count()-1);
-			troop.hp = hp;
-		    }
-		    if(troop.Count() > troop.oldcount) {
-			troop.SetCount(troop.oldcount);
-			troop.hp = hp;
-		    }
-		}
-	    }
-	    return;
-	}
-	case SUMMONEELEMENT:
-	case SUMMONAELEMENT:
-	case SUMMONFELEMENT:
-	case SUMMONWELEMENT:
-	    // TODO
-	    return;
-// 	ARROW,
-// 	FIREBALL,
-// 	FIREBLAST,
-// 	LIGHTNINGBOLT,
-// 	CHAINLIGHTNING,
-// 	HOLYWORD,
-// 	HOLYSHOUT,
-// 	COLDRAY,
-// 	COLDRING,
-// 	DEATHRIPPLE,
-// 	DEATHWAVE,
-// 	ARMAGEDDON,
-// 	ELEMENTALSTORM,
-// 	METEORSHOWER,
-	default: {
-	    int hp = Monster::GetStats(troop.Monster()).hp;
-	    while(troop.hp < damage) {
-		troop.SetCount(troop.Count() - 1);
-		if(troop.Count() <= 0) {
-		    troop.SetCount(0);
-		    troop.hp = 0;
-		    break;
-		}
-		damage -= troop.hp;
-		troop.hp = hp;
-	    }
-	    return;
-	}
-	}
-    }
-}
-
-Spell::spell_t Spell::TroopAttack(Monster::monster_t monster)
-{
-    switch(monster) {
-    case Monster::CYCLOPS:
-	if(!Rand::Get(0, 4)) return PARALYZE;
-	break;
-    case Monster::UNICORN:
-	if(!Rand::Get(0, 4)) return BLIND;
-	break;
-    case Monster::MUMMY:
-	if(!Rand::Get(0, 4)) return CURSE;
-	break;
-    case Monster::ROYAL_MUMMY:
-	if(!Rand::Get(0, 3)) return CURSE;
-	break;
-    case Monster::MEDUSA:
-	if(!Rand::Get(0, 4)) return PARALYZE;
-	break;
-    case Monster::ARCHMAGE:
-	if(!Rand::Get(0, 4)) return DISPEL;
-	break;
-    default:
-	return NONE;
-    }
-    return NONE;
-}
-
 u8 Spell::GetInlIndexSprite(spell_t spell)
 {
-    switch(spell) {
-    case HASTE:
-    case MASSHASTE:
-	return 0;
-    case SLOW:
-    case MASSSLOW:
-	return 1;
-    case BLIND:
-	return 2;
-    case BLESS:
-    case MASSBLESS:
-	return 3;
-    case CURSE:
-    case MASSCURSE:
-	return 4;
-    case BERZERKER:
-	return 5;
-    case PARALYZE:
-	return 6;
-    case HYPNOTIZE:
-	return 7;
-    case DRAGONSLAYER:
-	return 8;
-    case BLOODLUST:
-	return 9;
-    case SHIELD:
-    case MASSSHIELD:
-	return 10;
-    case STONE:
-	return 11;
-    case ANTIMAGIC:
-	return 12;
-    case STONESKIN:
-	return 13;
-    case STELLSKIN:
-	return 14;
-    default:
-	return 0;
+    switch(spell)
+    {
+	case HASTE:
+	case MASSHASTE:		return 0;
+	case SLOW:
+	case MASSSLOW:		return 1;
+	case BLIND:		return 2;
+	case BLESS:
+	case MASSBLESS:		return 3;
+	case CURSE:
+	case MASSCURSE:		return 4;
+	case BERZERKER:		return 5;
+	case PARALYZE:		return 6;
+	case HYPNOTIZE:		return 7;
+	case DRAGONSLAYER:	return 8;
+	case BLOODLUST:		return 9;
+	case SHIELD:
+	case MASSSHIELD:	return 10;
+	case STONE:		return 11;
+	case ANTIMAGIC:		return 12;
+	case STONESKIN:		return 13;
+	case STELLSKIN:		return 14;
+	default: break;
     }
+
     return 0;
 }

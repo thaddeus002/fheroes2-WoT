@@ -17,20 +17,21 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #ifndef H2ARMY_H
 #define H2ARMY_H
 
 #include <string>
 #include <vector>
-#include <utility>
 #include "race.h"
-#include "dialog.h"
 #include "monster.h"
 #include "skill.h"
 #include "gamedefs.h"
 
 class Surface;
 class Heroes;
+class Point;
+class Rect;
 
 namespace Army
 {
@@ -75,59 +76,6 @@ namespace Army
             const Skill::Primary* master_skill;
     };
 
-    class BattleTroop : public Troop
-    {
-    public:
-	BattleTroop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
-	BattleTroop(const BattleTroop & troop);
-        BattleTroop(const Troop & troop);
-
-	BattleTroop & operator= (const BattleTroop & troops);
-        BattleTroop & operator= (const Troop & troops);
-	
-	void SetPosition(const Point & pt) { pos = pt; };
-	const Point& Position() const { return pos; };
-
-	void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
-	void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
-	void Animate(Monster::animstate_t as = Monster::AS_NONE);
-	void SetMagic(Spell::magic_t &magic);
-	bool FindMagic(Spell::spell_t spell) const;
-	void RemoveMagic(Spell::spell_t spell);
-	void ClearMagic();
-	void ProceedMagic();
-	const std::vector<Spell::magic_t> &Magics() const { return magics; };
-        
-        bool IsReflected() const { return reflect; }
-        void SetReflect(bool r) { lastReflect = reflect; reflect = r; }
-        void SetOriginalReflection(bool r) { origReflect = r; }
-        void ResetReflection() { reflect = origReflect; }
-        bool WasReflected() const { return lastReflect; }
-        
-        bool HasRetaliated() const { return retaliated; }
-        void SetRetaliated(bool r) { retaliated = r; }
-        
-        int TotalHP() const { return hp + (count - 1) * Monster::GetStats(monster).hp; }
-        
-        int ApplyDamage(int damage);
-
-	Monster::animstate_t    astate;
-	u16                     aframe;
-	bool                    attackRanged;
-	u8                      shots;
-	u16                     hp;
-	u16                     oldcount;
-	bool                    summoned;
-
-    private:
-	Point                   pos;
-	Background bg;
-	bool saved;
-        bool reflect, origReflect, lastReflect;
-        bool retaliated;
-	std::vector<Spell::magic_t> magics;
-    };
-
     bool isValid(const Troop & troop);
 
     bool PredicateStrongestTroop(const Troop & t1, const Troop & t2);
@@ -135,9 +83,9 @@ namespace Army
     bool PredicateSlowestTroop(const Troop & t1, const Troop & t2);
     bool PredicateFastestTroop(const Troop & t1, const Troop & t2);
 
-    typedef std::vector<BattleTroop> BattleArmy_t;
     typedef std::vector<Troop> army_t;
 
+    // deprecated
     class SelectBar
     {
     public:

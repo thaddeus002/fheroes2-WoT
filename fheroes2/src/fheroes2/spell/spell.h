@@ -21,19 +21,15 @@
 #define H2SPELL_H
 
 #include <string>
-#include <vector>
 #include "gamedefs.h"
 #include "icn.h"
 #include "m82.h"
 #include "monster.h"
 
-namespace Army {
-    class BattleTroop;
-}
-
 namespace Spell
 {
-    typedef enum {
+    typedef enum
+    {
 	NONE,
 	FIREBALL,
 	FIREBLAST,
@@ -103,7 +99,8 @@ namespace Spell
 	STONE,
     } spell_t;
 
-    typedef enum {
+    typedef enum
+    {
 	NOTARGET,
 	ONEFRIEND,
 	ONEENEMY,
@@ -116,32 +113,16 @@ namespace Spell
 	FREECELL
     } target_t;
 
-    typedef struct {
-        const std::string name;
-	u8 mana;
-	u8 level;
-	bool combat;
-	u8 sprite;
-	target_t target;
-	u8 power;
-	ICN::icn_t icn;
-	M82::m82_t m82;
-        const std::string description;
-    } stats_t;
-
-    typedef struct {
-	spell_t spell;
-	u8 duration;
-    } magic_t;
-
     const std::string &String(spell_t spell);
     u8 Mana(spell_t spell);
     u8 Level(spell_t spell);
     bool isCombat(spell_t spell);
+
     /* return index sprite spells.icn */
     u8 GetIndexSprite(spell_t spell);
     /* return index in spellinl.icn */
     u8 GetInlIndexSprite(spell_t spell);
+
     target_t Target(spell_t spell);
     u8 Power(spell_t spell);
     ICN::icn_t Icn(spell_t spell);
@@ -150,10 +131,6 @@ namespace Spell
 
     spell_t RandCombat(const u8 lvl);
     spell_t RandAdventure(const u8 lvl);
-    
-    bool AllowSpell(spell_t spell, const Army::BattleTroop &troop);
-    void ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop);
-    spell_t TroopAttack(Monster::monster_t monster);
 };
 
 #endif

@@ -32,6 +32,9 @@
 #include "skill.h"
 #include "dialog.h"
 #include "game.h"
+#include "battle_troop.h"
+
+// TODO:: FIX: Dialog::ArmyInfo
 
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
 {

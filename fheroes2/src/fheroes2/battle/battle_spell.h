@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Vasily Makarov                                  *
- *   drmoriarty@rambler.ru                                                 *
+ *   Copyright (C) 2008 by Vasily Makarov <drmoriarty@rambler.ru>          *
+ *   Copyright (C) 2008 by Josh Matthews  <josh@joshmatthews.net>          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,22 +18,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <vector>
-#include "heroes.h"
-#include "castle.h"
-#include "maps_tiles.h"
+#ifndef H2BATTLE_SPELL_H
+#define H2BATTLE_SPELL_H
 
-#ifndef BATTLE_H
-#define BATTLE_H
+#include "spell.h"
+#include "monster.h"
+#include "gamedefs.h"
 
-namespace Army {
-    
-    typedef enum { WIN, LOSE, RETREAT, SURRENDER, AUTO } battle_t;
+namespace Army { class BattleTroop; };
 
-    battle_t Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile);
-    battle_t Battle(Heroes& hero, Army::army_t & army, const Maps::Tiles & tile);
-    battle_t Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile);
-	
+namespace Spell	// or Battle 
+{
+    typedef struct
+    {
+	spell_t spell;
+	u8 duration;
+    } magic_t;
+
+    bool AllowSpell(spell_t spell, const Army::BattleTroop &troop);
+    void ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop);
+    spell_t TroopAttack(Monster::monster_t monster);
 };
 
 #endif
