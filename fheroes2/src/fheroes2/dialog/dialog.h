@@ -42,6 +42,7 @@ class Surface;
 namespace Army
 {
     class Troop;
+    class BattleTroop;
 };
 
 namespace Maps
@@ -51,7 +52,9 @@ namespace Maps
 
 namespace Dialog
 {
-    typedef enum {
+    typedef enum { READONLY = 0x01, BUTTONS = 0x02 } flags_t;
+    typedef enum
+    {
 	ZERO	= 0x0000,
 	YES     = 0x0001,
         OK      = 0x0002,
@@ -102,7 +105,8 @@ namespace Dialog
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
 
     // army info
-    answer_t ArmyInfo(const Army::Troop & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle=false);
+    answer_t ArmyInfo(const Army::Troop & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle=false); // deprecated
+    answer_t ArmyInfo(const Army::Troop & troop, u8 flags, bool battle = false);
 
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);

@@ -34,11 +34,16 @@
 #include "game.h"
 #include "battle_troop.h"
 
-// TODO:: FIX: Dialog::ArmyInfo
 
+// derecated
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
 {
-    const Army::BattleTroop & army(basicArmy);
+    return ArmyInfo(basicArmy, (quickshow ? 0 : (dismiss ? Dialog::BUTTONS : Dialog::READONLY|Dialog::BUTTONS)), battle);
+}
+
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u8 flags, bool battle)
+{
+    const Army::BattleTroop & battroop(troops);
 
     Display & display = Display::Get();
 
@@ -46,8 +51,8 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
 
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
 
-    const Monster::stats_t monster = Monster::GetStats(army.Monster());
-    const Skill::Primary *skills = army.MasterSkill();
+    const Monster::stats_t stats = Monster::GetStats(battroop.Monster());
+    const Skill::Primary *skills = battroop.MasterSkill();
 
     Rect pos_rt;
 
@@ -69,12 +74,12 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     std::string message;
 
     // name
-    dst_pt.x = pos_rt.x  + 140 - Text::width(monster.name, Font::BIG) / 2;
+    dst_pt.x = pos_rt.x  + 140 - Text::width(stats.name, Font::BIG) / 2;
     dst_pt.y = pos_rt.y + 40;
-    Text(monster.name, Font::BIG, dst_pt);
+    Text(stats.name, Font::BIG, dst_pt);
     
     // count
-    String::AddInt(message, army.Count());
+    String::AddInt(message, battroop.Count());
     dst_pt.x = pos_rt.x + 140 - Text::width(message, Font::BIG) / 2;
     dst_pt.y = pos_rt.y + 225;
     Text(message, Font::BIG, dst_pt);
@@ -86,12 +91,12 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, monster.attack);
+    String::AddInt(message, stats.attack);
 
     if(skills)
     {
 	message += " (";
-	String::AddInt(message, monster.attack + (*skills).GetAttack());
+	String::AddInt(message, stats.attack + (*skills).GetAttack());
 	message += ")";
     }
 
@@ -105,12 +110,12 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, monster.defence);
+    String::AddInt(message, stats.defence);
 
     if(skills)
     {
 	message += " (";
-	String::AddInt(message, monster.defence + (*skills).GetDefense());
+	String::AddInt(message, stats.defence + (*skills).GetDefense());
 	message += ")";
     }
 
@@ -118,14 +123,14 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     Text(message, Font::BIG, dst_pt);
 
     // shot
-    if(monster.shots) {
+    if(stats.shots) {
 	message = battle ? "Shots Left:" : "Shots:";
 	dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
 	dst_pt.y += 18;
 	Text(message, Font::BIG, dst_pt);
 
 	message.clear();
-	String::AddInt(message, battle ? army.shots : monster.shots);
+	String::AddInt(message, battle ? battroop.shots : stats.shots);
 	dst_pt.x = pos_rt.x + 420;
 	Text(message, Font::BIG, dst_pt);
     }
@@ -137,9 +142,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, monster.damageMin);
+    String::AddInt(message, stats.damageMin);
     message += " - ";
-    String::AddInt(message, monster.damageMax);
+    String::AddInt(message, stats.damageMax);
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -150,7 +155,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, monster.hp);
+    String::AddInt(message, stats.hp);
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -161,7 +166,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
 	Text(message, Font::BIG, dst_pt);
 	
 	message.clear();
-	String::AddInt(message, army.hp);
+	String::AddInt(message, battroop.hp);
 	dst_pt.x = pos_rt.x + 420;
 	Text(message, Font::BIG, dst_pt);
     }
@@ -172,7 +177,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     dst_pt.y += 18;
     Text(message, Font::BIG, dst_pt);
 
-    message = Speed::String(monster.speed);
+    message = Speed::String(stats.speed);
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -196,11 +201,6 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
-    // monster animation
-    //Animation animeMonster(Point(pos_rt.x + 100, pos_rt.y + 180), monster.file, ?, ?, false, Animation::INFINITY | Animation::RING | Animation::LOW);
-
-    bool upgrade = false;
-
     // button upgrade
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 190;
@@ -216,29 +216,27 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     dst_pt.y = pos_rt.y + 222;
     Button buttonExit(dst_pt, viewarmy, 3, 4);
 
-    if(!quickshow)
+    if(READONLY & flags)
     {
-	if(show_upgrade && monster.monster != Monster::Upgrade(monster.monster))
-	{
-	    upgrade = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(monster.monster) * army.Count()) <= world.GetMyKingdom().GetFundsResource();
+	buttonDismiss.Press();
+	buttonDismiss.SetDisable(true);
+    }
 
-	    if(!upgrade)
-	    {
-		buttonUpgrade.Press();
-		buttonUpgrade.SetDisable(true);
-	    }
-	    
-	    buttonUpgrade.Draw();
-	}
-	else
+    if(Monster::AllowUpgrade(stats.monster))
+    {
+	const bool conditions = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(stats.monster) * battroop.Count()) <= world.GetMyKingdom().GetFundsResource();
+	if(!conditions)
+	{
+	    buttonUpgrade.Press();
 	    buttonUpgrade.SetDisable(true);
-
-	if(!dismiss)
-	{
-	    buttonDismiss.Press();
-	    buttonDismiss.SetDisable(true);
 	}
+	if(BUTTONS & flags) buttonUpgrade.Draw();
+    }
+    else
+	buttonUpgrade.SetDisable(true);
 
+    if(BUTTONS & flags)
+    {
 	buttonDismiss.Draw();
 	buttonExit.Draw();
     }
@@ -252,19 +250,16 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
         
     u16 animat = 0;
     Point anim_rt(pos_rt.x + 100, pos_rt.y + 180);
-    Army::BattleTroop troop(army.Monster(), 0);
+    Army::BattleTroop troop(battroop.Monster(), 0);
     troop.astate = Monster::AS_NONE;
     troop.aframe = 0;
     troop.Blit(anim_rt);
     int animcount=0;
+
     // dialog menu loop
     while(le.HandleEvents())
     {
-        if(quickshow)
-	{
-	    if(!le.MouseRight()) break;
-        }
-	else
+        if(flags & BUTTONS)
 	{
 	    if(buttonUpgrade.isEnable()) le.MousePressLeft(buttonUpgrade) ? (buttonUpgrade).PressDraw() : (buttonUpgrade).ReleaseDraw();
     	    if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? (buttonDismiss).PressDraw() : (buttonDismiss).ReleaseDraw();
@@ -277,9 +272,13 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
 	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)){ result = Dialog::DISMISS; break; }
 
     	    // exit
-    	    if(le.MouseClickLeft(buttonExit) ||
-    		le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
+    	    if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
 	}
+	else
+	{
+	    if(!le.MouseRight()) break;
+        }
+
 	if(Game::ShouldAnimateInfrequent(animat++, 3)) {
 	    troop.Animate();
 	    if(troop.astate == Monster::AS_NONE) {
@@ -299,13 +298,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
 	    troop.BlitR(anim_rt);
 	    display.Flip();
 	}
-
-	//animeMonster.DrawSprite();
     }
 
     cursor.Hide();
-
     back.Restore();
-
     return result;
 }
