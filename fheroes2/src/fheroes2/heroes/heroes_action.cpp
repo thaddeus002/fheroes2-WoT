@@ -1464,8 +1464,6 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		{
 		    const Resource::resource_t r = Resource::Rand();
 		    std::string header = "A leprechaun offers you the " + Artifact::String(art) + " for the small price of ";
-		    std::string body;
-		    u16 buttons = 0;
 		    Resource::funds_t payment;
 		    if(1 == c)
 		    {
@@ -1488,20 +1486,20 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 
 		    if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
 		    {
-			buttons = Dialog::YES | Dialog::NO;
-			body = "Do you wish to buy this artifact?";
+			PlaySoundWarning;
+			if(Dialog::YES == DialogWithArtifact(header, "Do you wish to buy this artifact?", art, Dialog::YES | Dialog::NO))
+			{
+		    	    conditions = true;
+		    	    world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+			}
+			else
+			    Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    }
 		    else
 		    {
-			buttons = Dialog::OK;
-			body = "You try to pay the leprechaun, but realize that you can't afford it. The leprechaun stamps his foot and ignores you.";
+			PlaySoundFailure;
+			Dialog::Message("You try to pay the leprechaun, but realize that you can't afford it.", "The leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    }
-		    
-		    PlaySoundWarning;
-		    if(Dialog::YES == DialogWithArtifact(header, body, art, buttons))
-			conditions = true;
-		    else
-			Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    break;
 		}
 
@@ -1509,26 +1507,34 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		case 4:
 		case 5:
 		{
-		    u32 buttons = 0;
-		    std::string header;
-		    std::string body;
 		    if(4 == c)
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::WISDOM) ? 0 : Dialog::OK;
-			header = "You've found the humble dwelling of a withered hermit.";
-			body = "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.";
+			if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
+			{
+			    PlaySoundSuccess;
+			    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
+			    conditions = true;
+			}
+			else
+			{
+			    PlaySoundFailure;
+			    Dialog::Message("You've found the humble dwelling of a withered hermit.", "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.", Font::BIG, Dialog::OK);
+			}
 		    }
 		    else
 		    {
-			buttons = hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? 0 : Dialog::OK;
-			header = "You've come across the spartan quarters of a retired soldier.";
-			body = "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.";
+			if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
+			{
+			    PlaySoundSuccess;
+			    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
+			    conditions = true;
+			}
+			else
+			{
+			    PlaySoundFailure;
+			    Dialog::Message("You've come across the spartan quarters of a retired soldier.", "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.", Font::BIG, Dialog::OK);
+			}
 		    }
-		    PlaySoundSuccess;
-		    if(buttons)
-			DialogWithArtifact(header, body, art, buttons);
-		    else
-			conditions = true;
 		    break;
 		}
 
