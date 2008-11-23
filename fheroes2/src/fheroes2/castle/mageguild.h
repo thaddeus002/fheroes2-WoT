@@ -28,9 +28,7 @@
 class MageGuild : public Spell::Storage
 {
     public:
-	MageGuild();
-	
-	void SetRace(const Race::race_t rc);
+	MageGuild(const Race::race_t & rc);
 
 	u8 GetLevel(void) const;
 	Spell::spell_t GetSpell(u8 level, u8 index) const;
@@ -47,11 +45,9 @@ class MageGuild : public Spell::Storage
 	static Spell::spell_t GetSpellRace(const Race::race_t rc, const u8 lvl);
 
     private:
-	Race::race_t race;
-
-	u8 level;
-	
-	bool upgrade;
+	const Race::race_t &	race;
+	u8			level;
+	bool			upgrade;
 };
 
 #endif

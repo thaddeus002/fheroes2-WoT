@@ -21,13 +21,8 @@
 #include <algorithm>
 #include "mageguild.h"
 
-MageGuild::MageGuild() : level(0), upgrade(false)
+MageGuild::MageGuild(const Race::race_t & rc) : race(rc), level(0), upgrade(false)
 {
-}
-
-void MageGuild::SetRace(const Race::race_t rc)
-{
-    race = rc;
 }
 
 void MageGuild::BuildNextLevel(void)

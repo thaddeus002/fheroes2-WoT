@@ -71,7 +71,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
     vec_eventsmap.reserve(6);
     vec_riddles.reserve(10);
     vec_rumors.reserve(10);
-    vec_castles.reserve(30);
+    vec_castles.reserve(MAXCASTLES);
     vec_teleports.reserve(10);
 
     // playing kingdom
@@ -248,7 +248,7 @@ void World::LoadMaps(const std::string &filename)
     vec_eventsmap.reserve(6);
     vec_riddles.reserve(10);
     vec_rumors.reserve(10);
-    vec_castles.reserve(30);
+    vec_castles.reserve(MAXCASTLES);
     vec_teleports.reserve(10);
 
     // playing kingdom
@@ -557,26 +557,42 @@ void World::LoadMaps(const std::string &filename)
 	// empty block
 	if(-1 == cx && -1 == cy) continue;
 
-	switch(id){
-	    case 0x00: break; // tower: knight
-	    case 0x01: break; // tower: barbarian
-	    case 0x02: break; // tower: sorceress
-	    case 0x03: break; // tower: warlock
-	    case 0x04: break; // tower: wizard
-	    case 0x05: break; // tower: necromancer
-	    case 0x06: break; // tower: random
-	    case 0x80: break; // castle: knight
-	    case 0x81: break; // castle: barbarian
-	    case 0x82: break; // castle: sorceress
-	    case 0x83: break; // castle: warlock
-	    case 0x84: break; // castle: wizard
-	    case 0x85: break; // castle: necromancer
-	    case 0x86: break; // castle: random
+	switch(id)
+	{
+	    case 0x00: // tower: knight
+	    case 0x80: // castle: knight
+		vec_castles.push_back(new Castle(cx, cy, Race::KNGT));	break;
+
+	    case 0x01: // tower: barbarian
+	    case 0x81: // castle: barbarian
+		vec_castles.push_back(new Castle(cx, cy, Race::BARB));	break;
+
+	    case 0x02: // tower: sorceress
+	    case 0x82: // castle: sorceress
+		vec_castles.push_back(new Castle(cx, cy, Race::SORC));	break;
+
+	    case 0x03: // tower: warlock
+	    case 0x83: // castle: warlock
+		vec_castles.push_back(new Castle(cx, cy, Race::WRLK));	break;
+
+	    case 0x04: // tower: wizard
+	    case 0x84: // castle: wizard
+		vec_castles.push_back(new Castle(cx, cy, Race::WZRD));	break;
+
+	    case 0x05: // tower: necromancer
+	    case 0x85: // castle: necromancer
+		vec_castles.push_back(new Castle(cx, cy, Race::NECR));	break;
+
+	    case 0x06: // tower: random
+	    case 0x86: // castle: random
+		vec_castles.push_back(new Castle(cx, cy, Race::BOMG));	break;
+
 	    default:
 		Error::Warning("World::World: castle block, unknown id: ", id);
 		if(H2Config::Debug()) Error::Verbose("maps index: ", cx + cy * w());
 		break;
 	}
+
     }
 
     if(H2Config::Debug()) Error::Verbose("World::World: read coord castles, tellg: ", fd.tellg());
@@ -689,14 +705,33 @@ void World::LoadMaps(const std::string &filename)
 		    // add castle
 		    if(SIZEOFMP2CASTLE != sizeblock) Error::Warning("World::World: read castle: incorrect size block.");
 		    else
-		    vec_castles.push_back(new Castle(tile.GetUniq1(), *it_index, pblock));
+		    {
+			Castle *castle = const_cast<Castle *>(GetCastle(*it_index));
+			if(castle)
+			{
+			    castle->LoadFromMP2(pblock);
+			    Maps::MinimizeAreaForCastle(castle->GetCenter());
+			}
+			else
+			Error::Warning("World::World: load castle: not found, index: ", *it_index);
+		    }
 		    break;
 		case MP2::OBJ_RNDTOWN:
 		case MP2::OBJ_RNDCASTLE:
 		    // add rnd castle
 		    if(SIZEOFMP2CASTLE != sizeblock) Error::Warning("World::World: read castle: incorrect size block.");
 		    else
-		    vec_castles.push_back(new Castle(tile.GetUniq1(), *it_index, pblock, true));
+		    {
+			Castle *castle = const_cast<Castle *>(GetCastle(*it_index));
+			if(castle)
+			{
+			    castle->LoadFromMP2(pblock);
+			    Maps::UpdateRNDSpriteForCastle(castle->GetCenter(), castle->GetRace(), castle->isCastle());
+			    Maps::MinimizeAreaForCastle(castle->GetCenter());
+			}
+			else
+			Error::Warning("World::World: load castle: not found, index: ", *it_index);
+		    }
 		    break;
 		case MP2::OBJ_HEROES:
 		    // add heroes

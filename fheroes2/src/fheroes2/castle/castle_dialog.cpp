@@ -411,7 +411,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 			}
 			else
 			// combine to castle
-			if(selectCastleTroops.isSelected() || castle_heroes && 1 < (*castle_heroes).GetCountArmy())
+			if(selectCastleTroops.isSelected() || castle_heroes && 1 < Army::GetCountTroops((*castle_heroes).GetArmy()))
 			{
 			    army[ii].SetCount(army[ii].Count() + select_count);
 
@@ -429,7 +429,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    }
 		    // move to empty position
 		    else
-		    if(selectCastleTroops.isSelected() || castle_heroes && 1 < (*castle_heroes).GetCountArmy())
+		    if(selectCastleTroops.isSelected() || castle_heroes && 1 < Army::GetCountTroops((*castle_heroes).GetArmy()))
 		    {
 			army[ii] = select_troops;
 			select_troops.Set(Monster::UNKNOWN, 0);
@@ -461,7 +461,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    // right click empty troops - redistribute troops
 	    if(le.MouseClickRight(coordsCastleTroops[ii]) &&
 		!Army::isValid(army[ii]) &&
-		(selectCastleTroops.isSelected() || (castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && 1 < (*castle_heroes).GetCountArmy())))
+		(selectCastleTroops.isSelected() || (castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && 1 < Army::GetCountTroops((*castle_heroes).GetArmy()))))
 	    {
 		cursor.Hide();
 
@@ -496,7 +496,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-		Dialog::ArmyInfo(army[ii], (1 == GetCountArmy() ? false : true), true, false);
+		Dialog::ArmyInfo(army[ii], (1 == Army::GetCountTroops(army) ? false : true), true, false);
 
 		cursor.Show();
 
@@ -526,7 +526,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 			    Monster::GetRace(select_monster) == race &&
 			    (building & GetUpgradeBuilding(Monster::Dwelling(select_monster), race));
 
-		    switch(Dialog::ArmyInfo(army2[ii], (1 == (*castle_heroes).GetCountArmy() ? false : true), false, show_upgrade))
+		    switch(Dialog::ArmyInfo(army2[ii], (1 == Army::GetCountTroops((*castle_heroes).GetArmy()) ? false : true), false, show_upgrade))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
@@ -643,7 +643,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-		Dialog::ArmyInfo(army2[ii], (1 == (*castle_heroes).GetCountArmy() ? false : true), true, false);
+		Dialog::ArmyInfo(army2[ii], (1 == Army::GetCountTroops((*castle_heroes).GetArmy()) ? false : true), true, false);
 
 		cursor.Show();
 
@@ -856,7 +856,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
 	else
 	// buy castle
-	if(building & BUILD_TENT && le.MouseClickLeft(coordBuildingTent))
+	if(le.MouseClickLeft(coordBuildingTent))
 	{
 	    if(!allow_castle)
 	    {
@@ -1021,7 +1021,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), GetDescriptionBuilding(BUILD_CASTLE), Font::BIG);
 	else
-	if(building & BUILD_TENT && le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
+	if(le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
 	else
 	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG);
 	else
@@ -1081,9 +1081,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_CASTLE && le.MouseCursor(coordBuildingCastle)) statusBar.ShowMessage(GetStringBuilding(BUILD_CASTLE));
 	else
-	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
+	if(le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_TENT));
 	else
-	if(building & BUILD_TENT && le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_TENT));
+	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
 	else
 	// mage guild
 	if(building & BUILD_MAGEGUILD5 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD5));
@@ -1128,7 +1128,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    	statusBar.ShowMessage("Combine " + Monster::String(army[ii].Monster()) + " armies") :
 			statusBar.ShowMessage("Exchange " + Monster::String(army[ii].Monster()) + " with " + Monster::String(army[castle_select].Monster()));
 		else
-		if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && 1 == (*castle_heroes).GetCountArmy())
+		if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && 1 == Army::GetCountTroops((*castle_heroes).GetArmy()))
 			statusBar.ShowMessage("Cannot move last army to garrison");
 		else
 		if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && Army::isValid(army[ii]) && Army::isValid((*castle_heroes).GetArmy().at(selectHeroesTroops->GetCursorIndex())))

@@ -18,102 +18,134 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "castle.h"
 #include "captain.h"
 
-Captain::Captain() : Skill::Primary()
+Captain::Captain(const Castle & c) : home(c)
 {
 }
 
-void Captain::SetRace(Race::race_t race)
+bool Captain::isValid(void) const
 {
-    switch(race)
-    {
-	case Race::KNGT:
-	    attack	= 1;
-	    defence	= 1;
-	    power	= 1;
-	    knowledge	= 1;
-	    morale	= Morale::NORMAL;
-	    luck	= Luck::NORMAL;
-	    break;
-
-	case Race::BARB:
-	    attack	= 1;
-	    defence	= 1;
-	    power	= 1;
-	    knowledge	= 1;
-	    morale	= Morale::NORMAL;
-	    luck	= Luck::NORMAL;
-	    break;
-
-	case Race::SORC:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    morale	= Morale::NORMAL;
-	    luck	= Luck::NORMAL;
-	    break;
-
-	case Race::WRLK:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    morale	= Morale::NORMAL;
-	    luck	= Luck::NORMAL;
-	    break;
-
-	case Race::WZRD:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    morale	= Morale::NORMAL;
-	    luck	= Luck::NORMAL;
-	    break;
-
-	case Race::NECR:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    morale	= Morale::NORMAL;
-	    luck	= Luck::NORMAL;
-	    break;
-
-	default:
-	    break;
-    }
-
+    return home.isBuild(Castle::BUILD_CAPTAIN);
 }
 
 u8 Captain::GetAttack(void) const
 {
-    return attack;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 0;
+	default: break;
+    }
+
+    return 0;
 }
 
 u8 Captain::GetDefense(void) const
 {
-    return defence;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 0;
+	default: break;
+    }
+
+    return 0;
 }
 
 u8 Captain::GetPower(void) const
 {
-    return power;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 2;
+	default: break;
+    }
+
+    return 0;
 }
 
 u8 Captain::GetKnowledge(void) const
 {
-    return knowledge;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 2;
+	default: break;
+    }
+
+    return 0;
 }
 
 Morale::morale_t Captain::GetMorale(void) const
 {
-    return morale;
+    s8 result = Morale::NORMAL;
+
+    // check castle morale modificators
+    result += home.GetMoraleWithModificators();
+
+    // check from army morale modificators
+    result += Army::GetMoraleWithModificators(home.GetArmy());
+
+    // result
+    if(result < Morale::AWFUL)  return Morale::TREASON;
+    else
+    if(result < Morale::POOR)   return Morale::AWFUL;
+    else
+    if(result < Morale::NORMAL) return Morale::POOR;
+    else
+    if(result < Morale::GOOD)   return Morale::NORMAL;
+    else
+    if(result < Morale::GREAT)  return Morale::GOOD;
+    else
+    if(result < Morale::BLOOD)  return Morale::GREAT;
+
+    return Morale::BLOOD;
 }
 
 Luck::luck_t Captain::GetLuck(void) const
 {
-    return luck;
+    s8 result = Luck::NORMAL;
+
+    // check castle morale modificators
+    result += home.GetLuckWithModificators();
+
+    // check from army morale modificators
+    result += Army::GetLuckWithModificators(home.GetArmy());
+
+    // result
+    if(result < Luck::AWFUL)    return Luck::CURSED;
+    else
+    if(result < Luck::BAD)      return Luck::AWFUL;
+    else
+    if(result < Luck::NORMAL)   return Luck::BAD;
+    else
+    if(result < Luck::GOOD)     return Luck::NORMAL;
+    else
+    if(result < Luck::GREAT)    return Luck::GOOD;
+    else
+    if(result < Luck::IRISH)    return Luck::GREAT;
+
+    return Luck::IRISH;
 }

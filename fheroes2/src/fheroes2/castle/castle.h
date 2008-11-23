@@ -65,7 +65,7 @@ public:
 	BUILD_MAGEGUILD3        = 0x00010000,
 	BUILD_MAGEGUILD4        = 0x00020000,
 	BUILD_MAGEGUILD5        = 0x00040000,
-	BUILD_TENT              = 0x00080000,
+	BUILD_TENT              = 0x00080000,	// deprecated
 	DWELLING_MONSTER1       = 0x00100000,
 	DWELLING_MONSTER2       = 0x00200000,
 	DWELLING_MONSTER3       = 0x00400000,
@@ -80,7 +80,8 @@ public:
 	DWELLING_UPGRADE7       = 0x80000000        // black dragon
     } building_t;
 
-    Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd = false);
+    Castle(s16 cx, s16 cy, const Race::race_t rs);
+    void LoadFromMP2(const void *ptr);
 
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
     bool AllowBuild(void) const{ return allow_build; };
@@ -101,7 +102,7 @@ public:
     u8 GetLevelMageGuild(void);
 
     const Army::army_t & GetArmy(void) const{ return army; }; 
-    u8 GetCountArmy(void) const;
+    Army::army_t & GetArmy(void) { return army; }; 
     u16 GetDwellingLivedCount(building_t dw);
 
     const Point & GetCenter(void) const;
@@ -118,6 +119,9 @@ public:
 
     Dialog::answer_t OpenDialog(void);
 
+    s8 GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
+    s8 GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static ICN::icn_t GetICNBuilding(const building_t & build, const Race::race_t & race);
@@ -132,13 +136,8 @@ public:
 
 private:
     void RedrawResourcePanel(void);
-    void CorrectAreaMaps(void);
     void TownUpgradeToCastle(void);
-    void ModifyTIlesRNDSprite(Maps::Tiles & tile);
-    void ModifyTilesTownToCastle(Maps::Tiles & tile);
-    void MinimizeAreaMapsID(void);
     u32 GetBuildingRequires(const building_t & build) const;
-
     Rect GetCoordBuilding(building_t building, const Point & pt);
     void RedrawAllBuilding(const Point & dst_pt, const std::vector<building_t> & orders);
     void RedrawBuilding(const building_t build, const Point & dst_pt, const u32 ticket);
@@ -157,8 +156,12 @@ private:
     void PressRightAction(building_t b);
 
 private:
-    Color::color_t	color;
+    const Point		mp;
     Race::race_t	race;
+    const Captain	captain;
+    const bool		nearly_sea;
+
+    Color::color_t	color;
     std::string		name;
     u32			building;
     bool		allow_castle;
@@ -169,12 +172,6 @@ private:
     std::vector<u16>    dwelling;
     Army::army_t        army;
     Heroes * 		castle_heroes;
-
-    Captain		captain;
-
-    // center point maps
-    const Point		mp;
-    const bool		nearly_sea;
 };
 
 #endif

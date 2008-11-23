@@ -22,6 +22,7 @@
 #define H2ARMY_H
 
 #include <string>
+#include <list>
 #include <vector>
 #include "race.h"
 #include "monster.h"
@@ -32,6 +33,8 @@ class Surface;
 class Heroes;
 class Point;
 class Rect;
+
+#define	ARMYMAXTROOPS		5
 
 namespace Army
 {
@@ -84,6 +87,25 @@ namespace Army
     bool PredicateFastestTroop(const Troop & t1, const Troop & t2);
 
     typedef std::vector<Troop> army_t;
+
+    s8 GetMoraleWithModificators(const army_t &, std::list<std::string> *list = NULL);
+    s8 GetLuckWithModificators(const army_t &, std::list<std::string> *list = NULL);
+    Troop & GetSlowestTroop(army_t & army);
+    Troop & GetFastestTroop(army_t & army);
+    Troop & GetStrongestTroop(army_t & army);
+    Troop & GetWeakestTroop(army_t & army);
+    const Troop & GetSlowestTroop(const army_t & army);
+    const Troop & GetFastestTroop(const army_t & army);
+    const Troop & GetStrongestTroop(const army_t & army);
+    const Troop & GetWeakestTroop(const army_t & army);
+    u8 GetCountTroops(const army_t & army);
+    u8 GetCountUniqTroops(const army_t & army);
+    Race::race_t GetRace(const army_t & army);
+    bool HasMonster(const army_t & army, const Monster::monster_t mon);
+    bool JoinTroop(army_t & army, const Troop & troop);
+    bool JoinTroop(army_t & army, const Monster::monster_t mon, const u16 count);
+    void SetMasterSkill(army_t & army, const Skill::Primary & primary);
+
 
     // deprecated
     class SelectBar

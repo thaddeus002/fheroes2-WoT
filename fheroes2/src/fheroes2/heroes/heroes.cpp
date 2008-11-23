@@ -119,13 +119,10 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     
     // set default army
     const Monster::stats_t monster = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
-
     army[0].Set(monster.monster, monster.grown);
 
     // set master primary skill to army
-    Army::army_t::iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    for(; it1 != it2; ++it1) (*it1).SetMasterSkill(this);
+    Army::SetMasterSkill(army, *this);
 
     // extra hero
     switch(hid)
@@ -711,7 +708,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     }
     else
     {
-    	switch(Monster::GetStats(GetSlowestArmy().Monster()).speed)
+    	switch(Monster::GetStats(Army::GetSlowestTroop(army).Monster()).speed)
 	{
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;
@@ -808,26 +805,6 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
         default:
             break;
     }
-    
-    const Castle* castle = inCastle();
-
-    // bonus in castle
-    if(castle)
-    {
-	// and tavern
-	if(Race::NECR != castle->GetRace() && castle->isBuild(Castle::BUILD_TAVERN))
-	{
-	    result += 1;
-	    if(list) list->push_back(Castle::GetStringBuilding(Castle::BUILD_TAVERN, castle->GetRace()) + p1);
-	}
-
-	// and barbarian coliseum
-        if(Race::BARB == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC))
-	{
-	    result += 2;
-	    if(list) list->push_back(Castle::GetStringBuilding(Castle::BUILD_SPEC, castle->GetRace()) + p2);
-	}
-    }
 
     // object visited
     if(isVisited(MP2::OBJ_BUOY))
@@ -866,76 +843,14 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	if(list) list->push_back(MP2::StringObject(MP2::OBJ_DERELICTSHIP) + m1);
     }
 
-    // different race penalty
-    Army::army_t::const_iterator it1_army = army.begin();
-    Army::army_t::const_iterator it2_army = army.end();
-    u8 count = 0;
-    u8 count_kngt = 0;
-    u8 count_barb = 0;
-    u8 count_sorc = 0;
-    u8 count_wrlk = 0;
-    u8 count_wzrd = 0;
-    u8 count_necr = 0;
-    u8 count_bomg = 0;
-    bool ghost_present = false;
-    for(; it1_army != it2_army; ++it1_army) if(Monster::UNKNOWN != (*it1_army).Monster())
-    {
-	switch(Monster::GetRace((*it1_army).Monster()))
-	{
-	    case Race::KNGT: ++count_kngt; break;
-	    case Race::BARB: ++count_barb; break;
-	    case Race::SORC: ++count_sorc; break;
-	    case Race::WRLK: ++count_wrlk; break;
-	    case Race::WZRD: ++count_wzrd; break;
-	    case Race::NECR: ++count_necr; break;
-	    case Race::BOMG: ++count_bomg; break;
-	    default: break;
-	}
-	if(Monster::GHOST == (*it1_army).Monster()) ghost_present = true;
-    }
+    const Castle* castle = inCastle();
+    // check castle morale modificators
+    if(castle) result += castle->GetMoraleWithModificators(list);
 
-    Race::race_t r = Race::MULT;
-    if(count_kngt){ ++count; r = Race::KNGT; }
-    if(count_barb){ ++count; r = Race::BARB; }
-    if(count_sorc){ ++count; r = Race::SORC; }
-    if(count_wrlk){ ++count; r = Race::WRLK; }
-    if(count_wzrd){ ++count; r = Race::WZRD; }
-    if(count_necr){ ++count; r = Race::NECR; }
-    if(count_bomg){ ++count; r = Race::BOMG; }
+    // check from army morale
+    result += Army::GetMoraleWithModificators(army, list);
 
-    switch(count)
-    {
-	case 2:
-	case 0: break;
-	case 1:
-	    if(0 == count_necr && !ghost_present && 1 < GetCountUniqTroops())
-	    {
-		++result;
-		if(list) list->push_back("All " + Race::String(r) + " troops +1");
-	    }
-	    break;
-	case 3:
-	    --result;
-	    if(list) list->push_back("Troops of 3 alignments -1");
-	    break;
-	case 4:
-	    result -= 2;
-	    --result;
-	    if(list) list->push_back("Troops of 4 alignments -2");
-	    break;
-	default:
-	    result -=3;
-	    if(list) list->push_back("Troops of 5 alignments -3");
-	    break;
-    }
-
-    // undead in life group
-    if(1 < GetCountUniqTroops() && (count_necr || ghost_present) && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
-    {
-	--result;
-	if(list) list->push_back("Some undead in groups -1");
-    }
-
+    // result
     if(result < Morale::AWFUL)	return Morale::TREASON;
     else
     if(result < Morale::POOR)	return Morale::AWFUL;
@@ -1027,13 +942,12 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 	if(list) list->push_back(MP2::StringObject(MP2::OBJ_PYRAMID) + m2);
     }
 
-    // bonus in castle and sorceress rainbow
     const Castle* castle = inCastle();
-    if(castle && Race::SORC == castle->GetRace() && castle->isBuild(Castle::BUILD_SPEC))
-    {
-	result += 2;
-	if(list) list->push_back(Castle::GetStringBuilding(Castle::BUILD_SPEC, castle->GetRace()) + p2);
-    }
+    // check castle morale modificators
+    if(castle) result += castle->GetLuckWithModificators(list);
+
+    // check from army morale
+    result += Army::GetLuckWithModificators(army, list);
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else
@@ -1048,27 +962,6 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
     if(result < Luck::IRISH)	return Luck::GREAT;
 
     return Luck::IRISH;
-}
-
-// return valid count heroes army
-u8 Heroes::GetCountArmy(void) const
-{
-    u8 result = 0;
-
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii) if(Army::isValid(army[ii])) ++result;
-
-    return result;
-}
-
-u8 Heroes::GetCountUniqTroops(void) const
-{
-    std::vector<Monster::monster_t> troops;
-    troops.reserve(HEROESMAXARMY);
-
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii) if(army[ii].isValid()) troops.push_back(army[ii].Monster());
-    troops.resize(std::unique(troops.begin(), troops.end()) - troops.begin());
-
-    return troops.size();
 }
 
 /* recrut hero */
@@ -1649,107 +1542,6 @@ bool Heroes::ApplyPenaltyMovement(void)
     else return false;
 
     return true;
-}
-
-/*  true if present monster */
-bool Heroes::HasMonster(const Monster::monster_t mon) const
-{
-    Army::army_t::const_iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    
-    for(; it1 != it2; it1++) if(mon == (*it1).Monster()) return true;
-
-    return false;
-}
-
-bool Heroes::JoinTroops(const Monster::monster_t mon, const u16 count)
-{
-    Army::army_t::iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    
-    for(; it1 != it2; it1++) if(mon == (*it1).Monster())
-    {
-	(*it1).SetCount((*it1).Count() + count);
-	if(H2Config::Debug()) Error::Verbose("Heroes::JoinTroops: monster: " + Monster::String(mon) + ", count: ", count);
-	return true;
-    }
-
-    it1 = army.begin();
-    if(HEROESMAXARMY > GetCountArmy())
-    {
-	for(; it1 != it2; it1++) if(Monster::UNKNOWN == (*it1).Monster())
-	{
-	    (*it1).SetMonster(mon);
-	    (*it1).SetCount(count);
-	    
-	    if(H2Config::Debug()) Error::Verbose("Heroes::JoinTroops: monster: " + Monster::String(mon) + ", count: ", count);
-	    return true;
-	}
-    }
-
-    if(H2Config::MyColor() == GetColor())
-	Dialog::Message(Monster::String(mon), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
-
-    return false;
-}
-
-Army::Troop & Heroes::GetSlowestArmy(void)
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroop);
-}
-
-Army::Troop & Heroes::GetFastestArmy(void)
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateFastestTroop);
-}
-
-Army::Troop & Heroes::GetStrongestArmy(void)
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroop);
-}
-
-Army::Troop & Heroes::GetWeakestArmy(void)
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroop);
-}
-
-const Army::Troop & Heroes::GetSlowestArmy(void) const
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateSlowestTroop);
-}
-
-const Army::Troop & Heroes::GetFastestArmy(void) const
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateFastestTroop);
-}
-
-const Army::Troop & Heroes::GetStrongestArmy(void) const
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateStrongestTroop);
-}
-
-const Army::Troop & Heroes::GetWeakestArmy(void) const
-{
-    return *min_element(army.begin(), army.end(), Army::PredicateWeakestTroop);
-}
-
-Race::race_t Heroes::GetRaceArmy(void) const
-{
-    Army::army_t::const_iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    std::vector<Race::race_t> races;
-    races.reserve(HEROESMAXARMY);
-
-    for(; it1 != it2; ++it1) if((*it1).isValid()) races.push_back(Monster::GetRace((*it1).Monster()));
-    races.resize(std::unique(races.begin(), races.end()) - races.begin());
-
-    if(races.empty())
-    {
-	Error::Warning("Heroes::GetRaceArmy: empty");
-	return Race::MULT;
-    }
-
-    return 1 < races.size() ? Race::MULT : races.at(0);
 }
 
 bool Heroes::MayStillMove(void) const

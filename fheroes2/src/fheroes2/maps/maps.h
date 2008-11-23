@@ -26,6 +26,7 @@
 #define TILEWIDTH 32
 
 class Point;
+class Castle;
 
 namespace Maps
 {
@@ -69,6 +70,10 @@ namespace Maps
     u16 ScanAroundObject(const u16 center, const u8 obj, bool full);
     void ClearFog(const Point & center, const u8 scoute, const u8 color);
     u16 GetApproximateDistance(const u16 index1, const u16 index2);
+
+    void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool is_castle);
+    void UpdateSpritesFromTownToCastle(const Point & center);
+    void MinimizeAreaForCastle(const Point & center);
 };
 
 #endif
