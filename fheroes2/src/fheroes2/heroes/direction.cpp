@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "maps.h"
-#include "error.h"
 #include "direction.h"
 
 const std::string & Direction::String(vector_t direct)

@@ -20,10 +20,9 @@
 
 #include <algorithm>
 
-#include "config.h"
+#include "settings.h"
 #include "castle.h"
 #include "heroes.h"
-#include "error.h"
 #include "difficulty.h"
 #include "game_statuswindow.h"
 #include "gameevent.h"

@@ -20,9 +20,8 @@
 
 #include "world.h"
 #include "agg.h"
-#include "engine.h"
 #include "cursor.h"
-#include "sprite.h"
+#include "settings.h"
 #include "gamearea.h"
 #include "maps_tiles.h"
 #include "castle.h"

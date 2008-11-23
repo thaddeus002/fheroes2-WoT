@@ -19,11 +19,8 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "rect.h"
-#include "localevent.h"
 #include "cursor.h"
-#include "sprite.h"
-#include "config.h"
+#include "settings.h"
 #include "dialog.h"
 
 #define FRAMEBORDER_WIDTH	(640 + SHADOWWIDTH + 2 * BORDERWIDTH)

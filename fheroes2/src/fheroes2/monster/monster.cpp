@@ -19,14 +19,14 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "rand.h"
+#include "engine.h"
 #include "army.h"
 #include "castle.h"
-#include "error.h"
 #include "game.h"
-#include "config.h"
+#include "settings.h"
 #include "gamearea.h"
 #include "maps.h"
+#include "maps_tiles.h"
 #include "difficulty.h"
 #include "monster.h"
 

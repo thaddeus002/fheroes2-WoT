@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "world.h"
+#include "maps_tiles.h"
 #include "mounts.h"
 #include "trees.h"
 #include "objxloc.h"
@@ -33,7 +34,6 @@
 #include "objgras.h"
 #include "objcrck.h"
 #include "direction.h"
-#include "error.h"
 #include "object.h"
 
 Object::Object(const MP2::object_t obj, const u16 sicn, const u32 uid)

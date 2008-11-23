@@ -20,9 +20,6 @@
 #ifndef H2SPLITTER_H
 #define H2SPLITTER_H
 
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
 #include "gamedefs.h"
 
 class Splitter : public SpriteCursor

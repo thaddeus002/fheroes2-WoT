@@ -24,13 +24,11 @@
 #include <bitset>
 #include <string>
 #include "gamedefs.h"
-#include "maps_tiles.h"
 #include "mageguild.h"
 #include "color.h"
 #include "captain.h"
 #include "dialog.h"
 #include "race.h"
-#include "rect.h"
 #include "army.h"
 #include "heroes.h"
 
@@ -41,6 +39,7 @@
 #define GROWN_WEL2		8
 
 class Heroes;
+namespace Maps { class Tiles; };
 
 class Castle
 {

@@ -19,11 +19,8 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "config.h"
+#include "settings.h"
 #include "cursor.h"
-#include "text.h"
-#include "tools.h"
-#include "localevent.h"
 #include "button.h"
 #include "dialog.h"
 

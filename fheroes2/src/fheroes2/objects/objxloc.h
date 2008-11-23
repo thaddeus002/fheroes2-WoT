@@ -21,8 +21,9 @@
 #ifndef H2OBJXLOC_H
 #define H2OBJXLOC_H
 
-#include "maps_tiles.h"
 #include "gamedefs.h"
+
+namespace Maps { class TilesAddon; };
 
 namespace ObjLoyalty
 {

@@ -19,9 +19,8 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "error.h"
+#include "maps_tiles.h"
 #include "settings.h"
-#include "rand.h"
 #include "world.h"
 #include "artifact.h"
 

@@ -19,11 +19,9 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "localevent.h"
 #include "button.h"
 #include "cursor.h"
-#include "config.h"
-#include "background.h"
+#include "settings.h"
 #include "dialog.h"
 
 Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)

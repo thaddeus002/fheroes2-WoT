@@ -19,9 +19,7 @@
  ***************************************************************************/
 
 #include <string>
-#include "text.h"
 #include "cursor.h"
-#include "display.h"
 #include "castle.h"
 #include "payment.h"
 #include "kingdom.h"

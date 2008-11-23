@@ -19,9 +19,7 @@
  ***************************************************************************/
 
 #include <fstream>
-#include "tools.h"
-#include "error.h"
-#include "config.h"
+#include "settings.h"
 
 namespace
 {

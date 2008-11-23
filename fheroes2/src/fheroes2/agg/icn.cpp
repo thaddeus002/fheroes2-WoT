@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "settings.h"
 #include "icn.h"
 
 namespace ICN

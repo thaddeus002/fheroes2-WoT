@@ -25,11 +25,11 @@
 #include "race.h"
 #include "settings.h"
 #include "agg.h"
-#include "sprite.h"
 #include "cursor.h"
 #include "world.h"
 #include "portrait.h"
 #include "game_focus.h"
+#include "kingdom.h"
 #include "game_selectobjbar.h"
 
 #define ICONS_WIDTH		46

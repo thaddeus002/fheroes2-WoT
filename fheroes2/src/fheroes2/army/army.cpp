@@ -19,9 +19,7 @@
  ***************************************************************************/
 
 #include "army.h"
-#include "display.h"
 #include "agg.h"
-#include "sprite.h"
 
 const std::string & Army::String(Army::size_t size)
 {

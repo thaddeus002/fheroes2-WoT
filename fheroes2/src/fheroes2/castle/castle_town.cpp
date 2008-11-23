@@ -23,19 +23,16 @@
 #include <bitset>
 #include "agg.h"
 #include "world.h"
-#include "localevent.h"
 #include "button.h"
 #include "cursor.h"
-#include "config.h"
+#include "settings.h"
 #include "castle.h"
-#include "captain.h"
 #include "dialog.h"
 #include "heroes.h"
-#include "background.h"
-#include "tools.h"
 #include "text.h"
 #include "portrait.h"
 #include "payment.h"
+#include "kingdom.h"
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 {

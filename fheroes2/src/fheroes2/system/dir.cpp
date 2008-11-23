@@ -21,10 +21,8 @@
 #include <dirent.h> 
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "error.h"
 #include "gamedefs.h"
-#include "config.h"
-#include "tools.h"
+#include "settings.h"
 #include "dir.h"
 
 Dir::Dir()

@@ -20,12 +20,9 @@
 
 #include <string>
 #include "agg.h"
-#include "localevent.h"
 #include "button.h"
 #include "cursor.h"
-#include "display.h"
 #include "castle.h"
-#include "background.h"
 #include "text.h"
 
 void Castle::OpenMageGuild(void)

@@ -18,9 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "rect.h"
-#include "spritecursor.h"
-#include "error.h"
 #include "maps.h"
 #include "gamearea.h"
 #include "cursor.h"

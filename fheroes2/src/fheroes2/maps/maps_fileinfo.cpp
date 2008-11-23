@@ -20,7 +20,7 @@
 
 
 #include <fstream>
-#include "error.h"
+#include "kingdom.h"
 #include "maps_fileinfo.h"
 
 #define LENGTHNAME		16

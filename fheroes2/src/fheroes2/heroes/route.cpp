@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include "agg.h"
 #include "world.h"
 #include "heroes.h"
@@ -25,8 +26,7 @@
 #include "direction.h"
 #include "maps.h"
 #include "game.h"
-#include "config.h"
-#include "error.h"
+#include "settings.h"
 #include "route.h"
 
 /* construct */

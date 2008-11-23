@@ -20,8 +20,8 @@
 
 #include <list>
 #include "dir.h"
-#include "error.h"
-#include "config.h"
+#include "gamedefs.h"
+#include "settings.h"
 #include "maps_fileinfo.h"
 #include "world.h"
 #include "dialog.h"

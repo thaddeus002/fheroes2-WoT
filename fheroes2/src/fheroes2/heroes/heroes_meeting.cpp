@@ -21,11 +21,9 @@
 #include <string>
 #include <algorithm>
 #include "agg.h"
-#include "engine.h"
 #include "button.h"
 #include "cursor.h"
-#include "config.h"
-#include "tools.h"
+#include "settings.h"
 #include "text.h"
 #include "army.h"
 #include "heroes.h"

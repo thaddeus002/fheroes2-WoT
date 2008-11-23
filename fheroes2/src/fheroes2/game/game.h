@@ -21,8 +21,6 @@
 #ifndef H2GAME_H
 #define H2GAME_H
 
-#include "maps.h"
-
 #define RADARWIDTH	144
 #define BORDERWIDTH	16
 

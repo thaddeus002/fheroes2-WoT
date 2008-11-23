@@ -21,19 +21,13 @@
 #include <bitset>
 #include <list>
 #include <string>
-#include "background.h"
 #include "dir.h"
 #include "agg.h"
-#include "sprite.h"
-#include "spritecursor.h"
-#include "engine.h"
 #include "button.h"
 #include "cursor.h"
 #include "maps_fileinfo.h"
 #include "difficulty.h"
 #include "dialog.h"
-#include "text.h"
-#include "tools.h"
 #include "splitter.h"
 #include "world.h"
 

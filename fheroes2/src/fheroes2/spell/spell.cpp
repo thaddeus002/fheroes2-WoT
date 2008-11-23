@@ -18,9 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "rand.h"
 #include "spell.h"
-#include "tools.h"
 #include "army.h"
 
 #define icnnone ICN::UNKNOWN

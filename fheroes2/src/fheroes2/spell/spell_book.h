@@ -21,8 +21,10 @@
 #ifndef H2SPELLBOOK_H
 #define H2SPELLBOOK_H
 
-#include "spell_storage.h"
 #include "gamedefs.h"
+#include "spell_storage.h"
+#include "skill.h"
+
 class Heroes;
 
 namespace Spell

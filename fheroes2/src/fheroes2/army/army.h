@@ -26,9 +26,7 @@
 #include "race.h"
 #include "dialog.h"
 #include "monster.h"
-#include "rect.h"
 #include "skill.h"
-#include "spritecursor.h"
 #include "gamedefs.h"
 
 class Surface;

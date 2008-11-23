@@ -19,9 +19,7 @@
  ***************************************************************************/
 
 #include "gamedefs.h"
-#include "rand.h"
 #include "race.h"
-#include "error.h"
 #include "skill.h"
 
 Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0), morale(Morale::NORMAL), luck(Luck::NORMAL)

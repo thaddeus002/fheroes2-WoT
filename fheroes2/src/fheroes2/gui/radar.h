@@ -20,7 +20,7 @@
 #ifndef H2RADAR_H
 #define H2RADAR_H
 
-#include "rect.h"
+#include "gamedefs.h"
 
 class Radar
 {

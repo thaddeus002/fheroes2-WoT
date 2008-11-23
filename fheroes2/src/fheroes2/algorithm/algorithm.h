@@ -21,8 +21,6 @@
 #define H2ALGORITHM_H
 
 #include <list>
-#include "army.h"
-#include "skill.h"
 #include "gamedefs.h"
 
 class Heroes;

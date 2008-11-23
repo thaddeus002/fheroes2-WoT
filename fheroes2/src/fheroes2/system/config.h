@@ -22,9 +22,7 @@
 #define H2CONFIG_H
 
 #include "gamedefs.h"
-#include "display.h"
 #include "color.h"
-#include "settings.h"
 
 namespace H2Config
 {

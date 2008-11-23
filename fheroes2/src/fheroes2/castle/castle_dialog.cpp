@@ -22,22 +22,17 @@
 #include <utility>
 #include <algorithm>
 #include "agg.h"
-#include "audio.h"
-#include "localevent.h"
 #include "button.h"
 #include "world.h"
 #include "cursor.h"
-#include "config.h"
-#include "captain.h"
+#include "settings.h"
 #include "resource.h"
 #include "castle.h"
 #include "heroes.h"
 #include "payment.h"
 #include "kingdom.h"
-#include "background.h"
 #include "tools.h"
 #include "text.h"
-#include "error.h"
 #include "portrait.h"
 #include "dialog.h"
 

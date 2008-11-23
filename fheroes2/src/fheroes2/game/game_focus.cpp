@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
 #include "castle.h"
 #include "heroes.h"
 #include "cursor.h"
@@ -29,6 +28,7 @@
 #include "game_statuswindow.h"
 #include "agg.h"
 #include "world.h"
+#include "kingdom.h"
 #include "game_focus.h"
 
 Game::Focus::Focus() : castle(NULL), heroes(NULL)

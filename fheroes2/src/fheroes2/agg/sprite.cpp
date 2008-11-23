@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "error.h"
 #include "settings.h"
 #include "sprite.h"
 

@@ -18,12 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "gamedefs.h"
 #include "agg.h"
 #include "cursor.h"
-#include "sprite.h"
-#include "engine.h"
 #include "button.h"
-#include "display.h"
 #include "settings.h"
 #include "game.h"
 

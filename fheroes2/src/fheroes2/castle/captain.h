@@ -21,6 +21,8 @@
 #define H2CAPTAIN_H
 
 #include "race.h"
+#include "morale.h"
+#include "luck.h"
 #include "skill.h"
 #include "gamedefs.h"
 

@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <string>
-#include "config.h"
 #include "resource.h"
 #include "artifact.h"
 #include "gamedefs.h"

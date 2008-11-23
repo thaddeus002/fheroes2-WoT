@@ -33,6 +33,7 @@
 #include "midi_xmi.h"
 #include "palette.h"
 #include "rand.h"
+#include "tools.h"
 #include "types.h"
 
 #define INIT_VIDEO	SDL_INIT_VIDEO

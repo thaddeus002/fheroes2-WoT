@@ -24,7 +24,6 @@
 #include "ground.h"
 #include "mp2.h"
 #include "direction.h"
-#include "surface.h"
 #include "gamedefs.h"
 #include "color.h"
 

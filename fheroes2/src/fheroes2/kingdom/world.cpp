@@ -20,18 +20,17 @@
 
 #include <cstdlib> 
 #include <fstream> 
-#include "engine.h" 
 #include "agg.h" 
 #include "artifact.h"
 #include "resource.h"
-#include "config.h" 
+#include "settings.h" 
 #include "kingdom.h" 
 #include "heroes.h" 
 #include "castle.h" 
-#include "gameevent.h" 
-#include "mp2.h" 
-#include "text.h" 
-#include "algorithm.h" 
+#include "gameevent.h"
+#include "mp2.h"
+#include "text.h"
+#include "algorithm.h"
 #include "world.h"
 
 World & world = World::GetWorld();

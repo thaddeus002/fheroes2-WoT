@@ -20,8 +20,6 @@
 
 #include "agg.h"
 #include "castle.h"
-#include "engine.h"
-#include "sprite.h"
 #include "settings.h"
 #include "cursor.h"
 

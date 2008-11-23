@@ -18,14 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "rand.h"
-#include "error.h"
 #include "mp2.h"
 #include "world.h"
 #include "agg.h"
-#include "sprite.h"
-#include "tools.h"
-#include "display.h"
+#include "maps_tiles.h"
 #include "resource.h"
 
 Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)

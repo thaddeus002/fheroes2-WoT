@@ -22,10 +22,7 @@
 
 #include <string>
 #include "gamedefs.h"
-#include "background.h"
-#include "maps_fileinfo.h"
 #include "monster.h"
-#include "rect.h"
 #include "spell.h"
 #include "skill.h"
 #include "text.h"
@@ -47,9 +44,9 @@ namespace Army
     class Troop;
 };
 
-namespace Skill
+namespace Maps
 {
-    class Primary;
+    class FileInfo;
 };
 
 namespace Dialog

@@ -20,8 +20,6 @@
 #ifndef H2BUTTON_H
 #define H2BUTTON_H
 
-#include "rect.h"
-#include "sprite.h"
 #include "icn.h"
 #include "gamedefs.h"
 

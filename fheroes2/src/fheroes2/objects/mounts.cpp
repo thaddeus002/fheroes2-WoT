@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
 #include "mounts.h"
 
 Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)

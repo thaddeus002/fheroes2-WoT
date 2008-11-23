@@ -23,21 +23,17 @@
 #include <vector>
 #include <list>
 #include <string>
-#include "background.h"
 #include "dir.h"
 #include "agg.h"
-#include "sprite.h"
-#include "spritecursor.h"
-#include "error.h"
-#include "localevent.h"
+#include "gamedefs.h"
 #include "button.h"
 #include "cursor.h"
-#include "config.h"
+#include "settings.h"
 #include "maps_fileinfo.h"
 #include "difficulty.h"
 #include "dialog.h"
 #include "text.h"
-#include "tools.h"
+#include "kingdom.h"
 #include "splitter.h"
 #include "game.h"
 

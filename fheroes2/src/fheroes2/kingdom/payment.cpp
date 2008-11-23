@@ -20,9 +20,7 @@
 
 #include "rect.h"
 #include "castle.h"
-#include "error.h"
 #include "settings.h"
-#include "sprite.h"
 #include "payment.h"
 
 PaymentConditions::BuyMonster::BuyMonster(const Monster::monster_t & monster)

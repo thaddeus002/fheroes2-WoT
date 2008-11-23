@@ -20,13 +20,10 @@
 
 #include <string>
 #include "agg.h"
-#include "localevent.h"
 #include "button.h"
 #include "cursor.h"
-#include "config.h"
+#include "settings.h"
 #include "castle.h"
-#include "background.h"
-#include "tools.h"
 #include "text.h"
 
 void Castle::OpenThievesGuild(void)

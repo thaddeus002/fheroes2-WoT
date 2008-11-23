@@ -20,7 +20,6 @@
 #ifndef H2SIZECURSOR_H
 #define H2SIZECURSOR_H
 
-#include "spritecursor.h"
 #include "gamedefs.h"
 
 class Surface;

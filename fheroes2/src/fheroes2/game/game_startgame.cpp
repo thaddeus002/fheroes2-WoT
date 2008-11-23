@@ -22,9 +22,7 @@
 #include <algorithm>
 
 #include "agg.h"
-#include "audio.h"
-#include "sprite.h"
-#include "localevent.h"
+#include "engine.h"
 #include "button.h"
 #include "dialog.h"
 #include "world.h"
@@ -36,7 +34,6 @@
 #include "splitter.h"
 #include "maps_tiles.h"
 #include "ground.h"
-#include "error.h"
 #include "game_interface.h"
 #include "game_statuswindow.h"
 #include "game_selectobjbar.h"
@@ -44,6 +41,7 @@
 #include "route.h"
 #include "game_focus.h"
 #include "scripting.h"
+#include "kingdom.h"
 
 namespace Game
 {

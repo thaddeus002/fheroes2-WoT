@@ -19,14 +19,12 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "config.h"
+#include "settings.h"
 #include "cursor.h"
-#include "text.h"
 #include "payment.h"
 #include "world.h"
-#include "tools.h"
-#include "localevent.h"
 #include "button.h"
+#include "kingdom.h"
 #include "dialog.h"
 
 u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)

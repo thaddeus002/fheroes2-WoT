@@ -33,9 +33,8 @@
 #include "xmi.h"
 #include "m82.h"
 #include "mus.h"
+#include "sprite.h"
 #include "palette.h"
-#include "settings.h"
-#include "text.h"
 
 class Surface;
 class Sprite;
@@ -140,7 +139,7 @@ namespace AGG
     // wrapper AGG::GetColor
     u32 GetColor(const u16 index, const u8 flag = 0);
 
-    const Sprite & GetLetter(char ch, Font::type_t ft);
+    const Sprite & GetLetter(char ch, u8 ft);
     
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);

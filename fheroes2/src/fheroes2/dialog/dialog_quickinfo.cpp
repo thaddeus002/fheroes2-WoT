@@ -19,26 +19,18 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "localevent.h"
-#include "text.h"
 #include "maps.h"
 #include "army.h"
 #include "heroes.h"
 #include "castle.h"
-#include "tools.h"
 #include "monster.h"
 #include "gamearea.h"
-#include "background.h"
 #include "cursor.h"
-#include "error.h"
-#include "display.h"
-#include "sprite.h"
 #include "portrait.h"
 #include "game_focus.h"
-#include "spell.h"
-#include "skill.h"
 #include "world.h"
 #include "settings.h"
+#include "kingdom.h"
 #include "dialog.h"
 
 void Dialog::QuickInfo(const Maps::Tiles & tile)

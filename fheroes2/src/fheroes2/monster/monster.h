@@ -23,12 +23,13 @@
 #include <vector>
 #include <string>
 #include "mp2.h"
-#include "maps_tiles.h"
 #include "race.h"
 #include "icn.h"
+#include "m82.h"
 #include "speed.h"
 #include "gamedefs.h"
-#include "m82.h"
+
+namespace Maps { class Tiles; };
 
 namespace Monster
 {

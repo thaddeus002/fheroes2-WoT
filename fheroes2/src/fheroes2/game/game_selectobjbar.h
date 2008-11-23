@@ -25,7 +25,6 @@
 #include "gamedefs.h"
 #include "game.h"
 #include "splitter.h"
-#include "rect.h"
 
 namespace Game
 {

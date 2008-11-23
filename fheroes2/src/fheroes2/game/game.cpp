@@ -21,14 +21,12 @@
 #include <map>
 #include <cstdlib>
 
-#include "error.h"
+#include "gamedefs.h"
 #include "settings.h"
-#include "audio.h"
 #include "game_focus.h"
 #include "maps_tiles.h"
 #include "ground.h"
 #include "world.h"
-#include "m82.h"
 #include "mp2.h"
 #include "agg.h"
 #include "game.h"

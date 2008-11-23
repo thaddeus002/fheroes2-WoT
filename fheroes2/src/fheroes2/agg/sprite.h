@@ -20,7 +20,6 @@
 #ifndef H2SPRITE_H
 #define H2SPRITE_H
 
-#include "surface.h"
 #include "icn.h"
 #include "gamedefs.h"
 

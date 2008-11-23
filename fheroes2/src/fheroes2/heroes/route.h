@@ -22,7 +22,7 @@
 
 #include <list>
 #include "gamedefs.h"
-#include "rect.h"
+#include "direction.h"
 
 class Heroes;
 

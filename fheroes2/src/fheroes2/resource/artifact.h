@@ -22,9 +22,10 @@
 
 #include <string>
 #include <vector>
-#include "maps_tiles.h"
 #include "mp2.h"
 #include "gamedefs.h"
+
+namespace Maps { class Tiles; };
 
 namespace Artifact
 {

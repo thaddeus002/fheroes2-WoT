@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "error.h"
 #include "spell_storage.h"
 
 Spell::Storage::Storage()

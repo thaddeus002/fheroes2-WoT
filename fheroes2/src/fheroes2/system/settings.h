@@ -24,9 +24,10 @@
 #include <string>
 #include <iostream>
 #include "gamedefs.h"
-#include "display.h"
-#include "rect.h"
+#include "difficulty.h"
 #include "maps_fileinfo.h"
+#include "game.h"
+#include "config.h"
 
 class Settings
 {

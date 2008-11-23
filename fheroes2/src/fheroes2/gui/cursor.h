@@ -20,7 +20,6 @@
 #ifndef H2CURSOR_H
 #define H2CURSOR_H
 
-#include "spritecursor.h"
 #include "gamedefs.h"
 
 class Cursor : public SpriteCursor

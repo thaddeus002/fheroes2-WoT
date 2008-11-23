@@ -19,10 +19,10 @@
  ***************************************************************************/
 
 #include <bitset>
+
+#include "gamedefs.h"
 #include "agg.h"
-#include "config.h"
-#include "sprite.h"
-#include "engine.h"
+#include "settings.h"
 #include "button.h"
 #include "dialog.h"
 #include "world.h"
@@ -34,7 +34,6 @@
 #include "direction.h"
 #include "maps_tiles.h"
 #include "ground.h"
-#include "tools.h"
 #include "editor_interface.h"
 #include "game.h"
 

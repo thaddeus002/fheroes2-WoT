@@ -20,17 +20,14 @@
 
 #include <string>
 #include "agg.h"
-#include "localevent.h"
 #include "button.h"
 #include "world.h"
 #include "cursor.h"
-#include "config.h"
+#include "settings.h"
 #include "resource.h"
 #include "castle.h"
 #include "heroes.h"
 #include "kingdom.h"
-#include "background.h"
-#include "tools.h"
 #include "text.h"
 
 

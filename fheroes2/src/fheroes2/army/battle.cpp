@@ -23,22 +23,18 @@
 #include <algorithm>
 #include <utility>
 #include "battle.h"
-#include "localevent.h"
-#include "display.h"
 #include "agg.h"
-#include "sprite.h"
 #include "ground.h"
 #include "world.h"
-#include "m82.h"
 #include "button.h"
 #include "cursor.h"
-#include "config.h"
-#include "error.h"
-#include "tools.h"
-#include "rand.h"
+#include "settings.h"
 #include "portrait.h"
 #include "spell.h"
-#include "audio.h"
+#include "castle.h"
+#include "heroes.h"
+#include "kingdom.h"
+#include "maps_tiles.h"
 
 #define CELLW 44
 #define CELLH 42

@@ -19,11 +19,9 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "error.h"
+#include "gamedefs.h"
 #include "race.h"
 #include "heroes.h"
-#include "tools.h"
-#include "sprite.h"
 #include "portrait.h"
 
 const Surface & Portrait::Captain(const Race::race_t rc, const Portrait::size_t sz)

@@ -20,6 +20,7 @@
 
 #include "icn.h"
 #include "mp2.h"
+#include "maps_tiles.h"
 #include "objxloc.h"
 
 bool ObjLoyalty::isPassable(const u16 icn, const u8 index)

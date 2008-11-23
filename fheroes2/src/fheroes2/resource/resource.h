@@ -22,8 +22,9 @@
 
 #include <string>
 #include <vector>
-#include "maps_tiles.h"
 #include "gamedefs.h"
+
+namespace Maps { class Tiles; };
 
 namespace Resource
 {

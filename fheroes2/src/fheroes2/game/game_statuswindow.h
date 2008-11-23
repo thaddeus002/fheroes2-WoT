@@ -24,7 +24,6 @@
 #include "gamedefs.h"
 #include "game.h"
 #include "color.h"
-#include "rect.h"
 
 class Surface;
 class Castle;

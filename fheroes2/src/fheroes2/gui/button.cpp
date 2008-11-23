@@ -20,7 +20,6 @@
 
 #include "agg.h"
 #include "cursor.h"
-#include "display.h"
 #include "button.h"
 
 Button::Button() : _icn(ICN::UNKNOWN)

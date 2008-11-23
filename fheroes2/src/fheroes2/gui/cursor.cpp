@@ -19,10 +19,7 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "rect.h"
-#include "error.h"
-#include "config.h"
-#include "sprite.h"
+#include "settings.h"
 #include "cursor.h"
 
 /* constructor */

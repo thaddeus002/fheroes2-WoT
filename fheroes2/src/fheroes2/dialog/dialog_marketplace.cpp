@@ -21,22 +21,15 @@
 #include <string>
 #include <vector>
 #include "agg.h"
-#include "localevent.h"
 #include "button.h"
 #include "world.h"
 #include "cursor.h"
-#include "config.h"
+#include "settings.h"
 #include "resource.h"
 #include "kingdom.h"
-#include "background.h"
-#include "spritecursor.h"
 #include "splitter.h"
-#include "tools.h"
-#include "rect.h"
-#include "text.h"
 #include "marketplace.h"
 #include "dialog.h"
-#include "error.h"
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs);
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);

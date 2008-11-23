@@ -22,7 +22,6 @@
 
 #include "gamedefs.h"
 #include "cursor.h"
-#include "rect.h"
 
 class GameArea : protected Rect
 {

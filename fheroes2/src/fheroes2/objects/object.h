@@ -22,9 +22,9 @@
 #define H2OBJECT_H
 
 #include "mp2.h"
-#include "world.h"
-#include "maps_tiles.h"
 #include "gamedefs.h"
+
+namespace Maps { class TilesAddon; };
 
 class Object
 {

@@ -19,13 +19,10 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "engine.h"
 #include "agg.h"
 #include "cursor.h"
-#include "sprite.h"
 #include "spell_book.h"
 #include "dialog.h"
-#include "tools.h"
 #include "heroes.h"
 
 #define SPELL_PER_PAGE	6

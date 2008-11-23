@@ -19,12 +19,9 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "config.h"
+#include "settings.h"
 #include "cursor.h"
-#include "text.h"
-#include "localevent.h"
 #include "button.h"
-#include "tools.h"
 #include "dialog.h"
 
 void Dialog::ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs)

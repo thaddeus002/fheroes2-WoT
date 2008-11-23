@@ -20,9 +20,6 @@
 
 #include <string>
 #include "agg.h"
-#include "sprite.h"
-#include "display.h"
-#include "tools.h"
 #include "text.h"
 
 #define WIDTH_BIG	0x0E

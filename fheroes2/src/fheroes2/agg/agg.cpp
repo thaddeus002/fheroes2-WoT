@@ -21,13 +21,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "error.h"
-#include "engine.h"
-#include "config.h"
-#include "surface.h"
-#include "sprite.h"
-#include "audio.h"
-#include "tools.h"
+#include "settings.h"
+#include "text.h"
 #include "agg.h"
 
 #define FATSIZENAME	15
@@ -798,7 +793,7 @@ u32 AGG::GetColor(const u16 index, const u8 flag)
 }
 
 /* return letter sprite */
-const Sprite & AGG::GetLetter(char ch, Font::type_t ft)
+const Sprite & AGG::GetLetter(char ch, u8 ft)
 {
     if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
     

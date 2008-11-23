@@ -21,16 +21,12 @@
 #include <string>
 #include "agg.h"
 #include "world.h"
-#include "localevent.h"
 #include "button.h"
 #include "cursor.h"
 #include "castle.h"
 #include "kingdom.h"
-#include "config.h"
+#include "settings.h"
 #include "dialog.h"
-#include "background.h"
-#include "tools.h"
-#include "text.h"
 #include "payment.h"
 
 Dialog::answer_t Dialog::BuyBoat(bool enable)

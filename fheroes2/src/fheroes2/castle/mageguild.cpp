@@ -19,8 +19,6 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "error.h"
-#include "rand.h"
 #include "mageguild.h"
 
 MageGuild::MageGuild() : level(0), upgrade(false)

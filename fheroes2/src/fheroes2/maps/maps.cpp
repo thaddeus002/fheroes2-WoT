@@ -19,14 +19,12 @@
  ***************************************************************************/
 
 #include <cstdlib>
+#include <algorithm>
 #include "world.h"
 #include "gamearea.h"
-#include "error.h"
 #include "settings.h"
 #include "maps.h"
 #include "maps_tiles.h"
-#include <cstdlib>
-#include <algorithm>
 
 namespace Maps
 {

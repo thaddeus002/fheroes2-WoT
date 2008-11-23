@@ -23,9 +23,9 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "gamedefs.h"
 #include "maps.h"
 #include "race.h"
-#include "rect.h"
 #include "maps_tiles.h"
 #include "heroes.h"
 #include "week.h"

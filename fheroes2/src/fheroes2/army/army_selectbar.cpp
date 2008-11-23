@@ -19,12 +19,7 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "monster.h"
-#include "error.h"
-#include "tools.h"
 #include "text.h"
-#include "sprite.h"
-#include "display.h"
 #include "army.h"
 
 Army::SelectBar::SelectBar(const Point & pos, const Army::army_t & troops)

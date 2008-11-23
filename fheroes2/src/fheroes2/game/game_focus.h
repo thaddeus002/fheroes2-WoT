@@ -21,7 +21,7 @@
 #ifndef H2GAMEFOCUS_H
 #define H2GAMEFOCUS_H
 
-#include "rect.h"
+#include "gamedefs.h"
 #include "game.h"
 
 class Castle;

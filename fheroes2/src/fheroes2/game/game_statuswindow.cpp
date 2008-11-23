@@ -21,10 +21,8 @@
 #include <algorithm>
 #include "agg.h"
 #include "text.h"
-#include "tools.h"
 #include "world.h"
-#include "config.h"
-#include "sprite.h"
+#include "settings.h"
 #include "kingdom.h"
 #include "castle.h"
 #include "heroes.h"

@@ -18,13 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "gamedefs.h"
 #include "agg.h"
 #include "dialog.h"
 #include "cursor.h"
-#include "sprite.h"
-#include "localevent.h"
 #include "button.h"
-#include "display.h"
 #include "game.h"
 
 Game::menu_t Game::Editor::MainMenu(void)

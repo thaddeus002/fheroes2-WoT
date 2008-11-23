@@ -18,8 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "morale.h"
-#include "luck.h"
 #include "captain.h"
 
 Captain::Captain() : Skill::Primary()

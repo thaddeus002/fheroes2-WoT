@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <iostream>
-#include "error.h"
 #include "splitter.h"
 
 /* splitter constructor */

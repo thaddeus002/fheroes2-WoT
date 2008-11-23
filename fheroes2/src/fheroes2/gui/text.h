@@ -23,9 +23,6 @@
 
 #include <vector>
 #include "gamedefs.h"
-#include "rect.h"
-#include "display.h"
-#include "background.h"
 
 namespace Font
 {

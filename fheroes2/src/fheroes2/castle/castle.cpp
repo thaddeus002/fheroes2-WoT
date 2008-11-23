@@ -18,14 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "agg.h"
 #include "difficulty.h"
-#include "config.h"
-#include "error.h"
+#include "settings.h"
 #include "payment.h"
 #include "world.h"
-#include "agg.h"
-#include "display.h"
-#include "sprite.h"
+#include "kingdom.h"
+#include "maps_tiles.h"
 #include "castle.h"
 
 Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
