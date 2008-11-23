@@ -24,7 +24,7 @@
 #include "mageguild.h"
 #include "spell.h"
 
-MageGuild::MageGuild(const Race::race_t rc) : race(rc), level(0), upgrade(false)
+MageGuild::MageGuild(const Race::race_t & rc) : race(rc), level(0), upgrade(false)
 {
 }
 

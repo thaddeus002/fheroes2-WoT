@@ -26,53 +26,6 @@
 
 Captain::Captain(const Castle & c) : home(c)
 {
-    switch(home.GetRace())
-    {
-	case Race::KNGT:
-	    attack	= 1;
-	    defence	= 1;
-	    power	= 1;
-	    knowledge	= 1;
-	    break;
-
-	case Race::BARB:
-	    attack	= 1;
-	    defence	= 1;
-	    power	= 1;
-	    knowledge	= 1;
-	    break;
-
-	case Race::SORC:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    break;
-
-	case Race::WRLK:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    break;
-
-	case Race::WZRD:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    break;
-
-	case Race::NECR:
-	    attack	= 0;
-	    defence	= 0;
-	    power	= 2;
-	    knowledge	= 2;
-	    break;
-
-	default:
-	    break;
-    }
 }
 
 bool Captain::isValid(void) const
@@ -82,22 +35,70 @@ bool Captain::isValid(void) const
 
 u8 Captain::GetAttack(void) const
 {
-    return isValid() ? attack : 0;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 0;
+	default: break;
+    }
+
+    return 0;
 }
 
 u8 Captain::GetDefense(void) const
 {
-    return isValid() ? defence : 0;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 0;
+	default: break;
+    }
+
+    return 0;
 }
 
 u8 Captain::GetPower(void) const
 {
-    return isValid() ? power : 0;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 2;
+	default: break;
+    }
+
+    return 0;
 }
 
 u8 Captain::GetKnowledge(void) const
 {
-    return isValid() ? knowledge : 0;
+    if(isValid())
+    switch(home.GetRace())
+    {
+	case Race::KNGT:
+	case Race::BARB:	return 1;
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:	return 2;
+	default: break;
+    }
+
+    return 0;
 }
 
 Morale::morale_t Captain::GetMorale(void) const

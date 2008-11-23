@@ -157,7 +157,7 @@ private:
 
 private:
     const Point		mp;
-    const Race::race_t	race;
+    Race::race_t	race;
     const Captain	captain;
     const bool		nearly_sea;
 

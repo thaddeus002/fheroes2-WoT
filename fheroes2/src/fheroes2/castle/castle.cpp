@@ -184,7 +184,16 @@ void Castle::LoadFromMP2(const void *ptr)
     ptr8 += 13;
 
     // race
-    //
+    switch(*ptr8)
+    { 	 
+	case 0x00: race = Race::KNGT; break; 	 
+	case 0x01: race = Race::BARB; break; 	 
+        case 0x02: race = Race::SORC; break; 	 
+	case 0x03: race = Race::WRLK; break; 	 
+	case 0x04: race = Race::WZRD; break; 	 
+        case 0x05: race = Race::NECR; break; 	 
+        default: race = (Color::GRAY != color ? Settings::Get().FileInfo().KingdomRace(color) : Race::Rand()); break; 	 
+    }
     ++ptr8;
 
     // castle

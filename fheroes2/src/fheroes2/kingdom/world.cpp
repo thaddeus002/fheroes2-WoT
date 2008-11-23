@@ -589,7 +589,7 @@ void World::LoadMaps(const std::string &filename)
 
 	    case 0x06: // tower: random
 	    case 0x86: // castle: random
-		vec_castles.push_back(new Castle(cx, cy, Race::Rand()));break;
+		vec_castles.push_back(new Castle(cx, cy, Race::BOMG));	break;
 
 	    default:
 		Error::Warning("World::World: castle block, unknown id: ", id);
