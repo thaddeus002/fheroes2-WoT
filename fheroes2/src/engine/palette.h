@@ -24,9 +24,7 @@
 #include <vector>
 #include "types.h"
 
-struct SDL_Palette;
-
-class Palette
+class Palette : protected SDL_Palette
 {
 public:
     Palette(); 
@@ -47,7 +45,6 @@ public:
 
 private:
     std::vector<u32> pal;
-    SDL_Palette *sdlpal;
 };
 
 #endif

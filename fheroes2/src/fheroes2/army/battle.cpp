@@ -38,11 +38,7 @@
 #include "rand.h"
 #include "portrait.h"
 #include "spell.h"
-#include "audio_interface.h"
-#include "army.h"
-#include "castle.h"
-#include "heroes.h"
-#include "SDL.h"
+#include "audio.h"
 
 #define CELLW 44
 #define CELLH 42
@@ -2375,7 +2371,7 @@ void Army::InitArmyPosition(Army::BattleArmy_t & army, bool compact, bool reflec
 	    army[i].aframe = 1;
 	    army[i].astate = Monster::AS_NONE;
 	    army[i].shots = stats.shots;
-            army[i].hp = stats.hp;
+	    army[i].hp = stats.hp;
 	    army[i].oldcount = army[i].Count();
             army[i].SetReflect(reflect);
             army[i].SetOriginalReflection(reflect);

@@ -19,8 +19,8 @@
  ***************************************************************************/
 
 #include "error.h"
+#include "audio.h"
 #include "engine.h"
-#include "SDL.h"
 
 namespace Mixer
 {
@@ -36,17 +36,7 @@ namespace Cdrom
 
 bool SDL::Init(const u32 system)
 {
-    u32 flags = INIT_NONE;
-    if(system & INIT_VIDEO)
-        flags |= SDL_INIT_VIDEO;
-    if(system & INIT_AUDIO)
-        flags |= SDL_INIT_AUDIO;
-    if(system  & INIT_TIMER)
-        flags |= SDL_INIT_TIMER;
-    if(system  & INIT_CDROM)
-        flags |= SDL_INIT_CDROM;
-    
-    if(0 > SDL_Init(flags))
+    if(0 > SDL_Init(system))
     {
 	Error::Warning("SDL::Init: error: " + std::string(SDL_GetError()));
 

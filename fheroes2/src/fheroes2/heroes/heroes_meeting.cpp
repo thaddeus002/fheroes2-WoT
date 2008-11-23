@@ -31,7 +31,6 @@
 #include "heroes.h"
 #include "portrait.h"
 #include "game_interface.h"
-#include "SDL.h"
 
 namespace
 {
@@ -412,7 +411,7 @@ static void RedrawArtifacts(const ArtifactList &artifacts)
  */
 static void PrepareArmy(Army::army_t &army, const Point &pt, ArmyList &coords)
 {
-    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
     {
 	if(army[ii].isValid())
 	{

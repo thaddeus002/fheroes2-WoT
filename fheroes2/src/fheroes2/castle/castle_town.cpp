@@ -36,7 +36,6 @@
 #include "text.h"
 #include "portrait.h"
 #include "payment.h"
-#include "SDL.h"
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 {
@@ -224,6 +223,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		case BUILD_TAVERN:	index = 2; break;
 		case BUILD_SHIPYARD:	index = 3; break;
 		case BUILD_WELL:	index = 4; break;
+		case BUILD_TENT:	index = 5; break;
 		case BUILD_CASTLE:	index = 6; break;
 		case BUILD_STATUE:	index = 7; break;
 		case BUILD_LEFTTURRET:	index = 8; break;

@@ -26,11 +26,6 @@
 #define DEFAULT_DEPTH           16              // Surface use bits color
 
 class Palette;
-class Point;
-class Rect;
-struct SDL_Surface;
-struct SDL_PixelFormat;
-struct SDL_Color;
 
 class Surface
 {
@@ -47,14 +42,14 @@ public:
     Surface & operator= (const Surface & bs);
     void Set(u16 sw, u16 sh, bool alpha = false);
 
-    u16 w(void) const;
-    u16 h(void) const;
-    u8  depth(void) const;
+    u16 w(void) const{ return surface ? surface->w : 0; };
+    u16 h(void) const{ return surface ? surface->h : 0; };
+    u8  depth(void) const{ return surface ? surface->format->BitsPerPixel : 0; };
 
     bool valid(void) const{ return surface ? true : false; };
-    bool alpha(void) const;
-    u32 flags(void) const;
-    u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
+    bool alpha(void) const{ return  SDL_SRCALPHA & surface->flags; };
+    u32 flags(void) const{ return surface->flags; };
+    u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const{ return a ? SDL_MapRGBA(surface->format, r, g, b, a) : SDL_MapRGB(surface->format, r, g, b); };
 
     void Blit(const Surface &src);
     void Blit(const Surface &src, s16 dst_ox, s16 dst_oy);
@@ -64,8 +59,8 @@ public:
 
     void ScaleFrom(const Surface & bs);
     
-    bool SaveBMP(const char *fn) const;
-    const void *pixels(void) const;
+    bool SaveBMP(const char *fn) const{ return SDL_SaveBMP(surface, fn) ? false : true; };
+    const void *pixels(void) const{ return surface->pixels; };
     const SDL_Surface *GetSurface(void) const{ return surface; };
 
     void Fill(u32 color);
@@ -78,9 +73,9 @@ public:
     void LoadPalette(const SDL_Color *colors, u32 ncolor);
     void SetDisplayFormat(void);
     void SetColorKey(void);
-    void SetColorKey(u8 r, u8 g, u8 b);
-    void SetColorKey(u32 color);
-    void SetAlpha(u8 level);
+    void SetColorKey(u8 r, u8 g, u8 b){ SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, MapRGB(r, g, b)); };
+    void SetColorKey(u32 color){ SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, color); };
+    void SetAlpha(u8 level){ SDL_SetAlpha(surface, SDL_SRCALPHA|SDL_RLEACCEL, level); };
     void SetPixel4(u16 x, u16 y, u32 color);
     void SetPixel3(u16 x, u16 y, u32 color);
     void SetPixel2(u16 x, u16 y, u32 color);
@@ -93,14 +88,14 @@ public:
     u32 GetPixel1(u16 x, u16 y);
     u32 GetPixel(u16 x, u16 y);
 
-    void Lock(void);
-    void Unlock(void);
+    void Lock(void){ if(SDL_MUSTLOCK(surface)) SDL_LockSurface(surface); };
+    void Unlock(void){ if(SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface); };
 
 protected:
     void CreateSurface(const Rect &sz, u8 dp, u32 fl){ CreateSurface(sz.w, sz.h, dp, fl); };
     void CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl);
-    void FreeSurface(void);
-    const SDL_PixelFormat *GetPixelFormat(void) const;
+    void FreeSurface(void){ if(surface) SDL_FreeSurface(surface); surface = NULL; };
+    const SDL_PixelFormat *GetPixelFormat(void) const{ return surface->format; };
 
     SDL_Surface *surface;
     

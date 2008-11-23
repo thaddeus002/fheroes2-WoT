@@ -25,7 +25,6 @@
 #include "config.h"
 #include "background.h"
 #include "dialog.h"
-#include "SDL.h"
 
 Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
 {

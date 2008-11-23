@@ -37,7 +37,6 @@
 #include "tools.h"
 #include "editor_interface.h"
 #include "game.h"
-#include "SDL.h"
 
 namespace Game
 {

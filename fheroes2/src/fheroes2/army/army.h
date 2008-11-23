@@ -21,7 +21,6 @@
 #define H2ARMY_H
 
 #include <string>
-#include <list>
 #include <vector>
 #include <utility>
 #include "race.h"
@@ -31,16 +30,12 @@
 #include "skill.h"
 #include "spritecursor.h"
 #include "gamedefs.h"
-#include "spell_types.h"
 
 class Surface;
 class Heroes;
 
-#define	ARMYMAXTROOPS		5
-
 namespace Army
 {
-
     typedef enum
     {
 	FEW	= 1,
@@ -103,7 +98,7 @@ namespace Army
 	void RemoveMagic(Spell::spell_t spell);
 	void ClearMagic();
 	void ProceedMagic();
-	const std::vector<Spell::magic_t> &Magics() const;
+	const std::vector<Spell::magic_t> &Magics() const { return magics; };
         
         bool IsReflected() const { return reflect; }
         void SetReflect(bool r) { lastReflect = reflect; reflect = r; }
@@ -127,8 +122,6 @@ namespace Army
 	bool                    summoned;
 
     private:
-        void initDefaults();
-    
 	Point                   pos;
 	Background bg;
 	bool saved;
@@ -147,26 +140,6 @@ namespace Army
     typedef std::vector<BattleTroop> BattleArmy_t;
     typedef std::vector<Troop> army_t;
 
-
-    s8 GetMoraleWithModificators(const army_t &, std::list<std::string> *list = NULL);
-    s8 GetLuckWithModificators(const army_t &, std::list<std::string> *list = NULL);
-    Troop & GetSlowestTroop(army_t & army);
-    Troop & GetFastestTroop(army_t & army);
-    Troop & GetStrongestTroop(army_t & army);
-    Troop & GetWeakestTroop(army_t & army);
-    const Troop & GetSlowestTroop(const army_t & army);
-    const Troop & GetFastestTroop(const army_t & army);
-    const Troop & GetStrongestTroop(const army_t & army);
-    const Troop & GetWeakestTroop(const army_t & army);
-    u8 GetCountTroops(const army_t & army);
-    u8 GetCountUniqTroops(const army_t & army);
-    Race::race_t GetRace(const army_t & army);
-    bool HasMonster(const army_t & army, const Monster::monster_t mon);
-    bool JoinTroop(army_t & army, const Troop & troop);
-    bool JoinTroop(army_t & army, const Monster::monster_t mon, const u16 count);
-    void SetMasterSkill(army_t & army, const Skill::Primary & primary);
-
-    // deprecated
     class SelectBar
     {
     public:

@@ -37,7 +37,6 @@
 #include "marketplace.h"
 #include "dialog.h"
 #include "error.h"
-#include "SDL.h"
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs);
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);

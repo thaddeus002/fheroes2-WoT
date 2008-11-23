@@ -27,18 +27,11 @@
 #include "display.h"
 #include "sprite.h"
 #include "castle.h"
-#include "army.h"
 
-Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
-    nearly_sea(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))),
-    color(Color::GRAY), building(0), army_spread(true), allow_build(true), present_boat(false), mageguild(race),
-    dwelling(CASTLEMAXMONSTER, 0), army(ARMYMAXTROOPS), castle_heroes(false)
-{
-    // set master primary skill to army
-    Army::SetMasterSkill(army, captain);
-}
-
-void Castle::LoadFromMP2(const void *ptr)
+Castle::Castle(u32 gid, u16 mapindex, const void *ptr, bool rnd)
+    : building(0), army_spread(true), allow_build(true), present_boat(false), dwelling(CASTLEMAXMONSTER, 0),
+      army(CASTLEMAXARMY), castle_heroes(false), mp(mapindex % world.w(), mapindex / world.h()),
+      nearly_sea(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST)))
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
@@ -185,20 +178,22 @@ void Castle::LoadFromMP2(const void *ptr)
 
     // race
     switch(*ptr8)
-    { 	 
-	case 0x00: race = Race::KNGT; break; 	 
-	case 0x01: race = Race::BARB; break; 	 
-        case 0x02: race = Race::SORC; break; 	 
-	case 0x03: race = Race::WRLK; break; 	 
-	case 0x04: race = Race::WZRD; break; 	 
-        case 0x05: race = Race::NECR; break; 	 
-        default: race = (Color::GRAY != color ? Settings::Get().FileInfo().KingdomRace(color) : Race::Rand()); break; 	 
+    {
+	case 0x00: race = Race::KNGT; break;
+	case 0x01: race = Race::BARB; break;
+	case 0x02: race = Race::SORC; break;
+	case 0x03: race = Race::WRLK; break;
+	case 0x04: race = Race::WZRD; break;
+	case 0x05: race = Race::NECR; break;
+	default: race = (Color::GRAY != color ? Settings::Get().FileInfo().KingdomRace(color) : Race::Rand()); break;
     }
     ++ptr8;
 
     // castle
     if(*ptr8) building |= BUILD_CASTLE;
     ++ptr8;
+
+    building |= (building & BUILD_CASTLE ? BUILD_CASTLE : BUILD_TENT);
 
     // allow upgrade to castle (0 - true, 1 - false)
     allow_castle = (*ptr8 ? false : true);
@@ -246,6 +241,7 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7));
 
     // MageGuild
+    mageguild.SetRace(race);
     if(building & BUILD_MAGEGUILD1) mageguild.BuildNextLevel();
     if(building & BUILD_MAGEGUILD2) mageguild.BuildNextLevel();
     if(building & BUILD_MAGEGUILD3) mageguild.BuildNextLevel();
@@ -253,12 +249,26 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & BUILD_MAGEGUILD5) mageguild.BuildNextLevel();
     if(Race::WZRD == race && building & BUILD_SPEC) mageguild.UpgradeExt();
 
+    // modify RND sprites
+    if(rnd) CorrectAreaMaps();
+
+    // minimize area maps id
+    MinimizeAreaMapsID();
+    
+    // set master primary skill to army
+    Army::army_t::iterator it1 = army.begin();
+    Army::army_t::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) (*it1).SetMasterSkill(&captain);
+
+    // init captain
+    if(building & BUILD_CAPTAIN) captain.SetRace(race);
+
     // remove tavern from necromancer castle
     if(Race::NECR == race && !Settings::Get().Modes(Settings::PRICELOYALTY))
     	building &= ~BUILD_TAVERN;
 
     // end
-    if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "Castle::LoadFromMP2: castle: " : "Castle::LoadFromMP2: town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
+    if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "add castle: " : "add town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
 const Point & Castle::GetCenter(void) const
@@ -329,6 +339,170 @@ void Castle::ChangeColor(Color::color_t cl)
     world.GetTiles(mp).CaptureFlags32(MP2::OBJ_CASTLE, color);
 }
 
+/* correct sprites for RND castles */
+void Castle::CorrectAreaMaps(void)
+{
+/* 
+castle size: T and B - sprite, S - shadow, XX - center
+
+              T0
+      S1S1T1T1T1T1T1
+    S2S2S2T2T2T2T2T2
+      S3S3B1B1XXB1B1
+        S4B2B2  B2B2
+*/
+    std::vector<u16> coords;
+
+    // T0
+    if(isCastle()) coords.push_back((mp.y - 3) * world.h() + mp.x);
+    // T1
+    coords.push_back((mp.y - 2) * world.h() + mp.x - 2);
+    coords.push_back((mp.y - 2) * world.h() + mp.x - 1);
+    coords.push_back((mp.y - 2) * world.h() + mp.x);
+    coords.push_back((mp.y - 2) * world.h() + mp.x + 1);
+    coords.push_back((mp.y - 2) * world.h() + mp.x + 2);
+    // T2
+    coords.push_back((mp.y - 1) * world.h() + mp.x - 2);
+    coords.push_back((mp.y - 1) * world.h() + mp.x - 1);
+    coords.push_back((mp.y - 1) * world.h() + mp.x);
+    coords.push_back((mp.y - 1) * world.h() + mp.x + 1);
+    coords.push_back((mp.y - 1) * world.h() + mp.x + 2);
+    // B1
+    coords.push_back(mp.y * world.h() + mp.x - 2);
+    coords.push_back(mp.y * world.h() + mp.x - 1);
+    coords.push_back(mp.y * world.h() + mp.x);
+    coords.push_back(mp.y * world.h() + mp.x + 1);
+    coords.push_back(mp.y * world.h() + mp.x + 2);
+    // B2
+    coords.push_back((mp.y + 1) * world.h() + mp.x - 2);
+    coords.push_back((mp.y + 1) * world.h() + mp.x - 1);
+    coords.push_back((mp.y + 1) * world.h() + mp.x);
+    coords.push_back((mp.y + 1) * world.h() + mp.x + 1);
+    coords.push_back((mp.y + 1) * world.h() + mp.x + 2);
+
+    Maps::Tiles & tile_center = world.GetTiles(mp);
+
+    // correct only RND town and castle
+    switch(tile_center.GetObject())
+    {
+	case MP2::OBJ_RNDTOWN:
+	case MP2::OBJ_RNDCASTLE:
+	    break;
+	
+	default:
+	    Error::Warning("Castle::CorrectAreaMaps: correct only RND town and castle. index: ", mp.y * world.w() + mp.x);
+	    return;
+    }
+
+    // modify all rnd sprites
+    std::vector<u16>::const_iterator itc = coords.begin();
+    for(; itc != coords.end(); ++itc) ModifyTIlesRNDSprite(world.GetTiles(*itc));
+}
+
+void Castle::MinimizeAreaMapsID(void)
+{
+    // reset castle ID
+    for(s8 yy = -3; yy < 2; ++yy)
+	for(s8 xx = -2; xx < 3; ++xx)
+    {
+	Maps::Tiles & tile = world.GetTiles((mp.y + yy) * world.h() + mp.x + xx);
+
+	if(MP2::OBJN_RNDCASTLE == tile.GetObject() ||
+     	     MP2::OBJN_RNDTOWN == tile.GetObject() ||
+	     MP2::OBJN_CASTLE  == tile.GetObject()) tile.SetObject(MP2::OBJ_ZERO);
+    }
+
+    // set minimum area castle ID
+    for(s8 yy = -1; yy < 1; ++yy)
+	for(s8 xx = -2; xx < 3; ++xx)
+    {
+	Maps::Tiles & tile = world.GetTiles((mp.y + yy) * world.h() + mp.x + xx);
+
+	tile.SetObject(MP2::OBJN_CASTLE);
+    }
+
+    // restore center ID
+    world.GetTiles(mp).SetObject(MP2::OBJ_CASTLE);
+}
+
+/* modify RND sprites alghoritm */
+void Castle::ModifyTIlesRNDSprite(Maps::Tiles & tile)
+{
+    Maps::TilesAddon *addon = tile.FindRNDCastle();
+
+    if(addon)
+    {
+        addon->object -= 12;
+
+        switch(race)
+        {
+    	    case Race::KNGT: break;
+            case Race::BARB: addon->index += 32; break;
+            case Race::SORC: addon->index += 64; break;
+            case Race::WRLK: addon->index += 96; break;
+            case Race::WZRD: addon->index += 128; break;
+            case Race::NECR: addon->index += 160; break;
+            default: Error::Warning("Castle::ModifyTIlesRNDSprite: unknown race."); break;
+	}
+    }
+}
+
+// modify Town sprite to Castle
+void Castle::ModifyTilesTownToCastle(Maps::Tiles & tile)
+{
+    Maps::TilesAddon *addon = tile.FindCastle();
+
+    if(addon)
+            addon->index -= 16;
+}
+
+void Castle::TownUpgradeToCastle(void)
+{
+    // correct area maps sprites
+    std::vector<u16> coords;
+
+    // T0
+    coords.push_back((mp.y - 3) * world.h() + mp.x);
+    // T1
+    coords.push_back((mp.y - 2) * world.h() + mp.x - 2);
+    coords.push_back((mp.y - 2) * world.h() + mp.x - 1);
+    coords.push_back((mp.y - 2) * world.h() + mp.x);
+    coords.push_back((mp.y - 2) * world.h() + mp.x + 1);
+    coords.push_back((mp.y - 2) * world.h() + mp.x + 2);
+    // T2
+    coords.push_back((mp.y - 1) * world.h() + mp.x - 2);
+    coords.push_back((mp.y - 1) * world.h() + mp.x - 1);
+    coords.push_back((mp.y - 1) * world.h() + mp.x);
+    coords.push_back((mp.y - 1) * world.h() + mp.x + 1);
+    coords.push_back((mp.y - 1) * world.h() + mp.x + 2);
+    // B1
+    coords.push_back(mp.y * world.h() + mp.x - 2);
+    coords.push_back(mp.y * world.h() + mp.x - 1);
+    coords.push_back(mp.y * world.h() + mp.x);
+    coords.push_back(mp.y * world.h() + mp.x + 1);
+    coords.push_back(mp.y * world.h() + mp.x + 2);
+
+    // modify all rnd sprites
+    std::vector<u16>::const_iterator itc = coords.begin();
+    for(; itc != coords.end(); ++itc) ModifyTilesTownToCastle(world.GetTiles(*itc));
+
+
+
+
+    // remove tent
+    building &= ~BUILD_TENT;
+}
+
+// return valid count army in castle
+u8 Castle::GetCountArmy(void) const
+{
+    u8 result = 0;
+
+    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii) if(Army::isValid(army[ii])) ++result;
+
+    return result;
+}
+
 // return mage guild level
 u8 Castle::GetLevelMageGuild(void)
 {
@@ -359,7 +533,7 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
 	"Upg. Armory", "Upg. Adobe", "Upg. Stonehenge", "Upg. Maze", "Cliff Nest", "Upg. Mansion",
 	"Upg. Jousting Arena", "Upg. Bridge", "Fenced Meadow", "Swamp", "Upg. Ivory Tower", "Upg. Mausoleum",
 	"Upg. Cathedral", "Pyramid", "Red Tower", "Red Tower", "Upg. Cloud Castle", "Laboratory",
-	"", "", "", "Black Tower", "", "" };
+	"Upg. Cathedral", "Pyramid", "Red Tower", "Black Tower", "Upg. Cloud Castle", "Laboratory" };
 
     static const std::string shrine = "Shrine";
 
@@ -575,12 +749,12 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
     if(dwelling[dw_index] < count) return false;
 
     // find free cell
-    u8 num_cell = ARMYMAXTROOPS;
-    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+    u8 num_cell = CASTLEMAXARMY;
+    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
 	if(ms == army[ii].Monster() || 0 == army[ii].Count()){ num_cell = ii; break; }
 
     // not found
-    if(ARMYMAXTROOPS <= num_cell) return false;
+    if(CASTLEMAXARMY <= num_cell) return false;
 
     // buy
     const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms) * count);
@@ -951,9 +1125,8 @@ void Castle::BuyBuilding(building_t build)
 
 	switch(build)
 	{
-	    case BUILD_CASTLE:
-		Maps::UpdateSpritesFromTownToCastle(GetCenter());
-		break;
+	    case BUILD_CASTLE: TownUpgradeToCastle(); break;
+	    case BUILD_CAPTAIN: captain.SetRace(race); break;
 
 	    case BUILD_MAGEGUILD1:
 	    case BUILD_MAGEGUILD2:
@@ -1429,38 +1602,4 @@ void Castle::Dump(void) const
     std::cout << "present heroes  : " << (GetHeroes() ? "yes" : "no") << std::endl;
     std::cout << "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl;
     std::cout << "nearly sea      : " << (nearly_sea ? "yes" : "no") << std::endl;
-}
-
-s8 Castle::GetMoraleWithModificators(std::list<std::string> *list) const
-{
-    s8 result(Morale::NORMAL);
-
-    // and tavern
-    if(Race::NECR != race && isBuild(BUILD_TAVERN))
-    {
-        result += 1;
-        if(list) list->push_back(GetStringBuilding(BUILD_TAVERN, race) + "+1");
-    }
-
-    // and barbarian coliseum
-    if(Race::BARB == race && isBuild(BUILD_SPEC))
-    {
-        result += 2;
-        if(list) list->push_back(GetStringBuilding(BUILD_SPEC, race) + "+2");
-    }
-
-    return result;
-}
-
-s8 Castle::GetLuckWithModificators(std::list<std::string> *list) const
-{
-    s8 result(Luck::NORMAL);
-
-    if(Race::SORC == race && isBuild(BUILD_SPEC))
-    {
-        result += 2;
-        if(list) list->push_back(Castle::GetStringBuilding(BUILD_SPEC, race) + "+2");
-    }
-
-    return result;
 }

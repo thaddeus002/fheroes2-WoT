@@ -28,7 +28,7 @@
 #include "luck.h"
 #include "gamedefs.h"
 
-#define MAXPRIMARYSKILL		4
+#define MAXPRIMARYSKILL		6
 #define MAXSECONDARYSKILL	14
 
 namespace Skill
@@ -75,6 +75,8 @@ namespace Skill
 	u8			defence;
 	u8			power;
 	u8			knowledge;
+	Morale::morale_t	morale;		// deprecated, will be removed.
+        Luck::luck_t		luck;		// deprecated, will be removed.
     };
 
     class Secondary : private std::pair<u8, u8>

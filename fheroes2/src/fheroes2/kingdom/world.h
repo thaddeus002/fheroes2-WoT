@@ -44,7 +44,6 @@ namespace GameEvent
 
 #define DAYOFWEEK       7 
 #define WEEKOFMONTH     4 
-#define MAXCASTLES	72
 
 class World : protected Size
 {

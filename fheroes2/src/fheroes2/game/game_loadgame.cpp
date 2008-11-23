@@ -25,8 +25,6 @@
 #include "button.h"
 #include "game.h"
 #include "error.h"
-#include "audio_interface.h"
-#include "SDL.h"
 
 Game::menu_t Game::LoadGame(void)
 {

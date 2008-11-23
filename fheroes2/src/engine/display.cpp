@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <string>
-#include "SDL.h"
 #include "rect.h"
 #include "types.h"
 #include "error.h"

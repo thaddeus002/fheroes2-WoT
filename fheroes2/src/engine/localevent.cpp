@@ -20,7 +20,6 @@
 
 #include <sstream>
 #include <ctime>
-#include "SDL.h"
 #include "error.h"
 #include "display.h"
 #include "localevent.h"
@@ -38,7 +37,7 @@ Point LocalEvent::mouse_pr(-1, -1);
 Point LocalEvent::mouse_rl(-1, -1);
 Point LocalEvent::mouse_rm(-1, -1);
 Point LocalEvent::mouse_rr(-1, -1);
-int LocalEvent::key_value = SDLK_EURO;
+SDLKey LocalEvent::key_value = SDLK_EURO;
 void (* LocalEvent::redraw_cursor_func)(u16, u16) = NULL;
 
 LocalEvent::LocalEvent()
@@ -93,31 +92,6 @@ bool LocalEvent::HandleEvents(void)
     SDL_Delay(1);
 
     return true;
-}
-
-bool LocalEvent::MouseMotion(void) const
-{
-    return mouse_motion;
-}
-
-bool LocalEvent::MouseMotion(const Rect &rt) const
-{
-    return mouse_motion ? rt & mouse_cu : false;
-}
-
-bool LocalEvent::MouseLeft(void) const
-{
-    return mouse_pressed && SDL_BUTTON_LEFT == mouse_button;
-}
-
-bool LocalEvent::MouseMiddle(void) const
-{
-    return mouse_pressed && SDL_BUTTON_MIDDLE  == mouse_button;
-}
-
-bool LocalEvent::MouseRight(void) const
-{
-    return mouse_pressed && SDL_BUTTON_RIGHT == mouse_button;
 }
 
 void LocalEvent::HandleKeyboardEvent(SDL_keysym & keysym, bool pressed)
@@ -250,66 +224,6 @@ bool LocalEvent::MouseClickRight(const Rect &rt)
     return false;
 }
 
-bool LocalEvent::MouseWheelUp(void) const
-{
-    return mouse_pressed && SDL_BUTTON_WHEELUP == mouse_button;
-}
-
-bool LocalEvent::MouseWheelDn(void) const
-{
-    return mouse_pressed && SDL_BUTTON_WHEELDOWN == mouse_button;
-}
-
-bool LocalEvent::MousePressLeft(const Rect &rt) const
-{
-    return MouseLeft() ? rt & mouse_pl : false;
-}
-
-bool LocalEvent::MousePressLeft(const Point &pt, u16 w, u16 h) const
-{
-    return MouseLeft() ? Rect(pt.x, pt.y, w, h) & mouse_pl : false;
-}
-
-bool LocalEvent::MousePressMiddle(const Rect &rt) const
-{
-    return MouseMiddle() ? rt & mouse_pm : false;
-}
-
-bool LocalEvent::MousePressRight(const Rect &rt) const
-{
-    return MouseRight() ? rt & mouse_pr : false;
-}
-
-bool LocalEvent::MouseReleaseLeft(const Rect &rt) const
-{
-    return MouseLeft() ? false : rt & mouse_rl;
-}
-
-bool LocalEvent::MouseReleaseMiddle(const Rect &rt) const
-{
-    return MouseMiddle() ? false : rt & mouse_rm;
-}
-
-bool LocalEvent::MouseReleaseRight(const Rect &rt) const
-{
-    return MouseRight() ? false : rt & mouse_rr;
-}
-
-bool LocalEvent::MouseWheelUp(const Rect &rt) const
-{
-    return MouseWheelUp() ? rt & mouse_cu : false;
-}
-
-bool LocalEvent::MouseWheelDn(const Rect &rt) const
-{
-    return MouseWheelDn() ? rt & mouse_cu : false;
-}
-
-bool LocalEvent::MouseCursor(const Rect &rt) const
-{
-    return rt & mouse_cu;
-}
-
 const Point & LocalEvent::MouseCursor(void)
 {
     int x, y;
@@ -321,11 +235,6 @@ const Point & LocalEvent::MouseCursor(void)
     mouse_cu.y = y;
 
     return mouse_cu;
-}
-
-bool LocalEvent::KeyPress(int key) const
-{
-    return key == key_value && key_pressed;
 }
 
 void LocalEvent::SetGlobalFilterEvents(void (*pf)(u16, u16))

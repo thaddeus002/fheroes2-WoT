@@ -21,14 +21,9 @@
 #include <string>
 #include <algorithm>
 
-#include "SDL.h"
-#include "SDL_mixer.h"
 #include "engine.h"
 #include "error.h"
 #include "audio.h"
-#include "audio_interface.h"
-
-const u32 MAXVOLUME = MIX_MAX_VOLUME;
 
 namespace Music
 {
@@ -268,7 +263,7 @@ void Music::Reset(void)
 
 void Mixer::Init(void)
 {
-    if(SDL::SubSystem(SDL_INIT_AUDIO))
+    if(SDL::SubSystem(INIT_AUDIO))
     {
 	hardware.freq = 22050;
 	hardware.format = AUDIO_S16;

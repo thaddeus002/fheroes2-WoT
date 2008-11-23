@@ -25,7 +25,6 @@
 #include "localevent.h"
 #include "button.h"
 #include "dialog.h"
-#include "SDL.h"
 
 void Dialog::SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
 {

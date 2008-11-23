@@ -23,7 +23,7 @@
 
 #include "error.h"
 #include "settings.h"
-#include "audio_interface.h"
+#include "audio.h"
 #include "game_focus.h"
 #include "maps_tiles.h"
 #include "ground.h"

@@ -40,7 +40,6 @@
 #include "tools.h"
 #include "splitter.h"
 #include "game.h"
-#include "SDL.h"
 
 namespace Scenario
 {
@@ -436,12 +435,6 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 
     // draw class
     current = 0;
-
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-    {
-	TextSprite & text = coordClass[Color::GetIndex(color)].second;
-	text.Hide();
-    }
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	if(conf.FileInfo().KingdomColors() & color)

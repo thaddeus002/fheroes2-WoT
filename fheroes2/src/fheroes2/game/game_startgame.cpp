@@ -22,7 +22,7 @@
 #include <algorithm>
 
 #include "agg.h"
-#include "audio_interface.h"
+#include "audio.h"
 #include "sprite.h"
 #include "localevent.h"
 #include "button.h"
@@ -44,8 +44,6 @@
 #include "route.h"
 #include "game_focus.h"
 #include "scripting.h"
-#include "spell.h"
-#include "SDL.h"
 
 namespace Game
 {

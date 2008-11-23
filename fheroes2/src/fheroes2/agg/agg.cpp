@@ -20,16 +20,13 @@
 
 #include <fstream>
 #include <iostream>
-#include "SDL.h"
+
 #include "error.h"
 #include "engine.h"
 #include "config.h"
 #include "surface.h"
 #include "sprite.h"
 #include "audio.h"
-#include "audio_interface.h"
-#include "midi_xmi.h"
-#include "midi_mid.h"
 #include "tools.h"
 #include "agg.h"
 

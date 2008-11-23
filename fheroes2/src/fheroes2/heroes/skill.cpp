@@ -24,14 +24,14 @@
 #include "error.h"
 #include "skill.h"
 
-Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0)
+Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0), morale(Morale::NORMAL), luck(Luck::NORMAL)
 {
 }
 
 // primary skill from level up (dependence from race and hero level)
 Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 level)
 {
-    Rand::Queue percents(MAXPRIMARYSKILL);
+    Rand::Queue percents(4);
 
     // primary skill
     switch(race)

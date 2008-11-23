@@ -25,7 +25,6 @@
 #include "localevent.h"
 #include "button.h"
 #include "dialog.h"
-#include "SDL.h"
 
 u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons)
 {

@@ -26,7 +26,6 @@
 #include "background.h"
 #include "tools.h"
 #include "dialog.h"
-#include "SDL.h"
 
 namespace Dialog
 {

@@ -20,6 +20,8 @@
 #ifndef H2TYPES_H
 #define H2TYPES_H
 
+#include "SDL.h"
+#include "SDL_mixer.h"
 #include "l10n.h"
 
 typedef int8_t		s8;

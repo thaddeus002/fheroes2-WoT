@@ -25,12 +25,13 @@
 #include <vector>
 #include <list>
 #include "race.h"
-#include "spell_types.h"
+#include "spell.h"
 #include "color.h"
 #include "morale.h"
 #include "mp2.h"
 #include "luck.h"
 #include "dialog.h"
+#include "army.h"
 #include "skill.h"
 #include "artifact.h"
 #include "route.h"
@@ -38,10 +39,10 @@
 #include "direction.h"
 #include "spell_book.h"
 #include "gamedefs.h"
-#include "army_types.h"
 
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXSKILL		8
+#define HEROESMAXARMY		5
 #define HEROESMAXCOUNT		71
 
 #define SCOUTINGBASE		4
@@ -117,6 +118,18 @@ public:
 
     const Army::army_t & GetArmy(void) const{ return army; }
     Army::army_t & GetArmy(void) { return army; };
+    bool HasMonster(const Monster::monster_t mon) const;
+    Army::Troop & GetSlowestArmy(void);
+    Army::Troop & GetFastestArmy(void);
+    Army::Troop & GetStrongestArmy(void);
+    Army::Troop & GetWeakestArmy(void);
+    const Army::Troop & GetSlowestArmy(void) const;
+    const Army::Troop & GetFastestArmy(void) const;
+    const Army::Troop & GetStrongestArmy(void) const;
+    const Army::Troop & GetWeakestArmy(void) const;
+    u8 GetCountArmy(void) const;
+    u8 GetCountUniqTroops(void) const;
+    Race::race_t GetRaceArmy(void) const;
 
     const Spell::Book & SpellBook(void) const { return spell_book; };
 
@@ -217,6 +230,8 @@ public:
 
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
+
+    bool JoinTroops(const Monster::monster_t, const u16 count);
 
     bool spellCasted;
 

@@ -35,9 +35,6 @@
 #include "algorithm.h"
 #include "ai.h"
 #include "gameevent.h"
-#include "army.h"
-#include "spell.h"
-#include "audio_interface.h"
 
 #define OBSERVATIONTOWERSCOUTE 10
 
@@ -1469,6 +1466,8 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		{
 		    const Resource::resource_t r = Resource::Rand();
 		    std::string header = "A leprechaun offers you the " + Artifact::String(art) + " for the small price of ";
+		    std::string body;
+		    u16 buttons = 0;
 		    Resource::funds_t payment;
 		    if(1 == c)
 		    {
@@ -1491,20 +1490,20 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 
 		    if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
 		    {
-			PlaySoundWarning;
-			if(Dialog::YES == DialogWithArtifact(header, "Do you wish to buy this artifact?", art, Dialog::YES | Dialog::NO))
-			{
-		    	    conditions = true;
-		    	    world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
-			}
-			else
-			    Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
+			buttons = Dialog::YES | Dialog::NO;
+			body = "Do you wish to buy this artifact?";
 		    }
 		    else
 		    {
-			PlaySoundFailure;
-			Dialog::Message("You try to pay the leprechaun, but realize that you can't afford it.", "The leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
+			buttons = Dialog::OK;
+			body = "You try to pay the leprechaun, but realize that you can't afford it. The leprechaun stamps his foot and ignores you.";
 		    }
+		    
+		    PlaySoundWarning;
+		    if(Dialog::YES == DialogWithArtifact(header, body, art, buttons))
+			conditions = true;
+		    else
+			Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
 		    break;
 		}
 
@@ -1512,34 +1511,26 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		case 4:
 		case 5:
 		{
+		    u32 buttons = 0;
+		    std::string header;
+		    std::string body;
 		    if(4 == c)
 		    {
-			if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
-			{
-			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
-			    conditions = true;
-			}
-			else
-			{
-			    PlaySoundFailure;
-			    Dialog::Message("You've found the humble dwelling of a withered hermit.", "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.", Font::BIG, Dialog::OK);
-			}
+			buttons = hero.HasSecondarySkill(Skill::Secondary::WISDOM) ? 0 : Dialog::OK;
+			header = "You've found the humble dwelling of a withered hermit.";
+			body = "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.";
 		    }
 		    else
 		    {
-			if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
-			{
-			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(tile.GetObject()), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
-			    conditions = true;
-			}
-			else
-			{
-			    PlaySoundFailure;
-			    Dialog::Message("You've come across the spartan quarters of a retired soldier.", "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.", Font::BIG, Dialog::OK);
-			}
+			buttons = hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP) ? 0 : Dialog::OK;
+			header = "You've come across the spartan quarters of a retired soldier.";
+			body = "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.";
 		    }
+		    PlaySoundSuccess;
+		    if(buttons)
+			DialogWithArtifact(header, body, art, buttons);
+		    else
+			conditions = true;
 		    break;
 		}
 
@@ -1718,10 +1709,7 @@ void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
 	PlayPickupSound();
 
 	const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
-	if(!Army::JoinTroop(hero.GetArmy(), Monster::GENIE, recruit))
-	    Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
-	else
-	if(recruit)
+	if(recruit && hero.JoinTroops(Monster::GENIE, recruit))
 	{
 	    AnimationRemoveObject(tile);
 	    tile.SetCountMonster(0);
@@ -1804,7 +1792,7 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     {
 	PlaySoundWarning;
 	Dialog::Message("A whirlpool engulfs your ship.", "Some of your army has fallen overboard.", Font::BIG, Dialog::OK);
-	Army::Troop & troops = Army::GetWeakestTroop(hero.GetArmy());
+	Army::Troop & troops = hero.GetWeakestArmy();
 	const u16 c = troops.Count() / 2;
 	troops.SetCount(c ? c : 1);
     }
@@ -2043,13 +2031,8 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
         const std::string & message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you.";
 
 	PlaySoundSuccess;
-	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO))
-	{
-	    if(!Army::JoinTroop(hero.GetArmy(), monster, count))
-		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
-	    else
-		tile.SetCountMonster(0);
-	}
+	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO) &&
+	    hero.JoinTroops(monster, count)) tile.SetCountMonster(0);
     }
     else
     {
@@ -2109,13 +2092,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
 	if(Dialog::YES == Dialog::Message(msg_full1, msg_full2, Font::BIG, Dialog::YES | Dialog::NO))
 	{
 	    const u16 recruit = Dialog::RecruitMonster(monster, count);
-	    if(recruit)
-	    {
-		if(!Army::JoinTroop(hero.GetArmy(), monster, recruit))
-		    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
-		else
-		    tile.SetCountMonster(count - recruit);
-	    }
+	    if(recruit && hero.JoinTroops(monster, recruit)) tile.SetCountMonster(count - recruit);
 	}
     }
     else
@@ -2301,13 +2278,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
     {
 	const Monster::monster_t monster = Monster::Monster(obj);
         const u16 recruit = Dialog::RecruitMonster(monster, count);
-        if(recruit)
-        {
-    	    if(!Army::JoinTroop(hero.GetArmy(), monster, recruit))
-		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
-    	    else
-    		tile.SetCountMonster(count - recruit);
-    	}
+        if(recruit && hero.JoinTroops(monster, recruit)) tile.SetCountMonster(count - recruit);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
@@ -2408,20 +2379,20 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
     switch(obj)
     {
 	case MP2::OBJ_HILLFORT:
-	    if(Army::HasMonster(hero.GetArmy(), Monster::DWARF))
+	    if(hero.HasMonster(Monster::DWARF))
 	    {
 		UpgradeMonsters(hero, Monster::DWARF);
 		mons.push_back(Monster::DWARF);
 		msg1 = Monster::MultipleNames(Monster::DWARF);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::ORC))
+	    if(hero.HasMonster(Monster::ORC))
 	    {
 		UpgradeMonsters(hero, Monster::ORC);
 		mons.push_back(Monster::ORC);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::ORC);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::OGRE))
+	    if(hero.HasMonster(Monster::OGRE))
 	    {
 		UpgradeMonsters(hero, Monster::OGRE);
 		mons.push_back(Monster::OGRE);
@@ -2433,20 +2404,20 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
 	    break;
 
 	case MP2::OBJ_FREEMANFOUNDRY:
-	    if(Army::HasMonster(hero.GetArmy(), Monster::PIKEMAN))
+	    if(hero.HasMonster(Monster::PIKEMAN))
 	    {
 		UpgradeMonsters(hero, Monster::PIKEMAN);
 		mons.push_back(Monster::PIKEMAN);
 		msg1 = Monster::MultipleNames(Monster::PIKEMAN);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::SWORDSMAN))
+	    if(hero.HasMonster(Monster::SWORDSMAN))
 	    {
 		UpgradeMonsters(hero, Monster::SWORDSMAN);
 		mons.push_back(Monster::SWORDSMAN);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::SWORDSMAN);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::IRON_GOLEM))
+	    if(hero.HasMonster(Monster::IRON_GOLEM))
 	    {
 		UpgradeMonsters(hero, Monster::IRON_GOLEM);
 		mons.push_back(Monster::IRON_GOLEM);

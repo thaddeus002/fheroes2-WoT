@@ -18,16 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "army_types.h"
+#include <vector>
+#include "heroes.h"
+#include "castle.h"
+#include "maps_tiles.h"
 
 #ifndef BATTLE_H
 #define BATTLE_H
-
-class Heroes;
-class Castle;
-namespace Maps {
-    class Tiles;
-}
 
 namespace Army {
     

@@ -32,7 +32,6 @@
 #include "tools.h"
 #include "text.h"
 #include "payment.h"
-#include "SDL.h"
 
 Dialog::answer_t Dialog::BuyBoat(bool enable)
 {

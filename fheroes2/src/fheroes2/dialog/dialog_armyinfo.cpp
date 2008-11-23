@@ -36,10 +36,11 @@
 #include "skill.h"
 #include "dialog.h"
 #include "game.h"
-#include "SDL.h"
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
 {
+    const Army::BattleTroop & army(basicArmy);
+
     Display & display = Display::Get();
 
     const ICN::icn_t viewarmy = H2Config::EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;

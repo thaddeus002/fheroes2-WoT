@@ -28,7 +28,6 @@
 #include "background.h"
 #include "tools.h"
 #include "text.h"
-#include "SDL.h"
 
 void Castle::OpenThievesGuild(void)
 {

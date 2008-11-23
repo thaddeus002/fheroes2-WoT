@@ -26,7 +26,6 @@
 #include "display.h"
 #include "settings.h"
 #include "game.h"
-#include "SDL.h"
 
 Game::menu_t Game::LoadStandard(void)
 {

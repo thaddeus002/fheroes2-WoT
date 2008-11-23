@@ -21,7 +21,12 @@
 #ifndef H2AUDIO_H
 #define H2AUDIO_H
 
-#include "SDL.h"
+#include <vector>
+#include "types.h"
+
+#define MAXVOLUME		MIX_MAX_VOLUME
+#define CHANNEL_RESERVED	22
+#define CHANNEL_FREE		6
 
 namespace Audio
 {
@@ -38,5 +43,43 @@ namespace Audio
 	bool Convert(void);
     };
 };
+
+namespace Cdrom
+{
+    bool	isValid(void);
+    void	Play(const u8 track, bool loop, bool force = false);
+    void	Pause(void);
+};
+
+namespace Music
+{
+    void	Play(const std::vector<u8> & body, bool loop);
+    void	Volume(const u8 vol);
+    void	Pause(void);
+    void	Resume(void);
+    void	Reset(void);
+    bool	isPlaying(void);
+    bool	isPaused(void);
+};
+
+namespace Mixer
+{
+    bool	isValid(void);
+    const Audio::Spec &HardwareSpec(void);
+    u8		Volume(const int ch, const int vol = -1);
+    void	Pause(const int ch = -1);
+    void	PauseLoops(void);
+    void	Resume(const int ch = -1);
+    void	ResumeLoops(void);
+    void	Reset(const int ch = -1);
+    u8		isPlaying(const int ch);
+    u8		isPaused(const int ch);
+    void	PlayRAW(const std::vector<u8> & body, const int ch = -1);
+    void	LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch);
+
+    void	Reduce(void);
+    void	Enhance(void);
+};
+
 
 #endif

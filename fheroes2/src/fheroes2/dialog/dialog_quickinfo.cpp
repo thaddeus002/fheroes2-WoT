@@ -35,11 +35,11 @@
 #include "sprite.h"
 #include "portrait.h"
 #include "game_focus.h"
+#include "spell.h"
 #include "skill.h"
 #include "world.h"
 #include "settings.h"
 #include "dialog.h"
-#include "spell.h"
 
 void Dialog::QuickInfo(const Maps::Tiles & tile)
 {
@@ -277,7 +277,7 @@ void Dialog::QuickInfo(const Castle & castle)
     dst_pt.y += sprite.h() + 5;
     Text(message, Font::SMALL, dst_pt);
 
-    u8 count = Army::GetCountTroops(castle.GetArmy());
+    u8 count = castle.GetCountArmy();
 
     if(! count)
     {
@@ -292,14 +292,14 @@ void Dialog::QuickInfo(const Castle & castle)
         u8 current = 0;
 	const Army::army_t & army = castle.GetArmy();
 
-	for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
         {
 	    if(Army::isValid(army.at(ii)))
 	    {
 		const Sprite & monster = AGG::GetICN(ICN::MONS32, army.at(ii).Monster());
 
                 // align from count
-		dst_pt.x = (cur_rt.w / ARMYMAXTROOPS - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / ARMYMAXTROOPS) * (ARMYMAXTROOPS - count) / (2 * count));
+		dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
 		dst_pt.y = cur_rt.y + 85;
 		// alignt from height sprite
 		dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
@@ -469,22 +469,20 @@ void Dialog::QuickInfo(const Heroes & hero)
     Text(message, Font::SMALL, dst_pt);
 
     // get valid count army
-    u8 count = Army::GetCountTroops(hero.GetArmy());
+    u8 count = hero.GetCountArmy();
 
     // draw monster sprite in one string
     u8 current = 0;
     const Army::army_t & army = hero.GetArmy();
 
-    Army::army_t::const_iterator it1 = army.begin();
-    Army::army_t::const_iterator it2 = army.end();
-    for(; it1 != it2; ++it1)
+    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
     {
-    	if((*it1).isValid())
+	if(Army::isValid(army.at(ii)))
 	{
-	    const Sprite & monster = AGG::GetICN(ICN::MONS32, (*it1).Monster());
+	    const Sprite & monster = AGG::GetICN(ICN::MONS32, army.at(ii).Monster());
 
             // align from count
-	    dst_pt.x = (cur_rt.w / ARMYMAXTROOPS - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / ARMYMAXTROOPS) * (ARMYMAXTROOPS - count) / (2 * count));
+	    dst_pt.x = (cur_rt.w / CASTLEMAXARMY - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / CASTLEMAXARMY) * (CASTLEMAXARMY - count) / (2 * count));
 	    dst_pt.y = cur_rt.y + 112;
 	    // alignt from height sprite
 	    dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
@@ -492,7 +490,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
 	    // count message
             message.clear();
-	    String::AddInt(message, (*it1).Count());
+	    String::AddInt(message, army.at(ii).Count());
 	    dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
 	    dst_pt.y = cur_rt.y + 142;
 	    Text(message, Font::SMALL, dst_pt);

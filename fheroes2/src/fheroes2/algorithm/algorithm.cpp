@@ -21,7 +21,6 @@
 #include "heroes.h"
 #include "castle.h"
 #include "algorithm.h"
-#include "army.h"
 
 u32 Algorithm::CalculateExperience(const Army::army_t & army)
 {

@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <cmath>
-#include "SDL.h"
 #include "rect.h"
 
 Point::Point(s16 px, s16 py) : x(px), y(py)

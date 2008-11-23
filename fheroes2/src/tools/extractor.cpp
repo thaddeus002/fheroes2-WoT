@@ -32,7 +32,7 @@
 #include <fstream>
 #include <vector>
 #include <cctype>
-#include "SDL.h"
+
 #include "types.h"
 
 #define AGGSIZENAME	15

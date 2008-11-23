@@ -36,9 +36,6 @@
 #include "castle.h"
 #include "portrait.h"
 #include "dialog.h"
-#include "army.h"
-#include "spell.h"
-#include "SDL.h"
 
 void DrawLuckSprite(const Luck::luck_t luck, const Point & pt)
 {
@@ -610,7 +607,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	}
 
 	// heroes troops
-	for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
 	{
 	    if(le.MouseClickLeft(coordsHeroesTroops[ii]))
 	    {
@@ -629,7 +626,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
                     	    Monster::GetRace(select_monster) == castle->GetRace() &&
                             castle->isBuild(Castle::GetUpgradeBuilding(Monster::Dwelling(select_monster), castle->GetRace()));
 
-                    switch(Dialog::ArmyInfo(army[ii], readonly? false : (1 == Army::GetCountTroops(army) ? false : true), false, show_upgrade))
+                    switch(Dialog::ArmyInfo(army[ii], readonly? false : (1 == GetCountArmy() ? false : true), false, show_upgrade))
 		    {
 			case Dialog::UPGRADE:
 			    select_troops.SetMonster(Monster::Upgrade(select_monster));
@@ -747,7 +744,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    {
 		cursor.Hide();
 
-		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == Army::GetCountTroops(army) ? false : true), true, false);
+		Dialog::ArmyInfo(army[ii], readonly ? false : (1 == GetCountArmy() ? false : true), true, false);
 
 		cursor.Show();
 		display.Flip();
