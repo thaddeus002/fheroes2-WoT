@@ -144,42 +144,39 @@ void Game::Interface::DrawBorder(bool drawMiddle, bool useAlt)
         srcrt.y += TILEWIDTH;
         srcrt.h = icnadv.h() - srcrt.y;
         display.Blit(icnadv, srcrt, dstpt);
-    }
 
-    if(drawMiddle)
-    {
-    // RIGHT BORDER
-    srcrt.x = icnadv.w() - BORDERWIDTH;
-    srcrt.y = 0;
-    srcrt.w = BORDERWIDTH;
-    srcrt.h = 255;
-    dstpt.x = display.w() - BORDERWIDTH;
-    dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
-    srcrt.y = 255;
-    srcrt.h = TILEWIDTH;
-    dstpt.x = display.w() - BORDERWIDTH;
-    dstpt.y = srcrt.y;
-    for(u8 ii = 0; ii < count_h + 1; ++ii)
-    {
+        // RIGHT BORDER
+        srcrt.x = icnadv.w() - BORDERWIDTH;
+        srcrt.y = 0;
+        srcrt.w = BORDERWIDTH;
+        srcrt.h = 255;
+        dstpt.x = display.w() - BORDERWIDTH;
+        dstpt.y = srcrt.y;
         display.Blit(icnadv, srcrt, dstpt);
-	dstpt.y += TILEWIDTH;
-    }
-    srcrt.y += TILEWIDTH;
-    srcrt.h = icnadv.h() - srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+        srcrt.y = 255;
+        srcrt.h = TILEWIDTH;
+        dstpt.x = display.w() - BORDERWIDTH;
+        dstpt.y = srcrt.y;
+        for(u8 ii = 0; ii < count_h + 1; ++ii)
+        {
+            display.Blit(icnadv, srcrt, dstpt);
+            dstpt.y += TILEWIDTH;
+        }
+        srcrt.y += TILEWIDTH;
+        srcrt.h = icnadv.h() - srcrt.y;
+        display.Blit(icnadv, srcrt, dstpt);
 
-    // ICON BORDER
-    srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;
-    srcrt.y = RADARWIDTH + BORDERWIDTH;
-    srcrt.w = RADARWIDTH;
-    srcrt.h = BORDERWIDTH;
-    dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
-    dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
-    dstpt.y = srcrt.y + BORDERWIDTH + count_icons * 32;
-    srcrt.y = srcrt.y + BORDERWIDTH + 4 * 32;
-    display.Blit(icnadv, srcrt, dstpt);
+        // ICON BORDER
+        srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;
+        srcrt.y = RADARWIDTH + BORDERWIDTH;
+        srcrt.w = RADARWIDTH;
+        srcrt.h = BORDERWIDTH;
+        dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
+        dstpt.y = srcrt.y;
+        display.Blit(icnadv, srcrt, dstpt);
+        dstpt.y = srcrt.y + BORDERWIDTH + count_icons * 32;
+        srcrt.y = srcrt.y + BORDERWIDTH + 4 * 32;
+        display.Blit(icnadv, srcrt, dstpt);
     }
 }
 
