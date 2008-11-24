@@ -20,6 +20,7 @@
 
 #include <sstream>
 #include <ctime>
+#include "SDL.h"
 #include "error.h"
 #include "display.h"
 #include "localevent.h"
@@ -37,8 +38,85 @@ Point LocalEvent::mouse_pr(-1, -1);
 Point LocalEvent::mouse_rl(-1, -1);
 Point LocalEvent::mouse_rm(-1, -1);
 Point LocalEvent::mouse_rr(-1, -1);
-SDLKey LocalEvent::key_value = SDLK_EURO;
+KeySym LocalEvent::key_value = KEY_NONE;
 void (* LocalEvent::redraw_cursor_func)(u16, u16) = NULL;
+
+struct KeyMap
+{
+    SDLKey sdl;
+    KeySym desdl;
+} mapping[] = {
+    { SDLK_UNKNOWN, KEY_NONE },
+    { SDLK_ESCAPE, KEY_ESCAPE },
+    { SDLK_RETURN, KEY_RETURN },
+    { SDLK_BACKSPACE, KEY_BACKSPACE },
+    { SDLK_LCTRL, KEY_CONTROL },
+    { SDLK_RCTRL, KEY_CONTROL },
+    { SDLK_LSHIFT, KEY_SHIFT },
+    { SDLK_RSHIFT, KEY_SHIFT },
+    { SDLK_BACKSLASH, KEY_BACKSLASH },
+    { SDLK_SPACE, KEY_SPACE },
+    { SDLK_F1, KEY_F1 },
+    { SDLK_F2, KEY_F2 },
+    { SDLK_F3, KEY_F3 },
+    { SDLK_F4, KEY_F4 },
+    { SDLK_F5, KEY_F5 },
+    { SDLK_F6, KEY_F6 },
+    { SDLK_F7, KEY_F7 },
+    { SDLK_F8, KEY_F8 },
+    { SDLK_F9, KEY_F9 },
+    { SDLK_F10, KEY_F10 },
+    { SDLK_F11, KEY_F11 },
+    { SDLK_F12, KEY_F12 },
+    { SDLK_PRINT, KEY_PRINT },
+    { SDLK_LEFT, KEY_LEFT },
+    { SDLK_RIGHT, KEY_RIGHT },
+    { SDLK_UP, KEY_UP },
+    { SDLK_DOWN, KEY_DOWN },
+    { SDLK_1, KEY_1 },
+    { SDLK_2, KEY_2 },
+    { SDLK_3, KEY_3 },
+    { SDLK_4, KEY_4 },
+    { SDLK_5, KEY_5 },
+    { SDLK_6, KEY_6 },
+    { SDLK_7, KEY_7 },
+    { SDLK_8, KEY_8 },
+    { SDLK_9, KEY_9 },
+    { SDLK_a, KEY_a },
+    { SDLK_b, KEY_b },
+    { SDLK_c, KEY_c },
+    { SDLK_d, KEY_d },
+    { SDLK_e, KEY_e },
+    { SDLK_f, KEY_f },
+    { SDLK_g, KEY_g },
+    { SDLK_h, KEY_h },
+    { SDLK_i, KEY_i },
+    { SDLK_j, KEY_j },
+    { SDLK_k, KEY_k },
+    { SDLK_l, KEY_l },
+    { SDLK_m, KEY_m },
+    { SDLK_n, KEY_n },
+    { SDLK_o, KEY_o },
+    { SDLK_p, KEY_p },
+    { SDLK_q, KEY_q },
+    { SDLK_r, KEY_r },
+    { SDLK_s, KEY_s },
+    { SDLK_t, KEY_t },
+    { SDLK_u, KEY_u },
+    { SDLK_v, KEY_v },
+    { SDLK_w, KEY_w },
+    { SDLK_x, KEY_x },
+    { SDLK_y, KEY_y },
+    { SDLK_z, KEY_z }
+};
+
+static KeySym SDLToKeySym(SDLKey &key)
+{
+    for(u16 i = 0; i < sizeof(mapping) / sizeof(mapping[0]); i++)
+        if(mapping[i].sdl == key)
+            return mapping[i].desdl;
+    return KEY_NONE;
+}
 
 LocalEvent::LocalEvent()
 {
@@ -94,10 +172,35 @@ bool LocalEvent::HandleEvents(void)
     return true;
 }
 
+bool LocalEvent::MouseMotion(void) const
+{
+    return mouse_motion;
+}
+
+bool LocalEvent::MouseMotion(const Rect &rt) const
+{
+    return mouse_motion ? rt & mouse_cu : false;
+}
+
+bool LocalEvent::MouseLeft(void) const
+{
+    return mouse_pressed && SDL_BUTTON_LEFT == mouse_button;
+}
+
+bool LocalEvent::MouseMiddle(void) const
+{
+    return mouse_pressed && SDL_BUTTON_MIDDLE  == mouse_button;
+}
+
+bool LocalEvent::MouseRight(void) const
+{
+    return mouse_pressed && SDL_BUTTON_RIGHT == mouse_button;
+}
+
 void LocalEvent::HandleKeyboardEvent(SDL_keysym & keysym, bool pressed)
 {
     key_pressed = pressed;
-    key_value = keysym.sym;
+    key_value = SDLToKeySym(keysym.sym);
 }
 
 void LocalEvent::HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion)
@@ -224,6 +327,66 @@ bool LocalEvent::MouseClickRight(const Rect &rt)
     return false;
 }
 
+bool LocalEvent::MouseWheelUp(void) const
+{
+    return mouse_pressed && SDL_BUTTON_WHEELUP == mouse_button;
+}
+
+bool LocalEvent::MouseWheelDn(void) const
+{
+    return mouse_pressed && SDL_BUTTON_WHEELDOWN == mouse_button;
+}
+
+bool LocalEvent::MousePressLeft(const Rect &rt) const
+{
+    return MouseLeft() ? rt & mouse_pl : false;
+}
+
+bool LocalEvent::MousePressLeft(const Point &pt, u16 w, u16 h) const
+{
+    return MouseLeft() ? Rect(pt.x, pt.y, w, h) & mouse_pl : false;
+}
+
+bool LocalEvent::MousePressMiddle(const Rect &rt) const
+{
+    return MouseMiddle() ? rt & mouse_pm : false;
+}
+
+bool LocalEvent::MousePressRight(const Rect &rt) const
+{
+    return MouseRight() ? rt & mouse_pr : false;
+}
+
+bool LocalEvent::MouseReleaseLeft(const Rect &rt) const
+{
+    return MouseLeft() ? false : rt & mouse_rl;
+}
+
+bool LocalEvent::MouseReleaseMiddle(const Rect &rt) const
+{
+    return MouseMiddle() ? false : rt & mouse_rm;
+}
+
+bool LocalEvent::MouseReleaseRight(const Rect &rt) const
+{
+    return MouseRight() ? false : rt & mouse_rr;
+}
+
+bool LocalEvent::MouseWheelUp(const Rect &rt) const
+{
+    return MouseWheelUp() ? rt & mouse_cu : false;
+}
+
+bool LocalEvent::MouseWheelDn(const Rect &rt) const
+{
+    return MouseWheelDn() ? rt & mouse_cu : false;
+}
+
+bool LocalEvent::MouseCursor(const Rect &rt) const
+{
+    return rt & mouse_cu;
+}
+
 const Point & LocalEvent::MouseCursor(void)
 {
     int x, y;
@@ -235,6 +398,11 @@ const Point & LocalEvent::MouseCursor(void)
     mouse_cu.y = y;
 
     return mouse_cu;
+}
+
+bool LocalEvent::KeyPress(KeySym key) const
+{
+    return key == key_value && key_pressed;
 }
 
 void LocalEvent::SetGlobalFilterEvents(void (*pf)(u16, u16))

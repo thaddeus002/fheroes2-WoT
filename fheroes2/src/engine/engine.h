@@ -20,7 +20,7 @@
 #ifndef H2ENGINE_H
 #define H2ENGINE_H
 
-#include "audio.h"
+#include "audio_interface.h"
 #include "background.h"
 #include "display.h"
 #include "error.h"
@@ -29,17 +29,15 @@
 #include "spritecursor.h"
 #include "surface.h"
 #include "palette.h"
-#include "midi_mid.h"
-#include "midi_xmi.h"
-#include "palette.h"
 #include "rand.h"
 #include "tools.h"
 #include "types.h"
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
-#define INIT_CDROM      SDL_INIT_CDROM
+#define INIT_NONE       0x00
+#define INIT_VIDEO	0x01
+#define INIT_AUDIO	0x02
+#define INIT_TIMER	0x04
+#define INIT_CDROM      0x08
 
 namespace SDL
 {

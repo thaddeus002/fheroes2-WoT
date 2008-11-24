@@ -20,8 +20,6 @@
 #ifndef H2TYPES_H
 #define H2TYPES_H
 
-#include "SDL.h"
-#include "SDL_mixer.h"
 #include "l10n.h"
 
 typedef int8_t		s8;
@@ -40,59 +38,31 @@ typedef uint32_t	u32;
 #define SEPARATOR       '/'
 #endif
 
+void DELAY(uint32_t);
 
-#define KEY_RETURN	SDLK_RETURN
-#define KEY_ESCAPE	SDLK_ESCAPE
+extern const uint32_t DEFAULT_COLOR_KEY16;
+extern const uint32_t DEFAULT_COLOR_KEY32;
 
-#define DELAY(X)	SDL_Delay(X)
+extern const uint32_t RMASK16;
+extern const uint32_t GMASK16;
+extern const uint32_t BMASK16;
+extern const uint32_t AMASK16;
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+extern const uint32_t RMASK32;
+extern const uint32_t GMASK32;
+extern const uint32_t BMASK32;
+extern const uint32_t AMASK32;
 
-#define DEFAULT_COLOR_KEY16	0xf0f0
-#define DEFAULT_COLOR_KEY32	0xff00ff00
+uint16_t Swap16(uint16_t);
+uint32_t Swap32(uint32_t);
 
-#define RMASK16 0x0000f000
-#define GMASK16 0x00000f00
-#define BMASK16 0x000000f0
-#define AMASK16 0x0000000f
+uint16_t Load16(uint8_t *p);
+uint32_t Load32(uint8_t *p);
 
-#define RMASK32 0xff000000
-#define GMASK32 0x00ff0000
-#define BMASK32 0x0000ff00
-#define AMASK32 0x000000ff
+#define SWAP16(X)    X=Swap16(X)
+#define SWAP32(X)    X=Swap32(X)
 
-#define SWAP16(X)    X=SDL_Swap16(X)
-#define SWAP32(X)    X=SDL_Swap32(X)
-
-// slow implementation uint16_t = *(uint8_t *)
-#define LOAD16(p, b)	b=(((uint16_t)(((b) & 0) | *(((uint8_t *)p) + 1)) << 8) | *(((uint8_t *)p)))
-// slow implementation uint32_t = *(uint8_t *)
-#define LOAD32(p, b)	b=(((((((uint32_t)(((b) & 0) | *(((uint8_t *)p) + 3)) << 8) | *(((uint8_t *)p) + 2)) << 8) | *(((uint8_t *)p) + 1)) << 8) | *((uint8_t *)p))
-
-#else
-
-#define DEFAULT_COLOR_KEY16	0x0f0f
-#define DEFAULT_COLOR_KEY32	0x00ff00ff
-
-#define RMASK16 0x0000000f
-#define GMASK16 0x000000f0
-#define BMASK16 0x00000f00
-#define AMASK16 0x0000f000
-
-#define RMASK32 0x000000ff
-#define GMASK32 0x0000ff00
-#define BMASK32 0x00ff0000
-#define AMASK32 0xff000000
-
-#define SWAP16(X) ;
-#define SWAP32(X) ;
-
-// implementation uint16_t = *(uint8_t *)
-#define LOAD16(p, b)	b=(*(uint16_t *)(p))
-
-// implementation uint32_t = *(uint8_t *)
-#define LOAD32(p, b)	b=(*(uint32_t *)(p))
-
-#endif
+#define LOAD16(p, b) b=Load16((uint8_t *)p)
+#define LOAD32(p, b) b=Load32((uint8_t *)p)
 
 #endif

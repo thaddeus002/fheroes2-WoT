@@ -20,7 +20,8 @@
 
 #include <iostream>
 #include <fstream>
-
+#include "midi_xmi.h"
+#include "midi_mid.h"
 #include "engine.h"
 
 int main(int argc, char **argv)

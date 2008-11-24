@@ -35,6 +35,7 @@
 #include "heroes.h"
 #include "kingdom.h"
 #include "maps_tiles.h"
+#include "audio_interface.h"
 
 #define CELLW 44
 #define CELLH 42
@@ -702,34 +703,16 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
                 army2[i].SetCount(0);
             return WIN;
 	}
-        if(le.KeyPress(SDLK_BACKSPACE)) {
+        if(le.KeyPress(KEY_BACKSPACE)) {
             for(u16 i = 0; i < army1.size(); i++)
                 army1[i].SetCount(0);
             return LOSE;
         }
-        if(le.KeyPress(SDLK_BACKSLASH))
+        if(le.KeyPress(KEY_BACKSLASH))
         {
             for(u16 i = 0; i < army1.size(); i++)
                 army1[i].SetReflect(!army1[i].IsReflected());
         }
-	if(le.KeyPress(SDLK_SPACE)) {
-	    DrawBackground(tile);
-	    Temp(0, 1, dst_pt);
-	    i = 1;
-	    display.Flip();
-	}
-	if(le.KeyPress(SDLK_KP_PLUS)) {
-	    DrawBackground(tile);
-	    Temp(1, 0, dst_pt);
-	    i = 1;
-	    display.Flip();
-	}
-	if(le.KeyPress(SDLK_KP_MINUS)) {
-	    DrawBackground(tile);
-	    Temp(-1, 0, dst_pt);
-	    i = 1;
-	    display.Flip();
-	}
 	if(Game::ShouldAnimateInfrequent(++animat, 3) && !i) {
 	    cursor.Hide();
 	    DrawBackground(tile);
@@ -3058,45 +3041,4 @@ int Army::CheckLuck(Heroes *hero, const Army::BattleTroop &troop)
 	}
     }
     return 0;
-}
-
-void Army::Temp(int dicn, int dindex, Point pt)
-{
-    static int icn=0, index=0;
-    if(dicn) {
-	icn += dicn;
-	index = 0;
-    }
-    index += dindex;
-    if(icn < 0) icn = ICN::UNKNOWN-1;
-    if(icn >= ICN::UNKNOWN) icn = 0;
-    if(index < 0) index = 0;
-    std::string str = ICN::GetString((ICN::icn_t)icn);
-    str += NOL10N(" ");
-    String::AddInt(str, index);
-    str += NOL10N("-");
-    int dh = 0, x = 0, y = 0;
-    while(1) {
-	const Sprite &sp = AGG::GetICN((ICN::icn_t)icn, index);
-	if(sp.w() == 0 || sp.h() == 0) {
-	    index --;
-	    break;
-	}
-	if(dh < sp.h()) dh = sp.h();
-	if(x + sp.w() > 640) {
-	    x = 0;
-	    y += dh;
-	    if(y + sp.h() > 480) {
-		index --;
-		break;
-	    }
-	    dh = sp.h();
-	}
-	display.Blit(sp, pt.x + x, pt.y + y);
-	x += sp.w();
-	index ++;
-	if(index >= AGG::GetICNCount((ICN::icn_t)icn)) break;
-    }
-    String::AddInt(str, index);
-    Text(str, Font::SMALL, pt);
 }

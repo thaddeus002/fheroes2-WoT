@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "background.h"
-
 #include "display.h"
 #include "error.h"
 
@@ -47,7 +46,7 @@ void Background::Save(void)
 
     if(0 == Rect::w || 0 == Rect::h) return;
 
-    if(! Surface::valid()) CreateSurface(*this, DEFAULT_DEPTH, SDL_SWSURFACE);
+    if(! Surface::valid()) CreateSurface(*this, DEFAULT_DEPTH, SWSURFACE);
 
     Blit(Display::Get(), *this, 0, 0);
     SetDisplayFormat();

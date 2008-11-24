@@ -30,7 +30,6 @@
 #include "kingdom.h"
 #include "text.h"
 
-
 void Castle::OpenTavern(void)
 {
     const std::string & header = "A generous tip for the barkeep yields the following rumor:";

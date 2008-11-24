@@ -23,6 +23,8 @@
 #include <vector>
 #include "types.h"
 
+class SDL_Rect;
+
 class Point
 {
 public:

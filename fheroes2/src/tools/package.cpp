@@ -28,7 +28,6 @@
 #include <cstring>
 #include <algorithm>
 #include <cctype>
-
 #include "types.h"
 
 #define AGGSIZENAME	15

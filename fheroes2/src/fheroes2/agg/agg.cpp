@@ -23,6 +23,9 @@
 
 #include "settings.h"
 #include "text.h"
+#include "audio.h"
+#include "midi_xmi.h"
+#include "midi_mid.h"
 #include "agg.h"
 
 #define FATSIZENAME	15

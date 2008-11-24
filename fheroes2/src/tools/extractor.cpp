@@ -32,7 +32,6 @@
 #include <fstream>
 #include <vector>
 #include <cctype>
-
 #include "types.h"
 
 #define AGGSIZENAME	15

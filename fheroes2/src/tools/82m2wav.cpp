@@ -20,7 +20,6 @@
 
 #include <iostream>
 #include <fstream>
-
 #include "types.h"
 
 class wavhead

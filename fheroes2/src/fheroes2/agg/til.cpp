@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <cstdlib>
-
 #include "surface.h"
 #include "agg.h"
 #include "error.h"
@@ -63,7 +62,7 @@ void TIL::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
     // valid sf_dst
     if(!sf_dst.valid() || sf_dst.w() != tile_width || sf_dst.h() != tile_height)
     {
-        sf_dst = Surface(tile_width, tile_height, 8, SDL_SWSURFACE);
+        sf_dst = Surface(tile_width, tile_height, 8, SWSURFACE);
         sf_dst.LoadPalette(AGG::Cache::Get().GetPAL());
     }
 
