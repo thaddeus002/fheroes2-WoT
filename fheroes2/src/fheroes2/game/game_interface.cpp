@@ -146,6 +146,8 @@ void Game::Interface::DrawBorder(bool drawMiddle, bool useAlt)
         display.Blit(icnadv, srcrt, dstpt);
     }
 
+    if(drawMiddle)
+    {
     // RIGHT BORDER
     srcrt.x = icnadv.w() - BORDERWIDTH;
     srcrt.y = 0;
@@ -178,6 +180,7 @@ void Game::Interface::DrawBorder(bool drawMiddle, bool useAlt)
     dstpt.y = srcrt.y + BORDERWIDTH + count_icons * 32;
     srcrt.y = srcrt.y + BORDERWIDTH + 4 * 32;
     display.Blit(icnadv, srcrt, dstpt);
+    }
 }
 
 void Game::Interface::Draw(void)
