@@ -101,6 +101,11 @@ const Skill::Primary* Army::Troop::MasterSkill(void) const
     return army ? army->commander : NULL;
 }
 
+const Army::army_t* Army::Troop::GetArmy(void) const
+{
+    return army;
+}
+
 Monster::monster_t Army::Troop::Monster(void) const
 {
     return monster;

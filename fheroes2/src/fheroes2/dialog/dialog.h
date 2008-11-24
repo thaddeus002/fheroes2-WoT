@@ -105,8 +105,7 @@ namespace Dialog
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
 
     // army info
-    answer_t ArmyInfo(const Army::Troop & army, bool dismiss, bool quickshow, bool show_upgrade, bool battle=false); // deprecated
-    answer_t ArmyInfo(const Army::Troop & troop, u8 flags, bool battle = false);
+    answer_t ArmyInfo(const Army::Troop & troop, u8 flags);
 
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);

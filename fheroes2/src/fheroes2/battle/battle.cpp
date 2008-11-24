@@ -803,10 +803,10 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 		    cursor.SetThemes(cursor.WAR_INFO);
 		    if(click) {
 			cursor.SetThemes(cursor.POINTER); 
-			Dialog::ArmyInfo(myArmy[t], false, false, false, true);
+			Dialog::ArmyInfo(myArmy[t], Dialog::READONLY|Dialog::BUTTONS);
 		    }
 		    if(le.MouseRight()) {
-			Dialog::ArmyInfo(myArmy[t], false, true, false, true);
+			Dialog::ArmyInfo(myArmy[t], 0);
 		    }
 		} else if(t = FindTroop(enemyArmy, cur_pt), t >= 0 && enemyArmy[t].Count() > 0) {
 		    // enemy troop
@@ -819,7 +819,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 			    attack = cur_pt;
 			    return WIN;
 			} else if(le.MouseRight()) {
-			    Dialog::ArmyInfo(enemyArmy[t], false, true, false, true);
+			    Dialog::ArmyInfo(enemyArmy[t], 0);
 			}
 		    } else if(mp = CanAttack(myTroop, movePoints, enemyArmy[t], le.MouseCursor()-(Bf2Scr(cur_pt)+dst_pt)), mp >= 0) {
 			std::string str = tr("battle.attack_monster").sub(Monster::String(enemyArmy[t].Monster()));
@@ -837,16 +837,16 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 			    attack = cur_pt;
 			    return WIN;
 			} else if(le.MouseRight())
-			    Dialog::ArmyInfo(enemyArmy[t], false, true, false, true);
+			    Dialog::ArmyInfo(enemyArmy[t], 0);
 		    } else {
 			// attack
 			statusBar2->ShowMessage(tr("battle.view_monster").sub(Monster::String(enemyArmy[t].Monster())));
 			cursor.SetThemes(cursor.WAR_INFO);
 			if(click) {
 			    cursor.SetThemes(cursor.POINTER);
-			    Dialog::ArmyInfo(enemyArmy[t], false, false, false, true);
+			    Dialog::ArmyInfo(enemyArmy[t], Dialog::READONLY|Dialog::BUTTONS);
 			} else if(le.MouseRight()) {
-			    Dialog::ArmyInfo(enemyArmy[t], false, true, false, true);
+			    Dialog::ArmyInfo(enemyArmy[t], 0);
 			}
 		    }
 		} else {

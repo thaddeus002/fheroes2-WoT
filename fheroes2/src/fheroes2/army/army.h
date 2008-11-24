@@ -69,6 +69,7 @@ namespace Army
             void	Reset(void);
             
             const Skill::Primary* MasterSkill(void) const;
+            const army_t* GetArmy(void) const;
 
             Monster::monster_t Monster(void) const;
             u16 	Count(void) const;

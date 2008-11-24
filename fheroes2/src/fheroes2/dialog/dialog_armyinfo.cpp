@@ -34,17 +34,10 @@
 #include "game.h"
 #include "battle_troop.h"
 
-
-// derecated
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, bool quickshow, bool show_upgrade, bool battle)
-{
-    return ArmyInfo(basicArmy, (quickshow ? 0 : (dismiss ? Dialog::BUTTONS : Dialog::READONLY|Dialog::BUTTONS)), battle);
-}
-
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u8 flags, bool battle) // remove battle - possibile troops->army->Modes(Army::FIGHT)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u8 flags)
 {
     const Army::BattleTroop & battroop(troops);
-
+    const bool battle = troops.GetArmy() && troops.GetArmy()->Modes(Army::FIGHT);
     Display & display = Display::Get();
 
     const ICN::icn_t viewarmy = H2Config::EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
