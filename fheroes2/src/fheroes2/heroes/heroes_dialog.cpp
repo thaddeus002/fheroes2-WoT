@@ -798,7 +798,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         if(le.MouseCursor(selectArmy.GetArea()))
         {
             const s8 index1 = selectArmy.GetIndexFromCoord(le.MouseCursor());
-            if(0 <= index)
+            if(0 <= index1)
             {
                 const Army::Troop & troop1 = army.At(index1);
                 const std::string & monster1 = Monster::String(troop1.Monster());
