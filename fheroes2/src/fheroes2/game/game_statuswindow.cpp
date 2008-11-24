@@ -166,7 +166,7 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
     Display & display = Display::Get();
 
     // valid count army
-    u16 count = std::count_if(armies.begin(), armies.end(), Army::isValid);
+    u16 count = armies.GetCount();
 
     Point dst_pt;
     u8 current = 0;
@@ -177,10 +177,12 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
     // one lines
     if(4 > count)
     {
-	for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
-	    if(armies[ii].isValid())
+	for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+	{
+	    const Army::Troop & troop = armies.At(ii);
+	    if(troop.isValid())
 	    {
-		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
+		const Sprite & sprite = AGG::GetICN(ICN::MONS32, troop.Monster());
 
 		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
 		dst_pt.y = pos.y + 55 - sprite.h() + oh;
@@ -188,11 +190,12 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
 		display.Blit(sprite, dst_pt);
 
 		str.clear();
-		String::AddInt(str, armies[ii].Count());
+		String::AddInt(str, troop.Count());
 		Text(str, Font::SMALL, dst_pt.x + (sprite.w() - Text::width(str, Font::SMALL)) / 2, dst_pt.y + sprite.h() + 2);
 
 		++current;
 	    }
+	}
     }
     else
     // two lines
@@ -201,10 +204,12 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
 	u8 ii = 0;
 	count = ( 4 < count ? 3 : 2);
 
-	for(; ii < HEROESMAXARMY; ++ii)
-	    if(armies[ii].isValid())
+	for(; ii < ARMYMAXTROOPS; ++ii)
+	{
+	    const Army::Troop & troop = armies.At(ii);
+	    if(troop.isValid())
 	    {
-		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
+		const Sprite & sprite = AGG::GetICN(ICN::MONS32, troop.Monster());
 
 		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
 		dst_pt.y = pos.y + 42 - sprite.h() + oh;
@@ -212,23 +217,26 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
 		display.Blit(sprite, dst_pt);
 
 		str.clear();
-		String::AddInt(str, armies[ii].Count());
+		String::AddInt(str, troop.Count());
 		Text(str, Font::SMALL, dst_pt.x + (sprite.w() - Text::width(str, Font::SMALL)) / 2, dst_pt.y + sprite.h() - 6);
 
 		++current;
 
 		if(current == count) break;
 	    }
+	}
 
 	// bottom
 	count = 2;
 	current = 0;
 	++ii;
 
-	for(; ii < HEROESMAXARMY; ++ii)
-	    if(armies[ii].isValid())
+	for(; ii < ARMYMAXTROOPS; ++ii)
+	{
+	    const Army::Troop & troop = armies.At(ii);
+	    if(troop.isValid())
 	    {
-		const Sprite & sprite = AGG::GetICN(ICN::MONS32, armies[ii].Monster());
+		const Sprite & sprite = AGG::GetICN(ICN::MONS32, troop.Monster());
 
 		dst_pt.x = (pos.w / one_line - sprite.w()) / 2 + pos.x + current * pos.w / count + ((pos.w / one_line) * (one_line - count) / (2 * count));
 		dst_pt.y = pos.y + 65 - sprite.h() + oh;
@@ -236,11 +244,12 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
 		display.Blit(sprite, dst_pt);
 
 		str.clear();
-		String::AddInt(str, armies[ii].Count());
+		String::AddInt(str, troop.Count());
 		Text(str, Font::SMALL, dst_pt.x + (sprite.w() - Text::width(str, Font::SMALL)) / 2, dst_pt.y + sprite.h() - 6);
 
 		++current;
 	    }
+	}
     }
 }
 

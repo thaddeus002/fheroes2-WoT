@@ -38,7 +38,10 @@ class Rect;
 
 namespace Army
 {
-    typedef enum
+    class army_t;
+    class BattleTroop;
+
+    enum armysize_t
     {
 	FEW	= 1,
 	SEVERAL	= 5,
@@ -49,91 +52,100 @@ namespace Army
 	SWARM	= 250,
 	ZOUNDS	= 500,
 	LEGION	= 1000
-    } size_t;
+    };
 
-    const std::string & String(size_t size);
-    size_t GetSize(u16 count);
+    const std::string & String(armysize_t);
+    armysize_t GetSize(u16);
 
     class Troop
     {
         public:
             Troop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
             
-            void Set(Monster::monster_t m, u16 c){ monster = m; count = c; };
-            void SetMonster(Monster::monster_t m){ monster = m; };
-            void SetCount(u16 c){ count = c; };
+            void	Set(Monster::monster_t, u16);
+            void	SetMonster(Monster::monster_t);
+            void	UpgradeMonster(void);
+            void	SetCount(u16);
+            void	Reset(void);
             
-            const Skill::Primary* MasterSkill(void) const{ return master_skill; };
-            void SetMasterSkill(const Skill::Primary* p){ master_skill = p; };
-            
-            Monster::monster_t Monster(void) const{ return monster; };
-            u16 Count(void) const{ return count; };
-            
-            bool isValid(void) const;
-            
-            static bool PredicateIsValid(const Troop & t);
-            
+            const Skill::Primary* MasterSkill(void) const;
+
+            Monster::monster_t Monster(void) const;
+            u16 	Count(void) const;
+
+            bool	isValid(void) const;
+
         protected:
-            Monster::monster_t monster;
-            u16 count;
-            const Skill::Primary* master_skill;
+    	    friend class army_t;
+            Monster::monster_t	monster;
+            u16			count;
+	    const army_t*	army;
     };
 
-    bool isValid(const Troop & troop);
+    bool isValidTroop(const Troop & troop);
+    bool StrongestTroop(const Troop & t1, const Troop & t2);
+    bool WeakestTroop(const Troop & t1, const Troop & t2);
+    bool SlowestTroop(const Troop & t1, const Troop & t2);
+    bool FastestTroop(const Troop & t1, const Troop & t2);
+    void SwapTroops(Troop & t1, Troop & t2);
 
-    bool PredicateStrongestTroop(const Troop & t1, const Troop & t2);
-    bool PredicateWeakestTroop(const Troop & t1, const Troop & t2);
-    bool PredicateSlowestTroop(const Troop & t1, const Troop & t2);
-    bool PredicateFastestTroop(const Troop & t1, const Troop & t2);
-
-    typedef std::vector<Troop> army_t;
-
-    s8 GetMoraleWithModificators(const army_t &, std::list<std::string> *list = NULL);
-    s8 GetLuckWithModificators(const army_t &, std::list<std::string> *list = NULL);
-    Troop & GetSlowestTroop(army_t & army);
-    Troop & GetFastestTroop(army_t & army);
-    Troop & GetStrongestTroop(army_t & army);
-    Troop & GetWeakestTroop(army_t & army);
-    const Troop & GetSlowestTroop(const army_t & army);
-    const Troop & GetFastestTroop(const army_t & army);
-    const Troop & GetStrongestTroop(const army_t & army);
-    const Troop & GetWeakestTroop(const army_t & army);
-    u8 GetCountTroops(const army_t & army);
-    u8 GetCountUniqTroops(const army_t & army);
-    Race::race_t GetRace(const army_t & army);
-    bool HasMonster(const army_t & army, const Monster::monster_t mon);
-    bool JoinTroop(army_t & army, const Troop & troop);
-    bool JoinTroop(army_t & army, const Monster::monster_t mon, const u16 count);
-    void SetMasterSkill(army_t & army, const Skill::Primary & primary);
-
-
-    // deprecated
-    class SelectBar
+    enum flags_t
     {
-    public:
-	SelectBar(const Point & pos, const army_t & troops);
-
-	bool isSelected(void) const{ return selected; };
-
-	const std::vector<Rect> & GetCoords(void) const{ return coords; };
-	
-	u8 GetCursorIndex(void) const{ return cursor_index; };
-
-	void Redraw(const u8 alpha = 0xFF);
-	void Reset(void);
-	void Select(u8 index);
-
-    private:
-	const Point pos_pt;
-	const Surface & empty_back;
-	const u8 step;
-	SpriteCursor cursor;
-	const army_t & army;
-	bool selected;
-	u8 cursor_index;
-	
-	std::vector<Rect> coords;
+	FIGHT	= 0x0001,
     };
+
+    class army_t
+    {
+	public:
+	    army_t(const Skill::Primary* s = NULL);
+
+	    army_t & operator= (const army_t &);		// deprecated, will be removed!
+
+	    void 	SetModes(flags_t);
+	    void	ResetModes(flags_t);
+	    bool	Modes(flags_t) const;
+
+	    void	Import(const std::vector<Troop> &);
+	    void	Import(const std::vector<BattleTroop> &);
+	    void	UpgradeMonsters(const Monster::monster_t);
+
+	    Troop&	At(u8);
+	    Troop &	GetSlowestTroop(void);
+	    Troop &	GetFastestTroop(void);
+	    Troop &	GetStrongestTroop(void);
+	    Troop &	GetWeakestTroop(void);
+
+	    const Troop&At(u8) const;
+	    const Troop&GetSlowestTroop(void) const;
+	    const Troop&GetFastestTroop(void) const;
+	    const Troop&GetStrongestTroop(void) const;
+	    const Troop&GetWeakestTroop(void) const;
+
+	    Race::race_t GetRace(void) const;
+
+	    u8		Size(void) const;
+	    u8		GetCount(void) const;
+	    u8		GetUniqCount(void) const;
+	    u16		GetCountMonsters(const Monster::monster_t) const;
+	    s8		GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
+	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+
+	    bool	HasMonster(const Monster::monster_t mon);
+	    bool	JoinTroop(const Troop & troop);
+	    bool	JoinTroop(const Monster::monster_t mon, const u16 count);
+
+	private:
+	    friend class Troop;
+
+	    std::vector<Troop>	army;
+	    const Skill::Primary* commander;
+	    u16			flags;
+    };
+
+
+
+
+
 };
 
 #endif

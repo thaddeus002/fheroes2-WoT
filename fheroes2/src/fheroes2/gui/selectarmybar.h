@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,24 +18,58 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "heroes.h"
-#include "castle.h"
-#include "algorithm.h"
+#ifndef H2SELECTARMYBAR_H
+#define H2SELECTARMYBAR_H
 
-u32 Algorithm::CalculateExperience(const Army::army_t & army)
+#include "gamedefs.h"
+#include "army.h"
+
+class Rect;
+class Surface;
+class SpriteCursor;
+class LocalEvent;
+
+class SelectArmyBar
 {
-    u32 res = 0;
-    for(u8 ii = 0; ii < army.Size(); ++ii) res += army.At(ii).Count() * Monster::GetStats(army.At(ii).Monster()).hp;
+public:
+    SelectArmyBar();
 
-    return res;
-}
+    const Rect &GetArea(void) const;
+    bool	isSelected(void) const;
+    s8		GetIndexFromCoord(const Point &);
+    s8		Selected(void) const;
 
-u32 Algorithm::CalculateExperience(const Heroes & hero)
-{
-    return 500 + CalculateExperience(hero.GetArmy());
-}
+    bool	ReadOnly(void) const;
+    bool	SaveLastTroop(void) const;
+    bool	isValid(void) const;
 
-u32 Algorithm::CalculateExperience(const Castle & castle)
-{
-    return 500 + CalculateExperience(castle.GetArmy());
-}
+    void 	SetArmy(Army::army_t &);
+    void 	SetPos(const Point &);
+    void 	SetBackgroundSprite(const Surface &);
+    void	SetCursorSprite(const Surface &);
+    void 	SetInterval(u8);
+
+    void	SetReadOnly(void);
+    void	SetSaveLastTroop(void);
+    void 	SetUseMons32Sprite(void);	// second variant: for small sprite ICN::MONS32
+
+    void 	Redraw(Surface & display = Display::Get());
+    void 	Reset(void);
+    void	Select(u8);
+
+    static void QueueEventProcessing(SelectArmyBar &);
+    static void QueueEventProcessing(SelectArmyBar &, SelectArmyBar &);
+
+private:
+    Army::army_t *	army;
+    Rect		pos;
+    u8			interval;
+    s8			selected;
+    u8			flags;
+    Point		offset;
+
+    const Surface *	background;
+    SpriteCursor	spritecursor;
+};
+
+#endif

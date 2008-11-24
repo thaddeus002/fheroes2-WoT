@@ -32,8 +32,8 @@
 #include "ai.h"
 #include "heroes.h"
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), spellCasted(false), name(str), experience(0), magic_point(0),
-    move_point(0), army(HEROESMAXARMY), spell_book(*this), hid(ht), race(rc), army_spread(true), enable_move(false), shipmaster(false),
+Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
+    move_point(0), army(this), spell_book(*this), hid(ht), race(rc), flags(ARMYSPREAD),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     artifacts.reserve(HEROESMAXARTIFACT);
@@ -119,10 +119,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     
     // set default army
     const Monster::stats_t monster = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
-    army[0].Set(monster.monster, monster.grown);
-
-    // set master primary skill to army
-    Army::SetMasterSkill(army, *this);
+    army.At(0).Set(monster.monster, monster.grown);
 
     // extra hero
     switch(hid)
@@ -248,8 +245,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    break;
 
     	case SANDYSANDY:
-	    army[0].Set(Monster::BLACK_DRAGON, 2);
-    	    army[1].Set(Monster::RED_DRAGON, 3);
+	    army.At(0).Set(Monster::BLACK_DRAGON, 2);
+    	    army.At(1).Set(Monster::RED_DRAGON, 3);
 
 	    secondary_skills.clear();
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::BASIC));
@@ -296,52 +293,52 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
         ++ptr8;
 
         // monster1
-        army[0].SetMonster(Monster::Monster(*ptr8));
+        army.At(0).SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster2
-        army[1].SetMonster(Monster::Monster(*ptr8));
+        army.At(1).SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster3
-        army[2].SetMonster(Monster::Monster(*ptr8));
+        army.At(2).SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster4
-        army[3].SetMonster(Monster::Monster(*ptr8));
+        army.At(3).SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // monster5
-        army[4].SetMonster(Monster::Monster(*ptr8));
+        army.At(4).SetMonster(Monster::Monster(*ptr8));
         ++ptr8;
 
         // count1
         LOAD16(ptr8, byte16);
-        army[0].SetCount(byte16);
+        army.At(0).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count2
         LOAD16(ptr8, byte16);
-        army[1].SetCount(byte16);
+        army.At(1).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count3
         LOAD16(ptr8, byte16);
-        army[2].SetCount(byte16);
+        army.At(2).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count4
         LOAD16(ptr8, byte16);
-        army[3].SetCount(byte16);
+        army.At(3).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count5
         LOAD16(ptr8, byte16);
-        army[4].SetCount(byte16);
+        army.At(4).SetCount(byte16);
         ++ptr8;
         ++ptr8;
     }
@@ -439,6 +436,21 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 bool Heroes::operator== (const Heroes & h) const
 {
     return hid == h.hid;
+}
+
+void Heroes::SetModes(flags_t f)
+{
+    flags |= f;
+}
+
+void Heroes::ResetModes(flags_t f)
+{
+    flags &= ~f;
+}
+
+bool Heroes::Modes(flags_t f) const
+{
+    return flags & f;
 }
 
 const Point & Heroes::GetCenter(void) const
@@ -708,7 +720,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     }
     else
     {
-    	switch(Monster::GetStats(Army::GetSlowestTroop(army).Monster()).speed)
+    	switch(Monster::GetStats(army.GetSlowestTroop().Monster()).speed)
 	{
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;
@@ -848,7 +860,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     if(castle) result += castle->GetMoraleWithModificators(list);
 
     // check from army morale
-    result += Army::GetMoraleWithModificators(army, list);
+    result += army.GetMoraleWithModificators(list);
 
     // result
     if(result < Morale::AWFUL)	return Morale::TREASON;
@@ -947,7 +959,7 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
     if(castle) result += castle->GetLuckWithModificators(list);
 
     // check from army morale
-    result += Army::GetLuckWithModificators(army, list);
+    result += army.GetLuckWithModificators(list);
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else
@@ -1257,13 +1269,13 @@ void Heroes::AppendSpellToBook(const Spell::spell_t spell)
 /* return true is move enable */
 bool Heroes::isEnableMove(void) const
 {
-    return enable_move && path.isValid() && path.GetFrontPenalty() <= move_point;
+    return Modes(ENABLEMOVE) && path.isValid() && path.GetFrontPenalty() <= move_point;
 }
 
 /* set enable move */
 void Heroes::SetMove(bool f)
 {
-    enable_move = f;
+    f ? SetModes(ENABLEMOVE) : ResetModes(ENABLEMOVE);
 }
 
 void Heroes::SaveUnderObject(MP2::object_t obj)
@@ -1278,12 +1290,12 @@ MP2::object_t Heroes::GetUnderObject(void) const
 
 bool Heroes::isShipMaster(void) const
 {
-    return shipmaster;
+    return Modes(SHIPMASTER);
 }
 
 void Heroes::SetShipMaster(bool f)
 {
-    shipmaster = f;
+    f ? SetModes(SHIPMASTER) : ResetModes(SHIPMASTER);
 }
 
 bool Heroes::HasSecondarySkill(const Skill::Secondary::skill_t skill) const

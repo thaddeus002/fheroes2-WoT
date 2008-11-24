@@ -32,7 +32,6 @@
 #include "army.h"
 #include "heroes.h"
 
-#define CASTLEMAXARMY           5 
 #define CASTLEMAXMONSTER        6 
 
 #define GROWN_WELL		2
@@ -44,7 +43,8 @@ namespace Maps { class Tiles; };
 class Castle
 {
 public:
-    typedef enum {
+    enum building_t
+    {
 	BUILD_NOTHING		= 0x00000000,
 	BUILD_THIEVESGUILD      = 0x00000001,
         BUILD_TAVERN            = 0x00000002,
@@ -78,13 +78,26 @@ public:
 	DWELLING_UPGRADE5       = 0x20000000,
 	DWELLING_UPGRADE6       = 0x40000000,
 	DWELLING_UPGRADE7       = 0x80000000        // black dragon
-    } building_t;
+    };
+
+    enum flags_t
+    {
+	NEARLYSEA		= 0x0001,
+	ALLOWCASTLE		= 0x0002,
+	ARMYSPREAD		= 0x0004,
+	ALLOWBUILD		= 0x0008,
+	BOATPRESENT		= 0x0010,
+    };
 
     Castle(s16 cx, s16 cy, const Race::race_t rs);
     void LoadFromMP2(const void *ptr);
 
+    void SetModes(flags_t);
+    void ResetModes(flags_t);
+    bool Modes(flags_t) const;
+
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
-    bool AllowBuild(void) const{ return allow_build; };
+    bool AllowBuild(void) const{ return Modes(ALLOWBUILD); };
     bool isBuild(u32 bd) const{ return building & bd; };
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
@@ -159,15 +172,13 @@ private:
     const Point		mp;
     Race::race_t	race;
     const Captain	captain;
-    const bool		nearly_sea;
 
     Color::color_t	color;
     std::string		name;
     u32			building;
-    bool		allow_castle;
-    bool		army_spread;
-    bool		allow_build;
-    bool		present_boat;
+
+    u16			flags;
+
     MageGuild		mageguild;
     std::vector<u16>    dwelling;
     Army::army_t        army;

@@ -106,7 +106,7 @@ Morale::morale_t Captain::GetMorale(void) const
     result += home.GetMoraleWithModificators();
 
     // check from army morale modificators
-    result += Army::GetMoraleWithModificators(home.GetArmy());
+    result += home.GetArmy().GetMoraleWithModificators();
 
     // result
     if(result < Morale::AWFUL)  return Morale::TREASON;
@@ -132,7 +132,7 @@ Luck::luck_t Captain::GetLuck(void) const
     result += home.GetLuckWithModificators();
 
     // check from army morale modificators
-    result += Army::GetLuckWithModificators(home.GetArmy());
+    result += home.GetArmy().GetLuckWithModificators();
 
     // result
     if(result < Luck::AWFUL)    return Luck::CURSED;

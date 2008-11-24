@@ -28,6 +28,7 @@
 #include "army.h"
 #include "heroes.h"
 #include "portrait.h"
+#include "selectarmybar.h"
 #include "game_interface.h"
 
 namespace
@@ -66,9 +67,9 @@ namespace
     typedef SelectableRectList<Artifact::artifact_t>::Type ArtifactList;
 }
 
-static void PrepareArmy(Army::army_t &army, const Point &p, ArmyList &coords);
+//static void PrepareArmy(Army::army_t &army, const Point &p, ArmyList &coords);
 static void PrepareArtifacts(std::vector<Artifact::artifact_t> &artifacts, const Point &p, ArtifactList &coords);
-static void RedrawArmy(const ArmyList &coords);
+//static void RedrawArmy(const ArmyList &coords);
 static void RedrawArtifacts(const ArtifactList &coords);
 static void RedrawItem(const Sprite *sprite, const Rect &display, const Rect &select, int adjustHeight, bool selected);
 static void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> & skills);
@@ -101,6 +102,8 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y;
     display.Blit(backSprite, src_rt, dst_pt);
+
+    Game::Interface::Get().DrawBorder(false, false);
 
     // header
     message = GetName() + " meets " + heroes2.GetName();
@@ -203,17 +206,41 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     RedrawSecondarySkill(dst_pt, heroes2.secondary_skills);
 
     // army
-    ArmyList armyCoords[2];
-    
+    //ArmyList armyCoords[2];
     dst_pt.x = cur_pt.x + 36;
     dst_pt.y = cur_pt.y + 267;
-    PrepareArmy(army, dst_pt, armyCoords[0]);
-    RedrawArmy(armyCoords[0]);
+    //PrepareArmy(army, dst_pt, armyCoords[0]);
+    //RedrawArmy(armyCoords[0]);
+
+    const Rect rt(36, 267, 44, 44);
+    Surface sfb(rt.w, rt.h);
+    sfb.Blit(backSprite, rt, 0, 0);
+    Surface sfc(rt.w - 1, rt.h - 1);
+    Cursor::DrawCursor(sfc, 0xD6, true);
+    
+    SelectArmyBar selectArmy1;
+    selectArmy1.SetArmy(army);
+    selectArmy1.SetPos(dst_pt);
+    selectArmy1.SetInterval(1);
+    selectArmy1.SetBackgroundSprite(sfb);
+    selectArmy1.SetCursorSprite(sfc);
+    selectArmy1.SetUseMons32Sprite();
+    selectArmy1.SetSaveLastTroop();
+    selectArmy1.Redraw();
 
     dst_pt.x = cur_pt.x + 381;
     dst_pt.y = cur_pt.y + 267;
-    PrepareArmy(heroes2.army, dst_pt, armyCoords[1]);
-    RedrawArmy(armyCoords[1]);
+    //PrepareArmy(heroes2.army, dst_pt, armyCoords[1]);
+    //RedrawArmy(armyCoords[1]);
+    SelectArmyBar selectArmy2;
+    selectArmy2.SetArmy(heroes2.GetArmy());
+    selectArmy2.SetPos(dst_pt);
+    selectArmy2.SetInterval(1);
+    selectArmy2.SetBackgroundSprite(sfb);
+    selectArmy2.SetCursorSprite(sfc);
+    selectArmy2.SetUseMons32Sprite();
+    selectArmy2.SetSaveLastTroop();
+    selectArmy2.Redraw();
 
     // artifact
     ArtifactList artifactCoords[2];
@@ -249,32 +276,40 @@ void Heroes::MeetingDialog(Heroes & heroes2)
         
         bool updateScreen = false;
         
-        for(int i = 0; i < 2; i++)
-            for(u16 j = 0; j < armyCoords[i].size(); j++)
-                if(le.MouseClickLeft(armyCoords[i][j].selectable))
-                {
+	// selector troops event
+	if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
+	{
+	    DeselectList<Artifact::artifact_t>(artifactCoords);
+    	    SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2);
+	}
+//        for(int i = 0; i < 2; i++)
+//            for(u16 j = 0; j < armyCoords[i].size(); j++)
+//                if(le.MouseClickLeft(armyCoords[i][j].selectable))
+//                {
                     //TODO: Splitting troops
-                    DeselectList<Artifact::artifact_t>(artifactCoords);
-                    PerformAction<Army::Troop>(armyCoords[i][j], armyCoords);
-                    updateScreen = true;
-                    break;
-                }
+//                    DeselectList<Artifact::artifact_t>(artifactCoords);
+//                    PerformAction<Army::Troop>(armyCoords[i][j], armyCoords);
+//                    updateScreen = true;
+//                    break;
+//                }
         
         for(int i = 0; i < 2; i++)
             for(u16 j = 0; j < artifactCoords[i].size(); j++)
                 if(le.MouseClickLeft(artifactCoords[i][j].selectable))
                 {
-                    DeselectList<Army::Troop>(armyCoords);
+//                    DeselectList<Army::Troop>(armyCoords);
+		    selectArmy1.Reset();
+		    selectArmy2.Reset();
                     PerformAction<Artifact::artifact_t>(artifactCoords[i][j], artifactCoords);
                     updateScreen = true;
                     break;
                 }
-        
+
         if(updateScreen)
         {
             cursor.Hide();
-            RedrawArmy(armyCoords[0]);
-            RedrawArmy(armyCoords[1]);
+//            RedrawArmy(armyCoords[0]);
+//            RedrawArmy(armyCoords[1]);
             RedrawArtifacts(artifactCoords[0]);
             RedrawArtifacts(artifactCoords[1]);
             cursor.Show();
@@ -282,16 +317,16 @@ void Heroes::MeetingDialog(Heroes & heroes2)
         }
     }
     
-    Army::army_t newArmy[2];
+//    std::vector<Army::Troop> newArmy(2);
     std::vector<Artifact::artifact_t> newArtifacts[2];
     for(int i = 0; i < 2; i++)
     {
-        RecreateListsFromSelectable<Army::Troop>(armyCoords[i], newArmy[i]);
+//        RecreateListsFromSelectable<Army::Troop>(armyCoords[i], newArmy[i]);
         RecreateListsFromSelectable<Artifact::artifact_t>(artifactCoords[i], newArtifacts[i]);
     }
-    army.swap(newArmy[0]);
+//    army.swap(newArmy[0]);
     artifacts.swap(newArtifacts[0]);
-    heroes2.army.swap(newArmy[1]);
+//    heroes2.army.swap(newArmy[1]);
     heroes2.artifacts.swap(newArtifacts[1]);
     
     background.Restore();
@@ -362,6 +397,7 @@ static void RedrawItem(const Sprite *sprite, const Rect &displayable, const Rect
 /** Draw a list of SelectableRect items in their proper places
  *  \param army List of troops encapsulated in SelectableRect objects
  */
+/*
 static void RedrawArmy(const ArmyList &army)
 {
     for(u8 ii = 0; ii < army.size(); ++ii)
@@ -383,6 +419,7 @@ static void RedrawArmy(const ArmyList &army)
         }
     }
 }
+*/
 
 /** Draw a list of SelectableRect items in their proper places
  *  \param artifacts List of artifacts encapsulated in SelectableRect objects
@@ -405,9 +442,10 @@ static void RedrawArtifacts(const ArtifactList &artifacts)
  *  \param[in]  pt       Starting point at which to display the troop pictures
  *  \param[out] coords  List of SelectableRect objects encapsulating each troop object
  */
+/*
 static void PrepareArmy(Army::army_t &army, const Point &pt, ArmyList &coords)
 {
-    for(u8 ii = 0; ii < HEROESMAXARMY; ++ii)
+    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
     {
 	if(army[ii].isValid())
 	{
@@ -426,6 +464,7 @@ static void PrepareArmy(Army::army_t &army, const Point &pt, ArmyList &coords)
         }
     }
 }
+*/
 
 /** Convert a list of artifacts into a list of SelectableRect objects
  *  \param[in]  artifacts  List of artifacts

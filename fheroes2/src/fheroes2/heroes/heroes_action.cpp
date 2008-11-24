@@ -79,14 +79,6 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
 void ActionToMagellanMaps(Heroes &hero, const u16 dst_index);
 void ActionToEvent(Heroes &hero, const u16 dst_index);
 
-void UpgradeMonsters(Heroes & hero, const Monster::monster_t monster)
-{
-    Army::army_t::iterator it1 = hero.GetArmy().begin();
-    Army::army_t::const_iterator it2 = hero.GetArmy().end();
-
-    for(; it1 != it2; it1++) if(monster == (*it1).Monster() && Monster::AllowUpgrade(monster)) (*it1).SetMonster(Monster::Upgrade(monster));
-}
-
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
     std::string str;
@@ -409,19 +401,19 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = Monster::GetSize(tile);
-    Army::army_t army(5);
+    Army::army_t army;
     if(count > 5)
     {
 	const s16 c = count / 5;
-	army[0] = Army::Troop(monster, c);
-	army[1] = Army::Troop(monster, c);
-	army[2] = Army::Troop(monster, c + count - (c * 5));
-	army[3] = Army::Troop(monster, c);
-	army[4] = Army::Troop(monster, c);
+	army.At(0).Set(monster, c);
+	army.At(1).Set(monster, c);
+	army.At(2).Set(monster, c + count - (c * 5));
+	army.At(3).Set(monster, c);
+	army.At(4).Set(monster, c);
     }
     else
     {
-	army[0] = Army::Troop(monster, count);
+	army.At(0).Set(monster, count);
     }
 
     if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
@@ -459,11 +451,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 	    BattleLose(hero, b);
 	    if(!Settings::Get().Original())
 	    {
-		u16 c = 0;
-		Army::army_t::const_iterator it1 = army.begin();
-		Army::army_t::const_iterator it2 = army.end();
-		for(; it1 != it2; ++it1) if((*it1).isValid()) c+= (*it1).Count();
-	        tile.SetCountMonster(c);
+	        tile.SetCountMonster(army.GetCountMonsters(monster));
 	    }
 	    break;
         
@@ -977,12 +965,12 @@ void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You come upon the pyramid of a great and ancient king.", "You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians. Will you search?", Font::BIG, Dialog::OK))
 		{
 		    // battle
-		    Army::army_t army(5);
-		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
-		    army.at(0).Set(Monster::LORD_VAMPIRE, 10);
-		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
-		    army.at(0).Set(Monster::LORD_VAMPIRE, 10);
-		    army.at(0).Set(Monster::ROYAL_MUMMY, 10);
+		    Army::army_t army;
+		    army.At(0).Set(Monster::ROYAL_MUMMY, 10);
+		    army.At(1).Set(Monster::LORD_VAMPIRE, 10);
+		    army.At(2).Set(Monster::ROYAL_MUMMY, 10);
+		    army.At(3).Set(Monster::LORD_VAMPIRE, 10);
+		    army.At(4).Set(Monster::ROYAL_MUMMY, 10);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
@@ -1158,12 +1146,12 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("You tentatively approach the burial ground of ancient warriors.", "Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
-		    Army::army_t army(5);
-		    army.at(0).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.at(1).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.at(2).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.at(3).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.at(4).Set(Monster::MUTANT_ZOMBIE, 20);
+		    Army::army_t army;
+		    army.At(0).Set(Monster::MUTANT_ZOMBIE, 20);
+		    army.At(1).Set(Monster::MUTANT_ZOMBIE, 20);
+		    army.At(2).Set(Monster::MUTANT_ZOMBIE, 20);
+		    army.At(3).Set(Monster::MUTANT_ZOMBIE, 20);
+		    army.At(4).Set(Monster::MUTANT_ZOMBIE, 20);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
@@ -1204,7 +1192,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		PlaySoundWarning;
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the shipwreck?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
-		    Army::army_t army(5);
+		    Army::army_t army;
 		    Resource::funds_t resource;
 		    Artifact::artifact_t art = Artifact::UNKNOWN;
 		    u8 c = 1;
@@ -1229,11 +1217,11 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
                 	    break;
                 	default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
                     }
-		    army.at(0).Set(Monster::GHOST, c);
-		    army.at(1).Set(Monster::GHOST, c);
-		    army.at(2).Set(Monster::GHOST, c);
-		    army.at(3).Set(Monster::GHOST, c);
-		    army.at(4).Set(Monster::GHOST, c);
+		    army.At(0).Set(Monster::GHOST, c);
+		    army.At(1).Set(Monster::GHOST, c);
+		    army.At(2).Set(Monster::GHOST, c);
+		    army.At(3).Set(Monster::GHOST, c);
+		    army.At(4).Set(Monster::GHOST, c);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
@@ -1276,12 +1264,12 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		PlaySoundWarning;
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
-		    Army::army_t army(5);
-		    army.at(0).Set(Monster::SKELETON, 20);
-		    army.at(1).Set(Monster::SKELETON, 20);
-		    army.at(2).Set(Monster::SKELETON, 20);
-		    army.at(3).Set(Monster::SKELETON, 20);
-		    army.at(4).Set(Monster::SKELETON, 20);
+		    Army::army_t army;
+		    army.At(0).Set(Monster::SKELETON, 20);
+		    army.At(1).Set(Monster::SKELETON, 20);
+		    army.At(2).Set(Monster::SKELETON, 20);
+		    army.At(3).Set(Monster::SKELETON, 20);
+		    army.At(4).Set(Monster::SKELETON, 20);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
@@ -1557,8 +1545,8 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 						    (10== c ? Monster::PHOENIX :
 						    (11== c ? Monster::GREEN_DRAGON :
 						    (12== c ? Monster::TITAN : Monster::BONE_DRAGON )))))));
-		    Army::army_t army(1);
-		    army.at(0).Set(mons, count);
+		    Army::army_t army;
+		    army.At(3).Set(mons, count);
 
 		    PlaySoundWarning;
 		    if(6 == c)
@@ -1713,7 +1701,7 @@ void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
 	PlayPickupSound();
 
 	const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
-	if(!Army::JoinTroop(hero.GetArmy(), Monster::GENIE, recruit))
+	if(!hero.GetArmy().JoinTroop(Monster::GENIE, recruit))
 	    Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 	else
 	if(recruit)
@@ -1799,7 +1787,7 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     {
 	PlaySoundWarning;
 	Dialog::Message("A whirlpool engulfs your ship.", "Some of your army has fallen overboard.", Font::BIG, Dialog::OK);
-	Army::Troop & troops = Army::GetWeakestTroop(hero.GetArmy());
+	Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
 	const u16 c = troops.Count() / 2;
 	troops.SetCount(c ? c : 1);
     }
@@ -1813,12 +1801,12 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
     PlaySoundWarning;
     if(Dialog::YES == Dialog::Message("You come upon an abandoned gold mine.", "The mine appears to be haunted. Do you wish to enter?", Font::BIG, Dialog::YES | Dialog::NO))
     {
-	Army::army_t army(5);
-	army.at(0).Set(Monster::GHOST, tile.GetQuantity1());
-	army.at(1).Set(Monster::GHOST, tile.GetQuantity1());
-	army.at(2).Set(Monster::GHOST, tile.GetQuantity1());
-	army.at(3).Set(Monster::GHOST, tile.GetQuantity1());
-	army.at(4).Set(Monster::GHOST, tile.GetQuantity1());
+	Army::army_t army;
+	army.At(0).Set(Monster::GHOST, tile.GetQuantity1());
+	army.At(1).Set(Monster::GHOST, tile.GetQuantity1());
+	army.At(2).Set(Monster::GHOST, tile.GetQuantity1());
+	army.At(3).Set(Monster::GHOST, tile.GetQuantity1());
+	army.At(4).Set(Monster::GHOST, tile.GetQuantity1());
 	const u32 exp = Algorithm::CalculateExperience(army);
 	const Army::battle_t b = Army::Battle(hero, army, tile);
 
@@ -2040,7 +2028,7 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
 	PlaySoundSuccess;
 	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO))
 	{
-	    if(!Army::JoinTroop(hero.GetArmy(), monster, count))
+	    if(!hero.GetArmy().JoinTroop(monster, count))
 		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 	    else
 		tile.SetCountMonster(0);
@@ -2106,7 +2094,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
 	    const u16 recruit = Dialog::RecruitMonster(monster, count);
 	    if(recruit)
 	    {
-		if(!Army::JoinTroop(hero.GetArmy(), monster, recruit))
+		if(!hero.GetArmy().JoinTroop(monster, recruit))
 		    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 		else
 		    tile.SetCountMonster(count - recruit);
@@ -2151,12 +2139,12 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    }
 	    else
 	    {
-		Army::army_t army(5);
-		army.at(0).Set(Monster::ZOMBIE, 20);
-		army.at(1).Set(Monster::LORD_VAMPIRE, 5);
-		army.at(2).Set(Monster::POWER_LICH, 5);
-		army.at(3).Set(Monster::LORD_VAMPIRE, 5);
-		army.at(4).Set(Monster::ZOMBIE, 20);
+		Army::army_t army;
+		army.At(0).Set(Monster::ZOMBIE, 20);
+		army.At(1).Set(Monster::LORD_VAMPIRE, 5);
+		army.At(2).Set(Monster::POWER_LICH, 5);
+		army.At(3).Set(Monster::LORD_VAMPIRE, 5);
+		army.At(4).Set(Monster::ZOMBIE, 20);
 
 		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("You've found the ruins of an ancient city, now inhabited solely by the undead.", "Will you search?", Font::BIG, Dialog::YES | Dialog::NO))
@@ -2203,12 +2191,12 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    }
 	    else
 	    {
-		Army::army_t army(5);
-		army.at(0).Set(Monster::WAR_TROLL, 4);
-		army.at(1).Set(Monster::TROLL, 4);
-		army.at(2).Set(Monster::TROLL, 4);
-		army.at(3).Set(Monster::TROLL, 4);
-		army.at(4).Set(Monster::WAR_TROLL, 4);
+		Army::army_t army;
+		army.At(0).Set(Monster::WAR_TROLL, 4);
+		army.At(1).Set(Monster::TROLL, 4);
+		army.At(2).Set(Monster::TROLL, 4);
+		army.At(3).Set(Monster::TROLL, 4);
+		army.At(4).Set(Monster::WAR_TROLL, 4);
 		
 		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("Trolls living under the bridge challenge you.", "Will you fight them?", Font::BIG, Dialog::YES | Dialog::NO))
@@ -2255,11 +2243,11 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    }
 	    else
 	    {
-		Army::army_t army(3);
-		army.at(0).Set(Monster::GREEN_DRAGON, 3);
-		army.at(1).Set(Monster::RED_DRAGON, 2);
-		army.at(2).Set(Monster::BLACK_DRAGON, 1);
-		
+		Army::army_t army;
+		army.At(0).Set(Monster::GREEN_DRAGON, 3);
+		army.At(1).Set(Monster::RED_DRAGON, 2);
+		army.At(2).Set(Monster::BLACK_DRAGON, 1);
+
 		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("You stand before the Dragon City, a place off-limits to mere humans.", "Do you wish to violate this rule and challenge the Dragons to a fight?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
@@ -2298,7 +2286,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
         const u16 recruit = Dialog::RecruitMonster(monster, count);
         if(recruit)
         {
-    	    if(!Army::JoinTroop(hero.GetArmy(), monster, recruit))
+    	    if(!hero.GetArmy().JoinTroop(monster, recruit))
 		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
     	    else
     		tile.SetCountMonster(count - recruit);
@@ -2403,22 +2391,22 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
     switch(obj)
     {
 	case MP2::OBJ_HILLFORT:
-	    if(Army::HasMonster(hero.GetArmy(), Monster::DWARF))
+	    if(hero.GetArmy().HasMonster(Monster::DWARF))
 	    {
-		UpgradeMonsters(hero, Monster::DWARF);
+		hero.GetArmy().UpgradeMonsters(Monster::DWARF);
 		mons.push_back(Monster::DWARF);
 		msg1 = Monster::MultipleNames(Monster::DWARF);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::ORC))
+	    if(hero.GetArmy().HasMonster(Monster::ORC))
 	    {
-		UpgradeMonsters(hero, Monster::ORC);
+		hero.GetArmy().UpgradeMonsters(Monster::ORC);
 		mons.push_back(Monster::ORC);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::ORC);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::OGRE))
+	    if(hero.GetArmy().HasMonster(Monster::OGRE))
 	    {
-		UpgradeMonsters(hero, Monster::OGRE);
+		hero.GetArmy().UpgradeMonsters(Monster::OGRE);
 		mons.push_back(Monster::OGRE);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::OGRE);
@@ -2428,22 +2416,22 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
 	    break;
 
 	case MP2::OBJ_FREEMANFOUNDRY:
-	    if(Army::HasMonster(hero.GetArmy(), Monster::PIKEMAN))
+	    if(hero.GetArmy().HasMonster(Monster::PIKEMAN))
 	    {
-		UpgradeMonsters(hero, Monster::PIKEMAN);
+		hero.GetArmy().UpgradeMonsters(Monster::PIKEMAN);
 		mons.push_back(Monster::PIKEMAN);
 		msg1 = Monster::MultipleNames(Monster::PIKEMAN);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::SWORDSMAN))
+	    if(hero.GetArmy().HasMonster(Monster::SWORDSMAN))
 	    {
-		UpgradeMonsters(hero, Monster::SWORDSMAN);
+		hero.GetArmy().UpgradeMonsters(Monster::SWORDSMAN);
 		mons.push_back(Monster::SWORDSMAN);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::SWORDSMAN);
 	    }
-	    if(Army::HasMonster(hero.GetArmy(), Monster::IRON_GOLEM))
+	    if(hero.GetArmy().HasMonster(Monster::IRON_GOLEM))
 	    {
-		UpgradeMonsters(hero, Monster::IRON_GOLEM);
+		hero.GetArmy().UpgradeMonsters(Monster::IRON_GOLEM);
 		mons.push_back(Monster::IRON_GOLEM);
 		if(msg1.size()) msg1 += ", ";
 		msg1 += Monster::MultipleNames(Monster::IRON_GOLEM);

@@ -670,7 +670,7 @@ Castle::building_t Castle::OpenTown(void)
     const std::string descriptionGroupedArmyFormat("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield.");
     const Point pointSpreadArmyFormat(rectSpreadArmyFormat.x - 1, rectSpreadArmyFormat.y - 1);
     const Point pointGroupedArmyFormat(rectGroupedArmyFormat.x - 1, rectGroupedArmyFormat.y - 1);
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army_spread ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Modes(ARMYSPREAD) ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     if(BUILD_CAPTAIN &building)
     {
 	std::string message("Attack Skill");
@@ -712,7 +712,7 @@ Castle::building_t Castle::OpenTown(void)
 	display.Blit(spriteSpreadArmyFormat, rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
 	display.Blit(spriteGroupedArmyFormat, rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
 
-	cursorFormat.Show(army_spread ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+	cursorFormat.Show(Modes(ARMYSPREAD) ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
     const bool many_hero = world.GetMyKingdom().GetHeroes().size() == KINGDOMMAXHEROES;
@@ -891,22 +891,22 @@ Castle::building_t Castle::OpenTown(void)
 		return BUILD_CAPTAIN;
 	}
         else
-	if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectSpreadArmyFormat) && !army_spread)
+	if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectSpreadArmyFormat) && !Modes(ARMYSPREAD))
         {
             cursor.Hide();
             cursorFormat.Move(pointSpreadArmyFormat);
             cursor.Show();
             display.Flip();
-            army_spread = true;
+            SetModes(ARMYSPREAD);
         }
 	else
-        if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectGroupedArmyFormat) && army_spread)
+        if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectGroupedArmyFormat) && Modes(ARMYSPREAD))
         {
             cursor.Hide();
             cursorFormat.Move(pointGroupedArmyFormat);
             cursor.Show();
             display.Flip();
-            army_spread = false;
+            ResetModes(ARMYSPREAD);
         }
 	else
 	if(Heroes::UNKNOWN != name1 && le.MouseClickLeft(rectHero1) &&

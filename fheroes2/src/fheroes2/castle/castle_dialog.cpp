@@ -35,6 +35,7 @@
 #include "text.h"
 #include "portrait.h"
 #include "dialog.h"
+#include "selectarmybar.h"
 
 void Castle::RedrawNameTown(const Point & src_pt)
 {
@@ -51,7 +52,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 {
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
-    present_boat = PresentBoat();
+    PresentBoat() ? SetModes(BOATPRESENT) : ResetModes(BOATPRESENT);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -106,13 +107,16 @@ Dialog::answer_t Castle::OpenDialog(void)
     // castle troops selector
     dst_pt.x = cur_pt.x + 112;
     dst_pt.y = cur_pt.y + 262;
-    Army::SelectBar selectCastleTroops(dst_pt, army);
-    selectCastleTroops.Reset();
-    selectCastleTroops.Redraw();
-    const std::vector<Rect> & coordsCastleTroops = selectCastleTroops.GetCoords();
+
+    SelectArmyBar selectCaptainArmy;
+    selectCaptainArmy.SetArmy(army);
+    selectCaptainArmy.SetPos(dst_pt);
+    selectCaptainArmy.SetInterval(6);
+    selectCaptainArmy.SetBackgroundSprite(AGG::GetICN(ICN::STRIP, 2));
+    selectCaptainArmy.SetCursorSprite(AGG::GetICN(ICN::STRIP, 1));
+    selectCaptainArmy.Redraw();
 
     // portrait heroes or captain or sign
-
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 361;
     
@@ -130,13 +134,17 @@ Dialog::answer_t Castle::OpenDialog(void)
     dst_pt.x = cur_pt.x + 112;
     dst_pt.y = cur_pt.y + 361;
 
-    Army::SelectBar* selectHeroesTroops = castle_heroes ? new Army::SelectBar(dst_pt, (*castle_heroes).GetArmy()) : NULL;
-    const std::vector<Rect>* coordsHeroesTroops = castle_heroes ? &selectHeroesTroops->GetCoords() : NULL;
+    SelectArmyBar selectHeroesArmy;
+    selectHeroesArmy.SetPos(dst_pt);
+    selectHeroesArmy.SetInterval(6);
+    selectHeroesArmy.SetBackgroundSprite(AGG::GetICN(ICN::STRIP, 2));
+    selectHeroesArmy.SetCursorSprite(AGG::GetICN(ICN::STRIP, 1));
+    selectHeroesArmy.SetSaveLastTroop();
 
     if(castle_heroes)
     {
-	selectHeroesTroops->Reset();
-	selectHeroesTroops->Redraw();
+        selectHeroesArmy.SetArmy(castle_heroes->GetArmy());
+        selectHeroesArmy.Redraw();
     }
     else
     	display.Blit(AGG::GetICN(ICN::STRIP, 11), dst_pt);
@@ -172,6 +180,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     // orders draw building
     std::vector<building_t> orders_building;
+    orders_building.reserve(32);
+
     switch(race)
     {
 	case Race::KNGT:
@@ -350,309 +360,20 @@ Dialog::answer_t Castle::OpenDialog(void)
 
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-	// castle troops
-	for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
-	{
-	    if(le.MouseClickLeft(coordsCastleTroops[ii]))
-	    {
-		cursor.Hide();
-
-		// show dialog army info
-		if(selectCastleTroops.isSelected() && Army::isValid(army[ii]) && selectCastleTroops.GetCursorIndex() == ii)
-		{
-		    Army::Troop & select_troops = army[ii];
-		    const Monster::monster_t select_monster = select_troops.Monster();
-		    const u16 select_count = select_troops.Count();
-		    Kingdom & kingdom = world.GetMyKingdom();
-		    
-		    const bool show_upgrade = Monster::AllowUpgrade(select_monster) &&
-			    Monster::GetRace(select_monster) == race &&
-			    (building & GetUpgradeBuilding(Monster::Dwelling(select_monster), race));
-
-		    switch(Dialog::ArmyInfo(army[ii], true, false, show_upgrade))
-		    {
-			case Dialog::UPGRADE:
-			    select_troops.SetMonster(Monster::Upgrade(select_monster));
-		            kingdom.OddFundsResource(PaymentConditions::UpgradeMonster(select_monster) * select_count);
-			    Castle::RedrawResourcePanel();
-
-    			    // RedrawResourcePanel destroy sprite buttonExit
-			    if(buttonExit.isPressed()) buttonExit.Draw();
-			    break;
-
-			case Dialog::DISMISS:
-			    select_troops.Set(Monster::UNKNOWN, 0);
-			    break;
-
-			default: break;
-		    }
-		    selectCastleTroops.Reset();
-		    selectCastleTroops.Redraw();
-		}
-		else
-		// change or combine army or move to empty
-		if(selectCastleTroops.isSelected() || (castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected()))
-		{
-		    // from castle or castle_heroes
-		    Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
-			const_cast<Army::army_t &>((*castle_heroes).GetArmy())[selectHeroesTroops->GetCursorIndex()] );
-
-		    const Monster::monster_t select_monster = select_troops.Monster();
-		    const u16 select_count = select_troops.Count();
-
-		    // change or combine army
-		    if(Army::isValid(army[ii]))
-		    {
-			// change to castle
-			if(army[ii].Monster() != select_monster)
-			{
-			    select_troops = army[ii];
-			    army[ii].Set(select_monster, select_count);
-			}
-			else
-			// combine to castle
-			if(selectCastleTroops.isSelected() || castle_heroes && 1 < Army::GetCountTroops((*castle_heroes).GetArmy()))
-			{
-			    army[ii].SetCount(army[ii].Count() + select_count);
-
-			    select_troops.Set(Monster::UNKNOWN, 0);
-			}
-
-			selectCastleTroops.Reset();
-			selectCastleTroops.Redraw();
-
-			if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected())
-			{
-			    selectHeroesTroops->Reset();
-			    selectHeroesTroops->Redraw();
-			}
-		    }
-		    // move to empty position
-		    else
-		    if(selectCastleTroops.isSelected() || castle_heroes && 1 < Army::GetCountTroops((*castle_heroes).GetArmy()))
-		    {
-			army[ii] = select_troops;
-			select_troops.Set(Monster::UNKNOWN, 0);
-
-			selectCastleTroops.Reset();
-			selectCastleTroops.Redraw();
-
-			if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected())
-			{
-			    selectHeroesTroops->Reset();
-			    selectHeroesTroops->Redraw();
-			}
-		    }
-		}
-		else
-		// select army
-		if(Army::isValid(army[ii]))
-		{
-		    selectCastleTroops.Reset();
-		    selectCastleTroops.Select(ii);
-		    selectCastleTroops.Redraw();
-		}
-
-		cursor.Show();
-
-		display.Flip();
-	    }
-	    else
-	    // right click empty troops - redistribute troops
-	    if(le.MouseClickRight(coordsCastleTroops[ii]) &&
-		!Army::isValid(army[ii]) &&
-		(selectCastleTroops.isSelected() || (castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && 1 < Army::GetCountTroops((*castle_heroes).GetArmy()))))
-	    {
-		cursor.Hide();
-
-		Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
-		    const_cast<Army::army_t &>((*castle_heroes).GetArmy())[selectHeroesTroops->GetCursorIndex()] );
-
-		if(const u16 redistr_count = Dialog::SelectCount(select_troops.Count()))
-		{
-		    army[ii].Set(select_troops.Monster(), redistr_count);
-		
-		    select_troops.SetCount(select_troops.Count() - redistr_count);
-		}
-
-		cursor.Hide();
-
-		selectCastleTroops.Reset();
-		selectCastleTroops.Redraw();
-
-		if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected())
-		{
-		    selectHeroesTroops->Reset();
-		    selectHeroesTroops->Redraw();
-		}
-
-		cursor.Show();
-
-		display.Flip();
-	    }
-	    else
-	    // press right - show quick info
-	    if(le.MousePressRight(coordsCastleTroops[ii]) && Army::isValid(army[ii]))
-	    {
-		cursor.Hide();
-
-		Dialog::ArmyInfo(army[ii], (1 == Army::GetCountTroops(army) ? false : true), true, false);
-
-		cursor.Show();
-
-		display.Flip();
-	    }
-	}
-
-	// castle_heroes troops
-	if(castle_heroes)
-	{
-	    Army::army_t & army2 = const_cast<Army::army_t &>((*castle_heroes).GetArmy());
-
-	    for(u8 ii = 0; ii < coordsHeroesTroops->size(); ++ii)
-		if(coordsHeroesTroops && le.MouseClickLeft(coordsHeroesTroops->at(ii)))
-	    {
-		cursor.Hide();
-
-		// show dialog army info
-		if(selectHeroesTroops && selectHeroesTroops->isSelected() && Army::isValid(army2[ii]) && selectHeroesTroops->GetCursorIndex() == ii)
-		{
-		    Army::Troop & select_troops = army2[ii];
-		    const Monster::monster_t select_monster = select_troops.Monster();
-		    const u16 select_count = select_troops.Count();
-		    Kingdom & kingdom = world.GetMyKingdom();
-
-		    const bool show_upgrade = Monster::AllowUpgrade(select_monster) &&
-			    Monster::GetRace(select_monster) == race &&
-			    (building & GetUpgradeBuilding(Monster::Dwelling(select_monster), race));
-
-		    switch(Dialog::ArmyInfo(army2[ii], (1 == Army::GetCountTroops((*castle_heroes).GetArmy()) ? false : true), false, show_upgrade))
-		    {
-			case Dialog::UPGRADE:
-			    select_troops.SetMonster(Monster::Upgrade(select_monster));
-		            kingdom.OddFundsResource(PaymentConditions::UpgradeMonster(select_monster) * select_count);
-			    Castle::RedrawResourcePanel();
-
-    			    // RedrawResourcePanel destroy sprite buttonExit
-			    if(buttonExit.isPressed()) buttonExit.Draw();
-			    break;
-
-			case Dialog::DISMISS:
-			    select_troops.Set(Monster::UNKNOWN, 0);
-			    break;
-
-			default: break;
-		    }
-		    selectHeroesTroops->Reset();
-		    selectHeroesTroops->Redraw();
-		}
-		else
-		// change or combine army or move to empty
-		if(selectHeroesTroops && (selectHeroesTroops->isSelected() || selectCastleTroops.isSelected()))
-		{
-		    // from castle or castle_heroes
-		    Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
-			army2[selectHeroesTroops->GetCursorIndex()] );
-
-		    const Monster::monster_t select_monster = select_troops.Monster();
-		    const u16 select_count = select_troops.Count();
-
-		    // change or combine army
-		    if(Army::isValid(army2[ii]))
-		    {
-			// change to castle_heroes
-			if(army2[ii].Monster() != select_monster)
-			{
-			    select_troops = army2[ii];
-			    army2[ii].Set(select_monster, select_count);
-			}
-			else
-			// combine to castle_heroes
-			{
-			    army2[ii].SetCount(army2[ii].Count() + select_count);
-
-			    select_troops.Set(Monster::UNKNOWN, 0);
-			}
-
-			selectCastleTroops.Reset();
-			selectCastleTroops.Redraw();
-
-			selectHeroesTroops->Reset();
-			selectHeroesTroops->Redraw();
-		    }
-		    // move to empty position
-		    else
-		    {
-			army2[ii] = select_troops;
-			select_troops.Set(Monster::UNKNOWN, 0);
-
-			selectCastleTroops.Reset();
-			selectCastleTroops.Redraw();
-
-			selectHeroesTroops->Reset();
-			selectHeroesTroops->Redraw();
-		    }
-		}
-		else
-		// select army
-		if(selectHeroesTroops && Army::isValid(army2[ii]))
-		{
-		    selectHeroesTroops->Reset();
-		    selectHeroesTroops->Select(ii);
-		    selectHeroesTroops->Redraw();
-		}
-
-		cursor.Show();
-
-		display.Flip();
-	    }
-	    else
-	    // right empty click - redistribute troops
-	    if(coordsHeroesTroops &&
-	       le.MouseClickRight(coordsHeroesTroops->at(ii)) &&
-	       !Army::isValid(army2[ii]) &&
-	       selectHeroesTroops &&
-	       (selectHeroesTroops->isSelected() || selectCastleTroops.isSelected()))
-	    {
-		cursor.Hide();
-
-		Army::Troop & select_troops = ( selectCastleTroops.isSelected() ? army[selectCastleTroops.GetCursorIndex()] :
-		    army2[selectHeroesTroops->GetCursorIndex()] );
-
-		if(const u16 redistr_count = Dialog::SelectCount(select_troops.Count()))
-		{
-		    army2[ii].Set(select_troops.Monster(), redistr_count);
-		
-		    select_troops.SetCount(select_troops.Count() - redistr_count);
-		}
-
-		cursor.Hide();
-
-		selectCastleTroops.Reset();
-		selectCastleTroops.Redraw();
-
-		selectHeroesTroops->Reset();
-		selectHeroesTroops->Redraw();
-
-		cursor.Show();
-		display.Flip();
-	    }
-	    else
-	    // press right - show quick info
-	    if(coordsHeroesTroops && le.MousePressRight(coordsHeroesTroops->at(ii)) && Army::isValid(army2[ii]))
-	    {
-		cursor.Hide();
-
-		Dialog::ArmyInfo(army2[ii], (1 == Army::GetCountTroops((*castle_heroes).GetArmy()) ? false : true), true, false);
-
-		cursor.Show();
-
-		display.Flip();
-	    }
-	}
+       // selector troops event
+        if(castle_heroes && selectHeroesArmy.isValid())
+        {
+            if(le.MouseCursor(selectCaptainArmy.GetArea()) || le.MouseCursor(selectHeroesArmy.GetArea()))
+                SelectArmyBar::QueueEventProcessing(selectCaptainArmy, selectHeroesArmy);
+        }
+        else
+        {
+            if(le.MouseCursor(selectCaptainArmy.GetArea()))
+                SelectArmyBar::QueueEventProcessing(selectCaptainArmy);
+        }
 
 	// view hero
-	if(castle_heroes && selectHeroesTroops && le.MouseClickLeft(rectHeroPortrait))
+	if(castle_heroes && le.MouseClickLeft(rectHeroPortrait))
 	{
 	    const std::vector<Heroes *> & myHeroes = world.GetMyKingdom().GetHeroes();
 	    Dialog::answer_t result = Dialog::ZERO;
@@ -685,8 +406,9 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    }
 
 	    cursor.Hide();
-	    selectHeroesTroops->Reset();
-	    selectHeroesTroops->Redraw();
+            if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
+            if(selectHeroesArmy.isSelected()) selectHeroesArmy.Reset();
+            selectHeroesArmy.Redraw();
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -715,13 +437,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Resource::funds_t res;
 	    res.gold = BUY_BOAT_GOLD;
 	    res.wood = BUY_BOAT_WOOD;
-	    bool enable = world.GetMyKingdom().AllowPayment(res) && (false == present_boat);
+	    bool enable = world.GetMyKingdom().AllowPayment(res) && (false == Modes(BOATPRESENT));
 
 	    if(Dialog::OK == Dialog::BuyBoat(enable))
 	    {
 		AGG::PlaySound(M82::BUILDTWN);
 		world.GetMyKingdom().OddFundsResource(res);
-		present_boat = true;
+		SetModes(BOATPRESENT);
 		world.CreateBoat(GetIndex(), true);
 
 		RedrawResourcePanel();
@@ -737,7 +459,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	{
 	    OpenWell();
 	    cursor.Hide();
-	    selectCastleTroops.Redraw();
+	    selectCaptainArmy.Redraw();
 	    RedrawResourcePanel();
 
     	    // RedrawResourcePanel destroy sprite buttonExit
@@ -776,6 +498,10 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    if(Castle::BUILD_NOTHING != build)
 	    {
 		cursor.Hide();
+
+        	if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
+        	if(selectHeroesArmy.isSelected()) selectHeroesArmy.Reset();
+
 		BuyBuilding(build);
 
 		// play sound
@@ -784,8 +510,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		RedrawAnimationBuilding(cur_pt, build);
 
 		RedrawResourcePanel();		                
-	        RedrawAllBuilding(cur_pt, orders_building);
-	        RedrawNameTown(cur_pt);
+	        //RedrawAllBuilding(cur_pt, orders_building);
+	        //RedrawNameTown(cur_pt);
 
 		if(Castle::BUILD_CAPTAIN == build && ! castle_heroes)
 		    display.Blit(Portrait::Captain(race, Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
@@ -801,19 +527,19 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-		if(selectHeroesTroops) delete selectHeroesTroops;
-		dst_pt.x = cur_pt.x + 112;
-		dst_pt.y = cur_pt.y + 361;
-		selectHeroesTroops = new Army::SelectBar(dst_pt, (*castle_heroes).GetArmy());
+                if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
+                if(selectHeroesArmy.isSelected()) selectHeroesArmy.Reset();
 
-		// play sound
-		const Surface & port = Portrait::Hero((*castle_heroes), Portrait::BIG);
-		Surface sf(port.w(), port.h());
-		sf.SetColorKey();
-		sf.Blit(port);
+                selectHeroesArmy.SetArmy(castle_heroes->GetArmy());
 
 		if(buyhero)
 		{
+/*
+		    const Surface & port = Portrait::Hero((*castle_heroes), Portrait::BIG);
+		    Surface sf(port.w(), port.h());
+		    sf.SetColorKey();
+		    sf.Blit(port);
+
 		    AGG::PlaySound(M82::BUILDTWN);
 		    LocalEvent & le = LocalEvent::GetLocalEvent();
 		    u32 ticket = 0;
@@ -834,21 +560,12 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    }
 
 		    RedrawResourcePanel();
+*/
 		}
 
-		display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
-
-    		dst_pt.x = cur_pt.x;
-        	dst_pt.y = cur_pt.y + 256;
-                display.Blit(AGG::GetICN(ICN::STRIP, 0), dst_pt);
-
-		coordsHeroesTroops = &selectHeroesTroops->GetCoords();
-
-		if(selectHeroesTroops)
-		{
-		    selectHeroesTroops->Reset();
-		    selectHeroesTroops->Redraw();
-		}
+                display.Blit(AGG::GetICN(ICN::STRIP, 0), cur_pt.x, cur_pt.y + 256);
+                display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
+                selectHeroesArmy.Redraw();
 
 		cursor.Show();
 		display.Flip();
@@ -858,7 +575,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// buy castle
 	if(le.MouseClickLeft(coordBuildingTent))
 	{
-	    if(!allow_castle)
+	    if(!Modes(ALLOWCASTLE))
 	    {
 		Dialog::Message("Town", "This town may not be upgraded to a castle.", Font::BIG, Dialog::OK);
 	    }
@@ -874,8 +591,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 		RedrawAnimationBuilding(cur_pt, BUILD_CASTLE);
 
 		RedrawResourcePanel();
-	        RedrawAllBuilding(cur_pt, orders_building);
-	        RedrawNameTown(cur_pt);
+	        //RedrawAllBuilding(cur_pt, orders_building);
+	        //RedrawNameTown(cur_pt);
 
 		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
@@ -899,7 +616,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    if((*castle_heroes).BuySpellBook())
 	    {
 		cursor.Hide();
-		selectCastleTroops.Redraw();
+		selectCaptainArmy.Redraw();
 		RedrawResourcePanel();
 
 		if(buttonExit.isPressed()) buttonExit.Draw();
@@ -915,7 +632,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Monster::Monster(race, DWELLING_MONSTER1), dwelling[0])))
 	{
 	    cursor.Hide();
-	    selectCastleTroops.Redraw();
+	    selectCaptainArmy.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
@@ -930,7 +647,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
 	{
 	    cursor.Hide();
-	    selectCastleTroops.Redraw();
+	    selectCaptainArmy.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
@@ -945,7 +662,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
 	{
 	    cursor.Hide();
-	    selectCastleTroops.Redraw();
+	    selectCaptainArmy.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
@@ -960,7 +677,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
 	{
 	    cursor.Hide();
-	    selectCastleTroops.Redraw();
+	    selectCaptainArmy.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
@@ -975,7 +692,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
 	{
 	    cursor.Hide();
-	    selectCastleTroops.Redraw();
+	    selectCaptainArmy.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
@@ -990,7 +707,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
 	{
 	    cursor.Hide();
-	    selectCastleTroops.Redraw();
+	    selectCaptainArmy.Redraw();
 	    RedrawResourcePanel();
 
 	    // RedrawResourcePanel destroy sprite buttonExit
@@ -1110,82 +827,97 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & DWELLING_MONSTER6 && le.MouseCursor(coordDwellingMonster6)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE6 & building ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)));
 	else
 	// status message over castle troops
-	if(le.MouseCursor(coordsCastleTroops[0]) ||
-	   le.MouseCursor(coordsCastleTroops[1]) ||
-	   le.MouseCursor(coordsCastleTroops[2]) ||
-	   le.MouseCursor(coordsCastleTroops[3]) ||
-	   le.MouseCursor(coordsCastleTroops[4]))
+	if(le.MouseCursor(selectCaptainArmy.GetArea()))
 	{
-	    const u8 castle_select = selectCastleTroops.GetCursorIndex();
+            const s8 index1 = selectCaptainArmy.GetIndexFromCoord(le.MouseCursor());
+            if(0 <= index)
+            {
+		const Army::Troop & troop1 = army.At(index1);
+		const std::string & monster1 = Monster::String(troop1.Monster());
 
-	    for(u8 ii = 0; ii < coordsCastleTroops.size(); ++ii) if(le.MouseCursor(coordsCastleTroops[ii]))
-	    {
-		if(selectCastleTroops.isSelected() && ii == castle_select)
-		    statusBar.ShowMessage("View " + Monster::String(army[ii].Monster()));
+		if(selectCaptainArmy.isSelected())
+		{
+		    const u8 index2 = selectCaptainArmy.Selected();
+		    const Army::Troop & troop2 = army.At(index2);
+		    const std::string & monster2 = Monster::String(troop2.Monster());
+
+		    if(index1 == index2)
+			statusBar.ShowMessage("View " + monster1);
+		    else
+		    if(troop1.isValid() && troop2.isValid())
+			troop1.Monster() == troop2.Monster() ?
+			statusBar.ShowMessage("Combine " + monster1 + " armies") :
+			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    else
+			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		}
 		else
-		if(selectCastleTroops.isSelected() && Army::isValid(army[ii]) && Army::isValid(army[castle_select]))
-		    army[castle_select].Monster() == army[ii].Monster() ?
-		    	statusBar.ShowMessage("Combine " + Monster::String(army[ii].Monster()) + " armies") :
-			statusBar.ShowMessage("Exchange " + Monster::String(army[ii].Monster()) + " with " + Monster::String(army[castle_select].Monster()));
-		else
-		if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && 1 == Army::GetCountTroops((*castle_heroes).GetArmy()))
+		if(castle_heroes && selectHeroesArmy.isSelected())
+		{
+		    const u8 index2 = selectHeroesArmy.Selected();
+		    const Army::Troop & troop2 = castle_heroes->GetArmy().At(index2);
+		    const std::string & monster2 = Monster::String(troop2.Monster());
+
+		    if(selectHeroesArmy.SaveLastTroop() && !troop1.isValid())
 			statusBar.ShowMessage("Cannot move last army to garrison");
+		    else
+		    if(troop1.isValid() && troop2.isValid())
+			troop1.Monster() == troop2.Monster() ?
+			statusBar.ShowMessage("Combine " + monster1 + " armies") :
+			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    else
+			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		}
 		else
-		if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected() && Army::isValid(army[ii]) && Army::isValid((*castle_heroes).GetArmy().at(selectHeroesTroops->GetCursorIndex())))
-		    (*castle_heroes).GetArmy().at(selectHeroesTroops->GetCursorIndex()).Monster() == army[ii].Monster() ?
-		    	statusBar.ShowMessage("Combine " + Monster::String(army[ii].Monster()) + " armies") : 
-			statusBar.ShowMessage("Exchange " + Monster::String(army[ii].Monster()) + " with " + Monster::String((*castle_heroes).GetArmy().at(selectHeroesTroops->GetCursorIndex()).Monster()));
-		else
-		if(selectCastleTroops.isSelected())
-		    statusBar.ShowMessage("Move and right click Redistribute " + Monster::String(army[castle_select].Monster()));
-		else
-		if(castle_heroes && selectHeroesTroops && selectHeroesTroops->isSelected())
-		    statusBar.ShowMessage("Move and right click Redistribute " + Monster::String((*castle_heroes).GetArmy().at(selectHeroesTroops->GetCursorIndex()).Monster()));
-		else
-		if(Army::isValid(army[ii]))
-		    statusBar.ShowMessage("Select " + Monster::String(army[ii].Monster()));
+		if(troop1.isValid())
+		    statusBar.ShowMessage("Select " + monster1);
 		else
 		    statusBar.ShowMessage("Empty");
 	    }
 	}
 	else
 	// status message over castle_heroes troops
-	if(castle_heroes &&
-	    selectHeroesTroops &&
-	    coordsHeroesTroops &&
-	   (le.MouseCursor(coordsHeroesTroops->at(0)) ||
-	    le.MouseCursor(coordsHeroesTroops->at(1)) ||
-	    le.MouseCursor(coordsHeroesTroops->at(2)) ||
-	    le.MouseCursor(coordsHeroesTroops->at(3)) ||
-	    le.MouseCursor(coordsHeroesTroops->at(4))))
+	if(castle_heroes && le.MouseCursor(selectHeroesArmy.GetArea()))
 	{
-	    const u8 heroes_select = selectHeroesTroops->GetCursorIndex();
-	    const Army::army_t & army2 = (*castle_heroes).GetArmy();
+            const s8 index1 = selectHeroesArmy.GetIndexFromCoord(le.MouseCursor());
+            if(0 <= index)
+            {
+		const Army::Troop & troop1 = castle_heroes->GetArmy().At(index1);
+		const std::string & monster1 = Monster::String(troop1.Monster());
 
-	    for(u8 ii = 0; ii < coordsHeroesTroops->size(); ++ii) if(le.MouseCursor(coordsHeroesTroops->at(ii)))
-	    {
+		if(selectHeroesArmy.isSelected())
+		{
+		    const u8 index2 = selectHeroesArmy.Selected();
+		    const Army::Troop & troop2 = castle_heroes->GetArmy().At(index2);
+		    const std::string & monster2 = Monster::String(troop2.Monster());
 
-		if(selectHeroesTroops->isSelected() && ii == heroes_select)
-		    statusBar.ShowMessage("View " + Monster::String(army2[ii].Monster()));
+		    if(index1 == index2)
+			statusBar.ShowMessage("View " + monster1);
+		    else
+		    if(troop1.isValid() && troop2.isValid())
+			troop1.Monster() == troop2.Monster() ?
+			statusBar.ShowMessage("Combine " + monster1 + " armies") :
+			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    else
+			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		}
 		else
-		if(selectHeroesTroops->isSelected() && Army::isValid(army2[ii]) && Army::isValid(army2[heroes_select]))
-		    army2[heroes_select].Monster() == army2[ii].Monster() ?
-		    	statusBar.ShowMessage("Combine " + Monster::String(army2[ii].Monster()) + " armies") :
-			statusBar.ShowMessage("Exchange " + Monster::String(army2[ii].Monster()) + " with " + Monster::String(army2[heroes_select].Monster()));
+		if(selectCaptainArmy.isSelected())
+		{
+		    const u8 index2 = selectCaptainArmy.Selected();
+		    const Army::Troop & troop2 = army.At(index2);
+		    const std::string & monster2 = Monster::String(troop2.Monster());
+
+		    if(troop1.isValid() && troop2.isValid())
+			troop1.Monster() == troop2.Monster() ?
+			statusBar.ShowMessage("Combine " + monster1 + " armies") :
+			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    else
+			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		}
 		else
-		if(selectCastleTroops.isSelected() && Army::isValid(army2[ii]) && Army::isValid(army[selectCastleTroops.GetCursorIndex()]))
-		    army[selectCastleTroops.GetCursorIndex()].Monster() == army2[ii].Monster() ?
-		    	statusBar.ShowMessage("Combine " + Monster::String(army2[ii].Monster()) + " armies") :
-			statusBar.ShowMessage("Exchange " + Monster::String(army2[ii].Monster()) + " with " + Monster::String(army[selectCastleTroops.GetCursorIndex()].Monster()));
-		else
-		if(selectHeroesTroops->isSelected())
-		    statusBar.ShowMessage("Move and right click Redistribute " + Monster::String(army2[heroes_select].Monster()));
-		else
-		if(selectCastleTroops.isSelected())
-		    statusBar.ShowMessage("Move and right click Redistribute " + Monster::String(army[selectCastleTroops.GetCursorIndex()].Monster()));
-		else
-		if(Army::isValid(army2[ii]))
-		    statusBar.ShowMessage("Select " + Monster::String(army2[ii].Monster()));
+		if(troop1.isValid())
+		    statusBar.ShowMessage("Select " + monster1);
 		else
 		    statusBar.ShowMessage("Empty");
 	    }
@@ -1205,10 +937,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
     }
 
-    if(selectHeroesTroops) delete selectHeroesTroops;
-
     Display::Get().Fade();
-
     return result;
 }
 

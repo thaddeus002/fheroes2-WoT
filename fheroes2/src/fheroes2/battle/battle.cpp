@@ -164,19 +164,19 @@ namespace Army {
     void Temp(int, int, Point);
 }
 
-Army::BattleArmy_t Army::ArmyToBattleArmy(const Army::army_t &army)
+Army::BattleArmy_t Army::ArmyToBattleArmy(const Army::army_t &army)		// need optimize, ArmyToBattleArmy(const army_t&, BattleArmy_t&)
 {
     Army::BattleArmy_t battleArmy;
-    for(u16 i = 0; i < army.size(); i++)
-        battleArmy.push_back(Army::BattleTroop(army[i]));
+    for(u16 i = 0; i < army.Size(); i++)
+        battleArmy.push_back(Army::BattleTroop(army.At(i)));
     return battleArmy;
 }
 
-Army::army_t Army::BattleArmyToArmy(const Army::BattleArmy_t &battleArmy)
+Army::army_t Army::BattleArmyToArmy(const Army::BattleArmy_t &battleArmy)	// need optimize, BattleArmyToArmy(constBattleArmy_t&, army_t&)
 {
     Army::army_t army;
-    for(u16 i = 0; i < battleArmy.size(); i++)
-        army.push_back(battleArmy[i]);
+    army.Import(battleArmy);
+
     return army;
 }
 
@@ -486,8 +486,8 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &basic
     bool goodmorale;
 
     while(status == AUTO) {
-	if(hero1) hero1->spellCasted = false;
-	if(hero2) hero2->spellCasted = false;
+	if(hero1) hero1->ResetModes(Heroes::SPELLCASTED);
+	if(hero2) hero2->ResetModes(Heroes::SPELLCASTED);
 	for(u16 i=0; i<army1.size(); i++) army1[i].ProceedMagic();
 	for(u16 i=0; i<army2.size(); i++) army2[i].ProceedMagic();
 	Speed::speed_t cursp = Speed::INSTANT;
@@ -753,7 +753,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 	    }
 	    if(s == SURRENDER) return s;
 	    if(spell != Spell::NONE && MagicSelectTarget(hero1, hero2, army1, army2, tile, false, spell))
-		hero1->spellCasted = 0;//true;
+		hero1->ResetModes(Heroes::SPELLCASTED);// SetModes(Heroes::SPELLCASTED);
 	}
 	if(le.MouseClickLeft(rectHero2)) {
 	    battle_t s = HeroStatus(*hero2, *statusBar2, spell, false, hero1, troopN >= 0);
@@ -763,7 +763,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 	    }
 	    if(s == SURRENDER) return s;
 	    if(spell != Spell::NONE && MagicSelectTarget(hero1, hero2, army1, army2, tile, true, spell))
-		hero2->spellCasted = 0;//true;
+		hero2->ResetModes(Heroes::SPELLCASTED);// SetModes(Heroes::SPELLCASTED);
 	}
 	if(le.MousePressRight(rectHero1)) HeroStatus(*hero1, *statusBar2, spell, true, false, false);
 	if(le.MousePressRight(rectHero2)) HeroStatus(*hero2, *statusBar2, spell, true, false, false);
@@ -2600,7 +2600,7 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spel
     Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);
     Button buttonSur(pos_rt.x + 148, pos_rt.y + 148, butt, 13, 14);
     Button buttonOK(pos_rt.x + 207, pos_rt.y + 148, butt, 15, 16);
-    buttonMag.SetDisable(!hero.SpellBook().Active() || hero.spellCasted || locked || quickshow);
+    buttonMag.SetDisable(!hero.SpellBook().Active() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
     buttonRet.SetDisable(locked || quickshow);
     buttonSur.SetDisable(!cansurrender || locked || quickshow);
     buttonMag.Draw();

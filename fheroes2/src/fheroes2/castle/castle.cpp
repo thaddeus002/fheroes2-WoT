@@ -28,12 +28,10 @@
 #include "castle.h"
 
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
-    nearly_sea(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))),
-    color(Color::GRAY), building(0), army_spread(true), allow_build(true), present_boat(false), mageguild(race),
-    dwelling(CASTLEMAXMONSTER, 0), army(ARMYMAXTROOPS), castle_heroes(false)
+    color(Color::GRAY), building(0), flags(ARMYSPREAD|ALLOWBUILD), mageguild(race),
+    dwelling(CASTLEMAXMONSTER, 0), army(&captain), castle_heroes(false)
 {
-    // set master primary skill to army
-    Army::SetMasterSkill(army, captain);
+    if(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))) SetModes(NEARLYSEA);
 }
 
 void Castle::LoadFromMP2(const void *ptr)
@@ -118,52 +116,52 @@ void Castle::LoadFromMP2(const void *ptr)
 	++ptr8;
 	
 	// monster1
-	army[0].SetMonster(Monster::Monster(*ptr8));
+	army.At(0).SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster2
-	army[1].SetMonster(Monster::Monster(*ptr8));
+	army.At(1).SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster3
-	army[2].SetMonster(Monster::Monster(*ptr8));
+	army.At(2).SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster4
-	army[3].SetMonster(Monster::Monster(*ptr8));
+	army.At(3).SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// monster5
-	army[4].SetMonster(Monster::Monster(*ptr8));
+	army.At(4).SetMonster(Monster::Monster(*ptr8));
 	++ptr8;
 
 	// count1
 	LOAD16(ptr8, byte16);
-	army[0].SetCount(byte16);
+	army.At(0).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count2
 	LOAD16(ptr8, byte16);
-	army[1].SetCount(byte16);
+	army.At(1).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count3
 	LOAD16(ptr8, byte16);
-	army[2].SetCount(byte16);
+	army.At(2).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count4
 	LOAD16(ptr8, byte16);
-	army[3].SetCount(byte16);
+	army.At(3).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count5
 	LOAD16(ptr8, byte16);
-	army[4].SetCount(byte16);
+	army.At(4).SetCount(byte16);
 	++ptr8;
 	++ptr8;
     }
@@ -199,7 +197,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ++ptr8;
 
     // allow upgrade to castle (0 - true, 1 - false)
-    allow_castle = (*ptr8 ? false : true);
+    (*ptr8 ? ResetModes(ALLOWCASTLE) : SetModes(ALLOWCASTLE));
     ++ptr8;
 
     // unknown 29 byte
@@ -215,12 +213,12 @@ void Castle::LoadFromMP2(const void *ptr)
 	switch(Settings::Get().GameDifficulty())
 	{
     	    case Difficulty::EASY:
-        	army[0].Set(mon1.monster, mon1.grown * 2);
-        	army[1].Set(mon2.monster, mon2.grown * 2);
+        	army.At(0).Set(mon1.monster, mon1.grown * 2);
+        	army.At(1).Set(mon2.monster, mon2.grown * 2);
         	break;
 
     	    case Difficulty::NORMAL:
-        	army[0].Set(mon1.monster, mon1.grown);
+        	army.At(0).Set(mon1.monster, mon1.grown);
         	break;
 
     	    case Difficulty::HARD:
@@ -259,6 +257,21 @@ void Castle::LoadFromMP2(const void *ptr)
     if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "Castle::LoadFromMP2: castle: " : "Castle::LoadFromMP2: town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
+void Castle::SetModes(flags_t f)
+{
+    flags |= f;
+}
+
+void Castle::ResetModes(flags_t f)
+{
+    flags &= ~f;
+}
+
+bool Castle::Modes(flags_t f) const
+{
+    return flags & f;
+}
+
 const Point & Castle::GetCenter(void) const
 { return mp; }
 
@@ -275,7 +288,7 @@ void Castle::ActionNewDay(void)
     // for learns new spells need today
     if(castle_heroes && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);
 
-    allow_build = true;
+    SetModes(ALLOWBUILD);
 }
 
 void Castle::ActionNewWeek(void)
@@ -572,24 +585,13 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
     // incorrect count
     if(dwelling[dw_index] < count) return false;
 
-    // find free cell
-    u8 num_cell = CASTLEMAXARMY;
-    for(u8 ii = 0; ii < CASTLEMAXARMY; ++ii)
-	if(ms == army[ii].Monster() || 0 == army[ii].Count()){ num_cell = ii; break; }
-
-    // not found
-    if(CASTLEMAXARMY <= num_cell) return false;
-
     // buy
     const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms) * count);
     Kingdom & kingdom = world.GetKingdom(color);
-    
-    if(! kingdom.AllowPayment(paymentCosts)) return false;
+
+    if(! kingdom.AllowPayment(paymentCosts) || !army.JoinTroop(ms, count)) return false;
 
     kingdom.OddFundsResource(paymentCosts);
-    
-    army[num_cell].Set(ms, army[num_cell].Count() + count);
-
     dwelling[dw_index] -= count;
 
     return true;
@@ -903,7 +905,7 @@ u32 Castle::GetBuildingRequires(const building_t & build) const
 bool Castle::AllowBuyBuilding(building_t build) const
 {
     // check allow building
-    if(!allow_build) return false;
+    if(!Modes(ALLOWBUILD)) return false;
 
     // check valid payment
     if(! world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBuilding(race, build))) return false;
@@ -973,7 +975,7 @@ void Castle::BuyBuilding(building_t build)
 	}
 
 	// disable day build
-	allow_build = false;
+	ResetModes(ALLOWBUILD);
 	
 	if(H2Config::Debug()) Error::Verbose("Castle::BuyBuilding: " + GetStringBuilding(build, race));
 }
@@ -1310,7 +1312,7 @@ const Heroes* Castle::GetHeroes(void) const
 
 bool Castle::HaveNearlySea(void) const
 {
-    return nearly_sea;
+    return Modes(NEARLYSEA);
 }
 
 bool Castle::PresentBoat(void) const
@@ -1426,7 +1428,7 @@ void Castle::Dump(void) const
     std::cout << "build           : " << building << std::endl;
     std::cout << "present heroes  : " << (GetHeroes() ? "yes" : "no") << std::endl;
     std::cout << "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl;
-    std::cout << "nearly sea      : " << (nearly_sea ? "yes" : "no") << std::endl;
+    std::cout << "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl;
 }
 
 s8 Castle::GetMoraleWithModificators(std::list<std::string> *list) const

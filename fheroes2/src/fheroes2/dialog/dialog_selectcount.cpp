@@ -138,9 +138,9 @@ u16 Dialog::SelectCount(u16 max_count)
 	    display.Flip();
 	}
 
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) return result;
-	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)) return 0;
+        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) break;
+	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ result = 0; break; }
     }
-
-    return 0;
+    cursor.Hide();
+    return result;
 }

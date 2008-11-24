@@ -42,7 +42,6 @@
 
 #define HEROESMAXARTIFACT	14
 #define HEROESMAXSKILL		8
-#define HEROESMAXARMY		5
 #define HEROESMAXCOUNT		71
 
 #define SCOUTINGBASE		4
@@ -75,7 +74,7 @@
 class Heroes : public Skill::Primary
 {
 public:
-    typedef enum
+    enum heroes_t
     {
 	// knight
 	LORDKILBURN, SIRGALLANTH, ECTOR, GVENNETH, TYRO, AMBROSE, RUBY, MAXIMUS, DIMITRY,
@@ -95,7 +94,15 @@ public:
 	SOLMYR, DAINWIN, MOG, UNCLEIVAN, JOSEPH, GALLAVANT, ELDERIAN, CEALLACH, DRAKONIA, MARTINE, JARKONAS,
 	// debugger
 	SANDYSANDY, UNKNOWN
-    } heroes_t;
+    };
+
+    enum flags_t
+    {
+	SHIPMASTER	= 0x0001,
+	ARMYSPREAD	= 0x0002,
+	SPELLCASTED	= 0x0004,
+	ENABLEMOVE	= 0x0008,
+    };
 
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
 
@@ -107,6 +114,10 @@ public:
     const Castle* inCastle(void) const;
 
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
+
+    void SetModes(flags_t);
+    void ResetModes(flags_t);
+    bool Modes(flags_t) const;
 
     Heroes::heroes_t GetID(void) const{ return hid; };
     Color::color_t GetColor(void) const{ return color; };
@@ -219,8 +230,6 @@ public:
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
 
-    bool spellCasted;
-
 private:
     std::string		name;
     Color::color_t	color;
@@ -237,9 +246,7 @@ private:
     const heroes_t	hid;
     const Race::race_t	race;
 
-    bool		army_spread;
-    bool		enable_move;
-    bool 		shipmaster;
+    u16 		flags;
 
     MP2::object_t	save_maps_general;
 
