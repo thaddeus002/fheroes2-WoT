@@ -24,8 +24,7 @@
 #include <limits.h>
 
 #include "gamedefs.h"
-#include "cmdline.h"
-#include "tools.h"
+#include "audio.h"	// need SDL.h for mingw32 build
 #include "settings.h"
 #include "dir.h"
 #include "agg.h"
@@ -53,6 +52,17 @@ char *basename(const char *path)
     return buff;
 }
 
+int PrintHelp(const char *basename)
+{
+    std::cout << "Usage: " << basename << " [OPTIONS]\n" \
+	    << "  -e\teditors mode\n" \
+	    << "  -d\tdebug mode\n" \
+	    << "  -c\tpath to config file (default fheroes2.cfg)\n" \
+	    << "  -h\tprint this help and exit" << std::endl;
+
+    return EXIT_SUCCESS;
+}
+
 int main(int argc, char **argv)
 {
 	chdir(dirname(argv[0]));
@@ -76,49 +86,41 @@ int main(int argc, char **argv)
 	std::cout << "config: " << fheroes2_cfg << (conf.Read(fheroes2_cfg) ? " load" : " not found") << std::endl;
 
 	{
-	    // parse cmd params
-	    CmdLine cmd((const char **) argv);
+	    int opt;
+	    while((opt = getopt(argc, argv, "hed:c:")) != -1)
+    		switch(opt)
+                {
+                    case 'e':
+			conf.SetModes(Settings::EDITOR);
+			conf.SetDebug(3);
 
-	    if(cmd.Exists('h'))
-	    {
-		std::cout << "Usage: " << argv[0] << " [OPTIONS]\n" \
-		    << "  -e\teditors mode\n" \
-		    << "  -d\tdebug mode\n" \
-		    << "  -c\tpath to config file (default fheroes2.cfg)\n" \
-		    << "  -h\tprint this help and exit" << std::endl;
+			std::cout << "start: editor mode." << std::endl;
 
-		return EXIT_SUCCESS;
-	    }
-
-	    // load cmd config
-	    if(cmd.Exists('c'))
-	    {
-		const std::string & cmd_config = cmd.GetValue('c');
-
-		std::cout << "config: " << cmd_config << (conf.Read(cmd_config) ? " load" : " not found") << std::endl;
-	    }
-
-	    // set debug
-	    if(cmd.Exists('d')) conf.SetDebug(String::ToInt(cmd.GetValue('d')));
-
-	    // editor mode
-	    if(cmd.Exists('e'))
-	    {
-		conf.SetModes(Settings::EDITOR);
-		conf.SetDebug(3);
-
-		std::cout << "start: editor mode." << std::endl;
-
-		caption = "Free Heroes II (Editor), version: ";
-		String::AddInt(caption, conf.MajorVersion());
-		caption += ".";
-		String::AddInt(caption, conf.MinorVersion());
+			caption = "Free Heroes II (Editor), version: ";
+			String::AddInt(caption, conf.MajorVersion());
+			caption += ".";
+			String::AddInt(caption, conf.MinorVersion());
 
 #ifndef BUILD_RELEASE
-		caption += ", build: ";
-		String::AddInt(caption, conf.DateBuild());
+			caption += ", build: ";
+			String::AddInt(caption, conf.DateBuild());
 #endif
-	    }
+			break;
+			
+                    case 'd':
+                	conf.SetDebug(optarg ? String::ToInt(optarg) : 0);
+                	break;
+
+                    case 'c':
+                	std::cout << "config: " << optarg << (conf.Read(optarg) ? " load" : " not found") << std::endl;
+                	break;
+
+                    case '?':
+                    case 'h': return PrintHelp(argv[0]);
+
+                    default:  break;
+		}
+
 	}
 
 	// random init
