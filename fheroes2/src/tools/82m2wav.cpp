@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "SDL.h"
 #include "types.h"
 
 class wavhead
