@@ -103,8 +103,6 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.y = cur_pt.y;
     display.Blit(backSprite, src_rt, dst_pt);
 
-    Game::Interface::Get().DrawBorder(false, false);
-
     // header
     message = GetName() + " meets " + heroes2.GetName();
     dst_pt.x = cur_pt.x + 320 - Text::width(message, Font::BIG) / 2;
@@ -216,7 +214,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     Surface sfb(rt.w, rt.h);
     sfb.Blit(backSprite, rt, 0, 0);
     Surface sfc(rt.w - 1, rt.h - 1);
-    Cursor::DrawCursor(sfc, 0xD6, true);
+    Cursor::DrawCursor(sfc, 0x10, true);
     
     SelectArmyBar selectArmy1;
     selectArmy1.SetArmy(army);

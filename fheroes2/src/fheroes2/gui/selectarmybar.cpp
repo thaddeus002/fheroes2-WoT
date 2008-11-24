@@ -153,7 +153,9 @@ void SelectArmyBar::Redraw(Surface & display)
 	if(troop.isValid())
 	{
             // blit alt background
-            if(!(flags & FLAGS_USEMONS32))
+            if(flags & FLAGS_USEMONS32)
+		display.Blit(*background, pt);
+	    else
 	    switch(Monster::GetRace(troop.Monster()))
             {
                 case Race::KNGT: display.Blit(AGG::GetICN(ICN::STRIP, 4), pt);  break;
