@@ -76,7 +76,7 @@ template<class T> static void DeselectList(std::vector<SelectableRect<T> > *list
 template<class T> static SelectableRect<T> *GetSelectedListElement(std::vector<SelectableRect<T> > &list);
 template<class T> static void PerformAction(SelectableRect<T> &picked, std::vector<SelectableRect<T> > *list);
 template<class T> static std::vector<T> RecreateListsFromSelectable(const std::vector<SelectableRect<T> > &list, std::vector<T> &out);
-template<class T> static bool IsActionValid(SelectableRect<T> &picked);
+template<class T> static bool IsActionValid(SelectableRect<T> &picked, SelectableRect<T> *other);
 template<class T> static void RecalcDisplayable(SelectableRect<T> &item);
 
 void Heroes::MeetingDialog(Heroes & heroes2)
@@ -101,8 +101,6 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y;
     display.Blit(backSprite, src_rt, dst_pt);
-    
-    Game::Interface::Get().DrawBorder(false, false);
 
     // header
     message = GetName() + " meets " + heroes2.GetName();
@@ -336,7 +334,7 @@ static void RedrawItem(const Sprite *sprite, const Rect &displayable, const Rect
 
     const int ox = displayable.x;
     const int oy = displayable.y;
-    Surface surf(selectable.w, selectable.h);
+    Surface surf(selectable.w, selectable.h + adjustHeight);
     const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     Point offset((display.w() - backSprite.w()) / 2, (display.h() - backSprite.h()) / 2);
     Rect back(selectable.x - offset.x, selectable.y - offset.y, selectable.w, selectable.h + adjustHeight);
@@ -481,11 +479,12 @@ static SelectableRect<T> *GetSelectedListElement(std::vector<SelectableRect<T> >
 
 /** Check whether an action about to be performed on the given SelectableRect should continue
  *  \param picked Chosen object
+  *  \param other  Previously selected object
  */
 template <>
-static bool IsActionValid<Army::Troop>(SelectableRect<Army::Troop> &picked)
+static bool IsActionValid<Army::Troop>(SelectableRect<Army::Troop> &picked, SelectableRect<Army::Troop> *other)
 {
-    if(!picked.object->isValid())
+    if(!other && !picked.object->isValid())
         return false;
     
     //TODO: Ensure there is still one stack left if troops are being transferred
@@ -494,9 +493,10 @@ static bool IsActionValid<Army::Troop>(SelectableRect<Army::Troop> &picked)
 
 /** Check whether an action about to be performed on the given SelectableRect should continue
  *  \param picked Chosen object
+ *  \param other  Previously selected object
  */
 template <>
-static bool IsActionValid<Artifact::artifact_t>(SelectableRect<Artifact::artifact_t> &picked)
+static bool IsActionValid<Artifact::artifact_t>(SelectableRect<Artifact::artifact_t> &picked, SelectableRect<Artifact::artifact_t> *other)
 {
     if(picked.object)
     {
@@ -521,13 +521,10 @@ static bool IsActionValid<Artifact::artifact_t>(SelectableRect<Artifact::artifac
 template<class T>
 static void PerformAction(SelectableRect<T> &picked, std::vector<SelectableRect<T> > *list)
 {
-    if(!IsActionValid<T>(picked))
-        return;
-
     for(int j = 0; j < 2; j++)
     {
         SelectableRect<T> *other = GetSelectedListElement(list[j]);
-        if(other && other != &picked) //Perform a swap
+        if(other && other != &picked && IsActionValid<T>(picked, other)) //Perform a swap
         {
             std::swap(picked.object, other->object);
             RecalcDisplayable(picked);
@@ -536,7 +533,7 @@ static void PerformAction(SelectableRect<T> &picked, std::vector<SelectableRect<
             return;
         }
     }
-    if(picked.object) //Can't toggle empty spaces
+    if(IsActionValid<T>(picked, NULL))
         picked.toggle();
 }
 
