@@ -830,7 +830,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(le.MouseCursor(selectCaptainArmy.GetArea()))
 	{
             const s8 index1 = selectCaptainArmy.GetIndexFromCoord(le.MouseCursor());
-            if(0 <= index)
+            if(0 <= index1)
             {
 		const Army::Troop & troop1 = army.At(index1);
 		const std::string & monster1 = Monster::String(troop1.Monster());
@@ -880,7 +880,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(castle_heroes && le.MouseCursor(selectHeroesArmy.GetArea()))
 	{
             const s8 index1 = selectHeroesArmy.GetIndexFromCoord(le.MouseCursor());
-            if(0 <= index)
+            if(0 <= index1)
             {
 		const Army::Troop & troop1 = castle_heroes->GetArmy().At(index1);
 		const std::string & monster1 = Monster::String(troop1.Monster());
