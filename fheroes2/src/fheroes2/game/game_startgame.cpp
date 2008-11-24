@@ -320,6 +320,7 @@ void Game::OpenHeroes(Heroes *hero)
 	}
     }
 
+    globalfocus.Redraw();
     cursor.Show();
     Display::Get().Flip();
     Mixer::Enhance();

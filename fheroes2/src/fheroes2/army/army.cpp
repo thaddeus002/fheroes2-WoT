@@ -22,6 +22,7 @@
 #include "agg.h"
 #include "settings.h"
 #include "battle_troop.h"
+#include "text.h"
 #include "army.h"
 
 const std::string & Army::String(Army::armysize_t size)
@@ -290,7 +291,12 @@ bool Army::army_t::JoinTroop(const Troop & troop)
     return false;
 }
 
-bool Army::army_t::HasMonster(const Monster::monster_t mon)
+bool Army::army_t::isValid(void) const
+{
+    return army.end() != std::find_if(army.begin(),army.end(), Army::isValidTroop);
+}
+
+bool Army::army_t::HasMonster(const Monster::monster_t mon) const
 {
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
@@ -439,4 +445,43 @@ const Army::Troop & Army::army_t::GetStrongestTroop(void) const
 const Army::Troop & Army::army_t::GetWeakestTroop(void) const
 {
     return *min_element(army.begin(), army.end(), WeakestTroop);
+}
+
+/* draw MONS32 sprite in line, first valid = 0, count = 0 */
+void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) const
+{
+    if(0 == count) count = GetCount();
+    else
+    if(ARMYMAXTROOPS < count) count = ARMYMAXTROOPS;
+
+    const u8 chunk = width / count;
+    cx += chunk / 2;
+
+    std::string str;
+    Text text("", Font::SMALL);
+
+    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+    {
+	const Army::Troop & troop = army[ii];
+
+    	if(troop.isValid())
+	{
+	    if(0 == first && count)
+    	    {
+		const Sprite & monster = AGG::GetICN(ICN::MONS32, troop.Monster());
+
+    		Display::Get().Blit(monster, cx - monster.w() / 2, cy + 30 - monster.h());
+
+    		str.clear();
+    		String::AddInt(str, troop.Count());
+		text.SetText(str);
+		text.Blit(cx - text.width() / 2, cy + 28);
+
+		cx += chunk;
+		--count;
+	    }
+	    else
+		--first;
+	}
+    }
 }

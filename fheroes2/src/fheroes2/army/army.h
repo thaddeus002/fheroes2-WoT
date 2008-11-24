@@ -110,6 +110,8 @@ namespace Army
 	    void	Import(const std::vector<BattleTroop> &);
 	    void	UpgradeMonsters(const Monster::monster_t);
 
+	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0) const;
+
 	    Troop&	At(u8);
 	    Troop &	GetSlowestTroop(void);
 	    Troop &	GetFastestTroop(void);
@@ -131,7 +133,8 @@ namespace Army
 	    s8		GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
 	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
 
-	    bool	HasMonster(const Monster::monster_t mon);
+	    bool	isValid(void) const;
+	    bool	HasMonster(const Monster::monster_t mon) const;
 	    bool	JoinTroop(const Troop & troop);
 	    bool	JoinTroop(const Monster::monster_t mon, const u16 count);
 

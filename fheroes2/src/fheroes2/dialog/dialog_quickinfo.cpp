@@ -279,36 +279,8 @@ void Dialog::QuickInfo(const Castle & castle)
 	Text(message, Font::SMALL, dst_pt);
     }
     else
-    {
-        // draw in one string
-        u8 current = 0;
-	const Army::army_t & army = castle.GetArmy();
+	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192);
 
-	for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
-        {
-    	    const Army::Troop & troop = army.At(ii);
-	    if(troop.isValid())
-	    {
-		const Sprite & monster = AGG::GetICN(ICN::MONS32, troop.Monster());
-
-                // align from count
-		dst_pt.x = (cur_rt.w / ARMYMAXTROOPS - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / ARMYMAXTROOPS) * (ARMYMAXTROOPS - count) / (2 * count));
-		dst_pt.y = cur_rt.y + 85;
-		// alignt from height sprite
-		dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
-                display.Blit(monster, dst_pt);
-
-		// count message
-                message.clear();
-		String::AddInt(message, troop.Count());
-		dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
-		dst_pt.y = cur_rt.y + 118;
-		Text(message, Font::SMALL, dst_pt);
-
-        	current++;
-            }
-	}
-    }
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     cursor.Show();
@@ -461,38 +433,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     dst_pt.x += 75;
     Text(message, Font::SMALL, dst_pt);
 
-    // get valid count army
-    u8 count = hero.GetArmy().GetCount();
-
     // draw monster sprite in one string
-    u8 current = 0;
-    const Army::army_t & army = hero.GetArmy();
+    hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160);
 
-    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
-    {
-	const Army::Troop & troop = army.At(ii);
-	if(troop.isValid())
-	{
-	    const Sprite & monster = AGG::GetICN(ICN::MONS32, troop.Monster());
-
-            // align from count
-	    dst_pt.x = (cur_rt.w / ARMYMAXTROOPS - monster.w()) / 2 + cur_rt.x + current * cur_rt.w / count + ((cur_rt.w / ARMYMAXTROOPS) * (ARMYMAXTROOPS - count) / (2 * count));
-	    dst_pt.y = cur_rt.y + 112;
-	    // alignt from height sprite
-	    dst_pt.y += (monster.h() > 32 ? -(monster.h() - 32) : 32 - monster.h());
-            display.Blit(monster, dst_pt);
-
-	    // count message
-            message.clear();
-	    String::AddInt(message, troop.Count());
-	    dst_pt.x += (monster.w() - Text::width(message, Font::SMALL)) / 2;
-	    dst_pt.y = cur_rt.y + 142;
-	    Text(message, Font::SMALL, dst_pt);
-
-    	    current++;
-        }
-    }
-    
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     cursor.Show();
