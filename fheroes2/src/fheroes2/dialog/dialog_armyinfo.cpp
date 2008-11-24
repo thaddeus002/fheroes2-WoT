@@ -41,7 +41,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & basicArmy, bool dismiss, b
     return ArmyInfo(basicArmy, (quickshow ? 0 : (dismiss ? Dialog::BUTTONS : Dialog::READONLY|Dialog::BUTTONS)), battle);
 }
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u8 flags, bool battle)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u8 flags, bool battle) // remove battle - possibile troops->army->Modes(Army::FIGHT)
 {
     const Army::BattleTroop & battroop(troops);
 
