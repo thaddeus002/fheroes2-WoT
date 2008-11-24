@@ -38,27 +38,6 @@
 #define ICONS_CURSOR_HEIGHT	32
 #define ICONS_CURSOR_COLOR	0x98
 
-void Game::SelectObjectBar::DrawCursor(Surface & sf)
-{
-    u32 color = AGG::GetColor(ICONS_CURSOR_COLOR);
-
-    sf.Lock();
-
-    for(u8 ii = 0; ii < ICONS_CURSOR_WIDTH; ++ii)
-    {
-        sf.SetPixel2(ii, 0, color);
-        sf.SetPixel2(ii, ICONS_CURSOR_HEIGHT - 1, color);
-    }
-
-    for(u8 ii = 0; ii < ICONS_CURSOR_HEIGHT; ++ii)
-    {
-        sf.SetPixel2(0, ii, color);
-        sf.SetPixel2(ICONS_CURSOR_WIDTH - 1, ii, color);
-    }
-
-    sf.Unlock();
-}
-
 Game::SelectObjectBar::SelectObjectBar(const s16 px, const s16 py) : pos_pt(px, py)
 {
     const u8 count_h = (Display::Get().h() - 480) / TILEWIDTH;
@@ -98,7 +77,7 @@ Game::SelectBarHeroes::SelectBarHeroes()
 {
     sf_cursor.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT);
     sf_cursor.SetColorKey();
-    DrawCursor(sf_cursor);
+    Cursor::DrawCursor(sf_cursor, ICONS_CURSOR_COLOR, true);
 
     sp_cursor.Save(pos_pt);
     sp_cursor.SetSprite(sf_cursor);
@@ -379,7 +358,7 @@ Game::SelectBarCastle::SelectBarCastle()
 {
     sf_cursor.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT);
     sf_cursor.SetColorKey();
-    DrawCursor(sf_cursor);
+    Cursor::DrawCursor(sf_cursor, ICONS_CURSOR_COLOR, true);
 
     sp_cursor.Save(pos_pt);
     sp_cursor.SetSprite(sf_cursor);

@@ -34,8 +34,6 @@ class SelectObjectBar
 public:
     SelectObjectBar(const s16 px, const s16 py);
 
-    static void 		DrawCursor(Surface & sf);
-
     void			Redraw(void) const;
 
     const std::vector<Rect> &	GetCoords(void) const;

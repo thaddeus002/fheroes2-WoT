@@ -133,7 +133,7 @@ public:
 	static Cursor &	Get(void);
 
 	static void	Redraw(u16 x, u16 y);
-	static void	DrawCursor(Surface &surface, const u8 indexcolor);
+	static void	DrawCursor(Surface &surface, const u8 indexcolor, bool solid = false);
 
 
 	themes_t	Themes(void);
