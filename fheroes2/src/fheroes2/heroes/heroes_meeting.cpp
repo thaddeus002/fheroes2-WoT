@@ -210,10 +210,10 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     //PrepareArmy(army, dst_pt, armyCoords[0]);
     //RedrawArmy(armyCoords[0]);
 
-    const Rect rt(36, 267, 44, 44);
+    const Rect rt(36, 267, 44, 54);
     Surface sfb(rt.w, rt.h);
     sfb.Blit(backSprite, rt, 0, 0);
-    Surface sfc(rt.w - 1, rt.h - 1);
+    Surface sfc(rt.w - 1, rt.h - 1 - 10);
     Cursor::DrawCursor(sfc, 0x10, true);
     
     SelectArmyBar selectArmy1;

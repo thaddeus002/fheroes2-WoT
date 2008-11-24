@@ -171,15 +171,25 @@ void SelectArmyBar::Redraw(Surface & display)
 	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.Monster());
 
             if(flags & FLAGS_USEMONS32)
-		display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 5);
+	    {
+	    	display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 13);
+    
+        	// draw count
+        	std::string str;
+        	String::AddInt(str, troop.Count());
+        	Text text(str, Font::SMALL);
+		text.Blit(pt.x + (background->w() - text.width()) / 2, pt.y + background->h() - 10);
+            }
             else
-		display.Blit(spmonh, pt.x + spmonh.x(), pt.y + spmonh.y());
-
-            // draw count
-            std::string str;
-            String::AddInt(str, troop.Count());
-            Text text(str, Font::SMALL);
-	    text.Blit(pt.x + background->w() - text.width() - 3, pt.y + background->h() - 13);
+	    {
+	    	display.Blit(spmonh, pt.x + spmonh.x(), pt.y + spmonh.y());
+    
+        	// draw count
+        	std::string str;
+        	String::AddInt(str, troop.Count());
+        	Text text(str, Font::SMALL);
+		text.Blit(pt.x + background->w() - text.width() - 3, pt.y + background->h() - 13);
+	    }
 	}
 	else
 	{
@@ -188,7 +198,7 @@ void SelectArmyBar::Redraw(Surface & display)
 	pt.x += background->w() + interval;
     }
 
-    if(0 <= selected) spritecursor.Show(pos.x + selected * (background->w() + interval) + offset.x, pos.y + offset.y);
+    if(0 <= selected) spritecursor.Show(pos.x + selected * (background->w() + interval) + offset.x, flags & FLAGS_USEMONS32 ? pos.y : pos.y + offset.y);
 }
 
 void SelectArmyBar::Reset(void)
@@ -203,7 +213,7 @@ void SelectArmyBar::Select(u8 index)
     {
 	selected = index;
 	spritecursor.Hide();
-	spritecursor.Show(pos.x + index * (background->w() + interval) + offset.x, pos.y + offset.y);
+	spritecursor.Show(pos.x + index * (background->w() + interval) + offset.x, flags & FLAGS_USEMONS32 ? pos.y : pos.y + offset.y);
     }
 }
 
