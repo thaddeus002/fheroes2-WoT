@@ -41,80 +41,74 @@ Point LocalEvent::mouse_rr(-1, -1);
 KeySym LocalEvent::key_value = KEY_NONE;
 void (* LocalEvent::redraw_cursor_func)(u16, u16) = NULL;
 
-struct KeyMap
-{
-    SDLKey sdl;
-    KeySym desdl;
-} mapping[] = {
-    { SDLK_UNKNOWN, KEY_NONE },
-    { SDLK_ESCAPE, KEY_ESCAPE },
-    { SDLK_RETURN, KEY_RETURN },
-    { SDLK_BACKSPACE, KEY_BACKSPACE },
-    { SDLK_LCTRL, KEY_CONTROL },
-    { SDLK_RCTRL, KEY_CONTROL },
-    { SDLK_LSHIFT, KEY_SHIFT },
-    { SDLK_RSHIFT, KEY_SHIFT },
-    { SDLK_BACKSLASH, KEY_BACKSLASH },
-    { SDLK_SPACE, KEY_SPACE },
-    { SDLK_F1, KEY_F1 },
-    { SDLK_F2, KEY_F2 },
-    { SDLK_F3, KEY_F3 },
-    { SDLK_F4, KEY_F4 },
-    { SDLK_F5, KEY_F5 },
-    { SDLK_F6, KEY_F6 },
-    { SDLK_F7, KEY_F7 },
-    { SDLK_F8, KEY_F8 },
-    { SDLK_F9, KEY_F9 },
-    { SDLK_F10, KEY_F10 },
-    { SDLK_F11, KEY_F11 },
-    { SDLK_F12, KEY_F12 },
-    { SDLK_PRINT, KEY_PRINT },
-    { SDLK_LEFT, KEY_LEFT },
-    { SDLK_RIGHT, KEY_RIGHT },
-    { SDLK_UP, KEY_UP },
-    { SDLK_DOWN, KEY_DOWN },
-    { SDLK_1, KEY_1 },
-    { SDLK_2, KEY_2 },
-    { SDLK_3, KEY_3 },
-    { SDLK_4, KEY_4 },
-    { SDLK_5, KEY_5 },
-    { SDLK_6, KEY_6 },
-    { SDLK_7, KEY_7 },
-    { SDLK_8, KEY_8 },
-    { SDLK_9, KEY_9 },
-    { SDLK_a, KEY_a },
-    { SDLK_b, KEY_b },
-    { SDLK_c, KEY_c },
-    { SDLK_d, KEY_d },
-    { SDLK_e, KEY_e },
-    { SDLK_f, KEY_f },
-    { SDLK_g, KEY_g },
-    { SDLK_h, KEY_h },
-    { SDLK_i, KEY_i },
-    { SDLK_j, KEY_j },
-    { SDLK_k, KEY_k },
-    { SDLK_l, KEY_l },
-    { SDLK_m, KEY_m },
-    { SDLK_n, KEY_n },
-    { SDLK_o, KEY_o },
-    { SDLK_p, KEY_p },
-    { SDLK_q, KEY_q },
-    { SDLK_r, KEY_r },
-    { SDLK_s, KEY_s },
-    { SDLK_t, KEY_t },
-    { SDLK_u, KEY_u },
-    { SDLK_v, KEY_v },
-    { SDLK_w, KEY_w },
-    { SDLK_x, KEY_x },
-    { SDLK_y, KEY_y },
-    { SDLK_z, KEY_z }
-};
-
 static KeySym SDLToKeySym(SDLKey &key)
 {
-    for(u16 i = 0; i < sizeof(mapping) / sizeof(mapping[0]); i++)
-        if(mapping[i].sdl == key)
-            return mapping[i].desdl;
+    switch(key)
+    {
+	default: break;
+	case SDLK_ESCAPE:	return KEY_ESCAPE;
+	case SDLK_RETURN:	return KEY_RETURN;
+	case SDLK_BACKSPACE:	return KEY_BACKSPACE;
+	case SDLK_LCTRL:	return KEY_CONTROL;
+	case SDLK_RCTRL:	return KEY_CONTROL;
+	case SDLK_LSHIFT:	return KEY_SHIFT;
+	case SDLK_RSHIFT:	return KEY_SHIFT;
+	case SDLK_BACKSLASH:	return KEY_BACKSLASH;
+	case SDLK_SPACE:	return KEY_SPACE;
+	case SDLK_F1:		return KEY_F1;
+	case SDLK_F2:		return KEY_F2;
+	case SDLK_F3:		return KEY_F3;
+	case SDLK_F4:		return KEY_F4;
+	case SDLK_F5:		return KEY_F5;
+	case SDLK_F6:		return KEY_F6;
+	case SDLK_F7:		return KEY_F7;
+	case SDLK_F8:		return KEY_F8;
+	case SDLK_F9:		return KEY_F9;
+	case SDLK_F10:		return KEY_F10;
+	case SDLK_F11:		return KEY_F11;
+	case SDLK_F12:		return KEY_F12;
+	case SDLK_PRINT:	return KEY_PRINT;
+	case SDLK_LEFT:		return KEY_LEFT;
+	case SDLK_RIGHT:	return KEY_RIGHT;
+	case SDLK_UP:		return KEY_UP;
+	case SDLK_DOWN:		return KEY_DOWN;
+	case SDLK_1:		return KEY_1;
+	case SDLK_2:		return KEY_2;
+	case SDLK_3:		return KEY_3;
+	case SDLK_4:		return KEY_4;
+	case SDLK_5:		return KEY_5;
+	case SDLK_6:		return KEY_6;
+	case SDLK_7:		return KEY_7;
+	case SDLK_8:		return KEY_8;
+	case SDLK_9:		return KEY_9;
+	case SDLK_a:		return KEY_a;
+	case SDLK_b:		return KEY_b;
+	case SDLK_c:		return KEY_c;
+	case SDLK_d:		return KEY_d;
+	case SDLK_e:		return KEY_e;
+	case SDLK_f:		return KEY_f;
+	case SDLK_g:		return KEY_g;
+	case SDLK_h:		return KEY_h;
+	case SDLK_i:		return KEY_i;
+	case SDLK_j:		return KEY_j;
+	case SDLK_k:		return KEY_k;
+	case SDLK_l:		return KEY_l;
+	case SDLK_m:		return KEY_m;
+	case SDLK_n:		return KEY_n;
+	case SDLK_o:		return KEY_o;
+	case SDLK_p:		return KEY_p;
+	case SDLK_q:		return KEY_q;
+	case SDLK_r:		return KEY_r;
+	case SDLK_s:		return KEY_s;
+	case SDLK_t:		return KEY_t;
+	case SDLK_u:		return KEY_u;
+	case SDLK_v:		return KEY_v;
+	case SDLK_w:		return KEY_w;
+	case SDLK_x:		return KEY_x;
+	case SDLK_y:		return KEY_y;
+	case SDLK_z:		return KEY_z;
+    }
+
     return KEY_NONE;
 }
 
