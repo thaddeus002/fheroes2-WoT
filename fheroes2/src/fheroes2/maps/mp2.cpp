@@ -364,8 +364,6 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_SAWMILL:			return "Sawmill";
         case MP2::OBJN_ORACLE:
         case MP2::OBJ_ORACLE:			return "Oracle";
-        case MP2::OBJN_SHIPWRECK:
-        case MP2::OBJ_SHIPWRECK:		return "Ship Wreck";
         case MP2::OBJN_DESERTTENT:
         case MP2::OBJ_DESERTTENT:		return "Desert Tent";
         case MP2::OBJN_CASTLE:
@@ -422,8 +420,10 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_CAVE:			return "Cave";
         case MP2::OBJN_MAGELLANMAPS:
         case MP2::OBJ_MAGELLANMAPS:		return "Magellan Maps";
+        case MP2::OBJN_SHIPWRECK:
+        case MP2::OBJ_SHIPWRECK:		return "Derelict Ship";
         case MP2::OBJN_DERELICTSHIP:
-        case MP2::OBJ_DERELICTSHIP:		return "Derelict Ship";
+        case MP2::OBJ_DERELICTSHIP:		return "Ship Wreck";
         case MP2::OBJN_OBSERVATIONTOWER:
         case MP2::OBJ_OBSERVATIONTOWER:		return "Observation Tower";
         case MP2::OBJN_FREEMANFOUNDRY:
