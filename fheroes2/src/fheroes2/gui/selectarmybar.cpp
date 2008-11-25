@@ -83,8 +83,15 @@ void SelectArmyBar::SetArmy(Army::army_t & a)
 
 void SelectArmyBar::SetPos(const Point & pt)
 {
-    pos = pt;
-    spritecursor.Save(pt);
+    SetPos(pt.x, pt.y);
+}
+
+void SelectArmyBar::SetPos(s16 cx, s16 cy)
+    
+{
+    pos.x = cx;
+    pos.y = cy;
+    spritecursor.Save(cx, cy);
 }
 
 void SelectArmyBar::SetBackgroundSprite(const Surface & sf)

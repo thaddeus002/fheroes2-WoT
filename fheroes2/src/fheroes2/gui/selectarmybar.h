@@ -45,6 +45,7 @@ public:
 
     void 	SetArmy(Army::army_t &);
     void 	SetPos(const Point &);
+    void 	SetPos(s16, s16);
     void 	SetBackgroundSprite(const Surface &);
     void	SetCursorSprite(const Surface &);
     void 	SetInterval(u8);

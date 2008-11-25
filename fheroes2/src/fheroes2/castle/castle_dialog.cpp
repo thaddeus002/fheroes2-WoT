@@ -533,13 +533,18 @@ Dialog::answer_t Castle::OpenDialog(void)
 
 		if(buyhero)
 		{
-/*
-		    const Surface & port = Portrait::Hero((*castle_heroes), Portrait::BIG);
-		    Surface sf(port.w(), port.h());
+		    const Rect rt(0, 98, 552, 107);
+		    Surface sf(rt.w, rt.h);
 		    sf.SetColorKey();
-		    sf.Blit(port);
+            	    sf.Blit(AGG::GetICN(ICN::STRIP, 0), rt, 0, 0);
+		    const Surface & port = Portrait::Hero((*castle_heroes), Portrait::BIG);
+		    sf.Blit(port, 6, 6);
+		    selectHeroesArmy.SetPos(112, 5);
+		    selectHeroesArmy.Redraw(sf);
+		    selectHeroesArmy.SetPos(cur_pt.x + 112, cur_pt.y + 361);
 
 		    AGG::PlaySound(M82::BUILDTWN);
+
 		    LocalEvent & le = LocalEvent::GetLocalEvent();
 		    u32 ticket = 0;
 		    u8 alpha = 0;
@@ -549,17 +554,14 @@ Dialog::answer_t Castle::OpenDialog(void)
     			if(!(ticket % ANIMATION_HIGH))
     			{
         		    sf.SetAlpha(alpha);
-        		    display.Blit(sf, cur_pt.x + 5, cur_pt.y + 361);
-			    selectHeroesTroops->Redraw(alpha);
+        		    display.Blit(sf, cur_pt.x, cur_pt.y + 356);
         		    display.Flip();
         		    alpha += 10;
     			}
-
     			++ticket;
 		    }
 
 		    RedrawResourcePanel();
-*/
 		}
 
                 display.Blit(AGG::GetICN(ICN::STRIP, 0), cur_pt.x, cur_pt.y + 256);
