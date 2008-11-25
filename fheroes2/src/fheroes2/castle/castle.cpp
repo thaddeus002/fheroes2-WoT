@@ -254,7 +254,7 @@ void Castle::LoadFromMP2(const void *ptr)
     {
 	case Race::BARB: building &= ~(DWELLING_UPGRADE3 | DWELLING_UPGRADE6); break;
         case Race::SORC: building &= ~(DWELLING_UPGRADE5 | DWELLING_UPGRADE6); break;
-	case Race::WRLK: building &= ~(DWELLING_UPGRADE2 | DWELLING_UPGRADE3); break;
+	case Race::WRLK: building &= ~(DWELLING_UPGRADE2 | DWELLING_UPGRADE3 | DWELLING_UPGRADE5); break;
 	case Race::WZRD: building &= ~(DWELLING_UPGRADE2 | DWELLING_UPGRADE4); break;
         case Race::NECR: building &= ~(DWELLING_UPGRADE6); break;
         default: break;
