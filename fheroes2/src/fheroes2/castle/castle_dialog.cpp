@@ -573,7 +573,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
 	else
 	// buy castle
-	if(le.MouseClickLeft(coordBuildingTent))
+	if(!(building & BUILD_CASTLE) && le.MouseClickLeft(coordBuildingTent))
 	{
 	    if(!Modes(ALLOWCASTLE))
 	    {
@@ -738,7 +738,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), GetDescriptionBuilding(BUILD_CASTLE), Font::BIG);
 	else
-	if(le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
+	if(!(building & BUILD_CASTLE) && le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
 	else
 	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG);
 	else
@@ -798,7 +798,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & BUILD_CASTLE && le.MouseCursor(coordBuildingCastle)) statusBar.ShowMessage(GetStringBuilding(BUILD_CASTLE));
 	else
-	if(le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_TENT));
+	if(!(building & BUILD_CASTLE) && le.MouseCursor(coordBuildingTent)) statusBar.ShowMessage(GetStringBuilding(BUILD_TENT));
 	else
 	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
 	else
