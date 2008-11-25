@@ -1825,12 +1825,12 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
 
-	    sf = new Surface(sprite.w(), sprite.h() + 12);
+	    sf = new Surface(sprite.w(), sprite.h() + 14);
 	    sf->SetColorKey();
 	    sf->Blit(sprite);
 	    body = "1 / day";
     	    Text text(body, Font::SMALL);
-    	    text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+    	    text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
 
 	    res = Resource::MERCURY;
 	    header = MP2::StringObject(obj);
@@ -1846,12 +1846,12 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
             {
 		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
 
-		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
 		body = "2 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf); // Here is pink fringing, becose letter sprite use shadow. Wiil fix later...
 
         	res = Resource::ORE;
         	header = "Ore Mine";
@@ -1863,12 +1863,12 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
             {
 		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
 
-		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
 		body = "1 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::SULFUR;
         	header = "Sulfur Mine";
@@ -1880,12 +1880,12 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
             {
 		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
 
-		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
 		body = "1 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::CRYSTAL;
         	header = "Crystal Mine";
@@ -1897,12 +1897,12 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
             {
 		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
 
-		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
 		body = "1 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::GEMS;
         	header = "Gems Mine";
@@ -1914,12 +1914,12 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
             {
 		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
 
-		sf = new Surface(sprite.w(), sprite.h() + 12);
+		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
 		body = "1000 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::GOLD;
         	header = "Gold Mine";

@@ -267,7 +267,7 @@ void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArm
     {
         width -= 10;
         Surface surf(width, height + 15);
-        surf.SetDisplayFormat();
+        //surf.SetDisplayFormat();	fix pink fringing
         surf.SetColorKey();
         int x = 0;
         for(u16 i = 0; i < killed.size(); i++)
@@ -277,7 +277,7 @@ void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArm
             std::string amount;
             String::AddInt(amount, killed[i].second);
             Text number(amount, Font::SMALL);
-            number.Blit(Point(x + (sprite.w() - number.width()) / 2, surf.h() - 15), surf);
+            number.Blit(Point(x + (sprite.w() - number.width()) / 2, surf.h() - 15), surf);	// Here is pink fringing, becose letter sprite use shadow, need draw to dislpay or use Army::DrawMons32Line
             x += sprite.w() + 10;
         }
         display.Blit(surf, draw.x + (draw.w - surf.w()) / 2, draw.y);

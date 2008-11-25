@@ -553,14 +553,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    {
     			if(!(ticket % ANIMATION_HIGH))
     			{
+    			    cursor.Hide();
         		    sf.SetAlpha(alpha);
         		    display.Blit(sf, cur_pt.x, cur_pt.y + 356);
+    			    cursor.Show();
         		    display.Flip();
         		    alpha += 10;
     			}
     			++ticket;
 		    }
 
+		    cursor.Hide();
 		    RedrawResourcePanel();
 		}
 
