@@ -424,7 +424,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
     // level up
     u8 level = GetLevel();
-    while(1 < level--) LevelUp();
+    while(1 < level--) LevelUp(true);	// start game: auto select skill
 
     // other param
     magic_point = GetMaxSpellPoints();
@@ -1433,7 +1433,7 @@ void Heroes::FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & se
 }
 
 /* up level */
-void Heroes::LevelUp(void)
+void Heroes::LevelUp(bool autoselect)
 {
     const Skill::Primary::skill_t primary1 = Skill::Primary::FromLevelUp(race, GetLevel());
 
@@ -1457,7 +1457,7 @@ void Heroes::LevelUp(void)
 
     if(Skill::Secondary::UNKNOWN == sec1.Skill() && Skill::Secondary::UNKNOWN == sec2.Skill())
     {
-	if(GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == H2Config::MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level.";
@@ -1468,7 +1468,7 @@ void Heroes::LevelUp(void)
     else
     if(Skill::Secondary::UNKNOWN == sec1.Skill())
     {
-	if(GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == H2Config::MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
@@ -1495,7 +1495,7 @@ void Heroes::LevelUp(void)
     else
     if(Skill::Secondary::UNKNOWN == sec2.Skill())
     {
-	if(GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == H2Config::MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
@@ -1523,7 +1523,7 @@ void Heroes::LevelUp(void)
     {
 	Skill::Secondary::skill_t skill_select(Skill::Secondary::UNKNOWN);
 
-	if(GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == H2Config::MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";

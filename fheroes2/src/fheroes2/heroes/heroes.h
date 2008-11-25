@@ -222,7 +222,7 @@ public:
 
     u32 GetExperience(void) const;
     void IncreaseExperience(const u32 exp);
-    void LevelUp(void);
+    void LevelUp(bool autoselect = false);
 
     void PostBattle(void);
     void Dump(void) const;
