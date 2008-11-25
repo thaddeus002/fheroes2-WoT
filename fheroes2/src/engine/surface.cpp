@@ -448,17 +448,17 @@ const void *Surface::pixels(void) const
 
 void Surface::SetColorKey(u8 r, u8 g, u8 b)
 {
-    SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, MapRGB(r, g, b));
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY, MapRGB(r, g, b));
 }
 
 void Surface::SetColorKey(u32 color)
 {
-    SDL_SetColorKey(surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, color);
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY, color);
 }
 
 void Surface::SetAlpha(u8 level)
 {
-    SDL_SetAlpha(surface, SDL_SRCALPHA|SDL_RLEACCEL, level);
+    SDL_SetAlpha(surface, SDL_SRCALPHA, level);
 }
 
 void Surface::Lock(void)
