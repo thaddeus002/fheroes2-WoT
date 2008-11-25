@@ -231,7 +231,6 @@ void Game::OpenCastle(Castle *castle)
 	    cursor.Show();
 	    display.Flip();
 
-	    display.Fade();
 	    result = (*it)->OpenDialog();
 
 	    if(Dialog::PREV == result)
@@ -283,7 +282,6 @@ void Game::OpenHeroes(Heroes *hero)
 	    cursor.Show();
 	    display.Flip();
 
-	    display.Fade();
 	    result = (*it)->OpenDialog();
 
 	    switch(result)

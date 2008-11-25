@@ -384,7 +384,6 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 	        Display::Get().Flip();
 	        cursor.Hide();
-	        Display::Get().Fade();
 
                 result = (*it)->OpenDialog();
 
@@ -937,7 +936,6 @@ Dialog::answer_t Castle::OpenDialog(void)
 	}
     }
 
-    Display::Get().Fade();
     return result;
 }
 

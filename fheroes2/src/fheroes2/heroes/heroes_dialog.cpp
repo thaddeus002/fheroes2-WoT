@@ -603,10 +603,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	}
 
         // exit
-	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) {
-	    Display::Get().Fade();
-	    return Dialog::CANCEL;
-	}
+	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return Dialog::CANCEL;
 
         // heroes troops
         if(le.MouseCursor(selectArmy.GetArea()))

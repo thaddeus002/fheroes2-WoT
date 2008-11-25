@@ -336,7 +336,7 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
     const int baseAnimY = backgroundY + 36;
    
     cursor.SetThemes(cursor.WAR_POINTER); 
-    display.Fade(100, false);
+    display.Fade(100);
     display.Flip();
     cursor.Hide();
     display.Blit(shadow, backgroundX - 17, backgroundY + 10);

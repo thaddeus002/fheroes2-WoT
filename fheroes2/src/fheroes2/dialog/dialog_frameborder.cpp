@@ -19,8 +19,8 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "cursor.h"
 #include "settings.h"
+#include "cursor.h"
 #include "dialog.h"
 
 #define FRAMEBORDER_WIDTH	(640 + SHADOWWIDTH + 2 * BORDERWIDTH)
@@ -43,14 +43,10 @@ Dialog::FrameBorder::FrameBorder()
     area.w = 640;
     area.h = 480;
 
-    // cursor
-    bool localcursor = false;
-    Cursor & cursor = Cursor::Get();
-    if(pos & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
-
+    if(Cursor::Get().isVisible()){ Cursor::Get().Hide(); };
     back.Save(pos);
 
-    if(640 != display.w())
+    if(640 != display.w() || 480 != display.h())
     {
 	Rect  src_rt;
 	Point dst_pt;
@@ -139,18 +135,14 @@ Dialog::FrameBorder::FrameBorder()
 	dst_pt = Point(pos.x + pos.w - BORDERWIDTH, pos.y + pos.h - BORDERWIDTH * 3 - SHADOWWIDTH);
 	display.Blit(surdbkg, src_rt, dst_pt);
     }
+    else
+        Display::Fade();
 }
 
 Dialog::FrameBorder::~FrameBorder()
 {
-    bool localcursor = false;
-    Cursor & cursor = Cursor::Get();
-    if(cursor.isVisible() &&
-	(back.GetRect() & cursor.GetRect() ||
-        area & cursor.GetRect())){ cursor.Hide(); localcursor = true; }
-
+    if(Cursor::Get().isVisible()){ Cursor::Get().Hide(); };
+    Display::Fade();
     back.Restore();
-    
-    if(localcursor) cursor.Show();
-    Display::Get().Flip();
+    Display::Flip();
 }

@@ -42,13 +42,12 @@ public:
     static void		Flip();
     static void		FullScreen(void);
     
-    static void		Fade(int fadeTo=0, bool restore=true);
-    static void		Rise(int riseTo=255);
+    static bool		Fade(u8 fadeTo=0);
+    static bool		Rise(u8 riseTo=255);
 
     Display &		operator= (const Display & dp);
 
 private:
-    static int faded;
     Display();
 };
 

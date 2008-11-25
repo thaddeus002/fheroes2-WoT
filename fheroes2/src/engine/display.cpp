@@ -25,9 +25,6 @@
 #include "error.h"
 #include "display.h"
 
-bool needrise = false;
-int Display::faded = 255;
-
 Display::Display()
 {
     videosurface = true;
@@ -70,10 +67,7 @@ void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
 /* flip */
 void Display::Flip()
 {
-    Display & display = Display::Get();
-
-    if(needrise && faded == 0) display.Rise();
-    else SDL_Flip(display.surface);
+    SDL_Flip(Display::Get().surface);
 }
 
 /* full screen */
@@ -108,56 +102,60 @@ void Display::ShowCursor(void)
     SDL_ShowCursor(SDL_ENABLE);
 }
 
-void Display::Fade(int fadeTo, bool restore)
+bool Display::Fade(u8 fadeTo)
 {
     Display & display = Display::Get();
-    if(faded < fadeTo || display.w() != 640 || display.h() != 480) return;
+    u8 alpha = display.surface->format->alpha;
+
+    if(alpha == fadeTo) return false;
+    else
+    if(alpha < fadeTo) return Rise(fadeTo);
+    if(display.w() != 640 || display.h() != 480) return false;
+
     Surface temp(display);
     temp.SetDisplayFormat();
     temp.Blit(display);
     const u32 black = temp.MapRGB(0, 0, 0);
-    u8 ii = std::max(faded, 255);
-    while(ii > fadeTo)
+
+    while(alpha > fadeTo)
     {
+	alpha -= alpha - 10 > fadeTo ? 10 : alpha - fadeTo;
 	display.Fill(black);
-	temp.SetAlpha(ii);
+	temp.SetAlpha(alpha);
 	display.Blit(temp);
         display.Flip();
-	ii -= ii - 10 > fadeTo ? 10 : ii - fadeTo;
 	DELAY(10);
     }
-    faded = ii;
-    if(restore)
-    {
-        temp.SetAlpha(255 - fadeTo);
-        display.Blit(temp);
-    }
-    needrise = true;
+
+    return true;
 }
 
-void Display::Rise(int riseTo)
+bool Display::Rise(u8 riseTo)
 {
     Display & display = Display::Get();
-    if(riseTo < faded) return;
-    needrise = false;
+    u8 alpha = display.surface->format->alpha;
+
+    if(alpha == riseTo) return false;
+    else
+    if(riseTo < alpha) return Fade(riseTo);
+    if(display.w() != 640 || display.h() != 480) return false;
+
     Surface temp(display);
     temp.SetDisplayFormat();
     temp.Blit(display);
     const u32 black = temp.MapRGB(0, 0, 0);
-    u8 ii = std::max(faded, 0);
-    while(ii < riseTo)
+
+    while(alpha < riseTo)
     {
+	alpha += alpha + 10 < riseTo ? 10 : riseTo - alpha;
 	display.Fill(black);
-	temp.SetAlpha(ii);
+	temp.SetAlpha(alpha);
 	display.Blit(temp);
         display.Flip();
-	ii += ii + 10 < riseTo ? 10 : riseTo - ii;
 	DELAY(10);
     }
-    faded = ii;
-    temp.SetAlpha(255 - riseTo);
-    display.Blit(temp);
-    display.Flip();
+
+    return true;
 }
 
 /* get video display */
