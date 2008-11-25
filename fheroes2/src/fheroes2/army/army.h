@@ -133,6 +133,7 @@ namespace Army
 	    u16		GetCountMonsters(const Monster::monster_t) const;
 	    s8		GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
 	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+	    u32		CalculateExperience(void) const;
 
 	    bool	isValid(void) const;
 	    bool	HasMonster(const Monster::monster_t mon) const;

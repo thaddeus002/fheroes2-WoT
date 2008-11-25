@@ -406,7 +406,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 
     if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
 
-    const u32 exp = Algorithm::CalculateExperience(army);
+    const u32 exp = army.CalculateExperience();
     const Army::battle_t b = Army::Battle(hero, army, tile);
 
     switch(b)
@@ -461,7 +461,7 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
     {
 	if(H2Config::Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
-	const u32 exp = Algorithm::CalculateExperience(*other_hero);
+	const u32 exp = other_hero->GetArmy().CalculateExperience();
 
 	switch(b)
 	{
@@ -505,7 +505,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
     {
 	if(H2Config::Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
-	const u32 exp = Algorithm::CalculateExperience(*castle);
+	const u32 exp = castle->GetArmy().CalculateExperience();
 
 	switch(b)
 	{
@@ -959,7 +959,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 		    army.At(4).Set(Monster::ROYAL_MUMMY, 10);
 
 		    // battle
-		    const u32 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1136,7 +1136,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    Army::ArrangeTroopsForBattle(army, Monster::MUTANT_ZOMBIE, 100);
 
 		    // battle
-		    const u32 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1202,7 +1202,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
                     ArrangeTroopsForBattle(army, Monster::GHOST, c * ARMYMAXTROOPS);
 
 		    // battle
-		    const u32 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1246,7 +1246,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		    ArrangeTroopsForBattle(army, Monster::SKELETON, 200);
 
 		    // battle
-		    const u32 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -1533,7 +1533,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		    if(battle)
 		    {
 			//Display::Fade(); need move to start battle code
-			const u32 exp = Algorithm::CalculateExperience(army);
+			const u32 exp = army.CalculateExperience();
 			const Army::battle_t b = Army::Battle(hero, army, tile);
 			switch(b)
 			{
@@ -1778,7 +1778,7 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 	Army::army_t army;
 	ArrangeTroopsForBattle(army, Monster::GHOST, tile.GetQuantity1() * ARMYMAXTROOPS);
 
-	const u32 exp = Algorithm::CalculateExperience(army);
+	const u32 exp = army.CalculateExperience();
 	const Army::battle_t b = Army::Battle(hero, army, tile);
 
 	switch(b)
@@ -2121,7 +2121,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You've found the ruins of an ancient city, now inhabited solely by the undead.", "Will you search?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u32 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -2173,7 +2173,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("Trolls living under the bridge challenge you.", "Will you fight them?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u32 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {
@@ -2223,7 +2223,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You stand before the Dragon City, a place off-limits to mere humans.", "Do you wish to violate this rule and challenge the Dragons to a fight?", Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u32 exp = Algorithm::CalculateExperience(army);
+		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
 		    switch(b)
 		    {

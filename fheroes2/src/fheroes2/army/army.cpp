@@ -502,3 +502,16 @@ void Army::ArrangeTroopsForBattle(army_t & army, Monster::monster_t monster, u16
 	army.At(0).Set(monster, count);
     }
 }
+
+u32 Army::army_t::CalculateExperience(void) const
+{
+    u32 res = 0;
+
+    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+	res += army[ii].Count() * Monster::GetStats(army[ii].Monster()).hp;
+
+    if(commander) res += 500;
+
+    return res;
+
+}

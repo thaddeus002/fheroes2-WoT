@@ -18,24 +18,5 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "heroes.h"
-#include "castle.h"
 #include "algorithm.h"
 
-u32 Algorithm::CalculateExperience(const Army::army_t & army)
-{
-    u32 res = 0;
-    for(u8 ii = 0; ii < army.Size(); ++ii) res += army.At(ii).Count() * Monster::GetStats(army.At(ii).Monster()).hp;
-
-    return res;
-}
-
-u32 Algorithm::CalculateExperience(const Heroes & hero)
-{
-    return 500 + CalculateExperience(hero.GetArmy());
-}
-
-u32 Algorithm::CalculateExperience(const Castle & castle)
-{
-    return 500 + CalculateExperience(castle.GetArmy());
-}

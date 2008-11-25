@@ -22,17 +22,13 @@
 
 #include <list>
 #include "gamedefs.h"
+#include "skill.h"
+#include "mp2.h"
 
-class Heroes;
-class Castle;
 namespace Route { class Step; };
 
 namespace Algorithm
 {
-    u32 CalculateExperience(const Army::army_t & army);
-    u32 CalculateExperience(const Heroes & hero);
-    u32 CalculateExperience(const Castle &castle);
-
     bool PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit = MAXU16, const Skill::Level::type_t pathfinding = Skill::Level::NONE, const u8 under = MP2::OBJ_ZERO);
 };
 

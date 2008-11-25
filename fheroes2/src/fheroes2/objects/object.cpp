@@ -115,6 +115,12 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 {
     switch(general)
     {
+	case MP2::OBJ_SHIPWRECK:
+	    return (direct & (Direction::LEFT | Direction::BOTTOM_LEFT));
+
+	case MP2::OBJ_DERELICTSHIP:
+	    return (direct & (Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM));
+
 	case MP2::OBJ_ARCHERHOUSE:
 	case MP2::OBJ_DOCTORHUT:
 	case MP2::OBJ_DWARFCOTT:
@@ -152,6 +158,7 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_ALCHEMYTOWER:
         case MP2::OBJ_HUTMAGI:
         case MP2::OBJ_EYEMAGI:
+
 	    return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_TRADINGPOST:
@@ -183,7 +190,6 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_ALCHEMYLAB:
 	case MP2::OBJ_CAVE:
 	case MP2::OBJ_CITYDEAD:
-	case MP2::OBJ_DERELICTSHIP:
 	case MP2::OBJ_GRAVEYARD:
 	case MP2::OBJ_DRAGONCITY:
 	case MP2::OBJ_XANADU:
@@ -201,9 +207,6 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 
 	case MP2::OBJ_CASTLE:
 	    return (direct & Direction::BOTTOM);
-
-	case MP2::OBJ_SHIPWRECK:
-	    return (direct & Direction::LEFT);
 
 	default: break;
     }
