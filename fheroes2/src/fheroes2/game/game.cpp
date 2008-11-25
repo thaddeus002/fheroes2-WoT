@@ -121,8 +121,8 @@ void Game::EnvironmentSoundMixer(bool forced)
 		    switch(object)
 		    {
 			case MP2::OBJ_BUOY:		channel = 0; break;
-			case MP2::OBJ_DERELICTSHIP:
-			case MP2::OBJ_SHIPWRECK:	channel = 1; break;
+			case MP2::OBJ_SHIPWRECK:
+			case MP2::OBJ_DERELICTSHIP:	channel = 1; break;
 			case MP2::OBJ_COAST:		channel = 2; break;
 			case MP2::OBJ_ORACLE:		channel = 3; break;
 			case MP2::OBJ_STONELIGHTS:	channel = 4; break;

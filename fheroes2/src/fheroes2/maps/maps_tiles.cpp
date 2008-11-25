@@ -626,7 +626,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_SAWMILL:		return MP2::OBJN_SAWMILL;
 	case MP2::OBJN_ORACLE:		return MP2::OBJN_ORACLE;
 
-	case MP2::OBJN_DERELICTSHIP:	return MP2::OBJN_DERELICTSHIP;
+	case MP2::OBJN_SHIPWRECK:	return MP2::OBJN_SHIPWRECK;
 	case MP2::OBJN_DESERTTENT:	return MP2::OBJN_DESERTTENT;
 	case MP2::OBJN_CASTLE:		return MP2::OBJN_CASTLE;
         case MP2::OBJN_STONELIGHTS:	return MP2::OBJN_STONELIGHTS;
@@ -662,7 +662,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJN_XANADU:		return MP2::OBJN_XANADU;
 	case MP2::OBJN_CAVE:		return MP2::OBJN_CAVE;
 	case MP2::OBJN_MAGELLANMAPS:	return MP2::OBJN_MAGELLANMAPS;
-	case MP2::OBJN_SHIPWRECK:	return MP2::OBJN_SHIPWRECK;
+	case MP2::OBJN_DERELICTSHIP:	return MP2::OBJN_DERELICTSHIP;
 	case MP2::OBJN_MAGICWELL:	return MP2::OBJN_MAGICWELL;
 
 	case MP2::OBJN_OBSERVATIONTOWER:return MP2::OBJN_OBSERVATIONTOWER;
@@ -714,7 +714,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_ORACLE:		return MP2::OBJ_ORACLE;
 	case MP2::OBJ_SHRINE1:		return MP2::OBJ_SHRINE1;
 
-	case MP2::OBJ_DERELICTSHIP:	return MP2::OBJ_DERELICTSHIP;
+	case MP2::OBJ_SHIPWRECK:	return MP2::OBJ_SHIPWRECK;
 	case MP2::OBJ_DESERTTENT:	return MP2::OBJ_DESERTTENT;
 	case MP2::OBJ_CASTLE:		return MP2::OBJ_CASTLE;
 	case MP2::OBJ_STONELIGHTS:	return MP2::OBJ_STONELIGHTS;
@@ -771,7 +771,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_LEANTO:		return MP2::OBJ_LEANTO;
 	case MP2::OBJ_MAGELLANMAPS:	return MP2::OBJ_MAGELLANMAPS;
 	case MP2::OBJ_FLOTSAM:		return MP2::OBJ_FLOTSAM;
-	case MP2::OBJ_SHIPWRECK:	return MP2::OBJ_SHIPWRECK;
+	case MP2::OBJ_DERELICTSHIP:	return MP2::OBJ_DERELICTSHIP;
 	case MP2::OBJ_SHIPWRECKSURVIROR:return MP2::OBJ_SHIPWRECKSURVIROR;
 	case MP2::OBJ_BOTTLE:		return MP2::OBJ_BOTTLE;
 	case MP2::OBJ_MAGICWELL:	return MP2::OBJ_MAGICWELL;
@@ -1605,13 +1605,13 @@ void Maps::Tiles::UpdateQuantity(void)
 	    }
 	break;
 
-	case MP2::OBJ_SHIPWRECK:
+	case MP2::OBJ_DERELICTSHIP:
 	    // variant: 10ghost(1000g), 15 ghost(2000g), 25ghost(5000g) or 50ghost(2000g+art)
 	    quantity2 = Rand::Get(1, 4);
 	    quantity1 = 4 == quantity2 ? Artifact::Rand() : 0;
 	break;
 
-	case MP2::OBJ_DERELICTSHIP:
+	case MP2::OBJ_SHIPWRECK:
 	    // 5000 gold
 	    quantity2 = 50;
 	break;

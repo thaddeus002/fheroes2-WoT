@@ -420,10 +420,10 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_CAVE:			return "Cave";
         case MP2::OBJN_MAGELLANMAPS:
         case MP2::OBJ_MAGELLANMAPS:		return "Magellan Maps";
-        case MP2::OBJN_SHIPWRECK:
-        case MP2::OBJ_SHIPWRECK:		return "Derelict Ship";
         case MP2::OBJN_DERELICTSHIP:
-        case MP2::OBJ_DERELICTSHIP:		return "Ship Wreck";
+        case MP2::OBJ_DERELICTSHIP:		return "Derelict Ship";
+        case MP2::OBJN_SHIPWRECK:
+        case MP2::OBJ_SHIPWRECK:		return "Ship Wreck";
         case MP2::OBJN_OBSERVATIONTOWER:
         case MP2::OBJ_OBSERVATIONTOWER:		return "Observation Tower";
         case MP2::OBJN_FREEMANFOUNDRY:
@@ -613,7 +613,7 @@ bool MP2::isActionObject(const object_t obj, const bool water)
 	switch(obj)
 	{
     	    case OBJ_TREASURECHEST:
-	    case OBJ_SHIPWRECK:
+	    case OBJ_DERELICTSHIP:
 	    case OBJ_WHIRLPOOL:
 	    case OBJ_BUOY:
 	    case OBJ_BOTTLE:
@@ -660,7 +660,7 @@ bool MP2::isActionObject(const object_t obj, const bool water)
 	    case OBJ_RESOURCE:
 	    case OBJ_SAWMILL:
 	    case OBJ_ORACLE:
-	    case OBJ_DERELICTSHIP:
+	    case OBJ_SHIPWRECK:
 	    case OBJ_DESERTTENT:
 	    case OBJ_STONELIGHTS:
 	    case OBJ_WAGONCAMP:
@@ -789,8 +789,8 @@ bool MP2::isBattleLife(const MP2::object_t obj)
 	case OBJ_TEMPLE:
 	case OBJ_WATERINGHOLE:
 	case OBJ_GRAVEYARD:
-        case OBJ_SHIPWRECK:
         case OBJ_DERELICTSHIP:
+        case OBJ_SHIPWRECK:
 
 	case OBJ_MERMAID:
 

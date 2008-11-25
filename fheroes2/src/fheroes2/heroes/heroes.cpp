@@ -844,15 +844,15 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 	--result;
 	if(list) list->push_back(MP2::StringObject(MP2::OBJ_GRAVEYARD) + m1);
     }
-    if(isVisited(MP2::OBJ_SHIPWRECK))
-    {
-	--result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_SHIPWRECK) + m1);
-    }
     if(isVisited(MP2::OBJ_DERELICTSHIP))
     {
 	--result;
 	if(list) list->push_back(MP2::StringObject(MP2::OBJ_DERELICTSHIP) + m1);
+    }
+    if(isVisited(MP2::OBJ_SHIPWRECK))
+    {
+	--result;
+	if(list) list->push_back(MP2::StringObject(MP2::OBJ_SHIPWRECK) + m1);
     }
 
     const Castle* castle = inCastle();

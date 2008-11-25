@@ -314,9 +314,9 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_WATERINGHOLE:
         case MP2::OBJ_BUOY:		ActionToGoodMoraleObject(*this, dst_index); break;
 
-	case MP2::OBJ_DERELICTSHIP:
+	case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
-	case MP2::OBJ_SHIPWRECK:	ActionToPoorMoraleObject(*this, dst_index); break;
+	case MP2::OBJ_DERELICTSHIP:	ActionToPoorMoraleObject(*this, dst_index); break;
 
         // experience modification
         case MP2::OBJ_GAZEBO:		ActionToExperienceObject(*this, dst_index); break;
@@ -1168,7 +1168,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		body = "Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.";
     	    break;
 
-        case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_DERELICTSHIP:
     	    if(battle)
     	    {
     		PlaySoundWarning;
@@ -1236,7 +1236,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		body = "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
     	    break;
 
-        case MP2::OBJ_DERELICTSHIP:
+        case MP2::OBJ_SHIPWRECK:
     	    if(battle)
     	    {
     		PlaySoundWarning;

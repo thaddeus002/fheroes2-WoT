@@ -937,8 +937,8 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_FLOTSAM:
             case MP2::OBJ_SHIPWRECKSURVIROR:
             case MP2::OBJ_TREASURECHEST:
-            case MP2::OBJ_SHIPWRECK:
             case MP2::OBJ_DERELICTSHIP:
+            case MP2::OBJ_SHIPWRECK:
             case MP2::OBJ_GRAVEYARD:
             case MP2::OBJ_PYRAMID:
             case MP2::OBJ_DAEMONCAVE:
