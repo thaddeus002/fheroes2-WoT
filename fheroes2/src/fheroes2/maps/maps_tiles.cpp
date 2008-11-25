@@ -1606,14 +1606,14 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_DERELICTSHIP:
-	    // variant: 10ghost(1000g), 15 ghost(2000g), 25ghost(5000g) or 50ghost(2000g+art)
-	    quantity2 = Rand::Get(1, 4);
-	    quantity1 = 4 == quantity2 ? Artifact::Rand() : 0;
+	    // 5000 gold
+	    quantity2 = 50;
 	break;
 
 	case MP2::OBJ_SHIPWRECK:
-	    // 5000 gold
-	    quantity2 = 50;
+	    // variant: 10ghost(1000g), 15 ghost(2000g), 25ghost(5000g) or 50ghost(2000g+art)
+	    quantity2 = Rand::Get(1, 4);
+	    quantity1 = 4 == quantity2 ? Artifact::Rand() : 0;
 	break;
 
 	case MP2::OBJ_GRAVEYARD:

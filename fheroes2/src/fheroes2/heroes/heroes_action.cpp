@@ -1168,7 +1168,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		body = "Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.";
     	    break;
 
-        case MP2::OBJ_DERELICTSHIP:
+        case MP2::OBJ_SHIPWRECK:
     	    if(battle)
     	    {
     		PlaySoundWarning;
@@ -1236,14 +1236,14 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		body = "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
     	    break;
 
-        case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_DERELICTSHIP:
     	    if(battle)
     	    {
     		PlaySoundWarning;
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
-		    ArrangeTroopsForBattle(army, Monster::SKELETON, 100);
+		    ArrangeTroopsForBattle(army, Monster::SKELETON, 200);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
