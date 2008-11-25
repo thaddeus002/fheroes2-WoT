@@ -485,3 +485,20 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) 
 	}
     }
 }
+
+void Army::ArrangeTroopsForBattle(army_t & army, Monster::monster_t monster, u16 count)
+{
+    if(count > ARMYMAXTROOPS)
+    {
+	const s16 c = count / ARMYMAXTROOPS;
+	army.At(0).Set(monster, c);
+	army.At(1).Set(monster, c);
+	army.At(2).Set(monster, c + count - (c * ARMYMAXTROOPS));
+	army.At(3).Set(monster, c);
+	army.At(4).Set(monster, c);
+    }
+    else
+    {
+	army.At(0).Set(monster, count);
+    }
+}

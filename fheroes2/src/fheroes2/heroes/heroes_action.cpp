@@ -402,23 +402,9 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = Monster::GetSize(tile);
     Army::army_t army;
-    if(count > 5)
-    {
-	const s16 c = count / 5;
-	army.At(0).Set(monster, c);
-	army.At(1).Set(monster, c);
-	army.At(2).Set(monster, c + count - (c * 5));
-	army.At(3).Set(monster, c);
-	army.At(4).Set(monster, c);
-    }
-    else
-    {
-	army.At(0).Set(monster, count);
-    }
+    Army::ArrangeTroopsForBattle(army, monster, count);
 
     if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
-
-    //Display::Fade(); need move to start battle code
 
     const u32 exp = Algorithm::CalculateExperience(army);
     const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -1147,11 +1133,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You tentatively approach the burial ground of ancient warriors.", "Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
-		    army.At(0).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.At(1).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.At(2).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.At(3).Set(Monster::MUTANT_ZOMBIE, 20);
-		    army.At(4).Set(Monster::MUTANT_ZOMBIE, 20);
+		    Army::ArrangeTroopsForBattle(army, Monster::MUTANT_ZOMBIE, 100);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
@@ -1217,11 +1199,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
                 	    break;
                 	default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
                     }
-		    army.At(0).Set(Monster::GHOST, c);
-		    army.At(1).Set(Monster::GHOST, c);
-		    army.At(2).Set(Monster::GHOST, c);
-		    army.At(3).Set(Monster::GHOST, c);
-		    army.At(4).Set(Monster::GHOST, c);
+                    ArrangeTroopsForBattle(army, Monster::GHOST, c * ARMYMAXTROOPS);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
@@ -1265,11 +1243,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
-		    army.At(0).Set(Monster::SKELETON, 20);
-		    army.At(1).Set(Monster::SKELETON, 20);
-		    army.At(2).Set(Monster::SKELETON, 20);
-		    army.At(3).Set(Monster::SKELETON, 20);
-		    army.At(4).Set(Monster::SKELETON, 20);
+		    ArrangeTroopsForBattle(army, Monster::SKELETON, 100);
 
 		    // battle
 		    const u32 exp = Algorithm::CalculateExperience(army);
@@ -1546,7 +1520,7 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 						    (11== c ? Monster::GREEN_DRAGON :
 						    (12== c ? Monster::TITAN : Monster::BONE_DRAGON )))))));
 		    Army::army_t army;
-		    army.At(3).Set(mons, count);
+		    Army::ArrangeTroopsForBattle(army, mons, count);
 
 		    PlaySoundWarning;
 		    if(6 == c)
@@ -1802,11 +1776,8 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
     if(Dialog::YES == Dialog::Message("You come upon an abandoned gold mine.", "The mine appears to be haunted. Do you wish to enter?", Font::BIG, Dialog::YES | Dialog::NO))
     {
 	Army::army_t army;
-	army.At(0).Set(Monster::GHOST, tile.GetQuantity1());
-	army.At(1).Set(Monster::GHOST, tile.GetQuantity1());
-	army.At(2).Set(Monster::GHOST, tile.GetQuantity1());
-	army.At(3).Set(Monster::GHOST, tile.GetQuantity1());
-	army.At(4).Set(Monster::GHOST, tile.GetQuantity1());
+	ArrangeTroopsForBattle(army, Monster::GHOST, tile.GetQuantity1() * ARMYMAXTROOPS);
+
 	const u32 exp = Algorithm::CalculateExperience(army);
 	const Army::battle_t b = Army::Battle(hero, army, tile);
 
@@ -2197,7 +2168,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 		army.At(2).Set(Monster::TROLL, 4);
 		army.At(3).Set(Monster::TROLL, 4);
 		army.At(4).Set(Monster::WAR_TROLL, 4);
-		
+
 		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("Trolls living under the bridge challenge you.", "Will you fight them?", Font::BIG, Dialog::YES | Dialog::NO))
 		{

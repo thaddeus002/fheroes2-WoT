@@ -89,6 +89,7 @@ namespace Army
     bool SlowestTroop(const Troop & t1, const Troop & t2);
     bool FastestTroop(const Troop & t1, const Troop & t2);
     void SwapTroops(Troop & t1, Troop & t2);
+    void ArrangeTroopsForBattle(army_t &, Monster::monster_t, u16);
 
     enum flags_t
     {
@@ -109,7 +110,7 @@ namespace Army
 	    void	Import(const std::vector<Troop> &);
 	    void	Import(const std::vector<BattleTroop> &);
 	    void	UpgradeMonsters(const Monster::monster_t);
-
+	    
 	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0) const;
 
 	    Troop&	At(u8);
