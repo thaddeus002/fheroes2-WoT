@@ -33,137 +33,136 @@
 #include "portrait.h"
 #include "dialog.h"
 #include "selectarmybar.h"
+#include "selectartifactbar.h"
 
-void DrawLuckSprite(const Luck::luck_t luck, const Point & pt)
+void DrawLuckSprite(const Luck::luck_t luck, s16 cx, s16 cy)
 {
     Display & display = Display::Get();
-    Point dst_pt(pt);
 
     switch(luck)
     {
 	case Luck::CURSED:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Luck::AWFUL:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 7;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Luck::BAD:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
+	    cx += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Luck::NORMAL:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 6);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
+	    cx += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Luck::GOOD:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
+	    cx += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Luck::GREAT:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 7;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Luck::IRISH:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	default: break;
     }
 }
 
-void DrawMoraleSprite(const Morale::morale_t morale, const Point & pt)
+void DrawMoraleSprite(const Morale::morale_t morale, s16 cx, s16 cy)
 {
     Display & display = Display::Get();
-    Point dst_pt(pt);
 
     switch(morale)
     {
 	case Morale::TREASON:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Morale::AWFUL:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 7;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Morale::POOR:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
+	    cx += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Morale::NORMAL:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 7);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
+	    cx += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Morale::GOOD:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    dst_pt.x += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, dst_pt);
+	    cx += (34 - sprite.w()) / 2;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Morale::GREAT:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 7;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 7;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	case Morale::BLOOD:
 	{
 	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
-	    dst_pt.x += 5;
-	    display.Blit(sprite, dst_pt);
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
+	    cx += 5;
+	    display.Blit(sprite, cx, cy);
 	} break;
 
 	default: break;
@@ -317,7 +316,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     std::string headerMoraleInfo(MoraleString(current_morale));
 
     backgroundMorale.Save();
-    DrawMoraleSprite(current_morale, rectMoraleInfo);
+    DrawMoraleSprite(current_morale, dst_pt.x, dst_pt.y);
 
     // luck
     dst_pt.x = cur_pt.x + 552;
@@ -333,7 +332,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     std::string headerLuckInfo(LuckString(current_luck));
 
     backgroundLuck.Save();
-    DrawLuckSprite(current_luck, dst_pt);
+    DrawLuckSprite(current_luck, dst_pt.x, dst_pt.y);
 
     // army format spread
     dst_pt.x = cur_pt.x + 515;
@@ -478,33 +477,16 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     const Rect rectMaxCoordsSkill(coordsSkill);
 
-    // artifact
-    for(u8 ii = 0; ii < HEROESMAXARTIFACT; ii++)
-    {
-        // sprite
-        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, 0);
+    dst_pt.x = cur_pt.x + 51;
+    dst_pt.y = cur_pt.y + 308;
 
-        dst_pt.x = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.x + 51 + ii * (art.w() + 15) : cur_pt.x + 51 + (ii - HEROESMAXARTIFACT / 2) * (art.w() + 15));
-        dst_pt.y = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.y + 308 : cur_pt.y + 387);
-
-        display.Blit(art, dst_pt);
-    }
-
-    std::vector<Rect> coordsArtifact;
-
-    for(u8 ii = 0; ii < artifacts.size(); ii++)
-    {
-        // sprite
-        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, artifacts[ii] + 1);
-
-        dst_pt.x = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.x + 51 + ii * (art.w() + 15) : cur_pt.x + 51 + (ii - HEROESMAXARTIFACT / 2) * (art.w() + 15));
-        dst_pt.y = (ii < HEROESMAXARTIFACT / 2 ? cur_pt.y + 308 : cur_pt.y + 387);
-
-        display.Blit(art, dst_pt);
-	
-	coordsArtifact.push_back(Rect(dst_pt.x, dst_pt.y, art.w(), art.h()));
-    }
-    const Rect rectMaxCoordsArtifact(coordsArtifact);
+    SelectArtifactsBar selectArtifacts(*this);
+    selectArtifacts.SetPos(dst_pt);
+    selectArtifacts.SetInterval(15);
+    selectArtifacts.SetBackgroundSprite(AGG::GetICN(ICN::ARTIFACT, 0));
+    selectArtifacts.SetCursorSprite(AGG::GetICN(ICN::NGEXTRA, 62));
+    if(readonly) selectArtifacts.SetReadOnly();
+    selectArtifacts.Redraw();
 
     // bottom small bar
     Dialog::StatusBar statusBar(Point(cur_pt.x + 22, cur_pt.y + 460), AGG::GetICN(ICN::HSBTNS, 8), Font::BIG);
@@ -579,7 +561,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    if(moraleModificators.size()) moraleModificators.push_front("Current Morale Modifiers:");
 	    moraleModificators.push_front(" ");
 	    moraleModificators.push_front(Morale::Description(current_morale));
-	    DrawMoraleSprite(current_morale, rectMoraleInfo);
+	    DrawMoraleSprite(current_morale, rectMoraleInfo.x, rectMoraleInfo.y);
 	    headerMoraleInfo = MoraleString(current_morale);
 	    cursor.Show();
 	    display.Flip();
@@ -595,7 +577,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    if(luckModificators.size()) luckModificators.push_front("Current Morale Modifiers:");
 	    luckModificators.push_front(" ");
 	    luckModificators.push_front(Luck::Description(current_luck));
-	    DrawLuckSprite(current_luck, dst_pt);
+	    DrawLuckSprite(current_luck, rectLuckInfo.x, rectLuckInfo.y);
 	    headerLuckInfo = LuckString(current_luck);
 	    cursor.Show();
 	    display.Flip();
@@ -608,9 +590,21 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         // heroes troops
         if(le.MouseCursor(selectArmy.GetArea()))
         {
-            SelectArmyBar::QueueEventProcessing(selectArmy);
-            redrawMorale = true;
-        }
+            if(SelectArmyBar::QueueEventProcessing(selectArmy))
+            {
+        	redrawMorale = true;
+        	redrawLuck = true;
+    	    }
+	}
+
+        if(le.MouseCursor(selectArtifacts.GetArea()))
+        {
+            SelectArtifactsBar::QueueEventProcessing(selectArtifacts);
+            {
+        	redrawMorale = true;
+        	redrawLuck = true;
+    	    }
+	}
 
         // button click
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
@@ -682,16 +676,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    }
 	}
 
-	// left click artifact
-	for(u8 ii = 0; ii < coordsArtifact.size(); ++ii) if(le.MouseClickLeft(coordsArtifact[ii]))
-	{
-	    const Artifact::artifact_t art = artifacts[ii];
-
-	    if(Artifact::MAGIC_BOOK == art) spell_book.Open();
-	    else
-	    if(Artifact::UNKNOWN != art) Dialog::Message(Artifact::String(art), Artifact::Description(art), Font::BIG, Dialog::OK);
-	}
-
 	// right info
         if(le.MousePressRight(rectAttackSkill)) Dialog::Message("Attack Skill", "Your attack skill is a bonus added to each creature's attack skill.", Font::BIG);
         else
@@ -728,13 +712,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    }
 	}
 
-	// right info artifact
-	for(u8 ii = 0; ii < coordsArtifact.size(); ++ii) if(le.MousePressRight(coordsArtifact[ii]))
-	{
-	    const Artifact::artifact_t art = artifacts[ii];
-	    if(Artifact::UNKNOWN != art) Dialog::Message(Artifact::String(art), Artifact::Description(art), Font::BIG);
-	}
-
         // status message
 	if(le.MouseCursor(rectAttackSkill)) statusBar.ShowMessage("View Attack Skill Info");
 	else
@@ -765,15 +742,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         if(le.MouseCursor(buttonNextHero)) statusBar.ShowMessage("Show next heroes");
         else
 	// status message over artifact
-	if(le.MouseCursor(rectMaxCoordsArtifact))
+	if(le.MouseCursor(selectArtifacts.GetArea()))
 	{
-	    for(u8 ii = 0; ii < coordsArtifact.size(); ++ii) if(le.MouseCursor(coordsArtifact[ii]))
-	    {
-		if(ii < artifacts.size() && Artifact::UNKNOWN != artifacts[ii])
-		    statusBar.ShowMessage("View " + Artifact::String(artifacts[ii]) + " Info");
-		else
-		    statusBar.Clear("Hero Screen");
-	    }
+	    const s8 index = selectArtifacts.GetIndexFromCoord(le.MouseCursor());
+	    if(0 <= index && index < HEROESMAXARTIFACT && Artifact::UNKNOWN != artifacts[index])
+		statusBar.ShowMessage("View " + Artifact::String(artifacts[index]) + " Info");
+	    else
+		statusBar.Clear("Hero Screen");
 	}
 	else
 	// status message over skill

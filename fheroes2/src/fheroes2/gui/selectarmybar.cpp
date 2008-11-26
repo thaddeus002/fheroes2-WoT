@@ -177,13 +177,13 @@ void SelectArmyBar::Redraw(Surface & display)
 
             if(flags & FLAGS_USEMONS32)
 	    {
-	    	display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 13);
+	    	display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11);
     
         	// draw count
         	std::string str;
         	String::AddInt(str, troop.Count());
         	Text text(str, Font::SMALL);
-		text.Blit(pt.x + (background->w() - text.width()) / 2, pt.y + background->h() - 10);
+		text.Blit(pt.x + (background->w() - text.width()) / 2, pt.y + background->h() - 11);
             }
             else
 	    {
@@ -222,15 +222,16 @@ void SelectArmyBar::Select(u8 index)
     }
 }
 
-void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
+bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 {
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    if(! bar.isValid()) return;
+    if(! bar.isValid()) return false;
 
     const s8 index1 = bar.GetIndexFromCoord(le.MouseCursor());
-    if(0 > index1 || ARMYMAXTROOPS <= static_cast<size_t>(index1)) return;
+    if(0 > index1 || ARMYMAXTROOPS <= index1) return false;
 
+    bool change = false;
     Army::Troop & troop1 = bar.army->At(index1);
     Cursor::Get().Hide();
 
@@ -250,10 +251,12 @@ void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
             	    case Dialog::UPGRADE:
             		world.GetMyKingdom().OddFundsResource(PaymentConditions::UpgradeMonster(troop1.Monster()) * troop1.Count());
             		troop1.UpgradeMonster();
+			change = true;
             	    break;
 
         	    case Dialog::DISMISS:
                 	troop1.Reset();
+			change = true;
                 	break;
 
 		    default: break;
@@ -308,13 +311,16 @@ void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 
     Cursor::Get().Show();
     Display::Get().Flip();
+
+    return change;
 }
 
-void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & bar2)
+bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & bar2)
 {
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    if(!bar1.isValid() || !bar2.isValid()) return;
+    if(!bar1.isValid() || !bar2.isValid()) return false;
+    bool change = false;
 
     if((bar1.isSelected() || (!bar1.isSelected() && !bar2.isSelected())) && le.MouseCursor(bar1.GetArea()))
 	    QueueEventProcessing(bar1);
@@ -325,7 +331,7 @@ void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     if(bar1.isSelected() && le.MouseCursor(bar2.GetArea()))
     {
 	const s8 index1 = bar2.GetIndexFromCoord(le.MouseCursor());
-	if(0 > index1 || ARMYMAXTROOPS <= static_cast<size_t>(index1)) return;
+	if(0 > index1 || ARMYMAXTROOPS <= index1) return false;
 	const s8 index2 = bar1.Selected();
 
 	Army::Troop & troop1 = bar2.army->At(index1);
@@ -341,11 +347,15 @@ void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    {
 		troop1.SetCount(troop1.Count() + troop2.Count());
 		troop2.Reset();
+		change = true;
 	    }
 	    // exchange
 	    else
 	    if(!bar1.SaveLastTroop() || troop1.isValid())
-		Army::SwapTroops(troop1, troop2);
+	    {
+	    	Army::SwapTroops(troop1, troop2);
+		change = true;
+	    }
 
 	    bar1.Reset();
 	    bar2.Reset();
@@ -389,7 +399,7 @@ void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     if(bar2.isSelected() && le.MouseCursor(bar1.GetArea()))
     {
 	const s8 index1 = bar1.GetIndexFromCoord(le.MouseCursor());
-	if(0 > index1 || ARMYMAXTROOPS <= static_cast<size_t>(index1)) return;
+	if(0 > index1 || ARMYMAXTROOPS <= index1) return false;
 	const s8 index2 = bar2.Selected();
 
 	Army::Troop & troop1 = bar1.army->At(index1);
@@ -405,11 +415,15 @@ void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    {
 		troop1.SetCount(troop1.Count() + troop2.Count());
 		troop2.Reset();
+		change = true;
 	    }
 	    // exchange
 	    else
 	    if(!bar2.SaveLastTroop() || troop1.isValid())
+	    {
 		Army::SwapTroops(troop1, troop2);
+		change = true;
+	    }
 
 	    bar1.Reset();
 	    bar2.Reset();
@@ -449,4 +463,6 @@ void SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	Cursor::Get().Show();
 	Display::Get().Flip();
     }
+
+    return change;
 }

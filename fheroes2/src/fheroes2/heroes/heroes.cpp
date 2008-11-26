@@ -33,10 +33,9 @@
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
-    move_point(0), army(this), spell_book(*this), hid(ht), race(rc), flags(ARMYSPREAD),
+    move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(*this), hid(ht), race(rc), flags(ARMYSPREAD),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
-    artifacts.reserve(HEROESMAXARTIFACT);
     secondary_skills.reserve(HEROESMAXSKILL);
 
     // hero is freeman
@@ -73,7 +72,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
 
 	    spell_book.Activate();
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
 	case Race::WRLK:
@@ -86,7 +85,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
 
 	    spell_book.Activate();
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
 	case Race::WZRD:
@@ -98,7 +97,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::ADVANCED));
 
 	    spell_book.Activate();
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
 	case Race::NECR:
@@ -111,7 +110,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
 
 	    spell_book.Activate();
-	    artifacts.push_back(Artifact::MAGIC_BOOK);
+	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
 	default: Error::Warning("Heroes::Heroes: unknown race."); break;
@@ -253,11 +252,11 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LOGISTICS, Skill::Level::BASIC));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::MYSTICISM, Skill::Level::BASIC));
 
-	    artifacts.push_back(Artifact::MEDAL_VALOR);
-	    artifacts.push_back(Artifact::STEALTH_SHIELD);
-	    artifacts.push_back(Artifact::DRAGON_SWORD);
-	    artifacts.push_back(Artifact::RABBIT_FOOT);
-	    artifacts.push_back(Artifact::ENDLESS_BAG_GOLD);
+	    PickupArtifact(Artifact::MEDAL_VALOR);
+	    PickupArtifact(Artifact::STEALTH_SHIELD);
+	    PickupArtifact(Artifact::DRAGON_SWORD);
+	    PickupArtifact(Artifact::RABBIT_FOOT);
+	    PickupArtifact(Artifact::ENDLESS_BAG_GOLD);
 
 	    experience = 777;
 
@@ -357,15 +356,15 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     Artifact::artifact_t artifact = Artifact::UNKNOWN;
 
     // artifact 1
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) artifacts.push_back(artifact);
+    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) PickupArtifact(artifact);
     ++ptr8;
 
     // artifact 2
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) artifacts.push_back(artifact);
+    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) PickupArtifact(artifact);
     ++ptr8;
 
     // artifact 3
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) artifacts.push_back(artifact);
+    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) PickupArtifact(artifact);
     ++ptr8;
 
     // unknown byte
@@ -477,7 +476,7 @@ u8 Heroes::GetAttack(void) const
 {
     u8 result = attack;
 
-    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+    BagArtifacts::const_iterator it = artifacts.begin();
 
     for(; it != artifacts.end(); ++it)
 
@@ -521,7 +520,7 @@ u8 Heroes::GetDefense(void) const
 {
     u8 result = defence;
 
-    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+    BagArtifacts::const_iterator it = artifacts.begin();
 
     for(; it != artifacts.end(); ++it)
 
@@ -565,7 +564,7 @@ u8 Heroes::GetPower(void) const
 {
     u8 result = power;
 
-    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+    BagArtifacts::const_iterator it = artifacts.begin();
 
     for(; it != artifacts.end(); ++it)
 
@@ -609,7 +608,7 @@ u8 Heroes::GetKnowledge(void) const
 {
     u8 result = knowledge;
 
-    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+    BagArtifacts::const_iterator it = artifacts.begin();
 
     for(; it != artifacts.end(); ++it)
 
@@ -774,7 +773,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     const std::string m2(" -2");
 
     // bonus artifact
-    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+    BagArtifacts::const_iterator it = artifacts.begin();
 
     for(; it != artifacts.end(); ++it)
 	switch(*it)
@@ -887,7 +886,7 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 {
     s8 result = Luck::NORMAL;
 
-    std::vector<Artifact::artifact_t>::const_iterator it = artifacts.begin();
+    BagArtifacts::const_iterator it = artifacts.begin();
 
     const std::string p1(" +1");
     const std::string p2(" +2");
@@ -1148,23 +1147,53 @@ void Heroes::SetVisited(const u16 index, const Visit::type_t type)
 
 void Heroes::TakeArtifacts(Heroes & hero2)
 {
-    while(hero2.artifacts.size())
+    for(u8 ii = 0; ii < HEROESMAXARTIFACT; ++ii)
     {
-	const Artifact::artifact_t art = hero2.artifacts.back();
-	if(Artifact::MAGIC_BOOK != art && !Artifact::Ultimate(art) && HEROESMAXARTIFACT > artifacts.size()) artifacts.push_back(art);
-	hero2.artifacts.pop_back();
+	const Artifact::artifact_t art = hero2.artifacts[ii];
+	if(Artifact::UNKNOWN != art &&
+	    Artifact::MAGIC_BOOK != art &&
+	    !Artifact::Ultimate(art))
+	{
+	    PickupArtifact(art);
+	    hero2.artifacts[ii] = Artifact::UNKNOWN;
+	}
     }
 }
 
 u8 Heroes::GetCountArtifacts(void) const
 {
-    return artifacts.size();
+    return std::count_if(artifacts.begin(), artifacts.end(), Artifact::isValid);
 }
 
 /* return true if artifact present */
 bool Heroes::HasArtifact(const Artifact::artifact_t & art) const
 {
     return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), art);
+}
+
+bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
+{
+    BagArtifacts::iterator it = std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);
+
+    if(artifacts.end() == it)
+    {
+	if(H2Config::MyColor() == color)
+	{
+	    art == Artifact::MAGIC_BOOK ?
+	    Dialog::Message("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book.", "Try giving one of your artifacts to another hero.", Font::BIG, Dialog::OK) :
+	    Dialog::Message("Warning", "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
+	}
+	return false;
+    }
+
+    *it = art;
+
+    return true;
+}
+
+BagArtifacts & Heroes::GetBagArtifacts(void)
+{
+    return artifacts;
 }
 
 /* return level hero */
@@ -1244,13 +1273,6 @@ bool Heroes::BuySpellBook(void)
 	return false;
     }
 
-    if(artifacts.size() >= HEROESMAXARTIFACT)
-    {
-	if(Settings::Get().MyColor() == color)
-	Dialog::Message("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book.", "Try giving one of your artifacts to another hero.", Font::BIG, Dialog::OK);
-	return false;
-    }
-
     if(Settings::Get().MyColor() == color)
     {
 	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
@@ -1262,12 +1284,14 @@ bool Heroes::BuySpellBook(void)
 	if(Dialog::NO == Dialog::SpriteInfo(header, "Do you wish to buy one?", sprite, Dialog::YES | Dialog::NO)) return false;
     }
 
-    kingdom.OddFundsResource(payment);
+    if(PickupArtifact(Artifact::MAGIC_BOOK))
+    {
+	kingdom.OddFundsResource(payment);
+	spell_book.Activate();
+	return true;
+    }
 
-    spell_book.Activate();
-    artifacts.push_back(Artifact::MAGIC_BOOK);
-    
-    return true;
+    return false;
 }
 
 /* add new spell to book from storage */
@@ -1367,18 +1391,6 @@ void Heroes::Scoute(void)
     Maps::ClearFog(mp, (HasArtifact(Artifact::TELESCOPE) ? 1 : 0) + SCOUTINGBASE + GetLevelSkill(Skill::Secondary::SCOUTING), color);
 }
 
-bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
-{
-    if(HEROESMAXARTIFACT <= artifacts.size())
-    {
-	if(H2Config::MyColor() == color) Dialog::Message("Warning", "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
-	return false;
-    }
-
-    artifacts.push_back(art);
-    
-    return true;
-}
 
 /* set cente from index maps */
 void Heroes::SetCenter(const u16 index)

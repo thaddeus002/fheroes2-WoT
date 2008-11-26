@@ -580,6 +580,11 @@ bool Artifact::Ultimate(artifact_t art)
     return false;
 }
 
+bool Artifact::isValid(artifact_t art)
+{
+    return UNKNOWN != art;
+}
+
 void Artifact::ChangeTileWithRNDArtifact(Maps::Tiles & tile)
 {
     Maps::TilesAddon *addon = NULL;

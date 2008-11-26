@@ -71,6 +71,8 @@
 #define DEFAULT_WZRD_POWER	2
 #define DEFAULT_WZRD_KNOWLEDGE	2
 
+typedef std::vector<Artifact::artifact_t> BagArtifacts;
+
 class Heroes : public Skill::Primary
 {
 public:
@@ -164,6 +166,7 @@ public:
     bool PickupArtifact(const Artifact::artifact_t & art);
     bool HasArtifact(const Artifact::artifact_t & art) const;
     u8 GetCountArtifacts(void) const;
+    BagArtifacts & GetBagArtifacts(void);
     void TakeArtifacts(Heroes &);
 
     u8 GetMobilityIndexSprite(void) const;
@@ -238,7 +241,7 @@ private:
 
     std::vector<Skill::Secondary>	secondary_skills;
 
-    std::vector<Artifact::artifact_t>	artifacts;
+    BagArtifacts	artifacts;
     Army::army_t        army;
     Spell::Book		spell_book;
 

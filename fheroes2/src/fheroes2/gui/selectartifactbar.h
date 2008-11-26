@@ -18,21 +18,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2SELECTARMYBAR_H
-#define H2SELECTARMYBAR_H
+#ifndef H2SELECTARTIFACTBAR_H
+#define H2SELECTARTIFACTBAR_H
 
 #include "gamedefs.h"
-#include "army.h"
 
 class Rect;
 class Surface;
+class Heroes;
 class SpriteCursor;
 class LocalEvent;
 
-class SelectArmyBar
+class SelectArtifactsBar
 {
 public:
-    SelectArmyBar();
+    SelectArtifactsBar(Heroes &);
 
     const Rect &GetArea(void) const;
     bool	isSelected(void) const;
@@ -40,10 +40,8 @@ public:
     s8		Selected(void) const;
 
     bool	ReadOnly(void) const;
-    bool	SaveLastTroop(void) const;
     bool	isValid(void) const;
 
-    void 	SetArmy(Army::army_t &);
     void 	SetPos(const Point &);
     void 	SetPos(s16, s16);
     void 	SetBackgroundSprite(const Surface &);
@@ -51,18 +49,17 @@ public:
     void 	SetInterval(u8);
 
     void	SetReadOnly(void);
-    void	SetSaveLastTroop(void);
-    void 	SetUseMons32Sprite(void);	// second variant: for small sprite ICN::MONS32
+    void        SetUseArts32Sprite(void);
 
     void 	Redraw(Surface & display = Display::Get());
     void 	Reset(void);
     void	Select(u8);
 
-    static bool QueueEventProcessing(SelectArmyBar &);
-    static bool QueueEventProcessing(SelectArmyBar &, SelectArmyBar &);
+    static bool QueueEventProcessing(SelectArtifactsBar &);
+    static bool QueueEventProcessing(SelectArtifactsBar &, SelectArtifactsBar &);
 
 private:
-    Army::army_t *	army;
+    Heroes &		hero;
     Rect		pos;
     u8			interval;
     s8			selected;
