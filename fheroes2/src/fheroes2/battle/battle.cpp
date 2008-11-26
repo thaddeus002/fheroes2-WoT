@@ -228,25 +228,29 @@ void Army::BattleSummaryVsHero(Heroes &hero, const Army::BattleArmy_t &heroOrig,
     armies.push_back(std::make_pair(&otherArmy, &hero2Orig));
     //TODO: Necromancy
     //TODO: Eagle eye
-    const std::vector<Artifact::artifact_t> *artifacts = status == WIN ? &hero2.GetArtifacts() : NULL;
-    BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, status);
-    Heroes *from, *to;
-    if(status == WIN)
-    {
-        from = &hero2;
-        to = &hero;
-    }
-    else
-    {
-        from = &hero;
-        to = &hero2;
-    }
-    if(from->GetArtifacts().size() > 1)
-    {
+    //
+    //const std::vector<Artifact::artifact_t> *artifacts = status == WIN ? &hero2.GetArtifacts() : NULL;
+    //BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, status);
+    //Heroes *from, *to;
+    //if(status == WIN)
+    //{
+    //    from = &hero2;
+    //    to = &hero;
+    //}
+    //else
+    //{
+    //    from = &hero;
+    //    to = &hero2;
+    //}
+    //
+    // MOVE TO:: Heroes::Action and Heroes::TakeArtifacts
+    //
+    //if(from->GetArtifacts().size() > 1)
+    //{
         //Transfer all artifacts except the spell book
-        to->GetArtifacts().insert(to->GetArtifacts().end(), from->GetArtifacts().begin() + 1, from->GetArtifacts().end());
-        from->GetArtifacts().clear();
-    }
+    //    to->GetArtifacts().insert(to->GetArtifacts().end(), from->GetArtifacts().begin() + 1, from->GetArtifacts().end());
+    //    from->GetArtifacts().clear();
+    //}
 }
 
 void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArmy_t &current, const Rect &draw)

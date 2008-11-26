@@ -161,11 +161,10 @@ public:
     void LevelUpSkill(const Skill::Secondary::skill_t skill);
     void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
 
-    const std::vector<Artifact::artifact_t> & GetArtifacts(void) const{ return artifacts; }
-    std::vector<Artifact::artifact_t> & GetArtifacts(void) { return artifacts; };
     bool PickupArtifact(const Artifact::artifact_t & art);
     bool HasArtifact(const Artifact::artifact_t & art) const;
-    bool MaxCountArtifact(void) const;
+    u8 GetCountArtifacts(void) const;
+    void TakeArtifacts(Heroes &);
 
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;

@@ -471,6 +471,7 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
 		(*other_hero).FadeOut();
     		world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
     		const_cast<Heroes &>(*other_hero).SetFreeman(b);
+		hero.TakeArtifacts(const_cast<Heroes &>(*other_hero));
 		hero.ActionAfterBattle();
 		break;
 
@@ -1607,17 +1608,19 @@ void ActionToTreasureChest(Heroes &hero, const u16 dst_index)
 	    Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
 	}
 	else
-	if(tile.GetQuantity1() && !hero.MaxCountArtifact())
+	if(tile.GetQuantity1())
 	{
 	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
 
 	    message += " you open it and find ";
 	    String::AddInt(message, resource.gold);
 	    message += " gold and the " + Artifact::String(art);
-	    DialogWithArtifactAndGold("Chest", message, art, resource.gold);
 
-	    hero.PickupArtifact(art);
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    if(hero.PickupArtifact(art))
+	    {
+		DialogWithArtifactAndGold("Chest", message, art, resource.gold);
+		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    }
 	}
 	else
 	{
@@ -1635,15 +1638,17 @@ void ActionToTreasureChest(Heroes &hero, const u16 dst_index)
     {
 	std::string message("After scouring the area,");
 
-	if(tile.GetQuantity1() && !hero.MaxCountArtifact())
+	if(tile.GetQuantity1())
 	{
 	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
 	
 	    message += " you fall upon a hidden chest, containing the ancient artifact " + Artifact::String(art);
-	    DialogWithArtifact("Chest", message, art);
 
-	    hero.PickupArtifact(art);
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    if(hero.PickupArtifact(art))
+	    {
+		DialogWithArtifact("Chest", message, art);
+		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    }
 	}
 	else
 	{

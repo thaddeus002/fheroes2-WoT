@@ -1146,6 +1146,21 @@ void Heroes::SetVisited(const u16 index, const Visit::type_t type)
     if(MP2::OBJ_ZERO != object) visit_object.push_front(Visit::IndexObject(index, object));
 }
 
+void Heroes::TakeArtifacts(Heroes & hero2)
+{
+    while(hero2.artifacts.size())
+    {
+	const Artifact::artifact_t art = hero2.artifacts.back();
+	if(Artifact::MAGIC_BOOK != art && !Artifact::Ultimate(art) && HEROESMAXARTIFACT > artifacts.size()) artifacts.push_back(art);
+	hero2.artifacts.pop_back();
+    }
+}
+
+u8 Heroes::GetCountArtifacts(void) const
+{
+    return artifacts.size();
+}
+
 /* return true if artifact present */
 bool Heroes::HasArtifact(const Artifact::artifact_t & art) const
 {
@@ -1354,7 +1369,7 @@ void Heroes::Scoute(void)
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
 {
-    if(MaxCountArtifact())
+    if(HEROESMAXARTIFACT <= artifacts.size())
     {
 	if(H2Config::MyColor() == color) Dialog::Message("Warning", "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
 	return false;
@@ -1363,11 +1378,6 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
     artifacts.push_back(art);
     
     return true;
-}
-
-bool Heroes::MaxCountArtifact(void) const
-{
-    return HEROESMAXARTIFACT <= artifacts.size();
 }
 
 /* set cente from index maps */

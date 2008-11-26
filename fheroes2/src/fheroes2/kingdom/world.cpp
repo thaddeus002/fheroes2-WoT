@@ -1009,16 +1009,6 @@ void World::LoadMaps(const std::string &filename)
 			default: break;
 		    }
 
-		    // dependence from game difficulty
-		    switch(Settings::Get().GameDifficulty())
-		    {
-			case Difficulty::EASY:	count = count * 2;
-			case Difficulty::NORMAL:break;
-			case Difficulty::HARD:	count = static_cast<u32>(count / 1.5);
-			case Difficulty::EXPERT:count = static_cast<u32>(count / 2);
-			case Difficulty::IMPOSSIBLE:count = 0;
-		    }
-
 		    tile.SetCountMonster(count);
 		}
 		break;

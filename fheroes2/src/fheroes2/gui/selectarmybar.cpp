@@ -20,7 +20,6 @@
 
 #include "engine.h"
 #include "agg.h"
-#include "sprite.h"
 #include "cursor.h"
 #include "monster.h"
 #include "text.h"
@@ -78,7 +77,6 @@ s8 SelectArmyBar::GetIndexFromCoord(const Point & coord)
 void SelectArmyBar::SetArmy(Army::army_t & a)
 {
     army = &a;
-    if(background) pos.w = ARMYMAXTROOPS * background->w() + (ARMYMAXTROOPS - 1) * interval;
 }
 
 void SelectArmyBar::SetPos(const Point & pt)
@@ -97,7 +95,7 @@ void SelectArmyBar::SetPos(s16 cx, s16 cy)
 void SelectArmyBar::SetBackgroundSprite(const Surface & sf)
 {
     background = &sf;
-    if(army) pos.w = ARMYMAXTROOPS * sf.w() + (ARMYMAXTROOPS - 1) * interval;
+    pos.w = ARMYMAXTROOPS * sf.w() + (ARMYMAXTROOPS - 1) * interval;
     pos.h = background->h();
 
     offset.x = (background->w() - spritecursor.w()) / 2;
@@ -118,8 +116,8 @@ void SelectArmyBar::SetCursorSprite(const Surface & sf)
 void SelectArmyBar::SetInterval(const u8 it)
 {
     interval = it;
-    if(army) pos.w = (ARMYMAXTROOPS - 1) * interval;
-    if(background && army) pos.w += ARMYMAXTROOPS * background->w();
+    pos.w = (ARMYMAXTROOPS - 1) * interval;
+    if(background) pos.w += ARMYMAXTROOPS * background->w();
 }
 
 void SelectArmyBar::SetSaveLastTroop(void)

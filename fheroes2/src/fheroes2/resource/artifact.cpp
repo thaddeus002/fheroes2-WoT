@@ -560,6 +560,26 @@ u8 Artifact::GetIndexSprite(Artifact::artifact_t artifact)
     return 0;
 }
 
+bool Artifact::Ultimate(artifact_t art)
+{
+    switch(art)
+    {
+	case ULTIMATE_BOOK:
+	case ULTIMATE_SWORD:
+	case ULTIMATE_CLOAK:
+	case ULTIMATE_WAND:
+	case ULTIMATE_SHIELD:
+	case ULTIMATE_STAFF:
+	case ULTIMATE_CROWN:
+	case GOLDEN_GOOSE:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
 void Artifact::ChangeTileWithRNDArtifact(Maps::Tiles & tile)
 {
     Maps::TilesAddon *addon = NULL;

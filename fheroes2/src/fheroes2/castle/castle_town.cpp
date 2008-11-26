@@ -68,7 +68,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     str = heroes.GetName() + " is a level ";
     String::AddInt(str, heroes.GetLevel());
     str += " " + Race::String(heroes.GetRace()) + " with ";
-    String::AddInt(str, heroes.GetArtifacts().size());
+    String::AddInt(str, heroes.GetCountArtifacts());
     str += " artifacts.";
 
     Rect src_rt(box_rt.x, box_rt.y + portrait_frame.w() + tit_rt.h - 3, BOXAREA_WIDTH, 200);

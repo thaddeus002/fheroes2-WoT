@@ -158,7 +158,8 @@ namespace Artifact
     
     artifact_t Artifact(u8 index);
     artifact_t FromIndexSprite(u8 index);
-    
+
+    bool Ultimate(artifact_t);
     u8 GetIndexSprite(Artifact::artifact_t artifact);
     
     void ChangeTileWithRNDArtifact(Maps::Tiles & tile);
