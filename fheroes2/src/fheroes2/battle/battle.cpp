@@ -95,7 +95,7 @@ namespace Army {
     bool CleanupBodies(Army::BattleArmy_t &army, u16 idx, Army::BattleArmy_t &bodies);
     
     void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArmy_t &current, const Rect &draw);
-    void BattleSummary(const std::string &name, const ArmyPairs &armies, const std::vector<Artifact::artifact_t> *artifacts, Spell::spell_t, int deadRaised, Army::battle_t status);
+    void BattleSummary(const std::string &name, const ArmyPairs &armies, const BagArtifacts *artifacts, Spell::spell_t, int deadRaised, Army::battle_t status);
     void BattleSummaryVsArmy(Heroes &hero, const Army::BattleArmy_t &heroOrig, const Army::BattleArmy_t &army, const Army::BattleArmy_t &armyOrig, Army::battle_t status);
     void BattleSummaryVsHero(Heroes &hero, const Army::BattleArmy_t &heroOrig, Heroes &hero2, const Army::BattleArmy_t &hero2Orig, Army::battle_t status);
     
@@ -228,9 +228,9 @@ void Army::BattleSummaryVsHero(Heroes &hero, const Army::BattleArmy_t &heroOrig,
     armies.push_back(std::make_pair(&otherArmy, &hero2Orig));
     //TODO: Necromancy
     //TODO: Eagle eye
-    //
-    //const std::vector<Artifact::artifact_t> *artifacts = status == WIN ? &hero2.GetArtifacts() : NULL;
-    //BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, status);
+    const BagArtifacts *artifacts = status == WIN ? &hero2.GetBagArtifacts() : NULL;
+    BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, status);
+    
     //Heroes *from, *to;
     //if(status == WIN)
     //{
@@ -294,8 +294,8 @@ void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArm
 }
 
 void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
-                         const std::vector<Artifact::artifact_t> *artifacts,
-                         Spell::spell_t spell, int deadRaised, Army::battle_t status)
+                         const BagArtifacts *artifacts, Spell::spell_t spell,
+                         int deadRaised, Army::battle_t status)
 {
     ICN::icn_t interface = Settings::Get().EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE;
     ICN::icn_t buttonIcon = Settings::Get().EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB;
@@ -311,10 +311,13 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
     switch(status)
     {
         case WIN:
+        {
+            Army::army_t army = BattleArmyToArmy(*armies[0].first);
             animation.push_back(std::make_pair(ICN::WINCMBT, Point(32, 0)));
             message[0] = tr("battle.victory1");
-            message[1] = tr("battle.victory2").sub(name).sub(1000); //FIXME
+            message[1] = tr("battle.victory2").sub(name).sub(army.CalculateExperience());
             break;
+        }
         case LOSE:
             animation.push_back(std::make_pair(ICN::CMBTLOS1, Point(0, 0)));
             animation.push_back(std::make_pair(ICN::CMBTLOS2, Point(0, 0)));
