@@ -32,186 +32,9 @@
 #include "castle.h"
 #include "portrait.h"
 #include "dialog.h"
+#include "heroes_indicator.h"
 #include "selectarmybar.h"
 #include "selectartifactbar.h"
-
-void DrawLuckSprite(const Luck::luck_t luck, s16 cx, s16 cy)
-{
-    Display & display = Display::Get();
-
-    switch(luck)
-    {
-	case Luck::CURSED:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Luck::AWFUL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    display.Blit(sprite, cx, cy);
-	    cx += 7;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Luck::BAD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 3);
-	    cx += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Luck::NORMAL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 6);
-	    cx += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Luck::GOOD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    cx += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Luck::GREAT:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    display.Blit(sprite, cx, cy);
-	    cx += 7;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Luck::IRISH:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 2);
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	default: break;
-    }
-}
-
-void DrawMoraleSprite(const Morale::morale_t morale, s16 cx, s16 cy)
-{
-    Display & display = Display::Get();
-
-    switch(morale)
-    {
-	case Morale::TREASON:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Morale::AWFUL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    display.Blit(sprite, cx, cy);
-	    cx += 7;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Morale::POOR:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 5);
-	    cx += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Morale::NORMAL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 7);
-	    cx += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Morale::GOOD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    cx += (34 - sprite.w()) / 2;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Morale::GREAT:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    display.Blit(sprite, cx, cy);
-	    cx += 7;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	case Morale::BLOOD:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 4);
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	    cx += 5;
-	    display.Blit(sprite, cx, cy);
-	} break;
-
-	default: break;
-    }
-}
-
-const char* MoraleString(const Morale::morale_t morale)
-{
-    switch(morale)
-    {
-	case Morale::TREASON:
-	case Morale::AWFUL:
-	case Morale::POOR:
-	    return "Bad Morale";
-
-	case Morale::NORMAL:
-	    return "Neutral Morale";
-
-	case Morale::GOOD:
-	case Morale::GREAT:
-	case Morale::BLOOD:
-	    return "Good Morale";
-
-	default: break;
-    }
-    return NULL;
-}
-
-const char* LuckString(const Luck::luck_t luck)
-{
-    switch(luck)
-    {
-	case Luck::CURSED:
-	case Luck::AWFUL:
-	case Luck::BAD:
-	    return "Bad Luck";
-
-	case Luck::NORMAL:
-	    return "Neutral Luck";
-
-	case Luck::GOOD:
-	case Luck::GREAT:
-	case Luck::IRISH:
-	    return "Good Luck";
-
-	default: break;
-    }
-    return NULL;
-}
 
 Dialog::answer_t Heroes::OpenDialog(bool readonly)
 {
@@ -303,36 +126,20 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     const Rect rectKnowledgeSkill(cur_pt.x + 156 + 3 * 88, cur_pt.y + 30, 80, 92);
 
     // morale
-    dst_pt.x = cur_pt.x + 515;
+    dst_pt.x = cur_pt.x + 514;
     dst_pt.y = cur_pt.y + 35;
 
-    const Rect rectMoraleInfo(dst_pt, 34, 26);
-    Background backgroundMorale(rectMoraleInfo);
-    std::list<std::string> moraleModificators;
-    Morale::morale_t current_morale = GetMoraleWithModificators(&moraleModificators);
-    if(moraleModificators.size()) moraleModificators.push_front("Current Morale Modifiers:");
-    moraleModificators.push_front(" ");
-    moraleModificators.push_front(Morale::Description(current_morale));
-    std::string headerMoraleInfo(MoraleString(current_morale));
-
-    backgroundMorale.Save();
-    DrawMoraleSprite(current_morale, dst_pt.x, dst_pt.y);
+    MoraleIndicator moraleIndicator(*this);
+    moraleIndicator.SetPos(dst_pt);
+    moraleIndicator.Redraw();
 
     // luck
     dst_pt.x = cur_pt.x + 552;
     dst_pt.y = cur_pt.y + 35;
 
-    const Rect rectLuckInfo(dst_pt, 34, 26);
-    Background backgroundLuck(rectLuckInfo);
-    std::list<std::string> luckModificators;
-    Luck::luck_t current_luck = GetLuckWithModificators(&luckModificators);
-    if(luckModificators.size()) luckModificators.push_front("Current Morale Modifiers:");
-    luckModificators.push_front(" ");
-    luckModificators.push_front(Luck::Description(current_luck));
-    std::string headerLuckInfo(LuckString(current_luck));
-
-    backgroundLuck.Save();
-    DrawLuckSprite(current_luck, dst_pt.x, dst_pt.y);
+    LuckIndicator luckIndicator(*this);
+    luckIndicator.SetPos(dst_pt);
+    luckIndicator.Redraw();
 
     // army format spread
     dst_pt.x = cur_pt.x + 515;
@@ -555,14 +362,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	if(redrawMorale)
 	{
 	    cursor.Hide();
-	    backgroundMorale.Restore();
-	    moraleModificators.clear();
-	    current_morale = GetMoraleWithModificators(&moraleModificators);
-	    if(moraleModificators.size()) moraleModificators.push_front("Current Morale Modifiers:");
-	    moraleModificators.push_front(" ");
-	    moraleModificators.push_front(Morale::Description(current_morale));
-	    DrawMoraleSprite(current_morale, rectMoraleInfo.x, rectMoraleInfo.y);
-	    headerMoraleInfo = MoraleString(current_morale);
+	    moraleIndicator.Redraw();
 	    cursor.Show();
 	    display.Flip();
 	    redrawMorale = false;
@@ -571,14 +371,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	if(redrawLuck)
 	{
 	    cursor.Hide();
-	    backgroundLuck.Restore();
-	    luckModificators.clear();
-	    current_luck = GetLuckWithModificators(&luckModificators);
-	    if(luckModificators.size()) luckModificators.push_front("Current Morale Modifiers:");
-	    luckModificators.push_front(" ");
-	    luckModificators.push_front(Luck::Description(current_luck));
-	    DrawLuckSprite(current_luck, rectLuckInfo.x, rectLuckInfo.y);
-	    headerLuckInfo = LuckString(current_luck);
+	    luckIndicator.Redraw();
 	    cursor.Show();
 	    display.Flip();
 	    redrawLuck = false;
@@ -626,6 +419,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     	    { return Dialog::DISMISS; }
 	}
 
+        if(le.MouseCursor(moraleIndicator.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator);
+        else
+        if(le.MouseCursor(luckIndicator.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator);
+
 	// left click info
         if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message("Attack Skill", "Your attack skill is a bonus added to each creature's attack skill.", Font::BIG, Dialog::OK);
         else
@@ -635,10 +432,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         else
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG, Dialog::OK);
 	else
-	if(le.MouseClickLeft(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, moraleModificators, Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rectLuckInfo)) Dialog::Message(headerLuckInfo, luckModificators, Font::BIG, Dialog::OK);
-        else
         if(le.MouseClickLeft(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
         else
         if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG, Dialog::OK);
@@ -685,10 +478,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         else
         if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG);
 	else
-        if(le.MousePressRight(rectMoraleInfo)) Dialog::Message(headerMoraleInfo, moraleModificators, Font::BIG);
-        else
-        if(le.MousePressRight(rectLuckInfo)) Dialog::Message(headerLuckInfo, luckModificators, Font::BIG);
-        else
         if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG);
         else
         if(le.MousePressRight(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG);
@@ -721,9 +510,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	else
 	if(le.MouseCursor(rectKnowledgeSkill)) statusBar.ShowMessage("View Knowledge Info");
 	else
-	if(le.MouseCursor(rectMoraleInfo)) statusBar.ShowMessage("View Morale Info");
+	if(le.MouseCursor(moraleIndicator.GetArea())) statusBar.ShowMessage("View Morale Info");
 	else
-	if(le.MouseCursor(rectLuckInfo)) statusBar.ShowMessage("View Luck Info");
+	if(le.MouseCursor(luckIndicator.GetArea())) statusBar.ShowMessage("View Luck Info");
 	else
 	if(le.MouseCursor(rectExperienceInfo)) statusBar.ShowMessage("View Experience Info");
 	else

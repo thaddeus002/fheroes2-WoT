@@ -30,12 +30,9 @@
 #include "portrait.h"
 #include "selectarmybar.h"
 #include "selectartifactbar.h"
+#include "heroes_indicator.h"
 #include "game_interface.h"
 
-extern void DrawLuckSprite(const Luck::luck_t, s16, s16);
-extern void DrawMoraleSprite(const Morale::morale_t, s16, s16);
-
-void RedrawLuckAndMoraleInfo(const Point &, const Skill::Primary &, const Skill::Primary &);
 void RedrawPrimarySkillInfo(const Point &, const Skill::Primary &, const Skill::Primary &);
 void RedrawSecondarySkill(const Point &, const std::vector<Skill::Secondary> &);
 
@@ -77,11 +74,29 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.y = cur_pt.y + 72;
     display.Blit(Portrait::Hero(heroes2.GetID(), Portrait::BIG), dst_pt);
 
-    Background backInfo1(cur_pt.x + 30, cur_pt.y + 75, 55, 90);
-    Background backInfo2(cur_pt.x + 565, cur_pt.y + 75, 55, 90);
-    backInfo1.Save();
-    backInfo2.Save();
-    RedrawLuckAndMoraleInfo(cur_pt, *this, heroes2);
+    dst_pt.x = cur_pt.x + 34;
+    dst_pt.y = cur_pt.y + 75;
+    MoraleIndicator moraleIndicator1(*this);
+    moraleIndicator1.SetPos(dst_pt);
+    moraleIndicator1.Redraw();
+
+    dst_pt.x = cur_pt.x + 34;
+    dst_pt.y = cur_pt.y + 115;
+    LuckIndicator luckIndicator1(*this);
+    luckIndicator1.SetPos(dst_pt);
+    luckIndicator1.Redraw();
+
+    dst_pt.x = cur_pt.x + 566;
+    dst_pt.y = cur_pt.y + 75;
+    MoraleIndicator moraleIndicator2(heroes2);
+    moraleIndicator2.SetPos(dst_pt);
+    moraleIndicator2.Redraw();
+
+    dst_pt.x = cur_pt.x + 566;
+    dst_pt.y = cur_pt.y + 115;
+    LuckIndicator luckIndicator2(heroes2);
+    luckIndicator2.SetPos(dst_pt);
+    luckIndicator2.Redraw();
 
     // primary skill
     Background backPrimary(cur_pt.x + 255, cur_pt.y + 50, 130, 135);
@@ -185,9 +200,10 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     	    if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
 	    {
 		cursor.Hide();
-		backInfo1.Restore();
-		backInfo2.Restore();
-		RedrawLuckAndMoraleInfo(cur_pt, *this, heroes2);
+		moraleIndicator1.Redraw();
+		moraleIndicator2.Redraw();
+		luckIndicator1.Redraw();
+		luckIndicator2.Redraw();
 		cursor.Show();
 		display.Flip();
 	    }
@@ -205,27 +221,28 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 		cursor.Hide();
 		backPrimary.Restore();
 		RedrawPrimarySkillInfo(cur_pt, *this, heroes2);
-		backInfo1.Restore();
-		backInfo2.Restore();
-		RedrawLuckAndMoraleInfo(cur_pt, *this, heroes2);
+		moraleIndicator1.Redraw();
+		moraleIndicator2.Redraw();
+		luckIndicator1.Redraw();
+		luckIndicator2.Redraw();
 		cursor.Show();
 		display.Flip();
 	    }
 	}
+
+        if(le.MouseCursor(moraleIndicator1.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator1);
+        else
+        if(le.MouseCursor(moraleIndicator2.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator2);
+	else
+        if(le.MouseCursor(luckIndicator1.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator1);
+        else
+        if(le.MouseCursor(luckIndicator2.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator2);
     }
 
-    cursor.Show();
+    cursor.Hide();
     background.Restore();
+    cursor.Show();
     display.Flip();
-}
-
-void RedrawLuckAndMoraleInfo(const Point & pt, const Skill::Primary & p1, const Skill::Primary & p2)
-{
-    DrawLuckSprite(p1.GetLuck(), pt.x + 30, pt.y + 75);
-    DrawMoraleSprite(p1.GetMorale(), pt.x + 30, pt.y + 120);
-
-    DrawLuckSprite(p2.GetLuck(), pt.x + 565, pt.y + 75);
-    DrawMoraleSprite(p2.GetMorale(), pt.x + 565, pt.y + 120);
 }
 
 void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, const Skill::Primary & p2)
