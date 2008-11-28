@@ -995,21 +995,7 @@ void World::LoadMaps(const std::string &filename)
 		{
 		    const Monster::monster_t monster = Monster::Monster(tile.GetObject());
 		    if(Monster::UNKNOWN == monster) continue;
-
-		    // save count
-		    u32 count = 0;
-
-		    // dependence from level monster
-		    switch(Monster::GetLevel(monster))
-		    {
-			case Monster::LEVEL1:	count = 4 * Monster::GetGrown(monster); break;
-			case Monster::LEVEL2:	count = 2 * Monster::GetGrown(monster); break;
-			case Monster::LEVEL3:	count = Monster::GetGrown(monster); break;
-			case Monster::LEVEL4:	count = 2;
-			default: break;
-		    }
-
-		    tile.SetCountMonster(count);
+		    tile.SetCountMonster(Monster::GetGrown(monster));
 		}
 		break;
 
