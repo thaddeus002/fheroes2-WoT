@@ -143,7 +143,6 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_SHRINE2:
 	case MP2::OBJ_SHRINE3:
 	case MP2::OBJ_TREEHOUSE:
-	case MP2::OBJ_CAMPFIRE:
 	case MP2::OBJ_ARTESIANSPRING:
 	case MP2::OBJ_SKELETON:
 	case MP2::OBJ_TREEKNOWLEDGE:
