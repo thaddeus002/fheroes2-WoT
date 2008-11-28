@@ -312,7 +312,7 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
     {
         case WIN:
         {
-            Army::army_t army = BattleArmyToArmy(*armies[0].first);
+            Army::army_t army = BattleArmyToArmy(*armies[1].first);
             animation.push_back(std::make_pair(ICN::WINCMBT, Point(32, 0)));
             message[0] = tr("battle.victory1");
             message[1] = tr("battle.victory2").sub(name).sub(army.CalculateExperience());
