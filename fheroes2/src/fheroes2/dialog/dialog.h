@@ -52,7 +52,6 @@ namespace Maps
 
 namespace Dialog
 {
-    typedef enum { READONLY = 0x01, BUTTONS = 0x02 } flags_t;
     typedef enum
     {
 	ZERO	= 0x0000,
@@ -70,6 +69,9 @@ namespace Dialog
 	PUZZLE	= 0x0400,
 	INFO	= 0x0800,
 	DIG	= 0x1000,
+
+	READONLY= 0x2000,
+	BUTTONS = (YES|OK|NO|CANCEL),
     } answer_t;
 
     answer_t AdventureOptions(const bool enabledig);
@@ -105,7 +107,7 @@ namespace Dialog
     void DwellingInfo(const Monster::monster_t & monster, u16 available);
 
     // army info
-    answer_t ArmyInfo(const Army::Troop & troop, u8 flags);
+    answer_t ArmyInfo(const Army::Troop & troop, u16 flags);
 
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);

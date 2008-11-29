@@ -28,6 +28,7 @@ class Rect;
 class Surface;
 class SpriteCursor;
 class LocalEvent;
+class Castle;
 
 class SelectArmyBar
 {
@@ -49,6 +50,7 @@ public:
     void 	SetBackgroundSprite(const Surface &);
     void	SetCursorSprite(const Surface &);
     void 	SetInterval(u8);
+    void	SetCastle(const Castle &);
 
     void	SetReadOnly(void);
     void	SetSaveLastTroop(void);
@@ -71,6 +73,8 @@ private:
 
     const Surface *	background;
     SpriteCursor	spritecursor;
+
+    const Castle *	castle;
 };
 
 #endif

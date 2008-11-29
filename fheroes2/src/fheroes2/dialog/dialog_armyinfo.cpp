@@ -22,9 +22,6 @@
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
-#include "payment.h"
-#include "world.h"
-#include "kingdom.h"
 #include "monster.h"
 #include "morale.h"
 #include "luck.h"
@@ -34,7 +31,7 @@
 #include "game.h"
 #include "battle_troop.h"
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u8 flags)
+Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
 {
     const Army::BattleTroop & battroop(troops);
     const bool battle = troops.GetArmy() && troops.GetArmy()->Modes(Army::FIGHT);
@@ -217,8 +214,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u8 flags)
 
     if(Monster::AllowUpgrade(stats.monster))
     {
-	const bool conditions = PaymentConditions::payment_t(PaymentConditions::UpgradeMonster(stats.monster) * battroop.Count()) <= world.GetMyKingdom().GetFundsResource();
-	if(!conditions)
+	if(READONLY & flags || !(UPGRADE & flags))
 	{
 	    buttonUpgrade.Press();
 	    buttonUpgrade.SetDisable(true);

@@ -249,6 +249,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     selectArmy.SetCursorSprite(AGG::GetICN(ICN::STRIP, 1));
     selectArmy.SetSaveLastTroop();
     if(readonly) selectArmy.SetReadOnly();
+    const Castle* castle = inCastle();
+    if(castle) selectArmy.SetCastle(*castle);
     selectArmy.Redraw();
 
     // secskill

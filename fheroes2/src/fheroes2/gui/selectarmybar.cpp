@@ -28,6 +28,7 @@
 #include "kingdom.h"
 #include "army.h"
 #include "tools.h"
+#include "castle.h"
 #include "selectarmybar.h"
 
 enum
@@ -37,7 +38,7 @@ enum
     FLAGS_SAVELAST	= 0x04,
 };
 
-SelectArmyBar::SelectArmyBar() : army(NULL), interval(0), selected(-1), flags(0), background(NULL)
+SelectArmyBar::SelectArmyBar() : army(NULL), interval(0), selected(-1), flags(0), background(NULL), castle(NULL)
 {
 }
 
@@ -133,6 +134,11 @@ void SelectArmyBar::SetReadOnly(void)
 void SelectArmyBar::SetUseMons32Sprite(void)
 {
     flags |= FLAGS_USEMONS32;
+}
+
+void SelectArmyBar::SetCastle(const Castle & c)
+{
+    castle = &c;
 }
 
 bool SelectArmyBar::SaveLastTroop(void) const
@@ -246,10 +252,20 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	    // dialog
 	    if(index1 == index2)
 	    {
-		switch(Dialog::ArmyInfo(troop1, (bar.ReadOnly() || bar.SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS)))
+		u16 flags = (bar.ReadOnly() || bar.SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
+		PaymentConditions::UpgradeMonster payment(troop1.Monster());
+		payment *= troop1.Count();
+
+		if(Monster::AllowUpgrade(troop1.Monster()) &&
+		    bar.castle &&
+		    bar.castle->isBuild(Monster::Dwelling(Monster::Upgrade(troop1.Monster()))) &&
+		    payment <= world.GetMyKingdom().GetFundsResource())
+		    flags |= Dialog::UPGRADE;
+
+		switch(Dialog::ArmyInfo(troop1, flags))
 		{
             	    case Dialog::UPGRADE:
-            		world.GetMyKingdom().OddFundsResource(PaymentConditions::UpgradeMonster(troop1.Monster()) * troop1.Count());
+            		world.GetMyKingdom().OddFundsResource(payment);
             		troop1.UpgradeMonster();
 			change = true;
             	    break;

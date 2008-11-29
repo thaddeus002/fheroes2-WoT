@@ -114,6 +114,7 @@ Dialog::answer_t Castle::OpenDialog(void)
     selectCaptainArmy.SetInterval(6);
     selectCaptainArmy.SetBackgroundSprite(AGG::GetICN(ICN::STRIP, 2));
     selectCaptainArmy.SetCursorSprite(AGG::GetICN(ICN::STRIP, 1));
+    selectCaptainArmy.SetCastle(*this);
     selectCaptainArmy.Redraw();
 
     // portrait heroes or captain or sign
@@ -140,6 +141,7 @@ Dialog::answer_t Castle::OpenDialog(void)
     selectHeroesArmy.SetBackgroundSprite(AGG::GetICN(ICN::STRIP, 2));
     selectHeroesArmy.SetCursorSprite(AGG::GetICN(ICN::STRIP, 1));
     selectHeroesArmy.SetSaveLastTroop();
+    selectHeroesArmy.SetCastle(*this);
 
     if(castle_heroes)
     {
