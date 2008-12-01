@@ -933,7 +933,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(! statusBar.isEmpty()) statusBar.Clear();
 
 	// animation sprite
-	if(!(++ticket % ANIMATION_LOW))
+	if(Game::ShouldAnimateInfrequent(ticket, 10))
 	{
 	    cursor.Hide();
 	    RedrawAllBuilding(cur_pt, orders_building);
@@ -941,6 +941,8 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    cursor.Show();
 	    display.Flip();
 	}
+
+	++ticket;
     }
 
     return result;
