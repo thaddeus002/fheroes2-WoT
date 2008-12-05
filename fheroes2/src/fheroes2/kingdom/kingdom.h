@@ -85,11 +85,21 @@ class Heroes;
 class Kingdom
 {
 public:
+    enum flags_t
+    {
+	PLAY	= 0x0001,
+	
+    };
+
     Kingdom(const Color::color_t cl, const Game::control_t con = Game::AI);
+
+    void SetModes(flags_t);
+    void ResetModes(flags_t);
+    bool Modes(flags_t) const;
 
     Game::control_t Control() const{ return control; };
     void SetControl(const Game::control_t con) { control = con; };
-    bool isPlay(void) const{ return play; };
+    bool isPlay(void) const{ return Modes(PLAY); };
     bool AllowPayment(const Resource::funds_t & funds) const;
 
     Color::color_t GetColor(void) const{ return color; };
@@ -134,11 +144,14 @@ public:
 
     bool HeroesMayStillMove(void) const;
 
+    void Dump(void) const;
+
 private:
     const Color::color_t color;
     Game::control_t control;
-    bool play;
     Resource::funds_t resource;
+
+    u16 flags;
 
     std::vector<Castle *> castles;
     std::vector<Heroes *> heroes;

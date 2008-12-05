@@ -33,6 +33,8 @@
 #include "heroes.h"
 
 #define CASTLEMAXMONSTER        6 
+#define TOWN_SCOUTE		4
+#define CASTLE_SCOUTE		5
 
 #define GROWN_WELL		2
 #define GROWN_WEL2		8
@@ -87,6 +89,7 @@ public:
 	ARMYSPREAD		= 0x0004,
 	ALLOWBUILD		= 0x0008,
 	BOATPRESENT		= 0x0010,
+	CAPITAL			= 0x0020,
     };
 
     Castle(s16 cx, s16 cy, const Race::race_t rs);
@@ -97,12 +100,9 @@ public:
     bool Modes(flags_t) const;
 
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
-    bool AllowBuild(void) const{ return Modes(ALLOWBUILD); };
-    bool isBuild(u32 bd) const{ return building & bd; };
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
     bool RecruitMonster(building_t dw, u16 count);
-    bool AllowBuyBuilding(building_t build) const;
     bool AllowBuyHero(void);
     bool ContainCoord(const u16 ax, const u16 ay) const;
 
@@ -127,13 +127,17 @@ public:
     void ActionNewWeek(void);
     void ActionNewMonth(void);
 
-    void BuyBuilding(building_t build);
     void DrawImageCastle(const Point & pt);
 
     Dialog::answer_t OpenDialog(void);
 
     s8 GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
     s8 GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+
+    bool AllowBuild(void) const{ return Modes(ALLOWBUILD); };
+    bool AllowBuyBuilding(building_t build) const;
+    bool isBuild(u32 bd) const{ return building & bd; };
+    void BuyBuilding(building_t build);
 
     static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
     static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
@@ -144,6 +148,10 @@ public:
     static bool PredicateIsCastle(const Castle *castle);
     static bool PredicateIsTown(const Castle *castle);
     static bool PredicateIsBuildMarketplace(const Castle *castle);
+
+    bool AITurns(void);
+    bool AITaskDefence(void);
+    bool AITaskDevelopment(void);
 
     void Dump(void) const;
 

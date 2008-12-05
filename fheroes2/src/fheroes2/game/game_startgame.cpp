@@ -151,6 +151,8 @@ Game::menu_t Game::StartGame(void)
 	    Kingdom & kingdom = world.GetKingdom(color);
 	    if(kingdom.isPlay())
 	    {
+		if(1 < conf.Debug()) kingdom.Dump();
+
 		radar.HideArea();
 		world.ClearFog(color);
 

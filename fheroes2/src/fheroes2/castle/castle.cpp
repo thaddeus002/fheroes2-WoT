@@ -595,8 +595,8 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
 	default: return false;
     }
 
-    // incorrect count
-    if(dwelling[dw_index] < count) return false;
+    // fix count
+    if(dwelling[dw_index] < count) count = dwelling[dw_index];
 
     // buy
     const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms) * count);
@@ -607,6 +607,7 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
     kingdom.OddFundsResource(paymentCosts);
     dwelling[dw_index] -= count;
 
+    if(H2Config::Debug()) Error::Verbose("Castle::RecruitMonster: " + name);
     return true;
 }
 
@@ -920,8 +921,27 @@ bool Castle::AllowBuyBuilding(building_t build) const
     // check allow building
     if(!Modes(ALLOWBUILD)) return false;
 
+    switch(build)
+    {
+	// allow build castle
+	case BUILD_CASTLE: if(! Modes(ALLOWCASTLE)) return false;
+
+	// buid shipyard only nearly sea
+	case BUILD_SHIPYARD: if(! HaveNearlySea()) return false;
+
+	// check upgrade dwelling
+        case DWELLING_UPGRADE2: if((Race::WRLK | Race::WZRD) & race) return false; break;
+        case DWELLING_UPGRADE3: if((Race::BARB | Race::WRLK) & race) return false; break;
+        case DWELLING_UPGRADE4: if((Race::WZRD) & race) return false; break;
+        case DWELLING_UPGRADE5: if((Race::SORC | Race::WRLK) & race) return false; break;
+        case DWELLING_UPGRADE6: if((Race::BARB | Race::SORC | Race::NECR) & race) return false; break;
+        case DWELLING_UPGRADE7: if(Race::WRLK != race) return false; break;
+
+	default: break;
+    }
+
     // check valid payment
-    if(! world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBuilding(race, build))) return false;
+    if(! world.GetKingdom(color).AllowPayment(PaymentConditions::BuyBuilding(race, build))) return false;
 
     // check build requirements
     std::bitset<32> requires(Castle::GetBuildingRequires(build));
@@ -940,15 +960,6 @@ bool Castle::AllowBuyBuilding(building_t build) const
 	}
     }
 
-    // other requires
-    switch(build)
-    {
-	// buid shipyard only nearly sea
-	case BUILD_SHIPYARD: if(! HaveNearlySea()) return false;
-	
-	default: break;
-    }
-
     return true;
 }
 
@@ -957,7 +968,7 @@ void Castle::BuyBuilding(building_t build)
 {
 	if(! AllowBuyBuilding(build)) return;
 	
-	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBuilding(race, build));
+	world.GetKingdom(color).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
 
 	// add build
 	building |= build;
@@ -990,7 +1001,7 @@ void Castle::BuyBuilding(building_t build)
 	// disable day build
 	ResetModes(ALLOWBUILD);
 	
-	if(H2Config::Debug()) Error::Verbose("Castle::BuyBuilding: " + GetStringBuilding(build, race));
+	if(H2Config::Debug()) Error::Verbose("Castle::BuyBuilding: " + name + " build " + GetStringBuilding(build, race));
 }
 
 /* draw image castle to position */

@@ -26,8 +26,17 @@
 
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
+    const char *sep = ". ";
     std::list<std::string> list;
-    if(message.size()) list.push_back(message);
+    size_t pos1 = 0;
+    size_t pos2 = 0;
+    while(std::string::npos != (pos2 = message.find(sep, pos1)))
+    {
+	list.push_back(message.substr(pos1, pos2 - pos1 + 1));
+	pos1 = pos2 + 2;
+    }
+    list.push_back(message.substr(pos1, message.size() - pos1));
+
     return Dialog::Message(header, list, ft, buttons);
 }
 

@@ -104,6 +104,8 @@ public:
 	ARMYSPREAD	= 0x0002,
 	SPELLCASTED	= 0x0004,
 	ENABLEMOVE	= 0x0008,
+	HUNTER		= 0x0010,
+	SCOUTER		= 0x0020,
     };
 
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
@@ -227,6 +229,7 @@ public:
     void LevelUp(bool autoselect = false);
 
     void PostBattle(void);
+    void AITurns(void);
     void Dump(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);

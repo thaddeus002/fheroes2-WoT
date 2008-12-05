@@ -1606,3 +1606,7 @@ void Heroes::Dump(void) const
     std::cout << "direction       : " << Direction::String(direction) << std::endl;
     std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
 }
+
+void Heroes::AITurns(void)
+{
+}

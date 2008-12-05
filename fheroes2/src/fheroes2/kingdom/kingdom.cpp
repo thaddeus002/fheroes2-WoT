@@ -30,8 +30,11 @@
 #include "world.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), play(cl & Settings::Get().FileInfo().KingdomColors() ? true : false)
+Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0)
 {
+    // set play
+    if(cl & Settings::Get().FileInfo().KingdomColors()) SetModes(PLAY);
+
     // set starting resource
     switch(Settings::Get().GameDifficulty())
     {
@@ -86,8 +89,30 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
     castles.reserve(15);
 }
 
+void Kingdom::SetModes(flags_t f)
+{
+    flags |= f;
+}
+
+void Kingdom::ResetModes(flags_t f)
+{
+    flags &= ~f;
+}
+
+bool Kingdom::Modes(flags_t f) const
+{
+    return flags & f;
+}
+
 void Kingdom::AITurns(void)
 {
+    if(castles.empty() && heroes.empty())
+    {
+	ResetModes(PLAY);
+	Error::Verbose("Kingdom::AITurns: " + Color::String(color) + "Loss!");
+	return;
+    }
+
     Game::StatusWindow & status = Game::StatusWindow::Get();
 
     status.RedrawAITurns(color, 0);
@@ -101,11 +126,45 @@ void Kingdom::AITurns(void)
     status.RedrawAITurns(color, 8);
     status.RedrawAITurns(color, 9);
 
+    std::vector<Castle *>::const_iterator itc = castles.begin();
+    std::vector<Heroes *>::const_iterator ith = heroes.begin();
+
+    // first day
+    if(1 == world.GetDay())
+    {
+	// set capital
+	if(castles.size())
+	{
+	    if(0 == GetCountCastle()) castles.front()->SetModes(Castle::CAPITAL);
+	    else
+	    // find first castle
+	    for(itc = castles.begin(); itc != castles.end(); ++itc) if(*itc && (**itc).isCastle()) (**itc).SetModes(Castle::CAPITAL);
+	}
+
+	// buy hero
+	// set role hunter or scouter
+    }
+
+    // castle AI turn
+    itc = castles.begin();
+    for(; itc != castles.end(); ++itc) if(*itc) (**itc).AITurns();
+
+    // heroes AI turn
+    ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).AITurns();
+
     if(H2Config::Debug()) Error::Verbose("Kingdom::AITurns: " + Color::String(color) + " moved");
 }
 
 void Kingdom::ActionNewDay(void)
 {
+    if(castles.empty() && heroes.empty())
+    {
+	ResetModes(PLAY);
+	Error::Verbose("Kingdom::ActionNewDay: " + Color::String(color) + "Loss!");
+	return;
+    }
+
     // castle New Day
     std::vector<Castle *>::const_iterator itc = castles.begin();
     for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewDay();
@@ -149,7 +208,7 @@ void Kingdom::ActionNewDay(void)
     {
 	AddFundsResource(event_day->GetResource());
         if(Game::LOCAL == control) Dialog::ResourceInfo(event_day->GetMessage(), "", event_day->GetResource());
-    }                                            
+    }
 }
 
 void Kingdom::ActionNewWeek(void)
@@ -204,7 +263,7 @@ void Kingdom::RemoveHeroes(const Heroes *hero)
     if(hero && heroes.size())
 	heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
 
-    if(heroes.empty() && castles.empty()) play = false;
+    if(heroes.empty() && castles.empty()) ResetModes(PLAY);
 }
 
 void Kingdom::AddCastle(const Castle *castle)
@@ -218,7 +277,20 @@ void Kingdom::RemoveCastle(const Castle *castle)
     if(castle && castles.size())
 	castles.erase(std::find(castles.begin(), castles.end(), castle));
 
-    if(heroes.empty() && castles.empty()) play = false;
+    if(heroes.empty() && castles.empty()) ResetModes(PLAY);
+
+    // set other capital
+    if(castles.size() && castle->Modes(Castle::CAPITAL))
+    {
+	std::vector<Castle *>::const_iterator itc = castles.begin();
+
+	if(0 == GetCountCastle()) castles.front()->SetModes(Castle::CAPITAL);
+	else
+	// find first castle
+	for(; itc != castles.end(); ++itc) if(*itc && (**itc).isCastle()) (**itc).SetModes(Castle::CAPITAL);
+    }
+
+    const_cast<Castle *>(castle)->ResetModes(Castle::CAPITAL);
 }
 
 u8 Kingdom::GetCountCastle(void) const
@@ -288,4 +360,17 @@ bool Kingdom::HeroesMayStillMove(void) const
     std::vector<Heroes *>::const_iterator ith = heroes.begin();
     for(; ith != heroes.end(); ++ith) if(*ith && (**ith).MayStillMove()) return true;
     return false;
+}
+
+void Kingdom::Dump(void) const
+{
+    std::cout << "Kingdom::Dump: " << "color: " << Color::String(color) <<
+    ", resource: " << 
+    "ore(" << resource.ore << ")," <<
+    "wood(" << resource.wood << ")," <<
+    "mercury(" << resource.mercury << ")," <<
+    "sulfur(" << resource.sulfur << ")," <<
+    "crystal(" << resource.crystal << ")," <<
+    "gems(" << resource.gems << ")," <<
+    "gold(" << resource.gold << ")" << std::endl;
 }

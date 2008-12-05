@@ -95,6 +95,8 @@ public:
     u16 CountWeek(void){ return week + 1; };
     bool BeginWeek(void){ return begin_week; };
     bool BeginMonth(void){ return begin_month; };
+    bool LastDay(void){ return ((day % DAYOFWEEK) == (DAYOFWEEK - 1)); };
+    bool LastWeek(void){ return ((week % WEEKOFMONTH) == (WEEKOFMONTH - 1)); };
     Week::type_t GetWeekType(void) const{ return week_name; };
 
     void NextDay(void);
