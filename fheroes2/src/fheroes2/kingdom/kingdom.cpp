@@ -256,10 +256,6 @@ void Kingdom::AddHeroes(const Heroes *hero)
 
 void Kingdom::RemoveHeroes(const Heroes *hero)
 {
-    //
-    // TODO: for current week need move hero to tavern
-    //
-
     if(hero && heroes.size())
 	heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
 

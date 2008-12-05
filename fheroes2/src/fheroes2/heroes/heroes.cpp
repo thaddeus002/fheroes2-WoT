@@ -30,6 +30,7 @@
 #include "gamearea.h"
 #include "kingdom.h"
 #include "ai.h"
+#include "battle.h"
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
@@ -117,8 +118,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     }
     
     // set default army
-    const Monster::stats_t monster = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
-    army.At(0).Set(monster.monster, monster.grown);
+    army.Reset(true);
 
     // extra hero
     switch(hid)
@@ -1585,7 +1585,9 @@ bool Heroes::MayStillMove(void) const
 
 void Heroes::SetFreeman(const u8 reason)
 {
-    // TODO reason: 0 - DISMISS, Army::LOSE, Army::RETREAT, Army::SURRENDER
+    if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetRecruits(color).second = hid;
+    if(Army::LOSE == reason || Army::RETREAT == reason) army.Reset();
+
     color = Color::GRAY;
     world.GetTiles(mp).SetObject(save_maps_general);
     mp.x = -1;

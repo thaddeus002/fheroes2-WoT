@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 #include <list>
-#include "race.h"
 #include "spell.h"
 #include "color.h"
 #include "morale.h"

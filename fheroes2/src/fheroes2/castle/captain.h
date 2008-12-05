@@ -20,7 +20,6 @@
 #ifndef H2CAPTAIN_H
 #define H2CAPTAIN_H
 
-#include "race.h"
 #include "morale.h"
 #include "luck.h"
 #include "skill.h"
@@ -40,6 +39,7 @@ class Captain : public Skill::Primary
         u8 GetKnowledge(void) const;
         Morale::morale_t GetMorale(void) const;
         Luck::luck_t GetLuck(void) const;
+        Race::race_t GetRace(void) const;
 
 	const Castle & home;
 };

@@ -26,6 +26,7 @@
 #include <utility>
 #include "morale.h"
 #include "luck.h"
+#include "race.h"
 #include "gamedefs.h"
 
 #define MAXPRIMARYSKILL		4
@@ -66,6 +67,7 @@ namespace Skill
         virtual u8 GetKnowledge(void) const = 0;
 	virtual Morale::morale_t GetMorale(void) const = 0;
 	virtual Luck::luck_t GetLuck(void) const = 0;
+	virtual Race::race_t GetRace(void) const = 0;
 
         static const std::string & String(const skill_t skill);
 	static skill_t FromLevelUp(const u8 race, const u8 level);

@@ -23,6 +23,7 @@
 #include "settings.h"
 #include "battle_troop.h"
 #include "text.h"
+#include "castle.h"
 #include "army.h"
 
 const std::string & Army::String(Army::armysize_t size)
@@ -514,4 +515,39 @@ u32 Army::army_t::CalculateExperience(void) const
 
     return res;
 
+}
+
+void Army::army_t::Reset(bool soft)
+{
+    std::vector<Troop>::iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) (*it1).Reset();
+
+    if(commander)
+    {
+    	const Monster::monster_t mons1 = Monster::Monster(commander->GetRace(), Castle::DWELLING_MONSTER1);
+
+	if(soft)
+	{
+    	    const Monster::monster_t mons2 = Monster::Monster(commander->GetRace(), Castle::DWELLING_MONSTER2);
+
+	    switch(Rand::Get(1, 3))
+	    {
+		case 1:
+		    JoinTroop(mons1, 3 * Monster::GetGrown(mons1));
+		    break;
+		case 2:
+		    JoinTroop(mons2, static_cast<u8>(1.5 * Monster::GetGrown(mons2)));
+		    break;
+		default:
+		    JoinTroop(mons1, 2 * Monster::GetGrown(mons1));
+		    JoinTroop(mons2, Monster::GetGrown(mons2));
+		    break;
+	    }
+	}
+	else
+	{
+	    JoinTroop(mons1, 1);
+	}
+    }
 }

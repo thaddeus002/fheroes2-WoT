@@ -718,16 +718,17 @@ Castle::building_t Castle::OpenTown(void)
     const bool many_hero = world.GetMyKingdom().GetHeroes().size() == KINGDOMMAXHEROES;
     const bool allow_buy_hero = AllowBuyHero();
 
+    const Recruits & recruits = world.GetRecruits(GetColor());
+
     // first hero
-    const Heroes::heroes_t & name1 = world.GetFreeRecruit1();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 260;
     const Rect rectHero1(dst_pt, 102, 93);
     Heroes *hero1 = NULL;
-    if(Heroes::UNKNOWN != name1)
+    if(Heroes::UNKNOWN != recruits.first)
     {
-	hero1 = &world.GetHeroes(name1);
-	display.Blit(Portrait::Hero(name1, Portrait::BIG), dst_pt);
+	hero1 = &world.GetHeroes(recruits.first);
+	display.Blit(Portrait::Hero(recruits.first, Portrait::BIG), dst_pt);
     }
     else
 	display.FillRect(0, 0, 0, rectHero1);
@@ -740,15 +741,14 @@ Castle::building_t Castle::OpenTown(void)
     }
 
     // second hero
-    const Heroes::heroes_t & name2 = world.GetFreeRecruit2();
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 362;
     const Rect rectHero2(dst_pt, 102, 94);
     Heroes *hero2 = NULL;
-    if(Heroes::UNKNOWN != name2)
+    if(Heroes::UNKNOWN != recruits.second)
     {
-    	hero2 = &world.GetHeroes(name2);
-	display.Blit(Portrait::Hero(name2, Portrait::BIG), dst_pt);
+    	hero2 = &world.GetHeroes(recruits.second);
+	display.Blit(Portrait::Hero(recruits.second, Portrait::BIG), dst_pt);
     }
     else
 	display.FillRect(0, 0, 0, rectHero2);
@@ -909,18 +909,18 @@ Castle::building_t Castle::OpenTown(void)
             ResetModes(ARMYSPREAD);
         }
 	else
-	if(Heroes::UNKNOWN != name1 && le.MouseClickLeft(rectHero1) &&
-	    Dialog::OK == DialogBuyHero(name1))
+	if(Heroes::UNKNOWN != recruits.first && le.MouseClickLeft(rectHero1) &&
+	    Dialog::OK == DialogBuyHero(recruits.first))
         {
-    	    RecruitHero(name1);
+    	    RecruitHero(recruits.first);
 
     	    return BUILD_NOTHING;
         }
 	else
-	if(Heroes::UNKNOWN != name2 && le.MouseClickLeft(rectHero2) &&
-	    Dialog::OK == DialogBuyHero(name2))
+	if(Heroes::UNKNOWN != recruits.second && le.MouseClickLeft(rectHero2) &&
+	    Dialog::OK == DialogBuyHero(recruits.second))
         {
-    	    RecruitHero(name2);
+    	    RecruitHero(recruits.second);
 
 	    return BUILD_NOTHING;
         }
@@ -969,9 +969,9 @@ Castle::building_t Castle::OpenTown(void)
         else
 	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message("Grouped Formation", descriptionGroupedArmyFormat, Font::BIG);
 	else
-	if(hero1 && le.MousePressRight(rectHero1)) hero1->OpenDialog(true);
+	if(hero1 && le.MousePressRight(rectHero1)){ hero1->OpenDialog(true); cursor.Show(); display.Flip(); }
 	else
-	if(hero2 && le.MousePressRight(rectHero2)) hero2->OpenDialog(true);
+	if(hero2 && le.MousePressRight(rectHero2)){ hero2->OpenDialog(true); cursor.Show(); display.Flip(); }
 
         // status info
 	if(le.MouseCursor(rectDwelling1))

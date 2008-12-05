@@ -149,3 +149,8 @@ Luck::luck_t Captain::GetLuck(void) const
 
     return Luck::IRISH;
 }
+
+Race::race_t Captain::GetRace(void) const
+{
+    return home.GetRace();
+}

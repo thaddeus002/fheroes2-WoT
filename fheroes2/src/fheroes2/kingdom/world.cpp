@@ -61,9 +61,6 @@ void World::NewMaps(const u16 sw, const u16 sh)
     begin_week = true;
     begin_month = true;
 
-    free_recruit_hero1 = Heroes::UNKNOWN;
-    free_recruit_hero2 = Heroes::UNKNOWN;
-
     week_name = Week::TORTOISE;
 
     // reserve memory
@@ -233,9 +230,6 @@ void World::LoadMaps(const std::string &filename)
 
     begin_week = true;
     begin_month = true;
-
-    free_recruit_hero1 = Heroes::UNKNOWN;
-    free_recruit_hero2 = Heroes::UNKNOWN;
 
     week_name = Week::TORTOISE;
 
@@ -784,7 +778,7 @@ void World::LoadMaps(const std::string &filename)
 				    pblock[18] < Heroes::BAX &&
 				    static_cast<u8>(pblock[18]) < vec_heroes.size() &&
 				    vec_heroes.at(pblock[18])->isFreeman() ?
-				    vec_heroes[pblock[18]] : GetFreemanHeroes(race));
+				    vec_heroes[pblock[18]] : vec_heroes[GetFreemanHeroes(race)]);
 
 			    if(hero)
 			    {
@@ -1044,7 +1038,7 @@ void World::LoadMaps(const std::string &filename)
 		const Castle & castle = *(kingdom.GetCastles().at(0));
 
 		// place hero
-		if(const Heroes *hero = GetFreemanHeroes(castle.GetRace()))
+		if(const Heroes *hero = vec_heroes[GetFreemanHeroes(castle.GetRace())])
 		{
 		    const_cast<Heroes &>(*hero).Recruit(castle);
 
@@ -1173,10 +1167,7 @@ void World::NextDay(void)
 
 void World::NewWeek(void)
 {
-    // change free recruit hero
-    const Race::race_t & rc = Settings::Get().FileInfo().KingdomRace(Settings::Get().MyColor());
-    free_recruit_hero1 = GetFreemanHeroes(rc)->GetID();
-    free_recruit_hero2 = GetFreemanHeroes()->GetID();
+    UpdateRecruits();
     
     UpdateDwellingPopulation();
 
@@ -1268,30 +1259,7 @@ void World::FreeOldMaps(void)
     vec_heroes.clear();
 }
 
-const Heroes::heroes_t & World::GetFreeRecruit1(void)
-{
-    const Race::race_t & rc = Settings::Get().FileInfo().KingdomRace(Settings::Get().MyColor());
-
-    if(Heroes::UNKNOWN == free_recruit_hero1 || !(*vec_heroes[free_recruit_hero1]).isFreeman()) free_recruit_hero1 = GetFreemanHeroes(rc)->GetID();
-
-    return free_recruit_hero1;
-}
-
-const Heroes::heroes_t & World::GetFreeRecruit2(void)
-{
-    if(Heroes::UNKNOWN == free_recruit_hero2 || !(*vec_heroes[free_recruit_hero2]).isFreeman()) free_recruit_hero2 = GetFreemanHeroes()->GetID();
-
-    while(free_recruit_hero1 == free_recruit_hero2)
-    {
-	Error::Verbose("World::GetFreeRecruit2: hero1 equal hero2");
-
-	free_recruit_hero2 = GetFreemanHeroes()->GetID();
-    }
-
-    return free_recruit_hero2;
-}
-
-const Heroes * World::GetFreemanHeroes(Race::race_t rc)
+Heroes::heroes_t World::GetFreemanHeroes(Race::race_t rc)
 {
     u8 min = 0;
     u8 max = 0;
@@ -1335,7 +1303,8 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
     }
 
     std::vector<Heroes::heroes_t> freeman_heroes;
-    
+    freeman_heroes.reserve(HEROESMAXCOUNT);
+
     // find freeman in race
     if(Race::BOMG != rc)
 	for(u8 ii = min; ii <= max; ++ii)
@@ -1351,10 +1320,10 @@ const Heroes * World::GetFreemanHeroes(Race::race_t rc)
     {
 	Error::Warning("World::GetFreemanHeroes: freeman not found, all heroes busy.");
 
-	return NULL;
+	return Heroes::UNKNOWN;
     }
 
-    return vec_heroes[ freeman_heroes[Rand::Get(freeman_heroes.size() - 1)] ];
+    return *Rand::Get(freeman_heroes);
 }
 
 const std::string & World::GetRumors(void)
@@ -1773,4 +1742,42 @@ const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const u16 in
     }
 
     return NULL;
+}
+
+Recruits & World::GetRecruits(Color::color_t color)
+{
+    u8 index = 6;
+
+    switch(color)
+    {
+        case Color::BLUE:       index = 0;
+        case Color::GREEN:      index = 1;
+        case Color::RED:        index = 2;
+        case Color::YELLOW:     index = 3;
+        case Color::ORANGE:     index = 4;
+        case Color::PURPLE:     index = 5;
+	default: break;
+    }
+
+    Recruits & recruits = vec_recruits[index];
+
+    if(Heroes::UNKNOWN == recruits.first || !(*vec_heroes[recruits.first]).isFreeman()) recruits.first = GetFreemanHeroes(GetKingdom(color).GetRace());
+    if(Heroes::UNKNOWN == recruits.second || !(*vec_heroes[recruits.second]).isFreeman()) recruits.second = GetFreemanHeroes();
+
+    return recruits;
+}
+
+void World::UpdateRecruits(void)
+{
+    for(Color::color_t color = Color::BLUE; color < Color::GRAY; ++color)
+    {
+	Kingdom & kingdom = GetKingdom(color);
+	Recruits & recruits = GetRecruits(color);
+
+	if(kingdom.isPlay())
+	{
+	    recruits.first = GetFreemanHeroes(kingdom.GetRace());
+	    recruits.second = GetFreemanHeroes();
+	}
+    }
 }

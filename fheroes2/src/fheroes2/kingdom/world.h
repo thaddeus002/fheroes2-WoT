@@ -42,6 +42,11 @@ namespace GameEvent
     class Riddle;
 };
 
+struct Recruits : public std::pair<Heroes::heroes_t, Heroes::heroes_t>
+{
+    Recruits() : std::pair<Heroes::heroes_t, Heroes::heroes_t>(Heroes::UNKNOWN, Heroes::UNKNOWN){};
+};
+
 #define DAYOFWEEK       7 
 #define WEEKOFMONTH     4 
 #define MAXCASTLES	72
@@ -78,10 +83,8 @@ public:
     const Heroes * GetHeroes(u16 maps_index) const;
     const Heroes * GetHeroes(u8 ax, u8 ay) const;
     const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); };
-    const Heroes * GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
-    const Heroes::heroes_t & GetFreeRecruit1(void);
-    const Heroes::heroes_t & GetFreeRecruit2(void);
+    Recruits & GetRecruits(Color::color_t);
 
     Heroes & GetHeroes(const Heroes::heroes_t & hero){ return *vec_heroes[hero]; };
 
@@ -129,9 +132,11 @@ public:
 protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
+    void UpdateRecruits(void);
+    Heroes::heroes_t GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
 private:
-    World() : Size(0, 0), width(Size::w), height(Size::h) {};
+    World() : Size(0, 0), vec_recruits(7), width(Size::w), height(Size::h) {};
 
     void FreeOldMaps(void);
 
@@ -145,6 +150,7 @@ private:
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
     std::vector<u16>                    vec_teleports;
+    std::vector<Recruits>		vec_recruits;
 
     std::map<u32, std::vector<u16> >	map_whirlpools;
     std::map<u16, std::string>		map_sign;
@@ -165,8 +171,6 @@ private:
     bool begin_week;
     bool begin_month;
 
-    Heroes::heroes_t free_recruit_hero1;
-    Heroes::heroes_t free_recruit_hero2;
 
     Week::type_t week_name;
     

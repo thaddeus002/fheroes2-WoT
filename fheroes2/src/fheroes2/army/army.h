@@ -110,7 +110,8 @@ namespace Army
 	    void	Import(const std::vector<Troop> &);
 	    void	Import(const std::vector<BattleTroop> &);
 	    void	UpgradeMonsters(const Monster::monster_t);
-	    
+	    void	Reset(bool = false);	// reset: soft or hard
+
 	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0) const;
 
 	    Troop&	At(u8);
