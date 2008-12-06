@@ -924,10 +924,10 @@ bool Castle::AllowBuyBuilding(building_t build) const
     switch(build)
     {
 	// allow build castle
-	case BUILD_CASTLE: if(! Modes(ALLOWCASTLE)) return false;
+	case BUILD_CASTLE: if(! Modes(ALLOWCASTLE)) return false; break;
 
 	// buid shipyard only nearly sea
-	case BUILD_SHIPYARD: if(! HaveNearlySea()) return false;
+	case BUILD_SHIPYARD: if(! HaveNearlySea()) return false; break;
 
 	// check upgrade dwelling
         case DWELLING_UPGRADE2: if((Race::WRLK | Race::WZRD) & race) return false; break;
