@@ -71,14 +71,8 @@ void Font::Close(void)
 }
 
 #else
-struct TTF_Font;
-namespace Font
-{
-    TTF_Font *Get(void);
-}
 void Font::Init(void){};
 void Font::Quit(void){};
 bool Font::Open(const std::string &, u8){ return false; };
 void Font::Close(void){};
-TTF_Font* Font::Get(void){ return NULL; };
 #endif
