@@ -35,21 +35,28 @@ public:
 
     typedef enum
     {
-        NONE              = 0x00000000,
-        SOUND             = 0x00000001,
-        FULLSCREEN        = 0x00000004,
-        LOGO              = 0x00000008,
-        EDITOR            = 0x00000010,
-        MUSIC_EXT         = 0x00000020,
-        MUSIC_CD          = 0x00000040,
-        MUSIC_MIDI        = 0x00000080,
-        ORIGINAL          = 0x00010000,
-        PRICELOYALTY      = 0x00020000,
-        EVILINTERFACE     = 0x00040000,
-        SHADOW            = 0x00080000,
-        BATTLEGRID        = 0x00100000,
-        BATTLEMOUSESHADOW = 0x00200000,
-        BATTLEMOVESHADOW  = 0x00400000,
+	NONE              = 0x00000000,
+
+	PREFERABLY_COUNT2 = 0x00000002,
+	PREFERABLY_COUNT3 = 0x00000003,
+	PREFERABLY_COUNT4 = 0x00000004,
+	PREFERABLY_COUNT5 = 0x00000005,
+	PREFERABLY_COUNT6 = 0x00000006,
+
+        SOUND             = 0x00010000,
+        FULLSCREEN        = 0x00020000,
+        LOGO              = 0x00040000,
+        EDITOR            = 0x00080000,
+        MUSIC_EXT         = 0x00100000,
+        MUSIC_CD          = 0x00200000,
+        MUSIC_MIDI        = 0x00400000,
+        ORIGINAL          = 0x00800000,
+        PRICELOYALTY      = 0x01000000,
+        EVILINTERFACE     = 0x02000000,
+        SHADOW            = 0x04000000,
+        BATTLEGRID        = 0x08000000,
+        BATTLEMOUSESHADOW = 0x10000000,
+        BATTLEMOVESHADOW  = 0x20000000,
 
 	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
 

@@ -369,7 +369,7 @@ bool Heroes::MoveStep(void)
 	{
 	    M82::m82_t wav = M82::UNKNOWN;
 
-	    const u8 speed = 3;
+	    const u8 speed = (4 > Settings::Get().Animation() ? 1 : (7 > Settings::Get().Animation() ? 2 : 3));
 
 	    // play sound
 	    switch(world.GetTiles(mp).GetGround())

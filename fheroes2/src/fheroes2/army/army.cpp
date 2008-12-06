@@ -284,7 +284,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
         for(; it1 != it2; it1++) if(Monster::UNKNOWN == (*it1).Monster())
         {
             *it1 = troop;
-            if(Settings::Get().Debug()) Error::Verbose("Army::JoinTroops: monster: " + Monster::String(troop.Monster()) + ", count: ", troop.Count());
+            if(1 < Settings::Get().Debug()) Error::Verbose("Army::JoinTroops: monster: " + Monster::String(troop.Monster()) + ", count: ", troop.Count());
             return true;
         }
     }
