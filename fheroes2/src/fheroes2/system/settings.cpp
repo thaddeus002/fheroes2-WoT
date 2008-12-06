@@ -46,7 +46,7 @@ namespace
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"),
+    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"), fontname("arial.ttf"),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
 {
 }
@@ -132,6 +132,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "data = " << path_data_directory << std::endl;
     stream << "maps = " << path_maps_directory << std::endl;
     stream << "translation = " << translationFile << std::endl;
+    stream << "font = " << fontname << std::endl;
 
     str.clear();
     String::AddInt(str, video_mode.w);
@@ -206,6 +207,9 @@ bool Settings::Modes(const settings_t s) const { return modes & s; }
 
 const std::string & Settings::TranslationFile(void) const { return translationFile; }
 
+/* return fontname */
+const std::string & Settings::FontName(void) const { return fontname; }
+
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
 
@@ -267,6 +271,9 @@ void Settings::Parse(const std::string & left, const std::string & right)
     else
     // translation strings
     if(left == "translation") translationFile = right;
+    else
+    // font name
+    if(left == "font") fontname = right;
     else
     // data directory
     if(left == "data") path_data_directory = right;

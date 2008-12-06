@@ -18,59 +18,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
-#include "engine.h"
-#include "font.h"
-#include "SDL.h"
+#ifndef H2FONT_H
+#define H2FONT_H
 
-namespace Mixer
+#include <string>
+
+class Surface;
+
+namespace Font
 {
     void Init(void);
     void Quit(void);
-}
 
-namespace Cdrom
-{
-    void Open(void);
+    bool Open(const std::string & filename, u8 size);
+    bool isValid(void);
     void Close(void);
-}
+};
 
-bool SDL::Init(const u32 system)
-{
-    u32 flags = INIT_NONE;
-    if(system & INIT_VIDEO)
-        flags |= SDL_INIT_VIDEO;
-    if(system & INIT_AUDIO)
-        flags |= SDL_INIT_AUDIO;
-    if(system  & INIT_TIMER)
-        flags |= SDL_INIT_TIMER;
-    if(system  & INIT_CDROM)
-        flags |= SDL_INIT_CDROM;
-    
-    if(0 > SDL_Init(flags))
-    {
-	Error::Warning("SDL::Init: error: " + std::string(SDL_GetError()));
-
-	return false;
-    }
-
-    if(INIT_AUDIO & system) Mixer::Init();
-    if(INIT_CDROM & system) Cdrom::Open();
-    Font::Init();
-
-    return true;
-}
-
-void SDL::Quit(void)
-{
-    Font::Quit();
-    if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();
-    if(SubSystem(SDL_INIT_AUDIO)) Mixer::Quit();
-
-    SDL_Quit();
-}
-
-bool SDL::SubSystem(const u32 system)
-{
-    return system & SDL_WasInit(system);
-}
+#endif

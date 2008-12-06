@@ -20,57 +20,60 @@
 
 #include "error.h"
 #include "engine.h"
+#include "surface.h"
 #include "font.h"
-#include "SDL.h"
 
-namespace Mixer
+#ifdef WITH_TTF
+#include "SDL_ttf.h"
+
+namespace Font
 {
-    void Init(void);
-    void Quit(void);
+    TTF_Font* Get(void);
+
+    static TTF_Font * fnt = NULL;
+};
+
+void Font::Init(void)
+{
+    if(0 != TTF_Init()) Error::Verbose("Font::Init: error");
 }
 
-namespace Cdrom
+void Font::Quit(void)
 {
-    void Open(void);
-    void Close(void);
+    TTF_Quit();
 }
 
-bool SDL::Init(const u32 system)
+bool Font::isValid(void)
 {
-    u32 flags = INIT_NONE;
-    if(system & INIT_VIDEO)
-        flags |= SDL_INIT_VIDEO;
-    if(system & INIT_AUDIO)
-        flags |= SDL_INIT_AUDIO;
-    if(system  & INIT_TIMER)
-        flags |= SDL_INIT_TIMER;
-    if(system  & INIT_CDROM)
-        flags |= SDL_INIT_CDROM;
-    
-    if(0 > SDL_Init(flags))
-    {
-	Error::Warning("SDL::Init: error: " + std::string(SDL_GetError()));
-
-	return false;
-    }
-
-    if(INIT_AUDIO & system) Mixer::Init();
-    if(INIT_CDROM & system) Cdrom::Open();
-    Font::Init();
-
-    return true;
+    return fnt;
 }
 
-void SDL::Quit(void)
+TTF_Font* Font::Get(void)
 {
-    Font::Quit();
-    if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();
-    if(SubSystem(SDL_INIT_AUDIO)) Mixer::Quit();
-
-    SDL_Quit();
+    return fnt;
 }
 
-bool SDL::SubSystem(const u32 system)
+bool Font::Open(const std::string & filename, u8 size)
 {
-    return system & SDL_WasInit(system);
+    if(fnt) TTF_CloseFont(fnt);
+
+    fnt = TTF_OpenFont(filename.c_str(), size);
+
+    if(!fnt) Error::Warning("Font::Open: error open: " + filename);
+
+    return fnt;
 }
+
+void Font::Close(void)
+{
+    if(fnt) TTF_CloseFont(fnt);
+    fnt = NULL;
+}
+
+#else
+void Font::Init(void){};
+void Font::Quit(void){};
+bool Font::Open(const std::string &, u8){ return false; };
+void Font::Close(void){};
+TTF_Font* Font::Get(void){ return NULL; };
+#endif

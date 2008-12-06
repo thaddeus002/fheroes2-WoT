@@ -25,6 +25,7 @@
 #include "types.h"
 
 struct SDL_Palette;
+struct SDL_Color;
 
 class Palette
 {
@@ -41,7 +42,7 @@ public:
 
     u32 Size(void) const;
     u32 Color(const u16 index) const;
-
+    const SDL_Color * SDLColor(const u16 index) const;
     const SDL_Color * SDLColors(void) const;
 
 

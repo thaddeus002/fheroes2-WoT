@@ -4,7 +4,7 @@
 # Options:
 # DEBUG: build in debug mode
 # RELEASE: build with addons extensions
-# SCRIPTING: build with lua support
+# DEVELOPMENT: build with development extensions
 #
 
 TARGET := fheroes2
@@ -22,7 +22,7 @@ ifdef RELEASE
 CFLAGS := $(CFLAGS) -DBUILD_RELEASE
 endif
 
-ifdef SCRIPTING
+ifdef DEVELOPMENT
 CFLAGS := $(CFLAGS) $(LUA_FLAGS) -DWITH_LUA
 LIBS := $(LIBS) $(LUA_LIBS)
 endif

@@ -21,10 +21,11 @@
 #define H2SURFACE_H
 
 #include "rect.h"
+#include "SDL.h"
 #include "types.h"
 
 #define DEFAULT_DEPTH           16              // Surface use bits color
-extern const u32 SWSURFACE;
+#define SWSURFACE 		SDL_SWSURFACE
 
 class Palette;
 class Point;
@@ -32,6 +33,8 @@ class Rect;
 struct SDL_Surface;
 struct SDL_PixelFormat;
 struct SDL_Color;
+
+typedef SDL_Color Colors;
 
 class Surface
 {
@@ -47,6 +50,9 @@ public:
 
     Surface & operator= (const Surface & bs);
     void Set(u16 sw, u16 sh, bool alpha = false);
+
+    void RenderTextSolid(const std::string & msg, const Colors &  clr, bool unicode = false);
+    void RenderTextBlended(const std::string & msg, const Colors & clr, bool unicode = false);
 
     u16 w(void) const;
     u16 h(void) const;
@@ -76,7 +82,7 @@ public:
     void FillRect(u8 r, u8 g, u8 b, const Rect & src){ FillRect(MapRGB(r, g, b), src); };
 
     void LoadPalette(const Palette & pal);
-    void LoadPalette(const SDL_Color *colors, u32 ncolor);
+    void LoadPalette(const Colors *colors, u32 ncolor);
     void SetDisplayFormat(void);
     void SetColorKey(void);
     void SetColorKey(u8 r, u8 g, u8 b);

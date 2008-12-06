@@ -21,9 +21,16 @@
 #include "surface.h"
 #include "palette.h"
 #include "error.h"
-#include "SDL.h"
+#include "font.h"
 
-const u32 SWSURFACE = SDL_SWSURFACE;
+#ifdef WITH_TTF
+#include "SDL_ttf.h"
+
+namespace Font
+{
+    TTF_Font* Get(void);
+};
+#endif
 
 Surface::Surface() : surface(NULL), videosurface(false)
 {
@@ -132,7 +139,7 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 }
 
 /* load  palette for 8bit surface */
-void Surface::LoadPalette(const SDL_Color *colors, u32 ncolor)
+void Surface::LoadPalette(const Colors *colors, u32 ncolor)
 {
     if(!colors) Error::Warning("Surface::LoadPalette: empty palette.");
 
@@ -483,4 +490,20 @@ void Surface::FreeSurface(void)
 const SDL_PixelFormat *Surface::GetPixelFormat(void) const
 {
     return surface->format;
+}
+
+void Surface::RenderTextSolid(const std::string & msg, const Colors & clr, bool unicode)
+{
+#ifdef WITH_TTF
+    if(surface) SDL_FreeSurface(surface);
+    if(Font::isValid()) surface = (unicode ? TTF_RenderUTF8_Solid(Font::Get(), msg.c_str(), clr) : TTF_RenderText_Solid(Font::Get(), msg.c_str(), clr));
+#endif
+}
+
+void Surface::RenderTextBlended(const std::string & msg, const Colors & clr, bool unicode)
+{
+#ifdef WITH_TTF
+    if(surface) SDL_FreeSurface(surface);
+    if(Font::isValid()) surface = (unicode ? TTF_RenderUTF8_Blended(Font::Get(), msg.c_str(), clr) : TTF_RenderText_Blended(Font::Get(), msg.c_str(), clr));
+#endif
 }

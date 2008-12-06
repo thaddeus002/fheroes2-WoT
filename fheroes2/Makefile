@@ -1,6 +1,11 @@
 # makefile
 # project: Free Heroes2
 #
+# Options:
+# DEBUG: build in debug mode
+# RELEASE: build with addons extensions
+# DEVELOPMENT: build with development extensions
+#
 
 TARGET := fheroes2
 

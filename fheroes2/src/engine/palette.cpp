@@ -152,3 +152,8 @@ u32 Palette::Color(const u16 index) const
 {
     return index < sdlpal->ncolors ? pal[index] : 0;
 }
+
+const SDL_Color * Palette::SDLColor(const u16 index) const
+{
+    return index < sdlpal->ncolors ? &sdlpal->colors[index] : NULL;
+}

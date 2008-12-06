@@ -237,7 +237,7 @@ void Lua::RegisterCommonFunc()
   RegisterFunc("alert", (void*)alert, Lua::VOID, 0);
   RegisterFunc("alert1", (void*)alert1, Lua::VOID, 1, Lua::STRING);
   RegisterFunc("msg", (void*)message, Lua::VOID, 2, Lua::STRING, Lua::STRING);
-  RegisterFunc("message", (void*)Dialog::Message, Lua::INTEGER, 4, Lua::STRING, Lua::STRING, Lua::INTEGER, Lua::INTEGER);
+//  RegisterFunc("message", (void*)Dialog::Message, Lua::INTEGER, 4, Lua::STRING, Lua::STRING, Lua::INTEGER, Lua::INTEGER);
 }
 
 // callback function

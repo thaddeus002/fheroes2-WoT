@@ -13,6 +13,11 @@ else
 CFLAGS := $(CFLAGS) -O2 -Wall $(SDL_FLAGS)
 endif
 
+ifdef DEVELOPMENT
+CFLAGS := $(CFLAGS) -DWITH_TTF
+LIBS := $(LIBS) $(LUA_LIBS) -lSDL_ttf
+endif
+
 CC = g++
 
 all: $(TARGET).a $(TARGET).so
