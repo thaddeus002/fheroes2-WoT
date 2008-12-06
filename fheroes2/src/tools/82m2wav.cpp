@@ -33,12 +33,21 @@ class wavhead
 	{
 	    // "RIFF"
 	    SWAP32(riff);
+	    SWAP32(size);
 	    // "WAVE"
 	    SWAP32(wave);
 	    // " fmt"
 	    SWAP32(fmt);
+	    SWAP32(size_t);
+	    SWAP16(format);
+	    SWAP16(channels);
+	    SWAP32(samples);
+	    SWAP32(byteper);
+	    SWAP16(align);
+	    SWAP16(bitsper);
 	    // "data"
 	    SWAP32(data);
+	    SWAP32(size_d);
 	};
 
     void write(std::fstream & fd)
