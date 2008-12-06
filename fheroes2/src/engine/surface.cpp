@@ -22,6 +22,7 @@
 #include "palette.h"
 #include "error.h"
 #include "font.h"
+#include "SDL.h"
 
 #ifdef WITH_TTF
 #include "SDL_ttf.h"
@@ -31,6 +32,8 @@ namespace Font
     TTF_Font* Get(void);
 };
 #endif
+
+const int SWSURFACE = SDL_SWSURFACE;
 
 Surface::Surface() : surface(NULL), videosurface(false)
 {

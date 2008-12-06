@@ -28,8 +28,8 @@
 
 namespace Font
 {
-    TTF_Font* Get(void);
-
+    TTF_Font *Get(void);
+    
     static TTF_Font * fnt = NULL;
 };
 
@@ -71,6 +71,11 @@ void Font::Close(void)
 }
 
 #else
+struct TTF_Font;
+namespace Font
+{
+    TTF_Font *Get(void);
+}
 void Font::Init(void){};
 void Font::Quit(void){};
 bool Font::Open(const std::string &, u8){ return false; };

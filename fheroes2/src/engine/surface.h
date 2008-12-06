@@ -21,11 +21,10 @@
 #define H2SURFACE_H
 
 #include "rect.h"
-#include "SDL.h"
 #include "types.h"
 
 #define DEFAULT_DEPTH           16              // Surface use bits color
-#define SWSURFACE 		SDL_SWSURFACE
+extern const int SWSURFACE;
 
 class Palette;
 class Point;
