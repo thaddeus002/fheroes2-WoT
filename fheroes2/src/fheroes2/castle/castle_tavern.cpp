@@ -96,7 +96,7 @@ void Castle::OpenTavern(void)
 
 
         // animation
-	if(0 == (speed % ANIMATION_LOW))
+	if(Game::ShouldAnimateInfrequent(speed, 8))
 	{
 	    cursor.Hide();
 

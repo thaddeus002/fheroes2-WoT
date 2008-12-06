@@ -239,5 +239,5 @@ void Route::Path::Dump(void) const
     const_iterator it1 = begin();
     const_iterator it2 = end();
 
-    for(; it1 != it2; ++it1) std::cout << Direction::String((*it1).Direction()) << ", " << (*it1).Penalty() << std::endl;
+    for(; it1 != it2; ++it1) std::cout << "Path::Dump: " << Direction::String((*it1).Direction()) << ", " << (*it1).Penalty() << std::endl;
 }

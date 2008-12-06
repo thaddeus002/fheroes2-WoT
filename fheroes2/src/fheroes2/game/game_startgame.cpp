@@ -632,7 +632,7 @@ bool Game::ShouldAnimate(u32 ticket)
 bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
 {
     //TODO: Use user-selected speed instead of medium by default
-    return !(ticket % (1 < modifier ? (ANIMATION_MEDIUM - Settings::Get().Animation()) * modifier : ANIMATION_MEDIUM - Settings::Get().Animation()));
+    return !(ticket % (1 < modifier ? (ANIMATION_SPEED - (2 * Settings::Get().Animation())) * modifier : ANIMATION_SPEED - (2 * Settings::Get().Animation())));
 }
 
 Game::menu_t Game::HumanTurn(void)
@@ -1217,7 +1217,7 @@ Game::menu_t Game::HumanTurn(void)
 	update_audio = false;
 
 	// animation
-        if(Game::ShouldAnimate(ticket))
+        if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
             cursor.Hide();
 
@@ -1232,7 +1232,7 @@ Game::menu_t Game::HumanTurn(void)
 
         	scrollDir = GameArea::NONE;
             }
-    	    else
+	    else
     	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
 		Heroes & heroes = global_focus.GetHeroes();
@@ -1267,7 +1267,7 @@ Game::menu_t Game::HumanTurn(void)
 		}
 	    }
 
-	    if(Game::ShouldAnimateInfrequent(ticket, 10)) Maps::IncreaseAnimationTicket();
+	    if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
 
 	    gamearea.Redraw();
             radar.RedrawCursor();

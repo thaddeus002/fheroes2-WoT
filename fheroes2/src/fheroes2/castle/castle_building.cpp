@@ -22,6 +22,7 @@
 #include "castle.h"
 #include "settings.h"
 #include "cursor.h"
+#include "game.h"
 
 Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 {
@@ -383,7 +384,7 @@ void Castle::RedrawAnimationBuilding(const Point & dst_pt, const building_t buil
 
     while(le.HandleEvents() && ii < 250)
     {
-        if(!(ticket % ANIMATION_MEDIUM))
+        if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
     	    cursor.Hide();
     	    display.Blit(bg, src_rt);

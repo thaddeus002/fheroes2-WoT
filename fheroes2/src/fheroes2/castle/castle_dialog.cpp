@@ -500,19 +500,14 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    {
 		cursor.Hide();
 
-        	if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
-        	if(selectHeroesArmy.isSelected()) selectHeroesArmy.Reset();
-
+                if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
 		BuyBuilding(build);
 
 		// play sound
 		AGG::PlaySound(M82::BUILDTWN);
 		
 		RedrawAnimationBuilding(cur_pt, build);
-
 		RedrawResourcePanel();		                
-	        //RedrawAllBuilding(cur_pt, orders_building);
-	        //RedrawNameTown(cur_pt);
 
 		if(Castle::BUILD_CAPTAIN == build && ! castle_heroes)
 		    display.Blit(Portrait::Captain(race, Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
@@ -523,15 +518,12 @@ Dialog::answer_t Castle::OpenDialog(void)
 		cursor.Show();
 		display.Flip();
 	    }
-	    else
+
 	    if(castle_heroes)
 	    {
 		cursor.Hide();
 
-                if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
                 if(selectHeroesArmy.isSelected()) selectHeroesArmy.Reset();
-
-                selectHeroesArmy.SetArmy(castle_heroes->GetArmy());
 
 		if(buyhero)
 		{
@@ -541,6 +533,7 @@ Dialog::answer_t Castle::OpenDialog(void)
             	    sf.Blit(AGG::GetICN(ICN::STRIP, 0), rt, 0, 0);
 		    const Surface & port = Portrait::Hero((*castle_heroes), Portrait::BIG);
 		    sf.Blit(port, 6, 6);
+            	    selectHeroesArmy.SetArmy(castle_heroes->GetArmy());
 		    selectHeroesArmy.SetPos(112, 5);
 		    selectHeroesArmy.Redraw(sf);
 		    selectHeroesArmy.SetPos(cur_pt.x + 112, cur_pt.y + 361);
@@ -553,7 +546,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 
 		    while(le.HandleEvents() && alpha < 250)
 		    {
-    			if(!(ticket % ANIMATION_HIGH))
+    			if(Game::ShouldAnimateInfrequent(ticket, 1))
     			{
     			    cursor.Hide();
         		    sf.SetAlpha(alpha);
@@ -566,12 +559,11 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    }
 
 		    cursor.Hide();
+            	    display.Blit(AGG::GetICN(ICN::STRIP, 0), cur_pt.x, cur_pt.y + 256);
+            	    display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
+            	    selectHeroesArmy.Redraw();
 		    RedrawResourcePanel();
 		}
-
-                display.Blit(AGG::GetICN(ICN::STRIP, 0), cur_pt.x, cur_pt.y + 256);
-                display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
-                selectHeroesArmy.Redraw();
 
 		cursor.Show();
 		display.Flip();
@@ -595,10 +587,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		AGG::PlaySound(M82::BUILDTWN);
 
 		RedrawAnimationBuilding(cur_pt, BUILD_CASTLE);
-
 		RedrawResourcePanel();
-	        //RedrawAllBuilding(cur_pt, orders_building);
-	        //RedrawNameTown(cur_pt);
 
 		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();

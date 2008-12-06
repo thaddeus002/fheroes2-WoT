@@ -223,9 +223,9 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     u32 ticket = 0;
     u8 alpha = 250;
 
-    while(le.HandleEvents() && alpha > 0)
+    while(le.HandleEvents() && alpha > 10)
     {
-	if(!(ticket % ANIMATION_HIGH))
+	if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
 	    cursor.Hide();
 	    tile.RedrawTile();
@@ -236,7 +236,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 	    if(hero) hero->Redraw(false);
             cursor.Show();
             display.Flip();
-            alpha -= 10;
+            alpha -= 20;
         }
 
         ++ticket;

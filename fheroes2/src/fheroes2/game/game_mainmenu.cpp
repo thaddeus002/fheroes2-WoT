@@ -101,7 +101,7 @@ Game::menu_t Game::MainMenu(void)
 	{
 	    if(2 > trigger_anime1)
 	    {
-		DELAY(ANIMATION_HIGH);
+		DELAY(8);
 		cursor.Hide();
 		const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, ++trigger_anime1);
 		display.Blit(sprite, sprite.x(), sprite.y());
@@ -126,7 +126,7 @@ Game::menu_t Game::MainMenu(void)
 	{
 	    if(6 > trigger_anime2)
 	    {
-		DELAY(ANIMATION_HIGH);
+		DELAY(8);
 		cursor.Hide();
 		const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, ++trigger_anime2);
 		display.Blit(sprite, sprite.x(), sprite.y());
@@ -151,7 +151,7 @@ Game::menu_t Game::MainMenu(void)
 	{
 	    if(10 > trigger_anime3)
 	    {
-		DELAY(ANIMATION_HIGH);
+		DELAY(8);
 		cursor.Hide();
 		const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, ++trigger_anime3);
 		display.Blit(sprite, sprite.x(), sprite.y());
@@ -176,7 +176,7 @@ Game::menu_t Game::MainMenu(void)
 	{
 	    if(14 > trigger_anime4)
 	    {
-		DELAY(ANIMATION_HIGH);
+		DELAY(8);
 		cursor.Hide();
 		const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, ++trigger_anime4);
 		display.Blit(sprite, sprite.x(), sprite.y());
@@ -201,7 +201,7 @@ Game::menu_t Game::MainMenu(void)
 	{
 	    if(18 > trigger_anime5)
 	    {
-		DELAY(ANIMATION_HIGH);
+		DELAY(8);
 		cursor.Hide();
 		const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, ++trigger_anime5);
 		display.Blit(sprite, sprite.x(), sprite.y());
@@ -243,7 +243,7 @@ Game::menu_t Game::MainMenu(void)
 	if(le.MousePressRight(buttonNewGame)) Dialog::Message("New Game", "Start a single or multi-player game.", Font::BIG);
 
 
-	if(Game::ShouldAnimateInfrequent(ticket, 6))
+	if(Game::ShouldAnimateInfrequent(ticket, 10))
 	{
 	    cursor.Hide();
 	    const Sprite & lantern12 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0, lantern_frame++));
