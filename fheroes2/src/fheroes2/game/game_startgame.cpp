@@ -310,6 +310,7 @@ void Game::OpenHeroes(Heroes *hero)
 		    (*it)->SetFreeman(0);
 		    myKingdom.RemoveHeroes(*it);
 
+		    cursor.Hide();
     		    globalfocus.Reset(Game::Focus::HEROES);
     		    globalfocus.Redraw();
 
