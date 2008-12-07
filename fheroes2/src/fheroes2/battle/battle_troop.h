@@ -41,6 +41,11 @@ namespace Army
 	
 	void SetPosition(const Point & pt) { pos = pt; };
 	const Point& Position() const { return pos; };
+        void SetScreenPosition(const Point & pt) { screenPos = pt; };
+	const Point& ScreenPosition() const { return screenPos; };
+        
+        bool IsMoving() const { return moving; }
+        void SetMoving(bool m) { moving = m; }
 
 	void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
 	void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
@@ -55,8 +60,11 @@ namespace Army
         bool IsReflected() const { return reflect; }
         void SetReflect(bool r) { lastReflect = reflect; reflect = r; }
         void SetOriginalReflection(bool r) { origReflect = r; }
-        void ResetReflection() { reflect = origReflect; }
+        void ResetReflection() { SetReflect(origReflect); }
         bool WasReflected() const { return lastReflect; }
+        bool OriginalReflection() const { return origReflect; }
+        
+        bool IsWide() const { return Monster::GetStats(Monster()).wide; }
         
         bool HasRetaliated() const { return retaliated; }
         void SetRetaliated(bool r) { retaliated = r; }
@@ -75,12 +83,16 @@ namespace Army
 
     private:
 	Point                   pos;
+        Point                   screenPos;
 	Background bg;
 	bool saved;
         bool reflect, origReflect, lastReflect;
         bool retaliated;
+        bool moving;
 	std::vector<Spell::magic_t> magics;
     };
+    
+    typedef std::vector<BattleTroop> BattleArmy_t;
 };
 
 #endif

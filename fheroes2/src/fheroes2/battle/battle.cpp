@@ -36,6 +36,7 @@
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "audio_interface.h"
+#include "battle_troop.h"
 
 #define CELLW 44
 #define CELLH 42
@@ -140,6 +141,7 @@ namespace Army {
     Point GetReachableAttackCell(const Army::BattleTroop &target, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, int troopN);
     std::vector<Point> *FindPath(const Point& start, const Point &end, int moves, const Army::BattleTroop &troop, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, int skip);
     int CanAttack(const Army::BattleTroop &myTroop, const std::vector<Point> &moves, const Army::BattleTroop &enemyTroop, const Point &d);
+    bool CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTroop &target, const Point &attackFrom);
     
     void SettingsDialog();
     battle_t HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender=false, bool locked=false);
@@ -718,7 +720,11 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
         if(le.KeyPress(KEY_BACKSLASH))
         {
             for(u16 i = 0; i < army1.size(); i++)
+            {
                 army1[i].SetReflect(!army1[i].IsReflected());
+                if(army1[i].IsWide() && army1[i].WasReflected() != army1[i].IsReflected())
+                    army1[i].SetPosition(army1[i].Position() + Point( army1[i].WasReflected() ? -1 : 1, 0 ));
+            }
         }
 	if(Game::ShouldAnimateInfrequent(++animat, 3) && !i) {
 	    cursor.Hide();
@@ -1146,14 +1152,10 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 	int frame = 0, curstep = 0, part = 0, numsteps;
 	std::vector<Point> *path=0;
         
-        /*DrawShadow(move);
-        Display::Get().Flip();
-        while(le.HandleEvents())
-            if(le.KeyPress(KEY_RETURN))
-                break;*/
-        
 	if(myMonster.fly) {
             myTroop.SetReflect(end.x < start.x);
+            if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+                myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
 	    if(len >= 12) prep = post = 4;
 	    else if(len >= 8) prep = post = 2;
 	    else prep = post = 1;
@@ -1171,12 +1173,14 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 	    step.x = ((Bf2Scr(path->back())+dst_pt).x - tp.x) / len;
 	    step.y = ((Bf2Scr(path->back())+dst_pt).y - tp.y) / len;
             myTroop.SetReflect(step.x < 0);
+            if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+                myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
 	    if(step.y) step.x = -step.x;
 	    else step.x = 0;
+            tp = Bf2Scr(myTroop.Position()) + dst_pt;
             
             /*DrawTroop(myTroop);
             Display::Get().Flip();
-            
             while(le.HandleEvents())
             {
                 if(le.KeyPress(KEY_RETURN))
@@ -1224,13 +1228,15 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 			step.x = ((Bf2Scr(path->back())+dst_pt).x - tp.x) / len;
 			step.y = ((Bf2Scr(path->back())+dst_pt).y - tp.y) / len;
                         myTroop.SetReflect(step.x < 0);
+                        if(myTroop.IsWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
+                            myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
+                        tp = Bf2Scr(myTroop.Position()) + dst_pt;
 			if(step.y) step.x = -step.x;
 			else step.x = 0;
 			myTroop.Animate(Monster::AS_WALK);
                         
                         /*DrawTroop(myTroop);
                         Display::Get().Flip();
-                        
                         while(le.HandleEvents())
                         {
                             if(le.KeyPress(KEY_RETURN))
@@ -1272,6 +1278,8 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 	    }
 	}
 	myTroop.SetPosition(move);
+        if(myTroop.IsWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
+            myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
 	if(path) delete path;
     }
     
@@ -1299,7 +1307,7 @@ void Army::GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::Bat
         case Monster::PHOENIX:
         case Monster::CYCLOPS:
         {
-            bool wide = Monster::GetStats(attacker.Monster()).wide;
+            bool wide = attacker.IsWide();
             Point base = attacker.Position();
             int xIncr = reflected ? 0 : 1;
             if(wide)
@@ -1310,7 +1318,9 @@ void Army::GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::Bat
                 nextcell = attack + incr;
             else
                 nextcell = attack + Point( 0, incr.y);
-            //printf("incr: %d, %d\n", incr.x, incr.y);
+            /*printf("pos: %d, %d\n", attacker.Position().x, attacker.Position().y);
+            printf("attack: %d, %d\n", attack.x, attack.y);
+            printf("incr: %d, %d\n", incr.x, incr.y);*/
             int t;
             if((t = FindTroop(army1, nextcell)) >= 0
             && &army1[t] != &attacker
@@ -1479,7 +1489,9 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
 	else
 	    mytrooptate = Monster::AS_ATT2P;
         
-        myTroop.SetReflect(myTroop.Position().x > targets[0]->Position().x);
+        myTroop.SetReflect(myTroop.Position().x >= targets[0]->Position().x);
+        if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+            myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
         
         int delayFrames;
          
@@ -1570,11 +1582,6 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
 		display.Flip();
 	    }
 	}
-        for(u16 tid = 0; tid < targets.size(); tid++)
-        {
-            targets[tid]->ResetReflection();
-            DrawTroop(*targets[tid]);
-        }
         
 	std::string status;
         if(myTroop.Count() > 1)
@@ -1607,13 +1614,15 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1,
     cursor.Hide();
     Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
     
-    bool retaliate;
+    bool attack, retaliate = false;
     
-    retaliate = AnimateMove(hero1, hero2, army1, army2, tile, troopN, move);
-    if(retaliate)
+    attack = AnimateMove(hero1, hero2, army1, army2, tile, troopN, move);
+    if(attack)
         retaliate = AnimateAttack(hero1, hero2, army1, army2, tile, troopN, attack);
     
     myTroop.ResetReflection();
+    if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+            myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
     DrawTroop(myTroop);
     return retaliate;
 }
@@ -2316,7 +2325,7 @@ void Army::DrawTroop(Army::BattleTroop & troop, int animframe)
 {
     if(troop.Monster() == Monster::UNKNOWN) return;
     bool reflect = troop.IsReflected();
-    bool wide = Monster::GetStats(troop.Monster()).wide;
+    bool wide = troop.IsWide();
     Point pos = troop.Position();
     Point tp = Bf2Scr(pos) + dst_pt;
     troop.Blit(tp, reflect, animframe);
@@ -2409,7 +2418,7 @@ inline bool Army::BfValid(const Point & pt)
 bool Army::FindTroopAt(const Army::BattleTroop &troop, const Point &p)
 {
     Point p2(troop.Position());
-    if(Monster::GetStats(troop.Monster()).wide) p2.x += troop.IsReflected() ? -1 : 1;
+    if(troop.IsWide()) p2.x += troop.IsReflected() ? -1 : 1;
     if(troop.Monster() != Monster::UNKNOWN && (p == troop.Position() || p == p2)) 
         return true;
     else return false;
@@ -2486,7 +2495,7 @@ bool Army::CellFree(const Point &p, const Army::BattleArmy_t &army1, const Army:
 bool Army::CellFreeFor(const Point &p, const Army::BattleTroop &troop, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, int skip)
 {
     bool isFree = CellFree(p, army1, army2, skip);
-    if(isFree && Monster::GetStats(troop.Monster()).wide)
+    if(isFree && troop.IsWide())
       //WIDE-REVIEW
       isFree = CellFree(Point(p.x + (troop.IsReflected() ? -1 : 1), p.y), army1, army2, skip);
     return isFree;
@@ -2844,12 +2853,39 @@ void Army::AttackStatus(const std::string &str)
     statusBar2->ShowMessage(str2);
 }
 
-//FIXME: This documentation is wrong because I don't actually understand what the function does.
-/** Determine if a troop can attack a given enemy
+/** Determine if a troop can attack an enemeny from the given cell
+ *  \param attacker   Troop which is attacking
+ *  \param target     Troop which is defending
+ *  \param attackFrom Battlefield point from which to attack
+ */
+bool Army::CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTroop &target, const Point &attackFrom)
+{
+    //FIXME: These calculations are based on current reflection state
+    std::vector<Point> from, to;
+    from.push_back(attackFrom);
+    if(attacker.IsWide())
+        from.push_back(attackFrom + Point( attacker.IsReflected() ? -1 : 1, 0 ));
+    to.push_back(target.Position());
+    if(target.IsWide())
+        to.push_back(target.Position() + Point ( target.IsReflected() ? -1 : 1, 0 ));
+    for(u16 i = 0; i < from.size(); i++)
+        for(u16 j = 0; j < to.size(); j++)
+        {
+            int dx = to[i].x - from[j].x;
+            int dy = to[i].y - from[j].y;
+            if(abs(dy) == 1 && dx >= 0 && dx <= 1)
+                return true;
+            else if(!dy && abs(dx) == 1)
+                return true;
+        }
+    return false;
+}
+
+/** Determine if a troop can attack an enemy from the given screen point
  *  \param myTroop    Attacker troop
  *  \param moves      #Point vector of valid cells attacker can move to
  *  \param enemyTroop Enemy target
- *  \param d          Starting point
+ *  \param d          Screenspace position from which the attack would occur
  *  \return Non-zero if the attacker can attack the enemy
  */
 int Army::CanAttack(const Army::BattleTroop &myTroop, const std::vector<Point> &moves, const Army::BattleTroop &enemyTroop, const Point &d)
@@ -2860,42 +2896,36 @@ int Army::CanAttack(const Army::BattleTroop &myTroop, const std::vector<Point> &
     delta.y += CELLH/2;
     const Monster::stats_t &myMonster = Monster::GetStats(myTroop.Monster());
     const Monster::stats_t &enemyMonster = Monster::GetStats(enemyTroop.Monster());
+    std::vector<Point> from, to;
+    to.push_back(enemyTroop.Position());
+    if(enemyMonster.wide)
+        to.push_back(enemyTroop.Position() + Point ( enemyTroop.IsReflected() ? -1 : 1, 0 ));
     int mp = -1, min = 9999;
     for(u32 i=0; i<moves.size(); i++) {
 	Point d, p1, p2;
-	p1 = moves[i];
-	p2 = enemyTroop.Position();
-	do {
-	    for(d.x = -1; d.x <= 1; d.x++)
-		for(d.y = -1; d.y <= 1; d.y++) 
-		    if(d.x || d.y ) {
-			if(p1.y%2 && d.y && d.x>0) continue;
-			if(!(p1.y%2) && d.y && d.x<0) continue;
-			if(p1 + d == p2) {
-			    Point d2 = Bf2Scr(p2)+delta - Bf2Scr(p1);
-			    if(abs(d2.x) + abs(d2.y) < min) {
-				min = abs(d2.x) + abs(d2.y);
-				mp = i;
-			    }
-			}
-		    }
-            bool mod = false;
-	    if(myMonster.wide && p1.x == moves[i].x) {
-                //WIDE-REVIEW
-		p1.x += myTroop.IsReflected() ? -1 : 1;
-                //p1.x ++;
-		mod = true;
-	    }
-	    if(enemyMonster.wide && p2.x == enemyTroop.Position().x) {
-                //WIDE-REVIEW
-		if(!mod) p1 = myTroop.Position();
-		p2.x -= myTroop.IsReflected() ? -1 : 1;
-                //p2.x --;
-		mod = true;
-	    }
-            if(mod) continue;
-	    else break;
-	} while(1);
+        from.clear();
+        from.push_back(moves[i]);
+        if(myMonster.wide)
+            from.push_back(moves[i] + Point( myTroop.IsReflected() ? -1 : 1, 0 ));
+        for(u32 j = 0; j < from.size(); j++)
+            for(u32 k = 0; k < to.size(); k++)
+            {
+                p1 = from[j];
+                p2 = to[k];
+                for(d.x = -1; d.x <= 1; d.x++)
+                    for(d.y = -1; d.y <= 1; d.y++) 
+                        if(d.x || d.y ) {
+                            if(p1.y%2 && d.y && d.x>0) continue;
+                            if(!(p1.y%2) && d.y && d.x<0) continue;
+                            if(p1 + d == p2) {
+                                Point d2 = Bf2Scr(p2)+delta - Bf2Scr(p1);
+                                if(abs(d2.x) + abs(d2.y) < min) {
+                                    min = abs(d2.x) + abs(d2.y);
+                                    mp = i;
+                                }
+                            }
+                        }
+            }
     }
     return mp;
 }
@@ -2910,8 +2940,8 @@ int Army::CanAttack(const Army::BattleTroop &myTroop, const std::vector<Point> &
 Point Army::GetReachableAttackCell(const Army::BattleTroop &target, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, int troopN)
 {
     const Army::BattleTroop &attacker = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
-    bool targetWide = Monster::GetStats(target.Monster()).wide;
-    bool attackerWide = Monster::GetStats(attacker.Monster()).wide;
+    bool targetWide = target.IsWide();
+    bool attackerWide = attacker.IsWide();
     Point delta, p = target.Position();
     int xstart, xend, xincr;
     int ystart, yend, yincr;
@@ -2943,6 +2973,7 @@ Point Army::GetReachableAttackCell(const Army::BattleTroop &target, const Army::
             {
                 if(delta.x < 0 && delta.y) continue;
                 if(CellFreeFor(p + delta, attacker, army1, army2, troopN)
+                && CanAttackFrom(attacker, target, p + delta)
                 && find(movePoints.begin(), movePoints.end(), p + delta) != movePoints.end())
                     return p + delta;
             }

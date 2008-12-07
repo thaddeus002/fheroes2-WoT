@@ -22,8 +22,6 @@
 #define BATTLE_H
 
 #include <vector>
-#include "battle_troop.h"
-
 
 class Heroes;
 class Castle;
@@ -32,12 +30,12 @@ namespace Maps { class Tiles; };
 namespace Army
 {    
     typedef enum { WIN, LOSE, RETREAT, SURRENDER, AUTO } battle_t;
+    
+    class army_t;
 
     battle_t Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile);
     battle_t Battle(Heroes& hero, Army::army_t & army, const Maps::Tiles & tile);
     battle_t Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile);
-
-    typedef std::vector<BattleTroop> BattleArmy_t;
 };
 
 #endif

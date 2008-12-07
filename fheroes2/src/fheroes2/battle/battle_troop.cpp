@@ -30,6 +30,7 @@ Army::BattleTroop::BattleTroop(Monster::monster_t m, u16 c)
 : Troop(m, c)
 , attackRanged(false)
 , summoned(false)
+, moving(false)
 {
 }
 
@@ -43,9 +44,11 @@ Army::BattleTroop::BattleTroop(const Army::BattleTroop & troop)
 , oldcount(troop.oldcount)
 , summoned(troop.summoned)
 , pos(troop.Position())
+, screenPos(troop.screenPos)
 , saved(false)
 , reflect(troop.reflect)
 , origReflect(troop.origReflect)
+, moving(troop.moving)
 {
 }
 
