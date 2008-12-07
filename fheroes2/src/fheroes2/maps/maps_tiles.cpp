@@ -1220,10 +1220,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 
 	    // MONS32
 	    if(ICN::MONS32 == MP2::GetICNObject(addon.object) &&
-	    (0x43 == addon.index ||
-	    0x44 == addon.index ||
-	    0x45 == addon.index ||
-	    0x46 == addon.index)) return &addon;
+	    (0x41 < addon.index && 0x47 > addon.index)) return &addon;
 	}
     }
 
@@ -1691,6 +1688,32 @@ void Maps::Tiles::SetCountMonster(const u16 count)
 {
     quantity1 = count % 0xFF;
     quantity2 = count / 0xFF;
+}
+
+void Maps::Tiles::UpdateRNDMonsterSprite(void)
+{
+    Maps::TilesAddon *addon = FindRNDMonster();
+
+    if(addon)
+    {
+	u8 index = 0;
+
+	switch(general)
+	{
+    	    case MP2::OBJ_RNDMONSTER:       index = Monster::Rand(); break;
+    	    case MP2::OBJ_RNDMONSTER1:      index = Monster::Rand1();break;
+    	    case MP2::OBJ_RNDMONSTER2:      index = Monster::Rand2();break;
+    	    case MP2::OBJ_RNDMONSTER3:      index = Monster::Rand3();break;
+    	    case MP2::OBJ_RNDMONSTER4:      index = Monster::Rand4();break;
+
+	    default: Error::Warning("Maps::Tiles::UpdateRNDMonsterSprite: unknown object, index: ", maps_index); return;
+	}
+
+        addon->index = index;
+        general = MP2::OBJ_MONSTER;
+    }
+    else
+        Error::Warning("Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: ", maps_index);
 }
 
 void Maps::Tiles::UpdateAbandoneMine(void)

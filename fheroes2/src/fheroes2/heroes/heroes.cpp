@@ -421,6 +421,9 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     // save general object
     save_maps_general = MP2::OBJ_ZERO;
 
+    // fix zero army
+    if(!army.isValid()) army.Reset(true);
+
     // level up
     u8 level = GetLevel();
     while(1 < level--) LevelUp(true);	// start game: auto select skill

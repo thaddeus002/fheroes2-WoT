@@ -958,7 +958,7 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_RNDMONSTER3:
 	    case MP2::OBJ_RNDMONSTER4:
 		// modify rnd monster sprite
-		Monster::ChangeTileWithRNDMonster(tile);
+		tile.UpdateRNDMonsterSprite();
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
 		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
 		else

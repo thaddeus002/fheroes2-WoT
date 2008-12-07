@@ -201,11 +201,8 @@ namespace Monster
     monster_t Rand4(void);
 
     u16 GetRNDSize(monster_t monster);
-    u16 GetSize(const Maps::Tiles & tile);
 
     u32 Dwelling(const monster_t monster);
-
-    void ChangeTileWithRNDMonster(Maps::Tiles & tile);
 };
 
 #endif

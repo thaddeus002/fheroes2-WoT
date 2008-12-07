@@ -127,6 +127,7 @@ namespace Maps
 
 	u16 GetCountMonster(void) const;
 	void SetCountMonster(const u16 count);
+	void UpdateRNDMonsterSprite(void);
 	
 	void UpdateAbandoneMine(void);
 

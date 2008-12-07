@@ -175,6 +175,7 @@ void PlayPickupSound(void)
 
 void AnimationRemoveObject(const Maps::Tiles & tile)
 {
+    return;
     Maps::TilesAddon *addon = NULL;
 
     switch(tile.GetObject())
@@ -400,7 +401,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
-    const u16 count = Monster::GetSize(tile);
+    const u16 count = tile.GetCountMonster();
     Army::army_t army;
     Army::ArrangeTroopsForBattle(army, monster, count);
 

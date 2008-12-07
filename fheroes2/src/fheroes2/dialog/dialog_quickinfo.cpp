@@ -85,7 +85,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     {
         case MP2::OBJ_MONSTER:
     	{
-    	    switch(Army::GetSize(Monster::GetSize(tile)))
+    	    switch(Army::GetSize(tile.GetCountMonster()))
     	    {
 		case Army::FEW:		name_object = "A few "; break;
 		case Army::SEVERAL:	name_object = "Several "; break;

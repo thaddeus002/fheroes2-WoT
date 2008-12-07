@@ -61,9 +61,8 @@ XMI::xmi_t XMI::FromMUS(const MUS::mus_t mus)
         case MUS::WARLOCK:	return MIDI0006;
         case MUS::NECROMANCER:	return MIDI0007;
         case MUS::KNIGHT:	return MIDI0008;
-        case MUS::WIZARD:	return MIDI0009;
-        //9 and 10 are both the Wizard theme?
-        //case MUS::BARBARIAN:	return MIDI0010;
+        case MUS::BARBARIAN:	return MIDI0009;
+        case MUS::WIZARD:	return MIDI0010;
         case MUS::LAVA:		return MIDI0011;
         case MUS::DESERT:	return MIDI0013;
         case MUS::SNOW:		return MIDI0014;

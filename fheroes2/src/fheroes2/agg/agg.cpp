@@ -505,6 +505,8 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
 		    delete [] cvt.buf;
 		    cvt.buf = NULL;
+
+		    break;
 	    }
     }
 }
@@ -543,6 +545,8 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 		m.SetPPQN(64);
 
 		m.Write(reinterpret_cast<std::vector<char> &>(v));
+
+		break;
 	    }
     }
 }
