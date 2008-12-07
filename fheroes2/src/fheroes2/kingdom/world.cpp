@@ -547,14 +547,14 @@ void World::LoadMaps(const std::string &filename)
     // 72 x 3 byte (cx, cy, id)
     for(u8 ii = 0; ii < 72; ++ii)
     {
-	char cx, cy, id;
+	u8 cx, cy, id;
 
-	fd.read(&cx, 1);
-	fd.read(&cy, 1);
-	fd.read(&id, 1);
+	fd.read(reinterpret_cast<char *>(&cx), 1);
+	fd.read(reinterpret_cast<char *>(&cy), 1);
+	fd.read(reinterpret_cast<char *>(&id), 1);
 	
 	// empty block
-	if(-1 == cx && -1 == cy) continue;
+	if(0xFF == cx && 0xFF == cy) continue;
 
 	switch(id)
 	{
@@ -600,16 +600,17 @@ void World::LoadMaps(const std::string &filename)
     // 144 x 3 byte (cx, cy, id)
     for(u8 ii = 0; ii < 144; ++ii)
     {
-	char cx, cy, id;
+	u8 cx, cy, id;
 
-	fd.read(&cx, 1);
-	fd.read(&cy, 1);
-	fd.read(&id, 1);
+	fd.read(reinterpret_cast<char *>(&cx), 1);
+	fd.read(reinterpret_cast<char *>(&cy), 1);
+	fd.read(reinterpret_cast<char *>(&id), 1);
 	
 	// empty block
-	if(-1 == cx && -1 == cy) continue;
+	if(0xFF == cx && 0xFF == cy) continue;
 
-	switch(id){
+	switch(id)
+	{
 	    case 0x00: break; // mines: wood
 	    case 0x01: break; // mines: mercury
  	    case 0x02: break; // mines: ore
@@ -1113,7 +1114,7 @@ const Castle * World::GetCastle(u8 ax, u8 ay)
     for(; it1 != it2; ++it1)
         if(*it1 && (*it1)->ContainCoord(ax, ay)) return *it1;
 
-    Error::Warning("World::GetCastle: return NULL pointer");
+    std::cout << "warning: World::GetCastle: return NULL pointer, x: " << static_cast<int>(ax) << ", y: " << static_cast<int>(ay) << std::endl;
 
     return NULL;
 }
