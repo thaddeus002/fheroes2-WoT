@@ -28,6 +28,7 @@
 #include "battle.h"
 #include "gamearea.h"
 #include "game_focus.h"
+#include "game_selectobjbar.h"
 #include "kingdom.h"
 #include "cursor.h"
 #include "algorithm.h"
@@ -515,8 +516,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
 		world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
 		world.GetKingdom(hero.GetColor()).AddCastle(castle);
 		const_cast<Castle *>(castle)->ChangeColor(hero.GetColor());
-		Game::Focus::Get().Reset(Game::Focus::CASTLE);
-		Game::Focus::Get().Redraw();
+		Game::SelectBarCastle::Get().Redraw();
 		hero.ActionAfterBattle();
 		break;
 
