@@ -62,6 +62,60 @@ void Text::Blit(const Point & dst_pt, Surface & dst)
 
 void Text::Blit(u16 ax, u16 ay, Surface & dst)
 {
+#ifdef WITH_TTF
+    const u16 size = message.size() + 1;
+    u16 *unicode = new u16[size];
+    std::memset(unicode, 0, 2 * size);
+
+    String::UTF8_to_UNICODE(unicode, message.c_str(), message.size());
+
+    Point pt(ax, ay);
+    u16 y1 = ay;
+
+    for(u16 ii = 0; ii < size; ++ii)
+    {
+	if(0 == unicode[ii]) continue;
+	pt.y = y1;
+
+	const Surface & sprite = AGG::GetUnicodeLetter(unicode[ii], font);
+	if(!sprite.valid()) return;
+
+        // valign
+	switch(unicode[ii])
+	{
+	    case L'-':
+    		pt.y += (Font::SMALL == font ? HEIGHT_SMALL / 2 : HEIGHT_BIG / 2);
+    	    break;
+
+    	    // "
+    	    case L'"':
+	    // '
+    	    case L'\'':
+        	pt.y += (Font::SMALL == font ? 2 : 3);
+    	    break;
+
+    	    case L'y':
+    	    case L'g':
+    	    case L'p':
+    	    case L'q':
+    	    case L'j':
+        	pt.y += (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + 2 : HEIGHT_BIG - sprite.h() + 2);
+    	    break;
+
+    	    default:
+        	if(Font::SMALL == font && sprite.h() < HEIGHT_SMALL) pt.y += HEIGHT_SMALL - sprite.h();
+        	else
+		if(Font::BIG == font && sprite.h() < HEIGHT_BIG) pt.y += HEIGHT_BIG - sprite.h();
+            break;
+	}
+
+	dst.Blit(sprite, pt);
+
+	pt.x += sprite.w();
+    }
+
+    delete [] unicode;
+#else
     std::string::const_iterator it = message.begin();
     std::string::const_iterator it_end = message.end();
 
@@ -115,17 +169,31 @@ void Text::Blit(u16 ax, u16 ay, Surface & dst)
 
 	pt.x += sprite.w();
     }
+#endif
 }
 
 u16 Text::width(const std::string &str,  Font::type_t ft, u16 start, u16 count)
 {
+#ifdef WITH_TTF
+    const u16 size = str.size() + 1;
+    u16 *unicode = new u16[size];
+    std::memset(unicode, 0, 2 * size);
+
+    String::UTF8_to_UNICODE(unicode, str.c_str(), str.size());
+
     u16 res = 0;
+    if(0xffff == count) count = size;
+    for(u16 ii = start; ii < start + count; ++ii) if(0 != unicode[ii]) res += AGG::GetUnicodeLetter(unicode[ii], ft).w();
 
+    delete [] unicode;
+    return res;
+#else
+    u16 res = 0;
     if(0xffff == count) count = str.size();
-
     for(int ii = start; ii < start + count; ++ii) res += Char::width(str[ii], ft);
     
     return res;
+#endif
 }
 
 u16 Text::height(const std::string &str, Font::type_t ft, u16 width)

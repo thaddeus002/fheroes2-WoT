@@ -590,12 +590,15 @@ void AGG::Cache::LoadFNT(void)
     const u8 letters_size = std::strlen(letters);
     const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
+    u16 *unicode = new u16[letters_size + 1];
+
+    String::UTF8_to_UNICODE(unicode, letters, letters_size);
 
     // small
     if(font_small.isValid())
     {
 	for(u8 ii = 0; ii < letters_size; ++ii)
-	    font_small.RenderChar(fnt_cache[letters[ii]].second, letters[ii], white);
+	    font_small.RenderUnicodeChar(fnt_cache[unicode[ii]].second, unicode[ii], white);
     }
     else
 	PreloadObject(ICN::SMALFONT);
@@ -604,10 +607,12 @@ void AGG::Cache::LoadFNT(void)
     if(font_medium.isValid())
     {
 	for(u8 ii = 0; ii < letters_size; ++ii)
-	    font_medium.RenderChar(fnt_cache[letters[ii]].first, letters[ii], white);
+	    font_medium.RenderUnicodeChar(fnt_cache[unicode[ii]].first, unicode[ii], white);
     }
     else
 	PreloadObject(ICN::FONT);
+
+    delete [] unicode;
 
     if(conf.Debug()) fnt_cache.size() ? Error::Verbose("AGG::LoadFonts: preload charsets from " + conf.FontName()) : Error::Verbose("AGG::LoadFonts: internal.");
 #else
@@ -618,16 +623,16 @@ void AGG::Cache::LoadFNT(void)
 #endif
 }
 
-void AGG::Cache::LoadFNT(u32 ch)
+void AGG::Cache::LoadFNT(u16 ch)
 {
 #ifdef WITH_TTF
     const Settings & conf = Settings::Get();
     const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
     // small
-    if(font_small.isValid()) font_small.RenderChar(fnt_cache[ch].second, ch, white);
+    if(font_small.isValid()) font_small.RenderUnicodeChar(fnt_cache[ch].second, ch, white);
     // medium
-    if(font_medium.isValid()) font_medium.RenderChar(fnt_cache[ch].first, ch, white);
+    if(font_medium.isValid()) font_medium.RenderUnicodeChar(fnt_cache[ch].first, ch, white);
 
     if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
 #endif
@@ -794,7 +799,7 @@ const std::vector<u8> & AGG::Cache::GetMUS(const MUS::mus_t mus)
 }
 
 /* return FNT cache */
-const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u32 c)
+const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u16 c)
 {
     if(!fnt_cache[c].first.valid()) LoadFNT(c);
 
@@ -916,21 +921,23 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 }
 
 /* return letter sprite */
-const Surface & AGG::GetLetter(char ch, u8 ft)
+const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
 {
-    if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
-    
 #ifdef WITH_TTF
-
     if(AGG::Cache::Get().isValidFonts())
     {
 	const std::pair<Surface, Surface> & fonts = AGG::Cache::Get().GetFNT(ch);
 	return Font::SMALL == ft ? fonts.second : fonts.first;
     }
     else
+#endif
     return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
 
-#else
+}
+
+const Surface & AGG::GetLetter(char ch, u8 ft)
+{
+    if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
+    
     return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
-#endif
 }

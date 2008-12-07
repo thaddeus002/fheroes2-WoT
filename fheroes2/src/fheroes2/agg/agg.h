@@ -91,7 +91,7 @@ namespace AGG
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
         const std::vector<u8> & GetMUS(const MUS::mus_t mus);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
-	const std::pair<Surface, Surface> & GetFNT(u32);
+	const std::pair<Surface, Surface> & GetFNT(u16);
 
 	void LoadICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
@@ -101,7 +101,7 @@ namespace AGG
 	void LoadPAL(void);
 
 	void LoadFNT(void);
-	void LoadFNT(u32);
+	void LoadFNT(u16);
 	bool isValidFonts(void) const;
 
 	void FreeICN(const ICN::icn_t icn, bool reflect = false);
@@ -121,7 +121,7 @@ namespace AGG
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
         std::map<MUS::mus_t, std::vector<u8> > mus_cache;
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;
-	std::map<u32, std::pair<Surface, Surface> > fnt_cache;
+	std::map<u16, std::pair<Surface, Surface> > fnt_cache;
 
 	Palette palette;
 #ifdef WITH_TTF
@@ -151,7 +151,8 @@ namespace AGG
     u32 GetColor(const u16 index, const u8 flag = 0);
 
     const Surface & GetLetter(char ch, u8 ft);
-    
+    const Surface & GetUnicodeLetter(u16 ch, u8 ft);
+
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);
     void PlayMusic(const MUS::mus_t mus, bool loop = true);
