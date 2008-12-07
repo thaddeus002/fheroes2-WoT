@@ -451,6 +451,8 @@ const Army::Troop & Army::army_t::GetWeakestTroop(void) const
 /* draw MONS32 sprite in line, first valid = 0, count = 0 */
 void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) const
 {
+    if(!isValid()) return;
+
     if(0 == count) count = GetCount();
     else
     if(ARMYMAXTROOPS < count) count = ARMYMAXTROOPS;
