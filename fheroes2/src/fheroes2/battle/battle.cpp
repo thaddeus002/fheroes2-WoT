@@ -205,7 +205,7 @@ Army::battle_t Army::Battle(Heroes& hero, Castle& castle, const Maps::Tiles &til
     // TODO
     //Army::battle_t status = BattleInt(&hero, 0, const_cast<std::vector<Army::BattleTroop>&>(hero.GetArmy()), army, tile);
     Army::battle_t status = WIN;
-    BattleSummaryVsArmy(hero, ArmyToBattleArmy(heroArmy), ArmyToBattleArmy(castle.GetArmy()), ArmyToBattleArmy(oppArmy), status);
+    //BattleSummaryVsArmy(hero, ArmyToBattleArmy(heroArmy), ArmyToBattleArmy(castle.GetArmy()), ArmyToBattleArmy(oppArmy), status);
     return status;
 }
 
