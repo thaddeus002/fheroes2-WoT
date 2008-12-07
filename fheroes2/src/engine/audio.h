@@ -22,6 +22,9 @@
 #define H2AUDIO_H
 
 #include "SDL.h"
+#include "SDL_mixer.h"
+
+#define MAXVOLUME MIX_MAX_VOLUME
 
 namespace Audio
 {

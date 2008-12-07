@@ -21,18 +21,37 @@
 #ifndef H2FONT_H
 #define H2FONT_H
 
+#ifdef WITH_TTF
 #include <string>
+#include "types.h"
+#include "SDL_ttf.h"
 
 class Surface;
 
-namespace Font
+namespace SDL
 {
-    void Init(void);
-    void Quit(void);
+    class Font
+    {
+    public:
+	Font();
+	~Font();
 
-    bool Open(const std::string & filename, u8 size, u8 style = 0);
-    bool isValid(void);
-    void Close(void);
+	static void Init(void);
+	static void Quit(void);
+
+	bool Open(const std::string &, u8);
+	bool isValid(void) const;
+	void SetStyle(u8);
+
+	void RenderText(Surface &, const std::string &, const Colors &);
+	void RenderChar(Surface &, char, const Colors &);
+
+    private:
+	TTF_Font *fnt;
+
+	static bool init;
+    };
 };
+#endif
 
 #endif

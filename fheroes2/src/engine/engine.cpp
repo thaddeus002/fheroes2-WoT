@@ -21,7 +21,6 @@
 #include "error.h"
 #include "engine.h"
 #include "font.h"
-#include "SDL.h"
 
 namespace Mixer
 {
@@ -37,33 +36,26 @@ namespace Cdrom
 
 bool SDL::Init(const u32 system)
 {
-    u32 flags = INIT_NONE;
-    if(system & INIT_VIDEO)
-        flags |= SDL_INIT_VIDEO;
-    if(system & INIT_AUDIO)
-        flags |= SDL_INIT_AUDIO;
-    if(system  & INIT_TIMER)
-        flags |= SDL_INIT_TIMER;
-    if(system  & INIT_CDROM)
-        flags |= SDL_INIT_CDROM;
-    
-    if(0 > SDL_Init(flags))
+    if(0 > SDL_Init(system))
     {
 	Error::Warning("SDL::Init: error: " + std::string(SDL_GetError()));
 
 	return false;
     }
 
-    if(INIT_AUDIO & system) Mixer::Init();
-    if(INIT_CDROM & system) Cdrom::Open();
-    Font::Init();
-
+    if(SDL_INIT_AUDIO & system) Mixer::Init();
+    if(SDL_INIT_CDROM & system) Cdrom::Open();
+#ifdef WITH_TTF
+    SDL::Font::Init();
+#endif
     return true;
 }
 
 void SDL::Quit(void)
 {
-    Font::Quit();
+#ifdef WITH_TTF
+    SDL::Font::Quit();
+#endif
     if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();
     if(SubSystem(SDL_INIT_AUDIO)) Mixer::Quit();
 

@@ -21,19 +21,10 @@
 #include "surface.h"
 #include "palette.h"
 #include "error.h"
-#include "font.h"
-#include "SDL.h"
 
 #ifdef WITH_TTF
 #include "SDL_ttf.h"
-
-namespace Font
-{
-    TTF_Font* Get(void);
-};
 #endif
-
-const int SWSURFACE = SDL_SWSURFACE;
 
 Surface::Surface() : surface(NULL), videosurface(false)
 {
@@ -493,25 +484,4 @@ void Surface::FreeSurface(void)
 const SDL_PixelFormat *Surface::GetPixelFormat(void) const
 {
     return surface->format;
-}
-
-void Surface::RenderText(const std::string & msg, const Colors & clr)
-{
-#ifdef WITH_TTF
-    if(surface) SDL_FreeSurface(surface);
-    if(Font::isValid())
-    surface = TTF_STYLE_BOLD & TTF_GetFontStyle(Font::Get()) ? TTF_RenderUTF8_Blended(Font::Get(), msg.c_str(), clr) : TTF_RenderUTF8_Solid(Font::Get(), msg.c_str(), clr);
-#endif
-}
-
-void Surface::RenderChar(char ch, const Colors & clr)
-{
-    char buf[2] = { '\0', '\0' };
-         buf[0] = ch;
-
-#ifdef WITH_TTF
-    if(surface) SDL_FreeSurface(surface);
-    if(Font::isValid())
-    surface = TTF_STYLE_BOLD & TTF_GetFontStyle(Font::Get()) ? TTF_RenderUTF8_Blended(Font::Get(), buf, clr) : TTF_RenderUTF8_Solid(Font::Get(), buf, clr);
-#endif
 }

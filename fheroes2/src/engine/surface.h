@@ -24,16 +24,17 @@
 #include "types.h"
 
 #define DEFAULT_DEPTH           16              // Surface use bits color
-extern const int SWSURFACE;
+#define SWSURFACE		SDL_SWSURFACE
 
 class Palette;
 class Point;
 class Rect;
 struct SDL_Surface;
 struct SDL_PixelFormat;
-struct SDL_Color;
 
-typedef SDL_Color Colors;
+#ifdef WITH_TTF
+namespace SDL { class Font; };
+#endif
 
 class Surface
 {
@@ -49,9 +50,6 @@ public:
 
     Surface & operator= (const Surface & bs);
     void Set(u16 sw, u16 sh, bool alpha = false);
-
-    void RenderText(const std::string & msg, const Colors &  clr);
-    void RenderChar(char ch, const Colors &  clr);
 
     u16 w(void) const;
     u16 h(void) const;
@@ -103,6 +101,10 @@ public:
     void Unlock(void);
 
 protected:
+#ifdef WITH_TTF
+    friend class SDL::Font;
+#endif
+
     void CreateSurface(const Rect &sz, u8 dp, u32 fl){ CreateSurface(sz.w, sz.h, dp, fl); };
     void CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl);
     void FreeSurface(void);

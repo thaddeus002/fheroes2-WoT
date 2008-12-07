@@ -22,6 +22,7 @@
 #include <algorithm>
 
 #include "agg.h"
+#include "audio.h"
 #include "engine.h"
 #include "button.h"
 #include "dialog.h"

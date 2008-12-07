@@ -34,6 +34,7 @@
 #include "m82.h"
 #include "mus.h"
 #include "sprite.h"
+#include "font.h"
 #include "palette.h"
 
 class Surface;
@@ -98,8 +99,10 @@ namespace AGG
         void LoadMUS(const MUS::mus_t mus);
 	void LoadMID(const XMI::xmi_t xmi);
 	void LoadPAL(void);
+
 	void LoadFNT(void);
 	void LoadFNT(u32);
+	bool isValidFonts(void) const;
 
 	void FreeICN(const ICN::icn_t icn, bool reflect = false);
 	void FreeTIL(const TIL::til_t til);
@@ -121,6 +124,10 @@ namespace AGG
 	std::map<u32, std::pair<Surface, Surface> > fnt_cache;
 
 	Palette palette;
+#ifdef WITH_TTF
+	SDL::Font font_medium;
+	SDL::Font font_small;
+#endif
 	bool heroes2_agg;
     };
 

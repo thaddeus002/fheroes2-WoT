@@ -17,45 +17,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "SDL.h"
 #include "types.h"
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-
-const uint32_t DEFAULT_COLOR_KEY16 = 0xf0f0;
-const uint32_t DEFAULT_COLOR_KEY32 = 0xff00ff00;
-
-const uint32_t RMASK16 = 0x0000f000;
-const uint32_t GMASK16 = 0x00000f00;
-const uint32_t BMASK16 = 0x000000f0;
-const uint32_t AMASK16 = 0x0000000f;
-
-const uint32_t RMASK32 = 0xff000000;
-const uint32_t GMASK32 = 0x00ff0000;
-const uint32_t BMASK32 = 0x0000ff00;
-const uint32_t AMASK32 = 0x000000ff;
-
-#else
-
-const uint32_t DEFAULT_COLOR_KEY16 = 0x0f0f;
-const uint32_t DEFAULT_COLOR_KEY32 = 0x00ff00ff;
-
-const uint32_t RMASK16 = 0x0000000f;
-const uint32_t GMASK16 = 0x000000f0;
-const uint32_t BMASK16 = 0x00000f00;
-const uint32_t AMASK16 = 0x0000f000;
-
-const uint32_t RMASK32 = 0x000000ff;
-const uint32_t GMASK32 = 0x0000ff00;
-const uint32_t BMASK32 = 0x00ff0000;
-const uint32_t AMASK32 = 0xff000000;
-
-#endif
-
-void DELAY(u32 ticks)
-{
-    SDL_Delay(ticks);
-}
 
 uint16_t Swap16(uint16_t val)
 {

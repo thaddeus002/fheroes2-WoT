@@ -20,7 +20,6 @@
 
 #include <sstream>
 #include <ctime>
-#include "SDL.h"
 #include "error.h"
 #include "display.h"
 #include "localevent.h"

@@ -18,63 +18,75 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_TTF
+
+#include "font.h"
 #include "error.h"
 #include "engine.h"
 #include "surface.h"
-#include "font.h"
-
-#ifdef WITH_TTF
 #include "SDL_ttf.h"
 
-namespace Font
-{
-    TTF_Font *Get(void);
-    
-    static TTF_Font * fnt = NULL;
-};
+bool SDL::Font::init = false;
 
-void Font::Init(void)
+SDL::Font::Font() : fnt(NULL)
+{
+}
+
+SDL::Font::~Font()
+{
+    if(fnt) TTF_CloseFont(fnt);
+}
+
+void SDL::Font::Init(void)
 {
     if(0 != TTF_Init()) Error::Verbose("Font::Init: error");
+    else init = true;
 }
 
-void Font::Quit(void)
+void SDL::Font::Quit(void)
 {
     TTF_Quit();
+    init = false;
 }
 
-bool Font::isValid(void)
+bool SDL::Font::isValid(void) const
 {
     return fnt;
 }
 
-TTF_Font* Font::Get(void)
+bool SDL::Font::Open(const std::string & filename, u8 size)
 {
+    if(init)
+    {
+	if(fnt) TTF_CloseFont(fnt);
+
+	fnt = TTF_OpenFont(filename.c_str(), size);
+
+	if(!fnt) Error::Warning("Font::Open: error open: " + filename);
+    }
     return fnt;
 }
 
-bool Font::Open(const std::string & filename, u8 size, u8 style)
+void SDL::Font::SetStyle(u8 style)
 {
-    if(fnt) TTF_CloseFont(fnt);
-
-    fnt = TTF_OpenFont(filename.c_str(), size);
-
-    if(!fnt) Error::Warning("Font::Open: error open: " + filename);
-    else
-    if(style) TTF_SetFontStyle(fnt, style);
-
-    return fnt;
+    if(fnt) TTF_SetFontStyle(fnt, style);
 }
 
-void Font::Close(void)
+void SDL::Font::RenderText(Surface & dst, const std::string & msg, const Colors & clr)
 {
-    if(fnt) TTF_CloseFont(fnt);
-    fnt = NULL;
+    if(dst.surface) SDL_FreeSurface(dst.surface);
+    if(fnt)
+    dst.surface = TTF_STYLE_BOLD & TTF_GetFontStyle(fnt) ? TTF_RenderUTF8_Blended(fnt, msg.c_str(), clr) : TTF_RenderUTF8_Solid(fnt, msg.c_str(), clr);
 }
 
-#else
-void Font::Init(void){};
-void Font::Quit(void){};
-bool Font::Open(const std::string &, u8, u8){ return false; };
-void Font::Close(void){};
+void SDL::Font::RenderChar(Surface & dst, char ch, const Colors & clr)
+{
+    char buf[2] = { '\0', '\0' };
+         buf[0] = ch;
+
+    if(dst.surface) SDL_FreeSurface(dst.surface);
+    if(fnt)
+    dst.surface = TTF_STYLE_BOLD & TTF_GetFontStyle(fnt) ? TTF_RenderUTF8_Blended(fnt, buf, clr) : TTF_RenderUTF8_Solid(fnt, buf, clr);
+}
+
 #endif

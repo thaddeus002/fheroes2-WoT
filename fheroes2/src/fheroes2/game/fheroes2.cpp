@@ -24,7 +24,7 @@
 #include <limits.h>
 
 #include "gamedefs.h"
-#include "audio.h"	// need SDL.h for mingw32 build
+#include "audio.h"
 #include "settings.h"
 #include "dir.h"
 #include "agg.h"

@@ -21,6 +21,7 @@
 #include <map>
 #include <cstdlib>
 
+#include "audio.h"
 #include "gamedefs.h"
 #include "settings.h"
 #include "game_focus.h"

@@ -26,7 +26,6 @@
 #include "audio.h"
 #include "midi_xmi.h"
 #include "midi_mid.h"
-#include "font.h"
 #include "agg.h"
 
 #define FATSIZENAME	15
@@ -169,6 +168,12 @@ void AGG::File::Dump(void) const
 /* AGG::Cache constructor */
 AGG::Cache::Cache() : heroes2_agg(false)
 {
+#ifdef WITH_TTF
+    const Settings & conf = Settings::Get();
+
+    font_medium.Open(conf.FontName(), 15);
+    font_small.Open(conf.FontName(), 10);
+#endif
 }
 
 AGG::Cache::~Cache()
@@ -585,25 +590,26 @@ void AGG::Cache::LoadFNT(void)
     const u8 letters_size = std::strlen(letters);
     const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
+
     // small
-    if(Font::Open(conf.FontName(), 10))
+    if(font_small.isValid())
     {
 	for(u8 ii = 0; ii < letters_size; ++ii)
-	    fnt_cache[letters[ii]].second.RenderChar(letters[ii], white);
-
-	Font::Close();
+	    font_small.RenderChar(fnt_cache[letters[ii]].second, letters[ii], white);
     }
+    else
+	PreloadObject(ICN::SMALFONT);
 
     // medium
-    if(Font::Open(conf.FontName(), 15))
+    if(font_medium.isValid())
     {
 	for(u8 ii = 0; ii < letters_size; ++ii)
-	    fnt_cache[letters[ii]].first.RenderChar(letters[ii], white);
-
-	Font::Close();
+	    font_medium.RenderChar(fnt_cache[letters[ii]].first, letters[ii], white);
     }
+    else
+	PreloadObject(ICN::FONT);
 
-    if(conf.Debug()) Error::Verbose("AGG::LoadFonts: preload charsets from " + conf.FontName());
+    if(conf.Debug()) fnt_cache.size() ? Error::Verbose("AGG::LoadFonts: preload charsets from " + conf.FontName()) : Error::Verbose("AGG::LoadFonts: internal.");
 #else
     PreloadObject(ICN::SMALFONT);
     PreloadObject(ICN::FONT);
@@ -619,18 +625,9 @@ void AGG::Cache::LoadFNT(u32 ch)
     const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
     // small
-    if(Font::Open(conf.FontName(), 10))
-    {
-	fnt_cache[ch].second.RenderChar(ch, white);
-	Font::Close();
-    }
-
+    if(font_small.isValid()) font_small.RenderChar(fnt_cache[ch].second, ch, white);
     // medium
-    if(Font::Open(conf.FontName(), 15))
-    {
-	fnt_cache[ch].first.RenderChar(ch, white);
-	Font::Close();
-    }
+    if(font_medium.isValid()) font_medium.RenderChar(fnt_cache[ch].first, ch, white);
 
     if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
 #endif
@@ -804,6 +801,14 @@ const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u32 c)
     return fnt_cache[c];
 }
 
+bool AGG::Cache::isValidFonts(void) const
+{
+#ifdef WITH_TTF
+    return font_small.isValid() && font_medium.isValid();
+#endif
+    return false;
+}
+
 // wrapper AGG::PreloadObject
 void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
@@ -916,12 +921,15 @@ const Surface & AGG::GetLetter(char ch, u8 ft)
     if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
     
 #ifdef WITH_TTF
-    const std::pair<Surface, Surface> & fonts = AGG::Cache::Get().GetFNT(ch);
 
-    if(!fonts.first.valid())
+    if(AGG::Cache::Get().isValidFonts())
+    {
+	const std::pair<Surface, Surface> & fonts = AGG::Cache::Get().GetFNT(ch);
+	return Font::SMALL == ft ? fonts.second : fonts.first;
+    }
+    else
     return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
 
-    return Font::SMALL == ft ? fonts.second : fonts.first;
 #else
     return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
 #endif

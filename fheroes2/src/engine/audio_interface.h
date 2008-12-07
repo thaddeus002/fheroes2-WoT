@@ -23,7 +23,6 @@
 #include <vector>
 #include "types.h"
 
-extern const u32 MAXVOLUME;
 #define CHANNEL_RESERVED	22
 #define CHANNEL_FREE		6
 

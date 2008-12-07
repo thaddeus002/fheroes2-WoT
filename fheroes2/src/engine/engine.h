@@ -33,11 +33,10 @@
 #include "tools.h"
 #include "types.h"
 
-#define INIT_NONE       0x00
-#define INIT_VIDEO	0x01
-#define INIT_AUDIO	0x02
-#define INIT_TIMER	0x04
-#define INIT_CDROM      0x08
+#define INIT_VIDEO	SDL_INIT_VIDEO
+#define INIT_AUDIO	SDL_INIT_AUDIO
+#define INIT_TIMER	SDL_INIT_TIMER
+#define INIT_CDROM	SDL_INIT_CDROM
 
 namespace SDL
 {
