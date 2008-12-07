@@ -30,7 +30,8 @@ namespace Dialog
     void DrawSystemInfo(const Point & dst);
 };
 
-bool Dialog::SystemOptions(void)
+/* return 0x02 - change sound, 0x04 - change music, 0x08 - change interface */
+u8 Dialog::SystemOptions(void)
 {
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
@@ -81,7 +82,7 @@ bool Dialog::SystemOptions(void)
     cursor.Show();
     display.Flip();
 
-    bool result = false;
+    u8 result = 0;
 
     // dialog menu loop
     while(le.HandleEvents())
@@ -95,7 +96,7 @@ bool Dialog::SystemOptions(void)
         if(conf.Sound() && le.MouseClickLeft(rect1))
         {
     	    conf.SetSoundVolume(10 > conf.SoundVolume() ? conf.SoundVolume() + 1 : 0);
-    	    result = true;
+    	    result |= 0x02;
     	    cursor.Hide();
     	    display.Blit(back2, rb);
 	    DrawSystemInfo(rb);
@@ -107,7 +108,7 @@ bool Dialog::SystemOptions(void)
         if(conf.Music() && le.MouseClickLeft(rect2))
         {
     	    conf.SetMusicVolume(10 > conf.MusicVolume() ? conf.MusicVolume() + 1 : 0);
-    	    result = true;
+    	    result |= 0x04;
     	    cursor.Hide();
     	    display.Blit(back2, rb);
 	    DrawSystemInfo(rb);
@@ -119,7 +120,7 @@ bool Dialog::SystemOptions(void)
         if(le.MouseClickLeft(rect4))
         {
     	    conf.SetAnimation(10 > conf.Animation() ? conf.Animation() + 1 : 0);
-    	    result = true;
+    	    result |= 0x01;
     	    cursor.Hide();
     	    display.Blit(back2, rb);
 	    DrawSystemInfo(rb);
@@ -131,7 +132,7 @@ bool Dialog::SystemOptions(void)
         if(le.MouseClickLeft(rect7))
         {
     	    conf.EvilInterface() ? conf.ResetModes(Settings::EVILINTERFACE) : conf.SetModes(Settings::EVILINTERFACE);
-    	    result = true;
+    	    result |= 0x08;
     	    cursor.Hide();
     	    display.Blit(back2, rb);
 	    DrawSystemInfo(rb);

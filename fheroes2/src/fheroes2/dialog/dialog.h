@@ -76,7 +76,7 @@ namespace Dialog
 
     answer_t AdventureOptions(const bool enabledig);
     Game::menu_t FileOptions(void);
-    bool SystemOptions(void);
+    u8    SystemOptions(void);
     const Maps::FileInfo * SelectFileInfo(const std::list<Maps::FileInfo *> & list);
 
     // show info cell maps

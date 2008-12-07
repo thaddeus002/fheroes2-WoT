@@ -1157,23 +1157,31 @@ Game::menu_t Game::HumanTurn(void)
 		Mixer::Reduce();
 
 		// Change and save system settings
-		Dialog::SystemOptions();
+		const u8 changes = Dialog::SystemOptions();
 		
-		const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
-		const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
-
-		Mixer::Volume(-1, vol1);
-		Music::Volume(vol2);
-                update_audio = true;
-
-		cursor.Hide();
-		if(selectHeroes.isSelected()) selectHeroes.Unselect();
-		if(selectCastle.isSelected()) selectCastle.Unselect();
-		I.Draw();
-		global_focus.Reset(Focus::HEROES);
-		global_focus.Redraw();
-		cursor.Show();
-		display.Flip();
+		if(0x02 & changes)
+		{
+		    const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
+		    Mixer::Volume(-1, vol1);
+            	    update_audio = true;
+		}
+		if(0x04 & changes)
+		{
+		    const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
+		    Music::Volume(vol2);
+            	    update_audio = true;
+		}
+		if(0x08 & changes)
+		{
+		    cursor.Hide();
+		    if(selectHeroes.isSelected()) selectHeroes.Unselect();
+		    if(selectCastle.isSelected()) selectCastle.Unselect();
+		    I.Draw();
+		    global_focus.Reset(Focus::HEROES);
+		    global_focus.Redraw();
+		    cursor.Show();
+		    display.Flip();
+		}
 
 		Mixer::Enhance();
 	    }
