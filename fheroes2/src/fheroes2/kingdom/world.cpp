@@ -33,6 +33,11 @@
 #include "algorithm.h"
 #include "world.h"
 
+bool PredicateHeroesIsFreeman(const Heroes *h)
+{
+    return h && h->isFreeman();
+}
+
 World & world = World::GetWorld();
 
 u32 World::uniq0 = 0;
@@ -1764,6 +1769,14 @@ Recruits & World::GetRecruits(Color::color_t color)
     if(Heroes::UNKNOWN == recruits.first || !(*vec_heroes[recruits.first]).isFreeman()) recruits.first = GetFreemanHeroes(GetKingdom(color).GetRace());
     if(Heroes::UNKNOWN == recruits.second || !(*vec_heroes[recruits.second]).isFreeman()) recruits.second = GetFreemanHeroes();
 
+    if(recruits.second == recruits.first)
+    {
+	if(2 < std::count_if(vec_heroes.begin(), vec_heroes.end(), PredicateHeroesIsFreeman))
+	    while(recruits.second == recruits.first) recruits.second = GetFreemanHeroes();
+	else
+	    recruits.second = Heroes::UNKNOWN;
+    }
+
     return recruits;
 }
 
@@ -1778,6 +1791,14 @@ void World::UpdateRecruits(void)
 	{
 	    recruits.first = GetFreemanHeroes(kingdom.GetRace());
 	    recruits.second = GetFreemanHeroes();
+
+	    if(recruits.second == recruits.first)
+	    {
+		if(2 < std::count_if(vec_heroes.begin(), vec_heroes.end(), PredicateHeroesIsFreeman))
+		    while(recruits.second == recruits.first) recruits.second = GetFreemanHeroes();
+		else
+		    recruits.second = Heroes::UNKNOWN;
+	    }
 	}
     }
 }
