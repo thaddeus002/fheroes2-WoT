@@ -22,7 +22,7 @@
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
-const uint16_t DEFAULT_COLOR_KEY16 = 0xf0f0;
+const uint32_t DEFAULT_COLOR_KEY16 = 0xf0f0;
 const uint32_t DEFAULT_COLOR_KEY32 = 0xff00ff00;
 
 const uint32_t RMASK16 = 0x0000f000;
