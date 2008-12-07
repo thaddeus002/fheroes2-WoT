@@ -103,3 +103,37 @@ bool String::Compare(const std::string &str1, const std::string &str2, bool sens
 
     return str1 == str2;
 }
+
+// from SDL_ttf
+void String::UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len)
+{
+    int i, j;
+    u16 ch;
+
+    for ( i=0, j=0; i < len; ++i, ++j )
+    {
+	ch = ((const unsigned char *)utf8)[i];
+        if ( ch >= 0xF0 )
+	{
+            ch  =  (u16)(utf8[i]&0x07) << 18;
+            ch |=  (u16)(utf8[++i]&0x3F) << 12;
+            ch |=  (u16)(utf8[++i]&0x3F) << 6;
+            ch |=  (u16)(utf8[++i]&0x3F);
+        }
+	else
+        if ( ch >= 0xE0 )
+	{
+            ch  =  (u16)(utf8[i]&0x0F) << 12;
+            ch |=  (u16)(utf8[++i]&0x3F) << 6;
+            ch |=  (u16)(utf8[++i]&0x3F);
+        }
+	else
+        if ( ch >= 0xC0 )
+	{
+            ch  =  (u16)(utf8[i]&0x1F) << 6;
+            ch |=  (u16)(utf8[++i]&0x3F);
+        }
+        unicode[j] = ch;
+    }
+    unicode[j] = 0;
+}

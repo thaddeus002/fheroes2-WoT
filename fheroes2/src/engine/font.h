@@ -45,6 +45,7 @@ namespace SDL
 
 	void RenderText(Surface &, const std::string &, const Colors &);
 	void RenderChar(Surface &, char, const Colors &);
+	void RenderUnicodeChar(Surface &, u16, const Colors &);
 
     private:
 	TTF_Font *fnt;

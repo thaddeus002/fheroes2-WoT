@@ -21,6 +21,7 @@
 #define H2TOOLS_H
 
 #include <string>
+#include "types.h"
 
 namespace String
 {
@@ -31,6 +32,10 @@ namespace String
     void AddInt(std::string &str, int value);
     int  ToInt(const std::string &str);
     bool Compare(const std::string &str1, const std::string &str2, bool sensitive = true);
+
+    // from SDL_ttf
+    void UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len);
+
 };
 
 #endif
