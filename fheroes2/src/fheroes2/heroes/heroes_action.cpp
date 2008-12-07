@@ -175,7 +175,6 @@ void PlayPickupSound(void)
 
 void AnimationRemoveObject(const Maps::Tiles & tile)
 {
-    return;
     Maps::TilesAddon *addon = NULL;
 
     switch(tile.GetObject())
