@@ -53,13 +53,15 @@ TTF_Font* Font::Get(void)
     return fnt;
 }
 
-bool Font::Open(const std::string & filename, u8 size)
+bool Font::Open(const std::string & filename, u8 size, u8 style)
 {
     if(fnt) TTF_CloseFont(fnt);
 
     fnt = TTF_OpenFont(filename.c_str(), size);
 
     if(!fnt) Error::Warning("Font::Open: error open: " + filename);
+    else
+    if(style) TTF_SetFontStyle(fnt, style);
 
     return fnt;
 }
@@ -73,6 +75,6 @@ void Font::Close(void)
 #else
 void Font::Init(void){};
 void Font::Quit(void){};
-bool Font::Open(const std::string &, u8){ return false; };
+bool Font::Open(const std::string &, u8, u8){ return false; };
 void Font::Close(void){};
 #endif

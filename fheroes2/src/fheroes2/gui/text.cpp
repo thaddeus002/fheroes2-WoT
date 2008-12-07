@@ -68,8 +68,8 @@ void Text::Blit(u16 ax, u16 ay, Surface & dst)
     Point pt(ax, ay);
     u16 y1 = ay;
 
-    for(; it != it_end; ++it){
-
+    for(; it != it_end; ++it)
+    {
 	pt.y = y1;
 
 	// space or unknown letter
@@ -79,10 +79,12 @@ void Text::Blit(u16 ax, u16 ay, Surface & dst)
 	    continue;
 	}
 
-	const Sprite &sprite = AGG::GetLetter(*it, font);
-        // valign
-	switch(*it){
+	const Surface & sprite = AGG::GetLetter(*it, font);
+	if(!sprite.valid()) return;
 
+        // valign
+	switch(*it)
+	{
 	    case '-':
     		pt.y += (Font::SMALL == font ? HEIGHT_SMALL / 2 : HEIGHT_BIG / 2);
     	    break;

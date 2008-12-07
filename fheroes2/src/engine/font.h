@@ -30,7 +30,7 @@ namespace Font
     void Init(void);
     void Quit(void);
 
-    bool Open(const std::string & filename, u8 size);
+    bool Open(const std::string & filename, u8 size, u8 style = 0);
     bool isValid(void);
     void Close(void);
 };

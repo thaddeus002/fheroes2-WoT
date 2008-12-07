@@ -191,6 +191,9 @@ int main(int argc, char **argv)
             // load palette
 	    cache.LoadPAL();
 
+	    // load font
+	    cache.LoadFNT();
+
 #ifdef BUILD_RELEASE
 	    // SDL logo
 	    if(conf.Logo())

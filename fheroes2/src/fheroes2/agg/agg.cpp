@@ -26,6 +26,7 @@
 #include "audio.h"
 #include "midi_xmi.h"
 #include "midi_mid.h"
+#include "font.h"
 #include "agg.h"
 
 #define FATSIZENAME	15
@@ -229,7 +230,6 @@ AGG::Cache::~Cache()
 	    for(; it1 != it2; ++it1) delete *it1;
 	}
     }
-
 }
 
 /* get AGG::Cache object */
@@ -574,6 +574,68 @@ void AGG::Cache::LoadMUS(const MUS::mus_t mus)
     }
 }
 
+void AGG::Cache::LoadFNT(void)
+{
+    const Settings & conf = Settings::Get();
+
+#ifdef WITH_TTF
+    if(fnt_cache.size()) return;
+
+    const char *letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"; // only for test development
+    const u8 letters_size = std::strlen(letters);
+    const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
+
+    // small
+    if(Font::Open(conf.FontName(), 10))
+    {
+	for(u8 ii = 0; ii < letters_size; ++ii)
+	    fnt_cache[letters[ii]].second.RenderChar(letters[ii], white);
+
+	Font::Close();
+    }
+
+    // medium
+    if(Font::Open(conf.FontName(), 15))
+    {
+	for(u8 ii = 0; ii < letters_size; ++ii)
+	    fnt_cache[letters[ii]].first.RenderChar(letters[ii], white);
+
+	Font::Close();
+    }
+
+    if(conf.Debug()) Error::Verbose("AGG::LoadFonts: preload charsets from " + conf.FontName());
+#else
+    PreloadObject(ICN::SMALFONT);
+    PreloadObject(ICN::FONT);
+
+    if(conf.Debug()) Error::Verbose("AGG::LoadFonts: internal.");
+#endif
+}
+
+void AGG::Cache::LoadFNT(u32 ch)
+{
+#ifdef WITH_TTF
+    const Settings & conf = Settings::Get();
+    const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
+
+    // small
+    if(Font::Open(conf.FontName(), 10))
+    {
+	fnt_cache[ch].second.RenderChar(ch, white);
+	Font::Close();
+    }
+
+    // medium
+    if(Font::Open(conf.FontName(), 15))
+    {
+	fnt_cache[ch].first.RenderChar(ch, white);
+	Font::Close();
+    }
+
+    if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
+#endif
+}
+
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 {
@@ -734,6 +796,14 @@ const std::vector<u8> & AGG::Cache::GetMUS(const MUS::mus_t mus)
     return v;
 }
 
+/* return FNT cache */
+const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u32 c)
+{
+    if(!fnt_cache[c].first.valid()) LoadFNT(c);
+
+    return fnt_cache[c];
+}
+
 // wrapper AGG::PreloadObject
 void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
@@ -799,14 +869,6 @@ u32 AGG::GetColor(const u16 index, const u8 flag)
     return AGG::Cache::Get().GetPAL().Color(index);
 }
 
-/* return letter sprite */
-const Sprite & AGG::GetLetter(char ch, u8 ft)
-{
-    if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
-    
-    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
-}
-
 /* wrapper Audio::Play */
 void AGG::PlaySound(const M82::m82_t m82)
 {
@@ -846,4 +908,21 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
         else Music::Reset();
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + XMI::GetString(xmi));
     }
+}
+
+/* return letter sprite */
+const Surface & AGG::GetLetter(char ch, u8 ft)
+{
+    if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
+    
+#ifdef WITH_TTF
+    const std::pair<Surface, Surface> & fonts = AGG::Cache::Get().GetFNT(ch);
+
+    if(!fonts.first.valid())
+    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
+
+    return Font::SMALL == ft ? fonts.second : fonts.first;
+#else
+    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
+#endif
 }

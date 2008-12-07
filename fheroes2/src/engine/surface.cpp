@@ -495,18 +495,23 @@ const SDL_PixelFormat *Surface::GetPixelFormat(void) const
     return surface->format;
 }
 
-void Surface::RenderTextSolid(const std::string & msg, const Colors & clr, bool unicode)
+void Surface::RenderText(const std::string & msg, const Colors & clr)
 {
 #ifdef WITH_TTF
     if(surface) SDL_FreeSurface(surface);
-    if(Font::isValid()) surface = (unicode ? TTF_RenderUTF8_Solid(Font::Get(), msg.c_str(), clr) : TTF_RenderText_Solid(Font::Get(), msg.c_str(), clr));
+    if(Font::isValid())
+    surface = TTF_STYLE_BOLD & TTF_GetFontStyle(Font::Get()) ? TTF_RenderUTF8_Blended(Font::Get(), msg.c_str(), clr) : TTF_RenderUTF8_Solid(Font::Get(), msg.c_str(), clr);
 #endif
 }
 
-void Surface::RenderTextBlended(const std::string & msg, const Colors & clr, bool unicode)
+void Surface::RenderChar(char ch, const Colors & clr)
 {
+    char buf[2] = { '\0', '\0' };
+         buf[0] = ch;
+
 #ifdef WITH_TTF
     if(surface) SDL_FreeSurface(surface);
-    if(Font::isValid()) surface = (unicode ? TTF_RenderUTF8_Blended(Font::Get(), msg.c_str(), clr) : TTF_RenderText_Blended(Font::Get(), msg.c_str(), clr));
+    if(Font::isValid())
+    surface = TTF_STYLE_BOLD & TTF_GetFontStyle(Font::Get()) ? TTF_RenderUTF8_Blended(Font::Get(), buf, clr) : TTF_RenderUTF8_Solid(Font::Get(), buf, clr);
 #endif
 }

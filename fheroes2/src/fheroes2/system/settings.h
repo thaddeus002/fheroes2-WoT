@@ -79,6 +79,7 @@ public:
     const Maps::FileInfo & FileInfo(void) const;
     Maps::FileInfo & FileInfo(void);
 
+    const std::string & PreloadCharsets(void) const;
     const std::string & FontName(void) const;
     const std::string & TranslationFile(void) const;
     const std::string & DataDirectory(void) const;
@@ -148,7 +149,7 @@ private:
     std::string path_maps_directory;
     std::string translationFile;
     std::string fontname;
-    
+
     Maps::FileInfo current_maps_file;
     
     u8 sound_volume;

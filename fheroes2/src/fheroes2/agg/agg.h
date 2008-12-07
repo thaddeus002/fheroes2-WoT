@@ -90,6 +90,7 @@ namespace AGG
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
         const std::vector<u8> & GetMUS(const MUS::mus_t mus);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
+	const std::pair<Surface, Surface> & GetFNT(u32);
 
 	void LoadICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
@@ -97,6 +98,8 @@ namespace AGG
         void LoadMUS(const MUS::mus_t mus);
 	void LoadMID(const XMI::xmi_t xmi);
 	void LoadPAL(void);
+	void LoadFNT(void);
+	void LoadFNT(u32);
 
 	void FreeICN(const ICN::icn_t icn, bool reflect = false);
 	void FreeTIL(const TIL::til_t til);
@@ -115,6 +118,7 @@ namespace AGG
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
         std::map<MUS::mus_t, std::vector<u8> > mus_cache;
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;
+	std::map<u32, std::pair<Surface, Surface> > fnt_cache;
 
 	Palette palette;
 	bool heroes2_agg;
@@ -139,7 +143,7 @@ namespace AGG
     // wrapper AGG::GetColor
     u32 GetColor(const u16 index, const u8 flag = 0);
 
-    const Sprite & GetLetter(char ch, u8 ft);
+    const Surface & GetLetter(char ch, u8 ft);
     
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);

@@ -50,8 +50,8 @@ public:
     Surface & operator= (const Surface & bs);
     void Set(u16 sw, u16 sh, bool alpha = false);
 
-    void RenderTextSolid(const std::string & msg, const Colors &  clr, bool unicode = false);
-    void RenderTextBlended(const std::string & msg, const Colors & clr, bool unicode = false);
+    void RenderText(const std::string & msg, const Colors &  clr);
+    void RenderChar(char ch, const Colors &  clr);
 
     u16 w(void) const;
     u16 h(void) const;
