@@ -876,6 +876,7 @@ void World::LoadMaps(const std::string &filename)
 		break;
 
 	    case MP2::OBJ_STONELIGHTS:
+		tile.UpdateStoneLightsSprite();
 		vec_teleports.push_back(ii);
 		break;
 
@@ -915,13 +916,13 @@ void World::LoadMaps(const std::string &filename)
     	    case MP2::OBJ_RNDARTIFACT2:
     	    case MP2::OBJ_RNDARTIFACT3:
 		// modify rnd artifact sprite
-		Artifact::ChangeTileWithRNDArtifact(tile);
+		tile.UpdateRNDArtifactSprite();
     		tile.UpdateQuantity();
 		break;
 
 	    case MP2::OBJ_RNDRESOURCE:
 		// modify rnd resource sprite
-		Resource::ChangeTileWithRNDResource(tile);
+		tile.UpdateRNDResourceSprite();
 		tile.UpdateQuantity();
 		break;
 

@@ -894,6 +894,9 @@ namespace ICN
 	
 	// system
 	ROUTERED,
+	TELEPORT1,
+	TELEPORT2,
+	TELEPORT3,
 
 	UNKNOWN
 

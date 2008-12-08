@@ -25,8 +25,6 @@
 #include "mp2.h"
 #include "gamedefs.h"
 
-namespace Maps { class Tiles; };
-
 namespace Artifact
 {
     typedef enum {
@@ -162,8 +160,6 @@ namespace Artifact
     bool Ultimate(artifact_t);
     bool isValid(artifact_t);
     u8 GetIndexSprite(Artifact::artifact_t artifact);
-    
-    void ChangeTileWithRNDArtifact(Maps::Tiles & tile);
 };
 
 #endif

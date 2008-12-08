@@ -306,6 +306,73 @@ bool AGG::Cache::AttachFile(const std::string & fname)
     return true;
 }
 
+/* load manual ICN object */
+void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
+{
+    std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+
+    if(v.size()) return;
+
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+
+    Sprite *sprite = NULL;
+    u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
+
+    // Preload ICN
+    switch(icn)
+    {
+	case ICN::TELEPORT1:
+	case ICN::TELEPORT2:
+	case ICN::TELEPORT3: LoadICN(ICN::OBJNMUL2); count = 2; break;
+
+	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 144; break;
+
+	default: break;
+    }
+
+    v.resize(count);
+
+    for(u8 ii = 0; ii < count; ++ii)
+    {
+	switch(icn)
+	{
+	    case ICN::TELEPORT1:
+		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 116));
+		sprite->Lock();
+		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii));
+		sprite->Unlock();
+		break;
+
+	    case ICN::TELEPORT2:
+		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 119));
+		sprite->Lock();
+		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii));
+		sprite->Unlock();
+		break;
+
+	    case ICN::TELEPORT3:
+		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 122));
+		sprite->Lock();
+		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii));
+		sprite->Unlock();
+		break;
+
+	    case ICN::ROUTERED:
+		sprite = new Sprite(GetICN(ICN::ROUTE, ii));
+		sprite->Lock();
+		sprite->ChangeColor(palette.Color(0x55), palette.Color(0xB0));
+		sprite->ChangeColor(palette.Color(0x5C), palette.Color(0xB7));
+		sprite->ChangeColor(palette.Color(0x60), palette.Color(0xBB));
+		sprite->Unlock();
+		break;
+
+	    default: break;
+	}
+
+	if(sprite) v[ii] = sprite;
+    }
+}
+
 /* load ICN object to AGG::Cache */
 void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 {
@@ -349,22 +416,9 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		for(u16 ii = 0; ii < count_sprite; ++ii)
 		{
 		    const ICN::Header & header = icn_headers[ii];
-
 		    const u32 size_data = (ii + 1 != count_sprite ? icn_headers[ii + 1].OffsetData() - header.OffsetData() : total_size - header.OffsetData());
 
-		    u8 flag = 0;
-		    
-		    if(reflect) flag |= Sprite::REFLECT;
-
-		    // system
-		    switch(icn)
-		    {
-			case ICN::ROUTERED:	flag |= Sprite::GREEN2RED; break;
-
-			default: break;
-		    }
-
-		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data, flag);
+		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data, reflect);
 		}
 
 		return;
@@ -703,7 +757,16 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
     const std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
-    if(0 == v.size()) LoadICN(icn, reflect);
+    if(0 == v.size())
+    switch(icn)
+    {
+	case ICN::ROUTERED:
+	case ICN::TELEPORT1:
+	case ICN::TELEPORT2:
+	case ICN::TELEPORT3:	LoadExtraICN(icn, reflect);	break;
+
+	default:		LoadICN(icn, reflect);		break;
+    }
 
     if(index >= v.size())
     {
@@ -870,12 +933,12 @@ const std::vector<u8> & AGG::GetMID(const XMI::xmi_t xmi)
 }
 
 // wrapper AGG::GetColor
-u32 AGG::GetColor(const u16 index, const u8 flag)
+u32 AGG::GetColor(const u16 index)
 {
-    if(Sprite::GREEN2RED & flag) return AGG::Cache::Get().GetPAL().Color(index + 0x5C);
-    else
-    if(Sprite::WHITE2YELLOW & flag) return AGG::Cache::Get().GetPAL().Color(index + 0xC0);
-    else
+//    if(Sprite::GREEN2RED & flag) return AGG::Cache::Get().GetPAL().Color(index + 0x5C);
+//    else
+//    if(Sprite::WHITE2YELLOW & flag) return AGG::Cache::Get().GetPAL().Color(index + 0xC0);
+//    else
     return AGG::Cache::Get().GetPAL().Color(index);
 }
 

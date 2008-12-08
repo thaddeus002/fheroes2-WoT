@@ -97,6 +97,8 @@ public:
     u32 GetPixel1(u16 x, u16 y);
     u32 GetPixel(u16 x, u16 y);
 
+    void ChangeColor(u32, u32);
+
     void Lock(void);
     void Unlock(void);
 

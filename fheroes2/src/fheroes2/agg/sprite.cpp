@@ -23,21 +23,19 @@
 #include "sprite.h"
 
 /* ICN Sprite constructor */
-Sprite::Sprite(const ICN::Header & header, const char *data, const u32 size, const u8 modify)
+Sprite::Sprite(const ICN::Header & header, const char *data, const u32 size, bool reflect)
     : Surface(header.Width(), header.Height(), Settings::Get().Shadow()), offsetX(header.OffsetX()), offsetY(header.OffsetY())
 {
     SetColorKey();
-    DrawICN(*this, data, size, modify);
-    if(Settings::Get().Shadow()) SetDisplayFormat();
+    DrawICN(*this, data, size, reflect);
 }
 
-void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, const u8 flags)
+void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect)
 {
     if(NULL == buf || 0 == size) return;
 
     const u8 *cur = (const u8 *) buf;
     const u8 *max = cur + size;
-    const bool reflect = flags & REFLECT;
 
     u8  c = 0;
     u16 x = reflect ? sf.w() - 1 : 0;
@@ -64,7 +62,7 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, const u8 fla
 	    ++cur;
 	    while(c-- && cur < max)
 	    {
-		sf.SetPixel2(x, y, AGG::GetColor(*cur, flags));
+		sf.SetPixel2(x, y, AGG::GetColor(*cur));
 		reflect ? x-- : x++;
 		++cur;
 	    }
@@ -98,14 +96,14 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, const u8 fla
 	    ++cur;
 	    c = *cur;
 	    ++cur;
-	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur, flags)); reflect ? x-- : x++; }
+	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur)); reflect ? x-- : x++; }
 	    ++cur;
 	}
 	else
 	{
 	    c = *cur - 0xC0;
 	    ++cur;
-	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur, flags)); reflect ? x-- : x++; }
+	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur)); reflect ? x-- : x++; }
 	    ++cur;
 	}
 

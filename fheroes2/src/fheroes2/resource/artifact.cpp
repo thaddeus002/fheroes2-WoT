@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "agg.h"
-#include "maps_tiles.h"
 #include "settings.h"
 #include "world.h"
 #include "artifact.h"
@@ -583,50 +582,4 @@ bool Artifact::Ultimate(artifact_t art)
 bool Artifact::isValid(artifact_t art)
 {
     return UNKNOWN != art;
-}
-
-void Artifact::ChangeTileWithRNDArtifact(Maps::Tiles & tile)
-{
-    Maps::TilesAddon *addon = NULL;
-
-    u8 index = 0;
-
-    switch(tile.GetObject())
-    {
-	case MP2::OBJ_RNDARTIFACT:
-	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT);
-    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT));
-	    break;
-	case MP2::OBJ_RNDARTIFACT1:
-	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT1);
-    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT1));
-	    break;
-	case MP2::OBJ_RNDARTIFACT2:
-	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT2);
-    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT2));
-	    break;
-	case MP2::OBJ_RNDARTIFACT3:
-	    addon = tile.FindRNDArtifact(MP2::OBJ_RNDARTIFACT3);
-    	    index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT3));
-	    break;
-	default:
-	    return;
-    }
-    
-    if(addon)
-    {
-	const u16 center = tile.GetIndex();
-        const u32 uniq = addon->uniq;
-        addon->index = index;
-        tile.SetObject(MP2::OBJ_ARTIFACT);
-
-        // replace shadow artifact
-        if(Maps::isValidDirection(center, Direction::LEFT))
-        {
-            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(center, Direction::LEFT));
-            Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(uniq);
-
-	    if(shadow) shadow->index = index - 1;
-        }
-    }
 }

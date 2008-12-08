@@ -1797,7 +1797,7 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 		PlaySoundSuccess;
 		DialogWithGold(MP2::StringObject(obj), "You beat the Ghosts and are able to restore the mine to production.", 1000);
 		tile.SetQuantity1(0);
-		tile.UpdateAbandoneMine();
+		tile.UpdateAbandoneMineSprite();
 		world.CaptureObject(dst_index, hero.GetColor());
 		world.GetTiles(dst_index).CaptureFlags32(MP2::OBJ_MINES, hero.GetColor());
 		hero.ActionAfterBattle();

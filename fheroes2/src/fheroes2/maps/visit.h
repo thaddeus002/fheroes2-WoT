@@ -25,6 +25,8 @@
 #include "mp2.h"
 #include "gamedefs.h"
 
+namespace Maps { class Tiles; };
+
 namespace Visit
 {
     typedef enum { LOCAL, GLOBAL } type_t;

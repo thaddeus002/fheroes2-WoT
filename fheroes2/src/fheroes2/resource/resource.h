@@ -24,8 +24,6 @@
 #include <vector>
 #include "gamedefs.h"
 
-namespace Maps { class Tiles; };
-
 namespace Resource
 {
     typedef enum {
@@ -89,8 +87,6 @@ namespace Resource
 
     /* return index sprite resource.icn */
     u8 GetIndexSprite2(resource_t resource);
-
-    void ChangeTileWithRNDResource(Maps::Tiles & tile);
 
     void AlignDraw(const funds_t & rs, const Rect & dst_rt);
 };

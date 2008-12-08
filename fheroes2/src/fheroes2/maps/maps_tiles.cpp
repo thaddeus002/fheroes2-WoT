@@ -1716,7 +1716,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
         Error::Warning("Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: ", maps_index);
 }
 
-void Maps::Tiles::UpdateAbandoneMine(void)
+void Maps::Tiles::UpdateAbandoneMineSprite(void)
 {
     if(addons_level1.size())
     {
@@ -1734,5 +1734,90 @@ void Maps::Tiles::UpdateAbandoneMine(void)
 		break;
 	    }
 	}
+    }
+}
+
+void Maps::Tiles::UpdateStoneLightsSprite(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object))
+	    switch(addon.index)
+	    {
+		case 116:	addon.object = 0x11; addon.index = 0; break;
+		case 119:	addon.object = 0x12; addon.index = 0; break;
+		case 122:	addon.object = 0x13; addon.index = 0; break;
+		default: 	break;
+	    }
+	}
+    }
+}
+
+void Maps::Tiles::UpdateRNDArtifactSprite(void)
+{
+    TilesAddon *addon = NULL;
+    u8 index = 0;
+
+    switch(general)
+    {
+        case MP2::OBJ_RNDARTIFACT:
+            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT);
+            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT));
+            break;
+        case MP2::OBJ_RNDARTIFACT1:
+            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT1);
+            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT1));
+            break;
+        case MP2::OBJ_RNDARTIFACT2:
+            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT2);
+            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT2));
+            break;
+        case MP2::OBJ_RNDARTIFACT3:
+            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT3);
+            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT3));
+            break;
+        default: return;
+    }
+
+    if(addon)
+    {
+        addon->index = index;
+        general = MP2::OBJ_ARTIFACT;
+
+        // replace shadow artifact
+        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+        {
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+            Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(addon->uniq);
+
+            if(shadow) shadow->index = index - 1;
+        }
+    }
+}
+
+void Maps::Tiles::UpdateRNDResourceSprite(void)
+{
+    TilesAddon *addon = FindRNDResource();
+
+    if(addon)
+    {
+        addon->index = Resource::GetIndexSprite(Resource::Rand());
+        general = MP2::OBJ_RESOURCE;
+
+        // replace shadow artifact
+        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+        {
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+            Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(addon->uniq);
+
+            if(shadow) shadow->index = addon->index - 1;
+        }
     }
 }

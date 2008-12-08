@@ -21,7 +21,6 @@
 #include "mp2.h"
 #include "world.h"
 #include "agg.h"
-#include "maps_tiles.h"
 #include "resource.h"
 
 Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
@@ -296,30 +295,6 @@ void Resource::funds_t::Reset(void)
     crystal = 0;
     gems = 0;
     gold = 0;
-}
-
-void Resource::ChangeTileWithRNDResource(Maps::Tiles & tile)
-{
-    Maps::TilesAddon *addon = tile.FindRNDResource();
-
-    if(addon)
-    {
-	const u16 center = tile.GetIndex();
-       	const u32 uniq = addon->uniq;
-        const u8 index = Resource::GetIndexSprite(Resource::Rand());
-
-        addon->index = index;
-        tile.SetObject(MP2::OBJ_RESOURCE);
-
-        // replace shadow artifact
-        if(Maps::isValidDirection(center, Direction::LEFT))
-        {
-            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(center, Direction::LEFT));
-            Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(uniq);
-
-            if(shadow) shadow->index = index - 1;
-        }
-    }
 }
 
 void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)

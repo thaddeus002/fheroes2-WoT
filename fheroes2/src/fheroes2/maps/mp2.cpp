@@ -26,6 +26,14 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 {
     switch(type)
     {
+	// manual
+	case 0x11:
+	    return ICN::TELEPORT1;
+	case 0x12:
+	    return ICN::TELEPORT2;
+	case 0x13:
+	    return ICN::TELEPORT3;
+
 	// artifact
 	case 0x2C:
 	case 0x2D:

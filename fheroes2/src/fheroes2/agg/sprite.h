@@ -26,10 +26,8 @@
 class Sprite : public Surface
 {
 public:
-    enum { REFLECT = 0x01, GREEN2RED = 0x02, WHITE2YELLOW = 0x04 } flag_t;
-
     /* icn sprite constructor */
-    Sprite(const ICN::Header & header, const char *data, const u32 size, const u8 modify = 0);
+    Sprite(const ICN::Header & header, const char *data, const u32 size, bool reflect = false);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };
@@ -38,7 +36,7 @@ public:
     operator Size() const { return Size(w(), h()); }
     operator Rect() const { return Rect(offsetX, offsetY, w(), h()); }
 
-    static void DrawICN(Surface & sf, const char *buf, const u32 size, const u8 flags = 0);
+    static void DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect);
 
 private:
     s16		offsetX;

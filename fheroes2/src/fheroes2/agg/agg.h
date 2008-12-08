@@ -93,6 +93,7 @@ namespace AGG
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 	const std::pair<Surface, Surface> & GetFNT(u16);
 
+	void LoadExtraICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
 	void LoadWAV(const M82::m82_t m82);
@@ -148,7 +149,7 @@ namespace AGG
     const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 
     // wrapper AGG::GetColor
-    u32 GetColor(const u16 index, const u8 flag = 0);
+    u32 GetColor(const u16 index);
 
     const Surface & GetLetter(char ch, u8 ft);
     const Surface & GetUnicodeLetter(u16 ch, u8 ft);
