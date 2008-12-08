@@ -1614,10 +1614,10 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1,
     cursor.Hide();
     Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
     
-    bool attack, retaliate = false;
+    bool doAttack, retaliate = false;
     
-    attack = AnimateMove(hero1, hero2, army1, army2, tile, troopN, move);
-    if(attack)
+    doAttack = AnimateMove(hero1, hero2, army1, army2, tile, troopN, move);
+    if(doAttack)
         retaliate = AnimateAttack(hero1, hero2, army1, army2, tile, troopN, attack);
     
     myTroop.ResetReflection();
