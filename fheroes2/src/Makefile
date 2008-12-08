@@ -25,6 +25,9 @@ all:
 	$(MAKE) -C engine
 	$(MAKE) -C dist
 	$(MAKE) -C tools
+ifdef DEVELOPMENT
+	$(MAKE) -C dist pot
+endif
 
 clean:
 	$(MAKE) -C tools clean

@@ -11,7 +11,9 @@ TARGET := fheroes2
 
 all:
 	$(MAKE) -C src
-	cp src/dist/$(TARGET) .
+	@cp src/dist/$(TARGET).pot lang
+	@cp src/dist/$(TARGET) .
 
 clean:
 	$(MAKE) -C src clean
+	@rm -f lang/$(TARGET).pot

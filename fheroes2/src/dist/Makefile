@@ -33,6 +33,7 @@ CC := g++
 
 SOURCEROOT := ../fheroes2
 SOURCEDIR  := $(shell ls $(SOURCEROOT))
+POT        := $(TARGET).pot
 
 SEARCH := $(addprefix $(SOURCEROOT)/, $(addsuffix /*.cpp, $(SOURCEDIR)))
 
@@ -41,6 +42,10 @@ all: $(TARGET)
 $(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH)))) $(LIBENGINE)
 	@echo "lnk: $@"
 	$(CC) $^ -o $@ $(LIBS)
+
+pot: $(wildcard $(SEARCH))
+	@echo "gen: $(POT)"
+	@xgettext -d $(TARGET) -C -ktr -o $(POT) $(wildcard $(SEARCH))
 
 VPATH := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
 
@@ -53,4 +58,4 @@ include $(wildcard *.d)
 .PHONY: clean
 
 clean:
-	rm -f *.o *.d *.exe $(TARGET)
+	rm -f *.pot *.o *.d *.exe $(TARGET)
