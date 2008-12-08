@@ -135,6 +135,7 @@ namespace Maps
 	void UpdateAbandoneMineSprite(void);
 	void UpdateStoneLightsSprite(void);
 	void UpdateFountainSprite(void);
+	void UpdateTreasureChestSprite(void);
 
     private:
 	void CorrectFlags32(const u8 index);

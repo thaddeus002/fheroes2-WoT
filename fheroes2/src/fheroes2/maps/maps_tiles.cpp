@@ -966,6 +966,9 @@ Maps::TilesAddon * Maps::Tiles::FindResource(void)
 	    // OBJNRSRC
 	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && (addon.index % 2)) return &addon;
 	    else
+	    // TREASURE
+	    if(ICN::TREASURE == MP2::GetICNObject(addon.object)) return &addon;
+	    else
 	    // OBJNWATR
 	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && 
 		(0 == addon.index ||	// buttle
@@ -1836,6 +1839,26 @@ void Maps::Tiles::UpdateFountainSprite(void)
 	    if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object) && 15 == addon.index)
 	    {
 		addon.object = 0x14;
+		addon.index = 0;
+	    }
+	}
+    }
+}
+
+void Maps::Tiles::UpdateTreasureChestSprite(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && 19 == addon.index)
+	    {
+		addon.object = 0x15;
 		addon.index = 0;
 	    }
 	}

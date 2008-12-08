@@ -323,9 +323,10 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
     {
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
-	case ICN::TELEPORT3: LoadICN(ICN::OBJNMUL2); count = 2; break;
-
+	case ICN::TELEPORT3:
 	case ICN::FOUNTAIN:  LoadICN(ICN::OBJNMUL2); count = 2; break;
+
+	case ICN::TREASURE:  LoadICN(ICN::OBJNRSRC); count = 2; break;
 
 	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 144; break;
 
@@ -370,6 +371,15 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 		sprite->ChangeColor(palette.Color(0xED), palette.Color(0xED - ii));
 		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE - ii));
 		sprite->ChangeColor(palette.Color(0xEF), palette.Color(0xEF - ii));
+		sprite->Unlock();
+		break;
+
+	    case ICN::TREASURE:
+		sprite = new Sprite(GetICN(ICN::OBJNRSRC, 19));
+		sprite->Lock();
+		sprite->ChangeColor(palette.Color(0x0A), palette.Color(ii ? 0x00 : 0x0A));
+		sprite->ChangeColor(palette.Color(0xC2), palette.Color(ii ? 0xD6 : 0xC2));
+		sprite->ChangeColor(palette.Color(0x64), palette.Color(ii ? 0xDA : 0x64));
 		sprite->Unlock();
 		break;
 
@@ -780,7 +790,8 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
 	case ICN::TELEPORT3:
-	case ICN::FOUNTAIN:	LoadExtraICN(icn, reflect);	break;
+	case ICN::FOUNTAIN:
+	case ICN::TREASURE:	LoadExtraICN(icn, reflect);	break;
 
 	default:		LoadICN(icn, reflect);		break;
     }
@@ -952,10 +963,6 @@ const std::vector<u8> & AGG::GetMID(const XMI::xmi_t xmi)
 // wrapper AGG::GetColor
 u32 AGG::GetColor(const u16 index)
 {
-//    if(Sprite::GREEN2RED & flag) return AGG::Cache::Get().GetPAL().Color(index + 0x5C);
-//    else
-//    if(Sprite::WHITE2YELLOW & flag) return AGG::Cache::Get().GetPAL().Color(index + 0xC0);
-//    else
     return AGG::Cache::Get().GetPAL().Color(index);
 }
 
