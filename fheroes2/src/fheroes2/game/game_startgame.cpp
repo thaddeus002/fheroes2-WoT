@@ -546,7 +546,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			    else
 			    if(tile.isPassable())
 			    {
-				const bool protection = (MAXU16 != Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_MONSTER, !Settings::Get().Original()));
+				const bool protection = (MAXU16 != Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_MONSTER, Settings::Get().Original()));
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
 				    case 0:	return Cursor::POINTER;
