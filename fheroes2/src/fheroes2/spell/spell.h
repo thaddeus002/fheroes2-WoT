@@ -96,8 +96,10 @@ namespace Spell
 	SETAGUARDIAN,
 	SETFGUARDIAN,
 	SETWGUARDIAN,
-	STONE,
     } spell_t;
+
+    inline spell_t & operator++ (spell_t & spell){ return spell = (SETWGUARDIAN > spell ? spell_t(spell + 1) : SETWGUARDIAN); };
+    inline spell_t & operator-- (spell_t & spell){ return spell = (NONE < spell ? spell_t(spell - 1) : NONE); };
 
     typedef enum
     {

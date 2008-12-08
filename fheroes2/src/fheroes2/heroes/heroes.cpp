@@ -260,8 +260,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 
 	    experience = 777;
 
-	    for(Spell::spell_t spell=(Spell::spell_t)(Spell::NONE+1); spell < Spell::STONE; spell = (Spell::spell_t)(spell+1)) 
-		spell_book.Append(spell, Skill::Level::EXPERT);
+	    // all spell in magic book
+	    for(Spell::spell_t spell = Spell::FIREBALL; spell < Spell::SETWGUARDIAN; ++spell) spell_book.Append(spell, Skill::Level::EXPERT);
 	    break;
 
 	default: break;

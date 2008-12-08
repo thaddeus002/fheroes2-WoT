@@ -30,85 +30,81 @@ namespace Spell
     {
         const std::string name;
         u8 mana;
-        u8 level;
-        bool combat;
         u8 sprite;
-        target_t target;
         u8 power;
         ICN::icn_t icn;
         M82::m82_t m82;
         const std::string description;
     } all_spells[] = {
-	//  name                   mana lvl cmbt  spr    target  pwr icn            m82           description
-	{ "Unknown",                 0, 0, false,  0,  NOTARGET,  0, ICN::UNKNOWN,  M82::UNKNOWN, "Unknown spell." },
-	{ "Fireball",                9, 3,  true,  8,  ONEENEMY, 10, ICN::FIREBALL, M82::FIREBALL, "Causes a giant fireball to strike the selected area, damaging all nearby creatures." },	{ "Fireblast",              15, 4,  true,  9,  ONEENEMY, 10, ICN::FIREBAL2, M82::FIREBALL, "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one." }, 
-	{ "Lightning Bolt",          7, 2,  true,  4,  ONEENEMY, 25, ICN::SPARKS,   M82::LIGHTBLT, "Causes a bolt of electrical energy to strike the selected creature." }, 
-	{ "Chain Lightning",        15, 4,  true,  5,  ONEENEMY, 40, ICN::SPARKS,   M82::CHAINLTE, "Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!" }, 
-	{ "Teleport",                9, 3,  true, 10, ONEFRIEND,  0, icnnone      , M82::TELEIN, "Teleports the creature you select to any open position on the battlefield." }, 
-	{ "Cure",                    6, 1,  true,  6, ONEFRIEND,  5, ICN::MAGIC01 , M82::CURE, "Removes all negative spells cast upon one of your units, and restores up to 5 HP per level of spell power." }, 
-	{ "Mass Cure",              15, 4,  true,  2, ALLFRIEND,  5, ICN::MAGIC01 , M82::MASSCURE, "Removes all negative spells cast upon your forces, and restores up to 5 HP per level of spell power, per creature." }, 
-	{ "Resurrect",              12, 4,  true, 12, ONEFRIEND, 50, icnnone      , M82::RESURECT, "Resurrects creatures from a damaged or dead unit until end of combat." }, 
-	{ "Resurrect True",         15, 5,  true, 13, ONEFRIEND, 50, icnnone      , M82::RESURTRU, "Resurrects creatures from a damaged or dead unit permanently." }, 
-	{ "Haste",                   3, 1,  true, 14, ONEFRIEND,  1, ICN::HASTE   , M82::HASTE, "Increases the speed of any creature by two." }, 
-	{ "Mass Haste",             10, 3,  true, 14, ALLFRIEND,  1, ICN::HASTE   , M82::MASSHAST, "Increases the speed of all of your creatures by two." }, 
-	{ "Slow",                    3, 1,  true,  1,  ONEENEMY,  1, ICN::MAGIC02 , M82::SLOW, "Slows target to half movement rate." }, 
-	{ "Mass Slow",              15, 4,  true,  1,  ALLENEMY,  1, ICN::MAGIC02 , M82::MASSSLOW, "Slows all enemies to half movement rate." }, 
-	{ "Blind ",                  6, 2,  true, 21,  ONEENEMY,  1, ICN::BLIND   , M82::BLIND, "Clouds the affected creatures' eyes, preventing them from moving." }, 
-	{ "Bless",                   3, 1,  true,  7, ONEFRIEND,  1, ICN::BLESS   , M82::BLESS, "Causes the selected creatures to inflict maximum damage." }, 
-	{ "Mass Bless",             12, 3,  true,  7, ALLFRIEND,  1, ICN::BLESS   , M82::MASSBLES, "Causes all of your units to inflict maximum damage." },
-	{ "Stoneskin",               3, 1,  true, 31, ONEFRIEND,  1, ICN::STONSKIN, M82::STONSKIN, "Magically increases the defense skill of the selected creatures." },
-	{ "Steelskin",               6, 2,  true, 30, ONEFRIEND,  1, ICN::STELSKIN, M82::STELSKIN, "Increases the defense skill of the targeted creatures.  This is an improved version of Stoneskin." },
-	{ "Curse",                   3, 1,  true,  3,  ONEENEMY,  1, ICN::CURSE   , M82::CURSE, "Causes the selected creatures to inflict minimum damage." },
-	{ "Mass Curse",             12, 3,  true,  3,  ALLENEMY,  1, ICN::CURSE   , M82::MASSCURS, "Causes all enemy troops to inflict minimum damage." },
-	{ "Holy Word",               9, 3,  true, 22,   ALLDEAD, 10, icnnone      , m82none, "Damages all undead in the battle." },
-	{ "Holy Shout",             12, 4,  true, 23,   ALLDEAD, 20, icnnone      , m82none, "Damages all undead in the battle.  This is an improved version of Holy Word." },
-	{ "Anti-Magic",              7, 3,  true, 17, ONEFRIEND,  1, ICN::MAGIC06 , M82::ANTIMAGK, "Prevents harmful magic against the selected creatures." },
-	{ "Dispel Magic",            5, 1,  true, 18, ONEFRIEND,  0, ICN::MAGIC07 , M82::DIPMAGK, "Removes all magic spells from a single target." },
-	{ "Mass Dispel",            12, 3,  true, 18,       ALL,  0, ICN::MAGIC07 , M82::DIPMAGK, "Removes all magic spells from all creatures." },
-	{ "Magic Arrow",             3, 1,  true, 38,  ONEENEMY, 10, icnnone      , M82::MAGCAROW, "Causes a magic arrow to strike the selected target." },
-	{ "Berzerker",              12, 4,  true, 19,  ONEENEMY,  0, icnnone      , M82::BERZERK, "Causes a creature to attack its nearest neighbor." },
-	{ "Armageddon",             20, 5,  true, 16,       ALL, 50, icnnone      , M82::ARMGEDN, "Holy terror strikes the battlefield, causing severe damage to all creatures." },
-	{ "Elemental Storm",        15, 4,  true, 11,       ALL, 25, ICN::STORM,    M82::STORM, "Magical elements pour down on the battlefield, damaging all creatures." },
-	{ "Meteor Shower",          15, 4,  true, 24,       ALL, 25, ICN::METEOR,   M82::METEOR, "A rain of rocks strikes an area of the battlefield, damaging all nearby creatures." },
-	{ "Paralyze",                9, 3,  true, 20,  ONEENEMY,  1, ICN::PARALYZE, M82::PARALIZE, "The targeted creatures are paralyzed, unable to move or retaliate." },
-	{ "Hypnotize",              15, 5,  true, 37,  ONEENEMY,  0, ICN::HYPNOTIZ, M82::HYPNOTIZ, "Brings a single enemy unit under your control for one combat round if its hits are less than 25 times the caster's spell power." },
-	{ "Cold Ray",                6, 2,  true, 36,  ONEENEMY, 20, ICN::ICECLOUD/*COLDRAY*/, M82::COLDRAY, "Drains body heat from a single enemy unit." },
-	{ "Cold Ring",               9, 3,  true, 35,  FREECELL, 10, ICN::COLDRING, M82::COLDRING, "Drains body heat from all units surrounding the center point, but not including the center point." },
-	{ "Disrupting Ray",          7, 2,  true, 34,  ONEENEMY,  0, ICN::DISRRAY,  M82::DISRUPTR, "Reduces the defense rating of an enemy unit by three." },
-	{ "Death Ripple",            6, 2,  true, 28,   ALLLIVE,  5, ICN::REDDEATH, M82::MNRDEATH, "Damages all living (non-undead) units in the battle." },
-	{ "Death Wave",             10, 3,  true, 29,   ALLLIVE, 10, ICN::REDDEATH, m82none, "Damages all living (non-undead) units in the battle.  This spell is an improved version of Death Ripple." },
-	{ "Dragon Slayer",           6, 2,  true, 32, ONEFRIEND,  1, ICN::DRAGSLAY, M82::DRGNSLAY, "Greatly increases a unit's attack skill vs. Dragons." },
-	{ "Blood Lust",              3, 1,  true, 27, ONEFRIEND,  1, icnnone      , M82::BLOODLUS, "Increases a unit's attack skill." },
-	{ "Animate Dead",           10, 3,  true, 25, ONEFRIEND, 50, icnnone      , M82::RESURECT, "Resurrects creatures from a damaged or dead undead unit permanently." },
-	{ "Mirror Image",           25, 5,  true, 26, ONEFRIEND,  0, icnnone      , M82::MIRRORIM, "Creates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage." },
-	{ "Shield",                  3, 1,  true, 15, ONEFRIEND,  1, ICN::SHIELD,   M82::SHIELD, "Halves damage received from ranged attacks for a single unit." },
-	{ "Mass Shield",             7, 4,  true, 15, ALLFRIEND,  1, ICN::SHIELD  , M82::MASSSHIE, "Halves damage received from ranged attacks for all of your units." },
-	{ "Summon Earth Elemental", 25, 5,  true, 56,  FREECELL,  3, icnnone      , M82::SUMNELM, "Summons Earth Elementals to fight for your army." },
-	{ "Summon Air Elemental",   25, 5,  true, 57,  FREECELL,  3, icnnone      , M82::SUMNELM, "Summons Air Elementals to fight for your army." },
-	{ "Summon Fire Elemental",  25, 5,  true, 58,  FREECELL,  3, icnnone      , M82::SUMNELM, "Summons Fire Elementals to fight for your army." },
-	{ "Summon Water Elemental", 25, 5,  true, 59,  FREECELL,  3, icnnone      , M82::SUMNELM, "Summons Water Elementals to fight for your army." },
-	{ "Earthquake",             15, 3,  true, 33,       ALL,  0, icnnone      , M82::ERTHQUAK, "Damages castle walls." },
-	{ "View Mines",              1, 1, false, 39,  NOTARGET,  0, icnnone      , m82none, "Causes all mines across the land to become visible." },
-	{ "View Resources",          1, 1, false, 40,  NOTARGET,  0, icnnone      , m82none, "Causes all resources across the land to become visible." },
-	{ "View Artifacts",          2, 2, false, 41,  NOTARGET,  0, icnnone      , m82none, "Causes all artifacts across the land to become visible." },
-	{ "View Towns",              2, 3, false, 42,  NOTARGET,  0, icnnone      , m82none, "Causes all towns and castles across the land to become visible." },
-	{ "View Heroes",             2, 3, false, 43,  NOTARGET,  0, icnnone      , m82none, "Causes all Heroes across the land to become visible." },
-	{ "View All",                3, 4, false, 44,  NOTARGET,  0, icnnone      , m82none, "Causes the entire land to become visible." },
-	{ "Identify Hero",           3, 3, false, 45,  NOTARGET,  0, icnnone      , m82none, "Allows the caster to view detailed information on enemy Heroes." },
-	{ "Summon Boat",             5, 2, false, 46,  NOTARGET,  0, icnnone      , m82none, "Summons the nearest unoccupied, friendly boat to an adjacent shore location.  A friendly boat is one which you just built or were the most recent player to occupy." },
-	{ "Dimension Door",         10, 5, false, 47,  NOTARGET,  0, icnnone      , m82none, "Allows the caster to magically transport to a nearby location." },
-	{ "Town Gate",              10, 4, false, 48,  NOTARGET,  0, icnnone      , m82none, "Returns the caster to any town or castle currently owned." },
-	{ "Town Portal",            20, 5, false, 49,  NOTARGET,  0, icnnone      , m82none, "Returns the hero to the town or castle of choice, provided it is controlled by you." },
-	{ "Visions",                 6, 2, false, 50,  NOTARGET,  0, icnnone      , m82none, "Visions predicts the likely outcome of an encounter with a neutral army camp." },
-	{ "Haunt",                   8, 2, false, 51,  NOTARGET,  0, icnnone      , M82::H2MINE, "Haunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)" },
-	{ "Set Earth Guardian",     15, 4, false, 52,  NOTARGET,  4, icnnone      , m82none, "Sets Earth Elementals to guard a mine against enemy armies." },
-	{ "Set Air Guardian",       15, 4, false, 53,  NOTARGET,  4, icnnone      , m82none, "Sets Air Elementals to guard a mine against enemy armies." },
-	{ "Set Fire Guardian",      15, 4, false, 54,  NOTARGET,  4, icnnone      , m82none, "Sets Fire Elementals to guard a mine against enemy armies." },
-	{ "Set Water Guardian",     15, 4, false, 55,  NOTARGET,  4, icnnone      , m82none, "Sets Water Elementals to guard a mine against enemy armies." },
-	{ "Stone",                   9, 3, false,  0,  NOTARGET,  1, icnnone      , m82none, "" }
+	//  name                   mana spr pwr icn            m82           description
+	{ "Unknown",                 0,  0,  0, ICN::UNKNOWN,  M82::UNKNOWN, "Unknown spell." },
+	{ "Fireball",                9,  8, 10, ICN::FIREBALL, M82::FIREBALL, "Causes a giant fireball to strike the selected area, damaging all nearby creatures." },
+	{ "Fireblast",              15,  9, 10, ICN::FIREBAL2, M82::FIREBALL, "An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one." }, 
+	{ "Lightning Bolt",          7,  4, 25, ICN::SPARKS,   M82::LIGHTBLT, "Causes a bolt of electrical energy to strike the selected creature." }, 
+	{ "Chain Lightning",        15,  5, 40, ICN::SPARKS,   M82::CHAINLTE, "Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!" }, 
+	{ "Teleport",                9, 10,  0, icnnone      , M82::TELEIN, "Teleports the creature you select to any open position on the battlefield." }, 
+	{ "Cure",                    6,  6,  5, ICN::MAGIC01 , M82::CURE, "Removes all negative spells cast upon one of your units, and restores up to 5 HP per level of spell power." }, 
+	{ "Mass Cure",              15,  2,  5, ICN::MAGIC01 , M82::MASSCURE, "Removes all negative spells cast upon your forces, and restores up to 5 HP per level of spell power, per creature." }, 
+	{ "Resurrect",              12, 12, 50, icnnone      , M82::RESURECT, "Resurrects creatures from a damaged or dead unit until end of combat." }, 
+	{ "Resurrect True",         15, 13, 50, icnnone      , M82::RESURTRU, "Resurrects creatures from a damaged or dead unit permanently." }, 
+	{ "Haste",                   3, 14,  1, ICN::HASTE   , M82::HASTE, "Increases the speed of any creature by two." }, 
+	{ "Mass Haste",             10, 14,  1, ICN::HASTE   , M82::MASSHAST, "Increases the speed of all of your creatures by two." }, 
+	{ "Slow",                    3,  1,  1, ICN::MAGIC02 , M82::SLOW, "Slows target to half movement rate." }, 
+	{ "Mass Slow",              15,  1,  1, ICN::MAGIC02 , M82::MASSSLOW, "Slows all enemies to half movement rate." }, 
+	{ "Blind ",                  6, 21,  1, ICN::BLIND   , M82::BLIND, "Clouds the affected creatures' eyes, preventing them from moving." }, 
+	{ "Bless",                   3,  7,  1, ICN::BLESS   , M82::BLESS, "Causes the selected creatures to inflict maximum damage." }, 
+	{ "Mass Bless",             12,  7,  1, ICN::BLESS   , M82::MASSBLES, "Causes all of your units to inflict maximum damage." },
+	{ "Stoneskin",               3, 31,  1, ICN::STONSKIN, M82::STONSKIN, "Magically increases the defense skill of the selected creatures." },
+	{ "Steelskin",               6, 30,  1, ICN::STELSKIN, M82::STELSKIN, "Increases the defense skill of the targeted creatures.  This is an improved version of Stoneskin." },
+	{ "Curse",                   3,  3,  1, ICN::CURSE   , M82::CURSE, "Causes the selected creatures to inflict minimum damage." },
+	{ "Mass Curse",             12,  3,  1, ICN::CURSE   , M82::MASSCURS, "Causes all enemy troops to inflict minimum damage." },
+	{ "Holy Word",               9, 22, 10, icnnone      , m82none, "Damages all undead in the battle." },
+	{ "Holy Shout",             12, 23, 20, icnnone      , m82none, "Damages all undead in the battle.  This is an improved version of Holy Word." },
+	{ "Anti-Magic",              7, 17,  1, ICN::MAGIC06 , M82::ANTIMAGK, "Prevents harmful magic against the selected creatures." },
+	{ "Dispel Magic",            5, 18,  0, ICN::MAGIC07 , M82::DIPMAGK, "Removes all magic spells from a single target." },
+	{ "Mass Dispel",            12, 18,  0, ICN::MAGIC07 , M82::DIPMAGK, "Removes all magic spells from all creatures." },
+	{ "Magic Arrow",             3, 38, 10, icnnone      , M82::MAGCAROW, "Causes a magic arrow to strike the selected target." },
+	{ "Berzerker",              12, 19,  0, icnnone      , M82::BERZERK, "Causes a creature to attack its nearest neighbor." },
+	{ "Armageddon",             20, 16, 50, icnnone      , M82::ARMGEDN, "Holy terror strikes the battlefield, causing severe damage to all creatures." },
+	{ "Elemental Storm",        15, 11, 25, ICN::STORM,    M82::STORM, "Magical elements pour down on the battlefield, damaging all creatures." },
+	{ "Meteor Shower",          15, 24, 25, ICN::METEOR,   M82::METEOR, "A rain of rocks strikes an area of the battlefield, damaging all nearby creatures." },
+	{ "Paralyze",                9, 20,  1, ICN::PARALYZE, M82::PARALIZE, "The targeted creatures are paralyzed, unable to move or retaliate." },
+	{ "Hypnotize",              15, 37,  0, ICN::HYPNOTIZ, M82::HYPNOTIZ, "Brings a single enemy unit under your control for one combat round if its hits are less than 25 times the caster's spell power." },
+	{ "Cold Ray",                6, 36, 20, ICN::ICECLOUD/*COLDRAY*/, M82::COLDRAY, "Drains body heat from a single enemy unit." },
+	{ "Cold Ring",               9, 35, 10, ICN::COLDRING, M82::COLDRING, "Drains body heat from all units surrounding the center point, but not including the center point." },
+	{ "Disrupting Ray",          7, 34,  0, ICN::DISRRAY,  M82::DISRUPTR, "Reduces the defense rating of an enemy unit by three." },
+	{ "Death Ripple",            6, 28,  5, ICN::REDDEATH, M82::MNRDEATH, "Damages all living (non-undead) units in the battle." },
+	{ "Death Wave",             10, 29, 10, ICN::REDDEATH, m82none, "Damages all living (non-undead) units in the battle.  This spell is an improved version of Death Ripple." },
+	{ "Dragon Slayer",           6, 32,  1, ICN::DRAGSLAY, M82::DRGNSLAY, "Greatly increases a unit's attack skill vs. Dragons." },
+	{ "Blood Lust",              3, 27,  1, icnnone      , M82::BLOODLUS, "Increases a unit's attack skill." },
+	{ "Animate Dead",           10, 25, 50, icnnone      , M82::RESURECT, "Resurrects creatures from a damaged or dead undead unit permanently." },
+	{ "Mirror Image",           25, 26,  0, icnnone      , M82::MIRRORIM, "Creates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage." },
+	{ "Shield",                  3, 15,  1, ICN::SHIELD,   M82::SHIELD, "Halves damage received from ranged attacks for a single unit." },
+	{ "Mass Shield",             7, 15,  1, ICN::SHIELD  , M82::MASSSHIE, "Halves damage received from ranged attacks for all of your units." },
+	{ "Summon Earth Elemental", 25, 56,  3, icnnone      , M82::SUMNELM, "Summons Earth Elementals to fight for your army." },
+	{ "Summon Air Elemental",   25, 57,  3, icnnone      , M82::SUMNELM, "Summons Air Elementals to fight for your army." },
+	{ "Summon Fire Elemental",  25, 58,  3, icnnone      , M82::SUMNELM, "Summons Fire Elementals to fight for your army." },
+	{ "Summon Water Elemental", 25, 59,  3, icnnone      , M82::SUMNELM, "Summons Water Elementals to fight for your army." },
+	{ "Earthquake",             15, 33,  0, icnnone      , M82::ERTHQUAK, "Damages castle walls." },
+	{ "View Mines",              1, 39,  0, icnnone      , m82none, "Causes all mines across the land to become visible." },
+	{ "View Resources",          1, 40,  0, icnnone      , m82none, "Causes all resources across the land to become visible." },
+	{ "View Artifacts",          2, 41,  0, icnnone      , m82none, "Causes all artifacts across the land to become visible." },
+	{ "View Towns",              2, 42,  0, icnnone      , m82none, "Causes all towns and castles across the land to become visible." },
+	{ "View Heroes",             2, 43,  0, icnnone      , m82none, "Causes all Heroes across the land to become visible." },
+	{ "View All",                3, 44,  0, icnnone      , m82none, "Causes the entire land to become visible." },
+	{ "Identify Hero",           3, 45,  0, icnnone      , m82none, "Allows the caster to view detailed information on enemy Heroes." },
+	{ "Summon Boat",             5, 46,  0, icnnone      , m82none, "Summons the nearest unoccupied, friendly boat to an adjacent shore location.  A friendly boat is one which you just built or were the most recent player to occupy." },
+	{ "Dimension Door",         10, 47,  0, icnnone      , m82none, "Allows the caster to magically transport to a nearby location." },
+	{ "Town Gate",              10, 48,  0, icnnone      , m82none, "Returns the caster to any town or castle currently owned." },
+	{ "Town Portal",            20, 49,  0, icnnone      , m82none, "Returns the hero to the town or castle of choice, provided it is controlled by you." },
+	{ "Visions",                 6, 50,  0, icnnone      , m82none, "Visions predicts the likely outcome of an encounter with a neutral army camp." },
+	{ "Haunt",                   8, 51,  0, icnnone      , M82::H2MINE, "Haunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)" },
+	{ "Set Earth Guardian",     15, 52,  4, icnnone      , m82none, "Sets Earth Elementals to guard a mine against enemy armies." },
+	{ "Set Air Guardian",       15, 53,  4, icnnone      , m82none, "Sets Air Elementals to guard a mine against enemy armies." },
+	{ "Set Fire Guardian",      15, 54,  4, icnnone      , m82none, "Sets Fire Elementals to guard a mine against enemy armies." },
+	{ "Set Water Guardian",     15, 55,  4, icnnone      , m82none, "Sets Water Elementals to guard a mine against enemy armies." },
     };
-
-}
+};
 
 const std::string &Spell::String(spell_t spell)
 { 
@@ -128,7 +124,68 @@ u8 Spell::Mana(spell_t spell)
 
 Spell::target_t Spell::Target(spell_t spell)
 {
-    return Spell::all_spells[spell].target;
+    switch(spell)
+    {
+	case HOLYWORD:
+	case HOLYSHOUT:		return ALLDEAD;
+
+	case FIREBALL:
+	case FIREBLAST:
+	case LIGHTNINGBOLT:
+	case CHAINLIGHTNING:
+	case SLOW:
+	case BLIND:
+	case CURSE:
+	case ARROW:
+	case BERZERKER:
+	case PARALYZE:
+	case HYPNOTIZE:
+	case COLDRAY:
+	case DISRUPTINGRAY:	return ONEENEMY;
+
+	case MASSSLOW:
+	case MASSCURSE:		return ALLENEMY;
+
+	case DEATHRIPPLE:
+	case DEATHWAVE:		return ALLLIVE;
+
+	case TELEPORT:
+	case CURE:
+	case RESURRECT:
+	case RESURRECTTRUE:
+	case HASTE:
+	case BLESS:
+	case MASSBLESS:
+	case STONESKIN:
+	case STELLSKIN:
+	case ANTIMAGIC:
+	case DISPEL:
+	case DRAGONSLAYER:
+	case BLOODLUST:
+	case ANIMATEDEAD:
+	case MIRRORIMAGE:
+	case SHIELD:		return ONEFRIEND;
+
+	case MASSCURE:
+	case MASSHASTE:
+	case MASSSHIELD:	return ALLFRIEND;
+
+	case COLDRING:
+	case SUMMONEELEMENT:
+	case SUMMONAELEMENT:
+	case SUMMONFELEMENT:
+	case SUMMONWELEMENT:	return FREECELL;
+
+	case MASSDISPEL:
+	case ARMAGEDDON:
+	case ELEMENTALSTORM:
+	case METEORSHOWER:
+	case EARTHQUAKE:	return ALL;
+
+	default: break;
+    }
+
+    return NOTARGET;
 }
 
 u8 Spell::Power(spell_t spell)
@@ -148,7 +205,92 @@ M82::m82_t Spell::M82(spell_t spell)
 
 u8 Spell::Level(spell_t spell)
 {
-    return Spell::all_spells[spell].level;
+    switch(spell)
+    {
+	case BLESS:
+	case BLOODLUST:
+	case CURE:
+	case CURSE:
+	case DISPEL:
+	case HASTE:
+	case ARROW:
+	case SHIELD:
+	case SLOW:
+	case STONESKIN:
+
+	case VIEWMINES:
+	case VIEWRESOURCES:
+		return 1;
+
+	case BLIND:
+	case COLDRAY:
+	case DEATHRIPPLE:
+	case DISRUPTINGRAY:
+	case DRAGONSLAYER:
+	case LIGHTNINGBOLT:
+	case STELLSKIN:
+
+	case HAUNT:
+	case SUMMONBOAT:
+	case VIEWARTIFACTS:
+	case VISIONS:
+		return 2;
+
+	case ANIMATEDEAD:
+	case ANTIMAGIC:
+	case COLDRING:
+	case DEATHWAVE:
+	case EARTHQUAKE:
+	case FIREBALL:
+	case HOLYWORD:
+	case MASSBLESS:
+	case MASSCURSE:
+	case MASSDISPEL:
+	case MASSHASTE:
+	case PARALYZE:
+	case TELEPORT:
+
+	case IDENTIFYHERO:
+	case VIEWHEROES:
+	case VIEWTOWNS:
+		return 3;
+
+	case BERZERKER:
+	case CHAINLIGHTNING:
+	case ELEMENTALSTORM:
+	case FIREBLAST:
+	case HOLYSHOUT:
+	case MASSCURE:
+	case MASSSHIELD:
+	case MASSSLOW:
+	case METEORSHOWER:
+	case RESURRECT:
+
+	case SETEGUARDIAN:
+	case SETAGUARDIAN:
+	case SETFGUARDIAN:
+	case SETWGUARDIAN:
+	case TOWNGATE:
+	case VIEWALL:
+		return 4;
+
+	case ARMAGEDDON:
+	case HYPNOTIZE:
+	case MIRRORIMAGE:
+	case RESURRECTTRUE:
+	case SUMMONEELEMENT:
+	case SUMMONAELEMENT:
+	case SUMMONFELEMENT:
+	case SUMMONWELEMENT:
+
+	case DIMENSIONDOOR:
+	case TOWNPORTAL:
+		return 5;
+
+	default: break;
+    }
+
+    return 0;
 }
 
 Spell::spell_t Spell::RandCombat(const u8 lvl)
@@ -289,7 +431,29 @@ Spell::spell_t Spell::RandAdventure(const u8 lvl)
 
 bool Spell::isCombat(spell_t spell)
 {
-    return Spell::all_spells[spell].combat;
+    switch(spell)
+    {
+	case NONE:
+	case VIEWMINES:
+	case VIEWRESOURCES:
+	case VIEWARTIFACTS:
+	case VIEWTOWNS:
+	case VIEWHEROES:
+	case VIEWALL:
+	case IDENTIFYHERO:
+	case SUMMONBOAT:
+	case DIMENSIONDOOR:
+	case TOWNGATE:
+	case TOWNPORTAL:
+	case VISIONS:
+	case HAUNT:
+	case SETEGUARDIAN:
+	case SETAGUARDIAN:
+	case SETFGUARDIAN:
+	case SETWGUARDIAN:	return false;
+	default: break;
+    }
+    return true;
 }
 
 u8 Spell::GetIndexSprite(spell_t spell)
@@ -317,7 +481,7 @@ u8 Spell::GetInlIndexSprite(spell_t spell)
 	case BLOODLUST:		return 9;
 	case SHIELD:
 	case MASSSHIELD:	return 10;
-	case STONE:		return 11;
+	//case :		return 11; unknown
 	case ANTIMAGIC:		return 12;
 	case STONESKIN:		return 13;
 	case STELLSKIN:		return 14;
