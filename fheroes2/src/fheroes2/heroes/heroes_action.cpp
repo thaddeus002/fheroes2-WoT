@@ -1726,6 +1726,8 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
+    Game::Focus::Get().Redraw();
+
     // check monster
     u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, !Settings::Get().Original());
     if(MAXU16 != dst_index2) hero.Action(dst_index2);
@@ -1761,6 +1763,8 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
     hero.FadeIn();
+
+    Game::Focus::Get().Redraw();
 
     if(Rand::Get(1))
     {
