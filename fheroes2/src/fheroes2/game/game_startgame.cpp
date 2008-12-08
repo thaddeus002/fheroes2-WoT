@@ -545,14 +545,17 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 				}
 			    else
 			    if(tile.isPassable())
+			    {
+				const bool protection = (MAXU16 != Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_MONSTER, !Settings::Get().Original()));
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
 				    case 0:	return Cursor::POINTER;
-				    case 1:	return Cursor::MOVE;
-				    case 2:	return Cursor::MOVE2;
-				    case 3:	return Cursor::MOVE3;
-				    default:	return Cursor::MOVE4;
+				    case 1:	return protection ? Cursor::FIGHT : Cursor::MOVE;
+				    case 2:	return protection ? Cursor::FIGHT2 : Cursor::MOVE2;
+				    case 3:	return protection ? Cursor::FIGHT3 : Cursor::MOVE3;
+				    default:	return protection ? Cursor::FIGHT4 : Cursor::MOVE4;
 				}
+			    }
 			    else
 				return Cursor::POINTER;
 		}
