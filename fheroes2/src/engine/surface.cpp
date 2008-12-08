@@ -488,6 +488,7 @@ const SDL_PixelFormat *Surface::GetPixelFormat(void) const
 
 void Surface::ChangeColor(u32 fc, u32 tc)
 {
+    if(fc != tc)
     for(u16 y = 0; y < surface->h; ++y)
 	for(u16 x = 0; x < surface->w; ++x)
 	    if(fc == GetPixel(x, y)) SetPixel(x, y, tc);

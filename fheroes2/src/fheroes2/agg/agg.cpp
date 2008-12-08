@@ -325,6 +325,8 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 	case ICN::TELEPORT2:
 	case ICN::TELEPORT3: LoadICN(ICN::OBJNMUL2); count = 2; break;
 
+	case ICN::FOUNTAIN:  LoadICN(ICN::OBJNMUL2); count = 2; break;
+
 	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 144; break;
 
 	default: break;
@@ -354,6 +356,20 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 122));
 		sprite->Lock();
 		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii));
+		sprite->Unlock();
+		break;
+
+	    case ICN::FOUNTAIN:
+		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 15));
+		sprite->Lock();
+		sprite->ChangeColor(palette.Color(0xE8), palette.Color(0xE8 - ii));
+		sprite->ChangeColor(palette.Color(0xE9), palette.Color(0xE9 - ii));
+		sprite->ChangeColor(palette.Color(0xEA), palette.Color(0xEA - ii));
+		sprite->ChangeColor(palette.Color(0xEB), palette.Color(0xEB - ii));
+		sprite->ChangeColor(palette.Color(0xEC), palette.Color(0xEC - ii));
+		sprite->ChangeColor(palette.Color(0xED), palette.Color(0xED - ii));
+		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE - ii));
+		sprite->ChangeColor(palette.Color(0xEF), palette.Color(0xEF - ii));
 		sprite->Unlock();
 		break;
 
@@ -763,7 +779,8 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 	case ICN::ROUTERED:
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
-	case ICN::TELEPORT3:	LoadExtraICN(icn, reflect);	break;
+	case ICN::TELEPORT3:
+	case ICN::FOUNTAIN:	LoadExtraICN(icn, reflect);	break;
 
 	default:		LoadICN(icn, reflect);		break;
     }

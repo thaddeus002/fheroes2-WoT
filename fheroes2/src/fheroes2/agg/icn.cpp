@@ -892,6 +892,7 @@ namespace ICN
 	{ TELEPORT1,	"MANUAL.ICN" },
 	{ TELEPORT2,	"MANUAL.ICN" },
 	{ TELEPORT3,	"MANUAL.ICN" },
+	{ FOUNTAIN,	"MANUAL.ICN" },
 
 	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
@@ -923,6 +924,8 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket)
 	case TELEPORT1:
 	case TELEPORT2:
 	case TELEPORT3:	return start + ticket % 2;
+
+	case FOUNTAIN:	return start + ticket % 2;
 
 	case TWNBBOAT:
 	case TWNKBOAT:

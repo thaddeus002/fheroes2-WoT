@@ -33,6 +33,8 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	    return ICN::TELEPORT2;
 	case 0x13:
 	    return ICN::TELEPORT3;
+	case 0x14:
+	    return ICN::FOUNTAIN;
 
 	// artifact
 	case 0x2C:

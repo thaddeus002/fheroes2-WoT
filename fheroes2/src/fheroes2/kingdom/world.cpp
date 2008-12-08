@@ -880,6 +880,10 @@ void World::LoadMaps(const std::string &filename)
 		vec_teleports.push_back(ii);
 		break;
 
+	    case MP2::OBJ_FOUNTAIN:
+		tile.UpdateFountainSprite();
+		break;
+
 	    case MP2::OBJ_WHIRLPOOL:
 		map_whirlpools[tile.GetUniq1()].push_back(ii);
 		break;

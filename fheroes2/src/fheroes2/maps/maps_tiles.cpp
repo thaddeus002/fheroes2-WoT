@@ -1821,3 +1821,23 @@ void Maps::Tiles::UpdateRNDResourceSprite(void)
         }
     }
 }
+
+void Maps::Tiles::UpdateFountainSprite(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object) && 15 == addon.index)
+	    {
+		addon.object = 0x14;
+		addon.index = 0;
+	    }
+	}
+    }
+}
