@@ -214,12 +214,18 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
 
     if(Monster::AllowUpgrade(stats.monster))
     {
-	if(READONLY & flags || !(UPGRADE & flags))
+	if(UPGRADE & flags)
+	{
+	    buttonUpgrade.SetDisable(false);
+	    buttonUpgrade.Draw();
+	}
+	else
+	if(READONLY & flags)
 	{
 	    buttonUpgrade.Press();
 	    buttonUpgrade.SetDisable(true);
+	    buttonUpgrade.Draw();
 	}
-	if(BUTTONS & flags) buttonUpgrade.Draw();
     }
     else
 	buttonUpgrade.SetDisable(true);
