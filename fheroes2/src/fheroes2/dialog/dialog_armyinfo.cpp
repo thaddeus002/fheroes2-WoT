@@ -33,7 +33,7 @@
 
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
 {
-    const Army::BattleTroop & battroop(troops);
+    Army::BattleTroop battroop(troops);
     const bool battle = troops.GetArmy() && troops.GetArmy()->Modes(Army::FIGHT);
     Display & display = Display::Get();
 
@@ -245,10 +245,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
         
     u16 animat = 0;
     Point anim_rt(pos_rt.x + 100, pos_rt.y + 180);
-    Army::BattleTroop troop(battroop.Monster(), 0);
-    troop.astate = Monster::AS_NONE;
-    troop.aframe = 0;
-    troop.Blit(anim_rt);
+    battroop.astate = Monster::AS_NONE;
+    battroop.aframe = 0;
+    battroop.Blit(anim_rt);
     int animcount=0;
 
     // dialog menu loop
@@ -275,22 +274,22 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
         }
 
 	if(Game::ShouldAnimateInfrequent(animat++, 3)) {
-	    troop.Animate();
-	    if(troop.astate == Monster::AS_NONE) {
+	    battroop.Animate();
+	    if(battroop.astate == Monster::AS_NONE) {
 		switch(animcount) {
-		case 0: troop.Animate(Monster::AS_IDLE),  animcount++; break;
-		case 1: troop.Animate(Monster::AS_WALK),  animcount++; break;
- 		case 2: troop.Animate(Monster::AS_ATT1P), animcount++; break;
-		case 3: troop.Animate(Monster::AS_WALK),  animcount++; break;
- 		case 4: troop.Animate(Monster::AS_ATT2P), animcount++; break;
-		case 5: troop.Animate(Monster::AS_WALK),  animcount++; break;
- 		case 6: troop.Animate(Monster::AS_ATT3P), animcount++; break;
-		case 7: troop.Animate(Monster::AS_PAIN),  animcount++; break;
- 		case 8: troop.Animate(Monster::AS_PAIN),  animcount++; break;
- 		case 9: troop.Animate(Monster::AS_DIE),   animcount=0; break;
+		case 0: battroop.Animate(Monster::AS_IDLE),  animcount++; break;
+		case 1: battroop.Animate(Monster::AS_WALK),  animcount++; break;
+ 		case 2: battroop.Animate(Monster::AS_ATT1P), animcount++; break;
+		case 3: battroop.Animate(Monster::AS_WALK),  animcount++; break;
+ 		case 4: battroop.Animate(Monster::AS_ATT2P), animcount++; break;
+		case 5: battroop.Animate(Monster::AS_WALK),  animcount++; break;
+ 		case 6: battroop.Animate(Monster::AS_ATT3P), animcount++; break;
+		case 7: battroop.Animate(Monster::AS_PAIN),  animcount++; break;
+ 		case 8: battroop.Animate(Monster::AS_PAIN),  animcount++; break;
+ 		case 9: battroop.Animate(Monster::AS_DIE),   animcount=0; break;
 		}
 	    }
-	    troop.BlitR(anim_rt);
+	    battroop.BlitR(anim_rt);
 	    display.Flip();
 	}
     }
