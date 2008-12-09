@@ -598,13 +598,18 @@ void ActionToPickupResource(Heroes &hero, const u16 dst_index)
     AnimationRemoveObject(tile);
 
     world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+    tile.RemoveObjectSprite();
 
     // dialog
     switch(tile.GetObject())
     {
 	case MP2::OBJ_CAMPFIRE:
+	    // force reset sound
+	    tile.SetObject(MP2::OBJ_ZERO);
+	    Game::EnvironmentSoundMixer();
+
 	    resource.gold += 100 * count;
-	    Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), "Ransacking an enemy camp, you discover a hidden cache of treasures.", resource);
+	    Dialog::ResourceInfo("CampFire", "Ransacking an enemy camp, you discover a hidden cache of treasures.", resource);
 	break;
 
 	case MP2::OBJ_BOTTLE:
@@ -613,8 +618,6 @@ void ActionToPickupResource(Heroes &hero, const u16 dst_index)
 
 	default: break;
     }
-
-    tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
     if(H2Config::Debug()) Error::Verbose("ActionToPickupResource: " + hero.GetName() + " pickup small resource");

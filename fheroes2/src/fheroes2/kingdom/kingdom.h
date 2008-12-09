@@ -120,6 +120,7 @@ public:
     u8 GetCountCastle(void) const;
     u8 GetCountTown(void) const;
     u8 GetCountMarketplace(void) const;
+    u8 GetCountCapital(void) const;
 
     const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; };
     const std::vector<Castle *> & GetCastles(void) const{ return castles; };
@@ -147,6 +148,12 @@ public:
     void Dump(void) const;
 
 private:
+    void AICastlesTurns(void);
+    void AICastleDevelopment(Castle &);
+    void AICastleDefence(Castle &);
+    void AIHeroesTurns(void);
+    void AIHeroesTask(void);
+
     const Color::color_t color;
     Game::control_t control;
     Resource::funds_t resource;
@@ -155,6 +162,7 @@ private:
 
     std::vector<Castle *> castles;
     std::vector<Heroes *> heroes;
+    Castle *ai_capital;
 
     std::list<Visit::IndexObject> visit_object;
 };

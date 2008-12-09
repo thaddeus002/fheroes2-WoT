@@ -29,7 +29,7 @@
 
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
     color(Color::GRAY), building(0), flags(ARMYSPREAD|ALLOWBUILD), mageguild(race),
-    dwelling(CASTLEMAXMONSTER, 0), army(&captain), castle_heroes(false)
+    dwelling(CASTLEMAXMONSTER, 0), army(&captain), castle_heroes(NULL)
 {
     if(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))) SetModes(NEARLYSEA);
 }
@@ -298,6 +298,8 @@ bool Castle::ContainCoord(const u16 ax, const u16 ay) const
 
 void Castle::ActionNewDay(void)
 {
+    castle_heroes = GetHeroes();
+
     // for learns new spells need today
     if(castle_heroes && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);
 
@@ -526,6 +528,8 @@ const std::string & Castle::GetDescriptionBuilding(const building_t & build, con
 
 bool Castle::AllowBuyHero(void)
 {
+    castle_heroes = GetHeroes();
+
     if(castle_heroes) return false;
 
     const Kingdom & kingdom = world.GetKingdom(color);
@@ -1334,6 +1338,11 @@ const Heroes* Castle::GetHeroes(void) const
     return world.GetHeroes(mp.x, mp.y);
 }
 
+Heroes* Castle::GetHeroes(void)
+{
+    return const_cast<Heroes *>(world.GetHeroes(mp.x, mp.y));
+}
+
 bool Castle::HaveNearlySea(void) const
 {
     return Modes(NEARLYSEA);
@@ -1428,6 +1437,11 @@ u32 Castle::GetUpgradeBuilding(const u32 build, const Race::race_t & race)
     return build;
 }
 
+bool Castle::PredicateIsCapital(const Castle *castle)
+{
+    return castle && castle->Modes(CAPITAL);
+}
+
 bool Castle::PredicateIsCastle(const Castle* castle)
 {
     return castle && castle->isCastle();
@@ -1487,4 +1501,14 @@ s8 Castle::GetLuckWithModificators(std::list<std::string> *list) const
     }
 
     return result;
+}
+
+void Castle::RecruitAllMonster(void)
+{
+    if(isBuild(DWELLING_MONSTER6)) RecruitMonster(DWELLING_MONSTER6, MAXU16);
+    if(isBuild(DWELLING_MONSTER5)) RecruitMonster(DWELLING_MONSTER5, MAXU16);
+    if(isBuild(DWELLING_MONSTER4)) RecruitMonster(DWELLING_MONSTER4, MAXU16);
+    if(isBuild(DWELLING_MONSTER3)) RecruitMonster(DWELLING_MONSTER3, MAXU16);
+    if(isBuild(DWELLING_MONSTER2)) RecruitMonster(DWELLING_MONSTER2, MAXU16);
+    if(isBuild(DWELLING_MONSTER1)) RecruitMonster(DWELLING_MONSTER1, MAXU16);
 }

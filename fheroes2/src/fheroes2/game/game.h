@@ -21,6 +21,8 @@
 #ifndef H2GAME_H
 #define H2GAME_H
 
+#include <types.h>
+
 #define RADARWIDTH	144
 #define BORDERWIDTH	16
 
@@ -84,7 +86,7 @@ namespace Game
     void SetFixVideoMode(void);
     
     void PreloadLOOPSounds(void);
-    void EnvironmentSoundMixer(bool forced);
+    void EnvironmentSoundMixer(void);
 
     namespace Editor
     {

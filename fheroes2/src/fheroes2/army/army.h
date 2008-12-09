@@ -61,7 +61,9 @@ namespace Army
     {
         public:
             Troop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
-            
+            Troop(const Troop &);
+	    Troop & operator= (const Troop &);
+
             void	Set(Monster::monster_t, u16);
             void	SetMonster(Monster::monster_t);
             void	UpgradeMonster(void);
@@ -75,6 +77,7 @@ namespace Army
             u16 	Count(void) const;
 
             bool	isValid(void) const;
+	    bool	HasMonster(Monster::monster_t) const;
 
         protected:
     	    friend class army_t;
@@ -140,6 +143,9 @@ namespace Army
 	    bool	HasMonster(const Monster::monster_t mon) const;
 	    bool	JoinTroop(const Troop & troop);
 	    bool	JoinTroop(const Monster::monster_t mon, const u16 count);
+
+	    void	JoinStrongestFromArmy(army_t &);
+            void	KeepOnlyWeakestTroops(army_t &);
 
 	private:
 	    friend class Troop;

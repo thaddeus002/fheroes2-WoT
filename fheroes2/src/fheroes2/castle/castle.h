@@ -100,6 +100,7 @@ public:
     bool Modes(flags_t) const;
 
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
+    bool isCapital(void) const{ return flags & CAPITAL; };
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
     bool RecruitMonster(building_t dw, u16 count);
@@ -108,6 +109,7 @@ public:
 
     void RecruitHero(const Heroes::heroes_t hero);
     const Heroes* GetHeroes(void) const;
+    Heroes* GetHeroes(void);
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
@@ -117,6 +119,7 @@ public:
     const Army::army_t & GetArmy(void) const{ return army; }; 
     Army::army_t & GetArmy(void) { return army; }; 
     u16 GetDwellingLivedCount(building_t dw);
+    void RecruitAllMonster(void);
 
     const Point & GetCenter(void) const;
     u16 GetIndex(void) const;
@@ -148,10 +151,7 @@ public:
     static bool PredicateIsCastle(const Castle *castle);
     static bool PredicateIsTown(const Castle *castle);
     static bool PredicateIsBuildMarketplace(const Castle *castle);
-
-    bool AITurns(void);
-    bool AITaskDefence(void);
-    bool AITaskDevelopment(void);
+    static bool PredicateIsCapital(const Castle *castle);
 
     void Dump(void) const;
 

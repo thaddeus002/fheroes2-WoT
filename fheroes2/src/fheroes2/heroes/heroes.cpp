@@ -1102,6 +1102,20 @@ const Castle* Heroes::inCastle(void) const
     return NULL;
 }
 
+Castle* Heroes::inCastle(void)
+{
+    if(Color::GRAY == color) return false;
+
+    const std::vector<Castle *> & castles = world.GetKingdom(color).GetCastles();
+    
+    std::vector<Castle *>::const_iterator it1 = castles.begin();
+    std::vector<Castle *>::const_iterator it2 = castles.end();
+
+    for(; it1 != it2; ++it1) if((**it1).GetCenter() == mp) return *it1;
+
+    return NULL;
+}
+
 /* is visited cell */
 bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 {
@@ -1601,6 +1615,22 @@ void Heroes::SetFreeman(const u8 reason)
     SetMove(false);
 }
 
+bool Heroes::isShow(u8 color)
+{
+    const u16 index_from = GetIndex();
+    const Maps::Tiles & tile_from = world.GetTiles(index_from);
+
+    if(path.isValid())
+    {
+        const u16 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
+        const Maps::Tiles & tile_to = world.GetTiles(index_to);
+
+        return !tile_from.isFog(color) && !tile_to.isFog(color);
+    }
+
+    return !tile_from.isFog(color);
+}
+
 void Heroes::Dump(void) const
 {
     std::cout << "----------------I--------" << std::endl;
@@ -1612,8 +1642,4 @@ void Heroes::Dump(void) const
     std::cout << "move point      : " << move_point << std::endl;
     std::cout << "direction       : " << Direction::String(direction) << std::endl;
     std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
-}
-
-void Heroes::AITurns(void)
-{
 }

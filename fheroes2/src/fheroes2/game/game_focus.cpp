@@ -66,10 +66,7 @@ void Game::Focus::Set(const Heroes *hr)
     GameArea::Get().Center(heroes->GetCenter());
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(hr->GetCenter()).GetGround()));
-    
-    //Force the environment sounds to recalculate, for times like
-    //exiting a castle/battle screen
-    Game::EnvironmentSoundMixer(true);
+    Game::EnvironmentSoundMixer();
     
     StatusWindow::Get().SetState(StatusWindow::ARMY);
 }
@@ -96,10 +93,7 @@ void Game::Focus::Set(const Castle *cs)
     GameArea::Get().Center(castle->GetCenter());
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(cs->GetCenter()).GetGround()));
-    
-    //Force the environment sounds to recalculate, for times like
-    //exiting a castle/battle screen
-    Game::EnvironmentSoundMixer(true);
+    Game::EnvironmentSoundMixer();
 
     StatusWindow::Get().SetState(StatusWindow::FUNDS);
 }

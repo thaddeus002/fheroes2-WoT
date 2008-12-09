@@ -175,7 +175,6 @@ Game::menu_t Game::StartGame(void)
 		    }
 		    conf.SetMyColor(color);
 		    m = HumanTurn();
-		    cursor.Hide();
 		    Mixer::Reduce();
 		    if(m != ENDTURN) goto OUTDOOR;
 		    break;
@@ -183,16 +182,11 @@ Game::menu_t Game::StartGame(void)
 		    cursor.SetThemes(Cursor::WAIT);
 		    cursor.Show();
 	            display.Flip();
-		    //TODO: network players: sync world, kingdoms and heroes.
-		    //kingdom.AITurns();
+		    Error::Verbose("Game::Turns: network player: " + Color::String(color));
 		    cursor.Hide();
 		    break;
 	        case AI:
-		    cursor.SetThemes(Cursor::WAIT);
-		    cursor.Show();
-	            display.Flip();
 		    kingdom.AITurns();
-		    cursor.Hide();
 		    break;
 		default:
 		    Dialog::Message(Color::String(color), "default", Font::BIG, Dialog::OK);
@@ -661,7 +655,6 @@ Game::menu_t Game::HumanTurn(void)
     u8 scrollDir = GameArea::NONE;
     LocalEvent & le = LocalEvent::GetLocalEvent();
     u32 ticket = 0;
-    bool update_audio = false;
 
     Game::Interface & I = Game::Interface::Get();
 
@@ -693,7 +686,6 @@ Game::menu_t Game::HumanTurn(void)
     selectHeroes.Redraw();
     selectCastle.Redraw();
 
-    Game::EnvironmentSoundMixer(true);
 
     switch(global_focus.Type())
     {
@@ -712,8 +704,10 @@ Game::menu_t Game::HumanTurn(void)
 
     //Override whatever the focus set the window to show
     statusWindow.SetState(StatusWindow::DAY);
-
     global_focus.Redraw();
+
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
+    Game::EnvironmentSoundMixer();
 
     cursor.Show();
     display.Flip();
@@ -1168,13 +1162,13 @@ Game::menu_t Game::HumanTurn(void)
 		{
 		    const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
 		    Mixer::Volume(-1, vol1);
-            	    update_audio = true;
+		    Game::EnvironmentSoundMixer();
 		}
 		if(0x04 & changes)
 		{
 		    const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
 		    Music::Volume(vol2);
-            	    update_audio = true;
+		    Game::EnvironmentSoundMixer();
 		}
 		if(0x08 & changes)
 		{
@@ -1225,10 +1219,6 @@ Game::menu_t Game::HumanTurn(void)
 	// end cursor over left panel
 	}
 
-	// mix all sound from focus
-	Game::EnvironmentSoundMixer(update_audio);
-	update_audio = false;
-
 	// animation
         if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
@@ -1246,38 +1236,10 @@ Game::menu_t Game::HumanTurn(void)
         	scrollDir = GameArea::NONE;
             }
 	    else
-    	    if(Game::Focus::HEROES == global_focus.Type())
+    	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().Move())
 	    {
-		Heroes & heroes = global_focus.GetHeroes();
-		const Route::Path & path = heroes.GetPath();
-
-		// if valid and enable move or anime sprite
-		if(path.isValid() &&
-		    (heroes.isEnableMove() || (heroes.GetSpriteIndex() < 45 && heroes.GetSpriteIndex() % 9) || heroes.GetSpriteIndex() >= 45))
-		{
-		    // if need change through the circle
-		    if(heroes.GetDirection() != path.GetFrontDirection())
-		    {
-			heroes.AngleStep(path.GetFrontDirection());
-		    }
-		    else
-		    // move
-		    {
-                        //In case of exiting a battle, we want the music to return to normal
-			if(heroes.MoveStep())
-			{
-			    update_audio = true;
-			    statusWindow.Redraw();
-			}
-
-			gamearea.Center(global_focus.Center());
-			selectHeroes.Redraw(&heroes);
-		    }
-		}
-		else
-		{
-		    heroes.SetMove(false);
-		}
+		AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
+		Game::EnvironmentSoundMixer();
 	    }
 
 	    if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
@@ -1291,6 +1253,7 @@ Game::menu_t Game::HumanTurn(void)
         ++ticket;
     }
 
+    cursor.Hide();
     if(Game::Focus::HEROES == global_focus.Type())
     {
 	global_focus.GetHeroes().ShowPath(false);

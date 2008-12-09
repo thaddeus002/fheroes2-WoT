@@ -74,25 +74,17 @@ void Game::SetFixVideoMode(void)
 }
 
 /* play all sound from focus area game */
-void Game::EnvironmentSoundMixer(bool forced)
+void Game::EnvironmentSoundMixer(void)
 {
-    static u16 previous_index = MAXU16;
-
     const Focus & focus = Focus::Get();
     const Point & abs_pt = focus.Center();
     const Settings & conf = Settings::Get();
 
-    const u16 new_index = Maps::GetIndexFromAbsPoint(abs_pt);
-
-    if(conf.Sound() && (previous_index != new_index || forced))
+    if(conf.Sound())
     {
-	previous_index = new_index;
-
 	std::vector<u8> vols(CHANNEL_RESERVED, 0);
 
         Mixer::PauseLoops();
-
-        AGG::PlayMusic(MUS::FromGround(world.GetTiles(new_index).GetGround()));
         
         // scan 4x4 square from focus
         for(s16 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)

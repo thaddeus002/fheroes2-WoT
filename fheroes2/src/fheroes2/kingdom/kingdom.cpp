@@ -24,13 +24,12 @@
 #include "castle.h"
 #include "heroes.h"
 #include "difficulty.h"
-#include "game_statuswindow.h"
 #include "gameevent.h"
 #include "payment.h"
 #include "world.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0)
+Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), ai_capital(NULL)
 {
     // set play
     if(cl & Settings::Get().FileInfo().KingdomColors()) SetModes(PLAY);
@@ -102,58 +101,6 @@ void Kingdom::ResetModes(flags_t f)
 bool Kingdom::Modes(flags_t f) const
 {
     return flags & f;
-}
-
-void Kingdom::AITurns(void)
-{
-    if(castles.empty() && heroes.empty())
-    {
-	ResetModes(PLAY);
-	Error::Verbose("Kingdom::AITurns: " + Color::String(color) + "Loss!");
-	return;
-    }
-
-    Game::StatusWindow & status = Game::StatusWindow::Get();
-
-    status.RedrawAITurns(color, 0);
-    status.RedrawAITurns(color, 1);
-    status.RedrawAITurns(color, 2);
-    status.RedrawAITurns(color, 3);
-    status.RedrawAITurns(color, 4);
-    status.RedrawAITurns(color, 5);
-    status.RedrawAITurns(color, 6);
-    status.RedrawAITurns(color, 7);
-    status.RedrawAITurns(color, 8);
-    status.RedrawAITurns(color, 9);
-
-    std::vector<Castle *>::const_iterator itc = castles.begin();
-    std::vector<Heroes *>::const_iterator ith = heroes.begin();
-
-    // first day
-    if(1 == world.GetDay())
-    {
-	// set capital
-	if(castles.size())
-	{
-	    if(0 == GetCountCastle()) castles.front()->SetModes(Castle::CAPITAL);
-	    else
-	    // find first castle
-	    for(itc = castles.begin(); itc != castles.end(); ++itc) if(*itc && (**itc).isCastle()) (**itc).SetModes(Castle::CAPITAL);
-	}
-
-	// buy hero
-	// set role hunter or scouter
-    }
-
-    // castle AI turn
-    itc = castles.begin();
-    for(; itc != castles.end(); ++itc) if(*itc) (**itc).AITurns();
-
-    // heroes AI turn
-    ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).AITurns();
-
-    if(H2Config::Debug()) Error::Verbose("Kingdom::AITurns: " + Color::String(color) + " moved");
 }
 
 void Kingdom::ActionNewDay(void)
@@ -275,18 +222,9 @@ void Kingdom::RemoveCastle(const Castle *castle)
 
     if(heroes.empty() && castles.empty()) ResetModes(PLAY);
 
-    // set other capital
-    if(castles.size() && castle->Modes(Castle::CAPITAL))
-    {
-	std::vector<Castle *>::const_iterator itc = castles.begin();
-
-	if(0 == GetCountCastle()) castles.front()->SetModes(Castle::CAPITAL);
-	else
-	// find first castle
-	for(; itc != castles.end(); ++itc) if(*itc && (**itc).isCastle()) (**itc).SetModes(Castle::CAPITAL);
-    }
-
     const_cast<Castle *>(castle)->ResetModes(Castle::CAPITAL);
+
+    if(ai_capital == castle) ai_capital = NULL;
 }
 
 u8 Kingdom::GetCountCastle(void) const
@@ -369,4 +307,9 @@ void Kingdom::Dump(void) const
     "crystal(" << resource.crystal << ")," <<
     "gems(" << resource.gems << ")," <<
     "gold(" << resource.gold << ")" << std::endl;
+}
+
+u8 Kingdom::GetCountCapital(void) const
+{
+    return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsCapital);
 }

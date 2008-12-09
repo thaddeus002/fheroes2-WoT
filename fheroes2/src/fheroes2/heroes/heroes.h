@@ -115,6 +115,7 @@ public:
     bool operator== (const Heroes & h) const;
 
     const Castle* inCastle(void) const;
+    Castle* inCastle(void);
 
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
 
@@ -203,13 +204,13 @@ public:
     void SetCenter(const Point& pt){ mp = pt; };
     void SetCenter(const u16 index);
 
+    bool Move(bool fast = false);
+    bool isShow(u8 color);
     bool isEnableMove(void) const;
     void SetMove(bool f);
     void Action(const u16 dst_index);
     bool ApplyPenaltyMovement(void);
 
-    void AngleStep(const Direction::vector_t to_direct);
-    bool MoveStep(void);
     void Redraw(bool with_shadow = true) const;
     void RedrawDependencesTiles(void) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; };
@@ -228,13 +229,15 @@ public:
     void LevelUp(bool autoselect = false);
 
     void PostBattle(void);
-    void AITurns(void);
     void Dump(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);
 
 private:
+    void AngleStep(const Direction::vector_t to_direct);
+    bool MoveStep(bool fast = false);
+
     std::string		name;
     Color::color_t	color;
     u32			experience;

@@ -23,15 +23,43 @@
 #include "cursor.h"
 #include "settings.h"
 #include "gamearea.h"
+#include "game_statuswindow.h"
+#include "game_selectobjbar.h"
 #include "maps_tiles.h"
 #include "castle.h"
 #include "heroes.h"
 
 bool ReflectSprite(const u16 from);
+void PlayWalkSound(Maps::Ground::ground_t ground);
 const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
 const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
 const Sprite & SpriteShad(const Heroes & hero, const u8 index);
 bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next);
+
+void PlayWalkSound(Maps::Ground::ground_t ground)
+{
+    M82::m82_t wav = M82::UNKNOWN;
+
+    const u8 speed = (4 > Settings::Get().Animation() ? 1 : (7 > Settings::Get().Animation() ? 2 : 3));
+
+    // play sound
+    switch(ground)
+    {
+    	case Maps::Ground::WATER:       wav = (1 == speed ? M82::WSND00 : (2 == speed ? M82::WSND10 : M82::WSND20)); break;
+    	case Maps::Ground::GRASS:       wav = (1 == speed ? M82::WSND01 : (2 == speed ? M82::WSND11 : M82::WSND21)); break;
+    	case Maps::Ground::WASTELAND:   wav = (1 == speed ? M82::WSND02 : (2 == speed ? M82::WSND12 : M82::WSND22)); break;
+    	case Maps::Ground::SWAMP:
+    	case Maps::Ground::BEACH:       wav = (1 == speed ? M82::WSND03 : (2 == speed ? M82::WSND13 : M82::WSND23)); break;
+    	case Maps::Ground::LAVA:        wav = (1 == speed ? M82::WSND04 : (2 == speed ? M82::WSND14 : M82::WSND24)); break;
+    	case Maps::Ground::DESERT:
+    	case Maps::Ground::SNOW:        wav = (1 == speed ? M82::WSND05 : (2 == speed ? M82::WSND15 : M82::WSND25)); break;
+    	case Maps::Ground::DIRT:        wav = (1 == speed ? M82::WSND06 : (2 == speed ? M82::WSND16 : M82::WSND26)); break;
+
+    	default: break;
+    }
+
+    if(wav != M82::UNKNOWN) AGG::PlaySound(wav);
+}
 
 bool ReflectSprite(const u16 from)
 {
@@ -348,13 +376,54 @@ void Heroes::RedrawDependencesTiles(void) const
     if(Maps::isValidDirection(center, direction)) world.GetTiles(Maps::GetDirectionIndex(center, direction)).RedrawTop();
 }
 
-bool Heroes::MoveStep(void)
+bool Heroes::MoveStep(bool fast)
 {
     const u16 index_from = GetIndex();
     const u16 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
     const u16 index_dst = path.GetDestinationIndex();
-    bool didMove = false;
 
+    if(fast)
+    {
+	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
+	{
+	    ApplyPenaltyMovement();
+	    path.Reset();
+	    Action(index_to);
+	    SetMove(false);
+	}
+	else
+	{
+	    Maps::Tiles & tiles_from = world.GetTiles(index_from);
+	    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+	    if(MP2::OBJ_HEROES != save_maps_general) tiles_from.SetObject(save_maps_general);
+
+	    SetCenter(index_to);
+	    Scoute();
+	    ApplyPenaltyMovement();
+
+	    if(index_to == index_dst)
+	    {
+		path.Reset();
+		Action(index_to);
+		SetMove(false);
+	    }
+
+	    save_maps_general = tiles_to.GetObject();
+	    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+	    path.PopFront();
+
+	    const u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, Settings::Get().Original());
+	    if(MAXU16 != dst_index2)
+    	    {
+		Action(dst_index2);
+		SetMove(false);
+	    }
+	}
+	return true;
+    }
+    else
     if(0 == sprite_index % 9)
     {
 	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
@@ -367,27 +436,8 @@ bool Heroes::MoveStep(void)
 	}
 	else
 	{
-	    M82::m82_t wav = M82::UNKNOWN;
-
-	    const u8 speed = (4 > Settings::Get().Animation() ? 1 : (7 > Settings::Get().Animation() ? 2 : 3));
-
 	    // play sound
-	    switch(world.GetTiles(mp).GetGround())
-	    {
-    		case Maps::Ground::WATER:       wav = (1 == speed ? M82::WSND00 : (2 == speed ? M82::WSND10 : M82::WSND20)); break;
-    		case Maps::Ground::GRASS:       wav = (1 == speed ? M82::WSND01 : (2 == speed ? M82::WSND11 : M82::WSND21)); break;
-    		case Maps::Ground::WASTELAND:   wav = (1 == speed ? M82::WSND02 : (2 == speed ? M82::WSND12 : M82::WSND22)); break;
-    		case Maps::Ground::SWAMP:
-    		case Maps::Ground::BEACH:       wav = (1 == speed ? M82::WSND03 : (2 == speed ? M82::WSND13 : M82::WSND23)); break;
-    		case Maps::Ground::LAVA:        wav = (1 == speed ? M82::WSND04 : (2 == speed ? M82::WSND14 : M82::WSND24)); break;
-    		case Maps::Ground::DESERT:
-    		case Maps::Ground::SNOW:        wav = (1 == speed ? M82::WSND05 : (2 == speed ? M82::WSND15 : M82::WSND25)); break;
-    		case Maps::Ground::DIRT:        wav = (1 == speed ? M82::WSND06 : (2 == speed ? M82::WSND16 : M82::WSND26)); break;
-
-    		default: break;
-	    }
-
-	    if(wav != M82::UNKNOWN) AGG::PlaySound(wav);
+	    PlayWalkSound(world.GetTiles(mp).GetGround());
 	}
     }
     else
@@ -407,7 +457,6 @@ bool Heroes::MoveStep(void)
 	    path.Reset();
 	    Action(index_to);
 	    SetMove(false);
-            didMove = true;
 	}
 
 	save_maps_general = tiles_to.GetObject();
@@ -424,15 +473,14 @@ bool Heroes::MoveStep(void)
 	    Display::Get().Flip();
 	    Action(dst_index2);
 	    SetMove(false);
-            didMove = true;
 	}
 
-	return didMove;
+	return true;
     }
 
     ++sprite_index;
 
-    return didMove;
+    return false;
 }
 
 void Heroes::AngleStep(const Direction::vector_t to_direct)
@@ -442,6 +490,7 @@ void Heroes::AngleStep(const Direction::vector_t to_direct)
 
     // start index
     if(45 > sprite_index && 0 == sprite_index % 9)
+    {
 	switch(direction)
 	{
     	    case Direction::TOP:		sprite_index = 45; break;
@@ -455,6 +504,7 @@ void Heroes::AngleStep(const Direction::vector_t to_direct)
 
 	    default: break;
 	}
+    }
     // animation process
     else
     {
@@ -660,4 +710,45 @@ void Heroes::FadeIn(void) const
 
         ++ticket;
     }
+}
+
+bool Heroes::Move(bool fast)
+{
+    // move hero
+    if(path.isValid() &&
+           (isEnableMove() || (GetSpriteIndex() < 45 && GetSpriteIndex() % 9) || GetSpriteIndex() >= 45))
+    {
+	// fast move for hide AI
+	if(fast)
+	{
+    	    MoveStep(true);
+	}
+	else
+	{
+    	    // if need change through the circle
+	    if(GetDirection() != path.GetFrontDirection())
+    	    {
+                AngleStep(path.GetFrontDirection());
+            }
+            else
+            // move
+    	    if(MoveStep())
+    	    {
+		if(color == Settings::Get().MyColor())
+		{
+		    Game::StatusWindow::Get().Redraw();
+        	    Game::SelectBarHeroes::Get().Redraw(this);
+		}
+
+		GameArea::Get().Center(mp);
+		return true;
+    	    }
+	}
+    }
+    else
+    {
+	SetMove(false);
+    }
+
+    return false;
 }
