@@ -11,7 +11,9 @@ TARGET := fheroes2
 
 all:
 	$(MAKE) -C src
+ifdef DEVELOPMENT
 	@cp src/dist/$(TARGET).pot lang
+endif
 	@cp src/dist/$(TARGET) .
 
 clean:

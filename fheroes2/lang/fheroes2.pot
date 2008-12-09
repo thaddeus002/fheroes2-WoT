@@ -1,0 +1,237 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-12-09 01:10-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../fheroes2/battle/battle.cpp:293
+msgid "battle.none"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:319
+msgid "battle.victory1"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:320
+msgid "battle.victory2"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:327
+msgid "battle.lose"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:331 ../fheroes2/battle/battle.cpp:2641
+#: ../fheroes2/battle/battle.cpp:2648
+msgid "battle.surrender"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:337 ../fheroes2/battle/battle.cpp:2640
+#: ../fheroes2/battle/battle.cpp:2646
+msgid "battle.retreat"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:362
+msgid "battle.casualties"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:363
+msgid "battle.attacker"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:364
+msgid "battle.defender"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:758
+msgid "battle.skip"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:758
+msgid "battle.skip_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:759 ../fheroes2/battle/battle.cpp:787
+msgid "battle.auto"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:759
+msgid "battle.auto_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:760
+msgid "battle.options"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:760
+msgid "battle.options_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:764 ../fheroes2/battle/battle.cpp:774
+msgid "battle.retreat?"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:784
+msgid "battle.skip_unit"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:790
+msgid "battle.system_options"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:793 ../fheroes2/battle/battle.cpp:2652
+msgid "battle.hero_options"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:796
+msgid "battle.opp_hero"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:815
+msgid "battle.monster_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:828
+msgid "battle.shoot_monster"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:838
+msgid "battle.attack_monster"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:856
+msgid "battle.view_monster"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:874
+msgid "battle.fly"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:875
+msgid "battle.move"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:876
+msgid "battle.move/fly_here"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1170
+msgid "battle.error"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1170
+msgid "battle.no_path"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1588
+msgid "battle.multiple_attack"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1590
+msgid "battle.single_attack"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1596
+msgid "battle.multiple_perish"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1597
+msgid "battle.single_perish"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1784
+msgid "battle.affect_noone"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1883
+msgid "battle.spell_damage_single"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:1885
+msgid "battle.spell_damage_multiple"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2581
+msgid "hero.long_name"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2585 ../fheroes2/battle/battle.cpp:2589
+#: ../fheroes2/battle/battle.cpp:2593 ../fheroes2/battle/battle.cpp:2597
+#: ../fheroes2/battle/battle.cpp:2602 ../fheroes2/battle/battle.cpp:2606
+msgid "hero.skill_display"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2585
+msgid "skills.attack"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2589
+msgid "skills.defense"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2593
+msgid "skills.spell_power"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2597
+msgid "skills.knowledge"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2602
+msgid "skills.morale"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2606
+msgid "skills.luck"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2610
+msgid "hero.skill_display_ratio"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2610
+msgid "skills.spell_points"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2639 ../fheroes2/battle/battle.cpp:2644
+msgid "battle.cast_spell"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2639
+msgid "battle.cast_spell_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2640
+msgid "battle.retreat_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2641
+msgid "battle.surrender_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2642 ../fheroes2/battle/battle.cpp:2650
+msgid "dialog.cancel"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:2642
+msgid "battle.cancel_info"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:3004
+msgid "battle.high_morale"
+msgstr ""
+
+#: ../fheroes2/battle/battle.cpp:3031
+msgid "battle.low_morale"
+msgstr ""

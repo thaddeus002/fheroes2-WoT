@@ -37,7 +37,7 @@ POT        := $(TARGET).pot
 
 SEARCH := $(addprefix $(SOURCEROOT)/, $(addsuffix /*.cpp, $(SOURCEDIR)))
 
-all: $(TARGET) pot
+all: $(TARGET)
 
 $(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH)))) $(LIBENGINE)
 	@echo "lnk: $@"
