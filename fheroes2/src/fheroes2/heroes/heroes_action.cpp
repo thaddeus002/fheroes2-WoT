@@ -673,7 +673,7 @@ void ActionToResource(Heroes &hero, const u16 dst_index)
 
     	    case MP2::OBJ_MAGICGARDEN:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.", "In exchange for his freedom, he guides you to a smallpot filled with precious things.", resource);
+		    Dialog::ResourceInfo("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.", "In exchange for his freedom, he guides you to a small pot filled with precious things.", resource);
 		else
 		    Dialog::Message("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.", "Perhaps you should try again next week.", Font::BIG, Dialog::OK);
     	    break;
