@@ -29,6 +29,12 @@ void AIToResource(Heroes &hero, const u16 dst_index);
 void AIToWagon(Heroes &hero, const u16 dst_index);
 void AIToSkeleton(Heroes &hero, const u16 dst_index);
 
+void Heroes::AIUpdateRoles(void)
+{
+    SetModes(SCOUTER);
+    SetModes(HUNTER);
+}
+
 void Heroes::AIAction(const u16 dst_index)
 {
     const MP2::object_t & object = world.GetTiles(dst_index).GetObject();

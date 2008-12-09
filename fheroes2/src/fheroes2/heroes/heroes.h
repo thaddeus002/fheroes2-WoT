@@ -209,8 +209,10 @@ public:
     bool isEnableMove(void) const;
     void SetMove(bool f);
     void Action(const u16 dst_index);
-    void AIAction(const u16 dst_index);
     bool ApplyPenaltyMovement(void);
+
+    void AIAction(const u16 dst_index);
+    void AIUpdateRoles(void);
 
     void Redraw(bool with_shadow = true) const;
     void RedrawDependencesTiles(void) const;

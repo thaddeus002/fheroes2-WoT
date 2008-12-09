@@ -81,6 +81,9 @@ void Kingdom::AITurns(void)
     // castle AI turn
     AICastlesTurns();
 
+    // update roles
+    if(heroes.size()) std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::AIUpdateRoles));
+
     // buy hero in capital
     if(heroes.empty() && ai_capital && ai_capital->isCastle())
     {
