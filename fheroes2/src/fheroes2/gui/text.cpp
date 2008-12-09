@@ -74,8 +74,19 @@ void Text::Blit(u16 ax, u16 ay, Surface & dst)
 
     for(u16 ii = 0; ii < size; ++ii)
     {
+	// end string
 	if(0 == unicode[ii]) continue;
+
 	pt.y = y1;
+
+	// TODO: size font should depend from ttf
+
+	// space or unknown letter
+	if(unicode[ii] < 0x0021)
+	{
+	    pt.x += (Font::SMALL == font ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
+	    continue;
+	}
 
 	const Surface & sprite = AGG::GetUnicodeLetter(unicode[ii], font);
 	if(!sprite.valid()) return;
