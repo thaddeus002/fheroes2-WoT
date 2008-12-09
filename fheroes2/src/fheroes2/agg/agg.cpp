@@ -171,8 +171,8 @@ AGG::Cache::Cache() : heroes2_agg(false)
 #ifdef WITH_TTF
     const Settings & conf = Settings::Get();
 
-    font_medium.Open(conf.FontName(), 15);
-    font_small.Open(conf.FontName(), 10);
+    font_medium.Open(conf.FontsNormal(), conf.FontsNormalSize());
+    font_small.Open(conf.FontsSmall(), conf.FontsSmallSize());
 #endif
 }
 
@@ -666,7 +666,7 @@ void AGG::Cache::LoadFNT(void)
 #ifdef WITH_TTF
     if(fnt_cache.size()) return;
 
-    const char *letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"; // only for test development
+    const char *letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
     const u8 letters_size = std::strlen(letters);
     const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
@@ -678,7 +678,7 @@ void AGG::Cache::LoadFNT(void)
     if(font_small.isValid())
     {
 	for(u8 ii = 0; ii < letters_size; ++ii)
-	    font_small.RenderUnicodeChar(fnt_cache[unicode[ii]].second, unicode[ii], white);
+	    font_small.RenderUnicodeChar(fnt_cache[unicode[ii]].second, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
     }
     else
 	PreloadObject(ICN::SMALFONT);
@@ -687,14 +687,24 @@ void AGG::Cache::LoadFNT(void)
     if(font_medium.isValid())
     {
 	for(u8 ii = 0; ii < letters_size; ++ii)
-	    font_medium.RenderUnicodeChar(fnt_cache[unicode[ii]].first, unicode[ii], white);
+	    font_medium.RenderUnicodeChar(fnt_cache[unicode[ii]].first, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
     }
     else
 	PreloadObject(ICN::FONT);
 
     delete [] unicode;
 
-    if(conf.Debug()) fnt_cache.size() ? Error::Verbose("AGG::LoadFonts: preload charsets from " + conf.FontName()) : Error::Verbose("AGG::LoadFonts: internal.");
+    if(conf.Debug())
+    {
+	if(fnt_cache.size())
+	{
+    	    Error::Verbose("AGG::LoadFonts: normal fonts " + conf.FontsNormal());
+    	    Error::Verbose("AGG::LoadFonts:  small fonts " + conf.FontsSmall());
+    	    Error::Verbose("AGG::LoadFonts: preload english charsets");
+	}
+	else
+	    Error::Verbose("AGG::LoadFonts: internal.");
+    }
 #else
     PreloadObject(ICN::SMALFONT);
     PreloadObject(ICN::FONT);
@@ -710,9 +720,9 @@ void AGG::Cache::LoadFNT(u16 ch)
     const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
     // small
-    if(font_small.isValid()) font_small.RenderUnicodeChar(fnt_cache[ch].second, ch, white);
+    if(font_small.isValid()) font_small.RenderUnicodeChar(fnt_cache[ch].second, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
     // medium
-    if(font_medium.isValid()) font_medium.RenderUnicodeChar(fnt_cache[ch].first, ch, white);
+    if(font_medium.isValid()) font_medium.RenderUnicodeChar(fnt_cache[ch].first, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 
     if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
 #endif

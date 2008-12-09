@@ -72,31 +72,50 @@ void SDL::Font::SetStyle(u8 style)
     if(fnt) TTF_SetFontStyle(fnt, style);
 }
 
-void SDL::Font::RenderText(Surface & dst, const std::string & msg, const Colors & clr)
+void SDL::Font::RenderText(Surface & dst, const std::string & msg, const Colors & clr, render_t render)
 {
     if(dst.surface) SDL_FreeSurface(dst.surface);
-    if(fnt)
-    dst.surface = TTF_STYLE_BOLD & TTF_GetFontStyle(fnt) ? TTF_RenderUTF8_Blended(fnt, msg.c_str(), clr) : TTF_RenderUTF8_Solid(fnt, msg.c_str(), clr);
+    if(fnt) switch(render)
+    {
+	case BLENDED:	dst.surface = TTF_RenderUTF8_Blended(fnt, msg.c_str(), clr);	break;
+	default:	dst.surface = TTF_RenderUTF8_Solid(fnt, msg.c_str(), clr);	break;
+    }
 }
 
-void SDL::Font::RenderChar(Surface & dst, char ch, const Colors & clr)
+void SDL::Font::RenderChar(Surface & dst, char ch, const Colors & clr, render_t render)
 {
     char buf[2] = { '\0', '\0' };
          buf[0] = ch;
 
     if(dst.surface) SDL_FreeSurface(dst.surface);
-    if(fnt)
-    dst.surface = TTF_STYLE_BOLD & TTF_GetFontStyle(fnt) ? TTF_RenderUTF8_Blended(fnt, buf, clr) : TTF_RenderUTF8_Solid(fnt, buf, clr);
+    if(fnt) switch(render)
+    {
+	case BLENDED:	dst.surface = TTF_RenderUTF8_Blended(fnt, buf, clr);	break;
+	default:	dst.surface = TTF_RenderUTF8_Solid(fnt, buf, clr);	break;
+    }
 }
 
-void SDL::Font::RenderUnicodeChar(Surface & dst, u16 ch, const Colors & clr)
+void SDL::Font::RenderUnicodeText(Surface & dst, const u16 *msg, const Colors & clr, render_t render)
+{
+    if(dst.surface) SDL_FreeSurface(dst.surface);
+    if(fnt) switch(render)
+    {
+	case BLENDED:	dst.surface = TTF_RenderUNICODE_Blended(fnt, msg, clr);	break;
+	default:	dst.surface = TTF_RenderUNICODE_Solid(fnt, msg, clr);	break;
+    }
+}
+
+void SDL::Font::RenderUnicodeChar(Surface & dst, u16 ch, const Colors & clr, render_t render)
 {
     u16 buf[2] = { L'\0', L'\0' };
         buf[0] = ch;
 
     if(dst.surface) SDL_FreeSurface(dst.surface);
-    if(fnt)
-    dst.surface = TTF_STYLE_BOLD & TTF_GetFontStyle(fnt) ? TTF_RenderUNICODE_Blended(fnt, buf, clr) : TTF_RenderUNICODE_Solid(fnt, buf, clr);
+    if(fnt) switch(render)
+    {
+	case BLENDED:	dst.surface = TTF_RenderUNICODE_Blended(fnt, buf, clr);	break;
+	default:	dst.surface = TTF_RenderUNICODE_Solid(fnt, buf, clr);	break;
+    }
 }
 
 #endif

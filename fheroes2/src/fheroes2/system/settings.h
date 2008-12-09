@@ -37,11 +37,7 @@ public:
     {
 	NONE              = 0x00000000,
 
-	PREFERABLY_COUNT2 = 0x00000002,
-	PREFERABLY_COUNT3 = 0x00000003,
-	PREFERABLY_COUNT4 = 0x00000004,
-	PREFERABLY_COUNT5 = 0x00000005,
-	PREFERABLY_COUNT6 = 0x00000006,
+        FONTRENDERBLENDED = 0x00008000,
 
         SOUND             = 0x00010000,
         FULLSCREEN        = 0x00020000,
@@ -80,12 +76,17 @@ public:
     Maps::FileInfo & FileInfo(void);
 
     const std::string & PreloadCharsets(void) const;
-    const std::string & FontName(void) const;
     const std::string & TranslationFile(void) const;
     const std::string & DataDirectory(void) const;
     const std::string & MapsDirectory(void) const;
 
     Difficulty::difficulty_t GameDifficulty(void) const;
+
+    const std::string & FontsNormal(void) const;
+    const std::string & FontsSmall(void) const;
+    u8 FontsNormalSize(void) const;
+    u8 FontsSmallSize(void) const;
+    bool FontsRenderBlended(void) const;
 
     bool Editor(void) const;
     bool Original(void) const;
@@ -148,7 +149,11 @@ private:
     std::string path_data_directory;
     std::string path_maps_directory;
     std::string translationFile;
-    std::string fontname;
+
+    std::string font_normal;
+    std::string font_small;
+    u8 size_normal;
+    u8 size_small;
 
     Maps::FileInfo current_maps_file;
     

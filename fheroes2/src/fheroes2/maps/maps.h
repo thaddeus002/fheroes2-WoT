@@ -67,9 +67,16 @@ namespace Maps
     u16 GetDirectionAroundGround(const u16 center, const u16 ground);
     u8  GetCountAroundGround(const u16 center, const u16 ground);
     u16 GetMaxGroundAround(const u16 center);
-    u16 ScanAroundObject(const u16 center, const u8 obj, bool full);
+
+    bool ScanAroundObject(const u16 center, const u8 obj, bool full, u16 & res);
+    bool ScanDistanceObject(const u16 center, const u8 obj, const u8 dist, u16 & res);
+
+    bool TileUnderProtection(const u16 index);
+    bool TileUnderProtection(const u16 index, u16 & res);
+
     void ClearFog(const Point & center, const u8 scoute, const u8 color);
     u16 GetApproximateDistance(const u16 index1, const u16 index2);
+
 
     void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool is_castle);
     void UpdateSpritesFromTownToCastle(const Point & center);

@@ -1694,9 +1694,8 @@ bool World::CreateBoat(const u16 center, bool build)
         if(Maps::Ground::WATER == tile.GetGround() &&
     	    MP2::OBJ_ZERO == tile.GetObject())
 	{
-    	    const u16 coast = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_COAST, false);
-
-	    if(MAXU16 != coast && Algorithm::PathFind(NULL, center, coast, 256))
+    	    u16 coast = MAXU16;
+	    if(Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_COAST, false, coast) && Algorithm::PathFind(NULL, center, coast, 256))
     	    {
     		if(build)
     		{
@@ -1761,20 +1760,7 @@ const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const u16 in
 
 Recruits & World::GetRecruits(Color::color_t color)
 {
-    u8 index = 6;
-
-    switch(color)
-    {
-        case Color::BLUE:       index = 0;
-        case Color::GREEN:      index = 1;
-        case Color::RED:        index = 2;
-        case Color::YELLOW:     index = 3;
-        case Color::ORANGE:     index = 4;
-        case Color::PURPLE:     index = 5;
-	default: break;
-    }
-
-    Recruits & recruits = vec_recruits[index];
+    Recruits & recruits = map_recruits[color];
 
     if(Heroes::UNKNOWN == recruits.first || !(*vec_heroes[recruits.first]).isFreeman()) recruits.first = GetFreemanHeroes(GetKingdom(color).GetRace());
     if(Heroes::UNKNOWN == recruits.second || !(*vec_heroes[recruits.second]).isFreeman()) recruits.second = GetFreemanHeroes();

@@ -981,6 +981,7 @@ void Castle::BuyBuilding(building_t build)
 	{
 	    case BUILD_CASTLE:
 		Maps::UpdateSpritesFromTownToCastle(GetCenter());
+		Maps::ClearFog(GetCenter(), CASTLE_SCOUTE, GetColor());
 		break;
 
 	    case BUILD_MAGEGUILD1:

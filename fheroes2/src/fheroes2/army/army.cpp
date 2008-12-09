@@ -23,6 +23,9 @@
 #include "agg.h"
 #include "settings.h"
 #include "battle_troop.h"
+#include "payment.h"
+#include "world.h"
+#include "kingdom.h"
 #include "text.h"
 #include "castle.h"
 #include "army.h"
@@ -690,5 +693,26 @@ void Army::army_t::KeepOnlyWeakestTroops(army_t & army2)
     {
 	JoinTroop(priority.back());
 	priority.pop_back();
+    }
+}
+
+void Army::army_t::UpgradeTroops(const Castle & castle)
+{
+    std::vector<Troop>::iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    
+    for(; it1 != it2; ++it1) if((*it1).isValid())
+    {
+	Troop & troop = *it1;
+        PaymentConditions::UpgradeMonster payment(troop.Monster());
+        payment *= troop.Count();
+
+	if(castle.GetRace() == Monster::GetRace(troop.Monster()) &&
+	   castle.isBuild(Monster::Dwelling(Monster::Upgrade(troop.Monster()))) &&
+	   payment <= world.GetKingdom(castle.GetColor()).GetFundsResource())
+	{
+    	    world.GetMyKingdom().OddFundsResource(payment);
+            troop.UpgradeMonster();
+	}
     }
 }

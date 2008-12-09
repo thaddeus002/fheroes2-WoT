@@ -249,7 +249,7 @@ void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
                 world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
 }
 
-u16 Maps::ScanAroundObject(const u16 center, const u8 obj, bool full)
+bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, u16 & res)
 {
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
@@ -259,9 +259,33 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj, bool full)
     {
             if((!y && !x) || (y && x && !full)) continue;
 	    if(isValidAbsPoint(cx + x, cy + y) &&
-		obj == world.GetTiles(GetIndexFromAbsPoint(cx + x, cy + y)).GetObject()) return (cy + y) * world.w() + (cx + x);
+		obj == world.GetTiles(GetIndexFromAbsPoint(cx + x, cy + y)).GetObject())
+	    {
+		res = (cy + y) * world.w() + (cx + x);
+		return true;
+	    }
     }
-    return MAXU16;
+    return false;
+}
+
+bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u8 dist, u16 & res)
+{
+    s16 cx = center % world.w();
+    s16 cy = center / world.w();
+
+    for(s16 y = -dist; y <= dist; ++y)
+        for(s16 x = -dist; x <= dist; ++x)
+    {
+            if(!y && !x) continue;
+	    if(isValidAbsPoint(cx + x, cy + y) &&
+		obj == world.GetTiles(GetIndexFromAbsPoint(cx + x, cy + y)).GetObject())
+	    {
+		res = (cy + y) * world.w() + (cx + x);
+		return true;
+	    }
+    }
+
+    return false;
 }
 
 u16 Maps::GetApproximateDistance(const u16 index1, const u16 index2)
@@ -413,4 +437,15 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 	Maps::TilesAddon *addon = world.GetTiles(*it1).FindCastle();
 	if(addon) addon->index -= 16;
     }
+}
+
+bool Maps::TileUnderProtection(const u16 index)
+{
+    u16 res;
+    return Maps::ScanAroundObject(index, MP2::OBJ_MONSTER, Settings::Get().Original(), res);
+}
+
+bool Maps::TileUnderProtection(const u16 index, u16 & res)
+{
+    return Maps::ScanAroundObject(index, MP2::OBJ_MONSTER, Settings::Get().Original(), res);
 }

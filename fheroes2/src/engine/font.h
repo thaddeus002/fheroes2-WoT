@@ -33,6 +33,8 @@ namespace SDL
     class Font
     {
     public:
+	enum render_t { SOLID, BLENDED };
+
 	Font();
 	~Font();
 
@@ -43,9 +45,10 @@ namespace SDL
 	bool isValid(void) const;
 	void SetStyle(u8);
 
-	void RenderText(Surface &, const std::string &, const Colors &);
-	void RenderChar(Surface &, char, const Colors &);
-	void RenderUnicodeChar(Surface &, u16, const Colors &);
+	void RenderText(Surface &, const std::string &, const Colors &, render_t = SOLID);
+	void RenderChar(Surface &, char, const Colors &, render_t = SOLID);
+	void RenderUnicodeText(Surface &, const u16 *, const Colors &, render_t = SOLID);
+	void RenderUnicodeChar(Surface &, u16, const Colors &, render_t = SOLID);
 
     private:
 	TTF_Font *fnt;

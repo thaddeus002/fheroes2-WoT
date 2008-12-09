@@ -100,6 +100,7 @@ namespace Maps
 	void SetObject(MP2::object_t object){ general = object; };
 
 	void UpdateQuantity(void);
+	bool ValidQuantity(void) const;
 	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
 
 	void RedrawTile(void) const;

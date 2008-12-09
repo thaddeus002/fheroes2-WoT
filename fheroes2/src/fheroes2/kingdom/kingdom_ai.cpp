@@ -102,9 +102,6 @@ void Kingdom::AITurns(void)
     // prepare task for heroes
     AIHeroesTask();
 
-    // scan area maps
-    // and set task for heroes movement
-
     // heroes AI turn
     AIHeroesTurns();
 
@@ -263,11 +260,13 @@ void Kingdom::AIHeroesTask(void)
     {
 	Heroes & hero = **ith1;
 	Castle *castle= hero.inCastle();
+	u16 index = MAXU16;
 
 	// if hero in castle
 	if(castle)
 	{
 	    castle->RecruitAllMonster();
+	    hero.GetArmy().UpgradeTroops(*castle);
 
 	    // recruit army
 	    if(hero.Modes(Heroes::HUNTER))
@@ -277,6 +276,178 @@ void Kingdom::AIHeroesTask(void)
 		hero.GetArmy().KeepOnlyWeakestTroops(castle->GetArmy());
 	}
 
-	// more other
+	// TODO: AI hero use double distance
+
+	// scouter task
+	if(MAXU16 == index && hero.Modes(Heroes::SCOUTER))
+	{
+	    if(hero.isShipMaster())
+	    {
+		// pickup objects
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_BOTTLE, 2 * hero.GetScoute(), index));
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_FLOTSAM, 2 * hero.GetScoute(), index));
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SHIPWRECKSURVIROR, 2 * hero.GetScoute(), index));
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_TREASURECHEST, 2 * hero.GetScoute(), index) &&
+		    Maps::Ground::WATER == world.GetTiles(index).GetGround());
+	    }
+	    else
+	    {
+		// pickup resource
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_RESOURCE, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index));
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_CAMPFIRE, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index));
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_TREASURECHEST, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    Maps::Ground::WATER != world.GetTiles(index).GetGround());
+		else
+		// piclup object
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WAGON, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    world.GetTiles(index).ValidQuantity());
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WATERWHEEL, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    world.GetTiles(index).ValidQuantity());
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WINDMILL, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    world.GetTiles(index).ValidQuantity());
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_LEANTO, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    world.GetTiles(index).ValidQuantity());
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MAGICGARDEN, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    world.GetTiles(index).ValidQuantity());
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SKELETON, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    world.GetTiles(index).ValidQuantity());
+		else
+		// capture flags resource object
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SAWMILL, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    hero.GetColor() != world.ColorCapturedObject(index));
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MINES, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    hero.GetColor() != world.ColorCapturedObject(index));
+		else
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ALCHEMYTOWER, 2 * hero.GetScoute(), index) &&
+		    !Maps::TileUnderProtection(index) &&
+		    hero.GetColor() != world.ColorCapturedObject(index));
+	    }
+	}
+
+	// hunter task
+	if(MAXU16 == index && hero.Modes(Heroes::HUNTER))
+	{
+	}
+
+	// general object
+	if(MAXU16 == index)
+	{
+	    // if bad luck, visit object
+	    // if bad morale, visit object
+	    // primary skill, secondary skill, experience object
+	    // or more other
+	}
+
+	// goto: clear fog
+	if(MAXU16 == index)
+	{
+	}
+
+	if(MAXU16 != index) hero.GetPath().Calculate(index);
+
+	//
+	hero.SetMove(true);
     }
 }
+
+/*
+OBJ_ARTIFACT
+OBJ_ABANDONEDMINE
+OBJ_AIRALTAR
+OBJ_ALCHEMYLAB
+OBJ_ANCIENTLAMP
+OBJ_ARCHERHOUSE
+OBJ_ARENA
+OBJ_ARTESIANSPRING
+OBJ_ARTIFACT
+OBJ_BARRIER
+OBJ_BARROWMOUNDS
+OBJ_BOAT
+OBJ_BUOY
+OBJ_CASTLE
+OBJ_CAVE
+OBJ_CITYDEAD
+OBJ_DAEMONCAVE
+OBJ_DERELICTSHIP
+OBJ_DESERTTENT
+OBJ_DOCTORHUT
+OBJ_DRAGONCITY
+OBJ_DWARFCOTT
+OBJ_EARTHALTAR
+OBJ_EXCAVATION
+OBJ_EYEMAGI
+OBJ_FAERIERING
+OBJ_FIREALTAR
+OBJ_FORT
+OBJ_FOUNTAIN
+OBJ_FREEMANFOUNDRY
+OBJ_GAZEBO
+OBJ_GOBLINHUT
+OBJ_GRAVEYARD
+OBJ_HALFLINGHOLE
+OBJ_HEROES
+OBJ_HILLFORT
+OBJ_HUTMAGI
+OBJ_IDOL
+OBJ_LIGHTHOUSE
+OBJ_JAIL
+OBJ_MAGELLANMAPS
+OBJ_MAGICWELL
+OBJ_MERCENARYCAMP
+OBJ_MERMAID
+OBJ_MONSTER
+OBJ_OASIS
+OBJ_OBELISK
+OBJ_OBSERVATIONTOWER
+OBJ_ORACLE
+OBJ_PEASANTHUT
+OBJ_PYRAMID
+OBJ_RUINS
+OBJ_SHIPWRECK
+OBJ_SHRINE1
+OBJ_SHRINE2
+OBJ_SHRINE3
+OBJ_SIGN
+OBJ_SIRENS
+OBJ_SPHINX
+OBJ_STABLES
+OBJ_STANDINGSTONES
+OBJ_STONELIGHTS
+OBJ_TEMPLE
+OBJ_THATCHEDHUT
+OBJ_TRADINGPOST
+OBJ_TRAVELLERTENT
+OBJ_TREECITY
+OBJ_TREEHOUSE
+OBJ_TREEKNOWLEDGE
+OBJ_TROLLBRIDGE
+OBJ_WAGONCAMP
+OBJ_WATCHTOWER
+OBJ_WATERALTAR
+OBJ_WATERINGHOLE
+OBJ_WHIRLPOOL
+OBJ_WITCHSHUT
+OBJ_XANADU
+*/

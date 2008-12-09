@@ -414,8 +414,8 @@ bool Heroes::MoveStep(bool fast)
 
 	    path.PopFront();
 
-	    const u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, Settings::Get().Original());
-	    if(MAXU16 != dst_index2)
+	    u16 dst_index2 = MAXU16;
+	    if(Maps::TileUnderProtection(index_to, dst_index2))
     	    {
 		Action(dst_index2);
 		SetMove(false);
@@ -466,8 +466,8 @@ bool Heroes::MoveStep(bool fast)
 
 	sprite_index -= 8;
 
-	const u16 dst_index2 = Maps::ScanAroundObject(index_to, MP2::OBJ_MONSTER, Settings::Get().Original());
-	if(MAXU16 != dst_index2)
+	u16 dst_index2 = MAXU16;
+	if(Maps::TileUnderProtection(index_to, dst_index2))
         {
 	    GameArea::Get().Redraw();
 	    Display::Get().Flip();

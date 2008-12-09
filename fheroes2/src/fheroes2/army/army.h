@@ -30,6 +30,7 @@
 #include "gamedefs.h"
 
 class Surface;
+class Castle;
 class Heroes;
 class Point;
 class Rect;
@@ -146,6 +147,7 @@ namespace Army
 
 	    void	JoinStrongestFromArmy(army_t &);
             void	KeepOnlyWeakestTroops(army_t &);
+	    void	UpgradeTroops(const Castle &);
 
 	private:
 	    friend class Troop;

@@ -29,7 +29,6 @@
 #include "cursor.h"
 #include "gamearea.h"
 #include "kingdom.h"
-#include "ai.h"
 #include "battle.h"
 #include "heroes.h"
 
@@ -1405,7 +1404,12 @@ void Heroes::LevelUpSkill(const Skill::Secondary::skill_t skill)
 
 void Heroes::Scoute(void)
 {
-    Maps::ClearFog(mp, (HasArtifact(Artifact::TELESCOPE) ? 1 : 0) + SCOUTINGBASE + GetLevelSkill(Skill::Secondary::SCOUTING), color);
+    Maps::ClearFog(mp, GetScoute(), color);
+}
+
+u8 Heroes::GetScoute(void) const
+{
+    return (HasArtifact(Artifact::TELESCOPE) ? 1 : 0) + SCOUTINGBASE + GetLevelSkill(Skill::Secondary::SCOUTING);
 }
 
 
@@ -1571,7 +1575,7 @@ void Heroes::LevelUp(bool autoselect)
 	// AI select
 	else
 	{
-    	    skill_select = AI::SelectSkill(*this, sec1, sec2);
+    	    skill_select = (Rand::Get(0, 1) ? sec1.Skill() : sec2.Skill());
 	}
 
 	LevelUpSkill(skill_select);

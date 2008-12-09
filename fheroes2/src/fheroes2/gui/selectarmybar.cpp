@@ -258,6 +258,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 
 		if(Monster::AllowUpgrade(troop1.Monster()) &&
 		    bar.castle &&
+		    bar.castle->GetRace() == Monster::GetRace(troop1.Monster()) &&
 		    bar.castle->isBuild(Monster::Dwelling(Monster::Upgrade(troop1.Monster()))) &&
 		    payment <= world.GetMyKingdom().GetFundsResource())
 		    flags |= Dialog::UPGRADE;

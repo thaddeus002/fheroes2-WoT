@@ -136,7 +136,7 @@ protected:
     Heroes::heroes_t GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
 private:
-    World() : Size(0, 0), vec_recruits(7), width(Size::w), height(Size::h) {};
+    World() : Size(0, 0), width(Size::w), height(Size::h) {};
 
     void FreeOldMaps(void);
 
@@ -150,8 +150,8 @@ private:
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
     std::vector<u16>                    vec_teleports;
-    std::vector<Recruits>		vec_recruits;
 
+    std::map<Color::color_t, Recruits>	map_recruits;
     std::map<u32, std::vector<u16> >	map_whirlpools;
     std::map<u16, std::string>		map_sign;
     std::map<u16, Spell::spell_t>	map_shrine;

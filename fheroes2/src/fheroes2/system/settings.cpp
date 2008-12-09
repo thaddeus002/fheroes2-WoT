@@ -46,7 +46,8 @@ namespace
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"), fontname("dejavusans.ttf"),
+    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"),
+    font_normal("files/fonts/dejavusans.ttf"), font_small("files/fonts/dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
 {
 }
@@ -132,7 +133,10 @@ void Settings::Dump(std::ostream & stream) const
     stream << "data = " << path_data_directory << std::endl;
     stream << "maps = " << path_maps_directory << std::endl;
     stream << "translation = " << translationFile << std::endl;
-    stream << "fonts = " << fontname << std::endl;
+    stream << "fonts normal = " << font_normal << std::endl;
+    stream << "fonts small = " << font_small << std::endl;
+    stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
+    stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
 
     str.clear();
     String::AddInt(str, video_mode.w);
@@ -208,7 +212,11 @@ bool Settings::Modes(const settings_t s) const { return modes & s; }
 const std::string & Settings::TranslationFile(void) const { return translationFile; }
 
 /* return fontname */
-const std::string & Settings::FontName(void) const { return fontname; }
+const std::string & Settings::FontsNormal(void) const { return font_normal; }
+const std::string & Settings::FontsSmall(void) const { return font_small; }
+u8 Settings::FontsNormalSize(void) const { return size_normal; }
+u8 Settings::FontsSmallSize(void) const { return size_small; }
+bool Settings::FontsRenderBlended(void) const { return FONTRENDERBLENDED & modes; }
 
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
@@ -273,7 +281,15 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "translation") translationFile = right;
     else
     // font name
-    if(left == "fonts") fontname = right;
+    if(left == "fonts normal") font_normal = right;
+    else
+    if(left == "fonts small") font_small = right;
+    else
+    if(left == "fonts normal size") size_normal = String::ToInt(right);
+    else
+    if(left == "fonts small size") size_small = String::ToInt(right);
+    else
+    if(left == "fonts render" && right == "blended") SetModes(FONTRENDERBLENDED);
     else
     // data directory
     if(left == "data") path_data_directory = right;
@@ -467,7 +483,10 @@ void Settings::SetPlayers(u8 c)
 
 void Settings::SetPreferablyCountPlayers(u8 c)
 {
-    preferably_count_players = c;
+    if(2 > c) preferably_count_players = 2;
+    else
+    if(6 < c) preferably_count_players = 6;
+    else      preferably_count_players = c;
 }
 
 u8 Settings::PreferablyCountPlayers(void) const

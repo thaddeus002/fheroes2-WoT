@@ -192,16 +192,14 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
     	    display.Unlock();
 	}
     }
-    else
-    // redraw fog
-    {
-	for(u8 oy = ry; oy < ry + rh; ++oy)
-	    for(u8 ox = rx; ox < rx + rw; ++ox)
-	{
-	    const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
 
-	    if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), ox, oy);
-	}
+    // redraw fog
+    for(u8 oy = ry; oy < ry + rh; ++oy)
+	for(u8 ox = rx; ox < rx + rw; ++ox)
+    {
+	const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
+
+	if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), ox, oy);
     }
 }
 
@@ -315,10 +313,10 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
     Monster::monster_t monster = Monster::Monster(tile);
     Point dst_pt;
     Rect src_rt;
-    const u16 dst_index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES, false);
+    u16 dst_index = MAXU16;
 
     // draw attack sprite
-    if(MAXU16 != dst_index)
+    if(Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES, false, dst_index))
     {
 	bool revert = false;
 

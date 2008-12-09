@@ -209,6 +209,7 @@ public:
     bool isEnableMove(void) const;
     void SetMove(bool f);
     void Action(const u16 dst_index);
+    void AIAction(const u16 dst_index);
     bool ApplyPenaltyMovement(void);
 
     void Redraw(bool with_shadow = true) const;
@@ -217,6 +218,7 @@ public:
     void FadeOut(void) const;
     void FadeIn(void) const;
     void Scoute(void);
+    u8   GetScoute(void) const;
 
     bool isShipMaster(void) const;
     void SetShipMaster(bool f);

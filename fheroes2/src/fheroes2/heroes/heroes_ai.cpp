@@ -1,253 +1,225 @@
-/*************************************************************************** 
- *   Copyright (C) 2008 by Andrey Afletdinov                               * 
- *   afletdinov@mail.dc.baikal.ru                                          * 
- *                                                                         * 
- *   This program is free software; you can redistribute it and/or modify  * 
- *   it under the terms of the GNU General Public License as published by  * 
- *   the Free Software Foundation; either version 2 of the License, or     * 
- *   (at your option) any later version.                                   * 
- *                                                                         * 
- *   This program is distributed in the hope that it will be useful,       * 
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * 
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
- *   GNU General Public License for more details.                          * 
- *                                                                         * 
- *   You should have received a copy of the GNU General Public License     * 
- *   along with this program; if not, write to the                         * 
- *   Free Software Foundation, Inc.,                                       * 
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
+/***************************************************************************
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
+ *   afletdinov@mail.dc.baikal.ru                                          *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "agg.h"
-#include "mp2.h"
-#include "world.h"
 #include "settings.h"
-#include "castle.h"
-#include "monster.h"
-#include "heroes.h"
-#include "battle.h"
-#include "gamearea.h"
-#include "game_focus.h"
-#include "game_selectobjbar.h"
 #include "kingdom.h"
-#include "cursor.h"
-#include "algorithm.h"
-#include "gameevent.h"
+#include "world.h"
+#include "heroes.h"
 
-#define OBSERVATIONTOWERSCOUTE 10
+void AIToPickupResource(Heroes &hero, const u16 dst_index);
+void AIToTreasureChest(Heroes &hero, const u16 dst_index);
+void AIToResource(Heroes &hero, const u16 dst_index);
+void AIToWagon(Heroes &hero, const u16 dst_index);
+void AIToSkeleton(Heroes &hero, const u16 dst_index);
 
-#define PlaySoundWarning	AGG::PlaySound(M82::EXPERNCE)
-#define PlaySoundSuccess	AGG::PlaySound(M82::TREASURE)
-#define PlaySoundFailure	AGG::PlaySound(M82::H2MINE)
-#define PlaySoundVisited	AGG::PlaySound(M82::RSBRYFZL)
-
-void ActionToCastle(Heroes &hero, const u16 dst_index);
-void ActionToHeroes(Heroes &hero, const u16 dst_index);
-void ActionToMonster(Heroes &hero, const u16 dst_index);
-void ActionToBoat(Heroes &hero, const u16 dst_index);
-void ActionToCoast(Heroes &hero, const u16 dst_index);
-void ActionToWagon(Heroes &hero, const u16 dst_index);
-void ActionToSkeleton(Heroes &hero, const u16 dst_index);
-void ActionToResource(Heroes &hero, const u16 dst_index);
-void ActionToPickupResource(Heroes &hero, const u16 dst_index);
-void ActionToFlotSam(Heroes &hero, const u16 dst_index);
-void ActionToArtifact(Heroes &hero, const u16 dst_index);
-void ActionToShrine(Heroes &hero, const u16 dst_index);
-void ActionToWitchsHut(Heroes &hero, const u16 dst_index);
-void ActionToGoodLuckObject(Heroes &hero, const u16 dst_index);
-void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index);
-void ActionToSign(Heroes &hero, const u16 dst_index);
-void ActionToMagicWell(Heroes &hero, const u16 dst_index);
-void ActionToTradingPost(Heroes &hero);
-void ActionToPrimarySkillObject(Heroes &hero, const u16 dst_index);
-void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index);
-void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index);
-void ActionToExperienceObject(Heroes &hero, const u16 dst_index);
-void ActionToTreasureChest(Heroes &hero, const u16 dst_index);
-void ActionToAncientLamp(Heroes &hero, const u16 dst_index);
-void ActionToTeleports(Heroes &hero, const u16 dst_index);
-void ActionToWhirlpools(Heroes &hero, const u16 dst_index);
-void ActionToObservationTower(Heroes &hero, const u16 dst_index);
-void ActionToCaptureObject(Heroes &hero, const u16 dst_index);
-void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index);
-void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index);
-void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index);
-void ActionToArtesianSpring(Heroes &hero, const u16 dst_index);
-void ActionToAbandoneMine(Heroes &hero, const u16 dst_index);
-void ActionToXanadu(Heroes &hero, const u16 dst_index);
-void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
-void ActionToMagellanMaps(Heroes &hero, const u16 dst_index);
-void ActionToEvent(Heroes &hero, const u16 dst_index);
-
-u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
+void Heroes::AIAction(const u16 dst_index)
 {
-    std::string str;
-    String::AddInt(str, count);
-    const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
-    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
-    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art + 1);
-    Surface image(gold.w() + border.w() + 50, border.h());
-    image.SetColorKey();
-    image.Blit(border);
-    image.Blit(artifact, 5, 5);
-    image.Blit(gold, border.w() + 50, (border.h() - gold.h()) / 2);
-    Text text(str, Font::SMALL);
-    text.Blit(border.w() + 50 + (gold.w() - Text::width(str, Font::SMALL)) / 2, border.h() - 25, image);
-    return Dialog::SpriteInfo(hdr, msg, image, buttons);
-}
+    const MP2::object_t & object = world.GetTiles(dst_index).GetObject();
 
-u16 DialogWithGold(const std::string & hdr, const std::string & msg, const u16 count, const u16 buttons = Dialog::OK)
-{
-    std::string str;
-    String::AddInt(str, count);
-    const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
-    Surface image(gold.w(), gold.h() + 12);
-    image.SetColorKey();
-    image.Blit(gold);
-    Text text(str, Font::SMALL);
-    text.Blit((gold.w() - Text::width(str, Font::SMALL)) / 2, gold.h(), image);
-    return Dialog::SpriteInfo(hdr, msg, image, buttons);
-}
-
-u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK)
-{
-    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
-    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art + 1);
-    Surface image(border.w(), border.h());
-    image.Blit(border);
-    image.Blit(artifact, 5, 5);
-    return Dialog::SpriteInfo(hdr, msg, image, buttons);
-}
-
-u16 DialogMorale(const std::string & hdr, const std::string & msg, const bool good, u8 count)
-{
-    if(1 > count) count = 1;
-    if(3 < count) count = 3;
-    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 2 : 3));
-    u8 offset = sprite.w() * 4 / 3;
-    Surface image(sprite.w() + offset * (count - 1), sprite.h());
-    image.SetColorKey();
-    for(u8 ii = 0; ii < count; ++ii) image.Blit(sprite, offset * ii, 0);
-    return Dialog::SpriteInfo(hdr, msg, image);
-}
-
-u16 DialogLuck(const std::string & hdr, const std::string & msg, const bool good, u8 count)
-{
-    if(1 > count) count = 1;
-    if(3 < count) count = 3;
-    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 0 : 1));
-    u8 offset = sprite.w() * 4 / 3;
-    Surface image(sprite.w() + offset * (count - 1), sprite.h());
-    image.SetColorKey();
-    for(u8 ii = 0; ii < count; ++ii) image.Blit(sprite, offset * ii, 0);
-    return Dialog::SpriteInfo(hdr, msg, image);
-}
-
-void BattleLose(Heroes &hero, const u8 reason)
-{
-    AGG::PlaySound(M82::KILLFADE);
-    hero.FadeOut();
-    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
-    Game::Focus::Get().Reset(Game::Focus::HEROES);
-    Game::Focus::Get().Redraw();
-    hero.SetFreeman(reason);
-}
-
-void PlayPickupSound(void)
-{
-    M82::m82_t wav = M82::UNKNOWN;
-
-    switch(Rand::Get(1, 7))
+    switch(object)
     {
-        case 1: wav = M82::PICKUP01; break;
-        case 2: wav = M82::PICKUP02; break;
-        case 3: wav = M82::PICKUP03; break;
-        case 4: wav = M82::PICKUP04; break;
-        case 5: wav = M82::PICKUP05; break;
-        case 6: wav = M82::PICKUP06; break;
-        case 7: wav = M82::PICKUP07; break;
+        // pickup object
+        case MP2::OBJ_RESOURCE:
+        case MP2::OBJ_BOTTLE:
+        case MP2::OBJ_CAMPFIRE:         AIToPickupResource(*this, dst_index); break;
 
-        default: return;
+        case MP2::OBJ_TREASURECHEST:	AIToTreasureChest(*this, dst_index); break;
+
+        case MP2::OBJ_MAGICGARDEN:
+        case MP2::OBJ_LEANTO:
+        case MP2::OBJ_WINDMILL:
+        case MP2::OBJ_WATERWHEEL:	AIToResource(*this, dst_index); break;
+
+        case MP2::OBJ_WAGON:		AIToWagon(*this, dst_index); break;
+        case MP2::OBJ_SKELETON:		AIToSkeleton(*this, dst_index); break;
+
+	default:
+	    Error::Verbose("AI::Action: Hero " + GetName() + " say: I'm stupid, help my please..");
+	    break;
+    }
+}
+
+void AIToPickupResource(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    Resource::funds_t resource;
+    const u8 count = tile.GetQuantity2();
+
+    switch(tile.GetQuantity1())
+    {
+        case Resource::WOOD: resource.wood += count; break;
+        case Resource::MERCURY: resource.mercury += count; break;
+        case Resource::ORE: resource.ore += count; break;
+        case Resource::SULFUR: resource.sulfur += count; break;
+        case Resource::CRYSTAL: resource.crystal += count; break;
+        case Resource::GEMS: resource.gems += count; break;
+        case Resource::GOLD: resource.gold += 100 * count; break;
+
+        default: break;
     }
 
-    AGG::PlaySound(wav);
+    //if(hero.isShow()) AnimationRemoveObject(tile);
+    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+    tile.RemoveObjectSprite();
+
+    tile.SetObject(MP2::OBJ_ZERO);
+    if(Settings::Get().Debug()) Error::Verbose("AIToPickupResource: " + hero.GetName() + " pickup small resource");
 }
 
-void AnimationRemoveObject(const Maps::Tiles & tile)
+void AIToTreasureChest(Heroes &hero, const u16 dst_index)
 {
-    Maps::TilesAddon *addon = NULL;
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    Resource::funds_t resource;
+    resource.gold = tile.GetQuantity2() * 100;
 
-    switch(tile.GetObject())
+    //if(hero.isShow()) AnimationRemoveObject(tile);
+
+    if(Maps::Ground::WATER == tile.GetGround())
     {
-	case MP2::OBJ_FLOTSAM:
-	case MP2::OBJ_SHIPWRECKSURVIROR:
-	case MP2::OBJ_BOTTLE:
-        case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_ANCIENTLAMP:
-	case MP2::OBJ_RESOURCE:	addon = const_cast<Maps::Tiles &>(tile).FindResource(); break;
+	if(tile.GetQuantity1())
+	{
+	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    if(!hero.PickupArtifact(art))
+		    resource.gold = 1500;	// it is from FAQ
+	}
+	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+    }
+    else
+    {
+	if(tile.GetQuantity1())
+	{
+	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	
+	    if(!hero.PickupArtifact(art))
+		    resource.gold = 1000;	// it is from FAQ
+	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	}
+	else
+	{
+	    const u16 expr = resource.gold - 500;
 
-	case MP2::OBJ_ARTIFACT:	addon = const_cast<Maps::Tiles &>(tile).FindArtifact(); break;
-	case MP2::OBJ_CAMPFIRE:	addon = const_cast<Maps::Tiles &>(tile).FindCampFire(); break;
-	case MP2::OBJ_MONSTER:  addon = const_cast<Maps::Tiles &>(tile).FindMonster(); break;
+	    // select gold or exp
+	    if(Rand::Get(1))
+		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    else
+		hero.IncreaseExperience(expr);
+	}
+    }
+
+    tile.RemoveObjectSprite();
+    tile.SetObject(MP2::OBJ_ZERO);
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToTreasureChest: " + hero.GetName() + " pickup chest");
+}
+
+void AIToResource(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const u8 count = tile.GetQuantity2();
+    Resource::funds_t resource;
+
+    switch(tile.GetQuantity1())
+    {
+	case Resource::WOOD: resource.wood += count; break;
+    	case Resource::MERCURY: resource.mercury += count; break;
+    	case Resource::ORE: resource.ore += count; break;
+    	case Resource::SULFUR: resource.sulfur += count; break;
+    	case Resource::CRYSTAL: resource.crystal += count; break;
+    	case Resource::GEMS: resource.gems += count; break;
+    	case Resource::GOLD: resource.gold += 100 * count; break;
 
 	default: break;
     }
 
-    if(NULL == addon) return;
+    if(resource.GetValidItems())
+	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 
-    const Rect & area = GameArea::Get().GetRect();
-    const Point pos(tile.GetIndex() % world.w() - area.x, tile.GetIndex() / world.w() - area.y);
+    tile.SetQuantity1(0);
+    tile.SetQuantity2(0);
 
-    const s16 dstx = BORDERWIDTH + TILEWIDTH * pos.x;
-    const s16 dsty = BORDERWIDTH + TILEWIDTH * pos.y;
-
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-
-    u16 index = MAXU16;
-    const Heroes *hero = NULL;
-    if(Maps::ScanDistanceObject(tile.GetIndex(), MP2::OBJ_HEROES, 1, index)) hero = world.GetHeroes(index);
-
-    Surface sf(tile.GetSurface());
-
-    const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
-    sf.Blit(sprite, sprite.x(), sprite.y());
-
-    // if animation sprite
-    if(0 != (index = ICN::AnimationFrame(MP2::GetICNObject(addon->object), addon->index)))
-    {
-	const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), index);
-	sf.Blit(sprite, sprite.x(), sprite.y());
-    }
-
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-    u32 ticket = 0;
-    u8 alpha = 250;
-
-    while(le.HandleEvents() && alpha > 10)
-    {
-	if(Game::ShouldAnimateInfrequent(ticket, 1))
-        {
-	    cursor.Hide();
-	    tile.RedrawTile();
-	    tile.RedrawBottom(addon);
-            sf.SetAlpha(alpha);
-	    display.Blit(sf, dstx, dsty);
-	    tile.RedrawTop();
-	    if(hero) hero->Redraw(false);
-            cursor.Show();
-            display.Flip();
-            alpha -= 20;
-        }
-
-        ++ticket;
-    }
+    if(H2Config::Debug()) Error::Verbose("AIToResource: " + hero.GetName() + " pickup small resource");
 }
 
+void AIToSkeleton(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    // artifact
+    if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
+    {
+	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+
+	if(hero.PickupArtifact(art))
+	{
+	    tile.SetQuantity1(0);
+	    tile.SetQuantity2(0);
+	}
+    }
+
+    if(H2Config::Debug()) Error::Verbose("AIToSkeleton: " + hero.GetName());
+}
+
+void AIToWagon(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    // artifact
+    if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
+    {
+	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	if(hero.PickupArtifact(art))
+	    tile.SetQuantity1(0);
+    }
+    else
+    if(tile.GetQuantity1() && tile.GetQuantity2())
+    {
+	const u8 count = tile.GetQuantity2();
+	Resource::funds_t resource;
+
+	switch(tile.GetQuantity1())
+	{
+	    case Resource::WOOD:	resource.wood += count; break;
+    	    case Resource::MERCURY:	resource.mercury += count; break;
+    	    case Resource::ORE:		resource.ore += count; break;
+    	    case Resource::SULFUR:	resource.sulfur += count; break;
+    	    case Resource::CRYSTAL:	resource.crystal += count; break;
+    	    case Resource::GEMS:	resource.gems += count; break;
+    	    case Resource::GOLD:	resource.gold += 100 * count; break;
+
+	    default: break;
+	}
+
+	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+
+	tile.SetQuantity1(0);
+	tile.SetQuantity2(0);
+    }
+
+    if(H2Config::Debug()) Error::Verbose("AIToWagon: " + hero.GetName());
+}
+
+/*
 // action to next cell
 void Heroes::Action(const u16 dst_index)
 {
-    if(Settings::Get().MyColor() != GetColor()) return AIAction(dst_index);
+    if(H2Config::MyColor() != GetColor()) return AIAction(*this, dst_index);
 
     const MP2::object_t & object = world.GetTiles(dst_index).GetObject();
 
@@ -262,20 +234,12 @@ void Heroes::Action(const u16 dst_index)
 	case MP2::OBJ_COAST:	ActionToCoast(*this, dst_index); break;
 
         // resource object
-        case MP2::OBJ_MAGICGARDEN:
-        case MP2::OBJ_LEANTO:
-        case MP2::OBJ_WINDMILL:
-        case MP2::OBJ_WATERWHEEL:	ActionToResource(*this, dst_index); break;
-
-        case MP2::OBJ_WAGON:		ActionToWagon(*this, dst_index); break;
-        case MP2::OBJ_SKELETON:		ActionToSkeleton(*this, dst_index); break;
 
         // pickup object
         case MP2::OBJ_RESOURCE:
         case MP2::OBJ_BOTTLE:
         case MP2::OBJ_CAMPFIRE:		ActionToPickupResource(*this, dst_index); break;
 
-        case MP2::OBJ_TREASURECHEST:	ActionToTreasureChest(*this, dst_index); break;
         case MP2::OBJ_ANCIENTLAMP:	ActionToAncientLamp(*this, dst_index); break;
         case MP2::OBJ_FLOTSAM:		ActionToFlotSam(*this, dst_index); break;
 
@@ -390,7 +354,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_EYEMAGI:
         case MP2::OBJ_SIRENS:
         case MP2::OBJ_MERMAID:
-	    if(Settings::Get().Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
+	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
 
 	default: break;
@@ -405,7 +369,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     Army::army_t army;
     Army::ArrangeTroopsForBattle(army, monster, count);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
+    if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
 
     const u32 exp = army.CalculateExperience();
     const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -454,13 +418,13 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
 
     if(hero.GetColor() == other_hero->GetColor())
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
+	if(H2Config::Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
 
 	hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
     }
     else
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
+	if(H2Config::Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
 	const u32 exp = other_hero->GetArmy().CalculateExperience();
 
@@ -495,7 +459,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
 
     if(hero.GetColor() == castle->GetColor())
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
+	if(H2Config::Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
 
 	Mixer::Reduce();
 
@@ -505,7 +469,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
     }
     else
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
+	if(H2Config::Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
 	const u32 exp = castle->GetArmy().CalculateExperience();
 
@@ -550,7 +514,7 @@ void ActionToBoat(Heroes &hero, const u16 dst_index)
     tiles_to.SetObject(MP2::OBJ_HEROES);
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToBoat: " + hero.GetName() + " to boat");
+    if(H2Config::Debug()) Error::Verbose("ActionToBoat: " + hero.GetName() + " to boat");
 }
 
 void ActionToCoast(Heroes &hero, const u16 dst_index)
@@ -572,202 +536,10 @@ void ActionToCoast(Heroes &hero, const u16 dst_index)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToCoast: " + hero.GetName() + " to coast");
+    if(H2Config::Debug()) Error::Verbose("ActionToCoast: " + hero.GetName() + " to coast");
 }
 
-void ActionToPickupResource(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
-    const u8 count = tile.GetQuantity2();
 
-    switch(tile.GetQuantity1())
-    {
-	case Resource::WOOD: resource.wood += count; break;
-    	case Resource::MERCURY: resource.mercury += count; break;
-    	case Resource::ORE: resource.ore += count; break;
-    	case Resource::SULFUR: resource.sulfur += count; break;
-    	case Resource::CRYSTAL: resource.crystal += count; break;
-    	case Resource::GEMS: resource.gems += count; break;
-    	case Resource::GOLD: resource.gold += 100 * count; break;
-
-	default: break;
-    }
-
-    PlayPickupSound();
-    AnimationRemoveObject(tile);
-
-    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-    tile.RemoveObjectSprite();
-
-    // dialog
-    switch(tile.GetObject())
-    {
-	case MP2::OBJ_CAMPFIRE:
-	    // force reset sound
-	    tile.SetObject(MP2::OBJ_ZERO);
-	    Game::EnvironmentSoundMixer();
-
-	    resource.gold += 100 * count;
-	    Dialog::ResourceInfo("CampFire", "Ransacking an enemy camp, you discover a hidden cache of treasures.", resource);
-	break;
-
-	case MP2::OBJ_BOTTLE:
-	    Dialog::Message(MP2::StringObject(tile.GetObject()), world.MessageSign(dst_index), Font::BIG, Dialog::OK);
-	break;
-
-	default: break;
-    }
-    tile.SetObject(MP2::OBJ_ZERO);
-
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPickupResource: " + hero.GetName() + " pickup small resource");
-}
-
-void ActionToResource(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    const u8 count = tile.GetQuantity2();
-    Resource::funds_t resource;
-
-    switch(tile.GetQuantity1())
-    {
-	case Resource::WOOD: resource.wood += count; break;
-    	case Resource::MERCURY: resource.mercury += count; break;
-    	case Resource::ORE: resource.ore += count; break;
-    	case Resource::SULFUR: resource.sulfur += count; break;
-    	case Resource::CRYSTAL: resource.crystal += count; break;
-    	case Resource::GEMS: resource.gems += count; break;
-    	case Resource::GOLD: resource.gold += 100 * count; break;
-
-	default: break;
-    }
-
-    if(resource.GetValidItems())
-    {
-	PlaySoundSuccess;
-	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-    }
-    else
-	PlaySoundVisited;
-
-    // dialog
-    switch(tile.GetObject())
-    {
-	    case MP2::OBJ_WINDMILL:
-	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("The keeper of the mill announces:", "\"Milord, I have been working very hard to provide you with these resources, come back next week for more.\"", resource);
-		else
-		    Dialog::Message("The keeper of the mill announces:", "\"Milord, I am sorry, there are no resources currently available. Please try again next week.\"", Font::BIG, Dialog::OK);
-	    break;
-
-	    case MP2::OBJ_WATERWHEEL:
-	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("The keeper of the mill announces:", "\"Milord, I have been working very hard to provide you with this gold, come back next week for more.\"", resource);
-		else
-		    Dialog::Message("The keeper of the mill announces:", "\"Milord, I am sorry, there is no gold currently available. Please try again next week.\"", Font::BIG, Dialog::OK);
-	    break;
-	    
-	    case MP2::OBJ_LEANTO:
-	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("You've found an abandoned lean-to.", "Poking about, you discover some resources hidden nearby.", resource);
-		else
-		    Dialog::Message("The lean-to is long abandoned.", "There is nothing of value here.", Font::BIG, Dialog::OK);
-	    break;
-
-    	    case MP2::OBJ_MAGICGARDEN:
-	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.", "In exchange for his freedom, he guides you to a small pot filled with precious things.", resource);
-		else
-		    Dialog::Message("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.", "Perhaps you should try again next week.", Font::BIG, Dialog::OK);
-    	    break;
-
-	    default: break;
-    }
-
-    tile.SetQuantity1(0);
-    tile.SetQuantity2(0);
-
-    if(Settings::Get().Debug()) Error::Verbose("ActionToResource: " + hero.GetName() + " pickup small resource");
-}
-
-void ActionToSkeleton(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-
-    // artifact
-    if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
-    {
-	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-
-	if(hero.PickupArtifact(art))
-	{
-	    PlayPickupSound();
-	    DialogWithArtifact("You come upon the remains of an unfortunate adventurer.", "Searching through the tattered clothing, you find " + Artifact::String(art), art);
-
-	    tile.SetQuantity1(0);
-	    tile.SetQuantity2(0);
-	}
-    }
-    else
-    {
-	PlaySoundVisited;
-	Dialog::Message("You come upon the remains of an unfortunate adventurer.", "Searching through the tattered clothing, you find nothing.", Font::BIG, Dialog::OK);
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("ActionToSkeleton: " + hero.GetName());
-}
-
-void ActionToWagon(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-
-    // artifact
-    if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
-    {
-	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-	if(hero.PickupArtifact(art))
-	{
-	    PlayPickupSound();
-	    DialogWithArtifact("You come across an old wagon left by a trader who didn't quite make it to safe terrain.", "Searching inside, you find the " + Artifact::String(art), art);
-
-	    tile.SetQuantity1(0);
-	}
-    }
-    else
-    if(tile.GetQuantity1() && tile.GetQuantity2())
-    {
-	const u8 count = tile.GetQuantity2();
-	Resource::funds_t resource;
-
-	switch(tile.GetQuantity1())
-	{
-	    case Resource::WOOD:	resource.wood += count; break;
-    	    case Resource::MERCURY:	resource.mercury += count; break;
-    	    case Resource::ORE:		resource.ore += count; break;
-    	    case Resource::SULFUR:	resource.sulfur += count; break;
-    	    case Resource::CRYSTAL:	resource.crystal += count; break;
-    	    case Resource::GEMS:	resource.gems += count; break;
-    	    case Resource::GOLD:	resource.gold += 100 * count; break;
-
-	    default: break;
-	}
-
-	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-
-	PlayPickupSound();
-	Dialog::ResourceInfo("You come across an old wagon left by a trader who didn't quite make it to safe terrain.", "Inside, you find some of the wagon's cargo still intact.", resource);
-
-	tile.SetQuantity1(0);
-	tile.SetQuantity2(0);
-    }
-    else
-    {
-    	PlaySoundVisited;
-	Dialog::Message("You come across an old wagon left by a trader who didn't quite make it to safe terrain.", "Unfortunately, others have found it first, and the wagon is empty.", Font::BIG, Dialog::OK);
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("ActionToWagon: " + hero.GetName());
-}
 
 void ActionToFlotSam(Heroes &hero, const u16 dst_index)
 {
@@ -804,7 +576,7 @@ void ActionToFlotSam(Heroes &hero, const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToFlotSam: " + hero.GetName() + " pickup small resource");
+    if(H2Config::Debug()) Error::Verbose("ActionToFlotSam: " + hero.GetName() + " pickup small resource");
 }
 
 void ActionToShrine(Heroes &hero, const u16 dst_index)
@@ -858,7 +630,7 @@ void ActionToShrine(Heroes &hero, const u16 dst_index)
     hero.SetVisited(dst_index, Visit::GLOBAL);
     Dialog::SpellInfo(spell_name, body, spell);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToShrine: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToShrine: " + hero.GetName());
 }
 
 void ActionToWitchsHut(Heroes &hero, const u16 dst_index)
@@ -890,7 +662,7 @@ void ActionToWitchsHut(Heroes &hero, const u16 dst_index)
 
     Dialog::SkillInfo(skill_name, "An ancient and immortal witch living in a hut with bird's legs for stilts teaches you " + skill_name + " for her own inscrutable purposes.", skill, Skill::Level::BASIC);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToWitchsHut: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToWitchsHut: " + hero.GetName());
 }
 
 void ActionToGoodLuckObject(Heroes &hero, const u16 dst_index)
@@ -935,7 +707,7 @@ void ActionToGoodLuckObject(Heroes &hero, const u16 dst_index)
 	DialogLuck(MP2::StringObject(obj), body_true, true, 1);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToGoodLuckObject: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToGoodLuckObject: " + hero.GetName());
 }
 
 void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
@@ -1019,14 +791,14 @@ void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 	DialogLuck(MP2::StringObject(obj), body, false, 2);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPoorLuckObject: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToPoorLuckObject: " + hero.GetName());
 }
 
 void ActionToSign(Heroes &hero, const u16 dst_index)
 {
     PlaySoundWarning;
     Dialog::Message("Sign", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
-    if(Settings::Get().Debug()) Error::Verbose("ActionToSign: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToSign: " + hero.GetName());
 }
 
 void ActionToMagicWell(Heroes &hero, const u16 dst_index)
@@ -1053,14 +825,14 @@ void ActionToMagicWell(Heroes &hero, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A drink from the well has restored your spell points to maximum.", Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToMagicWell: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToMagicWell: " + hero.GetName());
 }
 
 void ActionToTradingPost(Heroes &hero)
 {
     PlaySoundSuccess;
     Dialog::Marketplace(true);
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTradingPost: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToTradingPost: " + hero.GetName());
 }
 
 void ActionToPrimarySkillObject(Heroes &hero, const u16 dst_index)
@@ -1116,7 +888,7 @@ void ActionToPrimarySkillObject(Heroes &hero, const u16 dst_index)
 	Dialog::SkillInfo(MP2::StringObject(obj), body_true, skill);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPrimarySkillObject: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToPrimarySkillObject: " + hero.GetName());
 }
 
 void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
@@ -1297,7 +1069,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 	DialogMorale(MP2::StringObject(obj), body, false, 1);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPoorMoraleObject: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToPoorMoraleObject: " + hero.GetName());
 }
 
 void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
@@ -1351,7 +1123,7 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
         hero.IncreaseMovePoints(move);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToGoodMoraleObject: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToGoodMoraleObject: " + hero.GetName());
 }
 
 
@@ -1401,7 +1173,7 @@ void ActionToExperienceObject(Heroes &hero, const u16 dst_index)
 	hero.IncreaseExperience(exp);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToExperienceObject: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToExperienceObject: " + hero.GetName());
 }
 
 void ActionToArtifact(Heroes &hero, const u16 dst_index)
@@ -1588,101 +1360,9 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 	tile.SetObject(MP2::OBJ_ZERO);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToArtifact: " + hero.GetName() + " pickup artifact");
+    if(H2Config::Debug()) Error::Verbose("ActionToArtifact: " + hero.GetName() + " pickup artifact");
 }
 
-void ActionToTreasureChest(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
-    resource.gold = tile.GetQuantity2() * 100;
-
-    PlayPickupSound();
-    AnimationRemoveObject(tile);
-
-    // dialog
-    if(Maps::Ground::WATER == tile.GetGround())
-    {
-	std::string message("After spending hours trying to fish the chest out of the sea,");
-
-	if(0 == resource.gold)
-	{
-	    message += " you open it, only to find it empty.";
-	    Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
-	}
-	else
-	if(tile.GetQuantity1())
-	{
-	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-
-	    if(hero.PickupArtifact(art))
-	    {
-		message += " you open it and find ";
-		String::AddInt(message, resource.gold);
-		message += " gold and the " + Artifact::String(art);
-		DialogWithArtifactAndGold("Chest", message, art, resource.gold);
-	    }
-	    else
-	    {
-		resource.gold = 1500;	// it is from FAQ
-		message += " you open it and find ";
-		String::AddInt(message, resource.gold);
-		message += " gold pieces.";
-		DialogWithGold("Chest", message, resource.gold);
-	    }
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-	}
-	else
-	{
-	    message += " you open it and find ";
-	    String::AddInt(message, resource.gold);
-	    message += " gold pieces.";
-	    DialogWithGold("Chest", message, resource.gold);
-
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-	}
-    }
-    else
-    {
-	std::string message("After scouring the area,");
-
-	if(tile.GetQuantity1())
-	{
-	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-	
-	    message += " you fall upon a hidden chest, containing the ancient artifact " + Artifact::String(art);
-
-	    if(hero.PickupArtifact(art))
-	    {
-		DialogWithArtifact("Chest", message, art);
-	    }
-	    else
-	    {
-		resource.gold = 1000;	// it is from FAQ
-		message += " you fall upon a hidden chest, containing the ";
-		String::AddInt(message, resource.gold);
-		message += " gold pieces.";
-		DialogWithGold("Chest", message, resource.gold);
-	    }
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-	}
-	else
-	{
-	    const u16 expr = resource.gold - 500;
-	    message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";
-
-	    if(Dialog::SelectGoldOrExp("Chest", message, resource.gold, expr))
-		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-	    else
-		hero.IncreaseExperience(expr);
-	}
-    }
-
-    tile.RemoveObjectSprite();
-    tile.SetObject(MP2::OBJ_ZERO);
-
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTreasureChest: " + hero.GetName() + " pickup chest");
-}
 
 void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
 {
@@ -1707,7 +1387,7 @@ void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTreasureChest: " + hero.GetName() + " pickup chest");
+    if(H2Config::Debug()) Error::Verbose("ActionToTreasureChest: " + hero.GetName() + " pickup chest");
 }
 
 void ActionToTeleports(Heroes &hero, const u16 index_from)
@@ -1830,10 +1510,10 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+    if(H2Config::Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
 
-/* capture color object */
+//
 void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
@@ -1992,7 +1672,7 @@ void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
     }
 
     if(sf) delete sf;
-    if(Settings::Get().Debug()) Error::Verbose("ActionToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+    if(H2Config::Debug()) Error::Verbose("ActionToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
 
 void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
@@ -2037,7 +1717,7 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
 	Dialog::Message("", "As you approach the dwelling, you notice that there is no one here.", Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingJoinMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    if(H2Config::Debug()) Error::Verbose("ActionToDwellingJoinMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }
 
 void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
@@ -2104,7 +1784,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
 	Dialog::Message(msg_void1, msg_void2, Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingRecruitMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    if(H2Config::Debug()) Error::Verbose("ActionToDwellingRecruitMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }
 
 void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
@@ -2290,7 +1970,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
     	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    if(H2Config::Debug()) Error::Verbose("ActionToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }
 
 void ActionToObservationTower(Heroes &hero, const u16 dst_index)
@@ -2326,7 +2006,7 @@ void ActionToArtesianSpring(Heroes &hero, const u16 dst_index)
 	Dialog::Message(name, "A drink from the spring fills your blood with magic!  You have twice your normal spell points in reserve.", Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToArtesianSpring: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToArtesianSpring: " + hero.GetName());
 }
 
 void ActionToXanadu(Heroes &hero, const u16 dst_index)
@@ -2370,7 +2050,7 @@ void ActionToXanadu(Heroes &hero, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToXanadu: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToXanadu: " + hero.GetName());
 }
 
 void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
@@ -2474,7 +2154,7 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(obj), msg2, Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToUpgradeArmyObject: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToUpgradeArmyObject: " + hero.GetName());
 }
 
 void ActionToMagellanMaps(Heroes &hero, const u16 dst_index)
@@ -2493,7 +2173,7 @@ void ActionToMagellanMaps(Heroes &hero, const u16 dst_index)
 	Game::Focus::Get().Redraw();
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToMagellanMaps: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToMagellanMaps: " + hero.GetName());
 }
 
 void ActionToEvent(Heroes &hero, const u16 dst_index)
@@ -2520,5 +2200,6 @@ void ActionToEvent(Heroes &hero, const u16 dst_index)
 
     world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToEvent: " + hero.GetName());
+    if(H2Config::Debug()) Error::Verbose("ActionToEvent: " + hero.GetName());
 }
+*/
