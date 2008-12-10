@@ -201,6 +201,7 @@ Game::menu_t Game::Editor::StartGame()
 		radar.RedrawCursor();
 		Interface::DrawTopNumberCell();
 		Interface::DrawLeftNumberCell();
+                areaMaps.Redraw();
 		cursor.Show();
 		display.Flip();
 	    }
