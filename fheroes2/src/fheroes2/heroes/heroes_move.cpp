@@ -197,7 +197,7 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
     if(hero.isShipMaster())
         switch(next.GetObject())
         {
-            case MP2::OBJ_TREASURECHEST:
+            case MP2::OBJ_WATERCHEST:
             case MP2::OBJ_SHIPWRECKSURVIROR:
             case MP2::OBJ_FLOTSAM:
             case MP2::OBJ_BOTTLE:

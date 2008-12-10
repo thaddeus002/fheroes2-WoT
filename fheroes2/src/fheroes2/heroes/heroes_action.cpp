@@ -181,7 +181,9 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     {
 	case MP2::OBJ_FLOTSAM:
 	case MP2::OBJ_SHIPWRECKSURVIROR:
-	case MP2::OBJ_BOTTLE:
+        case MP2::OBJ_WATERCHEST:
+	case MP2::OBJ_BOTTLE:	addon = const_cast<Maps::Tiles &>(tile).FindWaterResource(); break;
+
         case MP2::OBJ_TREASURECHEST:
         case MP2::OBJ_ANCIENTLAMP:
 	case MP2::OBJ_RESOURCE:	addon = const_cast<Maps::Tiles &>(tile).FindResource(); break;
@@ -275,6 +277,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_BOTTLE:
         case MP2::OBJ_CAMPFIRE:		ActionToPickupResource(*this, dst_index); break;
 
+        case MP2::OBJ_WATERCHEST:
         case MP2::OBJ_TREASURECHEST:	ActionToTreasureChest(*this, dst_index); break;
         case MP2::OBJ_ANCIENTLAMP:	ActionToAncientLamp(*this, dst_index); break;
         case MP2::OBJ_FLOTSAM:		ActionToFlotSam(*this, dst_index); break;

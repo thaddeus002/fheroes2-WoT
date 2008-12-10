@@ -692,6 +692,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_SKELETON:		return MP2::OBJ_SKELETON;
 	case MP2::OBJ_DAEMONCAVE:	return MP2::OBJ_DAEMONCAVE;
 	case MP2::OBJ_TREASURECHEST:	return MP2::OBJ_TREASURECHEST;
+	case MP2::OBJ_WATERCHEST:	return MP2::OBJ_WATERCHEST;
 	case MP2::OBJ_FAERIERING:	return MP2::OBJ_FAERIERING;
 	case MP2::OBJ_CAMPFIRE:		return MP2::OBJ_CAMPFIRE;
 	case MP2::OBJ_FOUNTAIN:		return MP2::OBJ_FOUNTAIN;
@@ -864,7 +865,6 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 	case MP2::OBJ_UNKNW_62:		return MP2::OBJ_UNKNW_62;
 	case MP2::OBJ_UNKNW_79:		return MP2::OBJ_UNKNW_79;
 	case MP2::OBJ_UNKNW_7A:		return MP2::OBJ_UNKNW_7A;
-	case MP2::OBJ_UNKNW_80:		return MP2::OBJ_UNKNW_80;
 	case MP2::OBJ_UNKNW_91:		return MP2::OBJ_UNKNW_91;
 	case MP2::OBJ_UNKNW_92:		return MP2::OBJ_UNKNW_92;
 	case MP2::OBJ_UNKNW_A1:		return MP2::OBJ_UNKNW_A1;
@@ -954,6 +954,30 @@ bool Maps::Tiles::isStream(void) const
     return addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isStream);
 }
 
+Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // OBJNWATR
+	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && 
+		(0 == addon.index ||	// buttle
+		19 == addon.index ||	// chest
+		45 == addon.index ||	// flotsam
+		111 == addon.index))	// surviror
+				return &addon;
+	}
+    }
+
+    return NULL;
+}
+
 Maps::TilesAddon * Maps::Tiles::FindResource(void)
 {
     if(addons_level1.size())
@@ -970,14 +994,6 @@ Maps::TilesAddon * Maps::Tiles::FindResource(void)
 	    else
 	    // TREASURE
 	    if(ICN::TREASURE == MP2::GetICNObject(addon.object)) return &addon;
-	    else
-	    // OBJNWATR
-	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && 
-		(0 == addon.index ||	// buttle
-		19 == addon.index ||	// chest
-		45 == addon.index ||	// flotsam
-		111 == addon.index))	// surviror
-				return &addon;
 	}
     }
 
@@ -1554,56 +1570,53 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_TREASURECHEST:
-	    if(Maps::Ground::WATER == GetGround())
+	    switch(Rand::Get(1, 10))
 	    {
-		switch(Rand::Get(1, 10))
-		{
-            	    // 70% - 1500 gold
-                    default:
-                	quantity2 = 15;
-            	    break;
-                    // 20% - empty
-                    case 7:
-		    case 8:
-            	    break;
-                    // 10% - 1000 gold + art
-		    case 10:
-                	quantity1 = Artifact::Rand1();
-			quantity2 = 10;
-		    break;
-		}
+            	// 70% - 1500 gold
+                default:
+            	    quantity2 = 15;
+            	break;
+                // 20% - empty
+                case 7:
+		case 8:
+            	break;
+                // 10% - 1000 gold + art
+		case 10:
+            	    quantity1 = Artifact::Rand1();
+		    quantity2 = 10;
+		break;
 	    }
-	    else
+	break;
+
+	case MP2::OBJ_WATERCHEST:
+	    switch(Rand::Get(1, 20))
 	    {
-		switch(Rand::Get(1, 20))
-		{
-		    // 32% - 2000 gold or 1500 exp
-		    default:
-			quantity2 = 20;
-		    break;
-		    // 31% - 1500 gold or 1000 exp
-		    case 2:
-		    case 5:
-		    case 8:
-		    case 11:
-		    case 14:
-		    case 17:
-			quantity2 = 15;
-		    break;
-		    // 31% - 1000 gold or 500 exp
-		    case 3:
-		    case 6:
-		    case 9:
-		    case 12:
-		    case 15:
-		    case 18:
-			quantity2 = 10;
-		    break;
-		    // 10% - art
-		    case 20:
-			quantity1 = Artifact::Rand1();
-		    break;
-		}
+		// 32% - 2000 gold or 1500 exp
+		default:
+		    quantity2 = 20;
+		break;
+		// 31% - 1500 gold or 1000 exp
+		case 2:
+		case 5:
+		case 8:
+		case 11:
+		case 14:
+		case 17:
+		    quantity2 = 15;
+		break;
+		// 31% - 1000 gold or 500 exp
+		case 3:
+		case 6:
+		case 9:
+		case 12:
+		case 15:
+		case 18:
+		    quantity2 = 10;
+		break;
+		// 10% - art
+		case 20:
+		    quantity1 = Artifact::Rand1();
+		break;
 	    }
 	break;
 
@@ -1670,6 +1683,7 @@ bool Maps::Tiles::ValidQuantity(void) const
 	case MP2::OBJ_FLOTSAM:
 	case MP2::OBJ_SHIPWRECKSURVIROR:
 	case MP2::OBJ_TREASURECHEST:
+	case MP2::OBJ_WATERCHEST:
 	case MP2::OBJ_DERELICTSHIP:
 	case MP2::OBJ_SHIPWRECK:
 	case MP2::OBJ_GRAVEYARD:
@@ -1693,10 +1707,11 @@ void Maps::Tiles::RemoveObjectSprite(void)
 	case MP2::OBJ_ARTIFACT:		addon = FindArtifact(); break;
 	case MP2::OBJ_CAMPFIRE:		addon = FindCampFire(); break;
 
+	case MP2::OBJ_WATERCHEST:
 	case MP2::OBJ_BOTTLE:
 	case MP2::OBJ_FLOTSAM:
+	case MP2::OBJ_SHIPWRECKSURVIROR:addon = FindWaterResource(); break;
 
-	case MP2::OBJ_SHIPWRECKSURVIROR:
 	case MP2::OBJ_TREASURECHEST:
 	case MP2::OBJ_ANCIENTLAMP:
 	case MP2::OBJ_RESOURCE:		addon = FindResource(); break;

@@ -480,6 +480,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_BUOY:			return "Buoy";
         case MP2::OBJ_SKELETON:			return "Skeleton";
         case MP2::OBJ_TREASURECHEST:		return "Treasure Chest";
+        case MP2::OBJ_WATERCHEST:		return "Treasure Chest";
         case MP2::OBJ_CAMPFIRE:			return "Camp Fire";
         case MP2::OBJ_FOUNTAIN:			return "Fountain";
         case MP2::OBJ_ANCIENTLAMP:		return "Ancient Lamp";
@@ -590,7 +591,6 @@ const char * MP2::StringObject(u8 object)
 	case MP2::OBJ_UNKNW_62:		return "OBJ_UNKNW_62";
 	case MP2::OBJ_UNKNW_79:		return "OBJ_UNKNW_79";
 	case MP2::OBJ_UNKNW_7A:		return "OBJ_UNKNW_7A";
-	case MP2::OBJ_UNKNW_80:		return "OBJ_UNKNW_80";
 	case MP2::OBJ_UNKNW_91:		return "OBJ_UNKNW_91";
 	case MP2::OBJ_UNKNW_92:		return "OBJ_UNKNW_92";
 	case MP2::OBJ_UNKNW_A1:		return "OBJ_UNKNW_A1";
@@ -624,7 +624,7 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     {
 	switch(obj)
 	{
-    	    case OBJ_TREASURECHEST:
+    	    case OBJ_WATERCHEST:
 	    case OBJ_DERELICTSHIP:
 	    case OBJ_WHIRLPOOL:
 	    case OBJ_BUOY:

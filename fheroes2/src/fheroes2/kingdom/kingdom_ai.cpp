@@ -302,8 +302,7 @@ void Kingdom::AIHeroesTask(void)
 		else
 		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SHIPWRECKSURVIROR, 2 * hero.GetScoute(), index));
 		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_TREASURECHEST, 2 * hero.GetScoute(), index) &&
-		    Maps::Ground::WATER == world.GetTiles(index).GetGround());
+		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WATERCHEST, 2 * hero.GetScoute(), index));
 	    }
 	    else
 	    {
@@ -315,8 +314,7 @@ void Kingdom::AIHeroesTask(void)
 		    !Maps::TileUnderProtection(index));
 		else
 		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_TREASURECHEST, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    Maps::Ground::WATER != world.GetTiles(index).GetGround());
+		    !Maps::TileUnderProtection(index));
 		else
 		// piclup object
 		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WAGON, 2 * hero.GetScoute(), index) &&

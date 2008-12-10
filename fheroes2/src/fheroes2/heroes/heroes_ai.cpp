@@ -46,6 +46,7 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_BOTTLE:
         case MP2::OBJ_CAMPFIRE:         AIToPickupResource(*this, dst_index); break;
 
+        case MP2::OBJ_WATERCHEST:
         case MP2::OBJ_TREASURECHEST:	AIToTreasureChest(*this, dst_index); break;
 
         case MP2::OBJ_MAGICGARDEN:

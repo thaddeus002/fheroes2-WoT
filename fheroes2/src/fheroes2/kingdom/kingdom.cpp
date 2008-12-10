@@ -98,7 +98,7 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
         ai_scan_pickup_resource.push_back(MP2::OBJ_BOTTLE);
 	ai_scan_pickup_resource.push_back(MP2::OBJ_FLOTSAM);
 	ai_scan_pickup_resource.push_back(MP2::OBJ_SHIPWRECKSURVIROR);
-	ai_scan_pickup_resource.push_back(MP2::OBJ_TREASURECHEST);
+	ai_scan_pickup_resource.push_back(MP2::OBJ_WATERCHEST);
     }
 
     if(ai_scan_pickup_resource.empty())

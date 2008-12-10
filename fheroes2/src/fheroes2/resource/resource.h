@@ -37,14 +37,15 @@ namespace Resource
         GOLD	= 0x40,
     } resource_t;
 
-    typedef enum {
-	TREASURECHEST,
-	ANCIENTLAMP,
-	CAMPFIRE,
-	SHIPWRECKSURVIROR,
-	FLOTSAM,
-	BOTTLE,
-    } other_t;
+//    typedef enum {
+//	WATERCHEST,
+//	TREASURECHEST,
+//	ANCIENTLAMP,
+//	CAMPFIRE,
+//	SHIPWRECKSURVIROR,
+//	FLOTSAM,
+//	BOTTLE,
+//    } other_t;
 
     class funds_t
     {

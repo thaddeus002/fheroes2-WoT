@@ -931,7 +931,10 @@ void World::LoadMaps(const std::string &filename)
 		break;
 
             case MP2::OBJ_TREASURECHEST:
-    		tile.UpdateTreasureChestSprite();
+		if(Maps::Ground::WATER == tile.GetGround())
+		    tile.SetObject(MP2::OBJ_WATERCHEST);
+    		else
+		    tile.UpdateTreasureChestSprite();
     		tile.UpdateQuantity();
 		break;
 

@@ -78,6 +78,7 @@ namespace Maps
 	TilesAddon * FindAddonLevel2(u32 uniq2);
 
 	TilesAddon * FindCampFire(void);
+	TilesAddon * FindWaterResource(void);
 	TilesAddon * FindResource(void);
 	TilesAddon * FindRNDResource(void);
 	TilesAddon * FindArtifact(void);

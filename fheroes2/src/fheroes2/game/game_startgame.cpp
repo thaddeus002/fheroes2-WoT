@@ -381,9 +381,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     		    }
     		    break;
 
-    		    case MP2::OBJ_TREASURECHEST:
-			if(Maps::Ground::WATER != tile.GetGround()) return Cursor::POINTER;
-			else
+    		    case MP2::OBJ_WATERCHEST:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
 			    case 0:	return Cursor::POINTER;
@@ -515,8 +513,6 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			break;
 
     		    case MP2::OBJ_TREASURECHEST:
-			if(Maps::Ground::WATER == tile.GetGround()) return Cursor::POINTER;
-			else
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
 			    case 0:	return Cursor::POINTER;
