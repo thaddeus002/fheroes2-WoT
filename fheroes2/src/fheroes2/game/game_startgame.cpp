@@ -1240,6 +1240,10 @@ Game::menu_t Game::HumanTurn(void)
 	    {
 		AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
 		Game::EnvironmentSoundMixer();
+
+                statusWindow.Redraw();
+                selectHeroes.Redraw(&global_focus.GetHeroes());
+                gamearea.Center(global_focus.Center());
 	    }
 
 	    if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();

@@ -734,13 +734,6 @@ bool Heroes::Move(bool fast)
             // move
     	    if(MoveStep())
     	    {
-		if(color == Settings::Get().MyColor())
-		{
-		    Game::StatusWindow::Get().Redraw();
-        	    Game::SelectBarHeroes::Get().Redraw(this);
-		}
-
-		GameArea::Get().Center(mp);
 		return true;
     	    }
 	}

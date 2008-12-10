@@ -164,6 +164,10 @@ private:
     std::vector<Heroes *> heroes;
     Castle *ai_capital;
 
+    static std::vector<u8> ai_scan_pickup_water;
+    static std::vector<u8> ai_scan_pickup_resource;
+    static std::vector<u8> ai_scan_pickup_objects;
+
     std::list<Visit::IndexObject> visit_object;
 };
 

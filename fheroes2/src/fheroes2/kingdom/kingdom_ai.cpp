@@ -222,35 +222,44 @@ void Kingdom::AIHeroesTurns(void)
     {
 	Heroes & hero = **ith1;
 
-	if(0 == Settings::Get().Debug() && !hero.isShow(Settings::Get().MyColor()))
-	    hero.Move(true);
-	else
+	u32 ticket = 0;
+
+	if(hero.isShow(Settings::Get().MyColor()))
 	{
-	    u32 ticket = 0;
 	    Cursor::Get().Hide();
 	    GameArea::Get().Center(hero.GetCenter());
 	    GameArea::Get().Redraw();
 	    Cursor::Get().Show();
 	    Display::Get().Flip();
+	}
 
-	    while(!hero.isFreeman() && hero.isEnableMove())
+	while(1)
+	{
+	    if(hero.isFreeman() || !hero.isEnableMove()) break;
+
+	    if(0 == Settings::Get().Debug() && !hero.isShow(Settings::Get().MyColor()))
+		hero.Move(true);
+	    else
+	    if(Game::ShouldAnimateInfrequent(ticket, 1))
 	    {
-		if(Game::ShouldAnimateInfrequent(ticket, 1))
-		{
-		    Cursor::Get().Hide();
-		    hero.Move();
-		    GameArea::Get().Center(hero.GetCenter());
-		    GameArea::Get().Redraw();
-		    Cursor::Get().Show();
-		    Display::Get().Flip();
-		}
+		Cursor::Get().Hide();
+		hero.Move();
 
-		++ticket;
+    		if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
+
+		GameArea::Get().Center(hero.GetCenter());
+		GameArea::Get().Redraw();
+		Cursor::Get().Show();
+		Display::Get().Flip();
 	    }
 
-	    // 0.2 sec delay for show enemy hero position
-	    DELAY(200);
+	    DELAY(1);
+	    ++ticket;
+
 	}
+
+	// 0.2 sec delay for show enemy hero position
+	DELAY(200);
     }
 }
 
