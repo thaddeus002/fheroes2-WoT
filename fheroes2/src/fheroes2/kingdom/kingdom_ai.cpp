@@ -29,6 +29,7 @@
 #include "world.h"
 #include "settings.h"
 #include "kingdom.h"
+#include "agg.h"
 
 void Kingdom::AITurns(void)
 {
@@ -38,6 +39,8 @@ void Kingdom::AITurns(void)
 	Error::Verbose("Kingdom::AITurns: " + Color::String(color) + "Loss!");
 	return;
     }
+    
+    AGG::PlayMusic(MUS::COMPUTER);
 
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();

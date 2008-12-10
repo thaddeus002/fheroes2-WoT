@@ -156,6 +156,7 @@ Game::menu_t Game::StartGame(void)
 
 		radar.HideArea();
 		world.ClearFog(color);
+                Mixer::PauseLoops();
 
 		switch(kingdom.Control())
 		{
