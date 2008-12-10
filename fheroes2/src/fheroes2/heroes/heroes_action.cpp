@@ -1649,7 +1649,7 @@ void ActionToTreasureChest(Heroes &hero, const u16 dst_index)
     {
 	std::string message("After scouring the area,");
 
-	if(0 == resource.gold)
+	if(500 > resource.gold)
 	{
 	    message += " you open it, only to find it empty.";
 	    Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
