@@ -20,7 +20,7 @@
 
 #include "game.h"
 #include "cursor.h"
-#include "display.h"
+#include "engine.h"
 #include "gamearea.h"
 #include "game_statuswindow.h"
 #include "radar.h"
@@ -236,7 +236,7 @@ void Kingdom::AIHeroesTurns(void)
 	    Display::Get().Flip();
 	}
 
-	while(1)
+	while(LocalEvent::GetLocalEvent().HandleEvents())
 	{
 	    if(hero.isFreeman() || !hero.isEnableMove()) break;
 
@@ -256,9 +256,7 @@ void Kingdom::AIHeroesTurns(void)
 		Display::Get().Flip();
 	    }
 
-	    DELAY(1);
 	    ++ticket;
-
 	}
 
 	// 0.2 sec delay for show enemy hero position
@@ -378,10 +376,10 @@ void Kingdom::AIHeroesTask(void)
 	{
 	}
 
-	if(MAXU16 != index) hero.GetPath().Calculate(index);
+        if(MAXU16 != index && hero.GetPath().Calculate(index) && 1 < Settings::Get().Debug()) hero.GetPath().Dump();
 
-	//
-	hero.SetMove(true);
+        //
+        if(hero.GetPath().isValid()) hero.SetMove(true);
     }
 }
 

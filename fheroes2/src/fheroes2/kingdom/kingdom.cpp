@@ -29,10 +29,6 @@
 #include "world.h"
 #include "kingdom.h"
 
-std::vector<u8> Kingdom::ai_scan_pickup_water = std::vector<u8>();
-std::vector<u8> Kingdom::ai_scan_pickup_resource = std::vector<u8>();
-std::vector<u8> Kingdom::ai_scan_pickup_objects = std::vector<u8>();
-
 Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), ai_capital(NULL)
 {
     // set play
@@ -90,35 +86,6 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
 
     heroes.reserve(KINGDOMMAXHEROES);
     castles.reserve(15);
-
-    // init static vector
-    if(ai_scan_pickup_water.empty())
-    {
-	ai_scan_pickup_resource.reserve(4);
-        ai_scan_pickup_resource.push_back(MP2::OBJ_BOTTLE);
-	ai_scan_pickup_resource.push_back(MP2::OBJ_FLOTSAM);
-	ai_scan_pickup_resource.push_back(MP2::OBJ_SHIPWRECKSURVIROR);
-	ai_scan_pickup_resource.push_back(MP2::OBJ_WATERCHEST);
-    }
-
-    if(ai_scan_pickup_resource.empty())
-    {
-	ai_scan_pickup_resource.reserve(3);
-	ai_scan_pickup_resource.push_back(MP2::OBJ_TREASURECHEST);
-	ai_scan_pickup_resource.push_back(MP2::OBJ_RESOURCE);
-	ai_scan_pickup_resource.push_back(MP2::OBJ_CAMPFIRE);
-    }
-
-    if(ai_scan_pickup_objects.empty())
-    {
-	ai_scan_pickup_objects.reserve(6);
-	ai_scan_pickup_objects.push_back(MP2::OBJ_WAGON);
-	ai_scan_pickup_objects.push_back(MP2::OBJ_WATERWHEEL);
-	ai_scan_pickup_objects.push_back(MP2::OBJ_WINDMILL);
-	ai_scan_pickup_objects.push_back(MP2::OBJ_LEANTO);
-	ai_scan_pickup_objects.push_back(MP2::OBJ_MAGICGARDEN);
-	ai_scan_pickup_objects.push_back(MP2::OBJ_SKELETON);
-    }
 }
 
 void Kingdom::SetModes(flags_t f)

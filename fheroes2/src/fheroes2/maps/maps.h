@@ -69,8 +69,7 @@ namespace Maps
     u16 GetMaxGroundAround(const u16 center);
 
     bool ScanAroundObject(const u16 center, const u8 obj, bool full, u16 & res);
-    bool ScanDistanceObject(const u16 center, const u8 obj, const u8 dist, u16 & res);
-    bool ScanDistanceObjects(const u16 center, const std::vector<u8> & objs, const u8 dist, u16 & res);
+    bool ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 & res);
 
     bool TileUnderProtection(const u16 index);
     bool TileUnderProtection(const u16 index, u16 & res);

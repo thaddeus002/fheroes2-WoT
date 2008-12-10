@@ -38,7 +38,7 @@ namespace Skill
 
     namespace Level
     {
-	typedef enum { NONE, BASIC, ADVANCED, EXPERT } type_t;
+	typedef enum { NONE=0, BASIC=1, ADVANCED=2, EXPERT=3 } type_t;
 	
 	type_t FromMP2(const u8 byte);
 

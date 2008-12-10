@@ -236,6 +236,8 @@ u16 Route::Path::GetAllowStep(void) const
 
 void Route::Path::Dump(void) const
 {
+    std::cout << "Path::Dump: from: " << hero.GetIndex() << ", to: " << dst << ", obj: " << MP2::StringObject(world.GetTiles(dst).GetObject()) << std::endl;
+
     const_iterator it1 = begin();
     const_iterator it2 = end();
 

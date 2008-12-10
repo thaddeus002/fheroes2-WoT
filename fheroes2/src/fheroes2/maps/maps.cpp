@@ -269,47 +269,29 @@ bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, u16 & res
     return false;
 }
 
-bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u8 dist, u16 & res)
+bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 & res)
 {
+    const s16 cx = center % world.w();
+    const s16 cy = center / world.w();
+
     // from center to abroad
-    for(u8 ii = 1; ii <= dist; ++ii)
+    for(u16 ii = 1; ii <= dist; ++ii)
     {
-	const s16 tx = center % world.w() - ii;
-	const s16 ty = center / world.w() - ii;
-	
-	for(s16 cy = ty; cy <= ty + 2 * dist; ++cy)
-	    for(s16 cx = tx; cx <= tx + 2 * dist; ++cx)
+	const s16 tx = cx - ii;
+	const s16 ty = cy - ii;
+
+	const s16 mx = tx + 2 * dist;
+	const s16 my = ty + 2 * dist;
+
+	for(s16 iy = ty; iy < my + 1; ++iy)
+	    for(s16 ix = tx; ix < mx + 1; ++ix)
 	{
-            if(cy > ty && cy < ty + 2 * dist && cx > tx && cx < tx + 2 * dist) continue;
+	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
-	    res = GetIndexFromAbsPoint(cx, cy);
+	    res = GetIndexFromAbsPoint(ix, iy);
 
-	    if(isValidAbsPoint(cx, cy) &&
+	    if(isValidAbsPoint(ix, iy) &&
 		obj == world.GetTiles(res).GetObject()) return true;
-	}
-    }
-
-    res = MAXU16;
-    return false;
-}
-
-bool Maps::ScanDistanceObjects(const u16 center, const std::vector<u8> & objs, const u8 dist, u16 & res)
-{
-    // from center to abroad
-    for(u8 ii = 1; ii <= dist; ++ii)
-    {
-	const s16 tx = center % world.w() - ii;
-	const s16 ty = center / world.w() - ii;
-	
-	for(s16 cy = ty; cy <= ty + 2 * dist; ++cy)
-	    for(s16 cx = tx; cx <= tx + 2 * dist; ++cx)
-	{
-            if(cy > ty && cy < ty + 2 * dist && cx > tx && cx < tx + 2 * dist) continue;
-
-	    res = GetIndexFromAbsPoint(cx, cy);
-
-	    if(isValidAbsPoint(cx, cy) &&
-		objs.end() != std::find(objs.begin(), objs.end(), world.GetTiles(res).GetObject())) return true;
 	}
     }
 
