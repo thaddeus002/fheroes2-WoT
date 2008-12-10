@@ -48,11 +48,12 @@
 #define COLOR_PURPLE	0x87
 #define COLOR_GRAY	0x10
 
-u32 GetPaletteIndexFromColor(const u8 color);
 u32 GetPaletteIndexFromGround(const u16 ground);
 
 /* constructor */
-Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL)
+Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL),
+    sf_blue(NULL), sf_green(NULL), sf_red(NULL), sf_yellow(NULL),
+    sf_orange(NULL), sf_purple(NULL), sf_gray(NULL), sf_black(NULL)
 {
 }
 
@@ -61,6 +62,14 @@ Radar::~Radar()
     if(cursor) delete cursor;
     if(spriteArea) delete spriteArea;
     if(spriteCursor) delete spriteCursor;
+    if(sf_blue) delete sf_blue;
+    if(sf_green) delete sf_green;
+    if(sf_red) delete sf_red;
+    if(sf_yellow) delete sf_yellow;
+    if(sf_orange) delete sf_orange;
+    if(sf_purple) delete sf_purple;
+    if(sf_gray) delete sf_gray;
+    if(sf_black) delete sf_black;
 }
 
 /* construct gui */
@@ -71,11 +80,38 @@ void Radar::Build(void)
     if(cursor) delete cursor;
     if(spriteArea) delete spriteArea;
     if(spriteCursor) delete spriteCursor;
+    if(sf_blue) delete sf_blue;
+    if(sf_green) delete sf_green;
+    if(sf_red) delete sf_red;
+    if(sf_yellow) delete sf_yellow;
+    if(sf_orange) delete sf_orange;
+    if(sf_purple) delete sf_purple;
+    if(sf_gray) delete sf_gray;
+    if(sf_black) delete sf_black;
 
     spriteArea = new Surface(RADARWIDTH, RADARWIDTH);
     spriteCursor = new Surface(static_cast<u16>(GameArea::w() * (RADARWIDTH / static_cast<float>(world.w()))),
                 	static_cast<u16>(GameArea::h() * (RADARWIDTH / static_cast<float>(world.h()))));
     cursor = new SpriteCursor(*spriteCursor, pos.x, pos.y);
+
+    const u8 x = world.w() == Maps::SMALL ? 4 : 2;
+    sf_blue = new Surface(x, x);
+    sf_green = new Surface(x, x);
+    sf_red = new Surface(x, x);
+    sf_yellow = new Surface(x, x);
+    sf_orange = new Surface(x, x);
+    sf_purple = new Surface(x, x);
+    sf_gray = new Surface(x, x);
+    sf_black = new Surface(x, x);
+
+    sf_blue->Fill(AGG::GetColor(COLOR_BLUE));
+    sf_green->Fill(AGG::GetColor(COLOR_GREEN));
+    sf_red->Fill(AGG::GetColor(COLOR_RED));
+    sf_yellow->Fill(AGG::GetColor(COLOR_YELLOW));
+    sf_orange->Fill(AGG::GetColor(COLOR_ORANGE));
+    sf_purple->Fill(AGG::GetColor(COLOR_PURPLE));
+    sf_gray->Fill(AGG::GetColor(COLOR_GRAY));
+    sf_black->Fill(0);
 
     Generate();
     Cursor::DrawCursor(*spriteCursor, RADARCOLOR);
@@ -94,7 +130,8 @@ void Radar::Generate(void)
     const u16 world_w = world.w();
     const u16 world_h = world.h();
 
-    Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2);
+    const u8 x = world.w() == Maps::SMALL ? 4 : 2;
+    Surface tile_surface(x, x);
 
     for(u16 index = 0; index < world_w * world_h; ++index)
     {
@@ -128,7 +165,7 @@ void Radar::RedrawArea(const u8 color)
 
     const u16 world_w = world.w();
     const u16 world_h = world.h();
-    Surface tile_surface(Maps::SMALL ? 4 : 2, Maps::SMALL ? 4 : 2);
+    const Surface *tile_surface = NULL;
 
     cursor->Hide();
     display.Blit(*spriteArea, pos.x, pos.y);
@@ -138,14 +175,14 @@ void Radar::RedrawArea(const u8 color)
 	const Maps::Tiles & tile = world.GetTiles(index);
 
 	if(!Settings::Get().Debug() && tile.isFog(color))
-	    tile_surface.Fill(0);
+	    tile_surface = sf_black;
 	else
 	    switch(tile.GetObject())
 	    {
 		case MP2::OBJ_HEROES:
 		{
 		    const Heroes *hero = world.GetHeroes(index);
-		    if(hero) tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(hero->GetColor())));
+		    if(hero) tile_surface = GetSurfaceFromColor(hero->GetColor());
 		}
 		break;
 
@@ -153,7 +190,7 @@ void Radar::RedrawArea(const u8 color)
 		case MP2::OBJN_CASTLE:
 		{
 		    const Castle *castle = world.GetCastle(index);
-		    if(castle) tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(castle->GetColor())));
+		    if(castle) tile_surface = GetSurfaceFromColor(castle->GetColor());
 		}
 		break;
 
@@ -167,15 +204,18 @@ void Radar::RedrawArea(const u8 color)
 		//case MP2::OBJN_MINES:
 		case MP2::OBJ_SAWMILL:
 		//case MP2::OBJN_SAWMILL:
-		    tile_surface.Fill(AGG::GetColor(GetPaletteIndexFromColor(world.ColorCapturedObject(index)))); break;
+		    tile_surface = GetSurfaceFromColor(world.ColorCapturedObject(index)); break;
 
 		default: continue;
 	    }
 
-	float dstx = (index % world_w) * RADARWIDTH / world_w;
-	float dsty = (index / world_h) * RADARWIDTH / world_w;
+	if(tile_surface)
+	{
+	    float dstx = (index % world_w) * RADARWIDTH / world_w;
+	    float dsty = (index / world_h) * RADARWIDTH / world_w;
 
-	display.Blit(tile_surface, pos.x + static_cast<u16>(dstx), pos.y + static_cast<u16>(dsty));
+	    display.Blit(*tile_surface, pos.x + static_cast<u16>(dstx), pos.y + static_cast<u16>(dsty));
+	}
     }
 }
 
@@ -188,21 +228,21 @@ void Radar::RedrawCursor(void)
     cursor->Show();
 }
 
-u32 GetPaletteIndexFromColor(const u8 color)
+Surface *Radar::GetSurfaceFromColor(const u8 color)
 {
     switch(color)
     {
-	case Color::BLUE:	return (COLOR_BLUE);
-	case Color::GREEN:	return (COLOR_GREEN);
-	case Color::RED:	return (COLOR_RED);
-	case Color::YELLOW:	return (COLOR_YELLOW);
-	case Color::ORANGE:	return (COLOR_ORANGE);
-	case Color::PURPLE:	return (COLOR_PURPLE);
-	case Color::GRAY:	return (COLOR_GRAY);
+	case Color::BLUE:	return sf_blue;
+	case Color::GREEN:	return sf_green;
+	case Color::RED:	return sf_red;
+	case Color::YELLOW:	return sf_yellow;
+	case Color::ORANGE:	return sf_orange;
+	case Color::PURPLE:	return sf_purple;
+	case Color::GRAY:	return sf_gray;
 	default:		break;
     }
 
-    return 0;
+    return NULL;
 }
 
 u32 GetPaletteIndexFromGround(const u16 ground)

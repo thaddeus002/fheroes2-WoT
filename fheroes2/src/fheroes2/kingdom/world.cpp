@@ -591,7 +591,8 @@ void World::LoadMaps(const std::string &filename)
 		if(H2Config::Debug()) Error::Verbose("maps index: ", cx + cy * w());
 		break;
 	}
-
+	// preload in to capture objects cache
+	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_CASTLE, Color::GRAY);
     }
 
     if(H2Config::Debug()) Error::Verbose("World::World: read coord castles, tellg: ", fd.tellg());
@@ -611,16 +612,38 @@ void World::LoadMaps(const std::string &filename)
 
 	switch(id)
 	{
-	    case 0x00: break; // mines: wood
-	    case 0x01: break; // mines: mercury
- 	    case 0x02: break; // mines: ore
-	    case 0x03: break; // mines: sulfur
-	    case 0x04: break; // mines: crystal
-	    case 0x05: break; // mines: gems
-	    case 0x06: break; // mines: gold
-	    case 0x64: break; // lighthouse
-	    case 0x65: break; // dragon city
-	    case 0x67: break; // abandoned mines
+	    // mines: wood
+	    case 0x00:
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_SAWMILL, Color::GRAY);
+		break; 
+	    // mines: mercury
+	    case 0x01:
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_ALCHEMYLAB, Color::GRAY);
+		break;
+	    // mines: ore
+ 	    case 0x02:
+	    // mines: sulfur
+	    case 0x03:
+	    // mines: crystal
+	    case 0x04:
+	    // mines: gems
+	    case 0x05:
+	    // mines: gold
+	    case 0x06:
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_MINES, Color::GRAY);
+		break; 
+	    // lighthouse
+	    case 0x64:
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_LIGHTHOUSE, Color::GRAY);
+		break; 
+	    // dragon city
+	    case 0x65:
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_DRAGONCITY, Color::GRAY);
+		break; 
+	    // abandoned mines
+	    case 0x67:
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_ABANDONEDMINE, Color::GRAY);
+		break; 
 	    default:
 		Error::Warning("World::World: kingdom block, unknown id: ", id);
 		if(H2Config::Debug()) Error::Verbose("maps index: ", cx + cy * w());
@@ -711,6 +734,7 @@ void World::LoadMaps(const std::string &filename)
 			{
 			    castle->LoadFromMP2(pblock);
 			    Maps::MinimizeAreaForCastle(castle->GetCenter());
+			    map_captureobj[tile.GetIndex()].second = castle->GetColor();
 			}
 			else
 			Error::Warning("World::World: load castle: not found, index: ", *it_index);
@@ -728,6 +752,7 @@ void World::LoadMaps(const std::string &filename)
 			    castle->LoadFromMP2(pblock);
 			    Maps::UpdateRNDSpriteForCastle(castle->GetCenter(), castle->GetRace(), castle->isCastle());
 			    Maps::MinimizeAreaForCastle(castle->GetCenter());
+			    map_captureobj[tile.GetIndex()].second = castle->GetColor();
 			}
 			else
 			Error::Warning("World::World: load castle: not found, index: ", *it_index);

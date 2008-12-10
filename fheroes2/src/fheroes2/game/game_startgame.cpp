@@ -1254,6 +1254,7 @@ Game::menu_t Game::HumanTurn(void)
 	    if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
 
 	    gamearea.Redraw();
+            radar.RedrawArea(conf.MyColor());
             radar.RedrawCursor();
             cursor.Show();
             display.Flip();

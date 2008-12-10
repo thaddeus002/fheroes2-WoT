@@ -37,12 +37,22 @@ public:
     void RedrawCursor(void);
 
 private:
+    Surface *GetSurfaceFromColor(const u8);
     Radar();
 
     Rect pos;
     Surface *spriteArea;
     Surface *spriteCursor;
     SpriteCursor *cursor;
+
+    Surface* sf_blue;
+    Surface* sf_green;
+    Surface* sf_red;
+    Surface* sf_yellow;
+    Surface* sf_orange;
+    Surface* sf_purple;
+    Surface* sf_gray;
+    Surface* sf_black;
 };
 
 #endif

@@ -34,6 +34,7 @@
 class Heroes;
 class Castle;
 class Kingdom;
+class Radar;
 
 namespace GameEvent
 {
@@ -141,6 +142,7 @@ private:
     void FreeOldMaps(void);
 
 private:
+    friend class Radar;
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;
     std::vector<GameEvent::Day *>       vec_eventsday;
