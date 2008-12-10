@@ -1,16 +1,32 @@
-SVN
+SVN - up to r692
 
 Users
 
 + Heroes now level up and learn new skills based on race tables from HoMM II
   (afletdinov)
++ Wide monsters in battle now properly reflect in place, fixing a number of
+  overlapping troop bugs (revvy)
++ Animation speed on the main adventure screen can now be controlled from the
+  settings panel in game (afletdinov)
++ Added animations for previously static objects (stone liths, treasure chests,
+  fountains) (afletdinov)
++ Added rudimentary AI for castle building, recruiting troops and controlling
+  heroes (afletdinov)
++ Stopped end turn confirmation dialog from appearing when all heroes cannot
+  move any further along their paths, but still have movement points remaining
+  (revvy)
++ Added music to Barbarian castle (afletdinov)
++ Tiles surrounding a monster on the adventure screen now show the battle
+  mouse cursor (afletdinov)
 
 Developers
 
 + Army::Troops has been split into Army::Troop (for storing monster type, total
   number, and primary skill) and Army::BattleTroop, which holds information
   about animation, hit points, and position. (revvy)
-+ Renamed uses of HighestTroop to FastestTroop (revvy)
-+ Introduced army_types.h, spell_types.h, and audio_interface.h for inclusion
-  by headers to reduce uneeded dependencies. (revvy)
-+ Moved all SDL dependencies out of header files to reduce build times. (revvy)
++ Fixed a couple endian issues, so fheroes2 should theoretically work perfectly
+  on MacOS (revvy, afletdinov)
+
+November 20, 2008 - Development build r571
+
++ Everything!

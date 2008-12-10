@@ -18,4 +18,3 @@ endif
 
 clean:
 	$(MAKE) -C src clean
-	@rm -f lang/$(TARGET).pot
