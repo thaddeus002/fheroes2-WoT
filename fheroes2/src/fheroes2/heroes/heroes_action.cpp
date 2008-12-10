@@ -1649,12 +1649,6 @@ void ActionToTreasureChest(Heroes &hero, const u16 dst_index)
     {
 	std::string message("After scouring the area,");
 
-	if(500 > resource.gold)
-	{
-	    message += " you open it, only to find it empty.";
-	    Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
-	}
-	else
 	if(tile.GetQuantity1())
 	{
 	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
@@ -1676,6 +1670,7 @@ void ActionToTreasureChest(Heroes &hero, const u16 dst_index)
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
+	if(resource.gold >= 500)
 	{
 	    const u16 expr = resource.gold - 500;
 	    message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";

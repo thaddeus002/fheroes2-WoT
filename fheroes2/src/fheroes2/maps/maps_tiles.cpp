@@ -1569,7 +1569,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    quantity2 = 0;
 	break;
 
-	case MP2::OBJ_TREASURECHEST:
+	case MP2::OBJ_WATERCHEST:
 	    switch(Rand::Get(1, 10))
 	    {
             	// 70% - 1500 gold
@@ -1588,7 +1588,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    }
 	break;
 
-	case MP2::OBJ_WATERCHEST:
+	case MP2::OBJ_TREASURECHEST:
 	    switch(Rand::Get(1, 20))
 	    {
 		// 32% - 2000 gold or 1500 exp

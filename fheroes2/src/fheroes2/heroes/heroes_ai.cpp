@@ -28,6 +28,8 @@ void AIToTreasureChest(Heroes &hero, const u16 dst_index);
 void AIToResource(Heroes &hero, const u16 dst_index);
 void AIToWagon(Heroes &hero, const u16 dst_index);
 void AIToSkeleton(Heroes &hero, const u16 dst_index);
+void AIToCaptureObject(Heroes &hero, const u16 dst_index);
+void AIToFlotSam(Heroes &hero, const u16 dst_index);
 
 void Heroes::AIUpdateRoles(void)
 {
@@ -56,6 +58,12 @@ void Heroes::AIAction(const u16 dst_index)
 
         case MP2::OBJ_WAGON:		AIToWagon(*this, dst_index); break;
         case MP2::OBJ_SKELETON:		AIToSkeleton(*this, dst_index); break;
+        case MP2::OBJ_FLOTSAM:		AIToFlotSam(*this, dst_index); break;
+
+	case MP2::OBJ_ALCHEMYLAB:
+        case MP2::OBJ_MINES:
+	case MP2::OBJ_SAWMILL:
+        case MP2::OBJ_LIGHTHOUSE:	AIToCaptureObject(*this, dst_index); break;
 
 	default:
 	    Error::Verbose("AI::Action: Hero " + GetName() + " say: I'm stupid, help my please..");
@@ -82,7 +90,6 @@ void AIToPickupResource(Heroes &hero, const u16 dst_index)
         default: break;
     }
 
-    //if(hero.isShow()) AnimationRemoveObject(tile);
     world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     tile.RemoveObjectSprite();
 
@@ -95,8 +102,6 @@ void AIToTreasureChest(Heroes &hero, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     Resource::funds_t resource;
     resource.gold = tile.GetQuantity2() * 100;
-
-    //if(hero.isShow()) AnimationRemoveObject(tile);
 
     if(Maps::Ground::WATER == tile.GetGround())
     {
@@ -222,6 +227,63 @@ void AIToWagon(Heroes &hero, const u16 dst_index)
     if(H2Config::Debug()) Error::Verbose("AIToWagon: " + hero.GetName());
 }
 
+void AIToCaptureObject(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+    Resource::resource_t res = Resource::UNKNOWN;
+
+    switch(obj)
+    {
+	case MP2::OBJ_ALCHEMYLAB:	res = Resource::MERCURY; break;
+	case MP2::OBJ_SAWMILL:		res = Resource::WOOD; break;
+        case MP2::OBJ_MINES:
+    	{
+    	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
+            // ore
+            if(0 == taddon->index)	res = Resource::ORE;
+            else
+            // sulfur
+            if(1 == taddon->index)	res = Resource::SULFUR;
+            else
+            // crystal
+            if(2 == taddon->index)	res = Resource::CRYSTAL;
+            else
+            // gems
+            if(3 == taddon->index)	res = Resource::GEMS;
+            else
+            // gold
+            if(4 == taddon->index)	res = Resource::GOLD;
+    	}
+    	break;
+        default: break;
+    }
+
+    // capture object
+    if(hero.GetColor() != world.ColorCapturedObject(dst_index))
+    {
+	world.CaptureObject(dst_index, hero.GetColor());
+	world.GetTiles(dst_index).CaptureFlags32(obj, hero.GetColor());
+    }
+    if(H2Config::Debug()) Error::Verbose("AIToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+}
+
+void AIToFlotSam(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    Resource::funds_t resource;
+
+    resource.gold += 100 * tile.GetQuantity1();
+    resource.wood += tile.GetQuantity2();
+
+    if(resource.GetValidItems()) world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+
+    tile.RemoveObjectSprite();
+    tile.SetObject(MP2::OBJ_ZERO);
+
+    if(H2Config::Debug()) Error::Verbose("AIToFlotSam: " + hero.GetName() + " pickup small resource");
+}
+
 /*
 // action to next cell
 void Heroes::Action(const u16 dst_index)
@@ -248,7 +310,6 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_CAMPFIRE:		ActionToPickupResource(*this, dst_index); break;
 
         case MP2::OBJ_ANCIENTLAMP:	ActionToAncientLamp(*this, dst_index); break;
-        case MP2::OBJ_FLOTSAM:		ActionToFlotSam(*this, dst_index); break;
 
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_ARTIFACT: 	ActionToArtifact(*this, dst_index); break;
@@ -302,10 +363,6 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_MAGELLANMAPS:	ActionToMagellanMaps(*this, dst_index); break;
 
 	// capture color object
-	case MP2::OBJ_ALCHEMYLAB:
-        case MP2::OBJ_MINES:
-	case MP2::OBJ_SAWMILL:
-        case MP2::OBJ_LIGHTHOUSE:	ActionToCaptureObject(*this, dst_index); break;
 
         case MP2::OBJ_ABANDONEDMINE:	ActionToAbandoneMine(*this, dst_index); break;
 
@@ -548,43 +605,6 @@ void ActionToCoast(Heroes &hero, const u16 dst_index)
 
 
 
-void ActionToFlotSam(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    std::string body;
-    Resource::funds_t resource;
-
-    resource.gold += 100 * tile.GetQuantity1();
-    resource.wood += tile.GetQuantity2();
-
-    if(resource.gold && resource.wood)
-	body = "You search through the flotsam, and find some wood and some gold.";
-    else
-    if(resource.wood)
-	body = "You search through the flotsam, and find some wood.";
-    else
-    if(resource.gold)
-        body = "You search through the flotsam, and find some gold.";
-    else
-	body = "You search through the flotsam, but find nothing.";
-
-    PlayPickupSound();
-    AnimationRemoveObject(tile);
-
-
-    if(resource.GetValidItems())
-    {
-	Dialog::ResourceInfo(MP2::StringObject(tile.GetObject()), body, resource);
-	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-    }
-    else
-	Dialog::Message(MP2::StringObject(tile.GetObject()), body, Font::BIG, Dialog::OK);
-
-    tile.RemoveObjectSprite();
-    tile.SetObject(MP2::OBJ_ZERO);
-
-    if(H2Config::Debug()) Error::Verbose("ActionToFlotSam: " + hero.GetName() + " pickup small resource");
-}
 
 void ActionToShrine(Heroes &hero, const u16 dst_index)
 {
@@ -1521,166 +1541,6 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 }
 
 //
-void ActionToCaptureObject(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t obj = tile.GetObject();
-
-    std::string header;
-    std::string body;
-
-    Resource::resource_t res = Resource::UNKNOWN;
-    Surface *sf = NULL;
-
-    switch(obj)
-    {
-	case MP2::OBJ_ALCHEMYLAB:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
-
-	    sf = new Surface(sprite.w(), sprite.h() + 14);
-	    sf->SetColorKey();
-	    sf->Blit(sprite);
-	    body = "1 / day";
-    	    Text text(body, Font::SMALL);
-    	    text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
-
-	    res = Resource::MERCURY;
-	    header = MP2::StringObject(obj);
-	    body = "You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.";
-	}
-	    break;
-        case MP2::OBJ_MINES:
-    	{
-    	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
-
-            // ore
-            if(0 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-		body = "2 / day";
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf); // Here is pink fringing, becose letter sprite use shadow. Wiil fix later...
-
-        	res = Resource::ORE;
-        	header = "Ore Mine";
-        	body = "You gain control of an ore mine. It will provide you with two units of ore per day.";
-            }
-            else
-            // sulfur
-            if(1 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-		body = "1 / day";
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
-
-        	res = Resource::SULFUR;
-        	header = "Sulfur Mine";
-		body = "You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.";
-            }
-            else
-            // crystal
-            if(2 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-		body = "1 / day";
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
-
-        	res = Resource::CRYSTAL;
-        	header = "Crystal Mine";
-		body = "You gain control of a crystal mine. It will provide you with one unit of crystal per day.";
-            }
-            else
-            // gems
-            if(3 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-		body = "1 / day";
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
-
-        	res = Resource::GEMS;
-        	header = "Gems Mine";
-		body = "You gain control of a gem mine. It will provide you with one unit of gems per day.";
-            }
-            else
-            // gold
-            if(4 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-		body = "1000 / day";
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
-
-        	res = Resource::GOLD;
-        	header = "Gold Mine";
-		body = "You gain control of a gold mine. It will provide you with 1000 gold per day.";
-            }
-    	}
-    	    break;
-	case MP2::OBJ_SAWMILL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
-
-	    sf = new Surface(sprite.w(), sprite.h() + 12);
-	    sf->SetColorKey();
-	    sf->Blit(sprite);
-	    body = "2 / day";
-    	    Text text(body, Font::SMALL);
-    	    text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
-
-    	    res = Resource::WOOD;
-	    header = MP2::StringObject(obj);
-	    body = "You gain control of a sawmill. It will provide you with two units of wood per day.";
-	}
-	    break;
-
-        case MP2::OBJ_LIGHTHOUSE:
-	    header = MP2::StringObject(obj);
-    	    body = "The lighthouse is now under your control, and all of your ships will now move further each turn.";
-	    break;
-
-        default:
-    	    Error::Warning("ActionToCaptureObject: unknown captured: " + std::string(MP2::StringObject(obj)));
-    	    return;
-    }
-
-    // capture object
-    if(hero.GetColor() != world.ColorCapturedObject(dst_index))
-    {
-	PlaySoundSuccess;
-	world.CaptureObject(dst_index, hero.GetColor());
-	world.GetTiles(dst_index).CaptureFlags32(obj, hero.GetColor());
-
-	if(sf) Dialog::SpriteInfo(header, body, *sf);
-	else Dialog::Message(header, body, Font::BIG, Dialog::OK);
-    }
-
-    if(sf) delete sf;
-    if(H2Config::Debug()) Error::Verbose("ActionToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
-}
 
 void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
 {
