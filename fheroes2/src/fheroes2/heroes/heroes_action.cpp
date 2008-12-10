@@ -1699,20 +1699,25 @@ void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
     const u32 count = tile.GetCountMonster();
 
     PlaySoundSuccess;
-    if(Dialog::YES == Dialog::Message("You stumble upon a dented and tarnished lamp lodged deep in the earth.", "Do you wish to rub the lamp?", Font::BIG, Dialog::YES|Dialog::NO))
+    if(Dialog::YES == Dialog::Message(MP2::StringObject(tile.GetObject()), "You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?", Font::BIG, Dialog::YES|Dialog::NO))
     {
-	PlayPickupSound();
-
 	const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
-	if(!hero.GetArmy().JoinTroop(Monster::GENIE, recruit))
-	    Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
-	else
 	if(recruit)
 	{
-	    AnimationRemoveObject(tile);
-	    tile.SetCountMonster(0);
-	    tile.RemoveObjectSprite();
-	    tile.SetObject(MP2::OBJ_ZERO);
+	    if(hero.GetArmy().JoinTroop(Monster::GENIE, recruit))
+	    {
+		if(recruit == count)
+		{
+		    AnimationRemoveObject(tile);
+		    tile.SetCountMonster(0);
+		    tile.RemoveObjectSprite();
+		    tile.SetObject(MP2::OBJ_ZERO);
+		}
+		else
+		    tile.SetCountMonster(count - recruit);
+	    }
+	    else
+		Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 	}
     }
 

@@ -1057,13 +1057,13 @@ void Heroes::ActionNewDay(void)
     }
 
     // remove day visit object
-    visit_object.remove_if(Visit::IndexObject::isDayLife);
+    visit_object.remove_if(Visit::isDayLife);
 }
 
 void Heroes::ActionNewWeek(void)
 {
     // remove week visit object
-    visit_object.remove_if(Visit::IndexObject::isWeekLife);
+    visit_object.remove_if(Visit::isWeekLife);
     
     // fix artesian spring effect
     if(magic_point > GetMaxSpellPoints()) magic_point = GetMaxSpellPoints();
@@ -1072,13 +1072,13 @@ void Heroes::ActionNewWeek(void)
 void Heroes::ActionNewMonth(void)
 {
     // remove month visit object
-    visit_object.remove_if(Visit::IndexObject::isMonthLife);
+    visit_object.remove_if(Visit::isMonthLife);
 }
 
 void Heroes::ActionAfterBattle(void)
 {
     // remove month visit object
-    visit_object.remove_if(Visit::IndexObject::isBattleLife);
+    visit_object.remove_if(Visit::isBattleLife);
 }
 
 u16 Heroes::FindPath(u16 dst_index)
@@ -1120,16 +1120,10 @@ bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 {
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(tile);
 
-    std::list<Visit::IndexObject>::const_iterator it1 = visit_object.begin();
-    std::list<Visit::IndexObject>::const_iterator it2 = visit_object.end();
-
     const u16 & index = tile.GetIndex();
     const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
-    //const MP2::object_t & object = tile.GetObject();
 
-    for(; it1 != it2; ++it1) if(index == (*it1).first && object == (*it1).second) return true;
-
-    return false;
+    return visit_object.end() != std::find(visit_object.begin(), visit_object.end(), IndexObject(index, object));
 }
 
 /* return true if object visited */
@@ -1137,8 +1131,8 @@ bool Heroes::isVisited(const MP2::object_t & object, const Visit::type_t type) c
 {
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(object);
 
-    std::list<Visit::IndexObject>::const_iterator it1 = visit_object.begin();
-    std::list<Visit::IndexObject>::const_iterator it2 = visit_object.end();
+    std::list<IndexObject>::const_iterator it1 = visit_object.begin();
+    std::list<IndexObject>::const_iterator it2 = visit_object.end();
 
     for(; it1 != it2; ++it1) if((*it1).second == object) return true;
 
@@ -1158,7 +1152,7 @@ void Heroes::SetVisited(const u16 index, const Visit::type_t type)
     if(isVisited(tile))
 	return;
     else
-    if(MP2::OBJ_ZERO != object) visit_object.push_front(Visit::IndexObject(index, object));
+    if(MP2::OBJ_ZERO != object) visit_object.push_front(IndexObject(index, object));
 }
 
 void Heroes::TakeArtifacts(Heroes & hero2)

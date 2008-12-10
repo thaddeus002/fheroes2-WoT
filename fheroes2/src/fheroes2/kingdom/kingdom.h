@@ -162,9 +162,11 @@ private:
 
     std::vector<Castle *> castles;
     std::vector<Heroes *> heroes;
-    Castle *ai_capital;
 
-    std::list<Visit::IndexObject> visit_object;
+    Castle *ai_capital;
+    std::map<u16, u8> ai_scan_object;
+
+    std::list<IndexObject> visit_object;
 };
 
 #endif

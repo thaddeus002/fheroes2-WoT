@@ -539,6 +539,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    selectHeroesArmy.SetPos(cur_pt.x + 112, cur_pt.y + 361);
 
 		    AGG::PlaySound(M82::BUILDTWN);
+		    RedrawResourcePanel();
 
 		    LocalEvent & le = LocalEvent::GetLocalEvent();
 		    u32 ticket = 0;
@@ -562,7 +563,6 @@ Dialog::answer_t Castle::OpenDialog(void)
             	    display.Blit(AGG::GetICN(ICN::STRIP, 0), cur_pt.x, cur_pt.y + 256);
             	    display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
             	    selectHeroesArmy.Redraw();
-		    RedrawResourcePanel();
 
 	    	    // update spell book
 		    if(castle_heroes && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);

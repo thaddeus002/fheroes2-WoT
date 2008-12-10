@@ -483,7 +483,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_WATERCHEST:		return "Treasure Chest";
         case MP2::OBJ_CAMPFIRE:			return "Camp Fire";
         case MP2::OBJ_FOUNTAIN:			return "Fountain";
-        case MP2::OBJ_ANCIENTLAMP:		return "Ancient Lamp";
+        case MP2::OBJ_ANCIENTLAMP:		return "Genie Lamp";
         case MP2::OBJ_GOBLINHUT:		return "Goblin Hut";
         case MP2::OBJ_THATCHEDHUT:		return "Thatched Hut";
         case MP2::OBJ_MONSTER:			return "Monster";

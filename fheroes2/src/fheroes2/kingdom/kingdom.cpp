@@ -86,6 +86,9 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
 
     heroes.reserve(KINGDOMMAXHEROES);
     castles.reserve(15);
+
+    // scan map
+    //world.StoreActionObject(GetColor(), ai_scan_object);
 }
 
 void Kingdom::SetModes(flags_t f)
@@ -250,22 +253,17 @@ bool Kingdom::AllowPayment(const Resource::funds_t & funds) const
 /* is visited cell */
 bool Kingdom::isVisited(const Maps::Tiles & tile) const
 {
-    std::list<Visit::IndexObject>::const_iterator it1 = visit_object.begin();
-    std::list<Visit::IndexObject>::const_iterator it2 = visit_object.end();
-
     const u16 & index = tile.GetIndex();
     const MP2::object_t & object = tile.GetObject();
 
-    for(; it1 != it2; ++it1) if(index == (*it1).first && object == (*it1).second) return true;
-
-    return false;
+    return visit_object.end() != std::find(visit_object.begin(), visit_object.end(), IndexObject(index, object));
 }
 
 /* return true if object visited */
 bool Kingdom::isVisited(const MP2::object_t & object) const
 {
-    std::list<Visit::IndexObject>::const_iterator it1 = visit_object.begin();
-    std::list<Visit::IndexObject>::const_iterator it2 = visit_object.end();
+    std::list<IndexObject>::const_iterator it1 = visit_object.begin();
+    std::list<IndexObject>::const_iterator it2 = visit_object.end();
 
     for(; it1 != it2; ++it1) if((*it1).second == object) return true;
 
@@ -281,7 +279,7 @@ void Kingdom::SetVisited(const u16 index, const MP2::object_t & object)
 
     const MP2::object_t obj = object != MP2::OBJ_ZERO ? object : tile.GetObject();
 
-    if(MP2::OBJ_ZERO != obj) visit_object.push_front(Visit::IndexObject(index, obj));
+    if(MP2::OBJ_ZERO != obj) visit_object.push_front(IndexObject(index, obj));
 }
 
 bool Kingdom::HeroesMayStillMove(void) const

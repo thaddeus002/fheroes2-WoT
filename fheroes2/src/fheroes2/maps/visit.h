@@ -27,23 +27,23 @@
 
 namespace Maps { class Tiles; };
 
+class IndexObject : public std::pair<u16, MP2::object_t>
+{
+    public:
+    IndexObject();
+    IndexObject(const std::pair<u16, MP2::object_t> & pair);
+    IndexObject(const u16 index, const MP2::object_t object);
+    IndexObject(const Maps::Tiles & tile);
+};
+
 namespace Visit
 {
     typedef enum { LOCAL, GLOBAL } type_t;
 
-    class IndexObject : public std::pair<u16, MP2::object_t>
-    {
-	public:
-	IndexObject();
-	IndexObject(const std::pair<u16, MP2::object_t> & pair);
-	IndexObject(const u16 index, const MP2::object_t object);
-	IndexObject(const Maps::Tiles & tile);
-
-	static bool isDayLife(const IndexObject & visit);
-	static bool isWeekLife(const IndexObject & visit);
-	static bool isMonthLife(const IndexObject & visit);
-	static bool isBattleLife(const IndexObject & visit);
-    };
+    bool isDayLife(const IndexObject & visit);
+    bool isWeekLife(const IndexObject & visit);
+    bool isMonthLife(const IndexObject & visit);
+    bool isBattleLife(const IndexObject & visit);
 };
 
 #endif

@@ -52,16 +52,9 @@ void Kingdom::AITurns(void)
 
     Game::StatusWindow & status = Game::StatusWindow::Get();
 
+    // turn indicator
     status.RedrawAITurns(color, 0);
     status.RedrawAITurns(color, 1);
-    status.RedrawAITurns(color, 2);
-    status.RedrawAITurns(color, 3);
-    status.RedrawAITurns(color, 4);
-    status.RedrawAITurns(color, 5);
-    status.RedrawAITurns(color, 6);
-    status.RedrawAITurns(color, 7);
-    status.RedrawAITurns(color, 8);
-    status.RedrawAITurns(color, 9);
 
     // set capital
     if(NULL == ai_capital && castles.size())
@@ -84,8 +77,16 @@ void Kingdom::AITurns(void)
 	}
     }
 
+    // turn indicator
+    status.RedrawAITurns(color, 2);
+    status.RedrawAITurns(color, 3);
+
     // castle AI turn
     AICastlesTurns();
+
+    // turn indicator
+    status.RedrawAITurns(color, 4);
+    status.RedrawAITurns(color, 5);
 
     // update roles
     if(heroes.size()) std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::AIUpdateRoles));
@@ -108,11 +109,21 @@ void Kingdom::AITurns(void)
 	}
     }
 
+    // turn indicator
+    status.RedrawAITurns(color, 6);
+    status.RedrawAITurns(color, 7);
+
     // prepare task for heroes
     AIHeroesTask();
 
+    // turn indicator
+    status.RedrawAITurns(color, 8);
+
     // heroes AI turn
     AIHeroesTurns();
+
+    // turn indicator
+    status.RedrawAITurns(color, 9);
 
     cursor.Hide();
 
@@ -263,7 +274,7 @@ void Kingdom::AIHeroesTurns(void)
 	}
 
 	// 0.2 sec delay for show enemy hero position
-	DELAY(200);
+	if(hero.isShow(Settings::Get().MyColor())) DELAY(200);
     }
 }
 

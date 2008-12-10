@@ -267,7 +267,7 @@ private:
     Direction::vector_t direction;
     u8			sprite_index;
 
-    std::list<Visit::IndexObject> visit_object;
+    std::list<IndexObject> visit_object;
 };
 
 #endif
