@@ -103,6 +103,13 @@ bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms)
 		case ICN::X_LOC2:
 		case ICN::X_LOC3:	if(! ObjLoyalty::isPassable(icn, addon.index)) return false; break;
 
+		// MANUAL.ICN
+		case ICN::TREASURE:
+		case ICN::TELEPORT1:
+	        case ICN::TELEPORT2:
+		case ICN::TELEPORT3:
+		case ICN::FOUNTAIN:	return false; break;
+
 		default: break;
 	    }
         }
