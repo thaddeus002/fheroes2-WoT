@@ -1279,7 +1279,7 @@ Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
 	    TilesAddon & addon = *it1;
 
 	    // MTNDSRT
-            if(ICN::MTNDSRT == MP2::GetICNObject(addon.object) && 61 == addon.index) return &addon;
+            if(ICN::OBJNDSRT == MP2::GetICNObject(addon.object) && 61 == addon.index) return &addon;
 	    else
 	    // OBJNMULT
             if(ICN::OBJNMULT == MP2::GetICNObject(addon.object) && 131 == addon.index) return &addon;
