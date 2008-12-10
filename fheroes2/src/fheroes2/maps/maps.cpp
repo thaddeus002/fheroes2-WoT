@@ -280,13 +280,13 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u1
 	const s16 tx = cx - ii;
 	const s16 ty = cy - ii;
 
-	const s16 mx = tx + 2 * dist;
-	const s16 my = ty + 2 * dist;
+	const s16 mx = tx + 2 * ii;
+	const s16 my = ty + 2 * ii;
 
-	for(s16 iy = ty; iy < my + 1; ++iy)
-	    for(s16 ix = tx; ix < mx + 1; ++ix)
+	for(s16 iy = ty; iy <= my; ++iy)
+	    for(s16 ix = tx; ix <= mx; ++ix)
 	{
-	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
+	    if(ty < iy & iy < my && tx < ix && ix < mx) continue;
 
 	    res = GetIndexFromAbsPoint(ix, iy);
 
