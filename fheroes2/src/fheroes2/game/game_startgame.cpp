@@ -35,6 +35,7 @@
 #include "splitter.h"
 #include "maps_tiles.h"
 #include "ground.h"
+#include "gameevent.h"
 #include "game_interface.h"
 #include "game_statuswindow.h"
 #include "game_selectobjbar.h"
@@ -693,6 +694,7 @@ Game::menu_t Game::HumanTurn(void)
 	    break;
 	case Focus::HEROES:
 	    if(conf.Original()) global_focus.Set(myHeroes.front());
+	    if(global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().GetPath().Show();
 	    break;
 	case Focus::CASTLE:
 	    if(conf.Original()) global_focus.Set(myCastles.front());
@@ -718,6 +720,12 @@ Game::menu_t Game::HumanTurn(void)
 	    Dialog::Message("Astrologers proclaim month of the " + Week::GetString(name) + ".", message, Font::BIG, Dialog::OK);
 	else
 	    Dialog::Message("Astrologers proclaim week of the " + Week::GetString(name) + ".", message, Font::BIG, Dialog::OK);
+    }
+
+    // show event day
+    {
+	const GameEvent::Day* event_day = world.GetEventDay(conf.MyColor());
+	if(event_day) Dialog::ResourceInfo(event_day->GetMessage(), "", event_day->GetResource());
     }
 
     // startgame loop

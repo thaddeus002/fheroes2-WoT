@@ -150,12 +150,7 @@ void Kingdom::ActionNewDay(void)
     
     // check event day
     const GameEvent::Day* event_day = world.GetEventDay(color);
-    
-    if(event_day)
-    {
-	AddFundsResource(event_day->GetResource());
-        if(Game::LOCAL == control) Dialog::ResourceInfo(event_day->GetMessage(), "", event_day->GetResource());
-    }
+    if(event_day) AddFundsResource(event_day->GetResource());
 }
 
 void Kingdom::ActionNewWeek(void)

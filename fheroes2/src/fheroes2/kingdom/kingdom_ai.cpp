@@ -77,8 +77,11 @@ void Kingdom::AITurns(void)
 	    }
 	}
 	else
-	    // first town
-	    castles.front()->SetModes(Castle::CAPITAL);
+	// first town
+	{
+	    ai_capital = castles.front();
+	    ai_capital->SetModes(Castle::CAPITAL);
+	}
     }
 
     // castle AI turn
