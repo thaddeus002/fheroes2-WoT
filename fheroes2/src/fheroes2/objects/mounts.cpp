@@ -39,6 +39,20 @@ Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
 
 bool Mounts::isPassable(const u16 icn, const u8 index)
 {
+    // bug fix
+    switch(icn)
+    {
+        case ICN::MTNGRAS:
+	    if(43 == index || 44 == index || 53 == index || 54 == index) return false;
+	    break;
+        case ICN::MTNDIRT:
+	    if(73 == index || 84 == index || 86 == index) return false;
+	    break;
+
+	default: break;
+    }
+
+    // all
     switch(icn)
     {
         // 133 sprites
