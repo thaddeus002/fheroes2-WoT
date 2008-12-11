@@ -23,6 +23,7 @@
 #include "cursor.h"
 #include "settings.h"
 #include "gamearea.h"
+#include "kingdom.h"
 #include "game_statuswindow.h"
 #include "game_selectobjbar.h"
 #include "maps_tiles.h"
@@ -436,6 +437,7 @@ bool Heroes::MoveStep(bool fast)
 	}
 	else
 	{
+	    if(Game::LOCAL == world.GetKingdom(GetColor()).Control())
 	    // play sound
 	    PlayWalkSound(world.GetTiles(mp).GetGround());
 	}

@@ -1112,6 +1112,16 @@ void ActionToPrimarySkillObject(Heroes &hero, const u16 dst_index)
 	hero.IncreasePrimarySkill(skill);
 	hero.SetVisited(dst_index);
 	Dialog::SkillInfo(MP2::StringObject(obj), body_true, skill);
+
+	// fix double action tile
+	if(obj == MP2::OBJ_STANDINGSTONES)
+	{
+	    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
+	    else
+	    if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+	}
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToPrimarySkillObject: " + hero.GetName());
@@ -1678,6 +1688,7 @@ void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
 	    {
 		if(recruit == count)
 		{
+		    PlayPickupSound();
 		    AnimationRemoveObject(tile);
 		    tile.SetCountMonster(0);
 		    tile.RemoveObjectSprite();
