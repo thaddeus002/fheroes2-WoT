@@ -59,7 +59,7 @@ namespace Army
         
         bool IsReflected() const { return reflect; }
         void SetReflect(bool r) { lastReflect = reflect; reflect = r; }
-        void SetOriginalReflection(bool r) { origReflect = r; }
+        void SetOriginalReflection(bool r) { origReflect = reflect = lastReflect = r; }
         void ResetReflection() { SetReflect(origReflect); }
         bool WasReflected() const { return lastReflect; }
         bool OriginalReflection() const { return origReflect; }
