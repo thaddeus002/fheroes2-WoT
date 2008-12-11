@@ -34,6 +34,7 @@ class Castle;
 class Heroes;
 class Point;
 class Rect;
+namespace Maps { class Tiles; };
 
 #define	ARMYMAXTROOPS		5
 
@@ -93,7 +94,6 @@ namespace Army
     bool SlowestTroop(const Troop & t1, const Troop & t2);
     bool FastestTroop(const Troop & t1, const Troop & t2);
     void SwapTroops(Troop & t1, Troop & t2);
-    void ArrangeTroopsForBattle(army_t &, Monster::monster_t, u16);
 
     enum flags_t
     {
@@ -111,6 +111,7 @@ namespace Army
 	    void	ResetModes(flags_t);
 	    bool	Modes(flags_t) const;
 
+	    void	FromGuardian(const Maps::Tiles &);
 	    void	Import(const std::vector<Troop> &);
 	    void	Import(const std::vector<BattleTroop> &);
 	    void	UpgradeMonsters(const Monster::monster_t);
@@ -118,6 +119,7 @@ namespace Army
 
 	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0) const;
 
+	    Troop&	FirstValid(void);
 	    Troop&	At(u8);
 	    Troop &	GetSlowestTroop(void);
 	    Troop &	GetFastestTroop(void);
@@ -148,6 +150,7 @@ namespace Army
 	    void	JoinStrongestFromArmy(army_t &);
             void	KeepOnlyWeakestTroops(army_t &);
 	    void	UpgradeTroops(const Castle &);
+	    void	ArrangeForBattle(void);
 
 	private:
 	    friend class Troop;

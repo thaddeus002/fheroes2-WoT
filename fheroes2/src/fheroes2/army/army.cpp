@@ -26,6 +26,7 @@
 #include "payment.h"
 #include "world.h"
 #include "kingdom.h"
+#include "maps_tiles.h"
 #include "text.h"
 #include "castle.h"
 #include "army.h"
@@ -196,6 +197,84 @@ Army::army_t::army_t & Army::army_t::operator= (const army_t & a)
     return *this;
 }
 
+void Army::army_t::FromGuardian(const Maps::Tiles & t)
+{
+    Reset();
+
+    switch(t.GetObject())
+    {
+	case MP2::OBJ_PYRAMID:
+            army[0].Set(Monster::ROYAL_MUMMY, 10);
+            army[1].Set(Monster::LORD_VAMPIRE, 10);
+            army[2].Set(Monster::ROYAL_MUMMY, 10);
+            army[3].Set(Monster::LORD_VAMPIRE, 10);
+            army[4].Set(Monster::ROYAL_MUMMY, 10);
+	    break;
+
+	case MP2::OBJ_GRAVEYARD:
+	    army[0].Set(Monster::MUTANT_ZOMBIE, 100);
+	    ArrangeForBattle();
+	    break;
+
+	case MP2::OBJ_SHIPWRECK:
+	    army[0].Set(Monster::GHOST, t.GetQuantity2());
+	    ArrangeForBattle();
+	    break;
+
+	case MP2::OBJ_DERELICTSHIP:
+	    army[0].Set(Monster::SKELETON, 200);
+	    ArrangeForBattle();
+	    break;
+
+	case MP2::OBJ_ARTIFACT:
+	    switch(t.GetQuantity2())
+	    {
+		case 6:	army[0].Set(Monster::ROGUE, 50); break;	
+		case 7:	army[0].Set(Monster::GENIE, 1); break;	
+		case 8:	army[0].Set(Monster::PALADIN, 1); break;	
+		case 9:	army[0].Set(Monster::CYCLOPS, 1); break;	
+		case 10:army[0].Set(Monster::PHOENIX, 1); break;	
+		case 11:army[0].Set(Monster::GREEN_DRAGON, 1); break;	
+		case 12:army[0].Set(Monster::TITAN, 1); break;	
+		case 13:army[0].Set(Monster::BONE_DRAGON, 1); break;
+		default: break;	
+	    }
+	    ArrangeForBattle();
+	    break;
+
+	case MP2::OBJ_ABANDONEDMINE:
+	    army[0].Set(Monster::GHOST, t.GetQuantity2());
+	    ArrangeForBattle();
+	    break;
+
+	case MP2::OBJ_CITYDEAD:
+            army[0].Set(Monster::ZOMBIE, 20);
+            army[1].Set(Monster::LORD_VAMPIRE, 5);
+            army[2].Set(Monster::POWER_LICH, 5);
+            army[3].Set(Monster::LORD_VAMPIRE, 5);
+            army[4].Set(Monster::ZOMBIE, 20);
+	    break;
+
+	case MP2::OBJ_TROLLBRIDGE:
+            army[0].Set(Monster::TROLL, 4);
+            army[1].Set(Monster::WAR_TROLL, 4);
+            army[2].Set(Monster::TROLL, 4);
+            army[3].Set(Monster::WAR_TROLL, 4);
+            army[4].Set(Monster::TROLL, 4);
+	    break;
+
+	case MP2::OBJ_DRAGONCITY:
+            army[0].Set(Monster::GREEN_DRAGON, 3);
+            army[1].Set(Monster::RED_DRAGON, 2);
+            army[2].Set(Monster::BLACK_DRAGON, 1);
+	    break;
+
+	default: break;
+    }
+
+    ArrangeForBattle();
+}
+
 void Army::army_t::Import(const std::vector<Troop> & v)
 {
     for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
@@ -241,6 +320,19 @@ bool Army::army_t::Modes(flags_t f) const
 u8 Army::army_t::Size(void) const
 {
     return ARMYMAXTROOPS;
+}
+
+Army::Troop & Army::army_t::FirstValid(void)
+{
+    std::vector<Troop>::iterator it = std::find_if(army.begin(), army.end(), Army::isValidTroop);
+
+    if(it == army.end())
+    {
+	Error::Warning("Army::FirstValid: not found, return first invalid..");
+	it = army.begin();
+    }
+
+    return *it;
 }
 
 Army::Troop & Army::army_t::At(u8 index)
@@ -505,20 +597,81 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) 
     }
 }
 
-void Army::ArrangeTroopsForBattle(army_t & army, Monster::monster_t monster, u16 count)
+void Army::army_t::ArrangeForBattle(void)
 {
-    if(count > ARMYMAXTROOPS)
+    std::vector<Troop> priority;
+    priority.reserve(ARMYMAXTROOPS);
+
+    std::vector<Troop>::iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    
+    for(; it1 != it2; ++it1)
     {
-	const s16 c = count / ARMYMAXTROOPS;
-	army.At(0).Set(monster, c);
-	army.At(1).Set(monster, c);
-	army.At(2).Set(monster, c + count - (c * ARMYMAXTROOPS));
-	army.At(3).Set(monster, c);
-	army.At(4).Set(monster, c);
+	Troop & troop = *it1;
+	if(!troop.isValid()) continue;
+
+	std::vector<Troop>::iterator it = std::find_if(priority.begin(), priority.end(), std::bind2nd(std::mem_fun_ref(&Troop::HasMonster), troop.Monster()));
+
+	if(it == priority.end())
+	    priority.push_back(troop);
+	else
+	    (*it).SetCount((*it).Count() + troop.Count());
+
+	troop.Reset();
     }
-    else
+
+    switch(priority.size())
     {
-	army.At(0).Set(monster, count);
+	case 1:
+	{
+	    const Monster::monster_t m = priority.back().Monster();
+	    const u16 count = priority.back().Count();
+	    if(49 < count)
+	    {
+		const u16 c = count / 5;
+		army[0].Set(m, c);
+		army[1].Set(m, c);
+		army[2].Set(m, c + count - (c * 5));
+		army[3].Set(m, c);
+		army[4].Set(m, c);
+	    }
+	    else
+	    if(20 < count)
+	    {
+		const u16 c = count / 3;
+		army[1].Set(m, c);
+		army[2].Set(m, c + count - (c * 3));
+		army[3].Set(m, c);
+	    }
+	    else
+		army[2].Set(m, count);
+	    break;
+	}
+	case 2:
+	{
+	    // TODO: need modify army for 2 troops
+	    Import(priority);
+	    break;
+	}
+	case 3:
+	{
+	    // TODO: need modify army for 3 troops
+	    Import(priority);
+	    break;
+	}
+	case 4:
+	{
+	    // TODO: need modify army for 4 troops
+	    Import(priority);
+	    break;
+	}
+	case 5:
+	{    // possible change orders monster
+	    // store
+	    Import(priority);
+	    break;
+	}
+	default: break;
     }
 }
 

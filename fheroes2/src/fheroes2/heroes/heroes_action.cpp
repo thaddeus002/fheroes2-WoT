@@ -406,7 +406,8 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     const Monster::monster_t monster = Monster::Monster(tile);
     const u16 count = tile.GetCountMonster();
     Army::army_t army;
-    Army::ArrangeTroopsForBattle(army, monster, count);
+    army.At(0).Set(monster, count);
+    army.ArrangeForBattle();
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
 
@@ -959,11 +960,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 		{
 		    // battle
 		    Army::army_t army;
-		    army.At(0).Set(Monster::ROYAL_MUMMY, 10);
-		    army.At(1).Set(Monster::LORD_VAMPIRE, 10);
-		    army.At(2).Set(Monster::ROYAL_MUMMY, 10);
-		    army.At(3).Set(Monster::LORD_VAMPIRE, 10);
-		    army.At(4).Set(Monster::ROYAL_MUMMY, 10);
+		    army.FromGuardian(tile);
 
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -1140,7 +1137,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 		if(Dialog::YES == Dialog::Message("You tentatively approach the burial ground of ancient warriors.", "Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
-		    Army::ArrangeTroopsForBattle(army, Monster::MUTANT_ZOMBIE, 100);
+		    army.FromGuardian(tile);
 
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -1182,31 +1179,17 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the shipwreck?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
+		    army.FromGuardian(tile);
 		    Resource::funds_t resource;
 		    Artifact::artifact_t art = Artifact::UNKNOWN;
-		    u8 c = 1;
                     switch(tile.GetQuantity2())
                     {
-                	case 1:
-                	    resource.gold = 1000;
-                	    c = 2;
-                	    break;
-                	case 2:
-                	    resource.gold = 2000;
-                	    c = 3;
-                	    break;
-                	case 3:
-                	    resource.gold = 5000;
-                	    c = 5;
-                	    break;
-                	case 4:
-                	    resource.gold = 2000;
-			    art = Artifact::Artifact(tile.GetQuantity1());
-                	    c = 10;
-                	    break;
+                	case 10: resource.gold = 1000; break;
+                	case 15: resource.gold = 2000; break;
+                	case 25: resource.gold = 5000; break;
+                	case 50: resource.gold = 2000; art = Artifact::Artifact(tile.GetQuantity1()); break;
                 	default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
                     }
-                    ArrangeTroopsForBattle(army, Monster::GHOST, c * ARMYMAXTROOPS);
 
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -1250,7 +1233,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
     		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
-		    ArrangeTroopsForBattle(army, Monster::SKELETON, 200);
+		    army.FromGuardian(tile);
 
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -1518,28 +1501,22 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 		case 13:
 		{
 		    bool battle = true;
-		    const u8 count = (c == 6 ? 50 : 1);
-		    const Monster::monster_t mons = (6 == c ? Monster::ROGUE :
-						    (7 == c ? Monster::GENIE :
-						    (8 == c ? Monster::PALADIN :
-						    (9 == c ? Monster::CYCLOPS :
-						    (10== c ? Monster::PHOENIX :
-						    (11== c ? Monster::GREEN_DRAGON :
-						    (12== c ? Monster::TITAN : Monster::BONE_DRAGON )))))));
 		    Army::army_t army;
-		    Army::ArrangeTroopsForBattle(army, mons, count);
+		    army.FromGuardian(tile);
+		    const Army::Troop & troop = army.FirstValid();
+		    const std::string monster = 1 < troop.Count() ? Monster::String(troop.Monster()) : Monster::MultipleNames(troop.Monster());
 
 		    PlaySoundWarning;
+
 		    if(6 == c)
 			Dialog::Message("You come upon an ancient artifact.", "As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.", Font::BIG, Dialog::OK);
 		    else
 			battle = (Dialog::YES == Dialog::Message("Through a clearing you observe an ancient artifact.",
-						"Unfortunately, it's guarded by a nearby " + Monster::String(mons) + ". Do you want to fight the " + Monster::String(mons) + " for the artifact?",
+						"Unfortunately, it's guarded by a nearby " + monster + ". Do you want to fight the " + monster + " for the artifact?",
 						Font::BIG, Dialog::YES | Dialog::NO));
 
 		    if(battle)
 		    {
-			//Display::Fade(); need move to start battle code
 			const u32 exp = army.CalculateExperience();
 			const Army::battle_t b = Army::Battle(hero, army, tile);
 			switch(b)
@@ -1811,7 +1788,7 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
     if(Dialog::YES == Dialog::Message("You come upon an abandoned gold mine.", "The mine appears to be haunted. Do you wish to enter?", Font::BIG, Dialog::YES | Dialog::NO))
     {
 	Army::army_t army;
-	ArrangeTroopsForBattle(army, Monster::GHOST, tile.GetQuantity1() * ARMYMAXTROOPS);
+	army.FromGuardian(tile);
 
 	const u32 exp = army.CalculateExperience();
 	const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -2146,11 +2123,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    else
 	    {
 		Army::army_t army;
-		army.At(0).Set(Monster::ZOMBIE, 20);
-		army.At(1).Set(Monster::LORD_VAMPIRE, 5);
-		army.At(2).Set(Monster::POWER_LICH, 5);
-		army.At(3).Set(Monster::LORD_VAMPIRE, 5);
-		army.At(4).Set(Monster::ZOMBIE, 20);
+		army.FromGuardian(tile);
 
 		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("You've found the ruins of an ancient city, now inhabited solely by the undead.", "Will you search?", Font::BIG, Dialog::YES | Dialog::NO))
@@ -2198,11 +2171,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    else
 	    {
 		Army::army_t army;
-		army.At(0).Set(Monster::WAR_TROLL, 4);
-		army.At(1).Set(Monster::TROLL, 4);
-		army.At(2).Set(Monster::TROLL, 4);
-		army.At(3).Set(Monster::TROLL, 4);
-		army.At(4).Set(Monster::WAR_TROLL, 4);
+		army.FromGuardian(tile);
 
 		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("Trolls living under the bridge challenge you.", "Will you fight them?", Font::BIG, Dialog::YES | Dialog::NO))
@@ -2250,9 +2219,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 	    else
 	    {
 		Army::army_t army;
-		army.At(0).Set(Monster::GREEN_DRAGON, 3);
-		army.At(1).Set(Monster::RED_DRAGON, 2);
-		army.At(2).Set(Monster::BLACK_DRAGON, 1);
+		army.FromGuardian(tile);
 
 		PlaySoundWarning;
 		if(Dialog::YES == Dialog::Message("You stand before the Dragon City, a place off-limits to mere humans.", "Do you wish to violate this rule and challenge the Dragons to a fight?", Font::BIG, Dialog::YES | Dialog::NO))

@@ -1627,8 +1627,14 @@ void Maps::Tiles::UpdateQuantity(void)
 
 	case MP2::OBJ_SHIPWRECK:
 	    // variant: 10ghost(1000g), 15 ghost(2000g), 25ghost(5000g) or 50ghost(2000g+art)
-	    quantity2 = Rand::Get(1, 4);
-	    quantity1 = 4 == quantity2 ? Artifact::Rand() : 0;
+	    switch(Rand::Get(1, 4))
+	    {
+		case 1: quantity2 = 10; break;
+		case 2: quantity2 = 15; break;
+		case 3: quantity2 = 25; break;
+		case 4: quantity1 = Artifact::Rand(); quantity2 = 50; break;
+		default: break;
+	    }
 	break;
 
 	case MP2::OBJ_GRAVEYARD:
@@ -1659,8 +1665,8 @@ void Maps::Tiles::UpdateQuantity(void)
 
 	// rand monster
 	case MP2::OBJ_ABANDONEDMINE:
-	    quantity1 = Monster::GetRNDSize(Monster::GHOST);
-	    quantity2 = 0;
+	    quantity1 = 0;
+	    quantity2 = Rand::Get(39, 45);	// I checked in Heroes II: min 3 x 13, and max 3 x 15
 	break;
 
 	default: break;
