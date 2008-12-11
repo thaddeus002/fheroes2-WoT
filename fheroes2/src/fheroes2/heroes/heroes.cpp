@@ -30,6 +30,7 @@
 #include "gamearea.h"
 #include "kingdom.h"
 #include "battle.h"
+#include "visit.h"
 #include "heroes.h"
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
@@ -431,7 +432,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     magic_point = GetMaxSpellPoints();
     move_point = GetMaxMovePoints();
 
-    if(H2Config::Debug()) Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
+    if(Settings::Get().Debug()) Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
 bool Heroes::operator== (const Heroes & h) const
@@ -1187,7 +1188,7 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
 
     if(artifacts.end() == it)
     {
-	if(H2Config::MyColor() == color)
+	if(Settings::Get().MyColor() == color)
 	{
 	    art == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book.", "Try giving one of your artifacts to another hero.", Font::BIG, Dialog::OK) :
@@ -1494,7 +1495,7 @@ void Heroes::LevelUp(bool autoselect)
 
     if(Skill::Secondary::UNKNOWN == sec1.Skill() && Skill::Secondary::UNKNOWN == sec2.Skill())
     {
-	if(!autoselect && GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level.";
@@ -1505,7 +1506,7 @@ void Heroes::LevelUp(bool autoselect)
     else
     if(Skill::Secondary::UNKNOWN == sec1.Skill())
     {
-	if(!autoselect && GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
@@ -1532,7 +1533,7 @@ void Heroes::LevelUp(bool autoselect)
     else
     if(Skill::Secondary::UNKNOWN == sec2.Skill())
     {
-	if(!autoselect && GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
@@ -1560,7 +1561,7 @@ void Heroes::LevelUp(bool autoselect)
     {
 	Skill::Secondary::skill_t skill_select(Skill::Secondary::UNKNOWN);
 
-	if(!autoselect && GetColor() == H2Config::MyColor())
+	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
 	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
@@ -1575,7 +1576,7 @@ void Heroes::LevelUp(bool autoselect)
 	LevelUpSkill(skill_select);
     }
 
-    if(H2Config::Debug()) Error::Verbose("Heroes::LevelUp: for " + GetName());
+    if(Settings::Get().Debug()) Error::Verbose("Heroes::LevelUp: for " + GetName());
 }
 
 /* apply penalty */
@@ -1595,8 +1596,8 @@ bool Heroes::ApplyPenaltyMovement(void)
 
 bool Heroes::MayStillMove(void) const
 {
-    if(path.isValid())
-        return move_point >= path.GetFrontPenalty();
+    if(Modes(STUPID)) return false;
+    if(path.isValid()) return move_point >= path.GetFrontPenalty();
     return move_point >= Maps::Ground::GetPenalty(Maps::GetIndexFromAbsPoint(mp), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
 }
 

@@ -210,7 +210,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     // crest
     if(Color::GRAY == color)
-	switch(Settings::Get().MyColor())
+	switch(GetColor())
 	{
 	    case Color::BLUE:	index_sprite = 0; break;
 	    case Color::GREEN:	index_sprite = 1; break;

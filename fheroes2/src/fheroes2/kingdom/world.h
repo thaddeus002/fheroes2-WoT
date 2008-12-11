@@ -92,16 +92,17 @@ public:
     Artifact::artifact_t DiggingForUltimateArtifacts(const Point & center);
     void ActionForMagellanMaps(u8 color);
 
-    u8 GetDay(void){ return day % DAYOFWEEK + 1; };
-    u8 GetWeek(void){ return week % WEEKOFMONTH + 1; };
-    u8 GetMonth(void){ return month + 1; };
-    u16 CountDay(void){ return day + 1; };
-    u16 CountWeek(void){ return week + 1; };
-    bool BeginWeek(void){ return begin_week; };
-    bool BeginMonth(void){ return begin_month; };
-    bool LastDay(void){ return ((day % DAYOFWEEK) == (DAYOFWEEK - 1)); };
-    bool LastWeek(void){ return ((week % WEEKOFMONTH) == (WEEKOFMONTH - 1)); };
+    u8 GetDay(void) const{ return day % DAYOFWEEK + 1; };
+    u8 GetWeek(void) const{ return week % WEEKOFMONTH + 1; };
+    u8 GetMonth(void) const{ return month + 1; };
+    u16 CountDay(void) const{ return day + 1; };
+    u16 CountWeek(void) const{ return week + 1; };
+    bool BeginWeek(void) const{ return begin_week; };
+    bool BeginMonth(void) const{ return begin_month; };
+    bool LastDay(void) const{ return ((day % DAYOFWEEK) == (DAYOFWEEK - 1)); };
+    bool LastWeek(void) const{ return ((week % WEEKOFMONTH) == (WEEKOFMONTH - 1)); };
     Week::type_t GetWeekType(void) const{ return week_name; };
+    void DateDump(void) const;
 
     void NextDay(void);
     void NewWeek(void);
@@ -121,6 +122,7 @@ public:
     u16 CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const;
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;
     Color::color_t ColorCapturedObject(const u16 index) const;
+    void StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & store);
 
     bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);

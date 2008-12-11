@@ -77,7 +77,8 @@
 #include "resource.h"
 #include "gamedefs.h"
 #include "game.h"
-#include "visit.h"
+#include "mp2.h"
+#include "pairs.h"
 
 class Castle;
 class Heroes;
@@ -149,10 +150,9 @@ public:
 
 private:
     void AICastlesTurns(void);
-    void AICastleDevelopment(Castle &);
-    void AICastleDefence(Castle &);
     void AIHeroesTurns(void);
     void AIHeroesTask(void);
+    void AIDumpCacheObjects(const IndexDistance &) const;
 
     const Color::color_t color;
     Game::control_t control;
@@ -164,7 +164,7 @@ private:
     std::vector<Heroes *> heroes;
 
     Castle *ai_capital;
-    std::map<u16, u8> ai_scan_object;
+    std::map<u16, MP2::object_t> ai_objects;
 
     std::list<IndexObject> visit_object;
 };

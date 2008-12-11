@@ -894,7 +894,7 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 /* accept move */
 bool Maps::Tiles::isPassable(void) const
 {
-    if(isFog(Settings::Get().MyColor())) return false;
+    if(isFog(Settings::Get().CurrentColor())) return false;
 
     if(Game::Focus::HEROES == Game::Focus::Get().Type())
     {
@@ -1663,37 +1663,14 @@ void Maps::Tiles::UpdateQuantity(void)
 	    quantity2 = 0;
 	break;
 
-	default: return;
+	default: break;
     }
 }
 
 bool Maps::Tiles::ValidQuantity(void) const
 {
-    switch(general)
-    {
-	case MP2::OBJ_SKELETON:
-	case MP2::OBJ_WAGON:
-	case MP2::OBJ_ARTIFACT:
-	case MP2::OBJ_RESOURCE:
-	case MP2::OBJ_MAGICGARDEN:
-	case MP2::OBJ_WATERWHEEL:
-	case MP2::OBJ_WINDMILL:
-	case MP2::OBJ_LEANTO:
-	case MP2::OBJ_CAMPFIRE:
-	case MP2::OBJ_FLOTSAM:
-	case MP2::OBJ_SHIPWRECKSURVIROR:
-	case MP2::OBJ_TREASURECHEST:
-	case MP2::OBJ_WATERCHEST:
-	case MP2::OBJ_DERELICTSHIP:
-	case MP2::OBJ_SHIPWRECK:
-	case MP2::OBJ_GRAVEYARD:
-	case MP2::OBJ_PYRAMID:
-	case MP2::OBJ_DAEMONCAVE:
-	case MP2::OBJ_ABANDONEDMINE:
+    if(MP2::isQuantityObject(general))
 	    return quantity1 || quantity2;
-
-	default: break;
-    }
 
     return false;
 }

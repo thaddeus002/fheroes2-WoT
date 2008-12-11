@@ -34,6 +34,7 @@
 #include "skill.h"
 #include "artifact.h"
 #include "route.h"
+#include "pairs.h"
 #include "visit.h"
 #include "direction.h"
 #include "spell_book.h"
@@ -105,6 +106,7 @@ public:
 	ENABLEMOVE	= 0x0008,
 	HUNTER		= 0x0010,
 	SCOUTER		= 0x0020,
+	STUPID		= 0x0040,
     };
 
     Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
@@ -122,6 +124,8 @@ public:
     void SetModes(flags_t);
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
+
+    void ResetStupidFlag(void) { ResetModes(STUPID); };
 
     Heroes::heroes_t GetID(void) const{ return hid; };
     Color::color_t GetColor(void) const{ return color; };

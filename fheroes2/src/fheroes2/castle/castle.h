@@ -155,6 +155,9 @@ public:
 
     void Dump(void) const;
 
+    void AIDefence(void);
+    void AIDevelopment(void);
+
 private:
     void RedrawResourcePanel(void);
     void TownUpgradeToCastle(void);

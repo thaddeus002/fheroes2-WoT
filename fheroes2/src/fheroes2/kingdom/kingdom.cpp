@@ -27,6 +27,7 @@
 #include "gameevent.h"
 #include "payment.h"
 #include "world.h"
+#include "visit.h"
 #include "kingdom.h"
 
 Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), ai_capital(NULL)
@@ -86,9 +87,6 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
 
     heroes.reserve(KINGDOMMAXHEROES);
     castles.reserve(15);
-
-    // scan map
-    //world.StoreActionObject(GetColor(), ai_scan_object);
 }
 
 void Kingdom::SetModes(flags_t f)
@@ -168,7 +166,7 @@ void Kingdom::ActionNewWeek(void)
     for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewWeek();
 
     // debug an gift
-    if(H2Config::Debug() && color == Settings::Get().MyColor())
+    if(H2Config::Debug() && Game::LOCAL == Control())
     {
 	Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
 
@@ -284,13 +282,12 @@ void Kingdom::SetVisited(const u16 index, const MP2::object_t & object)
 
 bool Kingdom::HeroesMayStillMove(void) const
 {
-    std::vector<Heroes *>::const_iterator ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith) if(*ith && (**ith).MayStillMove()) return true;
-    return false;
+    return heroes.end() != std::find_if(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::MayStillMove));
 }
 
 void Kingdom::Dump(void) const
 {
+    world.DateDump();
     std::cout << "Kingdom::Dump: " << "color: " << Color::String(color) <<
     ", resource: " << 
     "ore(" << resource.ore << ")," <<

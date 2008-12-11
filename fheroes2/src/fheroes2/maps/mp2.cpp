@@ -350,7 +350,8 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 
 const char * MP2::StringObject(u8 object)
 {
-    switch(object){
+    switch(object)
+    {
         case MP2::OBJ_ZERO:			return "OBJ_ZERO";
         case MP2::OBJN_ALCHEMYLAB:
         case MP2::OBJ_ALCHEMYLAB:		return "Alchemist Lab";
@@ -618,12 +619,90 @@ const char * MP2::StringObject(u8 object)
     return "";
 }
 
-bool MP2::isActionObject(const object_t obj, const bool water)
+bool MP2::isDayLife(const u8 obj)
 {
-    if(water)
+    // FIXME: list day object life
+    switch(obj)
     {
-	switch(obj)
-	{
+	case OBJ_MAGICWELL:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool MP2::isWeekLife(const u8 obj)
+{
+    // FIXME: list week object life
+    switch(obj)
+    {
+	case OBJ_STABLES:
+        case OBJ_MAGICGARDEN:
+        case OBJ_WATERWHEEL:
+        case OBJ_WINDMILL:
+        case OBJ_ARTESIANSPRING:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool MP2::isMonthLife(const u8 obj)
+{
+    // FIXME: list month object life
+    switch(obj)
+    {
+	default: break;
+    }
+
+    return false;
+}
+
+bool MP2::isBattleLife(const u8 obj)
+{
+    // FIXME: list battle object life
+    switch(obj)
+    {
+	// luck modificators
+	case OBJ_IDOL:
+	case OBJ_FOUNTAIN:
+	case OBJ_FAERIERING:
+	case OBJ_PYRAMID:
+
+	// morale modificators
+	case OBJ_BUOY:
+	case OBJ_OASIS:
+	case OBJ_TEMPLE:
+	case OBJ_WATERINGHOLE:
+	case OBJ_GRAVEYARD:
+        case OBJ_DERELICTSHIP:
+        case OBJ_SHIPWRECK:
+
+	case OBJ_MERMAID:
+
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool MP2::isActionObject(const u8 obj, const bool water)
+{
+    if(water) return isWaterObject(obj);
+
+    return isGroundObject(obj);
+}
+
+bool MP2::isWaterObject(const u8 obj)
+{
+    switch(obj)
+    {
     	    case OBJ_WATERCHEST:
 	    case OBJ_DERELICTSHIP:
 	    case OBJ_WHIRLPOOL:
@@ -638,15 +717,18 @@ bool MP2::isActionObject(const object_t obj, const bool water)
     	    
     	    case MP2::OBJ_MERMAID:
     	    case MP2::OBJ_SIRENS:
-		return true;
+            return true;
 
-	    default: break;
-	}
+        default: break;
     }
-    else
+
+    return false;
+}
+
+bool MP2::isGroundObject(const u8 obj)
+{
+    switch(obj)
     {
-	switch(obj)
-	{
     	    case OBJ_TREASURECHEST:
     	    case OBJ_ALCHEMYLAB:
     	    case OBJ_SIGN:
@@ -730,82 +812,54 @@ bool MP2::isActionObject(const object_t obj, const bool water)
 	    case MP2::OBJ_ALCHEMYTOWER:
 	    case MP2::OBJ_HUTMAGI:
 	    case MP2::OBJ_EYEMAGI:
-
 		return true;
 
 	    default: break;
-	}
     }
 
     return false;
 }
 
-
-bool MP2::isDayLife(const MP2::object_t obj)
+bool MP2::isQuantityObject(const u8 obj)
 {
-    // FIXME: list day object life
     switch(obj)
     {
-	case OBJ_MAGICWELL:
-	    return true;
-
-	default: break;
-    }
-
-    return false;
-}
-
-bool MP2::isWeekLife(const MP2::object_t obj)
-{
-    // FIXME: list week object life
-    switch(obj)
-    {
-	case OBJ_STABLES:
+        case OBJ_SKELETON:
+        case OBJ_WAGON:
+        case OBJ_ARTIFACT:
+        case OBJ_RESOURCE:
         case OBJ_MAGICGARDEN:
         case OBJ_WATERWHEEL:
         case OBJ_WINDMILL:
-        case OBJ_ARTESIANSPRING:
-	    return true;
-
-	default: break;
-    }
-
-    return false;
-}
-
-bool MP2::isMonthLife(const MP2::object_t obj)
-{
-    // FIXME: list month object life
-    switch(obj)
-    {
-	default: break;
-    }
-
-    return false;
-}
-
-bool MP2::isBattleLife(const MP2::object_t obj)
-{
-    // FIXME: list battle object life
-    switch(obj)
-    {
-	// luck modificators
-	case OBJ_IDOL:
-	case OBJ_FOUNTAIN:
-	case OBJ_FAERIERING:
-	case OBJ_PYRAMID:
-
-	// morale modificators
-	case OBJ_BUOY:
-	case OBJ_OASIS:
-	case OBJ_TEMPLE:
-	case OBJ_WATERINGHOLE:
-	case OBJ_GRAVEYARD:
+        case OBJ_LEANTO:
+        case OBJ_CAMPFIRE:
+        case OBJ_FLOTSAM:
+        case OBJ_SHIPWRECKSURVIROR:
+        case OBJ_TREASURECHEST:
+        case OBJ_WATERCHEST:
         case OBJ_DERELICTSHIP:
         case OBJ_SHIPWRECK:
+        case OBJ_GRAVEYARD:
+        case OBJ_PYRAMID:
+        case OBJ_DAEMONCAVE:
+        case OBJ_ABANDONEDMINE:
+            return true;
 
-	case OBJ_MERMAID:
+        default: break;
+    }
 
+    return false;
+}
+
+bool MP2::isCaptureObject(const u8 obj)
+{
+    switch(obj)
+    {
+        case OBJ_MINES:
+        case OBJ_ALCHEMYLAB:
+        case OBJ_SAWMILL:
+        case OBJ_LIGHTHOUSE:
+        case OBJ_CASTLE:
 	    return true;
 
 	default: break;

@@ -124,6 +124,7 @@ void AIToTreasureChest(Heroes &hero, const u16 dst_index)
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
+	if(resource.gold >= 500)
 	{
 	    const u16 expr = resource.gold - 500;
 
@@ -288,8 +289,6 @@ void AIToFlotSam(Heroes &hero, const u16 dst_index)
 // action to next cell
 void Heroes::Action(const u16 dst_index)
 {
-    if(H2Config::MyColor() != GetColor()) return AIAction(*this, dst_index);
-
     const MP2::object_t & object = world.GetTiles(dst_index).GetObject();
 
     switch(object)

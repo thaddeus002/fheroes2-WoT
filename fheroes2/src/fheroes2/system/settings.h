@@ -119,7 +119,9 @@ public:
     u8   GameType(void) const;
     void SetGameType(const Game::type_t type);
 
+    Color::color_t CurrentColor(void) const;
     Color::color_t MyColor(void) const;
+    void SetCurrentColor(const Color::color_t c);
     void SetMyColor(const Color::color_t c);
     u8   Players(void) const;
     void SetPlayers(u8 c);
@@ -145,6 +147,7 @@ private:
 
     Difficulty::difficulty_t game_difficulty;
     Color::color_t my_color;
+    Color::color_t cur_color;
 
     std::string path_data_directory;
     std::string path_maps_directory;

@@ -23,7 +23,6 @@
 
 #include "gamedefs.h"
 #include "game.h"
-#include "color.h"
 
 class Surface;
 class Castle;
@@ -46,7 +45,7 @@ public:
     void SetState(const info_t info);
     void NextState(void);
 
-    void RedrawAITurns(Color::color_t color, u8 progress) const;
+    void RedrawAITurns(u8 color, u8 progress) const;
 
 private:
     StatusWindow();

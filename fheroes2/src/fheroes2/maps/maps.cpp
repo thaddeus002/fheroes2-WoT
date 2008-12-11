@@ -157,7 +157,7 @@ int Maps::GetIndexFromAreaPoint(s16 px, s16 py)
 u16 Maps::GetDirectionAroundFog(const u16 center, u8 color)
 {
     if(!isValidAbsPoint(center % world.w(), center / world.h())) return 0;
-    if(0 == color) color = Settings::Get().MyColor();
+    if(0 == color) color = Settings::Get().CurrentColor();
 
     u16 result = 0;
 

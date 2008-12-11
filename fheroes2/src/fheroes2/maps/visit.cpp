@@ -18,42 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "world.h"
-#include "maps_tiles.h"
+#include "pairs.h"
 #include "visit.h"
 
-IndexObject::IndexObject() : std::pair<u16, MP2::object_t>(MAXU16, MP2::OBJ_ZERO)
-{
-}
-
-IndexObject::IndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair)
-{
-}
-
-IndexObject::IndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object)
-{
-}
-
-IndexObject::IndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject())
-{
-}
-
-bool Visit::isDayLife(const IndexObject & visit)
-{
-    return MP2::isDayLife(visit.second);
-}
-
-bool Visit::isWeekLife(const IndexObject & visit)
-{
-    return MP2::isWeekLife(visit.second);
-}
-
-bool Visit::isMonthLife(const IndexObject & visit)
-{
-    return MP2::isMonthLife(visit.second);
-}
-
-bool Visit::isBattleLife(const IndexObject & visit)
-{
-    return MP2::isBattleLife(visit.second);
-}
+bool Visit::isDayLife(const IndexObject & visit){ return MP2::isDayLife(visit.second); };
+bool Visit::isWeekLife(const IndexObject & visit){ return MP2::isWeekLife(visit.second); };
+bool Visit::isMonthLife(const IndexObject & visit){ return MP2::isMonthLife(visit.second); };
+bool Visit::isBattleLife(const IndexObject & visit){ return MP2::isBattleLife(visit.second); };

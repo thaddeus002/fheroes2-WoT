@@ -529,12 +529,16 @@ namespace MP2
     ICN::icn_t GetICNObject(const u8 type);
     const char *StringObject(u8 object);
     
-    bool isActionObject(const object_t obj, const bool water);
+    bool isActionObject(const u8 obj, const bool water);
+    bool isGroundObject(const u8 obj);
+    bool isWaterObject(const u8 obj);
+    bool isQuantityObject(const u8 obj);
+    bool isCaptureObject(const u8 obj);
 
-    bool isDayLife(const MP2::object_t obj);
-    bool isWeekLife(const MP2::object_t obj);
-    bool isMonthLife(const MP2::object_t obj);
-    bool isBattleLife(const MP2::object_t obj);
+    bool isDayLife(const u8 obj);
+    bool isWeekLife(const u8 obj);
+    bool isMonthLife(const u8 obj);
+    bool isBattleLife(const u8 obj);
 };
 
 #endif

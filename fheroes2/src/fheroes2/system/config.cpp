@@ -25,4 +25,3 @@ u8 H2Config::Debug(void) { return Settings::Get().Debug(); }
 
 bool H2Config::Shadow(void) { return Settings::Get().Shadow(); }
 bool H2Config::EvilInterface(void) { return Settings::Get().EvilInterface(); }
-Color::color_t H2Config::MyColor(void) { return Settings::Get().MyColor(); }

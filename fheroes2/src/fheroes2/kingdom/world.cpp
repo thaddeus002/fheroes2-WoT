@@ -1826,3 +1826,32 @@ void World::UpdateRecruits(void)
 	}
     }
 }
+
+void World::StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & store)
+{
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+
+    for(; it1 != it2; ++it1) if(*it1)
+    {
+	const Maps::Tiles & tile = **it1;
+	if(tile.isFog(color)) continue;
+
+	if(MP2::isGroundObject(tile.GetObject()) || MP2::isWaterObject(tile.GetObject()))
+	{
+	    // if quantity object is empty
+	    if(MP2::isQuantityObject(tile.GetObject()) && !tile.ValidQuantity()) continue;
+
+	    // skip if object captured (skip castle)
+	    if(MP2::OBJ_CASTLE != tile.GetObject() && MP2::isCaptureObject(tile.GetObject()) && color == ColorCapturedObject(tile.GetIndex())) continue;
+
+	    store[tile.GetIndex()] = tile.GetObject();
+	}
+    }
+}
+
+void World::DateDump(void) const
+{
+    std::cout << "World::Date: month: " << static_cast<int>(GetMonth()) <<  ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()) << std::endl;
+}
+

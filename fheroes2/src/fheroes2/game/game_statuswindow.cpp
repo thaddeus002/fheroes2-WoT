@@ -182,7 +182,7 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
     }
 }
 
-void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
+void Game::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
 {
     // restore background
     DrawBackground();
@@ -226,8 +226,6 @@ void Game::StatusWindow::RedrawAITurns(Color::color_t color, u8 progress) const
     //
     // sprites ICN::HOURGLAS, 11, 30
     //
-
-    display.Flip();
 }
 
 void Game::StatusWindow::DrawBackground(void) const

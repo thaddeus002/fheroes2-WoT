@@ -18,19 +18,28 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2MAPSVISIT_H
-#define H2MAPSVISIT_H
+#ifndef H2PAIRS_H
+#define H2PAIRS_H
 
-class IndexObject;
+#include <utility>
+#include "maps_tiles.h"
 
-namespace Visit
+class IndexDistance : public std::pair<u16, u16>
 {
-    typedef enum { LOCAL, GLOBAL } type_t;
+    public:
+    IndexDistance() : std::pair<u16, u16>(MAXU16, 0) {};
+    IndexDistance(u16 i, u16 d) : std::pair<u16, u16>(i, d) {};
 
-    bool isDayLife(const IndexObject & visit);
-    bool isWeekLife(const IndexObject & visit);
-    bool isMonthLife(const IndexObject & visit);
-    bool isBattleLife(const IndexObject & visit);
+    static bool Longest(const IndexDistance & id1, const IndexDistance & id2){ return id1.second > id2.second; };
+};
+
+class IndexObject : public std::pair<u16, MP2::object_t>
+{
+    public:
+    IndexObject() : std::pair<u16, MP2::object_t>(MAXU16, MP2::OBJ_ZERO) {};
+    IndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair) {};
+    IndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object) {};
+    IndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject()) {};
 };
 
 #endif

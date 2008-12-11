@@ -156,6 +156,7 @@ Game::menu_t Game::StartGame(void)
 		if(1 < conf.Debug()) kingdom.Dump();
 
 		radar.HideArea();
+		conf.SetCurrentColor(color);
 		world.ClearFog(color);
                 Mixer::PauseLoops();
 

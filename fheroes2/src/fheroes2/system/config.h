@@ -30,8 +30,6 @@ namespace H2Config
 
     bool Shadow(void);
     bool EvilInterface(void);
-    
-    Color::color_t MyColor(void);
 };
 
 #endif

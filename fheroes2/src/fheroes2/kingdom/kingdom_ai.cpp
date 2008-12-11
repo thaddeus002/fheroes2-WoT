@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <functional>
 #include "game.h"
 #include "cursor.h"
 #include "engine.h"
@@ -30,6 +31,21 @@
 #include "settings.h"
 #include "kingdom.h"
 #include "agg.h"
+
+void RedrawAITurns(u8 color, u8 i)
+{
+    Cursor::Get().Hide();
+    Game::StatusWindow::Get().RedrawAITurns(color, i);
+    Cursor::Get().Show();
+    Display::Get().Flip();
+}
+
+void Kingdom::AIDumpCacheObjects(const IndexDistance & id) const
+{
+    std::map<u16, MP2::object_t>::const_iterator it = ai_objects.find(id.first);
+    if(it != ai_objects.end())
+    std::cout << "AIDumpCacheObjects: " << MP2::StringObject((*it).second) << ", maps index: " << id.second << std::endl;
+}
 
 void Kingdom::AITurns(void)
 {
@@ -50,11 +66,16 @@ void Kingdom::AITurns(void)
     cursor.Show();
     display.Flip();
 
-    Game::StatusWindow & status = Game::StatusWindow::Get();
+    // turn indicator
+    RedrawAITurns(color, 0);
+
+    // scan map
+    ai_objects.clear();
+    world.StoreActionObject(GetColor(), ai_objects);
+    if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AITurns: kingdom: " + Color::String(color) + ", size cache objects: ", ai_objects.size());
 
     // turn indicator
-    status.RedrawAITurns(color, 0);
-    status.RedrawAITurns(color, 1);
+    RedrawAITurns(color, 1);
 
     // set capital
     if(NULL == ai_capital && castles.size())
@@ -78,15 +99,13 @@ void Kingdom::AITurns(void)
     }
 
     // turn indicator
-    status.RedrawAITurns(color, 2);
-    status.RedrawAITurns(color, 3);
+    RedrawAITurns(color, 2);
 
     // castle AI turn
     AICastlesTurns();
 
     // turn indicator
-    status.RedrawAITurns(color, 4);
-    status.RedrawAITurns(color, 5);
+    RedrawAITurns(color, 3);
 
     // update roles
     if(heroes.size()) std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::AIUpdateRoles));
@@ -110,20 +129,33 @@ void Kingdom::AITurns(void)
     }
 
     // turn indicator
-    status.RedrawAITurns(color, 6);
-    status.RedrawAITurns(color, 7);
-
-    // prepare task for heroes
-    AIHeroesTask();
-
-    // turn indicator
-    status.RedrawAITurns(color, 8);
-
-    // heroes AI turn
-    AIHeroesTurns();
+    RedrawAITurns(color, 4);
+    
+    // push stupid heroes
+    std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ResetStupidFlag));
 
     // turn indicator
-    status.RedrawAITurns(color, 9);
+    RedrawAITurns(color, 5);
+
+    while(HeroesMayStillMove())
+    {
+	RedrawAITurns(color, 6);
+
+	// prepare task for heroes
+	AIHeroesTask();
+
+	// turn indicator
+	RedrawAITurns(color, 7);
+
+	// heroes AI turn
+	AIHeroesTurns();
+
+	// turn indicator
+	RedrawAITurns(color, 8);
+    }
+
+    // turn indicator
+    RedrawAITurns(color, 9);
 
     cursor.Hide();
 
@@ -161,72 +193,8 @@ void Kingdom::AICastlesTurns(void)
 	}
 
 SKIPLOOP:
-	defence ? AICastleDefence(castle) : AICastleDevelopment(castle);
+	defence ? castle.AIDefence() : castle.AIDevelopment();
     }
-}
-
-void Kingdom::AICastleDefence(Castle & castle)
-{
-    if(castle.isCastle())
-    {
-        if(!castle.isBuild(Castle::BUILD_LEFTTURRET))  castle.BuyBuilding(Castle::BUILD_LEFTTURRET);
-        if(!castle.isBuild(Castle::BUILD_RIGHTTURRET)) castle.BuyBuilding(Castle::BUILD_RIGHTTURRET);
-        if(!castle.isBuild(Castle::BUILD_MOAT))        castle.BuyBuilding(Castle::BUILD_MOAT);
-        if(!castle.isBuild(Castle::BUILD_CAPTAIN) && NULL == castle.GetHeroes())      castle.BuyBuilding(Castle::BUILD_CAPTAIN);
-        if(!castle.isBuild(Castle::BUILD_TAVERN) && Race::KNGT == castle.GetRace())   castle.BuyBuilding(Castle::BUILD_TAVERN);
-        if(!castle.isBuild(Castle::BUILD_SPEC))        castle.BuyBuilding(Castle::BUILD_SPEC);
-    }
-    castle.RecruitAllMonster();
-}
-
-void Kingdom::AICastleDevelopment(Castle & castle)
-{
-    const Race::race_t race = castle.GetRace();
-
-    if(heroes.size() && castle.isCastle() && castle.isCapital())
-    {
-	if(!castle.isBuild(Castle::BUILD_STATUE))	castle.BuyBuilding(Castle::BUILD_STATUE);
-	if(!castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == race)	castle.BuyBuilding(Castle::BUILD_SPEC);
-	if(!castle.isBuild(Castle::BUILD_TAVERN) && Race::KNGT == race)	castle.BuyBuilding(Castle::BUILD_TAVERN);
-	if(!castle.isBuild(Castle::BUILD_MAGEGUILD1) && ((Race::SORC | Race::WZRD | Race::WRLK | Race::NECR) & race)) castle.BuyBuilding(Castle::BUILD_MAGEGUILD1);
-	if(!castle.isBuild(Castle::BUILD_WELL))		castle.BuyBuilding(Castle::BUILD_WELL);
-
-	if(!castle.isBuild(Castle::DWELLING_MONSTER1))	castle.BuyBuilding(Castle::DWELLING_MONSTER1);
-	if(!castle.isBuild(Castle::DWELLING_MONSTER2))	castle.BuyBuilding(Castle::DWELLING_MONSTER2);
-	if(!castle.isBuild(Castle::DWELLING_MONSTER3))	castle.BuyBuilding(Castle::DWELLING_MONSTER3);
-	if(!castle.isBuild(Castle::DWELLING_MONSTER4))	castle.BuyBuilding(Castle::DWELLING_MONSTER4);
-
-	if(!castle.isBuild(Castle::BUILD_THIEVESGUILD) && ((Race::NECR) & race)) castle.BuyBuilding(Castle::BUILD_THIEVESGUILD);
-	if(!castle.isBuild(Castle::BUILD_MARKETPLACE))	castle.BuyBuilding(Castle::BUILD_MARKETPLACE);
-
-	if(!castle.isBuild(Castle::BUILD_MAGEGUILD1))	castle.BuyBuilding(Castle::BUILD_MAGEGUILD1);
-	if(!castle.isBuild(Castle::BUILD_MAGEGUILD2) && ((Race::SORC | Race::WZRD | Race::WRLK | Race::NECR) & race)) castle.BuyBuilding(Castle::BUILD_MAGEGUILD2);
-
-	if(!castle.isBuild(Castle::DWELLING_UPGRADE2))	castle.BuyBuilding(Castle::DWELLING_UPGRADE2);
-	if(!castle.isBuild(Castle::DWELLING_UPGRADE3))	castle.BuyBuilding(Castle::DWELLING_UPGRADE3);
-	if(!castle.isBuild(Castle::DWELLING_UPGRADE4))	castle.BuyBuilding(Castle::DWELLING_UPGRADE4);
-
-	if(!castle.isBuild(Castle::BUILD_LEFTTURRET))	castle.BuyBuilding(Castle::BUILD_LEFTTURRET);
-	if(!castle.isBuild(Castle::BUILD_RIGHTTURRET))	castle.BuyBuilding(Castle::BUILD_RIGHTTURRET);
-	if(!castle.isBuild(Castle::BUILD_MOAT))		castle.BuyBuilding(Castle::BUILD_MOAT);
-	if(!castle.isBuild(Castle::BUILD_CAPTAIN))	castle.BuyBuilding(Castle::BUILD_CAPTAIN);
-
-	if(!castle.isBuild(Castle::BUILD_MAGEGUILD2))	castle.BuyBuilding(Castle::BUILD_MAGEGUILD2);
-
-	if(!castle.isBuild(Castle::DWELLING_MONSTER5))	castle.BuyBuilding(Castle::DWELLING_MONSTER5);
-	if(!castle.isBuild(Castle::DWELLING_MONSTER6))	castle.BuyBuilding(Castle::DWELLING_MONSTER6);
-
-	if(!castle.isBuild(Castle::BUILD_MAGEGUILD3))	castle.BuyBuilding(Castle::BUILD_MAGEGUILD3);
-
-	if(!castle.isBuild(Castle::DWELLING_UPGRADE5))	castle.BuyBuilding(Castle::DWELLING_UPGRADE5);
-	if(!castle.isBuild(Castle::DWELLING_UPGRADE6))	castle.BuyBuilding(Castle::DWELLING_UPGRADE6);
-    }
-    else
-    // build castle only monday or tuesday or for capital
-    if(3 > world.GetDay() || castle.isCapital()) castle.BuyBuilding(Castle::BUILD_CASTLE);
-
-    // last day and buy monster
-    if(world.LastDay()) castle.RecruitAllMonster();
 }
 
 void Kingdom::AIHeroesTurns(void)
@@ -238,6 +206,9 @@ void Kingdom::AIHeroesTurns(void)
     for(; ith1 != ith2; ++ith1) if(*ith1)
     {
 	Heroes & hero = **ith1;
+
+        if(hero.GetPath().isValid()) hero.SetMove(true);
+	else continue;
 
 	u32 ticket = 0;
 
@@ -286,7 +257,10 @@ void Kingdom::AIHeroesTask(void)
     for(; ith1 != ith2; ++ith1) if(*ith1)
     {
 	Heroes & hero = **ith1;
-	Castle *castle= hero.inCastle();
+
+	if(hero.GetPath().isValid()) continue;
+
+	Castle *castle = hero.inCastle();
 	u16 index = MAXU16;
 
 	// if hero in castle
@@ -303,81 +277,93 @@ void Kingdom::AIHeroesTask(void)
 		hero.GetArmy().KeepOnlyWeakestTroops(castle->GetArmy());
 	}
 
-	// TODO: AI hero use double distance
+	// load minimal distance tasks
+	std::vector<IndexDistance>objs;
+	objs.reserve(ai_objects.size());
+	std::vector<IndexDistance>::const_reverse_iterator ito1 = objs.rbegin();
+	std::vector<IndexDistance>::const_reverse_iterator ito2 = objs.rend();
+
+	std::map<u16, MP2::object_t>::const_iterator itm1 = ai_objects.begin();
+	std::map<u16, MP2::object_t>::const_iterator itm2 = ai_objects.end();
+
+	for(; itm1 != itm2; ++itm1)
+	{
+	    // filter ground or water
+	    if(!MP2::isActionObject((*itm1).second, hero.isShipMaster())) continue;
+
+	    if(hero.GetPath().Calculate((*itm1).first))
+		objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
+	}
+
+	if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
+	if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: kingdom: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
 
 	// scouter task
-	if(MAXU16 == index && hero.Modes(Heroes::SCOUTER))
+	if(MAXU16 == index && objs.size() && hero.Modes(Heroes::SCOUTER))
 	{
 	    if(hero.isShipMaster())
 	    {
-		// pickup objects
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_BOTTLE, 2 * hero.GetScoute(), index));
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_FLOTSAM, 2 * hero.GetScoute(), index));
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SHIPWRECKSURVIROR, 2 * hero.GetScoute(), index));
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WATERCHEST, 2 * hero.GetScoute(), index));
+		// on water
+		ito1 = objs.rbegin();
+		ito2 = objs.rend();
+
+		while(ito1 != ito2 && MAXU16 == index)
+		{
+		    index = (*ito1).first;
+		    switch(ai_objects[index])
+		    {
+			// pickup resource
+			case MP2::OBJ_SHIPWRECKSURVIROR:
+			case MP2::OBJ_WATERCHEST:
+			case MP2::OBJ_FLOTSAM:
+			case MP2::OBJ_BOTTLE: break;
+
+			default: index = MAXU16; break;
+		    }
+		    ++ito1;
+		}
 	    }
 	    else
 	    {
-		// pickup resource
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_RESOURCE, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index));
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_CAMPFIRE, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index));
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_TREASURECHEST, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index));
-		else
-		// piclup object
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WAGON, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    world.GetTiles(index).ValidQuantity());
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WATERWHEEL, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    world.GetTiles(index).ValidQuantity());
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_WINDMILL, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    world.GetTiles(index).ValidQuantity());
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_LEANTO, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    world.GetTiles(index).ValidQuantity());
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MAGICGARDEN, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    world.GetTiles(index).ValidQuantity());
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SKELETON, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    world.GetTiles(index).ValidQuantity());
-		else
-		// capture flags resource object
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SAWMILL, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    hero.GetColor() != world.ColorCapturedObject(index));
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MINES, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    hero.GetColor() != world.ColorCapturedObject(index));
-		else
-		if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ALCHEMYTOWER, 2 * hero.GetScoute(), index) &&
-		    !Maps::TileUnderProtection(index) &&
-		    hero.GetColor() != world.ColorCapturedObject(index));
+		// on ground
+		ito1 = objs.rbegin();
+		ito2 = objs.rend();
+
+		while(ito1 != ito2 && MAXU16 == index)
+		{
+		    index = (*ito1).first;
+		    switch(ai_objects[index])
+		    {
+			// capture objects
+			case MP2::OBJ_SAWMILL:
+			case MP2::OBJ_MINES:
+			case MP2::OBJ_ALCHEMYTOWER:
+			// piclup object
+			case MP2::OBJ_WAGON:
+			case MP2::OBJ_WATERWHEEL:
+			case MP2::OBJ_WINDMILL:
+			case MP2::OBJ_LEANTO:
+			case MP2::OBJ_MAGICGARDEN:
+			case MP2::OBJ_SKELETON:
+			// pickup resource
+			case MP2::OBJ_RESOURCE:
+			case MP2::OBJ_CAMPFIRE:
+			case MP2::OBJ_TREASURECHEST: break;
+
+			default: index = MAXU16; break;
+		    }
+		    ++ito1;
+		}
 	    }
 	}
 
 	// hunter task
-	if(MAXU16 == index && hero.Modes(Heroes::HUNTER))
+	if(MAXU16 == index && objs.size() && hero.Modes(Heroes::HUNTER))
 	{
 	}
 
 	// general object
-	if(MAXU16 == index)
+	if(MAXU16 == index && objs.size())
 	{
 	    // if bad luck, visit object
 	    // if bad morale, visit object
@@ -385,94 +371,57 @@ void Kingdom::AIHeroesTask(void)
 	    // or more other
 	}
 
-	// goto: clear fog
-	if(MAXU16 == index)
+	// last chance
+	if(MAXU16 == index && objs.size())
 	{
+		// on ground
+		ito1 = objs.rbegin();
+		ito2 = objs.rend();
+
+		while(ito1 != ito2 && MAXU16 == index)
+		{
+		    index = (*ito1).first;
+		    switch(ai_objects[index])
+		    {
+			// castle
+			case MP2::OBJ_CASTLE:
+			{
+			    const Castle *castle = world.GetCastle(index);
+			    // goto: if my castle, and is free,
+			    if(!castle || castle->GetColor() != GetColor() || castle->GetHeroes()) index = MAXU16;
+			    break;
+			}
+
+			// boat
+			case MP2::OBJ_BOAT: break;
+
+			// or ...
+
+			default: index = MAXU16; break;
+		    }
+		    ++ito1;
+		}
 	}
 
-        if(MAXU16 != index && hero.GetPath().Calculate(index) && 1 < Settings::Get().Debug()) hero.GetPath().Dump();
-
-        //
-        if(hero.GetPath().isValid()) hero.SetMove(true);
+	// success
+	if(MAXU16 != index)
+	{
+	    ai_objects.erase(index);
+	    hero.GetPath().Calculate(index);
+	    if(1 < Settings::Get().Debug()) hero.GetPath().Dump();
+	}
+	else
+	{
+	    hero.GetPath().Reset();
+	    Error::Verbose("AI::HeroesTask: kingdom: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: unknown task...");
+	    if(1 < Settings::Get().Debug())
+	    {
+		ito1 = objs.rbegin();
+		ito2 = objs.rend();
+		for(; ito1 != ito2; ++ito1) AIDumpCacheObjects(*ito1);
+	    }
+	    Error::Verbose("AI::HeroesTask: kingdom: " + Color::String(color) + ", Hero " + hero.GetName() + " say: I'm stupid, help my please..");
+	    hero.SetModes(Heroes::STUPID);
+	}
     }
 }
-
-/*
-OBJ_ARTIFACT
-OBJ_ABANDONEDMINE
-OBJ_AIRALTAR
-OBJ_ALCHEMYLAB
-OBJ_ANCIENTLAMP
-OBJ_ARCHERHOUSE
-OBJ_ARENA
-OBJ_ARTESIANSPRING
-OBJ_ARTIFACT
-OBJ_BARRIER
-OBJ_BARROWMOUNDS
-OBJ_BOAT
-OBJ_BUOY
-OBJ_CASTLE
-OBJ_CAVE
-OBJ_CITYDEAD
-OBJ_DAEMONCAVE
-OBJ_DERELICTSHIP
-OBJ_DESERTTENT
-OBJ_DOCTORHUT
-OBJ_DRAGONCITY
-OBJ_DWARFCOTT
-OBJ_EARTHALTAR
-OBJ_EXCAVATION
-OBJ_EYEMAGI
-OBJ_FAERIERING
-OBJ_FIREALTAR
-OBJ_FORT
-OBJ_FOUNTAIN
-OBJ_FREEMANFOUNDRY
-OBJ_GAZEBO
-OBJ_GOBLINHUT
-OBJ_GRAVEYARD
-OBJ_HALFLINGHOLE
-OBJ_HEROES
-OBJ_HILLFORT
-OBJ_HUTMAGI
-OBJ_IDOL
-OBJ_LIGHTHOUSE
-OBJ_JAIL
-OBJ_MAGELLANMAPS
-OBJ_MAGICWELL
-OBJ_MERCENARYCAMP
-OBJ_MERMAID
-OBJ_MONSTER
-OBJ_OASIS
-OBJ_OBELISK
-OBJ_OBSERVATIONTOWER
-OBJ_ORACLE
-OBJ_PEASANTHUT
-OBJ_PYRAMID
-OBJ_RUINS
-OBJ_SHIPWRECK
-OBJ_SHRINE1
-OBJ_SHRINE2
-OBJ_SHRINE3
-OBJ_SIGN
-OBJ_SIRENS
-OBJ_SPHINX
-OBJ_STABLES
-OBJ_STANDINGSTONES
-OBJ_STONELIGHTS
-OBJ_TEMPLE
-OBJ_THATCHEDHUT
-OBJ_TRADINGPOST
-OBJ_TRAVELLERTENT
-OBJ_TREECITY
-OBJ_TREEHOUSE
-OBJ_TREEKNOWLEDGE
-OBJ_TROLLBRIDGE
-OBJ_WAGONCAMP
-OBJ_WATCHTOWER
-OBJ_WATERALTAR
-OBJ_WATERINGHOLE
-OBJ_WHIRLPOOL
-OBJ_WITCHSHUT
-OBJ_XANADU
-*/

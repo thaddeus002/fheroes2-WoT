@@ -46,7 +46,7 @@ namespace
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     modes(SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"),
+    my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"),
     font_normal("files/fonts/dejavusans.ttf"), font_small("files/fonts/dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
 {
@@ -205,6 +205,7 @@ u8 Settings::Debug(void) const { return debug; }
 /* return game difficulty */
 Difficulty::difficulty_t Settings::GameDifficulty(void) const { return game_difficulty; }
 
+Color::color_t Settings::CurrentColor(void) const { return cur_color; }
 Color::color_t Settings::MyColor(void) const { return my_color; }
 
 bool Settings::Modes(const settings_t s) const { return modes & s; }
@@ -390,6 +391,7 @@ void Settings::SetDebug(const u8 d) { debug = d; }
 /**/
 void Settings::SetGameDifficulty(const Difficulty::difficulty_t d) { game_difficulty = d; }
 
+void Settings::SetCurrentColor(const Color::color_t c) { cur_color = c; }
 void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
 
 /**/
