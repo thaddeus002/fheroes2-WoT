@@ -1641,4 +1641,8 @@ void Heroes::Dump(void) const
     std::cout << "move point      : " << move_point << std::endl;
     std::cout << "direction       : " << Direction::String(direction) << std::endl;
     std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
+    std::cout << "flags           : " << (flags & SHIPMASTER ? "SHIPMATER," : ",") <<
+                                         (flags & SCOUTER ? "SCOUTER," : ",") <<
+                                         (flags & HUNTER ? "HUNTER," : ",") <<
+                                         (flags & STUPID ? "STUPID," : ",") << std::endl;
 }

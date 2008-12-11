@@ -38,40 +38,43 @@ struct cell_t
     bool	open;
 };
 
-bool ImpassableCorners(const u16 from, const Direction::vector_t to)
+bool ImpassableCorners(const u16 from, const Direction::vector_t to, const Heroes *hero)
 {
     if( to & (Direction::TOP | Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)) return false;
 
     if(to & (Direction::TOP_LEFT | Direction::BOTTOM_LEFT))
     {
     	if(Maps::isValidDirection(from, Direction::LEFT) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::LEFT)).isPassable()) return true;
+	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::LEFT)).isPassable(hero)) return true;
     }
 
     if(to & (Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT))
     {
     	if(Maps::isValidDirection(from, Direction::RIGHT) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::RIGHT)).isPassable()) return true;
+	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::RIGHT)).isPassable(hero)) return true;
     }
 
     if(to & (Direction::TOP_LEFT | Direction::TOP_RIGHT))
     {
     	if(Maps::isValidDirection(from, Direction::TOP) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::TOP)).isPassable()) return true;
+	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::TOP)).isPassable(hero)) return true;
     }
 
     if(to & (Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT))
     {
     	if(Maps::isValidDirection(from, Direction::BOTTOM) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::BOTTOM)).isPassable()) return true;
+	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::BOTTOM)).isPassable(hero)) return true;
     }
 
     return false;
 }
 
-bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit, const Skill::Level::type_t pathfinding, const u8 under)
+bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit, const Heroes *hero)
 {
     const u8 debug = Settings::Get().Debug();
+
+    const Skill::Level::type_t pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
+    const u8 under = (hero ? hero->GetUnderObject() : MP2::OBJ_ZERO);
 
     u16 cur = from;
     u16 alt = 0;
@@ -114,13 +117,13 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 			if(MP2::OBJ_ZERO != under && MP2::OBJ_HEROES == tile1.GetObject() &&  ! Object::AllowDirect(under, direct)) continue;
 
 			// check obstacles as corners
-			//if(ImpassableCorners(cur, direct)) continue;  // disable, need fix more objects with passable option
+			//if(ImpassableCorners(cur, direct, hero)) continue;  // disable, need fix more objects with passable option
 
 			// check direct to object
 			const Maps::Tiles & tile2 = world.GetTiles(tmp);
 			if(! Object::AllowDirect(tile2.GetObject(), Direction::Reflect(direct))) continue;
 
-			if(tile2.isPassable() || tmp == to) list[tmp] = cell;
+			if(tile2.isPassable(hero) || tmp == to) list[tmp] = cell;
 		    }
 		    // check alt
 		    else
@@ -194,8 +197,9 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	}
         return true;
     }
-    if(debug)
-	std::cout << "Algorithm::PathFind: not found, from:" << from << ", to: " << to << std::endl;
+
+    if(debug) std::cout << "Algorithm::PathFind: not found, from:" << from << ", to: " << to << std::endl;
+    list.clear();
 
     return false;
 }

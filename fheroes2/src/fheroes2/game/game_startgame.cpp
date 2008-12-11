@@ -417,7 +417,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 				    default:	return Cursor::REDBOAT4;
 				}
 			    else
-			    if(tile.isPassable())
+			    if(tile.isPassable(&from_hero))
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
 				    case 0:	return Cursor::POINTER;
@@ -537,7 +537,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 				    default:	return Cursor::ACTION4;
 				}
 			    else
-			    if(tile.isPassable())
+			    if(tile.isPassable(&from_hero))
 			    {
 				const bool protection = Maps::TileUnderProtection(tile.GetIndex());
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
@@ -817,7 +817,7 @@ Game::menu_t Game::HumanTurn(void)
 			    break;
 
 			    default:
-				if(tile.isPassable() || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
+				if(tile.isPassable(&from_hero) || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
 				    ShowPathOrStartMoveHero(&from_hero, index_maps);
 			    break;
 			}

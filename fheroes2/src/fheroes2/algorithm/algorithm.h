@@ -26,10 +26,11 @@
 #include "mp2.h"
 
 namespace Route { class Step; };
+class Heroes;
 
 namespace Algorithm
 {
-    bool PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit = MAXU16, const Skill::Level::type_t pathfinding = Skill::Level::NONE, const u8 under = MP2::OBJ_ZERO);
+    bool PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit = MAXU16, const Heroes * = NULL);
 };
 
 #endif

@@ -892,13 +892,13 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 }
 
 /* accept move */
-bool Maps::Tiles::isPassable(void) const
+bool Maps::Tiles::isPassable(const Heroes *hero) const
 {
     if(isFog(Settings::Get().CurrentColor())) return false;
 
-    if(Game::Focus::HEROES == Game::Focus::Get().Type())
+    if(hero)
     {
-	if(Game::Focus::Get().GetHeroes().isShipMaster())
+	if(hero->isShipMaster())
 	{
     	    if(Ground::WATER != Maps::Tiles::GetGround()) return false;
 

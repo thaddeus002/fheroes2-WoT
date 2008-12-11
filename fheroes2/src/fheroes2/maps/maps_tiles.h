@@ -28,6 +28,7 @@
 #include "color.h"
 
 class Sprite;
+class Heroes;
 
 namespace Maps
 {
@@ -67,7 +68,7 @@ namespace Maps
 	u32 GetSize1(void) const{ return addons_level1.size(); };
 	u32 GetSize2(void) const{ return addons_level2.size(); };
 
-	bool isPassable(void) const;
+	bool isPassable(const Heroes * hero = NULL) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
 
