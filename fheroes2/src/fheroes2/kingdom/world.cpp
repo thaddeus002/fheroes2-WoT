@@ -592,7 +592,7 @@ void World::LoadMaps(const std::string &filename)
 		break;
 	}
 	// preload in to capture objects cache
-	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_CASTLE, Color::GRAY);
+	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_CASTLE, Color::GRAY);
     }
 
     if(H2Config::Debug()) Error::Verbose("World::World: read coord castles, tellg: ", fd.tellg());
@@ -614,11 +614,11 @@ void World::LoadMaps(const std::string &filename)
 	{
 	    // mines: wood
 	    case 0x00:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_SAWMILL, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_SAWMILL, Color::GRAY);
 		break; 
 	    // mines: mercury
 	    case 0x01:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_ALCHEMYLAB, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_ALCHEMYLAB, Color::GRAY);
 		break;
 	    // mines: ore
  	    case 0x02:
@@ -630,19 +630,19 @@ void World::LoadMaps(const std::string &filename)
 	    case 0x05:
 	    // mines: gold
 	    case 0x06:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_MINES, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_MINES, Color::GRAY);
 		break; 
 	    // lighthouse
 	    case 0x64:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_LIGHTHOUSE, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_LIGHTHOUSE, Color::GRAY);
 		break; 
 	    // dragon city
 	    case 0x65:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_DRAGONCITY, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_DRAGONCITY, Color::GRAY);
 		break; 
 	    // abandoned mines
 	    case 0x67:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_ABANDONEDMINE, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_ABANDONEDMINE, Color::GRAY);
 		break; 
 	    default:
 		Error::Warning("World::World: kingdom block, unknown id: ", id);
