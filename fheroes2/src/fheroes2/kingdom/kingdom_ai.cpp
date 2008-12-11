@@ -44,7 +44,7 @@ void Kingdom::AIDumpCacheObjects(const IndexDistance & id) const
 {
     std::map<u16, MP2::object_t>::const_iterator it = ai_objects.find(id.first);
     if(it != ai_objects.end())
-    std::cout << "AIDumpCacheObjects: " << MP2::StringObject((*it).second) << ", maps index: " << id.second << std::endl;
+    std::cout << "AIDumpCacheObjects: " << MP2::StringObject((*it).second) << ", maps index: " << id.first << ", dist: " << id.second << std::endl;
 }
 
 void Kingdom::AITurns(void)
@@ -301,106 +301,144 @@ void Kingdom::AIHeroesTask(void)
 	// scouter task
 	if(MAXU16 == index && objs.size() && hero.Modes(Heroes::SCOUTER))
 	{
-	    if(hero.isShipMaster())
+	    ito1 = objs.rbegin();
+	    ito2 = objs.rend();
+	    while(ito1 != ito2 && MAXU16 == index)
 	    {
-		// on water
-		ito1 = objs.rbegin();
-		ito2 = objs.rend();
-
-		while(ito1 != ito2 && MAXU16 == index)
+		index = (*ito1).first;
+		switch(ai_objects[index])
 		{
-		    index = (*ito1).first;
-		    switch(ai_objects[index])
-		    {
-			// pickup resource
-			case MP2::OBJ_SHIPWRECKSURVIROR:
-			case MP2::OBJ_WATERCHEST:
-			case MP2::OBJ_FLOTSAM:
-			case MP2::OBJ_BOTTLE: break;
+		    // water object
+		    case MP2::OBJ_SHIPWRECKSURVIROR:
+		    case MP2::OBJ_WATERCHEST:
+		    case MP2::OBJ_FLOTSAM:
+		    case MP2::OBJ_BOTTLE:
+		    case MP2::OBJ_BUOY:
 
-			default: index = MAXU16; break;
-		    }
-		    ++ito1;
+		    case MP2::OBJ_MAGELLANMAPS:
+		    case MP2::OBJ_MERMAID:
+		    case MP2::OBJ_SIRENS:
+		    case MP2::OBJ_DERELICTSHIP:
+		    case MP2::OBJ_WHIRLPOOL:
+		    case MP2::OBJ_COAST:
+			if(hero.isShipMaster()) break;
+
+		    // capture objects
+		    case MP2::OBJ_SAWMILL:
+		    case MP2::OBJ_MINES:
+		    case MP2::OBJ_ALCHEMYLAB:
+		    // piclup object
+		    case MP2::OBJ_WAGON:
+		    case MP2::OBJ_WATERWHEEL:
+		    case MP2::OBJ_WINDMILL:
+		    case MP2::OBJ_LEANTO:
+		    case MP2::OBJ_MAGICGARDEN:
+		    case MP2::OBJ_SKELETON:
+		    // pickup resource
+		    case MP2::OBJ_RESOURCE:
+		    case MP2::OBJ_CAMPFIRE:
+		    case MP2::OBJ_TREASURECHEST:
+
+		    // increase view
+		    case MP2::OBJ_OBSERVATIONTOWER:
+						break;
+
+			default:
+			index = MAXU16;		break;
 		}
-	    }
-	    else
-	    {
-		// on ground
-		ito1 = objs.rbegin();
-		ito2 = objs.rend();
-
-		while(ito1 != ito2 && MAXU16 == index)
-		{
-		    index = (*ito1).first;
-		    switch(ai_objects[index])
-		    {
-			// capture objects
-			case MP2::OBJ_SAWMILL:
-			case MP2::OBJ_MINES:
-			case MP2::OBJ_ALCHEMYTOWER:
-			// piclup object
-			case MP2::OBJ_WAGON:
-			case MP2::OBJ_WATERWHEEL:
-			case MP2::OBJ_WINDMILL:
-			case MP2::OBJ_LEANTO:
-			case MP2::OBJ_MAGICGARDEN:
-			case MP2::OBJ_SKELETON:
-			// pickup resource
-			case MP2::OBJ_RESOURCE:
-			case MP2::OBJ_CAMPFIRE:
-			case MP2::OBJ_TREASURECHEST: break;
-
-			default: index = MAXU16; break;
-		    }
-		    ++ito1;
-		}
+		++ito1;
 	    }
 	}
 
 	// hunter task
 	if(MAXU16 == index && objs.size() && hero.Modes(Heroes::HUNTER))
 	{
-	}
+	    ito1 = objs.rbegin();
+	    ito2 = objs.rend();
+	    while(ito1 != ito2 && MAXU16 == index)
+	    {
+		index = (*ito1).first;
+		switch(ai_objects[index])
+		{
+		    // new spell
+                    case MP2::OBJ_SHRINE1:
+		    case MP2::OBJ_SHRINE2:
+		    case MP2::OBJ_SHRINE3:
+		    {
+			if(! hero.isVisited(world.GetTiles(index)) &&
+                             // check spell book
+			     hero.HasArtifact(Artifact::MAGIC_BOOK) &&
+                             // check valid level spell and wisdom skill
+                             !(3 == Spell::Level(world.SpellFromShrine(index)) &&
+                               Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))) break;
+			else
+			    index = MAXU16;	
+			break;
+		    }
 
-	// general object
-	if(MAXU16 == index && objs.size())
-	{
-	    // if bad luck, visit object
-	    // if bad morale, visit object
-	    // primary skill, secondary skill, experience object
-	    // or more other
+    		    // primary skill
+		    case MP2::OBJ_FORT:
+    		    case MP2::OBJ_MERCENARYCAMP:
+    		    case MP2::OBJ_DOCTORHUT:
+    		    case MP2::OBJ_STANDINGSTONES:
+		    // sec skill
+		    case MP2::OBJ_WITCHSHUT:
+		    // exp
+		    case MP2::OBJ_GAZEBO:
+			if(! hero.isVisited(world.GetTiles(index))) break; else index = MAXU16; break;
+
+    		    // good luck
+                    case MP2::OBJ_FOUNTAIN:
+    		    case MP2::OBJ_FAERIERING:
+    		    case MP2::OBJ_IDOL:
+			if(! hero.isVisited(world.GetTiles(index)) && Luck::IRISH > hero.GetLuck()) break; else index = MAXU16; break;
+
+
+	            // good morale
+		    case MP2::OBJ_OASIS:
+    		    case MP2::OBJ_TEMPLE:
+    		    case MP2::OBJ_WATERINGHOLE:
+			if(! hero.isVisited(world.GetTiles(index)) && Morale::BLOOD > hero.GetMorale()) break; else index = MAXU16; break;
+
+			default:
+			index = MAXU16;		break;
+		}
+		++ito1;
+	    }
 	}
 
 	// last chance
 	if(MAXU16 == index && objs.size())
 	{
-		// on ground
-		ito1 = objs.rbegin();
-		ito2 = objs.rend();
+	    // on ground
+	    ito1 = objs.rbegin();
+	    ito2 = objs.rend();
 
-		while(ito1 != ito2 && MAXU16 == index)
+	    while(ito1 != ito2 && MAXU16 == index)
+	    {
+		index = (*ito1).first;
+		switch(ai_objects[index])
 		{
-		    index = (*ito1).first;
-		    switch(ai_objects[index])
+		    // castle
+		    case MP2::OBJ_CASTLE:
 		    {
-			// castle
-			case MP2::OBJ_CASTLE:
-			{
 			    const Castle *castle = world.GetCastle(index);
 			    // goto: if my castle, and is free,
 			    if(!castle || castle->GetColor() != GetColor() || castle->GetHeroes()) index = MAXU16;
 			    break;
-			}
-
-			// boat
-			case MP2::OBJ_BOAT: break;
-
-			// or ...
-
-			default: index = MAXU16; break;
 		    }
-		    ++ito1;
+
+		    // boat
+		    case MP2::OBJ_BOAT: break;
+		    // new view
+		    case MP2::OBJ_STONELIGHTS: break;
+
+		    // or ...
+
+		    default: index = MAXU16; break;
 		}
+		++ito1;
+	    }
 	}
 
 	// success

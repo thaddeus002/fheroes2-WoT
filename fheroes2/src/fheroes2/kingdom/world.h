@@ -52,6 +52,8 @@ struct Recruits : public std::pair<Heroes::heroes_t, Heroes::heroes_t>
 #define WEEKOFMONTH     4 
 #define MAXCASTLES	72
 
+#define OBSERVATIONTOWERSCOUTE 10
+
 class World : protected Size
 {
 public:
@@ -73,9 +75,9 @@ public:
     Maps::Tiles & GetTiles(u16 index){ return *vec_tiles.at(index); };
 
     Kingdom & GetMyKingdom(void);
-    Kingdom & GetKingdom(Color::color_t color);
+    Kingdom & GetKingdom(u8 color);
     const Kingdom & GetMyKingdom(void) const;
-    const Kingdom & GetKingdom(Color::color_t color) const;
+    const Kingdom & GetKingdom(u8 color) const;
 
     const Castle * GetCastle(u16 maps_index);
     const Castle * GetCastle(u8 ax, u8 ay);

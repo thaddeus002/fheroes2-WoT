@@ -30,6 +30,16 @@ void AIToWagon(Heroes &hero, const u16 dst_index);
 void AIToSkeleton(Heroes &hero, const u16 dst_index);
 void AIToCaptureObject(Heroes &hero, const u16 dst_index);
 void AIToFlotSam(Heroes &hero, const u16 dst_index);
+void AIToObservationTower(Heroes &hero, const u16 dst_index);
+void AIToMagellanMaps(Heroes &hero, const u16 dst_index);
+void AIToTeleports(Heroes &hero, const u16 dst_index);
+void AIToWhirlpools(Heroes &hero, const u16 dst_index);
+void AIToPrimarySkillObject(Heroes &hero, const u16 dst_index);
+void AIToExperienceObject(Heroes &hero, const u16 dst_index);
+void AIToWitchsHut(Heroes &hero, const u16 dst_index);
+void AIToShrine(Heroes &hero, const u16 dst_index);
+void AIToGoodLuckObject(Heroes &hero, const u16 dst_index);
+void AIToGoodMoraleObject(Heroes &hero, const u16 dst_index);
 
 void Heroes::AIUpdateRoles(void)
 {
@@ -64,6 +74,42 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_MINES:
 	case MP2::OBJ_SAWMILL:
         case MP2::OBJ_LIGHTHOUSE:	AIToCaptureObject(*this, dst_index); break;
+
+	// increase view
+	case MP2::OBJ_OBSERVATIONTOWER:	AIToObservationTower(*this, dst_index); break;
+        case MP2::OBJ_MAGELLANMAPS:	AIToMagellanMaps(*this, dst_index); break;
+
+        // teleports
+	case MP2::OBJ_STONELIGHTS:	AIToTeleports(*this, dst_index); break;
+	case MP2::OBJ_WHIRLPOOL:	AIToWhirlpools(*this, dst_index); break;
+
+        // primary skill modification
+        case MP2::OBJ_FORT:
+        case MP2::OBJ_MERCENARYCAMP:
+        case MP2::OBJ_DOCTORHUT:
+        case MP2::OBJ_STANDINGSTONES:	AIToPrimarySkillObject(*this, dst_index); break;
+
+	// experience modification
+        case MP2::OBJ_GAZEBO:           AIToExperienceObject(*this, dst_index); break;
+
+        // witchs hut
+        case MP2::OBJ_WITCHSHUT: 	AIToWitchsHut(*this, dst_index); break;
+
+        // shrine circle
+	case MP2::OBJ_SHRINE1:
+	case MP2::OBJ_SHRINE2:
+        case MP2::OBJ_SHRINE3:		AIToShrine(*this, dst_index); break;
+
+        // luck modification
+        case MP2::OBJ_FOUNTAIN:
+        case MP2::OBJ_FAERIERING:
+        case MP2::OBJ_IDOL:		AIToGoodLuckObject(*this, dst_index); break;
+
+        // morale modification
+        case MP2::OBJ_OASIS:
+        case MP2::OBJ_TEMPLE:
+        case MP2::OBJ_WATERINGHOLE:
+        case MP2::OBJ_BUOY:		AIToGoodMoraleObject(*this, dst_index); break;
 
 	default:
 	    Error::Verbose("AI::Action: Hero " + GetName() + " say: I'm stupid, help my please..");
@@ -167,7 +213,7 @@ void AIToResource(Heroes &hero, const u16 dst_index)
     tile.SetQuantity1(0);
     tile.SetQuantity2(0);
 
-    if(H2Config::Debug()) Error::Verbose("AIToResource: " + hero.GetName() + " pickup small resource");
+    if(Settings::Get().Debug()) Error::Verbose("AIToResource: " + hero.GetName() + " pickup small resource");
 }
 
 void AIToSkeleton(Heroes &hero, const u16 dst_index)
@@ -186,7 +232,7 @@ void AIToSkeleton(Heroes &hero, const u16 dst_index)
 	}
     }
 
-    if(H2Config::Debug()) Error::Verbose("AIToSkeleton: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToSkeleton: " + hero.GetName());
 }
 
 void AIToWagon(Heroes &hero, const u16 dst_index)
@@ -225,7 +271,7 @@ void AIToWagon(Heroes &hero, const u16 dst_index)
 	tile.SetQuantity2(0);
     }
 
-    if(H2Config::Debug()) Error::Verbose("AIToWagon: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToWagon: " + hero.GetName());
 }
 
 void AIToCaptureObject(Heroes &hero, const u16 dst_index)
@@ -266,7 +312,7 @@ void AIToCaptureObject(Heroes &hero, const u16 dst_index)
 	world.CaptureObject(dst_index, hero.GetColor());
 	world.GetTiles(dst_index).CaptureFlags32(obj, hero.GetColor());
     }
-    if(H2Config::Debug()) Error::Verbose("AIToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+    if(Settings::Get().Debug()) Error::Verbose("AIToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
 
 void AIToFlotSam(Heroes &hero, const u16 dst_index)
@@ -282,8 +328,198 @@ void AIToFlotSam(Heroes &hero, const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(H2Config::Debug()) Error::Verbose("AIToFlotSam: " + hero.GetName() + " pickup small resource");
+    if(Settings::Get().Debug()) Error::Verbose("AIToFlotSam: " + hero.GetName() + " pickup small resource");
 }
+
+void AIToObservationTower(Heroes &hero, const u16 dst_index)
+{
+    Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, hero.GetColor());
+    hero.SetVisited(dst_index, Visit::GLOBAL);
+}
+
+void AIToMagellanMaps(Heroes &hero, const u16 dst_index)
+{
+    if(1000 <= world.GetKingdom(hero.GetColor()).GetFundsGold())
+    {
+	hero.SetVisited(dst_index, Visit::GLOBAL);
+	world.ActionForMagellanMaps(hero.GetColor());
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToMagellanMaps: " + hero.GetName());
+}
+
+void AIToTeleports(Heroes &hero, const u16 index_from)
+{
+    const u16 index_to = world.NextTeleport(index_from);
+    hero.ApplyPenaltyMovement();
+
+    if(index_from == index_to)
+    {
+	Error::Warning("AIToTeleports: action unsuccessfully...");
+	return;
+    }
+
+    Maps::Tiles & tiles_from = world.GetTiles(index_from);
+    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
+
+    hero.SaveUnderObject(MP2::OBJ_STONELIGHTS);
+    hero.SetCenter(index_to);
+    hero.Scoute();
+
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+    // check monster
+    u16 dst_index2 = MAXU16;
+    if(Maps::TileUnderProtection(index_to, dst_index2)) hero.Action(dst_index2);
+}
+
+void AIToWhirlpools(Heroes &hero, const u16 index_from)
+{
+    const u16 index_to = world.NextWhirlpool(index_from);
+    hero.ApplyPenaltyMovement();
+
+    if(index_from == index_to)
+    {
+	Error::Warning("AIToWhirlpools: action unsuccessfully...");
+	return;
+    }
+
+    Maps::Tiles & tiles_from = world.GetTiles(index_from);
+    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
+
+    hero.SaveUnderObject(MP2::OBJ_WHIRLPOOL);
+    hero.SetCenter(index_to);
+    hero.Scoute();
+
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+
+    if(Rand::Get(1))
+    {
+	Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
+	const u16 c = troops.Count() / 2;
+	troops.SetCount(c ? c : 1);
+    }
+}
+
+void AIToPrimarySkillObject(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+
+    Skill::Primary::skill_t skill = Skill::Primary::UNKNOWN;
+
+    switch(obj)
+    {
+        case MP2::OBJ_FORT:		skill = Skill::Primary::DEFENCE; break;
+        case MP2::OBJ_MERCENARYCAMP:	skill = Skill::Primary::ATTACK; break;
+        case MP2::OBJ_DOCTORHUT:	skill = Skill::Primary::KNOWLEDGE; break;
+        case MP2::OBJ_STANDINGSTONES:	skill = Skill::Primary::POWER; break;
+
+    	default: break;
+    }
+
+    if(!hero.isVisited(tile))
+    {
+	// increase skill
+	hero.IncreasePrimarySkill(skill);
+	hero.SetVisited(dst_index);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToPrimarySkillObject: " + hero.GetName());
+}
+
+void AIToExperienceObject(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+
+    u32 exp = 0;
+
+    switch(obj)
+    {
+        case MP2::OBJ_GAZEBO: exp = 1000; break;
+    	default: break;
+    }
+
+    // check already visited
+    if(! hero.isVisited(tile) && exp)
+    {
+	hero.SetVisited(dst_index);
+	hero.IncreaseExperience(exp);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToExperienceObject: " + hero.GetName());
+}
+
+void AIToWitchsHut(Heroes &hero, const u16 dst_index)
+{
+    const Skill::Secondary::skill_t skill = world.SkillFromWitchsHut(dst_index);
+
+    // check full
+    if(HEROESMAXSKILL > hero.CountSecondarySkill() && !hero.HasSecondarySkill(skill))
+	hero.LearnBasicSkill(skill);
+
+    hero.SetVisited(dst_index);
+    if(Settings::Get().Debug()) Error::Verbose("AIToWitchsHut: " + hero.GetName());
+}
+
+void AIToShrine(Heroes &hero, const u16 dst_index)
+{
+    const Spell::spell_t spell = world.SpellFromShrine(dst_index);
+    const u8 spell_level = Spell::Level(spell);
+
+    // check spell book
+    if(hero.HasArtifact(Artifact::MAGIC_BOOK) &&
+    // check valid level spell and wisdom skill
+      !(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM)))
+    {
+	hero.AppendSpellToBook(spell);
+	hero.SetVisited(dst_index);
+    }
+    if(Settings::Get().Debug()) Error::Verbose("AIToShrine: " + hero.GetName());
+}
+
+void AIToGoodLuckObject(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+
+    // check already visited
+    if(!hero.isVisited(obj)) hero.SetVisited(dst_index);
+    if(Settings::Get().Debug()) Error::Verbose("AIToGoodLuckObject: " + hero.GetName());
+}
+
+void AIToGoodMoraleObject(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+
+    u16 move = 0;
+
+    switch(obj)
+    {
+        case MP2::OBJ_OASIS:		move = 800; break;
+        case MP2::OBJ_WATERINGHOLE:	move = 400; break;
+    	default: break;
+    }
+
+    // check already visited
+    if(!hero.isVisited(obj))
+    {
+	// modify morale
+	hero.SetVisited(dst_index);
+        hero.IncreaseMovePoints(move);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToGoodMoraleObject: " + hero.GetName());
+}
+
+
+
 
 /*
 // action to next cell
@@ -293,77 +529,38 @@ void Heroes::Action(const u16 dst_index)
 
     switch(object)
     {
-	case MP2::OBJ_MONSTER:	ActionToMonster(*this, dst_index); break;
+	case MP2::OBJ_MONSTER:	AIToMonster(*this, dst_index); break;
 
-        case MP2::OBJ_CASTLE:	ActionToCastle(*this, dst_index); break;
-        case MP2::OBJ_HEROES:	ActionToHeroes(*this, dst_index); break;
+        case MP2::OBJ_CASTLE:	AIToCastle(*this, dst_index); break;
+        case MP2::OBJ_HEROES:	AIToHeroes(*this, dst_index); break;
 
-        case MP2::OBJ_BOAT:	ActionToBoat(*this, dst_index); break;
-	case MP2::OBJ_COAST:	ActionToCoast(*this, dst_index); break;
+        case MP2::OBJ_BOAT:	AIToBoat(*this, dst_index); break;
+	case MP2::OBJ_COAST:	AIToCoast(*this, dst_index); break;
 
         // resource object
 
         // pickup object
-        case MP2::OBJ_RESOURCE:
-        case MP2::OBJ_BOTTLE:
-        case MP2::OBJ_CAMPFIRE:		ActionToPickupResource(*this, dst_index); break;
-
-        case MP2::OBJ_ANCIENTLAMP:	ActionToAncientLamp(*this, dst_index); break;
-
+        case MP2::OBJ_ANCIENTLAMP:	AIToAncientLamp(*this, dst_index); break;
         case MP2::OBJ_SHIPWRECKSURVIROR:
-        case MP2::OBJ_ARTIFACT: 	ActionToArtifact(*this, dst_index); break;
-
-        // shrine circle
-	case MP2::OBJ_SHRINE1:
-	case MP2::OBJ_SHRINE2:
-        case MP2::OBJ_SHRINE3:		ActionToShrine(*this, dst_index); break;
-
-        // witchs hut
-        case MP2::OBJ_WITCHSHUT: 	ActionToWitchsHut(*this, dst_index); break;
+        case MP2::OBJ_ARTIFACT: 	AIToArtifact(*this, dst_index); break;
 
         // info message
-        case MP2::OBJ_SIGN:		ActionToSign(*this, dst_index); break;
+        case MP2::OBJ_SIGN:		AIToSign(*this, dst_index); break;
 
-        // luck modification
-        case MP2::OBJ_FOUNTAIN:
-        case MP2::OBJ_FAERIERING:
-        case MP2::OBJ_IDOL:		ActionToGoodLuckObject(*this, dst_index); break;
+	case MP2::OBJ_PYRAMID:		AIToPoorLuckObject(*this, dst_index); break;
 
-	case MP2::OBJ_PYRAMID:		ActionToPoorLuckObject(*this, dst_index); break;
+        case MP2::OBJ_MAGICWELL: 	AIToMagicWell(*this, dst_index); break;
+        case MP2::OBJ_TRADINGPOST:	AIToTradingPost(*this); break;
 
-        case MP2::OBJ_MAGICWELL: 	ActionToMagicWell(*this, dst_index); break;
-        case MP2::OBJ_TRADINGPOST:	ActionToTradingPost(*this); break;
-
-        // primary skill modification
-        case MP2::OBJ_FORT:
-        case MP2::OBJ_MERCENARYCAMP:
-        case MP2::OBJ_DOCTORHUT:
-        case MP2::OBJ_STANDINGSTONES:	ActionToPrimarySkillObject(*this, dst_index); break;
-
-        // morale modification
-        case MP2::OBJ_OASIS:
-        case MP2::OBJ_TEMPLE:
-        case MP2::OBJ_WATERINGHOLE:
-        case MP2::OBJ_BUOY:		ActionToGoodMoraleObject(*this, dst_index); break;
 
 	case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
-	case MP2::OBJ_DERELICTSHIP:	ActionToPoorMoraleObject(*this, dst_index); break;
+	case MP2::OBJ_DERELICTSHIP:	AIToPoorMoraleObject(*this, dst_index); break;
 
-        // experience modification
-        case MP2::OBJ_GAZEBO:		ActionToExperienceObject(*this, dst_index); break;
-
-        // teleports
-	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(*this, dst_index); break;
-	case MP2::OBJ_WHIRLPOOL:	ActionToWhirlpools(*this, dst_index); break;
-
-	// obsv tower
-	case MP2::OBJ_OBSERVATIONTOWER:	ActionToObservationTower(*this, dst_index); break;
-        case MP2::OBJ_MAGELLANMAPS:	ActionToMagellanMaps(*this, dst_index); break;
 
 	// capture color object
 
-        case MP2::OBJ_ABANDONEDMINE:	ActionToAbandoneMine(*this, dst_index); break;
+        case MP2::OBJ_ABANDONEDMINE:	AIToAbandoneMine(*this, dst_index); break;
 
 	// accept army
         case MP2::OBJ_WATCHTOWER:
@@ -375,27 +572,27 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_DWARFCOTT:
         case MP2::OBJ_HALFLINGHOLE:
 	case MP2::OBJ_PEASANTHUT:
-        case MP2::OBJ_THATCHEDHUT:	ActionToDwellingJoinMonster(*this, dst_index); break;
+        case MP2::OBJ_THATCHEDHUT:	AIToDwellingJoinMonster(*this, dst_index); break;
 
 	// recruit army
         case MP2::OBJ_RUINS:
         case MP2::OBJ_TREECITY:
         case MP2::OBJ_WAGONCAMP:
-	case MP2::OBJ_DESERTTENT:	ActionToDwellingRecruitMonster(*this, dst_index); break;
+	case MP2::OBJ_DESERTTENT:	AIToDwellingRecruitMonster(*this, dst_index); break;
 
         // battle and recruit army
         case MP2::OBJ_DRAGONCITY:
         case MP2::OBJ_CITYDEAD:
-        case MP2::OBJ_TROLLBRIDGE:	ActionToDwellingBattleMonster(*this, dst_index); break;
+        case MP2::OBJ_TROLLBRIDGE:	AIToDwellingBattleMonster(*this, dst_index); break;
 
-        case MP2::OBJ_ARTESIANSPRING:	ActionToArtesianSpring(*this, dst_index); break;
+        case MP2::OBJ_ARTESIANSPRING:	AIToArtesianSpring(*this, dst_index); break;
 
-        case MP2::OBJ_XANADU:		ActionToXanadu(*this, dst_index); break;
+        case MP2::OBJ_XANADU:		AIToXanadu(*this, dst_index); break;
 
         case MP2::OBJ_HILLFORT:
-        case MP2::OBJ_FREEMANFOUNDRY:	ActionToUpgradeArmyObject(*this, dst_index); break;
+        case MP2::OBJ_FREEMANFOUNDRY:	AIToUpgradeArmyObject(*this, dst_index); break;
 
-	case MP2::OBJ_EVENT:		ActionToEvent(*this, dst_index); break;
+	case MP2::OBJ_EVENT:		AIToEvent(*this, dst_index); break;
 
         // object
         case MP2::OBJ_DAEMONCAVE:
@@ -417,14 +614,14 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_EYEMAGI:
         case MP2::OBJ_SIRENS:
         case MP2::OBJ_MERMAID:
-	    if(H2Config::Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
+	    if(Settings::Get().Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
 
 	default: break;
     }
 }
 
-void ActionToMonster(Heroes &hero, const u16 dst_index)
+void AIToMonster(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster::monster_t monster = Monster::Monster(tile);
@@ -432,7 +629,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     Army::army_t army;
     Army::ArrangeTroopsForBattle(army, monster, count);
 
-    if(H2Config::Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
+    if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
 
     const u32 exp = army.CalculateExperience();
     const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -473,7 +670,7 @@ void ActionToMonster(Heroes &hero, const u16 dst_index)
     }
 }
 
-void ActionToHeroes(Heroes &hero, const u16 dst_index)
+void AIToHeroes(Heroes &hero, const u16 dst_index)
 {
     const Heroes *other_hero = world.GetHeroes(dst_index);
 
@@ -481,13 +678,13 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
 
     if(hero.GetColor() == other_hero->GetColor())
     {
-	if(H2Config::Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
+	if(Settings::Get().Debug()) Error::Verbose("AIToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
 
 	hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
     }
     else
     {
-	if(H2Config::Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
+	if(Settings::Get().Debug()) Error::Verbose("AIToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
 	const u32 exp = other_hero->GetArmy().CalculateExperience();
 
@@ -514,7 +711,7 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
     }
 }
 
-void ActionToCastle(Heroes &hero, const u16 dst_index)
+void AIToCastle(Heroes &hero, const u16 dst_index)
 {
     const Castle *castle = world.GetCastle(dst_index);
 
@@ -522,7 +719,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
 
     if(hero.GetColor() == castle->GetColor())
     {
-	if(H2Config::Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
+	if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
 
 	Mixer::Reduce();
 
@@ -532,7 +729,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
     }
     else
     {
-	if(H2Config::Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
+	if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 	const Army::battle_t b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
 	const u32 exp = castle->GetArmy().CalculateExperience();
 
@@ -558,7 +755,7 @@ void ActionToCastle(Heroes &hero, const u16 dst_index)
     }
 }
 
-void ActionToBoat(Heroes &hero, const u16 dst_index)
+void AIToBoat(Heroes &hero, const u16 dst_index)
 {
     if(hero.isShipMaster()) return;
 
@@ -577,10 +774,10 @@ void ActionToBoat(Heroes &hero, const u16 dst_index)
     tiles_to.SetObject(MP2::OBJ_HEROES);
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
-    if(H2Config::Debug()) Error::Verbose("ActionToBoat: " + hero.GetName() + " to boat");
+    if(Settings::Get().Debug()) Error::Verbose("AIToBoat: " + hero.GetName() + " to boat");
 }
 
-void ActionToCoast(Heroes &hero, const u16 dst_index)
+void AIToCoast(Heroes &hero, const u16 dst_index)
 {
     if(! hero.isShipMaster()) return;
 
@@ -599,144 +796,12 @@ void ActionToCoast(Heroes &hero, const u16 dst_index)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    if(H2Config::Debug()) Error::Verbose("ActionToCoast: " + hero.GetName() + " to coast");
+    if(Settings::Get().Debug()) Error::Verbose("AIToCoast: " + hero.GetName() + " to coast");
 }
 
 
 
-
-void ActionToShrine(Heroes &hero, const u16 dst_index)
-{
-    const Spell::spell_t spell = world.SpellFromShrine(dst_index);
-    const std::string & spell_name = Spell::String(spell);
-    const u8 spell_level = Spell::Level(spell);
-
-    std::string head;
-    std::string body("You come across");
-
-    switch(spell_level)
-    {
-	case 1:
-	    head = "Shrine of the 1st Circle";
-	    body += " a small shrine attended by a group of novice acolytes. In exchange for your protection, they agree to teach you a simple spell -";
-	    break;
-	case 2:
-	    head = "Shrine of the 2st Circle";
-	    body += " an ornate shrine attended by a group of rotund friars. In exchange for your protection, they agree to teach you a spell -";
-	    break;
-	case 3:
-	    head = "Shrine of the 3st Circle";
-	    body += " a lavish shrine attended by a group of high priests. In exchange for your protection, they agree to teach you a sophisticated spell -";
-	    break;
-	default: return;
-    }
-    
-    body += "'" + spell_name + "'.";
-
-    // check spell book
-    if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
-    {
-	PlaySoundFailure;
-	body += " Unfortunately, you have no Magic Book to record the spell with.";
-	Dialog::Message(head, body, Font::BIG, Dialog::OK);
-	return;
-    }
-
-    // check valid level spell and wisdom skill
-    if(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))
-    {
-	PlaySoundFailure;
-	body += " Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.";
-	Dialog::Message(head, body, Font::BIG, Dialog::OK);
-	return;
-    }
-
-    PlaySoundSuccess;
-    hero.AppendSpellToBook(spell);
-    hero.SetVisited(dst_index, Visit::GLOBAL);
-    Dialog::SpellInfo(spell_name, body, spell);
-
-    if(H2Config::Debug()) Error::Verbose("ActionToShrine: " + hero.GetName());
-}
-
-void ActionToWitchsHut(Heroes &hero, const u16 dst_index)
-{
-    const Skill::Secondary::skill_t skill = world.SkillFromWitchsHut(dst_index);
-    const std::string & skill_name = Skill::Secondary::String(skill);
-    const std::string head("Witch's Hut");
-
-    // check full
-    if(HEROESMAXSKILL == hero.CountSecondarySkill())
-    {
-	PlaySoundFailure;
-	Dialog::Message("You approach the hut and observe a witch inside studying an ancient tome on " + skill_name + ".", "As you approach, she turns and focuses her one glass eye on you. \"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\"", Font::BIG, Dialog::OK);
-	return;
-    }
-
-    // check present skill
-    if(hero.HasSecondarySkill(skill))
-    {
-	PlaySoundVisited;
-	const std::string body();
-	Dialog::Message("You approach the hut and observe a witch inside studying an ancient tome on " + skill_name + ".", "As you approach, she turns and speaks. \"You already know that which I would teach you. I can help you no further.\"", Font::BIG, Dialog::OK);
-	return;
-    }
-
-    PlaySoundSuccess;
-    hero.LearnBasicSkill(skill);
-    hero.SetVisited(dst_index, Visit::GLOBAL);
-
-    Dialog::SkillInfo(skill_name, "An ancient and immortal witch living in a hut with bird's legs for stilts teaches you " + skill_name + " for her own inscrutable purposes.", skill, Skill::Level::BASIC);
-
-    if(H2Config::Debug()) Error::Verbose("ActionToWitchsHut: " + hero.GetName());
-}
-
-void ActionToGoodLuckObject(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t obj = tile.GetObject();
-
-    std::string body_true;
-    std::string body_false;
-
-    switch(obj)
-    {
-        case MP2::OBJ_FOUNTAIN:
-    	    body_false = "You drink from the enchanted fountain, but nothing happens.";
-    	    body_true = "As you drink the sweet water, you gain luck for your next battle.";
-    	    break;
-
-        case MP2::OBJ_FAERIERING:
-    	    body_false = "You enter the faerie ring, but nothing happens.";
-    	    body_true = "Upon entering the mystical faerie ring, your army gains luck for its next battle.";
-    	    break;
-
-        case MP2::OBJ_IDOL:
-	    body_false = "You've found an ancient and weathered stone idol. It is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.";
-	    body_true = "You've found an ancient and weathered stone idol. Kissing it is supposed to be lucky, so you do. The stone is very cold to the touch.";
-    	    break;
-
-    	default: return;
-    }
-
-    // check already visited
-    if(hero.isVisited(obj))
-    {
-	PlaySoundVisited;
-	Dialog::Message(MP2::StringObject(obj), body_false, Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	// modify luck
-        hero.SetVisited(dst_index);
-	AGG::PlaySound(M82::GOODLUCK);
-	DialogLuck(MP2::StringObject(obj), body_true, true, 1);
-    }
-
-    if(H2Config::Debug()) Error::Verbose("ActionToGoodLuckObject: " + hero.GetName());
-}
-
-void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
+void AIToPoorLuckObject(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
@@ -817,17 +882,17 @@ void ActionToPoorLuckObject(Heroes &hero, const u16 dst_index)
 	DialogLuck(MP2::StringObject(obj), body, false, 2);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToPoorLuckObject: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToPoorLuckObject: " + hero.GetName());
 }
 
-void ActionToSign(Heroes &hero, const u16 dst_index)
+void AIToSign(Heroes &hero, const u16 dst_index)
 {
     PlaySoundWarning;
     Dialog::Message("Sign", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
-    if(H2Config::Debug()) Error::Verbose("ActionToSign: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToSign: " + hero.GetName());
 }
 
-void ActionToMagicWell(Heroes &hero, const u16 dst_index)
+void AIToMagicWell(Heroes &hero, const u16 dst_index)
 {
     const u16 max = hero.GetMaxSpellPoints();
 
@@ -851,73 +916,18 @@ void ActionToMagicWell(Heroes &hero, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A drink from the well has restored your spell points to maximum.", Font::BIG, Dialog::OK);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToMagicWell: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToMagicWell: " + hero.GetName());
 }
 
-void ActionToTradingPost(Heroes &hero)
+void AIToTradingPost(Heroes &hero)
 {
     PlaySoundSuccess;
     Dialog::Marketplace(true);
-    if(H2Config::Debug()) Error::Verbose("ActionToTradingPost: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToTradingPost: " + hero.GetName());
 }
 
-void ActionToPrimarySkillObject(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t obj = tile.GetObject();
 
-    std::string body_false;
-    std::string body_true;
-    Skill::Primary::skill_t skill = Skill::Primary::ATTACK;
-
-    switch(obj)
-    {
-        case MP2::OBJ_FORT:
-    	    skill = Skill::Primary::DEFENCE;
-    	    body_false = "\"I'm sorry sir,\" The leader of the soldiers says, \"but you already know everything we have to teach.\"";
-    	    body_true = "The soldiers living in the fort teach you a few new defensive tricks.";
-    	    break;
-
-        case MP2::OBJ_MERCENARYCAMP:
-    	    skill = Skill::Primary::ATTACK;
-    	    body_false = "You've come upon a mercenary camp practicing their tactics. \"You're too advanced for us,\" the mercenary captain says. \"We can teach nothing more.\"";
-    	    body_true = "You've come upon a mercenary camp practicing their tactics. The mercenaries welcome you and your troops and invite you to train with them.";
-    	    break;
-
-        case MP2::OBJ_DOCTORHUT:
-    	    skill = Skill::Primary::KNOWLEDGE;
-    	    body_false = "\"Go 'way!\", the witch doctor barks, \"you know all I know.\"";
-    	    body_true = "An Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.";
-    	    break;
-
-        case MP2::OBJ_STANDINGSTONES:
-    	    skill = Skill::Primary::POWER;
-    	    body_false = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, the Druids turn you away, indicating they have nothing new to teach you.";
-    	    body_true = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, they teach you new ways to cast spells.";
-    	    break;
-
-    	default: return;
-    }
-
-    // check already visited
-    if(hero.isVisited(tile))
-    {
-	PlaySoundVisited;
-	Dialog::Message(MP2::StringObject(obj), body_false, Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	PlaySoundSuccess;
-	// increase skill
-	hero.IncreasePrimarySkill(skill);
-	hero.SetVisited(dst_index);
-	Dialog::SkillInfo(MP2::StringObject(obj), body_true, skill);
-    }
-
-    if(H2Config::Debug()) Error::Verbose("ActionToPrimarySkillObject: " + hero.GetName());
-}
-
-void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
+void AIToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
@@ -999,7 +1009,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 			    art = Artifact::Artifact(tile.GetQuantity1());
                 	    c = 10;
                 	    break;
-                	default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
+                	default: Error::Warning("AIToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
                     }
                     ArrangeTroopsForBattle(army, Monster::GHOST, c * ARMYMAXTROOPS);
 
@@ -1095,114 +1105,10 @@ void ActionToPoorMoraleObject(Heroes &hero, const u16 dst_index)
 	DialogMorale(MP2::StringObject(obj), body, false, 1);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToPoorMoraleObject: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToPoorMoraleObject: " + hero.GetName());
 }
 
-void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t obj = tile.GetObject();
-
-    std::string body_true;
-    std::string body_false;
-    u16 move = 0;
-
-    switch(obj)
-    {
-        case MP2::OBJ_BUOY:
-    	    body_false = "Your men spot a navigational buoy, confirming that you are on course.";
-    	    body_true = "Your men spot a navigational buoy, confirming that you are on course and increasing their morale.";
-    	    break;
-
-        case MP2::OBJ_OASIS:
-    	    body_false = "The drink at the oasis is refreshing, but offers no further benefit. The oasis might help again if you fought a battle first.";
-    	    body_true = "A drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.";
-    	    move = 800;	// + 8TP, from FAQ
-    	    break;
-
-        case MP2::OBJ_WATERINGHOLE:
-    	    body_false = "The drink at the watering hole is refreshing, but offers no further benefit. The watering hole might help again if you fought a battle first.";
-	    body_true = "A drink at the watering hole fills your troops with strength and lifts their spirits. You can travel a bit further today.";
-    	    move = 400;	// + 4TP, from FAQ
-    	    break;
-
-        case MP2::OBJ_TEMPLE:
-    	    body_false = "It doesn't help to pray twice before a battle. Come back after you've fought.";
-    	    body_true = "A visit and a prayer at the temple raises the morale of your troops.";
-    	    break;
-
-    	default: return;
-    }
-
-    // check already visited
-    if(hero.isVisited(obj))
-    {
-	PlaySoundVisited;
-    	Dialog::Message(MP2::StringObject(obj), body_false, Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	// modify morale
-	hero.SetVisited(dst_index);
-	AGG::PlaySound(M82::GOODMRLE);
-	DialogMorale(MP2::StringObject(obj), body_true, true, (obj == MP2::OBJ_TEMPLE ? 2 : 1));
-        hero.IncreaseMovePoints(move);
-    }
-
-    if(H2Config::Debug()) Error::Verbose("ActionToGoodMoraleObject: " + hero.GetName());
-}
-
-
-void ActionToExperienceObject(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t obj = tile.GetObject();
-
-    std::string body_true;
-    std::string body_false;
-    
-    u32 exp = 0;
-
-    switch(obj)
-    {
-        case MP2::OBJ_GAZEBO:
-    	    body_false = "An old Knight appears on the steps of the gazebo. \"I am sorry, my liege, I have taught you all I can.\"";
-    	    body_true = "An old Knight appears on the steps of the gazebo. \"My liege, I will teach you all that I know to aid you in your travels.\"";
-    	    exp = 1000;
-    	    break;
-
-    	default: return;
-    }
-
-    // check already visited
-    if(hero.isVisited(tile))
-    {
-	PlaySoundVisited;
-	Dialog::Message(MP2::StringObject(obj), body_false, Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	std::string count;
-	String::AddInt(count, exp);
-	const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-	Surface image(sprite.w(), sprite.h() + 12);
-	image.SetColorKey();
-	image.Blit(sprite);
-	Text text(count, Font::SMALL);
-	text.Blit((sprite.w() - Text::width(count, Font::SMALL)) / 2, sprite.h() + 2, image);
-
-	PlaySoundWarning;
-	Dialog::SpriteInfo(MP2::StringObject(obj), body_true, image);
-
-	// visit
-	hero.SetVisited(dst_index);
-	hero.IncreaseExperience(exp);
-    }
-
-    if(H2Config::Debug()) Error::Verbose("ActionToExperienceObject: " + hero.GetName());
-}
-
-void ActionToArtifact(Heroes &hero, const u16 dst_index)
+void AIToArtifact(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -1386,11 +1292,11 @@ void ActionToArtifact(Heroes &hero, const u16 dst_index)
 	tile.SetObject(MP2::OBJ_ZERO);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToArtifact: " + hero.GetName() + " pickup artifact");
+    if(Settings::Get().Debug()) Error::Verbose("AIToArtifact: " + hero.GetName() + " pickup artifact");
 }
 
 
-void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
+void AIToAncientLamp(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const u32 count = tile.GetCountMonster();
@@ -1413,93 +1319,11 @@ void ActionToAncientLamp(Heroes &hero, const u16 dst_index)
 	}
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToTreasureChest: " + hero.GetName() + " pickup chest");
+    if(Settings::Get().Debug()) Error::Verbose("AIToTreasureChest: " + hero.GetName() + " pickup chest");
 }
 
-void ActionToTeleports(Heroes &hero, const u16 index_from)
-{
-    const u16 index_to = world.NextTeleport(index_from);
-    hero.ApplyPenaltyMovement();
 
-    if(index_from == index_to)
-    {
-	AGG::PlaySound(M82::RSBRYFZL);
-	Error::Warning("ActionToTeleports: action unsuccessfully...");
-	return;
-    }
-
-    AGG::PlaySound(M82::KILLFADE);
-    hero.GetPath().Hide();
-    hero.FadeOut();
-
-    Maps::Tiles & tiles_from = world.GetTiles(index_from);
-    Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
-
-    hero.SaveUnderObject(MP2::OBJ_STONELIGHTS);
-    hero.SetCenter(index_to);
-    hero.Scoute();
-
-    tiles_to.SetObject(MP2::OBJ_HEROES);
-
-    Game::Focus::Get().Redraw();
-    Display::Get().Flip();
-
-    AGG::PlaySound(M82::KILLFADE);
-    hero.GetPath().Hide();
-    hero.FadeIn();
-
-    // check monster
-    u16 dst_index2 = MAXU16;
-    if(Maps::TileUnderProtection(index_to, dst_index2)) hero.Action(dst_index2);
-}
-
-void ActionToWhirlpools(Heroes &hero, const u16 index_from)
-{
-    const u16 index_to = world.NextWhirlpool(index_from);
-    hero.ApplyPenaltyMovement();
-
-    if(index_from == index_to)
-    {
-	AGG::PlaySound(M82::RSBRYFZL);
-	Error::Warning("ActionToWhirlpools: action unsuccessfully...");
-	return;
-    }
-
-    AGG::PlaySound(M82::KILLFADE);
-    hero.GetPath().Hide();
-    hero.FadeOut();
-
-    Maps::Tiles & tiles_from = world.GetTiles(index_from);
-    Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
-
-    hero.SaveUnderObject(MP2::OBJ_WHIRLPOOL);
-    hero.SetCenter(index_to);
-    hero.Scoute();
-
-    tiles_to.SetObject(MP2::OBJ_HEROES);
-
-    Game::Focus::Get().Redraw();
-    Display::Get().Flip();
-
-    AGG::PlaySound(M82::KILLFADE);
-    hero.GetPath().Hide();
-    hero.FadeIn();
-
-    if(Rand::Get(1))
-    {
-	PlaySoundWarning;
-	Dialog::Message("A whirlpool engulfs your ship.", "Some of your army has fallen overboard.", Font::BIG, Dialog::OK);
-	Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
-	const u16 c = troops.Count() / 2;
-	troops.SetCount(c ? c : 1);
-    }
-}
-
-void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
+void AIToAbandoneMine(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
@@ -1536,12 +1360,12 @@ void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
 	}
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+    if(Settings::Get().Debug()) Error::Verbose("AIToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
 
 //
 
-void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
+void AIToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
@@ -1583,10 +1407,10 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
 	Dialog::Message("", "As you approach the dwelling, you notice that there is no one here.", Font::BIG, Dialog::OK);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToDwellingJoinMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    if(Settings::Get().Debug()) Error::Verbose("AIToDwellingJoinMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }
 
-void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
+void AIToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
@@ -1650,10 +1474,10 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u16 dst_index)
 	Dialog::Message(msg_void1, msg_void2, Font::BIG, Dialog::OK);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToDwellingRecruitMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    if(Settings::Get().Debug()) Error::Verbose("AIToDwellingRecruitMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }
 
-void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
+void AIToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t obj = tile.GetObject();
@@ -1836,19 +1660,11 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
     	}
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    if(Settings::Get().Debug()) Error::Verbose("AIToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }
 
-void ActionToObservationTower(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    PlaySoundSuccess;
-    Dialog::Message(MP2::StringObject(tile.GetObject()), "From the observation tower, you are able to see distant lands.", Font::BIG, Dialog::OK);
-    Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, hero.GetColor());
-}
-
-void ActionToArtesianSpring(Heroes &hero, const u16 dst_index)
+void AIToArtesianSpring(Heroes &hero, const u16 dst_index)
 {
     const u16 max = hero.GetMaxSpellPoints();
     const std::string & name = MP2::StringObject(MP2::OBJ_ARTESIANSPRING);
@@ -1872,10 +1688,10 @@ void ActionToArtesianSpring(Heroes &hero, const u16 dst_index)
 	Dialog::Message(name, "A drink from the spring fills your blood with magic!  You have twice your normal spell points in reserve.", Font::BIG, Dialog::OK);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToArtesianSpring: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToArtesianSpring: " + hero.GetName());
 }
 
-void ActionToXanadu(Heroes &hero, const u16 dst_index)
+void AIToXanadu(Heroes &hero, const u16 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -1916,10 +1732,10 @@ void ActionToXanadu(Heroes &hero, const u16 dst_index)
 	}
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToXanadu: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToXanadu: " + hero.GetName());
 }
 
-void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
+void AIToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t & obj = tile.GetObject();
@@ -2020,29 +1836,11 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(obj), msg2, Font::BIG, Dialog::OK);
     }
 
-    if(H2Config::Debug()) Error::Verbose("ActionToUpgradeArmyObject: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToUpgradeArmyObject: " + hero.GetName());
 }
 
-void ActionToMagellanMaps(Heroes &hero, const u16 dst_index)
-{
-    if(1000 > world.GetKingdom(hero.GetColor()).GetFundsGold())
-    {
-	PlaySoundFailure;
-	Dialog::Message("The captain sighs.", "\"You don't have enough money, eh?  You can't expect me to give my maps away for free!\"", Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	PlaySoundWarning;
-	if(Dialog::YES == Dialog::Message("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold.", "Do you wish to buy the maps?", Font::BIG, Dialog::YES | Dialog::NO))
-	    world.ActionForMagellanMaps(hero.GetColor());
 
-	Game::Focus::Get().Redraw();
-    }
-
-    if(H2Config::Debug()) Error::Verbose("ActionToMagellanMaps: " + hero.GetName());
-}
-
-void ActionToEvent(Heroes &hero, const u16 dst_index)
+void AIToEvent(Heroes &hero, const u16 dst_index)
 {
     // check event maps
     const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
@@ -2066,6 +1864,6 @@ void ActionToEvent(Heroes &hero, const u16 dst_index)
 
     world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
 
-    if(H2Config::Debug()) Error::Verbose("ActionToEvent: " + hero.GetName());
+    if(Settings::Get().Debug()) Error::Verbose("AIToEvent: " + hero.GetName());
 }
 */

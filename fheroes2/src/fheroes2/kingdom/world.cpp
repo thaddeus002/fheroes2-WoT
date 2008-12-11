@@ -1100,7 +1100,7 @@ const Kingdom & World::GetMyKingdom(void) const
 { return GetKingdom(Settings::Get().MyColor()); }
 
 /* get kingdom */
-Kingdom & World::GetKingdom(Color::color_t color)
+Kingdom & World::GetKingdom(u8 color)
 {
     switch(color)
     {
@@ -1118,7 +1118,7 @@ Kingdom & World::GetKingdom(Color::color_t color)
     return *vec_kingdoms[6];
 }
 
-const Kingdom & World::GetKingdom(Color::color_t color) const
+const Kingdom & World::GetKingdom(u8 color) const
 {
     switch(color)
     {
@@ -1844,6 +1844,17 @@ void World::StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & sto
 
 	    // skip if object captured (skip castle)
 	    if(MP2::OBJ_CASTLE != tile.GetObject() && MP2::isCaptureObject(tile.GetObject()) && color == ColorCapturedObject(tile.GetIndex())) continue;
+
+	    // check: is visited objects
+	    switch(tile.GetObject())
+	    {
+                case MP2::OBJ_MAGELLANMAPS:
+                case MP2::OBJ_OBSERVATIONTOWER:
+		    if(world.GetKingdom(color).isVisited(tile)) continue;
+		    break;
+
+		default: break;
+	    }
 
 	    store[tile.GetIndex()] = tile.GetObject();
 	}

@@ -34,8 +34,6 @@
 #include "algorithm.h"
 #include "gameevent.h"
 
-#define OBSERVATIONTOWERSCOUTE 10
-
 #define PlaySoundWarning	AGG::PlaySound(M82::EXPERNCE)
 #define PlaySoundSuccess	AGG::PlaySound(M82::TREASURE)
 #define PlaySoundFailure	AGG::PlaySound(M82::H2MINE)
@@ -859,7 +857,7 @@ void ActionToShrine(Heroes &hero, const u16 dst_index)
 
     PlaySoundSuccess;
     hero.AppendSpellToBook(spell);
-    hero.SetVisited(dst_index, Visit::GLOBAL);
+    hero.SetVisited(dst_index);
     Dialog::SpellInfo(spell_name, body, spell);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToShrine: " + hero.GetName());
@@ -890,7 +888,7 @@ void ActionToWitchsHut(Heroes &hero, const u16 dst_index)
 
     PlaySoundSuccess;
     hero.LearnBasicSkill(skill);
-    hero.SetVisited(dst_index, Visit::GLOBAL);
+    hero.SetVisited(dst_index);
 
     Dialog::SkillInfo(skill_name, "An ancient and immortal witch living in a hut with bird's legs for stilts teaches you " + skill_name + " for her own inscrutable purposes.", skill, Skill::Level::BASIC);
 
