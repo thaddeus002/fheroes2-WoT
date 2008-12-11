@@ -469,12 +469,14 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
 	switch(b)
 	{
 	    case Army::WIN:
+		hero.TakeArtifacts(const_cast<Heroes &>(*other_hero));
 		hero.IncreaseExperience(exp);
 		AGG::PlaySound(M82::KILLFADE);
 		(*other_hero).FadeOut();
     		world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
     		const_cast<Heroes &>(*other_hero).SetFreeman(b);
-		hero.TakeArtifacts(const_cast<Heroes &>(*other_hero));
+	        // set default army
+		const_cast<Heroes &>(*other_hero).GetArmy().Reset(true);
 		hero.ActionAfterBattle();
 		break;
 
@@ -1343,6 +1345,16 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
 	AGG::PlaySound(M82::GOODMRLE);
 	DialogMorale(MP2::StringObject(obj), body_true, true, (obj == MP2::OBJ_TEMPLE ? 2 : 1));
         hero.IncreaseMovePoints(move);
+
+	// fix double action tile
+	if(obj == MP2::OBJ_OASIS)
+	{
+	    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
+	    else
+	    if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+	}
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToGoodMoraleObject: " + hero.GetName());
@@ -1724,7 +1736,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
+    tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
 
     hero.SaveUnderObject(MP2::OBJ_STONELIGHTS);
     hero.SetCenter(index_to);
@@ -1763,7 +1775,7 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
+    tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
 
     hero.SaveUnderObject(MP2::OBJ_WHIRLPOOL);
     hero.SetCenter(index_to);

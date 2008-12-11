@@ -279,11 +279,11 @@ Artifact::artifact_t Artifact::FromIndexSprite(u8 index)
 
 /* artifact name */
 const std::string & Artifact::String(artifact_t artifact)
-{ return (MAGIC_BOOK < artifact ? all_artifacts[MAGIC_BOOK + 1].name : all_artifacts[artifact].name); }
+{ return all_artifacts[artifact].name; }
 
 /* artifact description */
 const std::string & Artifact::Description(artifact_t artifact)
-{ return (MAGIC_BOOK < artifact ? all_artifacts[MAGIC_BOOK + 1].description : all_artifacts[artifact].description); }
+{ return all_artifacts[artifact].description; }
 
 
 Artifact::artifact_t Artifact::RandUltimate(void)

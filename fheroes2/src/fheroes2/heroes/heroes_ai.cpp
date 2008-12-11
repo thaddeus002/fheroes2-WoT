@@ -362,7 +362,7 @@ void AIToTeleports(Heroes &hero, const u16 index_from)
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
+    tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
 
     hero.SaveUnderObject(MP2::OBJ_STONELIGHTS);
     hero.SetCenter(index_to);
@@ -389,7 +389,7 @@ void AIToWhirlpools(Heroes &hero, const u16 index_from)
     Maps::Tiles & tiles_from = world.GetTiles(index_from);
     Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-    if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
+    tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
 
     hero.SaveUnderObject(MP2::OBJ_WHIRLPOOL);
     hero.SetCenter(index_to);
@@ -523,6 +523,16 @@ void AIToGoodMoraleObject(Heroes &hero, const u16 dst_index)
 	// modify morale
 	hero.SetVisited(dst_index);
         hero.IncreaseMovePoints(move);
+
+        // fix double action tile
+        if(obj == MP2::OBJ_OASIS)
+        {
+            if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
+            else
+            if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+        }
     }
 
     if(Settings::Get().Debug()) Error::Verbose("AIToGoodMoraleObject: " + hero.GetName());

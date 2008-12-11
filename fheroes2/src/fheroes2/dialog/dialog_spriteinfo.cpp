@@ -60,33 +60,6 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    //Point pt;
-    
-    //pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-    //pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-
-/*
-    Button button(pt, system, 1, 2);
-
-    button.Draw();
-
-    cursor.Show();
-    display.Flip();
-
-    // message loop
-    while(le.HandleEvents())
-    {
-	le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
-
-        if(le.MouseClickLeft(button)){ break; }
-
-	if(le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)){ break; }
-    }
-
-    cursor.Hide();
-}
-*/
-
     Button *button1 = NULL;
     Button *button2 = NULL;
     Point pt;

@@ -152,6 +152,8 @@ namespace Army
 	    void	UpgradeTroops(const Castle &);
 	    void	ArrangeForBattle(void);
 
+	    void	Dump(void) const;
+
 	private:
 	    friend class Troop;
 

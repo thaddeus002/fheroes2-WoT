@@ -33,6 +33,9 @@
 #include "visit.h"
 #include "heroes.h"
 
+extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
+extern void PlayPickupSound(void);
+
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
     move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(*this), hid(ht), race(rc), flags(ARMYSPREAD),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
@@ -1165,6 +1168,11 @@ void Heroes::TakeArtifacts(Heroes & hero2)
 	    Artifact::MAGIC_BOOK != art &&
 	    !Artifact::Ultimate(art))
 	{
+	    if(Settings::Get().MyColor() == color)
+	    {
+		PlayPickupSound();
+		DialogWithArtifact("You have captured an enemy artifact!", Artifact::String(art), art);
+	    }
 	    PickupArtifact(art);
 	    hero2.artifacts[ii] = Artifact::UNKNOWN;
 	}

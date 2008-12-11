@@ -869,3 +869,15 @@ void Army::army_t::UpgradeTroops(const Castle & castle)
 	}
     }
 }
+
+void Army::army_t::Dump(void) const
+{
+    std::cout << "Army::Dump: ";
+
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    
+    for(; it1 != it2; ++it1) if((*it1).isValid()) std::cout << Monster::String((*it1).Monster()) << "(" << (*it1).Count() << "), ";
+
+    std::cout << std::endl;
+}
