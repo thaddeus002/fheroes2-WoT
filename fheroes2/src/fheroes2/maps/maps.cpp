@@ -286,7 +286,7 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u1
 	for(s16 iy = ty; iy <= my; ++iy)
 	    for(s16 ix = tx; ix <= mx; ++ix)
 	{
-	    if(ty < iy & iy < my && tx < ix && ix < mx) continue;
+	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
 	    res = GetIndexFromAbsPoint(ix, iy);
 
