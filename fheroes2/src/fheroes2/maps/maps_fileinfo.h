@@ -59,6 +59,8 @@ public:
     void SetKingdomColors(const u8 colors);
     void SetKingdomRace(const Color::color_t color, const Race::race_t race);
 
+    static bool PredicateForSorting(const FileInfo*, const FileInfo*);
+
 protected:
     static Race::race_t ByteToRace(u8 byte);
 

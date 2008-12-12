@@ -31,7 +31,7 @@
 
 #define SIZEOFMP2SIGN   0x0a
 #define SIZEOFMP2RUMOR  0x09
-#define SIZEOFMP2EVENT  0x33
+#define SIZEOFMP2EVENT  0x32
 #define SIZEOFMP2RIDDLE 0x8a
 
 namespace MP2

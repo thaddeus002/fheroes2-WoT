@@ -369,7 +369,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_FREEMANFOUNDRY:	ActionToUpgradeArmyObject(*this, dst_index); break;
 
-	case MP2::OBJ_EVENT:		ActionToEvent(*this, dst_index); break;
+        case MP2::OBJ_EVENT:		ActionToEvent(*this, dst_index); break;
 
         // object
         case MP2::OBJ_DAEMONCAVE:
@@ -2322,6 +2322,17 @@ void ActionToArtesianSpring(Heroes &hero, const u16 dst_index)
 	hero.SetVisited(dst_index);
 	hero.SetSpellPoints(max * 2);
 	Dialog::Message(name, "A drink from the spring fills your blood with magic!  You have twice your normal spell points in reserve.", Font::BIG, Dialog::OK);
+
+	// fix double action tile
+	{
+	    const Maps::Tiles & tile = world.GetTiles(dst_index);
+
+	    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
+	    else
+	    if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+	}
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToArtesianSpring: " + hero.GetName());

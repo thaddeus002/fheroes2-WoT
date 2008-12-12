@@ -21,6 +21,7 @@
 #include "settings.h"
 #include "kingdom.h"
 #include "world.h"
+#include "gameevent.h"
 #include "heroes.h"
 
 void AIToPickupResource(Heroes &hero, const u16 dst_index);
@@ -40,6 +41,11 @@ void AIToWitchsHut(Heroes &hero, const u16 dst_index);
 void AIToShrine(Heroes &hero, const u16 dst_index);
 void AIToGoodLuckObject(Heroes &hero, const u16 dst_index);
 void AIToGoodMoraleObject(Heroes &hero, const u16 dst_index);
+void AIToMagicWell(Heroes &hero, const u16 dst_index);
+void AIToArtesianSpring(Heroes &hero, const u16 dst_index);
+void AIToXanadu(Heroes &hero, const u16 dst_index);
+void AIToEvent(Heroes &hero, const u16 dst_index);
+void AIToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
 
 void Heroes::AIUpdateRoles(void)
 {
@@ -74,6 +80,9 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_MINES:
 	case MP2::OBJ_SAWMILL:
         case MP2::OBJ_LIGHTHOUSE:	AIToCaptureObject(*this, dst_index); break;
+
+	// event
+	case MP2::OBJ_EVENT:		AIToEvent(*this, dst_index); break;
 
 	// increase view
 	case MP2::OBJ_OBSERVATIONTOWER:	AIToObservationTower(*this, dst_index); break;
@@ -111,6 +120,16 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_WATERINGHOLE:
         case MP2::OBJ_BUOY:		AIToGoodMoraleObject(*this, dst_index); break;
 
+        // magic point
+	case MP2::OBJ_ARTESIANSPRING:	AIToArtesianSpring(*this, dst_index); break;
+        case MP2::OBJ_MAGICWELL: 	AIToMagicWell(*this, dst_index); break;
+
+        // increase skill
+	case MP2::OBJ_XANADU:		AIToXanadu(*this, dst_index); break;
+
+        case MP2::OBJ_HILLFORT:
+        case MP2::OBJ_FREEMANFOUNDRY:	AIToUpgradeArmyObject(*this, dst_index); break;
+
 	default:
 	    Error::Verbose("AI::Action: Hero " + GetName() + " say: I'm stupid, help my please..");
 	    break;
@@ -138,6 +157,8 @@ void AIToPickupResource(Heroes &hero, const u16 dst_index)
 
     world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     tile.RemoveObjectSprite();
+
+    hero.GetPath().Reset();
 
     tile.SetObject(MP2::OBJ_ZERO);
     if(Settings::Get().Debug()) Error::Verbose("AIToPickupResource: " + hero.GetName() + " pickup small resource");
@@ -538,6 +559,114 @@ void AIToGoodMoraleObject(Heroes &hero, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToGoodMoraleObject: " + hero.GetName());
 }
 
+void AIToMagicWell(Heroes &hero, const u16 dst_index)
+{
+    const u16 max = hero.GetMaxSpellPoints();
+
+    if(hero.GetSpellPoints() != max &&
+	// check already visited
+	!hero.isVisited(MP2::OBJ_MAGICWELL))
+    {
+	hero.SetVisited(dst_index);
+	hero.SetSpellPoints(max);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToMagicWell: " + hero.GetName());
+}
+
+void AIToArtesianSpring(Heroes &hero, const u16 dst_index)
+{
+    const u16 max = hero.GetMaxSpellPoints();
+
+    if(!hero.isVisited(MP2::OBJ_ARTESIANSPRING) &&
+       hero.GetSpellPoints() < max * 2)
+    {
+	hero.SetVisited(dst_index);
+	hero.SetSpellPoints(max * 2);
+
+        // fix double action tile
+        {
+	    const Maps::Tiles & tile = world.GetTiles(dst_index);
+
+            if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
+            else
+            if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+        }
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToArtesianSpring: " + hero.GetName());
+}
+
+void AIToXanadu(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const Skill::Level::type_t level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
+    const u8 level2 = hero.GetLevel();
+
+    if(!hero.isVisited(tile) &&
+      ((level1 == Skill::Level::BASIC && 7 < level2) ||
+       (level1 == Skill::Level::ADVANCED && 5 < level2) ||
+       (level1 == Skill::Level::EXPERT && 3 < level2) ||
+       (9 < level2)))
+    {
+	hero.IncreasePrimarySkill(Skill::Primary::ATTACK);
+	hero.IncreasePrimarySkill(Skill::Primary::DEFENCE);
+	hero.IncreasePrimarySkill(Skill::Primary::KNOWLEDGE);
+	hero.IncreasePrimarySkill(Skill::Primary::POWER);
+	hero.SetVisited(dst_index);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToXanadu: " + hero.GetName());
+}
+
+void AIToEvent(Heroes &hero, const u16 dst_index)
+{
+    // check event maps
+    const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
+    if(event_maps)
+    {
+        if(event_maps->GetResource().GetValidItems())
+    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
+	if(Artifact::UNKNOWN != event_maps->GetArtifact())
+	    hero.PickupArtifact(event_maps->GetArtifact());
+    }
+    world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToEvent: " + hero.GetName());
+}
+
+void AIToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t & obj = tile.GetObject();
+
+    switch(obj)
+    {
+	case MP2::OBJ_HILLFORT:
+	    if(hero.GetArmy().HasMonster(Monster::DWARF))
+		hero.GetArmy().UpgradeMonsters(Monster::DWARF);
+	    if(hero.GetArmy().HasMonster(Monster::ORC))
+		hero.GetArmy().UpgradeMonsters(Monster::ORC);
+	    if(hero.GetArmy().HasMonster(Monster::OGRE))
+		hero.GetArmy().UpgradeMonsters(Monster::OGRE);
+	    break;
+
+	case MP2::OBJ_FREEMANFOUNDRY:
+	    if(hero.GetArmy().HasMonster(Monster::PIKEMAN))
+		hero.GetArmy().UpgradeMonsters(Monster::PIKEMAN);
+	    if(hero.GetArmy().HasMonster(Monster::SWORDSMAN))
+		hero.GetArmy().UpgradeMonsters(Monster::SWORDSMAN);
+	    if(hero.GetArmy().HasMonster(Monster::IRON_GOLEM))
+		hero.GetArmy().UpgradeMonsters(Monster::IRON_GOLEM);
+	    break;
+
+	default: break;
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToUpgradeArmyObject: " + hero.GetName());
+}
 
 
 
@@ -569,7 +698,6 @@ void Heroes::Action(const u16 dst_index)
 
 	case MP2::OBJ_PYRAMID:		AIToPoorLuckObject(*this, dst_index); break;
 
-        case MP2::OBJ_MAGICWELL: 	AIToMagicWell(*this, dst_index); break;
         case MP2::OBJ_TRADINGPOST:	AIToTradingPost(*this); break;
 
 
@@ -605,14 +733,8 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_CITYDEAD:
         case MP2::OBJ_TROLLBRIDGE:	AIToDwellingBattleMonster(*this, dst_index); break;
 
-        case MP2::OBJ_ARTESIANSPRING:	AIToArtesianSpring(*this, dst_index); break;
 
-        case MP2::OBJ_XANADU:		AIToXanadu(*this, dst_index); break;
 
-        case MP2::OBJ_HILLFORT:
-        case MP2::OBJ_FREEMANFOUNDRY:	AIToUpgradeArmyObject(*this, dst_index); break;
-
-	case MP2::OBJ_EVENT:		AIToEvent(*this, dst_index); break;
 
         // object
         case MP2::OBJ_DAEMONCAVE:
@@ -913,32 +1035,6 @@ void AIToSign(Heroes &hero, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToSign: " + hero.GetName());
 }
 
-void AIToMagicWell(Heroes &hero, const u16 dst_index)
-{
-    const u16 max = hero.GetMaxSpellPoints();
-
-    if(hero.GetSpellPoints() == max)
-    {
-	PlaySoundFailure;
-	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A drink at the well is supposed to restore your spell points, but you are already at maximum.", Font::BIG, Dialog::OK);
-    }
-    else
-    // check already visited
-    if(hero.isVisited(MP2::OBJ_MAGICWELL))
-    {
-	PlaySoundVisited;
-	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A second drink at the well in one day will not help you.", Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	PlaySoundSuccess;
-	hero.SetVisited(dst_index);
-	hero.SetSpellPoints(max);
-	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A drink from the well has restored your spell points to maximum.", Font::BIG, Dialog::OK);
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToMagicWell: " + hero.GetName());
-}
 
 void AIToTradingPost(Heroes &hero)
 {
@@ -1684,207 +1780,138 @@ void AIToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
 }
 
+*/
 
-void AIToArtesianSpring(Heroes &hero, const u16 dst_index)
+bool Heroes::AIValidObject(const u8 obj, const u16 index)
 {
-    const u16 max = hero.GetMaxSpellPoints();
-    const std::string & name = MP2::StringObject(MP2::OBJ_ARTESIANSPRING);
-
-    if(hero.isVisited(MP2::OBJ_ARTESIANSPRING))
-    {
-	PlaySoundVisited;
-	Dialog::Message(name, "The spring only refills once a week, and someone's already been here this week.", Font::BIG, Dialog::OK);
-    }
-    else
-    if(hero.GetSpellPoints() == max * 2)
-    {	
-	PlaySoundFailure;
-	Dialog::Message(name, "A drink at the spring is supposed to give you twice your normal spell points, but you are already at that level.", Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	PlaySoundSuccess;
-	hero.SetVisited(dst_index);
-	hero.SetSpellPoints(max * 2);
-	Dialog::Message(name, "A drink from the spring fills your blood with magic!  You have twice your normal spell points in reserve.", Font::BIG, Dialog::OK);
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToArtesianSpring: " + hero.GetName());
-}
-
-void AIToXanadu(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-
-    if(hero.isVisited(tile))
-    {
-	PlaySoundVisited;
-	Dialog::Message("Recognizing you, the butler refuses to admit you.", "\"The master,\" he says, \"will not see the same student twice.\"", Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	bool access = false;
-	switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
-	{
-	    case Skill::Level::BASIC:
-		if(7 < hero.GetLevel()) access = true; break;
-	    case Skill::Level::ADVANCED:
-		if(5 < hero.GetLevel()) access = true; break;
-	    case Skill::Level::EXPERT:
-		if(3 < hero.GetLevel()) access = true; break;
-	    default:
-		if(9 < hero.GetLevel()) access = true; break;
-	}
-
-	if(access)
-	{
-	    PlaySoundSuccess;
-	    Dialog::Message("The butler admits you to see the master of the house.", "He trains you in the four skills a hero should know.", Font::BIG, Dialog::OK);
-	    hero.IncreasePrimarySkill(Skill::Primary::ATTACK);
-	    hero.IncreasePrimarySkill(Skill::Primary::DEFENCE);
-	    hero.IncreasePrimarySkill(Skill::Primary::KNOWLEDGE);
-	    hero.IncreasePrimarySkill(Skill::Primary::POWER);
-	    hero.SetVisited(dst_index);
-	}
-	else
-	{
-	    PlaySoundFailure;
-	    Dialog::Message("The butler opens the door and looks you up and down.", "\"You are neither famous nor diplomatic enough to be admitted to see my master,\" he sniffs. \"Come back when you think yourself worthy.\"", Font::BIG, Dialog::OK);
-	}
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToXanadu: " + hero.GetName());
-}
-
-void AIToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
-{
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t & obj = tile.GetObject();
-
-    std::string msg1;
-    std::string msg2;
-    std::string msg3;
-    
-    std::vector<Monster::monster_t> mons;
-    mons.reserve(3);
-
     switch(obj)
     {
-	case MP2::OBJ_HILLFORT:
-	    if(hero.GetArmy().HasMonster(Monster::DWARF))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::DWARF);
-		mons.push_back(Monster::DWARF);
-		msg1 = Monster::MultipleNames(Monster::DWARF);
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::ORC))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::ORC);
-		mons.push_back(Monster::ORC);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::ORC);
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::OGRE))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::OGRE);
-		mons.push_back(Monster::OGRE);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::OGRE);
-	    }
-	    msg1 = "All of the " + msg1 + " you have in your army have been trained by the battle masters of the fort.  Your army now contains " + msg1 + ".";
-	    msg2 = "An unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any such troops brought to them.  Unfortunately, you have none with you.";
+	// water object
+	case MP2::OBJ_SHIPWRECKSURVIROR:
+	case MP2::OBJ_WATERCHEST:
+	case MP2::OBJ_FLOTSAM:
+	case MP2::OBJ_BOTTLE:
+	case MP2::OBJ_BUOY:
+
+	case MP2::OBJ_MAGELLANMAPS:
+	case MP2::OBJ_MERMAID:
+	case MP2::OBJ_SIRENS:
+	case MP2::OBJ_DERELICTSHIP:
+	case MP2::OBJ_WHIRLPOOL:
+	case MP2::OBJ_COAST:
+	    if(isShipMaster()) return true;
+            break;
+
+	// capture objects
+	case MP2::OBJ_SAWMILL:
+	case MP2::OBJ_MINES:
+	case MP2::OBJ_ALCHEMYLAB:
+	    if(world.ColorCapturedObject(index) != GetColor()) return true;
 	    break;
 
-	case MP2::OBJ_FREEMANFOUNDRY:
-	    if(hero.GetArmy().HasMonster(Monster::PIKEMAN))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::PIKEMAN);
-		mons.push_back(Monster::PIKEMAN);
-		msg1 = Monster::MultipleNames(Monster::PIKEMAN);
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::SWORDSMAN))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::SWORDSMAN);
-		mons.push_back(Monster::SWORDSMAN);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::SWORDSMAN);
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::IRON_GOLEM))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::IRON_GOLEM);
-		mons.push_back(Monster::IRON_GOLEM);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::IRON_GOLEM);
-	    }
-	    msg1 = "All of your " + msg1 + " have been upgraded into " + msg1 + ".";
-	    msg2 = "A blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.";
+	// piclup object
+	case MP2::OBJ_WAGON:
+	case MP2::OBJ_WATERWHEEL:
+	case MP2::OBJ_WINDMILL:
+	case MP2::OBJ_LEANTO:
+	case MP2::OBJ_MAGICGARDEN:
+	case MP2::OBJ_SKELETON:
+	    if(world.GetTiles(index).ValidQuantity()) return true;
 	    break;
+
+	// pickup resource
+	case MP2::OBJ_RESOURCE:
+	case MP2::OBJ_CAMPFIRE:
+	case MP2::OBJ_TREASURECHEST:
+	    return true;
+
+	// increase view
+	case MP2::OBJ_OBSERVATIONTOWER:
+	    if(! isVisited(world.GetTiles(index), Visit::GLOBAL)) return true;
+	    break;
+
+	// new spell
+        case MP2::OBJ_SHRINE1:
+	case MP2::OBJ_SHRINE2:
+	case MP2::OBJ_SHRINE3:
+	    if(! isVisited(world.GetTiles(index)) &&
+                // check spell book
+		HasArtifact(Artifact::MAGIC_BOOK) &&
+                // check valid level spell and wisdom skill
+                !(3 == Spell::Level(world.SpellFromShrine(index)) &&
+                Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM))) return true;
+	    break;
+
+    	// primary skill
+	case MP2::OBJ_FORT:
+    	case MP2::OBJ_MERCENARYCAMP:
+    	case MP2::OBJ_DOCTORHUT:
+    	case MP2::OBJ_STANDINGSTONES:
+	// sec skill
+	case MP2::OBJ_WITCHSHUT:
+	// exp
+	case MP2::OBJ_GAZEBO:
+	    if(! isVisited(world.GetTiles(index))) return true;
+	    break;
+
+    	// good luck
+        case MP2::OBJ_FOUNTAIN:
+    	case MP2::OBJ_FAERIERING:
+    	case MP2::OBJ_IDOL:
+	    if(! isVisited(world.GetTiles(index)) &&
+		Luck::IRISH > GetLuck()) return true;
+	    break;
+
+	// good morale
+	case MP2::OBJ_OASIS:
+    	case MP2::OBJ_TEMPLE:
+    	case MP2::OBJ_WATERINGHOLE:
+	    if(! isVisited(world.GetTiles(index)) &&
+		Morale::BLOOD > GetMorale()) return true;
+	    break;
+
+	case MP2::OBJ_MAGICWELL:
+	    if(! isVisited(world.GetTiles(index)) &&
+		GetMaxSpellPoints() != GetSpellPoints()) return true;
+	    break;
+
+	case MP2::OBJ_ARTESIANSPRING:
+	    if(! isVisited(world.GetTiles(index)) &&
+		2 * GetMaxSpellPoints() > GetSpellPoints()) return true;
+	    break;
+
+	case MP2::OBJ_XANADU:
+	{
+	    const Skill::Level::type_t level1 = GetLevelSkill(Skill::Secondary::DIPLOMACY);
+	    const u8 level2 = GetLevel();
+
+	    if(!isVisited(world.GetTiles(index)) &&
+		((level1 == Skill::Level::BASIC && 7 < level2) ||
+		(level1 == Skill::Level::ADVANCED && 5 < level2) ||
+		(level1 == Skill::Level::EXPERT && 3 < level2) || (9 < level2))) return true;
+	    break;
+	}
+
+	// upgrade army
+	case MP2::OBJ_HILLFORT:
+            if(army.HasMonster(Monster::DWARF) ||
+               army.HasMonster(Monster::ORC) ||
+               army.HasMonster(Monster::OGRE)) return true;
+            break;
+
+	// upgrade army
+        case MP2::OBJ_FREEMANFOUNDRY:
+            if(army.HasMonster(Monster::PIKEMAN) ||
+               army.HasMonster(Monster::SWORDSMAN) ||
+               army.HasMonster(Monster::IRON_GOLEM)) return true;
+            break;
+
+	/*
+	    or add later
+	*/
 
 	default: break;
     }
 
-    if(mons.size())
-    {
-	// composite sprite
-	u8 ox = 0;
-	const Sprite & br = AGG::GetICN(ICN::STRIP, 12);
-	Surface sf(br.w() * mons.size() + (mons.size() - 1) * 4, br.h());
-	sf.SetColorKey();
-	std::vector<Monster::monster_t>::const_iterator it1 = mons.begin();
-	std::vector<Monster::monster_t>::const_iterator it2 = mons.end();
-	for(; it1 != it2; ++it1)
-	{
-	    sf.Blit(br, ox, 0);
-	    switch(Monster::GetRace(*it1))
-	    {
-		case Race::KNGT:	sf.Blit(AGG::GetICN(ICN::STRIP, 4), ox + 6, 6); break;
-		case Race::BARB:	sf.Blit(AGG::GetICN(ICN::STRIP, 5), ox + 6, 6); break;
-		case Race::SORC:	sf.Blit(AGG::GetICN(ICN::STRIP, 6), ox + 6, 6); break;
-		case Race::WRLK:	sf.Blit(AGG::GetICN(ICN::STRIP, 7), ox + 6, 6); break;
-		case Race::WZRD:	sf.Blit(AGG::GetICN(ICN::STRIP, 8), ox + 6, 6); break;
-		case Race::NECR:	sf.Blit(AGG::GetICN(ICN::STRIP, 9), ox + 6, 6); break;
-		default:		sf.Blit(AGG::GetICN(ICN::STRIP, 10), ox + 6, 6); break;
-	    }
-	    const Sprite & mon = AGG::GetICN(Monster::GetStats(Monster::Upgrade(*it1)).monh_icn, 0);
-	    sf.Blit(mon, ox + 6 + mon.x(), 6 + mon.y());
-	    ox += br.w() + 4;
-	}
-	Dialog::SpriteInfo(MP2::StringObject(obj), msg1, sf);
-    }
-    else
-    {
-	PlaySoundFailure;
-	Dialog::Message(MP2::StringObject(obj), msg2, Font::BIG, Dialog::OK);
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToUpgradeArmyObject: " + hero.GetName());
+    return false;
 }
-
-
-void AIToEvent(Heroes &hero, const u16 dst_index)
-{
-    // check event maps
-    const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
-    if(event_maps)
-    {
-        if(event_maps->GetResource().GetValidItems())
-        {
-    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
-	    PlaySoundSuccess;
-    	    Dialog::ResourceInfo(event_maps->GetMessage(), "", event_maps->GetResource());
-	}
-	if(Artifact::UNKNOWN != event_maps->GetArtifact())
-	{
-	    if(hero.PickupArtifact(event_maps->GetArtifact()))
-	    {
-		PlayPickupSound();
-		DialogWithArtifact("You find " + Artifact::String(event_maps->GetArtifact()), "", event_maps->GetArtifact());
-	    }
-	}
-    }
-
-    world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToEvent: " + hero.GetName());
-}
-*/

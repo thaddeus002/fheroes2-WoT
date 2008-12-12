@@ -57,7 +57,6 @@ Game::menu_t Game::ScenarioInfo(void)
     Dir dir;
 
     dir.Read(conf.MapsDirectory(), ".mp2", false);
-    dir.sort();
 
     // loyality version
     if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
@@ -83,6 +82,9 @@ Game::menu_t Game::ScenarioInfo(void)
 	Dialog::Message("Warning", "No maps available!", Font::BIG, Dialog::OK);
 	return MAINMENU;
     }
+
+    // sort list
+    info_maps.sort(Maps::FileInfo::PredicateForSorting);
 
     // preload
     AGG::PreloadObject(ICN::HEROES);

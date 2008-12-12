@@ -403,6 +403,8 @@ bool Heroes::MoveStep(bool fast)
 	    Scoute();
 	    ApplyPenaltyMovement();
 
+	    if(MP2::OBJ_EVENT == tiles_to.GetObject()) Action(index_to);
+
 	    if(index_to == index_dst)
 	    {
 		path.Reset();
@@ -453,6 +455,8 @@ bool Heroes::MoveStep(bool fast)
 	SetCenter(index_to);
 	Scoute();
 	ApplyPenaltyMovement();
+
+	if(MP2::OBJ_EVENT == tiles_to.GetObject()) Action(index_to);
 
 	if(index_to == index_dst)
 	{

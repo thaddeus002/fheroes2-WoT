@@ -298,112 +298,33 @@ void Kingdom::AIHeroesTask(void)
 	if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
 	if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: kingdom: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
 
-	// scouter task
-	if(MAXU16 == index && objs.size() && hero.Modes(Heroes::SCOUTER))
+	if(MAXU16 == index && objs.size())
 	{
 	    ito1 = objs.rbegin();
 	    ito2 = objs.rend();
 	    while(ito1 != ito2 && MAXU16 == index)
 	    {
-		index = (*ito1).first;
-		switch(ai_objects[index])
-		{
-		    // water object
-		    case MP2::OBJ_SHIPWRECKSURVIROR:
-		    case MP2::OBJ_WATERCHEST:
-		    case MP2::OBJ_FLOTSAM:
-		    case MP2::OBJ_BOTTLE:
-		    case MP2::OBJ_BUOY:
-
-		    case MP2::OBJ_MAGELLANMAPS:
-		    case MP2::OBJ_MERMAID:
-		    case MP2::OBJ_SIRENS:
-		    case MP2::OBJ_DERELICTSHIP:
-		    case MP2::OBJ_WHIRLPOOL:
-		    case MP2::OBJ_COAST:
-			if(hero.isShipMaster()) break;
-
-		    // capture objects
-		    case MP2::OBJ_SAWMILL:
-		    case MP2::OBJ_MINES:
-		    case MP2::OBJ_ALCHEMYLAB:
-		    // piclup object
-		    case MP2::OBJ_WAGON:
-		    case MP2::OBJ_WATERWHEEL:
-		    case MP2::OBJ_WINDMILL:
-		    case MP2::OBJ_LEANTO:
-		    case MP2::OBJ_MAGICGARDEN:
-		    case MP2::OBJ_SKELETON:
-		    // pickup resource
-		    case MP2::OBJ_RESOURCE:
-		    case MP2::OBJ_CAMPFIRE:
-		    case MP2::OBJ_TREASURECHEST:
-
-		    // increase view
-		    case MP2::OBJ_OBSERVATIONTOWER:
-						break;
-
-			default:
-			index = MAXU16;		break;
-		}
+		const u16 index1 = (*ito1).first;
 		++ito1;
-	    }
-	}
+		const u16 index2 = (ito1 != ito2 ? (*ito1).first : MAXU16);
 
-	// hunter task
-	if(MAXU16 == index && objs.size() && hero.Modes(Heroes::HUNTER))
-	{
-	    ito1 = objs.rbegin();
-	    ito2 = objs.rend();
-	    while(ito1 != ito2 && MAXU16 == index)
-	    {
-		index = (*ito1).first;
-		switch(ai_objects[index])
+		if(MAXU16 == index2)
 		{
-		    // new spell
-                    case MP2::OBJ_SHRINE1:
-		    case MP2::OBJ_SHRINE2:
-		    case MP2::OBJ_SHRINE3:
+		    if(hero.AIValidObject(ai_objects[index1], index1)) index = index1;
+		}
+		else
+		{
+		    if(Rand::Get(1))
 		    {
-			if(! hero.isVisited(world.GetTiles(index)) &&
-                             // check spell book
-			     hero.HasArtifact(Artifact::MAGIC_BOOK) &&
-                             // check valid level spell and wisdom skill
-                             !(3 == Spell::Level(world.SpellFromShrine(index)) &&
-                               Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))) break;
-			else
-			    index = MAXU16;	
-			break;
+			if(hero.AIValidObject(ai_objects[index1], index1)) index = index1;
 		    }
-
-    		    // primary skill
-		    case MP2::OBJ_FORT:
-    		    case MP2::OBJ_MERCENARYCAMP:
-    		    case MP2::OBJ_DOCTORHUT:
-    		    case MP2::OBJ_STANDINGSTONES:
-		    // sec skill
-		    case MP2::OBJ_WITCHSHUT:
-		    // exp
-		    case MP2::OBJ_GAZEBO:
-			if(! hero.isVisited(world.GetTiles(index))) break; else index = MAXU16; break;
-
-    		    // good luck
-                    case MP2::OBJ_FOUNTAIN:
-    		    case MP2::OBJ_FAERIERING:
-    		    case MP2::OBJ_IDOL:
-			if(! hero.isVisited(world.GetTiles(index)) && Luck::IRISH > hero.GetLuck()) break; else index = MAXU16; break;
-
-
-	            // good morale
-		    case MP2::OBJ_OASIS:
-    		    case MP2::OBJ_TEMPLE:
-    		    case MP2::OBJ_WATERINGHOLE:
-			if(! hero.isVisited(world.GetTiles(index)) && Morale::BLOOD > hero.GetMorale()) break; else index = MAXU16; break;
-
-			default:
-			index = MAXU16;		break;
+		    else
+		    {
+			if(hero.AIValidObject(ai_objects[index2], index2)) index = index2;
+			else
+			if(hero.AIValidObject(ai_objects[index1], index1)) index = index1;
+		    }
 		}
-		++ito1;
 	    }
 	}
 
@@ -430,8 +351,9 @@ void Kingdom::AIHeroesTask(void)
 
 		    // boat
 		    case MP2::OBJ_BOAT: break;
+
 		    // new view
-		    case MP2::OBJ_STONELIGHTS: break;
+    		    case MP2::OBJ_STONELIGHTS: break;
 
 		    // or ...
 

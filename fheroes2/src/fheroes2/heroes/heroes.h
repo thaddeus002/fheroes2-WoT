@@ -217,6 +217,7 @@ public:
 
     void AIAction(const u16 dst_index);
     void AIUpdateRoles(void);
+    bool AIValidObject(const u8, const u16);
 
     void Redraw(bool with_shadow = true) const;
     void RedrawDependencesTiles(void) const;
