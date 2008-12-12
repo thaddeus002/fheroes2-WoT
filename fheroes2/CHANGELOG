@@ -1,4 +1,4 @@
-SVN - up to r692
+SVN - up to r718
 
 Users
 
@@ -18,6 +18,7 @@ Users
 + Added music to Barbarian castle (afletdinov)
 + Tiles surrounding a monster on the adventure screen now show the battle
   mouse cursor (afletdinov)
++ Battle summary screen no longer misses some captured artifacts. (revvy)
 
 Developers
 
