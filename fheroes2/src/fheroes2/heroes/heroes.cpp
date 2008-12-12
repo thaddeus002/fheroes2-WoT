@@ -1165,10 +1165,9 @@ void Heroes::TakeArtifacts(Heroes & hero2)
     {
         const Artifact::artifact_t art = hero2.artifacts[ii];
         if(Artifact::UNKNOWN != art &&
-           Artifact::MAGIC_BOOK != art &&
-           !Artifact::Ultimate(art))
+           Artifact::MAGIC_BOOK != art)
         {
-            PickupArtifact(art);
+            if(PickupArtifact(art))
             hero2.artifacts[ii] = Artifact::UNKNOWN;
         }
     }
@@ -1195,7 +1194,7 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
 	{
 	    art == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book.", "Try giving one of your artifacts to another hero.", Font::BIG, Dialog::OK) :
-	    Dialog::Message("Warning", "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
+	    Dialog::Message(Artifact::String(art), "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
 	}
 	return false;
     }

@@ -393,6 +393,7 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
         
         if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonDone))
         {
+	    cursor.Hide();
             bool done = false;
             switch(state)
             {
@@ -450,13 +451,17 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
             }
             if(done)
               break;
+	    cursor.Show();
+	    display.Flip();
         }
         
         if(frame < count && Game::ShouldAnimateInfrequent(ticket++, 3))
         {
             const Sprite &animFrame = AGG::GetICN(animation[subanim].first, frame++, false);
+	    cursor.Hide();
             display.Blit(AGG::GetICN(animation[subanim].first, 0), baseAnimX, baseAnimY);
             display.Blit(animFrame, animation[subanim].second.x + baseAnimX, animation[subanim].second.y + baseAnimY);
+	    cursor.Show();
             display.Flip();
             if(frame == count && animation[subanim].first != ICN::CMBTFLE3)
             {
