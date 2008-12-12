@@ -72,7 +72,7 @@ void Kingdom::AITurns(void)
     // scan map
     ai_objects.clear();
     world.StoreActionObject(GetColor(), ai_objects);
-    if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AITurns: kingdom: " + Color::String(color) + ", size cache objects: ", ai_objects.size());
+    if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AITurns: " + Color::String(color) + ", size cache objects: ", ai_objects.size());
 
     // turn indicator
     RedrawAITurns(color, 1);
@@ -296,7 +296,7 @@ void Kingdom::AIHeroesTask(void)
 	}
 
 	if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
-	if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: kingdom: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
+	if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
 
 	if(MAXU16 == index && objs.size())
 	{
@@ -366,6 +366,7 @@ void Kingdom::AIHeroesTask(void)
 	// success
 	if(MAXU16 != index)
 	{
+	    if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: go to object: " + MP2::StringObject(ai_objects[index]) + ", index: ", index);
 	    ai_objects.erase(index);
 	    hero.GetPath().Calculate(index);
 	    if(1 < Settings::Get().Debug()) hero.GetPath().Dump();
@@ -373,14 +374,14 @@ void Kingdom::AIHeroesTask(void)
 	else
 	{
 	    hero.GetPath().Reset();
-	    Error::Verbose("AI::HeroesTask: kingdom: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: unknown task...");
+	    if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: unknown task...");
 	    if(1 < Settings::Get().Debug())
 	    {
 		ito1 = objs.rbegin();
 		ito2 = objs.rend();
 		for(; ito1 != ito2; ++ito1) AIDumpCacheObjects(*ito1);
 	    }
-	    Error::Verbose("AI::HeroesTask: kingdom: " + Color::String(color) + ", Hero " + hero.GetName() + " say: I'm stupid, help my please..");
+	    if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero " + hero.GetName() + " say: I'm stupid, help my please..");
 	    hero.SetModes(Heroes::STUPID);
 	}
     }

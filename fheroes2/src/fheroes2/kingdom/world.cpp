@@ -750,7 +750,7 @@ void World::LoadMaps(const std::string &filename)
 			if(castle)
 			{
 			    castle->LoadFromMP2(pblock);
-			    Maps::UpdateRNDSpriteForCastle(castle->GetCenter(), castle->GetRace());
+			    Maps::UpdateRNDSpriteForCastle(castle->GetCenter(), castle->GetRace(), castle->isCastle());
 			    Maps::MinimizeAreaForCastle(castle->GetCenter());
 			    map_captureobj[tile.GetIndex()].second = castle->GetColor();
 			}

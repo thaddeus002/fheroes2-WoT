@@ -338,7 +338,7 @@ void Maps::MinimizeAreaForCastle(const Point & center)
 }
 
 /* correct sprites for RND castles */
-void Maps::UpdateRNDSpriteForCastle(const Point & center, u8 race)
+void Maps::UpdateRNDSpriteForCastle(const Point & center, u8 race, bool castle)
 {
 /* 
 castle size: T and B - sprite, S - shadow, XX - center
@@ -353,7 +353,7 @@ castle size: T and B - sprite, S - shadow, XX - center
     coords.reserve(21);
 
     // T0
-    coords.push_back(GetIndexFromAbsPoint(center.x, center.y - 3));
+    if(castle) coords.push_back(GetIndexFromAbsPoint(center.x, center.y - 3));
     // T1
     coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y - 2));
     coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y - 2));

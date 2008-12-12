@@ -198,7 +198,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
         return true;
     }
 
-    if(debug) std::cout << "Algorithm::PathFind: not found, from:" << from << ", to: " << to << std::endl;
+    if(1 < debug) std::cout << "Algorithm::PathFind: not found, from:" << from << ", to: " << to << std::endl;
     list.clear();
 
     return false;

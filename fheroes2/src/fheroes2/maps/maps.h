@@ -79,7 +79,7 @@ namespace Maps
     u16 GetApproximateDistance(const u16 index1, const u16 index2);
 
 
-    void UpdateRNDSpriteForCastle(const Point & center, u8 race);
+    void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool castle);
     void UpdateSpritesFromTownToCastle(const Point & center);
     void MinimizeAreaForCastle(const Point & center);
 };
