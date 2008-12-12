@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include <cmath>
 #include <algorithm>
 #include "artifact.h"
 #include "world.h"
@@ -1250,6 +1251,9 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 	case 9:		return 13200;
 	case 10:	return 15500;
 	case 11:	return 18500;
+
+	default:        return (GetExperienceFromLevel(lvl - 1) + static_cast<u32>(round((GetExperienceFromLevel(lvl - 1) - GetExperienceFromLevel(lvl - 2)) * 1.2 / 100) * 100));
+/*
 	case 12:	return 22100;
 	case 13:	return 26400;
 	case 14:	return 31600;
@@ -1257,11 +1261,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 	case 16:	return 45300;
 	case 17:	return 54200;
 	case 18:	return 65000;
-
-
-	// FIXME:	calculate alghoritm
-
-	default:	return MAXU16;
+*/
     }
 
     return 0;
