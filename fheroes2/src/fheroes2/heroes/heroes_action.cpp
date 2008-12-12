@@ -456,9 +456,9 @@ void ActionToHeroes(Heroes &hero, const u16 dst_index)
 
     if(hero.GetColor() == other_hero->GetColor())
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
+        if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
 
-	hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
+        hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
     }
     else
     {

@@ -1163,19 +1163,14 @@ void Heroes::TakeArtifacts(Heroes & hero2)
 {
     for(u8 ii = 0; ii < HEROESMAXARTIFACT; ++ii)
     {
-	const Artifact::artifact_t art = hero2.artifacts[ii];
-	if(Artifact::UNKNOWN != art &&
-	    Artifact::MAGIC_BOOK != art &&
-	    !Artifact::Ultimate(art))
-	{
-	    if(Settings::Get().MyColor() == color)
-	    {
-		PlayPickupSound();
-		DialogWithArtifact("You have captured an enemy artifact!", Artifact::String(art), art);
-	    }
-	    PickupArtifact(art);
-	    hero2.artifacts[ii] = Artifact::UNKNOWN;
-	}
+        const Artifact::artifact_t art = hero2.artifacts[ii];
+        if(Artifact::UNKNOWN != art &&
+           Artifact::MAGIC_BOOK != art &&
+           !Artifact::Ultimate(art))
+        {
+            PickupArtifact(art);
+            hero2.artifacts[ii] = Artifact::UNKNOWN;
+        }
     }
 }
 

@@ -295,6 +295,11 @@ void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArm
     }
 }
 
+static bool PredicateCanTakeArtifact(const Artifact::artifact_t &artifact)
+{
+    return Artifact::isValid(artifact) && artifact != Artifact::MAGIC_BOOK;
+}
+
 void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
                          const BagArtifacts *artifacts, Spell::spell_t spell,
                          int deadRaised, Army::battle_t status)
@@ -371,7 +376,16 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
     
     u32 ticket = 0;
     u32 frame = 1, subanim = 0, count = AGG::GetICNCount(animation[subanim].first);
-    u16 artIndex = 1; //skip the magic book
+    u16 artIndex = 0;
+    if(artifacts)
+    {
+        BagArtifacts::const_iterator artifact = std::find_if(artifacts->begin(), artifacts->end(),
+                                                             PredicateCanTakeArtifact);
+        if(artifact != artifacts->end())
+            artIndex = artifact - artifacts->begin();
+        else artIndex = MAXU16;
+    }
+    
     int state = 0;
     while(le.HandleEvents()) {
         if(le.MousePressLeft(buttonDone)) buttonDone.PressDraw();
@@ -392,11 +406,23 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
                         display.Blit(background, backgroundX, backgroundY);
                         AGG::PlaySound(M82::PICKUP01);
                         const Sprite & art = AGG::GetICN(ICN::ARTIFACT, artifacts->at(artIndex) + 1);
+                        const Sprite & border = AGG::GetICN(ICN::WINLOSEB, 0);
                         std::string artName = Artifact::String(artifacts->at(artIndex));
+                        Rect titleRect(backgroundX + background.w() / 8, baseAnimY + animBase.h() + 20, background.w() * 3 / 4, background.h());
+                        TextBox title("You have captured an enemy artifact!", Font::BIG, titleRect);
                         Text artText(artName, Font::SMALL);
-                        artText.Blit(backgroundX + (background.w() - artText.width()) / 2, buttonDone.y - 20 - art.h() - artText.height() - 10);
-                        display.Blit(art, backgroundX + (background.w() - art.w()) / 2, buttonDone.y - 20 - art.h());
-                        artIndex++;
+                        artText.Blit(backgroundX + (background.w() - artText.width()) / 2, buttonDone.y - artText.height() - 5);
+                        int artX = backgroundX + (background.w() - art.w()) / 2;
+                        int artY = buttonDone.y - artText.height() - 10 - art.h() - 10;
+                        display.Blit(art, artX, artY);
+                        display.Blit(border, artX - (border.w() - art.w()) / 2, artY - (border.h() - art.h()) / 2);
+
+                        //Scan for the next valid artifact in the list
+                        while(++artIndex < artifacts->size() &&
+                              !PredicateCanTakeArtifact(artifacts->at(artIndex))) ;
+
+                        if(artIndex == artifacts->size())
+                            state++;
                         break;
                     }
                     else state++; //fall-through
