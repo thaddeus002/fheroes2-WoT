@@ -1252,8 +1252,9 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 	case 10:	return 15500;
 	case 11:	return 18500;
 
-	default:        return (GetExperienceFromLevel(lvl - 1) + static_cast<u32>(round((GetExperienceFromLevel(lvl - 1) - GetExperienceFromLevel(lvl - 2)) * 1.2 / 100) * 100));
+	default:        break;
 /*
+	original values:
 	case 12:	return 22100;
 	case 13:	return 26400;
 	case 14:	return 31600;
@@ -1264,7 +1265,8 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 */
     }
 
-    return 0;
+    const u32 l1 = GetExperienceFromLevel(lvl - 1);
+    return (l1 + static_cast<u32>(round((l1 - GetExperienceFromLevel(lvl - 2)) * 1.2 / 100) * 100));
 }
 
 /* buy book */
