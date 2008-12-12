@@ -1300,6 +1300,15 @@ void World::FreeOldMaps(void)
 	for(; it != vec_heroes.end(); ++it) delete *it;
     }
     vec_heroes.clear();
+
+    // extra
+    vec_teleports.clear();
+    map_recruits.clear();
+    map_whirlpools.clear();
+    map_sign.clear();
+    map_shrine.clear();
+    map_witchshut.clear();
+    map_captureobj.clear();
 }
 
 Heroes::heroes_t World::GetFreemanHeroes(Race::race_t rc)
