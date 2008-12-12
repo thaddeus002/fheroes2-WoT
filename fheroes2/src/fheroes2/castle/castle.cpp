@@ -193,7 +193,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ++ptr8;
 
     // castle
-    if(*ptr8) building |= BUILD_CASTLE;
+    if(0 == *ptr8) building |= BUILD_CASTLE;
     ++ptr8;
 
     // allow upgrade to castle (0 - true, 1 - false)
