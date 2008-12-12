@@ -193,7 +193,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ++ptr8;
 
     // castle
-    if(0 == *ptr8) building |= BUILD_CASTLE;
+    if(*ptr8) building |= BUILD_CASTLE;
     ++ptr8;
 
     // allow upgrade to castle (0 - true, 1 - false)
@@ -923,7 +923,7 @@ u32 Castle::GetBuildingRequires(const building_t & build) const
 bool Castle::AllowBuyBuilding(building_t build) const
 {
     // check allow building
-    if(!Modes(ALLOWBUILD)) return false;
+    if(!Modes(ALLOWBUILD) || build & building) return false;
 
     switch(build)
     {
@@ -1468,6 +1468,7 @@ void Castle::Dump(void) const
     std::cout << "present heroes  : " << (GetHeroes() ? "yes" : "no") << std::endl;
     std::cout << "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl;
     std::cout << "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl;
+    std::cout << "is castle       : " << (isCastle() ? "yes" : "no") << std::endl;
 }
 
 s8 Castle::GetMoraleWithModificators(std::list<std::string> *list) const

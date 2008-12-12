@@ -79,7 +79,7 @@ void Castle::AIDevelopment(void)
     }
     else
     // build castle only monday or tuesday or for capital
-    if(3 > world.GetDay() || isCapital()) BuyBuilding(BUILD_CASTLE);
+    if(3 > world.GetDay() || !isCastle() || isCapital()) BuyBuilding(BUILD_CASTLE);
 
     // last day and buy monster
     if(world.LastDay()) RecruitAllMonster();
