@@ -760,7 +760,8 @@ void AIToCastle(Heroes &hero, const u16 dst_index)
 		world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
 		world.GetKingdom(hero.GetColor()).AddCastle(castle);
 		const_cast<Castle *>(castle)->ChangeColor(hero.GetColor());
-		Game::SelectBarCastle::Get().Redraw();
+                world.CaptureObject(dst_index, hero.GetColor());
+ 		Game::SelectBarCastle::Get().Redraw();
 		hero.ActionAfterBattle();
 		break;
 

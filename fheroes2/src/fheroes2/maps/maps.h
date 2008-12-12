@@ -42,6 +42,7 @@ namespace Maps
     u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
     bool isValidDirection(u16 from, Direction::vector_t vector);
 
+    bool isValidAbsIndex(const s16);
     bool isValidAbsPoint(const Point & pt);
     bool isValidAbsPoint(const s16 x, const s16 y);
 
@@ -54,11 +55,11 @@ namespace Maps
     u16 GetLeftIndex(u16 from);
     u16 GetTopLeftIndex(u16 from);
 
-    u16 GetIndexFromAbsPoint(const Point & mp);
-    u16 GetIndexFromAbsPoint(s16 px, s16 py);
+    s16 GetIndexFromAbsPoint(const Point & mp);
+    s16 GetIndexFromAbsPoint(s16 px, s16 py);
 
-    int GetIndexFromAreaPoint(const Point & pt);
-    int GetIndexFromAreaPoint(s16 px, s16 py);
+    s16 GetIndexFromAreaPoint(const Point & pt);
+    s16 GetIndexFromAreaPoint(s16 px, s16 py);
 
     u32 AnimationTicket(void);
     void IncreaseAnimationTicket(void);
@@ -78,7 +79,7 @@ namespace Maps
     u16 GetApproximateDistance(const u16 index1, const u16 index2);
 
 
-    void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool is_castle);
+    void UpdateRNDSpriteForCastle(const Point & center, u8 race);
     void UpdateSpritesFromTownToCastle(const Point & center);
     void MinimizeAreaForCastle(const Point & center);
 };

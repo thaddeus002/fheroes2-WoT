@@ -83,6 +83,11 @@ bool Maps::isValidAbsPoint(const Point & pt)
     return isValidAbsPoint(pt.x, pt.y);
 }
 
+bool Maps::isValidAbsIndex(const s16 i)
+{
+    return 0 <= i && i < world.w() * world.h();
+}
+
 bool Maps::isValidAbsPoint(const s16 x, const s16 y)
 {
     return 0 <= x && world.w() > x && 0 <= y && world.h() > y;
@@ -129,23 +134,23 @@ u16 Maps::GetTopLeftIndex(u16 from)
 }
 
 /* convert maps point to index maps */
-u16 Maps::GetIndexFromAbsPoint(const Point & mp)
+s16 Maps::GetIndexFromAbsPoint(const Point & mp)
 {
     return GetIndexFromAbsPoint(mp.x, mp.y);
 }
 
-u16 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
+s16 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
 {
     return py * world.w() + px;
 }
 
 /* convert area point to index maps */
-int Maps::GetIndexFromAreaPoint(const Point & pt)
+s16 Maps::GetIndexFromAreaPoint(const Point & pt)
 {
     return GetIndexFromAreaPoint(pt.x, pt.y);
 }
 
-int Maps::GetIndexFromAreaPoint(s16 px, s16 py)
+s16 Maps::GetIndexFromAreaPoint(s16 px, s16 py)
 {
     const Rect & area_pos = GameArea::Get().GetRect();
 
@@ -333,7 +338,7 @@ void Maps::MinimizeAreaForCastle(const Point & center)
 }
 
 /* correct sprites for RND castles */
-void Maps::UpdateRNDSpriteForCastle(const Point & center, u8 race, bool is_castle)
+void Maps::UpdateRNDSpriteForCastle(const Point & center, u8 race)
 {
 /* 
 castle size: T and B - sprite, S - shadow, XX - center
@@ -348,31 +353,31 @@ castle size: T and B - sprite, S - shadow, XX - center
     coords.reserve(21);
 
     // T0
-    if(is_castle) coords.push_back((center.y - 3) * world.h() + center.x);
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y - 3));
     // T1
-    coords.push_back((center.y - 2) * world.h() + center.x - 2);
-    coords.push_back((center.y - 2) * world.h() + center.x - 1);
-    coords.push_back((center.y - 2) * world.h() + center.x);
-    coords.push_back((center.y - 2) * world.h() + center.x + 1);
-    coords.push_back((center.y - 2) * world.h() + center.x + 2);
+    coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 1, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y - 2));
     // T2
-    coords.push_back((center.y - 1) * world.h() + center.x - 2);
-    coords.push_back((center.y - 1) * world.h() + center.x - 1);
-    coords.push_back((center.y - 1) * world.h() + center.x);
-    coords.push_back((center.y - 1) * world.h() + center.x + 1);
-    coords.push_back((center.y - 1) * world.h() + center.x + 2);
+    coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 1, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y - 1));
     // B1
-    coords.push_back(center.y * world.h() + center.x - 2);
-    coords.push_back(center.y * world.h() + center.x - 1);
-    coords.push_back(center.y * world.h() + center.x);
-    coords.push_back(center.y * world.h() + center.x + 1);
-    coords.push_back(center.y * world.h() + center.x + 2);
+    coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 1, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y));
     // B2
-    coords.push_back((center.y + 1) * world.h() + center.x - 2);
-    coords.push_back((center.y + 1) * world.h() + center.x - 1);
-    coords.push_back((center.y + 1) * world.h() + center.x);
-    coords.push_back((center.y + 1) * world.h() + center.x + 1);
-    coords.push_back((center.y + 1) * world.h() + center.x + 2);
+    coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y + 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y + 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y + 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 1, center.y + 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y + 1));
 
     Maps::Tiles & tile_center = world.GetTiles(center);
 
@@ -384,7 +389,7 @@ castle size: T and B - sprite, S - shadow, XX - center
 	    break;
 	
 	default:
-	    Error::Warning("Maps::UpdateRNDSpriteForCastle: correct only RND town and castle. index: ", center.y * world.w() + center.x);
+	    Error::Warning("Maps::UpdateRNDSpriteForCastle: correct only RND town and castle. index: ", GetIndexFromAbsPoint(center.x, center.y));
 	    return;
     }
 
@@ -392,7 +397,7 @@ castle size: T and B - sprite, S - shadow, XX - center
     std::vector<u16>::const_iterator it1 = coords.begin();
     std::vector<u16>::const_iterator it2 = coords.end();
 
-    for(; it1 != it2; ++it1)
+    for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
     {
 	Maps::TilesAddon *addon = world.GetTiles(*it1).FindRNDCastle();
 	if(addon)
@@ -417,36 +422,42 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 {
     // correct area maps sprites
     std::vector<u16> coords;
-    coords.reserve(16);
+    coords.reserve(15);
 
-    // T0
-    coords.push_back((center.y - 3) * world.h() + center.x);
     // T1
-    coords.push_back((center.y - 2) * world.h() + center.x - 2);
-    coords.push_back((center.y - 2) * world.h() + center.x - 1);
-    coords.push_back((center.y - 2) * world.h() + center.x);
-    coords.push_back((center.y - 2) * world.h() + center.x + 1);
-    coords.push_back((center.y - 2) * world.h() + center.x + 2);
+    coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 1, center.y - 2));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y - 2));
     // T2
-    coords.push_back((center.y - 1) * world.h() + center.x - 2);
-    coords.push_back((center.y - 1) * world.h() + center.x - 1);
-    coords.push_back((center.y - 1) * world.h() + center.x);
-    coords.push_back((center.y - 1) * world.h() + center.x + 1);
-    coords.push_back((center.y - 1) * world.h() + center.x + 2);
+    coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 1, center.y - 1));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y - 1));
     // B1
-    coords.push_back(center.y * world.h() + center.x - 2);
-    coords.push_back(center.y * world.h() + center.x - 1);
-    coords.push_back(center.y * world.h() + center.x);
-    coords.push_back(center.y * world.h() + center.x + 1);
-    coords.push_back(center.y * world.h() + center.x + 2);
+    coords.push_back(GetIndexFromAbsPoint(center.x - 2, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x - 1, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 1, center.y));
+    coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y));
 
-    // modify all rnd sprites
+    // modify all town sprites
     std::vector<u16>::const_iterator it1 = coords.begin();
     std::vector<u16>::const_iterator it2 = coords.end();
-    for(; it1 != it2; ++it1)
+    for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
     {
-	Maps::TilesAddon *addon = world.GetTiles(*it1).FindCastle();
+	TilesAddon *addon = world.GetTiles(*it1).FindCastle();
 	if(addon) addon->index -= 16;
+    }
+
+    // T0
+    if(isValidAbsIndex(GetIndexFromAbsPoint(center.x, center.y - 3) && isValidAbsIndex(GetIndexFromAbsPoint(center.x, center.y - 2))))
+    {
+	TilesAddon *addon = world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 2)).FindCastle();
+	if(addon)
+	    world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 3)).AddonsPushLevel2(TilesAddon(addon->level, addon->uniq, addon->object, addon->index - 3));
     }
 }
 
