@@ -774,99 +774,89 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 {
     s8 result = Morale::NORMAL;
 
-    const std::string p1(" +1");
-    const std::string p2(" +2");
-    const std::string m1(" -1");
-    const std::string m2(" -2");
+    std::vector<std::string> modStrings;
+    modStrings.push_back(" -3");
+    modStrings.push_back(" -2");
+    modStrings.push_back(" -1");
+    modStrings.push_back(" +0");
+    modStrings.push_back(" +1");
+    modStrings.push_back(" +2");
+    modStrings.push_back(" +3");
+    const int baseMod = modStrings.size() / 2;
 
+    std::vector<std::pair<int, int> > modifiers;
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_VALOR, 1));
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_COURAGE, 1));
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_HONOR, 1));
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_DISTINCTION, 1));
+    modifiers.push_back(std::make_pair(Artifact::FIZBIN_MISFORTUNE, -2));
+    
     // bonus artifact
     BagArtifacts::const_iterator it = artifacts.begin();
 
-    if(HasArtifact(Artifact::MEDAL_VALOR))
+    for(u16 i = 0; i < modifiers.size(); i++)
     {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
+        Artifact::artifact_t art = (Artifact::artifact_t)modifiers[i].first;
+        if(!HasArtifact(art))
+            continue;
+        
+        result += modifiers[i].second;
+        if(list)
+        {
+            std::string modString = Artifact::String(art);
+            modString += modStrings[baseMod + modifiers[i].second];
+            list->push_back(modString);
+        }
     }
-    if(HasArtifact(Artifact::MEDAL_COURAGE))
-    {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
-    }
-    if(HasArtifact(Artifact::MEDAL_HONOR))
-    {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
-    }
-    if(HasArtifact(Artifact::MEDAL_DISTINCTION))
-    {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
-    }
-    if(HasArtifact(Artifact::FIZBIN_MISFORTUNE))
-    {
-	result -= 2;
-	if(list) list->push_back(Artifact::String(*it) + m2);
-    }
+
+    modifiers.clear();
+    modifiers.push_back(std::make_pair(Skill::Level::BASIC, 1));
+    modifiers.push_back(std::make_pair(Skill::Level::ADVANCED, 2));
+    modifiers.push_back(std::make_pair(Skill::Level::EXPERT, 3));
 
     // bonus leadership
-    switch(GetLevelSkill(Skill::Secondary::LEADERSHIP))
+    for(u16 i = 0; i < modifiers.size(); i++)
     {
-        case Skill::Level::EXPERT:
-            result += 3;
-	    if(list) list->push_back("Expert Leadership +3");
-            break;
+        Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
+        if(!GetLevelSkill(Skill::Secondary::LEADERSHIP) == level)
+            continue;
 
-        case Skill::Level::ADVANCED:
-            result += 2;
-	    if(list) list->push_back("Advanced Leadership +2");
-            break;
-
-        case Skill::Level::BASIC:
-            result += 1;
-	    if(list) list->push_back("Basic Leadership +1");
-            break;
-
-        default:
-            break;
+        result += modifiers[i].second;
+        if(list)
+        {
+            std::string modString = Skill::Level::String(level); modString += " ";
+            modString += Skill::Secondary::String(Skill::Secondary::LEADERSHIP);
+            modString += modStrings[baseMod + modifiers[i].second];
+            list->push_back(modString);
+        }
+        break;
     }
+
+    modifiers.clear();
+    modifiers.push_back(std::make_pair(MP2::OBJ_BUOY, 1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_OASIS, 1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_WATERINGHOLE, 1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_TEMPLE, 2));
+    modifiers.push_back(std::make_pair(MP2::OBJ_GRAVEYARD, -1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_DERELICTSHIP, -1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_SHIPWRECK, -1));
 
     // object visited
-    if(isVisited(MP2::OBJ_BUOY))
+    for(u16 i = 0; i < modifiers.size(); i++)
     {
-	++result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_BUOY) + p1);
-    }
-    if(isVisited(MP2::OBJ_OASIS))
-    {
-	++result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_OASIS) + p1);
-    }
-    if(isVisited(MP2::OBJ_WATERINGHOLE))
-    {
-	++result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_WATERINGHOLE) + p1);
-    }
-    if(isVisited(MP2::OBJ_TEMPLE))
-    {
-	result += 2;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_TEMPLE) + p2);
-    }
-    if(isVisited(MP2::OBJ_GRAVEYARD))
-    {
-	--result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_GRAVEYARD) + m1);
-    }
-    if(isVisited(MP2::OBJ_DERELICTSHIP))
-    {
-	--result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_DERELICTSHIP) + m1);
-    }
-    if(isVisited(MP2::OBJ_SHIPWRECK))
-    {
-	--result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_SHIPWRECK) + m1);
-    }
+        MP2::object_t obj = (MP2::object_t)modifiers[i].first;
+        if(!isVisited(obj))
+            continue;
 
+        result += modifiers[i].second;
+        if(list)
+        {
+            std::string modString = MP2::StringObject(obj);
+            modString += modStrings[baseMod + modifiers[i].second];
+            list->push_back(modString);
+        }
+    }
+    
     const Castle* castle = inCastle();
     // check castle morale modificators
     if(castle) result += castle->GetMoraleWithModificators(list);
@@ -901,76 +891,83 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 
     BagArtifacts::const_iterator it = artifacts.begin();
 
-    const std::string p1(" +1");
-    const std::string p2(" +2");
-    const std::string m2(" -2");
+    std::vector<std::string> modStrings;
+    modStrings.push_back(" -3");
+    modStrings.push_back(" -2");
+    modStrings.push_back(" -1");
+    modStrings.push_back(" +0");
+    modStrings.push_back(" +1");
+    modStrings.push_back(" +2");
+    modStrings.push_back(" +3");
+    const int baseMod = modStrings.size() / 2;
+
+    std::vector<std::pair<int, int> > modifiers;
+    modifiers.push_back(std::make_pair(Artifact::RABBIT_FOOT, 1));
+    modifiers.push_back(std::make_pair(Artifact::GOLDEN_HORSESHOE, 1));
+    modifiers.push_back(std::make_pair(Artifact::GAMBLER_LUCKY_COIN, 1));
+    modifiers.push_back(std::make_pair(Artifact::FOUR_LEAF_CLOVER, 1));
 
     // bonus artifact
-    if(HasArtifact(Artifact::RABBIT_FOOT))
+    for(u16 i = 0; i < modifiers.size(); i++)
     {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
+        Artifact::artifact_t art = (Artifact::artifact_t)modifiers[i].first;
+        if(!HasArtifact(art))
+            continue;
+
+        result += modifiers[i].second;
+        if(list)
+        {
+            std::string modString = Artifact::String(art);
+            modString += modStrings[baseMod + modifiers[i].second];
+            list->push_back(modString);
+        }
     }
-    if(HasArtifact(Artifact::GOLDEN_HORSESHOE))
-    {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
-    }
-    if(HasArtifact(Artifact::GAMBLER_LUCKY_COIN))
-    {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
-    }
-    if(HasArtifact(Artifact::FOUR_LEAF_CLOVER))
-    {
-	result += 1;
-	if(list) list->push_back(Artifact::String(*it) + p1);
-    }
+
+    modifiers.clear();
+    modifiers.push_back(std::make_pair(Skill::Level::BASIC, 1));
+    modifiers.push_back(std::make_pair(Skill::Level::ADVANCED, 2));
+    modifiers.push_back(std::make_pair(Skill::Level::EXPERT, 3));
 
     // bonus luck
-    switch(GetLevelSkill(Skill::Secondary::LUCK))
+    for(u16 i = 0; i < modifiers.size(); i++)
     {
-        case Skill::Level::EXPERT:
-            result += 3;
-	    if(list) list->push_back("Expert Luck +3");
-            break;
+        Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
+        if(!GetLevelSkill(Skill::Secondary::LUCK) == level)
+            continue;
 
-        case Skill::Level::ADVANCED:
-            result += 2;
-	    if(list) list->push_back("Advanced Luck +2");
-            break;
-
-        case Skill::Level::BASIC:
-            result += 1;
-	    if(list) list->push_back("Basic Luck +1");
-            break;
-
-        default:
-            break;
+        result += modifiers[i].second;
+        if(list)
+        {
+            std::string modString = Skill::Level::String(level); modString += " ";
+            modString += Skill::Secondary::String(Skill::Secondary::LUCK);
+            modString += modStrings[baseMod + modifiers[i].second];
+            list->push_back(modString);
+        }
+        break;
     }
 
+    modifiers.clear();
+    modifiers.push_back(std::make_pair(MP2::OBJ_FAERIERING, 1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_FOUNTAIN, 1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_IDOL, 1));
+    modifiers.push_back(std::make_pair(MP2::OBJ_PYRAMID, -2));
+    
     // object visited
-    if(isVisited(MP2::OBJ_FAERIERING))
+    for(u16 i = 0; i < modifiers.size(); i++)
     {
-	++result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_FAERIERING) + p1);
-    }
-    if(isVisited(MP2::OBJ_FOUNTAIN))
-    {
-	++result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_FOUNTAIN) + p1);
-    }
-    if(isVisited(MP2::OBJ_IDOL))
-    {
-	++result;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_IDOL) + p1);
-    }
-    if(isVisited(MP2::OBJ_PYRAMID))
-    {
-	 result -= 2;
-	if(list) list->push_back(MP2::StringObject(MP2::OBJ_PYRAMID) + m2);
-    }
+        MP2::object_t obj = (MP2::object_t)modifiers[i].first;
+        if(!isVisited(obj))
+            continue;
 
+        result += modifiers[i].second;
+        if(list)
+        {
+            std::string modString = MP2::StringObject(obj);
+            modString += modStrings[baseMod + modifiers[i].second];
+            list->push_back(modString);
+        }
+    }
+    
     const Castle* castle = inCastle();
     // check castle morale modificators
     if(castle) result += castle->GetLuckWithModificators(list);
