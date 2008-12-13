@@ -90,6 +90,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
     list[cur].open   = false;
 
     u32 itr = 0;
+    cell_t cell;
 
     while(cur != to)
     {
@@ -104,7 +105,6 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 		    // new
 		    if(MAXU16 == list[tmp].parent)
 		    {
-			cell_t cell;
 	    		cell.cost_g = Maps::Ground::GetPenalty(tmp, direct, pathfinding);
 			cell.parent = cur;
 			cell.open = true;
@@ -128,17 +128,21 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 		    // check alt
 		    else
 		    {
-			alt = Maps::Ground::GetPenalty(cur, Direction::Reflect(direct), pathfinding);
-			if(list[cur].cost_t > list[tmp].cost_t + alt)
+			alt = Maps::Ground::GetPenalty(cur, direct, pathfinding);
+			if(list[tmp].cost_t > list[cur].cost_t + alt)
 			{
-			    list[cur].parent = tmp;
-			    list[cur].cost_g = alt;
-			    list[cur].cost_t = list[tmp].cost_t + alt;
+			    list[tmp].parent = cur;
+			    list[tmp].cost_g = alt;
+			    list[tmp].cost_t = list[cur].cost_t + alt;
 			}
 		    }
     		}
 	    }
 	}
+
+	if(cur == to) break;
+	else
+	list[cur].open = false;
 
 	if(3 <= debug)
 	{
@@ -151,21 +155,21 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	// find minimal cost
 	for(; it1 != it2; ++it1) if((*it1).second.open)
 	{
-	    const cell_t & cell = (*it1).second;
-	    direct = Direction::Get(cur, (*it1).first);
+	    const cell_t & cell2 = (*it1).second;
 
-	    if(Direction::UNKNOWN != direct)
+	    if(3 <= debug && cell2.cost_g != MAXU16)
 	    {
-		if(3 <= debug && cell.cost_g != MAXU16)
+		direct = Direction::Get(cur, (*it1).first);
+		if(Direction::UNKNOWN != direct)
 		{
 		    std::cout << "  direct: " << Direction::String(Direction::Get(cur, (*it1).first));
 		    std::cout << ", index: " << (*it1).first;
-		    std::cout << ", cost g: " << cell.cost_g;
-		    std::cout << ", cost t: " << cell.cost_t << std::endl;
+		    std::cout << ", cost g: " << cell2.cost_g;
+		    std::cout << ", cost t: " << cell2.cost_t << std::endl;
 		}
 	    }
 
-	    if(cell.cost_t < tmp)
+	    if(cell2.cost_t < tmp)
 	    {
     		tmp = (*it1).second.cost_t;
     		alt = (*it1).first;
@@ -181,7 +185,6 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	}
 
 	cur = alt;
-	list[cur].open = false;
 	++itr;
     }
 

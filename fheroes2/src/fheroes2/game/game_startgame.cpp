@@ -968,6 +968,7 @@ Game::menu_t Game::HumanTurn(void)
 		{
 		    cursor.Hide();
 		    radar.RedrawCursor();
+		    gamearea.Redraw();
 		    cursor.Show();
 		    display.Flip();
 		}
@@ -1254,10 +1255,9 @@ Game::menu_t Game::HumanTurn(void)
 	// animation
         if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
-            cursor.Hide();
-
             if(scrollDir)
             {
+        	cursor.Hide();
     		cursor.SetThemes(GameArea::ScrollToCursor(scrollDir));
     		gamearea.Scroll(scrollDir);
 
@@ -1266,25 +1266,39 @@ Game::menu_t Game::HumanTurn(void)
     		    global_focus.GetHeroes().SetMove(false);
 
         	scrollDir = GameArea::NONE;
+
+		gamearea.Redraw();
+        	radar.RedrawCursor();
+        	cursor.Show();
+        	display.Flip();
             }
 	    else
-    	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().Move())
+    	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
 	    {
-		AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
-		Game::EnvironmentSoundMixer();
-
-                statusWindow.Redraw();
-                selectHeroes.Redraw(&global_focus.GetHeroes());
-                gamearea.Center(global_focus.Center());
+        	cursor.Hide();
+		if(global_focus.GetHeroes().Move())
+		{
+		    AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
+		    Game::EnvironmentSoundMixer();
+            	    statusWindow.Redraw();
+            	    selectHeroes.Redraw(&global_focus.GetHeroes());
+            	    gamearea.Center(global_focus.Center());
+        	    radar.RedrawArea(conf.MyColor());
+        	    radar.RedrawCursor();
+		}
+		gamearea.Redraw();
+        	cursor.Show();
+        	display.Flip();
 	    }
 
-	    if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
-
-	    gamearea.Redraw();
-            radar.RedrawArea(conf.MyColor());
-            radar.RedrawCursor();
-            cursor.Show();
-            display.Flip();
+	    if(Game::ShouldAnimateInfrequent(ticket, 12))
+	    {
+        	cursor.Hide();
+		Maps::IncreaseAnimationTicket();
+		gamearea.Redraw();
+        	cursor.Show();
+        	display.Flip();
+	    }
         }
 
         ++ticket;
