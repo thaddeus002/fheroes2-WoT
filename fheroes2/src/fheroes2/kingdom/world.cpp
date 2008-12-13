@@ -1703,11 +1703,9 @@ Artifact::artifact_t World::DiggingForUltimateArtifacts(const Point & center)
     }
     tile.AddonsPushLevel1(Maps::TilesAddon(0, GetUniq(), obj, idx));
 
-    if(ultimate_artifact == tile.GetIndex() && tile.GetQuantity1())
+    if(ultimate_artifact == tile.GetIndex())
     {
-	tile.SetQuantity1(0);
 	ultimate_artifact = 0xFFFF;
-
 	return Artifact::Artifact(tile.GetQuantity1());
     }
 
