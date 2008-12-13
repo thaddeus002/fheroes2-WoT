@@ -138,6 +138,7 @@ Game::menu_t Game::StartGame(void)
 
     // generate sprite map
     areaMaps.GenerateUltimateArtifactAreaSurface(world.GetUltimateArtifactIndex(), world.GetUltimateArtifactArea());
+    world.GetUltimateArtifactArea().GrayScale();
 
     Mixer::Reset();
 

@@ -98,7 +98,8 @@ public:
     u32 GetPixel(u16 x, u16 y);
 
     void ChangeColor(u32, u32);
-
+    void GrayScale(void);
+    
     void Lock(void);
     void Unlock(void);
 
