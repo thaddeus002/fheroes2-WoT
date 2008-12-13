@@ -459,6 +459,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			{
 			    if(from_hero.GetColor() == castle->GetColor()) return Cursor::CASTLE;
 			    else
+			    if(castle->GetArmy().isValid())
 			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			    {
 				case 0:	return Cursor::POINTER;
@@ -466,6 +467,15 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 				case 2:	return Cursor::FIGHT2;
 				case 3:	return Cursor::FIGHT3;
 				default:return Cursor::FIGHT4;
+			    }
+			    else
+			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
+			    {
+				case 0:	return Cursor::POINTER;
+				case 1:	return Cursor::ACTION;
+				case 2:	return Cursor::ACTION2;
+				case 3:	return Cursor::ACTION3;
+				default:return Cursor::ACTION4;
 			    }
 			}
     		    }
@@ -476,13 +486,23 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     			const Castle *castle = world.GetCastle(tile.GetIndex());
 
     			if(NULL != castle)
+			    if(from_hero.GetColor() != castle->GetColor() && castle->GetArmy().isValid())
 			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			    {
 				case 0:	return Cursor::POINTER;
-				case 1:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION : Cursor::FIGHT;
-				case 2:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION2 : Cursor::FIGHT2;
-				case 3:	return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION3 : Cursor::FIGHT3;
-				default:return from_hero.GetColor() == castle->GetColor() ? Cursor::ACTION4 : Cursor::FIGHT4;
+				case 1:	return Cursor::FIGHT;
+				case 2:	return Cursor::FIGHT2;
+				case 3:	return Cursor::FIGHT3;
+				default:return Cursor::FIGHT4;
+			    }
+			    else
+			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
+			    {
+				case 0:	return Cursor::POINTER;
+				case 1:	return Cursor::ACTION;
+				case 2:	return Cursor::ACTION2;
+				case 3:	return Cursor::ACTION3;
+				default:return Cursor::ACTION4;
 			    }
 			    break;
         	    }
