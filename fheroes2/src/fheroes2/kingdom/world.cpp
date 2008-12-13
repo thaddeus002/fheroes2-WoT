@@ -1098,8 +1098,9 @@ void World::LoadMaps(const std::string &filename)
 	for(u16 ii = 0; ii < vec_tiles.size(); ++ii)
 	{
 	    const Maps::Tiles & tile = *vec_tiles[ii];
-
-	    if(Maps::Ground::WATER != tile.GetGround() && 0 == tile.GetSize1()) pools.push_back(tile.GetIndex());
+	    const u16 x = tile.GetIndex() % width;
+	    const u16 y = tile.GetIndex() / width;
+	    if(Maps::Ground::WATER != tile.GetGround() && 0 == tile.GetSize1() && x > 5 && x < width - 5 && y > 5 && y < height - 5) pools.push_back(tile.GetIndex());
 	}
 
 	if(pools.size())
