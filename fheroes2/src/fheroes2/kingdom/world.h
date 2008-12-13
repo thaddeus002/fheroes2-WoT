@@ -91,6 +91,8 @@ public:
 
     Heroes & GetHeroes(const Heroes::heroes_t & hero){ return *vec_heroes[hero]; };
 
+    Surface & GetUltimateArtifactArea(void);
+    u16 GetUltimateArtifactIndex(void);
     Artifact::artifact_t DiggingForUltimateArtifacts(const Point & center);
     void ActionForMagellanMaps(u8 color);
 
@@ -141,7 +143,7 @@ protected:
     Heroes::heroes_t GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
 private:
-    World() : Size(0, 0), width(Size::w), height(Size::h) {};
+    World() : Size(0, 0), ultimate_artifact_area(448, 448), width(Size::w), height(Size::h) {};
 
     void FreeOldMaps(void);
 
@@ -167,6 +169,7 @@ private:
     std::map<u16, std::pair<MP2::object_t, Color::color_t> > map_captureobj;
 
     u16 ultimate_artifact;
+    Surface ultimate_artifact_area;
 
     u16 & width;
     u16 & height;
@@ -177,9 +180,8 @@ private:
     bool begin_week;
     bool begin_month;
 
+    Week::type_t week_name;    
 
-    Week::type_t week_name;
-    
     static u32 uniq0;
 };
 

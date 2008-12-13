@@ -67,7 +67,7 @@ void GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh)
     }
 }
 
-GameArea::GameArea() : Rect(0, 0, 0, 0), gx(Rect::x), gy(Rect::y), gw(Rect::w), gh(Rect::h)
+GameArea::GameArea() : Rect(0, 0, 0, 0), gx(Rect::x), gy(Rect::y), gw(Rect::w), gh(Rect::h), max(0)
 {
 }
 
@@ -78,11 +78,26 @@ void GameArea::Build(void)
 
     gw = (Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH;
     gh = (Display::Get().h() - 2 * BORDERWIDTH) / TILEWIDTH;
+
+    max = world.w() * world.h() - 1;
+}
+
+/* convert area point to index maps */
+s16 GameArea::GetIndexFromMousePoint(const Point & pt)
+{
+    return GetIndexFromMousePoint(pt.x, pt.y);
+}
+
+s16 GameArea::GetIndexFromMousePoint(s16 px, s16 py)
+{
+    u16 result = (gy + (py - BORDERWIDTH) / TILEWIDTH) * world.w() + gx + (px - BORDERWIDTH) / TILEWIDTH;
+
+    return result > max || result < GetLeftTopIndexMaps() ? -1 : result;
 }
 
 u16 GameArea::GetLeftTopIndexMaps(void)
 {
-    return Maps::GetIndexFromAbsPoint(x(), y());
+    return Maps::GetIndexFromAbsPoint(gx, gy);
 }
 
 /* readraw rect, default all */
@@ -597,4 +612,44 @@ Cursor::themes_t GameArea::ScrollToCursor(const u8 scroll)
     }
 
     return Cursor::NONE;
+}
+
+void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf)
+{
+    if(Maps::isValidAbsIndex(index))
+    {
+	Display & display = Display::Get();
+	Point pt(index % world.w(), index / world.h());
+
+	Center(pt);
+	Redraw();
+
+	// blit marker
+	for(u8 ii = 0; ii < h(); ++ii) if(index < Maps::GetIndexFromAbsPoint(gx + gw - 1, gy + ii))
+	{
+	    pt.y = ii;
+	    break;
+	}
+	for(u8 ii = 0; ii < w(); ++ii) if(index == Maps::GetIndexFromAbsPoint(gx + ii, gy + pt.y))
+	{
+	    pt.x = ii;
+	    break;
+	}
+	const Sprite & marker = AGG::GetICN(ICN::ROUTE, 0);
+	display.Blit(marker, BORDERWIDTH + pt.x * TILEWIDTH, BORDERWIDTH + pt.y * TILEWIDTH + 8);
+
+	Rect rt(BORDERWIDTH + pt.x * TILEWIDTH - sf.w() / 2, BORDERWIDTH + pt.y * TILEWIDTH - sf.h() / 2, sf.w(), sf.h());
+
+	// fix align
+	if(rt.x < BORDERWIDTH) rt.x = BORDERWIDTH;
+	else
+	if(rt.x > BORDERWIDTH + TILEWIDTH * gw - rt.w) rt.x = BORDERWIDTH + TILEWIDTH * gw - rt.w;
+	if(rt.y < BORDERWIDTH) rt.y = BORDERWIDTH;
+	else
+	if(rt.y > BORDERWIDTH + TILEWIDTH * gh - rt.h) rt.y = BORDERWIDTH + TILEWIDTH * gh - rt.h;
+
+	sf.Blit(display, rt, 0, 0);
+    }
+    else
+    Error::Warning("GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
 }

@@ -115,6 +115,8 @@ namespace Dialog
     // dialog buy boat
     answer_t BuyBoat(bool enable);
 
+    void PuzzleMaps(void);
+
 class Box
 {
 public:

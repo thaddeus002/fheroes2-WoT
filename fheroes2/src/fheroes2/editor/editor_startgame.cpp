@@ -221,7 +221,7 @@ Game::menu_t Game::Editor::StartGame()
 	if(le.MouseCursor(area_pos))
 	{
             const Point & mouse_coord = le.MouseCursor();
-            const u16 index_maps = Maps::GetIndexFromAreaPoint(mouse_coord);
+            const u16 index_maps = areaMaps.GetIndexFromMousePoint(mouse_coord);
             Maps::Tiles & tile = world.GetTiles(index_maps);
             const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
             //u8 object = tile.GetObject();

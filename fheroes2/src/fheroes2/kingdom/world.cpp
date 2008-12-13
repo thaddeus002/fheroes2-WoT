@@ -1089,6 +1089,27 @@ void World::LoadMaps(const std::string &filename)
 		}
 	    }
 
+    // generate position for ultimate
+    if(MAXU16 == ultimate_artifact)
+    {
+	std::vector<u16> pools;
+	pools.reserve(vec_tiles.size());
+
+	for(u16 ii = 0; ii < vec_tiles.size(); ++ii)
+	{
+	    const Maps::Tiles & tile = *vec_tiles[ii];
+
+	    if(Maps::Ground::WATER != tile.GetGround() && 0 == tile.GetSize1()) pools.push_back(tile.GetIndex());
+	}
+
+	if(pools.size())
+	{
+	    const u16 pos = *Rand::Get(pools);
+	    ultimate_artifact = pos;
+	    vec_tiles[pos]->SetQuantity1(Artifact::RandUltimate());
+	}
+    }
+
     if(H2Config::Debug()) Error::Verbose("World::LoadMaps: end load.");
 }
 
@@ -1875,3 +1896,12 @@ void World::DateDump(void) const
     std::cout << "World::Date: month: " << static_cast<int>(GetMonth()) <<  ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()) << std::endl;
 }
 
+u16 World::GetUltimateArtifactIndex(void)
+{
+    return ultimate_artifact;
+}
+
+Surface & World::GetUltimateArtifactArea(void)
+{
+    return ultimate_artifact_area;
+}

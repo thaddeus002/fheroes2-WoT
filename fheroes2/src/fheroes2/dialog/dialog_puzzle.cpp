@@ -17,59 +17,61 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEAREA_H
-#define H2GAMEAREA_H
 
-#include "gamedefs.h"
+#include <string>
+#include "agg.h"
+#include "button.h"
 #include "cursor.h"
+#include "world.h"
+#include "settings.h"
+#include "dialog.h"
 
-class GameArea : protected Rect
+void Dialog::PuzzleMaps(void)
 {
-public:
-    static GameArea & Get(void);
-    void Build(void);
+    Display & display = Display::Get();
 
-    enum scroll_t
+    // cursor
+    Cursor & cursor = Cursor::Get();
+
+    cursor.Hide();
+
+    Dialog::FrameBorder background;
+
+    const Point cur_pt(background.GetArea().x, background.GetArea().y);
+    Point dst_pt(cur_pt);
+
+    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
+
+    const Surface & sf = world.GetUltimateArtifactArea();
+    //const u8 open_puzzle = world.CountCapturedObject(MP2::OBJ_OBELISK, Settings::Get().MyColor());
+    //const u8 max_obelisk = world.CountObeliskOnMaps();
+
+    dst_pt.x = cur_pt.x + (640 - sf.w())/2;
+    dst_pt.y = cur_pt.y + (480 - sf.h())/2;
+    display.Blit(sf, dst_pt);
+
+    // draw border around 
+
+    // draw puzzle
+
+
+    // button exit
+    dst_pt.x = cur_pt.x + 578;
+    dst_pt.y = cur_pt.y + 461;
+    Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
+
+    buttonExit.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+   
+    // message loop
+    while(le.HandleEvents())
     {
-	NONE	= 0x00,
-	LEFT	= 0x01,
-	RIGHT	= 0x02,
-	TOP	= 0x04,
-	BOTTOM	= 0x08,
-    };
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-    const Rect & GetRect(void) const { return *this; };
-
-    static s16 x(void) { return Get().GetRect().x; };
-    static s16 y(void) { return Get().GetRect().y; };
-    static u16 w(void) { return Get().GetRect().w; };
-    static u16 h(void) { return Get().GetRect().h; };
-
-    static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
-    static Cursor::themes_t ScrollToCursor(const u8 scroll);
-
-    void Scroll(const u8 scroll);
-    void Center(const Point &pt);
-    void CenterFromRadar(const Point &pt);
-
-    void Redraw(const s16 rx = 0, const s16 ry = 0, const u16 rw = w(), const u16 rh = h()) const;
-    void Redraw(const Rect & rt) const;
-
-    u16 GetLeftTopIndexMaps(void);
-    s16 GetIndexFromMousePoint(const Point & pt);
-    s16 GetIndexFromMousePoint(s16 px, s16 py);
-
-    void GenerateUltimateArtifactAreaSurface(const u16, Surface &);
-
-private:
-    GameArea();
-
-    s16 & gx;
-    s16 & gy;
-    u16 & gw;
-    u16 & gh;
-
-    u16 max;
-};
-
-#endif
+        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+    }
+}

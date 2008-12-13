@@ -28,6 +28,7 @@
 
 class Heroes;
 class Castle;
+class Surface;
 
 namespace Game
 {

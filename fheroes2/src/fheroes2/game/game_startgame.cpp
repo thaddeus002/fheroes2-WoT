@@ -45,6 +45,8 @@
 #include "scripting.h"
 #include "kingdom.h"
 
+extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
+
 namespace Game
 {
     Cursor::themes_t GetCursor(const Maps::Tiles & tile);
@@ -131,14 +133,17 @@ Game::menu_t Game::StartGame(void)
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
 
+    Game::Focus & global_focus = Focus::Get();
+    global_focus.Reset();
+
+    // generate sprite map
+    areaMaps.GenerateUltimateArtifactAreaSurface(world.GetUltimateArtifactIndex(), world.GetUltimateArtifactArea());
+
     Mixer::Reset();
 
     // Create radar
     Radar & radar = Radar::Get();
     radar.Build();
-
-    Game::Focus & global_focus = Focus::Get();
-    global_focus.Reset();
 
     // draw interface
     Game::Interface::Get().Draw();
@@ -759,7 +764,7 @@ Game::menu_t Game::HumanTurn(void)
 	if(le.MouseCursor(area_pos))
 	{
 	    const Point & mouse_coord = le.MouseCursor();
-	    const int index_maps = Maps::GetIndexFromAreaPoint(mouse_coord);
+	    const int index_maps = gamearea.GetIndexFromMousePoint(mouse_coord);
 	    if(0 > index_maps) continue;
 
 	    const Maps::Tiles & tile = world.GetTiles(index_maps);
@@ -1121,9 +1126,9 @@ Game::menu_t Game::HumanTurn(void)
 		switch(Dialog::AdventureOptions(Game::Focus::HEROES == global_focus.Type()))
 		{
 		    case Dialog::WORLD:	break;
-		    case Dialog::PUZZLE:break;
+		    case Dialog::PUZZLE:	Dialog::PuzzleMaps(); break;
 		    case Dialog::INFO:	break;
-		    case Dialog::DIG:	DiggingForArtifacts(global_focus.GetHeroes());
+		    case Dialog::DIG:	DiggingForArtifacts(global_focus.GetHeroes()); break;
 
 		    default: break;
 		}
@@ -1297,7 +1302,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	    // TODO: congratulations!
 	    // check returns
 	    const_cast<Heroes &>(hero).PickupArtifact(ultimate);
-	    Dialog::Message("Congratulations!!!", "After spending many hours digging here, you have uncovered the " + Artifact::String(ultimate), Font::BIG, Dialog::OK);
+	    DialogWithArtifact("Congratulations!", "After spending many hours digging here, you have uncovered the " + Artifact::String(ultimate), ultimate);
 	}
 
 	Cursor::Get().Hide();

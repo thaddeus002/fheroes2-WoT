@@ -144,21 +144,6 @@ s16 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
     return py * world.w() + px;
 }
 
-/* convert area point to index maps */
-s16 Maps::GetIndexFromAreaPoint(const Point & pt)
-{
-    return GetIndexFromAreaPoint(pt.x, pt.y);
-}
-
-s16 Maps::GetIndexFromAreaPoint(s16 px, s16 py)
-{
-    const Rect & area_pos = GameArea::Get().GetRect();
-
-    u16 result = (area_pos.y + (py - BORDERWIDTH) / TILEWIDTH) * world.w() + area_pos.x + (px - BORDERWIDTH) / TILEWIDTH;
-
-    return result > world.w() * world.h() - 1 ? -1 : result;
-}
-
 u16 Maps::GetDirectionAroundFog(const u16 center, u8 color)
 {
     if(!isValidAbsPoint(center % world.w(), center / world.h())) return 0;
