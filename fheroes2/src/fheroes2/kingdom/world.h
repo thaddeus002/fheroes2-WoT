@@ -128,6 +128,8 @@ public:
     Color::color_t ColorCapturedObject(const u16 index) const;
     void StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & store);
 
+    u16 CountObeliskOnMaps(void);
+
     bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);
 
@@ -181,6 +183,7 @@ private:
     bool begin_month;
 
     Week::type_t week_name;    
+    u16 count_obelisk;
 
     static u32 uniq0;
 };

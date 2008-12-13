@@ -43,14 +43,17 @@ void Dialog::PuzzleMaps(void)
     display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
 
     const Surface & sf = world.GetUltimateArtifactArea();
-    //const u8 open_puzzle = world.CountCapturedObject(MP2::OBJ_OBELISK, Settings::Get().MyColor());
-    //const u8 max_obelisk = world.CountObeliskOnMaps();
+    const u8 open_puzzle = world.CountCapturedObject(MP2::OBJ_OBELISK, Settings::Get().MyColor());
+    const u8 max_obelisk = world.CountObeliskOnMaps();
 
     dst_pt.x = cur_pt.x + (640 - sf.w())/2;
     dst_pt.y = cur_pt.y + (480 - sf.h())/2;
     display.Blit(sf, dst_pt);
 
     // draw border around 
+    Rect  src_rt(0, 0, 480, 480);
+    const Surface & bd = AGG::GetICN((Settings::Get().EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD), 0);
+    display.Blit(bd, src_rt, dst_pt.x - 16, dst_pt.y - 16);
 
     // draw puzzle
 

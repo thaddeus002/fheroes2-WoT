@@ -67,7 +67,8 @@ void World::NewMaps(const u16 sw, const u16 sh)
     begin_month = true;
 
     week_name = Week::TORTOISE;
-
+    count_obelisk = 0;
+    
     // reserve memory
     vec_eventsday.reserve(6);
     vec_eventsmap.reserve(6);
@@ -237,6 +238,7 @@ void World::LoadMaps(const std::string &filename)
     begin_month = true;
 
     week_name = Week::TORTOISE;
+    count_obelisk = 0;
 
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -886,6 +888,10 @@ void World::LoadMaps(const std::string &filename)
 	//
 	switch(tile.GetObject())
 	{
+	    case MP2::OBJ_OBELISK:
+		count_obelisk += 1;
+		break;
+
 	    case MP2::OBJ_WITCHSHUT:
 		map_witchshut[ii] = Skill::Secondary::RandForWitchsHut();
 		break;
@@ -1905,4 +1911,9 @@ u16 World::GetUltimateArtifactIndex(void)
 Surface & World::GetUltimateArtifactArea(void)
 {
     return ultimate_artifact_area;
+}
+
+u16 World::CountObeliskOnMaps(void)
+{
+    return count_obelisk;
 }
