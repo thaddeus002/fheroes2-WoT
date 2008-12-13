@@ -23,15 +23,16 @@
 #include "settings.h"
 #include "dialog.h"
 
+#define BOX_WIDTH       306
 #define BOX_TOP         99 
 #define BOX_MIDDLE      45 
 #define BOX_BOTTOM      81 
 #define BOXE_TOP        88 
 #define BOXE_MIDDLE     45 
 #define BOXE_BOTTOM     81 
-#define BOXAREA_TOP     30 
+#define BOXAREA_TOP     35 
 #define BOXAREA_MIDDLE  45 
-#define BOXAREA_BOTTOM  30 
+#define BOXAREA_BOTTOM  35 
 
 Dialog::Box::Box(u16 height, bool buttons)
 {
@@ -48,8 +49,8 @@ Dialog::Box::Box(u16 height, bool buttons)
     u16 byte16 = (H2Config::EvilInterface() ? BOXE_TOP + BOXE_BOTTOM + count * BOXE_MIDDLE : BOX_TOP + BOX_BOTTOM + count * BOX_MIDDLE);
     Rect pos((display.w() - BOX_WIDTH) / 2, (display.h() - byte16) / 2, BOX_WIDTH, byte16);
 
-    byte16 = (H2Config::EvilInterface() ? pos.y + BOXE_TOP - 30 : pos.y + BOX_TOP - 30);
-    area = Rect(pos.x + 41, byte16, BOXAREA_WIDTH, BOXAREA_TOP + BOXAREA_BOTTOM + count * BOXAREA_MIDDLE);
+    byte16 = (H2Config::EvilInterface() ? pos.y + BOXE_TOP - BOXAREA_TOP : pos.y + BOX_TOP - BOXAREA_TOP);
+    area = Rect(pos.x + 36, byte16, BOXAREA_WIDTH, BOXAREA_TOP + BOXAREA_BOTTOM + count * BOXAREA_MIDDLE);
     if(buttons) area.h -= BUTTON_HEIGHT;
 
     bool localcursor = false;

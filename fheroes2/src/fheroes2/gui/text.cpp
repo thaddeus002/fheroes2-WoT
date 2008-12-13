@@ -194,7 +194,14 @@ u16 Text::width(const std::string &str,  Font::type_t ft, u16 start, u16 count)
 
     u16 res = 0;
     if(0xffff == count) count = size;
-    for(u16 ii = start; ii < start + count; ++ii) if(0 != unicode[ii]) res += AGG::GetUnicodeLetter(unicode[ii], ft).w();
+    for(u16 ii = start; ii < start + count; ++ii)
+    // if(0 != unicode[ii]) 
+    if(unicode[ii] < 0x0021)
+    {
+	res += (Font::SMALL == ft ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
+    }
+    else
+	res += AGG::GetUnicodeLetter(unicode[ii], ft).w();
 
     delete [] unicode;
     return res;

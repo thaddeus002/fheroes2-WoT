@@ -38,20 +38,23 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20 + Text::height(message, Font::BIG, BOXAREA_WIDTH) + sprite.h(), buttons);
+    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
+    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+
+    Box box(height1 + 10 + height2 + 10 + sprite.h(), buttons);
 
     Rect pos = box.GetArea();
 
     if(header.size())
     {
 	TextBox(header, Font::BIG, pos);
-        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 15;
+        pos.y += height1 + 10;
     }
 
     if(message.size())
     {
         TextBox(message, Font::BIG, pos);
-        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += height2 + 10;
     }
 
     // blit sprite

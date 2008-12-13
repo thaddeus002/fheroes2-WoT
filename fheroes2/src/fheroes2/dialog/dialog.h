@@ -31,8 +31,7 @@
 
 #define	SHADOWWIDTH	16
 
-#define BOX_WIDTH       306
-#define BOXAREA_WIDTH   234
+#define BOXAREA_WIDTH   245
 #define BUTTON_HEIGHT   50
 
 class Castle;

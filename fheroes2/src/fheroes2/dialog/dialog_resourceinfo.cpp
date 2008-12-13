@@ -38,21 +38,24 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
+    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
+    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+
     const u8 extra = (4 > rs.GetValidItems() ? 40 : (4 > rs.GetValidItems() ? 80 : 120));
-    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 10 + extra + Text::height(message, Font::BIG, BOXAREA_WIDTH), Dialog::OK);
+    Box box(height1 + 10 + height2 + 10 + extra, Dialog::OK);
 
     Rect pos = box.GetArea();
 
     if(header.size())
     {
 	TextBox(header, Font::BIG, pos);
-        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 10;
+        pos.y += height1 + 10;
     }
 
     if(message.size())
     {
         TextBox(message, Font::BIG, pos);
-        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 5;
+        pos.y += height2 + 10;
     }
 
     // draw resource

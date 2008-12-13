@@ -45,22 +45,25 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
+    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
+    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+
     const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(skill));
 
-    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20 + Text::height(message, Font::BIG, BOXAREA_WIDTH) + 20 + sprite.h(), ok_button ? Dialog::OK : 0);
+    Box box(height1 + 10 + height2 + 10 + sprite.h(), ok_button ? Dialog::OK : 0);
 
     Rect pos = box.GetArea();
 
     if(header.size())
     {
 	TextBox(header, Font::BIG, pos);
-        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += height1 + 10;
     }
 
     if(message.size())
     {
         TextBox(message, Font::BIG, pos);
-        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += height2 + 10;
     }
 
     // blit sprite

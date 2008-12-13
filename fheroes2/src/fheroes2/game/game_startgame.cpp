@@ -1273,22 +1273,28 @@ Game::menu_t Game::HumanTurn(void)
         	display.Flip();
             }
 	    else
-    	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
+    	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
-        	cursor.Hide();
-		if(global_focus.GetHeroes().Move())
+		Heroes & hero = global_focus.GetHeroes();
+		if(hero.isEnableMove())
 		{
-		    AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
-		    Game::EnvironmentSoundMixer();
-            	    statusWindow.Redraw();
-            	    selectHeroes.Redraw(&global_focus.GetHeroes());
-            	    gamearea.Center(global_focus.Center());
-        	    radar.RedrawArea(conf.MyColor());
-        	    radar.RedrawCursor();
+        	    cursor.Hide();
+		    if(hero.Move())
+		    {
+			AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
+			Game::EnvironmentSoundMixer();
+            		statusWindow.Redraw();
+            		selectHeroes.Redraw(&hero);
+            		gamearea.Center(global_focus.Center());
+        		radar.RedrawArea(conf.MyColor());
+        		radar.RedrawCursor();
+		    }
+		    gamearea.Redraw();
+        	    cursor.Show();
+        	    display.Flip();
 		}
-		gamearea.Redraw();
-        	cursor.Show();
-        	display.Flip();
+		else
+		    hero.SetMove(false);
 	    }
 
 	    if(Game::ShouldAnimateInfrequent(ticket, 12))

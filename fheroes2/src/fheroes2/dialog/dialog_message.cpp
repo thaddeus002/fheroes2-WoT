@@ -35,7 +35,7 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 	list.push_back(message.substr(pos1, pos2 - pos1 + 1));
 	pos1 = pos2 + 2;
     }
-    list.push_back(message.substr(pos1, message.size() - pos1));
+    if(message.size()) list.push_back(message.substr(pos1, message.size() - pos1));
 
     return Dialog::Message(header, list, ft, buttons);
 }
@@ -60,14 +60,17 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
     std::list<std::string>::const_iterator it2 = messages.end();
     for(; it1 != it2; ++it1) hm += Text::height(*it1, ft, BOXAREA_WIDTH);
 
-    Box box((header.size() ? Text::height(header, ft, BOXAREA_WIDTH) + 20 : 0) + hm, buttons);
+    Box box((header.size() ? Text::height(header, ft, BOXAREA_WIDTH) + 10 : 0) + hm, buttons);
 
     Rect pos = box.GetArea();
+
+    if(messages.empty()) pos.y += 10;
 
     if(header.size())
     {
 	TextBox(header, ft, pos);
-        pos.y += Text::height(header, ft, BOXAREA_WIDTH) + 20;
+        pos.y += Text::height(header, ft, BOXAREA_WIDTH);
+	pos.y += 10;
     }
 
     if(messages.size()) TextBox(messages, ft, pos);
