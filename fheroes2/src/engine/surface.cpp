@@ -500,14 +500,12 @@ void Surface::GrayScale(void)
 {
     if(!surface) return;
 
-    u32 pixel;
     u8 r, g, b, z;
     
     for(u16 y = 0; y < surface->h; ++y)
 	for(u16 x = 0; x < surface->w; ++x)
     {
-	pixel = GetPixel(x, y);
-	SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+	SDL_GetRGB(GetPixel(x, y), surface->format, &r, &g, &b);
 	z = static_cast<u8>(0.299 * r + 0.587 * g + 0.114 * b);
 	r = z;
 	g = z;
