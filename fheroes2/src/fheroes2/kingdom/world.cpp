@@ -731,7 +731,7 @@ void World::LoadMaps(const std::string &filename)
 		    if(SIZEOFMP2CASTLE != sizeblock) Error::Warning("World::World: read castle: incorrect size block.");
 		    else
 		    {
-			Castle *castle = const_cast<Castle *>(GetCastle(*it_index));
+			Castle *castle = GetCastle(*it_index);
 			if(castle)
 			{
 			    castle->LoadFromMP2(pblock);
@@ -748,7 +748,7 @@ void World::LoadMaps(const std::string &filename)
 		    if(SIZEOFMP2CASTLE != sizeblock) Error::Warning("World::World: read castle: incorrect size block.");
 		    else
 		    {
-			Castle *castle = const_cast<Castle *>(GetCastle(*it_index));
+			Castle *castle = GetCastle(*it_index);
 			if(castle)
 			{
 			    castle->LoadFromMP2(pblock);
@@ -1165,13 +1165,18 @@ const Kingdom & World::GetKingdom(u8 color) const
 }
 
 /* get castle from index maps */
-const Castle * World::GetCastle(u16 maps_index)
+Castle * World::GetCastle(u16 maps_index)
+{
+    return GetCastle(maps_index % width, maps_index / height);
+}
+
+const Castle * World::GetCastle(u16 maps_index) const
 {
     return GetCastle(maps_index % width, maps_index / height);
 }
 
 /* get castle from coord maps */
-const Castle * World::GetCastle(u8 ax, u8 ay)
+Castle * World::GetCastle(u8 ax, u8 ay) const
 {
     std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
     std::vector<Castle *>::const_iterator it2 = vec_castles.end();
@@ -1185,13 +1190,18 @@ const Castle * World::GetCastle(u8 ax, u8 ay)
 }
 
 /* get heroes from index maps */
+Heroes * World::GetHeroes(u16 maps_index)
+{
+    return GetHeroes(maps_index % width, maps_index / height);
+}
+
 const Heroes * World::GetHeroes(u16 maps_index) const
 {
     return GetHeroes(maps_index % width, maps_index / height);
 }
 
 /* get heroes from coord maps */
-const Heroes * World::GetHeroes(u8 ax, u8 ay) const
+Heroes * World::GetHeroes(u8 ax, u8 ay) const
 {
     std::vector<Heroes *>::const_iterator it1 = vec_heroes.begin();
     std::vector<Heroes *>::const_iterator it2 = vec_heroes.end();
@@ -1561,6 +1571,14 @@ void World::CaptureObject(const u16 index, const Color::color_t col)
 
     map_captureobj[index].first = obj;
     map_captureobj[index].second = col;
+
+    if(MP2::OBJ_CASTLE == obj)
+    {
+	Castle *castle = GetCastle(index);
+	if(castle) castle->ChangeColor(col);
+    }
+
+    GetTiles(index).CaptureFlags32(obj, col);
 }
 
 /* return color captured object */
@@ -1914,4 +1932,25 @@ Surface & World::GetUltimateArtifactArea(void)
 u16 World::CountObeliskOnMaps(void)
 {
     return count_obelisk;
+}
+
+void World::KingdomLoss(const Color::color_t color)
+{
+    // castles
+    std::vector<Castle *>::iterator itc1 = vec_castles.begin();
+    std::vector<Castle *>::const_iterator itc2 = vec_castles.end();
+    for(; itc1 != itc2; ++itc1) if(*itc1 && (*itc1)->GetColor() == color) (*itc1)->ChangeColor(color);
+
+    // capture object
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::iterator it1 = map_captureobj.begin();
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+    for(; it1 != it2; ++it1)
+    {
+	std::pair<MP2::object_t, Color::color_t> & pair = (*it1).second;
+	if(pair.second == color)
+	{
+	    pair.second = Color::GRAY;
+	    GetTiles((*it1).first).CaptureFlags32(pair.first, Color::GRAY);
+	}
+    }
 }

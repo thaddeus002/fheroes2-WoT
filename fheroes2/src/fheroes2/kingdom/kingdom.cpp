@@ -109,7 +109,7 @@ void Kingdom::ActionNewDay(void)
     if(castles.empty() && heroes.empty())
     {
 	ResetModes(PLAY);
-	Error::Verbose("Kingdom::ActionNewDay: " + Color::String(color) + "Loss!");
+	world.KingdomLoss(color);
 	return;
     }
 
@@ -202,7 +202,11 @@ void Kingdom::RemoveHeroes(const Heroes *hero)
     if(hero && heroes.size())
 	heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
 
-    if(heroes.empty() && castles.empty()) ResetModes(PLAY);
+    if(heroes.empty() && castles.empty())
+    {
+	ResetModes(PLAY);
+	world.KingdomLoss(color);
+    }
 }
 
 void Kingdom::AddCastle(const Castle *castle)
@@ -216,7 +220,11 @@ void Kingdom::RemoveCastle(const Castle *castle)
     if(castle && castles.size())
 	castles.erase(std::find(castles.begin(), castles.end(), castle));
 
-    if(heroes.empty() && castles.empty()) ResetModes(PLAY);
+    if(heroes.empty() && castles.empty())
+    {
+	ResetModes(PLAY);
+	world.KingdomLoss(color);
+    }
 
     const_cast<Castle *>(castle)->ResetModes(Castle::CAPITAL);
 

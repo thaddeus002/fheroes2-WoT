@@ -329,10 +329,7 @@ void AIToCaptureObject(Heroes &hero, const u16 dst_index)
 
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
-    {
 	world.CaptureObject(dst_index, hero.GetColor());
-	world.GetTiles(dst_index).CaptureFlags32(obj, hero.GetColor());
-    }
     if(Settings::Get().Debug()) Error::Verbose("AIToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
 }
 
@@ -881,7 +878,6 @@ void AIToCastle(Heroes &hero, const u16 dst_index)
 		hero.IncreaseExperience(exp);
 		world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
 		world.GetKingdom(hero.GetColor()).AddCastle(castle);
-		const_cast<Castle *>(castle)->ChangeColor(hero.GetColor());
                 world.CaptureObject(dst_index, hero.GetColor());
  		Game::SelectBarCastle::Get().Redraw();
 		hero.ActionAfterBattle();
@@ -1463,7 +1459,6 @@ void AIToAbandoneMine(Heroes &hero, const u16 dst_index)
 		tile.SetQuantity1(0);
 		tile.UpdateAbandoneMineSprite();
 		world.CaptureObject(dst_index, hero.GetColor());
-		world.GetTiles(dst_index).CaptureFlags32(MP2::OBJ_MINES, hero.GetColor());
 		hero.ActionAfterBattle();
 		break;
 

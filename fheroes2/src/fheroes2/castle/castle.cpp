@@ -351,8 +351,6 @@ void Castle::ActionNewMonth(void)
 void Castle::ChangeColor(Color::color_t cl)
 {
     color = cl;
-
-    world.GetTiles(mp).CaptureFlags32(MP2::OBJ_CASTLE, color);
 }
 
 // return mage guild level

@@ -78,14 +78,17 @@ public:
     Kingdom & GetKingdom(u8 color);
     const Kingdom & GetMyKingdom(void) const;
     const Kingdom & GetKingdom(u8 color) const;
+    void KingdomLoss(const Color::color_t);
 
-    const Castle * GetCastle(u16 maps_index);
-    const Castle * GetCastle(u8 ax, u8 ay);
-    const Castle * GetCastle(const Point & pt){ return GetCastle(pt.x, pt.y); };
+    const Castle * GetCastle(u16 maps_index) const;
+    const Castle * GetCastle(const Point & pt) const{ return GetCastle(pt.x, pt.y); };
+    Castle * GetCastle(u16 maps_index);
+    Castle * GetCastle(u8 ax, u8 ay) const;
 
     const Heroes * GetHeroes(u16 maps_index) const;
-    const Heroes * GetHeroes(u8 ax, u8 ay) const;
     const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); };
+    Heroes * GetHeroes(u16 maps_index);
+    Heroes * GetHeroes(u8 ax, u8 ay) const;
 
     Recruits & GetRecruits(Color::color_t);
 
