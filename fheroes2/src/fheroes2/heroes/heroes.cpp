@@ -782,25 +782,31 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     // bonus artifact
     BagArtifacts::const_iterator it = artifacts.begin();
 
-    for(; it != artifacts.end(); ++it)
-	switch(*it)
-	{
-            case Artifact::MEDAL_VALOR:
-            case Artifact::MEDAL_COURAGE:
-            case Artifact::MEDAL_HONOR:
-            case Artifact::MEDAL_DISTINCTION:
-                result += 1;
-		if(list) list->push_back(Artifact::String(*it) + p1);
-                break;
-
-            case Artifact::FIZBIN_MISFORTUNE:
-                result -= 2;
-		if(list) list->push_back(Artifact::String(*it) + m2);
-                break;
-
-            default:
-		break;
-    	}
+    if(HasArtifact(Artifact::MEDAL_VALOR))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
+    if(HasArtifact(Artifact::MEDAL_COURAGE))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
+    if(HasArtifact(Artifact::MEDAL_HONOR))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
+    if(HasArtifact(Artifact::MEDAL_DISTINCTION))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
+    if(HasArtifact(Artifact::FIZBIN_MISFORTUNE))
+    {
+	result -= 2;
+	if(list) list->push_back(Artifact::String(*it) + m2);
+    }
 
     // bonus leadership
     switch(GetLevelSkill(Skill::Secondary::LEADERSHIP))
@@ -900,21 +906,26 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
     const std::string m2(" -2");
 
     // bonus artifact
-    for(; it != artifacts.end(); ++it)
-
-	switch(*it)
-	{
-    	    case Artifact::RABBIT_FOOT:
-            case Artifact::GOLDEN_HORSESHOE:
-            case Artifact::GAMBLER_LUCKY_COIN:
-            case Artifact::FOUR_LEAF_CLOVER:
-	    	++result;
-		if(list) list->push_back(Artifact::String(*it) + p1);
-		break;
-
-            default:
-		break;
-    	}
+    if(HasArtifact(Artifact::RABBIT_FOOT))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
+    if(HasArtifact(Artifact::GOLDEN_HORSESHOE))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
+    if(HasArtifact(Artifact::GAMBLER_LUCKY_COIN))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
+    if(HasArtifact(Artifact::FOUR_LEAF_CLOVER))
+    {
+	result += 1;
+	if(list) list->push_back(Artifact::String(*it) + p1);
+    }
 
     // bonus luck
     switch(GetLevelSkill(Skill::Secondary::LUCK))
