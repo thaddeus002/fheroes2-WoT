@@ -155,7 +155,8 @@ namespace Army {
     void PrepMovePointsInt(const Army::BattleTroop &troop, const Point &p, int move, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, int skip);
     
     void AttackStatus(const std::string &str);
-    
+
+    bool IsAffectedByMorale(const Army::BattleTroop &troop);
     bool GoodMorale(Heroes *hero, const Army::BattleTroop &troop);
     bool BadMorale(Heroes *hero, const Army::BattleTroop &troop);
     int CheckLuck(Heroes *hero, const Army::BattleTroop &troop);
@@ -3014,10 +3015,31 @@ Point Army::GetReachableAttackCell(const Army::BattleTroop &target, const Army::
     return Point(-1);
 }
 
-bool Army::GoodMorale(Heroes *hero, const Army::BattleTroop &troop)
+bool Army::IsAffectedByMorale(const Army::BattleTroop &troop)
 {
     if(Monster::GetRace(troop.Monster()) == Race::NECR) return false;
-    if(Monster::GetRace(troop.Monster()) == Race::BOMG && troop.Monster() >= Monster::EARTH_ELEMENT) return false;
+    else if(Monster::GetRace(troop.Monster()) == Race::BOMG)
+    {
+        switch(troop.Monster())
+        {
+            case Monster::EARTH_ELEMENT:
+            case Monster::FIRE_ELEMENT:
+            case Monster::WATER_ELEMENT:
+            case Monster::AIR_ELEMENT:
+            case Monster::GENIE:
+            case Monster::GHOST:
+                return false;
+            default:
+                return true;
+        }
+    }
+    else return true;
+}
+
+bool Army::GoodMorale(Heroes *hero, const Army::BattleTroop &troop)
+{
+    if(!IsAffectedByMorale(troop))   
+       return false;
     int m = Rand::Get(1, MORALEBOUND);
     if(hero && (hero->GetMorale() >= m)) {
 	AGG::PlaySound(M82::GOODMRLE);
@@ -3043,8 +3065,8 @@ bool Army::GoodMorale(Heroes *hero, const Army::BattleTroop &troop)
 
 bool Army::BadMorale(Heroes *hero, const Army::BattleTroop &troop)
 {
-    if(Monster::GetRace(troop.Monster()) == Race::NECR) return false;
-    if(Monster::GetRace(troop.Monster()) == Race::BOMG && troop.Monster() >= Monster::EARTH_ELEMENT) return false;
+    if(!IsAffectedByMorale(troop))
+        return false;
     int m = -Rand::Get(1, MORALEBOUND);
     if(hero && (hero->GetMorale() <= m)) {
 	AGG::PlaySound(M82::BADMRLE);
