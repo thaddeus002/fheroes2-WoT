@@ -139,7 +139,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
         case MP2::OBJ_OBELISK:
             // check visited
-            visit_status = Game::Focus::Get().GetHeroes().isVisited(tile, Visit::GLOBAL) ? "(already visited)" : "(not visited)";
+            visit_status = world.GetKingdom(settings.MyColor()).isVisited(tile) ? "(already visited)" : "(not visited)";
             break;
 
         default: break;

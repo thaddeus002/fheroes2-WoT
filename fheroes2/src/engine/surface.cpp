@@ -523,10 +523,8 @@ void Surface::Sepia(void)
 {
     if(!surface) return;
 
-    u8 r, g, b, z;
-    
-    for(u32 x = 0; x < surface->w; x++)
-        for(u32 y = 0; y < surface->h; y++)
+    for(u16 x = 0; x < surface->w; x++)
+        for(u16 y = 0; y < surface->h; y++)
         {
             u32 pixel = GetPixel(x, y);
             u8 r, g, b;
