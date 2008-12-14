@@ -23,6 +23,7 @@
 
 Army::BattleTroop::BattleTroop(const Troop &t)
 : Troop(t)
+, reflect(false)
 {
 }
 

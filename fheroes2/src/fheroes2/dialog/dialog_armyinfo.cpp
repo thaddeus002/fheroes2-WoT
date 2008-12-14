@@ -34,7 +34,13 @@
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
 {
     Army::BattleTroop battroop(troops);
-    const bool battle = troops.GetArmy() && troops.GetArmy()->Modes(Army::FIGHT);
+    return ArmyInfo(battroop, flags);
+}
+
+Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
+{
+    Army::BattleTroop battroop(troop);
+    const bool battle = BATTLE & flags;
     Display & display = Display::Get();
 
     const ICN::icn_t viewarmy = H2Config::EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
@@ -238,60 +244,40 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     
+    Dialog::answer_t result = Dialog::ZERO;
+
+    const Sprite & frame = AGG::GetICN(stats.file_icn, 0);
+    Point anim_rt(pos_rt.x + (pos_rt.w / 2 - frame.w()) / 2 , pos_rt.y + 180);
+    battroop.astate = Monster::AS_IDLE;
+    battroop.aframe = 0;
+    battroop.Animate();
+    battroop.Blit(anim_rt, battroop.IsReflected());
+
     cursor.Show();
     display.Flip();
     
-    Dialog::answer_t result = Dialog::ZERO;
-        
-    u16 animat = 0;
-    Point anim_rt(pos_rt.x + 100, pos_rt.y + 180);
-    battroop.astate = Monster::AS_NONE;
-    battroop.aframe = 0;
-    battroop.Blit(anim_rt);
-    int animcount=0;
-
     // dialog menu loop
     while(le.HandleEvents())
     {
         if(flags & BUTTONS)
-	{
-	    if(buttonUpgrade.isEnable()) le.MousePressLeft(buttonUpgrade) ? (buttonUpgrade).PressDraw() : (buttonUpgrade).ReleaseDraw();
+        {
+            if(buttonUpgrade.isEnable()) le.MousePressLeft(buttonUpgrade) ? (buttonUpgrade).PressDraw() : (buttonUpgrade).ReleaseDraw();
     	    if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? (buttonDismiss).PressDraw() : (buttonDismiss).ReleaseDraw();
     	    le.MousePressLeft(buttonExit) ? (buttonExit).PressDraw() : (buttonExit).ReleaseDraw();
-
-	    // upgrade
-	    if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade)){ result = Dialog::UPGRADE; break; }
-
+            
+            // upgrade
+            if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade)){ result = Dialog::UPGRADE; break; }
+            
     	    // dismiss
-	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)){ result = Dialog::DISMISS; break; }
-
+            if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)){ result = Dialog::DISMISS; break; }
+            
     	    // exit
     	    if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
-	}
-	else
-	{
-	    if(!le.MouseRight()) break;
         }
-
-	if(Game::ShouldAnimateInfrequent(animat++, 3)) {
-	    battroop.Animate();
-	    if(battroop.astate == Monster::AS_NONE) {
-		switch(animcount) {
-		case 0: battroop.Animate(Monster::AS_IDLE),  animcount++; break;
-		case 1: battroop.Animate(Monster::AS_WALK),  animcount++; break;
- 		case 2: battroop.Animate(Monster::AS_ATT1P), animcount++; break;
-		case 3: battroop.Animate(Monster::AS_WALK),  animcount++; break;
- 		case 4: battroop.Animate(Monster::AS_ATT2P), animcount++; break;
-		case 5: battroop.Animate(Monster::AS_WALK),  animcount++; break;
- 		case 6: battroop.Animate(Monster::AS_ATT3P), animcount++; break;
-		case 7: battroop.Animate(Monster::AS_PAIN),  animcount++; break;
- 		case 8: battroop.Animate(Monster::AS_PAIN),  animcount++; break;
- 		case 9: battroop.Animate(Monster::AS_DIE),   animcount=0; break;
-		}
-	    }
-	    battroop.BlitR(anim_rt);
-	    display.Flip();
-	}
+        else
+        {
+            if(!le.MouseRight()) break;
+        }
     }
 
     cursor.Hide();

@@ -70,6 +70,7 @@ namespace Dialog
 	DIG	= 0x1000,
 
 	READONLY= 0x2000,
+    BATTLE= 0x4000,
 	BUTTONS = (YES|OK|NO|CANCEL),
     } answer_t;
 
@@ -107,6 +108,7 @@ namespace Dialog
 
     // army info
     answer_t ArmyInfo(const Army::Troop & troop, u16 flags);
+    answer_t ArmyInfo(const Army::BattleTroop & troop, u16 flags);
 
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);
