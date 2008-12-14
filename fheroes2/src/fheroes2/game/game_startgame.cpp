@@ -770,16 +770,16 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft)) scrollDir |= GameArea::LEFT;
+	if(le.MouseCursor(areaScrollLeft) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
         else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight)) scrollDir |= GameArea::RIGHT;
+	if(le.MouseCursor(areaScrollRight) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
 	
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop)) scrollDir |= GameArea::TOP;
+	if(le.MouseCursor(areaScrollTop) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom)) scrollDir |= GameArea::BOTTOM;
+	if(le.MouseCursor(areaScrollBottom) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
 
 	// cursor over game area
 	if(le.MouseCursor(area_pos))

@@ -226,6 +226,20 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bo
     //
 }
 
+bool GameArea::AllowScroll(scroll_t direct)
+{
+    switch(direct)
+    {
+	case LEFT:	if(0 < gx) return true;			break;
+	case RIGHT:	if(world.w() - gw > gx) return true;	break;
+	case TOP:	if(0 < gy) return true;			break;
+	case BOTTOM:	if(world.h() - gh > gy) return true;	break;
+	default: break;
+    }
+
+    return false;
+}
+
 /* scroll area */
 void GameArea::Scroll(const u8 scroll)
 {

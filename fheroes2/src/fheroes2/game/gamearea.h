@@ -48,6 +48,7 @@ public:
     static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
     static Cursor::themes_t ScrollToCursor(const u8 scroll);
 
+    bool AllowScroll(scroll_t);
     void Scroll(const u8 scroll);
     void Center(const Point &pt);
     void CenterFromRadar(const Point &pt);
