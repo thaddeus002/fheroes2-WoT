@@ -40,6 +40,9 @@ class IndexObject : public std::pair<u16, MP2::object_t>
     IndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair) {};
     IndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object) {};
     IndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject()) {};
+
+    bool isIndex(u16 index) const { return index == first; };
+    bool isObject(MP2::object_t object) const { return object == second; };
 };
 
 #endif

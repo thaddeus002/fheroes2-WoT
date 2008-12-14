@@ -140,9 +140,9 @@ public:
     void ActionNewWeek(void);
     void ActionNewMonth(void);
 
-    void SetVisited(const u16 index, const MP2::object_t & object = MP2::OBJ_ZERO);
-    u16  CountVisitedObjects(const MP2::object_t &) const;
-    bool isVisited(const MP2::object_t & object) const;
+    void SetVisited(const u16 index, const MP2::object_t object = MP2::OBJ_ZERO);
+    u16  CountVisitedObjects(const MP2::object_t) const;
+    bool isVisited(const MP2::object_t object) const;
     bool isVisited(const Maps::Tiles & tile) const;
 
     bool HeroesMayStillMove(void) const;

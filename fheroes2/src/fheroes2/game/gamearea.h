@@ -28,7 +28,6 @@ class GameArea : protected Rect
 public:
     static GameArea & Get(void);
     void Build(void);
-    void Build(const Rect &);
 
     enum scroll_t
     {

@@ -214,16 +214,16 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bo
     }
 
     // redraw fog
-    if(!drawFog)
-        return;
-    
-    for(u8 oy = ry; oy < ry + rh; ++oy)
-	for(u8 ox = rx; ox < rx + rw; ++ox)
+    if(drawFog)
+	for(u8 oy = ry; oy < ry + rh; ++oy)
+	    for(u8 ox = rx; ox < rx + rw; ++ox)
     {
-	const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
+	    const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
 
-	if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), ox, oy);
+	    if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), ox, oy);
     }
+
+    //
 }
 
 /* scroll area */

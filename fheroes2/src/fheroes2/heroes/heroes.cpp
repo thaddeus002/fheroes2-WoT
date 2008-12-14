@@ -770,21 +770,32 @@ Morale::morale_t Heroes::GetMorale(void) const
     return GetMoraleWithModificators(NULL);
 }
 
+const std::string & StringModifiers(s8 mod)
+{
+    static const std::string mods[] = { "0", "-3", "-2", "-1", "+1", "+2", "+3" };
+
+    switch(mod)
+    {
+	case -3: return mods[1];
+	case -2: return mods[2];
+	case -1: return mods[3];
+	case  1: return mods[4];
+	case  2: return mods[5];
+	case  3: return mods[6];
+
+	default: break;
+    }
+
+    return mods[0];
+}
+
 Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
 {
     s8 result = Morale::NORMAL;
 
-    std::vector<std::string> modStrings;
-    modStrings.push_back(" -3");
-    modStrings.push_back(" -2");
-    modStrings.push_back(" -1");
-    modStrings.push_back(" +0");
-    modStrings.push_back(" +1");
-    modStrings.push_back(" +2");
-    modStrings.push_back(" +3");
-    const int baseMod = modStrings.size() / 2;
+    std::vector<std::pair<int, s8> > modifiers;
+    modifiers.reserve(10);
 
-    std::vector<std::pair<int, int> > modifiers;
     modifiers.push_back(std::make_pair(Artifact::MEDAL_VALOR, 1));
     modifiers.push_back(std::make_pair(Artifact::MEDAL_COURAGE, 1));
     modifiers.push_back(std::make_pair(Artifact::MEDAL_HONOR, 1));
@@ -797,16 +808,12 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     for(u16 i = 0; i < modifiers.size(); i++)
     {
         Artifact::artifact_t art = (Artifact::artifact_t)modifiers[i].first;
-        if(!HasArtifact(art))
-            continue;
-        
+	if(!HasArtifact(art))
+	    continue;
+
         result += modifiers[i].second;
         if(list)
-        {
-            std::string modString = Artifact::String(art);
-            modString += modStrings[baseMod + modifiers[i].second];
-            list->push_back(modString);
-        }
+	    list->push_back(Artifact::String(art) + StringModifiers(modifiers[i].second));
     }
 
     modifiers.clear();
@@ -818,17 +825,12 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     for(u16 i = 0; i < modifiers.size(); i++)
     {
         Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
-        if(!GetLevelSkill(Skill::Secondary::LEADERSHIP) == level)
+        if(GetLevelSkill(Skill::Secondary::LEADERSHIP) == Skill::Level::NONE)
             continue;
 
         result += modifiers[i].second;
         if(list)
-        {
-            std::string modString = Skill::Level::String(level); modString += " ";
-            modString += Skill::Secondary::String(Skill::Secondary::LEADERSHIP);
-            modString += modStrings[baseMod + modifiers[i].second];
-            list->push_back(modString);
-        }
+            list->push_back(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LEADERSHIP) + StringModifiers(modifiers[i].second));
         break;
     }
 
@@ -850,11 +852,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
 
         result += modifiers[i].second;
         if(list)
-        {
-            std::string modString = MP2::StringObject(obj);
-            modString += modStrings[baseMod + modifiers[i].second];
-            list->push_back(modString);
-        }
+            list->push_back(MP2::StringObject(obj) + StringModifiers(modifiers[i].second));
     }
     
     const Castle* castle = inCastle();
@@ -891,17 +889,9 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 
     BagArtifacts::const_iterator it = artifacts.begin();
 
-    std::vector<std::string> modStrings;
-    modStrings.push_back(" -3");
-    modStrings.push_back(" -2");
-    modStrings.push_back(" -1");
-    modStrings.push_back(" +0");
-    modStrings.push_back(" +1");
-    modStrings.push_back(" +2");
-    modStrings.push_back(" +3");
-    const int baseMod = modStrings.size() / 2;
+    std::vector<std::pair<int, s8> > modifiers;
+    modifiers.reserve(5);
 
-    std::vector<std::pair<int, int> > modifiers;
     modifiers.push_back(std::make_pair(Artifact::RABBIT_FOOT, 1));
     modifiers.push_back(std::make_pair(Artifact::GOLDEN_HORSESHOE, 1));
     modifiers.push_back(std::make_pair(Artifact::GAMBLER_LUCKY_COIN, 1));
@@ -916,11 +906,7 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 
         result += modifiers[i].second;
         if(list)
-        {
-            std::string modString = Artifact::String(art);
-            modString += modStrings[baseMod + modifiers[i].second];
-            list->push_back(modString);
-        }
+            list->push_back(Artifact::String(art) + StringModifiers(modifiers[i].second));
     }
 
     modifiers.clear();
@@ -932,18 +918,12 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
     for(u16 i = 0; i < modifiers.size(); i++)
     {
         Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
-        if(!GetLevelSkill(Skill::Secondary::LUCK) == level)
+        if(GetLevelSkill(Skill::Secondary::LUCK) == Skill::Level::NONE)
             continue;
 
         result += modifiers[i].second;
         if(list)
-        {
-            std::string modString = Skill::Level::String(level); modString += " ";
-            modString += Skill::Secondary::String(Skill::Secondary::LUCK);
-            modString += modStrings[baseMod + modifiers[i].second];
-            list->push_back(modString);
-        }
-        break;
+            list->push_back(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LUCK) + StringModifiers(modifiers[i].second));
     }
 
     modifiers.clear();
@@ -961,11 +941,7 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 
         result += modifiers[i].second;
         if(list)
-        {
-            std::string modString = MP2::StringObject(obj);
-            modString += modStrings[baseMod + modifiers[i].second];
-            list->push_back(modString);
-        }
+            list->push_back(MP2::StringObject(obj) + StringModifiers(modifiers[i].second));
     }
     
     const Castle* castle = inCastle();

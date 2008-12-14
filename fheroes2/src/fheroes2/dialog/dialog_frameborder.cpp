@@ -23,7 +23,7 @@
 #include "cursor.h"
 #include "dialog.h"
 
-Dialog::FrameBorder::FrameBorder(bool fade, int enclosedWidth, int enclosedHeight)
+Dialog::FrameBorder::FrameBorder(bool fade, u16 enclosedWidth, u16 enclosedHeight)
 : doFade(fade)
 {
     Display & display = Display::Get();
@@ -31,8 +31,8 @@ Dialog::FrameBorder::FrameBorder(bool fade, int enclosedWidth, int enclosedHeigh
     
     Rect pos;
     
-    const int totalWidth = enclosedWidth + SHADOWWIDTH + 2 * BORDERWIDTH;
-    const int totalHeight = enclosedHeight + SHADOWWIDTH + 2 * BORDERWIDTH;
+    const u16 totalWidth = enclosedWidth + SHADOWWIDTH + 2 * BORDERWIDTH;
+    const u16 totalHeight = enclosedHeight + SHADOWWIDTH + 2 * BORDERWIDTH;
 
     pos.x = 640 == display.w() ? 0 : (display.w() - totalWidth) / 2;
     pos.y = 640 == display.w() ? 0 : (display.h() - totalHeight) / 2;

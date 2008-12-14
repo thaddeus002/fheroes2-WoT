@@ -29,13 +29,11 @@
 #include "radar.h"
 #include "kingdom.h"
 
-std::vector<Point> pieceOffsets;
-std::vector<Point> revealOrder;
 
 #define PUZZLE_WIDTH 6
 #define PUZZLE_HEIGHT 8
 
-static void InitPuzzle(void)
+void InitPuzzle(std::vector<Point> & pieceOffsets, std::vector<Point> & revealOrder)
 {
     pieceOffsets.push_back(Point(-13, 0));
     pieceOffsets.push_back(Point(-20, 0));
@@ -144,13 +142,14 @@ static void InitPuzzle(void)
 
 void Dialog::PuzzleMaps(void)
 {
-    static bool wasInit = false;
-    if(!wasInit)
-    {
-        InitPuzzle();
-        wasInit = true;
-    }
-    
+    std::vector<Point> pieceOffsets;
+    std::vector<Point> revealOrder;
+
+    pieceOffsets.reserve(50);
+    revealOrder.reserve(50);
+
+    InitPuzzle(pieceOffsets, revealOrder);
+
     Display & display = Display::Get();
 
     Cursor & cursor = Cursor::Get();

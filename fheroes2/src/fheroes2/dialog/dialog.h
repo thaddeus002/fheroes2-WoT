@@ -133,7 +133,7 @@ private:
 class FrameBorder
 {
 public:
-    FrameBorder(bool fade=true, int width = 640, int height = 480);
+    FrameBorder(bool fade=true, u16 width = 640, u16 height = 480);
     ~FrameBorder();
 
     const Rect & GetArea(void) const{ return area; };

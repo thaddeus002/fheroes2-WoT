@@ -2546,4 +2546,5 @@ void ActionToObelisk(Heroes &hero, const u16 dst_index)
     }
     
     Dialog::PuzzleMaps();
+    if(Settings::Get().Debug()) Error::Verbose("ActionToObelisk: " + hero.GetName());
 }
