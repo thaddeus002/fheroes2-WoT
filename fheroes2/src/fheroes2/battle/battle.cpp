@@ -322,7 +322,11 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
             Army::army_t army = BattleArmyToArmy(*armies[1].first);
             animation.push_back(std::make_pair(ICN::WINCMBT, Point(32, 0)));
             message[0] = tr("battle.victory1");
-            message[1] = tr("battle.victory2").sub(name).sub(army.CalculateExperience());
+            //TODO: EXP1 is the correct amount of experience that should be awarded, in case
+            //      the opposing army retreated or surrendered.  However, the actual amount
+            //      awarded is given by Army_t::CalculateExperience, which assumes that all
+            //      creatures were killed.
+            message[1] = tr("battle.victory2").sub(name).sub(EXP1);
             break;
         }
         case LOSE:
