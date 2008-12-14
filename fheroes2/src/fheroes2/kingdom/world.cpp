@@ -1094,7 +1094,7 @@ void World::LoadMaps(const std::string &filename)
 		    kingdom.AddHeroes(const_cast<Heroes *>(hero));
 		}
 	    }
-
+    
     // generate position for ultimate
     if(MAXU16 == ultimate_artifact)
     {
@@ -1119,7 +1119,6 @@ void World::LoadMaps(const std::string &filename)
 
     if(H2Config::Debug()) Error::Verbose("World::LoadMaps: end load.");
 }
-
 /* get human kindom */
 Kingdom & World::GetMyKingdom(void)
 { return GetKingdom(Settings::Get().MyColor()); }
@@ -1338,7 +1337,7 @@ void World::FreeOldMaps(void)
 	for(; it != vec_heroes.end(); ++it) delete *it;
     }
     vec_heroes.clear();
-
+    
     // extra
     vec_teleports.clear();
     map_recruits.clear();

@@ -23,20 +23,21 @@
 #include "cursor.h"
 #include "dialog.h"
 
-#define FRAMEBORDER_WIDTH	(640 + SHADOWWIDTH + 2 * BORDERWIDTH)
-#define FRAMEBORDER_HEIGHT	(480 + SHADOWWIDTH + 2 * BORDERWIDTH)
-
-Dialog::FrameBorder::FrameBorder()
+Dialog::FrameBorder::FrameBorder(bool fade, int enclosedWidth, int enclosedHeight)
+: doFade(fade)
 {
     Display & display = Display::Get();
     const Sprite & surdbkg = (H2Config::EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
     
     Rect pos;
+    
+    const int totalWidth = enclosedWidth + SHADOWWIDTH + 2 * BORDERWIDTH;
+    const int totalHeight = enclosedHeight + SHADOWWIDTH + 2 * BORDERWIDTH;
 
-    pos.x = 640 == display.w() ? 0 : (display.w() - FRAMEBORDER_WIDTH) / 2;
-    pos.y = 640 == display.w() ? 0 : (display.h() - FRAMEBORDER_HEIGHT) / 2;
-    pos.w = 640 == display.w() ? 640 : FRAMEBORDER_WIDTH;
-    pos.h = 640 == display.w() ? 480 : FRAMEBORDER_HEIGHT;
+    pos.x = 640 == display.w() ? 0 : (display.w() - totalWidth) / 2;
+    pos.y = 640 == display.w() ? 0 : (display.h() - totalHeight) / 2;
+    pos.w = 640 == display.w() ? 640 : totalWidth;
+    pos.h = 640 == display.w() ? 480 : totalHeight;
 
     area.x = 640 == display.w() ? 0 : pos.x + BORDERWIDTH + SHADOWWIDTH;
     area.y = 640 == display.w() ? 0 : pos.y + BORDERWIDTH;
@@ -135,14 +136,15 @@ Dialog::FrameBorder::FrameBorder()
 	dst_pt = Point(pos.x + pos.w - BORDERWIDTH, pos.y + pos.h - BORDERWIDTH * 3 - SHADOWWIDTH);
 	display.Blit(surdbkg, src_rt, dst_pt);
     }
-    else
+    else if(fade)
         Display::Fade();
 }
 
 Dialog::FrameBorder::~FrameBorder()
 {
     if(Cursor::Get().isVisible()){ Cursor::Get().Hide(); };
-    Display::Fade();
+    if(doFade)
+        Display::Fade();
     back.Restore();
     Display::Flip();
 }

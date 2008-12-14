@@ -138,7 +138,7 @@ Game::menu_t Game::StartGame(void)
 
     // generate sprite map
     areaMaps.GenerateUltimateArtifactAreaSurface(world.GetUltimateArtifactIndex(), world.GetUltimateArtifactArea());
-    world.GetUltimateArtifactArea().GrayScale();
+    world.GetUltimateArtifactArea().Sepia();
 
     Mixer::Reset();
 
@@ -710,7 +710,6 @@ Game::menu_t Game::HumanTurn(void)
 
     selectHeroes.Redraw();
     selectCastle.Redraw();
-
 
     switch(global_focus.Type())
     {

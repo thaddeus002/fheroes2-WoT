@@ -113,7 +113,8 @@ namespace Dialog
 
     // dialog buy boat
     answer_t BuyBoat(bool enable);
-
+    
+    // puzzle
     void PuzzleMaps(void);
 
 class Box
@@ -132,7 +133,7 @@ private:
 class FrameBorder
 {
 public:
-    FrameBorder();
+    FrameBorder(bool fade=true, int width = 640, int height = 480);
     ~FrameBorder();
 
     const Rect & GetArea(void) const{ return area; };
@@ -140,6 +141,7 @@ public:
 private:
     Background back;
     Rect area;
+    bool doFade;
 };
 
 class StatusBar

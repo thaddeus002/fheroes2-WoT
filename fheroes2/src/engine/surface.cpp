@@ -119,6 +119,11 @@ u32 Surface::MapRGB(u8 r, u8 g, u8 b, u8 a) const
     return a ? SDL_MapRGBA(surface->format, r, g, b, a) : SDL_MapRGB(surface->format, r, g, b);
 }
 
+void Surface::GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a) const
+{
+    return a ? SDL_GetRGBA(pixel, surface->format, r, g, b, a) : SDL_GetRGB(pixel, surface->format, r, g, b);
+}
+
 /* create new surface */
 void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 {
@@ -505,11 +510,35 @@ void Surface::GrayScale(void)
     for(u16 y = 0; y < surface->h; ++y)
 	for(u16 x = 0; x < surface->w; ++x)
     {
-	SDL_GetRGB(GetPixel(x, y), surface->format, &r, &g, &b);
+	GetRGB(GetPixel(x, y), &r, &g, &b);
 	z = static_cast<u8>(0.299 * r + 0.587 * g + 0.114 * b);
 	r = z;
 	g = z;
 	b = z;
-	SetPixel(x, y, SDL_MapRGB(surface->format, r, g, b));
+	SetPixel(x, y, MapRGB(r, g, b));
     }
+}
+
+void Surface::Sepia(void)
+{
+    if(!surface) return;
+
+    u8 r, g, b, z;
+    
+    for(u32 x = 0; x < surface->w; x++)
+        for(u32 y = 0; y < surface->h; y++)
+        {
+            u32 pixel = GetPixel(x, y);
+            u8 r, g, b;
+            GetRGB(pixel, &r, &g, &b);
+    
+            //Numbers derived from http://blogs.techrepublic.com.com/howdoi/?p=120
+            #define CLAMP255(val) static_cast<u8>(std::min<u16>((val), 255))
+            u8 outR = CLAMP255(static_cast<u16>(r * 0.693f + g * 0.769f + b * 0.189f));
+            u8 outG = CLAMP255(static_cast<u16>(r * 0.449f + g * 0.686f + b * 0.168f));
+            u8 outB = CLAMP255(static_cast<u16>(r * 0.272f + g * 0.534f + b * 0.131f));
+            pixel = MapRGB(outR, outG, outB);
+            SetPixel(x, y, pixel);
+            #undef CLAMP255
+        }
 }

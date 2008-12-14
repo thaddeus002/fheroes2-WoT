@@ -101,12 +101,17 @@ u16 GameArea::GetLeftTopIndexMaps(void)
 }
 
 /* readraw rect, default all */
-void GameArea::Redraw(const Rect & rt) const
+void GameArea::Redraw(const Rect & rt, bool drawFog) const
 {
-    Redraw(rt.x, rt.y, rt.w, rt.h);
+    Redraw(rt.x, rt.y, rt.w, rt.h, drawFog);
 }
 
-void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) const
+void GameArea::RedrawNoFog(void) const
+{
+    Redraw(0, 0, w(), h(), false);
+}
+
+void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bool drawFog) const
 {
     Display & display = Display::Get();
 
@@ -209,6 +214,9 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh) co
     }
 
     // redraw fog
+    if(!drawFog)
+        return;
+    
     for(u8 oy = ry; oy < ry + rh; ++oy)
 	for(u8 ox = rx; ox < rx + rw; ++ox)
     {
@@ -622,7 +630,7 @@ void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf
 	Point pt(index % world.w(), index / world.h());
 
 	Center(pt);
-	Redraw();
+	RedrawNoFog();
 
 	// blit marker
 	for(u8 ii = 0; ii < h(); ++ii) if(index < Maps::GetIndexFromAbsPoint(gx + gw - 1, gy + ii))

@@ -28,6 +28,7 @@ class GameArea : protected Rect
 public:
     static GameArea & Get(void);
     void Build(void);
+    void Build(const Rect &);
 
     enum scroll_t
     {
@@ -52,8 +53,9 @@ public:
     void Center(const Point &pt);
     void CenterFromRadar(const Point &pt);
 
-    void Redraw(const s16 rx = 0, const s16 ry = 0, const u16 rw = w(), const u16 rh = h()) const;
-    void Redraw(const Rect & rt) const;
+    void Redraw(const s16 rx = 0, const s16 ry = 0, const u16 rw = w(), const u16 rh = h(), bool drawFog = true) const;
+    void Redraw(const Rect & rt, bool drawFog = true) const;
+    void RedrawNoFog(void) const;
 
     u16 GetLeftTopIndexMaps(void);
     s16 GetIndexFromMousePoint(const Point & pt);

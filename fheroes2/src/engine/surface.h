@@ -59,6 +59,7 @@ public:
     bool alpha(void) const;
     u32 flags(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
+    void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 
     void Blit(const Surface &src);
     void Blit(const Surface &src, s16 dst_ox, s16 dst_oy);
@@ -99,6 +100,7 @@ public:
 
     void ChangeColor(u32, u32);
     void GrayScale(void);
+    void Sepia(void);
     
     void Lock(void);
     void Unlock(void);

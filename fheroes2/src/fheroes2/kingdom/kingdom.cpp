@@ -276,6 +276,16 @@ bool Kingdom::isVisited(const MP2::object_t & object) const
     return false;
 }
 
+u16 Kingdom::CountVisitedObjects(const MP2::object_t & object) const
+{
+    std::list<IndexObject>::const_iterator it1 = visit_object.begin();
+    std::list<IndexObject>::const_iterator it2 = visit_object.end();
+    u16 count = 0;
+    for(; it1 != it2; it1++)
+        count += it1->second == object;
+    return count;
+}
+
 /* set visited cell */
 void Kingdom::SetVisited(const u16 index, const MP2::object_t & object)
 {

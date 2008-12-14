@@ -76,6 +76,7 @@ void ActionToXanadu(Heroes &hero, const u16 dst_index);
 void ActionToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
 void ActionToMagellanMaps(Heroes &hero, const u16 dst_index);
 void ActionToEvent(Heroes &hero, const u16 dst_index);
+void ActionToObelisk(Heroes &hero, const u16 dst_index);
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
@@ -370,10 +371,11 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_FREEMANFOUNDRY:	ActionToUpgradeArmyObject(*this, dst_index); break;
 
         case MP2::OBJ_EVENT:		ActionToEvent(*this, dst_index); break;
+        
+        case MP2::OBJ_OBELISK:          ActionToObelisk(*this, dst_index); break;
 
         // object
         case MP2::OBJ_DAEMONCAVE:
-        case MP2::OBJ_OBELISK:
 	case MP2::OBJ_ORACLE:
         case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_SPHINX:
@@ -2528,4 +2530,20 @@ void ActionToEvent(Heroes &hero, const u16 dst_index)
     world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToEvent: " + hero.GetName());
+}
+
+void ActionToObelisk(Heroes &hero, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+    if(!hero.isVisited(obj, Visit::GLOBAL))
+    {
+        hero.SetVisited(dst_index, Visit::GLOBAL);
+        AGG::PlaySound(M82::EXPERNCE);
+        Dialog::Message("Obelisk", "You come upon an obelisk made from a type of stone you have never seen before.  Staring at it intensely, the smooth "
+                                   "surface suddenly changes to an inscription.  The inscription is a piece of a lost ancient map.  Quickly you copy down "
+                                   "the piece and the inscription vanishes as abruptly as it appeared.", Font::BIG, Dialog::OK);
+    }
+    
+    Dialog::PuzzleMaps();
 }
