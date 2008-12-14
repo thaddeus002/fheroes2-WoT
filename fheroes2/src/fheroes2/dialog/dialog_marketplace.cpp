@@ -31,17 +31,173 @@
 #include "marketplace.h"
 #include "dialog.h"
 
+void RedrawInfoBuySell(std::string &message, TextSprite *textSell, TextSprite *textBuy, const Rect &pos_rt, u32 count_sell, u32 count_buy);
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs);
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);
 void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPost);
 u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost);
+
+struct TradeWindowGUI
+{
+    Button *buttonTrade;
+    Button *buttonLeft;
+    Button *buttonRight;
+    Splitter *splitter;
+    std::string message_info;
+    TextSprite *textSell;
+    TextSprite *textBuy;
+    const Sprite *sprite_exit;
+    ICN::icn_t tradpost;
+    Background *back;
+};
+    
+void ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell,
+                   const Rect &pos_rt, Point &dst_pt, Rect &dst_rt, std::string &message, TradeWindowGUI &gui, bool fromTradingPost)
+{
+    Cursor &cursor = Cursor::Get();
+    Display &display = Display::Get();
+    if(resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy))
+    {
+        cursor.Hide();
+        gui.back->Restore();
+        dst_rt.x = pos_rt.x;
+        dst_rt.y = pos_rt.y + 30;
+        dst_rt.w = pos_rt.w;
+        dst_rt.h = 100;
+        TextBox(gui.message_info, Font::BIG, dst_rt);
+        if(gui.buttonTrade) delete gui.buttonTrade;
+        if(gui.buttonLeft) delete gui.buttonLeft;
+        if(gui.buttonRight) delete gui.buttonRight;
+        if(gui.splitter) delete gui.splitter;
+        if(gui.textSell) delete gui.textSell;
+        if(gui.textBuy) delete gui.textBuy;
+        gui.buttonTrade = NULL;
+        gui.buttonLeft = NULL;
+        gui.buttonRight = NULL;
+        gui.textSell = NULL;
+        gui.textBuy = NULL;
+        gui.splitter = NULL;
+        cursor.Show();
+        display.Flip();
+    }
+    else
+    {
+        cursor.Hide();
+        gui.back->Restore();
+        if(gui.buttonTrade) delete gui.buttonTrade;
+        if(gui.buttonLeft) delete gui.buttonLeft;
+        if(gui.buttonRight) delete gui.buttonRight;
+        dst_pt.x = pos_rt.x + (pos_rt.w - gui.sprite_exit->w()) / 2;
+        dst_pt.y = pos_rt.y + 150;
+        gui.buttonTrade = new Button(dst_pt, gui.tradpost, 15, 16);
+        const Sprite & bar = AGG::GetICN(gui.tradpost, 1);
+        dst_pt.x = pos_rt.x + (pos_rt.w - bar.w()) / 2 - 2;
+        dst_pt.y = pos_rt.y + 128;
+        display.Blit(bar, dst_pt);
+        dst_rt.x = dst_pt.x + 24;
+        dst_rt.y = dst_pt.y + 4;
+        dst_rt.w = 188;
+        dst_rt.h = 10;
+        gui.splitter = new Splitter(AGG::GetICN(gui.tradpost, 2), dst_rt, Splitter::HORIZONTAL);
+        gui.splitter->SetRange(0, (Resource::GOLD == resourceTo ? max_sell : max_buy));
+        dst_pt.x = pos_rt.x + 6;
+        dst_pt.y = pos_rt.y + 129;
+        gui.buttonLeft = new Button(dst_pt, gui.tradpost, 3, 4);
+        dst_pt.x = pos_rt.x + 215;
+        dst_pt.y = pos_rt.y + 129;
+        gui.buttonRight = new Button(dst_pt, gui.tradpost, 5, 6);
+        Resource::resource_t rs_from = static_cast<Resource::resource_t>(resourceFrom);
+        Resource::resource_t rs_to   = static_cast<Resource::resource_t>(resourceTo);
+        u16 exchange_rate = GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
+        if(Resource::GOLD == resourceTo)
+        {
+            message = "I can offer you ";
+            String::AddInt(message, exchange_rate);
+            message += " units of " + Resource::String(rs_to) + " for 1 unit of " + Resource::String(rs_from);
+        }
+        else
+        {
+            message = "I can offer you 1 unit of " + Resource::String(rs_to) + " for ";
+            String::AddInt(message, exchange_rate);
+            message += " units of " + Resource::String(rs_from) + ".";
+        }
+        dst_rt.x = pos_rt.x;
+        dst_rt.y = pos_rt.y + 30;
+        dst_rt.w = pos_rt.w;
+        dst_rt.h = 100;
+        TextBox(message, Font::BIG, dst_rt);
+        const Sprite & sprite_from = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_from));
+        dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2;
+        dst_pt.y = pos_rt.y + 115 - sprite_from.h();
+        display.Blit(sprite_from, dst_pt);
+        message.clear();
+        String::AddInt(message, count_sell);
+        dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2;
+        dst_pt.y = pos_rt.y + 116;
+        gui.textSell = new TextSprite(message, Font::SMALL, dst_pt);
+        const Sprite & sprite_to = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_to));
+        dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2;
+        dst_pt.y = pos_rt.y + 115 - sprite_to.h();
+        display.Blit(sprite_to, dst_pt);
+        message.clear();
+        String::AddInt(message, count_buy);
+        dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2;
+        dst_pt.y = pos_rt.y + 116;
+        gui.textBuy = new TextSprite(message, Font::SMALL, dst_pt);
+        const Sprite & sprite_fromto = AGG::GetICN(gui.tradpost, 0);
+        dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2;
+        dst_pt.y = pos_rt.y + 90;
+        display.Blit(sprite_fromto, dst_pt);
+        const std::string & str_qty = "Qty to trade";
+        dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(str_qty, Font::SMALL)) / 2;
+        dst_pt.y = pos_rt.y + 110;
+        Text(str_qty, Font::SMALL, dst_pt);
+        gui.buttonTrade->Draw();
+        gui.buttonLeft->Draw();
+        gui.buttonRight->Draw();
+        cursor.Show();
+        display.Flip();
+        RedrawInfoBuySell(message, gui.textSell, gui.textBuy, pos_rt, count_sell, count_buy);
+    }
+}
+
+void RedrawInfoBuySell(std::string &message, TextSprite *textSell, TextSprite *textBuy, const Rect &pos_rt, u32 count_sell, u32 count_buy)
+{
+    Cursor &cursor = Cursor::Get();
+    Display &display = Display::Get();
+    Point dst_pt;
+    cursor.Hide();
+	if(textSell)
+	{
+		message.clear();
+		String::AddInt(message, count_sell);
+		dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2;
+		dst_pt.y = pos_rt.y + 116;
+		textSell->Hide();
+		textSell->SetText(message);
+		textSell->SetPos(dst_pt);
+		textSell->Show();
+	}
+	if(textBuy)
+	{
+		message.clear();
+		String::AddInt(message, count_buy);
+		dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2;
+		dst_pt.y = pos_rt.y + 116;
+		textBuy->Hide();
+		textBuy->SetText(message);
+		textBuy->SetPos(dst_pt);
+		textBuy->Show();
+	}
+	cursor.Show();
+	display.Flip();
+}
 
 void Dialog::Marketplace(bool fromTradingPost)
 {
     Display & display = Display::Get();
     const ICN::icn_t tradpost = H2Config::EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     const std::string & header = "Marketplace";
-    const std::string & message_info = "Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for.";
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -66,13 +222,23 @@ void Dialog::Marketplace(bool fromTradingPost)
     Background back(dst_rt);
     back.Save();
 
+    TradeWindowGUI gui;
+    gui.buttonTrade = NULL;
+    gui.buttonLeft = NULL;
+    gui.buttonRight = NULL;
+    gui.splitter = NULL;
+    gui.textSell = NULL;
+    gui.textBuy = NULL;
+    gui.message_info = "Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for.";
+    gui.back = &back;
+    gui.tradpost = tradpost;
 
     // message info
     dst_rt.x = pos_rt.x;
     dst_rt.y = pos_rt.y + 30;
     dst_rt.w = pos_rt.w;
     dst_rt.h = 100;
-    TextBox(message_info, Font::BIG, dst_rt);
+    TextBox(gui.message_info, Font::BIG, dst_rt);
 
     Kingdom & kingdom = world.GetMyKingdom();
     const Sprite & spritecursor = AGG::GetICN(tradpost, 14);
@@ -121,155 +287,15 @@ void Dialog::Marketplace(bool fromTradingPost)
     u32 max_sell = 0;
     u32 max_buy = 0;
 
-    Button *buttonTrade = NULL;
-    Button *buttonLeft = NULL;
-    Button *buttonRight = NULL;
-
-    Splitter *splitter = NULL;
-    
-    TextSprite *textSell = NULL;
-    TextSprite *textBuy = NULL;
-
     std::string message;
-
-#define ShowTradeArea \
-    if(resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy)) \
-    { \
-	cursor.Hide(); \
-	back.Restore(); \
-	dst_rt.x = pos_rt.x; \
-	dst_rt.y = pos_rt.y + 30; \
-	dst_rt.w = pos_rt.w; \
-	dst_rt.h = 100; \
-	TextBox(message_info, Font::BIG, dst_rt); \
-	if(buttonTrade) delete buttonTrade; \
-	if(buttonLeft) delete buttonLeft; \
-        if(buttonRight) delete buttonRight; \
-        if(splitter) delete splitter; \
-        if(textSell) delete textSell; \
-        if(textBuy) delete textBuy; \
-        buttonTrade = NULL; \
-        buttonLeft = NULL; \
-        buttonRight = NULL; \
-        textSell = NULL; \
-        textBuy = NULL; \
-        splitter = NULL; \
-        cursor.Show(); \
-        display.Flip(); \
-    } \
-    else \
-    { \
-	cursor.Hide(); \
-	back.Restore(); \
-	if(buttonTrade) delete buttonTrade; \
-	if(buttonLeft) delete buttonLeft; \
-	if(buttonRight) delete buttonRight; \
-	dst_pt.x = pos_rt.x + (pos_rt.w - sprite_exit.w()) / 2; \
-	dst_pt.y = pos_rt.y + 150; \
-	buttonTrade = new Button(dst_pt, tradpost, 15, 16); \
-	const Sprite & bar = AGG::GetICN(tradpost, 1); \
-	dst_pt.x = pos_rt.x + (pos_rt.w - bar.w()) / 2 - 2; \
-	dst_pt.y = pos_rt.y + 128; \
-	display.Blit(bar, dst_pt); \
-	dst_rt.x = dst_pt.x + 24; \
-	dst_rt.y = dst_pt.y + 4; \
-	dst_rt.w = 188; \
-	dst_rt.h = 10; \
-	splitter = new Splitter(AGG::GetICN(tradpost, 2), dst_rt, Splitter::HORIZONTAL); \
-	splitter->SetRange(0, (Resource::GOLD == resourceTo ? max_sell : max_buy)); \
-	dst_pt.x = pos_rt.x + 6; \
-	dst_pt.y = pos_rt.y + 129; \
-	buttonLeft = new Button(dst_pt, tradpost, 3, 4); \
-	dst_pt.x = pos_rt.x + 215; \
-	dst_pt.y = pos_rt.y + 129; \
-	buttonRight = new Button(dst_pt, tradpost, 5, 6); \
-	Resource::resource_t rs_from = static_cast<Resource::resource_t>(resourceFrom); \
-	Resource::resource_t rs_to   = static_cast<Resource::resource_t>(resourceTo); \
-	u16 exchange_rate = GetTradeCosts(resourceFrom, resourceTo, fromTradingPost); \
-	if(Resource::GOLD == resourceTo) \
-	{ \
-	    message = "I can offer you "; \
-	    String::AddInt(message, exchange_rate); \
-	    message += " units of " + Resource::String(rs_to) + " for 1 unit of " + Resource::String(rs_from); \
-	} \
-	else \
-	{ \
-	    message = "I can offer you 1 unit of " + Resource::String(rs_to) + " for "; \
-	    String::AddInt(message, exchange_rate); \
-	    message += " units of " + Resource::String(rs_from) + "."; \
-	} \
-	dst_rt.x = pos_rt.x; \
-	dst_rt.y = pos_rt.y + 30; \
-	dst_rt.w = pos_rt.w; \
-	dst_rt.h = 100; \
-	TextBox(message, Font::BIG, dst_rt); \
-	const Sprite & sprite_from = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_from)); \
-	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2; \
-	dst_pt.y = pos_rt.y + 115 - sprite_from.h(); \
-	display.Blit(sprite_from, dst_pt); \
-	message.clear(); \
-	String::AddInt(message, count_sell); \
-	dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2; \
-	dst_pt.y = pos_rt.y + 116; \
-	textSell = new TextSprite(message, Font::SMALL, dst_pt); \
-	const Sprite & sprite_to = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_to)); \
-	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2; \
-	dst_pt.y = pos_rt.y + 115 - sprite_to.h(); \
-	display.Blit(sprite_to, dst_pt); \
-	message.clear(); \
-	String::AddInt(message, count_buy); \
-	dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2; \
-	dst_pt.y = pos_rt.y + 116; \
-	textBuy = new TextSprite(message, Font::SMALL, dst_pt); \
-	const Sprite & sprite_fromto = AGG::GetICN(tradpost, 0); \
-	dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2; \
-	dst_pt.y = pos_rt.y + 90; \
-	display.Blit(sprite_fromto, dst_pt); \
-	const std::string & str_qty = "Qty to trade"; \
-	dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(str_qty, Font::SMALL)) / 2; \
-	dst_pt.y = pos_rt.y + 110; \
-	Text(str_qty, Font::SMALL, dst_pt); \
-	(*buttonTrade).Draw(); \
-	(*buttonLeft).Draw(); \
-	(*buttonRight).Draw(); \
-	cursor.Show(); \
-	display.Flip(); \
-	RedrawInfoBuySell; \
-    } \
-
-#define RedrawInfoBuySell \
-	cursor.Hide(); \
-	if(textSell) \
-	{ \
-		message.clear(); \
-		String::AddInt(message, count_sell); \
-		dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2; \
-		dst_pt.y = pos_rt.y + 116; \
-		textSell->Hide(); \
-		textSell->SetText(message); \
-		textSell->SetPos(dst_pt); \
-		textSell->Show(); \
-	} \
-	if(textBuy) \
-	{ \
-		message.clear(); \
-		String::AddInt(message, count_buy); \
-		dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2; \
-		dst_pt.y = pos_rt.y + 116; \
-		textBuy->Hide(); \
-		textBuy->SetText(message); \
-		textBuy->SetPos(dst_pt); \
-		textBuy->Show(); \
-	} \
-	cursor.Show(); \
-	display.Flip();
-
 
     // button exit
     const Sprite & sprite_exit = AGG::GetICN(tradpost, 17);
     dst_pt.x = pos_rt.x + (pos_rt.w - sprite_exit.w()) / 2;
     dst_pt.y = pos_rt.y + pos_rt.h + BUTTON_HEIGHT - sprite_exit.h();
     Button buttonExit(dst_pt, tradpost, 17, 18);
+
+    gui.sprite_exit = &sprite_exit;
 
     buttonExit.Draw();
 
@@ -281,191 +307,200 @@ void Dialog::Marketplace(bool fromTradingPost)
     // message loop
     while(le.HandleEvents())
     {
-        if(buttonTrade) le.MousePressLeft(*buttonTrade) ? (*buttonTrade).PressDraw() : (*buttonTrade).ReleaseDraw();
-        if(buttonLeft) le.MousePressLeft(*buttonLeft) ? (*buttonLeft).PressDraw() : (*buttonLeft).ReleaseDraw();
-        if(buttonRight) le.MousePressLeft(*buttonRight) ? (*buttonRight).PressDraw() : (*buttonRight).ReleaseDraw();
+        if(gui.buttonTrade) le.MousePressLeft(*gui.buttonTrade) ? (*gui.buttonTrade).PressDraw() : (*gui.buttonTrade).ReleaseDraw();
+        if(gui.buttonLeft) le.MousePressLeft(*gui.buttonLeft) ? (*gui.buttonLeft).PressDraw() : (*gui.buttonLeft).ReleaseDraw();
+        if(gui.buttonRight) le.MousePressLeft(*gui.buttonRight) ? (*gui.buttonRight).PressDraw() : (*gui.buttonRight).ReleaseDraw();
 
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
 	
-	// click from
-	for(u8 ii = 0; ii < rectsFrom.size(); ++ii)
-	{
-	    const Rect & rect_from = rectsFrom[ii];
-
-	    if(le.MouseClickLeft(rect_from))
-	    {
-		switch(ii)
-		{
-		    case 0:
-			resourceFrom = Resource::WOOD;
-			max_sell = fundsFrom.wood;
-			break;
-		    case 1:
-			resourceFrom = Resource::MERCURY;
-			max_sell = fundsFrom.mercury;
-			break;
-		    case 2:
-			resourceFrom = Resource::ORE;
-			max_sell = fundsFrom.ore;
-			break;
-		    case 3:
-			resourceFrom = Resource::SULFUR;
-			max_sell = fundsFrom.sulfur;
-			break;
-		    case 4:
-			resourceFrom = Resource::CRYSTAL;
-			max_sell = fundsFrom.crystal;
-			break;
-		    case 5:
-			resourceFrom = Resource::GEMS;
-			max_sell = fundsFrom.gems;
-			break;
-		    case 6:
-			resourceFrom = Resource::GOLD;
-			max_sell = fundsFrom.gold;
-			break;
-		    default: break;
-		}
-
-		if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
-		{
-		    max_buy = Resource::GOLD == resourceTo ? 
-			max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
-                        max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
-		}
-
-		count_sell = 0;
-		count_buy = 0;
-
-		cursor.Hide();
-		cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
-
-		if(resourceTo) cursorTo.Hide();
-		RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
-		if(resourceTo) cursorTo.Show();
-		if(resourceTo) ShowTradeArea;
-
-		cursor.Show();
-		display.Flip();
-	    }
-	}
-
-	// click to
-	for(u8 ii = 0; ii < rectsTo.size(); ++ii)
-	{
-	    const Rect & rect_to = rectsTo[ii];
-
-	    if(le.MouseClickLeft(rect_to))
-	    {
-		switch(ii)
-		{
-		    case 0: resourceTo = Resource::WOOD; break;
-		    case 1: resourceTo = Resource::MERCURY; break;
-		    case 2: resourceTo = Resource::ORE; break;
-		    case 3: resourceTo = Resource::SULFUR; break;
-		    case 4: resourceTo = Resource::CRYSTAL; break;
-		    case 5: resourceTo = Resource::GEMS; break;
-		    case 6: resourceTo = Resource::GOLD; break;
-		    default: break;
-		}
-
-		if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
-		{
-		    max_buy = Resource::GOLD == resourceTo ? 
-			max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
-                        max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
-		}
-
-		count_sell = 0;
-		count_buy = 0;
-
-		cursor.Hide();
-		cursorTo.Move(rect_to.x - 2, rect_to.y - 2);
-
-		if(resourceFrom)
-		{
-		    cursorTo.Hide();
-		    RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
-		    cursorTo.Show();
-		    ShowTradeArea;
-		}
-		cursor.Show();
-		display.Flip();
-	    }
-	}
-
-	// move splitter
-        if(splitter && max_buy && le.MousePressLeft(splitter->GetRect()))
+        // click from
+        for(u8 ii = 0; ii < rectsFrom.size(); ++ii)
         {
-            u32 seek = (le.MouseCursor().x - splitter->GetRect().x) * 100 / splitter->GetStep();
-
-            if(seek < splitter->Min()) seek = splitter->Min();
+            const Rect & rect_from = rectsFrom[ii];
+            
+            if(le.MouseClickLeft(rect_from))
+            {
+                switch(ii)
+                {
+                    case 0:
+                        resourceFrom = Resource::WOOD;
+                        max_sell = fundsFrom.wood;
+                        break;
+                    case 1:
+                        resourceFrom = Resource::MERCURY;
+                        max_sell = fundsFrom.mercury;
+                        break;
+                    case 2:
+                        resourceFrom = Resource::ORE;
+                        max_sell = fundsFrom.ore;
+                        break;
+                    case 3:
+                        resourceFrom = Resource::SULFUR;
+                        max_sell = fundsFrom.sulfur;
+                        break;
+                    case 4:
+                        resourceFrom = Resource::CRYSTAL;
+                        max_sell = fundsFrom.crystal;
+                        break;
+                    case 5:
+                        resourceFrom = Resource::GEMS;
+                        max_sell = fundsFrom.gems;
+                        break;
+                    case 6:
+                        resourceFrom = Resource::GOLD;
+                        max_sell = fundsFrom.gold;
+                        break;
+                    default: break;
+                }
+                
+                if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
+                {
+                    max_buy = Resource::GOLD == resourceTo ? 
+                        max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
+                        max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
+                }
+                
+                count_sell = 0;
+                count_buy = 0;
+                
+                cursor.Hide();
+                cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
+                cursorFrom.Show();
+                
+                if(resourceTo) cursorTo.Hide();
+                RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
+                if(resourceTo) cursorTo.Show();
+                if(resourceTo) ShowTradeArea(resourceFrom, resourceTo, max_buy, max_sell, count_buy, count_sell, pos_rt, dst_pt, dst_rt, message, gui, fromTradingPost);
+                
+                cursor.Show();
+                display.Flip();
+            }
+        }
+        
+        // click to
+        for(u8 ii = 0; ii < rectsTo.size(); ++ii)
+        {
+            const Rect & rect_to = rectsTo[ii];
+            
+            if(le.MouseClickLeft(rect_to))
+            {
+                switch(ii)
+                {
+                    case 0: resourceTo = Resource::WOOD; break;
+                    case 1: resourceTo = Resource::MERCURY; break;
+                    case 2: resourceTo = Resource::ORE; break;
+                    case 3: resourceTo = Resource::SULFUR; break;
+                    case 4: resourceTo = Resource::CRYSTAL; break;
+                    case 5: resourceTo = Resource::GEMS; break;
+                    case 6: resourceTo = Resource::GOLD; break;
+                    default: break;
+                }
+                
+                if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
+                {
+                    max_buy = Resource::GOLD == resourceTo ? 
+                        max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
+                        max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
+                }
+                
+                count_sell = 0;
+                count_buy = 0;
+                
+                cursor.Hide();
+                cursorTo.Move(rect_to.x - 2, rect_to.y - 2);
+                
+                if(resourceFrom)
+                {
+                    cursorTo.Hide();
+                    RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
+                    cursorTo.Show();
+                    ShowTradeArea(resourceFrom, resourceTo, max_buy, max_sell, count_buy, count_sell, pos_rt, dst_pt, dst_rt, message, gui, fromTradingPost);
+                }
+                cursor.Show();
+                display.Flip();
+            }
+        }
+        
+        // move splitter
+        if(gui.splitter && max_buy && le.MousePressLeft(gui.splitter->GetRect()))
+        {
+            u32 seek = (le.MouseCursor().x - gui.splitter->GetRect().x) * 100 / gui.splitter->GetStep();
+            
+            if(seek < gui.splitter->Min()) seek = gui.splitter->Min();
             else
-            if(seek > splitter->Max()) seek = splitter->Max();
-
-	    count_buy = seek * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
-	    count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
-
+            if(seek > gui.splitter->Max()) seek = gui.splitter->Max();
+            
+            count_buy = seek * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
+            count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
+            
             cursor.Hide();
-            splitter->Move(seek);
-	    RedrawInfoBuySell;
+            gui.splitter->Move(seek);
+            RedrawInfoBuySell(message, gui.textSell, gui.textBuy, pos_rt, count_sell, count_buy);
             cursor.Show();
             display.Flip();
         }
+        
+        // trade
+        if(gui.buttonTrade && le.MouseClickLeft(*gui.buttonTrade) && count_sell && count_buy)
+        {
+            kingdom.OddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceFrom), count_sell));
+            kingdom.AddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceTo), count_buy));
+            
+            gui.message_info = "You have received quite a bargain. I expect to make no profit on the deal. Can I interest you in any of my other wares?";
+            resourceTo = resourceFrom = Resource::UNKNOWN;
+            ShowTradeArea(resourceFrom, resourceTo, 0, 0, 0, 0, pos_rt, dst_pt, dst_rt, message, gui, fromTradingPost);
 
-	// trade
-	if(buttonTrade && le.MouseClickLeft(*buttonTrade) && count_sell && count_buy)
-	{
-	    kingdom.OddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceFrom), count_sell));
-    	    kingdom.AddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceTo), count_buy));
-
-    	    // exit
-    	    break;
-	}
-
-	// decrease trade resource
-	if(count_buy &&
-	    ((buttonLeft && le.MouseClickLeft(*buttonLeft)) ||
-	    le.MouseWheelDn(splitter->GetRect())))
-	{
-	    count_buy -= Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
-
-	    count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
-
+            fundsFrom = kingdom.GetFundsResource();
+            cursorTo.Hide();
+            cursorFrom.Hide();
+            RedrawFromResource(pt1, fundsFrom);
+            RedrawToResource(pt2, false, fromTradingPost, resourceFrom);
+            display.Flip();
+        }
+        
+        // decrease trade resource
+        if(count_buy &&
+           ((gui.buttonLeft && le.MouseClickLeft(*gui.buttonLeft)) ||
+            le.MouseWheelDn(gui.splitter->GetRect())))
+        {
+            count_buy -= Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
+            
+            count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
+            
             cursor.Hide();
-	    splitter->Backward();
+            gui.splitter->Backward();
             cursor.Show();
             display.Flip();
-
-	    RedrawInfoBuySell;
-	}
-
-	// increase trade resource
-	if( count_buy < max_buy &&
-	    ((buttonRight && le.MouseClickLeft(*buttonRight)) ||
-	    le.MouseWheelUp(splitter->GetRect())))
-	{
-	    count_buy += Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
-
-	    count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
-
+            
+            RedrawInfoBuySell(message, gui.textSell, gui.textBuy, pos_rt, count_sell, count_buy);
+        }
+        
+        // increase trade resource
+        if( count_buy < max_buy &&
+            ((gui.buttonRight && le.MouseClickLeft(*gui.buttonRight)) ||
+             le.MouseWheelUp(gui.splitter->GetRect())))
+        {
+            count_buy += Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
+            
+            count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
+            
             cursor.Hide();
-	    splitter->Forward();
+            gui.splitter->Forward();
             cursor.Show();
             display.Flip();
-
-	    RedrawInfoBuySell;
-	}
+            
+            RedrawInfoBuySell(message, gui.textSell, gui.textBuy, pos_rt, count_sell, count_buy);
+        }
     }
-
-    if(buttonTrade) delete buttonTrade;
-    if(buttonLeft) delete buttonLeft;
-    if(buttonRight) delete buttonRight;
-    if(splitter) delete splitter;
-    if(textSell) delete textSell;
-    if(textBuy) delete textBuy;
+    
+    if(gui.buttonTrade) delete gui.buttonTrade;
+    if(gui.buttonLeft) delete gui.buttonLeft;
+    if(gui.buttonRight) delete gui.buttonRight;
+    if(gui.splitter) delete gui.splitter;
+    if(gui.textSell) delete gui.textSell;
+    if(gui.textBuy) delete gui.textBuy;
 
     cursor.Hide();
 }

@@ -376,7 +376,7 @@ Castle::building_t Castle::OpenTown(void)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Dialog::FrameBorder background;
+    Dialog::FrameBorder background(false);
 
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);

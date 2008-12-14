@@ -34,7 +34,7 @@ void Castle::OpenMageGuild(void)
 
     cursor.Hide();
 
-    Dialog::FrameBorder background;
+    Dialog::FrameBorder background(false);
 
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
