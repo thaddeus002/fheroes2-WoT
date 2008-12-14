@@ -627,6 +627,7 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     Route::Path & path = hero->GetPath();
     Display & display = Display::Get();
 
+    Cursor::Get().Hide();
     // show path
     if(path.GetDestinationIndex() != dst_index)
     {
@@ -634,18 +635,18 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
 	path.Calculate(dst_index);
         if(1 < Settings::Get().Debug()) path.Dump();
         path.Show();
+	GameArea::Get().Redraw();
     }
     // start move
     else
     if(path.isValid())
     {
-	Cursor::Get().Hide();
         Game::Focus::Get().Set(hero);
         Game::Focus::Get().Redraw();
-	Cursor::Get().Show();
-	display.Flip();
         hero->SetMove(true);
     }
+    Cursor::Get().Show();
+    display.Flip();
 }
 
 bool Game::ShouldAnimate(u32 ticket)
