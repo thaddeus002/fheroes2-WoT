@@ -772,7 +772,7 @@ Morale::morale_t Heroes::GetMorale(void) const
 
 const std::string & StringModifiers(s8 mod)
 {
-    static const std::string mods[] = { "0", "-3", "-2", "-1", "+1", "+2", "+3" };
+    static const std::string mods[] = { " 0", " -3", " -2", " -1", " +1", " +2", " +3" };
 
     switch(mod)
     {
@@ -825,7 +825,7 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     for(u16 i = 0; i < modifiers.size(); i++)
     {
         Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
-        if(GetLevelSkill(Skill::Secondary::LEADERSHIP) == Skill::Level::NONE)
+        if(GetLevelSkill(Skill::Secondary::LEADERSHIP) != level)
             continue;
 
         result += modifiers[i].second;
@@ -918,7 +918,7 @@ Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
     for(u16 i = 0; i < modifiers.size(); i++)
     {
         Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
-        if(GetLevelSkill(Skill::Secondary::LUCK) == Skill::Level::NONE)
+        if(GetLevelSkill(Skill::Secondary::LUCK) != level)
             continue;
 
         result += modifiers[i].second;
