@@ -3026,7 +3026,6 @@ bool Army::IsAffectedByMorale(const Army::BattleTroop &troop)
             case Monster::FIRE_ELEMENT:
             case Monster::WATER_ELEMENT:
             case Monster::AIR_ELEMENT:
-            case Monster::GENIE:
             case Monster::GHOST:
                 return false;
             default:
