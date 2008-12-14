@@ -959,14 +959,14 @@ bool Army::AttackTroopInList(const Army::BattleArmy_t &list, Army::BattleArmy_t 
     return false;
 }
 
-struct DistancePredicate : public std::binary_function<Army::BattleTroop, Army::BattleTroop, bool>
+struct ClosestDistancePredicate
 {
     const Point &orig;
-    DistancePredicate(const Point &init) : orig(init) {}
+    ClosestDistancePredicate(const Point &init) : orig(init) {}
     
-    bool operator()(const Army::BattleTroop &first, const Army::BattleTroop &second) const
+    bool operator()(const Point &first, const Point &second) const
     {
-        return orig.distance(first.Position()) < orig.distance(second.Position());
+        return orig.distance(first) < orig.distance(second);
     }
 };
 
@@ -977,10 +977,19 @@ struct DistancePredicate : public std::binary_function<Army::BattleTroop, Army::
  */
 void Army::MoveToClosestTroopInList(const Army::BattleArmy_t &list, const Army::BattleTroop &myTroop, Point &move)
 {
-    Army::BattleArmy_t tempTroop = list;
-    sort(tempTroop.begin(), tempTroop.end(), DistancePredicate(myTroop.Position()));
-    
-    Point target = tempTroop.front().Position();
+    std::vector<Point> positions;
+    Army::BattleArmy_t::const_iterator it = list.begin();
+    // Make a list of all available target points (including wide creature locations)
+    for(; it != list.end(); it++)
+    {
+        positions.push_back(it->Position());
+        if(it->IsWide())
+            positions.push_back(it->Position() + (it->IsReflected() ? Point(-1, 0) : Point(1, 0)));
+    }
+    sort(positions.begin(), positions.end(), ClosestDistancePredicate(myTroop.Position()));
+
+    // Find the move point that is nearest to the closest target point
+    Point target = positions.front();
     Point closest = movePoints[0];
     for(u16 idx = 0; idx < movePoints.size(); idx++)
     {
@@ -1192,6 +1201,12 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
             myTroop.SetReflect(end.x < start.x);
             if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
                 myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
+
+            /*DrawShadow(move);
+            while(le.HandleEvents())
+                if(le.KeyPress(KEY_RETURN))
+                break;*/
+            
 	    if(len >= 12) prep = post = 4;
 	    else if(len >= 8) prep = post = 2;
 	    else prep = post = 1;
@@ -1418,6 +1433,11 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
     
     if(BfValid(attack))
     {
+        /*DrawShadow(attack);
+        while(le.HandleEvents())
+            if(le.KeyPress(KEY_RETURN))
+            break;*/
+        
         std::vector<Army::BattleTroop *> targets;
         GetTargets(targets, myTroop, attack, army1, army2);
         
@@ -2903,12 +2923,27 @@ bool Army::CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTr
     to.push_back(target.Position());
     if(target.IsWide())
         to.push_back(target.Position() + Point ( target.IsReflected() ? -1 : 1, 0 ));
+
+    s8 minDX, maxDX;
+    if(target.Position().y % 2 == 0)
+    {
+        minDX = 0;
+        maxDX = 1;
+    }
+    else
+    {
+        minDX = -1;
+        maxDX = 0;
+    }
+    
     for(u16 i = 0; i < from.size(); i++)
         for(u16 j = 0; j < to.size(); j++)
         {
-            int dx = to[i].x - from[j].x;
-            int dy = to[i].y - from[j].y;
-            if(abs(dy) == 1 && dx >= 0 && dx <= 1)
+            int dx = from[i].x - to[j].x;
+            int dy = from[i].y - to[j].y;
+            //printf("- %d,%d to %d,%d: %d,%d (%d-%d)\n", from[i].x, from[i].y, to[j].x, to[j].y, dx, dy, minDX, maxDX);
+            
+            if(abs(dy) == 1 && dx >= minDX && dx <= maxDX)
                 return true;
             else if(!dy && abs(dx) == 1)
                 return true;
@@ -3006,10 +3041,16 @@ Point Army::GetReachableAttackCell(const Army::BattleTroop &target, const Army::
         for(delta.y = ystart; delta.y != yend; delta.y += yincr)
             if((delta.x || delta.y) && BfValid(p + delta))
             {
-                if(delta.x < 0 && delta.y) continue;
+                /*DrawShadow(p + delta);
+                Display::Get().Flip();
+                while(le.HandleEvents())
+                    if(le.KeyPress(KEY_RETURN))
+                    break;*/
+                
+                // if(delta.x > 0 && delta.y) continue;
                 if(CellFreeFor(p + delta, attacker, army1, army2, troopN)
-                && CanAttackFrom(attacker, target, p + delta)
-                && find(movePoints.begin(), movePoints.end(), p + delta) != movePoints.end())
+                && find(movePoints.begin(), movePoints.end(), p + delta) != movePoints.end()
+                   && CanAttackFrom(attacker, target, p + delta))
                     return p + delta;
             }
     return Point(-1);

@@ -195,7 +195,7 @@ Game::menu_t Game::StartGame(void)
 		    cursor.Hide();
 		    break;
 	        case AI:
-		    kingdom.AITurns();
+                kingdom.AITurns();
 		    break;
 		default:
 		    Dialog::Message(Color::String(color), "default", Font::BIG, Dialog::OK);
