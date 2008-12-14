@@ -2,23 +2,24 @@ SVN - up to r718
 
 Users
 
-+ Heroes now level up and learn new skills based on race tables from HoMM II
-  (afletdinov)
++ Heroes now level up and learn new skills based on race tables from
+  HoMM II.  (afletdinov)
 + Wide monsters in battle now properly reflect in place, fixing a number of
-  overlapping troop bugs (revvy)
+  overlapping troop bugs. (revvy)
 + Animation speed on the main adventure screen can now be controlled from the
-  settings panel in game (afletdinov)
+  settings panel in game. (afletdinov)
 + Added animations for previously static objects (stone liths, treasure chests,
-  fountains) (afletdinov)
+  fountains). (afletdinov)
 + Added rudimentary AI for castle building, recruiting troops and controlling
-  heroes (afletdinov)
+  heroes. (afletdinov)
 + Stopped end turn confirmation dialog from appearing when all heroes cannot
-  move any further along their paths, but still have movement points remaining
-  (revvy)
-+ Added music to Barbarian castle (afletdinov)
+  move any further along their paths, but still have movement points
+  remaining. (revvy)
++ Added music to Barbarian castle. (afletdinov)
 + Tiles surrounding a monster on the adventure screen now show the battle
-  mouse cursor (afletdinov)
+  mouse cursor. (afletdinov)
 + Battle summary screen no longer misses some captured artifacts. (revvy)
++ Added ultimate artifact puzzle interface. (revvy, afletdinov)
 
 Developers
 
