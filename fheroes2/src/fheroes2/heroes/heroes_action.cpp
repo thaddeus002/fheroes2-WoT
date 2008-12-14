@@ -2030,7 +2030,7 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u16 dst_index)
 	const Monster::monster_t monster = Monster::Monster(obj);
         const std::string & message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you.";
 
-	PlaySoundSuccess;
+        AGG::PlaySound(M82::EXPERNCE);
 	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO))
 	{
 	    if(!hero.GetArmy().JoinTroop(monster, count))

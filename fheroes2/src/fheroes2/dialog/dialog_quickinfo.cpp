@@ -137,6 +137,11 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 		visit_status = "(" + Skill::Secondary::String(world.SkillFromWitchsHut(tile.GetIndex())) + ")";
 	    break;
 
+        case MP2::OBJ_OBELISK:
+            // check visited
+            visit_status = Game::Focus::Get().GetHeroes().isVisited(tile, Visit::GLOBAL) ? "(already visited)" : "(not visited)";
+            break;
+
         default: break;
     }
 

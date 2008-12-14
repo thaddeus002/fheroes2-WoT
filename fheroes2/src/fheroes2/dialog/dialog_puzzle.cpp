@@ -237,4 +237,8 @@ void Dialog::PuzzleMaps(void)
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
     }
+
+    // In higher resolutions, the radar is not included in the FrameBorder,
+    // so we need to make sure that it is explicitly redrawn.
+    Radar::Get().RedrawArea();
 }
