@@ -22,6 +22,9 @@ Users
 + Added ultimate artifact puzzle interface. (revvy, afletdinov)
 + Fixed a bug preventing remaining HP information from showing up in the monster
   info window in battle. (revvy)
++ Fixed recurring problem in battles where AI units would walk next to a unit
+  but not attack. (revvy)
++ Fixed bug causing marketplace dialog to close after every trade. (revvy)
 
 Developers
 
