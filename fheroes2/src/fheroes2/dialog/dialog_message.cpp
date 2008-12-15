@@ -116,8 +116,8 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
 	case CANCEL:
             pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 3).w()) / 2;
             pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
-	    button1 = new Button(pt, system, 3, 4);
-	    result1 = CANCEL;
+	    button2 = new Button(pt, system, 3, 4);
+	    result2 = CANCEL;
 	    break;
 
 	default:
@@ -143,9 +143,9 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
         if(button1 && le.MouseClickLeft(*button1)){ result = result1; break; }
         if(button2 && le.MouseClickLeft(*button2)){ result = result2; break; }
 
-	if(le.KeyPress(KEY_RETURN)){ result = Dialog::YES | Dialog::OK; break; }
+	if(le.KeyPress(KEY_RETURN)){ result = result1; break; }
 	
-	if(le.KeyPress(KEY_ESCAPE)){ result = Dialog::NO | Dialog::CANCEL; break; }
+	if(le.KeyPress(KEY_ESCAPE)){ result = result2; break; }
     }
 
     cursor.SetThemes(oldthemes);
