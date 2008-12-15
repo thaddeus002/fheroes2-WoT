@@ -1288,6 +1288,8 @@ Game::menu_t Game::HumanTurn(void)
             		gamearea.Center(global_focus.Center());
         		radar.RedrawArea(conf.MyColor());
         		radar.RedrawCursor();
+
+			cursor.SetThemes(GetCursor(world.GetTiles(gamearea.GetIndexFromMousePoint(le.MouseCursor()))));
 		    }
 		    gamearea.Redraw();
         	    cursor.Show();
