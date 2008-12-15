@@ -151,8 +151,8 @@ public:
 
 private:
     void AICastlesTurns(void);
-    void AIHeroesTurns(void);
-    void AIHeroesTask(void);
+    void AIHeroesTurns(Heroes &);
+    void AIHeroesTask(Heroes &);
     void AIDumpCacheObjects(const IndexDistance &) const;
 
     const Color::color_t color;

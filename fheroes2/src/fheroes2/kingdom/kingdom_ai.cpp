@@ -40,6 +40,7 @@ void RedrawAITurns(u8 color, u8 i)
     Display::Get().Flip();
 }
 
+
 void Kingdom::AIDumpCacheObjects(const IndexDistance & id) const
 {
     std::map<u16, MP2::object_t>::const_iterator it = ai_objects.find(id.first);
@@ -137,21 +138,31 @@ void Kingdom::AITurns(void)
     // turn indicator
     RedrawAITurns(color, 5);
 
-    while(HeroesMayStillMove())
+
+    // heroes turns
+    std::vector<Heroes *>::const_iterator ith1 = heroes.begin();
+    std::vector<Heroes *>::const_iterator ith2 = heroes.end();
+
+    for(; ith1 != ith2; ++ith1) if(*ith1)
     {
+	Heroes & hero = **ith1;
+
+	while(hero.MayStillMove())
+	{
 	RedrawAITurns(color, 6);
 
 	// prepare task for heroes
-	AIHeroesTask();
+	AIHeroesTask(hero);
 
 	// turn indicator
 	RedrawAITurns(color, 7);
 
 	// heroes AI turn
-	AIHeroesTurns();
+	AIHeroesTurns(hero);
 
 	// turn indicator
 	RedrawAITurns(color, 8);
+	}
     }
 
     // turn indicator
@@ -197,18 +208,12 @@ SKIPLOOP:
     }
 }
 
-void Kingdom::AIHeroesTurns(void)
+void Kingdom::AIHeroesTurns(Heroes &hero)
 {
-    std::vector<Heroes *>::const_iterator ith1 = heroes.begin();
-    std::vector<Heroes *>::const_iterator ith2 = heroes.end();
-    Cursor::Get().Hide();
-
-    for(; ith1 != ith2; ++ith1) if(*ith1)
-    {
-	Heroes & hero = **ith1;
-
         if(hero.GetPath().isValid()) hero.SetMove(true);
-	else continue;
+	else return;
+
+	Cursor::Get().Hide();
 
 	u32 ticket = 0;
 
@@ -246,19 +251,11 @@ void Kingdom::AIHeroesTurns(void)
 
 	// 0.2 sec delay for show enemy hero position
 	if(hero.isShow(Settings::Get().MyColor())) DELAY(200);
-    }
 }
 
-void Kingdom::AIHeroesTask(void)
+void Kingdom::AIHeroesTask(Heroes & hero)
 {
-    std::vector<Heroes *>::const_iterator ith1 = heroes.begin();
-    std::vector<Heroes *>::const_iterator ith2 = heroes.end();
-
-    for(; ith1 != ith2; ++ith1) if(*ith1)
-    {
-	Heroes & hero = **ith1;
-
-	if(hero.GetPath().isValid()) continue;
+	if(hero.GetPath().isValid()) return;
 
 	Castle *castle = hero.inCastle();
 	u16 index = MAXU16;
@@ -384,5 +381,4 @@ void Kingdom::AIHeroesTask(void)
 	    if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero " + hero.GetName() + " say: I'm stupid, help my please..");
 	    hero.SetModes(Heroes::STUPID);
 	}
-    }
 }
