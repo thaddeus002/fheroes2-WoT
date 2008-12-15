@@ -296,11 +296,8 @@ void Maps::Tiles::RedrawBottom(const TilesAddon * skip) const
 		    display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		    // possible anime
-		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
+		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
 		    {
-			// skip animation for MagickGarden if void resource
-			if(MP2::OBJ_MAGICGARDEN == general && 0 == quantity2) continue;
-
 			const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 			display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		    }

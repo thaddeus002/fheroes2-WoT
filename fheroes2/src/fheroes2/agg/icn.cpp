@@ -918,7 +918,7 @@ void ICN::Header::Load(const char * p)
     LOAD32(&p[9], offset_data);
 }
 
-u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket)
+u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, const u8 quantity)
 {
     switch(icn)
     {
@@ -1285,10 +1285,11 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket)
 		case 0xAD:
 		// shadow smoke
 		case 0xB4:
+		    return start + (ticket % 6) + 1;
+
 		// magic garden
 		case 0xBE:
-
-		    return start + (ticket % 6) + 1;
+		    return quantity ? start + (ticket % 6) + 1 : start + 7;
 
 		default:
 		    return 0;
