@@ -108,19 +108,25 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     	    break;
 
 	case MP2::OBJ_GAZEBO:
-	case MP2::OBJ_FOUNTAIN:
-	case MP2::OBJ_FAERIERING:
-	case MP2::OBJ_IDOL:
 	case MP2::OBJ_FORT:
 	case MP2::OBJ_MERCENARYCAMP:
 	case MP2::OBJ_DOCTORHUT:
 	case MP2::OBJ_STANDINGSTONES:
-	case MP2::OBJ_OASIS:
-	case MP2::OBJ_TEMPLE:
-	case MP2::OBJ_BUOY:
 	    // check visited
 	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
 		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile) ? "(already visited)" : "(not visited)";
+	    break;
+
+	case MP2::OBJ_FOUNTAIN:
+	case MP2::OBJ_FAERIERING:
+	case MP2::OBJ_IDOL:
+	case MP2::OBJ_OASIS:
+	case MP2::OBJ_TEMPLE:
+	case MP2::OBJ_BUOY:
+	case MP2::OBJ_WATERINGHOLE:
+	    // check visited
+	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
+		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile.GetObject()) ? "(already visited)" : "(not visited)";
 	    break;
 
 	case MP2::OBJ_SHRINE1:

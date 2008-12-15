@@ -164,7 +164,7 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_ALCHEMYTOWER:
         case MP2::OBJ_HUTMAGI:
         case MP2::OBJ_EYEMAGI:
-
+	case MP2::OBJ_WATERINGHOLE:
 	    return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_TRADINGPOST:

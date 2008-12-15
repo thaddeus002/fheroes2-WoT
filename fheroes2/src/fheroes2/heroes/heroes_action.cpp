@@ -868,7 +868,7 @@ void ActionToShrine(Heroes &hero, const u16 dst_index)
 
     PlaySoundSuccess;
     hero.AppendSpellToBook(spell);
-    hero.SetVisited(dst_index);
+    hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
     Dialog::SpellInfo(spell_name, body, spell);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToShrine: " + hero.GetName());
@@ -899,7 +899,7 @@ void ActionToWitchsHut(Heroes &hero, const u16 dst_index)
 
     PlaySoundSuccess;
     hero.LearnBasicSkill(skill);
-    hero.SetVisited(dst_index);
+    hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
 
     Dialog::SkillInfo(skill_name, "An ancient and immortal witch living in a hut with bird's legs for stilts teaches you " + skill_name + " for her own inscrutable purposes.", skill, Skill::Level::BASIC);
 
