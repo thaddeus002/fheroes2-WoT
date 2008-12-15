@@ -1129,7 +1129,6 @@ void ActionToPrimarySkillObject(Heroes &hero, const u16 dst_index)
 	{
 	    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
 		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-	    else
 	    if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
 		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
 	}
@@ -1360,7 +1359,6 @@ void ActionToGoodMoraleObject(Heroes &hero, const u16 dst_index)
 	{
 	    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
 		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-	    else
 	    if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
 		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
 	}
@@ -2335,7 +2333,6 @@ void ActionToArtesianSpring(Heroes &hero, const u16 dst_index)
 
 	    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
 		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-	    else
 	    if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
 		tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
 	}
