@@ -390,17 +390,6 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     		    }
     		    break;
 
-    		    case MP2::OBJ_WATERCHEST:
-			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
-			{
-			    case 0:	return Cursor::POINTER;
-			    case 1:	return Cursor::REDBOAT;
-			    case 2:	return Cursor::REDBOAT2;
-			    case 3:	return Cursor::REDBOAT3;
-			    default:	return Cursor::REDBOAT4;
-			}
-			break;
-
 		    case MP2::OBJ_COAST:
 			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			{
@@ -413,7 +402,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			break;
 
 		    default:
-			    if(MP2::isActionObject(tile.GetObject(), true))
+			    if(MP2::isWaterObject(tile.GetObject()))
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
 				    case 0:	return Cursor::POINTER;
@@ -541,27 +530,19 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 			}
 			break;
 
-    		    case MP2::OBJ_TREASURECHEST:
-			switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
-			{
-			    case 0:	return Cursor::POINTER;
-			    case 1:	return Cursor::ACTION;
-			    case 2:	return Cursor::ACTION2;
-			    case 3:	return Cursor::ACTION3;
-			    default:	return Cursor::ACTION4;
-			}
-			break;
-
 		    default:
-			    if(MP2::isActionObject(tile.GetObject(), false))
+			    if(MP2::isGroundObject(tile.GetObject()))
+			    {
+				const bool protection = Maps::TileUnderProtection(tile.GetIndex());
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
 				    case 0:	return Cursor::POINTER;
-				    case 1:	return Cursor::ACTION;
-				    case 2:	return Cursor::ACTION2;
-				    case 3:	return Cursor::ACTION3;
-				    default:	return Cursor::ACTION4;
+				    case 1:	return protection ? Cursor::FIGHT : Cursor::ACTION;
+				    case 2:	return protection ? Cursor::FIGHT2 : Cursor::ACTION2;
+				    case 3:	return protection ? Cursor::FIGHT3 : Cursor::ACTION3;
+				    default:	return protection ? Cursor::FIGHT4 : Cursor::ACTION4;
 				}
+			    }
 			    else
 			    if(tile.isPassable(&from_hero))
 			    {

@@ -248,6 +248,12 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 // action to next cell
 void Heroes::Action(const u16 dst_index)
 {
+    // check: tile is protected
+    {
+	u16 dst_index2 = MAXU16;
+	if(Maps::TileUnderProtection(dst_index, dst_index2)) Action(dst_index2);
+    }
+
     if(Game::AI == world.GetKingdom(GetColor()).Control()) return AIAction(dst_index);
 
     const MP2::object_t & object = world.GetTiles(dst_index).GetObject();
