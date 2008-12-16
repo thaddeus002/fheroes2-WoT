@@ -26,7 +26,7 @@
 
 namespace Font
 {
-    typedef enum { SMALL, BIG } type_t;
+    typedef enum { SMALL = 0x01, BIG = 0x02, YELLOWBIG = 0x04 } type_t;
 };
 
 namespace Char

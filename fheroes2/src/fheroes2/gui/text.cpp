@@ -116,7 +116,7 @@ void Text::Blit(u16 ax, u16 ay, Surface & dst)
     	    default:
         	if(Font::SMALL == font && sprite.h() < HEIGHT_SMALL) pt.y += HEIGHT_SMALL - sprite.h();
         	else
-		if(Font::BIG == font && sprite.h() < HEIGHT_BIG) pt.y += HEIGHT_BIG - sprite.h();
+		if(Font::SMALL != font && sprite.h() < HEIGHT_BIG) pt.y += HEIGHT_BIG - sprite.h();
             break;
 	}
 
@@ -172,7 +172,7 @@ void Text::Blit(u16 ax, u16 ay, Surface & dst)
     	    default:
         	if(Font::SMALL == font && sprite.h() < HEIGHT_SMALL) pt.y += HEIGHT_SMALL - sprite.h();
         	else
-		if(Font::BIG == font && sprite.h() < HEIGHT_BIG) pt.y += HEIGHT_BIG - sprite.h();
+		if(Font::SMALL != font && sprite.h() < HEIGHT_BIG) pt.y += HEIGHT_BIG - sprite.h();
             break;
 	}
 

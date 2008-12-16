@@ -68,7 +68,7 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
 
     if(header.size())
     {
-	TextBox(header, ft, pos);
+	TextBox(header, (ft == Font::BIG ? Font::YELLOWBIG : ft), pos);
         pos.y += Text::height(header, ft, BOXAREA_WIDTH);
 	pos.y += 10;
     }

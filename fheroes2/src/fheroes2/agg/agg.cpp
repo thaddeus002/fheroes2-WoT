@@ -330,6 +330,8 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 
 	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 144; break;
 
+	case ICN::YELLOWFONT:  LoadICN(ICN::FONT); count = 95; break;
+
 	default: break;
     }
 
@@ -389,6 +391,20 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 		sprite->ChangeColor(palette.Color(0x55), palette.Color(0xB0));
 		sprite->ChangeColor(palette.Color(0x5C), palette.Color(0xB7));
 		sprite->ChangeColor(palette.Color(0x60), palette.Color(0xBB));
+		sprite->Unlock();
+		break;
+
+	    case ICN::YELLOWFONT:
+		sprite = new Sprite(GetICN(ICN::FONT, ii));
+		sprite->Lock();
+		sprite->ChangeColor(palette.Color(0x0B), palette.Color(0xDA));
+		sprite->ChangeColor(palette.Color(0x0C), palette.Color(0xDA));
+		sprite->ChangeColor(palette.Color(0x0D), palette.Color(0xDA));
+		sprite->ChangeColor(palette.Color(0x0F), palette.Color(0xDB));
+		sprite->ChangeColor(palette.Color(0x10), palette.Color(0xDB));
+		sprite->ChangeColor(palette.Color(0x11), palette.Color(0xDB));
+		sprite->ChangeColor(palette.Color(0x12), palette.Color(0xDB));
+		sprite->ChangeColor(palette.Color(0x14), palette.Color(0xDB));
 		sprite->Unlock();
 		break;
 
@@ -796,6 +812,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     if(0 == v.size())
     switch(icn)
     {
+	case ICN::YELLOWFONT:
 	case ICN::ROUTERED:
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
@@ -1028,7 +1045,7 @@ const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
     }
     else
 #endif
-    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
+    return AGG::GetLetter(ch, ft);
 
 }
 
@@ -1036,5 +1053,5 @@ const Surface & AGG::GetLetter(char ch, u8 ft)
 {
     if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
     
-    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN(ICN::FONT, ch - 0x20);
+    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN((Font::YELLOWBIG == ft ? ICN::YELLOWFONT : ICN::FONT), ch - 0x20);
 }
