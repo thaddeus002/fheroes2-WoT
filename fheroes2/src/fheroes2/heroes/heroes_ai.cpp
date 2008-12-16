@@ -20,10 +20,13 @@
 
 #include "settings.h"
 #include "kingdom.h"
+#include "army.h"
+#include "battle.h"
 #include "world.h"
 #include "gameevent.h"
 #include "heroes.h"
 
+void AIToMonster(Heroes &hero, const u16 dst_index);
 void AIToPickupResource(Heroes &hero, const u16 dst_index);
 void AIToTreasureChest(Heroes &hero, const u16 dst_index);
 void AIToResource(Heroes &hero, const u16 dst_index);
@@ -46,11 +49,19 @@ void AIToArtesianSpring(Heroes &hero, const u16 dst_index);
 void AIToXanadu(Heroes &hero, const u16 dst_index);
 void AIToEvent(Heroes &hero, const u16 dst_index);
 void AIToUpgradeArmyObject(Heroes &hero, const u16 dst_index);
+void AIToPoorMoraleObject(Heroes &hero, const u16 dst_index);
+void AIToPoorLuckObject(Heroes &hero, const u16 dst_index);
 
 void Heroes::AIUpdateRoles(void)
 {
     SetModes(SCOUTER);
     SetModes(HUNTER);
+}
+
+void AIBattleLose(Heroes &hero, const u8 reason)
+{
+    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
+    hero.SetFreeman(reason);
 }
 
 void Heroes::AIAction(const u16 dst_index)
@@ -59,6 +70,8 @@ void Heroes::AIAction(const u16 dst_index)
 
     switch(object)
     {
+	case MP2::OBJ_MONSTER:		AIToMonster(*this, dst_index); break;
+
         // pickup object
         case MP2::OBJ_RESOURCE:
         case MP2::OBJ_BOTTLE:
@@ -130,9 +143,63 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_HILLFORT:
         case MP2::OBJ_FREEMANFOUNDRY:	AIToUpgradeArmyObject(*this, dst_index); break;
 
+	case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_GRAVEYARD:
+	case MP2::OBJ_DERELICTSHIP:	AIToPoorMoraleObject(*this, dst_index); break;
+
+	case MP2::OBJ_PYRAMID:		AIToPoorLuckObject(*this, dst_index); break;
+
 	default:
 	    Error::Verbose("AI::Action: Hero " + GetName() + " say: I'm stupid, help my please..");
 	    break;
+    }
+}
+
+void AIToMonster(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const Monster::monster_t monster = Monster::Monster(tile);
+    const u16 count = tile.GetCountMonster();
+    Army::army_t army;
+    army.At(0).Set(monster, count);
+    army.ArrangeForBattle();
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
+
+    const u32 exp = army.CalculateExperience();
+    const Army::battle_t b = Army::Battle(hero, army, tile);
+
+    switch(b)
+    {
+	case Army::WIN:
+	{
+	    hero.IncreaseExperience(exp);
+	    Maps::TilesAddon *addon = tile.FindMonster();
+	    if(addon)
+	    {
+		const u32 uniq = addon->uniq;
+		tile.Remove(uniq);
+		tile.SetObject(MP2::OBJ_ZERO);
+
+		// remove shadow from left cell
+		if(Maps::isValidDirection(dst_index, Direction::LEFT))
+		    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+	    }
+	    hero.ActionAfterBattle();
+	    break;
+	}
+
+	case Army::RETREAT:
+	case Army::SURRENDER:
+	case Army::LOSE:
+	    AIBattleLose(hero, b);
+	    if(!Settings::Get().Original())
+	    {
+	        tile.SetCountMonster(army.GetCountMonsters(monster));
+	    }
+	    break;
+        
+        default: break;
     }
 }
 
@@ -646,7 +713,205 @@ void AIToUpgradeArmyObject(Heroes &hero, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToUpgradeArmyObject: " + hero.GetName());
 }
 
+void AIToPoorMoraleObject(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
 
+    const bool battle = (tile.GetQuantity1() || tile.GetQuantity2());
+    bool complete = false;
+    
+    switch(obj)
+    {
+        case MP2::OBJ_GRAVEYARD:
+	if(battle)
+	{
+	    Army::army_t army;
+	    army.FromGuardian(tile);
+
+	    // battle
+	    const u32 exp = army.CalculateExperience();
+	    const Army::battle_t b = Army::Battle(hero, army, tile);
+	    switch(b)
+	    {
+		case Army::WIN:
+		{
+	    	    hero.IncreaseExperience(exp);
+	    	    complete = true;
+	    	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    	    Resource::funds_t resource;
+	    	    resource.gold = tile.GetQuantity2() * 100;
+	    	    hero.PickupArtifact(art);
+	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    	    hero.ActionAfterBattle();
+	    	    break;
+		}
+		case Army::RETREAT:
+		case Army::SURRENDER:
+		case Army::LOSE:
+	    	    AIBattleLose(hero, b);
+	    	    break;
+        
+		default: break;
+	    }
+	}
+	break;
+
+        case MP2::OBJ_SHIPWRECK:
+	if(battle)
+	{
+		Army::army_t army;
+		army.FromGuardian(tile);
+		Resource::funds_t resource;
+		Artifact::artifact_t art = Artifact::UNKNOWN;
+                switch(tile.GetQuantity2())
+                {
+            	    case 10: resource.gold = 1000; break;
+            	    case 15: resource.gold = 2000; break;
+            	    case 25: resource.gold = 5000; break;
+            	    case 50: resource.gold = 2000; art = Artifact::Artifact(tile.GetQuantity1()); break;
+            	    default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
+                }
+
+		// battle
+		const u32 exp = army.CalculateExperience();
+		const Army::battle_t b = Army::Battle(hero, army, tile);
+		switch(b)
+		{
+		    case Army::WIN:
+		    {
+	    		hero.IncreaseExperience(exp);
+	    		complete = true;
+			hero.PickupArtifact(art);
+	    		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    		hero.ActionAfterBattle();
+	    		break;
+		    }
+		    case Army::RETREAT:
+		    case Army::SURRENDER:
+		    case Army::LOSE:
+	    		AIBattleLose(hero, b);
+	    		break;
+        
+		    default: break;
+		}
+	    }
+	    break;
+
+        case MP2::OBJ_DERELICTSHIP:
+	if(battle)
+	{
+	    Army::army_t army;
+	    army.FromGuardian(tile);
+
+	    // battle
+	    const u32 exp = army.CalculateExperience();
+	    const Army::battle_t b = Army::Battle(hero, army, tile);
+	    switch(b)
+	    {
+		case Army::WIN:
+		{
+	    	    hero.IncreaseExperience(exp);
+	    	    complete = true;
+	    	    Resource::funds_t resource;
+	    	    resource.gold = tile.GetQuantity2() * 100;
+	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	    	    hero.ActionAfterBattle();
+	    	    break;
+		}
+		case Army::RETREAT:
+		case Army::SURRENDER:
+		case Army::LOSE:
+	    	    AIBattleLose(hero, b);
+	    	    break;
+        
+		default: break;
+	    }
+	}
+	break;
+
+	default: break;
+    }
+
+    if(complete)
+    {
+	tile.SetQuantity1(0);
+	tile.SetQuantity2(0);
+    }
+    else
+    if(!battle && !hero.isVisited(obj))
+    {
+	// modify morale
+	hero.SetVisited(dst_index);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToPoorMoraleObject: " + hero.GetName());
+}
+
+void AIToPoorLuckObject(Heroes &hero, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const MP2::object_t obj = tile.GetObject();
+    const bool battle = tile.GetQuantity1();
+    bool complete = false;
+
+    switch(obj)
+    {
+        case MP2::OBJ_PYRAMID:
+    	if(battle)
+    	{
+            // battle
+            Army::army_t army;
+            army.FromGuardian(tile);
+
+	    // battle
+	    const u32 exp = army.CalculateExperience();
+	    const Army::battle_t b = Army::Battle(hero, army, tile);
+	    switch(b)
+	    {
+		case Army::WIN:
+		{
+		    hero.IncreaseExperience(exp);
+		    complete = true;
+		    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
+		    // check magick book
+		    if(hero.HasArtifact(Artifact::MAGIC_BOOK) &&
+		    // check skill level for wisdom
+			Skill::Level::EXPERT == hero.GetLevelSkill(Skill::Secondary::WISDOM))
+		    {
+			hero.AppendSpellToBook(spell);
+		    }
+		    hero.ActionAfterBattle();
+		    break;
+		}
+		case Army::RETREAT:
+		case Army::SURRENDER:
+		case Army::LOSE:
+		    AIBattleLose(hero, b);
+		    break;
+        
+    		default: break;
+	    }
+	}
+    	break;
+
+    	default: break;
+    }
+
+    if(complete)
+    {
+	tile.SetQuantity1(0);
+	tile.SetQuantity2(0);
+    }
+    else
+    if(!battle && !hero.isVisited(obj))
+    {
+	// modify luck
+        hero.SetVisited(dst_index);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToPoorLuckObject: " + hero.GetName());
+}
 
 /*
 // action to next cell
@@ -656,8 +921,6 @@ void Heroes::Action(const u16 dst_index)
 
     switch(object)
     {
-	case MP2::OBJ_MONSTER:	AIToMonster(*this, dst_index); break;
-
         case MP2::OBJ_CASTLE:	AIToCastle(*this, dst_index); break;
         case MP2::OBJ_HEROES:	AIToHeroes(*this, dst_index); break;
 
@@ -674,14 +937,10 @@ void Heroes::Action(const u16 dst_index)
         // info message
         case MP2::OBJ_SIGN:		AIToSign(*this, dst_index); break;
 
-	case MP2::OBJ_PYRAMID:		AIToPoorLuckObject(*this, dst_index); break;
 
         case MP2::OBJ_TRADINGPOST:	AIToTradingPost(*this); break;
 
 
-	case MP2::OBJ_SHIPWRECK:
-        case MP2::OBJ_GRAVEYARD:
-	case MP2::OBJ_DERELICTSHIP:	AIToPoorMoraleObject(*this, dst_index); break;
 
 
 	// capture color object
@@ -741,54 +1000,6 @@ void Heroes::Action(const u16 dst_index)
     }
 }
 
-void AIToMonster(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Monster::monster_t monster = Monster::Monster(tile);
-    const u16 count = tile.GetCountMonster();
-    Army::army_t army;
-    Army::ArrangeTroopsForBattle(army, monster, count);
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
-
-    const u32 exp = army.CalculateExperience();
-    const Army::battle_t b = Army::Battle(hero, army, tile);
-
-    switch(b)
-    {
-	case Army::WIN:
-	{
-	    hero.IncreaseExperience(exp);
-	    Maps::TilesAddon *addon = tile.FindMonster();
-	    if(addon)
-	    {
-		AGG::PlaySound(M82::KILLFADE);
-		const u32 uniq = addon->uniq;
-		AnimationRemoveObject(tile);
-		tile.Remove(uniq);
-		tile.SetObject(MP2::OBJ_ZERO);
-
-		// remove shadow from left cell
-		if(Maps::isValidDirection(dst_index, Direction::LEFT))
-		    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-	    }
-	    hero.ActionAfterBattle();
-	    break;
-	}
-
-	case Army::RETREAT:
-	case Army::SURRENDER:
-	case Army::LOSE:
-	    BattleLose(hero, b);
-	    if(!Settings::Get().Original())
-	    {
-	        tile.SetCountMonster(army.GetCountMonsters(monster));
-	    }
-	    break;
-        
-        default: break;
-    }
-}
 
 void AIToHeroes(Heroes &hero, const u16 dst_index)
 {
@@ -823,7 +1034,7 @@ void AIToHeroes(Heroes &hero, const u16 dst_index)
 	    case Army::LOSE:
 	    case Army::RETREAT:
 	    case Army::SURRENDER:
-		BattleLose(hero, b);
+		AIBattleLose(hero, b);
 		break;
 
             default: break;
@@ -867,7 +1078,7 @@ void AIToCastle(Heroes &hero, const u16 dst_index)
 	    case Army::LOSE:
 	    case Army::RETREAT:
 	    case Army::SURRENDER:
-		BattleLose(hero, b);
+		AIBattleLose(hero, b);
 		break;
 
             default: break;
@@ -920,91 +1131,6 @@ void AIToCoast(Heroes &hero, const u16 dst_index)
 }
 
 
-
-void AIToPoorLuckObject(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t obj = tile.GetObject();
-    const bool battle = tile.GetQuantity1();
-    bool complete = false;
-    std::string body;
-
-    switch(obj)
-    {
-        case MP2::OBJ_PYRAMID:
-    	    if(battle)
-    	    {
-		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("You come upon the pyramid of a great and ancient king.", "You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians. Will you search?", Font::BIG, Dialog::OK))
-		{
-		    // battle
-		    Army::army_t army;
-		    army.At(0).Set(Monster::ROYAL_MUMMY, 10);
-		    army.At(1).Set(Monster::LORD_VAMPIRE, 10);
-		    army.At(2).Set(Monster::ROYAL_MUMMY, 10);
-		    army.At(3).Set(Monster::LORD_VAMPIRE, 10);
-		    army.At(4).Set(Monster::ROYAL_MUMMY, 10);
-
-		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
-		    switch(b)
-		    {
-			case Army::WIN:
-			{
-			    PlaySoundSuccess;
-			    hero.IncreaseExperience(exp);
-			    complete = true;
-			    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
-			    // check magick book
-			    if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
-				Dialog::Message(MP2::StringObject(obj), "Unfortunately, you have no Magic Book to record the spell with.", Font::BIG, Dialog::OK);
-			    else
-			    // check skill level for wisdom
-			    if(Skill::Level::EXPERT > hero.GetLevelSkill(Skill::Secondary::WISDOM))
-			    	Dialog::Message(MP2::StringObject(obj), "Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.", Font::BIG, Dialog::OK);
-			    else
-			    {
-				Dialog::SpellInfo(Spell::String(spell), "Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell.", spell, true);
-				hero.AppendSpellToBook(spell);
-			    }
-			    hero.ActionAfterBattle();
-			    break;
-			}
-			case Army::RETREAT:
-			case Army::SURRENDER:
-			case Army::LOSE:
-			    BattleLose(hero, b);
-			    break;
-        
-    			default: break;
-		    }
-		}
-    	    }
-    	    else
-    		body = "You come upon the pyramid of a great and ancient king. Routine exploration reveals that the pyramid is completely empty.";
-    	    break;
-
-    	default: return;
-    }
-
-    if(complete)
-    {
-	tile.SetQuantity1(0);
-	tile.SetQuantity2(0);
-    }
-    else
-    if(!battle && !hero.isVisited(obj))
-    {
-	// modify luck
-        hero.SetVisited(dst_index);
-	AGG::PlaySound(M82::BADLUCK);
-	DialogLuck(MP2::StringObject(obj), body, false, 2);
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToPoorLuckObject: " + hero.GetName());
-}
-
 void AIToSign(Heroes &hero, const u16 dst_index)
 {
     PlaySoundWarning;
@@ -1021,186 +1147,6 @@ void AIToTradingPost(Heroes &hero)
 }
 
 
-void AIToPoorMoraleObject(Heroes &hero, const u16 dst_index)
-{
-    Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t obj = tile.GetObject();
-
-    const bool battle = (tile.GetQuantity1() || tile.GetQuantity2());
-    bool complete = false;
-    std::string body;
-    
-    switch(obj)
-    {
-        case MP2::OBJ_GRAVEYARD:
-    	    if(battle)
-    	    {
-    		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("You tentatively approach the burial ground of ancient warriors.", "Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
-    		{
-		    Army::army_t army;
-		    Army::ArrangeTroopsForBattle(army, Monster::MUTANT_ZOMBIE, 100);
-
-		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
-		    switch(b)
-		    {
-			case Army::WIN:
-			{
-			    hero.IncreaseExperience(exp);
-			    complete = true;
-			    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-			    Resource::funds_t resource;
-			    resource.gold = tile.GetQuantity2() * 100;
-			    PlaySoundSuccess;
-			    DialogWithArtifactAndGold(MP2::StringObject(obj), "Upon defeating the zomies you search the graves and find something!", art, resource.gold);
-			    hero.PickupArtifact(art);
-			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.ActionAfterBattle();
-			    break;
-			}
-			case Army::RETREAT:
-			case Army::SURRENDER:
-			case Army::LOSE:
-			    BattleLose(hero, b);
-			    break;
-        
-    			default: break;
-		    }
-    		}
-    	    }
-    	    else
-    		body = "Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.";
-    	    break;
-
-        case MP2::OBJ_SHIPWRECK:
-    	    if(battle)
-    	    {
-    		PlaySoundWarning;
-    		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the shipwreck?", Font::BIG, Dialog::YES | Dialog::NO))
-    		{
-		    Army::army_t army;
-		    Resource::funds_t resource;
-		    Artifact::artifact_t art = Artifact::UNKNOWN;
-		    u8 c = 1;
-                    switch(tile.GetQuantity2())
-                    {
-                	case 1:
-                	    resource.gold = 1000;
-                	    c = 2;
-                	    break;
-                	case 2:
-                	    resource.gold = 2000;
-                	    c = 3;
-                	    break;
-                	case 3:
-                	    resource.gold = 5000;
-                	    c = 5;
-                	    break;
-                	case 4:
-                	    resource.gold = 2000;
-			    art = Artifact::Artifact(tile.GetQuantity1());
-                	    c = 10;
-                	    break;
-                	default: Error::Warning("AIToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
-                    }
-                    ArrangeTroopsForBattle(army, Monster::GHOST, c * ARMYMAXTROOPS);
-
-		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
-		    switch(b)
-		    {
-			case Army::WIN:
-			{
-			    hero.IncreaseExperience(exp);
-			    complete = true;
-			    PlaySoundSuccess;
-			    if(art == Artifact::UNKNOWN)
-				DialogWithGold(MP2::StringObject(obj), "Upon defeating the Ghosts you sift through the debris and find something!", resource.gold);
-			    else
-			    {
-				DialogWithArtifactAndGold(MP2::StringObject(obj), "Upon defeating the Ghosts you sift through the debris and find something!", art, resource.gold);
-				hero.PickupArtifact(art);
-			    }
-			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.ActionAfterBattle();
-			    break;
-			}
-			case Army::RETREAT:
-			case Army::SURRENDER:
-			case Army::LOSE:
-			    BattleLose(hero, b);
-			    break;
-        
-    			default: break;
-		    }
-    		}
-    	    }
-    	    else
-    		body = "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
-    	    break;
-
-        case MP2::OBJ_DERELICTSHIP:
-    	    if(battle)
-    	    {
-    		PlaySoundWarning;
-    		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
-    		{
-		    Army::army_t army;
-		    ArrangeTroopsForBattle(army, Monster::SKELETON, 200);
-
-		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
-		    switch(b)
-		    {
-			case Army::WIN:
-			{
-			    hero.IncreaseExperience(exp);
-			    complete = true;
-			    Resource::funds_t resource;
-			    resource.gold = tile.GetQuantity2() * 100;
-			    PlaySoundSuccess;
-			    DialogWithGold(MP2::StringObject(obj), "Upon defeating the Skeletons you sift through the debris and find something!", resource.gold);
-			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.ActionAfterBattle();
-			    break;
-			}
-			case Army::RETREAT:
-			case Army::SURRENDER:
-			case Army::LOSE:
-			    BattleLose(hero, b);
-			    break;
-        
-    			default: break;
-		    }
-    		}
-    	    }
-    	    else
-    		body = "Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
-    	    break;
-
-    	default: return;
-    }
-
-    if(complete)
-    {
-	tile.SetQuantity1(0);
-	tile.SetQuantity2(0);
-    }
-    else
-    if(!battle && !hero.isVisited(obj))
-    {
-	// modify morale
-	hero.SetVisited(dst_index);
-	AGG::PlaySound(M82::BADMRLE);
-	DialogMorale(MP2::StringObject(obj), body, false, 1);
-    }
-
-    if(Settings::Get().Debug()) Error::Verbose("AIToPoorMoraleObject: " + hero.GetName());
-}
 
 void AIToArtifact(Heroes &hero, const u16 dst_index)
 {
@@ -1350,7 +1296,7 @@ void AIToArtifact(Heroes &hero, const u16 dst_index)
 			    case Army::RETREAT:
 			    case Army::SURRENDER:
 			    case Army::LOSE:
-				BattleLose(hero, b);
+				AIBattleLose(hero, b);
 				break;
         
     			default: break;
@@ -1446,7 +1392,7 @@ void AIToAbandoneMine(Heroes &hero, const u16 dst_index)
 	    case Army::RETREAT:
 	    case Army::SURRENDER:
 	    case Army::LOSE:
-		BattleLose(hero, b);
+		AIBattleLose(hero, b);
 		break;
         
     	    default: break;
@@ -1625,7 +1571,7 @@ void AIToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 			case Army::RETREAT:
 			case Army::SURRENDER:
 			case Army::LOSE:
-			    BattleLose(hero, b);
+			    AIBattleLose(hero, b);
 			    break;
         
     			default: break;
@@ -1677,7 +1623,7 @@ void AIToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 			case Army::RETREAT:
 			case Army::SURRENDER:
 			case Army::LOSE:
-			    BattleLose(hero, b);
+			    AIBattleLose(hero, b);
 			    break;
         
     			default: break;
@@ -1727,7 +1673,7 @@ void AIToDwellingBattleMonster(Heroes &hero, const u16 dst_index)
 			case Army::RETREAT:
 			case Army::SURRENDER:
 			case Army::LOSE:
-			    BattleLose(hero, b);
+			    AIBattleLose(hero, b);
 			    break;
         
     			default: break;
