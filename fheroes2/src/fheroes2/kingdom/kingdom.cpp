@@ -266,7 +266,7 @@ bool Kingdom::isVisited(const Maps::Tiles & tile) const
 }
 
 /* return true if object visited */
-bool Kingdom::isVisited(const MP2::object_t object) const
+bool Kingdom::isVisited(const u8 object) const
 {
     return visit_object.end() != std::find_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isObject), object));
 }

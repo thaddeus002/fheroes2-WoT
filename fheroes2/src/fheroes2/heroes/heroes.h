@@ -202,7 +202,7 @@ public:
     Direction::vector_t GetDirection(void) const{ return direction; };
 
     void SetVisited(const u16 index, const Visit::type_t type = Visit::LOCAL);
-    bool isVisited(const MP2::object_t & object, const Visit::type_t type = Visit::LOCAL) const;
+    bool isVisited(const u8 object, const Visit::type_t type = Visit::LOCAL) const;
     bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
 
     void SetCenter(const Point& pt){ mp = pt; };

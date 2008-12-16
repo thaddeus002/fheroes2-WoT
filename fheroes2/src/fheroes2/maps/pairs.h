@@ -42,7 +42,7 @@ class IndexObject : public std::pair<u16, MP2::object_t>
     IndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject()) {};
 
     bool isIndex(u16 index) const { return index == first; };
-    bool isObject(MP2::object_t object) const { return object == second; };
+    bool isObject(u8 object) const { return object == second; };
 };
 
 #endif

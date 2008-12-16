@@ -79,7 +79,7 @@ namespace Army
             u16 	Count(void) const;
 
 	    u8		Attack(void) const;
-	    u8		Defence(void) const;
+	    u8		Defense(void) const;
 	    u32		HitPoint(void) const;
 	    u16		DamageMin(void) const;
 	    u16		DamageMax(void) const;
@@ -149,7 +149,7 @@ namespace Army
 	    u32		CalculateExperience(void) const;
 
 	    u16		Attack(void) const;
-	    u16		Defence(void) const;
+	    u16		Defense(void) const;
 	    u32		HitPoint(void) const;
 	    u32		DamageMin(void) const;
 	    u32		DamageMax(void) const;

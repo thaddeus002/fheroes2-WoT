@@ -147,7 +147,7 @@ u8 Army::Troop::Attack(void) const
     return Monster::GetStats(monster).attack;
 }
 
-u8 Army::Troop::Defence(void) const
+u8 Army::Troop::Defense(void) const
 {
     return Monster::GetStats(monster).defence;
 }
@@ -915,18 +915,20 @@ u16 Army::army_t::Attack(void) const
     u8 count = 0;
 
     for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).Attack(); ++count; }
+    if(commander) res += commander->GetAttack();
 
     return res / count;
 }
 
-u16 Army::army_t::Defence(void) const
+u16 Army::army_t::Defense(void) const
 {
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     u16 res = 0;
     u8 count = 0;
 
-    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).Defence(); ++count; }
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).Defense(); ++count; }
+    if(commander) res += commander->GetDefense();
 
     return res / count;
 }
@@ -968,30 +970,29 @@ u32 Army::army_t::DamageMax(void) const
 bool Army::army_t::StrongerEnemyArmy(const army_t & a)
 {
     u16 a1 = Attack();
-    u16 d1 = Defence();
+    u16 d1 = Defense();
     u32 h1 = HitPoint();
     u32 m1 = DamageMin();
     u32 x1 = DamageMax();
     u32 r1 = 0;
 
     u16 a2 = a.Attack();
-    u16 d2 = a.Defence();
+    u16 d2 = a.Defense();
     u32 h2 = a.HitPoint();
     u32 m2 = a.DamageMin();
     u32 x2 = a.DamageMax();
     u32 r2 = 0;
 
-    // total damage1
+    // total damage: from FAQ
     if(a1 > d2)
 	r1 = static_cast<u32>((m1 + x1) / 2 * (1 + 0.1 * std::min(a1 - d2, 20)));
     else
 	r1 = static_cast<u32>((m1 + x1) / 2 * (1 + 0.05 * std::min(d2 - a1, 14)));
 
-    // total damage1
     if(a2 > d1)
 	r2 = static_cast<u32>((m2 + x2) / 2 * (1 + 0.1 * std::min(a2 - d1, 20)));
     else
 	r2 = static_cast<u32>((m2 + x2) / 2 * (1 + 0.05 * std::min(d1 - a2, 14)));
 
-    return r1 > h2 && r2 < h1;
+    return h1 / r2 > h2 / r1;
 }

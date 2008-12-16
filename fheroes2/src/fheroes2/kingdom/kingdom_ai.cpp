@@ -285,24 +285,34 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 
 	for(; itm1 != itm2; ++itm1)
 	{
-	    // filter ground or water
-	    if(!MP2::isActionObject((*itm1).second, hero.isShipMaster())) continue;
-
-	    if(hero.GetPath().Calculate((*itm1).first))
+	    if(hero.isShipMaster())
 	    {
-		u16 pos = 0;
-		// check monster on path
-		if(hero.GetPath().isUnderProtection(pos))
+		if(MP2::isGroundObject((*itm1).second)) continue;
+
+		if(hero.GetPath().Calculate((*itm1).first) &&
+		   hero.AIValidObject((*itm1).second, (*itm1).first)) objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
+	    }
+	    else
+	    {
+		if(MP2::isWaterObject((*itm1).second)) continue;
+
+		if(hero.GetPath().Calculate((*itm1).first) &&
+		   hero.AIValidObject((*itm1).second, (*itm1).first))
 		{
-		    const Maps::Tiles & tile = world.GetTiles(pos);
-		    Army::army_t enemy;
-		    enemy.At(0).Set(Monster::Monster(tile), tile.GetCountMonster());
+		    u16 pos = 0;
+		    // check monster on path
+		    if(hero.GetPath().isUnderProtection(pos))
+		    {
+			const Maps::Tiles & tile = world.GetTiles(pos);
+			Army::army_t enemy;
+			enemy.At(0).Set(Monster::Monster(tile), tile.GetCountMonster());
 
-		    // can we will win battle
-		    if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy)) continue;
+			// can we will win battle
+			if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy)) continue;
+		    }
+
+		    objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
 		}
-
-		objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
 	    }
 	}
 
@@ -321,56 +331,12 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 
 		if(MAXU16 == index2)
 		{
-		    if(hero.AIValidObject(ai_objects[index1], index1)) index = index1;
+		    index = index1;
 		}
 		else
 		{
-		    if(Rand::Get(1))
-		    {
-			if(hero.AIValidObject(ai_objects[index1], index1)) index = index1;
-		    }
-		    else
-		    {
-			if(hero.AIValidObject(ai_objects[index2], index2)) index = index2;
-			else
-			if(hero.AIValidObject(ai_objects[index1], index1)) index = index1;
-		    }
+		    index = Rand::Get(1) ? index1 : index2;
 		}
-	    }
-	}
-
-	// last chance
-	if(MAXU16 == index && objs.size())
-	{
-	    // on ground
-	    ito1 = objs.rbegin();
-	    ito2 = objs.rend();
-
-	    while(ito1 != ito2 && MAXU16 == index)
-	    {
-		index = (*ito1).first;
-		switch(ai_objects[index])
-		{
-		    // castle
-		    case MP2::OBJ_CASTLE:
-		    {
-			    const Castle *castle = world.GetCastle(index);
-			    // goto: if my castle, and is free,
-			    if(!castle || castle->GetColor() != GetColor() || castle->GetHeroes()) index = MAXU16;
-			    break;
-		    }
-
-		    // boat
-		    case MP2::OBJ_BOAT: break;
-
-		    // new view
-    		    case MP2::OBJ_STONELIGHTS: break;
-
-		    // or ...
-
-		    default: index = MAXU16; break;
-		}
-		++ito1;
 	    }
 	}
 

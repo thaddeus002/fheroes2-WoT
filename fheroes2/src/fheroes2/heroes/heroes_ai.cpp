@@ -1718,7 +1718,6 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	case MP2::OBJ_MAGELLANMAPS:
 	case MP2::OBJ_MERMAID:
 	case MP2::OBJ_SIRENS:
-	case MP2::OBJ_DERELICTSHIP:
 	case MP2::OBJ_WHIRLPOOL:
 	case MP2::OBJ_COAST:
 	    if(isShipMaster()) return true;
@@ -1780,7 +1779,7 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
         case MP2::OBJ_FOUNTAIN:
     	case MP2::OBJ_FAERIERING:
     	case MP2::OBJ_IDOL:
-	    if(! isVisited(world.GetTiles(index)) &&
+	    if(! isVisited(obj) &&
 		Luck::IRISH > GetLuck()) return true;
 	    break;
 
@@ -1788,7 +1787,7 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	case MP2::OBJ_OASIS:
     	case MP2::OBJ_TEMPLE:
     	case MP2::OBJ_WATERINGHOLE:
-	    if(! isVisited(world.GetTiles(index)) &&
+	    if(! isVisited(obj) &&
 		Morale::BLOOD > GetMorale()) return true;
 	    break;
 
@@ -1827,6 +1826,38 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
                army.HasMonster(Monster::SWORDSMAN) ||
                army.HasMonster(Monster::IRON_GOLEM)) return true;
             break;
+
+	case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_GRAVEYARD:
+	case MP2::OBJ_DERELICTSHIP:
+        {
+	    const Maps::Tiles & tile = world.GetTiles(index);
+            Army::army_t enemy;
+	    enemy.FromGuardian(tile);
+
+            // can we will win battle
+            if(enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy)) return true;
+	    break;
+	}
+
+	//case MP2::OBJ_PYRAMID:
+
+	case MP2::OBJ_MONSTER:
+	{
+            const Maps::Tiles & tile = world.GetTiles(index);
+            Army::army_t enemy;
+            enemy.At(0).Set(Monster::Monster(tile), tile.GetCountMonster());
+
+            // can we will win battle
+            if(enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy)) return true;
+	    break;
+	}
+
+	case MP2::OBJ_CASTLE:
+	case MP2::OBJ_BOAT:
+	case MP2::OBJ_STONELIGHTS:
+	    // check later
+	    return true;
 
 	/*
 	    or add later
