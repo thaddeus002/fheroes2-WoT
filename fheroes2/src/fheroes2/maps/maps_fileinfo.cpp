@@ -333,7 +333,7 @@ bool Maps::FileInfo::Read(const std::string &filename)
     // start with hero
     fd.seekg(0x25, std::ios_base::beg);
     fd.read(&byte8, 1);
-    if(byte8) with_heroes = true;
+    if(0 == byte8) with_heroes = true;
 
     // race color
     fd.read(&byte8, 1);
