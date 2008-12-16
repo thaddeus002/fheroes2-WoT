@@ -250,7 +250,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	}
 
 	// 0.2 sec delay for show enemy hero position
-	if(hero.isShow(Settings::Get().MyColor())) DELAY(200);
+	if(!hero.isFreeman() && hero.isShow(Settings::Get().MyColor())) DELAY(200);
 }
 
 void Kingdom::AIHeroesTask(Heroes & hero)

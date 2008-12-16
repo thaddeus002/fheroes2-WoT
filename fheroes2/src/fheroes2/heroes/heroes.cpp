@@ -1584,7 +1584,8 @@ bool Heroes::ApplyPenaltyMovement(void)
 
 bool Heroes::MayStillMove(void) const
 {
-    if(Modes(STUPID)) return false;
+    if(Modes(STUPID) || isFreeman()) return false;
+
     if(path.isValid()) return move_point >= path.GetFrontPenalty();
     return move_point >= Maps::Ground::GetPenalty(Maps::GetIndexFromAbsPoint(mp), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
 }
