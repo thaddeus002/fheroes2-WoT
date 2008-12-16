@@ -1436,6 +1436,8 @@ u16 World::NextTeleport(const u16 index) const
 	return index;
     }
 
+    const u8 type = GetTiles(index).GetQuantity1();
+
     std::vector<u16> v;
     v.reserve(vec_teleports.size());
 
@@ -1445,11 +1447,12 @@ u16 World::NextTeleport(const u16 index) const
     {
 	const u16 & i = *it1;
 	if(i == index) continue;
+	if(type != GetTiles(i).GetQuantity1()) continue;
 	if(NULL != world.GetHeroes(i)) continue;
 	v.push_back(i);
     }
 
-    if(v.empty()) Error::Warning("World::NextTeleport: is full.");
+    if(v.empty()) Error::Warning("World::NextTeleport: not found.");
 
     return v.size() ? *Rand::Get(v) : index;
 }

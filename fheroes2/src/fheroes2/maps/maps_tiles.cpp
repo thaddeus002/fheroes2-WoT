@@ -1781,9 +1781,9 @@ void Maps::Tiles::UpdateStoneLightsSprite(void)
 	    if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object))
 	    switch(addon.index)
 	    {
-		case 116:	addon.object = 0x11; addon.index = 0; break;
-		case 119:	addon.object = 0x12; addon.index = 0; break;
-		case 122:	addon.object = 0x13; addon.index = 0; break;
+		case 116:	addon.object = 0x11; addon.index = 0; quantity1 = 1; break;
+		case 119:	addon.object = 0x12; addon.index = 0; quantity1 = 2; break;
+		case 122:	addon.object = 0x13; addon.index = 0; quantity1 = 3; break;
 		default: 	break;
 	    }
 	}

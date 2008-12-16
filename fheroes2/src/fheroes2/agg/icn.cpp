@@ -925,7 +925,8 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
     {
 	case TELEPORT1:
 	case TELEPORT2:
-	case TELEPORT3:
+	case TELEPORT3: return start + ticket % 8;
+
 	case FOUNTAIN:
 	case TREASURE:	return start + ticket % 2;
 

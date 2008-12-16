@@ -323,7 +323,8 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
     {
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
-	case ICN::TELEPORT3:
+	case ICN::TELEPORT3: LoadICN(ICN::OBJNMUL2); count = 8; break;
+
 	case ICN::FOUNTAIN:  LoadICN(ICN::OBJNMUL2); count = 2; break;
 
 	case ICN::TREASURE:  LoadICN(ICN::OBJNRSRC); count = 2; break;
@@ -344,7 +345,7 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 	    case ICN::TELEPORT1:
 		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 116));
 		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii));
+		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii / 2));
 		sprite->Unlock();
 		break;
 
