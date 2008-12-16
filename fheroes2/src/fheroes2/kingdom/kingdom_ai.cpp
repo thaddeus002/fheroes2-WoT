@@ -289,7 +289,21 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 	    if(!MP2::isActionObject((*itm1).second, hero.isShipMaster())) continue;
 
 	    if(hero.GetPath().Calculate((*itm1).first))
+	    {
+		u16 pos = 0;
+		// check monster on path
+		if(hero.GetPath().isUnderProtection(pos))
+		{
+		    const Maps::Tiles & tile = world.GetTiles(pos);
+		    Army::army_t enemy;
+		    enemy.At(0).Set(Monster::Monster(tile), tile.GetCountMonster());
+
+		    // can we will win battle
+		    if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy)) continue;
+		}
+
 		objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
+	    }
 	}
 
 	if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);

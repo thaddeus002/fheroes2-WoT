@@ -142,6 +142,31 @@ u16 Army::Troop::Count(void) const
     return count;
 }
 
+u8 Army::Troop::Attack(void) const
+{
+    return Monster::GetStats(monster).attack;
+}
+
+u8 Army::Troop::Defence(void) const
+{
+    return Monster::GetStats(monster).defence;
+}
+
+u32 Army::Troop::HitPoint(void) const
+{
+    return Monster::GetStats(monster).hp * count;
+}
+
+u16 Army::Troop::DamageMin(void) const
+{
+    return Monster::GetStats(monster).damageMin * count;
+}
+
+u16 Army::Troop::DamageMax(void) const
+{
+    return Monster::GetStats(monster).damageMax * count;
+}
+
 bool Army::Troop::isValid(void) const
 {
     return Monster::UNKNOWN > monster && count;
@@ -880,4 +905,93 @@ void Army::army_t::Dump(void) const
     for(; it1 != it2; ++it1) if((*it1).isValid()) std::cout << Monster::String((*it1).Monster()) << "(" << (*it1).Count() << "), ";
 
     std::cout << std::endl;
+}
+
+u16 Army::army_t::Attack(void) const
+{
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    u16 res = 0;
+    u8 count = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).Attack(); ++count; }
+
+    return res / count;
+}
+
+u16 Army::army_t::Defence(void) const
+{
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    u16 res = 0;
+    u8 count = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).Defence(); ++count; }
+
+    return res / count;
+}
+
+u32 Army::army_t::HitPoint(void) const
+{
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    u32 res = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()) res += (*it1).HitPoint();
+
+    return res;
+}
+
+u32 Army::army_t::DamageMin(void) const
+{
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    u32 res = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()) res += (*it1).DamageMin();
+
+    return res;
+}
+
+u32 Army::army_t::DamageMax(void) const
+{
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    u32 res = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()) res += (*it1).DamageMax();
+
+    return res;
+}
+
+// this algorithm
+bool Army::army_t::StrongerEnemyArmy(const army_t & a)
+{
+    u16 a1 = Attack();
+    u16 d1 = Defence();
+    u32 h1 = HitPoint();
+    u32 m1 = DamageMin();
+    u32 x1 = DamageMax();
+    u32 r1 = 0;
+
+    u16 a2 = a.Attack();
+    u16 d2 = a.Defence();
+    u32 h2 = a.HitPoint();
+    u32 m2 = a.DamageMin();
+    u32 x2 = a.DamageMax();
+    u32 r2 = 0;
+
+    // total damage1
+    if(a1 > d2)
+	r1 = static_cast<u32>((m1 + x1) / 2 * (1 + 0.1 * std::min(a1 - d2, 20)));
+    else
+	r1 = static_cast<u32>((m1 + x1) / 2 * (1 + 0.05 * std::min(d2 - a1, 14)));
+
+    // total damage1
+    if(a2 > d1)
+	r2 = static_cast<u32>((m2 + x2) / 2 * (1 + 0.1 * std::min(a2 - d1, 20)));
+    else
+	r2 = static_cast<u32>((m2 + x2) / 2 * (1 + 0.05 * std::min(d1 - a2, 14)));
+
+    return r1 > h2 && r2 < h1;
 }

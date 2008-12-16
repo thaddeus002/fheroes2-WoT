@@ -78,6 +78,12 @@ namespace Army
             Monster::monster_t Monster(void) const;
             u16 	Count(void) const;
 
+	    u8		Attack(void) const;
+	    u8		Defence(void) const;
+	    u32		HitPoint(void) const;
+	    u16		DamageMin(void) const;
+	    u16		DamageMax(void) const;
+
             bool	isValid(void) const;
 	    bool	HasMonster(Monster::monster_t) const;
 
@@ -142,10 +148,17 @@ namespace Army
 	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
 	    u32		CalculateExperience(void) const;
 
+	    u16		Attack(void) const;
+	    u16		Defence(void) const;
+	    u32		HitPoint(void) const;
+	    u32		DamageMin(void) const;
+	    u32		DamageMax(void) const;
+
 	    bool	isValid(void) const;
 	    bool	HasMonster(const Monster::monster_t mon) const;
 	    bool	JoinTroop(const Troop & troop);
 	    bool	JoinTroop(const Monster::monster_t mon, const u16 count);
+	    bool	StrongerEnemyArmy(const army_t &);
 
 	    void	JoinStrongestFromArmy(army_t &);
             void	KeepOnlyWeakestTroops(army_t &);
