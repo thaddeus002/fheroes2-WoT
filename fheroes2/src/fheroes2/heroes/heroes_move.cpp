@@ -379,9 +379,9 @@ void Heroes::RedrawDependencesTiles(void) const
 
 bool Heroes::MoveStep(bool fast)
 {
-    const u16 index_from = GetIndex();
-    const u16 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
-    const u16 index_dst = path.GetDestinationIndex();
+    u16 index_from = GetIndex();
+    u16 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
+    u16 index_dst = path.GetDestinationIndex();
 
     if(fast)
     {
@@ -465,8 +465,20 @@ bool Heroes::MoveStep(bool fast)
 	    SetMove(false);
 	}
 
-	save_maps_general = tiles_to.GetObject();
-	tiles_to.SetObject(MP2::OBJ_HEROES);
+	switch(tiles_to.GetObject())
+	{
+	    case MP2::OBJ_STONELIGHTS:
+	    case MP2::OBJ_WHIRLPOOL:
+		save_maps_general = tiles_to.GetObject();
+		index_to = GetIndex();
+		world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
+		break;
+
+	    default:
+		save_maps_general = tiles_to.GetObject();
+		tiles_to.SetObject(MP2::OBJ_HEROES);
+		break;
+	}
 
 	path.PopFront();
 

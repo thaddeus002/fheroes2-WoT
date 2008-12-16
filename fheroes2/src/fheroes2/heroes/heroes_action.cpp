@@ -1740,16 +1740,8 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
-    Maps::Tiles & tiles_from = world.GetTiles(index_from);
-    Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-    tiles_from.SetObject(MP2::OBJ_STONELIGHTS);
-
-    hero.SaveUnderObject(MP2::OBJ_STONELIGHTS);
     hero.SetCenter(index_to);
     hero.Scoute();
-
-    tiles_to.SetObject(MP2::OBJ_HEROES);
 
     Game::Focus::Get().Redraw();
     Display::Get().Flip();
@@ -1758,9 +1750,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    // check monster
-    u16 dst_index2 = MAXU16;
-    if(Maps::TileUnderProtection(index_to, dst_index2)) hero.Action(dst_index2);
+    if(Settings::Get().Debug()) Error::Verbose("ActionToStoneLights: " + hero.GetName());
 }
 
 void ActionToWhirlpools(Heroes &hero, const u16 index_from)
@@ -1779,16 +1769,8 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
-    Maps::Tiles & tiles_from = world.GetTiles(index_from);
-    Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-    tiles_from.SetObject(MP2::OBJ_WHIRLPOOL);
-
-    hero.SaveUnderObject(MP2::OBJ_WHIRLPOOL);
     hero.SetCenter(index_to);
     hero.Scoute();
-
-    tiles_to.SetObject(MP2::OBJ_HEROES);
 
     Game::Focus::Get().Redraw();
     Display::Get().Flip();
@@ -1805,6 +1787,8 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
 	const u16 c = troops.Count() / 2;
 	troops.SetCount(c ? c : 1);
     }
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToWhirlpools: " + hero.GetName());
 }
 
 void ActionToAbandoneMine(Heroes &hero, const u16 dst_index)
