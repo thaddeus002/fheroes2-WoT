@@ -503,9 +503,9 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJ_RNDMONSTER:            	return "OBJ_RNDMONSTER";
         case MP2::OBJ_RNDULTIMATEARTIFACT:   	return "OBJ_RNDULTIMATEARTIFACT";
         case MP2::OBJ_IDOL:                  	return "Idol";
-        case MP2::OBJ_SHRINE1:               	return "Shrine of Level 1";
-        case MP2::OBJ_SHRINE2:               	return "Shrine of Level 2";
-        case MP2::OBJ_SHRINE3:               	return "Shrine of Level 3";
+        case MP2::OBJ_SHRINE1:               	return "Shrine of the First Circle";
+        case MP2::OBJ_SHRINE2:               	return "Shrine of the Second Circle";
+        case MP2::OBJ_SHRINE3:               	return "Shrine of the Third Circle";
         case MP2::OBJ_WAGON:                 	return "Wagon";
         case MP2::OBJ_LEANTO:                	return "Lean To";
         case MP2::OBJ_FLOTSAM:               	return "Flotsam";
