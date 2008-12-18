@@ -995,7 +995,7 @@ void World::LoadMaps(const std::string &filename)
 
 	    case MP2::OBJ_MONSTER:
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
-		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
+		    tile.SetCountMonster(Monster(tile).GetRNDSize());
 		else
 		    // old format
 		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
@@ -1009,7 +1009,7 @@ void World::LoadMaps(const std::string &filename)
 		// modify rnd monster sprite
 		tile.UpdateRNDMonsterSprite();
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
-		    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
+		    tile.SetCountMonster(Monster(tile).GetRNDSize());
 		else
 		    // old format
 		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
@@ -1036,9 +1036,7 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_CITYDEAD:
 		// initial update dwelling population
 		{
-		    const Monster::monster_t monster = Monster::Monster(tile.GetObject());
-		    if(Monster::UNKNOWN == monster) continue;
-		    tile.SetCountMonster(Monster::GetGrown(monster));
+		    tile.SetCountMonster(Monster(Monster::FromObject(tile.GetObject())).GetGrown());
 		}
 		break;
 
@@ -1660,10 +1658,7 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_PEASANTHUT:
             case MP2::OBJ_THATCHEDHUT:
 	    {
-		const Monster::monster_t monster = Monster::Monster(obj);
-		if(Monster::UNKNOWN == monster) continue;
-
-		tile.SetCountMonster(tile.GetCountMonster() + Monster::GetGrown(monster));
+		tile.SetCountMonster(tile.GetCountMonster() + Monster(Monster::FromObject(obj)).GetGrown());
 		break;
 	    }
 
@@ -1675,10 +1670,7 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_DRAGONCITY:
             case MP2::OBJ_CITYDEAD:
             {
-		const Monster::monster_t monster = Monster::Monster(obj);
-		if(Monster::UNKNOWN == monster) continue;
-
-		if(0 == tile.GetCountMonster()) tile.SetCountMonster(tile.GetCountMonster() + Monster::GetGrown(monster));
+		if(0 == tile.GetCountMonster()) tile.SetCountMonster(tile.GetCountMonster() + Monster(Monster::FromObject(obj)).GetGrown());
         	break;
 	    }
 
@@ -1698,7 +1690,7 @@ void World::UpdateMonsterPopulation(void)
 	const u16 count = tile.GetCountMonster();
 
 	if(0 == count)
-	    tile.SetCountMonster(Monster::GetRNDSize(Monster::Monster(tile)));
+	    tile.SetCountMonster(Monster(tile).GetRNDSize());
 	else
 	    tile.SetCountMonster(count * 8 / 7);
     }

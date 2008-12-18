@@ -116,23 +116,23 @@ void Castle::LoadFromMP2(const void *ptr)
 	++ptr8;
 	
 	// monster1
-	army.At(0).SetMonster(Monster::Monster(*ptr8));
+	army.At(0).SetMonster(Monster::FromInt(*ptr8 + 1));
 	++ptr8;
 
 	// monster2
-	army.At(1).SetMonster(Monster::Monster(*ptr8));
+	army.At(1).SetMonster(Monster::FromInt(*ptr8 + 1));
 	++ptr8;
 
 	// monster3
-	army.At(2).SetMonster(Monster::Monster(*ptr8));
+	army.At(2).SetMonster(Monster::FromInt(*ptr8 + 1));
 	++ptr8;
 
 	// monster4
-	army.At(3).SetMonster(Monster::Monster(*ptr8));
+	army.At(3).SetMonster(Monster::FromInt(*ptr8 + 1));
 	++ptr8;
 
 	// monster5
-	army.At(4).SetMonster(Monster::Monster(*ptr8));
+	army.At(4).SetMonster(Monster::FromInt(*ptr8 + 1));
 	++ptr8;
 
 	// count1
@@ -207,18 +207,18 @@ void Castle::LoadFromMP2(const void *ptr)
     // troops auto pack
     if(!custom_troops)
     {
-	const Monster::stats_t mon1 = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER1));
-	const Monster::stats_t mon2 = Monster::GetStats(Monster::Monster(race, Castle::DWELLING_MONSTER2));
+	const Monster mon1(race, Castle::DWELLING_MONSTER1);
+	const Monster mon2(race, Castle::DWELLING_MONSTER2);
 
 	switch(Settings::Get().GameDifficulty())
 	{
     	    case Difficulty::EASY:
-        	army.At(0).Set(mon1.monster, mon1.grown * 2);
-        	army.At(1).Set(mon2.monster, mon2.grown * 2);
+        	army.At(0).Set(mon1, mon1.GetGrown() * 2);
+        	army.At(1).Set(mon2, mon2.GetGrown() * 2);
         	break;
 
     	    case Difficulty::NORMAL:
-        	army.At(0).Set(mon1.monster, mon1.grown);
+        	army.At(0).Set(mon1, mon1.GetGrown());
         	break;
 
     	    case Difficulty::HARD:
@@ -228,18 +228,18 @@ void Castle::LoadFromMP2(const void *ptr)
 	}
     }
     // dwelling pack
-    if(building & DWELLING_MONSTER1) dwelling[0]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1));
-    if(building & DWELLING_MONSTER2) dwelling[1]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2));
-    if(building & DWELLING_UPGRADE2) dwelling[1]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE2));
-    if(building & DWELLING_MONSTER3) dwelling[2]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3));
-    if(building & DWELLING_UPGRADE3) dwelling[2]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE3));
-    if(building & DWELLING_MONSTER4) dwelling[3]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4));
-    if(building & DWELLING_UPGRADE4) dwelling[3]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE4));
-    if(building & DWELLING_MONSTER5) dwelling[4]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5));
-    if(building & DWELLING_UPGRADE5) dwelling[4]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE5));
-    if(building & DWELLING_MONSTER6) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6));
-    if(building & DWELLING_UPGRADE6) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE6));
-    if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7));
+    if(building & DWELLING_MONSTER1) dwelling[0]  = Monster(race, DWELLING_MONSTER1).GetGrown();
+    if(building & DWELLING_MONSTER2) dwelling[1]  = Monster(race, DWELLING_MONSTER2).GetGrown();
+    if(building & DWELLING_UPGRADE2) dwelling[1]  = Monster(race, DWELLING_UPGRADE2).GetGrown();
+    if(building & DWELLING_MONSTER3) dwelling[2]  = Monster(race, DWELLING_MONSTER3).GetGrown();
+    if(building & DWELLING_UPGRADE3) dwelling[2]  = Monster(race, DWELLING_UPGRADE3).GetGrown();
+    if(building & DWELLING_MONSTER4) dwelling[3]  = Monster(race, DWELLING_MONSTER4).GetGrown();
+    if(building & DWELLING_UPGRADE4) dwelling[3]  = Monster(race, DWELLING_UPGRADE4).GetGrown();
+    if(building & DWELLING_MONSTER5) dwelling[4]  = Monster(race, DWELLING_MONSTER5).GetGrown();
+    if(building & DWELLING_UPGRADE5) dwelling[4]  = Monster(race, DWELLING_UPGRADE5).GetGrown();
+    if(building & DWELLING_MONSTER6) dwelling[5]  = Monster(race, DWELLING_MONSTER6).GetGrown();
+    if(building & DWELLING_UPGRADE6) dwelling[5]  = Monster(race, DWELLING_UPGRADE6).GetGrown();
+    if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster(race, DWELLING_UPGRADE7).GetGrown();
 
     // MageGuild
     if(building & BUILD_MAGEGUILD1) mageguild.BuildNextLevel();
@@ -267,7 +267,7 @@ void Castle::LoadFromMP2(const void *ptr)
     	building &= ~BUILD_TAVERN;
 
     // end
-    if(H2Config::Debug()) Error::Verbose((building & BUILD_CASTLE ? "Castle::LoadFromMP2: castle: " : "Castle::LoadFromMP2: town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
+    if(Settings::Get().Debug()) Error::Verbose((building & BUILD_CASTLE ? "Castle::LoadFromMP2: castle: " : "Castle::LoadFromMP2: town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
 void Castle::SetModes(flags_t f)
@@ -312,29 +312,29 @@ void Castle::ActionNewWeek(void)
     u8 wel2 = building & BUILD_WEL2 ? GROWN_WEL2 : 0;
 
     // dw 1
-    if(building & DWELLING_MONSTER1) dwelling[0]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)) + well + wel2;
+    if(building & DWELLING_MONSTER1) dwelling[0]  += Monster(race, DWELLING_MONSTER1).GetGrown() + well + wel2;
     // dw 2
-    if(building & DWELLING_UPGRADE2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE2)) + well;
+    if(building & DWELLING_UPGRADE2) dwelling[1]  += Monster(race, DWELLING_UPGRADE2).GetGrown() + well;
     else
-    if(building & DWELLING_MONSTER2) dwelling[1]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)) + well;
+    if(building & DWELLING_MONSTER2) dwelling[1]  += Monster(race, DWELLING_MONSTER2).GetGrown() + well;
     // dw 3
-    if(building & DWELLING_UPGRADE3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE3)) + well;
+    if(building & DWELLING_UPGRADE3) dwelling[2]  += Monster(race, DWELLING_UPGRADE3).GetGrown() + well;
     else
-    if(building & DWELLING_MONSTER3) dwelling[2]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)) + well;
+    if(building & DWELLING_MONSTER3) dwelling[2]  += Monster(race, DWELLING_MONSTER3).GetGrown() + well;
     // dw 4
-    if(building & DWELLING_UPGRADE4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE4)) + well;
+    if(building & DWELLING_UPGRADE4) dwelling[3]  += Monster(race, DWELLING_UPGRADE4).GetGrown() + well;
     else
-    if(building & DWELLING_MONSTER4) dwelling[3]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4)) + well;
+    if(building & DWELLING_MONSTER4) dwelling[3]  += Monster(race, DWELLING_MONSTER4).GetGrown() + well;
     // dw 5
-    if(building & DWELLING_UPGRADE5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE5)) + well;
+    if(building & DWELLING_UPGRADE5) dwelling[4]  += Monster(race, DWELLING_UPGRADE5).GetGrown() + well;
     else
-    if(building & DWELLING_MONSTER5) dwelling[4]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5)) + well;
+    if(building & DWELLING_MONSTER5) dwelling[4]  += Monster(race, DWELLING_MONSTER5).GetGrown() + well;
     // dw 6
-    if(building & DWELLING_UPGRADE7) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE7)) + well;
+    if(building & DWELLING_UPGRADE7) dwelling[5]  += Monster(race, DWELLING_UPGRADE7).GetGrown() + well;
     else
-    if(building & DWELLING_UPGRADE6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_UPGRADE6)) + well;
+    if(building & DWELLING_UPGRADE6) dwelling[5]  += Monster(race, DWELLING_UPGRADE6).GetGrown() + well;
     else
-    if(building & DWELLING_MONSTER6) dwelling[5]  += Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6)) + well;
+    if(building & DWELLING_MONSTER6) dwelling[5]  += Monster(race, DWELLING_MONSTER6).GetGrown() + well;
 }
 
 void Castle::ActionNewMonth(void)
@@ -564,34 +564,34 @@ void Castle::RecruitHero(const Heroes::heroes_t hero)
 /* recruit monster from building to castle army */
 bool Castle::RecruitMonster(building_t dw, u16 count)
 {
-    Monster::monster_t ms = Monster::UNKNOWN;
+    Monster ms;
 
     u8 dw_index = 0;
 
     switch(dw)
     {
 	case DWELLING_MONSTER1:
-	    ms = Monster::Monster(race, DWELLING_MONSTER1);
+	    ms = Monster(race, DWELLING_MONSTER1);
 	    dw_index = 0;
 	    break;
 	case DWELLING_MONSTER2:
-	    ms = Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2);
+	    ms = Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2);
 	    dw_index = 1;
 	    break;
 	case DWELLING_MONSTER3:
-	    ms = Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3);
+	    ms = Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3);
 	    dw_index = 2;
 	    break;
 	case DWELLING_MONSTER4:
-	    ms = Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4);
+	    ms = Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4);
 	    dw_index = 3;
 	    break;
 	case DWELLING_MONSTER5:
-	    ms = Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5);
+	    ms = Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5);
 	    dw_index = 4;
 	    break;
 	case DWELLING_MONSTER6:
-	    ms = Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6));
+	    ms = Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6));
 	    dw_index = 5;
 	    break;	
 	default: return false;
@@ -601,7 +601,7 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
     if(dwelling[dw_index] < count) count = dwelling[dw_index];
 
     // buy
-    const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms) * count);
+    const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms()) * count);
     Kingdom & kingdom = world.GetKingdom(color);
 
     if(! kingdom.AllowPayment(paymentCosts) || !army.JoinTroop(ms, count)) return false;
@@ -609,7 +609,7 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
     kingdom.OddFundsResource(paymentCosts);
     dwelling[dw_index] -= count;
 
-    if(H2Config::Debug()) Error::Verbose("Castle::RecruitMonster: " + name);
+    if(Settings::Get().Debug()) Error::Verbose("Castle::RecruitMonster: " + name);
     return true;
 }
 
@@ -992,19 +992,19 @@ void Castle::BuyBuilding(building_t build)
             // build library
             case BUILD_SPEC: if(Race::WZRD == race) mageguild.UpgradeExt(); break;
 
-	    case DWELLING_MONSTER1: dwelling[0] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER1)); break;
-	    case DWELLING_MONSTER2: dwelling[1] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER2)); break;
-	    case DWELLING_MONSTER3: dwelling[2] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER3)); break;
-	    case DWELLING_MONSTER4: dwelling[3] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER4)); break;
-	    case DWELLING_MONSTER5: dwelling[4] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER5)); break;
-	    case DWELLING_MONSTER6: dwelling[5] = Monster::GetGrown(Monster::Monster(race, DWELLING_MONSTER6)); break;
+	    case DWELLING_MONSTER1: dwelling[0] = Monster(race, DWELLING_MONSTER1).GetGrown(); break;
+	    case DWELLING_MONSTER2: dwelling[1] = Monster(race, DWELLING_MONSTER2).GetGrown(); break;
+	    case DWELLING_MONSTER3: dwelling[2] = Monster(race, DWELLING_MONSTER3).GetGrown(); break;
+	    case DWELLING_MONSTER4: dwelling[3] = Monster(race, DWELLING_MONSTER4).GetGrown(); break;
+	    case DWELLING_MONSTER5: dwelling[4] = Monster(race, DWELLING_MONSTER5).GetGrown(); break;
+	    case DWELLING_MONSTER6: dwelling[5] = Monster(race, DWELLING_MONSTER6).GetGrown(); break;
 	    default: break;
 	}
 
 	// disable day build
 	ResetModes(ALLOWBUILD);
 	
-	if(H2Config::Debug()) Error::Verbose("Castle::BuyBuilding: " + name + " build " + GetStringBuilding(build, race));
+	if(Settings::Get().Debug()) Error::Verbose("Castle::BuyBuilding: " + name + " build " + GetStringBuilding(build, race));
 }
 
 /* draw image castle to position */

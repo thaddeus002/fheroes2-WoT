@@ -167,7 +167,7 @@ void SelectArmyBar::Redraw(Surface & display)
             if(flags & FLAGS_USEMONS32)
 		display.Blit(*background, pt);
 	    else
-	    switch(Monster::GetRace(troop.Monster()))
+	    switch(troop.GetRace())
             {
                 case Race::KNGT: display.Blit(AGG::GetICN(ICN::STRIP, 4), pt);  break;
                 case Race::BARB: display.Blit(AGG::GetICN(ICN::STRIP, 5), pt);  break;
@@ -178,8 +178,8 @@ void SelectArmyBar::Redraw(Surface & display)
                 default: display.Blit(AGG::GetICN(ICN::STRIP, 10), pt); break;
             }
 
-	    const Sprite & spmonh = AGG::GetICN(Monster::GetStats(troop.Monster()).monh_icn, 0);
-	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.Monster());
+	    const Sprite & spmonh = AGG::GetICN(troop.ICNMonh(), 0);
+	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
 
             if(flags & FLAGS_USEMONS32)
 	    {
@@ -253,13 +253,13 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	    if(index1 == index2)
 	    {
 		u16 flags = (bar.ReadOnly() || bar.SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
-		PaymentConditions::UpgradeMonster payment(troop1.Monster());
+		PaymentConditions::UpgradeMonster payment(troop1());
 		payment *= troop1.Count();
 
-		if(Monster::AllowUpgrade(troop1.Monster()) &&
+		if(troop1.isAllowUpgrade() &&
 		    bar.castle &&
-		    bar.castle->GetRace() == Monster::GetRace(troop1.Monster()) &&
-		    bar.castle->isBuild(Monster::Dwelling(Monster::Upgrade(troop1.Monster()))) &&
+		    bar.castle->GetRace() == troop1.GetRace() &&
+		    bar.castle->isBuild(Monster::GetDwelling(Monster::Upgrade(troop1))) &&
 		    payment <= world.GetMyKingdom().GetFundsResource())
 		    flags |= Dialog::UPGRADE;
 
@@ -267,7 +267,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 		{
             	    case Dialog::UPGRADE:
             		world.GetMyKingdom().OddFundsResource(payment);
-            		troop1.UpgradeMonster();
+            		troop1.Upgrade();
 			change = true;
             	    break;
 
@@ -281,7 +281,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	    }
 	    else
 	    // combine
-	    if(troop1.Monster() == troop2.Monster())
+	    if(troop1() == troop2())
 	    {
 		troop1.SetCount(troop1.Count() + troop2.Count());
 		troop2.Reset();
@@ -317,7 +317,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 
 	    if(redistr_count)
 	    {
-		troop1.Set(troop2.Monster(), redistr_count);
+		troop1.Set(troop2, redistr_count);
 		troop2.SetCount(troop2.Count() - redistr_count);
 	    }
 
@@ -360,7 +360,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	if(le.MouseClickLeft(bar2.GetArea()))
 	{
 	    // combine
-	    if(!bar1.SaveLastTroop() && troop1.Monster() == troop2.Monster())
+	    if(!bar1.SaveLastTroop() && troop1() == troop2())
 	    {
 		troop1.SetCount(troop1.Count() + troop2.Count());
 		troop2.Reset();
@@ -397,7 +397,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 
 		if(redistr_count)
 		{
-		    troop1.Set(troop2.Monster(), redistr_count);
+		    troop1.Set(troop2, redistr_count);
 		    troop2.SetCount(troop2.Count() - redistr_count);
 		}
 
@@ -428,7 +428,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	if(le.MouseClickLeft(bar1.GetArea()))
 	{
 	    // combine
-	    if(!bar2.SaveLastTroop() && troop1.Monster() == troop2.Monster())
+	    if(!bar2.SaveLastTroop() && troop1() == troop2())
 	    {
 		troop1.SetCount(troop1.Count() + troop2.Count());
 		troop2.Reset();
@@ -465,7 +465,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 
 		if(redistr_count)
 		{
-		    troop1.Set(troop2.Monster(), redistr_count);
+		    troop1.Set(troop2, redistr_count);
 		    troop2.SetCount(troop2.Count() - redistr_count);
 		}
 

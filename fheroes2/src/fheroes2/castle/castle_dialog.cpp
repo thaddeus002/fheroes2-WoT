@@ -627,7 +627,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	// left click dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MouseClickLeft(coordDwellingMonster1) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
-		Monster::Monster(race, DWELLING_MONSTER1), dwelling[0])))
+		Monster(race, DWELLING_MONSTER1), dwelling[0])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -642,7 +642,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & DWELLING_MONSTER2 && le.MouseClickLeft(coordDwellingMonster2) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
-		Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
+		Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -657,7 +657,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & DWELLING_MONSTER3 && le.MouseClickLeft(coordDwellingMonster3) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
-		Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
+		Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -672,7 +672,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & DWELLING_MONSTER4 && le.MouseClickLeft(coordDwellingMonster4) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
-		Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
+		Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -687,7 +687,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & DWELLING_MONSTER5 && le.MouseClickLeft(coordDwellingMonster5) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
-		Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
+		Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -702,7 +702,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	if(building & DWELLING_MONSTER6 && le.MouseClickLeft(coordDwellingMonster6) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
-	    Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
+	    Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -746,22 +746,22 @@ Dialog::answer_t Castle::OpenDialog(void)
 	else
 	// right press dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1))
-	    Dialog::DwellingInfo(Monster::Monster(race, DWELLING_MONSTER1), dwelling[0]);
+	    Dialog::DwellingInfo(Monster(race, DWELLING_MONSTER1), dwelling[0]);
 	else
 	if(building & DWELLING_MONSTER2 && le.MousePressRight(coordDwellingMonster2))
-	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1]);
+	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1]);
 	else
 	if(building & DWELLING_MONSTER3 && le.MousePressRight(coordDwellingMonster3))
-	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2]);
+	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2]);
 	else
 	if(building & DWELLING_MONSTER4 && le.MousePressRight(coordDwellingMonster4))
-	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3]);
+	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3]);
 	else
 	if(building & DWELLING_MONSTER5 && le.MousePressRight(coordDwellingMonster5))
-	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4]);
+	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4]);
 	else
 	if(building & DWELLING_MONSTER6 && le.MousePressRight(coordDwellingMonster6))
-	    Dialog::DwellingInfo(Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5]);
+	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5]);
 
 	// status message exit
 	if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(isCastle() ? "Exit castle" : "Exit town");
@@ -812,17 +812,17 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(building & BUILD_MAGEGUILD1 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD1, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD1));
 	else
 	// dwelling monster
-	if(building & DWELLING_MONSTER1 && le.MouseCursor(coordDwellingMonster1)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_MONSTER1)));
+	if(building & DWELLING_MONSTER1 && le.MouseCursor(coordDwellingMonster1)) statusBar.ShowMessage(Monster(race, DWELLING_MONSTER1).GetName());
 	else
-	if(building & DWELLING_MONSTER2 && le.MouseCursor(coordDwellingMonster2)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE2 & building ? DWELLING_UPGRADE2 : DWELLING_MONSTER2)));
+	if(building & DWELLING_MONSTER2 && le.MouseCursor(coordDwellingMonster2)) statusBar.ShowMessage(Monster(race, DWELLING_UPGRADE2 & building ? DWELLING_UPGRADE2 : DWELLING_MONSTER2).GetName());
 	else
-	if(building & DWELLING_MONSTER3 && le.MouseCursor(coordDwellingMonster3)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE3 & building ? DWELLING_UPGRADE3 : DWELLING_MONSTER3)));
+	if(building & DWELLING_MONSTER3 && le.MouseCursor(coordDwellingMonster3)) statusBar.ShowMessage(Monster(race, DWELLING_UPGRADE3 & building ? DWELLING_UPGRADE3 : DWELLING_MONSTER3).GetName());
 	else
-	if(building & DWELLING_MONSTER4 && le.MouseCursor(coordDwellingMonster4)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE4 & building ? DWELLING_UPGRADE4 : DWELLING_MONSTER4)));
+	if(building & DWELLING_MONSTER4 && le.MouseCursor(coordDwellingMonster4)) statusBar.ShowMessage(Monster(race, DWELLING_UPGRADE4 & building ? DWELLING_UPGRADE4 : DWELLING_MONSTER4).GetName());
 	else
-	if(building & DWELLING_MONSTER5 && le.MouseCursor(coordDwellingMonster5)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE5 & building ? DWELLING_UPGRADE5 : DWELLING_MONSTER5)));
+	if(building & DWELLING_MONSTER5 && le.MouseCursor(coordDwellingMonster5)) statusBar.ShowMessage(Monster(race, DWELLING_UPGRADE5 & building ? DWELLING_UPGRADE5 : DWELLING_MONSTER5).GetName());
 	else
-	if(building & DWELLING_MONSTER6 && le.MouseCursor(coordDwellingMonster6)) statusBar.ShowMessage(Monster::String(Monster::Monster(race, DWELLING_UPGRADE6 & building ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)));
+	if(building & DWELLING_MONSTER6 && le.MouseCursor(coordDwellingMonster6)) statusBar.ShowMessage(Monster(race, DWELLING_UPGRADE6 & building ? DWELLING_UPGRADE6 : DWELLING_MONSTER6).GetName());
 	else
 	// status message over castle troops
 	if(le.MouseCursor(selectCaptainArmy.GetArea()))
@@ -831,19 +831,19 @@ Dialog::answer_t Castle::OpenDialog(void)
             if(0 <= index1)
             {
 		const Army::Troop & troop1 = army.At(index1);
-		const std::string & monster1 = Monster::String(troop1.Monster());
+		const std::string & monster1 = troop1.GetName();
 
 		if(selectCaptainArmy.isSelected())
 		{
 		    const u8 index2 = selectCaptainArmy.Selected();
 		    const Army::Troop & troop2 = army.At(index2);
-		    const std::string & monster2 = Monster::String(troop2.Monster());
+		    const std::string & monster2 = troop2.GetName();
 
 		    if(index1 == index2)
 			statusBar.ShowMessage("View " + monster1);
 		    else
 		    if(troop1.isValid() && troop2.isValid())
-			troop1.Monster() == troop2.Monster() ?
+			troop1() == troop2() ?
 			statusBar.ShowMessage("Combine " + monster1 + " armies") :
 			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
 		    else
@@ -854,13 +854,13 @@ Dialog::answer_t Castle::OpenDialog(void)
 		{
 		    const u8 index2 = selectHeroesArmy.Selected();
 		    const Army::Troop & troop2 = castle_heroes->GetArmy().At(index2);
-		    const std::string & monster2 = Monster::String(troop2.Monster());
+		    const std::string & monster2 = troop2.GetName();
 
 		    if(selectHeroesArmy.SaveLastTroop() && !troop1.isValid())
 			statusBar.ShowMessage("Cannot move last army to garrison");
 		    else
 		    if(troop1.isValid() && troop2.isValid())
-			troop1.Monster() == troop2.Monster() ?
+			troop1() == troop2() ?
 			statusBar.ShowMessage("Combine " + monster1 + " armies") :
 			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
 		    else
@@ -881,19 +881,19 @@ Dialog::answer_t Castle::OpenDialog(void)
             if(0 <= index1)
             {
 		const Army::Troop & troop1 = castle_heroes->GetArmy().At(index1);
-		const std::string & monster1 = Monster::String(troop1.Monster());
+		const std::string & monster1 = troop1.GetName();
 
 		if(selectHeroesArmy.isSelected())
 		{
 		    const u8 index2 = selectHeroesArmy.Selected();
 		    const Army::Troop & troop2 = castle_heroes->GetArmy().At(index2);
-		    const std::string & monster2 = Monster::String(troop2.Monster());
+		    const std::string & monster2 = troop2.GetName();
 
 		    if(index1 == index2)
 			statusBar.ShowMessage("View " + monster1);
 		    else
 		    if(troop1.isValid() && troop2.isValid())
-			troop1.Monster() == troop2.Monster() ?
+			troop1() == troop2() ?
 			statusBar.ShowMessage("Combine " + monster1 + " armies") :
 			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
 		    else
@@ -904,10 +904,10 @@ Dialog::answer_t Castle::OpenDialog(void)
 		{
 		    const u8 index2 = selectCaptainArmy.Selected();
 		    const Army::Troop & troop2 = army.At(index2);
-		    const std::string & monster2 = Monster::String(troop2.Monster());
+		    const std::string & monster2 = troop2.GetName();
 
 		    if(troop1.isValid() && troop2.isValid())
-			troop1.Monster() == troop2.Monster() ?
+			troop1() == troop2() ?
 			statusBar.ShowMessage("Combine " + monster1 + " armies") :
 			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
 		    else

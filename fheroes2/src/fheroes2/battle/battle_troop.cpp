@@ -27,7 +27,7 @@ Army::BattleTroop::BattleTroop(const Troop &t)
 {
 }
 
-Army::BattleTroop::BattleTroop(Monster::monster_t m, u16 c)
+Army::BattleTroop::BattleTroop(monster_t m, u16 c)
 : Troop(m, c)
 , attackRanged(false)
 , summoned(false)
@@ -62,9 +62,9 @@ Army::BattleTroop & Army::BattleTroop::operator= (const Army::BattleTroop & troo
     hp = troop.hp;
     oldcount = troop.oldcount;
     summoned = troop.summoned;
-    monster = troop.Monster();
-    count = troop.Count();
-    pos = troop.Position();
+    id = troop.id;
+    count = troop.count;
+    pos = troop.pos;
     reflect = troop.reflect;
     origReflect = troop.origReflect;
 
@@ -81,7 +81,7 @@ void Army::BattleTroop::BlitR(const Point& dst_pt, bool reflect, int frame)
 {
     Display & display = Display::Get();
     if(saved) bg.Restore();
-    const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
+    const Sprite & sp = AGG::GetICN(ICNFile(), frame<0 ? aframe : frame, reflect);
     saved = true;
     Point p(dst_pt.x + (reflect ? -sp.w()-sp.x() : sp.x()), dst_pt.y + sp.y());
     bg.Save(p.x, p.y, sp.w(), sp.h());
@@ -91,34 +91,34 @@ void Army::BattleTroop::BlitR(const Point& dst_pt, bool reflect, int frame)
 void Army::BattleTroop::Blit(const Point& dst_pt, bool reflect, int frame)
 {
     Display & display = Display::Get();
-    const Sprite & sp = AGG::GetICN(Monster::GetStats(monster).file_icn, frame<0 ? aframe : frame, reflect);
+    const Sprite & sp = AGG::GetICN(ICNFile(), frame<0 ? aframe : frame, reflect);
     saved = true;
     Point p(dst_pt.x + (reflect ? -sp.w()-sp.x() : sp.x()), dst_pt.y + sp.y());
     bg.Save(p.x, p.y, sp.w(), sp.h());
     display.Blit(sp, p);
 }
 
-void Army::BattleTroop::Animate(Monster::animstate_t as)
+void Army::BattleTroop::Animate(u8 as)
 {
-    bool ranged = attackRanged && Monster::GetStats(monster).miss_icn != ICN::UNKNOWN;
+    bool ranged = attackRanged && isArchers();
     u8 start, count;
-    if(as != Monster::AS_NONE) {
+    if(as != AS_NONE) {
 	astate = as;
-	Monster::GetAnimFrames(monster, as & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : as, start, count, ranged);
+	GetAnimFrames(as & AS_ATTPREP ? AS_ATTPREP : as, start, count, ranged);
 	aframe = start;
     } else {
-	Monster::GetAnimFrames(monster, astate & Monster::AS_ATTPREP ? Monster::AS_ATTPREP : astate, start, count, ranged);
+	GetAnimFrames(astate & AS_ATTPREP ? AS_ATTPREP : astate, start, count, ranged);
 	aframe++;
 	if(aframe >= start+count) {
-            if(astate == Monster::AS_DIE) {
+            if(astate == AS_DIE) {
 		aframe --;
-            } else if(astate & Monster::AS_ATTPREP) {
-		astate = (Monster::animstate_t)(astate & ~Monster::AS_ATTPREP);
-		Monster::GetAnimFrames(monster, astate, start, count, ranged);
+            } else if(astate & AS_ATTPREP) {
+		astate = astate & ~AS_ATTPREP;
+		GetAnimFrames(astate, start, count, ranged);
 		aframe = start;
 	    } else {
-		astate = Monster::AS_NONE;
-		Monster::GetAnimFrames(monster, astate, start, count, ranged);
+		astate = AS_NONE;
+		GetAnimFrames(astate, start, count, ranged);
 		aframe = start;
 	    }
 	}
@@ -131,7 +131,7 @@ int Army::BattleTroop::ApplyDamage(int damage)
     while(damage >= hp)
     {
         damage -= hp;
-        hp = Monster::GetStats(monster).hp;
+        hp = Monster::GetHitPoints();
         count--;
         perished++;
         if(!count)

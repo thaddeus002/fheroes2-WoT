@@ -25,6 +25,7 @@
 #include "castle.h"
 #include "settings.h"
 #include "agg.h"
+#include "speed.h"
 #include "monster.h"
 #include "payment.h"
 #include "cursor.h"
@@ -248,8 +249,9 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    break;
 
     	case SANDYSANDY:
-	    army.At(0).Set(Monster::BLACK_DRAGON, 2);
-    	    army.At(1).Set(Monster::RED_DRAGON, 3);
+	    army.Clear();
+	    army.JoinTroop(Monster::BLACK_DRAGON, 2);
+    	    army.JoinTroop(Monster::RED_DRAGON, 3);
 
 	    secondary_skills.clear();
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::BASIC));
@@ -296,23 +298,23 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
         ++ptr8;
 
         // monster1
-        army.At(0).SetMonster(Monster::Monster(*ptr8));
+        army.At(0).SetMonster(Monster::FromInt(*ptr8 + 1));
         ++ptr8;
 
         // monster2
-        army.At(1).SetMonster(Monster::Monster(*ptr8));
+        army.At(1).SetMonster(Monster::FromInt(*ptr8 + 1));
         ++ptr8;
 
         // monster3
-        army.At(2).SetMonster(Monster::Monster(*ptr8));
+        army.At(2).SetMonster(Monster::FromInt(*ptr8 + 1));
         ++ptr8;
 
         // monster4
-        army.At(3).SetMonster(Monster::Monster(*ptr8));
+        army.At(3).SetMonster(Monster::FromInt(*ptr8 + 1));
         ++ptr8;
 
         // monster5
-        army.At(4).SetMonster(Monster::Monster(*ptr8));
+        army.At(4).SetMonster(Monster::FromInt(*ptr8 + 1));
         ++ptr8;
 
         // count1
@@ -726,7 +728,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     }
     else
     {
-    	switch(Monster::GetStats(army.GetSlowestTroop().Monster()).speed)
+    	switch(army.GetSlowestTroop().GetSpeed())
 	{
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;

@@ -30,6 +30,7 @@
 #include "cursor.h"
 #include "settings.h"
 #include "portrait.h"
+#include "speed.h"
 #include "spell.h"
 #include "castle.h"
 #include "heroes.h"
@@ -101,11 +102,11 @@ namespace Army {
     void BattleSummaryVsHero(Heroes &hero, const Army::BattleArmy_t &heroOrig, Heroes &hero2, const Army::BattleArmy_t &hero2Orig, Army::battle_t status);
     
     bool DangerousUnitPredicate(Army::BattleTroop first, Army::BattleTroop second);
-    bool AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack);
-    bool AttackRangedTroop(const Monster::stats_t &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack);
+    bool AttackNonRangedTroop(const Monster &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack);
+    bool AttackRangedTroop(const Monster &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack);
     bool AttackTroopInList(const Army::BattleArmy_t &troop, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack);
     void MoveToClosestTroopInList(const Army::BattleArmy_t &troop, const Army::BattleTroop &myTroop, Point &move);
-    void MoveOrAttack(const Monster::stats_t &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack, bool rangedFirst);
+    void MoveOrAttack(const Monster &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack, bool rangedFirst);
     
     void GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::BattleTroop &attacker, const Point &attack, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2);
     
@@ -161,8 +162,7 @@ namespace Army {
     bool BadMorale(Heroes *hero, const Army::BattleTroop &troop);
     int CheckLuck(Heroes *hero, const Army::BattleTroop &troop);
     bool CanRetaliate(const Army::BattleTroop &attacker, const Army::BattleTroop &defender);
-    bool CanAttackTwice(Monster::monster_t attacker);
-    int AdjustDamage(Monster::monster_t attacker, Monster::monster_t defender, int damage, bool ranged);
+    int AdjustDamage(Monster & attacker, Monster & defender, int damage, bool ranged);
 
     void Temp(int, int, Point);
 }
@@ -265,7 +265,7 @@ void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArm
         int delta = orig[i].Count() - current[i].Count();
         if(!orig[i].isValid() || delta <= 0)
             continue;
-        const Sprite &monster = AGG::GetICN(ICN::MONS32, orig[i].Monster());
+        const Sprite &monster = AGG::GetICN(ICN::MONS32, orig[i].GetSpriteIndex());
         killed.push_back(std::make_pair(&monster, delta));
         width += monster.w() + 10;
         height = std::max(height, monster.h());
@@ -543,7 +543,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &basic
 	    for(unsigned int i=0; i < army1.size(); i++) {
                 bool attackerAlive = true;
 		goodmorale = false;
-		if(Monster::GetStats(army1[i].Monster()).speed == cursp && army1[i].Count() > 0 && !BadMorale(hero1, army1[i])) do {
+		if(army1[i].GetSpeed() == cursp && army1[i].Count() > 0 && !BadMorale(hero1, army1[i])) do {
                   redoturn:
 		    battle_t s;
 		    if(hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::LOCAL && !O_AUTO) {
@@ -566,7 +566,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &basic
                         }
 		    }
                     bool defenderAlive = true;
-                    int repeat = CanAttackTwice(army1[i].Monster()) ? 1 : 0;
+                    int repeat = army1[i].isTwiceAttack() ? 1 : 0;
                     do
                     {
                         //Perform the attack
@@ -589,7 +589,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &basic
 	    for(unsigned int i=0; i < army2.size(); i++) {
 		goodmorale = false;
                 bool attackerAlive = true;
-		if(Monster::GetStats(army2[i].Monster()).speed == cursp && army2[i].Count() > 0 && !BadMorale(hero2, army2[i])) do {
+		if(army2[i].GetSpeed() == cursp && army2[i].Count() > 0 && !BadMorale(hero2, army2[i])) do {
 		    battle_t s;
 		    if(hero2 && world.GetKingdom(hero2->GetColor()).Control() == Game::LOCAL && !O_AUTO) {
 			s = HumanTurn(hero1, hero2, army1, army2, tile, -i-1, move, attack);
@@ -609,7 +609,7 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &basic
                         }
 		    }
                     bool defenderAlive = true;
-                    int repeat = CanAttackTwice(army2[i].Monster()) ? 1 : 0;
+                    int repeat = army2[i].isTwiceAttack() ? 1 : 0;
                     do
                     {
                         //Perform the attack
@@ -698,7 +698,6 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
         return WIN;
     
     Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
-    const Monster::stats_t &myMonster = Monster::GetStats(myTroop.Monster());
     PrepMovePoints(troopN, army1, army2);
     bool close = false;
     for(u16 j=0; j<enemyArmy.size(); j++) {
@@ -758,7 +757,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
             for(u16 i = 0; i < army1.size(); i++)
             {
                 army1[i].SetReflect(!army1[i].IsReflected());
-                if(army1[i].IsWide() && army1[i].WasReflected() != army1[i].IsReflected())
+                if(army1[i].isWide() && army1[i].WasReflected() != army1[i].IsReflected())
                     army1[i].SetPosition(army1[i].Position() + Point( army1[i].WasReflected() ? -1 : 1, 0 ));
             }
         }
@@ -780,7 +779,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
                     DrawShadow(cur_pt);
             }
 	    DrawMark(myTroop.Position(), 1);
-	    if(myMonster.wide) {
+	    if(myTroop.isWide()) {
 		Point p = myTroop.Position();
 		p.x += myTroop.IsReflected() ? -1 : 1;
 		DrawMark(p);
@@ -848,7 +847,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 		// cursor on the battle field
 		if(t = FindTroop(myArmy, cur_pt), t >= 0 && myArmy[t].Count() > 0) {
 		    // troop from my army
-		    statusBar2->ShowMessage(tr("battle.monster_info").sub(Monster::String(myArmy[t].Monster())));
+		    statusBar2->ShowMessage(tr("battle.monster_info").sub(myArmy[t].GetName()));
 		    cursor.SetThemes(cursor.WAR_INFO);
 		    if(click) {
 			cursor.SetThemes(cursor.POINTER); 
@@ -861,7 +860,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 		    // enemy troop
 		    int mp;
 		    if(myTroop.shots > 0 && !close) {
-                        std::string str = tr("battle.shoot_monster").sub(Monster::String(enemyArmy[t].Monster())).sub(myTroop.shots);
+                        std::string str = tr("battle.shoot_monster").sub(enemyArmy[t].GetName()).sub(myTroop.shots);
 			statusBar2->ShowMessage(str);
 			cursor.SetThemes(cursor.WAR_ARROW);
 			if(click) {
@@ -871,7 +870,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 			    Dialog::ArmyInfo(enemyArmy[t], Dialog::BATTLE);
 			}
 		    } else if(mp = CanAttack(myTroop, movePoints, enemyArmy[t], le.MouseCursor()-(Bf2Scr(cur_pt)+dst_pt)), mp >= 0) {
-			std::string str = tr("battle.attack_monster").sub(Monster::String(enemyArmy[t].Monster()));
+			std::string str = tr("battle.attack_monster").sub(enemyArmy[t].GetName());
 			statusBar2->ShowMessage(str);
 			Point p1 = Bf2Scr(movePoints[mp]), p2 = Bf2Scr(cur_pt);
 			if(p1.x > p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPRIGHT);
@@ -889,7 +888,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 			    Dialog::ArmyInfo(enemyArmy[t], Dialog::BATTLE);
 		    } else {
 			// attack
-			statusBar2->ShowMessage(tr("battle.view_monster").sub(Monster::String(enemyArmy[t].Monster())));
+			statusBar2->ShowMessage(tr("battle.view_monster").sub(enemyArmy[t].GetName()));
 			cursor.SetThemes(cursor.WAR_INFO);
 			if(click) {
 			    cursor.SetThemes(cursor.POINTER);
@@ -907,9 +906,9 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 		    }
 		    if(canmove) {
 			std::string str;
-			if(myMonster.fly) cursor.SetThemes(cursor.WAR_FLIGHT), str = tr("battle.fly");
+			if(myTroop.isFly()) cursor.SetThemes(cursor.WAR_FLIGHT), str = tr("battle.fly");
 			else cursor.SetThemes(cursor.WAR_MOVE), str = tr("battle.move");
-			statusBar2->ShowMessage(tr("battle.move/fly_here").sub(str).sub(Monster::String(myTroop.Monster())));
+			statusBar2->ShowMessage(tr("battle.move/fly_here").sub(str).sub(myTroop.GetName()));
 			if(click) {
 			    move = cur_pt;
 			    return WIN;
@@ -930,8 +929,7 @@ Army::battle_t Army::HumanTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t 
 
 bool Army::DangerousUnitPredicate(Army::BattleTroop first, Army::BattleTroop second)
 {
-    return  (first.Count() * Monster::GetStats(first.Monster()).damageMax) >
-            (second.Count() * Monster::GetStats(second.Monster()).damageMax);
+    return  first.GetDamageMax() > second.GetDamageMax();
 }
 
 /** Attempt to attack a unit in the given list
@@ -983,7 +981,7 @@ void Army::MoveToClosestTroopInList(const Army::BattleArmy_t &list, const Army::
     for(; it != list.end(); it++)
     {
         positions.push_back(it->Position());
-        if(it->IsWide())
+        if(it->isWide())
             positions.push_back(it->Position() + (it->IsReflected() ? Point(-1, 0) : Point(1, 0)));
     }
     sort(positions.begin(), positions.end(), ClosestDistancePredicate(myTroop.Position()));
@@ -1009,7 +1007,7 @@ void Army::MoveToClosestTroopInList(const Army::BattleArmy_t &list, const Army::
  *  \param[out] attack     #Point which to attack
  *  \param[in] rangedFirst Try to attack ranged units first
  */
-void Army::MoveOrAttack(const Monster::stats_t &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack, bool rangedFirst)
+void Army::MoveOrAttack(const Monster &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack, bool rangedFirst)
 {
     bool result;
     if(rangedFirst)
@@ -1044,15 +1042,14 @@ void Army::MoveOrAttack(const Monster::stats_t &myMonster, Army::BattleArmy_t &a
  *  \param[out] attack    #Point which to attack
  *  \return Whether a possible move or attack was found
  */
-bool Army::AttackRangedTroop(const Monster::stats_t &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack)
+bool Army::AttackRangedTroop(const Monster &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack)
 {
     const Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
     const Army::BattleArmy_t &enemyArmy = troopN >= 0 ? army2 : army1;
     Army::BattleArmy_t ranged;
     for(u16 i = 0; i < enemyArmy.size(); i++)
     {
-        Monster::stats_t enemy = Monster::GetStats(enemyArmy[i].Monster());
-        if(enemyArmy[i].Count() && enemy.shots)
+        if(enemyArmy[i].Count() && enemyArmy[i].isArchers())
             ranged.push_back(enemyArmy[i]);
     }
     if(ranged.size())
@@ -1077,15 +1074,14 @@ bool Army::AttackRangedTroop(const Monster::stats_t &myMonster, Army::BattleArmy
  *  \param[out] attack    #Point which to attack
  *  \return Whether a possible move or attack was found
  */
-bool Army::AttackNonRangedTroop(const Monster::stats_t &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack)
+bool Army::AttackNonRangedTroop(const Monster &myMonster, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, int troopN, Point &move, Point &attack)
 {
     const Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
     std::vector<Army::BattleTroop> &enemyArmy = troopN >= 0 ? army2 : army1;
     std::vector<Army::BattleTroop> nonranged;
     for(u16 i = 0; i < enemyArmy.size(); i++)
     {
-        Monster::stats_t enemy = Monster::GetStats(enemyArmy[i].Monster());
-        if(enemyArmy[i].Count() && !enemy.shots)
+        if(enemyArmy[i].Count() && !enemyArmy[i].isArchers())
             nonranged.push_back(enemyArmy[i]);
     }
     if(nonranged.size())
@@ -1112,7 +1108,6 @@ Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &
         return WIN;
     
     Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
-    const Monster::stats_t &myMonster = Monster::GetStats(myTroop.Monster());
     PrepMovePoints(troopN, army1, army2);
     bool close = false;
     for(u16 j=0; j<enemyArmy.size(); j++) {
@@ -1153,9 +1148,9 @@ Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &
     //TODO: Magic
     //TODO: Retreat/surrender
     
-    if(myMonster.fly || (myMonster.shots && !close))
-        MoveOrAttack(myMonster, army1, army2, troopN, move, attack, true);
-    else if(myMonster.shots && close)
+    if(myTroop.isFly() || (myTroop.isArchers() && !close))
+        MoveOrAttack(myTroop, army1, army2, troopN, move, attack, true);
+    else if(myTroop.isArchers() && close)
     {
         std::vector<Army::BattleTroop> closeEnemies;
         for(u16 j=0; j<enemyArmy.size(); j++)
@@ -1171,7 +1166,7 @@ Army::battle_t Army::CompTurn(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &
         move = myTroop.Position();
     }
     else
-        MoveOrAttack(myMonster, army1, army2, troopN, move, attack, false);
+        MoveOrAttack(myTroop, army1, army2, troopN, move, attack, false);
     
     return WIN;
 }
@@ -1184,7 +1179,6 @@ bool Army::IsDamageFatal(int damage, Army::BattleTroop &troop)
 bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, const Maps::Tiles &tile, int troopN, const Point &move)
 {
     Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
-    const Monster::stats_t &myMonster = Monster::GetStats(myTroop.Monster());
     u16 animat = 0;
     
     if(BfValid(move) && move != myTroop.Position()) {
@@ -1193,13 +1187,13 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 	Point tp = start;
 	Point step;
 	u8 st, len, prep=0, post=0;
-	Monster::GetAnimFrames(myTroop.Monster(), Monster::AS_WALK, st, len);
+	myTroop.GetAnimFrames(Monster::AS_WALK, st, len);
 	int frame = 0, curstep = 0, part = 0, numsteps;
 	std::vector<Point> *path=0;
         
-	if(myMonster.fly) {
+	if(myTroop.isFly()) {
             myTroop.SetReflect(end.x < start.x);
-            if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+            if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
                 myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
 
             /*DrawShadow(move);
@@ -1217,14 +1211,14 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 	    step.x /= numsteps;
 	    step.y /= numsteps;
 	} else {
-	    if(path = FindPath(myTroop.Position(), move, Speed::Move(myMonster.speed), myTroop, army1, army2, troopN),!path) {
+	    if(path = FindPath(myTroop.Position(), move, Speed::Move(myTroop.GetSpeed()), myTroop, army1, army2, troopN),!path) {
 		Dialog::Message(tr("battle.error"), tr("battle.no_path"), Font::BIG, Dialog::OK);
 		return false;
 	    }
 	    step.x = ((Bf2Scr(path->back())+dst_pt).x - tp.x) / len;
 	    step.y = ((Bf2Scr(path->back())+dst_pt).y - tp.y) / len;
             myTroop.SetReflect(step.x < 0);
-            if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+            if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
                 myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
 	    if(step.y) step.x = -step.x;
 	    else step.x = 0;
@@ -1239,25 +1233,25 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
             }*/
 	}
 	myTroop.Animate(Monster::AS_WALK);
-        if(!myMonster.fly)
-            AGG::PlaySound(myMonster.m82_move);
+        if(!myTroop.isFly())
+            AGG::PlaySound(myTroop.M82Move());
 	while(le.HandleEvents()) {
             bool shouldAnimate = false;
-            if(myMonster.fly)
+            if(myTroop.isFly())
                 shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 4);
             else
                 shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 2);
 	    if(shouldAnimate) {
-		if(myMonster.fly) {
+		if(myTroop.isFly()) {
 		    if(frame >= prep && !part) {
-			AGG::PlaySound(myMonster.m82_move);
+			AGG::PlaySound(myTroop.M82Move());
 			part = 1;
 		    }
 		    if(part == 1) {
 			tp += step;
 			curstep ++;
 			if(myTroop.aframe >= st+len-post-1) {
-			    AGG::PlaySound(myMonster.m82_move);
+			    AGG::PlaySound(myTroop.M82Move());
 			    myTroop.aframe = st+prep;
 			}
 			if(curstep == numsteps) {
@@ -1271,7 +1265,7 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 		    tp += step;
 		    if(myTroop.astate != Monster::AS_WALK && path->size()) {
                         if(path->size() > 1)
-                            AGG::PlaySound(myMonster.m82_move);
+                            AGG::PlaySound(myTroop.M82Move());
 			myTroop.SetPosition(path->back());
 			tp = Bf2Scr(myTroop.Position()) + dst_pt;
 			path->pop_back();
@@ -1279,7 +1273,7 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 			step.x = ((Bf2Scr(path->back())+dst_pt).x - tp.x) / len;
 			step.y = ((Bf2Scr(path->back())+dst_pt).y - tp.y) / len;
                         myTroop.SetReflect(step.x < 0);
-                        if(myTroop.IsWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
+                        if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
                             myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
                         tp = Bf2Scr(myTroop.Position()) + dst_pt;
 			if(step.y) step.x = -step.x;
@@ -1329,7 +1323,7 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 	    }
 	}
 	myTroop.SetPosition(move);
-        if(myTroop.IsWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
+        if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
 	if(path) delete path;
     }
@@ -1350,7 +1344,7 @@ void Army::GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::Bat
     Army::BattleTroop &mainTarget = (t = FindTroop(army1, attack), t >= 0 ? army1[t] : army2[FindTroop(army2, attack)]);
     bool reflected = mainTarget.Position().x <= attacker.Position().x;
     targets.push_back(&mainTarget);
-    switch(attacker.Monster())
+    switch(attacker())
     {
         case Monster::GREEN_DRAGON:
         case Monster::RED_DRAGON:
@@ -1358,7 +1352,7 @@ void Army::GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::Bat
         case Monster::PHOENIX:
         case Monster::CYCLOPS:
         {
-            bool wide = attacker.IsWide();
+            bool wide = attacker.isWide();
             Point base = attacker.Position();
             int xIncr = reflected ? 0 : 1;
             if(wide)
@@ -1389,7 +1383,7 @@ void Army::GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::Bat
         case Monster::POWER_LICH:
         {
             Point base;
-            if(attacker.Monster() == Monster::HYDRA)
+            if(attacker == Monster::HYDRA)
             {
                 base = attacker.Position();
                 base.x += attacker.IsReflected() ? -1 : 1;
@@ -1427,7 +1421,6 @@ void Army::GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::Bat
 bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2, const Maps::Tiles &tile, int troopN, const Point &attack)
 {
     Army::BattleTroop &myTroop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
-    const Monster::stats_t &myMonster = Monster::GetStats(myTroop.Monster());
     u16 animat = 0;
     bool retaliate = false;
     
@@ -1441,39 +1434,39 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
         std::vector<Army::BattleTroop *> targets;
         GetTargets(targets, myTroop, attack, army1, army2);
         
-        Monster::monster_t targetMonster = targets[0]->Monster();
+        BattleTroop & targetTroop = *targets[0];
         
         bool closeAttack = false;
         {
             Point tmp(0,0);
             std::vector<Point> tmpmoves;
-            tmpmoves.push_back(targets[0]->Position());
-            if(CanAttack(*targets[0], tmpmoves, myTroop, tmp) >= 0)
+            tmpmoves.push_back(targetTroop.Position());
+            if(CanAttack(targetTroop, tmpmoves, myTroop, tmp) >= 0)
             {
                 closeAttack = true;
-                if(CanRetaliate(myTroop, *targets[0]))
+                if(CanRetaliate(myTroop, targetTroop))
                 {
                     retaliate = true;
-                    targets[0]->SetRetaliated(true);
+                    targetTroop.SetRetaliated(true);
                 }
             }
         }
         
-	int sk_a = myMonster.attack + (myTroop.MasterSkill() ? myTroop.MasterSkill()->GetAttack() : 0);
+	int sk_a = myTroop.GetAttack();
 	long damage = 0;
 	switch(CheckLuck(troopN >= 0 ? hero1 : hero2, myTroop)) {
 	case -1:
-	    damage = myMonster.damageMin*myTroop.Count();
+	    damage = myTroop.GetDamageMin();
 	    break;
 	case 0:
-	    damage = Rand::Get(myMonster.damageMin*myTroop.Count(), myMonster.damageMax*myTroop.Count());
+	    damage = Rand::Get(myTroop.GetDamageMin(), myTroop.GetDamageMax());
 	    break;
 	case 1:
-	    damage = myMonster.damageMax*myTroop.Count();
+	    damage = myTroop.GetDamageMax();
 	    break;
 	}
         
-        bool ranged = myMonster.miss_icn != ICN::UNKNOWN && myTroop.shots > 0 && !closeAttack;
+        bool ranged = myTroop.isArchers() && myTroop.shots > 0 && !closeAttack;
         int origDamage = damage;
         int perished;
         
@@ -1485,10 +1478,10 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
             Army::BattleTroop &target = *targets[tid];
             damage = origDamage;
             
-            int sk_d = Monster::GetStats(target.Monster()).defence + (target.MasterSkill() ? target.MasterSkill()->GetDefense() : 0);
+            int sk_d = target.GetDefense();
             
             //Racial/unit modifiers apply here
-            damage = AdjustDamage(myTroop.Monster(), target.Monster(), damage, ranged);
+            damage = AdjustDamage(myTroop, target, damage, ranged);
             
             // TODO bless and curse
             //damage *= sk_a;
@@ -1505,15 +1498,15 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
             M82::m82_t targetsound;
             if(IsDamageFatal(damage, target)) {
                 targetstate = Monster::AS_DIE;
-                targetsound = Monster::GetStats(target.Monster()).m82_kill;
+                targetsound = target.M82Kill();
             } else {
                 targetstate = Monster::AS_PAIN;
-                targetsound = Monster::GetStats(target.Monster()).m82_wnce;
+                targetsound = target.M82Wnce();
             }
             targetActions.push_back(std::make_pair(targetstate, targetsound));
             
             u8 start, currentTargetLen;
-            Monster::GetAnimFrames(target.Monster(), targetstate, start, currentTargetLen);
+            target.GetAnimFrames(targetstate, start, currentTargetLen);
             targetLen = std::max(currentTargetLen, targetLen);
             
             int tempPerished = target.ApplyDamage(damage);
@@ -1526,7 +1519,7 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
         }
         
 	int state = Army::PREATTACK, missframe = 0, missindex = 0;
-	Point miss_start(myTroop.Position().x + (myMonster.wide ? (myTroop.IsReflected() ? -1 : 1): 0), myTroop.Position().y);
+	Point miss_start(myTroop.Position().x + (myTroop.isWide() ? (myTroop.IsReflected() ? -1 : 1): 0), myTroop.Position().y);
 	miss_start = Bf2Scr(miss_start) + dst_pt;
 	Point miss_step(Bf2Scr(targets[0]->Position()) + dst_pt);
 	miss_step -= miss_start;
@@ -1537,7 +1530,7 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
 	miss_step.y /= MISSFRAMES;
 	miss_start.y -= CELLH;
         
-	Monster::animstate_t mytrooptate;
+	u8 mytrooptate;
 	if(targets[0]->Position().y > myTroop.Position().y)
 	    mytrooptate = Monster::AS_ATT3P;
 	else if(targets[0]->Position().y < myTroop.Position().y)
@@ -1546,23 +1539,23 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
 	    mytrooptate = Monster::AS_ATT2P;
         
         myTroop.SetReflect(myTroop.Position().x >= targets[0]->Position().x);
-        if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+        if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
         
         int delayFrames;
          
         u8 start, prepLen, attackLen;
-        Monster::GetAnimFrames(myTroop.Monster(), (Monster::animstate_t)(mytrooptate & ~Monster::AS_ATTPREP), start, attackLen);
-        Monster::GetAnimFrames(myTroop.Monster(), Monster::AS_ATTPREP, start, prepLen);
+        myTroop.GetAnimFrames(mytrooptate & ~Monster::AS_ATTPREP, start, attackLen);
+        myTroop.GetAnimFrames(Monster::AS_ATTPREP, start, prepLen);
         myTroop.attackRanged = ranged;
          
 	if(!ranged) {
-	    AGG::PlaySound(myMonster.m82_attk);
+	    AGG::PlaySound(myTroop.M82Attk());
 	    delayFrames = prepLen + attackLen / 3;
 	} else {
-            AGG::PlaySound(myMonster.m82_shot);
+            AGG::PlaySound(myTroop.M82Shot());
             delayFrames = prepLen + attackLen + 3;
-	    int maxind = AGG::GetICNCount(myMonster.miss_icn);
+	    int maxind = AGG::GetICNCount(myTroop.ICNMiss());
 	    if(maxind > 1) {
 		double angle = M_PI_2 - atan2(-miss_step.y, miss_step.x);
 		missindex = (int)(angle/M_PI * maxind);
@@ -1631,7 +1624,7 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
 			}
 		    }
 		if(state == Army::MISSILE_FLIGHT) {
-		    display.Blit(AGG::GetICN(myMonster.miss_icn, abs(missindex), missindex < 0), miss_start);
+		    display.Blit(AGG::GetICN(myTroop.ICNMiss(), abs(missindex), missindex < 0), miss_start);
 		    miss_start += miss_step;
 		    missframe ++;
 		}
@@ -1640,17 +1633,12 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
 	}
         
 	std::string status;
-        if(myTroop.Count() > 1)
-            status = tr("battle.multiple_attack").sub(Monster::MultipleNames(myTroop.Monster())).sub(damage);
-        else
-            status = tr("battle.single_attack").sub(Monster::String(myTroop.Monster())).sub(damage);
+        status = tr("battle.single_attack").sub(myTroop.GetName()).sub(damage);
         
         if(perished)
         {
             status += NOL10N("  ");
-            if(perished > 1)
-                status += tr("battle.multiple_perish").sub(perished).sub(Monster::MultipleNames(targetMonster));
-            else status += tr("battle.single_perish").sub(perished).sub(Monster::String(targetMonster));
+            status += tr("battle.single_perish").sub(perished).sub(targetTroop.GetName());
         }
         AttackStatus(status);
         
@@ -1658,7 +1646,7 @@ bool Army::AnimateAttack(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1
 	if(!ranged) {
 	    std::vector<Army::BattleTroop*> ta1, ta2;
 	    (troopN >= 0 ? ta1 : ta2).push_back(targets[0]);
-	    MagicCycle(hero1, hero2, ta1, ta2, army1, army2, troopN<0, Spell::TroopAttack(myTroop.Monster()), tile);
+	    MagicCycle(hero1, hero2, ta1, ta2, army1, army2, troopN<0, Spell::TroopAttack(myTroop), tile);
 	}
     }
     
@@ -1677,7 +1665,7 @@ bool Army::AnimateCycle(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1,
         retaliate = AnimateAttack(hero1, hero2, army1, army2, tile, troopN, attack);
     
     myTroop.ResetReflection();
-    if(myTroop.IsWide() && myTroop.WasReflected() != myTroop.IsReflected())
+    if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
     DrawTroop(myTroop);
     return retaliate;
@@ -1853,13 +1841,13 @@ bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::BattleTroo
     }
     if(damage) {
 	for(u16 i=0; i<aff1.size(); i++) {
-	    if(damage < (aff1[i]->Count()-1) * Monster::GetStats(aff1[i]->Monster()).hp + aff1[i]->hp)
+	    if(damage < (aff1[i]->Count()-1) * Monster(*aff1[i]).GetHitPoints() + aff1[i]->hp)
 		aff1[i]->Animate(Monster::AS_PAIN);
 	    else
 		aff1[i]->Animate(Monster::AS_DIE);
 	}
 	for(u16 i=0; i<aff2.size(); i++) {
-	    if(damage < (aff2[i]->Count()-1) * Monster::GetStats(aff2[i]->Monster()).hp + aff2[i]->hp)
+	    if(damage < (aff2[i]->Count()-1) * Monster(*aff2[i]).GetHitPoints() + aff2[i]->hp)
 		aff2[i]->Animate(Monster::AS_PAIN);
 	    else
 		aff2[i]->Animate(Monster::AS_DIE);
@@ -1895,13 +1883,13 @@ bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::BattleTroo
 		    bool br = true;
 		    for(u16 i=0; i<aff1.size(); i++) if(aff1[i]->astate != Monster::AS_NONE) {
 			u8 strt=0, len=0;
-			Monster::GetAnimFrames(aff1[i]->Monster(), Monster::AS_DIE, strt, len, false);
+			aff1[i]->GetAnimFrames(Monster::AS_DIE, strt, len, false);
 			if(aff1[i]->astate != Monster::AS_DIE || aff1[i]->aframe < strt+len-1)
 			    br = false;
 		    }
 		    for(u16 i=0; i<aff2.size(); i++) if(aff2[i]->astate != Monster::AS_NONE) {
 			u8 strt=0, len=0;
-			Monster::GetAnimFrames(aff2[i]->Monster(), Monster::AS_DIE, strt, len, false);
+			aff2[i]->GetAnimFrames(Monster::AS_DIE, strt, len, false);
 			if(aff2[i]->astate != Monster::AS_DIE || aff2[i]->aframe < strt+len-1)
 			    br = false;
 		    }
@@ -1937,7 +1925,7 @@ bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::BattleTroo
 	std::string str;
         if(aff1.size() + aff2.size() == 1)
             str = tr("battle.spell_damage_single").sub(Spell::String(spell)).sub(damage)
-                                                 .sub(Monster::MultipleNames((aff1.size()?aff1[0]:aff2[0])->Monster()));
+                                                 .sub(aff1.size() ? aff1[0]->GetName() : aff2[0]->GetName());
         else str = tr("battle.spell_damage_multiple").sub(Spell::String(spell)).sub(damage);
 	AttackStatus(str);
 	AttackStatus(NOL10N(""));
@@ -1947,14 +1935,11 @@ bool Army::MagicCycle(Heroes *hero1, Heroes *hero2, std::vector<Army::BattleTroo
 
 bool Army::CanRetaliate(const Army::BattleTroop &attacker, const Army::BattleTroop &defender)
 {
-    const Monster::monster_t defMonster = defender.Monster();
-    const Monster::monster_t attMonster = attacker.Monster();
-    
     if(defender.HasRetaliated())
-        if(defMonster != Monster::GRIFFIN)
+        if(defender != Monster::GRIFFIN)
             return false;
     
-    switch(attMonster)
+    switch(attacker())
     {
         case Monster::VAMPIRE:
         case Monster::LORD_VAMPIRE:
@@ -1968,32 +1953,16 @@ bool Army::CanRetaliate(const Army::BattleTroop &attacker, const Army::BattleTro
     return !defender.HasRetaliated();
 }
 
-bool Army::CanAttackTwice(Monster::monster_t attacker)
-{
-    switch(attacker)
-    {
-        case Monster::WOLF:
-        case Monster::PALADIN:
-        case Monster::CRUSADER:
-        case Monster::ELF:
-        case Monster::GRAND_ELF:
-        case Monster::RANGER:
-            return true;
-        default:
-            return false;
-    }
-}
-
-int Army::AdjustDamage(Monster::monster_t attacker, Monster::monster_t defender, int damage, bool ranged)
+int Army::AdjustDamage(Monster & attacker, Monster & defender, int damage, bool ranged)
 {
     if(attacker == Monster::CRUSADER
-    && Monster::GetRace(defender) == Race::NECR)
+    && defender.GetRace() == Race::NECR)
         return damage * 2;
     
     else if(!ranged)
     {
-        if(Monster::GetStats(attacker).miss_icn != ICN::UNKNOWN)
-            switch(attacker)
+        if(attacker.isArchers())
+            switch(attacker())
             {
                 case Monster::MAGE:
                 case Monster::ARCHMAGE:
@@ -2379,9 +2348,9 @@ void Army::DrawArmy(Army::BattleArmy_t & army1, Army::BattleArmy_t & army2, int 
 
 void Army::DrawTroop(Army::BattleTroop & troop, int animframe)
 {
-    if(troop.Monster() == Monster::UNKNOWN) return;
+    if(troop() == Monster::UNKNOWN) return;
     bool reflect = troop.IsReflected();
-    bool wide = troop.IsWide();
+    bool wide = troop.isWide();
     Point pos = troop.Position();
     Point tp = Bf2Scr(pos) + dst_pt;
     troop.Blit(tp, reflect, animframe);
@@ -2415,14 +2384,14 @@ void Army::InitArmyPosition(Army::BattleArmy_t & army, bool compact, bool reflec
     int x = reflect ? 10 : 0;
     int y = compact ? 2 : 0;
     for(unsigned int i=0; i < army.size(); i++) {
-	if(army[i].Monster() != Monster::UNKNOWN) {
-	    const Monster::stats_t &stats = Monster::GetStats(army[i].Monster());
-	    AGG::PreloadObject(stats.file_icn);
+	if(army[i].GetID() != Monster::UNKNOWN) {
+	    const Monster &stats = army[i];
+	    AGG::PreloadObject(stats.ICNFile());
             army[i].SetPosition(Point(x, y));
 	    army[i].aframe = 1;
 	    army[i].astate = Monster::AS_NONE;
-	    army[i].shots = stats.shots;
-	    army[i].hp = stats.hp;
+	    army[i].shots = stats.GetShots();
+	    army[i].hp = stats.GetHitPoints();
 	    army[i].oldcount = army[i].Count();
             army[i].SetOriginalReflection(reflect);
             army[i].SetRetaliated(false);
@@ -2435,12 +2404,12 @@ void Army::StartTurn(Army::BattleArmy_t &army)
 {
     for(u16 i = 0; i < army.size(); i++)
     {
-        switch(army[i].Monster())
+        switch(army[i].GetID())
         {
             case Monster::TROLL:
             case Monster::WAR_TROLL:
                 //Trolls replenish health every turn
-                army[i].hp = Monster::GetStats(army[i].Monster()).hp;
+                army[i].hp = Monster(army[i]).GetHitPoints();
                 break;
             default:
                 break;
@@ -2473,8 +2442,8 @@ inline bool Army::BfValid(const Point & pt)
 bool Army::FindTroopAt(const Army::BattleTroop &troop, const Point &p)
 {
     Point p2(troop.Position());
-    if(troop.IsWide()) p2.x += troop.IsReflected() ? -1 : 1;
-    if(troop.Monster() != Monster::UNKNOWN && (p == troop.Position() || p == p2)) 
+    if(troop.isWide()) p2.x += troop.IsReflected() ? -1 : 1;
+    if(troop() != Monster::UNKNOWN && (p == troop.Position() || p == p2)) 
         return true;
     else return false;
 }
@@ -2488,7 +2457,7 @@ bool Army::FindTroopAt(const Army::BattleTroop &troop, const Point &p)
 int Army::FindTroopExact(const Army::BattleArmy_t &army, const Point &p)
 {
     for(unsigned int i=0; i<army.size(); i++) {
-	if(army[i].Monster() != Monster::UNKNOWN && army[i].Position() == p)
+	if(army[i].GetID() != Monster::UNKNOWN && army[i].Position() == p)
             return i;
     }
     return -1;
@@ -2550,7 +2519,7 @@ bool Army::CellFree(const Point &p, const Army::BattleArmy_t &army1, const Army:
 bool Army::CellFreeFor(const Point &p, const Army::BattleTroop &troop, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, int skip)
 {
     bool isFree = CellFree(p, army1, army2, skip);
-    if(isFree && troop.IsWide())
+    if(isFree && troop.isWide())
       //WIDE-REVIEW
       isFree = CellFree(Point(p.x + (troop.IsReflected() ? -1 : 1), p.y), army1, army2, skip);
     return isFree;
@@ -2819,8 +2788,7 @@ void Army::PrepMovePoints(int troopN, const Army::BattleArmy_t &army1, const Arm
     movePoints.clear();
     Point p;
     const Army::BattleTroop &troop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
-    const Monster::stats_t &stat = Monster::GetStats(troop.Monster());
-    if(stat.fly) {
+    if(troop.isFly()) {
 	for(p.x = 0; p.x < BFW; p.x ++) 
 	    for(p.y = 0; p.y < BFH; p.y ++) {
 		if(CellFreeFor(p, troop, army1, army2, troopN))
@@ -2835,7 +2803,7 @@ void Army::PrepMovePoints(int troopN, const Army::BattleArmy_t &army1, const Arm
 		if(d.x || d.y ) {
 		    if(p.y%2 && d.y && d.x>0) continue;
 		    if(!(p.y%2) && d.y && d.x<0) continue;
-		    PrepMovePointsInt(troop, p+d, Speed::Move(stat.speed), army1, army2, troopN);
+		    PrepMovePointsInt(troop, p+d, Speed::Move(troop.GetSpeed()), army1, army2, troopN);
 		}
     }
 }
@@ -2918,10 +2886,10 @@ bool Army::CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTr
     //FIXME: These calculations are based on current reflection state
     std::vector<Point> from, to;
     from.push_back(attackFrom);
-    if(attacker.IsWide())
+    if(attacker.isWide())
         from.push_back(attackFrom + Point( attacker.IsReflected() ? -1 : 1, 0 ));
     to.push_back(target.Position());
-    if(target.IsWide())
+    if(target.isWide())
         to.push_back(target.Position() + Point ( target.IsReflected() ? -1 : 1, 0 ));
 
     s8 minDX, maxDX;
@@ -2964,18 +2932,18 @@ int Army::CanAttack(const Army::BattleTroop &myTroop, const std::vector<Point> &
     Point delta = d;
     //delta.x -= CELLW;
     delta.y += CELLH/2;
-    const Monster::stats_t &myMonster = Monster::GetStats(myTroop.Monster());
-    const Monster::stats_t &enemyMonster = Monster::GetStats(enemyTroop.Monster());
+    const Monster &myMonster = myTroop;
+    const Monster &enemyMonster = enemyTroop;
     std::vector<Point> from, to;
     to.push_back(enemyTroop.Position());
-    if(enemyMonster.wide)
+    if(enemyMonster.isWide())
         to.push_back(enemyTroop.Position() + Point ( enemyTroop.IsReflected() ? -1 : 1, 0 ));
     int mp = -1, min = 9999;
     for(u32 i=0; i<moves.size(); i++) {
 	Point d, p1, p2;
         from.clear();
         from.push_back(moves[i]);
-        if(myMonster.wide)
+        if(myMonster.isWide())
             from.push_back(moves[i] + Point( myTroop.IsReflected() ? -1 : 1, 0 ));
         for(u32 j = 0; j < from.size(); j++)
             for(u32 k = 0; k < to.size(); k++)
@@ -3010,8 +2978,8 @@ int Army::CanAttack(const Army::BattleTroop &myTroop, const std::vector<Point> &
 Point Army::GetReachableAttackCell(const Army::BattleTroop &target, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, int troopN)
 {
     const Army::BattleTroop &attacker = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
-    bool targetWide = target.IsWide();
-    bool attackerWide = attacker.IsWide();
+    bool targetWide = target.isWide();
+    bool attackerWide = attacker.isWide();
     Point delta, p = target.Position();
     int xstart, xend, xincr;
     int ystart, yend, yincr;
@@ -3058,10 +3026,10 @@ Point Army::GetReachableAttackCell(const Army::BattleTroop &target, const Army::
 
 bool Army::IsAffectedByMorale(const Army::BattleTroop &troop)
 {
-    if(Monster::GetRace(troop.Monster()) == Race::NECR) return false;
-    else if(Monster::GetRace(troop.Monster()) == Race::BOMG)
+    if(troop.GetRace() == Race::NECR) return false;
+    else if(troop.GetRace() == Race::BOMG)
     {
-        switch(troop.Monster())
+        switch(troop())
         {
             case Monster::EARTH_ELEMENT:
             case Monster::FIRE_ELEMENT:
@@ -3097,7 +3065,7 @@ bool Army::GoodMorale(Heroes *hero, const Army::BattleTroop &troop)
 	    }
 	    back.Restore();
 	}
-	AttackStatus(tr("battle.high_morale").sub(Monster::MultipleNames(troop.Monster())));
+	AttackStatus(tr("battle.high_morale").sub(troop.GetName()));
 	return true;
     }
     return false;
@@ -3124,7 +3092,7 @@ bool Army::BadMorale(Heroes *hero, const Army::BattleTroop &troop)
 	    }
 	    back.Restore();
 	}
-	AttackStatus(tr("battle.low_morale").sub(Monster::MultipleNames(troop.Monster())));
+	AttackStatus(tr("battle.low_morale").sub(troop.GetName()));
 	return true;
     }
     return false;

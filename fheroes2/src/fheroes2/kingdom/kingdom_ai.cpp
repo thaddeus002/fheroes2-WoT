@@ -305,7 +305,7 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 		    {
 			const Maps::Tiles & tile = world.GetTiles(pos);
 			Army::army_t enemy;
-			enemy.At(0).Set(Monster::Monster(tile), tile.GetCountMonster());
+			enemy.At(0).Set(Monster(tile), tile.GetCountMonster());
 
 			// can we will win battle
 			if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy)) continue;

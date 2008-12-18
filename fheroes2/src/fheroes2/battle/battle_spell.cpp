@@ -24,13 +24,13 @@
 bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
 {
     target_t target = Target(spell);
-    if(troop.Monster() == Monster::DWARF || troop.Monster() == Monster::BATTLE_DWARF) {
+    if(troop == Monster::DWARF || troop == Monster::BATTLE_DWARF) {
 	if(!Rand::Get(0,3) && target != ONEFRIEND && target != ALLFRIEND) return false;
     }
     if(troop.FindMagic(ANTIMAGIC) && target != ONEFRIEND && target != ALLFRIEND)
 	return false;
     if(spell == ANTIMAGIC && troop.summoned) return false;
-    switch(troop.Monster()) {
+    switch(troop()) {
     case Monster::GREEN_DRAGON:
     case Monster::RED_DRAGON:
     case Monster::BLACK_DRAGON:
@@ -47,20 +47,20 @@ bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
 	case HYPNOTIZE:
 	case DEATHRIPPLE:
 	case DEATHWAVE:
-	    return Monster::GetRace(troop.Monster()) != Race::NECR;
+	    return troop.GetRace() != Race::NECR;
 	case HOLYWORD:
 	case HOLYSHOUT:
-	    return Monster::GetRace(troop.Monster()) == Race::NECR;
+	    return troop.GetRace() == Race::NECR;
 	case ANIMATEDEAD:
-	    return Monster::GetRace(troop.Monster()) == Race::NECR &&
-		( Monster::GetStats(troop.Monster()).hp > troop.hp ||
+	    return troop.GetRace() == Race::NECR &&
+		( Monster(troop()).GetHitPoints() > troop.hp ||
 		  troop.oldcount > troop.Count());
 	case CURE:
 	case MASSCURE:
-	    return Monster::GetStats(troop.Monster()).hp > troop.hp;
+	    return Monster(troop()).GetHitPoints() > troop.hp;
 	case RESURRECT:
 	case RESURRECTTRUE:
-	    return Monster::GetStats(troop.Monster()).hp > troop.hp ||
+	    return Monster(troop()).GetHitPoints() > troop.hp ||
 		troop.oldcount > troop.Count();
 
 	case DISPEL:
@@ -173,7 +173,7 @@ void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
 	case RESURRECT:
 	case RESURRECTTRUE:
 	case ANIMATEDEAD: {
-	    int hp = Monster::GetStats(troop.Monster()).hp;
+	    int hp = Monster(troop()).GetHitPoints();
 	    troop.hp += damage;
 	    if(troop.hp > hp) {
 		if(spell == CURE) troop.hp = hp;
@@ -213,7 +213,7 @@ void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
 // 	ELEMENTALSTORM,
 // 	METEORSHOWER,
 	default: {
-	    int hp = Monster::GetStats(troop.Monster()).hp;
+	    int hp = Monster(troop()).GetHitPoints();
 	    while(troop.hp < damage) {
 		troop.SetCount(troop.Count() - 1);
 		if(troop.Count() <= 0) {
@@ -230,9 +230,10 @@ void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
     }
 }
 
-Spell::spell_t Spell::TroopAttack(Monster::monster_t monster)
+Spell::spell_t Spell::TroopAttack(const Monster & monster)
 {
-    switch(monster) {
+    switch(monster())
+    {
     case Monster::CYCLOPS:
 	if(!Rand::Get(0, 4)) return PARALYZE;
 	break;

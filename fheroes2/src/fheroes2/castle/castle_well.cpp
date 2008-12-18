@@ -81,7 +81,7 @@ void Castle::OpenWell(void)
         {
     	    if(building & DWELLING_MONSTER1 && le.MouseClickLeft(rectMonster1) &&
     		Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
-            	    Monster::Monster(race, DWELLING_MONSTER1), dwelling[0])))
+            	    Monster(race, DWELLING_MONSTER1), dwelling[0])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -91,7 +91,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER2 && le.MouseClickLeft(rectMonster2) &&
     		Castle::RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
-            	    Monster::Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
+            	    Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -101,7 +101,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER3 && le.MouseClickLeft(rectMonster3) &&
     		Castle::RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
-            	    Monster::Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
+            	    Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -111,7 +111,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER4 && le.MouseClickLeft(rectMonster4) &&
     		Castle::RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
-            	    Monster::Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
+            	    Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -121,7 +121,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER5 && le.MouseClickLeft(rectMonster5) &&
     		Castle::RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
-            	    Monster::Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
+            	    Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -131,7 +131,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER6 && le.MouseClickLeft(rectMonster6) &&
                 Castle::RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
-                    Monster::Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
+                    Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -210,7 +210,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 		break;
 	}
 
-	const Monster::stats_t & monster = Monster::GetStats(Monster::Monster(race, dw_orig));
+	const Monster monster(race, dw_orig);
 
 	Point dst_pt;
 	std::string str;
@@ -237,38 +237,38 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	dst_pt.y = pt.y + 103;
 	Text(str, Font::SMALL, dst_pt);
 	// monster
-	const Sprite & smonster = AGG::GetICN(monster.monh_icn, 0);
+	const Sprite & smonster = AGG::GetICN(monster.ICNMonh(), 0);
 	dst_pt.x = pt.x + 193 - smonster.w() / 2;
 	dst_pt.y = pt.y + 124 - smonster.h();
 	display.Blit(smonster, dst_pt);
 	// name
-	str = monster.name;
-	dst_pt.x = pt.x + 122 - Text::width(monster.name, Font::SMALL) / 2;
+	str = monster.GetName();
+	dst_pt.x = pt.x + 122 - Text::width(monster.GetName(), Font::SMALL) / 2;
 	dst_pt.y = pt.y + 16;
 	Text(str, Font::SMALL, dst_pt);
 	// attack
 	str = "Attack: ";
-	String::AddInt(str, monster.attack);
+	String::AddInt(str, monster.GetAttack());
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 22;
 	Text(str, Font::SMALL, dst_pt);
 	// defense
 	str = "Defense: ";
-	String::AddInt(str, monster.defence);
+	String::AddInt(str, monster.GetDefense());
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 34;
 	Text(str, Font::SMALL, dst_pt);
 	// damage
 	str = "Damg: ";
-	String::AddInt(str, monster.damageMin);
+	String::AddInt(str, monster.GetDamageMin());
 	str += "-";
-	String::AddInt(str, monster.damageMax);
+	String::AddInt(str, monster.GetDamageMax());
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
 	dst_pt.y = pt.y + 46;
 	Text(str, Font::SMALL, dst_pt);
 	// hp
 	str = "HP: ";
-	String::AddInt(str, monster.hp);
+	String::AddInt(str, monster.GetHitPoints());
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
         dst_pt.y = pt.y + 58;
 	Text(str, Font::SMALL, dst_pt);
@@ -277,14 +277,14 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
         dst_pt.y = pt.y + 78;
         Text(str, Font::SMALL, dst_pt);
-	str = Speed::String(monster.speed);
+	str = Speed::String(monster.GetSpeed());
         dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
         dst_pt.y = pt.y + 90;
 	Text(str, Font::SMALL, dst_pt);
 	
 	if(present)
 	{
-	    u8 grown = monster.grown;
+	    u8 grown = monster.GetGrown();
 	    grown += building & BUILD_WELL ? GROWN_WELL : 0;
 	    if(DWELLING_MONSTER1 & building) grown += building & BUILD_WEL2 ? GROWN_WEL2 : 0;
 

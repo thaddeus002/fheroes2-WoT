@@ -98,7 +98,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 		case Army::LEGION:	name_object = "A legion of "; break;
             }
 
-            name_object += Monster::String(Monster::Monster(tile)) + "s";
+            name_object += Monster(tile).GetMultiName();
     	}
     	    break;
 

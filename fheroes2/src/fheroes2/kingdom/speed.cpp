@@ -20,7 +20,7 @@
 
 #include "speed.h"
 
-const std::string & Speed::String(speed_t speed)
+const std::string & Speed::String(u8 speed)
 {
     static const std::string str_speed[] = { "Crawling", "Very Slow", "Slow", "Average", "Fast",
 	"Very Fast", "Ultra Fast", "Blazing", "Instant" };
@@ -41,18 +41,20 @@ const std::string & Speed::String(speed_t speed)
     return str_speed[0];
 }
 
-const int Speed::Move(speed_t speed)
+u8 Speed::Move(u8 speed)
 {
-    switch(speed) {
-    case CRAWLING: return 1;
-    case VERYSLOW: return 2;
-    case SLOW: return 3;
-    case AVERAGE: return 4;
-    case FAST: return 5;
-    case VERYFAST: return 6;
-    case ULTRAFAST: return 7;
-    case BLAZING: return 8;
-    case INSTANT: return 9;
+    switch(speed)
+    {
+	case CRAWLING:	return 1;
+	case VERYSLOW:	return 2;
+	case SLOW: 	return 3;
+	case AVERAGE: 	return 4;
+	case FAST: 	return 5;
+	case VERYFAST: 	return 6;
+	case ULTRAFAST: return 7;
+	case BLAZING: 	return 8;
+	case INSTANT: 	return 9;
+	default: break;
     }
     return 0;
 }

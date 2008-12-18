@@ -37,8 +37,8 @@ namespace Speed
         INSTANT
     } speed_t;
 
-    const std::string & String(speed_t speed);
-    const int Move(speed_t speed);
+    const std::string & String(u8 speed);
+    u8 Move(u8 speed);
 
     inline speed_t& operator++ (speed_t& speed){ return speed = ( INSTANT == speed ? INSTANT : speed_t(speed + 1)); };
     inline speed_t& operator-- (speed_t& speed){ return speed = ( CRAWLING == speed ? CRAWLING : speed_t(speed - 1)); };

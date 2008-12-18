@@ -49,7 +49,7 @@ namespace Army
 
 	void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
 	void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
-	void Animate(Monster::animstate_t as = Monster::AS_NONE);
+	void Animate(u8 as = Monster::AS_NONE);
 	void SetMagic(Spell::magic_t &magic);
 	bool FindMagic(Spell::spell_t spell) const;
 	void RemoveMagic(Spell::spell_t spell);
@@ -64,16 +64,14 @@ namespace Army
         bool WasReflected() const { return lastReflect; }
         bool OriginalReflection() const { return origReflect; }
         
-        bool IsWide() const { return Monster::GetStats(Monster()).wide; }
-        
         bool HasRetaliated() const { return retaliated; }
         void SetRetaliated(bool r) { retaliated = r; }
         
-        int TotalHP() const { return hp + (count - 1) * Monster::GetStats(monster).hp; }
-        
+        int TotalHP() const { return hp + (count - 1) * Monster(id).GetHitPoints(); }
+    
         int ApplyDamage(int damage);
 
-	Monster::animstate_t    astate;
+	u8                      astate;
 	u16                     aframe;
 	bool                    attackRanged;
 	u8                      shots;

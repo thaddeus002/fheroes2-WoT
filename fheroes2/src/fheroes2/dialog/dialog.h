@@ -103,8 +103,8 @@ namespace Dialog
     u16 SelectCount(u16 max);
 
     // recruit monster
-    u16 RecruitMonster(const Monster::monster_t & monster, u16 available);
-    void DwellingInfo(const Monster::monster_t & monster, u16 available);
+    u16 RecruitMonster(const Monster & monster, u16 available);
+    void DwellingInfo(const Monster & monster, u16 available);
 
     // army info
     answer_t ArmyInfo(const Army::Troop & troop, u16 flags);

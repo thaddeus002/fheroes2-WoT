@@ -403,13 +403,12 @@ void Heroes::Action(const u16 dst_index)
 void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Monster::monster_t monster = Monster::Monster(tile);
-    const u16 count = tile.GetCountMonster();
+    const Monster monster(tile);
     Army::army_t army;
-    army.At(0).Set(monster, count);
+    army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
+    if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
 
     const u32 exp = army.CalculateExperience();
     const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -1517,7 +1516,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    Army::army_t army;
 		    army.FromGuardian(tile);
 		    const Army::Troop & troop = army.FirstValid();
-		    const std::string monster = 1 < troop.Count() ? Monster::String(troop.Monster()) : Monster::MultipleNames(troop.Monster());
+		    const std::string & monster = troop.GetName();
 
 		    PlaySoundWarning;
 
@@ -2002,14 +2001,14 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
 
     if(count)
     {
-	const Monster::monster_t monster = Monster::Monster(obj);
-        const std::string & message = "A group of " + Monster::String(monster) + " with a desire for greater glory wish to join you.";
+	const Monster monster(Monster::FromObject(obj));
+        const std::string & message = "A group of " + monster.GetName() + " with a desire for greater glory wish to join you.";
 
         AGG::PlaySound(M82::EXPERNCE);
 	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO))
 	{
 	    if(!hero.GetArmy().JoinTroop(monster, count))
-		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		Dialog::Message(monster.GetName(), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 	    else
 		tile.SetCountMonster(0);
 	}
@@ -2066,7 +2065,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 
     if(count)
     {
-	const Monster::monster_t monster = Monster::Monster(obj);
+	const Monster monster(Monster::FromObject(obj));
 	PlaySoundSuccess;
 	if(Dialog::YES == Dialog::Message(msg_full1, msg_full2, Font::BIG, Dialog::YES | Dialog::NO))
 	{
@@ -2074,7 +2073,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 	    if(recruit)
 	    {
 		if(!hero.GetArmy().JoinTroop(monster, recruit))
-		    Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		    Dialog::Message(monster.GetName(), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
 		else
 		    tile.SetCountMonster(count - recruit);
 	    }
@@ -2250,12 +2249,12 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
     // recruit monster
     if(count && complete)
     {
-	const Monster::monster_t monster = Monster::Monster(obj);
+	const Monster monster(Monster::FromObject(obj));
         const u16 recruit = Dialog::RecruitMonster(monster, count);
         if(recruit)
         {
     	    if(!hero.GetArmy().JoinTroop(monster, recruit))
-		Dialog::Message(Monster::String(monster), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		Dialog::Message(monster.GetName(), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
     	    else
     		tile.SetCountMonster(count - recruit);
     	}
@@ -2368,21 +2367,21 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::DWARF);
 		mons.push_back(Monster::DWARF);
-		msg1 = Monster::MultipleNames(Monster::DWARF);
+		msg1 = Monster(Monster::DWARF).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::ORC))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::ORC);
 		mons.push_back(Monster::ORC);
 		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::ORC);
+		msg1 += Monster(Monster::ORC).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::OGRE))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::OGRE);
 		mons.push_back(Monster::OGRE);
 		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::OGRE);
+		msg1 += Monster(Monster::OGRE).GetMultiName();
 	    }
 	    msg1 = "All of the " + msg1 + " you have in your army have been trained by the battle masters of the fort.  Your army now contains " + msg1 + ".";
 	    msg2 = "An unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any such troops brought to them.  Unfortunately, you have none with you.";
@@ -2393,21 +2392,21 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::PIKEMAN);
 		mons.push_back(Monster::PIKEMAN);
-		msg1 = Monster::MultipleNames(Monster::PIKEMAN);
+		msg1 = Monster(Monster::PIKEMAN).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::SWORDSMAN))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::SWORDSMAN);
 		mons.push_back(Monster::SWORDSMAN);
 		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::SWORDSMAN);
+		msg1 += Monster(Monster::SWORDSMAN).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::IRON_GOLEM))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::IRON_GOLEM);
 		mons.push_back(Monster::IRON_GOLEM);
 		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster::MultipleNames(Monster::IRON_GOLEM);
+		msg1 += Monster(Monster::IRON_GOLEM).GetMultiName();
 	    }
 	    msg1 = "All of your " + msg1 + " have been upgraded into " + msg1 + ".";
 	    msg2 = "A blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.";
@@ -2428,7 +2427,7 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	for(; it1 != it2; ++it1)
 	{
 	    sf.Blit(br, ox, 0);
-	    switch(Monster::GetRace(*it1))
+	    switch(Monster(*it1).GetRace())
 	    {
 		case Race::KNGT:	sf.Blit(AGG::GetICN(ICN::STRIP, 4), ox + 6, 6); break;
 		case Race::BARB:	sf.Blit(AGG::GetICN(ICN::STRIP, 5), ox + 6, 6); break;
@@ -2438,7 +2437,7 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		case Race::NECR:	sf.Blit(AGG::GetICN(ICN::STRIP, 9), ox + 6, 6); break;
 		default:		sf.Blit(AGG::GetICN(ICN::STRIP, 10), ox + 6, 6); break;
 	    }
-	    const Sprite & mon = AGG::GetICN(Monster::GetStats(Monster::Upgrade(*it1)).monh_icn, 0);
+	    const Sprite & mon = AGG::GetICN(Monster(Monster::Upgrade(*it1)).ICNMonh(), 0);
 	    sf.Blit(mon, ox + 6 + mon.x(), 6 + mon.y());
 	    ox += br.w() + 4;
 	}

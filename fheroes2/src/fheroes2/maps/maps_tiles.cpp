@@ -32,6 +32,7 @@
 #include "game_focus.h"
 #include "object.h"
 #include "objxloc.h"
+#include "monster.h"
 #include "resource.h"
 #include "maps_tiles.h"
 
@@ -1731,10 +1732,10 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 	switch(general)
 	{
     	    case MP2::OBJ_RNDMONSTER:       index = Monster::Rand(); break;
-    	    case MP2::OBJ_RNDMONSTER1:      index = Monster::Rand1();break;
-    	    case MP2::OBJ_RNDMONSTER2:      index = Monster::Rand2();break;
-    	    case MP2::OBJ_RNDMONSTER3:      index = Monster::Rand3();break;
-    	    case MP2::OBJ_RNDMONSTER4:      index = Monster::Rand4();break;
+    	    case MP2::OBJ_RNDMONSTER1:      index = Monster::Rand(Monster::LEVEL1);break;
+    	    case MP2::OBJ_RNDMONSTER2:      index = Monster::Rand(Monster::LEVEL2);break;
+    	    case MP2::OBJ_RNDMONSTER3:      index = Monster::Rand(Monster::LEVEL3);break;
+    	    case MP2::OBJ_RNDMONSTER4:      index = Monster::Rand(Monster::LEVEL4);break;
 
 	    default: Error::Warning("Maps::Tiles::UpdateRNDMonsterSprite: unknown object, index: ", maps_index); return;
 	}

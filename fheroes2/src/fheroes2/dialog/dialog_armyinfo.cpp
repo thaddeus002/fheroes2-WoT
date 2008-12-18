@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "monster.h"
 #include "morale.h"
+#include "speed.h"
 #include "luck.h"
 #include "army.h"
 #include "skill.h"
@@ -47,7 +48,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
 
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
 
-    const Monster::stats_t stats = Monster::GetStats(battroop.Monster());
+    const Monster & mons = battroop;
     const Skill::Primary *skills = battroop.MasterSkill();
 
     Rect pos_rt;
@@ -70,9 +71,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     std::string message;
 
     // name
-    dst_pt.x = pos_rt.x  + 140 - Text::width(stats.name, Font::BIG) / 2;
+    dst_pt.x = pos_rt.x  + 140 - Text::width(mons.GetName(), Font::BIG) / 2;
     dst_pt.y = pos_rt.y + 40;
-    Text(stats.name, Font::BIG, dst_pt);
+    Text(mons.GetName(), Font::BIG, dst_pt);
     
     // count
     String::AddInt(message, battroop.Count());
@@ -87,12 +88,12 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, stats.attack);
+    String::AddInt(message, mons.GetAttack());
 
     if(skills)
     {
 	message += " (";
-	String::AddInt(message, stats.attack + (*skills).GetAttack());
+	String::AddInt(message, mons.GetAttack() + (*skills).GetAttack());
 	message += ")";
     }
 
@@ -106,12 +107,12 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, stats.defence);
+    String::AddInt(message, mons.GetDefense());
 
     if(skills)
     {
 	message += " (";
-	String::AddInt(message, stats.defence + (*skills).GetDefense());
+	String::AddInt(message, mons.GetDefense() + (*skills).GetDefense());
 	message += ")";
     }
 
@@ -119,14 +120,15 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     Text(message, Font::BIG, dst_pt);
 
     // shot
-    if(stats.shots) {
+    if(mons.isArchers())
+    {
 	message = battle ? "Shots Left:" : "Shots:";
 	dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
 	dst_pt.y += 18;
 	Text(message, Font::BIG, dst_pt);
 
 	message.clear();
-	String::AddInt(message, battle ? battroop.shots : stats.shots);
+	String::AddInt(message, battle ? battroop.shots : mons.GetShots());
 	dst_pt.x = pos_rt.x + 420;
 	Text(message, Font::BIG, dst_pt);
     }
@@ -138,9 +140,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, stats.damageMin);
+    String::AddInt(message, mons.GetDamageMin());
     message += " - ";
-    String::AddInt(message, stats.damageMax);
+    String::AddInt(message, mons.GetDamageMax());
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -151,7 +153,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     Text(message, Font::BIG, dst_pt);
 
     message.clear();
-    String::AddInt(message, stats.hp);
+    String::AddInt(message, mons.GetHitPoints());
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -173,7 +175,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     dst_pt.y += 18;
     Text(message, Font::BIG, dst_pt);
 
-    message = Speed::String(stats.speed);
+    message = Speed::String(mons.GetSpeed());
     dst_pt.x = pos_rt.x + 420;
     Text(message, Font::BIG, dst_pt);
 
@@ -218,7 +220,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
 	buttonDismiss.SetDisable(true);
     }
 
-    if(Monster::AllowUpgrade(stats.monster))
+    if(mons.isAllowUpgrade())
     {
 	if(UPGRADE & flags)
 	{
@@ -246,7 +248,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     
     Dialog::answer_t result = Dialog::ZERO;
 
-    const Sprite & frame = AGG::GetICN(stats.file_icn, 0);
+    const Sprite & frame = AGG::GetICN(mons.ICNFile(), 0);
     Point anim_rt(pos_rt.x + (pos_rt.w / 2 - frame.w()) / 2 , pos_rt.y + 180);
     battroop.astate = Monster::AS_IDLE;
     battroop.aframe = 0;

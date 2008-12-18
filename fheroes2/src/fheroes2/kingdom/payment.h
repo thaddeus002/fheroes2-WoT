@@ -22,10 +22,6 @@
 #define H2PAYMENT_H
 
 #include "resource.h"
-#include "race.h" 
-#include "monster.h" 
-
-class Rect;
 
 #define RATE_DIFFERENCE_UPGRADE		2
 
@@ -358,19 +354,19 @@ namespace PaymentConditions
     class BuyBuilding : public payment_t
     {
     public:
-	BuyBuilding(const Race::race_t & race, const u32 build);
+	BuyBuilding(const u8 race, const u32 build);
     };
 
     class BuyMonster : public payment_t
     {
     public:
-	BuyMonster(const Monster::monster_t & monster);
+	BuyMonster(u8 monster);
     };
     
     class UpgradeMonster : public payment_t
     {
     public:
-	UpgradeMonster(const Monster::monster_t & monster);
+	UpgradeMonster(u8 monster);
     };
 };
 

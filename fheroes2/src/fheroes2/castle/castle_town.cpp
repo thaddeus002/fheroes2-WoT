@@ -138,7 +138,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 			 DWELLING_UPGRADE5 |
 			 DWELLING_UPGRADE6 |
 			 DWELLING_UPGRADE7) & build ?
-			 std::string("The " + GetStringBuilding(build, race) + " produces " + Monster::MultipleNames(Monster::Monster(race, build)) + ".") :
+			 std::string("The " + GetStringBuilding(build, race) + " produces " + Monster(race, build).GetMultiName() + ".") :
 			 GetDescriptionBuilding(build, race);
 	
     u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
@@ -428,7 +428,7 @@ Castle::building_t Castle::OpenTown(void)
     // dwelling 2
     dst_pt.x = cur_pt.x + 150;
     dst_pt.y = cur_pt.y + 3;
-    bool allowUpgrade2 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER2)) && building & DWELLING_MONSTER2;
+    bool allowUpgrade2 = Monster(race, DWELLING_MONSTER2).isAllowUpgrade() && building & DWELLING_MONSTER2;
     index = allowUpgrade2  ? 25 : 20;
     display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling2(dst_pt, 135, 57);
@@ -439,7 +439,7 @@ Castle::building_t Castle::OpenTown(void)
     // dwelling 3
     dst_pt.x = cur_pt.x + 294;
     dst_pt.y = cur_pt.y + 3;
-    bool allowUpgrade3 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER3)) && building & DWELLING_MONSTER3;
+    bool allowUpgrade3 = Monster(race, DWELLING_MONSTER3).isAllowUpgrade() && building & DWELLING_MONSTER3;
     index = allowUpgrade3 ? 26 : 21;
     display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling3(dst_pt, 135, 57);
@@ -450,7 +450,7 @@ Castle::building_t Castle::OpenTown(void)
     // dwelling 4
     dst_pt.x = cur_pt.x + 6;
     dst_pt.y = cur_pt.y + 78;
-    bool allowUpgrade4 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER4)) && building & DWELLING_MONSTER4;
+    bool allowUpgrade4 = Monster(race, DWELLING_MONSTER4).isAllowUpgrade() && building & DWELLING_MONSTER4;
     index = allowUpgrade4 ? 27 : 22;
     display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling4(dst_pt, 135, 57);
@@ -461,7 +461,7 @@ Castle::building_t Castle::OpenTown(void)
     // dwelling 5
     dst_pt.x = cur_pt.x + 150;
     dst_pt.y = cur_pt.y + 78;
-    bool allowUpgrade5 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER5)) && building & DWELLING_MONSTER5;
+    bool allowUpgrade5 = Monster(race, DWELLING_MONSTER5).isAllowUpgrade() && building & DWELLING_MONSTER5;
     index = allowUpgrade5 ? 28 : 23;
     display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectDwelling5(dst_pt, 135, 57);
@@ -472,8 +472,8 @@ Castle::building_t Castle::OpenTown(void)
     // dwelling 6
     dst_pt.x = cur_pt.x + 294;
     dst_pt.y = cur_pt.y + 78;
-    bool allowUpgrade6 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_MONSTER6)) && building & DWELLING_MONSTER6;
-    bool allowUpgrade7 = Monster::AllowUpgrade(Monster::Monster(race, DWELLING_UPGRADE6)) && building & DWELLING_UPGRADE6;
+    bool allowUpgrade6 = Monster(race, DWELLING_MONSTER6).isAllowUpgrade() && building & DWELLING_MONSTER6;
+    bool allowUpgrade7 = Monster(race, DWELLING_UPGRADE6).isAllowUpgrade() && building & DWELLING_UPGRADE6;
     index = allowUpgrade7 ? 30 :
            (allowUpgrade6 ? 29 : 24);
     display.Blit(AGG::GetICN(icn, index), dst_pt);
@@ -1138,7 +1138,7 @@ void Castle::PressRightAction(building_t b)
 			 DWELLING_UPGRADE5 |
 			 DWELLING_UPGRADE6 |
 			 DWELLING_UPGRADE7) & b ?
-			 std::string("The " + GetStringBuilding(b, race) + " produces " + Monster::MultipleNames(Monster::Monster(race, b)) + ".") :
+			 std::string("The " + GetStringBuilding(b, race) + " produces " + Monster(race, b).GetMultiName() + ".") :
 			 GetDescriptionBuilding(b, race);
 
     if(b & building && complete)

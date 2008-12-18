@@ -59,37 +59,33 @@ namespace Army
     const std::string & String(armysize_t);
     armysize_t GetSize(u16);
 
-    class Troop
+    class Troop : public Monster
     {
         public:
-            Troop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
-            Troop(const Troop &);
-	    Troop & operator= (const Troop &);
+            Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
 
-            void	Set(Monster::monster_t, u16);
-            void	SetMonster(Monster::monster_t);
-            void	UpgradeMonster(void);
+            void	Set(const Monster &, u16);
+            void	Set(monster_t, u16);
+            void	SetMonster(const Monster &);
+            void	SetMonster(monster_t);
             void	SetCount(u16);
             void	Reset(void);
             
             const Skill::Primary* MasterSkill(void) const;
             const army_t* GetArmy(void) const;
+	    const std::string & GetName(void) const;
 
-            Monster::monster_t Monster(void) const;
             u16 	Count(void) const;
 
-	    u8		Attack(void) const;
-	    u8		Defense(void) const;
-	    u32		HitPoint(void) const;
-	    u16		DamageMin(void) const;
-	    u16		DamageMax(void) const;
+	    u32		GetHitPoints(void) const;
+	    u16		GetDamageMin(void) const;
+	    u16		GetDamageMax(void) const;
 
             bool	isValid(void) const;
-	    bool	HasMonster(Monster::monster_t) const;
+	    bool	HasMonster(monster_t) const;
 
         protected:
     	    friend class army_t;
-            Monster::monster_t	monster;
             u16			count;
 	    const army_t*	army;
     };
@@ -120,7 +116,9 @@ namespace Army
 	    void	FromGuardian(const Maps::Tiles &);
 	    void	Import(const std::vector<Troop> &);
 	    void	Import(const std::vector<BattleTroop> &);
+	    void	UpgradeMonsters(const Monster &);
 	    void	UpgradeMonsters(const Monster::monster_t);
+	    void	Clear(void);
 	    void	Reset(bool = false);	// reset: soft or hard
 
 	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0) const;
@@ -143,21 +141,24 @@ namespace Army
 	    u8		Size(void) const;
 	    u8		GetCount(void) const;
 	    u8		GetUniqCount(void) const;
+	    u16		GetCountMonsters(const Monster &) const;
 	    u16		GetCountMonsters(const Monster::monster_t) const;
 	    s8		GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
 	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
 	    u32		CalculateExperience(void) const;
 
-	    u16		Attack(void) const;
-	    u16		Defense(void) const;
-	    u32		HitPoint(void) const;
-	    u32		DamageMin(void) const;
-	    u32		DamageMax(void) const;
+	    u16		GetAttack(void) const;
+	    u16		GetDefense(void) const;
+	    u32		GetHitPoints(void) const;
+	    u32		GetDamageMin(void) const;
+	    u32		GetDamageMax(void) const;
 
 	    bool	isValid(void) const;
-	    bool	HasMonster(const Monster::monster_t mon) const;
+	    bool	HasMonster(const Monster &) const;
+	    bool	HasMonster(const Monster::monster_t) const;
 	    bool	JoinTroop(const Troop & troop);
 	    bool	JoinTroop(const Monster::monster_t mon, const u16 count);
+	    bool	JoinTroop(const Monster & mon, const u16 count);
 	    bool	StrongerEnemyArmy(const army_t &);
 
 	    void	JoinStrongestFromArmy(army_t &);
@@ -174,11 +175,6 @@ namespace Army
 	    const Skill::Primary* commander;
 	    u16			flags;
     };
-
-
-
-
-
 };
 
 #endif

@@ -347,7 +347,7 @@ void RedrawHeroes(const Maps::Tiles & tile)
 void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
 {
     Display & display = Display::Get();
-    Monster::monster_t monster = Monster::Monster(tile);
+    const Monster monster(tile);
     Point dst_pt;
     Rect src_rt;
     u16 dst_index = MAXU16;
@@ -365,7 +365,7 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
 	    default: break;
 	}
 
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9 + (revert ? 8 : 7));
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + (revert ? 8 : 7));
 
 	dst_pt.x = dst.x + sprite_first.x() + 16;
 	dst_pt.y = dst.y + TILEWIDTH + sprite_first.y();
@@ -376,7 +376,7 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
     else
     {
 	// draw first sprite
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster * 9);
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9);
 
 	dst_pt.x = dst.x + sprite_first.x() + 16;
 	dst_pt.y = dst.y + TILEWIDTH + sprite_first.y();
@@ -385,7 +385,7 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
 	display.Blit(sprite_first, src_rt, dst_pt);
 
 	// draw second sprite
-	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster * 9 + 1 + (Maps::AnimationTicket() % 6));
+	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + 1 + (Maps::AnimationTicket() % 6));
 
 	dst_pt.x = dst.x + sprite_next.x() + 16;
 	dst_pt.y = dst.y + TILEWIDTH + sprite_next.y();

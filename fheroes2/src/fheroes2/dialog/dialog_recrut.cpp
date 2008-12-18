@@ -27,7 +27,7 @@
 #include "kingdom.h"
 #include "dialog.h"
 
-u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
+u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 {
     Display & display = Display::Get();
 
@@ -39,7 +39,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     
     // calculate max count
     u16 max = 0;
-    const PaymentConditions::BuyMonster paymentMonster(monster);
+    const PaymentConditions::BuyMonster paymentMonster(monster());
     const Resource::funds_t & kingdomResource = world.GetMyKingdom().GetFundsResource();
     while(Resource::funds_t(paymentMonster * max) <= kingdomResource && max <= available) ++max;
 
@@ -59,7 +59,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
 
     Point dst_pt;
 
-    std::string message("Recruit " + Monster::String(monster));
+    std::string message("Recruit " + monster.GetName());
 
     // text recruit monster
     dst_pt.x = pos.x + (pos.w - Text::width(message, Font::BIG)) / 2;
@@ -67,7 +67,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     Text(message, Font::BIG, dst_pt);
 
     // sprite monster
-    const Sprite & smon = AGG::GetICN(Monster::GetStats(monster).monh_icn, 0);
+    const Sprite & smon = AGG::GetICN(monster.ICNMonh(), 0);
     dst_pt.x = pos.x + 70 - smon.w() / 2;
     dst_pt.y = pos.y + 120 - smon.h();
     display.Blit(smon, dst_pt);
@@ -354,7 +354,7 @@ u16 Dialog::RecruitMonster(const Monster::monster_t & monster, u16 available)
     return result;
 }
 
-void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
+void Dialog::DwellingInfo(const Monster & monster, u16 available)
 {
     Display & display = Display::Get();
 
@@ -364,7 +364,7 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
     
-    const PaymentConditions::BuyMonster paymentMonster(monster);
+    const PaymentConditions::BuyMonster paymentMonster(monster());
 
     const Sprite & box = AGG::GetICN(ICN::RECR2BKG, 0);
     const Rect pos((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
@@ -378,13 +378,13 @@ void Dialog::DwellingInfo(const Monster::monster_t & monster, u16 available)
 
     Point dst_pt;
 
-    std::string message("Recruit " + Monster::String(monster));
+    std::string message("Recruit " + monster.GetName());
 
     // text recruit monster
     Text(message, Font::BIG, pos.x + (pos.w - Text::width(message, Font::BIG)) / 2, pos.y + 25);
 
     // sprite monster
-    const Sprite & smon = AGG::GetICN(Monster::GetStats(monster).monh_icn, 0);
+    const Sprite & smon = AGG::GetICN(monster.ICNMonh(), 0);
     dst_pt.x = pos.x + 70 - smon.w() / 2;
     dst_pt.y = pos.y + 120 - smon.h();
     display.Blit(smon, dst_pt);

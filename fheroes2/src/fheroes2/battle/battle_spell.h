@@ -37,7 +37,7 @@ namespace Spell	// or Battle
 
     bool AllowSpell(spell_t spell, const Army::BattleTroop &troop);
     void ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop);
-    spell_t TroopAttack(Monster::monster_t monster);
+    spell_t TroopAttack(const Monster &);
 };
 
 #endif

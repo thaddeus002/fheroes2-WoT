@@ -162,13 +162,12 @@ void Heroes::AIAction(const u16 dst_index)
 void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Monster::monster_t monster = Monster::Monster(tile);
-    const u16 count = tile.GetCountMonster();
+    const Monster monster(tile);
     Army::army_t army;
-    army.At(0).Set(monster, count);
+    army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + Monster::String(monster));
+    if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
 
     const u32 exp = army.CalculateExperience();
     const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -1072,7 +1071,7 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	{
             const Maps::Tiles & tile = world.GetTiles(index);
             Army::army_t enemy;
-            enemy.At(0).Set(Monster::Monster(tile), tile.GetCountMonster());
+            enemy.JoinTroop(Monster(tile), tile.GetCountMonster());
 
             // can we will win battle
             if(enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy)) return true;

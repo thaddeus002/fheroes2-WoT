@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,109 +17,111 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #ifndef H2MONSTER_H
 #define H2MONSTER_H
 
-#include <vector>
 #include <string>
-#include "mp2.h"
-#include "race.h"
+#include "skill.h"
 #include "icn.h"
 #include "m82.h"
-#include "speed.h"
 #include "gamedefs.h"
 
 namespace Maps { class Tiles; };
 
-namespace Monster
+class Monster : public Skill::Primary
 {
-    typedef enum {
+public:
+    enum level_t
+    {
+	LEVEL0,
 	LEVEL1,
 	LEVEL2,
 	LEVEL3,
 	LEVEL4
-    } level_t;
+    };
 
-    typedef enum {
-	PEASANT		= 0,
-	ARCHER		= 1,
-	RANGER		= 2,
-	PIKEMAN		= 3,
-	VETERAN_PIKEMAN	= 4,
-	SWORDSMAN	= 5,
-	MASTER_SWORDSMAN= 6,
-	CAVALRY		= 7,
-	CHAMPION	= 8,
-	PALADIN		= 9,
-	CRUSADER	= 10,
-	GOBLIN		= 11,
-	ORC		= 12,
-	CHIEF_ORC	= 13,
-	WOLF		= 14,
-	OGRE		= 15,
-	LORD_OGRE	= 16,
-	TROLL		= 17,
-	WAR_TROLL	= 18,
-	CYCLOPS		= 19,
-	SPRITE		= 20,
-	DWARF		= 21,
-	BATTLE_DWARF	= 22,
-	ELF		= 23,
-	GRAND_ELF	= 24,
-	DRUID		= 25,
-	GREATER_DRUID	= 26,
-	UNICORN		= 27,
-	PHOENIX		= 28,
-	CENTAUR		= 29,
-	GARGOYLE	= 30,
-	GRIFFIN		= 31,
-	MINOTAUR	= 32,
-	KNIGHT_MINOTAUR	= 33,
-	HYDRA		= 34,
-	GREEN_DRAGON	= 35,
-	RED_DRAGON	= 36,
-	BLACK_DRAGON	= 37,
-	HALFLING	= 38,
-	BOAR		= 39,
-	IRON_GOLEM	= 40,
-	STEEL_GOLEM	= 41,
-	ROC		= 42,
-	MAGE		= 43,
-	ARCHMAGE	= 44,
-	GIANT		= 45,
-	TITAN		= 46,
-	SKELETON	= 47,
-	ZOMBIE		= 48,
-	MUTANT_ZOMBIE	= 49,
-	MUMMY		= 50,
-	ROYAL_MUMMY	= 51,
-	VAMPIRE		= 52,
-	LORD_VAMPIRE	= 53,
-	LICH		= 54,
-	POWER_LICH	= 55,
-	BONE_DRAGON	= 56,
+    enum monster_t
+    {
+	UNKNOWN,
 
-	ROGUE		= 57,
-	NOMAD		= 58,
-	GHOST		= 59,
-	GENIE		= 60,
-	MEDUSA		= 61,
-	EARTH_ELEMENT	= 62,
-	AIR_ELEMENT	= 63,
-	FIRE_ELEMENT	= 64,
-	WATER_ELEMENT	= 65,
+	PEASANT,
+	ARCHER,
+	RANGER,
+	PIKEMAN,
+	VETERAN_PIKEMAN,
+	SWORDSMAN,
+	MASTER_SWORDSMAN,
+	CAVALRY,
+	CHAMPION,
+	PALADIN,
+	CRUSADER,
+	GOBLIN,
+	ORC,
+	CHIEF_ORC,
+	WOLF,
+	OGRE,
+	LORD_OGRE,
+	TROLL,
+	WAR_TROLL,
+	CYCLOPS,
+	SPRITE,
+	DWARF,
+	BATTLE_DWARF,
+	ELF,
+	GRAND_ELF,
+	DRUID,
+	GREATER_DRUID,
+	UNICORN,
+	PHOENIX,
+	CENTAUR,
+	GARGOYLE,
+	GRIFFIN,
+	MINOTAUR,
+	KNIGHT_MINOTAUR,
+	HYDRA,
+	GREEN_DRAGON,
+	RED_DRAGON,
+	BLACK_DRAGON,
+	HALFLING,
+	BOAR,
+	IRON_GOLEM,
+	STEEL_GOLEM,
+	ROC,
+	MAGE,
+	ARCHMAGE,
+	GIANT,
+	TITAN,
+	SKELETON,
+	ZOMBIE,
+	MUTANT_ZOMBIE,
+	MUMMY,
+	ROYAL_MUMMY,
+	VAMPIRE,
+	LORD_VAMPIRE,
+	LICH,
+	POWER_LICH,
+	BONE_DRAGON,
 
-	UNKNOWN		= 66,
+	ROGUE,
+	NOMAD,
+	GHOST,
+	GENIE,
+	MEDUSA,
+	EARTH_ELEMENT,
+	AIR_ELEMENT,
+	FIRE_ELEMENT,
+	WATER_ELEMENT,
 
 	MONSTER_RND1,
 	MONSTER_RND2,
 	MONSTER_RND3,
 	MONSTER_RND4,
 	MONSTER_RND,
+    };
 
-    } monster_t;
-
-    typedef struct {
+    struct animattack_t
+    {
 	u8 attprep_start;
 	u8 attprep_count;
 	u8 attack1_start;
@@ -128,9 +130,10 @@ namespace Monster
 	u8 attack2_count;
 	u8 attack3_start;
 	u8 attack3_count;
-    } animattack_t;
+    };
 
-    typedef struct {
+    struct anim_t
+    {
 	u8 walk_start;
 	u8 walk_count;
 	u8 idle_start;
@@ -141,68 +144,99 @@ namespace Monster
 	u8 die_count;
 	animattack_t a;
 	animattack_t ar;
-    } anim_t;
-    
-    typedef enum { 
-	AS_NONE=0, 
-	AS_IDLE=1, 
-	AS_WALK=2, 
-	AS_ATT1=3, 
-	AS_ATT2=4, 
-	AS_ATT3=5, 
-	AS_PAIN=6, 
-	AS_DIE=7, 
-	AS_ATTPREP=16, 
-	AS_ATT1P=16+3,
-	AS_ATT2P=16+4,
-	AS_ATT3P=16+5
-    } animstate_t;
+    };
 
-    typedef struct {
-	bool fly;
-	bool wide;
-	monster_t monster;
-	u8 attack;
-	u8 defence;
-	u8 shots;
-	u8 damageMin;
-	u8 damageMax;
-	u16 hp;
-	Speed::speed_t speed;
-	u8 grown;
-	const std::string name;
-	const ICN::icn_t file_icn;
-	const ICN::icn_t monh_icn;
-	const ICN::icn_t miss_icn;
-	anim_t animation;
-	M82::m82_t m82_attk, m82_expl, m82_kill, m82_move, m82_shot, m82_wnce;
-    } stats_t;
+    enum animstate_t
+    { 
+	AS_NONE		= 0,
+	AS_IDLE		= 1,
+	AS_WALK		= 2,
+	AS_ATT1		= 3,
+	AS_ATT2		= 4,
+	AS_ATT3		= 5,
+	AS_PAIN		= 6,
+	AS_DIE		= 7,
+	AS_ATTPREP	= 16,
+	AS_ATT1P	= 16+3,
+	AS_ATT2P	= 16+4,
+	AS_ATT3P	= 16+5
+    };
 
-    const std::string & String(monster_t monster);
-    const std::string MultipleNames(monster_t monster);
-    const stats_t & GetStats(monster_t monster);
-    u8 GetGrown(monster_t monster);
-    Race::race_t GetRace(monster_t monster);
-    level_t GetLevel(monster_t monster);
-    void GetAnimFrames(monster_t monster, animstate_t anim, u8 & start, u8 & length, bool attranged=false);
+    Monster();
+    Monster(monster_t);
+    Monster(const Maps::Tiles &);
+    Monster(u8, u32);
 
-    monster_t Upgrade(monster_t monster);
-    bool AllowUpgrade(monster_t monster);
+    bool operator== (monster_t) const;
+    bool operator!= (monster_t) const;
+    monster_t operator() (void) const;
 
-    monster_t Monster(u8 num);
-    monster_t Monster(Race::race_t race, u32 dwelling);
-    monster_t Monster(const Maps::Tiles & tile);
-    monster_t Monster(const MP2::object_t obj);
+    monster_t GetID(void) const;
 
-    monster_t Rand(void);
-    monster_t Rand1(void);
-    monster_t Rand2(void);
-    monster_t Rand3(void);
-    monster_t Rand4(void);
+    void Set(monster_t);
+    void Upgrade(void);
 
-    u16 GetRNDSize(monster_t monster);
+    u8 GetAttack(void) const;
+    u8 GetDefense(void) const;
+    u8 GetPower(void) const;
+    u8 GetKnowledge(void) const;
+    Morale::morale_t GetMorale(void) const;
+    Luck::luck_t GetLuck(void) const;
+    Race::race_t GetRace(void) const;
 
-    u32 Dwelling(const monster_t monster);
+    u8  GetDamageMin(void) const;
+    u8  GetDamageMax(void) const;
+    u8  GetShots(void) const;
+    u16 GetHitPoints(void) const;
+    u8  GetSpeed(void) const;
+    u8  GetGrown(void) const;
+    u8  GetLevel(void) const;
+    u16 GetRNDSize(void) const;
+    u8  GetSpriteIndex(void) const;
+
+    const std::string & GetName(void) const;
+    const std::string & GetMultiName(void) const;
+
+    bool isFly(void) const;
+    bool isWide(void) const;
+    bool isArchers(void) const;
+    bool isAllowUpgrade(void) const;
+    bool isTwiceAttack(void) const;
+
+    ICN::icn_t ICNFile(void) const;
+    ICN::icn_t ICNMonh(void) const;
+    ICN::icn_t ICNMiss(void) const;
+
+    M82::m82_t M82Attk(void) const;
+    M82::m82_t M82Expl(void) const;
+    M82::m82_t M82Kill(void) const;
+    M82::m82_t M82Move(void) const;
+    M82::m82_t M82Shot(void) const;
+    M82::m82_t M82Wnce(void) const;
+
+    const anim_t & Animation(void) const;
+    void GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged = false);
+
+    static const std::string & String(Monster &);
+    static monster_t Upgrade(Monster &);
+    static u16 GetRNDSize(Monster &);
+    static u8  GetLevel(Monster &);
+    static u32 GetDwelling(Monster &);
+
+    static const std::string & String(monster_t);
+    static monster_t Upgrade(monster_t);
+    static u16 GetRNDSize(monster_t);
+    static u8  GetLevel(monster_t);
+    static u32 GetDwelling(monster_t);
+
+    static monster_t FromInt(u8);
+    static monster_t FromDwelling(u8, u32);
+    static monster_t FromObject(u8);
+    static monster_t FromMaps(const Maps::Tiles &);
+    static monster_t Rand(level_t = LEVEL0);
+
+protected:
+    monster_t id;
 };
 
 #endif

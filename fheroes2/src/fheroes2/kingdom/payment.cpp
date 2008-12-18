@@ -18,12 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
-#include "rect.h"
 #include "castle.h"
 #include "settings.h"
+#include "race.h"
+#include "monster.h"
 #include "payment.h"
 
-PaymentConditions::BuyMonster::BuyMonster(const Monster::monster_t & monster)
+PaymentConditions::BuyMonster::BuyMonster(u8 monster)
 {
     gold	= 0;
     wood	= 0;
@@ -138,10 +139,10 @@ PaymentConditions::BuyMonster::BuyMonster(const Monster::monster_t & monster)
     }
 }
 
-PaymentConditions::UpgradeMonster::UpgradeMonster(const Monster::monster_t & monster)
+PaymentConditions::UpgradeMonster::UpgradeMonster(u8 monster)
 {
-    payment_t pay = BuyMonster(Monster::Upgrade(monster)) - BuyMonster(monster);
-    
+    payment_t pay = BuyMonster(Monster::Upgrade(Monster::FromInt(monster))) - BuyMonster(monster);
+
     gold	= pay.gold;
     wood	= pay.wood;
     mercury	= pay.mercury;
@@ -151,7 +152,7 @@ PaymentConditions::UpgradeMonster::UpgradeMonster(const Monster::monster_t & mon
     gems	= pay.gems;
 }
 
-PaymentConditions::BuyBuilding::BuyBuilding(const Race::race_t & race, const u32 build)
+PaymentConditions::BuyBuilding::BuyBuilding(const u8 race, const u32 build)
 {
     gold	= 0;
     wood	= 0;

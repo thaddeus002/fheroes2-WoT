@@ -564,19 +564,19 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
             if(0 <= index1)
             {
                 const Army::Troop & troop1 = army.At(index1);
-                const std::string & monster1 = Monster::String(troop1.Monster());
+                const std::string & monster1 = troop1.GetName();
 
                 if(selectArmy.isSelected())
                 {
                     const u8 index2 = selectArmy.Selected();
                     const Army::Troop & troop2 = army.At(index2);
-                    const std::string & monster2 = Monster::String(troop2.Monster());
+                    const std::string & monster2 = troop2.GetName();
 
                     if(index1 == index2)
                         statusBar.ShowMessage("View " + monster1);
                     else
                     if(troop1.isValid() && troop2.isValid())
-                        troop1.Monster() == troop2.Monster() ?
+                        troop1() == troop2() ?
                         statusBar.ShowMessage("Combine " + monster1 + " armies") :
                         statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
                     else
