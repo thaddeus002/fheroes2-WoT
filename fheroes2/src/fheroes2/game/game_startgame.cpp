@@ -723,11 +723,11 @@ Game::menu_t Game::HumanTurn(void)
     if(1 < world.CountWeek() && world.BeginWeek())
     {
 	const Week::type_t name = world.GetWeekType();
-	const std::string message(name == Week::PLAGUE ? "All populations are halved." : "All dwellings increase population.");
-	if(world.BeginMonth())
-	    Dialog::Message("Astrologers proclaim month of the " + Week::GetString(name) + ".", message, Font::BIG, Dialog::OK);
-	else
-	    Dialog::Message("Astrologers proclaim week of the " + Week::GetString(name) + ".", message, Font::BIG, Dialog::OK);
+	std::string message("Astrologers proclaim ");
+	message += world.BeginMonth() ? "month" : "week";
+	message += " of the " + Week::GetString(name) + ".";
+	message += (name == Week::PLAGUE ? " All populations are halved." : " All dwellings increase population.");
+	Dialog::Message("", message, Font::BIG, Dialog::OK);
     }
 
     // show event day

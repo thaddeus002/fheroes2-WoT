@@ -400,28 +400,31 @@ bool Heroes::MoveStep(bool fast)
 	    if(MP2::OBJ_HEROES != save_maps_general) tiles_from.SetObject(save_maps_general);
 
 	    SetCenter(index_to);
-	    Scoute();
-	    ApplyPenaltyMovement();
-
-	    if(MP2::OBJ_EVENT == tiles_to.GetObject()) Action(index_to);
-
-	    if(index_to == index_dst)
-	    {
-		path.Reset();
-		Action(index_to);
-		SetMove(false);
-	    }
-
 	    save_maps_general = tiles_to.GetObject();
 	    tiles_to.SetObject(MP2::OBJ_HEROES);
-
+	    Scoute();
+	    ApplyPenaltyMovement();
 	    path.PopFront();
 
+	    if(MP2::OBJ_EVENT == save_maps_general) Action(index_to);
+
+	    // check protection tile
 	    u16 dst_index2 = MAXU16;
 	    if(Maps::TileUnderProtection(index_to, dst_index2))
     	    {
 		Action(dst_index2);
 		SetMove(false);
+	    }
+
+	    // possible hero is die
+	    if(!isFreeman())
+	    {
+		if(index_to == index_dst)
+		{
+		    path.Reset();
+		    Action(index_to);
+		    SetMove(false);
+		}
 	    }
 	}
 	return true;
@@ -453,37 +456,16 @@ bool Heroes::MoveStep(bool fast)
 	if(MP2::OBJ_HEROES != save_maps_general) tiles_from.SetObject(save_maps_general);
 
 	SetCenter(index_to);
+	save_maps_general = tiles_to.GetObject();
+	tiles_to.SetObject(MP2::OBJ_HEROES);
 	Scoute();
 	ApplyPenaltyMovement();
-
-	if(MP2::OBJ_EVENT == tiles_to.GetObject()) Action(index_to);
-
-	if(index_to == index_dst)
-	{
-	    path.Reset();
-	    Action(index_to);
-	    SetMove(false);
-	}
-
-	switch(tiles_to.GetObject())
-	{
-	    case MP2::OBJ_STONELIGHTS:
-	    case MP2::OBJ_WHIRLPOOL:
-		save_maps_general = tiles_to.GetObject();
-		index_to = GetIndex();
-		world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
-		break;
-
-	    default:
-		save_maps_general = tiles_to.GetObject();
-		tiles_to.SetObject(MP2::OBJ_HEROES);
-		break;
-	}
-
+	sprite_index -= 8;
 	path.PopFront();
 
-	sprite_index -= 8;
+	if(MP2::OBJ_EVENT == save_maps_general) Action(index_to);
 
+	// check protection tile
 	u16 dst_index2 = MAXU16;
 	if(Maps::TileUnderProtection(index_to, dst_index2))
         {
@@ -491,6 +473,17 @@ bool Heroes::MoveStep(bool fast)
 	    Display::Get().Flip();
 	    Action(dst_index2);
 	    SetMove(false);
+	}
+
+	// possible hero is die
+	if(!isFreeman())
+	{
+	    if(index_to == index_dst)
+	    {
+		path.Reset();
+		Action(index_to);
+		SetMove(false);
+	    }
 	}
 
 	return true;
