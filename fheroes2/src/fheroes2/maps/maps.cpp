@@ -144,10 +144,9 @@ s16 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
     return py * world.w() + px;
 }
 
-u16 Maps::GetDirectionAroundFog(const u16 center, u8 color)
+u16 Maps::GetDirectionAroundFog(const u16 center, const u8 color)
 {
     if(!isValidAbsPoint(center % world.w(), center / world.h())) return 0;
-    if(0 == color) color = Settings::Get().CurrentColor();
 
     u16 result = 0;
 

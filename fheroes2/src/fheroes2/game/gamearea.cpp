@@ -403,7 +403,7 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
     const s16 dstx = BORDERWIDTH + TILEWIDTH * ox;
     const s16 dsty = BORDERWIDTH + TILEWIDTH * oy;
     Display & display = Display::Get();
-    const u16 around = Maps::GetDirectionAroundFog(dst_index);
+    const u16 around = Maps::GetDirectionAroundFog(dst_index, Settings::Get().MyColor());
 
     // TIL::CLOF32
     if(DIRECTION_ALL == around)
