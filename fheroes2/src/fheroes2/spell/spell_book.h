@@ -23,21 +23,22 @@
 
 #include "gamedefs.h"
 #include "spell_storage.h"
-#include "skill.h"
 
 class Heroes;
+namespace Skill { class Primary; };
 
 namespace Spell
 {
     class Book : public Storage
     {
     public:
-	Book(const Heroes &h);
+	Book(const Skill::Primary *p);
 
-        void Appends(const Storage & st, const Skill::Level::type_t & wisdom);
-        void Append(const Spell::spell_t sp, const Skill::Level::type_t & wisdom);
+        void Appends(const Storage & st, const u8 wisdom);
+        void Append(const Spell::spell_t sp, const u8 wisdom);
 
-	typedef enum {
+	typedef enum
+	{
 	    ALL = 0,
 	    ADVN,
 	    CMBT
@@ -45,14 +46,14 @@ namespace Spell
 
 	Spell::spell_t Open(filter_t filt = ALL, bool canselect=false) const;
 	void Activate(void) { active = true; };
-	bool Active(void) const { return active; };
+	bool isActive(void) const { return active; };
 
     private:
 	void RedrawLists(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt) const;
 	static Spell::spell_t GetSelected(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt);
 	void Filter(std::vector<Spell::spell_t> & spells, bool adv_mode) const;
-	
-	const Heroes *hero;
+
+	const Skill::Primary *hero;
 	bool active;
 	u8 list_count;
     };

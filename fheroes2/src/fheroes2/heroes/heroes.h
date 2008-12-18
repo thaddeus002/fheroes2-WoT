@@ -25,7 +25,6 @@
 #include <vector>
 #include <list>
 #include "spell.h"
-#include "color.h"
 #include "morale.h"
 #include "mp2.h"
 #include "luck.h"
@@ -131,6 +130,8 @@ public:
     Color::color_t GetColor(void) const{ return color; };
     Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
+    u8 GetType(void) const { return Skill::Primary::HEROES; };
+    Spell::Book * GetSpellBook(void) { return spell_book.isActive() ? &spell_book : NULL; };
 
     const Point & GetCenter(void) const;
     u16 GetIndex(void) const;

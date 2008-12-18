@@ -77,9 +77,12 @@ namespace Army
 
             u16 	Count(void) const;
 
+	    u8		GetAttack(void) const;
+	    u8		GetDefense(void) const;
 	    u32		GetHitPoints(void) const;
 	    u16		GetDamageMin(void) const;
 	    u16		GetDamageMax(void) const;
+	    Color::color_t GetColor(void) const;
 
             bool	isValid(void) const;
 	    bool	HasMonster(monster_t) const;
@@ -136,7 +139,8 @@ namespace Army
 	    const Troop&GetStrongestTroop(void) const;
 	    const Troop&GetWeakestTroop(void) const;
 
-	    Race::race_t GetRace(void) const;
+	    Race::race_t   GetRace(void) const;
+	    Color::color_t GetColor(void) const;
 
 	    u8		Size(void) const;
 	    u8		GetCount(void) const;

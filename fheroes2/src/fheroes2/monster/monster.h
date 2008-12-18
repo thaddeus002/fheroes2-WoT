@@ -183,6 +183,10 @@ public:
     Morale::morale_t GetMorale(void) const;
     Luck::luck_t GetLuck(void) const;
     Race::race_t GetRace(void) const;
+    Color::color_t GetColor(void) const;
+    u8 GetType(void) const;
+    u16 GetSpellPoints(void) const;
+    Spell::Book* GetSpellBook(void);
 
     u8  GetDamageMin(void) const;
     u8  GetDamageMax(void) const;

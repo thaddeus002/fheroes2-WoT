@@ -24,7 +24,6 @@
 #include "gamedefs.h"
 #include "icn.h"
 #include "m82.h"
-#include "monster.h"
 
 namespace Spell
 {

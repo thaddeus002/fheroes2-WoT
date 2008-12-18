@@ -2640,7 +2640,7 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spel
     Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);
     Button buttonSur(pos_rt.x + 148, pos_rt.y + 148, butt, 13, 14);
     Button buttonOK(pos_rt.x + 207, pos_rt.y + 148, butt, 15, 16);
-    buttonMag.SetDisable(!hero.SpellBook().Active() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
+    buttonMag.SetDisable(!hero.SpellBook().isActive() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
     buttonRet.SetDisable(locked || quickshow);
     buttonSur.SetDisable(!cansurrender || locked || quickshow);
     buttonMag.Draw();

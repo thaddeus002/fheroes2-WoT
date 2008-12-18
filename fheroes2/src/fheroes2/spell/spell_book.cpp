@@ -23,15 +23,15 @@
 #include "cursor.h"
 #include "spell_book.h"
 #include "dialog.h"
-#include "heroes.h"
+#include "skill.h"
 
 #define SPELL_PER_PAGE	6
 
-Spell::Book::Book(const Heroes &h) : hero(&h), active(false), list_count(0)
+Spell::Book::Book(const Skill::Primary *p) : hero(p), active(false), list_count(0)
 {
 }
 
-void Spell::Book::Appends(const Storage & st, const Skill::Level::type_t & wisdom)
+void Spell::Book::Appends(const Storage & st, const u8 wisdom)
 {
     if(st.Size1())
     {
@@ -69,7 +69,7 @@ void Spell::Book::Appends(const Storage & st, const Skill::Level::type_t & wisdo
     }
 }
 
-void Spell::Book::Append(const Spell::spell_t sp, const Skill::Level::type_t & wisdom)
+void Spell::Book::Append(const Spell::spell_t sp, const u8 wisdom)
 {
     switch(Spell::Level(sp))
     {
@@ -191,14 +191,16 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 	    display.Flip();
 	}
 
-	if(le.MouseClickLeft(info_rt)) {
+	if(le.MouseClickLeft(info_rt) && hero)
+	{
 	    std::string str = "Your hero has ";
 	    String::AddInt(str, hero->GetSpellPoints());
 	    str += " spell points remaining";
 	    Dialog::Message("", str, Font::BIG, Dialog::OK);
 	}
 
-	if(le.MousePressRight(info_rt)) {
+	if(le.MousePressRight(info_rt) && hero)
+	{
 	    std::string str = "Your hero has ";
 	    String::AddInt(str, hero->GetSpellPoints());
 	    str += " spell points remaining";
@@ -230,12 +232,17 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 	if(le.MouseClickLeft(pos))
 	{
 	    Spell::spell_t spell = GetSelected(spells, current_index, pos);
-	    if(canselect) {
-		if(spell != Spell::NONE) {
-		    if(hero->GetSpellPoints() >= Spell::Mana(spell)) {
+	    if(canselect)
+	    {
+		if(spell != Spell::NONE && hero)
+		{
+		    if(hero->GetSpellPoints() >= Spell::Mana(spell))
+		    {
 			curspell = spell;
 			break;
-		    } else {
+		    }
+		    else
+		    {
 			std::string str = "That spell costs ";
 			String::AddInt(str, Spell::Mana(spell));
 			str += " mana. You only have ";
@@ -244,7 +251,10 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 			Dialog::Message("", str, Font::BIG, Dialog::OK);
 		    }
 		}
-	    } else if(spell != Spell::NONE) {
+	    }
+	    else
+	    if(spell != Spell::NONE)
+	    {
 		cursor.Hide();
 		Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, true);
 		cursor.Show();
@@ -297,11 +307,13 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
 
     Point tp = info_rt;
     tp += Point(9, 6);
-    int mp = hero->GetSpellPoints();
+    int mp = hero ? hero->GetSpellPoints() : 0;
     std::string mps;
-    for(int i=100; i>=1; i/=10) {
+    for(int i=100; i>=1; i/=10)
+    {
 	mps = " ";
-	if(mp >= i) {
+	if(mp >= i)
+	{
 	    mps = "";
 	    String::AddInt(mps, (mp%(i*10))/i);
 	}

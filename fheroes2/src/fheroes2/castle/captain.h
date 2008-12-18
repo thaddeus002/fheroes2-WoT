@@ -20,9 +20,8 @@
 #ifndef H2CAPTAIN_H
 #define H2CAPTAIN_H
 
-#include "morale.h"
-#include "luck.h"
 #include "skill.h"
+#include "spell_book.h"
 #include "gamedefs.h"
 
 class Castle;
@@ -40,8 +39,15 @@ class Captain : public Skill::Primary
         Morale::morale_t GetMorale(void) const;
         Luck::luck_t GetLuck(void) const;
         Race::race_t GetRace(void) const;
+        Color::color_t GetColor(void) const;
+	const std::string & GetName(void) const;
+	u8 GetType(void) const;
+	u16 GetSpellPoints(void) const;
+	Spell::Book * GetSpellBook(void);
 
+    private:
 	const Castle & home;
+	Spell::Book spell_book;
 };
 
 #endif

@@ -39,7 +39,7 @@ extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, 
 extern void PlayPickupSound(void);
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
-    move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(*this), hid(ht), race(rc), flags(ARMYSPREAD),
+    move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), hid(ht), race(rc), flags(ARMYSPREAD),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     secondary_skills.reserve(HEROESMAXSKILL);
@@ -1024,7 +1024,7 @@ void Heroes::ActionNewDay(void)
     move_point = GetMaxMovePoints();
 
     // recovery spell points
-    if(spell_book.Active())
+    if(spell_book.isActive())
     {
 	// possible visit arteian spring 2 * max
 	u16 prev = magic_point;
@@ -1253,7 +1253,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 /* buy book */
 bool Heroes::BuySpellBook(void)
 {
-    if(spell_book.Active() || Color::GRAY == color) return false;
+    if(spell_book.isActive() || Color::GRAY == color) return false;
 
     Resource::funds_t payment(Resource::GOLD, BUY_SPELL_BOOK_GOLD);
     Kingdom & kingdom = world.GetKingdom(color);

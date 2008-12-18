@@ -21,7 +21,7 @@
 #include "castle.h"
 #include "captain.h"
 
-Captain::Captain(const Castle & c) : home(c)
+Captain::Captain(const Castle & c) : home(c), spell_book(this)
 {
 }
 
@@ -153,4 +153,29 @@ Luck::luck_t Captain::GetLuck(void) const
 Race::race_t Captain::GetRace(void) const
 {
     return home.GetRace();
+}
+
+Color::color_t Captain::GetColor(void) const
+{
+    return home.GetColor();
+}
+
+const std::string & Captain::GetName(void) const
+{
+    return home.GetName();
+}
+
+u8 Captain::GetType(void) const
+{
+    return Skill::Primary::CAPTAIN;
+}
+
+Spell::Book * Captain::GetSpellBook(void)
+{
+    return spell_book.isActive() ? &spell_book : NULL;
+}
+
+u16 Captain::GetSpellPoints(void) const
+{
+    return 0;
 }

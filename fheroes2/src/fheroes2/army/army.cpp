@@ -134,6 +134,21 @@ u16 Army::Troop::Count(void) const
     return count;
 }
 
+u8 Army::Troop::GetAttack(void) const
+{
+    return army && army->commander ? army->commander->GetAttack() + Monster::GetAttack() : Monster::GetAttack();
+}
+
+u8 Army::Troop::GetDefense(void) const
+{
+    return army && army->commander ? army->commander->GetDefense() + Monster::GetDefense() : Monster::GetDefense();
+}
+
+Color::color_t Army::Troop::GetColor(void) const
+{
+    return army && army->commander ? army->commander->GetColor() : Color::GRAY;
+}
+
 u32 Army::Troop::GetHitPoints(void) const
 {
     return Monster::GetHitPoints() * count;
@@ -439,6 +454,11 @@ bool Army::army_t::HasMonster(const Monster & mons) const
 bool Army::army_t::HasMonster(const Monster::monster_t mons) const
 {
     return army.end() != std::find_if(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::HasMonster), mons));
+}
+
+Color::color_t Army::army_t::GetColor(void) const
+{
+    return commander ? commander->GetColor() : Color::GRAY;
 }
 
 Race::race_t Army::army_t::GetRace(void) const
@@ -922,7 +942,6 @@ u16 Army::army_t::GetAttack(void) const
     u8 count = 0;
 
     for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetAttack(); ++count; }
-    if(commander) res += commander->GetAttack();
 
     return res / count;
 }
@@ -935,7 +954,6 @@ u16 Army::army_t::GetDefense(void) const
     u8 count = 0;
 
     for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetDefense(); ++count; }
-    if(commander) res += commander->GetDefense();
 
     return res / count;
 }
