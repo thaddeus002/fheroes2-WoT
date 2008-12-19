@@ -642,7 +642,7 @@ void AIToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
 void AIToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Skill::Level::type_t level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
+    const u8 level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
     const u8 level2 = hero.GetLevel();
 
     if(!hero.isVisited(tile) &&
@@ -1028,7 +1028,7 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 
 	case MP2::OBJ_XANADU:
 	{
-	    const Skill::Level::type_t level1 = GetLevelSkill(Skill::Secondary::DIPLOMACY);
+	    const u8 level1 = GetLevelSkill(Skill::Secondary::DIPLOMACY);
 	    const u8 level2 = GetLevel();
 
 	    if(!isVisited(world.GetTiles(index)) &&

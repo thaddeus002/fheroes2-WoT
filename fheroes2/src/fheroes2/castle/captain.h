@@ -44,6 +44,7 @@ class Captain : public Skill::Primary
 	u8 GetType(void) const;
 	u16 GetSpellPoints(void) const;
 	Spell::Book * GetSpellBook(void);
+	u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
 
     private:
 	const Castle & home;

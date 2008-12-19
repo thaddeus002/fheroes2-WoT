@@ -47,6 +47,53 @@ namespace Skill
 
 	const std::string & String(const type_t level);
     };
+
+    class Secondary : private std::pair<u8, u8>
+    {
+	public:
+
+	typedef enum
+	{
+	    UNKNOWN	= 0,
+	    PATHFINDING	= 1,
+	    ARCHERY	= 2,
+	    LOGISTICS	= 3,
+	    SCOUTING	= 4,
+	    DIPLOMACY	= 5,
+	    NAVIGATION	= 6,
+	    LEADERSHIP	= 7,
+	    WISDOM	= 8,
+	    MYSTICISM	= 9,
+	    LUCK	= 10,
+	    BALLISTICS	= 11,
+	    EAGLEEYE	= 12,
+	    NECROMANCY	= 13,
+	    ESTATES	= 14,
+	} skill_t;
+
+	Secondary();
+	Secondary(const skill_t & s, const Level::type_t & t);
+
+	void		SetSkill(const skill_t s);
+	void		SetLevel(const u8 level);
+	void		NextLevel(void);
+
+	Level::type_t	Level(void) const;
+	skill_t		Skill(void) const;
+
+	static skill_t 	FromMP2(const u8 byte);
+	static skill_t 	RandForWitchsHut(void);
+	static const std::string & String(const skill_t skill);
+	static const std::string & Description(const skill_t skill, const Level::type_t level);
+	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t> & exclude);
+	static skill_t PriorityFromRace(const u8 race);
+
+	/* index sprite from SECSKILL */
+	static u8 GetIndexSprite1(const skill_t skill);
+
+	/* index sprite from MINISS */
+	static u8 GetIndexSprite2(const skill_t skill);
+    };
     
     class Primary
     {
@@ -84,6 +131,7 @@ namespace Skill
 	virtual u8 GetType(void) const = 0;
 	virtual u16 GetSpellPoints(void) const = 0;
 	virtual Spell::Book * GetSpellBook(void) = 0;
+	virtual u8 GetLevelSkill(const Skill::Secondary::skill_t) const = 0;
 
         static const std::string & String(const skill_t skill);
 	static skill_t FromLevelUp(const u8 race, const u8 level);
@@ -95,52 +143,6 @@ namespace Skill
 	u8			knowledge;
     };
 
-    class Secondary : private std::pair<u8, u8>
-    {
-	public:
-
-	typedef enum
-	{
-	    UNKNOWN	= 0,
-	    PATHFINDING	= 1,
-	    ARCHERY	= 2,
-	    LOGISTICS	= 3,
-	    SCOUTING	= 4,
-	    DIPLOMACY	= 5,
-	    NAVIGATION	= 6,
-	    LEADERSHIP	= 7,
-	    WISDOM	= 8,
-	    MYSTICISM	= 9,
-	    LUCK	= 10,
-	    BALLISTICS	= 11,
-	    EAGLEEYE	= 12,
-	    NECROMANCY	= 13,
-	    ESTATES	= 14,
-	} skill_t;
-
-	Secondary();
-	Secondary(const skill_t & s, const Level::type_t & t);
-
-	void		SetSkill(const skill_t s);
-	void		SetLevel(const Level::type_t level);
-	void		NextLevel(void);
-
-	Level::type_t	Level(void) const;
-	skill_t		Skill(void) const;
-
-	static skill_t 	FromMP2(const u8 byte);
-	static skill_t 	RandForWitchsHut(void);
-	static const std::string & String(const skill_t skill);
-	static const std::string & Description(const skill_t skill, const Level::type_t level);
-	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t> & exclude);
-	static skill_t PriorityFromRace(const u8 race);
-
-	/* index sprite from SECSKILL */
-	static u8 GetIndexSprite1(const skill_t skill);
-
-	/* index sprite from MINISS */
-	static u8 GetIndexSprite2(const skill_t skill);
-    };
 };
 
 #endif

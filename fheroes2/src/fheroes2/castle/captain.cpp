@@ -179,3 +179,8 @@ u16 Captain::GetSpellPoints(void) const
 {
     return 0;
 }
+
+u8 Captain::GetLevelSkill(const Skill::Secondary::skill_t skill) const
+{
+    return 0;
+}

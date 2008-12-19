@@ -162,7 +162,7 @@ public:
 
     bool HasSecondarySkill(const Skill::Secondary::skill_t skill) const;
     u8   CountSecondarySkill(void) const;
-    Skill::Level::type_t GetLevelSkill(const Skill::Secondary::skill_t skill) const;
+    u8   GetLevelSkill(const Skill::Secondary::skill_t skill) const;
     void LearnBasicSkill(const Skill::Secondary::skill_t skill);
     void LevelUpSkill(const Skill::Secondary::skill_t skill);
     void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;

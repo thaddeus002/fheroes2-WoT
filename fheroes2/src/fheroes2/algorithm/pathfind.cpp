@@ -73,7 +73,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 {
     const u8 debug = Settings::Get().Debug();
 
-    const Skill::Level::type_t pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
+    const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
     const u8 under = (hero ? hero->GetUnderObject() : MP2::OBJ_ZERO);
 
     u16 cur = from;

@@ -42,11 +42,6 @@ namespace Army
         public:
             Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
 
-	    enum flags_t
-	    {
-		MOVED	= 0x0001,
-	    };
-
             void	Set(const Monster &, u16);
             void	Set(monster_t, u16);
             void	SetMonster(const Monster &);
@@ -64,6 +59,7 @@ namespace Army
 	    u8		GetAttack(void) const;
 	    u8		GetDefense(void) const;
 	    u32		GetHitPoints(void) const;
+	    u16		GetDamage(void) const;
 	    u16		GetDamageMin(void) const;
 	    u16		GetDamageMax(void) const;
 	    Color::color_t GetColor(void) const;

@@ -178,11 +178,15 @@ void Skill::Secondary::SetSkill(const skill_t skill)
     first = skill;
 }
 
-void Skill::Secondary::SetLevel(const Level::type_t level)
+void Skill::Secondary::SetLevel(const u8 level)
 {
-    if(Level::NONE == level) return;
-
-    second = level;
+    switch(level)
+    {
+	case Level::BASIC:
+	case Level::ADVANCED:
+	case Level::EXPERT:	second = level; break;
+	default: break;
+    }
 }
 
 void Skill::Secondary::NextLevel(void)

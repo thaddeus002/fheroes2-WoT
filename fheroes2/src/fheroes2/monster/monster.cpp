@@ -324,6 +324,11 @@ u16 Monster::GetSpellPoints(void) const
     return 0;
 }
 
+u8 Monster::GetLevelSkill(const Skill::Secondary::skill_t skill) const
+{
+    return 0;
+}
+
 Spell::Book* Monster::GetSpellBook(void)
 {
     return NULL;

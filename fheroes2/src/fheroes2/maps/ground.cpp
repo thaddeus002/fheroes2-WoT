@@ -45,7 +45,7 @@ const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
     return str_ground[9];
 }
 
-u16 Maps::Ground::GetPenalty(const u16 index, const Direction::vector_t direct, const Skill::Level::type_t pathfinding)
+u16 Maps::Ground::GetPenalty(const u16 index, const Direction::vector_t direct, const u8 pathfinding)
 {
     if(Direction::UNKNOWN == direct) return MAXU16;
 

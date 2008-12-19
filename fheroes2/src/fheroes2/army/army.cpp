@@ -593,6 +593,16 @@ void Army::army_t::BattleNewTurn(void)
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleNewTurn));
 }
 
+void Army::army_t::SetModes(u32 f)
+{
+    std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::SetModes), f));
+}
+
+void Army::army_t::ResetModes(u32 f)
+{
+    std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::ResetModes), f));
+}
+
 void Army::army_t::Clear(void)
 {
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::Reset));

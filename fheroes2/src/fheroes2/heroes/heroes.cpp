@@ -1331,7 +1331,7 @@ u8 Heroes::CountSecondarySkill(void) const
     return secondary_skills.size();
 }
 
-Skill::Level::type_t Heroes::GetLevelSkill(const Skill::Secondary::skill_t skill) const
+u8 Heroes::GetLevelSkill(const Skill::Secondary::skill_t skill) const
 {
     std::vector<Skill::Secondary>::const_iterator it1 = secondary_skills.begin();
     std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();

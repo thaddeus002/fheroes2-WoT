@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+#include "speed.h"
 #include "army.h"
 #include "army_troop.h"
 
@@ -110,6 +111,38 @@ u32 Army::Troop::GetHitPoints(void) const
     return Monster::GetHitPoints() * count;
 }
 
+u16 Army::Troop::GetDamage(void) const
+{
+    u16 dmg = 0;
+
+    if(Modes(SP_BLESS))
+	dmg = GetDamageMax();
+    else
+    if(Modes(SP_CURSE))
+	dmg = GetDamageMin();
+    else
+	dmg = Rand::Get(GetDamageMin(), GetDamageMax());
+
+    // check skill archery +%10, +%25, +%50
+    if(army && army->commander)
+    {
+	switch(army->commander->GetLevelSkill(Skill::Secondary::ARCHERY))
+	{
+	    case Skill::Level::BASIC:	dmg += (dmg * 10) / 100; break;
+	    case Skill::Level::ADVANCED:dmg += (dmg * 25) / 100; break;
+	    case Skill::Level::EXPERT:	dmg += (dmg * 50) / 100; break;
+	    default: break;
+	}
+    }
+
+    // check luck x2
+    if(Modes(LUCK_GOOD)) dmg *= 2;
+    else
+    if(Modes(LUCK_BAD)) dmg /= 2;
+
+    return dmg;
+}
+
 u16 Army::Troop::GetDamageMin(void) const
 {
     return Monster::GetDamageMin() * count;
@@ -122,7 +155,14 @@ u16 Army::Troop::GetDamageMax(void) const
 
 u8 Army::Troop::GetSpeed(void) const
 {
-    return Modes(MOVED) ? 0 : Monster::GetSpeed();
+    if(!Modes(MOVED | SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_HYPNOTIZE | SP_STONE))
+    {
+	if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < Monster::GetSpeed() ? Speed::INSTANT : Monster::GetSpeed() + 2);
+	else
+	if(Modes(SP_SLOW)) return (Speed::SLOW > Monster::GetSpeed() ? Speed::CRAWLING : Monster::GetSpeed() - 2);
+    }
+
+    return 0;
 }
 
 bool Army::Troop::isValid(void) const
