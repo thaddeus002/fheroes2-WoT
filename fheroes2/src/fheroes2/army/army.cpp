@@ -91,7 +91,15 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
 {
     Reset();
 
-    switch(t.GetObject())
+    u8 obj = t.GetObject();
+
+    if(MP2::OBJ_HEROES == obj)
+    {
+	const Heroes* hero = world.GetHeroes(t.GetIndex());
+	if(hero) obj = hero->GetUnderObject();
+    }
+
+    switch(obj)
     {
 	case MP2::OBJ_PYRAMID:
             army[0].Set(Monster::ROYAL_MUMMY, 10);
@@ -161,8 +169,6 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
 
 	default: break;
     }
-
-    ArrangeForBattle();
 }
 
 void Army::army_t::Import(const std::vector<Troop> & v)

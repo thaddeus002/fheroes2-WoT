@@ -155,14 +155,13 @@ u16 Army::Troop::GetDamageMax(void) const
 
 u8 Army::Troop::GetSpeed(void) const
 {
-    if(!Modes(MOVED | SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_HYPNOTIZE | SP_STONE))
-    {
-	if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < Monster::GetSpeed() ? Speed::INSTANT : Monster::GetSpeed() + 2);
-	else
-	if(Modes(SP_SLOW)) return (Speed::SLOW > Monster::GetSpeed() ? Speed::CRAWLING : Monster::GetSpeed() - 2);
-    }
+    if(Modes(MOVED | SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_HYPNOTIZE | SP_STONE)) return Speed::STANDING;
 
-    return 0;
+    if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < Monster::GetSpeed() ? Speed::INSTANT : Monster::GetSpeed() + 2);
+    else
+    if(Modes(SP_SLOW)) return (Speed::SLOW > Monster::GetSpeed() ? Speed::CRAWLING : Monster::GetSpeed() - 2);
+
+    return Monster::GetSpeed();
 }
 
 bool Army::Troop::isValid(void) const

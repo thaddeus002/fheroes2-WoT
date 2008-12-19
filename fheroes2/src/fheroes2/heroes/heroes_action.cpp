@@ -1139,11 +1139,11 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(battle)
     	    {
     		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("You tentatively approach the burial ground of ancient warriors.", "Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message("", "You tentatively approach the burial ground of ancient warriors. Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
-
+		    army.Dump();
 		    // battle
 		    const u32 exp = army.CalculateExperience();
 		    const Army::battle_t b = Army::Battle(hero, army, tile);
@@ -1181,7 +1181,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(battle)
     	    {
     		PlaySoundWarning;
-    		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the shipwreck?", Font::BIG, Dialog::YES | Dialog::NO))
+    		if(Dialog::YES == Dialog::Message("", "The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the shipwreck?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
@@ -1235,7 +1235,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(battle)
     	    {
     		PlaySoundWarning;
-    		if(Dialog::YES == Dialog::Message("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.", "Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
+    		if(Dialog::YES == Dialog::Message("", "The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
