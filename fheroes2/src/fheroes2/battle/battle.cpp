@@ -1211,7 +1211,7 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
 	    step.x /= numsteps;
 	    step.y /= numsteps;
 	} else {
-	    if(path = FindPath(myTroop.Position(), move, Speed::Move(myTroop.GetSpeed()), myTroop, army1, army2, troopN),!path) {
+	    if(path = FindPath(myTroop.Position(), move, myTroop.GetSpeed(), myTroop, army1, army2, troopN),!path) {
 		Dialog::Message(tr("battle.error"), tr("battle.no_path"), Font::BIG, Dialog::OK);
 		return false;
 	    }
@@ -2803,7 +2803,7 @@ void Army::PrepMovePoints(int troopN, const Army::BattleArmy_t &army1, const Arm
 		if(d.x || d.y ) {
 		    if(p.y%2 && d.y && d.x>0) continue;
 		    if(!(p.y%2) && d.y && d.x<0) continue;
-		    PrepMovePointsInt(troop, p+d, Speed::Move(troop.GetSpeed()), army1, army2, troopN);
+		    PrepMovePointsInt(troop, p+d, troop.GetSpeed(), army1, army2, troopN);
 		}
     }
 }

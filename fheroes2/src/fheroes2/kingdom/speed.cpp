@@ -22,39 +22,22 @@
 
 const std::string & Speed::String(u8 speed)
 {
-    static const std::string str_speed[] = { "Crawling", "Very Slow", "Slow", "Average", "Fast",
+    static const std::string str_speed[] = { "Standing", "Crawling", "Very Slow", "Slow", "Average", "Fast",
 	"Very Fast", "Ultra Fast", "Blazing", "Instant" };
 
     switch(speed)
     {
-	case CRAWLING:	return str_speed[0];
-        case VERYSLOW:	return str_speed[1];
-        case SLOW:	return str_speed[2];
-        case AVERAGE:	return str_speed[3];
-        case FAST:	return str_speed[4];
-        case VERYFAST:	return str_speed[5];
-        case ULTRAFAST:	return str_speed[6];
-        case BLAZING:	return str_speed[7];
-        case INSTANT:	return str_speed[8];
+	case CRAWLING:	return str_speed[1];
+        case VERYSLOW:	return str_speed[2];
+        case SLOW:	return str_speed[3];
+        case AVERAGE:	return str_speed[4];
+        case FAST:	return str_speed[5];
+        case VERYFAST:	return str_speed[6];
+        case ULTRAFAST:	return str_speed[7];
+        case BLAZING:	return str_speed[8];
+        case INSTANT:	return str_speed[9];
+	default: break;
     }
     
     return str_speed[0];
-}
-
-u8 Speed::Move(u8 speed)
-{
-    switch(speed)
-    {
-	case CRAWLING:	return 1;
-	case VERYSLOW:	return 2;
-	case SLOW: 	return 3;
-	case AVERAGE: 	return 4;
-	case FAST: 	return 5;
-	case VERYFAST: 	return 6;
-	case ULTRAFAST: return 7;
-	case BLAZING: 	return 8;
-	case INSTANT: 	return 9;
-	default: break;
-    }
-    return 0;
 }
