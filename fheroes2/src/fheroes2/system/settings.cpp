@@ -45,11 +45,14 @@ namespace
 
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
-    modes(SHADOW | ORIGINAL | LOGO), debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
+    debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"),
     font_normal("files/fonts/dejavusans.ttf"), font_small("files/fonts/dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
 {
+    SetModes(SHADOW);
+    SetModes(ORIGINAL);
+    SetModes(LOGO);
 }
 
 Settings & Settings::Get(void)
@@ -87,10 +90,10 @@ bool Settings::Read(const std::string & filename)
 	    String::Lower(left);
 	    
 	    if(right == "on")
-		SetModes(left);
+		SetStrModes(left);
 	    else
 	    if(right == "off")
-		ResetModes(left);
+		ResetStrModes(left);
 	    else
 		Parse(left, right);
 	}
@@ -144,19 +147,19 @@ void Settings::Dump(std::ostream & stream) const
     String::AddInt(str, video_mode.h);
 
     stream << "videomode = " << str << std::endl;
-    stream << "sound = " << (modes & SOUND ? "on"  : "off") << std::endl;
-    stream << "music = " << (modes & MUSIC_CD ? "cd" : ( modes & MUSIC_MIDI ? "midi" : ( modes & MUSIC_EXT ? "ext" : "off"))) << std::endl;
+    stream << "sound = " << (Modes(SOUND) ? "on"  : "off") << std::endl;
+    stream << "music = " << (Modes(MUSIC_CD) ? "cd" : ( Modes(MUSIC_MIDI) ? "midi" : ( Modes(MUSIC_EXT) ? "ext" : "off"))) << std::endl;
     stream << "sound volume = " << static_cast<int>(sound_volume) << std::endl;
     stream << "music volume = " << static_cast<int>(music_volume) << std::endl;
     stream << "animation = " << static_cast<int>(animation) << std::endl;
-    stream << "fullscreen = " << (modes & FULLSCREEN ? "on"  : "off") << std::endl;
-    stream << "evilinterface = " << (modes & EVILINTERFACE ? "on"  : "off") << std::endl;
-    stream << "shadow = " << (modes & SHADOW ? "on"  : "off") << std::endl;
-    stream << "original = " << (modes & ORIGINAL ? "on"  : "off") << std::endl;
+    stream << "fullscreen = " << (Modes(FULLSCREEN) ? "on"  : "off") << std::endl;
+    stream << "evilinterface = " << (Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
+    stream << "shadow = " << (Modes(SHADOW) ? "on"  : "off") << std::endl;
+    stream << "original = " << (Modes(ORIGINAL) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
-    stream << "battle grid = " << (modes & BATTLEGRID ? "on" : "off") << std::endl;
-    stream << "battle movement shadow = " << (modes & BATTLEMOVESHADOW ? "on" : "off") << std::endl;
-    stream << "battle mouse shadow = " << (modes & BATTLEMOUSESHADOW ? "on" : "off") << std::endl;
+    stream << "battle grid = " << (Modes(BATTLEGRID) ? "on" : "off") << std::endl;
+    stream << "battle movement shadow = " << (Modes(BATTLEMOVESHADOW) ? "on" : "off") << std::endl;
+    stream << "battle mouse shadow = " << (Modes(BATTLEMOUSESHADOW) ? "on" : "off") << std::endl;
 
     stream << std::endl;
 }
@@ -208,8 +211,6 @@ Difficulty::difficulty_t Settings::GameDifficulty(void) const { return game_diff
 Color::color_t Settings::CurrentColor(void) const { return cur_color; }
 Color::color_t Settings::MyColor(void) const { return my_color; }
 
-bool Settings::Modes(const settings_t s) const { return modes & s; }
-
 const std::string & Settings::TranslationFile(void) const { return translationFile; }
 
 /* return fontname */
@@ -217,7 +218,7 @@ const std::string & Settings::FontsNormal(void) const { return font_normal; }
 const std::string & Settings::FontsSmall(void) const { return font_small; }
 u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
-bool Settings::FontsRenderBlended(void) const { return FONTRENDERBLENDED & modes; }
+bool Settings::FontsRenderBlended(void) const { return Modes(FONTRENDERBLENDED); }
 
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
@@ -226,46 +227,40 @@ const std::string & Settings::DataDirectory(void) const { return path_data_direc
 const std::string & Settings::MapsDirectory(void) const { return path_maps_directory; }
 
 /* return editor */
-bool Settings::Editor(void) const { return modes & EDITOR; }
+bool Settings::Editor(void) const { return Modes(EDITOR); }
 
 /* return original version */
-bool Settings::Original(void) const { return modes & ORIGINAL; }
+bool Settings::Original(void) const { return Modes(ORIGINAL); }
 
 /* return sound */
-bool Settings::Sound(void) const { return modes & SOUND; }
+bool Settings::Sound(void) const { return Modes(SOUND); }
 
 /* return music */
-bool Settings::Music(void) const { return modes & MUSIC; }
+bool Settings::Music(void) const { return Modes(MUSIC); }
 
 /* return animation */
 u8   Settings::Animation(void) const { return animation; }
 
 /* return full screen */
-bool Settings::FullScreen(void) const { return modes & FULLSCREEN; }
+bool Settings::FullScreen(void) const { return Modes(FULLSCREEN); }
 
 /* return evil interface */
-bool Settings::EvilInterface(void) const { return modes & EVILINTERFACE; }
+bool Settings::EvilInterface(void) const { return Modes(EVILINTERFACE); }
 
 /* return shadow */
-bool Settings::Shadow(void) const { return modes & SHADOW; }
+bool Settings::Shadow(void) const { return Modes(SHADOW); }
 
 /* get show logo */
-bool Settings::Logo(void) const { return modes & LOGO; }
+bool Settings::Logo(void) const { return Modes(LOGO); }
 
 /* battle grid */
-bool Settings::BattleGrid(void) const { return modes & BATTLEGRID; }
+bool Settings::BattleGrid(void) const { return Modes(BATTLEGRID); }
 
 /* battle shaded grid */
-bool Settings::BattleMovementShaded(void) const { return modes & BATTLEMOVESHADOW; }
+bool Settings::BattleMovementShaded(void) const { return Modes(BATTLEMOVESHADOW); }
 
 /* battle shaded mouse */
-bool Settings::BattleMouseShaded(void) const { return modes & BATTLEMOUSESHADOW; }
-
-/* set modes */
-void Settings::SetModes(const settings_t s) { modes |= s; }
-
-/* reset modes */
-void Settings::ResetModes(const settings_t s) { modes &= ~s; }
+bool Settings::BattleMouseShaded(void) const { return Modes(BATTLEMOUSESHADOW); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }
@@ -395,7 +390,7 @@ void Settings::SetCurrentColor(const Color::color_t c) { cur_color = c; }
 void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
 
 /**/
-void Settings::SetModes(const std::string & key)
+void Settings::SetStrModes(const std::string & key)
 {
     // debug
     if(key == "debug")		debug = 1;
@@ -412,7 +407,7 @@ void Settings::SetModes(const std::string & key)
     }
 }
 
-void Settings::ResetModes(const std::string & key)
+void Settings::ResetStrModes(const std::string & key)
 {
     // debug
     if(key == "debug")		debug = 0;

@@ -30,6 +30,7 @@
 #include "dialog.h"
 #include "race.h"
 #include "army.h"
+#include "bitmodes.h"
 #include "heroes.h"
 
 #define CASTLEMAXMONSTER        6 
@@ -42,7 +43,7 @@
 class Heroes;
 namespace Maps { class Tiles; };
 
-class Castle
+class Castle : public BitModes
 {
 public:
     enum building_t
@@ -95,12 +96,8 @@ public:
     Castle(s16 cx, s16 cy, const Race::race_t rs);
     void LoadFromMP2(const void *ptr);
 
-    void SetModes(flags_t);
-    void ResetModes(flags_t);
-    bool Modes(flags_t) const;
-
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
-    bool isCapital(void) const{ return flags & CAPITAL; };
+    bool isCapital(void) const{ return Modes(CAPITAL); };
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
     bool RecruitMonster(building_t dw, u16 count);
@@ -187,8 +184,6 @@ private:
     Color::color_t	color;
     std::string		name;
     u32			building;
-
-    u16			flags;
 
     MageGuild		mageguild;
     std::vector<u16>    dwelling;

@@ -37,6 +37,7 @@
 #include "visit.h"
 #include "direction.h"
 #include "spell_book.h"
+#include "bitmodes.h"
 #include "gamedefs.h"
 
 #define HEROESMAXARTIFACT	14
@@ -72,7 +73,7 @@
 
 typedef std::vector<Artifact::artifact_t> BagArtifacts;
 
-class Heroes : public Skill::Primary
+class Heroes : public Skill::Primary, public BitModes
 {
 public:
     enum heroes_t
@@ -119,10 +120,6 @@ public:
     Castle* inCastle(void);
 
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
-
-    void SetModes(flags_t);
-    void ResetModes(flags_t);
-    bool Modes(flags_t) const;
 
     void ResetStupidFlag(void) { ResetModes(STUPID); };
 
@@ -262,8 +259,6 @@ private:
 
     const heroes_t	hid;
     const Race::race_t	race;
-
-    u16 		flags;
 
     MP2::object_t	save_maps_general;
 

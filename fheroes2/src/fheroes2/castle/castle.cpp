@@ -28,9 +28,12 @@
 #include "castle.h"
 
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
-    color(Color::GRAY), building(0), flags(ARMYSPREAD|ALLOWBUILD), mageguild(race),
+    color(Color::GRAY), building(0), mageguild(race),
     dwelling(CASTLEMAXMONSTER, 0), army(&captain), castle_heroes(NULL)
 {
+    SetModes(ARMYSPREAD);
+    SetModes(ALLOWBUILD);
+
     if(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))) SetModes(NEARLYSEA);
 }
 
@@ -268,21 +271,6 @@ void Castle::LoadFromMP2(const void *ptr)
 
     // end
     if(Settings::Get().Debug()) Error::Verbose((building & BUILD_CASTLE ? "Castle::LoadFromMP2: castle: " : "Castle::LoadFromMP2: town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
-}
-
-void Castle::SetModes(flags_t f)
-{
-    flags |= f;
-}
-
-void Castle::ResetModes(flags_t f)
-{
-    flags &= ~f;
-}
-
-bool Castle::Modes(flags_t f) const
-{
-    return flags & f;
 }
 
 const Point & Castle::GetCenter(void) const

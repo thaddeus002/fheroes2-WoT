@@ -27,9 +27,10 @@
 #include "difficulty.h"
 #include "maps_fileinfo.h"
 #include "game.h"
+#include "bitmodes.h"
 #include "config.h"
 
-class Settings
+class Settings : public BitModes
 {
 public:
 
@@ -100,8 +101,6 @@ public:
     bool BattleMovementShaded(void) const;
     bool BattleMouseShaded(void) const;
 
-    bool Modes(const settings_t s) const;
-
     const Size & VideoMode(void) const;
 
     u8   SoundVolume(void) const;
@@ -109,8 +108,6 @@ public:
 
     void SetDebug(const u8 d);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
-    void SetModes(const settings_t s);
-    void ResetModes(const settings_t s);
 
     void SetSoundVolume(const u8 v);
     void SetMusicVolume(const u8 v);
@@ -130,8 +127,8 @@ public:
 
 protected:
     void Parse(const std::string & left, const std::string & right);
-    void SetModes(const std::string & key);
-    void ResetModes(const std::string & key);
+    void SetStrModes(const std::string & key);
+    void ResetStrModes(const std::string & key);
 
 private:
     Settings();
@@ -140,7 +137,6 @@ private:
     const u8 minor_version;
     const u32 build_date;
 
-    u32 modes;
     u8 debug;
 
     Size video_mode;

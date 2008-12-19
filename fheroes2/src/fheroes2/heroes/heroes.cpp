@@ -39,9 +39,11 @@ extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, 
 extern void PlayPickupSound(void);
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
-    move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), hid(ht), race(rc), flags(ARMYSPREAD),
+    move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), hid(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
+    SetModes(ARMYSPREAD);
+
     secondary_skills.reserve(HEROESMAXSKILL);
 
     // hero is freeman
@@ -446,21 +448,6 @@ bool Heroes::operator== (const Heroes & h) const
     return hid == h.hid;
 }
 
-void Heroes::SetModes(flags_t f)
-{
-    flags |= f;
-}
-
-void Heroes::ResetModes(flags_t f)
-{
-    flags &= ~f;
-}
-
-bool Heroes::Modes(flags_t f) const
-{
-    return flags & f;
-}
-
 const Point & Heroes::GetCenter(void) const
 { return mp; }
 
@@ -730,6 +717,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     {
     	switch(army.GetSlowestTroop().GetSpeed())
 	{
+	    default: break;
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;
 	    case Speed::SLOW:		point = 1100; break;
@@ -1627,8 +1615,8 @@ void Heroes::Dump(void) const
     std::cout << "move point      : " << move_point << std::endl;
     std::cout << "direction       : " << Direction::String(direction) << std::endl;
     std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
-    std::cout << "flags           : " << (flags & SHIPMASTER ? "SHIPMATER," : ",") <<
-                                         (flags & SCOUTER ? "SCOUTER," : ",") <<
-                                         (flags & HUNTER ? "HUNTER," : ",") <<
-                                         (flags & STUPID ? "STUPID," : ",") << std::endl;
+    std::cout << "flags           : " << (Modes(SHIPMASTER) ? "SHIPMATER," : ",") <<
+                                         (Modes(SCOUTER) ? "SCOUTER," : ",") <<
+                                         (Modes(HUNTER) ? "HUNTER," : ",") <<
+                                         (Modes(STUPID) ? "STUPID," : ",") << std::endl;
 }
