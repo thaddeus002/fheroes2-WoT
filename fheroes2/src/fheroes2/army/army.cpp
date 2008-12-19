@@ -72,139 +72,7 @@ Army::armysize_t Army::GetSize(u16 count)
     return FEW;
 }
 
-Army::Troop::Troop(monster_t m, u16 c) : Monster(m), count(c), army(NULL)
-{
-}
-
-bool Army::Troop::HasMonster(monster_t m) const
-{
-    return id == m;
-}
-
-void Army::Troop::Set(const Monster & m, u16 c)
-{
-    id = m();
-    count = c;
-}
-
-void Army::Troop::Set(monster_t m, u16 c)
-{
-    id = m;
-    count = c;
-}
-
-void Army::Troop::SetMonster(const Monster & m)
-{
-    id = m();
-}
-
-void Army::Troop::SetMonster(monster_t m)
-{
-    id = m;
-}
-
-void Army::Troop::SetCount(u16 c)
-{
-    count = c;
-}
-
-void Army::Troop::Reset(void)
-{
-    id = Monster::UNKNOWN;
-    count = 0;
-}
-
-const Skill::Primary* Army::Troop::MasterSkill(void) const
-{
-    return army ? army->commander : NULL;
-}
-
-const Army::army_t* Army::Troop::GetArmy(void) const
-{
-    return army;
-}
-
-const std::string & Army::Troop::GetName(void) const
-{
-    return 1 < count ? Monster::GetMultiName() : Monster::GetName();
-}
-
-u16 Army::Troop::Count(void) const
-{
-    return count;
-}
-
-u8 Army::Troop::GetAttack(void) const
-{
-    return army && army->commander ? army->commander->GetAttack() + Monster::GetAttack() : Monster::GetAttack();
-}
-
-u8 Army::Troop::GetDefense(void) const
-{
-    return army && army->commander ? army->commander->GetDefense() + Monster::GetDefense() : Monster::GetDefense();
-}
-
-Color::color_t Army::Troop::GetColor(void) const
-{
-    return army && army->commander ? army->commander->GetColor() : Color::GRAY;
-}
-
-u32 Army::Troop::GetHitPoints(void) const
-{
-    return Monster::GetHitPoints() * count;
-}
-
-u16 Army::Troop::GetDamageMin(void) const
-{
-    return Monster::GetDamageMin() * count;
-}
-
-u16 Army::Troop::GetDamageMax(void) const
-{
-    return Monster::GetDamageMax() * count;
-}
-
-bool Army::Troop::isValid(void) const
-{
-    return Monster::UNKNOWN < id && count;
-}
-
-bool Army::isValidTroop(const Troop & troop)
-{
-    return troop.isValid();
-}
-
-bool Army::StrongestTroop(const Troop & t1, const Troop & t2)
-{
-    return t1.isValid() && t2.isValid() && (t1.GetDamageMin() > t2.GetDamageMin());
-}
-
-bool Army::WeakestTroop(const Troop & t1, const Troop & t2)
-{
-    return t1.isValid() && t2.isValid() && (t1.GetDamageMax() < t2.GetDamageMax());
-}
-
-bool Army::SlowestTroop(const Troop & t1, const Troop & t2)
-  {
-    return t1.isValid() && t2.isValid() && (t1.GetSpeed() < t2.GetSpeed());
-}
-
-bool Army::FastestTroop(const Troop & t1, const Troop & t2)
-{
-    return t1.isValid() && t2.isValid() && (t1.GetSpeed() > t2.GetSpeed());
-}
-
-void Army::SwapTroops(Troop & t1, Troop & t2)
-{
-    std::swap(t1, t2);
-}
-
-
-
-
-
-
-Army::army_t::army_t(const Skill::Primary* s) : army(ARMYMAXTROOPS), commander(s), flags(0)
+Army::army_t::army_t(const Skill::Primary* s) : army(ARMYMAXTROOPS), commander(s)
 {
     std::vector<Troop>::iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
@@ -327,21 +195,6 @@ void Army::army_t::UpgradeMonsters(const Monster & m)
 void Army::army_t::UpgradeMonsters(const Monster::monster_t m)
 {
     for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii) if(army[ii].isValid() && army[ii] == m) army[ii].Upgrade();
-}
-
-void Army::army_t::SetModes(flags_t f)
-{
-    flags |= f;
-}
-
-void Army::army_t::ResetModes(flags_t f)
-{
-    flags &= ~f;
-}
-
-bool Army::army_t::Modes(flags_t f) const
-{
-    return flags & f;
 }
 
 u8 Army::army_t::Size(void) const
@@ -733,6 +586,11 @@ u32 Army::army_t::CalculateExperience(void) const
 
     return res;
 
+}
+
+void Army::army_t::BattleNewTurn(void)
+{
+    std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleNewTurn));
 }
 
 void Army::army_t::Clear(void)

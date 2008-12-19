@@ -24,23 +24,16 @@
 #include <string>
 #include <list>
 #include <vector>
-#include "race.h"
-#include "monster.h"
-#include "skill.h"
-#include "gamedefs.h"
+#include "bitmodes.h"
+#include "army_troop.h"
 
-class Surface;
 class Castle;
-class Heroes;
-class Point;
-class Rect;
 namespace Maps { class Tiles; };
 
 #define	ARMYMAXTROOPS		5
 
 namespace Army
 {
-    class army_t;
     class BattleTroop;
 
     enum armysize_t
@@ -59,62 +52,17 @@ namespace Army
     const std::string & String(armysize_t);
     armysize_t GetSize(u16);
 
-    class Troop : public Monster
-    {
-        public:
-            Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
-
-            void	Set(const Monster &, u16);
-            void	Set(monster_t, u16);
-            void	SetMonster(const Monster &);
-            void	SetMonster(monster_t);
-            void	SetCount(u16);
-            void	Reset(void);
-            
-            const Skill::Primary* MasterSkill(void) const;
-            const army_t* GetArmy(void) const;
-	    const std::string & GetName(void) const;
-
-            u16 	Count(void) const;
-
-	    u8		GetAttack(void) const;
-	    u8		GetDefense(void) const;
-	    u32		GetHitPoints(void) const;
-	    u16		GetDamageMin(void) const;
-	    u16		GetDamageMax(void) const;
-	    Color::color_t GetColor(void) const;
-
-            bool	isValid(void) const;
-	    bool	HasMonster(monster_t) const;
-
-        protected:
-    	    friend class army_t;
-            u16			count;
-	    const army_t*	army;
-    };
-
-    bool isValidTroop(const Troop & troop);
-    bool StrongestTroop(const Troop & t1, const Troop & t2);
-    bool WeakestTroop(const Troop & t1, const Troop & t2);
-    bool SlowestTroop(const Troop & t1, const Troop & t2);
-    bool FastestTroop(const Troop & t1, const Troop & t2);
-    void SwapTroops(Troop & t1, Troop & t2);
-
     enum flags_t
     {
-	FIGHT	= 0x0001,
+	BATTLE		= 0x0001,
     };
 
-    class army_t
+    class army_t : public BitModes
     {
 	public:
 	    army_t(const Skill::Primary* s = NULL);
 
 	    army_t & operator= (const army_t &);		// deprecated, will be removed!
-
-	    void 	SetModes(flags_t);
-	    void	ResetModes(flags_t);
-	    bool	Modes(flags_t) const;
 
 	    void	FromGuardian(const Maps::Tiles &);
 	    void	Import(const std::vector<Troop> &);
@@ -123,11 +71,12 @@ namespace Army
 	    void	UpgradeMonsters(const Monster::monster_t);
 	    void	Clear(void);
 	    void	Reset(bool = false);	// reset: soft or hard
+	    void	BattleNewTurn(void);
 
 	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0) const;
 
-	    Troop&	FirstValid(void);
-	    Troop&	At(u8);
+	    Troop &	FirstValid(void);
+	    Troop &	At(u8);
 	    Troop &	GetSlowestTroop(void);
 	    Troop &	GetFastestTroop(void);
 	    Troop &	GetStrongestTroop(void);
@@ -177,7 +126,6 @@ namespace Army
 
 	    std::vector<Troop>	army;
 	    const Skill::Primary* commander;
-	    u16			flags;
     };
 };
 
