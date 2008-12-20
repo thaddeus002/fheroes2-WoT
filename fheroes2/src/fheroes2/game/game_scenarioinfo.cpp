@@ -245,7 +245,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
 		text.Hide();
 		text.SetText(name);
-		text.SetPos(rt.x + (rt.w - text.width()) / 2, rt.y + rt.h + 2);
+		text.SetPos(rt.x + (rt.w - text.w()) / 2, rt.y + rt.h + 2);
 		text.Show();
 
 		cursor.Show();
@@ -475,7 +475,7 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 	    const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
 	    text.SetFont(Font::SMALL);
 	    text.SetText(name);
-	    text.SetPos(rt.x + (rt.w - text.width()) / 2, rt.y + rt.h + 2);
+	    text.SetPos(rt.x + (rt.w - text.w()) / 2, rt.y + rt.h + 2);
 	    text.Show();
 
     	    ++current;

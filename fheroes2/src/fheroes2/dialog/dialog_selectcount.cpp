@@ -24,11 +24,12 @@
 #include "button.h"
 #include "dialog.h"
 
-u16 Dialog::SelectCount(u16 max_count)
+u16 Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 cur)
 {
     Display & display = Display::Get();
 
-    if(max_count < 2) return 0;
+    if(min >= max) min = 0;
+    if(cur > max || cur < min) cur = min;
 
     const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
@@ -43,12 +44,14 @@ u16 Dialog::SelectCount(u16 max_count)
 
     const Rect & pos = box.GetArea();
     Point pt;
+    std::string message;
+    Text text;
 
     // text
-    std::string message("Move how many troops?");
-    pt.x = pos.x + (pos.w - Text::width(message, Font::BIG)) / 2;
+    text.Set(header, Font::BIG);
+    pt.x = pos.x + (pos.w - text.w()) / 2;
     pt.y = pos.y;
-    Text(message, Font::BIG, pt);
+    text.Blit(pt);
 
     // sprite edit
     const Surface & sprite_edit = AGG::GetICN(ICN::TOWNWIND, 4);
@@ -56,12 +59,12 @@ u16 Dialog::SelectCount(u16 max_count)
     pt.y = pos.y + 55;
     display.Blit(sprite_edit, pt);
 
-    u16 result = max_count / 2;
     message.clear();
-    String::AddInt(message, result);
-    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
+    String::AddInt(message, cur);
+    text.Set(message);
+    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
     pt.y = pos.y + 56;
-    Text(message, Font::BIG, pt);
+    text.Blit(pt);
 
     // buttons
     pt.x = pos.x + 150;
@@ -100,9 +103,9 @@ u16 Dialog::SelectCount(u16 max_count)
 
 	// up
 	if((le.MouseWheelUp(pos) ||
-            le.MouseClickLeft(buttonUp)) && result < max_count)
+            le.MouseClickLeft(buttonUp)) && cur < max)
 	{
-	    ++result;
+	    ++cur;
 
 	    cursor.Hide();
 	    pt.x = pos.x + 80;
@@ -110,19 +113,20 @@ u16 Dialog::SelectCount(u16 max_count)
 	    display.Blit(sprite_edit, pt);
 
 	    message.clear();
-	    String::AddInt(message, result);
-	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
+	    String::AddInt(message, cur);
+	    text.Set(message);
+	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
 	    pt.y = pos.y + 56;
-	    Text(message, Font::BIG, pt);
+	    text.Blit(pt);
 	    cursor.Show();
 	    display.Flip();
 	}
 
 	// down
 	if((le.MouseWheelDn(pos) ||
-            le.MouseClickLeft(buttonDn)) && 1 < result)
+            le.MouseClickLeft(buttonDn)) && min < cur)
 	{
-	    --result;
+	    --cur;
 
 	    cursor.Hide();
 	    pt.x = pos.x + 80;
@@ -130,17 +134,18 @@ u16 Dialog::SelectCount(u16 max_count)
 	    display.Blit(sprite_edit, pt);
 
 	    message.clear();
-	    String::AddInt(message, result);
-	    pt.x = pos.x + 80 + (sprite_edit.w() - Text::width(message, Font::BIG)) / 2;
+	    String::AddInt(message, cur);
+	    text.Set(message);
+	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
 	    pt.y = pos.y + 56;
-	    Text(message, Font::BIG, pt);
+	    text.Blit(pt);
 	    cursor.Show();
 	    display.Flip();
 	}
 
         if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) break;
-	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ result = 0; break; }
+	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ cur = 0; break; }
     }
     cursor.Hide();
-    return result;
+    return cur;
 }

@@ -27,6 +27,14 @@
 #define HEIGHT_BIG	0x10
 #define HEIGHT_SMALL	0x0B
 
+u8 Char::height(char ch, Font::type_t ft)
+{
+    if(ch < 0x21)
+	return (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG);
+
+    return AGG::GetLetter(ch, ft).h();
+}
+
 u8 Char::width(char ch, Font::type_t ft)
 {
     if(ch < 0x21)
@@ -35,22 +43,26 @@ u8 Char::width(char ch, Font::type_t ft)
     return AGG::GetLetter(ch, ft).w();
 }
 
-/* text string */
-Text::Text(const std::string & msg, Font::type_t ft) : font(ft), message(msg)
+Text::Text() : font(Font::BIG), gw(0), gh(HEIGHT_BIG) 
 {
 }
 
-Text::Text(const std::string &msg, Font::type_t ft, u16 ax, u16 ay) : font(ft), message(msg)
+/* text string */
+Text::Text(const std::string & msg, Font::type_t ft) : font(ft), message(msg), gw(width()), gh(ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL)
+{
+}
+
+Text::Text(const std::string &msg, Font::type_t ft, u16 ax, u16 ay) : font(ft), message(msg), gw(width()), gh(ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL)
 {
     Blit(ax, ay);
 }
 
-Text::Text(const std::string &msg, Font::type_t ft, const Point & pt) : font(ft), message(msg)
+Text::Text(const std::string &msg, Font::type_t ft, const Point & pt) : font(ft), message(msg), gw(width()), gh(ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL)
 {
     Blit(pt.x, pt.y);
 }
 
-Text::Text(const std::string &msg, Font::type_t ft, const Rect & rt) : font(ft), message(msg)
+Text::Text(const std::string &msg, Font::type_t ft, const Rect & rt) : font(ft), message(msg), gw(width()), gh(ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL)
 {
     Blit(rt.x, rt.y);
 }
@@ -208,8 +220,9 @@ u16 Text::width(const std::string &str,  Font::type_t ft, u16 start, u16 count)
 #else
     u16 res = 0;
     if(0xffff == count) count = str.size();
-    for(int ii = start; ii < start + count; ++ii) res += Char::width(str[ii], ft);
-    
+    for(int ii = start; ii < start + count; ++ii)
+	res += Char::width(str[ii], ft);
+
     return res;
 #endif
 }
@@ -218,7 +231,7 @@ u16 Text::height(const std::string &str, Font::type_t ft, u16 width)
 {
     if(str.empty()) return 0;
 
-    if(! width) return (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+    if(! width) return ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL;
 
     u16 pos_last = str.size() - 1;
 
@@ -334,19 +347,20 @@ TextSprite::TextSprite() : hide(true)
 {
 }
 
-TextSprite::TextSprite(const std::string & msg, Font::type_t ft, const Point & pt) : Text(msg, ft), hide(false)
+TextSprite::TextSprite(const std::string & msg, Font::type_t ft, const Point & pt) : Text(msg, ft), hide(true)
 {
-    back.Save(Rect(pt, Text::width(msg, ft), Text::height(msg, ft, Text::width(msg, ft))));
+    back.Save(Rect(pt, gw, gh + 5));
 }
 
-TextSprite::TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay) : Text(msg, ft), hide(false)
+TextSprite::TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay) : Text(msg, ft), hide(true)
 {
-    back.Save(Rect(ax, ay, Text::width(msg, ft), Text::height(msg, ft, Text::width(msg, ft))));
+    back.Save(Rect(ax, ay, gw, gh + 5));
 }
 
 void TextSprite::Show(void)
 {
     Blit(back.GetRect().x, back.GetRect().y);
+    hide = false;
 }
 
 void TextSprite::Hide(void)
@@ -355,8 +369,46 @@ void TextSprite::Hide(void)
     hide = true;
 }
 
+void TextSprite::SetText(const std::string & msg)
+{
+    Hide();
+    Set(msg);
+    back.Save(back.GetPos().x, back.GetPos().y, gw, gh + 5);
+}
+
+void TextSprite::SetFont(Font::type_t ft)
+{
+    Hide();
+    Set(ft);
+    back.Save(back.GetPos().x, back.GetPos().y, gw, gh + 5);
+}
+
 void TextSprite::SetPos(u16 ax, u16 ay)
 {
-    back.Save(Rect(ax, ay, width(), height()));
-    hide = false;
+    back.Save(ax, ay, gw, gh + 5);
+}
+
+u16 TextSprite::w(void)
+{
+    return back.GetSize().w;
+}
+
+u16 TextSprite::h(void)
+{
+    return back.GetSize().h;
+}
+
+bool TextSprite::isHide(void) const
+{
+    return hide;
+}
+
+bool TextSprite::isShow(void) const
+{
+    return !hide;
+}
+
+const Rect & TextSprite::GetRect(void) const
+{
+    return back.GetRect();
 }

@@ -35,6 +35,7 @@
 #include "text.h"
 #include "portrait.h"
 #include "dialog.h"
+#include "statusbar.h"
 #include "selectarmybar.h"
 
 void Castle::RedrawNameTown(const Point & src_pt)
@@ -43,9 +44,10 @@ void Castle::RedrawNameTown(const Point & src_pt)
     Point dst_pt(src_pt.x + 320 - ramka.w() / 2, src_pt.y + 248);
     Display::Get().Blit(ramka, dst_pt);
 
-    dst_pt.x = src_pt.x + 320 - Text::width(name, Font::SMALL) / 2;
+    Text text(name, Font::SMALL);
+    dst_pt.x = src_pt.x + 320 - text.w() / 2;
     dst_pt.y = src_pt.y + 248;
-    Text(name, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 }
 
 Dialog::answer_t Castle::OpenDialog(void)
@@ -70,13 +72,16 @@ Dialog::answer_t Castle::OpenDialog(void)
     Button buttonPrevCastle(dst_pt, ICN::SMALLBAR, 1, 2);
 
     // bottom small bar
-    Dialog::StatusBar statusBar(Point(cur_pt.x + 21, cur_pt.y + 461), AGG::GetICN(ICN::SMALLBAR, 0), Font::BIG);
-    statusBar.Clear();
+    const Sprite & bar = AGG::GetICN(ICN::SMALLBAR, 0);
+    dst_pt.x += buttonPrevCastle.w;
+    display.Blit(bar, dst_pt);
 
-    u8 index_sprite = 0;
+    StatusBar statusBar;
+    statusBar.SetFont(Font::BIG);
+    statusBar.SetCenter(dst_pt.x + bar.w() / 2, dst_pt.y + 11);
 
     // button next castle
-    dst_pt.x += 640 - 21;
+    dst_pt.x += bar.w();
     Button buttonNextCastle(dst_pt, ICN::SMALLBAR, 3, 4);
 
     // strip grid
@@ -85,6 +90,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 
     display.Blit(AGG::GetICN(ICN::STRIP, 0), dst_pt);
 
+    u8 index_sprite = 0;
     // color crest
     switch(color)
     {
@@ -920,10 +926,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    statusBar.ShowMessage("Empty");
 	    }
 	}
-	else
-	// clear all
-	if(! statusBar.isEmpty()) statusBar.Clear();
-
+	
 	// animation sprite
 	if(Game::ShouldAnimateInfrequent(ticket, 10))
 	{
@@ -954,6 +957,7 @@ void Castle::RedrawResourcePanel(void)
     display.FillRect(0, 0, 0, src_rt);
 
     std::string count;
+    Text text;
 
     // sprite wood
     dst_pt.x = src_rt.x + 1;
@@ -964,8 +968,9 @@ void Castle::RedrawResourcePanel(void)
     // count wood
     count.erase();
     String::AddInt(count, resource.wood);
+    text.Set(count, Font::SMALL);
     dst_pt.y += 22;
-    Text(count, Font::SMALL, dst_pt.x + (wood.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
+    text.Blit(dst_pt.x + (wood.w() - text.w()) / 2, dst_pt.y);
 
     // sprite sulfur
     dst_pt.x = src_rt.x + 42;
@@ -976,8 +981,9 @@ void Castle::RedrawResourcePanel(void)
     // count sulfur
     count.erase();
     String::AddInt(count, resource.sulfur);
+    text.Set(count);
     dst_pt.y += 26;
-    Text(count, Font::SMALL, dst_pt.x + (sulfur.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
+    text.Blit(dst_pt.x + (sulfur.w() - text.w()) / 2, dst_pt.y);
 
     // sprite crystal
     dst_pt.x = src_rt.x + 1;
@@ -988,8 +994,9 @@ void Castle::RedrawResourcePanel(void)
     // count crystal
     count.erase();
     String::AddInt(count, resource.crystal);
+    text.Set(count);
     dst_pt.y += 33;
-    Text(count, Font::SMALL, dst_pt.x + (crystal.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
+    text.Blit(dst_pt.x + (crystal.w() - text.w()) / 2, dst_pt.y);
 
     // sprite mercury
     dst_pt.x = src_rt.x + 44;
@@ -1000,8 +1007,9 @@ void Castle::RedrawResourcePanel(void)
     // count mercury
     count.erase();
     String::AddInt(count, resource.mercury);
+    text.Set(count);
     dst_pt.y += 34;
-    Text(count, Font::SMALL, dst_pt.x + (mercury.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
+    text.Blit(dst_pt.x + (mercury.w() - text.w()) / 2, dst_pt.y);
 
     // sprite ore
     dst_pt.x = src_rt.x + 1;
@@ -1012,8 +1020,9 @@ void Castle::RedrawResourcePanel(void)
     // count ore
     count.erase();
     String::AddInt(count, resource.ore);
+    text.Set(count);
     dst_pt.y += 26;
-    Text(count, Font::SMALL, dst_pt.x + (ore.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
+    text.Blit(dst_pt.x + (ore.w() - text.w()) / 2, dst_pt.y);
 
     // sprite gems
     dst_pt.x = src_rt.x + 45;
@@ -1024,8 +1033,9 @@ void Castle::RedrawResourcePanel(void)
     // count gems
     count.erase();
     String::AddInt(count, resource.gems);
+    text.Set(count);
     dst_pt.y += 26;
-    Text(count, Font::SMALL, dst_pt.x + (gems.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
+    text.Blit(dst_pt.x + (gems.w() - text.w()) / 2, dst_pt.y);
 
     // sprite gold
     dst_pt.x = src_rt.x + 6;
@@ -1036,8 +1046,9 @@ void Castle::RedrawResourcePanel(void)
     // count gold
     count.erase();
     String::AddInt(count, resource.gold);
+    text.Set(count);
     dst_pt.y += 24;
-    Text(count, Font::SMALL, dst_pt.x + (gold.w() - Text::width(count, Font::SMALL)) / 2, dst_pt.y);
+    text.Blit(dst_pt.x + (gold.w() - text.w()) / 2, dst_pt.y);
     
     // sprite button exit
     dst_pt.x = src_rt.x + 1;

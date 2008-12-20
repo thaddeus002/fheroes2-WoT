@@ -37,6 +37,7 @@
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "audio_interface.h"
+#include "statusbar.h"
 #include "battle_troop.h"
 
 #define CELLW 44
@@ -69,8 +70,8 @@ namespace Army {
     long EXP1, EXP2;
     Point dst_pt;
     std::vector<Point> movePoints;
-    Dialog::StatusBar *statusBar1;
-    Dialog::StatusBar *statusBar2;
+    StatusBar *statusBar1;
+    StatusBar *statusBar2;
     typedef struct {
 	ICN::icn_t icn;
 	Point scrpoint, bfpoint;
@@ -145,7 +146,7 @@ namespace Army {
     bool CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTroop &target, const Point &attackFrom);
     
     void SettingsDialog();
-    battle_t HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender=false, bool locked=false);
+    battle_t HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender=false, bool locked=false);
     
     void DrawShadow(const Point &pt);
     void DrawCell(const Point &pt);
@@ -520,10 +521,18 @@ Army::battle_t Army::BattleInt(Heroes *hero1, Heroes *hero2, Army::army_t &basic
     display.Blit(AGG::GetICN(ICN::TEXTBAR, 4), dst_pt.x, dst_pt.y + 480-36);
     display.Blit(AGG::GetICN(ICN::TEXTBAR, 6), dst_pt.x, dst_pt.y + 480-18);
 
-    statusBar1 = new Dialog::StatusBar(Point(dst_pt.x + 50, dst_pt.y + 480-36), AGG::GetICN(ICN::TEXTBAR, 8), Font::BIG);
-    statusBar1->Clear(NOL10N(" "));
-    statusBar2 = new Dialog::StatusBar(Point(dst_pt.x + 50, dst_pt.y + 480-16), AGG::GetICN(ICN::TEXTBAR, 9), Font::BIG);
-    statusBar2->Clear(NOL10N(" "));
+    const Sprite & bar1 = AGG::GetICN(ICN::TEXTBAR, 8);
+    const Sprite & bar2 = AGG::GetICN(ICN::TEXTBAR, 9);
+
+    display.Blit(bar1, dst_pt.x + 50, dst_pt.y + 480-36);
+    display.Blit(bar2, dst_pt.x + 50, dst_pt.y + 480-16);
+
+    statusBar1 = new StatusBar;
+    statusBar1->SetCenter(dst_pt.x + 50 + bar1.w()/2, dst_pt.y + 480-26);
+    statusBar1->ShowMessage(NOL10N(" "));
+    statusBar2 = new StatusBar;
+    statusBar2->SetCenter(dst_pt.x + 50 + bar2.w()/2, dst_pt.y + 480-6);
+    statusBar2->ShowMessage(NOL10N(" "));
 
     display.Flip();
     Point move, attack;
@@ -2374,9 +2383,10 @@ void Army::DrawTroop(Army::BattleTroop & troop, int animframe)
 	String::AddInt(str, count / 1000), str += NOL10N("K");
     else 
 	String::AddInt(str, count / 1000000), str += NOL10N("M");
-    tp.x += 10 - Text::width(str, Font::SMALL) / 2;
+    Text text(str, Font::SMALL);
+    tp.x += 10 - text.w() / 2;
     tp.y -= 1;
-    Text(str, Font::SMALL, tp);
+    text.Blit(tp);
 }
 
 void Army::InitArmyPosition(Army::BattleArmy_t & army, bool compact, bool reflect)
@@ -2578,7 +2588,7 @@ void Army::SettingsDialog()
     }
 }
 
-Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender, bool locked)
+Army::battle_t Army::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender, bool locked)
 {
     spell = Spell::NONE;
     const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
@@ -2602,39 +2612,42 @@ Army::battle_t Army::HeroStatus(Heroes &hero, Dialog::StatusBar &statusBar, Spel
     display.Blit(AGG::GetICN(butt, Color::GetIndex(hero.GetColor())+1), pos_rt.x + 148, pos_rt.y + 36);
     Point tp(pos_rt);
     std::string str;
-    str = tr("hero.long_name").sub(hero.GetName()).sub(Race::String(hero.GetRace()));
-    tp.x += 8 + pos_rt.w/2 - Text::width(str, Font::SMALL)/2;
+    Text text;
+    text.Set(Font::SMALL);
+    text.Set(tr("hero.long_name").sub(hero.GetName()).sub(Race::String(hero.GetRace())));
+    tp.x += 8 + pos_rt.w/2 - text.w()/2;
     tp.y += 10;
-    Text(str, Font::SMALL, tp);
-    str = tr("hero.skill_display").sub(tr("skills.attack")).sub(hero.GetAttack());
-    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    text.Blit(tp);
+    text.Set(tr("hero.skill_display").sub(tr("skills.attack")).sub(hero.GetAttack()));
+    tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 40;
-    Text(str, Font::SMALL, tp);
-    str = tr("hero.skill_display").sub(tr("skills.defense")).sub(hero.GetDefense());
-    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    text.Blit(tp);
+    text.Set(tr("hero.skill_display").sub(tr("skills.defense")).sub(hero.GetDefense()));
+    tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 51;
-    Text(str, Font::SMALL, tp);
-    str = tr("hero.skill_display").sub(tr("skills.spell_power")).sub(hero.GetPower());
-    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    text.Blit(tp);
+    text.Set(tr("hero.skill_display").sub(tr("skills.spell_power")).sub(hero.GetPower()));
+    tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 62;
-    Text(str, Font::SMALL, tp);
+    text.Blit(tp);
     str = tr("hero.skill_display").sub(tr("skills.knowledge")).sub(hero.GetKnowledge());
     String::AddInt(str, hero.GetKnowledge());
-    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    text.Set(str);
+    tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 73;
-    Text(str, Font::SMALL, tp);
-    str = tr("hero.skill_display").sub(tr("skills.morale")).sub(hero.GetMorale());
-    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    text.Blit(tp);
+    text.Set(tr("hero.skill_display").sub(tr("skills.morale")).sub(hero.GetMorale()));
+    tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 84;
-    Text(str, Font::SMALL, tp);
-    str = tr("hero.skill_display").sub(tr("skills.luck")).sub(hero.GetLuck());
-    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    text.Blit(tp);
+    text.Set(tr("hero.skill_display").sub(tr("skills.luck")).sub(hero.GetLuck()));
+    tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 95;
-    Text(str, Font::SMALL, tp);
-    str = tr("hero.skill_display_ratio").sub(tr("skills.spell_points")).sub(hero.GetSpellPoints()).sub(hero.GetMaxSpellPoints());
-    tp.x = pos_rt.x + 205 - Text::width(str, Font::SMALL)/2;
+    text.Blit(tp);
+    text.Set(tr("hero.skill_display_ratio").sub(tr("skills.spell_points")).sub(hero.GetSpellPoints()).sub(hero.GetMaxSpellPoints()));
+    tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 117;
-    Text(str, Font::SMALL, tp);
+    text.Blit(tp);
     
     Button buttonMag(pos_rt.x + 30, pos_rt.y + 148, butt, 9, 10);
     Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);

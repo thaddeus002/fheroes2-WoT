@@ -34,6 +34,7 @@
 #include "dialog.h"
 #include "heroes_indicator.h"
 #include "selectarmybar.h"
+#include "statusbar.h"
 #include "selectartifactbar.h"
 
 Dialog::answer_t Heroes::OpenDialog(bool readonly)
@@ -298,8 +299,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     selectArtifacts.Redraw();
 
     // bottom small bar
-    Dialog::StatusBar statusBar(Point(cur_pt.x + 22, cur_pt.y + 460), AGG::GetICN(ICN::HSBTNS, 8), Font::BIG);
-    statusBar.Clear("Hero Screen");
+    dst_pt.x = cur_pt.x + 22;
+    dst_pt.y = cur_pt.y + 460;
+    const Sprite & bar = AGG::GetICN(ICN::HSBTNS, 8);
+    display.Blit(bar, dst_pt);
+
+    StatusBar statusBar;
+    statusBar.SetCenter(dst_pt.x + bar.w() / 2, dst_pt.y + 11);
 
     u16 index1 = readonly ? 5 : 4;
     u16 index2 = 5;
@@ -539,7 +545,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	    if(0 <= index && index < HEROESMAXARTIFACT && Artifact::UNKNOWN != artifacts[index])
 		statusBar.ShowMessage("View " + Artifact::String(artifacts[index]) + " Info");
 	    else
-		statusBar.Clear("Hero Screen");
+		statusBar.ShowMessage("Hero Screen");
 	}
 	else
 	// status message over skill
@@ -553,7 +559,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
 		    statusBar.ShowMessage("View " + Skill::Level::String(level) + " " + Skill::Secondary::String(skill) + " Info");
 		else
-		    statusBar.Clear("Hero Screen");
+		    statusBar.ShowMessage("Hero Screen");
 	    }
 	}
 	else
@@ -591,7 +597,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         }
         else
         // clear all
-        if(! statusBar.isEmpty()) statusBar.Clear("Hero Screen");
+        statusBar.ShowMessage("Hero Screen");
     }
 
     return Dialog::ZERO;

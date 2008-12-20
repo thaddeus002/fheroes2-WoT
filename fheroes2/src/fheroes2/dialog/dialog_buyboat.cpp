@@ -38,28 +38,26 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    const std::string & string_header = "Build a new ship:";
-    const std::string & string_cost = "Resource cost:";
-
-
     Dialog::Box box(100, true);
 
     const Rect & box_rt = box.GetArea();
-
     Point dst_pt;
+    Text text;
 
-    dst_pt.x = box_rt.x + (box_rt.w - Text::width(string_header, Font::BIG)) / 2;
+    text.Set("Build a new ship:", Font::BIG);
+    dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
     dst_pt.y = box_rt.y;
-    Text(string_header, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     const Sprite & sprite = AGG::GetICN(ICN::BOATWIND, 0);
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
     dst_pt.y = box_rt.y + 25;
     display.Blit(sprite, dst_pt);
 
-    dst_pt.x = box_rt.x + (box_rt.w - Text::width(string_cost, Font::BIG)) / 2;
+    text.Set("Resource cost:", Font::BIG);
+    dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
     dst_pt.y = box_rt.y + 35 + sprite.h();
-    Text(string_cost, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     const Rect src_rt(box_rt.x, box_rt.y + 40 + sprite.h(), box_rt.w, box_rt.h);
 

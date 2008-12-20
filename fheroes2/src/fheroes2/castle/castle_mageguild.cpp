@@ -42,6 +42,7 @@ void Castle::OpenMageGuild(void)
     display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
 
     std::string message;
+    Text text;
 
     // bar
     dst_pt.x = cur_pt.x;
@@ -49,10 +50,10 @@ void Castle::OpenMageGuild(void)
     display.Blit(AGG::GetICN(ICN::WELLXTRA, 2), dst_pt);
 
     // text bar
-    message = "The above spells have been added to your book.";
-    dst_pt.x = cur_pt.x + 280 - Text::width(message, Font::BIG) / 2;
+    text.Set("The above spells have been added to your book.", Font::BIG);
+    dst_pt.x = cur_pt.x + 280 - text.w() / 2;
     dst_pt.y = cur_pt.y + 461;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     const u8 level = mageguild.GetLevel();
     // sprite
@@ -97,14 +98,17 @@ void Castle::OpenMageGuild(void)
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
-		std::string str1 = str.substr(0, pos);
-		std::string str2 = str.substr(pos);
+		Text t1(str.substr(0, pos), Font::SMALL);
+		Text t2(str.substr(pos), Font::SMALL);
 
-		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
-		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
+		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
 	    }
 	    else
-		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    {
+		Text t1(str, Font::SMALL);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
+	    }
 
 	    rectsLevel5.push_back(Rect(dst_pt.x - roll5.w() / 2, dst_pt.y, roll5.w(), roll5.h()));
 	}
@@ -132,14 +136,17 @@ void Castle::OpenMageGuild(void)
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
-		std::string str1 = str.substr(0, pos);
-		std::string str2 = str.substr(pos);
+		Text t1(str.substr(0, pos), Font::SMALL);
+		Text t2(str.substr(pos), Font::SMALL);
 
-		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
-		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
+		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
 	    }
 	    else
-		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    {
+		Text t1(str, Font::SMALL);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
+	    }
 
 	    rectsLevel4.push_back(Rect(dst_pt.x - roll4.w() / 2, dst_pt.y, roll4.w(), roll4.h()));
 	}
@@ -167,14 +174,17 @@ void Castle::OpenMageGuild(void)
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
-		std::string str1 = str.substr(0, pos);
-		std::string str2 = str.substr(pos);
+		Text t1(str.substr(0, pos), Font::SMALL);
+		Text t2(str.substr(pos), Font::SMALL);
 
-		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
-		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
+		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
 	    }
 	    else
-		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    {
+		Text t1(str, Font::SMALL);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
+	    }
 
 	    rectsLevel3.push_back(Rect(dst_pt.x - roll3.w() / 2, dst_pt.y, roll3.w(), roll3.h()));
 	}
@@ -202,14 +212,17 @@ void Castle::OpenMageGuild(void)
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
-		std::string str1 = str.substr(0, pos);
-		std::string str2 = str.substr(pos);
+		Text t1(str.substr(0, pos), Font::SMALL);
+		Text t2(str.substr(pos), Font::SMALL);
 
-		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
-		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
+		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
 	    }
 	    else
-		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    {
+		Text t1(str, Font::SMALL);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
+	    }
 
 	    rectsLevel2.push_back(Rect(dst_pt.x - roll2.w() / 2, dst_pt.y, roll2.w(), roll2.h()));
 	}
@@ -237,14 +250,17 @@ void Castle::OpenMageGuild(void)
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
-		std::string str1 = str.substr(0, pos);
-		std::string str2 = str.substr(pos);
+		Text t1(str.substr(0, pos), Font::SMALL);
+		Text t2(str.substr(pos), Font::SMALL);
 
-		Text(str1, Font::SMALL, dst_pt.x + 5 - Text::width(str1, Font::SMALL) / 2, dst_pt.y + 62);
-		Text(str2, Font::SMALL, dst_pt.x + 5 - Text::width(str2, Font::SMALL) / 2, dst_pt.y + 71);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
+		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
 	    }
 	    else
-		Text(str, Font::SMALL, dst_pt.x + 5 - Text::width(str, Font::SMALL) / 2, dst_pt.y + 65);
+	    {
+		Text t1(str, Font::SMALL);
+		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
+	    }
 
 	    rectsLevel1.push_back(Rect(dst_pt.x - roll1.w() / 2, dst_pt.y, roll1.w(), roll1.h()));
 	}

@@ -42,7 +42,10 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     const Sprite & sprite_expr = AGG::GetICN(ICN::EXPMRL, 4);
 
     Point pt;
-    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20 + Text::height(message, Font::BIG, BOXAREA_WIDTH) + 10 + sprite_expr.h(), true);
+    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
+    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+
+    Box box(height1 + 20 + height2 + 10 + sprite_expr.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
     pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
@@ -53,17 +56,19 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     Button button_no(pt, system, 7, 8);
 
     Rect pos = box.GetArea();
+    Text text;
+    std::string str;
 
     if(header.size())
     {
 	TextBox(header, Font::BIG, pos);
-        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += height1 + 20;
     }
 
     if(message.size())
     {
         TextBox(message, Font::BIG, pos);
-        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += height2 + 20;
     }
 
     pos.y += sprite_expr.h();
@@ -71,17 +76,19 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     pos.x = box.GetArea().x + box.GetArea().w / 2 - sprite_gold.w() - 30;
     display.Blit(sprite_gold, pos.x, pos.y - sprite_gold.h());
     // text
-    std::string text_gold;
-    String::AddInt(text_gold, gold);
-    Text(text_gold, Font::SMALL, pos.x + (sprite_gold.w() - Text::width(text_gold, Font::SMALL)) / 2, pos.y + 2);
+    str.clear();
+    String::AddInt(str, gold);
+    text.Set(str, Font::SMALL);
+    text.Blit(pos.x + (sprite_gold.w() - text.w()) / 2, pos.y + 2);
 
     // sprite2
     pos.x = box.GetArea().x + box.GetArea().w / 2 + 30;
     display.Blit(sprite_expr, pos.x, pos.y - sprite_expr.h());
     // text
-    std::string text_expr;
-    String::AddInt(text_expr, expr);
-    Text(text_expr, Font::SMALL, pos.x + (sprite_expr.w() - Text::width(text_expr, Font::SMALL)) / 2, pos.y + 2);
+    str.clear();
+    String::AddInt(str, expr);
+    text.Set(str, Font::SMALL);
+    text.Blit(pos.x + (sprite_expr.w() - text.w()) / 2, pos.y + 2);
 
     button_yes.Draw();
     button_no.Draw();

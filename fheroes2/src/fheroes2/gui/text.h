@@ -32,6 +32,7 @@ namespace Font
 namespace Char
 {
     u8 width(char ch, Font::type_t ft);
+    u8 height(char ch, Font::type_t ft);
 };
 
 class Text
@@ -39,7 +40,7 @@ class Text
 public:
     typedef enum { LEFT, CENTER, RIGHT } align_t;
 
-    Text(){};
+    Text();
     Text(const std::string & msg, Font::type_t ft);
 
     // with blit
@@ -47,8 +48,14 @@ public:
     Text(const std::string & msg, Font::type_t ft, const Rect & dst_rt);
     Text(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
 
-    void SetText(const std::string & msg){ message = msg; };
-    void SetFont(const Font::type_t & ft){ font = ft; };
+    void Set(const std::string & msg, Font::type_t ft){ message = msg; font = ft; gw = width(); };
+    void Set(const std::string & msg){  message = msg; gw = width(); };
+    void Set(Font::type_t ft){ font = ft; gw = width(); };
+
+    void Clear(void){ message.clear(); gw = 0; };
+
+    u16 w(void){ return gw; }
+    u16 h(void){ return gh; }
 
     u16 width(u16 start = 0, u16 count = 0xffff){ return Text::width(message, font, start, count); };
     u16 height(u16 width = 0){ return Text::height(message, font, width); };
@@ -59,12 +66,14 @@ public:
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
     void Blit(const Point & dst_pt, Surface & sf = Display::Get());
 
-private:
+protected:
     Font::type_t font;
     std::string message;
+    u16 gw;
+    u8  gh;
 };
 
-class TextSprite : public Text
+class TextSprite : protected Text
 {
 public:
     TextSprite();
@@ -73,9 +82,18 @@ public:
 
     void SetPos(const Point & pt){ SetPos(pt.x, pt.y); };
     void SetPos(u16 ax, u16 ay);
+    void SetText(const std::string & msg);
+    void SetFont(Font::type_t ft);
 
     void Show(void);
     void Hide(void);
+
+    bool isHide(void) const;
+    bool isShow(void) const;
+
+    u16  w(void);
+    u16  h(void);
+    const Rect & GetRect(void) const;
 
 private:
     Background back;

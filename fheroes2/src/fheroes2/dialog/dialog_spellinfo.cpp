@@ -64,10 +64,10 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     display.Blit(sprite, pos.x, pos.y);
 
     // small text
-    const std::string &spell_name = Spell::String(spell);
-    pos.x = box.GetArea().x + (pos.w - Text::width(spell_name, Font::SMALL)) / 2;
+    Text text(Spell::String(spell), Font::SMALL);
+    pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
     pos.y = pos.y + sprite.h() + 10;
-    Text(spell_name, Font::SMALL, pos.x, pos.y);
+    text.Blit(pos);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

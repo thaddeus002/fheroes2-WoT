@@ -156,7 +156,8 @@ void Dialog::DrawSystemInfo(const Point & dst)
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
 
-    std::string text;
+    std::string str;
+    Text text;
 
     Surface black(65, 65);
     black.Fill(0, 0, 0);
@@ -165,87 +166,96 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Sprite & sprite1 = AGG::GetICN(ICN::SPANEL, conf.Sound() ? 1 : 0);
     const Rect rect1(dst.x + 36, dst.y + 47, sprite1.w(), sprite1.h());
     display.Blit(sprite1, rect1);
-    text.clear();
-    text = "sound ";
+    str.clear();
+    str = "sound ";
     if(conf.Sound() && conf.SoundVolume())
-	String::AddInt(text, conf.SoundVolume());
+	String::AddInt(str, conf.SoundVolume());
     else
-	text += "off";
-    Text(text, Font::SMALL, rect1.x + (rect1.w - Text::width(text, Font::SMALL)) / 2, rect1.y + rect1.h + 5);
+	str += "off";
+    text.Set(str, Font::SMALL);
+    text.Blit(rect1.x + (rect1.w - text.w()) / 2, rect1.y + rect1.h + 5);
 
     // music
     const Sprite & sprite2 = AGG::GetICN(ICN::SPANEL, conf.Music() ? 3 : 2);
     const Rect rect2(dst.x + 128, dst.y + 47, sprite2.w(), sprite2.h());
     display.Blit(sprite2, rect2);
-    text.clear();
-    text = "music ";
+    str.clear();
+    str = "music ";
     if(conf.Music() && conf.MusicVolume())
-	String::AddInt(text, conf.MusicVolume());
+	String::AddInt(str, conf.MusicVolume());
     else
-	text += "off";
-    Text(text, Font::SMALL, rect2.x + (rect2.w - Text::width(text, Font::SMALL)) / 2, rect2.y + rect2.h + 5);
+	str += "off";
+    text.Set(str);
+    text.Blit(rect2.x + (rect2.w - text.w()) / 2, rect2.y + rect2.h + 5);
 
     // unused
     const Sprite & sprite3 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect3(dst.x + 220, dst.y + 47, sprite3.w(), sprite3.h());
     display.Blit(black, rect3);
-    text.clear();
-    text = "unused";
-    Text(text, Font::SMALL, rect3.x + (rect3.w - Text::width(text, Font::SMALL)) / 2, rect3.y + rect3.h + 5);
+    str.clear();
+    str = "unused";
+    text.Set(str);
+    text.Blit(rect3.x + (rect3.w - text.w()) / 2, rect3.y + rect3.h + 5);
 
     // animation speed
     const u8 is = conf.Animation() ? (conf.Animation() < 9 ? (conf.Animation() < 7 ? (conf.Animation() < 4 ? 4 : 5) : 6) : 7) : 9;
     const Sprite & sprite4 = AGG::GetICN(ICN::SPANEL, is);
     const Rect rect4(dst.x + 36, dst.y + 157, sprite4.w(), sprite4.h());
     display.Blit(sprite4, rect4);
-    text.clear();
-    text = "animation ";
+    str.clear();
+    str = "animation ";
     if(conf.Animation())
-	String::AddInt(text, conf.Animation());
+	String::AddInt(str, conf.Animation());
     else
-	text += "off";
-    Text(text, Font::SMALL, rect4.x + (rect4.w - Text::width(text, Font::SMALL)) / 2, rect4.y + rect4.h + 5);
+	str += "off";
+    text.Set(str);
+    text.Blit(rect4.x + (rect4.w - text.w()) / 2, rect4.y + rect4.h + 5);
 
     // unused
     const Sprite & sprite5 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect5(dst.x + 128, dst.y + 157, sprite5.w(), sprite5.h());
     display.Blit(black, rect5);
-    text.clear();
-    text = "unused";
-    Text(text, Font::SMALL, rect5.x + (rect5.w - Text::width(text, Font::SMALL)) / 2, rect5.y + rect5.h + 5);
+    str.clear();
+    str = "unused";
+    text.Set(str);
+    text.Blit(rect5.x + (rect5.w - text.w()) / 2, rect5.y + rect5.h + 5);
 
     // unused
     const Sprite & sprite6 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect6(dst.x + 220, dst.y + 157, sprite6.w(), sprite6.h());
     display.Blit(black, rect6);
-    text.clear();
-    text = "unused";
-    Text(text, Font::SMALL, rect6.x + (rect6.w - Text::width(text, Font::SMALL)) / 2, rect6.y + rect6.h + 5);
+    str.clear();
+    str = "unused";
+    text.Set(str);
+    text.Blit(rect6.x + (rect6.w - text.w()) / 2, rect6.y + rect6.h + 5);
 
     // interface
     const Sprite & sprite7 = AGG::GetICN(ICN::SPANEL, (conf.EvilInterface() ? 17 : 16));
     const Rect rect7(dst.x + 36, dst.y + 267, sprite7.w(), sprite7.h());
     display.Blit(sprite7, rect7);
-    text.clear();
+    str.clear();
     if(conf.EvilInterface())
-	text = "Evil";
+	str = "Evil";
     else
-	text = "Good";
-    Text(text, Font::SMALL, rect7.x + (rect7.w - Text::width(text, Font::SMALL)) / 2, rect7.y + rect7.h + 5);
+	str = "Good";
+    text.Set(str);
+    text.Blit(rect7.x + (rect7.w - text.w()) / 2, rect7.y + rect7.h + 5);
 
     // unused
     const Sprite & sprite8 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect8(dst.x + 128, dst.y + 267, sprite8.w(), sprite8.h());
     display.Blit(black, rect8);
-    text.clear();
-    text = "unused";
-    Text(text, Font::SMALL, rect8.x + (rect8.w - Text::width(text, Font::SMALL)) / 2, rect8.y + rect8.h + 5);
+    str.clear();
+    str = "unused";
+    text.Set(str);
+    text.Blit(rect8.x + (rect8.w - text.w()) / 2, rect8.y + rect8.h + 5);
 
     // unused
     const Sprite & sprite9 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect9(dst.x + 220, dst.y + 267, sprite9.w(), sprite9.h());
     display.Blit(black, rect9);
-    text.clear();
-    text = "unused";
-    Text(text, Font::SMALL, rect9.x + (rect9.w - Text::width(text, Font::SMALL)) / 2, rect9.y + rect9.h + 5);
+    str.clear();
+    str = "unused";
+    text.Set(str);
+    text.Blit(rect9.x + (rect9.w - text.w()) / 2, rect9.y + rect9.h + 5);
 }

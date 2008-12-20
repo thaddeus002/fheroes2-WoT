@@ -69,23 +69,26 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
 
     Point dst_pt(pos_rt.x, pos_rt.y);
     std::string message;
+    Text text;
 
     // name
-    dst_pt.x = pos_rt.x  + 140 - Text::width(mons.GetName(), Font::BIG) / 2;
+    text.Set(mons.GetName(), Font::BIG);
+    dst_pt.x = pos_rt.x  + 140 - text.w() / 2;
     dst_pt.y = pos_rt.y + 40;
-    Text(mons.GetName(), Font::BIG, dst_pt);
+    text.Blit(dst_pt);
     
     // count
     String::AddInt(message, battroop.Count());
-    dst_pt.x = pos_rt.x + 140 - Text::width(message, Font::BIG) / 2;
+    text.Set(message);
+    dst_pt.x = pos_rt.x + 140 - text.w() / 2;
     dst_pt.y = pos_rt.y + 225;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
     
     // attack
-    message = "Attack:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    text.Set("Attack:");
+    dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y = pos_rt.y + 40;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, mons.GetAttack());
@@ -97,14 +100,15 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
 	message += ")";
     }
 
+    text.Set(message);
     dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     // defense
-    message = "Defense:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    text.Set("Defense:");
+    dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, mons.GetDefense());
@@ -116,88 +120,94 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
 	message += ")";
     }
 
+    text.Set(message);
     dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     // shot
     if(mons.isArchers())
     {
-	message = battle ? "Shots Left:" : "Shots:";
-	dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+	text.Set(battle ? "Shots Left:" : "Shots:");
+	dst_pt.x = pos_rt.x + 400 - text.w();
 	dst_pt.y += 18;
-	Text(message, Font::BIG, dst_pt);
+	text.Blit(dst_pt);
 
 	message.clear();
 	String::AddInt(message, battle ? battroop.shots : mons.GetShots());
+	text.Set(message);
 	dst_pt.x = pos_rt.x + 420;
-	Text(message, Font::BIG, dst_pt);
+	text.Blit(dst_pt);
     }
 
     // damage
-    message = "Damage:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    text.Set("Damage:");
+    dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, mons.GetDamageMin());
     message += " - ";
     String::AddInt(message, mons.GetDamageMax());
+    text.Set(message);
     dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     // hp
-    message = "Hit Points:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    text.Set("Hit Points:");
+    dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, mons.GetHitPoints());
+    text.Set(message);
     dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
-    if(battle) {
-	message = "Hit Points Left:";
-	dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    if(battle)
+    {
+	text.Set("Hit Points Left:");
+	dst_pt.x = pos_rt.x + 400 - text.w();
 	dst_pt.y += 18;
-	Text(message, Font::BIG, dst_pt);
+	text.Blit(dst_pt);
 	
 	message.clear();
 	String::AddInt(message, battroop.hp);
+	text.Set(message);
 	dst_pt.x = pos_rt.x + 420;
-	Text(message, Font::BIG, dst_pt);
+	text.Blit(dst_pt);
     }
 
     // speed
-    message = "Speed:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    text.Set("Speed:");
+    dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
-    message = Speed::String(mons.GetSpeed());
+    text.Set(Speed::String(mons.GetSpeed()));
     dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     // morale
-    message = "Morale:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    text.Set("Morale:");
+    dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
-    message = (skills ? Morale::String((*skills).GetMorale()) : Morale::String(Morale::NORMAL));
+    text.Set(skills ? Morale::String((*skills).GetMorale()) : Morale::String(Morale::NORMAL));
     dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     // luck
-    message = "Luck:";
-    dst_pt.x = pos_rt.x + 400 - Text::width(message, Font::BIG);
+    text.Set("Luck:");
+    dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
-    message = (skills ? Luck::String((*skills).GetLuck()) : Luck::String(Luck::NORMAL));
+    text.Set(skills ? Luck::String((*skills).GetLuck()) : Luck::String(Luck::NORMAL));
     dst_pt.x = pos_rt.x + 420;
-    Text(message, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     // button upgrade
     dst_pt.x = pos_rt.x + 284;

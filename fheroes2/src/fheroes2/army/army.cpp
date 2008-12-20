@@ -475,7 +475,8 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) 
     cx += chunk / 2;
 
     std::string str;
-    Text text("", Font::SMALL);
+    Text text;
+    text.Set(Font::SMALL);
 
     for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
     {
@@ -491,7 +492,7 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) 
 
     		str.clear();
     		String::AddInt(str, troop.Count());
-		text.SetText(str);
+		text.Set(str);
 		text.Blit(cx - text.width() / 2, cy + 28);
 
 		cx += chunk;

@@ -39,14 +39,7 @@ void Castle::OpenWell(void)
 
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
 
-    const std::string & str_msg = "Town Population Information and Statistics";
-
     Point dst_pt(cur_pt);
-
-    // text
-    dst_pt.x = cur_pt.x + 280 - Text::width(str_msg, Font::BIG) / 2;
-    dst_pt.y = cur_pt.y + 462;
-    Text(str_msg, Font::BIG, dst_pt);
 
     // button exit
     dst_pt.x = cur_pt.x + 578;
@@ -147,11 +140,18 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     Display & display = Display::Get();
     display.Blit(AGG::GetICN(ICN::WELLBKG, 0), cur_pt);
 
+    Text text;
+    Point dst_pt, pt;
+
+    text.Set("Town Population Information and Statistics", Font::BIG);
+    dst_pt.x = cur_pt.x + 280 - text.w() / 2;
+    dst_pt.y = cur_pt.y + 462;
+    text.Blit(dst_pt);
+
     u32 dw = DWELLING_MONSTER1;
 
     while(dw <= DWELLING_MONSTER6)
     {
-	Point pt(cur_pt);
 	bool present = false;
 	building_t dw_orig = DWELLING_MONSTER1;
 	u8 icnindex = 0;
@@ -212,8 +212,6 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 
 	const Monster monster(race, dw_orig);
 
-	Point dst_pt;
-	std::string str;
 	ICN::icn_t icnname = ICN::UNKNOWN;
 
 	switch(race)
@@ -232,55 +230,61 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	dst_pt.y = pt.y + 35;
 	display.Blit(AGG::GetICN(icnname, icnindex), dst_pt);
 	// text
-	str = GetStringBuilding(dw_orig, race);
-	dst_pt.x = pt.x + 86 - Text::width(str, Font::SMALL) / 2;
+	text.Set(GetStringBuilding(dw_orig, race), Font::SMALL);
+	dst_pt.x = pt.x + 86 - text.w() / 2;
 	dst_pt.y = pt.y + 103;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	// monster
 	const Sprite & smonster = AGG::GetICN(monster.ICNMonh(), 0);
 	dst_pt.x = pt.x + 193 - smonster.w() / 2;
 	dst_pt.y = pt.y + 124 - smonster.h();
 	display.Blit(smonster, dst_pt);
 	// name
-	str = monster.GetName();
-	dst_pt.x = pt.x + 122 - Text::width(monster.GetName(), Font::SMALL) / 2;
+	text.Set(monster.GetName());
+	dst_pt.x = pt.x + 122 - text.w() / 2;
 	dst_pt.y = pt.y + 16;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	// attack
+	std::string str;
 	str = "Attack: ";
 	String::AddInt(str, monster.GetAttack());
-	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+	text.Set(str);
+	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 22;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	// defense
 	str = "Defense: ";
 	String::AddInt(str, monster.GetDefense());
-	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+	text.Set(str);
+	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 34;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	// damage
 	str = "Damg: ";
 	String::AddInt(str, monster.GetDamageMin());
 	str += "-";
 	String::AddInt(str, monster.GetDamageMax());
-	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+	text.Set(str);
+	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 46;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	// hp
 	str = "HP: ";
 	String::AddInt(str, monster.GetHitPoints());
-	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+	text.Set(str);
+	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 58;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
         // speed
         str = "Speed:";
-	dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+	text.Set(str);
+	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 78;
-        Text(str, Font::SMALL, dst_pt);
-	str = Speed::String(monster.GetSpeed());
-        dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+	text.Blit(dst_pt);
+	text.Set(Speed::String(monster.GetSpeed()));
+	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 90;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	
 	if(present)
 	{
@@ -288,26 +292,28 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	    grown += building & BUILD_WELL ? GROWN_WELL : 0;
 	    if(DWELLING_MONSTER1 & building) grown += building & BUILD_WEL2 ? GROWN_WEL2 : 0;
 
-    	    str = "Growth";
-	    dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+    	    text.Set("Growth");
+	    dst_pt.x = pt.x + 268 - text.w() / 2;
     	    dst_pt.y = pt.y + 110;
-    	    Text(str, Font::SMALL, dst_pt);
+    	    text.Blit(dst_pt);
 	    str = "+ ";
 	    String::AddInt(str, grown);
     	    str += " / week";
-	    dst_pt.x = pt.x + 268 - Text::width(str, Font::SMALL) / 2;
+	    text.Set(str);
+	    dst_pt.x = pt.x + 268 - text.w() / 2;
     	    dst_pt.y = pt.y + 122;
-    	    Text(str, Font::SMALL, dst_pt);
+    	    text.Blit(dst_pt);
 
-    	    str = "Available:";
+    	    text.Set("Available:");
 	    dst_pt.x = pt.x + 44;
     	    dst_pt.y = pt.y + 122;
-    	    Text(str, Font::SMALL, dst_pt);
+    	    text.Blit(dst_pt);
 	    str.clear();
 	    String::AddInt(str, available);
-    	    dst_pt.x = pt.x + 129 - Text::width(str, Font::BIG) / 2;
+	    text.Set(str, Font::BIG);
+    	    dst_pt.x = pt.x + 129 - text.w() / 2;
     	    dst_pt.y = pt.y + 119;
-	    Text(str, Font::BIG, dst_pt);
+	    text.Blit(dst_pt);
 	}
 	
 	dw <<= 1;

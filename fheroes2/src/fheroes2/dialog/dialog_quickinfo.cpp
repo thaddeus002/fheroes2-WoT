@@ -151,21 +151,25 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
         default: break;
     }
 
+    Text text;
+    text.Set(name_object, Font::SMALL);
+
     if(visit_status.empty())
     {
-	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(name_object, Font::SMALL)) / 2;
-	u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(name_object, Font::SMALL)) / 2;
-	Text(name_object, Font::SMALL, tx, ty);
+	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
+	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.height()) / 2;
+	text.Blit(tx, ty);
     }
     else
     {
-    	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(name_object, Font::SMALL)) / 2;
-	u16 ty = pos.y + (pos.h - BORDERWIDTH - Text::height(name_object, Font::SMALL)) / 2 - 7;
-	Text(name_object, Font::SMALL, tx, ty);
+    	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
+	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.height()) / 2 - 7;
+	text.Blit(tx, ty);
 
-	tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - Text::width(visit_status, Font::SMALL)) / 2;
+	text.Set(visit_status);
+	tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
 	ty += 15;
-	Text(visit_status, Font::SMALL, tx, ty);
+	text.Blit(tx, ty);
     }
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -226,13 +230,13 @@ void Dialog::QuickInfo(const Castle & castle)
 
     cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 12, 178, 140);
     Point dst_pt;
-    std::string message;
+    Text text;
 
     // castle name
-    message = castle.GetName();
-    dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
+    text.Set(castle.GetName(), Font::SMALL);
+    dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
     dst_pt.y = cur_rt.y + 5;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     u8 index = 0;
 
@@ -275,19 +279,19 @@ void Dialog::QuickInfo(const Castle & castle)
     display.Blit(r_flag, dst_pt);
 
     // info
-    message = std::string("Defenders:");
-    dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
+    text.Set("Defenders:");
+    dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
     dst_pt.y += sprite.h() + 5;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     u8 count = castle.GetArmy().GetCount();
 
     if(! count)
     {
-	message = std::string("None");
-	dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
+	text.Set("None");
+	dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
 	dst_pt.y += 45;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
     else
 	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192);
@@ -351,13 +355,13 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 10, 146, 144);
     Point dst_pt;
-    std::string message;
+    Text text;
 
     // heroes name
-    message = hero.GetName();
-    dst_pt.x = cur_rt.x + (cur_rt.w - Text::width(message, Font::SMALL)) / 2;
+    text.Set(hero.GetName(), Font::SMALL);
+    dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
     dst_pt.y = cur_rt.y + 2;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // mini port heroes
     const Surface & port = Portrait::Hero(hero, Portrait::SMALL);
@@ -388,61 +392,66 @@ void Dialog::QuickInfo(const Heroes & hero)
     display.Blit(r_flag, dst_pt);
 
     // attack
-    message = "Attack:";
+    text.Set("Attack:");
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += port.h() + 4;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
-    message.clear();
+    std::string message;
     String::AddInt(message, hero.GetAttack());
+    text.Set(message);
     dst_pt.x += 75;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // defense
-    message = "Defense:";
+    text.Set("Defense:");
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetDefense());
+    text.Set(message);
     dst_pt.x += 75;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // power
-    message = "Spell Power:";
+    text.Set("Spell Power:");
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetPower());
+    text.Set(message);
     dst_pt.x += 75;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // knowledge
-    message = "Knowledge:     ";
+    text.Set("Knowledge:     ");
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetKnowledge());
+    text.Set(message);
     dst_pt.x += 75;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
     
     // spell point
-    message = "Spell Points:  ";
+    text.Set("Spell Points:  ");
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     message.clear();
     String::AddInt(message, hero.GetSpellPoints());
     message += "/";
     String::AddInt(message, hero.GetMaxSpellPoints());
+    text.Set(message);
     dst_pt.x += 75;
-    Text(message, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // draw monster sprite in one string
     hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160);

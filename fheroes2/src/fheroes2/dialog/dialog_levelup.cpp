@@ -78,11 +78,14 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     pos.x += 3;
     Rect rect_image1(pos, sprite_skill1.w(), sprite_skill1.h());
     display.Blit(sprite_skill1, pos.x, pos.y + 3);
+
+    Text text;
+
     // text
-    const std::string &name_skill1 = Skill::Secondary::String(sec1.Skill());
-    Text(name_skill1, Font::SMALL, pos.x + (sprite_skill1.w() - Text::width(name_skill1, Font::SMALL)) / 2, pos.y + 5);
-    const std::string &name_level1 = Skill::Level::String(sec1.Level());
-    Text(name_level1, Font::SMALL, pos.x + (sprite_skill1.w() - Text::width(name_level1, Font::SMALL)) / 2, pos.y + sprite_skill1.h() - 12);
+    text.Set(Skill::Secondary::String(sec1.Skill()), Font::SMALL);
+    text.Blit(pos.x + (sprite_skill1.w() - text.w()) / 2, pos.y + 5);
+    text.Set(Skill::Level::String(sec1.Level()), Font::SMALL);
+    text.Blit(pos.x + (sprite_skill1.w() - text.w()) / 2, pos.y + sprite_skill1.h() - 12);
 
     // sprite2
     pos.x = box.GetArea().x + box.GetArea().w / 2 + 20;

@@ -73,19 +73,22 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
     display.Blit(sprite, pos.x, pos.y + 3);
 
+    Text text;
+
     // small text
-    const std::string & skill_name = Skill::Secondary::String(skill);
-    const std::string & skill_level= Skill::Level::String(level);
-    pos.x = box.GetArea().x + (pos.w - Text::width(skill_name, Font::SMALL)) / 2;
-    Text(skill_name, Font::SMALL, pos.x, pos.y + 3);
-    pos.x = box.GetArea().x + (pos.w - Text::width(skill_level, Font::SMALL)) / 2;
-    Text(skill_level, Font::SMALL, pos.x, pos.y + 55);
+    text.Set(Skill::Secondary::String(skill), Font::SMALL);
+    pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
+    text.Blit(pos.x, pos.y + 3);
+
+    text.Set(Skill::Level::String(level));
+    pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
+    text.Blit(pos.x, pos.y + 55);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
     Button *button = NULL;
     Point pt;
-    
+
     if(ok_button)
     {
         pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
@@ -157,20 +160,23 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     }
     const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, index);
 
-    Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20 + Text::height(message, Font::BIG, BOXAREA_WIDTH) + 10 + sprite.h(), Dialog::OK);
+    u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
+    u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+
+    Box box(height1 + 20 + height2 + 10 + sprite.h(), Dialog::OK);
 
     Rect pos = box.GetArea();
 
     if(header.size())
     {
 	TextBox(header, Font::BIG, pos);
-        pos.y += Text::height(header, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += height1 + 20;
     }
 
     if(message.size())
     {
         TextBox(message, Font::BIG, pos);
-        pos.y += Text::height(message, Font::BIG, BOXAREA_WIDTH) + 20;
+        pos.y += height2 + 20;
     }
 
     // blit sprite
@@ -180,12 +186,15 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
     display.Blit(sprite, pos.x, pos.y + 6);
 
-    // small text
-    const std::string skill_level("+1");
-    pos.x = box.GetArea().x + (pos.w - Text::width(skill_name, Font::SMALL)) / 2;
-    Text(skill_name, Font::SMALL, pos.x, pos.y + 8);
-    pos.x = box.GetArea().x + (pos.w - Text::width(skill_level, Font::BIG)) / 2;
-    Text(skill_level, Font::BIG, pos.x, pos.y + 80);
+    Text text;
+
+    text.Set(skill_name, Font::SMALL);
+    pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
+    text.Blit(pos.x, pos.y + 8);
+
+    text.Set("+1", Font::BIG);
+    pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
+    text.Blit(pos.x, pos.y + 80);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

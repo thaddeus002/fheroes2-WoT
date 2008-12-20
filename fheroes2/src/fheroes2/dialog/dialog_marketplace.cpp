@@ -141,10 +141,10 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2;
         dst_pt.y = pos_rt.y + 90;
         display.Blit(sprite_fromto, dst_pt);
-        const std::string & str_qty = "Qty to trade";
-        dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(str_qty, Font::SMALL)) / 2;
+        Text text("Qty to trade", Font::SMALL);
+        dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2;
         dst_pt.y = pos_rt.y + 110;
-        Text(str_qty, Font::SMALL, dst_pt);
+        text.Blit(dst_pt);
 
         buttonTrade.SetDisable(false);
         buttonLeft.SetDisable(false);
@@ -164,20 +164,21 @@ void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy)
 {
     Point dst_pt;
     std::string message;
+
     String::AddInt(message, count_sell);
-    dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = pos_rt.y + 116;
     textSell.Hide();
     textSell.SetText(message);
+    dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - textSell.w() / 2;
+    dst_pt.y = pos_rt.y + 116;
     textSell.SetPos(dst_pt);
     textSell.Show();
 
     message.clear();
     String::AddInt(message, count_buy);
-    dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = pos_rt.y + 116;
     textBuy.Hide();
     textBuy.SetText(message);
+    dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - textBuy.w() / 2;
+    dst_pt.y = pos_rt.y + 116;
     textBuy.SetPos(dst_pt);
     textBuy.Show();
 }
@@ -197,11 +198,13 @@ void Dialog::Marketplace(bool fromTradingPost)
     const Rect & pos_rt = box.GetArea();
     Point dst_pt(pos_rt.x, pos_rt.y);
     Rect dst_rt(pos_rt);
+    Text text;
 
     // header
-    dst_pt.x = pos_rt.x + (pos_rt.w - Text::width(header, Font::BIG)) / 2;
+    text.Set(header, Font::BIG);
+    dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2;
     dst_pt.y = pos_rt.y;
-    Text(header, Font::BIG, dst_pt);
+    text.Blit(dst_pt);
 
     TradeWindowGUI gui(pos_rt);
 
@@ -222,9 +225,10 @@ void Dialog::Marketplace(bool fromTradingPost)
     rectsFrom[5] = Rect(pt1.x + 74, pt1.y + 37, 34, 34);// gems
     rectsFrom[6] = Rect(pt1.x + 37, pt1.y + 74, 34, 34);// gold
     SpriteCursor cursorFrom(spritecursor);
-    dst_pt.x = pt1.x + (108 - Text::width(header_from, Font::SMALL)) / 2;
+    text.Set(header_from, Font::SMALL);
+    dst_pt.x = pt1.x + (108 - text.w()) / 2;
     dst_pt.y = pt1.y - 15;
-    Text(header_from, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
     RedrawFromResource(pt1, fundsFrom);
 
     const std::string & header_to = "Available Trades";
@@ -241,9 +245,10 @@ void Dialog::Marketplace(bool fromTradingPost)
     rectsTo[5] = Rect(pt2.x + 74, pt2.y + 37, 34, 34);	// gems
     rectsTo[6] = Rect(pt2.x + 37, pt2.y + 74, 34, 34);	// gold
     SpriteCursor cursorTo(spritecursor);
-    dst_pt.x = pt2.x + (108 - Text::width(header_to, Font::SMALL)) / 2;
+    text.Set(header_to, Font::SMALL);
+    dst_pt.x = pt2.x + (108 - text.w()) / 2;
     dst_pt.y = pt2.y - 15;
-    Text(header_to, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
     RedrawToResource(pt2, false, fromTradingPost);
 
     u32 count_sell = 0;
@@ -467,6 +472,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     std::string str;
     Point dst_pt;
+    Text text;
 
     // wood
     dst_pt.x = pt.x;
@@ -474,9 +480,10 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     display.Blit(AGG::GetICN(tradpost, 7), dst_pt);
     str.clear();
     String::AddInt(str, rs.wood);
-    dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+    text.Set(str, Font::SMALL);
+    dst_pt.x += 34 - text.w() / 2;
     dst_pt.y += 21;
-    Text(str, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
     
     // mercury
     dst_pt.x = pt.x + 37;
@@ -484,9 +491,10 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     display.Blit(AGG::GetICN(tradpost, 8), dst_pt);
     str.clear();
     String::AddInt(str, rs.mercury);
-    dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+    text.Set(str);
+    dst_pt.x += 34 - text.w() / 2;
     dst_pt.y += 21;
-    Text(str, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // ore
     dst_pt.x = pt.x + 74;
@@ -494,9 +502,10 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     display.Blit(AGG::GetICN(tradpost, 9), dst_pt);
     str.clear();
     String::AddInt(str, rs.ore);
-    dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+    text.Set(str);
+    dst_pt.x += 34 - text.w() / 2;
     dst_pt.y += 21;
-    Text(str, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // sulfur
     dst_pt.x = pt.x;
@@ -504,9 +513,10 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     display.Blit(AGG::GetICN(tradpost, 10), dst_pt);
     str.clear();
     String::AddInt(str, rs.sulfur);
-    dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+    text.Set(str);
+    dst_pt.x += 34 - text.w() / 2;
     dst_pt.y += 21;
-    Text(str, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // crystal
     dst_pt.x = pt.x + 37;
@@ -514,9 +524,10 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     display.Blit(AGG::GetICN(tradpost, 11), dst_pt);
     str.clear();
     String::AddInt(str, rs.crystal);
-    dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+    text.Set(str);
+    dst_pt.x += 34 - text.w() / 2;
     dst_pt.y += 21;
-    Text(str, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // gems
     dst_pt.x = pt.x + 74;
@@ -524,9 +535,10 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     display.Blit(AGG::GetICN(tradpost, 12), dst_pt);
     str.clear();
     String::AddInt(str, rs.gems);
-    dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+    text.Set(str);
+    dst_pt.x += 34 - text.w() / 2;
     dst_pt.y += 21;
-    Text(str, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 
     // gold
     dst_pt.x = pt.x + 37;
@@ -534,9 +546,10 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     display.Blit(AGG::GetICN(tradpost, 13), dst_pt);
     str.clear();
     String::AddInt(str, rs.gold);
-    dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+    text.Set(str);
+    dst_pt.x += 34 - text.w() / 2;
     dst_pt.y += 21;
-    Text(str, Font::SMALL, dst_pt);
+    text.Blit(dst_pt);
 }
 
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource)
@@ -545,6 +558,8 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     std::string str;
     Point dst_pt;
+    Text text;
+    text.Set(Font::SMALL);
 
     // wood
     dst_pt.x = pt.x;
@@ -553,9 +568,10 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     if(showcost)
     {
 	GetStringTradeCosts(str, from_resource, Resource::WOOD, tradingPost);
-	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+	text.Set(str);
+	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
     
     // mercury
@@ -565,9 +581,10 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     if(showcost)
     {
 	GetStringTradeCosts(str, from_resource, Resource::MERCURY, tradingPost);
-	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+	text.Set(str);
+	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
-        Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 
     // ore
@@ -577,9 +594,10 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     if(showcost)
     {
 	GetStringTradeCosts(str, from_resource, Resource::ORE, tradingPost);
-	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+	text.Set(str);
+	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 
     // sulfur
@@ -589,9 +607,10 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     if(showcost)
     {
 	GetStringTradeCosts(str, from_resource, Resource::SULFUR, tradingPost);
-	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+	text.Set(str);
+	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 
     // crystal
@@ -601,9 +620,10 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     if(showcost)
     {
 	GetStringTradeCosts(str, from_resource, Resource::CRYSTAL, tradingPost);
-	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+	text.Set(str);
+	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 
     // gems
@@ -613,9 +633,10 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     if(showcost)
     {
 	GetStringTradeCosts(str, from_resource, Resource::GEMS, tradingPost);
-	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+	text.Set(str);
+	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 
     // gold
@@ -625,9 +646,10 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     if(showcost)
     {
 	GetStringTradeCosts(str, from_resource, Resource::GOLD, tradingPost);
-	dst_pt.x += (34 - Text::width(str, Font::SMALL)) / 2;
+	text.Set(str);
+	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 }
 

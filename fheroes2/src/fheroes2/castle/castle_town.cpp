@@ -31,8 +31,33 @@
 #include "heroes.h"
 #include "text.h"
 #include "portrait.h"
+#include "statusbar.h"
 #include "payment.h"
 #include "kingdom.h"
+
+void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message, const Castle & castle, const u32 building)
+{
+    if(isBuilt)
+        bar.ShowMessage(message + " is already built");
+    else
+    {
+        const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), static_cast<Castle::building_t>(building));
+
+        if(!castle.AllowBuild())
+            bar.ShowMessage("Cannot build. Already built here this turn.");
+        else
+        if(castle.AllowBuild() && ! world.GetMyKingdom().AllowPayment(paymentBuild))
+            bar.ShowMessage("Cannot afford " + message);
+        else
+        if(Castle::BUILD_SHIPYARD == building && !castle.HaveNearlySea())
+            bar.ShowMessage("Cannot build " + message + " because castle is to far from water.");
+        else
+        if(!castle.AllowBuyBuilding(static_cast<Castle::building_t>(building)))
+            bar.ShowMessage("Cannot build " + message);
+        else
+            bar.ShowMessage("Build " + message);
+    }
+}
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 {
@@ -255,12 +280,12 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     dst_pt.y = box_rt.y + 13;
     display.Blit(building_icons, dst_pt);
 
-    const std::string & building_name = GetStringBuilding(build, race);
-    dst_pt.x = box_rt.x + (box_rt.w - Text::width(building_name, Font::SMALL)) / 2;
-    dst_pt.y = box_rt.y + 70;
-    Text(building_name, Font::SMALL, dst_pt);
+    Text text;
 
-    std::string str;
+    text.Set(GetStringBuilding(build, race), Font::SMALL);
+    dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
+    dst_pt.y = box_rt.y + 70;
+    text.Blit(dst_pt);
 
     src_rt.x = box_rt.x;
     src_rt.y = box_rt.y + 100;
@@ -270,10 +295,10 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
     if(height_requires)
     {
-	str = "Requires:";
-	dst_pt.x = box_rt.x + (box_rt.w - Text::width(str, Font::BIG)) / 2;
+	text.Set("Requires:", Font::BIG);
+	dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
 	dst_pt.y = box_rt.y + 100 + height_description + 20;
-	Text(str, Font::BIG, dst_pt);
+	text.Blit(dst_pt);
 
 	src_rt.x = box_rt.x;
 	src_rt.y = box_rt.y + 100 + height_description + 35;
@@ -361,10 +386,10 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
 	}
 
 	// name
-	const std::string & stringBuilding = Castle::GetStringBuilding(build, castle.GetRace());
-        dst_pt.x = pt.x + 68 - Text::width(stringBuilding, Font::SMALL) / 2;
+	Text text(Castle::GetStringBuilding(build, castle.GetRace()), Font::SMALL);
+        dst_pt.x = pt.x + 68 - text.w() / 2;
 	dst_pt.y = pt.y + 58;
-	Text(stringBuilding, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 }
 
@@ -673,41 +698,49 @@ Castle::building_t Castle::OpenTown(void)
     SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Modes(ARMYSPREAD) ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     if(BUILD_CAPTAIN &building)
     {
-	std::string message("Attack Skill");
+	Text text("Attack Skill", Font::SMALL);
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y = cur_pt.y + 168;
-	Text(message, Font::SMALL, dst_pt);
-	message.clear();
+	text.Blit(dst_pt);
+
+	std::string message;
 	String::AddInt(message, captain.GetAttack());
+	text.Set(message);
 	dst_pt.x += 90;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	
-	message = "Defense Skill ";
+	text.Set("Defense Skill ");
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
+
 	message.clear();
 	String::AddInt(message, captain.GetDefense());
+	text.Set(message);
 	dst_pt.x += 90;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
-	message = "Spell Power ";
+	text.Set("Spell Power ");
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
+
 	message.clear();
 	String::AddInt(message, captain.GetPower());
+	text.Set(message);
 	dst_pt.x += 90;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
-	message = "Knowledge ";
+	text.Set("Knowledge ");
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
+
 	message.clear();
 	String::AddInt(message, captain.GetKnowledge());
+	text.Set(message);
 	dst_pt.x += 90;
-	Text(message, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 	
 	display.Blit(spriteSpreadArmyFormat, rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
 	display.Blit(spriteGroupedArmyFormat, rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
@@ -763,8 +796,11 @@ Castle::building_t Castle::OpenTown(void)
     // bottom bar
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    Dialog::StatusBar statusBar(dst_pt, AGG::GetICN(ICN::CASLBAR, 0), Font::BIG);
-    statusBar.Clear("Castle Options");
+    const Sprite & bar = AGG::GetICN(ICN::CASLBAR, 0);
+    display.Blit(bar, dst_pt);
+
+    StatusBar statusBar;
+    statusBar.SetCenter(dst_pt.x + bar.w() / 2, dst_pt.y + 11);
 
     // redraw resource panel
     RedrawResourcePanel();
@@ -975,38 +1011,38 @@ Castle::building_t Castle::OpenTown(void)
 
         // status info
 	if(le.MouseCursor(rectDwelling1))
-	    statusBar.ShowBuildMessage(DWELLING_MONSTER1 & building, stringDwelling1, *this, DWELLING_MONSTER1);
+	    ShowBuildMessage(statusBar, DWELLING_MONSTER1 & building, stringDwelling1, *this, DWELLING_MONSTER1);
 	else
 	if(le.MouseCursor(rectDwelling2))
 	{
 	    if(isBuild(DWELLING_MONSTER2) && allowUpgrade2)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE2), stringDwelling2, *this, DWELLING_UPGRADE2);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE2), stringDwelling2, *this, DWELLING_UPGRADE2);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER2), stringDwelling2, *this, DWELLING_MONSTER2);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER2), stringDwelling2, *this, DWELLING_MONSTER2);
 	}
 	else
 	if(le.MouseCursor(rectDwelling3))
 	{
 	    if(isBuild(DWELLING_MONSTER3) && allowUpgrade3)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE3), stringDwelling3, *this, DWELLING_UPGRADE3);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE3), stringDwelling3, *this, DWELLING_UPGRADE3);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER3), stringDwelling3, *this, DWELLING_MONSTER3);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER3), stringDwelling3, *this, DWELLING_MONSTER3);
 	}
 	else
 	if(le.MouseCursor(rectDwelling4))
 	{
 	    if(isBuild(DWELLING_MONSTER4) && allowUpgrade4)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE4), stringDwelling4, *this, DWELLING_UPGRADE4);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE4), stringDwelling4, *this, DWELLING_UPGRADE4);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER4), stringDwelling4, *this, DWELLING_MONSTER4);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER4), stringDwelling4, *this, DWELLING_MONSTER4);
 	}
 	else
 	if(le.MouseCursor(rectDwelling5))
 	{
 	    if(isBuild(DWELLING_MONSTER5) && allowUpgrade5)
-		statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE5), stringDwelling5, *this, DWELLING_UPGRADE5);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE5), stringDwelling5, *this, DWELLING_UPGRADE5);
 	    else
-		statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER5), stringDwelling5, *this, DWELLING_MONSTER5);
+		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER5), stringDwelling5, *this, DWELLING_MONSTER5);
 	}
 	else
 	if(le.MouseCursor(rectDwelling6))
@@ -1014,64 +1050,64 @@ Castle::building_t Castle::OpenTown(void)
 	    if(isBuild(DWELLING_MONSTER6) && allowUpgrade6)
 	    {
 		if(isBuild(DWELLING_UPGRADE6) && allowUpgrade7)
-		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE7), stringDwelling6, *this, DWELLING_UPGRADE7);
+		    ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE7), stringDwelling6, *this, DWELLING_UPGRADE7);
 		else
-		    statusBar.ShowBuildMessage(isBuild(DWELLING_UPGRADE6), stringDwelling6, *this, DWELLING_UPGRADE6);
+		    ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE6), stringDwelling6, *this, DWELLING_UPGRADE6);
 	    }
 	    else
-		    statusBar.ShowBuildMessage(isBuild(DWELLING_MONSTER6), stringDwelling6, *this, DWELLING_MONSTER6);
+		    ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER6), stringDwelling6, *this, DWELLING_MONSTER6);
 	}
 	else
 	if(le.MouseCursor(rectMageGuild))
 	{
 	    switch(GetLevelMageGuild())
 	    {
-		case 0: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD1); break;
-		case 1: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD2); break;
-                case 2: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD3); break;
-                case 3: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD4); break;
-                case 4: statusBar.ShowBuildMessage(false, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
-                case 5: statusBar.ShowBuildMessage(true,  stringMageGuild, *this, BUILD_MAGEGUILD5); break;
+		case 0: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD1); break;
+		case 1: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD2); break;
+                case 2: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD3); break;
+                case 3: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD4); break;
+                case 4: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
+                case 5: ShowBuildMessage(statusBar, true,  stringMageGuild, *this, BUILD_MAGEGUILD5); break;
 
 		default: break;
 	    }
 	}
 	else
 	if((Race::NECR != race || Settings::Get().Modes(Settings::PRICELOYALTY)) && le.MouseCursor(rectTavern))
-	    statusBar.ShowBuildMessage(BUILD_TAVERN & building, stringTavern, *this, BUILD_TAVERN);
+	    ShowBuildMessage(statusBar, BUILD_TAVERN & building, stringTavern, *this, BUILD_TAVERN);
 	else
 	if(le.MouseCursor(rectThievesGuild))
-	    statusBar.ShowBuildMessage(BUILD_THIEVESGUILD & building, stringThievesGuild, *this, BUILD_THIEVESGUILD);
+	    ShowBuildMessage(statusBar, BUILD_THIEVESGUILD & building, stringThievesGuild, *this, BUILD_THIEVESGUILD);
 	else
 	if(le.MouseCursor(rectShipyard))
-	    statusBar.ShowBuildMessage(BUILD_SHIPYARD & building, stringShipyard, *this, BUILD_SHIPYARD);
+	    ShowBuildMessage(statusBar, BUILD_SHIPYARD & building, stringShipyard, *this, BUILD_SHIPYARD);
 	else
 	if(le.MouseCursor(rectStatue))
-	    statusBar.ShowBuildMessage(BUILD_STATUE & building, stringStatue, *this, BUILD_STATUE);
+	    ShowBuildMessage(statusBar, BUILD_STATUE & building, stringStatue, *this, BUILD_STATUE);
 	else
 	if(le.MouseCursor(rectMarketplace))
-	    statusBar.ShowBuildMessage(BUILD_MARKETPLACE & building, stringMarketplace, *this, BUILD_MARKETPLACE);
+	    ShowBuildMessage(statusBar, BUILD_MARKETPLACE & building, stringMarketplace, *this, BUILD_MARKETPLACE);
 	else
 	if(le.MouseCursor(rectWell))
-	    statusBar.ShowBuildMessage(BUILD_WELL & building, stringWell, *this, BUILD_WELL);
+	    ShowBuildMessage(statusBar, BUILD_WELL & building, stringWell, *this, BUILD_WELL);
 	else
 	if(le.MouseCursor(rectWel2))
-	    statusBar.ShowBuildMessage(BUILD_WEL2 & building, stringWel2, *this, BUILD_WEL2);
+	    ShowBuildMessage(statusBar, BUILD_WEL2 & building, stringWel2, *this, BUILD_WEL2);
 	else
 	if(le.MouseCursor(rectSpec))
-	    statusBar.ShowBuildMessage(BUILD_SPEC & building, stringSpec, *this, BUILD_SPEC);
+	    ShowBuildMessage(statusBar, BUILD_SPEC & building, stringSpec, *this, BUILD_SPEC);
 	else
 	if(le.MouseCursor(rectLTurret))
-	    statusBar.ShowBuildMessage(BUILD_LEFTTURRET & building, stringLTurret, *this, BUILD_LEFTTURRET);
+	    ShowBuildMessage(statusBar, BUILD_LEFTTURRET & building, stringLTurret, *this, BUILD_LEFTTURRET);
 	else
 	if(le.MouseCursor(rectRTurret))
-	    statusBar.ShowBuildMessage(BUILD_RIGHTTURRET & building, stringRTurret, *this, BUILD_RIGHTTURRET);
+	    ShowBuildMessage(statusBar, BUILD_RIGHTTURRET & building, stringRTurret, *this, BUILD_RIGHTTURRET);
 	else
 	if(le.MouseCursor(rectMoat))
-	    statusBar.ShowBuildMessage(BUILD_MOAT & building, stringMoat, *this, BUILD_MOAT);
+	    ShowBuildMessage(statusBar, BUILD_MOAT & building, stringMoat, *this, BUILD_MOAT);
 	else
 	if(le.MouseCursor(rectCaptain))
-	    statusBar.ShowBuildMessage(BUILD_CAPTAIN & building, stringCaptain, *this, BUILD_CAPTAIN);
+	    ShowBuildMessage(statusBar, BUILD_CAPTAIN & building, stringCaptain, *this, BUILD_CAPTAIN);
 	else
 	if((hero1 && le.MouseCursor(rectHero1)) ||
 	   (hero2 && le.MouseCursor(rectHero2)))
@@ -1099,7 +1135,7 @@ Castle::building_t Castle::OpenTown(void)
 	    statusBar.ShowMessage("Set garrison combat formation to 'Grouped'");
 	else
 	// clear all
-	if(! statusBar.isEmpty()) statusBar.Clear("Castle Options");
+	    statusBar.ShowMessage("Castle Options");
     }
 
     return BUILD_NOTHING;
