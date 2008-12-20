@@ -18,12 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "agg.h"
+#include "settings.h"
 #include "gamedefs.h"
 #include "test.h"
 
 void RunTest1(void);
 void RunTest2(void);
 void RunTest3(void);
+
+void TestMonsterSprite(void);
 
 void Test::Run(int num)
 {
@@ -33,11 +37,11 @@ void Test::Run(int num)
 	case 2: RunTest2(); break;
 	case 3: RunTest3(); break;
 
+	case 9: TestMonsterSprite(); break;
+
 	default: Error::Warning("Test::Run: unknown test."); break;
     }
 }
-
-/* Please, do not commit changes in this file. */
 
 void RunTest1(void)
 {
