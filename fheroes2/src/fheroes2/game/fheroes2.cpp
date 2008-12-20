@@ -30,6 +30,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "game.h"
+#include "test.h"
 #include "image_logo.h"
 #include "image_icons.h"
 
@@ -68,6 +69,7 @@ int main(int argc, char **argv)
 	chdir(dirname(argv[0]));
 
 	Settings & conf = Settings::Get();
+	int test = 0;
 
 	std::string caption("Free Heroes II, version: ");
 	String::AddInt(caption, conf.MajorVersion());
@@ -87,7 +89,7 @@ int main(int argc, char **argv)
 
 	{
 	    int opt;
-	    while((opt = getopt(argc, argv, "hed:c:")) != -1)
+	    while((opt = getopt(argc, argv, "het:d:c:")) != -1)
     		switch(opt)
                 {
                     case 'e':
@@ -104,9 +106,13 @@ int main(int argc, char **argv)
 #ifndef BUILD_RELEASE
 			caption += ", build: ";
 			String::AddInt(caption, conf.DateBuild());
-#endif
 			break;
 			
+                    case 't':
+			test = String::ToInt(optarg);
+			break;
+#endif
+
                     case 'd':
                 	conf.SetDebug(optarg ? String::ToInt(optarg) : 0);
                 	break;
@@ -241,7 +247,7 @@ int main(int argc, char **argv)
 	    LocalEvent::SetGlobalFilterEvents(Cursor::Redraw);
 
 	    // goto main menu
-	    Game::menu_t rs = conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU;
+	    Game::menu_t rs = (test ? Game::TESTING : (conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU));
 
 	    while(rs != Game::QUITGAME)
 	    {
@@ -266,6 +272,7 @@ int main(int argc, char **argv)
 			case Game::STARTGAME:      rs = Game::StartGame();      	break;
 			case Game::NEWHOTSEAT:     rs = Game::NewHotSeat();		break;
 		        case Game::NEWNETWORK:     rs = Game::NewNetwork();		break;
+		        case Game::TESTING:        rs = Game::Testing(test);		break;
 
 
 	    		default: break;

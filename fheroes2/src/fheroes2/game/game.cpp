@@ -30,7 +30,10 @@
 #include "world.h"
 #include "mp2.h"
 #include "agg.h"
+#include "test.h"
 #include "game.h"
+
+Game::menu_t Game::Testing(u8 t){ Test::Run(t); return Game::QUITGAME; }
 
 Game::menu_t Game::NewStandard(void){ Settings::Get().SetGameType(Game::STANDARD); return Game::SCENARIOINFO; }
 Game::menu_t Game::NewHotSeat(void){ Settings::Get().SetGameType(Game::HOTSEAT); return Game::SCENARIOINFO; }

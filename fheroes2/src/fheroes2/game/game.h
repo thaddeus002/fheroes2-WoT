@@ -58,7 +58,8 @@ namespace Game
 	EDITLOADMAP,
 	EDITSAVEMAP,
 	EDITSTART,
-	ENDTURN
+	ENDTURN,
+	TESTING,
     } menu_t;
 
     typedef enum { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK } type_t;
@@ -79,6 +80,8 @@ namespace Game
     menu_t LoadMulti(void);
     menu_t ScenarioInfo(void);
     menu_t StartGame(void);
+
+    menu_t Testing(u8);
 
     void DrawInterface(void);
     

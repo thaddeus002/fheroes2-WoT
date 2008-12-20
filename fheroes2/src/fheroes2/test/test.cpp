@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
- *   afletdinov@mail.dc.baikal.ru                                          *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
+ *   <afletdinov@mail.dc.baikal.ru>                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,25 +18,38 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2BITMODES_H
-#define H2BITMODES_H
-
 #include "gamedefs.h"
+#include "test.h"
 
-#define MODES_ALL 0xFFFFFFFF
+void RunTest1(void);
+void RunTest2(void);
+void RunTest3(void);
 
-class BitModes
+void Test::Run(int num)
 {
-public:
-    BitModes() : modes(0) {};
+    switch(num)
+    {
+	case 1: RunTest1(); break;
+	case 2: RunTest2(); break;
+	case 3: RunTest3(); break;
 
-    void        SetModes(u32 f) { modes |= f; };
-    void        ResetModes(u32 f) { modes &= ~f; };
+	default: Error::Warning("Test::Run: unknown test."); break;
+    }
+}
 
-    bool        Modes(u32 f) const { return (modes & f); };
+/* Please, do not commit changes in this file. */
 
-protected:
-    u32		modes;
-};
+void RunTest1(void)
+{
+    Error::Verbose("Run Test1");
+}
 
-#endif
+void RunTest2(void)
+{
+    Error::Verbose("Run Test3");
+}
+
+void RunTest3(void)
+{
+    Error::Verbose("Run Test3");
+}

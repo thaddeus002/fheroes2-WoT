@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
- *   afletdinov@mail.dc.baikal.ru                                          *
+ *   Copyright (C) 2008 by Andrey Afletdinov                               *
+ *   <afletdinov@mail.dc.baikal.ru>                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,25 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2BITMODES_H
-#define H2BITMODES_H
+#ifndef H2TEST_H
+#define H2TEST_H
 
-#include "gamedefs.h"
-
-#define MODES_ALL 0xFFFFFFFF
-
-class BitModes
+namespace Test
 {
-public:
-    BitModes() : modes(0) {};
-
-    void        SetModes(u32 f) { modes |= f; };
-    void        ResetModes(u32 f) { modes &= ~f; };
-
-    bool        Modes(u32 f) const { return (modes & f); };
-
-protected:
-    u32		modes;
+    void Run(int);
 };
 
 #endif
