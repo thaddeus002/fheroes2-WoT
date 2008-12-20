@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <functional>
 #include "speed.h"
+#include "spell.h"
 #include "luck.h"
 #include "morale.h"
 #include "army.h"
@@ -64,7 +65,6 @@ void Army::Troop::SetCount(u16 c)
 
 void Army::Troop::SetModes(u32 f)
 {
-
     // check magic
     if(((IS_MAGIC & f) || (SP_DISRUPTINGRAY == f)) && Modes(SP_ANTIMAGIC)) return;
 
@@ -119,13 +119,6 @@ void Army::Troop::SetModes(u32 f)
 	    break;
 
 	case SP_CURE:
-	{
-	    u32 max = Monster::GetHitPoints() * count;
-	    if(army && army->commander) hp = (max < hp + 5 * army->commander->GetPower() ? max : hp + 5 * army->commander->GetPower());
-	    ResetModes(IS_MAGIC);
-	    return;
-	}
-
 	case SP_DISPEL:
 	    ResetModes(IS_MAGIC);
 	    return;
@@ -134,7 +127,7 @@ void Army::Troop::SetModes(u32 f)
 	    ResetModes(IS_MAGIC);
 	    break;
 
-	case SP_DISRUPTINRAY:
+	case SP_DISRUPTINGRAY:
 	    // TODO: need accumulate and fix GetDefense
 	    break;
 
@@ -145,12 +138,201 @@ void Army::Troop::SetModes(u32 f)
     BitModes::SetModes(f);
 }
 
+bool Army::Troop::BattleApplySpell(u8 spell, u8 sp)
+{
+    // global magic resistant
+    switch(id)
+    {
+	case Monster::GREEN_DRAGON:
+	case Monster::RED_DRAGON:
+	case Monster::BLACK_DRAGON: return false;
+
+	default: break;
+    }
+
+    if(Modes(SP_ANTIMAGIC)) return false;
+
+    u16 dmg = Spell::GetInflictDamage(spell, sp);
+
+
+    // local magic resistant
+    if(isUndead())
+    {
+	switch(spell)
+	{
+	    case Spell::DEATHRIPPLE:
+	    case Spell::DEATHWAVE: dmg = 0; break;
+
+	    case Spell::CURSE:
+	    case Spell::MASSCURSE:
+	    case Spell::BLESS:
+	    case Spell::MASSBLESS:
+	    case Spell::BLIND:
+	    case Spell::PARALYZE:
+	    case Spell::HYPNOTIZE:
+	    case Spell::BERZERKER: return false;
+	    default: break;
+	}
+    }
+    // is live
+    else
+    {
+	switch(spell)
+	{
+	    case Spell::HOLYSHOUT:
+	    case Spell::HOLYWORD: dmg = 0; break;
+	    default: break;
+	}
+    }
+
+    if(isElemental())
+    {
+	switch(spell)
+	{
+	    case Spell::BLIND:
+	    case Spell::PARALYZE:
+	    case Spell::HYPNOTIZE:
+	    case Spell::BERZERKER: return false;
+	    default: break;
+	}
+    }
+
+    if(Spell::isBad(spell))
+    {
+	switch(id)
+	{
+            case Monster::EARTH_ELEMENT:
+		if(Spell::LIGHTNINGBOLT == spell ||
+		    Spell::CHAINLIGHTNING == spell ||
+		    Spell::METEORSHOWER == spell) return false; break;
+
+            case Monster::AIR_ELEMENT:
+		if(Spell::METEORSHOWER == spell) return false;
+		else
+		if(Spell::LIGHTNINGBOLT == spell ||
+		    Spell::CHAINLIGHTNING == spell ||
+		    Spell::ELEMENTALSTORM == spell) dmg *= 2; break;
+
+            case Monster::FIRE_ELEMENT:
+		if(Spell::FIREBALL == spell ||
+		    Spell::FIREBLAST) return false;
+		else
+		if(Spell::COLDRAY == spell ||
+		    Spell::COLDRING == spell) dmg *= 2; break;
+
+    	    case Monster::WATER_ELEMENT:
+		if(Spell::COLDRAY == spell ||
+		    Spell::COLDRING == spell) return false;
+		else
+		if(Spell::FIREBALL == spell ||
+		    Spell::FIREBLAST) dmg *= 2; break;
+
+	    case Monster::DWARF:
+	    case Monster::BATTLE_DWARF:
+		if(3 == Rand::Get(1,4)) return false; break;
+
+	    case Monster::GIANT:
+	    case Monster::TITAN:
+		if(Spell::BLIND == spell ||
+		    Spell::PARALYZE == spell ||
+		    Spell::BERZERKER == spell ||
+		    Spell::HYPNOTIZE == spell) return false; break;
+
+	    case Monster::PHOENIX:
+		if(Spell::COLDRAY == spell ||
+		    Spell::LIGHTNINGBOLT == spell ||
+		    Spell::COLDRING == spell ||
+		    Spell::FIREBALL == spell ||
+		    Spell::CHAINLIGHTNING == spell ||
+		    Spell::ELEMENTALSTORM == spell ||
+		    Spell::FIREBLAST) return false; break;
+
+	    case Monster::CRUSADER:
+		if(Spell::CURSE == spell ||
+		    Spell::MASSCURSE == spell) return false; break;
+
+            case Monster::IRON_GOLEM:
+    	    case Monster::STEEL_GOLEM:
+		if(Spell::COLDRAY == spell ||
+		    Spell::LIGHTNINGBOLT == spell ||
+		    Spell::COLDRING == spell ||
+		    Spell::FIREBALL == spell ||
+		    Spell::CHAINLIGHTNING == spell ||
+		    Spell::ELEMENTALSTORM == spell ||
+		    Spell::FIREBLAST) dmg /=2; break;
+
+	    default: break;
+	}
+    }
+
+    // apply damage
+    if(dmg)
+    {
+	if(dmg > hp) hp = 0;
+	else hp -= dmg;
+
+	BattleUpdateHitPoints();
+    }
+
+    if(Spell::CURE == spell || Spell::MASSCURE == spell)
+    {
+	u32 max = Monster::GetHitPoints() * count;
+	if(army && army->commander) hp = (max < hp + 5 * sp ? max : hp + 5 * sp);
+    }
+
+    // set modes
+    switch(spell)
+    {
+	case Spell::CURE:
+	case Spell::MASSCURE: SetModes(SP_CURE); break;
+
+	case Spell::DISPEL:
+	case Spell::MASSDISPEL: SetModes(SP_DISPEL); break;
+
+	case Spell::BLESS:
+	case Spell::MASSBLESS: SetModes(SP_BLESS); break;
+
+	case Spell::BLOODLUST: SetModes(SP_BLODLUST); break;
+
+	case Spell::CURSE:
+	case Spell::MASSCURSE: SetModes(SP_CURSE); break;
+
+    	case Spell::HASTE:
+	case Spell::MASSHASTE: SetModes(SP_HASTE); break;
+
+	case Spell::SHIELD:
+	case Spell::MASSSHIELD: SetModes(SP_SHIELD); break;
+
+	case Spell::SLOW:
+	case Spell::MASSSLOW: SetModes(SP_SLOW); break;
+
+	case Spell::STONESKIN: SetModes(SP_STONESKIN); break;
+	case Spell::STEELSKIN: SetModes(SP_STEELSKIN); break;
+
+	case Spell::ANTIMAGIC: SetModes(SP_ANTIMAGIC); break;
+
+	case Spell::BLIND: SetModes(SP_BLIND); break;
+	case Spell::PARALYZE: SetModes(SP_PARALYZE); break;
+	case Spell::BERZERKER: SetModes(SP_BERZERKER); break;
+	case Spell::HYPNOTIZE: SetModes(SP_HYPNOTIZE); break;
+
+	case Spell::STONE: SetModes(SP_STONE); break;
+
+	case Spell::DRAGONSLAYER: SetModes(SP_DRAGONSLAYER); break;
+	case Spell::DISRUPTINGRAY: SetModes(SP_DISRUPTINGRAY); break;
+
+	default: break;
+    }
+
+    return true;
+}
+
 void Army::Troop::BattleInit(void)
 {
     hp = Monster::GetHitPoints() * count;
 }
 
-void Army::Troop::BattleUpdate(void)
+void Army::Troop::BattleUpdateHitPoints(void)
 {
     // update count
     if(hp < static_cast<u32>(count * Monster::GetHitPoints()))
@@ -158,8 +340,6 @@ void Army::Troop::BattleUpdate(void)
 	count = hp / Monster::GetHitPoints();
 	if(hp > static_cast<u32>(count * Monster::GetHitPoints())) ++count;
     }
-
-    // update other
 }
 
 void Army::Troop::BattleNewTurn(void)
@@ -361,4 +541,3 @@ void Army::SwapTroops(Troop & t1, Troop & t2)
 {
     std::swap(t1, t2);
 }
-

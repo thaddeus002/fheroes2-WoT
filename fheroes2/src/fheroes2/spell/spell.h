@@ -47,7 +47,7 @@ namespace Spell
 	BLESS,
 	MASSBLESS,
 	STONESKIN,
-	STELLSKIN,
+	STEELSKIN,
 	CURSE,
 	MASSCURSE,
 	HOLYWORD,
@@ -95,6 +95,8 @@ namespace Spell
 	SETAGUARDIAN,
 	SETFGUARDIAN,
 	SETWGUARDIAN,
+
+	STONE,
     } spell_t;
 
     inline spell_t & operator++ (spell_t & spell){ return spell = (SETWGUARDIAN > spell ? spell_t(spell + 1) : SETWGUARDIAN); };
@@ -116,13 +118,15 @@ namespace Spell
 
     const std::string &String(spell_t spell);
     u8 Mana(spell_t spell);
-    u8 Level(spell_t spell);
-    bool isCombat(spell_t spell);
+    u8 Level(u8);
+    bool isCombat(u8);
+    bool isBad(u8);
+    u16 GetInflictDamage(u8, u8);
 
     /* return index sprite spells.icn */
-    u8 GetIndexSprite(spell_t spell);
+    u8 GetIndexSprite(u8);
     /* return index in spellinl.icn */
-    u8 GetInlIndexSprite(spell_t spell);
+    u8 GetInlIndexSprite(u8);
 
     target_t Target(spell_t spell);
     u8 Power(spell_t spell);

@@ -103,6 +103,7 @@ namespace Spell
 	{ "Set Air Guardian",       15, 53,  4, icnnone      , m82none, "Sets Air Elementals to guard a mine against enemy armies." },
 	{ "Set Fire Guardian",      15, 54,  4, icnnone      , m82none, "Sets Fire Elementals to guard a mine against enemy armies." },
 	{ "Set Water Guardian",     15, 55,  4, icnnone      , m82none, "Sets Water Elementals to guard a mine against enemy armies." },
+	{ "Stone",     		     0,  0,  0, icnnone      , M82::PARALIZE, "Stone spell from Medusa." },
     };
 };
 
@@ -157,7 +158,7 @@ Spell::target_t Spell::Target(spell_t spell)
 	case BLESS:
 	case MASSBLESS:
 	case STONESKIN:
-	case STELLSKIN:
+	case STEELSKIN:
 	case ANTIMAGIC:
 	case DISPEL:
 	case DRAGONSLAYER:
@@ -203,7 +204,7 @@ M82::m82_t Spell::M82(spell_t spell)
     return Spell::all_spells[spell].m82;
 }
 
-u8 Spell::Level(spell_t spell)
+u8 Spell::Level(u8 spell)
 {
     switch(spell)
     {
@@ -228,7 +229,7 @@ u8 Spell::Level(spell_t spell)
 	case DISRUPTINGRAY:
 	case DRAGONSLAYER:
 	case LIGHTNINGBOLT:
-	case STELLSKIN:
+	case STEELSKIN:
 
 	case HAUNT:
 	case SUMMONBOAT:
@@ -320,7 +321,7 @@ Spell::spell_t Spell::RandCombat(const u8 lvl)
 	case 4: return DISRUPTINGRAY;
 	case 5: return DRAGONSLAYER;
 	case 6: return LIGHTNINGBOLT;
-	case 7: return STELLSKIN;
+	case 7: return STEELSKIN;
 	default: break;
     }
     else
@@ -429,7 +430,7 @@ Spell::spell_t Spell::RandAdventure(const u8 lvl)
     return Spell::NONE;
 }
 
-bool Spell::isCombat(spell_t spell)
+bool Spell::isCombat(u8 spell)
 {
     switch(spell)
     {
@@ -456,12 +457,12 @@ bool Spell::isCombat(spell_t spell)
     return true;
 }
 
-u8 Spell::GetIndexSprite(spell_t spell)
+u8 Spell::GetIndexSprite(u8 spell)
 {
     return Spell::all_spells[spell].sprite;
 }
 
-u8 Spell::GetInlIndexSprite(spell_t spell)
+u8 Spell::GetInlIndexSprite(u8 spell)
 {
     switch(spell)
     {
@@ -481,12 +482,72 @@ u8 Spell::GetInlIndexSprite(spell_t spell)
 	case BLOODLUST:		return 9;
 	case SHIELD:
 	case MASSSHIELD:	return 10;
-	//case :		return 11; unknown
+	case STONE:		return 11;
 	case ANTIMAGIC:		return 12;
 	case STONESKIN:		return 13;
-	case STELLSKIN:		return 14;
+	case STEELSKIN:		return 14;
 	default: break;
     }
 
     return 0;
+}
+
+u16 Spell::GetInflictDamage(u8 spell, u8 sp)
+{
+    switch(spell)
+    {
+        case DEATHRIPPLE:        return 5 * sp;
+        case ARROW:
+        case COLDRING:
+        case DEATHWAVE:
+        case FIREBALL:
+        case HOLYWORD:
+        case FIREBLAST:          return 10 * sp;
+        case COLDRAY:
+        case HOLYSHOUT:          return 20 * sp;
+        case LIGHTNINGBOLT:
+        case ELEMENTALSTORM:
+        case METEORSHOWER:       return 25 * sp;
+        case CHAINLIGHTNING:     return 40 * sp;
+        case ARMAGEDDON:         return 50 * sp;
+
+	default: break;
+    }
+
+    return 0;
+}
+
+bool Spell::isBad(u8 spell)
+{
+    switch(spell)
+    {
+	case FIREBALL:
+	case FIREBLAST:
+	case LIGHTNINGBOLT:
+	case CHAINLIGHTNING:
+	case SLOW:
+	case MASSSLOW:
+	case BLIND:
+	case CURSE:
+	case MASSCURSE:
+	case HOLYWORD:
+	case HOLYSHOUT:
+	case ARROW:
+	case BERZERKER:
+	case ARMAGEDDON:
+	case ELEMENTALSTORM:
+	case METEORSHOWER:
+	case PARALYZE:
+	case HYPNOTIZE:
+	case COLDRAY:
+	case COLDRING:
+	case DISRUPTINGRAY:
+	case DEATHRIPPLE:
+	case DEATHWAVE:
+		return true;
+
+	default: break;
+    }
+
+    return false;
 }

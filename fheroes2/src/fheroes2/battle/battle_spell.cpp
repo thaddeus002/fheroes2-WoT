@@ -76,7 +76,7 @@ bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
 	SLOW,
 	MASSSLOW,
 	STONESKIN,
-	STELLSKIN,
+	STEELSKIN,
 	ANTIMAGIC,
 	ARROW,
 	ARMAGEDDON,
@@ -139,9 +139,9 @@ void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
 	    troop.RemoveMagic(MASSBLESS);
 	    break;
 	case STONESKIN:
-	    troop.RemoveMagic(STELLSKIN);
+	    troop.RemoveMagic(STEELSKIN);
 	    break;
-	case STELLSKIN:
+	case STEELSKIN:
 	    troop.RemoveMagic(STONESKIN);
 	    break;
 	case MASSSLOW:

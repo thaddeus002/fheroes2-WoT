@@ -51,7 +51,9 @@ namespace Army
 
             void	BattleNewTurn(void);
 	    void	BattleInit(void);
-	    void	BattleUpdate(void);
+	    void	BattleUpdateHitPoints(void);
+	    bool	BattleApplySpell(u8, u8);
+
 	    void        SetModes(u32);
 
             const Skill::Primary* MasterSkill(void) const;
