@@ -36,8 +36,8 @@ class Captain : public Skill::Primary
         u8 GetDefense(void) const;
         u8 GetPower(void) const;
         u8 GetKnowledge(void) const;
-        Morale::morale_t GetMorale(void) const;
-        Luck::luck_t GetLuck(void) const;
+        s8 GetMorale(void) const;
+        s8 GetLuck(void) const;
         Race::race_t GetRace(void) const;
         Color::color_t GetColor(void) const;
 	const std::string & GetName(void) const;

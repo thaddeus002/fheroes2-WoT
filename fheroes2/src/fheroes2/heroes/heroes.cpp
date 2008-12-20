@@ -26,6 +26,8 @@
 #include "settings.h"
 #include "agg.h"
 #include "speed.h"
+#include "luck.h"
+#include "morale.h"
 #include "monster.h"
 #include "payment.h"
 #include "cursor.h"
@@ -755,7 +757,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     return point;
 }
 
-Morale::morale_t Heroes::GetMorale(void) const
+s8 Heroes::GetMorale(void) const
 {
     return GetMoraleWithModificators(NULL);
 }
@@ -779,7 +781,7 @@ const std::string & StringModifiers(s8 mod)
     return mods[0];
 }
 
-Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
+s8 Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
 {
     s8 result = Morale::NORMAL;
 
@@ -868,12 +870,12 @@ Morale::morale_t Heroes::GetMoraleWithModificators(std::list<std::string> *list)
     return Morale::BLOOD;
 }
 
-Luck::luck_t Heroes::GetLuck(void) const
+s8 Heroes::GetLuck(void) const
 {
     return GetLuckWithModificators(NULL);
 }
 
-Luck::luck_t Heroes::GetLuckWithModificators(std::list<std::string> *list) const
+s8 Heroes::GetLuckWithModificators(std::list<std::string> *list) const
 {
     s8 result = Luck::NORMAL;
 

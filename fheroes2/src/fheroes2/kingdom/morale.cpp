@@ -20,27 +20,28 @@
 
 #include "morale.h"
 
-const std::string & Morale::String(Morale::morale_t morale)
+const std::string & Morale::String(s8 morale)
 {
-    static const std::string str_morale[] = { "Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood" };
+    static const std::string str_morale[] = { "Unknown", "Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood" };
 
     switch(morale)
     {
-        case Morale::TREASON:	return str_morale[0];
-        case Morale::AWFUL:	return str_morale[1];
-        case Morale::POOR:	return str_morale[2];
-        case Morale::NORMAL:	return str_morale[3];
-        case Morale::GOOD:	return str_morale[4];
-        case Morale::GREAT:	return str_morale[5];
-        case Morale::BLOOD:	return str_morale[6];
+        case Morale::TREASON:	return str_morale[1];
+        case Morale::AWFUL:	return str_morale[2];
+        case Morale::POOR:	return str_morale[3];
+        case Morale::NORMAL:	return str_morale[4];
+        case Morale::GOOD:	return str_morale[5];
+        case Morale::GREAT:	return str_morale[6];
+        case Morale::BLOOD:	return str_morale[7];
+	default: break;
     }
 
     return str_morale[0];
 }
 
-const std::string & Morale::Description(Morale::morale_t morale)
+const std::string & Morale::Description(s8 morale)
 {
-    static const std::string str_desc_morale[] = { 
+    static const std::string str_desc_morale[] = { "Unknown",
 	"Bad morale may cause your armies to freeze in combat.",
 	"Neutral morale means your armies will never be blessed with extra attacks or freeze in combat.",
 	"Good morale may give your armies extra attacks in combat." };
@@ -49,11 +50,12 @@ const std::string & Morale::Description(Morale::morale_t morale)
     {
         case Morale::TREASON:
         case Morale::AWFUL:
-        case Morale::POOR:	return str_desc_morale[0];
-        case Morale::NORMAL:	return str_desc_morale[1];
+        case Morale::POOR:	return str_desc_morale[1];
+        case Morale::NORMAL:	return str_desc_morale[2];
         case Morale::GOOD:
         case Morale::GREAT:
-        case Morale::BLOOD:	return str_desc_morale[2];
+        case Morale::BLOOD:	return str_desc_morale[3];
+	default: break;
     }
 
     return str_desc_morale[0];

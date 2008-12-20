@@ -20,27 +20,28 @@
 
 #include "luck.h"
 
-const std::string & Luck::String(Luck::luck_t luck)
+const std::string & Luck::String(s8 luck)
 {
-    static const std::string str_luck[] = { "Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish" };
+    static const std::string str_luck[] = { "Unknown", "Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish" };
 
     switch(luck)
     {
-        case Luck::CURSED:	return str_luck[0];
-        case Luck::AWFUL:	return str_luck[1];
-        case Luck::BAD:		return str_luck[2];
-        case Luck::NORMAL:	return str_luck[3];
-        case Luck::GOOD:	return str_luck[4];
-        case Luck::GREAT:	return str_luck[5];
-        case Luck::IRISH:	return str_luck[6];
+        case Luck::CURSED:	return str_luck[1];
+        case Luck::AWFUL:	return str_luck[2];
+        case Luck::BAD:		return str_luck[3];
+        case Luck::NORMAL:	return str_luck[4];
+        case Luck::GOOD:	return str_luck[5];
+        case Luck::GREAT:	return str_luck[6];
+        case Luck::IRISH:	return str_luck[7];
+	default: break;
     }
 
     return str_luck[0];
 }
 
-const std::string & Luck::Description(Luck::luck_t luck)
+const std::string & Luck::Description(s8 luck)
 {
-    static const std::string str_desc_luck[] = {
+    static const std::string str_desc_luck[] = { "Unknown",
 	"Bad luck sometimes falls on your armies in combat, causing their attacks to only do half damage.",
 	"Neutral luck means your armies will never get lucky or unlucky attacks on the enemy.",
 	"Good luck sometimes lets your armies get lucky attacks (double strength) in combat." };
@@ -49,11 +50,12 @@ const std::string & Luck::Description(Luck::luck_t luck)
     {
         case Luck::CURSED:
         case Luck::AWFUL:
-        case Luck::BAD:		return str_desc_luck[0];
-        case Luck::NORMAL:	return str_desc_luck[1];
+        case Luck::BAD:		return str_desc_luck[1];
+        case Luck::NORMAL:	return str_desc_luck[2];
         case Luck::GOOD:
         case Luck::GREAT:
-        case Luck::IRISH:	return str_desc_luck[2];
+        case Luck::IRISH:	return str_desc_luck[3];
+	default: break;
     }
 
     return str_desc_luck[0];

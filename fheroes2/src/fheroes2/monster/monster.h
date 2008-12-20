@@ -180,8 +180,8 @@ public:
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
     u8 GetKnowledge(void) const;
-    Morale::morale_t GetMorale(void) const;
-    Luck::luck_t GetLuck(void) const;
+    s8 GetMorale(void) const;
+    s8 GetLuck(void) const;
     Race::race_t GetRace(void) const;
     Color::color_t GetColor(void) const;
     u8 GetType(void) const;
@@ -202,6 +202,8 @@ public:
     const std::string & GetName(void) const;
     const std::string & GetMultiName(void) const;
 
+    bool isElemental(void) const;
+    bool isUndead(void) const;
     bool isFly(void) const;
     bool isWide(void) const;
     bool isArchers(void) const;

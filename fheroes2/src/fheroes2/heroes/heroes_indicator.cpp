@@ -19,10 +19,12 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "luck.h"
+#include "morale.h"
 #include "heroes.h"
 #include "heroes_indicator.h"
 
-const char* MoraleString(const Morale::morale_t morale)
+const char* MoraleString(s8 morale)
 {
     switch(morale)
     {
@@ -44,7 +46,7 @@ const char* MoraleString(const Morale::morale_t morale)
     return NULL;
 }
 
-const char* LuckString(const Luck::luck_t luck)
+const char* LuckString(s8 luck)
 {
     switch(luck)
     {

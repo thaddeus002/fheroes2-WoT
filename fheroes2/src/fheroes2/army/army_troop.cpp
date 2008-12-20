@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <functional>
 #include "speed.h"
+#include "luck.h"
+#include "morale.h"
 #include "army.h"
 #include "army_troop.h"
 
@@ -60,10 +62,37 @@ void Army::Troop::SetCount(u16 c)
     count = c;
 }
 
+void Army::Troop::BattleInit(void)
+{
+    hp = Monster::GetHitPoints() * count;
+}
+
+void Army::Troop::BattleUpdate(void)
+{
+    // update count
+    if(hp < static_cast<u32>(count * Monster::GetHitPoints()))
+    {
+	count = hp / Monster::GetHitPoints();
+	if(hp > static_cast<u32>(count * Monster::GetHitPoints())) ++count;
+    }
+
+    // update other
+}
+
 void Army::Troop::BattleNewTurn(void)
 {
     ResetModes(MODES_ALL);
     SetModes(BATTLE);
+
+    switch(id)
+    {
+	case Monster::TROLL:
+	case Monster::WAR_TROLL:
+	    hp = Monster::GetHitPoints() * count;
+	    break;
+
+	default: break;
+    }
 }
 
 void Army::Troop::Reset(void)
@@ -109,7 +138,7 @@ Color::color_t Army::Troop::GetColor(void) const
 
 u32 Army::Troop::GetHitPoints(void) const
 {
-    return Monster::GetHitPoints() * count;
+    return Modes(BATTLE) ? hp : Monster::GetHitPoints() * count;
 }
 
 u16 Army::Troop::GetDamage(void) const
@@ -124,15 +153,33 @@ u16 Army::Troop::GetDamage(void) const
     else
 	dmg = Rand::Get(GetDamageMin(), GetDamageMax());
 
-    // check skill archery +%10, +%25, +%50
-    if(army && army->commander)
+    if(isArchers())
     {
-	switch(army->commander->GetLevelSkill(Skill::Secondary::ARCHERY))
+	if(Modes(HANDFIGHTING))
 	{
-	    case Skill::Level::BASIC:	dmg += (dmg * 10) / 100; break;
-	    case Skill::Level::ADVANCED:dmg += (dmg * 25) / 100; break;
-	    case Skill::Level::EXPERT:	dmg += (dmg * 50) / 100; break;
-	    default: break;
+	    switch(id)
+	    {
+		// skip
+		case Monster::MAGE:
+		case Monster::ARCHMAGE:
+		case Monster::TITAN: break;
+
+		default: dmg /= 2; break;
+	    }
+	}
+	else
+	{
+	    // check skill archery +%10, +%25, +%50
+	    if(army && army->commander)
+	    {
+		switch(army->commander->GetLevelSkill(Skill::Secondary::ARCHERY))
+		{
+		    case Skill::Level::BASIC:	dmg += (dmg * 10) / 100; break;
+		    case Skill::Level::ADVANCED:dmg += (dmg * 25) / 100; break;
+		    case Skill::Level::EXPERT:	dmg += (dmg * 50) / 100; break;
+		    default: break;
+		}
+	    }
 	}
     }
 
@@ -163,6 +210,28 @@ u8 Army::Troop::GetSpeed(void) const
     if(Modes(SP_SLOW)) return (Speed::SLOW > Monster::GetSpeed() ? Speed::CRAWLING : Monster::GetSpeed() - 2);
 
     return Monster::GetSpeed();
+}
+
+s8 Army::Troop::GetMorale(void) const
+{
+    if(isUndead() || isElemental()) return Morale::NORMAL;
+    else
+    if(army)
+    {
+	return army->commander ? army->commander->GetMorale() : army->GetMorale();
+    }
+
+    return Morale::NORMAL;
+}
+
+s8 Army::Troop::GetLuck(void) const
+{
+    if(army)
+    {
+	return army->commander ? army->commander->GetLuck() : army->GetLuck();
+    }
+
+    return Luck::NORMAL;
 }
 
 bool Army::Troop::isValid(void) const

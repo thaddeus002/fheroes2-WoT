@@ -58,6 +58,7 @@ namespace Army
 
         MOVED           = 0x00000002,
         SKIPMOVE        = 0x00000004,
+	HANDFIGHTING	= 0x00000008,
 
 	LUCK_GOOD	= 0x00000800,
 	LUCK_BAD	= 0x00001000,
@@ -125,6 +126,8 @@ namespace Army
 	    u8		GetUniqCount(void) const;
 	    u16		GetCountMonsters(const Monster &) const;
 	    u16		GetCountMonsters(const Monster::monster_t) const;
+	    s8		GetMorale(void) const;
+	    s8		GetLuck(void) const;
 	    s8		GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
 	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
 	    u32		CalculateExperience(void) const;

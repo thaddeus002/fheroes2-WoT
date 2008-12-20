@@ -28,6 +28,8 @@
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "text.h"
+#include "luck.h"
+#include "morale.h"
 #include "castle.h"
 #include "army.h"
 
@@ -339,9 +341,19 @@ Race::race_t Army::army_t::GetRace(void) const
     return 1 < races.size() ? Race::MULT : races.at(0);
 }
 
+s8 Army::army_t::GetLuck(void) const
+{
+    return GetLuckWithModificators();
+}
+
 s8 Army::army_t::GetLuckWithModificators(std::list<std::string> *list) const
 {
-    return 0;
+    return Luck::NORMAL;
+}
+
+s8 Army::army_t::GetMorale(void) const
+{
+    return GetMoraleWithModificators();
 }
 
 // TODO:: need optimize
@@ -602,6 +614,8 @@ void Army::army_t::BattleNewTurn(void)
 
 void Army::army_t::SetModes(u32 f)
 {
+    if(BATTLE == f) std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleInit));
+
     std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::SetModes), f));
 }
 

@@ -23,6 +23,8 @@
 #include "settings.h"
 #include "payment.h"
 #include "world.h"
+#include "luck.h"
+#include "morale.h"
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "castle.h"

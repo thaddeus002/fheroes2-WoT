@@ -21,10 +21,13 @@
 #define H2LUCK_H
 
 #include <string>
+#include "gamedefs.h"
 
 namespace Luck
 {
-    typedef enum {
+    typedef enum
+    {
+	UNKNOWN    = -4,
         CURSED     = -3,
         AWFUL      = -2,
         BAD        = -1,
@@ -34,8 +37,8 @@ namespace Luck
         IRISH      = 3
     } luck_t;
 
-    const std::string & String(luck_t luck);
-    const std::string & Description(luck_t luck);
+    const std::string & String(s8);
+    const std::string & Description(s8);
 
     inline luck_t & operator++ (luck_t & luck){ return luck = IRISH == luck ? IRISH : luck_t(luck + 1); };
     inline luck_t & operator-- (luck_t & luck){ return luck = CURSED == luck ? CURSED : luck_t(luck - 1); };

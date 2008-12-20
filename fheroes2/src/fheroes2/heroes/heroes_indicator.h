@@ -23,8 +23,6 @@
 
 #include <list>
 #include <string>
-#include "morale.h"
-#include "luck.h"
 
 class Heroes;
 
@@ -53,7 +51,7 @@ public:
     static void QueueEventProcessing(LuckIndicator &);
 
 private:
-    Luck::luck_t luck;
+    s8 luck;
 };
 
 class MoraleIndicator : public HeroesIndicator
@@ -65,7 +63,7 @@ public:
     static void QueueEventProcessing(MoraleIndicator &);
 
 private:
-    Morale::morale_t morale;
+    s8 morale;
 };
 
 #endif

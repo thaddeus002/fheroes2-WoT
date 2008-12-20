@@ -22,6 +22,8 @@
 #include "kingdom.h"
 #include "army.h"
 #include "battle.h"
+#include "luck.h"
+#include "morale.h"
 #include "world.h"
 #include "gameevent.h"
 #include "heroes.h"

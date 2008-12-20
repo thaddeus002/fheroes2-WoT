@@ -48,8 +48,11 @@ namespace Army
             void	SetMonster(monster_t);
             void	SetCount(u16);
             void	Reset(void);
+
             void	BattleNewTurn(void);
-            
+	    void	BattleInit(void);
+	    void	BattleUpdate(void);
+
             const Skill::Primary* MasterSkill(void) const;
             const army_t* GetArmy(void) const;
 	    const std::string & GetName(void) const;
@@ -64,6 +67,8 @@ namespace Army
 	    u16		GetDamageMax(void) const;
 	    Color::color_t GetColor(void) const;
 	    u8		GetSpeed(void) const;
+	    s8		GetMorale(void) const;
+	    s8		GetLuck(void) const;
 
             bool	isValid(void) const;
 	    bool	HasMonster(monster_t) const;

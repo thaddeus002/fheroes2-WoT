@@ -24,6 +24,8 @@
 #include "speed.h"
 #include "maps_tiles.h"
 #include "settings.h"
+#include "luck.h"
+#include "morale.h"
 #include "monster.h"
 
 static const struct
@@ -290,12 +292,12 @@ u8 Monster::GetKnowledge(void) const
     return 0;
 }
 
-Morale::morale_t Monster::GetMorale(void) const
+s8 Monster::GetMorale(void) const
 {
     return Morale::NORMAL;
 }
 
-Luck::luck_t Monster::GetLuck(void) const
+s8 Monster::GetLuck(void) const
 {
     return Luck::NORMAL;
 }
@@ -420,6 +422,43 @@ const std::string & Monster::GetName(void) const
 const std::string & Monster::GetMultiName(void) const
 {
     return monsters[id].multiname;
+}
+
+bool Monster::isUndead(void) const
+{
+    switch(id)
+    {
+        case SKELETON:
+        case ZOMBIE:
+        case MUTANT_ZOMBIE:
+        case MUMMY:
+        case ROYAL_MUMMY:
+        case VAMPIRE:
+        case LORD_VAMPIRE:
+        case LICH:
+        case POWER_LICH:
+        case BONE_DRAGON:
+	case GHOST: return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool Monster::isElemental(void) const
+{
+    switch(id)
+    {
+        case EARTH_ELEMENT:
+        case AIR_ELEMENT:
+        case FIRE_ELEMENT:
+        case WATER_ELEMENT: return true;
+
+	default: break;
+    }
+
+    return false;
 }
 
 bool Monster::isFly(void) const

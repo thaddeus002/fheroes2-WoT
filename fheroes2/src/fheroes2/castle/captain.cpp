@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include "castle.h"
+#include "luck.h"
+#include "morale.h"
 #include "captain.h"
 
 Captain::Captain(const Castle & c) : home(c), spell_book(this)
@@ -98,7 +100,7 @@ u8 Captain::GetKnowledge(void) const
     return 0;
 }
 
-Morale::morale_t Captain::GetMorale(void) const
+s8 Captain::GetMorale(void) const
 {
     s8 result = Morale::NORMAL;
 
@@ -124,7 +126,7 @@ Morale::morale_t Captain::GetMorale(void) const
     return Morale::BLOOD;
 }
 
-Luck::luck_t Captain::GetLuck(void) const
+s8 Captain::GetLuck(void) const
 {
     s8 result = Luck::NORMAL;
 

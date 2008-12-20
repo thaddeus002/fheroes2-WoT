@@ -25,9 +25,7 @@
 #include <vector>
 #include <list>
 #include "spell.h"
-#include "morale.h"
 #include "mp2.h"
-#include "luck.h"
 #include "dialog.h"
 #include "army.h"
 #include "skill.h"
@@ -144,10 +142,10 @@ public:
     u8 GetKnowledge(void) const;
     void IncreasePrimarySkill(const Skill::Primary::skill_t skill);
 
-    Morale::morale_t GetMorale(void) const;
-    Luck::luck_t GetLuck(void) const;
-    Morale::morale_t GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
-    Luck::luck_t GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+    s8 GetMorale(void) const;
+    s8 GetLuck(void) const;
+    s8 GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
+    s8 GetLuckWithModificators(std::list<std::string> *list = NULL) const;
     u8 GetLevel(void) const;
 
     u16 GetMaxSpellPoints(void) const;
