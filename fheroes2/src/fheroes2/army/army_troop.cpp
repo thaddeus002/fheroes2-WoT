@@ -62,7 +62,8 @@ void Army::Troop::SetCount(u16 c)
 
 void Army::Troop::BattleNewTurn(void)
 {
-    ResetModes(MOVED);
+    ResetModes(MODES_ALL);
+    SetModes(BATTLE);
 }
 
 void Army::Troop::Reset(void)
