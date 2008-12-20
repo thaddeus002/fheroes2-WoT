@@ -62,6 +62,89 @@ void Army::Troop::SetCount(u16 c)
     count = c;
 }
 
+void Army::Troop::SetModes(u32 f)
+{
+
+    // check magic
+    if(((IS_MAGIC & f) || (SP_DISRUPTINGRAY == f)) && Modes(SP_ANTIMAGIC)) return;
+
+    switch(f)
+    {
+	case SP_STEELSKIN:
+	    if(Modes(SP_STONESKIN))
+	    {
+		ResetModes(SP_STONESKIN);
+		return;
+	    }
+	    break;
+
+	case SP_STONESKIN:
+	    if(Modes(SP_STEELSKIN))
+	    {
+		ResetModes(SP_STEELSKIN);
+		return;
+	    }
+	    break;
+
+	case SP_BLESS:
+	    if(Modes(SP_CURSE))
+	    {
+		ResetModes(SP_CURSE);
+		return;
+	    }
+	    break;
+
+	case SP_CURSE:
+	    if(Modes(SP_BLESS))
+	    {
+		ResetModes(SP_BLESS);
+		return;
+	    }
+	    break;
+
+	case SP_HASTE:
+	    if(Modes(SP_SLOW))
+	    {
+		ResetModes(SP_SLOW);
+		return;
+	    }
+	    break;
+
+	case SP_SLOW:
+	    if(Modes(SP_HASTE))
+	    {
+		ResetModes(SP_HASTE);
+		return;
+	    }
+	    break;
+
+	case SP_CURE:
+	{
+	    u32 max = Monster::GetHitPoints() * count;
+	    if(army && army->commander) hp = (max < hp + 5 * army->commander->GetPower() ? max : hp + 5 * army->commander->GetPower());
+	    ResetModes(IS_MAGIC);
+	    return;
+	}
+
+	case SP_DISPEL:
+	    ResetModes(IS_MAGIC);
+	    return;
+
+	case SP_ANTIMAGIC:
+	    ResetModes(IS_MAGIC);
+	    break;
+
+	case SP_DISRUPTINRAY:
+	    // TODO: need accumulate and fix GetDefense
+	    break;
+
+	default:
+	    break;
+    }
+
+    BitModes::SetModes(f);
+}
+
 void Army::Troop::BattleInit(void)
 {
     hp = Monster::GetHitPoints() * count;
@@ -123,12 +206,22 @@ u16 Army::Troop::Count(void) const
 
 u8 Army::Troop::GetAttack(void) const
 {
-    return army && army->commander ? army->commander->GetAttack() + Monster::GetAttack() : Monster::GetAttack();
+    u8 mod = 0;
+
+    if(Modes(SP_BLODLUST)) mod += 3;
+
+    return army && army->commander ? army->commander->GetAttack() + Monster::GetAttack() + mod : Monster::GetAttack() + mod;
 }
 
 u8 Army::Troop::GetDefense(void) const
 {
-    return army && army->commander ? army->commander->GetDefense() + Monster::GetDefense() : Monster::GetDefense();
+    u8 mod = 0;
+
+    if(Modes(SP_STONESKIN)) mod += 3;
+    if(Modes(SP_STEELSKIN)) mod += 5;
+    if(Modes(SP_DISRUPTINGRAY)) mod -= 3;
+
+    return army && army->commander ? army->commander->GetDefense() + Monster::GetDefense() + mod : Monster::GetDefense() + mod;
 }
 
 Color::color_t Army::Troop::GetColor(void) const

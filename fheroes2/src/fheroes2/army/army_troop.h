@@ -52,6 +52,7 @@ namespace Army
             void	BattleNewTurn(void);
 	    void	BattleInit(void);
 	    void	BattleUpdate(void);
+	    void        SetModes(u32);
 
             const Skill::Primary* MasterSkill(void) const;
             const army_t* GetArmy(void) const;
