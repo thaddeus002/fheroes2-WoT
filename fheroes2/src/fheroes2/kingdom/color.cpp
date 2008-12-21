@@ -20,7 +20,7 @@
 
 #include "color.h"
 
-const std::string & Color::String(Color::color_t color)
+const std::string & Color::String(u8 color)
 {
     static const std::string str_color[] = { "Blue", "Green", "Red", "Yellow", "Orange", "Purple", "Gray" };
 

@@ -50,7 +50,6 @@ namespace Army
             void	Reset(void);
 
             void	BattleNewTurn(void);
-	    void	BattleInit(void);
 	    void	BattleUpdateHitPoints(void);
 	    bool	BattleApplySpell(u8, u8);
 

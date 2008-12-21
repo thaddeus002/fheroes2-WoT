@@ -614,8 +614,6 @@ void Army::army_t::BattleNewTurn(void)
 
 void Army::army_t::SetModes(u32 f)
 {
-    if(BATTLE == f) std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleInit));
-
     std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::SetModes), f));
 }
 
@@ -880,7 +878,6 @@ u32 Army::army_t::GetDamageMax(void) const
     return res;
 }
 
-// this algorithm
 bool Army::army_t::StrongerEnemyArmy(const army_t & a)
 {
     u16 a1 = GetAttack();
@@ -909,4 +906,9 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & a)
 	r2 = static_cast<u32>((m2 + x2) / 2 * (1 + 0.05 * std::min(d1 - a2, 14)));
 
     return h1 / r2 > h2 / r1;
+}
+
+const Skill::Primary* Army::army_t::GetCommander(void) const
+{
+    return commander;
 }

@@ -70,6 +70,11 @@ void Army::Troop::SetModes(u32 f)
 
     switch(f)
     {
+	// init battle
+	case BATTLE:
+	    hp = Monster::GetHitPoints() * count;
+	    break;
+
 	case SP_STEELSKIN:
 	    if(Modes(SP_STONESKIN))
 	    {
@@ -327,11 +332,6 @@ bool Army::Troop::BattleApplySpell(u8 spell, u8 sp)
     return true;
 }
 
-void Army::Troop::BattleInit(void)
-{
-    hp = Monster::GetHitPoints() * count;
-}
-
 void Army::Troop::BattleUpdateHitPoints(void)
 {
     // update count
@@ -344,9 +344,6 @@ void Army::Troop::BattleUpdateHitPoints(void)
 
 void Army::Troop::BattleNewTurn(void)
 {
-    ResetModes(MODES_ALL);
-    SetModes(BATTLE);
-
     switch(id)
     {
 	case Monster::TROLL:
@@ -356,6 +353,7 @@ void Army::Troop::BattleNewTurn(void)
 
 	default: break;
     }
+    ResetModes(Army::MOVED);
 }
 
 void Army::Troop::Reset(void)
@@ -476,7 +474,9 @@ u16 Army::Troop::GetDamageMax(void) const
 
 u8 Army::Troop::GetSpeed(void) const
 {
-    if(Modes(MOVED | SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_HYPNOTIZE | SP_STONE)) return Speed::STANDING;
+    if(Modes(SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_HYPNOTIZE | SP_STONE)) return Speed::STANDING;
+
+    if(!Modes(MORALE_GOOD) && Modes(MOVED)) return Speed::STANDING;
 
     if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < Monster::GetSpeed() ? Speed::INSTANT : Monster::GetSpeed() + 2);
     else

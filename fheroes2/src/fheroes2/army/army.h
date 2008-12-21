@@ -156,6 +156,8 @@ namespace Army
 
 	    void	Dump(void) const;
 
+	    const Skill::Primary* GetCommander(void) const;
+
 	private:
 	    friend class Troop;
 
