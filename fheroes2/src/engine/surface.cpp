@@ -540,3 +540,47 @@ void Surface::Sepia(void)
             #undef CLAMP255
         }
 }
+
+void Surface::DrawLine(const Point & p1, const Point & p2, u32 c)
+{
+    DrawLine(p1.x, p1.y, p2.x, p2.y, c);
+}
+
+void Surface::DrawLine(u16 x1, u16 y1, u16 x2, u16 y2, u32 c)
+{
+    const u16 dx = std::abs(x2 - x1);
+    const u16 dy = std::abs(y2 - y1);
+
+    if(dx > dy)
+    {
+	s16 ns = std::div(dx, 2).quot;
+
+	for(u16 i = 0; i <= dx; ++i)
+	{
+	    SetPixel(x1, y1, c);
+	    x1 < x2 ? ++x1 : --x1;
+	    ns -= dy;
+	    if(ns < 0)
+	    {
+		y1 < y2 ? ++y1 : --y1;
+		ns += dx;
+	    }
+	}
+    }
+    else
+    {
+	s16 ns = std::div(dy, 2).quot;
+
+	for(u16 i = 0; i <= dy; ++i)
+	{
+	    SetPixel(x1, y1, c);
+	    y1 < y2 ? ++y1 : --y1;
+	    ns -= dx;
+	    if(ns < 0)
+	    {
+		x1 < x2 ? ++x1 : --x1;
+		ns += dy;
+	    }
+	}
+    }
+}

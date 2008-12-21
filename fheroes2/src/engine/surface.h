@@ -98,6 +98,9 @@ public:
     u32 GetPixel1(u16 x, u16 y);
     u32 GetPixel(u16 x, u16 y);
 
+    void DrawLine(const Point &, const Point &, u32);
+    void DrawLine(u16, u16, u16, u16, u32);
+
     void ChangeColor(u32, u32);
     void GrayScale(void);
     void Sepia(void);
