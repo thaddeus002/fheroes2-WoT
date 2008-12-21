@@ -22,7 +22,7 @@
 #include "cursor.h"
 #include "button.h"
 
-Button::Button() : _icn(ICN::UNKNOWN)
+Button::Button() : _icn(ICN::UNKNOWN), pressed(false), disable(false)
 {
 }
 

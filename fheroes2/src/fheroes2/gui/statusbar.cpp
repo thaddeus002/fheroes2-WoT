@@ -47,6 +47,7 @@ void StatusBar::ShowMessage(const std::string & msg)
         Show();
         Cursor::Get().Show();
         Display::Get().Flip();
+	prev = msg;
     }
 }
 
@@ -54,4 +55,9 @@ void StatusBar::Redraw(void)
 {
     Hide();
     Show();
+}
+
+const std::string & StatusBar::GetMessage(void) const
+{
+    return prev;
 }

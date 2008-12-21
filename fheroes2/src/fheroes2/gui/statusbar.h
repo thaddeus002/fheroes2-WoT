@@ -34,6 +34,8 @@ public:
     void ShowMessage(const std::string & msg);
     void Redraw(void);
 
+    const std::string & GetMessage(void) const;
+
 private:
     Point center;
     std::string prev;
