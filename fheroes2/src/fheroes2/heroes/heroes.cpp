@@ -261,6 +261,11 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::BASIC));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LOGISTICS, Skill::Level::BASIC));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::MYSTICISM, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::ARCHERY, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::SCOUTING, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::DIPLOMACY, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::NECROMANCY, Skill::Level::BASIC));
 
 	    PickupArtifact(Artifact::MEDAL_VALOR);
 	    PickupArtifact(Artifact::STEALTH_SHIELD);
@@ -1463,7 +1468,7 @@ void Heroes::LevelUp(bool autoselect)
     Skill::Secondary sec1;
     Skill::Secondary sec2;
 
-    FindSkillsForLevelUp(sec1, sec2);
+    if(HEROESMAXSKILL > secondary_skills.size()) FindSkillsForLevelUp(sec1, sec2);
 
     std::string header;
     std::string message;
