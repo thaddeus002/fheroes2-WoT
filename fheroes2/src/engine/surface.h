@@ -105,6 +105,7 @@ public:
     void DrawLine(u16, u16, u16, u16, u32);
 
     void MakeStencil(Surface &, u32) const;
+    void MakeContour(Surface &, u32) const;
 
     void ChangeColor(u32, u32);
     void GrayScale(void);

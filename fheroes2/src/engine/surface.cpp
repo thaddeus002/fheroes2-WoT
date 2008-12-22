@@ -625,14 +625,52 @@ void Surface::MakeStencil(Surface & dst, u32 col) const
     if(!surface) return;
 
     dst.Set(surface->w, surface->h);
+    dst.SetColorKey();
     const u32 clkey = GetColorKey();
+
     dst.Lock();
     for(u16 y = 0; y < surface->h; ++y)
 	for(u16 x = 0; x < surface->w; ++x)
     {
-	if(clkey == GetPixel(x, y))
+	if(clkey != GetPixel(x, y))
 	{
 	    dst.SetPixel(x, y, col);
+	}
+    }
+    dst.Unlock();
+}
+
+void Surface::MakeContour(Surface & dst, u32 col) const
+{
+    dst.Set(surface->w + 2, surface->h + 2);
+    dst.SetColorKey();
+
+    Surface trf;
+    u32 fake = MapRGB(0x00, 0xFF, 0xFF);
+
+    MakeStencil(trf, fake);
+    const u32 clkey = trf.GetColorKey();
+    dst.Lock();
+    for(u16 y = 0; y < trf.h(); ++y)
+	for(u16 x = 0; x < trf.w(); ++x)
+    {
+	if(fake == trf.GetPixel(x, y))
+	{
+	    if(0 == x) dst.SetPixel(x, y, col);
+	    else
+	    if(trf.w() - 1 == x) dst.SetPixel(x + 2, y, col);
+	    else
+	    if(0 == y) dst.SetPixel(x, y, col);
+	    else
+	    if(trf.h() - 1 == y) dst.SetPixel(x, y + 2, col);
+	    else
+	    {
+		if(0 < x && clkey == trf.GetPixel(x - 1, y)) dst.SetPixel(x, y + 1, col);
+		if(trf.w() - 1 > x && clkey == trf.GetPixel(x + 1, y)) dst.SetPixel(x + 2, y + 1, col);
+
+		if(0 < y && clkey == trf.GetPixel(x, y - 1)) dst.SetPixel(x + 1, y, col);
+		if(trf.h() - 1 > y && clkey == trf.GetPixel(x, y + 1)) dst.SetPixel(x + 1, y + 2, col);
+	    }
 	}
     }
     dst.Unlock();
