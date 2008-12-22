@@ -32,10 +32,9 @@
 #include <fstream>
 #include <sstream>
 #include "SDL.h"
-#include "kbpal.h"
 #include "engine.h"
 
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & palette, bool rledebug);
+void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug);
 
 class icnheader
 {
@@ -113,27 +112,6 @@ int main(int argc, char **argv)
     }
 
 
-    SDL_Color *colors = new SDL_Color[SIZEPALETTE];
-    std::vector<u32> palette(SIZEPALETTE);
-
-    Surface surface(1, 1, true);
-    surface.SetAlpha(255);
-
-    char *p = kb_pal;
-
-    for(u16 ii = 0; ii < SIZEPALETTE; ++ii)
-    {
-	colors[ii].r = *p++;
-	colors[ii].g = *p++;
-	colors[ii].b = *p++;
-	
-	colors[ii].r <<= 2;
-	colors[ii].g <<= 2;
-	colors[ii].b <<= 2;
-	
-	palette[ii] = surface.MapRGB(colors[ii].r, colors[ii].g, colors[ii].b);
-    }
-
     SDL::Init();
 
     u16 count_sprite;
@@ -171,7 +149,7 @@ int main(int argc, char **argv)
 
 	sf.Fill(0xff, 0xff, 0xff);
 
-	DrawICN(sf, data_size, reinterpret_cast<const u8*>(buf), palette, debug);
+	DrawICN(sf, data_size, reinterpret_cast<const u8*>(buf), debug);
 
         delete [] buf;
 
@@ -202,8 +180,6 @@ int main(int argc, char **argv)
 	sf.SaveBMP(dstfile.c_str());
     }
 
-    delete [] colors;
-
     fd_data.close();
 
     std::cout << "expand to: " << prefix << std::endl;
@@ -214,14 +190,14 @@ int main(int argc, char **argv)
 }
 
 /* draw RLE ICN to surface */
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & palette, bool rledebug)
+void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug)
 {
     u8 i, count;
     u16 x = 0;
     u16 y = 0;
     u32 index = 0;
 
-    u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : DEFAULT_COLOR_KEY16;
+    u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
 
     if(rledebug) printf("START RLE DEBUG\n");
 
@@ -250,7 +226,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & p
 	    while(i++ < count && index < size)
 	    {
 		if(rledebug) printf(":%hhX", vdata[index]);
-		sf.SetPixel2(x++, y, palette.at(vdata[index++]));
+		sf.SetPixel(x++, y, sf.GetColor(vdata[index++]));
 	    }
 	    continue;
 	}
@@ -284,7 +260,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & p
 		++index;
 		for(i = 0; i < vdata[index]; ++i)
 		{
-		    sf.SetPixel2(x++, y, shadow);
+		    sf.SetPixel(x++, y, shadow);
 		    if(rledebug) printf(":%hhX", count);
 		}
 		++index;
@@ -296,7 +272,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & p
 		count = vdata[index];
 		for(i = 0; i < vdata[index] % 4; ++i)
 		{
-		    sf.SetPixel2(x++, y, shadow);
+		    sf.SetPixel(x++, y, shadow);
 		    if(rledebug) printf(":%hhX", count);
 		}
 		++index;
@@ -314,7 +290,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & p
 	    ++index;
 	    for(i = 0; i < count; ++i)
 	    {
-	    	sf.SetPixel2(x++, y, palette.at(vdata[index]));
+	    	sf.SetPixel(x++, y, sf.GetColor(vdata[index]));
 	    	if(rledebug) printf(":%hhX", vdata[index]);
 	    }
 	    ++index;
@@ -330,7 +306,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, const std::vector<u32> & p
 	    ++index;
 	    for(i = 0; i < count; ++i)
 	    {
-		sf.SetPixel2(x++, y, palette.at(vdata[index]));
+		sf.SetPixel(x++, y, sf.GetColor(vdata[index]));
 		if(rledebug) printf(":%hhX", vdata[index]);
 	    }
 	    ++index;

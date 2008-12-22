@@ -32,7 +32,6 @@
 #include <fstream>
 #include <sstream>
 #include "SDL.h"
-#include "kbpal.h"
 #include "engine.h"
 
 int main(int argc, char **argv)
@@ -90,22 +89,6 @@ int main(int argc, char **argv)
 
     fd_data.read(body, size);
 
-
-    SDL_Color *colors = new SDL_Color[SIZEPALETTE];
-
-    char *p = kb_pal;
-
-    for(u16 ii = 0; ii < SIZEPALETTE; ++ii)
-    {
-	colors[ii].r = *p++;
-	colors[ii].g = *p++;
-	colors[ii].b = *p++;
-	
-	colors[ii].r <<= 2;
-	colors[ii].g <<= 2;
-	colors[ii].b <<= 2;
-    }
-
     SDL::Init();
 
     for(u16 cur = 0; cur < count; ++cur)
@@ -114,12 +97,8 @@ int main(int argc, char **argv)
 
         Surface sf(width, height, 8, SDL_SWSURFACE);
 
-        sf.LoadPalette(colors, SIZEPALETTE);
-
 	sf.Lock();
-
 	memcpy(const_cast<void *>(sf.pixels()), vdata, width * height);
-
 	sf.Unlock();
 
 	std::string dstfile(prefix);
@@ -149,7 +128,6 @@ int main(int argc, char **argv)
 	sf.SaveBMP(dstfile.c_str());
     }
 
-    delete [] colors;
     delete [] body;
 
     fd_data.close();

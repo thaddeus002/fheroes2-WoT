@@ -344,69 +344,58 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 	{
 	    case ICN::TELEPORT1:
 		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 116));
-		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii / 2));
-		sprite->Unlock();
+		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE + ii / 2));
 		break;
 
 	    case ICN::TELEPORT2:
 		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 119));
-		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii));
-		sprite->Unlock();
+		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE + ii));
 		break;
 
 	    case ICN::TELEPORT3:
 		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 122));
-		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE + ii));
-		sprite->Unlock();
+		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE + ii));
 		break;
 
 	    case ICN::FOUNTAIN:
 		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 15));
-		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0xE8), palette.Color(0xE8 - ii));
-		sprite->ChangeColor(palette.Color(0xE9), palette.Color(0xE9 - ii));
-		sprite->ChangeColor(palette.Color(0xEA), palette.Color(0xEA - ii));
-		sprite->ChangeColor(palette.Color(0xEB), palette.Color(0xEB - ii));
-		sprite->ChangeColor(palette.Color(0xEC), palette.Color(0xEC - ii));
-		sprite->ChangeColor(palette.Color(0xED), palette.Color(0xED - ii));
-		sprite->ChangeColor(palette.Color(0xEE), palette.Color(0xEE - ii));
-		sprite->ChangeColor(palette.Color(0xEF), palette.Color(0xEF - ii));
-		sprite->Unlock();
+		sprite->ChangeColor(sprite->GetColor(0xE8), sprite->GetColor(0xE8 - ii));
+		sprite->ChangeColor(sprite->GetColor(0xE9), sprite->GetColor(0xE9 - ii));
+		sprite->ChangeColor(sprite->GetColor(0xEA), sprite->GetColor(0xEA - ii));
+		sprite->ChangeColor(sprite->GetColor(0xEB), sprite->GetColor(0xEB - ii));
+		sprite->ChangeColor(sprite->GetColor(0xEC), sprite->GetColor(0xEC - ii));
+		sprite->ChangeColor(sprite->GetColor(0xED), sprite->GetColor(0xED - ii));
+		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE - ii));
+		sprite->ChangeColor(sprite->GetColor(0xEF), sprite->GetColor(0xEF - ii));
 		break;
 
 	    case ICN::TREASURE:
 		sprite = new Sprite(GetICN(ICN::OBJNRSRC, 19));
-		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0x0A), palette.Color(ii ? 0x00 : 0x0A));
-		sprite->ChangeColor(palette.Color(0xC2), palette.Color(ii ? 0xD6 : 0xC2));
-		sprite->ChangeColor(palette.Color(0x64), palette.Color(ii ? 0xDA : 0x64));
-		sprite->Unlock();
+		sprite->ChangeColor(sprite->GetColor(0x0A), sprite->GetColor(ii ? 0x00 : 0x0A));
+		sprite->ChangeColor(sprite->GetColor(0xC2), sprite->GetColor(ii ? 0xD6 : 0xC2));
+		sprite->ChangeColor(sprite->GetColor(0x64), sprite->GetColor(ii ? 0xDA : 0x64));
 		break;
 
 	    case ICN::ROUTERED:
 		sprite = new Sprite(GetICN(ICN::ROUTE, ii));
-		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0x55), palette.Color(0xB0));
-		sprite->ChangeColor(palette.Color(0x5C), palette.Color(0xB7));
-		sprite->ChangeColor(palette.Color(0x60), palette.Color(0xBB));
-		sprite->Unlock();
+		sprite->ChangeColor(sprite->GetColor(0x55), sprite->GetColor(0xB0));
+		sprite->ChangeColor(sprite->GetColor(0x5C), sprite->GetColor(0xB7));
+		sprite->ChangeColor(sprite->GetColor(0x60), sprite->GetColor(0xBB));
 		break;
 
 	    case ICN::YELLOWFONT:
 		sprite = new Sprite(GetICN(ICN::FONT, ii));
-		sprite->Lock();
-		sprite->ChangeColor(palette.Color(0x0B), palette.Color(0xDA));
-		sprite->ChangeColor(palette.Color(0x0C), palette.Color(0xDA));
-		sprite->ChangeColor(palette.Color(0x0D), palette.Color(0xDA));
-		sprite->ChangeColor(palette.Color(0x0F), palette.Color(0xDB));
-		sprite->ChangeColor(palette.Color(0x10), palette.Color(0xDB));
-		sprite->ChangeColor(palette.Color(0x11), palette.Color(0xDB));
-		sprite->ChangeColor(palette.Color(0x12), palette.Color(0xDB));
-		sprite->ChangeColor(palette.Color(0x14), palette.Color(0xDB));
-		sprite->Unlock();
+		sprite->ChangeColor(sprite->GetColor(0x0A), sprite->GetColor(0xDA));
+		sprite->ChangeColor(sprite->GetColor(0x0B), sprite->GetColor(0xDA));
+		sprite->ChangeColor(sprite->GetColor(0x0C), sprite->GetColor(0xDA));
+		sprite->ChangeColor(sprite->GetColor(0x0D), sprite->GetColor(0xDA));
+		sprite->ChangeColor(sprite->GetColor(0x0E), sprite->GetColor(0xDB));
+		sprite->ChangeColor(sprite->GetColor(0x0F), sprite->GetColor(0xDB));
+		sprite->ChangeColor(sprite->GetColor(0x10), sprite->GetColor(0xDB));
+		sprite->ChangeColor(sprite->GetColor(0x11), sprite->GetColor(0xDB));
+		sprite->ChangeColor(sprite->GetColor(0x12), sprite->GetColor(0xDB));
+		sprite->ChangeColor(sprite->GetColor(0x13), sprite->GetColor(0xDB));
+		sprite->ChangeColor(sprite->GetColor(0x14), sprite->GetColor(0xDB));
 		break;
 
 	    default: break;
@@ -520,12 +509,8 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 		    
 		    Surface & sf = *v[ii];
 
-		    sf.LoadPalette(palette);
-
     		    sf.Lock();
-
             	    memcpy(const_cast<void *>(sf.pixels()), &body[6 + ii * tile_size], tile_size);
-
                     sf.Unlock();
 		}
 
@@ -533,34 +518,6 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 	    }
 
 	Error::Warning("AGG::Cache::LoadTIL: not found: " + TIL::GetString(til));
-    }
-}
-
-/* load PAL object to AGG::Cache */
-void AGG::Cache::LoadPAL(void)
-{
-    const PAL::pal_t pal = PAL::KB;
-
-    if(palette.Size()) return;
-
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadPAL: " + PAL::GetString(pal));
-
-    if(agg_cache.size())
-    {
-	std::vector<char> body;
-
-	std::list<File *>::const_iterator it1 = agg_cache.begin();
-	std::list<File *>::const_iterator it2 = agg_cache.end();
-
-	for(; it1 != it2; ++it1)
-
-	    // read only first found
-	    if((**it1).Read(PAL::GetString(pal), body))
-	    {
-		palette.Load(body);
-
-		return;
-	    }
     }
 }
 
@@ -651,6 +608,11 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 		break;
 	    }
     }
+}
+
+void AGG::Cache::LoadPAL(void)
+{
+    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadPAL: ", Palette::Get().Size());
 }
 
 void AGG::Cache::LoadMUS(const MUS::mus_t mus)
@@ -881,12 +843,6 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index)
     return *surface;
 }
 
-/* return Palette from AGG::Cache */
-const Palette & AGG::Cache::GetPAL(void)
-{
-    return palette;
-}
-
 /* return CVT from AGG::Cache */
 const std::vector<u8> & AGG::Cache::GetWAV(const M82::m82_t m82)
 {
@@ -986,12 +942,6 @@ const std::vector<u8> & AGG::GetMUS(const MUS::mus_t mus)
 const std::vector<u8> & AGG::GetMID(const XMI::xmi_t xmi)
 {
     return AGG::Cache::Get().GetMID(xmi);
-}
-
-// wrapper AGG::GetColor
-u32 AGG::GetColor(const u16 index)
-{
-    return AGG::Cache::Get().GetPAL().Color(index);
 }
 
 /* wrapper Audio::Play */

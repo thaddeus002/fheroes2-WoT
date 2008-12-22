@@ -40,7 +40,8 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
     u8  c = 0;
     u16 x = reflect ? sf.w() - 1 : 0;
     u16 y = 0;
-    const u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : DEFAULT_COLOR_KEY16;
+    const u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
+    bool alpha = false;
 
     // lock surface
     sf.Lock();
@@ -62,7 +63,7 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
 	    ++cur;
 	    while(c-- && cur < max)
 	    {
-		sf.SetPixel2(x, y, AGG::GetColor(*cur));
+		sf.SetPixel(x, y, sf.GetColor(*cur));
 		reflect ? x-- : x++;
 		++cur;
 	    }
@@ -86,7 +87,7 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
 	{
 	    ++cur;
 	    c = *cur % 4 ? *cur % 4 : *(++cur);
-	    while(c--){ sf.SetPixel2(x, y, shadow); reflect ? x-- : x++; }
+	    while(c--){ sf.SetPixel(x, y, shadow); alpha = true; reflect ? x-- : x++; }
 	    ++cur;
 	}
 	else
@@ -96,14 +97,14 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
 	    ++cur;
 	    c = *cur;
 	    ++cur;
-	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur)); reflect ? x-- : x++; }
+	    while(c--){ sf.SetPixel(x, y, sf.GetColor(*cur)); reflect ? x-- : x++; }
 	    ++cur;
 	}
 	else
 	{
 	    c = *cur - 0xC0;
 	    ++cur;
-	    while(c--){ sf.SetPixel2(x, y, AGG::GetColor(*cur)); reflect ? x-- : x++; }
+	    while(c--){ sf.SetPixel(x, y, sf.GetColor(*cur)); reflect ? x-- : x++; }
 	    ++cur;
 	}
 
@@ -116,4 +117,6 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
 
     // unlock surface
     sf.Unlock();
+
+    if(! alpha) sf.ResetAlpha();
 }

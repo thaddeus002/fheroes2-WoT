@@ -117,7 +117,7 @@ void Game::SelectBarHeroes::RedrawIcon(const Heroes & hero, const Rect & dst)
     display.FillRect(0, 0, 0, dst);
 
     Surface sf_blue(7, ICONS_HEIGHT, true);
-    sf_blue.Fill(AGG::GetColor(0x4C));
+    sf_blue.Fill(sf_blue.GetColor(0x4C));
 
     // mobility
     display.Blit(sf_blue, dst.x, dst.y);

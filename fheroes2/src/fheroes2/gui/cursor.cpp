@@ -185,46 +185,46 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
     u16 height = surface.h();
 
     // draw cursor
-    u32 color = AGG::GetColor(indexcolor);
+    u32 color = surface.GetColor(indexcolor);
     surface.Lock();
     if(solid)
     {
 	for(u8 i = 0; i < width; ++i)
         {
-    	    surface.SetPixel2(i, 0, color);
-            surface.SetPixel2(i, height - 1, color);
+    	    surface.SetPixel(i, 0, color);
+            surface.SetPixel(i, height - 1, color);
         }
 
         for(u8 i = 0; i < height; ++i)
         {
-            surface.SetPixel2(0, i, color);
-    	    surface.SetPixel2(width - 1, i, color);
+            surface.SetPixel(0, i, color);
+    	    surface.SetPixel(width - 1, i, color);
         }
     }
     else
     {
 	for(u8 i = 0; i < width; ++i)
 	{
-    	    surface.SetPixel2(i, 0, color);
-    	    if(i + 1 < width) surface.SetPixel2(i + 1, 0, color);
+    	    surface.SetPixel(i, 0, color);
+    	    if(i + 1 < width) surface.SetPixel(i + 1, 0, color);
     	    i += 3;
 	}
 	for(u8 i = 0; i < width; ++i)
 	{
-    	    surface.SetPixel2(i, height - 1, color);
-    	    if(i + 1 < width) surface.SetPixel2(i + 1, height - 1, color);
+    	    surface.SetPixel(i, height - 1, color);
+    	    if(i + 1 < width) surface.SetPixel(i + 1, height - 1, color);
     	    i += 3;
 	}
 	for(u8 i = 0; i < height; ++i)
 	{
-    	    surface.SetPixel2(0, i, color);
-    	    if(i + 1 < height) surface.SetPixel2(0, i + 1, color);
+    	    surface.SetPixel(0, i, color);
+    	    if(i + 1 < height) surface.SetPixel(0, i + 1, color);
     	    i += 3;
 	}
 	for(u8 i = 0; i < height; ++i)
 	{
-    	    surface.SetPixel2(width - 1, i, color);
-    	    if(i + 1 < height) surface.SetPixel2(width - 1, i + 1, color);
+    	    surface.SetPixel(width - 1, i, color);
+    	    if(i + 1 < height) surface.SetPixel(width - 1, i + 1, color);
     	    i += 3;
 	}
     }

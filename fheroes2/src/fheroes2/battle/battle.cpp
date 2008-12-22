@@ -275,7 +275,6 @@ void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArm
     {
         width -= 10;
         Surface surf(width, height + 15);
-        //surf.SetDisplayFormat();	fix pink fringing
         surf.SetColorKey();
         int x = 0;
         for(u16 i = 0; i < killed.size(); i++)

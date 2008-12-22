@@ -79,27 +79,32 @@ public:
     void FillRect(u32 color, const Rect & src);
     void FillRect(u8 r, u8 g, u8 b, const Rect & src){ FillRect(MapRGB(r, g, b), src); };
 
-    void LoadPalette(const Palette & pal);
-    void LoadPalette(const Colors *colors, u32 ncolor);
     void SetDisplayFormat(void);
     void SetColorKey(void);
     void SetColorKey(u8 r, u8 g, u8 b);
     void SetColorKey(u32 color);
     void SetAlpha(u8 level);
+    void ResetAlpha(void);
     void SetPixel4(u16 x, u16 y, u32 color);
     void SetPixel3(u16 x, u16 y, u32 color);
     void SetPixel2(u16 x, u16 y, u32 color);
-    void SetPixel1(u16 x, u16 y, u8 color);
+    void SetPixel1(u16 x, u16 y, u32 color);
     void SetPixel(u16 x, u16 y, u32 color);
+    
+    void LoadPalette(void);
+    u32 GetColorKey(void) const;
+    u32 GetColor(u16) const;
 
-    u32 GetPixel4(u16 x, u16 y);
-    u32 GetPixel3(u16 x, u16 y);
-    u32 GetPixel2(u16 x, u16 y);
-    u32 GetPixel1(u16 x, u16 y);
-    u32 GetPixel(u16 x, u16 y);
+    u32 GetPixel4(u16 x, u16 y) const;
+    u32 GetPixel3(u16 x, u16 y) const;
+    u32 GetPixel2(u16 x, u16 y) const;
+    u32 GetPixel1(u16 x, u16 y) const;
+    u32 GetPixel(u16 x, u16 y) const;
 
     void DrawLine(const Point &, const Point &, u32);
     void DrawLine(u16, u16, u16, u16, u32);
+
+    void MakeStencil(Surface &, u32) const;
 
     void ChangeColor(u32, u32);
     void GrayScale(void);
@@ -112,6 +117,7 @@ protected:
 #ifdef WITH_TTF
     friend class SDL::Font;
 #endif
+    friend class Palette;
 
     void CreateSurface(const Rect &sz, u8 dp, u32 fl){ CreateSurface(sz.w, sz.h, dp, fl); };
     void CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl);

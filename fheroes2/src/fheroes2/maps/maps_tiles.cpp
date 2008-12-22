@@ -137,8 +137,6 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
     fogs(0xFF)
 {
-    tile_sprite.LoadPalette(AGG::Cache::Get().GetPAL());
-
     SetTile(mp2tile.tileIndex, mp2tile.shape);
 
     AddonsPushLevel1(mp2tile);

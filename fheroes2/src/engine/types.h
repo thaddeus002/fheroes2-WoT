@@ -46,13 +46,15 @@ typedef SDL_Color Colors;
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
-#define DEFAULT_COLOR_KEY16	0xf0f0
-#define DEFAULT_COLOR_KEY32	0xff00ff00
-
 #define RMASK16			0x0000f000
 #define GMASK16			0x00000f00
 #define BMASK16			0x000000f0
 #define AMASK16			0x0000000f
+
+#define RMASK24			0x00fc0000
+#define GMASK24			0x0003f000
+#define BMASK24			0x00000fc0
+#define AMASK24			0x0000003f
 
 #define RMASK32			0xff000000
 #define GMASK32			0x00ff0000
@@ -61,13 +63,15 @@ typedef SDL_Color Colors;
 
 #else
 
-#define DEFAULT_COLOR_KEY16	0x0f0f
-#define DEFAULT_COLOR_KEY32	0x00ff00ff
-
 #define RMASK16			0x0000000f
 #define GMASK16			0x000000f0
 #define BMASK16			0x00000f00
 #define AMASK16			0x0000f000
+
+#define RMASK24			0x0000003f
+#define GMASK24			0x00000fc0
+#define BMASK24			0x0003f000
+#define AMASK24			0x00fc0000
 
 #define RMASK32			0x000000ff
 #define GMASK32			0x0000ff00

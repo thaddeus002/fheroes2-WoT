@@ -30,23 +30,18 @@ struct SDL_Color;
 class Palette
 {
 public:
-    Palette(); 
-    Palette(const std::vector<char> & v);
-    Palette(const Palette & p);
-
     ~Palette();
 
-    Palette & operator= (const Palette & p);
+    static Palette & Get(void);
 
-    void Load(const std::vector<char> & v);
-
-    u32 Size(void) const;
-    u32 Color(const u16 index) const;
-    const SDL_Color * SDLColor(const u16 index) const;
-    const SDL_Color * SDLColors(void) const;
-
+    u16 Size(void) const;
+    u32 GetColor(u16) const;
+    u32 GetAlphaColor(u16) const;
+    const SDL_Palette * SDLPalette(void) const;
 
 private:
+    Palette(); 
+
     std::vector<u32> pal;
     SDL_Palette *sdlpal;
 };

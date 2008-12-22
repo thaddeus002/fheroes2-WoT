@@ -63,7 +63,6 @@ void TIL::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
     if(!sf_dst.valid() || sf_dst.w() != tile_width || sf_dst.h() != tile_height)
     {
         sf_dst = Surface(tile_width, tile_height, 8, SWSURFACE);
-        sf_dst.LoadPalette(AGG::Cache::Get().GetPAL());
     }
 
     const char * src = reinterpret_cast<const char *>(sf_src.pixels());

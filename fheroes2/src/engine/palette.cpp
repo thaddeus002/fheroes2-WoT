@@ -21,139 +21,66 @@
 #include "SDL.h"
 #include "surface.h"
 #include "error.h"
+#include "palette_h2.h"
 #include "palette.h"
 
 Palette::Palette()
 {
-    sdlpal = new SDL_Palette;
-    sdlpal->ncolors = 0;
-    sdlpal->colors  = NULL;
-}
+    const u16 size = 255;
 
-Palette::Palette(const std::vector<char> & v)
-{
     sdlpal = new SDL_Palette;
-    sdlpal->ncolors = v.size() / 3;
-    
-    if(sdlpal->ncolors)
+    sdlpal->ncolors = size;
+    sdlpal->colors  = new SDL_Color[size];
+
+    pal.resize(size);
+
+    Surface sfa;
+    sfa.CreateSurface(1, 1, DEFAULT_DEPTH, SDL_SWSURFACE|SDL_SRCALPHA);
+    sfa.SetAlpha(255);
+
+    const unsigned char *p = kb_pal;
+
+    for(u16 ii = 0; ii < size; ++ii)
     {
-	pal.resize(sdlpal->ncolors);
+        sdlpal->colors[ii].r = *p++;
+        sdlpal->colors[ii].g = *p++;
+        sdlpal->colors[ii].b = *p++;
 
-	Surface surface(1, 1, true);
-        surface.SetAlpha(255);
+        sdlpal->colors[ii].r <<= 2;
+        sdlpal->colors[ii].g <<= 2;
+        sdlpal->colors[ii].b <<= 2;
 
-    	sdlpal->colors = new SDL_Color[sdlpal->ncolors];
-	const char * p = & v[0];
-
-	for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
-	{
-	    sdlpal->colors[ii].r = *p++;
-    	    sdlpal->colors[ii].g = *p++;
-    	    sdlpal->colors[ii].b = *p++;
-
-	    sdlpal->colors[ii].r <<= 2;
-    	    sdlpal->colors[ii].g <<= 2;
-    	    sdlpal->colors[ii].b <<= 2;
-
-    	    pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
-	}
+        pal[ii] = SDL_MapRGBA(sfa.surface->format, sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b, 0xFF);
     }
-}
-
-Palette::Palette(const Palette & p)
-{
-    sdlpal = new SDL_Palette;
-    sdlpal->ncolors = p.sdlpal->ncolors;
-    sdlpal->colors = new SDL_Color[sdlpal->ncolors];
-
-    memcpy(sdlpal->colors, p.sdlpal->colors, sdlpal->ncolors * sizeof(SDL_Color));
-
-    pal.resize(sdlpal->ncolors);
-
-    Surface surface(1, 1, true);
-    surface.SetAlpha(255);
-
-    for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
-	pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
 }
 
 Palette::~Palette()
 {
-    if(sdlpal->colors) delete [] sdlpal->colors;
-    delete sdlpal;
-}
-
-Palette & Palette::operator= (const Palette & p)
-{
-    if(sdlpal->colors) delete [] sdlpal->colors;
-
-    sdlpal->ncolors = p.sdlpal->ncolors;
-    sdlpal->colors = new SDL_Color[sdlpal->ncolors];
-
-    memcpy(sdlpal->colors, p.sdlpal->colors, sdlpal->ncolors * sizeof(SDL_Color));
-
-    pal.resize(sdlpal->ncolors);
-
-    Surface surface(1, 1, true);
-    surface.SetAlpha(255);
-
-    for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
-	pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
-
-    return *this;
-}
-
-void Palette::Load(const std::vector<char> & v)
-{
-    if(sdlpal->colors) delete [] sdlpal->colors;
-
-    sdlpal->ncolors = v.size() / 3;
-
-    if(sdlpal->ncolors)
+    if(sdlpal)
     {
-	pal.resize(sdlpal->ncolors);
-
-	Surface surface(1, 1, true);
-	surface.SetAlpha(255);
-
-	sdlpal->colors = new SDL_Color[sdlpal->ncolors];
-	const char * p = & v[0];
-
-	for(u16 ii = 0; ii < sdlpal->ncolors; ++ii)
-	{
-	    sdlpal->colors[ii].r = *p++;
-    	    sdlpal->colors[ii].g = *p++;
-    	    sdlpal->colors[ii].b = *p++;
-
-	    sdlpal->colors[ii].r <<= 2;
-    	    sdlpal->colors[ii].g <<= 2;
-    	    sdlpal->colors[ii].b <<= 2;
-
-	    pal[ii] = surface.MapRGB(sdlpal->colors[ii].r, sdlpal->colors[ii].g, sdlpal->colors[ii].b);
-	}
-
-	return;
+	if(sdlpal->colors) delete [] sdlpal->colors;
+	delete sdlpal;
     }
-
-    Error::Warning("Palette::Load: size == 0");
 }
 
-u32 Palette::Size(void) const
+Palette & Palette::Get(void)
 {
-    return sdlpal->ncolors;
+    static Palette pal_cache;
+
+    return pal_cache;
 }
 
-const SDL_Color * Palette::SDLColors(void) const
+u16 Palette::Size(void) const
 {
-    return sdlpal->colors;
+    return pal.size();
 }
 
-u32 Palette::Color(const u16 index) const
+u32 Palette::GetColor(u16 index) const
 {
-    return index < sdlpal->ncolors ? pal[index] : 0;
+    return index < pal.size() ? pal[index] : 0;
 }
 
-const SDL_Color * Palette::SDLColor(const u16 index) const
+const SDL_Palette * Palette::SDLPalette(void) const
 {
-    return index < sdlpal->ncolors ? &sdlpal->colors[index] : NULL;
+    return sdlpal;
 }

@@ -29,13 +29,11 @@
 #include "gamedefs.h"
 #include "icn.h"
 #include "til.h"
-#include "pal.h"
 #include "xmi.h"
 #include "m82.h"
 #include "mus.h"
 #include "sprite.h"
 #include "font.h"
-#include "palette.h"
 
 class Surface;
 class Sprite;
@@ -87,7 +85,6 @@ namespace AGG
 	int GetICNCount(const ICN::icn_t icn);
 	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
 	const Surface & GetTIL(const TIL::til_t til, u16 index);
-	const Palette & GetPAL(void);
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
         const std::vector<u8> & GetMUS(const MUS::mus_t mus);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
@@ -99,8 +96,8 @@ namespace AGG
 	void LoadWAV(const M82::m82_t m82);
         void LoadMUS(const MUS::mus_t mus);
 	void LoadMID(const XMI::xmi_t xmi);
-	void LoadPAL(void);
 
+	void LoadPAL(void);
 	void LoadFNT(void);
 	void LoadFNT(u16);
 	bool isValidFonts(void) const;
@@ -124,7 +121,6 @@ namespace AGG
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;
 	std::map<u16, std::pair<Surface, Surface> > fnt_cache;
 
-	Palette palette;
 #ifdef WITH_TTF
 	SDL::Font font_medium;
 	SDL::Font font_small;
@@ -147,9 +143,6 @@ namespace AGG
     const std::vector<u8> & GetWAV(const M82::m82_t m82);
     const std::vector<u8> & GetMUS(const MUS::mus_t mus);
     const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
-
-    // wrapper AGG::GetColor
-    u32 GetColor(const u16 index);
 
     const Surface & GetLetter(char ch, u8 ft);
     const Surface & GetUnicodeLetter(u16 ch, u8 ft);

@@ -104,13 +104,13 @@ void Radar::Build(void)
     sf_gray = new Surface(x, x);
     sf_black = new Surface(x, x);
 
-    sf_blue->Fill(AGG::GetColor(COLOR_BLUE));
-    sf_green->Fill(AGG::GetColor(COLOR_GREEN));
-    sf_red->Fill(AGG::GetColor(COLOR_RED));
-    sf_yellow->Fill(AGG::GetColor(COLOR_YELLOW));
-    sf_orange->Fill(AGG::GetColor(COLOR_ORANGE));
-    sf_purple->Fill(AGG::GetColor(COLOR_PURPLE));
-    sf_gray->Fill(AGG::GetColor(COLOR_GRAY));
+    sf_blue->Fill(sf_blue->GetColor(COLOR_BLUE));
+    sf_green->Fill(sf_green->GetColor(COLOR_GREEN));
+    sf_red->Fill(sf_red->GetColor(COLOR_RED));
+    sf_yellow->Fill(sf_yellow->GetColor(COLOR_YELLOW));
+    sf_orange->Fill(sf_orange->GetColor(COLOR_ORANGE));
+    sf_purple->Fill(sf_purple->GetColor(COLOR_PURPLE));
+    sf_gray->Fill(sf_gray->GetColor(COLOR_GRAY));
     sf_black->Fill(0);
 
     Generate();
@@ -139,10 +139,10 @@ void Radar::Generate(void)
 	u32 color = COLOR_ROAD;
 
 	if(tile.isRoad())
-		tile_surface.Fill(AGG::GetColor(color));
+		tile_surface.Fill(tile_surface.GetColor(color));
 	else
 	if(0 != (color = GetPaletteIndexFromGround(tile.GetGround())))
-		tile_surface.Fill(AGG::GetColor(tile.GetObject() == MP2::OBJ_MOUNTS ? color + 2 : color));
+		tile_surface.Fill(tile_surface.GetColor(tile.GetObject() == MP2::OBJ_MOUNTS ? color + 2 : color));
 	else
 	    continue;
 

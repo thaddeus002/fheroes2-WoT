@@ -208,7 +208,7 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bo
     	    const s16 dsty = BORDERWIDTH + TILEWIDTH * oy;
 
     	    display.Lock();
-    	    display.SetPixel(dstx, dsty, AGG::GetColor(0x40));
+    	    display.SetPixel(dstx, dsty, display.GetColor(0x40));
     	    display.Unlock();
 	}
     }
