@@ -481,7 +481,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     str.clear();
     String::AddInt(str, rs.wood);
     text.Set(str, Font::SMALL);
-    dst_pt.x += 34 - text.w() / 2;
+    dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
     
@@ -492,7 +492,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     str.clear();
     String::AddInt(str, rs.mercury);
     text.Set(str);
-    dst_pt.x += 34 - text.w() / 2;
+    dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
 
@@ -503,7 +503,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     str.clear();
     String::AddInt(str, rs.ore);
     text.Set(str);
-    dst_pt.x += 34 - text.w() / 2;
+    dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
 
@@ -514,7 +514,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     str.clear();
     String::AddInt(str, rs.sulfur);
     text.Set(str);
-    dst_pt.x += 34 - text.w() / 2;
+    dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
 
@@ -525,7 +525,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     str.clear();
     String::AddInt(str, rs.crystal);
     text.Set(str);
-    dst_pt.x += 34 - text.w() / 2;
+    dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
 
@@ -536,7 +536,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     str.clear();
     String::AddInt(str, rs.gems);
     text.Set(str);
-    dst_pt.x += 34 - text.w() / 2;
+    dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
 
@@ -547,7 +547,7 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     str.clear();
     String::AddInt(str, rs.gold);
     text.Set(str);
-    dst_pt.x += 34 - text.w() / 2;
+    dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
 }
