@@ -74,6 +74,7 @@ void Text::Blit(const Point & dst_pt, Surface & dst)
 
 void Text::Blit(u16 ax, u16 ay, Surface & dst)
 {
+    if(message.empty()) return;
 #ifdef WITH_TTF
     const u16 size = message.size() + 1;
     u16 *unicode = new u16[size];

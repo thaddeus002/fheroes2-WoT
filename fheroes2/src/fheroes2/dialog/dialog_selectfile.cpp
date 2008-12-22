@@ -235,7 +235,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	    backgroundInfo.Restore();
 	    it_current = it_list_head;
 	    while(num--) ++it_current;
-	    DrawList(it_list_head, it_current);
+	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    DrawSelectInfo(**it_current);
 	    cursor.Show();
 	    display.Flip();
@@ -249,7 +249,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	    backgroundList.Restore();
 	    --it_list_head;
 	    --num_head;
-	    DrawList(it_list_head, it_current);
+	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    split.Backward();
 	    cursor.Show();
 	    display.Flip();
@@ -263,7 +263,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	    backgroundList.Restore();
 	    ++it_list_head;
 	    ++num_head;
-	    DrawList(it_list_head, it_current);
+	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    split.Forward();
 	    cursor.Show();
 	    display.Flip();
@@ -285,7 +285,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	    split.Move(seek);
 	    while(seek--){ ++it_list_head; ++num_head; }
 
-	    DrawList(it_list_head, it_current);
+	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
 	    cursor.Show();
 	    display.Flip();
  	}
@@ -326,16 +326,18 @@ void DrawList(std::list<Maps::FileInfo *>::const_iterator &it_top, std::list<Map
     u8 index = 0;
     std::list<Maps::FileInfo *>::const_iterator it_head(it_top);
 
-    for(int ii = 0; ii < count; ++ii)
+    for(int ii = 0; ii < count; ++ii) if(*it_head)
     {
+	const Maps::FileInfo & info = **it_head;
+
 	// sprite count
-	const std::bitset<8> colors((**it_head).KingdomColors());
+	const std::bitset<8> colors(info.KingdomColors());
 	index = 19 + colors.count();
 	const Sprite &spriteCount = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteCount, x, y);
 
         // sprite size
-	switch((**it_head).SizeMaps())
+	switch(info.SizeMaps())
 	{
             case Maps::SMALL:
     		index = 26;
@@ -357,15 +359,15 @@ void DrawList(std::list<Maps::FileInfo *>::const_iterator &it_top, std::list<Map
 	display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
 	// text longname
-	Text((**it_head).Name(), (it_head == it_sel ? Font::YELLOWBIG : Font::BIG), x + spriteCount.w() + spriteSize.w() + 18, y);
+	Text(info.Name(), (it_head == it_sel ? Font::YELLOWBIG : Font::BIG), x + spriteCount.w() + spriteSize.w() + 18, y);
 
 	// sprite wins
-	index = 30 + (**it_head).ConditionsWins();
+	index = 30 + info.ConditionsWins();
 	const Sprite &spriteWins = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteWins, x + 224, y);
 
 	// sprite loss
-	index = 36 + (**it_head).ConditionsLoss();
+	index = 36 + info.ConditionsLoss();
 	const Sprite &spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteLoss, x + 226 + spriteWins.w(), y);
 
