@@ -129,7 +129,8 @@ namespace Army {
     
     void InitArmyPosition(Army::BattleArmy_t & army, bool compact, bool reflect=false);
     void StartTurn(Army::BattleArmy_t &army);
-    
+
+    inline Point Scr2BfDirect(const Point & pt); // translate coordinate to battle field
     inline Point Scr2Bf(const Point & pt); // translate coordinate to battle field
     inline Point Bf2Scr(const Point & pt); // translate to screen (offset to frame border)
     inline bool BfValid(const Point & pt); // check battle field point
@@ -234,27 +235,6 @@ void Army::BattleSummaryVsHero(Heroes &hero, const Army::BattleArmy_t &heroOrig,
     //TODO: Eagle eye
     const BagArtifacts *artifacts = status == WIN ? &hero2.GetBagArtifacts() : NULL;
     BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, status);
-    
-    //Heroes *from, *to;
-    //if(status == WIN)
-    //{
-    //    from = &hero2;
-    //    to = &hero;
-    //}
-    //else
-    //{
-    //    from = &hero;
-    //    to = &hero2;
-    //}
-    //
-    // MOVE TO:: Heroes::Action and Heroes::TakeArtifacts
-    //
-    //if(from->GetArtifacts().size() > 1)
-    //{
-        //Transfer all artifacts except the spell book
-    //    to->GetArtifacts().insert(to->GetArtifacts().end(), from->GetArtifacts().begin() + 1, from->GetArtifacts().end());
-    //    from->GetArtifacts().clear();
-    //}
 }
 
 void Army::DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArmy_t &current, const Rect &draw)
@@ -1190,150 +1170,152 @@ bool Army::AnimateMove(Heroes *hero1, Heroes *hero2, Army::BattleArmy_t &army1, 
     u16 animat = 0;
     
     if(BfValid(move) && move != myTroop.Position()) {
-	Point start = Bf2Scr(myTroop.Position()) + dst_pt;
-	Point end = Bf2Scr(move) + dst_pt;
-	Point tp = start;
-	Point step;
-	u8 st, len, prep=0, post=0;
-	myTroop.GetAnimFrames(Monster::AS_WALK, st, len);
-	int frame = 0, curstep = 0, part = 0, numsteps;
-	std::vector<Point> *path=0;
+        Point start = Bf2Scr(myTroop.Position()) + dst_pt;
+        Point end = Bf2Scr(move) + dst_pt;
+        myTroop.SetScreenPosition(start);
+        Point step;
+        u8 st, len, prep=0, post=0;
+        myTroop.GetAnimFrames(Monster::AS_WALK, st, len);
+        int frame = 0, curstep = 0, part = 0, numsteps;
+        std::vector<Point> *path=0;
         
-	if(myTroop.isFly()) {
+        if(myTroop.isFly()) {
             myTroop.SetReflect(end.x < start.x);
             if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
                 myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
 
-            /*DrawShadow(move);
-            while(le.HandleEvents())
-                if(le.KeyPress(KEY_RETURN))
-                break;*/
+            myTroop.SetScreenPosition(Bf2Scr(myTroop.Position()) + dst_pt);
             
-	    if(len >= 12) prep = post = 4;
-	    else if(len >= 8) prep = post = 2;
-	    else prep = post = 1;
-	    step = end-start;
+            /*DrawShadow(move);
+              while(le.HandleEvents())
+              if(le.KeyPress(KEY_RETURN))
+              break;*/
+            
+            if(len >= 12) prep = post = 4;
+            else if(len >= 8) prep = post = 2;
+            else prep = post = 1;
+            step = end-start;
             const int deltaX = abs(myTroop.Position().x - move.x);
             const int deltaY = abs(myTroop.Position().y - move.y);
             numsteps = std::max(std::max(deltaX, deltaY), 1); //avoid divide by zero
-	    step.x /= numsteps;
-	    step.y /= numsteps;
-	} else {
-	    if(path = FindPath(myTroop.Position(), move, myTroop.GetSpeed(), myTroop, army1, army2, troopN),!path) {
-		Dialog::Message(tr("battle.error"), tr("battle.no_path"), Font::BIG, Dialog::OK);
-		return false;
-	    }
-	    step.x = ((Bf2Scr(path->back())+dst_pt).x - tp.x) / len;
-	    step.y = ((Bf2Scr(path->back())+dst_pt).y - tp.y) / len;
+            step.x /= numsteps;
+            step.y /= numsteps;
+        } else {
+            if(path = FindPath(myTroop.Position(), move, myTroop.GetSpeed(), myTroop, army1, army2, troopN),!path) {
+                Dialog::Message(tr("battle.error"), tr("battle.no_path"), Font::BIG, Dialog::OK);
+                return false;
+            }
+            step.x = ((Bf2Scr(path->back())+dst_pt).x - myTroop.ScreenPosition().x) / len;
+            step.y = ((Bf2Scr(path->back())+dst_pt).y - myTroop.ScreenPosition().y) / len;
             myTroop.SetReflect(step.x < 0);
             if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
                 myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
-	    if(step.y) step.x = -step.x;
-	    else step.x = 0;
-            tp = Bf2Scr(myTroop.Position()) + dst_pt;
-            
+            if(step.y) step.x = -step.x;
+            else step.x = 0;
+            myTroop.SetScreenPosition(Bf2Scr(myTroop.Position()) + dst_pt);
+
             /*DrawTroop(myTroop);
-            Display::Get().Flip();
-            while(le.HandleEvents())
-            {
-                if(le.KeyPress(KEY_RETURN))
-                    break;
-            }*/
-	}
-	myTroop.Animate(Monster::AS_WALK);
+              Display::Get().Flip();
+              while(le.HandleEvents())
+              {
+              if(le.KeyPress(KEY_RETURN))
+              break;
+              }*/
+        }
+        myTroop.Animate(Monster::AS_WALK);
         if(!myTroop.isFly())
             AGG::PlaySound(myTroop.M82Move());
-	while(le.HandleEvents()) {
+        while(le.HandleEvents()) {
             bool shouldAnimate = false;
             if(myTroop.isFly())
                 shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 4);
             else
                 shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 2);
-	    if(shouldAnimate) {
-		if(myTroop.isFly()) {
-		    if(frame >= prep && !part) {
-			AGG::PlaySound(myTroop.M82Move());
-			part = 1;
-		    }
-		    if(part == 1) {
-			tp += step;
-			curstep ++;
-			if(myTroop.aframe >= st+len-post-1) {
-			    AGG::PlaySound(myTroop.M82Move());
-			    myTroop.aframe = st+prep;
-			}
-			if(curstep == numsteps) {
-			    part = 3;
-			    tp = end;
-			    myTroop.aframe = st+len-post;
-			}
-		    }
-		    if(part == 3 && myTroop.astate != Monster::AS_WALK) break;
-		} else {
-		    tp += step;
-		    if(myTroop.astate != Monster::AS_WALK && path->size()) {
+            if(shouldAnimate) {
+                if(myTroop.isFly()) {
+                    if(frame >= prep && !part) {
+                        AGG::PlaySound(myTroop.M82Move());
+                        part = 1;
+                    }
+                    if(part == 1) {
+                        myTroop.SetScreenPosition(myTroop.ScreenPosition() + step);
+                        curstep ++;
+                        if(myTroop.aframe >= st+len-post-1) {
+                            AGG::PlaySound(myTroop.M82Move());
+                            myTroop.aframe = st+prep;
+                        }
+                        if(curstep == numsteps) {
+                            part = 3;
+                            myTroop.SetScreenPosition(end);
+                            myTroop.aframe = st+len-post;
+                        }
+                    }
+                    if(part == 3 && myTroop.astate != Monster::AS_WALK) break;
+                } else {
+                    myTroop.SetScreenPosition(myTroop.ScreenPosition() + step);
+                    if(myTroop.astate != Monster::AS_WALK && path->size()) {
                         if(path->size() > 1)
                             AGG::PlaySound(myTroop.M82Move());
-			myTroop.SetPosition(path->back());
-			tp = Bf2Scr(myTroop.Position()) + dst_pt;
-			path->pop_back();
-			if(!path->size()) break;
-			step.x = ((Bf2Scr(path->back())+dst_pt).x - tp.x) / len;
-			step.y = ((Bf2Scr(path->back())+dst_pt).y - tp.y) / len;
+                        myTroop.SetPosition(path->back());
+                        myTroop.SetScreenPosition(Bf2Scr(myTroop.Position()) + dst_pt);
+                        path->pop_back();
+                        if(!path->size()) break;
+                        step.x = ((Bf2Scr(path->back())+dst_pt).x - myTroop.ScreenPosition().x) / len;
+                        step.y = ((Bf2Scr(path->back())+dst_pt).y - myTroop.ScreenPosition().y) / len;
                         myTroop.SetReflect(step.x < 0);
                         if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
                             myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
-                        tp = Bf2Scr(myTroop.Position()) + dst_pt;
-			if(step.y) step.x = -step.x;
-			else step.x = 0;
-			myTroop.Animate(Monster::AS_WALK);
-                        
+                        myTroop.SetScreenPosition(Bf2Scr(myTroop.Position()) + dst_pt);
+                        if(step.y) step.x = -step.x;
+                        else step.x = 0;
+                        myTroop.Animate(Monster::AS_WALK);
+
                         /*DrawTroop(myTroop);
-                        Display::Get().Flip();
-                        while(le.HandleEvents())
-                        {
-                            if(le.KeyPress(KEY_RETURN))
-                                break;
-                        }*/
-		    }
-		}
-		DrawBackground(tile);
-		if(hero1) DrawHero(*hero1, 1, false, 1);
-		if(hero2) DrawHero(*hero2, 1, true);
+                          Display::Get().Flip();
+                          while(le.HandleEvents())
+                          {
+                          if(le.KeyPress(KEY_RETURN))
+                          break;
+                          }*/
+                    }
+                }
+                DrawBackground(tile);
+                if(hero1) DrawHero(*hero1, 1, false, 1);
+                if(hero2) DrawHero(*hero2, 1, true);
                 /*if(path)
-                    DrawPath(*path);*/
-		Point p;
-		int t=-1;
-		for(p.y = 0; p.y < BFH; p.y++)
-		    for(p.x = 0; p.x < BFW; p.x++) {
-			DrawObject(p);
-			if(t = FindTroopExact(army1, p), t >= 0) {
-			    if(&army1[t] == &myTroop) {
-                                myTroop.Blit(tp, myTroop.IsReflected());
-                                myTroop.Animate();
-			    } else {
-				DrawTroop(army1[t]);
-				army1[t].Animate();
-			    }
-			}
-			if(t = FindTroopExact(army2, p), t >= 0) {
-			    if(&army2[t] == &myTroop) {
-				myTroop.Blit(tp, myTroop.IsReflected());
-				myTroop.Animate();
-			    } else {
-				DrawTroop(army2[t]);
-				army2[t].Animate();
-			    }
-			}
-		    }
-		display.Flip();
-		frame ++;
-	    }
-	}
-	myTroop.SetPosition(move);
+                  DrawPath(*path);*/
+                Point p;
+                Point adjusted = Scr2BfDirect(myTroop.ScreenPosition() - dst_pt);
+                int t=-1;
+                for(p.y = 0; p.y < BFH; p.y++)
+                    for(p.x = 0; p.x < BFW; p.x++) {
+                        DrawObject(p);
+                        if(t = FindTroopExact(army1, p), t >= 0) {
+                            if(&army1[t] != &myTroop) {
+                                DrawTroop(army1[t]);
+                                army1[t].Animate();
+                            }
+                        }
+                        if(t = FindTroopExact(army2, p), t >= 0) {
+                            if(&army2[t] != &myTroop) {
+                                DrawTroop(army2[t]);
+                                army2[t].Animate();
+                            }
+                        }
+                        if(adjusted == p)
+                        {
+                            myTroop.Blit(myTroop.ScreenPosition(), myTroop.IsReflected());
+                            myTroop.Animate();
+                        }
+                    }
+                display.Flip();
+                frame ++;
+            }
+        }
+        myTroop.SetPosition(move);
         if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
-	if(path) delete path;
+        if(path) delete path;
     }
     
     return true;
@@ -2425,6 +2407,12 @@ void Army::StartTurn(Army::BattleArmy_t &army)
         }
         army[i].SetRetaliated(false);
     }
+}
+
+// translate coordinate to batle field
+inline Point Army::Scr2BfDirect(const Point & pt)
+{
+    return Point((pt.x - BFX - (((pt.y - BFY)/CELLH) % 2 ? CELLW/2 : 0))/CELLW , (pt.y - BFY)/CELLH);
 }
 
 // translate coordinate to batle field

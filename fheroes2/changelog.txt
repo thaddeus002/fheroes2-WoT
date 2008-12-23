@@ -34,6 +34,8 @@ Users
 + All major dialogs should respond like HoMM II to ESC and RET key presses.
   (afletdinov)
 + Message boxes now display the title in proper yellow letters. (afletdinov)
++ Monsters now properly draw in front of scenery and other monsters while
+  moving in battle. (revvy)
 + Many more bug fixes.
 
 Developers
