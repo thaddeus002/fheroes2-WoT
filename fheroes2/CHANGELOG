@@ -1,4 +1,4 @@
-SVN - up to r718
+SVN - up to r800
 
 Users
 
@@ -27,6 +27,14 @@ Users
 + Fixed bug causing marketplace dialog to close after every trade. (revvy)
 + Fixed various problems with dialogs being slightly transparent and very ugly.
   (afletdinov, revvy)
++ Fixed bug causing experience award display on battle summary screen to
+  always show 0. (revvy)
++ Tiles surrounding monsters on the adventure screen now display the proper
+  fight cursor. (afletdinov)
++ All major dialogs should respond like HoMM II to ESC and RET key presses.
+  (afletdinov)
++ Message boxes now display the title in proper yellow letters. (afletdinov)
++ Many more bug fixes.
 
 Developers
 
