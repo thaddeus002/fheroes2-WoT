@@ -894,6 +894,9 @@ Game::menu_t Game::HumanTurn(void)
 	    {
 		if(conf.Debug()) tile.DebugInfo();
 
+		if(!conf.Debug() && tile.isFog(conf.CurrentColor()))
+		    Dialog::QuickInfo(tile);
+                else
 		switch(tile.GetObject())
 		{
 		    case MP2::OBJN_CASTLE:

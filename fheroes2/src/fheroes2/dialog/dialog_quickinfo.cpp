@@ -81,6 +81,9 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     std::string visit_status;
     const Settings & settings = Settings::Get();
 
+    if(!settings.Debug() && tile.isFog(settings.CurrentColor()))
+	name_object = "Unchartered Territory";
+    else
     switch(tile.GetObject())
     {
         case MP2::OBJ_MONSTER:
