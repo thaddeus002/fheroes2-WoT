@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <string.h>
 #include "midi_mtrk.h"
 
 using namespace MIDI;

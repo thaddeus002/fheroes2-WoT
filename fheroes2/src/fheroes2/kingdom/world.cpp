@@ -19,7 +19,8 @@
  ***************************************************************************/
 
 #include <cstdlib> 
-#include <fstream> 
+#include <fstream>
+#include <algorithm>
 #include "agg.h" 
 #include "artifact.h"
 #include "resource.h"

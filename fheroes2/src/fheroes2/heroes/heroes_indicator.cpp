@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
+#include <cmath>
 #include "agg.h"
 #include "luck.h"
 #include "morale.h"
@@ -98,7 +99,7 @@ void LuckIndicator::Redraw(void)
     luck = hero.GetLuckWithModificators(&lists);
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > luck ? 3 : (0 < luck ? 2 : 6)));
     const u8 inter = 6;
-    u8 count = (0 == luck ? 1 : std::abs(luck));
+    u8 count = (0 == luck ? 1 : std::abs((double)luck));
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 
@@ -133,7 +134,7 @@ void MoraleIndicator::Redraw(void)
     morale = hero.GetMoraleWithModificators(&lists);
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
     const u8 inter = 6;
-    u8 count = (0 == morale ? 1 : std::abs(morale));
+    u8 count = (0 == morale ? 1 : std::abs((double)morale));
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 

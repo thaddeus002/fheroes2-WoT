@@ -31,6 +31,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstring>
 #include "SDL.h"
 #include "engine.h"
 

@@ -9,6 +9,7 @@
 
 TARGET := fheroes2
 LUA_LIBS := -Wl,-Bstatic -llua -Wl,-Bdynamic
+#LUA_LIBS := $(shell pkg-config lua --libs)
 LUA_FLAGS :=
 SDL_LIBS := $(shell sdl-config --libs) -lSDL_mixer
 SDL_FLAGS := $(shell sdl-config --cflags)

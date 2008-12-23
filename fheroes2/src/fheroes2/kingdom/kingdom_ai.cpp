@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <functional>
+#include <algorithm>
 #include "game.h"
 #include "cursor.h"
 #include "engine.h"
