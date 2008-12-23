@@ -25,6 +25,8 @@ Users
 + Fixed recurring problem in battles where AI units would walk next to a unit
   but not attack. (revvy)
 + Fixed bug causing marketplace dialog to close after every trade. (revvy)
++ Fixed various problems with dialogs being slightly transparent and very ugly.
+  (afletdinov, revvy)
 
 Developers
 

@@ -450,7 +450,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		    const ICN::Header & header = icn_headers[ii];
 		    const u32 size_data = (ii + 1 != count_sprite ? icn_headers[ii + 1].OffsetData() - header.OffsetData() : total_size - header.OffsetData());
 
-		    v[ii] = new Sprite(header, &body[6 + header.OffsetData()], size_data, reflect);
+		    v[ii] = new Sprite(icn, header, &body[6 + header.OffsetData()], size_data, reflect);
 		}
 
 		return;

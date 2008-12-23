@@ -27,7 +27,7 @@ class Sprite : public Surface
 {
 public:
     /* icn sprite constructor */
-    Sprite(const ICN::Header & header, const char *data, const u32 size, bool reflect = false);
+    Sprite(const ICN::icn_t icn, const ICN::Header & header, const char *data, const u32 size, bool reflect = false);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };

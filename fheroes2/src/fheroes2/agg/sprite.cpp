@@ -23,8 +23,8 @@
 #include "sprite.h"
 
 /* ICN Sprite constructor */
-Sprite::Sprite(const ICN::Header & header, const char *data, const u32 size, bool reflect)
-    : Surface(header.Width(), header.Height(), Settings::Get().Shadow()), offsetX(header.OffsetX()), offsetY(header.OffsetY())
+Sprite::Sprite(const ICN::icn_t icn, const ICN::Header & header, const char *data, const u32 size, bool reflect)
+    : Surface(header.Width(), header.Height(), ICN::RequiresAlpha(icn)), offsetX(header.OffsetX()), offsetY(header.OffsetY())
 {
     SetColorKey();
     DrawICN(*this, data, size, reflect);

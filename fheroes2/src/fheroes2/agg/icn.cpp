@@ -1481,3 +1481,21 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
     return 0;
 }
 
+bool ICN::RequiresAlpha(const ICN::icn_t icn)
+{
+    if(!Settings::Get().Shadow())
+        return false;
+
+    switch(icn)
+    {
+        case ICN::SYSTEM:
+        case ICN::SYSTEME:
+        case ICN::BUYBUILD:
+        case ICN::BUYBUILE:
+            return false;
+        default:
+            break;
+    }
+    
+    return true;
+}
