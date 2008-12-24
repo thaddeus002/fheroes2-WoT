@@ -682,7 +682,8 @@ Game::menu_t Game::HumanTurn(void)
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
-    if(Game::HOTSEAT == conf.GameType() || conf.Original()) global_focus.Reset();
+    //if(Game::HOTSEAT == conf.GameType() || conf.Original()) global_focus.Reset();
+    global_focus.Reset();
 
     Game::SelectBarCastle & selectCastle = Game::SelectBarCastle::Get();
     Game::SelectBarHeroes & selectHeroes = Game::SelectBarHeroes::Get();
@@ -1009,15 +1010,18 @@ Game::menu_t Game::HumanTurn(void)
     		myCastles.size() > I.CountIcons())
     	    {
     		Splitter & splitter = selectCastle.GetSplitter();
-    		u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
-        	if(seek > myCastles.size() - I.CountIcons()) seek = myCastles.size() - I.CountIcons();
+    		if(0 != splitter.GetStep())
+    		{
+    		    u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
+        	    if(seek > myCastles.size() - I.CountIcons()) seek = myCastles.size() - I.CountIcons();
 
-        	cursor.Hide();
-        	splitter.Move(seek);
-		selectCastle.SetTop(seek);
-		selectCastle.Redraw();
-        	cursor.Show();
-        	display.Flip();
+        	    cursor.Hide();
+        	    splitter.Move(seek);
+		    selectCastle.SetTop(seek);
+		    selectCastle.Redraw();
+        	    cursor.Show();
+        	    display.Flip();
+		}
 	    }
 	    else
     	    // move splitter cursor heroes
@@ -1025,15 +1029,18 @@ Game::menu_t Game::HumanTurn(void)
     		myHeroes.size() > I.CountIcons())
     	    {
     		Splitter & splitter = selectHeroes.GetSplitter();
-    		u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
-        	if(seek > myHeroes.size() - I.CountIcons()) seek = myHeroes.size() - I.CountIcons();
+    		if(0 != splitter.GetStep())
+    		{
+    		    u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
+        	    if(seek > myHeroes.size() - I.CountIcons()) seek = myHeroes.size() - I.CountIcons();
 
-        	cursor.Hide();
-        	splitter.Move(seek);
-		selectHeroes.SetTop(seek);
-		selectHeroes.Redraw();
-        	cursor.Show();
-        	display.Flip();
+        	    cursor.Hide();
+        	    splitter.Move(seek);
+		    selectHeroes.SetTop(seek);
+		    selectHeroes.Redraw();
+        	    cursor.Show();
+        	    display.Flip();
+		}
 	    }
 
 	    // click Heroes Icons
@@ -1119,6 +1126,9 @@ Game::menu_t Game::HumanTurn(void)
 	    // click End Turn
 	    if(le.MouseClickLeft(buttonEndTur))
 	    {
+    		if(Game::Focus::HEROES == global_focus.Type())
+		    global_focus.GetHeroes().SetMove(false);
+
 		if(!myKingdom.HeroesMayStillMove() ||
 		    Dialog::YES == Dialog::Message("", "One or more heroes may still move, are you sure you want to end your turn?", Font::BIG, Dialog::YES | Dialog::NO))
 	    	    break;
@@ -1267,11 +1277,9 @@ Game::menu_t Game::HumanTurn(void)
 		    {
 			AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
 			Game::EnvironmentSoundMixer();
-            		statusWindow.Redraw();
-            		selectHeroes.Redraw(&hero);
             		gamearea.Center(global_focus.Center());
-        		radar.RedrawArea(conf.MyColor());
-        		radar.RedrawCursor();
+            		global_focus.Reset(Focus::HEROES);
+            		global_focus.Redraw();
 
 			cursor.SetThemes(GetCursor(world.GetTiles(gamearea.GetIndexFromMousePoint(le.MouseCursor()))));
 		    }

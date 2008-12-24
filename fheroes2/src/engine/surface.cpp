@@ -181,12 +181,8 @@ void Surface::LoadPalette(void)
 void Surface::SetDisplayFormat(void)
 {
     SDL_Surface *osurface = surface;
-
     surface = (osurface->flags & SDL_SRCALPHA ? SDL_DisplayFormatAlpha(osurface) : SDL_DisplayFormat(osurface));
-
-    if(!surface) Error::Warning("Surface::SetDisplayFormat: empty surface, error:" + std::string(SDL_GetError()));
-
-    SDL_FreeSurface(osurface);
+    if(osurface) SDL_FreeSurface(osurface);
 }
 
 u32 Surface::GetColor(u16 index) const

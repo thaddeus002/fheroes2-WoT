@@ -51,17 +51,17 @@ bool Cursor::SetThemes(const Cursor::themes_t name)
 	{
 	    case 0x3000:
 		SetSprite(AGG::GetICN(ICN::SPELCO, 0xFF & name));
-		if(H2Config::Debug()) Error::Verbose("Cursor::Set: SPELCO.ICN, ", 0xFF & name);
+		if(2 < Settings::Get().Debug()) Error::Verbose("Cursor::Set: SPELCO.ICN, ", 0xFF & name);
 		break;
 	    
 	    case 0x2000:
 		SetSprite(AGG::GetICN(ICN::CMSECO, 0xFF & name));
-		if(H2Config::Debug()) Error::Verbose("Cursor::Set: CMSECO.ICN, ", 0xFF & name);
+		if(2 < Settings::Get().Debug()) Error::Verbose("Cursor::Set: CMSECO.ICN, ", 0xFF & name);
 		break;
 	    
 	    case 0x1000:
 		SetSprite(AGG::GetICN(ICN::ADVMCO, 0xFF & name));
-		if(H2Config::Debug()) Error::Verbose("Cursor::Set: ADVMCO.ICN, ", 0xFF & name);
+		if(2 < Settings::Get().Debug()) Error::Verbose("Cursor::Set: ADVMCO.ICN, ", 0xFF & name);
 		break;
 
 	    default:

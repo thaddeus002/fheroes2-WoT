@@ -46,7 +46,7 @@ void Game::Focus::Set(const Heroes *hr)
 {
     if(NULL == hr) return;
 
-    if(heroes)
+    if(heroes && hr != heroes)
     {
 	const_cast<Heroes *>(heroes)->SetMove(false);
         const_cast<Heroes *>(heroes)->ShowPath(false);
@@ -101,10 +101,15 @@ void Game::Focus::Set(const Castle *cs)
 void Game::Focus::Reset(const focus_t priority)
 {
     Kingdom & myKingdom = world.GetMyKingdom();
+    SelectBarHeroes::Get().Reset();
+    SelectBarCastle::Get().Reset();
 
     switch(priority)
     {
 	case HEROES:
+	    if(heroes->GetColor() == Settings::Get().MyColor())
+        	Set(heroes);
+	    else
 	    if(myKingdom.GetHeroes().size())
         	Set(myKingdom.GetHeroes().front());
 	    else
@@ -114,10 +119,16 @@ void Game::Focus::Reset(const focus_t priority)
                 Set(myKingdom.GetCastles().front());
             }
             else
-                Reset();
+	    {
+	    	castle = NULL;
+		heroes = NULL;
+	    }
 	    break;
 
 	case CASTLE:
+	    if(castle->GetColor() == Settings::Get().MyColor())
+        	Set(castle);
+	    else
 	    if(myKingdom.GetCastles().size())
         	Set(myKingdom.GetCastles().front());
 	    else
@@ -127,14 +138,15 @@ void Game::Focus::Reset(const focus_t priority)
                 Set(myKingdom.GetHeroes().front());
             }
             else
-                Reset();
+	    {
+		castle = NULL;
+		heroes = NULL;
+	    }
 	    break;
 
 	default:
 	    castle = NULL;
 	    heroes = NULL;
-	    SelectBarHeroes::Get().Reset();
-	    SelectBarCastle::Get().Reset();
 	    break;
     }
 }

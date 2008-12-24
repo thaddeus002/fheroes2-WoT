@@ -99,7 +99,7 @@ void LuckIndicator::Redraw(void)
     luck = hero.GetLuckWithModificators(&lists);
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > luck ? 3 : (0 < luck ? 2 : 6)));
     const u8 inter = 6;
-    u8 count = (0 == luck ? 1 : std::abs((double)luck));
+    u8 count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 
@@ -134,7 +134,7 @@ void MoraleIndicator::Redraw(void)
     morale = hero.GetMoraleWithModificators(&lists);
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
     const u8 inter = 6;
-    u8 count = (0 == morale ? 1 : std::abs((double)morale));
+    u8 count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 
