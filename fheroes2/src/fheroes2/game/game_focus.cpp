@@ -107,7 +107,7 @@ void Game::Focus::Reset(const focus_t priority)
     switch(priority)
     {
 	case HEROES:
-	    if(heroes->GetColor() == Settings::Get().MyColor())
+	    if(heroes && heroes->GetColor() == Settings::Get().MyColor())
         	Set(heroes);
 	    else
 	    if(myKingdom.GetHeroes().size())
@@ -126,7 +126,7 @@ void Game::Focus::Reset(const focus_t priority)
 	    break;
 
 	case CASTLE:
-	    if(castle->GetColor() == Settings::Get().MyColor())
+	    if(castle && castle->GetColor() == Settings::Get().MyColor())
         	Set(castle);
 	    else
 	    if(myKingdom.GetCastles().size())
