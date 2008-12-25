@@ -1,5 +1,7 @@
 SVN - up to r800
 
+December 25, 2008 - Development build r807
+
 Users
 
 + Heroes now level up and learn new skills based on race tables from
