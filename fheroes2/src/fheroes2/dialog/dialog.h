@@ -100,7 +100,7 @@ namespace Dialog
     void ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs);
 
     // redistribute count
-    u16 SelectCount(const std::string &header, u16 min, u16 max, u16 cur);
+    bool SelectCount(const std::string &header, u16 min, u16 max, u16 & res);
 
     // recruit monster
     u16 RecruitMonster(const Monster & monster, u16 available);

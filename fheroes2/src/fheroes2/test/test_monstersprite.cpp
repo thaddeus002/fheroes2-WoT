@@ -86,49 +86,65 @@ void TestMonsterSprite(void)
 
 	if(le.MouseClickLeft(pos))
 	{
-            cursor.Hide();
-	    monster.Set(Monster::FromInt(Dialog::SelectCount("Monster", Monster::PEASANT, Monster::WATER_ELEMENT, monster())));
-	    start = 0;
-	    count = AGG::GetICNCount(monster.ICNFile());
-	    frame = 0;
-            cursor.Show();
-            display.Flip();
+            u16 mons = monster();
+            if(Dialog::SelectCount("Monster", Monster::PEASANT, Monster::WATER_ELEMENT, mons))
+	    {
+        	cursor.Hide();
+		monster.Set(Monster::FromInt(mons));
+		start = 0;
+		count = AGG::GetICNCount(monster.ICNFile());
+		frame = 0;
+        	cursor.Show();
+        	display.Flip();
+	    }
 	}
 
 	if(le.MouseClickLeft(start_bar.GetRect()))
 	{
-            cursor.Hide();
-	    start = Dialog::SelectCount("Start", 0, AGG::GetICNCount(monster.ICNFile()) - 1, start);
-	    if(start + count > AGG::GetICNCount(monster.ICNFile())) count = AGG::GetICNCount(monster.ICNFile()) - start;
-	    str.clear();
-	    String::AddInt(str, start);
-	    start_bar.ShowMessage("start: " + str);
-            cursor.Show();
-            display.Flip();
+	    u16 start2 = start;
+	    if(Dialog::SelectCount("Start", 0, AGG::GetICNCount(monster.ICNFile()) - 1, start2))
+	    {
+        	cursor.Hide();
+		start = start2;
+		if(start + count > AGG::GetICNCount(monster.ICNFile())) count = AGG::GetICNCount(monster.ICNFile()) - start;
+		str.clear();
+		String::AddInt(str, start);
+		start_bar.ShowMessage("start: " + str);
+        	cursor.Show();
+        	display.Flip();
+    	    }
 	}
 
 	if(le.MouseClickLeft(count_bar.GetRect()))
 	{
-            cursor.Hide();
-	    count = Dialog::SelectCount("Count", 1, AGG::GetICNCount(monster.ICNFile()), count);
-	    frame = start;
-	    str.clear();
-	    String::AddInt(str, count);
-	    count_bar.ShowMessage("count: " + str);
-            cursor.Show();
-            display.Flip();
+	    u16 count2 = count;
+	    if(Dialog::SelectCount("Count", 1, AGG::GetICNCount(monster.ICNFile()), count2))
+	    {
+        	cursor.Hide();
+		count = count2;
+		frame = start;
+		str.clear();
+		String::AddInt(str, count);
+		count_bar.ShowMessage("count: " + str);
+        	cursor.Show();
+        	display.Flip();
+	    }
 	}
 
 	if(le.MouseClickLeft(speed_bar.GetRect()))
 	{
-            cursor.Hide();
-	    speed = Dialog::SelectCount("Speed", 1, 50, speed);
-	    frame = start;
-	    str.clear();
-	    String::AddInt(str, speed);
-	    speed_bar.ShowMessage("speed: " + str);
-            cursor.Show();
-            display.Flip();
+	    u16 speed2 = speed;
+	    if(Dialog::SelectCount("Speed", 1, 50, speed2))
+	    {
+        	cursor.Hide();
+		speed = speed2;
+		frame = start;
+		str.clear();
+		String::AddInt(str, speed);
+		speed_bar.ShowMessage("speed: " + str);
+        	cursor.Show();
+        	display.Flip();
+	    }
 	}
 
         if(Game::ShouldAnimateInfrequent(ticket, speed))

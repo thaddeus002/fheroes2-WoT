@@ -313,9 +313,8 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	{
 	    const s8 index2 = bar.Selected();
 	    Army::Troop & troop2 = bar.army->At(index2);
-	    const u16 redistr_count = Dialog::SelectCount("Move how many troops?", 1, troop2.Count(), troop2.Count() / 2);
-
-	    if(redistr_count)
+	    u16 redistr_count = troop2.Count() / 2;
+	    if(Dialog::SelectCount("Move how many troops?", 1, troop2.Count() - 1, redistr_count))
 	    {
 		troop1.Set(troop2, redistr_count);
 		troop2.SetCount(troop2.Count() - redistr_count);
@@ -393,9 +392,8 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    else
 	    // empty troops - redistribute troops
 	    {
-		const u16 redistr_count = Dialog::SelectCount("Move how many troops?", 1, troop2.Count(), troop2.Count() / 2);
-
-		if(redistr_count)
+		u16 redistr_count = troop2.Count() / 2;
+		if(Dialog::SelectCount("Move how many troops?", 1, troop2.Count() - 1, redistr_count))
 		{
 		    troop1.Set(troop2, redistr_count);
 		    troop2.SetCount(troop2.Count() - redistr_count);
@@ -461,9 +459,8 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    else
 	    // empty troops - redistribute troops
 	    {
-		const u16 redistr_count = Dialog::SelectCount("Move how many troops?", 1, troop2.Count(), troop2.Count() / 2);
-
-		if(redistr_count)
+		u16 redistr_count = troop2.Count() / 2;
+		if(Dialog::SelectCount("Move how many troops?", 1, troop2.Count() - 1, redistr_count))
 		{
 		    troop1.Set(troop2, redistr_count);
 		    troop2.SetCount(troop2.Count() - redistr_count);

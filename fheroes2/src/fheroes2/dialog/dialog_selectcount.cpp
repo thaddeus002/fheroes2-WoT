@@ -24,7 +24,7 @@
 #include "button.h"
 #include "dialog.h"
 
-u16 Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 cur)
+bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 {
     Display & display = Display::Get();
 
@@ -143,9 +143,9 @@ u16 Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 cur)
 	    display.Flip();
 	}
 
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) break;
-	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ cur = 0; break; }
+        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)){ cursor.Hide(); return true; }
+	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ cur = 0;  break; }
     }
     cursor.Hide();
-    return cur;
+    return false;
 }
