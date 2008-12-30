@@ -1433,11 +1433,30 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
 void Heroes::FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const
 {
     std::vector<Skill::Secondary::skill_t> exclude_skills;
-    exclude_skills.reserve(HEROESMAXSKILL);
+    exclude_skills.reserve(MAXSECONDARYSKILL);
 
     std::vector<Skill::Secondary>::const_iterator it1 = secondary_skills.begin();
     std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
     for(; it1 != it2; ++it1) if((*it1).Level() == Skill::Level::EXPERT) exclude_skills.push_back((*it1).Skill());
+
+    // is full, add other.
+    if(HEROESMAXSKILL <= secondary_skills.size())
+    {
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::PATHFINDING)) exclude_skills.push_back(Skill::Secondary::PATHFINDING);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::ARCHERY)) exclude_skills.push_back(Skill::Secondary::ARCHERY);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::LOGISTICS)) exclude_skills.push_back(Skill::Secondary::LOGISTICS);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::SCOUTING)) exclude_skills.push_back(Skill::Secondary::SCOUTING);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::DIPLOMACY)) exclude_skills.push_back(Skill::Secondary::DIPLOMACY);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::NAVIGATION)) exclude_skills.push_back(Skill::Secondary::NAVIGATION);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::LEADERSHIP)) exclude_skills.push_back(Skill::Secondary::LEADERSHIP);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM)) exclude_skills.push_back(Skill::Secondary::WISDOM);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::MYSTICISM)) exclude_skills.push_back(Skill::Secondary::MYSTICISM);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::LUCK)) exclude_skills.push_back(Skill::Secondary::LUCK);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::BALLISTICS)) exclude_skills.push_back(Skill::Secondary::BALLISTICS);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::EAGLEEYE)) exclude_skills.push_back(Skill::Secondary::EAGLEEYE);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::NECROMANCY)) exclude_skills.push_back(Skill::Secondary::NECROMANCY);
+	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::ESTATES)) exclude_skills.push_back(Skill::Secondary::ESTATES);
+    }
 
     sec1.SetSkill(Skill::Secondary::PriorityFromRace(GetRace(), exclude_skills));
     exclude_skills.push_back(sec1.Skill());
@@ -1468,7 +1487,8 @@ void Heroes::LevelUp(bool autoselect)
     Skill::Secondary sec1;
     Skill::Secondary sec2;
 
-    if(HEROESMAXSKILL > secondary_skills.size()) FindSkillsForLevelUp(sec1, sec2);
+    FindSkillsForLevelUp(sec1, sec2);
+    if(1 < Settings::Get().Debug()) Error::Verbose("Heroes::LevelUp: " + Skill::Secondary::String(sec1.Skill()) + " or " + Skill::Secondary::String(sec2.Skill()));
 
     std::string header;
     std::string message;
