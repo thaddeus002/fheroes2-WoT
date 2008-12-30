@@ -227,6 +227,15 @@ void AIToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
         default: break;
     }
 
+    switch(obj)
+    {
+        case MP2::OBJ_CAMPFIRE:
+	    resource.gold += 100 * count;
+    	    break;
+
+        default: break;
+    }
+
     world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     tile.RemoveObjectSprite();
 

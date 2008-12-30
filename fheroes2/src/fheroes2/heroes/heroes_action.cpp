@@ -602,8 +602,6 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
 
     PlayPickupSound();
     AnimationRemoveObject(tile);
-
-    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     tile.RemoveObjectSprite();
 
     // dialog
@@ -624,6 +622,7 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	default: break;
     }
+    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     tile.SetObject(MP2::OBJ_ZERO);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToPickupResource: " + hero.GetName() + " pickup small resource");
