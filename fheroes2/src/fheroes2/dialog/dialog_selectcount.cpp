@@ -90,6 +90,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     buttonOk.Draw();
     buttonCancel.Draw();
 
+    bool zero = false;
     cursor.Show();
     display.Flip();
 
@@ -100,6 +101,83 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
 	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
+
+	if(le.KeyPress(KEY_BACKSPACE))
+	{
+	    if(min < cur)
+	    {
+		cur /= 10;
+		if(cur < min)
+		{
+		    cur = min;
+		    zero = true;
+		}
+	    }
+
+	    cursor.Hide();
+	    pt.x = pos.x + 80;
+	    pt.y = pos.y + 55;
+	    display.Blit(sprite_edit, pt);
+
+	    message.clear();
+	    String::AddInt(message, cur);
+	    text.Set(message);
+	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
+	    pt.y = pos.y + 56;
+	    text.Blit(pt);
+	    cursor.Show();
+	    display.Flip();
+	}
+
+	if(le.KeyPress(KEY_0) ||
+	   le.KeyPress(KEY_1) ||
+	   le.KeyPress(KEY_2) ||
+	   le.KeyPress(KEY_3) ||
+	   le.KeyPress(KEY_4) ||
+	   le.KeyPress(KEY_5) ||
+	   le.KeyPress(KEY_6) ||
+	   le.KeyPress(KEY_7) ||
+	   le.KeyPress(KEY_8) ||
+	   le.KeyPress(KEY_9))
+	{
+	    if(max > cur)
+	    {
+		if(zero)
+		{
+		    cur = 0;
+		    zero = false;
+		}
+		cur *= 10;
+		switch(le.KeyValue())
+		{
+		    case KEY_1:	cur += 1; break;
+		    case KEY_2:	cur += 2; break;
+		    case KEY_3:	cur += 3; break;
+		    case KEY_4:	cur += 4; break;
+		    case KEY_5:	cur += 5; break;
+		    case KEY_6:	cur += 6; break;
+		    case KEY_7:	cur += 7; break;
+		    case KEY_8:	cur += 8; break;
+		    case KEY_9:	cur += 9; break;
+		    default: break;
+		}
+		if(cur > max) cur = max;
+	    }
+
+	    cursor.Hide();
+	    pt.x = pos.x + 80;
+	    pt.y = pos.y + 55;
+	    display.Blit(sprite_edit, pt);
+
+	    message.clear();
+	    String::AddInt(message, cur);
+	    text.Set(message);
+	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
+	    pt.y = pos.y + 56;
+	    text.Blit(pt);
+	    cursor.Show();
+	    display.Flip();
+	}
 
 	// up
 	if((le.MouseWheelUp(pos) ||

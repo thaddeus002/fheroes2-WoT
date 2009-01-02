@@ -57,6 +57,7 @@ enum KeySym
     KEY_RIGHT,
     KEY_UP,
     KEY_DOWN,
+    KEY_0,
     KEY_1,
     KEY_2,
     KEY_3,
@@ -146,7 +147,8 @@ public:
     bool MouseCursor(const Rect &rt) const;
 
     bool KeyPress(KeySym key) const;
-    
+    KeySym KeyValue(void) const;
+
 private:
     LocalEvent();
 

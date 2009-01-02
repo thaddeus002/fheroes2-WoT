@@ -40,7 +40,7 @@ Point LocalEvent::mouse_rr(-1, -1);
 KeySym LocalEvent::key_value = KEY_NONE;
 void (* LocalEvent::redraw_cursor_func)(u16, u16) = NULL;
 
-static KeySym SDLToKeySym(SDLKey &key)
+static KeySym SDLToKeySym(SDLKey key)
 {
     switch(key)
     {
@@ -71,6 +71,7 @@ static KeySym SDLToKeySym(SDLKey &key)
 	case SDLK_RIGHT:	return KEY_RIGHT;
 	case SDLK_UP:		return KEY_UP;
 	case SDLK_DOWN:		return KEY_DOWN;
+	case SDLK_0:		return KEY_0;
 	case SDLK_1:		return KEY_1;
 	case SDLK_2:		return KEY_2;
 	case SDLK_3:		return KEY_3;
@@ -391,6 +392,11 @@ const Point & LocalEvent::MouseCursor(void)
     mouse_cu.y = y;
 
     return mouse_cu;
+}
+
+KeySym LocalEvent::KeyValue(void) const
+{
+    return key_value;
 }
 
 bool LocalEvent::KeyPress(KeySym key) const
