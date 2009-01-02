@@ -37,21 +37,11 @@ namespace Resource
         GOLD	= 0x40,
     } resource_t;
 
-//    typedef enum {
-//	WATERCHEST,
-//	TREASURECHEST,
-//	ANCIENTLAMP,
-//	CAMPFIRE,
-//	SHIPWRECKSURVIROR,
-//	FLOTSAM,
-//	BOTTLE,
-//    } other_t;
-
     class funds_t
     {
     public:
 	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};
-	funds_t(const resource_t rs, u32 count);
+	funds_t(u8 rs, u32 count);
 
 	const funds_t operator+ (const funds_t &pm) const;
 	const funds_t operator* (u32 mul) const;

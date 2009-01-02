@@ -1408,7 +1408,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
     const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
 
     bool conditions = false;
-    const u8 c = tile.GetQuantity2();
+    const u8 c = 0x0f & tile.GetQuantity2();
 
     switch(obj)
     {
@@ -1425,7 +1425,33 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		case 2:
 		case 3:
 		{
-		    const Resource::resource_t r = Resource::Rand();
+		    u8 type = tile.GetQuantity2() >> 4;
+		    Resource::resource_t r = Resource::UNKNOWN;
+
+		    switch(type)
+		    {
+			case 1: r = Resource::WOOD; break;
+        		case 2: r = Resource::MERCURY; break;
+        		case 3: r = Resource::ORE; break;
+        		case 4: r = Resource::SULFUR; break;
+        		case 5: r = Resource::CRYSTAL; break;
+        		case 6: r = Resource::GEMS; break;
+			default:
+			    r = Resource::Rand();
+			    // store variants
+			    switch(r)
+			    {
+				case Resource::WOOD: tile.SetQuantity2(0x10 + c); break;
+        			case Resource::MERCURY: tile.SetQuantity2(0x20 + c); break;
+        			case Resource::ORE: tile.SetQuantity2(0x30 + c); break;
+        			case Resource::SULFUR: tile.SetQuantity2(0x40 + c); break;
+        			case Resource::CRYSTAL: tile.SetQuantity2(0x50 + c); break;
+        			case Resource::GEMS: tile.SetQuantity2(0x60 + c); break;
+				default: break;
+			    }
+			    break;
+		    }
+
 		    std::string header = "A leprechaun offers you the " + Artifact::String(art) + " for the small price of ";
 		    Resource::funds_t payment;
 		    if(1 == c)
@@ -1442,7 +1468,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    }
 		    else
 		    {
-			header += "3000 Gold and 3 " + Resource::String(r) + ".";
+			header += "3000 Gold and 5 " + Resource::String(r) + ".";
 			payment += Resource::funds_t(Resource::GOLD, 3000);
 			payment += Resource::funds_t(r, 5);
 		    }

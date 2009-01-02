@@ -23,7 +23,7 @@
 #include "agg.h"
 #include "resource.h"
 
-Resource::funds_t::funds_t(const resource_t rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
+Resource::funds_t::funds_t(u8 rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
 {
     switch(rs)
     {
