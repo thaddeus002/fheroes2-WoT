@@ -18,14 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "agg.h"
+#include <string>
+#include <vector>
+#include <bitset>
 #include "settings.h"
 #include "world.h"
 #include "artifact.h"
 
-namespace Artifact {
+namespace Artifact
+{
+    static std::bitset<UNKNOWN + 1> used(0);
 
-    static const stats_t all_artifacts[] = {
+    static struct
+    {
+        const std::string name;
+        const std::string description;
+    } all_artifacts[] = {
 	{ "Ultimate Book", "The Ultimate Book of Knowledge increases your knowledge by 12." },
 	{ "Ultimate Sword", "The Ultimate Sword of Dominion increases your attack skill by 12." },
 	{ "Ultimate Cloak", "The Ultimate Cloak of Protection increases your defense skill by 12." },
@@ -246,11 +254,8 @@ Artifact::artifact_t Artifact::Artifact(u8 index)
 	case 0x65: return SWORD_ANDURAN;
 	case 0x66: return SPADE_NECROMANCY;
 
-	case 0xFF: return UNKNOWN;
-
 	// not used
-	default:
-	    Error::Warning("Artifact::Artifact: unknown: ", index);
+	default: break;
     }
     
     return Artifact::UNKNOWN;
@@ -302,21 +307,8 @@ Artifact::artifact_t Artifact::RandUltimate(void)
     return Artifact::GOLDEN_GOOSE;
 }
 
-Artifact::artifact_t Artifact::Rand(MP2::object_t object)
-{
-    switch(object)
-    {
-	case MP2::OBJ_RNDARTIFACT1: return Rand1();
-	case MP2::OBJ_RNDARTIFACT2: return Rand2();
-	case MP2::OBJ_RNDARTIFACT3: return Rand3();
-	default: break;
-    }
-    
-    return Rand();
-}
-
 /* get rand all artifact */
-Artifact::artifact_t Artifact::Rand(void)
+Artifact::artifact_t Artifact::Rand(bool uniq)
 {
     switch(Rand::Get(1, 3))
     {
@@ -329,103 +321,203 @@ Artifact::artifact_t Artifact::Rand(void)
 }
 
 /* get rand level 1 artifact */
-Artifact::artifact_t Artifact::Rand1(void)
+Artifact::artifact_t Artifact::Rand1(bool uniq)
 {
-    switch(Rand::Get(1, 27))
+    std::vector<artifact_t> arts;
+    arts.reserve(27);
+
+    if(uniq)
     {
-        case 1: return Artifact::MEDAL_VALOR;
-        case 2: return Artifact::MEDAL_COURAGE;
-        case 3: return Artifact::MEDAL_HONOR;
-        case 4: return Artifact::MEDAL_DISTINCTION;
-        case 5: return Artifact::THUNDER_MACE;
-        case 6: return Artifact::ARMORED_GAUNTLETS;
-        case 7: return Artifact::DEFENDER_HELM;
-        case 8: return Artifact::GIANT_FLAIL;
-        case 9: return Artifact::RABBIT_FOOT;
-        case 10: return Artifact::GOLDEN_HORSESHOE;
-        case 11: return Artifact::GAMBLER_LUCKY_COIN;
-        case 12: return Artifact::FOUR_LEAF_CLOVER;
-        case 13: return Artifact::ENCHANTED_HOURGLASS;
-        case 14: return Artifact::ICE_CLOAK;
-        case 15: return Artifact::FIRE_CLOAK;
-        case 16: return Artifact::LIGHTNING_HELM;
-        case 17: return Artifact::SNAKE_RING;
-        case 18: return Artifact::HOLY_PENDANT;
-        case 19: return Artifact::PENDANT_FREE_WILL;
-        case 20: return Artifact::PENDANT_LIFE;
-        case 21: return Artifact::PENDANT_DEATH;
-        case 22: return Artifact::GOLDEN_BOW;
-        case 23: return Artifact::TELESCOPE;
-        case 24: return Artifact::SERENITY_PENDANT;
-        case 25: return Artifact::STATESMAN_QUILL;
-        case 26: return Artifact::KINETIC_PENDANT;
-	default: break;
+        if(!used.test(MEDAL_VALOR)) arts.push_back(MEDAL_VALOR);
+        if(!used.test(MEDAL_COURAGE)) arts.push_back(MEDAL_COURAGE);
+        if(!used.test(MEDAL_HONOR)) arts.push_back(MEDAL_HONOR);
+        if(!used.test(MEDAL_DISTINCTION)) arts.push_back(MEDAL_DISTINCTION);
+        if(!used.test(THUNDER_MACE)) arts.push_back(THUNDER_MACE);
+        if(!used.test(ARMORED_GAUNTLETS)) arts.push_back(ARMORED_GAUNTLETS);
+        if(!used.test(DEFENDER_HELM)) arts.push_back(DEFENDER_HELM);
+        if(!used.test(GIANT_FLAIL)) arts.push_back(GIANT_FLAIL);
+        if(!used.test(RABBIT_FOOT)) arts.push_back(RABBIT_FOOT);
+        if(!used.test(GOLDEN_HORSESHOE)) arts.push_back(GOLDEN_HORSESHOE);
+        if(!used.test(GAMBLER_LUCKY_COIN)) arts.push_back(GAMBLER_LUCKY_COIN);
+        if(!used.test(FOUR_LEAF_CLOVER)) arts.push_back(FOUR_LEAF_CLOVER);
+        if(!used.test(ENCHANTED_HOURGLASS)) arts.push_back(ENCHANTED_HOURGLASS);
+        if(!used.test(ICE_CLOAK)) arts.push_back(ICE_CLOAK);
+        if(!used.test(FIRE_CLOAK)) arts.push_back(FIRE_CLOAK);
+        if(!used.test(LIGHTNING_HELM)) arts.push_back(LIGHTNING_HELM);
+        if(!used.test(SNAKE_RING)) arts.push_back(SNAKE_RING);
+        if(!used.test(HOLY_PENDANT)) arts.push_back(HOLY_PENDANT);
+        if(!used.test(PENDANT_FREE_WILL)) arts.push_back(PENDANT_FREE_WILL);
+        if(!used.test(PENDANT_LIFE)) arts.push_back(PENDANT_LIFE);
+        if(!used.test(PENDANT_DEATH)) arts.push_back(PENDANT_DEATH);
+        if(!used.test(GOLDEN_BOW)) arts.push_back(GOLDEN_BOW);
+        if(!used.test(TELESCOPE)) arts.push_back(TELESCOPE);
+        if(!used.test(SERENITY_PENDANT)) arts.push_back(SERENITY_PENDANT);
+        if(!used.test(STATESMAN_QUILL)) arts.push_back(STATESMAN_QUILL);
+        if(!used.test(KINETIC_PENDANT)) arts.push_back(KINETIC_PENDANT);
+	if(!used.test(SEEING_EYE_PENDANT)) arts.push_back(SEEING_EYE_PENDANT);
+    }
+    else
+    {
+        arts.push_back(MEDAL_VALOR);
+        arts.push_back(MEDAL_COURAGE);
+        arts.push_back(MEDAL_HONOR);
+        arts.push_back(MEDAL_DISTINCTION);
+        arts.push_back(THUNDER_MACE);
+        arts.push_back(ARMORED_GAUNTLETS);
+        arts.push_back(DEFENDER_HELM);
+        arts.push_back(GIANT_FLAIL);
+        arts.push_back(RABBIT_FOOT);
+        arts.push_back(GOLDEN_HORSESHOE);
+        arts.push_back(GAMBLER_LUCKY_COIN);
+        arts.push_back(FOUR_LEAF_CLOVER);
+        arts.push_back(ENCHANTED_HOURGLASS);
+        arts.push_back(ICE_CLOAK);
+        arts.push_back(FIRE_CLOAK);
+        arts.push_back(LIGHTNING_HELM);
+        arts.push_back(SNAKE_RING);
+        arts.push_back(HOLY_PENDANT);
+        arts.push_back(PENDANT_FREE_WILL);
+        arts.push_back(PENDANT_LIFE);
+        arts.push_back(PENDANT_DEATH);
+        arts.push_back(GOLDEN_BOW);
+        arts.push_back(TELESCOPE);
+        arts.push_back(SERENITY_PENDANT);
+        arts.push_back(STATESMAN_QUILL);
+        arts.push_back(KINETIC_PENDANT);
+	arts.push_back(SEEING_EYE_PENDANT);
     }
 
-    return Artifact::SEEING_EYE_PENDANT;
+    if(arts.empty()) return Rand1(false);
+    const artifact_t res = *Rand::Get(arts);
+    used.set(res);
+
+    return res;
 }
 
 /* get rand level 2 artifact */
-Artifact::artifact_t Artifact::Rand2(void)
+Artifact::artifact_t Artifact::Rand2(bool uniq)
 {
-    switch(Rand::Get(1, 21))
+    std::vector<artifact_t> arts;
+    arts.reserve(21);
+
+    if(uniq)
     {
-        case 1: return Artifact::CASTER_BRACELET;
-        case 2: return Artifact::MAGE_RING;
-        case 3: return Artifact::STEALTH_SHIELD;
-        case 4: return Artifact::POWER_AXE;
-        case 5: return Artifact::MINOR_SCROLL;
-        case 6: return Artifact::ENDLESS_PURSE_GOLD;
-        case 7: return Artifact::SAILORS_ASTROLABE_MOBILITY;
-        case 8: return Artifact::ENDLESS_CORD_WOOD;
-        case 9: return Artifact::ENDLESS_CART_ORE;
-        case 10: return Artifact::SPIKED_HELM;
-        case 11: return Artifact::WHITE_PEARL;
-        case 12: return Artifact::EVIL_EYE;
-        case 13: return Artifact::GOLD_WATCH;
-        case 14: return Artifact::ANKH;
-        case 15: return Artifact::BOOK_ELEMENTS;
-        case 16: return Artifact::ELEMENTAL_RING;
-        case 17: return Artifact::SKULLCAP;
-        case 18: return Artifact::EVERCOLD_ICICLE;
-        case 19: return Artifact::POWER_RING;
-        case 20: return Artifact::AMMO_CART;
-	default: break;
+        if(!used.test(CASTER_BRACELET)) arts.push_back(CASTER_BRACELET);
+        if(!used.test(MAGE_RING)) arts.push_back(MAGE_RING);
+        if(!used.test(STEALTH_SHIELD)) arts.push_back(STEALTH_SHIELD);
+        if(!used.test(POWER_AXE)) arts.push_back(POWER_AXE);
+        if(!used.test(MINOR_SCROLL)) arts.push_back(MINOR_SCROLL);
+        if(!used.test(ENDLESS_PURSE_GOLD)) arts.push_back(ENDLESS_PURSE_GOLD);
+        if(!used.test(SAILORS_ASTROLABE_MOBILITY)) arts.push_back(SAILORS_ASTROLABE_MOBILITY);
+        if(!used.test(ENDLESS_CORD_WOOD)) arts.push_back(ENDLESS_CORD_WOOD);
+        if(!used.test(ENDLESS_CART_ORE)) arts.push_back(ENDLESS_CART_ORE);
+        if(!used.test(SPIKED_HELM)) arts.push_back(SPIKED_HELM);
+        if(!used.test(WHITE_PEARL)) arts.push_back(WHITE_PEARL);
+        if(!used.test(EVIL_EYE)) arts.push_back(EVIL_EYE);
+        if(!used.test(GOLD_WATCH)) arts.push_back(GOLD_WATCH);
+        if(!used.test(ANKH)) arts.push_back(ANKH);
+        if(!used.test(BOOK_ELEMENTS)) arts.push_back(BOOK_ELEMENTS);
+        if(!used.test(ELEMENTAL_RING)) arts.push_back(ELEMENTAL_RING);
+        if(!used.test(SKULLCAP)) arts.push_back(SKULLCAP);
+        if(!used.test(EVERCOLD_ICICLE)) arts.push_back(EVERCOLD_ICICLE);
+        if(!used.test(POWER_RING)) arts.push_back(POWER_RING);
+        if(!used.test(AMMO_CART)) arts.push_back(AMMO_CART);
+        if(!used.test(EVERHOT_LAVA_ROCK)) arts.push_back(EVERHOT_LAVA_ROCK);
     }
-    
-    return Artifact::EVERHOT_LAVA_ROCK;
+    else
+    {
+        arts.push_back(CASTER_BRACELET);
+        arts.push_back(MAGE_RING);
+        arts.push_back(STEALTH_SHIELD);
+        arts.push_back(POWER_AXE);
+        arts.push_back(MINOR_SCROLL);
+        arts.push_back(ENDLESS_PURSE_GOLD);
+        arts.push_back(SAILORS_ASTROLABE_MOBILITY);
+        arts.push_back(ENDLESS_CORD_WOOD);
+        arts.push_back(ENDLESS_CART_ORE);
+        arts.push_back(SPIKED_HELM);
+        arts.push_back(WHITE_PEARL);
+        arts.push_back(EVIL_EYE);
+        arts.push_back(GOLD_WATCH);
+        arts.push_back(ANKH);
+        arts.push_back(BOOK_ELEMENTS);
+        arts.push_back(ELEMENTAL_RING);
+        arts.push_back(SKULLCAP);
+        arts.push_back(EVERCOLD_ICICLE);
+        arts.push_back(POWER_RING);
+        arts.push_back(AMMO_CART);
+        arts.push_back(EVERHOT_LAVA_ROCK);
+    }
+
+    if(arts.empty()) return Rand2(false);
+    const artifact_t res = *Rand::Get(arts);
+    used.set(res);
+
+    return res;
 }
 
 /* get rand level 3 artifact */
-Artifact::artifact_t Artifact::Rand3(void)
+Artifact::artifact_t Artifact::Rand3(bool uniq)
 {
-    switch(Rand::Get(1, 22))
+    std::vector<artifact_t> arts;
+    arts.reserve(22);
+
+    if(uniq)
     {
-        case 1: return Artifact::ARCANE_NECKLACE;
-        case 2: return Artifact::WITCHES_BROACH;
-        case 3: return Artifact::BALLISTA;
-        case 4: return Artifact::DRAGON_SWORD;
-        case 5: return Artifact::DIVINE_BREASTPLATE;
-        case 6: return Artifact::MAJOR_SCROLL;
-        case 7: return Artifact::SUPERIOR_SCROLL;
-        case 8: return Artifact::FOREMOST_SCROLL;
-        case 9: return Artifact::ENDLESS_SACK_GOLD;
-        case 10: return Artifact::ENDLESS_BAG_GOLD;
-        case 11: return Artifact::NOMAD_BOOTS_MOBILITY;
-        case 12: return Artifact::TRAVELER_BOOTS_MOBILITY;
-        case 13: return Artifact::TRUE_COMPASS_MOBILITY;
-        case 14: return Artifact::ENDLESS_POUCH_SULFUR;
-        case 15: return Artifact::ENDLESS_POUCH_GEMS;
-        case 16: return Artifact::ENDLESS_POUCH_CRYSTAL;
-        case 17: return Artifact::ENDLESS_VIAL_MERCURY;
-        case 18: return Artifact::SPIKED_SHIELD;
-        case 19: return Artifact::BLACK_PEARL;
-        case 20: return Artifact::LIGHTNING_ROD;
-        case 21: return Artifact::WAND_NEGATION;
-	default: break;
+        if(!used.test(ARCANE_NECKLACE)) arts.push_back(ARCANE_NECKLACE);
+        if(!used.test(WITCHES_BROACH)) arts.push_back(WITCHES_BROACH);
+        if(!used.test(BALLISTA)) arts.push_back(BALLISTA);
+        if(!used.test(DRAGON_SWORD)) arts.push_back(DRAGON_SWORD);
+        if(!used.test(DIVINE_BREASTPLATE)) arts.push_back(DIVINE_BREASTPLATE);
+        if(!used.test(MAJOR_SCROLL)) arts.push_back(MAJOR_SCROLL);
+        if(!used.test(SUPERIOR_SCROLL)) arts.push_back(SUPERIOR_SCROLL);
+        if(!used.test(FOREMOST_SCROLL)) arts.push_back(FOREMOST_SCROLL);
+        if(!used.test(ENDLESS_SACK_GOLD)) arts.push_back(ENDLESS_SACK_GOLD);
+        if(!used.test(ENDLESS_BAG_GOLD)) arts.push_back(ENDLESS_BAG_GOLD);
+        if(!used.test(NOMAD_BOOTS_MOBILITY)) arts.push_back(NOMAD_BOOTS_MOBILITY);
+        if(!used.test(TRAVELER_BOOTS_MOBILITY)) arts.push_back(TRAVELER_BOOTS_MOBILITY);
+        if(!used.test(TRUE_COMPASS_MOBILITY)) arts.push_back(TRUE_COMPASS_MOBILITY);
+        if(!used.test(ENDLESS_POUCH_SULFUR)) arts.push_back(ENDLESS_POUCH_SULFUR);
+        if(!used.test(ENDLESS_POUCH_GEMS)) arts.push_back(ENDLESS_POUCH_GEMS);
+        if(!used.test(ENDLESS_POUCH_CRYSTAL)) arts.push_back(ENDLESS_POUCH_CRYSTAL);
+        if(!used.test(ENDLESS_VIAL_MERCURY)) arts.push_back(ENDLESS_VIAL_MERCURY);
+        if(!used.test(SPIKED_SHIELD)) arts.push_back(SPIKED_SHIELD);
+        if(!used.test(BLACK_PEARL)) arts.push_back(BLACK_PEARL);
+        if(!used.test(LIGHTNING_ROD)) arts.push_back(LIGHTNING_ROD);
+        if(!used.test(WAND_NEGATION)) arts.push_back(WAND_NEGATION);
+        if(!used.test(WIZARD_HAT)) arts.push_back(WIZARD_HAT);
     }
-    
-    return Artifact::WIZARD_HAT;
+    else
+    {
+        arts.push_back(ARCANE_NECKLACE);
+        arts.push_back(WITCHES_BROACH);
+        arts.push_back(BALLISTA);
+        arts.push_back(DRAGON_SWORD);
+        arts.push_back(DIVINE_BREASTPLATE);
+        arts.push_back(MAJOR_SCROLL);
+        arts.push_back(SUPERIOR_SCROLL);
+        arts.push_back(FOREMOST_SCROLL);
+        arts.push_back(ENDLESS_SACK_GOLD);
+        arts.push_back(ENDLESS_BAG_GOLD);
+        arts.push_back(NOMAD_BOOTS_MOBILITY);
+        arts.push_back(TRAVELER_BOOTS_MOBILITY);
+        arts.push_back(TRUE_COMPASS_MOBILITY);
+        arts.push_back(ENDLESS_POUCH_SULFUR);
+        arts.push_back(ENDLESS_POUCH_GEMS);
+        arts.push_back(ENDLESS_POUCH_CRYSTAL);
+        arts.push_back(ENDLESS_VIAL_MERCURY);
+        arts.push_back(SPIKED_SHIELD);
+        arts.push_back(BLACK_PEARL);
+        arts.push_back(LIGHTNING_ROD);
+        arts.push_back(WAND_NEGATION);
+        arts.push_back(WIZARD_HAT);
+    }
+
+    if(arts.empty()) return Rand3(false);
+    const artifact_t res = *Rand::Get(arts);
+    used.set(res);
+
+    return res;
 }
 
 /* return index sprite objnarti.icn */
@@ -582,4 +674,14 @@ bool Artifact::Ultimate(artifact_t art)
 bool Artifact::isValid(artifact_t art)
 {
     return UNKNOWN != art;
+}
+
+u8 Artifact::IndexSprite32(Artifact::artifact_t art)
+{
+    return art;
+}
+
+u8 Artifact::IndexSprite64(Artifact::artifact_t art)
+{
+    return art + 1;
 }

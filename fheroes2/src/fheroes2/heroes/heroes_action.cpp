@@ -84,7 +84,7 @@ u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
     String::AddInt(str, count);
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
-    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art + 1);
+    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art));
     Surface image(gold.w() + border.w() + 50, border.h());
     image.SetColorKey();
     image.Blit(border);
@@ -111,7 +111,7 @@ u16 DialogWithGold(const std::string & hdr, const std::string & msg, const u16 c
 u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK)
 {
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
-    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art + 1);
+    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art));
     Surface image(border.w(), border.h());
     image.Blit(border);
     image.Blit(artifact, 5, 5);

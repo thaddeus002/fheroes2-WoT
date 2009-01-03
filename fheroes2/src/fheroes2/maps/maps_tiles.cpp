@@ -1798,19 +1798,19 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
     {
         case MP2::OBJ_RNDARTIFACT:
             addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT);
-            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT));
+            index = Artifact::GetIndexSprite(Artifact::Rand());
             break;
         case MP2::OBJ_RNDARTIFACT1:
             addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT1);
-            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT1));
+            index = Artifact::GetIndexSprite(Artifact::Rand1());
             break;
         case MP2::OBJ_RNDARTIFACT2:
             addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT2);
-            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT2));
+            index = Artifact::GetIndexSprite(Artifact::Rand2());
             break;
         case MP2::OBJ_RNDARTIFACT3:
             addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT3);
-            index = Artifact::GetIndexSprite(Artifact::Rand(MP2::OBJ_RNDARTIFACT3));
+            index = Artifact::GetIndexSprite(Artifact::Rand3());
             break;
         default: return;
     }

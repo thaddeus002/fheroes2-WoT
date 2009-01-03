@@ -391,7 +391,7 @@ void Army::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
                     {
                         display.Blit(background, backgroundX, backgroundY);
                         AGG::PlaySound(M82::PICKUP01);
-                        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, artifacts->at(artIndex) + 1);
+                        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(artifacts->at(artIndex)));
                         const Sprite & border = AGG::GetICN(ICN::WINLOSEB, 0);
                         std::string artName = Artifact::String(artifacts->at(artIndex));
                         Rect titleRect(backgroundX + background.w() / 8, baseAnimY + animBase.h() + 20, background.w() * 3 / 4, background.h());

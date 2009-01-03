@@ -20,14 +20,12 @@
 #ifndef H2ARTIFACT_H
 #define H2ARTIFACT_H
 
-#include <string>
-#include <vector>
-#include "mp2.h"
 #include "gamedefs.h"
 
 namespace Artifact
 {
-    typedef enum {
+    enum artifact_t
+    {
 	ULTIMATE_BOOK,
 	ULTIMATE_SWORD,
 	ULTIMATE_CLOAK,
@@ -116,6 +114,7 @@ namespace Artifact
 	DUMMY2,
 	DUMMY3,
 	DUMMY4,
+
 	SPELL_SCROLL,
 	ARM_MARTYR,
 	BREASTPLATE_ANDURAN,
@@ -134,22 +133,14 @@ namespace Artifact
 	SWORD_ANDURAN,
 	SPADE_NECROMANCY,
 
-	UNKNOWN
-
-    } artifact_t;
-
-
-    typedef struct {
-        const std::string name;
-        const std::string description;
-    } stats_t;
+	UNKNOWN,
+    };
 
     artifact_t RandUltimate(void);
-    artifact_t Rand(MP2::object_t object);
-    artifact_t Rand(void);
-    artifact_t Rand1(void);
-    artifact_t Rand2(void);
-    artifact_t Rand3(void);
+    artifact_t Rand(bool uniq = true);
+    artifact_t Rand1(bool uniq = true);
+    artifact_t Rand2(bool uniq = true);
+    artifact_t Rand3(bool uniq = true);
 
     const std::string & String(artifact_t artifact);
     const std::string & Description(artifact_t artifact);
@@ -159,7 +150,14 @@ namespace Artifact
 
     bool Ultimate(artifact_t);
     bool isValid(artifact_t);
-    u8 GetIndexSprite(Artifact::artifact_t artifact);
+
+    /* objnarti.icn */
+    u8 GetIndexSprite(artifact_t);
+
+    /* artfx.icn */
+    u8 IndexSprite32(artifact_t);
+    /* artifact.icn */
+    u8 IndexSprite64(artifact_t);
 };
 
 #endif

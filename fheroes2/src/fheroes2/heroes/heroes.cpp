@@ -1270,7 +1270,7 @@ bool Heroes::BuySpellBook(void)
 	Surface sprite(border.w(), border.h());
 
 	sprite.Blit(border);
-	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::MAGIC_BOOK + 1), 5, 5);
+	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(Artifact::MAGIC_BOOK)), 5, 5);
 
 	if(Dialog::NO == Dialog::SpriteInfo(header, "Do you wish to buy one?", sprite, Dialog::YES | Dialog::NO)) return false;
     }
