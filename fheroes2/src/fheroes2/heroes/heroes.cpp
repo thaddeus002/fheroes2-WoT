@@ -719,7 +719,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     {
     	switch(army.GetSlowestTroop().GetSpeed())
 	{
-	    default: Error::Verbose("111111: " + army.GetSlowestTroop().GetName()); break;
+	    default: break;
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;
 	    case Speed::SLOW:		point = 1100; break;
