@@ -354,6 +354,7 @@ void Army::Troop::BattleNewTurn(void)
 	default: break;
     }
     ResetModes(Army::MOVED);
+    ResetModes(Army::SKIPMOVE);
 }
 
 void Army::Troop::Reset(void)
@@ -474,13 +475,18 @@ u16 Army::Troop::GetDamageMax(void) const
 
 u8 Army::Troop::GetSpeed(void) const
 {
-    if(Modes(SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_HYPNOTIZE | SP_STONE)) return Speed::STANDING;
+    if(Modes(BATTLE))
+    {
+	if(!isValid()) return Speed::STANDING;
 
-    if(!Modes(MORALE_GOOD) && Modes(MOVED)) return Speed::STANDING;
+	if(Modes(SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_HYPNOTIZE | SP_STONE)) return Speed::STANDING;
 
-    if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < Monster::GetSpeed() ? Speed::INSTANT : Monster::GetSpeed() + 2);
-    else
-    if(Modes(SP_SLOW)) return (Speed::SLOW > Monster::GetSpeed() ? Speed::CRAWLING : Monster::GetSpeed() - 2);
+	if(!Modes(MORALE_GOOD) && Modes(MOVED)) return Speed::STANDING;
+
+	if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < Monster::GetSpeed() ? Speed::INSTANT : Monster::GetSpeed() + 2);
+	else
+	if(Modes(SP_SLOW)) return (Speed::SLOW > Monster::GetSpeed() ? Speed::CRAWLING : Monster::GetSpeed() - 2);
+    }
 
     return Monster::GetSpeed();
 }
@@ -519,22 +525,22 @@ bool Army::isValidTroop(const Troop & troop)
 
 bool Army::StrongestTroop(const Troop & t1, const Troop & t2)
 {
-    return t1.isValid() && t2.isValid() && (t1.GetDamageMin() > t2.GetDamageMin());
+    return t1.GetDamageMin() > t2.GetDamageMin();
 }
 
 bool Army::WeakestTroop(const Troop & t1, const Troop & t2)
 {
-    return t1.isValid() && t2.isValid() && (t1.GetDamageMax() < t2.GetDamageMax());
+    return t1.GetDamageMax() < t2.GetDamageMax();
 }
 
 bool Army::SlowestTroop(const Troop & t1, const Troop & t2)
-  {
-    return t1.isValid() && t2.isValid() && (t1.GetSpeed() < t2.GetSpeed());
+{
+    return t1.GetSpeed() < t2.GetSpeed();
 }
 
 bool Army::FastestTroop(const Troop & t1, const Troop & t2)
 {
-    return t1.isValid() && t2.isValid() && (t1.GetSpeed() > t2.GetSpeed());
+    return t1.GetSpeed() > t2.GetSpeed();
 }
 
 void Army::SwapTroops(Troop & t1, Troop & t2)

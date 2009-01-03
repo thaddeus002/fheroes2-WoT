@@ -33,6 +33,42 @@
 #include "castle.h"
 #include "army.h"
 
+std::vector<Army::Troop>::iterator MaxElement(std::vector<Army::Troop>::iterator first, std::vector<Army::Troop>::iterator last, bool (*pf)(const Army::Troop &, const Army::Troop &))
+{
+    while(first != last) if(Army::isValidTroop(*first)) break; else ++first;
+    std::vector<Army::Troop>::iterator largest = first;
+    if(first == last) return last;
+    while(++first != last) if(Army::isValidTroop(*first) && pf(*largest, *first)) largest = first;
+    return largest;
+}
+
+std::vector<Army::Troop>::const_iterator MaxElement(std::vector<Army::Troop>::const_iterator first, std::vector<Army::Troop>::const_iterator last, bool (*pf)(const Army::Troop &, const Army::Troop &))
+{
+    while(first != last) if(Army::isValidTroop(*first)) break; else ++first;
+    std::vector<Army::Troop>::const_iterator largest = first;
+    if(first == last) return last;
+    while(++first != last) if(Army::isValidTroop(*first) && pf(*largest, *first)) largest = first;
+    return largest;
+}
+
+std::vector<Army::Troop>::iterator MinElement(std::vector<Army::Troop>::iterator first, std::vector<Army::Troop>::iterator last, bool (*pf)(const Army::Troop &, const Army::Troop &))
+{
+    while(first != last) if(Army::isValidTroop(*first)) break; else ++first;
+    std::vector<Army::Troop>::iterator lowest = first;
+    if(first == last) return last;
+    while(++first != last) if(Army::isValidTroop(*first) && pf(*first, *lowest)) lowest = first;
+    return lowest;
+}
+
+std::vector<Army::Troop>::const_iterator MinElement(std::vector<Army::Troop>::const_iterator first, std::vector<Army::Troop>::const_iterator last, bool (*pf)(const Army::Troop &, const Army::Troop &))
+{
+    while(first != last) if(Army::isValidTroop(*first)) break; else ++first;
+    std::vector<Army::Troop>::const_iterator lowest = first;
+    if(first == last) return last;
+    while(++first != last) if(Army::isValidTroop(*first) && pf(*first, *lowest)) lowest = first;
+    return lowest;
+}
+
 const std::string & Army::String(Army::armysize_t size)
 {
     static const std::string str_size[] = { "Few", "Several", "Pack", "Lots", "Horde", "Throng", "Swarm", "Zounds", "Legion" };
@@ -436,42 +472,42 @@ s8 Army::army_t::GetMoraleWithModificators(std::list<std::string> *list) const
 
 Army::Troop & Army::army_t::GetSlowestTroop(void)
 {
-    return *min_element(army.begin(), army.end(), SlowestTroop);
+    return *MinElement(army.begin(), army.end(), SlowestTroop);
 }
 
 Army::Troop & Army::army_t::GetFastestTroop(void)
 {
-    return *min_element(army.begin(), army.end(), FastestTroop);
+    return *MaxElement(army.begin(), army.end(), FastestTroop);
 }
 
 Army::Troop & Army::army_t::GetStrongestTroop(void)
 {
-    return *min_element(army.begin(), army.end(), StrongestTroop);
+    return *MaxElement(army.begin(), army.end(), StrongestTroop);
 }
 
 Army::Troop & Army::army_t::GetWeakestTroop(void)
 {
-    return *min_element(army.begin(), army.end(), WeakestTroop);
+    return *MinElement(army.begin(), army.end(), WeakestTroop);
 }
 
 const Army::Troop & Army::army_t::GetSlowestTroop(void) const
 {
-    return *min_element(army.begin(), army.end(), SlowestTroop);
+    return *MinElement(army.begin(), army.end(), SlowestTroop);
 }
 
 const Army::Troop & Army::army_t::GetFastestTroop(void) const
 {
-    return *min_element(army.begin(), army.end(), FastestTroop);
+    return *MaxElement(army.begin(), army.end(), FastestTroop);
 }
 
 const Army::Troop & Army::army_t::GetStrongestTroop(void) const
 {
-    return *min_element(army.begin(), army.end(), StrongestTroop);
+    return *MaxElement(army.begin(), army.end(), StrongestTroop);
 }
 
 const Army::Troop & Army::army_t::GetWeakestTroop(void) const
 {
-    return *min_element(army.begin(), army.end(), WeakestTroop);
+    return *MinElement(army.begin(), army.end(), WeakestTroop);
 }
 
 /* draw MONS32 sprite in line, first valid = 0, count = 0 */

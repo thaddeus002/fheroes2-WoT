@@ -258,20 +258,15 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::P
     	    army.JoinTroop(Monster::RED_DRAGON, 3);
 
 	    secondary_skills.clear();
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LOGISTICS, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::MYSTICISM, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::ARCHERY, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LOGISTICS, Skill::Level::EXPERT));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::SCOUTING, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::DIPLOMACY, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::NECROMANCY, Skill::Level::BASIC));
 
-	    PickupArtifact(Artifact::MEDAL_VALOR);
 	    PickupArtifact(Artifact::STEALTH_SHIELD);
 	    PickupArtifact(Artifact::DRAGON_SWORD);
-	    PickupArtifact(Artifact::RABBIT_FOOT);
-	    PickupArtifact(Artifact::ENDLESS_BAG_GOLD);
+	    PickupArtifact(Artifact::NOMAD_BOOTS_MOBILITY);
+	    PickupArtifact(Artifact::TRAVELER_BOOTS_MOBILITY);
+	    PickupArtifact(Artifact::TRUE_COMPASS_MOBILITY);
 
 	    experience = 777;
 
@@ -724,7 +719,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     {
     	switch(army.GetSlowestTroop().GetSpeed())
 	{
-	    default: break;
+	    default: Error::Verbose("111111: " + army.GetSlowestTroop().GetName()); break;
 	    case Speed::CRAWLING:
 	    case Speed::VERYSLOW:	point = 1000; break;
 	    case Speed::SLOW:		point = 1100; break;
@@ -1227,10 +1222,6 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 	case 9:		return 13200;
 	case 10:	return 15500;
 	case 11:	return 18500;
-
-	default:        break;
-/*
-	original values:
 	case 12:	return 22100;
 	case 13:	return 26400;
 	case 14:	return 31600;
@@ -1238,7 +1229,8 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 	case 16:	return 45300;
 	case 17:	return 54200;
 	case 18:	return 65000;
-*/
+
+	default:        break;
     }
 
     const u32 l1 = GetExperienceFromLevel(lvl - 1);
@@ -1640,6 +1632,8 @@ void Heroes::Dump(void) const
     std::cout << "experience      : " << experience << std::endl;
     std::cout << "magic point     : " << magic_point << std::endl;
     std::cout << "move point      : " << move_point << std::endl;
+    std::cout << "max magic point : " << GetMaxSpellPoints() << std::endl;
+    std::cout << "max move point  : " << GetMaxMovePoints() << std::endl;
     std::cout << "direction       : " << Direction::String(direction) << std::endl;
     std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
     std::cout << "flags           : " << (Modes(SHIPMASTER) ? "SHIPMATER," : ",") <<
