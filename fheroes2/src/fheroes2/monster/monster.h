@@ -222,7 +222,7 @@ public:
     M82::m82_t M82Wnce(void) const;
 
     const anim_t & Animation(void) const;
-    void GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged = false);
+    void GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged = false) const;
 
     static const std::string & String(Monster &);
     static monster_t Upgrade(Monster &);

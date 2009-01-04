@@ -102,6 +102,7 @@ namespace Army
 	    void	Clear(void);
 	    void	Reset(bool = false);	// reset: soft or hard
 	    void	BattleNewTurn(void);
+	    void	BattleLoadContours(bool);
 
 	    void	SetModes(u32);
 	    void	ResetModes(u32);

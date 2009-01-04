@@ -256,7 +256,7 @@ bool Route::Path::isUnderProtection(u16 & res) const
 	if(Maps::isValidDirection(next, (*it1).Direction()))
 	    next = Maps::GetDirectionIndex(next, (*it1).Direction());
 
-	if(Maps::TileUnderProtection(next, res))  return true;
+	if(Maps::TileUnderProtection(next, &res))  return true;
     }
 
     return false;

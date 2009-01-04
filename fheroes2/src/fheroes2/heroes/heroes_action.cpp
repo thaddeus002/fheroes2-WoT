@@ -77,6 +77,7 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index);
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
@@ -207,7 +208,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
     u16 index = MAXU16;
     const Heroes *hero = NULL;
-    if(Maps::ScanDistanceObject(tile.GetIndex(), MP2::OBJ_HEROES, 1, index)) hero = world.GetHeroes(index);
+    if(Maps::ScanDistanceObject(tile.GetIndex(), MP2::OBJ_HEROES, 1, &index)) hero = world.GetHeroes(index);
 
     Surface sf(tile.GetSurface());
 
@@ -374,10 +375,11 @@ void Heroes::Action(const u16 dst_index)
         
         case MP2::OBJ_OBELISK:          ActionToObelisk(*this, object, dst_index); break;
 
+        case MP2::OBJ_TREEKNOWLEDGE:	ActionToTreeKnowledge(*this, object, dst_index); break;
+
         // object
         case MP2::OBJ_DAEMONCAVE:
 	case MP2::OBJ_ORACLE:
-        case MP2::OBJ_TREEKNOWLEDGE:
         case MP2::OBJ_SPHINX:
 
         case MP2::OBJ_JAIL:
@@ -2536,4 +2538,61 @@ void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
     
     Dialog::PuzzleMaps();
     if(Settings::Get().Debug()) Error::Verbose("ActionToObelisk: " + hero.GetName());
+}
+
+void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    if(hero.isVisited(tile))
+    {
+	PlaySoundVisited;
+	Dialog::Message(MP2::StringObject(obj), "Upon your approach, the tree opens its eyes in delight. \"It is good to see you, my student. I hope my teachings have helped you.\"", Font::BIG, Dialog::OK);
+    }
+    else
+    {
+	bool conditions = false;
+	Resource::funds_t payment;
+	switch(tile.GetQuantity2())
+	{
+	    case 10:	payment.gems = 10; break;
+	    case 20:	payment.gold = 2000; break;
+	    default:	conditions = true; break;
+	}
+
+        if(conditions)
+        {
+	    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
+	    const std::string & body = "Upon your approach, the tree opens its eyes in delight. \"Ahh, an adventurer! Allow me to teach you a little of what I have learned over the ages.\"";
+	    Dialog::SpriteInfo(MP2::StringObject(obj), body, sprite);
+	}
+	else
+	{
+	    if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+            {
+		const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
+		std::string body("Upon your approach, the tree opens its eyes in delight. \"Ahh, an adventurer! I will be happy to teach you a little of what I have learned over the ages for a mere ");
+		body += (payment.gold ? "2000 gold" : "10 gems");
+		body += ".\" (Just bury it around my roots.)";
+		conditions = Dialog::YES == Dialog::SpriteInfo(MP2::StringObject(obj), body, sprite, Dialog::YES|Dialog::NO);
+    	    }
+	    else
+	    {
+		std::string body("Tears brim in the eyes of the tree. \"I need ");
+		body += (payment.gold ? "2000 gold" : "10 gems");
+		body += ".\" it whispers. (sniff) \"Well, come back when you can pay me.\"";
+		Dialog::Message(MP2::StringObject(obj), body, Font::BIG, Dialog::OK);
+	    }
+	}
+
+	if(conditions)
+	{
+    	    if(payment.GetValidItems()) world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+	    hero.SetVisited(dst_index);
+	    Error::Verbose("level: ", hero.GetLevel());
+	    hero.IncreaseExperience(hero.GetExperienceFromLevel(hero.GetLevel()) - hero.GetExperience());
+	}
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToTreeKnowledge: " + hero.GetName());
 }

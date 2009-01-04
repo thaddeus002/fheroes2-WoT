@@ -238,30 +238,36 @@ void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
                 world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
 }
 
-bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, u16 & res)
+bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, u16 *res)
 {
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
+    u16 res2 = 0;
 
     for(s16 y = -1; y <= 1; ++y)
         for(s16 x = -1; x <= 1; ++x)
     {
             if((!y && !x) || (y && x && !full)) continue;
 
-	    res = GetIndexFromAbsPoint(cx + x, cy + y);
+	    res2 = GetIndexFromAbsPoint(cx + x, cy + y);
 
 	    if(isValidAbsPoint(cx + x, cy + y) &&
-		obj == world.GetTiles(res).GetObject()) return true;
+		obj == world.GetTiles(res2).GetObject())
+	    {
+		if(res) *res = res2;
+		return true;
+	    }
     }
 
-    res = MAXU16;
+    if(res) *res = MAXU16;
     return false;
 }
 
-bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 & res)
+bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 *res)
 {
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
+    u16 res2 = 0;
 
     // from center to abroad
     for(u16 ii = 1; ii <= dist; ++ii)
@@ -277,14 +283,18 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u1
 	{
 	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
-	    res = GetIndexFromAbsPoint(ix, iy);
+	    res2 = GetIndexFromAbsPoint(ix, iy);
 
 	    if(isValidAbsPoint(ix, iy) &&
-		obj == world.GetTiles(res).GetObject()) return true;
+		obj == world.GetTiles(res2).GetObject())
+	    {
+		if(res) *res = res2;
+		return true;
+	    }
 	}
     }
 
-    res = MAXU16;
+    if(res) *res = MAXU16;
     return false;
 }
 
@@ -445,13 +455,7 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
     }
 }
 
-bool Maps::TileUnderProtection(const u16 index)
-{
-    u16 res;
-    return Maps::ScanAroundObject(index, MP2::OBJ_MONSTER, Settings::Get().Original(), res);
-}
-
-bool Maps::TileUnderProtection(const u16 index, u16 & res)
+bool Maps::TileUnderProtection(const u16 index, u16 *res)
 {
     return Maps::ScanAroundObject(index, MP2::OBJ_MONSTER, Settings::Get().Original(), res);
 }

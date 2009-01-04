@@ -353,7 +353,7 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
     u16 dst_index = MAXU16;
 
     // draw attack sprite
-    if(Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES, Settings::Get().Original(), dst_index))
+    if(Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES, Settings::Get().Original(), &dst_index))
     {
 	bool revert = false;
 

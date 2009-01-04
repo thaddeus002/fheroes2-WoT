@@ -41,6 +41,7 @@ namespace Army
     {
         public:
             Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
+	    ~Troop();
 
             void	Set(const Monster &, u16);
             void	Set(monster_t, u16);
@@ -49,15 +50,18 @@ namespace Army
             void	SetCount(u16);
             void	Reset(void);
 
+	    void	BattleLoadContours(bool);
             void	BattleNewTurn(void);
 	    void	BattleUpdateHitPoints(void);
 	    bool	BattleApplySpell(u8, u8);
 
 	    void        SetModes(u32);
+	    void	ResetModes(u32);
 
             const Skill::Primary* MasterSkill(void) const;
             const army_t* GetArmy(void) const;
 	    const std::string & GetName(void) const;
+	    const Surface* GetContour(u8) const;
 
             u16 	Count(void) const;
 
@@ -81,6 +85,8 @@ namespace Army
 	    const army_t*	army;
 
 	    u32			hp;
+	    u8			disruptingray;
+	    std::vector<Surface *> contours;
     };
 };
 

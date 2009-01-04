@@ -1220,7 +1220,7 @@ const Monster::anim_t & Monster::Animation(void) const
     return animonsters[id].animation;
 }
 
-void Monster::GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged)
+void Monster::GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged) const
 {
     switch(anim)
     {

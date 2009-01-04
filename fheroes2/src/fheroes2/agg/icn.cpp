@@ -937,6 +937,20 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
 	case TWNWBOAT:
 	case TWNZBOAT:	return 1 + ticket % 9;
 
+        case CMBTCAPB:
+        case CMBTCAPK:
+        case CMBTCAPN:
+        case CMBTCAPS:
+        case CMBTCAPW:
+        case CMBTCAPZ:	return 1 + ticket % 10;
+
+        case CMBTHROB:	return 1 + ticket % 18;
+        case CMBTHROK:	return 1 + ticket % 19;
+        case CMBTHRON:	return 1 + ticket % 19;
+        case CMBTHROS:	return 1 + ticket % 16;
+        case CMBTHROW:	return 1 + ticket % 16;
+        case CMBTHROZ:	return 1 + ticket % 18;
+
 	case TWNBDOCK:
 	case TWNKDOCK:
 	case TWNNDOCK:

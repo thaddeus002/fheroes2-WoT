@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+#include "agg.h"
 #include "speed.h"
 #include "spell.h"
 #include "luck.h"
@@ -27,8 +28,19 @@
 #include "army.h"
 #include "army_troop.h"
 
-Army::Troop::Troop(monster_t m, u16 c) : Monster(m), count(c), army(NULL)
+Army::Troop::Troop(monster_t m, u16 c) : Monster(m), count(c), army(NULL), disruptingray(0)
 {
+}
+
+Army::Troop::~Troop()
+{
+    if(contours.size())
+    {
+	std::vector<Surface *>::const_iterator it1 = contours.begin();
+	std::vector<Surface *>::const_iterator it2 = contours.end();
+
+	for(; it1 != it2; ++it1) if(*it1) delete *it1;
+    }
 }
 
 bool Army::Troop::HasMonster(monster_t m) const
@@ -63,8 +75,28 @@ void Army::Troop::SetCount(u16 c)
     count = c;
 }
 
+void Army::Troop::ResetModes(u32 f)
+{
+    if(!isValid()) return;
+
+    switch(f)
+    {
+	case BATTLE:
+	    disruptingray = 0;
+	    modes = 0;
+	    return;
+
+	default:
+	    break;
+    }
+
+    BitModes::ResetModes(f);
+}
+
 void Army::Troop::SetModes(u32 f)
 {
+    if(!isValid()) return;
+
     // check magic
     if(((IS_MAGIC & f) || (SP_DISRUPTINGRAY == f)) && Modes(SP_ANTIMAGIC)) return;
 
@@ -133,7 +165,7 @@ void Army::Troop::SetModes(u32 f)
 	    break;
 
 	case SP_DISRUPTINGRAY:
-	    // TODO: need accumulate and fix GetDefense
+	    ++disruptingray;
 	    break;
 
 	default:
@@ -334,6 +366,8 @@ bool Army::Troop::BattleApplySpell(u8 spell, u8 sp)
 
 void Army::Troop::BattleUpdateHitPoints(void)
 {
+    if(!isValid()) return;
+
     // update count
     if(hp < static_cast<u32>(count * Monster::GetHitPoints()))
     {
@@ -344,6 +378,8 @@ void Army::Troop::BattleUpdateHitPoints(void)
 
 void Army::Troop::BattleNewTurn(void)
 {
+    if(!isValid()) return;
+
     switch(id)
     {
 	case Monster::TROLL:
@@ -355,6 +391,65 @@ void Army::Troop::BattleNewTurn(void)
     }
     ResetModes(Army::MOVED);
     ResetModes(Army::SKIPMOVE);
+    ResetModes(Army::MORALE_BAD);
+    ResetModes(Army::MORALE_GOOD);
+    ResetModes(Army::LUCK_BAD);
+    ResetModes(Army::LUCK_GOOD);
+
+    // check for reset flags SP_MAGIC
+
+    // define morale
+    switch(GetMorale())
+    {
+	case Morale::TREASON:	if(9 > Rand::Get(1, 16)) SetModes(Army::MORALE_BAD); break;	// 50%
+        case Morale::AWFUL:	if(6 > Rand::Get(1, 15)) SetModes(Army::MORALE_BAD); break;	// 30%
+        case Morale::POOR:	if(2 > Rand::Get(1, 15)) SetModes(Army::MORALE_BAD); break;	// 15%
+        case Morale::GOOD:	if(2 > Rand::Get(1, 15)) SetModes(Army::MORALE_GOOD); break;	// 15%
+        case Morale::GREAT:	if(6 > Rand::Get(1, 15)) SetModes(Army::MORALE_GOOD); break;	// 30%
+        case Morale::BLOOD:	if(9 > Rand::Get(1, 16)) SetModes(Army::MORALE_GOOD); break;	// 50%
+	default: break;
+    }
+
+    // define luck
+    switch(GetLuck())
+    {
+        case Luck::CURSED:	if(9 > Rand::Get(1, 16)) SetModes(Army::LUCK_BAD); break;	// 50%
+        case Luck::AWFUL:	if(6 > Rand::Get(1, 15)) SetModes(Army::LUCK_BAD); break;	// 30%
+        case Luck::BAD:		if(2 > Rand::Get(1, 15)) SetModes(Army::LUCK_BAD); break;	// 15%
+        case Luck::GOOD:	if(2 > Rand::Get(1, 15)) SetModes(Army::LUCK_GOOD); break;	// 15%
+        case Luck::GREAT:	if(6 > Rand::Get(1, 15)) SetModes(Army::LUCK_GOOD); break;	// 30%
+        case Luck::IRISH:	if(9 > Rand::Get(1, 16)) SetModes(Army::LUCK_GOOD); break;	// 50%
+	default: break;
+    }
+}
+
+void Army::Troop::BattleLoadContours(bool inv)
+{
+    if(!isValid()) return;
+
+    if(contours.size())
+    {
+	std::vector<Surface *>::const_iterator it1 = contours.begin();
+	std::vector<Surface *>::const_iterator it2 = contours.end();
+
+	for(; it1 != it2; ++it1) if(*it1) delete *it1;
+    }
+
+    u8 start = 0;
+    u8 length = 0;
+    GetAnimFrames(Monster::AS_IDLE, start, length);
+
+    contours.reserve(length);
+
+    for(u8 ii = start; ii < start + length; ++ii)
+    {
+	const Sprite & sprite = AGG::GetICN(ICNFile(), ii, inv);
+
+        Surface *contour = new Surface();
+        sprite.MakeContour(*contour, sprite.GetColor(0xDA));
+
+	contours.push_back(contour);
+    }
 }
 
 void Army::Troop::Reset(void)
@@ -400,7 +495,11 @@ u8 Army::Troop::GetDefense(void) const
     if(Modes(SP_STEELSKIN)) mod += 5;
     if(Modes(SP_DISRUPTINGRAY)) mod -= 3;
 
-    return army && army->commander ? army->commander->GetDefense() + Monster::GetDefense() + mod : Monster::GetDefense() + mod;
+    mod += army && army->commander ? army->commander->GetDefense() + Monster::GetDefense() : Monster::GetDefense();
+
+    if(disruptingray) mod = (mod <= disruptingray * 3 ? 1 : mod - disruptingray * 3);
+
+    return mod;
 }
 
 Color::color_t Army::Troop::GetColor(void) const
@@ -511,6 +610,11 @@ s8 Army::Troop::GetLuck(void) const
     }
 
     return Luck::NORMAL;
+}
+
+const Surface* Army::Troop::GetContour(u8 index) const
+{
+    return (contours.empty() || index >= contours.size() ? NULL : contours[index]);
 }
 
 bool Army::Troop::isValid(void) const

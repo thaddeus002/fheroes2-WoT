@@ -38,7 +38,7 @@ std::vector<Army::Troop>::iterator MaxElement(std::vector<Army::Troop>::iterator
     while(first != last) if(Army::isValidTroop(*first)) break; else ++first;
     std::vector<Army::Troop>::iterator largest = first;
     if(first == last) return last;
-    while(++first != last) if(Army::isValidTroop(*first) && pf(*largest, *first)) largest = first;
+    while(++first != last) if(Army::isValidTroop(*first) && pf(*first, *largest)) largest = first;
     return largest;
 }
 
@@ -47,7 +47,7 @@ std::vector<Army::Troop>::const_iterator MaxElement(std::vector<Army::Troop>::co
     while(first != last) if(Army::isValidTroop(*first)) break; else ++first;
     std::vector<Army::Troop>::const_iterator largest = first;
     if(first == last) return last;
-    while(++first != last) if(Army::isValidTroop(*first) && pf(*largest, *first)) largest = first;
+    while(++first != last) if(Army::isValidTroop(*first) && pf(*first, *largest)) largest = first;
     return largest;
 }
 
@@ -646,6 +646,11 @@ u32 Army::army_t::CalculateExperience(void) const
 void Army::army_t::BattleNewTurn(void)
 {
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleNewTurn));
+}
+
+void Army::army_t::BattleLoadContours(bool inv)
+{
+    std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::BattleLoadContours), inv));
 }
 
 void Army::army_t::SetModes(u32 f)

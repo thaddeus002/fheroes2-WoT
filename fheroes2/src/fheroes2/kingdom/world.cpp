@@ -987,6 +987,7 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_PYRAMID:
             case MP2::OBJ_DAEMONCAVE:
             case MP2::OBJ_ABANDONEDMINE:
+	    case MP2::OBJ_TREEKNOWLEDGE:
     		tile.UpdateQuantity();
 		break;
 
@@ -1771,7 +1772,7 @@ bool World::CreateBoat(const u16 center, bool build)
     	    MP2::OBJ_ZERO == tile.GetObject())
 	{
     	    u16 coast = MAXU16;
-	    if(Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_COAST, false, coast) && Algorithm::PathFind(NULL, center, coast, 256))
+	    if(Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_COAST, false, &coast) && Algorithm::PathFind(NULL, center, coast, 256))
     	    {
     		if(build)
     		{

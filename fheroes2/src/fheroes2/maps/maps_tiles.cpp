@@ -1587,11 +1587,11 @@ void Maps::Tiles::UpdateQuantity(void)
 	case MP2::OBJ_TREASURECHEST:
 	    switch(Rand::Get(1, 20))
 	    {
-		// 32% - 2000 gold or 1500 exp
+		// 35% - 2000 gold or 1500 exp
 		default:
 		    quantity2 = 20;
 		break;
-		// 31% - 1500 gold or 1000 exp
+		// 30% - 1500 gold or 1000 exp
 		case 2:
 		case 5:
 		case 8:
@@ -1600,7 +1600,7 @@ void Maps::Tiles::UpdateQuantity(void)
 		case 17:
 		    quantity2 = 15;
 		break;
-		// 31% - 1000 gold or 500 exp
+		// 30% - 1000 gold or 500 exp
 		case 3:
 		case 6:
 		case 9:
@@ -1609,7 +1609,7 @@ void Maps::Tiles::UpdateQuantity(void)
 		case 18:
 		    quantity2 = 10;
 		break;
-		// 10% - art
+		// 5% - art
 		case 20:
 		    quantity1 = Artifact::Rand1();
 		break;
@@ -1663,6 +1663,20 @@ void Maps::Tiles::UpdateQuantity(void)
 	case MP2::OBJ_ABANDONEDMINE:
 	    quantity1 = 0;
 	    quantity2 = Rand::Get(39, 45);	// I checked in Heroes II: min 3 x 13, and max 3 x 15
+	break;
+
+	case MP2::OBJ_TREEKNOWLEDGE:
+	    // variant: 10 gems, 2000 gold or free
+	    switch(Rand::Get(1, 3))
+	    {
+		case 1:
+		    quantity2 = 10;
+		break;
+		case 2:
+		    quantity2 = 20;
+		break;
+		default: break;
+	    }
 	break;
 
 	default: break;
