@@ -427,7 +427,7 @@ Dialog::answer_t Castle::OpenDialog(void)
 	if(buttonNextCastle.isEnable() && le.MouseClickLeft(buttonNextCastle)){ result = Dialog::NEXT; break; }
 	else
 	// left click building
-	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) OpenThievesGuild();
+	if(building & BUILD_THIEVESGUILD && le.MouseClickLeft(coordBuildingThievesGuild)) Dialog::ThievesGuild(0x01);
 	else
 	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern))
 	{

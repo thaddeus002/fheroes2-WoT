@@ -78,6 +78,57 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToOracle(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index);
+
+u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u16 count, const u16 exp, const u16 buttons = Dialog::OK)
+{
+    const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
+    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
+    Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12);
+    image.SetColorKey();
+    image.Blit(gold, 0, image.h() - gold.h() - 12);
+    image.Blit(sprite, gold.w() + 50, 0);
+    std::string str;
+    String::AddInt(str, count);
+    Text text(str, Font::SMALL);
+    text.Blit((gold.w() - text.w()) / 2, image.h() - 12, image);
+    str.clear();
+    String::AddInt(str, exp);
+    text.Set(str);
+    text.Blit(gold.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
+    return Dialog::SpriteInfo(hdr, msg, image, buttons);
+}
+
+u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 exp, const u16 buttons = Dialog::OK)
+{
+    std::string str;
+    String::AddInt(str, exp);
+    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
+    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art));
+    Surface image(sprite.w() + border.w() + 50, border.h());
+    image.SetColorKey();
+    image.Blit(border);
+    image.Blit(artifact, 5, 5);
+    image.Blit(sprite, border.w() + 50, (border.h() - sprite.h()) / 2);
+    Text text(str, Font::SMALL);
+    text.Blit(border.w() + 50 + (sprite.w() - text.w()) / 2, border.h() - 25, image);
+    return Dialog::SpriteInfo(hdr, msg, image, buttons);
+}
+
+u16 DialogWithExp(const std::string & hdr, const std::string & msg, const u16 exp, const u16 buttons = Dialog::OK)
+{
+    std::string str;
+    String::AddInt(str, exp);
+    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
+    Surface image(sprite.w(), sprite.h() + 12);
+    image.SetColorKey();
+    image.Blit(sprite);
+    Text text(str, Font::SMALL);
+    text.Blit((sprite.w() - text.w()) / 2, sprite.h(), image);
+    return Dialog::SpriteInfo(hdr, msg, image, buttons);
+}
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
 {
@@ -92,7 +143,7 @@ u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
     image.Blit(artifact, 5, 5);
     image.Blit(gold, border.w() + 50, (border.h() - gold.h()) / 2);
     Text text(str, Font::SMALL);
-    text.Blit(border.w() + 50 + (gold.w() - Text::width(str, Font::SMALL)) / 2, border.h() - 25, image);
+    text.Blit(border.w() + 50 + (gold.w() - text.w()) / 2, border.h() - 25, image);
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -105,7 +156,7 @@ u16 DialogWithGold(const std::string & hdr, const std::string & msg, const u16 c
     image.SetColorKey();
     image.Blit(gold);
     Text text(str, Font::SMALL);
-    text.Blit((gold.w() - Text::width(str, Font::SMALL)) / 2, gold.h(), image);
+    text.Blit((gold.w() - text.w()) / 2, gold.h(), image);
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -324,6 +375,7 @@ void Heroes::Action(const u16 dst_index)
 
         // experience modification
         case MP2::OBJ_GAZEBO:		ActionToExperienceObject(*this, object, dst_index); break;
+        case MP2::OBJ_DAEMONCAVE:	ActionToDaemonCave(*this, object, dst_index); break;
 
         // teleports
 	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(*this, dst_index); break;
@@ -377,9 +429,10 @@ void Heroes::Action(const u16 dst_index)
 
         case MP2::OBJ_TREEKNOWLEDGE:	ActionToTreeKnowledge(*this, object, dst_index); break;
 
+	case MP2::OBJ_ORACLE:		ActionToOracle(*this, object, dst_index); break;
+
+
         // object
-        case MP2::OBJ_DAEMONCAVE:
-	case MP2::OBJ_ORACLE:
         case MP2::OBJ_SPHINX:
 
         case MP2::OBJ_JAIL:
@@ -1383,17 +1436,8 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index)
     }
     else
     {
-	std::string count;
-	String::AddInt(count, exp);
-	const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-	Surface image(sprite.w(), sprite.h() + 12);
-	image.SetColorKey();
-	image.Blit(sprite);
-	Text text(count, Font::SMALL);
-	text.Blit((sprite.w() - Text::width(count, Font::SMALL)) / 2, sprite.h() + 2, image);
-
 	PlaySoundWarning;
-	Dialog::SpriteInfo(MP2::StringObject(obj), body_true, image);
+	DialogWithExp(MP2::StringObject(obj), body_true, exp);
 
 	// visit
 	hero.SetVisited(dst_index);
@@ -2595,4 +2639,109 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToTreeKnowledge: " + hero.GetName());
+}
+
+void ActionToOracle(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Dialog::ThievesGuild(0xFF);
+    if(Settings::Get().Debug()) Error::Verbose("ActionToOracle: " + hero.GetName());
+}
+
+void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), "The entrance to the cave is dark, and a foul, sulfurous smell issues from the cave mouth.  Will you enter?", Font::BIG, Dialog::YES|Dialog::NO))
+    {
+	if(tile.GetQuantity2())
+	{
+	    Resource::funds_t resource;
+
+	    if(Dialog::YES == Dialog::Message("", "You find a powerful and grotesque Demon in the cave. \"Today,\" it rasps, \"you will fight and surely die. But I will give you a choice of deaths. You may fight me, or you may fight my servants. Do you prefer to fight my servants?\"", Font::BIG, Dialog::YES|Dialog::NO))
+	    {
+		// battle with earth elements
+		Army::army_t army;
+		army.FromGuardian(tile);
+
+		// battle
+		const u32 exp = army.CalculateExperience();
+		const Army::battle_t b = Army::Battle(hero, army, tile);
+		switch(b)
+		{
+		    case Army::WIN:
+			hero.IncreaseExperience(exp);
+			hero.ActionAfterBattle();
+			resource.gold = 2500;
+			DialogWithGold("", "Upon defeating the daemon's servants, you find a hidden cache with 2500 gold.", 2500);
+			world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+			tile.SetQuantity2(0);
+		    break;
+
+		    case Army::RETREAT:
+		    case Army::SURRENDER:
+		    case Army::LOSE:
+			BattleLose(hero, b);
+			break;
+        
+    		    default: break;
+		}
+	    }
+	    // check variants
+	    else
+	    {
+		u16 exp = 0;
+		switch(tile.GetQuantity2())
+		{
+		    case 1:
+			exp = 1000;
+			DialogWithExp("", "The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive 1,000 experience points.", exp);
+    			hero.IncreaseExperience(exp);
+			tile.SetQuantity2(0);
+			break;
+		    case 2:
+		    {
+		    	exp = 1000;
+			const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+			if(Artifact::UNKNOWN != art) DialogArtifactWithExp("", "The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and find the " + Artifact::String(art) + " in the back of the cave.", art, exp);
+    			hero.PickupArtifact(art);
+    			hero.IncreaseExperience(exp);
+			tile.SetQuantity1(Artifact::UNKNOWN);
+			tile.SetQuantity2(0);
+			break;
+		    }
+		    case 3:
+		    	exp = 1000;
+			resource.gold = 2500;
+			DialogGoldWithExp("", "The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive 1,000 experience points and 2,500 gold.", resource.gold, exp);
+    			hero.IncreaseExperience(exp);
+			world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+			tile.SetQuantity2(0);
+			break;
+		    default:
+		    {
+			bool remove = true;
+			if(2500 <= world.GetKingdom(hero.GetColor()).GetFundsGold())
+			{
+			    if(Dialog::YES == Dialog::Message("", "The Demon leaps upon you and has its claws at your throat before you can even draw your sword. \"Your life is mine,\" it says. \"I will sell it back to you for 2,500 gold.\"", Font::BIG, Dialog::YES|Dialog::NO))
+			    {
+				remove = false;
+				resource.gold = 2500;
+				world.GetKingdom(hero.GetColor()).OddFundsResource(resource);
+			    }
+			}
+			else
+			    Dialog::Message("", "Seeing that you do not have 2500 gold, the demon slashes you with its claws, and the last thing you see is a red haze.", Font::BIG, Dialog::OK);
+
+			if(remove) BattleLose(hero, Army::LOSE);
+			tile.SetQuantity2(0);
+			break;
+		    }
+		}
+	    }
+	}
+	else
+	    Dialog::Message("", "Except for evidence of a terrible battle, the cave is empty.", Font::BIG, Dialog::OK);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToDaemonCave: " + hero.GetName());
 }

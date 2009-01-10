@@ -119,6 +119,9 @@ namespace Dialog
     // puzzle
     void PuzzleMaps(void);
 
+    // thieves guild
+    void ThievesGuild(u8);
+
 class Box
 {
 public:

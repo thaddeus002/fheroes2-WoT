@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,10 +23,10 @@
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
-#include "castle.h"
 #include "text.h"
+#include "dialog.h"
 
-void Castle::OpenThievesGuild(void)
+void Dialog::ThievesGuild(u8 count)
 {
     Display & display = Display::Get();
 

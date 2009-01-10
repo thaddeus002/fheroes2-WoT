@@ -951,6 +951,13 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
         case CMBTHROW:	return 1 + ticket % 16;
         case CMBTHROZ:	return 1 + ticket % 18;
 
+        case HEROFL00:
+        case HEROFL01:
+        case HEROFL02:
+        case HEROFL03:
+        case HEROFL04:
+        case HEROFL05:	return ticket % 5;
+
 	case TWNBDOCK:
 	case TWNKDOCK:
 	case TWNNDOCK:

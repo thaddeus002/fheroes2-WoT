@@ -1646,17 +1646,9 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_DAEMONCAVE:
-	    // 1000 exp or 1000 exp + 2500 gold or 1000 exp + art
-	    switch(Rand::Get(1, 3))
-	    {
-		case 1:
-		    quantity2 = 25;
-		break;
-		case 2:
-		    quantity1 = Artifact::Rand();
-		break;
-		default: break;
-	    }
+	    // 1000 exp or 1000 exp + 2500 gold or 1000 exp + art or (-2500 or remove hero)
+	    quantity2 = Rand::Get(1, 4);
+	    quantity1 = Artifact::Rand();
 	break;
 
 	// rand monster
