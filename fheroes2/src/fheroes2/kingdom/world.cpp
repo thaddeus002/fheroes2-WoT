@@ -599,7 +599,7 @@ void World::LoadMaps(const std::string &filename)
     }
 
     if(H2Config::Debug()) Error::Verbose("World::World: read coord castles, tellg: ", fd.tellg());
-    fd.seekg(endof_addons + 72, std::ios_base::beg);
+    fd.seekg(endof_addons + (72 * 3), std::ios_base::beg);
 
     // cood resource kingdoms
     // 144 x 3 byte (cx, cy, id)
@@ -656,7 +656,7 @@ void World::LoadMaps(const std::string &filename)
     }
 
     if(H2Config::Debug()) Error::Verbose("World::World: read coord other resource, tellg: ", fd.tellg());
-    fd.seekg(endof_addons + 72 + 144, std::ios_base::beg);
+    fd.seekg(endof_addons + (72 * 3) + (144 * 3), std::ios_base::beg);
 
     // unknown byte
     char unk_byte;
