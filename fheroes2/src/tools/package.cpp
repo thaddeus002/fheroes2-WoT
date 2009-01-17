@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
     // write count
     u16 count = fats.size();
-    SWAP16(count);
+    SwapLE16(count);
     fd.write(reinterpret_cast<const char *>(&count), 2);
 
     // write fat1
@@ -98,9 +98,9 @@ int main(int argc, char **argv)
         const aggfat_t & fat = *it1;
 
         u32 le_size = fat.size;
-        SWAP32(le_size);
+        SwapLE32(le_size);
         u32 le_offset = offset;
-        SWAP32(le_offset);
+        SwapLE32(le_offset);
 
         u32 crc = 0; // TODO: fix crc or ?
 	fd.write(reinterpret_cast<const char *>(&crc), 4);

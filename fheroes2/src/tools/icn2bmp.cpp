@@ -47,21 +47,21 @@ class icnheader
         if(fd.fail()) return;
 
         fd.read(reinterpret_cast<char *>(& offsetX), sizeof(s16));
-        SWAP16(offsetX);
+        SwapLE16(offsetX);
 
         fd.read(reinterpret_cast<char *>(& offsetY), sizeof(s16));
-        SWAP16(offsetY);
+        SwapLE16(offsetY);
 
 	fd.read(reinterpret_cast<char *>(& width), sizeof(u16));
-	SWAP16(width);
+	SwapLE16(width);
 
 	fd.read(reinterpret_cast<char *>(& height), sizeof(u16));
-	SWAP16(height);
+	SwapLE16(height);
 
 	fd.ignore();
 
 	fd.read(reinterpret_cast<char *>(& offsetData), sizeof(u32));
-	SWAP32(offsetData);
+	SwapLE32(offsetData);
     };
 
     s16	offsetX;
@@ -119,10 +119,10 @@ int main(int argc, char **argv)
     u32 total_size;
 
     fd_data.read(reinterpret_cast<char *>(& count_sprite), sizeof(u16));
-    SWAP16(count_sprite);
+    SwapLE16(count_sprite);
 
     fd_data.read(reinterpret_cast<char *>(& total_size), sizeof(u32));
-    SWAP32(total_size);
+    SwapLE32(total_size);
 
     u32 save_pos = fd_data.tellg();
 

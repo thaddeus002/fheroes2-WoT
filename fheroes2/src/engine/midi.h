@@ -25,15 +25,6 @@
 
 namespace MIDI
 {
-    static __inline__ u32 Swap32(u32 x){ return((x<<24)|((x<<8)&0x00FF0000)|((x>>8)&0x0000FF00)|(x>>24)); };
-    static __inline__ u16 Swap16(u16 x){ return((x<<8)|(x>>8)); };
-
-    u32 ReadBE32(const char * p);
-    u16 ReadBE16(const char * p);
-
-    void WriteBE32(char * p, u32 x);
-    void WriteBE16(char * p, u16 x);
-
     u8 UnpackDelta(const char *p, u32 & d);
     u8 PackDelta(char *p, const u32 & d);
 };

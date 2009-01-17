@@ -77,13 +77,13 @@ int main(int argc, char **argv)
     u16 count, width, height;
     
     fd_data.read(reinterpret_cast<char *>(&count), sizeof(u16));
-    SWAP16(count);
+    SwapLE16(count);
 
     fd_data.read(reinterpret_cast<char *>(&width), sizeof(u16));
-    SWAP16(width);
+    SwapLE16(width);
 
     fd_data.read(reinterpret_cast<char *>(&height), sizeof(u16));
-    SWAP16(height);
+    SwapLE16(height);
 
     char *body = new char[size];
 

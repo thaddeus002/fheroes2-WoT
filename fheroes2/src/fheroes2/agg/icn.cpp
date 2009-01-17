@@ -911,12 +911,12 @@ ICN::Header::Header() : offset_x(0), offset_y(0), width(0), height(0), type(0), 
 
 void ICN::Header::Load(const char * p)
 {
-    LOAD16(&p[0], offset_x);
-    LOAD16(&p[2], offset_y);
-    LOAD16(&p[4], width);
-    LOAD16(&p[6], height);
+    offset_x = ReadLE16(reinterpret_cast<const u8*>(&p[0]));
+    offset_y = ReadLE16(reinterpret_cast<const u8*>(&p[2]));
+    width = ReadLE16(reinterpret_cast<const u8*>(&p[4]));
+    height= ReadLE16(reinterpret_cast<const u8*>(&p[6]));
     type = p[8];
-    LOAD32(&p[9], offset_data);
+    offset_data = ReadLE32(reinterpret_cast<const u8*>(&p[9]));
 }
 
 u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, const u8 quantity)

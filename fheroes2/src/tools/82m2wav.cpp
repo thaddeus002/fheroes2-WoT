@@ -32,22 +32,22 @@ class wavhead
 	align(channels * 0x08 / 8), bitsper(0x08), data(0x61746164), size_d(sz)
 	{
 	    // "RIFF"
-	    SWAP32(riff);
-	    SWAP32(size);
+	    SwapLE32(riff);
+	    SwapLE32(size);
 	    // "WAVE"
-	    SWAP32(wave);
+	    SwapLE32(wave);
 	    // " fmt"
-	    SWAP32(fmt);
-	    SWAP32(size_t);
-	    SWAP16(format);
-	    SWAP16(channels);
-	    SWAP32(samples);
-	    SWAP32(byteper);
-	    SWAP16(align);
-	    SWAP16(bitsper);
+	    SwapLE32(fmt);
+	    SwapLE32(size_t);
+	    SwapLE16(format);
+	    SwapLE16(channels);
+	    SwapLE32(samples);
+	    SwapLE32(byteper);
+	    SwapLE16(align);
+	    SwapLE16(bitsper);
 	    // "data"
-	    SWAP32(data);
-	    SWAP32(size_d);
+	    SwapLE32(data);
+	    SwapLE32(size_d);
 	};
 
     void write(std::fstream & fd)

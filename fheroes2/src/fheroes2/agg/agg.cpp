@@ -49,7 +49,7 @@ AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), c
     if(isGameFile)
     {
         stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
-        SWAP16(count_items);
+        SwapLE16(count_items);
 
         if(H2Config::Debug()) Error::Verbose("AGG::File: count items: ", count_items);
 
@@ -70,13 +70,13 @@ AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), c
             stream->seekg(pos, std::ios_base::beg);
 
             stream->read(reinterpret_cast<char *>(&f.crc), sizeof(u32));
-            SWAP32(f.crc);
+            SwapLE32(f.crc);
 
             stream->read(reinterpret_cast<char *>(&f.offset), sizeof(u32));
-            SWAP32(f.offset);
+            SwapLE32(f.offset);
 
             stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
-            SWAP32(f.size);
+            SwapLE32(f.size);
         }
     }
     else
@@ -429,9 +429,8 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		u16 count_sprite;
 		u32 total_size;
 
-		LOAD16(&body[0], count_sprite);
-
-		LOAD32(&body[2], total_size);
+		count_sprite = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
+		total_size = ReadLE32(reinterpret_cast<const u8*>(&body[2]));
 
 		v.resize(count_sprite);
 
@@ -484,11 +483,9 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 	    {
 		u16 count, width, height;
 
-		LOAD16(&body.at(0), count);
-
-		LOAD16(&body.at(2), width);
-
-		LOAD16(&body.at(4), height);
+		count = ReadLE16(reinterpret_cast<const u8*>(&body.at(0)));
+		width = ReadLE16(reinterpret_cast<const u8*>(&body.at(2)));
+		height= ReadLE16(reinterpret_cast<const u8*>(&body.at(4)));
 
 		const u32 tile_size = width * height;
 		const u32 body_size = 6 + count * tile_size;

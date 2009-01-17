@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     u16 count;
     u16 total = 0;
     fd_data.read(reinterpret_cast<char *>(&count), sizeof(u16));
-    SWAP16(count);
+    SwapLE16(count);
 
     char buf[AGGSIZENAME];
     std::vector<aggfat_t> vector(count);
@@ -88,10 +88,10 @@ int main(int argc, char **argv)
 	fd_data.seekg(sizeof(u32), std::ios_base::cur);
 
         fd_data.read(reinterpret_cast<char *>(&fat.offset), sizeof(u32));
-	SWAP32(fat.offset);
+	SwapLE32(fat.offset);
 
         fd_data.read(reinterpret_cast<char *>(&fat.size), sizeof(u32));
-        SWAP32(fat.size);
+        SwapLE32(fat.size);
 
 	fd_data.seekg(fat.offset, std::ios_base::beg);
 

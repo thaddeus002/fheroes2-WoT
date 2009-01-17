@@ -156,7 +156,7 @@ bool Maps::FileInfo::Read(const std::string &filename)
 
     // magic byte
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(byte32));
-    SWAP32(byte32);
+    SwapLE32(byte32);
 
     if(byte32 != 0x0000005C)
     {
@@ -167,7 +167,7 @@ bool Maps::FileInfo::Read(const std::string &filename)
 
     // level
     fd.read(reinterpret_cast<char *>(&byte16), sizeof(byte16));
-    SWAP16(byte16);
+    SwapLE16(byte16);
 
     switch(byte16)
     {

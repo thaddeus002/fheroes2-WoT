@@ -92,13 +92,8 @@ bool Chunk::Read(std::istream & i)
 
     i.read(id, 4);
 
-    u32 x;
-    i.read(reinterpret_cast<char *>(&x), 4);
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    size = MIDI::Swap32(x);
-#else
-    size = x;
-#endif
+    i.read(reinterpret_cast<char *>(&size), 4);
+    SwapBE32(size);
 
     if(data) delete [] data;
     data = NULL;
@@ -118,7 +113,7 @@ bool Chunk::Read(const std::vector<char> & b)
 
     memcpy(id, &b[0], 4);
 
-    size = MIDI::ReadBE32(&b[4]);
+    size = ReadBE32(reinterpret_cast<const u8*>(&b[4]));
 
     if(data) delete [] data;
     data = NULL;
@@ -140,7 +135,7 @@ bool Chunk::Read(const char *p)
 
     memcpy(id, p, 4);
 
-    size = MIDI::ReadBE32(&p[4]);
+    size = ReadBE32(reinterpret_cast<const u8*>(&p[4]));
 
     if(data) delete [] data;
     data = NULL;
@@ -160,12 +155,8 @@ bool Chunk::Write(std::ostream & o) const
 
     o.write(id, 4);
 
-    u32 x;
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    x = MIDI::Swap32(size);
-#else
-    x = size;
-#endif
+    u32 x = size;
+    SwapBE32(x);
     o.write(reinterpret_cast<char *>(&x), 4);
 
     if(size && data) o.write(data, size);
@@ -179,7 +170,7 @@ bool Chunk::Write(char *p) const
 
     memcpy(p, id, 4);
 
-    MIDI::WriteBE32(&p[4], size);
+    WriteBE32(&p[4], size);
 
     if(size && data) memcpy(&p[8], data, size);
 

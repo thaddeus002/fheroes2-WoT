@@ -21,34 +21,6 @@
 #include <iostream>
 #include "midi.h"
 
-u32 MIDI::ReadBE32(const char * p)
-{
-    const unsigned char * u = (const unsigned char *) p;
-
-    return ((((u32) *u) << 24) | (((u32) *(u + 1)) << 16) | (((u32) *(u + 2)) << 8) | ((u32) *(u + 3)));
-}
-
-u16 MIDI::ReadBE16(const char * p)
-{
-    const unsigned char * u = (const unsigned char *) p;
-
-    return((((u16) *u) << 8) | ((u16) *(u + 1)));
-}
-
-void MIDI::WriteBE32(char * p, u32 x)
-{
-    p[0] = static_cast<char>(x >> 24);
-    p[1] = static_cast<char>((x & 0x00FF0000) >> 16);
-    p[2] = static_cast<char>((x & 0x0000FF00) >> 8);
-    p[3] = static_cast<char>(x & 0x000000FF);
-}
-
-void MIDI::WriteBE16(char * p, u16 x)
-{
-    p[0] = static_cast<char>(x >> 8);
-    p[1] = static_cast<char>(x & 0x00FF);
-}
-
 u8 MIDI::UnpackDelta(const char *p, u32 & d)
 {
     const char *p2 = p;

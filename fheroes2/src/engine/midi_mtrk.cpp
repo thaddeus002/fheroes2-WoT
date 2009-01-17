@@ -140,10 +140,9 @@ bool MTrk::Write(std::ostream & o) const
     std::list<Event *>::const_iterator it2 = events.end();
     for(; it1 != it2; ++it1) if(*it1) size += (*it1)->Size();
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    size = MIDI::Swap32(size);
-#endif
-    o.write(reinterpret_cast<char *>(&size), 4);
+    u32 x = size;
+    SwapBE32(x);
+    o.write(reinterpret_cast<char *>(&x), 4);
 
     if(events.size())
     {
@@ -167,10 +166,9 @@ bool MTrk::Write(char *p) const
     std::list<Event *>::const_iterator it2 = events.end();
     for(; it1 != it2; ++it1) if(*it1) size += (*it1)->Size();
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    size = MIDI::Swap32(size);
-#endif
-    memcpy(p, reinterpret_cast<char *>(&size), 4);
+    u32 x = size;
+    SwapBE32(x);
+    memcpy(p, reinterpret_cast<char *>(&x), 4);
     p+= 4;
 
     if(events.size())

@@ -322,31 +322,31 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
         ++ptr8;
 
         // count1
-        LOAD16(ptr8, byte16);
+        byte16 = ReadLE16(ptr8);
         army.At(0).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count2
-        LOAD16(ptr8, byte16);
+        byte16 = ReadLE16(ptr8);
         army.At(1).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count3
-        LOAD16(ptr8, byte16);
+        byte16 = ReadLE16(ptr8);
         army.At(2).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count4
-        LOAD16(ptr8, byte16);
+        byte16 = ReadLE16(ptr8);
         army.At(3).SetCount(byte16);
         ++ptr8;
         ++ptr8;
 
         // count5
-        LOAD16(ptr8, byte16);
+        byte16 = ReadLE16(ptr8);
         army.At(4).SetCount(byte16);
         ++ptr8;
         ++ptr8;
@@ -381,7 +381,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // experience
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     experience = byte32;
     ptr8 += 4;
 

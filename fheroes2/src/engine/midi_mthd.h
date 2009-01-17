@@ -50,9 +50,9 @@ namespace MIDI
 
 	const char* Data(void) const{ return Chunk::data; };
 	u32 Size(void) const{ return 8 + size; };
-	u16 Format(void) const{ return MIDI::ReadBE16(&data[0]); };
-	u16 Tracks(void) const{ return MIDI::ReadBE16(&data[2]); };
-	u16 PPQN(void) const{ return MIDI::ReadBE16(&data[4]); };
+	u16 Format(void) const{ return ReadBE16(reinterpret_cast<const u8*>(&data[0])); };
+	u16 Tracks(void) const{ return ReadBE16(reinterpret_cast<const u8*>(&data[2])); };
+	u16 PPQN(void) const{ return ReadBE16(reinterpret_cast<const u8*>(&data[4])); };
 
 	void Dump(void) const;
     };

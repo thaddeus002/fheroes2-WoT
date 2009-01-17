@@ -387,14 +387,14 @@ void World::LoadMaps(const std::string &filename)
     // read uniq
     fd.seekg(endof_mp2 - sizeof(u32), std::ios_base::beg);
     fd.read(reinterpret_cast<char *>(&uniq0), sizeof(u32));
-    SWAP32(uniq0);
+    SwapLE32(uniq0);
 
     // offset data
     fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
 
     // width
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
-    SWAP32(byte32);
+    SwapLE32(byte32);
 
     switch(byte32)
     {
@@ -408,7 +408,7 @@ void World::LoadMaps(const std::string &filename)
 
     // height
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
-    SWAP32(byte32);
+    SwapLE32(byte32);
 
     if(byte32 != static_cast<u32>(height)) Error::Warning("World::World: maps size mismatch!");
 
@@ -417,7 +417,7 @@ void World::LoadMaps(const std::string &filename)
 
     // count mp2addon_t
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
-    SWAP32(byte32);
+    SwapLE32(byte32);
 
     // read all addons
     std::vector<MP2::mp2addon_t> vec_mp2addons;
@@ -427,7 +427,7 @@ void World::LoadMaps(const std::string &filename)
 	MP2::mp2addon_t mp2addon;
 
 	fd.read(reinterpret_cast<char *>(&mp2addon.indexAddon), sizeof(u16));
-	SWAP16(mp2addon.indexAddon);
+	SwapLE16(mp2addon.indexAddon);
 
 	fd.read(&byte8, 1);
 	mp2addon.objectNameN1 = byte8 * 2;
@@ -445,10 +445,10 @@ void World::LoadMaps(const std::string &filename)
 	mp2addon.indexNameN2 = byte8;
 
 	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN1), sizeof(u32));
-	SWAP32(mp2addon.uniqNumberN1);
+	SwapLE32(mp2addon.uniqNumberN1);
 
 	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN2), sizeof(u32));
-	SWAP32(mp2addon.uniqNumberN2);
+	SwapLE32(mp2addon.uniqNumberN2);
 
 	vec_mp2addons.push_back(mp2addon);
     }
@@ -469,7 +469,7 @@ void World::LoadMaps(const std::string &filename)
 
 	// byte16
 	fd.read(reinterpret_cast<char *>(&mp2tile.tileIndex), sizeof(u16));
-	SWAP16(mp2tile.tileIndex);
+	SwapLE16(mp2tile.tileIndex);
 
 	fd.read(&byte8, 1);
 	mp2tile.objectName1 = byte8;
@@ -513,15 +513,15 @@ void World::LoadMaps(const std::string &filename)
 
 	// offset first addon
 	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
-	SWAP16(byte16);
+	SwapLE16(byte16);
 
 	// byte32
 	fd.read(reinterpret_cast<char *>(&mp2tile.uniqNumber1), sizeof(u32));
-	SWAP32(mp2tile.uniqNumber1);
+	SwapLE32(mp2tile.uniqNumber1);
 
 	// byte32
 	fd.read(reinterpret_cast<char *>(&mp2tile.uniqNumber2), sizeof(u32));
-	SWAP32(mp2tile.uniqNumber2);
+	SwapLE32(mp2tile.uniqNumber2);
 
 	Maps::Tiles * tile = new Maps::Tiles(ii, mp2tile);
 
@@ -676,7 +676,7 @@ void World::LoadMaps(const std::string &filename)
 	if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
 
 	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
-	SWAP16(byte16);
+	SwapLE16(byte16);
 
 	if(4 < H2Config::Debug())
 	    printf("%hX", byte16);
@@ -698,7 +698,7 @@ void World::LoadMaps(const std::string &filename)
 	// size block
 	u16 sizeblock;
 	fd.read(reinterpret_cast<char *>(&sizeblock), sizeof(u16));
-	SWAP16(sizeblock);
+	SwapLE16(sizeblock);
 
 	char *pblock = new char[sizeblock];
 

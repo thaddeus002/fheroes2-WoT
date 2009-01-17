@@ -24,12 +24,12 @@
 #include "l10n.h"
 #include "SDL.h"
 
-typedef int8_t		s8;
-typedef uint8_t		u8;
-typedef int16_t		s16;
-typedef uint16_t	u16;
-typedef int32_t		s32;
-typedef uint32_t	u32;
+typedef Sint8		s8;
+typedef Uint8		u8;
+typedef Sint16		s16;
+typedef Uint16		u16;
+typedef Sint32		s32;
+typedef Uint32		u32;
 
 typedef SDL_Color Colors;
 
@@ -80,16 +80,19 @@ typedef SDL_Color Colors;
 
 #endif
 
-uint16_t Swap16(uint16_t);
-uint32_t Swap32(uint32_t);
+#define Swap16(X)	X=SDL_Swap16(X)
+#define Swap32(X)	X=SDL_Swap32(X)
+#define SwapLE16(X)	X=SDL_SwapLE16(X)
+#define SwapLE32(X)	X=SDL_SwapLE32(X)
+#define SwapBE16(X)	X=SDL_SwapBE16(X)
+#define SwapBE32(X)	X=SDL_SwapBE32(X)
 
-uint16_t Load16(uint8_t *p);
-uint32_t Load32(uint8_t *p);
+u32 ReadBE32(const u8 *p);
+u32 ReadLE32(const u8 *p);
+u16 ReadBE16(const u8 *p);
+u16 ReadLE16(const u8 *p);
 
-#define SWAP16(X)    X=Swap16(X)
-#define SWAP32(X)    X=Swap32(X)
-
-#define LOAD16(p, b) b=Load16((uint8_t *)p)
-#define LOAD32(p, b) b=Load32((uint8_t *)p)
+void WriteBE32(char *p, u32 x);
+void WriteBE16(char *p, u16 x);
 
 #endif

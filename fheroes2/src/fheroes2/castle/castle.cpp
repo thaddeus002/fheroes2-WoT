@@ -62,7 +62,7 @@ void Castle::LoadFromMP2(const void *ptr)
 	++ptr8;
 	
 	// building
-	LOAD16(ptr8, byte16);
+	byte16 = ReadLE16(ptr8);
         if(0x0002 & byte16) building |= BUILD_THIEVESGUILD;
         if(0x0004 & byte16) building |= BUILD_TAVERN;
         if(0x0008 & byte16) building |= BUILD_SHIPYARD;
@@ -78,7 +78,7 @@ void Castle::LoadFromMP2(const void *ptr)
 	++ptr8;
 
 	// dwelling
-	LOAD16(ptr8, byte16);
+	byte16 = ReadLE16(ptr8);
         if(0x0008 & byte16) building |= DWELLING_MONSTER1;
         if(0x0010 & byte16) building |= DWELLING_MONSTER2;
         if(0x0020 & byte16) building |= DWELLING_MONSTER3;
@@ -141,31 +141,31 @@ void Castle::LoadFromMP2(const void *ptr)
 	++ptr8;
 
 	// count1
-	LOAD16(ptr8, byte16);
+	byte16 = ReadLE16(ptr8);
 	army.At(0).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count2
-	LOAD16(ptr8, byte16);
+	byte16 = ReadLE16(ptr8);
 	army.At(1).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count3
-	LOAD16(ptr8, byte16);
+	byte16 = ReadLE16(ptr8);
 	army.At(2).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count4
-	LOAD16(ptr8, byte16);
+	byte16 = ReadLE16(ptr8);
 	army.At(3).SetCount(byte16);
 	++ptr8;
 	++ptr8;
 
 	// count5
-	LOAD16(ptr8, byte16);
+	byte16 = ReadLE16(ptr8);
 	army.At(4).SetCount(byte16);
 	++ptr8;
 	++ptr8;

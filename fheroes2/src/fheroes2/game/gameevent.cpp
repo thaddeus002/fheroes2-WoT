@@ -40,53 +40,53 @@ GameEvent::Day::Day(const void *ptr)
     ++ptr8;
 
     // resource
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.wood = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.mercury = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.ore = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.sulfur = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.crystal = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.gems = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.gold = byte32;
 
     // skip artifact
-    LOAD16(ptr8, byte16);
+    byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
 
     // allow computer
-    LOAD16(ptr8, byte16);
+    byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
     computer = byte16;
 
     // day of first occurent
-    LOAD16(ptr8, byte16);
+    byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
     first = byte16;
 
     // subsequent occurrences
-    LOAD16(ptr8, byte16);
+    byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
     subsequent = byte16;
@@ -142,36 +142,36 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     ++ptr8;
 
     // resource
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.wood = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.mercury = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.ore = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.sulfur = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.crystal = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.gems = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.gold = byte32;
 
     // artifact
-    LOAD16(ptr8, byte16);
+    byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
     artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? artifact = Artifact::Artifact(byte16) : Artifact::UNKNOWN);
@@ -233,36 +233,36 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     ++ptr8;
 
     // resource
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.wood = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.mercury = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.ore = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.sulfur = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.crystal = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.gems = byte32;
 
-    LOAD32(ptr8, byte32);
+    byte32 = ReadLE32(ptr8);
     ptr8 += 4;;
     resource.gold = byte32;
 
     // artifact
-    LOAD16(ptr8, byte16);
+    byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
     if(0xffff != byte16 && Artifact::MAGIC_BOOK > byte16) artifact = Artifact::Artifact(byte16);

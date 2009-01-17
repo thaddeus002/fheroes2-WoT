@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Josh Matthews <josh@joshmatthews.net>           *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
+ *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,38 +20,36 @@
 
 #include "types.h"
 
-uint16_t Swap16(uint16_t val)
+u32 ReadBE32(const u8 *p)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    return SDL_Swap16(val);
-#else
-    return val;
-#endif
+    return ((((u32) *p) << 24) | (((u32) *(p + 1)) << 16) | (((u32) *(p + 2)) << 8) | ((u32) *(p + 3)));
 }
 
-uint32_t Swap32(uint32_t val)
+u32 ReadLE32(const u8 *p)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    return SDL_Swap32(val);
-#else
-    return val;
-#endif
+    return ((((u32) *(p + 3)) << 24) | (((u32) *(p + 2)) << 16) | (((u32) *(p + 1)) << 8) | ((u32) *p));
 }
 
-uint16_t Load16(uint8_t *p)
+u16 ReadBE16(const u8 *p)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    return (uint16_t)((*(p + 1) << 8) | *p);
-#else
-    return *(uint16_t *)p;
-#endif
+    return((((u16) *p) << 8) | ((u16) *(p + 1)));
 }
 
-uint32_t Load32(uint8_t *p)
+u16 ReadLE16(const u8 *p)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    return (uint32_t)((*(p + 3) << 24) | (*(p + 2) << 16) | (*(p + 1) << 8) | *p);
-#else
-    return *(uint32_t *)p;
-#endif
+    return((((u16) *(p + 1)) << 8) | ((u16) *p));
+}
+
+void WriteBE32(char *p, u32 x)
+{
+    *p = static_cast<char>(x >> 24);
+    *(p + 1) = static_cast<char>((x & 0x00FF0000) >> 16);
+    *(p + 2) = static_cast<char>((x & 0x0000FF00) >> 8);
+    *(p + 3) = static_cast<char>(x & 0x000000FF);
+}
+
+void WriteBE16(char *p, u16 x)
+{
+    *p = static_cast<char>(x >> 8);
+    *(p + 1) = static_cast<char>(x & 0x00FF);
 }
