@@ -14,13 +14,25 @@ LUA_FLAGS :=
 SDL_LIBS := $(shell sdl-config --libs) -lSDL_mixer
 SDL_FLAGS := $(shell sdl-config --cflags)
 BUILD_DATE := $(shell date +%Y%m%d)
+CFLAGS := $(SDL_FLAGS) -Wall -fsigned-char
+LIBS := $(SDL_LIBS)
 
-ifdef DEVELOPMENT
-SDL_FLAGS := $(SDL_FLAGS) -DWITH_TTF
-SDL_LIBS := $(SDL_LIBS) -lSDL_ttf
+ifdef DEBUG
+CFLAGS := $(CFLAGS) -O0 -g
+else
+CFLAGS := $(CFLAGS) -O2
 endif
 
-export SDL_FLAGS SDL_LIBS LUA_LIBS BUILD_DATE
+ifdef DEVELOPMENT
+CFLAGS := $(CFLAGS) $(LUA_FLAGS) -DWITH_LUA -DWITH_TTF
+LIBS := $(LIBS) $(LUA_LIBS) -lSDL_ttf
+endif
+
+ifdef RELEASE
+CFLAGS := $(CFLAGS) -DBUILD_RELEASE
+endif
+
+export BUILD_DATE CFLAGS LIBS
 
 all:
 	$(MAKE) -C engine

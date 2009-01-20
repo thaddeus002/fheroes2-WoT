@@ -9,25 +9,8 @@
 
 TARGET := fheroes2
 LIBENGINE := ../engine/libengine.a
-LIBS := $(LIBENGINE) $(SDL_LIBS)
-CFLAGS = -I../engine
-
-ifdef DEBUG
-CFLAGS := $(CFLAGS) -O0 -g -Wall $(SDL_FLAGS)
-else
-CFLAGS := $(CFLAGS) -O2 -Wall $(SDL_FLAGS)
-endif
-
-ifdef RELEASE
-CFLAGS := $(CFLAGS) -DBUILD_RELEASE
-endif
-
-ifdef DEVELOPMENT
-CFLAGS := $(CFLAGS) $(LUA_FLAGS) -DWITH_LUA
-LIBS := $(LIBS) $(LUA_LIBS)
-endif
-
-CFLAGS := $(CFLAGS) -DBUILD_DATE=$(BUILD_DATE)
+LIBS := $(LIBENGINE) $(LIBS)
+CFLAGS := $(CFLAGS) -I../engine -DBUILD_DATE=$(BUILD_DATE)
 
 CC := g++
 

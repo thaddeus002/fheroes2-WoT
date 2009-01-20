@@ -4,14 +4,8 @@
 
 TARGETS := extractor 82m2wav til2bmp icn2bmp xmi2mid package
 LIBENGINE := ../engine/libengine.a
-LIBS := $(LIBENGINE) $(SDL_LIBS)
-CFLAGS = -I../engine
-
-ifdef DEBUG
-CFLAGS := $(CFLAGS) -O0 -g -Wall $(SDL_FLAGS)
-else
-CFLAGS := $(CFLAGS) -O2 -Wall $(SDL_FLAGS)
-endif
+LIBS := $(LIBENGINE) $(LIBS)
+CFLAGS := $(CFLAGS) -I../engine
 
 CC := g++
 
