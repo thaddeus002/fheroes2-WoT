@@ -1,4 +1,19 @@
-SVN - up to r800
+SVN - up to r826
+
+Users
+
++ Campfires now give gold rewards along with other resources. (afletdinov)
++ Numeric fields now accept keyboard input. (afletdinov)
++ Black Dragons now correctly cost 2 sulphur. (afletdinov)
++ Artifacts with resource costs are now fixed, instead of changing randomly
+  each time a hero touches the artifact. (afletdinov)
++ Fix maps generating the same random artifact multiple times. (afletdinov)
++ Add actions for Tree of Knowledge, Oracle, and Demon Cave map objects. (afletdinov)
++ Various endian fixes which make fheroes2 playable on AmigaOS. (afletdinov)
+
+Developers
+
++ Nothing.
 
 December 25, 2008 - Development build r807
 
