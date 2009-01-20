@@ -326,7 +326,7 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 	}
 
 	// read delta
-	while(0 < *ptr)
+	while(0 < static_cast<s8>(*ptr))
 	{
 	    delta += *ptr;
 	    ++ptr;

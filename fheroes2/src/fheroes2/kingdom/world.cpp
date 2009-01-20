@@ -374,7 +374,7 @@ void World::LoadMaps(const std::string &filename)
 
     AGG::PreloadObject(TIL::GROUND32);
 
-    char byte8;
+    u8   byte8;
     u16  byte16;
     u32  byte32;
     std::vector<u16> vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
@@ -429,19 +429,19 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&mp2addon.indexAddon), sizeof(u16));
 	SwapLE16(mp2addon.indexAddon);
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2addon.objectNameN1 = byte8 * 2;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2addon.indexNameN1 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2addon.quantityN = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2addon.objectNameN2 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2addon.indexNameN2 = byte8;
 
 	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN1), sizeof(u32));
@@ -471,28 +471,28 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&mp2tile.tileIndex), sizeof(u16));
 	SwapLE16(mp2tile.tileIndex);
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.objectName1 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.indexName1 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.quantity1 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.quantity2 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.objectName2 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.indexName2 = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.shape = byte8;
 
-	fd.read(&byte8, 1);
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
 	mp2tile.generalObject = byte8;
 
 	switch(mp2tile.generalObject)
@@ -659,8 +659,8 @@ void World::LoadMaps(const std::string &filename)
     fd.seekg(endof_addons + (72 * 3) + (144 * 3), std::ios_base::beg);
 
     // unknown byte
-    char unk_byte;
-    fd.read(&unk_byte, 1);
+    u8 unk_byte;
+    fd.read(reinterpret_cast<char *>(&unk_byte), 1);
     if(4 < H2Config::Debug() && unk_byte)
 	printf("World::World: dump unknown byte: %hhX\n", unk_byte);
 
@@ -700,10 +700,10 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&sizeblock), sizeof(u16));
 	SwapLE16(sizeblock);
 
-	char *pblock = new char[sizeblock];
+	u8 *pblock = new u8[sizeblock];
 
 	// read block
-	fd.read(pblock, sizeblock);
+	fd.read(reinterpret_cast<char *>(pblock), sizeblock);
 
 	std::vector<u16>::const_iterator it_index = vec_object.begin();
 	bool findobject = false;
@@ -831,7 +831,7 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
 		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
-			map_sign[*it_index] = std::string(&pblock[9]);
+			map_sign[*it_index] = std::string(reinterpret_cast<char *>(&pblock[9]));
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
@@ -860,7 +860,7 @@ void World::LoadMaps(const std::string &filename)
 	    {
 		if(pblock[8])
 		{
-		    vec_rumors.push_back(&pblock[8]);
+		    vec_rumors.push_back(reinterpret_cast<char *>(&pblock[8]));
 		    if(H2Config::Debug()) Error::Verbose("add Rumors: " + vec_rumors.back());
 		}
 	    }
