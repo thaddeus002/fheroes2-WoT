@@ -7,9 +7,11 @@ Users
 + Black Dragons now correctly cost 2 sulphur. (afletdinov)
 + Artifacts with resource costs are now fixed, instead of changing randomly
   each time a hero touches the artifact. (afletdinov)
-+ Fix maps generating the same random artifact multiple times. (afletdinov)
-+ Add actions for Tree of Knowledge, Oracle, and Demon Cave map objects. (afletdinov)
-+ Various endian fixes which make fheroes2 playable on AmigaOS. (afletdinov)
++ Fixed maps generating the same random artifact multiple times. (afletdinov)
++ Added actions for Tree of Knowledge, Oracle, and Demon Cave map objects. (afletdinov)
++ Fixed various endian issues which made fheroes2 unplayable on AmigaOS. (afletdinov)
++ Added keyboard hotkeys for buttons on the main menu and ending the turn in game.
+  (afletdinov, revvy)
 
 Developers
 

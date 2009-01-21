@@ -1124,7 +1124,7 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 	    else
 	    // click End Turn
-	    if(le.MouseClickLeft(buttonEndTur))
+	    if(le.KeyPress(KEY_e) || le.MouseClickLeft(buttonEndTur))
 	    {
     		if(Game::Focus::HEROES == global_focus.Type())
 		    global_focus.GetHeroes().SetMove(false);
