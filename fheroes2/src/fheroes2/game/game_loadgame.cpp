@@ -72,9 +72,9 @@ Game::menu_t Game::LoadGame(void)
 	le.MousePressLeft(buttonMultiGame) ? buttonMultiGame.PressDraw() : buttonMultiGame.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonStandartGame)) return LOADSTANDARD;
-	if(le.MouseClickLeft(buttonCampainGame)) return LOADCAMPAIN;
-	if(le.MouseClickLeft(buttonMultiGame)) return LOADMULTI;
+	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonStandartGame)) return LOADSTANDARD;
+	if(le.KeyPress(KEY_c) || le.MouseClickLeft(buttonCampainGame)) return LOADCAMPAIN;
+	if(le.KeyPress(KEY_m) || le.MouseClickLeft(buttonMultiGame)) return LOADMULTI;
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
     }
 

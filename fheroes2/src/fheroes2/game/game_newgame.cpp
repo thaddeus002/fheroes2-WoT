@@ -76,9 +76,9 @@ Game::menu_t Game::NewGame(void)
 	le.MousePressLeft(buttonMultiGame) ? buttonMultiGame.PressDraw() : buttonMultiGame.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
-	if(le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
-	if(le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
+	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
+	if(le.KeyPress(KEY_c) || le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
+	if(le.KeyPress(KEY_m) || le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info

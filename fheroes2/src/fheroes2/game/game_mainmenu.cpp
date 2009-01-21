@@ -221,15 +221,15 @@ Game::menu_t Game::MainMenu(void)
 	    display.Flip();
 	}
 
-	if(le.MouseClickLeft(buttonNewGame)) return NEWGAME;
+	if(le.KeyPress(KEY_n) || le.MouseClickLeft(buttonNewGame)) return NEWGAME;
 	else
-	if(le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
+	if(le.KeyPress(KEY_l) || le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
 	else
-	if(le.MouseClickLeft(buttonHighScores)) return HIGHSCORES;
+	if(le.KeyPress(KEY_h) || le.MouseClickLeft(buttonHighScores)) return HIGHSCORES;
 	else
-	if(le.MouseClickLeft(buttonCredits)) return CREDITS;
+	if(le.KeyPress(KEY_c) || le.MouseClickLeft(buttonCredits)) return CREDITS;
 	else
-	if(le.MouseClickLeft(buttonQuit) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
+	if(le.KeyPress(KEY_q) || le.MouseClickLeft(buttonQuit) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
 
 	// right info
 #ifdef WITH_TTF

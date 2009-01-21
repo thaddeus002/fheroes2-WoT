@@ -258,7 +258,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
 	// click select
-	if(le.MouseClickLeft(buttonSelectMaps))
+	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectMaps))
 	{
 	    const Maps::FileInfo * finfo = Dialog::SelectFileInfo(info_maps);
 	    if(NULL != finfo) conf.LoadFileMaps(finfo->FileMaps());
@@ -288,7 +288,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	}
 
 	// click ok
-	if(le.MouseClickLeft(buttonOk))
+	if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
 	{
 	    if(H2Config::Debug()) Error::Verbose("select maps: " + conf.FileInfo().FileMaps());
 	    if(H2Config::Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
