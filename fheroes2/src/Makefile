@@ -15,7 +15,7 @@ SDL_LIBS := $(shell sdl-config --libs) -lSDL_mixer
 SDL_FLAGS := $(shell sdl-config --cflags)
 BUILD_DATE := $(shell date +%Y%m%d)
 CFLAGS := $(SDL_FLAGS) -Wall -fsigned-char
-LIBS := $(SDL_LIBS)
+LIBS := $(SDL_LIBS) -lpng
 
 ifdef DEBUG
 CFLAGS := $(CFLAGS) -O0 -g

@@ -68,8 +68,10 @@ public:
     void Blit(const Surface &src, const Rect &src_rt, const Point &dst_pt){ Blit(src, src_rt, dst_pt.x, dst_pt.y); };
 
     void ScaleFrom(const Surface & bs);
-    
+
     bool SaveBMP(const char *fn) const;
+    bool SavePNG(const char *fn) const;
+
     const void *pixels(void) const;
     const SDL_Surface *GetSurface(void) const{ return surface; };
 

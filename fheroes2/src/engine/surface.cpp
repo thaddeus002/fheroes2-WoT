@@ -27,6 +27,8 @@
 #include "SDL_ttf.h"
 #endif
 
+#include "IMG_savepng.h"
+
 Surface::Surface() : surface(NULL), videosurface(false)
 {
 }
@@ -474,6 +476,11 @@ void Surface::ScaleFrom(const Surface & bs)
 bool Surface::SaveBMP(const char *fn) const
 {
     return SDL_SaveBMP(surface, fn) ? false : true;
+}
+
+bool Surface::SavePNG(const char *fn) const
+{
+    return IMG_SavePNG(fn, surface, -1);
 }
 
 const void *Surface::pixels(void) const
