@@ -54,6 +54,8 @@ void AIToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index);
 
 void Heroes::AIUpdateRoles(void)
 {
@@ -153,6 +155,9 @@ void Heroes::AIAction(const u16 dst_index)
 	case MP2::OBJ_DERELICTSHIP:	AIToPoorMoraleObject(*this, object, dst_index); break;
 
 	case MP2::OBJ_PYRAMID:		AIToPoorLuckObject(*this, object, dst_index); break;
+	case MP2::OBJ_DAEMONCAVE:	AIToDaemonCave(*this, object, dst_index); break;
+
+        case MP2::OBJ_TREEKNOWLEDGE:	AIToTreeKnowledge(*this, object, dst_index); break;
 
 
 	default:
@@ -924,6 +929,70 @@ void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToObelisk: " + hero.GetName());
 }
 
+void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    if(!hero.isVisited(tile))
+    {
+	Resource::funds_t payment;
+	switch(tile.GetQuantity2())
+	{
+	    case 10:	payment.gems = 10; break;
+	    case 20:	payment.gold = 2000; break;
+	    default:	break;
+	}
+
+    	if(!payment.GetValidItems() || world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+    	{
+	    if(payment.GetValidItems()) world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+	    hero.SetVisited(dst_index);
+	    Error::Verbose("level: ", hero.GetLevel());
+	    hero.IncreaseExperience(hero.GetExperienceFromLevel(hero.GetLevel()) - hero.GetExperience());
+	}
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToTreeKnowledge: " + hero.GetName());
+}
+
+
+void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    if(tile.GetQuantity2())
+    {
+	Resource::funds_t resource;
+
+	// check variants
+	switch(tile.GetQuantity2())
+	{
+	    case 1:
+    		hero.IncreaseExperience(1000);
+		tile.SetQuantity2(0);
+		break;
+	    case 2:
+	    {
+		const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+		if(Artifact::UNKNOWN != art) hero.PickupArtifact(art);
+    		hero.IncreaseExperience(1000);
+		tile.SetQuantity1(Artifact::UNKNOWN);
+		tile.SetQuantity2(0);
+		break;
+	    }
+	    case 3:
+		resource.gold = 2500;
+    		hero.IncreaseExperience(1000);
+		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+		tile.SetQuantity2(0);
+		break;
+	    default:
+		break;
+	}
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToDaemonCave: " + hero.GetName());
+}
 
 
 
@@ -966,7 +1035,7 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	    if(world.ColorCapturedObject(index) != GetColor()) return true;
 	    break;
 
-	// piclup object
+	// pickup object
 	case MP2::OBJ_WAGON:
 	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_WINDMILL:
@@ -984,6 +1053,8 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 
 	// increase view
 	case MP2::OBJ_OBSERVATIONTOWER:
+	// obelisk
+	case MP2::OBJ_OBELISK:
 	    if(! isVisited(world.GetTiles(index), Visit::GLOBAL)) return true;
 	    break;
 
@@ -1009,6 +1080,22 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	// exp
 	case MP2::OBJ_GAZEBO:
 	    if(! isVisited(world.GetTiles(index))) return true;
+	    break;
+
+	case MP2::OBJ_TREEKNOWLEDGE:
+	    if(! isVisited(world.GetTiles(index)))
+	    {
+		Resource::funds_t payment;
+		switch(world.GetTiles(index).GetQuantity2())
+		{
+		    case 10:	payment.gems = 10; break;
+		    case 20:	payment.gold = 2000; break;
+		    default:	break;
+		}
+
+    		if(!payment.GetValidItems() || world.GetKingdom(GetColor()).AllowPayment(payment))
+		    return true;
+	    }
 	    break;
 
     	// good luck
@@ -1078,6 +1165,10 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 
 	//case MP2::OBJ_PYRAMID:
 
+	case MP2::OBJ_DAEMONCAVE:
+	    if(world.GetTiles(index).GetQuantity2() && 4 != world.GetTiles(index).GetQuantity2()) return true;
+	    break;
+
 	case MP2::OBJ_MONSTER:
 	{
             const Maps::Tiles & tile = world.GetTiles(index);
@@ -1104,3 +1195,5 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 
     return false;
 }
+
+
