@@ -91,6 +91,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     buttonCancel.Draw();
 
     bool zero = false;
+    bool first = true;
     cursor.Show();
     display.Flip();
 
@@ -111,6 +112,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 		{
 		    cur = min;
 		    zero = true;
+		    first = true;
 		}
 	    }
 
@@ -140,6 +142,12 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 	   le.KeyPress(KEY_8) ||
 	   le.KeyPress(KEY_9))
 	{
+	    if(first)
+	    {
+		cur = 0;
+		first = false;
+	    }
+
 	    if(max > cur)
 	    {
 		if(zero)
