@@ -8,9 +8,6 @@
 #
 
 TARGET := fheroes2
-LUA_LIBS := -Wl,-Bstatic -llua -Wl,-Bdynamic
-#LUA_LIBS := $(shell pkg-config lua --libs)
-LUA_FLAGS :=
 SDL_LIBS := $(shell sdl-config --libs) -lSDL_mixer
 SDL_FLAGS := $(shell sdl-config --cflags)
 PNG_LIBS := $(shell libpng12-config --libs)
@@ -26,8 +23,8 @@ CFLAGS := $(CFLAGS) -O2
 endif
 
 ifdef DEVELOPMENT
-CFLAGS := $(CFLAGS) $(LUA_FLAGS) -DWITH_LUA -DWITH_TTF
-LIBS := $(LIBS) $(LUA_LIBS) -lSDL_ttf
+CFLAGS := $(CFLAGS) -DWITH_TTF
+LIBS := $(LIBS) -lSDL_ttf
 endif
 
 ifdef RELEASE

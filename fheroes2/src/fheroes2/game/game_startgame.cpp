@@ -42,7 +42,6 @@
 #include "settings.h"
 #include "route.h"
 #include "game_focus.h"
-#include "scripting.h"
 #include "kingdom.h"
 
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
@@ -1105,12 +1104,6 @@ Game::menu_t Game::HumanTurn(void)
 	    // click Kingdom Summary
 	    if(le.MouseClickLeft(buttonKingdom))
 	    {
-#ifdef WITH_LUA
-	        Lua::DoString("alert()");
-	        Lua::DoString("alert1('test')");
-	        Lua::DoString("msg('header', 'text')");
-	        Lua::DoString("message('header', 'text', 0, 2)");
-#endif
 	    }
 	    else
 	    // click Cast Spell
