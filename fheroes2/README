@@ -6,7 +6,8 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 
 - SDL
 - SDL_mixer
-- Lua 5.1 or above (for building only)
+- libpng12
+- zlib
 
 Build environment:
 DEBUG		- build in debug mode
@@ -14,7 +15,6 @@ RELEASE		- build with addons extensions
 SCRIPTING	- build with lua support
 
 SDL libraries can be found at http://www.libsdl.org .
-Lua libraries can be found at http://www.lua.org .
 
 Sourcecode: you can get it here: http://sourceforge.net/projects/fheroes2/
 
