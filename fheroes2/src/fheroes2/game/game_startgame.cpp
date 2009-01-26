@@ -739,6 +739,7 @@ Game::menu_t Game::HumanTurn(void)
     // startgame loop
     while(le.HandleEvents())
     {
+	// Hot Keys:
 	// ESC
 	if(le.KeyPress(KEY_ESCAPE))
 	{
@@ -749,6 +750,17 @@ Game::menu_t Game::HumanTurn(void)
     	    if(Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
     	    continue;
 	}
+        else
+        // press End Turn
+        if(le.KeyPress(KEY_e))
+        {
+            if(Game::Focus::HEROES == global_focus.Type())
+                global_focus.GetHeroes().SetMove(false);
+
+            if(!myKingdom.HeroesMayStillMove() ||
+                Dialog::YES == Dialog::Message("", "One or more heroes may still move, are you sure you want to end your turn?", Font::BIG, Dialog::YES | Dialog::NO))
+                break;
+        }
 
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
@@ -1117,7 +1129,7 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 	    else
 	    // click End Turn
-	    if(le.KeyPress(KEY_e) || le.MouseClickLeft(buttonEndTur))
+	    if(le.MouseClickLeft(buttonEndTur))
 	    {
     		if(Game::Focus::HEROES == global_focus.Type())
 		    global_focus.GetHeroes().SetMove(false);
