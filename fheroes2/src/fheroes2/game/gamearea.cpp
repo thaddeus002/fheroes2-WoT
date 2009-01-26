@@ -671,6 +671,7 @@ void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf
 	if(rt.y > BORDERWIDTH + TILEWIDTH * gh - rt.h) rt.y = BORDERWIDTH + TILEWIDTH * gh - rt.h;
 
 	sf.Blit(display, rt, 0, 0);
+	display.FillRect(0x00, 0x00, 0x00, Rect(BORDERWIDTH, BORDERWIDTH, gw * TILEWIDTH, gh * TILEWIDTH));
     }
     else
     Error::Warning("GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
