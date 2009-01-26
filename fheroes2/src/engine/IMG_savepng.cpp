@@ -26,7 +26,7 @@
  */
 #include <stdlib.h>
 #include "SDL.h"
-#include <png.h>
+#include "png.h"
 #include "IMG_savepng.h"
 
 int IMG_SavePNG(const char *file, SDL_Surface *surf,int compression){
