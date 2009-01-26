@@ -12,7 +12,6 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 Build environment:
 DEBUG		- build in debug mode
 RELEASE		- build with addons extensions
-SCRIPTING	- build with lua support
 
 SDL libraries can be found at http://www.libsdl.org .
 
@@ -24,3 +23,10 @@ Copy maps files (*.mp2) in to maps directory.
 Hot keys:
 F4		- switch to fullscreen
 PrintScreen	- create screenshot
+e		- end turn
+
+Main menu:
+n		- new game
+s		- standard game
+c		- campaign game
+m		- multi-player game
