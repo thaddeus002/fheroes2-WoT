@@ -679,7 +679,7 @@ void World::LoadMaps(const std::string &filename)
 	SwapLE16(byte16);
 
 	if(4 < H2Config::Debug())
-	    printf("%hX", byte16);
+	    printf(":%hX", byte16);
 
 	if(byte16) countblock = byte16 - 1;
     }
