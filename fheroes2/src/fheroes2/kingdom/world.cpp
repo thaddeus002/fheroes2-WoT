@@ -659,33 +659,35 @@ void World::LoadMaps(const std::string &filename)
     fd.seekg(endof_addons + (72 * 3) + (144 * 3), std::ios_base::beg);
 
     // unknown byte
-    u8 unk_byte;
-    fd.read(reinterpret_cast<char *>(&unk_byte), 1);
-    if(4 < H2Config::Debug() && unk_byte)
-	printf("World::World: dump unknown byte: %hhX\n", unk_byte);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
+    if(4 < H2Config::Debug() && byte8)
+	printf("World::World: dump unknown byte: %hhX\n", byte8);
 
     if(4 < H2Config::Debug())
-	    printf("World::World: dump final block: ");
+	printf("World::World: dump final block: ");
 
     // count final mp2 blocks
     u16 countblock = 0;
-    byte16 = 0xffff;
-    while(byte16)
+    while(1)
     {
+	u8 l = 0;
+	u8 h = 0;
+
 	// debug endof mp2
 	if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
 
-	fd.read(reinterpret_cast<char *>(&byte16), sizeof(u16));
-	SwapLE16(byte16);
+	fd.read(reinterpret_cast<char *>(&l), 1);
+	fd.read(reinterpret_cast<char *>(&h), 1);
 
-	if(4 < H2Config::Debug())
-	    printf(":%hX", byte16);
+	if(4 < H2Config::Debug()){ printf(":%hX", l); printf(":%hX", h); }
 
-	if(byte16) countblock = byte16 - 1;
+	if(0 == h && 0 == l) break;
+	else
+	{
+	    countblock = 255 * h + l;
+	}
     }
-
-    if(4 < H2Config::Debug())
-	printf("\n");
+    if(4 < H2Config::Debug()) printf("\n");
 
     if(H2Config::Debug()) Error::Verbose("World::World: read find final mp2 blocks, tellg: ", fd.tellg());
 
