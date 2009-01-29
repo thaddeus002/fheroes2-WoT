@@ -684,7 +684,7 @@ void World::LoadMaps(const std::string &filename)
 	if(0 == h && 0 == l) break;
 	else
 	{
-	    countblock = 255 * h + l;
+	    countblock = 255 * h + l - 1;
 	}
     }
     if(4 < H2Config::Debug()) printf("\n");
