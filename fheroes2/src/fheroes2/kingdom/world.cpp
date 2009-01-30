@@ -663,6 +663,7 @@ void World::LoadMaps(const std::string &filename)
     if(4 < H2Config::Debug() && byte8)
 	printf("World::World: dump unknown byte: %hhX\n", byte8);
 
+    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg: ", fd.tellg());
     if(4 < H2Config::Debug())
 	printf("World::World: dump final block: ");
 
@@ -672,6 +673,8 @@ void World::LoadMaps(const std::string &filename)
     {
 	u8 l = 0;
 	u8 h = 0;
+
+	if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg: ", fd.tellg());
 
 	// debug endof mp2
 	if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
