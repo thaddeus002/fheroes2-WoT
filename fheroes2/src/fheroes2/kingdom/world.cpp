@@ -660,12 +660,15 @@ void World::LoadMaps(const std::string &filename)
 
     // unknown byte
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(4 < H2Config::Debug() && byte8)
-	printf("World::World: dump unknown byte: %hhX\n", byte8);
+    if(4 < H2Config::Debug() && byte8) printf("World::World: dump unknown byte: %hhX\n", byte8);
 
     if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg: ", fd.tellg());
-    if(4 < H2Config::Debug())
-	printf("World::World: dump final block: ");
+
+    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg 1: ", fd.tellg());
+    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg 2: ", fd.tellg());
+    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg 3: ", fd.tellg());
+
+    if(4 < H2Config::Debug()) printf("World::World: dump final block: ");
 
     // count final mp2 blocks
     u16 countblock = 0;
@@ -674,15 +677,13 @@ void World::LoadMaps(const std::string &filename)
 	u8 l = 0;
 	u8 h = 0;
 
-	if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg: ", fd.tellg());
-
 	// debug endof mp2
 	if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
 
 	fd.read(reinterpret_cast<char *>(&l), 1);
 	fd.read(reinterpret_cast<char *>(&h), 1);
 
-	if(4 < H2Config::Debug()){ printf(":%hX", l); printf(":%hX", h); }
+	if(4 < H2Config::Debug()){ printf(":%hhX", l); printf(":%hhX", h); }
 
 	if(0 == h && 0 == l) break;
 	else
