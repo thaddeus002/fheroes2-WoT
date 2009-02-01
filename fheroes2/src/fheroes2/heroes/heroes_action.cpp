@@ -113,7 +113,7 @@ u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, cons
     image.Blit(artifact, 5, 5);
     image.Blit(sprite, border.w() + 50, (border.h() - sprite.h()) / 2);
     Text text(str, Font::SMALL);
-    text.Blit(border.w() + 50 + (sprite.w() - text.w()) / 2, border.h() - 25, image);
+    text.Blit(border.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 

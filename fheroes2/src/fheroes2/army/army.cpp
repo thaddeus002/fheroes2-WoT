@@ -205,6 +205,13 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
             army[2].Set(Monster::BLACK_DRAGON, 1);
 	    break;
 
+	case MP2::OBJ_DAEMONCAVE:
+            army[0].Set(Monster::EARTH_ELEMENT, 2);
+            army[1].Set(Monster::EARTH_ELEMENT, 2);
+            army[2].Set(Monster::EARTH_ELEMENT, 2);
+            army[3].Set(Monster::EARTH_ELEMENT, 2);
+	    break;
+
 	default: break;
     }
 }

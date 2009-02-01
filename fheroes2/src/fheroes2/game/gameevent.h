@@ -77,6 +77,10 @@ class Riddle
 public:
     Riddle(u16 index, const void *ptr);
 
+    const Resource::funds_t & GetResource(void) const{ return resource; };
+    Artifact::artifact_t GetArtifact(void) const {return artifact; };
+    bool AnswerCorrect(const std::string & answer);
+
 private:
     u16 index_map;
     Resource::funds_t resource;

@@ -213,8 +213,6 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     // message
     message = std::string(reinterpret_cast<const char *>(ptr8));
     
-    //if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Coord: long message, incorrect block?");
-
     if(H2Config::Debug()) Error::Verbose("GameEvent::Coord: add: " + message);
 }
 
@@ -223,6 +221,7 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
     u32 byte32 = 0;
+    answers.reserve(9);
 
     // id
     if(0x00 != *ptr8)
@@ -265,25 +264,27 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
-    if(0xffff != byte16 && Artifact::MAGIC_BOOK > byte16) artifact = Artifact::Artifact(byte16);
+    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? Artifact::Artifact(byte16) : Artifact::UNKNOWN);
 
     // count answers
     u8 count = *ptr8;
     ++ptr8;
 
     // answers
-    for(u8 i = 0; i < 8; ++i){
-
+    for(u8 i = 0; i < 8; ++i)
+    {
 	std::string str(reinterpret_cast<const char *>(ptr8));
 	if(count-- && str.size()) answers.push_back(str);
-	
 	ptr8 += 13;
     }
 
     // message
     message = std::string(reinterpret_cast<const char *>(ptr8));
     
-    //if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Riddle: long message, incorrect block?");
-
     if(H2Config::Debug()) Error::Verbose("GameEvent::Riddle: add: " + message);
+}
+
+bool GameEvent::Riddle::AnswerCorrect(const std::string & answer)
+{
+    return answers.end() != std::find(answers.begin(), answers.end(), answer);
 }
