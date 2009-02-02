@@ -6,15 +6,11 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 
 - SDL
 - SDL_mixer
+- SDL_image
 - libpng12
 - zlib
 
-Build environment:
-DEBUG		- build in debug mode
-RELEASE		- build with addons extensions
-
 SDL libraries can be found at http://www.libsdl.org .
-
 Sourcecode: you can get it here: http://sourceforge.net/projects/fheroes2/
 
 Copy origin data/*.agg in to data directory.

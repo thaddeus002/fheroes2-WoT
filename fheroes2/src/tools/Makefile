@@ -2,7 +2,7 @@
 # project: Free Heroes2 Tools
 #
 
-TARGETS := extractor 82m2wav til2bmp icn2bmp icn2png xmi2mid package
+TARGETS := extractor 82m2wav til2bmp icn2png xmi2mid
 LIBENGINE := ../engine/libengine.a
 LIBS := $(LIBENGINE) $(LIBS)
 CFLAGS := $(CFLAGS) -I../engine
