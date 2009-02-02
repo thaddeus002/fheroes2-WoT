@@ -1,7 +1,7 @@
-SVN - up to r826
+SVN - up to r849
 
 Users
-
++ Added icn2png convertor tools
 + Campfires now give gold rewards along with other resources. (afletdinov)
 + Numeric fields now accept keyboard input. (afletdinov)
 + Black Dragons now correctly cost 2 sulphur. (afletdinov)
