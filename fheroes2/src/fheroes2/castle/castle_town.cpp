@@ -61,7 +61,7 @@ void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 {
-    const ICN::icn_t system = (H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    const ICN::icn_t system = (Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     const Heroes & heroes = world.GetHeroes(hero);
 
@@ -145,7 +145,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 {
     Display & display = Display::Get();
 
-    const ICN::icn_t system = (H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    const ICN::icn_t system = (Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();

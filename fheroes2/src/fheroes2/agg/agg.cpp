@@ -26,6 +26,8 @@
 #include "audio.h"
 #include "midi_xmi.h"
 #include "midi_mid.h"
+#include "dir.h"
+#include "SDL_image.h"
 #include "agg.h"
 
 #define FATSIZENAME	15
@@ -44,14 +46,14 @@ AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), c
 	return;
     }
 
-    if(H2Config::Debug()) Error::Verbose("AGG::File: load: " + filename);
+    if(Settings::Get().Debug()) Error::Verbose("AGG::File: load: " + filename);
 
     if(isGameFile)
     {
         stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
         SwapLE16(count_items);
 
-        if(H2Config::Debug()) Error::Verbose("AGG::File: count items: ", count_items);
+        if(Settings::Get().Debug()) Error::Verbose("AGG::File: count items: ", count_items);
 
         char buf[FATSIZENAME + 1];
         buf[FATSIZENAME] = 0;
@@ -132,11 +134,11 @@ bool AGG::File::Read(const std::string & key, std::vector<char> & body)
 
     body.clear();
 
-    if(H2Config::Debug() > 3) f.Dump(key);
+    if(Settings::Get().Debug() > 3) f.Dump(key);
     
     if(f.size)
     {
-	if(2 < H2Config::Debug()) Error::Verbose("AGG::File::Read: " + key);
+	if(2 < Settings::Get().Debug()) Error::Verbose("AGG::File::Read: " + key);
 
 	body.resize(f.size);
 
@@ -313,7 +315,7 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 
     if(v.size()) return;
 
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
 
     Sprite *sprite = NULL;
     u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
@@ -412,8 +414,35 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 
     if(v.size()) return;
 
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+    // load from image cache dir
+    if(Settings::Get().CacheDirectory().size())
+    {
+	Dir dir;
+	const std::string icn_folder(Settings::Get().CacheDirectory() + SEPARATOR + ICN::GetString(icn));
 
+	dir.Read(icn_folder, ".png", false);
+	dir.sort();
+	
+	if(dir.size())
+	{
+	    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
+
+	    v.resize(dir.size());
+	    Dir::const_iterator itd = dir.begin();
+
+	    for(u16 ii = 0; ii < dir.size(); ++ii)
+    	    {
+    		v[ii] = new Sprite(IMG_Load((*itd).c_str()), 0, 0);
+    		++itd;
+    	    }
+
+    	    return;
+        }
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+
+    // load from agg file
     if(agg_cache.size())
     {
 	std::vector<char> body;
@@ -457,7 +486,6 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 
 	Error::Warning("AGG::Cache::LoadICN: not found: " + ICN::GetString(icn));
     }
-
 }
 
 /* load TIL object to AGG::Cache */
@@ -467,7 +495,7 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 
     if(v.size()) return;
 
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadTIL: " + TIL::GetString(til));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadTIL: " + TIL::GetString(til));
 
     if(agg_cache.size())
     {
@@ -525,7 +553,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
     if(v.size()) return;
 
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadWAV: " + M82::GetString(m82));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadWAV: " + M82::GetString(m82));
 
     if(! Mixer::isValid()) return;
 
@@ -574,7 +602,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
     if(v.size()) return;
 
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadMID: " + XMI::GetString(xmi));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMID: " + XMI::GetString(xmi));
 
     if(! Mixer::isValid()) return;
 
@@ -609,7 +637,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
 void AGG::Cache::LoadPAL(void)
 {
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadPAL: ", Palette::Get().Size());
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadPAL: ", Palette::Get().Size());
 }
 
 void AGG::Cache::LoadMUS(const MUS::mus_t mus)
@@ -618,7 +646,7 @@ void AGG::Cache::LoadMUS(const MUS::mus_t mus)
     
     if(v.size()) return;
 
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + MUS::GetString(mus));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + MUS::GetString(mus));
 
     if(! Mixer::isValid()) return;
 
@@ -707,7 +735,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 {
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::FreeICN: " + ICN::GetString(icn));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: " + ICN::GetString(icn));
 
     std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
@@ -725,7 +753,7 @@ void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 /* free TIL object in AGG::Cache */
 void AGG::Cache::FreeTIL(const TIL::til_t til)
 {
-    if(H2Config::Debug()) Error::Verbose("AGG::Cache::FreeTIL: " + TIL::GetString(til));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeTIL: " + TIL::GetString(til));
 
     std::vector<Surface *> & v = til_cache[til];
 

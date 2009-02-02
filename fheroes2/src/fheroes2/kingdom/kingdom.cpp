@@ -166,7 +166,7 @@ void Kingdom::ActionNewWeek(void)
     for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewWeek();
 
     // debug an gift
-    if(H2Config::Debug() && Game::LOCAL == Control())
+    if(Settings::Get().Debug() && Game::LOCAL == Control())
     {
 	Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
 

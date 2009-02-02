@@ -198,7 +198,7 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bo
 
 
     // redraw grid
-    if(H2Config::Debug())
+    if(Settings::Get().Debug())
     {
 
 	for(u8 oy = ry; oy < ry + rh; ++oy)

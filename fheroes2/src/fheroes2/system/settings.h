@@ -28,7 +28,6 @@
 #include "maps_fileinfo.h"
 #include "game.h"
 #include "bitmodes.h"
-#include "config.h"
 
 class Settings : public BitModes
 {
@@ -78,6 +77,7 @@ public:
 
     const std::string & PreloadCharsets(void) const;
     const std::string & TranslationFile(void) const;
+    const std::string & CacheDirectory(void) const;
     const std::string & DataDirectory(void) const;
     const std::string & MapsDirectory(void) const;
 
@@ -145,6 +145,7 @@ private:
     Color::color_t my_color;
     Color::color_t cur_color;
 
+    std::string path_cache_directory;
     std::string path_data_directory;
     std::string path_maps_directory;
     std::string translationFile;

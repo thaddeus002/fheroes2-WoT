@@ -124,7 +124,7 @@ GameEvent::Day::Day(const void *ptr)
 
     //if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Day: long message, incorrect block?");
 
-    if(H2Config::Debug()) Error::Verbose("GameEvent::Day: add: " + message);
+    if(Settings::Get().Debug()) Error::Verbose("GameEvent::Day: add: " + message);
 }
 
 GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
@@ -213,7 +213,7 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     // message
     message = std::string(reinterpret_cast<const char *>(ptr8));
     
-    if(H2Config::Debug()) Error::Verbose("GameEvent::Coord: add: " + message);
+    if(Settings::Get().Debug()) Error::Verbose("GameEvent::Coord: add: " + message);
 }
 
 GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
@@ -281,7 +281,7 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     // message
     message = std::string(reinterpret_cast<const char *>(ptr8));
     
-    if(H2Config::Debug()) Error::Verbose("GameEvent::Riddle: add: " + message);
+    if(Settings::Get().Debug()) Error::Verbose("GameEvent::Riddle: add: " + message);
 }
 
 bool GameEvent::Riddle::AnswerCorrect(const std::string & answer)

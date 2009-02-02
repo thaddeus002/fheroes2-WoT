@@ -28,8 +28,8 @@ Game::menu_t Dialog::FileOptions(void)
 {
     Display & display = Display::Get();
     // preload
-    const ICN::icn_t cpanbkg = H2Config::EvilInterface() ? ICN::CPANBKGE : ICN::CPANBKG;
-    const ICN::icn_t cpanel  = H2Config::EvilInterface() ? ICN::CPANELE : ICN::CPANEL;
+    const ICN::icn_t cpanbkg = Settings::Get().EvilInterface() ? ICN::CPANBKGE : ICN::CPANBKG;
+    const ICN::icn_t cpanel  = Settings::Get().EvilInterface() ? ICN::CPANELE : ICN::CPANEL;
 
     AGG::PreloadObject(cpanbkg);
     AGG::PreloadObject(cpanel);

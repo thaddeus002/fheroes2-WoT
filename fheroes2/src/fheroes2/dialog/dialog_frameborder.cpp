@@ -27,7 +27,7 @@ Dialog::FrameBorder::FrameBorder(bool fade, u16 enclosedWidth, u16 enclosedHeigh
 : doFade(fade)
 {
     Display & display = Display::Get();
-    const Sprite & surdbkg = (H2Config::EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
+    const Sprite & surdbkg = (Settings::Get().EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
     
     Rect pos;
     

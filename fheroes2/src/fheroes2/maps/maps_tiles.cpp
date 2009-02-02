@@ -1433,7 +1433,7 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 		}
 	    }
 
-	    if(H2Config::Debug()) Error::Warning("Maps::Tiles::FixLoyaltyVersion: index: ", maps_index);
+	    if(Settings::Get().Debug()) Error::Warning("Maps::Tiles::FixLoyaltyVersion: index: ", maps_index);
 
 	} break;
 

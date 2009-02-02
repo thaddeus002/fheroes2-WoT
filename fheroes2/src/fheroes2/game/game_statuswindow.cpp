@@ -43,7 +43,7 @@ Game::StatusWindow & Game::StatusWindow::Get(void)
 
 void Game::StatusWindow::SetPos(const Point &pt)
 {
-    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
     pos = Rect(pt, ston.w(), ston.h());
     count = (Display::Get().h() - BORDERWIDTH - pos.y) / TILEWIDTH;
 }
@@ -62,7 +62,7 @@ void Game::StatusWindow::Redraw(void)
 {
     // restore background
     DrawBackground();
-    const Sprite & ston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     // draw info: Day and Funds and Army
     if(UNKNOWN != state && count >= ((ston.h() * 3 + 15)/ TILEWIDTH))
@@ -142,7 +142,7 @@ void Game::StatusWindow::DrawDayInfo(const u8 oh) const
     std::string message;
     Display & display = Display::Get();
 
-    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), pos.x, pos.y + 1 + oh);
+    display.Blit(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), pos.x, pos.y + 1 + oh);
 
     message = "Month: ";
     String::AddInt(message, world.GetMonth());
@@ -231,7 +231,7 @@ void Game::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
 void Game::StatusWindow::DrawBackground(void) const
 {
     Display & display = Display::Get();
-    const Sprite & icnston = AGG::GetICN(H2Config::EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & icnston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
     Point dstpt(pos);
 
     if(display.h() - BORDERWIDTH - icnston.h() > dstpt.y)

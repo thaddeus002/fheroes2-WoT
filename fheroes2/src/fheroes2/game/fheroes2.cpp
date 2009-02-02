@@ -103,7 +103,9 @@ int main(int argc, char **argv)
 			caption += ".";
 			String::AddInt(caption, conf.MinorVersion());
 
-#ifndef BUILD_RELEASE
+#ifdef BUILD_RELEASE
+			break;
+#else
 			caption += ", build: ";
 			String::AddInt(caption, conf.DateBuild());
 			break;

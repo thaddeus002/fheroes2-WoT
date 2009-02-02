@@ -2524,8 +2524,8 @@ bool Army::CellFreeFor(const Point &p, const Army::BattleTroop &troop, const Arm
 
 void Army::SettingsDialog()
 { 
-    const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::CSPANBKE : ICN::CSPANBKG;
-    const ICN::icn_t butt = H2Config::EvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN;
+    const ICN::icn_t sett = Settings::Get().EvilInterface() ? ICN::CSPANBKE : ICN::CSPANBKG;
+    const ICN::icn_t butt = Settings::Get().EvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN;
     const Surface & dialog = AGG::GetICN(sett, 0);
 
     Rect pos_rt;
@@ -2578,7 +2578,7 @@ void Army::SettingsDialog()
 Army::battle_t Army::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender, bool locked)
 {
     spell = Spell::NONE;
-    const ICN::icn_t sett = H2Config::EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
+    const ICN::icn_t sett = Settings::Get().EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
     const ICN::icn_t butt = ICN::VIEWGEN;
     const Surface & dialog = AGG::GetICN(sett, 0);
 

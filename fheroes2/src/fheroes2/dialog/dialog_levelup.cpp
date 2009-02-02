@@ -27,7 +27,7 @@
 Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header, const Skill::Secondary & sec1, const Skill::Secondary & sec2)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);

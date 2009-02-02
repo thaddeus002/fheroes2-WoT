@@ -34,7 +34,7 @@ void Dialog::SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level
 void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);
@@ -120,7 +120,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
 void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);

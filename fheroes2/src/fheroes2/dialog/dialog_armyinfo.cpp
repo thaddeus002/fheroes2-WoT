@@ -44,7 +44,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     const bool battle = BATTLE & flags;
     Display & display = Display::Get();
 
-    const ICN::icn_t viewarmy = H2Config::EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
+    const ICN::icn_t viewarmy = Settings::Get().EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
 
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
 

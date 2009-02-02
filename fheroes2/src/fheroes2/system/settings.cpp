@@ -46,7 +46,8 @@ namespace
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"), translationFile("english.str"),
+    my_color(Color::GRAY), cur_color(Color::GRAY), path_cache_directory(""), path_data_directory("data"), path_maps_directory("maps"),
+    translationFile("english.str"),
     font_normal("files/fonts/dejavusans.ttf"), font_small("files/fonts/dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
 {
@@ -133,6 +134,7 @@ void Settings::Dump(std::ostream & stream) const
     String::AddInt(str, build_date);
     stream <<", build " << str << std::endl;
 
+    stream << "cache = " << path_cache_directory << std::endl;
     stream << "data = " << path_data_directory << std::endl;
     stream << "maps = " << path_maps_directory << std::endl;
     stream << "translation = " << translationFile << std::endl;
@@ -220,6 +222,9 @@ u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontsRenderBlended(void) const { return Modes(FONTRENDERBLENDED); }
 
+/* return path to image cache directory */
+const std::string & Settings::CacheDirectory(void) const { return path_cache_directory; }
+
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
 
@@ -286,6 +291,9 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "fonts small size") size_small = String::ToInt(right);
     else
     if(left == "fonts render" && right == "blended") SetModes(FONTRENDERBLENDED);
+    else
+    // cache directory
+    if(left == "cache") path_cache_directory = right;
     else
     // data directory
     if(left == "data") path_data_directory = right;

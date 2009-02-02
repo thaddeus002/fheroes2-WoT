@@ -31,7 +31,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     if(min >= max) min = 0;
     if(cur > max || cur < min) cur = min;
 
-    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);

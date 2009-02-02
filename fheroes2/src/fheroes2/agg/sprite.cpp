@@ -22,6 +22,10 @@
 #include "settings.h"
 #include "sprite.h"
 
+Sprite::Sprite(SDL_Surface *sf, s16 ox, s16 oy) : Surface(sf), offsetX(ox), offsetY(ox)
+{
+}
+
 /* ICN Sprite constructor */
 Sprite::Sprite(const ICN::icn_t icn, const ICN::Header & header, const char *data, const u32 size, bool reflect)
     : Surface(header.Width(), header.Height(), ICN::RequiresAlpha(icn)), offsetX(header.OffsetX()), offsetY(header.OffsetY())

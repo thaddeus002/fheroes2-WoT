@@ -345,7 +345,7 @@ void World::LoadMaps(const std::string &filename)
 	vec_heroes[68] = new Heroes(Heroes::DRAKONIA, Race::WZRD, "Drakonia");
 	vec_heroes[69] = new Heroes(Heroes::MARTINE, Race::SORC, "Martine");
 	vec_heroes[70] = new Heroes(Heroes::JARKONAS, Race::BARB, "Jarkonas");
-	vec_heroes[71] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = Settings::Get().Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
     else
@@ -361,7 +361,7 @@ void World::LoadMaps(const std::string &filename)
 	vec_heroes[68] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[71] = H2Config::Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = Settings::Get().Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
 
@@ -455,7 +455,7 @@ void World::LoadMaps(const std::string &filename)
 
     const u32 endof_addons = fd.tellg();
 
-    if(H2Config::Debug()) Error::Verbose("World::World: read all tiles addons, tellg: ", endof_addons);
+    if(Settings::Get().Debug()) Error::Verbose("World::World: read all tiles addons, tellg: ", endof_addons);
 
     // offset data
     fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
@@ -541,7 +541,7 @@ void World::LoadMaps(const std::string &filename)
 	vec_tiles[ii] = tile;
     }
 
-    if(H2Config::Debug()) Error::Verbose("World::World: read all tiles, tellg: ", fd.tellg());
+    if(Settings::Get().Debug()) Error::Verbose("World::World: read all tiles, tellg: ", fd.tellg());
 
     // after addons
     fd.seekg(endof_addons, std::ios_base::beg);
@@ -591,14 +591,14 @@ void World::LoadMaps(const std::string &filename)
 
 	    default:
 		Error::Warning("World::World: castle block, unknown id: ", id);
-		if(H2Config::Debug()) Error::Verbose("maps index: ", cx + cy * w());
+		if(Settings::Get().Debug()) Error::Verbose("maps index: ", cx + cy * w());
 		break;
 	}
 	// preload in to capture objects cache
 	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_CASTLE, Color::GRAY);
     }
 
-    if(H2Config::Debug()) Error::Verbose("World::World: read coord castles, tellg: ", fd.tellg());
+    if(Settings::Get().Debug()) Error::Verbose("World::World: read coord castles, tellg: ", fd.tellg());
     fd.seekg(endof_addons + (72 * 3), std::ios_base::beg);
 
     // cood resource kingdoms
@@ -650,25 +650,25 @@ void World::LoadMaps(const std::string &filename)
 		break; 
 	    default:
 		Error::Warning("World::World: kingdom block, unknown id: ", id);
-		if(H2Config::Debug()) Error::Verbose("maps index: ", cx + cy * w());
+		if(Settings::Get().Debug()) Error::Verbose("maps index: ", cx + cy * w());
 		break;	
 	}
     }
 
-    if(H2Config::Debug()) Error::Verbose("World::World: read coord other resource, tellg: ", fd.tellg());
+    if(Settings::Get().Debug()) Error::Verbose("World::World: read coord other resource, tellg: ", fd.tellg());
     fd.seekg(endof_addons + (72 * 3) + (144 * 3), std::ios_base::beg);
 
     // unknown byte
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(4 < H2Config::Debug() && byte8) printf("World::World: dump unknown byte: %hhX\n", byte8);
+    if(4 < Settings::Get().Debug() && byte8) printf("World::World: dump unknown byte: %hhX\n", byte8);
 
-    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg: ", fd.tellg());
+    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg: ", fd.tellg());
 
-    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg 1: ", fd.tellg());
-    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg 2: ", fd.tellg());
-    if(4 < H2Config::Debug()) Error::Verbose("World::World: tellg 3: ", fd.tellg());
+    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg 1: ", fd.tellg());
+    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg 2: ", fd.tellg());
+    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg 3: ", fd.tellg());
 
-    if(4 < H2Config::Debug()) printf("World::World: dump final block: ");
+    if(4 < Settings::Get().Debug()) printf("World::World: dump final block: ");
 
     // count final mp2 blocks
     u16 countblock = 0;
@@ -683,7 +683,7 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&l), 1);
 	fd.read(reinterpret_cast<char *>(&h), 1);
 
-	if(4 < H2Config::Debug()){ printf(":%hhX", l); printf(":%hhX", h); }
+	if(4 < Settings::Get().Debug()){ printf(":%hhX", l); printf(":%hhX", h); }
 
 	if(0 == h && 0 == l) break;
 	else
@@ -691,9 +691,9 @@ void World::LoadMaps(const std::string &filename)
 	    countblock = 256 * h + l - 1;
 	}
     }
-    if(4 < H2Config::Debug()) printf("\n");
+    if(4 < Settings::Get().Debug()) printf("\n");
 
-    if(H2Config::Debug()) Error::Verbose("World::World: read find final mp2 blocks, tellg: ", fd.tellg());
+    if(Settings::Get().Debug()) Error::Verbose("World::World: read find final mp2 blocks, tellg: ", fd.tellg());
 
     // castle or heroes or (events, rumors, etc)
     for(u16 ii = 0; ii < countblock; ++ii)
@@ -867,7 +867,7 @@ void World::LoadMaps(const std::string &filename)
 		if(pblock[8])
 		{
 		    vec_rumors.push_back(reinterpret_cast<char *>(&pblock[8]));
-		    if(H2Config::Debug()) Error::Verbose("add Rumors: " + vec_rumors.back());
+		    if(Settings::Get().Debug()) Error::Verbose("add Rumors: " + vec_rumors.back());
 		}
 	    }
 	}
@@ -1065,7 +1065,7 @@ void World::LoadMaps(const std::string &filename)
 	if(*itc1) GetKingdom((*itc1)->GetColor()).AddCastle(*itc1);
 
     // play with debug hero
-    if(H2Config::Debug())
+    if(Settings::Get().Debug())
     {
 	// get first castle position
 	Kingdom & kingdom = GetMyKingdom();
@@ -1125,7 +1125,7 @@ void World::LoadMaps(const std::string &filename)
 	}
     }
 
-    if(H2Config::Debug()) Error::Verbose("World::LoadMaps: end load.");
+    if(Settings::Get().Debug()) Error::Verbose("World::LoadMaps: end load.");
 }
 /* get human kindom */
 Kingdom & World::GetMyKingdom(void)

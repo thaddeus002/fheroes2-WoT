@@ -343,7 +343,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	    break;
     }
 
-    if(H2Config::Debug()) Error::Warning("MP2::GetICNObject: unknown type: ", type);
+    if(Settings::Get().Debug()) Error::Warning("MP2::GetICNObject: unknown type: ", type);
 
     return ICN::UNKNOWN;
 }

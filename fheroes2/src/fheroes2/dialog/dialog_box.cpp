@@ -38,7 +38,7 @@ Dialog::Box::Box(u16 height, bool buttons)
 {
     Display & display = Display::Get();
 
-    const ICN::icn_t buybuild = H2Config::EvilInterface() ? ICN::BUYBUILE : ICN::BUYBUILD;
+    const ICN::icn_t buybuild = Settings::Get().EvilInterface() ? ICN::BUYBUILE : ICN::BUYBUILD;
 
     AGG::PreloadObject(buybuild);
 
@@ -46,10 +46,10 @@ Dialog::Box::Box(u16 height, bool buttons)
 
     u8 count = (height < BOXAREA_TOP + BOXAREA_BOTTOM ? 0 : 1 + (height - BOXAREA_TOP - BOXAREA_BOTTOM) / BOXAREA_MIDDLE);
 
-    u16 byte16 = (H2Config::EvilInterface() ? BOXE_TOP + BOXE_BOTTOM + count * BOXE_MIDDLE : BOX_TOP + BOX_BOTTOM + count * BOX_MIDDLE);
+    u16 byte16 = (Settings::Get().EvilInterface() ? BOXE_TOP + BOXE_BOTTOM + count * BOXE_MIDDLE : BOX_TOP + BOX_BOTTOM + count * BOX_MIDDLE);
     Rect pos((display.w() - BOX_WIDTH) / 2, (display.h() - byte16) / 2, BOX_WIDTH, byte16);
 
-    byte16 = (H2Config::EvilInterface() ? pos.y + BOXE_TOP - BOXAREA_TOP : pos.y + BOX_TOP - BOXAREA_TOP);
+    byte16 = (Settings::Get().EvilInterface() ? pos.y + BOXE_TOP - BOXAREA_TOP : pos.y + BOX_TOP - BOXAREA_TOP);
     area = Rect(pos.x + 36, byte16, BOXAREA_WIDTH, BOXAREA_TOP + BOXAREA_BOTTOM + count * BOXAREA_MIDDLE);
     if(buttons) area.h -= BUTTON_HEIGHT;
 
@@ -62,7 +62,7 @@ Dialog::Box::Box(u16 height, bool buttons)
     Point pt(pos.x, pos.y);
 
     // left top sprite
-    if(!H2Config::EvilInterface()) ++pt.x;
+    if(!Settings::Get().EvilInterface()) ++pt.x;
     display.Blit(AGG::GetICN(buybuild, 4), pt);
 
     // left middle sprite

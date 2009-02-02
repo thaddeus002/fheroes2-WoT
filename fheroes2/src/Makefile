@@ -8,7 +8,7 @@
 #
 
 TARGET := fheroes2
-SDL_LIBS := $(shell sdl-config --libs) -lSDL_mixer
+SDL_LIBS := $(shell sdl-config --libs) -lSDL_image -lSDL_mixer
 SDL_FLAGS := $(shell sdl-config --cflags)
 PNG_LIBS := $(shell libpng12-config --libs)
 PNG_FLAGS := $(shell libpng12-config --cflags)

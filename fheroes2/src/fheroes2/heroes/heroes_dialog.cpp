@@ -55,7 +55,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 
     display.Blit(AGG::GetICN(ICN::HEROBKG, 0), dst_pt);
 
-    display.Blit(AGG::GetICN(H2Config::EvilInterface() ? ICN::HEROEXTE : ICN::HEROEXTG, 0), dst_pt);
+    display.Blit(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::HEROEXTE : ICN::HEROEXTG, 0), dst_pt);
 
     std::string message;
 

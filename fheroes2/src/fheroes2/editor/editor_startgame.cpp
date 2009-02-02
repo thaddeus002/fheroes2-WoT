@@ -305,7 +305,7 @@ Game::menu_t Game::Editor::StartGame()
 	    {
 		if(btnSelectInfo.isPressed())
 		{
-		    if(H2Config::Debug())
+		    if(Settings::Get().Debug())
 		    {
 			tile.DebugInfo();
 

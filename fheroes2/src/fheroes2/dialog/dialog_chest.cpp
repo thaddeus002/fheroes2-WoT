@@ -27,7 +27,7 @@
 bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = H2Config::EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
         
     // preload
     AGG::PreloadObject(system);

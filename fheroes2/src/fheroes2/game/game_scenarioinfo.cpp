@@ -290,15 +290,15 @@ Game::menu_t Game::ScenarioInfo(void)
 	// click ok
 	if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
 	{
-	    if(H2Config::Debug()) Error::Verbose("select maps: " + conf.FileInfo().FileMaps());
-	    if(H2Config::Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
+	    if(Settings::Get().Debug()) Error::Verbose("select maps: " + conf.FileInfo().FileMaps());
+	    if(Settings::Get().Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
 	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 		if(conf.FileInfo().KingdomColors() & color)
 		{
 		    if(Race::RAND == conf.FileInfo().KingdomRace(color)) conf.FileInfo().SetKingdomRace(color, Race::Rand());
-		    if(H2Config::Debug()) Error::Verbose(Color::String(color) + ": " + Race::String(conf.FileInfo().KingdomRace(color)));
+		    if(Settings::Get().Debug()) Error::Verbose(Color::String(color) + ": " + Race::String(conf.FileInfo().KingdomRace(color)));
 		}
-	    if(H2Config::Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
+	    if(Settings::Get().Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
 
 	    result = STARTGAME;
 	    break;
