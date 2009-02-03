@@ -31,12 +31,14 @@ namespace Spell	// or Battle
 {
     typedef struct
     {
-	spell_t spell;
-	u8 duration;
+        spell_t spell;
+        u8 duration;
     } magic_t;
 
     bool AllowSpell(spell_t spell, const Army::BattleTroop &troop);
     void ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop);
+    bool isTroopAffectedBySpell(u8 spell, const Army::BattleTroop &troop);
+    u16 GetInflictDamageVersus(u8, u8, const Army::BattleTroop &);
     spell_t TroopAttack(const Monster &);
 };
 

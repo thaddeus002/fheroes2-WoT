@@ -27,35 +27,40 @@
 #include "battle_spell.h"
 #include "gamedefs.h"
 
+typedef std::vector<s8> IndexList;
+
 namespace Army
 {
     class BattleTroop : public Troop
     {
-    public:
-	BattleTroop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
-	BattleTroop(const BattleTroop & troop);
+      public:
+        BattleTroop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
+        BattleTroop(const BattleTroop & troop);
         BattleTroop(const Troop & troop);
+        ~BattleTroop();
 
-	BattleTroop & operator= (const BattleTroop & troops);
+        void Init();
+
+        BattleTroop & operator= (const BattleTroop & troops);
         BattleTroop & operator= (const Troop & troops);
 	
-	void SetPosition(const Point & pt) { pos = pt; };
-	const Point& Position() const { return pos; };
+        void SetPosition(const Point & pt) { pos = pt; };
+        const Point& Position() const { return pos; };
         void SetScreenPosition(const Point & pt) { screenPos = pt; };
-	const Point& ScreenPosition() const { return screenPos; };
+        const Point& ScreenPosition() const { return screenPos; };
         
-        bool IsMoving() const { return moving; }
+        bool isMoving() const { return moving; }
         void SetMoving(bool m) { moving = m; }
 
-	void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
-	void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
-	void Animate(u8 as = Monster::AS_NONE);
-	void SetMagic(Spell::magic_t &magic);
-	bool FindMagic(Spell::spell_t spell) const;
-	void RemoveMagic(Spell::spell_t spell);
-	void ClearMagic();
-	void ProceedMagic();
-	const std::vector<Spell::magic_t> &Magics() const { return magics; };
+        void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
+        void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
+        void Animate(u8 as = Monster::AS_NONE);
+        void SetMagic(Spell::magic_t &magic);
+        bool FindMagic(Spell::spell_t spell) const;
+        void RemoveMagic(Spell::spell_t spell);
+        void ClearMagic();
+        void ProceedMagic();
+        const std::vector<Spell::magic_t> &Magics() const { return magics; };
         
         bool IsReflected() const { return reflect; }
         void SetReflect(bool r) { lastReflect = reflect; reflect = r; }
@@ -64,33 +69,56 @@ namespace Army
         bool WasReflected() const { return lastReflect; }
         bool OriginalReflection() const { return origReflect; }
         
-        bool HasRetaliated() const { return retaliated; }
-        void SetRetaliated(bool r) { retaliated = r; }
+        u32 TotalHP() const { return hp + (count - 1) * Monster::GetHitPoints(); }
+
+        void    SetModes(u32);
+
+        void	NewTurn(void);
+	    void	UpdateHitPoints(void);
+        bool    isAffectedBySpell(u8);
+	    bool	ApplySpell(u8, u8);
+
+        bool    IsDamageFatal(u16) const;
+        bool    CanRetaliateAgainst(const BattleTroop &) const;
         
-        int TotalHP() const { return hp + (count - 1) * Monster(id).GetHitPoints(); }
-    
-        int ApplyDamage(int damage);
+        u8		GetAttack(void) const;
+	    u8		GetDefense(void) const;
+	    u32		GetHitPoints(void) const;
+	    u16		GetDamageVersus(const BattleTroop &) const;
+        u8		GetSpeed(void) const;
+        
+        int     ApplyDamage(long);
 
-	u8                      astate;
-	u16                     aframe;
-	bool                    attackRanged;
-	u8                      shots;
-	u16                     hp;
-	u16                     oldcount;
-	bool                    summoned;
+        void    LoadContours(bool);
+        const Surface* GetContour(u8) const;
 
-    private:
-	Point                   pos;
+        u8                      astate;
+        u16                     aframe;
+        bool                    attackRanged;
+        u8                      shots;
+        u16                     hp;
+        u16                     oldcount;
+        bool                    summoned;
+        long                    damageToApply;
+        
+      private:
+        Point                   pos;
         Point                   screenPos;
-	Background bg;
-	bool saved;
+        Background bg;
+        bool saved;
         bool reflect, origReflect, lastReflect;
-        bool retaliated;
         bool moving;
-	std::vector<Spell::magic_t> magics;
+        std::vector<Spell::magic_t> magics;
+
+        u8			disruptingray;
+	    std::vector<Surface *> contours;
     };
     
-    typedef std::vector<BattleTroop> BattleArmy_t;
+    typedef std::vector<Army::BattleTroop> BattleArmy_t;
+    void GetTroopsOfSpeed(const BattleArmy_t &, u8, IndexList &);
+    bool isArmyValid(const BattleArmy_t &);
+    void NewTurn(BattleArmy_t &);
+    void LoadContours(BattleArmy_t &, bool);
 };
 
 #endif

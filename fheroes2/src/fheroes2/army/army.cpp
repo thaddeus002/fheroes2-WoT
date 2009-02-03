@@ -650,16 +650,6 @@ u32 Army::army_t::CalculateExperience(void) const
 
 }
 
-void Army::army_t::BattleNewTurn(void)
-{
-    std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleNewTurn));
-}
-
-void Army::army_t::BattleLoadContours(bool inv)
-{
-    std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::BattleLoadContours), inv));
-}
-
 void Army::army_t::SetModes(u32 f)
 {
     std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::SetModes), f));

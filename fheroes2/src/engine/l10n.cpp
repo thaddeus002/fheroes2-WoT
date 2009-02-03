@@ -54,7 +54,7 @@ namespace l10n
     LocalizedString::operator std::string()
     {
         std::string subbed(string);
-        for(u16 i = 0; i < sizeof(subs); i++)
+        for(u16 i = 0; i < subs.size(); i++)
         {
             std::string find = "%";
             String::AddInt(find, i + 1);

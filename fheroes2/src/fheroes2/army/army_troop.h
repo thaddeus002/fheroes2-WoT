@@ -39,54 +39,47 @@ namespace Army
 
     class Troop : public Monster, public BitModes
     {
-        public:
-            Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
-	    ~Troop();
-
-            void	Set(const Monster &, u16);
-            void	Set(monster_t, u16);
-            void	SetMonster(const Monster &);
-            void	SetMonster(monster_t);
-            void	SetCount(u16);
-            void	Reset(void);
-
-	    void	BattleLoadContours(bool);
-            void	BattleNewTurn(void);
-	    void	BattleUpdateHitPoints(void);
-	    bool	BattleApplySpell(u8, u8);
-
-	    void        SetModes(u32);
-	    void	ResetModes(u32);
-
-            const Skill::Primary* MasterSkill(void) const;
-            const army_t* GetArmy(void) const;
+      public:
+        Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
+		virtual ~Troop();
+        
+        void	Set(const Monster &, u16);
+        void	Set(monster_t, u16);
+        void	SetMonster(const Monster &);
+        void	SetMonster(monster_t);
+        void	SetCount(u16);
+        void	Reset(void);
+        
+        const Skill::Primary* MasterSkill(void) const;
+        const army_t* GetArmy(void) const;
 	    const std::string & GetName(void) const;
-	    const Surface* GetContour(u8) const;
+        
+        u16 	Count(void) const;
+        
+	    virtual u8		GetAttack(void) const;
+	    virtual u8		GetDefense(void) const;
+	    virtual u32		GetHitPoints(void) const;
 
-            u16 	Count(void) const;
-
-	    u8		GetAttack(void) const;
-	    u8		GetDefense(void) const;
-	    u32		GetHitPoints(void) const;
-	    u16		GetDamage(void) const;
-	    u16		GetDamageMin(void) const;
+        u16		GetDamageMin(void) const;
 	    u16		GetDamageMax(void) const;
 	    Color::color_t GetColor(void) const;
-	    u8		GetSpeed(void) const;
-	    s8		GetMorale(void) const;
+        virtual u8		GetSpeed(void) const;
+
+        s8		GetMorale(void) const;
 	    s8		GetLuck(void) const;
 
-            bool	isValid(void) const;
+        
+        bool	isValid(void) const;
+        bool    isAffectedByMorale(void) const;
 	    bool	HasMonster(monster_t) const;
-
-        protected:
-    	    friend class army_t;
-            u16			count;
+        
+      protected:
+        friend class army_t;
+        u16			count;
 	    const army_t*	army;
 
+        
 	    u32			hp;
-	    u8			disruptingray;
-	    std::vector<Surface *> contours;
     };
 };
 

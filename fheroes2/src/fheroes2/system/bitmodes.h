@@ -30,10 +30,11 @@ class BitModes
 public:
     BitModes() : modes(0) {};
 
-    void        SetModes(u32 f) { modes |= f; };
-    void        ResetModes(u32 f) { modes &= ~f; };
+    void        SetModes(u32 f) { modes |= f; }
+    void        ResetModes(u32 f) { modes &= ~f; }
+    void        ToggleModes(u32 f) { modes ^= f; }
 
-    bool        Modes(u32 f) const { return (modes & f); };
+    bool        Modes(u32 f) const { return (modes & f); }
 
 protected:
     u32		modes;
