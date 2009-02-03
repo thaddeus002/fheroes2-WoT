@@ -1,4 +1,14 @@
-SVN - up to r849
+SVN - up to r852
+
+Users
++ AI battles now use battle system logic to properly decide outcomes.
+  (revvy)
+
+Developers
++ Battle engine rewritten to separate logic from display, and to allow
+  for future expansion (ie. castles/towns). (revvy)
+
+February 1, 2009 - Development build r850
 
 Users
 + Added icn2png convertor tools
