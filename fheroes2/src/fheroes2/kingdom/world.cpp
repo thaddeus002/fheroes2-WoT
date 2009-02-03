@@ -661,13 +661,6 @@ void World::LoadMaps(const std::string &filename)
     // unknown byte
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(4 < Settings::Get().Debug() && byte8) printf("World::World: dump unknown byte: %hhX\n", byte8);
-
-    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg: ", fd.tellg());
-
-    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg 1: ", fd.tellg());
-    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg 2: ", fd.tellg());
-    if(4 < Settings::Get().Debug()) Error::Verbose("World::World: tellg 3: ", fd.tellg());
-
     if(4 < Settings::Get().Debug()) printf("World::World: dump final block: ");
 
     // count final mp2 blocks
@@ -678,7 +671,7 @@ void World::LoadMaps(const std::string &filename)
 	u8 h = 0;
 
 	// debug endof mp2
-	if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
+	//if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
 
 	fd.read(reinterpret_cast<char *>(&l), 1);
 	fd.read(reinterpret_cast<char *>(&h), 1);
@@ -699,7 +692,7 @@ void World::LoadMaps(const std::string &filename)
     for(u16 ii = 0; ii < countblock; ++ii)
     {
 	// debug
-	if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
+	//if(endof_mp2 < fd.tellg()) Error::Except("World::World: read maps: out of range.");
 
 	// size block
 	u16 sizeblock;
