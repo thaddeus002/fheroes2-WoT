@@ -218,7 +218,10 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
             if(troop.Modes(Army::MORALE_BAD))
             {
                 if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
+                {
                     m_battlefield.AnimateMorale(false, troop);
+                    m_gui->Status(tr("battle.low_morale").sub(troop.GetName()));
+                }
                 continue;
             }
             else goodMorale = true;
@@ -292,7 +295,10 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
         {
             currentTroop--;
             if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
+            {
                 m_battlefield.AnimateMorale(true, troop);
+                m_gui->Status(tr("battle.high_morale").sub(troop.GetName()));
+            }
         }
     }
 
@@ -844,10 +850,9 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
 
     if(!ranged)
     {
-        std::vector<Army::BattleTroop*> ta1, ta2;
-        (troopN >= 0 ? ta1 : ta2).push_back(targets[0]);
-        //TODO: magic
-        //MagicCycle(hero1, hero2, ta1, ta2, army1, army2, troopN<0, Spell::TroopAttack(myTroop), tile);
+        std::vector<Army::BattleTroop*> affected;
+        affected.push_back(targets[0]);
+        PerformMagic(affected, NULL, Spell::TroopAttack(myTroop));
     }
     
     return retaliate;

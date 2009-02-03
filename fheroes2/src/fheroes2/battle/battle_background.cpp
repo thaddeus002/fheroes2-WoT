@@ -535,7 +535,6 @@ namespace Battle
     {
         ICN::icn_t icn = goodMorale ? ICN::MORALEG : ICN::MORALEB;
         M82::m82_t m82 = goodMorale ? M82::GOODMRLE : M82::BADMRLE;
-        std::string status = goodMorale ? "battle.high_morale" : "battle.low_morale";
 
         AGG::PlaySound(m82);
         for(u16 i=0; i < AGG::GetICNCount(icn); i++) {
@@ -552,8 +551,6 @@ namespace Battle
             }
             back.Restore();
         }
-        //TODO: status message
-        //AttackStatus(tr(status).sub(troop.GetName()));
     }
 
     void Battlefield::Background::MagicAnimation(std::vector<Army::BattleTroop*> &affected, Heroes *hero1, Heroes *hero2, bool reflect, Spell::spell_t spell)
