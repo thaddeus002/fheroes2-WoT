@@ -747,7 +747,7 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_RNDTOWN:
 		case MP2::OBJ_RNDCASTLE:
 		    // add rnd castle
-		    if(SIZEOFMP2CASTLE != sizeblock) Error::Warning("World::World: read castle: incorrect size block.", sizeblock);
+		    if(SIZEOFMP2CASTLE != sizeblock) Error::Warning("World::World: read castle: incorrect size block. ", sizeblock);
 		    else
 		    {
 			Castle *castle = GetCastle(*it_index);
@@ -764,7 +764,7 @@ void World::LoadMaps(const std::string &filename)
 		    break;
 		case MP2::OBJ_HEROES:
 		    // add heroes
-		    if(SIZEOFMP2HEROES != sizeblock) Error::Warning("World::World: read heroes: incorrect size block.", sizeblock);
+		    if(SIZEOFMP2HEROES != sizeblock) Error::Warning("World::World: read heroes: incorrect size block. ", sizeblock);
 		    else
 		    if(NULL != (addon = tile.FindMiniHero()))
 		    {
