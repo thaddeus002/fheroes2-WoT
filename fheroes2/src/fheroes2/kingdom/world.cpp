@@ -686,7 +686,7 @@ void World::LoadMaps(const std::string &filename)
     }
     if(4 < Settings::Get().Debug()) printf("\n");
 
-    if(Settings::Get().Debug()) Error::Verbose("World::World: read find final mp2 blocks, tellg: ", fd.tellg());
+    //if(Settings::Get().Debug()) Error::Verbose("World::World: read find final mp2 blocks, tellg: ", fd.tellg());
 
     // castle or heroes or (events, rumors, etc)
     for(u16 ii = 0; ii < countblock; ++ii)
