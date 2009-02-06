@@ -763,16 +763,16 @@ Game::menu_t Game::HumanTurn(void)
         }
 
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
+	if((le.KeyPress(KEY_LEFT) || le.MouseCursor(areaScrollLeft)) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
         else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
+	if((le.KeyPress(KEY_RIGHT) || le.MouseCursor(areaScrollRight)) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
 	
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
+	if((le.KeyPress(KEY_UP) || le.MouseCursor(areaScrollTop)) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
+	if((le.KeyPress(KEY_DOWN) || le.MouseCursor(areaScrollBottom)) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
 
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
