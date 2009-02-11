@@ -116,17 +116,17 @@ Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Map
 }
 
 Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::Tiles &tile)
-: m_battlefield(&hero, NULL, hero.GetArmy(), castle.GetArmy(), Point(-1, -1), tile)
+: m_gui(NULL), m_battlefield(&hero, NULL, hero.GetArmy(), castle.GetArmy(), Point(-1, -1), tile)
 {
     // TODO
     //m_battleStatus = BattleInt(&hero, 0, const_cast<std::vector<Army::BattleTroop>&>(hero.GetArmy()), army, tile);
-    m_battleStatus = Army::WIN;
+    m_battleStatus = Army::WIN; // m_gui is NULL!!!
     //BattleSummaryVsArmy(hero, ArmyToBattleArmy(heroArmy), ArmyToBattleArmy(castle.GetArmy()), ArmyToBattleArmy(oppArmy), status);
 }
 
 Battle::BattleControl::~BattleControl()
 {
-    delete m_gui;
+    if(m_gui) delete m_gui;
 }
 
 void Battle::BattleControl::BattleSummaryVsArmy(Heroes &hero, const Army::BattleArmy_t &heroOrig, const Army::BattleArmy_t &army, const Army::BattleArmy_t &armyOrig)
