@@ -76,7 +76,7 @@ void Game::DialogPlayersTurn(const Color::color_t color)
    	    default: break;
     }
 
-    Dialog::SpriteInfo("", Color::String(color) + " player's turn", sign);
+    Dialog::SpriteInfo("", Color::String(color) + _(" player's turn"), sign);
 }
 
 bool Game::CursorChangePosition(const u16 index)
@@ -197,7 +197,7 @@ Game::menu_t Game::StartGame(void)
                 kingdom.AITurns();
 		    break;
 		default:
-		    Dialog::Message(Color::String(color), "default", Font::BIG, Dialog::OK);
+		    Dialog::Message(Color::String(color), _("default"), Font::BIG, Dialog::OK);
 		    break;
 		}
 	    }
@@ -723,10 +723,10 @@ Game::menu_t Game::HumanTurn(void)
     if(1 < world.CountWeek() && world.BeginWeek())
     {
 	const Week::type_t name = world.GetWeekType();
-	std::string message("Astrologers proclaim ");
-	message += world.BeginMonth() ? "month" : "week";
-	message += " of the " + Week::GetString(name) + ".";
-	message += (name == Week::PLAGUE ? " All populations are halved." : " All dwellings increase population.");
+	std::string message(_("Astrologers proclaim "));
+	message += world.BeginMonth() ? _("month") : _("week");
+	message += _(" of the ") + Week::GetString(name) + ".";
+	message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
 	Dialog::Message("", message, Font::BIG, Dialog::OK);
     }
 
@@ -747,7 +747,7 @@ Game::menu_t Game::HumanTurn(void)
     	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
     	    	global_focus.GetHeroes().SetMove(false);
     	    else
-    	    if(Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
+    	    if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
     	    continue;
 	}
         else
@@ -758,7 +758,7 @@ Game::menu_t Game::HumanTurn(void)
                 global_focus.GetHeroes().SetMove(false);
 
             if(!myKingdom.HeroesMayStillMove() ||
-                Dialog::YES == Dialog::Message("", "One or more heroes may still move, are you sure you want to end your turn?", Font::BIG, Dialog::YES | Dialog::NO))
+                Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
                 break;
         }
 
@@ -1135,7 +1135,7 @@ Game::menu_t Game::HumanTurn(void)
 		    global_focus.GetHeroes().SetMove(false);
 
 		if(!myKingdom.HeroesMayStillMove() ||
-		    Dialog::YES == Dialog::Message("", "One or more heroes may still move, are you sure you want to end your turn?", Font::BIG, Dialog::YES | Dialog::NO))
+		    Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    	    break;
 	    }
 	    else
@@ -1228,25 +1228,25 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 
 	    // right info
-	    if(le.MousePressRight(radar.GetRect())) Dialog::Message("World Map", "A miniature view of the known world. Left click to move viewing area.", Font::BIG);
+	    if(le.MousePressRight(radar.GetRect())) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonNextHero)) Dialog::Message("Next Hero", "Select the next Hero.", Font::BIG);
+	    if(le.MousePressRight(buttonNextHero)) Dialog::Message(_("Next Hero"), _("Select the next Hero."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonMovement)) Dialog::Message("Continue Movement", "Continue the Hero's movement along the current path.", Font::BIG);
+	    if(le.MousePressRight(buttonMovement)) Dialog::Message(_("Continue Movement"), _("Continue the Hero's movement along the current path."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonKingdom)) Dialog::Message("Kingdom Summary", "View a Summary of your Kingdom.", Font::BIG);
+	    if(le.MousePressRight(buttonKingdom)) Dialog::Message(_("Kingdom Summary"), _("View a Summary of your Kingdom."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonSpell)) Dialog::Message("Cast Spell", "Cast an adventure spell.", Font::BIG);
+	    if(le.MousePressRight(buttonSpell)) Dialog::Message(_("Cast Spell"), _("Cast an adventure spell."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonEndTur)) Dialog::Message("End Turn", "End your turn and left the computer take its turn.", Font::BIG);
+	    if(le.MousePressRight(buttonEndTur)) Dialog::Message(_("End Turn"), _("End your turn and left the computer take its turn."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonAdventure)) Dialog::Message("Adventure Options", "Bring up the adventure options menu.", Font::BIG);
+	    if(le.MousePressRight(buttonAdventure)) Dialog::Message(_("Adventure Options"), _("Bring up the adventure options menu."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonFile)) Dialog::Message("File Options", "Bring up the file options menu, alloving you to load menu, save etc.", Font::BIG);
+	    if(le.MousePressRight(buttonFile)) Dialog::Message(_("File Options"), _("Bring up the file options menu, alloving you to load menu, save etc."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonSystem)) Dialog::Message("System Options", "Bring up the system options menu, alloving you to customize your game.", Font::BIG);
+	    if(le.MousePressRight(buttonSystem)) Dialog::Message(_("System Options"), _("Bring up the system options menu, alloving you to customize your game."), Font::BIG);
 	    else
-	    if(le.MousePressRight(statusWindow.GetRect())) Dialog::Message("Status Window", "This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows.", Font::BIG);
+	    if(le.MousePressRight(statusWindow.GetRect())) Dialog::Message(_("Status Window"), _("This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows."), Font::BIG);
 
 	// end cursor over left panel
 	}
@@ -1326,7 +1326,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
     {
 	if(0 != world.GetTiles(hero.GetCenter()).GetSize1())
 	{
-	    Dialog::Message("", "Try searching on clear ground.", Font::BIG, Dialog::OK);
+	    Dialog::Message("", _("Try searching on clear ground."), Font::BIG, Dialog::OK);
 	    return false;
 	}
 
@@ -1336,13 +1336,13 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	const Artifact::artifact_t ultimate = world.DiggingForUltimateArtifacts(hero.GetCenter());
 
 	if(Artifact::UNKNOWN == ultimate)
-	    Dialog::Message("", "Nothing here. Where could it be?", Font::BIG, Dialog::OK);
+	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);
 	else
 	{
 	    // TODO: congratulations!
 	    // check returns
 	    const_cast<Heroes &>(hero).PickupArtifact(ultimate);
-	    DialogWithArtifact("Congratulations!", "After spending many hours digging here, you have uncovered the " + Artifact::String(ultimate), ultimate);
+	    DialogWithArtifact(_("Congratulations!"), _("After spending many hours digging here, you have uncovered the ") + Artifact::String(ultimate), ultimate);
 	}
 
 	Cursor::Get().Hide();
@@ -1351,7 +1351,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	Display::Get().Flip();
     }
     else
-	Dialog::Message("", "Digging for artifacts requires a whole day, try again tomorrow.", Font::BIG, Dialog::OK);
+	Dialog::Message("", _("Digging for artifacts requires a whole day, try again tomorrow."), Font::BIG, Dialog::OK);
 
     return false;
 }

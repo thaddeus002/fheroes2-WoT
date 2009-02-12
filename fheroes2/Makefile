@@ -12,7 +12,7 @@ TARGET := fheroes2
 all:
 	$(MAKE) -C src
 ifdef DEVELOPMENT
-	@cp src/dist/$(TARGET).pot lang
+	@cp src/dist/$(TARGET).pot files/lang
 endif
 	@cp src/dist/$(TARGET) .
 

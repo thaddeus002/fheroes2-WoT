@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "gamedefs.h"
 #include "difficulty.h"
 
 // operator ++difficulty_t
@@ -31,7 +32,7 @@ Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& diff
 
 const std::string & Difficulty::String(Difficulty::difficulty_t difficulty)
 {
-    static const std::string str_difficulty[] = { "Easy", "Normal", "Hard", "Expert", "Impossible" };
+    static const std::string str_difficulty[] = { _("Easy"), _("Normal"), _("Hard"), _("Expert"), _("Impossible") };
 
     switch(difficulty)
     {

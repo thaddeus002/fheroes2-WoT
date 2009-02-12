@@ -82,10 +82,10 @@ Game::menu_t Game::NewGame(void)
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info
-	if(le.MousePressRight(buttonStandartGame)) Dialog::Message("Standard Game", "A single player game playing out a single map.", Font::BIG);
-	if(le.MousePressRight(buttonCampainGame)) Dialog::Message("Campaign Game", "A single player game playing through a series of maps.", Font::BIG);
-	if(le.MousePressRight(buttonMultiGame)) Dialog::Message("Multi-Player Game", "A multi-player game, with several human players completing against each other on a single map.", Font::BIG);
-	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Cancel", "Cancel back to the main menu.", Font::BIG);
+	if(le.MousePressRight(buttonStandartGame)) Dialog::Message(_("Standard Game"), _("A single player game playing out a single map."), Font::BIG);
+	if(le.MousePressRight(buttonCampainGame)) Dialog::Message(_("Campaign Game"), _("A single player game playing through a series of maps."), Font::BIG);
+	if(le.MousePressRight(buttonMultiGame)) Dialog::Message(_("Multi-Player Game"), _("A multi-player game, with several human players completing against each other on a single map."), Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
 		 
     }
 
@@ -149,9 +149,9 @@ Game::menu_t Game::NewMulti(void)
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info
-	if(le.MousePressRight(buttonHotSeat)) Dialog::Message("Hot Seat", "Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn.", Font::BIG);
-	if(le.MousePressRight(buttonNetwork)) Dialog::Message("Network", "Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network).", Font::BIG);
-	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Cancel", "Cancel back to the main menu.", Font::BIG);
+	if(le.MousePressRight(buttonHotSeat)) Dialog::Message(_("Hot Seat"), _("Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn."), Font::BIG);
+	if(le.MousePressRight(buttonNetwork)) Dialog::Message(_("Network"), _("Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network)."), Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
 		 
     }
 
@@ -214,12 +214,12 @@ u8 SelectCountPlayers(void)
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return 0;
 
         // right info
-	if(le.MousePressRight(button2Players)) Dialog::Message("2 Players", "Play with 2 human players, and optionally, up, to 4 additional computer players.", Font::BIG);
-	if(le.MousePressRight(button3Players)) Dialog::Message("3 Players", "Play with 3 human players, and optionally, up, to 3 additional computer players.", Font::BIG);
-	if(le.MousePressRight(button4Players)) Dialog::Message("4 Players", "Play with 4 human players, and optionally, up, to 2 additional computer players.", Font::BIG);
-	if(le.MousePressRight(button5Players)) Dialog::Message("5 Players", "Play with 5 human players, and optionally, up, to 1 additional computer players.", Font::BIG);
-	if(le.MousePressRight(button6Players)) Dialog::Message("6 Players", "Play with 6 human players.", Font::BIG);
-	if(le.MousePressRight(buttonCancel)) Dialog::Message("Cancel", "Cancel back to the main menu.", Font::BIG);
+	if(le.MousePressRight(button2Players)) Dialog::Message(_("2 Players"), _("Play with 2 human players, and optionally, up, to 4 additional computer players."), Font::BIG);
+	if(le.MousePressRight(button3Players)) Dialog::Message(_("3 Players"), _("Play with 3 human players, and optionally, up, to 3 additional computer players."), Font::BIG);
+	if(le.MousePressRight(button4Players)) Dialog::Message(_("4 Players"), _("Play with 4 human players, and optionally, up, to 2 additional computer players."), Font::BIG);
+	if(le.MousePressRight(button5Players)) Dialog::Message(_("5 Players"), _("Play with 5 human players, and optionally, up, to 1 additional computer players."), Font::BIG);
+	if(le.MousePressRight(button6Players)) Dialog::Message(_("6 Players"), _("Play with 6 human players."), Font::BIG);
+	if(le.MousePressRight(buttonCancel)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
     }
 
     return 0;

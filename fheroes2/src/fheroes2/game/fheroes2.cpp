@@ -22,6 +22,7 @@
 #include <string>
 #include <unistd.h>
 #include <limits.h>
+#include <libintl.h>
 
 #include "gamedefs.h"
 #include "audio.h"
@@ -67,6 +68,11 @@ int PrintHelp(const char *basename)
 int main(int argc, char **argv)
 {
 	chdir(dirname(argv[0]));
+
+	setlocale(LC_ALL, "");
+	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+	textdomain(GETTEXT_PACKAGE);
 
 	Settings & conf = Settings::Get();
 	int test = 0;

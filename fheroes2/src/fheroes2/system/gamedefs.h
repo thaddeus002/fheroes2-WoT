@@ -27,4 +27,8 @@
 
 #define ANIMATION_SPEED 23
 
+#define _(String) gettext(String)
+#define GETTEXT_PACKAGE "fheroes2"
+#define LOCALEDIR "./files/lang"
+
 #endif

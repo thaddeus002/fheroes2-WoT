@@ -28,7 +28,7 @@ $(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH)))) $(LIBENGINE)
 
 pot: $(wildcard $(SEARCH))
 	@echo "gen: $(POT)"
-	@xgettext -d $(TARGET) -C -ktr -o $(POT) $(wildcard $(SEARCH))
+	@xgettext -d $(TARGET) -C -k_ -o $(POT) $(wildcard $(SEARCH))
 
 VPATH := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
 

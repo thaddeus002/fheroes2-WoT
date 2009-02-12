@@ -153,15 +153,15 @@ void Game::StatusWindow::DrawDayInfo(const u8 oh) const
 
     display.Blit(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), pos.x, pos.y + 1 + oh);
 
-    message = "Month: ";
+    message = _("Month: ");
     String::AddInt(message, world.GetMonth());
 
-    message += " Week: ";
+    message += _(" Week: ");
     String::AddInt(message, world.GetWeek());
     Text text(message, Font::SMALL);
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 30 + oh);
 
-    message = "Day: ";
+    message = _("Day: ");
     String::AddInt(message, world.GetDay());
     text.Set(message, Font::BIG);
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 46 + oh);

@@ -79,7 +79,7 @@ Game::menu_t Game::ScenarioInfo(void)
     // empty maps
     if(info_maps.empty())
     {
-	Dialog::Message("Warning", "No maps available!", Font::BIG, Dialog::OK);
+	Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
 	return MAINMENU;
     }
 
@@ -242,7 +242,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		conf.FileInfo().SetKingdomRace(color, race);
 		display.Blit(AGG::GetICN(ICN::NGEXTRA, index), rt.x, rt.y);
 
-		const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
+		const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
 		textsprite.Hide();
 		textsprite.SetText(name);
 		textsprite.SetPos(rt.x + (rt.w - textsprite.w()) / 2, rt.y + rt.h + 2);
@@ -305,7 +305,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	}
 	
 	// right info
-	if(le.MousePressRight(buttonSelectMaps)) Dialog::Message("Scenario", "Click here to select which scenario to play.", Font::BIG);
+	if(le.MousePressRight(buttonSelectMaps)) Dialog::Message(_("Scenario"), _("Click here to select which scenario to play."), Font::BIG);
 
 	// difficulty
 	if(le.MousePressRight(rectDifficultyEs) ||
@@ -313,23 +313,23 @@ Game::menu_t Game::ScenarioInfo(void)
 	    le.MousePressRight(rectDifficultyHd) ||
 	    le.MousePressRight(rectDifficultyEx) ||
 	    le.MousePressRight(rectDifficultyIm))
-		Dialog::Message("Game Difficulty", "This lets you change the starting difficulty at which you will play. Higher difficulty levels start you of with fewer resources, and at the higher settings, give extra resources to the computer.", Font::BIG);
+		Dialog::Message(_("Game Difficulty"), _("This lets you change the starting difficulty at which you will play. Higher difficulty levels start you of with fewer resources, and at the higher settings, give extra resources to the computer."), Font::BIG);
 
 	// color
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	    if(conf.FileInfo().KingdomColors() & color &&
 		le.MousePressRight(coordColors[Color::GetIndex(color)]))
-		    Dialog::Message("Opponents", "This lets you change player starting positions and colors. A particular color will always start in a particular location. Some positions may only be played by a computer player or only by a human player.", Font::BIG);
+		    Dialog::Message(_("Opponents"), _("This lets you change player starting positions and colors. A particular color will always start in a particular location. Some positions may only be played by a computer player or only by a human player."), Font::BIG);
 
 	// class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	    if(conf.FileInfo().KingdomColors() & color &&
 		le.MousePressRight(coordClass[Color::GetIndex(color)].first))
-		    Dialog::Message("Class", "This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alingment.", Font::BIG);
+		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alingment."), Font::BIG);
 
-	//if(le.MousePressRight(?)) Dialog::Message("Difficulty Rating", "The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score.", Font::BIG);
-	if(le.MousePressRight(buttonOk)) Dialog::Message("OK", "Click to accept these settings and start a new game.", Font::BIG);
-	if(le.MousePressRight(buttonCancel)) Dialog::Message("Cancel", "Click to return to the main menu.", Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message(_("Difficulty Rating"), _("The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score."), Font::BIG);
+	if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Click to accept these settings and start a new game."), Font::BIG);
+	if(le.MousePressRight(buttonCancel)) Dialog::Message(_("Cancel"), _("Click to return to the main menu."), Font::BIG);
     }
 
     std::list<Maps::FileInfo *>::const_iterator it1 = info_maps.begin();
@@ -395,7 +395,7 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
     display.Blit(panel, 204, 33);
 
     // text scenario
-    Text text("Scenario:", Font::BIG);
+    Text text(_("Scenario:"), Font::BIG);
     text.Blit(376, 53);
 
     // maps name
@@ -403,23 +403,23 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
     text.Blit(260, 78);
     
     // text game difficulty
-    text.Set("Game Difficulty:");
+    text.Set(_("Game Difficulty:"));
     text.Blit(330, 107);
 
     //
-    text.Set("Easy", Font::SMALL);
+    text.Set(_("Easy"), Font::SMALL);
     text.Blit(248, 196);
-    text.Set("Normal");
+    text.Set(_("Normal"));
     text.Blit(316, 196);
-    text.Set("Hard");
+    text.Set(_("Hard"));
     text.Blit(395, 196);
-    text.Set("Expert");
+    text.Set(_("Expert"));
     text.Blit(472, 196);
-    text.Set("Impossible");
+    text.Set(_("Impossible"));
     text.Blit(536, 196);
 
     // text opponents
-    text.Set("Opponents:", Font::BIG);
+    text.Set(_("Opponents:"), Font::BIG);
     text.Blit(368, 210);
 
     // draw opponents
@@ -438,7 +438,7 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 	}
 
     // text class
-    text.Set("Class:", Font::BIG);
+    text.Set(_("Class:"), Font::BIG);
     text.Blit(386, 290);
 
     // draw class
@@ -482,7 +482,7 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 	    const Rect & rt = coordClass[Color::GetIndex(color)].first;
 	    TextSprite & textsprite = coordClass[Color::GetIndex(color)].second;
 
-	    const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
+	    const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
 	    textsprite.SetFont(Font::SMALL);
 	    textsprite.SetText(name);
 	    textsprite.SetPos(rt.x + (rt.w - text.w()) / 2, rt.y + rt.h + 2);

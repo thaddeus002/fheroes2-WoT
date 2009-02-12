@@ -232,15 +232,15 @@ Game::menu_t Game::MainMenu(void)
 	if(le.KeyPress(KEY_q) || le.MouseClickLeft(buttonQuit) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
 
 	// right info
-	if(le.MousePressRight(buttonQuit)) Dialog::Message("Quit", "Quit Heroes of Might and return to the operating system.", Font::BIG);
+	if(le.MousePressRight(buttonQuit)) Dialog::Message(_("Quit"), _("Quit Heroes of Might and return to the operating system."), Font::BIG);
 	else
-	if(le.MousePressRight(buttonLoadGame)) Dialog::Message("Load Game", "Load a previously saved game.", Font::BIG);
+	if(le.MousePressRight(buttonLoadGame)) Dialog::Message(_("Load Game"), _("Load a previously saved game."), Font::BIG);
 	else
-	if(le.MousePressRight(buttonCredits)) Dialog::Message("Credits", "View the credits screen.", Font::BIG);
+	if(le.MousePressRight(buttonCredits)) Dialog::Message(_("Credits"), _("View the credits screen."), Font::BIG);
 	else
-	if(le.MousePressRight(buttonHighScores)) Dialog::Message("High Scores", "View the high score screen.", Font::BIG);
+	if(le.MousePressRight(buttonHighScores)) Dialog::Message(_("High Scores"), _("View the high score screen."), Font::BIG);
 	else
-	if(le.MousePressRight(buttonNewGame)) Dialog::Message("New Game", "Start a single or multi-player game.", Font::BIG);
+	if(le.MousePressRight(buttonNewGame)) Dialog::Message(_("New Game"), _("Start a single or multi-player game."), Font::BIG);
 
 
 	if(Game::ShouldAnimateInfrequent(ticket, 10))
