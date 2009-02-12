@@ -189,7 +189,7 @@ void SelectArmyBar::Redraw(Surface & display)
         	std::string str;
         	String::AddInt(str, troop.Count());
         	Text text(str, Font::SMALL);
-		text.Blit(pt.x + (background->w() - text.width()) / 2, pt.y + background->h() - 11);
+		text.Blit(pt.x + (background->w() - text.w()) / 2, pt.y + background->h() - 11);
             }
             else
 	    {
@@ -199,7 +199,7 @@ void SelectArmyBar::Redraw(Surface & display)
         	std::string str;
         	String::AddInt(str, troop.Count());
         	Text text(str, Font::SMALL);
-		text.Blit(pt.x + background->w() - text.width() - 3, pt.y + background->h() - 13);
+		text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - 13);
 	    }
 	}
 	else

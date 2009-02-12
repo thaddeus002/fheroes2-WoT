@@ -548,7 +548,7 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) 
     		str.clear();
     		String::AddInt(str, troop.Count());
 		text.Set(str);
-		text.Blit(cx - text.width() / 2, cy + 28);
+		text.Blit(cx - text.w() / 2, cy + 28);
 
 		cx += chunk;
 		--count;

@@ -1911,7 +1911,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    sf->Blit(sprite);
 	    body = "1 / day";
     	    Text text(body, Font::SMALL);
-    	    text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
+    	    text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
 	    res = Resource::MERCURY;
 	    header = MP2::StringObject(obj);
@@ -1932,7 +1932,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf->Blit(sprite);
 		body = "2 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf); // Here is pink fringing, becose letter sprite use shadow. Wiil fix later...
+    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf); // Here is pink fringing, becose letter sprite use shadow. Wiil fix later...
 
         	res = Resource::ORE;
         	header = "Ore Mine";
@@ -1949,7 +1949,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf->Blit(sprite);
 		body = "1 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::SULFUR;
         	header = "Sulfur Mine";
@@ -1966,7 +1966,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf->Blit(sprite);
 		body = "1 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::CRYSTAL;
         	header = "Crystal Mine";
@@ -1983,7 +1983,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf->Blit(sprite);
 		body = "1 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::GEMS;
         	header = "Gems Mine";
@@ -2000,7 +2000,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf->Blit(sprite);
 		body = "1000 / day";
     		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.width()) / 2, sf->h() - 12, *sf);
+    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::GOLD;
         	header = "Gold Mine";
@@ -2017,7 +2017,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    sf->Blit(sprite);
 	    body = "2 / day";
     	    Text text(body, Font::SMALL);
-    	    text.Blit((sf->w() - Text::width(body, Font::SMALL)) / 2, sf->h() - 12, *sf);
+    	    text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
     	    res = Resource::WOOD;
 	    header = MP2::StringObject(obj);

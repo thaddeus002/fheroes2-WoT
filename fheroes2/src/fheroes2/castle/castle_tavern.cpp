@@ -43,12 +43,16 @@ void Castle::OpenTavern(void)
 
     cursor.Hide();
 
-    Dialog::Box box(Text::height(header, Font::BIG, BOXAREA_WIDTH) + 130 + Text::height(message, Font::BIG, BOXAREA_WIDTH), true);
+    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
+    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+
+    Dialog::Box box(height1 + 130 + height2, true);
 
     const Rect & pos = box.GetArea();
     Point dst_pt(pos.x, pos.y);
 
-    Text(tavern, Font::BIG, pos.x + (pos.w - Text::width(tavern, Font::BIG)) / 2, dst_pt.y);
+    Text text(tavern, Font::BIG);
+    text.Blit(pos.x + (pos.w - text.w()) / 2, dst_pt.y);
 
     const Sprite & s1 = AGG::GetICN(tavwin, 0);
     dst_pt.x = pos.x + (pos.w - s1.w()) / 2;

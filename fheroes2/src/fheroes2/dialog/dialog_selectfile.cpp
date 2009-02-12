@@ -359,7 +359,8 @@ void DrawList(std::list<Maps::FileInfo *>::const_iterator &it_top, std::list<Map
 	display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
 	// text longname
-	Text(info.Name(), (it_head == it_sel ? Font::YELLOWBIG : Font::BIG), x + spriteCount.w() + spriteSize.w() + 18, y);
+	Text text(info.Name(), (it_head == it_sel ? Font::YELLOWBIG : Font::BIG));
+	text.Blit(x + spriteCount.w() + spriteSize.w() + 18, y);
 
 	// sprite wins
 	index = 30 + info.ConditionsWins();
@@ -413,7 +414,8 @@ void DrawSelectInfo(const Maps::FileInfo & finfo)
     display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
     // text longname
-    Text(finfo.Name(), Font::BIG, x + spriteCount.w() + spriteSize.w() + 22, y);
+    Text text(finfo.Name(), Font::BIG);
+    text.Blit(x + spriteCount.w() + spriteSize.w() + 22, y);
 
     // sprite wins
     index = 30 + finfo.ConditionsWins();
@@ -425,8 +427,11 @@ void DrawSelectInfo(const Maps::FileInfo & finfo)
     const Sprite &spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteLoss, x + 211 + spriteWins.w(), y);
 
-    Text("Maps difficulty:", Font::BIG, 200, 295);
-    Text(Difficulty::String(finfo.Difficulty()), Font::BIG, 360, 295);
+    text.Set("Maps difficulty:");
+    text.Blit(200, 295);
+
+    text.Set(Difficulty::String(finfo.Difficulty()));
+    text.Blit(360, 295);
     
     TextBox(finfo.Description(), Font::BIG, Rect(175, 322, 282, 90));
 }

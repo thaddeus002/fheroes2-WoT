@@ -226,7 +226,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		cursor.Hide();
 		u8 index = 0;
 		const Rect & rt = coordClass[Color::GetIndex(color)].first;
-		TextSprite & text = coordClass[Color::GetIndex(color)].second;
+		TextSprite & textsprite = coordClass[Color::GetIndex(color)].second;
 		Race::race_t race = conf.FileInfo().KingdomRace(color);
 		switch(race)
 		{
@@ -243,10 +243,10 @@ Game::menu_t Game::ScenarioInfo(void)
 		display.Blit(AGG::GetICN(ICN::NGEXTRA, index), rt.x, rt.y);
 
 		const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
-		text.Hide();
-		text.SetText(name);
-		text.SetPos(rt.x + (rt.w - text.w()) / 2, rt.y + rt.h + 2);
-		text.Show();
+		textsprite.Hide();
+		textsprite.SetText(name);
+		textsprite.SetPos(rt.x + (rt.w - textsprite.w()) / 2, rt.y + rt.h + 2);
+		textsprite.Show();
 
 		cursor.Show();
 		display.Flip();
@@ -395,23 +395,32 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
     display.Blit(panel, 204, 33);
 
     // text scenario
-    Text("Scenario:", Font::BIG, 376, 53);
+    Text text("Scenario:", Font::BIG);
+    text.Blit(376, 53);
 
     // maps name
-    Text(conf.FileInfo().Name(), Font::BIG, 260, 78);
+    text.Set(conf.FileInfo().Name());
+    text.Blit(260, 78);
     
     // text game difficulty
-    Text("Game Difficulty:", Font::BIG, 330, 107);
+    text.Set("Game Difficulty:");
+    text.Blit(330, 107);
 
     //
-    Text("Easy", Font::SMALL, 248, 196);
-    Text("Normal", Font::SMALL, 316, 196);
-    Text("Hard", Font::SMALL, 395, 196);
-    Text("Expert", Font::SMALL, 472, 196);
-    Text("Impossible", Font::SMALL, 536, 196);
+    text.Set("Easy", Font::SMALL);
+    text.Blit(248, 196);
+    text.Set("Normal");
+    text.Blit(316, 196);
+    text.Set("Hard");
+    text.Blit(395, 196);
+    text.Set("Expert");
+    text.Blit(472, 196);
+    text.Set("Impossible");
+    text.Blit(536, 196);
 
     // text opponents
-    Text("Opponents:", Font::BIG, 368, 210);
+    text.Set("Opponents:", Font::BIG);
+    text.Blit(368, 210);
 
     // draw opponents
     const std::bitset<8> colors(conf.FileInfo().KingdomColors());
@@ -429,15 +438,16 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 	}
 
     // text class
-    Text("Class:", Font::BIG, 386, 290);
+    text.Set("Class:", Font::BIG);
+    text.Blit(386, 290);
 
     // draw class
     current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
     {
-	TextSprite & text = coordClass[Color::GetIndex(color)].second;
-	text.Hide();
+	TextSprite & textsprite = coordClass[Color::GetIndex(color)].second;
+	textsprite.Hide();
     }
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
@@ -470,13 +480,13 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 	    display.Blit(sprite, pt);
 
 	    const Rect & rt = coordClass[Color::GetIndex(color)].first;
-	    TextSprite & text = coordClass[Color::GetIndex(color)].second;
+	    TextSprite & textsprite = coordClass[Color::GetIndex(color)].second;
 
 	    const std::string & name = (Race::NECR == race ? "Necroman" : Race::String(race));
-	    text.SetFont(Font::SMALL);
-	    text.SetText(name);
-	    text.SetPos(rt.x + (rt.w - text.w()) / 2, rt.y + rt.h + 2);
-	    text.Show();
+	    textsprite.SetFont(Font::SMALL);
+	    textsprite.SetText(name);
+	    textsprite.SetPos(rt.x + (rt.w - text.w()) / 2, rt.y + rt.h + 2);
+	    textsprite.Show();
 
     	    ++current;
     }

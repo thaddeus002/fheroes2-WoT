@@ -94,10 +94,10 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     Rect rect_image2(pos, sprite_skill2.w(), sprite_skill2.h());
     display.Blit(sprite_skill2, pos.x, pos.y + 3);
     // text
-    const std::string &name_skill2 = Skill::Secondary::String(sec2.Skill());
-    Text(name_skill2, Font::SMALL, pos.x + (sprite_skill2.w() - Text::width(name_skill2, Font::SMALL)) / 2, pos.y + 5);
-    const std::string &name_level2 = Skill::Level::String(sec2.Level());
-    Text(name_level2, Font::SMALL, pos.x + (sprite_skill2.w() - Text::width(name_level2, Font::SMALL)) / 2, pos.y + sprite_skill2.h() - 12);
+    Text name_skill2(Skill::Secondary::String(sec2.Skill()), Font::SMALL);
+    name_skill2.Blit(pos.x + (sprite_skill2.w() - name_skill2.w()) / 2, pos.y + 5);
+    Text name_level2(Skill::Level::String(sec2.Level()), Font::SMALL);
+    name_level2.Blit(pos.x + (sprite_skill2.w() - name_level2.w()) / 2, pos.y + sprite_skill2.h() - 12);
 
     button_learn1.Draw();
     button_learn2.Draw();

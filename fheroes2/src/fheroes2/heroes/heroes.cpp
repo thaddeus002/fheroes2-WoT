@@ -1513,10 +1513,10 @@ void Heroes::LevelUp(bool autoselect)
 	    // text
 	    const std::string &name_skill = Skill::Secondary::String(sec2.Skill());
 	    Text text_skill(name_skill, Font::SMALL);
-	    text_skill.Blit(3 + (sprite_skill.w() - Text::width(name_skill, Font::SMALL)) / 2, 6, sf);
+	    text_skill.Blit(3 + (sprite_skill.w() - text_skill.w()) / 2, 6, sf);
 	    const std::string &name_level = Skill::Level::String(sec2.Level());
 	    Text text_level(name_level, Font::SMALL);
-	    text_level.Blit(3 + (sprite_skill.w() - Text::width(name_level, Font::SMALL)) / 2, sprite_skill.h() - 12, sf);
+	    text_level.Blit(3 + (sprite_skill.w() - text_level.w()) / 2, sprite_skill.h() - 12, sf);
 
 	    Dialog::SpriteInfo(header, message, sf);
 	}
@@ -1540,10 +1540,10 @@ void Heroes::LevelUp(bool autoselect)
 	    // text
 	    const std::string &name_skill = Skill::Secondary::String(sec1.Skill());
 	    Text text_skill(name_skill, Font::SMALL);
-	    text_skill.Blit(3 + (sprite_skill.w() - Text::width(name_skill, Font::SMALL)) / 2, 6, sf);
+	    text_skill.Blit(3 + (sprite_skill.w() - text_skill.w()) / 2, 6, sf);
 	    const std::string &name_level = Skill::Level::String(sec1.Level());
 	    Text text_level(name_level, Font::SMALL);
-	    text_level.Blit(3 + (sprite_skill.w() - Text::width(name_level, Font::SMALL)) / 2, sprite_skill.h() - 12, sf);
+	    text_level.Blit(3 + (sprite_skill.w() - text_level.w()) / 2, sprite_skill.h() - 12, sf);
 
 	    Dialog::SpriteInfo(header, message, sf);
 	}

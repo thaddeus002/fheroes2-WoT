@@ -160,13 +160,13 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     if(visit_status.empty())
     {
 	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
-	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.height()) / 2;
+	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.h()) / 2;
 	text.Blit(tx, ty);
     }
     else
     {
     	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
-	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.height()) / 2 - 7;
+	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.h()) / 2 - 7;
 	text.Blit(tx, ty);
 
 	text.Set(visit_status);

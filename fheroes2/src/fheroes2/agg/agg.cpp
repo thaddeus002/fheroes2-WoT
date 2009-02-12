@@ -170,12 +170,13 @@ void AGG::File::Dump(void) const
 /* AGG::Cache constructor */
 AGG::Cache::Cache() : heroes2_agg(false)
 {
-#ifdef WITH_TTF
-    const Settings & conf = Settings::Get();
+    Settings & conf = Settings::Get();
 
-    font_medium.Open(conf.FontsNormal(), conf.FontsNormalSize());
-    font_small.Open(conf.FontsSmall(), conf.FontsSmallSize());
-#endif
+    if(conf.Unicode())
+    {
+	if(!font_medium.Open(conf.FontsNormal(), conf.FontsNormalSize()) ||
+	   !font_small.Open(conf.FontsSmall(), conf.FontsSmallSize())) conf.ResetModes(Settings::UNICODE);
+    }
 }
 
 AGG::Cache::~Cache()
@@ -667,69 +668,74 @@ void AGG::Cache::LoadFNT(void)
 {
     const Settings & conf = Settings::Get();
 
-#ifdef WITH_TTF
-    if(fnt_cache.size()) return;
-
-    const char *letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-    const u8 letters_size = std::strlen(letters);
-    const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
-
-    u16 *unicode = new u16[letters_size + 1];
-
-    String::UTF8_to_UNICODE(unicode, letters, letters_size);
-
-    // small
-    if(font_small.isValid())
+    if(conf.Unicode())
     {
-	for(u8 ii = 0; ii < letters_size; ++ii)
-	    font_small.RenderUnicodeChar(fnt_cache[unicode[ii]].second, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-    }
-    else
-	PreloadObject(ICN::SMALFONT);
+	if(fnt_cache.size()) return;
 
-    // medium
-    if(font_medium.isValid())
-    {
-	for(u8 ii = 0; ii < letters_size; ++ii)
-	    font_medium.RenderUnicodeChar(fnt_cache[unicode[ii]].first, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-    }
-    else
-	PreloadObject(ICN::FONT);
+	const char *letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+	const u8 letters_size = std::strlen(letters);
+        const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
-    delete [] unicode;
+	u16 *unicode = new u16[letters_size + 1];
 
-    if(conf.Debug())
-    {
-	if(fnt_cache.size())
+	String::UTF8_to_UNICODE(unicode, letters, letters_size);
+
+	// small
+	if(font_small.isValid())
 	{
-    	    Error::Verbose("AGG::LoadFonts: normal fonts " + conf.FontsNormal());
-    	    Error::Verbose("AGG::LoadFonts:  small fonts " + conf.FontsSmall());
-    	    Error::Verbose("AGG::LoadFonts: preload english charsets");
+	    for(u8 ii = 0; ii < letters_size; ++ii)
+		font_small.RenderUnicodeChar(fnt_cache[unicode[ii]].second, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 	}
 	else
-	    Error::Verbose("AGG::LoadFonts: internal.");
-    }
-#else
-    PreloadObject(ICN::SMALFONT);
-    PreloadObject(ICN::FONT);
+	    PreloadObject(ICN::SMALFONT);
 
-    if(conf.Debug()) Error::Verbose("AGG::LoadFonts: internal.");
-#endif
+	// medium
+	if(font_medium.isValid())
+	{
+	    for(u8 ii = 0; ii < letters_size; ++ii)
+		font_medium.RenderUnicodeChar(fnt_cache[unicode[ii]].first, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	}
+	else
+	    PreloadObject(ICN::FONT);
+
+	delete [] unicode;
+
+	if(conf.Debug())
+	{
+	    if(fnt_cache.size())
+	    {
+    		Error::Verbose("AGG::LoadFonts: normal fonts " + conf.FontsNormal());
+    	        Error::Verbose("AGG::LoadFonts:  small fonts " + conf.FontsSmall());
+    		Error::Verbose("AGG::LoadFonts: preload english charsets");
+	    }
+	    else
+		Error::Verbose("AGG::LoadFonts: internal.");
+	}
+    }
+    else
+    {
+	PreloadObject(ICN::SMALFONT);
+	PreloadObject(ICN::FONT);
+
+	if(conf.Debug()) Error::Verbose("AGG::LoadFonts: internal.");
+    }
 }
 
 void AGG::Cache::LoadFNT(u16 ch)
 {
-#ifdef WITH_TTF
     const Settings & conf = Settings::Get();
-    const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
-    // small
-    if(font_small.isValid()) font_small.RenderUnicodeChar(fnt_cache[ch].second, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-    // medium
-    if(font_medium.isValid()) font_medium.RenderUnicodeChar(fnt_cache[ch].first, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+    if(conf.Unicode())
+    {
+	const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
 
-    if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
-#endif
+	// small
+	font_small.RenderUnicodeChar(fnt_cache[ch].second, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	// medium
+	font_medium.RenderUnicodeChar(fnt_cache[ch].first, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+
+	if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
+    }
 }
 
 /* free ICN object in AGG::Cache */
@@ -908,10 +914,7 @@ const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u16 c)
 
 bool AGG::Cache::isValidFonts(void) const
 {
-#ifdef WITH_TTF
-    return font_small.isValid() && font_medium.isValid();
-#endif
-    return false;
+    return Settings::Get().Unicode() ? font_small.isValid() && font_medium.isValid() : false;
 }
 
 // wrapper AGG::PreloadObject
@@ -1013,16 +1016,13 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 /* return letter sprite */
 const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
 {
-#ifdef WITH_TTF
     if(AGG::Cache::Get().isValidFonts())
     {
 	const std::pair<Surface, Surface> & fonts = AGG::Cache::Get().GetFNT(ch);
 	return Font::SMALL == ft ? fonts.second : fonts.first;
     }
     else
-#endif
     return AGG::GetLetter(ch, ft);
-
 }
 
 const Surface & AGG::GetLetter(char ch, u8 ft)

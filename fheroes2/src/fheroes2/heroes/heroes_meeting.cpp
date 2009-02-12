@@ -61,9 +61,8 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
     // header
     message = GetName() + " meets " + heroes2.GetName();
-    dst_pt.x = cur_pt.x + 320 - Text::width(message, Font::BIG) / 2;
-    dst_pt.y = cur_pt.y + 26;
-    Text(message, Font::BIG, dst_pt);
+    Text text(message, Font::BIG);
+    text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 26);
 
     // portrait
     dst_pt.x = cur_pt.x + 93;
@@ -248,83 +247,70 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, const Skill::Primary & p2)
 {
     std::string message;
-    Point dst_pt;
 
     // attack skill
     message.clear();
     message += "Attack Skill";
-    dst_pt.x = cur_pt.x + 320 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 64;
-    Text(message, Font::SMALL, dst_pt);
+    Text text(message, Font::SMALL);
+    text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 64);
 
     message.clear();
     String::AddInt(message, p1.GetAttack());
-    dst_pt.x = cur_pt.x + 260 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 64;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 64);
 
     message.clear();
     String::AddInt(message, p2.GetAttack());
-    dst_pt.x = cur_pt.x + 380 - Text::width(message, Font::SMALL);
-    dst_pt.y = cur_pt.y + 64;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 64);
 
     // defense skill
     message.clear();
     message += "Defense Skill";
-    dst_pt.x = cur_pt.x + 320 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 96;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 96);
 
     message.clear();
     String::AddInt(message, p1.GetDefense());
-    dst_pt.x = cur_pt.x + 260 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 96;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 96);
 
     message.clear();
     String::AddInt(message, p2.GetDefense());
-    dst_pt.x = cur_pt.x + 380 - Text::width(message, Font::SMALL);
-    dst_pt.y = cur_pt.y + 96;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 96);
 
     // spell power
     message.clear();
     message += "Spell Power";
-    dst_pt.x = cur_pt.x + 320 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 128;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 128);
 
     message.clear();
     String::AddInt(message, p1.GetPower());
-    dst_pt.x = cur_pt.x + 260 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 128;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 128);
 
     message.clear();
     String::AddInt(message, p2.GetPower());
-    dst_pt.x = cur_pt.x + 380 - Text::width(message, Font::SMALL);
-    dst_pt.y = cur_pt.y + 128;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 128);
 
     // knowledge
     message.clear();
     message += "Knowledge";
-    dst_pt.x = cur_pt.x + 320 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 160;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 160);
 
     message.clear();
     String::AddInt(message, p1.GetKnowledge());
-    dst_pt.x = cur_pt.x + 260 - Text::width(message, Font::SMALL) / 2;
-    dst_pt.y = cur_pt.y + 160;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 160);
 
     message.clear();
     String::AddInt(message, p2.GetKnowledge());
-    dst_pt.x = cur_pt.x + 380 - Text::width(message, Font::SMALL);
-    dst_pt.y = cur_pt.y + 160;
-    Text(message, Font::SMALL, dst_pt);
+    text.Set(message);
+    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 160);
 }
 
 void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> & skills)
@@ -345,7 +331,8 @@ void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> 
 
             std::string message;
             String::AddInt(message, level);
-            Text(message, Font::SMALL, dst_pt.x + (sprite_skill.w() - Text::width(message, Font::SMALL)) - 3, dst_pt.y + sprite_skill.h() - 12);
+            Text text(message, Font::SMALL);
+            text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) - 3, dst_pt.y + sprite_skill.h() - 12);
 
             dst_pt.x += sprite_skill.w() + 1;
         }

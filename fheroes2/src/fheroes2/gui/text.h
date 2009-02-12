@@ -21,6 +21,7 @@
 #ifndef H2TEXT_H
 #define H2TEXT_H
 
+#include <string>
 #include <vector>
 #include "gamedefs.h"
 
@@ -29,48 +30,102 @@ namespace Font
     typedef enum { SMALL = 0x01, BIG = 0x02, YELLOWBIG = 0x04 } type_t;
 };
 
-namespace Char
+class TextInterface
 {
-    u8 width(char ch, Font::type_t ft);
-    u8 height(char ch, Font::type_t ft);
+public:
+    TextInterface(Font::type_t ft = Font::BIG) : font(ft){};
+    virtual ~TextInterface(){};
+
+    virtual void SetText(const std::string &) = 0;
+    virtual void SetFont(const Font::type_t &) = 0;
+    virtual void Clear(void) = 0;
+
+    virtual u16 w(void) const = 0;
+    virtual u16 h(void) const = 0;
+
+    virtual void Blit(u16 ax, u16 ay, Surface & sf = Display::Get()) = 0;
+
+    Font::type_t font;
+};
+
+
+class TextAscii : public TextInterface
+{
+public:
+    TextAscii() {};
+    TextAscii(const std::string &, Font::type_t = Font::BIG);
+
+    void SetText(const std::string &);
+    void SetFont(const Font::type_t &);
+    void Clear(void);
+
+    u16 w(void) const;
+    u16 w(u16, u16) const;
+    u16 h(void) const;
+    u16 h(const u16) const;
+
+    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
+    static u8 char_w(char, Font::type_t);
+
+private:
+    std::string message;
+};
+
+class TextUnicode : public TextInterface
+{
+public:
+    TextUnicode() {};
+    TextUnicode(const std::string & msg, Font::type_t ft = Font::BIG);
+    TextUnicode(const u16 *, size_t, Font::type_t ft = Font::BIG);
+
+    void SetText(const std::string &);
+    void SetFont(const Font::type_t &);
+    void Clear(void);
+
+    u16 w(void) const;
+    u16 w(u16, u16) const;
+    u16 h(void) const;
+    u16 h(const u16) const;
+
+    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
+
+    static bool isspace(u16);
+    static u8 char_w(u16, Font::type_t);
+
+private:
+    std::vector<u16> message;
 };
 
 class Text
 {
 public:
-    typedef enum { LEFT, CENTER, RIGHT } align_t;
-
     Text();
-    Text(const std::string & msg, Font::type_t ft);
+    Text(const std::string &, Font::type_t ft = Font::BIG);
+    Text(const u16 *, size_t, Font::type_t ft = Font::BIG);
+    Text(const Text &);
+    ~Text();
 
-    // with blit
-    Text(const std::string & msg, Font::type_t ft, const Point & dst_pt);
-    Text(const std::string & msg, Font::type_t ft, const Rect & dst_rt);
-    Text(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
+    Text & operator= (const Text &);
 
-    void Set(const std::string & msg, Font::type_t ft){ message = msg; font = ft; gw = width(); };
-    void Set(const std::string & msg){  message = msg; gw = width(); };
-    void Set(Font::type_t ft){ font = ft; gw = width(); };
+    void Set(const std::string &, Font::type_t);
+    void Set(const std::string &);
+    void Set(Font::type_t);
 
-    void Clear(void){ message.clear(); gw = 0; };
+    void Clear(void);
 
-    u16 w(void){ return gw; }
-    u16 h(void){ return gh; }
+    u16 w(void) const{ return gw; };
+    u16 h(void) const{ return gh; };
 
-    u16 width(u16 start = 0, u16 count = 0xffff){ return Text::width(message, font, start, count); };
-    u16 height(u16 width = 0){ return Text::height(message, font, width); };
+    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get()) const;
+    void Blit(const Point & dst_pt, Surface & sf = Display::Get()) const;
 
-    static u16 width(const std::string &str, Font::type_t ft, u16 start = 0, u16 count = 0xffff);
+    static u16 width(const std::string &str, Font::type_t ft, u16 start = 0, u16 count = 0);
     static u16 height(const std::string &str, Font::type_t ft, u16 width = 0);
 
-    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
-    void Blit(const Point & dst_pt, Surface & sf = Display::Get());
-
 protected:
-    Font::type_t font;
-    std::string message;
+    TextInterface *message;
     u16 gw;
-    u8  gh;
+    u16 gh;
 };
 
 class TextSprite : protected Text
@@ -100,12 +155,33 @@ private:
     bool hide;
 };
 
-class TextBox
+class TextBox : protected Rect
 {
 public:
-    TextBox(const std::string & msg, Font::type_t ft, const Rect & rt);
-    TextBox(const std::list<std::string> & list, Font::type_t ft, const Rect & rt);
-    Rect extents;
+    TextBox(){};
+    TextBox(const std::string &, Font::type_t, u16);
+    TextBox(const std::list<std::string> &, Font::type_t, u16);
+
+    TextBox(const std::string &, Font::type_t, const Rect &);
+    TextBox(const std::list<std::string> &, Font::type_t, const Rect &);
+
+    void Set(const std::list<std::string> &, Font::type_t, u16);
+    void Set(const std::string &, Font::type_t, u16);
+
+    const Rect & GetRect(void) const{ return *this; };
+    s16 x(void) const{ return Rect::x; };
+    s16 y(void) const{ return Rect::y; };
+    u16 w(void) const{ return Rect::w; };
+    u16 h(void) const{ return Rect::h; };
+
+    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
+    void Blit(const Point & pt, Surface & sf = Display::Get());
+
+private:
+    void Append(const std::string &, Font::type_t, u16);
+    void Append(const std::vector<u16> &, Font::type_t, u16);
+
+    std::list<Text> messages;
 };
 
 #endif

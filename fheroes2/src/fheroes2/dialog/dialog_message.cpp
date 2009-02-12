@@ -55,25 +55,22 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    u16 hm = 0;
-    std::list<std::string>::const_iterator it1 = messages.begin();
-    std::list<std::string>::const_iterator it2 = messages.end();
-    for(; it1 != it2; ++it1) hm += Text::height(*it1, ft, BOXAREA_WIDTH);
+    TextBox textbox1(header, (ft == Font::BIG ? Font::YELLOWBIG : ft), BOXAREA_WIDTH);
+    TextBox textbox2(messages, ft, BOXAREA_WIDTH);
 
-    Box box((header.size() ? Text::height(header, ft, BOXAREA_WIDTH) + 10 : 0) + hm, buttons);
-
+    Box box((header.size() ? textbox1.h() + 10 : 0) + textbox2.h(), buttons);
     Rect pos = box.GetArea();
 
     if(messages.empty()) pos.y += 10;
 
     if(header.size())
     {
-	TextBox(header, (ft == Font::BIG ? Font::YELLOWBIG : ft), pos);
-        pos.y += Text::height(header, ft, BOXAREA_WIDTH);
+        textbox1.Blit(pos.x, pos.y);
+        pos.y += textbox1.h();
 	pos.y += 10;
     }
 
-    if(messages.size()) TextBox(messages, ft, pos);
+    if(messages.size()) textbox2.Blit(pos.x, pos.y);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

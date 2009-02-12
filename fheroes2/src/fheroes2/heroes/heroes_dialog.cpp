@@ -68,22 +68,23 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     message = name + " the " + Race::String(race) + " ( Level ";
     String::AddInt(message, GetLevel());
     message += " )";
-    dst_pt.x = cur_pt.x + 320 - Text::width(message, Font::BIG) / 2;
-    dst_pt.y = cur_pt.y + 1;
-    Text(message, Font::BIG, dst_pt);
+    Text text(message, Font::BIG);
+    text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 1);
 
     u8 index_sprite = 0;
 
     // attack
     message = "Attack Skill";
+    text.Set(message, Font::SMALL);
     dst_pt.x = cur_pt.x + 196;
     dst_pt.y = cur_pt.y + 34;
-    Text(message, Font::SMALL, dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     message.clear();
     String::AddInt(message, GetAttack());
+    text.Set(message, Font::BIG);
     dst_pt.y += 70;
-    Text(message, Font::BIG, dst_pt.x - Text::width(message, Font::BIG) / 2, dst_pt.y);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
     const Rect rectAttackSkill(cur_pt.x + 156, cur_pt.y + 30, 80, 92);
 
@@ -91,12 +92,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     message = "Defense Skill";
     dst_pt.x = cur_pt.x + 284;
     dst_pt.y = cur_pt.y + 34;
-    Text(message, Font::SMALL, dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y);
+    text.Set(message, Font::SMALL);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
     message.clear();
     String::AddInt(message, GetDefense());
     dst_pt.y += 70;
-    Text(message, Font::BIG, dst_pt.x - Text::width(message, Font::BIG) / 2, dst_pt.y);
+    text.Set(message, Font::BIG);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectDefenseSkill(cur_pt.x + 156 + 88, cur_pt.y + 30, 80, 92);
     
@@ -104,12 +107,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     message = "Spell Power";
     dst_pt.x = cur_pt.x + 372;
     dst_pt.y = cur_pt.y + 34;
-    Text(message, Font::SMALL, dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y);
+    text.Set(message, Font::SMALL);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
     message.clear();
     String::AddInt(message, GetPower());
     dst_pt.y += 70;
-    Text(message, Font::BIG, dst_pt.x - Text::width(message, Font::BIG) / 2, dst_pt.y);
+    text.Set(message, Font::BIG);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectSpellSkill(cur_pt.x + 156 + 2 * 88, cur_pt.y + 30, 80, 92);
 
@@ -117,12 +122,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     message = "Knowledge";
     dst_pt.x = cur_pt.x + 460;
     dst_pt.y = cur_pt.y + 34;
-    Text(message, Font::SMALL, dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y);
+    text.Set(message, Font::SMALL);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
     message.clear();
     String::AddInt(message, GetKnowledge());
     dst_pt.y += 70;
-    Text(message, Font::BIG, dst_pt.x - Text::width(message, Font::BIG) / 2, dst_pt.y);
+    text.Set(message, Font::BIG);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectKnowledgeSkill(cur_pt.x + 156 + 3 * 88, cur_pt.y + 30, 80, 92);
 
@@ -177,7 +184,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     String::AddInt(message, GetExperience());
     dst_pt.x = cur_pt.x + 528;
     dst_pt.y = cur_pt.y + 107;
-    Text(message, Font::SMALL, dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y);
+    text.Set(message, Font::SMALL);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
     std::string headerExperience("Level ");
     String::AddInt(headerExperience, GetLevel());
@@ -201,7 +209,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     String::AddInt(message, GetMaxSpellPoints());
     dst_pt.x = cur_pt.x + 568;
     dst_pt.y = cur_pt.y + 107;
-    Text(message, Font::SMALL, dst_pt.x - Text::width(message, Font::SMALL) / 2, dst_pt.y);
+    text.Set(message, Font::SMALL);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     std::string descriptionSpellPoints(name + " currently has ");
     String::AddInt(descriptionSpellPoints, GetSpellPoints());
@@ -273,11 +282,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	{
 	    // string skill
 	    message = Skill::Secondary::String(skill);
-	    Text(message, Font::SMALL, dst_pt.x + (sprite_skill.w() - Text::width(message, Font::SMALL)) / 2, dst_pt.y + 3);
+	    text.Set(message, Font::SMALL);
+	    text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 3);
 
 	    // string level
 	    message = Skill::Level::String(level);
-	    Text(message, Font::SMALL, dst_pt.x + (sprite_skill.w() - Text::width(message, Font::SMALL)) / 2, dst_pt.y + 50);
+	    text.Set(message);
+	    text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 50);
 	}
 
 	coordsSkill.push_back(Rect(dst_pt.x, dst_pt.y, sprite_skill.w(), sprite_skill.h()));
@@ -561,6 +572,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		else
 		    statusBar.ShowMessage("Hero Screen");
 	    }
+	    else
+		statusBar.ShowMessage("Hero Screen");
 	}
 	else
         // status message over troops
@@ -594,6 +607,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
                 else
                     statusBar.ShowMessage("Empty");
             }
+	    else
+		statusBar.ShowMessage("Hero Screen");
         }
         else
         // clear all

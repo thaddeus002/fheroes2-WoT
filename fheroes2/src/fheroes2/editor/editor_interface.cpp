@@ -371,10 +371,8 @@ void Game::Editor::Interface::DrawTopNumberCell(void)
 	std::string number;
 	String::AddInt(number, area.x + ii);
 
-	dst_pt.x = 2 * BORDERWIDTH + ii * TILEWIDTH - Text::width(number, Font::SMALL) / 2;
-	dst_pt.y = 2;
-	Text(number, Font::SMALL, dst_pt);
-
+	Text text(number, Font::SMALL);
+	text.Blit(2 * BORDERWIDTH + ii * TILEWIDTH - text.w() / 2, 2);
     }
 }
 
@@ -394,8 +392,7 @@ void Game::Editor::Interface::DrawLeftNumberCell(void)
 	std::string number;
 	String::AddInt(number, area.y + ii);
 
- 	dst_pt.x = BORDERWIDTH / 2 - Text::width(number, Font::SMALL) / 2 - 1;
-	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH + BORDERWIDTH - 5;
-	Text(number, Font::SMALL, dst_pt);
+	Text text(number, Font::SMALL);
+ 	text.Blit(BORDERWIDTH / 2 - text.w() / 2 - 1, BORDERWIDTH + ii * TILEWIDTH + BORDERWIDTH - 5);
     }
 }

@@ -317,8 +317,9 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
 	    mps = "";
 	    String::AddInt(mps, (mp%(i*10))/i);
 	}
-	Text(mps, Font::SMALL, tp);
-	tp.y += Text::height(mps, Font::SMALL);
+	Text text(mps, Font::SMALL);
+	text.Blit(tp);
+	tp.y += text.h();
     }
 
     u16 ox = 0;
@@ -350,12 +351,16 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
                 std::string str1 = str.substr(0, pos);
         	std::string str2 = str.substr(pos);
 
-                Text(str1, Font::SMALL, pt.x + ox - Text::width(str1, Font::SMALL) / 2, pt.y + oy + 22);
-                Text(str2, Font::SMALL, pt.x + ox - Text::width(str2, Font::SMALL) / 2, pt.y + oy + 31);
+                Text text(str1, Font::SMALL);
+                text.Blit(pt.x + ox - text.w() / 2, pt.y + oy + 22);
+                text.Set(str2);
+                text.Blit(pt.x + ox - text.w() / 2, pt.y + oy + 31);
             }
             else
-                Text(str, Font::SMALL, pt.x + ox - Text::width(str, Font::SMALL) / 2, pt.y + oy + 25);
-
+            {
+                Text text(str, Font::SMALL);
+                text.Blit(pt.x + ox - text.w() / 2, pt.y + oy + 25);
+	    }
     	    oy += 80;
 	}
     }

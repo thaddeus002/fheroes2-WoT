@@ -53,6 +53,7 @@ public:
         BATTLEGRID        = 0x08000000,
         BATTLEMOUSESHADOW = 0x10000000,
         BATTLEMOVESHADOW  = 0x20000000,
+        UNICODE           = 0x40000000,
 
 	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
 
@@ -100,6 +101,7 @@ public:
     bool BattleGrid(void) const;
     bool BattleMovementShaded(void) const;
     bool BattleMouseShaded(void) const;
+    bool Unicode(void) const;
 
     const Size & VideoMode(void) const;
 

@@ -137,3 +137,28 @@ void String::UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len)
     }
     unicode[j] = 0;
 }
+
+void String::UNICODE_to_UTF8(std::string & utf8, const u16 *unicode, size_t len)
+{
+    utf8.reserve(2 * len);
+
+    for(size_t ii = 0; ii < len; ++ii)
+    {
+	if(unicode[ii] < 128)
+	{
+            utf8.append(1, static_cast<char>(unicode[ii]));
+	}
+	else
+	if(unicode[ii] < 2048)
+	{
+    	    utf8.append(1, static_cast<char>(192 + ((unicode[ii] - (unicode[ii] % 64)) / 64)));
+            utf8.append(1, static_cast<char>(128 + (unicode[ii] % 64)));
+        }
+        else
+        {
+    	    utf8.append(1, static_cast<char>(224 + ((unicode[ii] - (unicode[ii] % 4096)) / 4096)));
+            utf8.append(1, static_cast<char>(128 + (((unicode[ii] % 4096) - (unicode[ii] % 64)) / 64)));
+            utf8.append(1, static_cast<char>(128 + (unicode[ii] % 64)));
+        }
+    }
+}

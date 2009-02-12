@@ -22,7 +22,7 @@ else
 CFLAGS := $(CFLAGS) -O2
 endif
 
-ifdef DEVELOPMENT
+ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_TTF
 LIBS := $(LIBS) -lSDL_ttf
 endif

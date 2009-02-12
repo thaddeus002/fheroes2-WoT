@@ -322,9 +322,10 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 
 	str.clear();
 	String::AddInt(str, rs.wood);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	Text text(str, Font::SMALL);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
 	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
 	++count;
     }
@@ -338,9 +339,10 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 
 	str.clear();
 	String::AddInt(str, rs.ore);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	Text text(str, Font::SMALL);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
 	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
 	++count;
     }
@@ -354,9 +356,10 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 
 	str.clear();
 	String::AddInt(str, rs.mercury);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	Text text(str, Font::SMALL);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
 	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
 	++count;
     }
@@ -372,9 +375,10 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 
 	str.clear();
 	String::AddInt(str, rs.sulfur);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	Text text(str, Font::SMALL);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
 	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
 	++count;
     }
@@ -389,9 +393,10 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 
 	str.clear();
 	String::AddInt(str, rs.crystal);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	Text text(str, Font::SMALL);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
 	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
 	++count;
     }
@@ -406,9 +411,10 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 
 	str.clear();
 	String::AddInt(str, rs.gems);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	Text text(str, Font::SMALL);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
 	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
 
 	++count;
     }
@@ -424,8 +430,9 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 
 	str.clear();
 	String::AddInt(str, rs.gold);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - Text::width(str, Font::SMALL) / 2;
+	Text text(str, Font::SMALL);
+	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
 	dst_pt.y = dst_rt.y + 2 + offset;
-	Text(str, Font::SMALL, dst_pt);
+	text.Blit(dst_pt);
     }
 }

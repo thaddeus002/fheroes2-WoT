@@ -39,7 +39,8 @@ namespace
         { "logo",              Settings::LOGO                        },
         { "battlegrid",        Settings::BATTLEGRID                  },
         { "battlemoveshadow",  Settings::BATTLEMOVESHADOW            },
-        { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           }
+        { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           },
+        { "unicode",           Settings::UNICODE                     },
     };
 }
 
@@ -102,6 +103,12 @@ bool Settings::Read(const std::string & filename)
 
     file.close();
 
+#ifndef WITH_TTF
+    ResetModes(UNICODE);
+#endif
+
+    if(font_normal.empty() || font_small.empty()) ResetModes(UNICODE);
+
     return true;
 }
 
@@ -162,6 +169,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "battle grid = " << (Modes(BATTLEGRID) ? "on" : "off") << std::endl;
     stream << "battle movement shadow = " << (Modes(BATTLEMOVESHADOW) ? "on" : "off") << std::endl;
     stream << "battle mouse shadow = " << (Modes(BATTLEMOUSESHADOW) ? "on" : "off") << std::endl;
+    stream << "unicode = " << (Modes(UNICODE) ? "on" : "off") << std::endl;
 
     stream << std::endl;
 }
@@ -266,6 +274,9 @@ bool Settings::BattleMovementShaded(void) const { return Modes(BATTLEMOVESHADOW)
 
 /* battle shaded mouse */
 bool Settings::BattleMouseShaded(void) const { return Modes(BATTLEMOUSESHADOW); }
+
+/* unicode support */
+bool Settings::Unicode(void) const { return Modes(UNICODE); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }

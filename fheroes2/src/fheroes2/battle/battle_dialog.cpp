@@ -40,7 +40,7 @@ static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleAr
             std::string amount;
             String::AddInt(amount, killed[i].second);
             Text number(amount, Font::SMALL);
-            number.Blit(Point(x + (sprite.w() - number.width()) / 2, surf.h() - 15), surf);	// Here is pink fringing, becose letter sprite use shadow, need draw to dislpay or use Army::DrawMons32Line
+            number.Blit(Point(x + (sprite.w() - number.w()) / 2, surf.h() - 15), surf);	// Here is pink fringing, becose letter sprite use shadow, need draw to dislpay or use Army::DrawMons32Line
             x += sprite.w() + 10;
         }
         display.Blit(surf, draw.x + (draw.w - surf.w()) / 2, draw.y);
@@ -48,7 +48,7 @@ static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleAr
     else
     {
         Text none(tr("battle.none"), Font::SMALL);
-        none.Blit(draw.x + (draw.w - none.width()) / 2, draw.y);
+        none.Blit(draw.x + (draw.w - none.w()) / 2, draw.y);
     }
 }
 
@@ -120,20 +120,20 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
     display.Blit(background, backgroundX, backgroundY);
     display.Blit(animBase, baseAnimX, baseAnimY);
     buttonDone.Draw();
-    
+
     TextBox first(message[0], Font::BIG, Rect(baseAnimX - 20, backgroundY + 180, animBase.w() + 40, background.h() - 160));
     if(message[1].size())
-        TextBox::TextBox(message[1], Font::BIG, Rect(baseAnimX - 20, first.extents.y + first.extents.h,
-                         animBase.w() + 40, background.h() - 160 - first.extents.h));
-    
+	TextBox::TextBox(message[1], Font::BIG, Rect(baseAnimX - 20, first.y() + first.h(),
+            animBase.w() + 40, background.h() - 160 - first.h()));
+
     const int textY = backgroundY + background.h() / 2 + 30;
     TextBox title(tr("battle.casualties"), Font::SMALL, Rect(backgroundX, textY, background.w(), 40));
-    TextBox attacker(tr("battle.attacker"), Font::SMALL, Rect(backgroundX, title.extents.y + int(title.extents.h * 1.5f), background.w(), 40));
-    TextBox defender(tr("battle.defender"), Font::SMALL, Rect(backgroundX, attacker.extents.y + attacker.extents.h * 4, background.w(), 40));
-    
-    DrawArmySummary(*armies[0].second, *armies[0].first, Rect(backgroundX, attacker.extents.y + attacker.extents.h + 5, background.w(), 0));
-    DrawArmySummary(*armies[1].second, *armies[1].first, Rect(backgroundX, defender.extents.y + defender.extents.h + 5, background.w(), 0));
-    
+    TextBox attacker(tr("battle.attacker"), Font::SMALL, Rect(backgroundX, title.y() + int(title.h() * 1.5f), background.w(), 40));
+    TextBox defender(tr("battle.defender"), Font::SMALL, Rect(backgroundX, attacker.y() + attacker.h() * 4, background.w(), 40));
+
+    DrawArmySummary(*armies[0].second, *armies[0].first, Rect(backgroundX, attacker.y() + attacker.h() + 5, background.w(), 0));
+    DrawArmySummary(*armies[1].second, *armies[1].first, Rect(backgroundX, defender.y() + defender.h() + 5, background.w(), 0));
+
     cursor.Show();
     display.Flip();
     
@@ -175,9 +175,9 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
                         Rect titleRect(backgroundX + background.w() / 8, baseAnimY + animBase.h() + 20, background.w() * 3 / 4, background.h());
                         TextBox title("You have captured an enemy artifact!", Font::BIG, titleRect);
                         Text artText(artName, Font::SMALL);
-                        artText.Blit(backgroundX + (background.w() - artText.width()) / 2, buttonDone.y - artText.height() - 5);
+                        artText.Blit(backgroundX + (background.w() - artText.w()) / 2, buttonDone.y - artText.h() - 5);
                         int artX = backgroundX + (background.w() - art.w()) / 2;
-                        int artY = buttonDone.y - artText.height() - 10 - art.h() - 10;
+                        int artY = buttonDone.y - artText.h() - 10 - art.h() - 10;
                         display.Blit(art, artX, artY);
                         display.Blit(border, artX - (border.w() - art.w()) / 2, artY - (border.h() - art.h()) / 2);
 
