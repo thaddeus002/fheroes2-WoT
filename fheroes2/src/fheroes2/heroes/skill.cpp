@@ -121,7 +121,7 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 
 const std::string & Skill::Primary::String(const Skill::Primary::skill_t skill)
 {
-    static const std::string str_skill[] = { "Attack", "Defence", "Power", "Knowledge", "Unknown" };
+    static const std::string str_skill[] = { _("Attack"), _("Defence"), _("Power"), _("Knowledge"), "Unknown" };
 
     switch(skill)
     {
@@ -151,7 +151,7 @@ Skill::Level::type_t Skill::Level::FromMP2(const u8 byte)
 
 const std::string & Skill::Level::String(const type_t level)
 {
-    static const std::string str_level[] = { "None", "Basic", "Advanced", "Expert" };
+    static const std::string str_level[] = { "None", _("Basic"), _("Advanced"), _("Expert") };
 
     switch(level)
     {
@@ -342,8 +342,8 @@ u8 Skill::Secondary::GetIndexSprite2(const skill_t skill)
 
 const std::string & Skill::Secondary::String(const skill_t skill)
 {
-    static const std::string str_skill[] = { "Pathfinding", "Archery", "Logistics", "Scouting", "Diplomacy", "Navigation", 
-	"Leadership", "Wisdom", "Mysticism", "Luck", "Ballistics", "Eagle Eye", "Necromancy", "Estates", "Unknown"  };
+    static const std::string str_skill[] = { _("Pathfinding"), _("Archery"), _("Logistics"), _("Scouting"), _("Diplomacy"), _("Navigation"), 
+	_("Leadership"), _("Wisdom"), _("Mysticism"), _("Luck"), _("Ballistics"), _("Eagle Eye"), _("Necromancy"), _("Estates"), "Unknown"  };
 
     switch(skill)
     {
@@ -372,61 +372,61 @@ const std::string & Skill::Secondary::Description(const skill_t skill, const Lev
 {
     static const std::string description_skill[] =
     {
-	"Basic Pathfinding reduces the movement penalty for rough terrain by 25 percent.",
-	"Advanced Pathfinding reduces the movement penalty for rough terrain by 50 percent.",
-	"Expert Pathfinding eliminates the movement penalty for rough terrain.",
+	_("Basic Pathfinding reduces the movement penalty for rough terrain by 25 percent."),
+	_("Advanced Pathfinding reduces the movement penalty for rough terrain by 50 percent."),
+	_("Expert Pathfinding eliminates the movement penalty for rough terrain."),
 
-	"Basic Archery increases the damage done by range attacking creatures by 10 percent.",
-	"Advanced Archery increases the damage done by range attacking creatures by 25 percent.",
-	"Expert Archery increases the damage done by range attacking creatures by 50 percent.",
+	_("Basic Archery increases the damage done by range attacking creatures by 10 percent."),
+	_("Advanced Archery increases the damage done by range attacking creatures by 25 percent."),
+	_("Expert Archery increases the damage done by range attacking creatures by 50 percent."),
 
-	"Basic Logistics increases your hero's movement points by 10 percent.",
-	"Advanced Logistics increases your hero's movement points by 20 percent.",
-	"Expert Logistics increases your hero's movement points by 30 percent.",
+	_("Basic Logistics increases your hero's movement points by 10 percent."),
+	_("Advanced Logistics increases your hero's movement points by 20 percent."),
+	_("Expert Logistics increases your hero's movement points by 30 percent."),
 
-	"Basic Scouting increases your hero's viewable area by 1 square.",
-	"Advanced Scouting increases your hero's viewable area by 2 squares.",
-	"Expert Scouting increases your hero's viewable area by 3 squares.",
+	_("Basic Scouting increases your hero's viewable area by 1 square."),
+	_("Advanced Scouting increases your hero's viewable area by 2 squares."),
+	_("Expert Scouting increases your hero's viewable area by 3 squares."),
 
-	"Basic Diplomacy allows you to negotiate with monsters who are weaker than your group.  Approximately 1/4 of the creatures may offer to join you.",
-	"Advanced Diplomacy allows you to negotiate with monsters who are weaker than your group.  Approximately 1/2 of the creatures may offer to join you.",
-	"Expert Diplomacy allows you to negotiate with monsters who are weaker than your group.  All of the creatures may offer to join you.",
+	_("Basic Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately 1/4 of the creatures may offer to join you."),
+	_("Advanced Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately 1/2 of the creatures may offer to join you."),
+	_("Expert Diplomacy allows you to negotiate with monsters who are weaker than your group. All of the creatures may offer to join you."),
 
-	"Basic Navigation increases your hero's movement points over water by 1/3.",
-	"Advanced Navigation increases your hero's movement points over water by 2/3.",
-	"Expert Navigation doubles your hero's movement points over water.",
+	_("Basic Navigation increases your hero's movement points over water by 1/3."),
+	_("Advanced Navigation increases your hero's movement points over water by 2/3."),
+	_("Expert Navigation doubles your hero's movement points over water."),
 
-	"Basic Leadership increases your hero's troops' morale by 1.",
-	"Advanced Leadership increases your hero's troops' morale by 2.",
-	"Expert Leadership increases your hero's troops' morale by 3.",
+	_("Basic Leadership increases your hero's troops' morale by 1."),
+	_("Advanced Leadership increases your hero's troops' morale by 2."),
+	_("Expert Leadership increases your hero's troops' morale by 3."),
 
-	"Basic Wisdom allows your hero to learn third level spells.",
-	"Advanced Wisdom allows your hero to learn fourth level spells.",
-	"Expert Wisdom allows your hero to learn fifth level spells.",
+	_("Basic Wisdom allows your hero to learn third level spells."),
+	_("Advanced Wisdom allows your hero to learn fourth level spells."),
+	_("Expert Wisdom allows your hero to learn fifth level spells."),
 
-	"Basic Mysticism regenerates two of your hero's spell points per day.",
-	"Advanced Mysticism regenerates three of your hero's spell points per day.",
-	"Expert Mysticism regenerates four of your hero's spell points per day.",
+	_("Basic Mysticism regenerates two of your hero's spell points per day."),
+	_("Advanced Mysticism regenerates three of your hero's spell points per day."),
+	_("Expert Mysticism regenerates four of your hero's spell points per day."),
 
-	"Basic Luck increases your hero's luck by 1.",
-	"Advanced Luck increases your hero's luck by 2.",
-	"Expert Luck increases your hero's luck by 3.",
+	_("Basic Luck increases your hero's luck by 1."),
+	_("Advanced Luck increases your hero's luck by 2."),
+	_("Expert Luck increases your hero's luck by 3."),
 
-	"Basic Ballistics gives your hero's catapult shots a greater chance to hit and do damage to castle walls.",
-	"Advanced Ballistics gives your hero's catapult an extra shot, and each shot has a greater chance to hit and do damage to castle walls.",
-	"Expert Ballistics gives your hero's catapult an extra shot, and each shot automatically destroys any wall, except a fortified wall in a Knight town.",
+	_("Basic Ballistics gives your hero's catapult shots a greater chance to hit and do damage to castle walls."),
+	_("Advanced Ballistics gives your hero's catapult an extra shot, and each shot has a greater chance to hit and do damage to castle walls."),
+	_("Expert Ballistics gives your hero's catapult an extra shot, and each shot automatically destroys any wall, except a fortified wall in a Knight town."),
 
-	"Basic Eagle Eye gives your hero a 20 percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat.",
-	"Advanced Eagle Eye gives your hero a 30 percent chance to learn any given 3rd level spell (or below) used against him in combat.",
-	"Expert Eagle Eye gives your hero a 40 percent chance to learn any given 4th level spell (or below) used against him in combat.",
+	_("Basic Eagle Eye gives your hero a 20 percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat."),
+	_("Advanced Eagle Eye gives your hero a 30 percent chance to learn any given 3rd level spell (or below) used against him in combat."),
+	_("Expert Eagle Eye gives your hero a 40 percent chance to learn any given 4th level spell (or below) used against him in combat."),
 
-	"Basic Necromancy allows 10 percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
-	"Advanced Necromancy allows 20 percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
-	"Expert Necromancy allows 30 percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
+	_("Basic Necromancy allows 10 percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
+	_("Advanced Necromancy allows 20 percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
+	_("Expert Necromancy allows 30 percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
 
-	"Your hero produces 100 gold pieces per turn as tax revenue from estates.",
-	"Your hero produces 250 gold pieces per turn as tax revenue from estates.",
-	"Your hero produces 500 gold pieces per turn as tax revenue from estates." };
+	_("Your hero produces 100 gold pieces per turn as tax revenue from estates."),
+	_("Your hero produces 250 gold pieces per turn as tax revenue from estates."),
+	_("Your hero produces 500 gold pieces per turn as tax revenue from estates.") };
 
     u8 index = 0;
 

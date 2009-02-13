@@ -22,8 +22,8 @@
 
 const std::string & Speed::String(u8 speed)
 {
-    static const std::string str_speed[] = { "Standing", "Crawling", "Very Slow", "Slow", "Average", "Fast",
-	"Very Fast", "Ultra Fast", "Blazing", "Instant" };
+    static const std::string str_speed[] = { _("Standing"), _("Crawling"), _("Very Slow"), _("Slow"), _("Average"), _("Fast"),
+	_("Very Fast"), _("Ultra Fast"), _("Blazing"), _("Instant") };
 
     switch(speed)
     {

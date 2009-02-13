@@ -33,15 +33,15 @@ const char* MoraleString(s8 morale)
         case Morale::TREASON:
         case Morale::AWFUL:
         case Morale::POOR:
-            return "Bad Morale";
+            return _("Bad Morale");
 
         case Morale::NORMAL:
-            return "Neutral Morale";
+            return _("Neutral Morale");
 
         case Morale::GOOD:
         case Morale::GREAT:
         case Morale::BLOOD:
-    	    return "Good Morale";
+    	    return _("Good Morale");
 
         default: break;
     }
@@ -55,15 +55,15 @@ const char* LuckString(s8 luck)
         case Luck::CURSED:
         case Luck::AWFUL:
         case Luck::BAD:
-            return "Bad Luck";
+            return _("Bad Luck");
 
         case Luck::NORMAL:
-            return "Neutral Luck";
+            return _("Neutral Luck");
 
         case Luck::GOOD:
         case Luck::GREAT:
         case Luck::IRISH:
-            return "Good Luck";
+            return _("Good Luck");
 
         default: break;
     }
@@ -104,7 +104,7 @@ void LuckIndicator::Redraw(void)
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 
-    if(lists.size()) lists.push_front("Current Luck Modifiers:");
+    if(lists.size()) lists.push_front(_("Current Luck Modifiers:"));
     lists.push_front(" ");
     lists.push_front(Luck::Description(luck));
 
@@ -139,7 +139,7 @@ void MoraleIndicator::Redraw(void)
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 
-    if(lists.size()) lists.push_front("Current Morale Modifiers:");
+    if(lists.size()) lists.push_front(_("Current Morale Modifiers:"));
     lists.push_front(" ");
     lists.push_front(Morale::Description(morale));
 

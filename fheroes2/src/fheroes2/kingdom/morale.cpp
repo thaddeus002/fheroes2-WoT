@@ -22,7 +22,7 @@
 
 const std::string & Morale::String(s8 morale)
 {
-    static const std::string str_morale[] = { "Unknown", "Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood" };
+    static const std::string str_morale[] = { "Unknown", _("Treason"), _("Awful"), _("Poor"), _("Normal"), _("Good"), _("Great"), _("Blood") };
 
     switch(morale)
     {
@@ -42,9 +42,9 @@ const std::string & Morale::String(s8 morale)
 const std::string & Morale::Description(s8 morale)
 {
     static const std::string str_desc_morale[] = { "Unknown",
-	"Bad morale may cause your armies to freeze in combat.",
-	"Neutral morale means your armies will never be blessed with extra attacks or freeze in combat.",
-	"Good morale may give your armies extra attacks in combat." };
+	_("Bad morale may cause your armies to freeze in combat."),
+	_("Neutral morale means your armies will never be blessed with extra attacks or freeze in combat."),
+	_("Good morale may give your armies extra attacks in combat.") };
 
     switch(morale)
     {

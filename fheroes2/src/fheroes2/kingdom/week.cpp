@@ -19,15 +19,16 @@
  ***************************************************************************/
 
 #include "engine.h"
+#include "gamedefs.h"
 #include "week.h"
 
 const std::string & Week::GetString(type_t type)
 {
-    static const std::string str_name[] = { "Unnamed", "PLAGUE",
-		"Ant", "Grasshopper", "Dragonfly", "Spider", "Butterfly", "Bumblebee",
-		"Locust", "Earthworm", "Hornet", "Beetle", "Squirrel", "Rabbit",
-		"Gopher", "Badger", "Eagle", "Weasel", "Raven", "Mongoose", "Aardvark",
-		"Lizard", "Tortoise", "Hedgehog", "Condor", "Monsters HII" };
+    static const std::string str_name[] = { "Unnamed", _("PLAGUE"),
+		_("Ant"), _("Grasshopper"), _("Dragonfly"), _("Spider"), _("Butterfly"), _("Bumblebee"),
+		_("Locust"), _("Earthworm"), _("Hornet"), _("Beetle"), _("Squirrel"), _("Rabbit"),
+		_("Gopher"), _("Badger"), _("Eagle"), _("Weasel"), _("Raven"), _("Mongoose"), _("Aardvark"),
+		_("Lizard"), _("Tortoise"), _("Hedgehog"), _("Condor"), "Monsters HII" };
 
     switch(type)
     {

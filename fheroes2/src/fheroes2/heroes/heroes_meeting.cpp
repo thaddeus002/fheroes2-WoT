@@ -60,7 +60,9 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     display.Blit(backSprite, src_rt, dst_pt);
 
     // header
-    message = GetName() + " meets " + heroes2.GetName();
+    message = "%{name1} meets %{name2}";
+    String::Replace(message, "%{name1}", GetName());
+    String::Replace(message, "%{name2}", heroes2.GetName());
     Text text(message, Font::BIG);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 26);
 
@@ -249,8 +251,7 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
     std::string message;
 
     // attack skill
-    message.clear();
-    message += "Attack Skill";
+    message = _("Attack Skill");
     Text text(message, Font::SMALL);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 64);
 
@@ -265,8 +266,7 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
     text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 64);
 
     // defense skill
-    message.clear();
-    message += "Defense Skill";
+    message = _("Defense Skill");
     text.Set(message);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 96);
 
@@ -281,8 +281,7 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
     text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 96);
 
     // spell power
-    message.clear();
-    message += "Spell Power";
+    message = _("Spell Power");
     text.Set(message);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 128);
 
@@ -297,8 +296,7 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
     text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 128);
 
     // knowledge
-    message.clear();
-    message += "Knowledge";
+    message = _("Knowledge");
     text.Set(message);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 160);
 

@@ -19,12 +19,13 @@
  ***************************************************************************/
 
 #include "engine.h"
+#include "gamedefs.h"
 #include "race.h"
 
 const std::string & Race::String(Race::race_t race)
 {
-    static const std::string str_race[] = { "Knight", "Barbarian", "Sorceress", 
-	"Warlock", "Wizard", "Necromancer", "Multi", "Random", "Neutral" };
+    static const std::string str_race[] = { _("Knight"), _("Barbarian"), _("Sorceress"),
+	_("Warlock"), _("Wizard"), _("Necromancer"), _("Multi"), "Random", "Neutral" };
 
     switch(race){
         case Race::KNGT: return str_race[0];

@@ -193,16 +193,15 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 
 	if(le.MouseClickLeft(info_rt) && hero)
 	{
-	    std::string str = "Your hero has ";
-	    String::AddInt(str, hero->GetSpellPoints());
-	    str += " spell points remaining";
+	    std::string str = _("Your hero has %{point} spell points remaining");
+	    String::Replace(str, "%{point}", hero->GetSpellPoints());
 	    Dialog::Message("", str, Font::BIG, Dialog::OK);
 	}
 
 	if(le.MousePressRight(info_rt) && hero)
 	{
-	    std::string str = "Your hero has ";
-	    String::AddInt(str, hero->GetSpellPoints());
+	    std::string str = _("Your hero has %{point} spell points remaining");
+	    String::Replace(str, "%{point}", hero->GetSpellPoints());
 	    str += " spell points remaining";
 	    Dialog::Message("", str, Font::BIG);
 	}
@@ -243,11 +242,9 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 		    }
 		    else
 		    {
-			std::string str = "That spell costs ";
-			String::AddInt(str, Spell::Mana(spell));
-			str += " mana. You only have ";
-			String::AddInt(str, hero->GetSpellPoints());
-			str += " mana, so you can't cast the spell.";
+			std::string str = _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
+			String::Replace(str, "%{mana}", Spell::Mana(spell));
+			String::Replace(str, "%{point}", hero->GetSpellPoints());
 			Dialog::Message("", str, Font::BIG, Dialog::OK);
 		    }
 		}

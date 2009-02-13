@@ -22,7 +22,7 @@
 
 const std::string & Luck::String(s8 luck)
 {
-    static const std::string str_luck[] = { "Unknown", "Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish" };
+    static const std::string str_luck[] = { "Unknown", _("Cursed"), _("Awful"), _("Bad"), _("Normal"), _("Good"), _("Great"), _("Irish") };
 
     switch(luck)
     {
@@ -42,9 +42,9 @@ const std::string & Luck::String(s8 luck)
 const std::string & Luck::Description(s8 luck)
 {
     static const std::string str_desc_luck[] = { "Unknown",
-	"Bad luck sometimes falls on your armies in combat, causing their attacks to only do half damage.",
-	"Neutral luck means your armies will never get lucky or unlucky attacks on the enemy.",
-	"Good luck sometimes lets your armies get lucky attacks (double strength) in combat." };
+	_("Bad luck sometimes falls on your armies in combat, causing their attacks to only do half damage."),
+	_("Neutral luck means your armies will never get lucky or unlucky attacks on the enemy."),
+	_("Good luck sometimes lets your armies get lucky attacks (double strength) in combat.") };
 
     switch(luck)
     {

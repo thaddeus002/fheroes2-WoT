@@ -65,16 +65,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     display.Blit(Portrait::Hero(hid, Portrait::BIG), dst_pt);
 
     // name
-    message = name + " the " + Race::String(race) + " ( Level ";
-    String::AddInt(message, GetLevel());
-    message += " )";
+    message = "%{name} the %{race} ( Level %{level} )";
+    String::Replace(message, "%{name}", name);
+    String::Replace(message, "%{race}", Race::String(race));
+    String::Replace(message, "%{level}", GetLevel());
     Text text(message, Font::BIG);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 1);
 
     u8 index_sprite = 0;
 
     // attack
-    message = "Attack Skill";
+    message = _("Attack Skill");
     text.Set(message, Font::SMALL);
     dst_pt.x = cur_pt.x + 196;
     dst_pt.y = cur_pt.y + 34;
@@ -89,7 +90,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     const Rect rectAttackSkill(cur_pt.x + 156, cur_pt.y + 30, 80, 92);
 
     // defense
-    message = "Defense Skill";
+    message = _("Defense Skill");
     dst_pt.x = cur_pt.x + 284;
     dst_pt.y = cur_pt.y + 34;
     text.Set(message, Font::SMALL);
@@ -104,7 +105,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     const Rect rectDefenseSkill(cur_pt.x + 156 + 88, cur_pt.y + 30, 80, 92);
     
     // spell
-    message = "Spell Power";
+    message = _("Spell Power");
     dst_pt.x = cur_pt.x + 372;
     dst_pt.y = cur_pt.y + 34;
     text.Set(message, Font::SMALL);
@@ -119,7 +120,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     const Rect rectSpellSkill(cur_pt.x + 156 + 2 * 88, cur_pt.y + 30, 80, 92);
 
     // knowledge
-    message = "Knowledge";
+    message = _("Knowledge");
     dst_pt.x = cur_pt.x + 460;
     dst_pt.y = cur_pt.y + 34;
     text.Set(message, Font::SMALL);
@@ -156,7 +157,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     display.Blit(sprite1, dst_pt);
 
     const Rect rectSpreadArmyFormat(dst_pt, sprite1.w(), sprite1.h());
-    const std::string descriptionSpreadArmyFormat("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.");
+    const std::string descriptionSpreadArmyFormat = _("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.");
     const Point army1_pt(dst_pt.x - 1, dst_pt.y - 1);
     
     // army format grouped
@@ -166,7 +167,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     display.Blit(sprite2, dst_pt);
 
     const Rect rectGroupedArmyFormat(dst_pt, sprite2.w(), sprite2.h());    
-    const std::string descriptionGroupedArmyFormat("'Grouped' combat formation bunches your army together in the center of your side of the battlefield.");
+    const std::string descriptionGroupedArmyFormat = _("'Grouped' combat formation bunches your army together in the center of your side of the battlefield.");
     const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
 
     // cursor format
@@ -187,14 +188,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     text.Set(message, Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
-    std::string headerExperience("Level ");
-    String::AddInt(headerExperience, GetLevel());
+    std::string headerExperience = _("Level %{level}");
+    String::Replace(headerExperience, "%{level}", GetLevel());
     
-    std::string descriptionExperience("Current experience ");
-    String::AddInt(descriptionExperience, GetExperience());
-    descriptionExperience += " Next level ";
-    String::AddInt(descriptionExperience, GetExperienceFromLevel(GetLevelFromExperience(experience)));
-    descriptionExperience += ".";
+    std::string descriptionExperience = _("Current experience %{exp1} Next level %{exp2}.");
+    String::Replace(descriptionExperience, "%{exp1}", GetExperience());
+    String::Replace(descriptionExperience, "%{exp2}", GetExperienceFromLevel(GetLevelFromExperience(experience)));
 
     // spell points
     dst_pt.x = cur_pt.x + 550;
@@ -212,11 +211,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     text.Set(message, Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
-    std::string descriptionSpellPoints(name + " currently has ");
-    String::AddInt(descriptionSpellPoints, GetSpellPoints());
-    descriptionSpellPoints += " spell points out of a maximum of ";
-    String::AddInt(descriptionSpellPoints, GetMaxSpellPoints());
-    descriptionSpellPoints += ". The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events.";
+    std::string descriptionSpellPoints = _("%{name} currently has %{point} spell points out of a maximum of %{max}. The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events.");
+    String::Replace(descriptionSpellPoints, "%{point}", GetSpellPoints());
+    String::Replace(descriptionSpellPoints, "%{max}", GetMaxSpellPoints());
 
     // crest
     if(Color::GRAY == color)
@@ -434,7 +431,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     	    
     	    // dismiss
     	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
-    	      Dialog::YES == Dialog::Message(GetName(), "Are you sure you want to dismiss this Hero?", Font::BIG, Dialog::YES | Dialog::NO))
+    	      Dialog::YES == Dialog::Message(GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
     	    { return Dialog::DISMISS; }
 	}
 
@@ -443,17 +440,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
         if(le.MouseCursor(luckIndicator.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator);
 
 	// left click info
-        if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message("Attack Skill", "Your attack skill is a bonus added to each creature's attack skill.", Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message(_("Attack Skill"), _("Your attack skill is a bonus added to each creature's attack skill."), Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectDefenseSkill)) Dialog::Message("Defense Skill", "Your defense skill is a bonus added to each creature's defense skill.", Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), _("Your defense skill is a bonus added to each creature's defense skill."), Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message("Spell Power", "Your spell power determines the length or power of a spell.", Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message(_("Spell Power"), _("Your spell power determines the length or power of a spell."), Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG, Dialog::OK);
 	else
         if(le.MouseClickLeft(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message(_("Spell Points"), descriptionSpellPoints, Font::BIG, Dialog::OK);
 	else
         if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !Modes(ARMYSPREAD))
         {
@@ -489,21 +486,21 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	}
 
 	// right info
-        if(le.MousePressRight(rectAttackSkill)) Dialog::Message("Attack Skill", "Your attack skill is a bonus added to each creature's attack skill.", Font::BIG);
+        if(le.MousePressRight(rectAttackSkill)) Dialog::Message(_("Attack Skill"), _("Your attack skill is a bonus added to each creature's attack skill."), Font::BIG);
         else
-        if(le.MousePressRight(rectDefenseSkill)) Dialog::Message("Defense Skill", "Your defense skill is a bonus added to each creature's defense skill.", Font::BIG);
+        if(le.MousePressRight(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), _("Your defense skill is a bonus added to each creature's defense skill."), Font::BIG);
         else
-        if(le.MousePressRight(rectSpellSkill)) Dialog::Message("Spell Power", "Your spell power determines the length or power of a spell.", Font::BIG);
+        if(le.MousePressRight(rectSpellSkill)) Dialog::Message(_("Spell Power"), _("Your spell power determines the length or power of a spell."), Font::BIG);
         else
-        if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message("Knowledge", "Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.", Font::BIG);
+        if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG);
 	else
         if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG);
         else
-        if(le.MousePressRight(rectSpellPointsInfo)) Dialog::Message("Spell Points", descriptionSpellPoints, Font::BIG);
+        if(le.MousePressRight(rectSpellPointsInfo)) Dialog::Message(_("Spell Points"), descriptionSpellPoints, Font::BIG);
         else
-        if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message("Spread Formation", descriptionSpreadArmyFormat, Font::BIG);
+        if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
-        if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message("Grouped Formation", descriptionGroupedArmyFormat, Font::BIG);
+        if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 
 	// right info skill
 	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MousePressRight(coordsSkill[ii]))
@@ -521,42 +518,46 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	}
 
         // status message
-	if(le.MouseCursor(rectAttackSkill)) statusBar.ShowMessage("View Attack Skill Info");
+	if(le.MouseCursor(rectAttackSkill)) statusBar.ShowMessage(_("View Attack Skill Info"));
 	else
-	if(le.MouseCursor(rectDefenseSkill)) statusBar.ShowMessage("View Defense Skill Info");
+	if(le.MouseCursor(rectDefenseSkill)) statusBar.ShowMessage(_("View Defense Skill Info"));
 	else
-	if(le.MouseCursor(rectSpellSkill)) statusBar.ShowMessage("View Spell Power Info");
+	if(le.MouseCursor(rectSpellSkill)) statusBar.ShowMessage(_("View Spell Power Info"));
 	else
-	if(le.MouseCursor(rectKnowledgeSkill)) statusBar.ShowMessage("View Knowledge Info");
+	if(le.MouseCursor(rectKnowledgeSkill)) statusBar.ShowMessage(_("View Knowledge Info"));
 	else
-	if(le.MouseCursor(moraleIndicator.GetArea())) statusBar.ShowMessage("View Morale Info");
+	if(le.MouseCursor(moraleIndicator.GetArea())) statusBar.ShowMessage(_("View Morale Info"));
 	else
-	if(le.MouseCursor(luckIndicator.GetArea())) statusBar.ShowMessage("View Luck Info");
+	if(le.MouseCursor(luckIndicator.GetArea())) statusBar.ShowMessage(_("View Luck Info"));
 	else
-	if(le.MouseCursor(rectExperienceInfo)) statusBar.ShowMessage("View Experience Info");
+	if(le.MouseCursor(rectExperienceInfo)) statusBar.ShowMessage(_("View Experience Info"));
 	else
-	if(le.MouseCursor(rectSpellPointsInfo)) statusBar.ShowMessage("View Spell Points Info");
+	if(le.MouseCursor(rectSpellPointsInfo)) statusBar.ShowMessage(_("View Spell Points Info"));
 	else
-	if(le.MouseCursor(rectSpreadArmyFormat)) statusBar.ShowMessage("Set army combat formation to 'Spread'");
+	if(le.MouseCursor(rectSpreadArmyFormat)) statusBar.ShowMessage(_("Set army combat formation to 'Spread'"));
 	else
-	if(le.MouseCursor(rectGroupedArmyFormat)) statusBar.ShowMessage("Set army combat formation to 'Grouped'");
+	if(le.MouseCursor(rectGroupedArmyFormat)) statusBar.ShowMessage(_("Set army combat formation to 'Grouped'"));
 	else
-        if(le.MouseCursor(buttonExit)) statusBar.ShowMessage("Exit hero");
+        if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(_("Exit hero"));
         else
-        if(le.MouseCursor(buttonDismiss)) statusBar.ShowMessage("Dismiss hero");
+        if(le.MouseCursor(buttonDismiss)) statusBar.ShowMessage(_("Dismiss hero"));
         else
-        if(le.MouseCursor(buttonPrevHero)) statusBar.ShowMessage("Show prev heroes");
+        if(le.MouseCursor(buttonPrevHero)) statusBar.ShowMessage(_("Show prev heroes"));
         else
-        if(le.MouseCursor(buttonNextHero)) statusBar.ShowMessage("Show next heroes");
+        if(le.MouseCursor(buttonNextHero)) statusBar.ShowMessage(_("Show next heroes"));
         else
 	// status message over artifact
 	if(le.MouseCursor(selectArtifacts.GetArea()))
 	{
 	    const s8 index = selectArtifacts.GetIndexFromCoord(le.MouseCursor());
 	    if(0 <= index && index < HEROESMAXARTIFACT && Artifact::UNKNOWN != artifacts[index])
-		statusBar.ShowMessage("View " + Artifact::String(artifacts[index]) + " Info");
+	    {
+		std::string str = _("View %{art} Info");
+		String::Replace(str, "%{art}", Artifact::String(artifacts[index]));
+		statusBar.ShowMessage(str);
+	    }
 	    else
-		statusBar.ShowMessage("Hero Screen");
+		statusBar.ShowMessage(_("Hero Screen"));
 	}
 	else
 	// status message over skill
@@ -568,12 +569,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 		const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
 
 		if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
-		    statusBar.ShowMessage("View " + Skill::Level::String(level) + " " + Skill::Secondary::String(skill) + " Info");
+		{
+		    std::string str = _("View %{level} %{skill} Info");
+		    String::Replace(str, "%{level}", Skill::Level::String(level));
+		    String::Replace(str, "%{skill}", Skill::Secondary::String(skill));
+		    statusBar.ShowMessage(str);
+		}
 		else
-		    statusBar.ShowMessage("Hero Screen");
+		    statusBar.ShowMessage(_("Hero Screen"));
 	    }
 	    else
-		statusBar.ShowMessage("Hero Screen");
+		statusBar.ShowMessage(_("Hero Screen"));
 	}
 	else
         // status message over troops
@@ -584,6 +590,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
             {
                 const Army::Troop & troop1 = army.At(index1);
                 const std::string & monster1 = troop1.GetName();
+                std::string str;
 
                 if(selectArmy.isSelected())
                 {
@@ -592,27 +599,40 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
                     const std::string & monster2 = troop2.GetName();
 
                     if(index1 == index2)
-                        statusBar.ShowMessage("View " + monster1);
+            	    {
+                	str = _("View %{monster}");
+                	String::Replace(str, "%{monster}", monster1);
+            	    }
                     else
                     if(troop1.isValid() && troop2.isValid())
-                        troop1() == troop2() ?
-                        statusBar.ShowMessage("Combine " + monster1 + " armies") :
-                        statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+                    {
+                        str = troop1() == troop2() ? _("Combine %{monster1} armies") : _("Exchange %{monster2} with %{monster1}");
+                	String::Replace(str, "%{monster1}", monster1);
+                	String::Replace(str, "%{monster2}", monster2);
+                    }
                     else
-                        statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+                    {
+                        str = _("Move and right click Redistribute %{monster}");
+                	String::Replace(str, "%{monster}", monster2);
+                    }
                 }
                 else
                 if(troop1.isValid())
-                    statusBar.ShowMessage("Select " + monster1);
+                {
+                    str = _("Select %{monster}");
+                    String::Replace(str, "%{monster}", monster1);
+                }
                 else
-                    statusBar.ShowMessage("Empty");
+                    str = _("Empty");
+
+                statusBar.ShowMessage(str);
             }
 	    else
-		statusBar.ShowMessage("Hero Screen");
+		statusBar.ShowMessage(_("Hero Screen"));
         }
         else
         // clear all
-        statusBar.ShowMessage("Hero Screen");
+        statusBar.ShowMessage(_("Hero Screen"));
     }
 
     return Dialog::ZERO;

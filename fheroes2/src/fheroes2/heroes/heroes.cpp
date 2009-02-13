@@ -1165,8 +1165,8 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
 	if(Settings::Get().MyColor() == color)
 	{
 	    art == Artifact::MAGIC_BOOK ?
-	    Dialog::Message("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book.", "Try giving one of your artifacts to another hero.", Font::BIG, Dialog::OK) :
-	    Dialog::Message(Artifact::String(art), "You have no room to carry another artifact!", Font::BIG, Dialog::OK);
+	    Dialog::Message(_("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book."), _("Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
+	    Dialog::Message(Artifact::String(art), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
 	}
 	return false;
     }
@@ -1245,14 +1245,13 @@ bool Heroes::BuySpellBook(void)
     Resource::funds_t payment(Resource::GOLD, BUY_SPELL_BOOK_GOLD);
     Kingdom & kingdom = world.GetKingdom(color);
 
-    std::string header = "To cast spells, you must first buy a spell book for ";
-    String::AddInt(header, BUY_SPELL_BOOK_GOLD);
-    header += " gold.";
+    std::string header = _("To cast spells, you must first buy a spell book for %{gold} gold");
+    String::Replace(header, "%{gold}", BUY_SPELL_BOOK_GOLD);
 
     if( ! kingdom.AllowPayment(payment))
     {
 	if(Settings::Get().MyColor() == color)
-	Dialog::Message(header, "Unfortunately, you seem to be a little short of cash at the moment.", Font::BIG, Dialog::OK);
+	Dialog::Message(header, _("Unfortunately, you seem to be a little short of cash at the moment."), Font::BIG, Dialog::OK);
 	return false;
     }
 
@@ -1264,7 +1263,7 @@ bool Heroes::BuySpellBook(void)
 	sprite.Blit(border);
 	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(Artifact::MAGIC_BOOK)), 5, 5);
 
-	if(Dialog::NO == Dialog::SpriteInfo(header, "Do you wish to buy one?", sprite, Dialog::YES | Dialog::NO)) return false;
+	if(Dialog::NO == Dialog::SpriteInfo(header, _("Do you wish to buy one?"), sprite, Dialog::YES | Dialog::NO)) return false;
     }
 
     if(PickupArtifact(Artifact::MAGIC_BOOK))
@@ -1490,8 +1489,10 @@ void Heroes::LevelUp(bool autoselect)
 	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
-	    header = name + " has gained a level.";
-	    message = Skill::Primary::String(primary1) + " Skill +1";
+	    header = _("%{name} has gained a level.");
+	    String::Replace(header, "%{name}", name);
+	    message = _("%{skill} Skill +1");
+	    String::Replace(message, "%{skill}", Skill::Primary::String(primary1));
 	    Dialog::Message(header, message, Font::BIG, Dialog::OK);
 	}
     }
@@ -1501,8 +1502,12 @@ void Heroes::LevelUp(bool autoselect)
 	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
-	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
-    	    message = "You have learned " + Skill::Level::String(sec2.Level()) + " " + Skill::Secondary::String(sec2.Skill()) + ".";
+	    header = _("%{name} has gained a level. %{skill} Skill +1");
+	    String::Replace(header, "%{name}", name);
+	    String::Replace(header, "%{skill}", Skill::Primary::String(primary1));
+    	    message = _("You have learned %{level} %{skill}.");
+	    String::Replace(message, "%{level}", Skill::Level::String(sec2.Level()));
+	    String::Replace(message, "%{skill}", Skill::Secondary::String(sec2.Skill()));
 
 	    const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
     	    Surface sf(sprite_frame.w(), sprite_frame.h());
@@ -1528,8 +1533,12 @@ void Heroes::LevelUp(bool autoselect)
 	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
-	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
-    	    message = "You have learned " + Skill::Level::String(sec1.Level()) + " " + Skill::Secondary::String(sec1.Skill()) + ".";
+	    header = _("%{name} has gained a level. %{skill} Skill +1");
+	    String::Replace(header, "%{name}", name);
+	    String::Replace(header, "%{skill}", Skill::Primary::String(primary1));
+    	    message = _("You have learned %{level} %{skill}.");
+	    String::Replace(message, "%{level}", Skill::Level::String(sec1.Level()));
+	    String::Replace(message, "%{skill}", Skill::Secondary::String(sec1.Skill()));
 
 	    const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
     	    Surface sf(sprite_frame.w(), sprite_frame.h());
@@ -1556,7 +1565,9 @@ void Heroes::LevelUp(bool autoselect)
 	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
-	    header = name + " has gained a level. " + Skill::Primary::String(primary1) + " Skill +1";
+	    header = _("%{name} has gained a level. %{skill} Skill +1");
+	    String::Replace(header, "%{name}", name);
+	    String::Replace(header, "%{skill}", Skill::Primary::String(primary1));
     	    skill_select = Dialog::LevelUpSelectSkill(header, sec1, sec2);
 	}
 	// AI select

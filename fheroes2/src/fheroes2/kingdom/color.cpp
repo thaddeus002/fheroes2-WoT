@@ -22,7 +22,7 @@
 
 const std::string & Color::String(u8 color)
 {
-    static const std::string str_color[] = { "Blue", "Green", "Red", "Yellow", "Orange", "Purple", "Gray" };
+    static const std::string str_color[] = { _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple"), _("Gray") };
 
     switch(color)
     {

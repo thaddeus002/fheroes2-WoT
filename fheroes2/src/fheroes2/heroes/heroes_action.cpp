@@ -668,7 +668,7 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
 	    Game::EnvironmentSoundMixer();
 
 	    resource.gold += 100 * count;
-	    Dialog::ResourceInfo(MP2::StringObject(obj), "Ransacking an enemy camp, you discover a hidden cache of treasures.", resource);
+	    Dialog::ResourceInfo(MP2::StringObject(obj), _("Ransacking an enemy camp, you discover a hidden cache of treasures."), resource);
 	break;
 
 	case MP2::OBJ_BOTTLE:
@@ -715,30 +715,30 @@ void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	    case MP2::OBJ_WINDMILL:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("The keeper of the mill announces:", "\"Milord, I have been working very hard to provide you with these resources, come back next week for more.\"", resource);
+		    Dialog::ResourceInfo(_("The keeper of the mill announces:"), _("\"Milord, I have been working very hard to provide you with these resources, come back next week for more.\""), resource);
 		else
-		    Dialog::Message("The keeper of the mill announces:", "\"Milord, I am sorry, there are no resources currently available. Please try again next week.\"", Font::BIG, Dialog::OK);
+		    Dialog::Message(_("The keeper of the mill announces:"), _("\"Milord, I am sorry, there are no resources currently available. Please try again next week.\""), Font::BIG, Dialog::OK);
 	    break;
 
 	    case MP2::OBJ_WATERWHEEL:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("The keeper of the mill announces:", "\"Milord, I have been working very hard to provide you with this gold, come back next week for more.\"", resource);
+		    Dialog::ResourceInfo(_("The keeper of the mill announces:"), _("\"Milord, I have been working very hard to provide you with this gold, come back next week for more.\""), resource);
 		else
-		    Dialog::Message("The keeper of the mill announces:", "\"Milord, I am sorry, there is no gold currently available. Please try again next week.\"", Font::BIG, Dialog::OK);
+		    Dialog::Message(_("The keeper of the mill announces:"), _("\"Milord, I am sorry, there is no gold currently available. Please try again next week.\""), Font::BIG, Dialog::OK);
 	    break;
 	    
 	    case MP2::OBJ_LEANTO:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("You've found an abandoned lean-to.", "Poking about, you discover some resources hidden nearby.", resource);
+		    Dialog::ResourceInfo(_("You've found an abandoned lean-to."), _("Poking about, you discover some resources hidden nearby."), resource);
 		else
-		    Dialog::Message("The lean-to is long abandoned.", "There is nothing of value here.", Font::BIG, Dialog::OK);
+		    Dialog::Message(_("The lean-to is long abandoned."), _("There is nothing of value here."), Font::BIG, Dialog::OK);
 	    break;
 
     	    case MP2::OBJ_MAGICGARDEN:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.", "In exchange for his freedom, he guides you to a small pot filled with precious things.", resource);
+		    Dialog::ResourceInfo(_("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms."), _("In exchange for his freedom, he guides you to a small pot filled with precious things."), resource);
 		else
-		    Dialog::Message("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.", "Perhaps you should try again next week.", Font::BIG, Dialog::OK);
+		    Dialog::Message(_("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today."), _("Perhaps you should try again next week."), Font::BIG, Dialog::OK);
     	    break;
 
 	    default: break;
@@ -839,15 +839,15 @@ void ActionToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
     resource.wood += tile.GetQuantity2();
 
     if(resource.gold && resource.wood)
-	body = "You search through the flotsam, and find some wood and some gold.";
+	body = _("You search through the flotsam, and find some wood and some gold.");
     else
     if(resource.wood)
-	body = "You search through the flotsam, and find some wood.";
+	body = _("You search through the flotsam, and find some wood.");
     else
     if(resource.gold)
-        body = "You search through the flotsam, and find some gold.";
+        body = _("You search through the flotsam, and find some gold.");
     else
-	body = "You search through the flotsam, but find nothing.";
+	body = _("You search through the flotsam, but find nothing.");
 
     PlayPickupSound();
     AnimationRemoveObject(tile);
@@ -874,32 +874,32 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
     const u8 spell_level = Spell::Level(spell);
 
     std::string head;
-    std::string body("You come across");
+    std::string body;
 
     switch(spell_level)
     {
 	case 1:
-	    head = "Shrine of the 1st Circle";
-	    body += " a small shrine attended by a group of novice acolytes. In exchange for your protection, they agree to teach you a simple spell -";
+	    head = _("Shrine of the 1st Circle");
+	    body = _("You come across a small shrine attended by a group of novice acolytes. In exchange for your protection, they agree to teach you a simple spell - '%{spell}'.");
 	    break;
 	case 2:
-	    head = "Shrine of the 2st Circle";
-	    body += " an ornate shrine attended by a group of rotund friars. In exchange for your protection, they agree to teach you a spell -";
+	    head = _("Shrine of the 2st Circle");
+	    body = _("You come across an ornate shrine attended by a group of rotund friars. In exchange for your protection, they agree to teach you a spell - '%{spell}'.");
 	    break;
 	case 3:
-	    head = "Shrine of the 3st Circle";
-	    body += " a lavish shrine attended by a group of high priests. In exchange for your protection, they agree to teach you a sophisticated spell -";
+	    head = _("Shrine of the 3st Circle");
+	    body = _("You come across a lavish shrine attended by a group of high priests. In exchange for your protection, they agree to teach you a sophisticated spell - '%{spell}'.");
 	    break;
 	default: return;
     }
     
-    body += "'" + spell_name + "'.";
+    String::Replace(body, "%{spell}", spell_name);
 
     // check spell book
     if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
     {
 	PlaySoundFailure;
-	body += " Unfortunately, you have no Magic Book to record the spell with.";
+	body += _(" Unfortunately, you have no Magic Book to record the spell with.");
 	Dialog::Message(head, body, Font::BIG, Dialog::OK);
 	return;
     }
@@ -908,7 +908,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
     if(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))
     {
 	PlaySoundFailure;
-	body += " Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.";
+	body += _(" Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.");
 	Dialog::Message(head, body, Font::BIG, Dialog::OK);
 	return;
     }
@@ -925,13 +925,16 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     const Skill::Secondary::skill_t skill = world.SkillFromWitchsHut(dst_index);
     const std::string & skill_name = Skill::Secondary::String(skill);
-    const std::string head("Witch's Hut");
+    const std::string head = _("Witch's Hut");
+
+    std::string body = _("You approach the hut and observe a witch inside studying an ancient tome on %{skill}.");
+    String::Replace(body, "%{skill}", skill_name);
 
     // check full
     if(HEROESMAXSKILL == hero.CountSecondarySkill())
     {
 	PlaySoundFailure;
-	Dialog::Message("You approach the hut and observe a witch inside studying an ancient tome on " + skill_name + ".", "As you approach, she turns and focuses her one glass eye on you. \"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\"", Font::BIG, Dialog::OK);
+	Dialog::Message(body, _("As you approach, she turns and focuses her one glass eye on you. \"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
 	return;
     }
 
@@ -939,8 +942,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.HasSecondarySkill(skill))
     {
 	PlaySoundVisited;
-	const std::string body();
-	Dialog::Message("You approach the hut and observe a witch inside studying an ancient tome on " + skill_name + ".", "As you approach, she turns and speaks. \"You already know that which I would teach you. I can help you no further.\"", Font::BIG, Dialog::OK);
+	Dialog::Message(body, _("As you approach, she turns and speaks. \"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
 	return;
     }
 
@@ -948,7 +950,9 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     hero.LearnBasicSkill(skill);
     hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
 
-    Dialog::SkillInfo(skill_name, "An ancient and immortal witch living in a hut with bird's legs for stilts teaches you " + skill_name + " for her own inscrutable purposes.", skill, Skill::Level::BASIC);
+    body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
+    String::Replace(body, "%{skill}", skill_name);
+    Dialog::SkillInfo(skill_name, body, skill, Skill::Level::BASIC);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToWitchsHut: " + hero.GetName());
 }
@@ -961,18 +965,18 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     switch(obj)
     {
         case MP2::OBJ_FOUNTAIN:
-    	    body_false = "You drink from the enchanted fountain, but nothing happens.";
-    	    body_true = "As you drink the sweet water, you gain luck for your next battle.";
+    	    body_false = _("You drink from the enchanted fountain, but nothing happens.");
+    	    body_true = _("As you drink the sweet water, you gain luck for your next battle.");
     	    break;
 
         case MP2::OBJ_FAERIERING:
-    	    body_false = "You enter the faerie ring, but nothing happens.";
-    	    body_true = "Upon entering the mystical faerie ring, your army gains luck for its next battle.";
+    	    body_false = _("You enter the faerie ring, but nothing happens.");
+    	    body_true = _("Upon entering the mystical faerie ring, your army gains luck for its next battle.");
     	    break;
 
         case MP2::OBJ_IDOL:
-	    body_false = "You've found an ancient and weathered stone idol. It is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.";
-	    body_true = "You've found an ancient and weathered stone idol. Kissing it is supposed to be lucky, so you do. The stone is very cold to the touch.";
+	    body_false = _("You've found an ancient and weathered stone idol. It is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.");
+	    body_true = _("You've found an ancient and weathered stone idol. Kissing it is supposed to be lucky, so you do. The stone is very cold to the touch.");
     	    break;
 
     	default: return;
@@ -1008,7 +1012,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(battle)
     	    {
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("You come upon the pyramid of a great and ancient king.", "You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians. Will you search?", Font::BIG, Dialog::OK))
+		if(Dialog::YES == Dialog::Message(_("You come upon the pyramid of a great and ancient king."), _("You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians. Will you search?"), Font::BIG, Dialog::OK))
 		{
 		    // battle
 		    Army::army_t army;
@@ -1027,14 +1031,14 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
 			    // check magick book
 			    if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
-				Dialog::Message(MP2::StringObject(obj), "Unfortunately, you have no Magic Book to record the spell with.", Font::BIG, Dialog::OK);
+				Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you have no Magic Book to record the spell with."), Font::BIG, Dialog::OK);
 			    else
 			    // check skill level for wisdom
 			    if(Skill::Level::EXPERT > hero.GetLevelSkill(Skill::Secondary::WISDOM))
-			    	Dialog::Message(MP2::StringObject(obj), "Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.", Font::BIG, Dialog::OK);
+			    	Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it."), Font::BIG, Dialog::OK);
 			    else
 			    {
-				Dialog::SpellInfo(Spell::String(spell), "Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell.", spell, true);
+				Dialog::SpellInfo(Spell::String(spell), _("Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell."), spell, true);
 				hero.AppendSpellToBook(spell);
 			    }
 			    hero.ActionAfterBattle();
@@ -1051,7 +1055,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
     	    }
     	    else
-    		body = "You come upon the pyramid of a great and ancient king. Routine exploration reveals that the pyramid is completely empty.";
+    		body = _("You come upon the pyramid of a great and ancient king. Routine exploration reveals that the pyramid is completely empty.");
     	    break;
 
     	default: return;
@@ -1088,21 +1092,21 @@ void ActionToMagicWell(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.GetSpellPoints() == max)
     {
 	PlaySoundFailure;
-	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A drink at the well is supposed to restore your spell points, but you are already at maximum.", Font::BIG, Dialog::OK);
+	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), _("A drink at the well is supposed to restore your spell points, but you are already at maximum."), Font::BIG, Dialog::OK);
     }
     else
     // check already visited
     if(hero.isVisited(MP2::OBJ_MAGICWELL))
     {
 	PlaySoundVisited;
-	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A second drink at the well in one day will not help you.", Font::BIG, Dialog::OK);
+	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), _("A second drink at the well in one day will not help you."), Font::BIG, Dialog::OK);
     }
     else
     {
 	PlaySoundSuccess;
 	hero.SetVisited(dst_index);
 	hero.SetSpellPoints(max);
-	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), "A drink from the well has restored your spell points to maximum.", Font::BIG, Dialog::OK);
+	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), _("A drink from the well has restored your spell points to maximum."), Font::BIG, Dialog::OK);
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToMagicWell: " + hero.GetName());
@@ -1127,26 +1131,26 @@ void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
     {
         case MP2::OBJ_FORT:
     	    skill = Skill::Primary::DEFENCE;
-    	    body_false = "\"I'm sorry sir,\" The leader of the soldiers says, \"but you already know everything we have to teach.\"";
-    	    body_true = "The soldiers living in the fort teach you a few new defensive tricks.";
+    	    body_false = _("\"I'm sorry sir,\" The leader of the soldiers says, \"but you already know everything we have to teach.\"");
+    	    body_true = _("The soldiers living in the fort teach you a few new defensive tricks.");
     	    break;
 
         case MP2::OBJ_MERCENARYCAMP:
     	    skill = Skill::Primary::ATTACK;
-    	    body_false = "You've come upon a mercenary camp practicing their tactics. \"You're too advanced for us,\" the mercenary captain says. \"We can teach nothing more.\"";
-    	    body_true = "You've come upon a mercenary camp practicing their tactics. The mercenaries welcome you and your troops and invite you to train with them.";
+    	    body_false = _("You've come upon a mercenary camp practicing their tactics. \"You're too advanced for us,\" the mercenary captain says. \"We can teach nothing more.\"");
+    	    body_true = _("You've come upon a mercenary camp practicing their tactics. The mercenaries welcome you and your troops and invite you to train with them.");
     	    break;
 
         case MP2::OBJ_DOCTORHUT:
     	    skill = Skill::Primary::KNOWLEDGE;
-    	    body_false = "\"Go 'way!\", the witch doctor barks, \"you know all I know.\"";
-    	    body_true = "An Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.";
+    	    body_false = _("\"Go 'way!\", the witch doctor barks, \"you know all I know.\"");
+    	    body_true = _("An Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.");
     	    break;
 
         case MP2::OBJ_STANDINGSTONES:
     	    skill = Skill::Primary::POWER;
-    	    body_false = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, the Druids turn you away, indicating they have nothing new to teach you.";
-    	    body_true = "You've found a group of Druids worshipping at one of their strange stone edifices. Silently, they teach you new ways to cast spells.";
+    	    body_false = _("You've found a group of Druids worshipping at one of their strange stone edifices. Silently, the Druids turn you away, indicating they have nothing new to teach you.");
+    	    body_true = _("You've found a group of Druids worshipping at one of their strange stone edifices. Silently, they teach you new ways to cast spells.");
     	    break;
 
     	default: return;
@@ -1193,7 +1197,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(battle)
     	    {
     		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("", "You tentatively approach the burial ground of ancient warriors. Do you want to search the graves?", Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message("", _("You tentatively approach the burial ground of ancient warriors. Do you want to search the graves?"), Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
@@ -1211,7 +1215,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			    Resource::funds_t resource;
 			    resource.gold = tile.GetQuantity2() * 100;
 			    PlaySoundSuccess;
-			    DialogWithArtifactAndGold(MP2::StringObject(obj), "Upon defeating the zomies you search the graves and find something!", art, resource.gold);
+			    DialogWithArtifactAndGold(MP2::StringObject(obj), _("Upon defeating the zomies you search the graves and find something!"), art, resource.gold);
 			    hero.PickupArtifact(art);
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 			    hero.ActionAfterBattle();
@@ -1228,14 +1232,14 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		}
     	    }
     	    else
-    		body = "Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.";
+    		body = _("Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.");
     	    break;
 
         case MP2::OBJ_SHIPWRECK:
     	    if(battle)
     	    {
     		PlaySoundWarning;
-    		if(Dialog::YES == Dialog::Message("", "The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the shipwreck?", Font::BIG, Dialog::YES | Dialog::NO))
+    		if(Dialog::YES == Dialog::Message("", _("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the shipwreck?"), Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
@@ -1261,10 +1265,10 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			    complete = true;
 			    PlaySoundSuccess;
 			    if(art == Artifact::UNKNOWN)
-				DialogWithGold(MP2::StringObject(obj), "Upon defeating the Ghosts you sift through the debris and find something!", resource.gold);
+				DialogWithGold(MP2::StringObject(obj), _("Upon defeating the Ghosts you sift through the debris and find something!"), resource.gold);
 			    else
 			    {
-				DialogWithArtifactAndGold(MP2::StringObject(obj), "Upon defeating the Ghosts you sift through the debris and find something!", art, resource.gold);
+				DialogWithArtifactAndGold(MP2::StringObject(obj), _("Upon defeating the Ghosts you sift through the debris and find something!"), art, resource.gold);
 				hero.PickupArtifact(art);
 			    }
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -1282,14 +1286,14 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		}
     	    }
     	    else
-    		body = "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
+    		body = _("Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.");
     	    break;
 
         case MP2::OBJ_DERELICTSHIP:
     	    if(battle)
     	    {
     		PlaySoundWarning;
-    		if(Dialog::YES == Dialog::Message("", "The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the ship?", Font::BIG, Dialog::YES | Dialog::NO))
+    		if(Dialog::YES == Dialog::Message("", _("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the ship?"), Font::BIG, Dialog::YES | Dialog::NO))
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
@@ -1306,7 +1310,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			    Resource::funds_t resource;
 			    resource.gold = tile.GetQuantity2() * 100;
 			    PlaySoundSuccess;
-			    DialogWithGold(MP2::StringObject(obj), "Upon defeating the Skeletons you sift through the debris and find something!", resource.gold);
+			    DialogWithGold(MP2::StringObject(obj), _("Upon defeating the Skeletons you sift through the debris and find something!"), resource.gold);
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 			    hero.ActionAfterBattle();
 			    break;
@@ -1322,7 +1326,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		}
     	    }
     	    else
-    		body = "Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.";
+    		body = _("Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.");
     	    break;
 
     	default: return;
@@ -1356,25 +1360,25 @@ void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     switch(obj)
     {
         case MP2::OBJ_BUOY:
-    	    body_false = "Your men spot a navigational buoy, confirming that you are on course.";
-    	    body_true = "Your men spot a navigational buoy, confirming that you are on course and increasing their morale.";
+    	    body_false = _("Your men spot a navigational buoy, confirming that you are on course.");
+    	    body_true = _("Your men spot a navigational buoy, confirming that you are on course and increasing their morale.");
     	    break;
 
         case MP2::OBJ_OASIS:
-    	    body_false = "The drink at the oasis is refreshing, but offers no further benefit. The oasis might help again if you fought a battle first.";
-    	    body_true = "A drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.";
+    	    body_false = _("The drink at the oasis is refreshing, but offers no further benefit. The oasis might help again if you fought a battle first.");
+    	    body_true = _("A drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.");
     	    move = 800;	// + 8TP, from FAQ
     	    break;
 
         case MP2::OBJ_WATERINGHOLE:
-    	    body_false = "The drink at the watering hole is refreshing, but offers no further benefit. The watering hole might help again if you fought a battle first.";
-	    body_true = "A drink at the watering hole fills your troops with strength and lifts their spirits. You can travel a bit further today.";
+    	    body_false = _("The drink at the watering hole is refreshing, but offers no further benefit. The watering hole might help again if you fought a battle first.");
+	    body_true = _("A drink at the watering hole fills your troops with strength and lifts their spirits. You can travel a bit further today.");
     	    move = 400;	// + 4TP, from FAQ
     	    break;
 
         case MP2::OBJ_TEMPLE:
-    	    body_false = "It doesn't help to pray twice before a battle. Come back after you've fought.";
-    	    body_true = "A visit and a prayer at the temple raises the morale of your troops.";
+    	    body_false = _("It doesn't help to pray twice before a battle. Come back after you've fought.");
+    	    body_true = _("A visit and a prayer at the temple raises the morale of your troops.");
     	    break;
 
     	default: return;
@@ -1420,8 +1424,8 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index)
     switch(obj)
     {
         case MP2::OBJ_GAZEBO:
-    	    body_false = "An old Knight appears on the steps of the gazebo. \"I am sorry, my liege, I have taught you all I can.\"";
-    	    body_true = "An old Knight appears on the steps of the gazebo. \"My liege, I will teach you all that I know to aid you in your travels.\"";
+    	    body_false = _("An old Knight appears on the steps of the gazebo. \"I am sorry, my liege, I have taught you all I can.\"");
+    	    body_true = _("An old Knight appears on the steps of the gazebo. \"My liege, I will teach you all that I know to aid you in your travels.\"");
     	    exp = 1000;
     	    break;
 
@@ -1459,9 +1463,14 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
     switch(obj)
     {
         case MP2::OBJ_SHIPWRECKSURVIROR:
+        {
 	    conditions = true;
 	    PlaySoundSuccess;
-	    DialogWithArtifact(MP2::StringObject(obj), "You've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he rewards you for your act of kindness by giving you the " + Artifact::String(art), art);        break;
+	    std::string str = _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he rewards you for your act of kindness by giving you the %{art}.");
+	    String::Replace(str, "%{art}", Artifact::String(art));
+	    DialogWithArtifact(MP2::StringObject(obj), str, art);
+	}
+	    break;
 
 	case MP2::OBJ_ARTIFACT:
 	    switch(c)
@@ -1498,29 +1507,38 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			    break;
 		    }
 
-		    std::string header = "A leprechaun offers you the " + Artifact::String(art) + " for the small price of ";
+		    std::string header;
+
 		    Resource::funds_t payment;
 		    if(1 == c)
 		    {
-			header += "2000 Gold.";
+			header = "A leprechaun offers you the %{art} for the small price of %{gold} Gold.";
+			String::Replace(header, "%{gold}", 2000);
 			payment += Resource::funds_t(Resource::GOLD, 2000);
 		    }
 		    else
 		    if(2 == c)
 		    {
-			header += "2500 Gold and 3 " + Resource::String(r) + ".";
+			header = "A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.";
+			String::Replace(header, "%{gold}", 2500);
+			String::Replace(header, "%{count}", 3);
+			String::Replace(header, "%{res}", Resource::String(r));
 			payment += Resource::funds_t(Resource::GOLD, 2500);
 			payment += Resource::funds_t(r, 3);
 		    }
 		    else
 		    {
-			header += "3000 Gold and 5 " + Resource::String(r) + ".";
+			header = "A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.";
+			String::Replace(header, "%{gold}", 3000);
+			String::Replace(header, "%{count}", 5);
+			String::Replace(header, "%{res}", Resource::String(r));
 			payment += Resource::funds_t(Resource::GOLD, 3000);
 			payment += Resource::funds_t(r, 5);
 		    }
+		    String::Replace(header, "%{art}", Artifact::String(art));
 
 		    PlaySoundWarning;
-		    if(Dialog::YES == DialogWithArtifact(header, "Do you wish to buy this artifact?", art, Dialog::YES | Dialog::NO))
+		    if(Dialog::YES == DialogWithArtifact(header, _("Do you wish to buy this artifact?"), art, Dialog::YES | Dialog::NO))
 		    {
 			if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
 			{
@@ -1530,11 +1548,11 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			else
 			{
 			    PlaySoundFailure;
-			    Dialog::Message("You try to pay the leprechaun, but realize that you can't afford it.", "The leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
+			    Dialog::Message(_("You try to pay the leprechaun, but realize that you can't afford it."), _("The leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
 			}
 		    }
 		    else
-			Dialog::Message("", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.", Font::BIG, Dialog::OK);
+			Dialog::Message("", _("Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
 		    break;
 		}
 
@@ -1547,13 +1565,15 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
 			{
 			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(obj), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
+			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + Artifact::String(art), art, Dialog::OK);
 			    conditions = true;
 			}
 			else
 			{
 			    PlaySoundFailure;
-			    Dialog::Message("You've found the humble dwelling of a withered hermit.", "The hermit tells you that he is willing to give the " + Artifact::String(art) + " to the first wise person he meets.", Font::BIG, Dialog::OK);
+			    std::string str = _("The hermit tells you that he is willing to give the %{art} to the first wise person he meets.");
+			    String::Replace(str, "%{art}", Artifact::String(art));
+			    Dialog::Message(_("You've found the humble dwelling of a withered hermit."), str, Font::BIG, Dialog::OK);
 			}
 		    }
 		    else
@@ -1561,13 +1581,15 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
 			{
 			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(obj), "You've found the artifact: " + Artifact::String(art), art, Dialog::OK);
+			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + Artifact::String(art), art, Dialog::OK);
 			    conditions = true;
 			}
 			else
 			{
 			    PlaySoundFailure;
-			    Dialog::Message("You've come across the spartan quarters of a retired soldier.", "The soldier tells you that he is willing to pass on the " + Artifact::String(art) + " to the first true leader he meets.", Font::BIG, Dialog::OK);
+			    std::string str = _("The soldier tells you that he is willing to pass on the %{art} to the first true leader he meets.");
+			    String::Replace(str, "%{art}", Artifact::String(art));
+			    Dialog::Message(_("You've come across the spartan quarters of a retired soldier."), str, Font::BIG, Dialog::OK);
 			}
 		    }
 		    break;
@@ -1592,12 +1614,14 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    PlaySoundWarning;
 
 		    if(6 == c)
-			Dialog::Message("You come upon an ancient artifact.", "As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.", Font::BIG, Dialog::OK);
+			Dialog::Message(_("You come upon an ancient artifact."), _("As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
 		    else
-			battle = (Dialog::YES == Dialog::Message("Through a clearing you observe an ancient artifact.",
-						"Unfortunately, it's guarded by a nearby " + monster + ". Do you want to fight the " + monster + " for the artifact?",
-						Font::BIG, Dialog::YES | Dialog::NO));
-
+		    {
+			std::string str = _("Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
+			String::Replace(str, "%{monster}", monster);
+			battle = (Dialog::YES == Dialog::Message(_("Through a clearing you observe an ancient artifact."), str,	Font::BIG, Dialog::YES | Dialog::NO));
+		    }
+		    
 		    if(battle)
 		    {
 			const u32 exp = army.CalculateExperience();
@@ -1605,11 +1629,15 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			switch(b)
 			{
 			    case Army::WIN:
-			    hero.IncreaseExperience(exp);
-			    conditions = true;
-			    PlaySoundSuccess;
-			    DialogWithArtifact("Victorious, you take your prize, the ", Artifact::String(art), art);
-			    hero.ActionAfterBattle();
+			    {
+				hero.IncreaseExperience(exp);
+				conditions = true;
+				PlaySoundSuccess;
+				std::string str = _("Victorious, you take your prize, the %{art}.");
+				String::Replace(str, "%{art}", Artifact::String(art));
+				DialogWithArtifact(MP2::StringObject(obj), str, art);
+				hero.ActionAfterBattle();
+			    }
 			    break;
 
 			    case Army::RETREAT:
@@ -1624,14 +1652,14 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    else
 		    {
 			PlaySoundFailure;
-			Dialog::Message("", "Discretion is the better part of valor, and you decide to avoid this fight for today.", Font::BIG, Dialog::OK);
+			Dialog::Message("", _("Discretion is the better part of valor, and you decide to avoid this fight for today."), Font::BIG, Dialog::OK);
 		    }
 		    break;
 		}
 
 		default:
 		    PlaySoundSuccess;
-		    DialogWithArtifact(MP2::StringObject(obj), "You've found the artifact: " + Artifact::String(art), art);
+		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + Artifact::String(art), art);
 		    conditions = true;
 		    break;
 	    }
@@ -1666,12 +1694,11 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
     // dialog
     if(Maps::Ground::WATER == tile.GetGround())
     {
-	std::string message("After spending hours trying to fish the chest out of the sea,");
+	std::string message;
 
 	if(0 == resource.gold)
 	{
-	    message += " you open it, only to find it empty.";
-	    Dialog::Message("Chest", message, Font::BIG, Dialog::OK);
+	    Dialog::Message("Chest", _("After spending hours trying to fish the chest out of the sea, you open it, only to find it empty."), Font::BIG, Dialog::OK);
 	}
 	else
 	if(tile.GetQuantity1())
@@ -1680,26 +1707,24 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    if(hero.PickupArtifact(art))
 	    {
-		message += " you open it and find ";
-		String::AddInt(message, resource.gold);
-		message += " gold and the " + Artifact::String(art);
+		message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold and the %{art}.");
+		String::Replace(message, "%{gold}", resource.gold);
+		String::Replace(message, "%{art}", Artifact::String(art));
 		DialogWithArtifactAndGold("Chest", message, art, resource.gold);
 	    }
 	    else
 	    {
 		resource.gold = 1500;	// it is from FAQ
-		message += " you open it and find ";
-		String::AddInt(message, resource.gold);
-		message += " gold pieces.";
+		message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold pieces.");
+		String::Replace(message, "%{gold}", resource.gold);
 		DialogWithGold("Chest", message, resource.gold);
 	    }
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
 	{
-	    message += " you open it and find ";
-	    String::AddInt(message, resource.gold);
-	    message += " gold pieces.";
+	    message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold pieces.");
+	    String::Replace(message, "%{gold}", resource.gold);
 	    DialogWithGold("Chest", message, resource.gold);
 
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -1707,24 +1732,23 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
     }
     else
     {
-	std::string message("After scouring the area,");
+	std::string message;
 
 	if(tile.GetQuantity1())
 	{
 	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
 	
-	    message += " you fall upon a hidden chest, containing the ancient artifact " + Artifact::String(art);
-
 	    if(hero.PickupArtifact(art))
 	    {
+		message = _("After scouring the area, you fall upon a hidden chest, containing the ancient artifact %{art}.");
+		String::Replace(message, "%{art}", Artifact::String(art));
 		DialogWithArtifact("Chest", message, art);
 	    }
 	    else
 	    {
 		resource.gold = 1000;	// it is from FAQ
-		message += " you fall upon a hidden chest, containing the ";
-		String::AddInt(message, resource.gold);
-		message += " gold pieces.";
+		message = _("After scouring the area, you fall upon a hidden chest, containing the %{gold} gold pieces.");
+		String::Replace(message, "%{gold}", resource.gold);
 		DialogWithGold("Chest", message, resource.gold);
 	    }
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -1733,7 +1757,7 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(resource.gold >= 500)
 	{
 	    const u16 expr = resource.gold - 500;
-	    message += " you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?";
+	    message = _("After scouring the area, you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?");
 
 	    if(Dialog::SelectGoldOrExp("Chest", message, resource.gold, expr))
 		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -1754,7 +1778,7 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
     const u32 count = tile.GetCountMonster();
 
     PlaySoundSuccess;
-    if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), "You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?", Font::BIG, Dialog::YES|Dialog::NO))
+    if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?"), Font::BIG, Dialog::YES|Dialog::NO))
     {
 	const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
 	if(recruit)
@@ -1773,7 +1797,7 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
 		    tile.SetCountMonster(count - recruit);
 	    }
 	    else
-		Dialog::Message(Monster::String(Monster::GENIE), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		Dialog::Message(Monster::String(Monster::GENIE), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	}
     }
 
@@ -1844,7 +1868,7 @@ void ActionToWhirlpools(Heroes &hero, const u16 index_from)
     if(Rand::Get(1))
     {
 	PlaySoundWarning;
-	Dialog::Message("A whirlpool engulfs your ship.", "Some of your army has fallen overboard.", Font::BIG, Dialog::OK);
+	Dialog::Message(_("A whirlpool engulfs your ship."), _("Some of your army has fallen overboard."), Font::BIG, Dialog::OK);
 	Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
 	const u16 c = troops.Count() / 2;
 	troops.SetCount(c ? c : 1);
@@ -1858,7 +1882,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     PlaySoundWarning;
-    if(Dialog::YES == Dialog::Message("You come upon an abandoned gold mine.", "The mine appears to be haunted. Do you wish to enter?", Font::BIG, Dialog::YES | Dialog::NO))
+    if(Dialog::YES == Dialog::Message(_("You come upon an abandoned gold mine."), _("The mine appears to be haunted. Do you wish to enter?"), Font::BIG, Dialog::YES | Dialog::NO))
     {
 	Army::army_t army;
 	army.FromGuardian(tile);
@@ -1871,7 +1895,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 	    case Army::WIN:
 		hero.IncreaseExperience(exp);
 		PlaySoundSuccess;
-		DialogWithGold(MP2::StringObject(obj), "You beat the Ghosts and are able to restore the mine to production.", 1000);
+		DialogWithGold(MP2::StringObject(obj), _("You beat the Ghosts and are able to restore the mine to production."), 1000);
 		tile.SetQuantity1(0);
 		tile.UpdateAbandoneMineSprite();
 		world.CaptureObject(dst_index, hero.GetColor());
@@ -1915,7 +1939,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    res = Resource::MERCURY;
 	    header = MP2::StringObject(obj);
-	    body = "You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.";
+	    body = _("You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.");
 	}
 	    break;
         case MP2::OBJ_MINES:
@@ -1935,8 +1959,8 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf); // Here is pink fringing, becose letter sprite use shadow. Wiil fix later...
 
         	res = Resource::ORE;
-        	header = "Ore Mine";
-        	body = "You gain control of an ore mine. It will provide you with two units of ore per day.";
+        	header = _("Ore Mine");
+        	body = _("You gain control of an ore mine. It will provide you with two units of ore per day.");
             }
             else
             // sulfur
@@ -1952,8 +1976,8 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::SULFUR;
-        	header = "Sulfur Mine";
-		body = "You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.";
+        	header = _("Sulfur Mine");
+		body = _("You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.");
             }
             else
             // crystal
@@ -1969,8 +1993,8 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::CRYSTAL;
-        	header = "Crystal Mine";
-		body = "You gain control of a crystal mine. It will provide you with one unit of crystal per day.";
+        	header = _("Crystal Mine");
+		body = _("You gain control of a crystal mine. It will provide you with one unit of crystal per day.");
             }
             else
             // gems
@@ -1986,8 +2010,8 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::GEMS;
-        	header = "Gems Mine";
-		body = "You gain control of a gem mine. It will provide you with one unit of gems per day.";
+        	header = _("Gems Mine");
+		body = _("You gain control of a gem mine. It will provide you with one unit of gems per day.");
             }
             else
             // gold
@@ -2003,8 +2027,8 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
         	res = Resource::GOLD;
-        	header = "Gold Mine";
-		body = "You gain control of a gold mine. It will provide you with 1000 gold per day.";
+        	header = _("Gold Mine");
+		body = _("You gain control of a gold mine. It will provide you with 1000 gold per day.");
             }
     	}
     	    break;
@@ -2021,13 +2045,13 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     	    res = Resource::WOOD;
 	    header = MP2::StringObject(obj);
-	    body = "You gain control of a sawmill. It will provide you with two units of wood per day.";
+	    body = _("You gain control of a sawmill. It will provide you with two units of wood per day.");
 	}
 	    break;
 
         case MP2::OBJ_LIGHTHOUSE:
 	    header = MP2::StringObject(obj);
-    	    body = "The lighthouse is now under your control, and all of your ships will now move further each turn.";
+    	    body = _("The lighthouse is now under your control, and all of your ships will now move further each turn.");
 	    break;
 
         default:
@@ -2073,13 +2097,14 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
     if(count)
     {
 	const Monster monster(Monster::FromObject(obj));
-        const std::string & message = "A group of " + monster.GetName() + " with a desire for greater glory wish to join you.";
+        std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.");
+        String::Replace(message, "%{monster}", monster.GetName());
 
         AGG::PlaySound(M82::EXPERNCE);
-	if(Dialog::YES == Dialog::Message(message, "Do you accept?", Font::BIG, Dialog::YES|Dialog::NO))
+	if(Dialog::YES == Dialog::Message(message, _("Do you accept?"), Font::BIG, Dialog::YES|Dialog::NO))
 	{
 	    if(!hero.GetArmy().JoinTroop(monster, count))
-		Dialog::Message(monster.GetName(), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	    else
 		tile.SetCountMonster(0);
 	}
@@ -2087,7 +2112,7 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
     else
     {
 	PlaySoundVisited;
-	Dialog::Message("", "As you approach the dwelling, you notice that there is no one here.", Font::BIG, Dialog::OK);
+	Dialog::Message("", _("As you approach the dwelling, you notice that there is no one here."), Font::BIG, Dialog::OK);
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingJoinMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
@@ -2102,31 +2127,31 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
     switch(obj)
     {
         case MP2::OBJ_RUINS:
-    	    msg_void1 = "You search the ruins, but the Medusas that used to live here are gone.";
-    	    msg_void2 = "Perhaps there will be more next week.";
-    	    msg_full1 = "You've found some Medusas living in the ruins. They are willing to join your army for a price.";
-    	    msg_full2 = "Do you want to recruit Medusas?";
+    	    msg_void1 = _("You search the ruins, but the Medusas that used to live here are gone.");
+    	    msg_void2 = _("Perhaps there will be more next week.");
+    	    msg_full1 = _("You've found some Medusas living in the ruins. They are willing to join your army for a price.");
+    	    msg_full2 = _("Do you want to recruit Medusas?");
     	    break;
 
         case MP2::OBJ_TREECITY:
-    	    msg_void1 = "You've found a Sprite Tree City.";
-    	    msg_void2 = "Unfortunately, none of the Sprites living there wish to join an army. Maybe next week.";
-    	    msg_full1 = "Some of the Sprites living in the tree city are willing to join your army for a price.";
-    	    msg_full2 = "Do you want to recruit Sprites?";
+    	    msg_void1 = _("You've found a Sprite Tree City.");
+    	    msg_void2 = _("Unfortunately, none of the Sprites living there wish to join an army. Maybe next week.");
+    	    msg_full1 = _("Some of the Sprites living in the tree city are willing to join your army for a price.");
+    	    msg_full2 = _("Do you want to recruit Sprites?");
     	    break;
   
         case MP2::OBJ_WAGONCAMP:
-    	    msg_void1 = "A colorful Rogues' wagon stands empty here.";
-    	    msg_void2 = "Perhaps more Rogues will be here later.";
-    	    msg_full1 = "Distant sounds of music and laughter draw you to a colorful wagon housing Rogues.";
-    	    msg_full2 = "Do you wish to have any Rogues join your army?";
+    	    msg_void1 = _("A colorful Rogues' wagon stands empty here.");
+    	    msg_void2 = _("Perhaps more Rogues will be here later.");
+    	    msg_full1 = _("Distant sounds of music and laughter draw you to a colorful wagon housing Rogues.");
+    	    msg_full2 = _("Do you wish to have any Rogues join your army?");
     	    break;
 
 	case MP2::OBJ_DESERTTENT:
-    	    msg_void1 = "A group of tattered tents, billowing in the sandy wind, beckons you.";
-    	    msg_void2 = "The tents are unoccupied. Perhaps more Nomads will be here later.";
-    	    msg_full1 = "A group of tattered tents, billowing in the sandy wind, beckons you.";
-    	    msg_full2 = "Do you wish to have any Nomads join you during your travels?";
+    	    msg_void1 = _("A group of tattered tents, billowing in the sandy wind, beckons you.");
+    	    msg_void2 = _("The tents are unoccupied. Perhaps more Nomads will be here later.");
+    	    msg_full1 = _("A group of tattered tents, billowing in the sandy wind, beckons you.");
+    	    msg_full2 = _("Do you wish to have any Nomads join you during your travels?");
     	    break;
 
 	default: return;
@@ -2144,7 +2169,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 	    if(recruit)
 	    {
 		if(!hero.GetArmy().JoinTroop(monster, recruit))
-		    Dialog::Message(monster.GetName(), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		    Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 		else
 		    tile.SetCountMonster(count - recruit);
 	    }
@@ -2176,13 +2201,13 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    	if(0 == count)
 	    	{
 		    PlaySoundVisited;
-	    	    Dialog::Message("The City of the Dead is empty of life, and empty of unlife as well.", "Perhaps some undead will move in next week.", Font::BIG, Dialog::OK);
+	    	    Dialog::Message(_("The City of the Dead is empty of life, and empty of unlife as well."), _("Perhaps some undead will move in next week."), Font::BIG, Dialog::OK);
 		    break;
 		}
 		else
 	    	{
 		    PlaySoundSuccess;
-		    complete = (Dialog::YES == Dialog::Message("Some Liches living here are willing to join your army for a price.", "Do you want to recruit Liches?", Font::BIG, Dialog::YES | Dialog::NO));
+		    complete = (Dialog::YES == Dialog::Message(_("Some Liches living here are willing to join your army for a price."), _("Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
 		}
 	    }
 	    else
@@ -2191,7 +2216,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		army.FromGuardian(tile);
 
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("You've found the ruins of an ancient city, now inhabited solely by the undead.", "Will you search?", Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message(_("You've found the ruins of an ancient city, now inhabited solely by the undead."), _("Will you search?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -2202,7 +2227,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price.", "Do you want to recruit Liches?", Font::BIG, Dialog::YES | Dialog::NO));
+			    complete = (Dialog::YES == Dialog::Message(_("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price."), _("Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
 			    hero.ActionAfterBattle();
 			break;
 
@@ -2224,13 +2249,13 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    	if(0 == count)
 	    	{
 		    PlaySoundVisited;
-	    	    Dialog::Message("You've found one of those bridges that Trolls are so fond of living under, but there are none here.", "Perhaps there will be some next week.", Font::BIG, Dialog::OK);
+	    	    Dialog::Message(_("You've found one of those bridges that Trolls are so fond of living under, but there are none here."), _("Perhaps there will be some next week."), Font::BIG, Dialog::OK);
 		    break;
 		}
 		else
 		{
 		    PlaySoundSuccess;
-	    	    complete = (Dialog::YES == Dialog::Message("Some Trolls living under a bridge are willing to join your army, but for a price.", "Do you want to recruit Trolls?", Font::BIG, Dialog::YES | Dialog::NO));
+	    	    complete = (Dialog::YES == Dialog::Message(_("Some Trolls living under a bridge are willing to join your army, but for a price."), _("Do you want to recruit Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
 		}
 	    }
 	    else
@@ -2239,7 +2264,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		army.FromGuardian(tile);
 
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("Trolls living under the bridge challenge you.", "Will you fight them?", Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message(_("Trolls living under the bridge challenge you."), _("Will you fight them?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -2250,7 +2275,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries.", "Do you want to buy any Trolls?", Font::BIG, Dialog::YES | Dialog::NO));
+			    complete = (Dialog::YES == Dialog::Message(_("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries."), _("Do you want to buy any Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
 			    hero.ActionAfterBattle();
 			break;
 
@@ -2272,13 +2297,13 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    	if(0 == count)
 	    	{
 		    PlaySoundVisited;
-	    	    Dialog::Message("The Dragon city has no Dragons willing to join you this week.", "Perhaps a Dragon will become available next week.", Font::BIG, Dialog::OK);
+	    	    Dialog::Message(_("The Dragon city has no Dragons willing to join you this week."), _("Perhaps a Dragon will become available next week."), Font::BIG, Dialog::OK);
 		    break;
 		}
 		else
 		{
 		    PlaySoundSuccess;
-	    	    complete = (Dialog::YES == Dialog::Message("The Dragon city is willing to offer some Dragons for your army for a price.", "Do you wish to recruit Dragons?", Font::BIG, Dialog::YES | Dialog::NO));
+	    	    complete = (Dialog::YES == Dialog::Message(_("The Dragon city is willing to offer some Dragons for your army for a price."), _("Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
 		}
 	    }
 	    else
@@ -2287,7 +2312,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		army.FromGuardian(tile);
 
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("You stand before the Dragon City, a place off-limits to mere humans.", "Do you wish to violate this rule and challenge the Dragons to a fight?", Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message(_("You stand before the Dragon City, a place off-limits to mere humans."), _("Do you wish to violate this rule and challenge the Dragons to a fight?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -2298,7 +2323,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.", "Do you wish to recruit Dragons?", Font::BIG, Dialog::YES | Dialog::NO));
+			    complete = (Dialog::YES == Dialog::Message(_("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price."), _("Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
 			    hero.ActionAfterBattle();
 			break;
 
@@ -2325,7 +2350,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
         if(recruit)
         {
     	    if(!hero.GetArmy().JoinTroop(monster, recruit))
-		Dialog::Message(monster.GetName(), "You are unable to recruit at this time, your ranks are full.", Font::BIG, Dialog::OK);
+		Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
     	    else
     		tile.SetCountMonster(count - recruit);
     	}
@@ -2337,7 +2362,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 void ActionToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     PlaySoundSuccess;
-    Dialog::Message(MP2::StringObject(obj), "From the observation tower, you are able to see distant lands.", Font::BIG, Dialog::OK);
+    Dialog::Message(MP2::StringObject(obj), _("From the observation tower, you are able to see distant lands."), Font::BIG, Dialog::OK);
     Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, hero.GetColor());
 }
 
@@ -2349,20 +2374,20 @@ void ActionToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.isVisited(MP2::OBJ_ARTESIANSPRING))
     {
 	PlaySoundVisited;
-	Dialog::Message(name, "The spring only refills once a week, and someone's already been here this week.", Font::BIG, Dialog::OK);
+	Dialog::Message(name, _("The spring only refills once a week, and someone's already been here this week."), Font::BIG, Dialog::OK);
     }
     else
     if(hero.GetSpellPoints() == max * 2)
     {	
 	PlaySoundFailure;
-	Dialog::Message(name, "A drink at the spring is supposed to give you twice your normal spell points, but you are already at that level.", Font::BIG, Dialog::OK);
+	Dialog::Message(name, _("A drink at the spring is supposed to give you twice your normal spell points, but you are already at that level."), Font::BIG, Dialog::OK);
     }
     else
     {
 	PlaySoundSuccess;
 	hero.SetVisited(dst_index);
 	hero.SetSpellPoints(max * 2);
-	Dialog::Message(name, "A drink from the spring fills your blood with magic!  You have twice your normal spell points in reserve.", Font::BIG, Dialog::OK);
+	Dialog::Message(name, _("A drink from the spring fills your blood with magic! You have twice your normal spell points in reserve."), Font::BIG, Dialog::OK);
 
 	// fix double action tile
 	{
@@ -2385,7 +2410,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.isVisited(tile))
     {
 	PlaySoundVisited;
-	Dialog::Message("Recognizing you, the butler refuses to admit you.", "\"The master,\" he says, \"will not see the same student twice.\"", Font::BIG, Dialog::OK);
+	Dialog::Message(_("Recognizing you, the butler refuses to admit you."), _("\"The master,\" he says, \"will not see the same student twice.\""), Font::BIG, Dialog::OK);
     }
     else
     {
@@ -2405,7 +2430,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(access)
 	{
 	    PlaySoundSuccess;
-	    Dialog::Message("The butler admits you to see the master of the house.", "He trains you in the four skills a hero should know.", Font::BIG, Dialog::OK);
+	    Dialog::Message(_("The butler admits you to see the master of the house."), _("He trains you in the four skills a hero should know."), Font::BIG, Dialog::OK);
 	    hero.IncreasePrimarySkill(Skill::Primary::ATTACK);
 	    hero.IncreasePrimarySkill(Skill::Primary::DEFENCE);
 	    hero.IncreasePrimarySkill(Skill::Primary::KNOWLEDGE);
@@ -2415,7 +2440,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 	else
 	{
 	    PlaySoundFailure;
-	    Dialog::Message("The butler opens the door and looks you up and down.", "\"You are neither famous nor diplomatic enough to be admitted to see my master,\" he sniffs. \"Come back when you think yourself worthy.\"", Font::BIG, Dialog::OK);
+	    Dialog::Message(_("The butler opens the door and looks you up and down."), _("\"You are neither famous nor diplomatic enough to be admitted to see my master,\" he sniffs. \"Come back when you think yourself worthy.\""), Font::BIG, Dialog::OK);
 	}
     }
 
@@ -2424,6 +2449,8 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    std::string monsters;
+    std::string monsters_upgrade;
     std::string msg1;
     std::string msg2;
     std::string msg3;
@@ -2438,24 +2465,31 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::DWARF);
 		mons.push_back(Monster::DWARF);
-		msg1 = Monster(Monster::DWARF).GetMultiName();
+		monsters = Monster(Monster::DWARF).GetMultiName();
+		monsters_upgrade = Monster(Monster::Upgrade(Monster::DWARF)).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::ORC))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::ORC);
 		mons.push_back(Monster::ORC);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster(Monster::ORC).GetMultiName();
+		if(monsters.size()) monsters += ", ";
+		monsters += Monster(Monster::ORC).GetMultiName();
+		if(monsters_upgrade.size()) monsters_upgrade += ", ";
+		monsters_upgrade += Monster(Monster::Upgrade(Monster::ORC)).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::OGRE))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::OGRE);
 		mons.push_back(Monster::OGRE);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster(Monster::OGRE).GetMultiName();
+		if(monsters.size()) monsters += ", ";
+		monsters += Monster(Monster::OGRE).GetMultiName();
+		if(monsters_upgrade.size()) monsters_upgrade += ", ";
+		monsters_upgrade += Monster(Monster::Upgrade(Monster::OGRE)).GetMultiName();
 	    }
-	    msg1 = "All of the " + msg1 + " you have in your army have been trained by the battle masters of the fort.  Your army now contains " + msg1 + ".";
-	    msg2 = "An unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any such troops brought to them.  Unfortunately, you have none with you.";
+	    msg1 = _("All of the %{monsters} you have in your army have been trained by the battle masters of the fort. Your army now contains %{monsters2}.");
+	    String::Replace(msg1, "%{monsters}", monsters);
+	    String::Replace(msg1, "%{monsters2}", monsters_upgrade);
+	    msg2 = _("An unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any such troops brought to them. Unfortunately, you have none with you.");
 	    break;
 
 	case MP2::OBJ_FREEMANFOUNDRY:
@@ -2463,24 +2497,31 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::PIKEMAN);
 		mons.push_back(Monster::PIKEMAN);
-		msg1 = Monster(Monster::PIKEMAN).GetMultiName();
+		monsters = Monster(Monster::PIKEMAN).GetMultiName();
+		monsters_upgrade = Monster(Monster::Upgrade(Monster::PIKEMAN)).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::SWORDSMAN))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::SWORDSMAN);
 		mons.push_back(Monster::SWORDSMAN);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster(Monster::SWORDSMAN).GetMultiName();
+		if(monsters.size()) monsters += ", ";
+		monsters += Monster(Monster::SWORDSMAN).GetMultiName();
+		if(monsters_upgrade.size()) monsters_upgrade += ", ";
+		monsters_upgrade += Monster(Monster::Upgrade(Monster::SWORDSMAN)).GetMultiName();
 	    }
 	    if(hero.GetArmy().HasMonster(Monster::IRON_GOLEM))
 	    {
 		hero.GetArmy().UpgradeMonsters(Monster::IRON_GOLEM);
 		mons.push_back(Monster::IRON_GOLEM);
-		if(msg1.size()) msg1 += ", ";
-		msg1 += Monster(Monster::IRON_GOLEM).GetMultiName();
+		if(monsters.size()) monsters += ", ";
+		monsters += Monster(Monster::IRON_GOLEM).GetMultiName();
+		if(monsters_upgrade.size()) monsters_upgrade += ", ";
+		monsters_upgrade += Monster(Monster::Upgrade(Monster::IRON_GOLEM)).GetMultiName();
 	    }
-	    msg1 = "All of your " + msg1 + " have been upgraded into " + msg1 + ".";
-	    msg2 = "A blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.";
+	    msg1 = _("All of your %{monsters} have been upgraded into %{monsters2}.");
+	    String::Replace(msg1, "%{monsters}", monsters);
+	    String::Replace(msg1, "%{monsters2}", monsters_upgrade);
+	    msg2 = _("A blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.");
 	    break;
 
 	default: break;
@@ -2528,12 +2569,12 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
     if(1000 > world.GetKingdom(hero.GetColor()).GetFundsGold())
     {
 	PlaySoundFailure;
-	Dialog::Message("The captain sighs.", "\"You don't have enough money, eh?  You can't expect me to give my maps away for free!\"", Font::BIG, Dialog::OK);
+	Dialog::Message(_("The captain sighs."), _("\"You don't have enough money, eh?  You can't expect me to give my maps away for free!\""), Font::BIG, Dialog::OK);
     }
     else
     {
 	PlaySoundWarning;
-	if(Dialog::YES == Dialog::Message("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold.", "Do you wish to buy the maps?", Font::BIG, Dialog::YES | Dialog::NO))
+	if(Dialog::YES == Dialog::Message(_("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold."), _("Do you wish to buy the maps?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    world.ActionForMagellanMaps(hero.GetColor());
 
 	Game::Focus::Get().Redraw();
@@ -2575,9 +2616,7 @@ void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
     {
         hero.SetVisited(dst_index, Visit::GLOBAL);
         AGG::PlaySound(M82::EXPERNCE);
-        Dialog::Message("Obelisk", "You come upon an obelisk made from a type of stone you have never seen before.  Staring at it intensely, the smooth "
-                                   "surface suddenly changes to an inscription.  The inscription is a piece of a lost ancient map.  Quickly you copy down "
-                                   "the piece and the inscription vanishes as abruptly as it appeared.", Font::BIG, Dialog::OK);
+        Dialog::Message(_("Obelisk"), _("You come upon an obelisk made from a type of stone you have never seen before. Staring at it intensely, the smooth surface suddenly changes to an inscription. The inscription is a piece of a lost ancient map. Quickly you copy down the piece and the inscription vanishes as abruptly as it appeared."), Font::BIG, Dialog::OK);
     }
     
     Dialog::PuzzleMaps();
@@ -2591,7 +2630,7 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.isVisited(tile))
     {
 	PlaySoundVisited;
-	Dialog::Message(MP2::StringObject(obj), "Upon your approach, the tree opens its eyes in delight. \"It is good to see you, my student. I hope my teachings have helped you.\"", Font::BIG, Dialog::OK);
+	Dialog::Message(MP2::StringObject(obj), _("Upon your approach, the tree opens its eyes in delight. \"It is good to see you, my student. I hope my teachings have helped you.\""), Font::BIG, Dialog::OK);
     }
     else
     {
@@ -2607,7 +2646,7 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
         if(conditions)
         {
 	    const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-	    const std::string & body = "Upon your approach, the tree opens its eyes in delight. \"Ahh, an adventurer! Allow me to teach you a little of what I have learned over the ages.\"";
+	    const std::string & body = _("Upon your approach, the tree opens its eyes in delight. \"Ahh, an adventurer! Allow me to teach you a little of what I have learned over the ages.\"");
 	    Dialog::SpriteInfo(MP2::StringObject(obj), body, sprite);
 	}
 	else
@@ -2615,16 +2654,21 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
 	    if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
             {
 		const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-		std::string body("Upon your approach, the tree opens its eyes in delight. \"Ahh, an adventurer! I will be happy to teach you a little of what I have learned over the ages for a mere ");
-		body += (payment.gold ? "2000 gold" : "10 gems");
-		body += ".\" (Just bury it around my roots.)";
+		std::string body = _("Upon your approach, the tree opens its eyes in delight.");
+		body += " ";
+		body += payment.gold ? _("\"Ahh, an adventurer! I will be happy to teach you a little of what I have learned over the ages for a mere 2000 gold.\"") :
+		        _("\"Ahh, an adventurer! I will be happy to teach you a little of what I have learned over the ages for a mere 10 gems.\"");
+		body += " ";
+		body += _("(Just bury it around my roots.)");
 		conditions = Dialog::YES == Dialog::SpriteInfo(MP2::StringObject(obj), body, sprite, Dialog::YES|Dialog::NO);
     	    }
 	    else
 	    {
-		std::string body("Tears brim in the eyes of the tree. \"I need ");
-		body += (payment.gold ? "2000 gold" : "10 gems");
-		body += ".\" it whispers. (sniff) \"Well, come back when you can pay me.\"";
+		std::string body = _("Tears brim in the eyes of the tree.");
+		body += " ";
+		body += payment.gold ? _("\"I need 2000 gold.\"") : _("\"I need 10 gems.\"");
+		body += " ";
+		body += _("it whispers. (sniff) \"Well, come back when you can pay me.\"");
 		Dialog::Message(MP2::StringObject(obj), body, Font::BIG, Dialog::OK);
 	    }
 	}
@@ -2651,13 +2695,13 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), "The entrance to the cave is dark, and a foul, sulfurous smell issues from the cave mouth.  Will you enter?", Font::BIG, Dialog::YES|Dialog::NO))
+    if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("The entrance to the cave is dark, and a foul, sulfurous smell issues from the cave mouth. Will you enter?"), Font::BIG, Dialog::YES|Dialog::NO))
     {
 	if(tile.GetQuantity2())
 	{
 	    Resource::funds_t resource;
 
-	    if(Dialog::YES == Dialog::Message("", "You find a powerful and grotesque Demon in the cave. \"Today,\" it rasps, \"you will fight and surely die. But I will give you a choice of deaths. You may fight me, or you may fight my servants. Do you prefer to fight my servants?\"", Font::BIG, Dialog::YES|Dialog::NO))
+	    if(Dialog::YES == Dialog::Message("", _("You find a powerful and grotesque Demon in the cave. \"Today,\" it rasps, \"you will fight and surely die. But I will give you a choice of deaths. You may fight me, or you may fight my servants. Do you prefer to fight my servants?\""), Font::BIG, Dialog::YES|Dialog::NO))
 	    {
 		// battle with earth elements
 		Army::army_t army;
@@ -2672,7 +2716,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 			hero.IncreaseExperience(exp);
 			hero.ActionAfterBattle();
 			resource.gold = 2500;
-			DialogWithGold("", "Upon defeating the daemon's servants, you find a hidden cache with 2500 gold.", 2500);
+			DialogWithGold("", _("Upon defeating the daemon's servants, you find a hidden cache with 2500 gold."), 2500);
 			world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 			tile.SetQuantity2(0);
 		    break;
@@ -2694,7 +2738,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		{
 		    case 1:
 			exp = 1000;
-			DialogWithExp("", "The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive 1,000 experience points.", exp);
+			DialogWithExp("", _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive 1,000 experience points."), exp);
     			hero.IncreaseExperience(exp);
 			tile.SetQuantity2(0);
 			break;
@@ -2702,7 +2746,9 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		    {
 		    	exp = 1000;
 			const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-			if(Artifact::UNKNOWN != art) DialogArtifactWithExp("", "The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and find the " + Artifact::String(art) + " in the back of the cave.", art, exp);
+			std::string str = _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and find the %{art} in the back of the cave.");
+			String::Replace(str, "%{art}", Artifact::String(art));
+			if(Artifact::UNKNOWN != art) DialogArtifactWithExp("", str, art, exp);
     			hero.PickupArtifact(art);
     			hero.IncreaseExperience(exp);
 			tile.SetQuantity1(Artifact::UNKNOWN);
@@ -2712,7 +2758,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		    case 3:
 		    	exp = 1000;
 			resource.gold = 2500;
-			DialogGoldWithExp("", "The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive 1,000 experience points and 2,500 gold.", resource.gold, exp);
+			DialogGoldWithExp("", _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive 1,000 experience points and 2,500 gold."), resource.gold, exp);
     			hero.IncreaseExperience(exp);
 			world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 			tile.SetQuantity2(0);
@@ -2722,7 +2768,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 			bool remove = true;
 			if(2500 <= world.GetKingdom(hero.GetColor()).GetFundsGold())
 			{
-			    if(Dialog::YES == Dialog::Message("", "The Demon leaps upon you and has its claws at your throat before you can even draw your sword. \"Your life is mine,\" it says. \"I will sell it back to you for 2,500 gold.\"", Font::BIG, Dialog::YES|Dialog::NO))
+			    if(Dialog::YES == Dialog::Message("", _("The Demon leaps upon you and has its claws at your throat before you can even draw your sword. \"Your life is mine,\" it says. \"I will sell it back to you for 2,500 gold.\""), Font::BIG, Dialog::YES|Dialog::NO))
 			    {
 				remove = false;
 				resource.gold = 2500;
@@ -2730,7 +2776,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 			    }
 			}
 			else
-			    Dialog::Message("", "Seeing that you do not have 2500 gold, the demon slashes you with its claws, and the last thing you see is a red haze.", Font::BIG, Dialog::OK);
+			    Dialog::Message("", _("Seeing that you do not have 2500 gold, the demon slashes you with its claws, and the last thing you see is a red haze."), Font::BIG, Dialog::OK);
 
 			if(remove) BattleLose(hero, Army::LOSE);
 			tile.SetQuantity2(0);
@@ -2740,7 +2786,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 	    }
 	}
 	else
-	    Dialog::Message("", "Except for evidence of a terrible battle, the cave is empty.", Font::BIG, Dialog::OK);
+	    Dialog::Message("", _("Except for evidence of a terrible battle, the cave is empty."), Font::BIG, Dialog::OK);
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToDaemonCave: " + hero.GetName());

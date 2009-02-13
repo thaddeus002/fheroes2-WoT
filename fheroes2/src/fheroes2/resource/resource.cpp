@@ -212,27 +212,20 @@ bool Resource::funds_t::operator>= (const funds_t & pm) const
 /* name resource */
 const std::string & Resource::String(resource_t resource)
 {
-    static const std::string stringWood("Wood");
-    static const std::string stringMercury("Mercury");
-    static const std::string stringOre("Ore");
-    static const std::string stringSulfur("Sulfur");
-    static const std::string stringCrystal("Crystal");
-    static const std::string stringGems("Gems");
-    static const std::string stringGold("Gold");
+    static const std::string res[] = { "Unknown", _("Wood"), _("Mercury"), _("Ore"), _("Sulfur"), _("Crystal"), _("Gems"), _("Gold") };
 
     switch(resource){
-        case Resource::WOOD:	return stringWood;
-        case Resource::MERCURY:	return stringMercury;
-        case Resource::ORE:	return stringOre;
-        case Resource::SULFUR:	return stringSulfur;
-        case Resource::CRYSTAL: return stringCrystal;
-        case Resource::GEMS:	return stringGems;
-	case Resource::GOLD:	return stringGold;
+        case Resource::WOOD:	return res[1];
+        case Resource::MERCURY:	return res[2];
+        case Resource::ORE:	return res[3];
+        case Resource::SULFUR:	return res[4];
+        case Resource::CRYSTAL: return res[5];
+        case Resource::GEMS:	return res[6];
+	case Resource::GOLD:	return res[7];
 	default: break;
-	    Error::Warning("Resource::String: unknown");
     }
     
-    return stringWood;
+    return res[0];
 }
 
 /* return index sprite objnrsrc.icn */
