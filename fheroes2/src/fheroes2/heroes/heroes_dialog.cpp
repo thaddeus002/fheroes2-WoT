@@ -65,7 +65,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     display.Blit(Portrait::Hero(hid, Portrait::BIG), dst_pt);
 
     // name
-    message = "%{name} the %{race} ( Level %{level} )";
+    message = _("%{name} the %{race} ( Level %{level} )");
     String::Replace(message, "%{name}", name);
     String::Replace(message, "%{race}", Race::String(race));
     String::Replace(message, "%{level}", GetLevel());

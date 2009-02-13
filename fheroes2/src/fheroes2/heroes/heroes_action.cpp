@@ -1512,14 +1512,14 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    Resource::funds_t payment;
 		    if(1 == c)
 		    {
-			header = "A leprechaun offers you the %{art} for the small price of %{gold} Gold.";
+			header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold.");
 			String::Replace(header, "%{gold}", 2000);
 			payment += Resource::funds_t(Resource::GOLD, 2000);
 		    }
 		    else
 		    if(2 == c)
 		    {
-			header = "A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.";
+			header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
 			String::Replace(header, "%{gold}", 2500);
 			String::Replace(header, "%{count}", 3);
 			String::Replace(header, "%{res}", Resource::String(r));
@@ -1528,7 +1528,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    }
 		    else
 		    {
-			header = "A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.";
+			header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
 			String::Replace(header, "%{gold}", 3000);
 			String::Replace(header, "%{count}", 5);
 			String::Replace(header, "%{res}", Resource::String(r));

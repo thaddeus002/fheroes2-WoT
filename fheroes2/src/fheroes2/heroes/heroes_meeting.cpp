@@ -60,7 +60,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     display.Blit(backSprite, src_rt, dst_pt);
 
     // header
-    message = "%{name1} meets %{name2}";
+    message = _("%{name1} meets %{name2}");
     String::Replace(message, "%{name1}", GetName());
     String::Replace(message, "%{name2}", heroes2.GetName());
     Text text(message, Font::BIG);
