@@ -33,6 +33,9 @@ namespace String
     int  ToInt(const std::string &str);
     bool Compare(const std::string &str1, const std::string &str2, bool sensitive = true);
 
+    void Replace(std::string &, const std::string &, const std::string &);
+    void Replace(std::string &, const std::string &, int);
+
     // from SDL_ttf
     void UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len);
     void UNICODE_to_UTF8(std::string & utf8, const u16 *unicode, size_t len);

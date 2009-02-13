@@ -517,9 +517,9 @@ namespace Battle
         if(count < 1000)
             String::AddInt(str, count);
         else if(count < 1000000)
-            String::AddInt(str, count / 1000), str += NOL10N("K");
+            String::AddInt(str, count / 1000), str += "K";
         else 
-            String::AddInt(str, count / 1000000), str += NOL10N("M");
+            String::AddInt(str, count / 1000000), str += "M";
         Text text(str, Font::SMALL);
         tp.x += 10 - text.w() / 2;
         tp.y -= 1;

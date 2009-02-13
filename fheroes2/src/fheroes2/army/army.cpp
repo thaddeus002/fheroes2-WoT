@@ -71,7 +71,7 @@ std::vector<Army::Troop>::const_iterator MinElement(std::vector<Army::Troop>::co
 
 const std::string & Army::String(Army::armysize_t size)
 {
-    static const std::string str_size[] = { "Few", "Several", "Pack", "Lots", "Horde", "Throng", "Swarm", "Zounds", "Legion" };
+    static const std::string str_size[] = { _("Few"), _("Several"), _("Pack"), _("Lots"), _("Horde"), _("Throng"), _("Swarm"), _("Zounds"), _("Legion") };
 
     switch(size)
     {
@@ -450,20 +450,25 @@ s8 Army::army_t::GetMoraleWithModificators(std::list<std::string> *list) const
     	    if(0 == count_necr && !ghost_present && 1 < uniq_count)
             {
                 ++result;
-                if(list) list->push_back("All " + Race::String(r) + " troops +1");
+                if(list)
+                {
+            	    std::string str = _("All %{race} troops +1");
+            	    String::Replace(str, "%{race}", Race::String(r));
+            	    list->push_back(str);
+            	}
             }
             break;
         case 3:
             result -= 1;
-            if(list) list->push_back("Troops of 3 alignments -1");
+            if(list) list->push_back(_("Troops of 3 alignments -1"));
             break;
         case 4:
     	    result -= 2;
-            if(list) list->push_back("Troops of 4 alignments -2");
+            if(list) list->push_back(_("Troops of 4 alignments -2"));
             break;
         default:
             result -= 3;
-            if(list) list->push_back("Troops of 5 alignments -3");
+            if(list) list->push_back(_("Troops of 5 alignments -3"));
             break;
     }
 
@@ -471,7 +476,7 @@ s8 Army::army_t::GetMoraleWithModificators(std::list<std::string> *list) const
     if(1 < uniq_count && (count_necr || ghost_present) && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
     {
         result -= 1;
-        if(list) list->push_back("Some undead in groups -1");
+        if(list) list->push_back(_("Some undead in groups -1"));
     }
 
     return result;

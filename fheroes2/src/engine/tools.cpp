@@ -104,6 +104,25 @@ bool String::Compare(const std::string &str1, const std::string &str2, bool sens
     return str1 == str2;
 }
 
+void String::Replace(std::string & dst, const std::string & pred, const std::string & src)
+{
+    size_t pos = dst.find(pred);
+
+    if(pos != std::string::npos) dst.replace(pos, pred.size(), src);
+}
+
+void String::Replace(std::string & dst, const std::string & pred, int value)
+{
+    size_t pos = dst.find(pred);
+
+    if(pos != std::string::npos)
+    {
+	std::ostringstream stream;
+	stream << value;
+	Replace(dst, pred, stream.str());
+    }
+}
+
 // from SDL_ttf
 void String::UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len)
 {

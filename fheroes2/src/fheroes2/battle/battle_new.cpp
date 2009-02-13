@@ -220,7 +220,9 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
                 if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
                 {
                     m_battlefield.AnimateMorale(false, troop);
-                    m_gui->Status(tr("battle.low_morale").sub(troop.GetName()));
+                    std::string str = _("Low morale causes the %{name} to freeze in panic.");
+                    String::Replace(str, "%{name}", troop.GetName());
+                    m_gui->Status(str);
                 }
                 continue;
             }
@@ -297,7 +299,9 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
             if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
             {
                 m_battlefield.AnimateMorale(true, troop);
-                m_gui->Status(tr("battle.high_morale").sub(troop.GetName()));
+                std::string str = _("High morale enables the %{name} to attack again.");
+                String::Replace(str, "%{name}", troop.GetName());
+                m_gui->Status(str);
             }
         }
     }
@@ -601,8 +605,8 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move)
                 action = new WalkAction(move, myTroop, path);
             else
             {
-                //Dialog::Message(tr("battle.error"), tr("battle.no_path"), Font::BIG, Dialog::OK);
-                Error::Warning(tr("battle.no_path"));
+                //Dialog::Message(_("Error"), _("Path not found!"), Font::BIG, Dialog::OK);
+                Error::Warning("Path not found!");
                 return false;
             }
         }
@@ -836,13 +840,16 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
 
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
-        std::string status;
-        status = tr("battle.single_attack").sub(myTroop.GetName()).sub(damage);
+        std::string status = _("%{name} does %{value} damage.");
+        String::Replace(status, "%{name}", myTroop.GetName());
+        String::Replace(status, "%{value}", damage);
         
         if(perished)
         {
-            status += NOL10N("  ");
-            status += tr("battle.single_perish").sub(perished).sub(targetTroop.GetName());
+            std::string addon = _(" %{value} %{name} perishes.");
+    	    String::Replace(addon, "%{value}", perished);
+    	    String::Replace(addon, "%{name}", targetTroop.GetName());
+            status += addon;
         }
 
         m_gui->Status(status);
@@ -915,7 +922,7 @@ bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affect
 {
     if(spell == Spell::NONE) return false;
     if(!affected.size()) {
-        Dialog::Message(NOL10N(""), tr("battle.affect_noone"), Font::BIG, Dialog::OK);
+        Dialog::Message("", _("That spell will affect no one!"), Font::BIG, Dialog::OK);
         return false;
     }
 
@@ -933,10 +940,20 @@ bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affect
         {
             std::string str;
             if(affected.size() == 1)
-                str = tr("battle.spell_damage_single").sub(Spell::String(spell)).sub(damage).sub(affected[0]->GetName());
-            else str = tr("battle.spell_damage_multiple").sub(Spell::String(spell)).sub(damage);
+    	    {
+    	        str = _("The %{spell} does %{value} damage.");
+    	        String::Replace(str, "%{spell}", Spell::String(spell));
+                String::Replace(str, "%{value}", damage);
+            }
+            else
+            {
+    	        str = _("The %{spell} does %{value} damage to the %{name}.");
+    	        String::Replace(str, "%{spell}", Spell::String(spell));
+                String::Replace(str, "%{value}", damage);
+    	        String::Replace(str, "%{name}", affected[0]->GetName());
+            }
             m_gui->Status(str);
-            m_gui->Status(NOL10N(""));
+            m_gui->Status("");
         }
     }
     
@@ -1116,7 +1133,7 @@ namespace Battle
 
         m_battlefield->Redraw();
 
-        m_gui->Status(NOL10N(""));
+        m_gui->Status("");
         
         cursor.Show();
 
@@ -1177,7 +1194,9 @@ namespace Battle
                 // cursor on the battle field
                 if(t = m_battlefield->FindTroop(*m_ownArmy, cur_pt), t >= 0 && (*m_ownArmy)[t].Count() > 0) {
                     // troop from my army
-                    m_gui->Status(tr("battle.monster_info").sub((*m_ownArmy)[t].GetName()), true);
+                    std::string str = _("View %{name} info.");
+                    String::Replace(str, "%{name}", (*m_ownArmy)[t].GetName());
+                    m_gui->Status(str, true);
                     cursor.SetThemes(cursor.WAR_INFO);
                     if(click) {
                         cursor.SetThemes(cursor.POINTER); 
@@ -1190,7 +1209,9 @@ namespace Battle
                     // enemy troop
                     int mp;
                     if(myTroop.shots > 0 && !myTroop.Modes(Army::HANDFIGHTING)) {
-                        std::string str = tr("battle.shoot_monster").sub((*m_oppArmy)[t].GetName()).sub(myTroop.shots);
+                        std::string str = _("Shoot %{name} (%{value} shot(s) left)");
+                        String::Replace(str, "%{name}", (*m_oppArmy)[t].GetName());
+                        String::Replace(str, "%{value}", myTroop.shots);
                         m_gui->Status(str, true);
                         cursor.SetThemes(cursor.WAR_ARROW);
                         if(click) {
@@ -1200,7 +1221,8 @@ namespace Battle
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
                         }
                     } else if(mp = m_battlefield->CanAttack(myTroop, m_movePoints, (*m_oppArmy)[t], le.MouseCursor() - Bf2Scr(cur_pt)), mp >= 0) {
-                        std::string str = tr("battle.attack_monster").sub((*m_oppArmy)[t].GetName());
+                        std::string str = _("Attack %{name}");
+                        String::Replace(str, "%{name}", (*m_oppArmy)[t].GetName());
                         m_gui->Status(str, true);
                         Point p1 = Bf2ScrNoOffset(m_movePoints[mp]), p2 = Bf2ScrNoOffset(cur_pt);
                         if(p1.x > p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPRIGHT);
@@ -1218,7 +1240,9 @@ namespace Battle
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
                     } else {
                         // attack
-                        m_gui->Status(tr("battle.view_monster").sub((*m_oppArmy)[t].GetName()), true);
+                        std::string str = _("View %{name} info.");
+                        String::Replace(str, "%{name}", (*m_oppArmy)[t].GetName());
+                        m_gui->Status(str, true);
                         cursor.SetThemes(cursor.WAR_INFO);
                         if(click) {
                             cursor.SetThemes(cursor.POINTER);
@@ -1236,21 +1260,24 @@ namespace Battle
                             break;
                         }
                     if(canmove) {
-                        std::string str;
-                        if(myTroop.isFly()) cursor.SetThemes(cursor.WAR_FLIGHT), str = tr("battle.fly");
-                        else cursor.SetThemes(cursor.WAR_MOVE), str = tr("battle.move");
-                        m_gui->Status(tr("battle.move/fly_here").sub(str).sub(myTroop.GetName()), true);
+                        std::string str2, str;
+                        if(myTroop.isFly()) cursor.SetThemes(cursor.WAR_FLIGHT), str2 = _("Fly");
+                        else cursor.SetThemes(cursor.WAR_MOVE), str2 = _("Move");
+                        str = _("%{move} %{name} here.");
+                        String::Replace(str, "%{move}", str2);
+                        String::Replace(str, "%{name}", myTroop.GetName());
+                        m_gui->Status(str, true);
                         if(click) {
                             move = cur_pt;
                             return GUI::NONE;
                         }
                     } else {
-                        m_gui->Status(NOL10N(" "), true);
+                        m_gui->Status("", true);
                         cursor.SetThemes(cursor.WAR_NONE);
                     }
                 }
             } else if(!mouseActive) {
-                m_gui->Status(NOL10N(" "), true);
+                m_gui->Status("", true);
                 cursor.SetThemes(cursor.WAR_NONE);
             }
         }
@@ -2038,9 +2065,9 @@ namespace Battle
         display.Blit(bar2, g_baseOffset.x + 50, g_baseOffset.y + 480-16);
         
         m_statusBar[0].SetCenter(g_baseOffset.x + 50 + bar1.w()/2, g_baseOffset.y + 480-26);
-        m_statusBar[0].ShowMessage(NOL10N(" "));
+        m_statusBar[0].ShowMessage("");
         m_statusBar[1].SetCenter(g_baseOffset.x + 50 + bar2.w()/2, g_baseOffset.y + 480-6);
-        m_statusBar[1].ShowMessage(NOL10N(" "));
+        m_statusBar[1].ShowMessage("");
 
         m_hero[0] = hero1;
         m_hero[1] = hero2;
@@ -2083,15 +2110,15 @@ namespace Battle
 
     GUI::interaction_t GUI::Interact(TroopIndex troopN, Spell::spell_t &spell, Battlefield &battlefield, bool &mouseActive)
     {
-        do_button(*m_skip, return SKIP, Dialog::Message(tr("battle.skip"), tr("battle.skip_info"), Font::BIG));
-        do_button(*m_auto, return AUTO, Dialog::Message(tr("battle.auto"), tr("battle.auto_info"), Font::BIG));
-        do_button(*m_settings, SettingsDialog(), Dialog::Message(tr("battle.options"), tr("battle.options_info"), Font::BIG));
+        do_button(*m_skip, return SKIP, Dialog::Message(_("Skip"), _("Skip the current creature. The current creature loses its turn and does not get to go again until the next round."), Font::BIG));
+        do_button(*m_auto, return AUTO, Dialog::Message(_("Auto Combat"), _("Allows the computer to fight out the battle for you."), Font::BIG));
+        do_button(*m_settings, SettingsDialog(), Dialog::Message(_("System Options"), _("Allows you to customize the combat screen."), Font::BIG));
         for(u8 i = 0; i < 2; i++)
         {
             if(le.MouseClickLeft(battlefield.GetHeroRect(i))) {
                 Army::battle_t s = HeroStatus(*m_hero[i], m_statusBar[1], spell, false, m_hero[i ^ 1], troopN < 0);
                 if(s == Army::RETREAT) {
-                    if(Dialog::Message(NOL10N(""), tr("battle.retreat?"), Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
+                    if(Dialog::Message("", _("Are you sure you want to retreat?"), Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
                         return RETREAT;
                 }
                 else if(s == Army::SURRENDER) return SURRENDER;
@@ -2103,23 +2130,23 @@ namespace Battle
         }
         
         if(le.MouseCursor(*m_skip)) {
-            m_statusBar[1].ShowMessage(tr("battle.skip_unit"));
+            m_statusBar[1].ShowMessage(_("Skip this unit"));
             cursor.SetThemes(cursor.WAR_POINTER);
             mouseActive = true;
         }else if(le.MouseCursor(*m_auto)) {
-            m_statusBar[1].ShowMessage(tr("battle.auto"));
+            m_statusBar[1].ShowMessage(_("Auto Combat"));
             cursor.SetThemes(cursor.WAR_POINTER);
             mouseActive = true;
         } else if(le.MouseCursor(*m_settings)) {
-            m_statusBar[1].ShowMessage(tr("battle.system_options"));
+            m_statusBar[1].ShowMessage(_("Customize system options"));
             cursor.SetThemes(cursor.WAR_POINTER);
             mouseActive = true;
         } else if(le.MouseCursor(troopN >= 0 ? battlefield.GetHeroRect(0) : battlefield.GetHeroRect(1))) {
-            m_statusBar[1].ShowMessage(tr("battle.hero_options"));
+            m_statusBar[1].ShowMessage(_("Hero's Options"));
             cursor.SetThemes(cursor.WAR_HELMET);
             mouseActive = true;
         } else if(le.MouseCursor(troopN >= 0 ? battlefield.GetHeroRect(1) : battlefield.GetHeroRect(0))) {
-            m_statusBar[1].ShowMessage(tr("battle.opp_hero"));
+            m_statusBar[1].ShowMessage(_("View Opposing Hero"));
             cursor.SetThemes(cursor.WAR_INFO);
             mouseActive = true;
         }

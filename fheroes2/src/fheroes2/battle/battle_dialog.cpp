@@ -47,7 +47,7 @@ static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleAr
     }
     else
     {
-        Text none(tr("battle.none"), Font::SMALL);
+        Text none(_("None"), Font::SMALL);
         none.Blit(draw.x + (draw.w - none.w()) / 2, draw.y);
     }
 }
@@ -80,29 +80,33 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
         case Army::WIN:
         {
             animation.push_back(std::make_pair(ICN::WINCMBT, Point(32, 0)));
-            message[0] = tr("battle.victory1");
+            message[0] = _("A glorious victory!");
             //TODO: EXP1 is the correct amount of experience that should be awarded, in case
             //      the opposing army retreated or surrendered.  However, the actual amount
             //      awarded is given by Army_t::CalculateExperience, which assumes that all
             //      creatures were killed.
-            message[1] = tr("battle.victory2").sub(name).sub(/*EXP1*/0);
+            message[1] = _("For valor in combat, %{name} receives %{exp} experience.");
+            String::Replace(message[1], "%{name}", name);
+            String::Replace(message[1], "%{exp}", 0);	/*EXP1*/
             break;
         }
         case Army::LOSE:
             animation.push_back(std::make_pair(ICN::CMBTLOS1, Point(0, 0)));
             animation.push_back(std::make_pair(ICN::CMBTLOS2, Point(0, 0)));
             animation.push_back(std::make_pair(ICN::CMBTLOS3, Point(0, 29)));
-            message[0] = tr("battle.lose").sub(name);
+            message[0] = _("Your forces suffer a bitter defeat, and %{name} abandons your cause.");
+            String::Replace(message[0], "%{name}", name);
             break;
         case Army::SURRENDER:
             animation.push_back(std::make_pair(ICN::CMBTSURR, Point(32, 3)));
-            message[0] = tr("battle.surrender_long");
+            message[0] = _("TODO");
             break;
         case Army::RETREAT:
             animation.push_back(std::make_pair(ICN::CMBTFLE1, Point(34, 42)));
             animation.push_back(std::make_pair(ICN::CMBTFLE2, Point(0, 12)));
             animation.push_back(std::make_pair(ICN::CMBTFLE3, Point(0, 0)));
-            message[0] = tr("battle.retreat_long").sub(name);
+            message[0] = _("Your forces in disarray, the cowardly %{name} flees in terror.");
+            String::Replace(message[0], "%{name}", name);
             break;
         default:
             break;
@@ -127,9 +131,9 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
             animBase.w() + 40, background.h() - 160 - first.h()));
 
     const int textY = backgroundY + background.h() / 2 + 30;
-    TextBox title(tr("battle.casualties"), Font::SMALL, Rect(backgroundX, textY, background.w(), 40));
-    TextBox attacker(tr("battle.attacker"), Font::SMALL, Rect(backgroundX, title.y() + int(title.h() * 1.5f), background.w(), 40));
-    TextBox defender(tr("battle.defender"), Font::SMALL, Rect(backgroundX, attacker.y() + attacker.h() * 4, background.w(), 40));
+    TextBox title(_("Battlefield Casualties"), Font::SMALL, Rect(backgroundX, textY, background.w(), 40));
+    TextBox attacker(_("Attacker"), Font::SMALL, Rect(backgroundX, title.y() + int(title.h() * 1.5f), background.w(), 40));
+    TextBox defender(_("Defender"), Font::SMALL, Rect(backgroundX, attacker.y() + attacker.h() * 4, background.w(), 40));
 
     DrawArmySummary(*armies[0].second, *armies[0].first, Rect(backgroundX, attacker.y() + attacker.h() + 5, background.w(), 0));
     DrawArmySummary(*armies[1].second, *armies[1].first, Rect(backgroundX, defender.y() + defender.h() + 5, background.w(), 0));
@@ -173,7 +177,7 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
                         const Sprite & border = AGG::GetICN(ICN::WINLOSEB, 0);
                         std::string artName = Artifact::String(artifacts->at(artIndex));
                         Rect titleRect(backgroundX + background.w() / 8, baseAnimY + animBase.h() + 20, background.w() * 3 / 4, background.h());
-                        TextBox title("You have captured an enemy artifact!", Font::BIG, titleRect);
+                        TextBox title(_("You have captured an enemy artifact!"), Font::BIG, titleRect);
                         Text artText(artName, Font::SMALL);
                         artText.Blit(backgroundX + (background.w() - artText.w()) / 2, buttonDone.y - artText.h() - 5);
                         int artX = backgroundX + (background.w() - art.w()) / 2;
@@ -314,37 +318,54 @@ Army::battle_t Battle::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spe
     std::string str;
     Text text;
     text.Set(Font::SMALL);
-    text.Set(tr("hero.long_name").sub(hero.GetName()).sub(Race::String(hero.GetRace())));
+    str = _("%{name} the %{race}");
+    String::Replace(str, "%{name}", hero.GetName());
+    String::Replace(str, "%{race}", Race::String(hero.GetRace()));
+    text.Set(str);
     tp.x += 8 + pos_rt.w/2 - text.w()/2;
     tp.y += 10;
     text.Blit(tp);
-    text.Set(tr("hero.skill_display").sub(tr("skills.attack")).sub(hero.GetAttack()));
+    str = _("Attack") + std::string(": ");
+    String::AddInt(str, hero.GetAttack());
+    text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 40;
     text.Blit(tp);
-    text.Set(tr("hero.skill_display").sub(tr("skills.defense")).sub(hero.GetDefense()));
+    str = _("Defense") + std::string(": ");
+    String::AddInt(str, hero.GetDefense());
+    text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 51;
     text.Blit(tp);
-    text.Set(tr("hero.skill_display").sub(tr("skills.spell_power")).sub(hero.GetPower()));
+    str = _("Spell Power") + std::string(": ");
+    String::AddInt(str, hero.GetPower());
+    text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 62;
     text.Blit(tp);
-    str = tr("hero.skill_display").sub(tr("skills.knowledge")).sub(hero.GetKnowledge());
+    str = _("Knowledge") + std::string(": ");
     String::AddInt(str, hero.GetKnowledge());
     text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 73;
     text.Blit(tp);
-    text.Set(tr("hero.skill_display").sub(tr("skills.morale")).sub(hero.GetMorale()));
+    str = _("Morale") + std::string(": ");
+    String::AddInt(str, hero.GetMorale());
+    text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 84;
     text.Blit(tp);
-    text.Set(tr("hero.skill_display").sub(tr("skills.luck")).sub(hero.GetLuck()));
+    str = _("Luck") + std::string(": ");
+    String::AddInt(str, hero.GetLuck());
+    text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 95;
     text.Blit(tp);
-    text.Set(tr("hero.skill_display_ratio").sub(tr("skills.spell_points")).sub(hero.GetSpellPoints()).sub(hero.GetMaxSpellPoints()));
+    str = _("Spell Points") + std::string(": ");
+    String::AddInt(str, hero.GetSpellPoints());
+    str += "/";
+    String::AddInt(str, hero.GetMaxSpellPoints());
+    text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 117;
     text.Blit(tp);
@@ -377,20 +398,20 @@ Army::battle_t Battle::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spe
         if(le.KeyPress(KEY_ESCAPE)) {
             return Army::NONE;
         }
-        do_button(buttonMag, {if(spell=hero.SpellBook().Open(Spell::Book::CMBT, true),spell!=Spell::NONE) {back.Restore();return Army::NONE;}}, Dialog::Message(tr("battle.cast_spell"), tr("battle.cast_spell_info"), Font::BIG));
-        do_button(buttonRet, return Army::RETREAT, Dialog::Message(tr("battle.retreat"), tr("battle.retreat_info"), Font::BIG));
-        do_button(buttonSur, return Army::SURRENDER, Dialog::Message(tr("battle.surrender"), tr("battle.surrender_info"), Font::BIG));
-        do_button(buttonOK, return Army::NONE, Dialog::Message(tr("dialog.cancel"), tr("battle.cancel_info"), Font::BIG));
+        do_button(buttonMag, {if(spell=hero.SpellBook().Open(Spell::Book::CMBT, true),spell!=Spell::NONE) {back.Restore();return Army::NONE;}}, Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG));
+        do_button(buttonRet, return Army::RETREAT, Dialog::Message(_("Retreat"), _("Retreat your hero, abandoning your creatures. Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces."), Font::BIG));
+        do_button(buttonSur, return Army::SURRENDER, Dialog::Message(_("Surrender"), _("Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again."), Font::BIG));
+        do_button(buttonOK, return Army::NONE, Dialog::Message(_("Cancel"), _("Return to the battle."), Font::BIG));
         if(le.MouseCursor(buttonMag)) {
-            statusBar.ShowMessage(tr("battle.cast_spell"));
+            statusBar.ShowMessage(_("Cast Spell"));
         } else if(le.MouseCursor(buttonRet)) {
-            statusBar.ShowMessage(tr("battle.retreat"));
+            statusBar.ShowMessage(_("Retreat"));
         } else if(le.MouseCursor(buttonSur)) {
-            statusBar.ShowMessage(tr("battle.surrender"));
+            statusBar.ShowMessage(_("Surrender"));
         } else if(le.MouseCursor(buttonOK)) {
-            statusBar.ShowMessage(tr("dialog.cancel"));
+            statusBar.ShowMessage(_("Cancel"));
         } else {
-            statusBar.ShowMessage(tr("battle.hero_options"));
+            statusBar.ShowMessage(_("Hero's Options"));
         }
     }
     return Army::NONE;

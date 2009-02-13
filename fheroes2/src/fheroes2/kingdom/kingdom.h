@@ -72,6 +72,7 @@
 #define DAY_PROFIT_GOLD                 1000
 
 #include <vector>
+#include <map>
 #include "race.h"
 #include "color.h"
 #include "resource.h"

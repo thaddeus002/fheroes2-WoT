@@ -21,7 +21,6 @@
 #ifndef H2TYPES_H
 #define H2TYPES_H
 
-#include "l10n.h"
 #include "SDL.h"
 
 typedef Sint8		s8;

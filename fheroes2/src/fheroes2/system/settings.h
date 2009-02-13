@@ -77,7 +77,6 @@ public:
     Maps::FileInfo & FileInfo(void);
 
     const std::string & PreloadCharsets(void) const;
-    const std::string & TranslationFile(void) const;
     const std::string & CacheDirectory(void) const;
     const std::string & DataDirectory(void) const;
     const std::string & MapsDirectory(void) const;
@@ -150,7 +149,6 @@ private:
     std::string path_cache_directory;
     std::string path_data_directory;
     std::string path_maps_directory;
-    std::string translationFile;
 
     std::string font_normal;
     std::string font_small;

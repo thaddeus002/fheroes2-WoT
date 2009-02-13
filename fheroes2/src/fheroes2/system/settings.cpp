@@ -48,7 +48,6 @@ namespace
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_cache_directory(""), path_data_directory("data"), path_maps_directory("maps"),
-    translationFile("english.str"),
     font_normal("files/fonts/dejavusans.ttf"), font_small("files/fonts/dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
 {
@@ -144,7 +143,6 @@ void Settings::Dump(std::ostream & stream) const
     stream << "cache = " << path_cache_directory << std::endl;
     stream << "data = " << path_data_directory << std::endl;
     stream << "maps = " << path_maps_directory << std::endl;
-    stream << "translation = " << translationFile << std::endl;
     stream << "fonts normal = " << font_normal << std::endl;
     stream << "fonts small = " << font_small << std::endl;
     stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
@@ -221,8 +219,6 @@ Difficulty::difficulty_t Settings::GameDifficulty(void) const { return game_diff
 Color::color_t Settings::CurrentColor(void) const { return cur_color; }
 Color::color_t Settings::MyColor(void) const { return my_color; }
 
-const std::string & Settings::TranslationFile(void) const { return translationFile; }
-
 /* return fontname */
 const std::string & Settings::FontsNormal(void) const { return font_normal; }
 const std::string & Settings::FontsSmall(void) const { return font_small; }
@@ -288,9 +284,6 @@ void Settings::Parse(const std::string & left, const std::string & right)
     else
     // animation
     if(left == "animation") animation = String::ToInt(right);
-    else
-    // translation strings
-    if(left == "translation") translationFile = right;
     else
     // font name
     if(left == "fonts normal") font_normal = right;

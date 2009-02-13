@@ -549,7 +549,7 @@ bool Army::isArmyValid(const BattleArmy_t &army)
 
 void Army::NewTurn(BattleArmy_t &army)
 {
-    printf("resetting\n");
+    //printf("resetting\n");
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Army::BattleTroop::NewTurn));
 }
 
