@@ -170,6 +170,7 @@ void AGG::File::Dump(void) const
 /* AGG::Cache constructor */
 AGG::Cache::Cache() : heroes2_agg(false)
 {
+#ifdef WITH_TTF
     Settings & conf = Settings::Get();
 
     if(conf.Unicode())
@@ -177,6 +178,7 @@ AGG::Cache::Cache() : heroes2_agg(false)
 	if(!font_medium.Open(conf.FontsNormal(), conf.FontsNormalSize()) ||
 	   !font_small.Open(conf.FontsSmall(), conf.FontsSmallSize())) conf.ResetModes(Settings::UNICODE);
     }
+#endif
 }
 
 AGG::Cache::~Cache()
@@ -668,6 +670,7 @@ void AGG::Cache::LoadFNT(void)
 {
     const Settings & conf = Settings::Get();
 
+#ifdef WITH_TTF
     if(conf.Unicode())
     {
 	if(fnt_cache.size()) return;
@@ -713,6 +716,7 @@ void AGG::Cache::LoadFNT(void)
 	}
     }
     else
+#endif
     {
 	PreloadObject(ICN::SMALFONT);
 	PreloadObject(ICN::FONT);
@@ -723,6 +727,7 @@ void AGG::Cache::LoadFNT(void)
 
 void AGG::Cache::LoadFNT(u16 ch)
 {
+#ifdef WITH_TTF
     const Settings & conf = Settings::Get();
 
     if(conf.Unicode())
@@ -736,6 +741,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 
 	if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
     }
+#endif
 }
 
 /* free ICN object in AGG::Cache */
@@ -914,7 +920,10 @@ const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u16 c)
 
 bool AGG::Cache::isValidFonts(void) const
 {
+#ifdef WITH_TTF
     return Settings::Get().Unicode() ? font_small.isValid() && font_medium.isValid() : false;
+#endif
+    return false;
 }
 
 // wrapper AGG::PreloadObject
