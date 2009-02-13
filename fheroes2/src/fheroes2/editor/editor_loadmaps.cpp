@@ -42,7 +42,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
     // empty maps dir
     if(dir.empty())
     {
-        Dialog::Message("Warning", "No maps available!", Font::BIG, Dialog::OK);
+        Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
         return EDITMAINMENU;
     }
 

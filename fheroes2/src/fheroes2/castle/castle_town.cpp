@@ -37,26 +37,47 @@
 
 void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message, const Castle & castle, const u32 building)
 {
+    std::string str;
+    
     if(isBuilt)
-        bar.ShowMessage(message + " is already built");
+    {
+        str = _("%{name} is already built");
+        String::Replace(str, "%{name}", message);
+    }
     else
     {
         const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), static_cast<Castle::building_t>(building));
 
         if(!castle.AllowBuild())
-            bar.ShowMessage("Cannot build. Already built here this turn.");
+	{
+	    str = _("Cannot build. Already built here this turn.");
+        }
         else
         if(castle.AllowBuild() && ! world.GetMyKingdom().AllowPayment(paymentBuild))
-            bar.ShowMessage("Cannot afford " + message);
+	{
+	    str = _("Cannot afford %{name}");
+    	    String::Replace(str, "%{name}", message);
+        }
         else
         if(Castle::BUILD_SHIPYARD == building && !castle.HaveNearlySea())
-            bar.ShowMessage("Cannot build " + message + " because castle is to far from water.");
+        {
+            str = _("Cannot build %{name} because castle is to far from water.");
+    	    String::Replace(str, "%{name}", message);
+        }
         else
         if(!castle.AllowBuyBuilding(static_cast<Castle::building_t>(building)))
-            bar.ShowMessage("Cannot build " + message);
+        {
+            str = _("Cannot build %{name}");
+    	    String::Replace(str, "%{name}", message);
+        }
         else
-            bar.ShowMessage("Build " + message);
+	{
+	    str = _("Build %{name}");
+    	    String::Replace(str, "%{name}", message);
+        }
     }
+
+    bar.ShowMessage(str);
 }
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
@@ -75,7 +96,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     Point dst_pt;
     std::string str;
 
-    str = "Recruit Hero";
+    str = _("Recruit Hero");
     u8 height_title = Text::height(str, Font::BIG, BOXAREA_WIDTH);
     Rect tit_rt(box_rt.x + 5, box_rt.y - height_title / 2, BOXAREA_WIDTH, height_title);
     TextBox(str, Font::BIG, tit_rt);
@@ -90,11 +111,11 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     dst_pt.y = box_rt.y + tit_rt.h;
     display.Blit(portrait_frame, dst_pt);
 
-    str = heroes.GetName() + " is a level ";
-    String::AddInt(str, heroes.GetLevel());
-    str += " " + Race::String(heroes.GetRace()) + " with ";
-    String::AddInt(str, heroes.GetCountArtifacts());
-    str += " artifacts.";
+    str = _("%{name} is a level %{value} %{race} with %{count} artifacts.");
+    String::Replace(str, "%{name}", heroes.GetName());
+    String::Replace(str, "%{value}", heroes.GetLevel());
+    String::Replace(str, "%{race}", Race::String(heroes.GetRace()));
+    String::Replace(str, "%{count}", heroes.GetCountArtifacts());
 
     Rect src_rt(box_rt.x, box_rt.y + portrait_frame.w() + tit_rt.h - 3, BOXAREA_WIDTH, 200);
     TextBox(str, Font::BIG, src_rt);
@@ -150,22 +171,28 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    const std::string & building_description =
-			(DWELLING_MONSTER1 |
-			 DWELLING_MONSTER2 |
-			 DWELLING_MONSTER3 |
-			 DWELLING_MONSTER4 |
-			 DWELLING_MONSTER5 |
-			 DWELLING_MONSTER6 |
-			 DWELLING_UPGRADE2 |
-			 DWELLING_UPGRADE3 |
-			 DWELLING_UPGRADE4 |
-			 DWELLING_UPGRADE5 |
-			 DWELLING_UPGRADE6 |
-			 DWELLING_UPGRADE7) & build ?
-			 std::string("The " + GetStringBuilding(build, race) + " produces " + Monster(race, build).GetMultiName() + ".") :
-			 GetDescriptionBuilding(build, race);
-	
+    std::string building_description;
+
+    if((DWELLING_MONSTER1 |
+	DWELLING_MONSTER2 |
+	DWELLING_MONSTER3 |
+	DWELLING_MONSTER4 |
+	DWELLING_MONSTER5 |
+	DWELLING_MONSTER6 |
+	DWELLING_UPGRADE2 |
+	DWELLING_UPGRADE3 |
+	DWELLING_UPGRADE4 |
+	DWELLING_UPGRADE5 |
+	DWELLING_UPGRADE6 |
+	DWELLING_UPGRADE7) & build)
+    {
+	building_description = _("The %{building} produces %{monster}.");
+	String::Replace(building_description, "%{building}", GetStringBuilding(build, race));
+	String::Replace(building_description, "%{monster}", Monster(race, build).GetMultiName());
+    }
+    else
+	building_description = GetDescriptionBuilding(build, race);
+
     u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
 
     // prepare requires build string
@@ -295,7 +322,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
     if(height_requires)
     {
-	text.Set("Requires:", Font::BIG);
+	text.Set(_("Requires:"), Font::BIG);
 	dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
 	dst_pt.y = box_rt.y + 100 + height_description + 20;
 	text.Blit(dst_pt);
@@ -691,14 +718,14 @@ Castle::building_t Castle::OpenTown(void)
     const Sprite & spriteGroupedArmyFormat = AGG::GetICN(ICN::HSICONS, 10);
     const Rect rectSpreadArmyFormat(cur_pt.x + 550, cur_pt.y + 220, spriteSpreadArmyFormat.w(), spriteSpreadArmyFormat.h());
     const Rect rectGroupedArmyFormat(cur_pt.x + 585, cur_pt.y + 220, spriteGroupedArmyFormat.w(), spriteGroupedArmyFormat.h());
-    const std::string descriptionSpreadArmyFormat("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.");
-    const std::string descriptionGroupedArmyFormat("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield.");
+    const std::string descriptionSpreadArmyFormat(_("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army."));
+    const std::string descriptionGroupedArmyFormat(_("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield."));
     const Point pointSpreadArmyFormat(rectSpreadArmyFormat.x - 1, rectSpreadArmyFormat.y - 1);
     const Point pointGroupedArmyFormat(rectGroupedArmyFormat.x - 1, rectGroupedArmyFormat.y - 1);
     SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Modes(ARMYSPREAD) ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     if(BUILD_CAPTAIN &building)
     {
-	Text text("Attack Skill", Font::SMALL);
+	Text text(_("Attack Skill") + std::string(" "), Font::SMALL);
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y = cur_pt.y + 168;
 	text.Blit(dst_pt);
@@ -709,7 +736,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 	
-	text.Set("Defense Skill ");
+	text.Set(_("Defense Skill") + std::string(" "));
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
 	text.Blit(dst_pt);
@@ -720,7 +747,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 
-	text.Set("Spell Power ");
+	text.Set(_("Spell Power") + std::string(" "));
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
 	text.Blit(dst_pt);
@@ -731,7 +758,7 @@ Castle::building_t Castle::OpenTown(void)
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 
-	text.Set("Knowledge ");
+	text.Set(_("Knowledge") + std::string(" "));
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
 	text.Blit(dst_pt);
@@ -1001,9 +1028,9 @@ Castle::building_t Castle::OpenTown(void)
 	else
 	if(le.MousePressRight(rectCaptain)) PressRightAction(BUILD_CAPTAIN);
         else
-	if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message("Spread Formation", descriptionSpreadArmyFormat, Font::BIG);
+	if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
-	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message("Grouped Formation", descriptionGroupedArmyFormat, Font::BIG);
+	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 	else
 	if(hero1 && le.MousePressRight(rectHero1)){ hero1->OpenDialog(true); cursor.Show(); display.Flip(); }
 	else
@@ -1113,29 +1140,39 @@ Castle::building_t Castle::OpenTown(void)
 	   (hero2 && le.MouseCursor(rectHero2)))
 	{
 	    if(many_hero)
-		statusBar.ShowMessage("Cannot recruit - you have too many Heroes.");
+		statusBar.ShowMessage(_("Cannot recruit - you have too many Heroes."));
 	    else
 	    if(castle_heroes)
-		statusBar.ShowMessage("Cannot recruit - you already have a Hero in this town.");
+		statusBar.ShowMessage(_("Cannot recruit - you already have a Hero in this town."));
 	    else
 	    if(! allow_buy_hero)
-		statusBar.ShowMessage("Cannot afford a Hero");
+		statusBar.ShowMessage(_("Cannot afford a Hero"));
 	    else
 	    if(le.MouseCursor(rectHero1))
-		statusBar.ShowMessage("Recruit " + hero1->GetName() + " the " + Race::String(hero1->GetRace()));
+	    {
+		std::string str = _("Recruit %{name} the %{race}");
+		String::Replace(str, "%{name}", hero1->GetName());
+		String::Replace(str, "%{race}", Race::String(hero1->GetRace()));
+	    	statusBar.ShowMessage(str);
+	    }
 	    else
 	    if(le.MouseCursor(rectHero2))
-		statusBar.ShowMessage("Recruit " + hero2->GetName() + " the " + Race::String(hero2->GetRace()));
+	    {
+		std::string str = _("Recruit %{name} the %{race}");
+		String::Replace(str, "%{name}", hero2->GetName());
+		String::Replace(str, "%{race}", Race::String(hero2->GetRace()));
+	    	statusBar.ShowMessage(str);
+	    }
 	}
 	else
 	if(le.MouseCursor(rectSpreadArmyFormat))
-	    statusBar.ShowMessage("Set garrison combat formation to 'Spread'");
+	    statusBar.ShowMessage(_("Set garrison combat formation to 'Spread'"));
 	else
 	if(le.MouseCursor(rectGroupedArmyFormat))
-	    statusBar.ShowMessage("Set garrison combat formation to 'Grouped'");
+	    statusBar.ShowMessage(_("Set garrison combat formation to 'Grouped'"));
 	else
 	// clear all
-	    statusBar.ShowMessage("Castle Options");
+	    statusBar.ShowMessage(_("Castle Options"));
     }
 
     return BUILD_NOTHING;
@@ -1161,21 +1198,27 @@ void Castle::PressRightAction(building_t b)
 	default: break;
     }
 
-    const std::string & building_description =
-			(DWELLING_MONSTER1 |
-			 DWELLING_MONSTER2 |
-			 DWELLING_MONSTER3 |
-			 DWELLING_MONSTER4 |
-			 DWELLING_MONSTER5 |
-			 DWELLING_MONSTER6 |
-			 DWELLING_UPGRADE2 |
-			 DWELLING_UPGRADE3 |
-			 DWELLING_UPGRADE4 |
-			 DWELLING_UPGRADE5 |
-			 DWELLING_UPGRADE6 |
-			 DWELLING_UPGRADE7) & b ?
-			 std::string("The " + GetStringBuilding(b, race) + " produces " + Monster(race, b).GetMultiName() + ".") :
-			 GetDescriptionBuilding(b, race);
+    std::string building_description;
+    
+    if((DWELLING_MONSTER1 |
+	DWELLING_MONSTER2 |
+	DWELLING_MONSTER3 |
+	DWELLING_MONSTER4 |
+	DWELLING_MONSTER5 |
+	DWELLING_MONSTER6 |
+	DWELLING_UPGRADE2 |
+	DWELLING_UPGRADE3 |
+	DWELLING_UPGRADE4 |
+	DWELLING_UPGRADE5 |
+	DWELLING_UPGRADE6 |
+	DWELLING_UPGRADE7) & b)
+    {
+	building_description = _("The %{building} produces %{monster}.");
+	String::Replace(building_description, "%{building}", GetStringBuilding(b, race));
+	String::Replace(building_description, "%{monster}", Monster(race, b).GetMultiName());
+    }
+    else
+	building_description = GetDescriptionBuilding(b, race);
 
     if(b & building && complete)
 	Dialog::Message(GetStringBuilding(b, race), building_description, Font::BIG);

@@ -167,11 +167,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Rect rect1(dst.x + 36, dst.y + 47, sprite1.w(), sprite1.h());
     display.Blit(sprite1, rect1);
     str.clear();
-    str = "sound ";
+    str = _("sound");
+    str += " ";
     if(conf.Sound() && conf.SoundVolume())
 	String::AddInt(str, conf.SoundVolume());
     else
-	str += "off";
+	str += _("off");
     text.Set(str, Font::SMALL);
     text.Blit(rect1.x + (rect1.w - text.w()) / 2, rect1.y + rect1.h + 5);
 
@@ -180,11 +181,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Rect rect2(dst.x + 128, dst.y + 47, sprite2.w(), sprite2.h());
     display.Blit(sprite2, rect2);
     str.clear();
-    str = "music ";
+    str = _("music");
+    str += " ";
     if(conf.Music() && conf.MusicVolume())
 	String::AddInt(str, conf.MusicVolume());
     else
-	str += "off";
+	str += _("off");
     text.Set(str);
     text.Blit(rect2.x + (rect2.w - text.w()) / 2, rect2.y + rect2.h + 5);
 
@@ -203,11 +205,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Rect rect4(dst.x + 36, dst.y + 157, sprite4.w(), sprite4.h());
     display.Blit(sprite4, rect4);
     str.clear();
-    str = "animation ";
+    str = _("animation");
+    str += " ";
     if(conf.Animation())
 	String::AddInt(str, conf.Animation());
     else
-	str += "off";
+	str += _("off");
     text.Set(str);
     text.Blit(rect4.x + (rect4.w - text.w()) / 2, rect4.y + rect4.h + 5);
 
@@ -234,10 +237,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Rect rect7(dst.x + 36, dst.y + 267, sprite7.w(), sprite7.h());
     display.Blit(sprite7, rect7);
     str.clear();
+    str = _("Interface");
+    str += ": ";
     if(conf.EvilInterface())
-	str = "Evil";
+	str += _("Evil");
     else
-	str = "Good";
+	str += _("Good");
     text.Set(str);
     text.Blit(rect7.x + (rect7.w - text.w()) / 2, rect7.y + rect7.h + 5);
 

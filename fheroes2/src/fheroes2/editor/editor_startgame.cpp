@@ -170,7 +170,7 @@ Game::menu_t Game::Editor::StartGame()
     while(le.HandleEvents())
     {
 	// ESC
-	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", "Are you sure you want to quit?", Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
+	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft))	scrollDir |= GameArea::LEFT;
@@ -786,109 +786,109 @@ Game::menu_t Game::Editor::StartGame()
 
 	// press right info
 	if(le.MousePressRight(btnZoom))
-	    Dialog::Message("Magnify", "Change between zoom and normal view.", Font::BIG);
+	    Dialog::Message(_("Magnify"), _("Change between zoom and normal view."), Font::BIG);
 	else
 	if(le.MousePressRight(btnUndo))
-	    Dialog::Message("Undo", "Undo your last action. Press againt to redo the action.", Font::BIG);
+	    Dialog::Message(_("Undo"), _("Undo your last action. Press againt to redo the action."), Font::BIG);
 	else
 	if(le.MousePressRight(btnNew))
-	    Dialog::Message("New", "Start a new map from scratch.", Font::BIG);
+	    Dialog::Message(_("New"), _("Start a new map from scratch."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSpec))
-	    Dialog::Message("Specifications", "Edit maps title, description, and other general information.", Font::BIG);
+	    Dialog::Message(_("Specifications"), _("Edit maps title, description, and other general information."), Font::BIG);
 	else
 	if(le.MousePressRight(btnFile))
-	    Dialog::Message("File Options", "Open the file options menu, where you can save or load maps, or quit out of the editor.", Font::BIG);
+	    Dialog::Message(_("File Options"), _("Open the file options menu, where you can save or load maps, or quit out of the editor."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSystem))
-	    Dialog::Message("System Options", "View the editor system options, which let you customize the editor.", Font::BIG);
+	    Dialog::Message(_("System Options"), _("View the editor system options, which let you customize the editor."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSelectGround))
-	    Dialog::Message("Terrain Mode", "Used to draw the underlying grass, dirt, water, etc. on the map.", Font::BIG);
+	    Dialog::Message(_("Terrain Mode"), _("Used to draw the underlying grass, dirt, water, etc. on the map."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSelectObject))
-	    Dialog::Message("Object Mode", "Used to place objects (mountains, trees, treasure, etc.) on the map.", Font::BIG);
+	    Dialog::Message(_("Object Mode"), _("Used to place objects (mountains, trees, treasure, etc.) on the map."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSelectInfo))
-	    Dialog::Message("Detail Mode", "Used for special editing of monsters, heroes and towns.", Font::BIG);
+	    Dialog::Message(_("Detail Mode"), _("Used for special editing of monsters, heroes and towns."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSelectRiver))
-	    Dialog::Message("Stream Mode", "Allows you to draw streams by clicking and dragging.", Font::BIG);
+	    Dialog::Message(_("Stream Mode"), _("Allows you to draw streams by clicking and dragging."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSelectRoad))
-	    Dialog::Message("Road Mode", "Allows you to draw roads by clicking and dragging.", Font::BIG);
+	    Dialog::Message(_("Road Mode"), _("Allows you to draw roads by clicking and dragging."), Font::BIG);
 	else
 	if(le.MousePressRight(btnSelectClear))
-	    Dialog::Message("Erase Mode", "Used to erase objects of the map.", Font::BIG);
+	    Dialog::Message(_("Erase Mode"), _("Used to erase objects of the map."), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainWater))
-	    Dialog::Message("Water", "Traversable only by boat.", Font::BIG);
+	    Dialog::Message(_("Water"), _("Traversable only by boat."), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainGrass))
-	    Dialog::Message("Grass", "No special modifiers.", Font::BIG);
+	    Dialog::Message(_("Grass"), _("No special modifiers."), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainSnow))
-	    Dialog::Message("Snow", "Cost 1.5 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
+	    Dialog::Message(_("Snow"), _("Cost 1.5 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)"), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainSwamp))
-	    Dialog::Message("Swamp", "Cost 1.75 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
+	    Dialog::Message(_("Swamp"), _("Cost 1.75 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)"), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainLava))
-	    Dialog::Message("Lava", "No special modifiers.", Font::BIG);
+	    Dialog::Message(_("Lava"), _("No special modifiers."), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainBeach))
-	    Dialog::Message("Beach", "Cost 1.25 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
+	    Dialog::Message(_("Beach"), _("Cost 1.25 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)"), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainDirt))
-	    Dialog::Message("Dirt", "No special modifiers.", Font::BIG);
+	    Dialog::Message(_("Dirt"), _("No special modifiers."), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainWasteland))
-	    Dialog::Message("Wasteland", "Cost 1.25 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
+	    Dialog::Message(_("Wasteland"), _("Cost 1.25 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)"), Font::BIG);
 	else
 	if(btnSelectGround.isPressed() && le.MousePressRight(rectTerrainDesert))
-	    Dialog::Message("Desert", "Cost 2 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)", Font::BIG);
+	    Dialog::Message(_("Desert"), _("Cost 2 times normal movement for all heroes. (Pathfinding reduces or eliminates the penalty.)"), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectWater))
-	    Dialog::Message("Water Objects", "Used to select objects most appropriate for use on water.", Font::BIG);
+	    Dialog::Message(_("Water Objects"), _("Used to select objects most appropriate for use on water."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectGrass))
-	    Dialog::Message("Grass Objects", "Used to select objects most appropriate for use on grass.", Font::BIG);
+	    Dialog::Message(_("Grass Objects"), _("Used to select objects most appropriate for use on grass."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectSnow))
-	    Dialog::Message("Snow Objects", "Used to select objects most appropriate for use on snow.", Font::BIG);
+	    Dialog::Message(_("Snow Objects"), _("Used to select objects most appropriate for use on snow."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectSwamp))
-	    Dialog::Message("Swamp Objects", "Used to select objects most appropriate for use on swamp.", Font::BIG);
+	    Dialog::Message(_("Swamp Objects"), _("Used to select objects most appropriate for use on swamp."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectLava))
-	    Dialog::Message("Lava Objects", "Used to select objects most appropriate for use on lava.", Font::BIG);
+	    Dialog::Message(_("Lava Objects"), _("Used to select objects most appropriate for use on lava."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectDesert))
-	    Dialog::Message("Desert Objects", "Used to select objects most appropriate for use on desert.", Font::BIG);
+	    Dialog::Message(_("Desert Objects"), _("Used to select objects most appropriate for use on desert."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectDirt))
-	    Dialog::Message("Dirt Objects", "Used to select objects most appropriate for use on dirt.", Font::BIG);
+	    Dialog::Message(_("Dirt Objects"), _("Used to select objects most appropriate for use on dirt."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectWasteland))
-	    Dialog::Message("Wasteland Objects", "Used to select objects most appropriate for use on wasteland.", Font::BIG);
+	    Dialog::Message(_("Wasteland Objects"), _("Used to select objects most appropriate for use on wasteland."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectBeach))
-	    Dialog::Message("Beach Objects", "Used to select objects most appropriate for use on beach.", Font::BIG);
+	    Dialog::Message(_("Beach Objects"), _("Used to select objects most appropriate for use on beach."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectTown))
-	    Dialog::Message("Towns", "Used to place a town or castle.", Font::BIG);
+	    Dialog::Message(_("Towns"), _("Used to place a town or castle."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectMonster))
-	    Dialog::Message("Monsters", "Used to place a monster group.", Font::BIG);
+	    Dialog::Message(_("Monsters"), _("Used to place a monster group."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectHero))
-	    Dialog::Message("Heroes", "Used to place a hero.", Font::BIG);
+	    Dialog::Message(_("Heroes"), _("Used to place a hero."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectArtifact))
-	    Dialog::Message("Artifact", "Used to place an artifact.", Font::BIG);
+	    Dialog::Message(_("Artifact"), _("Used to place an artifact."), Font::BIG);
 	else
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectResource))
-	    Dialog::Message("Treasures", "Used to place a resource or treasure.", Font::BIG);
+	    Dialog::Message(_("Treasures"), _("Used to place a resource or treasure."), Font::BIG);
 
 	if(scrollDir)
 	{

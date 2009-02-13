@@ -138,22 +138,22 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     {
 	case Skill::Primary::ATTACK:
 	    index = 0;
-	    skill_name = Skill::Primary::String(skill) + " Skill";
+	    skill_name = _("Attack Skill");
 	    break;
 
 	case Skill::Primary::DEFENCE:
 	    index = 1;
-	    skill_name = Skill::Primary::String(skill) + " Skill";
+	    skill_name = _("Defense Skill");
 	    break;
 
 	case Skill::Primary::POWER:
 	    index = 2;
-	    skill_name = "Spell " + Skill::Primary::String(skill);
+	    skill_name = _("Spell Power");
 	    break;
 
 	case Skill::Primary::KNOWLEDGE:
 	    index = 3;
-	    skill_name = Skill::Primary::String(skill);
+	    skill_name = _("Knowledge");
 	    break;
 
 	default: break;

@@ -76,7 +76,9 @@ void Game::DialogPlayersTurn(const Color::color_t color)
    	    default: break;
     }
 
-    Dialog::SpriteInfo("", Color::String(color) + _(" player's turn"), sign);
+    std::string str = _("%{color} player's turn");
+    String::Replace(str, "%{color}", Color::String(color));
+    Dialog::SpriteInfo("", str, sign);
 }
 
 bool Game::CursorChangePosition(const u16 index)
@@ -723,9 +725,8 @@ Game::menu_t Game::HumanTurn(void)
     if(1 < world.CountWeek() && world.BeginWeek())
     {
 	const Week::type_t name = world.GetWeekType();
-	std::string message(_("Astrologers proclaim "));
-	message += world.BeginMonth() ? _("month") : _("week");
-	message += _(" of the ") + Week::GetString(name) + ".";
+	std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
+	String::Replace(message, "%{name}", Week::GetString(name));
 	message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
 	Dialog::Message("", message, Font::BIG, Dialog::OK);
     }

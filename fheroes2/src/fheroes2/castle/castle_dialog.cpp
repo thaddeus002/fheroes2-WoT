@@ -770,16 +770,16 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5]);
 
 	// status message exit
-	if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(isCastle() ? "Exit castle" : "Exit town");
+	if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(isCastle() ? _("Exit castle") : _("Exit town"));
 	else
 	// status message prev castle
-	if(le.MouseCursor(buttonPrevCastle)) statusBar.ShowMessage("Show previous town");
+	if(le.MouseCursor(buttonPrevCastle)) statusBar.ShowMessage(_("Show previous town"));
 	else
 	// status message next castle
-	if(le.MouseCursor(buttonNextCastle)) statusBar.ShowMessage("Show next town");
+	if(le.MouseCursor(buttonNextCastle)) statusBar.ShowMessage(_("Show next town"));
 	else
 	// status message view hero
-	if(castle_heroes && le.MouseCursor(rectHeroPortrait)) statusBar.ShowMessage("View Hero");
+	if(castle_heroes && le.MouseCursor(rectHeroPortrait)) statusBar.ShowMessage(_("View Hero"));
 	else
 	// building
 	if(building & BUILD_THIEVESGUILD && le.MouseCursor(coordBuildingThievesGuild)) statusBar.ShowMessage(GetStringBuilding(BUILD_THIEVESGUILD));
@@ -838,6 +838,7 @@ Dialog::answer_t Castle::OpenDialog(void)
             {
 		const Army::Troop & troop1 = army.At(index1);
 		const std::string & monster1 = troop1.GetName();
+		std::string str;
 
 		if(selectCaptainArmy.isSelected())
 		{
@@ -846,14 +847,22 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const std::string & monster2 = troop2.GetName();
 
 		    if(index1 == index2)
-			statusBar.ShowMessage("View " + monster1);
+		    {
+			str = _("View %{name}");
+			String::Replace(str, "%{name}", monster1);
+		    }
 		    else
 		    if(troop1.isValid() && troop2.isValid())
-			troop1() == troop2() ?
-			statusBar.ShowMessage("Combine " + monster1 + " armies") :
-			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    {
+			str = troop1() == troop2() ? _("Combine %{name} armies") : _("Exchange %{name2} with %{name}");
+			String::Replace(str, "%{name}", monster1);
+			String::Replace(str, "%{name2}", monster2);
+		    }
 		    else
-			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		    {
+		    	str = _("Move and right click Redistribute %{name}");
+			String::Replace(str, "%{name}", monster2);
+		    }
 		}
 		else
 		if(castle_heroes && selectHeroesArmy.isSelected())
@@ -863,20 +872,30 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const std::string & monster2 = troop2.GetName();
 
 		    if(selectHeroesArmy.SaveLastTroop() && !troop1.isValid())
-			statusBar.ShowMessage("Cannot move last army to garrison");
+			str = _("Cannot move last army to garrison");
 		    else
 		    if(troop1.isValid() && troop2.isValid())
-			troop1() == troop2() ?
-			statusBar.ShowMessage("Combine " + monster1 + " armies") :
-			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    {
+			str = troop1() == troop2() ? _("Combine %{name} armies") : _("Exchange %{name2} with %{name}");
+			String::Replace(str, "%{name}", monster1);
+			String::Replace(str, "%{name2}", monster2);
+		    }
 		    else
-			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		    {
+		    	str = _("Move and right click Redistribute %{name}");
+			String::Replace(str, "%{name}", monster2);
+		    }
 		}
 		else
 		if(troop1.isValid())
-		    statusBar.ShowMessage("Select " + monster1);
+		{
+		    str = _("Select %{name}");
+		    String::Replace(str, "%{name}", monster1);
+		}
 		else
-		    statusBar.ShowMessage("Empty");
+		    str = _("Empty");
+
+		    statusBar.ShowMessage(str);
 	    }
 	}
 	else
@@ -888,7 +907,8 @@ Dialog::answer_t Castle::OpenDialog(void)
             {
 		const Army::Troop & troop1 = castle_heroes->GetArmy().At(index1);
 		const std::string & monster1 = troop1.GetName();
-
+		std::string str;
+		
 		if(selectHeroesArmy.isSelected())
 		{
 		    const u8 index2 = selectHeroesArmy.Selected();
@@ -896,14 +916,22 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const std::string & monster2 = troop2.GetName();
 
 		    if(index1 == index2)
-			statusBar.ShowMessage("View " + monster1);
+		    {
+			str = _("View %{name}");
+			String::Replace(str, "%{name}", monster1);
+		    }
 		    else
 		    if(troop1.isValid() && troop2.isValid())
-			troop1() == troop2() ?
-			statusBar.ShowMessage("Combine " + monster1 + " armies") :
-			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    {
+			str = troop1() == troop2() ? _("Combine %{name} armies") : _("Exchange %{name2} with %{name}");
+			String::Replace(str, "%{name}", monster1);
+			String::Replace(str, "%{name2}", monster2);
+		    }
 		    else
-			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		    {
+			str = _("Move and right click Redistribute %{name}");
+			String::Replace(str, "%{name}", monster2);
+		    }
 		}
 		else
 		if(selectCaptainArmy.isSelected())
@@ -913,17 +941,27 @@ Dialog::answer_t Castle::OpenDialog(void)
 		    const std::string & monster2 = troop2.GetName();
 
 		    if(troop1.isValid() && troop2.isValid())
-			troop1() == troop2() ?
-			statusBar.ShowMessage("Combine " + monster1 + " armies") :
-			statusBar.ShowMessage("Exchange " + monster2 + " with " + monster1);
+		    {
+			str = troop1() == troop2() ? _("Combine %{name} armies") : _("Exchange %{name2} with %{name}");
+			String::Replace(str, "%{name}", monster1);
+			String::Replace(str, "%{name2}", monster2);
+		    }
 		    else
-			statusBar.ShowMessage("Move and right click Redistribute " + monster2);
+		    {
+			str = _("Move and right click Redistribute %{name}");
+			String::Replace(str, "%{name}", monster2);
+		    }
 		}
 		else
 		if(troop1.isValid())
-		    statusBar.ShowMessage("Select " + monster1);
+		    {
+			str = _("Select %{name}");
+			String::Replace(str, "%{name}", monster1);
+		    }
 		else
-		    statusBar.ShowMessage("Empty");
+		    str = _("Empty");
+
+		    statusBar.ShowMessage(str);
 	    }
 	}
 	

@@ -50,7 +50,7 @@ void Castle::OpenMageGuild(void)
     display.Blit(AGG::GetICN(ICN::WELLXTRA, 2), dst_pt);
 
     // text bar
-    text.Set("The above spells have been added to your book.", Font::BIG);
+    text.Set(_("The above spells have been added to your book."), Font::BIG);
     dst_pt.x = cur_pt.x + 280 - text.w() / 2;
     dst_pt.y = cur_pt.y + 461;
     text.Blit(dst_pt);

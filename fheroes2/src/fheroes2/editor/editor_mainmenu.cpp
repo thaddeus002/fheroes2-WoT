@@ -73,9 +73,9 @@ Game::menu_t Game::Editor::MainMenu(void)
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
 
         // right info
-	if(le.MousePressRight(buttonNewMap)) Dialog::Message("New Map", "Create a new map, either from scratch or using the random map generator.", Font::BIG);
-	if(le.MousePressRight(buttonLoadMap)) Dialog::Message("Load Map", "Load an existing map.", Font::BIG);
-	if(le.MousePressRight(buttonCancelGame)) Dialog::Message("Quit", "Quit out of the map editor.", Font::BIG);
+	if(le.MousePressRight(buttonNewMap)) Dialog::Message(_("New Map"), _("Create a new map, either from scratch or using the random map generator."), Font::BIG);
+	if(le.MousePressRight(buttonLoadMap)) Dialog::Message(_("Load Map"), _("Load an existing map."), Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Quit"), _("Quit out of the map editor."), Font::BIG);
     }
 
     return QUITGAME;

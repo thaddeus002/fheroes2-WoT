@@ -43,7 +43,11 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     const Sprite & sprite_skill2 = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(sec2.Skill()));
 
     Point pt;
-    const std::string message("You may learn either " + Skill::Level::String(sec1.Level()) + " " + Skill::Secondary::String(sec1.Skill()) + " or " + Skill::Level::String(sec2.Level()) + " " + Skill::Secondary::String(sec2.Skill()) + ".");
+    std::string message = _("You may learn either %{level1} %{skill1} or %{level2} %{skill2}.");
+    String::Replace(message, "%{level1}", Skill::Level::String(sec1.Level()));
+    String::Replace(message, "%{skill1}", Skill::Secondary::String(sec1.Skill()));
+    String::Replace(message, "%{level2}", Skill::Level::String(sec2.Level()));
+    String::Replace(message, "%{skill2}", Skill::Secondary::String(sec2.Skill()));
     const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
     const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
 

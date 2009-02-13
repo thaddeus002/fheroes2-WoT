@@ -85,7 +85,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     text.Blit(dst_pt);
     
     // attack
-    text.Set("Attack:");
+    message = _("Attack");
+    message += ":";
+    text.Set(message);
     dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y = pos_rt.y + 40;
     text.Blit(dst_pt);
@@ -105,7 +107,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     text.Blit(dst_pt);
 
     // defense
-    text.Set("Defense:");
+    message = _("Defense");
+    message += ":";
+    text.Set(message);
     dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
     text.Blit(dst_pt);
@@ -127,7 +131,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     // shot
     if(mons.isArchers())
     {
-	text.Set(battle ? "Shots Left:" : "Shots:");
+	message = _(battle ? "Shots Left" : "Shots");
+	message += ":";
+	text.Set(message);
 	dst_pt.x = pos_rt.x + 400 - text.w();
 	dst_pt.y += 18;
 	text.Blit(dst_pt);
@@ -140,7 +146,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     }
 
     // damage
-    text.Set("Damage:");
+    message = _("Damage");
+    message += ":";
+    text.Set(message);
     dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
     text.Blit(dst_pt);
@@ -154,7 +162,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     text.Blit(dst_pt);
 
     // hp
-    text.Set("Hit Points:");
+    message = _("Hit Points");
+    message += ":";
+    text.Set(message);
     dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
     text.Blit(dst_pt);
@@ -167,7 +177,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
 
     if(battle)
     {
-	text.Set("Hit Points Left:");
+	message = _("Hit Points Left");
+	message += ":";
+	text.Set(message);
 	dst_pt.x = pos_rt.x + 400 - text.w();
 	dst_pt.y += 18;
 	text.Blit(dst_pt);
@@ -180,7 +192,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     }
 
     // speed
-    text.Set("Speed:");
+    message = _("Speed");
+    message += ":";
+    text.Set(message);
     dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
     text.Blit(dst_pt);
@@ -190,7 +204,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     text.Blit(dst_pt);
 
     // morale
-    text.Set("Morale:");
+    message = _("Morale");
+    message += ":";
+    text.Set(message);
     dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
     text.Blit(dst_pt);
@@ -200,7 +216,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     text.Blit(dst_pt);
 
     // luck
-    text.Set("Luck:");
+    message = _("Luck");
+    message += ":";
+    text.Set(message);
     dst_pt.x = pos_rt.x + 400 - text.w();
     dst_pt.y += 18;
     text.Blit(dst_pt);

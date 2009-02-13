@@ -44,7 +44,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     Point dst_pt;
     Text text;
 
-    text.Set("Build a new ship:", Font::BIG);
+    text.Set(_("Build a new ship:"), Font::BIG);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
     dst_pt.y = box_rt.y;
     text.Blit(dst_pt);
@@ -54,7 +54,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     dst_pt.y = box_rt.y + 25;
     display.Blit(sprite, dst_pt);
 
-    text.Set("Resource cost:", Font::BIG);
+    text.Set(_("Resource cost:"), Font::BIG);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
     dst_pt.y = box_rt.y + 35 + sprite.h();
     text.Blit(dst_pt);

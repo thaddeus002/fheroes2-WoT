@@ -32,7 +32,7 @@
 
 void Castle::OpenTavern(void)
 {
-    const std::string & header = "A generous tip for the barkeep yields the following rumor:";
+    const std::string & header = _("A generous tip for the barkeep yields the following rumor:");
     const ICN::icn_t system = (Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
     const ICN::icn_t tavwin = ICN::TAVWIN;
     const std::string & tavern = GetStringBuilding(BUILD_TAVERN);

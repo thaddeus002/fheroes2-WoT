@@ -291,19 +291,19 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
  	}
 
 	// right info
-	if(le.MousePressRight(buttonSelectSmall)) Dialog::Message("Small Maps", "View only maps of size small (36x36).", Font::BIG);
-	if(le.MousePressRight(buttonSelectMedium)) Dialog::Message("Medium Maps", "View only maps of size medium (72x72).", Font::BIG);
-	if(le.MousePressRight(buttonSelectLarge)) Dialog::Message("Large Maps", "View only maps of size large (108x108).", Font::BIG);
-	if(le.MousePressRight(buttonSelectXLarge)) Dialog::Message("Extra Large Maps", "View only maps of size extra large (144x144).", Font::BIG);
-	if(le.MousePressRight(buttonSelectAll)) Dialog::Message("All Maps", "View all maps, regardless of size.", Font::BIG);
-	if(le.MousePressRight(countPlayers)) Dialog::Message("Players Icon", "Indicates how many players total are in the EditScenario. Any positions not occupied by humans will be occupied by computer players.", Font::BIG);
-	if(le.MousePressRight(sizeMaps)) Dialog::Message("Size Icon", "Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144).", Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message("Selected Name", "The name of the currently selected map.", Font::BIG);
-	if(le.MousePressRight(victoryCond)) Dialog::Message("Victory Condition Icon", "There are 6 possiblities: FIXME.", Font::BIG);
-	if(le.MousePressRight(lossCond)) Dialog::Message("Loss Condition Icon", "There are 4 possible loss conditions, as indicated by the following icons: FIXME.", Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message("Selected Map Difficulty", "The map difficulty of the currently selected map.  The map difficulty is determined by the EditScenario designer. More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player.", Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message("Selected Description", "The description of the currently selected map.", Font::BIG);
-	if(le.MousePressRight(buttonOk)) Dialog::Message("OK", "Accept the choice made.", Font::BIG);
+	if(le.MousePressRight(buttonSelectSmall)) Dialog::Message(_("Small Maps"), _("View only maps of size small (36x36)."), Font::BIG);
+	if(le.MousePressRight(buttonSelectMedium)) Dialog::Message(_("Medium Maps"), _("View only maps of size medium (72x72)."), Font::BIG);
+	if(le.MousePressRight(buttonSelectLarge)) Dialog::Message(_("Large Maps"), _("View only maps of size large (108x108)."), Font::BIG);
+	if(le.MousePressRight(buttonSelectXLarge)) Dialog::Message(_("Extra Large Maps"), _("View only maps of size extra large (144x144)."), Font::BIG);
+	if(le.MousePressRight(buttonSelectAll)) Dialog::Message(_("All Maps"), _("View all maps, regardless of size."), Font::BIG);
+	if(le.MousePressRight(countPlayers)) Dialog::Message(_("Players Icon"), _("Indicates how many players total are in the EditScenario. Any positions not occupied by humans will be occupied by computer players."), Font::BIG);
+	if(le.MousePressRight(sizeMaps)) Dialog::Message(_("Size Icon"), _("Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144)."), Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Name"), _("The name of the currently selected map."), Font::BIG);
+	if(le.MousePressRight(victoryCond)) Dialog::Message(_("Victory Condition Icon"), _("There are 6 possiblities: FIXME."), Font::BIG);
+	if(le.MousePressRight(lossCond)) Dialog::Message(_("Loss Condition Icon"), _("There are 4 possible loss conditions, as indicated by the following icons: FIXME."), Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Map Difficulty"), _("The map difficulty of the currently selected map.  The map difficulty is determined by the EditScenario designer. More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player."), Font::BIG);
+	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Description"), _("The description of the currently selected map."), Font::BIG);
+	if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Accept the choice made."), Font::BIG);
 
 	// exit
 	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN)) break;
@@ -427,7 +427,7 @@ void DrawSelectInfo(const Maps::FileInfo & finfo)
     const Sprite &spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteLoss, x + 211 + spriteWins.w(), y);
 
-    text.Set("Maps difficulty:");
+    text.Set(_("Maps difficulty:"));
     text.Blit(200, 295);
 
     text.Set(Difficulty::String(finfo.Difficulty()));

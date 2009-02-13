@@ -57,7 +57,7 @@ public:
         splitter.SetArea(Rect(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 1).w()) / 2 + 22, pos_rt.y + 132, 188, 10));
 	splitter.SetOrientation(Splitter::HORIZONTAL);
 
-	TextBox("Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for.", Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
+	TextBox(_("Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for."), Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
 
         textSell.SetFont(Font::SMALL);
         textBuy.SetFont(Font::SMALL);
@@ -90,7 +90,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         cursor.Hide();
         back.Restore();
         Rect dst_rt(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100);
-        TextBox("You have received quite a bargain. I expect to make no profit on the deal. Can I interest you in any of my other wares?", Font::BIG, dst_rt);
+        TextBox(_("You have received quite a bargain. I expect to make no profit on the deal. Can I interest you in any of my other wares?"), Font::BIG, dst_rt);
 	buttonTrade.SetDisable(true);
         buttonLeft.SetDisable(true);
         buttonRight.SetDisable(true);
@@ -114,15 +114,16 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
 	std::string message;
         if(Resource::GOLD == resourceTo)
         {
-            message = "I can offer you ";
-            String::AddInt(message, exchange_rate);
-            message += " units of " + Resource::String(rs_to) + " for 1 unit of " + Resource::String(rs_from);
+            message = _("I can offer you %{count} for 1 unit of %{resfrom}.");
+            String::Replace(message, "%{count}", exchange_rate);
+            String::Replace(message, "%{resfrom}", Resource::String(rs_from));
         }
         else
         {
-            message = "I can offer you 1 unit of " + Resource::String(rs_to) + " for ";
-            String::AddInt(message, exchange_rate);
-            message += " units of " + Resource::String(rs_from) + ".";
+            message = _("I can offer you 1 unit of %{resto} for %{count} units of %{resfrom}.");
+            String::Replace(message, "%{resto}", Resource::String(rs_to));
+            String::Replace(message, "%{resfrom}", Resource::String(rs_from));
+            String::Replace(message, "%{count}", exchange_rate);
         }
         TextBox(message, Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
         const Sprite & sprite_from = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(rs_from));
@@ -141,7 +142,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2;
         dst_pt.y = pos_rt.y + 90;
         display.Blit(sprite_fromto, dst_pt);
-        Text text("Qty to trade", Font::SMALL);
+        Text text(_("Qty to trade"), Font::SMALL);
         dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2;
         dst_pt.y = pos_rt.y + 110;
         text.Blit(dst_pt);
@@ -187,7 +188,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 {
     Display & display = Display::Get();
     const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
-    const std::string & header = "Marketplace";
+    const std::string & header = _("Marketplace");
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -211,7 +212,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     Kingdom & kingdom = world.GetMyKingdom();
     const Sprite & spritecursor = AGG::GetICN(tradpost, 14);
 
-    const std::string & header_from = "Your Resources";
+    const std::string & header_from = _("Your Resources");
 
     Resource::funds_t fundsFrom = kingdom.GetFundsResource();
     u8 resourceFrom = 0;
@@ -231,7 +232,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     text.Blit(dst_pt);
     RedrawFromResource(pt1, fundsFrom);
 
-    const std::string & header_to = "Available Trades";
+    const std::string & header_to = _("Available Trades");
 
     Resource::funds_t fundsTo;
     u8 resourceTo = 0;
@@ -659,7 +660,7 @@ void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPo
 
     if(rs_from == rs_to)
     {
-	str = "n/a";
+	str = _("n/a");
 	
 	return;
     }

@@ -63,7 +63,9 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     Text text;
 
     // text recruit monster
-    text.Set("Recruit " + monster.GetName(), Font::BIG);
+    str = _("Recruit %{name}");
+    String::Replace(str, "%{name}", monster.GetName());
+    text.Set(str, Font::BIG);
     dst_pt.x = pos.x + (pos.w - text.w()) / 2;
     dst_pt.y = pos.y + 25;
     text.Blit(dst_pt);
@@ -228,7 +230,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     }
 
     // text number buy
-    text.Set("Number to buy:");
+    text.Set(_("Number to buy:"));
     dst_pt.x = pos.x + 30;
     dst_pt.y = pos.y + 163;
     text.Blit(dst_pt);
@@ -237,8 +239,8 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     static_info.Save();
 
 #define RedrawCurrentInfo \
-    str = "Available: "; \
-    String::AddInt(str, available); \
+    str = _("Available: %{count}"); \
+    String::Replace(str, "%{count}", available); \
     text.Set(str, Font::SMALL); \
     text.Blit(pos.x + 70 - text.w() / 2, pos.y + 130); \
     str.clear(); \
@@ -395,7 +397,9 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     std::string str;
 
     // text recruit monster
-    text.Set("Recruit " + monster.GetName(), Font::BIG);
+    str = _("Recruit %{name}");
+    String::Replace(str, "%{name}", monster.GetName());
+    text.Set(str, Font::BIG);
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 25);
 
     // sprite monster
@@ -524,8 +528,8 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     }
 
     // text available
-    str = "Available: ";
-    String::AddInt(str, available);
+    str = _("Available: %{count}");
+    String::Replace(str, "%{count}", available);
     text.Set(str);
     text.Blit(pos.x + 70 - text.w() / 2, pos.y + 130);
 

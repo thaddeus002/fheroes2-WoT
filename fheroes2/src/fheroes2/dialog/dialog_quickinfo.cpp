@@ -82,7 +82,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     const Settings & settings = Settings::Get();
 
     if(!settings.Debug() && tile.isFog(settings.CurrentColor()))
-	name_object = "Unchartered Territory";
+	name_object = _("Unchartered Territory");
     else
     switch(tile.GetObject())
     {
@@ -90,18 +90,18 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     	{
     	    switch(Army::GetSize(tile.GetCountMonster()))
     	    {
-		case Army::FEW:		name_object = "A few "; break;
-		case Army::SEVERAL:	name_object = "Several "; break;
-		case Army::PACK:	name_object = "A pack of "; break;
-		case Army::LOTS:	name_object = "Lots of "; break;
-		case Army::HORDE:	name_object = "A horde of "; break;
-		case Army::THRONG:	name_object = "A throng of "; break;
-		case Army::SWARM:	name_object = "A swarm of "; break;
-		case Army::ZOUNDS:	name_object = "Zounds of "; break;
-		case Army::LEGION:	name_object = "A legion of "; break;
+		case Army::FEW:		name_object = _("A few %{monster}"); break;
+		case Army::SEVERAL:	name_object = _("Several %{monster}"); break;
+		case Army::PACK:	name_object = _("A pack of %{monster}"); break;
+		case Army::LOTS:	name_object = _("Lots of %{monster}"); break;
+		case Army::HORDE:	name_object = _("A horde of %{monster}"); break;
+		case Army::THRONG:	name_object = _("A throng of %{monster}"); break;
+		case Army::SWARM:	name_object = _("A swarm of %{monster}"); break;
+		case Army::ZOUNDS:	name_object = _("Zounds of %{monster}"); break;
+		case Army::LEGION:	name_object = _("A legion of %{monster}"); break;
             }
 
-            name_object += Monster(tile).GetMultiName();
+            String::Replace(name_object, "%{monster}", Monster(tile).GetMultiName());
     	}
     	    break;
 
@@ -117,7 +117,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_STANDINGSTONES:
 	    // check visited
 	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
-		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile) ? "(already visited)" : "(not visited)";
+		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile) ? _("(already visited)") : _("(not visited)");
 	    break;
 
 	case MP2::OBJ_FOUNTAIN:
@@ -129,7 +129,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_WATERINGHOLE:
 	    // check visited
 	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
-		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile.GetObject()) ? "(already visited)" : "(not visited)";
+		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)");
 	    break;
 
 	case MP2::OBJ_SHRINE1:
@@ -148,7 +148,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
         case MP2::OBJ_OBELISK:
             // check visited
-            visit_status = world.GetKingdom(settings.MyColor()).isVisited(tile) ? "(already visited)" : "(not visited)";
+            visit_status = world.GetKingdom(settings.MyColor()).isVisited(tile) ? _("(already visited)") : _("(not visited)");
             break;
 
         default: break;
@@ -282,7 +282,7 @@ void Dialog::QuickInfo(const Castle & castle)
     display.Blit(r_flag, dst_pt);
 
     // info
-    text.Set("Defenders:");
+    text.Set(_("Defenders:"));
     dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
     dst_pt.y += sprite.h() + 5;
     text.Blit(dst_pt);
@@ -291,7 +291,7 @@ void Dialog::QuickInfo(const Castle & castle)
 
     if(! count)
     {
-	text.Set("None");
+	text.Set(_("None"));
 	dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
 	dst_pt.y += 45;
 	text.Blit(dst_pt);
@@ -393,21 +393,25 @@ void Dialog::QuickInfo(const Heroes & hero)
     const Sprite & r_flag = AGG::GetICN(ICN::FLAG32, index + 1);
     dst_pt.x = cur_rt.x + (cur_rt.w + 40) / 2;
     display.Blit(r_flag, dst_pt);
+    std::string message;
 
     // attack
-    text.Set("Attack:");
+    message = _("Attack");
+    message += ":";
+    text.Set(message);
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += port.h() + 4;
     text.Blit(dst_pt);
 
-    std::string message;
     String::AddInt(message, hero.GetAttack());
     text.Set(message);
     dst_pt.x += 75;
     text.Blit(dst_pt);
 
     // defense
-    text.Set("Defense:");
+    message = _("Defense");
+    message += ":";
+    text.Set(message);
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
     text.Blit(dst_pt);
@@ -419,7 +423,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // power
-    text.Set("Spell Power:");
+    message = _("Spell Power");
+    message += ":";
+    text.Set(message);
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
     text.Blit(dst_pt);
@@ -431,7 +437,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // knowledge
-    text.Set("Knowledge:     ");
+    message = _("Knowledge");
+    message += ":";
+    text.Set(message);
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
     text.Blit(dst_pt);
@@ -443,7 +451,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
     
     // spell point
-    text.Set("Spell Points:  ");
+    message = _("Spell Points");
+    message += ":";
+    text.Set(message);
     dst_pt.x = cur_rt.x + 35;
     dst_pt.y += 12;
     text.Blit(dst_pt);

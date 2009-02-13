@@ -351,31 +351,31 @@ u8 Castle::GetLevelMageGuild(void)
 
 const std::string & Castle::GetStringBuilding(const building_t & build, const Race::race_t & race)
 {
-    static const std::string str_build[] = { "Thieves' Guild", "Tavern", "Shipyard", "Well", "Statue", "Left Turret",
-	"Right Turret", "Marketplace", "Moat", "Castle", "Tent", "Captain's Quarters", "Mage Guild, Level 1", 
-	 "Mage Guild, Level 2",  "Mage Guild, Level 3",  "Mage Guild, Level 4",  "Mage Guild, Level 5", "Unknown" };
+    static const std::string str_build[] = { _("Thieves' Guild"), _("Tavern"), _("Shipyard"), _("Well"), _("Statue"), _("Left Turret"),
+	_("Right Turret"), _("Marketplace"), _("Moat"), _("Castle"), _("Tent"), _("Captain's Quarters"), _("Mage Guild, Level 1"), 
+	 _("Mage Guild, Level 2"), _("Mage Guild, Level 3"), _("Mage Guild, Level 4"), _("Mage Guild, Level 5"), "Unknown" };
 
-    static const std::string str_wel2[] = { "Farm", "Garbage Heap", "Crystal Garden", "Waterfall", "Orchard", "Skull Pile" };
+    static const std::string str_wel2[] = { _("Farm"), _("Garbage Heap"), _("Crystal Garden"), _("Waterfall"), _("Orchard"), _("Skull Pile") };
 
-    static const std::string str_spec[] = { "Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm" };
+    static const std::string str_spec[] = { _("Fortifications"), _("Coliseum"), _("Rainbow"), _("Dungeon"), _("Library"), _("Storm") };
 
     static const std::string str_dwelling[] = {
-	"Thatched Hut", "Hut", "Treehouse", "Cave", "Habitat", "Excavation",
-	"Archery Range", "Stick Hut", "Cottage", "Crypt", "Pen", "Graveyard",
-	"Blacksmith", "Den", "Archery Range", "Nest", "Foundry", "Pyramid",
-	"Armory", "Adobe", "Stonehenge", "Maze", "Cliff Nest", "Mansion",
-	"Jousting Arena", "Bridge", "Fenced Meadow", "Swamp", "Ivory Tower", "Mausoleum",
-	"Cathedral", "Pyramid", "Red Tower", "Green Tower", "Cloud Castle", "Laboratory" };
+	_("Thatched Hut"), _("Hut"), _("Treehouse"), _("Cave"), _("Habitat"), _("Excavation"),
+	_("Archery Range"), _("Stick Hut"), _("Cottage"), _("Crypt"), _("Pen"), _("Graveyard"),
+	_("Blacksmith"), _("Den"), _("Archery Range"), _("Nest"), _("Foundry"), _("Pyramid"),
+	_("Armory"), _("Adobe"), _("Stonehenge"), _("Maze"), _("Cliff Nest"), _("Mansion"),
+	_("Jousting Arena"), _("Bridge"), _("Fenced Meadow"), _("Swamp"), _("Ivory Tower"), _("Mausoleum"),
+	_("Cathedral"), _("Pyramid"), _("Red Tower"), _("Green Tower"), _("Cloud Castle"), _("Laboratory") };
 
     static const std::string str_upgrade[] = {
-	"Upg. Archery Range", "Upg. Stick Hut", "Upg. Cottage", "Crypt", "Pen", "Upg. Graveyard",
-	"Upg. Blacksmith", "Den", "Upg. Archery Range", "Nest", "Upg. Foundry", "Upg. Pyramid",
-	"Upg. Armory", "Upg. Adobe", "Upg. Stonehenge", "Upg. Maze", "Cliff Nest", "Upg. Mansion",
-	"Upg. Jousting Arena", "Upg. Bridge", "Fenced Meadow", "Swamp", "Upg. Ivory Tower", "Upg. Mausoleum",
-	"Upg. Cathedral", "Pyramid", "Red Tower", "Red Tower", "Upg. Cloud Castle", "Laboratory",
-	"", "", "", "Black Tower", "", "" };
+	_("Upg. Archery Range"), _("Upg. Stick Hut"), _("Upg. Cottage"), _("Crypt"), _("Pen"), _("Upg. Graveyard"),
+	_("Upg. Blacksmith"), _("Den"), _("Upg. Archery Range"), _("Nest"), _("Upg. Foundry"), _("Upg. Pyramid"),
+	_("Upg. Armory"), _("Upg. Adobe"), _("Upg. Stonehenge"), _("Upg. Maze"), _("Cliff Nest"), _("Upg. Mansion"),
+	_("Upg. Jousting Arena"), _("Upg. Bridge"), _("Fenced Meadow"), _("Swamp"), _("Upg. Ivory Tower"), _("Upg. Mausoleum"),
+	_("Upg. Cathedral"), _("Pyramid"), _("Red Tower"), _("Red Tower"), _("Upg. Cloud Castle"), _("Laboratory"),
+	"", "", "", _("Black Tower"), "", "" };
 
-    static const std::string shrine = "Shrine";
+    static const std::string shrine = _("Shrine");
 
     u8 offset = 0;
 
@@ -438,37 +438,37 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
 const std::string & Castle::GetDescriptionBuilding(const building_t & build, const Race::race_t & race)
 {
     static const std::string desc_build[] = {
-	"The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns.",
-	"The Tavern increases morale for troops defending the castle.",
-	"The Shipyard allows ships to be built.",
-	"The Well increases the growth rate of all dwellings by 2 creatures per week.",
-	"The Statue increases your town's income by 250 per day.",
-	"The Left Turret provides extra firepower during castle combat.",
-	"The Right Turret provides extra firepower during castle combat.",
-	"The Marketplace can be used to convert one type of resource into another. The more marketplaces you control, the better the exchange rate.",
-	"The Moat slows attacking units. Any unit entering the moat must end its turn there and becomes more vulnerable to attack.",
-	"The Castle improves town defense and increases income to 1000 gold per day.",
-	"The Tent provides workers to build a castle, provided the materials and the gold are available.",
-	"The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.",
-	"The Mage Guild allows heroes to learn spells and replenish their spell points.", "Unknown" };
+	_("The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns."),
+	_("The Tavern increases morale for troops defending the castle."),
+	_("The Shipyard allows ships to be built."),
+	_("The Well increases the growth rate of all dwellings by 2 creatures per week."),
+	_("The Statue increases your town's income by 250 per day."),
+	_("The Left Turret provides extra firepower during castle combat."),
+	_("The Right Turret provides extra firepower during castle combat."),
+	_("The Marketplace can be used to convert one type of resource into another. The more marketplaces you control, the better the exchange rate."),
+	_("The Moat slows attacking units. Any unit entering the moat must end its turn there and becomes more vulnerable to attack."),
+	_("The Castle improves town defense and increases income to 1000 gold per day."),
+	_("The Tent provides workers to build a castle, provided the materials and the gold are available."),
+	_("The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present."),
+	_("The Mage Guild allows heroes to learn spells and replenish their spell points."), "Unknown" };
 
     static const std::string desc_wel2[] = {
-	"The Farm increases production of Peasants by 8 per week.",
-	"The Garbage Heap increases production of Goblins by 8 per week.",
-	"The Crystal Garden increases production of Sprites by 8 per week.",
-	"The Waterfall increases production of Centaurs by 8 per week.",
-	"The Orchard increases production of Halflings by 8 per week.",
-	"The Skull Pile increases production of Skeletons by 8 per week." };
+	_("The Farm increases production of Peasants by 8 per week."),
+	_("The Garbage Heap increases production of Goblins by 8 per week."),
+	_("The Crystal Garden increases production of Sprites by 8 per week."),
+	_("The Waterfall increases production of Centaurs by 8 per week."),
+	_("The Orchard increases production of Halflings by 8 per week."),
+	_("The Skull Pile increases production of Skeletons by 8 per week.") };
 
     static const std::string desc_spec[] = {
-	"The Fortifications increase the toughness of the walls, increasing the number of turns it takes to knock them down.",
-	"The Coliseum provides inspiring spectacles to defending troops, raising their morale by two during combat.",
-	"The Rainbow increases the luck of the defending units by two.",
-	"The Dungeon increases the income of the town by 500 / day.",
-	"The Library increases the number of spells in the Guild by one for each level of the guild.",
-	"The Storm adds +2 to the power of spells of a defending spell caster." };
+	_("The Fortifications increase the toughness of the walls, increasing the number of turns it takes to knock them down."),
+	_("The Coliseum provides inspiring spectacles to defending troops, raising their morale by two during combat."),
+	_("The Rainbow increases the luck of the defending units by two."),
+	_("The Dungeon increases the income of the town by 500 / day."),
+	_("The Library increases the number of spells in the Guild by one for each level of the guild."),
+	_("The Storm adds +2 to the power of spells of a defending spell caster.") };
 
-    static const std::string shrine_descr = "The Shrine increases the necromancy skill of all your necromancers by 10 percent.";
+    static const std::string shrine_descr = _("The Shrine increases the necromancy skill of all your necromancers by 10 percent.");
 
     u8 offset = 0;
 

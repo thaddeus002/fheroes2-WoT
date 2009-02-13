@@ -88,11 +88,11 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
 
 	// right info
-        if(le.MousePressRight(buttonWorld)) Dialog::Message("", "View the entire world.", Font::BIG);
-        if(le.MousePressRight(buttonPuzzle)) Dialog::Message("", "View the obelisk puzzle.", Font::BIG);
-        if(le.MousePressRight(buttonInfo)) Dialog::Message("", "View information on the scenario you are currently playing.", Font::BIG);
-        if(le.MousePressRight(buttonDig)) Dialog::Message("", "Dig for the Ultimate Artifact.", Font::BIG);
-        if(le.MousePressRight(buttonCancel)) Dialog::Message("", "Exit this menu without doing anything.", Font::BIG);
+        if(le.MousePressRight(buttonWorld)) Dialog::Message("", _("View the entire world."), Font::BIG);
+        if(le.MousePressRight(buttonPuzzle)) Dialog::Message("", _("View the obelisk puzzle."), Font::BIG);
+        if(le.MousePressRight(buttonInfo)) Dialog::Message("", _("View information on the scenario you are currently playing."), Font::BIG);
+        if(le.MousePressRight(buttonDig)) Dialog::Message("", _("Dig for the Ultimate Artifact."), Font::BIG);
+        if(le.MousePressRight(buttonCancel)) Dialog::Message("", _("Exit this menu without doing anything."), Font::BIG);
     }
 
     // restore background

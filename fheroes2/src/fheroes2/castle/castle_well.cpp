@@ -143,7 +143,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     Text text;
     Point dst_pt, pt;
 
-    text.Set("Town Population Information and Statistics", Font::BIG);
+    text.Set(_("Town Population Information and Statistics"), Font::BIG);
     dst_pt.x = cur_pt.x + 280 - text.w() / 2;
     dst_pt.y = cur_pt.y + 462;
     text.Blit(dst_pt);
@@ -246,21 +246,24 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	text.Blit(dst_pt);
 	// attack
 	std::string str;
-	str = "Attack: ";
+	str = _("Attack");
+	str += ": ";
 	String::AddInt(str, monster.GetAttack());
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 22;
 	text.Blit(dst_pt);
 	// defense
-	str = "Defense: ";
+	str = _("Defense");
+	str += ": ";
 	String::AddInt(str, monster.GetDefense());
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 34;
 	text.Blit(dst_pt);
 	// damage
-	str = "Damg: ";
+	str = _("Damg");
+	str += ": ";
 	String::AddInt(str, monster.GetDamageMin());
 	str += "-";
 	String::AddInt(str, monster.GetDamageMax());
@@ -269,14 +272,16 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	dst_pt.y = pt.y + 46;
 	text.Blit(dst_pt);
 	// hp
-	str = "HP: ";
+	str = _("HP");
+	str += ": ";
 	String::AddInt(str, monster.GetHitPoints());
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 58;
 	text.Blit(dst_pt);
         // speed
-        str = "Speed:";
+        str = _("Speed");
+        str += ": ";
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 78;
@@ -292,19 +297,22 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	    grown += building & BUILD_WELL ? GROWN_WELL : 0;
 	    if(DWELLING_MONSTER1 & building) grown += building & BUILD_WEL2 ? GROWN_WEL2 : 0;
 
-    	    text.Set("Growth");
+    	    text.Set(_("Growth"));
 	    dst_pt.x = pt.x + 268 - text.w() / 2;
     	    dst_pt.y = pt.y + 110;
     	    text.Blit(dst_pt);
 	    str = "+ ";
 	    String::AddInt(str, grown);
-    	    str += " / week";
+    	    str += " / ";
+    	    str += _("week");
 	    text.Set(str);
 	    dst_pt.x = pt.x + 268 - text.w() / 2;
     	    dst_pt.y = pt.y + 122;
     	    text.Blit(dst_pt);
 
-    	    text.Set("Available:");
+    	    str = _("Available");
+    	    str += ": ";
+    	    text.Set(str);
 	    dst_pt.x = pt.x + 44;
     	    dst_pt.y = pt.y + 122;
     	    text.Blit(dst_pt);
