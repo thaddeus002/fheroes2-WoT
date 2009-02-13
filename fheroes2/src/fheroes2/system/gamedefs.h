@@ -27,9 +27,16 @@
 
 #define ANIMATION_SPEED 23
 
+#ifdef WITH_TTF
+#include <libintl.h>
 #define _(String) gettext(String)
 #define gettext_noop(String) String
 #define N_(String) gettext_noop(String)
+#else
+#define _(String) String
+#define gettext_noop(String) String
+#define N_(String) gettext_noop(String)
+#endif
 
 #define GETTEXT_PACKAGE "fheroes2"
 #define LOCALEDIR "./files/lang"
