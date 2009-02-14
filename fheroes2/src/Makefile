@@ -25,6 +25,9 @@ endif
 ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_TTF
 LIBS := $(LIBS) -lSDL_ttf
+ifeq ($(OS), Windows_NT)
+LIBS := $(LIBS) -lintl -liconv
+endif
 endif
 
 ifdef RELEASE
