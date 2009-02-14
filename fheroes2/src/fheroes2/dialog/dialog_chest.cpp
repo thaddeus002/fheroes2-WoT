@@ -42,10 +42,10 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     const Sprite & sprite_expr = AGG::GetICN(ICN::EXPMRL, 4);
 
     Point pt;
-    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
-    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+    TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
+    TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
-    Box box(height1 + 20 + height2 + 10 + sprite_expr.h(), true);
+    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite_expr.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
     pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
@@ -61,14 +61,14 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
 
     if(header.size())
     {
-	TextBox(header, Font::BIG, pos);
-        pos.y += height1 + 20;
+	box1.Blit(pos);
+        pos.y += box1.h() + 20;
     }
 
     if(message.size())
     {
-        TextBox(message, Font::BIG, pos);
-        pos.y += height2 + 20;
+        box2.Blit(pos);
+        pos.y += box2.h() + 20;
     }
 
     pos.y += sprite_expr.h();

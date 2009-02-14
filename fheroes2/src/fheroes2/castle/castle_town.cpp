@@ -97,19 +97,20 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     std::string str;
 
     str = _("Recruit Hero");
-    u8 height_title = Text::height(str, Font::BIG, BOXAREA_WIDTH);
-    Rect tit_rt(box_rt.x + 5, box_rt.y - height_title / 2, BOXAREA_WIDTH, height_title);
-    TextBox(str, Font::BIG, tit_rt);
+    Text text(str, Font::BIG);
+    dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
+    dst_pt.y = box_rt.y;
+    text.Blit(dst_pt);
 
     //portrait and frame
     const Sprite & portrait_frame = AGG::GetICN(ICN::SURRENDR, 4);
-    dst_pt.x = box_rt.x + 10 + (box_rt.w - portrait_frame.w()) / 2;
-    dst_pt.y = box_rt.y + tit_rt.h + 5;
-    display.Blit(Portrait::Hero(hero, Portrait::BIG), dst_pt);
-
-    dst_pt.x = box_rt.x + 5 + (box_rt.w  - portrait_frame.w()) / 2;
-    dst_pt.y = box_rt.y + tit_rt.h;
+    dst_pt.x = box_rt.x + (box_rt.w - portrait_frame.w()) / 2;
+    dst_pt.y = dst_pt.y + text.h() + 10;
     display.Blit(portrait_frame, dst_pt);
+
+    dst_pt.x = dst_pt.x + 5;
+    dst_pt.y = dst_pt.y + 5;
+    display.Blit(Portrait::Hero(hero, Portrait::BIG), dst_pt);
 
     str = _("%{name} is a level %{value} %{race} with %{count} artifacts.");
     String::Replace(str, "%{name}", heroes.GetName());
@@ -117,12 +118,14 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
     String::Replace(str, "%{race}", Race::String(heroes.GetRace()));
     String::Replace(str, "%{count}", heroes.GetCountArtifacts());
 
-    Rect src_rt(box_rt.x, box_rt.y + portrait_frame.w() + tit_rt.h - 3, BOXAREA_WIDTH, 200);
-    TextBox(str, Font::BIG, src_rt);
+    TextBox box2(str, Font::BIG, box_rt.w);
+    dst_pt.x = box_rt.x;
+    dst_pt.y = dst_pt.y + portrait_frame.h() + 5;
+    box2.Blit(dst_pt);
 
     Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
 
-    src_rt.y += 50;
+    const Rect src_rt(box_rt.x, dst_pt.y + box2.h() + 10, box_rt.w, 0);
     Resource::AlignDraw(paymentCosts, src_rt);
 
     dst_pt.x = box_rt.x;

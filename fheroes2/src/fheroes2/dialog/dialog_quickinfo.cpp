@@ -403,6 +403,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     dst_pt.y += port.h() + 4;
     text.Blit(dst_pt);
 
+    message.clear();
     String::AddInt(message, hero.GetAttack());
     text.Set(message);
     dst_pt.x += 75;

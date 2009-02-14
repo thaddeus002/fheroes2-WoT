@@ -43,10 +43,10 @@ void Castle::OpenTavern(void)
 
     cursor.Hide();
 
-    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
-    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
+    TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
+    TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
-    Dialog::Box box(height1 + 130 + height2, true);
+    Dialog::Box box(box1.h() + 130 + box2.h(), true);
 
     const Rect & pos = box.GetArea();
     Point dst_pt(pos.x, pos.y);
@@ -72,10 +72,10 @@ void Castle::OpenTavern(void)
     }
 
     Rect rt(pos.x, dst_pt.y + s1.h() + 10, pos.w, pos.h);
-    TextBox(header, Font::BIG, rt);
+    box1.Blit(rt);
 
     rt.y += 60;
-    TextBox(message, Font::BIG, rt);
+    box2.Blit(rt);
 
     // button yes
     const Sprite & s4 = AGG::GetICN(system, 5);

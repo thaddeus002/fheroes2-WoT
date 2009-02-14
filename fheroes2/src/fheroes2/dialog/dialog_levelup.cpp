@@ -48,10 +48,11 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     String::Replace(message, "%{skill1}", Skill::Secondary::String(sec1.Skill()));
     String::Replace(message, "%{level2}", Skill::Level::String(sec2.Level()));
     String::Replace(message, "%{skill2}", Skill::Secondary::String(sec2.Skill()));
-    const u16 height1 = Text::height(header, Font::BIG, BOXAREA_WIDTH);
-    const u16 height2 = Text::height(message, Font::BIG, BOXAREA_WIDTH);
 
-    Box box(height1 + 10 + height2 + 10 + sprite_frame.h(), true);
+    TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
+    TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
+
+    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite_frame.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
     pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 9).h();
@@ -65,14 +66,14 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
 
     if(header.size())
     {
-	TextBox(header, Font::BIG, pos);
-        pos.y += height1 + 10;
+	box1.Blit(pos);
+        pos.y += box1.h() + 10;
     }
 
     if(message.size())
     {
-        TextBox(message, Font::BIG, pos);
-        pos.y += height2 + 10;
+        box2.Blit(pos);
+        pos.y += box2.h() + 10;
     }
 
     // sprite1

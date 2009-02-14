@@ -212,6 +212,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     std::string descriptionSpellPoints = _("%{name} currently has %{point} spell points out of a maximum of %{max}. The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events.");
+    String::Replace(headerExperience, "%{name}", GetName());
     String::Replace(descriptionSpellPoints, "%{point}", GetSpellPoints());
     String::Replace(descriptionSpellPoints, "%{max}", GetMaxSpellPoints());
 

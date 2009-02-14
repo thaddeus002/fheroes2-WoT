@@ -485,7 +485,7 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 	    const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
 	    textsprite.SetFont(Font::SMALL);
 	    textsprite.SetText(name);
-	    textsprite.SetPos(rt.x + (rt.w - text.w()) / 2, rt.y + rt.h + 2);
+	    textsprite.SetPos(rt.x + (rt.w - textsprite.w()) / 2, rt.y + rt.h + 2);
 	    textsprite.Show();
 
     	    ++current;
