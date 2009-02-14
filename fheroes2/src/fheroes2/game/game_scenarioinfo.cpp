@@ -396,31 +396,31 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 
     // text scenario
     Text text(_("Scenario:"), Font::BIG);
-    text.Blit(376, 53);
+    text.Blit(414 - text.w()/2, 53);
 
     // maps name
     text.Set(conf.FileInfo().Name());
-    text.Blit(260, 78);
+    text.Blit(374 - text.w()/2, 78);
     
     // text game difficulty
     text.Set(_("Game Difficulty:"));
-    text.Blit(330, 107);
+    text.Blit(414 - text.w()/2, 107);
 
     //
     text.Set(_("Easy"), Font::SMALL);
-    text.Blit(248, 196);
+    text.Blit(260 - text.w()/2, 196);
     text.Set(_("Normal"));
-    text.Blit(316, 196);
+    text.Blit(336 - text.w()/2, 196);
     text.Set(_("Hard"));
-    text.Blit(395, 196);
+    text.Blit(412 - text.w()/2, 196);
     text.Set(_("Expert"));
-    text.Blit(472, 196);
+    text.Blit(490 - text.w()/2, 196);
     text.Set(_("Impossible"));
-    text.Blit(536, 196);
+    text.Blit(566 - text.w()/2, 196);
 
     // text opponents
     text.Set(_("Opponents:"), Font::BIG);
-    text.Blit(368, 210);
+    text.Blit(414 - text.w()/2, 213);
 
     // draw opponents
     const std::bitset<8> colors(conf.FileInfo().KingdomColors());
@@ -439,7 +439,7 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
 
     // text class
     text.Set(_("Class:"), Font::BIG);
-    text.Blit(386, 290);
+    text.Blit(414 - text.w()/2, 290);
 
     // draw class
     current = 0;
