@@ -312,6 +312,8 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     cursor.Show();
     display.Flip();
 
+    bool first = true;
+
     // str loop
     while(le.HandleEvents())
     {
@@ -320,6 +322,66 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	le.MousePressLeft(buttonMax) ? buttonMax.PressDraw() : buttonMax.ReleaseDraw();
 	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
 	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
+
+	if(le.KeyPress(KEY_BACKSPACE))
+	{
+	    if(0 < result)
+	    {
+		result /= 10;
+		if(0 == result) first = true;
+	    }
+
+	    paymentCosts = paymentMonster * result;
+	    cursor.Hide();
+	    static_info.Restore();
+	    RedrawCurrentInfo;
+	    cursor.Show();
+	    display.Flip();
+	}
+
+	if(le.KeyPress(KEY_0) ||
+	   le.KeyPress(KEY_1) ||
+	   le.KeyPress(KEY_2) ||
+	   le.KeyPress(KEY_3) ||
+	   le.KeyPress(KEY_4) ||
+	   le.KeyPress(KEY_5) ||
+	   le.KeyPress(KEY_6) ||
+	   le.KeyPress(KEY_7) ||
+	   le.KeyPress(KEY_8) ||
+	   le.KeyPress(KEY_9))
+	{
+	    if(first)
+	    {
+		result = 0;
+		first = false;
+	    }
+
+	    if(max > result)
+	    {
+		result *= 10;
+		switch(le.KeyValue())
+		{
+		    case KEY_1:	result += 1; break;
+		    case KEY_2:	result += 2; break;
+		    case KEY_3:	result += 3; break;
+		    case KEY_4:	result += 4; break;
+		    case KEY_5:	result += 5; break;
+		    case KEY_6:	result += 6; break;
+		    case KEY_7:	result += 7; break;
+		    case KEY_8:	result += 8; break;
+		    case KEY_9:	result += 9; break;
+		    default: break;
+		}
+		if(result > max) result = max;
+	    }
+
+	    paymentCosts = paymentMonster * result;
+	    cursor.Hide();
+	    static_info.Restore();
+	    RedrawCurrentInfo;
+	    cursor.Show();
+	    display.Flip();
+	}
 
 	if(le.MouseClickLeft(buttonUp) && result < max)
 	{
