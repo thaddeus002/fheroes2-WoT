@@ -185,15 +185,6 @@ int main(int argc, char **argv)
     	    // attach agg files
     	    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) cache.AttachFile(*itd);
 
-	    if(conf.Modes(Settings::MUSIC_EXT))
-            {
-                Dir dir;
-                dir.Read(conf.DataDirectory(), ".ogg", false);
-                if(dir.size())
-                  for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) cache.AttachFile(*itd);
-                else Error::Warning("No music files found.");
-            }
-            
             if(conf.Debug()) conf.Dump();
             
             // load palette

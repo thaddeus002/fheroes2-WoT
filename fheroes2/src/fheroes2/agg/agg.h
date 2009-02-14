@@ -55,7 +55,7 @@ namespace AGG
     class File
     {
     public:
-	File(const std::string & fname, bool isGameFile=true);
+	File(const std::string & fname);
 	~File();
 
 	const std::string & Name(void) const;

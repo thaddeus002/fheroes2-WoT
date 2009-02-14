@@ -35,7 +35,7 @@
 char *basename(const char *path);
 
 /*AGG::File constructor */
-AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), count_items(0), stream(NULL)
+AGG::File::File(const std::string & fname) : filename(fname), count_items(0), stream(NULL)
 {
     stream = new std::fstream(filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -48,7 +48,6 @@ AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), c
 
     if(Settings::Get().Debug()) Error::Verbose("AGG::File: load: " + filename);
 
-    if(isGameFile)
     {
         stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
         SwapLE16(count_items);
@@ -80,16 +79,6 @@ AGG::File::File(const std::string & fname, bool isGameFile) : filename(fname), c
             stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
             SwapLE32(f.size);
         }
-    }
-    else
-    {
-        FAT &f = fat[basename(fname.c_str())];
-        count_items = 1;
-        stream->seekg(0, std::ios_base::end);
-        f.size = stream->tellg();
-        f.offset = 0;
-        f.crc = 0;
-        stream->seekg(0, std::ios_base::beg);
     }
 }
 
@@ -301,11 +290,6 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 	}
 	else
     	    agg_cache.push_front(file);
-    }
-    else
-    {
-	AGG::File *file = new File(fname, false);
-	agg_cache.push_front(file);
     }
 
     return true;
@@ -646,24 +630,28 @@ void AGG::Cache::LoadPAL(void)
 void AGG::Cache::LoadMUS(const MUS::mus_t mus)
 {
     std::vector<u8> & v = mus_cache[mus];
-    
+    const std::string musname("files/music/" + MUS::GetString(mus));
     if(v.size()) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + MUS::GetString(mus));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + musname);
 
     if(! Mixer::isValid()) return;
 
-    if(agg_cache.size())
+    std::fstream stream(musname.c_str(), std::ios::in | std::ios::binary);
+
+    if(stream.fail())
     {
-	std::vector<char> body;
-
-	std::list<File *>::const_iterator it1 = agg_cache.begin();
-	std::list<File *>::const_iterator it2 = agg_cache.end();
-
-	for(; it1 != it2; ++it1)
-	    // read only first found
-	    if((**it1).Read(MUS::GetString(mus), reinterpret_cast<std::vector<char> &>(v))) break;
+	Error::Warning("AGG::Cache::LoadMUS: error read file: " + musname + ", skipping...");
+	return;
     }
+
+    stream.seekg(0, std::ios_base::end);
+    const u32 size = stream.tellg();
+    stream.seekg(0, std::ios_base::beg);
+    v.resize(size);
+    
+    stream.read(reinterpret_cast<char *>(&v[0]), size);
+    stream.close();
 }
 
 void AGG::Cache::LoadFNT(void)
