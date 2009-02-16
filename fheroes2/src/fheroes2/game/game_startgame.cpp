@@ -56,8 +56,30 @@ namespace Game
     bool CursorChangePosition(const u16 index);
     bool DiggingForArtifacts(const Heroes & hero);
     void DialogPlayersTurn(const Color::color_t);
+    void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
 };
 
+void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
+{
+    if(Maps::isValidDirection(hero.GetIndex(), direct))
+    {
+	const u16 dst = Maps::GetDirectionIndex(hero.GetIndex(), direct);
+	const Maps::Tiles & tile = world.GetTiles(dst);
+
+	switch(tile.GetObject())
+	{
+    	    case MP2::OBJN_CASTLE:
+    	    {
+    		const Castle *to_castle = world.GetCastle(dst);
+		if(to_castle) ShowPathOrStartMoveHero(&hero, to_castle->GetIndex());
+	    }
+
+	    default:
+		if(Cursor::POINTER != GetCursor(tile)) ShowPathOrStartMoveHero(&hero, dst);
+	}
+    }
+}
+                                   
 void Game::DialogPlayersTurn(const Color::color_t color)
 {
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
@@ -810,6 +832,17 @@ Game::menu_t Game::HumanTurn(void)
 		display.Flip();
 	    }
 	}
+	else
+	// move hero left
+	if((le.KeyPress(KEY_LEFT) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::LEFT);
+	else
+	// move hero right
+	if((le.KeyPress(KEY_RIGHT) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::RIGHT);
+	else
+	// move hero up
+	if((le.KeyPress(KEY_UP) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
+	// move hero down
+	if((le.KeyPress(KEY_DOWN) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
 
 	// scroll area maps left
 	if((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_LEFT) || le.MouseCursor(areaScrollLeft)) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
