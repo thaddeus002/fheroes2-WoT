@@ -113,6 +113,15 @@ void Kingdom::ActionNewDay(void)
 	return;
     }
 
+    // first day
+    if(world.BeginWeek() && world.BeginMonth() && 1 == world.GetMonth())
+    {
+	// check event day
+	const GameEvent::Day* event_day = world.GetEventDay(color);
+	if(event_day) AddFundsResource(event_day->GetResource());
+	return;
+    }
+
     // castle New Day
     std::vector<Castle *>::const_iterator itc = castles.begin();
     for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewDay();
@@ -310,4 +319,30 @@ void Kingdom::Dump(void) const
 u8 Kingdom::GetCountCapital(void) const
 {
     return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsCapital);
+}
+
+void Kingdom::AddFundsResource(const Resource::funds_t & funds)
+{
+    resource = resource + funds;
+
+    if(0 > resource.wood) resource.wood = 0;
+    if(0 > resource.mercury) resource.mercury = 0;
+    if(0 > resource.ore) resource.ore = 0;
+    if(0 > resource.sulfur) resource.sulfur = 0;
+    if(0 > resource.crystal) resource.crystal = 0;
+    if(0 > resource.gems) resource.gems = 0;
+    if(0 > resource.gold) resource.gold = 0;
+}
+
+void Kingdom::OddFundsResource(const Resource::funds_t & funds)
+{
+    resource = resource - funds;
+
+    if(0 > resource.wood) resource.wood = 0;
+    if(0 > resource.mercury) resource.mercury = 0;
+    if(0 > resource.ore) resource.ore = 0;
+    if(0 > resource.sulfur) resource.sulfur = 0;
+    if(0 > resource.crystal) resource.crystal = 0;
+    if(0 > resource.gems) resource.gems = 0;
+    if(0 > resource.gold) resource.gold = 0;
 }

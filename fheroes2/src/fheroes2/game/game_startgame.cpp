@@ -174,6 +174,9 @@ Game::menu_t Game::StartGame(void)
 
     Game::menu_t m = ENDTURN;
 
+    // action first day
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(world.GetKingdom(color).isPlay()) world.GetKingdom(color).ActionNewDay();
+
     while(1)
     {
 	// AI move

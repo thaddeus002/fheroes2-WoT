@@ -58,15 +58,14 @@ namespace Resource
 	u8 GetValidItems(void) const;
 	void Reset(void);
 
-        u32 wood;
-        u32 mercury;
-        u32 ore;
-        u32 sulfur;
-        u32 crystal;
-        u32 gems;
-        u32 gold;
+        s32 wood;
+        s32 mercury;
+        s32 ore;
+        s32 sulfur;
+        s32 crystal;
+        s32 gems;
+        s32 gold;
     };
-
 
     const std::string & String(resource_t resource);
 

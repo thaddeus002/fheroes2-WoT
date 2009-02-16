@@ -116,8 +116,8 @@ public:
     u16 GetFundsGems(void) const{ return resource.gems; };
     u32 GetFundsGold(void) const{ return resource.gold; };
 
-    void AddFundsResource(const Resource::funds_t & funds){ resource = resource + funds; };
-    void OddFundsResource(const Resource::funds_t & funds){ resource = resource - funds; };
+    void AddFundsResource(const Resource::funds_t & funds);
+    void OddFundsResource(const Resource::funds_t & funds);
 
     u8 GetCountCastle(void) const;
     u8 GetCountTown(void) const;
