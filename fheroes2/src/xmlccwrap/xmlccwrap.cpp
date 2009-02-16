@@ -23,10 +23,12 @@
 #include <libxml/tree.h>
 #include <libxml/HTMLparser.h>
 #include <libxml/encoding.h>
-/* disable xslt
+
+#ifndef WITHOUT_XSLT
 #include <libxslt/xsltutils.h>
 #include <libxslt/transform.h>
-*/
+#endif
+
 #include "xmlccwrap.h"
 #include "libxmlexport.h"
 
@@ -50,7 +52,7 @@ namespace xmlcc
   void writenode(xmlDocPtr, Element *, xmlNodePtr, int = 0);
 
 
-/* disable xslt
+#ifndef WITHOUT_XSLT
   XSLTTree::XSLTTree()
   {
     xsltP = 0;
@@ -86,7 +88,7 @@ namespace xmlcc
   {
     return xsltP;
   }
-*/
+#endif
 
   XMLTree::XMLTree() : _filename(), _root(), _compression(0)
   { }
@@ -384,7 +386,7 @@ namespace xmlcc
   }
 
 
-/* disable xslt
+#ifndef WITHOUT_XSLT
   bool XMLTree::xslt(const XSLTTree & xsltTree, const std::string & outputfile, ParameterMap & parameterMap)
   {
     bool ret = false;
@@ -429,7 +431,7 @@ namespace xmlcc
     ParameterMap parameterMap;
     return xslt(xsltTree, outputfile, parameterMap);
   }
-*/
+#endif
 
   const std::string & XMLTree::getErrorString()
   {

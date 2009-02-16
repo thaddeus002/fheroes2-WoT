@@ -1,7 +1,7 @@
 # makefile
 
 TARGET = libxmlccwrap
-CFLAGS := $(shell xml2-config --cflags)
+CFLAGS := $(shell xml2-config --cflags) -DWITHOUT_XSLT
 LIBS := -O2 -Wall -I . $(shell xml2-config --libs)
 
 CC = g++

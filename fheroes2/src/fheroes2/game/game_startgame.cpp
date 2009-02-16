@@ -762,18 +762,66 @@ Game::menu_t Game::HumanTurn(void)
                 Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
                 break;
         }
+        else
+        // press Next Hero
+        if(le.KeyPress(KEY_h) && myHeroes.size())
+	{
+	    if(Game::Focus::HEROES != global_focus.Type())
+	    {
+		cursor.Hide();
+		global_focus.Reset(Game::Focus::HEROES);
+		global_focus.Redraw();
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+	    {
+	        std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
+        	++it;
+                if(it == myHeroes.end()) it = myHeroes.begin();
+		cursor.Hide();
+		global_focus.Set(*it);
+		global_focus.Redraw();
+		cursor.Show();
+		display.Flip();
+	    }
+	}
+        else
+        // press Next Tower
+        if(le.KeyPress(KEY_t) && myCastles.size())
+	{
+	    if(Game::Focus::CASTLE != global_focus.Type())
+	    {
+		cursor.Hide();
+		global_focus.Reset(Game::Focus::CASTLE);
+		global_focus.Redraw();
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+	    {
+	        std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), &global_focus.GetCastle());
+        	++it;
+                if(it == myCastles.end()) it = myCastles.begin();
+		cursor.Hide();
+		global_focus.Set(*it);
+		global_focus.Redraw();
+		cursor.Show();
+		display.Flip();
+	    }
+	}
 
 	// scroll area maps left
-	if((le.KeyPress(KEY_LEFT) || le.MouseCursor(areaScrollLeft)) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
+	if((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_LEFT) || le.MouseCursor(areaScrollLeft)) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
         else
 	// scroll area maps right
-	if((le.KeyPress(KEY_RIGHT) || le.MouseCursor(areaScrollRight)) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
+	if((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_RIGHT) || le.MouseCursor(areaScrollRight)) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
 	
 	// scroll area maps top
-	if((le.KeyPress(KEY_UP) || le.MouseCursor(areaScrollTop)) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
+	if((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_UP) || le.MouseCursor(areaScrollTop)) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
 	else
 	// scroll area maps bottom
-	if((le.KeyPress(KEY_DOWN) || le.MouseCursor(areaScrollBottom)) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
+	if((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_DOWN) || le.MouseCursor(areaScrollBottom)) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
 
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
@@ -1102,8 +1150,27 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 
 	    // click Next Hero
-	    if(le.MouseClickLeft(buttonNextHero))
+	    if(le.MouseClickLeft(buttonNextHero) && myHeroes.size())
 	    {
+		if(Game::Focus::HEROES != global_focus.Type())
+		{
+		    cursor.Hide();
+		    global_focus.Reset(Game::Focus::HEROES);
+		    global_focus.Redraw();
+		    cursor.Show();
+		    display.Flip();
+		}
+		else
+		{
+		    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
+                    ++it;
+                    if(it == myHeroes.end()) it = myHeroes.begin();
+		    cursor.Hide();
+		    global_focus.Set(*it);
+		    global_focus.Redraw();
+		    cursor.Show();
+		    display.Flip();
+		}
 	    }
 	    else
 	    // click Continue Movement

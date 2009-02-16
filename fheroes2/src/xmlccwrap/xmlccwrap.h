@@ -43,8 +43,7 @@ extern "C++"
     typedef std::multimap<std::string, std::string> ParameterMap;
     typedef ParameterMap::value_type ValuePair;
 
-
-/* disable xslt
+#ifndef WITHOUT_XSLT
     class XSLTTree
     {
       private:
@@ -61,7 +60,7 @@ extern "C++"
         bool read(const std::string &fn);
         const void * exportxsltStylesheetPtr() const;
     };
-*/
+#endif
 
     class XMLTree
     {
@@ -103,11 +102,10 @@ extern "C++"
         bool write(const std::string &fn);
         const std::string & writeBuffer() const;
 
-
-/* disable xslt
+#ifndef WITHOUT_XSLT
         bool xslt(const XSLTTree & xsltTree, const std::string & outputfile, ParameterMap & parameterMap);
         bool xslt(const XSLTTree & xsltTree, const std::string & outputfile);
-*/
+#endif
 
         const std::string & getErrorString();
     };

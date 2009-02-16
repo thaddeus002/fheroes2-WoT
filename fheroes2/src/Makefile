@@ -51,6 +51,9 @@ endif
 	$(MAKE) -C dist pot
 
 clean:
+ifdef DEVELOPMENT
+	$(MAKE) -C xmlccwrap clean
+endif
 	$(MAKE) -C tools clean
 	$(MAKE) -C dist clean
 	$(MAKE) -C engine clean

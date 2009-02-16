@@ -110,7 +110,7 @@ static KeySym SDLToKeySym(SDLKey key)
     }
 
     return KEY_NONE;
-}
+};
 
 LocalEvent::LocalEvent()
 {
@@ -134,10 +134,10 @@ bool LocalEvent::HandleEvents(void)
     {
 	// keyboard
 	if(SDL_KEYDOWN == event.type)
-	    HandleKeyboardEvent(event.key.keysym, true);
+	    HandleKeyboardEvent(event.key, true);
 	else
 	if(SDL_KEYUP == event.type)
-	    HandleKeyboardEvent(event.key.keysym, false);
+	    HandleKeyboardEvent(event.key, false);
 
 	// mouse motion
 	if(SDL_MOUSEMOTION == event.type)
@@ -191,10 +191,10 @@ bool LocalEvent::MouseRight(void) const
     return mouse_pressed && SDL_BUTTON_RIGHT == mouse_button;
 }
 
-void LocalEvent::HandleKeyboardEvent(SDL_keysym & keysym, bool pressed)
+void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event, bool pressed)
 {
     key_pressed = pressed;
-    key_value = SDLToKeySym(keysym.sym);
+    key_value = SDLToKeySym(event.keysym.sym);
 }
 
 void LocalEvent::HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion)
@@ -392,6 +392,11 @@ const Point & LocalEvent::MouseCursor(void)
     mouse_cu.y = y;
 
     return mouse_cu;
+}
+
+u16 LocalEvent::KeyMod(void) const
+{
+    return SDL_GetModState();
 }
 
 KeySym LocalEvent::KeyValue(void) const

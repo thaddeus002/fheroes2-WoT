@@ -30,6 +30,8 @@ struct SDL_MouseButtonEvent;
 union SDL_Event;
 struct SDL_keysym;
 
+enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT, MOD_ALT = KMOD_ALT };
+
 enum KeySym
 {
     KEY_NONE,
@@ -148,6 +150,7 @@ public:
 
     bool KeyPress(KeySym key) const;
     KeySym KeyValue(void) const;
+    u16	   KeyMod(void) const;
 
 private:
     LocalEvent();
@@ -156,7 +159,7 @@ private:
     void HandleMouseButtonEvent(const SDL_MouseButtonEvent & button);
     void HandleMouseWheelEvent(const SDL_MouseButtonEvent & button);
 
-    void HandleKeyboardEvent(SDL_keysym & keysym, bool pressed);
+    void HandleKeyboardEvent(SDL_KeyboardEvent &, bool pressed);
 
     static int GlobalFilterEvents(const SDL_Event *event);
 
