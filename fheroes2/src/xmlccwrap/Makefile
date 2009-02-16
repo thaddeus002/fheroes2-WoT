@@ -23,4 +23,3 @@ include $(wildcard *.d)
 
 clean:
 	rm -f *.a *.so *.d *.o
-	make -C clean

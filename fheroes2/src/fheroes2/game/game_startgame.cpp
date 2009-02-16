@@ -844,8 +844,11 @@ Game::menu_t Game::HumanTurn(void)
 	else
 	// move hero up
 	if((le.KeyPress(KEY_UP) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
+	else
 	// move hero down
 	if((le.KeyPress(KEY_DOWN) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
+	else
+	if(le.KeyPress(KEY_s)) world.Save();
 
 	// scroll area maps left
 	if((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_LEFT) || le.MouseCursor(areaScrollLeft)) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
@@ -1277,6 +1280,7 @@ Game::menu_t Game::HumanTurn(void)
 			return result;
 
 		    case Game::SAVEGAME:
+			world.Save();
 			break;
 
 		    default:
