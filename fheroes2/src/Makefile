@@ -22,6 +22,11 @@ else
 CFLAGS := $(CFLAGS) -O2
 endif
 
+ifdef DEVELOPMENT
+CFLAGS := $(CFLAGS) $(shell xml2-config --cflags)
+LIBS := $(LIBS) $(shell xml2-config --libs)
+endif
+
 ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_TTF
 LIBS := $(LIBS) -lSDL_ttf
@@ -37,12 +42,13 @@ endif
 export BUILD_DATE CFLAGS LIBS
 
 all:
+ifdef DEVELOPMENT
+	$(MAKE) -C xmlccwrap
+endif
 	$(MAKE) -C engine
 	$(MAKE) -C dist
 	$(MAKE) -C tools
-ifdef DEVELOPMENT
 	$(MAKE) -C dist pot
-endif
 
 clean:
 	$(MAKE) -C tools clean
