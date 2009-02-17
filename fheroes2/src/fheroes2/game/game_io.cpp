@@ -22,6 +22,7 @@
 #include "kingdom.h"
 #include "heroes.h"
 #include "castle.h"
+#include "army.h"
 #include "world.h"
 
 extern char *basename(const char *path);
@@ -326,6 +327,154 @@ void Game::SaveXML(const std::string &fn)
 	str.clear();
 	String::AddInt(str, hero.color);
 	hero2->addAttribute("color", str);
+
+	hero2->addAttribute("name", hero.name);
+
+	str.clear();
+	String::AddInt(str, hero.hid);
+	hero2->addAttribute("hid", str);
+
+	str.clear();
+	String::AddInt(str, hero.race);
+	hero2->addAttribute("race", str);
+
+	str.clear();
+	String::AddInt(str, hero.GetAttack());
+	hero2->addAttribute("attack", str);
+
+	str.clear();
+	String::AddInt(str, hero.GetDefense());
+	hero2->addAttribute("defense", str);
+
+	str.clear();
+	String::AddInt(str, hero.GetKnowledge());
+	hero2->addAttribute("knowledge", str);
+
+	str.clear();
+	String::AddInt(str, hero.GetPower());
+	hero2->addAttribute("power", str);
+
+	str.clear();
+	String::AddInt(str, hero.experience);
+	hero2->addAttribute("experience", str);
+
+	str.clear();
+	String::AddInt(str, hero.magic_point);
+	hero2->addAttribute("magic_point", str);
+
+	str.clear();
+	String::AddInt(str, hero.move_point);
+	hero2->addAttribute("move_point", str);
+
+	str.clear();
+	String::AddInt(str, hero.direction);
+	hero2->addAttribute("direction", str);
+
+	str.clear();
+	String::AddInt(str, hero.sprite_index);
+	hero2->addAttribute("sprite_index", str);
+
+	str.clear();
+	String::AddInt(str, hero.save_maps_general);
+	hero2->addAttribute("save_maps_general", str);
+
+	// heroes->hero->secondary_skills
+	xmlcc::Element *secondary = hero2->addElement("secondary_skills");
+
+	str.clear();
+	String::AddInt(str, hero.secondary_skills.size());
+	secondary->addAttribute("size", str);
+
+	for(u16 ii = 0; ii < hero.secondary_skills.size(); ++ii)
+	{
+	    const Skill::Secondary & sec = hero.secondary_skills[ii];
+	    xmlcc::Element *pair = secondary->addElement("pair");
+
+	    str.clear();
+	    String::AddInt(str, sec.Skill());
+	    pair->addAttribute("skill", str);
+
+	    str.clear();
+	    String::AddInt(str, sec.Level());
+	    pair->addAttribute("level", str);
+	}
+
+	// heroes->hero->artifacts
+	xmlcc::Element *artifacts = hero2->addElement("artifacts");
+
+	str.clear();
+	String::AddInt(str, hero.artifacts.size());
+	artifacts->addAttribute("size", str);
+
+	for(u16 ii = 0; ii < hero.artifacts.size(); ++ii)
+	{
+	    xmlcc::Element *artifact = artifacts->addElement("artifact");
+
+	    str.clear();
+	    String::AddInt(str, hero.artifacts[ii]);
+	    artifact->addAttribute("type", str);
+	}
+
+	// heroes->hero->armies
+	xmlcc::Element *armies = hero2->addElement("armies");
+
+	str.clear();
+	String::AddInt(str, ARMYMAXTROOPS);
+	armies->addAttribute("size", str);
+
+	for(u16 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+	{
+	    const Army::Troop & troop = hero.army.At(ii);
+	    xmlcc::Element *troop2 = armies->addElement("troop");
+
+	    str.clear();
+	    String::AddInt(str, troop());
+	    troop2->addAttribute("monster", str);
+
+	    str.clear();
+	    String::AddInt(str, troop.Count());
+	    troop2->addAttribute("count", str);
+	}
+
+/*
+	Spell::Book spell_book;
+*/
+
+	// heroes->hero->center
+	xmlcc::Element *center = hero2->addElement("center");
+
+	str.clear();
+	String::AddInt(str, hero.mp.x);
+	center->addAttribute("x", str);
+
+	str.clear();
+	String::AddInt(str, hero.mp.y);
+	center->addAttribute("y", str);
+
+	// heroes->hero->visit_object
+	xmlcc::Element *visit = hero2->addElement("visit_object");
+
+	str.clear();
+	String::AddInt(str, hero.visit_object.size());
+	visit->addAttribute("size", str);
+
+        {
+	    std::list<IndexObject>::const_iterator it1 = hero.visit_object.begin();
+	    std::list<IndexObject>::const_iterator it2 = hero.visit_object.end();
+	
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *pair = visit->addElement("pair");
+
+		str.clear();
+		String::AddInt(str, (*it1).first);
+		pair->addAttribute("index", str);
+
+		str.clear();
+		String::AddInt(str, (*it1).second);
+		pair->addAttribute("object", str);
+	    }
+	}
     }
 
     // world->castles
