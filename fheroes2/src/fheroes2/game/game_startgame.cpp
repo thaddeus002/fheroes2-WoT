@@ -39,6 +39,7 @@
 #include "game_interface.h"
 #include "game_statuswindow.h"
 #include "game_selectobjbar.h"
+#include "game_io.h"
 #include "settings.h"
 #include "route.h"
 #include "game_focus.h"
@@ -848,7 +849,7 @@ Game::menu_t Game::HumanTurn(void)
 	// move hero down
 	if((le.KeyPress(KEY_DOWN) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
 	else
-	if(le.KeyPress(KEY_s)) world.Save();
+	if(le.KeyPress(KEY_s)) Game::Save();
 
 	// scroll area maps left
 	if((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_LEFT) || le.MouseCursor(areaScrollLeft)) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
@@ -1280,7 +1281,7 @@ Game::menu_t Game::HumanTurn(void)
 			return result;
 
 		    case Game::SAVEGAME:
-			world.Save();
+			Game::Save();
 			break;
 
 		    default:

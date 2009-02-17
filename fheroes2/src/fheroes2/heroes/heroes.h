@@ -36,6 +36,7 @@
 #include "direction.h"
 #include "spell_book.h"
 #include "bitmodes.h"
+#include "game_io.h"
 #include "gamedefs.h"
 
 #define HEROESMAXARTIFACT	14
@@ -240,6 +241,7 @@ public:
     static u32 GetExperienceFromLevel(u8 lvl);
 
 private:
+    friend void Game::SaveXML(const std::string &);
     void AngleStep(const Direction::vector_t to_direct);
     bool MoveStep(bool fast = false);
 

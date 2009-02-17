@@ -30,6 +30,7 @@
 #include "heroes.h"
 #include "week.h"
 #include "color.h"
+#include "game_io.h"
 
 class Heroes;
 class Castle;
@@ -136,8 +137,6 @@ public:
     bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);
 
-    void Save(const std::string &fn = std::string("fheroes2.sav"));
-
     const GameEvent::Day*   GetEventDay(const Color::color_t c) const;
     const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;
 
@@ -156,6 +155,8 @@ private:
 
 private:
     friend class Radar;
+    friend void Game::SaveXML(const std::string &);
+    
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;
     std::vector<GameEvent::Day *>       vec_eventsday;

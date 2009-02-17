@@ -32,6 +32,7 @@
 #include "army.h"
 #include "bitmodes.h"
 #include "heroes.h"
+#include "game_io.h"
 
 #define CASTLEMAXMONSTER        6 
 #define TOWN_SCOUTE		4
@@ -177,6 +178,8 @@ private:
     void PressRightAction(building_t b);
 
 private:
+    friend void Game::SaveXML(const std::string &);
+
     const Point		mp;
     Race::race_t	race;
     const Captain	captain;

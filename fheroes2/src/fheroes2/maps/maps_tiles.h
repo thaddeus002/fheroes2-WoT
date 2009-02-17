@@ -25,6 +25,7 @@
 #include "mp2.h"
 #include "direction.h"
 #include "gamedefs.h"
+#include "game_io.h"
 #include "color.h"
 
 class Sprite;
@@ -144,10 +145,11 @@ namespace Maps
 	void CorrectFlags32(const u8 index);
 
     private:
+	friend void Game::SaveXML(const std::string &);
+	
 	const u16 maps_index;
 	Surface tile_sprite;
 	u16	tile_index;
-        u8	shape;
         u8      general;
         u8      quantity1;
         u8      quantity2;

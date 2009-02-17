@@ -80,6 +80,7 @@
 #include "game.h"
 #include "mp2.h"
 #include "pairs.h"
+#include "game_io.h"
 
 class Castle;
 class Heroes;
@@ -151,6 +152,8 @@ public:
     void Dump(void) const;
 
 private:
+    friend void Game::SaveXML(const std::string &);
+
     void AICastlesTurns(void);
     void AIHeroesTurns(Heroes &);
     void AIHeroesTask(Heroes &);
