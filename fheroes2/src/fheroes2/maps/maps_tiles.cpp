@@ -134,7 +134,7 @@ bool Maps::TilesAddon::isStream(const TilesAddon & ta)
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SWSURFACE), tile_index(mp2tile.tileIndex),
-    general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
+    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
     fogs(0xFF)
 {
     SetTile(mp2tile.tileIndex, mp2tile.shape);
@@ -145,10 +145,11 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
     if(Settings::Get().Debug()) ClearFog(Settings::Get().MyColor());
 }
 
-void Maps::Tiles::SetTile(const u16 index, const u8 shape)
+void Maps::Tiles::SetTile(const u16 index, const u8 sh)
 {
-    AGG::GetTIL(TIL::GROUND32, index, shape, tile_sprite);
+    AGG::GetTIL(TIL::GROUND32, index, sh, tile_sprite);
     tile_index = index;
+    shape = sh;
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)

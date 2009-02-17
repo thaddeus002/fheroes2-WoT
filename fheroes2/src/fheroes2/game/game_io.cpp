@@ -117,7 +117,15 @@ void Game::SaveXML(const std::string &fn)
 
 	str.clear();
 	String::AddInt(str, ii);
-	tile2->addAttribute("index", str);
+	tile2->addAttribute("ii", str);
+
+	str.clear();
+	String::AddInt(str, tile.tile_index);
+	tile2->addAttribute("tile_index", str);
+
+	str.clear();
+	String::AddInt(str, tile.shape);
+	tile2->addAttribute("shape", str);
 
 	str.clear();
 	String::AddInt(str, tile.general);
@@ -134,11 +142,74 @@ void Game::SaveXML(const std::string &fn)
 	str.clear();
 	String::AddInt(str, tile.fogs);
 	tile2->addAttribute("fogs", str);
-/*
-        Surface tile_sprite;
-        std::list<TilesAddon> addons_level1;
-        std::list<TilesAddon> addons_level2;
-*/
+
+	// tiles->tile->addons1
+	xmlcc::Element *addons1 = tiles->addElement("addons_level1");
+
+	str.clear();
+	String::AddInt(str, tile.addons_level1.size());
+	addons1->addAttribute("size", str);
+
+        {
+	    std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level1.begin();
+	    std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level1.end();
+	
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *addon2 = addons1->addElement("addon");
+		const Maps::TilesAddon & addon = *it1;
+
+		str.clear();
+		String::AddInt(str, addon.level);
+		addon2->addAttribute("level", str);
+
+		str.clear();
+		String::AddInt(str, addon.uniq);
+		addon2->addAttribute("uniq", str);
+
+		str.clear();
+		String::AddInt(str, addon.object);
+		addon2->addAttribute("object", str);
+
+		str.clear();
+		String::AddInt(str, addon.index);
+		addon2->addAttribute("index", str);
+	    }
+	}
+
+	// tiles->tile->addon2
+	xmlcc::Element *addons2 = tiles->addElement("addons_level2");
+
+	str.clear();
+	String::AddInt(str, tile.addons_level2.size());
+	addons2->addAttribute("size", str);
+
+        {
+	    std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level2.begin();
+	    std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level2.end();
+	
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *addon2 = addons1->addElement("addon");
+		const Maps::TilesAddon & addon = *it1;
+
+		str.clear();
+		String::AddInt(str, addon.level);
+		addon2->addAttribute("level", str);
+
+		str.clear();
+		String::AddInt(str, addon.uniq);
+		addon2->addAttribute("uniq", str);
+
+		str.clear();
+		String::AddInt(str, addon.object);
+		addon2->addAttribute("object", str);
+
+		str.clear();
+		String::AddInt(str, addon.index);
+		addon2->addAttribute("index", str);
+	    }
+	}
     }
 
     // world->kingdoms
@@ -156,7 +227,7 @@ void Game::SaveXML(const std::string &fn)
 
 	str.clear();
 	String::AddInt(str, ii);
-	kingdom2->addAttribute("index", str);
+	kingdom2->addAttribute("ii", str);
 
 	str.clear();
 	String::AddInt(str, kingdom.color);
@@ -210,10 +281,30 @@ void Game::SaveXML(const std::string &fn)
 	String::AddInt(str, kingdom.resource.gold);
 	funds->addAttribute("gold", str);
 
-/*
-    std::map<u16, MP2::object_t> ai_objects;
-    std::list<IndexObject> visit_object;
-*/
+	// kingdoms->kingdom->visit_object
+	xmlcc::Element *visit = kingdom2->addElement("visit_object");
+
+	str.clear();
+	String::AddInt(str, kingdom.visit_object.size());
+	visit->addAttribute("size", str);
+
+        {
+	    std::list<IndexObject>::const_iterator it1 = kingdom.visit_object.begin();
+	    std::list<IndexObject>::const_iterator it2 = kingdom.visit_object.end();
+	
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *pair = visit->addElement("pair");
+
+		str.clear();
+		String::AddInt(str, (*it1).first);
+		pair->addAttribute("index", str);
+
+		str.clear();
+		String::AddInt(str, (*it1).second);
+		pair->addAttribute("object", str);
+	    }
+	}
     }
 
     // world->heroes
@@ -230,7 +321,7 @@ void Game::SaveXML(const std::string &fn)
 
 	str.clear();
 	String::AddInt(str, ii);
-	hero2->addAttribute("index", str);
+	hero2->addAttribute("ii", str);
 
 	str.clear();
 	String::AddInt(str, hero.color);
@@ -251,7 +342,7 @@ void Game::SaveXML(const std::string &fn)
 
 	str.clear();
 	String::AddInt(str, ii);
-	castle2->addAttribute("index", str);
+	castle2->addAttribute("ii", str);
 
 	str.clear();
 	String::AddInt(str, castle.color);
@@ -259,6 +350,7 @@ void Game::SaveXML(const std::string &fn)
     }
 
     tree.setRoot(root);
+    tree.setCompression(6);
     tree.write(fn);
 }
 #else

@@ -150,6 +150,7 @@ namespace Maps
 	const u16 maps_index;
 	Surface tile_sprite;
 	u16	tile_index;
+	u8	shape;
         u8      general;
         u8      quantity1;
         u8      quantity2;
