@@ -27,8 +27,11 @@
 #include "midi_xmi.h"
 #include "midi_mid.h"
 #include "dir.h"
-#include "SDL_image.h"
 #include "agg.h"
+
+#ifdef WITH_PNG
+#include "SDL_image.h"
+#endif
 
 #define FATSIZENAME	15
 
