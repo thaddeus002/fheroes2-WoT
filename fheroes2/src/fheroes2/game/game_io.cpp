@@ -325,6 +325,10 @@ void Game::SaveXML(const std::string &fn)
 	hero2->addAttribute("ii", str);
 
 	str.clear();
+	String::AddInt(str, hero.modes);
+	hero2->addAttribute("modes", str);
+
+	str.clear();
 	String::AddInt(str, hero.color);
 	hero2->addAttribute("color", str);
 
@@ -486,6 +490,7 @@ void Game::SaveXML(const std::string &fn)
 
     for(u16 ii = 0; ii < world.vec_castles.size(); ++ii) if(world.vec_castles[ii])
     {
+	// castles->castle
 	xmlcc::Element *castle2 = castles->addElement("castle");
 	const Castle & castle = *world.vec_castles[ii];
 
@@ -494,8 +499,73 @@ void Game::SaveXML(const std::string &fn)
 	castle2->addAttribute("ii", str);
 
 	str.clear();
+	String::AddInt(str, castle.modes);
+	castle2->addAttribute("modes", str);
+
+	str.clear();
 	String::AddInt(str, castle.color);
 	castle2->addAttribute("color", str);
+
+	castle2->addAttribute("name", castle.name);
+
+	str.clear();
+	String::AddInt(str, castle.race);
+	castle2->addAttribute("race", str);
+
+	str.clear();
+	String::AddInt(str, castle.building);
+	castle2->addAttribute("building", str);
+
+	// castles->castle->center
+	xmlcc::Element *center = castle2->addElement("center");
+
+	str.clear();
+	String::AddInt(str, castle.mp.x);
+	center->addAttribute("x", str);
+
+	str.clear();
+	String::AddInt(str, castle.mp.y);
+	center->addAttribute("y", str);
+
+/*
+        MageGuild           mageguild;
+*/
+	// castles->castle->armies
+	xmlcc::Element *armies = castle2->addElement("armies");
+
+	str.clear();
+	String::AddInt(str, ARMYMAXTROOPS);
+	armies->addAttribute("size", str);
+
+	for(u16 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+	{
+	    const Army::Troop & troop = castle.army.At(ii);
+	    xmlcc::Element *troop2 = armies->addElement("troop");
+
+	    str.clear();
+	    String::AddInt(str, troop());
+	    troop2->addAttribute("monster", str);
+
+	    str.clear();
+	    String::AddInt(str, troop.Count());
+	    troop2->addAttribute("count", str);
+	}
+
+	// castles->castle->dwelling
+	xmlcc::Element *dwelling = castle2->addElement("dwellings");
+
+	str.clear();
+	String::AddInt(str, castle.dwelling.size());
+	dwelling->addAttribute("size", str);
+
+	for(u16 ii = 0; ii < castle.dwelling.size(); ++ii)
+	{
+	    xmlcc::Element *artifact = dwelling->addElement("dwelling");
+
+	    str.clear();
+	    String::AddInt(str, castle.dwelling[ii]);
+	    artifact->addAttribute("type", str);
+	}
     }
 
     tree.setRoot(root);

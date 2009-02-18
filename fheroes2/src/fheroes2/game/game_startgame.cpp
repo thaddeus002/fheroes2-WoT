@@ -837,31 +837,60 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 	}
 	else
-	// move hero left
-	if((le.KeyPress(KEY_LEFT) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::LEFT);
-	else
-	// move hero right
-	if((le.KeyPress(KEY_RIGHT) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::RIGHT);
-	else
-	// move hero up
-	if((le.KeyPress(KEY_UP) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
-	else
-	// move hero down
-	if((le.KeyPress(KEY_DOWN) && Focus::HEROES == global_focus.Type())) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
-	else
+	// save game
 	if(le.KeyPress(KEY_s)) Game::Save();
+	else
+	// key left
+	if(le.KeyPress(KEY_LEFT))
+	{
+	    // scroll map
+	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
+	    else
+	    // move hero
+	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::LEFT);
+	}
+	else
+	// key right
+	if(le.KeyPress(KEY_RIGHT))
+	{
+	    // scroll map
+	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
+	    else
+	    // move hero
+	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::RIGHT);
+	}
+	else
+	// key top
+	if(le.KeyPress(KEY_UP))
+	{
+	    // scroll map
+	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
+	    else
+	    // move hero
+	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
+	}
+	else
+	// key bottom
+	if(le.KeyPress(KEY_DOWN))
+	{
+	    // scroll map
+	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
+	    else
+	    // move hero
+	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
+	}
 
 	// scroll area maps left
-	if(((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_LEFT)) || le.MouseCursor(areaScrollLeft)) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
+	if(le.MouseCursor(areaScrollLeft) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
         else
 	// scroll area maps right
-	if(((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_RIGHT)) || le.MouseCursor(areaScrollRight)) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
+	if(le.MouseCursor(areaScrollRight) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
 	
 	// scroll area maps top
-	if(((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_UP)) || le.MouseCursor(areaScrollTop)) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
+	if(le.MouseCursor(areaScrollTop) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
 	else
 	// scroll area maps bottom
-	if(((MOD_CTRL & le.KeyMod()) && (le.KeyPress(KEY_DOWN)) || le.MouseCursor(areaScrollBottom)) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
+	if(le.MouseCursor(areaScrollBottom) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
 
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
