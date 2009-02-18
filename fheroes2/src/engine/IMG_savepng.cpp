@@ -26,8 +26,10 @@
  */
 #include <stdlib.h>
 #include "SDL.h"
-#include "png.h"
 #include "IMG_savepng.h"
+
+#ifdef WITH_PNG
+#include "png.h"
 
 int IMG_SavePNG(const char *file, SDL_Surface *surf,int compression){
 	SDL_RWops *fp;
@@ -278,3 +280,5 @@ savedone: /* clean up and return */
 	}
 	return ret;
 }
+
+#endif

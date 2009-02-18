@@ -32,6 +32,7 @@ extern "C" {
 #define IMG_COMPRESS_MAX 9
 #define IMG_COMPRESS_DEFAULT -1
 
+#ifdef WITH_PNG
 /**
  * Takes a filename, a surface to save, and a compression level.  The
  * compression level can be 0(min) through 9(max), or -1(default).
@@ -46,6 +47,8 @@ DECLSPEC int SDLCALL    IMG_SavePNG(const char  *file,
 DECLSPEC int SDLCALL IMG_SavePNG_RW(SDL_RWops   *src,
                                     SDL_Surface *surf,
                                     int          compression);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

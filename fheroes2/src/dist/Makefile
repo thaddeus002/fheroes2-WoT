@@ -12,11 +12,6 @@ LIBENGINE := ../engine/libengine.a
 LIBS := $(LIBENGINE) $(LIBS)
 CFLAGS := $(CFLAGS) -I../engine -DBUILD_DATE=$(BUILD_DATE)
 
-ifdef DEVELOPMENT
-CFLAGS := $(CFLAGS) -I../xmlccwrap -DWITH_XML
-LIBS := ../xmlccwrap/libxmlccwrap.a $(LIBS)
-endif
-
 CC := g++
 
 SOURCEROOT := ../fheroes2

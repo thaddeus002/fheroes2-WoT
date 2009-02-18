@@ -480,7 +480,11 @@ bool Surface::SaveBMP(const char *fn) const
 
 bool Surface::SavePNG(const char *fn) const
 {
+#ifdef WITH_PNG
     return IMG_SavePNG(fn, surface, -1);
+#else
+    return false;
+#endif
 }
 
 const void *Surface::pixels(void) const

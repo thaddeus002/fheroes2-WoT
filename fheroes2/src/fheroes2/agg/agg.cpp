@@ -402,6 +402,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     if(v.size()) return;
 
     // load from image cache dir
+#ifdef WITH_PNG
     if(Settings::Get().CacheDirectory().size())
     {
 	Dir dir;
@@ -426,6 +427,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     	    return;
         }
     }
+#endif
 
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
 
