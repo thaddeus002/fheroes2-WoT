@@ -68,13 +68,6 @@ int main(int argc, char **argv)
 {
 	chdir(dirname(argv[0]));
 
-#ifdef WITH_TTF
-	setlocale(LC_ALL, "");
-	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-	textdomain(GETTEXT_PACKAGE);
-#endif
-
 	Settings & conf = Settings::Get();
 	int test = 0;
 
@@ -137,6 +130,16 @@ int main(int argc, char **argv)
 		}
 
 	}
+
+#ifdef WITH_TTF
+	if(conf.Unicode())
+	{
+	    setlocale(LC_ALL, "");
+	    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+	    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+	    textdomain(GETTEXT_PACKAGE);
+	}
+#endif
 
 	// random init
 	Rand::Init();
