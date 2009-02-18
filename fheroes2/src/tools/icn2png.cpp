@@ -74,7 +74,7 @@ class icnheader
 int main(int argc, char **argv)
 {
 #ifndef WITH_PNG
-    std::cout << argv[0] << "build with PNG support" << std::endl;
+    std::cout << "need build with PNG support" << std::endl;
     return EXIT_SUCCESS;
 #else
     if(argc < 3)

@@ -62,7 +62,9 @@ endif
 	$(MAKE) -C engine
 	$(MAKE) -C dist
 	$(MAKE) -C tools
+ifndef WITHOUT_UNICODE
 	$(MAKE) -C dist pot
+endif
 
 clean:
 	$(MAKE) -C xmlccwrap clean

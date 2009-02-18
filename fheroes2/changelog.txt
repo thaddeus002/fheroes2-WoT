@@ -1,4 +1,4 @@
-SVN - up to r880
+SVN - up to r883
 
 Users
 + Added save current game.
@@ -9,6 +9,7 @@ Users
   (revvy)
 
 Developers
++ Added build options (WITHOUT_PNG, WITHOUT_XML, WITHOUT_UNICODE)
 + Battle engine rewritten to separate logic from display, and to allow
   for future expansion (ie. castles/towns). (revvy)
 
