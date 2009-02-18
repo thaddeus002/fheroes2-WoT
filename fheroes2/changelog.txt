@@ -1,6 +1,10 @@
-SVN - up to r852
+SVN - up to r880
 
 Users
++ Added save current game.
++ Added keyboard hotkeys for scroll map and move hero.
++ Added gettext support.
++ Unicode support with TTF font render.
 + AI battles now use battle system logic to properly decide outcomes.
   (revvy)
 

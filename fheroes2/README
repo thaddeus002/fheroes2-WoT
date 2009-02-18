@@ -11,6 +11,7 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 - libpng
 - libvorbis
 - libogg
+- libxml2
 - freetype
 - zlib
 - gettext
@@ -25,6 +26,15 @@ Hot keys:
 F4		- switch to fullscreen
 PrintScreen	- create screenshot
 e		- end turn
+Up		- move hero top
+Down		- move hero bottom
+Left		- move hero left
+Right		- move hero right
+Ctrl + Up	- scroll map top
+Ctrl + Down	- scroll map bottom
+Ctrl + Left	- scroll map left
+Ctrl + Right	- scroll map right
+s		- save game to fheroes2.sav
 
 Main menu:
 n		- new game
