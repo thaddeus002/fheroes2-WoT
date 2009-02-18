@@ -5,15 +5,11 @@ Prerequisites:
 You need to have these libraries (with equivalent devel versions) to build fHeroes2:
 
 - SDL
-- SDL_mixer
-- SDL_image
+- SDL_mixer (with OGG support)
+- SDL_image (with PNG support)
 - SDL_ttf
 - libpng
-- libvorbis
-- libogg
 - libxml2
-- freetype
-- zlib
 - gettext
 
 SDL libraries can be found at http://www.libsdl.org .
