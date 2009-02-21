@@ -52,7 +52,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
     std::list<Maps::FileInfo *>::const_iterator it_end = allmaps.end();
 
     for(; it_current != it_end; ++it_current)
-	switch((**it_current).SizeMaps())
+	switch((**it_current).SizeMaps().w)
 	{
     	    case Maps::SMALL:	smallmaps.push_back(*it_current);break;
     	    case Maps::MEDIUM:	mediummaps.push_back(*it_current); break;
@@ -242,28 +242,36 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	}
 
 	// click up
-	if((le.MouseWheelUp(rectAreaList) || le.MouseWheelUp(split.GetRect()) || le.MouseClickLeft(buttonPgUp)) &&
+	if((le.MouseWheelUp(rectAreaList) || le.MouseWheelUp(split.GetRect()) || le.MouseClickLeft(buttonPgUp) ||
+	    le.KeyPress(KEY_PAGEUP) || le.KeyPress(KEY_UP)) &&
 	    curmaps->size() && num_head)
 	{
 	    cursor.Hide();
 	    backgroundList.Restore();
+	    backgroundInfo.Restore();
 	    --it_list_head;
 	    --num_head;
+	    if(le.KeyPress(KEY_UP)) it_current = it_list_head;
 	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
+	    DrawSelectInfo(**it_current);
 	    split.Backward();
 	    cursor.Show();
 	    display.Flip();
 	}
 
 	// click down
-	if((le.MouseWheelDn(rectAreaList) || le.MouseWheelDn(split.GetRect()) || le.MouseClickLeft(buttonPgDn)) &&
+	if((le.MouseWheelDn(rectAreaList) || le.MouseWheelDn(split.GetRect()) || le.MouseClickLeft(buttonPgDn) ||
+	    le.KeyPress(KEY_PAGEDOWN) || le.KeyPress(KEY_DOWN)) &&
 	    LISTMAXITEM < curmaps->size() && num_head + LISTMAXITEM < curmaps->size())
 	{
 	    cursor.Hide();
 	    backgroundList.Restore();
+	    backgroundInfo.Restore();
 	    ++it_list_head;
 	    ++num_head;
+	    if(le.KeyPress(KEY_DOWN)) it_current = it_list_head;
 	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
+	    DrawSelectInfo(**it_current);
 	    split.Forward();
 	    cursor.Show();
 	    display.Flip();
@@ -337,7 +345,7 @@ void DrawList(std::list<Maps::FileInfo *>::const_iterator &it_top, std::list<Map
 	display.Blit(spriteCount, x, y);
 
         // sprite size
-	switch(info.SizeMaps())
+	switch(info.SizeMaps().w)
 	{
             case Maps::SMALL:
     		index = 26;
@@ -392,7 +400,7 @@ void DrawSelectInfo(const Maps::FileInfo & finfo)
     display.Blit(spriteCount, x, y);
 
     // sprite size
-    switch(finfo.SizeMaps())
+    switch(finfo.SizeMaps().w)
     {
         case Maps::SMALL:
     	    index = 26;

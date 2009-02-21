@@ -50,14 +50,8 @@ World & World::GetWorld(void)
     return insideWorld;
 }
 
-/* new maps */
-void World::NewMaps(const u16 sw, const u16 sh)
+void World::Defaults(void)
 {
-    FreeOldMaps();
-
-    width = sw;
-    height = sh;
-
     ultimate_artifact = 0xFFFF;
 
     day = 0;
@@ -69,7 +63,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
 
     week_name = Week::TORTOISE;
     count_obelisk = 0;
-    
+
     // reserve memory
     vec_eventsday.reserve(6);
     vec_eventsmap.reserve(6);
@@ -79,7 +73,6 @@ void World::NewMaps(const u16 sw, const u16 sh)
     vec_teleports.reserve(10);
 
     // playing kingdom
-    Settings::Get().FileInfo().SetKingdomColors(Color::BLUE | Color::GREEN | Color::RED | Color::YELLOW | Color::ORANGE | Color::PURPLE);
     vec_kingdoms.resize(KINGDOMMAX + 1);
     vec_kingdoms[0] = new Kingdom(Color::BLUE);
     vec_kingdoms[1] = new Kingdom(Color::GREEN);
@@ -171,7 +164,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
 	vec_heroes[68] = new Heroes(Heroes::DRAKONIA, Race::WZRD, _("Drakonia"));
 	vec_heroes[69] = new Heroes(Heroes::MARTINE, Race::SORC, _("Martine"));
 	vec_heroes[70] = new Heroes(Heroes::JARKONAS, Race::BARB, _("Jarkonas"));
-	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = Settings::Get().Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
     else
@@ -187,9 +180,19 @@ void World::NewMaps(const u16 sw, const u16 sh)
 	vec_heroes[68] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[71] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
+	vec_heroes[71] = Settings::Get().Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
 	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
     }
+}
+
+/* new maps */
+void World::NewMaps(const u16 sw, const u16 sh)
+{
+    FreeOldMaps();
+    Defaults();
+
+    width = sw;
+    height = sh;
 
     Display & display = Display::Get();
 
@@ -228,142 +231,10 @@ void World::NewMaps(const u16 sw, const u16 sh)
 void World::LoadMaps(const std::string &filename)
 {
     FreeOldMaps();
-
-    ultimate_artifact = 0xFFFF;
-
-    day = 0;
-    week = 0;
-    month = 0;
-
-    begin_week = true;
-    begin_month = true;
-
-    week_name = Week::TORTOISE;
-    count_obelisk = 0;
+    Defaults();
 
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
-
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
-
-    // reserve memory
-    vec_eventsday.reserve(6);
-    vec_eventsmap.reserve(6);
-    vec_riddles.reserve(10);
-    vec_rumors.reserve(10);
-    vec_castles.reserve(MAXCASTLES);
-    vec_teleports.reserve(10);
-
-    // playing kingdom
-    vec_kingdoms.resize(KINGDOMMAX + 1);
-    vec_kingdoms[0] = new Kingdom(Color::BLUE);
-    vec_kingdoms[1] = new Kingdom(Color::GREEN);
-    vec_kingdoms[2] = new Kingdom(Color::RED);
-    vec_kingdoms[3] = new Kingdom(Color::YELLOW);
-    vec_kingdoms[4] = new Kingdom(Color::ORANGE);
-    vec_kingdoms[5] = new Kingdom(Color::PURPLE);
-    vec_kingdoms[6] = new Kingdom(Color::GRAY);
-
-    // initialize all heroes
-    vec_heroes.resize(HEROESMAXCOUNT + 2);
-    vec_heroes[0] = new Heroes(Heroes::LORDKILBURN, Race::KNGT, _("Lord Kilburn"));
-    vec_heroes[1] = new Heroes(Heroes::SIRGALLANTH, Race::KNGT, _("Sir Gallanth"));
-    vec_heroes[2] = new Heroes(Heroes::ECTOR, Race::KNGT, _("Ector"));
-    vec_heroes[3] = new Heroes(Heroes::GVENNETH, Race::KNGT, _("Gvenneth"));
-    vec_heroes[4] = new Heroes(Heroes::TYRO, Race::KNGT, _("Tyro"));
-    vec_heroes[5] = new Heroes(Heroes::AMBROSE, Race::KNGT, _("Ambrose"));
-    vec_heroes[6] = new Heroes(Heroes::RUBY, Race::KNGT, _("Ruby"));
-    vec_heroes[7] = new Heroes(Heroes::MAXIMUS, Race::KNGT, _("Maximus"));
-    vec_heroes[8] = new Heroes(Heroes::DIMITRY, Race::KNGT, _("Dimitry"));
-
-    vec_heroes[9] = new Heroes(Heroes::THUNDAX, Race::BARB, _("Thundax"));
-    vec_heroes[10] = new Heroes(Heroes::FINEOUS, Race::BARB, _("Fineous"));
-    vec_heroes[11] = new Heroes(Heroes::JOJOSH, Race::BARB, _("Jojosh"));
-    vec_heroes[12] = new Heroes(Heroes::CRAGHACK, Race::BARB, _("Crag Hack"));
-    vec_heroes[13] = new Heroes(Heroes::JEZEBEL, Race::BARB, _("Jezebel"));
-    vec_heroes[14] = new Heroes(Heroes::JACLYN, Race::BARB, _("Jaclyn"));
-    vec_heroes[15] = new Heroes(Heroes::ERGON, Race::BARB, _("Ergon"));
-    vec_heroes[16] = new Heroes(Heroes::TSABU, Race::BARB, _("Tsabu"));
-    vec_heroes[17] = new Heroes(Heroes::ATLAS, Race::BARB, _("Atlas"));
-
-    vec_heroes[18] = new Heroes(Heroes::ASTRA, Race::SORC, _("Astra"));
-    vec_heroes[19] = new Heroes(Heroes::NATASHA, Race::SORC, _("Natasha"));
-    vec_heroes[20] = new Heroes(Heroes::TROYAN, Race::SORC, _("Troyan"));
-    vec_heroes[21] = new Heroes(Heroes::VATAWNA, Race::SORC, _("Vatawna"));
-    vec_heroes[22] = new Heroes(Heroes::REBECCA, Race::SORC, _("Rebecca"));
-    vec_heroes[23] = new Heroes(Heroes::GEM, Race::SORC, _("Gem"));
-    vec_heroes[24] = new Heroes(Heroes::ARIEL, Race::SORC, _("Ariel"));
-    vec_heroes[25] = new Heroes(Heroes::CARLAWN, Race::SORC, _("Carlawn"));
-    vec_heroes[26] = new Heroes(Heroes::LUNA, Race::SORC, _("Luna"));
-
-    vec_heroes[27] = new Heroes(Heroes::ARIE, Race::WRLK, _("Arie"));
-    vec_heroes[28] = new Heroes(Heroes::ALAMAR, Race::WRLK, _("Alamar"));
-    vec_heroes[29] = new Heroes(Heroes::VESPER, Race::WRLK, _("Vesper"));
-    vec_heroes[30] = new Heroes(Heroes::CRODO, Race::WRLK, _("Crodo"));
-    vec_heroes[31] = new Heroes(Heroes::BAROK, Race::WRLK, _("Barok"));
-    vec_heroes[32] = new Heroes(Heroes::KASTORE, Race::WRLK, _("Kastore"));
-    vec_heroes[33] = new Heroes(Heroes::AGAR, Race::WRLK, _("Agar"));
-    vec_heroes[34] = new Heroes(Heroes::FALAGAR, Race::WRLK, _("Falagar"));
-    vec_heroes[35] = new Heroes(Heroes::WRATHMONT, Race::WRLK, _("Wrathmont"));
-
-    vec_heroes[36] = new Heroes(Heroes::MYRA, Race::WZRD, _("Myra"));
-    vec_heroes[37] = new Heroes(Heroes::FLINT, Race::WZRD, _("Flint"));
-    vec_heroes[38] = new Heroes(Heroes::DAWN, Race::WZRD, _("Dawn"));
-    vec_heroes[39] = new Heroes(Heroes::HALON, Race::WZRD, _("Halon"));
-    vec_heroes[40] = new Heroes(Heroes::MYRINI, Race::WZRD, _("Myrini"));
-    vec_heroes[41] = new Heroes(Heroes::WILFREY, Race::WZRD, _("Wilfrey"));
-    vec_heroes[42] = new Heroes(Heroes::SARAKIN, Race::WZRD, _("Sarakin"));
-    vec_heroes[43] = new Heroes(Heroes::KALINDRA, Race::WZRD, _("Kalindra"));
-    vec_heroes[44] = new Heroes(Heroes::MANDIGAL, Race::WZRD, _("Mandigal"));
-
-    vec_heroes[45] = new Heroes(Heroes::ZOM, Race::NECR, _("Zom"));
-    vec_heroes[46] = new Heroes(Heroes::DARLANA, Race::NECR, _("Darlana"));
-    vec_heroes[47] = new Heroes(Heroes::ZAM, Race::NECR, _("Zam"));
-    vec_heroes[48] = new Heroes(Heroes::RANLOO, Race::NECR, _("Ranloo"));
-    vec_heroes[49] = new Heroes(Heroes::CHARITY, Race::NECR, _("Charity"));
-    vec_heroes[50] = new Heroes(Heroes::RIALDO, Race::NECR, _("Rialdo"));
-    vec_heroes[51] = new Heroes(Heroes::ROXANA, Race::NECR, _("Roxana"));
-    vec_heroes[52] = new Heroes(Heroes::SANDRO, Race::NECR, _("Sandro"));
-    vec_heroes[53] = new Heroes(Heroes::CELIA, Race::NECR, _("Celia"));
-
-    vec_heroes[54] = new Heroes(Heroes::ROLAND, Race::WZRD, _("Roland"));
-    vec_heroes[55] = new Heroes(Heroes::CORLAGON, Race::KNGT, _("Lord Corlagon"));
-    vec_heroes[56] = new Heroes(Heroes::ELIZA, Race::SORC, _("Sister Eliza"));
-    vec_heroes[57] = new Heroes(Heroes::ARCHIBALD, Race::WRLK, _("Archibald"));
-    vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT, _("Lord Halton"));
-    vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR, _("Brother Bax"));
-
-    if(Settings::Get().Modes(Settings::PRICELOYALTY))
-    {
-	vec_heroes[60] = new Heroes(Heroes::SOLMYR, Race::WZRD, _("Solmyr"));
-	vec_heroes[61] = new Heroes(Heroes::DAINWIN, Race::WRLK, _("Dainwin"));
-	vec_heroes[62] = new Heroes(Heroes::MOG, Race::NECR, _("Mog"));
-	vec_heroes[63] = new Heroes(Heroes::UNCLEIVAN, Race::BARB, _("Uncle Ivan"));
-	vec_heroes[64] = new Heroes(Heroes::JOSEPH, Race::KNGT, _("Joseph"));
-	vec_heroes[65] = new Heroes(Heroes::GALLAVANT, Race::KNGT, _("Gallavant"));
-	vec_heroes[66] = new Heroes(Heroes::ELDERIAN, Race::WRLK, _("Elderian"));
-	vec_heroes[67] = new Heroes(Heroes::CEALLACH, Race::KNGT, _("Ceallach"));
-	vec_heroes[68] = new Heroes(Heroes::DRAKONIA, Race::WZRD, _("Drakonia"));
-	vec_heroes[69] = new Heroes(Heroes::MARTINE, Race::SORC, _("Martine"));
-	vec_heroes[70] = new Heroes(Heroes::JARKONAS, Race::BARB, _("Jarkonas"));
-	vec_heroes[71] = Settings::Get().Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-    }
-    else
-    {
-	vec_heroes[60] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[61] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[62] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[63] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[64] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[65] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[66] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[67] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[68] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[69] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[70] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[71] = Settings::Get().Debug() ? new Heroes(Heroes::SANDYSANDY, Race::WRLK, "SandySandy") : new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-	vec_heroes[72] = new Heroes(Heroes::UNKNOWN, Race::KNGT, "Unknown");
-    }
 
     Display & display = Display::Get();
 

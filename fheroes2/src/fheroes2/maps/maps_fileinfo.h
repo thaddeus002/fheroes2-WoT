@@ -53,7 +53,7 @@ public:
 
     bool PlayWithHeroes(void) const;
 
-    mapsize_t SizeMaps(void) const;
+    const Size & SizeMaps(void) const;
     Difficulty::difficulty_t Difficulty(void) const;
 
     void SetKingdomColors(const u8 colors);
@@ -69,7 +69,7 @@ private:
     std::string name;
     std::string description;
 
-    mapsize_t size;
+    Size size;
     Difficulty::difficulty_t difficulty;
 
     u8 kingdom_colors;

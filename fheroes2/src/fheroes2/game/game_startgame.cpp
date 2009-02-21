@@ -840,6 +840,9 @@ Game::menu_t Game::HumanTurn(void)
 	// save game
 	if(le.KeyPress(KEY_s)) Game::Save();
 	else
+	// load game
+	if(le.KeyPress(KEY_l)) Game::Load();
+	else
 	// key left
 	if(le.KeyPress(KEY_LEFT))
 	{

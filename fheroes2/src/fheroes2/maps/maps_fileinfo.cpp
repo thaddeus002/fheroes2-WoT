@@ -31,7 +31,7 @@ Maps::FileInfo::FileInfo() : size(Maps::ZERO), difficulty(Difficulty::EASY),
 {
 }
 
-Maps::FileInfo::FileInfo(const std::string &filename) : size(Maps::ZERO), difficulty(Difficulty::EASY),
+Maps::FileInfo::FileInfo(const std::string &filename) : difficulty(Difficulty::EASY),
     kingdom_colors(0), allow_colors(0), rnd_colors(0), with_heroes(false), races(KINGDOMMAX)
 {
     Read(filename);
@@ -52,7 +52,7 @@ const std::string & Maps::FileInfo::Description(void) const
     return description;
 }
 
-Maps::mapsize_t Maps::FileInfo::SizeMaps(void) const
+const Size & Maps::FileInfo::SizeMaps(void) const
 {
     return size;
 }
@@ -126,7 +126,6 @@ bool Maps::FileInfo::PlayWithHeroes(void) const
 
 bool Maps::FileInfo::Read(const std::string &filename)
 {
-    size = Maps::ZERO;
     difficulty = Difficulty::EASY;
     kingdom_colors = 0;
     allow_colors = 0;
@@ -194,55 +193,11 @@ bool Maps::FileInfo::Read(const std::string &filename)
 
     // width
     fd.read(&byte8, 1);
-
-    switch(byte8)
-    {
-	case Maps::SMALL:
-	    size = Maps::SMALL;
-	    break;
-
-	case Maps::MEDIUM:
-	    size = Maps::MEDIUM;
-	    break;
-
-	case Maps::LARGE:
-	    size = Maps::LARGE;
-	    break;
-
-	case Maps::XLARGE:
-	    size = Maps::XLARGE;
-	    break;
-	
-	default:
-	    Error::Warning("Maps::FileInfo: width unknown");
-	    break;
-    }
+    size.w = byte8;
 
     // height
     fd.read(&byte8, 1);
-
-    switch(byte8)
-    {
-	case Maps::SMALL:
-	    if(size != Maps::SMALL) Error::Warning("Maps::FileInfo: incorrect height");
-	    break;
-
-	case Maps::MEDIUM:
-	    if(size != Maps::MEDIUM) Error::Warning("Maps::FileInfo: incorrect height");
-	    break;
-
-	case Maps::LARGE:
-	    if(size != Maps::LARGE) Error::Warning("Maps::FileInfo: incorrect height");
-	    break;
-
-	case Maps::XLARGE:
-	    if(size != Maps::XLARGE) Error::Warning("Maps::FileInfo: incorrect height");
-	    break;
-	
-	default:
-	    Error::Warning("Maps::FileInfo: height unknown");
-	    break;
-    }
+    size.h = byte8;
 
     // kingdom color blue
     fd.read(&byte8, 1);

@@ -150,12 +150,13 @@ protected:
 
 private:
     World() : Size(0, 0), ultimate_artifact_area(448, 448), width(Size::w), height(Size::h) {};
-
+    void Defaults(void);
     void FreeOldMaps(void);
 
 private:
     friend class Radar;
     friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
     
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;

@@ -153,6 +153,7 @@ public:
 
 private:
     friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
 
     void AICastlesTurns(void);
     void AIHeroesTurns(Heroes &);

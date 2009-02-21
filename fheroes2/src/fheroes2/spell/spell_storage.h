@@ -23,6 +23,7 @@
 
 #include <list>
 #include "spell.h"
+#include "game_io.h"
 #include "gamedefs.h"
 
 namespace Spell
@@ -47,6 +48,8 @@ namespace Spell
 	const std::list<Spell::spell_t> & Spells5(void) const;
 
     protected:
+	friend void Game::SaveXML(const std::string &);
+
 	std::list<Spell::spell_t>	spells_level1;
 	std::list<Spell::spell_t>	spells_level2;
 	std::list<Spell::spell_t>	spells_level3;

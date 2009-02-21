@@ -42,6 +42,8 @@ enum KeySym
     KEY_SHIFT,
     KEY_BACKSLASH,
     KEY_SPACE,
+    KEY_PAGEUP,
+    KEY_PAGEDOWN,
     KEY_F1,
     KEY_F2,
     KEY_F3,

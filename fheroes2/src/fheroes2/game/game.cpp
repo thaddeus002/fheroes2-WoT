@@ -50,7 +50,7 @@ void Game::SetFixVideoMode(void)
     Size fixsize(conf.VideoMode());
     u32 max = 0;
 
-    switch(conf.FileInfo().SizeMaps())
+    switch(conf.FileInfo().SizeMaps().w)
     {
 	default:
 	case Maps::SMALL:

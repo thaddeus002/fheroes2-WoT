@@ -73,10 +73,6 @@ class icnheader
                                                 
 int main(int argc, char **argv)
 {
-#ifndef WITH_PNG
-    std::cout << "need build with PNG support" << std::endl;
-    return EXIT_SUCCESS;
-#else
     if(argc < 3)
     {
 	std::cout << argv[0] << " [-d] infile.icn extract_to_dir" << std::endl;
@@ -180,9 +176,13 @@ int main(int argc, char **argv)
     		break;
         }
 
+#ifndef WITH_PNG
+	dstfile += ".bmp";
+	sf.SaveBMP(dstfile.c_str());
+#else
 	dstfile += ".png";
-
 	sf.SavePNG(dstfile.c_str());
+#endif
     }
 
     fd_data.close();
@@ -192,7 +192,6 @@ int main(int argc, char **argv)
     SDL::Quit();
 
     return EXIT_SUCCESS;
-#endif
 }
 
 /* draw RLE ICN to surface */

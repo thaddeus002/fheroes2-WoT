@@ -54,6 +54,8 @@ static KeySym SDLToKeySym(SDLKey key)
 	case SDLK_RSHIFT:	return KEY_SHIFT;
 	case SDLK_BACKSLASH:	return KEY_BACKSLASH;
 	case SDLK_SPACE:	return KEY_SPACE;
+	case SDLK_PAGEUP:	return KEY_PAGEUP;
+	case SDLK_PAGEDOWN:	return KEY_PAGEDOWN;
 	case SDLK_F1:		return KEY_F1;
 	case SDLK_F2:		return KEY_F2;
 	case SDLK_F3:		return KEY_F3;
@@ -445,9 +447,13 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
         
         	std::string name("screenshot_");
         	name += stream.str();
+#ifndef WITH_PNG
         	name += ".bmp";
-
             	if(display.SaveBMP(name.c_str())) Error::Verbose("save: " + name);
+#else
+        	name += ".png";
+            	if(display.SavePNG(name.c_str())) Error::Verbose("save: " + name);
+#endif
 	    }
 	    	return 0;
 

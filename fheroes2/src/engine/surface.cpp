@@ -481,7 +481,7 @@ bool Surface::SaveBMP(const char *fn) const
 bool Surface::SavePNG(const char *fn) const
 {
 #ifdef WITH_PNG
-    return IMG_SavePNG(fn, surface, -1);
+    return IMG_SavePNG(fn, surface, -1) ? false : true;
 #else
     return false;
 #endif

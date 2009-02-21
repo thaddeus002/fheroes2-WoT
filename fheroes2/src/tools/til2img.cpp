@@ -123,9 +123,13 @@ int main(int argc, char **argv)
     		break;
         }
 
-	dstfile += ".bmp";
-
-	sf.SaveBMP(dstfile.c_str());
+#ifndef WITH_PNG
+        dstfile += ".bmp";
+        sf.SaveBMP(dstfile.c_str());
+#else
+        dstfile += ".png";
+        sf.SavePNG(dstfile.c_str());
+#endif
     }
 
     delete [] body;

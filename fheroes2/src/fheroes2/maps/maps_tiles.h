@@ -146,7 +146,8 @@ namespace Maps
 
     private:
 	friend void Game::SaveXML(const std::string &);
-	
+	friend void Game::LoadXML(const std::string &);
+
 	const u16 maps_index;
 	Surface tile_sprite;
 	u16	tile_index;

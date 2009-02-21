@@ -214,12 +214,13 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 			}else{
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
-										0xff0000, 0x00ff00, 0x0000ff, 0x00000000);
+										0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000);
 #else
 				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
 										0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000);
 #endif
 			}
+			//SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, Uint32 flags);
 			if(!tempsurf){
 				SDL_SetError("Couldn't allocate temp surface");
 				goto savedone;

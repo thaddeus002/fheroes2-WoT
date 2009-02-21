@@ -29,9 +29,16 @@ extern char *basename(const char *path);
 
 void Game::Save(const std::string &fn)
 {
-    Error::Verbose("Game::Save: to " + fn);
+    Error::Verbose("Game::Save: " + fn);
 
     SaveXML(fn);
+}
+
+void Game::Load(const std::string &fn)
+{
+    Error::Verbose("Game::Load: " + fn);
+
+    LoadXML(fn);
 }
 
 #ifdef WITH_XML
@@ -58,6 +65,16 @@ void Game::SaveXML(const std::string &fn)
     // maps
     xmlcc::Element *maps = root->addElement("maps");
 
+    str.clear();
+    String::AddInt(str, conf.FileInfo().SizeMaps().w);
+    xmlcc::Element *mapsw = maps->addElement("width");
+    mapsw->addContent(str);
+
+    str.clear();
+    String::AddInt(str, conf.FileInfo().SizeMaps().h);
+    xmlcc::Element *mapsh = maps->addElement("height");
+    mapsh->addContent(str);
+
     // maps->file
     str = basename(conf.FileInfo().FileMaps().c_str());
     xmlcc::Element *file = maps->addElement("file");
@@ -68,6 +85,17 @@ void Game::SaveXML(const std::string &fn)
     // maps->description
     xmlcc::Element *desc = maps->addElement("description");
     desc->addContent(conf.FileInfo().Description());
+
+    // game
+    xmlcc::Element *game = root->addElement("game");
+
+    str.clear();
+    String::AddInt(str, conf.FileInfo().ConditionsWins());
+    game->addAttribute("wins", str);
+
+    str.clear();
+    String::AddInt(str, conf.FileInfo().ConditionsLoss());
+    game->addAttribute("loss", str);
 
     // world
     xmlcc::Element *world2 = root->addElement("world");
@@ -145,7 +173,7 @@ void Game::SaveXML(const std::string &fn)
 	tile2->addAttribute("fogs", str);
 
 	// tiles->tile->addons1
-	xmlcc::Element *addons1 = tiles->addElement("addons_level1");
+	xmlcc::Element *addons1 = tile2->addElement("addons_level1");
 
 	str.clear();
 	String::AddInt(str, tile.addons_level1.size());
@@ -179,7 +207,7 @@ void Game::SaveXML(const std::string &fn)
 	}
 
 	// tiles->tile->addon2
-	xmlcc::Element *addons2 = tiles->addElement("addons_level2");
+	xmlcc::Element *addons2 = tile2->addElement("addons_level2");
 
 	str.clear();
 	String::AddInt(str, tile.addons_level2.size());
@@ -231,12 +259,12 @@ void Game::SaveXML(const std::string &fn)
 	kingdom2->addAttribute("ii", str);
 
 	str.clear();
-	String::AddInt(str, kingdom.color);
-	kingdom2->addAttribute("color", str);
+	String::AddInt(str, kingdom.flags);
+	kingdom2->addAttribute("modes", str);
 
 	str.clear();
-	String::AddInt(str, kingdom.flags);
-	kingdom2->addAttribute("flags", str);
+	String::AddInt(str, kingdom.color);
+	kingdom2->addAttribute("color", str);
 
 	str.clear();
 	String::AddInt(str, kingdom.control);
@@ -416,7 +444,7 @@ void Game::SaveXML(const std::string &fn)
 
 	    str.clear();
 	    String::AddInt(str, hero.artifacts[ii]);
-	    artifact->addAttribute("type", str);
+	    artifact->addContent(str);
 	}
 
 	// heroes->hero->armies
@@ -440,9 +468,72 @@ void Game::SaveXML(const std::string &fn)
 	    troop2->addAttribute("count", str);
 	}
 
-/*
-	Spell::Book spell_book;
-*/
+	// heroes->hero->spell_book
+	xmlcc::Element *book = hero2->addElement("spell_book");
+	book->addAttribute("enable", hero.spell_book.isActive() ? "true" : "false");
+        {
+	    std::list<Spell::spell_t>::const_iterator it1, it2;
+
+	    // spell_level1
+	    it1 = hero.spell_book.spells_level1.begin();
+	    it2 = hero.spell_book.spells_level1.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = book->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level2
+	    it1 = hero.spell_book.spells_level2.begin();
+	    it2 = hero.spell_book.spells_level2.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = book->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level3
+	    it1 = hero.spell_book.spells_level3.begin();
+	    it2 = hero.spell_book.spells_level3.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = book->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level4
+	    it1 = hero.spell_book.spells_level4.begin();
+	    it2 = hero.spell_book.spells_level4.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = book->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level5
+	    it1 = hero.spell_book.spells_level5.begin();
+	    it2 = hero.spell_book.spells_level5.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = book->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+	}
 
 	// heroes->hero->center
 	xmlcc::Element *center = hero2->addElement("center");
@@ -527,9 +618,77 @@ void Game::SaveXML(const std::string &fn)
 	String::AddInt(str, castle.mp.y);
 	center->addAttribute("y", str);
 
-/*
-        MageGuild           mageguild;
-*/
+	// castles->castle->mageguild
+	xmlcc::Element *guild = castle2->addElement("mageguild");
+
+	str.clear();
+	String::AddInt(str, castle.mageguild.GetLevel());
+	guild->addAttribute("level", str);
+
+        {
+	    std::list<Spell::spell_t>::const_iterator it1, it2;
+
+	    // spell_level1
+	    it1 = castle.mageguild.spells_level1.begin();
+	    it2 = castle.mageguild.spells_level1.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = guild->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level2
+	    it1 = castle.mageguild.spells_level2.begin();
+	    it2 = castle.mageguild.spells_level2.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = guild->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level3
+	    it1 = castle.mageguild.spells_level3.begin();
+	    it2 = castle.mageguild.spells_level3.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = guild->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level4
+	    it1 = castle.mageguild.spells_level4.begin();
+	    it2 = castle.mageguild.spells_level4.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = guild->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+
+	    // spell_level5
+	    it1 = castle.mageguild.spells_level5.begin();
+	    it2 = castle.mageguild.spells_level5.end();
+
+	    for(; it1 != it2; ++it1)
+	    {
+		xmlcc::Element *spell = guild->addElement("spell");
+		str.clear();
+		String::AddInt(str, *it1);
+		spell->addContent(str);
+	    }
+	}
+
 	// castles->castle->armies
 	xmlcc::Element *armies = castle2->addElement("armies");
 
@@ -552,19 +711,19 @@ void Game::SaveXML(const std::string &fn)
 	}
 
 	// castles->castle->dwelling
-	xmlcc::Element *dwelling = castle2->addElement("dwellings");
+	xmlcc::Element *dwellings = castle2->addElement("dwellings");
 
 	str.clear();
 	String::AddInt(str, castle.dwelling.size());
-	dwelling->addAttribute("size", str);
+	dwellings->addAttribute("size", str);
 
 	for(u16 ii = 0; ii < castle.dwelling.size(); ++ii)
 	{
-	    xmlcc::Element *artifact = dwelling->addElement("dwelling");
+	    xmlcc::Element *dwelling = dwellings->addElement("dwelling");
 
 	    str.clear();
 	    String::AddInt(str, castle.dwelling[ii]);
-	    artifact->addAttribute("type", str);
+	    dwelling->addContent(str);
 	}
     }
 
@@ -572,6 +731,53 @@ void Game::SaveXML(const std::string &fn)
     tree.setCompression(6);
     tree.write(fn);
 }
+
+void Game::LoadXML(const std::string &fn)
+{
+    xmlcc::XMLTree tree;
+
+    if(!tree.read("fheroes2.sav"))
+    {
+	Error::Warning("Game::LoadXML: parser error: " + fn);
+	return;
+    }
+
+    xmlcc::Element *fheroes2 = tree.getRoot();
+
+    if(!fheroes2 || fheroes2->name() != "fheroes2")
+    {
+	Error::Warning("Game::LoadXML: parser error: fheroes2");
+	return;
+    }
+
+    xmlcc::Element *maps = fheroes2->getElement("maps");
+    if(!maps)
+    {
+	Error::Warning("Game::LoadXML: parser error: maps");
+	return;
+    }
+
+    xmlcc::Element *mapsw = maps->getElement("width");
+    xmlcc::Element *mapsh = maps->getElement("height");
+    if(!mapsw || !mapsh)
+    {
+	Error::Warning("Game::LoadXML: parser error: width or height");
+	return;
+    }
+//
+//    Error::Verbose(mapsw->name());
+//    Error::Verbose(mapsh->name());
+//    Error::Verbose("w: " + mapsw->getContent());
+//    Error::Verbose("h: " + mapsh->getContent());
+//    Error::Verbose("w: ", String::ToInt(mapsw->getContent()));
+//    Error::Verbose("h: ", String::ToInt(mapsh->getContent()));
+
+//    xmlcc::Element *file = maps->getElement("file");
+//    xmlcc::Element *name = maps->getElement("name");
+//    xmlcc::Element *desc = maps->getElement("description");
+
+}
 #else
 void Game::SaveXML(const std::string &){};
+void Game::LoadXML(const std::string &){};
 #endif
