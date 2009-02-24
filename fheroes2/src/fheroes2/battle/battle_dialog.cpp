@@ -1,4 +1,5 @@
 #include <string>
+#include <algorithm>
 #include "battle.h"
 #include "battle_types.h"
 #include "engine.h"

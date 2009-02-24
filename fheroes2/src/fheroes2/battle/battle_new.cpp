@@ -1,4 +1,5 @@
 #include <cmath>
+#include <algorithm>
 #include "engine.h"
 #include "settings.h"
 #include "army_troop.h"
