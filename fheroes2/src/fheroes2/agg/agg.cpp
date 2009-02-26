@@ -164,11 +164,13 @@ AGG::Cache::Cache() : heroes2_agg(false)
 {
 #ifdef WITH_TTF
     Settings & conf = Settings::Get();
+    const std::string font1(conf.LocalDataPrefix() + SEPARATOR + "fonts" + SEPARATOR + conf.FontsNormal());
+    const std::string font2(conf.LocalDataPrefix() + SEPARATOR + "fonts" + SEPARATOR + conf.FontsSmall());
 
     if(conf.Unicode())
     {
-	if(!font_medium.Open(conf.FontsNormal(), conf.FontsNormalSize()) ||
-	   !font_small.Open(conf.FontsSmall(), conf.FontsSmallSize())) conf.ResetModes(Settings::UNICODE);
+	if(!font_medium.Open(font1, conf.FontsNormalSize()) ||
+	   !font_small.Open(font2, conf.FontsSmallSize())) conf.ResetModes(Settings::UNICODE);
     }
 #endif
 }
@@ -403,20 +405,21 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
     if(v.size()) return;
+    const Settings & conf = Settings::Get();
 
     // load from image cache dir
 #ifdef WITH_PNG
-    if(Settings::Get().CacheDirectory().size())
+    if(conf.Modes(Settings::USECACHE))
     {
 	Dir dir;
-	const std::string icn_folder(Settings::Get().CacheDirectory() + SEPARATOR + ICN::GetString(icn));
+	const std::string icn_folder(conf.LocalDataPrefix() + SEPARATOR + "cache" + SEPARATOR + ICN::GetString(icn));
 
 	dir.Read(icn_folder, ".png", false);
 	dir.sort();
 	
 	if(dir.size())
 	{
-	    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
+	    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
 
 	    v.resize(dir.size());
 	    Dir::const_iterator itd = dir.begin();
@@ -432,7 +435,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     }
 #endif
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
 
     // load from agg file
     if(agg_cache.size())
@@ -635,10 +638,11 @@ void AGG::Cache::LoadPAL(void)
 void AGG::Cache::LoadMUS(const MUS::mus_t mus)
 {
     std::vector<u8> & v = mus_cache[mus];
-    const std::string musname("files/music/" + MUS::GetString(mus));
+    const Settings & conf = Settings::Get();
+    const std::string musname(conf.LocalDataPrefix() + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
     if(v.size()) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + musname);
+    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + musname);
 
     if(! Mixer::isValid()) return;
 

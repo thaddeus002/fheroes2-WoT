@@ -131,7 +131,7 @@ u32 Surface::MapRGB(u8 r, u8 g, u8 b, u8 a) const
 
 void Surface::GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a) const
 {
-    return (SDL_SRCALPHA & surface->flags) ? SDL_GetRGBA(pixel, surface->format, r, g, b, a) : SDL_GetRGB(pixel, surface->format, r, g, b);
+    return (SDL_SRCALPHA & surface->flags && a) ? SDL_GetRGBA(pixel, surface->format, r, g, b, a) : SDL_GetRGB(pixel, surface->format, r, g, b);
 }
 
 /* create new surface */
@@ -199,8 +199,9 @@ u32 Surface::GetColorKey(void) const
 {
     if(! surface) return 0;
 
-    return surface->flags & SDL_SRCALPHA ? SDL_MapRGBA(surface->format, 0xFF, 0x00, 0xFF, 0) :
-			    SDL_MapRGB(surface->format, 0xFF, 0x00, 0xFF);
+//    return surface->flags & SDL_SRCALPHA ? SDL_MapRGBA(surface->format, 0xFF, 0x00, 0xFF, 0) :
+//			    SDL_MapRGB(surface->format, 0xFF, 0x00, 0xFF);
+    return SDL_MapRGBA(surface->format, 0xFF, 0x00, 0xFF, 0);
 }
 
 /* set color key */
@@ -475,13 +476,13 @@ void Surface::ScaleFrom(const Surface & bs)
 
 bool Surface::SaveBMP(const char *fn) const
 {
-    return SDL_SaveBMP(surface, fn) ? false : true;
+    return !surface || SDL_SaveBMP(surface, fn) ? false : true;
 }
 
 bool Surface::SavePNG(const char *fn) const
 {
 #ifdef WITH_PNG
-    return IMG_SavePNG(fn, surface, -1) ? false : true;
+    return !surface || IMG_SavePNG(fn, surface, -1) ? false : true;
 #else
     return false;
 #endif
@@ -489,17 +490,20 @@ bool Surface::SavePNG(const char *fn) const
 
 const void *Surface::pixels(void) const
 {
-    return surface->pixels;
+    return surface ? surface->pixels : NULL;
 }
 
 void Surface::SetAlpha(u8 level)
 {
+    if(!surface) return;
     SDL_SetAlpha(surface, SDL_SRCALPHA, level);
 }
 
 void Surface::ResetAlpha(void)
 {
+    if(!surface) return;
     SDL_SetAlpha(surface, 0, 0);
+    surface->format->Amask = 0;
 }
 
 void Surface::Lock(void)

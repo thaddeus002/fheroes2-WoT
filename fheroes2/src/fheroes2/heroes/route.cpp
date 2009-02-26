@@ -51,11 +51,11 @@ void Route::Path::PopFront(void)
 }
 
 /* return length path */
-u16 Route::Path::Calculate(const u16 dst_index, const u16 limit, bool revert)
+u16 Route::Path::Calculate(const u16 dst_index, const u16 limit)
 {
     clear();
 
-    Algorithm::PathFind(this, (revert ? dst_index : hero.GetIndex()), (revert ? hero.GetIndex() : dst_index), limit, &hero);
+    Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
 
     dst = dst_index;
 

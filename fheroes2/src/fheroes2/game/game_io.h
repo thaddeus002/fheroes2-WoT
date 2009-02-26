@@ -25,8 +25,11 @@
 
 namespace Game
 {
-    void Save(const std::string & fn = std::string("fheroes2.sav"));
-    void Load(const std::string & fn = std::string("fheroes2.sav"));
+    void Save(void);
+    void Load(void);
+
+    void Save(const std::string & fn);
+    void Load(const std::string & fn);
 
     void SaveXML(const std::string &);
     void LoadXML(const std::string &);

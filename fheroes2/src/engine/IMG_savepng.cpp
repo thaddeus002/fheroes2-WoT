@@ -136,17 +136,17 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 			png_set_tRNS(png_ptr,info_ptr,palette_alpha,fmt->colorkey+1,NULL);
 		}
 	}else{ /* Truecolor */
-		if (fmt->Amask) {
+//		if (fmt->Amask) {
 			png_set_IHDR(png_ptr,info_ptr,
 				surf->w,surf->h,8,PNG_COLOR_TYPE_RGB_ALPHA,
 				PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,
 				PNG_FILTER_TYPE_DEFAULT);
-		} else {
-			png_set_IHDR(png_ptr,info_ptr,
-				surf->w,surf->h,8,PNG_COLOR_TYPE_RGB,
-				PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,
-				PNG_FILTER_TYPE_DEFAULT);
-		}
+//		} else {
+//			png_set_IHDR(png_ptr,info_ptr,
+//				surf->w,surf->h,8,PNG_COLOR_TYPE_RGB,
+//				PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,
+//				PNG_FILTER_TYPE_DEFAULT);
+//		}
 	}
 	png_write_info(png_ptr, info_ptr);
 
@@ -203,7 +203,7 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 		}
 		if (funky_format) {
 			/* Allocate non-funky format, and copy pixeldata in*/
-			if(fmt->Amask){
+//			if(fmt->Amask){
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
 										0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
@@ -211,16 +211,15 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
 										0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 #endif
-			}else{
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
-										0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000);
-#else
-				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
-										0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000);
-#endif
-			}
-			//SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, Uint32 flags);
+//			}else{
+//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+//				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
+//										0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000);
+//#else
+//				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
+//										0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000);
+//#endif
+//			}
 			if(!tempsurf){
 				SDL_SetError("Couldn't allocate temp surface");
 				goto savedone;

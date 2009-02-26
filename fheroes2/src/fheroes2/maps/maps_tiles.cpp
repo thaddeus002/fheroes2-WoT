@@ -432,6 +432,7 @@ Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2)
 
 void Maps::Tiles::DebugInfo(void) const
 {
+    u16 res = 0;
     std::list<TilesAddon>::const_iterator it1;
     std::list<TilesAddon>::const_iterator it2;
 
@@ -552,6 +553,8 @@ void Maps::Tiles::DebugInfo(void) const
 	}
     }
 
+    std::cout << "----------------I--------" << std::endl;
+
     // extra obj info
     switch(general)
     {
@@ -576,7 +579,6 @@ void Maps::Tiles::DebugInfo(void) const
         case MP2::OBJ_THATCHEDHUT:
 	//
 	case MP2::OBJ_MONSTER:
-	    std::cout << "----------------I--------" << std::endl;
 	    std::cout << "count           : " << GetCountMonster() << std::endl;
 	    break;
 
@@ -595,7 +597,10 @@ void Maps::Tiles::DebugInfo(void) const
 	    }
 	    break;
 
-	default: break;
+	default:
+	    if(Maps::TileUnderProtection(maps_index, &res))
+		std::cout << "protection      : " << res << std::endl;
+	    break;
     }
 
     std::cout << "----------------:--------" << std::endl << std::endl;

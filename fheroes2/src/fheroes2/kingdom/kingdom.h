@@ -71,6 +71,8 @@
 #define DAY_PROFIT_GEMS                 1
 #define DAY_PROFIT_GOLD                 1000
 
+#define LOST_TOWN_DAYS			7
+
 #include <vector>
 #include <map>
 #include "race.h"
@@ -91,7 +93,6 @@ public:
     enum flags_t
     {
 	PLAY	= 0x0001,
-	
     };
 
     Kingdom(const Color::color_t cl, const Game::control_t con = Game::AI);
@@ -124,6 +125,7 @@ public:
     u8 GetCountTown(void) const;
     u8 GetCountMarketplace(void) const;
     u8 GetCountCapital(void) const;
+    u8 GetLostTownDays(void) const;
 
     const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; };
     const std::vector<Castle *> & GetCastles(void) const{ return castles; };
@@ -133,6 +135,7 @@ public:
 
     void AddHeroes(const Heroes *hero);
     void RemoveHeroes(const Heroes *hero);
+    void FreeAllHeroes(void);
 
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);
@@ -165,6 +168,7 @@ private:
     Resource::funds_t resource;
 
     u16 flags;
+    u8  lost_town_days;
 
     std::vector<Castle *> castles;
     std::vector<Heroes *> heroes;

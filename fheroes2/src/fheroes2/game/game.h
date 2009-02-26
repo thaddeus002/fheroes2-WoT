@@ -29,12 +29,13 @@
 class Heroes;
 class Castle;
 class Surface;
+class Kingdom;
 
 namespace Game
 {
     typedef enum
     {
-	CANCEL,
+	CANCEL = 0,
 	QUITGAME,
 	MAINMENU,
         NEWGAME,
@@ -59,11 +60,13 @@ namespace Game
 	EDITSAVEMAP,
 	EDITSTART,
 	ENDTURN,
+	WINSGAME,
+	LOSSGAME,
 	TESTING,
     } menu_t;
 
     typedef enum { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK } type_t;
-    typedef enum { LOCAL, REMOTE, AI } control_t;
+    typedef enum { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 } control_t;
 
     menu_t MainMenu(void);
     menu_t NewGame(void);
@@ -91,7 +94,7 @@ namespace Game
     
     void PreloadLOOPSounds(void);
     void EnvironmentSoundMixer(void);
-
+    
     namespace Editor
     {
 	Game::menu_t MainMenu(void);

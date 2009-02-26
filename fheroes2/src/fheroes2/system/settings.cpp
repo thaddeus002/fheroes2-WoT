@@ -41,14 +41,16 @@ namespace
         { "battlemoveshadow",  Settings::BATTLEMOVESHADOW            },
         { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           },
         { "unicode",           Settings::UNICODE                     },
+        { "use cache",         Settings::USECACHE                    },
     };
 }
 
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), cur_color(Color::GRAY), path_cache_directory(""), path_data_directory("data"), path_maps_directory("maps"),
-    font_normal("files/fonts/dejavusans.ttf"), font_small("files/fonts/dejavusans.ttf"), size_normal(15), size_small(10),
+    my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"),
+    local_data_prefix("files"),
+    font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
 {
     SetModes(SHADOW);
@@ -134,19 +136,15 @@ void Settings::Dump(std::ostream & stream) const
     str += ".";
     String::AddInt(str, minor_version);
     
+    stream << std::endl;
     stream << "# fheroes2 dump config, version " << str;
 
     str.clear();
     String::AddInt(str, build_date);
     stream <<", build " << str << std::endl;
 
-    stream << "cache = " << path_cache_directory << std::endl;
     stream << "data = " << path_data_directory << std::endl;
     stream << "maps = " << path_maps_directory << std::endl;
-    stream << "fonts normal = " << font_normal << std::endl;
-    stream << "fonts small = " << font_small << std::endl;
-    stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
-    stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
 
     str.clear();
     String::AddInt(str, video_mode.w);
@@ -163,11 +161,20 @@ void Settings::Dump(std::ostream & stream) const
     stream << "evilinterface = " << (Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
     stream << "shadow = " << (Modes(SHADOW) ? "on"  : "off") << std::endl;
     stream << "original = " << (Modes(ORIGINAL) ? "on"  : "off") << std::endl;
+    stream << "use cache = " << (Modes(USECACHE) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
+
     stream << "battle grid = " << (Modes(BATTLEGRID) ? "on" : "off") << std::endl;
     stream << "battle movement shadow = " << (Modes(BATTLEMOVESHADOW) ? "on" : "off") << std::endl;
     stream << "battle mouse shadow = " << (Modes(BATTLEMOUSESHADOW) ? "on" : "off") << std::endl;
+
+#ifdef WITH_TTF
+    stream << "fonts normal = " << font_normal << std::endl;
+    stream << "fonts small = " << font_small << std::endl;
+    stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
+    stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
     stream << "unicode = " << (Modes(UNICODE) ? "on" : "off") << std::endl;
+#endif
 
     stream << std::endl;
 }
@@ -226,14 +233,14 @@ u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontsRenderBlended(void) const { return Modes(FONTRENDERBLENDED); }
 
-/* return path to image cache directory */
-const std::string & Settings::CacheDirectory(void) const { return path_cache_directory; }
-
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
 
 /* return path to maps directory */
 const std::string & Settings::MapsDirectory(void) const { return path_maps_directory; }
+
+/* return path to locales directory */
+const std::string & Settings::LocalDataPrefix(void) const { return local_data_prefix; }
 
 /* return editor */
 bool Settings::Editor(void) const { return Modes(EDITOR); }
@@ -295,9 +302,6 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "fonts small size") size_small = String::ToInt(right);
     else
     if(left == "fonts render" && right == "blended") SetModes(FONTRENDERBLENDED);
-    else
-    // cache directory
-    if(left == "cache") path_cache_directory = right;
     else
     // data directory
     if(left == "data") path_data_directory = right;
@@ -501,4 +505,9 @@ void Settings::SetPreferablyCountPlayers(u8 c)
 u8 Settings::PreferablyCountPlayers(void) const
 {
     return preferably_count_players;
+}
+
+void Settings::SetLocalDataPrefix(const std::string & str)
+{
+    local_data_prefix = str;
 }

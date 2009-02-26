@@ -2593,8 +2593,12 @@ void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
         {
     	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
 	    PlaySoundSuccess;
-    	    Dialog::ResourceInfo(event_maps->GetMessage(), "", event_maps->GetResource());
+    	    Dialog::ResourceInfo("", event_maps->GetMessage(), event_maps->GetResource());
 	}
+	else
+        if(event_maps->GetMessage().size())
+            Dialog::Message("", event_maps->GetMessage(), Font::BIG, Dialog::OK);
+
 	if(Artifact::UNKNOWN != event_maps->GetArtifact())
 	{
 	    if(hero.PickupArtifact(event_maps->GetArtifact()))

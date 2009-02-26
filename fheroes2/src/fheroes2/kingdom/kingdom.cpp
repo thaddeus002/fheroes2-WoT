@@ -28,9 +28,10 @@
 #include "payment.h"
 #include "world.h"
 #include "visit.h"
+#include "battle.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), ai_capital(NULL)
+Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
 {
     // set play
     if(cl & Settings::Get().FileInfo().KingdomColors()) SetModes(PLAY);
@@ -106,9 +107,10 @@ bool Kingdom::Modes(flags_t f) const
 
 void Kingdom::ActionNewDay(void)
 {
-    if(castles.empty() && heroes.empty())
+    if((castles.empty() && heroes.empty()) || 0 == lost_town_days)
     {
 	ResetModes(PLAY);
+	if(heroes.size()) FreeAllHeroes();
 	world.KingdomLoss(color);
 	return;
     }
@@ -121,6 +123,9 @@ void Kingdom::ActionNewDay(void)
 	if(event_day) AddFundsResource(event_day->GetResource());
 	return;
     }
+
+    // check lost town
+    if(castles.empty()) --lost_town_days;
 
     // castle New Day
     std::vector<Castle *>::const_iterator itc = castles.begin();
@@ -222,6 +227,8 @@ void Kingdom::AddCastle(const Castle *castle)
 {
     if(castle && castles.end() == std::find(castles.begin(), castles.end(), castle))
 	castles.push_back(const_cast<Castle *>(castle));
+
+    lost_town_days = LOST_TOWN_DAYS + 1;
 }
 
 void Kingdom::RemoveCastle(const Castle *castle)
@@ -345,4 +352,16 @@ void Kingdom::OddFundsResource(const Resource::funds_t & funds)
     if(0 > resource.crystal) resource.crystal = 0;
     if(0 > resource.gems) resource.gems = 0;
     if(0 > resource.gold) resource.gold = 0;
+}
+
+u8 Kingdom::GetLostTownDays(void) const
+{
+    return lost_town_days;
+}
+
+void Kingdom::FreeAllHeroes(void)
+{
+    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetFreeman), Army::SURRENDER));
+
+    heroes.clear();
 }

@@ -23,7 +23,7 @@
 #include "engine.h"
 
 #define MAJOR_VERSION 0
-#define MINOR_VERSION 1
+#define MINOR_VERSION 2
 
 #define ANIMATION_SPEED 23
 
@@ -39,6 +39,5 @@
 #endif
 
 #define GETTEXT_PACKAGE "fheroes2"
-#define LOCALEDIR "./files/lang"
 
 #endif

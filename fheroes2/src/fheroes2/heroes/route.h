@@ -46,7 +46,7 @@ namespace Route
 	    u16		GetDestinationIndex(void) const{ return dst; };
 	    Direction::vector_t GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
-	    u16		Calculate(const u16 dst_index, const u16 limit = MAXU16, bool revert = false);
+	    u16		Calculate(const u16 dst_index, const u16 limit = MAXU16);
 
 	    void	Show(void){ hide = false; };
 	    void	Hide(void){ hide = true; };

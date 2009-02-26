@@ -54,6 +54,7 @@ public:
         BATTLEMOUSESHADOW = 0x10000000,
         BATTLEMOVESHADOW  = 0x20000000,
         UNICODE           = 0x40000000,
+	USECACHE          = 0x80000000,
 
 	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
 
@@ -76,10 +77,9 @@ public:
     const Maps::FileInfo & FileInfo(void) const;
     Maps::FileInfo & FileInfo(void);
 
-    const std::string & PreloadCharsets(void) const;
-    const std::string & CacheDirectory(void) const;
     const std::string & DataDirectory(void) const;
     const std::string & MapsDirectory(void) const;
+    const std::string & LocalDataPrefix(void) const;
 
     Difficulty::difficulty_t GameDifficulty(void) const;
 
@@ -126,6 +126,8 @@ public:
     u8   PreferablyCountPlayers(void) const;
     void SetPreferablyCountPlayers(u8 c);
 
+    void SetLocalDataPrefix(const std::string &);
+
 protected:
     void Parse(const std::string & left, const std::string & right);
     void SetStrModes(const std::string & key);
@@ -146,9 +148,9 @@ private:
     Color::color_t my_color;
     Color::color_t cur_color;
 
-    std::string path_cache_directory;
     std::string path_data_directory;
     std::string path_maps_directory;
+    std::string local_data_prefix;
 
     std::string font_normal;
     std::string font_small;

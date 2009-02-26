@@ -48,6 +48,12 @@ public:
     u8 AllowColors(void) const;
     u8 ConditionsWins(void) const;
     u8 ConditionsLoss(void) const;
+    u8 Wins1(void) const;
+    u8 Wins2(void) const;
+    u8 Wins3(void) const;
+    u8 Wins4(void) const;
+    u8 Loss1(void) const;
+    u8 Loss2(void) const;
 
     Race::race_t KingdomRace(const Color::color_t color) const;
 
@@ -76,7 +82,13 @@ private:
     u8 allow_colors;
     u8 rnd_colors;
     u8 conditions_wins;
+    u8 wins1;
+    u8 wins2;
+    u8 wins3;
+    u8 wins4;
     u8 conditions_loss;
+    u8 loss1;
+    u8 loss2;
 
     bool with_heroes;
 

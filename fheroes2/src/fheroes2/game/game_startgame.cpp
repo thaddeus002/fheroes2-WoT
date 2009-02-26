@@ -53,12 +53,33 @@ namespace Game
     void OpenCastle(Castle *castle);
     void OpenHeroes(Heroes *heroes);
     void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
-    Game::menu_t HumanTurn(void);
+    menu_t HumanTurn(void);
+    menu_t NetworkTurn(Kingdom &);
     bool CursorChangePosition(const u16 index);
     bool DiggingForArtifacts(const Heroes & hero);
-    void DialogPlayersTurn(const Color::color_t);
+    void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
+    bool HumanPlayerLossGame(void);
+    bool DefeatsAllPlayers(Color::color_t);
 };
+
+bool Game::HumanPlayerLossGame(void)
+{
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	if(world.GetKingdom(color).isPlay() && ((LOCAL | REMOTE) & world.GetKingdom(color).Control())) return false;
+
+    Error::Verbose("Game::HumanPlayerLossGame: local players or remote players not found.");
+
+    return true;
+}
+
+bool Game::DefeatsAllPlayers(Color::color_t mycolor)
+{
+    for(Color::color_t c = Color::BLUE; c != Color::GRAY; ++c)
+	if(mycolor != c && world.GetKingdom(c).isPlay()) return false;
+
+    return true;
+}
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 {
@@ -81,7 +102,7 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
     }
 }
                                    
-void Game::DialogPlayersTurn(const Color::color_t color)
+void Game::DialogPlayers(const Color::color_t color, const std::string & str)
 {
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
 
@@ -99,8 +120,6 @@ void Game::DialogPlayersTurn(const Color::color_t color)
    	    default: break;
     }
 
-    std::string str = _("%{color} player's turn");
-    String::Replace(str, "%{color}", Color::String(color));
     Dialog::SpriteInfo("", str, sign);
 }
 
@@ -175,10 +194,13 @@ Game::menu_t Game::StartGame(void)
 
     Game::menu_t m = ENDTURN;
 
+    u8 players = 0;
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if((LOCAL | REMOTE) & world.GetKingdom(color).Control()) players |= color;
+
     // action first day
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(world.GetKingdom(color).isPlay()) world.GetKingdom(color).ActionNewDay();
 
-    while(1)
+    while(m == ENDTURN && players)
     {
 	// AI move
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
@@ -207,35 +229,47 @@ Game::menu_t Game::StartGame(void)
 			StatusWindow::Get().Redraw();
 			areaMaps.Redraw();
 			display.Flip();
-			DialogPlayersTurn(color);
+			std::string str = _("%{color} player's turn");
+			String::Replace(str, "%{color}", Color::String(color));
+			DialogPlayers(color, str);
 		    }
 		    conf.SetMyColor(color);
 		    m = HumanTurn();
 		    Mixer::Reduce();
-		    if(m != ENDTURN) goto OUTDOOR;
+		    if(LOSSGAME == m) players &= ~color;
 		    break;
+
 	        case REMOTE:
-		    cursor.SetThemes(Cursor::WAIT);
-		    cursor.Show();
-	            display.Flip();
-		    Error::Verbose("Game::Turns: network player: " + Color::String(color));
-		    cursor.Hide();
+		    m = NetworkTurn(kingdom);
+		    if(LOSSGAME == m) players &= ~color;
 		    break;
+
 	        case AI:
-                kingdom.AITurns();
+            	    kingdom.AITurns();
 		    break;
+
 		default:
-		    Dialog::Message(Color::String(color), _("default"), Font::BIG, Dialog::OK);
+		    Error::Verbose("Game::StartGame: unknown control, for player: " + Color::String(color));
 		    break;
 		}
+
+		if(ENDTURN != m) break;
 	    }
 	}
 	world.NextDay();
     }
 
-OUTDOOR:
 
-    return m == ENDTURN ? QUITGAME : m;
+    switch(m)
+    {
+	case WINSGAME:	Error::Verbose("Game::StartGame: wins game"); return MAINMENU;
+	case LOSSGAME:	Error::Verbose("Game::StartGame: loss game"); return MAINMENU;
+	case ENDTURN:	return QUITGAME;
+
+	default: break;
+    }
+
+    return m;
 }
 
 /* open castle wrapper */
@@ -709,7 +743,6 @@ Game::menu_t Game::HumanTurn(void)
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
-    //if(Game::HOTSEAT == conf.GameType() || conf.Original()) global_focus.Reset();
     global_focus.Reset();
 
     Game::SelectBarCastle & selectCastle = Game::SelectBarCastle::Get();
@@ -757,14 +790,52 @@ Game::menu_t Game::HumanTurn(void)
 	Dialog::Message("", message, Font::BIG, Dialog::OK);
     }
 
+    // warning lost all town
+    if(myCastles.empty())
+    {
+	if(myHeroes.empty()) return LOSSGAME;
+
+	if(0 == myKingdom.GetLostTownDays())
+	{
+	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    DialogPlayers(conf.MyColor(), str);
+	    return LOSSGAME;
+	}
+	else
+	if(1 == myKingdom.GetLostTownDays())
+	{
+	    std::string str = _("%{color} player, this is your last day to capture a town, or you will be banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    DialogPlayers(conf.MyColor(), str);
+	}
+	else
+	if(LOST_TOWN_DAYS >= myKingdom.GetLostTownDays())
+	{
+	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
+	    DialogPlayers(conf.MyColor(), str);
+	}
+    }
+
     // show event day
     {
 	const GameEvent::Day* event_day = world.GetEventDay(conf.MyColor());
-	if(event_day) Dialog::ResourceInfo(event_day->GetMessage(), "", event_day->GetResource());
+	if(event_day)
+	{
+	    if(event_day->GetResource().GetValidItems())
+		Dialog::ResourceInfo("", event_day->GetMessage(), event_day->GetResource());
+	    else
+	    if(event_day->GetMessage().size())
+		Dialog::Message("", event_day->GetMessage(), Font::BIG, Dialog::OK);
+	}
     }
 
+    Game::menu_t res = CANCEL;
+
     // startgame loop
-    while(le.HandleEvents())
+    while(!res && le.HandleEvents())
     {
 	// Hot Keys:
 	// ESC
@@ -774,7 +845,9 @@ Game::menu_t Game::HumanTurn(void)
     	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
     	    	global_focus.GetHeroes().SetMove(false);
     	    else
-    	    if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO)) return QUITGAME;
+    	    if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))
+		res = QUITGAME;
+
     	    continue;
 	}
         else
@@ -786,7 +859,9 @@ Game::menu_t Game::HumanTurn(void)
 
             if(!myKingdom.HeroesMayStillMove() ||
                 Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
-                break;
+		res = ENDTURN;
+
+    	    continue;
         }
         else
         // press Next Hero
@@ -838,7 +913,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 	else
 	// save game
-	if(le.KeyPress(KEY_s)) Game::Save();
+	if(le.KeyPress(KEY_s)){ Game::Save(); Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK); }
 	else
 	// load game
 	if(le.KeyPress(KEY_l)) Game::Load();
@@ -953,8 +1028,6 @@ Game::menu_t Game::HumanTurn(void)
     				}
     			    }
     			    break;
-
-			    break;
 
 			    default:
 				if(tile.isPassable(&from_hero) || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
@@ -1276,7 +1349,9 @@ Game::menu_t Game::HumanTurn(void)
 
 		if(!myKingdom.HeroesMayStillMove() ||
 		    Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
-	    	    break;
+		    res = ENDTURN;
+
+		continue;
 	    }
 	    else
     	    // click AdventureOptions
@@ -1303,17 +1378,23 @@ Game::menu_t Game::HumanTurn(void)
 		Mixer::Reduce();
 
 		Game::menu_t result = Dialog::FileOptions();
-	    
+		Mixer::Reset();
+
 		switch(result)
 		{
-		    case Game::NEWGAME:
-		    case Game::LOADGAME:
-		    case Game::QUITGAME:
-			Mixer::Reset();
-			return result;
+		    case NEWGAME:
+		    case QUITGAME:
+			res = result;
+			break;
 
-		    case Game::SAVEGAME:
-			Game::Save();
+		    case LOADGAME:
+			if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+			    res = LOADGAME;
+			break;
+
+		    case SAVEGAME:
+			Save();
+			Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
 			break;
 
 		    default:
@@ -1432,6 +1513,12 @@ Game::menu_t Game::HumanTurn(void)
 		    gamearea.Redraw();
         	    cursor.Show();
         	    display.Flip();
+
+		    // end turn: lost heroes and towns
+		    if(myCastles.empty() && myHeroes.empty()) res = LOSSGAME;
+		    else
+		    // defeats all players
+		    if(DefeatsAllPlayers(myKingdom.GetColor())) res = WINSGAME;
 		}
 		else
 		    hero.SetMove(false);
@@ -1450,6 +1537,16 @@ Game::menu_t Game::HumanTurn(void)
         ++ticket;
     }
 
+    if(res == WINSGAME) Dialog::Message(_("Congratulations!"), _("You are victorious."), Font::BIG, Dialog::OK);
+
+    // warning lost all town
+    if(myCastles.empty() && LOST_TOWN_DAYS < myKingdom.GetLostTownDays())
+    {
+	std::string str = _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated.");
+	String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	DialogPlayers(conf.MyColor(), str);
+    }
+
     cursor.Hide();
     if(Game::Focus::HEROES == global_focus.Type())
     {
@@ -1458,7 +1555,7 @@ Game::menu_t Game::HumanTurn(void)
         display.Flip();
     }
 
-    return ENDTURN;
+    return res;
 }
 
 bool Game::DiggingForArtifacts(const Heroes & hero)
@@ -1495,4 +1592,20 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	Dialog::Message("", _("Digging for artifacts requires a whole day, try again tomorrow."), Font::BIG, Dialog::OK);
 
     return false;
+}
+
+Game::menu_t Game::NetworkTurn(Kingdom & kingdom)
+{
+    Error::Verbose("Game::NetworkGame: player: " + Color::String(kingdom.GetColor()));
+
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    //const Settings & conf = Settings::Get();
+
+    cursor.Show();
+    display.Flip();
+
+    cursor.Hide();
+
+    return ENDTURN;
 }

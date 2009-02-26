@@ -134,8 +134,9 @@ int main(int argc, char **argv)
 #ifdef WITH_TTF
 	if(conf.Unicode())
 	{
+	    const std::string localesdir(conf.LocalDataPrefix() + SEPARATOR + "lang");
 	    setlocale(LC_ALL, "");
-	    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+	    bindtextdomain(GETTEXT_PACKAGE, localesdir.c_str());
 	    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 	    textdomain(GETTEXT_PACKAGE);
 	}
@@ -269,7 +270,6 @@ int main(int argc, char **argv)
 			case Game::NEWHOTSEAT:     rs = Game::NewHotSeat();		break;
 		        case Game::NEWNETWORK:     rs = Game::NewNetwork();		break;
 		        case Game::TESTING:        rs = Game::Testing(test);		break;
-
 
 	    		default: break;
 		}

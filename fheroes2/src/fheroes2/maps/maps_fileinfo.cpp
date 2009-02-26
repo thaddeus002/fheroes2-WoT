@@ -280,10 +280,29 @@ bool Maps::FileInfo::Read(const std::string &filename)
     fd.read(&byte8, 1);
     conditions_wins = byte8;
 
+    // data wins
+    fd.read(&byte8, 1);
+    wins1 = byte8;
+    fd.read(&byte8, 1);
+    wins2 = byte8;
+    fd.read(&byte8, 1);
+    wins3 = byte8;
+    fd.read(&byte8, 1);
+    wins4 = byte8;
+
     // loss
     fd.seekg(0x22, std::ios_base::beg);
     fd.read(&byte8, 1);
     conditions_loss = byte8;
+
+    // data loss
+    fd.read(&byte8, 1);
+    loss1 = byte8;
+
+    // data loss
+    fd.seekg(0x2e, std::ios_base::beg);
+    fd.read(&byte8, 1);
+    loss2 = byte8;
 
     // start with hero
     fd.seekg(0x25, std::ios_base::beg);
@@ -347,4 +366,34 @@ bool Maps::FileInfo::PredicateForSorting(const FileInfo *fi1, const FileInfo *fi
     if(!fi1 || !fi2 || fi1->name.empty() || fi2->name.empty()) return false;
 
     return std::tolower(fi1->name[0]) < std::tolower(fi2->name[0]);
+}
+
+u8 Maps::FileInfo::Wins1(void) const
+{
+    return wins1;
+}
+
+u8 Maps::FileInfo::Wins2(void) const
+{
+    return wins2;
+}
+
+u8 Maps::FileInfo::Wins3(void) const
+{
+    return wins3;
+}
+
+u8 Maps::FileInfo::Wins4(void) const
+{
+    return wins4;
+}
+
+u8 Maps::FileInfo::Loss1(void) const
+{
+    return loss1;
+}
+
+u8 Maps::FileInfo::Loss2(void) const
+{
+    return loss2;
 }

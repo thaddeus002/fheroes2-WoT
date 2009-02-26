@@ -27,6 +27,20 @@
 
 extern char *basename(const char *path);
 
+void Game::Save(void)
+{
+    const std::string defaults(Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + "fheroes2.sav");
+
+    Save(defaults);
+}
+
+void Game::Load(void)
+{
+    const std::string defaults(Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + "fheroes2.sav");
+
+    Load(defaults);
+}
+
 void Game::Save(const std::string &fn)
 {
     Error::Verbose("Game::Save: " + fn);
@@ -261,6 +275,10 @@ void Game::SaveXML(const std::string &fn)
 	str.clear();
 	String::AddInt(str, kingdom.flags);
 	kingdom2->addAttribute("modes", str);
+
+	str.clear();
+	String::AddInt(str, kingdom.lost_town_days);
+	kingdom2->addAttribute("lost_town_days", str);
 
 	str.clear();
 	String::AddInt(str, kingdom.color);

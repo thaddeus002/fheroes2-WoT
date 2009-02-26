@@ -54,9 +54,9 @@ namespace Army
 
     enum flags_t
     {
-        ATTACKED		= 0x00000001,
+        ATTACKED	= 0x00000001,
 
-        RETALIATED           = 0x00000002,
+        RETALIATED      = 0x00000002,
         HANDFIGHTING	= 0x00000008,
         
         LUCK_GOOD	= 0x00000010,

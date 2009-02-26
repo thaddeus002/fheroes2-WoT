@@ -1636,7 +1636,6 @@ bool Heroes::isShow(u8 color)
 
 void Heroes::Dump(void) const
 {
-    std::cout << "----------------I--------" << std::endl;
     std::cout << "name            : " << name << std::endl;
     std::cout << "race            : " << Race::String(race) << std::endl;
     std::cout << "color           : " << Color::String(color) << std::endl;

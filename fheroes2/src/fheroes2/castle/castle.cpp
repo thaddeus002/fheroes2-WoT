@@ -1448,7 +1448,6 @@ bool Castle::PredicateIsBuildMarketplace(const Castle* castle)
 
 void Castle::Dump(void) const
 {
-    std::cout << "----------------I--------" << std::endl;
     std::cout << "name            : " << name << std::endl;
     std::cout << "race            : " << Race::String(race) << std::endl;
     std::cout << "color           : " << Color::String(color) << std::endl;
