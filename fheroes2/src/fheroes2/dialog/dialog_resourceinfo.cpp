@@ -40,7 +40,7 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
-    const u8 extra = (4 > rs.GetValidItems() ? 40 : (4 > rs.GetValidItems() ? 80 : 120));
+    const u8 extra = (4 > rs.GetValidItems() ? 50 : (6 > rs.GetValidItems() ? 100 : 160));
 
     Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + extra, Dialog::OK);
 

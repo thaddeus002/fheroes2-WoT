@@ -69,7 +69,7 @@ namespace Maps
 	u32 GetSize1(void) const{ return addons_level1.size(); };
 	u32 GetSize2(void) const{ return addons_level2.size(); };
 
-	bool isPassable(const Heroes * hero = NULL) const;
+	bool isPassable(const Heroes * hero = NULL, bool skipfog = false) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
 
@@ -123,9 +123,9 @@ namespace Maps
 
 	void DebugInfo(void) const;
 	
-	bool isFog(u8 color) const{ return fogs & color; };
-	void SetFog(u8 color){ fogs |= color; };
-	void ClearFog(u8 color){ fogs &= ~color; };
+	bool isFog(u8 color) const;
+	void SetFog(u8 color);
+	void ClearFog(u8 color);
 
 	void FixLoyaltyVersion(void);
 

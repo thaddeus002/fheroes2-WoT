@@ -894,9 +894,9 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 }
 
 /* accept move */
-bool Maps::Tiles::isPassable(const Heroes *hero) const
+bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
 {
-    if(isFog(Settings::Get().CurrentColor())) return false;
+    if(!skipfog && isFog(Settings::Get().CurrentColor())) return false;
 
     if(hero)
     {
@@ -1901,4 +1901,19 @@ void Maps::Tiles::UpdateTreasureChestSprite(void)
 	    }
 	}
     }
+}
+
+bool Maps::Tiles::isFog(u8 color) const
+{
+    return fogs & color;
+}
+
+void Maps::Tiles::SetFog(u8 color)
+{
+    fogs |= color;
+}
+
+void Maps::Tiles::ClearFog(u8 color)
+{
+    if(fogs & color) fogs &= ~color;
 }

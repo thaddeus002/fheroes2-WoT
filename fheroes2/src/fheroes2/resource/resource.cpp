@@ -299,7 +299,7 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
     u16 index = 2 < valid_resource ? dst_rt.w / 3 : dst_rt.w / valid_resource;
 
     u8 count = 0;
-    u8 offset = 50;
+    u8 offset = 40;
 
     std::string str;
     Point dst_pt;

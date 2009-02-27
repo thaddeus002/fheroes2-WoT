@@ -186,8 +186,8 @@ void Kingdom::AICastlesTurns(void)
 	bool defence = false;
 
 	// find enemy hero
-	for(s8 y = -range; y <= range; ++y)
-    	    for(s8 x = -range; x <= range; ++x)
+	for(s8 y = -range; y <= range && !defence; ++y)
+    	    for(s8 x = -range; x <= range && !defence; ++x)
 	{
     	    if(!y && !x) continue;
 
@@ -197,14 +197,10 @@ void Kingdom::AICastlesTurns(void)
         	const Heroes* hero = NULL;
 
         	if(MP2::OBJ_HEROES == tile.GetObject() && NULL != (hero = world.GetHeroes(tile.GetIndex())) && GetColor() != hero->GetColor())
-            	{
 		    defence = true;
-		    goto SKIPLOOP;
-    		}
 	    }
 	}
 
-SKIPLOOP:
 	defence ? castle.AIDefence() : castle.AIDevelopment();
     }
 }
@@ -320,7 +316,7 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 	if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
 	if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
 
-	if(MAXU16 == index && objs.size())
+	if(objs.size())
 	{
 	    ito1 = objs.rbegin();
 	    ito2 = objs.rend();
@@ -340,6 +336,8 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 		}
 	    }
 	}
+	else
+	    hero.AIRescueWhereMove(index);
 
 	// success
 	if(MAXU16 != index)

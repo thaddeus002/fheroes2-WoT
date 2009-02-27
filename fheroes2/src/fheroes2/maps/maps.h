@@ -70,7 +70,7 @@ namespace Maps
     bool ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 *res = NULL);
     bool TileUnderProtection(const u16 index, u16 *res = NULL);
 
-    void ClearFog(const Point & center, const u8 scoute, const u8 color);
+    void ClearFog(const Point & center, u8 scoute, const u8 color);
     u16 GetApproximateDistance(const u16 index1, const u16 index2);
 
 

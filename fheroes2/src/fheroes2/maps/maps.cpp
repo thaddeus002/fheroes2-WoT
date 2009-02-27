@@ -24,6 +24,7 @@
 #include "gamearea.h"
 #include "settings.h"
 #include "maps.h"
+#include "kingdom.h"
 #include "maps_tiles.h"
 
 namespace Maps
@@ -228,9 +229,21 @@ u16 Maps::GetMaxGroundAround(const u16 center)
     return result;
 }
 
-void Maps::ClearFog(const Point & center, const u8 scoute, const u8 color)
+void Maps::ClearFog(const Point & center, u8 scoute, const u8 color)
 {
     if(0 == scoute) return;
+
+    // AI advantage
+    if(Game::AI == world.GetKingdom(color).Control())
+    {
+	switch(Settings::Get().GameDifficulty())
+	{
+    	    case Difficulty::HARD:	scoute += 2; break;
+    	    case Difficulty::EXPERT:	scoute += 4; break;
+    	    case Difficulty::IMPOSSIBLE:scoute += 6; break;
+	    default: break;
+	}
+    }
 
     for(s16 y = center.y - scoute; y <= center.y + scoute; ++y)
         for(s16 x = center.x - scoute; x <= center.x + scoute; ++x)

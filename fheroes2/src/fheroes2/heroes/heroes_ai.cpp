@@ -464,6 +464,9 @@ void AIToTeleports(Heroes &hero, const u16 index_from)
     hero.SetCenter(index_to);
     hero.Scoute();
 
+    world.GetTiles(index_from).SetObject(MP2::OBJ_STONELIGHTS);
+    world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
+
     if(Settings::Get().Debug()) Error::Verbose("AIToStoneLights: " + hero.GetName());
 }
 
@@ -480,6 +483,9 @@ void AIToWhirlpools(Heroes &hero, const u16 index_from)
 
     hero.SetCenter(index_to);
     hero.Scoute();
+
+    world.GetTiles(index_from).SetObject(MP2::OBJ_WHIRLPOOL);
+    world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
 
     if(Rand::Get(1))
     {
@@ -1196,4 +1202,50 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
     return false;
 }
 
+void Heroes::AIRescueWhereMove(u16 & to)
+{
+    u8 scoute = GetScoute();
 
+    switch(Settings::Get().GameDifficulty())
+    {
+        case Difficulty::HARD:      scoute += 2; break;
+        case Difficulty::EXPERT:    scoute += 4; break;
+        case Difficulty::IMPOSSIBLE:scoute += 6; break;
+        default: break;
+    }
+
+    scoute += 1;
+
+    // find unchartered territory
+    for(u16 ii = 1; ii <= scoute; ++ii)
+    {
+        const s16 tx = mp.x - ii;
+        const s16 ty = mp.y - ii;
+
+        const s16 mx = tx + 2 * ii;
+        const s16 my = ty + 2 * ii;
+
+        for(s16 iy = ty; iy <= my; ++iy)
+            for(s16 ix = tx; ix <= mx; ++ix)
+        {
+            if(ty < iy && iy < my && tx < ix && ix < mx) continue;
+
+            const u16 res = Maps::GetIndexFromAbsPoint(ix, iy);
+
+            if(Maps::isValidAbsPoint(ix, iy) &&
+                world.GetTiles(res).isFog(color) &&
+                world.GetTiles(res).isPassable(this, true) &&
+		GetPath().Calculate(res))
+            {
+                to = res;
+                return;
+            }
+        }
+    }
+
+    if(MP2::OBJ_STONELIGHTS == save_maps_general ||
+	MP2::OBJ_WHIRLPOOL == save_maps_general)
+    {
+	AIAction(GetIndex());
+    }
+}
