@@ -140,7 +140,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
 	// click small
-	if(le.KeyPress(KEY_s) || (le.MouseClickLeft(buttonSelectSmall) && smallmaps.size()))
+	if((le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectSmall)) && smallmaps.size())
 	{
 	    curmaps = &smallmaps;
 	    it_list_head = curmaps->begin();
@@ -157,7 +157,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	}
 
 	// click medium
-	if(le.KeyPress(KEY_m) || (le.MouseClickLeft(buttonSelectMedium) && mediummaps.size()))
+	if((le.KeyPress(KEY_m) || le.MouseClickLeft(buttonSelectMedium)) && mediummaps.size())
 	{
 	    curmaps = &mediummaps;
 	    it_list_head = curmaps->begin();
@@ -174,7 +174,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	}
 
 	// click large
-	if(le.KeyPress(KEY_l) || (le.MouseClickLeft(buttonSelectLarge) && largemaps.size()))
+	if((le.KeyPress(KEY_l) || le.MouseClickLeft(buttonSelectLarge)) && largemaps.size())
 	{
 	    curmaps = &largemaps;
 	    it_list_head = curmaps->begin();
@@ -191,7 +191,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	}
 
 	// click xlarge
-	if(le.KeyPress(KEY_x) || (le.MouseClickLeft(buttonSelectXLarge) && xlargemaps.size()))
+	if((le.KeyPress(KEY_x) || le.MouseClickLeft(buttonSelectXLarge)) && xlargemaps.size())
 	{
 	    curmaps = &xlargemaps;
 	    it_list_head = curmaps->begin();
@@ -208,7 +208,7 @@ const Maps::FileInfo * Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> 
 	}
 
 	// click all
-	if(le.KeyPress(KEY_a) || (le.MouseClickLeft(buttonSelectAll) && allmaps.size()))
+	if((le.KeyPress(KEY_a) || le.MouseClickLeft(buttonSelectAll)) && allmaps.size())
 	{
 	    curmaps = &allmaps;
 	    it_list_head = curmaps->begin();

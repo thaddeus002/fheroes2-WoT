@@ -26,7 +26,7 @@
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
 
-Maps::FileInfo::FileInfo() : size(Maps::ZERO), difficulty(Difficulty::EASY),
+Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
     kingdom_colors(0), allow_colors(0), rnd_colors(0), with_heroes(false), races(KINGDOMMAX)
 {
 }
@@ -149,7 +149,7 @@ bool Maps::FileInfo::Read(const std::string &filename)
 	return false;
     }
 
-    char byte8;
+    u8  byte8;
     u16 byte16;
     u32 byte32;
 
@@ -192,83 +192,83 @@ bool Maps::FileInfo::Read(const std::string &filename)
     }
 
     // width
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     size.w = byte8;
 
     // height
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     size.h = byte8;
 
     // kingdom color blue
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) kingdom_colors |= Color::BLUE;
 
     // kingdom color green
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) kingdom_colors |= Color::GREEN;
 
     // kingdom color red
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) kingdom_colors |= Color::RED;
 
     // kingdom color yellow
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) kingdom_colors |= Color::YELLOW;
 
     // kingdom color orange
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) kingdom_colors |= Color::ORANGE;
 
     // kingdom color purple
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) kingdom_colors |= Color::PURPLE;
 
     // allow color blue
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) allow_colors |= Color::BLUE;
 
     // allow color green
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) allow_colors |= Color::GREEN;
 
     // allow color red
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) allow_colors |= Color::RED;
 
     // allow color yellow
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) allow_colors |= Color::YELLOW;
 
     // allow color orange
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) allow_colors |= Color::ORANGE;
 
     // allow color purple
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) allow_colors |= Color::PURPLE;
 
     // rnd color blue
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) rnd_colors |= Color::BLUE;
 
     // rnd color green
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) rnd_colors |= Color::GREEN;
 
     // rnd color red
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) rnd_colors |= Color::RED;
 
     // rnd color yellow
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) rnd_colors |= Color::YELLOW;
 
     // rnd color orange
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) rnd_colors |= Color::ORANGE;
 
     // rnd color purple
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) rnd_colors |= Color::PURPLE;
 
     // kingdom count
@@ -277,50 +277,50 @@ bool Maps::FileInfo::Read(const std::string &filename)
 
     // wins
     fd.seekg(0x1D, std::ios_base::beg);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     conditions_wins = byte8;
 
     // data wins
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     wins1 = byte8;
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     wins2 = byte8;
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     wins3 = byte8;
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     wins4 = byte8;
 
     // loss
     fd.seekg(0x22, std::ios_base::beg);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     conditions_loss = byte8;
 
     // data loss
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     loss1 = byte8;
 
     // data loss
     fd.seekg(0x2e, std::ios_base::beg);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     loss2 = byte8;
 
     // start with hero
     fd.seekg(0x25, std::ios_base::beg);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(0 == byte8) with_heroes = true;
 
     // race color
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[0] = ByteToRace(byte8);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[1] = ByteToRace(byte8);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[2] = ByteToRace(byte8);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[3] = ByteToRace(byte8);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[4] = ByteToRace(byte8);
-    fd.read(&byte8, 1);
+    fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[5] = ByteToRace(byte8);
 
     // name
