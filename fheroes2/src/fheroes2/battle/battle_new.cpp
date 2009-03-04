@@ -674,7 +674,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         else if(status != GUI::NONE)
             break;
 
-        if(!PerformMove(troopIdx, move))
+        if(!PerformMove(troopIdx, move, !BfValid(attack)))
             continue;
         else validMove = true;
 
@@ -1141,7 +1141,7 @@ bool Battle::FlyAction::Step()
     }
 }
     
-bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move)
+bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bool resetReflection)
 {
     Army::BattleTroop &myTroop = m_battlefield.GetTroopFromIndex(troopN);
     u16 animat = 0;
@@ -1194,6 +1194,13 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move)
             
         myTroop.SetPosition(move);
         if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
+            myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
+    }
+
+    if(resetReflection)
+    {
+        myTroop.ResetReflection();
+        if(myTroop.isWide() && myTroop.IsReflected() != myTroop.WasReflected())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
     }
     
@@ -1378,6 +1385,10 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
             display.Flip();
         }
     }
+
+    attacker.ResetReflection();
+    if(attacker.isWide() && attacker.IsReflected() != attacker.WasReflected())
+        attacker.SetPosition(attacker.Position() + Point( attacker.IsReflected() ? 1 : -1, 0 ));
 }
 
 bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack)

@@ -313,7 +313,7 @@ namespace Battle
         void BattleSummaryVsHero(HeroBase &, const Army::BattleArmy_t &, HeroBase &, const Army::BattleArmy_t &);
         BattleTurn *CreateTurn(HeroBase *, Army::BattleArmy_t &, Army::BattleArmy_t &, bool forceComputer = false);
         Army::BattleTroop &NextValidTroop(s8 &, IndexList &);
-        bool PerformMove(TroopIndex, const Point &);
+        bool PerformMove(TroopIndex, const Point &, bool);
         bool PerformAttack(TroopIndex, const Point &);
         bool PerformAttackLogic(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool, long &, u16 &);
         void PerformAttackAnimation(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool);
