@@ -422,7 +422,6 @@ u8 Army::BattleTroop::GetDefense(void) const
 
     if(Modes(SP_STONESKIN)) mod += 3;
     if(Modes(SP_STEELSKIN)) mod += 5;
-    if(Modes(SP_DISRUPTINGRAY)) mod -= 3;
 
     if(disruptingray) mod = (mod <= disruptingray * 3 ? 1 : mod - disruptingray * 3);
 

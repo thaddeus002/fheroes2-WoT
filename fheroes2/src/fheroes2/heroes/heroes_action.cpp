@@ -568,7 +568,14 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 
 	const u32 exp = castle->GetArmy().isValid() ? castle->GetArmy().CalculateExperience() : 0;
-	const Army::battle_t b = castle->GetArmy().isValid() ? Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index)) : Army::WIN;
+	Army::battle_t b;
+    if(castle->GetArmy().isValid())
+    {
+        if(castle->isCastle())
+            b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
+        else b = Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index));
+    }
+    else b = Army::WIN;
 
 	switch(b)
 	{

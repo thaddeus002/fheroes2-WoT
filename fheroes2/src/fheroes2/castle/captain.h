@@ -23,32 +23,43 @@
 #include "skill.h"
 #include "spell_book.h"
 #include "gamedefs.h"
+#include "heroes.h"
 
 class Castle;
 
-class Captain : public Skill::Primary
+class Captain : public HeroBase
 {
-    public:
+  public:
 	Captain(const Castle &);
 
 	bool isValid(void) const;
-        u8 GetAttack(void) const;
-        u8 GetDefense(void) const;
-        u8 GetPower(void) const;
-        u8 GetKnowledge(void) const;
-        s8 GetMorale(void) const;
-        s8 GetLuck(void) const;
-        Race::race_t GetRace(void) const;
-        Color::color_t GetColor(void) const;
+    u8 GetAttack(void) const;
+    u8 GetDefense(void) const;
+    u8 GetPower(void) const;
+    u8 GetKnowledge(void) const;
+    s8 GetMorale(void) const;
+    s8 GetLuck(void) const;
+    Race::race_t GetRace(void) const;
+    Color::color_t GetColor(void) const;
 	const std::string & GetName(void) const;
 	u8 GetType(void) const;
 	u16 GetSpellPoints(void) const;
 	Spell::Book * GetSpellBook(void);
 	u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
 
-    private:
+    const Army::army_t & GetArmy(void) const;
+    Army::army_t & GetArmy(void);
+    bool HasArtifact(const Artifact::artifact_t & art) const;
+    BagArtifacts & GetBagArtifacts(void);
+    void TakeArtifacts(Heroes &);
+    u16 GetMaxSpellPoints(void) const;
+    void SetSpellPoints(const u16 point);
+
+  private:
 	const Castle & home;
 	Spell::Book spell_book;
+    BagArtifacts artifacts;
+    u16 spellPoints;
 };
 
 #endif

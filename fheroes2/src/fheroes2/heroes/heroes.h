@@ -72,7 +72,19 @@
 
 typedef std::vector<Artifact::artifact_t> BagArtifacts;
 
-class Heroes : public Skill::Primary, public BitModes
+class HeroBase : public Skill::Primary, public BitModes
+{
+  public:
+    virtual const Army::army_t & GetArmy(void) const = 0;
+    virtual Army::army_t & GetArmy(void) = 0;
+    virtual bool HasArtifact(const Artifact::artifact_t & art) const = 0;
+    virtual BagArtifacts & GetBagArtifacts(void) = 0;
+    virtual void TakeArtifacts(Heroes &) = 0;
+    virtual u16 GetMaxSpellPoints(void) const = 0;
+    virtual void SetSpellPoints(const u16 point) = 0;
+};
+
+class Heroes : public HeroBase
 {
 public:
     enum heroes_t

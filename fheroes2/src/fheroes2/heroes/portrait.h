@@ -26,6 +26,7 @@ namespace Portrait
 {
     typedef enum { BIG, MEDIUM, SMALL } size_t;
 
+    const Surface & Portrait(const HeroBase & hero, const Portrait::size_t sz);
     const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
     const Surface & Hero(const Heroes::heroes_t hid, const Portrait::size_t sz);
     const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);

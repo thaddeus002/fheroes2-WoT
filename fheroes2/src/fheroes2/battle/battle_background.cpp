@@ -7,14 +7,18 @@
 #include "world.h"
 #include "agg.h"
 #include "battle_troop.h"
+#include "captain.h"
 
 #define display Display::Get()
+#define le LocalEvent::GetLocalEvent()
 
 namespace Battle
 {
     Battlefield::Background::Background(const Point &pt, const Maps::Tiles & tile)
     : dst_pt(pt)
     {
+        flagframe = 0;
+        
         m_fringe = m_background = ICN::UNKNOWN;
          u16 index = tile.GetIndex();
          bool trees = false;
@@ -232,7 +236,7 @@ namespace Battle
                       break;
               }
               cobj.bf = p;
-              cobj.scr = Bf2Scr(p) + dst_pt;
+              cobj.scr = Bf2Scr(p);
               m_terrainObjects.push_back(cobj);
           }
     }
@@ -254,7 +258,10 @@ namespace Battle
         Point pt = dst_pt;
         pt.y += 200;
         display.Blit(AGG::GetICN(m_fringe, 0), pt);
-        
+    }
+
+    void Battlefield::Background::DrawGrid()
+    {
         if(BattleSettings::Get().Modes(BattleSettings::OPT_GRID))
         {
             Point p(0,0);
@@ -264,14 +271,11 @@ namespace Battle
         }
     }
 
-    void Battlefield::Background::DrawOverBackground(const PointList &movePoints, const Point &cur_pt, const Army::BattleTroop &troop)
+    void Battlefield::Background::DrawOverBackground(const PointList &movePoints, const Army::BattleTroop &troop)
     {
         if(BattleSettings::Get().Modes(BattleSettings::OPT_MOVESHADOW))
             for(u16 i = 0; i < movePoints.size(); i++)
                 DrawShadow(movePoints[i]);
-        if(BattleSettings::Get().Modes(BattleSettings::OPT_MOUSESHADOW))
-            if(BfValid(cur_pt))
-                DrawShadow(cur_pt);
         
         DrawMark(troop.Position(), 1);
         if(troop.isWide()) {
@@ -279,6 +283,13 @@ namespace Battle
             p.x += troop.IsReflected() ? -1 : 1;
             DrawMark(p);
         }
+    }
+
+    void Battlefield::Background::DrawCursor(const Point &cur_pt)
+    {
+        if(BattleSettings::Get().Modes(BattleSettings::OPT_MOUSESHADOW))
+            if(BfValid(cur_pt))
+                DrawShadow(cur_pt);
     }
 
     void Battlefield::Background::DrawShadow(const Point &pt)
@@ -305,7 +316,7 @@ namespace Battle
             }
             //shadow.SetAlpha(0x30);
         }
-        Point p = Bf2Scr(pt) + dst_pt;
+        Point p = Bf2Scr(pt);
         p.y -= CELLH+delta;
         p.x -= CELLW/2;
         display.Blit(shadow, p);
@@ -339,7 +350,7 @@ namespace Battle
             }
             //shadow.SetAlpha(0x80);
         }
-        Point p = Bf2Scr(pt) + dst_pt;
+        Point p = Bf2Scr(pt);
         p.y -= CELLH+delta;
         p.x -= CELLW/2;
         display.Blit(shadow, p);
@@ -373,7 +384,7 @@ namespace Battle
                 //shadow.FillRect(gr, r);
             }
         }
-        Point p = Bf2Scr(pt) + dst_pt;
+        Point p = Bf2Scr(pt);
         p.y -= CELLH+delta;
         p.x -= CELLW/2;
         display.Blit(shadow, p);
@@ -396,42 +407,19 @@ namespace Battle
             }
     }
 
-    void Battlefield::Background::DrawCaptain(const Race::race_t race, u16 animframe, bool reflect) const
+    Rect Battlefield::Background::DrawHeroObject(const HeroBase &hero, u16 animframe, bool reflect, int fframe)
     {
-        ICN::icn_t cap;
-        switch(race) {
-            case Race::BARB: cap = ICN::CMBTCAPB; break;
-            case Race::KNGT: cap = ICN::CMBTCAPK; break;
-            case Race::NECR: cap = ICN::CMBTCAPN; break;
-            case Race::SORC: cap = ICN::CMBTCAPS; break;
-            case Race::WRLK: cap = ICN::CMBTCAPW; break;
-            case Race::WZRD: cap = ICN::CMBTCAPZ; break;
-            default: return;
-        }
-        display.Blit(AGG::GetICN(cap, animframe, reflect), dst_pt.x + (reflect?550:0), dst_pt.y + 75);
-    }
-    
-    Rect Battlefield::Background::DrawHero(const Heroes & hero, u16 animframe, bool reflect, int fframe)
-    {
-        static int flagframe = 0;
         flagframe += fframe;
-        Rect r;
-        ICN::icn_t cap;
-        switch(hero.GetRace()) {
-            case Race::BARB: cap = ICN::CMBTHROB; break;
-            case Race::KNGT: cap = ICN::CMBTHROK; break;
-            case Race::NECR: cap = ICN::CMBTHRON; break;
-            case Race::SORC: cap = ICN::CMBTHROS; break;
-            case Race::WRLK: cap = ICN::CMBTHROW; break;
-            case Race::WZRD: cap = ICN::CMBTHROZ; break;
-            default: return r;
-        }
-        const Sprite & sp = AGG::GetICN(cap, animframe, reflect);
-        r.x = dst_pt.x + (reflect?640-sp.w():0);
-        r.y = dst_pt.y + 75;
-        r.w = sp.w();
-        r.h = sp.h();
-        display.Blit(sp, r.x, r.y);
+
+        ICN::icn_t icn;
+        Rect rect, flagRect;
+        if(hero.GetType() == Skill::Primary::CAPTAIN)
+            DrawCaptain(dynamic_cast<const Captain &>(hero), reflect, icn, rect, flagRect);
+        else DrawHero(dynamic_cast<const Heroes &>(hero),  reflect, icn, rect, flagRect);
+
+        const Sprite &sp = AGG::GetICN(icn, animframe, reflect);
+        display.Blit(sp, rect.x, rect.y);
+
         ICN::icn_t flag = ICN::UNKNOWN;
         switch(hero.GetColor()) {
             case Color::BLUE: flag = ICN::HEROFL00; break;
@@ -442,14 +430,57 @@ namespace Battle
             case Color::PURPLE: flag = ICN::HEROFL05; break;
             case Color::GRAY: flag = ICN::HEROFL06; break;
         }
-        display.Blit(AGG::GetICN(flag, flagframe%5, reflect), dst_pt.x + (reflect?640-sp.w()-17:17), dst_pt.y + 80);
-        return r;
+        display.Blit(AGG::GetICN(flag, flagframe%5, reflect), flagRect.x, flagRect.y);
+
+        return rect;
+    }
+
+    void Battlefield::Background::DrawCaptain(const Captain &captain, bool reflect, ICN::icn_t &icn, Rect &rect, Rect &flagRect)
+    {
+        switch(captain.GetRace()) {
+            case Race::BARB: icn = ICN::CMBTCAPB; break;
+            case Race::KNGT: icn = ICN::CMBTCAPK; break;
+            case Race::NECR: icn = ICN::CMBTCAPN; break;
+            case Race::SORC: icn = ICN::CMBTCAPS; break;
+            case Race::WRLK: icn = ICN::CMBTCAPW; break;
+            case Race::WZRD: icn = ICN::CMBTCAPZ; break;
+            default: icn = ICN::UNKNOWN;
+        }
+        const Sprite &sp = AGG::GetICN(icn, 1, reflect);
+        rect.x = dst_pt.x + (reflect ? 590: 0);
+        rect.y = dst_pt.y + 45;
+        rect.w = sp.w();
+        rect.h = sp.h();
+
+        flagRect.x = dst_pt.x + (reflect ? 640 - sp.w() - 17: 17);
+        flagRect.y = dst_pt.y + 50;
     }
     
-    void Battlefield::Background::DrawArmies(Army::BattleArmy_t & army1, Army::BattleArmy_t & army2, int animframe, bool idleAnimations)
+    void Battlefield::Background::DrawHero(const Heroes & hero, bool reflect, ICN::icn_t &icn, Rect &rect, Rect &flagRect)
+    {
+        switch(hero.GetRace()) {
+            case Race::BARB: icn = ICN::CMBTHROB; break;
+            case Race::KNGT: icn = ICN::CMBTHROK; break;
+            case Race::NECR: icn = ICN::CMBTHRON; break;
+            case Race::SORC: icn = ICN::CMBTHROS; break;
+            case Race::WRLK: icn = ICN::CMBTHROW; break;
+            case Race::WZRD: icn = ICN::CMBTHROZ; break;
+            default: icn = ICN::UNKNOWN; break;
+        }
+        const Sprite & sp = AGG::GetICN(icn, 1, reflect);
+        rect.x = dst_pt.x + (reflect?640-sp.w():0);
+        rect.y = dst_pt.y + 75;
+        rect.w = sp.w();
+        rect.h = sp.h();
+
+        flagRect.x = dst_pt.x + (reflect ? 640 - sp.w() - 17 : 17);
+        flagRect.y = dst_pt.y + 80;
+    }
+    
+    void Battlefield::Background::DrawForeground(BattleCastle *castle, Army::BattleArmy_t & army1, Army::BattleArmy_t & army2, int animframe, bool idleAnimations)
     {
         for(u16 i = 0; i < m_bodies.size(); i++)
-            DrawTroop(m_bodies[i]);
+            DrawTroop(m_bodies[i], castle);
         
         Army::BattleTroop *inMotion = NULL;
         for(u16 i = 0; i < army1.size(); i++)
@@ -460,41 +491,80 @@ namespace Battle
                 inMotion = &army2[i];
         
         Point p;
-        Point adjusted = inMotion ? Scr2BfDirect(inMotion->ScreenPosition() - dst_pt) : Point(-1, -1);
-        int t= -1;
+        Point adjusted = inMotion ? Scr2BfDirect(inMotion->ScreenPosition()) : Point(-1, -1);
+        int t = -1;
         for(p.y = 0; p.y < BFH; p.y++) 
             for(p.x = 0; p.x < BFW; p.x++) {
-                DrawObject(p);
+                Point temp(-1, -1);
+                if(p.y > BFH / 2)
+                {
+                    temp = p;
+                    p.x = BFW - p.x - 1;
+                }
+                
+                if(!castle) // No debris if castle present
+                    DrawObject(p);
+
+                if(castle && p.y < BFH / 2)
+                    castle->DrawCell(p);
+                
                 if(t = FindTroopExact(army1, p), t >= 0 && !army1[t].isMoving())
                 {
-                    DrawTroop(army1[t], animframe);
+                    DrawTroop(army1[t], castle, animframe);
                     army1[t].Animate();
                     if(idleAnimations && army1[t].astate == Monster::AS_NONE && !Rand::Get(0, 30))
                         army1[t].Animate(Monster::AS_IDLE);
                 }
                 if(t = FindTroopExact(army2, p), t >= 0 && !army2[t].isMoving())
                 {
-                    DrawTroop(army2[t], animframe);
+                    DrawTroop(army2[t], castle, animframe);
                     army2[t].Animate();
                     if(idleAnimations && army2[t].astate == Monster::AS_NONE && !Rand::Get(0, 30))
                         army2[t].Animate(Monster::AS_IDLE);
                 }
+
+                if(castle && p.y >= BFH / 2)
+                    castle->DrawCell(p);
+                
                 if(BfValid(adjusted) && p == adjusted)
                 {
                     inMotion->Blit(inMotion->ScreenPosition(), inMotion->IsReflected());
                     inMotion->Animate();
                 }
+
+                if(BfValid(temp))
+                    p = temp;
             }
     }
 
-    void Battlefield::Background::DrawTroop(Army::BattleTroop & troop, int animframe)
+    Battlefield::Background::Indicator_t Battlefield::Background::IndicatorFromStatus(const Army::BattleTroop &troop)
+    {
+        //TODO: Check with original HoMM II status indicators
+        if(troop.Modes(Army::SP_BLESS | Army::SP_STONESKIN | Army::SP_STEELSKIN))
+            return GREEN;
+        else if(troop.Modes(Army::SP_BLIND | Army::SP_PARALYZE))
+            return RED;
+        else if(troop.Modes(Army::SP_HASTE | Army::SP_SHIELD))
+            return YELLOW;
+        else return BLUE; 
+    }
+
+    void Battlefield::Background::DrawTroop(Army::BattleTroop & troop, BattleCastle *castle, int animframe)
     {
         if(troop() == Monster::UNKNOWN) return;
         bool reflect = troop.IsReflected();
         bool wide = troop.isWide();
         Point pos = troop.isMoving() ? Scr2BfDirect(troop.ScreenPosition()) : troop.Position();
-        Point tp = Bf2Scr(pos) + dst_pt;
+        Point tp = Bf2Scr(pos);
         troop.Blit(tp, reflect, animframe);
+
+        if(!troop.isMoving() && castle && castle->hasMoat() &&
+           (castle->IsCellInMoat(pos) ||
+            (wide && castle->IsCellInMoat(pos + Point(reflect ? -1 : 1, 0)))))
+        {
+            const Sprite &moat = AGG::GetICN(ICN::MOATPART, pos.y);
+            display.Blit(moat, Point(moat.x(), moat.y()));
+        }
 
         // No count if troop is in motion
         if(troop.isMoving())
@@ -503,14 +573,9 @@ namespace Battle
         // draw count
         if(troop.Count() == 0) return;
         int offset = wide ? CELLW : 0;
-        tp.x += reflect ? -30 + offset : 10 + offset;
+        tp.x += reflect ? -30 - offset : 10 + offset;
         tp.y -= 10;
-        // TODO color
-        u16 ind = 10;  // blue
-        // ind = 11;  // blue 2
-        // ind = 12;  // green
-        // ind = 13;  // yellow
-        // ind = 14;  // red
+        u16 ind = IndicatorFromStatus(troop);
         display.Blit(AGG::GetICN(ICN::TEXTBAR, ind), tp);
         std::string str;
         int count = troop.Count();
@@ -553,7 +618,7 @@ namespace Battle
         }
     }
 
-    void Battlefield::Background::MagicAnimation(std::vector<Army::BattleTroop*> &affected, Heroes *hero1, Heroes *hero2, bool reflect, Spell::spell_t spell)
+    void Battlefield::Background::MagicAnimation(std::vector<Army::BattleTroop*> &affected, HeroBase *hero1, HeroBase *hero2, bool reflect, Spell::spell_t spell)
     {
         ::Background back(Rect(g_baseOffset.x, g_baseOffset.y, 640, 480));
         back.Save();
@@ -566,13 +631,13 @@ namespace Battle
                 if(affected.size() == 1) {
                     Point start, end;
                     if(reflect && hero2) {
-                        Rect hrect = DrawHero(*hero2, 1, reflect);
+                        Rect hrect = DrawHeroObject(*hero2, 1, reflect);
                         start = hrect + Point(hrect.w, hrect.h/2);
-                        end = Bf2Scr(affected[0]->Position())+dst_pt;
+                        end = Bf2Scr(affected[0]->Position());
                     } else if(!reflect && hero1) {
-                        Rect hrect = DrawHero(*hero1, 1, reflect);
+                        Rect hrect = DrawHeroObject(*hero1, 1, reflect);
                         start = hrect + Point(0, hrect.h/2);
-                        end = Bf2Scr(affected[0]->Position())+dst_pt;
+                        end = Bf2Scr(affected[0]->Position());
                     } else break;
                     int animat = 0;
                     int frame = 0;
@@ -626,6 +691,113 @@ namespace Battle
                 // TODO
             default:
                 break;
+        }
+    }
+
+    void BattleCastle::DrawBackground()
+    {
+        const Sprite &ground = AGG::GetICN(m_groundICN, 1);
+        const Sprite &backwall = AGG::GetICN(m_groundICN, hasFortifications() ? 4 : 3);
+        const Sprite &reference = AGG::GetICN(ICN::CBKGDSRT, 0);
+        Point groundPt(g_baseOffset.x + reference.w() - ground.w(), Bf2Scr(Point(0, 0)).y - CELLH/2 + 4);
+        Point backwallPt(groundPt.x + ground.w() - backwall.w(), groundPt.y - backwall.h() + 4);
+
+        display.Blit(ground, groundPt);
+        display.Blit(backwall, backwallPt);
+    
+        if(hasMoat())
+        {   
+            const Sprite &moat = AGG::GetICN(ICN::MOATWHOL, 0);
+            display.Blit(moat, Point(moat.x(), moat.y()));
+        }
+    }
+
+    void BattleCastle::DrawForeground()
+    {
+        display.Blit(*m_castleParts[TOWER_KEEP]->m_sprite,
+                     getCastlePartDisplay(TOWER_KEEP) + g_baseOffset);
+    }
+
+    void BattleCastle::DrawCell(const Point &pt)
+    {
+        for(u16 i = 0; i < m_castleParts.size(); i++)
+        {
+            if(m_castleParts[i]->m_logical == pt && m_castleParts[i]->m_sprite)
+                display.Blit(*m_castleParts[i]->m_sprite, getCastlePartDisplay(i) + g_baseOffset);
+        }
+    }
+
+    void Catapult::Draw()
+    {
+        point = Point(g_baseOffset.x, g_baseOffset.y + Bf2ScrNoOffset(Point(0, 5)).y);
+        display.Blit(*sprite, point);
+    }
+    
+    void Catapult::Animate(Battlefield &battlefield, BattleCastle &castle, u8 target, u8 damage)
+    {
+        int ticket = 0;
+        int anim = 0;
+        AGG::PlaySound(M82::CATSND00);
+        int phase = PREATTACK;
+        bool done = false;
+        ICN::icn_t cloudICN = damage ? ICN::LICHCLOD : ICN::SMALCLOD;
+
+        battlefield.RedrawBackground();
+        if(!back)
+            back = new Background(point - Point(0, 20), sprite->w(), sprite->h() + 20);
+        back->Save();
+        battlefield.Redraw();
+        
+        while(!done && le.HandleEvents())
+        {
+            if(!Game::ShouldAnimateInfrequent(ticket++, 2))
+                continue;
+
+            switch(phase)
+            {
+                case PREATTACK:
+                {
+                    if(anim == AGG::GetICNCount(ICN::CATAPULT))
+                    {
+                        phase++;
+                        anim = 0;
+                        break;
+                    }
+                    back->Restore();
+                    const Sprite &catapult = AGG::GetICN(ICN::CATAPULT, anim++);
+                    display.Blit(catapult, point - Point(catapult.w() - sprite->w(), catapult.h() - sprite->h()));
+                    break;
+                }
+                case MISSILE_FLIGHT:
+                {
+                    battlefield.Redraw();
+                    //ICN::BOULDER
+                    
+                    phase++;
+                    AGG::PlaySound(M82::CATSND02);
+                    if(damage)
+                        castle.DamagePart(target, damage);
+                    break;
+                }
+                case MISSILE_IMPACT:
+                {
+                    if(anim == AGG::GetICNCount(cloudICN))
+                    {
+                        phase++;
+                        break;
+                    }
+                    battlefield.Redraw();
+                    const Sprite &cloud = AGG::GetICN(cloudICN, anim++);
+                    const Sprite &targetSprite = castle.getCastlePartSprite(target);
+                    Point disp = castle.getCastlePartDisplay(target) + g_baseOffset;
+                    display.Blit(cloud, disp - Point((cloud.w() - targetSprite.w()) / 2, (cloud.h() - targetSprite.h()) / 2));
+                    break;
+                }    
+                case POSTATTACK:
+                    done = true;
+                    break;
+            }
+            display.Flip();
         }
     }
 }

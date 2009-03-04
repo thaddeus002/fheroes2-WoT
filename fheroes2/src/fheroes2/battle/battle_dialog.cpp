@@ -1,5 +1,6 @@
 #include <string>
 #include <algorithm>
+#include <cassert>
 #include "battle.h"
 #include "battle_types.h"
 #include "engine.h"
@@ -110,6 +111,7 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
             String::Replace(message[0], "%{name}", name);
             break;
         default:
+            assert(0 && "Invalid battle state.");
             break;
     }
     
@@ -293,7 +295,7 @@ void Battle::SettingsDialog()
     }
 }
 
-Army::battle_t Battle::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender, bool locked)
+Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::spell_t &spell, bool quickshow, bool cansurrender, bool locked)
 {
     spell = Spell::NONE;
     const ICN::icn_t sett = Settings::Get().EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG;
@@ -313,7 +315,7 @@ Army::battle_t Battle::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spe
     back.Save();
 
     display.Blit(dialog, pos_rt.x, pos_rt.y);
-    display.Blit(Portrait::Hero(hero, Portrait::BIG), pos_rt.x + 27, pos_rt.y + 42);
+    display.Blit(Portrait::Portrait(hero, Portrait::BIG), pos_rt.x + 27, pos_rt.y + 42);
     display.Blit(AGG::GetICN(butt, Color::GetIndex(hero.GetColor())+1), pos_rt.x + 148, pos_rt.y + 36);
     Point tp(pos_rt);
     std::string str;
@@ -375,7 +377,7 @@ Army::battle_t Battle::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spe
     Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);
     Button buttonSur(pos_rt.x + 148, pos_rt.y + 148, butt, 13, 14);
     Button buttonOK(pos_rt.x + 207, pos_rt.y + 148, butt, 15, 16);
-    buttonMag.SetDisable(!hero.SpellBook().isActive() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
+    buttonMag.SetDisable(!hero.GetSpellBook()->isActive() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
     buttonRet.SetDisable(locked || quickshow);
     buttonSur.SetDisable(!cansurrender || locked || quickshow);
     buttonMag.Draw();
@@ -399,7 +401,7 @@ Army::battle_t Battle::HeroStatus(Heroes &hero, StatusBar &statusBar, Spell::spe
         if(le.KeyPress(KEY_ESCAPE)) {
             return Army::NONE;
         }
-        do_button(buttonMag, {if(spell=hero.SpellBook().Open(Spell::Book::CMBT, true),spell!=Spell::NONE) {back.Restore();return Army::NONE;}}, Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG));
+        do_button(buttonMag, {if(spell=hero.GetSpellBook()->Open(Spell::Book::CMBT, true),spell!=Spell::NONE) {back.Restore();return Army::NONE;}}, Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG));
         do_button(buttonRet, return Army::RETREAT, Dialog::Message(_("Retreat"), _("Retreat your hero, abandoning your creatures. Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces."), Font::BIG));
         do_button(buttonSur, return Army::SURRENDER, Dialog::Message(_("Surrender"), _("Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again."), Font::BIG));
         do_button(buttonOK, return Army::NONE, Dialog::Message(_("Cancel"), _("Return to the battle."), Font::BIG));

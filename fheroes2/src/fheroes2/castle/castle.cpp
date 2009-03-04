@@ -110,6 +110,7 @@ void Castle::LoadFromMP2(const void *ptr)
         building |= BUILD_TAVERN;
         building |= DWELLING_MONSTER1;
         building |= DWELLING_MONSTER2;
+
 	// default dwelling
 	// default magic tower
     }
@@ -976,7 +977,10 @@ void Castle::BuyBuilding(building_t build)
 	    case BUILD_MAGEGUILD2:
 	    case BUILD_MAGEGUILD3:
 	    case BUILD_MAGEGUILD4:
-	    case BUILD_MAGEGUILD5: mageguild.BuildNextLevel();
+	    case BUILD_MAGEGUILD5:
+            mageguild.BuildNextLevel();
+            captain.GetSpellBook()->Activate();
+            captain.GetSpellBook()->Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
 		break;
 
             // build library

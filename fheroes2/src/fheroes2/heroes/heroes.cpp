@@ -40,7 +40,7 @@
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 extern void PlayPickupSound(void);
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : Skill::Primary(), name(str), experience(0), magic_point(0),
+Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
     move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), hid(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {

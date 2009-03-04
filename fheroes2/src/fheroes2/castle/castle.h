@@ -97,6 +97,8 @@ public:
     Castle(s16 cx, s16 cy, const Race::race_t rs);
     void LoadFromMP2(const void *ptr);
 
+    Captain &GetCaptain() { return captain; }
+
     bool isCastle(void) const{ return building & BUILD_CASTLE; };
     bool isCapital(void) const{ return Modes(CAPITAL); };
     bool HaveNearlySea(void) const;
@@ -183,7 +185,7 @@ private:
 
     const Point		mp;
     Race::race_t	race;
-    const Captain	captain;
+    Captain	captain;
 
     Color::color_t	color;
     std::string		name;

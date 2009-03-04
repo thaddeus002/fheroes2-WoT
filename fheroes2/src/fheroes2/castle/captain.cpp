@@ -25,6 +25,7 @@
 
 Captain::Captain(const Castle & c) : home(c), spell_book(this)
 {
+    spellPoints = 10;
 }
 
 bool Captain::isValid(void) const
@@ -174,15 +175,50 @@ u8 Captain::GetType(void) const
 
 Spell::Book * Captain::GetSpellBook(void)
 {
-    return spell_book.isActive() ? &spell_book : NULL;
+    return &spell_book;
 }
 
 u16 Captain::GetSpellPoints(void) const
 {
-    return 0;
+    return spellPoints;
 }
 
 u8 Captain::GetLevelSkill(const Skill::Secondary::skill_t skill) const
 {
     return 0;
+}
+
+const Army::army_t & Captain::GetArmy(void) const
+{
+    return home.GetArmy();
+}
+
+Army::army_t & Captain::GetArmy(void)
+{
+    return const_cast<Army::army_t &>(home.GetArmy());
+}
+
+bool Captain::HasArtifact(const Artifact::artifact_t & art) const
+{
+    return false;
+}
+
+BagArtifacts & Captain::GetBagArtifacts(void)
+{
+    return artifacts;
+}
+
+void Captain::TakeArtifacts(Heroes &hero)
+{
+    hero.GetBagArtifacts().clear();
+}
+
+u16 Captain::GetMaxSpellPoints(void) const
+{
+    return 10;
+}
+
+void Captain::SetSpellPoints(const u16 point)
+{
+    spellPoints = point;
 }

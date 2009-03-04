@@ -23,66 +23,100 @@
 namespace Battle
 {
     Point g_baseOffset;
-
-    enum {
-        PREATTACK = 0,
-        MISSILE_FLIGHT,
-        MISSILE_IMPACT
-    };
 }
 
+/** Convert an #army_t into a #BattleArmy_t for use in battle.
+ *  \param[in]  army       army to convert
+ *  \param[out] battleArmy converted result
+ */
 void Army::ArmyToBattleArmy(const Army::army_t &army, Army::BattleArmy_t &battleArmy)
 {
     for(u16 i = 0; i < army.Size(); i++)
         battleArmy.push_back(Army::BattleTroop(army.At(i)));
 }
 
+/** Convert a #BattleArmy_t into an #army_t after use in battle.
+ *  \param[in]  battleArmy  army to convert
+ *  \param[out] army        converted result
+ */
 void Army::BattleArmyToArmy(const Army::BattleArmy_t &battleArmy, Army::army_t &army)
 {
     army.Import(battleArmy);
 }
 
-// translate coordinate to batle field
+/** Directly translate screen coordinate to battle field cell without half cell round up of Scr2Bf.
+ *  \param pt  Coordinate to convert
+ *  \return  Possibly invalid battlefield coordinate
+ */
 Point Battle::Scr2BfDirect(const Point & pt)
 {
-    return Point((pt.x - BFX - (((pt.y - BFY)/CELLH) % 2 ? CELLW/2 : 0))/CELLW , (pt.y - BFY)/CELLH) - g_baseOffset;
+    return Point((pt.x - g_baseOffset.x - BFX - (((pt.y - g_baseOffset.y - BFY)/CELLH) % 2 ? CELLW/2 : 0))/CELLW ,
+                 (pt.y - g_baseOffset.y - BFY)/CELLH);
 }
 
-// translate coordinate to batle field
+/** Translate screen coordinate to battle field cell, rounding up by a half cell.
+ *  \param pt  Coordinate to convert
+ *  \return  Possibly invalid battlefield coordinate
+ */
 Point Battle::Scr2Bf(const Point & pt)
 {
-    return Point((pt.x - BFX + (((pt.y - BFY + CELLH)/CELLH) % 2 ? CELLW/2 : 0))/CELLW , (pt.y - BFY + CELLH)/CELLH) - g_baseOffset;
+    return Point((pt.x - g_baseOffset.x - BFX + (((pt.y - g_baseOffset.y - BFY + CELLH)/CELLH) % 2 ? CELLW/2 : 0))/CELLW ,
+                 (pt.y - g_baseOffset.y - BFY + CELLH)/CELLH);
 }
 
-// translate to screen (absolute screen position)
+/** Translate battlefield cell to absolute screen position at bottom left of cell.
+ *  \param pt  Coordinate to convert
+ */
 Point Battle::Bf2Scr(const Point & pt)
 {
     return Point(BFX + pt.x*CELLW + (pt.y % 2 ? 0 : CELLW/2), BFY + pt.y*CELLH) + g_baseOffset;
 }
 
-// translate to screen (offset to frame border)
+/** Translate battlefield cell to relative screen position at bottom left of cell.
+ *  \param pt  Coordinate to convert
+ */
 Point Battle::Bf2ScrNoOffset(const Point& pt)
 {
     return Bf2Scr(pt) - g_baseOffset;
 }
 
+/** Determine if given #Point is a valid cell index on the battlefield.
+ */
 bool Battle::BfValid(const Point & pt)
 {
     return pt.x >= 0 && pt.x < BFW && pt.y >= 0 && pt.y < BFH;
 }
 
+/** Initiate a battle between two heroes.
+ *  \param h1    Left hero
+ *  \param h2    Right hero
+ *  \param tile  Map tile from which to derive visual elements
+ *  \return Battle status relative to left hero
+ */
 Army::battle_t Army::Battle(Heroes &h1, Heroes &h2, const Maps::Tiles &tile)
 {
     Battle::BattleControl battle(h1, h2, tile);
     return battle.GetStatus();
 }
 
+/** Initiate a battle between a hero and an army.
+ *  \param h1    Left hero
+ *  \param a     Right army
+ *  \param tile  Map tile from which to derive visual elements
+ *  \return Battle status relative to left hero
+ */
 Army::battle_t Army::Battle(Heroes &h, Army::army_t &a, const Maps::Tiles &tile)
 {
     Battle::BattleControl battle(h, a, tile);
     return battle.GetStatus();
 }
 
+/** Initiate a battle between a hero and a castle.
+ *  \param h1    Left hero
+ *  \param a     Right castle
+ *  \param tile  Map tile from which to derive visual elements
+ *  \return Battle status relative to left hero
+ */
 Army::battle_t Army::Battle(Heroes &h, Castle &c, const Maps::Tiles &tile)
 {
     Battle::BattleControl battle(h, c, tile);
@@ -91,8 +125,349 @@ Army::battle_t Army::Battle(Heroes &h, Castle &c, const Maps::Tiles &tile)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
+namespace Battle
+{
+    
+    BattleCastle::BattleCastle(Castle &castle)
+    : m_castle(castle)
+    {
+        m_drawbridge = CLOSED;
+        for(u16 i = 0; i < sizeof(m_wall) / sizeof(m_wall[0]); i++)
+            m_wall[i] = UNBROKEN;
+        for(u16 i = 0; i < sizeof(m_tower) / sizeof(m_tower[0]); i++)
+            m_tower[i] = UNBROKEN;
+        
+        switch(getRace())
+        {
+            case Race::KNGT:
+                m_groundICN = ICN::CASTBKGK;
+                m_wallICN = ICN::CASTLEK;
+                break;
+            case Race::BARB:
+                m_groundICN = ICN::CASTBKGB;
+                m_wallICN = ICN::CASTLEB;
+                break;
+            case Race::SORC:
+                m_groundICN = ICN::CASTBKGS;
+                m_wallICN = ICN::CASTLES;
+                break;
+            case Race::WRLK:
+                m_groundICN = ICN::CASTBKGW;
+                m_wallICN = ICN::CASTLEW;
+                break;
+            case Race::WZRD:
+                m_groundICN = ICN::CASTBKGZ;
+                m_wallICN = ICN::CASTLEZ;
+                break;
+            case Race::NECR:
+                m_groundICN = ICN::CASTBKGN;
+                m_wallICN = ICN::CASTLEN;
+                break;
+            default:
+                break;
+        }
+
+        RecreateCastle();
+    }
+
+    BattleCastle::~BattleCastle()
+    {
+        DestroyCastle();
+    }
+
+    void BattleCastle::OpenDrawbridge()
+    {
+        if(m_drawbridge == BROKEN)
+            return;
+        
+        m_drawbridge = OPEN;
+        RecreateCastle();
+    }
+
+    void BattleCastle::CloseDrawbridge()
+    {
+        if(m_drawbridge != OPEN)
+            return;
+
+        m_drawbridge = CLOSED;
+        RecreateCastle();
+    }
+
+    void BattleCastle::RecreateMoat()
+    {
+        m_moatCells.clear();
+        if(!hasMoat())
+            return;
+        
+        m_moatCells.reserve(9);
+        m_moatCells.push_back(Point(7, 0));
+        m_moatCells.push_back(Point(7, 1));
+        m_moatCells.push_back(Point(6, 2));
+        m_moatCells.push_back(Point(6, 3));
+        if(getDrawbridge() == CLOSED)
+        {
+            m_moatCells.push_back(Point(5, 4));
+            m_moatCells.push_back(Point(6, 4));
+        }
+        m_moatCells.push_back(Point(6, 5));
+        m_moatCells.push_back(Point(6, 6));
+        m_moatCells.push_back(Point(7, 7));
+        m_moatCells.push_back(Point(7, 8));
+    }
+
+    void BattleCastle::DestroyCastle()
+    {
+        for(u16 i = 0; i < m_castleParts.size(); i++)
+            delete m_castleParts[i];
+        m_castleParts.clear();
+    }
+
+    void BattleCastle::RecreateCastle()
+    {
+        DestroyCastle();
+        
+        u8 offset = hasFortifications() ? 28 : 5;
+        u8 idx = 0;
+        const Sprite *sprite;
+
+        sprite = &AGG::GetICN(m_wallICN, offset + (u8)getWall(idx));
+        m_castleParts.push_back(new CastlePart(sprite, Point(8, 0))); offset++; 
+    
+        sprite = &AGG::GetICN(m_wallICN, 17 + (getTower(idx) != UNBROKEN ? 2 : hasRight() ? 1 : 0));
+        m_castleParts.push_back(new CastlePart(sprite, Point(8, 1))); idx++;
+    
+        sprite = &AGG::GetICN(m_wallICN, offset + (u8)getWall(idx));
+        m_castleParts.push_back(new CastlePart(sprite, Point(7, 2))); offset++;
+    
+        sprite = &AGG::GetICN(m_wallICN, 17 + (getTower(idx) != UNBROKEN ? 2 : 0));
+        m_castleParts.push_back(new CastlePart(sprite, Point(7, 3))); idx++;
+    
+        sprite = &AGG::GetICN(m_wallICN, 4);
+        
+        if(getWall(idx) != UNBROKEN)
+        {
+            m_drawbridge = BROKEN;
+            sprite = NULL;
+        }
+        m_castleParts.push_back(new CastlePart(sprite, Point(6, 4)));
+    
+        sprite = &AGG::GetICN(m_wallICN, 17 + (getTower(idx) != UNBROKEN ? 2 : 0));
+        m_castleParts.push_back(new CastlePart(sprite, Point(7, 5))); idx++;
+    
+        sprite = &AGG::GetICN(m_wallICN, offset + (u8)getWall(idx));
+        m_castleParts.push_back(new CastlePart(sprite, Point(7, 6))); offset++;
+
+        sprite = &AGG::GetICN(m_wallICN, 17 + (getTower(idx) != UNBROKEN ? 2 : hasLeft() ? 1 : 0));
+        m_castleParts.push_back(new CastlePart(sprite, Point(8, 7))); idx++;
+    
+        sprite = &AGG::GetICN(m_wallICN, offset + (u8)getWall(idx));
+        m_castleParts.push_back(new CastlePart(sprite, Point(8, 8))); offset++;
+        
+        sprite = &AGG::GetICN(m_wallICN, 20 + (getTower(idx) != UNBROKEN ? 6 : 0));
+        m_castleParts.push_back(new CastlePart(sprite, Point(11, 1))); idx++;
+
+        if(getDrawbridge() != CLOSED)
+            sprite = &AGG::GetICN(m_wallICN, 21 + (getDrawbridge() == OPEN ? 0 : 3));
+        else sprite = NULL;
+
+        m_castleParts.push_back(new CastlePart(sprite, Point(4, 4)));
+
+        RecreateMoat();
+    }
+    
+    Race::race_t BattleCastle::getRace() const
+    {
+        return m_castle.GetRace();
+    }
+    
+    bool BattleCastle::hasLeft() const
+    {
+        return m_castle.isBuild(Castle::BUILD_LEFTTURRET);
+    }
+    
+    bool BattleCastle::hasRight() const
+    {
+        return m_castle.isBuild(Castle::BUILD_RIGHTTURRET);
+    }
+    
+    bool BattleCastle::hasMoat() const
+    {
+        return m_castle.isBuild(Castle::BUILD_MOAT);
+    }
+    
+    bool BattleCastle::hasFortifications() const
+    {
+        return getRace() == Race::KNGT && m_castle.isBuild(Castle::BUILD_SPEC);
+    }
+    
+    BattleCastle::WallStatus BattleCastle::getWall(u8 wall)
+    {
+        return m_wall[wall];
+    }
+
+    BattleCastle::WallStatus BattleCastle::getTower(u8 tower)
+    {
+        return m_tower[tower];
+    }
+
+    BattleCastle::DrawbridgeStatus BattleCastle::getDrawbridge()
+    {
+        return m_drawbridge;
+    }
+
+    Point BattleCastle::getCastlePoint(u8 part)
+    {
+        if(part % 2)
+            return m_castleParts[part]->m_logical;
+        else return *castlePartStatus(part) != DESTROYED ? m_castleParts[part]->m_logical : Point(-1, -1);
+    }
+
+    Point BattleCastle::getCastlePartDisplay(u8 part)
+    {
+        if(!m_castleParts[part]->m_sprite)
+            return Bf2ScrNoOffset(m_castleParts[part]->m_logical);
+        
+        if(m_castleParts[part]->m_sprite->x() > 0)
+            return Point(m_castleParts[part]->m_sprite->x(), m_castleParts[part]->m_sprite->y());
+        else
+            return Point(m_castleParts[part]->m_sprite->x(), m_castleParts[part]->m_sprite->y())
+                    + Bf2ScrNoOffset(m_castleParts[part]->m_logical);
+    }
+
+    const Sprite &BattleCastle::getCastlePartSprite(u8 part)
+    {
+        if(!m_castleParts[part]->m_sprite)
+            return AGG::GetICN(ICN::CASTLEZ, 0);
+        
+        return *m_castleParts[part]->m_sprite;
+    }
+
+    BattleCastle::WallStatus *BattleCastle::castlePartStatus(u8 part)
+    {
+        if(part % 2)
+            return &m_tower[part / 2];
+        else return &m_wall[part / 2];
+    }
+
+    u8 BattleCastle::CalculateDamage(u8 part, HeroBase *hero)
+    {
+        /* Arbitrary calculations that I invented:
+           - none:     1/3 chance of basic hit
+           - basic:    1/2 chance of basic hit
+           - advanced: 1/1 chance of hit, 1/3 chance of demolish
+           - expert:   1/1 chance of demolish
+
+           With fortifications, the list becomes:
+           - none:     1/4
+           - basic:    1/3
+           - advanced: 1/2, 1/3
+           - expert:   1/2
+        */
+        
+        s8 mod = hero->GetLevelSkill(Skill::Secondary::BALLISTICS);
+
+        if(hasFortifications())
+            mod--;
+
+        s8 res = Rand::Get(std::min(mod, (s8)Skill::Level::EXPERT), Skill::Level::EXPERT);
+        if(res >= Skill::Level::ADVANCED)
+        {
+            if(mod == Skill::Level::EXPERT)
+                return 2;
+            else return (2 == Rand::Get(0, 2)) + 1;
+        }
+        else return 0;
+    }
+    
+    void BattleCastle::DamagePart(u8 part, u8 damage)
+    {
+        while(damage--)
+            *castlePartStatus(part) = NextStatus(*castlePartStatus(part));
+        RecreateCastle();
+    }
+
+    BattleCastle::WallStatus BattleCastle::NextStatus(WallStatus status)
+    {
+        if(status == UNBROKEN)
+            return DAMAGED;
+        else return DESTROYED;        
+    }
+
+    /** Determine if a given battlefield point is part of a castle moat.
+     *  \param p  #Point to consider.
+     */
+    bool BattleCastle::IsCellInMoat(const Point &p)
+    {
+        return std::find(m_moatCells.begin(), m_moatCells.end(), p) != m_moatCells.end();
+    }
+
+    ///////////////////////////////////////////////////////////////
+
+    Catapult::Catapult()
+    {
+        sprite = &AGG::GetICN(ICN::CATAPULT, 0);
+        back = NULL;
+    }
+
+    Catapult::~Catapult()
+    {
+        delete back;
+    }
+
+    void Catapult::Fire(Battlefield &battlefield, BattleCastle &castle)
+    {
+        int target;
+        std::vector<int> targets;
+        do
+        {
+            //First attack existing walls
+            for(int i = 0; i < MAX_CASTLE_WALLS; i++)
+            {
+                if(castle.getWall(i) != BattleCastle::DESTROYED && i != 2)
+                    targets.push_back(i * 2);
+            }
+            if(targets.size()) break;
+        
+            //Next attack existing decorative towers
+            if(castle.getTower(1) == BattleCastle::UNBROKEN) targets.push_back(BattleCastle::LEFT_DRAWBRIDGE_TOWER);
+            if(castle.getTower(2) == BattleCastle::UNBROKEN) targets.push_back(BattleCastle::RIGHT_DRAWBRIDGE_TOWER);
+            if(targets.size()) break;
+        
+            //Then attack left or right towers
+            if(castle.getTower(0) == BattleCastle::UNBROKEN) targets.push_back(BattleCastle::LEFT_TOWER);
+            if(castle.getTower(3) == BattleCastle::UNBROKEN) targets.push_back(BattleCastle::RIGHT_TOWER);
+            if(targets.size()) break;
+        
+            //Then attack main tower
+            if(castle.getTower(4) == BattleCastle::UNBROKEN)
+            {
+                targets.push_back(BattleCastle::TOWER_KEEP);
+                break;
+            }
+            //Finally attack drawbridge
+            else if(castle.getWall(2) == BattleCastle::UNBROKEN)
+            {
+                targets.push_back(BattleCastle::DRAWBRIDGE);
+                break;
+            }
+        } while(0);
+    
+        if(!targets.size())
+            return;
+    
+        target = targets[Rand::Get(0, targets.size() - 1)];
+        u8 damage = castle.CalculateDamage(target, battlefield.GetHero(0));
+    
+        if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
+            Animate(battlefield, castle, target, damage);
+        else castle.DamagePart(target, damage);
+    }
+}
+    
+//////////////////////////////////////////////////////////////////////////////////////////
+
 Battle::BattleControl::BattleControl(Heroes &hero1, Heroes &hero2, const Maps::Tiles &tile)
-: m_battlefield(&hero1, &hero2, hero1.GetArmy(), hero2.GetArmy(), Point(-1, -1), tile)
+: m_battlefield(NULL, &hero1, &hero2, hero1.GetArmy(), hero2.GetArmy(), g_baseOffset, tile)
 {
     Army::BattleArmy_t hero1Army, hero2Army;
     ArmyToBattleArmy(hero1.GetArmy(), hero1Army);
@@ -104,7 +479,7 @@ Battle::BattleControl::BattleControl(Heroes &hero1, Heroes &hero2, const Maps::T
 }
 
 Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Maps::Tiles &tile)
-: m_battlefield(&hero, NULL, hero.GetArmy(), army, Point(-1, -1), tile)
+: m_battlefield(NULL, &hero, NULL, hero.GetArmy(), army, g_baseOffset, tile)
 {
     Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
     ArmyToBattleArmy(hero.GetArmy(), heroArmyOrig);
@@ -117,12 +492,48 @@ Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Map
 }
 
 Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::Tiles &tile)
-: m_gui(NULL), m_battlefield(&hero, NULL, hero.GetArmy(), castle.GetArmy(), Point(-1, -1), tile)
+: m_battlefield(&castle, &hero, NULL, hero.GetArmy(), castle.GetArmy(), g_baseOffset, tile)
 {
-    // TODO
-    //m_battleStatus = BattleInt(&hero, 0, const_cast<std::vector<Army::BattleTroop>&>(hero.GetArmy()), army, tile);
-    m_battleStatus = Army::WIN; // m_gui is NULL!!!
-    //BattleSummaryVsArmy(hero, ArmyToBattleArmy(heroArmy), ArmyToBattleArmy(castle.GetArmy()), ArmyToBattleArmy(oppArmy), status);
+    Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
+    ArmyToBattleArmy(hero.GetArmy(), heroArmyOrig);
+    HeroBase *hero2 = castle.GetHeroes() != &hero ? castle.GetHeroes() : NULL;
+    if(hero2)
+    {
+        u8 idx = 0;
+        while(idx < ARMYMAXTROOPS)
+        {
+            Army::Troop &troop = castle.GetArmy().At(idx);
+            if(!hero2->GetArmy().JoinTroop(troop))
+                break;
+            troop.SetCount(0);
+            idx++;
+        }
+        
+        ArmyToBattleArmy(hero2->GetArmy(), oppArmyOrig);
+    }
+    else
+    {
+        if(castle.GetCaptain().isValid())
+            hero2 = &castle.GetCaptain();
+        ArmyToBattleArmy(castle.GetArmy(), oppArmyOrig);
+    }
+    m_battlefield.SetHero(1, hero2);
+    
+    m_battleStatus = RunBattle(&hero, hero2);
+    BattleArmyToArmy(m_battlefield.GetArmy(0), hero.GetArmy());
+    if(hero2)
+    {
+        BattleArmyToArmy(m_battlefield.GetArmy(1), hero2->GetArmy());
+        BattleSummaryVsHero(hero, heroArmyOrig, *hero2, oppArmyOrig);
+    }
+    else
+    {
+        BattleArmyToArmy(m_battlefield.GetArmy(1), castle.GetArmy());
+        BattleSummaryVsArmy(hero, heroArmyOrig, oppArmy, oppArmyOrig);
+    }
+
+    if(m_battleStatus == Army::WIN) //TODO: Vanquish present hero?
+        castle.GetArmy().Clear();
 }
 
 Battle::BattleControl::~BattleControl()
@@ -130,7 +541,7 @@ Battle::BattleControl::~BattleControl()
     if(m_gui) delete m_gui;
 }
 
-void Battle::BattleControl::BattleSummaryVsArmy(Heroes &hero, const Army::BattleArmy_t &heroOrig, const Army::BattleArmy_t &army, const Army::BattleArmy_t &armyOrig)
+void Battle::BattleControl::BattleSummaryVsArmy(HeroBase &hero, const Army::BattleArmy_t &heroOrig, const Army::BattleArmy_t &army, const Army::BattleArmy_t &armyOrig)
 {
     Army::ArmyPairs armies;
     Army::BattleArmy_t ownArmy;
@@ -141,7 +552,7 @@ void Battle::BattleControl::BattleSummaryVsArmy(Heroes &hero, const Army::Battle
     /*Dialog::*/BattleSummary(hero.GetName(), armies, NULL, Spell::NONE, 0, m_battleStatus);
 }
 
-void Battle::BattleControl::BattleSummaryVsHero(Heroes &hero, const Army::BattleArmy_t &heroOrig, Heroes &hero2, const Army::BattleArmy_t &hero2Orig)
+void Battle::BattleControl::BattleSummaryVsHero(HeroBase &hero, const Army::BattleArmy_t &heroOrig, HeroBase &hero2, const Army::BattleArmy_t &hero2Orig)
 {
     Army::ArmyPairs armies;
     Army::BattleArmy_t ownArmy, otherArmy;
@@ -155,7 +566,7 @@ void Battle::BattleControl::BattleSummaryVsHero(Heroes &hero, const Army::Battle
     /*Dialog::*/BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, m_battleStatus);
 }
 
-void Battle::BattleControl::InitializeLogicSettings(Heroes *hero1, Heroes *hero2)
+void Battle::BattleControl::InitializeLogicSettings(HeroBase *hero1, HeroBase *hero2)
 {
     if(hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::LOCAL)
         BattleSettings::Get().ResetModes(BattleSettings::OPT_LOGICONLY);
@@ -164,7 +575,7 @@ void Battle::BattleControl::InitializeLogicSettings(Heroes *hero1, Heroes *hero2
     else BattleSettings::Get().SetModes(BattleSettings::OPT_LOGICONLY);
 }
 
-Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
+Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2)
 {
     InitializeLogicSettings(hero1, hero2);
     
@@ -173,12 +584,16 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
     if(haveDisplay)
         m_gui = new GUI(hero1, hero2);
     else m_gui = NULL;
-    
+        
     Army::battle_t battle_status = Army::NONE;
     GUI::interaction_t status = GUI::NONE;
 
     if(haveDisplay)
+    {
+        m_battlefield.Redraw();
         m_gui->Redraw();
+        display.Flip();
+    }
 
     IndexList troopOrder;
     m_battlefield.GetTroopOrdering(troopOrder);
@@ -189,6 +604,8 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
     turn[1] = CreateTurn(hero2, m_battlefield.GetArmy(1), m_battlefield.GetArmy(0));
 
     bool validMove = false; //FIXME: Hack so that battles terminate if no unit can move
+    
+    NewTurn();
     
     while(1)
     {
@@ -220,10 +637,11 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
             {
                 if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
                 {
-                    m_battlefield.AnimateMorale(false, troop);
                     std::string str = _("Low morale causes the %{name} to freeze in panic.");
                     String::Replace(str, "%{name}", troop.GetName());
                     m_gui->Status(str);
+                    m_gui->Redraw();
+                    m_battlefield.AnimateMorale(false, troop);
                 }
                 continue;
             }
@@ -239,7 +657,7 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
         }
         else if(status == GUI::AUTO)
         {
-            Heroes *hero = turn[currentTurn]->GetHero();
+            HeroBase *hero = turn[currentTurn]->GetHero();
             Army::BattleArmy_t &own = turn[currentTurn]->GetOwnArmy();
             Army::BattleArmy_t &opp = turn[currentTurn]->GetOppArmy();
             delete turn[currentTurn];
@@ -250,6 +668,7 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
         else if(status == GUI::SKIP)
         {
             //FIXME: Could lose out on morale/luck boost?
+            validMove = true;
             continue;
         }
         else if(status != GUI::NONE)
@@ -282,7 +701,7 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
                 
                 attackerAlive = troop.isValid();
             }
-            m_battlefield.CleanupBodies(0xFF);
+            m_battlefield.CleanupBodies();
             defenderAlive = defender->isValid();
 
             if(!attackerAlive || !defenderAlive || !troop.isTwiceAttack() || troop.Modes(Army::ATTACKED))
@@ -299,10 +718,11 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
             currentTroop--;
             if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
             {
-                m_battlefield.AnimateMorale(true, troop);
                 std::string str = _("High morale enables the %{name} to attack again.");
                 String::Replace(str, "%{name}", troop.GetName());
                 m_gui->Status(str);
+                m_gui->Redraw();
+                m_battlefield.AnimateMorale(true, troop);
             }
         }
     }
@@ -329,11 +749,132 @@ Army::battle_t Battle::BattleControl::RunBattle(Heroes *hero1, Heroes *hero2)
     return battle_status;
 }
 
-Battle::BattleTurn *Battle::BattleControl::CreateTurn(Heroes *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy, bool forceComputer /* = false */)
+Battle::BattleTurn *Battle::BattleControl::CreateTurn(HeroBase *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy, bool forceComputer /* = false */)
 {
     if(!forceComputer && hero && world.GetKingdom(hero->GetColor()).Control() == Game::LOCAL)
         return new HumanTurn(&m_battlefield, m_gui, hero, ownArmy, oppArmy);
     else return new ComputerTurn(&m_battlefield, m_gui, hero, ownArmy, oppArmy);
+}
+
+void Battle::BattleControl::NewTurn()
+{
+    Army::NewTurn(m_battlefield.GetArmy(0));
+    Army::NewTurn(m_battlefield.GetArmy(1));
+    for(u8 i = 0; i < 2; i++)
+        if(m_battlefield.GetHero(i))
+            m_battlefield.GetHero(i)->ResetModes(Heroes::SPELLCASTED);
+
+    int times = 1 + m_battlefield.GetHero(0)->GetLevelSkill(Skill::Secondary::BALLISTICS) / 2;
+    if(times == 1 && m_battlefield.GetHero(0)->HasArtifact(Artifact::BALLISTA))
+        times++;
+    while(times--)
+    {
+        if(m_battlefield.GetCatapult())
+            m_battlefield.GetCatapult()->Fire(m_battlefield, *m_battlefield.GetCastle());
+    }
+
+    BattleCastle *castle = m_battlefield.GetCastle();
+    if(castle)
+    {
+        Battle::BattleTurn *tempTurn = CreateTurn(m_battlefield.GetHero(1),
+                                                  m_battlefield.GetArmy(1),
+                                                  m_battlefield.GetArmy(0),
+                                                  true);
+        Battle::ComputerTurn *compTurn = (Battle::ComputerTurn *)tempTurn;
+        Point attack;
+
+        if(castle->hasLeft())
+        {
+            attack = compTurn->GetMostDangerousOpposingUnit();
+            PerformTowerAttack(attack, castle->getCastlePoint(BattleCastle::LEFT_TOWER));
+        }
+        
+        if(castle->hasRight())
+        {
+            attack = compTurn->GetMostDangerousOpposingUnit();
+            PerformTowerAttack(attack, castle->getCastlePoint(BattleCastle::RIGHT_TOWER));
+        }
+
+        attack = compTurn->GetMostDangerousOpposingUnit();
+        PerformTowerAttack(attack, castle->getCastlePoint(BattleCastle::TOWER_KEEP));
+
+        delete tempTurn;
+    }
+}
+
+void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point &from)
+{
+    int damage = 0; //TODO: proper damage value
+    TroopIndex idx = m_battlefield.FindTroop(m_battlefield.GetArmy(0), attack);
+    Army::BattleTroop &troop = m_battlefield.GetTroopFromIndex(idx);
+    
+    if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
+    {
+        Point start = Bf2Scr(from);
+        u8 state = MISSILE_FLIGHT;
+        Point delta = Bf2Scr(attack) - start;
+        int icnframe=-1, frame=0;
+        u32 animat = 0;
+        int maxind = AGG::GetICNCount(ICN::KEEP);
+        double angle = M_PI_2 - atan2(-delta.y, delta.x);
+        icnframe = (int)(angle/M_PI * maxind);
+
+        Monster::animstate_t targetstate;
+        M82::m82_t targetsound;
+        if(troop.IsDamageFatal(damage)) {
+            targetstate = Monster::AS_DIE;
+            targetsound = troop.M82Kill();
+        } else {
+            targetstate = Monster::AS_PAIN;
+            targetsound = troop.M82Wnce();
+        }
+
+        const int deltaX = abs(from.x - attack.x);
+        const int deltaY = abs(from.y - attack.y);
+        const int MISSFRAMES = std::max(std::max(deltaX, deltaY) * 2 / 3, 1); //avoid divide by zero
+        delta.x /= MISSFRAMES;
+        delta.y /= MISSFRAMES;
+
+        while(LocalEvent::GetLocalEvent().HandleEvents())
+        {
+            int scale = state == MISSILE_FLIGHT ? 2 : 4;
+            if(Game::ShouldAnimateInfrequent(animat++, scale))
+            {
+                m_battlefield.Redraw();
+
+                if(state == MISSILE_FLIGHT)
+                {    
+                    start += delta;
+                    frame ++;
+                    if(frame >= MISSFRAMES)
+                    {
+                        state++;
+                        frame = 0;
+                    }
+                    display.Blit(AGG::GetICN(ICN::KEEP, icnframe, true), start);
+                }
+                else if(state == MISSILE_IMPACT)
+                {
+                    if(!frame)
+                    {
+                        troop.Animate(targetstate);
+                        AGG::PlaySound(targetsound);
+                        frame++;
+                    }
+                    else if(troop.astate != Monster::AS_NONE) troop.Animate();
+                    else break;
+                }
+
+                m_gui->Redraw();
+                display.Flip();
+            }
+        }
+
+        
+    }
+    
+    troop.ApplyDamage(damage);
+    m_battlefield.CleanupBodies();
 }
 
 Army::BattleTroop &Battle::BattleControl::NextValidTroop(s8 &currentTroop, IndexList &troopOrder)
@@ -344,11 +885,7 @@ Army::BattleTroop &Battle::BattleControl::NextValidTroop(s8 &currentTroop, Index
         if((u8)currentTroop == troopOrder.size())
         {
             currentTroop = 0;
-            Army::NewTurn(m_battlefield.GetArmy(0));
-            Army::NewTurn(m_battlefield.GetArmy(1));
-            for(u8 i = 0; i < 2; i++)
-                if(m_battlefield.GetHero(i))
-                    m_battlefield.GetHero(i)->ResetModes(Heroes::SPELLCASTED);
+            NewTurn();
         }
         TroopIndex troopIdx = troopOrder[currentTroop++];
         troop = &m_battlefield.GetTroopFromIndex(troopIdx);
@@ -356,7 +893,7 @@ Army::BattleTroop &Battle::BattleControl::NextValidTroop(s8 &currentTroop, Index
     return *troop;
 }
 
-bool Battle::BattleControl::AdjustMorale(Heroes *hero, Army::BattleTroop &troop)
+bool Battle::BattleControl::AdjustMorale(HeroBase *hero, Army::BattleTroop &troop)
 {
     if(!troop.isAffectedByMorale() || troop.Modes(Army::MORALE_BAD | Army::MORALE_GOOD))   
        return false;
@@ -398,12 +935,13 @@ namespace Battle
     class WalkAction : public MoveAction
     {
       public:
-        WalkAction(const Point &, Army::BattleTroop &, PointList *);
+        WalkAction(Battlefield &, const Point &, Army::BattleTroop &, PointList *);
         ~WalkAction();
         bool Step();
 
       private:
         PointList *m_path;
+        Battlefield &m_battlefield;
     };
 
     class FlyAction : public MoveAction
@@ -427,9 +965,10 @@ Battle::MoveAction::~MoveAction()
     m_troop->SetMoving(false);
 }
     
-Battle::WalkAction::WalkAction(const Point &start, Army::BattleTroop &myTroop, PointList *path)
+Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Army::BattleTroop &myTroop, PointList *path)
 : Battle::MoveAction(myTroop)
 , m_path(path)
+, m_battlefield(battlefield)
 {
     if(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
@@ -461,10 +1000,25 @@ Battle::WalkAction::WalkAction(const Point &start, Army::BattleTroop &myTroop, P
           break;
           }*/
     }
+    
+    if(m_battlefield.GetCastle()
+    && (std::find(m_path->begin(), m_path->end(), Point(6,4)) != m_path->end()
+    || std::find(m_path->begin(), m_path->end(), Point(5,4)) != m_path->end()))
+    {
+        m_battlefield.GetCastle()->OpenDrawbridge();
+    }
 }
     
 Battle::WalkAction::~WalkAction()
 {
+    TroopIndex idx = m_battlefield.GetIndexFromTroop(*m_troop);
+    idx += idx < 0 ? -5 : 5; //FIXME: This is a gross hack to ensure that we don't actually check for a real troop
+    
+    if(m_battlefield.GetCastle()
+    && m_battlefield.CellFree(Point(5,4), idx)
+    && m_battlefield.CellFree(Point(6,4), idx))
+        m_battlefield.GetCastle()->CloseDrawbridge();
+    
     delete m_path;
 }
     
@@ -603,7 +1157,7 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move)
         {
             path = m_battlefield.FindPath(myTroop.Position(), move, myTroop.GetSpeed(), myTroop, troopN);
             if(path)
-                action = new WalkAction(move, myTroop, path);
+                action = new WalkAction(m_battlefield, move, myTroop, path);
             else
             {
                 //Dialog::Message(_("Error"), _("Path not found!"), Font::BIG, Dialog::OK);
@@ -611,7 +1165,8 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move)
                 return false;
             }
         }
-        while(le.HandleEvents()) {
+        while(le.HandleEvents())
+        {
             bool shouldAnimate;
 
             if(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
@@ -628,7 +1183,11 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move)
                 if(action->Step())
                     break;
                 if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
+                {
                     m_battlefield.Redraw();
+                    m_gui->Redraw();
+                    display.Flip();
+                }
             }
         }
         delete action;
@@ -644,8 +1203,17 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move)
 long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, const Army::BattleTroop &defender)
 {
     long damage = attacker.GetDamageVersus(defender); 
+
+    bool inMoat = m_battlefield.GetCastle() ? m_battlefield.GetCastle()->IsCellInMoat(defender.Position()) : false;
+    u8 defense = defender.GetDefense();
+    if(inMoat)
+    {
+        if(defense - 3 > 0)
+            defense -= 3;
+        else defense = 1;
+    }
     
-    float d = attacker.GetAttack() - defender.GetDefense();
+    float d = attacker.GetAttack() - defense;
     d *= d > 0 ? 0.1f : 0.05f;
     damage = (long)(((float)damage) * (1 + d));
     return damage;
@@ -801,12 +1369,13 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
                 else if(state == MISSILE_IMPACT && !delayFrames--) break;
             }
             m_battlefield.Redraw();
+            m_gui->Redraw();
             if(state == MISSILE_FLIGHT) {
                 display.Blit(AGG::GetICN(attacker.ICNMiss(), abs(missindex), missindex < 0), miss_start);
-                display.Flip();
                 miss_start += miss_step;
                 missframe ++;
             }
+            display.Flip();
         }
     }
 }
@@ -854,6 +1423,8 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
         }
 
         m_gui->Status(status);
+        m_gui->Redraw();
+        display.Flip();
     }
 
     if(!ranged)
@@ -866,7 +1437,7 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
     return retaliate;
 }
 
-void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*> &affected, Spell::spell_t spell, Heroes *hero)
+void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*> &affected, Spell::spell_t spell, HeroBase *hero)
 {
     AGG::PlaySound(Spell::M82(spell));
 
@@ -892,6 +1463,7 @@ void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*
         if(Game::ShouldAnimateInfrequent(animat++, 3))
         {
             m_battlefield.Redraw();
+            m_gui->Redraw();
 
             if(Spell::Icn(spell) != ICN::UNKNOWN)
             {
@@ -919,7 +1491,7 @@ void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*
     }
 }
 
-bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affected, Heroes *hero, Spell::spell_t spell)
+bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affected, HeroBase *hero, Spell::spell_t spell)
 {
     if(spell == Spell::NONE) return false;
     if(!affected.size()) {
@@ -955,16 +1527,16 @@ bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affect
             }
             m_gui->Status(str);
             m_gui->Status("");
+            m_gui->Redraw();
         }
+
+        PerformMagicAnimation(affected, spell, hero);
     }
     
-    if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
-        PerformMagicAnimation(affected, spell, hero);
-
     //TODO: message if spell is resisted by single unit?
     for(u16 i = 0; i < affected.size(); i++)
         affected[i]->ApplySpell(spell, spellpower);
-    m_battlefield.CleanupBodies(0xFF);
+    m_battlefield.CleanupBodies();
     
     return true;
 }
@@ -996,25 +1568,22 @@ namespace Battle
 
 ////////////////////////////////////////////////////////////////////////////
 
-    BattleTurn::BattleTurn(Battlefield *battlefield, GUI *gui, Heroes *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy)
+    BattleTurn::BattleTurn(Battlefield *battlefield, GUI *gui, HeroBase *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy)
     : m_battlefield(battlefield)
     , m_gui(gui)
     , m_ownArmy(&ownArmy)
     , m_oppArmy(&oppArmy)
     {
         m_hero[0] = hero;
-        m_hero[1] = NULL; //FIXME
+        m_hero[1] = NULL;
         m_spell = Spell::NONE;
     }
 
-    GUI::interaction_t BattleTurn::Run(Army::BattleTroop &troop, TroopIndex troopIdx,Point &move, Point &attack)
+    GUI::interaction_t BattleTurn::Run(Army::BattleTroop &troop, TroopIndex troopIdx, Point &move, Point &attack)
     {
         move = attack = Point(-1, -1);
-        
-        if(troopIdx >= 0)
-            PrepMovePoints(troopIdx, *m_ownArmy, *m_oppArmy);
-        else
-            PrepMovePoints(troopIdx, *m_oppArmy, *m_ownArmy);
+
+        PrepMovePoints(troopIdx);
         
         for(u16 j = 0; j < m_oppArmy->size(); j++)
         {
@@ -1028,37 +1597,30 @@ namespace Battle
         return GUI::NONE;
     }
 
-    /** Populate the global vector #movePoints with the given troop's available movement cells.
-     *  \param troopN  Index into \c army1 or \c army2
-     *  \param army1   The left army
-     *  \param army2   The right army
+    /** Populate the given troop's available movement cells.
+     *  \param troopN  Index of troop for which to populate the possible movement points
      */
-    void BattleTurn::PrepMovePoints(TroopIndex troopN, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2)
+    void BattleTurn::PrepMovePoints(TroopIndex troopN)
     {
         m_movePoints.clear();
         Point p;
-        const Army::BattleTroop &troop = troopN >= 0 ? army1[troopN] : army2[-troopN-1];
-        if(troop.isFly()) {
+        const Army::BattleTroop &troop = m_battlefield->GetTroopFromIndex(troopN);
+        if(troop.isFly())
+        {
             for(p.x = 0; p.x < BFW; p.x ++) 
-                for(p.y = 0; p.y < BFH; p.y ++) {
+                for(p.y = 0; p.y < BFH; p.y ++)
                     if(m_battlefield->CellFreeFor(p, troop, troopN))
                         m_movePoints.push_back(p);
-                }
-        } else {
+        }
+        else
+        {
             Point p = troop.Position();
             m_movePoints.push_back(p);
-            Point d;
-            for(d.x = -1; d.x <= 1; d.x++)
-                for(d.y = -1; d.y <= 1; d.y++) 
-                    if(d.x || d.y ) {
-                        if(p.y%2 && d.y && d.x>0) continue;
-                        if(!(p.y%2) && d.y && d.x<0) continue;
-                        PrepMovePointsInt(troop, p+d, troop.GetSpeed(), troopN);
-                    }
+            PrepMovePointsInt(troop, p, troop.GetSpeed() + 1, troopN);
         }
     }
 
-    /** Populate the global vector #movePoints with any free cells in range of the given point.
+    /** Populate the movement vector with any free cells in range of the given point.
      * \param troop   Troop to prepare
      * \param p       Starting point
      * \param move    Movement speed
@@ -1066,14 +1628,26 @@ namespace Battle
      */
     void BattleTurn::PrepMovePointsInt(const Army::BattleTroop &troop, const Point &p, int move, int skip)
     {
-        if(BfValid(p) && m_battlefield->CellFreeFor(p, troop, skip) && move > 0) {
-            bool exist = false;
-            for(u16 i = 0; i < m_movePoints.size(); i++) if(m_movePoints[i] == p) exist = true;
-            if(!exist) m_movePoints.push_back(p);
+        if(BfValid(p) && m_battlefield->CellFreeFor(p, troop, skip) && move > 0)
+        {
+            if(std::find(m_movePoints.begin(), m_movePoints.end(), p) == m_movePoints.end())
+                m_movePoints.push_back(p);
+
+            if(m_battlefield->GetCastle()
+            && m_battlefield->GetCastle()->IsCellInMoat(p)
+            && troop.Position() != p)
+            {
+                if(p != Point(6,4) && p != Point(5, 4))
+                    return;
+                else if(m_battlefield->GetSideFromIndex(m_battlefield->GetIndexFromTroop(troop)) != 1)
+                    return;
+            }
+            
             Point d;
             for(d.x = -1; d.x <= 1; d.x++)
                 for(d.y = -1; d.y <= 1; d.y++) 
-                    if(d.x || d.y ) {
+                    if(d.x || d.y )
+                    {
                         if(p.y%2 && d.y && d.x>0) continue;
                         if(!(p.y%2) && d.y && d.x<0) continue;
                         PrepMovePointsInt(troop, p+d, move - 1, skip);
@@ -1081,6 +1655,11 @@ namespace Battle
         }
     }
 
+    /** Populate a given vector with predetermined targets for certain classes of spells.
+     *  \param[out] targets  Array of troops which will be targets of the spell.
+     *  \param[in]  spell    Spell being cast.
+     *  \return true if further selection is needed, false otherwise.
+     */
     bool BattleTurn::MagicSelectTarget(std::vector<Army::BattleTroop*> &targets, const Spell::spell_t &spell)
     {
         targets.clear();
@@ -1118,7 +1697,7 @@ namespace Battle
 
 //////////////////////////////////////////////////////////////////////////////
 
-    HumanTurn::HumanTurn(Battlefield *battlefield, GUI *gui, Heroes *hero, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2)
+    HumanTurn::HumanTurn(Battlefield *battlefield, GUI *gui, HeroBase *hero, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2)
     : BattleTurn(battlefield, gui, hero, army1, army2)
     {
     }
@@ -1131,17 +1710,15 @@ namespace Battle
 
         cursor.SetThemes(cursor.WAR_POINTER);
         cursor.Hide();
-
-        m_battlefield->Redraw();
-
+        //m_battlefield->Redraw();
         m_gui->Status("");
-        
+        m_gui->Redraw();
         cursor.Show();
+        display.Flip();
 
         Army::BattleArmy_t &army1 = troopIdx >= 0 ? *m_ownArmy : *m_oppArmy;
         Army::BattleArmy_t &army2 = troopIdx >= 0 ? *m_oppArmy : *m_ownArmy;
-
-        int i = 0;
+        
         u16 animat = 0;
         Point cur_pt(-1,-1);
         
@@ -1167,9 +1744,14 @@ namespace Battle
                         army1[i].SetPosition(army1[i].Position() + Point( army1[i].WasReflected() ? -1 : 1, 0 ));
                 }
             }
-            if(Game::ShouldAnimateInfrequent(++animat, 3) && !i) {
+            if(le.KeyPress(KEY_f) && m_battlefield->GetCatapult())
+            {
+                m_battlefield->GetCatapult()->Fire(*m_battlefield, *m_battlefield->GetCastle());
+            }
+            if(Game::ShouldAnimateInfrequent(++animat, 3)) {
                 m_battlefield->Redraw(&m_movePoints, &cur_pt, &myTroop);
-                //statusBar1->Redraw();
+                m_gui->Redraw();
+                display.Flip();
             }
 
             bool mouseActive = false;
@@ -1198,6 +1780,7 @@ namespace Battle
                     std::string str = _("View %{name} info.");
                     String::Replace(str, "%{name}", (*m_ownArmy)[t].GetName());
                     m_gui->Status(str, true);
+                    m_gui->Redraw();
                     cursor.SetThemes(cursor.WAR_INFO);
                     if(click) {
                         cursor.SetThemes(cursor.POINTER); 
@@ -1214,6 +1797,7 @@ namespace Battle
                         String::Replace(str, "%{name}", (*m_oppArmy)[t].GetName());
                         String::Replace(str, "%{value}", myTroop.shots);
                         m_gui->Status(str, true);
+                        m_gui->Redraw();
                         cursor.SetThemes(cursor.WAR_ARROW);
                         if(click) {
                             attack = cur_pt;
@@ -1225,6 +1809,7 @@ namespace Battle
                         std::string str = _("Attack %{name}");
                         String::Replace(str, "%{name}", (*m_oppArmy)[t].GetName());
                         m_gui->Status(str, true);
+                        m_gui->Redraw();
                         Point p1 = Bf2ScrNoOffset(m_movePoints[mp]), p2 = Bf2ScrNoOffset(cur_pt);
                         if(p1.x > p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPRIGHT);
                         else if(p1.x < p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPLEFT);
@@ -1244,6 +1829,7 @@ namespace Battle
                         std::string str = _("View %{name} info.");
                         String::Replace(str, "%{name}", (*m_oppArmy)[t].GetName());
                         m_gui->Status(str, true);
+                        m_gui->Redraw();
                         cursor.SetThemes(cursor.WAR_INFO);
                         if(click) {
                             cursor.SetThemes(cursor.POINTER);
@@ -1268,17 +1854,20 @@ namespace Battle
                         String::Replace(str, "%{move}", str2);
                         String::Replace(str, "%{name}", myTroop.GetName());
                         m_gui->Status(str, true);
+                        m_gui->Redraw();
                         if(click) {
                             move = cur_pt;
                             return GUI::NONE;
                         }
                     } else {
                         m_gui->Status("", true);
+                        m_gui->Redraw();
                         cursor.SetThemes(cursor.WAR_NONE);
                     }
                 }
             } else if(!mouseActive) {
                 m_gui->Status("", true);
+                m_gui->Redraw();
                 cursor.SetThemes(cursor.WAR_NONE);
             }
         }
@@ -1337,7 +1926,7 @@ namespace Battle
     
 /////////////////////////////////////////////////////////////////////////////
 
-    ComputerTurn::ComputerTurn(Battlefield *battlefield, GUI *gui, Heroes *hero, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2)
+    ComputerTurn::ComputerTurn(Battlefield *battlefield, GUI *gui, HeroBase *hero, Army::BattleArmy_t &army1, Army::BattleArmy_t &army2)
     : BattleTurn(battlefield, gui, hero, army1, army2)
     {
     }
@@ -1373,6 +1962,13 @@ namespace Battle
     bool ComputerTurn::DangerousUnitPredicate(const Army::BattleTroop &first, const Army::BattleTroop &second)
     {
         return  first.GetDamageMax() > second.GetDamageMax();
+    }
+
+    Point ComputerTurn::GetMostDangerousOpposingUnit()
+    {
+        Army::BattleArmy_t oppArmy = *m_oppArmy;
+        std::sort(oppArmy.begin(), oppArmy.end(), DangerousUnitPredicate);
+        return oppArmy.front().Position();
     }
     
     /** Attempt to attack a unit in the given list
@@ -1636,10 +2232,21 @@ namespace Battle
     
 ////////////////////////////////////////////////////////////////////////////
     
-    Battlefield::Battlefield(Heroes *hero1, Heroes *hero2, Army::army_t &army1, Army::army_t &army2, Point pt, const Maps::Tiles &tiles)
+    Battlefield::Battlefield(Castle *castle, HeroBase *hero1, HeroBase *hero2, Army::army_t &army1, Army::army_t &army2, const Point &pt, const Maps::Tiles &tiles)
     : m_background(pt, tiles)
     {
-        m_background.GetBlockedCells(m_blockedCells);
+        if(!castle)
+        {
+            m_castle = NULL;
+            m_catapult = NULL;
+            m_background.GetBlockedCells(m_blockedCells);
+        }
+        else
+        {
+            m_castle = new BattleCastle(*castle);
+            m_catapult = new Catapult;
+            m_blockedCells.push_back(Point(0, 7)); //Block catapult cell, but nothing on battlefield
+        }
 
         m_army[0] = new Army::BattleArmy_t;
         Army::ArmyToBattleArmy(army1, *m_army[0]);
@@ -1654,30 +2261,28 @@ namespace Battle
         InitArmyPosition(*m_army[1], false, true);
     }
 
-    /** Remove any units from the battle that are dead, and return the status of a particular unit
-     *  \param idx    Specific index about which to return infomation
-     *  \return True if the given troop was cleaned up, and therefore dead, false otherwise
-     */
-    bool Battlefield::CleanupBodies(TroopIndex idx)
+    Battlefield::~Battlefield()
     {
-        bool troopCleaned = false;
+        delete m_castle;
+        delete m_catapult;
+    }
+
+    /** Remove any units from the battle that are dead.
+     */
+    void Battlefield::CleanupBodies()
+    {
         for(u8 j = 0; j < 1; j++) {
             for(u16 i = 0; i < m_army[j]->size(); i++)
             {
-                if((*m_army[j])[i].Count() == 0)
-                {
-                    Army::BattleTroop body = (*m_army[j])[i];
-                    m_background.AddBody(body);
-                    (*m_army[j])[i].SetMonster(Monster::UNKNOWN);
-                    if(i == idx)
-                        troopCleaned = true;
-                }
+                if((*m_army[j])[i].Count() != 0)
+                    continue;
+                
+                Army::BattleTroop body = (*m_army[j])[i];
+                m_background.AddBody(body);
+                (*m_army[j])[i].SetMonster(Monster::UNKNOWN);
             }
-            idx = ApplyIndexModifier(idx);
         }
-        return troopCleaned;
     }
-
     
     void Battlefield::InitArmyPosition(Army::BattleArmy_t & army, bool compact, bool reflect)
     {
@@ -1706,9 +2311,14 @@ namespace Battle
         return *m_army[num];
     }
 
-    Heroes *Battlefield::GetHero(u8 num)
+    HeroBase *Battlefield::GetHero(u8 num)
     {
         return m_hero[num];
+    }
+
+    void Battlefield::SetHero(u8 num, HeroBase *hero)
+    {
+        m_hero[num] = hero;
     }
 
     s8 Battlefield::GetIndexFromTroop(const Army::BattleTroop &troop)
@@ -1772,7 +2382,7 @@ namespace Battle
      *  \param p    Point at which to look
      *  \return The troop's index into \i army, or -1 if none found
      */
-    int Battlefield::FindTroopExact(const Army::BattleArmy_t &army, const Point &p)
+    TroopIndex Battlefield::FindTroopExact(const Army::BattleArmy_t &army, const Point &p)
     {
         for(unsigned int i=0; i<army.size(); i++) {
             if(army[i].GetID() != Monster::UNKNOWN && army[i].Position() == p)
@@ -1786,7 +2396,7 @@ namespace Battle
      *  \param p    Point at which to look
      *  \return The troop's index into \i army, or -1 if none found
      */
-    int Battlefield::FindTroop(const Army::BattleArmy_t &army, const Point &p)
+    TroopIndex Battlefield::FindTroop(const Army::BattleArmy_t &army, const Point &p)
     {
         for(unsigned int i=0; i<army.size(); i++) {
             if(IsTroopAt(army[i], p))
@@ -1800,7 +2410,7 @@ namespace Battle
      *  \param p    Point at which to look
      *  \return The troop's index into \i army, or -1 if none found
      */
-    int Battlefield::FindTroop(const std::vector<Army::BattleTroop*> &army, const Point &p)
+    TroopIndex Battlefield::FindTroop(const std::vector<Army::BattleTroop*> &army, const Point &p)
     {
         for(unsigned int i=0; i<army.size(); i++) {
             if(IsTroopAt(*army[i], p))
@@ -1813,15 +2423,30 @@ namespace Battle
      *  \param p      Battlefield cell
      *  \param skip   Troop id to ignore
      */
-    bool Battlefield::CellFree(const Point &p, int skip)
+    bool Battlefield::CellFree(const Point &p, TroopIndex skip)
     {
         int t;
         if(!BfValid(p)) return false;
         if(t = FindTroop(*m_army[0], p), t >= 0 && (*m_army[0])[t].Count() > 0 && (skip < 0 || skip != t)) 
             return false;
-        if(t = FindTroop(*m_army[1], p), t >= 0 && (*m_army[1])[t].Count() > 0 && (skip >= 0 || -skip-1 != t)) 
+        if(t = FindTroop(*m_army[1], p), t >= 0 && (*m_army[1])[t].Count() > 0 && (skip >= 0 || ApplyIndexModifier(skip) != t)) 
             return false;
-        for(u16 i=0; i < m_blockedCells.size(); i++) if(p == m_blockedCells[i]) return false;
+        for(u16 i = 0; i < m_blockedCells.size(); i++) if(p == m_blockedCells[i]) return false;
+
+        BattleCastle *castle = GetCastle();
+        if(castle)
+            for(u16 i = 0; i < MAX_CASTLE_PARTS; i++)
+                if(castle->getCastlePoint(i) == p)
+                {
+                    if(i == BattleCastle::DRAWBRIDGE)
+                    {
+                        if(GetSideFromIndex(skip) == 1)
+                            return true;
+                        else return false;
+                    }
+                    else return false;
+                }
+
         return true;
     }
 
@@ -1830,7 +2455,7 @@ namespace Battle
      *  \param troop  Troop to consider
      *  \param skip   Troop ID to ignore
      */
-    bool Battlefield::CellFreeFor(const Point &p, const Army::BattleTroop &troop, int skip)
+    bool Battlefield::CellFreeFor(const Point &p, const Army::BattleTroop &troop, TroopIndex skip)
     {
         bool isFree = CellFree(p, skip);
         if(isFree && troop.isWide())
@@ -1848,7 +2473,9 @@ namespace Battle
      */
     PointList *Battlefield::FindPath(const Point& start, const Point &end, int moves, const Army::BattleTroop &troop, TroopIndex skip)
     {
-        if(moves < 0 || !BfValid(start) || !CellFreeFor(start, troop, skip)) return 0;
+        if(moves < 0 || !BfValid(start) || !CellFreeFor(start, troop, skip))
+            return 0;
+
         if(start == end) return new std::vector<Point>();
         Point p = start;
         Point d;
@@ -1876,7 +2503,7 @@ namespace Battle
      *  \param moves      #Point vector of valid cells attacker can move to
      *  \param enemyTroop Enemy target
      *  \param d          Screenspace position from which the attack would occur
-     *  \return Non-zero if the attacker can attack the enemy
+     *  \return >= 0 if the attacker can attack the enemy
      */
     int Battlefield::CanAttack(const Army::BattleTroop &myTroop, const PointList &moves, const Army::BattleTroop &enemyTroop, const Point &d)
     {
@@ -2015,17 +2642,30 @@ namespace Battle
         }
     }
 
+    void Battlefield::RedrawBackground(const PointList *movePoints, const Army::BattleTroop *troop)
+    {
+        m_background.Draw();
+        if(m_castle)
+            m_castle->DrawBackground();
+        m_background.DrawGrid();
+        if(movePoints)
+            m_background.DrawOverBackground(*movePoints, *troop);
+    }
+
     void Battlefield::Redraw(const PointList *movePoints, const Point *cur_pt, const Army::BattleTroop *troop)
     {
         cursor.Hide();
-        m_background.Draw();
-        if(movePoints)
-            m_background.DrawOverBackground(*movePoints, *cur_pt, *troop);
-        if(m_hero[0]) m_heroRect[0] = m_background.DrawHero(*m_hero[0], 1, false, 1);
-        if(m_hero[1]) m_heroRect[1] = m_background.DrawHero(*m_hero[1], 1, true);
-        m_background.DrawArmies(*m_army[0], *m_army[1], -1, 0);
+        RedrawBackground(movePoints, troop);
+        if(m_catapult)
+            m_catapult->Draw();
+        if(m_hero[0]) m_heroRect[0] = m_background.DrawHeroObject(*m_hero[0], 1, false, 1);
+        if(m_hero[1]) m_heroRect[1] = m_background.DrawHeroObject(*m_hero[1], 1, true);
+        if(m_castle)
+            m_castle->DrawForeground();
+        m_background.DrawForeground(m_castle, *m_army[0], *m_army[1], -1, true);
+        if(cur_pt)
+            m_background.DrawCursor(*cur_pt);
         cursor.Show();
-        Display::Get().Flip();
     }
 
     void Battlefield::AnimateMorale(bool morale, const Army::BattleTroop &troop)
@@ -2033,14 +2673,14 @@ namespace Battle
         m_background.DrawMorale(morale, troop);
     }
 
-    void Battlefield::AnimateMagic(std::vector<Army::BattleTroop*> &aff, Heroes *h1, Heroes *h2, bool reflect, Spell::spell_t spell)
+    void Battlefield::AnimateMagic(std::vector<Army::BattleTroop*> &aff, HeroBase *h1, HeroBase *h2, bool reflect, Spell::spell_t spell)
     {
         m_background.MagicAnimation(aff, h1, h2, reflect, spell);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////    
 
-    GUI::GUI(Heroes *hero1, Heroes *hero2)
+    GUI::GUI(HeroBase *hero1, HeroBase *hero2)
     {
         m_frameborder = new Dialog::FrameBorder();
         g_baseOffset = Point(m_frameborder->GetArea().x, m_frameborder->GetArea().y);
@@ -2062,13 +2702,15 @@ namespace Battle
         const Sprite & bar1 = AGG::GetICN(ICN::TEXTBAR, 8);
         const Sprite & bar2 = AGG::GetICN(ICN::TEXTBAR, 9);
 
-        display.Blit(bar1, g_baseOffset.x + 50, g_baseOffset.y + 480-36);
-        display.Blit(bar2, g_baseOffset.x + 50, g_baseOffset.y + 480-16);
-        
-        m_statusBar[0].SetCenter(g_baseOffset.x + 50 + bar1.w()/2, g_baseOffset.y + 480-26);
-        m_statusBar[0].ShowMessage("");
-        m_statusBar[1].SetCenter(g_baseOffset.x + 50 + bar2.w()/2, g_baseOffset.y + 480-6);
-        m_statusBar[1].ShowMessage("");
+        //display.Blit(bar1, g_baseOffset.x + 50, g_baseOffset.y + 480-36);
+        //display.Blit(bar2, g_baseOffset.x + 50, g_baseOffset.y + 480-16);
+
+        m_statusBar[0] = new StatusBar;
+        m_statusBar[0]->SetCenter(g_baseOffset.x + 50 + bar1.w()/2, g_baseOffset.y + 480-26);
+        m_statusBar[0]->ShowMessage("");
+        m_statusBar[1] = new StatusBar;
+        m_statusBar[1]->SetCenter(g_baseOffset.x + 50 + bar2.w()/2, g_baseOffset.y + 480-6);
+        m_statusBar[1]->ShowMessage("");
 
         m_hero[0] = hero1;
         m_hero[1] = hero2;
@@ -2080,6 +2722,8 @@ namespace Battle
 
     GUI::~GUI()
     {
+        delete m_statusBar[0];
+        delete m_statusBar[1];
         delete m_frameborder;
         delete m_skip;
         delete m_auto;
@@ -2088,8 +2732,12 @@ namespace Battle
 
     void GUI::Redraw()
     {
-        m_statusBar[0].Redraw();
-        m_statusBar[1].Redraw();
+        const Sprite & bar1 = AGG::GetICN(ICN::TEXTBAR, 8);
+        const Sprite & bar2 = AGG::GetICN(ICN::TEXTBAR, 9);
+        display.Blit(bar1, g_baseOffset.x + 50, g_baseOffset.y + 480-36);
+        display.Blit(bar2, g_baseOffset.x + 50, g_baseOffset.y + 480-16);
+        m_statusBar[0]->Redraw();
+        m_statusBar[1]->Redraw();
     }
 
     void GUI::Status(const std::string &str, bool secondOnly /* = false */)
@@ -2105,8 +2753,8 @@ namespace Battle
             str1 = "";
             str2 = str;
         }
-        m_statusBar[0].ShowMessage(str1);
-        m_statusBar[1].ShowMessage(str2);
+        m_statusBar[0]->ShowMessage(str1);
+        m_statusBar[1]->ShowMessage(str2);
     }
 
     GUI::interaction_t GUI::Interact(TroopIndex troopN, Spell::spell_t &spell, Battlefield &battlefield, bool &mouseActive)
@@ -2117,7 +2765,8 @@ namespace Battle
         for(u8 i = 0; i < 2; i++)
         {
             if(le.MouseClickLeft(battlefield.GetHeroRect(i))) {
-                Army::battle_t s = HeroStatus(*m_hero[i], m_statusBar[1], spell, false, m_hero[i ^ 1], troopN < 0);
+                bool ownTurn = battlefield.GetSideFromIndex(troopN) == i;
+                Army::battle_t s = HeroStatus(*m_hero[i], *m_statusBar[1], spell, false, ownTurn, !ownTurn);
                 if(s == Army::RETREAT) {
                     if(Dialog::Message("", _("Are you sure you want to retreat?"), Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
                         return RETREAT;
@@ -2127,27 +2776,27 @@ namespace Battle
                     return SPELL;
             }
             else if(le.MousePressRight(battlefield.GetHeroRect(i)))
-                HeroStatus(*m_hero[i], m_statusBar[1], spell, true, false, false);
+                HeroStatus(*m_hero[i], *m_statusBar[1], spell, true, false, false);
         }
         
         if(le.MouseCursor(*m_skip)) {
-            m_statusBar[1].ShowMessage(_("Skip this unit"));
+            m_statusBar[1]->ShowMessage(_("Skip this unit"));
             cursor.SetThemes(cursor.WAR_POINTER);
             mouseActive = true;
         }else if(le.MouseCursor(*m_auto)) {
-            m_statusBar[1].ShowMessage(_("Auto Combat"));
+            m_statusBar[1]->ShowMessage(_("Auto Combat"));
             cursor.SetThemes(cursor.WAR_POINTER);
             mouseActive = true;
         } else if(le.MouseCursor(*m_settings)) {
-            m_statusBar[1].ShowMessage(_("Customize system options"));
+            m_statusBar[1]->ShowMessage(_("Customize system options"));
             cursor.SetThemes(cursor.WAR_POINTER);
             mouseActive = true;
         } else if(le.MouseCursor(troopN >= 0 ? battlefield.GetHeroRect(0) : battlefield.GetHeroRect(1))) {
-            m_statusBar[1].ShowMessage(_("Hero's Options"));
+            m_statusBar[1]->ShowMessage(_("Hero's Options"));
             cursor.SetThemes(cursor.WAR_HELMET);
             mouseActive = true;
         } else if(le.MouseCursor(troopN >= 0 ? battlefield.GetHeroRect(1) : battlefield.GetHeroRect(0))) {
-            m_statusBar[1].ShowMessage(_("View Opposing Hero"));
+            m_statusBar[1]->ShowMessage(_("View Opposing Hero"));
             cursor.SetThemes(cursor.WAR_INFO);
             mouseActive = true;
         }
