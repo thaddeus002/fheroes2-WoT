@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,18 +17,45 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2PORTRAIT_H
-#define H2PORTRAIT_H
 
-class Heroes;
+#include "attribute.h"
 
-namespace Portrait
+XML::Attribute::Attribute()
 {
-    typedef enum { BIG, MEDIUM, SMALL } size_t;
+}
 
-    const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
-    const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
-    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
-};
+XML::Attribute::Attribute(const std::string & name, const std::string & value)
+    : std::pair<std::string, std::string>(name, value)
+{
+}
 
-#endif
+bool XML::Attribute::operator== (const std::string & name) const
+{
+    return first == name;
+}
+
+void XML::Attribute::setName(const std::string & name)
+{
+    first = name;
+}
+
+void XML::Attribute::setValue(const std::string & value)
+{
+    second = value;
+}
+
+const std::string & XML::Attribute::getName(void) const
+{
+    return first;
+}
+
+const std::string & XML::Attribute::getValue(void) const
+{
+    return second;
+}
+
+void XML::Attribute::exportXML(xmlNodePtr node) const
+{
+    if(node)
+	xmlSetProp(node, (xmlChar *) first.c_str(), (xmlChar *) second.c_str());
+}

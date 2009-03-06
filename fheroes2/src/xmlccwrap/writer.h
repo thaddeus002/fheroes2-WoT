@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,18 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2PORTRAIT_H
-#define H2PORTRAIT_H
 
-class Heroes;
+#ifndef XMLWRITER_H
+#define XMLWRITER_H
 
-namespace Portrait
+#include <libxml/xmlwriter.h>
+
+namespace XML
 {
-    typedef enum { BIG, MEDIUM, SMALL } size_t;
+    class Writer
+    {
+    public:
+	Writer();
+	~Writer();
 
-    const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
-    const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
-    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
+	bool open(const char*, int = 0);
+	bool isValid(void) const;
+
+	void close(void);
+
+	void endElement(void);
+	bool startElement(const char*);
+
+	bool addElement(const char*, const std::string &);
+	bool addElement(const char*, const char*);
+	bool addElement(const char*, int);
+	bool addAttribute(const char*, const std::string &);
+	bool addAttribute(const char*, const char*);
+	bool addAttribute(const char*, int);
+
+    protected:
+	void endDocument(void);
+	bool startDocument(void);
+
+    private:
+	xmlTextWriterPtr writer;
+    };
 };
 
 #endif

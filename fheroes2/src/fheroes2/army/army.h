@@ -132,6 +132,7 @@ namespace Army
 	    s8		GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
 	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
 	    u32		CalculateExperience(void) const;
+	    u32		ActionToSirens(void);
 
 	    u16		GetAttack(void) const;
 	    u16		GetDefense(void) const;

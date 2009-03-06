@@ -95,6 +95,7 @@ namespace Maps
 	TilesAddon * FindRNDMonster(void);
 	TilesAddon * FindMonster(void);
 	const TilesAddon * FindMines(void) const;
+	TilesAddon * FindJail(void);
 
 	void SetTile(const u16 index, const u8 shape);
 
@@ -143,6 +144,7 @@ namespace Maps
 
     private:
 	void CorrectFlags32(const u8 index);
+	void RemoveJailSprite(void);
 
     private:
 	friend void Game::SaveXML(const std::string &);

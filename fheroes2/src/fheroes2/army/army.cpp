@@ -955,3 +955,23 @@ const Skill::Primary* Army::army_t::GetCommander(void) const
 {
     return commander;
 }
+
+u32 Army::army_t::ActionToSirens(void)
+{
+    std::vector<Troop>::iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    u32 res = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).isValid())
+    {
+	const u16 kill = (*it1).Count() * 30 / 100;
+
+	if(kill)
+	{
+	    (*it1).SetCount((*it1).Count() - kill);
+	    res += kill * static_cast<Monster>(*it1).GetHitPoints();
+	}
+    }
+
+    return res;
+}

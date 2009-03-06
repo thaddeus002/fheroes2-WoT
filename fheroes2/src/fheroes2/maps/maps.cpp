@@ -229,9 +229,10 @@ u16 Maps::GetMaxGroundAround(const u16 center)
     return result;
 }
 
-void Maps::ClearFog(const Point & center, u8 scoute, const u8 color)
+void Maps::ClearFog(u16 index, u8 scoute, const u8 color)
 {
     if(0 == scoute) return;
+    const Point center(index % world.w(), index / world.w());
 
     // AI advantage
     if(Game::AI == world.GetKingdom(color).Control())

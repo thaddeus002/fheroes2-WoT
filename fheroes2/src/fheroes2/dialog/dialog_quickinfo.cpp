@@ -26,7 +26,6 @@
 #include "monster.h"
 #include "gamearea.h"
 #include "cursor.h"
-#include "portrait.h"
 #include "game_focus.h"
 #include "world.h"
 #include "settings.h"
@@ -127,6 +126,8 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_TEMPLE:
 	case MP2::OBJ_BUOY:
 	case MP2::OBJ_WATERINGHOLE:
+	case MP2::OBJ_ARENA:
+	case MP2::OBJ_STABLES:
 	    // check visited
 	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
 		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)");
@@ -367,7 +368,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // mini port heroes
-    const Surface & port = Portrait::Hero(hero, Portrait::SMALL);
+    const Surface & port = hero.GetPortrait30x22();
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
     dst_pt.y += 15;
     display.Blit(port, dst_pt);

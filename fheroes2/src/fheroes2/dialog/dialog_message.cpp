@@ -58,7 +58,7 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
     TextBox textbox1(header, (ft == Font::BIG ? Font::YELLOWBIG : ft), BOXAREA_WIDTH);
     TextBox textbox2(messages, ft, BOXAREA_WIDTH);
 
-    Box box((header.size() ? textbox1.h() + 10 : 0) + textbox2.h(), buttons);
+    Box box((header.size() ? textbox1.h() + 10 : 10) + textbox2.h(), buttons);
     Rect pos = box.GetArea();
 
     if(messages.empty()) pos.y += 10;
@@ -67,8 +67,8 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
     {
         textbox1.Blit(pos.x, pos.y);
         pos.y += textbox1.h();
-	pos.y += 10;
     }
+    pos.y += 10;
 
     if(messages.size()) textbox2.Blit(pos.x, pos.y);
 

@@ -41,7 +41,7 @@ namespace Army
     {
       public:
         Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
-		virtual ~Troop();
+	virtual ~Troop();
         
         void	Set(const Monster &, u16);
         void	Set(monster_t, u16);
@@ -51,35 +51,35 @@ namespace Army
         void	Reset(void);
         
         const Skill::Primary* MasterSkill(void) const;
-        const army_t* GetArmy(void) const;
-	    const std::string & GetName(void) const;
+        const army_t*         GetArmy(void) const;
+	const std::string &   GetName(void) const;
         
-        u16 	Count(void) const;
+        u16 		Count(void) const;
         
-	    virtual u8		GetAttack(void) const;
-	    virtual u8		GetDefense(void) const;
-	    virtual u32		GetHitPoints(void) const;
+	virtual u8	GetAttack(void) const;
+	virtual u8	GetDefense(void) const;
+	virtual u32	GetHitPoints(void) const;
 
         u16		GetDamageMin(void) const;
-	    u16		GetDamageMax(void) const;
-	    Color::color_t GetColor(void) const;
-        virtual u8		GetSpeed(void) const;
+	u16		GetDamageMax(void) const;
+	Color::color_t	GetColor(void) const;
+        virtual u8	GetSpeed(void) const;
 
         s8		GetMorale(void) const;
-	    s8		GetLuck(void) const;
+	s8		GetLuck(void) const;
 
         
-        bool	isValid(void) const;
-        bool    isAffectedByMorale(void) const;
-	    bool	HasMonster(monster_t) const;
+        bool		isValid(void) const;
+        bool    	isAffectedByMorale(void) const;
+	bool		HasMonster(monster_t) const;
         
       protected:
         friend class army_t;
-        u16			count;
-	    const army_t*	army;
+        u16		count;
+	const army_t*	army;
 
         
-	    u32			hp;
+	u32		hp;
     };
 };
 

@@ -24,6 +24,8 @@
 
 #define WIDTH_BIG	0x0E
 #define WIDTH_SMALL	0x07
+#define SPACE_BIG	0x03
+#define SPACE_SMALL	0x02
 #define HEIGHT_BIG	0x10
 #define HEIGHT_SMALL	0x0B
 
@@ -80,7 +82,7 @@ u16 TextAscii::h(const u16 width) const
 {
     if(message.empty()) return 0;
     else
-    if(0 == width || w() <= width) return (Font::SMALL == font ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+    if(0 == width || w() <= width) return (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 
     u16 res = 0;
     u16 www = 0;
@@ -96,7 +98,7 @@ u16 TextAscii::h(const u16 width) const
 	if(www + char_w(*pos1, font) >= width)
 	{
 	    www = 0;
-	    res += (Font::SMALL == font ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+	    res += (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 	    if(pos2 != space) pos1 = space + 1;
 	    space = pos2;
 	    continue;
@@ -140,7 +142,7 @@ void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
     	    case 0x22:
 	    // '
     	    case 0x27:
-        	oy = (Font::SMALL == font ? 2 : 3);
+        	oy = (Font::SMALL == font ? SPACE_SMALL : SPACE_BIG);
     	    break;
 
     	    case 'y':
@@ -148,7 +150,7 @@ void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
     	    case 'p':
     	    case 'q':
     	    case 'j':
-        	oy = (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + 2 : HEIGHT_BIG - sprite.h() + 2);
+        	oy = (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + SPACE_SMALL : HEIGHT_BIG - sprite.h() + SPACE_BIG);
     	    break;
 
     	    default:
@@ -249,7 +251,7 @@ u16 TextUnicode::h(const u16 width) const
 {
     if(message.empty()) return 0;
     else
-    if(0 == width || w() <= width) return (Font::SMALL == font ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+    if(0 == width || w() <= width) return (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 
     u16 res = 0;
     u16 www = 0;
@@ -265,7 +267,7 @@ u16 TextUnicode::h(const u16 width) const
 	if(www + char_w(*pos1, font) >= width)
 	{
 	    www = 0;
-	    res += (Font::SMALL == font ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+	    res += (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 	    if(pos2 != space) pos1 = space + 1;
 	    space = pos2;
 	    continue;
@@ -314,7 +316,7 @@ void TextUnicode::Blit(u16 ax, u16 ay, Surface & dst)
     	    case L'"':
 	    // '
     	    case L'\'':
-        	oy = (Font::SMALL == font ? 2 : 3);
+        	oy = (Font::SMALL == font ? SPACE_SMALL : SPACE_BIG);
     	    break;
 
     	    case L'y':
@@ -322,7 +324,7 @@ void TextUnicode::Blit(u16 ax, u16 ay, Surface & dst)
     	    case L'p':
     	    case L'q':
     	    case L'j':
-        	oy = (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + 2 : HEIGHT_BIG - sprite.h() + 2);
+        	oy = (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + SPACE_SMALL : HEIGHT_BIG - sprite.h() + SPACE_BIG);
     	    break;
 
     	    default:
@@ -357,7 +359,7 @@ Text::Text(const std::string & msg, Font::type_t ft) : message(NULL), gw(0), gh(
 	message = static_cast<TextInterface *>(new TextAscii(msg, ft));
 
     gw = message->w();
-    gh = (ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL);
+    gh = message->h();
 }
 
 Text::Text(const u16 *pt, size_t sz, Font::type_t ft) : message(NULL), gw(0), gh(0)
@@ -367,7 +369,7 @@ Text::Text(const u16 *pt, size_t sz, Font::type_t ft) : message(NULL), gw(0), gh
     	message = static_cast<TextInterface *>(new TextUnicode(pt, sz, ft));
 
 	gw = message->w();
-	gh = (ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL);
+	gh = message->h();
     }
 }
 
@@ -404,21 +406,21 @@ void Text::Set(const std::string & msg, Font::type_t ft)
     message->SetText(msg);
     message->SetFont(ft);
     gw = message->w();
-    gh = (ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL);
+    gh = message->h();
 }
 
 void Text::Set(const std::string & msg)
 {
     message->SetText(msg);
     gw = message->w();
-    gh = (message->font == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL);
+    gh = message->h();
 }
 
 void Text::Set(Font::type_t ft)
 {
     message->SetFont(ft);
     gw = message->w();
-    gh = (ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL);
+    gh = message->h();
 }
 
 void Text::Clear(void)
@@ -457,8 +459,6 @@ u16 Text::width(const std::string &str, Font::type_t ft, u16 start, u16 count)
 u16 Text::height(const std::string &str, Font::type_t ft, u16 width)
 {
     if(str.empty()) return 0;
-    else
-    if(! width) return ft == Font::BIG ? HEIGHT_BIG : HEIGHT_SMALL;
 
     if(Settings::Get().Unicode())
     {
@@ -553,7 +553,7 @@ void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 	if(www + char_w >= width)
 	{
 	    www = 0;
-	    Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+	    Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 	    if(pos3 != space) pos2 = space + 1;
 
 	    if(pos3 != space)
@@ -572,7 +572,7 @@ void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 
     if(pos1 != pos2)
     {
-        Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+        Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 	messages.push_back(Text(msg.substr(pos1 - msg.begin(), pos2 - pos1), ft));
     }
 }
@@ -597,7 +597,7 @@ void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 	if(www + char_w >= width)
 	{
 	    www = 0;
-	    Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+	    Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 	    if(pos3 != space) pos2 = space + 1;
 
 	    if(pos3 != space)
@@ -616,7 +616,7 @@ void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 
     if(pos1 != pos2)
     {
-        Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL : HEIGHT_BIG) + 1;
+        Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
 	messages.push_back(Text(&msg.at(pos1 - msg.begin()), pos2 - pos1, ft));
     }
 }

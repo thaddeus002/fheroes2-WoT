@@ -99,6 +99,8 @@ namespace Dialog
     u16  SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons = Dialog::OK);
     void ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs);
 
+    Skill::Primary::skill_t SelectSkillFromArena(void);
+
     // redistribute count
     bool SelectCount(const std::string &header, u16 min, u16 max, u16 & res);
 

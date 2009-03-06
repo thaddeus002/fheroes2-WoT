@@ -117,9 +117,9 @@ void Kingdom::AITurns(void)
     {
 	const Recruits & recruits = world.GetRecruits(GetColor());
 
-	if(Heroes::UNKNOWN != recruits.first) ai_capital->RecruitHero(recruits.first);
+	if(recruits.first) ai_capital->RecruitHero(recruits.first);
 	else
-	if(Heroes::UNKNOWN != recruits.second) ai_capital->RecruitHero(recruits.second);
+	if(recruits.second) ai_capital->RecruitHero(recruits.second);
 
 	Heroes *hero = ai_capital->GetHeroes();
 

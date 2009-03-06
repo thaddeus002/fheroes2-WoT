@@ -886,6 +886,7 @@ namespace ICN
 	X_LOC1,
 	X_LOC2,
 	X_LOC3,
+	XPRIMARY,
 	Y_BFLG32,
 	Y_FLAG32,
 	YINYANG,
@@ -940,6 +941,7 @@ namespace ICN
     const std::string  & GetString(const icn_t icn);
     u16 AnimationFrame(const icn_t icn, const u16 start, const u32 ticket = 0, const u8 quantity = 0);
     bool RequiresAlpha(const icn_t icn);
+    icn_t PORTxxxx(u8);
 };
 
 #endif

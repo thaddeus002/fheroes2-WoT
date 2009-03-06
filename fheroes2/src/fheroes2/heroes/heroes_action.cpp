@@ -80,6 +80,13 @@ void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToOracle(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToAlchemistsTower(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToStables(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToArena(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToSirens(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToHutMagi(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToEyeMagi(Heroes &hero, const u8 obj, const u16 dst_index);
 
 u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u16 count, const u16 exp, const u16 buttons = Dialog::OK)
 {
@@ -432,22 +439,23 @@ void Heroes::Action(const u16 dst_index)
 	case MP2::OBJ_ORACLE:		ActionToOracle(*this, object, dst_index); break;
 
 
-        // object
-        case MP2::OBJ_SPHINX:
-
-        case MP2::OBJ_JAIL:
+	// loyalty version
         case MP2::OBJ_WATERALTAR:
         case MP2::OBJ_AIRALTAR:
         case MP2::OBJ_FIREALTAR:
         case MP2::OBJ_EARTHALTAR:
-        case MP2::OBJ_BARROWMOUNDS:
-        case MP2::OBJ_ARENA:
-        case MP2::OBJ_STABLES:
-        case MP2::OBJ_ALCHEMYTOWER:
-        case MP2::OBJ_HUTMAGI:
-        case MP2::OBJ_EYEMAGI:
-        case MP2::OBJ_SIRENS:
-        case MP2::OBJ_MERMAID:
+        case MP2::OBJ_BARROWMOUNDS:	ActionToDwellingRecruitMonster(*this, object, dst_index); break;
+        case MP2::OBJ_ALCHEMYTOWER:	ActionToAlchemistsTower(*this, object, dst_index); break;
+        case MP2::OBJ_STABLES:		ActionToStables(*this, object, dst_index); break;
+        case MP2::OBJ_ARENA:		ActionToArena(*this, object, dst_index); break;
+        case MP2::OBJ_MERMAID:		ActionToGoodLuckObject(*this, object, dst_index); break;
+        case MP2::OBJ_SIRENS:		ActionToSirens(*this, object, dst_index); break;
+        case MP2::OBJ_JAIL:		ActionToJail(*this, object, dst_index); break;
+        case MP2::OBJ_HUTMAGI:		ActionToHutMagi(*this, object, dst_index); break;
+        case MP2::OBJ_EYEMAGI:		ActionToEyeMagi(*this, object, dst_index); break;
+
+        // object
+        case MP2::OBJ_SPHINX:
 	    if(Settings::Get().Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
 
@@ -568,14 +576,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 
 	const u32 exp = castle->GetArmy().isValid() ? castle->GetArmy().CalculateExperience() : 0;
-	Army::battle_t b;
-    if(castle->GetArmy().isValid())
-    {
-        if(castle->isCastle())
-            b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
-        else b = Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index));
-    }
-    else b = Army::WIN;
+	const Army::battle_t b = castle->GetArmy().isValid() ? Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index)) : Army::WIN;
 
 	switch(b)
 	{
@@ -984,6 +985,11 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
         case MP2::OBJ_IDOL:
 	    body_false = _("You've found an ancient and weathered stone idol. It is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.");
 	    body_true = _("You've found an ancient and weathered stone idol. Kissing it is supposed to be lucky, so you do. The stone is very cold to the touch.");
+    	    break;
+
+        case MP2::OBJ_MERMAID:
+	    body_false = _("The mermaids silently entice you to return later and be blessed again.");
+	    body_true = _("The magical, soothing beauty of the Mermaids reaches you and your crew. Just for a moment, you forget your worries and bask in the beauty of the moment. The mermaids charms bless you with increased luck for your next combat.");
     	    break;
 
     	default: return;
@@ -2129,37 +2135,54 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     
-    std::string msg_full1, msg_full2, msg_void1, msg_void2;
+    std::string msg_full, msg_void;
 
     switch(obj)
     {
         case MP2::OBJ_RUINS:
-    	    msg_void1 = _("You search the ruins, but the Medusas that used to live here are gone.");
-    	    msg_void2 = _("Perhaps there will be more next week.");
-    	    msg_full1 = _("You've found some Medusas living in the ruins. They are willing to join your army for a price.");
-    	    msg_full2 = _("Do you want to recruit Medusas?");
+    	    msg_void = _("You search the ruins, but the Medusas that used to live here are gone. Perhaps there will be more next week.");
+    	    msg_full = _("You've found some Medusas living in the ruins. They are willing to join your army for a price. Do you want to recruit Medusas?");
     	    break;
 
         case MP2::OBJ_TREECITY:
-    	    msg_void1 = _("You've found a Sprite Tree City.");
-    	    msg_void2 = _("Unfortunately, none of the Sprites living there wish to join an army. Maybe next week.");
-    	    msg_full1 = _("Some of the Sprites living in the tree city are willing to join your army for a price.");
-    	    msg_full2 = _("Do you want to recruit Sprites?");
+    	    msg_void = _("You've found a Sprite Tree City. Unfortunately, none of the Sprites living there wish to join an army. Maybe next week.");
+    	    msg_full = _("Some of the Sprites living in the tree city are willing to join your army for a price. Do you want to recruit Sprites?");
     	    break;
   
         case MP2::OBJ_WAGONCAMP:
-    	    msg_void1 = _("A colorful Rogues' wagon stands empty here.");
-    	    msg_void2 = _("Perhaps more Rogues will be here later.");
-    	    msg_full1 = _("Distant sounds of music and laughter draw you to a colorful wagon housing Rogues.");
-    	    msg_full2 = _("Do you wish to have any Rogues join your army?");
+    	    msg_void = _("A colorful Rogues' wagon stands empty here. Perhaps more Rogues will be here later.");
+    	    msg_full = _("Distant sounds of music and laughter draw you to a colorful wagon housing Rogues. Do you wish to have any Rogues join your army?");
     	    break;
 
 	case MP2::OBJ_DESERTTENT:
-    	    msg_void1 = _("A group of tattered tents, billowing in the sandy wind, beckons you.");
-    	    msg_void2 = _("The tents are unoccupied. Perhaps more Nomads will be here later.");
-    	    msg_full1 = _("A group of tattered tents, billowing in the sandy wind, beckons you.");
-    	    msg_full2 = _("Do you wish to have any Nomads join you during your travels?");
+    	    msg_void = _("A group of tattered tents, billowing in the sandy wind, beckons you. The tents are unoccupied. Perhaps more Nomads will be here later.");
+    	    msg_full = _("A group of tattered tents, billowing in the sandy wind, beckons you. Do you wish to have any Nomads join you during your travels?");
     	    break;
+
+        case MP2::OBJ_EARTHALTAR:
+	    msg_void = _("The pit of mud bubbles for a minute and then lies still.");
+	    msg_full = _("As you approach the bubbling pit of mud, creatures begin to climb out and position themselves around it. In unison they say: \"Mother Earth would like to offer you a few of her troops. Do you want to recruit Earth Elementals?\"");
+	    break;
+
+        case MP2::OBJ_AIRALTAR:
+	    msg_void = _("You enter the structure of white stone pillars, and find nothing.");
+	    msg_full = _("White stone pillars support a roof that rises up to the sky. As you enter the structure, the dead air of the outside gives way to a whirling gust that almost pushes you back out. The air current materializes into a barely visible form. The creature asks, in what can only be described as a loud whisper: \"Why have you come? Are you here to call upon the forces of the air?\"");
+	    break;
+
+        case MP2::OBJ_FIREALTAR:
+	    msg_void = _("No Fire Elementals approach you from the lava pool.");
+	    msg_full = _("Beneath a structure that serves to hold in heat, Fire Elementals move about in a fiery pool of molten lava. A group of them approach you and offer their services. Would you like to recruit Fire Elementals?");
+	    break;
+
+        case MP2::OBJ_WATERALTAR:
+	    msg_void = _("A face forms in the water for a moment, and then is gone.");
+	    msg_full = _("Crystalline structures cast shadows over a small reflective pool of water. You peer into the pool, and a face that is not your own peers back. It asks: \"Would you like to call upon the powers of water?\"");
+	    break;
+
+	case MP2::OBJ_BARROWMOUNDS:
+	    msg_void = _("This burial site is deathly still.");
+	    msg_full = _("Restless spirits of long dead warriors seeking their final resting place offer to join you in hopes of finding peace. Do you wish to recruit ghosts?");
+	    break;
 
 	default: return;
     }
@@ -2170,7 +2193,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
     {
 	const Monster monster(Monster::FromObject(obj));
 	PlaySoundSuccess;
-	if(Dialog::YES == Dialog::Message(msg_full1, msg_full2, Font::BIG, Dialog::YES | Dialog::NO))
+	if(Dialog::YES == Dialog::Message("", msg_full, Font::BIG, Dialog::YES | Dialog::NO))
 	{
 	    const u16 recruit = Dialog::RecruitMonster(monster, count);
 	    if(recruit)
@@ -2185,7 +2208,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
     else
     {
 	PlaySoundVisited;
-	Dialog::Message(msg_void1, msg_void2, Font::BIG, Dialog::OK);
+	Dialog::Message("", msg_void, Font::BIG, Dialog::OK);
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingRecruitMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
@@ -2208,13 +2231,13 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    	if(0 == count)
 	    	{
 		    PlaySoundVisited;
-	    	    Dialog::Message(_("The City of the Dead is empty of life, and empty of unlife as well."), _("Perhaps some undead will move in next week."), Font::BIG, Dialog::OK);
+	    	    Dialog::Message(MP2::StringObject(obj), _("The City of the Dead is empty of life, and empty of unlife as well. Perhaps some undead will move in next week."), Font::BIG, Dialog::OK);
 		    break;
 		}
 		else
 	    	{
 		    PlaySoundSuccess;
-		    complete = (Dialog::YES == Dialog::Message(_("Some Liches living here are willing to join your army for a price."), _("Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
+		    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Some Liches living here are willing to join your army for a price. Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
 		}
 	    }
 	    else
@@ -2223,7 +2246,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		army.FromGuardian(tile);
 
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message(_("You've found the ruins of an ancient city, now inhabited solely by the undead."), _("Will you search?"), Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You've found the ruins of an ancient city, now inhabited solely by the undead. Will you search?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -2234,7 +2257,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message(_("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price."), _("Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
+			    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price. Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
 			    hero.ActionAfterBattle();
 			break;
 
@@ -2256,13 +2279,13 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    	if(0 == count)
 	    	{
 		    PlaySoundVisited;
-	    	    Dialog::Message(_("You've found one of those bridges that Trolls are so fond of living under, but there are none here."), _("Perhaps there will be some next week."), Font::BIG, Dialog::OK);
+	    	    Dialog::Message(MP2::StringObject(obj), _("You've found one of those bridges that Trolls are so fond of living under, but there are none here. Perhaps there will be some next week."), Font::BIG, Dialog::OK);
 		    break;
 		}
 		else
 		{
 		    PlaySoundSuccess;
-	    	    complete = (Dialog::YES == Dialog::Message(_("Some Trolls living under a bridge are willing to join your army, but for a price."), _("Do you want to recruit Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
+	    	    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Some Trolls living under a bridge are willing to join your army, but for a price. Do you want to recruit Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
 		}
 	    }
 	    else
@@ -2271,7 +2294,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		army.FromGuardian(tile);
 
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message(_("Trolls living under the bridge challenge you."), _("Will you fight them?"), Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Trolls living under the bridge challenge you. Will you fight them?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -2282,7 +2305,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message(_("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries."), _("Do you want to buy any Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
+			    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries. Do you want to buy any Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
 			    hero.ActionAfterBattle();
 			break;
 
@@ -2304,13 +2327,13 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    	if(0 == count)
 	    	{
 		    PlaySoundVisited;
-	    	    Dialog::Message(_("The Dragon city has no Dragons willing to join you this week."), _("Perhaps a Dragon will become available next week."), Font::BIG, Dialog::OK);
+	    	    Dialog::Message(MP2::StringObject(obj), _("The Dragon city has no Dragons willing to join you this week. Perhaps a Dragon will become available next week."), Font::BIG, Dialog::OK);
 		    break;
 		}
 		else
 		{
 		    PlaySoundSuccess;
-	    	    complete = (Dialog::YES == Dialog::Message(_("The Dragon city is willing to offer some Dragons for your army for a price."), _("Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
+	    	    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("The Dragon city is willing to offer some Dragons for your army for a price. Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
 		}
 	    }
 	    else
@@ -2319,7 +2342,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		army.FromGuardian(tile);
 
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message(_("You stand before the Dragon City, a place off-limits to mere humans."), _("Do you wish to violate this rule and challenge the Dragons to a fight?"), Font::BIG, Dialog::YES | Dialog::NO))
+		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You stand before the Dragon City, a place off-limits to mere humans. Do you wish to violate this rule and challenge the Dragons to a fight?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
 		    const u32 exp = army.CalculateExperience();
@@ -2330,7 +2353,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 			    hero.IncreaseExperience(exp);
 			    world.CaptureObject(dst_index, hero.GetColor());
 			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message(_("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price."), _("Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
+			    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price. Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
 			    hero.ActionAfterBattle();
 			break;
 
@@ -2370,7 +2393,7 @@ void ActionToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     PlaySoundSuccess;
     Dialog::Message(MP2::StringObject(obj), _("From the observation tower, you are able to see distant lands."), Font::BIG, Dialog::OK);
-    Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, hero.GetColor());
+    Maps::ClearFog(dst_index, OBSERVATIONTOWERSCOUTE, hero.GetColor());
 }
 
 void ActionToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2417,7 +2440,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.isVisited(tile))
     {
 	PlaySoundVisited;
-	Dialog::Message(_("Recognizing you, the butler refuses to admit you."), _("\"The master,\" he says, \"will not see the same student twice.\""), Font::BIG, Dialog::OK);
+	Dialog::Message(MP2::StringObject(obj), _("Recognizing you, the butler refuses to admit you. \"The master,\" he says, \"will not see the same student twice.\""), Font::BIG, Dialog::OK);
     }
     else
     {
@@ -2437,7 +2460,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(access)
 	{
 	    PlaySoundSuccess;
-	    Dialog::Message(_("The butler admits you to see the master of the house."), _("He trains you in the four skills a hero should know."), Font::BIG, Dialog::OK);
+	    Dialog::Message(MP2::StringObject(obj), _("The butler admits you to see the master of the house. He trains you in the four skills a hero should know."), Font::BIG, Dialog::OK);
 	    hero.IncreasePrimarySkill(Skill::Primary::ATTACK);
 	    hero.IncreasePrimarySkill(Skill::Primary::DEFENCE);
 	    hero.IncreasePrimarySkill(Skill::Primary::KNOWLEDGE);
@@ -2447,7 +2470,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 	else
 	{
 	    PlaySoundFailure;
-	    Dialog::Message(_("The butler opens the door and looks you up and down."), _("\"You are neither famous nor diplomatic enough to be admitted to see my master,\" he sniffs. \"Come back when you think yourself worthy.\""), Font::BIG, Dialog::OK);
+	    Dialog::Message(MP2::StringObject(obj), _("The butler opens the door and looks you up and down. \"You are neither famous nor diplomatic enough to be admitted to see my master,\" he sniffs. \"Come back when you think yourself worthy.\""), Font::BIG, Dialog::OK);
 	}
     }
 
@@ -2576,12 +2599,12 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
     if(1000 > world.GetKingdom(hero.GetColor()).GetFundsGold())
     {
 	PlaySoundFailure;
-	Dialog::Message(_("The captain sighs."), _("\"You don't have enough money, eh?  You can't expect me to give my maps away for free!\""), Font::BIG, Dialog::OK);
+	Dialog::Message(MP2::StringObject(obj), _("The captain sighs. \"You don't have enough money, eh?  You can't expect me to give my maps away for free!\""), Font::BIG, Dialog::OK);
     }
     else
     {
 	PlaySoundWarning;
-	if(Dialog::YES == Dialog::Message(_("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold."), _("Do you wish to buy the maps?"), Font::BIG, Dialog::YES | Dialog::NO))
+	if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold. Do you wish to buy the maps?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    world.ActionForMagellanMaps(hero.GetColor());
 
 	Game::Focus::Get().Redraw();
@@ -2627,7 +2650,7 @@ void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
     {
         hero.SetVisited(dst_index, Visit::GLOBAL);
         AGG::PlaySound(M82::EXPERNCE);
-        Dialog::Message(_("Obelisk"), _("You come upon an obelisk made from a type of stone you have never seen before. Staring at it intensely, the smooth surface suddenly changes to an inscription. The inscription is a piece of a lost ancient map. Quickly you copy down the piece and the inscription vanishes as abruptly as it appeared."), Font::BIG, Dialog::OK);
+        Dialog::Message(MP2::StringObject(obj), _("You come upon an obelisk made from a type of stone you have never seen before. Staring at it intensely, the smooth surface suddenly changes to an inscription. The inscription is a piece of a lost ancient map. Quickly you copy down the piece and the inscription vanishes as abruptly as it appeared."), Font::BIG, Dialog::OK);
     }
     
     Dialog::PuzzleMaps();
@@ -2801,4 +2824,145 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToDaemonCave: " + hero.GetName());
+}
+
+void ActionToAlchemistsTower(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+/*
+As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you. e checks your pack, and sees
+that you have 1 cursed item. For 750 gold, the alchemist will remove it for you. Do you pay?
+As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you. He checks your pack, and sees
+that you have %d cursed items. For 750 gold, the alchemist will remove them for you. Do you pay?
+You hear a voice from behind the locked door, "You don't have enough gold to pay for my services."
+You hear a voice from high above in the tower, "Go away! I can't help you!"
+*/
+    Dialog::Message("", _("You hear a voice from high above in the tower, \"Go away! I can't help you!\""), Font::BIG, Dialog::OK);
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToAlchemistsTower: " + hero.GetName());
+}
+
+void ActionToStables(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    const bool cavalry = hero.GetArmy().HasMonster(Monster::CAVALRY);
+    const bool visited = hero.isVisited(obj);
+    std::string body;
+
+    if(!cavalry && visited)
+	body = _("The head groom approaches you and speaks, \"You already have a fine horse, and have no inexperienced cavalry which might make use of our trained war horses.\"");
+    else
+    if(!cavalry && !visited)
+	body = _("As you approach the stables, the head groom appears, leading a fine looking war horse. \"This steed will help speed you in your travels. Alas, his endurance will wane with a lot of heavy riding, and you must return for a fresh mount in a week. We also have many fine war horses which could benefit mounted soldiers, but you have none we can help.\"");
+    else
+    if(cavalry && visited)
+	body = _("The head groom speaks to you, \"That is a fine looking horse you have. I am afraid we can give you no better, but the horses your cavalry are riding look to be of poor breeding stock. We have many trained war horses which would aid your riders greatly. I insist you take them.\"");
+    else
+    if(cavalry && !visited)
+	body = _("As you approach the stables, the head groom appears, leading a fine looking war horse. \"This steed will help speed you in your travels. Alas, he will grow tired in a week. You must also let me give better horses to your mounted soldiers, their horses look shoddy and weak.\"");
+
+
+    // check already visited
+    if(hero.isVisited(obj))
+    {
+	PlaySoundVisited;
+    }
+    else
+    {
+	hero.SetVisited(dst_index);
+	PlaySoundSuccess;
+        hero.IncreaseMovePoints(400);
+    }
+
+    if(cavalry) hero.GetArmy().UpgradeMonsters(Monster::CAVALRY);
+
+    Dialog::Message("", body, Font::BIG, Dialog::OK);
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToStables: " + hero.GetName());
+}
+
+void ActionToArena(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    if(hero.isVisited(obj))
+    {
+	PlaySoundVisited;
+	Dialog::Message(MP2::StringObject(obj), _("The Arena guards turn you away."), Font::BIG, Dialog::OK);
+    }
+    else
+    {
+	hero.SetVisited(dst_index);
+	PlaySoundSuccess;
+	hero.IncreasePrimarySkill(Dialog::SelectSkillFromArena());
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToArena: " + hero.GetName());
+}
+
+void ActionToSirens(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    if(hero.isVisited(obj))
+    {
+	PlaySoundVisited;
+	Dialog::Message(MP2::StringObject(obj), _("As the sirens sing their eerie song, your small, determined army manages to overcome the urge to dive headlong into the sea."), Font::BIG, Dialog::OK);
+    }
+    else
+    {
+	u32 exp = hero.GetArmy().ActionToSirens();
+	std::string str = _("You have your crew stop up their ears with wax before the sirens' eerie song has any chance of luring them to a watery grave. An eerie wailing song emanates from the sirens perched upon the rocks. Many of your crew fall under its spell, and dive into the water where they drown. You are now wiser for the visit, and gain %{exp} experience.");
+	String::Replace(str, "%{exp}", exp);
+
+	hero.SetVisited(dst_index, Visit::GLOBAL);
+	PlaySoundSuccess;
+	Dialog::Message(MP2::StringObject(obj), str, Font::BIG, Dialog::OK);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToSirens: " + hero.GetName());
+}
+
+void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    if(kingdom.GetHeroes().size() < KINGDOMMAXHEROES)
+    {
+	Maps::Tiles & tile = world.GetTiles(dst_index);
+	PlaySoundSuccess;
+	Dialog::Message(MP2::StringObject(obj), _("In a dazzling display of daring, you break into the local jail and free the hero imprisoned there, who, in return, pledges loyalty to your cause."), Font::BIG, Dialog::OK);
+
+	AnimationRemoveObject(tile);
+	tile.RemoveObjectSprite();
+	tile.SetObject(MP2::OBJ_ZERO);
+
+	Heroes *prisoner = world.FromJail(tile.GetIndex());
+
+	if(prisoner)
+	{
+	    const Point center(tile.GetIndex() % world.w(), tile.GetIndex() / world.w());
+	    prisoner->Recruit(hero.GetColor(), center);
+	    prisoner->ResetModes(Heroes::JAIL);
+	    kingdom.AddHeroes(prisoner);
+	}
+    }
+    else
+    {
+	std::string str = _("You already have %{count} heroes, and regretfully must leave the prisoner in this jail to languish in agony for untold days.");
+	String::Replace(str, "%{count}", KINGDOMMAXHEROES);
+	PlaySoundFailure;
+	Dialog::Message(MP2::StringObject(obj), str, Font::BIG, Dialog::OK);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToJail: " + hero.GetName());
+}
+
+void ActionToHutMagi(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Dialog::Message(MP2::StringObject(obj), _("You enter a rickety hut and talk to the magician who lives there. He tells you of places near and far which may aid you in your journeys."), Font::BIG, Dialog::OK);
+    world.ActionToEyeMagi(hero.GetColor());
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToHutMagi: " + hero.GetName());
+}
+
+void ActionToEyeMagi(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Dialog::Message(MP2::StringObject(obj), _("This eye seems to be intently studying its surroundings."), Font::BIG, Dialog::OK);
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToEyeMagi: " + hero.GetName());
 }

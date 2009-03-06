@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,18 +17,29 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2PORTRAIT_H
-#define H2PORTRAIT_H
 
-class Heroes;
+#ifndef XMLTREE_H
+#define XMLTREE_H
 
-namespace Portrait
+#include "element.h"
+
+namespace XML
 {
-    typedef enum { BIG, MEDIUM, SMALL } size_t;
+    class Tree
+    {
+    public:
+	Tree();
 
-    const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
-    const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
-    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
+	const Element & getRoot(void) const;
+	Element & getRoot(void);
+
+	bool write(const char*, const unsigned char = 0) const;
+	bool read(const char*);
+
+    private:
+
+	Element root;
+    };
 };
 
 #endif

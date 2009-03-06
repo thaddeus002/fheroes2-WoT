@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,18 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2PORTRAIT_H
-#define H2PORTRAIT_H
 
-class Heroes;
+#include "reader.h"
 
-namespace Portrait
+XML::Reader::Reader() : reader(NULL)
 {
-    typedef enum { BIG, MEDIUM, SMALL } size_t;
+}
 
-    const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
-    const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
-    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
-};
+XML::Reader::~Reader()
+{
+    if(reader) close();
+}
 
-#endif
+bool XML::Reader::open(const char* filename)
+{
+    if(reader) close();
+    if(filename) reader = xmlNewTextReaderFilename(filename);
+    return reader;
+}
+
+void XML::Reader::close(void)
+{
+    if(reader)
+    {
+	xmlTextReaderClose(reader);
+	xmlFreeTextReader(reader);
+	reader = NULL;
+    }
+}
+
+bool XML::Reader::isValid(void) const
+{
+    return reader;
+}

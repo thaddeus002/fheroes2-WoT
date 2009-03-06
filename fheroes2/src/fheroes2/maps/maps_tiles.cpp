@@ -1230,6 +1230,24 @@ Maps::TilesAddon * Maps::Tiles::FindFlags(void)
     return NULL;
 }
 
+Maps::TilesAddon * Maps::Tiles::FindJail(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(ICN::X_LOC2 == MP2::GetICNObject(addon.object) && 0x09 == addon.index) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
 Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 {
     if(addons_level1.size())
@@ -1707,6 +1725,8 @@ void Maps::Tiles::RemoveObjectSprite(void)
 	case MP2::OBJ_ANCIENTLAMP:
 	case MP2::OBJ_RESOURCE:		addon = FindResource(); break;
 
+	case MP2::OBJ_JAIL:		RemoveJailSprite(); return;
+
 	default: return;
     }
     
@@ -1715,6 +1735,42 @@ void Maps::Tiles::RemoveObjectSprite(void)
         // remove shadow sprite from left cell
         if(Maps::isValidDirection(maps_index, Direction::LEFT))
     	    world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT)).Remove(addon->uniq);
+
+	Remove(addon->uniq);
+    }
+}
+
+void Maps::Tiles::RemoveJailSprite(void)
+{
+    const Maps::TilesAddon *addon = FindJail();
+
+    if(addon)
+    {
+        // remove left sprite
+        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+    	{
+	    const u16 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
+	    world.GetTiles(left).Remove(addon->uniq);
+
+    	    // remove left left sprite
+    	    if(Maps::isValidDirection(left, Direction::LEFT))
+    		world.GetTiles(Maps::GetDirectionIndex(left, Direction::LEFT)).Remove(addon->uniq);
+	}
+
+        // remove top sprite
+        if(Maps::isValidDirection(maps_index, Direction::TOP))
+    	{
+	    const u16 top = Maps::GetDirectionIndex(maps_index, Direction::TOP);
+	    world.GetTiles(top).Remove(addon->uniq);
+	    world.GetTiles(top).SetObject(MP2::OBJ_ZERO);
+
+    	    // remove top left sprite
+    	    if(Maps::isValidDirection(top, Direction::LEFT))
+    	    {
+		world.GetTiles(Maps::GetDirectionIndex(top, Direction::LEFT)).Remove(addon->uniq);
+		world.GetTiles(Maps::GetDirectionIndex(top, Direction::LEFT)).SetObject(MP2::OBJ_ZERO);
+	    }
+	}
 
 	Remove(addon->uniq);
     }

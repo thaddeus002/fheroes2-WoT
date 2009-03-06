@@ -532,9 +532,9 @@ bool Castle::AllowBuyHero(void)
     return true;
 }
 
-void Castle::RecruitHero(const Heroes::heroes_t hero)
+void Castle::RecruitHero(Heroes* hero)
 {
-    if(! AllowBuyHero()) return;
+    if(! AllowBuyHero() && !hero) return;
 
     Kingdom & kingdom = world.GetKingdom(color);
 
@@ -542,14 +542,12 @@ void Castle::RecruitHero(const Heroes::heroes_t hero)
 
     kingdom.OddFundsResource(paymentCosts);
 
-    Heroes & heroes = world.GetHeroes(hero);
+    hero->SetCenter(GetCenter());
+    hero->Recruit(*this);
 
-    heroes.SetCenter(GetCenter());
-    heroes.Recruit(*this);
-
-    kingdom.AddHeroes(&heroes);
+    kingdom.AddHeroes(hero);
     
-    castle_heroes = &heroes;
+    castle_heroes = hero;
 }
 
 /* recruit monster from building to castle army */
@@ -970,7 +968,7 @@ void Castle::BuyBuilding(building_t build)
 	{
 	    case BUILD_CASTLE:
 		Maps::UpdateSpritesFromTownToCastle(GetCenter());
-		Maps::ClearFog(GetCenter(), CASTLE_SCOUTE, GetColor());
+		Maps::ClearFog(GetIndex(), CASTLE_SCOUTE, GetColor());
 		break;
 
 	    case BUILD_MAGEGUILD1:

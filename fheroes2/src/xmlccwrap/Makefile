@@ -1,10 +1,10 @@
 # makefile
+# xml wrapper
 
-TARGET = libxmlccwrap
-CFLAGS := $(shell xml2-config --cflags)
-LIBS := -O2 -Wall -I . $(shell xml2-config --libs)
-
-CC = g++
+TARGET	:= libxmlccwrap
+CFLAGS	:= -O2 -Wall $(shell xml2-config --cflags)
+LIBS	:= $(shell xml2-config --libs)
+CC 	:= g++
 
 all: $(TARGET).so $(TARGET).a
 

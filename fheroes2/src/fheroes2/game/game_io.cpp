@@ -245,7 +245,7 @@ void Game::SaveXML(const std::string &fn)
 	writer.addAttribute("modes", hero.modes);
 	writer.addAttribute("color", hero.color);
 	writer.addAttribute("name", hero.name);
-	writer.addAttribute("hid", hero.hid);
+	writer.addAttribute("portrait", hero.portrait);
 	writer.addAttribute("race", hero.race);
 	writer.addAttribute("attack", hero.GetAttack());
 	writer.addAttribute("defense", hero.GetDefense());

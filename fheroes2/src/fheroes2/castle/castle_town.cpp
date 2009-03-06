@@ -30,7 +30,6 @@
 #include "dialog.h"
 #include "heroes.h"
 #include "text.h"
-#include "portrait.h"
 #include "statusbar.h"
 #include "payment.h"
 #include "kingdom.h"
@@ -80,11 +79,11 @@ void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message
     bar.ShowMessage(str);
 }
 
-Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
+Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 {
-    const ICN::icn_t system = (Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    if(!hero) return Dialog::CANCEL;
 
-    const Heroes & heroes = world.GetHeroes(hero);
+    const ICN::icn_t system = (Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -110,13 +109,13 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes::heroes_t hero)
 
     dst_pt.x = dst_pt.x + 5;
     dst_pt.y = dst_pt.y + 5;
-    display.Blit(Portrait::Hero(hero, Portrait::BIG), dst_pt);
+    display.Blit(hero->GetPortrait101x93(), dst_pt);
 
     str = _("%{name} is a level %{value} %{race} with %{count} artifacts.");
-    String::Replace(str, "%{name}", heroes.GetName());
-    String::Replace(str, "%{value}", heroes.GetLevel());
-    String::Replace(str, "%{race}", Race::String(heroes.GetRace()));
-    String::Replace(str, "%{count}", heroes.GetCountArtifacts());
+    String::Replace(str, "%{name}", hero->GetName());
+    String::Replace(str, "%{value}", hero->GetLevel());
+    String::Replace(str, "%{race}", Race::String(hero->GetRace()));
+    String::Replace(str, "%{count}", hero->GetCountArtifacts());
 
     TextBox box2(str, Font::BIG, box_rt.w);
     dst_pt.x = box_rt.x;
@@ -174,7 +173,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    std::string building_description;
+    std::string str;
 
     if((DWELLING_MONSTER1 |
 	DWELLING_MONSTER2 |
@@ -189,21 +188,19 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 	DWELLING_UPGRADE6 |
 	DWELLING_UPGRADE7) & build)
     {
-	building_description = _("The %{building} produces %{monster}.");
-	String::Replace(building_description, "%{building}", GetStringBuilding(build, race));
-	String::Replace(building_description, "%{monster}", Monster(race, build).GetMultiName());
+	str = _("The %{building} produces %{monster}.");
+	String::Replace(str, "%{building}", GetStringBuilding(build, race));
+	String::Replace(str, "%{monster}", Monster(race, build).GetMultiName());
     }
     else
-	building_description = GetDescriptionBuilding(build, race);
+	str = GetDescriptionBuilding(build, race);
 
-    u8 height_description = Text::height(building_description, Font::BIG, BOXAREA_WIDTH);
+    TextBox box1(str, Font::BIG, BOXAREA_WIDTH);
 
     // prepare requires build string
-    std::string string_requires;
-
     std::bitset<32> requires(Castle::GetBuildingRequires(build));
     std::bitset<32> building2(building);
-	
+    str.clear();	
     if(requires.any())
     {
 	    u8 count = 0;
@@ -219,20 +216,22 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 
 		    if(! (building & value))
 		    {
-			string_requires += GetStringBuilding(static_cast<building_t>(value), race);
+			str += GetStringBuilding(static_cast<building_t>(value), race);
 
-			if(count < requires.count()) string_requires += ", ";
+			if(count < requires.count()) str += ", ";
 		    }
 		}
 	    }
     }
 
-    u8 height_requires = string_requires.empty() ? 0 : Text::height(string_requires, Font::BIG, BOXAREA_WIDTH);
+    bool requires_true = str.size();
+    TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
 
     PaymentConditions::BuyBuilding paymentBuild(race, build);
-    const u8 & valid_resource = paymentBuild.GetValidItems();
+    const u8 extra = (4 > paymentBuild.GetValidItems() ? 50 : (6 > paymentBuild.GetValidItems() ? 100 : 160));
+    const Sprite & window_icons = AGG::GetICN(ICN::BLDGXTRA, 0);
     
-    Dialog::Box box(60 + 30 + height_description + 15 + (height_requires ? 30 + height_requires : 0) + (7 == valid_resource ? 150 : (3 < valid_resource ? 100 : 50)), buttons);
+    Dialog::Box box(10 + window_icons.h() + 10 + box1.h() + (requires_true ? 10 + box2.h() : 0) + 10 + extra, buttons);
 
     const Rect & box_rt = box.GetArea();
 
@@ -299,50 +298,42 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 		default: return Dialog::CANCEL;
     }
 
-    const Sprite & window_icons = AGG::GetICN(ICN::CASLWIND, 0);
-    Rect src_rt(5, 2, 137, 72);
-    dst_pt.x = box_rt.x + (box_rt.w - src_rt.w) / 2;
-    dst_pt.y = box_rt.y + 12;
-    display.Blit(window_icons, src_rt, dst_pt);
+    // sprite window_icons
+    dst_pt.x = box_rt.x + (box_rt.w - window_icons.w()) / 2;
+    dst_pt.y = box_rt.y + 10;
+    display.Blit(window_icons, dst_pt);
 
     const Sprite & building_icons = AGG::GetICN(cstl_icn, index);
     dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
-    dst_pt.y = box_rt.y + 13;
+    dst_pt.y += 1;
     display.Blit(building_icons, dst_pt);
 
     Text text;
 
     text.Set(GetStringBuilding(build, race), Font::SMALL);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
-    dst_pt.y = box_rt.y + 70;
+    dst_pt.y += 57;
     text.Blit(dst_pt);
 
-    src_rt.x = box_rt.x;
-    src_rt.y = box_rt.y + 100;
-    src_rt.w = BOXAREA_WIDTH;
-    src_rt.h = 200;
-    TextBox(building_description, Font::BIG, src_rt);
+    dst_pt.x = box_rt.x;
+    dst_pt.y = box_rt.y + 10 + window_icons.h() + 10;
+    box1.Blit(dst_pt);
 
-    if(height_requires)
+    dst_pt.y += box1.h() + 10;
+    if(requires_true)
     {
 	text.Set(_("Requires:"), Font::BIG);
 	dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
-	dst_pt.y = box_rt.y + 100 + height_description + 20;
 	text.Blit(dst_pt);
 
-	src_rt.x = box_rt.x;
-	src_rt.y = box_rt.y + 100 + height_description + 35;
-	src_rt.w = BOXAREA_WIDTH;
-	src_rt.h = 200;
-	TextBox(string_requires, Font::BIG, src_rt);
-    }
-	
-    src_rt.x = box_rt.x;
-    src_rt.y = height_requires ? box_rt.y + 100 + height_description + 30 + height_requires : box_rt.y + 100 + height_description;
-    src_rt.w = BOXAREA_WIDTH;
-    src_rt.h = box_rt.h - src_rt.y;
+	dst_pt.x = box_rt.x;
+	dst_pt.y += text.h();
+	box2.Blit(dst_pt);
 
-    Resource::AlignDraw(paymentBuild, src_rt);
+	dst_pt.y += + 10;
+    }
+
+    Resource::AlignDraw(paymentBuild, Rect(box_rt.x, dst_pt.y, BOXAREA_WIDTH, 0));
 
     if(buttons)
     {
@@ -787,11 +778,9 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 260;
     const Rect rectHero1(dst_pt, 102, 93);
-    Heroes *hero1 = NULL;
-    if(Heroes::UNKNOWN != recruits.first)
+    if(recruits.first)
     {
-	hero1 = &world.GetHeroes(recruits.first);
-	display.Blit(Portrait::Hero(recruits.first, Portrait::BIG), dst_pt);
+	display.Blit(recruits.first->GetPortrait101x93(), dst_pt);
     }
     else
 	display.FillRect(0, 0, 0, rectHero1);
@@ -807,11 +796,9 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 362;
     const Rect rectHero2(dst_pt, 102, 94);
-    Heroes *hero2 = NULL;
-    if(Heroes::UNKNOWN != recruits.second)
+    if(recruits.second)
     {
-    	hero2 = &world.GetHeroes(recruits.second);
-	display.Blit(Portrait::Hero(recruits.second, Portrait::BIG), dst_pt);
+	display.Blit(recruits.second->GetPortrait101x93(), dst_pt);
     }
     else
 	display.FillRect(0, 0, 0, rectHero2);
@@ -975,7 +962,7 @@ Castle::building_t Castle::OpenTown(void)
             ResetModes(ARMYSPREAD);
         }
 	else
-	if(Heroes::UNKNOWN != recruits.first && le.MouseClickLeft(rectHero1) &&
+	if(recruits.first && le.MouseClickLeft(rectHero1) &&
 	    Dialog::OK == DialogBuyHero(recruits.first))
         {
     	    RecruitHero(recruits.first);
@@ -983,7 +970,7 @@ Castle::building_t Castle::OpenTown(void)
     	    return BUILD_NOTHING;
         }
 	else
-	if(Heroes::UNKNOWN != recruits.second && le.MouseClickLeft(rectHero2) &&
+	if(recruits.second && le.MouseClickLeft(rectHero2) &&
 	    Dialog::OK == DialogBuyHero(recruits.second))
         {
     	    RecruitHero(recruits.second);
@@ -1035,9 +1022,9 @@ Castle::building_t Castle::OpenTown(void)
         else
 	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 	else
-	if(hero1 && le.MousePressRight(rectHero1)){ hero1->OpenDialog(true); cursor.Show(); display.Flip(); }
+	if(recruits.first && le.MousePressRight(rectHero1)){ recruits.first->OpenDialog(true); cursor.Show(); display.Flip(); }
 	else
-	if(hero2 && le.MousePressRight(rectHero2)){ hero2->OpenDialog(true); cursor.Show(); display.Flip(); }
+	if(recruits.second && le.MousePressRight(rectHero2)){ recruits.second->OpenDialog(true); cursor.Show(); display.Flip(); }
 
         // status info
 	if(le.MouseCursor(rectDwelling1))
@@ -1139,8 +1126,8 @@ Castle::building_t Castle::OpenTown(void)
 	if(le.MouseCursor(rectCaptain))
 	    ShowBuildMessage(statusBar, BUILD_CAPTAIN & building, stringCaptain, *this, BUILD_CAPTAIN);
 	else
-	if((hero1 && le.MouseCursor(rectHero1)) ||
-	   (hero2 && le.MouseCursor(rectHero2)))
+	if((recruits.first && le.MouseCursor(rectHero1)) ||
+	   (recruits.second && le.MouseCursor(rectHero2)))
 	{
 	    if(many_hero)
 		statusBar.ShowMessage(_("Cannot recruit - you have too many Heroes."));
@@ -1154,16 +1141,16 @@ Castle::building_t Castle::OpenTown(void)
 	    if(le.MouseCursor(rectHero1))
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
-		String::Replace(str, "%{name}", hero1->GetName());
-		String::Replace(str, "%{race}", Race::String(hero1->GetRace()));
+		String::Replace(str, "%{name}", recruits.first->GetName());
+		String::Replace(str, "%{race}", Race::String(recruits.first->GetRace()));
 	    	statusBar.ShowMessage(str);
 	    }
 	    else
 	    if(le.MouseCursor(rectHero2))
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
-		String::Replace(str, "%{name}", hero2->GetName());
-		String::Replace(str, "%{race}", Race::String(hero2->GetRace()));
+		String::Replace(str, "%{name}", recruits.second->GetName());
+		String::Replace(str, "%{race}", Race::String(recruits.second->GetRace()));
 	    	statusBar.ShowMessage(str);
 	    }
 	}

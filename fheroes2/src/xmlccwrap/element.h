@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,18 +17,59 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2PORTRAIT_H
-#define H2PORTRAIT_H
 
-class Heroes;
+#ifndef XMLELEMENT_H
+#define XMLELEMENT_H
 
-namespace Portrait
+#include <list>
+#include <string>
+#include "attribute.h"
+
+namespace XML
 {
-    typedef enum { BIG, MEDIUM, SMALL } size_t;
+    class Tree;
+    class Element;
+    typedef std::list<Element> ElementList;
 
-    const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
-    const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
-    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
+    class Element
+    {
+    public:
+	Element();
+	Element(const std::string &);
+
+	bool operator== (const std::string &) const;
+
+	void setName(const char*);
+	void setName(const std::string &);
+	void setContent(const char*);
+	void setContent(int);
+	void setContent(const std::string &);
+	void setAttribute(const std::string &, int);
+	void setAttribute(const std::string &, const std::string &);
+	void setAttribute(const Attribute &);
+	Element & addElement(const Element &);
+	Element & addElement(const std::string &);
+
+	void exportXML(xmlNodePtr) const;
+	void importXML(xmlNodePtr);
+
+	const std::string & getName(void) const;
+	const std::string & getContent(void) const;
+	const ElementList & getElementList(void) const;
+	const AttributeList & getAttributeList(void) const;
+	const Element* getElement(const std::string &) const;
+	Element* getElement(const std::string &);
+	const Attribute* getAttribute(const std::string &) const;
+	Attribute* getAttribute(const std::string &);
+
+    private:
+	friend class Tree;
+
+	std::string name;
+	std::string content;
+	AttributeList attrs;
+	ElementList children;
+    };
 };
 
 #endif

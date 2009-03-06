@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,18 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2PORTRAIT_H
-#define H2PORTRAIT_H
 
-class Heroes;
+#ifndef XMLATTRIBUTE_H
+#define XMLATTRIBUTE_H
 
-namespace Portrait
+#include <utility>
+#include <list>
+#include <string>
+#include <libxml/parser.h>
+
+namespace XML
 {
-    typedef enum { BIG, MEDIUM, SMALL } size_t;
+    class Attribute;
+    typedef std::list<Attribute> AttributeList;
 
-    const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
-    const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
-    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
+    class Attribute : protected std::pair<std::string, std::string>
+    {
+    public:
+	Attribute();
+	Attribute(const std::string &, const std::string & = std::string());
+
+	bool operator== (const std::string &) const;
+
+	void setName(const std::string &);
+	void setValue(const std::string &);
+
+	void exportXML(xmlNodePtr) const;
+
+	const std::string & getName(void) const;
+	const std::string & getValue(void) const;
+    };
 };
 
 #endif

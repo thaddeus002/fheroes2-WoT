@@ -44,9 +44,9 @@ namespace GameEvent
     class Riddle;
 };
 
-struct Recruits : public std::pair<Heroes::heroes_t, Heroes::heroes_t>
+struct Recruits : public std::pair<Heroes*, Heroes*>
 {
-    Recruits() : std::pair<Heroes::heroes_t, Heroes::heroes_t>(Heroes::UNKNOWN, Heroes::UNKNOWN){};
+    Recruits() : std::pair<Heroes*, Heroes*>(NULL, NULL){};
 };
 
 #define DAYOFWEEK       7 
@@ -54,6 +54,7 @@ struct Recruits : public std::pair<Heroes::heroes_t, Heroes::heroes_t>
 #define MAXCASTLES	72
 
 #define OBSERVATIONTOWERSCOUTE 10
+#define MAGIEYESCOUTE 9
 
 class World : protected Size
 {
@@ -90,10 +91,9 @@ public:
     const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); };
     Heroes * GetHeroes(u16 maps_index);
     Heroes * GetHeroes(u8 ax, u8 ay) const;
+    Heroes * FromJail(u16);
 
     Recruits & GetRecruits(Color::color_t);
-
-    Heroes & GetHeroes(const Heroes::heroes_t & hero){ return *vec_heroes[hero]; };
 
     Surface & GetUltimateArtifactArea(void);
     u16 GetUltimateArtifactIndex(void);
@@ -132,6 +132,8 @@ public:
     Color::color_t ColorCapturedObject(const u16 index) const;
     void StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & store);
 
+    void ActionToEyeMagi(const Color::color_t) const;
+
     u16 CountObeliskOnMaps(void);
 
     bool CreateBoat(const u16 center, bool build);
@@ -146,7 +148,7 @@ protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
     void UpdateRecruits(void);
-    Heroes::heroes_t GetFreemanHeroes(Race::race_t rc = Race::BOMG);
+    Heroes* GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
 private:
     World() : Size(0, 0), ultimate_artifact_area(448, 448), width(Size::w), height(Size::h) {};
@@ -167,6 +169,7 @@ private:
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
     std::vector<u16>                    vec_teleports;
+    std::vector<u16>                    vec_eyes;
 
     std::map<Color::color_t, Recruits>	map_recruits;
     std::map<u32, std::vector<u16> >	map_whirlpools;

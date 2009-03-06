@@ -768,6 +768,13 @@ Monster::monster_t Monster::FromObject(u8 obj)
 
         case MP2::OBJ_ANCIENTLAMP:	return GENIE;
 
+        // loyalty version
+	case MP2::OBJ_WATERALTAR:	return EARTH_ELEMENT;
+        case MP2::OBJ_AIRALTAR:		return AIR_ELEMENT;
+        case MP2::OBJ_FIREALTAR:	return FIRE_ELEMENT;
+        case MP2::OBJ_EARTHALTAR:	return WATER_ELEMENT;
+	case MP2::OBJ_BARROWMOUNDS:	return GHOST;
+
         default: break;
     }
 
@@ -884,29 +891,9 @@ Monster::monster_t Monster::Rand(level_t level)
 
 u16 Monster::GetRNDSize(monster_t m)
 {
-    float level = 100;
+    const u8 grown = Monster(m).GetGrown();
 
-    switch(Settings::Get().GameDifficulty())
-    {
-	case Difficulty::EASY:		level = 50; break;
-	case Difficulty::NORMAL:	level = 80; break;
-        case Difficulty::HARD:		level = 120; break;
-	case Difficulty::EXPERT:	level = 150; break;
-	case Difficulty::IMPOSSIBLE:	level = 175; break;
-    }
-
-    u16 size = 1;
-    
-    switch(GetLevel(m))
-    {
-	case LEVEL1:	size = Rand::Get(Army::HORDE, static_cast<u32>(Army::THRONG * level / 100)); break;
-	case LEVEL2:	size = Rand::Get(Army::LOTS, static_cast<u32>(Army::HORDE * level / 100)); break;
-	case LEVEL3:	size = Rand::Get(Army::PACK, static_cast<u32>(Army::LOTS * level / 100)); break;
-	case LEVEL4:    size = Rand::Get(Army::SEVERAL, static_cast<u32>(Army::PACK * level / 100)); break;
-	default: break;
-    }
-
-    return static_cast<u16>(size * level / 100);
+    return Rand::Get(grown - grown / 2, grown + grown / 2);
 }
 
 u8 Monster::GetLevel(monster_t m)

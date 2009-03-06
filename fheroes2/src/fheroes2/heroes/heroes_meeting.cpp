@@ -27,7 +27,6 @@
 #include "army.h"
 #include "background.h"
 #include "heroes.h"
-#include "portrait.h"
 #include "selectarmybar.h"
 #include "selectartifactbar.h"
 #include "heroes_indicator.h"
@@ -69,11 +68,11 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // portrait
     dst_pt.x = cur_pt.x + 93;
     dst_pt.y = cur_pt.y + 72;
-    display.Blit(Portrait::Hero(GetID(), Portrait::BIG), dst_pt);
+    display.Blit(GetPortrait101x93(), dst_pt);
 
     dst_pt.x = cur_pt.x + 447;
     dst_pt.y = cur_pt.y + 72;
-    display.Blit(Portrait::Hero(heroes2.GetID(), Portrait::BIG), dst_pt);
+    display.Blit(heroes2.GetPortrait101x93(), dst_pt);
 
     dst_pt.x = cur_pt.x + 34;
     dst_pt.y = cur_pt.y + 75;

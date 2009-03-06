@@ -73,7 +73,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     // sprite monster
     const Sprite & smon = AGG::GetICN(monster.ICNMonh(), 0);
     dst_pt.x = pos.x + 70 - smon.w() / 2;
-    dst_pt.y = pos.y + 120 - smon.h();
+    dst_pt.y = pos.y + 130 - smon.h();
     display.Blit(smon, dst_pt);
 
     // info resource

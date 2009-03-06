@@ -18,9 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <string>
 #include <sstream>
-#include "xmlccwrap.h"
+#include "writer.h"
 
 XML::Writer::Writer() : writer(NULL)
 {
@@ -69,11 +68,6 @@ bool XML::Writer::startDocument(void)
     return writer && 0 == xmlTextWriterStartDocument(writer, NULL, NULL, NULL);
 }
 
-bool XML::Writer::startElement(const std::string & name)
-{
-    return startElement(name.c_str());
-}
-
 bool XML::Writer::startElement(const char* name)
 {
     return writer && name && 0 == xmlTextWriterStartElement(writer, reinterpret_cast<const xmlChar*>(name));
@@ -94,7 +88,7 @@ bool XML::Writer::addElement(const char* name, int content)
     std::ostringstream stream;
     stream << content;
 
-    return writer && name && 0 == xmlTextWriterWriteElement(writer, reinterpret_cast<const xmlChar*>(name), reinterpret_cast<const xmlChar*>(stream.str().c_str()));
+    return writer && name && content && 0 == xmlTextWriterWriteElement(writer, reinterpret_cast<const xmlChar*>(name), reinterpret_cast<const xmlChar*>(stream.str().c_str()));
 }
 
 bool XML::Writer::addAttribute(const char* name, const std::string & content)
@@ -112,56 +106,5 @@ bool XML::Writer::addAttribute(const char* name, int content)
     std::ostringstream stream;
     stream << content;
 
-    return writer && name && 0 == xmlTextWriterWriteAttribute(writer, reinterpret_cast<const xmlChar*>(name), reinterpret_cast<const xmlChar*>(stream.str().c_str()));
-}
-
-XML::Reader::Reader() : reader(NULL)
-{
-}
-
-XML::Reader::~Reader()
-{
-    if(reader) close();
-}
-
-bool XML::Reader::open(const char* filename)
-{
-    if(reader) close();
-    if(filename) reader = xmlNewTextReaderFilename(filename);
-    return reader;
-}
-
-void XML::Reader::close(void)
-{
-    if(reader)
-    {
-	xmlTextReaderClose(reader);
-	xmlFreeTextReader(reader);
-	reader = NULL;
-    }
-}
-
-bool XML::Reader::isValid(void) const
-{
-    return reader;
-}
-
-const char* XML::Reader::getName(void) const
-{
-    return reinterpret_cast<const char*>(xmlTextReaderConstName(reader));
-}
-
-const char* XML::Reader::getLocalName(void) const
-{
-    return reinterpret_cast<const char*>(xmlTextReaderConstLocalName(reader));
-}
-
-const char* XML::Reader::getValue(void) const
-{
-    return reinterpret_cast<const char*>(xmlTextReaderConstValue(reader));
-}
-
-const char* XML::Reader::getAttribute(const char* name) const
-{
-    return reinterpret_cast<const char*>(xmlTextReaderGetAttribute(reader, reinterpret_cast<const xmlChar*>(name)));
+    return writer && name && content && 0 == xmlTextWriterWriteAttribute(writer, reinterpret_cast<const xmlChar*>(name), reinterpret_cast<const xmlChar*>(stream.str().c_str()));
 }

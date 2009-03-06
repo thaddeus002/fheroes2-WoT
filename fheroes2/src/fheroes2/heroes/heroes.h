@@ -118,14 +118,13 @@ public:
 	HUNTER		= 0x0010,
 	SCOUTER		= 0x0020,
 	STUPID		= 0x0040,
+	JAIL		= 0x0080,
     };
 
-    Heroes(heroes_t ht, Race::race_t rc, const std::string & str);
+    Heroes(heroes_t ht, Race::race_t rc);
 
-    bool isFreeman(void) const{ return Color::GRAY == color; };
+    bool isFreeman(void) const;
     void SetFreeman(const u8 reason);
-
-    bool operator== (const Heroes & h) const;
 
     const Castle* inCastle(void) const;
     Castle* inCastle(void);
@@ -134,12 +133,15 @@ public:
 
     void ResetStupidFlag(void) { ResetModes(STUPID); };
 
-    Heroes::heroes_t GetID(void) const{ return hid; };
     Color::color_t GetColor(void) const{ return color; };
     Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
     u8 GetType(void) const { return Skill::Primary::HEROES; };
     Spell::Book * GetSpellBook(void) { return spell_book.isActive() ? &spell_book : NULL; };
+
+    const Surface & GetPortrait30x22(void) const;
+    const Surface & GetPortrait50x46(void) const;
+    const Surface & GetPortrait101x93(void) const;
 
     const Point & GetCenter(void) const;
     u16 GetIndex(void) const;
@@ -270,7 +272,7 @@ private:
     Army::army_t        army;
     Spell::Book		spell_book;
 
-    const heroes_t	hid;
+    heroes_t		portrait;
     const Race::race_t	race;
 
     MP2::object_t	save_maps_general;

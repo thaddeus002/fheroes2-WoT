@@ -107,7 +107,7 @@ public:
     bool AllowBuyHero(void);
     bool ContainCoord(const u16 ax, const u16 ay) const;
 
-    void RecruitHero(const Heroes::heroes_t hero);
+    void RecruitHero(Heroes*);
     const Heroes* GetHeroes(void) const;
     Heroes* GetHeroes(void);
 
@@ -174,7 +174,7 @@ private:
     void WellRedrawInfoArea(const Point & cur_pt);
     void RedrawAnimationBuilding(const Point & dst_pt, const building_t build);
 
-    Dialog::answer_t DialogBuyHero(const Heroes::heroes_t hero);
+    Dialog::answer_t DialogBuyHero(const Heroes*);
     Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
 
     void PressRightAction(building_t b);

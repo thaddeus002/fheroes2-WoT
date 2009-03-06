@@ -315,7 +315,7 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
     back.Save();
 
     display.Blit(dialog, pos_rt.x, pos_rt.y);
-    display.Blit(Portrait::Portrait(hero, Portrait::BIG), pos_rt.x + 27, pos_rt.y + 42);
+    display.Blit(Portrait::Get(hero, Portrait::BIG), pos_rt.x + 27, pos_rt.y + 42);
     display.Blit(AGG::GetICN(butt, Color::GetIndex(hero.GetColor())+1), pos_rt.x + 148, pos_rt.y + 36);
     Point tp(pos_rt);
     std::string str;

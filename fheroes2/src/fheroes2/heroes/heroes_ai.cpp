@@ -435,7 +435,7 @@ void AIToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    Maps::ClearFog(Point(dst_index % world.w(), dst_index / world.h()), OBSERVATIONTOWERSCOUTE, hero.GetColor());
+    Maps::ClearFog(dst_index, OBSERVATIONTOWERSCOUTE, hero.GetColor());
     hero.SetVisited(dst_index, Visit::GLOBAL);
 }
 

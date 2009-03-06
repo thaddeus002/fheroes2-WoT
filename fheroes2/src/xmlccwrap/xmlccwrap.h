@@ -18,63 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2XMLWRAP_H
-#define H2XMLWRAP_H
+#ifndef XMLWRAP_H
+#define XMLWRAP_H
 
-#include <libxml/xmlwriter.h>
-#include <libxml/xmlreader.h>
-
-namespace XML
-{
-    class Writer
-    {
-    public:
-	Writer();
-	~Writer();
-
-	bool open(const char*, int = 0);
-	bool isValid(void) const;
-
-	void close(void);
-
-	void endElement(void);
-	bool startElement(const std::string &);
-	bool startElement(const char*);
-
-	bool addElement(const char*, const std::string &);
-	bool addElement(const char*, const char*);
-	bool addElement(const char*, int);
-	bool addAttribute(const char*, const std::string &);
-	bool addAttribute(const char*, const char*);
-	bool addAttribute(const char*, int);
-
-    protected:
-	void endDocument(void);
-	bool startDocument(void);
-
-    private:
-	xmlTextWriterPtr writer;
-    };
-
-    class Reader
-    {
-    public:
-	Reader();
-	~Reader();
-
-	bool open(const char*);
-	bool isValid(void) const;
-
-	void close(void);
-
-	const char* getName(void) const;
-	const char* getLocalName(void) const;
-	const char* getValue(void) const;
-	const char* getAttribute(const char*) const;
-
-    private:
-	xmlTextReaderPtr reader;
-    };
-};
+#include "attribute.h"
+#include "element.h"
+#include "reader.h"
+#include "writer.h"
+#include "tree.h"
 
 #endif

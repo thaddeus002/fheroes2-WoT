@@ -40,10 +40,37 @@
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 extern void PlayPickupSound(void);
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str), experience(0), magic_point(0),
-    move_point(0), artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), hid(ht), race(rc),
+const std::string & HeroesName(Heroes::heroes_t id)
+{
+    static const std::string names[] = {
+	// knight
+	_("Lord Kilburn"), _("Sir Gallanth"), _("Ector"), _("Gvenneth"), _("Tyro"), _("Ambrose"), _("Ruby"), _("Maximus"), _("Dimitry"),
+	// barbarian
+	_("Thundax"), _("Fineous"), _("Jojosh"), _("Crag Hack"), _("Jezebel"), _("Jaclyn"), _("Ergon"), _("Tsabu"), _("Atlas"),
+	// sorceress
+	_("Astra"), _("Natasha"), _("Troyan"), _("Vatawna"), _("Rebecca"), _("Gem"), _("Ariel"), _("Carlawn"), _("Luna"),
+	// warlock
+	_("Arie"), _("Alamar"), _("Vesper"), _("Crodo"), _("Barok"), _("Kastore"), _("Agar"), _("Falagar"), _("Wrathmont"),
+	// wizard
+	_("Myra"), _("Flint"), _("Dawn"), _("Halon"), _("Myrini"), _("Wilfrey"), _("Sarakin"), _("Kalindra"), _("Mandigal"),
+	// necromant
+	_("Zom"), _("Darlana"), _("Zam"), _("Ranloo"), _("Charity"), _("Rialdo"), _("Roxana"), _("Sandro"), _("Celia"),
+	// campains
+	_("Roland"), _("Lord Corlagon"), _("Sister Eliza"), _("Archibald"), _("Lord Halton"), _("Brother Bax"),
+	// loyalty version
+	_("Solmyr"), _("Dainwin"), _("Mog"), _("Uncle Ivan"), _("Joseph"), _("Gallavant"), _("Elderian"), _("Ceallach"), _("Drakonia"), _("Martine"), _("Jarkonas"),
+	// debug
+	"SandySandy", "Unknown" };
+
+    return names[id];
+}
+
+Heroes::Heroes(heroes_t ht, Race::race_t rc) : experience(0), magic_point(0), move_point(0),
+    artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), portrait(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
+    name = HeroesName(ht);
+
     SetModes(ARMYSPREAD);
 
     secondary_skills.reserve(HEROESMAXSKILL);
@@ -130,7 +157,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc, const std::string & str) : name(str
     army.Reset(true);
 
     // extra hero
-    switch(hid)
+    switch(portrait)
     {
         case ROLAND:
             attack    = 0;
@@ -296,8 +323,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // custom troops
-    bool custom_troops = *ptr8;
-    if(custom_troops)
+    if(*ptr8)
     {
         ++ptr8;
 
@@ -357,10 +383,20 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     }
 
     // custom portrate
-    ++ptr8;
+    if(*ptr8)
+    {
+	++ptr8;
 
-    // index sprite portrate
-    ++ptr8;
+	// index sprite portrate
+	if(Heroes::SANDYSANDY > *ptr8)
+	{
+	    portrait = static_cast<heroes_t>(*ptr8);
+	}
+
+	++ptr8;
+    }
+    else
+	ptr8 += 2;
 
     // artifacts
     Artifact::artifact_t artifact = Artifact::UNKNOWN;
@@ -443,11 +479,6 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     move_point = GetMaxMovePoints();
 
     if(Settings::Get().Debug()) Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
-}
-
-bool Heroes::operator== (const Heroes & h) const
-{
-    return hid == h.hid;
 }
 
 const Point & Heroes::GetCenter(void) const
@@ -919,6 +950,7 @@ s8 Heroes::GetLuckWithModificators(std::list<std::string> *list) const
     }
 
     modifiers.clear();
+    modifiers.push_back(std::make_pair(MP2::OBJ_MERMAID, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_FAERIERING, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_FOUNTAIN, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_IDOL, 1));
@@ -1012,6 +1044,8 @@ void Heroes::ActionNewDay(void)
 
     // recovery move points
     move_point = GetMaxMovePoints();
+    // stables visited?
+    if(isVisited(MP2::OBJ_STABLES)) move_point += 400;
 
     // recovery spell points
     if(spell_book.isActive())
@@ -1370,7 +1404,7 @@ void Heroes::LevelUpSkill(const Skill::Secondary::skill_t skill)
 
 void Heroes::Scoute(void)
 {
-    Maps::ClearFog(mp, GetScoute(), color);
+    Maps::ClearFog(GetIndex(), GetScoute(), color);
 }
 
 u8 Heroes::GetScoute(void) const
@@ -1605,9 +1639,14 @@ bool Heroes::MayStillMove(void) const
     return move_point >= Maps::Ground::GetPenalty(Maps::GetIndexFromAbsPoint(mp), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
 }
 
+bool Heroes::isFreeman(void) const
+{
+    return Color::GRAY == color && !Modes(JAIL);
+}
+
 void Heroes::SetFreeman(const u8 reason)
 {
-    if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetRecruits(color).second = hid;
+    if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetRecruits(color).second = this;
     if(Army::LOSE == reason || Army::RETREAT == reason) army.Reset();
 
     color = Color::GRAY;
@@ -1632,6 +1671,31 @@ bool Heroes::isShow(u8 color)
     }
 
     return !tile_from.isFog(color);
+}
+
+const Surface & Heroes::GetPortrait30x22(void) const
+{
+    if(Heroes::SANDYSANDY > portrait) return AGG::GetICN(ICN::MINIPORT, portrait);
+    else
+    if(Heroes::SANDYSANDY == portrait) return AGG::GetICN(ICN::MINIPORT, BAX);
+
+    return AGG::GetICN(ICN::MINIPORT, 0);
+}
+
+const Surface & Heroes::GetPortrait50x46(void) const
+{
+    if(Heroes::SANDYSANDY > portrait) return AGG::GetICN(ICN::PORTMEDI, portrait + 1);
+    else
+    if(Heroes::SANDYSANDY == portrait) return AGG::GetICN(ICN::PORTMEDI, BAX + 1);
+
+    return AGG::GetICN(ICN::PORTMEDI, 0);
+}
+
+const Surface & Heroes::GetPortrait101x93(void) const
+{
+    ICN::icn_t icn = ICN::PORTxxxx(portrait);
+
+    return AGG::GetICN(ICN::UNKNOWN != icn ? icn : ICN::PORT0000, 0);
 }
 
 void Heroes::Dump(void) const

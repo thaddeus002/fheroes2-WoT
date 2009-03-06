@@ -62,7 +62,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     // portrait
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 31;
-    display.Blit(Portrait::Hero(hid, Portrait::BIG), dst_pt);
+    display.Blit(GetPortrait101x93(), dst_pt);
 
     // name
     message = _("%{name} the %{race} ( Level %{level} )");
