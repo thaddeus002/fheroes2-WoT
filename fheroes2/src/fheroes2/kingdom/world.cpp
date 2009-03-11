@@ -1876,3 +1876,13 @@ void World::ActionToEyeMagi(const Color::color_t color) const
 
     for(; it1 != it2; ++it1) Maps::ClearFog(*it1, MAGIEYESCOUTE, color);
 }
+
+GameEvent::Riddle* World::GetSphinx(const u16 index) const
+{
+    std::vector<GameEvent::Riddle *>::const_iterator it1 = vec_riddles.begin();
+    std::vector<GameEvent::Riddle *>::const_iterator it2 = vec_riddles.end();
+
+    for(; it1 != it2; ++it1) if(*it1 && (*it1)->GetIndex() == index) return  *it1;
+
+    return NULL;
+}

@@ -131,16 +131,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 	    display.Flip();
 	}
 
-	if(le.KeyPress(KEY_0) ||
-	   le.KeyPress(KEY_1) ||
-	   le.KeyPress(KEY_2) ||
-	   le.KeyPress(KEY_3) ||
-	   le.KeyPress(KEY_4) ||
-	   le.KeyPress(KEY_5) ||
-	   le.KeyPress(KEY_6) ||
-	   le.KeyPress(KEY_7) ||
-	   le.KeyPress(KEY_8) ||
-	   le.KeyPress(KEY_9))
+	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
 	{
 	    if(first)
 	    {
@@ -234,4 +225,150 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     }
     cursor.Hide();
     return false;
+}
+
+bool Dialog::InputString(const std::string &header, std::string &res)
+{
+    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    Cursor::themes_t oldcursor = cursor.Themes();
+    cursor.SetThemes(cursor.POINTER);
+
+    if(res.size()) res.clear();
+    res.reserve(48);
+
+    TextBox textbox(header, Font::BIG, BOXAREA_WIDTH);
+    Point dst_pt;
+    const Surface & sprite = AGG::GetICN((Settings::Get().EvilInterface() ? ICN::BUYBUILD : ICN::BUYBUILE), 3);
+
+    Box box(10 + textbox.h() + 10 + sprite.h(), OK|CANCEL);
+    const Rect & box_rt = box.GetArea();
+
+    // text
+    dst_pt.x = box_rt.x + (box_rt.w - textbox.w()) / 2;
+    dst_pt.y = box_rt.y + 10;
+    textbox.Blit(dst_pt);
+
+    dst_pt.x = box_rt.x;
+    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    Button buttonOk(dst_pt, system, 1, 2);
+
+    dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
+    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+    Button buttonCancel(dst_pt, system, 3, 4);
+
+    dst_pt.y = box_rt.y + 10 + textbox.h() + 10;
+    dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
+    display.Blit(sprite, dst_pt);
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    buttonOk.Draw();
+    buttonCancel.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    // message loop
+    while(le.HandleEvents())
+    {
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+        le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+
+        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) break;
+	else
+	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ res.clear(); break; }
+	else
+	if(le.KeyPress())
+	{
+	    switch(le.KeyValue())
+	    {
+		case KEY_EXCLAIM:	res += '!'; break;
+		case KEY_QUOTEDBL:	res += '"'; break;
+		case KEY_HASH:		res += '#'; break;
+		case KEY_DOLLAR:	res += '$'; break;
+		case KEY_AMPERSAND:	res += '&'; break;
+		case KEY_QUOTE:		res += '\''; break;
+		case KEY_LEFTPAREN:	res += '('; break;
+		case KEY_RIGHTPAREN:	res += ')'; break;
+		case KEY_ASTERISK:	res += '*'; break;
+		case KEY_PLUS:		res += '+'; break;
+		case KEY_COMMA:		res += ','; break;
+		case KEY_MINUS:		res += '-'; break;
+		case KEY_PERIOD:	res += '.'; break;
+		case KEY_SLASH:		res += '/'; break;
+		case KEY_COLON:		res += ':'; break;
+		case KEY_SEMICOLON:	res += ';'; break;
+		case KEY_LESS:		res += '<'; break;
+		case KEY_EQUALS:	res += '='; break;
+		case KEY_GREATER:	res += '>'; break;
+		case KEY_QUESTION:	res += '?'; break;
+		case KEY_AT:		res += '@'; break;
+		case KEY_LEFTBRACKET:	res += '['; break;
+		case KEY_BACKSLASH:	res += '\\'; break;
+		case KEY_RIGHTBRACKET:	res += ']'; break;
+		case KEY_CARET:		res += '^'; break;
+		case KEY_UNDERSCORE:	res += '_'; break;
+
+		case KEY_0:	res += '0'; break;
+		case KEY_1:	res += '1'; break;
+		case KEY_2:	res += '2'; break;
+		case KEY_3:	res += '3'; break;
+		case KEY_4:	res += '4'; break;
+		case KEY_5:	res += '5'; break;
+		case KEY_6:	res += '6'; break;
+		case KEY_7:	res += '7'; break;
+		case KEY_8:	res += '8'; break;
+		case KEY_9:	res += '9'; break;
+		case KEY_a:	res += 'a'; break;
+		case KEY_b:	res += 'b'; break;
+		case KEY_c:	res += 'c'; break;
+		case KEY_d:	res += 'd'; break;
+		case KEY_e:	res += 'e'; break;
+		case KEY_f:	res += 'f'; break;
+		case KEY_g:	res += 'g'; break;
+		case KEY_h:	res += 'h'; break;
+		case KEY_i:	res += 'i'; break;
+		case KEY_j:	res += 'j'; break;
+		case KEY_k:	res += 'k'; break;
+		case KEY_l:	res += 'l'; break;
+		case KEY_m:	res += 'm'; break;
+		case KEY_n:	res += 'n'; break;
+		case KEY_o:	res += 'o'; break;
+		case KEY_p:	res += 'p'; break;
+		case KEY_q:	res += 'q'; break;
+		case KEY_r:	res += 'r'; break;
+		case KEY_s:	res += 's'; break;
+		case KEY_t:	res += 't'; break;
+		case KEY_u:	res += 'u'; break;
+		case KEY_v:	res += 'v'; break;
+		case KEY_w:	res += 'w'; break;
+		case KEY_x:	res += 'x'; break;
+		case KEY_y:	res += 'y'; break;
+		case KEY_z:	res += 'z'; break;
+		case KEY_SPACE:	res += ' '; break;
+
+		case KEY_BACKSPACE: if(res.size()) res.resize(res.size() - 1); break;
+
+		default: break;
+	    }
+
+	    Text text(res, Font::BIG);
+	    if(text.w() < sprite.w() - 24)
+	    {
+		cursor.Hide();
+		display.Blit(sprite, dst_pt);
+		text.Blit(dst_pt.x + (sprite.w() - text.w()) / 2, dst_pt.y - 1);
+		cursor.Show();
+		display.Flip();
+	    }
+	}
+    }
+
+    cursor.SetThemes(oldcursor);
+    cursor.Hide();
+    return res.size();
 }

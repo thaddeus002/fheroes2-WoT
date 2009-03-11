@@ -87,6 +87,7 @@ void ActionToSirens(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToHutMagi(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToEyeMagi(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index);
 
 u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u16 count, const u16 exp, const u16 buttons = Dialog::OK)
 {
@@ -206,9 +207,9 @@ void BattleLose(Heroes &hero, const u8 reason)
     AGG::PlaySound(M82::KILLFADE);
     hero.FadeOut();
     world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
+    hero.SetFreeman(reason);
     Game::Focus::Get().Reset(Game::Focus::HEROES);
     Game::Focus::Get().Redraw();
-    hero.SetFreeman(reason);
 }
 
 void PlayPickupSound(void)
@@ -437,7 +438,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_TREEKNOWLEDGE:	ActionToTreeKnowledge(*this, object, dst_index); break;
 
 	case MP2::OBJ_ORACLE:		ActionToOracle(*this, object, dst_index); break;
-
+        case MP2::OBJ_SPHINX:		ActionToShinx(*this, object, dst_index); break;
 
 	// loyalty version
         case MP2::OBJ_WATERALTAR:
@@ -455,11 +456,9 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_EYEMAGI:		ActionToEyeMagi(*this, object, dst_index); break;
 
         // object
-        case MP2::OBJ_SPHINX:
+	default:
 	    if(Settings::Get().Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
 	    break;
-
-	default: break;
     }
 }
 
@@ -2905,7 +2904,7 @@ void ActionToArena(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToSirens(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    if(hero.isVisited(obj))
+    if(hero.isVisited(obj, Visit::GLOBAL))
     {
 	PlaySoundVisited;
 	Dialog::Message(MP2::StringObject(obj), _("As the sirens sing their eerie song, your small, determined army manages to overcome the urge to dive headlong into the sea."), Font::BIG, Dialog::OK);
@@ -2962,7 +2961,12 @@ void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index)
 void ActionToHutMagi(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Dialog::Message(MP2::StringObject(obj), _("You enter a rickety hut and talk to the magician who lives there. He tells you of places near and far which may aid you in your journeys."), Font::BIG, Dialog::OK);
-    world.ActionToEyeMagi(hero.GetColor());
+
+    if(!hero.isVisited(obj, Visit::GLOBAL))
+    {
+	hero.SetVisited(dst_index, Visit::GLOBAL);
+	world.ActionToEyeMagi(hero.GetColor());
+    }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToHutMagi: " + hero.GetName());
 }
@@ -2972,4 +2976,52 @@ void ActionToEyeMagi(Heroes &hero, const u8 obj, const u16 dst_index)
     Dialog::Message(MP2::StringObject(obj), _("This eye seems to be intently studying its surroundings."), Font::BIG, Dialog::OK);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToEyeMagi: " + hero.GetName());
+}
+
+void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    GameEvent::Riddle* riddle = world.GetSphinx(dst_index);
+
+    if(riddle && riddle->isValid())
+    {
+	if(Dialog::YES == Dialog::Message("", _("\"I have a riddle for you,\" the Sphinx says. \"Answer correctly, and you shall be rewarded. Answer incorrectly, and you shall be eaten. Do you accept the challenge?\""), Font::BIG, Dialog::YES|Dialog::NO))
+	{
+	    std::string header(_("The Sphinx asks you the following riddle: %{riddle}. Your answer?"));
+	    String::Replace(header, "%{riddle}", riddle->GetMessage());
+	    std::string answer;
+	    Dialog::InputString(header, answer);
+	    if(riddle->AnswerCorrect(answer))
+	    {
+		const Resource::funds_t & res = riddle->GetResource();
+		const Artifact::artifact_t art = riddle->GetArtifact();
+		const std::string say = _("Looking somewhat disappointed, the Sphinx sighs. You've answered my riddle so here's your reward. Now begone.");
+		const u8 count = res.GetValidItems();
+
+		if(count)
+		{
+		    if(1 == count && res.gold && Artifact::UNKNOWN != art)
+			DialogWithArtifactAndGold("", say, art, res.gold);
+		    else
+		    {
+			Dialog::ResourceInfo("", say, res);
+			if(Artifact::UNKNOWN != art) DialogWithArtifact("", say, art);
+		    }
+		}
+		else
+		if(Artifact::UNKNOWN != art) DialogWithArtifact("", say, art);
+
+		riddle->SetQuiet();
+		hero.SetVisited(dst_index, Visit::GLOBAL);
+	    }
+	    else
+	    {
+		Dialog::Message("", _("\"You guessed incorrectly,\" the Sphinx says, smiling. The Sphinx swipes at you with a paw, knocking you to the ground. Another blow makes the world go black, and you know no more."), Font::BIG, Dialog::OK);
+		BattleLose(hero, Army::LOSE);
+	    }
+	}
+    }
+    else
+	Dialog::Message(MP2::StringObject(obj), _("You come across a giant Sphinx. The Sphinx remains strangely quiet."), Font::BIG, Dialog::OK);
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToShinx: " + hero.GetName());
 }

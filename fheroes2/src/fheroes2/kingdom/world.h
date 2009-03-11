@@ -141,6 +141,7 @@ public:
 
     const GameEvent::Day*   GetEventDay(const Color::color_t c) const;
     const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;
+    GameEvent::Riddle* GetSphinx(const u16 index) const;
 
     static u32 GetUniq(void){ return ++uniq0; };
 

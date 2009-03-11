@@ -80,6 +80,10 @@ public:
     const Resource::funds_t & GetResource(void) const{ return resource; };
     Artifact::artifact_t GetArtifact(void) const {return artifact; };
     bool AnswerCorrect(const std::string & answer);
+    u16 GetIndex(void) const{ return index_map; };
+    const std::string & GetMessage(void) const{ return message; };
+    bool isValid(void) const;
+    void SetQuiet(void);
 
 private:
     u16 index_map;
@@ -87,6 +91,7 @@ private:
     Artifact::artifact_t artifact;
     std::vector<std::string> answers;
     std::string message;
+    bool quiet;
 };
 
 };

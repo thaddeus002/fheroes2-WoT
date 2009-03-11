@@ -65,7 +65,10 @@ public:
     u16 h(const u16) const;
 
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
-    static u8 char_w(char, Font::type_t);
+    static u8 CharWidth(char, Font::type_t);
+    static u8 CharHeight(Font::type_t);
+    static u8 CharAscent(Font::type_t);
+    static u8 CharDescent(Font::type_t);
 
 private:
     std::string message;
@@ -90,7 +93,10 @@ public:
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
 
     static bool isspace(u16);
-    static u8 char_w(u16, Font::type_t);
+    static u8 CharWidth(u16, Font::type_t);
+    static u8 CharHeight(Font::type_t);
+    static u8 CharAscent(Font::type_t);
+    static u8 CharDescent(Font::type_t);
 
 private:
     std::vector<u16> message;

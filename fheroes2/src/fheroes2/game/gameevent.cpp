@@ -275,6 +275,7 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     for(u8 i = 0; i < 8; ++i)
     {
 	std::string str(reinterpret_cast<const char *>(ptr8));
+	String::Lower(str);
 	if(count-- && str.size()) answers.push_back(str);
 	ptr8 += 13;
     }
@@ -288,4 +289,16 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
 bool GameEvent::Riddle::AnswerCorrect(const std::string & answer)
 {
     return answers.end() != std::find(answers.begin(), answers.end(), answer);
+}
+
+bool GameEvent::Riddle::isValid(void) const
+{
+    return !quiet;
+}
+
+void GameEvent::Riddle::SetQuiet(void)
+{
+    quiet = true;
+    artifact = Artifact::UNKNOWN;
+    resource = Resource::funds_t();
 }

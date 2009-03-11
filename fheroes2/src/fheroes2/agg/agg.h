@@ -89,6 +89,10 @@ namespace AGG
         const std::vector<u8> & GetMUS(const MUS::mus_t mus);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 	const std::pair<Surface, Surface> & GetFNT(u16);
+#ifdef WITH_TTF
+	const SDL::Font & GetMediumFont(void) const;
+	const SDL::Font & GetSmallFont(void) const;
+#endif
 
 	void LoadExtraICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadICN(const ICN::icn_t icn, bool reflect = false);

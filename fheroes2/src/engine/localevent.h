@@ -35,13 +35,39 @@ enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT
 enum KeySym
 {
     KEY_NONE,
-    KEY_ESCAPE,
-    KEY_RETURN,
     KEY_BACKSPACE,
+    KEY_RETURN,
+    KEY_ESCAPE,
+    KEY_SPACE,
+    KEY_EXCLAIM,
+    KEY_QUOTEDBL,
+    KEY_HASH,
+    KEY_DOLLAR,
+    KEY_AMPERSAND,
+    KEY_QUOTE,
+    KEY_LEFTPAREN,
+    KEY_RIGHTPAREN,
+    KEY_ASTERISK,
+    KEY_PLUS,
+    KEY_COMMA,
+    KEY_MINUS,
+    KEY_PERIOD,
+    KEY_SLASH,
+    KEY_COLON,
+    KEY_SEMICOLON,
+    KEY_LESS,
+    KEY_EQUALS,
+    KEY_GREATER,
+    KEY_QUESTION,
+    KEY_AT,
+    KEY_LEFTBRACKET,
+    KEY_BACKSLASH,
+    KEY_RIGHTBRACKET,
+    KEY_CARET,
+    KEY_UNDERSCORE,
+    KEY_ALT,
     KEY_CONTROL,
     KEY_SHIFT,
-    KEY_BACKSLASH,
-    KEY_SPACE,
     KEY_PAGEUP,
     KEY_PAGEDOWN,
     KEY_F1,
@@ -150,6 +176,7 @@ public:
 
     bool MouseCursor(const Rect &rt) const;
 
+    bool KeyPress(void) const;
     bool KeyPress(KeySym key) const;
     KeySym KeyValue(void) const;
     u16	   KeyMod(void) const;

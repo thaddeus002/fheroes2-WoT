@@ -103,6 +103,7 @@ namespace Dialog
 
     // redistribute count
     bool SelectCount(const std::string &header, u16 min, u16 max, u16 & res);
+    bool InputString(const std::string &, std::string &);
 
     // recruit monster
     u16 RecruitMonster(const Monster & monster, u16 available);

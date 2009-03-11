@@ -915,6 +915,18 @@ const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u16 c)
     return fnt_cache[c];
 }
 
+#ifdef WITH_TTF
+const SDL::Font & AGG::Cache::GetMediumFont(void) const
+{
+    return font_medium;
+}
+
+const SDL::Font & AGG::Cache::GetSmallFont(void) const
+{
+    return font_small;
+}
+#endif
+
 bool AGG::Cache::isValidFonts(void) const
 {
 #ifdef WITH_TTF

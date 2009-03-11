@@ -118,4 +118,24 @@ void SDL::Font::RenderUnicodeChar(Surface & dst, u16 ch, const Colors & clr, ren
     }
 }
 
+int SDL::Font::Height(void) const
+{
+    return fnt ? TTF_FontHeight(fnt) : 0;
+}
+
+int SDL::Font::Ascent(void) const
+{
+    return fnt ? TTF_FontAscent(fnt) : 0;
+}
+
+int SDL::Font::Descent(void) const
+{
+    return fnt ? TTF_FontDescent(fnt) : 0;
+}
+
+int SDL::Font::LineSkip(void) const
+{
+    return fnt ? TTF_FontLineSkip(fnt) : 0;
+}
+
 #endif

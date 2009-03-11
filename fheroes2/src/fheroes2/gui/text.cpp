@@ -22,13 +22,6 @@
 #include "settings.h"
 #include "text.h"
 
-#define WIDTH_BIG	0x0E
-#define WIDTH_SMALL	0x07
-#define SPACE_BIG	0x03
-#define SPACE_SMALL	0x02
-#define HEIGHT_BIG	0x10
-#define HEIGHT_SMALL	0x0B
-
 TextAscii::TextAscii(const std::string & msg, Font::type_t ft) : TextInterface(ft), message(msg)
 {
 }
@@ -48,9 +41,24 @@ void TextAscii::Clear(void)
     message.clear();
 }
 
-u8 TextAscii::char_w(char c, Font::type_t f)
+u8 TextAscii::CharWidth(char c, Font::type_t f)
 {
-    return (c < 0x21 ? (Font::SMALL == f ? WIDTH_SMALL / 2 : WIDTH_BIG / 2) : AGG::GetLetter(c, f).w());
+    return (c < 0x21 ? (Font::SMALL == f ? 4 : 6) : AGG::GetLetter(c, f).w());
+}
+
+u8 TextAscii::CharHeight(Font::type_t f)
+{
+    return CharAscent(f) + CharDescent(f) + 1;
+}
+
+u8 TextAscii::CharAscent(Font::type_t f)
+{
+    return Font::SMALL == f ? 8 : 13;
+}
+
+u8 TextAscii::CharDescent(Font::type_t f)
+{
+    return Font::SMALL == f ? 2 : 3;
 }
 
 u16 TextAscii::w(u16 s, u16 c) const
@@ -63,7 +71,7 @@ u16 TextAscii::w(u16 s, u16 c) const
     if(!c || c > message.size()) c = message.size() - s;
 
     for(u16 ii = s; ii < s + c; ++ii)
-	res += char_w(message[ii], font);
+	res += CharWidth(message[ii], font);
 
     return res;
 }
@@ -82,7 +90,7 @@ u16 TextAscii::h(const u16 width) const
 {
     if(message.empty()) return 0;
     else
-    if(0 == width || w() <= width) return (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+    if(0 == width || w() <= width) return CharHeight(font);
 
     u16 res = 0;
     u16 www = 0;
@@ -95,16 +103,16 @@ u16 TextAscii::h(const u16 width) const
     {
         if(std::isspace(*pos1)) space = pos1;
 
-	if(www + char_w(*pos1, font) >= width)
+	if(www + CharWidth(*pos1, font) >= width)
 	{
 	    www = 0;
-	    res += (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+	    res += CharHeight(font);
 	    if(pos2 != space) pos1 = space + 1;
 	    space = pos2;
 	    continue;
 	}
 
-        www += char_w(*pos1, font);
+        www += CharWidth(*pos1, font);
         ++pos1;
     }
 
@@ -117,14 +125,14 @@ void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
 
     std::string::const_iterator it = message.begin();
     std::string::const_iterator it_end = message.end();
-    u8 oy = 0;
+    s8 oy = 0;
 
     for(; it != it_end; ++it)
     {
 	// space or unknown letter
 	if(*it < 0x21)
 	{
-	    ax += (Font::SMALL == font ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
+	    ax += CharWidth(*it, font);
 	    continue;
 	}
 
@@ -135,14 +143,18 @@ void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
 	switch(*it)
 	{
 	    case '-':
-    		oy = (Font::SMALL == font ? HEIGHT_SMALL / 2 : HEIGHT_BIG / 2);
+    		oy = CharAscent(font) / 2;
+    	    break;
+
+	    case '_':
+    		oy = CharAscent(font);
     	    break;
 
     	    // "
     	    case 0x22:
 	    // '
     	    case 0x27:
-        	oy = (Font::SMALL == font ? SPACE_SMALL : SPACE_BIG);
+        	oy = 0;
     	    break;
 
     	    case 'y':
@@ -150,18 +162,15 @@ void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
     	    case 'p':
     	    case 'q':
     	    case 'j':
-        	oy = (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + SPACE_SMALL : HEIGHT_BIG - sprite.h() + SPACE_BIG);
+        	oy = CharAscent(font) + CharDescent(font) - sprite.h();
     	    break;
 
     	    default:
-        	if(Font::SMALL == font && sprite.h() < HEIGHT_SMALL) oy = HEIGHT_SMALL - sprite.h();
-        	else
-		if(Font::SMALL != font && sprite.h() < HEIGHT_BIG) oy = HEIGHT_BIG - sprite.h();
-		else oy = 0;
+        	oy = CharAscent(font) - sprite.h();
             break;
 	}
 
-	dst.Blit(sprite, ax, ay + oy);
+	dst.Blit(sprite, ax, ay + 2 + oy);
 	ax += sprite.w();
     }
 }
@@ -217,9 +226,30 @@ void TextUnicode::Clear(void)
     message.clear();
 }
 
-u8 TextUnicode::char_w(u16 c, Font::type_t f)
+u8 TextUnicode::CharWidth(u16 c, Font::type_t f)
 {
-    return (c < 0x0021 ? (Font::SMALL == f ? WIDTH_SMALL / 2 : WIDTH_BIG / 2) : AGG::GetUnicodeLetter(c, f).w());
+    return (c < 0x0021 ? (Font::SMALL == f ? 4 : 6) : AGG::GetUnicodeLetter(c, f).w());
+}
+
+u8 TextUnicode::CharHeight(Font::type_t f)
+{
+#ifdef WITH_TTF
+    return Font::SMALL == f ?
+        AGG::Cache::Get().GetSmallFont().Height() :
+        AGG::Cache::Get().GetMediumFont().Height();
+#else
+    return TextAscii::CharHeight(f);
+#endif
+}
+
+u8 TextUnicode::CharAscent(Font::type_t f)
+{
+    return 0;
+}
+
+u8 TextUnicode::CharDescent(Font::type_t f)
+{
+    return 0;
 }
 
 u16 TextUnicode::w(u16 s, u16 c) const
@@ -232,7 +262,7 @@ u16 TextUnicode::w(u16 s, u16 c) const
     if(!c || c > message.size()) c = message.size() - s;
 
     for(u16 ii = s; ii < s + c; ++ii)
-	res += char_w(message[ii], font);
+	res += CharWidth(message[ii], font);
 
     return res;
 }
@@ -251,7 +281,7 @@ u16 TextUnicode::h(const u16 width) const
 {
     if(message.empty()) return 0;
     else
-    if(0 == width || w() <= width) return (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+    if(0 == width || w() <= width) return CharHeight(font);
 
     u16 res = 0;
     u16 www = 0;
@@ -264,16 +294,16 @@ u16 TextUnicode::h(const u16 width) const
     {
         if(isspace(*pos1)) space = pos1;
 
-	if(www + char_w(*pos1, font) >= width)
+	if(www + CharWidth(*pos1, font) >= width)
 	{
 	    www = 0;
-	    res += (Font::SMALL == font ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+	    res += CharHeight(font);
 	    if(pos2 != space) pos1 = space + 1;
 	    space = pos2;
 	    continue;
 	}
 
-        www += char_w(*pos1, font);
+        www += CharWidth(*pos1, font);
         ++pos1;
     }
 
@@ -286,56 +316,23 @@ void TextUnicode::Blit(u16 ax, u16 ay, Surface & dst)
 
     std::vector<u16>::const_iterator it = message.begin();
     std::vector<u16>::const_iterator it_end = message.end();
-    u8 oy = 0;
 
     for(; it != it_end; ++it)
     {
 	// end string
 	if(0 == *it) continue;
 
-	// TODO: size font should depend from ttf
-
 	// space or unknown letter
 	if(*it < 0x0021)
 	{
-	    ax += (Font::SMALL == font ? WIDTH_SMALL / 2 : WIDTH_BIG / 2);
+	    ax += CharWidth(*it, font);
 	    continue;
 	}
 
 	const Surface & sprite = AGG::GetUnicodeLetter(*it, font);
 	if(!sprite.valid()) return;
 
-        // valign
-	switch(*it)
-	{
-	    case L'-':
-    		oy = (Font::SMALL == font ? HEIGHT_SMALL / 2 : HEIGHT_BIG / 2);
-    	    break;
-
-    	    // "
-    	    case L'"':
-	    // '
-    	    case L'\'':
-        	oy = (Font::SMALL == font ? SPACE_SMALL : SPACE_BIG);
-    	    break;
-
-    	    case L'y':
-    	    case L'g':
-    	    case L'p':
-    	    case L'q':
-    	    case L'j':
-        	oy = (Font::SMALL == font ? HEIGHT_SMALL - sprite.h() + SPACE_SMALL : HEIGHT_BIG - sprite.h() + SPACE_BIG);
-    	    break;
-
-    	    default:
-        	if(Font::SMALL == font && sprite.h() < HEIGHT_SMALL) oy = HEIGHT_SMALL - sprite.h();
-        	else
-		if(Font::SMALL != font && sprite.h() < HEIGHT_BIG) oy = HEIGHT_BIG - sprite.h();
-		else oy = 0;
-            break;
-	}
-
-	dst.Blit(sprite, ax, ay + oy);
+	dst.Blit(sprite, ax, ay);
 	ax += sprite.w();
     }
 }
@@ -548,12 +545,12 @@ void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
     while(pos2 < pos3)
     {
         if(std::isspace(*pos2)) space = pos2;
-	u8 char_w = TextAscii::char_w(*pos2, ft);
+	u8 char_w = TextAscii::CharWidth(*pos2, ft);
 
 	if(www + char_w >= width)
 	{
 	    www = 0;
-	    Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+	    Rect::h += TextAscii::CharHeight(ft);
 	    if(pos3 != space) pos2 = space + 1;
 
 	    if(pos3 != space)
@@ -572,7 +569,7 @@ void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 
     if(pos1 != pos2)
     {
-        Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+        Rect::h += TextAscii::CharHeight(ft);
 	messages.push_back(Text(msg.substr(pos1 - msg.begin(), pos2 - pos1), ft));
     }
 }
@@ -592,12 +589,12 @@ void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
     while(pos2 < pos3)
     {
         if(TextUnicode::isspace(*pos2)) space = pos2;
-	u8 char_w = TextUnicode::char_w(*pos2, ft);
+	u8 char_w = TextUnicode::CharWidth(*pos2, ft);
 
 	if(www + char_w >= width)
 	{
 	    www = 0;
-	    Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+	    Rect::h += TextUnicode::CharHeight(ft);
 	    if(pos3 != space) pos2 = space + 1;
 
 	    if(pos3 != space)
@@ -616,7 +613,7 @@ void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 
     if(pos1 != pos2)
     {
-        Rect::h += (Font::SMALL == ft ? HEIGHT_SMALL + SPACE_SMALL : HEIGHT_BIG + SPACE_BIG);
+        Rect::h += TextUnicode::CharHeight(ft);
 	messages.push_back(Text(&msg.at(pos1 - msg.begin()), pos2 - pos1, ft));
     }
 }

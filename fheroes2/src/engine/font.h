@@ -45,6 +45,11 @@ namespace SDL
 	bool isValid(void) const;
 	void SetStyle(u8);
 
+	int Height(void) const;
+	int Ascent(void) const;
+	int Descent(void) const;
+	int LineSkip(void) const;
+
 	void RenderText(Surface &, const std::string &, const Colors &, render_t = SOLID);
 	void RenderChar(Surface &, char, const Colors &, render_t = SOLID);
 	void RenderUnicodeText(Surface &, const u16 *, const Colors &, render_t = SOLID);

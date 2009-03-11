@@ -48,11 +48,38 @@ static KeySym SDLToKeySym(SDLKey key)
 	case SDLK_ESCAPE:	return KEY_ESCAPE;
 	case SDLK_RETURN:	return KEY_RETURN;
 	case SDLK_BACKSPACE:	return KEY_BACKSPACE;
+	case SDLK_EXCLAIM:    	return KEY_EXCLAIM;
+	case SDLK_QUOTEDBL:    	return KEY_QUOTEDBL;
+	case SDLK_HASH:    	return KEY_HASH;
+	case SDLK_DOLLAR:    	return KEY_DOLLAR;
+	case SDLK_AMPERSAND:    return KEY_AMPERSAND;
+	case SDLK_QUOTE:    	return KEY_QUOTE;
+	case SDLK_LEFTPAREN:    return KEY_LEFTPAREN;
+	case SDLK_RIGHTPAREN:   return KEY_RIGHTPAREN;
+	case SDLK_ASTERISK:     return KEY_ASTERISK;
+	case SDLK_PLUS:    	return KEY_PLUS;
+	case SDLK_COMMA:    	return KEY_COMMA;
+	case SDLK_MINUS:    	return KEY_MINUS;
+	case SDLK_PERIOD:    	return KEY_PERIOD;
+	case SDLK_SLASH:    	return KEY_SLASH;
+	case SDLK_COLON:	return KEY_COLON;
+	case SDLK_SEMICOLON:	return KEY_SEMICOLON;
+	case SDLK_LESS:		return KEY_LESS;
+	case SDLK_EQUALS:	return KEY_EQUALS;
+	case SDLK_GREATER:	return KEY_GREATER;
+	case SDLK_QUESTION:	return KEY_QUESTION;
+	case SDLK_AT:		return KEY_AT;
+	case SDLK_LEFTBRACKET:	return KEY_LEFTBRACKET;
+	case SDLK_BACKSLASH:	return KEY_BACKSLASH;
+	case SDLK_RIGHTBRACKET:	return KEY_RIGHTBRACKET;
+	case SDLK_CARET:	return KEY_CARET;
+	case SDLK_UNDERSCORE:	return KEY_UNDERSCORE;
+	case SDLK_LALT:		return KEY_ALT;
+	case SDLK_RALT:		return KEY_ALT;
 	case SDLK_LCTRL:	return KEY_CONTROL;
 	case SDLK_RCTRL:	return KEY_CONTROL;
 	case SDLK_LSHIFT:	return KEY_SHIFT;
 	case SDLK_RSHIFT:	return KEY_SHIFT;
-	case SDLK_BACKSLASH:	return KEY_BACKSLASH;
 	case SDLK_SPACE:	return KEY_SPACE;
 	case SDLK_PAGEUP:	return KEY_PAGEUP;
 	case SDLK_PAGEDOWN:	return KEY_PAGEDOWN;
@@ -404,6 +431,11 @@ u16 LocalEvent::KeyMod(void) const
 KeySym LocalEvent::KeyValue(void) const
 {
     return key_value;
+}
+
+bool LocalEvent::KeyPress(void) const
+{
+    return key_pressed;
 }
 
 bool LocalEvent::KeyPress(KeySym key) const
