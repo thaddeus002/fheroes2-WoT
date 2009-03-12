@@ -2918,6 +2918,7 @@ void ActionToSirens(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.SetVisited(dst_index, Visit::GLOBAL);
 	PlaySoundSuccess;
 	Dialog::Message(MP2::StringObject(obj), str, Font::BIG, Dialog::OK);
+	hero.IncreaseExperience(exp);
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToSirens: " + hero.GetName());
