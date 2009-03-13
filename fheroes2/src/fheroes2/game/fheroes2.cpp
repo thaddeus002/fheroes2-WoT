@@ -22,6 +22,7 @@
 #include <string>
 #include <unistd.h>
 #include <limits.h>
+#include <stdlib.h>
 
 #include "gamedefs.h"
 #include "audio.h"
