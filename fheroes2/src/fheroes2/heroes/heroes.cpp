@@ -514,11 +514,13 @@ u8 Heroes::GetAttack(void) const
 	    case Artifact::SPIKED_HELM:
 	    case Artifact::THUNDER_MACE:
 	    case Artifact::GIANT_FLAIL:
+	    case Artifact::SWORD_BREAKER:
 		result += 1;
 		break;
 
             case Artifact::SPIKED_SHIELD:
             case Artifact::POWER_AXE:
+            case Artifact::LEGENDARY_SCEPTER:
         	result += 2;
 		break;
 	    
@@ -528,6 +530,12 @@ u8 Heroes::GetAttack(void) const
 	
 	    case Artifact::ULTIMATE_CROWN:
 	        result += 4;
+	        break;
+
+	    case Artifact::BATTLE_GARB:
+	    case Artifact::SWORD_ANDURAN:
+	    case Artifact::HOLY_HAMMER:
+	        result += 5;
 	        break;
 	
 	    case Artifact::ULTIMATE_SHIELD:
@@ -563,6 +571,7 @@ u8 Heroes::GetDefense(void) const
 
             case Artifact::SPIKED_SHIELD:
             case Artifact::STEALTH_SHIELD:
+            case Artifact::LEGENDARY_SCEPTER:
                 result += 2;
                 break;
 
@@ -571,7 +580,13 @@ u8 Heroes::GetDefense(void) const
                 break;
 
             case Artifact::ULTIMATE_CROWN:
+	    case Artifact::SWORD_BREAKER:
                 result += 4;
+                break;
+
+            case Artifact::BREASTPLATE_ANDURAN:
+	    case Artifact::BATTLE_GARB:
+                result += 5;
                 break;
 
             case Artifact::ULTIMATE_SHIELD:
@@ -591,7 +606,7 @@ u8 Heroes::GetDefense(void) const
 
 u8 Heroes::GetPower(void) const
 {
-    u8 result = power;
+    s8 result = power;
 
     BagArtifacts::const_iterator it = artifacts.begin();
 
@@ -599,6 +614,10 @@ u8 Heroes::GetPower(void) const
 
 	switch(*it)
 	{
+            case Artifact::BROACH_SHIELDING:
+                result += -2;
+                break;
+
             case Artifact::WHITE_PEARL:
                 result += 1;
                 break;
@@ -606,10 +625,12 @@ u8 Heroes::GetPower(void) const
             case Artifact::BLACK_PEARL:
             case Artifact::CASTER_BRACELET:
             case Artifact::MAGE_RING:
+            case Artifact::LEGENDARY_SCEPTER:
                 result += 2;
                 break;
 
             case Artifact::WITCHES_BROACH:
+            case Artifact::ARM_MARTYR:
                 result += 3;
                 break;
 
@@ -617,6 +638,12 @@ u8 Heroes::GetPower(void) const
             case Artifact::ARCANE_NECKLACE:
                 result += 4;
                 break;
+
+	    case Artifact::BATTLE_GARB:
+	    case Artifact::STAFF_WIZARDRY:
+	    case Artifact::HELMET_ANDURAN:
+	        result += 5;
+	        break;
 
             case Artifact::ULTIMATE_STAFF:
                 result += 6;
@@ -630,7 +657,7 @@ u8 Heroes::GetPower(void) const
                 break;
 	}
 
-    return result;
+    return result < 0 ? 0 : result;
 }
 
 u8 Heroes::GetKnowledge(void) const
@@ -649,6 +676,7 @@ u8 Heroes::GetKnowledge(void) const
 
             case Artifact::BLACK_PEARL:
             case Artifact::MINOR_SCROLL:
+            case Artifact::LEGENDARY_SCEPTER:
                 result += 2;
                 break;
 
@@ -824,6 +852,8 @@ s8 Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
     modifiers.push_back(std::make_pair(Artifact::MEDAL_HONOR, 1));
     modifiers.push_back(std::make_pair(Artifact::MEDAL_DISTINCTION, 1));
     modifiers.push_back(std::make_pair(Artifact::FIZBIN_MISFORTUNE, -2));
+    modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
+    if(isShipMaster()) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
     
     // bonus artifact
     BagArtifacts::const_iterator it = artifacts.begin();
@@ -919,6 +949,8 @@ s8 Heroes::GetLuckWithModificators(std::list<std::string> *list) const
     modifiers.push_back(std::make_pair(Artifact::GOLDEN_HORSESHOE, 1));
     modifiers.push_back(std::make_pair(Artifact::GAMBLER_LUCKY_COIN, 1));
     modifiers.push_back(std::make_pair(Artifact::FOUR_LEAF_CLOVER, 1));
+    modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
+    if(isShipMaster()) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
 
     // bonus artifact
     for(u16 i = 0; i < modifiers.size(); i++)

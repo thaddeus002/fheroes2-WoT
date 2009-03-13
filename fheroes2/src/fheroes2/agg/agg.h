@@ -84,7 +84,7 @@ namespace AGG
 
 	int GetICNCount(const ICN::icn_t icn);
 	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
-	const Surface & GetTIL(const TIL::til_t til, u16 index);
+	const Surface & GetTIL(const TIL::til_t til, u16 index, u8 shape);
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
         const std::vector<u8> & GetMUS(const MUS::mus_t mus);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
@@ -143,7 +143,7 @@ namespace AGG
     // wrapper AGG::GetXXX
     int GetICNCount(const ICN::icn_t icn);
     const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
-    void GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst);
+    const Surface & GetTIL(const TIL::til_t til, const u16 index, const u8 shape);
     const std::vector<u8> & GetWAV(const M82::m82_t m82);
     const std::vector<u8> & GetMUS(const MUS::mus_t mus);
     const std::vector<u8> & GetMID(const XMI::xmi_t xmi);

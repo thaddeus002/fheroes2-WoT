@@ -70,8 +70,6 @@ void World::Defaults(void)
     vec_riddles.reserve(10);
     vec_rumors.reserve(10);
     vec_castles.reserve(MAXCASTLES);
-    vec_teleports.reserve(10);
-    vec_eyes.reserve(4);
 
     // playing kingdom
     vec_kingdoms.resize(KINGDOMMAX + 1);
@@ -793,26 +791,14 @@ void World::LoadMaps(const std::string &filename)
 		break;
 
 	    case MP2::OBJ_WITCHSHUT:
-		map_witchshut[ii] = Skill::Secondary::RandForWitchsHut();
-		break;
-
 	    case MP2::OBJ_SHRINE1:
-		map_shrine[ii] = Rand::Get(10) % 2 ? Spell::RandCombat(1) : Spell::RandAdventure(1);
-		break;
 	    case MP2::OBJ_SHRINE2:
-		map_shrine[ii] = Rand::Get(10) % 2 ? Spell::RandCombat(2) : Spell::RandAdventure(2);
-		break;
 	    case MP2::OBJ_SHRINE3:
-		map_shrine[ii] = Rand::Get(10) % 2 ? Spell::RandCombat(3) : Spell::RandAdventure(3);
+    		tile.UpdateQuantity();
 		break;
 
 	    case MP2::OBJ_STONELIGHTS:
 		tile.UpdateStoneLightsSprite();
-		vec_teleports.push_back(ii);
-		break;
-
-	    case MP2::OBJ_EYEMAGI:
-		vec_eyes.push_back(ii);
 		break;
 
 	    case MP2::OBJ_FOUNTAIN:
@@ -950,8 +936,6 @@ void World::LoadMaps(const std::string &filename)
 		break;
 	}
     }
-
-    AGG::FreeObject(TIL::GROUND32);
 
     // sort castles to kingdoms
     std::vector<Castle *>::const_iterator itc1 = vec_castles.begin();
@@ -1242,13 +1226,9 @@ void World::FreeOldMaps(void)
     vec_heroes.clear();
 
     // extra
-    vec_eyes.clear();
-    vec_teleports.clear();
     map_recruits.clear();
     map_whirlpools.clear();
     map_sign.clear();
-    map_shrine.clear();
-    map_witchshut.clear();
     map_captureobj.clear();
 }
 
@@ -1324,19 +1304,16 @@ const std::string & World::GetRumors(void)
     return vec_rumors[Rand::Get(vec_rumors.size() - 1)];
 }
 
-/* return spell from shrine circle */
-Spell::spell_t World::SpellFromShrine(const u16 index)
-{
-    return map_shrine[index];
-}
-
 /* return random teleport destination */
 u16 World::NextTeleport(const u16 index) const
 {
+    std::vector<u16> vec_teleports;
+    vec_teleports.reserve(10);
+    GetObjectIndexes(vec_teleports, MP2::OBJ_STONELIGHTS, false);
+
     if(2 > vec_teleports.size())
     {
 	Error::Warning("World::NextTeleport: is empty.");
-
 	return index;
     }
 
@@ -1350,9 +1327,7 @@ u16 World::NextTeleport(const u16 index) const
     for(; it1 != it2; ++it1)
     {
 	const u16 & i = *it1;
-	if(i == index) continue;
-	if(type != GetTiles(i).GetQuantity1()) continue;
-	if(NULL != world.GetHeroes(i)) continue;
+	if(i == index || type != GetTiles(i).GetQuantity1()) continue;
 	v.push_back(i);
     }
 
@@ -1403,12 +1378,6 @@ u16 World::NextWhirlpool(const u16 index)
     if(v3.empty()) Error::Warning("World::NextWhirlpool: is full.");
 
     return v3.size() ? *Rand::Get(v3) : index;
-}
-
-/* return skill from witchs hut */
-Skill::Secondary::skill_t World::SkillFromWitchsHut(const u16 index)
-{
-    return map_witchshut[index];
 }
 
 /* return message from sign */
@@ -1871,10 +1840,17 @@ Heroes* World::FromJail(u16 index)
 
 void World::ActionToEyeMagi(const Color::color_t color) const
 {
-    std::vector<u16>::const_iterator it1 = vec_eyes.begin();
-    std::vector<u16>::const_iterator it2 = vec_eyes.end();
+    std::vector<u16> vec_eyes;
+    vec_eyes.reserve(10);
+    GetObjectIndexes(vec_eyes, MP2::OBJ_EYEMAGI, true);
 
-    for(; it1 != it2; ++it1) Maps::ClearFog(*it1, MAGIEYESCOUTE, color);
+    if(vec_eyes.size())
+    {
+	std::vector<u16>::const_iterator it1 = vec_eyes.begin();
+	std::vector<u16>::const_iterator it2 = vec_eyes.end();
+
+	for(; it1 != it2; ++it1) Maps::ClearFog(*it1, MAGIEYESCOUTE, color);
+    }
 }
 
 GameEvent::Riddle* World::GetSphinx(const u16 index) const
@@ -1885,4 +1861,19 @@ GameEvent::Riddle* World::GetSphinx(const u16 index) const
     for(; it1 != it2; ++it1) if(*it1 && (*it1)->GetIndex() == index) return  *it1;
 
     return NULL;
+}
+
+void World::GetObjectIndexes(std::vector<u16> & v, MP2::object_t obj, bool check_hero) const
+{
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+
+    for(; it1 != it2; ++it1)
+	if(*it1 && obj == (*it1)->GetObject()) v.push_back((*it1)->GetIndex());
+	else
+	if(check_hero && *it1 && MP2::OBJ_HEROES == (*it1)->GetObject())
+	{
+	    const Heroes* hero = GetHeroes((*it1)->GetIndex());
+	    if(hero && obj == hero->GetUnderObject()) v.push_back((*it1)->GetIndex());
+	}
 }

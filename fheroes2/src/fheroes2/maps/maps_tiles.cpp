@@ -133,9 +133,9 @@ bool Maps::TilesAddon::isStream(const TilesAddon & ta)
     return ICN::STREAM == MP2::GetICNObject(ta.object);
 }
 
-Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite(TILEWIDTH, TILEWIDTH, 8, SWSURFACE), tile_index(mp2tile.tileIndex),
+Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
-    fogs(0xFF)
+    fogs(0xFF), redraw(true)
 {
     SetTile(mp2tile.tileIndex, mp2tile.shape);
 
@@ -147,9 +147,13 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
 
 void Maps::Tiles::SetTile(const u16 index, const u8 sh)
 {
-    AGG::GetTIL(TIL::GROUND32, index, sh, tile_sprite);
     tile_index = index;
     shape = sh;
+}
+
+const Surface & Maps::Tiles::GetTileSurface(void) const
+{
+    return AGG::GetTIL(TIL::GROUND32, tile_index, shape);
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
@@ -262,7 +266,7 @@ void Maps::Tiles::RedrawTile(void) const
 	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
 	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
 
-	Display::Get().Blit(tile_sprite, dstx, dsty);
+	Display::Get().Blit(GetTileSurface(), dstx, dsty);
     }
 }
 
@@ -608,289 +612,7 @@ void Maps::Tiles::DebugInfo(void) const
 
 MP2::object_t Maps::Tiles::GetObject(void) const
 {
-    switch(general)
-    {
-	case MP2::OBJ_ZERO:		return MP2::OBJ_ZERO;
-	case MP2::OBJN_ALCHEMYLAB:	return MP2::OBJN_ALCHEMYLAB;
-	case MP2::OBJN_DAEMONCAVE:	return MP2::OBJN_DAEMONCAVE;
-	case MP2::OBJN_FAERIERING:	return MP2::OBJN_FAERIERING;
-	case MP2::OBJN_GAZEBO:		return MP2::OBJN_GAZEBO;
-	case MP2::OBJN_GRAVEYARD:	return MP2::OBJN_GRAVEYARD;
-        case MP2::OBJN_ARCHERHOUSE:	return MP2::OBJN_ARCHERHOUSE;
-        case MP2::OBJN_DWARFCOTT:	return MP2::OBJN_DWARFCOTT;
-
-        case MP2::OBJN_PEASANTHUT:	return MP2::OBJN_PEASANTHUT;
-	case MP2::OBJN_DRAGONCITY:	return MP2::OBJN_DRAGONCITY;
-	case MP2::OBJN_LIGHTHOUSE:	return MP2::OBJN_LIGHTHOUSE;
-	case MP2::OBJN_WATERWHEEL:	return MP2::OBJN_WATERWHEEL;
-	case MP2::OBJN_MINES:		return MP2::OBJN_MINES;
-	case MP2::OBJN_OBELISK:		return MP2::OBJN_OBELISK;
-	case MP2::OBJN_OASIS:		return MP2::OBJN_OASIS;
-	case MP2::OBJ_COAST:		return MP2::OBJ_COAST;
-	case MP2::OBJN_SAWMILL:		return MP2::OBJN_SAWMILL;
-	case MP2::OBJN_ORACLE:		return MP2::OBJN_ORACLE;
-
-	case MP2::OBJN_SHIPWRECK:	return MP2::OBJN_SHIPWRECK;
-	case MP2::OBJN_DESERTTENT:	return MP2::OBJN_DESERTTENT;
-	case MP2::OBJN_CASTLE:		return MP2::OBJN_CASTLE;
-        case MP2::OBJN_STONELIGHTS:	return MP2::OBJN_STONELIGHTS;
-	case MP2::OBJN_WAGONCAMP:	return MP2::OBJN_WAGONCAMP;
-	case MP2::OBJN_WINDMILL:	return MP2::OBJN_WINDMILL;
-
-	case MP2::OBJN_RNDTOWN:		return MP2::OBJN_RNDTOWN;
-	case MP2::OBJN_RNDCASTLE:	return MP2::OBJN_RNDCASTLE;
-	case MP2::OBJ_SHRUB2:		return MP2::OBJ_SHRUB2;
-	case MP2::OBJ_NOTHINGSPECIAL:	return MP2::OBJ_NOTHINGSPECIAL;
-	case MP2::OBJN_WATCHTOWER:	return MP2::OBJN_WATCHTOWER;
-	case MP2::OBJN_TREEHOUSE:	return MP2::OBJN_TREEHOUSE;
-	case MP2::OBJN_TREECITY:	return MP2::OBJN_TREECITY;
-	case MP2::OBJN_RUINS:		return MP2::OBJN_RUINS;
-	case MP2::OBJN_FORT:		return MP2::OBJN_FORT;
-	case MP2::OBJN_TRADINGPOST:	return MP2::OBJN_TRADINGPOST;
-
-	case MP2::OBJN_ABANDONEDMINE:	return MP2::OBJN_ABANDONEDMINE;
-	case MP2::OBJN_TREEKNOWLEDGE:	return MP2::OBJN_TREEKNOWLEDGE;
-	case MP2::OBJN_DOCTORHUT:	return MP2::OBJN_DOCTORHUT;
-	case MP2::OBJN_TEMPLE:		return MP2::OBJN_TEMPLE;
-	case MP2::OBJN_HILLFORT:	return MP2::OBJN_HILLFORT;
-	case MP2::OBJN_HALFLINGHOLE:	return MP2::OBJN_HALFLINGHOLE;
-	case MP2::OBJN_MERCENARYCAMP:	return MP2::OBJN_MERCENARYCAMP;
-	case MP2::OBJN_PYRAMID:		return MP2::OBJN_PYRAMID;
-	case MP2::OBJN_CITYDEAD:	return MP2::OBJN_CITYDEAD;
-	case MP2::OBJN_EXCAVATION:	return MP2::OBJN_EXCAVATION;
-	case MP2::OBJN_SPHINX:		return MP2::OBJN_SPHINX;
-
-	case MP2::OBJ_TARPIT:		return MP2::OBJ_TARPIT;
-	case MP2::OBJN_TROLLBRIDGE:	return MP2::OBJN_TROLLBRIDGE;
-	case MP2::OBJN_WITCHSHUT:	return MP2::OBJN_WITCHSHUT;
-	case MP2::OBJN_XANADU:		return MP2::OBJN_XANADU;
-	case MP2::OBJN_CAVE:		return MP2::OBJN_CAVE;
-	case MP2::OBJN_MAGELLANMAPS:	return MP2::OBJN_MAGELLANMAPS;
-	case MP2::OBJN_DERELICTSHIP:	return MP2::OBJN_DERELICTSHIP;
-	case MP2::OBJN_MAGICWELL:	return MP2::OBJN_MAGICWELL;
-
-	case MP2::OBJN_OBSERVATIONTOWER:return MP2::OBJN_OBSERVATIONTOWER;
-	case MP2::OBJN_FREEMANFOUNDRY:	return MP2::OBJN_FREEMANFOUNDRY;
-	case MP2::OBJ_TREES:		return MP2::OBJ_TREES;
-	case MP2::OBJ_MOUNTS:		return MP2::OBJ_MOUNTS;
-	case MP2::OBJ_VOLCANO:		return MP2::OBJ_VOLCANO;
-	case MP2::OBJ_STONES:		return MP2::OBJ_STONES;
-	case MP2::OBJ_FLOWERS:		return MP2::OBJ_FLOWERS;
-	case MP2::OBJ_WATERLAKE:	return MP2::OBJ_WATERLAKE;
-	case MP2::OBJ_MANDRAKE:		return MP2::OBJ_MANDRAKE;
-	case MP2::OBJ_DEADTREE:		return MP2::OBJ_DEADTREE;
-	case MP2::OBJ_STUMP:		return MP2::OBJ_STUMP;
-	case MP2::OBJ_CRATER:		return MP2::OBJ_CRATER;
-	case MP2::OBJ_CACTUS:		return MP2::OBJ_CACTUS;
-	case MP2::OBJ_MOUND:		return MP2::OBJ_MOUND;
-	case MP2::OBJ_DUNE:		return MP2::OBJ_DUNE;
-
-	case MP2::OBJ_LAVAPOOL:		return MP2::OBJ_LAVAPOOL;
-	case MP2::OBJ_SHRUB:		return MP2::OBJ_SHRUB;
-
-	case MP2::OBJ_ALCHEMYLAB:	return MP2::OBJ_ALCHEMYLAB;
-	case MP2::OBJ_SIGN:		return MP2::OBJ_SIGN;
-	case MP2::OBJ_BUOY:		return MP2::OBJ_BUOY;
-	case MP2::OBJ_SKELETON:		return MP2::OBJ_SKELETON;
-	case MP2::OBJ_DAEMONCAVE:	return MP2::OBJ_DAEMONCAVE;
-	case MP2::OBJ_TREASURECHEST:	return MP2::OBJ_TREASURECHEST;
-	case MP2::OBJ_WATERCHEST:	return MP2::OBJ_WATERCHEST;
-	case MP2::OBJ_FAERIERING:	return MP2::OBJ_FAERIERING;
-	case MP2::OBJ_CAMPFIRE:		return MP2::OBJ_CAMPFIRE;
-	case MP2::OBJ_FOUNTAIN:		return MP2::OBJ_FOUNTAIN;
-	case MP2::OBJ_GAZEBO:		return MP2::OBJ_GAZEBO;
-	case MP2::OBJ_ANCIENTLAMP:	return MP2::OBJ_ANCIENTLAMP;
-	case MP2::OBJ_GRAVEYARD:	return MP2::OBJ_GRAVEYARD;
-	case MP2::OBJ_ARCHERHOUSE:	return MP2::OBJ_ARCHERHOUSE;
-	case MP2::OBJ_GOBLINHUT:	return MP2::OBJ_GOBLINHUT;
-	case MP2::OBJ_DWARFCOTT:	return MP2::OBJ_DWARFCOTT;
-
-	case MP2::OBJ_PEASANTHUT:	return MP2::OBJ_PEASANTHUT;
-	case MP2::OBJ_EVENT:		return MP2::OBJ_EVENT;
-	case MP2::OBJ_DRAGONCITY:	return MP2::OBJ_DRAGONCITY;
-	case MP2::OBJ_LIGHTHOUSE:	return MP2::OBJ_LIGHTHOUSE;
-	case MP2::OBJ_WATERWHEEL:	return MP2::OBJ_WATERWHEEL;
-	case MP2::OBJ_MINES:		return MP2::OBJ_MINES;
-	case MP2::OBJ_MONSTER:		return MP2::OBJ_MONSTER;
-	case MP2::OBJ_OBELISK:		return MP2::OBJ_OBELISK;
-	case MP2::OBJ_OASIS:		return MP2::OBJ_OASIS;
-	case MP2::OBJ_RESOURCE:		return MP2::OBJ_RESOURCE;
-	case MP2::OBJ_SAWMILL:		return MP2::OBJ_SAWMILL;
-	case MP2::OBJ_ORACLE:		return MP2::OBJ_ORACLE;
-	case MP2::OBJ_SHRINE1:		return MP2::OBJ_SHRINE1;
-
-	case MP2::OBJ_SHIPWRECK:	return MP2::OBJ_SHIPWRECK;
-	case MP2::OBJ_DESERTTENT:	return MP2::OBJ_DESERTTENT;
-	case MP2::OBJ_CASTLE:		return MP2::OBJ_CASTLE;
-	case MP2::OBJ_STONELIGHTS:	return MP2::OBJ_STONELIGHTS;
-	case MP2::OBJ_WAGONCAMP:	return MP2::OBJ_WAGONCAMP;
-	case MP2::OBJ_WHIRLPOOL:	return MP2::OBJ_WHIRLPOOL;
-	case MP2::OBJ_WINDMILL:		return MP2::OBJ_WINDMILL;
-	case MP2::OBJ_ARTIFACT:		return MP2::OBJ_ARTIFACT;
-	case MP2::OBJ_BOAT:		return MP2::OBJ_BOAT;
-	case MP2::OBJ_RNDULTIMATEARTIFACT:return MP2::OBJ_RNDULTIMATEARTIFACT;
-	case MP2::OBJ_RNDARTIFACT:	return MP2::OBJ_RNDARTIFACT;
-	case MP2::OBJ_RNDRESOURCE:	return MP2::OBJ_RNDRESOURCE;
-	case MP2::OBJ_RNDMONSTER:	return MP2::OBJ_RNDMONSTER;
-
-	case MP2::OBJ_RNDTOWN:		return MP2::OBJ_RNDTOWN;
-	case MP2::OBJ_RNDCASTLE:	return MP2::OBJ_RNDCASTLE;
-	case MP2::OBJ_RNDMONSTER1:	return MP2::OBJ_RNDMONSTER1;
-	case MP2::OBJ_RNDMONSTER2:	return MP2::OBJ_RNDMONSTER2;
-	case MP2::OBJ_RNDMONSTER3:	return MP2::OBJ_RNDMONSTER3;
-	case MP2::OBJ_RNDMONSTER4:	return MP2::OBJ_RNDMONSTER4;
-	case MP2::OBJ_HEROES:		return MP2::OBJ_HEROES;
-	case MP2::OBJ_WATCHTOWER:	return MP2::OBJ_WATCHTOWER;
-	case MP2::OBJ_TREEHOUSE:	return MP2::OBJ_TREEHOUSE;
-	case MP2::OBJ_TREECITY:		return MP2::OBJ_TREECITY;
-	case MP2::OBJ_RUINS:		return MP2::OBJ_RUINS;
-	case MP2::OBJ_FORT:		return MP2::OBJ_FORT;
-	case MP2::OBJ_TRADINGPOST:	return MP2::OBJ_TRADINGPOST;
-
-	case MP2::OBJ_ABANDONEDMINE:	return MP2::OBJ_ABANDONEDMINE;
-	case MP2::OBJ_THATCHEDHUT:	return MP2::OBJ_THATCHEDHUT;
-	case MP2::OBJ_STANDINGSTONES:	return MP2::OBJ_STANDINGSTONES;
-	case MP2::OBJ_IDOL:		return MP2::OBJ_IDOL;
-	case MP2::OBJ_TREEKNOWLEDGE:	return MP2::OBJ_TREEKNOWLEDGE;
-	case MP2::OBJ_DOCTORHUT:	return MP2::OBJ_DOCTORHUT;
-	case MP2::OBJ_TEMPLE:		return MP2::OBJ_TEMPLE;
-	case MP2::OBJ_HILLFORT:		return MP2::OBJ_HILLFORT;
-	case MP2::OBJ_HALFLINGHOLE:	return MP2::OBJ_HALFLINGHOLE;
-	case MP2::OBJ_MERCENARYCAMP:	return MP2::OBJ_MERCENARYCAMP;
-	case MP2::OBJ_SHRINE2:		return MP2::OBJ_SHRINE2;
-	case MP2::OBJ_SHRINE3:		return MP2::OBJ_SHRINE3;
-	case MP2::OBJ_PYRAMID:		return MP2::OBJ_PYRAMID;
-	case MP2::OBJ_CITYDEAD:		return MP2::OBJ_CITYDEAD;
-	case MP2::OBJ_EXCAVATION:	return MP2::OBJ_EXCAVATION;
-	case MP2::OBJ_SPHINX:		return MP2::OBJ_SPHINX;
-
-	case MP2::OBJ_WAGON:		return MP2::OBJ_WAGON;
-	case MP2::OBJN_ARTESIANSPRING:	return MP2::OBJN_ARTESIANSPRING;
-	case MP2::OBJ_ARTESIANSPRING:	return MP2::OBJ_ARTESIANSPRING;
-	case MP2::OBJ_TROLLBRIDGE:	return MP2::OBJ_TROLLBRIDGE;
-	case MP2::OBJN_WATERINGHOLE:	return MP2::OBJN_WATERINGHOLE;
-	case MP2::OBJ_WATERINGHOLE:	return MP2::OBJ_WATERINGHOLE;
-	case MP2::OBJ_WITCHSHUT:	return MP2::OBJ_WITCHSHUT;
-	case MP2::OBJ_XANADU:		return MP2::OBJ_XANADU;
-	case MP2::OBJ_CAVE:		return MP2::OBJ_CAVE;
-	case MP2::OBJ_LEANTO:		return MP2::OBJ_LEANTO;
-	case MP2::OBJ_MAGELLANMAPS:	return MP2::OBJ_MAGELLANMAPS;
-	case MP2::OBJ_FLOTSAM:		return MP2::OBJ_FLOTSAM;
-	case MP2::OBJ_DERELICTSHIP:	return MP2::OBJ_DERELICTSHIP;
-	case MP2::OBJ_SHIPWRECKSURVIROR:return MP2::OBJ_SHIPWRECKSURVIROR;
-	case MP2::OBJ_BOTTLE:		return MP2::OBJ_BOTTLE;
-	case MP2::OBJ_MAGICWELL:	return MP2::OBJ_MAGICWELL;
-	case MP2::OBJ_MAGICGARDEN:	return MP2::OBJ_MAGICGARDEN;
-
-	case MP2::OBJ_OBSERVATIONTOWER:	return MP2::OBJ_OBSERVATIONTOWER;
-	case MP2::OBJ_FREEMANFOUNDRY:	return MP2::OBJ_FREEMANFOUNDRY;
-
-	case MP2::OBJ_RNDARTIFACT1:	return MP2::OBJ_RNDARTIFACT1;
-	case MP2::OBJ_RNDARTIFACT2:	return MP2::OBJ_RNDARTIFACT2;
-	case MP2::OBJ_RNDARTIFACT3:	return MP2::OBJ_RNDARTIFACT3;
-
-
-        // loyality version
-        case MP2::OBJN_JAIL:		return MP2::OBJN_JAIL;
-        case MP2::OBJ_JAIL:		return MP2::OBJ_JAIL;
-        case MP2::OBJN_TRAVELLERTENT:	return MP2::OBJN_TRAVELLERTENT;
-        case MP2::OBJ_TRAVELLERTENT:	return MP2::OBJ_TRAVELLERTENT;
-        case MP2::OBJ_BARRIER:		return MP2::OBJ_BARRIER;
-    
-	case MP2::OBJN_FIREALTAR:	return MP2::OBJN_FIREALTAR;
-	case MP2::OBJ_FIREALTAR:	return MP2::OBJ_FIREALTAR;
-	case MP2::OBJN_AIRALTAR:	return MP2::OBJN_AIRALTAR;
-	case MP2::OBJ_AIRALTAR:		return MP2::OBJ_AIRALTAR;
-	case MP2::OBJN_EARTHALTAR:	return MP2::OBJN_EARTHALTAR;
-	case MP2::OBJ_EARTHALTAR:	return MP2::OBJ_EARTHALTAR;
-	case MP2::OBJN_WATERALTAR:	return MP2::OBJN_WATERALTAR;
-	case MP2::OBJ_WATERALTAR:	return MP2::OBJ_WATERALTAR;
-	case MP2::OBJN_BARROWMOUNDS:	return MP2::OBJN_BARROWMOUNDS;
-	case MP2::OBJ_BARROWMOUNDS:	return MP2::OBJ_BARROWMOUNDS;
-	case MP2::OBJN_ARENA:		return MP2::OBJN_ARENA;
-	case MP2::OBJ_ARENA:		return MP2::OBJ_ARENA;
-	case MP2::OBJN_STABLES:		return MP2::OBJN_STABLES;
-	case MP2::OBJ_STABLES:		return MP2::OBJ_STABLES;
-	case MP2::OBJN_ALCHEMYTOWER:	return MP2::OBJN_ALCHEMYTOWER;
-	case MP2::OBJ_ALCHEMYTOWER:	return MP2::OBJ_ALCHEMYTOWER;
-	case MP2::OBJN_HUTMAGI:		return MP2::OBJN_HUTMAGI;
-	case MP2::OBJ_HUTMAGI:		return MP2::OBJ_HUTMAGI;
-	case MP2::OBJN_EYEMAGI:		return MP2::OBJN_EYEMAGI;
-	case MP2::OBJ_EYEMAGI:		return MP2::OBJ_EYEMAGI;
-	case MP2::OBJN_MERMAID:		return MP2::OBJN_MERMAID;
-	case MP2::OBJ_MERMAID:		return MP2::OBJ_MERMAID;
-	case MP2::OBJN_SIRENS:		return MP2::OBJN_SIRENS;
-	case MP2::OBJ_SIRENS:		return MP2::OBJ_SIRENS;
-	case MP2::OBJ_REEFS:		return MP2::OBJ_REEFS;
-
-	case MP2::OBJ_UNKNW_02:		return MP2::OBJ_UNKNW_02;
-	case MP2::OBJ_UNKNW_03:		return MP2::OBJ_UNKNW_03;
-	case MP2::OBJ_UNKNW_04:		return MP2::OBJ_UNKNW_04;
-	case MP2::OBJ_UNKNW_06:		return MP2::OBJ_UNKNW_06;
-	case MP2::OBJ_UNKNW_08:		return MP2::OBJ_UNKNW_08;
-	case MP2::OBJ_UNKNW_09:		return MP2::OBJ_UNKNW_09;
-	case MP2::OBJ_UNKNW_0B:		return MP2::OBJ_UNKNW_0B;
-	case MP2::OBJ_UNKNW_0E:		return MP2::OBJ_UNKNW_0E;
-	case MP2::OBJ_UNKNW_11:		return MP2::OBJ_UNKNW_11;
-	case MP2::OBJ_UNKNW_12:		return MP2::OBJ_UNKNW_12;
-	case MP2::OBJ_UNKNW_13:		return MP2::OBJ_UNKNW_13;
-	case MP2::OBJ_UNKNW_18:		return MP2::OBJ_UNKNW_18;
-	case MP2::OBJ_UNKNW_1B:		return MP2::OBJ_UNKNW_1B;
-	case MP2::OBJ_UNKNW_1F:		return MP2::OBJ_UNKNW_1F;
-	case MP2::OBJ_UNKNW_21:		return MP2::OBJ_UNKNW_21;
-	case MP2::OBJ_UNKNW_26:		return MP2::OBJ_UNKNW_26;
-	case MP2::OBJ_UNKNW_27:		return MP2::OBJ_UNKNW_27;
-	case MP2::OBJ_UNKNW_29:		return MP2::OBJ_UNKNW_29;
-	case MP2::OBJ_UNKNW_2A:		return MP2::OBJ_UNKNW_2A;
-	case MP2::OBJ_UNKNW_2B:		return MP2::OBJ_UNKNW_2B;
-	case MP2::OBJ_UNKNW_2C:		return MP2::OBJ_UNKNW_2C;
-	case MP2::OBJ_UNKNW_2D:		return MP2::OBJ_UNKNW_2D;
-	case MP2::OBJ_UNKNW_2E:		return MP2::OBJ_UNKNW_2E;
-	case MP2::OBJ_UNKNW_2F:		return MP2::OBJ_UNKNW_2F;
-	case MP2::OBJ_UNKNW_32:		return MP2::OBJ_UNKNW_32;
-	case MP2::OBJ_UNKNW_33:		return MP2::OBJ_UNKNW_33;
-	case MP2::OBJ_UNKNW_34:		return MP2::OBJ_UNKNW_34;
-	case MP2::OBJ_UNKNW_35:		return MP2::OBJ_UNKNW_35;
-	case MP2::OBJ_UNKNW_36:		return MP2::OBJ_UNKNW_36;
-	case MP2::OBJ_UNKNW_37:		return MP2::OBJ_UNKNW_37;
-	case MP2::OBJ_UNKNW_41:		return MP2::OBJ_UNKNW_41;
-	case MP2::OBJ_UNKNW_42:		return MP2::OBJ_UNKNW_42;
-	case MP2::OBJ_UNKNW_43:		return MP2::OBJ_UNKNW_43;
-	case MP2::OBJ_UNKNW_4A:		return MP2::OBJ_UNKNW_4A;
-	case MP2::OBJ_UNKNW_4B:		return MP2::OBJ_UNKNW_4B;
-	case MP2::OBJ_UNKNW_50:		return MP2::OBJ_UNKNW_50;
-	case MP2::OBJ_UNKNW_58:		return MP2::OBJ_UNKNW_58;
-	case MP2::OBJ_UNKNW_5A:		return MP2::OBJ_UNKNW_5A;
-	case MP2::OBJ_UNKNW_5C:		return MP2::OBJ_UNKNW_5C;
-	case MP2::OBJ_UNKNW_5D:		return MP2::OBJ_UNKNW_5D;
-	case MP2::OBJ_UNKNW_5F:		return MP2::OBJ_UNKNW_5F;
-	case MP2::OBJ_UNKNW_62:		return MP2::OBJ_UNKNW_62;
-	case MP2::OBJ_UNKNW_79:		return MP2::OBJ_UNKNW_79;
-	case MP2::OBJ_UNKNW_7A:		return MP2::OBJ_UNKNW_7A;
-	case MP2::OBJ_UNKNW_91:		return MP2::OBJ_UNKNW_91;
-	case MP2::OBJ_UNKNW_92:		return MP2::OBJ_UNKNW_92;
-	case MP2::OBJ_UNKNW_A1:		return MP2::OBJ_UNKNW_A1;
-	case MP2::OBJ_UNKNW_A6:		return MP2::OBJ_UNKNW_A6;
-	case MP2::OBJ_UNKNW_AA:		return MP2::OBJ_UNKNW_AA;
-	case MP2::OBJ_UNKNW_B2:		return MP2::OBJ_UNKNW_B2;
-	case MP2::OBJ_UNKNW_B8:		return MP2::OBJ_UNKNW_B8;
-	case MP2::OBJ_UNKNW_B9:		return MP2::OBJ_UNKNW_B9;
-	case MP2::OBJ_UNKNW_D1:		return MP2::OBJ_UNKNW_D1;
-	case MP2::OBJ_UNKNW_E2:		return MP2::OBJ_UNKNW_E2;
-	case MP2::OBJ_UNKNW_E3:		return MP2::OBJ_UNKNW_E3;
-	case MP2::OBJ_UNKNW_E4:		return MP2::OBJ_UNKNW_E4;
-	case MP2::OBJ_UNKNW_E5:		return MP2::OBJ_UNKNW_E5;
-	case MP2::OBJ_UNKNW_E6:		return MP2::OBJ_UNKNW_E6;
-	case MP2::OBJ_UNKNW_E7:		return MP2::OBJ_UNKNW_E7;
-	case MP2::OBJ_UNKNW_E8:		return MP2::OBJ_UNKNW_E8;
-	case MP2::OBJ_UNKNW_F9:		return MP2::OBJ_UNKNW_F9;
-	case MP2::OBJ_UNKNW_FA:		return MP2::OBJ_UNKNW_FA;
-
-
-	default: Error::Warning("Maps::Tiles::GetObject: unknown object: ", general); Error::Warning("maps index: ", maps_index); break;
-    }
-    
-    return MP2::OBJ_ZERO;
+    return static_cast<MP2::object_t>(general);
 }
 
 /* accept move */
@@ -1472,6 +1194,22 @@ void Maps::Tiles::UpdateQuantity(void)
 
     switch(general)
     {
+        case MP2::OBJ_WITCHSHUT:
+                quantity1 = Skill::Secondary::RandForWitchsHut();
+	break;
+
+	case MP2::OBJ_SHRINE1:
+                quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(1) : Spell::RandAdventure(1);
+            break;
+
+        case MP2::OBJ_SHRINE2:
+                quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(2) : Spell::RandAdventure(2);
+            break;
+
+        case MP2::OBJ_SHRINE3:
+                quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(3) : Spell::RandAdventure(3);
+            break;
+
 	case MP2::OBJ_SKELETON:
 	    switch(Rand::Get(1, 2))
 	    {
@@ -1972,4 +1710,14 @@ void Maps::Tiles::SetFog(u8 color)
 void Maps::Tiles::ClearFog(u8 color)
 {
     if(fogs & color) fogs &= ~color;
+}
+
+bool Maps::Tiles::NeedRedraw(void) const
+{
+    return redraw;
+}
+
+void Maps::Tiles::SetRedraw(bool f)
+{
+    redraw = f;
 }

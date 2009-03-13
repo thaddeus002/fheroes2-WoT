@@ -138,13 +138,13 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_SHRINE3:
 	    // addons pack
 	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
-		visit_status = "(" + Spell::String(world.SpellFromShrine(tile.GetIndex())) + ")";
+		visit_status = "(" + Spell::String(Spell::Spell(tile.GetQuantity2())) + ")";
 	    break;
 
 	case MP2::OBJ_WITCHSHUT:
 	    // addons pack
 	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
-		visit_status = "(" + Skill::Secondary::String(world.SkillFromWitchsHut(tile.GetIndex())) + ")";
+		visit_status = "(" + Skill::Secondary::String(Skill::Secondary::Skill(tile.GetQuantity1())) + ")";
 	    break;
 
         case MP2::OBJ_OBELISK:

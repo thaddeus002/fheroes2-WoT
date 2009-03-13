@@ -79,6 +79,7 @@ namespace Skill
 	Level::type_t	Level(void) const;
 	skill_t		Skill(void) const;
 
+	static skill_t 	Skill(const u8);
 	static skill_t 	FromMP2(const u8 byte);
 	static skill_t 	RandForWitchsHut(void);
 	static const std::string & String(const skill_t skill);

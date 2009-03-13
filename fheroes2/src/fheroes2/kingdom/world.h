@@ -121,8 +121,6 @@ public:
     u16 NextTeleport(const u16 index) const;
     u16 NextWhirlpool(const u16 index);
 
-    Spell::spell_t SpellFromShrine(const u16 index);
-    Skill::Secondary::skill_t SkillFromWitchsHut(const u16 index);
     const std::string & MessageSign(const u16 index);
 
     u16 GetNearestObject(const u16 center, const MP2::object_t obj);
@@ -149,6 +147,7 @@ protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
     void UpdateRecruits(void);
+    void GetObjectIndexes(std::vector<u16> &, MP2::object_t, bool) const;
     Heroes* GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
 private:
@@ -169,14 +168,10 @@ private:
     std::vector<std::string>     	vec_rumors;
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
-    std::vector<u16>                    vec_teleports;
-    std::vector<u16>                    vec_eyes;
 
     std::map<Color::color_t, Recruits>	map_recruits;
     std::map<u32, std::vector<u16> >	map_whirlpools;
     std::map<u16, std::string>		map_sign;
-    std::map<u16, Spell::spell_t>	map_shrine;
-    std::map<u16, Skill::Secondary::skill_t> map_witchshut;
 
     // index, object, color
     std::map<u16, std::pair<MP2::object_t, Color::color_t> > map_captureobj;

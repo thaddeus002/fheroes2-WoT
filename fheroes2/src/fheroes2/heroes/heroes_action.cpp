@@ -269,8 +269,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     const Heroes *hero = NULL;
     if(Maps::ScanDistanceObject(tile.GetIndex(), MP2::OBJ_HEROES, 1, &index)) hero = world.GetHeroes(index);
 
-    Surface sf(tile.GetSurface());
-
+    Surface sf(tile.GetTileSurface());
     const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
     sf.Blit(sprite, sprite.x(), sprite.y());
 
@@ -883,7 +882,7 @@ void ActionToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Spell::spell_t spell = world.SpellFromShrine(dst_index);
+    const Spell::spell_t spell = Spell::Spell(world.GetTiles(dst_index).GetQuantity1());
     const std::string & spell_name = Spell::String(spell);
     const u8 spell_level = Spell::Level(spell);
 
@@ -937,7 +936,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Skill::Secondary::skill_t skill = world.SkillFromWitchsHut(dst_index);
+    const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(world.GetTiles(dst_index).GetQuantity1());
     const std::string & skill_name = Skill::Secondary::String(skill);
     const std::string head = _("Witch's Hut");
 

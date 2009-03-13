@@ -238,6 +238,11 @@ Skill::Secondary::skill_t Skill::Secondary::Skill(void) const
     return UNKNOWN;
 }
 
+Skill::Secondary::skill_t Skill::Secondary::Skill(const u8 index)
+{
+    return index > ESTATES ? UNKNOWN : static_cast<skill_t>(index);
+}
+
 Skill::Secondary::skill_t Skill::Secondary::FromMP2(const u8 byte)
 {
     switch(byte)

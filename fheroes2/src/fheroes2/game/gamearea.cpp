@@ -407,7 +407,7 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
 
     // TIL::CLOF32
     if(DIRECTION_ALL == around)
-	display.Blit(AGG::Cache::Get().GetTIL(TIL::CLOF32, dst_index % 4), dstx, dsty);
+	display.Blit(AGG::GetTIL(TIL::CLOF32, dst_index % 4, 0), dstx, dsty);
     else
     {
 	u8 index = 0;
@@ -606,7 +606,7 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
 	// unknown
 	else
 	{
-	    display.Blit(AGG::Cache::Get().GetTIL(TIL::CLOF32, dst_index % 4), dstx, dsty);
+	    display.Blit(AGG::GetTIL(TIL::CLOF32, dst_index % 4, 0), dstx, dsty);
 	    return;
 	}
 

@@ -63,7 +63,7 @@ namespace Maps
 	u8 GetQuantity1(void) const{ return quantity1; };
 	u8 GetQuantity2(void) const{ return quantity2; };
 	Ground::ground_t GetGround(void) const;
-	const Surface & GetSurface(void) const{ return tile_sprite; };
+	const Surface & GetTileSurface(void) const;
 	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().uniq : 0; };
 	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().uniq : 0; };
 	u32 GetSize1(void) const{ return addons_level1.size(); };
@@ -128,6 +128,9 @@ namespace Maps
 	void SetFog(u8 color);
 	void ClearFog(u8 color);
 
+	bool NeedRedraw(void) const;
+	void SetRedraw(bool);
+
 	void FixLoyaltyVersion(void);
 
 	u16 GetCountMonster(void) const;
@@ -150,17 +153,18 @@ namespace Maps
 	friend void Game::SaveXML(const std::string &);
 	friend void Game::LoadXML(const std::string &);
 
+        std::list<TilesAddon> addons_level1;
+        std::list<TilesAddon> addons_level2;
+
 	const u16 maps_index;
-	Surface tile_sprite;
 	u16	tile_index;
+
 	u8	shape;
         u8      general;
         u8      quantity1;
         u8      quantity2;
-        std::list<TilesAddon> addons_level1;
-        std::list<TilesAddon> addons_level2;
-
         u8	fogs;
+	bool	redraw;
     };
 };
 

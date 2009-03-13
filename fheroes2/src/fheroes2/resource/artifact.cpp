@@ -123,7 +123,7 @@ namespace Artifact
 	{ _("Dummy 3"), _("The reserved artifact.") },
 	{ _("Dummy 4"), _("The reserved artifact.") },
 
-	{ _("Spell Scroll"), _("This Spell Scroll gives your hero the ability to cast the '%s' spell. ") },
+	{ _("Spell Scroll"), _("This Spell Scroll gives your hero the ability to cast the %{spell} spell.") },
 	{ _("Arm of the Martyr"), _("The Arm of the Martyr increases your spell power by 3 but adds the undead morale penalty. ") },
 	{ _("Breastplate of Anduran"), _("The Breastplate increases your defense by 5. ") },
 	{ _("Broach of Shielding"), _("The Broach of Shielding provides 50% protection from Armageddon and Elemental Storm, but decreases spell power by 2. ") },

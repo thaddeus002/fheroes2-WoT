@@ -556,7 +556,7 @@ void AIToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Skill::Secondary::skill_t skill = world.SkillFromWitchsHut(dst_index);
+    const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(world.GetTiles(dst_index).GetQuantity1());
 
     // check full
     if(HEROESMAXSKILL > hero.CountSecondarySkill() && !hero.HasSecondarySkill(skill))
@@ -568,7 +568,7 @@ void AIToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Spell::spell_t spell = world.SpellFromShrine(dst_index);
+    const Spell::spell_t spell = Spell::Spell(world.GetTiles(dst_index).GetQuantity1());
     const u8 spell_level = Spell::Level(spell);
 
     // check spell book
@@ -1072,7 +1072,7 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
                 // check spell book
 		HasArtifact(Artifact::MAGIC_BOOK) &&
                 // check valid level spell and wisdom skill
-                !(3 == Spell::Level(world.SpellFromShrine(index)) &&
+                !(3 == Spell::Level(Spell::Spell(world.GetTiles(index).GetQuantity1())) &&
                 Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM))) return true;
 	    break;
 

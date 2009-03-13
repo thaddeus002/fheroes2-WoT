@@ -521,7 +521,7 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 		    break;
 		}
 
-		v.resize(count);
+		v.resize(4 * count, NULL);
 		
 		for(u16 ii = 0; ii < count; ++ii)
 		{
@@ -851,20 +851,43 @@ int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 }
 
 /* return TIL surface from AGG::Cache */
-const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index)
+const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 {
-    const std::vector<Surface *> & v = til_cache[til];
+    std::vector<Surface *> & v = til_cache[til];
 
     if(0 == v.size()) LoadTIL(til);
 
-    if(index >= v.size())
-    {
-	Error::Warning("AGG::GetTIL: " + TIL::GetString(til) + ", index out of range: ", index);
+    u16 index2 = index;
 
-	index = 0;
+    if(shape)
+    {
+	switch(til)
+	{
+	    case TIL::STON: index2 += 36 * (shape % 4); break;
+	    case TIL::CLOF32: index2 += 4 * (shape % 4); break;
+	    case TIL::GROUND32: index2 += 432 * (shape % 4); break;
+	    default: break;
+	}
     }
 
-    const Surface * surface = v[index];
+    if(index2 >= v.size())
+    {
+	Error::Warning("AGG::GetTIL: " + TIL::GetString(til) + ", index out of range: ", index);
+	index2 = 0;
+    }
+
+    Surface* surface = v[index2];
+
+    if(shape && NULL == surface)
+    {
+	const Surface* src = v[index];
+
+	if(src)
+	{
+	    surface = v[index2] = new Surface(src->w(), src->h(), 8, SDL_SWSURFACE);
+	    TIL::Reflect(*surface, *src, shape);
+	}
+    }
 
     if(NULL == surface)
     {
@@ -968,11 +991,9 @@ const Sprite & AGG::GetICN(const ICN::icn_t icn, const u16 index, bool reflect)
     return AGG::Cache::Get().GetICN(icn, index, reflect);
 }
 
-void AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shape, Surface & dst)
+const Surface & AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shape)
 {
-    const Surface & src = AGG::Cache::Get().GetTIL(til, index);
-
-    TIL::Reflect(dst, src, shape);
+    return AGG::Cache::Get().GetTIL(til, index, shape);
 }
 
 const std::vector<u8> & AGG::GetWAV(const M82::m82_t m82)

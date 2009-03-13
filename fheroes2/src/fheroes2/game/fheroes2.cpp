@@ -154,6 +154,8 @@ int main(int argc, char **argv)
 	if(SDL::Init(subsystem))
 	try
 	{
+	    std::atexit(SDL::Quit);
+
 	    if(Mixer::isValid())
 	    {
                 const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
@@ -284,8 +286,6 @@ int main(int argc, char **argv)
 	{
 	    conf.Dump();
 	}
-
-	SDL::Quit();
 
 	std::cout << "Bye." << std::endl;
 	

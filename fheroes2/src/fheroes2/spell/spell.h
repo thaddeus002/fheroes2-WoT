@@ -116,6 +116,8 @@ namespace Spell
 	FREECELL
     } target_t;
 
+    spell_t Spell(u8);
+
     const std::string &String(spell_t spell);
     u8 Mana(spell_t spell);
     u8 Level(u8);

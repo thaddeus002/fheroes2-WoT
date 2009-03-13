@@ -99,6 +99,14 @@ void Surface::Set(u16 sw, u16 sh, bool alpha)
     LoadPalette();
 }
 
+void Surface::Set(u16 sw, u16 sh, u8 depth, u32 fl)
+{
+    if(surface) SDL_FreeSurface(surface);
+
+    CreateSurface(sw, sh, depth,  fl);
+    LoadPalette();
+}
+
 u16 Surface::w(void) const
 {
     return surface ? surface->w : 0;

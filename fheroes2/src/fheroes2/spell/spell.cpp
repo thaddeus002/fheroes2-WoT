@@ -107,6 +107,11 @@ namespace Spell
     };
 };
 
+Spell::spell_t Spell::Spell(u8 index)
+{
+    return index > STONE ? NONE : static_cast<spell_t>(index);
+}
+
 const std::string &Spell::String(spell_t spell)
 { 
 //     std::string str = Spell::all_spells[spell].name + " ["; 

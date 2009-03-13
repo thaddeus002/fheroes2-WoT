@@ -50,6 +50,7 @@ public:
 
     Surface & operator= (const Surface & bs);
     void Set(u16 sw, u16 sh, bool alpha = false);
+    void Set(u16 sw, u16 sh, u8 depth, u32 fl);
 
     u16 w(void) const;
     u16 h(void) const;
