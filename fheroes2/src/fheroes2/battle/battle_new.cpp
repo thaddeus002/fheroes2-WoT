@@ -1076,7 +1076,9 @@ Battle::FlyAction::FlyAction(const Point &move, Army::BattleTroop &myTroop)
 : Battle::MoveAction(myTroop)
 {
     const Point &start = Bf2Scr(myTroop.Position());
-    m_end = Bf2Scr(move);
+    if(myTroop.isWide())
+        m_end = Bf2Scr(move + Point( move.x < myTroop.Position().x ? 1 : 0 ) );
+    else m_end = Bf2Scr(move);
 
     myTroop.SetMoving(true);
         
@@ -1851,12 +1853,7 @@ namespace Battle
                     }
                 } else {
                     // empty cell
-                    bool canmove = false;
-                    for(u16 i = 0; i < m_movePoints.size(); i++)
-                        if(m_movePoints[i] == cur_pt) {
-                            canmove = true; 
-                            break;
-                        }
+                    bool canmove = std::find(m_movePoints.begin(), m_movePoints.end(), cur_pt) != m_movePoints.end();
                     if(canmove) {
                         std::string str2, str;
                         if(myTroop.isFly()) cursor.SetThemes(cursor.WAR_FLIGHT), str2 = _("Fly");
