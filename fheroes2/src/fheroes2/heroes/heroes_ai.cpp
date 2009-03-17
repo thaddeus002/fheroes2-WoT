@@ -177,7 +177,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
 
     const u32 exp = army.CalculateExperience();
-    const Army::battle_t b = Army::WIN; //Army::Battle(hero, army, tile);
+    const Army::battle_t b = Army::Battle(hero, army, tile);
 
     switch(b)
     {
@@ -744,7 +744,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    // battle
 	    const u32 exp = army.CalculateExperience();
-	    const Army::battle_t b = Army::WIN; //Army::Battle(hero, army, tile);
+	    const Army::battle_t b = Army::Battle(hero, army, tile);
 	    switch(b)
 	    {
 		case Army::WIN:
@@ -788,7 +788,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 		// battle
 		const u32 exp = army.CalculateExperience();
-		const Army::battle_t b = Army::WIN; //Army::Battle(hero, army, tile);
+		const Army::battle_t b = Army::Battle(hero, army, tile);
 		switch(b)
 		{
 		    case Army::WIN:
@@ -819,7 +819,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    // battle
 	    const u32 exp = army.CalculateExperience();
-	    const Army::battle_t b = Army::WIN; //Army::Battle(hero, army, tile);
+	    const Army::battle_t b = Army::Battle(hero, army, tile);
 	    switch(b)
 	    {
 		case Army::WIN:
@@ -878,7 +878,7 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    // battle
 	    const u32 exp = army.CalculateExperience();
-	    const Army::battle_t b = Army::WIN; //Army::Battle(hero, army, tile);
+	    const Army::battle_t b = Army::Battle(hero, army, tile);
 	    switch(b)
 	    {
 		case Army::WIN:
