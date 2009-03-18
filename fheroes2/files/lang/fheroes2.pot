@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-16 09:15+0800\n"
+"POT-Creation-Date: 2009-03-17 21:23-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,105 +219,105 @@ msgid "Return to the battle."
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:417
-#: ../fheroes2/battle/battle_new.cpp:2803
+#: ../fheroes2/battle/battle_new.cpp:2815
 msgid "Hero's Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:640
+#: ../fheroes2/battle/battle_new.cpp:643
 msgid "Low morale causes the %{name} to freeze in panic."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:721
+#: ../fheroes2/battle/battle_new.cpp:727
 msgid "High morale enables the %{name} to attack again."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1426
+#: ../fheroes2/battle/battle_new.cpp:1438
 msgid "%{name} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1432
+#: ../fheroes2/battle/battle_new.cpp:1444
 msgid " %{value} %{name} perishes."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1511
+#: ../fheroes2/battle/battle_new.cpp:1523
 msgid "That spell will affect no one!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1530
+#: ../fheroes2/battle/battle_new.cpp:1542
 msgid "The %{spell} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1536
+#: ../fheroes2/battle/battle_new.cpp:1548
 msgid "The %{spell} does %{value} damage to the %{name}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1793
-#: ../fheroes2/battle/battle_new.cpp:1842
+#: ../fheroes2/battle/battle_new.cpp:1805
+#: ../fheroes2/battle/battle_new.cpp:1854
 msgid "View %{name} info."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1809
+#: ../fheroes2/battle/battle_new.cpp:1821
 msgid "Shoot %{name} (%{value} shot(s) left)"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1822
+#: ../fheroes2/battle/battle_new.cpp:1834
 msgid "Attack %{name}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1859
+#: ../fheroes2/battle/battle_new.cpp:1871
 msgid "Fly"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1860
+#: ../fheroes2/battle/battle_new.cpp:1872
 msgid "Move"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1861
+#: ../fheroes2/battle/battle_new.cpp:1873
 msgid "%{move} %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2770
+#: ../fheroes2/battle/battle_new.cpp:2782
 msgid "Skip"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2770
+#: ../fheroes2/battle/battle_new.cpp:2782
 msgid ""
 "Skip the current creature. The current creature loses its turn and does not "
 "get to go again until the next round."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2771
-#: ../fheroes2/battle/battle_new.cpp:2795
+#: ../fheroes2/battle/battle_new.cpp:2783
+#: ../fheroes2/battle/battle_new.cpp:2807
 msgid "Auto Combat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2771
+#: ../fheroes2/battle/battle_new.cpp:2783
 msgid "Allows the computer to fight out the battle for you."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2772
+#: ../fheroes2/battle/battle_new.cpp:2784
 #: ../fheroes2/editor/editor_startgame.cpp:804
 #: ../fheroes2/game/game_startgame.cpp:1469
 msgid "System Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2772
+#: ../fheroes2/battle/battle_new.cpp:2784
 msgid "Allows you to customize the combat screen."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2779
+#: ../fheroes2/battle/battle_new.cpp:2791
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2791
+#: ../fheroes2/battle/battle_new.cpp:2803
 msgid "Skip this unit"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2799
+#: ../fheroes2/battle/battle_new.cpp:2811
 msgid "Customize system options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2807
+#: ../fheroes2/battle/battle_new.cpp:2819
 msgid "View Opposing Hero"
 msgstr ""
 
@@ -1020,10 +1020,6 @@ msgstr ""
 
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:134
 msgid "Shots Left"
-msgstr ""
-
-#: ../fheroes2/dialog/dialog_armyinfo.cpp:134
-msgid "Shots"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:149

@@ -621,7 +621,10 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         if(currentTroop == (s8)troopOrder.size())
         {
             if(!validMove) //HACK for termination if battle is halted after full turn
+            {
+                Error::Warning("WARNING: Battle ended due to faulty AI.");
                 break;
+            }
             else validMove = false;
         }
         
@@ -674,8 +677,11 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         else if(status != GUI::NONE)
             break;
 
-        if(!PerformMove(troopIdx, move, !BfValid(attack)))
+        if(!PerformMove(troopIdx, move, !BfValid(attack)) && !BfValid(attack))
+        {
+            Error::Warning("Battle: invalid move attempted");
             continue;
+        }
         else validMove = true;
 
         //FIXME: Could lose out on morale/luck boost?
@@ -758,6 +764,8 @@ Battle::BattleTurn *Battle::BattleControl::CreateTurn(HeroBase *hero, Army::Batt
 
 void Battle::BattleControl::NewTurn()
 {
+    //Error::Warning("Battle::NewTurn");
+    
     Army::NewTurn(m_battlefield.GetArmy(0));
     Army::NewTurn(m_battlefield.GetArmy(1));
     for(u8 i = 0; i < 2; i++)
@@ -1228,6 +1236,21 @@ long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, c
     return damage;
 }
 
+void Battle::BattleControl::PerformAttackPreLogic(Army::BattleTroop &attacker, const std::vector<Army::BattleTroop *> &targets, bool ranged)
+{
+    for(u16 tid = 0; tid < targets.size(); tid++)
+    {
+        Army::BattleTroop &target = *targets[tid];
+            
+        long damage = CalculateDamage(attacker, target);
+        target.damageToApply = damage;
+            
+        //TODO: Don't gain experience from damage to own troop
+        //if(troopN >= 0) EXP1 += std::min(damage, (long)target.TotalHP());
+        //else EXP2 += std::min(damage, (long)target.TotalHP());            
+    }
+}
+
 bool Battle::BattleControl::PerformAttackLogic(Army::BattleTroop &attacker, const std::vector<Army::BattleTroop *> &targets, bool ranged, long &damage, u16 &perished)
 {
     bool retaliate = true;
@@ -1235,17 +1258,11 @@ bool Battle::BattleControl::PerformAttackLogic(Army::BattleTroop &attacker, cons
     for(u16 tid = 0; tid < targets.size(); tid++)
     {
         Army::BattleTroop &target = *targets[tid];
-        long thisDamage = target.damageToApply;
-            
-        //TODO: Don't gain experience from damage to own troop
-        //if(troopN >= 0) EXP1 += std::min(damage, (long)target.TotalHP());
-        //else EXP2 += std::min(damage, (long)target.TotalHP());
-        
         int tempPerished = target.ApplyDamage(target.damageToApply);
         if(!tid) //Only the original target matters
         {
             perished = tempPerished;
-            damage = thisDamage;
+            damage = target.damageToApply;
             if(!target.Count())
                 retaliate = false;
         }
@@ -1265,14 +1282,7 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
     for(u16 tid = 0; tid < targets.size(); tid++)
     {
         Army::BattleTroop &target = *targets[tid];
-            
-        long damage = CalculateDamage(attacker, target);
-        target.damageToApply = damage;
-            
-        //TODO: Don't gain experience from damage to own troop
-        //if(troopN >= 0) EXP1 += std::min(damage, (long)target.TotalHP());
-        //else EXP2 += std::min(damage, (long)target.TotalHP());
-            
+        long damage = target.damageToApply;
         Monster::animstate_t targetstate;
         M82::m82_t targetsound;
         if(target.IsDamageFatal(damage)) {
@@ -1416,6 +1426,8 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
 
     bool ranged = myTroop.isArchers() && myTroop.shots > 0 && !myTroop.Modes(Army::HANDFIGHTING);
 
+    PerformAttackPreLogic(myTroop, targets, ranged);
+    
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
         PerformAttackAnimation(myTroop, targets, ranged);
 

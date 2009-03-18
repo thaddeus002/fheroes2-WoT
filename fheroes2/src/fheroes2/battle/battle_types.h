@@ -315,6 +315,7 @@ namespace Battle
         Army::BattleTroop &NextValidTroop(s8 &, IndexList &);
         bool PerformMove(TroopIndex, const Point &, bool);
         bool PerformAttack(TroopIndex, const Point &);
+        void PerformAttackPreLogic(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool);
         bool PerformAttackLogic(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool, long &, u16 &);
         void PerformAttackAnimation(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool);
         bool PerformMagic(std::vector<Army::BattleTroop*> &, HeroBase *, Spell::spell_t);
