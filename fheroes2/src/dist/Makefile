@@ -5,7 +5,7 @@
 TARGET := fheroes2
 LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
 LIBS := $(LIBENGINE) $(LIBS)
-CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -DBUILD_DATE=$(BUILD_DATE)
+CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I/usr/local/include -DBUILD_DATE=$(BUILD_DATE)
 
 CC := g++
 
