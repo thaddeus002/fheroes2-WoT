@@ -21,10 +21,6 @@
 #ifndef XMLWRAP_H
 #define XMLWRAP_H
 
-#include "attribute.h"
-#include "element.h"
-#include "reader.h"
-#include "writer.h"
-#include "tree.h"
+#include "tinyxml.h"
 
 #endif

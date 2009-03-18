@@ -1,16 +1,11 @@
 # makefile
 # project: Free Heroes2
 #
-# Options:
-# DEBUG: build in debug mode
-# RELEASE: build with addons extensions
-# DEVELOPMENT: build with development extensions
-#
 
 TARGET := fheroes2
-LIBENGINE := ../engine/libengine.a
+LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
 LIBS := $(LIBENGINE) $(LIBS)
-CFLAGS := $(CFLAGS) -I../engine -DBUILD_DATE=$(BUILD_DATE)
+CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -DBUILD_DATE=$(BUILD_DATE)
 
 CC := g++
 

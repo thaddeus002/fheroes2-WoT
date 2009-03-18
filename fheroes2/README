@@ -9,7 +9,6 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 - SDL_image (with PNG support)
 - SDL_ttf
 - libpng
-- libxml2
 - gettext
 
 SDL libraries can be found at http://www.libsdl.org .

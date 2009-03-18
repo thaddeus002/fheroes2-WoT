@@ -1,9 +1,8 @@
 # makefile
 # xml wrapper
+# http://www.sourceforge.net/projects/tinyxml
 
 TARGET	:= libxmlccwrap
-CFLAGS	:= -O2 -Wall $(shell xml2-config --cflags)
-LIBS	:= $(shell xml2-config --libs)
 CC 	:= g++
 
 all: $(TARGET).so $(TARGET).a

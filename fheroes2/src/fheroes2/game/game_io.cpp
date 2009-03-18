@@ -24,6 +24,7 @@
 #include "castle.h"
 #include "army.h"
 #include "world.h"
+#include "xmlccwrap.h"
 
 extern char *basename(const char *path);
 
@@ -55,394 +56,429 @@ void Game::Load(const std::string &fn)
     LoadXML(fn);
 }
 
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-
 void Game::SaveXML(const std::string &fn)
 {
     std::string str;
-    XML::Writer writer;
     const Settings & conf = Settings::Get();
+    TiXmlDocument doc;
+    TiXmlElement *root, *node;
 
-    if(!writer.open(fn.c_str(), 5))
-    {
-	Error::Warning("Game::SaveXML: error write " + fn);
-	return;
-    }
-
-    writer.startElement("fheroes2");
+    doc.LinkEndChild(new TiXmlDeclaration( "1.0", "", ""));
+    root = new TiXmlElement("fheroes2");
 
     str.clear();
     String::AddInt(str, conf.MajorVersion());
     str += ".";
     String::AddInt(str, conf.MinorVersion());
 
-    writer.addAttribute("version", str);
-    writer.addAttribute("build", conf.DateBuild());
+    root->SetAttribute("version", str.c_str());
+    root->SetAttribute("build", conf.DateBuild());
+    doc.LinkEndChild(root);
 
     // maps
-    writer.startElement("maps");
-    writer.addAttribute("width", conf.FileInfo().SizeMaps().w);
-    writer.addAttribute("height", conf.FileInfo().SizeMaps().h);
-    writer.addAttribute("file", basename(conf.FileInfo().FileMaps().c_str()));
-    writer.addElement("name", conf.FileInfo().Name());
-    writer.addElement("description", conf.FileInfo().Description());
-    writer.endElement();
-
+    TiXmlElement* maps = new TiXmlElement("maps");
+    root->LinkEndChild(maps);
+    maps->SetAttribute("width", conf.FileInfo().SizeMaps().w);
+    maps->SetAttribute("height", conf.FileInfo().SizeMaps().h);
+    maps->SetAttribute("file", basename(conf.FileInfo().FileMaps().c_str()));
+    //
+    node = new TiXmlElement("name");
+    maps->LinkEndChild(node);
+    node->LinkEndChild(new TiXmlText(conf.FileInfo().Name().c_str()));
+    //
+    node = new TiXmlElement("description");
+    maps->LinkEndChild(node);
+    node->LinkEndChild(new TiXmlText(conf.FileInfo().Description().c_str()));
+    
     // game
-    writer.startElement("game");
-    writer.addAttribute("wins", conf.FileInfo().ConditionsWins());
-    writer.addAttribute("loss", conf.FileInfo().ConditionsLoss());
-    writer.endElement();
+    TiXmlElement* game = new TiXmlElement("game");
+    root->LinkEndChild(game);
+    game->SetAttribute("wins", conf.FileInfo().ConditionsWins());
+    game->SetAttribute("loss", conf.FileInfo().ConditionsLoss());
 
     // world
-    writer.startElement("world");
-    writer.addAttribute("width", world.width);
-    writer.addAttribute("height", world.height);
-    writer.addAttribute("ultimate", world.ultimate_artifact);
-    writer.addAttribute("uniq", world.uniq0);
-
+    TiXmlElement* wrld = new TiXmlElement("world");
+    root->LinkEndChild(wrld);
+    wrld->SetAttribute("width", world.width);
+    wrld->SetAttribute("height", world.height);
+    wrld->SetAttribute("ultimate", world.ultimate_artifact);
+    wrld->SetAttribute("uniq", world.uniq0);
     // world->date
-    writer.startElement("date");
-    writer.addAttribute("month", world.month);
-    writer.addAttribute("week", world.week);
-    writer.addAttribute("day", world.day);
-    writer.endElement();
+    node = new TiXmlElement("date");
+    wrld->LinkEndChild(node);
+    node->SetAttribute("month", world.month);
+    node->SetAttribute("week", world.week);
+    node->SetAttribute("day", world.day);
 
     // world->tiles
-    writer.startElement("tiles");
-    writer.addAttribute("size", world.vec_tiles.size());
+    TiXmlElement* tiles = new TiXmlElement("tiles");
+    wrld->LinkEndChild(tiles);
+    tiles->SetAttribute("size", world.vec_tiles.size());
 
     for(u16 ii = 0; ii < world.vec_tiles.size(); ++ii) if(world.vec_tiles[ii])
     {
 	// tiles->tile
-	writer.startElement("tile");
+	TiXmlElement* tile2 = new TiXmlElement("tile");
+	tiles->LinkEndChild(tile2);
 	const Maps::Tiles & tile = *world.vec_tiles[ii];
 
-	writer.addAttribute("ii", ii);
-	writer.addAttribute("tile_index", tile.tile_index);
-	writer.addAttribute("shape", tile.shape);
-	writer.addAttribute("general", tile.general);
-	writer.addAttribute("quantity1", tile.quantity1);
-	writer.addAttribute("quantity2", tile.quantity2);
-	writer.addAttribute("fogs", tile.fogs);
+	tile2->SetAttribute("ii", ii);
+	tile2->SetAttribute("tile_index", tile.tile_index);
+	tile2->SetAttribute("shape", tile.shape);
+	tile2->SetAttribute("general", tile.general);
+	tile2->SetAttribute("quantity1", tile.quantity1);
+	tile2->SetAttribute("quantity2", tile.quantity2);
+	tile2->SetAttribute("fogs", tile.fogs);
 
 	// tiles->tile->addons1
-	writer.startElement("addons_level1");
-	writer.addAttribute("size", tile.addons_level1.size());
+	TiXmlElement* addons = new TiXmlElement("addons_level1");
+	tile2->LinkEndChild(addons);
+	addons->SetAttribute("size", tile.addons_level1.size());
         {
 	    std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level1.begin();
 	    std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level1.end();
 	
 	    for(; it1 != it2; ++it1)
 	    {
-		writer.startElement("addon");
+		node = new TiXmlElement("addon");
+		addons->LinkEndChild(node);
 		const Maps::TilesAddon & addon = *it1;
-		writer.addAttribute("level", addon.level);
-		writer.addAttribute("uniq", addon.uniq);
-		writer.addAttribute("object", addon.object);
-		writer.addAttribute("index", addon.index);
-		writer.endElement();
+		node->SetAttribute("level", addon.level);
+		node->SetAttribute("uniq", addon.uniq);
+		node->SetAttribute("object", addon.object);
+		node->SetAttribute("index", addon.index);
 	    }
 	}
-	writer.endElement();
 
 	// tiles->tile->addons2
-	writer.startElement("addons_level2");
-	writer.addAttribute("size", tile.addons_level2.size());
+	addons = new TiXmlElement("addons_level2");
+	tile2->LinkEndChild(addons);
+	addons->SetAttribute("size", tile.addons_level2.size());
         {
 	    std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level2.begin();
 	    std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level2.end();
 	
 	    for(; it1 != it2; ++it1)
 	    {
-		writer.startElement("addon");
+		node = new TiXmlElement("addon");
+		addons->LinkEndChild(node);
 		const Maps::TilesAddon & addon = *it1;
-		writer.addAttribute("level", addon.level);
-		writer.addAttribute("uniq", addon.uniq);
-		writer.addAttribute("object", addon.object);
-		writer.addAttribute("index", addon.index);
-		writer.endElement();
+		node->SetAttribute("level", addon.level);
+		node->SetAttribute("uniq", addon.uniq);
+		node->SetAttribute("object", addon.object);
+		node->SetAttribute("index", addon.index);
 	    }
 	}
-	writer.endElement();
-
-	// tiles->tile
-	writer.endElement();
     }
 
-    // world->tiles
-    writer.endElement();
-
     // world->kingdoms
-    writer.startElement("kingdoms");
-    writer.addAttribute("size", world.vec_kingdoms.size());
+    TiXmlElement* kingdoms = new TiXmlElement("kingdoms");
+    wrld->LinkEndChild(kingdoms);
+    kingdoms->SetAttribute("size", world.vec_kingdoms.size());
 
     for(u16 ii = 0; ii < world.vec_kingdoms.size(); ++ii) if(world.vec_kingdoms[ii])
     {
 	// kingdoms->kingdom
-	writer.startElement("kingdom");
+	TiXmlElement* kingdom2 = new TiXmlElement("kingdom");
+	kingdoms->LinkEndChild(kingdom2);
 	const Kingdom & kingdom = *world.vec_kingdoms[ii];
 
-	writer.addAttribute("ii", ii);
-	writer.addAttribute("modes", kingdom.flags);
-	writer.addAttribute("lost_town_days", kingdom.lost_town_days);
-	writer.addAttribute("color", kingdom.color);
-	writer.addAttribute("control", kingdom.control);
+	kingdom2->SetAttribute("ii", ii);
+	kingdom2->SetAttribute("modes", kingdom.flags);
+	kingdom2->SetAttribute("lost_town_days", kingdom.lost_town_days);
+	kingdom2->SetAttribute("color", kingdom.color);
+	kingdom2->SetAttribute("control", kingdom.control);
 
 	if(kingdom.ai_capital)
-	writer.addAttribute("capital", kingdom.ai_capital->GetIndex());
+	    kingdom2->SetAttribute("capital", kingdom.ai_capital->GetIndex());
 	else
-	writer.addAttribute("capital", "null");
+	    kingdom2->SetAttribute("capital", "null");
 
 	// kingdoms->kingdom->funds
-	writer.startElement("funds");
-	writer.addAttribute("wood", kingdom.resource.wood);
-	writer.addAttribute("mercury", kingdom.resource.mercury);
-	writer.addAttribute("ore", kingdom.resource.ore);
-	writer.addAttribute("sulfur", kingdom.resource.sulfur);
-	writer.addAttribute("crystal", kingdom.resource.crystal);
-	writer.addAttribute("gems", kingdom.resource.gems);
-	writer.addAttribute("gold", kingdom.resource.gold);
-	writer.endElement();
+	TiXmlElement* funds = new TiXmlElement("funds");
+	kingdom2->LinkEndChild(funds);
+	funds->SetAttribute("wood", kingdom.resource.wood);
+	funds->SetAttribute("mercury", kingdom.resource.mercury);
+	funds->SetAttribute("ore", kingdom.resource.ore);
+	funds->SetAttribute("sulfur", kingdom.resource.sulfur);
+	funds->SetAttribute("crystal", kingdom.resource.crystal);
+	funds->SetAttribute("gems", kingdom.resource.gems);
+	funds->SetAttribute("gold", kingdom.resource.gold);
 
 	// kingdoms->kingdom->visit_object
-	writer.startElement("visit_object");
-	writer.addAttribute("size", kingdom.visit_object.size());
+	TiXmlElement* visit = new TiXmlElement("visit_object");
+	kingdom2->LinkEndChild(visit);
+	visit->SetAttribute("size", kingdom.visit_object.size());
         {
 	    std::list<IndexObject>::const_iterator it1 = kingdom.visit_object.begin();
 	    std::list<IndexObject>::const_iterator it2 = kingdom.visit_object.end();
 	
 	    for(; it1 != it2; ++it1)
 	    {
-		writer.startElement("pair");
-		writer.addAttribute("index", (*it1).first);
-		writer.addAttribute("object", (*it1).second);
-		writer.endElement();
+		node = new TiXmlElement("pair");
+		visit->LinkEndChild(node);
+		node->SetAttribute("index", (*it1).first);
+		node->SetAttribute("object", (*it1).second);
 	    }
 	}
-	// kingdoms->kingdom->visit_object
-	writer.endElement();
-
-	// kingdoms->kingdom
-	writer.endElement();
     }
 
-    // world->kingdoms
-    writer.endElement();
-
     // world->heroes
-    writer.startElement("heroes");
-    writer.addAttribute("size", world.vec_heroes.size());
+    TiXmlElement* heroes = new TiXmlElement("heroes");
+    wrld->LinkEndChild(heroes);
+    heroes->SetAttribute("size", world.vec_heroes.size());
 
     for(u16 ii = 0; ii < world.vec_heroes.size(); ++ii) if(world.vec_heroes[ii])
     {
 	// heroes->hero
-	writer.startElement("hero");
+	TiXmlElement* hero2 = new TiXmlElement("hero");
+	heroes->LinkEndChild(hero2);
 	const Heroes & hero = *world.vec_heroes[ii];
 
-	writer.addAttribute("ii", ii);
-	writer.addAttribute("modes", hero.modes);
-	writer.addAttribute("color", hero.color);
-	writer.addAttribute("name", hero.name);
-	writer.addAttribute("portrait", hero.portrait);
-	writer.addAttribute("race", hero.race);
-	writer.addAttribute("attack", hero.GetAttack());
-	writer.addAttribute("defense", hero.GetDefense());
-	writer.addAttribute("knowledge", hero.GetKnowledge());
-	writer.addAttribute("power", hero.GetPower());
-	writer.addAttribute("experience", hero.experience);
-	writer.addAttribute("magic_point", hero.magic_point);
-	writer.addAttribute("move_point", hero.move_point);
-	writer.addAttribute("direction", hero.direction);
-	writer.addAttribute("sprite_index", hero.sprite_index);
-	writer.addAttribute("save_maps_general", hero.save_maps_general);
+	hero2->SetAttribute("ii", ii);
+	hero2->SetAttribute("modes", hero.modes);
+	hero2->SetAttribute("color", hero.color);
+	hero2->SetAttribute("name", hero.name.c_str());
+	hero2->SetAttribute("portrait", hero.portrait);
+	hero2->SetAttribute("race", hero.race);
+	hero2->SetAttribute("attack", hero.GetAttack());
+	hero2->SetAttribute("defense", hero.GetDefense());
+	hero2->SetAttribute("knowledge", hero.GetKnowledge());
+	hero2->SetAttribute("power", hero.GetPower());
+	hero2->SetAttribute("experience", hero.experience);
+	hero2->SetAttribute("magic_point", hero.magic_point);
+	hero2->SetAttribute("move_point", hero.move_point);
+	hero2->SetAttribute("direction", hero.direction);
+	hero2->SetAttribute("sprite_index", hero.sprite_index);
+	hero2->SetAttribute("save_maps_general", hero.save_maps_general);
 
 	// heroes->hero->secondary_skills
-	writer.startElement("secondary_skills");
-	writer.addAttribute("size", hero.secondary_skills.size());
+	TiXmlElement* skills = new TiXmlElement("secondary_skills");
+	hero2->LinkEndChild(skills);
+	skills->SetAttribute("size", hero.secondary_skills.size());
 	for(u16 ii = 0; ii < hero.secondary_skills.size(); ++ii)
 	{
 	    const Skill::Secondary & sec = hero.secondary_skills[ii];
-	    writer.startElement("pair");
-	    writer.addAttribute("skill", sec.Skill());
-	    writer.addAttribute("level", sec.Level());
-	    writer.endElement();
+	    node = new TiXmlElement("pair");
+	    skills->LinkEndChild(node);
+	    node->SetAttribute("skill", sec.Skill());
+	    node->SetAttribute("level", sec.Level());
 	}
-	writer.endElement();
 
 	// heroes->hero->artifacts
-	writer.startElement("artifacts");
-	writer.addAttribute("size", hero.artifacts.size());
+	TiXmlElement* artifacts = new TiXmlElement("artifacts");
+	hero2->LinkEndChild(artifacts);
+	artifacts->SetAttribute("size", hero.artifacts.size());
 	for(u16 ii = 0; ii < hero.artifacts.size(); ++ii)
 	{
-	    writer.addElement("artifact", hero.artifacts[ii]);
+	    node = new TiXmlElement("artifact");
+	    artifacts->LinkEndChild(node);
+	    node->SetAttribute("id", hero.artifacts[ii]);
 	}
-	writer.endElement();
 
 	// heroes->hero->armies
-	writer.startElement("armies");
-	writer.addAttribute("size", ARMYMAXTROOPS);
+	TiXmlElement* armies = new TiXmlElement("armies");
+	hero2->LinkEndChild(armies);
+	armies->SetAttribute("size", ARMYMAXTROOPS);
 	for(u16 ii = 0; ii < ARMYMAXTROOPS; ++ii)
 	{
 	    const Army::Troop & troop = hero.army.At(ii);
-	    writer.startElement("troop");
-	    writer.addAttribute("monster", troop());
-	    writer.addAttribute("count", troop.Count());
-	    writer.endElement();
+	    node = new TiXmlElement("troop");
+	    armies->LinkEndChild(node);
+	    node->SetAttribute("monster", troop());
+	    node->SetAttribute("count", troop.Count());
 	}
-	writer.endElement();
 
 	// heroes->hero->spell_book
-	writer.startElement("spell_book");
-	writer.addAttribute("enable", hero.spell_book.isActive() ? "true" : "false");
+	TiXmlElement* book = new TiXmlElement("spell_book");
+	hero2->LinkEndChild(book);
+	book->SetAttribute("enable", hero.spell_book.isActive() ? "true" : "false");
         {
 	    std::list<Spell::spell_t>::const_iterator it1, it2;
 
 	    // spell_level1
 	    it1 = hero.spell_book.spells_level1.begin();
 	    it2 = hero.spell_book.spells_level1.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		book->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level2
 	    it1 = hero.spell_book.spells_level2.begin();
 	    it2 = hero.spell_book.spells_level2.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		book->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level3
 	    it1 = hero.spell_book.spells_level3.begin();
 	    it2 = hero.spell_book.spells_level3.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		book->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level4
 	    it1 = hero.spell_book.spells_level4.begin();
 	    it2 = hero.spell_book.spells_level4.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		book->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level5
 	    it1 = hero.spell_book.spells_level5.begin();
 	    it2 = hero.spell_book.spells_level5.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		book->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 	}
-	writer.endElement();
 
 	// heroes->hero->center
-	writer.startElement("center");
-	writer.addAttribute("x", hero.mp.x);
-	writer.addAttribute("y", hero.mp.y);
-	writer.endElement();
+	node = new TiXmlElement("center");
+	hero2->LinkEndChild(node);
+	node->SetAttribute("x", hero.mp.x);
+	node->SetAttribute("y", hero.mp.y);
 
 	// heroes->hero->visit_object
-	writer.startElement("visit_object");
-	writer.addAttribute("size", hero.visit_object.size());
+	TiXmlElement* visit = new TiXmlElement("visit_object");
+	hero2->LinkEndChild(visit);
+	visit->SetAttribute("size", hero.visit_object.size());
         {
 	    std::list<IndexObject>::const_iterator it1 = hero.visit_object.begin();
 	    std::list<IndexObject>::const_iterator it2 = hero.visit_object.end();
 	    for(; it1 != it2; ++it1)
 	    {
-		writer.startElement("pair");
-		writer.addAttribute("index", (*it1).first);
-		writer.addAttribute("object", (*it1).second);
-		writer.endElement();
+		node = new TiXmlElement("pair");
+		visit->LinkEndChild(node);
+		node->SetAttribute("index", (*it1).first);
+		node->SetAttribute("object", (*it1).second);
 	    }
 	}
-	writer.endElement();
-
-	// heroes->hero
-	writer.endElement();
     }
-    // world->heroes
-    writer.endElement();
 
     // world->castles
-    writer.startElement("castles");
-    writer.addAttribute("size", world.vec_castles.size());
+    TiXmlElement* castles = new TiXmlElement("castles");
+    wrld->LinkEndChild(castles);
+    castles->SetAttribute("size", world.vec_castles.size());
     for(u16 ii = 0; ii < world.vec_castles.size(); ++ii) if(world.vec_castles[ii])
     {
 	// castles->castle
-	writer.startElement("castle");
+	TiXmlElement* castle2 = new TiXmlElement("castle");
+	castles->LinkEndChild(castle2);
 	const Castle & castle = *world.vec_castles[ii];
 
-	writer.addAttribute("ii", ii);
-	writer.addAttribute("modes", castle.modes);
-	writer.addAttribute("color", castle.color);
-	writer.addAttribute("name", castle.name);
-	writer.addAttribute("race", castle.race);
-	writer.addAttribute("building", castle.building);
+	castle2->SetAttribute("ii", ii);
+	castle2->SetAttribute("modes", castle.modes);
+	castle2->SetAttribute("color", castle.color);
+	castle2->SetAttribute("name", castle.name.c_str());
+	castle2->SetAttribute("race", castle.race);
+	castle2->SetAttribute("building", castle.building);
 
 	// castles->castle->center
-	writer.startElement("center");
-	writer.addAttribute("x", castle.mp.x);
-	writer.addAttribute("y", castle.mp.y);
-	writer.endElement();
+	node = new TiXmlElement("center");
+	castle2->LinkEndChild(node);
+	node->SetAttribute("x", castle.mp.x);
+	node->SetAttribute("y", castle.mp.y);
 
 	// castles->castle->mageguild
-	writer.startElement("mageguild");
-	writer.addAttribute("level", castle.mageguild.GetLevel());
+	TiXmlElement* mage = new TiXmlElement("mageguild");
+	castle2->LinkEndChild(mage);
+	mage->SetAttribute("level", castle.mageguild.GetLevel());
         {
 	    std::list<Spell::spell_t>::const_iterator it1, it2;
 
 	    // spell_level1
 	    it1 = castle.mageguild.spells_level1.begin();
 	    it2 = castle.mageguild.spells_level1.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		mage->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level2
 	    it1 = castle.mageguild.spells_level2.begin();
 	    it2 = castle.mageguild.spells_level2.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		mage->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level3
 	    it1 = castle.mageguild.spells_level3.begin();
 	    it2 = castle.mageguild.spells_level3.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		mage->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level4
 	    it1 = castle.mageguild.spells_level4.begin();
 	    it2 = castle.mageguild.spells_level4.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		mage->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 
 	    // spell_level5
 	    it1 = castle.mageguild.spells_level5.begin();
 	    it2 = castle.mageguild.spells_level5.end();
-	    for(; it1 != it2; ++it1) writer.addElement("spell", *it1);
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("spell");
+		mage->LinkEndChild(node);
+		node->SetAttribute("id", *it1);
+	    }
 	}
-	writer.endElement();
 
 	// castles->castle->armies
-	writer.startElement("armies");
-	writer.addAttribute("size", ARMYMAXTROOPS);
+	TiXmlElement* armies = new TiXmlElement("armies");
+	castle2->LinkEndChild(armies);
+	armies->SetAttribute("size", ARMYMAXTROOPS);
 
 	for(u16 ii = 0; ii < ARMYMAXTROOPS; ++ii)
 	{
+	    node = new TiXmlElement("troop");
+	    armies->LinkEndChild(node);
 	    const Army::Troop & troop = castle.army.At(ii);
-	    writer.startElement("troop");
-	    writer.addAttribute("monster", troop());
-	    writer.addAttribute("count", troop.Count());
-	    writer.endElement();
+	    node->SetAttribute("monster", troop());
+	    node->SetAttribute("count", troop.Count());
 	}
-	writer.endElement();
 
 	// castles->castle->dwelling
-	writer.startElement("dwellings");
-	writer.addAttribute("size", castle.dwelling.size());
-	for(u16 ii = 0; ii < castle.dwelling.size(); ++ii) writer.addElement("dwelling", castle.dwelling[ii]);
-	writer.endElement();
-
-	// castles->castle
-	writer.endElement();
+	TiXmlElement* dwellings = new TiXmlElement("dwellings");
+	castle2->LinkEndChild(dwellings);
+	dwellings->SetAttribute("size", castle.dwelling.size());
+	for(u16 ii = 0; ii < castle.dwelling.size(); ++ii)
+	{
+	    node = new TiXmlElement("dwelling");
+	    dwellings->LinkEndChild(node);
+	    node->SetAttribute("dwelling", castle.dwelling[ii]);
+	}
     }
 
-    // world->castles
-    writer.endElement();
-
-    // world
-    writer.endElement();
-
-    // fheroes2
-    writer.endElement();
-
-    writer.close();
+    doc.SaveFile(fn.c_str());
 }
 
 void Game::LoadXML(const std::string &fn)
@@ -493,7 +529,3 @@ void Game::LoadXML(const std::string &fn)
 //    xmlcc::Element *desc = maps->getElement("description");
 
 }
-#else
-void Game::SaveXML(const std::string &){};
-void Game::LoadXML(const std::string &){};
-#endif
