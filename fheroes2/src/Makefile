@@ -10,8 +10,8 @@ PNG_FLAGS := $(shell libpng12-config --cflags)
 
 BUILD_DATE := $(shell date +%Y%m%d)
 
-CFLAGS := $(CFLAGS) -Wall -fsigned-char
-LIBS := $(LIBS)
+CFLAGS := -Wall -fsigned-char
+LIBS :=
 
 ifdef DEBUG
 CFLAGS := $(CFLAGS) -O0 -g
