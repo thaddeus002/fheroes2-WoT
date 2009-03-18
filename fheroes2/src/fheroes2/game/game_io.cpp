@@ -122,7 +122,6 @@ void Game::SaveXML(const std::string &fn)
 	tiles->LinkEndChild(tile2);
 	const Maps::Tiles & tile = *world.vec_tiles[ii];
 
-	tile2->SetAttribute("ii", ii);
 	tile2->SetAttribute("tile_index", tile.tile_index);
 	tile2->SetAttribute("shape", tile.shape);
 	tile2->SetAttribute("general", tile.general);
@@ -483,49 +482,116 @@ void Game::SaveXML(const std::string &fn)
 
 void Game::LoadXML(const std::string &fn)
 {
-/*
-    xmlcc::XMLTree tree;
+    TiXmlDocument doc;
+    if (!doc.LoadFile(fn.c_str())) return;
 
-    if(!tree.read("fheroes2.sav"))
+    TiXmlElement* root = doc.FirstChildElement();
+
+    if(!root || std::strcmp("fheroes2", root->Value()))
     {
-	Error::Warning("Game::LoadXML: parser error: " + fn);
+	Error::Verbose("Game::LoadXML: broken file " + fn);
 	return;
     }
 
-    xmlcc::Element *fheroes2 = tree.getRoot();
+    TiXmlElement *node;
+    TiXmlElement *maps = root->FirstChildElement("maps");
+    TiXmlElement *game = root->FirstChildElement("game");
+    TiXmlElement *wrld = root->FirstChildElement("world");
 
-    if(!fheroes2 || fheroes2->name() != "fheroes2")
+    if(!maps || !game || !wrld)
     {
-	Error::Warning("Game::LoadXML: parser error: fheroes2");
+	Error::Verbose("Game::LoadXML: broken file " + fn);
 	return;
     }
 
-    xmlcc::Element *maps = fheroes2->getElement("maps");
-    if(!maps)
+    TiXmlElement *date = wrld->FirstChildElement("date");
+    TiXmlElement *tiles = wrld->FirstChildElement("tiles");
+    TiXmlElement *kingdoms = wrld->FirstChildElement("kingdoms");
+    TiXmlElement *heroes = wrld->FirstChildElement("heroes");
+    TiXmlElement *castles = wrld->FirstChildElement("castles");
+
+    if(!date || !tiles || !kingdoms || !heroes || !castles)
     {
-	Error::Warning("Game::LoadXML: parser error: maps");
+	Error::Verbose("Game::LoadXML: broken file " + fn);
 	return;
     }
 
-    xmlcc::Element *mapsw = maps->getElement("width");
-    xmlcc::Element *mapsh = maps->getElement("height");
-    if(!mapsw || !mapsh)
+
+    int res;
+    const char *str;
+
+    // fheroes2 version
+    str = root->Attribute("version");
+    // fheroes2 build
+    root->Attribute("build", &res);
+
+    // maps width
+    maps->Attribute("width", &res);
+    // maps height
+    maps->Attribute("height", &res);
+    // maps file
+    str = maps->Attribute("file");
+
+    // maps name
+    node = maps->FirstChildElement("name");
+    str = node ? node->GetText() : NULL;
+
+    // maps description
+    node = maps->FirstChildElement("description");
+    str = node ? node->GetText() : NULL;
+
+    // game wins
+    game->Attribute("wins", &res);
+    // game loss
+    game->Attribute("loss", &res);
+
+    // world width
+    wrld->Attribute("width", &res);
+    // world height
+    wrld->Attribute("height", &res);
+    // world index for ultimate art
+    wrld->Attribute("ultimate", &res);
+    // world unique index
+    wrld->Attribute("uniq", &res);
+
+    // world date
+    date->Attribute("month", &res);
+    date->Attribute("week", &res);
+    date->Attribute("day", &res);
+
+    // tiles size
+    tiles->Attribute("size", &res);
+
+    TiXmlElement *tile = tiles->FirstChildElement();
+    for(; tile; tile = tile->NextSiblingElement())
     {
-	Error::Warning("Game::LoadXML: parser error: width or height");
-	return;
+	// load tile
     }
-*/
 
-//
-//    Error::Verbose(mapsw->name());
-//    Error::Verbose(mapsh->name());
-//    Error::Verbose("w: " + mapsw->getContent());
-//    Error::Verbose("h: " + mapsh->getContent());
-//    Error::Verbose("w: ", String::ToInt(mapsw->getContent()));
-//    Error::Verbose("h: ", String::ToInt(mapsh->getContent()));
+    // kingdoms size
+    kingdoms->Attribute("size", &res);
 
-//    xmlcc::Element *file = maps->getElement("file");
-//    xmlcc::Element *name = maps->getElement("name");
-//    xmlcc::Element *desc = maps->getElement("description");
+    TiXmlElement *kingdom = kingdoms->FirstChildElement();
+    for(; kingdom; kingdom = kingdom->NextSiblingElement())
+    {
+	// load kingdom
+    }
 
+    // heroes size
+    heroes->Attribute("size", &res);
+
+    TiXmlElement *hero = heroes->FirstChildElement();
+    for(; hero; hero = hero->NextSiblingElement())
+    {
+	// load hero
+    }
+
+    // castles size
+    castles->Attribute("size", &res);
+
+    TiXmlElement *castle = castles->FirstChildElement();
+    for(; castle; castle = castle->NextSiblingElement())
+    {
+	// load castle
+    }
 }
