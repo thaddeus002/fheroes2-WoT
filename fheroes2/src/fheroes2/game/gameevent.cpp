@@ -26,6 +26,10 @@
 
 #define SIZEMESSAGE 400
 
+GameEvent::Day::Day() : computer(false), first(MAXU16), subsequent(0), colors(0)
+{
+}
+
 GameEvent::Day::Day(const void *ptr)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
@@ -128,6 +132,10 @@ GameEvent::Day::Day(const void *ptr)
     if(Settings::Get().Debug()) Error::Verbose("GameEvent::Day: add: " + message);
 }
 
+GameEvent::Coord::Coord() : index_map(0), artifact(Artifact::UNKNOWN), computer(false), cancel(true), colors(0)
+{
+}
+
 GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
@@ -215,6 +223,10 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     message = std::string(reinterpret_cast<const char *>(ptr8));
     
     if(Settings::Get().Debug()) Error::Verbose("GameEvent::Coord: add: " + message);
+}
+
+GameEvent::Riddle::Riddle() : index_map(MAXU16), artifact(Artifact::UNKNOWN), quiet(true)
+{
 }
 
 GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)

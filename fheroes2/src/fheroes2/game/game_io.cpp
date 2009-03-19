@@ -24,6 +24,7 @@
 #include "castle.h"
 #include "army.h"
 #include "world.h"
+#include "gameevent.h"
 #include "xmlccwrap.h"
 
 extern char *basename(const char *path);
@@ -494,30 +495,145 @@ void Game::SaveXML(const std::string &fn)
 	recruits->SetAttribute("hero2", (rec.second ? rec.second->portrait : Heroes::UNKNOWN));
     }
 
-    // other
-    TiXmlElement* signs = new TiXmlElement("signs");
-    wrld->LinkEndChild(signs);
-    std::map<u16, std::string>::const_iterator its1 = world.map_sign.begin();
-    std::map<u16, std::string>::const_iterator its2 = world.map_sign.end();
-    for(; its1 != its2; ++its1)
+    // signs
     {
-	node = new TiXmlElement("sign");
-	signs->LinkEndChild(node);
-	node->SetAttribute("index", (*its1).first);
-	node->LinkEndChild(new TiXmlText((*its1).second.c_str()));
+        TiXmlElement* signs = new TiXmlElement("signs");
+	wrld->LinkEndChild(signs);
+        std::map<u16, std::string>::const_iterator it1 = world.map_sign.begin();
+	std::map<u16, std::string>::const_iterator it2 = world.map_sign.end();
+	for(; it1 != it2; ++it1)
+	{
+	    node = new TiXmlElement("sign");
+	    signs->LinkEndChild(node);
+	    node->SetAttribute("index", (*it1).first);
+	    node->LinkEndChild(new TiXmlText((*it1).second.c_str()));
+	}
     }
 
-    TiXmlElement* captured = new TiXmlElement("captured");
-    wrld->LinkEndChild(captured);
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator itc1 = world.map_captureobj.begin();
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator itc2 = world.map_captureobj.end();
-    for(; its1 != its2; ++its1)
+    // captured object
     {
-	node = new TiXmlElement("object");
-	captured->LinkEndChild(node);
-	node->SetAttribute("index", (*itc1).first);
-	node->SetAttribute("id", (*itc1).second.first);
-	node->SetAttribute("color", (*itc1).second.second);
+	TiXmlElement* captured = new TiXmlElement("captured");
+	wrld->LinkEndChild(captured);
+	std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = world.map_captureobj.begin();
+	std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = world.map_captureobj.end();
+	for(; it1 != it2; ++it1)
+	{
+	    node = new TiXmlElement("object");
+	    captured->LinkEndChild(node);
+	    node->SetAttribute("index", (*it1).first);
+	    node->SetAttribute("id", (*it1).second.first);
+	    node->SetAttribute("color", (*it1).second.second);
+	}
+    }
+
+    // rumors
+    {
+	TiXmlElement* rumors = new TiXmlElement("rumors");
+	wrld->LinkEndChild(rumors);
+
+	std::vector<std::string>::const_iterator it1 = world.vec_rumors.begin();
+	std::vector<std::string>::const_iterator it2 = world.vec_rumors.end();
+	for(; it1 != it2; ++it1)
+	{
+	    node = new TiXmlElement("message");
+	    rumors->LinkEndChild(node);
+	    node->LinkEndChild(new TiXmlText((*it1).c_str()));
+	}
+    }
+
+    // day events
+    {
+	TiXmlElement* events = new TiXmlElement("day_events");
+	wrld->LinkEndChild(events);
+
+	std::vector<GameEvent::Day *>::const_iterator it1 = world.vec_eventsday.begin();
+	std::vector<GameEvent::Day *>::const_iterator it2 = world.vec_eventsday.end();
+	for(; it1 != it2; ++it1) if(*it1)
+	{
+	    node = new TiXmlElement("event");
+	    events->LinkEndChild(node);
+	    node->SetAttribute("wood", (*it1)->resource.wood);
+	    node->SetAttribute("mercury", (*it1)->resource.mercury);
+	    node->SetAttribute("ore", (*it1)->resource.ore);
+	    node->SetAttribute("sulfur", (*it1)->resource.sulfur);
+	    node->SetAttribute("crystal", (*it1)->resource.crystal);
+	    node->SetAttribute("gems", (*it1)->resource.gems);
+	    node->SetAttribute("gold", (*it1)->resource.gold);
+	    if((*it1)->computer) node->SetAttribute("computer", "true");
+	    node->SetAttribute("first", (*it1)->first);
+	    node->SetAttribute("subsequent", (*it1)->subsequent);
+	    node->SetAttribute("colors", (*it1)->colors);
+	    node->LinkEndChild(new TiXmlText((*it1)->message.c_str()));
+	}
+    }
+    
+    // coord events
+    {
+	TiXmlElement* events = new TiXmlElement("coord_events");
+	wrld->LinkEndChild(events);
+
+	std::vector<GameEvent::Coord *>::const_iterator it1 = world.vec_eventsmap.begin();
+	std::vector<GameEvent::Coord *>::const_iterator it2 = world.vec_eventsmap.end();
+	for(; it1 != it2; ++it1) if(*it1)
+	{
+	    node = new TiXmlElement("event");
+	    events->LinkEndChild(node);
+	    node->SetAttribute("index", (*it1)->index_map);
+	    node->SetAttribute("wood", (*it1)->resource.wood);
+	    node->SetAttribute("mercury", (*it1)->resource.mercury);
+	    node->SetAttribute("ore", (*it1)->resource.ore);
+	    node->SetAttribute("sulfur", (*it1)->resource.sulfur);
+	    node->SetAttribute("crystal", (*it1)->resource.crystal);
+	    node->SetAttribute("gems", (*it1)->resource.gems);
+	    node->SetAttribute("gold", (*it1)->resource.gold);
+	    node->SetAttribute("artifact", (*it1)->artifact);
+	    if((*it1)->computer) node->SetAttribute("computer", "true");
+	    if((*it1)->cancel) node->SetAttribute("cancel", "true");
+	    node->SetAttribute("colors", (*it1)->colors);
+	    node->LinkEndChild(new TiXmlText((*it1)->message.c_str()));
+	}
+    }
+    
+    // sphinx riddles
+    {
+	TiXmlElement* sphinxes = new TiXmlElement("sphinxes");
+	wrld->LinkEndChild(sphinxes);
+
+	std::vector<GameEvent::Riddle *>::const_iterator it1 = world.vec_riddles.begin();
+	std::vector<GameEvent::Riddle *>::const_iterator it2 = world.vec_riddles.end();
+	for(; it1 != it2; ++it1) if(*it1)
+	{
+	    TiXmlElement* riddle = new TiXmlElement("riddle");
+	    sphinxes->LinkEndChild(riddle);
+	    riddle->SetAttribute("index", (*it1)->index_map);
+	    riddle->SetAttribute("wood", (*it1)->resource.wood);
+	    riddle->SetAttribute("mercury", (*it1)->resource.mercury);
+	    riddle->SetAttribute("ore", (*it1)->resource.ore);
+	    riddle->SetAttribute("sulfur", (*it1)->resource.sulfur);
+	    riddle->SetAttribute("crystal", (*it1)->resource.crystal);
+	    riddle->SetAttribute("gems", (*it1)->resource.gems);
+	    riddle->SetAttribute("gold", (*it1)->resource.gold);
+	    riddle->SetAttribute("artifact", (*it1)->artifact);
+	    if((*it1)->quiet) riddle->SetAttribute("quiet", "true");
+
+
+	    TiXmlElement* answers = new TiXmlElement("answers");
+	    riddle->LinkEndChild(answers);
+
+	    std::vector<std::string>::const_iterator ita1 = (*it1)->answers.begin();
+	    std::vector<std::string>::const_iterator ita2 = (*it1)->answers.end();
+
+	    for(; ita1 != ita2; ++ita1)
+	    {
+		node = new TiXmlElement("answer");
+		answers->LinkEndChild(node);
+		node->LinkEndChild(new TiXmlText((*ita1).c_str()));
+	    }
+
+	    node = new TiXmlElement("message");
+	    riddle->LinkEndChild(node);
+	    node->LinkEndChild(new TiXmlText((*it1)->message.c_str()));
+	}
     }
 
     doc.SaveFile(fn.c_str());
@@ -1000,7 +1116,6 @@ void Game::LoadXML(const std::string &fn)
 	TiXmlElement* recruits = kingdom2->FirstChildElement("recruits");
 	if(recruits)
 	{
-	    kingdom2->LinkEndChild(recruits);
 	    Recruits & rec = world.map_recruits[kingdom->color];
 	    recruits->Attribute("hero1", &res);
 	    rec.first = (res < Heroes::UNKNOWN ? world.GetHeroes(Heroes::ConvertID(res)) : NULL);
@@ -1010,7 +1125,7 @@ void Game::LoadXML(const std::string &fn)
 	world.vec_kingdoms.push_back(kingdom);
     }
 
-    // other
+    // signs
     TiXmlElement* signs = wrld->FirstChildElement("signs");
     if(signs)
     {
@@ -1021,6 +1136,8 @@ void Game::LoadXML(const std::string &fn)
 	    world.map_sign[res] = node->GetText();
 	}
     }
+
+    // captured objects
     TiXmlElement* captured = wrld->FirstChildElement("captured");
     if(captured)
     {
@@ -1033,6 +1150,140 @@ void Game::LoadXML(const std::string &fn)
 	    value.first = static_cast<MP2::object_t>(static_cast<u8>(res));
 	    node->Attribute("color", &res);
 	    value.second = Color::Get(res);
+	}
+    }
+
+    // rumors
+    TiXmlElement* rumors = wrld->FirstChildElement("rumors");
+    if(rumors)
+    {
+	node = rumors->FirstChildElement();
+	for(; node; node = node->NextSiblingElement())
+	{
+	    world.vec_rumors.push_back(node->GetText());
+	}
+    }
+
+    // day events
+    TiXmlElement* devents = wrld->FirstChildElement("day_events");
+    if(devents)
+    {
+	node = devents->FirstChildElement();
+	for(; node; node = node->NextSiblingElement())
+	{
+	    GameEvent::Day *event = new GameEvent::Day();
+
+	    node->Attribute("wood", &res);
+	    event->resource.wood = res;
+	    node->Attribute("mercury", &res);
+	    event->resource.mercury = res;
+	    node->Attribute("ore", &res);
+	    event->resource.ore = res;
+	    node->Attribute("sulfur", &res);
+	    event->resource.sulfur = res;
+	    node->Attribute("crystal", &res);
+	    event->resource.crystal = res;
+	    node->Attribute("gems", &res);
+	    event->resource.gems = res;
+	    node->Attribute("gold", &res);
+	    event->resource.gold = res;
+	    str = node->Attribute("computer");
+	    event->computer = str && 0 == std::strcmp(str, "true");
+	    node->Attribute("first", &res);
+	    event->first = res;
+	    node->Attribute("subsequent", &res);
+	    event->subsequent = res;
+	    node->Attribute("colors", &res);
+	    event->colors = res;
+	    event->message = node->GetText();
+	    
+	    world.vec_eventsday.push_back(event);
+	}
+    }
+
+    // coord events
+    TiXmlElement* cevents = wrld->FirstChildElement("coord_events");
+    if(cevents)
+    {
+	node = cevents->FirstChildElement();
+	for(; node; node = node->NextSiblingElement())
+	{
+	    GameEvent::Coord *event = new GameEvent::Coord();
+
+	    node->Attribute("index", &res);
+	    event->index_map = res;
+	    node->Attribute("wood", &res);
+	    event->resource.wood = res;
+	    node->Attribute("mercury", &res);
+	    event->resource.mercury = res;
+	    node->Attribute("ore", &res);
+	    event->resource.ore = res;
+	    node->Attribute("sulfur", &res);
+	    event->resource.sulfur = res;
+	    node->Attribute("crystal", &res);
+	    event->resource.crystal = res;
+	    node->Attribute("gems", &res);
+	    event->resource.gems = res;
+	    node->Attribute("gold", &res);
+	    event->resource.gold = res;
+	    node->Attribute("artifact", &res);
+	    event->artifact = Artifact::Artifact(res);
+	    str = node->Attribute("computer");
+	    event->computer = str && 0 == std::strcmp(str, "true");
+	    str = node->Attribute("cancel");
+	    event->cancel = str && 0 == std::strcmp(str, "true");
+	    node->Attribute("colors", &res);
+	    event->colors = res;
+	    event->message = node->GetText();
+	    
+	    world.vec_eventsmap.push_back(event);
+	}
+    }
+
+    // sphinx riddles
+    TiXmlElement* sphinxes = wrld->FirstChildElement("sphinxes");
+    if(sphinxes)
+    {
+	TiXmlElement *riddle2 = sphinxes->FirstChildElement();
+	for(; riddle2; riddle2 = riddle2->NextSiblingElement())
+	{
+	    GameEvent::Riddle *riddle = new GameEvent::Riddle();
+
+	    riddle2->Attribute("index", &res);
+	    riddle->index_map = res;
+	    riddle2->Attribute("wood", &res);
+	    riddle->resource.wood = res;
+	    riddle2->Attribute("mercury", &res);
+	    riddle->resource.mercury = res;
+	    riddle2->Attribute("ore", &res);
+	    riddle->resource.ore = res;
+	    riddle2->Attribute("sulfur", &res);
+	    riddle->resource.sulfur = res;
+	    riddle2->Attribute("crystal", &res);
+	    riddle->resource.crystal = res;
+	    riddle2->Attribute("gems", &res);
+	    riddle->resource.gems = res;
+	    riddle2->Attribute("gold", &res);
+	    riddle->resource.gold = res;
+	    riddle2->Attribute("artifact", &res);
+	    riddle->artifact = Artifact::Artifact(res);
+	    str = riddle2->Attribute("quiet");
+	    riddle->quiet = str && 0 == std::strcmp(str, "true");
+
+	    TiXmlElement *answers = riddle2->FirstChildElement("answers");
+	    if(answers)
+	    {
+		node = answers->FirstChildElement();
+		for(; node; node = node->NextSiblingElement())
+		{
+		    riddle->answers.push_back(node->GetText());
+		}
+	    }
+	    
+	    node = riddle2->FirstChildElement("message");
+	    if(node) riddle->message = node->GetText();
+
+	    world.vec_riddles.push_back(riddle);
 	}
     }
 

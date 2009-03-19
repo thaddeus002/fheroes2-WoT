@@ -24,6 +24,7 @@
 #include <string>
 #include "resource.h"
 #include "artifact.h"
+#include "game_io.h"
 #include "gamedefs.h"
 
 namespace GameEvent
@@ -32,6 +33,7 @@ namespace GameEvent
 class Day
 {
 public:
+    Day();
     Day(const void *ptr);
     
     bool AllowComputer(void) const{ return computer; };
@@ -42,6 +44,9 @@ public:
     const std::string & GetMessage(void) const{ return message; };
 
 private:
+    friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
+    
     Resource::funds_t resource;
     bool computer;
     u16 first;
@@ -53,6 +58,7 @@ private:
 class Coord
 {
 public:
+    Coord();
     Coord(u16 index, const void *ptr);
 
     bool AllowComputer(void) const{ return computer; };
@@ -63,6 +69,9 @@ public:
     Artifact::artifact_t GetArtifact(void) const {return artifact; };
 
 private:
+    friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
+
     u16 index_map;
     Resource::funds_t resource;
     Artifact::artifact_t artifact;
@@ -75,6 +84,7 @@ private:
 class Riddle
 {
 public:
+    Riddle();
     Riddle(u16 index, const void *ptr);
 
     const Resource::funds_t & GetResource(void) const{ return resource; };
@@ -86,6 +96,9 @@ public:
     void SetQuiet(void);
 
 private:
+    friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
+
     u16 index_map;
     Resource::funds_t resource;
     Artifact::artifact_t artifact;
