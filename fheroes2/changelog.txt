@@ -3,21 +3,21 @@ SVN - up to r915
 March 19, 2009 - Development build r915
 
 Users
-+ Added load game;
 + Added Russian translation .po file.
-+ Added actions: Mermaid, Sirens, Arena, Stables, Barrow Mounds, Elements Recruit, Jail, HutMagi, EyeMagi.
-+ Added save current game.
-+ Added keyboard hotkeys for scroll map and move hero.
-+ Added gettext support.
-+ Unicode support with TTF font render.
++ Added actions for Mermaids, Sirens, Arenas, Stables, Barrow Mounds, Elemental Recruiting, Jails, HutMagi,
+  EyeMagi, and Sphinxes.
++ Added load and save game support.
 + AI battles now use battle system logic to properly decide outcomes.
-  (revvy)
++ Added support for castle and town battles.
++ Arrow keys now move the current hero, while CTRL+arrow scrolls the map view.  
 
 Developers
-+ remove libxml2 dependence
++ Removed libxml2 dependence
 + Added build options (WITHOUT_PNG, WITHOUT_UNICODE)
 + Battle engine rewritten to separate logic from display, and to allow
-  for future expansion (ie. castles/towns). (revvy)
+  for future expansion (ie. castles/towns).
++ Added gettext support.
++ Unicode support with TTF font render.
 
 February 1, 2009 - Development build r850
 
