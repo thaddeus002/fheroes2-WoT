@@ -22,6 +22,7 @@
 
 #include <vector>
 #include "gamedefs.h"
+#include "game_io.h"
 #include "race.h"
 #include "spell_storage.h"
 
@@ -45,6 +46,9 @@ class MageGuild : public Spell::Storage
 	static Spell::spell_t GetSpellRace(const Race::race_t rc, const u8 lvl);
 
     private:
+	friend void Game::SaveXML(const std::string &);
+	friend void Game::LoadXML(const std::string &);
+
 	const Race::race_t &	race;
 	u8			level;
 	bool			upgrade;

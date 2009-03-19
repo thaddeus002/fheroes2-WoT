@@ -49,13 +49,15 @@ namespace Spell
 	bool isActive(void) const { return active; };
 
     private:
+	friend void Game::SaveXML(const std::string &);
+	friend void Game::LoadXML(const std::string &);
+
 	void RedrawLists(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt) const;
 	static Spell::spell_t GetSelected(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt);
 	void Filter(std::vector<Spell::spell_t> & spells, bool adv_mode) const;
 
 	const Skill::Primary *hero;
 	bool active;
-	u8 list_count;
     };
 };
 

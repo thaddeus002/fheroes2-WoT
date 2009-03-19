@@ -67,34 +67,50 @@ void Game::SaveXML(const std::string &fn)
     root = new TiXmlElement("fheroes2");
 
     str.clear();
-    String::AddInt(str, conf.MajorVersion());
+    String::AddInt(str, conf.major_version);
     str += ".";
-    String::AddInt(str, conf.MinorVersion());
+    String::AddInt(str, conf.minor_version);
 
     root->SetAttribute("version", str.c_str());
-    root->SetAttribute("build", conf.DateBuild());
+    root->SetAttribute("build", conf.build_date);
+                        
     doc.LinkEndChild(root);
 
     // maps
     TiXmlElement* maps = new TiXmlElement("maps");
     root->LinkEndChild(maps);
-    maps->SetAttribute("width", conf.FileInfo().SizeMaps().w);
-    maps->SetAttribute("height", conf.FileInfo().SizeMaps().h);
-    maps->SetAttribute("file", basename(conf.FileInfo().FileMaps().c_str()));
-    //
+    maps->SetAttribute("width", conf.current_maps_file.size.w);
+    maps->SetAttribute("height", conf.current_maps_file.size.h);
+    maps->SetAttribute("file", basename(conf.current_maps_file.file.c_str()));
+    maps->SetAttribute("difficulty", conf.current_maps_file.difficulty);
+    maps->SetAttribute("kingdom_colors", conf.current_maps_file.kingdom_colors);
+    maps->SetAttribute("allow_colors", conf.current_maps_file.allow_colors);
+    maps->SetAttribute("rnd_colors", conf.current_maps_file.rnd_colors);
+    maps->SetAttribute("conditions_wins", conf.current_maps_file.conditions_wins);
+    maps->SetAttribute("wins1", conf.current_maps_file.wins1);
+    maps->SetAttribute("wins2", conf.current_maps_file.wins2);
+    maps->SetAttribute("wins3", conf.current_maps_file.wins3);
+    maps->SetAttribute("wins4", conf.current_maps_file.wins4);
+    maps->SetAttribute("conditions_loss", conf.current_maps_file.conditions_loss);
+    maps->SetAttribute("loss1", conf.current_maps_file.loss1);
+    maps->SetAttribute("loss2", conf.current_maps_file.loss2);
     node = new TiXmlElement("name");
     maps->LinkEndChild(node);
-    node->LinkEndChild(new TiXmlText(conf.FileInfo().Name().c_str()));
-    //
+    node->LinkEndChild(new TiXmlText(conf.current_maps_file.name.c_str()));
     node = new TiXmlElement("description");
     maps->LinkEndChild(node);
-    node->LinkEndChild(new TiXmlText(conf.FileInfo().Description().c_str()));
+    node->LinkEndChild(new TiXmlText(conf.current_maps_file.description.c_str()));
+
     
     // game
     TiXmlElement* game = new TiXmlElement("game");
     root->LinkEndChild(game);
-    game->SetAttribute("wins", conf.FileInfo().ConditionsWins());
-    game->SetAttribute("loss", conf.FileInfo().ConditionsLoss());
+    game->SetAttribute("game_difficulty", conf.game_difficulty);
+    game->SetAttribute("my_color", conf.my_color);
+    game->SetAttribute("cur_color", conf.cur_color);
+    game->SetAttribute("game_type", conf.game);
+    game->SetAttribute("players", conf.players);
+    game->SetAttribute("preferably_count_players", conf.preferably_count_players);
 
     // world
     TiXmlElement* wrld = new TiXmlElement("world");
@@ -170,58 +186,6 @@ void Game::SaveXML(const std::string &fn)
 	}
     }
 
-    // world->kingdoms
-    TiXmlElement* kingdoms = new TiXmlElement("kingdoms");
-    wrld->LinkEndChild(kingdoms);
-    kingdoms->SetAttribute("size", world.vec_kingdoms.size());
-
-    for(u16 ii = 0; ii < world.vec_kingdoms.size(); ++ii) if(world.vec_kingdoms[ii])
-    {
-	// kingdoms->kingdom
-	TiXmlElement* kingdom2 = new TiXmlElement("kingdom");
-	kingdoms->LinkEndChild(kingdom2);
-	const Kingdom & kingdom = *world.vec_kingdoms[ii];
-
-	kingdom2->SetAttribute("ii", ii);
-	kingdom2->SetAttribute("modes", kingdom.flags);
-	kingdom2->SetAttribute("lost_town_days", kingdom.lost_town_days);
-	kingdom2->SetAttribute("color", kingdom.color);
-	kingdom2->SetAttribute("control", kingdom.control);
-
-	if(kingdom.ai_capital)
-	    kingdom2->SetAttribute("capital", kingdom.ai_capital->GetIndex());
-	else
-	    kingdom2->SetAttribute("capital", "null");
-
-	// kingdoms->kingdom->funds
-	TiXmlElement* funds = new TiXmlElement("funds");
-	kingdom2->LinkEndChild(funds);
-	funds->SetAttribute("wood", kingdom.resource.wood);
-	funds->SetAttribute("mercury", kingdom.resource.mercury);
-	funds->SetAttribute("ore", kingdom.resource.ore);
-	funds->SetAttribute("sulfur", kingdom.resource.sulfur);
-	funds->SetAttribute("crystal", kingdom.resource.crystal);
-	funds->SetAttribute("gems", kingdom.resource.gems);
-	funds->SetAttribute("gold", kingdom.resource.gold);
-
-	// kingdoms->kingdom->visit_object
-	TiXmlElement* visit = new TiXmlElement("visit_object");
-	kingdom2->LinkEndChild(visit);
-	visit->SetAttribute("size", kingdom.visit_object.size());
-        {
-	    std::list<IndexObject>::const_iterator it1 = kingdom.visit_object.begin();
-	    std::list<IndexObject>::const_iterator it2 = kingdom.visit_object.end();
-	
-	    for(; it1 != it2; ++it1)
-	    {
-		node = new TiXmlElement("pair");
-		visit->LinkEndChild(node);
-		node->SetAttribute("index", (*it1).first);
-		node->SetAttribute("object", (*it1).second);
-	    }
-	}
-    }
-
     // world->heroes
     TiXmlElement* heroes = new TiXmlElement("heroes");
     wrld->LinkEndChild(heroes);
@@ -234,16 +198,15 @@ void Game::SaveXML(const std::string &fn)
 	heroes->LinkEndChild(hero2);
 	const Heroes & hero = *world.vec_heroes[ii];
 
-	hero2->SetAttribute("ii", ii);
 	hero2->SetAttribute("modes", hero.modes);
 	hero2->SetAttribute("color", hero.color);
 	hero2->SetAttribute("name", hero.name.c_str());
 	hero2->SetAttribute("portrait", hero.portrait);
 	hero2->SetAttribute("race", hero.race);
-	hero2->SetAttribute("attack", hero.GetAttack());
-	hero2->SetAttribute("defense", hero.GetDefense());
-	hero2->SetAttribute("knowledge", hero.GetKnowledge());
-	hero2->SetAttribute("power", hero.GetPower());
+	hero2->SetAttribute("attack", hero.attack);
+	hero2->SetAttribute("defense", hero.defence);
+	hero2->SetAttribute("knowledge", hero.knowledge);
+	hero2->SetAttribute("power", hero.power);
 	hero2->SetAttribute("experience", hero.experience);
 	hero2->SetAttribute("magic_point", hero.magic_point);
 	hero2->SetAttribute("move_point", hero.move_point);
@@ -291,7 +254,7 @@ void Game::SaveXML(const std::string &fn)
 	// heroes->hero->spell_book
 	TiXmlElement* book = new TiXmlElement("spell_book");
 	hero2->LinkEndChild(book);
-	book->SetAttribute("enable", hero.spell_book.isActive() ? "true" : "false");
+	book->SetAttribute("enable", hero.spell_book.active ? "true" : "false");
         {
 	    std::list<Spell::spell_t>::const_iterator it1, it2;
 
@@ -380,7 +343,6 @@ void Game::SaveXML(const std::string &fn)
 	castles->LinkEndChild(castle2);
 	const Castle & castle = *world.vec_castles[ii];
 
-	castle2->SetAttribute("ii", ii);
 	castle2->SetAttribute("modes", castle.modes);
 	castle2->SetAttribute("color", castle.color);
 	castle2->SetAttribute("name", castle.name.c_str());
@@ -396,7 +358,8 @@ void Game::SaveXML(const std::string &fn)
 	// castles->castle->mageguild
 	TiXmlElement* mage = new TiXmlElement("mageguild");
 	castle2->LinkEndChild(mage);
-	mage->SetAttribute("level", castle.mageguild.GetLevel());
+	mage->SetAttribute("level", castle.mageguild.level);
+	if(castle.mageguild.upgrade) mage->SetAttribute("upgrade", "true");
         {
 	    std::list<Spell::spell_t>::const_iterator it1, it2;
 
@@ -477,6 +440,53 @@ void Game::SaveXML(const std::string &fn)
 	}
     }
 
+    // world->kingdoms
+    TiXmlElement* kingdoms = new TiXmlElement("kingdoms");
+    wrld->LinkEndChild(kingdoms);
+    kingdoms->SetAttribute("size", world.vec_kingdoms.size());
+
+    for(u16 ii = 0; ii < world.vec_kingdoms.size(); ++ii) if(world.vec_kingdoms[ii])
+    {
+	// kingdoms->kingdom
+	TiXmlElement* kingdom2 = new TiXmlElement("kingdom");
+	kingdoms->LinkEndChild(kingdom2);
+	const Kingdom & kingdom = *world.vec_kingdoms[ii];
+
+	kingdom2->SetAttribute("modes", kingdom.flags);
+	kingdom2->SetAttribute("lost_town_days", kingdom.lost_town_days);
+	kingdom2->SetAttribute("color", kingdom.color);
+	kingdom2->SetAttribute("control", kingdom.control);
+	kingdom2->SetAttribute("capital", (kingdom.ai_capital ? kingdom.ai_capital->GetIndex() : 0));
+
+	// kingdoms->kingdom->funds
+	TiXmlElement* funds = new TiXmlElement("funds");
+	kingdom2->LinkEndChild(funds);
+	funds->SetAttribute("wood", kingdom.resource.wood);
+	funds->SetAttribute("mercury", kingdom.resource.mercury);
+	funds->SetAttribute("ore", kingdom.resource.ore);
+	funds->SetAttribute("sulfur", kingdom.resource.sulfur);
+	funds->SetAttribute("crystal", kingdom.resource.crystal);
+	funds->SetAttribute("gems", kingdom.resource.gems);
+	funds->SetAttribute("gold", kingdom.resource.gold);
+
+	// kingdoms->kingdom->visit_object
+	TiXmlElement* visit = new TiXmlElement("visit_object");
+	kingdom2->LinkEndChild(visit);
+	visit->SetAttribute("size", kingdom.visit_object.size());
+        {
+	    std::list<IndexObject>::const_iterator it1 = kingdom.visit_object.begin();
+	    std::list<IndexObject>::const_iterator it2 = kingdom.visit_object.end();
+	
+	    for(; it1 != it2; ++it1)
+	    {
+		node = new TiXmlElement("pair");
+		visit->LinkEndChild(node);
+		node->SetAttribute("index", (*it1).first);
+		node->SetAttribute("object", (*it1).second);
+	    }
+	}
+    }
+
     doc.SaveFile(fn.c_str());
 }
 
@@ -516,82 +526,452 @@ void Game::LoadXML(const std::string &fn)
 	return;
     }
 
+    // loading info
+    Display & display = Display::Get();
+    display.Fill(0, 0, 0);
+    TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
+    display.Flip();
+
+    // prepare World
+    world.FreeOldMaps();
+    world.Defaults();
 
     int res;
     const char *str;
+    Settings & conf = Settings::Get();
+    conf.SetModes(Settings::LOADGAME);
 
     // fheroes2 version
     str = root->Attribute("version");
     // fheroes2 build
     root->Attribute("build", &res);
 
-    // maps width
+    // maps
     maps->Attribute("width", &res);
-    // maps height
+    conf.current_maps_file.size.w = res;
     maps->Attribute("height", &res);
-    // maps file
-    str = maps->Attribute("file");
-
-    // maps name
+    conf.current_maps_file.size.h = res;
+    conf.current_maps_file.file = maps->Attribute("file");
+    //
     node = maps->FirstChildElement("name");
-    str = node ? node->GetText() : NULL;
-
-    // maps description
+    if(node) conf.current_maps_file.name = node->GetText();
+    //
     node = maps->FirstChildElement("description");
-    str = node ? node->GetText() : NULL;
+    if(node) conf.current_maps_file.description = node->GetText();
+    //
+    maps->Attribute("difficulty", &res);
+    conf.current_maps_file.difficulty = Difficulty::Get(res);
+    maps->Attribute("kingdom_colors", &res);
+    conf.current_maps_file.kingdom_colors = res;
+    maps->Attribute("allow_colors", &res);
+    conf.current_maps_file.allow_colors = res;
+    maps->Attribute("rnd_colors", &res);
+    conf.current_maps_file.rnd_colors = res;
+    maps->Attribute("conditions_wins", &res);
+    conf.current_maps_file.conditions_wins = res;
+    maps->Attribute("wins1", &res);
+    conf.current_maps_file.wins1 = res;
+    maps->Attribute("wins2", &res);
+    conf.current_maps_file.wins2 = res;
+    maps->Attribute("wins3", &res);
+    conf.current_maps_file.wins3 = res;
+    maps->Attribute("wins4", &res);
+    conf.current_maps_file.wins4 = res;
+    maps->Attribute("conditions_loss", &res);
+    conf.current_maps_file.conditions_loss = res;
+    maps->Attribute("loss1", &res);
+    conf.current_maps_file.loss1 = res;
+    maps->Attribute("loss2", &res);
+    conf.current_maps_file.loss2 = res;
 
-    // game wins
-    game->Attribute("wins", &res);
-    // game loss
-    game->Attribute("loss", &res);
+    // game
+    game->Attribute("game_difficulty", &res);
+    conf.game_difficulty = Difficulty::Get(res);
+    game->Attribute("my_color", &res);
+    conf.my_color = Color::Get(res);
+    game->Attribute("cur_color", &res);
+    conf.cur_color = Color::Get(res);
+    game->Attribute("game_type", &res);
+    conf.game = Game::GetControl(res);
+    game->Attribute("players", &res);
+    conf.players = res;
+    game->Attribute("preferably_count_players", &res);
+    conf.preferably_count_players = res;
 
-    // world width
+    // world
     wrld->Attribute("width", &res);
-    // world height
+    world.width = res;
     wrld->Attribute("height", &res);
-    // world index for ultimate art
+    world.height = res;
     wrld->Attribute("ultimate", &res);
-    // world unique index
+    world.ultimate_artifact = res;
     wrld->Attribute("uniq", &res);
+    world.uniq0 = res;
 
     // world date
     date->Attribute("month", &res);
+    world.month = res;
     date->Attribute("week", &res);
+    world.week = res;
     date->Attribute("day", &res);
+    world.day = res;
 
-    // tiles size
+    // tiles
     tiles->Attribute("size", &res);
+    world.vec_tiles.reserve(res);
 
-    TiXmlElement *tile = tiles->FirstChildElement();
-    for(; tile; tile = tile->NextSiblingElement())
+    TiXmlElement *tile2 = tiles->FirstChildElement();
+    u16 maps_index = 0;
+    for(; tile2; tile2 = tile2->NextSiblingElement(), ++maps_index)
     {
 	// load tile
-    }
+	Maps::Tiles *tile = new Maps::Tiles(maps_index);
 
-    // kingdoms size
-    kingdoms->Attribute("size", &res);
+	tile2->Attribute("tile_index", &res);
+	tile->tile_index = res;
+	tile2->Attribute("shape", &res);
+	tile->shape = res;
+	tile2->Attribute("general", &res);
+	tile->general = res;
+	tile2->Attribute("quantity1", &res);
+	tile->quantity1 = res;
+	tile2->Attribute("quantity2", &res);
+	tile->quantity2 = res;
+	tile2->Attribute("fogs", &res);
+	tile->fogs = res;
 
-    TiXmlElement *kingdom = kingdoms->FirstChildElement();
-    for(; kingdom; kingdom = kingdom->NextSiblingElement())
-    {
-	// load kingdom
+	// tiles->tile->addons1
+	TiXmlElement *addons = tile2->FirstChildElement("addons_level1");
+	if(addons)
+	{
+	    Maps::TilesAddon ta;
+	    node = addons->FirstChildElement();
+	    for(; node; node = node->NextSiblingElement())
+	    {
+		node->Attribute("level", &res);
+		ta.level = res;
+		node->Attribute("uniq", &res);
+		ta.uniq = res;
+		node->Attribute("object", &res);
+		ta.object = res;
+		node->Attribute("index", &res);
+		ta.index = res;
+
+		tile->addons_level1.push_back(ta);
+	    }
+	}
+
+	// tiles->tile->addons2
+	addons = tile2->FirstChildElement("addons_level2");
+	if(addons)
+	{
+	    Maps::TilesAddon ta;
+	    node = addons->FirstChildElement();
+	    for(; node; node = node->NextSiblingElement())
+	    {
+		node->Attribute("level", &res);
+		ta.level = res;
+		node->Attribute("uniq", &res);
+		ta.uniq = res;
+		node->Attribute("object", &res);
+		ta.object = res;
+		node->Attribute("index", &res);
+		ta.index = res;
+
+		tile->addons_level2.push_back(ta);
+	    }
+	}
+
+	world.vec_tiles.push_back(tile);
     }
 
     // heroes size
     heroes->Attribute("size", &res);
+    world.vec_heroes.reserve(res);
 
-    TiXmlElement *hero = heroes->FirstChildElement();
-    for(; hero; hero = hero->NextSiblingElement())
+    TiXmlElement *hero2 = heroes->FirstChildElement();
+    for(; hero2; hero2 = hero2->NextSiblingElement())
     {
 	// load hero
+	hero2->Attribute("portrait", &res);
+	const Heroes::heroes_t id = Heroes::ConvertID(res);
+	hero2->Attribute("race", &res);
+	Heroes* hero = new Heroes(id, Race::Get(res));
+
+	hero2->Attribute("modes", &res);
+	hero->modes = res;
+	hero2->Attribute("color", &res);
+	hero->color = Color::Get(res);
+	hero->name = hero2->Attribute("name");
+	hero2->Attribute("attack", &res);
+	hero->attack = res;
+	hero2->Attribute("defense", &res);
+	hero->defence = res;
+	hero2->Attribute("power", &res);
+	hero->power = res;
+	hero2->Attribute("knowledge", &res);
+	hero->knowledge = res;
+	hero2->Attribute("experience", &res);
+	hero->experience = res;
+	hero2->Attribute("magic_point", &res);
+	hero->magic_point = res;
+	hero2->Attribute("move_point", &res);
+	hero->move_point = res;
+	hero2->Attribute("direction", &res);
+	hero->direction = Direction::FromInt(res);
+	hero2->Attribute("sprite_index", &res);
+	hero->sprite_index = res;
+	hero2->Attribute("save_maps_general", &res);
+	hero->save_maps_general = static_cast<MP2::object_t>(static_cast<u8>(res));
+
+	node = hero2->FirstChildElement("center");
+	if(node)
+	{
+	    node->Attribute("x", &res);
+	    hero->mp.x = res;
+	    node->Attribute("y", &res);
+	    hero->mp.y = res;
+	}
+
+	hero->secondary_skills.clear();
+	TiXmlElement* skills = hero2->FirstChildElement("secondary_skills");
+	if(skills)
+	{
+	    size_t ii = 0;
+	    node = skills->FirstChildElement();
+	    for(; node && ii < HEROESMAXSKILL; node = node->NextSiblingElement(), ++ii)
+	    {
+		Skill::Secondary skill;
+		node->Attribute("skill", &res);
+		skill.SetSkill(Skill::Secondary::Skill(res));
+		node->Attribute("level", &res);
+		skill.SetLevel(res);
+		hero->secondary_skills.push_back(skill);
+	    }
+	}
+
+	std::fill(hero->artifacts.begin(), hero->artifacts.end(), Artifact::UNKNOWN);
+	TiXmlElement* artifacts = hero2->FirstChildElement("artifacts");
+	if(artifacts)
+	{
+	    size_t ii = 0;
+	    node = artifacts->FirstChildElement();
+	    for(; node && ii < hero->artifacts.size(); node = node->NextSiblingElement(), ++ii)
+	    {
+	        node->Attribute("id", &res);
+		hero->artifacts[ii] = Artifact::Artifact(res);
+	    }
+	}
+
+	TiXmlElement* armies = hero2->FirstChildElement("armies");
+	if(armies)
+	{
+	    size_t ii = 0;
+	    node = armies->FirstChildElement();
+	    for(; node && ii < ARMYMAXTROOPS; node = node->NextSiblingElement(), ++ii)
+	    {
+		node->Attribute("monster", &res);
+		hero->army.At(ii).SetMonster(Monster::FromInt(res));
+		node->Attribute("count", &res);
+		hero->army.At(ii).SetCount(res);
+	    }
+	}
+
+	TiXmlElement* book = hero2->FirstChildElement("spell_book");
+	if(book)
+	{
+	    str = book->Attribute("enable");
+	    hero->spell_book.active = (str && 0 == std::strcmp(str, "true"));
+
+	    // load spells
+	    node = book->FirstChildElement();
+	    for(; node; node = node->NextSiblingElement())
+	    {
+		node->Attribute("id", &res);
+		const Spell::spell_t spell = Spell::Spell(res);
+		switch(Spell::Level(spell))
+		{
+		    case 1:	hero->spell_book.spells_level1.push_back(spell); break;
+		    case 2:	hero->spell_book.spells_level2.push_back(spell); break;
+		    case 3:	hero->spell_book.spells_level3.push_back(spell); break;
+		    case 4:	hero->spell_book.spells_level4.push_back(spell); break;
+		    case 5:	hero->spell_book.spells_level5.push_back(spell); break;
+		    default: break;
+		}
+	    }
+	}
+
+	TiXmlElement *visit = hero2->FirstChildElement("visit_object");
+	if(visit)
+	{
+	    node = visit->FirstChildElement();
+	    for(; node; node = node->NextSiblingElement())
+	    {
+		IndexObject io;
+		node->Attribute("index", &res);
+		io.first = res;
+		node->Attribute("object", &res);
+		io.second = static_cast<MP2::object_t>(static_cast<u8>(res));
+
+		hero->visit_object.push_back(io);
+	    }
+	}
+
+	world.vec_heroes.push_back(hero);
     }
 
     // castles size
     castles->Attribute("size", &res);
+    world.vec_castles.reserve(res);
 
-    TiXmlElement *castle = castles->FirstChildElement();
-    for(; castle; castle = castle->NextSiblingElement())
+    TiXmlElement *castle2 = castles->FirstChildElement();
+    for(; castle2; castle2 = castle2->NextSiblingElement())
     {
+	Point center;
+	node = castle2->FirstChildElement("center");
+	if(node)
+	{
+	    node->Attribute("x", &res);
+	    center.x = res;
+	    node->Attribute("y", &res);
+	    center.y = res;
+	}
+
+	castle2->Attribute("race", &res);
 	// load castle
+	Castle* castle = new Castle(center.x, center.y, Race::Get(res));
+
+	castle2->Attribute("modes", &res);
+	castle->modes = res;
+	castle2->Attribute("color", &res);
+	castle->color = Color::Get(res);
+	castle->name = castle2->Attribute("name");
+	castle2->Attribute("building", &res);
+	castle->building = res;
+
+	TiXmlElement* mage = castle2->FirstChildElement("mageguild");
+	if(mage)
+	{
+	    mage->Attribute("level", &res);
+	    castle->mageguild.level = res;
+	    str = mage->Attribute("upgrade");
+	    castle->mageguild.upgrade = (str && 0 == std::strcmp(str, "true"));
+
+	    // load spells
+	    node = mage->FirstChildElement();
+	    for(; node; node = node->NextSiblingElement())
+	    {
+		node->Attribute("id", &res);
+		const Spell::spell_t spell = Spell::Spell(res);
+		switch(Spell::Level(spell))
+		{
+		    case 1:	castle->mageguild.spells_level1.push_back(spell); break;
+		    case 2:	castle->mageguild.spells_level2.push_back(spell); break;
+		    case 3:	castle->mageguild.spells_level3.push_back(spell); break;
+		    case 4:	castle->mageguild.spells_level4.push_back(spell); break;
+		    case 5:	castle->mageguild.spells_level5.push_back(spell); break;
+		    default: break;
+		}
+	    }
+	}
+
+	TiXmlElement* armies = castle2->FirstChildElement("armies");
+	if(armies)
+	{
+	    size_t ii = 0;
+	    node = armies->FirstChildElement();
+	    for(; node && ii < ARMYMAXTROOPS; node = node->NextSiblingElement(), ++ii)
+	    {
+		node->Attribute("monster", &res);
+		castle->army.At(ii).SetMonster(Monster::FromInt(res));
+		node->Attribute("count", &res);
+		castle->army.At(ii).SetCount(res);
+	    }
+	}
+
+	TiXmlElement* dwellings = castle2->FirstChildElement("dwellings");
+	if(dwellings)
+	{
+	    size_t ii = 0;
+	    node = dwellings->FirstChildElement();
+	    for(; node && ii < castle->dwelling.size(); node = node->NextSiblingElement(), ++ii)
+	    {
+		node->Attribute("dwelling", &res);
+		castle->dwelling[ii] = res;
+	    }
+	}
+
+	world.vec_castles.push_back(castle);
     }
+
+    // kingdoms size
+    kingdoms->Attribute("size", &res);
+    world.vec_kingdoms.reserve(res);
+
+    TiXmlElement *kingdom2 = kingdoms->FirstChildElement();
+    for(; kingdom2; kingdom2 = kingdom2->NextSiblingElement())
+    {
+	kingdom2->Attribute("color", &res);
+	const Color::color_t color = Color::Get(res);
+
+	kingdom2->Attribute("control", &res);
+	// load kingdom
+	Kingdom* kingdom = new Kingdom(color, Game::GetControl(res));
+
+	kingdom2->Attribute("modes", &res);
+	kingdom->flags = res;
+	kingdom2->Attribute("lost_town_days", &res);
+	kingdom->lost_town_days = res;
+	kingdom2->Attribute("capital", &res);
+	kingdom->ai_capital = (res ? world.GetCastle(res) : NULL);
+
+	TiXmlElement *funds = kingdom2->FirstChildElement("funds");
+	if(funds)
+	{
+	    funds->Attribute("wood", &res);
+	    kingdom->resource.wood = res;
+	    funds->Attribute("mercury", &res);
+	    kingdom->resource.mercury = res;
+	    funds->Attribute("ore", &res);
+	    kingdom->resource.ore = res;
+	    funds->Attribute("sulfur", &res);
+	    kingdom->resource.sulfur = res;
+	    funds->Attribute("crystal", &res);
+	    kingdom->resource.crystal = res;
+	    funds->Attribute("gems", &res);
+	    kingdom->resource.gems = res;
+	    funds->Attribute("gold", &res);
+	    kingdom->resource.gold = res;
+	}
+
+	TiXmlElement *visit = kingdom2->FirstChildElement("visit_object");
+	if(visit)
+	{
+	    node = visit->FirstChildElement();
+	    for(; node; node = node->NextSiblingElement())
+	    {
+		IndexObject io;
+		node->Attribute("index", &res);
+		io.first = res;
+		node->Attribute("object", &res);
+		io.second = static_cast<MP2::object_t>(static_cast<u8>(res));
+
+		kingdom->visit_object.push_back(io);
+	    }
+	}
+
+	world.vec_kingdoms.push_back(kingdom);
+    }
+
+    // sort castles to kingdoms
+    std::vector<Castle *>::const_iterator itc1 = world.vec_castles.begin();
+    std::vector<Castle *>::const_iterator itc2 = world.vec_castles.end();
+    for(; itc1 != itc2; ++itc1)
+        if(*itc1) world.GetKingdom((*itc1)->GetColor()).AddCastle(*itc1);
+
+    // sort heroes to kingdoms
+    std::vector<Heroes *>::const_iterator ith1 = world.vec_heroes.begin();
+    std::vector<Heroes *>::const_iterator ith2 = world.vec_heroes.end();
+    for(; ith1 != ith2; ++ith1)
+        if(*ith1) world.GetKingdom((*ith1)->GetColor()).AddHeroes(*ith1);
 }

@@ -115,15 +115,6 @@ void Kingdom::ActionNewDay(void)
 	return;
     }
 
-    // first day
-    if(world.BeginWeek() && world.BeginMonth() && 1 == world.GetMonth())
-    {
-	// check event day
-	const GameEvent::Day* event_day = world.GetEventDay(color);
-	if(event_day) AddFundsResource(event_day->GetResource());
-	return;
-    }
-
     // check lost town
     if(castles.empty()) --lost_town_days;
 

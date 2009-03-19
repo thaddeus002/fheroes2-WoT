@@ -112,7 +112,7 @@ public:
     Week::type_t GetWeekType(void) const{ return week_name; };
     void DateDump(void) const;
 
-    void NextDay(void);
+    void NewDay(void);
     void NewWeek(void);
     void NewMonth(void);
 

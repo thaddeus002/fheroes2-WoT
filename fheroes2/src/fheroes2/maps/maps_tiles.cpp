@@ -36,6 +36,10 @@
 #include "resource.h"
 #include "maps_tiles.h"
 
+Maps::TilesAddon::TilesAddon() : level(0), uniq(0), object(0), index(0)
+{
+}
+
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
 {
 }
@@ -133,12 +137,16 @@ bool Maps::TilesAddon::isStream(const TilesAddon & ta)
     return ICN::STREAM == MP2::GetICNObject(ta.object);
 }
 
+Maps::Tiles::Tiles(u16 index) : maps_index(index), tile_index(0),
+    shape(0), general(0), quantity1(0), quantity2(0),
+    fogs(0xFF), redraw(true)
+{
+}
+
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
     fogs(0xFF), redraw(true)
 {
-    SetTile(mp2tile.tileIndex, mp2tile.shape);
-
     AddonsPushLevel1(mp2tile);
     AddonsPushLevel2(mp2tile);
 

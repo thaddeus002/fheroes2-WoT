@@ -56,3 +56,21 @@ Race::race_t Race::Rand(void)
 
     return Race::NECR;
 }
+
+Race::race_t Race::Get(u8 index)
+{
+    switch(index)
+    {
+	case KNGT:	return KNGT;
+	case BARB:	return BARB;
+	case SORC:	return SORC;
+	case WRLK:	return WRLK;
+	case WZRD:	return WZRD;
+	case NECR:	return NECR;
+	case MULT:	return MULT;
+	case RAND:	return RAND;
+	default: break;
+    }
+
+    return Race::BOMG;
+}

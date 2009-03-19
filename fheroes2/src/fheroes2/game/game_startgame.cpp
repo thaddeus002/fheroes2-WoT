@@ -139,18 +139,14 @@ bool Game::CursorChangePosition(const u16 index)
 
 Game::menu_t Game::StartGame(void)
 {
+    SetFixVideoMode();
+
     // cursor
     Cursor & cursor = Cursor::Get();
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
 
-    SetFixVideoMode();
-
     cursor.Hide();
-    display.Fade();
-
-    // Load maps
-    world.LoadMaps(conf.FileInfo().FileMaps());
 
     // preload sounds
     Game::PreloadLOOPSounds();
@@ -197,14 +193,16 @@ Game::menu_t Game::StartGame(void)
     u8 players = 0;
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if((LOCAL | REMOTE) & world.GetKingdom(color).Control()) players |= color;
 
-    // action first day
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(world.GetKingdom(color).isPlay()) world.GetKingdom(color).ActionNewDay();
-
     while(m == ENDTURN && players)
     {
-	// AI move
+	// world new day (skip if load game)
+	if(! conf.Modes(Settings::LOADGAME)) world.NewDay();
+
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	{
+	    // skip other player if loadgame
+	    if(conf.Modes(Settings::LOADGAME) && color != conf.MyColor()) continue;
+
 	    Kingdom & kingdom = world.GetKingdom(color);
 	    if(kingdom.isPlay())
 	    {
@@ -234,6 +232,7 @@ Game::menu_t Game::StartGame(void)
 			DialogPlayers(color, str);
 		    }
 		    conf.SetMyColor(color);
+		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
 		    m = HumanTurn();
 		    Mixer::Reduce();
 		    if(LOSSGAME == m) players &= ~color;
@@ -256,7 +255,6 @@ Game::menu_t Game::StartGame(void)
 		if(ENDTURN != m) break;
 	    }
 	}
-	world.NextDay();
     }
 
 
@@ -859,7 +857,7 @@ Game::menu_t Game::HumanTurn(void)
 
             if(!myKingdom.HeroesMayStillMove() ||
                 Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
-		res = ENDTURN;
+		return ENDTURN;
 
     	    continue;
         }
@@ -916,7 +914,8 @@ Game::menu_t Game::HumanTurn(void)
 	if(le.KeyPress(KEY_s)){ Game::Save(); Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK); }
 	else
 	// load game
-	if(le.KeyPress(KEY_l)) Game::Load();
+	if(le.KeyPress(KEY_l))
+	{ Game::Load(); return STARTGAME; }
 	else
 	// key left
 	if(le.KeyPress(KEY_LEFT))

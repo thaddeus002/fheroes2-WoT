@@ -198,3 +198,22 @@ Direction::vector_t Direction::Reflect(Direction::vector_t from)
 
     return UNKNOWN;
 }
+
+Direction::vector_t Direction::FromInt(u16 index)
+{
+    switch(index)
+    {
+	case 0x0001:	return TOP_LEFT;
+	case 0x0002:	return TOP;
+	case 0x0004:	return TOP_RIGHT;
+	case 0x0008:	return RIGHT;
+	case 0x0010:	return BOTTOM_RIGHT;
+	case 0x0020:	return BOTTOM;
+	case 0x0040:	return BOTTOM_LEFT;
+	case 0x0080:	return LEFT;
+	case 0x0100:	return CENTER;
+	default: break;
+    }
+
+    return UNKNOWN;
+}

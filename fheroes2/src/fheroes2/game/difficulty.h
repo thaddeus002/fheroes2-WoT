@@ -36,6 +36,7 @@ namespace Difficulty
     difficulty_t& operator-- (difficulty_t& difficulty);
     
     const std::string & String(difficulty_t difficulty);
+    difficulty_t Get(u8);
 };
 
 #endif

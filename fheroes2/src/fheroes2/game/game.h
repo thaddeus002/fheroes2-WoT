@@ -68,6 +68,8 @@ namespace Game
     typedef enum { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK } type_t;
     typedef enum { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 } control_t;
 
+    control_t GetControl(u8);
+
     menu_t MainMenu(void);
     menu_t NewGame(void);
     menu_t LoadGame(void);

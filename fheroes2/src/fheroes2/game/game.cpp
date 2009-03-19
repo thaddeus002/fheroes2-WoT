@@ -188,3 +188,15 @@ void Game::PreloadLOOPSounds(void)
 
     if(Settings::Get().Debug()) Error::Verbose("Game::PreloadLOOPSoundToMixer: done.");
 }
+
+Game::control_t Game::GetControl(u8 index)
+{
+    switch(index)
+    {
+	case LOCAL:	return LOCAL;
+	case REMOTE:	return REMOTE;
+	case AI:	return AI;
+	default: break;
+    }
+    return NONE;
+}

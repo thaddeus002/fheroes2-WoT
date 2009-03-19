@@ -21,6 +21,7 @@
 #define H2RACE_H
 
 #include <string>
+#include "gamedefs.h"
 
 namespace Race
 {
@@ -39,6 +40,7 @@ namespace Race
 
     const std::string & String(race_t race);
     race_t Rand(void);
+    race_t Get(u8);
 };
 
 #endif

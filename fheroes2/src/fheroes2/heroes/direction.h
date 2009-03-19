@@ -44,6 +44,7 @@ namespace Direction
 
     const std::string & String(vector_t direct);
 
+    vector_t FromInt(u16);
     vector_t Get(u16 from, u16 to);
     vector_t Reflect(vector_t from);
 

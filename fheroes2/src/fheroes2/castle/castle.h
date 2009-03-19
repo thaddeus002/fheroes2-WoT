@@ -185,7 +185,7 @@ private:
 
     const Point		mp;
     Race::race_t	race;
-    Captain	captain;
+    Captain		captain;
 
     Color::color_t	color;
     std::string		name;

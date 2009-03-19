@@ -109,6 +109,8 @@ public:
 	SANDYSANDY, UNKNOWN
     };
 
+    static heroes_t ConvertID(u8);
+
     enum flags_t
     {
 	SHIPMASTER	= 0x0001,
@@ -257,6 +259,7 @@ public:
 
 private:
     friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
     void AngleStep(const Direction::vector_t to_direct);
     bool MoveStep(bool fast = false);
 

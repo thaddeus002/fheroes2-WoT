@@ -27,6 +27,7 @@
 #include "difficulty.h"
 #include "maps_fileinfo.h"
 #include "game.h"
+#include "game_io.h"
 #include "bitmodes.h"
 
 class Settings : public BitModes
@@ -36,6 +37,7 @@ public:
     typedef enum
     {
 	NONE              = 0x00000000,
+	LOADGAME          = 0x00000001,
 
         FONTRENDERBLENDED = 0x00008000,
 
@@ -134,6 +136,9 @@ protected:
     void ResetStrModes(const std::string & key);
 
 private:
+    friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
+
     Settings();
 
     const u8 major_version;

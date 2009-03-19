@@ -45,3 +45,8 @@ const std::string & Difficulty::String(Difficulty::difficulty_t difficulty)
 
     return str_difficulty[0];
 }
+
+Difficulty::difficulty_t Difficulty::Get(u8 index)
+{
+    return IMPOSSIBLE < index ? IMPOSSIBLE : static_cast<difficulty_t>(index);
+}

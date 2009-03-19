@@ -27,6 +27,7 @@
 #include "color.h"
 #include "race.h"
 #include "gamedefs.h"
+#include "game_io.h"
 
 namespace Maps
 {
@@ -71,6 +72,9 @@ protected:
     static Race::race_t ByteToRace(u8 byte);
 
 private:
+    friend void Game::SaveXML(const std::string &);
+    friend void Game::LoadXML(const std::string &);
+
     std::string file;
     std::string name;
     std::string description;

@@ -41,6 +41,7 @@ namespace Color
     const std::string & String(u8);
     
     u8 GetIndex(color_t);
+    color_t Get(u8);
 };
 
 #endif

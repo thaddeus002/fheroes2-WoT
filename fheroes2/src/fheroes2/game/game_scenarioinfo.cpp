@@ -35,6 +35,7 @@
 #include "text.h"
 #include "kingdom.h"
 #include "splitter.h"
+#include "world.h"
 #include "game.h"
 
 namespace Scenario
@@ -335,6 +336,15 @@ Game::menu_t Game::ScenarioInfo(void)
     std::list<Maps::FileInfo *>::const_iterator it1 = info_maps.begin();
     std::list<Maps::FileInfo *>::const_iterator it2 = info_maps.end();
     for(; it1 != it2; ++it1) if(*it1) delete *it1;
+
+    cursor.Hide();
+
+    if(result == STARTGAME)
+    {
+	display.Fade();
+	// Load maps
+	world.LoadMaps(conf.FileInfo().FileMaps());
+    }
 
     return result;
 }

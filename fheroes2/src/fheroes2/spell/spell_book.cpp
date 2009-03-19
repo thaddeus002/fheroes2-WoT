@@ -27,7 +27,7 @@
 
 #define SPELL_PER_PAGE	6
 
-Spell::Book::Book(const Skill::Primary *p) : hero(p), active(false), list_count(0)
+Spell::Book::Book(const Skill::Primary *p) : hero(p), active(false)
 {
 }
 

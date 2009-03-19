@@ -65,6 +65,11 @@ const std::string & HeroesName(Heroes::heroes_t id)
     return names[id];
 }
 
+Heroes::heroes_t Heroes::ConvertID(u8 index)
+{
+    return index > UNKNOWN ? UNKNOWN : static_cast<heroes_t>(index);
+}
+
 Heroes::Heroes(heroes_t ht, Race::race_t rc) : experience(0), magic_point(0), move_point(0),
     artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), portrait(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)

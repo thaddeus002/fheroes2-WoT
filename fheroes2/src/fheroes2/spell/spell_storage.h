@@ -49,6 +49,7 @@ namespace Spell
 
     protected:
 	friend void Game::SaveXML(const std::string &);
+	friend void Game::LoadXML(const std::string &);
 
 	std::list<Spell::spell_t>	spells_level1;
 	std::list<Spell::spell_t>	spells_level2;

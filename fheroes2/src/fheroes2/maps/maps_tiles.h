@@ -38,6 +38,7 @@ namespace Maps
     public:
 	typedef enum { GROUND = 0, DOWN = 1, SHADOW = 2, UPPER = 3 } level_t;
 
+	TilesAddon();
 	TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii);
 
 	TilesAddon & operator= (const TilesAddon & ta);
@@ -56,6 +57,7 @@ namespace Maps
     class Tiles
     {
     public:
+	Tiles(u16);
 	Tiles(u16 mi, const MP2::mp2tile_t & mp2tile);
 
 	u16 GetIndex(void) const{ return maps_index; };

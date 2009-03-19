@@ -1098,8 +1098,8 @@ Heroes * World::GetHeroes(u8 ax, u8 ay) const
     return NULL;
 }
 
-/* end day */
-void World::NextDay(void)
+/* new day */
+void World::NewDay(void)
 {
     ++day;
 
