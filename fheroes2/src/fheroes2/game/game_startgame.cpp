@@ -915,7 +915,10 @@ Game::menu_t Game::HumanTurn(void)
 	else
 	// load game
 	if(le.KeyPress(KEY_l))
-	{ Game::Load(); return STARTGAME; }
+	{ 
+	    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+	    { Game::Load(); return STARTGAME; }
+	}
 	else
 	// key left
 	if(le.KeyPress(KEY_LEFT))
@@ -1382,6 +1385,10 @@ Game::menu_t Game::HumanTurn(void)
 		switch(result)
 		{
 		    case NEWGAME:
+			if(Dialog::YES == Dialog::Message("", _("Are you sure you want to restart? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+			    res = NEWGAME;
+			break;
+
 		    case QUITGAME:
 			res = result;
 			break;
