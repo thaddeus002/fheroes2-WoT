@@ -14,7 +14,7 @@ endif
 all: $(TARGET).so $(TARGET).a
 
 $(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-	$(CC) -shared -fPIC -o $@ $^ $(LIBS)
+	$(CC) -shared -fPIC -o $@ $^
 
 $(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 	ar crvs $@ $^
