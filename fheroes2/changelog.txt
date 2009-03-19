@@ -1,6 +1,7 @@
-SVN - up to r904
+SVN - up to r911
 
 Users
++ Added load game;
 + Added Russian translation .po file.
 + Added actions: Mermaid, Sirens, Arena, Stables, Barrow Mounds, Elements Recruit, Jail, HutMagi, EyeMagi.
 + Added save current game.
@@ -11,7 +12,8 @@ Users
   (revvy)
 
 Developers
-+ Added build options (WITHOUT_PNG, WITHOUT_XML, WITHOUT_UNICODE)
++ remove libxml2 dependence
++ Added build options (WITHOUT_PNG, WITHOUT_UNICODE)
 + Battle engine rewritten to separate logic from display, and to allow
   for future expansion (ie. castles/towns). (revvy)
 

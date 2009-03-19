@@ -129,3 +129,8 @@ Week::type_t Week::MonthRand(void)
 
     return UNNAMED;
 }
+
+Week::type_t Week::Get(u8 index)
+{
+    return index > CONDOR ? UNNAMED : static_cast<type_t>(index);
+}

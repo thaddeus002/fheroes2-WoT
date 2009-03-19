@@ -170,7 +170,6 @@ private:
     std::vector<Heroes *>               vec_heroes;
 
     std::map<Color::color_t, Recruits>	map_recruits;
-    std::map<u32, std::vector<u16> >	map_whirlpools;
     std::map<u16, std::string>		map_sign;
 
     // index, object, color

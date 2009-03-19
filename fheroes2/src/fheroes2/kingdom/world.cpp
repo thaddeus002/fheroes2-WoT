@@ -805,10 +805,6 @@ void World::LoadMaps(const std::string &filename)
 		tile.UpdateFountainSprite();
 		break;
 
-	    case MP2::OBJ_WHIRLPOOL:
-		map_whirlpools[tile.GetUniq1()].push_back(ii);
-		break;
-
 	    case MP2::OBJ_EVENT:
 		// remove event sprite
 		if(NULL != (addon = tile.FindEvent()))
@@ -1227,7 +1223,6 @@ void World::FreeOldMaps(void)
 
     // extra
     map_recruits.clear();
-    map_whirlpools.clear();
     map_sign.clear();
     map_captureobj.clear();
 }
@@ -1339,10 +1334,19 @@ u16 World::NextTeleport(const u16 index) const
 /* return random whirlpools destination */
 u16 World::NextWhirlpool(const u16 index)
 {
+    std::vector<u16> v3;
+    v3.reserve(40);
+    GetObjectIndexes(v3, MP2::OBJ_WHIRLPOOL, false);
+
+    std::map<u32, std::vector<u16> > map_whirlpools;
+    std::vector<u16>::const_iterator it3 = v3.begin();
+    std::vector<u16>::const_iterator it4 = v3.end();
+    for(; it3 != it4; ++it3)
+	map_whirlpools[GetTiles(*it3).GetUniq1()].push_back(*it3);
+
     if(2 > map_whirlpools.size())
     {
 	Error::Warning("World::NextWhirlpool: is empty.");
-
 	return index;
     }
 
@@ -1362,11 +1366,11 @@ u16 World::NextWhirlpool(const u16 index)
 
     std::vector<u16> & v2 = map_whirlpools[*Rand::Get(v1)];
 
-    std::vector<u16> v3;
+    v3.clear();
     v3.reserve(v2.size());
 
-    std::vector<u16>::const_iterator it3 = v2.begin();
-    std::vector<u16>::const_iterator it4 = v2.end();
+    it3 = v2.begin();
+    it4 = v2.end();
     for(; it3 != it4; ++it3)
     {
 	const u16 & i = *it3;

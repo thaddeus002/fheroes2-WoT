@@ -100,7 +100,6 @@ void Game::SaveXML(const std::string &fn)
     node = new TiXmlElement("description");
     maps->LinkEndChild(node);
     node->LinkEndChild(new TiXmlText(conf.current_maps_file.description.c_str()));
-
     
     // game
     TiXmlElement* game = new TiXmlElement("game");
@@ -119,13 +118,15 @@ void Game::SaveXML(const std::string &fn)
     wrld->SetAttribute("height", world.height);
     wrld->SetAttribute("ultimate", world.ultimate_artifact);
     wrld->SetAttribute("uniq", world.uniq0);
+    wrld->SetAttribute("week", world.week_name);
+    wrld->SetAttribute("count_obelisk", world.count_obelisk);
     // world->date
     node = new TiXmlElement("date");
     wrld->LinkEndChild(node);
     node->SetAttribute("month", world.month);
     node->SetAttribute("week", world.week);
     node->SetAttribute("day", world.day);
-
+        
     // world->tiles
     TiXmlElement* tiles = new TiXmlElement("tiles");
     wrld->LinkEndChild(tiles);
@@ -485,6 +486,38 @@ void Game::SaveXML(const std::string &fn)
 		node->SetAttribute("object", (*it1).second);
 	    }
 	}
+
+	TiXmlElement* recruits = new TiXmlElement("recruits");
+	kingdom2->LinkEndChild(recruits);
+	const Recruits & rec = world.map_recruits[kingdom.color];
+	recruits->SetAttribute("hero1", (rec.first ? rec.first->portrait : Heroes::UNKNOWN));
+	recruits->SetAttribute("hero2", (rec.second ? rec.second->portrait : Heroes::UNKNOWN));
+    }
+
+    // other
+    TiXmlElement* signs = new TiXmlElement("signs");
+    wrld->LinkEndChild(signs);
+    std::map<u16, std::string>::const_iterator its1 = world.map_sign.begin();
+    std::map<u16, std::string>::const_iterator its2 = world.map_sign.end();
+    for(; its1 != its2; ++its1)
+    {
+	node = new TiXmlElement("sign");
+	signs->LinkEndChild(node);
+	node->SetAttribute("index", (*its1).first);
+	node->LinkEndChild(new TiXmlText((*its1).second.c_str()));
+    }
+
+    TiXmlElement* captured = new TiXmlElement("captured");
+    wrld->LinkEndChild(captured);
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator itc1 = world.map_captureobj.begin();
+    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator itc2 = world.map_captureobj.end();
+    for(; its1 != its2; ++its1)
+    {
+	node = new TiXmlElement("object");
+	captured->LinkEndChild(node);
+	node->SetAttribute("index", (*itc1).first);
+	node->SetAttribute("id", (*itc1).second.first);
+	node->SetAttribute("color", (*itc1).second.second);
     }
 
     doc.SaveFile(fn.c_str());
@@ -607,6 +640,10 @@ void Game::LoadXML(const std::string &fn)
     world.ultimate_artifact = res;
     wrld->Attribute("uniq", &res);
     world.uniq0 = res;
+    wrld->Attribute("week", &res);
+    world.week_name = Week::Get(res);
+    wrld->Attribute("count_obelisk", &res);
+    world.count_obelisk = res;
 
     // world date
     date->Attribute("month", &res);
@@ -960,7 +997,43 @@ void Game::LoadXML(const std::string &fn)
 	    }
 	}
 
+	TiXmlElement* recruits = kingdom2->FirstChildElement("recruits");
+	if(recruits)
+	{
+	    kingdom2->LinkEndChild(recruits);
+	    Recruits & rec = world.map_recruits[kingdom->color];
+	    recruits->Attribute("hero1", &res);
+	    rec.first = (res < Heroes::UNKNOWN ? world.GetHeroes(Heroes::ConvertID(res)) : NULL);
+	    recruits->Attribute("hero2", &res);
+	    rec.second = (res < Heroes::UNKNOWN ? world.GetHeroes(Heroes::ConvertID(res)) : NULL);
+	}
 	world.vec_kingdoms.push_back(kingdom);
+    }
+
+    // other
+    TiXmlElement* signs = wrld->FirstChildElement("signs");
+    if(signs)
+    {
+	node = signs->FirstChildElement();
+	for(; node; node = node->NextSiblingElement())
+	{
+	    node->Attribute("index", &res);
+	    world.map_sign[res] = node->GetText();
+	}
+    }
+    TiXmlElement* captured = wrld->FirstChildElement("captured");
+    if(captured)
+    {
+	node = captured->FirstChildElement();
+	for(; node; node = node->NextSiblingElement())
+	{
+	    node->Attribute("index", &res);
+	    std::pair<MP2::object_t, Color::color_t> & value = world.map_captureobj[res];
+	    node->Attribute("id", &res);
+	    value.first = static_cast<MP2::object_t>(static_cast<u8>(res));
+	    node->Attribute("color", &res);
+	    value.second = Color::Get(res);
+	}
     }
 
     // sort castles to kingdoms
