@@ -26,6 +26,7 @@
 #include "world.h"
 #include "gameevent.h"
 #include "xmlccwrap.h"
+#include <cstring>
 
 extern char *basename(const char *path);
 
