@@ -24,9 +24,83 @@
 #include "cursor.h"
 #include "settings.h"
 #include "button.h"
+#include "network.h"
 #include "game.h"
 
 u8 SelectCountPlayers(void);
+
+Game::menu_t Game::NewStandard(void)
+{
+    Settings::Get().SetGameType(Game::STANDARD);
+    return Game::SCENARIOINFO;
+}
+
+Game::menu_t Game::NewHotSeat(void)
+{
+    Settings::Get().SetGameType(Game::HOTSEAT);
+    return Game::SCENARIOINFO;
+}
+
+Game::menu_t Game::NewCampain(void)
+{
+    Settings::Get().SetGameType(Game::CAMPAIGN);
+    Error::Verbose("New Campain Game: under construction.");
+    return Game::NEWGAME;
+}
+
+Game::menu_t Game::NewNetwork(void)
+{
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    Display & display = Display::Get();
+    display.SetVideoMode(640, 480);
+
+    Settings & conf = Settings::Get();
+
+    conf.SetGameType(Game::NETWORK);
+
+    // image background
+    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+    display.Blit(back);
+
+    const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
+    display.Blit(panel, 405, 5);
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    Button buttonHost(455, 45, ICN::BTNNET, 0, 1);
+    Button buttonGuest(455, 110, ICN::BTNNET, 2, 3);
+    Button buttonCancelGame(455, 375, ICN::BTNMP, 8, 9);
+
+    buttonHost.Draw();
+    buttonGuest.Draw();
+    buttonCancelGame.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    // newgame loop
+    while(le.HandleEvents())
+    {
+	le.MousePressLeft(buttonHost) ? buttonHost.PressDraw() : buttonHost.ReleaseDraw();
+	le.MousePressLeft(buttonGuest) ? buttonGuest.PressDraw() : buttonGuest.ReleaseDraw();
+	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
+
+	if(le.MouseClickLeft(buttonHost) || le.KeyPress(KEY_h)) return NetworkServer();
+	if(le.MouseClickLeft(buttonGuest) || le.KeyPress(KEY_g)) return NetworkClient();
+	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
+
+        // right info
+	if(le.MousePressRight(buttonHost)) Dialog::Message(_("Host"), _("The host sets up the game options. There can only be one host per network game."), Font::BIG);
+	if(le.MousePressRight(buttonGuest)) Dialog::Message(_("Guest"), _("The guest waits for the host to set up the game, then is automatically added in. There can be multiple guests for TCP/IP games."), Font::BIG);
+	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
+    }
+
+    return Game::MAINMENU;
+}
 
 Game::menu_t Game::NewGame(void)
 {
@@ -141,11 +215,7 @@ Game::menu_t Game::NewMulti(void)
 	    conf.SetPreferablyCountPlayers(SelectCountPlayers());
 	    return conf.PreferablyCountPlayers() ? NEWHOTSEAT : MAINMENU;
 	}
-	if(le.MouseClickLeft(buttonNetwork))
-	{
-	    conf.SetPreferablyCountPlayers(SelectCountPlayers());
-	    return conf.PreferablyCountPlayers() ? NEWNETWORK : MAINMENU;
-	}
+	if(le.MouseClickLeft(buttonNetwork)) return NEWNETWORK;
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info

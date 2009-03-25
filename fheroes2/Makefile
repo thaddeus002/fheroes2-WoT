@@ -6,6 +6,7 @@
 # RELEASE: build with addons extensions
 # DEVELOPMENT: build with development extensions
 #
+# WITHOUT_NETWORK: build without network support
 # WITHOUT_UNICODE: build without unicode (disable translation and ttf font)
 # WITHOUT_PNG: build without png support (disable cache image, icn2png)
 

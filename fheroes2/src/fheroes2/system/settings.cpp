@@ -21,6 +21,8 @@
 #include <fstream>
 #include "settings.h"
 
+#define DEFAULT_PORT	5154
+
 namespace
 {
     struct ModeSetting
@@ -51,7 +53,8 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"),
     local_data_prefix("files"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
-    sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0)
+    sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0),
+    port(DEFAULT_PORT)
 {
     SetModes(SHADOW);
     SetModes(ORIGINAL);
@@ -176,6 +179,8 @@ void Settings::Dump(std::ostream & stream) const
     stream << "unicode = " << (Modes(UNICODE) ? "on" : "off") << std::endl;
 #endif
 
+    stream << "port = " << port << std::endl;
+
     stream << std::endl;
 }
 
@@ -291,6 +296,9 @@ void Settings::Parse(const std::string & left, const std::string & right)
     else
     // animation
     if(left == "animation") animation = String::ToInt(right);
+    else
+    // port
+    if(left == "port"){ port = String::ToInt(right); if(!port) port = DEFAULT_PORT; }
     else
     // font name
     if(left == "fonts normal") font_normal = right;
@@ -496,7 +504,7 @@ void Settings::SetPlayers(u8 c)
 
 void Settings::SetPreferablyCountPlayers(u8 c)
 {
-    if(2 > c) preferably_count_players = 2;
+    if(2 > c) preferably_count_players = 0;
     else
     if(6 < c) preferably_count_players = 6;
     else      preferably_count_players = c;
@@ -510,4 +518,9 @@ u8 Settings::PreferablyCountPlayers(void) const
 void Settings::SetLocalDataPrefix(const std::string & str)
 {
     local_data_prefix = str;
+}
+
+u16 Settings::GetPort(void) const
+{
+    return port;
 }

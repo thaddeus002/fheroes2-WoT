@@ -265,13 +265,13 @@ int main(int argc, char **argv)
 	    		case Game::NEWSTANDARD:    rs = Game::NewStandard();		break;
 	    		case Game::NEWCAMPAIN:     rs = Game::NewCampain();		break;
 	    		case Game::NEWMULTI:       rs = Game::NewMulti();		break;
+			case Game::NEWHOTSEAT:     rs = Game::NewHotSeat();		break;
+		        case Game::NEWNETWORK:     rs = Game::NewNetwork();		break;
 	    		case Game::LOADSTANDARD:   rs = Game::LoadStandard();		break;
 	    		case Game::LOADCAMPAIN:    rs = Game::LoadCampain();		break;
 	    		case Game::LOADMULTI:      rs = Game::LoadMulti();		break;
 	    		case Game::SCENARIOINFO:   rs = Game::ScenarioInfo();		break;
 			case Game::STARTGAME:      rs = Game::StartGame();      	break;
-			case Game::NEWHOTSEAT:     rs = Game::NewHotSeat();		break;
-		        case Game::NEWNETWORK:     rs = Game::NewNetwork();		break;
 		        case Game::TESTING:        rs = Game::Testing(test);		break;
 
 	    		default: break;

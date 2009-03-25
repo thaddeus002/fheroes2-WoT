@@ -18,9 +18,44 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "game.h"
+#include "dialog.h"
+#include "settings.h"
+#include "sdlnet.h"
 #include "network.h"
 
 #ifdef WITH_NET
 
+Game::menu_t Game::NetworkClient(void)
+{
+    Settings & conf = Settings::Get();
+    std::string server;
 
+    if(!Dialog::InputString("Server Name", server)) return MAINMENU;
+
+    IPaddress ip;
+    if(! Network::ResolveHost(ip, server.c_str(), conf.GetPort()))
+    {
+        Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
+	return Game::MAINMENU;
+    }
+
+    Network::Socket client;
+    if(! client.Open(ip))
+    {
+        Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
+        return Game::MAINMENU;
+    }
+
+    client.Close();
+
+    return QUITGAME;
+}
+
+#else
+Game::menu_t Game::NetworkClient(void)
+{
+    Dialog::Message(_("Error"), _("This release is compiled without network support."), Font::BIG, Dialog::OK);
+    return MAINMENU;
+}
 #endif

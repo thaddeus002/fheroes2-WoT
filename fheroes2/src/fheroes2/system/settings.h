@@ -130,6 +130,8 @@ public:
 
     void SetLocalDataPrefix(const std::string &);
 
+    u16	GetPort(void) const;
+
 protected:
     void Parse(const std::string & left, const std::string & right);
     void SetStrModes(const std::string & key);
@@ -171,6 +173,8 @@ private:
     u8 game;
     u8 players;
     u8 preferably_count_players;
+    
+    u16 port;
 };
 
 #endif

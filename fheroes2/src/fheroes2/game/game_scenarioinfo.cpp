@@ -68,7 +68,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	const std::bitset<8> colors(mi->AllowColors());
 	
 	// multi map filter
-	if(Game::MULTI & conf.GameType() && 2 > colors.count())
+	if(Game::MULTI & conf.GameType() && conf.PreferablyCountPlayers() > colors.count())
 	{
 	    delete mi;
 	    continue;

@@ -22,7 +22,21 @@
 #include "agg.h"
 #include "cursor.h"
 #include "button.h"
+#include "settings.h"
 #include "game.h"
+
+Game::menu_t Game::LoadCampain(void)
+{
+    Settings::Get().SetGameType(Game::CAMPAIGN);
+    Error::Verbose("Load Campain Game: under construction.");
+    return Game::LOADGAME;
+}
+
+Game::menu_t Game::LoadMulti(void)
+{
+    Error::Verbose("Load Multi Game: under construction.");
+    return Game::LOADGAME;
+}
 
 Game::menu_t Game::LoadGame(void)
 {
