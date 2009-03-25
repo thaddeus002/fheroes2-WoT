@@ -32,6 +32,11 @@ LIBS := $(LIBS) -lintl -liconv
 endif
 endif
 
+ifndef WITHOUT_NETWORK
+CFLAGS := $(CFLAGS) -DWITH_NET
+SDL_LIBS := $(SDL_LIBS) -lSDL_net
+endif
+
 ifdef RELEASE
 CFLAGS := $(CFLAGS) -DBUILD_RELEASE
 endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,59 +18,4 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
-#include "engine.h"
-#include "font.h"
-#include "sdlnet.h"
-
-namespace Mixer
-{
-    void Init(void);
-    void Quit(void);
-}
-
-namespace Cdrom
-{
-    void Open(void);
-    void Close(void);
-}
-
-bool SDL::Init(const u32 system)
-{
-    if(0 > SDL_Init(system))
-    {
-	Error::Warning("SDL::Init: error: " + std::string(SDL_GetError()));
-
-	return false;
-    }
-
-    if(SDL_INIT_AUDIO & system) Mixer::Init();
-    if(SDL_INIT_CDROM & system) Cdrom::Open();
-#ifdef WITH_TTF
-    SDL::Font::Init();
-#endif
-#ifdef WITH_NET
-    Network::Init();
-#endif
-
-    return true;
-}
-
-void SDL::Quit(void)
-{
-#ifdef WITH_NET
-    Network::Quit();
-#endif
-#ifdef WITH_TTF
-    SDL::Font::Quit();
-#endif
-    if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();
-    if(SubSystem(SDL_INIT_AUDIO)) Mixer::Quit();
-
-    SDL_Quit();
-}
-
-bool SDL::SubSystem(const u32 system)
-{
-    return system & SDL_WasInit(system);
-}
+#include "network.h"

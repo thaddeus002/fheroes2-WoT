@@ -1,0 +1,48 @@
+			"Free Heroes II protocol, version 0.1"	
+
+	"SERVER"							"CLIENT"
+	------------------------------------------------------------------------
+	"BANNER"			"->"
+	------------------------------------------------------------------------
+					"<-"	"version, build"	"HELLO"
+	"LOGOUT"	"string"	"->"
+	"HELLO"		"version,
+			build, 
+			allow colors"	"->"
+					"<-"	"color, name"		"CONNECT"
+	"CONNECT"	"bool"		"->"
+	"MESSAGE"	"string"	"<>"	"string"		"MESSAGE"
+					"<-"				"READY"
+	------------------------------------------------------------------------
+	"LOADMAPS"	"data"		"->"
+					"<-"				"READY"
+	------------------------------------------------------------------------
+	"TURNS"		"color"		"->"
+
+	"HEROES"	"data"		"->"
+	"SPELL"		"data"		"->"
+	"MAPS"		"data"		"->"
+	"CASTLE"	"data"		"->"
+	"KINGDOM"	"data"		"->"
+	"WORLD"		"data"		"->"
+
+	"MESSAGE"	"string"	"<>"	"string"		"MESSAGE"
+	------------------------------------------------------------------------
+	"TURNS"		"color"		"->"
+					"<-"				"READY"
+
+					"<-"	"data"			"HEROES"
+	"HEROES"	"bool"		"->"
+					"<-"	"data"			"SPELL"
+	"SPELL"		"bool"		"->"
+					"<-"	"data"			"MAPS"
+	"MAPS"		"bool"		"->"
+					"<-"	"data"			"CASTLE"
+	"CASTLE"	"bool"		"->"
+					"<-"	"data"			"KINGDOM"
+	"KINGDOM"	"bool"		"->"
+					"<-"	"data"			"WORLD"
+	"WORLD"		"bool"		"->"
+
+	"MESSAGE"	"string"	"<>	"string"		"MESSAGE"
+	------------------------------------------------------------------------

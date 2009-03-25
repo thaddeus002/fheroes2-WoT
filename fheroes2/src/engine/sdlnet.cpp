@@ -18,11 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_NET
+
 #include <iostream>
 #include <algorithm>
 #include "sdlnet.h"
 
-#define FHXX	0x46483031	// free heroes2 protocol, ver 01
+#define FHXX	0x4601	// free heroes2 protocol, ver 01
 
 Network::Message::Message() : type(MSG_UNKNOWN)
 {
@@ -32,7 +34,7 @@ Network::Message::Message(msg_t id) : type(id)
 {
 }
 
-Uint16 Network::Message::GetID(void) const
+u16 Network::Message::GetID(void) const
 {
     return type;
 }
@@ -50,12 +52,12 @@ void Network::Message::Reset(void)
 
 bool Network::Message::Recv(const Socket & csd)
 {
-    Uint16 fhid;
+    u16 fhid;
     type = MSG_UNKNOWN;
 
     if(csd.Recv(reinterpret_cast<char *>(&fhid), sizeof(fhid)))
     {
-	fhid = SDL_SwapBE16(fhid);
+	SwapBE16(fhid);
 
 	// check id
 	if((0xFF00 & FHXX) != (0xFF00 & fhid))
@@ -71,7 +73,7 @@ bool Network::Message::Recv(const Socket & csd)
 	    return false;
 	}
 
-	Uint32 size;
+	u32 size;
 
 	if(csd.Recv(reinterpret_cast<char *>(&type), sizeof(type)) &&
 	   csd.Recv(reinterpret_cast<char *>(&size), sizeof(size)))
@@ -92,9 +94,13 @@ bool Network::Message::Send(const Socket & csd) const
     if(MSG_RAW == type)
 	return csd.Send(reinterpret_cast<const char *>(&data[0]), data.size());
 
-    const Uint16 fhid = SDL_SwapBE16(static_cast<Uint16>(FHXX));
-    const Uint16 sign = SDL_SwapBE16(type);
-    const Uint32 size = SDL_SwapBE32(data.size());
+    u16 fhid = FHXX;
+    u16 sign = type;
+    u32 size = data.size();
+
+    SwapBE16(fhid);
+    SwapBE16(sign);
+    SwapBE32(size);
 
     return csd.Send(reinterpret_cast<const char *>(&fhid), sizeof(fhid)) &&
            csd.Send(reinterpret_cast<const char *>(&sign), sizeof(sign)) &&
@@ -102,23 +108,23 @@ bool Network::Message::Send(const Socket & csd) const
            (size ? csd.Send(reinterpret_cast<const char *>(&data[0]), data.size()) : true);
 }
 
-void Network::Message::Push(Uint8 byte8)
+void Network::Message::Push(u8 byte8)
 {
     data.push_back(byte8);
 }
 
-void Network::Message::Push(Uint16 byte16)
+void Network::Message::Push(u16 byte16)
 {
-    data.push_back(static_cast<Uint8>(0x00FF & (byte16 >> 8)));
-    data.push_back(static_cast<Uint8>(0x00FF & byte16));
+    data.push_back(static_cast<u8>(0x00FF & (byte16 >> 8)));
+    data.push_back(static_cast<u8>(0x00FF & byte16));
 }
 
-void Network::Message::Push(Uint32 byte32)
+void Network::Message::Push(u32 byte32)
 {
-    data.push_back(static_cast<Uint8>(0x000000FF & (byte32 >> 24)));
-    data.push_back(static_cast<Uint8>(0x000000FF & (byte32 >> 16)));
-    data.push_back(static_cast<Uint8>(0x000000FF & (byte32 >> 8)));
-    data.push_back(static_cast<Uint8>(0x000000FF & byte32));
+    data.push_back(static_cast<u8>(0x000000FF & (byte32 >> 24)));
+    data.push_back(static_cast<u8>(0x000000FF & (byte32 >> 16)));
+    data.push_back(static_cast<u8>(0x000000FF & (byte32 >> 8)));
+    data.push_back(static_cast<u8>(0x000000FF & byte32));
 }
 
 void Network::Message::Push(const std::string & str)
@@ -133,7 +139,7 @@ void Network::Message::Push(const std::string & str)
     data.push_back(0x00);
 }
 
-bool Network::Message::Pop(Uint8 & byte8)
+bool Network::Message::Pop(u8 & byte8)
 {
     if(data.empty()) return false;
 
@@ -143,7 +149,7 @@ bool Network::Message::Pop(Uint8 & byte8)
     return true;
 }
 
-bool Network::Message::Pop(Uint16 & byte16)
+bool Network::Message::Pop(u16 & byte16)
 {
     if(data.size() < sizeof(byte16)) return false;
 
@@ -156,7 +162,7 @@ bool Network::Message::Pop(Uint16 & byte16)
     return true;
 }
 
-bool Network::Message::Pop(Uint32 & byte32)
+bool Network::Message::Pop(u32 & byte32)
 {
     if(data.size() < sizeof(byte32)) return false;
 
@@ -178,8 +184,8 @@ bool Network::Message::Pop(Uint32 & byte32)
 bool Network::Message::Pop(std::string & str)
 {
     // find end string
-    std::deque<Uint8>::const_iterator it_beg = data.begin();
-    std::deque<Uint8>::const_iterator it_end = std::find(data.begin(), data.end(), 0x00);
+    std::deque<u8>::const_iterator it_beg = data.begin();
+    std::deque<u8>::const_iterator it_end = std::find(data.begin(), data.end(), 0x00);
     if(it_end == data.end()) return false;
 
     for(; it_beg != it_end; ++it_beg) str += *it_beg;
@@ -193,8 +199,8 @@ void Network::Message::Dump(std::ostream & stream) const
     if(data.size())
     {
 	stream << ", data:";
-	std::deque<Uint8>::const_iterator it1 = data.begin();
-	std::deque<Uint8>::const_iterator it2 = data.end();
+	std::deque<u8>::const_iterator it1 = data.begin();
+	std::deque<u8>::const_iterator it2 = data.end();
 	for(; it1 != it2; ++it1) stream << " 0x" << std::hex << static_cast<int>(*it1);
     }
 
@@ -284,7 +290,7 @@ void Network::Quit(void)
     SDLNet_Quit();
 }
 
-bool Network::ResolveHost(IPaddress & ip, const char* host, Uint16 port)
+bool Network::ResolveHost(IPaddress & ip, const char* host, u16 port)
 {
     if(SDLNet_ResolveHost(&ip, host, port) < 0)
     {
@@ -299,21 +305,32 @@ const char* Network::GetError(void)
     return SDLNet_GetError();
 }
 
-const char* Network::GetMsgString(Uint16 msg)
+const char* Network::GetMsgString(u16 msg)
 {
     switch(msg)
     {
 	case MSG_RAW:		return "MSG_RAW";
 	case MSG_DATA:		return "MSG_DATA";
         case MSG_PING:		return "MSG_PING";
-        case MSG_SHUTDOWN:	return "MSG_SHUTDOWN";
+        case MSG_HELLO:		return "MSG_HELLO";
         case MSG_CONNECT:	return "MSG_CONNECT";
-        case MSG_LOGOUT:	return "MSG_LOGOUT";
-        case MSG_WAIT:		return "MSG_WAIT";
+	case MSG_MESSAGE:	return "MSG_MESSAGE";
         case MSG_READY:		return "MSG_READY";
+        case MSG_LOGOUT:	return "MSG_LOGOUT";
+
+        case MSG_LOADMAPS:	return "MSG_LOADMAPS";
+        case MSG_TURNS:		return "MSG_TURNS";
+        case MSG_HEROES:	return "MSG_HEROES";
+        case MSG_CASTLE:	return "MSG_CASTLE";
+        case MSG_SPELL:		return "MSG_SPELL";
+        case MSG_MAPS:		return "MSG_MAPS";
+        case MSG_KINGDOM:	return "MSG_KINGDOM";
+        case MSG_WORLD:		return "MSG_WORLD";
 
         default: break;
     }
 
     return "MSG_UNKNOWN";
 }
+
+#endif
