@@ -65,6 +65,8 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
 {
     if(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
         return;
+
+    AGG::PlayMusic(status == Army::WIN ? MUS::BATTLEWIN : MUS::BATTLELOSE);
     
     ICN::icn_t interface = Settings::Get().EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE;
     ICN::icn_t buttonIcon = Settings::Get().EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB;
