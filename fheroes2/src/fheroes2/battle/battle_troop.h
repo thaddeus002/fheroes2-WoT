@@ -31,6 +31,12 @@ typedef std::vector<s8> IndexList;
 
 namespace Army
 {
+    enum MovementState {
+        NOT_MOVING,
+        SELECTED,
+        IN_MOTION
+    };
+    
     class BattleTroop : public Troop
     {
       public:
@@ -48,9 +54,8 @@ namespace Army
         const Point& Position() const { return pos; };
         void SetScreenPosition(const Point & pt) { screenPos = pt; };
         const Point& ScreenPosition() const { return screenPos; };
-        
-        bool isMoving() const { return moving; }
-        void SetMoving(bool m) { moving = m; }
+        MovementState isMoving() const { return moving; }
+        void SetMoving(MovementState m) { moving = m; }
 
         void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
         void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
@@ -90,7 +95,7 @@ namespace Army
         int     ApplyDamage(long);
 
         void    LoadContours(bool);
-        const Surface* GetContour(u8) const;
+        const Surface* GetContour(u8);
 
         u8                      astate;
         u16                     aframe;
@@ -107,7 +112,7 @@ namespace Army
         Background bg;
         bool saved;
         bool reflect, origReflect, lastReflect;
-        bool moving;
+        MovementState moving;
         std::vector<Spell::magic_t> magics;
 
         u8			disruptingray;

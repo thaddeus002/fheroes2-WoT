@@ -70,7 +70,7 @@ Army::BattleTroop::~BattleTroop()
 void Army::BattleTroop::Init()
 {
     summoned = false;
-    moving = false;
+    moving = NOT_MOVING;
     saved = false;
     reflect = false;
     origReflect = false;
@@ -128,8 +128,10 @@ void Army::BattleTroop::Blit(const Point& dst_pt, bool reflect, int frame)
     display.Blit(sp, p);
 }
 
-const Surface* Army::BattleTroop::GetContour(u8 index) const
+const Surface* Army::BattleTroop::GetContour(u8 index)
 {
+    if(contours.empty())
+        LoadContours(IsReflected());
     return (contours.empty() || index >= contours.size() ? NULL : contours[index]);
 }
 
@@ -144,7 +146,7 @@ void Army::BattleTroop::LoadContours(bool inv)
 
 		for(; it1 != it2; ++it1) if(*it1) delete *it1;
     }
-
+    
     u8 start = 0;
     u8 length = 0;
     GetAnimFrames(Monster::AS_IDLE, start, length);

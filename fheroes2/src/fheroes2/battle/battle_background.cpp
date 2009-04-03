@@ -277,12 +277,12 @@ namespace Battle
             for(u16 i = 0; i < movePoints.size(); i++)
                 DrawShadow(movePoints[i]);
         
-        DrawMark(troop.Position(), 1);
+        /*DrawMark(troop.Position(), 1);
         if(troop.isWide()) {
             Point p = troop.Position();
             p.x += troop.IsReflected() ? -1 : 1;
             DrawMark(p);
-        }
+            }*/
     }
 
     void Battlefield::Background::DrawCursor(const Point &cur_pt)
@@ -484,10 +484,10 @@ namespace Battle
         
         Army::BattleTroop *inMotion = NULL;
         for(u16 i = 0; i < army1.size(); i++)
-            if(army1[i].isValid() && army1[i].isMoving())
+            if(army1[i].isValid() && army1[i].isMoving() == Army::IN_MOTION)
                 inMotion = &army1[i];
         for(u16 i = 0; i < army2.size(); i++)
-            if(army2[i].isValid() && army2[i].isMoving())
+            if(army2[i].isValid() && army2[i].isMoving() == Army::IN_MOTION)
                 inMotion = &army2[i];
         
         Point p;
@@ -508,14 +508,14 @@ namespace Battle
                 if(castle && p.y < BFH / 2)
                     castle->DrawCell(p);
                 
-                if(t = FindTroopExact(army1, p), t >= 0 && !army1[t].isMoving())
+                if(t = FindTroopExact(army1, p), t >= 0 && army1[t].isMoving() != Army::IN_MOTION)
                 {
                     DrawTroop(army1[t], castle, animframe);
                     army1[t].Animate();
                     if(idleAnimations && army1[t].astate == Monster::AS_NONE && !Rand::Get(0, 30))
                         army1[t].Animate(Monster::AS_IDLE);
                 }
-                if(t = FindTroopExact(army2, p), t >= 0 && !army2[t].isMoving())
+                if(t = FindTroopExact(army2, p), t >= 0 && army2[t].isMoving() != Army::IN_MOTION)
                 {
                     DrawTroop(army2[t], castle, animframe);
                     army2[t].Animate();
@@ -551,14 +551,30 @@ namespace Battle
 
     void Battlefield::Background::DrawTroop(Army::BattleTroop & troop, BattleCastle *castle, int animframe)
     {
+        static u32 frame = 0;
         if(troop() == Monster::UNKNOWN) return;
         bool reflect = troop.IsReflected();
         bool wide = troop.isWide();
-        Point pos = troop.isMoving() ? Scr2BfDirect(troop.ScreenPosition()) : troop.Position();
+        Point pos = troop.isMoving() == Army::IN_MOTION ? Scr2BfDirect(troop.ScreenPosition())
+                                                        : troop.Position();
         Point tp = Bf2Scr(pos);
         troop.Blit(tp, reflect, animframe);
+        if(troop.isMoving() == Army::SELECTED)
+        {
+            frame -= animframe;
+            u8 start, count;
+            troop.GetAnimFrames(troop.astate, start, count, false);
+            const Surface *outline = troop.GetContour(troop.aframe - start);
+            if(!outline)
+                Error::Warning("invalid contour %u", troop.aframe);
+            else
+            {
+                const_cast<Surface *>(outline)->SetAlpha(abs((frame%21)-10)*20+55);
+                display.Blit(*outline, tp - Point(outline->w() / 2, outline->h()));
+            }
+        }
 
-        if(!troop.isMoving() && castle && castle->hasMoat() &&
+        if(troop.isMoving() != Army::IN_MOTION && castle && castle->hasMoat() &&
            (castle->IsCellInMoat(pos) ||
             (wide && castle->IsCellInMoat(pos + Point(reflect ? -1 : 1, 0)))))
         {
@@ -567,7 +583,7 @@ namespace Battle
         }
 
         // No count if troop is in motion
-        if(troop.isMoving())
+        if(troop.isMoving() == Army::IN_MOTION)
             return;
         
         // draw count

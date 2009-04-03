@@ -584,7 +584,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
     if(haveDisplay)
         m_gui = new GUI(hero1, hero2);
     else m_gui = NULL;
-        
+    
     Army::battle_t battle_status = Army::NONE;
     GUI::interaction_t status = GUI::NONE;
 
@@ -627,12 +627,21 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
             }
             else validMove = false;
         }
+        else
+        {
+            int idx = currentTroop - 1;
+            if(currentTroop == 0)
+                idx = troopOrder.size() - 1;
+            Army::BattleTroop &last = m_battlefield.GetTroopFromIndex(troopOrder[idx]);
+            last.SetMoving(Army::NOT_MOVING);
+        }
         
         Army::BattleTroop &troop = NextValidTroop(currentTroop, troopOrder);
         TroopIndex troopIdx = troopOrder[currentTroop - 1];
         u8 currentTurn = m_battlefield.GetSideFromIndex(troopIdx);
         
         troop.ResetModes(Army::ATTACKED);
+        troop.SetMoving(Army::SELECTED);
         
         if(AdjustMorale(turn[currentTurn]->GetHero(), troop))
         {
@@ -965,12 +974,12 @@ Battle::MoveAction::MoveAction(Army::BattleTroop &troop)
 : m_troop(&troop)
 {
     m_frame = m_curstep = m_numsteps = m_st = m_prep = m_part = m_post = m_len = 0;
-    m_troop->SetMoving(true);
+    m_troop->SetMoving(Army::IN_MOTION);
 }
 
 Battle::MoveAction::~MoveAction()
 {
-    m_troop->SetMoving(false);
+    m_troop->SetMoving(Army::NOT_MOVING);
 }
     
 Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Army::BattleTroop &myTroop, PointList *path)
@@ -1088,7 +1097,7 @@ Battle::FlyAction::FlyAction(const Point &move, Army::BattleTroop &myTroop)
         m_end = Bf2Scr(move + Point( move.x < myTroop.Position().x ? 1 : 0 ) );
     else m_end = Bf2Scr(move);
 
-    myTroop.SetMoving(true);
+    myTroop.SetMoving(Army::IN_MOTION);
         
     myTroop.SetReflect(m_end.x < start.x);
     if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
