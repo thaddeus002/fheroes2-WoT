@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-03 02:01-0400\n"
+"POT-Creation-Date: 2009-04-03 12:03-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -208,8 +208,8 @@ msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:407
 #: ../fheroes2/battle/battle_dialog.cpp:415
-#: ../fheroes2/game/game_newgame.cpp:88 ../fheroes2/game/game_newgame.cpp:154
-#: ../fheroes2/game/game_newgame.cpp:222
+#: ../fheroes2/game/game_newgame.cpp:99 ../fheroes2/game/game_newgame.cpp:162
+#: ../fheroes2/game/game_newgame.cpp:224 ../fheroes2/game/game_newgame.cpp:292
 #: ../fheroes2/game/game_scenarioinfo.cpp:333
 msgid "Cancel"
 msgstr ""
@@ -1391,8 +1391,8 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/editor/editor_newmaps.cpp:112
-#: ../fheroes2/game/game_newgame.cpp:88 ../fheroes2/game/game_newgame.cpp:154
-#: ../fheroes2/game/game_newgame.cpp:222
+#: ../fheroes2/game/game_newgame.cpp:99 ../fheroes2/game/game_newgame.cpp:162
+#: ../fheroes2/game/game_newgame.cpp:224 ../fheroes2/game/game_newgame.cpp:292
 msgid "Cancel back to the main menu."
 msgstr ""
 
@@ -1701,7 +1701,7 @@ msgstr ""
 msgid "Impossible"
 msgstr ""
 
-#: ../fheroes2/game/game_io.cpp:681 ../fheroes2/kingdom/world.cpp:200
+#: ../fheroes2/game/game_io.cpp:682 ../fheroes2/kingdom/world.cpp:200
 #: ../fheroes2/kingdom/world.cpp:242
 msgid "Maps Loading..."
 msgstr ""
@@ -1742,97 +1742,117 @@ msgstr ""
 msgid "Start a single or multi-player game."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:85
+#: ../fheroes2/game/game_newgame.cpp:97
+msgid "Host"
+msgstr ""
+
+#: ../fheroes2/game/game_newgame.cpp:97
+msgid ""
+"The host sets up the game options. There can only be one host per network "
+"game."
+msgstr ""
+
+#: ../fheroes2/game/game_newgame.cpp:98
+msgid "Guest"
+msgstr ""
+
+#: ../fheroes2/game/game_newgame.cpp:98
+msgid ""
+"The guest waits for the host to set up the game, then is automatically added "
+"in. There can be multiple guests for TCP/IP games."
+msgstr ""
+
+#: ../fheroes2/game/game_newgame.cpp:159
 msgid "Standard Game"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:85
+#: ../fheroes2/game/game_newgame.cpp:159
 msgid "A single player game playing out a single map."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:86
+#: ../fheroes2/game/game_newgame.cpp:160
 msgid "Campaign Game"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:86
+#: ../fheroes2/game/game_newgame.cpp:160
 msgid "A single player game playing through a series of maps."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:87
+#: ../fheroes2/game/game_newgame.cpp:161
 msgid "Multi-Player Game"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:87
+#: ../fheroes2/game/game_newgame.cpp:161
 msgid ""
 "A multi-player game, with several human players completing against each "
 "other on a single map."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:152
+#: ../fheroes2/game/game_newgame.cpp:222
 msgid "Hot Seat"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:152
+#: ../fheroes2/game/game_newgame.cpp:222
 msgid ""
 "Play a Hot Seat game, where 2 to 4 players play around the same computer, "
 "switching into the 'Hot Seat' when it is their turn."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:153
+#: ../fheroes2/game/game_newgame.cpp:223
 msgid "Network"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:153
+#: ../fheroes2/game/game_newgame.cpp:223
 msgid ""
 "Play a network game, where 2 players use their own computers connected "
 "through a LAN (Local Area Network)."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:217
+#: ../fheroes2/game/game_newgame.cpp:287
 msgid "2 Players"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:217
+#: ../fheroes2/game/game_newgame.cpp:287
 msgid ""
 "Play with 2 human players, and optionally, up, to 4 additional computer "
 "players."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:218
+#: ../fheroes2/game/game_newgame.cpp:288
 msgid "3 Players"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:218
+#: ../fheroes2/game/game_newgame.cpp:288
 msgid ""
 "Play with 3 human players, and optionally, up, to 3 additional computer "
 "players."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:219
+#: ../fheroes2/game/game_newgame.cpp:289
 msgid "4 Players"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:219
+#: ../fheroes2/game/game_newgame.cpp:289
 msgid ""
 "Play with 4 human players, and optionally, up, to 2 additional computer "
 "players."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:220
+#: ../fheroes2/game/game_newgame.cpp:290
 msgid "5 Players"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:220
+#: ../fheroes2/game/game_newgame.cpp:290
 msgid ""
 "Play with 5 human players, and optionally, up, to 1 additional computer "
 "players."
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:221
+#: ../fheroes2/game/game_newgame.cpp:291
 msgid "6 Players"
 msgstr ""
 
-#: ../fheroes2/game/game_newgame.cpp:221
+#: ../fheroes2/game/game_newgame.cpp:291
 msgid "Play with 6 human players."
 msgstr ""
 
@@ -5138,6 +5158,16 @@ msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:124
 msgid "Water Elements"
+msgstr ""
+
+#: ../fheroes2/network/client.cpp:39 ../fheroes2/network/client.cpp:46
+#: ../fheroes2/network/client.cpp:58 ../fheroes2/network/server.cpp:44
+#: ../fheroes2/network/server.cpp:51 ../fheroes2/network/server.cpp:95
+msgid "Error"
+msgstr ""
+
+#: ../fheroes2/network/client.cpp:58 ../fheroes2/network/server.cpp:95
+msgid "This release is compiled without network support."
 msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:37

@@ -570,7 +570,8 @@ namespace Battle
             else
             {
                 const_cast<Surface *>(outline)->SetAlpha(abs((frame%21)-10)*20+55);
-                display.Blit(*outline, tp - Point(outline->w() / 2, outline->h()));
+                u32 xoff = outline->w() / (2 * (1 + wide));
+                display.Blit(*outline, tp - Point(xoff, outline->h()));
             }
         }
 
