@@ -24,13 +24,21 @@
 #include <algorithm>
 #include "sdlnet.h"
 
-#define FHXX	0x4601	// free heroes2 protocol, ver 01
+namespace Network
+{
+    static u16 proto = 0xFF01;
+};
 
-Network::Message::Message() : type(MSG_UNKNOWN)
+void Network::SetProtocolVersion(u16 v)
+{
+    proto = v;
+}
+
+Network::Message::Message() : type(0)
 {
 }
 
-Network::Message::Message(msg_t id) : type(id)
+Network::Message::Message(u16 id) : type(id)
 {
 }
 
@@ -39,38 +47,38 @@ u16 Network::Message::GetID(void) const
     return type;
 }
 
-void Network::Message::SetID(msg_t id)
+void Network::Message::SetID(u16 id)
 {
     type = id;
 }
 
 void Network::Message::Reset(void)
 {
-    type = MSG_UNKNOWN;
+    type = 0;
     data.clear();
 }
 
-bool Network::Message::Recv(const Socket & csd)
+bool Network::Message::Recv(const Socket & csd, bool debug)
 {
-    u16 fhid;
-    type = MSG_UNKNOWN;
+    u16 head;
+    type = 0;
 
-    if(csd.Recv(reinterpret_cast<char *>(&fhid), sizeof(fhid)))
+    if(csd.Recv(reinterpret_cast<char *>(&head), sizeof(head)))
     {
-	SwapBE16(fhid);
+	SwapBE16(head);
 
 	// check id
-	if((0xFF00 & FHXX) != (0xFF00 & fhid))
+	if((0xFF00 & proto) != (0xFF00 & head))
 	{
-	    std::cerr << "Network::Message::Recv: unknown packet id: 0x" << std::hex << fhid << std::endl;
-	    return false;
+	    if(debug) std::cerr << "Network::Message::Recv: unknown packet id: 0x" << std::hex << head << std::endl;
+	    return true;
 	}
 
 	// check ver
-	if((0x00FF & FHXX) > (0x00FF & fhid))
+	if((0x00FF & proto) > (0x00FF & head))
 	{
-	    std::cerr << "Network::Message::Recv: obsolete protocol version: 0x" << std::hex << (0x00FF & fhid) << std::endl;
-	    return false;
+	    if(debug) std::cerr << "Network::Message::Recv: obsolete protocol proto: 0x" << std::hex << (0x00FF & head) << std::endl;
+	    return true;
 	}
 
 	u32 size;
@@ -85,24 +93,23 @@ bool Network::Message::Recv(const Socket & csd)
 	    return size ? csd.Recv(reinterpret_cast<char *>(&data[0]), size) : true;
 	}
     }
-
     return false;
 }
 
-bool Network::Message::Send(const Socket & csd) const
+bool Network::Message::Send(const Socket & csd, bool raw) const
 {
-    if(MSG_RAW == type)
+    if(raw)
 	return csd.Send(reinterpret_cast<const char *>(&data[0]), data.size());
 
-    u16 fhid = FHXX;
+    u16 head = proto;
     u16 sign = type;
     u32 size = data.size();
 
-    SwapBE16(fhid);
+    SwapBE16(head);
     SwapBE16(sign);
     SwapBE32(size);
 
-    return csd.Send(reinterpret_cast<const char *>(&fhid), sizeof(fhid)) &&
+    return csd.Send(reinterpret_cast<const char *>(&head), sizeof(head)) &&
            csd.Send(reinterpret_cast<const char *>(&sign), sizeof(sign)) &&
            csd.Send(reinterpret_cast<const char *>(&size), sizeof(size)) &&
            (size ? csd.Send(reinterpret_cast<const char *>(&data[0]), data.size()) : true);
@@ -183,6 +190,8 @@ bool Network::Message::Pop(u32 & byte32)
 
 bool Network::Message::Pop(std::string & str)
 {
+    str.clear();
+
     // find end string
     std::deque<u8>::const_iterator it_beg = data.begin();
     std::deque<u8>::const_iterator it_end = std::find(data.begin(), data.end(), 0x00);
@@ -194,7 +203,7 @@ bool Network::Message::Pop(std::string & str)
 
 void Network::Message::Dump(std::ostream & stream) const
 {
-    stream << "Network::Message::Dump: type: " << GetMsgString(type) << ", size: " << data.size();
+    stream << "Network::Message::Dump: type: 0x" << std::hex << type << ", size: " << data.size();
 
     if(data.size())
     {
@@ -227,6 +236,24 @@ Network::Socket & Network::Socket::operator= (const Socket &)
 Network::Socket::~Socket()
 {
     if(sd) Close();
+}
+
+u32 Network::Socket::Host(void) const
+{
+    IPaddress* remoteIP = sd ? SDLNet_TCP_GetPeerAddress(sd) : NULL;
+    if(remoteIP) return SDLNet_Read32(&remoteIP->host);
+
+    std::cerr << "Network::Socket::Host: " << GetError() << std::endl;
+    return 0;
+}
+
+u16 Network::Socket::Port(void) const
+{
+    IPaddress* remoteIP = sd ? SDLNet_TCP_GetPeerAddress(sd) : NULL;
+    if(remoteIP) return SDLNet_Read16(&remoteIP->port);
+
+    std::cerr << "Network::Socket::Host: " << GetError() << std::endl;
+    return 0;
 }
 
 bool Network::Socket::Recv(char *buf, size_t len) const
@@ -303,34 +330,6 @@ bool Network::ResolveHost(IPaddress & ip, const char* host, u16 port)
 const char* Network::GetError(void)
 {
     return SDLNet_GetError();
-}
-
-const char* Network::GetMsgString(u16 msg)
-{
-    switch(msg)
-    {
-	case MSG_RAW:		return "MSG_RAW";
-	case MSG_DATA:		return "MSG_DATA";
-        case MSG_PING:		return "MSG_PING";
-        case MSG_HELLO:		return "MSG_HELLO";
-        case MSG_CONNECT:	return "MSG_CONNECT";
-	case MSG_MESSAGE:	return "MSG_MESSAGE";
-        case MSG_READY:		return "MSG_READY";
-        case MSG_LOGOUT:	return "MSG_LOGOUT";
-
-        case MSG_LOADMAPS:	return "MSG_LOADMAPS";
-        case MSG_TURNS:		return "MSG_TURNS";
-        case MSG_HEROES:	return "MSG_HEROES";
-        case MSG_CASTLE:	return "MSG_CASTLE";
-        case MSG_SPELL:		return "MSG_SPELL";
-        case MSG_MAPS:		return "MSG_MAPS";
-        case MSG_KINGDOM:	return "MSG_KINGDOM";
-        case MSG_WORLD:		return "MSG_WORLD";
-
-        default: break;
-    }
-
-    return "MSG_UNKNOWN";
 }
 
 #endif

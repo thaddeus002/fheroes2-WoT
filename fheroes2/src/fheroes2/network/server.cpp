@@ -63,7 +63,6 @@ Game::menu_t Game::NetworkServer(void)
 
     Network::Message banner;
     banner.Push(str);
-    banner.SetID(Network::MSG_RAW);
 
     bool exit = false;
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -73,7 +72,7 @@ Game::menu_t Game::NetworkServer(void)
     {
 	TCPsocket csd = server.Accept();
         Network::Socket client(csd);
-        banner.Send(client);
+        banner.Send(client, true);
         client.Close();
 
         DELAY(1);

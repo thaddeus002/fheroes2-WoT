@@ -30,35 +30,11 @@
 
 namespace Network
 {
-    enum msg_t
-    {
-	MSG_RAW,
-	MSG_DATA,
-
-	MSG_PING,
-	MSG_HELLO,
-	MSG_CONNECT,
-	MSG_MESSAGE,
-	MSG_READY,
-	MSG_LOGOUT,
-
-	MSG_LOADMAPS,
-	MSG_TURNS,
-	MSG_HEROES,
-	MSG_CASTLE,
-	MSG_SPELL,
-	MSG_MAPS,
-	MSG_KINGDOM,
-	MSG_WORLD,
-
-	MSG_UNKNOWN
-    };
-
     bool		Init(void);
     void		Quit(void);
     bool		ResolveHost(IPaddress &, const char*, u16);
     const char*		GetError(void);
-    const char*		GetMsgString(u16);
+    void		SetProtocolVersion(u16);
 
     class Socket
     {
@@ -69,6 +45,9 @@ namespace Network
 
 	bool		Recv(char *, size_t) const;
 	bool		Send(const char*, size_t) const;
+
+	u32		Host(void) const;
+	u16		Port(void) const;
 
 	bool		Open(IPaddress &);
 	bool		IsValid(void) const;
@@ -85,10 +64,10 @@ namespace Network
     {
     public:
 	Message();
-	Message(msg_t);
+	Message(u16);
 
 	u16	GetID(void) const;
-	void	SetID(msg_t);
+	void	SetID(u16);
 
 	void	Push(u8);
 	void	Push(u16);
@@ -100,8 +79,8 @@ namespace Network
 	bool	Pop(u32 &);
 	bool	Pop(std::string &);
 
-	bool	Recv(const Socket &);
-	bool	Send(const Socket &) const;
+	bool	Recv(const Socket &, bool = false);
+	bool	Send(const Socket &, bool = false) const;
 
 	void	Reset(void);
 	void	Dump(std::ostream & = std::cerr) const;

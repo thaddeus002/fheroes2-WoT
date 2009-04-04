@@ -32,6 +32,7 @@
 #include "cursor.h"
 #include "game.h"
 #include "test.h"
+#include "sdlnet.h"
 #include "image_logo.h"
 #include "image_icons.h"
 
@@ -151,6 +152,11 @@ int main(int argc, char **argv)
             subsystem |= INIT_AUDIO;
         if(conf.Modes(Settings::MUSIC_CD))
             subsystem |= INIT_CDROM | INIT_AUDIO;
+
+#ifdef WITH_NET
+        subsystem |= INIT_TIMER;
+        Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
+#endif
 
 	if(SDL::Init(subsystem))
 	try

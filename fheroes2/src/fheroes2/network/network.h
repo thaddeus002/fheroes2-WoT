@@ -23,8 +23,41 @@
 
 #include "gamedefs.h"
 
+#ifdef WITH_NET
+
 namespace Network
 {
+    class Socket;
+    class Message;
+
+    enum msg_t
+    {
+        MSG_UNKNOWN,
+
+        MSG_PING,
+        MSG_HELLO,
+        MSG_CONNECT,
+        MSG_MESSAGE,
+	MSG_READY,
+        MSG_LOGOUT,
+        MSG_SHUTDOWN,
+
+        MSG_LOADMAPS,
+        MSG_TURNS,
+        MSG_HEROES,
+        MSG_CASTLE,
+        MSG_SPELL,
+        MSG_MAPS,
+        MSG_KINGDOM,
+        MSG_WORLD,
+    };
+
+    const char*         GetMsgString(u16);
+
+    bool PacketAsk(Socket &, Message &);
+    bool PacketWait(Socket &, Message &, u16);
 };
+
+#endif
 
 #endif
