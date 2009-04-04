@@ -31,6 +31,7 @@
 
 #ifdef WITH_PNG
 #include "SDL_image.h"
+#include "xmlccwrap.h"
 #endif
 
 #define FATSIZENAME	15
@@ -413,25 +414,36 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     {
 	Dir dir;
 	const std::string icn_folder(conf.LocalDataPrefix() + SEPARATOR + "cache" + SEPARATOR + ICN::GetString(icn));
+	const std::string xml_spec(icn_folder + SEPARATOR + "spec.xml");
 
-	dir.Read(icn_folder, ".png", false);
-	dir.sort();
-	
-	if(dir.size())
+	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
+
+	// parse spec.xml
+	TiXmlDocument doc;
+	TiXmlElement* xml_icn = NULL;
+
+	if(doc.LoadFile(xml_spec.c_str()) &&
+	    NULL != (xml_icn = doc.FirstChildElement()) &&
+	    0 == std::strcmp("icn", xml_icn->Value()))
 	{
-	    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
+	    int count, ox, oy;
+	    xml_icn->Attribute("count", &count);
+	    v.reserve(count);
 
-	    v.resize(dir.size());
-	    Dir::const_iterator itd = dir.begin();
-
-	    for(u16 ii = 0; ii < dir.size(); ++ii)
-    	    {
-    		v[ii] = new Sprite(IMG_Load((*itd).c_str()), 0, 0);
-    		++itd;
-    	    }
-
-    	    return;
-        }
+	    TiXmlElement *xml_sprite = xml_icn->FirstChildElement();
+	    for(; xml_sprite; xml_sprite = xml_sprite->NextSiblingElement())
+	    {
+		xml_sprite->Attribute("ox", &ox);
+		xml_sprite->Attribute("oy", &oy);
+		const std::string sprite_file(icn_folder + SEPARATOR + xml_sprite->Attribute("name"));
+		SDL_Surface* sf = IMG_Load(sprite_file.c_str());
+		if(NULL == sf) Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
+    		v.push_back(new Sprite(sf, ox, oy));
+	    }
+	}
+	else
+	if(conf.Debug()) 
+    	    Error::Verbose("AGG::Cache::LoadICN: broken xml file: " + xml_spec);
     }
 #endif
 
