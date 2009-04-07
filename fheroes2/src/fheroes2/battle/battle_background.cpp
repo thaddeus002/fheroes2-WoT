@@ -564,14 +564,17 @@ namespace Battle
             frame -= animframe;
             u8 start, count;
             troop.GetAnimFrames(troop.astate, start, count, false);
-            const Surface *outline = troop.GetContour(troop.aframe - start);
+            const Surface *outline;
+            if(troop.astate != Monster::AS_NONE)
+                outline = troop.GetContour(troop.aframe - start + 1);
+            else outline = troop.GetContour(troop.aframe - start);
             if(!outline)
                 Error::Warning("invalid contour %u", troop.aframe);
             else
             {
                 const_cast<Surface *>(outline)->SetAlpha(abs((frame%21)-10)*20+55);
-                u32 xoff = outline->w() / (2 * (1 + wide));
-                display.Blit(*outline, tp - Point(xoff, outline->h()));
+                Point offset(troop.GetBlitOffset(troop.aframe, troop.IsReflected()));
+                display.Blit(*outline, tp + offset);
             }
         }
 

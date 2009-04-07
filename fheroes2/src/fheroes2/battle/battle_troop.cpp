@@ -118,12 +118,18 @@ void Army::BattleTroop::BlitR(const Point& dst_pt, bool reflect, int frame)
     display.Blit(sp, p);
 }
 
+Point Army::BattleTroop::GetBlitOffset(int frame, bool reflect)
+{
+    const Sprite & sp = AGG::GetICN(ICNFile(), frame<0 ? aframe : frame, reflect);
+    return Point(reflect ? -sp.w() - sp.x() : sp.x(), sp.y());
+}
+
 void Army::BattleTroop::Blit(const Point& dst_pt, bool reflect, int frame)
 {
     Display & display = Display::Get();
-    const Sprite & sp = AGG::GetICN(ICNFile(), frame<0 ? aframe : frame, reflect);
     saved = true;
-    Point p(dst_pt.x + (reflect ? -sp.w()-sp.x() : sp.x()), dst_pt.y + sp.y());
+    const Sprite & sp = AGG::GetICN(ICNFile(), frame<0 ? aframe : frame, reflect);
+    Point p = dst_pt + GetBlitOffset(frame, reflect);
     bg.Save(p.x, p.y, sp.w(), sp.h());
     display.Blit(sp, p);
 }
@@ -147,20 +153,24 @@ void Army::BattleTroop::LoadContours(bool inv)
 		for(; it1 != it2; ++it1) if(*it1) delete *it1;
     }
     
+    u8 idx = 0;
     u8 start = 0;
     u8 length = 0;
-    GetAnimFrames(Monster::AS_IDLE, start, length);
+    Monster::animstate_t states[] = { AS_NONE, AS_IDLE };
 
-    contours.reserve(length);
-
-    for(u8 ii = start; ii < start + length; ++ii)
+    for(idx = 0; idx < sizeof(states) / sizeof(states[0]); idx++)
     {
-		const Sprite & sprite = AGG::GetICN(ICNFile(), ii, inv);
+        GetAnimFrames(states[idx], start, length);
 
-        Surface *contour = new Surface();
-        sprite.MakeContour(*contour, sprite.GetColor(0xDA));
-
-		contours.push_back(contour);
+        for(u8 ii = start; ii < start + length; ++ii)
+        {
+            const Sprite & sprite = AGG::GetICN(ICNFile(), ii, inv);
+            
+            Surface *contour = new Surface();
+            sprite.MakeContour(*contour, sprite.GetColor(0xDA));
+            
+            contours.push_back(contour);
+        }
     }
 }
 

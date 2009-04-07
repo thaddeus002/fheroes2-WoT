@@ -57,6 +57,7 @@ namespace Army
         MovementState isMoving() const { return moving; }
         void SetMoving(MovementState m) { moving = m; }
 
+        Point GetBlitOffset(int frame, bool reflect);
         void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
         void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
         void Animate(u8 as = Monster::AS_NONE);
