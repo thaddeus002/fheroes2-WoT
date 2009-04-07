@@ -627,13 +627,11 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
             }
             else validMove = false;
         }
-        else
+
+        for(u16 idx = 0; idx < troopOrder.size(); idx++)
         {
-            int idx = currentTroop - 1;
-            if(currentTroop == 0)
-                idx = troopOrder.size() - 1;
-            Army::BattleTroop &last = m_battlefield.GetTroopFromIndex(troopOrder[idx]);
-            last.SetMoving(Army::NOT_MOVING);
+            Army::BattleTroop &troop = m_battlefield.GetTroopFromIndex(troopOrder[idx]);
+            troop.SetMoving(Army::NOT_MOVING);
         }
         
         Army::BattleTroop &troop = NextValidTroop(currentTroop, troopOrder);
@@ -699,6 +697,8 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
 
         bool attackerAlive = true;
         bool defenderAlive = true;
+
+        troop.SetMoving(Army::NOT_MOVING);
         
         while(1)
         {
@@ -979,7 +979,6 @@ Battle::MoveAction::MoveAction(Army::BattleTroop &troop)
 
 Battle::MoveAction::~MoveAction()
 {
-    m_troop->SetMoving(Army::NOT_MOVING);
 }
     
 Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Army::BattleTroop &myTroop, PointList *path)
@@ -1327,8 +1326,12 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
         mytrooptate = Monster::AS_ATT1P;
     else
         mytrooptate = Monster::AS_ATT2P;
-        
-    attacker.SetReflect(attacker.Position().x >= targets[0]->Position().x);
+
+    bool reflect;
+    if(attacker.Position().y % 2 == 0)
+        reflect = attacker.Position().x >= targets[0]->Position().x;
+    else reflect = attacker.Position().x > targets[0]->Position().x;
+    attacker.SetReflect(reflect);
     if(attacker.isWide() && attacker.WasReflected() != attacker.IsReflected())
         attacker.SetPosition(attacker.Position() + Point( attacker.WasReflected() ? -1 : 1, 0 ));
         

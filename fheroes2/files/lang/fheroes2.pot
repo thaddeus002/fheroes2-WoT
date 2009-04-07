@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-07 01:44-0400\n"
+"POT-Creation-Date: 2009-04-07 02:24-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,11 +219,11 @@ msgid "Return to the battle."
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:419
-#: ../fheroes2/battle/battle_new.cpp:2824
+#: ../fheroes2/battle/battle_new.cpp:2827
 msgid "Hero's Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:652
+#: ../fheroes2/battle/battle_new.cpp:650
 msgid "Low morale causes the %{name} to freeze in panic."
 msgstr ""
 
@@ -231,93 +231,93 @@ msgstr ""
 msgid "High morale enables the %{name} to attack again."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1447
+#: ../fheroes2/battle/battle_new.cpp:1450
 msgid "%{name} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1453
+#: ../fheroes2/battle/battle_new.cpp:1456
 msgid " %{value} %{name} perishes."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1532
+#: ../fheroes2/battle/battle_new.cpp:1535
 msgid "That spell will affect no one!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1551
+#: ../fheroes2/battle/battle_new.cpp:1554
 msgid "The %{spell} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1557
+#: ../fheroes2/battle/battle_new.cpp:1560
 msgid "The %{spell} does %{value} damage to the %{name}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1814
-#: ../fheroes2/battle/battle_new.cpp:1863
+#: ../fheroes2/battle/battle_new.cpp:1817
+#: ../fheroes2/battle/battle_new.cpp:1866
 msgid "View %{name} info."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1830
+#: ../fheroes2/battle/battle_new.cpp:1833
 msgid "Shoot %{name} (%{value} shot(s) left)"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1843
+#: ../fheroes2/battle/battle_new.cpp:1846
 msgid "Attack %{name}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1880
+#: ../fheroes2/battle/battle_new.cpp:1883
 msgid "Fly"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1881
+#: ../fheroes2/battle/battle_new.cpp:1884
 msgid "Move"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1882
+#: ../fheroes2/battle/battle_new.cpp:1885
 msgid "%{move} %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2791
+#: ../fheroes2/battle/battle_new.cpp:2794
 msgid "Skip"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2791
+#: ../fheroes2/battle/battle_new.cpp:2794
 msgid ""
 "Skip the current creature. The current creature loses its turn and does not "
 "get to go again until the next round."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2792
-#: ../fheroes2/battle/battle_new.cpp:2816
+#: ../fheroes2/battle/battle_new.cpp:2795
+#: ../fheroes2/battle/battle_new.cpp:2819
 msgid "Auto Combat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2792
+#: ../fheroes2/battle/battle_new.cpp:2795
 msgid "Allows the computer to fight out the battle for you."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2793
+#: ../fheroes2/battle/battle_new.cpp:2796
 #: ../fheroes2/editor/editor_startgame.cpp:804
 #: ../fheroes2/game/game_startgame.cpp:1475
 msgid "System Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2793
+#: ../fheroes2/battle/battle_new.cpp:2796
 msgid "Allows you to customize the combat screen."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2800
+#: ../fheroes2/battle/battle_new.cpp:2803
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2812
+#: ../fheroes2/battle/battle_new.cpp:2815
 msgid "Skip this unit"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2820
+#: ../fheroes2/battle/battle_new.cpp:2823
 msgid "Customize system options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2828
+#: ../fheroes2/battle/battle_new.cpp:2831
 msgid "View Opposing Hero"
 msgstr ""
 

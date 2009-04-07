@@ -559,7 +559,7 @@ namespace Battle
                                                         : troop.Position();
         Point tp = Bf2Scr(pos);
         troop.Blit(tp, reflect, animframe);
-        if(troop.isMoving() == Army::SELECTED)
+        if(troop.isValid() && troop.isMoving() == Army::SELECTED)
         {
             frame -= animframe;
             u8 start, count;
@@ -569,7 +569,7 @@ namespace Battle
                 outline = troop.GetContour(troop.aframe - start + 1);
             else outline = troop.GetContour(troop.aframe - start);
             if(!outline)
-                Error::Warning("invalid contour %u", troop.aframe);
+                Error::Warning("invalid contour ", troop.aframe);
             else
             {
                 const_cast<Surface *>(outline)->SetAlpha(abs((frame%21)-10)*20+55);
