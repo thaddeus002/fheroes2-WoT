@@ -650,13 +650,18 @@ void Surface::MakeStencil(Surface & dst, u32 col) const
 
     dst.Lock();
     for(u16 y = 0; y < surface->h; ++y)
-	for(u16 x = 0; x < surface->w; ++x)
-    {
-	if(clkey != GetPixel(x, y))
-	{
-	    dst.SetPixel(x, y, col);
-	}
-    }
+        for(u16 x = 0; x < surface->w; ++x)
+        {
+            u32 pixel = GetPixel(x, y);
+            // We wish to ignore any shadows. The alpha mask seems to be split as follows:
+            // - 0x0F: full intensity
+            // - 0x04: shadow
+            // - 0x00: transparent (but not colorkeyed)
+            if(clkey != pixel && (pixel & surface->format->Amask) >> surface->format->Ashift == 0x0F)
+            {
+                dst.SetPixel(x, y, col);
+            }
+        }
     dst.Unlock();
 }
 

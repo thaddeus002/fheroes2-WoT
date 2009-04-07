@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-07 01:32-0400\n"
+"POT-Creation-Date: 2009-04-07 01:44-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5162,11 +5162,11 @@ msgstr ""
 
 #: ../fheroes2/network/client.cpp:39 ../fheroes2/network/client.cpp:46
 #: ../fheroes2/network/client.cpp:58 ../fheroes2/network/server.cpp:44
-#: ../fheroes2/network/server.cpp:51 ../fheroes2/network/server.cpp:95
+#: ../fheroes2/network/server.cpp:51 ../fheroes2/network/server.cpp:94
 msgid "Error"
 msgstr ""
 
-#: ../fheroes2/network/client.cpp:58 ../fheroes2/network/server.cpp:95
+#: ../fheroes2/network/client.cpp:58 ../fheroes2/network/server.cpp:94
 msgid "This release is compiled without network support."
 msgstr ""
 
