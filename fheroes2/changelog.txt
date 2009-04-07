@@ -3,6 +3,7 @@ SVN - up to r929
 Users
 + Added glowing outlines around currently selected monster in battles.
 + Battle victory/defeat music now plays properly when viewing the summary.
++ Races are no longer grayed out on the scenario panel when restarting a game.
 
 Developers
 + Added wrapper library around SDL_net and networking client/server examples.
