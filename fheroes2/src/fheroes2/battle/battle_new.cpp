@@ -622,7 +622,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         {
             if(!validMove) //HACK for termination if battle is halted after full turn
             {
-                Error::Warning("WARNING: Battle ended due to faulty AI.");
+                Error::Warning("Battle ended due to faulty AI.");
                 break;
             }
             else validMove = false;
@@ -640,6 +640,11 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         
         troop.ResetModes(Army::ATTACKED);
         troop.SetMoving(Army::SELECTED);
+
+        u32 savedModes = (troop.Modes(Army::MORALE_BAD)  ? Army::MORALE_BAD  : 0) |
+                         (troop.Modes(Army::MORALE_GOOD) ? Army::MORALE_GOOD : 0) |
+                         (troop.Modes(Army::LUCK_GOOD)   ? Army::LUCK_GOOD   : 0) |
+                         (troop.Modes(Army::LUCK_BAD)    ? Army::LUCK_BAD    : 0);
         
         if(AdjustMorale(turn[currentTurn]->GetHero(), troop))
         {
@@ -663,7 +668,8 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         {
             PerformMagic(turn[currentTurn]->GetSpellTargets(), m_battlefield.GetHero(currentTurn), turn[currentTurn]->GetSpell());
             currentTroop--;
-            continue; //FIXME: Could lose out on morale/luck boost?
+            RevertModes(savedModes, troop);
+            continue;
         }
         else if(status == GUI::AUTO)
         {
@@ -677,7 +683,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         }
         else if(status == GUI::SKIP)
         {
-            //FIXME: Could lose out on morale/luck boost?
+            RevertModes(savedModes, troop);
             validMove = true;
             continue;
         }
@@ -690,10 +696,12 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
             continue;
         }
         else validMove = true;
-
-        //FIXME: Could lose out on morale/luck boost?
+        
         if(!BfValid(attack))
+        {
+            RevertModes(savedModes, troop);
             continue;
+        }
 
         bool attackerAlive = true;
         bool defenderAlive = true;
@@ -908,6 +916,18 @@ Army::BattleTroop &Battle::BattleControl::NextValidTroop(s8 &currentTroop, Index
         troop = &m_battlefield.GetTroopFromIndex(troopIdx);
     } while(!troop->isValid());
     return *troop;
+}
+
+void Battle::BattleControl::RevertModes(u32 prevModes, Army::BattleTroop &troop)
+{
+    if(prevModes & Army::MORALE_GOOD == 0)
+        troop.ResetModes(Army::MORALE_GOOD);
+    if(prevModes & Army::MORALE_BAD == 0)
+        troop.ResetModes(Army::MORALE_BAD);
+    if(prevModes & Army::LUCK_BAD == 0)
+        troop.ResetModes(Army::LUCK_BAD);
+    if(prevModes & Army::LUCK_GOOD == 0)
+        troop.ResetModes(Army::LUCK_GOOD);
 }
 
 bool Battle::BattleControl::AdjustMorale(HeroBase *hero, Army::BattleTroop &troop)

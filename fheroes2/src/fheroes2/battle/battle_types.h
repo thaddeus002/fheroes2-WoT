@@ -323,6 +323,7 @@ namespace Battle
 
         long CalculateDamage(const Army::BattleTroop &, const Army::BattleTroop &);
         bool AdjustMorale(HeroBase *, Army::BattleTroop &);
+        void RevertModes(u32, Army::BattleTroop &);
 
         Army::battle_t m_battleStatus;
         GUI *m_gui;
