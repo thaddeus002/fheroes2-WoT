@@ -104,7 +104,7 @@ Game::menu_t Game::ScenarioInfo(void)
     display.SetVideoMode(640, 480);
 
     // set first maps settings
-    if(conf.FileInfo().FileMaps().empty()) conf.LoadFileMaps(info_maps.front()->FileMaps());
+    conf.LoadFileMaps(info_maps.front()->FileMaps());
 
     Button buttonSelectMaps(513, 77, ICN::NGEXTRA, 64, 65);
     Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
