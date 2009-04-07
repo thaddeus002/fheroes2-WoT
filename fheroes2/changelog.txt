@@ -1,4 +1,12 @@
-SVN - up to r915
+SVN - up to r929
+
+Users
++ Added glowing outlines around currently selected monster in battles.
++ Battle victory/defeat music now plays properly when viewing the summary.
+
+Developers
++ Added wrapper library around SDL_net and networking client/server examples.
++ Added support for replacing ICN files at runtime with other images.
 
 March 19, 2009 - Development build r915
 
