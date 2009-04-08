@@ -20,6 +20,8 @@
 
 #include "sdlnet.h"
 #include "settings.h"
+#include "server.h"
+#include "error.h"
 #include "network.h"
 
 #ifdef WITH_NET
@@ -29,10 +31,10 @@ const char* Network::GetMsgString(u16 msg)
     switch(msg)
     {
         case MSG_PING:          return "MSG_PING";
-        case MSG_HELLO:         return "MSG_HELLO";
-        case MSG_CONNECT:       return "MSG_CONNECT";
-        case MSG_MESSAGE:       return "MSG_MESSAGE";
         case MSG_READY:         return "MSG_READY";
+        case MSG_MESSAGE:       return "MSG_MESSAGE";
+
+        case MSG_HELLO:         return "MSG_HELLO";
         case MSG_LOGOUT:        return "MSG_LOGOUT";
         case MSG_SHUTDOWN:      return "MSG_SHUTDOWN";
 
@@ -51,46 +53,38 @@ const char* Network::GetMsgString(u16 msg)
     return "MSG_UNKNOWN";
 }
 
-bool Network::PacketAsk(Socket & csd, Message & msg)
+int Network::RunDedicatedServer(void)
 {
-    const Settings & conf = Settings::Get();
+    Settings & conf = Settings::Get();
 
-    if(! msg.Send(csd))
+    Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
+    
+    if(SDL::Init(INIT_TIMER))
+    try
     {
-        csd.Close();
-        if(1 < conf.Debug()) Error::Warning("Network::AskHello: close socket");
-        return false;
+        std::atexit(SDL::Quit);
+
+        FH2Server & server = FH2Server::Get();
+
+        if(! server.Bind(conf.GetPort()))
+        {
+            Error::Warning(Network::GetError());
+            return -1;
+        }
+
+	conf.SetPreferablyCountPlayers(6);
+
+        return FH2Server::callbackCreateThread(&server);
+    }
+    catch(std::bad_alloc)
+    {
+    }
+    catch(Error::Exception)
+    {
+        conf.Dump();
     }
 
-    return true;
+    return 0;
 }
-
-bool Network::PacketWait(Socket & csd, Message & msg, u16 id)
-{
-    const Settings & conf = Settings::Get();
-
-    while(1)
-    {
-	if(msg.Recv(csd, (1 < conf.Debug())))
-	{
-	    if(id == msg.GetID()) return true;
-	    else
-	    if(MSG_LOGOUT == msg.GetID() || MSG_SHUTDOWN == msg.GetID()) return false;
-	    else
-	    if(1 < conf.Debug()) Error::Warning("Network::WaitHello: receive packet: " + std::string(GetMsgString(msg.GetID())));
-	}
-	else
-	{
-    	    csd.Close();
-    	    if(1 < conf.Debug()) Error::Warning("Network::WaitHello: close socket");
-    	    return false;
-	}
-
-	DELAY(1);
-    }
-
-    return true;
-}
-
 
 #endif

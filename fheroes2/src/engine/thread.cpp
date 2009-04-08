@@ -18,94 +18,81 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SDLNET_H
-#define SDLNET_H
+#include "thread.h"
 
-#ifdef WITH_NET
-#include <iostream>
-#include <string>
-#include "SDL_net.h"
-#include "types.h"
-
-namespace Network
+Thread::Thread() : thread(NULL)
 {
-    bool		Init(void);
-    void		Quit(void);
-    bool		ResolveHost(IPaddress &, const char*, u16);
-    const char*		GetError(void);
-    void		SetProtocolVersion(u16);
+}
 
-    class Socket
+Thread::~Thread()
+{
+    Kill();
+}
+
+void Thread::Create(int (*fn)(void *), void *param)
+{
+    thread = SDL_CreateThread(fn, param);
+}
+
+int Thread::Wait(void)
+{
+    int status = 0;
+    if(thread) SDL_WaitThread(thread, &status);
+    thread = NULL;
+    return status;
+}
+
+void Thread::Kill(void)
+{
+    if(thread) SDL_KillThread(thread);
+    thread = NULL;
+}
+
+bool Thread::IsRun(void) const
+{
+    return thread;
+}
+
+u32 Thread::GetID(void) const
+{
+    return thread ? SDL_GetThreadID(thread) : 0;
+}
+
+Mutex::Mutex() : mutex(SDL_CreateMutex())
+{
+}
+
+Mutex::~Mutex()
+{
+    if(mutex) SDL_DestroyMutex(mutex);
+}
+
+bool Mutex::Lock(void) const
+{
+    return mutex ? 0 == SDL_mutexP(mutex) : false;
+}
+
+bool Mutex::Unlock(void) const
+{
+    return mutex ? 0 == SDL_mutexV(mutex) : false;
+}
+
+Timer::Timer() : id(0)
+{
+}
+
+void Timer::Run(Timer & timer, u32 interval, u32 (*fn)(u32, void *), void *param)
+{
+    if(timer.id) Remove(timer);
+
+    timer.id = SDL_AddTimer(interval, fn, param);
+}
+
+void Timer::Remove(Timer & timer)
+{
+    if(timer.id)
     {
-    public:
-	Socket();
-	Socket(const TCPsocket);
-	~Socket();
-
-	bool		Recv(char *, size_t) const;
-	bool		Send(const char*, size_t) const;
-
-	u32		Host(void) const;
-	u16		Port(void) const;
-
-	bool		Open(IPaddress &);
-	bool		IsValid(void) const;
-	void		Close(void);
-
-    protected:
-	Socket(const Socket &);
-	Socket &	operator= (const Socket &);
-
-	TCPsocket	sd;
-    };
-
-    class Message
-    {
-    public:
-	Message();
-	Message(u16);
-	Message(const Message &);
-	~Message();
-
-	Message & operator= (const Message &);
-
-	u16	GetID(void) const;
-	void	SetID(u16);
-
-	void	Push(u8);
-	void	Push(u16);
-	void	Push(u32);
-	void	Push(const std::string &);
-
-	bool	Pop(u8 &);
-	bool	Pop(u16 &);
-	bool	Pop(u32 &);
-	bool	Pop(std::string &);
-
-	bool	Recv(const Socket &, bool = false);
-	bool	Send(const Socket &) const;
-
-	void	Reset(void);
-	void	Dump(std::ostream & = std::cerr) const;
-
-    private:
-	void	Resize(size_t);
-	size_t	Size(void) const;
-
-	u16		type;
-	char*		data;
-	char*		itd1;
-	char*		itd2;
-	size_t		dtsz;
-    };
-
-    class Server : public Socket
-    {
-    public:
-	Server();
-
-	TCPsocket	Accept(void);
-    };
-};
-#endif
-#endif
+	SDL_RemoveTimer(timer.id);
+	timer.id = 0;
+    }
+}

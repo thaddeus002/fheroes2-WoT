@@ -49,6 +49,7 @@ public:
     ~Surface();
 
     Surface & operator= (const Surface & bs);
+    void Set(SDL_Surface * sf);
     void Set(u16 sw, u16 sh, bool alpha = false);
     void Set(u16 sw, u16 sh, u8 depth, u32 fl);
 
@@ -129,8 +130,6 @@ protected:
     const SDL_PixelFormat *GetPixelFormat(void) const;
 
     SDL_Surface *surface;
-    
-    bool videosurface;
 };
 
 #endif

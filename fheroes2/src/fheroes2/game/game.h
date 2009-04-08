@@ -86,8 +86,8 @@ namespace Game
     menu_t ScenarioInfo(void);
     menu_t StartGame(void);
 
-    menu_t NetworkServer(void);
-    menu_t NetworkClient(void);
+    menu_t NetworkHost(void);
+    menu_t NetworkGuest(void);
 
     menu_t Testing(u8);
 

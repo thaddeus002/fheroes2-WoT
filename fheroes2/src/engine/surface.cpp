@@ -22,6 +22,7 @@
 #include "surface.h"
 #include "palette.h"
 #include "error.h"
+#include "display.h"
 
 #ifdef WITH_TTF
 #include "SDL_ttf.h"
@@ -29,36 +30,36 @@
 
 #include "IMG_savepng.h"
 
-Surface::Surface() : surface(NULL), videosurface(false)
+Surface::Surface() : surface(NULL)
 {
 }
 
-Surface::Surface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha) : videosurface(false)
+Surface::Surface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha)
 {
     surface = SDL_CreateRGBSurfaceFrom((void *) pixels, width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
 		RMASK32, GMASK32, BMASK32, alpha ? AMASK32 : 0);
 }
 
-Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl) : videosurface(false)
+Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl)
 {
     CreateSurface(sw, sh, depth,  fl);
     LoadPalette();
 }
 
-Surface::Surface(u16 sw, u16 sh, bool alpha) : videosurface(false)
+Surface::Surface(u16 sw, u16 sh, bool alpha)
 {
     CreateSurface(sw, sh, DEFAULT_DEPTH, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
     LoadPalette();
 }
 
-Surface::Surface(const Surface & bs) : videosurface(false)
+Surface::Surface(const Surface & bs)
 {
     surface = bs.valid() ?
 	SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags()) : NULL;
     LoadPalette();
 }
 
-Surface::Surface(SDL_Surface * sf) : videosurface(false)
+Surface::Surface(SDL_Surface * sf)
 {
     surface = sf ? sf : NULL;
     LoadPalette();
@@ -66,9 +67,7 @@ Surface::Surface(SDL_Surface * sf) : videosurface(false)
 
 Surface::~Surface()
 {
-    if(surface && !videosurface) SDL_FreeSurface(surface);
-
-    surface = NULL;
+    if(surface) SDL_FreeSurface(surface);
 }
 
 /* operator = */
@@ -89,6 +88,14 @@ Surface & Surface::operator= (const Surface & bs)
     LoadPalette();
 
     return *this;
+}
+
+void Surface::Set(SDL_Surface* sf)
+{
+    if(surface) SDL_FreeSurface(surface);
+
+    surface = sf ? sf : NULL;
+    LoadPalette();
 }
 
 void Surface::Set(u16 sw, u16 sh, bool alpha)

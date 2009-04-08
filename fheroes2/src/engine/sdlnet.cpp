@@ -20,9 +20,11 @@
 
 #ifdef WITH_NET
 
-#include <iostream>
 #include <algorithm>
+#include <cstring>
 #include "sdlnet.h"
+
+#define BUFSIZE 16
 
 namespace Network
 {
@@ -34,12 +36,64 @@ void Network::SetProtocolVersion(u16 v)
     proto = v;
 }
 
-Network::Message::Message() : type(0)
+Network::Message::Message() : type(0), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
 {
+    data = new char [dtsz + 1];
+
+    itd1 = data;
+    itd2 = itd1;
 }
 
-Network::Message::Message(u16 id) : type(id)
+Network::Message::Message(u16 id) : type(id), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
 {
+    data = new char [dtsz + 1];
+
+    itd1 = data;
+    itd2 = itd1;
+}
+
+Network::Message::Message(const Message & msg) : type(msg.type), data(NULL), itd1(NULL), itd2(NULL), dtsz(msg.dtsz)
+{
+    data = new char [dtsz + 1];
+
+    std::memcpy(data, msg.data, dtsz);
+    itd1 = &data[msg.itd1 - msg.data];
+    itd2 = &data[msg.itd2 - msg.data];
+}
+
+Network::Message & Network::Message::operator= (const Message & msg)
+{
+    type = msg.type;
+    dtsz = msg.dtsz;
+    data = new char [dtsz + 1];
+
+    std::memcpy(data, msg.data, dtsz);
+    itd1 = &data[msg.itd1 - msg.data];
+    itd2 = &data[msg.itd2 - msg.data];
+
+    return *this;
+}
+
+Network::Message::~Message()
+{
+    if(data) delete [] data;
+}
+
+void Network::Message::Resize(size_t lack)
+{
+    const size_t newsize = lack > dtsz ? dtsz + lack + 1 : 2 * dtsz + 1;
+    char* dat2 = new char [newsize];
+    std::memcpy(dat2, data, dtsz);
+    itd1 = &dat2[itd1 - data];
+    itd2 = &dat2[itd2 - data];
+    dtsz = newsize - 1;
+    delete [] data;
+    data = dat2;
+}
+
+size_t Network::Message::Size(void) const
+{
+    return itd2 - data;
 }
 
 u16 Network::Message::GetID(void) const
@@ -55,7 +109,9 @@ void Network::Message::SetID(u16 id)
 void Network::Message::Reset(void)
 {
     type = 0;
-    data.clear();
+
+    itd1 = data;
+    itd2 = itd1;
 }
 
 bool Network::Message::Recv(const Socket & csd, bool debug)
@@ -88,22 +144,32 @@ bool Network::Message::Recv(const Socket & csd, bool debug)
 	{
 	    type = SDL_SwapBE16(type);
 	    size = SDL_SwapBE32(size);
-	    data.resize(size);
 
-	    return size ? csd.Recv(reinterpret_cast<char *>(&data[0]), size) : true;
+	    if(size > dtsz)
+	    {
+		delete [] data;
+		data = new char [size + 1];
+		dtsz = size;
+	    }
+
+	    itd1 = data;
+	    itd2 = itd1 + size;
+
+	    return size ? csd.Recv(data, size) : true;
 	}
     }
     return false;
 }
 
-bool Network::Message::Send(const Socket & csd, bool raw) const
+bool Network::Message::Send(const Socket & csd) const
 {
-    if(raw)
-	return csd.Send(reinterpret_cast<const char *>(&data[0]), data.size());
+    // raw data
+    if(0 == type)
+	return Size() ? csd.Send(reinterpret_cast<const char *>(data), Size()) : false;
 
     u16 head = proto;
     u16 sign = type;
-    u32 size = data.size();
+    u32 size = Size();
 
     SwapBE16(head);
     SwapBE16(sign);
@@ -112,105 +178,128 @@ bool Network::Message::Send(const Socket & csd, bool raw) const
     return csd.Send(reinterpret_cast<const char *>(&head), sizeof(head)) &&
            csd.Send(reinterpret_cast<const char *>(&sign), sizeof(sign)) &&
            csd.Send(reinterpret_cast<const char *>(&size), sizeof(size)) &&
-           (size ? csd.Send(reinterpret_cast<const char *>(&data[0]), data.size()) : true);
+           (size ? csd.Send(data, Size()) : true);
 }
 
 void Network::Message::Push(u8 byte8)
 {
-    data.push_back(byte8);
+    if(data + dtsz < itd2 + 1) Resize(1);
+
+    *itd2 = byte8;
+    ++itd2;
 }
 
 void Network::Message::Push(u16 byte16)
 {
-    data.push_back(static_cast<u8>(0x00FF & (byte16 >> 8)));
-    data.push_back(static_cast<u8>(0x00FF & byte16));
+    if(data + dtsz < itd2 + 2) Resize(2);
+
+    *itd2 = 0x00FF & (byte16 >> 8);
+    ++itd2;
+
+    *itd2 = 0x00FF & byte16;
+    ++itd2;
 }
 
 void Network::Message::Push(u32 byte32)
 {
-    data.push_back(static_cast<u8>(0x000000FF & (byte32 >> 24)));
-    data.push_back(static_cast<u8>(0x000000FF & (byte32 >> 16)));
-    data.push_back(static_cast<u8>(0x000000FF & (byte32 >> 8)));
-    data.push_back(static_cast<u8>(0x000000FF & byte32));
+    if(data + dtsz < itd2 + 4) Resize(4);
+
+    *itd2 = 0x000000FF & (byte32 >> 24);
+    ++itd2;
+
+    *itd2 = 0x000000FF & (byte32 >> 16);
+    ++itd2;
+
+    *itd2 = 0x000000FF & (byte32 >> 8);
+    ++itd2;
+
+    *itd2 = 0x000000FF & byte32;
+    ++itd2;
 }
 
 void Network::Message::Push(const std::string & str)
 {
+    if(data + dtsz < itd2 + str.size() + 1) Resize(str.size() + 1);
+
     if(str.size())
     {
 	std::string::const_iterator it1 = str.begin();
 	std::string::const_iterator it2 = str.end();
-	for(; it1 != it2; ++it1) data.push_back(*it1);
+	for(; it1 != it2; ++it1, ++itd2) *itd2 = *it1;
     }
     // end string
-    data.push_back(0x00);
+    *itd2 = 0;
+    ++itd2;
 }
 
 bool Network::Message::Pop(u8 & byte8)
 {
-    if(data.empty()) return false;
+    if(itd1 + 1 > itd2) return false;
 
-    byte8 = data.front();
-    data.pop_front();
+    byte8 = *itd1;
+    ++itd1;
 
     return true;
 }
 
 bool Network::Message::Pop(u16 & byte16)
 {
-    if(data.size() < sizeof(byte16)) return false;
+    if(itd1 + 2 > itd2) return false;
 
-    byte16 = data.front();
+    byte16 = *itd1;
     byte16 <<= 8;
-    data.pop_front();
-    byte16 |= (0x00FF & data.front());
-    data.pop_front();
+    ++itd1;
+
+    byte16 |= (0x00FF & *itd1);
+    ++itd1;
 
     return true;
 }
 
 bool Network::Message::Pop(u32 & byte32)
 {
-    if(data.size() < sizeof(byte32)) return false;
+    if(itd1 + 4 > itd2) return false;
 
-    byte32 = data.front();
+    byte32 = *itd1;
     byte32 <<= 8;
-    data.pop_front();
-    byte32 |= (0x000000FF & data.front());
+    ++itd1;
+
+    byte32 |= (0x000000FF & *itd1);
     byte32 <<= 8;
-    data.pop_front();
-    byte32 |= (0x000000FF & data.front());
+    ++itd1;
+
+    byte32 |= (0x000000FF & *itd1);
     byte32 <<= 8;
-    data.pop_front();
-    byte32 |= (0x000000FF & data.front());
-    data.pop_front();
+    ++itd1;
+
+    byte32 |= (0x000000FF & *itd1);
+    ++itd1;
 
     return true;
 }
 
 bool Network::Message::Pop(std::string & str)
 {
-    str.clear();
+    if(itd1 >= itd2) return false;
 
     // find end string
-    std::deque<u8>::const_iterator it_beg = data.begin();
-    std::deque<u8>::const_iterator it_end = std::find(data.begin(), data.end(), 0x00);
-    if(it_end == data.end()) return false;
+    const char* end = itd1;
+    while(*end && end < itd2) ++end;
+    if(end == itd2) return false;
 
-    for(; it_beg != it_end; ++it_beg) str += *it_beg;
+    str = itd1;
     return true;
 }
 
 void Network::Message::Dump(std::ostream & stream) const
 {
-    stream << "Network::Message::Dump: type: 0x" << std::hex << type << ", size: " << data.size();
+    stream << "Network::Message::Dump: type: 0x" << std::hex << type << ", size: " << std::dec << Size();
 
-    if(data.size())
+    if(dtsz)
     {
 	stream << ", data:";
-	std::deque<u8>::const_iterator it1 = data.begin();
-	std::deque<u8>::const_iterator it2 = data.end();
-	for(; it1 != it2; ++it1) stream << " 0x" << std::hex << static_cast<int>(*it1);
+	const char* cur = itd1;
+	while(cur < itd2){ stream << " 0x" << std::hex << static_cast<int>(*cur); ++cur; }
     }
 
     stream  << std::endl;

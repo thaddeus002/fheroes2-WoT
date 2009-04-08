@@ -2,15 +2,11 @@
 
 	"SERVER"							"CLIENT"
 	------------------------------------------------------------------------
-	"BANNER"			"->"
 	------------------------------------------------------------------------
-					"<-"	"version, build"	"HELLO"
-	"LOGOUT"	"string"	"->"
-	"HELLO"		"version,
-			build, 
-			allow colors"	"->"
-					"<-"	"color, name"		"CONNECT"
-	"CONNECT"	"bool"		"->"
+	"READY"		"banner"	"->"
+					"<-"	"name"			"HELLO"
+	"HELLO"		"allow colors"	"->"
+					"<-"	"color"			"READY"
 	"MESSAGE"	"string"	"<>"	"string"		"MESSAGE"
 					"<-"				"READY"
 	------------------------------------------------------------------------

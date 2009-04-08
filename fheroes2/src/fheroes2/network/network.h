@@ -25,20 +25,19 @@
 
 #ifdef WITH_NET
 
-namespace Network
-{
-    class Socket;
-    class Message;
+#include "sdlnet.h"
 
-    enum msg_t
-    {
-        MSG_UNKNOWN,
+typedef std::pair<Network::Message, u32> MessageID;
+
+enum msg_t
+{
+        MSG_RAW,
 
         MSG_PING,
-        MSG_HELLO,
-        MSG_CONNECT,
-        MSG_MESSAGE,
 	MSG_READY,
+        MSG_MESSAGE,
+
+        MSG_HELLO,
         MSG_LOGOUT,
         MSG_SHUTDOWN,
 
@@ -50,12 +49,17 @@ namespace Network
         MSG_MAPS,
         MSG_KINGDOM,
         MSG_WORLD,
-    };
 
+        MSG_UNKNOWN,
+};
+
+namespace Network
+{
+    int			RunDedicatedServer(void);
     const char*         GetMsgString(u16);
 
-    bool PacketAsk(Socket &, Message &);
-    bool PacketWait(Socket &, Message &, u16);
+    //bool PacketAsk(Socket &, Message &);
+    //bool PacketWait(Socket &, Message &, u16);
 };
 
 #endif

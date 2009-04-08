@@ -26,7 +26,6 @@
 
 Display::Display()
 {
-    videosurface = true;
 }
 
 Display::~Display()

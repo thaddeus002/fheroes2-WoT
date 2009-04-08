@@ -269,6 +269,10 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     buttonOk.Draw();
     buttonCancel.Draw();
 
+    Text text("_", Font::BIG);
+    display.Blit(sprite, dst_pt);
+    text.Blit(dst_pt.x + (sprite.w() - text.w()) / 2, dst_pt.y - 1);
+
     cursor.Show();
     display.Flip();
 
@@ -356,7 +360,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 		default: break;
 	    }
 
-	    Text text(res, Font::BIG);
+	    text.Set(res + "_");
 	    if(text.w() < sprite.w() - 24)
 	    {
 		cursor.Hide();
@@ -370,5 +374,6 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 
     cursor.SetThemes(oldcursor);
     cursor.Hide();
+
     return res.size();
 }

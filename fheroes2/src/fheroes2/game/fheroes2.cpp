@@ -35,6 +35,7 @@
 #include "sdlnet.h"
 #include "image_logo.h"
 #include "image_icons.h"
+#include "network.h"
 
 char *dirname(const char *path)
 {
@@ -59,8 +60,11 @@ int PrintHelp(const char *basename)
 {
     std::cout << "Usage: " << basename << " [OPTIONS]\n" \
 	    << "  -e\teditors mode\n" \
-	    << "  -d\tdebug mode\n" \
-	    << "  -c\tpath to config file (default fheroes2.cfg)\n" \
+	    << "  -d\tdebug mode\n";
+#ifdef WITH_NET
+    std::cout << "  -s\tdedicated server\n";
+#endif
+    std::cout << "  -c\tpath to config file (default fheroes2.cfg)\n" \
 	    << "  -h\tprint this help and exit" << std::endl;
 
     return EXIT_SUCCESS;
@@ -91,7 +95,7 @@ int main(int argc, char **argv)
 
 	{
 	    int opt;
-	    while((opt = getopt(argc, argv, "het:d:c:")) != -1)
+	    while((opt = getopt(argc, argv, "hest:d:c:")) != -1)
     		switch(opt)
                 {
                     case 'e':
@@ -125,6 +129,10 @@ int main(int argc, char **argv)
                 	std::cout << "config: " << optarg << (conf.Read(optarg) ? " load" : " not found") << std::endl;
                 	break;
 
+                    case 's':
+#ifdef WITH_NET
+                	      return Network::RunDedicatedServer();
+#endif
                     case '?':
                     case 'h': return PrintHelp(argv[0]);
 

@@ -18,94 +18,48 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SDLNET_H
-#define SDLNET_H
+#ifndef CLIENTSOCKET_H
+#define CLIENTSOCKET_H
 
 #ifdef WITH_NET
-#include <iostream>
-#include <string>
-#include "SDL_net.h"
-#include "types.h"
 
-namespace Network
+#include "gamedefs.h"
+#include "thread.h"
+#include "network.h"
+#include "bitmodes.h"
+
+class FH2Server;
+
+enum status_t
 {
-    bool		Init(void);
-    void		Quit(void);
-    bool		ResolveHost(IPaddress &, const char*, u16);
-    const char*		GetError(void);
-    void		SetProtocolVersion(u16);
-
-    class Socket
-    {
-    public:
-	Socket();
-	Socket(const TCPsocket);
-	~Socket();
-
-	bool		Recv(char *, size_t) const;
-	bool		Send(const char*, size_t) const;
-
-	u32		Host(void) const;
-	u16		Port(void) const;
-
-	bool		Open(IPaddress &);
-	bool		IsValid(void) const;
-	void		Close(void);
-
-    protected:
-	Socket(const Socket &);
-	Socket &	operator= (const Socket &);
-
-	TCPsocket	sd;
-    };
-
-    class Message
-    {
-    public:
-	Message();
-	Message(u16);
-	Message(const Message &);
-	~Message();
-
-	Message & operator= (const Message &);
-
-	u16	GetID(void) const;
-	void	SetID(u16);
-
-	void	Push(u8);
-	void	Push(u16);
-	void	Push(u32);
-	void	Push(const std::string &);
-
-	bool	Pop(u8 &);
-	bool	Pop(u16 &);
-	bool	Pop(u32 &);
-	bool	Pop(std::string &);
-
-	bool	Recv(const Socket &, bool = false);
-	bool	Send(const Socket &) const;
-
-	void	Reset(void);
-	void	Dump(std::ostream & = std::cerr) const;
-
-    private:
-	void	Resize(size_t);
-	size_t	Size(void) const;
-
-	u16		type;
-	char*		data;
-	char*		itd1;
-	char*		itd2;
-	size_t		dtsz;
-    };
-
-    class Server : public Socket
-    {
-    public:
-	Server();
-
-	TCPsocket	Accept(void);
-    };
+    ST_CONNECT          = 0x0001,
+    ST_ADMIN            = 0x0008,
+    ST_SHUTDOWN         = 0x0010,
 };
+
+class ClientSocket : public Network::Socket, public BitModes
+{
+public:
+    ClientSocket();
+
+    bool IsConnected(void) const;
+    void Join(TCPsocket);
+    void RunThread(void);
+    void Shutdown(void);
+
+    const std::string & GetName(void) const;
+    int  ConnectionChat(void);
+
+    bool IsThreadID(u32) const;
+    u32 GetThreadID(void) const;
+
+private:
+    static int callbackCreateThread(void *);
+
+    Thread thread;
+    Network::Message packet;
+    std::string name;
+};
+
 #endif
 #endif

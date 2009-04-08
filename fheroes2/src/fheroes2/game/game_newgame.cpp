@@ -89,8 +89,8 @@ Game::menu_t Game::NewNetwork(void)
 	le.MousePressLeft(buttonGuest) ? buttonGuest.PressDraw() : buttonGuest.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonHost) || le.KeyPress(KEY_h)) return NetworkServer();
-	if(le.MouseClickLeft(buttonGuest) || le.KeyPress(KEY_g)) return NetworkClient();
+	if(le.MouseClickLeft(buttonHost) || le.KeyPress(KEY_h)) return NetworkHost();
+	if(le.MouseClickLeft(buttonGuest) || le.KeyPress(KEY_g)) return NetworkGuest();
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info

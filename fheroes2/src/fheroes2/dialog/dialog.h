@@ -21,6 +21,7 @@
 #define H2DIALOG_H
 
 #include <string>
+#include <list>
 #include "gamedefs.h"
 #include "monster.h"
 #include "spell.h"
@@ -70,7 +71,7 @@ namespace Dialog
 	DIG	= 0x1000,
 
 	READONLY= 0x2000,
-    BATTLE= 0x4000,
+	BATTLE	= 0x4000,
 	BUTTONS = (YES|OK|NO|CANCEL),
     } answer_t;
 
@@ -151,6 +152,30 @@ private:
     Rect area;
     bool doFade;
 };
+
+class NetworkChat
+{
+public:
+    ~NetworkChat();
+
+    static NetworkChat & Get();
+
+    bool MessageReady(void);
+    const std::string & GetMessage(void) const;
+    void ResetMessage(void);
+    void PushMessage(const std::string &);
+
+    void Hide(void) const;
+    void Show(void) const;
+
+private:
+    NetworkChat();
+
+    std::string msg;
+    std::list<std::string> spool;
+    bool modify;
+};
+
 };
 
 #endif
