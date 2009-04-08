@@ -39,7 +39,8 @@ public:
     ~FH2Server();
 
     bool Bind(u16);
-
+    void Exit(void);
+    
 protected:
     friend class ClientSocket;
 
@@ -50,6 +51,7 @@ protected:
     std::deque<MessageID> queue;
     std::list<ClientSocket> clients;
     u8 allow_colors;
+    bool exit;
     u32 admin_id;
     std::string banner;
 };

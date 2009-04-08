@@ -22,6 +22,7 @@
 #include "dialog.h"
 #include "agg.h"
 #include "settings.h"
+#include "cursor.h"
 #include "client.h"
 #include "server.h"
 
@@ -58,6 +59,11 @@ int FH2Server::callbackCreateThread(void *ptr)
     return ptr ? reinterpret_cast<FH2Server *>(ptr)->ConnectionChat() : -1;
 }
 
+void FH2Server::Exit(void)
+{
+    exit = true;
+}
+
 bool FH2Server::Bind(u16 port)
 {
     IPaddress ip;
@@ -72,7 +78,7 @@ int FH2Server::ConnectionChat(void)
     Network::Message packet(MSG_UNKNOWN);
 
     std::string str;
-    bool exit = false;
+    exit = false;
 
     // wait players
     while(! exit)
@@ -174,13 +180,19 @@ Game::menu_t Game::NetworkHost(void)
 {
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
 
     // select count players
-    conf.SetPreferablyCountPlayers(SelectCountPlayers());
+    const u8 max_players = SelectCountPlayers();
+
+    if(2 > max_players) return Game::MAINMENU;
+    conf.SetPreferablyCountPlayers(max_players);
 
     // clear background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+    cursor.Hide();
     display.Blit(back);
+    cursor.Show();
     display.Flip();
 
     // create local server
@@ -206,6 +218,8 @@ Game::menu_t Game::NetworkHost(void)
     }
     else
         Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
+
+    server.Exit();
 
     if(0 > thread.Wait())
     {

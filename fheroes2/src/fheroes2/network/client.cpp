@@ -22,6 +22,7 @@
 #include "dialog.h"
 #include "settings.h"
 #include "client.h"
+#include "cursor.h"
 #include "agg.h"
 
 #ifdef WITH_NET
@@ -172,10 +173,13 @@ Game::menu_t Game::NetworkGuest(void)
 {
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
-
+    Cursor & cursor = Cursor::Get();
+    
     // clear background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+    cursor.Hide();
     display.Blit(back);
+    cursor.Show();
     display.Flip();
 
     std::string server;
