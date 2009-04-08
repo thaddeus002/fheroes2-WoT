@@ -2315,8 +2315,10 @@ namespace Battle
 
     Battlefield::~Battlefield()
     {
-        delete m_castle;
-        delete m_catapult;
+        if(m_castle) delete m_castle;
+	if(m_catapult) delete m_catapult;
+	if(m_army[0]) delete m_army[0];
+	if(m_army[1]) delete m_army[1];
     }
 
     /** Remove any units from the battle that are dead.
