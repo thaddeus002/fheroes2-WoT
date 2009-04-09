@@ -10,6 +10,8 @@
 #include "button.h"
 #include "cursor.h"
 #include "portrait.h"
+#include "morale.h"
+#include "luck.h"
 
 #define display Display::Get()
 #define cursor Cursor::Get()
@@ -354,14 +356,12 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 73;
     text.Blit(tp);
-    str = _("Morale") + std::string(": ");
-    String::AddInt(str, hero.GetMorale());
+    str = _("Morale") + std::string(": ") + Morale::String(hero.GetMorale());
     text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 84;
     text.Blit(tp);
-    str = _("Luck") + std::string(": ");
-    String::AddInt(str, hero.GetLuck());
+    str = _("Luck") + std::string(": ") + Luck::String(hero.GetLuck());
     text.Set(str);
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 95;

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-09 17:04-0400\n"
+"POT-Creation-Date: 2009-04-09 17:34-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,52 +72,52 @@ msgstr ""
 msgid "Some undead in groups -1"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:52
+#: ../fheroes2/battle/battle_dialog.cpp:54
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:295
 msgid "None"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:87
+#: ../fheroes2/battle/battle_dialog.cpp:89
 msgid "A glorious victory!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:92
+#: ../fheroes2/battle/battle_dialog.cpp:94
 msgid "For valor in combat, %{name} receives %{exp} experience."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:101
+#: ../fheroes2/battle/battle_dialog.cpp:103
 msgid "Your forces suffer a bitter defeat, and %{name} abandons your cause."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:106
+#: ../fheroes2/battle/battle_dialog.cpp:108
 msgid "TODO"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:112
+#: ../fheroes2/battle/battle_dialog.cpp:114
 msgid "Your forces in disarray, the cowardly %{name} flees in terror."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:139
+#: ../fheroes2/battle/battle_dialog.cpp:141
 msgid "Battlefield Casualties"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:140
+#: ../fheroes2/battle/battle_dialog.cpp:142
 msgid "Attacker"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:141
+#: ../fheroes2/battle/battle_dialog.cpp:143
 msgid "Defender"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:185
+#: ../fheroes2/battle/battle_dialog.cpp:187
 msgid "You have captured an enemy artifact!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:326
+#: ../fheroes2/battle/battle_dialog.cpp:328
 msgid "%{name} the %{race}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:333
+#: ../fheroes2/battle/battle_dialog.cpp:335
 #: ../fheroes2/castle/castle_well.cpp:249
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:88
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:400
@@ -125,14 +125,14 @@ msgstr ""
 msgid "Attack"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:339
+#: ../fheroes2/battle/battle_dialog.cpp:341
 #: ../fheroes2/castle/castle_well.cpp:257
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:110
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:414
 msgid "Defense"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:345
+#: ../fheroes2/battle/battle_dialog.cpp:347
 #: ../fheroes2/castle/castle_town.cpp:744
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:428
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:151
@@ -143,7 +143,7 @@ msgstr ""
 msgid "Spell Power"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:351
+#: ../fheroes2/battle/battle_dialog.cpp:353
 #: ../fheroes2/castle/castle_town.cpp:755
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:442
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:156
@@ -154,12 +154,12 @@ msgstr ""
 msgid "Knowledge"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:357
+#: ../fheroes2/battle/battle_dialog.cpp:359
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:207
 msgid "Morale"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:363
+#: ../fheroes2/battle/battle_dialog.cpp:364
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:219 ../fheroes2/heroes/skill.cpp:351
 msgid "Luck"
 msgstr ""
