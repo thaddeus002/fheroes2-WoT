@@ -2819,6 +2819,7 @@ namespace Battle
 
     GUI::interaction_t GUI::Interact(TroopIndex troopN, Spell::spell_t &spell, Battlefield &battlefield, bool &mouseActive)
     {
+        bool canSurrender = m_hero[0] && m_hero[1];
         do_button(*m_skip, return SKIP, Dialog::Message(_("Skip"), _("Skip the current creature. The current creature loses its turn and does not get to go again until the next round."), Font::BIG));
         do_button(*m_auto, return AUTO, Dialog::Message(_("Auto Combat"), _("Allows the computer to fight out the battle for you."), Font::BIG));
         do_button(*m_settings, SettingsDialog(), Dialog::Message(_("System Options"), _("Allows you to customize the combat screen."), Font::BIG));
@@ -2826,7 +2827,7 @@ namespace Battle
         {
             if(le.MouseClickLeft(battlefield.GetHeroRect(i))) {
                 bool ownTurn = battlefield.GetSideFromIndex(troopN) == i;
-                Army::battle_t s = HeroStatus(*m_hero[i], *m_statusBar[1], spell, false, ownTurn, !ownTurn);
+                Army::battle_t s = HeroStatus(*m_hero[i], *m_statusBar[1], spell, false, canSurrender, !ownTurn);
                 if(s == Army::RETREAT) {
                     if(Dialog::Message("", _("Are you sure you want to retreat?"), Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
                         return RETREAT;

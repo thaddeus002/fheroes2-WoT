@@ -6,6 +6,7 @@ Users
 + Races are no longer grayed out on the scenario panel when restarting a game.
 + All units in battle now deal a minimum of 1 damage, with damage modifiers
   now capped at -30% and 300% as specified in the original manual.
++ Heroes may no longer surrender to non-heroes.
 
 Developers
 + Added wrapper library around SDL_net and networking client/server examples.
