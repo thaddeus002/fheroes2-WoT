@@ -374,12 +374,14 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
     tp.x = pos_rt.x + 205 - text.w()/2;
     tp.y = pos_rt.y + 117;
     text.Blit(tp);
-    
+
+    Spell::Book* spellbook = hero.GetSpellBook();
+
     Button buttonMag(pos_rt.x + 30, pos_rt.y + 148, butt, 9, 10);
     Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);
     Button buttonSur(pos_rt.x + 148, pos_rt.y + 148, butt, 13, 14);
     Button buttonOK(pos_rt.x + 207, pos_rt.y + 148, butt, 15, 16);
-    buttonMag.SetDisable(!hero.GetSpellBook()->isActive() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
+    buttonMag.SetDisable((spellbook && !spellbook->isActive()) || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
     buttonRet.SetDisable(locked || quickshow);
     buttonSur.SetDisable(!cansurrender || locked || quickshow);
     buttonMag.Draw();
