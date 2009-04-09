@@ -534,6 +534,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
     			const Castle *castle = world.GetCastle(tile.GetIndex());
 
     			if(NULL != castle)
+			{
 			    if(from_hero.GetColor() != castle->GetColor() && castle->GetArmy().isValid())
 			    switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 			    {
@@ -553,6 +554,7 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 				default:return Cursor::ACTION4;
 			    }
 			    break;
+			}
         	    }
         	    break;
 

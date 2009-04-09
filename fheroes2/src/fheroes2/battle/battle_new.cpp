@@ -920,13 +920,13 @@ Army::BattleTroop &Battle::BattleControl::NextValidTroop(s8 &currentTroop, Index
 
 void Battle::BattleControl::RevertModes(u32 prevModes, Army::BattleTroop &troop)
 {
-    if(prevModes & Army::MORALE_GOOD == 0)
+    if((prevModes & Army::MORALE_GOOD) == 0)
         troop.ResetModes(Army::MORALE_GOOD);
-    if(prevModes & Army::MORALE_BAD == 0)
+    if((prevModes & Army::MORALE_BAD) == 0)
         troop.ResetModes(Army::MORALE_BAD);
-    if(prevModes & Army::LUCK_BAD == 0)
+    if((prevModes & Army::LUCK_BAD) == 0)
         troop.ResetModes(Army::LUCK_BAD);
-    if(prevModes & Army::LUCK_GOOD == 0)
+    if((prevModes & Army::LUCK_GOOD) == 0)
         troop.ResetModes(Army::LUCK_GOOD);
 }
 

@@ -41,7 +41,7 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
 	    else
 	    // trees
 	    if((48 < index && index < 51) || (54 < index && index < 58) || 60 == index || 
-	    63 < index && index < 66 || 68 == index || 71 == index || 
+	    (63 < index && index < 66) || 68 == index || 71 == index || 
 	    74 == index || 77 == index || 80 == index) return false;
 	    else
 	    // lake

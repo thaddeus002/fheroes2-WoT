@@ -171,12 +171,12 @@ bool Rect::operator& (const Point & pt) const
 bool Rect::operator& (const Rect & rt) const
 {
     return
-	(rt.x > x && rt.x < x + w ||
-	rt.x + rt.w > x && rt.x + rt.w < x + w ||
-	x > rt.x && x < rt.x + rt.w ||
-	x + w > rt.x && x + w < rt.x + rt.w) &&
-	(rt.y > y && rt.y < y + h ||
-	rt.y + rt.h > y && rt.y + rt.h < y + h ||
-	y > rt.y && y < rt.y + rt.h ||
-	y + h > rt.y && y + h < rt.y + rt.h);
+	((rt.x > x && rt.x < x + w) ||
+	(rt.x + rt.w > x && rt.x + rt.w < x + w) ||
+	(x > rt.x && x < rt.x + rt.w) ||
+	(x + w > rt.x && x + w < rt.x + rt.w)) &&
+	((rt.y > y && rt.y < y + h) ||
+	(rt.y + rt.h > y && rt.y + rt.h < y + h) ||
+	(y > rt.y && y < rt.y + rt.h) ||
+	(y + h > rt.y && y + h < rt.y + rt.h));
 }
