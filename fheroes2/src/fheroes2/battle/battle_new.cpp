@@ -1469,7 +1469,7 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
         PerformAttackAnimation(myTroop, targets, ranged);
 
-    retaliate &= PerformAttackLogic(myTroop, targets, ranged, damage, perished);
+    retaliate &= PerformAttackLogic(myTroop, targets, ranged, damage, perished) && !ranged;
 
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
