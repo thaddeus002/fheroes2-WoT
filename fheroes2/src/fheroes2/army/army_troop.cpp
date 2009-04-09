@@ -84,9 +84,12 @@ const Army::army_t* Army::Troop::GetArmy(void) const
     return army;
 }
 
-const std::string & Army::Troop::GetName(void) const
+const std::string & Army::Troop::GetName(u32 amount /* = 0 */) const
 {
-    return 1 < count ? Monster::GetMultiName() : Monster::GetName();
+    u32 cmp = count;
+    if(amount)
+        cmp = amount;
+    return 1 < cmp ? Monster::GetMultiName() : Monster::GetName();
 }
 
 u16 Army::Troop::Count(void) const

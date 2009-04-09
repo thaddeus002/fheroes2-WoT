@@ -1473,15 +1473,21 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
 
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
-        std::string status = _("%{name} does %{value} damage.");
+        std::string status = _("%{name} %{does} %{value} damage.");
+        if(myTroop.Count() == 1)
+            String::Replace(status, "%{does}", _("does"));
+        else String::Replace(status, "%{does}", _("do"));
         String::Replace(status, "%{name}", myTroop.GetName());
         String::Replace(status, "%{value}", damage);
         
         if(perished)
         {
-            std::string addon = _(" %{value} %{name} perishes.");
+            std::string addon = _(" %{value} %{name} %{perishes}.");
+            if(perished == 1)
+                String::Replace(addon, "%{perishes}", "perishes");
+            else String::Replace(addon, "%{perishes}", "perish");
     	    String::Replace(addon, "%{value}", perished);
-    	    String::Replace(addon, "%{name}", targetTroop.GetName());
+    	    String::Replace(addon, "%{name}", targetTroop.GetName(perished));
             status += addon;
         }
 
