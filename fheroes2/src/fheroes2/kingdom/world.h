@@ -100,15 +100,15 @@ public:
     Artifact::artifact_t DiggingForUltimateArtifacts(const Point & center);
     void ActionForMagellanMaps(u8 color);
 
-    u8 GetDay(void) const{ return day % DAYOFWEEK + 1; };
-    u8 GetWeek(void) const{ return week % WEEKOFMONTH + 1; };
-    u8 GetMonth(void) const{ return month + 1; };
-    u16 CountDay(void) const{ return day + 1; };
-    u16 CountWeek(void) const{ return week + 1; };
-    bool BeginWeek(void) const{ return begin_week; };
-    bool BeginMonth(void) const{ return begin_month; };
-    bool LastDay(void) const{ return ((day % DAYOFWEEK) == (DAYOFWEEK - 1)); };
-    bool LastWeek(void) const{ return ((week % WEEKOFMONTH) == (WEEKOFMONTH - 1)); };
+    u8 GetDay(void) const{ return LastDay() ? DAYOFWEEK : day % DAYOFWEEK; };
+    u8 GetWeek(void) const{ return LastWeek() ? WEEKOFMONTH : week % WEEKOFMONTH; };
+    u8 GetMonth(void) const{ return month; };
+    u16 CountDay(void) const{ return day; };
+    u16 CountWeek(void) const{ return week; };
+    bool BeginWeek(void) const{ return 1 == (day % DAYOFWEEK); };
+    bool BeginMonth(void) const{ return 1 == (week % WEEKOFMONTH); };
+    bool LastDay(void) const{ return (0 == (day % DAYOFWEEK)); };
+    bool LastWeek(void) const{ return (0 == (week % WEEKOFMONTH)); };
     Week::type_t GetWeekType(void) const{ return week_name; };
     void DateDump(void) const;
 
@@ -184,8 +184,6 @@ private:
     u16 day;
     u16 week;
     u8 month;
-    bool begin_week;
-    bool begin_month;
 
     Week::type_t week_name;    
     u16 count_obelisk;

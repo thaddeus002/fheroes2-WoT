@@ -58,9 +58,6 @@ void World::Defaults(void)
     week = 0;
     month = 0;
 
-    begin_week = true;
-    begin_month = true;
-
     week_name = Week::TORTOISE;
     count_obelisk = 0;
 
@@ -1099,29 +1096,24 @@ void World::NewDay(void)
 {
     ++day;
 
-    if(!(day % DAYOFWEEK))
+    if(BeginWeek())
     {
         ++week;
-    
-        if(!(week % WEEKOFMONTH)) ++month;
+        if(BeginMonth()) ++month;
     }
-    
-    begin_week = (day % DAYOFWEEK ? false : true);
-            
-    begin_month = (begin_week && !(week % WEEKOFMONTH) ? true : false);
 
     // action new day
     for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewDay();
 
     // action new week
-    if(begin_week)
+    if(BeginWeek())
     {
         NewWeek();
         for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewWeek();
     }
     
     // action new month
-    if(begin_month)
+    if(BeginMonth())
     {
         NewMonth();
         for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewMonth();
