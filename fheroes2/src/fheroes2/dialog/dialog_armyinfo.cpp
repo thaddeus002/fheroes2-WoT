@@ -244,32 +244,32 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
 
     if(READONLY & flags)
     {
-	buttonDismiss.Press();
-	buttonDismiss.SetDisable(true);
+        buttonDismiss.Press();
+        buttonDismiss.SetDisable(true);
     }
 
-    if(mons.isAllowUpgrade())
+    if(!battle && mons.isAllowUpgrade())
     {
-	if(UPGRADE & flags)
-	{
-	    buttonUpgrade.SetDisable(false);
-	    buttonUpgrade.Draw();
-	}
-	else
-	if(READONLY & flags)
-	{
-	    buttonUpgrade.Press();
-	    buttonUpgrade.SetDisable(true);
-	    buttonUpgrade.Draw();
-	}
+        if(UPGRADE & flags)
+        {
+            buttonUpgrade.SetDisable(false);
+            buttonUpgrade.Draw();
+        }
+        else if(READONLY & flags)
+        {
+            buttonUpgrade.Press();
+            buttonUpgrade.SetDisable(true);
+            buttonUpgrade.Draw();
+        }
+        else buttonUpgrade.SetDisable(true);
     }
-    else
-	buttonUpgrade.SetDisable(true);
+    else buttonUpgrade.SetDisable(true);
 
     if(BUTTONS & flags)
     {
-	buttonDismiss.Draw();
-	buttonExit.Draw();
+        if(!battle)
+            buttonDismiss.Draw();
+        buttonExit.Draw();
     }
 
     LocalEvent & le = LocalEvent::GetLocalEvent();

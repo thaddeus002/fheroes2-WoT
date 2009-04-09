@@ -115,8 +115,16 @@ void Button::Draw(void)
 
     const Sprite & sprite1 = AGG::GetICN(_icn, _index1);
     const Sprite & sprite2 = AGG::GetICN(_icn, _index2);
+    const Sprite & src = pressed ? sprite2 : sprite1;
 
-    Display::Get().Blit(pressed ? sprite2 : sprite1, x, y);
+    Display::Get().Blit(src, x, y);
+
+    if(disable)
+    {
+        Surface darken(src.w(), src.h());
+        darken.SetAlpha(80);
+        Display::Get().Blit(darken, x, y);
+    }
 
     if(localcursor) cursor.Show();
 }
