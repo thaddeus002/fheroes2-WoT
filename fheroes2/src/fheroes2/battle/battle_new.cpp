@@ -1260,7 +1260,13 @@ long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, c
     
     float d = attacker.GetAttack() - defense;
     d *= d > 0 ? 0.1f : 0.05f;
+    if(d < -0.3f)
+        d = 0.3f;
+    else if(d > 3.0f)
+        d = 3.0f;
     damage = (long)(((float)damage) * (1 + d));
+    if(damage < 1)
+        damage = 1;
     return damage;
 }
 
