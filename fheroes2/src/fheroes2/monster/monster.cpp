@@ -891,9 +891,21 @@ Monster::monster_t Monster::Rand(level_t level)
 
 u16 Monster::GetRNDSize(monster_t m)
 {
+    u16 factor = 100;
+
+    switch(Settings::Get().GameDifficulty()) 	 
+    { 	 
+	case Difficulty::EASY:      factor = 100; break;
+	case Difficulty::NORMAL:    factor = 200; break;
+	case Difficulty::HARD:      factor = 300; break;
+	case Difficulty::EXPERT:    factor = 400; break;
+	case Difficulty::IMPOSSIBLE:factor = 500; break;
+	default: break;
+     }
+
     const u8 grown = Monster(m).GetGrown();
 
-    return Rand::Get(grown - grown / 2, grown + grown / 2);
+    return Rand::Get(factor * grown / 100, factor * (grown + grown / 2) / 100);
 }
 
 u8 Monster::GetLevel(monster_t m)
