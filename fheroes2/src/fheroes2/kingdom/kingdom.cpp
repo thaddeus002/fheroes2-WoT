@@ -165,39 +165,46 @@ void Kingdom::ActionNewDay(void)
 
 void Kingdom::ActionNewWeek(void)
 {
-
-    // castle New Week
-    std::vector<Castle *>::const_iterator itc = castles.begin();
-    for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewWeek();
-
-    // heroes New Week
-    std::vector<Heroes *>::const_iterator ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewWeek();
-
-    // debug an gift
-    if(1 < world.CountDay() && Settings::Get().Debug() && Game::LOCAL == Control())
+    // skip first day
+    if(1 < world.CountDay())
     {
-	Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
+	// castle New Week
+	std::vector<Castle *>::const_iterator itc = castles.begin();
+	for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewWeek();
 
-	resource.wood += 20;
-	resource.ore += 20;
-	resource.sulfur += 10;
-	resource.crystal += 10;
-	resource.gems += 10;
-	resource.mercury += 10;
-	resource.gold += 5000;
+	// heroes New Week
+	std::vector<Heroes *>::const_iterator ith = heroes.begin();
+	for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewWeek();
+
+	// debug an gift
+	if(Settings::Get().Debug() && Game::LOCAL == Control())
+	{
+	    Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
+
+	    resource.wood += 20;
+	    resource.ore += 20;
+	    resource.sulfur += 10;
+	    resource.crystal += 10;
+	    resource.gems += 10;
+	    resource.mercury += 10;
+	    resource.gold += 5000;
+	}
     }
 }
 
 void Kingdom::ActionNewMonth(void)
 {
-    // castle New Month
-    std::vector<Castle *>::const_iterator itc = castles.begin();
-    for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewMonth();
+    // skip first day
+    if(1 < world.CountDay())
+    {
+	// castle New Month
+	std::vector<Castle *>::const_iterator itc = castles.begin();
+	for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewMonth();
 
-    // heroes New Month
-    std::vector<Heroes *>::const_iterator ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewMonth();
+	// heroes New Month
+	std::vector<Heroes *>::const_iterator ith = heroes.begin();
+	for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewMonth();
+    }
 }
 
 void Kingdom::AddHeroes(const Heroes *hero)
