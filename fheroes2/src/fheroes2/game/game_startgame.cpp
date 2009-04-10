@@ -786,6 +786,7 @@ Game::menu_t Game::HumanTurn(void)
 	const Week::type_t name = world.GetWeekType();
 	std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
 	String::Replace(message, "%{name}", Week::GetString(name));
+	message += "\n \n";
 	message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
 	Dialog::Message("", message, Font::BIG, Dialog::OK);
     }

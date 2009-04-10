@@ -26,7 +26,7 @@
 
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
-    const char *sep = ". ";
+    const char sep = '\n';
     std::list<std::string> list;
     size_t pos1 = 0;
     size_t pos2 = 0;
