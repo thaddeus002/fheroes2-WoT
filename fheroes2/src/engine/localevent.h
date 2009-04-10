@@ -20,6 +20,7 @@
 #ifndef H2LOCALEVENT_H
 #define H2LOCALEVENT_H
 
+#include <string>
 #include "types.h"
 
 class Point;
@@ -181,6 +182,8 @@ public:
     KeySym KeyValue(void) const;
     u16	   KeyMod(void) const;
 
+    static void SetScreenshotPrefix(std::string &);
+
 private:
     LocalEvent();
 
@@ -210,6 +213,8 @@ private:
 
     static Point mouse_cu;	// point cursor
 
+    static std::string screenshot_prefix;
+    
     static void (*redraw_cursor_func)(u16, u16);
 };
 

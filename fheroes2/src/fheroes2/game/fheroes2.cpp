@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 
 	// random init
 	Rand::Init();
-	
+
 	u32 subsystem = INIT_VIDEO;
         if(conf.Sound() || conf.Music())
             subsystem |= INIT_AUDIO;
@@ -259,6 +259,10 @@ int main(int argc, char **argv)
 
 	    // set global events
 	    LocalEvent::SetGlobalFilterEvents(Cursor::Redraw);
+
+	    // set prefix for store screenshot
+	    caption = conf.LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + "screenshot_";
+	    LocalEvent::SetScreenshotPrefix(caption);
 
 	    // goto main menu
 	    Game::menu_t rs = (test ? Game::TESTING : (conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU));

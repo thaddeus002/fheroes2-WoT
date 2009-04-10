@@ -38,6 +38,7 @@ Point LocalEvent::mouse_rl(-1, -1);
 Point LocalEvent::mouse_rm(-1, -1);
 Point LocalEvent::mouse_rr(-1, -1);
 KeySym LocalEvent::key_value = KEY_NONE;
+std::string LocalEvent::screenshot_prefix("screenshot_");
 void (* LocalEvent::redraw_cursor_func)(u16, u16) = NULL;
 
 static KeySym SDLToKeySym(SDLKey key)
@@ -475,16 +476,12 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
 	    case SDLK_PRINT:
 	    {
 		std::ostringstream stream;
-    		stream << std::time(0);
-        
-        	std::string name("screenshot_");
-        	name += stream.str();
 #ifndef WITH_PNG
-        	name += ".bmp";
-            	if(display.SaveBMP(name.c_str())) Error::Verbose("save: " + name);
+		stream << screenshot_prefix << std::time(0) << ".bmp";
+            	if(display.SaveBMP(stream.str().c_str())) Error::Verbose("save: " + stream.str());
 #else
-        	name += ".png";
-            	if(display.SavePNG(name.c_str())) Error::Verbose("save: " + name);
+		stream << screenshot_prefix << std::time(0) << ".png";
+            	if(display.SavePNG(stream.str().c_str())) Error::Verbose("save: " + stream.str());
 #endif
 	    }
 	    	return 0;
@@ -527,4 +524,9 @@ void LocalEvent::SetStateDefaults(void)
     SetState(SDL_SYSWMEVENT, false);
     SetState(SDL_VIDEORESIZE, false);
     SetState(SDL_VIDEOEXPOSE, false);
+}
+
+void LocalEvent::SetScreenshotPrefix(std::string & str)
+{
+    screenshot_prefix = str;
 }
