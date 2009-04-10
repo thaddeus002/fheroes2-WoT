@@ -134,8 +134,8 @@ public:
 
     Dialog::answer_t OpenDialog(void);
 
-    s8 GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
-    s8 GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+    s8 GetMoraleWithModificators(std::string *strs = NULL) const;
+    s8 GetLuckWithModificators(std::string *strs = NULL) const;
 
     bool AllowBuild(void) const{ return Modes(ALLOWBUILD); };
     bool AllowBuyBuilding(building_t build) const;

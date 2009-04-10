@@ -845,7 +845,7 @@ const std::string & StringModifiers(s8 mod)
     return mods[0];
 }
 
-s8 Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
+s8 Heroes::GetMoraleWithModificators(std::string *strs) const
 {
     s8 result = Morale::NORMAL;
 
@@ -870,8 +870,8 @@ s8 Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
 	    continue;
 
         result += modifiers[i].second;
-        if(list)
-	    list->push_back(Artifact::String(art) + StringModifiers(modifiers[i].second));
+        if(strs)
+	    strs->append(Artifact::String(art) + StringModifiers(modifiers[i].second) + "\n");
     }
 
     modifiers.clear();
@@ -887,8 +887,8 @@ s8 Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
             continue;
 
         result += modifiers[i].second;
-        if(list)
-            list->push_back(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LEADERSHIP) + StringModifiers(modifiers[i].second));
+        if(strs)
+            strs->append(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LEADERSHIP) + StringModifiers(modifiers[i].second) + "\n");
         break;
     }
 
@@ -909,16 +909,16 @@ s8 Heroes::GetMoraleWithModificators(std::list<std::string> *list) const
             continue;
 
         result += modifiers[i].second;
-        if(list)
-            list->push_back(MP2::StringObject(obj) + StringModifiers(modifiers[i].second));
+        if(strs)
+            strs->append(MP2::StringObject(obj) + StringModifiers(modifiers[i].second) + "\n");
     }
     
     const Castle* castle = inCastle();
     // check castle morale modificators
-    if(castle) result += castle->GetMoraleWithModificators(list);
+    if(castle) result += castle->GetMoraleWithModificators(strs);
 
     // check from army morale
-    result += army.GetMoraleWithModificators(list);
+    result += army.GetMoraleWithModificators(strs);
 
     // result
     if(result < Morale::AWFUL)	return Morale::TREASON;
@@ -941,7 +941,7 @@ s8 Heroes::GetLuck(void) const
     return GetLuckWithModificators(NULL);
 }
 
-s8 Heroes::GetLuckWithModificators(std::list<std::string> *list) const
+s8 Heroes::GetLuckWithModificators(std::string *strs) const
 {
     s8 result = Luck::NORMAL;
 
@@ -965,8 +965,8 @@ s8 Heroes::GetLuckWithModificators(std::list<std::string> *list) const
             continue;
 
         result += modifiers[i].second;
-        if(list)
-            list->push_back(Artifact::String(art) + StringModifiers(modifiers[i].second));
+        if(strs)
+            strs->append(Artifact::String(art) + StringModifiers(modifiers[i].second) + "\n");
     }
 
     modifiers.clear();
@@ -982,8 +982,8 @@ s8 Heroes::GetLuckWithModificators(std::list<std::string> *list) const
             continue;
 
         result += modifiers[i].second;
-        if(list)
-            list->push_back(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LUCK) + StringModifiers(modifiers[i].second));
+        if(strs)
+            strs->append(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LUCK) + StringModifiers(modifiers[i].second) + "\n");
     }
 
     modifiers.clear();
@@ -1001,16 +1001,16 @@ s8 Heroes::GetLuckWithModificators(std::list<std::string> *list) const
             continue;
 
         result += modifiers[i].second;
-        if(list)
-            list->push_back(MP2::StringObject(obj) + StringModifiers(modifiers[i].second));
+        if(strs)
+            strs->append(MP2::StringObject(obj) + StringModifiers(modifiers[i].second) + "\n");
     }
     
     const Castle* castle = inCastle();
     // check castle morale modificators
-    if(castle) result += castle->GetLuckWithModificators(list);
+    if(castle) result += castle->GetLuckWithModificators(strs);
 
     // check from army morale
-    result += army.GetLuckWithModificators(list);
+    result += army.GetLuckWithModificators(strs);
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else

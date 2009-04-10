@@ -166,12 +166,8 @@ class TextBox : protected Rect
 public:
     TextBox(){};
     TextBox(const std::string &, Font::type_t, u16);
-    TextBox(const std::list<std::string> &, Font::type_t, u16);
-
     TextBox(const std::string &, Font::type_t, const Rect &);
-    TextBox(const std::list<std::string> &, Font::type_t, const Rect &);
 
-    void Set(const std::list<std::string> &, Font::type_t, u16);
     void Set(const std::string &, Font::type_t, u16);
 
     const Rect & GetRect(void) const{ return *this; };

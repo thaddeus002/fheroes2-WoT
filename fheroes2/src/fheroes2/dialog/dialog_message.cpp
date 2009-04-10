@@ -26,22 +26,6 @@
 
 u16 Dialog::Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons)
 {
-    const char sep = '\n';
-    std::list<std::string> list;
-    size_t pos1 = 0;
-    size_t pos2 = 0;
-    while(std::string::npos != (pos2 = message.find(sep, pos1)))
-    {
-	list.push_back(message.substr(pos1, pos2 - pos1 + 1));
-	pos1 = pos2 + 2;
-    }
-    if(message.size()) list.push_back(message.substr(pos1, message.size() - pos1));
-
-    return Dialog::Message(header, list, ft, buttons);
-}
-
-u16 Dialog::Message(const std::string &header, const std::list<std::string> &messages, Font::type_t ft, u16 buttons)
-{
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
@@ -56,12 +40,12 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
     cursor.SetThemes(cursor.POINTER);
 
     TextBox textbox1(header, (ft == Font::BIG ? Font::YELLOWBIG : ft), BOXAREA_WIDTH);
-    TextBox textbox2(messages, ft, BOXAREA_WIDTH);
+    TextBox textbox2(message, ft, BOXAREA_WIDTH);
 
     Box box((header.size() ? textbox1.h() + 10 : 10) + textbox2.h(), buttons);
     Rect pos = box.GetArea();
 
-    if(messages.empty()) pos.y += 10;
+    if(message.empty()) pos.y += 10;
 
     if(header.size())
     {
@@ -70,7 +54,7 @@ u16 Dialog::Message(const std::string &header, const std::list<std::string> &mes
     }
     pos.y += 10;
 
-    if(messages.size()) textbox2.Blit(pos.x, pos.y);
+    if(message.size()) textbox2.Blit(pos.x, pos.y);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 

@@ -161,8 +161,8 @@ public:
 
     s8 GetMorale(void) const;
     s8 GetLuck(void) const;
-    s8 GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
-    s8 GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+    s8 GetMoraleWithModificators(std::string *str = NULL) const;
+    s8 GetLuckWithModificators(std::string *str = NULL) const;
     u8 GetLevel(void) const;
 
     u16 GetMaxSpellPoints(void) const;

@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
 #include "agg.h"
 #include "settings.h"
 #include "text.h"
@@ -476,42 +477,10 @@ TextBox::TextBox(const std::string & msg, Font::type_t ft, u16 width)
     Set(msg, ft, width);
 }
 
-TextBox::TextBox(const std::list<std::string> & list, Font::type_t ft, u16 width)
-{
-    Set(list, ft, width);
-}
-
 TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
 {
     Set(msg, ft, rt.w);
     Blit(rt.x, rt.y);
-}
-
-TextBox::TextBox(const std::list<std::string> & list, Font::type_t ft, const Rect & rt)
-{
-    Set(list, ft, rt.w);
-    Blit(rt.x, rt.y);
-}
-
-void TextBox::Set(const std::list<std::string> & list, Font::type_t ft, u16 width)
-{
-    if(messages.size()) messages.clear();
-    if(list.empty()) return;
-
-    std::list<std::string>::const_iterator it1 = list.begin();
-    std::list<std::string>::const_iterator it2 = list.end();
-
-    for(; it1 != it2; ++it1)
-    if(Settings::Get().Unicode())
-    {
-	const std::string & msg = *it1;
-	std::vector<u16> unicode(2 * msg.size(), 0);
-	String::UTF8_to_UNICODE(&unicode[0], msg.c_str(), msg.size());
-	while(0 == unicode.back()) unicode.pop_back();
-	Append(unicode, ft, width);
-    }
-    else
-	Append(*it1, ft, width);
 }
 
 void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
@@ -524,10 +493,43 @@ void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
 	std::vector<u16> unicode(2 * msg.size(), 0);
 	String::UTF8_to_UNICODE(&unicode[0], msg.c_str(), msg.size());
 	while(0 == unicode.back()) unicode.pop_back();
-	Append(unicode, ft, width);
+
+        const u16 sep = '\n';
+        std::vector<u16> substr;
+        substr.reserve(msg.size());
+        std::vector<u16>::iterator pos1 = unicode.begin();
+        std::vector<u16>::iterator pos2;
+        while(unicode.end() != (pos2 = std::find(pos1, unicode.end(), sep)))
+        {
+    	    substr.assign(pos1, pos2);
+	    Append(substr, ft, width);
+            pos1 = pos2 + 1;
+        }
+        if(pos1 < unicode.end())
+        {
+    	    substr.assign(pos1, unicode.end());
+	    Append(substr, ft, width);
+	}
     }
     else
-	Append(msg, ft, width);
+    {
+        const char sep = '\n';
+        std::string substr;
+        substr.reserve(msg.size());
+        std::string::const_iterator pos1 = msg.begin();
+        std::string::const_iterator pos2;
+        while(msg.end() != (pos2 = std::find(pos1, msg.end(), sep)))
+        {
+    	    substr.assign(pos1, pos2);
+	    Append(substr, ft, width);
+            pos1 = pos2 + 1;
+        }
+        if(pos1 < msg.end())
+        {
+    	    substr.assign(pos1, msg.end());
+	    Append(substr, ft, width);
+	}
+    }
 }
 
 void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)

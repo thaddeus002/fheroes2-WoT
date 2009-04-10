@@ -72,6 +72,7 @@ const char* LuckString(s8 luck)
 
 HeroesIndicator::HeroesIndicator(const Heroes & h) : hero(h)
 {
+    descriptions.reserve(256);
 }
 
 const Rect & HeroesIndicator::GetArea(void) const
@@ -79,9 +80,9 @@ const Rect & HeroesIndicator::GetArea(void) const
     return area;
 }
 
-const std::list<std::string> & HeroesIndicator::GetLists(void) const
+const std::string & HeroesIndicator::GetDescriptions(void) const
 {
-    return lists;
+    return descriptions;
 }
 
 void HeroesIndicator::SetPos(const Point & pt)
@@ -96,17 +97,26 @@ LuckIndicator::LuckIndicator(const Heroes & h) : HeroesIndicator(h)
 
 void LuckIndicator::Redraw(void)
 {
-    lists.clear();
-    luck = hero.GetLuckWithModificators(&lists);
+    descriptions.clear();
+    descriptions.append(Luck::Description(luck));
+    descriptions.append("\n \n");
+    descriptions.append(_("Current Luck Modifiers:"));
+    descriptions.append("\n \n");
+
+    std::string modificators;
+    modificators.reserve(256);
+
+    luck = hero.GetLuckWithModificators(&modificators);
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > luck ? 3 : (0 < luck ? 2 : 6)));
     const u8 inter = 6;
     u8 count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 
-    if(lists.size()) lists.push_front(_("Current Luck Modifiers:"));
-    lists.push_front(" ");
-    lists.push_front(Luck::Description(luck));
+    if(modificators.size())
+	descriptions.append(modificators);
+    else
+	descriptions.append(_("None"));
 
     back.Restore();
     while(count--)
@@ -120,9 +130,9 @@ void LuckIndicator::QueueEventProcessing(LuckIndicator & indicator)
 {
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    if(le.MouseClickLeft(indicator.area)) Dialog::Message(LuckString(indicator.luck), indicator.lists, Font::BIG, Dialog::OK);
+    if(le.MouseClickLeft(indicator.area)) Dialog::Message(LuckString(indicator.luck), indicator.descriptions, Font::BIG, Dialog::OK);
     else
-    if(le.MousePressRight(indicator.area)) Dialog::Message(LuckString(indicator.luck), indicator.lists, Font::BIG);
+    if(le.MousePressRight(indicator.area)) Dialog::Message(LuckString(indicator.luck), indicator.descriptions, Font::BIG);
 }
 
 MoraleIndicator::MoraleIndicator(const Heroes & h) : HeroesIndicator(h), morale(Morale::NORMAL)
@@ -131,17 +141,26 @@ MoraleIndicator::MoraleIndicator(const Heroes & h) : HeroesIndicator(h), morale(
 
 void MoraleIndicator::Redraw(void)
 {
-    lists.clear();
-    morale = hero.GetMoraleWithModificators(&lists);
+    descriptions.clear();
+    descriptions.append(Morale::Description(morale));
+    descriptions.append("\n \n");
+    descriptions.append(_("Current Morale Modifiers:"));
+    descriptions.append("\n \n");
+
+    std::string modificators;
+    modificators.reserve(256);
+
+    morale = hero.GetMoraleWithModificators(&modificators);
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
     const u8 inter = 6;
     u8 count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
     s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s16 cy = area.y + (area.h - sprite.h()) / 2;
 
-    if(lists.size()) lists.push_front(_("Current Morale Modifiers:"));
-    lists.push_front(" ");
-    lists.push_front(Morale::Description(morale));
+    if(modificators.size())
+	descriptions.append(modificators);
+    else
+	descriptions.append(_("None"));
 
     back.Restore();
     while(count--)
@@ -155,7 +174,7 @@ void MoraleIndicator::QueueEventProcessing(MoraleIndicator & indicator)
 {
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    if(le.MouseClickLeft(indicator.area)) Dialog::Message(MoraleString(indicator.morale), indicator.lists, Font::BIG, Dialog::OK);
+    if(le.MouseClickLeft(indicator.area)) Dialog::Message(MoraleString(indicator.morale), indicator.descriptions, Font::BIG, Dialog::OK);
     else
-    if(le.MousePressRight(indicator.area)) Dialog::Message(MoraleString(indicator.morale), indicator.lists, Font::BIG);
+    if(le.MousePressRight(indicator.area)) Dialog::Message(MoraleString(indicator.morale), indicator.descriptions, Font::BIG);
 }

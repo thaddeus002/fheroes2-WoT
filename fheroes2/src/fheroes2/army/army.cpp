@@ -389,7 +389,7 @@ s8 Army::army_t::GetLuck(void) const
     return GetLuckWithModificators();
 }
 
-s8 Army::army_t::GetLuckWithModificators(std::list<std::string> *list) const
+s8 Army::army_t::GetLuckWithModificators(std::string *strs) const
 {
     return Luck::NORMAL;
 }
@@ -400,7 +400,7 @@ s8 Army::army_t::GetMorale(void) const
 }
 
 // TODO:: need optimize
-s8 Army::army_t::GetMoraleWithModificators(std::list<std::string> *list) const
+s8 Army::army_t::GetMoraleWithModificators(std::string *strs) const
 {
     s8 result(Morale::NORMAL);
 
@@ -450,25 +450,38 @@ s8 Army::army_t::GetMoraleWithModificators(std::list<std::string> *list) const
     	    if(0 == count_necr && !ghost_present && 1 < uniq_count)
             {
                 ++result;
-                if(list)
+                if(strs)
                 {
             	    std::string str = _("All %{race} troops +1");
             	    String::Replace(str, "%{race}", Race::String(r));
-            	    list->push_back(str);
+            	    strs->append(str);
+            	    strs->append("\n");
             	}
             }
             break;
         case 3:
             result -= 1;
-            if(list) list->push_back(_("Troops of 3 alignments -1"));
+            if(strs)
+            {
+        	strs->append(_("Troops of 3 alignments -1"));
+        	strs->append("\n");
+    	    }
             break;
         case 4:
     	    result -= 2;
-            if(list) list->push_back(_("Troops of 4 alignments -2"));
+            if(strs)
+            {
+        	strs->append(_("Troops of 4 alignments -2"));
+        	strs->append("\n");
+    	    }
             break;
         default:
             result -= 3;
-            if(list) list->push_back(_("Troops of 5 alignments -3"));
+            if(strs)
+            {
+        	strs->append(_("Troops of 5 alignments -3"));
+        	strs->append("\n");
+    	    }
             break;
     }
 
@@ -476,7 +489,11 @@ s8 Army::army_t::GetMoraleWithModificators(std::list<std::string> *list) const
     if(1 < uniq_count && (count_necr || ghost_present) && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg))
     {
         result -= 1;
-        if(list) list->push_back(_("Some undead in groups -1"));
+        if(strs)
+        {
+    	    strs->append(_("Some undead in groups -1"));
+    	    strs->append("\n");
+    	}
     }
 
     return result;

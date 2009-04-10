@@ -21,7 +21,6 @@
 #ifndef H2HEROESIND_H
 #define H2HEROESIND_H
 
-#include <list>
 #include <string>
 
 class Heroes;
@@ -32,14 +31,14 @@ public:
     HeroesIndicator(const Heroes &);
 
     const Rect & GetArea(void) const;
-    const std::list<std::string> & GetLists(void) const;
+    const std::string & GetDescriptions(void) const;
     void SetPos(const Point &);
 
 protected:
     const Heroes & 	hero;
     Rect		area;
     Background		back;
-    std::list<std::string> lists;
+    std::string		descriptions;
 };
 
 class LuckIndicator : public HeroesIndicator

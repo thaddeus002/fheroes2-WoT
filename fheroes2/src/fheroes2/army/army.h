@@ -22,7 +22,6 @@
 #define H2ARMY_H
 
 #include <string>
-#include <list>
 #include <vector>
 #include "bitmodes.h"
 #include "army_troop.h"
@@ -129,8 +128,8 @@ namespace Army
 	    u16		GetCountMonsters(const Monster::monster_t) const;
 	    s8		GetMorale(void) const;
 	    s8		GetLuck(void) const;
-	    s8		GetMoraleWithModificators(std::list<std::string> *list = NULL) const;
-	    s8		GetLuckWithModificators(std::list<std::string> *list = NULL) const;
+	    s8		GetMoraleWithModificators(std::string *strs = NULL) const;
+	    s8		GetLuckWithModificators(std::string *strs = NULL) const;
 	    u32		CalculateExperience(void) const;
 	    u32		ActionToSirens(void);
 

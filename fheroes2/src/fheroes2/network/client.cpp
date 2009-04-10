@@ -64,7 +64,7 @@ int FH2Client::ConnectionChat(void)
 
     // get banner
     packet.Pop(str);
-    if(!Dialog::InputString("Connected to " + str + ", enter player name:", name))
+    if(!Dialog::InputString("Connected to " + str + "\nEnter player name:", name))
     {
 	Close();
         if(conf.Debug()) std::cerr << "FH2Client::ConnectionChat: close socket" << std::endl;
