@@ -542,7 +542,7 @@ namespace Battle
         //TODO: Check with original HoMM II status indicators
         if(troop.Modes(Army::SP_BLESS | Army::SP_STONESKIN | Army::SP_STEELSKIN))
             return GREEN;
-        else if(troop.Modes(Army::SP_BLIND | Army::SP_PARALYZE))
+        else if(troop.Modes(Army::SP_BLIND | Army::SP_PARALYZE | Army::SP_CURSE))
             return RED;
         else if(troop.Modes(Army::SP_HASTE | Army::SP_SHIELD))
             return YELLOW;

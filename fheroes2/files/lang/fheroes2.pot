@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-09 18:14-0400\n"
+"POT-Creation-Date: 2009-04-10 15:56-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,24 +56,26 @@ msgstr ""
 msgid "All %{race} troops +1"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:463
+#: ../fheroes2/army/army.cpp:466
 msgid "Troops of 3 alignments -1"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:467
+#: ../fheroes2/army/army.cpp:474
 msgid "Troops of 4 alignments -2"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:471
+#: ../fheroes2/army/army.cpp:482
 msgid "Troops of 5 alignments -3"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:479
+#: ../fheroes2/army/army.cpp:494
 msgid "Some undead in groups -1"
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:54
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:295
+#: ../fheroes2/heroes/heroes_indicator.cpp:119
+#: ../fheroes2/heroes/heroes_indicator.cpp:163
 msgid "None"
 msgstr ""
 
@@ -173,7 +175,7 @@ msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:406
 #: ../fheroes2/battle/battle_dialog.cpp:411
-#: ../fheroes2/game/game_startgame.cpp:1469
+#: ../fheroes2/game/game_startgame.cpp:1470
 msgid "Cast Spell"
 msgstr ""
 
@@ -305,7 +307,7 @@ msgstr ""
 
 #: ../fheroes2/battle/battle_new.cpp:2831
 #: ../fheroes2/editor/editor_startgame.cpp:804
-#: ../fheroes2/game/game_startgame.cpp:1477
+#: ../fheroes2/game/game_startgame.cpp:1478
 msgid "System Options"
 msgstr ""
 
@@ -1405,7 +1407,7 @@ msgid "Cancel back to the main menu."
 msgstr ""
 
 #: ../fheroes2/editor/editor_startgame.cpp:173
-#: ../fheroes2/game/game_startgame.cpp:848
+#: ../fheroes2/game/game_startgame.cpp:849
 msgid "Are you sure you want to quit?"
 msgstr ""
 
@@ -1442,7 +1444,7 @@ msgid "Edit maps title, description, and other general information."
 msgstr ""
 
 #: ../fheroes2/editor/editor_startgame.cpp:801
-#: ../fheroes2/game/game_startgame.cpp:1475
+#: ../fheroes2/game/game_startgame.cpp:1476
 msgid "File Options"
 msgstr ""
 
@@ -1709,8 +1711,8 @@ msgstr ""
 msgid "Impossible"
 msgstr ""
 
-#: ../fheroes2/game/game_io.cpp:682 ../fheroes2/kingdom/world.cpp:200
-#: ../fheroes2/kingdom/world.cpp:242
+#: ../fheroes2/game/game_io.cpp:682 ../fheroes2/kingdom/world.cpp:197
+#: ../fheroes2/kingdom/world.cpp:239
 msgid "Maps Loading..."
 msgstr ""
 
@@ -1946,151 +1948,151 @@ msgstr ""
 msgid "Astrologers proclaim week of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:789
+#: ../fheroes2/game/game_startgame.cpp:790
 msgid " All populations are halved."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:789
+#: ../fheroes2/game/game_startgame.cpp:790
 msgid " All dwellings increase population."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:800
+#: ../fheroes2/game/game_startgame.cpp:801
 msgid ""
 "%{color} player, your heroes abandon you, and you are banished from this "
 "land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:808
+#: ../fheroes2/game/game_startgame.cpp:809
 msgid ""
 "%{color} player, this is your last day to capture a town, or you will be "
 "banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:815
+#: ../fheroes2/game/game_startgame.cpp:816
 msgid ""
 "%{color} player, you only have %{day} days left to capture a town, or you "
 "will be banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:861
-#: ../fheroes2/game/game_startgame.cpp:1355
+#: ../fheroes2/game/game_startgame.cpp:862
+#: ../fheroes2/game/game_startgame.cpp:1356
 msgid ""
 "One or more heroes may still move, are you sure you want to end your turn?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:916
-#: ../fheroes2/game/game_startgame.cpp:1405
+#: ../fheroes2/game/game_startgame.cpp:917
+#: ../fheroes2/game/game_startgame.cpp:1406
 msgid "Game saved successfully."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:921
-#: ../fheroes2/game/game_startgame.cpp:1399
+#: ../fheroes2/game/game_startgame.cpp:922
+#: ../fheroes2/game/game_startgame.cpp:1400
 msgid ""
 "Are you sure you want to load a new game? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1390
+#: ../fheroes2/game/game_startgame.cpp:1391
 msgid "Are you sure you want to restart? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1461
+#: ../fheroes2/game/game_startgame.cpp:1462
 msgid "World Map"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1461
+#: ../fheroes2/game/game_startgame.cpp:1462
 msgid "A miniature view of the known world. Left click to move viewing area."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1463
+#: ../fheroes2/game/game_startgame.cpp:1464
 msgid "Next Hero"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1463
+#: ../fheroes2/game/game_startgame.cpp:1464
 msgid "Select the next Hero."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1465
+#: ../fheroes2/game/game_startgame.cpp:1466
 msgid "Continue Movement"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1465
+#: ../fheroes2/game/game_startgame.cpp:1466
 msgid "Continue the Hero's movement along the current path."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1467
+#: ../fheroes2/game/game_startgame.cpp:1468
 msgid "Kingdom Summary"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1467
+#: ../fheroes2/game/game_startgame.cpp:1468
 msgid "View a Summary of your Kingdom."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1469
+#: ../fheroes2/game/game_startgame.cpp:1470
 msgid "Cast an adventure spell."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1471
+#: ../fheroes2/game/game_startgame.cpp:1472
 msgid "End Turn"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1471
+#: ../fheroes2/game/game_startgame.cpp:1472
 msgid "End your turn and left the computer take its turn."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1473
+#: ../fheroes2/game/game_startgame.cpp:1474
 msgid "Adventure Options"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1473
+#: ../fheroes2/game/game_startgame.cpp:1474
 msgid "Bring up the adventure options menu."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1475
+#: ../fheroes2/game/game_startgame.cpp:1476
 msgid "Bring up the file options menu, alloving you to load menu, save etc."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1477
+#: ../fheroes2/game/game_startgame.cpp:1478
 msgid "Bring up the system options menu, alloving you to customize your game."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1479
+#: ../fheroes2/game/game_startgame.cpp:1480
 msgid "Status Window"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1479
+#: ../fheroes2/game/game_startgame.cpp:1480
 msgid ""
 "This window provides information on the status of your hero or kingdom, and "
 "shows the date. Left click here to cycle throungh these windows."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1548
-#: ../fheroes2/game/game_startgame.cpp:1591
+#: ../fheroes2/game/game_startgame.cpp:1549
+#: ../fheroes2/game/game_startgame.cpp:1592
 msgid "Congratulations!"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1548
+#: ../fheroes2/game/game_startgame.cpp:1549
 msgid "You are victorious."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1553
+#: ../fheroes2/game/game_startgame.cpp:1554
 msgid ""
 "%{color} player, you have lost your last town. If you do not conquer another "
 "town in next week, you will be eliminated."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1575
+#: ../fheroes2/game/game_startgame.cpp:1576
 msgid "Try searching on clear ground."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1585
+#: ../fheroes2/game/game_startgame.cpp:1586
 msgid "Nothing here. Where could it be?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1591
+#: ../fheroes2/game/game_startgame.cpp:1592
 msgid "After spending many hours digging here, you have uncovered the "
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1600
+#: ../fheroes2/game/game_startgame.cpp:1601
 msgid "Digging for artifacts requires a whole day, try again tomorrow."
 msgstr ""
 
@@ -3505,46 +3507,46 @@ msgstr ""
 msgid "Jarkonas"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1239
+#: ../fheroes2/heroes/heroes.cpp:1240
 msgid ""
 "You must purchase a spell book to use the mage guild, but you currently have "
 "no room for a spell book."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1239
+#: ../fheroes2/heroes/heroes.cpp:1240
 msgid "Try giving one of your artifacts to another hero."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1240
+#: ../fheroes2/heroes/heroes.cpp:1241
 msgid "You have no room to carry another artifact!"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1319
+#: ../fheroes2/heroes/heroes.cpp:1320
 msgid "To cast spells, you must first buy a spell book for %{gold} gold"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1325
+#: ../fheroes2/heroes/heroes.cpp:1326
 msgid "Unfortunately, you seem to be a little short of cash at the moment."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1337
+#: ../fheroes2/heroes/heroes.cpp:1338
 msgid "Do you wish to buy one?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1563
+#: ../fheroes2/heroes/heroes.cpp:1564
 msgid "%{name} has gained a level."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1565
+#: ../fheroes2/heroes/heroes.cpp:1566
 msgid "%{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1576 ../fheroes2/heroes/heroes.cpp:1607
-#: ../fheroes2/heroes/heroes.cpp:1639
+#: ../fheroes2/heroes/heroes.cpp:1577 ../fheroes2/heroes/heroes.cpp:1608
+#: ../fheroes2/heroes/heroes.cpp:1640
 msgid "%{name} has gained a level. %{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1579 ../fheroes2/heroes/heroes.cpp:1610
+#: ../fheroes2/heroes/heroes.cpp:1580 ../fheroes2/heroes/heroes.cpp:1611
 msgid "You have learned %{level} %{skill}."
 msgstr ""
 
@@ -3716,11 +3718,11 @@ msgstr ""
 msgid "Good Luck"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_indicator.cpp:107
+#: ../fheroes2/heroes/heroes_indicator.cpp:103
 msgid "Current Luck Modifiers:"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_indicator.cpp:142
+#: ../fheroes2/heroes/heroes_indicator.cpp:147
 msgid "Current Morale Modifiers:"
 msgstr ""
 
@@ -4260,7 +4262,7 @@ msgstr ""
 msgid "Condor"
 msgstr ""
 
-#: ../fheroes2/kingdom/world.cpp:770
+#: ../fheroes2/kingdom/world.cpp:767
 msgid "This game is now in beta development version. ;)"
 msgstr ""
 
