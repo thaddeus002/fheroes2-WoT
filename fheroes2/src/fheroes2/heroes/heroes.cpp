@@ -1050,33 +1050,37 @@ void Heroes::ActionNewDay(void)
     // increase resource
     Resource::funds_t resource;
 
-    if(HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource.gold += INCOME_ENDLESS_SACK_GOLD;
-    if(HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource.gold += INCOME_ENDLESS_BAG_GOLD;
-    if(HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource.gold += INCOME_ENDLESS_PURSE_GOLD;
-    if(HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR;
-    if(HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource.mercury += INCOME_ENDLESS_VIAL_MERCURY;
-    if(HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource.gems += INCOME_ENDLESS_POUCH_GEMS;
-    if(HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource.wood += INCOME_ENDLESS_CORD_WOOD;
-    if(HasArtifact(Artifact::ENDLESS_CART_ORE))       resource.ore += INCOME_ENDLESS_CART_ORE;
-    if(HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL;
-
-    // estates skill bonus
-    switch(GetLevelSkill(Skill::Secondary::ESTATES))
+    // skip incomes for first day
+    if(1 < world.CountDay())
     {
-        case Skill::Level::BASIC:       resource.gold += 100; break;
-        case Skill::Level::ADVANCED:    resource.gold += 250; break;
-        case Skill::Level::EXPERT:      resource.gold += 500; break;
+	if(HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource.gold += INCOME_ENDLESS_SACK_GOLD;
+	if(HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource.gold += INCOME_ENDLESS_BAG_GOLD;
+	if(HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource.gold += INCOME_ENDLESS_PURSE_GOLD;
+	if(HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR;
+	if(HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource.mercury += INCOME_ENDLESS_VIAL_MERCURY;
+	if(HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource.gems += INCOME_ENDLESS_POUCH_GEMS;
+	if(HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource.wood += INCOME_ENDLESS_CORD_WOOD;
+	if(HasArtifact(Artifact::ENDLESS_CART_ORE))       resource.ore += INCOME_ENDLESS_CART_ORE;
+	if(HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL;
 
-        default: break;
-    }
+	// estates skill bonus
+	switch(GetLevelSkill(Skill::Secondary::ESTATES))
+	{
+    	    case Skill::Level::BASIC:       resource.gold += 100; break;
+    	    case Skill::Level::ADVANCED:    resource.gold += 250; break;
+    	    case Skill::Level::EXPERT:      resource.gold += 500; break;
 
-    if(resource.GetValidItems()) world.GetKingdom(GetColor()).AddFundsResource(resource);
+    	    default: break;
+	}
 
-    if(HasArtifact(Artifact::TAX_LIEN))
-    {
-	resource.Reset();
-	resource.gold = 250;
-	world.GetKingdom(GetColor()).OddFundsResource(resource);
+	if(resource.GetValidItems()) world.GetKingdom(GetColor()).AddFundsResource(resource);
+
+	if(HasArtifact(Artifact::TAX_LIEN))
+	{
+	    resource.Reset();
+	    resource.gold = 250;
+	    world.GetKingdom(GetColor()).OddFundsResource(resource);
+	}
     }
 
     // recovery move points

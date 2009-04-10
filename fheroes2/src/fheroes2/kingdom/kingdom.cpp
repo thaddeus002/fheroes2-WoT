@@ -126,34 +126,38 @@ void Kingdom::ActionNewDay(void)
     std::vector<Heroes *>::const_iterator ith = heroes.begin();
     for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewDay();
 
-    // captured object
-    resource.wood += DAY_PROFIT_WOOD * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
-    resource.ore += DAY_PROFIT_ORE * world.CountCapturedMines(Resource::ORE, color);
-    resource.mercury += DAY_PROFIT_MERCURY * world.CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
-    resource.sulfur += DAY_PROFIT_SULFUR * world.CountCapturedMines(Resource::SULFUR, color);
-    resource.crystal += DAY_PROFIT_CRYSTAL * world.CountCapturedMines(Resource::CRYSTAL, color);
-    resource.gems += DAY_PROFIT_GEMS * world.CountCapturedMines(Resource::GEMS, color);
-    resource.gold += DAY_PROFIT_GOLD * world.CountCapturedMines(Resource::GOLD, color);
-
-    // funds
-    itc = castles.begin();
-    for(; itc != castles.end(); ++itc)
+    // skip incomes for first day
+    if(1 < world.CountDay())
     {
-	if(*itc)
+	// captured object
+	resource.wood += DAY_PROFIT_WOOD * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
+	resource.ore += DAY_PROFIT_ORE * world.CountCapturedMines(Resource::ORE, color);
+	resource.mercury += DAY_PROFIT_MERCURY * world.CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
+	resource.sulfur += DAY_PROFIT_SULFUR * world.CountCapturedMines(Resource::SULFUR, color);
+	resource.crystal += DAY_PROFIT_CRYSTAL * world.CountCapturedMines(Resource::CRYSTAL, color);
+	resource.gems += DAY_PROFIT_GEMS * world.CountCapturedMines(Resource::GEMS, color);
+	resource.gold += DAY_PROFIT_GOLD * world.CountCapturedMines(Resource::GOLD, color);
+
+	// funds
+	itc = castles.begin();
+	for(; itc != castles.end(); ++itc)
 	{
-	    const Castle & castle = **itc;
+	    if(*itc)
+	    {
+		const Castle & castle = **itc;
 
-	    // castle or town profit
-	    resource.gold += (castle.isCastle() ? INCOME_CASTLE_GOLD : INCOME_TOWN_GOLD);
+		// castle or town profit
+		resource.gold += (castle.isCastle() ? INCOME_CASTLE_GOLD : INCOME_TOWN_GOLD);
 
-	    // statue
-	    resource.gold += (castle.isBuild(Castle::BUILD_STATUE) ? INCOME_STATUE_GOLD : 0);
+		// statue
+		resource.gold += (castle.isBuild(Castle::BUILD_STATUE) ? INCOME_STATUE_GOLD : 0);
 
-	    // dungeon for warlock
-	    resource.gold += (castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == castle.GetRace() ? INCOME_DUNGEON_GOLD : 0);
+		// dungeon for warlock
+		resource.gold += (castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == castle.GetRace() ? INCOME_DUNGEON_GOLD : 0);
+	    }
 	}
     }
-    
+
     // check event day
     const GameEvent::Day* event_day = world.GetEventDay(color);
     if(event_day) AddFundsResource(event_day->GetResource());
@@ -171,7 +175,7 @@ void Kingdom::ActionNewWeek(void)
     for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewWeek();
 
     // debug an gift
-    if(Settings::Get().Debug() && Game::LOCAL == Control())
+    if(1 < world.CountDay() && Settings::Get().Debug() && Game::LOCAL == Control())
     {
 	Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
 
