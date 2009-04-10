@@ -118,17 +118,17 @@ void Kingdom::ActionNewDay(void)
     // check lost town
     if(castles.empty()) --lost_town_days;
 
-    // castle New Day
-    std::vector<Castle *>::const_iterator itc = castles.begin();
-    for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewDay();
-
-    // heroes New Day
-    std::vector<Heroes *>::const_iterator ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewDay();
-
     // skip incomes for first day
     if(1 < world.CountDay())
     {
+        // castle New Day
+	std::vector<Castle *>::const_iterator itc = castles.begin();
+        for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewDay();
+
+	// heroes New Day
+        std::vector<Heroes *>::const_iterator ith = heroes.begin();
+	for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewDay();
+
 	// captured object
 	resource.wood += DAY_PROFIT_WOOD * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
 	resource.ore += DAY_PROFIT_ORE * world.CountCapturedMines(Resource::ORE, color);
