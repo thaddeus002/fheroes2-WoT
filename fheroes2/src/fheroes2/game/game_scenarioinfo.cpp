@@ -38,13 +38,14 @@
 #include "world.h"
 #include "game.h"
 
-namespace Scenario
-{
-    void DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair<Rect, TextSprite> > & coordClass);
-    void RedrawOpponentColors(const std::vector<Rect> & coordColors);
-    void RedrawRatingInfo(TextSprite &);
-    u8   GetAllowChangeRaces(const Maps::FileInfo &maps);
-}
+u8  GetAllowChangeRaces(const Maps::FileInfo &);
+u16 GetStepFor(u16, u16, u16);
+void RedrawStaticInfo(void);
+void RedrawRatingInfo(TextSprite &);
+void RedrawOpponentsInfo(const Point &);
+void RedrawClassInfo(const Point &, bool = false);
+void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
+void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
 Game::menu_t Game::ScenarioInfo(void)
 {
@@ -111,20 +112,28 @@ Game::menu_t Game::ScenarioInfo(void)
     Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
     Button buttonCancel(491, 413, ICN::NGEXTRA, 68, 69);
 
+    const Point pointDifficultyNormal(302, 124);
+    const Point pointOpponentInfo(228, 234);
+    const Point pointClassInfo(228, 314);
+
     // vector coord colors opponent
     std::vector<Rect> coordColors(KINGDOMMAX);
+
     // vector coord class
-    std::vector< std::pair<Rect, TextSprite> > coordClass(KINGDOMMAX);
+    std::vector<Rect> coordClass(KINGDOMMAX);
 
     // first allow color
     conf.SetPlayers(0);
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	if(color & conf.FileInfo().AllowColors()){ conf.SetPlayers(color); conf.SetMyColor(color); break; }
 
-    // set levelCursor (default normal)
-    const Point pointDifficultyNormal(302, 124);
-    Scenario::DrawInfo(coordColors, coordClass);
-    Scenario::RedrawOpponentColors(coordColors);
+    RedrawStaticInfo();
+
+    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
+    RedrawOpponentsInfo(pointOpponentInfo);
+
+    UpdateCoordClassInfo(pointClassInfo, coordClass);
+    RedrawClassInfo(pointClassInfo);
 
     SpriteCursor levelCursor(AGG::GetICN(ICN::NGEXTRA, 62), pointDifficultyNormal);
     levelCursor.Show(pointDifficultyNormal);
@@ -136,12 +145,12 @@ Game::menu_t Game::ScenarioInfo(void)
     const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
 
-    u8 rnd_color = Scenario::GetAllowChangeRaces(conf.FileInfo());
+    u8 rnd_color = GetAllowChangeRaces(conf.FileInfo());
 
     TextSprite rating;
     rating.SetFont(Font::BIG);
     rating.SetPos(370, 415);
-    Scenario::RedrawRatingInfo(rating);
+    RedrawRatingInfo(rating);
 
     buttonSelectMaps.Draw();
     buttonOk.Draw();
@@ -197,7 +206,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		conf.SetGameDifficulty(Difficulty::EASY);
 	    }
 
-	    Scenario::RedrawRatingInfo(rating);
+	    RedrawRatingInfo(rating);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -221,7 +230,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		    conf.SetMyColor(color);
 	    	    break;
 	    }
-	    Scenario::RedrawOpponentColors(coordColors);
+	    RedrawOpponentsInfo(pointOpponentInfo);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -229,12 +238,10 @@ Game::menu_t Game::ScenarioInfo(void)
 	// select class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	    if((conf.FileInfo().KingdomColors() & rnd_color & color) &&
-		le.MouseClickLeft(coordClass[Color::GetIndex(color)].first))
+		le.MouseClickLeft(coordClass[Color::GetIndex(color)]))
 	    {
 		cursor.Hide();
 		u8 index = 0;
-		const Rect & rt = coordClass[Color::GetIndex(color)].first;
-		TextSprite & textsprite = coordClass[Color::GetIndex(color)].second;
 		Race::race_t race = conf.FileInfo().KingdomRace(color);
 		switch(race)
 		{
@@ -248,13 +255,12 @@ Game::menu_t Game::ScenarioInfo(void)
 		    default: break;
 		}
 		conf.FileInfo().SetKingdomRace(color, race);
-		display.Blit(AGG::GetICN(ICN::NGEXTRA, index), rt.x, rt.y);
 
-		const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
-		textsprite.Hide();
-		textsprite.SetText(name);
-		textsprite.SetPos(rt.x + (rt.w - textsprite.w()) / 2, rt.y + rt.h + 2);
-		textsprite.Show();
+		RedrawStaticInfo();
+		levelCursor.Redraw();
+		RedrawOpponentsInfo(pointOpponentInfo);
+		RedrawClassInfo(pointClassInfo, true);
+		RedrawRatingInfo(rating);
 
 		cursor.Show();
 		display.Flip();
@@ -278,13 +284,17 @@ Game::menu_t Game::ScenarioInfo(void)
 	    for(Color::color_t col = Color::BLUE; col < Color::GRAY; ++col)
 		if(conf.FileInfo().AllowColors() & col){ conf.SetPlayers(col); conf.SetMyColor(col); break; }
 
-	    Scenario::DrawInfo(coordColors, coordClass);
-	    Scenario::RedrawOpponentColors(coordColors);
+	    RedrawStaticInfo();
+	    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
+	    RedrawOpponentsInfo(pointOpponentInfo);
+	    UpdateCoordClassInfo(pointClassInfo, coordClass);
+	    RedrawClassInfo(pointClassInfo);
+	    RedrawRatingInfo(rating);
 	    levelCursor.Move(pointDifficultyNormal);
 	    levelCursor.Show();
 	    cursor.Show();
 	    display.Flip();
-	    rnd_color = Scenario::GetAllowChangeRaces(conf.FileInfo());
+	    rnd_color = GetAllowChangeRaces(conf.FileInfo());
 	}
 
 	// click cancel
@@ -332,7 +342,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	// class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	    if(conf.FileInfo().KingdomColors() & color &&
-		le.MousePressRight(coordClass[Color::GetIndex(color)].first))
+		le.MousePressRight(coordClass[Color::GetIndex(color)]))
 		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alingment."), Font::BIG);
 
 	//if(le.MousePressRight(?)) Dialog::Message(_("Difficulty Rating"), _("The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score."), Font::BIG);
@@ -356,46 +366,33 @@ Game::menu_t Game::ScenarioInfo(void)
     return result;
 }
 
-void Scenario::RedrawOpponentColors(const std::vector<Rect> & coordColors)
+u16 GetStepFor(u16 current, u16 width, u16 count)
 {
-    std::map<Color::color_t, const Sprite *> colorHumanSprite;
-    colorHumanSprite[Color::BLUE] = &AGG::GetICN(ICN::NGEXTRA, 9);
-    colorHumanSprite[Color::GREEN] = &AGG::GetICN(ICN::NGEXTRA, 10);
-    colorHumanSprite[Color::RED] = &AGG::GetICN(ICN::NGEXTRA, 11);
-    colorHumanSprite[Color::YELLOW] = &AGG::GetICN(ICN::NGEXTRA, 12);
-    colorHumanSprite[Color::ORANGE] = &AGG::GetICN(ICN::NGEXTRA, 13);
-    colorHumanSprite[Color::PURPLE] = &AGG::GetICN(ICN::NGEXTRA, 14);
-
-    std::map<Color::color_t, const Sprite *> colorAllowSprite;
-    colorAllowSprite[Color::BLUE] = &AGG::GetICN(ICN::NGEXTRA, 3);
-    colorAllowSprite[Color::GREEN] = &AGG::GetICN(ICN::NGEXTRA, 4);
-    colorAllowSprite[Color::RED] = &AGG::GetICN(ICN::NGEXTRA, 5);
-    colorAllowSprite[Color::YELLOW] = &AGG::GetICN(ICN::NGEXTRA, 6);
-    colorAllowSprite[Color::ORANGE] = &AGG::GetICN(ICN::NGEXTRA, 7);
-    colorAllowSprite[Color::PURPLE] = &AGG::GetICN(ICN::NGEXTRA, 8);
-
-    std::map<Color::color_t, const Sprite *> colorOpponentSprite;
-    colorOpponentSprite[Color::BLUE] = &AGG::GetICN(ICN::NGEXTRA, 15);
-    colorOpponentSprite[Color::GREEN] = &AGG::GetICN(ICN::NGEXTRA, 16);
-    colorOpponentSprite[Color::RED] = &AGG::GetICN(ICN::NGEXTRA, 17);
-    colorOpponentSprite[Color::YELLOW] = &AGG::GetICN(ICN::NGEXTRA, 18);
-    colorOpponentSprite[Color::ORANGE] = &AGG::GetICN(ICN::NGEXTRA, 19);
-    colorOpponentSprite[Color::PURPLE] = &AGG::GetICN(ICN::NGEXTRA, 20);
-
-    const Settings & conf = Settings::Get();
-
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-    {
-	const Rect & rect = coordColors[Color::GetIndex(color)];
-
-	if(conf.FileInfo().KingdomColors() & color)
-	    Display::Get().Blit(conf.FileInfo().AllowColors() & color ?
-		(conf.Players() & color ?
-		    *colorHumanSprite[color] : *colorAllowSprite[color]) : *colorOpponentSprite[color], rect.x, rect.y);
-    }
+    return current * width * 6 / count + (width * (6 - count) / (2 * count));
 }
 
-void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair<Rect, TextSprite> > & coordClass)
+void UpdateCoordClassInfo(const Point & dst, std::vector<Rect> & rects)
+{
+    UpdateCoordOpponentsInfo(dst, rects);
+}
+
+void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
+{
+    const Settings & conf = Settings::Get();
+    const std::bitset<8> colors(conf.FileInfo().KingdomColors());
+    const u8 count = colors.count();
+    const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
+    u8 current = 0;
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	if(conf.FileInfo().KingdomColors() & color)
+    	{
+	    rects[Color::GetIndex(color)] = Rect(dst.x + GetStepFor(current, sprite.w(), count), dst.y, sprite.w(), sprite.h());
+    	    ++current;
+	}
+}
+
+void RedrawStaticInfo(void)
 {
     Display & display = Display::Get();
 
@@ -439,77 +436,113 @@ void Scenario::DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair
     text.Set(_("Opponents:"), Font::BIG);
     text.Blit(414 - text.w()/2, 213);
 
-    // draw opponents
+    // text class
+    text.Set(_("Class:"), Font::BIG);
+    text.Blit(414 - text.w()/2, 290);
+}
+
+
+void RedrawOpponentsInfo(const Point & dst)
+{
+    const Settings & conf = Settings::Get();
     const std::bitset<8> colors(conf.FileInfo().KingdomColors());
     const u8 count = colors.count();
     u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-        if(conf.FileInfo().KingdomColors() & color)
-        {
-            const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
-
-	    coordColors[Color::GetIndex(color)] = Rect(228 + current * sprite.w() * 6 / count + (sprite.w() * (6 - count) / (2 * count)), 234, sprite.w(), sprite.h());
-
-            ++current;
-	}
-
-    // text class
-    text.Set(_("Class:"), Font::BIG);
-    text.Blit(414 - text.w()/2, 290);
-
-    // draw class
-    current = 0;
-
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
     {
-	TextSprite & textsprite = coordClass[Color::GetIndex(color)].second;
-	textsprite.Hide();
+	if(conf.FileInfo().KingdomColors() & color)
+	{
+	    const Sprite* sprite = NULL;
+
+	    if(!(conf.FileInfo().AllowColors() & color))
+	    {
+		switch(color)
+		{
+		    case Color::BLUE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 15); break;
+		    case Color::GREEN:	sprite = &AGG::GetICN(ICN::NGEXTRA, 16); break;
+		    case Color::RED:	sprite = &AGG::GetICN(ICN::NGEXTRA, 17); break;
+		    case Color::YELLOW:	sprite = &AGG::GetICN(ICN::NGEXTRA, 18); break;
+		    case Color::ORANGE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 19); break;
+		    case Color::PURPLE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 20); break;
+		    default: break;
+		}
+	    }
+	    else
+	    if(conf.Players() & color)
+	    {
+		switch(color)
+		{
+		    case Color::BLUE:	sprite = &AGG::GetICN(ICN::NGEXTRA,  9); break;
+		    case Color::GREEN:	sprite = &AGG::GetICN(ICN::NGEXTRA, 10); break;
+		    case Color::RED:	sprite = &AGG::GetICN(ICN::NGEXTRA, 11); break;
+		    case Color::YELLOW:	sprite = &AGG::GetICN(ICN::NGEXTRA, 12); break;
+		    case Color::ORANGE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 13); break;
+		    case Color::PURPLE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 14); break;
+		    default: break;
+		}
+	    }
+	    else
+	    {
+		switch(color)
+		{
+		    case Color::BLUE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 3); break;
+		    case Color::GREEN:	sprite = &AGG::GetICN(ICN::NGEXTRA, 4); break;
+		    case Color::RED:	sprite = &AGG::GetICN(ICN::NGEXTRA, 5); break;
+		    case Color::YELLOW:	sprite = &AGG::GetICN(ICN::NGEXTRA, 6); break;
+		    case Color::ORANGE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 7); break;
+		    case Color::PURPLE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 8); break;
+		    default: break;
+		}
+	    }
+
+	    if(sprite)
+	    {
+		Display::Get().Blit(*sprite, dst.x + GetStepFor(current, sprite->w(), count), dst.y);
+		++current;
+	    }
+	}
     }
+}
+
+void RedrawClassInfo(const Point & dst, bool modify)
+{
+    Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
+    const std::bitset<8> colors(conf.FileInfo().KingdomColors());
+    const u8 count = colors.count();
+    u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	if(conf.FileInfo().KingdomColors() & color)
     {
 	    u8 index = 0;
-	    Point pt;
 	    const Race::race_t race = conf.FileInfo().KingdomRace(color);
-
 	    switch(race)
 	    {
-		case Race::KNGT: index = 70; break;
-	        case Race::BARB: index = 71; break;
-	        case Race::SORC: index = 72; break;
-		case Race::WRLK: index = 73; break;
-	        case Race::WZRD: index = 74; break;
-		case Race::NECR: index = 75; break;
+		case Race::KNGT: index = modify ? 51 : 70; break;
+	        case Race::BARB: index = modify ? 52 : 71; break;
+	        case Race::SORC: index = modify ? 53 : 72; break;
+		case Race::WRLK: index = modify ? 54 : 73; break;
+	        case Race::WZRD: index = modify ? 55 : 74; break;
+		case Race::NECR: index = modify ? 56 : 75; break;
 	        case Race::MULT: index = 76; break;
 		case Race::RAND: index = 58; break;
 		default: continue;
 	    }
 
     	    const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, index);
-
-    	    pt.x = 228 + current * sprite.w() * 6 / count + (sprite.w() * (6 - count) / (2 * count));
-    	    pt.y = 314;
-
-	    coordClass[Color::GetIndex(color)].first = Rect(pt.x, pt.y, sprite.w(), sprite.h());
-
-	    display.Blit(sprite, pt);
-
-	    const Rect & rt = coordClass[Color::GetIndex(color)].first;
-	    TextSprite & textsprite = coordClass[Color::GetIndex(color)].second;
+	    display.Blit(sprite, dst.x + GetStepFor(current, sprite.w(), count), dst.y);
 
 	    const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
-	    textsprite.SetFont(Font::SMALL);
-	    textsprite.SetText(name);
-	    textsprite.SetPos(rt.x + (rt.w - textsprite.w()) / 2, rt.y + rt.h + 2);
-	    textsprite.Show();
+	    Text label(name, Font::SMALL);
+	    label.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - label.w()) / 2, dst.y + sprite.h() + 2);
 
     	    ++current;
     }
 }
 
-u8 Scenario::GetAllowChangeRaces(const Maps::FileInfo &maps)
+u8 GetAllowChangeRaces(const Maps::FileInfo &maps)
 {
     u8 result = 0;
 
@@ -519,7 +552,7 @@ u8 Scenario::GetAllowChangeRaces(const Maps::FileInfo &maps)
     return result;
 }
 
-void Scenario::RedrawRatingInfo(TextSprite & sprite)
+void RedrawRatingInfo(TextSprite & sprite)
 {
     const Settings & conf = Settings::Get();
     sprite.Hide();

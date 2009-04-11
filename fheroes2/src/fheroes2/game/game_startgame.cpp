@@ -926,6 +926,24 @@ Game::menu_t Game::HumanTurn(void)
 	    { Game::Load(); return STARTGAME; }
 	}
 	else
+	// puzzle maps
+	if(le.KeyPress(KEY_p))
+	{
+	    Dialog::PuzzleMaps();
+	}
+	else
+	// game info
+	if(le.KeyPress(KEY_i))
+	{
+	    Dialog::GameInfo();
+	}
+	else
+	// dig artifact
+	if(le.KeyPress(KEY_d) && Game::Focus::HEROES == global_focus.Type())
+	{
+	    DiggingForArtifacts(global_focus.GetHeroes());
+	}
+	else
 	// key left
 	if(le.KeyPress(KEY_LEFT))
 	{
@@ -1371,7 +1389,7 @@ Game::menu_t Game::HumanTurn(void)
 		{
 		    case Dialog::WORLD:	break;
 		    case Dialog::PUZZLE:	Dialog::PuzzleMaps(); break;
-		    case Dialog::INFO:	break;
+		    case Dialog::INFO:	Dialog::GameInfo(); break;
 		    case Dialog::DIG:	DiggingForArtifacts(global_focus.GetHeroes()); break;
 
 		    default: break;

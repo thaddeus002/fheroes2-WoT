@@ -125,6 +125,8 @@ namespace Dialog
     // thieves guild
     void ThievesGuild(u8);
 
+    void GameInfo(void);
+
 class Box
 {
 public:

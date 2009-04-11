@@ -32,6 +32,22 @@ namespace Maps
     static u32 animation_ticket = 0;
 };
 
+const std::string & Maps::SizeString(u8 s)
+{
+    static const std::string mapsize[] = { _("Unknown"), _("Small"), _("Medium"), _("Large"), _("Extra Large") };
+
+    switch(s)
+    {
+	case SMALL:	return mapsize[1];
+	case MEDIUM:	return mapsize[2];
+	case LARGE:	return mapsize[3];
+	case XLARGE:	return mapsize[4];
+        default: break;
+    }
+
+    return mapsize[0];
+}
+
 u32 Maps::AnimationTicket(void)
 {
     return animation_ticket;

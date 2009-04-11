@@ -33,6 +33,10 @@ e		- end turn
 t		- next town
 h		- next hero
 s		- save game to fheroes2.sav
+l		- load game
+i		- game info
+p		- puzzle dialog
+d		- digging artifact for current hero
 
 Main menu:
 n		- new game
