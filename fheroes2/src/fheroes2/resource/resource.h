@@ -55,6 +55,9 @@ namespace Resource
 	bool operator> (const funds_t &pm) const;
 	bool operator>= (const funds_t &pm) const;
 
+        resource_t toSpecificResource() const;
+        s32 resourceMask(resource_t res) const;
+
 	u8 GetValidItems(void) const;
 	void Reset(void);
 

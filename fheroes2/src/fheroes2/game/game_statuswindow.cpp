@@ -30,7 +30,9 @@
 #include "game_focus.h"
 #include "game_statuswindow.h"
 
-Game::StatusWindow::StatusWindow() : state(UNKNOWN)
+#define RESOURCE_WINDOW_EXPIRE 6000
+
+Game::StatusWindow::StatusWindow() : state(UNKNOWN), timestamp(0)
 {
 }
 
@@ -55,6 +57,7 @@ const Rect & Game::StatusWindow::GetRect(void) const
 
 void Game::StatusWindow::SetState(const info_t info)
 {
+    if(state != RESOURCE || SDL_GetTicks() - timestamp >= RESOURCE_WINDOW_EXPIRE)
     state = info;
 }
 
@@ -67,16 +70,19 @@ void Game::StatusWindow::Redraw(void)
     // draw info: Day and Funds and Army
     if(UNKNOWN != state && count >= ((ston.h() * 3 + 15)/ TILEWIDTH))
     {
-	DrawDayInfo();
-	DrawKingdomInfo(ston.h() + 5);
-	DrawArmyInfo(2 * ston.h() + 10);
+        DrawDayInfo();
+        DrawKingdomInfo(ston.h() + 5);
+        if(state != RESOURCE)
+            DrawArmyInfo(2 * ston.h() + 10);
+        else DrawResourceInfo(2 * ston.h() + 10);
     }
     else
     switch(state)
     {
-	case DAY:	DrawDayInfo();		break;
-	case FUNDS:	DrawKingdomInfo();	break;
-	case ARMY:	DrawArmyInfo();		break;
+        case DAY:	DrawDayInfo();		break;
+        case FUNDS:	DrawKingdomInfo();	break;
+        case ARMY:	DrawArmyInfo();		break;
+        case RESOURCE: DrawResourceInfo(); break;
 	default: break;
     }
 }
@@ -88,6 +94,8 @@ void Game::StatusWindow::NextState(void)
     if(FUNDS == state) state = (Game::Focus::UNSEL == Game::Focus::Get().Type() ? DAY : ARMY);
     else
     if(ARMY == state) state = DAY;
+    else
+    if(RESOURCE == state) state = ARMY;
 }
 
 void Game::StatusWindow::DrawKingdomInfo(const u8 oh) const
@@ -163,6 +171,35 @@ void Game::StatusWindow::DrawDayInfo(const u8 oh) const
     String::Replace(message, "%{day}", world.GetDay());
     text.Set(message, Font::BIG);
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 46 + oh);
+}
+
+void Game::StatusWindow::SetResource(const Resource::funds_t &res)
+{
+    lastResource = res;
+    state = RESOURCE;
+    timestamp = SDL_GetTicks();
+}
+
+void Game::StatusWindow::DrawResourceInfo(const u8 oh) const
+{
+    std::string message = _("You find a small\nquantity of %{resource}.");
+    Resource::resource_t res = lastResource.toSpecificResource();
+    String::Replace(message, "%{resource}", Resource::String(res));
+    Rect adjusted = pos;
+    adjusted.y += 5 + oh;
+    TextBox text(message, Font::SMALL, adjusted);
+    u32 y = adjusted.y;
+    
+    Display & display = Display::Get();
+    const Sprite &spr = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
+    y += text.h() + 3;
+    display.Blit(spr, pos.x + (pos.w - spr.w()) / 2, y);
+
+    message = "";
+    String::AddInt(message, lastResource.resourceMask(res));
+    text.Set(message, Font::SMALL, pos.w);
+    y += spr.h();
+    text.Blit(pos.x + (pos.w - text.w()) / 2, y);
 }
 
 void Game::StatusWindow::DrawArmyInfo(const u8 oh) const

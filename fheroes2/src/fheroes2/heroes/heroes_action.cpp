@@ -29,6 +29,7 @@
 #include "gamearea.h"
 #include "game_focus.h"
 #include "game_selectobjbar.h"
+#include "game_statuswindow.h"
 #include "kingdom.h"
 #include "cursor.h"
 #include "algorithm.h"
@@ -675,20 +676,24 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
     // dialog
     switch(obj)
     {
-	case MP2::OBJ_CAMPFIRE:
-	    // force reset sound
-	    tile.SetObject(MP2::OBJ_ZERO);
-	    Game::EnvironmentSoundMixer();
+        case MP2::OBJ_CAMPFIRE:
+            // force reset sound
+            tile.SetObject(MP2::OBJ_ZERO);
+            Game::EnvironmentSoundMixer();
 
-	    resource.gold += 100 * count;
-	    Dialog::ResourceInfo(MP2::StringObject(obj), _("Ransacking an enemy camp, you discover a hidden cache of treasures."), resource);
-	break;
+            resource.gold += 100 * count;
+            Dialog::ResourceInfo(MP2::StringObject(obj), _("Ransacking an enemy camp, you discover a hidden cache of treasures."), resource);
+            break;
 
-	case MP2::OBJ_BOTTLE:
-	    Dialog::Message(MP2::StringObject(obj), world.MessageSign(dst_index), Font::BIG, Dialog::OK);
-	break;
+        case MP2::OBJ_BOTTLE:
+            Dialog::Message(MP2::StringObject(obj), world.MessageSign(dst_index), Font::BIG, Dialog::OK);
+            break;
 
-	default: break;
+        default:
+            Game::StatusWindow::Get().SetResource(resource);
+            Game::StatusWindow::Get().Redraw();
+            Display::Get().Flip();
+            break;
     }
     world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     tile.SetObject(MP2::OBJ_ZERO);

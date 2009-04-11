@@ -23,6 +23,7 @@
 
 #include "gamedefs.h"
 #include "game.h"
+#include "resource.h"
 
 class Surface;
 class Castle;
@@ -34,7 +35,7 @@ namespace Game
 class StatusWindow
 {
 public:
-    typedef enum { UNKNOWN, DAY, FUNDS, ARMY } info_t;
+    typedef enum { UNKNOWN, DAY, FUNDS, ARMY, RESOURCE } info_t;
 
     static StatusWindow & Get(void);
 
@@ -45,6 +46,8 @@ public:
     void SetState(const info_t info);
     void NextState(void);
 
+    void SetResource(const Resource::funds_t &res);
+
     void RedrawAITurns(u8 color, u8 progress) const;
 
 private:
@@ -52,12 +55,16 @@ private:
     void DrawKingdomInfo(const u8 oh = 0) const;
     void DrawDayInfo(const u8 oh = 0) const;
     void DrawArmyInfo(const u8 oh = 0) const;
+    void DrawResourceInfo(const u8 oh = 0) const;
     void DrawBackground(void) const;
 
     Rect pos;
     u8 count;
 
     info_t state;
+
+    Resource::funds_t lastResource;
+    u32 timestamp;
 };
 
 };
