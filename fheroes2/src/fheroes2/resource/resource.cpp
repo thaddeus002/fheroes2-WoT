@@ -290,47 +290,6 @@ void Resource::funds_t::Reset(void)
     gold = 0;
 }
 
-Resource::resource_t Resource::funds_t::toSpecificResource() const
-{
-    if(GetValidItems() != 1)
-        return UNKNOWN;
-    else if(wood)
-        return WOOD;
-    else if(ore)
-        return ORE;
-    else if(mercury)
-        return MERCURY;
-    else if(sulfur)
-        return SULFUR;
-    else if(crystal)
-        return CRYSTAL;
-    else if(gems)
-        return GEMS;
-    else if(gold)
-        return GOLD;
-    else return UNKNOWN;
-}
-
-s32 Resource::funds_t::resourceMask(Resource::resource_t res) const
-{
-    s32 result = 0;
-    if(res & WOOD)
-        result += wood;
-    if(res & ORE)
-        result += ore;
-    if(res & MERCURY)
-        result += mercury;
-    if(res & SULFUR)
-        result += sulfur;
-    if(res & CRYSTAL)
-        result += crystal;
-    if(res & GEMS)
-        result += gems;
-    if(res & gold)
-        result += gold;
-    return result;
-}
-
 void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
 {
     const u8 valid_resource = rs.GetValidItems();

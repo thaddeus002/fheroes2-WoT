@@ -21,6 +21,7 @@
 #ifndef H2STATUSWINDOW_H
 #define H2STATUSWINDOW_H
 
+#include "thread.h"
 #include "gamedefs.h"
 #include "game.h"
 #include "resource.h"
@@ -46,7 +47,7 @@ public:
     void SetState(const info_t info);
     void NextState(void);
 
-    void SetResource(const Resource::funds_t &res);
+    void SetResource(const Resource::resource_t, u16);
 
     void RedrawAITurns(u8 color, u8 progress) const;
 
@@ -57,14 +58,17 @@ private:
     void DrawArmyInfo(const u8 oh = 0) const;
     void DrawResourceInfo(const u8 oh = 0) const;
     void DrawBackground(void) const;
+    static u32 ResetResourceStatus(u32, void *);
 
     Rect pos;
     u8 count;
 
     info_t state;
 
-    Resource::funds_t lastResource;
-    u32 timestamp;
+    Resource::resource_t lastResource;
+    u16 countLastResource;
+    Timer timerShowLastResource;
+    info_t old_state;
 };
 
 };

@@ -30,9 +30,9 @@
 #include "game_focus.h"
 #include "game_statuswindow.h"
 
-#define RESOURCE_WINDOW_EXPIRE 6000
+#define RESOURCE_WINDOW_EXPIRE 4000
 
-Game::StatusWindow::StatusWindow() : state(UNKNOWN), timestamp(0)
+Game::StatusWindow::StatusWindow() : state(UNKNOWN)
 {
 }
 
@@ -41,6 +41,19 @@ Game::StatusWindow & Game::StatusWindow::Get(void)
     static Game::StatusWindow wstatus;
 
     return wstatus;
+}
+
+u32 Game::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
+{
+    if(ptr && RESOURCE == reinterpret_cast<Game::StatusWindow*>(ptr)->state)
+    {
+	reinterpret_cast<Game::StatusWindow*>(ptr)->state = reinterpret_cast<Game::StatusWindow*>(ptr)->old_state;
+	reinterpret_cast<Game::StatusWindow*>(ptr)->Redraw();
+    }
+    else
+	Timer::Remove(reinterpret_cast<Game::StatusWindow*>(ptr)->timerShowLastResource);
+
+    return tick;
 }
 
 void Game::StatusWindow::SetPos(const Point &pt)
@@ -57,7 +70,7 @@ const Rect & Game::StatusWindow::GetRect(void) const
 
 void Game::StatusWindow::SetState(const info_t info)
 {
-    if(state != RESOURCE || SDL_GetTicks() - timestamp >= RESOURCE_WINDOW_EXPIRE)
+    if(RESOURCE != state)
     state = info;
 }
 
@@ -173,33 +186,30 @@ void Game::StatusWindow::DrawDayInfo(const u8 oh) const
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 46 + oh);
 }
 
-void Game::StatusWindow::SetResource(const Resource::funds_t &res)
+void Game::StatusWindow::SetResource(const Resource::resource_t res, u16 count)
 {
     lastResource = res;
+    countLastResource = count;
+    old_state = state;
     state = RESOURCE;
-    timestamp = SDL_GetTicks();
+    Timer::Run(timerShowLastResource, RESOURCE_WINDOW_EXPIRE, ResetResourceStatus, this);
 }
 
 void Game::StatusWindow::DrawResourceInfo(const u8 oh) const
 {
     std::string message = _("You find a small\nquantity of %{resource}.");
-    Resource::resource_t res = lastResource.toSpecificResource();
-    String::Replace(message, "%{resource}", Resource::String(res));
-    Rect adjusted = pos;
-    adjusted.y += 5 + oh;
-    TextBox text(message, Font::SMALL, adjusted);
-    u32 y = adjusted.y;
+    String::Replace(message, "%{resource}", Resource::String(lastResource));
+    TextBox text(message, Font::SMALL, pos.w);
+    text.Blit(pos.x, pos.y + 4 + oh);
     
     Display & display = Display::Get();
-    const Sprite &spr = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
-    y += text.h() + 3;
-    display.Blit(spr, pos.x + (pos.w - spr.w()) / 2, y);
+    const Sprite &spr = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(lastResource));
+    display.Blit(spr, pos.x + (pos.w - spr.w()) / 2, pos.y + 6 + oh + text.h());
 
-    message = "";
-    String::AddInt(message, lastResource.resourceMask(res));
+    message.clear();
+    String::AddInt(message, countLastResource);
     text.Set(message, Font::SMALL, pos.w);
-    y += spr.h();
-    text.Blit(pos.x + (pos.w - text.w()) / 2, y);
+    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + oh + text.h() + spr.h() - 8);
 }
 
 void Game::StatusWindow::DrawArmyInfo(const u8 oh) const

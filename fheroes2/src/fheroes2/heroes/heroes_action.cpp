@@ -654,17 +654,18 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     Resource::funds_t resource;
+    Resource::resource_t res = Resource::UNKNOWN;
     const u8 count = tile.GetQuantity2();
 
     switch(tile.GetQuantity1())
     {
-	case Resource::WOOD: resource.wood += count; break;
-    	case Resource::MERCURY: resource.mercury += count; break;
-    	case Resource::ORE: resource.ore += count; break;
-    	case Resource::SULFUR: resource.sulfur += count; break;
-    	case Resource::CRYSTAL: resource.crystal += count; break;
-    	case Resource::GEMS: resource.gems += count; break;
-    	case Resource::GOLD: resource.gold += 100 * count; break;
+	case Resource::WOOD: res = Resource::WOOD; resource.wood += count; break;
+    	case Resource::MERCURY: res = Resource::MERCURY; resource.mercury += count; break;
+    	case Resource::ORE: res = Resource::ORE; resource.ore += count; break;
+    	case Resource::SULFUR: res = Resource::SULFUR; resource.sulfur += count; break;
+    	case Resource::CRYSTAL: res = Resource::CRYSTAL; resource.crystal += count; break;
+    	case Resource::GEMS: res = Resource::GEMS; resource.gems += count; break;
+    	case Resource::GOLD: res = Resource::GOLD; resource.gold += 100 * count; break;
 
 	default: break;
     }
@@ -690,7 +691,7 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
             break;
 
         default:
-            Game::StatusWindow::Get().SetResource(resource);
+            Game::StatusWindow::Get().SetResource(res, (Resource::GOLD == res ? 100 * count : count));
             Game::StatusWindow::Get().Redraw();
             Display::Get().Flip();
             break;
