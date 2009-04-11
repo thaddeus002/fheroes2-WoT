@@ -1,4 +1,4 @@
-SVN - up to r943
+SVN - up to r962
 
 Users
 + Added glowing outlines around currently selected monster in battles.
@@ -8,6 +8,14 @@ Users
   now capped at -30% and 300% as specified in the original manual.
 + Heroes may no longer surrender to non-heroes.
 + Removed 'Upgrade' and 'Dismiss' buttons from monster info dialogs in battle.
++ Fixed bug causing enemy corpses to resurrect with 65000 units.
++ Heroes now receive experience corresponding to amount of damage dealt in battles,
+  and the new number displays properly in the summary dialog.
++ Extra income is no longer received on the first day of the game.
++ Added support for Eagle Eye and Necromancy skills.
++ Elves and Rangers will no longer perform hand to hand combat attacks twice.
++ Screenshots now save to files/screenshot_[time].(png|bmp)
++ Starting monster stack sizes are now more in line with Heroes II defaults.
 
 Developers
 + Added wrapper library around SDL_net and networking client/server examples.
