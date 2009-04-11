@@ -42,6 +42,7 @@ namespace Scenario
 {
     void DrawInfo(std::vector<Rect> & coordColors,  std::vector< std::pair<Rect, TextSprite> > & coordClass);
     void RedrawOpponentColors(const std::vector<Rect> & coordColors);
+    void RedrawRatingInfo(TextSprite &);
     u8   GetAllowChangeRaces(const Maps::FileInfo &maps);
 }
 
@@ -137,6 +138,11 @@ Game::menu_t Game::ScenarioInfo(void)
 
     u8 rnd_color = Scenario::GetAllowChangeRaces(conf.FileInfo());
 
+    TextSprite rating;
+    rating.SetFont(Font::BIG);
+    rating.SetPos(370, 415);
+    Scenario::RedrawRatingInfo(rating);
+
     buttonSelectMaps.Draw();
     buttonOk.Draw();
     buttonCancel.Draw();
@@ -191,6 +197,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		conf.SetGameDifficulty(Difficulty::EASY);
 	    }
 
+	    Scenario::RedrawRatingInfo(rating);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -510,4 +517,15 @@ u8 Scenario::GetAllowChangeRaces(const Maps::FileInfo &maps)
 	if(Race::RAND == maps.KingdomRace(color)) result |= color;
 
     return result;
+}
+
+void Scenario::RedrawRatingInfo(TextSprite & sprite)
+{
+    const Settings & conf = Settings::Get();
+    sprite.Hide();
+
+    std::string str(_("Rating %{rating}%"));
+    String::Replace(str, "%{rating}", Game::GetRating(conf.FileInfo().Difficulty(), conf.GameDifficulty()));
+    sprite.SetText(str);
+    sprite.Show();
 }

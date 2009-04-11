@@ -193,3 +193,28 @@ Game::control_t Game::GetControl(u8 index)
     }
     return NONE;
 }
+
+u8 Game::GetRating(Difficulty::difficulty_t maps, Difficulty::difficulty_t game)
+{
+    u8 rating = 50;
+
+    switch(maps)
+    {
+        case Difficulty::NORMAL:     rating += 20; break;
+        case Difficulty::HARD:       rating += 40; break;
+        case Difficulty::EXPERT:
+        case Difficulty::IMPOSSIBLE:	rating += 80; break;
+	default: break;
+    }
+
+    switch(game)
+    {
+        case Difficulty::NORMAL:     rating += 30; break;
+        case Difficulty::HARD:       rating += 50; break;
+        case Difficulty::EXPERT:	rating += 70; break;
+        case Difficulty::IMPOSSIBLE:	rating += 90; break;
+	default: break;
+    }
+
+    return rating;
+}
