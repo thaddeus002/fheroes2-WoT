@@ -43,9 +43,9 @@ namespace Battle
     Point Bf2ScrNoOffset(const Point& pt); // translate to screen (offset to frame border)
     bool BfValid(const Point & pt); // check battle field point
 
-    void BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
+    void BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armies,
                        const BagArtifacts *artifacts, Spell::spell_t spell,
-                       int deadRaised, Army::battle_t status);
+                       u32 deadRaised, Army::battle_t status);
     Army::battle_t HeroStatus(HeroBase &, StatusBar &, Spell::spell_t &, bool, bool, bool);
     void SettingsDialog();
 
@@ -298,9 +298,9 @@ namespace Battle
     class BattleControl
     {
       public:
-        BattleControl(Heroes &, Heroes &, const Maps::Tiles &);
-        BattleControl(Heroes &, Army::army_t &, const Maps::Tiles &);
-        BattleControl(Heroes &, Castle &, const Maps::Tiles &);
+        BattleControl(Heroes &, Heroes &, const Maps::Tiles &, u32 &);
+        BattleControl(Heroes &, Army::army_t &, const Maps::Tiles &, u32 &);
+        BattleControl(Heroes &, Castle &, const Maps::Tiles &, u32 &);
         ~BattleControl();
         Army::battle_t GetStatus() const { return m_battleStatus; }
 
@@ -309,8 +309,11 @@ namespace Battle
         void NewTurn();
         void PerformTowerAttack(const Point &, const Point &);
         Army::battle_t RunBattle(HeroBase *, HeroBase *);
-        void BattleSummaryVsArmy(HeroBase &, const Army::BattleArmy_t &, const Army::BattleArmy_t &, const Army::BattleArmy_t &);
-        void BattleSummaryVsHero(HeroBase &, const Army::BattleArmy_t &, HeroBase &, const Army::BattleArmy_t &);
+        bool ShowLeftHeroResults(HeroBase *right, Army::battle_t result);
+        u32 CalculateRaisedDead(HeroBase &hero, u32 perished);
+        Spell::spell_t GetLearnedSpell(HeroBase &hero, std::vector<Spell::spell_t> &castSpells);
+        u32 BattleSummaryVsArmy(HeroBase &, const Army::BattleArmy_t &, const Army::BattleArmy_t &, const Army::BattleArmy_t &);
+        u32 BattleSummaryVsHero(HeroBase &, const Army::BattleArmy_t &, HeroBase &, const Army::BattleArmy_t &);
         BattleTurn *CreateTurn(HeroBase *, Army::BattleArmy_t &, Army::BattleArmy_t &, bool forceComputer = false);
         Army::BattleTroop &NextValidTroop(s8 &, IndexList &);
         bool PerformMove(TroopIndex, const Point &, bool);
@@ -328,6 +331,9 @@ namespace Battle
         Army::battle_t m_battleStatus;
         GUI *m_gui;
         Battlefield m_battlefield;
+        u32 m_experience[2];
+        u32 m_perished;
+        std::vector<Spell::spell_t> m_spellsCast;
     };
 
     class BattleTurn

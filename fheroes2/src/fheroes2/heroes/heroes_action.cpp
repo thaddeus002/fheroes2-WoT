@@ -471,8 +471,8 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
 
-    const u32 exp = army.CalculateExperience();
-    const Army::battle_t b = Army::Battle(hero, army, tile);
+    u32 exp = 0;
+    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 
     switch(b)
     {
@@ -525,8 +525,8 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     else
     {
 	if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
-	const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index));
-	const u32 exp = other_hero->GetArmy().CalculateExperience();
+    u32 exp = 0; 
+    const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index), exp);
 
 	switch(b)
 	{
@@ -573,13 +573,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 
-	const u32 exp = castle->GetArmy().isValid() ? castle->GetArmy().CalculateExperience() : 0;
+	u32 exp = 0;
     Army::battle_t b;
     if(castle->GetArmy().isValid())
     {
         if(castle->isCastle())
-            b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index));
-        else b = Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index));
+            b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp);
+        else b = Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index), exp);
     }
     else b = Army::WIN;
 
@@ -1037,8 +1037,8 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		    army.FromGuardian(tile);
 
 		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    u32 exp;
+		    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		    switch(b)
 		    {
 			case Army::WIN:
@@ -1221,8 +1221,8 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		    army.FromGuardian(tile);
 		    army.Dump();
 		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    u32 exp = 0;
+		    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		    switch(b)
 		    {
 			case Army::WIN:
@@ -1273,8 +1273,8 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
                     }
 
 		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
+            u32 exp = 0;
+		    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		    switch(b)
 		    {
 			case Army::WIN:
@@ -1317,8 +1317,8 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		    army.FromGuardian(tile);
 
 		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    u32 exp = 0;
+		    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		    switch(b)
 		    {
 			case Army::WIN:
@@ -1642,8 +1642,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    
 		    if(battle)
 		    {
-			const u32 exp = army.CalculateExperience();
-			const Army::battle_t b = Army::Battle(hero, army, tile);
+                u32 exp = 0;
+                const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 			switch(b)
 			{
 			    case Army::WIN:
@@ -1905,8 +1905,8 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 	Army::army_t army;
 	army.FromGuardian(tile);
 
-	const u32 exp = army.CalculateExperience();
-	const Army::battle_t b = Army::Battle(hero, army, tile);
+	u32 exp = 0;
+	const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 
 	switch(b)
 	{
@@ -2254,8 +2254,8 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You've found the ruins of an ancient city, now inhabited solely by the undead. Will you search?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    u32 exp = 0;
+		    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		    switch(b)
 		    {
 			case Army::WIN:
@@ -2302,8 +2302,8 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Trolls living under the bridge challenge you. Will you fight them?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    u32 exp = 0;
+		    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		    switch(b)
 		    {
 			case Army::WIN:
@@ -2350,8 +2350,8 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You stand before the Dragon City, a place off-limits to mere humans. Do you wish to violate this rule and challenge the Dragons to a fight?"), Font::BIG, Dialog::YES | Dialog::NO))
 		{
 		    // battle
-		    const u32 exp = army.CalculateExperience();
-		    const Army::battle_t b = Army::Battle(hero, army, tile);
+		    u32 exp = 0;
+		    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		    switch(b)
 		    {
 			case Army::WIN:
@@ -2747,8 +2747,8 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		army.FromGuardian(tile);
 
 		// battle
-		const u32 exp = army.CalculateExperience();
-		const Army::battle_t b = Army::Battle(hero, army, tile);
+		u32 exp = 0;
+		const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 		switch(b)
 		{
 		    case Army::WIN:

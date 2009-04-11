@@ -61,15 +61,16 @@ static bool PredicateCanTakeArtifact(const Artifact::artifact_t &artifact)
     return Artifact::isValid(artifact) && artifact != Artifact::MAGIC_BOOK;
 }
 
-void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armies,
+void Battle::BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armies,
                          const BagArtifacts *artifacts, Spell::spell_t spell,
-                         int deadRaised, Army::battle_t status)
+                         u32 deadRaised, Army::battle_t status)
 {
     if(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
         return;
 
     AGG::PlayMusic(status == Army::WIN ? MUS::BATTLEWIN : MUS::BATTLELOSE);
-    
+
+    const std::string &name = hero.GetName();
     ICN::icn_t interface = Settings::Get().EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE;
     ICN::icn_t buttonIcon = Settings::Get().EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB;
     const Sprite &background = AGG::GetICN(interface, 0);
@@ -84,18 +85,12 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
     switch(status)
     {
         case Army::WIN:
-        {
             animation.push_back(std::make_pair(ICN::WINCMBT, Point(32, 0)));
             message[0] = _("A glorious victory!");
-            //TODO: EXP1 is the correct amount of experience that should be awarded, in case
-            //      the opposing army retreated or surrendered.  However, the actual amount
-            //      awarded is given by Army_t::CalculateExperience, which assumes that all
-            //      creatures were killed.
             message[1] = _("For valor in combat, %{name} receives %{exp} experience.");
             String::Replace(message[1], "%{name}", name);
-            String::Replace(message[1], "%{exp}", 0);	/*EXP1*/
+            String::Replace(message[1], "%{exp}", exp);
             break;
-        }
         case Army::LOSE:
             animation.push_back(std::make_pair(ICN::CMBTLOS1, Point(0, 0)));
             animation.push_back(std::make_pair(ICN::CMBTLOS2, Point(0, 0)));
@@ -105,7 +100,8 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
             break;
         case Army::SURRENDER:
             animation.push_back(std::make_pair(ICN::CMBTSURR, Point(32, 3)));
-            message[0] = _("TODO");
+            message[0] = _("%{name} surrenders to the enemy, and departs in shame.");
+            String::Replace(message[0], "%{name}", name);
             break;
         case Army::RETREAT:
             animation.push_back(std::make_pair(ICN::CMBTFLE1, Point(34, 42)));
@@ -202,21 +198,31 @@ void Battle::BattleSummary(const std::string &name, const Army::ArmyPairs &armie
                     }
                     else state++; //fall-through
                 case 2:
+                {
                     state++; //fall-through
                     if(spell != Spell::NONE)
                     {
-                        //TODO: Eagle eye
+                        //TODO: Eagle eye text
                         display.Blit(background, backgroundX, backgroundY);
+                        const Sprite &spr = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+                        display.Blit(spr, backgroundX + (background.w() - spr.w()) / 2, backgroundY + (background.h() - spr.h()) / 2);
                         AGG::PlaySound(M82::PICKUP01);
+                        if(hero.GetSpellBook())
+                            hero.GetSpellBook()->Append(spell, hero.GetLevelSkill(Skill::Secondary::WISDOM));
                         break;
                     }
+                }
                 case 3:
                     state++; //fall-through
                     if(deadRaised != 0)
                     {
-                        //TODO: Necromancy
+                        //TODO: Necromancy text
+                        Monster monster(Monster::SKELETON);
+                        const Sprite &spr = AGG::GetICN(ICN::MONS32, monster.GetSpriteIndex());
                         display.Blit(background, backgroundX, backgroundY);
+                        display.Blit(spr, backgroundX + (background.w() - spr.w()) / 2, backgroundY + (background.h() - spr.h()) / 2);
                         AGG::PlaySound(M82::PICKUP01);
+                        hero.GetArmy().JoinTroop(Monster::SKELETON, deadRaised);
                         break;
                     }
                 case 4:

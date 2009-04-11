@@ -93,9 +93,9 @@ bool Battle::BfValid(const Point & pt)
  *  \param tile  Map tile from which to derive visual elements
  *  \return Battle status relative to left hero
  */
-Army::battle_t Army::Battle(Heroes &h1, Heroes &h2, const Maps::Tiles &tile)
+Army::battle_t Army::Battle(Heroes &h1, Heroes &h2, const Maps::Tiles &tile, u32 &exp)
 {
-    Battle::BattleControl battle(h1, h2, tile);
+    Battle::BattleControl battle(h1, h2, tile, exp);
     return battle.GetStatus();
 }
 
@@ -105,9 +105,9 @@ Army::battle_t Army::Battle(Heroes &h1, Heroes &h2, const Maps::Tiles &tile)
  *  \param tile  Map tile from which to derive visual elements
  *  \return Battle status relative to left hero
  */
-Army::battle_t Army::Battle(Heroes &h, Army::army_t &a, const Maps::Tiles &tile)
+Army::battle_t Army::Battle(Heroes &h, Army::army_t &a, const Maps::Tiles &tile, u32 &exp)
 {
-    Battle::BattleControl battle(h, a, tile);
+    Battle::BattleControl battle(h, a, tile, exp);
     return battle.GetStatus();
 }
 
@@ -117,9 +117,9 @@ Army::battle_t Army::Battle(Heroes &h, Army::army_t &a, const Maps::Tiles &tile)
  *  \param tile  Map tile from which to derive visual elements
  *  \return Battle status relative to left hero
  */
-Army::battle_t Army::Battle(Heroes &h, Castle &c, const Maps::Tiles &tile)
+Army::battle_t Army::Battle(Heroes &h, Castle &c, const Maps::Tiles &tile, u32 &exp)
 {
-    Battle::BattleControl battle(h, c, tile);
+    Battle::BattleControl battle(h, c, tile, exp);
     return battle.GetStatus();
 }
 
@@ -466,7 +466,7 @@ namespace Battle
     
 //////////////////////////////////////////////////////////////////////////////////////////
 
-Battle::BattleControl::BattleControl(Heroes &hero1, Heroes &hero2, const Maps::Tiles &tile)
+Battle::BattleControl::BattleControl(Heroes &hero1, Heroes &hero2, const Maps::Tiles &tile, u32 &exp)
 : m_battlefield(NULL, &hero1, &hero2, hero1.GetArmy(), hero2.GetArmy(), g_baseOffset, tile)
 {
     Army::BattleArmy_t hero1Army, hero2Army;
@@ -475,10 +475,10 @@ Battle::BattleControl::BattleControl(Heroes &hero1, Heroes &hero2, const Maps::T
     m_battleStatus = RunBattle(&hero1, &hero2);
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero1.GetArmy());
     BattleArmyToArmy(m_battlefield.GetArmy(1), hero2.GetArmy());
-    BattleSummaryVsHero(hero1, hero1Army, hero2, hero2Army);
+    exp = BattleSummaryVsHero(hero1, hero1Army, hero2, hero2Army);
 }
 
-Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Maps::Tiles &tile)
+Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Maps::Tiles &tile, u32 &exp)
 : m_battlefield(NULL, &hero, NULL, hero.GetArmy(), army, g_baseOffset, tile)
 {
     Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
@@ -488,10 +488,10 @@ Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Map
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero.GetArmy());
     BattleArmyToArmy(m_battlefield.GetArmy(1), army);
     ArmyToBattleArmy(army, oppArmy);
-    BattleSummaryVsArmy(hero, heroArmyOrig, oppArmy, oppArmyOrig);
+    exp = BattleSummaryVsArmy(hero, heroArmyOrig, oppArmy, oppArmyOrig);
 }
 
-Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::Tiles &tile)
+Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::Tiles &tile, u32 &exp)
 : m_battlefield(&castle, &hero, NULL, hero.GetArmy(), castle.GetArmy(), g_baseOffset, tile)
 {
     Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
@@ -524,12 +524,12 @@ Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::T
     if(hero2)
     {
         BattleArmyToArmy(m_battlefield.GetArmy(1), hero2->GetArmy());
-        BattleSummaryVsHero(hero, heroArmyOrig, *hero2, oppArmyOrig);
+        exp = BattleSummaryVsHero(hero, heroArmyOrig, *hero2, oppArmyOrig);
     }
     else
     {
         BattleArmyToArmy(m_battlefield.GetArmy(1), castle.GetArmy());
-        BattleSummaryVsArmy(hero, heroArmyOrig, oppArmy, oppArmyOrig);
+        exp = BattleSummaryVsArmy(hero, heroArmyOrig, oppArmy, oppArmyOrig);
     }
 
     if(m_battleStatus == Army::WIN) //TODO: Vanquish present hero?
@@ -541,18 +541,82 @@ Battle::BattleControl::~BattleControl()
     if(m_gui) delete m_gui;
 }
 
-void Battle::BattleControl::BattleSummaryVsArmy(HeroBase &hero, const Army::BattleArmy_t &heroOrig, const Army::BattleArmy_t &army, const Army::BattleArmy_t &armyOrig)
+bool Battle::BattleControl::ShowLeftHeroResults(HeroBase *right, Army::battle_t result)
+{
+    if(right && world.GetKingdom(right->GetColor()).Control() == Game::LOCAL &&
+       world.GetMyKingdom().GetColor() == right->GetColor())
+        return false;
+    else return true;
+}
+
+u32 Battle::BattleControl::CalculateRaisedDead(HeroBase &hero, u32 perished)
+{
+    float mod = 0.0f;
+    switch(hero.GetLevelSkill(Skill::Secondary::NECROMANCY))
+    {
+        case Skill::Level::BASIC:
+            mod = 0.1f;
+            break;
+        case Skill::Level::ADVANCED:
+            mod = 0.2f;
+            break;
+        case Skill::Level::EXPERT:
+            mod = 0.3f;
+            break;
+        default:
+            break;
+    }
+    return static_cast<u32>(perished * mod);
+}
+
+Spell::spell_t Battle::BattleControl::GetLearnedSpell(HeroBase &hero, std::vector<Spell::spell_t> &castSpells)
+{
+    u8 maxLevel = 0;
+    u8 chance = 0;
+    switch(hero.GetLevelSkill(Skill::Secondary::EAGLEEYE))
+    {
+        case Skill::Level::BASIC:
+            maxLevel = 2;
+            chance = 1;
+            break;
+        case Skill::Level::ADVANCED:
+            maxLevel = 3;
+            chance = 2;
+            break;
+        case Skill::Level::EXPERT:
+            maxLevel = 4;
+            chance = 3;
+            break;
+        default:
+            break;
+    }
+    std::vector<Spell::spell_t> availableSpells;
+    std::vector<Spell::spell_t>::const_iterator it1 = castSpells.begin();
+    std::vector<Spell::spell_t>::const_iterator it2 = castSpells.end();
+    for(; it1 != it2; it1++)
+        if(Spell::Level(*it1) <= maxLevel)
+            availableSpells.push_back(*it1);
+    if(!availableSpells.size())
+        return Spell::NONE;
+    Spell::spell_t learned = *Rand::Get<Spell::spell_t>(availableSpells);
+    if(Rand::Get(0, 10) <= chance)
+        return learned;
+    else return Spell::NONE;
+}
+
+u32 Battle::BattleControl::BattleSummaryVsArmy(HeroBase &hero, const Army::BattleArmy_t &heroOrig, const Army::BattleArmy_t &army, const Army::BattleArmy_t &armyOrig)
 {
     Army::ArmyPairs armies;
     Army::BattleArmy_t ownArmy;
     ArmyToBattleArmy(hero.GetArmy(), ownArmy);
     armies.push_back(std::make_pair(&ownArmy, &heroOrig));
     armies.push_back(std::make_pair(&army, &armyOrig));
-    //TODO: Necromancy
-    /*Dialog::*/BattleSummary(hero.GetName(), armies, NULL, Spell::NONE, 0, m_battleStatus);
+    u32 deadRaised = Army::WIN == m_battleStatus ? CalculateRaisedDead(hero, m_perished) : 0;
+    BattleSummary(hero, m_experience[0], armies, NULL, Spell::NONE, deadRaised, m_battleStatus);
+    return Army::WIN == m_battleStatus ? m_experience[0] : 0;
 }
 
-void Battle::BattleControl::BattleSummaryVsHero(HeroBase &hero, const Army::BattleArmy_t &heroOrig, HeroBase &hero2, const Army::BattleArmy_t &hero2Orig)
+u32 Battle::BattleControl::BattleSummaryVsHero(HeroBase &hero, const Army::BattleArmy_t &heroOrig, HeroBase &hero2, const Army::BattleArmy_t &hero2Orig)
 {
     Army::ArmyPairs armies;
     Army::BattleArmy_t ownArmy, otherArmy;
@@ -560,10 +624,51 @@ void Battle::BattleControl::BattleSummaryVsHero(HeroBase &hero, const Army::Batt
     ArmyToBattleArmy(hero2.GetArmy(), otherArmy);
     armies.push_back(std::make_pair(&ownArmy, &heroOrig));
     armies.push_back(std::make_pair(&otherArmy, &hero2Orig));
-    //TODO: Necromancy
-    //TODO: Eagle eye
-    const BagArtifacts *artifacts = m_battleStatus == Army::WIN ? &hero2.GetBagArtifacts() : NULL;
-    /*Dialog::*/BattleSummary(hero.GetName(), armies, artifacts, Spell::NONE, 0, m_battleStatus);
+    Spell::spell_t eagleEye;
+    u32 deadRaised = 0;
+    const BagArtifacts *artifacts = NULL;
+    HeroBase *target = NULL, *other = NULL;
+    u32 exp = 0;
+    bool leftResults = ShowLeftHeroResults(&hero2, m_battleStatus);
+    bool success = false;
+    if(leftResults)
+    {
+        if(m_battleStatus == Army::WIN)
+        {
+            success = true;
+            target = &hero;
+            other = &hero2;
+            exp = m_experience[0];
+        }
+        else
+        {
+            target = &hero2;
+            other = &hero;
+        }
+    }
+    else
+    {
+        if(m_battleStatus == Army::LOSE)
+        {
+            success = true;
+            target = &hero2;
+            other = &hero;
+            exp = m_experience[1];
+        }
+        else
+        {
+            target = &hero;
+            other = &hero2;
+        }
+    }
+    if(success)
+    {
+        artifacts = &other->GetBagArtifacts();
+        deadRaised = CalculateRaisedDead(*target, m_perished);
+        eagleEye = GetLearnedSpell(*target, m_spellsCast);
+    }
+    BattleSummary(*target, exp, armies, artifacts, eagleEye, deadRaised, m_battleStatus);
+    return exp;
 }
 
 void Battle::BattleControl::InitializeLogicSettings(HeroBase *hero1, HeroBase *hero2)
@@ -578,6 +683,10 @@ void Battle::BattleControl::InitializeLogicSettings(HeroBase *hero1, HeroBase *h
 Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2)
 {
     InitializeLogicSettings(hero1, hero2);
+
+    m_experience[0] = 0;
+    m_experience[1] = 0;
+    m_perished = 0;
     
     bool haveDisplay = !(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY));
     
@@ -1272,6 +1381,8 @@ long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, c
 
 void Battle::BattleControl::PerformAttackPreLogic(Army::BattleTroop &attacker, const std::vector<Army::BattleTroop *> &targets, bool ranged)
 {
+    TroopIndex tidx = m_battlefield.GetIndexFromTroop(attacker);
+    u8 side = m_battlefield.GetSideFromIndex(tidx);
     for(u16 tid = 0; tid < targets.size(); tid++)
     {
         Army::BattleTroop &target = *targets[tid];
@@ -1280,8 +1391,7 @@ void Battle::BattleControl::PerformAttackPreLogic(Army::BattleTroop &attacker, c
         target.damageToApply = damage;
             
         //TODO: Don't gain experience from damage to own troop
-        //if(troopN >= 0) EXP1 += std::min(damage, (long)target.TotalHP());
-        //else EXP2 += std::min(damage, (long)target.TotalHP());            
+        m_experience[side] += std::min(damage, (long)target.TotalHP());
     }
 }
 
@@ -1300,6 +1410,7 @@ bool Battle::BattleControl::PerformAttackLogic(Army::BattleTroop &attacker, cons
             if(!target.Count())
                 retaliate = false;
         }
+        m_perished += tempPerished;
     }
 
     if(ranged) attacker.shots --;
@@ -2337,7 +2448,7 @@ namespace Battle
      */
     void Battlefield::CleanupBodies()
     {
-        for(u8 j = 0; j < 1; j++) {
+        for(u8 j = 0; j < 2; j++) {
             for(u16 i = 0; i < m_army[j]->size(); i++)
             {
                 if((*m_army[j])[i].Count() != 0)

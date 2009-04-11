@@ -46,9 +46,9 @@ namespace Army
     class army_t;
     class BattleTroop;
 
-    Army::battle_t Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile);
-    Army::battle_t Battle(Heroes& hero, Army::army_t & army, const Maps::Tiles & tile);
-    Army::battle_t Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile);
+    Army::battle_t Battle(Heroes& hero1, Heroes& hero2, const Maps::Tiles & tile, u32 &);
+    Army::battle_t Battle(Heroes& hero, Army::army_t & army, const Maps::Tiles & tile, u32 &);
+    Army::battle_t Battle(Heroes& hero, Castle& castle, const Maps::Tiles &tile, u32 &);
 
     typedef std::vector<std::pair<const Army::BattleArmy_t *, const Army::BattleArmy_t *> > ArmyPairs;
     

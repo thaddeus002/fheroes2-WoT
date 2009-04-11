@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-10 15:56-0400\n"
+"POT-Creation-Date: 2009-04-11 01:28-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,7 +73,7 @@ msgid "Some undead in groups -1"
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:54
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:295
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:291
 #: ../fheroes2/heroes/heroes_indicator.cpp:119
 #: ../fheroes2/heroes/heroes_indicator.cpp:163
 msgid "None"
@@ -83,60 +83,60 @@ msgstr ""
 msgid "A glorious victory!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:94
+#: ../fheroes2/battle/battle_dialog.cpp:90
 msgid "For valor in combat, %{name} receives %{exp} experience."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:103
+#: ../fheroes2/battle/battle_dialog.cpp:98
 msgid "Your forces suffer a bitter defeat, and %{name} abandons your cause."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:108
-msgid "TODO"
+#: ../fheroes2/battle/battle_dialog.cpp:103
+msgid "%{name} surrenders to the enemy, and departs in shame."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:114
+#: ../fheroes2/battle/battle_dialog.cpp:110
 msgid "Your forces in disarray, the cowardly %{name} flees in terror."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:141
+#: ../fheroes2/battle/battle_dialog.cpp:137
 msgid "Battlefield Casualties"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:142
+#: ../fheroes2/battle/battle_dialog.cpp:138
 msgid "Attacker"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:143
+#: ../fheroes2/battle/battle_dialog.cpp:139
 msgid "Defender"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:187
+#: ../fheroes2/battle/battle_dialog.cpp:183
 msgid "You have captured an enemy artifact!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:328
+#: ../fheroes2/battle/battle_dialog.cpp:333
 msgid "%{name} the %{race}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:335
+#: ../fheroes2/battle/battle_dialog.cpp:340
 #: ../fheroes2/castle/castle_well.cpp:249
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:88
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:400
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:396
 #: ../fheroes2/heroes/skill.cpp:124
 msgid "Attack"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:341
+#: ../fheroes2/battle/battle_dialog.cpp:346
 #: ../fheroes2/castle/castle_well.cpp:257
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:110
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:414
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:410
 msgid "Defense"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:347
+#: ../fheroes2/battle/battle_dialog.cpp:352
 #: ../fheroes2/castle/castle_town.cpp:744
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:428
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:424
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:151
 #: ../fheroes2/heroes/heroes_dialog.cpp:108
 #: ../fheroes2/heroes/heroes_dialog.cpp:448
@@ -145,9 +145,9 @@ msgstr ""
 msgid "Spell Power"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:353
+#: ../fheroes2/battle/battle_dialog.cpp:358
 #: ../fheroes2/castle/castle_town.cpp:755
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:442
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:438
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:156
 #: ../fheroes2/heroes/heroes_dialog.cpp:123
 #: ../fheroes2/heroes/heroes_dialog.cpp:450
@@ -156,178 +156,178 @@ msgstr ""
 msgid "Knowledge"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:359
+#: ../fheroes2/battle/battle_dialog.cpp:364
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:207
 msgid "Morale"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:364
+#: ../fheroes2/battle/battle_dialog.cpp:369
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:219 ../fheroes2/heroes/skill.cpp:351
 msgid "Luck"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:369
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:456
+#: ../fheroes2/battle/battle_dialog.cpp:374
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:452
 #: ../fheroes2/heroes/heroes_dialog.cpp:454
 #: ../fheroes2/heroes/heroes_dialog.cpp:500
 msgid "Spell Points"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:406
 #: ../fheroes2/battle/battle_dialog.cpp:411
+#: ../fheroes2/battle/battle_dialog.cpp:416
 #: ../fheroes2/game/game_startgame.cpp:1470
 msgid "Cast Spell"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:406
+#: ../fheroes2/battle/battle_dialog.cpp:411
 msgid ""
 "Cast a magical spell. You may only cast one spell per combat round. The "
 "round is reset when every creature has had a turn"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:407
-#: ../fheroes2/battle/battle_dialog.cpp:413
+#: ../fheroes2/battle/battle_dialog.cpp:412
+#: ../fheroes2/battle/battle_dialog.cpp:418
 msgid "Retreat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:407
+#: ../fheroes2/battle/battle_dialog.cpp:412
 msgid ""
 "Retreat your hero, abandoning your creatures. Your hero will be available "
 "for you to recruit again, however, the hero will have only a novice hero's "
 "forces."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:408
-#: ../fheroes2/battle/battle_dialog.cpp:415
+#: ../fheroes2/battle/battle_dialog.cpp:413
+#: ../fheroes2/battle/battle_dialog.cpp:420
 msgid "Surrender"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:408
+#: ../fheroes2/battle/battle_dialog.cpp:413
 msgid ""
 "Surrendering costs gold. However if you pay the ransom, the hero and all of "
 "his or her surviving creatures will be available to recruit again."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:409
-#: ../fheroes2/battle/battle_dialog.cpp:417
+#: ../fheroes2/battle/battle_dialog.cpp:414
+#: ../fheroes2/battle/battle_dialog.cpp:422
 #: ../fheroes2/game/game_newgame.cpp:99 ../fheroes2/game/game_newgame.cpp:162
 #: ../fheroes2/game/game_newgame.cpp:224 ../fheroes2/game/game_newgame.cpp:292
 #: ../fheroes2/game/game_scenarioinfo.cpp:333
 msgid "Cancel"
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:409
+#: ../fheroes2/battle/battle_dialog.cpp:414
 msgid "Return to the battle."
 msgstr ""
 
-#: ../fheroes2/battle/battle_dialog.cpp:419
-#: ../fheroes2/battle/battle_new.cpp:2862
+#: ../fheroes2/battle/battle_dialog.cpp:424
+#: ../fheroes2/battle/battle_new.cpp:2973
 msgid "Hero's Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:655
+#: ../fheroes2/battle/battle_new.cpp:764
 msgid "Low morale causes the %{name} to freeze in panic."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:744
+#: ../fheroes2/battle/battle_new.cpp:853
 msgid "High morale enables the %{name} to attack again."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1476
+#: ../fheroes2/battle/battle_new.cpp:1587
 msgid "%{name} %{does} %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1478
+#: ../fheroes2/battle/battle_new.cpp:1589
 msgid "does"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1479
+#: ../fheroes2/battle/battle_new.cpp:1590
 msgid "do"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1485
+#: ../fheroes2/battle/battle_new.cpp:1596
 msgid " %{value} %{name} %{perishes}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1567
+#: ../fheroes2/battle/battle_new.cpp:1678
 msgid "That spell will affect no one!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1586
+#: ../fheroes2/battle/battle_new.cpp:1697
 msgid "The %{spell} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1592
+#: ../fheroes2/battle/battle_new.cpp:1703
 msgid "The %{spell} does %{value} damage to the %{name}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1849
-#: ../fheroes2/battle/battle_new.cpp:1898
+#: ../fheroes2/battle/battle_new.cpp:1960
+#: ../fheroes2/battle/battle_new.cpp:2009
 msgid "View %{name} info."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1865
+#: ../fheroes2/battle/battle_new.cpp:1976
 msgid "Shoot %{name} (%{value} shot(s) left)"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1878
+#: ../fheroes2/battle/battle_new.cpp:1989
 msgid "Attack %{name}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1915
+#: ../fheroes2/battle/battle_new.cpp:2026
 msgid "Fly"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1916
+#: ../fheroes2/battle/battle_new.cpp:2027
 msgid "Move"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1917
+#: ../fheroes2/battle/battle_new.cpp:2028
 msgid "%{move} %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2829
+#: ../fheroes2/battle/battle_new.cpp:2940
 msgid "Skip"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2829
+#: ../fheroes2/battle/battle_new.cpp:2940
 msgid ""
 "Skip the current creature. The current creature loses its turn and does not "
 "get to go again until the next round."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2830
-#: ../fheroes2/battle/battle_new.cpp:2854
+#: ../fheroes2/battle/battle_new.cpp:2941
+#: ../fheroes2/battle/battle_new.cpp:2965
 msgid "Auto Combat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2830
+#: ../fheroes2/battle/battle_new.cpp:2941
 msgid "Allows the computer to fight out the battle for you."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2831
+#: ../fheroes2/battle/battle_new.cpp:2942
 #: ../fheroes2/editor/editor_startgame.cpp:804
 #: ../fheroes2/game/game_startgame.cpp:1478
 msgid "System Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2831
+#: ../fheroes2/battle/battle_new.cpp:2942
 msgid "Allows you to customize the combat screen."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2838
+#: ../fheroes2/battle/battle_new.cpp:2949
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2850
+#: ../fheroes2/battle/battle_new.cpp:2961
 msgid "Skip this unit"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2858
+#: ../fheroes2/battle/battle_new.cpp:2969
 msgid "Customize system options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2866
+#: ../fheroes2/battle/battle_new.cpp:2977
 msgid "View Opposing Hero"
 msgstr ""
 
@@ -1092,59 +1092,77 @@ msgstr ""
 msgid "n/a"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:84
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:83
 msgid "Unchartered Territory"
 msgstr ""
 
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:91
+msgid ""
+"A few\n"
+"%{monster}"
+msgstr ""
+
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:92
-msgid "A few %{monster}"
+msgid ""
+"Several\n"
+"%{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:93
-msgid "Several %{monster}"
+msgid ""
+"A pack of\n"
+"%{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:94
-msgid "A pack of %{monster}"
+msgid ""
+"Lots of\n"
+"%{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:95
-msgid "Lots of %{monster}"
+msgid ""
+"A horde of\n"
+"%{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:96
-msgid "A horde of %{monster}"
+msgid ""
+"A throng of\n"
+"%{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:97
-msgid "A throng of %{monster}"
+msgid ""
+"A swarm of\n"
+"%{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:98
-msgid "A swarm of %{monster}"
+msgid ""
+"Zounds of\n"
+"%{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:99
-msgid "Zounds of %{monster}"
+msgid ""
+"A legion of\n"
+"%{monster}"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:100
-msgid "A legion of %{monster}"
-msgstr ""
-
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:119
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:133
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:152
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:120
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:137
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:166
 msgid "(already visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:119
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:133
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:152
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:120
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:137
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:166
 msgid "(not visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:286
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:282
 msgid "Defenders:"
 msgstr ""
 
