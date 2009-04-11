@@ -77,7 +77,6 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     display.Blit(box, pos.x, pos.y);
 
     std::string name_object(MP2::StringObject(tile.GetObject()));
-    std::string visit_status;
     const Settings & settings = Settings::Get();
 
     if(!settings.Debug() && tile.isFog(settings.CurrentColor()))
@@ -89,15 +88,15 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     	{
     	    switch(Army::GetSize(tile.GetCountMonster()))
     	    {
-		case Army::FEW:		name_object = _("A few %{monster}"); break;
-		case Army::SEVERAL:	name_object = _("Several %{monster}"); break;
-		case Army::PACK:	name_object = _("A pack of %{monster}"); break;
-		case Army::LOTS:	name_object = _("Lots of %{monster}"); break;
-		case Army::HORDE:	name_object = _("A horde of %{monster}"); break;
-		case Army::THRONG:	name_object = _("A throng of %{monster}"); break;
-		case Army::SWARM:	name_object = _("A swarm of %{monster}"); break;
-		case Army::ZOUNDS:	name_object = _("Zounds of %{monster}"); break;
-		case Army::LEGION:	name_object = _("A legion of %{monster}"); break;
+		case Army::FEW:		name_object = _("A few\n%{monster}"); break;
+		case Army::SEVERAL:	name_object = _("Several\n%{monster}"); break;
+		case Army::PACK:	name_object = _("A pack of\n%{monster}"); break;
+		case Army::LOTS:	name_object = _("Lots of\n%{monster}"); break;
+		case Army::HORDE:	name_object = _("A horde of\n%{monster}"); break;
+		case Army::THRONG:	name_object = _("A throng of\n%{monster}"); break;
+		case Army::SWARM:	name_object = _("A swarm of\n%{monster}"); break;
+		case Army::ZOUNDS:	name_object = _("Zounds of\n%{monster}"); break;
+		case Army::LEGION:	name_object = _("A legion of\n%{monster}"); break;
             }
 
             String::Replace(name_object, "%{monster}", Monster(tile).GetMultiName());
@@ -116,7 +115,10 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_STANDINGSTONES:
 	    // check visited
 	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
-		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile) ? _("(already visited)") : _("(not visited)");
+	    {
+	    	name_object.append("\n");
+		name_object.append(Game::Focus::Get().GetHeroes().isVisited(tile) ? _("(already visited)") : _("(not visited)"));
+	    }
 	    break;
 
 	case MP2::OBJ_FOUNTAIN:
@@ -130,7 +132,10 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_STABLES:
 	    // check visited
 	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
-		visit_status = Game::Focus::Get().GetHeroes().isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)");
+	    {
+		name_object.append("\n");
+		name_object.append(Game::Focus::Get().GetHeroes().isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)"));
+	    }
 	    break;
 
 	case MP2::OBJ_SHRINE1:
@@ -138,43 +143,34 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_SHRINE3:
 	    // addons pack
 	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
-		visit_status = "(" + Spell::String(Spell::Spell(tile.GetQuantity2())) + ")";
+	    {
+	    	name_object.append("\n(");
+	    	name_object.append(Spell::String(Spell::Spell(tile.GetQuantity1())));
+	    	name_object.append(")");
+	    }
 	    break;
 
 	case MP2::OBJ_WITCHSHUT:
 	    // addons pack
 	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
-		visit_status = "(" + Skill::Secondary::String(Skill::Secondary::Skill(tile.GetQuantity1())) + ")";
+	    {
+		name_object.append("\n(");
+		name_object.append(Skill::Secondary::String(Skill::Secondary::Skill(tile.GetQuantity1())));
+		name_object.append(")");
+	    }
 	    break;
 
         case MP2::OBJ_OBELISK:
             // check visited
-            visit_status = world.GetKingdom(settings.MyColor()).isVisited(tile) ? _("(already visited)") : _("(not visited)");
+	    name_object.append("\n");
+	    name_object.append(world.GetKingdom(settings.MyColor()).isVisited(tile) ? _("(already visited)") : _("(not visited)"));
             break;
 
         default: break;
     }
 
-    Text text;
-    text.Set(name_object, Font::SMALL);
-
-    if(visit_status.empty())
-    {
-	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
-	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.h()) / 2;
-	text.Blit(tx, ty);
-    }
-    else
-    {
-    	u16 tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
-	u16 ty = pos.y + (pos.h - BORDERWIDTH - text.h()) / 2 - 7;
-	text.Blit(tx, ty);
-
-	text.Set(visit_status);
-	tx = pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2;
-	ty += 15;
-	text.Blit(tx, ty);
-    }
+    TextBox text(name_object, Font::SMALL, 118);
+    text.Blit(pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2, pos.y + (pos.h - BORDERWIDTH - text.h()) / 2);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
