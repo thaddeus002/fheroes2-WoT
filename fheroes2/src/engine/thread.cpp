@@ -96,3 +96,8 @@ void Timer::Remove(Timer & timer)
 	timer.id = 0;
     }
 }
+
+bool Timer::IsValid(void) const
+{
+    return id;
+}

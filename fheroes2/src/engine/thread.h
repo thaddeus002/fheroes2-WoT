@@ -60,6 +60,8 @@ class Timer
 public:
     Timer();
 
+    bool IsValid(void) const;
+
     static void Run(Timer &, u32, u32 (*)(u32, void *), void *param = NULL);
     static void Remove(Timer &);
 

@@ -190,7 +190,12 @@ void Game::StatusWindow::SetResource(const Resource::resource_t res, u16 count)
 {
     lastResource = res;
     countLastResource = count;
-    old_state = state;
+
+    if(timerShowLastResource.IsValid())
+	Timer::Remove(timerShowLastResource);
+    else
+	old_state = state;
+
     state = RESOURCE;
     Timer::Run(timerShowLastResource, RESOURCE_WINDOW_EXPIRE, ResetResourceStatus, this);
 }
