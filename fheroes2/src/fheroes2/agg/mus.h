@@ -23,6 +23,7 @@
 
 #include <string>
 #include "gamedefs.h"
+#include "mp2.h"
 
 namespace MUS
 {
@@ -30,7 +31,7 @@ namespace MUS
     {
         UNUSED,
         DATATRACK,
-	BATTLE1,
+        BATTLE1,
         BATTLE2,
         BATTLE3,
         BARBARIAN,
@@ -53,26 +54,26 @@ namespace MUS
         MONTH2,
         PUZZLE,
         ROLAND,
-        EVENT1, // }
-        EVENT2, // |--> all the same?
-        EVENT3, // }
+        CARAVANS,
+        CARAVANS_2,
+        CARAVANS_3,
         COMPUTER,
         BATTLEWIN,
-        BATTLELOSE, // defeat, castle?
-        EVENT6, // defeat, catastrophe?
-        EVENT7,
-        EVENT8, // desert?
-        EVENT9,
-        EVENT10, // grasslands?
-        EVENT11, // snow?
-        EVENT12,
-        EVENT13,
-        EVENT14,
+        BATTLELOSE,
+        DEATH,
+        WATERSPRING,
+        ARABIAN,
+        NOMADTENTS,
+        TREEHOUSE,
+        DEMONCAVE,
+        EXPERIENCE,
+        SKILL,
+        WATCHTOWER,
         EVENT15,
-        EVENT16,
+        NEWS,
         MAINMENU,
         VICTORY,
-	UNKNOWN
+        UNKNOWN
     } mus_t;
 
     typedef struct
@@ -86,6 +87,7 @@ namespace MUS
 
     mus_t FromGround(const u16 ground);
     mus_t FromRace(const u8 race);
+    mus_t FromMapObject(const MP2::object_t object);
 };
 
 #endif

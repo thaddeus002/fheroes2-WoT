@@ -35,10 +35,12 @@
 #include "algorithm.h"
 #include "gameevent.h"
 
-#define PlaySoundWarning	AGG::PlaySound(M82::EXPERNCE)
-#define PlaySoundSuccess	AGG::PlaySound(M82::TREASURE)
-#define PlaySoundFailure	AGG::PlaySound(M82::H2MINE)
-#define PlaySoundVisited	AGG::PlaySound(M82::RSBRYFZL)
+#define PlayMusicReplacement(m82) if(MUS::FromMapObject((MP2::object_t)obj) == MUS::UNKNOWN) \
+                                      AGG::PlaySound(m82)
+#define PlaySoundWarning    PlayMusicReplacement(M82::EXPERNCE)
+#define PlaySoundSuccess	PlayMusicReplacement(M82::TREASURE)
+#define PlaySoundFailure	PlayMusicReplacement(M82::H2MINE)
+#define PlaySoundVisited	PlayMusicReplacement(M82::RSBRYFZL)
 
 void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -57,7 +59,7 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToSign(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToMagicWell(Heroes &hero, const u8 obj, const u16 dst_index);
-void ActionToTradingPost(Heroes &hero);
+void ActionToTradingPost(Heroes &hero, const u8 obj);
 void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -65,7 +67,7 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToTeleports(Heroes &hero, const u16 dst_index);
-void ActionToWhirlpools(Heroes &hero, const u16 dst_index);
+void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -312,6 +314,8 @@ void Heroes::Action(const u16 dst_index)
 
     const MP2::object_t object = (dst_index == GetIndex() ? GetUnderObject() : world.GetTiles(dst_index).GetObject());
 
+    AGG::PlayMusic(MUS::FromMapObject(object), false);
+
     switch(object)
     {
 	case MP2::OBJ_MONSTER:	ActionToMonster(*this, object, dst_index); break;
@@ -363,7 +367,7 @@ void Heroes::Action(const u16 dst_index)
 	case MP2::OBJ_PYRAMID:		ActionToPoorLuckObject(*this, object, dst_index); break;
 
         case MP2::OBJ_MAGICWELL: 	ActionToMagicWell(*this, object, dst_index); break;
-        case MP2::OBJ_TRADINGPOST:	ActionToTradingPost(*this); break;
+        case MP2::OBJ_TRADINGPOST:	ActionToTradingPost(*this, object); break;
 
         // primary skill modification
         case MP2::OBJ_FORT:
@@ -387,7 +391,7 @@ void Heroes::Action(const u16 dst_index)
 
         // teleports
 	case MP2::OBJ_STONELIGHTS:	ActionToTeleports(*this, dst_index); break;
-	case MP2::OBJ_WHIRLPOOL:	ActionToWhirlpools(*this, dst_index); break;
+        case MP2::OBJ_WHIRLPOOL:	ActionToWhirlpools(*this, object, dst_index); break;
 
 	// obsv tower
 	case MP2::OBJ_OBSERVATIONTOWER:	ActionToObservationTower(*this, object, dst_index); break;
@@ -1136,7 +1140,7 @@ void ActionToMagicWell(Heroes &hero, const u8 obj, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("ActionToMagicWell: " + hero.GetName());
 }
 
-void ActionToTradingPost(Heroes &hero)
+void ActionToTradingPost(Heroes &hero, const u8 obj)
 {
     PlaySoundSuccess;
     Dialog::Marketplace(true);
@@ -1860,7 +1864,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     if(Settings::Get().Debug()) Error::Verbose("ActionToStoneLights: " + hero.GetName());
 }
 
-void ActionToWhirlpools(Heroes &hero, const u16 index_from)
+void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
 {
     const u16 index_to = world.NextWhirlpool(index_from);
     hero.ApplyPenaltyMovement();

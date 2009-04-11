@@ -95,6 +95,7 @@ public:
     bool Original(void) const;
     bool Sound(void) const;
     bool Music(void) const;
+    bool CDMusic(void) const;
     bool FullScreen(void) const;
     bool EvilInterface(void) const;
     bool Shadow(void) const;

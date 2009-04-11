@@ -259,6 +259,8 @@ bool Settings::Sound(void) const { return Modes(SOUND); }
 /* return music */
 bool Settings::Music(void) const { return Modes(MUSIC); }
 
+bool Settings::CDMusic(void) const { return Modes(MUSIC_CD | MUSIC_EXT); }
+
 /* return animation */
 u8   Settings::Animation(void) const { return animation; }
 

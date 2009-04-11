@@ -23,6 +23,7 @@
 #include "race.h"
 #include "ground.h"
 #include "mus.h"
+#include "settings.h"
 
 namespace MUS
 {
@@ -44,7 +45,7 @@ namespace MUS
         { DESERT,       "Desert Theme"        },
         { SNOW,         "Snow Theme"          },
         { SWAMP,        "Swamp Theme"         },
-        { BEACH,        "Beach Theme"         },
+        { BEACH,        "Ocean Theme"         },
         { DIRT,         "Dirt Theme"          },
         { GRASS,        "Grass Theme"         },
         { LOSTGAME,     "Lost Game"           },
@@ -53,23 +54,23 @@ namespace MUS
         { MONTH2,       "Month (2)"           },
         { PUZZLE,       "Map Puzzle"          },
         { ROLAND,       "Roland's Campaign"   },
-        { EVENT1,       "25"                  },
-        { EVENT2,       "26"                  },
-        { EVENT3,       "27"                  },
+        { CARAVANS,     "25"                  },
+        { CARAVANS_2,   "26"                  },
+        { CARAVANS_3,   "27"                  },
         { COMPUTER,     "28"                  },
         { BATTLEWIN,    "29"                  },
         { BATTLELOSE,   "30"                  },
-        { EVENT6,       "31"                  },
-        { EVENT7,       "32"                  },
-        { EVENT8,       "33"                  },
-        { EVENT9,       "34"                  },
-        { EVENT10,      "35"                  },
-        { EVENT11,      "36"                  },
-        { EVENT12,      "37"                  },
-        { EVENT13,      "38"                  },
-        { EVENT14,      "39"                  },
+        { DEATH,        "31"                  },
+        { WATERSPRING,  "32"                  },
+        { ARABIAN,      "33"                  },
+        { NOMADTENTS,   "34"                  },
+        { TREEHOUSE,    "35"                  },
+        { DEMONCAVE,    "36"                  },
+        { EXPERIENCE,   "37"                  },
+        { SKILL,        "38"                  },
+        { WATCHTOWER,   "39"                  },
         { EVENT15,      "40"                  },
-        { EVENT16,      "41"                  },
+        { NEWS,         "41"                  },
         { MAINMENU,     "Main Menu"           },
         { VICTORY,      "Scenario Victory"    },
         { UNKNOWN,      "???"                 }
@@ -115,4 +116,49 @@ MUS::mus_t MUS::FromRace(const u8 race)
     }
 
     return UNKNOWN;
+}
+
+MUS::mus_t MUS::FromMapObject(const MP2::object_t object)
+{
+    if(!Settings::Get().CDMusic())
+        return MUS::UNKNOWN;
+    
+    switch(object)
+    {
+        case MP2::OBJ_WITCHSHUT:
+        case MP2::OBJ_FORT:
+        case MP2::OBJ_MERCENARYCAMP:
+        case MP2::OBJ_DOCTORHUT:
+        case MP2::OBJ_STANDINGSTONES:
+            return MUS::SKILL;
+
+        case MP2::OBJ_GAZEBO:
+        case MP2::OBJ_TREEKNOWLEDGE:
+            return MUS::EXPERIENCE;
+
+        case MP2::OBJ_DAEMONCAVE:
+            return MUS::DEMONCAVE;
+
+        case MP2::OBJ_TREEHOUSE:
+        case MP2::OBJ_TREECITY:
+            return MUS::TREEHOUSE;
+
+        case MP2::OBJ_WATCHTOWER:
+            return MUS::WATCHTOWER;
+
+        case MP2::OBJ_DESERTTENT:
+            return MUS::NOMADTENTS;
+
+        case MP2::OBJ_ARTESIANSPRING:
+            return MUS::WATERSPRING;
+
+        case MP2::OBJ_SPHINX:
+            return MUS::ARABIAN;
+
+        case MP2::OBJ_EVENT:
+            return MUS::NEWS;
+            
+        default:
+            return MUS::UNKNOWN;
+    }
 }

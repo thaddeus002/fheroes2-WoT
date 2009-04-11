@@ -783,12 +783,13 @@ Game::menu_t Game::HumanTurn(void)
     // new week dialog
     if(1 < world.CountWeek() && world.BeginWeek())
     {
-	const Week::type_t name = world.GetWeekType();
-	std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
-	String::Replace(message, "%{name}", Week::GetString(name));
-	message += "\n \n";
-	message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
-	Dialog::Message("", message, Font::BIG, Dialog::OK);
+        const Week::type_t name = world.GetWeekType();
+        std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
+        AGG::PlayMusic(world.BeginMonth() ? MUS::WEEK2_MONTH1 : MUS::WEEK1, false);
+        String::Replace(message, "%{name}", Week::GetString(name));
+        message += "\n \n";
+        message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
+        Dialog::Message("", message, Font::BIG, Dialog::OK);
     }
 
     // warning lost all town
@@ -798,6 +799,7 @@ Game::menu_t Game::HumanTurn(void)
 
 	if(0 == myKingdom.GetLostTownDays())
 	{
+        AGG::PlayMusic(MUS::DEATH, false);
 	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
 	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
 	    DialogPlayers(conf.MyColor(), str);
@@ -825,6 +827,7 @@ Game::menu_t Game::HumanTurn(void)
 	const GameEvent::Day* event_day = world.GetEventDay(conf.MyColor());
 	if(event_day)
 	{
+        AGG::PlayMusic(MUS::NEWS, false);
 	    if(event_day->GetResource().GetValidItems())
 		Dialog::ResourceInfo("", event_day->GetMessage(), event_day->GetResource());
 	    else
