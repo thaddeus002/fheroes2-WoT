@@ -836,7 +836,8 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
             m_battlefield.CleanupBodies();
             defenderAlive = defender->isValid();
 
-            if(!attackerAlive || !defenderAlive || !troop.isTwiceAttack() || troop.Modes(Army::ATTACKED))
+            if(!attackerAlive || !defenderAlive || !troop.isTwiceAttack() || troop.Modes(Army::ATTACKED) ||
+               (troop.Modes(Army::HANDFIGHTING) && troop.isArcher()))
                 break;
             
             troop.SetModes(Army::ATTACKED);

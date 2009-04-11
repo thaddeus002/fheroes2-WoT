@@ -498,6 +498,7 @@ u16 Army::BattleTroop::GetDamageVersus(const Army::BattleTroop &defender) const
         dmg *= 2;
     
     // check luck x2
+    //FIXME: units will receive bonuses every turn after the actual bonus occurs
     if(Modes(LUCK_GOOD)) dmg *= 2;
     else
     if(Modes(LUCK_BAD)) dmg /= 2;
