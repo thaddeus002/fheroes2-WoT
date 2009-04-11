@@ -183,58 +183,6 @@ AGG::Cache::~Cache()
     std::list<File *>::const_iterator agg_it2 = agg_cache.end();
 
     for(; agg_it1 != agg_it2; ++agg_it1) delete *agg_it1;
-
-
-    // free icn cache
-    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator icn_it1 = icn_cache.begin();
-    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator icn_it2 = icn_cache.end();
-
-    for(; icn_it1 != icn_it2; ++icn_it1)
-    {
-	const std::vector<Sprite *> & v = (*icn_it1).second;
-
-	if(v.size())
-	{
-	    std::vector<Sprite *>::const_iterator it1 = v.begin();
-	    std::vector<Sprite *>::const_iterator it2 = v.end();
-
-	    for(; it1 != it2; ++it1) delete *it1;
-	}
-    }
-
-    // free icn reflect cache
-    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator reflect_icn_it1 = reflect_icn_cache.begin();
-    std::map<ICN::icn_t, std::vector<Sprite *> >::const_iterator reflect_icn_it2 = reflect_icn_cache.end();
-
-    for(; reflect_icn_it1 != reflect_icn_it2; ++reflect_icn_it1)
-    {
-	const std::vector<Sprite *> & v = (*reflect_icn_it1).second;
-
-	if(v.size())
-	{
-	    std::vector<Sprite *>::const_iterator it1 = v.begin();
-	    std::vector<Sprite *>::const_iterator it2 = v.end();
-
-	    for(; it1 != it2; ++it1) delete *it1;
-	}
-    }
-
-    // free til cache
-    std::map<TIL::til_t, std::vector<Surface *> >::const_iterator til_it1 = til_cache.begin();
-    std::map<TIL::til_t, std::vector<Surface *> >::const_iterator til_it2 = til_cache.end();
-
-    for(; til_it1 != til_it2; ++til_it1)
-    {
-	const std::vector<Surface *> & v = (*til_it1).second;
-	    
-	if(v.size())
-	{
-	    std::vector<Surface *>::const_iterator it1 = v.begin();
-	    std::vector<Surface *>::const_iterator it2 = v.end();
-
-	    for(; it1 != it2; ++it1) delete *it1;
-	}
-    }
 }
 
 /* get AGG::Cache object */
@@ -304,13 +252,12 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 /* load manual ICN object */
 void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 {
-    std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
     if(v.size()) return;
 
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
 
-    Sprite *sprite = NULL;
     u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
 
     // Preload ICN
@@ -335,75 +282,75 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 
     for(u8 ii = 0; ii < count; ++ii)
     {
+	Sprite & sprite = v[ii];
+
 	switch(icn)
 	{
 	    case ICN::TELEPORT1:
-		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 116));
-		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE + ii / 2));
+		sprite = GetICN(ICN::OBJNMUL2, 116);
+		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE + ii / 2));
 		break;
 
 	    case ICN::TELEPORT2:
-		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 119));
-		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE + ii));
+		sprite = GetICN(ICN::OBJNMUL2, 119);
+		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE + ii));
 		break;
 
 	    case ICN::TELEPORT3:
-		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 122));
-		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE + ii));
+		sprite = GetICN(ICN::OBJNMUL2, 122);
+		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE + ii));
 		break;
 
 	    case ICN::FOUNTAIN:
-		sprite = new Sprite(GetICN(ICN::OBJNMUL2, 15));
-		sprite->ChangeColor(sprite->GetColor(0xE8), sprite->GetColor(0xE8 - ii));
-		sprite->ChangeColor(sprite->GetColor(0xE9), sprite->GetColor(0xE9 - ii));
-		sprite->ChangeColor(sprite->GetColor(0xEA), sprite->GetColor(0xEA - ii));
-		sprite->ChangeColor(sprite->GetColor(0xEB), sprite->GetColor(0xEB - ii));
-		sprite->ChangeColor(sprite->GetColor(0xEC), sprite->GetColor(0xEC - ii));
-		sprite->ChangeColor(sprite->GetColor(0xED), sprite->GetColor(0xED - ii));
-		sprite->ChangeColor(sprite->GetColor(0xEE), sprite->GetColor(0xEE - ii));
-		sprite->ChangeColor(sprite->GetColor(0xEF), sprite->GetColor(0xEF - ii));
+		sprite = GetICN(ICN::OBJNMUL2, 15);
+		sprite.ChangeColor(sprite.GetColor(0xE8), sprite.GetColor(0xE8 - ii));
+		sprite.ChangeColor(sprite.GetColor(0xE9), sprite.GetColor(0xE9 - ii));
+		sprite.ChangeColor(sprite.GetColor(0xEA), sprite.GetColor(0xEA - ii));
+		sprite.ChangeColor(sprite.GetColor(0xEB), sprite.GetColor(0xEB - ii));
+		sprite.ChangeColor(sprite.GetColor(0xEC), sprite.GetColor(0xEC - ii));
+		sprite.ChangeColor(sprite.GetColor(0xED), sprite.GetColor(0xED - ii));
+		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE - ii));
+		sprite.ChangeColor(sprite.GetColor(0xEF), sprite.GetColor(0xEF - ii));
 		break;
 
 	    case ICN::TREASURE:
-		sprite = new Sprite(GetICN(ICN::OBJNRSRC, 19));
-		sprite->ChangeColor(sprite->GetColor(0x0A), sprite->GetColor(ii ? 0x00 : 0x0A));
-		sprite->ChangeColor(sprite->GetColor(0xC2), sprite->GetColor(ii ? 0xD6 : 0xC2));
-		sprite->ChangeColor(sprite->GetColor(0x64), sprite->GetColor(ii ? 0xDA : 0x64));
+		sprite = GetICN(ICN::OBJNRSRC, 19);
+		sprite.ChangeColor(sprite.GetColor(0x0A), sprite.GetColor(ii ? 0x00 : 0x0A));
+		sprite.ChangeColor(sprite.GetColor(0xC2), sprite.GetColor(ii ? 0xD6 : 0xC2));
+		sprite.ChangeColor(sprite.GetColor(0x64), sprite.GetColor(ii ? 0xDA : 0x64));
 		break;
 
 	    case ICN::ROUTERED:
-		sprite = new Sprite(GetICN(ICN::ROUTE, ii));
-		sprite->ChangeColor(sprite->GetColor(0x55), sprite->GetColor(0xB0));
-		sprite->ChangeColor(sprite->GetColor(0x5C), sprite->GetColor(0xB7));
-		sprite->ChangeColor(sprite->GetColor(0x60), sprite->GetColor(0xBB));
+		sprite = GetICN(ICN::ROUTE, ii);
+		sprite.ChangeColor(sprite.GetColor(0x55), sprite.GetColor(0xB0));
+		sprite.ChangeColor(sprite.GetColor(0x5C), sprite.GetColor(0xB7));
+		sprite.ChangeColor(sprite.GetColor(0x60), sprite.GetColor(0xBB));
 		break;
 
 	    case ICN::YELLOWFONT:
-		sprite = new Sprite(GetICN(ICN::FONT, ii));
-		sprite->ChangeColor(sprite->GetColor(0x0A), sprite->GetColor(0xDA));
-		sprite->ChangeColor(sprite->GetColor(0x0B), sprite->GetColor(0xDA));
-		sprite->ChangeColor(sprite->GetColor(0x0C), sprite->GetColor(0xDA));
-		sprite->ChangeColor(sprite->GetColor(0x0D), sprite->GetColor(0xDA));
-		sprite->ChangeColor(sprite->GetColor(0x0E), sprite->GetColor(0xDB));
-		sprite->ChangeColor(sprite->GetColor(0x0F), sprite->GetColor(0xDB));
-		sprite->ChangeColor(sprite->GetColor(0x10), sprite->GetColor(0xDB));
-		sprite->ChangeColor(sprite->GetColor(0x11), sprite->GetColor(0xDB));
-		sprite->ChangeColor(sprite->GetColor(0x12), sprite->GetColor(0xDB));
-		sprite->ChangeColor(sprite->GetColor(0x13), sprite->GetColor(0xDB));
-		sprite->ChangeColor(sprite->GetColor(0x14), sprite->GetColor(0xDB));
+		sprite = GetICN(ICN::FONT, ii);
+		sprite.ChangeColor(sprite.GetColor(0x0A), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0B), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0C), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0D), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0E), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x0F), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x10), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x11), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x12), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x13), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x14), sprite.GetColor(0xDB));
 		break;
 
 	    default: break;
 	}
-
-	if(sprite) v[ii] = sprite;
     }
 }
 
 /* load ICN object to AGG::Cache */
 void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 {
-    std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
     if(v.size()) return;
     const Settings & conf = Settings::Get();
@@ -438,7 +385,10 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		const std::string sprite_file(icn_folder + SEPARATOR + xml_sprite->Attribute("name"));
 		SDL_Surface* sf = IMG_Load(sprite_file.c_str());
 		if(NULL == sf) Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
-    		v.push_back(new Sprite(sf, ox, oy));
+    		v.push_back(Sprite());
+		Sprite & sp = v.back();
+		sp.Set(sf);
+		sp.SetOffset(ox, oy);
 	    }
 	}
 	else
@@ -485,7 +435,11 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		    const ICN::Header & header = icn_headers[ii];
 		    const u32 size_data = (ii + 1 != count_sprite ? icn_headers[ii + 1].OffsetData() - header.OffsetData() : total_size - header.OffsetData());
 
-		    v[ii] = new Sprite(icn, header, &body[6 + header.OffsetData()], size_data, reflect);
+		    Sprite & sp = v[ii];
+		    sp.Set(header.Width(), header.Height(), ICN::RequiresAlpha(icn));
+		    sp.SetOffset(header.OffsetX(), header.OffsetY());
+		    sp.LoadICN(&body[6 + header.OffsetData()], size_data, reflect);
+		    //v[ii] = sp;
 		}
 
 		return;
@@ -498,7 +452,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 /* load TIL object to AGG::Cache */
 void AGG::Cache::LoadTIL(const TIL::til_t til)
 {
-    std::vector<Surface *> & v = til_cache[til];
+    std::vector<Surface> & v = til_cache[til];
 
     if(v.size()) return;
 
@@ -537,9 +491,9 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 		
 		for(u16 ii = 0; ii < count; ++ii)
 		{
-		    v[ii] = new Surface(width, height, 8, SDL_SWSURFACE);
-		    
-		    Surface & sf = *v[ii];
+		    Surface & sf = v[ii];
+
+		    sf.Set(width, height, 8, SDL_SWSURFACE);
 
     		    sf.Lock();
             	    memcpy(const_cast<void *>(sf.pixels()), &body[6 + ii * tile_size], tile_size);
@@ -758,17 +712,9 @@ void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 {
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: " + ICN::GetString(icn));
 
-    std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
-    if(v.size())
-    {
-	std::vector<Sprite *>::const_iterator it1 = v.begin();
-	std::vector<Sprite *>::const_iterator it2 = v.end();
-
-	for(; it1 != it2; ++it1) delete *it1;
-
-	v.clear();
-    }
+    if(v.size()) v.clear();
 }
 
 /* free TIL object in AGG::Cache */
@@ -776,17 +722,9 @@ void AGG::Cache::FreeTIL(const TIL::til_t til)
 {
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeTIL: " + TIL::GetString(til));
 
-    std::vector<Surface *> & v = til_cache[til];
+    std::vector<Surface> & v = til_cache[til];
 
-    if(v.size())
-    {
-	std::vector<Surface *>::const_iterator it1 = v.begin();
-	std::vector<Surface *>::const_iterator it2 = v.end();
-
-	for(; it1 != it2; ++it1) delete *it1;
-
-	v.clear();
-    }
+    if(v.size()) v.clear();
 }
 
 /* free 82M object in AGG::Cache */
@@ -816,7 +754,7 @@ void AGG::Cache::FreeMID(const XMI::xmi_t xmi)
 /* return ICN sprite from AGG::Cache */
 const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
-    const std::vector<Sprite *> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    const std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
     if(0 == v.size())
     switch(icn)
@@ -839,9 +777,9 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 	index = 0;
     }
 
-    const Sprite * sprite = v[index];
+    const Sprite & sprite = v[index];
 	
-    if(NULL == sprite)
+    if(! sprite.valid())
     {
 	Error::Warning("AGG::GetICN: icn: ", icn);
 	Error::Warning("AGG::GetICN: icn name: " + ICN::GetString(icn));
@@ -849,13 +787,13 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 	Error::Except("AGG::GetICN: return is NULL");
     }
 
-    return *sprite;
+    return sprite;
 }
 
 /* return count of sprites from specific ICN */
 int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 {
-    const std::vector<Sprite *> & v = icn_cache[icn];
+    const std::vector<Sprite> & v = icn_cache[icn];
 
     if(0 == v.size()) LoadICN(icn, false);
 
@@ -865,7 +803,7 @@ int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 /* return TIL surface from AGG::Cache */
 const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 {
-    std::vector<Surface *> & v = til_cache[til];
+    std::vector<Surface> & v = til_cache[til];
 
     if(0 == v.size()) LoadTIL(til);
 
@@ -888,20 +826,20 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 	index2 = 0;
     }
 
-    Surface* surface = v[index2];
+    Surface & surface = v[index2];
 
-    if(shape && NULL == surface)
+    if(shape && ! surface.valid())
     {
-	const Surface* src = v[index];
+	const Surface & src = v[index];
 
-	if(src)
+	if(src.valid())
 	{
-	    surface = v[index2] = new Surface(src->w(), src->h(), 8, SDL_SWSURFACE);
-	    TIL::Reflect(*surface, *src, shape);
+	    surface.Set(src.w(), src.h(), 8, SDL_SWSURFACE);
+	    TIL::Reflect(surface, src, shape);
 	}
     }
 
-    if(NULL == surface)
+    if(! surface.valid())
     {
 	Error::Warning("AGG::GetTIL: icn: ", til);
 	Error::Warning("AGG::GetTIL: icn name: " + TIL::GetString(til));
@@ -909,7 +847,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 	Error::Except("AGG::GetTIL: return is NULL");
     }
 
-    return *surface;
+    return surface;
 }
 
 /* return CVT from AGG::Cache */

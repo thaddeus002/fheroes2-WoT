@@ -117,9 +117,9 @@ namespace AGG
 
 	std::list<File *> agg_cache;
 
-	std::map<ICN::icn_t, std::vector<Sprite *> > icn_cache;
-	std::map<ICN::icn_t, std::vector<Sprite *> > reflect_icn_cache;
-	std::map<TIL::til_t, std::vector<Surface *> > til_cache;
+	std::map<ICN::icn_t, std::vector<Sprite> > icn_cache;
+	std::map<ICN::icn_t, std::vector<Sprite> > reflect_icn_cache;
+	std::map<TIL::til_t, std::vector<Surface> > til_cache;
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
         std::map<MUS::mus_t, std::vector<u8> > mus_cache;
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;

@@ -20,15 +20,15 @@
 #ifndef H2SPRITE_H
 #define H2SPRITE_H
 
-#include "icn.h"
 #include "gamedefs.h"
 
 class Sprite : public Surface
 {
 public:
-    /* icn sprite constructor */
-    Sprite(SDL_Surface *, s16, s16);
-    Sprite(const ICN::icn_t icn, const ICN::Header & header, const char *data, const u32 size, bool reflect = false);
+    Sprite();
+
+    void SetOffset(s16, s16);
+    void LoadICN(const char *, size_t, bool);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };
@@ -38,8 +38,8 @@ public:
     operator Rect() const { return Rect(offsetX, offsetY, w(), h()); }
 
     static void DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect);
-
 private:
+
     s16		offsetX;
     s16		offsetY;
 };

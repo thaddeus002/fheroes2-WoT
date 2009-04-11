@@ -18,20 +18,23 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "agg.h"
 #include "settings.h"
 #include "sprite.h"
 
-Sprite::Sprite(SDL_Surface *sf, s16 ox, s16 oy) : Surface(sf), offsetX(ox), offsetY(ox)
+Sprite::Sprite() : offsetX(0), offsetY(0)
 {
 }
 
-/* ICN Sprite constructor */
-Sprite::Sprite(const ICN::icn_t icn, const ICN::Header & header, const char *data, const u32 size, bool reflect)
-    : Surface(header.Width(), header.Height(), ICN::RequiresAlpha(icn)), offsetX(header.OffsetX()), offsetY(header.OffsetY())
+void Sprite::SetOffset(s16 ox, s16 oy)
+{
+    offsetX = ox;
+    offsetY = oy;
+}
+
+void Sprite::LoadICN(const char *buf, size_t size, bool reflect)
 {
     SetColorKey();
-    DrawICN(*this, data, size, reflect);
+    DrawICN(*this, buf, size, reflect);
 }
 
 void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect)
