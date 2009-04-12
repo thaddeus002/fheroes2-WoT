@@ -52,24 +52,8 @@ World & World::GetWorld(void)
 
 void World::Defaults(void)
 {
-    ultimate_artifact = 0xFFFF;
-
-    day = 0;
-    week = 0;
-    month = 0;
-
-    week_name = Week::TORTOISE;
-    count_obelisk = 0;
-
-    // reserve memory
-    vec_eventsday.reserve(6);
-    vec_eventsmap.reserve(6);
-    vec_riddles.reserve(10);
-    vec_rumors.reserve(10);
-    vec_castles.reserve(MAXCASTLES);
-
     // playing kingdom
-    vec_kingdoms.resize(KINGDOMMAX + 1);
+    vec_kingdoms.resize(KINGDOMMAX);
     vec_kingdoms[0] = new Kingdom(Color::BLUE);
     vec_kingdoms[1] = new Kingdom(Color::GREEN);
     vec_kingdoms[2] = new Kingdom(Color::RED);
@@ -184,7 +168,7 @@ void World::Defaults(void)
 /* new maps */
 void World::NewMaps(const u16 sw, const u16 sh)
 {
-    FreeOldMaps();
+    Reset();
     Defaults();
 
     width = sw;
@@ -226,7 +210,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
 /* load maps */
 void World::LoadMaps(const std::string &filename)
 {
-    FreeOldMaps();
+    Reset();
     Defaults();
 
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
@@ -1145,7 +1129,7 @@ void World::NewMonth(void)
 {
 }
 
-void World::FreeOldMaps(void)
+void World::Reset(void)
 {
     // maps tiles
     if(vec_tiles.size())
@@ -1217,6 +1201,24 @@ void World::FreeOldMaps(void)
     map_recruits.clear();
     map_sign.clear();
     map_captureobj.clear();
+
+    ultimate_artifact = 0xFFFF;
+
+    day = 0;
+    week = 0;
+    month = 0;
+
+    week_name = Week::TORTOISE;
+    count_obelisk = 0;
+
+    // reserve memory
+    vec_eventsday.reserve(6);
+    vec_eventsmap.reserve(6);
+    vec_riddles.reserve(10);
+    vec_rumors.reserve(10);
+    vec_castles.reserve(MAXCASTLES);
+    vec_kingdoms.reserve(KINGDOMMAX);
+    vec_heroes.reserve(HEROESMAXCOUNT + 2);
 }
 
 Heroes* World::GetFreemanHeroes(Race::race_t rc)

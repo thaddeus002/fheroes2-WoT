@@ -683,8 +683,7 @@ void Game::LoadXML(const std::string &fn)
     display.Flip();
 
     // prepare World
-    world.FreeOldMaps();
-    world.Defaults();
+    world.Reset();
 
     int res;
     const char *str;

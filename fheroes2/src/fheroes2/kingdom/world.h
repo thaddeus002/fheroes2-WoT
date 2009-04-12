@@ -59,7 +59,7 @@ struct Recruits : public std::pair<Heroes*, Heroes*>
 class World : protected Size
 {
 public:
-    ~World(){ FreeOldMaps(); };
+    ~World(){ Reset(); };
 
     void LoadMaps(const std::string &filename);
     void NewMaps(const u16 sw, const u16 sh);
@@ -153,7 +153,7 @@ protected:
 private:
     World() : Size(0, 0), ultimate_artifact_area(448, 448), width(Size::w), height(Size::h) {};
     void Defaults(void);
-    void FreeOldMaps(void);
+    void Reset(void);
 
 private:
     friend class Radar;
