@@ -291,8 +291,11 @@ void Castle::ActionNewDay(void)
 {
     castle_heroes = GetHeroes();
 
-    // for learns new spells need today
-    if(castle_heroes && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);
+    // for learns new spells need 1 day
+    if(!Settings::Get().Original() &&
+	castle_heroes &&
+	GetLevelMageGuild() &&
+	castle_heroes->GetSpellBook()) castle_heroes->AppendSpellsToBook(mageguild);
 
     SetModes(ALLOWBUILD);
 }
@@ -348,6 +351,11 @@ void Castle::ChangeColor(Color::color_t cl)
 u8 Castle::GetLevelMageGuild(void)
 {
     return mageguild.GetLevel();
+}
+
+const MageGuild & Castle::GetMageGuild(void) const
+{
+    return mageguild;
 }
 
 const std::string & Castle::GetStringBuilding(const building_t & build, const Race::race_t & race)
@@ -976,9 +984,13 @@ void Castle::BuyBuilding(building_t build)
 	    case BUILD_MAGEGUILD3:
 	    case BUILD_MAGEGUILD4:
 	    case BUILD_MAGEGUILD5:
-            mageguild.BuildNextLevel();
-            captain.GetSpellBook()->Activate();
-            captain.GetSpellBook()->Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
+        	mageguild.BuildNextLevel();
+        	captain.GetSpellBook()->Activate();
+        	captain.GetSpellBook()->Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
+
+		if(Settings::Get().Original() &&
+		    castle_heroes &&
+		    castle_heroes->GetSpellBook()) castle_heroes->AppendSpellsToBook(mageguild);
 		break;
 
             // build library

@@ -20,6 +20,7 @@
 
 #include "settings.h"
 #include "kingdom.h"
+#include "castle.h"
 #include "army.h"
 #include "battle.h"
 #include "luck.h"
@@ -56,6 +57,7 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
 
 void Heroes::AIUpdateRoles(void)
 {
@@ -76,6 +78,8 @@ void Heroes::AIAction(const u16 dst_index)
     switch(object)
     {
 	case MP2::OBJ_MONSTER:		AIToMonster(*this, object, dst_index); break;
+
+	case MP2::OBJ_CASTLE:		AIToCastle(*this, object, dst_index); break;
 
         // pickup object
         case MP2::OBJ_RESOURCE:
@@ -163,6 +167,51 @@ void Heroes::AIAction(const u16 dst_index)
 	default:
 	    Error::Verbose("AI::Action: Hero " + GetName() + " say: I'm stupid, help my please..");
 	    break;
+    }
+}
+
+void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    const Castle *castle = world.GetCastle(dst_index);
+
+    if(! castle) return;
+
+    if(hero.GetColor() == castle->GetColor())
+    {
+        if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
+        hero.AppendSpellsToBook(castle->GetMageGuild());
+    }
+    else
+    {
+        if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
+
+        u32 exp = 0;
+        Army::battle_t b;
+        if(castle->GetArmy().isValid())
+        {
+            b = castle->isCastle() ? Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp) :
+                Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index), exp);
+        }
+        else b = Army::WIN;
+
+        switch(b)
+        {
+            case Army::WIN:
+                if(exp) hero.IncreaseExperience(exp);
+                world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
+                world.GetKingdom(hero.GetColor()).AddCastle(castle);
+                world.CaptureObject(dst_index, hero.GetColor());
+                if(exp) hero.ActionAfterBattle();
+                break;
+
+            case Army::LOSE:
+            case Army::RETREAT:
+            case Army::SURRENDER:
+                AIBattleLose(hero, b);
+                break;
+
+            default: break;
+        }
     }
 }
 

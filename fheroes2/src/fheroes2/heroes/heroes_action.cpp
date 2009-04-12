@@ -570,6 +570,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	Mixer::Reduce();
 
+	hero.AppendSpellsToBook(castle->GetMageGuild());
 	const_cast<Castle *>(castle)->OpenDialog();
 
 	Mixer::Enhance();
@@ -579,14 +580,14 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 
 	u32 exp = 0;
-    Army::battle_t b;
-    if(castle->GetArmy().isValid())
-    {
-        if(castle->isCastle())
-            b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp);
-        else b = Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index), exp);
-    }
-    else b = Army::WIN;
+	Army::battle_t b;
+	if(castle->GetArmy().isValid())
+	{
+    	    if(castle->isCastle())
+        	b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp);
+    	    else b = Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index), exp);
+	}
+	else b = Army::WIN;
 
 	switch(b)
 	{

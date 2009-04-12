@@ -114,6 +114,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : experience(0), magic_point(0), mo
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
 
 	    spell_book.Activate();
+	    spell_book.Append(Spell::BLESS, Skill::Level::BASIC);
 	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
@@ -127,6 +128,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : experience(0), magic_point(0), mo
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
 
 	    spell_book.Activate();
+	    spell_book.Append(Spell::CURSE, Skill::Level::BASIC);
 	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
@@ -139,6 +141,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : experience(0), magic_point(0), mo
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::ADVANCED));
 
 	    spell_book.Activate();
+	    spell_book.Append(Spell::STONESKIN, Skill::Level::ADVANCED);
 	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
@@ -152,6 +155,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : experience(0), magic_point(0), mo
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
 
 	    spell_book.Activate();
+	    spell_book.Append(Spell::HASTE, Skill::Level::BASIC);
 	    PickupArtifact(Artifact::MAGIC_BOOK);
 	    break;
 	    
