@@ -570,7 +570,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	Mixer::Reduce();
 
-	hero.AppendSpellsToBook(castle->GetMageGuild());
+	if(Settings::Get().Original() && hero.GetSpellBook()) hero.AppendSpellsToBook(castle->GetMageGuild());
 	const_cast<Castle *>(castle)->OpenDialog();
 
 	Mixer::Enhance();
