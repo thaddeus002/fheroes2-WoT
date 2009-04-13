@@ -806,8 +806,8 @@ void World::LoadMaps(const std::string &filename)
 		// remove ultimate artifact sprite
 		if(NULL != (addon = tile.FindUltimateArtifact()))
 		{
-		    tile.Remove(addon->uniq);
 		    tile.SetQuantity1(Artifact::FromIndexSprite(addon->index));
+		    tile.Remove(addon->uniq);
 		    tile.SetObject(MP2::OBJ_ZERO);
 		    ultimate_artifact = ii;
 		}
