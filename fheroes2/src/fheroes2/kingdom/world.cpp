@@ -53,7 +53,7 @@ World & World::GetWorld(void)
 void World::Defaults(void)
 {
     // playing kingdom
-    vec_kingdoms.resize(KINGDOMMAX);
+    vec_kingdoms.resize(KINGDOMMAX + 1);
     vec_kingdoms[0] = new Kingdom(Color::BLUE);
     vec_kingdoms[1] = new Kingdom(Color::GREEN);
     vec_kingdoms[2] = new Kingdom(Color::RED);
