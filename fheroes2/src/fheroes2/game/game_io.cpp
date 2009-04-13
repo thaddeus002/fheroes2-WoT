@@ -112,6 +112,7 @@ void Game::SaveXML(const std::string &fn)
     game->SetAttribute("game_type", conf.game);
     game->SetAttribute("players", conf.players);
     game->SetAttribute("preferably_count_players", conf.preferably_count_players);
+    game->SetAttribute("debug", conf.debug);
 
     // world
     TiXmlElement* wrld = new TiXmlElement("world");
@@ -746,6 +747,8 @@ void Game::LoadXML(const std::string &fn)
     conf.players = res;
     game->Attribute("preferably_count_players", &res);
     conf.preferably_count_players = res;
+    game->Attribute("debug", &res);
+    conf.debug = res;
 
     // world
     wrld->Attribute("width", &res);

@@ -113,6 +113,10 @@ bool Settings::Read(const std::string & filename)
 
     if(font_normal.empty() || font_small.empty()) ResetModes(UNICODE);
 
+#ifdef BUILD_RELEASE
+    debug = 0;
+#endif
+
     return true;
 }
 
@@ -407,7 +411,10 @@ void Settings::Parse(const std::string & left, const std::string & right)
 }
 
 /* set level debug */
-void Settings::SetDebug(const u8 d) { debug = d; }
+void Settings::SetDebug(const u8 d)
+{
+    debug = d;
+}
 
 /**/
 void Settings::SetGameDifficulty(const Difficulty::difficulty_t d) { game_difficulty = d; }

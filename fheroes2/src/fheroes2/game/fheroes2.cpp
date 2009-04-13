@@ -59,8 +59,10 @@ char *basename(const char *path)
 int PrintHelp(const char *basename)
 {
     std::cout << "Usage: " << basename << " [OPTIONS]\n" \
-	    << "  -e\teditors mode\n" \
-	    << "  -d\tdebug mode\n";
+	    << "  -e\teditors mode\n";
+#ifndef BUILD_RELEASE
+    std::cout << "  -d\tdebug mode\n";
+#endif
 #ifdef WITH_NET
     std::cout << "  -s\tdedicated server\n";
 #endif
@@ -122,7 +124,9 @@ int main(int argc, char **argv)
 #endif
 
                     case 'd':
+#ifndef BUILD_RELEASE
                 	conf.SetDebug(optarg ? String::ToInt(optarg) : 0);
+#endif
                 	break;
 
                     case 'c':
