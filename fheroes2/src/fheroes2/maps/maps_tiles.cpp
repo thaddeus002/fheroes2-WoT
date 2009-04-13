@@ -356,6 +356,16 @@ void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 		if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 		{
 		    const Sprite & sprite = AGG::GetICN(icn, index);
+		    
+		    // fix flags redraw
+		    if(ICN::FLAG32 == icn)
+		    {
+			Rect rt;
+			Point pt(dstx + sprite.x(), dsty + sprite.y());
+			GameArea::SrcRectFixed(rt, pt, sprite.w(), sprite.h());
+			display.Blit(sprite, rt, pt);
+		    }
+		    else
 		    display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		    // possible anime
