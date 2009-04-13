@@ -292,8 +292,7 @@ void Castle::ActionNewDay(void)
     castle_heroes = GetHeroes();
 
     // for learns new spells need 1 day
-    if(!Settings::Get().Original() &&
-	castle_heroes &&
+    if(castle_heroes &&
 	GetLevelMageGuild() &&
 	castle_heroes->GetSpellBook()) castle_heroes->AppendSpellsToBook(mageguild);
 
@@ -348,7 +347,7 @@ void Castle::ChangeColor(Color::color_t cl)
 }
 
 // return mage guild level
-u8 Castle::GetLevelMageGuild(void)
+u8 Castle::GetLevelMageGuild(void) const
 {
     return mageguild.GetLevel();
 }
@@ -988,8 +987,7 @@ void Castle::BuyBuilding(building_t build)
         	captain.GetSpellBook()->Activate();
         	captain.GetSpellBook()->Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
 
-		if(Settings::Get().Original() &&
-		    castle_heroes &&
+		if(castle_heroes &&
 		    castle_heroes->GetSpellBook()) castle_heroes->AppendSpellsToBook(mageguild);
 		break;
 

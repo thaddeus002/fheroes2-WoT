@@ -202,7 +202,7 @@ public:
     void ActionNewMonth(void);
     void ActionAfterBattle(void);
 
-    bool BuySpellBook(void);
+    bool BuySpellBook(const Castle &);
     void AppendSpellsToBook(const Spell::Storage & spells);
     void AppendSpellToBook(const Spell::spell_t spell);
 

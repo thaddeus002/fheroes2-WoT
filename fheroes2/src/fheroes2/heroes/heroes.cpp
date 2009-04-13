@@ -1047,6 +1047,10 @@ void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
 void Heroes::Recruit(const Castle & castle)
 {
     Recruit(castle.GetColor(), castle.GetCenter());
+
+    // learn spell
+    if(castle.GetLevelMageGuild() &&
+	GetSpellBook()) AppendSpellsToBook(castle.GetMageGuild());
 }
 
 void Heroes::ActionNewDay(void)
@@ -1314,7 +1318,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 }
 
 /* buy book */
-bool Heroes::BuySpellBook(void)
+bool Heroes::BuySpellBook(const Castle & castle)
 {
     if(spell_book.isActive() || Color::GRAY == color) return false;
 
@@ -1346,6 +1350,8 @@ bool Heroes::BuySpellBook(void)
     {
 	kingdom.OddFundsResource(payment);
 	spell_book.Activate();
+	// add all spell to book
+	AppendSpellsToBook(castle.GetMageGuild());
 	return true;
     }
 

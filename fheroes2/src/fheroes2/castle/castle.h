@@ -114,7 +114,7 @@ public:
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
-    u8 GetLevelMageGuild(void);
+    u8 GetLevelMageGuild(void) const;
     const MageGuild & GetMageGuild(void) const;
 
     const Army::army_t & GetArmy(void) const{ return army; }; 
