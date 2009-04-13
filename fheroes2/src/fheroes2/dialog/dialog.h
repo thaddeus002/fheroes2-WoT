@@ -97,7 +97,7 @@ namespace Dialog
     void SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
     void SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill);
     u16  SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons = Dialog::OK);
-    void ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs);
+    u16 ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs, bool yesNo = false);
 
     Skill::Primary::skill_t SelectSkillFromArena(void);
 

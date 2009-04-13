@@ -938,32 +938,36 @@ u32 Army::army_t::GetDamageMax(void) const
     return res;
 }
 
-bool Army::army_t::StrongerEnemyArmy(const army_t & a)
+void Army::army_t::CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &other)
 {
     u16 a1 = GetAttack();
     u16 d1 = GetDefense();
-    u32 h1 = GetHitPoints();
     u32 m1 = GetDamageMin();
     u32 x1 = GetDamageMax();
-    u32 r1 = 0;
 
     u16 a2 = a.GetAttack();
     u16 d2 = a.GetDefense();
-    u32 h2 = a.GetHitPoints();
     u32 m2 = a.GetDamageMin();
     u32 x2 = a.GetDamageMax();
-    u32 r2 = 0;
 
     // total damage: from FAQ
     if(a1 > d2)
-	r1 = static_cast<u32>((m1 + x1) / 2 * (1 + 0.1 * std::min(a1 - d2, 20)));
+        own = static_cast<u32>((m1 + x1) / 2 * (1 + 0.1 * std::min(a1 - d2, 20)));
     else
-	r1 = static_cast<u32>((m1 + x1) / 2 * (1 + 0.05 * std::min(d2 - a1, 14)));
+        own = static_cast<u32>((m1 + x1) / 2 * (1 + 0.05 * std::min(d2 - a1, 14)));
 
     if(a2 > d1)
-	r2 = static_cast<u32>((m2 + x2) / 2 * (1 + 0.1 * std::min(a2 - d1, 20)));
+        other = static_cast<u32>((m2 + x2) / 2 * (1 + 0.1 * std::min(a2 - d1, 20)));
     else
-	r2 = static_cast<u32>((m2 + x2) / 2 * (1 + 0.05 * std::min(d1 - a2, 14)));
+        other = static_cast<u32>((m2 + x2) / 2 * (1 + 0.05 * std::min(d1 - a2, 14)));
+}
+
+bool Army::army_t::StrongerEnemyArmy(const army_t & a)
+{
+    u32 h1 = GetHitPoints();
+    u32 h2 = a.GetHitPoints();
+    u32 r1 = 0, r2 = 0;
+    CalculateForceRatiosVersus(a, r1, r2);
 
     return h1 / r2 > h2 / r1;
 }

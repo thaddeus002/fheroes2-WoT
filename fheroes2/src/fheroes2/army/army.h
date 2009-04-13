@@ -146,6 +146,7 @@ namespace Army
 	    bool	JoinTroop(const Monster::monster_t mon, const u16 count);
 	    bool	JoinTroop(const Monster & mon, const u16 count);
 	    bool	StrongerEnemyArmy(const army_t &);
+        void    CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &other);
 
 	    void	JoinStrongestFromArmy(army_t &);
             void	KeepOnlyWeakestTroops(army_t &);

@@ -468,50 +468,123 @@ void Heroes::Action(const u16 dst_index)
 
 void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    bool destroyTile = false, avoidBattle = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster monster(tile);
     Army::army_t army;
     army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
+    u32 ownRatio, otherRatio;
+    hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
+    if(ownRatio * 1.0f / otherRatio >= 2.0f)
+    {
+        if(Rand::Get(0, 10) <= 2) // 20% chance of joining for free
+        {
+            std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
+            std::string monst = monster.GetMultiName();
+            String::Lower(monst);
+            String::Replace(message, "%{monster}", monst);
+            if(Dialog::Message("Followers", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
+            {
+                hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
+                avoidBattle = true;
+            }
+            else Dialog::Message("", _("Insulted by your refusal of their offer, the monsters attack!"), Font::BIG, Dialog::OK);
+        }
+        else if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
+        {
+            float mod = 0.0f;
+            switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
+            {
+                case Skill::Level::BASIC:
+                    mod = 0.25f;
+                    break;
+                case Skill::Level::ADVANCED:
+                    mod = 0.5f;
+                    break;
+                case Skill::Level::EXPERT:
+                    mod = 1.0f;
+                    break;
+                default:
+                    break;
+            }
+            u32 toJoin = static_cast<u32>(tile.GetCountMonster() * mod);
+            u32 toBuy = 100; //FIXME
+            Resource::funds_t payment(Resource::GOLD, toBuy);
+            if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+            {
+                std::string message = _("The creatures are swayed by your diplomatic\ntongue, and make you an offer:\n \n"
+                                        "%{offer} of the %{total} %{monster} will join your army, and the rest will leave "
+                                        "you alone, for the sum of %{gold} gold.\nDo you accept?");
+                String::Replace(message, "%{offer}", toJoin);
+                String::Replace(message, "%{total}", tile.GetCountMonster());
+                std::string monst = monster.GetMultiName();
+                String::Lower(monst);
+                String::Replace(message, "%{monster}", monst);
+                String::Replace(message, "%{gold}", toBuy);
+                u16 result = Dialog::ResourceInfo("", message, payment, true);
+                if(result == Dialog::YES)
+                {
+                    
+                    hero.GetArmy().JoinTroop(monster, toJoin);
+                    avoidBattle = true;
+                }
+                else Dialog::Message("", _("Insulted by your refusal of their offer, the monsters attack!"), Font::BIG, Dialog::OK);
+            }
+        }
+        else if(ownRatio * 1.0f / otherRatio >= 5.0f)
+        {
+            std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.  Do you wish to pursue and engage them?");
+            std::string monst = monster.GetMultiName();
+            String::Lower(monst);
+            String::Replace(message, "%{monster}", monst);
+            if(Dialog::Message("", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::NO)
+                avoidBattle = true;
+        }
+    }
+    
     if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
 
     u32 exp = 0;
-    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
+    const Army::battle_t b = avoidBattle ? Army::WIN : Army::Battle(hero, army, tile, exp);
 
     switch(b)
     {
-	case Army::WIN:
-	{
-	    hero.IncreaseExperience(exp);
-	    Maps::TilesAddon *addon = tile.FindMonster();
-	    if(addon)
-	    {
-		AGG::PlaySound(M82::KILLFADE);
-		const u32 uniq = addon->uniq;
-		AnimationRemoveObject(tile);
-		tile.Remove(uniq);
-		tile.SetObject(MP2::OBJ_ZERO);
+        case Army::WIN:
+            hero.IncreaseExperience(exp);
+            destroyTile = true;
+            hero.ActionAfterBattle();
+            break;
 
-		// remove shadow from left cell
-		if(Maps::isValidDirection(dst_index, Direction::LEFT))
-		    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-	    }
-	    hero.ActionAfterBattle();
-	    break;
-	}
-
-	case Army::RETREAT:
-	case Army::SURRENDER:
-	case Army::LOSE:
-	    BattleLose(hero, b);
-	    if(!Settings::Get().Original())
-	    {
-	        tile.SetCountMonster(army.GetCountMonsters(monster));
-	    }
-	    break;
+        case Army::RETREAT:
+        case Army::SURRENDER:
+        case Army::LOSE:
+            BattleLose(hero, b);
+            if(!Settings::Get().Original())
+            {
+                tile.SetCountMonster(army.GetCountMonsters(monster));
+            }
+            break;
         
         default: break;
+    }
+
+    if(destroyTile)
+    {
+        Maps::TilesAddon *addon = tile.FindMonster();
+	    if(addon)
+	    {
+            AGG::PlaySound(M82::KILLFADE);
+            const u32 uniq = addon->uniq;
+            AnimationRemoveObject(tile);
+            tile.Remove(uniq);
+            tile.SetObject(MP2::OBJ_ZERO);
+
+            // remove shadow from left cell
+            if(Maps::isValidDirection(dst_index, Direction::LEFT))
+                world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+	    }
     }
 }
 

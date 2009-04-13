@@ -762,7 +762,9 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
                 if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
                 {
                     std::string str = _("Low morale causes the %{name} to freeze in panic.");
-                    String::Replace(str, "%{name}", troop.GetName());
+                    std::string monst = troop.GetName();
+                    String::Lower(monst);
+                    String::Replace(str, "%{name}", monst);
                     m_gui->Status(str);
                     m_gui->Redraw();
                     m_battlefield.AnimateMorale(false, troop);
@@ -852,7 +854,9 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
             if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
             {
                 std::string str = _("High morale enables the %{name} to attack again.");
-                String::Replace(str, "%{name}", troop.GetName());
+                std::string monst = troop.GetName();
+                String::Lower(monst);
+                String::Replace(str, "%{name}", monst);
                 m_gui->Status(str);
                 m_gui->Redraw();
                 m_battlefield.AnimateMorale(true, troop);
@@ -1589,7 +1593,9 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
         if(myTroop.Count() == 1)
             String::Replace(status, "%{does}", _("does"));
         else String::Replace(status, "%{does}", _("do"));
-        String::Replace(status, "%{name}", myTroop.GetName());
+        std::string name = myTroop.GetName();
+        String::Lower(name);
+        String::Replace(status, "%{name}", name);
         String::Replace(status, "%{value}", damage);
         
         if(perished)
@@ -1599,7 +1605,9 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
                 String::Replace(addon, "%{perishes}", "perishes");
             else String::Replace(addon, "%{perishes}", "perish");
     	    String::Replace(addon, "%{value}", perished);
-    	    String::Replace(addon, "%{name}", targetTroop.GetName(perished));
+            std::string name = targetTroop.GetName(perished);
+            String::Lower(name);
+    	    String::Replace(addon, "%{name}", name);
             status += addon;
         }
 
@@ -1704,7 +1712,9 @@ bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affect
     	        str = _("The %{spell} does %{value} damage to the %{name}.");
     	        String::Replace(str, "%{spell}", Spell::String(spell));
                 String::Replace(str, "%{value}", damage);
-    	        String::Replace(str, "%{name}", affected[0]->GetName());
+                std::string name = affected[0]->GetName();
+                String::Lower(name);
+    	        String::Replace(str, "%{name}", name);
             }
             m_gui->Status(str);
             m_gui->Status("");

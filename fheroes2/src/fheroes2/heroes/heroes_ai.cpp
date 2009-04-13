@@ -217,48 +217,100 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    bool avoidBattle = false, destroyTile = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster monster(tile);
     Army::army_t army;
     army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
+    u32 ownRatio, otherRatio;
+    hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
+    if(ownRatio * 1.0f / otherRatio >= 2.0f)
+    {
+        if(Rand::Get(0, 10) <= 2) // 20% chance of joining for free
+        {
+            if(0)
+            {
+                hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
+                avoidBattle = true;
+            }
+        }
+        else if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
+        {
+            float mod = 0.0f;
+            switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
+            {
+                case Skill::Level::BASIC:
+                    mod = 0.25f;
+                    break;
+                case Skill::Level::ADVANCED:
+                    mod = 0.5f;
+                    break;
+                case Skill::Level::EXPERT:
+                    mod = 1.0f;
+                    break;
+                default:
+                    break;
+            }
+            u32 toJoin = static_cast<u32>(tile.GetCountMonster() * mod);
+            u32 toBuy = 100; //FIXME
+            Resource::funds_t payment(Resource::GOLD, toBuy);
+            if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+            {
+                if(0)
+                {
+                    hero.GetArmy().JoinTroop(monster, toJoin);
+                    avoidBattle = true;
+                }
+            }
+        }
+        else if(ownRatio * 1.0f / otherRatio >= 5.0f)
+        {
+            if(Rand::Get(0, 1)) //FIXME: Some smarter decision here?
+                avoidBattle = true;
+        }
+    }
+
     if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
 
     u32 exp = 0;
-    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
+    const Army::battle_t b = avoidBattle ? Army::WIN : Army::Battle(hero, army, tile, exp);
 
     switch(b)
     {
-	case Army::WIN:
-	{
-	    hero.IncreaseExperience(exp);
-	    Maps::TilesAddon *addon = tile.FindMonster();
-	    if(addon)
-	    {
-		const u32 uniq = addon->uniq;
-		tile.Remove(uniq);
-		tile.SetObject(MP2::OBJ_ZERO);
+        case Army::WIN:
+            hero.IncreaseExperience(exp);
+            destroyTile = true;
+            hero.ActionAfterBattle();
+            break;
 
-		// remove shadow from left cell
-		if(Maps::isValidDirection(dst_index, Direction::LEFT))
-		    world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
-	    }
-	    hero.ActionAfterBattle();
-	    break;
-	}
-
-	case Army::RETREAT:
-	case Army::SURRENDER:
-	case Army::LOSE:
-	    AIBattleLose(hero, b);
-	    if(!Settings::Get().Original())
-	    {
-	        tile.SetCountMonster(army.GetCountMonsters(monster));
-	    }
-	    break;
+        case Army::RETREAT:
+        case Army::SURRENDER:
+        case Army::LOSE:
+            AIBattleLose(hero, b);
+            if(!Settings::Get().Original())
+            {
+                tile.SetCountMonster(army.GetCountMonsters(monster));
+            }
+            break;
         
         default: break;
+    }
+
+    if(destroyTile)
+    {
+        Maps::TilesAddon *addon = tile.FindMonster();
+        if(addon)
+        {
+            const u32 uniq = addon->uniq;
+            tile.Remove(uniq);
+            tile.SetObject(MP2::OBJ_ZERO);
+                
+            // remove shadow from left cell
+            if(Maps::isValidDirection(dst_index, Direction::LEFT))
+                world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+        }
     }
 }
 

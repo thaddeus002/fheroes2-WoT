@@ -97,16 +97,16 @@ LuckIndicator::LuckIndicator(const Heroes & h) : HeroesIndicator(h)
 
 void LuckIndicator::Redraw(void)
 {
+    std::string modificators;
+    modificators.reserve(256);
+    luck = hero.GetLuckWithModificators(&modificators);
+
     descriptions.clear();
     descriptions.append(Luck::Description(luck));
     descriptions.append("\n \n");
     descriptions.append(_("Current Luck Modifiers:"));
     descriptions.append("\n \n");
 
-    std::string modificators;
-    modificators.reserve(256);
-
-    luck = hero.GetLuckWithModificators(&modificators);
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > luck ? 3 : (0 < luck ? 2 : 6)));
     const u8 inter = 6;
     u8 count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
@@ -141,16 +141,16 @@ MoraleIndicator::MoraleIndicator(const Heroes & h) : HeroesIndicator(h), morale(
 
 void MoraleIndicator::Redraw(void)
 {
+    std::string modificators;
+    modificators.reserve(256);
+    morale = hero.GetMoraleWithModificators(&modificators);
+    
     descriptions.clear();
     descriptions.append(Morale::Description(morale));
     descriptions.append("\n \n");
     descriptions.append(_("Current Morale Modifiers:"));
     descriptions.append("\n \n");
-
-    std::string modificators;
-    modificators.reserve(256);
-
-    morale = hero.GetMoraleWithModificators(&modificators);
+    
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
     const u8 inter = 6;
     u8 count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
