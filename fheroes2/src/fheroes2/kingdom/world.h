@@ -81,6 +81,7 @@ public:
     const Kingdom & GetMyKingdom(void) const;
     const Kingdom & GetKingdom(u8 color) const;
     void KingdomLoss(const Color::color_t);
+    u8 CountPlayKingdoms(void) const;
 
     const Castle * GetCastle(u16 maps_index) const;
     const Castle * GetCastle(const Point & pt) const{ return GetCastle(pt.x, pt.y); };

@@ -1875,3 +1875,8 @@ void World::GetObjectIndexes(std::vector<u16> & v, MP2::object_t obj, bool check
 	    if(hero && obj == hero->GetUnderObject()) v.push_back((*it1)->GetIndex());
 	}
 }
+
+u8 World::CountPlayKingdoms(void) const
+{
+    return std::count_if(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::isPlay));
+}

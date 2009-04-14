@@ -192,9 +192,11 @@ Game::menu_t Game::StartGame(void)
 
     u8 players = 0;
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if((LOCAL | REMOTE) & world.GetKingdom(color).Control()) players |= color;
-
     while(m == ENDTURN && players)
     {
+	// break if notp lay
+	if(2 > world.CountPlayKingdoms()) break;
+
 	// world new day (skip if load game)
 	if(! conf.Modes(Settings::LOADGAME)) world.NewDay();
 
@@ -255,6 +257,7 @@ Game::menu_t Game::StartGame(void)
 		if(ENDTURN != m) break;
 	    }
 	}
+	DELAY(1);
     }
 
 
@@ -923,7 +926,7 @@ Game::menu_t Game::HumanTurn(void)
 	if(le.KeyPress(KEY_l))
 	{ 
 	    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-	    { Game::Load(); return STARTGAME; }
+	    return LOADGAME;
 	}
 	else
 	// puzzle maps
