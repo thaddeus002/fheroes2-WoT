@@ -1594,7 +1594,6 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
             String::Replace(status, "%{does}", _("does"));
         else String::Replace(status, "%{does}", _("do"));
         std::string name = myTroop.GetName();
-        String::Lower(name);
         String::Replace(status, "%{name}", name);
         String::Replace(status, "%{value}", damage);
         

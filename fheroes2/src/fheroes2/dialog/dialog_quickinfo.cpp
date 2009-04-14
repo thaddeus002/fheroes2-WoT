@@ -99,7 +99,9 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 		case Army::LEGION:	name_object = _("A legion of\n%{monster}"); break;
             }
 
-            String::Replace(name_object, "%{monster}", Monster(tile).GetMultiName());
+            std::string name = Monster(tile).GetMultiName();
+            String::Lower(name);
+            String::Replace(name_object, "%{monster}", name);
     	}
     	    break;
 

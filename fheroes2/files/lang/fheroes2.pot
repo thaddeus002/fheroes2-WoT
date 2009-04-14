@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-14 01:56-0400\n"
+"POT-Creation-Date: 2009-04-14 17:12-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,7 +73,7 @@ msgid "Some undead in groups -1"
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:54
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:291
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:293
 #: ../fheroes2/heroes/heroes_indicator.cpp:119
 #: ../fheroes2/heroes/heroes_indicator.cpp:163
 msgid "None"
@@ -122,7 +122,7 @@ msgstr ""
 #: ../fheroes2/battle/battle_dialog.cpp:341
 #: ../fheroes2/castle/castle_well.cpp:249
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:88
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:396
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:398
 #: ../fheroes2/heroes/skill.cpp:124
 msgid "Attack"
 msgstr ""
@@ -130,13 +130,13 @@ msgstr ""
 #: ../fheroes2/battle/battle_dialog.cpp:347
 #: ../fheroes2/castle/castle_well.cpp:257
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:110
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:410
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:412
 msgid "Defense"
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:353
-#: ../fheroes2/castle/castle_town.cpp:744
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:424
+#: ../fheroes2/castle/castle_town.cpp:746
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:426
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:151
 #: ../fheroes2/heroes/heroes_dialog.cpp:108
 #: ../fheroes2/heroes/heroes_dialog.cpp:448
@@ -146,8 +146,8 @@ msgid "Spell Power"
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:359
-#: ../fheroes2/castle/castle_town.cpp:755
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:438
+#: ../fheroes2/castle/castle_town.cpp:757
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:440
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:156
 #: ../fheroes2/heroes/heroes_dialog.cpp:123
 #: ../fheroes2/heroes/heroes_dialog.cpp:450
@@ -167,7 +167,7 @@ msgid "Luck"
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:375
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:452
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:454
 #: ../fheroes2/heroes/heroes_dialog.cpp:454
 #: ../fheroes2/heroes/heroes_dialog.cpp:500
 msgid "Spell Points"
@@ -221,7 +221,7 @@ msgid "Return to the battle."
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:425
-#: ../fheroes2/battle/battle_new.cpp:2984
+#: ../fheroes2/battle/battle_new.cpp:2983
 msgid "Hero's Options"
 msgstr ""
 
@@ -245,89 +245,89 @@ msgstr ""
 msgid "do"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1603
+#: ../fheroes2/battle/battle_new.cpp:1602
 msgid " %{value} %{name} %{perishes}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1687
+#: ../fheroes2/battle/battle_new.cpp:1686
 msgid "That spell will affect no one!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1706
+#: ../fheroes2/battle/battle_new.cpp:1705
 msgid "The %{spell} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1712
+#: ../fheroes2/battle/battle_new.cpp:1711
 msgid "The %{spell} does %{value} damage to the %{name}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1971
-#: ../fheroes2/battle/battle_new.cpp:2020
+#: ../fheroes2/battle/battle_new.cpp:1970
+#: ../fheroes2/battle/battle_new.cpp:2019
 msgid "View %{name} info."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1987
+#: ../fheroes2/battle/battle_new.cpp:1986
 msgid "Shoot %{name} (%{value} shot(s) left)"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2000
+#: ../fheroes2/battle/battle_new.cpp:1999
 msgid "Attack %{name}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2037
+#: ../fheroes2/battle/battle_new.cpp:2036
 msgid "Fly"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2038
+#: ../fheroes2/battle/battle_new.cpp:2037
 msgid "Move"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2039
+#: ../fheroes2/battle/battle_new.cpp:2038
 msgid "%{move} %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2951
+#: ../fheroes2/battle/battle_new.cpp:2950
 msgid "Skip"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2951
+#: ../fheroes2/battle/battle_new.cpp:2950
 msgid ""
 "Skip the current creature. The current creature loses its turn and does not "
 "get to go again until the next round."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2952
-#: ../fheroes2/battle/battle_new.cpp:2976
+#: ../fheroes2/battle/battle_new.cpp:2951
+#: ../fheroes2/battle/battle_new.cpp:2975
 msgid "Auto Combat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2952
+#: ../fheroes2/battle/battle_new.cpp:2951
 msgid "Allows the computer to fight out the battle for you."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2953
+#: ../fheroes2/battle/battle_new.cpp:2952
 #: ../fheroes2/editor/editor_startgame.cpp:804
 #: ../fheroes2/game/game_startgame.cpp:1499
 msgid "System Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2953
+#: ../fheroes2/battle/battle_new.cpp:2952
 msgid "Allows you to customize the combat screen."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2960
+#: ../fheroes2/battle/battle_new.cpp:2959
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2972
+#: ../fheroes2/battle/battle_new.cpp:2971
 msgid "Skip this unit"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2980
+#: ../fheroes2/battle/battle_new.cpp:2979
 msgid "Customize system options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2988
+#: ../fheroes2/battle/battle_new.cpp:2987
 msgid "View Opposing Hero"
 msgstr ""
 
@@ -894,28 +894,28 @@ msgid "%{name} is a level %{value} %{race} with %{count} artifacts."
 msgstr ""
 
 #: ../fheroes2/castle/castle_town.cpp:191
-#: ../fheroes2/castle/castle_town.cpp:1206
+#: ../fheroes2/castle/castle_town.cpp:1208
 msgid "The %{building} produces %{monster}."
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:325
+#: ../fheroes2/castle/castle_town.cpp:327
 msgid "Requires:"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:715
+#: ../fheroes2/castle/castle_town.cpp:717
 #: ../fheroes2/heroes/heroes_dialog.cpp:160
 msgid ""
 "'Spread' combat formation spreads your armies from the top to the bottom of "
 "the battlefield, with at least one empty space between each army."
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:716
+#: ../fheroes2/castle/castle_town.cpp:718
 msgid ""
 "'Grouped' combat formation bunches your army toget her in the center of your "
 "side of the battlefield."
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:722
+#: ../fheroes2/castle/castle_town.cpp:724
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:141
 #: ../fheroes2/heroes/heroes_dialog.cpp:78
 #: ../fheroes2/heroes/heroes_dialog.cpp:444
@@ -924,7 +924,7 @@ msgstr ""
 msgid "Attack Skill"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:733
+#: ../fheroes2/castle/castle_town.cpp:735
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:146
 #: ../fheroes2/heroes/heroes_dialog.cpp:93
 #: ../fheroes2/heroes/heroes_dialog.cpp:446
@@ -933,42 +933,42 @@ msgstr ""
 msgid "Defense Skill"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1021
+#: ../fheroes2/castle/castle_town.cpp:1023
 #: ../fheroes2/heroes/heroes_dialog.cpp:502
 msgid "Spread Formation"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1023
+#: ../fheroes2/castle/castle_town.cpp:1025
 #: ../fheroes2/heroes/heroes_dialog.cpp:504
 msgid "Grouped Formation"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1133
+#: ../fheroes2/castle/castle_town.cpp:1135
 msgid "Cannot recruit - you have too many Heroes."
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1136
+#: ../fheroes2/castle/castle_town.cpp:1138
 msgid "Cannot recruit - you already have a Hero in this town."
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1139
+#: ../fheroes2/castle/castle_town.cpp:1141
 msgid "Cannot afford a Hero"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1143
-#: ../fheroes2/castle/castle_town.cpp:1151
+#: ../fheroes2/castle/castle_town.cpp:1145
+#: ../fheroes2/castle/castle_town.cpp:1153
 msgid "Recruit %{name} the %{race}"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1159
+#: ../fheroes2/castle/castle_town.cpp:1161
 msgid "Set garrison combat formation to 'Spread'"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1162
+#: ../fheroes2/castle/castle_town.cpp:1164
 msgid "Set garrison combat formation to 'Grouped'"
 msgstr ""
 
-#: ../fheroes2/castle/castle_town.cpp:1165
+#: ../fheroes2/castle/castle_town.cpp:1167
 msgid "Castle Options"
 msgstr ""
 
@@ -1192,19 +1192,19 @@ msgid ""
 "%{monster}"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:120
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:137
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:166
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:122
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:139
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:168
 msgid "(already visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:120
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:137
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:166
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:122
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:139
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:168
 msgid "(not visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:282
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:284
 msgid "Defenders:"
 msgstr ""
 
@@ -4814,16 +4814,32 @@ msgstr ""
 msgid "Pikeman"
 msgstr ""
 
+#: ../fheroes2/monster/monster.cpp:50
+msgid "Pikemen"
+msgstr ""
+
 #: ../fheroes2/monster/monster.cpp:51
 msgid "Veteran Pikeman"
+msgstr ""
+
+#: ../fheroes2/monster/monster.cpp:51
+msgid "Veteran Pikemen"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:52
 msgid "Swordsman"
 msgstr ""
 
+#: ../fheroes2/monster/monster.cpp:52
+msgid "Swordsmen"
+msgstr ""
+
 #: ../fheroes2/monster/monster.cpp:53
 msgid "Master Swordman"
+msgstr ""
+
+#: ../fheroes2/monster/monster.cpp:53
+msgid "Master Swordmen"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:54
@@ -4918,12 +4934,12 @@ msgstr ""
 msgid "War Troll"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:68
-msgid "Cyclops"
+#: ../fheroes2/monster/monster.cpp:67
+msgid "War Trolls"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:68
-msgid "Cyclopes"
+msgid "Cyclops"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:71
@@ -5107,11 +5123,11 @@ msgid "Rocs"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:98
-msgid "Mage"
+msgid "Magi"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:99
-msgid "Archmage"
+msgid "Archmagi"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:100
@@ -5155,7 +5171,7 @@ msgid "Mummy"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:107
-msgid "Mummys"
+msgid "Mummies"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:108
@@ -5163,7 +5179,7 @@ msgid "Royal Mummy"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:108
-msgid "Royal Mummys"
+msgid "Royal Mummies"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:109
@@ -5187,7 +5203,7 @@ msgid "Lich"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:111
-msgid "Lichs"
+msgid "Liches"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:112
@@ -5195,7 +5211,7 @@ msgid "Power Lich"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:112
-msgid "Power Lichs"
+msgid "Power Liches"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:113
@@ -5247,35 +5263,35 @@ msgid "Medusas"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:121
-msgid "Earth Element"
+msgid "Earth Elemental"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:121
-msgid "Earth Elements"
+msgid "Earth Elementals"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:122
-msgid "Air Element"
+msgid "Air Elemental"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:122
-msgid "Air Elements"
+msgid "Air Elementals"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:123
-msgid "Fire Element"
+msgid "Fire Elemental"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:123
-msgid "Fire Elements"
+msgid "Fire Elementals"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:124
-msgid "Water Element"
+msgid "Water Elemental"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:124
-msgid "Water Elements"
+msgid "Water Elementals"
 msgstr ""
 
 #: ../fheroes2/network/client.cpp:192 ../fheroes2/network/client.cpp:205

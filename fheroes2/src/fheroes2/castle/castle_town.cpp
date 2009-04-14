@@ -188,9 +188,11 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
 	DWELLING_UPGRADE6 |
 	DWELLING_UPGRADE7) & build)
     {
-	str = _("The %{building} produces %{monster}.");
-	String::Replace(str, "%{building}", GetStringBuilding(build, race));
-	String::Replace(str, "%{monster}", Monster(race, build).GetMultiName());
+        str = _("The %{building} produces %{monster}.");
+        String::Replace(str, "%{building}", GetStringBuilding(build, race));
+        std::string name = Monster(race, build).GetMultiName();
+        String::Lower(name);
+        String::Replace(str, "%{monster}", name);
     }
     else
 	str = GetDescriptionBuilding(build, race);
