@@ -44,7 +44,7 @@ void TextAscii::Clear(void)
 
 u8 TextAscii::CharWidth(char c, Font::type_t f)
 {
-    return (c < 0x21 ? (Font::SMALL == f ? 4 : 6) : AGG::GetLetter(c, f).w());
+    return (c < 0x21 ? (Font::SMALL == f || Font::YELLOW_SMALL == f ? 4 : 6) : AGG::GetLetter(c, f).w());
 }
 
 u8 TextAscii::CharHeight(Font::type_t f)
@@ -54,12 +54,12 @@ u8 TextAscii::CharHeight(Font::type_t f)
 
 u8 TextAscii::CharAscent(Font::type_t f)
 {
-    return Font::SMALL == f ? 8 : 13;
+    return Font::SMALL == f || Font::YELLOW_SMALL == f ? 8 : 13;
 }
 
 u8 TextAscii::CharDescent(Font::type_t f)
 {
-    return Font::SMALL == f ? 2 : 3;
+    return Font::SMALL == f || Font::YELLOW_SMALL == f ? 2 : 3;
 }
 
 u16 TextAscii::w(u16 s, u16 c) const
@@ -229,13 +229,13 @@ void TextUnicode::Clear(void)
 
 u8 TextUnicode::CharWidth(u16 c, Font::type_t f)
 {
-    return (c < 0x0021 ? (Font::SMALL == f ? 4 : 6) : AGG::GetUnicodeLetter(c, f).w());
+    return (c < 0x0021 ? (Font::SMALL == f || Font::YELLOW_SMALL == f ? 4 : 6) : AGG::GetUnicodeLetter(c, f).w());
 }
 
 u8 TextUnicode::CharHeight(Font::type_t f)
 {
 #ifdef WITH_TTF
-    return Font::SMALL == f ?
+    return Font::SMALL == f || Font::YELLOW_SMALL ?
         AGG::Cache::Get().GetSmallFont().Height() :
         AGG::Cache::Get().GetMediumFont().Height();
 #else

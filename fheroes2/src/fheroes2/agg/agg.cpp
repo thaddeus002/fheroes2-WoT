@@ -273,7 +273,8 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 
 	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 144; break;
 
-	case ICN::YELLOWFONT:  LoadICN(ICN::FONT); count = 95; break;
+	case ICN::YELLOW_FONT:  LoadICN(ICN::FONT); count = 96; break;
+	case ICN::YELLOW_SMALFONT: LoadICN(ICN::SMALFONT); count = 96; break;
 
 	default: break;
     }
@@ -327,8 +328,23 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 		sprite.ChangeColor(sprite.GetColor(0x60), sprite.GetColor(0xBB));
 		break;
 
-	    case ICN::YELLOWFONT:
+	    case ICN::YELLOW_FONT:
 		sprite = GetICN(ICN::FONT, ii);
+		sprite.ChangeColor(sprite.GetColor(0x0A), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0B), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0C), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0D), sprite.GetColor(0xDA));
+		sprite.ChangeColor(sprite.GetColor(0x0E), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x0F), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x10), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x11), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x12), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x13), sprite.GetColor(0xDB));
+		sprite.ChangeColor(sprite.GetColor(0x14), sprite.GetColor(0xDB));
+		break;
+
+	    case ICN::YELLOW_SMALFONT:
+		sprite = GetICN(ICN::SMALFONT, ii);
 		sprite.ChangeColor(sprite.GetColor(0x0A), sprite.GetColor(0xDA));
 		sprite.ChangeColor(sprite.GetColor(0x0B), sprite.GetColor(0xDA));
 		sprite.ChangeColor(sprite.GetColor(0x0C), sprite.GetColor(0xDA));
@@ -759,7 +775,8 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     if(0 == v.size())
     switch(icn)
     {
-	case ICN::YELLOWFONT:
+	case ICN::YELLOW_FONT:
+	case ICN::YELLOW_SMALFONT:
 	case ICN::ROUTERED:
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
@@ -1008,7 +1025,7 @@ const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
     if(AGG::Cache::Get().isValidFonts())
     {
 	const std::pair<Surface, Surface> & fonts = AGG::Cache::Get().GetFNT(ch);
-	return Font::SMALL == ft ? fonts.second : fonts.first;
+	return (Font::SMALL | Font::YELLOW_SMALL) & ft ? fonts.second : fonts.first;
     }
     else
     return AGG::GetLetter(ch, ft);
@@ -1017,6 +1034,16 @@ const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
 const Surface & AGG::GetLetter(char ch, u8 ft)
 {
     if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
-    
-    return Font::SMALL == ft ? AGG::GetICN(ICN::SMALFONT, ch - 0x20) : AGG::GetICN((Font::YELLOWBIG == ft ? ICN::YELLOWFONT : ICN::FONT), ch - 0x20);
+
+    switch(ft)
+    {
+	case Font::YELLOW_BIG:	return AGG::GetICN(ICN::YELLOW_FONT, ch - 0x20);
+	case Font::YELLOW_SMALL:return AGG::GetICN(ICN::YELLOW_SMALFONT, ch - 0x20);
+	case Font::BIG:		return AGG::GetICN(ICN::FONT, ch - 0x20);
+	case Font::SMALL:	return AGG::GetICN(ICN::SMALFONT, ch - 0x20);
+
+	default: break;
+    }
+
+    return AGG::GetICN(ICN::SMALFONT, ch - 0x20);
 }

@@ -27,7 +27,7 @@
 
 namespace Font
 {
-    typedef enum { SMALL = 0x01, BIG = 0x02, YELLOWBIG = 0x04 } type_t;
+    typedef enum { SMALL = 0x01, BIG = 0x02, YELLOW_BIG = 0x04, YELLOW_SMALL = 0x08 } type_t;
 };
 
 class TextInterface
