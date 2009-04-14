@@ -32,20 +32,6 @@
 extern char *basename(const char *path);
 extern Race::race_t ByteToRace(u8);
 
-void Game::Save(void)
-{
-    const std::string defaults(Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + "fheroes2.sav");
-
-    Save(defaults);
-}
-
-void Game::Load(void)
-{
-    const std::string defaults(Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + "fheroes2.sav");
-
-    Load(defaults);
-}
-
 void Game::Save(const std::string &fn)
 {
     Error::Verbose("Game::Save: " + fn);

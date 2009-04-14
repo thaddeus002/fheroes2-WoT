@@ -32,7 +32,7 @@
 
 
 extern char *basename(const char *path);
-bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &);
+bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
 void RedrawFileListSimple( const Rect &, const std::string &, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
 void RedrawMapsFileList(const Rect &, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
 
@@ -49,7 +49,7 @@ bool Dialog::SelectFileSave(std::string & file)
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
 
-    return SelectFileListSimple(_("File to Save:"), lists, file);
+    return SelectFileListSimple(_("File to Save:"), lists, file, true);
 }
 
 bool Dialog::SelectFileLoad(std::string & file)
@@ -65,10 +65,10 @@ bool Dialog::SelectFileLoad(std::string & file)
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
 
-    return SelectFileListSimple(_("File to Load:"), lists, file);
+    return SelectFileListSimple(_("File to Load:"), lists, file, false);
 }
 
-bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, std::string & filename)
+bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, std::string & filename, bool editor)
 {
     // preload
     AGG::PreloadObject(ICN::REQBKG);
@@ -82,6 +82,8 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
     const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
     Background back((display.w() - panel.w()) / 2, (display.h() - panel.h()) / 2, panel.w(), panel.h());
+    back.Save();
+
     const Rect & rt = back.GetRect();
     const Rect list_rt(rt.x + 40, rt.y + 55, 265, 215);
 
@@ -229,6 +231,10 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	}
     }
 
+    cursor.Hide();
+    back.Restore();
+    display.Flip();
+
     return filename.size();
 }
 
@@ -309,6 +315,8 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
     
     const Sprite & panel = AGG::GetICN(ICN::REQSBKG, 0);
     Background back((display.w() - panel.w()) / 2, (display.h() - panel.h()) / 2, panel.w(), panel.h());
+    back.Save();
+
     const Rect & rt = back.GetRect();
     const Rect list_rt(rt.x + 55, rt.y + 55, 270, 175);
 
@@ -523,6 +531,10 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
     }
 
     filename = (*cur).FileMaps();
+
+    cursor.Hide();
+    back.Restore();
+    display.Flip();
 }
 
 void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFileInfoList::const_iterator top, MapsFileInfoList::const_iterator cur, const u8 max_items)

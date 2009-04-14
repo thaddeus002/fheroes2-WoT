@@ -43,6 +43,7 @@ namespace
         { "battlemoveshadow",  Settings::BATTLEMOVESHADOW            },
         { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           },
         { "unicode",           Settings::UNICODE                     },
+        { "autosave",          Settings::AUTOSAVE                    },
         { "use cache",         Settings::USECACHE                    },
     };
 }
@@ -183,6 +184,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "unicode = " << (Modes(UNICODE) ? "on" : "off") << std::endl;
 #endif
 
+    stream << "autosave = " << (Modes(AUTOSAVE) ? "on" : "off") << std::endl;
     stream << "port = " << port << std::endl;
 
     stream << std::endl;

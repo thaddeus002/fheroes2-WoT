@@ -25,9 +25,6 @@
 
 namespace Game
 {
-    void Save(void);
-    void Load(void);
-
     void Save(const std::string & fn);
     void Load(const std::string & fn);
 

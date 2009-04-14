@@ -38,6 +38,7 @@ public:
     {
 	NONE              = 0x00000000,
 	LOADGAME          = 0x00000001,
+	AUTOSAVE          = 0x00000002,
 
         FONTRENDERBLENDED = 0x00008000,
 

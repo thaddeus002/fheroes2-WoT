@@ -780,6 +780,8 @@ Game::menu_t Game::HumanTurn(void)
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
     Game::EnvironmentSoundMixer();
 
+    std::string filename;
+
     cursor.Show();
     display.Flip();
 
@@ -866,7 +868,7 @@ Game::menu_t Game::HumanTurn(void)
 
             if(!myKingdom.HeroesMayStillMove() ||
                 Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
-		return ENDTURN;
+		res = ENDTURN;
 
     	    continue;
         }
@@ -920,13 +922,28 @@ Game::menu_t Game::HumanTurn(void)
 	}
 	else
 	// save game
-	if(le.KeyPress(KEY_s)){ Game::Save(); Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK); }
+	if(le.KeyPress(KEY_s))
+	{
+	    if(Dialog::SelectFileSave(filename) && filename.size())
+	    {
+		Game::Save(filename);
+		Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
+	    }
+	}
 	else
 	// load game
 	if(le.KeyPress(KEY_l))
-	{ 
-	    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-	    return LOADGAME;
+	{
+	    if(conf.Original())
+	    {
+		if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+		return LOADGAME;
+	    }
+	    else
+	    {
+		// fast load
+		if(Dialog::SelectFileLoad(filename) && filename.size()){ Game::Load(filename); return STARTGAME; }
+	    }
 	}
 	else
 	// puzzle maps
@@ -1426,7 +1443,7 @@ Game::menu_t Game::HumanTurn(void)
 			break;
 
 		    case SAVEGAME:
-			Save();
+			if(Dialog::SelectFileSave(filename) && filename.size()) Game::Save(filename);
 			Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
 			break;
 
@@ -1586,6 +1603,12 @@ Game::menu_t Game::HumanTurn(void)
 	global_focus.GetHeroes().ShowPath(false);
 	global_focus.Redraw();
         display.Flip();
+    }
+
+    if(ENDTURN == res && conf.Modes(Settings::AUTOSAVE))
+    {
+	filename = conf.LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR +  "autosave.sav";
+	Game::Save(filename);
     }
 
     return res;
