@@ -145,6 +145,7 @@ void Game::SaveXML(const std::string &fn)
 	tile2->SetAttribute("quantity1", tile.quantity1);
 	tile2->SetAttribute("quantity2", tile.quantity2);
 	tile2->SetAttribute("fogs", tile.fogs);
+	tile2->SetAttribute("flags", tile.flags);
 
 	// tiles->tile->addons1
 	TiXmlElement* addons = new TiXmlElement("addons_level1");
@@ -810,6 +811,8 @@ void Game::LoadXML(const std::string &fn)
 	tile->quantity2 = res;
 	tile2->Attribute("fogs", &res);
 	tile->fogs = res;
+	tile2->Attribute("flags", &res);
+	tile->flags = res;
 
 	// tiles->tile->addons1
 	TiXmlElement *addons = tile2->FirstChildElement("addons_level1");

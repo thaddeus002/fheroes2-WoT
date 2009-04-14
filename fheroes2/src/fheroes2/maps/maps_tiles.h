@@ -54,6 +54,14 @@ namespace Maps
         u8	index;
     };
 
+    enum flags_t
+    {
+	REDRAW	= 0x01,	// reserved
+	USR2	= 0x02,
+	USR4	= 0x04,
+	USR8	= 0x08
+    };
+
     class Tiles
     {
     public:
@@ -166,7 +174,7 @@ namespace Maps
         u8      quantity1;
         u8      quantity2;
         u8	fogs;
-	bool	redraw;
+	u8	flags;
     };
 };
 
