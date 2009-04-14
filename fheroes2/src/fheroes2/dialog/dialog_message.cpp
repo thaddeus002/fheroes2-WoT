@@ -39,7 +39,7 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    TextBox textbox1(header, (ft == Font::BIG ? Font::YELLOWBIG : ft), BOXAREA_WIDTH);
+    TextBox textbox1(header, ft == Font::BIG ? Font::YELLOW_BIG : Font::YELLOW_SMALL, BOXAREA_WIDTH);
     TextBox textbox2(message, ft, BOXAREA_WIDTH);
 
     Box box((header.size() ? textbox1.h() + 10 : 10) + textbox2.h(), buttons);

@@ -52,7 +52,7 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     std::list<Maps::FileInfo *> info_maps;
-
+            
     Settings & conf = Settings::Get();
 
     conf.SetPlayers(Color::BLUE);
@@ -66,17 +66,21 @@ Game::menu_t Game::ScenarioInfo(void)
 
     for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
     {
-	Maps::FileInfo *mi = new Maps::FileInfo(*itd);
-	const std::bitset<8> colors(mi->AllowColors());
-	
-	// multi map filter
-	if(Game::MULTI & conf.GameType() && conf.PreferablyCountPlayers() > colors.count())
-	{
-	    delete mi;
-	    continue;
-	}
+       Maps::FileInfo *mi = new Maps::FileInfo();
+       if(mi->ReadBIN(*itd))
+       {
+           const std::bitset<8> colors(mi->AllowColors());
+           // multi map filter
+           if(Game::MULTI & conf.GameType() && conf.PreferablyCountPlayers() > colors.count())
+           {
+               delete mi;
+               continue;
+           }
 
-	info_maps.push_back(mi);
+           info_maps.push_back(mi);
+       }
+       else
+            delete mi;
     }
 
     // empty maps

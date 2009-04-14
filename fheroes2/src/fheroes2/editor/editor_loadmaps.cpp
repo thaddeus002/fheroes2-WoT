@@ -47,7 +47,10 @@ Game::menu_t Game::Editor::LoadMaps(void)
     }
 
     for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
-	info_maps.push_back(new Maps::FileInfo(*itd));
+    {
+       Maps::FileInfo* mi = new Maps::FileInfo;
+       mi->ReadBIN(*itd) ? info_maps.push_back(mi) : delete mi;
+    }
 
     // show dialog
     const Maps::FileInfo * finfo = Dialog::SelectFileInfo(info_maps);

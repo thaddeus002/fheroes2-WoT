@@ -367,7 +367,7 @@ void DrawList(std::list<Maps::FileInfo *>::const_iterator &it_top, std::list<Map
 	display.Blit(spriteSize, x + spriteCount.w() + 2, y);
 
 	// text longname
-	Text text(info.Name(), (it_head == it_sel ? Font::YELLOWBIG : Font::BIG));
+	Text text(info.Name(), (it_head == it_sel ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(x + spriteCount.w() + spriteSize.w() + 18, y);
 
 	// sprite wins
