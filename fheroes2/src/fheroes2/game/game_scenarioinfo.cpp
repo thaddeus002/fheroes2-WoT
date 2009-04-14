@@ -51,47 +51,26 @@ Game::menu_t Game::ScenarioInfo(void)
 {
     AGG::PlayMusic(MUS::MAINMENU);
 
-    std::list<Maps::FileInfo *> info_maps;
-            
     Settings & conf = Settings::Get();
-
     conf.SetPlayers(Color::BLUE);
-    // read maps directory
+
     Dir dir;
-
     dir.Read(conf.MapsDirectory(), ".mp2", false);
-
     // loyality version
     if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
 
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
+    if(dir.empty())
     {
-       Maps::FileInfo *mi = new Maps::FileInfo();
-       if(mi->ReadBIN(*itd))
-       {
-           const std::bitset<8> colors(mi->AllowColors());
-           // multi map filter
-           if(Game::MULTI & conf.GameType() && conf.PreferablyCountPlayers() > colors.count())
-           {
-               delete mi;
-               continue;
-           }
-
-           info_maps.push_back(mi);
-       }
-       else
-            delete mi;
+        Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
+        return MAINMENU;
     }
 
-    // empty maps
-    if(info_maps.empty())
-    {
-	Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
-	return MAINMENU;
-    }
-
-    // sort list
-    info_maps.sort(Maps::FileInfo::PredicateForSorting);
+    MapsFileInfoList lists(dir.size());
+    MapsFileInfoList::const_iterator res;
+    int ii = 0;
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadBIN(*itd)) --ii;
+    if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
+    std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
 
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -110,7 +89,7 @@ Game::menu_t Game::ScenarioInfo(void)
     display.SetVideoMode(640, 480);
 
     // set first maps settings
-    conf.LoadFileMaps(info_maps.front()->FileMaps());
+    conf.LoadFileMaps(lists.front().FileMaps());
 
     Button buttonSelectMaps(513, 77, ICN::NGEXTRA, 64, 65);
     Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
@@ -278,8 +257,9 @@ Game::menu_t Game::ScenarioInfo(void)
 	// click select
 	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectMaps))
 	{
-	    const Maps::FileInfo * finfo = Dialog::SelectFileInfo(info_maps);
-	    if(NULL != finfo) conf.LoadFileMaps(finfo->FileMaps());
+	    std::string filemaps;
+	    Dialog::SelectMapsFileList(lists, filemaps);
+	    conf.LoadFileMaps(filemaps);
 
 	    cursor.Hide();
 	    levelCursor.Hide();
@@ -353,10 +333,6 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Click to accept these settings and start a new game."), Font::BIG);
 	if(le.MousePressRight(buttonCancel)) Dialog::Message(_("Cancel"), _("Click to return to the main menu."), Font::BIG);
     }
-
-    std::list<Maps::FileInfo *>::const_iterator it1 = info_maps.begin();
-    std::list<Maps::FileInfo *>::const_iterator it2 = info_maps.end();
-    for(; it1 != it2; ++it1) if(*it1) delete *it1;
 
     cursor.Hide();
 

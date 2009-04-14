@@ -22,12 +22,14 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include "gamedefs.h"
 #include "monster.h"
 #include "spell.h"
 #include "skill.h"
 #include "text.h"
 #include "resource.h"
+#include "maps_fileinfo.h"
 #include "game.h"
 
 #define	SHADOWWIDTH	16
@@ -38,6 +40,8 @@
 class Castle;
 class Heroes;
 class Surface;
+
+typedef std::vector<Maps::FileInfo> MapsFileInfoList;
 
 namespace Army
 {
@@ -78,7 +82,10 @@ namespace Dialog
     answer_t AdventureOptions(const bool enabledig);
     Game::menu_t FileOptions(void);
     u8    SystemOptions(void);
-    const Maps::FileInfo * SelectFileInfo(const std::list<Maps::FileInfo *> & list);
+
+    bool SelectFileLoad(std::string &);
+    bool SelectFileSave(std::string &);
+    void SelectMapsFileList(MapsFileInfoList &, std::string &);
 
     // show info cell maps
     void QuickInfo(const Maps::Tiles & tile);
@@ -97,7 +104,7 @@ namespace Dialog
     void SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
     void SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill);
     u16  SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons = Dialog::OK);
-    u16 ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs, bool yesNo = false);
+    void ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs);
 
     Skill::Primary::skill_t SelectSkillFromArena(void);
 

@@ -120,9 +120,7 @@ Game::menu_t Game::LoadStandard(void)
 
     std::string file;
 
-//    Dialog::SelectFileLoad(file);
-
-    if(file.empty()) return MAINMENU;
+    if(!Dialog::SelectFileLoad(file) || file.empty()) return MAINMENU;
 
     Game::Load(file);
 

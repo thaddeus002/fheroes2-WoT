@@ -24,7 +24,7 @@
 #include "button.h"
 #include "dialog.h"
 
-u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs, bool yesNo /* = false */)
+void Dialog::ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -48,7 +48,7 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
 
     if(header.size())
     {
-        box1.Blit(pos);
+	box1.Blit(pos);
         pos.y += box1.h() + 10;
     }
 
@@ -63,59 +63,26 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
-    Point pt[2];
-    Button *button[2] = { NULL };
-    answer_t result[2] = { Dialog::ZERO };
+    Point pt;
+    
+    pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
+    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    Button button(pt, system, 1, 2);
 
-    if(!yesNo)
-    {
-        pt[0].x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-        pt[0].y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-        button[0] = new Button(pt[0], system, 1, 2);
-        result[0] = Dialog::OK;
-    }
-    else
-    {
-        pt[0].x = box.GetArea().x;
-        pt[0].y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
-	    button[0] = new Button(pt[0], system, 5, 6);
-	    result[0] = YES;
-        pt[1].x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 7).w();
-        pt[1].y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 7).h();
-	    button[1] = new Button(pt[1], system, 7, 8);
-	    result[1] = NO;
-    }
-
-    u8 idx;
-    for(idx = 0; idx < (u8)sizeof(button)/sizeof(button[0]); idx++)
-        if(button[idx])
-            button[idx]->Draw();
+    button.Draw();
 
     cursor.Show();
     display.Flip();
 
-    u16 ret = Dialog::ZERO;
-
     // message loop
-    while(le.HandleEvents() && ret == Dialog::ZERO)
+    while(le.HandleEvents())
     {
-        for(idx = 0; idx < (u8)sizeof(button)/sizeof(button[0]); idx++)
-            if(button[idx])
-            {
-                le.MousePressLeft(*button[idx]) ? button[idx]->PressDraw() : button[idx]->ReleaseDraw();
-                if(le.MouseClickLeft(*button[idx]))
-                    ret = result[idx];
-            }
+	le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
 
-        if(le.KeyPress(KEY_RETURN))
-            ret = result[0];
-        else if(le.KeyPress(KEY_ESCAPE))
-            ret = result[1];
+        if(le.MouseClickLeft(button)){ break; }
+
+	if(le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)){ break; }
     }
-    
+
     cursor.Hide();
-    delete button[0];
-    delete button[1];
-    
-    return ret;
 }

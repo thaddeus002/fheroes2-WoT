@@ -486,11 +486,11 @@ bool Maps::FileInfo::ReadBIN(const std::string & filename)
     return true;
 }
 
-bool Maps::FileInfo::PredicateForSorting(const FileInfo *fi1, const FileInfo *fi2)
+bool Maps::FileInfo::PredicateForSorting(const FileInfo & fi1, const FileInfo & fi2)
 {
-    if(!fi1 || !fi2 || fi1->name.empty() || fi2->name.empty()) return false;
+    if(fi1.name.empty() || fi2.name.empty()) return false;
 
-    return std::tolower(fi1->name[0]) < std::tolower(fi2->name[0]);
+    return std::tolower(fi1.name[0]) < std::tolower(fi2.name[0]);
 }
 
 u8 Maps::FileInfo::Wins1(void) const

@@ -66,7 +66,7 @@ public:
     Race::race_t KingdomRace(Color::color_t) const;
     void SetKingdomRace(Color::color_t, Race::race_t);
 
-    static bool PredicateForSorting(const FileInfo*, const FileInfo*);
+    static bool PredicateForSorting(const FileInfo &, const FileInfo &);
 
 private:
     friend void Game::SaveXML(const std::string &);
