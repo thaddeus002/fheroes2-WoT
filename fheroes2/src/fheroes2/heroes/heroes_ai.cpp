@@ -280,7 +280,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(ownRatio / otherRatio >= 5)
+    if(!avoidBattle && ownRatio / otherRatio >= 5)
     {
         avoidBattle = Rand::Get(0, 10) < 5;
     }

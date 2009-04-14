@@ -546,7 +546,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(ownRatio / otherRatio >= 5)
+    if(!avoidBattle && ownRatio / otherRatio >= 5)
     {
         std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.\nDo you wish to pursue and engage them?");
         std::string monst = monster.GetMultiName();
