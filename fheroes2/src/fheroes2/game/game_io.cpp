@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cstring>
+#include <ctime>
 #include "settings.h"
 #include "kingdom.h"
 #include "heroes.h"
@@ -26,9 +28,9 @@
 #include "world.h"
 #include "gameevent.h"
 #include "xmlccwrap.h"
-#include <cstring>
 
 extern char *basename(const char *path);
+extern Race::race_t ByteToRace(u8);
 
 void Game::Save(void)
 {
@@ -75,7 +77,8 @@ void Game::SaveXML(const std::string &fn)
 
     root->SetAttribute("version", str.c_str());
     root->SetAttribute("build", conf.build_date);
-                        
+    root->SetAttribute("time", std::time(NULL));
+
     doc.LinkEndChild(root);
 
     // maps
@@ -96,6 +99,14 @@ void Game::SaveXML(const std::string &fn)
     maps->SetAttribute("conditions_loss", conf.current_maps_file.conditions_loss);
     maps->SetAttribute("loss1", conf.current_maps_file.loss1);
     maps->SetAttribute("loss2", conf.current_maps_file.loss2);
+    node = new TiXmlElement("races");
+    maps->LinkEndChild(node);
+    node->SetAttribute("blue", conf.current_maps_file.races[0]);
+    node->SetAttribute("green", conf.current_maps_file.races[1]);
+    node->SetAttribute("red", conf.current_maps_file.races[2]);
+    node->SetAttribute("yellow", conf.current_maps_file.races[3]);
+    node->SetAttribute("orange", conf.current_maps_file.races[4]);
+    node->SetAttribute("purple", conf.current_maps_file.races[5]);
     node = new TiXmlElement("name");
     maps->LinkEndChild(node);
     node->LinkEndChild(new TiXmlText(conf.current_maps_file.name.c_str()));
@@ -708,6 +719,24 @@ void Game::LoadXML(const std::string &fn)
     //
     node = maps->FirstChildElement("description");
     if(node) conf.current_maps_file.description = node->GetText();
+    //
+    node = maps->FirstChildElement("races");
+    if(node)
+    {
+	node->Attribute("blue", &res);
+	conf.current_maps_file.races[0] = ByteToRace(res);
+	node->Attribute("green", &res);
+	conf.current_maps_file.races[1] = ByteToRace(res);
+	node->Attribute("red", &res);
+	conf.current_maps_file.races[2] = ByteToRace(res);
+	node->Attribute("yellow", &res);
+	conf.current_maps_file.races[3] = ByteToRace(res);
+	node->Attribute("orange", &res);
+	conf.current_maps_file.races[4] = ByteToRace(res);
+	node->Attribute("purple", &res);
+	conf.current_maps_file.races[5] = ByteToRace(res);
+    }
+
     //
     maps->Attribute("difficulty", &res);
     conf.current_maps_file.difficulty = Difficulty::Get(res);

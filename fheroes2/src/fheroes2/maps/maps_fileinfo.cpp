@@ -18,23 +18,37 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
+#include <algorithm>
 #include <fstream>
-#include "kingdom.h"
+#include "xmlccwrap.h"
 #include "maps_fileinfo.h"
 
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
 
-Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
-    kingdom_colors(0), allow_colors(0), rnd_colors(0), with_heroes(false), races(KINGDOMMAX)
+Race::race_t ByteToRace(u8 byte)
 {
+    switch(byte)
+    {
+	case 0x00:	return Race::KNGT;
+	case 0x01:	return Race::BARB;
+	case 0x02:	return Race::SORC;
+	case 0x03:	return Race::WRLK;
+	case 0x04:	return Race::WZRD;
+	case 0x05:	return Race::NECR;
+	case 0x06:	return Race::MULT;
+	case 0x07:	return Race::RAND;
+
+	default: 	break;
+    }
+
+    return Race::BOMG;
 }
 
-Maps::FileInfo::FileInfo(const std::string &filename) : difficulty(Difficulty::EASY),
-    kingdom_colors(0), allow_colors(0), rnd_colors(0), with_heroes(false), races(KINGDOMMAX)
+Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
+    kingdom_colors(0), allow_colors(0), rnd_colors(0), localtime(0), with_heroes(false)
 {
-    Read(filename);
+    for(u8 ii = 0; ii < KINGDOMMAX; ++ii) races[ii] = Race::BOMG;
 }
 
 const std::string & Maps::FileInfo::FileMaps(void) const
@@ -50,6 +64,11 @@ const std::string & Maps::FileInfo::Name(void) const
 const std::string & Maps::FileInfo::Description(void) const
 {
     return description;
+}
+
+const time_t & Maps::FileInfo::Time(void) const
+{
+    return localtime;
 }
 
 const Size & Maps::FileInfo::SizeMaps(void) const
@@ -82,7 +101,7 @@ u8 Maps::FileInfo::ConditionsLoss(void) const
     return conditions_loss;
 }
 
-Race::race_t Maps::FileInfo::KingdomRace(const Color::color_t color) const
+Race::race_t Maps::FileInfo::KingdomRace(Color::color_t color) const
 {
     switch(color)
     {
@@ -99,7 +118,7 @@ Race::race_t Maps::FileInfo::KingdomRace(const Color::color_t color) const
     return Race::BOMG;
 }
 
-void Maps::FileInfo::SetKingdomRace(const Color::color_t color, const Race::race_t race)
+void Maps::FileInfo::SetKingdomRace(Color::color_t color, Race::race_t race)
 {
     switch(color)
     {
@@ -126,28 +145,153 @@ bool Maps::FileInfo::PlayWithHeroes(void) const
 
 bool Maps::FileInfo::Read(const std::string &filename)
 {
-    difficulty = Difficulty::EASY;
-    kingdom_colors = 0;
-    allow_colors = 0;
-    rnd_colors = 0;
-    with_heroes = false;
-    races[0] = Race::BOMG;
-    races[1] = Race::BOMG;
-    races[2] = Race::BOMG;
-    races[3] = Race::BOMG;
-    races[4] = Race::BOMG;
-    races[5] = Race::BOMG;
+    if(ReadBIN(filename)) return true;
+    else
+    if(ReadXML(filename)) return true;
 
+    return false;
+}
+
+bool Maps::FileInfo::ReadXML(const std::string &filename)
+{
+    TiXmlDocument doc;
+
+    // prepare small xml in to memory (for fast loading)
+    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
+    if(! fd || fd.fail())
+    {
+        Error::Warning("Maps::FileInfo::ReadXML: " + filename +", file not found.");
+        return false;
+    }
+
+    std::vector<char> buf(1024, 0);
+    fd.read(&buf[0], buf.size() - 1);
+    fd.close();
+
+    const char* pred1 = "<game";
+    const char* pred2 = "</fheroes2>";
+    std::vector<char>::iterator it = std::search(buf.begin(), buf.end(), pred1, pred1 + std::strlen(pred1));
+
+    if(it == buf.end())
+    {
+        Error::Verbose("Maps::FileInfo::ReadXML: tag not found, broken file " + filename);
+        return false;
+    }
+
+    buf.resize(it - buf.begin() + std::strlen(pred2) + 1);
+    std::copy(pred2, pred2 + std::strlen(pred2) + 1, it);
+
+    // parse block
+    doc.Parse(&buf[0]);
+
+    if(doc.Error())
+    {
+        Error::Verbose("Maps::FileInfo::ReadXML: parse error");
+        return false;
+    }
+
+    TiXmlElement* root = doc.FirstChildElement();
+
+    if(!root || std::strcmp("fheroes2", root->Value()))
+    {
+        Error::Verbose("Maps::FileInfo::ReadXML: 1 broken file " + filename);
+        return false;
+    }
+
+    TiXmlElement *node;
+    TiXmlElement *maps = root->FirstChildElement("maps");
+
+    if(!maps)
+    {
+        Error::Verbose("Maps::FileInfo::ReadXML: 2 broken file " + filename);
+        return false;
+    }
+
+    int res;
+
+    // fheroes2 version
+    //str = root->Attribute("version");
+    // fheroes2 build
+    //root->Attribute("build", &res);
+
+    // locatime
+    root->Attribute("time", &res);
+    localtime = res;
+
+    // maps
+    maps->Attribute("width", &res);
+    size.w = res;
+    maps->Attribute("height", &res);
+    size.h = res;
+    //
     file = filename;
+    //
+    node = maps->FirstChildElement("name");
+    if(node) name = node->GetText();
+    //
+    node = maps->FirstChildElement("description");
+    if(node) description = node->GetText();
+    //
+    node = maps->FirstChildElement("races");
+    if(node)
+    {
+        node->Attribute("blue", &res);
+        races[0] = ByteToRace(res);
+        node->Attribute("green", &res);
+        races[1] = ByteToRace(res);
+        node->Attribute("red", &res);
+        races[2] = ByteToRace(res);
+        node->Attribute("yellow", &res);
+        races[3] = ByteToRace(res);
+        node->Attribute("orange", &res);
+        races[4] = ByteToRace(res);
+        node->Attribute("purple", &res);
+        races[5] = ByteToRace(res);
+    }
+    //
+    maps->Attribute("difficulty", &res);
+    difficulty = Difficulty::Get(res);
+    maps->Attribute("kingdom_colors", &res);
+    kingdom_colors = res;
+    maps->Attribute("allow_colors", &res);
+    allow_colors = res;
+    maps->Attribute("rnd_colors", &res);
+    rnd_colors = res;
+    maps->Attribute("conditions_wins", &res);
+    conditions_wins = res;
+    maps->Attribute("wins1", &res);
+    wins1 = res;
+    maps->Attribute("wins2", &res);
+    wins2 = res;
+    maps->Attribute("wins3", &res);
+    wins3 = res;
+    maps->Attribute("wins4", &res);
+    wins4 = res;
+    maps->Attribute("conditions_loss", &res);
+    conditions_loss = res;
+    maps->Attribute("loss1", &res);
+    loss1 = res;
+    maps->Attribute("loss2", &res);
+    loss2 = res;
 
+    return true;
+}
+
+bool Maps::FileInfo::ReadBIN(const std::string & filename)
+{
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(! fd || fd.fail())
     {
 	Error::Warning("Maps::FileInfo: " + filename +", file not found.");
-
 	return false;
     }
+
+    file = filename;
+    kingdom_colors = 0;
+    allow_colors = 0;
+    rnd_colors = 0;
+    localtime = 0;
 
     u8  byte8;
     u16 byte16;
@@ -307,7 +451,7 @@ bool Maps::FileInfo::Read(const std::string &filename)
     // start with hero
     fd.seekg(0x25, std::ios_base::beg);
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(0 == byte8) with_heroes = true;
+    with_heroes = 0 == byte8;
 
     // race color
     fd.read(reinterpret_cast<char *>(&byte8), 1);
@@ -340,25 +484,6 @@ bool Maps::FileInfo::Read(const std::string &filename)
     fd.close();
     
     return true;
-}
-
-Race::race_t Maps::FileInfo::ByteToRace(u8 byte)
-{
-    switch(byte)
-    {
-	case 0x00:	return Race::KNGT;
-	case 0x01:	return Race::BARB;
-	case 0x02:	return Race::SORC;
-	case 0x03:	return Race::WRLK;
-	case 0x04:	return Race::WZRD;
-	case 0x05:	return Race::NECR;
-	case 0x06:	return Race::MULT;
-	case 0x07:	return Race::RAND;
-
-	default: 	break;
-    }
-
-    return Race::BOMG;
 }
 
 bool Maps::FileInfo::PredicateForSorting(const FileInfo *fi1, const FileInfo *fi2)

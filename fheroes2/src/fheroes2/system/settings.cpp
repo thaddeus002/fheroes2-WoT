@@ -191,16 +191,14 @@ void Settings::Dump(std::ostream & stream) const
 /* read maps info */
 void Settings::LoadFileMaps(const std::string & file)
 {
-    current_maps_file.Read(file);
+    if(! current_maps_file.Read(file)) return;
 
     // set my color
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(current_maps_file.AllowColors() & color)
-	{
-	    my_color = color;
-
-	    break;
-	}
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(current_maps_file.AllowColors() & color)
+    {
+	my_color = color;
+	break;
+    }
 
     // game difficulty
     game_difficulty = Difficulty::NORMAL;

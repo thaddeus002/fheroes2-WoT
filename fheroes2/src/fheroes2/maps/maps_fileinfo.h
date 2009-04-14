@@ -20,12 +20,12 @@
 #ifndef H2MAPSFILEINFO_H
 #define H2MAPSFILEINFO_H
 
-#include <vector>
-
+#include <ctime>
 #include "maps.h"
 #include "difficulty.h"
 #include "color.h"
 #include "race.h"
+#include "kingdom.h"
 #include "gamedefs.h"
 #include "game_io.h"
 
@@ -37,13 +37,15 @@ class FileInfo
 
 public:
     FileInfo();
-    FileInfo(const std::string &filename);
 
-    bool Read(const std::string &filename);
+    bool Read(const std::string &);
+    bool ReadBIN(const std::string &);
+    bool ReadXML(const std::string &);
 
     const std::string & FileMaps(void) const;
     const std::string & Name(void) const;
     const std::string & Description(void) const;
+    const time_t & Time(void) const;
 
     u8 KingdomColors(void) const;
     u8 AllowColors(void) const;
@@ -56,20 +58,15 @@ public:
     u8 Loss1(void) const;
     u8 Loss2(void) const;
 
-    Race::race_t KingdomRace(const Color::color_t color) const;
-
     bool PlayWithHeroes(void) const;
-
     const Size & SizeMaps(void) const;
     Difficulty::difficulty_t Difficulty(void) const;
-
     void SetKingdomColors(const u8 colors);
-    void SetKingdomRace(const Color::color_t color, const Race::race_t race);
+
+    Race::race_t KingdomRace(Color::color_t) const;
+    void SetKingdomRace(Color::color_t, Race::race_t);
 
     static bool PredicateForSorting(const FileInfo*, const FileInfo*);
-
-protected:
-    static Race::race_t ByteToRace(u8 byte);
 
 private:
     friend void Game::SaveXML(const std::string &);
@@ -81,6 +78,7 @@ private:
 
     Size size;
     Difficulty::difficulty_t difficulty;
+    Race::race_t races[KINGDOMMAX];
 
     u8 kingdom_colors;
     u8 allow_colors;
@@ -94,9 +92,9 @@ private:
     u8 loss1;
     u8 loss2;
 
-    bool with_heroes;
+    time_t localtime;
 
-    std::vector<Race::race_t> races;
+    bool with_heroes;
 };
 
 };
