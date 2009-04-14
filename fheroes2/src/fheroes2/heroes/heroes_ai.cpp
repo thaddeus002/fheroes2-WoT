@@ -228,31 +228,25 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     u32 ownRatio, otherRatio;
     hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
 
-    bool join = (Rand::Get(0, 10) <= 2);              // FIXME: see Heroes::ActionToMonster
-    bool join_free_or_cost = (Rand::Get(0, 10) <= 2); // FIXME: see Heroes::ActionToMonster
+    bool join_free = (Rand::Get(0, 10) <= 2); // FIXME: see Heroes::ActionToMonster
     bool ext_conditions = (hero.GetArmy().GetCount() < ARMYMAXTROOPS || hero.GetArmy().HasMonster(monster));
 
-    if(join && ext_conditions)
+    if(ext_conditions && ownRatio / otherRatio >= 2)
     {
-        if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " join monster " + monster.GetName());
+        if(Settings::Get().Debug()) Error::Verbose("AIToMonster: possible " + hero.GetName() + " join monster " + monster.GetName());
 
-        // join free
-        if(join_free_or_cost)
+        if(join_free)
         {
-            if((ownRatio / otherRatio >= 2))
+            // join if ranged or flying monsters present
+            if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
             {
-        	// join if archers or fly or present
-        	if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
-        	{
-                    hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
-                    avoidBattle = true;
-        	}
+                hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
+                avoidBattle = true;
             }
             else
-            if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
-	}
-	// join for cost
-        else
+                if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
+        }
+        else if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
             u32 toJoin = tile.GetCountMonster();
             PaymentConditions::BuyMonster cost(monster());
@@ -265,24 +259,23 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
                 default: break;
             }
 
-            if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY) && world.GetKingdom(hero.GetColor()).GetFundsGold() >= toBuy)
+            if(world.GetKingdom(hero.GetColor()).GetFundsGold() >= toBuy)
             {
-        	// join if archers or fly or present
-        	if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
-        	{
+                // join if archers or fly or present
+                if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
+                {
                     hero.GetArmy().JoinTroop(monster, toJoin);
                     world.GetKingdom(hero.GetColor()).OddFundsResource(Resource::funds_t(Resource::GOLD, toBuy));
                     avoidBattle = true;
-        	}
+                }
             }
             else
-            if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
+                if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
         }
-    }
-
-    if(!avoidBattle && ownRatio / otherRatio >= 5)
-    {
-        avoidBattle = Rand::Get(0, 10) < 5;
+        else if(ownRatio / otherRatio >= 5)
+        {
+            avoidBattle = Rand::Get(0, 10) < 5;
+        }
     }
 
     if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
