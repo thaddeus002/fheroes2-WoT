@@ -26,6 +26,7 @@
 #include "luck.h"
 #include "morale.h"
 #include "world.h"
+#include "payment.h"
 #include "gameevent.h"
 #include "heroes.h"
 
@@ -226,50 +227,62 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     u32 ownRatio, otherRatio;
     hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
-    if(ownRatio * 1.0f / otherRatio >= 2.0f)
+
+    bool join = (Rand::Get(0, 10) <= 2);              // FIXME: see Heroes::ActionToMonster
+    bool join_free_or_cost = (Rand::Get(0, 10) <= 2); // FIXME: see Heroes::ActionToMonster
+    bool ext_conditions = (hero.GetArmy().GetCount() < ARMYMAXTROOPS || hero.GetArmy().HasMonster(monster));
+
+    if(join && ext_conditions)
     {
-        if(Rand::Get(0, 10) <= 2) // 20% chance of joining for free
+        if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " join monster " + monster.GetName());
+
+        // join free
+        if(join_free_or_cost)
         {
-            if(0)
+            if((ownRatio / otherRatio >= 2))
             {
-                hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
-                avoidBattle = true;
+        	// join if archers or fly or present
+        	if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
+        	{
+                    hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
+                    avoidBattle = true;
+        	}
             }
-        }
-        else if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
+            else
+            if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
+	}
+	// join for cost
+        else
         {
-            float mod = 0.0f;
+            u32 toJoin = tile.GetCountMonster();
+            PaymentConditions::BuyMonster cost(monster());
+            u32 toBuy = toJoin * cost.gold;
+
             switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
             {
-                case Skill::Level::BASIC:
-                    mod = 0.25f;
-                    break;
-                case Skill::Level::ADVANCED:
-                    mod = 0.5f;
-                    break;
-                case Skill::Level::EXPERT:
-                    mod = 1.0f;
-                    break;
-                default:
-                    break;
+                case Skill::Level::BASIC:   toJoin = toJoin * 25 / 100; break;
+                case Skill::Level::ADVANCED:toJoin = toJoin * 50 / 100; break;
+                default: break;
             }
-            u32 toJoin = static_cast<u32>(tile.GetCountMonster() * mod);
-            u32 toBuy = 100; //FIXME
-            Resource::funds_t payment(Resource::GOLD, toBuy);
-            if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+
+            if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY) && world.GetKingdom(hero.GetColor()).GetFundsGold() >= toBuy)
             {
-                if(0)
-                {
+        	// join if archers or fly or present
+        	if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
+        	{
                     hero.GetArmy().JoinTroop(monster, toJoin);
+                    world.GetKingdom(hero.GetColor()).OddFundsResource(Resource::funds_t(Resource::GOLD, toBuy));
                     avoidBattle = true;
-                }
+        	}
             }
+            else
+            if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
         }
-        else if(ownRatio * 1.0f / otherRatio >= 5.0f)
-        {
-            if(Rand::Get(0, 1)) //FIXME: Some smarter decision here?
-                avoidBattle = true;
-        }
+    }
+
+    if(ownRatio / otherRatio >= 5)
+    {
+        avoidBattle = Rand::Get(0, 10) < 5;
     }
 
     if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
