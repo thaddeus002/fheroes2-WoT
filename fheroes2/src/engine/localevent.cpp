@@ -82,6 +82,7 @@ static KeySym SDLToKeySym(SDLKey key)
 	case SDLK_LSHIFT:	return KEY_SHIFT;
 	case SDLK_RSHIFT:	return KEY_SHIFT;
 	case SDLK_SPACE:	return KEY_SPACE;
+	case SDLK_DELETE:	return KEY_DELETE;
 	case SDLK_PAGEUP:	return KEY_PAGEUP;
 	case SDLK_PAGEDOWN:	return KEY_PAGEDOWN;
 	case SDLK_F1:		return KEY_F1;

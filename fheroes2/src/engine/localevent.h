@@ -69,6 +69,7 @@ enum KeySym
     KEY_ALT,
     KEY_CONTROL,
     KEY_SHIFT,
+    KEY_DELETE,
     KEY_PAGEUP,
     KEY_PAGEDOWN,
     KEY_F1,
