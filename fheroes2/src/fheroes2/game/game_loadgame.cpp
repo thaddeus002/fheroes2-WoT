@@ -22,6 +22,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "button.h"
+#include "dialog.h"
 #include "settings.h"
 #include "game.h"
 
@@ -93,4 +94,37 @@ Game::menu_t Game::LoadGame(void)
     }
 
     return QUITGAME;
+}
+
+Game::menu_t Game::LoadStandard(void)
+{
+    Settings::Get().SetGameType(Game::STANDARD);
+
+    // preload
+    AGG::PreloadObject(ICN::HEROES);
+
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    Display & display = Display::Get();
+    display.SetVideoMode(640, 480);
+
+    // image background
+    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+    display.Blit(back);
+
+    cursor.Show();
+    display.Flip();
+
+    std::string file;
+
+    Dialog::SelectFileLoad(file);
+
+    if(file.empty()) return MAINMENU;
+
+    Game::Load(file);
+
+    return STARTGAME;
 }
