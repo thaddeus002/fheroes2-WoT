@@ -624,7 +624,7 @@ u32 Battle::BattleControl::BattleSummaryVsHero(HeroBase &hero, const Army::Battl
     ArmyToBattleArmy(hero2.GetArmy(), otherArmy);
     armies.push_back(std::make_pair(&ownArmy, &heroOrig));
     armies.push_back(std::make_pair(&otherArmy, &hero2Orig));
-    Spell::spell_t eagleEye;
+    Spell::spell_t eagleEye(Spell::NONE);
     u32 deadRaised = 0;
     const BagArtifacts *artifacts = NULL;
     HeroBase *target = NULL, *other = NULL;
