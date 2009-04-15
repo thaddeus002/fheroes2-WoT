@@ -139,9 +139,9 @@ Skill::Level::type_t Skill::Level::FromMP2(const u8 byte)
 {
     switch(byte)
     {
-       case 0: return BASIC;
-       case 1: return ADVANCED;
-       case 2: return EXPERT;
+       case 1: return BASIC;
+       case 2: return ADVANCED;
+       case 3: return EXPERT;
 
 	default: break;
     }

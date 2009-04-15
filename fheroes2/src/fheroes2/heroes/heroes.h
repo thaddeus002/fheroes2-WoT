@@ -249,7 +249,6 @@ public:
 
     u32 GetExperience(void) const;
     void IncreaseExperience(const u32 exp);
-    void LevelUp(bool autoselect = false);
 
     void PostBattle(void);
     void Dump(void) const;
@@ -260,6 +259,9 @@ public:
 private:
     friend void Game::SaveXML(const std::string &);
     friend void Game::LoadXML(const std::string &);
+    void LevelUp(bool autoselect = false);
+    Skill::Primary::skill_t LevelUpPrimarySkill(void);
+    void LevelUpSecondarySkill(const Skill::Primary::skill_t, bool autoselect = false);
     void AngleStep(const Direction::vector_t to_direct);
     bool MoveStep(bool fast = false);
 

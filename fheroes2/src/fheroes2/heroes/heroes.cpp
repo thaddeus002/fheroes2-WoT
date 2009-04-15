@@ -430,9 +430,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     experience = byte32;
     ptr8 += 4;
 
+    bool skip_levelup_skill = false;
     // custom skill
     if(*ptr8)
     {
+	skip_levelup_skill = true;
 	++ptr8;
 
 	secondary_skills.clear();
@@ -481,7 +483,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
     // level up
     u8 level = GetLevel();
-    while(1 < level--) LevelUp(true);	// start game: auto select skill
+    while(1 < level--)
+    {
+	Skill::Primary::skill_t primary = LevelUpPrimarySkill();
+	if(!skip_levelup_skill) LevelUpSecondarySkill(primary, true);
+    }
 
     // other param
     magic_point = GetMaxSpellPoints();
@@ -1545,6 +1551,11 @@ void Heroes::FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & se
 /* up level */
 void Heroes::LevelUp(bool autoselect)
 {
+    LevelUpSecondarySkill(LevelUpPrimarySkill(), autoselect);
+}
+
+Skill::Primary::skill_t Heroes::LevelUpPrimarySkill(void)
+{
     const Skill::Primary::skill_t primary1 = Skill::Primary::FromLevelUp(race, GetLevel());
 
     // upgrade primary
@@ -1556,7 +1567,13 @@ void Heroes::LevelUp(bool autoselect)
 	case Skill::Primary::KNOWLEDGE:	++knowledge; break;
 	default: break;
     }
+    if(Settings::Get().Debug()) Error::Verbose("Heroes::LevelUpPrimarySkill: for " + GetName());
 
+    return primary1;
+}
+
+void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool autoselect)
+{
     Skill::Secondary sec1;
     Skill::Secondary sec2;
 
@@ -1661,7 +1678,7 @@ void Heroes::LevelUp(bool autoselect)
 	LevelUpSkill(skill_select);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("Heroes::LevelUp: for " + GetName());
+    if(Settings::Get().Debug()) Error::Verbose("Heroes::LevelUpSecondarySkill: for " + GetName());
 }
 
 /* apply penalty */
