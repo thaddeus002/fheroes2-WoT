@@ -32,7 +32,9 @@ namespace Battle
 void Army::ArmyToBattleArmy(const Army::army_t &army, Army::BattleArmy_t &battleArmy)
 {
     for(u16 i = 0; i < army.Size(); i++)
-        battleArmy.push_back(Army::BattleTroop(army.At(i)));
+        if(army.At(i).isValid())
+            battleArmy.push_back(Army::BattleTroop(army.At(i)));
+        else battleArmy.push_back(Army::BattleTroop(Monster::UNKNOWN, 0));
 }
 
 /** Convert a #BattleArmy_t into an #army_t after use in battle.
@@ -472,6 +474,8 @@ Battle::BattleControl::BattleControl(Heroes &hero1, Heroes &hero2, const Maps::T
     Army::BattleArmy_t hero1Army, hero2Army;
     ArmyToBattleArmy(hero1.GetArmy(), hero1Army);
     ArmyToBattleArmy(hero2.GetArmy(), hero2Army);
+    m_commanders[0] = hero1.GetArmy().GetCommander();
+    m_commanders[1] = hero2.GetArmy().GetCommander();
     m_battleStatus = RunBattle(&hero1, &hero2);
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero1.GetArmy());
     BattleArmyToArmy(m_battlefield.GetArmy(1), hero2.GetArmy());
@@ -484,6 +488,8 @@ Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Map
     Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
     ArmyToBattleArmy(hero.GetArmy(), heroArmyOrig);
     ArmyToBattleArmy(army, oppArmyOrig);
+    m_commanders[0] = hero.GetArmy().GetCommander();
+    m_commanders[1] = army.GetCommander();
     m_battleStatus = RunBattle(&hero, NULL);
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero.GetArmy());
     BattleArmyToArmy(m_battlefield.GetArmy(1), army);
@@ -518,6 +524,9 @@ Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::T
         ArmyToBattleArmy(castle.GetArmy(), oppArmyOrig);
     }
     m_battlefield.SetHero(1, hero2);
+
+    m_commanders[0] = hero.GetArmy().GetCommander();
+    m_commanders[1] = castle.GetArmy().GetCommander();
     
     m_battleStatus = RunBattle(&hero, hero2);
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero.GetArmy());
@@ -673,9 +682,21 @@ u32 Battle::BattleControl::BattleSummaryVsHero(HeroBase &hero, const Army::Battl
 
 void Battle::BattleControl::InitializeLogicSettings(HeroBase *hero1, HeroBase *hero2)
 {
-    if(hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::LOCAL)
+    Army::army_t army[2] = {
+        Army::army_t(m_commanders[0]),
+        Army::army_t(m_commanders[1])
+    };
+    Army::BattleArmyToArmy(m_battlefield.GetArmy(0), army[0]);
+    Army::BattleArmyToArmy(m_battlefield.GetArmy(1), army[1]);
+
+    const Army::BattleTroop &troop = m_battlefield.GetArmy(1)[1];
+    printf("%d %d\n", troop.GetID(), troop.Count());
+
+    if((hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::LOCAL) ||
+       world.GetKingdom(army[0].GetColor()).Control() == Game::LOCAL)
         BattleSettings::Get().ResetModes(BattleSettings::OPT_LOGICONLY);
-    else if(hero2 && world.GetKingdom(hero2->GetColor()).Control() == Game::LOCAL)
+    else if((hero2 && world.GetKingdom(hero2->GetColor()).Control() == Game::LOCAL) ||
+            world.GetKingdom(army[1].GetColor()).Control() == Game::LOCAL)
         BattleSettings::Get().ResetModes(BattleSettings::OPT_LOGICONLY);
     else BattleSettings::Get().SetModes(BattleSettings::OPT_LOGICONLY);
 }
@@ -709,8 +730,8 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
     s8 currentTroop = 0;
 
     BattleTurn *turn[2];
-    turn[0] = CreateTurn(hero1, m_battlefield.GetArmy(0), m_battlefield.GetArmy(1));
-    turn[1] = CreateTurn(hero2, m_battlefield.GetArmy(1), m_battlefield.GetArmy(0));
+    turn[0] = CreateTurn(m_commanders[0], m_battlefield.GetArmy(0), m_battlefield.GetArmy(1));
+    turn[1] = CreateTurn(m_commanders[1], m_battlefield.GetArmy(1), m_battlefield.GetArmy(0));
 
     bool validMove = false; //FIXME: Hack so that battles terminate if no unit can move
     
@@ -886,11 +907,12 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
     return battle_status;
 }
 
-Battle::BattleTurn *Battle::BattleControl::CreateTurn(HeroBase *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy, bool forceComputer /* = false */)
+Battle::BattleTurn *Battle::BattleControl::CreateTurn(const Skill::Primary *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy, bool forceComputer /* = false */)
 {
+    const HeroBase *actualHero = dynamic_cast<const HeroBase *>(hero);
     if(!forceComputer && hero && world.GetKingdom(hero->GetColor()).Control() == Game::LOCAL)
-        return new HumanTurn(&m_battlefield, m_gui, hero, ownArmy, oppArmy);
-    else return new ComputerTurn(&m_battlefield, m_gui, hero, ownArmy, oppArmy);
+        return new HumanTurn(&m_battlefield, m_gui, const_cast<HeroBase *>(actualHero), ownArmy, oppArmy);
+    else return new ComputerTurn(&m_battlefield, m_gui, const_cast<HeroBase *>(actualHero), ownArmy, oppArmy);
 }
 
 void Battle::BattleControl::NewTurn()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-14 17:12-0400\n"
+"POT-Creation-Date: 2009-04-15 13:11-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -175,7 +175,7 @@ msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:412
 #: ../fheroes2/battle/battle_dialog.cpp:417
-#: ../fheroes2/game/game_startgame.cpp:1491
+#: ../fheroes2/game/game_startgame.cpp:1511
 msgid "Cast Spell"
 msgstr ""
 
@@ -212,7 +212,7 @@ msgstr ""
 #: ../fheroes2/battle/battle_dialog.cpp:423
 #: ../fheroes2/game/game_newgame.cpp:99 ../fheroes2/game/game_newgame.cpp:162
 #: ../fheroes2/game/game_newgame.cpp:224 ../fheroes2/game/game_newgame.cpp:292
-#: ../fheroes2/game/game_scenarioinfo.cpp:354
+#: ../fheroes2/game/game_scenarioinfo.cpp:333
 msgid "Cancel"
 msgstr ""
 
@@ -221,113 +221,113 @@ msgid "Return to the battle."
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:425
-#: ../fheroes2/battle/battle_new.cpp:2983
+#: ../fheroes2/battle/battle_new.cpp:3005
 msgid "Hero's Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:764
+#: ../fheroes2/battle/battle_new.cpp:785
 msgid "Low morale causes the %{name} to freeze in panic."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:856
+#: ../fheroes2/battle/battle_new.cpp:877
 msgid "High morale enables the %{name} to attack again."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1592
+#: ../fheroes2/battle/battle_new.cpp:1614
 msgid "%{name} %{does} %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1594
+#: ../fheroes2/battle/battle_new.cpp:1616
 msgid "does"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1595
+#: ../fheroes2/battle/battle_new.cpp:1617
 msgid "do"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1602
+#: ../fheroes2/battle/battle_new.cpp:1624
 msgid " %{value} %{name} %{perishes}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1686
+#: ../fheroes2/battle/battle_new.cpp:1708
 msgid "That spell will affect no one!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1705
+#: ../fheroes2/battle/battle_new.cpp:1727
 msgid "The %{spell} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1711
+#: ../fheroes2/battle/battle_new.cpp:1733
 msgid "The %{spell} does %{value} damage to the %{name}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1970
-#: ../fheroes2/battle/battle_new.cpp:2019
+#: ../fheroes2/battle/battle_new.cpp:1992
+#: ../fheroes2/battle/battle_new.cpp:2041
 msgid "View %{name} info."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1986
+#: ../fheroes2/battle/battle_new.cpp:2008
 msgid "Shoot %{name} (%{value} shot(s) left)"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1999
+#: ../fheroes2/battle/battle_new.cpp:2021
 msgid "Attack %{name}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2036
+#: ../fheroes2/battle/battle_new.cpp:2058
 msgid "Fly"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2037
+#: ../fheroes2/battle/battle_new.cpp:2059
 msgid "Move"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2038
+#: ../fheroes2/battle/battle_new.cpp:2060
 msgid "%{move} %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2950
+#: ../fheroes2/battle/battle_new.cpp:2972
 msgid "Skip"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2950
+#: ../fheroes2/battle/battle_new.cpp:2972
 msgid ""
 "Skip the current creature. The current creature loses its turn and does not "
 "get to go again until the next round."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2951
-#: ../fheroes2/battle/battle_new.cpp:2975
+#: ../fheroes2/battle/battle_new.cpp:2973
+#: ../fheroes2/battle/battle_new.cpp:2997
 msgid "Auto Combat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2951
+#: ../fheroes2/battle/battle_new.cpp:2973
 msgid "Allows the computer to fight out the battle for you."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2952
+#: ../fheroes2/battle/battle_new.cpp:2974
 #: ../fheroes2/editor/editor_startgame.cpp:804
-#: ../fheroes2/game/game_startgame.cpp:1499
+#: ../fheroes2/game/game_startgame.cpp:1519
 msgid "System Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2952
+#: ../fheroes2/battle/battle_new.cpp:2974
 msgid "Allows you to customize the combat screen."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2959
+#: ../fheroes2/battle/battle_new.cpp:2981
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2971
+#: ../fheroes2/battle/battle_new.cpp:2993
 msgid "Skip this unit"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2979
+#: ../fheroes2/battle/battle_new.cpp:3001
 msgid "Customize system options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2987
+#: ../fheroes2/battle/battle_new.cpp:3009
 msgid "View Opposing Hero"
 msgstr ""
 
@@ -1073,12 +1073,12 @@ msgid "Map Size"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_gameinfo.cpp:81
-#: ../fheroes2/game/game_scenarioinfo.cpp:344
+#: ../fheroes2/game/game_scenarioinfo.cpp:323
 msgid "Opponents"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_gameinfo.cpp:87
-#: ../fheroes2/game/game_scenarioinfo.cpp:350
+#: ../fheroes2/game/game_scenarioinfo.cpp:329
 msgid "Class"
 msgstr ""
 
@@ -1222,95 +1222,111 @@ msgstr ""
 msgid "Available: %{count}"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:302
+#: ../fheroes2/dialog/dialog_selectfile.cpp:52
+msgid "File to Save:"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectfile.cpp:68
+msgid "File to Load:"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectfile.cpp:203
+msgid "Are you sure you want to delete file:"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectfile.cpp:206
+msgid "Warning!"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectfile.cpp:509
 msgid "Small Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:302
+#: ../fheroes2/dialog/dialog_selectfile.cpp:509
 msgid "View only maps of size small (36x36)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:303
+#: ../fheroes2/dialog/dialog_selectfile.cpp:510
 msgid "Medium Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:303
+#: ../fheroes2/dialog/dialog_selectfile.cpp:510
 msgid "View only maps of size medium (72x72)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:304
+#: ../fheroes2/dialog/dialog_selectfile.cpp:511
 msgid "Large Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:304
+#: ../fheroes2/dialog/dialog_selectfile.cpp:511
 msgid "View only maps of size large (108x108)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:305
+#: ../fheroes2/dialog/dialog_selectfile.cpp:512
 msgid "Extra Large Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:305
+#: ../fheroes2/dialog/dialog_selectfile.cpp:512
 msgid "View only maps of size extra large (144x144)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:306
+#: ../fheroes2/dialog/dialog_selectfile.cpp:513
 msgid "All Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:306
+#: ../fheroes2/dialog/dialog_selectfile.cpp:513
 msgid "View all maps, regardless of size."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:307
+#: ../fheroes2/dialog/dialog_selectfile.cpp:514
 msgid "Players Icon"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:307
+#: ../fheroes2/dialog/dialog_selectfile.cpp:514
 msgid ""
 "Indicates how many players total are in the EditScenario. Any positions not "
 "occupied by humans will be occupied by computer players."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:308
+#: ../fheroes2/dialog/dialog_selectfile.cpp:515
 msgid "Size Icon"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:308
+#: ../fheroes2/dialog/dialog_selectfile.cpp:515
 msgid ""
 "Indicates whether the maps is small (36x36), medium (72x72), large "
 "(108x108), or extra large (144x144)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:310
+#: ../fheroes2/dialog/dialog_selectfile.cpp:517
 msgid "Victory Condition Icon"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:310
+#: ../fheroes2/dialog/dialog_selectfile.cpp:517
 msgid "There are 6 possiblities: FIXME."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:311
+#: ../fheroes2/dialog/dialog_selectfile.cpp:518
 msgid "Loss Condition Icon"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:311
+#: ../fheroes2/dialog/dialog_selectfile.cpp:518
 msgid ""
 "There are 4 possible loss conditions, as indicated by the following icons: "
 "FIXME."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:314
-#: ../fheroes2/game/game_scenarioinfo.cpp:353
+#: ../fheroes2/dialog/dialog_selectfile.cpp:521
+#: ../fheroes2/game/game_scenarioinfo.cpp:332
 msgid "OK"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:314
+#: ../fheroes2/dialog/dialog_selectfile.cpp:521
 msgid "Accept the choice made."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:438
-msgid "Maps difficulty:"
+#: ../fheroes2/dialog/dialog_selectfile.cpp:627
+msgid "Maps Difficulty:"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_system.cpp:170
@@ -1400,13 +1416,13 @@ msgstr ""
 msgid "Best Monster:"
 msgstr ""
 
-#: ../fheroes2/editor/editor_loadmaps.cpp:45
-#: ../fheroes2/game/game_scenarioinfo.cpp:89
+#: ../fheroes2/editor/editor_loadmaps.cpp:38
+#: ../fheroes2/game/game_scenarioinfo.cpp:64
 msgid "Warning"
 msgstr ""
 
-#: ../fheroes2/editor/editor_loadmaps.cpp:45
-#: ../fheroes2/game/game_scenarioinfo.cpp:89
+#: ../fheroes2/editor/editor_loadmaps.cpp:38
+#: ../fheroes2/game/game_scenarioinfo.cpp:64
 msgid "No maps available!"
 msgstr ""
 
@@ -1467,7 +1483,7 @@ msgid "Cancel back to the main menu."
 msgstr ""
 
 #: ../fheroes2/editor/editor_startgame.cpp:173
-#: ../fheroes2/game/game_startgame.cpp:852
+#: ../fheroes2/game/game_startgame.cpp:857
 msgid "Are you sure you want to quit?"
 msgstr ""
 
@@ -1504,7 +1520,7 @@ msgid "Edit maps title, description, and other general information."
 msgstr ""
 
 #: ../fheroes2/editor/editor_startgame.cpp:801
-#: ../fheroes2/game/game_startgame.cpp:1497
+#: ../fheroes2/game/game_startgame.cpp:1517
 msgid "File Options"
 msgstr ""
 
@@ -1746,32 +1762,32 @@ msgid "Used to place a resource or treasure."
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:35
-#: ../fheroes2/game/game_scenarioinfo.cpp:428
+#: ../fheroes2/game/game_scenarioinfo.cpp:403
 msgid "Easy"
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:35
-#: ../fheroes2/game/game_scenarioinfo.cpp:430 ../fheroes2/kingdom/luck.cpp:25
+#: ../fheroes2/game/game_scenarioinfo.cpp:405 ../fheroes2/kingdom/luck.cpp:25
 #: ../fheroes2/kingdom/morale.cpp:25
 msgid "Normal"
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:35
-#: ../fheroes2/game/game_scenarioinfo.cpp:432
+#: ../fheroes2/game/game_scenarioinfo.cpp:407
 msgid "Hard"
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:35
-#: ../fheroes2/game/game_scenarioinfo.cpp:434 ../fheroes2/heroes/skill.cpp:154
+#: ../fheroes2/game/game_scenarioinfo.cpp:409 ../fheroes2/heroes/skill.cpp:154
 msgid "Expert"
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:35
-#: ../fheroes2/game/game_scenarioinfo.cpp:436
+#: ../fheroes2/game/game_scenarioinfo.cpp:411
 msgid "Impossible"
 msgstr ""
 
-#: ../fheroes2/game/game_io.cpp:694 ../fheroes2/kingdom/world.cpp:181
+#: ../fheroes2/game/game_io.cpp:681 ../fheroes2/kingdom/world.cpp:181
 #: ../fheroes2/kingdom/world.cpp:223
 msgid "Maps Loading..."
 msgstr ""
@@ -1926,228 +1942,228 @@ msgstr ""
 msgid "Play with 6 human players."
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:330
+#: ../fheroes2/game/game_scenarioinfo.cpp:309
 msgid "Scenario"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:330
+#: ../fheroes2/game/game_scenarioinfo.cpp:309
 msgid "Click here to select which scenario to play."
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:338
+#: ../fheroes2/game/game_scenarioinfo.cpp:317
 msgid "Game Difficulty"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:338
+#: ../fheroes2/game/game_scenarioinfo.cpp:317
 msgid ""
 "This lets you change the starting difficulty at which you will play. Higher "
 "difficulty levels start you of with fewer resources, and at the higher "
 "settings, give extra resources to the computer."
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:344
+#: ../fheroes2/game/game_scenarioinfo.cpp:323
 msgid ""
 "This lets you change player starting positions and colors. A particular "
 "color will always start in a particular location. Some positions may only be "
 "played by a computer player or only by a human player."
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:350
+#: ../fheroes2/game/game_scenarioinfo.cpp:329
 msgid ""
 "This lets you change the class of a player. Classes are not always "
 "changeable. Depending on the scenario, a player may receive additional towns "
 "and/or heroes not of their primary alingment."
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:353
+#: ../fheroes2/game/game_scenarioinfo.cpp:332
 msgid "Click to accept these settings and start a new game."
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:354
+#: ../fheroes2/game/game_scenarioinfo.cpp:333
 msgid "Click to return to the main menu."
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:416
+#: ../fheroes2/game/game_scenarioinfo.cpp:391
 msgid "Scenario:"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:424
+#: ../fheroes2/game/game_scenarioinfo.cpp:399
 msgid "Game Difficulty:"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:440
+#: ../fheroes2/game/game_scenarioinfo.cpp:415
 msgid "Opponents:"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:444
+#: ../fheroes2/game/game_scenarioinfo.cpp:419
 msgid "Class:"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:541
+#: ../fheroes2/game/game_scenarioinfo.cpp:516
 msgid "Necroman"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:564
+#: ../fheroes2/game/game_scenarioinfo.cpp:539
 msgid "Rating %{rating}%"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:230
+#: ../fheroes2/game/game_startgame.cpp:232
 msgid "%{color} player's turn"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:787
+#: ../fheroes2/game/game_startgame.cpp:792
 msgid "Astrologers proclaim month of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:787
+#: ../fheroes2/game/game_startgame.cpp:792
 msgid "Astrologers proclaim week of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:791
+#: ../fheroes2/game/game_startgame.cpp:796
 msgid " All populations are halved."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:791
+#: ../fheroes2/game/game_startgame.cpp:796
 msgid " All dwellings increase population."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:803
+#: ../fheroes2/game/game_startgame.cpp:808
 msgid ""
 "%{color} player, your heroes abandon you, and you are banished from this "
 "land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:811
+#: ../fheroes2/game/game_startgame.cpp:816
 msgid ""
 "%{color} player, this is your last day to capture a town, or you will be "
 "banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:818
+#: ../fheroes2/game/game_startgame.cpp:823
 msgid ""
 "%{color} player, you only have %{day} days left to capture a town, or you "
 "will be banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:865
-#: ../fheroes2/game/game_startgame.cpp:1377
+#: ../fheroes2/game/game_startgame.cpp:870
+#: ../fheroes2/game/game_startgame.cpp:1397
 msgid ""
 "One or more heroes may still move, are you sure you want to end your turn?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:920
-#: ../fheroes2/game/game_startgame.cpp:1427
+#: ../fheroes2/game/game_startgame.cpp:930
+#: ../fheroes2/game/game_startgame.cpp:1447
 msgid "Game saved successfully."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:925
-#: ../fheroes2/game/game_startgame.cpp:1421
+#: ../fheroes2/game/game_startgame.cpp:939
+#: ../fheroes2/game/game_startgame.cpp:1441
 msgid ""
 "Are you sure you want to load a new game? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1412
+#: ../fheroes2/game/game_startgame.cpp:1432
 msgid "Are you sure you want to restart? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1483
+#: ../fheroes2/game/game_startgame.cpp:1503
 msgid "World Map"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1483
+#: ../fheroes2/game/game_startgame.cpp:1503
 msgid "A miniature view of the known world. Left click to move viewing area."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1485
+#: ../fheroes2/game/game_startgame.cpp:1505
 msgid "Next Hero"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1485
+#: ../fheroes2/game/game_startgame.cpp:1505
 msgid "Select the next Hero."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1487
+#: ../fheroes2/game/game_startgame.cpp:1507
 msgid "Continue Movement"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1487
+#: ../fheroes2/game/game_startgame.cpp:1507
 msgid "Continue the Hero's movement along the current path."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1489
+#: ../fheroes2/game/game_startgame.cpp:1509
 msgid "Kingdom Summary"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1489
+#: ../fheroes2/game/game_startgame.cpp:1509
 msgid "View a Summary of your Kingdom."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1491
+#: ../fheroes2/game/game_startgame.cpp:1511
 msgid "Cast an adventure spell."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1493
+#: ../fheroes2/game/game_startgame.cpp:1513
 msgid "End Turn"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1493
+#: ../fheroes2/game/game_startgame.cpp:1513
 msgid "End your turn and left the computer take its turn."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1495
+#: ../fheroes2/game/game_startgame.cpp:1515
 msgid "Adventure Options"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1495
+#: ../fheroes2/game/game_startgame.cpp:1515
 msgid "Bring up the adventure options menu."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1497
+#: ../fheroes2/game/game_startgame.cpp:1517
 msgid "Bring up the file options menu, alloving you to load menu, save etc."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1499
+#: ../fheroes2/game/game_startgame.cpp:1519
 msgid "Bring up the system options menu, alloving you to customize your game."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1501
+#: ../fheroes2/game/game_startgame.cpp:1521
 msgid "Status Window"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1501
+#: ../fheroes2/game/game_startgame.cpp:1521
 msgid ""
 "This window provides information on the status of your hero or kingdom, and "
 "shows the date. Left click here to cycle throungh these windows."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1570
-#: ../fheroes2/game/game_startgame.cpp:1613
+#: ../fheroes2/game/game_startgame.cpp:1590
+#: ../fheroes2/game/game_startgame.cpp:1639
 msgid "Congratulations!"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1570
+#: ../fheroes2/game/game_startgame.cpp:1590
 msgid "You are victorious."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1575
+#: ../fheroes2/game/game_startgame.cpp:1595
 msgid ""
 "%{color} player, you have lost your last town. If you do not conquer another "
 "town in next week, you will be eliminated."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1597
+#: ../fheroes2/game/game_startgame.cpp:1623
 msgid "Try searching on clear ground."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1607
+#: ../fheroes2/game/game_startgame.cpp:1633
 msgid "Nothing here. Where could it be?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1613
+#: ../fheroes2/game/game_startgame.cpp:1639
 msgid "After spending many hours digging here, you have uncovered the "
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1622
+#: ../fheroes2/game/game_startgame.cpp:1648
 msgid "Digging for artifacts requires a whole day, try again tomorrow."
 msgstr ""
 
@@ -3595,46 +3611,46 @@ msgstr ""
 msgid "Jarkonas"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1248
+#: ../fheroes2/heroes/heroes.cpp:1254
 msgid ""
 "You must purchase a spell book to use the mage guild, but you currently have "
 "no room for a spell book."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1248
+#: ../fheroes2/heroes/heroes.cpp:1254
 msgid "Try giving one of your artifacts to another hero."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1249
+#: ../fheroes2/heroes/heroes.cpp:1255
 msgid "You have no room to carry another artifact!"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1328
+#: ../fheroes2/heroes/heroes.cpp:1334
 msgid "To cast spells, you must first buy a spell book for %{gold} gold"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1334
+#: ../fheroes2/heroes/heroes.cpp:1340
 msgid "Unfortunately, you seem to be a little short of cash at the moment."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1346
+#: ../fheroes2/heroes/heroes.cpp:1352
 msgid "Do you wish to buy one?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1574
+#: ../fheroes2/heroes/heroes.cpp:1591
 msgid "%{name} has gained a level."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1576
+#: ../fheroes2/heroes/heroes.cpp:1593
 msgid "%{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1587 ../fheroes2/heroes/heroes.cpp:1618
-#: ../fheroes2/heroes/heroes.cpp:1650
+#: ../fheroes2/heroes/heroes.cpp:1604 ../fheroes2/heroes/heroes.cpp:1635
+#: ../fheroes2/heroes/heroes.cpp:1667
 msgid "%{name} has gained a level. %{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1590 ../fheroes2/heroes/heroes.cpp:1621
+#: ../fheroes2/heroes/heroes.cpp:1607 ../fheroes2/heroes/heroes.cpp:1638
 msgid "You have learned %{level} %{skill}."
 msgstr ""
 
@@ -4940,6 +4956,10 @@ msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:68
 msgid "Cyclops"
+msgstr ""
+
+#: ../fheroes2/monster/monster.cpp:68
+msgid "Cyclopes"
 msgstr ""
 
 #: ../fheroes2/monster/monster.cpp:71
