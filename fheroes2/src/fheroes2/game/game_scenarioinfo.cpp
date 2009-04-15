@@ -258,8 +258,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectMaps))
 	{
 	    std::string filemaps;
-	    Dialog::SelectMapsFileList(lists, filemaps);
-	    conf.LoadFileMaps(filemaps);
+	    if(Dialog::SelectMapsFileList(lists, filemaps) && filemaps.size()) conf.LoadFileMaps(filemaps);
 
 	    cursor.Hide();
 	    levelCursor.Hide();
@@ -280,7 +279,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    display.Flip();
 	    rnd_color = GetAllowChangeRaces(conf.FileInfo());
 	}
-
+	else
 	// click cancel
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
 	{
@@ -288,7 +287,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    result = MAINMENU;
 	    break;
 	}
-
+	else
 	// click ok
 	if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
 	{

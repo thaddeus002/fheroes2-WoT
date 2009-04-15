@@ -85,7 +85,7 @@ namespace Dialog
 
     bool SelectFileLoad(std::string &);
     bool SelectFileSave(std::string &);
-    void SelectMapsFileList(MapsFileInfoList &, std::string &);
+    bool SelectMapsFileList(MapsFileInfoList &, std::string &);
 
     // show info cell maps
     void QuickInfo(const Maps::Tiles & tile);

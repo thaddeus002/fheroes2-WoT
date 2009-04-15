@@ -282,7 +282,7 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const Ma
     }
 }
 
-void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
+bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 {
     AGG::PreloadObject(ICN::REQSBKG);
     AGG::PreloadObject(ICN::REQUEST);
@@ -376,6 +376,7 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     bool redraw = false;
+    bool res = false;
 
     while(le.HandleEvents())
     {
@@ -388,7 +389,8 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
-        if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN)){ res = true; break; }
+        if(le.KeyPress(KEY_ESCAPE)){ res = false; break; }
 
         if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > curlist->begin()))
 	{
@@ -542,6 +544,8 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
     cursor.Hide();
     back.Restore();
     display.Flip();
+    
+    return res;
 }
 
 void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFileInfoList::const_iterator top, MapsFileInfoList::const_iterator cur, const u8 max_items)
