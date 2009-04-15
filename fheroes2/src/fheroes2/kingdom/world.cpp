@@ -1684,7 +1684,7 @@ const GameEvent::Day*  World::GetEventDay(const Color::color_t c) const
 	for(; it1 != it2; ++it1) if(*it1)
 	{
 	    const GameEvent::Day & event = **it1;
-	    const u16 today = day + 1;
+	    const u16 today = day;
 	    const u16 first = event.GetFirst();
 	    const u16 sequent = event.GetSubsequent();
 
