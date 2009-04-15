@@ -1550,10 +1550,10 @@ void Heroes::LevelUp(bool autoselect)
     // upgrade primary
     switch(primary1)
     {
-	case Skill::Primary::ATTACK:	++attack;
-	case Skill::Primary::DEFENCE:	++defence;
-	case Skill::Primary::POWER:	++power;
-	case Skill::Primary::KNOWLEDGE:	++knowledge;
+	case Skill::Primary::ATTACK:	++attack; break;
+	case Skill::Primary::DEFENCE:	++defence; break;
+	case Skill::Primary::POWER:	++power; break;
+	case Skill::Primary::KNOWLEDGE:	++knowledge; break;
 	default: break;
     }
 
