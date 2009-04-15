@@ -1526,52 +1526,53 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
             shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 2);
         else
             shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 4);
-        if(shouldAnimate)
+
+        if(!shouldAnimate)
+            continue;
+
+        if(!ranged)
         {
-            if(!ranged)
+            //Time to start animating the targets?
+            if(delayFrames == 0)
             {
-                //Time to start animating the targets?
-                if(delayFrames == 0)
+                for(u16 tid = 0; tid < targets.size(); tid++)
                 {
-                    for(u16 tid = 0; tid < targets.size(); tid++)
-                    {
-                        targets[tid]->Animate(targetActions[tid].first);
-                        AGG::PlaySound(targetActions[tid].second);
-                    }
+                    targets[tid]->Animate(targetActions[tid].first);
+                    AGG::PlaySound(targetActions[tid].second);
                 }
-                else if(delayFrames < 0)
-                {
-                    //Are we finished animating all of the targets?
-                    if(delayFrames < -targetLen)
-                        break;
-                }
-                delayFrames --;
             }
-            else
+            else if(delayFrames < 0)
             {
-                if(state == PREATTACK && !delayFrames--) 
-                    state ++;
-                else if(state == MISSILE_FLIGHT && missframe >= MISSFRAMES)
-                {
-                    for(u16 tid = 0; tid < targets.size(); tid++)
-                    {
-                        targets[tid]->Animate(targetActions[tid].first);
-                        AGG::PlaySound(targetActions[tid].second);
-                    }
-                    delayFrames = targetLen;
-                    state++;
-                }
-                else if(state == MISSILE_IMPACT && !delayFrames--) break;
+                //Are we finished animating all of the targets?
+                if(delayFrames < -targetLen)
+                    break;
             }
-            m_battlefield.Redraw();
-            m_gui->Redraw();
-            if(state == MISSILE_FLIGHT) {
-                display.Blit(AGG::GetICN(attacker.ICNMiss(), abs(missindex), missindex < 0), miss_start);
-                miss_start += miss_step;
-                missframe ++;
-            }
-            display.Flip();
+            delayFrames --;
         }
+        else
+        {
+            if(state == PREATTACK && !delayFrames--) 
+                state ++;
+            else if(state == MISSILE_FLIGHT && missframe >= MISSFRAMES)
+            {
+                for(u16 tid = 0; tid < targets.size(); tid++)
+                {
+                    targets[tid]->Animate(targetActions[tid].first);
+                    AGG::PlaySound(targetActions[tid].second);
+                }
+                delayFrames = targetLen;
+                state++;
+            }
+            else if(state == MISSILE_IMPACT && !delayFrames--) break;
+        }
+        m_battlefield.Redraw();
+        m_gui->Redraw();
+        if(state == MISSILE_FLIGHT) {
+            display.Blit(AGG::GetICN(attacker.ICNMiss(), abs(missindex), missindex < 0), miss_start);
+            miss_start += miss_step;
+            missframe ++;
+        }
+        display.Flip();
     }
 
     attacker.ResetReflection();
