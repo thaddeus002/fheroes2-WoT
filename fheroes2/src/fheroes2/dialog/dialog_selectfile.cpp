@@ -86,6 +86,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
     const Rect & rt = back.GetRect();
     const Rect list_rt(rt.x + 40, rt.y + 55, 265, 215);
+    const Rect enter_field(rt.x + 45, rt.y + 286, 260, 16);
 
     Button buttonCancel(rt.x + 34, rt.y + 315, ICN::REQUEST, 3, 4);
     Button buttonOk(rt.x + 244, rt.y + 315, ICN::REQUEST, 1, 2);
@@ -123,8 +124,13 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
         le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
         le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN)){ if(cur != lists.end()) filename = (*cur).FileMaps(); break; };
+        if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN)){ if(cur != lists.end()) filename = (*cur).FileMaps(); break; };
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ filename.clear(); break; };
+
+        if(le.MouseClickLeft(enter_field) && editor)
+	{
+//	    edit_mode = true;
+	}
 
         if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > lists.begin()))
 	{
@@ -201,6 +207,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    {
 		unlink((*cur).FileMaps().c_str());
 		lists.erase(cur);
+		if(lists.empty()) buttonOk.SetDisable(true);
 		top = lists.begin();
 		cur = top;
 		split.SetRange(0, (max_items < lists.size() ? lists.size() - max_items : 0));
@@ -381,7 +388,7 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
 
         if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > curlist->begin()))
 	{
@@ -456,7 +463,7 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	    redraw = true;
 	}
 
-	if(le.MouseClickLeft(buttonSelectSmall) && buttonSelectSmall.isEnable())
+	if((le.MouseClickLeft(buttonSelectSmall) && buttonSelectSmall.isEnable()) && buttonSelectSmall.isEnable())
 	{
 	    curlist = &small;
 	    cur = top = curlist->begin();
@@ -464,7 +471,7 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	    redraw = true;
 	}
 
-	if(le.MouseClickLeft(buttonSelectMedium) && buttonSelectMedium.isEnable())
+	if((le.MouseClickLeft(buttonSelectMedium) && buttonSelectMedium.isEnable()) && buttonSelectMedium.isEnable())
 	{
 	    curlist = &medium;
 	    cur = top = curlist->begin();
@@ -472,7 +479,7 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	    redraw = true;
 	}
 
-	if(le.MouseClickLeft(buttonSelectLarge) && buttonSelectLarge.isEnable())
+	if((le.MouseClickLeft(buttonSelectLarge) && buttonSelectLarge.isEnable()) && buttonSelectLarge.isEnable())
 	{
 	    curlist = &large;
 	    cur = top = curlist->begin();
@@ -480,7 +487,7 @@ void Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	    redraw = true;
 	}
 
-	if(le.MouseClickLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable())
+	if((le.MouseClickLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable()) && buttonSelectXLarge.isEnable())
 	{
 	    curlist = &xlarge;
 	    cur = top = curlist->begin();
@@ -622,294 +629,3 @@ void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFi
     TextBox box((*cur).Description(), Font::BIG, 290);
     box.Blit(dst.x + 45, dst.y + 320);
 }
-
-/*
-// extended dialog
-const Maps::FileInfo* Dialog::SelectFileInfo(const std::list<Maps::FileInfo *> & info_maps)
-{
-    // preload
-    AGG::PreloadObject(ICN::REQSBKG);
-
-    std::list<Maps::FileInfo *> smallmaps, mediummaps, largemaps, xlargemaps;
-
-    const std::list<Maps::FileInfo *> & allmaps = info_maps;
-    const std::list<Maps::FileInfo *> *curmaps = &allmaps;
-
-    std::list<Maps::FileInfo *>::const_iterator it_list_head = allmaps.begin();
-    std::list<Maps::FileInfo *>::const_iterator it_current = it_list_head;
-    std::list<Maps::FileInfo *>::const_iterator it_end = allmaps.end();
-
-    for(; it_current != it_end; ++it_current)
-	switch((**it_current).SizeMaps().w)
-	{
-    	    case Maps::SMALL:	smallmaps.push_back(*it_current);break;
-    	    case Maps::MEDIUM:	mediummaps.push_back(*it_current); break;
-    	    case Maps::LARGE:	largemaps.push_back(*it_current); break;
-    	    case Maps::XLARGE:	xlargemaps.push_back(*it_current); break;
-	    default: continue;
-	}
-    it_current = it_list_head;
-
-    Display & display = Display::Get();
-
-    // cursor
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-    cursor.SetThemes(cursor.POINTER);
-
-    Background background(Rect(110, 0, 510, 480));
-    background.Save();
-
-    // image panel
-    const Sprite &shadow = AGG::GetICN(ICN::REQSBKG, 1);
-    display.Blit(shadow, 114, 21);
-    const Sprite &panel = AGG::GetICN(ICN::REQSBKG, 0);
-    display.Blit(panel, 130, 5);
-
-    Background backgroundList(Rect(170, 60, 270, 175));
-    backgroundList.Save();
-    Background backgroundInfo(Rect(165, 265, 305, 145));
-    backgroundInfo.Save();
-
-    // area list
-    Rect rectAreaList(Rect(170, 60, 270, 175));
-
-    const Rect countPlayers(175, 65, 17, 170);
-    const Rect sizeMaps(195, 65, 17, 170);
-    const Rect victoryCond(400, 65, 17, 170);
-    const Rect lossCond(420, 65, 17, 170);
-    
-    // Splitter
-    Splitter split(AGG::GetICN(ICN::ESCROLL, 3), Rect(460, 78, 8, 141), Splitter::VERTICAL);
-    split.SetRange(0, (LISTMAXITEM < allmaps.size() ? allmaps.size() - LISTMAXITEM : 0));
-
-    // button
-    Button buttonOk(270, 415, ICN::REQUESTS, 1, 2);
-    Button buttonPgUp(457, 60, ICN::REQUESTS, 5, 6);
-    Button buttonPgDn(457, 222, ICN::REQUESTS, 7, 8);
-
-    Button buttonSelectSmall(167, 28, ICN::REQUESTS, 9, 10);
-    Button buttonSelectMedium(229, 28, ICN::REQUESTS, 11, 12);
-    Button buttonSelectLarge(291, 28, ICN::REQUESTS, 13, 14);
-    Button buttonSelectXLarge(353, 28, ICN::REQUESTS, 15, 16);
-    Button buttonSelectAll(415, 28, ICN::REQUESTS, 17, 18);
-
-    DrawList(it_list_head, it_current, (LISTMAXITEM > allmaps.size() ? allmaps.size() : LISTMAXITEM));
-    DrawSelectInfo(**it_current);
-
-    buttonOk.Draw();
-    buttonPgUp.Draw();
-    buttonPgDn.Draw();
-    buttonSelectSmall.Draw();
-    buttonSelectMedium.Draw();
-    buttonSelectLarge.Draw();
-    buttonSelectXLarge.Draw();
-    buttonSelectAll.Draw();
-
-    cursor.Show();
-    display.Flip();
-
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-    size_t num_head = 0;
-    size_t num_select = 0;
-
-    // newstandard loop
-    while(le.HandleEvents())
-    {
-	// press button
-	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
-	le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
-	le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
-
-	le.MousePressLeft(buttonSelectSmall) ? buttonSelectSmall.PressDraw() : buttonSelectSmall.ReleaseDraw();
-	le.MousePressLeft(buttonSelectMedium) ? buttonSelectMedium.PressDraw() : buttonSelectMedium.ReleaseDraw();
-	le.MousePressLeft(buttonSelectLarge) ? buttonSelectLarge.PressDraw() : buttonSelectLarge.ReleaseDraw();
-	le.MousePressLeft(buttonSelectXLarge) ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
-	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
-
-	// click small
-	if((le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectSmall)) && smallmaps.size())
-	{
-	    curmaps = &smallmaps;
-	    it_list_head = curmaps->begin();
-	    it_current = it_list_head;
-	    num_head = 0;
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    backgroundInfo.Restore();
-	    DrawSelectInfo(**it_current);
-	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click medium
-	if((le.KeyPress(KEY_m) || le.MouseClickLeft(buttonSelectMedium)) && mediummaps.size())
-	{
-	    curmaps = &mediummaps;
-	    it_list_head = curmaps->begin();
-	    it_current = it_list_head;
-	    num_head = 0;
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    backgroundInfo.Restore();
-	    DrawSelectInfo(**it_current);
-	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click large
-	if((le.KeyPress(KEY_l) || le.MouseClickLeft(buttonSelectLarge)) && largemaps.size())
-	{
-	    curmaps = &largemaps;
-	    it_list_head = curmaps->begin();
-	    it_current = it_list_head;
-	    num_head = 0;
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    backgroundInfo.Restore();
-	    DrawSelectInfo(**it_current);
-	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click xlarge
-	if((le.KeyPress(KEY_x) || le.MouseClickLeft(buttonSelectXLarge)) && xlargemaps.size())
-	{
-	    curmaps = &xlargemaps;
-	    it_list_head = curmaps->begin();
-	    it_current = it_list_head;
-	    num_head = 0;
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    backgroundInfo.Restore();
-	    DrawSelectInfo(**it_current);
-	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click all
-	if((le.KeyPress(KEY_a) || le.MouseClickLeft(buttonSelectAll)) && allmaps.size())
-	{
-	    curmaps = &allmaps;
-	    it_list_head = curmaps->begin();
-	    it_current = it_list_head;
-	    num_head = 0;
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    backgroundInfo.Restore();
-	    DrawSelectInfo(**it_current);
-	    split.SetRange(0, (LISTMAXITEM < curmaps->size() ? curmaps->size() - LISTMAXITEM : 0));
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click list
-	if(le.MouseClickLeft(rectAreaList) && curmaps->size())
-	{
-	    u16 num = (le.MouseReleaseLeft().y - rectAreaList.y) / LISTHEIGHTROW;
-	    if(num >= curmaps->size()) num = curmaps->size() - 1;
-	    if(num_select == num) break;
-	    num_select = num;
-	    cursor.Hide();
-	    backgroundInfo.Restore();
-	    it_current = it_list_head;
-	    while(num--) ++it_current;
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    DrawSelectInfo(**it_current);
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click up
-	if((le.MouseWheelUp(rectAreaList) || le.MouseWheelUp(split.GetRect()) || le.MouseClickLeft(buttonPgUp) ||
-	    le.KeyPress(KEY_PAGEUP) || le.KeyPress(KEY_UP)) &&
-	    curmaps->size() && num_head)
-	{
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    backgroundInfo.Restore();
-	    --it_list_head;
-	    --num_head;
-	    if(le.KeyPress(KEY_UP)) it_current = it_list_head;
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    DrawSelectInfo(**it_current);
-	    split.Backward();
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// click down
-	if((le.MouseWheelDn(rectAreaList) || le.MouseWheelDn(split.GetRect()) || le.MouseClickLeft(buttonPgDn) ||
-	    le.KeyPress(KEY_PAGEDOWN) || le.KeyPress(KEY_DOWN)) &&
-	    LISTMAXITEM < curmaps->size() && num_head + LISTMAXITEM < curmaps->size())
-	{
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    backgroundInfo.Restore();
-	    ++it_list_head;
-	    ++num_head;
-	    if(le.KeyPress(KEY_DOWN)) it_current = it_list_head;
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    DrawSelectInfo(**it_current);
-	    split.Forward();
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// move cursor splitter
-	if(le.MousePressLeft(split.GetRect()) && curmaps->size() > LISTMAXITEM)
-	{
-	    s16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
-
-	    if(seek < split.Min()) seek = split.Min();
-	    else
-	    if(seek > split.Max()) seek = split.Max();
-
-	    it_list_head = curmaps->begin();
-	    num_head = 0;
-	    cursor.Hide();
-	    backgroundList.Restore();
-	    split.Move(seek);
-	    while(seek--){ ++it_list_head; ++num_head; }
-
-	    DrawList(it_list_head, it_current, (LISTMAXITEM > curmaps->size() ? curmaps->size() : LISTMAXITEM));
-	    cursor.Show();
-	    display.Flip();
- 	}
-
-	// right info
-	if(le.MousePressRight(buttonSelectSmall)) Dialog::Message(_("Small Maps"), _("View only maps of size small (36x36)."), Font::BIG);
-	if(le.MousePressRight(buttonSelectMedium)) Dialog::Message(_("Medium Maps"), _("View only maps of size medium (72x72)."), Font::BIG);
-	if(le.MousePressRight(buttonSelectLarge)) Dialog::Message(_("Large Maps"), _("View only maps of size large (108x108)."), Font::BIG);
-	if(le.MousePressRight(buttonSelectXLarge)) Dialog::Message(_("Extra Large Maps"), _("View only maps of size extra large (144x144)."), Font::BIG);
-	if(le.MousePressRight(buttonSelectAll)) Dialog::Message(_("All Maps"), _("View all maps, regardless of size."), Font::BIG);
-	if(le.MousePressRight(countPlayers)) Dialog::Message(_("Players Icon"), _("Indicates how many players total are in the EditScenario. Any positions not occupied by humans will be occupied by computer players."), Font::BIG);
-	if(le.MousePressRight(sizeMaps)) Dialog::Message(_("Size Icon"), _("Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144)."), Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Name"), _("The name of the currently selected map."), Font::BIG);
-	if(le.MousePressRight(victoryCond)) Dialog::Message(_("Victory Condition Icon"), _("There are 6 possiblities: FIXME."), Font::BIG);
-	if(le.MousePressRight(lossCond)) Dialog::Message(_("Loss Condition Icon"), _("There are 4 possible loss conditions, as indicated by the following icons: FIXME."), Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Map Difficulty"), _("The map difficulty of the currently selected map.  The map difficulty is determined by the EditScenario designer. More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player."), Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Description"), _("The description of the currently selected map."), Font::BIG);
-	if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Accept the choice made."), Font::BIG);
-
-	// exit
-	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN)) break;
-    }
-
-    cursor.Hide();
-    background.Restore();
-    
-    cursor.Show();
-
-    return info_maps.size() ? *it_current : NULL;
-}
-*/
