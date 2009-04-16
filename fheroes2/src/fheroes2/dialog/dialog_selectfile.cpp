@@ -33,8 +33,15 @@
 
 extern char *basename(const char *path);
 bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
-void RedrawFileListSimple( const Rect &, const std::string &, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
+void RedrawFileListSimple(const Rect &, const std::string &, const std::string & filename, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
 void RedrawMapsFileList(const Rect &, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
+
+void ResizeToShortName(const std::string & str, std::string & res)
+{
+    res.assign(basename(str.c_str()));
+    size_t it = res.find('.');
+    if(std::string::npos != it) res.resize(it);
+}
 
 bool Dialog::SelectFileSave(std::string & file)
 {
@@ -68,7 +75,7 @@ bool Dialog::SelectFileLoad(std::string & file)
     return SelectFileListSimple(_("File to Load:"), lists, file, false);
 }
 
-bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, std::string & filename, bool editor)
+bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, std::string & result, bool editor)
 {
     // preload
     AGG::PreloadObject(ICN::REQBKG);
@@ -93,8 +100,6 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     Button buttonPgUp(rt.x + 327, rt.y + 55, ICN::REQUEST, 5, 6);
     Button buttonPgDn(rt.x + 327, rt.y + 257, ICN::REQUEST, 7, 8);
 
-    if(lists.empty()) buttonOk.SetDisable(true);
-
     const u8 max_items = 11;
     MapsFileInfoList::iterator top = lists.begin();
     MapsFileInfoList::iterator cur = lists.begin();
@@ -102,8 +107,20 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     Splitter split(AGG::GetICN(ICN::ESCROLL, 3), Rect(rt.x + 330, rt.y + 73, 12, 180), Splitter::VERTICAL);
     split.SetRange(0, (max_items < lists.size() ? lists.size() - max_items : 0));
 
-    RedrawFileListSimple(rt, header, lists, top, cur, max_items);
-    filename.clear();
+    std::string filename;
+
+    if(editor)
+    {
+	filename.assign("newgame");
+	cur = lists.end();
+    }
+    else
+    {
+	if(lists.empty()) buttonOk.SetDisable(true);
+	ResizeToShortName((*cur).FileMaps(), filename);
+    }
+
+    RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
 
     buttonOk.Draw();
     buttonCancel.Draw();
@@ -116,6 +133,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
     bool redraw = false;
+    bool edit_mode = false;
 
     while(le.HandleEvents())
     {
@@ -124,12 +142,104 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
         le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
         le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
-        if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN)){ if(cur != lists.end()) filename = (*cur).FileMaps(); break; };
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ filename.clear(); break; };
+        if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN))
+        {
+    	    if(editor && filename.size())
+		result = Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
+    	    else
+    	    if(cur != lists.end())
+    		result = (*cur).FileMaps();
+    	    break;
+    	}
+    	else
+        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
+        {
+    	    result.clear();
+    	    break;
+	}
 
         if(le.MouseClickLeft(enter_field) && editor)
 	{
-//	    edit_mode = true;
+	    edit_mode = true;
+	    redraw = true;
+	}
+
+	if(edit_mode && le.KeyPress())
+	{
+	    switch(le.KeyValue())
+	    {
+		case KEY_EXCLAIM:	filename += '!'; break;
+		case KEY_QUOTEDBL:	filename += '"'; break;
+		case KEY_HASH:		filename += '#'; break;
+		case KEY_DOLLAR:	filename += '$'; break;
+		case KEY_AMPERSAND:	filename += '&'; break;
+		case KEY_QUOTE:		filename += '\''; break;
+		case KEY_LEFTPAREN:	filename += '('; break;
+		case KEY_RIGHTPAREN:	filename += ')'; break;
+		case KEY_ASTERISK:	filename += '*'; break;
+		case KEY_PLUS:		filename += '+'; break;
+		case KEY_COMMA:		filename += ','; break;
+		case KEY_MINUS:		filename += '-'; break;
+		case KEY_PERIOD:	filename += '.'; break;
+		case KEY_SLASH:		filename += '/'; break;
+		case KEY_COLON:		filename += ':'; break;
+		case KEY_SEMICOLON:	filename += ';'; break;
+		case KEY_LESS:		filename += '<'; break;
+		case KEY_EQUALS:	filename += '='; break;
+		case KEY_GREATER:	filename += '>'; break;
+		case KEY_QUESTION:	filename += '?'; break;
+		case KEY_AT:		filename += '@'; break;
+		case KEY_LEFTBRACKET:	filename += '['; break;
+		case KEY_BACKSLASH:	filename += '\\'; break;
+		case KEY_RIGHTBRACKET:	filename += ']'; break;
+		case KEY_CARET:		filename += '^'; break;
+		case KEY_UNDERSCORE:	filename += '_'; break;
+
+		case KEY_0:	filename += '0'; break;
+		case KEY_1:	filename += '1'; break;
+		case KEY_2:	filename += '2'; break;
+		case KEY_3:	filename += '3'; break;
+		case KEY_4:	filename += '4'; break;
+		case KEY_5:	filename += '5'; break;
+		case KEY_6:	filename += '6'; break;
+		case KEY_7:	filename += '7'; break;
+		case KEY_8:	filename += '8'; break;
+		case KEY_9:	filename += '9'; break;
+		case KEY_a:	filename += 'a'; break;
+		case KEY_b:	filename += 'b'; break;
+		case KEY_c:	filename += 'c'; break;
+		case KEY_d:	filename += 'd'; break;
+		case KEY_e:	filename += 'e'; break;
+		case KEY_f:	filename += 'f'; break;
+		case KEY_g:	filename += 'g'; break;
+		case KEY_h:	filename += 'h'; break;
+		case KEY_i:	filename += 'i'; break;
+		case KEY_j:	filename += 'j'; break;
+		case KEY_k:	filename += 'k'; break;
+		case KEY_l:	filename += 'l'; break;
+		case KEY_m:	filename += 'm'; break;
+		case KEY_n:	filename += 'n'; break;
+		case KEY_o:	filename += 'o'; break;
+		case KEY_p:	filename += 'p'; break;
+		case KEY_q:	filename += 'q'; break;
+		case KEY_r:	filename += 'r'; break;
+		case KEY_s:	filename += 's'; break;
+		case KEY_t:	filename += 't'; break;
+		case KEY_u:	filename += 'u'; break;
+		case KEY_v:	filename += 'v'; break;
+		case KEY_w:	filename += 'w'; break;
+		case KEY_x:	filename += 'x'; break;
+		case KEY_y:	filename += 'y'; break;
+		case KEY_z:	filename += 'z'; break;
+		case KEY_SPACE:	filename += ' '; break;
+
+		case KEY_BACKSPACE: if(filename.size()) filename.resize(filename.size() - 1); break;
+
+		default: break;
+	    }
+
+	    if(filename.empty()) buttonOk.SetDisable(true);
+	    redraw = true;
 	}
 
         if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > lists.begin()))
@@ -207,7 +317,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    {
 		unlink((*cur).FileMaps().c_str());
 		lists.erase(cur);
-		if(lists.empty()) buttonOk.SetDisable(true);
+		if(lists.empty() || filename.empty()) buttonOk.SetDisable(true);
 		top = lists.begin();
 		cur = top;
 		split.SetRange(0, (max_items < lists.size() ? lists.size() - max_items : 0));
@@ -226,7 +336,16 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	if(redraw)
 	{
 	    cursor.Hide();
-	    RedrawFileListSimple(rt, header, lists, top, cur, max_items);
+
+	    if(cur != lists.end())
+	    {
+		ResizeToShortName((*cur).FileMaps(), filename);
+		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
+	    }
+	    else
+	    if(editor)
+		RedrawFileListSimple(rt, header, filename + "_", lists, top, cur, max_items);
+
 	    buttonOk.Draw();
 	    buttonCancel.Draw();
 	    buttonPgUp.Draw();
@@ -242,10 +361,10 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     back.Restore();
     display.Flip();
 
-    return filename.size();
+    return result.size();
 }
 
-void RedrawFileListSimple(const Rect & dst, const std::string & header, const MapsFileInfoList & lists, MapsFileInfoList::const_iterator top, MapsFileInfoList::const_iterator cur, const u8 max_items)
+void RedrawFileListSimple(const Rect & dst, const std::string & header, const std::string & filename, const MapsFileInfoList & lists, MapsFileInfoList::const_iterator top, MapsFileInfoList::const_iterator cur, const u8 max_items)
 {
     Display & display = Display::Get();
     const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
@@ -275,9 +394,9 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const Ma
 	oy += text.h() + 2;
     }
 
-    if(cur != lists.end())
+    if(filename.size())
     {
-	text.Set(basename((*cur).FileMaps().c_str()), Font::BIG);
+	text.Set(filename, Font::BIG);
 	text.Blit(dst.x + 175 - text.w() / 2, dst.y + 289);
     }
 }
