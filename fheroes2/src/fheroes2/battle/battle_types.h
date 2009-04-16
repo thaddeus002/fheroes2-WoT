@@ -81,6 +81,7 @@ namespace Battle
         bool hasRight() const;
         bool hasFortifications() const;
         Race::race_t getRace() const;
+        u32 countBuildings() const;
 
         enum WallStatus {
             UNBROKEN = 0,
@@ -94,7 +95,7 @@ namespace Battle
             BROKEN
         };
         
-        enum {
+        enum CastlePieces {
             FIRST_WALL,
             LEFT_TOWER,
             SECOND_WALL,
@@ -307,7 +308,7 @@ namespace Battle
       private:
         void InitializeLogicSettings(HeroBase *, HeroBase *);
         void NewTurn();
-        void PerformTowerAttack(const Point &, const Point &);
+        void PerformTowerAttack(const Point &, const Point &, BattleCastle::CastlePieces);
         Army::battle_t RunBattle(HeroBase *, HeroBase *);
         bool ShowLeftHeroResults(HeroBase *right, Army::battle_t result);
         u32 CalculateRaisedDead(HeroBase &hero, u32 perished);

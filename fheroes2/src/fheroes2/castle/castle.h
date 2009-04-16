@@ -107,6 +107,8 @@ public:
     bool AllowBuyHero(void);
     bool ContainCoord(const u16 ax, const u16 ay) const;
 
+    u32 CountBuildings(void) const;
+
     void RecruitHero(Heroes*);
     const Heroes* GetHeroes(void) const;
     Heroes* GetHeroes(void);

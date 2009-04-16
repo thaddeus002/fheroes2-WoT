@@ -276,6 +276,20 @@ void Castle::LoadFromMP2(const void *ptr)
     if(Settings::Get().Debug()) Error::Verbose((building & BUILD_CASTLE ? "Castle::LoadFromMP2: castle: " : "Castle::LoadFromMP2: town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
+u32 Castle::CountBuildings(void) const
+{
+    u32 count = 0;
+    u32 flags[] = { BUILD_THIEVESGUILD, BUILD_TAVERN, BUILD_SHIPYARD, BUILD_WELL,
+                    BUILD_STATUE, BUILD_LEFTTURRET, BUILD_RIGHTTURRET,
+                    BUILD_MARKETPLACE, BUILD_WEL2, BUILD_MOAT, BUILD_SPEC,
+                    BUILD_CAPTAIN, BUILD_CASTLE, BUILD_MAGEGUILD1, DWELLING_MONSTER1,
+                    DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4,
+                    DWELLING_MONSTER5, DWELLING_MONSTER6 };
+    for(u8 idx = 0; idx < sizeof(flags) / sizeof(flags[0]); idx++)
+        count += (building & flags[idx]);
+    return count;
+}
+
 const Point & Castle::GetCenter(void) const
 { return mp; }
 

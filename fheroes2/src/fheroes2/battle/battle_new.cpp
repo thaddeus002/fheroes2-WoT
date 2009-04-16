@@ -276,6 +276,11 @@ namespace Battle
 
         RecreateMoat();
     }
+
+    u32 BattleCastle::countBuildings() const
+    {
+        return m_castle.CountBuildings();
+    }
     
     Race::race_t BattleCastle::getRace() const
     {
@@ -944,28 +949,35 @@ void Battle::BattleControl::NewTurn()
         Battle::ComputerTurn *compTurn = (Battle::ComputerTurn *)tempTurn;
         Point attack;
 
+        BattleCastle::CastlePieces piece = BattleCastle::TOWER_KEEP;
+        attack = compTurn->GetMostDangerousOpposingUnit();
+        PerformTowerAttack(attack, castle->getCastlePoint(piece), piece);
+
         if(castle->hasLeft())
         {
+            piece = BattleCastle::LEFT_TOWER;
             attack = compTurn->GetMostDangerousOpposingUnit();
-            PerformTowerAttack(attack, castle->getCastlePoint(BattleCastle::LEFT_TOWER));
+            PerformTowerAttack(attack, castle->getCastlePoint(piece), piece);
         }
         
         if(castle->hasRight())
         {
+            piece = BattleCastle::RIGHT_TOWER;
             attack = compTurn->GetMostDangerousOpposingUnit();
-            PerformTowerAttack(attack, castle->getCastlePoint(BattleCastle::RIGHT_TOWER));
+            PerformTowerAttack(attack, castle->getCastlePoint(piece), piece);
         }
-
-        attack = compTurn->GetMostDangerousOpposingUnit();
-        PerformTowerAttack(attack, castle->getCastlePoint(BattleCastle::TOWER_KEEP));
 
         delete tempTurn;
     }
 }
 
-void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point &from)
+void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point &from, BattleCastle::CastlePieces piece)
 {
-    int damage = 0; //TODO: proper damage value
+    int damage = 0;
+    Army::Troop archer(Monster::ARCHER, m_battlefield.GetCastle()->countBuildings());
+    if(piece != BattleCastle::TOWER_KEEP)
+        archer.SetCount(archer.Count() / 2);
+    
     TroopIndex idx = m_battlefield.FindTroop(m_battlefield.GetArmy(0), attack);
     Army::BattleTroop &troop = m_battlefield.GetTroopFromIndex(idx);
     
@@ -1018,8 +1030,26 @@ void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point 
                 {
                     if(!frame)
                     {
+                        int perished = troop.ApplyDamage(damage);
                         troop.Animate(targetstate);
                         AGG::PlaySound(targetsound);
+                        std::string message = _("%{tower} does %{dmg} damage.");
+                        String::Replace(message, "%{dmg}", damage);
+                        if(perished)
+                        {
+                            std::string creature = troop.GetName(perished);
+                            String::Lower(creature);
+                            message += _("  %{perished} %{creature} %{perish}.");
+                            String::Replace(message, "%{creature}", creature);
+                            String::Replace(message, "%{perished}", perished);
+                            if(perished != 1)
+                                String::Replace(message, "%{perish}", _("perish"));
+                            else String::Replace(message, "%{perish}", _("perishes"));
+                        }
+                        if(piece == BattleCastle::TOWER_KEEP)
+                            String::Replace(message, "%{tower}", "Garrison");
+                        else String::Replace(message, "%{tower}", "Tower");
+                        m_gui->Status(message);
                         frame++;
                     }
                     else if(troop.astate != Monster::AS_NONE) troop.Animate();
@@ -1033,8 +1063,7 @@ void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point 
 
         
     }
-    
-    troop.ApplyDamage(damage);
+            
     m_battlefield.CleanupBodies();
 }
 
@@ -1924,7 +1953,7 @@ namespace Battle
         cursor.SetThemes(cursor.WAR_POINTER);
         cursor.Hide();
         //m_battlefield->Redraw();
-        m_gui->Status("");
+        //m_gui->Status("");
         m_gui->Redraw();
         cursor.Show();
         display.Flip();
@@ -1934,7 +1963,9 @@ namespace Battle
         
         u16 animat = 0;
         Point cur_pt(-1,-1);
-        
+
+        bool mouseMotion = false;
+
         // dialog menu loop
         while(le.HandleEvents())
         {
@@ -1948,15 +1979,6 @@ namespace Battle
                     army1[i].SetCount(0);
                 return GUI::NONE;
             }
-            if(le.KeyPress(KEY_BACKSLASH))
-            {
-                for(u16 i = 0; i < army1.size(); i++)
-                {
-                    army1[i].SetReflect(!army1[i].IsReflected());
-                    if(army1[i].isWide() && army1[i].WasReflected() != army1[i].IsReflected())
-                        army1[i].SetPosition(army1[i].Position() + Point( army1[i].WasReflected() ? -1 : 1, 0 ));
-                }
-            }
             if(le.KeyPress(KEY_f) && m_battlefield->GetCatapult())
             {
                 m_battlefield->GetCatapult()->Fire(*m_battlefield, *m_battlefield->GetCastle());
@@ -1966,6 +1988,10 @@ namespace Battle
                 m_gui->Redraw();
                 display.Flip();
             }
+
+            if(!mouseMotion && !le.MouseMotion())
+                continue;
+            else mouseMotion = true;
 
             bool mouseActive = false;
             GUI::interaction_t interaction = m_gui->Interact(m_battlefield->GetIndexFromTroop(myTroop), m_spell, *m_battlefield, mouseActive);
@@ -2965,8 +2991,11 @@ namespace Battle
         static std::string str1, str2;
         if(!secondOnly)
         {
-            str1 = str2;
-            str2 = str;
+            if(str2 != str)
+            {
+                str1 = str2;
+                str2 = str;
+            }
         }
         else
         {
