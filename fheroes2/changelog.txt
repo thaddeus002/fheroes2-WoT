@@ -1,4 +1,4 @@
-SVN - up to r962
+SVN - up to r1006
 
 Users
 + Added glowing outlines around currently selected monster in battles.
@@ -17,6 +17,18 @@ Users
 + Screenshots now save to files/screenshot_[time].(png|bmp)
 + Starting monster stack sizes are now more in line with Heroes II defaults.
 + Added an info window in the status bar when collecting resources.
++ Added support for Diplomacy skill: monsters will now offer to join you
+  if your army is powerful enough.
++ Saving and loading of games has been implemented, as has autosave
+  (configured in fheroes2.cfg)
++ Fixed various bugs with heroes learning spells when entering a castle
+  and class-specific starting spells. 
++ Fixed a bug in which the computer would take over certain battles in which
+  a hero or captain was not present. This fixes the map Revolution, among others.
++ The keep and towers will now deal appropriate damage in castle battles.
++ Battle status messages are now visible for longer.
++ Heroes now level up at game start as they do in HoMM II.
++ Fixed a bug causing heroes to gain levels in multiple primary skills on levelup.
 
 Developers
 + Added wrapper library around SDL_net and networking client/server examples.
