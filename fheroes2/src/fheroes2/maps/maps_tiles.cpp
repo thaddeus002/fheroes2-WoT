@@ -1564,6 +1564,9 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 
         addon->index = index;
         general = MP2::OBJ_MONSTER;
+
+        if(Rand::Get(0, 10) <= 2) // 20% chance of joining player with 2x greater force
+            flags |= JOINER;
     }
     else
         Error::Warning("Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: ", maps_index);
@@ -1733,6 +1736,11 @@ void Maps::Tiles::ClearFog(u8 color)
 bool Maps::Tiles::NeedRedraw(void) const
 {
     return flags & REDRAW;
+}
+
+bool Maps::Tiles::IsJoiner(void) const
+{
+    return flags & JOINER;
 }
 
 void Maps::Tiles::SetRedraw(bool f)

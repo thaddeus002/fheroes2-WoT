@@ -57,7 +57,7 @@ namespace Maps
     enum flags_t
     {
 	REDRAW	= 0x01,	// reserved
-	USR2	= 0x02,
+	JOINER	= 0x02,
 	USR4	= 0x04,
 	USR8	= 0x08
     };
@@ -137,6 +137,8 @@ namespace Maps
 	bool isFog(u8 color) const;
 	void SetFog(u8 color);
 	void ClearFog(u8 color);
+
+        bool IsJoiner(void) const;
 
 	bool NeedRedraw(void) const;
 	void SetRedraw(bool);

@@ -479,15 +479,13 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     u32 ownRatio, otherRatio;
     hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
 
-    // FIXME: it is necessary to set when loading map,
-    bool join_free = (Rand::Get(0, 10) <= 2); // FIXME: and always false (join cost) for if the editor set the number or participated in the battle
     bool ext_conditions = (hero.GetArmy().GetCount() < ARMYMAXTROOPS || hero.GetArmy().HasMonster(monster));
 
     if(ext_conditions && ownRatio / otherRatio >= 2)
     {
         if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: possible " + hero.GetName() + " join monster " + monster.GetName());
         
-        if(join_free)
+        if(tile.IsJoiner())
         {
             std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
             std::string monst = monster.GetMultiName();

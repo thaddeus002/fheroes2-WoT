@@ -228,14 +228,13 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     u32 ownRatio, otherRatio;
     hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
 
-    bool join_free = (Rand::Get(0, 10) <= 2); // FIXME: see Heroes::ActionToMonster
     bool ext_conditions = (hero.GetArmy().GetCount() < ARMYMAXTROOPS || hero.GetArmy().HasMonster(monster));
 
     if(ext_conditions && ownRatio / otherRatio >= 2)
     {
         if(Settings::Get().Debug()) Error::Verbose("AIToMonster: possible " + hero.GetName() + " join monster " + monster.GetName());
 
-        if(join_free)
+        if(tile.IsJoiner())
         {
             // join if ranged or flying monsters present
             if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
