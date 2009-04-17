@@ -107,7 +107,7 @@ static const struct
 	{     6,   6,   3,   4,  25,   Speed::AVERAGE,   4, _("Mummy")          , _("Mummies") },
 	{     6,   6,   3,   4,  30,      Speed::FAST,   4, _("Royal Mummy")    , _("Royal Mummies") },
 	{     8,   6,   5,   7,  30,   Speed::AVERAGE,   3, _("Vampire")        , _("Vampires") },
-	{     8,   6,   5,   7,  40,      Speed::FAST,   3, _("Lord Vampire")   , _("Lord Vampires") },
+	{     8,   6,   5,   7,  40,      Speed::FAST,   3, _("Vampire Lord")   , _("Vampire Lords") },
 	{     7,  12,   8,  10,  25,      Speed::FAST,   2, _("Lich")           , _("Liches") },
 	{     7,  13,   8,  10,  35,  Speed::VERYFAST,   2, _("Power Lich")     , _("Power Liches") }, 
 	{    11,   9,  25,  45, 150,   Speed::AVERAGE,   1, _("Bone Dragon")    , _("Bone Dragons") },
