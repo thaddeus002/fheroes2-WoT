@@ -71,6 +71,7 @@
 #define DEFAULT_WZRD_KNOWLEDGE	2
 
 typedef std::vector<Artifact::artifact_t> BagArtifacts;
+class Recruits;
 
 class HeroBase : public Skill::Primary, public BitModes
 {
@@ -257,6 +258,7 @@ public:
     static u32 GetExperienceFromLevel(u8 lvl);
 
 private:
+    friend class Recruits;
     friend void Game::SaveXML(const std::string &);
     friend void Game::LoadXML(const std::string &);
     void LevelUp(bool autoselect = false);

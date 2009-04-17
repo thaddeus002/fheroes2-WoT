@@ -25,8 +25,8 @@
 #include "difficulty.h"
 #include "color.h"
 #include "race.h"
-#include "kingdom.h"
 #include "gamedefs.h"
+#include "kingdom_defines.h"
 #include "game_io.h"
 
 namespace Maps

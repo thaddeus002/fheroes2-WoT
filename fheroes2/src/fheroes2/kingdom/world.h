@@ -35,6 +35,7 @@
 class Heroes;
 class Castle;
 class Kingdom;
+class Recruits;
 class Radar;
 
 namespace GameEvent
@@ -42,11 +43,6 @@ namespace GameEvent
     class Day;
     class Coord;
     class Riddle;
-};
-
-struct Recruits : public std::pair<Heroes*, Heroes*>
-{
-    Recruits() : std::pair<Heroes*, Heroes*>(NULL, NULL){};
 };
 
 #define DAYOFWEEK       7 
@@ -88,13 +84,13 @@ public:
     Castle * GetCastle(u16 maps_index);
     Castle * GetCastle(u8 ax, u8 ay) const;
 
+    const Heroes * GetHeroes(Heroes::heroes_t) const;
     const Heroes * GetHeroes(u16 maps_index) const;
     const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); };
+    Heroes * GetHeroes(Heroes::heroes_t);
     Heroes * GetHeroes(u16 maps_index);
     Heroes * GetHeroes(u8 ax, u8 ay) const;
     Heroes * FromJail(u16);
-
-    Recruits & GetRecruits(Color::color_t);
 
     Surface & GetUltimateArtifactArea(void);
     u16 GetUltimateArtifactIndex(void);
@@ -142,14 +138,15 @@ public:
     const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;
     GameEvent::Riddle* GetSphinx(const u16 index) const;
 
+    Heroes* GetFreemanHeroes(Race::race_t rc = Race::BOMG) const;
+    void UpdateRecruits(Recruits &) const;
+
     static u32 GetUniq(void){ return ++uniq0; };
 
 protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
-    void UpdateRecruits(void);
     void GetObjectIndexes(std::vector<u16> &, MP2::object_t, bool) const;
-    Heroes* GetFreemanHeroes(Race::race_t rc = Race::BOMG);
 
 private:
     World() : Size(0, 0), ultimate_artifact_area(448, 448), width(Size::w), height(Size::h) {};
@@ -160,7 +157,7 @@ private:
     friend class Radar;
     friend void Game::SaveXML(const std::string &);
     friend void Game::LoadXML(const std::string &);
-    
+
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;
     std::vector<GameEvent::Day *>       vec_eventsday;
@@ -170,7 +167,6 @@ private:
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
 
-    std::map<Color::color_t, Recruits>	map_recruits;
     std::map<u16, std::string>		map_sign;
 
     // index, object, color

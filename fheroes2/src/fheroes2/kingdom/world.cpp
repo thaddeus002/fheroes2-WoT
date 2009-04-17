@@ -1052,6 +1052,16 @@ Castle * World::GetCastle(u8 ax, u8 ay) const
     return NULL;
 }
 
+Heroes * World::GetHeroes(Heroes::heroes_t id)
+{
+    return vec_heroes[id];
+}
+
+const Heroes * World::GetHeroes(Heroes::heroes_t id) const
+{
+    return vec_heroes[id];
+}
+
 /* get heroes from index maps */
 Heroes * World::GetHeroes(u16 maps_index)
 {
@@ -1106,8 +1116,6 @@ void World::NewDay(void)
 
 void World::NewWeek(void)
 {
-    UpdateRecruits();
-    
     UpdateDwellingPopulation();
 
     UpdateMonsterPopulation();
@@ -1198,7 +1206,6 @@ void World::Reset(void)
     vec_heroes.clear();
 
     // extra
-    map_recruits.clear();
     map_sign.clear();
     map_captureobj.clear();
 
@@ -1221,7 +1228,7 @@ void World::Reset(void)
     vec_heroes.reserve(HEROESMAXCOUNT + 2);
 }
 
-Heroes* World::GetFreemanHeroes(Race::race_t rc)
+Heroes* World::GetFreemanHeroes(Race::race_t rc) const
 {
     u8 min = 0;
     u8 max = 0;
@@ -1711,47 +1718,6 @@ const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const u16 in
     return NULL;
 }
 
-Recruits & World::GetRecruits(Color::color_t color)
-{
-    Recruits & recruits = map_recruits[color];
-
-    if(NULL == recruits.first || (recruits.first && !recruits.first->isFreeman())) recruits.first = GetFreemanHeroes(GetKingdom(color).GetRace());
-    if(NULL == recruits.second || (recruits.second && !recruits.second->isFreeman())) recruits.second = GetFreemanHeroes();
-
-    if(recruits.second == recruits.first)
-    {
-	if(2 < std::count_if(vec_heroes.begin(), vec_heroes.end(), PredicateHeroesIsFreeman))
-	    while(recruits.second == recruits.first) recruits.second = GetFreemanHeroes();
-	else
-	    recruits.second = NULL;
-    }
-
-    return recruits;
-}
-
-void World::UpdateRecruits(void)
-{
-    for(Color::color_t color = Color::BLUE; color < Color::GRAY; ++color)
-    {
-	Kingdom & kingdom = GetKingdom(color);
-	Recruits & recruits = GetRecruits(color);
-
-	if(kingdom.isPlay())
-	{
-	    recruits.first = GetFreemanHeroes(kingdom.GetRace());
-	    recruits.second = GetFreemanHeroes();
-
-	    if(recruits.second == recruits.first)
-	    {
-		if(2 < std::count_if(vec_heroes.begin(), vec_heroes.end(), PredicateHeroesIsFreeman))
-		    while(recruits.second == recruits.first) recruits.second = GetFreemanHeroes();
-		else
-		    recruits.second = NULL;
-	    }
-	}
-    }
-}
-
 void World::StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & store)
 {
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
@@ -1879,4 +1845,12 @@ void World::GetObjectIndexes(std::vector<u16> & v, MP2::object_t obj, bool check
 u8 World::CountPlayKingdoms(void) const
 {
     return std::count_if(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::isPlay));
+}
+
+void World::UpdateRecruits(Recruits & recruits) const
+{
+    if(2 < std::count_if(vec_heroes.begin(), vec_heroes.end(), PredicateHeroesIsFreeman))
+        while(recruits.GetID1() == recruits.GetID2()) recruits.SetHero2(GetFreemanHeroes());
+    else
+        recruits.SetHero2(NULL);
 }

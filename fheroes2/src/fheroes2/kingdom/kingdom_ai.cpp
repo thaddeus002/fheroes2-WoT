@@ -115,11 +115,11 @@ void Kingdom::AITurns(void)
     // buy hero in capital
     if(heroes.empty() && ai_capital && ai_capital->isCastle())
     {
-	const Recruits & recruits = world.GetRecruits(GetColor());
+	Recruits & rec = GetRecruits();
 
-	if(recruits.first) ai_capital->RecruitHero(recruits.first);
+	if(rec.GetHero1()) ai_capital->RecruitHero(rec.GetHero1());
 	else
-	if(recruits.second) ai_capital->RecruitHero(recruits.second);
+	if(rec.GetHero2()) ai_capital->RecruitHero(rec.GetHero2());
 
 	Heroes *hero = ai_capital->GetHeroes();
 

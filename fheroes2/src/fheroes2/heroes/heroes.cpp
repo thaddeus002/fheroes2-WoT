@@ -1711,7 +1711,7 @@ bool Heroes::isFreeman(void) const
 
 void Heroes::SetFreeman(const u8 reason)
 {
-    if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetRecruits(color).second = this;
+    if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetKingdom(color).GetRecruits().SetHero2(this);
     if(Army::LOSE == reason || Army::RETREAT == reason) army.Reset();
 
     color = Color::GRAY;

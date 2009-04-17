@@ -29,6 +29,7 @@
 #include "world.h"
 #include "visit.h"
 #include "battle.h"
+#include "kingdom_defines.h"
 #include "kingdom.h"
 
 Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
@@ -190,6 +191,8 @@ void Kingdom::ActionNewWeek(void)
 	    resource.gold += 5000;
 	}
     }
+
+    UpdateRecruits();
 }
 
 void Kingdom::ActionNewMonth(void)
@@ -366,4 +369,27 @@ void Kingdom::FreeAllHeroes(void)
     std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetFreeman), Army::SURRENDER));
 
     heroes.clear();
+}
+
+Recruits & Kingdom::GetRecruits(void)
+{
+    // update hero1
+    if(Heroes::UNKNOWN == recruits.GetID1() || (recruits.GetHero1() && !recruits.GetHero1()->isFreeman()))
+	recruits.SetHero1(world.GetFreemanHeroes(GetRace()));
+
+    // update hero2
+    if(Heroes::UNKNOWN == recruits.GetID2() || (recruits.GetHero2() && !recruits.GetHero2()->isFreeman()))
+	recruits.SetHero2(world.GetFreemanHeroes());
+
+    if(recruits.GetID1() == recruits.GetID2()) world.UpdateRecruits(recruits);
+
+    return recruits;
+}
+
+void Kingdom::UpdateRecruits(void)
+{
+    recruits.SetHero1(world.GetFreemanHeroes(GetRace()));
+    recruits.SetHero2(world.GetFreemanHeroes());
+
+    if(recruits.GetID1() == recruits.GetID2()) world.UpdateRecruits(recruits);
 }

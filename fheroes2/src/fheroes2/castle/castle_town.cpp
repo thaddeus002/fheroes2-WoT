@@ -771,18 +771,21 @@ Castle::building_t Castle::OpenTown(void)
 	cursorFormat.Show(Modes(ARMYSPREAD) ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
-    const bool many_hero = world.GetMyKingdom().GetHeroes().size() == KINGDOMMAXHEROES;
+    Kingdom & kingdom = world.GetMyKingdom();
+
+    const bool many_hero = kingdom.GetHeroes().size() == KINGDOMMAXHEROES;
     const bool allow_buy_hero = AllowBuyHero();
 
-    const Recruits & recruits = world.GetRecruits(GetColor());
+    Heroes* hero1 = kingdom.GetRecruits().GetHero1();
+    Heroes* hero2 = kingdom.GetRecruits().GetHero2();
 
     // first hero
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 260;
     const Rect rectHero1(dst_pt, 102, 93);
-    if(recruits.first)
+    if(hero1)
     {
-	display.Blit(recruits.first->GetPortrait101x93(), dst_pt);
+	display.Blit(hero1->GetPortrait101x93(), dst_pt);
     }
     else
 	display.FillRect(0, 0, 0, rectHero1);
@@ -798,9 +801,9 @@ Castle::building_t Castle::OpenTown(void)
     dst_pt.x = cur_pt.x + 443;
     dst_pt.y = cur_pt.y + 362;
     const Rect rectHero2(dst_pt, 102, 94);
-    if(recruits.second)
+    if(hero2)
     {
-	display.Blit(recruits.second->GetPortrait101x93(), dst_pt);
+	display.Blit(hero2->GetPortrait101x93(), dst_pt);
     }
     else
 	display.FillRect(0, 0, 0, rectHero2);
@@ -964,18 +967,18 @@ Castle::building_t Castle::OpenTown(void)
             ResetModes(ARMYSPREAD);
         }
 	else
-	if(recruits.first && le.MouseClickLeft(rectHero1) &&
-	    Dialog::OK == DialogBuyHero(recruits.first))
+	if(hero1 && le.MouseClickLeft(rectHero1) &&
+	    Dialog::OK == DialogBuyHero(hero1))
         {
-    	    RecruitHero(recruits.first);
+    	    RecruitHero(hero1);
 
     	    return BUILD_NOTHING;
         }
 	else
-	if(recruits.second && le.MouseClickLeft(rectHero2) &&
-	    Dialog::OK == DialogBuyHero(recruits.second))
+	if(hero2 && le.MouseClickLeft(rectHero2) &&
+	    Dialog::OK == DialogBuyHero(hero2))
         {
-    	    RecruitHero(recruits.second);
+    	    RecruitHero(hero2);
 
 	    return BUILD_NOTHING;
         }
@@ -1024,9 +1027,9 @@ Castle::building_t Castle::OpenTown(void)
         else
 	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 	else
-	if(recruits.first && le.MousePressRight(rectHero1)){ recruits.first->OpenDialog(true); cursor.Show(); display.Flip(); }
+	if(hero1 && le.MousePressRight(rectHero1)){ hero1->OpenDialog(true); cursor.Show(); display.Flip(); }
 	else
-	if(recruits.second && le.MousePressRight(rectHero2)){ recruits.second->OpenDialog(true); cursor.Show(); display.Flip(); }
+	if(hero2 && le.MousePressRight(rectHero2)){ hero2->OpenDialog(true); cursor.Show(); display.Flip(); }
 
         // status info
 	if(le.MouseCursor(rectDwelling1))
@@ -1128,8 +1131,8 @@ Castle::building_t Castle::OpenTown(void)
 	if(le.MouseCursor(rectCaptain))
 	    ShowBuildMessage(statusBar, BUILD_CAPTAIN & building, stringCaptain, *this, BUILD_CAPTAIN);
 	else
-	if((recruits.first && le.MouseCursor(rectHero1)) ||
-	   (recruits.second && le.MouseCursor(rectHero2)))
+	if((hero1 && le.MouseCursor(rectHero1)) ||
+	   (hero2 && le.MouseCursor(rectHero2)))
 	{
 	    if(many_hero)
 		statusBar.ShowMessage(_("Cannot recruit - you have too many Heroes."));
@@ -1143,16 +1146,16 @@ Castle::building_t Castle::OpenTown(void)
 	    if(le.MouseCursor(rectHero1))
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
-		String::Replace(str, "%{name}", recruits.first->GetName());
-		String::Replace(str, "%{race}", Race::String(recruits.first->GetRace()));
+		String::Replace(str, "%{name}", hero1->GetName());
+		String::Replace(str, "%{race}", Race::String(hero1->GetRace()));
 	    	statusBar.ShowMessage(str);
 	    }
 	    else
 	    if(le.MouseCursor(rectHero2))
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
-		String::Replace(str, "%{name}", recruits.second->GetName());
-		String::Replace(str, "%{race}", Race::String(recruits.second->GetRace()));
+		String::Replace(str, "%{name}", hero2->GetName());
+		String::Replace(str, "%{race}", Race::String(hero2->GetRace()));
 	    	statusBar.ShowMessage(str);
 	    }
 	}

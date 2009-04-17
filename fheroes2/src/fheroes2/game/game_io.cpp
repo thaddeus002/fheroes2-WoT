@@ -490,9 +490,8 @@ void Game::SaveXML(const std::string &fn)
 
 	TiXmlElement* recruits = new TiXmlElement("recruits");
 	kingdom2->LinkEndChild(recruits);
-	const Recruits & rec = world.map_recruits[kingdom.color];
-	recruits->SetAttribute("hero1", (rec.first ? rec.first->portrait : Heroes::UNKNOWN));
-	recruits->SetAttribute("hero2", (rec.second ? rec.second->portrait : Heroes::UNKNOWN));
+	recruits->SetAttribute("hero1", kingdom.recruits.GetID1());
+	recruits->SetAttribute("hero2", kingdom.recruits.GetID2());
     }
 
     // signs
@@ -1137,11 +1136,10 @@ void Game::LoadXML(const std::string &fn)
 	TiXmlElement* recruits = kingdom2->FirstChildElement("recruits");
 	if(recruits)
 	{
-	    Recruits & rec = world.map_recruits[kingdom->color];
 	    recruits->Attribute("hero1", &res);
-	    rec.first = (res < Heroes::UNKNOWN ? world.GetHeroes(Heroes::ConvertID(res)) : NULL);
+	    kingdom->recruits.SetID1(res);
 	    recruits->Attribute("hero2", &res);
-	    rec.second = (res < Heroes::UNKNOWN ? world.GetHeroes(Heroes::ConvertID(res)) : NULL);
+	    kingdom->recruits.SetID2(res);
 	}
 	world.vec_kingdoms.push_back(kingdom);
     }
