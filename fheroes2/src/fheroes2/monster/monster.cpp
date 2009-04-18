@@ -790,7 +790,6 @@ Monster::monster_t Monster::FromMaps(const Maps::Tiles & tile)
 
 Monster::monster_t Monster::Rand(level_t level)
 {
-    return (monster_t)(GHOST - 1);
     switch(level)
     {
 	case LEVEL0: return FromInt(Rand::Get(PEASANT, WATER_ELEMENT));
