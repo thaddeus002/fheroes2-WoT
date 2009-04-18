@@ -29,6 +29,8 @@ Users
 + Battle status messages are now visible for longer.
 + Heroes now level up at game start as they do in HoMM II.
 + Fixed a bug causing heroes to gain levels in multiple primary skills on levelup.
++ Genies now have 9% chance to halve the size of any troop attacked in battle.
++ Ghosts gain 1 unit for every unit they kill.
 
 Developers
 + Added wrapper library around SDL_net and networking client/server examples.

@@ -1414,7 +1414,7 @@ long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, c
 {
     if(attacker.GetID() == Monster::GENIE && Rand::Get(0, 100) < 9)
     {
-        u32 half = defender.Count() / 2;
+        u32 half = static_cast<u32>(defender.Count() * 1.0f / 2 + 0.5f);
         long damage = (half - 1) * defender.Monster::GetHitPoints() + defender.GetHitPoints();
         return damage;
     }
