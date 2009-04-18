@@ -186,6 +186,7 @@ namespace Battle
         bool CellFreeFor(const Point &, const Army::BattleTroop &, TroopIndex skip=99);
         PointList *FindPath(const Point& , const Point &, int , const Army::BattleTroop &, TroopIndex);
 
+        bool IsRangedAttackBlocked(const Army::BattleTroop &, const Army::BattleTroop &);
         int CanAttack(const Army::BattleTroop &, const PointList &, const Army::BattleTroop &, const Point &);
         bool IsTroopCloseTo(const Army::BattleTroop &, const Army::BattleTroop &);
 

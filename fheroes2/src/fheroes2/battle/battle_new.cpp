@@ -973,10 +973,10 @@ void Battle::BattleControl::NewTurn()
 
 void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point &from, BattleCastle::CastlePieces piece)
 {
-    int damage = 0;
     Army::Troop archer(Monster::ARCHER, m_battlefield.GetCastle()->countBuildings());
     if(piece != BattleCastle::TOWER_KEEP)
         archer.SetCount(archer.Count() / 2);
+    long damage = Rand::Get(archer.GetDamageMin(), archer.GetDamageMax());
     
     TroopIndex idx = m_battlefield.FindTroop(m_battlefield.GetArmy(0), attack);
     Army::BattleTroop &troop = m_battlefield.GetTroopFromIndex(idx);
@@ -1412,17 +1412,24 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
 
 long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, const Army::BattleTroop &defender)
 {
-    long damage = attacker.GetDamageVersus(defender); 
+    long damage = attacker.GetDamageVersus(defender);
 
-    bool inMoat = m_battlefield.GetCastle() ? m_battlefield.GetCastle()->IsCellInMoat(defender.Position()) : false;
     u8 defense = defender.GetDefense();
-    if(inMoat)
+
+    if(m_battlefield.GetCastle())
     {
-        if(defense - 3 > 0)
-            defense -= 3;
-        else defense = 1;
+        if(m_battlefield.GetCastle()->IsCellInMoat(defender.Position()))
+        {
+            if(defense - 3 > 0)
+                defense -= 3;
+            else defense = 1;
+        }
+
+        if(attacker.Modes(Army::HANDFIGHTING))
+            if(m_battlefield.IsRangedAttackBlocked(attacker, defender))
+                damage /= 2;
     }
-    
+
     float d = attacker.GetAttack() - defense;
     d *= d > 0 ? 0.1f : 0.05f;
     if(d < -0.3f)
@@ -1629,6 +1636,7 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
         if(targetTroop.CanRetaliateAgainst(myTroop))
             retaliate = true;
     }
+    else myTroop.ResetModes(Army::HANDFIGHTING);
 
     bool ranged = myTroop.isArchers() && myTroop.shots > 0 && !myTroop.Modes(Army::HANDFIGHTING);
 
@@ -1989,7 +1997,7 @@ namespace Battle
                 display.Flip();
             }
 
-            if(!mouseMotion && !le.MouseMotion())
+            if(!(mouseMotion || le.MouseMotion() || le.MouseLeft() || le.MouseRight()))
                 continue;
             else mouseMotion = true;
 
@@ -2041,7 +2049,10 @@ namespace Battle
                         String::Replace(str, "%{value}", myTroop.shots);
                         m_gui->Status(str, true);
                         m_gui->Redraw();
-                        cursor.SetThemes(cursor.WAR_ARROW);
+                        if(m_battlefield->IsRangedAttackBlocked(myTroop, (*m_oppArmy)[t]))
+                            cursor.SetThemes(cursor.WAR_BROKENARROW);
+                        else
+                            cursor.SetThemes(cursor.WAR_ARROW);
                         if(click) {
                             attack = cur_pt;
                             return GUI::NONE;
@@ -2677,7 +2688,8 @@ namespace Battle
             return false;
         if(t = FindTroop(*m_army[1], p), t >= 0 && (*m_army[1])[t].Count() > 0 && (skip >= 0 || ApplyIndexModifier(skip) != t)) 
             return false;
-        for(u16 i = 0; i < m_blockedCells.size(); i++) if(p == m_blockedCells[i]) return false;
+        if(std::find(m_blockedCells.begin(), m_blockedCells.end(), p) != m_blockedCells.end())
+            return false;
 
         BattleCastle *castle = GetCastle();
         if(castle)
@@ -2886,6 +2898,37 @@ namespace Battle
             default:
                 break;
         }
+    }
+
+    /** Determine if there are any obstructions between an attacker and a target troop.
+     *  \param attacker Attacking troop.
+     *  \param defender Defending troop.
+     */
+    bool Battlefield::IsRangedAttackBlocked(const Army::BattleTroop &attacker, const Army::BattleTroop &defender)
+    {
+        if(!GetCastle())
+            return false;
+        
+        Point delta = defender.Position() - attacker.Position();
+        if(delta.x < 0) // the defender in a castle gets no penalty
+            return false;
+        
+        const s16 dX = delta.x;
+        delta.x /= std::max(dX, delta.y);
+        delta.y /= std::max(dX, delta.y);
+        Point cur = attacker.Position();
+        bool found = false;
+        while(!found && cur.x < defender.Position().x)
+        {
+            for(u16 i = 0; i < MAX_CASTLE_PARTS; i++)
+            {
+                Point p = GetCastle()->getCastlePoint(i);
+                if(GetCastle()->getCastlePoint(i) == cur)
+                    found = true;
+            }
+            cur += delta;
+        }
+        return found;
     }
 
     void Battlefield::RedrawBackground(const PointList *movePoints, const Army::BattleTroop *troop)
