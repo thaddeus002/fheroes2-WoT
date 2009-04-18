@@ -991,7 +991,7 @@ void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point 
         int maxind = AGG::GetICNCount(ICN::KEEP);
         double angle = M_PI_2 - atan2(-delta.y, delta.x);
         icnframe = (int)(angle/M_PI * maxind);
-
+        
         Monster::animstate_t targetstate;
         M82::m82_t targetsound;
         if(troop.IsDamageFatal(damage)) {
@@ -1024,7 +1024,7 @@ void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point 
                         state++;
                         frame = 0;
                     }
-                    display.Blit(AGG::GetICN(ICN::KEEP, icnframe, true), start);
+                    display.Blit(AGG::GetICN(ICN::KEEP, abs(icnframe), icnframe < 0), start);
                 }
                 else if(state == MISSILE_IMPACT)
                 {
@@ -1412,6 +1412,13 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
 
 long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, const Army::BattleTroop &defender)
 {
+    if(attacker.GetID() == Monster::GENIE && Rand::Get(0, 100) < 9)
+    {
+        u32 half = defender.Count() / 2;
+        long damage = (half - 1) * defender.Monster::GetHitPoints() + defender.GetHitPoints();
+        return damage;
+    }
+    
     long damage = attacker.GetDamageVersus(defender);
 
     u8 defense = defender.GetDefense();
@@ -1439,6 +1446,7 @@ long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, c
     damage = (long)(((float)damage) * (1 + d));
     if(damage < 1)
         damage = 1;
+
     return damage;
 }
 
@@ -1475,6 +1483,9 @@ bool Battle::BattleControl::PerformAttackLogic(Army::BattleTroop &attacker, cons
         }
         m_perished += tempPerished;
     }
+
+    if(attacker.GetID() == Monster::GHOST)
+        attacker.SetCount(attacker.Count() + perished);
 
     if(ranged) attacker.shots --;
 
@@ -1649,20 +1660,33 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
 
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
-        std::string status = _("%{name} %{does} %{value} damage.");
-        if(myTroop.Count() == 1)
-            String::Replace(status, "%{does}", _("does"));
-        else String::Replace(status, "%{does}", _("do"));
-        std::string name = myTroop.GetName();
-        String::Replace(status, "%{name}", name);
-        String::Replace(status, "%{value}", damage);
+        std::string status;
+        
+        // Heuristic for genies halving monster stack
+        if(myTroop.GetID() == Monster::GENIE && abs(targetTroop.Count() - perished) <= 1)
+        {
+            status = _("%{name} %{destroys} half the enemy troops!");
+            if(myTroop.Count() == 1)
+                String::Replace(status, "%{destroys}", _("destroys"));
+            else String::Replace(status, "%{destroys}", _("destroy"));
+            String::Replace(status, "%{name}", myTroop.GetName());
+        }
+        else
+        {
+            status = _("%{name} %{does} %{value} damage.");
+            if(myTroop.Count() == 1)
+                String::Replace(status, "%{does}", _("does"));
+            else String::Replace(status, "%{does}", _("do"));
+            String::Replace(status, "%{name}", myTroop.GetName());
+            String::Replace(status, "%{value}", damage);
+        }
         
         if(perished)
         {
             std::string addon = _(" %{value} %{name} %{perishes}.");
             if(perished == 1)
-                String::Replace(addon, "%{perishes}", "perishes");
-            else String::Replace(addon, "%{perishes}", "perish");
+                String::Replace(addon, "%{perishes}", _("perishes"));
+            else String::Replace(addon, "%{perishes}", _("perish"));
     	    String::Replace(addon, "%{value}", perished);
             std::string name = targetTroop.GetName(perished);
             String::Lower(name);
